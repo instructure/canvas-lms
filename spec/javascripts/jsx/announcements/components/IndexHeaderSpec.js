@@ -217,3 +217,11 @@ test('clicking delete announcements button should show a confirm modal', (assert
     done()
   })
 })
+
+test('does not renders lock announcements button if announcements are globally locked', () => {
+  const tree = mount(
+    <IndexHeader {...makeProps({ announcementsLocked: true, permissions: { manage_content: true } })} />
+  )
+  const node = tree.find('#lock_announcements')
+  notOk(node.exists())
+})

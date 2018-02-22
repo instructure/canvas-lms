@@ -158,8 +158,22 @@ module CanvasRails
       end
     end
 
+    module TypeMapInitializerExtensions
+      def query_conditions_for_initial_load(type_map)
+        known_type_names = type_map.keys.map { |n| "'#{n}'" } + type_map.keys.map { |n| "'_#{n}'" }
+        <<-SQL % [known_type_names.join(", "),]
+          WHERE
+            t.typname IN (%s)
+        SQL
+      end
+    end
+
     Autoextend.hook(:"ActiveRecord::ConnectionAdapters::PostgreSQLAdapter",
                     PostgreSQLEarlyExtensions,
+                    method: :prepend)
+
+    Autoextend.hook(:"ActiveRecord::ConnectionAdapters::PostgreSQL::OID::TypeMapInitializer",
+                    TypeMapInitializerExtensions,
                     method: :prepend)
 
     SafeYAML.singleton_class.send(:attr_accessor, :safe_parsing)

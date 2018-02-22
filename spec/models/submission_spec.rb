@@ -1932,21 +1932,6 @@ describe Submission do
         expect(submission.originality_data).not_to include :vericite
       end
 
-      it "finds originality data for group assignment submissions" do
-        submission.update_attributes!(attachment_ids: attachment.id.to_s)
-        originality_report
-        submission_two = submission.dup
-        submission_two.update_attributes!(user: User.create!(name: 'second student'))
-        expect(submission_two.originality_data).to eq({
-          attachment.asset_string => {
-            similarity_score: originality_report.originality_score,
-            state: originality_report.state,
-            report_url: originality_report.originality_report_url,
-            status: originality_report.workflow_state
-          }
-        })
-      end
-
       it "finds originality data text entry submissions" do
         submission.update_attributes!(attachment_ids: attachment.id.to_s)
         originality_report.update_attributes!(attachment: nil)
@@ -2023,88 +2008,24 @@ describe Submission do
         group.update_attributes!(users: [user_two, test_student])
 
         submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
+        submission_two = assignment.submit_homework(user_two, submission_type: 'online_upload', attachments: [attachment])
+
+        submission.update!(group: group)
+        submission_two.update!(group: group)
 
         assignment.submissions.each do |s|
           s.update_attributes!(group: group, turnitin_data: {blah: 1})
         end
 
-        OriginalityReport.create!(originality_score: '1', submission: submission, attachment: attachment)
+        report = OriginalityReport.create!(originality_score: '1', submission: submission, attachment: attachment)
+        report.copy_to_group_submissions!
 
-        expect(assignment.submissions.map(&:has_originality_report?).uniq).to match_array [true]
+        expect(assignment.submissions.map(&:has_originality_report?)).to match_array [true, true]
       end
 
       it 'returns false when no reports are present' do
         submission = assignment.submit_homework(test_student, attachments: [attachment])
         expect(submission.has_originality_report?). to eq false
-      end
-    end
-
-    describe '#assignment_group_originality_reports' do
-      let(:test_course) do
-        test_course = course_model
-        test_course.enroll_teacher(test_teacher, enrollment_state: 'active')
-        test_course.enroll_student(test_student, enrollment_state: 'active')
-        test_course
-      end
-      let(:test_teacher) { User.create }
-      let(:test_student) { User.create }
-      let(:assignment) { Assignment.create!(title: 'test assignment', context: test_course) }
-      let(:attachment) { attachment_model(filename: "submission.doc", context: test_student) }
-      let(:report_url) { 'http://www.test-score.com' }
-
-      before do
-        user_two = test_student.dup
-        user_two.update_attributes!(lti_context_id: SecureRandom.uuid)
-        assignment.course.enroll_student(user_two)
-
-        group = group_model(context: assignment.course)
-        group.update_attributes!(users: [user_two, test_student])
-
-        @submission = assignment.submit_homework(
-          test_student,
-          submission_type: 'online_upload',
-          attachments: [attachment]
-        )
-
-        assignment.submissions.each do |s|
-          s.update_attributes!(group: group, turnitin_data: {blah: 1})
-        end
-      end
-
-      it 'returns originality reports from the same submission group' do
-        report = OriginalityReport.create!(originality_score: '1', submission: @submission, attachment: attachment)
-        expect(Submission.last.assignment_group_originality_reports).to match_array [report]
-      end
-
-      it 'does not return reports from another group' do
-        user_three = test_student.dup
-        user_four = test_student.dup
-
-        user_three.update_attributes!(lti_context_id: SecureRandom.uuid)
-        user_four.update_attributes!(lti_context_id: SecureRandom.uuid)
-
-        assignment.course.enroll_student(user_three)
-        assignment.course.enroll_student(user_four)
-
-        group = group_model(context: assignment.course)
-        group.update_attributes!(users: [user_three, user_four])
-
-        second_submission = assignment.submit_homework(
-          user_four,
-          submission_type: 'online_upload',
-          attachments: [attachment]
-        )
-
-        assignment.submissions.each do |s|
-          s.update_attributes!(group: group, turnitin_data: {blah: 1})
-        end
-
-        expect(second_submission.reload.assignment_group_originality_reports).to match_array []
-      end
-
-      it 'includes self originality reports' do
-        report = OriginalityReport.create!(originality_score: '1', submission: @submission, attachment: attachment)
-        expect(@submission.reload.assignment_group_originality_reports).to match_array [report]
       end
     end
 
@@ -2155,23 +2076,24 @@ describe Submission do
 
       it 'treats attachments in submission history as valid' do
         submission = nil
-        attachments = [attachment]
+        first_attachment = attachment
         Timecop.freeze(10.second.ago) do
           submission = assignment.submit_homework(test_student, submission_type: 'online_upload',
-                                     attachments: [attachments[0]])
+                                     attachments: [first_attachment])
         end
 
-        attachments << attachment_model(filename: "submission-b.doc", :context => test_student)
+        attachment = attachment_model(filename: "submission-b.doc", :context => test_student)
         Timecop.freeze(5.second.ago) do
-          submission = assignment.submit_homework test_student, attachments: [attachments[1]]
+          submission = assignment.submit_homework test_student, attachments: [attachment]
         end
 
-        attachments << attachment_model(filename: "submission-c.doc", :context => test_student)
+        attachment = attachment_model(filename: "submission-c.doc", :context => test_student)
         Timecop.freeze(1.second.ago) do
-          submission = assignment.submit_homework test_student, attachments: [attachments[2]]
+          submission = assignment.submit_homework test_student, attachments: [attachment]
         end
 
-        expect(submission.originality_report_url(attachments.first.asset_string, test_teacher)).to eq(report_url)
+        first_history = submission.submission_history.first
+        expect(first_history.originality_report_url(first_attachment.asset_string, test_teacher)).to eq(report_url)
       end
     end
   end

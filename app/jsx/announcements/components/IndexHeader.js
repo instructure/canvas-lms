@@ -61,6 +61,7 @@ export default class IndexHeader extends Component {
     deleteSelectedAnnouncements: func.isRequired,
     applicationElement: func,
     searchInputRef: func,
+    announcementsLocked: bool.isRequired,
   }
 
   static defaultProps = {
@@ -129,7 +130,7 @@ export default class IndexHeader extends Component {
                 />
               </GridCol>
               <GridCol width={6} textAlign="end">
-                {this.props.permissions.manage_content &&
+                {this.props.permissions.manage_content && !this.props.announcementsLocked &&
                   <Button
                     disabled={this.props.isBusy || this.props.selectedCount === 0}
                     size="medium"
@@ -170,7 +171,7 @@ export default class IndexHeader extends Component {
 const connectState = state => Object.assign({
   isBusy: state.isLockingAnnouncements || state.isDeletingAnnouncements,
   selectedCount: state.selectedAnnouncements.length,
-}, select(state, ['contextType', 'contextId', 'permissions', 'atomFeedUrl']))
+}, select(state, ['contextType', 'contextId', 'permissions', 'atomFeedUrl', 'announcementsLocked']))
 const selectedActions = ['searchAnnouncements', 'toggleSelectedAnnouncementsLock', 'deleteSelectedAnnouncements']
 const connectActions = dispatch => bindActionCreators(select(actions, selectedActions), dispatch)
 export const ConnectedIndexHeader = connect(connectState, connectActions)(IndexHeader)

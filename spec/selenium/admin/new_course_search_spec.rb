@@ -58,7 +58,7 @@ describe "new account course search" do
     expect(rows[0]).to include_text(empty_course.name)
     expect(rows[1]).to include_text(not_empty_course.name)
 
-    fj('label:contains("Hide courses without enrollments")').click
+    fj('label:contains("Hide courses without students")').click
     wait_for_loading_to_disappear
 
     rows = get_rows

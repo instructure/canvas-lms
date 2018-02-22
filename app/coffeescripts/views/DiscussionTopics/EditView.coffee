@@ -119,6 +119,7 @@ define [
       super
 
       @lockedItems = options.lockedItems || {}
+      @announcementsLocked = options.announcementsLocked
 
     setRenderSectionsAutocomplete: (func) =>
       @renderSectionsAutocomplete = func
@@ -165,6 +166,7 @@ define [
         lockedItems: @lockedItems
         allow_todo_date: data.todo_date?
         unlocked: if data.locked == undefined then !@isAnnouncement() else !data.locked
+        announcementsLocked: @announcementsLocked
       json.assignment = json.assignment.toView()
       json
 

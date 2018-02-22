@@ -40,6 +40,7 @@ const model = new (isAnnouncement ? Announcement : DiscussionTopic)(ENV.DISCUSSI
 model.urlRoot = ENV.DISCUSSION_TOPIC.URL_ROOT
 const assignment = model.get('assignment')
 
+const announcementsLocked = ENV.ANNOUNCEMENTS_LOCKED
 const sectionList = new SectionCollection(ENV.SECTION_LIST)
 const dueDateList = new DueDateList(assignment.get('assignment_overrides'), sectionList, assignment)
 
@@ -81,7 +82,8 @@ const view = new EditView({
       availabilityDatesReadonly: !!lockedItems.availability_dates
     })
   },
-  lockedItems: model.id ? lockedItems : {}  // if no id, creating a new discussion
+  lockedItems: model.id ? lockedItems : {},  // if no id, creating a new discussion
+  announcementsLocked
 })
 view.setRenderSectionsAutocomplete(() => renderSectionsAutocomplete(view))
 

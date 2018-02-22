@@ -325,7 +325,7 @@ module Api::V1::Submission
   private
 
   def show_originality_reports?(submission)
-    submission.assignment_group_originality_reports.present?
+    submission.originality_reports.present?
   end
 
   def speed_grader_url(submission, assignment, provisional_grade)

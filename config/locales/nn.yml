@@ -9263,11 +9263,11 @@ nn:
           verify: Stadfest
         details: 
           mfa_enrollment: |-
-              Godkjenning med fleire faktorar aukar tryggleiken ved at du må ha ei fysisk eining
-              i tillegg til å hugse passordet, for å kunne logge på Canvas. Det kan vere ei brikke som lagar
+              Fleirfaktorautentisering aukar tryggleiken ved at du må ha ei fysisk eining
+              i tillegg til å hugse passordet, for å kunne logge på Canvas. Det kan vere ei kodebrikke som genererer
               godkjenningskodar, eller ein mobiltelefon som tek imot tekstmeldingar. Du kan konfigurere Google Autentisering-appen for [iPhone](%{iphone_url}) eller
               [Android](%{android_url}) ved å skanne QR-koden nedanfor. Andre token kan du konfigurere ved å oppgi
-              den hemmelege nøkkelen **%{secret_key}**.
+              den hemmelege nøkkelen **%{secret_key}**. Når du har satt opp multifaktorautentisering bør du gå til profilsida di og skrive ut backup-kodar, i tilfelle eininga du normalt brukar for å generere autentiseringskodar ikkje er tilgjengeleg.
           mfa_required: "Du må installere godkjenning med fleire faktorar."
           otp_on_device: "Oppgi godkjenningskoden vist av token."
           otp_sent_to_phone: "Godkjenningskode er send til telefonen din. Skriv inn koden her."
@@ -11385,6 +11385,7 @@ nn:
   new_file_135ae520: "[ Ny fil ]"
   new_file_added_for_name_a5ec3156: "Ny fil lagt til for %{name}"
   new_gradebook_297f7e2d: "Ny karakterbok"
+  new_gradebook_enables_an_early_release_of_new_grad_76b8bf45: "Ny karakterbok tillet tidlege releaser av Ny karakterbok-forbetringar."
   new_group_category_66be9cbd: "Ny gruppekategori"
   new_group_set_7241a581: "Nytt gruppesett"
   new_module_4e9287e4: "Ny modul"
@@ -14432,6 +14433,7 @@ nn:
   remove_attribute_59a4aa64: "Fjern attributt"
   remove_c_name_section_d8eabd3a: "Fjern klassa %{c.name}"
   remove_contact_method_ca890ba3: "Fjern kontaktmåte"
+  remove_course_association_name_b760c502: "Fjern emneforbindelse %{name}"
   remove_email_address_b1820820: "Fjern e-postadresse"
   remove_empty_attachment_b2aea632: "fjern tomt vedlegg"
   remove_f47dc62a: Fjern
@@ -15058,18 +15060,25 @@ nn:
   select_module_to_move_before_or_after_c28e8f46: "Vel modul for å flytte før eller etter"
   select_module_to_move_item_into_89fb2ac7: "Vel modul for å flytte element til"
   select_navigation_links_68e1e924: "Vel navigasjonslenker"
+  select_one_b647b384: "Vel ein"
   select_one_of_the_options_c8b0c6e4: "Vel ein av alternativa:"
   select_prerequisite_module_57894963: "Vel modulen som er føresetnad"
   select_prerequite_module_e9042bb0: "Vel modulen som er føresetnad"
   select_student_name_caaff244: "Vel student %{name}"
+  select_studentname_e7b7908d: "Vel %{studentName}"
   select_students_for_review_6e004a12: "Vel studentar for vurdering"
+  select_sub_account_6704196a: "Vel underkonto"
+  select_term_f8083fb0: "Vel semester"
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Vel fila du vil kople til, eller legg til ei fil ved å velje \"Ny fil\"."
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Vel sida du vil knyte til, eller legg til ei ny side ved å velje \"Ny side\"."
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "Vel sida du vil knyte til denne *modulen*, eller legg til ei ny side ved å velje \"Ny side\"."
   select_type_of_prerequisite_8d6fa902: "Vel type føresetnad"
   select_video_file_35b61d4e: "Vel videofil"
+  select_what_you_d_like_to_display_on_the_home_page_c1b53804: "Vel kva du vil vise på startsida."
   selected_274ce24f: Valt
+  selected_all_courses_9cfef57f: "Valt alle emne"
   selected_answer: "Du valde dette svaret."
+  selected_course_course_a581f834: "Valt emne %{course}"
   selected_subtree_a7693937: "Valt %{subtree}"
   self_enrollments: 
     already_enrolled: 
@@ -15120,11 +15129,13 @@ nn:
   send_e3bd0ed0: Send
   send_message_6ccc90e8: "Send melding"
   send_message_to_name_c8ac05fc: "Send melding til %{name}"
+  send_notification_81773687: "Send varsel"
   send_only_to_the_following_types_of_users_d8465c11: "Send berre til følgande brukartypar:"
   send_this_announcement_to_unenrolled_users_4ea549d7: "Send melding til brukarar som ikkje er påmeldt"
   send_this_announcement_to_users_with_the_account_r_bd69c809: "Send meldinga til brukarar med kontorolle %{role}"
   send_this_announcement_to_users_with_the_course_ro_46904d40: "Send kunngjeringa til brukarar med kontorolle %{role}"
   send_to_ce05b460: "Send til"
+  sending_bf324366: Sender...
   sending_message_8ac5bc90: "Sender melding..."
   sending_message_failed_please_try_again_b53cc904: "Sending av melding mislukkast, prøv på nytt seinare"
   sequence_footer: 
@@ -15181,9 +15192,17 @@ nn:
         record_type: Oppføringstype
         ret_val: Retur-URL
   settings_5aa0fd0c: Innstillingar
+  settings_changed_exceptions_e5247936: "Unntak: innstillingar endra:"
   settings_for_assignment_name_c19565e1: "Innstillingar for oppgåve %{name}"
+  settings_for_name_7731a33d: "Innstillingar for %{name}"
+  settings_for_tab_label_3bff4468: "Innstillingar for %{tab_label}"
   settings_for_title_d3ca495: "Innstillingar for %{title}"
+  settings_tutorial_tray_6f37761b: "Innstillingar opplæringsmeny"
   setup_checklist_eb8b00b8: "Sjekkliste for oppsett"
+  share_important_information_with_all_users_in_your_bc49ee7f: |-
+      Del viktig informasjon med alle brukarar i emnet ditt.
+      Vel om du vil ha kopi av eigne kunngjeringar frå Varselmenyen.
+  share_important_updates_with_users_97ec11ad: "Del viktige oppdateringar med brukarar"
   shared: 
     account_notification: 
       close: lukk
@@ -15245,6 +15264,11 @@ nn:
     components: 
       ic_submission-download-dialog: 
         click_to_download: "Klikk her for å laste ned"
+        download_message: "Innleveringane vil bli pakka inn i ei ZIP-fil for nedlasting. Dette kan ta litt tid, avhengig av storleik og tal på filer som skal sendast."
+        download_message_intro: "Studentinnleveringane dine blir samla."
+        download_submissions: "Last ned alle innleveringar"
+      ic_submission_download_dialog: 
+        click_to_download: "Klikk for å laste ned"
         download_message: "Innleveringane vil bli pakka inn i ei ZIP-fil for nedlasting. Dette kan ta litt tid, avhengig av storleik og tal på filer som skal sendast."
         download_message_intro: "Studentinnleveringane dine blir samla."
         download_submissions: "Last ned alle innleveringar"
@@ -15647,6 +15671,9 @@ nn:
       titles: 
         full_comments: "Klikk for å sjå fullstendige kommentarar"
         linked_to_learning_outcome: "Kriteriet er kopla til eit læringsmål"
+    rubrics_component: 
+      links: 
+        assign_rubric: "Tildel vurderingsskjema"
     select_content_dialog: 
       add_to_module: "Legg %{item} til *modul*"
       assignment_item: Oppgåve
@@ -15792,25 +15819,25 @@ nn:
       labels: 
         folder: Mappe
       links: 
-        announcements: Kunngjeringsliste
-        announcements_page: Kunngjeringsliste
-        assignments: Oppgåveliste
-        assignments_page: Oppgåveliste
+        announcements: Kunngjeringar
+        announcements_page: Kunngjeringar
+        assignments: Oppgåver
+        assignments_page: Oppgåver
         collaborations_page: Samarbeid
-        discussions: Diskusjonsindeks
-        discussions_page: Diskusjonsindeks
-        files_page: Filindeks
+        discussions: Diskusjonar
+        discussions_page: Diskusjonar
+        files_page: Filer
         find_on_flickr: "Finn bilde på Flickr: Creative Commons"
         grades_page: Karakterar
-        modules: Modullister
+        modules: Modular
         modules_page: Modular
         new_page: "Lenke til ei ny side"
-        quizzes: Quizliste
+        quizzes: Quizar
         syllabus: Emneoversikt
         upload_file: "Last opp ei ny fil"
         upload_image: "Last opp eit nytt bilde"
         users_page: Personar
-        wiki_pages_index: "Wiki startside"
+        wiki_pages_index: Sider
       links_to: 
         announcements: Kunngjeringar
         assignments: Oppgåver
@@ -15820,7 +15847,7 @@ nn:
           course: Emnenavigering
           group: Gruppenavigering
         quizzes: Quizar
-        wiki_pages: Wiki-sider
+        wiki_pages: Sider
       messages: 
         loading: Lastar...
       new_page_name: "Kva vil du kalle den nye sida?"
@@ -15831,14 +15858,18 @@ nn:
         links: Lenker
       uploading_file: "Lastar opp *fil*..."
   shared_secret_892c88f2: "Delt hemmelegheit"
+  short_name_42f454a1: "Kort namn"
   short_name_ad9bf84f: "kort namn"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "Må vere sjølvforklarande, Canvas-ID-en til rapporteringsbrukaren"
+  show_76c0ed1c: Vis
   show_account_navigation_menu_d97270a9: "Vis meny for kontonavigasjon"
   show_admin_navigation_menu_92fb579f: "Vis admin-navigeringsmeny "
   show_all_artifacts_34b91a83: "Vis alle artefaktar"
   show_all_details_9879980c: "Vis alle detaljar"
+  show_all_sections_190203e8: "Vis alle klasser"
   show_and_hide_courses_menu_9e09d1d0: "Vis og skjul emnemeny"
   show_attendance_columns_4d160e16: "Vis kolonnar for frammøte"
+  show_by_709f525b: "Vis etter"
   show_by_date_e3967761: "Vis etter dato"
   show_by_type_c5d61732: "Vis etter type"
   show_calendar_events_in_the_month_view_on_multiple_e94c33ae: "Vis kalenderhendingar i månadsvisinga over fleire linjer hvis tittelen ikkje får plass på ei linje. "
@@ -15846,10 +15877,12 @@ nn:
   show_correct_answers_at_30c37e01: "Vis korrekte svar på"
   show_correct_answers_at_a5475aa3: "Vis korrekte svar på"
   show_course_sections_for_course_name_5f715702: "Vis emneklassar for emnet %{name}"
+  show_courses_from_8a087f63: "Vis emne frå"
   show_courses_navigation_menu_7ad1a8d4: "Vis meny for emnenavigasjon"
   show_current_grade_5bf4e0d9: "Vis gjeldande karakter"
   show_dashboard_card_view_41ebd6c6: "Vis dashbordkorta"
   show_deleted_replies_a2e0a36f: "Vis svar som er sletta"
+  show_exceptions_270ea1c5: "Vis unntak"
   show_final_grade_a95e14dc: "Vis sluttkarakter"
   show_groups_navigation_menu_1521d38d: "Vis meny for gruppenavigasjon"
   show_inactive_enrollments_8f4c4824: "Vis inaktive påmeldingar"
@@ -15859,21 +15892,25 @@ nn:
   show_notes_column_22d2b6c1: "Vis merknadskolonne"
   show_one_question_at_a_time_271e346d: "Vis eitt spørsmål om gongen"
   show_only_blueprint_courses_9fb37b41: "Vis kun blåkopiemne"
+  show_originality_report_to_students_be22f5ee: "Vis originalitetsrapport til studentar"
   show_question_details_b059df00: "Vis spørsmålsdetaljar"
   show_recent_activity_stream_2be4abc1: "Sjå nyleg aktivitetsstraum"
   show_rubric_dca783f2: "Vis vurderingsskjema"
   show_saved_what_if_scores_358bfe5f: "Vis lagra \"Kva-skjer-dersom\"-resultat"
   show_student_names_dcb40934: "Vis studentnamn"
+  show_sub_accounts_for_account_name_fa71a658: "Vis underkonto for %{account_name}"
   showing_all_announcements_36ff0cec: "Viser alle kunngjeringar"
   showing_all_discussions_7e09f4b7: "Viser alle diskusjonar"
   showing_all_sets_of_grading_periods_6c160874: "Viser alle sett med karaktersetjingsperiodar."
   shuffle_answers_edb602b7: "Stokk svar"
   signup_type_8b4506f3: Påmeldingstype
   similarity_detection_dcada48: Likskapskontroll
+  similarity_detection_platform_9e424d70: "Plattform for likskapskontroll"
   similarity_score_more_information_b7010a87: "Likskapsresultat – meir informasjon"
   simple_tls_45df2648: "Enkel TLS"
   singapore_65_b4927585: "Singapore (+65)"
   singapore_a145e422: Singapore
+  sis_2164965: SIS
   sis_agent_token_authentication_2a0b29e3: "Godkjenning av SIS-agenttoken"
   sis_batch: 
     diff_filename: "sis_upload_diffed_%{id}.zip"
@@ -15887,6 +15924,7 @@ nn:
   sis_friendly_name_52b5683d: "SIS-vennleg namn"
   sis_grade_export_settings_45a9f709: "Innstillingar for SIS-karaktereksport"
   sis_id_4495a887: SIS-ID
+  sis_id_70eda157: "SIS-ID:"
   sis_id_8c2029e1: SIS-ID
   sis_import: 
     buttons: 
@@ -15955,6 +15993,8 @@ nn:
     android_banner_price: GRATIS
     android_banner_title: "Canvas by Instructure"
     android_banner_view_button: VIS
+  snapshots_6e1806b4: Snapshots
+  snapshots_are_backups_of_your_canvas_trial_taking__f18bd571: "Snapshots er backup-versjonar av Canvas-utprøvinga di. Ved å ta ein snapshot opprettast det eit augneblinksbilde frå der du var i utprøvinga då du tok snapshot-en. "
   some_assignments_could_not_be_created_because_they_d91f2f21: "Nokre oppgåver kunne ikkje opprettast fordi dei fell innanfor ein lukka karaktersetjingsperiode."
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Nokre av konferansane på denne sida er skjulte på grunn av feil under korrigering av status"
   some_module_items_could_not_be_published_e4be3c0: "Nokre modulelement kunne ikkje publiserast"
@@ -15963,17 +16003,26 @@ nn:
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "Nokre innleveringar er ikke mogleg å karaktersetje; endring av karakter for desse innleveringane er ignorert. "
   someone: Nokon
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: "Det er noko som ikkje fungerer, men eg kan bruke alternative løysingar for ei stund"
+  something_went_wrong_please_try_refreshing_the_pag_4e14a67: "Noko gjekk gale. Prøv å laste sida på nytt. Dersom problemet held fram, kan det vere at det er for mange innleveringar knytta til \"%{assignmentTitle}\" som skal lastast inn i SpeedGrader."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Noko gjekk gale under aktiveringa av brukaren. Prøv på nytt seinare."
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Noko gjekk gale under oppdateringa av brukaren si rolle. Prøv på nytt seinare."
+  something_went_wrong_when_trying_to_sync_grades_to_592c4c35: "Noko gjekk gale under synkronisering av karakterane til studentinformasjonssystemet. Prøv på nytt seinare."
   something_went_wrong_while_deactivating_the_user_p_8ff3e261: "Noko gjekk gale under deaktiveringa av brukaren. Prøv på nytt seinare."
   sort_40afa70: "Sorter: "
+  sort_by_72dbba9c: "Sorter etter"
   sort_courses_cf94b8d4: "Sorter emne"
   sortable_name_73f707cf: "Namn som kan sorterast"
+  sortable_name_e25fe66c: "Namn som kan sorterast:"
   sorted_ascending_1f9b52c6: "Sortert i stigande rekkefølge."
   sorted_ascending_2318ec99: "Sortert i stigande rekkefølge"
+  sorted_ascending_3138603c: "sortert i stigande rekkefølge."
+  sorted_ascending_b6d61547: "sortert i stigande rekkefølge"
+  sorted_descending_1e30f0d5: "sortert i fallande rekkefølge"
   sorted_descending_7fcec1ff: "Sortert i fallande rekkefølge"
+  sorted_descending_84ec84c8: "sortert i fallande rekkefølge."
   sorted_descending_d9aa3cf8: "Sortert i fallande rekkefølge."
   source_code_2395ca74: Kjeldekode
+  south_africa_27_d5e0f1e1: "Sør-Afrika (+27)"
   south_korea_82_10618967: "Sør-Korea (+82)"
   space_ec476863: Mellomrom
   spain_34_d5286826: "Spania (+34)"

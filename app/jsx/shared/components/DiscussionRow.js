@@ -22,7 +22,6 @@ import { func } from 'prop-types'
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
 
-import Heading from '@instructure/ui-core/lib/components/Heading'
 import Container from '@instructure/ui-core/lib/components/Container'
 import Text from '@instructure/ui-core/lib/components/Text'
 import IconTimer from 'instructure-icons/lib/Line/IconTimerLine'
@@ -82,6 +81,13 @@ export default function DiscussionRow ({ discussion, masterCourseData, rowRef, o
       isRead={discussion.read_state === 'read'}
       author={discussion.author}
       title={discussion.title}
+      body={<div className="ic-discussion-row__content">{textContent}</div>}
+      sectionToolTip={
+        <SectionsTooltip
+          totalUserCount={discussion.user_count}
+          sections={discussion.sections}
+        />
+      }
       itemUrl={discussion.html_url}
       onSelectedChanged={onSelectedChanged}
       masterCourse={{
@@ -104,16 +110,6 @@ export default function DiscussionRow ({ discussion, masterCourseData, rowRef, o
         </div>
       }
       actionsContent={readCount}
-      clickableChildren={[
-        <Heading level="h3">{discussion.title}</Heading>,
-        <div className="ic-discussion-row__content">{textContent}</div>,
-      ]}
-      unclickableChildren={[
-        <SectionsTooltip
-          totalUserCount={discussion.user_count}
-          sections={discussion.sections}
-        />,
-      ]}
     />
   )
 }
