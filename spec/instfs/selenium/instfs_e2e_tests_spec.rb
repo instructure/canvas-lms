@@ -48,7 +48,8 @@ describe "instfs file uploads" do
       content_type: file_type,
       on_duplicate: "overwrite",
       quota_exempt: true,
-      capture_url: "http://#{HostUrl.default_host}/api/v1/files/capture"
+      capture_url: "http://#{HostUrl.default_host}/api/v1/files/capture",
+      domain_root_acount: Account.default
     )
     URI(instfs_stuff[:upload_url])
   end

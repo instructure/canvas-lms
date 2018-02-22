@@ -1631,6 +1631,10 @@ class Attachment < ActiveRecord::Base
     @domain_namespace.respond_to?(:file_namespace) ? @domain_namespace.file_namespace : @domain_namespace
   end
 
+  def self.domain_namespace_account
+    @domain_namespace
+  end
+
   def self.serialization_methods; [:mime_class, :currently_locked, :crocodoc_available?]; end
   cattr_accessor :skip_thumbnails
 

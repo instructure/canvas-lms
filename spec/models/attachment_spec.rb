@@ -1420,6 +1420,7 @@ describe Attachment do
 
     context "instfs attachment" do
       before do
+        allow(Attachment).to receive(:domain_namespace_account).and_return(double(domain: 'mydomain'))
         allow(InstFS).to receive(:enabled?).and_return true
         allow(InstFS).to receive(:jwt_secret).and_return 'secret'
         allow(InstFS).to receive(:app_host).and_return 'instfs'

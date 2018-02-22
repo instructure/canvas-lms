@@ -31,6 +31,7 @@ describe InstFS do
         'app-host' => @app_host,
         'secret' => Base64.encode64(@secret)
       })
+    allow(Attachment).to receive(:domain_namespace_account).and_return(double(domain: 'mydomain'))
   end
 
   it "returns decoded base 64 secret" do
@@ -145,6 +146,7 @@ describe InstFS do
         quota_exempt: quota_exempt,
         on_duplicate: on_duplicate,
         capture_url: capture_url,
+        domain_root_account: Account.default
       )
     end
 
