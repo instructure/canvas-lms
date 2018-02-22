@@ -16,7 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # @API Blueprint Courses
-# @beta
 # Configure blueprint courses
 #
 # @model BlueprintTemplate
