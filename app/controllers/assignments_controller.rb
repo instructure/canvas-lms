@@ -147,6 +147,7 @@ class AssignmentsController < ApplicationController
       conditional_release_js_env(@assignment, includes: :rule)
 
       @can_view_grades = @context.grants_right?(@current_user, session, :view_all_grades)
+      @downloadable_submissions = downloadable_submissions?(@current_user, @context, @assignment)
       @can_grade = @assignment.grants_right?(@current_user, session, :grade)
       if @can_view_grades || @can_grade
         visible_student_ids = @context.apply_enrollment_visibility(@context.all_student_enrollments, @current_user).pluck(:user_id)
@@ -210,6 +211,19 @@ class AssignmentsController < ApplicationController
         format.html { render }
       end
     end
+  end
+
+  def downloadable_submissions?(current_user, context, assignment)
+    types = ["online_upload", "online_url", "online_text_entry"]
+    return unless (assignment.submission_types.split(",") & types).any?
+
+    student_ids =
+      if assignment.grade_as_group?
+        assignment.representatives(current_user).map(&:id)
+      else
+        context.apply_enrollment_visibility(context.student_enrollments, current_user).pluck(:user_id)
+      end
+    student_ids.any? && assignment.submissions.where(user_id: student_ids, submission_type: types).exists?
   end
 
   def list_google_docs
