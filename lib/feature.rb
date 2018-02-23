@@ -108,6 +108,14 @@ class Feature
   # TODO: register built-in features here
   # (plugins may register additional features during application initialization)
   register(
+    'sis_imports_refactor' =>
+      {
+        display_name: -> { I18n.t('SIS Import Refactor')},
+        description: -> { I18n.t('Update how we process SIS improts') },
+        applies_to: 'Account',
+        state: 'hidden',
+        development: true
+      },
     'theme_editor_refactor' =>
     {
       display_name: -> { I18n.t('Theme Editor Refactor')},
