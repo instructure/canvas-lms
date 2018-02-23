@@ -95,7 +95,7 @@
     <% if !@group_memberships.empty? %>
       <h3><%= t('groups', 'Groups') %> <%= count_if_any(@group_memberships.count) %></h3>
       <div class="groups" style="font-size: 1.2em">
-        <ul class="unstyled_list context_list" style="margin-left: 5px; font-size: 0.9em; margin-bottom: 10px; max-height: 200px; overflow: auto;">
+        <ul class="unstyled_list context_list" style="margin-left: 5px; font-size: 0.9em; max-width: 800px; margin-bottom: 10px; max-height: 200px; overflow: auto;">
           <% @group_memberships.each do |membership| %>
             <% num_enrollments += 1 %>
             <li>
