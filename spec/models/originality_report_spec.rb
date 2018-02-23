@@ -48,12 +48,6 @@ describe OriginalityReport do
     expect(subject.errors[:originality_score]).to eq ['score must be between 0 and 100']
   end
 
-  it 'is invalid if the attachment is already taken' do
-    subject
-    duplicate = OriginalityReport.create(attachment: attachment, submission: submission_model)
-    expect(duplicate).to be_invalid
-  end
-
   it 'requires a valid workflow_state' do
     subject.workflow_state = 'invalid_state'
     subject.valid?
@@ -231,6 +225,104 @@ describe OriginalityReport do
     it "returns the state from similarity score if workflow state is 'scored'" do
       report.update_attributes(originality_score: '25')
       expect(report.state).to eq 'warning'
+    end
+  end
+
+  describe '#copy_to_group_submissions!' do
+    let(:submission_one) { submission_model }
+    let(:submission_two) { submission_model({assignment: submission_one.assignment}) }
+    let(:submission_three) { submission_model({assignment: submission_one.assignment}) }
+    let(:user_one) { submission_one.user }
+    let(:user_two) { submission_two.user }
+    let(:course) { submission_one.assignment.course }
+    let!(:group) do
+      group = course.groups.create!(name: 'group one')
+      group.add_user(user_one)
+      group.add_user(user_two)
+      submission_one.update!(group: group)
+      submission_two.update!(group: group)
+      group
+    end
+    let(:originality_score) { 23.2 }
+    let!(:originality_report) do
+      OriginalityReport.create!(
+        originality_score: originality_score,
+        submission: submission_one
+      )
+    end
+
+    it 'creates one originality report for every other submission in the group' do
+      expect do
+        originality_report.copy_to_group_submissions!
+      end.to change(OriginalityReport, :count).from(1).to(2)
+    end
+
+    it 'replaces originality reports that have the same attachment/submission combo' do
+      originality_report.copy_to_group_submissions!
+      expect do
+        originality_report.copy_to_group_submissions!
+      end.not_to change(OriginalityReport, :count)
+    end
+
+    it 'copies originality report to all submissions in the group' do
+      originality_report.copy_to_group_submissions!
+      expect(submission_two.originality_reports.first.originality_score).to eq originality_score
+    end
+
+    it 'does not copy originality reports to submissions outside the group' do
+      submission_three
+      originality_report.copy_to_group_submissions!
+      expect(submission_three.originality_reports).to be_blank
+    end
+
+    it 'does nothing if no group is set on the submission' do
+      non_group_report = OriginalityReport.create!(
+        originality_score: 50,
+        submission: submission_three
+      )
+      expect do
+        non_group_report.copy_to_group_submissions!
+      end.not_to change(OriginalityReport, :count)
+    end
+
+    context 'when lti link is present' do
+      let!(:link) do
+        Lti::Link.create!(
+          linkable: originality_report,
+          vendor_code: 'test.com',
+          product_code: 'Cool Tool',
+          resource_type_code: 'my_resource'
+        )
+      end
+
+      it 'copies the lti link if the originality report has one' do
+        originality_report.copy_to_group_submissions!
+        expect(submission_two.originality_reports.first.lti_link).to be_present
+      end
+
+      it 'copies the lti link vendor code' do
+        originality_report.copy_to_group_submissions!
+        vendor_code = submission_two.originality_reports.first.lti_link.vendor_code
+        expect(vendor_code).to eq link.vendor_code
+      end
+
+      it 'copies the lti link product code' do
+        originality_report.copy_to_group_submissions!
+        product_code = submission_two.originality_reports.first.lti_link.product_code
+        expect(product_code).to eq link.product_code
+      end
+
+      it 'copies the lti link resource type code' do
+        originality_report.copy_to_group_submissions!
+        resource_type_code = submission_two.originality_reports.first.lti_link.resource_type_code
+        expect(resource_type_code).to eq link.resource_type_code
+      end
+
+      it 'gives a new resource link id to the new link' do
+        originality_report.copy_to_group_submissions!
+        resource_link_id = submission_two.originality_reports.first.lti_link.resource_link_id
+        expect(resource_link_id).not_to eq link.resource_link_id
+      end
     end
   end
 end

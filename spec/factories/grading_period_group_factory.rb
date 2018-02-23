@@ -36,6 +36,12 @@ module Factories
       group
     end
 
+    def create_for_enrollment_term_and_account!(enrollment_term, account, title: TITLE)
+      group = account.grading_period_groups.create!(title: title)
+      group.enrollment_terms << enrollment_term
+      group
+    end
+
     def legacy_create_for_course(course)
       # This relationship will eventually go away.
       # Please use this helper so that old associations can be easily

@@ -710,18 +710,19 @@ describe Assignment::SpeedGrader do
       group.update_attributes!(users: [user_two, test_student])
 
       submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
+      submission_two = assignment.submit_homework(user_two, submission_type: 'online_upload', attachments: [attachment])
 
       assignment.submissions.each do |s|
         s.update_attributes!(group: group, turnitin_data: {blah: 1})
       end
 
-      OriginalityReport.create!(originality_score: '1', submission: submission, attachment: attachment)
+      report = OriginalityReport.create!(originality_score: '1', submission: submission, attachment: attachment)
+      report.copy_to_group_submissions!
 
       json = Assignment::SpeedGrader.new(assignment, test_teacher).json
 
-      has_report = json['submissions'].map{ |s| s['submission_history'].first['submission']['has_originality_report'] }.uniq
-      expect(has_report).to match_array [true]
-    end
+      has_report = json['submissions'].map{ |s| s['submission_history'].first['submission']['has_originality_report'] }
+      expect(has_report).to match_array [true, true]    end
 
     it "includes 'has_originality_report' in the json" do
       submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
@@ -756,6 +757,16 @@ describe Assignment::SpeedGrader do
       json = Assignment::SpeedGrader.new(assignment, test_teacher).json
       has_score = json['submissions'].first['submission_history'].first['submission']['has_originality_score']
       expect(has_score).to be_truthy
+    end
+
+    it 'includes originality data' do
+      submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
+      submission.update_attribute(:turnitin_data, {blah: 1})
+      OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
+      OriginalityReport.create!(originality_score: '1', submission: submission)
+      json = Assignment::SpeedGrader.new(assignment, test_teacher).json
+      keys = json['submissions'].first['submission_history'].first['submission']['turnitin_data'].keys
+      expect(keys).to include submission.asset_string, attachment.asset_string
     end
   end
 

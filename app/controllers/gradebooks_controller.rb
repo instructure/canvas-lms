@@ -958,10 +958,13 @@ class GradebooksController < ApplicationController
     courses << @context if courses.empty?
 
     courses.map do |course|
+      grading_period_set_id = GradingPeriodGroup.for_course(course)&.id
+
       {
         id: course.id,
         nickname: course.nickname_for(@current_user),
-        url: context_url(course, :context_grades_url)
+        url: context_url(course, :context_grades_url),
+        grading_period_set_id: grading_period_set_id.try(:to_s)
       }
     end.as_json
   end

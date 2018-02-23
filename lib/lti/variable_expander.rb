@@ -1090,7 +1090,7 @@ module Lti
     #   ```
     register_expansion 'vnd.Canvas.submission.url', [],
                         -> do
-                          SubmissionsApiController::SERVICE_DEFINITIONS.find do |s|
+                          Lti::SubmissionsApiController::SERVICE_DEFINITIONS.find do |s|
                             s[:id] == 'vnd.Canvas.submission'
                           end[:endpoint]
                         end,
@@ -1104,7 +1104,7 @@ module Lti
     #   ```
     register_expansion 'vnd.Canvas.submission.history.url', [],
                         -> do
-                          SubmissionsApiController::SERVICE_DEFINITIONS.find do |s|
+                          Lti::SubmissionsApiController::SERVICE_DEFINITIONS.find do |s|
                             s[:id] == 'vnd.Canvas.submission.history'
                           end[:endpoint]
                         end,

@@ -240,6 +240,7 @@
               </span>
               <span class="submission_status">
                 <%= submission.blank? ? 'none' : submission.workflow_state %>
+              </span>
               <span class="assignment_group_id"><%= assignment.assignment_group_id rescue "" %></span>
               <span class="assignment_id"><%= assignment.id.to_s %></span>
               <span class="group_weight"><%= assignment.group_weight rescue "" %></span>

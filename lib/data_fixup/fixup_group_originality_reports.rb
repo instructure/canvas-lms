@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-CanvasHttp.open_timeout = -> { Setting.get('http_open_timeout', 5).to_f }
-CanvasHttp.read_timeout = -> { Setting.get('http_read_timeout', 30).to_f }
-CanvasHttp.blocked_ip_filters = -> { Setting.get('http_blocked_ip_ranges', '127.0.0.1/8').split(/,/).presence }
+module DataFixup::FixupGroupOriginalityReports
+  def self.run
+    originality_reports = OriginalityReport.joins(:submission).where.not(submissions: {group_id: nil})
+    originality_reports.find_each(&:copy_to_group_submissions!)
+  end
+end
