@@ -166,10 +166,14 @@ export default class ThemeEditor extends React.Component {
   handleThemeStateChange = (key, value, opts = {}) => {
     let {files, properties} = this.state.themeStore
     if (value instanceof File) {
-      files.push({
+      const fileStorageObject = {
         variable_name: key,
         value
-      })
+      }
+      if (opts.customFileUpload) {
+        fileStorageObject.customFileUpload = true
+      }
+      files.push(fileStorageObject)
     } else {
       properties = {
         ...properties,
@@ -254,7 +258,10 @@ export default class ThemeEditor extends React.Component {
       processedData.append(`brand_config[variables][${k}]`, properties[k])
     })
     files.forEach(f => {
-      processedData.append(`brand_config[variables][${f.variable_name}]`, f.value)
+      const keyName = f.customFileUpload
+        ? f.variable_name
+        : `brand_config[variables][${f.variable_name}]`
+      processedData.append(keyName, f.value)
     })
     return processedData
   }

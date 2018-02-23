@@ -176,6 +176,29 @@ test('handleThemeStateChange updates when there is a file', () => {
   })
 })
 
+test('handleThemeStateChange sets the file object to have the customFileUpload flag when there is a customFileUpload', () => {
+  const wrapper = shallow(<ThemeEditor {...testProps} />)
+  const key = 'custom_css'
+  const value = new File(['foo'], 'foo.png')
+  wrapper.instance().handleThemeStateChange(key, value, {customFileUpload: true})
+  deepEqual(wrapper.state('themeStore'), {
+    properties: {
+      'ic-brand-primary': 'green',
+      'ic-brand-font-color-dark': '#2D3B45',
+      'ic-brand-global-nav-bgd': '#394B58',
+      'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
+      'ic-brand-favicon': '/images/favicon.ico'
+    },
+    files: [
+      {
+        value,
+        variable_name: key,
+        customFileUpload: true
+      }
+    ]
+  })
+})
+
 test('handleThemeStateChange resets to default when opts.resetValue is set', () => {
   const wrapper = shallow(<ThemeEditor {...testProps} />)
   wrapper.instance().handleThemeStateChange('ic-brand-font-color-dark', 'black')
@@ -225,5 +248,22 @@ test('processThemeStoreForSubmit puts the themeStore into a FormData and returns
     'brand_config[variables][ic-brand-global-nav-ic-icon-svg-fill]': '#efefef',
     'brand_config[variables][ic-brand-primary]': 'green',
     'brand_config[variables][ic-brand-favicon]': fileValue
+  })
+})
+
+test('processThemeStoreForSubmit sets the correct keys for custom uploads', () => {
+  const wrapper = shallow(<ThemeEditor {...testProps} />)
+  const key = 'custom_css'
+  const value = new File(['foo'], 'foo.png')
+  wrapper.instance().handleThemeStateChange(key, value, {customFileUpload: true})
+  const formData = wrapper.instance().processThemeStoreForSubmit()
+  const formObj = fromPairs(Array.from(formData.entries()))
+  deepEqual(formObj, {
+    'brand_config[variables][ic-brand-font-color-dark]': '#2D3B45',
+    'brand_config[variables][ic-brand-global-nav-bgd]': '#394B58',
+    'brand_config[variables][ic-brand-global-nav-ic-icon-svg-fill]': '#efefef',
+    'brand_config[variables][ic-brand-primary]': 'green',
+    'brand_config[variables][ic-brand-favicon]': '/images/favicon.ico',
+    [key]: value
   })
 })

@@ -32,7 +32,7 @@ export default function ThemeEditorSidebar(props) {
       <TabList variant="minimal" size="medium" padding="0">
         <TabPanel title={I18n.t('Edit')}>
           <ThemeEditorAccordion
-           refactorEnabled={props.refactorEnabled}
+            refactorEnabled={props.refactorEnabled}
             variableSchema={props.variableSchema}
             brandConfigVariables={props.brandConfig.variables}
             getDisplayValue={props.getDisplayValue}
@@ -81,6 +81,8 @@ export default function ThemeEditorSidebar(props) {
                 currentValue={props.brandConfig.css_overrides}
                 userInput={props.changedValues.css_overrides}
                 onChange={props.changeSomething.bind(null, 'css_overrides')}
+                themeState={props.themeState}
+                handleThemeStateChange={props.handleThemeStateChange}
               />
 
               <ThemeEditorFileUpload
@@ -90,6 +92,8 @@ export default function ThemeEditorSidebar(props) {
                 currentValue={props.brandConfig.js_overrides}
                 userInput={props.changedValues.js_overrides}
                 onChange={props.changeSomething.bind(null, 'js_overrides')}
+                themeState={props.themeState}
+                handleThemeStateChange={props.handleThemeStateChange}
               />
             </div>
           </div>
@@ -108,6 +112,8 @@ export default function ThemeEditorSidebar(props) {
                 currentValue={props.brandConfig.mobile_css_overrides}
                 userInput={props.changedValues.mobile_css_overrides}
                 onChange={props.changeSomething.bind(null, 'mobile_css_overrides')}
+                themeState={props.themeState}
+                handleThemeStateChange={props.handleThemeStateChange}
               />
 
               <ThemeEditorFileUpload
@@ -117,6 +123,8 @@ export default function ThemeEditorSidebar(props) {
                 currentValue={props.brandConfig.mobile_js_overrides}
                 userInput={props.changedValues.mobile_js_overrides}
                 onChange={props.changeSomething.bind(null, 'mobile_js_overrides')}
+                themeState={props.themeState}
+                handleThemeStateChange={props.handleThemeStateChange}
               />
             </div>
           </div>

@@ -28,11 +28,15 @@ export default class ThemeEditorFileUpload extends Component {
     name: PropTypes.string,
     onChange: PropTypes.func.isRequired,
     currentValue: PropTypes.string,
-    userInput: customTypes.userVariableInput
+    userInput: customTypes.userVariableInput,
+    themeState: PropTypes.object,
+    handleThemeStateChange: PropTypes.func
   }
 
   static defaultProps = {
-    userInput: {}
+    userInput: {},
+    themeState: {},
+    handleThemeStateChange() {}
   }
 
   state = {
@@ -51,15 +55,20 @@ export default class ThemeEditorFileUpload extends Component {
   handleFileChanged = event => {
     var file = event.target.files[0]
     this.setState({selectedFileName: file.name})
+    this.props.handleThemeStateChange(this.props.name, file, {customFileUpload: true})
     this.props.onChange(window.URL.createObjectURL(file))
   }
 
-  handleResetClicked() {
+  handleResetClicked = () => {
     // if they hit the "Reset" button,
     // we want to also clear out the value of the <input type=file>
     // but we don't want to mess with its value otherwise
     this.fileInput.value = ''
     this.setState({selectedFileName: ''})
+    this.props.handleThemeStateChange(this.props.name, null, {
+      customFileUpload: true,
+      resetValue: true
+    })
     this.props.onChange(!this.hasUserInput() ? '' : null)
   }
 
