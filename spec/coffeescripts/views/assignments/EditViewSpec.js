@@ -353,9 +353,17 @@ test('disables fields when inClosedGradingPeriod', function() {
   ok(view.$el.find('#assignment_group_id').attr('readonly'))
   equal(view.$el.find('#assignment_group_id').attr('aria-readonly'), 'true')
   ok(view.$el.find('#assignment_grading_type').attr('readonly'))
-  equal(view.$el.find('#assignment_grading_type').attr('aria-readonly'), 'true')
+  equal(view.$el.find('input[name="grading_type"]').attr('type'), 'hidden')
   ok(view.$el.find('#has_group_category').attr('readonly'))
   equal(view.$el.find('#has_group_category').attr('aria-readonly'), 'true')
+})
+
+test('disables grading type field when frozen', function() {
+  const view = this.editView({frozen_attributes: ['grading_type']})
+  view.$el.appendTo($('#fixtures'))
+
+  ok(view.$el.find('#assignment_grading_type').attr('readonly'))
+  equal(view.$el.find('input[name="grading_type"]').attr('type'), 'hidden')
 })
 
 test('does not disable post to sis when inClosedGradingPeriod', function() {
