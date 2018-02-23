@@ -200,7 +200,7 @@ module CCHelper
           if match_data = match.url.match(%r{/files/folder/(.*)})
             # this might not be the best idea but let's keep going and see what happens
             "#{COURSE_TOKEN}/files/folder/#{match_data[1]}"
-          else
+          elsif match.prefix.present?
             # If match.obj_id is nil, it's because we're actually linking to a page
             # (the /courses/:id/files page) and not to a specific file. In this case,
             # just pass it straight through.

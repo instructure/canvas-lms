@@ -166,7 +166,7 @@ module UserContent
 
     attr_reader :user, :context
 
-    class UriMatch < Struct.new(:url, :type, :obj_class, :obj_id, :rest)
+    class UriMatch < Struct.new(:url, :type, :obj_class, :obj_id, :rest, :prefix)
     end
 
     # specify a url type like "assignments" or "file_contents"
@@ -212,7 +212,7 @@ module UserContent
         if asset_types.key?(type)
           klass = asset_types[type]
           klass = klass.to_s.constantize if klass
-          match = UriMatch.new(relative_url, type, klass, obj_id, rest)
+          match = UriMatch.new(relative_url, type, klass, obj_id, rest, prefix)
           handler = @handlers[type] || @default_handler
           (handler && handler.call(match)) || relative_url
         else
