@@ -14,7 +14,7 @@
 
     function getCheckboxValue(){
       var exemptInput = $('#student_grading_{{assignment.id}}')
-      if($('input[type="checkbox"]').is(":checked")){
+      if($('.submission_details_dialog input[type="checkbox"]').is(":checked")){
         exemptInput.val("EX")
       }
       else {
