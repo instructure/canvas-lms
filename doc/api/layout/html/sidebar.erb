@@ -18,6 +18,8 @@
        klass << "current" if resource == options[:object] %>
     <a class="<%= klass.join(' ') %>" href="<%= link %>"><%= resource %></a>
   <% end %>
+  <h2>Outcomes</h2>
+  <a href="<%= url_for("file.outcomes_csv.html") %>" class="<%= 'current' if options[:object] == 'file.outcomes_csv.html' %>">Outcomes CSV Format</a>
   <h2>SIS</h2>
   <a href="<%= url_for("file.sis_csv.html") %>" class="<%= 'current' if options[:object] == 'file.sis_csv.html' %>">SIS CSV Format</a>
   <h2>External Tools</h2>

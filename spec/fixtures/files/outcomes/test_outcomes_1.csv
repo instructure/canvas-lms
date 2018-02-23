@@ -1,0 +1,4 @@
+canvas_id,vendor_guid,object_type,title,description,display_name,calculation_method,calculation_int,workflow_state,parent_guids,ratings,,,,,,,
+,a,group,A,AAA,display,,,active,,,,,,,,,
+,b,group,B,BBB,names,,,active,a,,,,,,,,
+,c,outcome,C,CCC,here,decaying_average,40,active,a b,3,Betterest,2,Better,1,Good,,

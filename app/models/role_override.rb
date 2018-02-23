@@ -208,6 +208,24 @@ class RoleOverride < ActiveRecord::Base
           'AccountAdmin'
         ]
       },
+      :import_outcomes => {
+        :label => lambda { t("Import learning outcomes") },
+        :available_to => [
+          'TaEnrollment',
+          'DesignerEnrollment',
+          'TeacherEnrollment',
+          'TeacherlessStudentEnrollment',
+          'ObserverEnrollment',
+          'AccountAdmin',
+          'AccountMembership'
+        ],
+        :true_for => [
+          'DesignerEnrollment',
+          'TeacherEnrollment',
+          'TeacherlessStudentEnrollment',
+          'AccountAdmin'
+        ]
+      },
       :manage_outcomes => {
         :label => lambda { t('permissions.manage_outcomes', "Manage learning outcomes") },
         :available_to => [

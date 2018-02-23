@@ -23,6 +23,8 @@ require 'csv'
 require 'socket'
 
 describe Course do
+  include_examples "outcome import context examples"
+
   describe 'relationships' do
     it { is_expected.to have_one(:late_policy).dependent(:destroy).inverse_of(:course) }
   end

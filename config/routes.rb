@@ -1239,6 +1239,13 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/sis_import_errors', action: :index, as: :account_sis_import_errors
     end
 
+    scope(controller: :outcome_imports_api) do
+      %w(account course).each do |context|
+        post "#{context}s/:#{context}_id/outcome_imports", action: :create
+        get "#{context}s/:#{context}_id/outcome_imports/:id", action: :show
+      end
+    end
+
     scope(controller: :users) do
       get 'users/self/activity_stream', action: :activity_stream, as: 'user_activity_stream'
       get 'users/activity_stream', action: :activity_stream # deprecated

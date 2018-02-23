@@ -53,6 +53,7 @@ class Attachment < ActiveRecord::Base
        :content_export, :content_migration, :course, :eportfolio, :epub_export,
        :gradebook_upload, :group, :submission, :purgatory,
        { context_folder: 'Folder', context_sis_batch: 'SisBatch',
+         context_outcome_import: 'OutcomeImport',
          context_user: 'User', quiz: 'Quizzes::Quiz',
          quiz_statistics: 'Quizzes::QuizStatistics',
          quiz_submission: 'Quizzes::QuizSubmission' }]
