@@ -34,8 +34,7 @@ ReactDOM.render(
       sharedBrandConfigs: window.ENV.sharedBrandConfigs,
       allowGlobalIncludes: window.ENV.allowGlobalIncludes,
       accountID: window.ENV.account_id,
-      useHighContrast: window.ENV.use_high_contrast,
-      refactorEnabled: window.ENV.REFACTOR_ENABLED
+      useHighContrast: window.ENV.use_high_contrast
     }}
   />,
   document.body

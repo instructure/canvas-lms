@@ -115,14 +115,6 @@ class Feature
         applies_to: 'RootAccount',
         state: 'hidden'
       },
-    'theme_editor_refactor' =>
-    {
-      display_name: -> { I18n.t('Theme Editor Refactor')},
-      description: -> { I18n.t('Move to using InstUI for several components and implementing a store system') },
-      applies_to: 'Account',
-      state: 'hidden',
-      development: true
-    },
     'section_specific_announcements' =>
     {
       display_name: -> { I18n.t('Section Specific Announcements') },

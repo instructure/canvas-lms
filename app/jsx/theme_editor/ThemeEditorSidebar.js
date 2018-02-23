@@ -24,7 +24,6 @@ import Container from '@instructure/ui-core/lib/components/Container'
 import types from './PropTypes'
 import ThemeEditorAccordion from './ThemeEditorAccordion'
 import ThemeEditorFileUpload from './ThemeEditorFileUpload'
-import ThemeEditor from './ThemeEditor'
 
 export default function ThemeEditorSidebar(props) {
   if (props.allowGlobalIncludes) {
@@ -32,7 +31,6 @@ export default function ThemeEditorSidebar(props) {
       <TabList variant="minimal" size="medium" padding="0">
         <TabPanel title={I18n.t('Edit')}>
           <ThemeEditorAccordion
-            refactorEnabled={props.refactorEnabled}
             variableSchema={props.variableSchema}
             brandConfigVariables={props.brandConfig.variables}
             getDisplayValue={props.getDisplayValue}
