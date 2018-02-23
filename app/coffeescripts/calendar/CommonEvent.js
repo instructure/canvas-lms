@@ -1,167 +1,229 @@
-#
-# Copyright (C) 2012 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+/*
+ * Copyright (C) 2012 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-define [
-  'i18n!calendar'
-  'jquery'
-  '../util/fcUtil'
-  'jquery.ajaxJSON'
-  'vendor/jquery.ba-tinypubsub'
-], (I18n, $, fcUtil) ->
+import I18n from 'i18n!calendar'
+import $ from 'jquery'
+import fcUtil from '../util/fcUtil'
+import 'jquery.ajaxJSON'
+import 'vendor/jquery.ba-tinypubsub'
 
-  class
-    readableTypes:
-      assignment: I18n.t('Assignment')
-      discussion: I18n.t('Discussion')
-      event: I18n.t('Event')
-      quiz: I18n.t('Quiz')
-      note: I18n.t('To Do')
+export default function CommonEvent(data, contextInfo, actualContextInfo) {
+  this.eventType = 'generic'
+  this.contextInfo = contextInfo
+  this.actualContextInfo = actualContextInfo
+  this.allPossibleContexts = null
+  this.className = []
+  this.object = {}
 
-    constructor: (data, contextInfo, actualContextInfo) ->
-      @eventType = 'generic'
-      @contextInfo = contextInfo
-      @actualContextInfo = actualContextInfo
-      @allPossibleContexts = null
-      @className = []
-      @object = {}
+  this.copyDataFromObject(data)
+}
 
-      @copyDataFromObject(data)
+Object.assign(CommonEvent.prototype, {
+  readableTypes: {
+    assignment: I18n.t('Assignment'),
+    discussion: I18n.t('Discussion'),
+    event: I18n.t('Event'),
+    quiz: I18n.t('Quiz'),
+    note: I18n.t('To Do')
+  },
 
-    isNewEvent: () ->
-      @eventType == 'generic' || !@object?.id
+  isNewEvent() {
+    return this.eventType === 'generic' || !(this.object && this.object.id)
+  },
 
-    isAppointmentGroupFilledEvent: () ->
-      @object?.child_events?.length > 0
+  isAppointmentGroupFilledEvent() {
+    return (
+      this.object &&
+      this.object.child_events &&
+      this.object.child_events.length > 0
+    )
+  },
 
-    isAppointmentGroupEvent: () ->
-      @object?.appointment_group_url
+  isAppointmentGroupEvent() {
+    return this.object && this.object.appointment_group_url
+  },
 
-    contextCode: () ->
-      @object?.effective_context_code || @object?.context_code || @contextInfo?.asset_string
+  contextCode() {
+    return (
+      (this.object && this.object.effective_context_code) ||
+      (this.object && this.object.context_code) ||
+      (this.contextInfo && this.contextInfo.asset_string)
+    )
+  },
 
-    isUndated: () ->
-      @start == null
+  isUndated() {
+    return this.start == null
+  },
 
-    isCompleted: -> false
+  isCompleted() {
+    return false
+  },
 
-    displayTimeString: () -> ""
-    readableType: () -> ""
+  displayTimeString() {
+    return ''
+  },
+  readableType() {
+    return ''
+  },
 
-    fullDetailsURL: () -> null
+  fullDetailsURL() {
+    return null
+  },
 
-    startDate: () -> @originalStart || @date
-    endDate: () -> @startDate()
+  startDate() {
+    return this.originalStart || this.date
+  },
+  endDate() {
+    return this.startDate()
+  },
 
-    possibleContexts: () -> @allPossibleContexts || [ @contextInfo ]
+  possibleContexts() {
+    return this.allPossibleContexts || [this.contextInfo]
+  },
 
-    addClass: (newClass) ->
-      found = false
-      for c in @className
-        if c == newClass
-          found = true
-          break
-      if !found then @className.push newClass
+  addClass(newClass) {
+    this.className = [...new Set([...this.className, newClass])]
+  },
 
-    removeClass: (rmClass) ->
-      idx = 0
-      for c in @className
-        if c == rmClass
-          @className.splice(idx, 1)
-        else
-          idx += 1
+  removeClass(rmClass) {
+    this.className = this.className.filter(c => c !== rmClass)
+  },
 
-    save: (params, success, error) ->
-      onSuccess = (data) =>
-        @copyDataFromObject(data)
-        $.publish "CommonEvent/eventSaved", this
-        success?()
+  save(params, success, error) {
+    const onSuccess = data => {
+      this.copyDataFromObject(data)
+      $.publish('CommonEvent/eventSaved', this)
+      if (typeof success === 'function') return success()
+    }
 
-      onError = (data) =>
-        @copyDataFromObject(data)
-        $.publish "CommonEvent/eventSaveFailed", this
-        error?()
+    const onError = data => {
+      this.copyDataFromObject(data)
+      $.publish('CommonEvent/eventSaveFailed', this)
+      if (typeof error === 'function') return error()
+    }
 
-      [ method, url ] = @methodAndURLForSave()
+    const [method, url] = this.methodAndURLForSave()
 
-      @forceMinimumDuration() # so short events don't look squished while waiting for ajax
-      $.publish "CommonEvent/eventSaving", this
-      $.ajaxJSON url, method, params, onSuccess, onError
+    this.forceMinimumDuration() // so short events don't look squished while waiting for ajax
+    $.publish('CommonEvent/eventSaving', this)
+    return $.ajaxJSON(url, method, params, onSuccess, onError)
+  },
 
-    isDueAtMidnight: () ->
-      @start && (@midnightFudged || (@start.hours() == 23 && @start.minutes() > 30) || (@start.hours() == 0 && @start.minutes() == 0))
+  isDueAtMidnight() {
+    return (
+      this.start &&
+      (this.midnightFudged ||
+        (this.start.hours() === 23 && this.start.minutes() > 30) ||
+        (this.start.hours() === 0 && this.start.minutes() === 0))
+    )
+  },
 
-    isPast: () ->
-      @start && @start < fcUtil.now()
+  isPast() {
+    return this.start && this.start < fcUtil.now()
+  },
 
-    copyDataFromObject: (data) ->
-      @originalStart = (fcUtil.clone(@start) if @start)
-      @midnightFudged = false # clear out cached value because now we have new data
-      if @isDueAtMidnight()
-        @midnightFudged = true
-        @start.minutes(30)
-        @start.seconds(0)
-        @end = fcUtil.clone(@start) unless @end
-      else
-        # minimum duration should only be enforced if not due at midnight
-        @forceMinimumDuration()
-      @preventWrappingAcrossDates()
+  copyDataFromObject(data) {
+    this.originalStart = this.start && fcUtil.clone(this.start)
+    this.midnightFudged = false // clear out cached value because now we have new data
+    if (this.isDueAtMidnight()) {
+      this.midnightFudged = true
+      this.start.minutes(30)
+      this.start.seconds(0)
+      if (!this.end) {
+        this.end = fcUtil.clone(this.start)
+      }
+    } else {
+      // minimum duration should only be enforced if not due at midnight
+      this.forceMinimumDuration()
+    }
+    return this.preventWrappingAcrossDates()
+  },
 
-    formatTime: (datetime, allDay=false) ->
-      return null unless datetime
-      datetime = fcUtil.unwrap(datetime)
-      if allDay
-        formattedHtml = $.dateString(datetime)
-      else
-        formattedHtml = $.datetimeString(datetime)
-      "<time datetime='#{datetime.toISOString()}'>#{formattedHtml}</time>"
+  formatTime(datetime, allDay = false) {
+    let formattedHtml
+    if (!datetime) {
+      return null
+    }
+    datetime = fcUtil.unwrap(datetime)
+    if (allDay) {
+      formattedHtml = $.dateString(datetime)
+    } else {
+      formattedHtml = $.datetimeString(datetime)
+    }
+    return `<time datetime='${datetime.toISOString()}'>${formattedHtml}</time>`
+  },
 
-    forceMinimumDuration: () ->
-      if @start && @end
-        minimumEnd = fcUtil.clone(@start).add(30, "minutes")
-        @end = minimumEnd if minimumEnd > @end
+  forceMinimumDuration() {
+    if (this.start && this.end) {
+      const minimumEnd = fcUtil.clone(this.start).add(30, 'minutes')
+      if (minimumEnd > this.end) {
+        return (this.end = minimumEnd)
+      }
+    }
+  },
 
-    preventWrappingAcrossDates: () ->
-      if @start && @start.hours() == 23 && @start.minutes() > 0 && (!@end || @start.isSame(@end))
-        @end = fcUtil.clone(@start).add(60 - @start.minutes(), "minutes")
+  preventWrappingAcrossDates() {
+    if (
+      this.start &&
+      this.start.hours() === 23 &&
+      this.start.minutes() > 0 &&
+      (!this.end || this.start.isSame(this.end))
+    ) {
+      return (this.end = fcUtil.clone(this.start).add(60 - this.start.minutes(), 'minutes'))
+    }
+  },
 
-    assignmentType: () ->
-      return if !@assignment
-      if @assignment.submission_types?.length
-        type = @assignment.submission_types[0]
-        if type == 'online_quiz'
-          return 'quiz'
-        if type == 'discussion_topic'
-          return 'discussion'
-      return 'assignment'
+  assignmentType() {
+    if (!this.assignment) return
+    if (
+      this.assignment.submission_types &&
+      this.assignment.submission_types.length
+    ) {
+      const type = this.assignment.submission_types[0]
+      if (type === 'online_quiz') return 'quiz'
+      if (type === 'discussion_topic') return 'discussion'
+    }
+    return 'assignment'
+  },
 
-    iconType: ->
-      if type = @assignmentType()
-        type
-      else if  @eventType == 'planner_note'
-        'note-light'
-      else if ENV.CALENDAR.BETTER_SCHEDULER
-        if @isAppointmentGroupEvent() && (@isAppointmentGroupFilledEvent() || @appointmentGroupEventStatus == "Reserved")
-          'calendar-reserved'
-        else if @isAppointmentGroupEvent()
-          'calendar-add'
-        else
-          'calendar-month'
-      else
-        'calendar-month'
+  iconType() {
+    let type
+    if ((type = this.assignmentType())) {
+      return type
+    } else if (this.eventType === 'planner_note') {
+      return 'note-light'
+    } else if (ENV.CALENDAR.BETTER_SCHEDULER) {
+      if (
+        this.isAppointmentGroupEvent() &&
+        (this.isAppointmentGroupFilledEvent() || this.appointmentGroupEventStatus === 'Reserved')
+      ) {
+        return 'calendar-reserved'
+      } else if (this.isAppointmentGroupEvent()) {
+        return 'calendar-add'
+      } else {
+        return 'calendar-month'
+      }
+    } else {
+      return 'calendar-month'
+    }
+  },
 
-    isOnCalendar: (context_code) ->
-      @calendarEvent.all_context_codes.match(///\b#{context_code}\b///)
+  isOnCalendar(context_code) {
+    return this.calendarEvent.all_context_codes.match(new RegExp(`\\b${context_code}\\b`))
+  }
+})

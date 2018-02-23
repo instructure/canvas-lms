@@ -1,82 +1,109 @@
-#
-# Copyright (C) 2012 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+/*
+ * Copyright (C) 2012 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-define [
-  'i18n!calendar'
-  'jquery'
-  '../calendar/CommonEvent'
-  '../util/fcUtil'
-  'jquery.instructure_date_and_time'
-  'jquery.instructure_misc_helpers'
-], (I18n, $, CommonEvent, fcUtil) ->
+import I18n from 'i18n!calendar'
+import $ from 'jquery'
+import CommonEvent from '../calendar/CommonEvent'
+import fcUtil from '../util/fcUtil'
+import {extend} from '../legacyCoffeesScriptHelpers'
+import 'jquery.instructure_date_and_time'
+import 'jquery.instructure_misc_helpers'
 
-  deleteConfirmation = I18n.t('prompts.delete_assignment', "Are you sure you want to delete this assignment?")
+const deleteConfirmation = I18n.t(
+  'prompts.delete_assignment',
+  'Are you sure you want to delete this assignment?'
+)
 
-  class Assignment extends CommonEvent
-    constructor: (data, contextInfo) ->
-      super
-      @eventType = 'assignment'
-      @deleteConfirmation = deleteConfirmation
-      @deleteURL = contextInfo.assignment_url
-      @addClass 'assignment'
+extend(Assignment, CommonEvent)
+export default function Assignment(data, contextInfo) {
+  Assignment.__super__.constructor.apply(this, arguments)
+  this.eventType = 'assignment'
+  this.deleteConfirmation = deleteConfirmation
+  this.deleteURL = contextInfo.assignment_url
+  this.addClass('assignment')
+}
 
-    copyDataFromObject: (data) ->
-      data = data.assignment if data.assignment
-      @object = @assignment = data
-      @id = "assignment_#{data.id}" if data.id
-      @title = data.title || data.name  || "Untitled" # due to a discrepancy between the legacy ajax API and the v1 API
-      @lock_explanation = @object.lock_explanation
-      @addClass "group_#{@contextCode()}"
-      @description = data.description
-      @start = @parseStartDate()
-      @end = null # in case it got set by midnight fudging
+Object.assign(Assignment.prototype, {
+  copyDataFromObject(data) {
+    if (data.assignment) data = data.assignment
+    this.object = this.assignment = data
+    if (data.id) this.id = `assignment_${data.id}`
+    this.title = data.title || data.name || 'Untitled' // due to a discrepancy between the legacy ajax API and the v1 API
+    this.lock_explanation = this.object.lock_explanation
+    this.addClass(`group_${this.contextCode()}`)
+    this.description = data.description
+    this.start = this.parseStartDate()
+    this.end = null // in case it got set by midnight fudging
 
-      super
+    return Assignment.__super__.copyDataFromObject.apply(this, arguments)
+  },
 
-    fullDetailsURL: () ->
-      @assignment.html_url
+  fullDetailsURL() {
+    return this.assignment.html_url
+  },
 
-    parseStartDate: () ->
-      fcUtil.wrap(@assignment.due_at) if @assignment.due_at
+  parseStartDate() {
+    if (this.assignment.due_at) {
+      return fcUtil.wrap(this.assignment.due_at)
+    }
+  },
 
-    displayTimeString: () ->
-      datetime = @originalStart
-      if datetime
-        I18n.t('Due: %{dueAt}', dueAt: @formatTime(datetime))
-      else
-        I18n.t('No Date')
-    readableType: () ->
-      @readableTypes[@assignmentType()]
+  displayTimeString() {
+    const datetime = this.originalStart
+    if (datetime) {
+      return I18n.t('Due: %{dueAt}', {dueAt: this.formatTime(datetime)})
+    } else {
+      return I18n.t('No Date')
+    }
+  },
 
-    saveDates: (success, error) ->
-      @save { 'assignment[due_at]': if @start then fcUtil.unwrap(@start).toISOString() else '' }, success, error
+  readableType() {
+    return this.readableTypes[this.assignmentType()]
+  },
 
-    save: (params, success, error) ->
-      $.publish('CommonEvent/assignmentSaved', @)
-      super(params, success, error)
+  saveDates(success, error) {
+    return this.save(
+      {'assignment[due_at]': this.start ? fcUtil.unwrap(this.start).toISOString() : ''},
+      success,
+      error
+    )
+  },
 
-    methodAndURLForSave: () ->
-      if @isNewEvent()
-        method = 'POST'
-        url = @contextInfo.create_assignment_url
-      else
-        method = 'PUT'
-        url = $.replaceTags(@contextInfo.assignment_url, 'id', @assignment.id)
-      [ method, url ]
+  save(params, success, error) {
+    $.publish('CommonEvent/assignmentSaved', this)
+    return Assignment.__super__.save.apply(this, arguments)
+  },
 
-    isCompleted: ->
-      @assignment.user_submitted || (this.isPast() && @assignment.needs_grading_count == 0)
+  methodAndURLForSave() {
+    let method, url
+    if (this.isNewEvent()) {
+      method = 'POST'
+      url = this.contextInfo.create_assignment_url
+    } else {
+      method = 'PUT'
+      url = $.replaceTags(this.contextInfo.assignment_url, 'id', this.assignment.id)
+    }
+    return [method, url]
+  },
+
+  isCompleted() {
+    return (
+      this.assignment.user_submitted || (this.isPast() && this.assignment.needs_grading_count === 0)
+    )
+  }
+})

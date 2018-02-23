@@ -1,139 +1,205 @@
-#
-# Copyright (C) 2017 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-define [
-  'i18n!calendar'
-  'jquery'
-  '../util/fcUtil'
-  '../util/semanticDateRange'
-  '../calendar/CommonEvent'
-  '../util/natcompare'
-  'jquery.instructure_date_and_time'
-  'jquery.instructure_misc_helpers'
-], (I18n, $, fcUtil, semanticDateRange, CommonEvent, natcompare) ->
+import I18n from 'i18n!calendar'
+import $ from 'jquery'
+import fcUtil from '../util/fcUtil'
+import semanticDateRange from '../util/semanticDateRange'
+import CommonEvent from '../calendar/CommonEvent'
+import natcompare from '../util/natcompare'
+import {extend} from '../legacyCoffeesScriptHelpers'
+import 'jquery.instructure_date_and_time'
+import 'jquery.instructure_misc_helpers'
 
-  class CalendarEvent extends CommonEvent
-    constructor: (data, contextInfo, actualContextInfo) ->
-      super data, contextInfo, actualContextInfo
-      @eventType = 'calendar_event'
-      @appointmentGroupEventStatus = @calculateAppointmentGroupEventStatus()
-      @reservedUsers = @getListOfReservedPeople(5).join('; ')
-      @deleteConfirmation = I18n.t("Are you sure you want to delete this event?")
-      @deleteURL = contextInfo.calendar_event_url
+extend(CalendarEvent, CommonEvent)
+export default function CalendarEvent(data, contextInfo, actualContextInfo) {
+  CalendarEvent.__super__.constructor.call(this, data, contextInfo, actualContextInfo)
+  this.eventType = 'calendar_event'
+  this.appointmentGroupEventStatus = this.calculateAppointmentGroupEventStatus()
+  this.reservedUsers = this.getListOfReservedPeople(5).join('; ')
+  this.deleteConfirmation = I18n.t('Are you sure you want to delete this event?')
+  this.deleteURL = contextInfo.calendar_event_url
+}
 
-    copyDataFromObject: (data) ->
-      data = data.calendar_event if data.calendar_event
-      @object = @calendarEvent = data
-      @id = "calendar_event_#{data.id}" if data.id
-      @title = data.title || "Untitled"
-      @comments = data.comments
-      @location_name = data.location_name
-      @location_address = data.location_address
-      @start = @parseStartDate()
-      @end = @parseEndDate()
-      # see originalStart in super's copyDataFromObject
-      @originalEndDate = fcUtil.clone(@end) if @end
-      @allDay = data.all_day
-      @editable = true
-      @lockedTitle = @object.parent_event_id?
-      @description = data.description
-      @addClass "group_#{@contextCode()}"
-      if @isAppointmentGroupEvent()
-        @addClass "scheduler-event"
-        if @object.reserved
-          @addClass "scheduler-reserved"
-        if @object.available_slots == 0
-          @addClass "scheduler-full"
-        if @object.available_slots == undefined || @object.available_slots > 0
-          @addClass "scheduler-available"
-        @editable = false
+Object.assign(CalendarEvent.prototype, {
+  copyDataFromObject(data) {
+    if (data.calendar_event) {
+      data = data.calendar_event
+    }
+    this.object = this.calendarEvent = data
+    if (data.id) this.id = `calendar_event_${data.id}`
+    this.title = data.title || 'Untitled'
+    this.comments = data.comments
+    this.location_name = data.location_name
+    this.location_address = data.location_address
+    this.start = this.parseStartDate()
+    this.end = this.parseEndDate()
+    // see originalStart in super's copyDataFromObject
+    if (this.end) this.originalEndDate = fcUtil.clone(this.end)
+    this.allDay = data.all_day
+    this.editable = true
+    this.lockedTitle = this.object.parent_event_id != null
+    this.description = data.description
+    this.addClass(`group_${this.contextCode()}`)
+    if (this.isAppointmentGroupEvent()) {
+      this.addClass('scheduler-event')
+      if (this.object.reserved) {
+        this.addClass('scheduler-reserved')
+      }
+      if (this.object.available_slots === 0) {
+        this.addClass('scheduler-full')
+      }
+      if (this.object.available_slots === undefined || this.object.available_slots > 0) {
+        this.addClass('scheduler-available')
+      }
+      this.editable = false
+    }
+    return CalendarEvent.__super__.copyDataFromObject.apply(this, arguments)
+  },
 
-      super
+  endDate() {
+    return this.originalEndDate
+  },
 
-    endDate: () -> @originalEndDate
+  parseStartDate() {
+    if (this.calendarEvent.start_at) {
+      return fcUtil.wrap(this.calendarEvent.start_at)
+    }
+  },
 
-    parseStartDate: () ->
-      fcUtil.wrap(@calendarEvent.start_at) if @calendarEvent.start_at
+  parseEndDate() {
+    if (this.calendarEvent.end_at) {
+      return fcUtil.wrap(this.calendarEvent.end_at)
+    }
+  },
 
-    parseEndDate: () ->
-      fcUtil.wrap(@calendarEvent.end_at) if @calendarEvent.end_at
+  fullDetailsURL() {
+    if (this.isAppointmentGroupEvent()) {
+      return `/appointment_groups/${this.object.appointment_group_id}`
+    } else {
+      return $.replaceTags(
+        this.contextInfo.calendar_event_url,
+        'id',
+        this.calendarEvent.parent_event_id || this.calendarEvent.id
+      )
+    }
+  },
 
-    fullDetailsURL: () ->
-      if @isAppointmentGroupEvent()
-        "/appointment_groups/#{@object.appointment_group_id}"
-      else
-        $.replaceTags(@contextInfo.calendar_event_url, 'id', @calendarEvent.parent_event_id ? @calendarEvent.id)
+  editGroupURL() {
+    if (this.isAppointmentGroupEvent()) {
+      return `/appointment_groups/${this.object.appointment_group_id}/edit`
+    } else {
+      return '#'
+    }
+  },
 
-    editGroupURL: () ->
-      if @isAppointmentGroupEvent()
-        "/appointment_groups/#{@object.appointment_group_id}/edit"
-      else
-        "#"
+  displayTimeString() {
+    if (this.calendarEvent.all_day) {
+      return this.formatTime(this.startDate(), true)
+    } else {
+      return semanticDateRange(this.calendarEvent.start_at, this.calendarEvent.end_at)
+    }
+  },
 
-    displayTimeString: () ->
-        if @calendarEvent.all_day
-          @formatTime(@startDate(), true)
-        else
-          semanticDateRange(@calendarEvent.start_at, @calendarEvent.end_at)
+  readableType() {
+    return this.readableTypes.event
+  },
 
-    readableType: () ->
-      @readableTypes['event']
+  saveDates(success, error) {
+    return this.save(
+      {
+        'calendar_event[start_at]': this.start ? fcUtil.unwrap(this.start).toISOString() : '',
+        'calendar_event[end_at]': this.end ? fcUtil.unwrap(this.end).toISOString() : '',
+        'calendar_event[all_day]': this.allDay
+      },
+      success,
+      error
+    )
+  },
 
-    saveDates: (success, error) ->
-      @save {
-        'calendar_event[start_at]': if @start then fcUtil.unwrap(@start).toISOString() else ''
-        'calendar_event[end_at]': if @end then fcUtil.unwrap(@end).toISOString() else ''
-        'calendar_event[all_day]': @allDay
-      }, success, error
+  methodAndURLForSave() {
+    let method, url
+    if (this.isNewEvent()) {
+      method = 'POST'
+      url = '/api/v1/calendar_events'
+    } else {
+      method = 'PUT'
+      url = this.calendarEvent.url
+    }
+    return [method, url]
+  },
 
-    methodAndURLForSave: () ->
-      if @isNewEvent()
-        method = 'POST'
-        url = '/api/v1/calendar_events'
-      else
-        method = 'PUT'
-        url = @calendarEvent.url
-      [ method, url ]
+  calculateAppointmentGroupEventStatus() {
+    let status = I18n.t('Available')
+    if (this.calendarEvent.available_slots > 0) {
+      status = I18n.t('%{availableSlots} Available', {availableSlots: I18n.n(this.calendarEvent.available_slots)})
+    }
+    if (this.calendarEvent.available_slots > 0 && (this.calendarEvent.child_events && this.calendarEvent.child_events.length)) {
+      status = I18n.t('%{availableSlots} more available', {availableSlots: I18n.n(this.calendarEvent.available_slots)})
+    }
+    if (this.calendarEvent.available_slots === 0) {
+      status = I18n.t('Filled')
+    }
+    if (this.consideredReserved()) {
+      status = I18n.t('Reserved')
+    }
 
-    calculateAppointmentGroupEventStatus: ->
-      status = I18n.t 'Available'
-      if @calendarEvent.available_slots > 0
-        status = I18n.t('%{availableSlots} Available', {availableSlots: I18n.n(@calendarEvent.available_slots)})
-      if @calendarEvent.available_slots > 0 && @calendarEvent.child_events?.length
-        status = I18n.t('%{availableSlots} more available', {availableSlots: I18n.n(@calendarEvent.available_slots)})
-      if @calendarEvent.available_slots == 0
-        status = I18n.t('Filled')
-      if @consideredReserved()
-        status = I18n.t('Reserved')
+    return status
+  },
 
-      status
+  // Returns an array of sortable user names that have reserved this slot optionally
+  // limited to a certain number.  The list is returned sorted naturally.  If there
+  // are more than the limit 'and more...' will be appended.
 
-    # Returns an array of sortable user names that have reserved this slot optionally
-    # limited to a certain number.  The list is returned sorted naturally.  If there
-    # are more than the limit 'and more...' will be appended.
-    getListOfReservedPeople: (limit) ->
-      return [] unless @calendarEvent.child_events?.length
-      names = @calendarEvent.child_events?.map((child_event) -> child_event.user?.sortable_name)
-      sorted = names.sort((a, b) => natcompare.strings(a, b))
-      if (limit)
-        sorted = sorted.slice(0, limit)
-      if @calendarEvent.child_events?.length > limit
+  getListOfReservedPeople(limit) {
+    if (
+      !(
+        this.calendarEvent &&
+        this.calendarEvent.child_events &&
+        this.calendarEvent.child_events.length
+      )
+    ) {
+      return []
+    }
+
+    const names = ((this.calendarEvent && this.calendarEvent.child_events) || []).map(
+      child_event => child_event.user && child_event.user.sortable_name
+    )
+    let sorted = names.sort((a, b) => natcompare.strings(a, b))
+
+    if (limit) {
+      sorted = sorted.slice(0, limit)
+      if (
+        (this.calendarEvent &&
+          this.calendarEvent.child_events &&
+          this.calendarEvent.child_events.length) > limit
+      ) {
         sorted.push(I18n.t('and more...'))
-      sorted
+      }
+    }
+    return sorted
+  },
 
-    # True if the slot should be considered reserved
-    consideredReserved: -> @calendarEvent.reserved == true || (@calendarEvent.appointment_group_url && @calendarEvent.parent_event_id)
+  // True if the slot should be considered reserved
+  consideredReserved() {
+    return (
+      this.calendarEvent.reserved === true ||
+      (this.calendarEvent.appointment_group_url && this.calendarEvent.parent_event_id)
+    )
+  }
+})

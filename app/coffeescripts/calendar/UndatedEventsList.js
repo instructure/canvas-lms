@@ -1,137 +1,169 @@
-#
-# Copyright (C) 2012 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+/*
+ * Copyright (C) 2012 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-define [
-  'i18n!calendar'
-  'jquery'
-  'jst/calendar/undatedEvents'
-  '../calendar/EventDataSource'
-  '../calendar/ShowEventDetailsDialog'
-  'jqueryui/draggable'
-  'jquery.disableWhileLoading'
-  'vendor/jquery.ba-tinypubsub'
-], (I18n, $, undatedEventsTemplate, EventDataSource, ShowEventDetailsDialog) ->
+import I18n from 'i18n!calendar'
+import $ from 'jquery'
+import undatedEventsTemplate from 'jst/calendar/undatedEvents'
+import ShowEventDetailsDialog from '../calendar/ShowEventDetailsDialog'
+import 'jqueryui/draggable'
+import 'jquery.disableWhileLoading'
+import 'vendor/jquery.ba-tinypubsub'
 
-  class UndatedEventsList
-    constructor: (selector, @dataSource, @calendar) ->
-      @div = $(selector).html undatedEventsTemplate({ unloaded: true })
-      @hidden = true
-      @visibleContextList = []
-      @previouslyFocusedElement = null
+export default class UndatedEventsList {
+  constructor(selector, dataSource, calendar) {
+    let toggler
+    this.dataSource = dataSource
+    this.calendar = calendar
+    this.div = $(selector).html(undatedEventsTemplate({unloaded: true}))
+    this.hidden = true
+    this.visibleContextList = []
+    this.previouslyFocusedElement = null
 
-      $.subscribe
-        "CommonEvent/eventDeleting" : @eventDeleting
-        "CommonEvent/eventDeleted" : @eventDeleted
-        "CommonEvent/eventSaving" : @eventSaving
-        "CommonEvent/eventSaved" : @eventSaved
-        "Calendar/visibleContextListChanged" : @visibleContextListChanged
+    $.subscribe({
+      'CommonEvent/eventDeleting': this.eventDeleting,
+      'CommonEvent/eventDeleted': this.eventDeleted,
+      'CommonEvent/eventSaving': this.eventSaving,
+      'CommonEvent/eventSaved': this.eventSaved,
+      'Calendar/visibleContextListChanged': this.visibleContextListChanged
+    })
 
-      @div.on('click keyclick', '.undated_event_title', @clickEvent)
-          .on('click', '.undated-events-link', @show)
-      if toggler = @div.prev('.element_toggler')
-        toggler.on('click keyclick', @toggle)
-        @div.find('.undated-events-link').hide()
+    this.div
+      .on('click keyclick', '.undated_event_title', this.clickEvent)
+      .on('click', '.undated-events-link', this.show)
+    if ((toggler = this.div.prev('.element_toggler'))) {
+      toggler.on('click keyclick', this.toggle)
+      this.div.find('.undated-events-link').hide()
+    }
+  }
 
-    load: () =>
-      return if @hidden
+  load = () => {
+    if (this.hidden) return
 
-      loadingDfd = new $.Deferred()
-      @div.disableWhileLoading(loadingDfd, {
-        buttons: ['.undated-events-link'],
-        opacity: 1,
-        lines: 8, length: 2, width: 2, radius: 3
+    const loadingDfd = new $.Deferred()
+    this.div.disableWhileLoading(loadingDfd, {
+      buttons: ['.undated-events-link'],
+      opacity: 1,
+      lines: 8,
+      length: 2,
+      width: 2,
+      radius: 3
+    })
+
+    const loadingTimer = setTimeout(
+      () => $.screenReaderFlashMessage(I18n.t('loading_undated_events', 'Loading undated events')),
+      0
+    )
+
+    return this.dataSource.getEvents(null, null, this.visibleContextList, events => {
+      clearTimeout(loadingTimer)
+      loadingDfd.resolve()
+      events.forEach(e => {
+        e.details_url = e.fullDetailsURL()
+        e.icon = e.iconType()
+      })
+      this.div.html(undatedEventsTemplate({events}))
+
+      events.forEach(e => {
+        this.div.find(`.${e.id}`).data('calendarEvent', e)
       })
 
-      loadingTimer = setTimeout ->
-        $.screenReaderFlashMessage(I18n.t('loading_undated_events', 'Loading undated events'))
-      , 0
+      this.div.find('.event').draggable({
+        revert: 'invalid',
+        revertDuration: 0,
+        helper: 'clone',
+        start: () => {
+          this.calendar.closeEventPopups()
+          $(this).hide()
+        },
+        stop(e, ui) {
+          // Only show the element after the drag stops if it doesn't have a start date now
+          // (meaning it wasn't dropped on the calendar)
+          if (!$(this).data('calendarEvent').start) $(this).show()
+        }
+      })
 
-      @dataSource.getEvents null, null, @visibleContextList, (events) =>
-        clearTimeout(loadingTimer)
-        loadingDfd.resolve()
-        for e in events
-          e.details_url = e.fullDetailsURL()
-          e.icon = e.iconType()
-        @div.html undatedEventsTemplate(events: events)
+      this.div.droppable({
+        hoverClass: 'droppable-hover',
+        accept: '.fc-event',
+        drop: (e, ui) => {
+          let event
+          if (!(event = this.calendar.lastEventDragged)) return
+          event.start = null
+          event.end = null
+          return event.saveDates()
+        }
+      })
 
-        for e in events
-          @div.find(".#{e.id}").data 'calendarEvent', e
+      if (this.previouslyFocusedElement) {
+        $(this.previouslyFocusedElement).focus()
+      } else {
+        this.div.siblings('.element_toggler').focus()
+      }
+    })
+  }
 
-        @div.find('.event').draggable
-          revert: 'invalid'
-          revertDuration: 0
-          helper: 'clone'
-          start: =>
-            @calendar.closeEventPopups()
-            $(this).hide()
-          stop: (e, ui) ->
-            # Only show the element after the drag stops if it doesn't have a start date now
-            # (meaning it wasn't dropped on the calendar)
-            $(this).show() unless $(this).data('calendarEvent').start
+  show = event => {
+    event.preventDefault()
+    this.hidden = false
+    this.load()
+  }
 
-        @div.droppable
-          hoverClass: 'droppable-hover'
-          accept: '.fc-event'
-          drop: (e, ui) =>
-            return unless event = @calendar.lastEventDragged
-            event.start = null
-            event.end = null
-            event.saveDates()
+  toggle = e => {
+    // defer this until after the section toggles
+    setTimeout(() => {
+      this.hidden = !this.div.is(':visible')
+      this.load()
+    }, 0)
+  }
 
-        if @previouslyFocusedElement
-          $(@previouslyFocusedElement).focus()
-        else
-          @div.siblings('.element_toggler').focus()
+  clickEvent = jsEvent => {
+    jsEvent.preventDefault()
+    const eventId = $(jsEvent.target)
+      .closest('.event')
+      .data('event-id')
+    const event = this.dataSource.eventWithId(eventId)
+    if (event) {
+      return new ShowEventDetailsDialog(event, this.dataSource).show(jsEvent)
+    }
+  }
 
-    show: (event) =>
-      event.preventDefault()
-      @hidden = false
-      @load()
+  visibleContextListChanged = list => {
+    this.visibleContextList = list
+    if (!this.hidden) this.load()
+  }
 
-    toggle: (e) =>
-      # defer this until after the section toggles
-      setTimeout =>
-        @hidden = !@div.is(':visible')
-        @load()
-      , 0
+  eventSaving = event => {
+    this.div.find(`.event.${event.id}`).addClass('event_pending')
+    this.previouslyFocusedElement = `.event.${event.id} a`
+  }
 
-    clickEvent: (jsEvent) =>
-      jsEvent.preventDefault()
-      eventId = $(jsEvent.target).closest('.event').data('event-id')
-      event = @dataSource.eventWithId(eventId)
-      if event
-        new ShowEventDetailsDialog(event, @dataSource).show jsEvent
+  eventSaved = () => {
+    this.load()
+  }
 
-    visibleContextListChanged: (list) =>
-      @visibleContextList = list
-      @load() unless @hidden
+  eventDeleting = event => {
+    const $li = this.div.find(`.event.${event.id}`)
+    $li.addClass('event_pending')
+    const $prev = $li.prev()
+    this.previouslyFocusedElement = $prev.length ? `.event.${$prev.data('event-id')} a` : null
+  }
 
-    eventSaving: (event) =>
-      @div.find(".event.#{event.id}").addClass('event_pending')
-      @previouslyFocusedElement = ".event.#{event.id} a"
-
-    eventSaved: =>
-      @load()
-
-    eventDeleting: (event) =>
-      $li = @div.find(".event.#{event.id}")
-      $li.addClass('event_pending')
-      $prev = $li.prev()
-      @previouslyFocusedElement = if $prev.length then ".event.#{$prev.data('event-id')} a" else null
-
-    eventDeleted: =>
-      @load()
+  eventDeleted = () => {
+    this.load()
+  }
+}

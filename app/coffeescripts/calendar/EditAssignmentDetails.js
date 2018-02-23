@@ -1,264 +1,348 @@
-#
-# Copyright (C) 2012 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+/*
+ * Copyright (C) 2012 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-define [
-  'i18n!calendar'
-  'jquery'
-  'underscore'
-  'timezone'
-  'moment'
-  '../util/fcUtil'
-  '../util/natcompare'
-  '../calendar/commonEventFactory'
-  '../views/ValidatedFormView'
-  '../calendar/CommonEvent.CalendarEvent'
-  '../util/SisValidationHelper'
-  'jst/calendar/editAssignment'
-  'jst/calendar/editAssignmentOverride'
-  'jst/EmptyDialogFormWrapper'
-  'jst/calendar/genericSelectOptions'
-  'jsx/shared/helpers/datePickerFormat'
-  'jsx/shared/FlashAlert'
-  'jsx/shared/helpers/momentDateHelper'
-  'jquery.instructure_date_and_time'
-  'jquery.instructure_forms'
-  'jquery.instructure_misc_helpers'
-  '../calendar/fcMomentHandlebarsHelpers'
-], (I18n, $, _, tz, moment, fcUtil, natcompare, commonEventFactory, ValidatedFormView,
-    CalendarEvent, SisValidationHelper, editAssignmentTemplate,
-    editAssignmentOverrideTemplate, wrapper, genericSelectOptionsTemplate,
-    datePickerFormat, { showFlashAlert }, withinMomentDates) ->
+import I18n from 'i18n!calendar'
+import $ from 'jquery'
+import moment from 'moment'
+import natcompare from '../util/natcompare'
+import commonEventFactory from '../calendar/commonEventFactory'
+import ValidatedFormView from '../views/ValidatedFormView'
+import SisValidationHelper from '../util/SisValidationHelper'
+import editAssignmentTemplate from 'jst/calendar/editAssignment'
+import editAssignmentOverrideTemplate from 'jst/calendar/editAssignmentOverride'
+import wrapper from 'jst/EmptyDialogFormWrapper'
+import genericSelectOptionsTemplate from 'jst/calendar/genericSelectOptions'
+import datePickerFormat from 'jsx/shared/helpers/datePickerFormat'
+import {showFlashAlert} from 'jsx/shared/FlashAlert'
+import withinMomentDates from 'jsx/shared/helpers/momentDateHelper'
+import {extend} from '../legacyCoffeesScriptHelpers'
+import 'jquery.instructure_date_and_time'
+import 'jquery.instructure_forms'
+import 'jquery.instructure_misc_helpers'
+import '../calendar/fcMomentHandlebarsHelpers'
 
-  class EditAssignmentDetailsRewrite extends ValidatedFormView
+extend(EditAssignmentDetailsRewrite, ValidatedFormView)
 
-    defaults:
-      width: 440
-      height: 384
+export default function EditAssignmentDetailsRewrite() {
+  this.setContext = this.setContext.bind(this)
+  this.activate = this.activate.bind(this)
+  this.moreOptions = this.moreOptions.bind(this)
+  this.setContext = this.setContext.bind(this)
+  this.contextChange = this.contextChange.bind(this)
+  this.setupTimeAndDatePickers = this.setupTimeAndDatePickers.bind(this)
+  this.submitAssignment = this.submitAssignment.bind(this)
+  this.getFormData = this.getFormData.bind(this)
+  this.onSaveSuccess = this.onSaveSuccess.bind(this)
+  this.onSaveFail = this.onSaveFail.bind(this)
+  return EditAssignmentDetailsRewrite.__super__.constructor.apply(this, arguments)
+}
 
-    events: _.extend {}, @::events,
-      'click .save_assignment': 'submitAssignment'
-      'click .more_options_link': 'moreOptions'
-      'change .context_id': 'contextChange'
+Object.assign(EditAssignmentDetailsRewrite.prototype, {
+  defaults: {
+    width: 440,
+    height: 384
+  },
 
-    template: editAssignmentTemplate
-    wrapper: wrapper
+  events: {
+    ...EditAssignmentDetailsRewrite.prototype.events,
+    'click .save_assignment': 'submitAssignment',
+    'click .more_options_link': 'moreOptions',
+    'change .context_id': 'contextChange'
+  },
 
-    @optionProperty 'assignmentGroup'
+  template: editAssignmentTemplate,
+  wrapper,
 
-    initialize: (selector, @event, @contextChangeCB, @closeCB) ->
-      super(
-        title: @event.title
-        contexts: @event.possibleContexts()
-        date: @event.startDate()
-        postToSISEnabled: ENV.POST_TO_SIS
-        postToSISName: ENV.SIS_NAME
-        postToSIS: @event.assignment.post_to_sis if @event.eventType == 'assignment'
-        datePickerFormat: if @event.allDay then 'medium_with_weekday' else 'full_with_weekday'
+  initialize(selector, event, contextChangeCB, closeCB) {
+    this.event = event
+    this.contextChangeCB = contextChangeCB
+    this.closeCB = closeCB
+    EditAssignmentDetailsRewrite.__super__.initialize.call(this, {
+      title: this.event.title,
+      contexts: this.event.possibleContexts(),
+      date: this.event.startDate(),
+      postToSISEnabled: ENV.POST_TO_SIS,
+      postToSISName: ENV.SIS_NAME,
+      postToSIS:
+        this.event.eventType === 'assignment' ? this.event.assignment.post_to_sis : undefined,
+      datePickerFormat: this.event.allDay ? 'medium_with_weekday' : 'full_with_weekday'
+    })
+    this.currentContextInfo = null
+    if (this.event.override) {
+      this.template = editAssignmentOverrideTemplate
+    }
+
+    $(selector).append(this.render().el)
+
+    this.setupTimeAndDatePickers()
+    this.$el.find('select.context_id').triggerHandler('change', false)
+
+    if (this.model == null) {
+      this.model = this.generateNewEvent()
+    }
+
+    if (!this.event.isNewEvent()) {
+      this.$el.find('.context_select').hide()
+      this.$el.attr('method', 'PUT')
+      return this.$el.attr(
+        'action',
+        $.replaceTags(this.event.contextInfo.assignment_url, 'id', this.event.object.id)
       )
-      @currentContextInfo = null
-      @.template = editAssignmentOverrideTemplate if @event.override
+    }
+  },
 
-      $(selector).append @.render().el
+  setContext(newContext) {
+    this.$el
+      .find('select.context_id')
+      .val(newContext)
+      .triggerHandler('change', false)
+  },
 
-      @setupTimeAndDatePickers()
-      @$el.find("select.context_id").triggerHandler('change', false)
+  contextInfoForCode(code) {
+    return this.event.possibleContexts().find(context => context.asset_string === code)
+  },
 
-      @model ?= @generateNewEvent()
+  activate() {
+    this.$el.find('select.context_id').change()
+    if (this.event.assignment && this.event.assignment.assignment_group_id) {
+      return this.$el
+        .find('.assignment_group_select .assignment_group')
+        .val(this.event.assignment.assignment_group_id)
+    }
+  },
 
-      if !@event.isNewEvent()
-        @$el.find(".context_select").hide()
-        @$el.attr('method', 'PUT')
-        @$el.attr('action', $.replaceTags(@event.contextInfo.assignment_url, 'id', @event.object.id))
+  moreOptions(jsEvent) {
+    jsEvent.preventDefault()
+    const pieces = $(jsEvent.target)
+      .attr('href')
+      .split('#')
+    const data = this.$el.getFormData({object_name: 'assignment'})
+    const params = {}
+    if (data.name) {
+      params.title = data.name
+    }
+    if (data.due_at && this.$el.find('.datetime_field').data('unfudged-date')) {
+      params.due_at = this.$el
+        .find('.datetime_field')
+        .data('unfudged-date')
+        .toISOString()
+    }
 
-    setContext: (newContext) =>
-      @$el.find("select.context_id").val(newContext).triggerHandler('change', false)
+    if (data.assignment_group_id) {
+      params.assignment_group_id = data.assignment_group_id
+    }
+    params.return_to = window.location.href
+    pieces[0] += `?${$.param(params)}`
+    return (window.location.href = pieces.join('#'))
+  },
 
-    contextInfoForCode: (code) ->
-      for context in @event.possibleContexts()
-        if context.asset_string == code
-          return context
-      return null
+  contextChange(jsEvent, propagate) {
+    if (this.ignoreContextChange) return
 
-    activate: () =>
-      @$el.find("select.context_id").change()
-      if @event.assignment?.assignment_group_id
-        @$el.find(".assignment_group_select .assignment_group").val(@event.assignment.assignment_group_id)
+    const context = $(jsEvent.target).val()
+    this.currentContextInfo = this.contextInfoForCode(context)
+    this.event.contextInfo = this.currentContextInfo
+    if (this.currentContextInfo == null) return
 
-    moreOptions: (jsEvent) =>
-      jsEvent.preventDefault()
-      pieces = $(jsEvent.target).attr('href').split("#")
-      data = @$el.getFormData( object_name: 'assignment' )
-      params = {}
-      params['title'] = data.name if data.name
-      if data.due_at and @$el.find(".datetime_field").data('unfudged-date')
-          params['due_at'] = @$el.find(".datetime_field").data('unfudged-date').toISOString()
+    if (propagate !== false) this.contextChangeCB(context)
 
-      if data.assignment_group_id then params['assignment_group_id'] = data.assignment_group_id
-      params['return_to'] = window.location.href
-      pieces[0] += "?" + $.param(params)
-      window.location.href = pieces.join("#")
+    // TODO: support adding a new assignment group from this select box
+    const assignmentGroupsSelectOptionsInfo = {
+      collection: this.currentContextInfo.assignment_groups.sort(natcompare.byKey('name'))
+    }
+    this.$el
+      .find('.assignment_group')
+      .html(genericSelectOptionsTemplate(assignmentGroupsSelectOptionsInfo))
 
-    setContext: (newContext) =>
-      @$el.find("select.context_id").val(newContext).triggerHandler('change', false)
+    // Update the edit and more options links with the new context
+    this.$el.attr('action', this.currentContextInfo.create_assignment_url)
+    const moreOptionsUrl = this.event.assignment
+      ? `${this.event.assignment.html_url}/edit`
+      : this.currentContextInfo.new_assignment_url
+    return this.$el.find('.more_options_link').attr('href', moreOptionsUrl)
+  },
 
-    contextChange: (jsEvent, propagate) =>
-      return if @ignoreContextChange
+  generateNewEvent() {
+    return commonEventFactory({}, [])
+  },
 
-      context = $(jsEvent.target).val()
-      @currentContextInfo = @contextInfoForCode(context)
-      @event.contextInfo = @currentContextInfo
-      if @currentContextInfo == null then return
+  submitAssignment(e) {
+    e.preventDefault()
+    const data = this.getFormData()
+    this.disableWhileLoadingOpts = {buttons: ['.save_assignment']}
+    if (data.assignment != null) {
+      return this.submitRegularAssignment(e, data.assignment)
+    } else {
+      return this.submitOverride(e, data.assignment_override)
+    }
+  },
 
-      if propagate != false
-        @contextChangeCB(context)
+  unfudgedDate(date) {
+    const unfudged = $.unfudgeDateForProfileTimezone(date)
+    if (unfudged) {
+      return unfudged.toISOString()
+    } else {
+      return ''
+    }
+  },
 
-      # TODO: support adding a new assignment group from this select box
-      assignmentGroupsSelectOptionsInfo =
-        collection: @currentContextInfo.assignment_groups.sort(natcompare.byKey('name'))
-      @$el.find(".assignment_group").html(genericSelectOptionsTemplate(assignmentGroupsSelectOptionsInfo))
+  getFormData() {
+    const data = EditAssignmentDetailsRewrite.__super__.getFormData.apply(this, arguments)
+    if (data.assignment != null) {
+      data.assignment.due_at = this.unfudgedDate(data.assignment.due_at)
+    } else {
+      data.assignment_override.due_at = this.unfudgedDate(data.assignment_override.due_at)
+    }
 
-      # Update the edit and more options links with the new context
-      @$el.attr('action', @currentContextInfo.create_assignment_url)
-      moreOptionsUrl = if @event.assignment
-                           "#{@event.assignment.html_url}/edit"
-                         else
-                           @currentContextInfo.new_assignment_url
-      @$el.find(".more_options_link").attr('href', moreOptionsUrl)
+    return data
+  },
 
-    setupTimeAndDatePickers: () =>
-      $field = @$el.find(".datetime_field")
-      $field.datetime_field({ datepicker: { dateFormat: datePickerFormat(if @event.allDay then I18n.t('#date.formats.medium_with_weekday') else I18n.t('#date.formats.full_with_weekday')) } })
+  submitRegularAssignment(event, data) {
+    data.due_at = this.unfudgedDate(data.due_at)
 
-    generateNewEvent: ->
-      commonEventFactory({}, [])
+    if (this.event.isNewEvent()) {
+      data.context_code = $(this.$el)
+        .find('.context_id')
+        .val()
+      this.model = commonEventFactory(data, this.event.possibleContexts())
+      return this.submit(event)
+    } else {
+      this.event.title = data.title
+      this.event.start = data.due_at // fudged
+      this.model = this.event
+      return this.submit(event)
+    }
+  },
 
-    submitAssignment: (e) =>
-      e.preventDefault()
-      data = @getFormData()
-      @disableWhileLoadingOpts = {buttons: ['.save_assignment']}
-      if data.assignment?
-        @submitRegularAssignment(e, data.assignment)
-      else
-        @submitOverride(e, data.assignment_override)
+  submitOverride(event, data) {
+    this.event.start = data.due_at // fudged
+    data.due_at = this.unfudgedDate(data.due_at)
+    this.model = this.event
+    return this.submit(event)
+  },
 
-    unfudgedDate: (date) ->
-      unfudged = $.unfudgeDateForProfileTimezone(date)
-      if unfudged then unfudged.toISOString() else ""
+  onSaveSuccess() {
+    return this.closeCB()
+  },
 
-    getFormData: =>
-      data = super
-      if data.assignment?
-        data.assignment.due_at = @unfudgedDate(data.assignment.due_at)
-      else
-        data.assignment_override.due_at = @unfudgedDate(data.assignment_override.due_at)
+  onSaveFail(xhr) {
+    let resp
+    if ((resp = JSON.parse(xhr.responseText))) {
+      showFlashAlert({message: resp.error, err: null, type: 'error'})
+    }
+    this.closeCB()
+    this.disableWhileLoadingOpts = {}
+    return EditAssignmentDetailsRewrite.__super__.onSaveFail.call(this, xhr)
+  },
 
-      return data
+  validateBeforeSave(data, errors) {
+    if (data.assignment != null) {
+      data = data.assignment
+      errors = this._validateTitle(data, errors)
+    } else {
+      data = data.assignment_override
+    }
+    errors = this._validateDueDate(data, errors)
+    return errors
+  },
 
-    submitRegularAssignment: (event, data) ->
-      data.due_at = @unfudgedDate(data.due_at)
+  _validateTitle(data, errors) {
+    const post_to_sis = data.post_to_sis === '1'
+    let max_name_length = 256
+    const max_name_length_required = ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT
 
-      if @event.isNewEvent()
-        data.context_code = $(@$el).find(".context_id").val()
-        @model = commonEventFactory(data, @event.possibleContexts())
-        @submit(event)
-      else
-        @event.title = data.title
-        @event.start = data.due_at # fudged
-        @model = @event
-        @submit(event)
+    if (post_to_sis && max_name_length_required) {
+      max_name_length = ENV.MAX_NAME_LENGTH
+    }
 
-    submitOverride: (event, data) ->
-      @event.start = data.due_at # fudged
-      data.due_at = @unfudgedDate(data.due_at)
-      @model = @event
-      @submit(event)
+    const validationHelper = new SisValidationHelper({
+      postToSIS: post_to_sis,
+      maxNameLength: max_name_length,
+      name: data.name,
+      maxNameLengthRequired: max_name_length_required
+    })
 
-    onSaveSuccess: =>
-      @closeCB()
-
-    onSaveFail: (xhr) =>
-      if resp = JSON.parse(xhr.responseText)
-        showFlashAlert({ message: resp.error, err: null, type: 'error' })
-      @closeCB()
-      @disableWhileLoadingOpts = {}
-      super(xhr)
-
-    validateBeforeSave: (data, errors) ->
-      if data.assignment?
-        data = data.assignment
-        errors = @_validateTitle data, errors
-      else
-        data = data.assignment_override
-      errors = @_validateDueDate data, errors
-      errors
-
-    _validateTitle: (data, errors) ->
-      post_to_sis = data.post_to_sis == '1'
-      max_name_length = 256
-      max_name_length_required = ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT
-
-      if post_to_sis && max_name_length_required
-        max_name_length = ENV.MAX_NAME_LENGTH
-
-      validationHelper = new SisValidationHelper({
-        postToSIS: post_to_sis
-        maxNameLength: max_name_length
-        name: data.name
-        maxNameLengthRequired: max_name_length_required
-      })
-
-      if !data.name or $.trim(data.name.toString()).length == 0
-        errors["assignment[name]"] = [
-          message: I18n.t 'name_is_required', 'Name is required!'
-        ]
-      else if validationHelper.nameTooLong()
-        errors["assignment[name]"] = [
-          message: I18n.t("Name is too long, must be under %{length} characters",
-                          length: max_name_length + 1)
-        ]
-      errors
-
-    _validateDueDate: (data, errors) ->
-      if @event.eventType == "assignment" && @event.assignment.unlock_at && @event.assignment.lock_at
-        startDate = moment(@event.assignment.unlock_at)
-        endDate = moment(@event.assignment.lock_at)
-        dueDate = moment(@event.start)
-        if !withinMomentDates(dueDate, startDate, endDate)
-          rangeErrorMessage = I18n.t("Assignment has a locked date. Due date cannot be set outside of locked date range.")
-          errors["lock_range"] = [
-            message: rangeErrorMessage
-          ]
-          showFlashAlert({
-            message: rangeErrorMessage,
-            err: null,
-            type: 'error'
+    if (!data.name || $.trim(data.name.toString()).length === 0) {
+      errors['assignment[name]'] = [{message: I18n.t('name_is_required', 'Name is required!')}]
+    } else if (validationHelper.nameTooLong()) {
+      errors['assignment[name]'] = [
+        {
+          message: I18n.t('Name is too long, must be under %{length} characters', {
+            length: max_name_length + 1
           })
-      post_to_sis = data.post_to_sis == '1'
-      return errors unless post_to_sis
+        }
+      ]
+    }
+    return errors
+  },
 
-      validationHelper = new SisValidationHelper({
-        postToSIS: post_to_sis
-        dueDateRequired: ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
-        dueDate: data.due_at
-      })
+  _validateDueDate(data, errors) {
+    let dueDate
+    if (
+      this.event.eventType === 'assignment' &&
+      this.event.assignment.unlock_at &&
+      this.event.assignment.lock_at
+    ) {
+      const startDate = moment(this.event.assignment.unlock_at)
+      const endDate = moment(this.event.assignment.lock_at)
+      dueDate = moment(this.event.start)
+      if (!withinMomentDates(dueDate, startDate, endDate)) {
+        const rangeErrorMessage = I18n.t(
+          'Assignment has a locked date. Due date cannot be set outside of locked date range.'
+        )
+        errors.lock_range = [{message: rangeErrorMessage}]
+        showFlashAlert({
+          message: rangeErrorMessage,
+          err: null,
+          type: 'error'
+        })
+      }
+    }
+    const post_to_sis = data.post_to_sis === '1'
+    if (!post_to_sis) {
+      return errors
+    }
 
-      error_tag = if data.name? then "assignment[due_at]" else "assignment_override[due_at]"
-      if validationHelper.dueDateMissing()
-        errors[error_tag] = [
-          message: I18n.t('Due Date is required!')
-        ]
-      errors
+    const validationHelper = new SisValidationHelper({
+      postToSIS: post_to_sis,
+      dueDateRequired: ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT,
+      dueDate: data.due_at
+    })
+
+    const error_tag = data.name != null ? 'assignment[due_at]' : 'assignment_override[due_at]'
+    if (validationHelper.dueDateMissing()) {
+      errors[error_tag] = [{message: I18n.t('Due Date is required!')}]
+    }
+    return errors
+  },
+
+  setupTimeAndDatePickers() {
+    const $field = this.$el.find('.datetime_field')
+    return $field.datetime_field({
+      datepicker: {
+        dateFormat: datePickerFormat(
+          this.event.allDay
+            ? I18n.t('#date.formats.medium_with_weekday')
+            : I18n.t('#date.formats.full_with_weekday')
+        )
+      }
+    })
+  }
+})
+
+EditAssignmentDetailsRewrite.optionProperty('assignmentGroup')

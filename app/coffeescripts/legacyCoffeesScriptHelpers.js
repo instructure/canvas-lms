@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 - present Instructure, Inc.
+ * Copyright (C) 2018 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,16 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default {
-  allDayDefault: false,
-  fixedWeekCount: false,
-  timezone: window.ENV.TIMEZONE,
-  // We do our own caching with our EventDataSource, so there's no need for
-  // fullcalendar to also cache.
-  lazyFetching: false,
-  dragRevertDuration: 0,
+const hasProp = {}.hasOwnProperty
 
-  // localization config
-  // note: timeFormat && columnFormat change based on lang
-  lang: window.ENV.FULLCALENDAR_LOCALE
+export function extend (child, parent) {
+  for (let key in parent) {
+    if (hasProp.call(parent, key)) child[key] = parent[key]
+  }
+  function ctor() {
+    this.constructor = child
+  }
+  ctor.prototype = parent.prototype
+  child.prototype = new ctor()
+  child.__super__ = parent.prototype
+  return child
 }

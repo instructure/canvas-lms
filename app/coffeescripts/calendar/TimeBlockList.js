@@ -1,92 +1,110 @@
-#
-# Copyright (C) 2012 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+/*
+ * Copyright (C) 2012 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-define [
-  'jquery'
-  'i18n!calendar'
-  '../calendar/TimeBlockListManager'
-  '../calendar/TimeBlockRow'
-  'jquery.instructure_date_and_time'
-  'jquery.instructure_forms'
-  'vendor/date'
-], ($, I18n, TimeBlockListManager, TimeBlockRow) ->
+import $ from 'jquery'
+import I18n from 'i18n!calendar'
+import TimeBlockListManager from '../calendar/TimeBlockListManager'
+import TimeBlockRow from '../calendar/TimeBlockRow'
+import 'jquery.instructure_date_and_time'
+import 'jquery.instructure_forms'
+import 'vendor/date'
 
-  class TimeBlockList
-    # blocks is an array of [ Date:start, Date:end, Bool:locked ].
-    # The UI only supports start/end times which
-    # are in the same day in the user's timezone.
-    constructor: (element, splitterSelector, blocks, blankRow) ->
-      @element = $(element)
-      @splitterDiv = $(splitterSelector)
-      @blocksManager = new TimeBlockListManager(blocks)
-      @splitterDiv.find('.split-link').click @handleSplitClick
-      @blankRow = blankRow
+export default class TimeBlockList {
+  constructor(element, splitterSelector, blocks, blankRow) {
+    this.element = $(element)
+    this.splitterDiv = $(splitterSelector)
+    this.blocksManager = new TimeBlockListManager(blocks)
+    this.splitterDiv.find('.split-link').click(this.handleSplitClick)
+    this.blankRow = blankRow
 
-      @element.delegate 'input', 'change', (event) =>
-        @addRow() if $(event.currentTarget).closest('tr').is ':last-child'
-      @render()
+    this.element.delegate('input', 'change', event => {
+      if (
+        $(event.currentTarget)
+          .closest('tr')
+          .is(':last-child')
+      )
+        this.addRow()
+    })
+    this.render()
+  }
 
-    render: ->
-      @rows = []
-      @element.empty()
-      @addRow(block) for block in @blocksManager.blocks
-      # only default to custom blank values if there's no existing timeblocks
-      blankRow = if @blocksManager.blocks.length == 0 then @blankRow else null
-      @addRow(blankRow) #add a blank row at the bottom
+  render() {
+    this.rows = []
+    this.element.empty()
+    this.blocksManager.blocks.forEach(block => this.addRow(block))
+    // only default to custom blank values if there's no existing timeblocks
+    const blankRow = this.blocksManager.blocks.length === 0 ? this.blankRow : null
+    return this.addRow(blankRow) // add a blank row at the bottom
+  }
 
-    rowRemoved: (rowToRemove) ->
-      @rows = for row in @rows when row isnt rowToRemove
-        aNonLockedRowExists = true unless row.locked
-        row
+  rowRemoved(rowToRemove) {
+    this.rows = this.rows.filter(row => row !== rowToRemove)
+    const aNonLockedRowExists = this.rows.some(row => !row.locked)
 
-      @addRow() unless aNonLockedRowExists
+    if (!aNonLockedRowExists) return this.addRow()
+  }
 
-    addRow: (data) =>
-      row = new TimeBlockRow(this, data)
-      @element.append row.$row
-      @rows.push row
-      row
+  addRow = data => {
+    const row = new TimeBlockRow(this, data)
+    this.element.append(row.$row)
+    this.rows.push(row)
+    return row
+  }
 
-    handleSplitClick: (event) =>
-      event.preventDefault()
-      duration = @splitterDiv.find('[name=duration]').val()
-      @split duration
+  handleSplitClick = event => {
+    event.preventDefault()
+    const duration = this.splitterDiv.find('[name=duration]').val()
+    return this.split(duration)
+  }
 
-    split: (minutes) ->
-      if minutes && @validate()
-        @blocksManager.split minutes
-        @render()
+  split(minutes) {
+    if (minutes && this.validate()) {
+      this.blocksManager.split(minutes)
+      return this.render()
+    }
+  }
 
-    # weird side-effect: populates the blocksManager
-    validate: ->
-      valid = true
-      @blocksManager.reset()
-      for row in @rows
-        if row.validate() and not row.incomplete()
-          @blocksManager.add row.getData()... unless row.blank()
-        else
-          valid = false
-
-      if @blocksManager.blocks.length == 0
-        alert(I18n.t 'no_dates_error', 'You need to specify at least one date and time')
+  // weird side-effect: populates the blocksManager
+  validate() {
+    let valid = true
+    this.blocksManager.reset()
+    this.rows.forEach(row => {
+      if (row.validate() && !row.incomplete()) {
+        if (!row.blank()) {
+          this.blocksManager.add.apply(this.blocksManager, row.getData())
+        }
+      } else {
         valid = false
-      else if !valid
-        alert(I18n.t 'time_block_errors', 'There are errors in your time block selections.')
-      valid
+      }
+    })
 
-    blocks: ->
-      [ range.start, range.end ] for range in @blocksManager.blocks when !range.locked
+    if (this.blocksManager.blocks.length === 0) {
+      alert(I18n.t('no_dates_error', 'You need to specify at least one date and time'))
+      valid = false
+    } else if (!valid) {
+      alert(I18n.t('time_block_errors', 'There are errors in your time block selections.'))
+    }
+    return valid
+  }
+
+  blocks() {
+    return this.blocksManager.blocks
+      .filter(range => !range.locked)
+      .map(range => [range.start, range.end])
+  }
+}

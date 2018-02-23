@@ -1,132 +1,160 @@
-#
-# Copyright (C) 2012 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+/*
+ * Copyright (C) 2012 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-define [
-  'jquery'
-  'i18n!calendar'
-  'jst/calendar/TimeBlockRow'
-  '../util/fcUtil'
-  'jsx/shared/helpers/datePickerFormat'
-  '../calendar/fcMomentHandlebarsHelpers' # make sure fcMomentToString and fcMomentToDateString are available to TimeBlockRow.handlebars
-], ($, I18n, timeBlockRowTemplate, fcUtil, datePickerFormat) ->
+import $ from 'jquery'
+import I18n from 'i18n!calendar'
+import timeBlockRowTemplate from 'jst/calendar/TimeBlockRow'
+import fcUtil from '../util/fcUtil'
+import datePickerFormat from 'jsx/shared/helpers/datePickerFormat'
+import '../calendar/fcMomentHandlebarsHelpers' // make sure fcMomentToString and fcMomentToDateString are available to TimeBlockRow.handlebars
 
-  class TimeBlockRow
-    constructor: (@TimeBlockList, data={}) ->
-      @locked = data.locked
-      timeoutId = null
-      data.date = data.date || data.start
-      @$row = $(timeBlockRowTemplate(data)).bind
-        focusin: =>
-          clearTimeout timeoutId
-          @focus()
-        focusout: => timeoutId = setTimeout((=> @$row.removeClass('focused')), 50)
+export default class TimeBlockRow {
+  constructor(TimeBlockList, data) {
+    if (data == null) data = {}
+    this.TimeBlockList = TimeBlockList
+    this.locked = data.locked
+    let timeoutId = null
+    data.date = data.date || data.start
+    this.$row = $(timeBlockRowTemplate(data)).bind({
+      focusin: () => {
+        clearTimeout(timeoutId)
+        this.focus()
+      },
+      focusout: () => {
+        timeoutId = setTimeout(() => this.$row.removeClass('focused'), 50)
+      }
+    })
 
-      @$date = @$row.find("input[name='date']")
-      @$start_time = @$row.find("input[name='start_time']")
-      @$end_time = @$row.find("input[name='end_time']")
+    this.$date = this.$row.find("input[name='date']")
+    this.$start_time = this.$row.find("input[name='start_time']")
+    this.$end_time = this.$row.find("input[name='end_time']")
 
-      $date_field = @$date.date_field({ datepicker: { dateFormat: datePickerFormat(I18n.t('#date.formats.medium_with_weekday')) } })
-      $date_field.change(@validate)
-      @$start_time.time_field().change(@validate)
-      @$end_time.time_field().change(@validate)
+    const $date_field = this.$date.date_field({
+      datepicker: {dateFormat: datePickerFormat(I18n.t('#date.formats.medium_with_weekday'))}
+    })
+    $date_field.change(this.validate)
+    this.$start_time.time_field().change(this.validate)
+    this.$end_time.time_field().change(this.validate)
 
-      if @locked
-        @$row.find('button').attr('disabled', true)
+    if (this.locked) this.$row.find('button').attr('disabled', true)
 
-      @$row.find('.delete-block-link').click(@remove)
+    this.$row.find('.delete-block-link').click(this.remove)
+  }
 
-    remove: (event) =>
-      event?.preventDefault()
-      @$row.remove()
-      # tell the list that I was removed
-      @TimeBlockList.rowRemoved(this)
-      # Send the keyboard focus to a reasonable location.
-      $('input.date_field:visible').focus()
+  remove = event => {
+    if (event) event.preventDefault()
 
-    focus: =>
-      @$row.addClass('focused')
-      # scroll all the way down if it is the last row
-      # (so the datetime suggest shows up in scrollable area)
-      if @$row.is ':last-child'
-        @$row.parents('.time-block-list-body-wrapper').scrollTop(9999)
+    this.$row.remove()
+    // tell the list that I was removed
+    this.TimeBlockList.rowRemoved(this)
+    // Send the keyboard focus to a reasonable location.
+    $('input.date_field:visible').focus()
+  }
 
-    validate: =>
-      # clear previous errors
-      @$date.data('associated_error_box')?.remove()
-      @$date.toggleClass 'error', false
-      @$start_time.data('associated_error_box')?.remove()
-      @$start_time.toggleClass 'error', false
-      @$end_time.data('associated_error_box')?.remove()
-      @$end_time.toggleClass 'error', false
+  focus = () => {
+    this.$row.addClass('focused')
+    // scroll all the way down if it is the last row
+    // (so the datetime suggest shows up in scrollable area)
+    if (this.$row.is(':last-child')) {
+      this.$row.parents('.time-block-list-body-wrapper').scrollTop(9999)
+    }
+  }
 
-      # for locked row, all values are valid, regardless of actual value
-      return true if @locked
+  validate = () => {
+    // clear previous errors
+    const remove = el => el && el.remove()
+    remove(this.$date.data('associated_error_box'))
+    this.$date.toggleClass('error', false)
+    remove(this.$start_time.data('associated_error_box'))
+    this.$start_time.toggleClass('error', false)
+    remove(this.$end_time.data('associated_error_box'))
+    this.$end_time.toggleClass('error', false)
 
-      # initialize field validity by parse validity
-      dateValid = not @$date.data('invalid')
-      startValid = not @$start_time.data('invalid')
-      endValid = not @$end_time.data('invalid')
+    // for locked row, all values are valid, regardless of actual value
+    if (this.locked) {
+      return true
+    }
 
-      # also make sure start is before end
-      start = @startAt()
-      end = @endAt()
-      if start and end and end <= start
-        @$start_time.errorBox(I18n.t 'end_before_start_error', 'Start time must be before end time')
-        startValid = false
+    // initialize field validity by parse validity
+    const dateValid = !this.$date.data('invalid')
+    let startValid = !this.$start_time.data('invalid')
+    let endValid = !this.$end_time.data('invalid')
 
-      # and end is in the future
-      if end and end < fcUtil.now()
-        @$end_time.errorBox(I18n.t 'ends_in_past_error', 'You cannot create an appointment slot that ends in the past')
-        endValid = false
+    // also make sure start is before end
+    const start = this.startAt()
+    const end = this.endAt()
+    if (start && end && end <= start) {
+      this.$start_time.errorBox(
+        I18n.t('end_before_start_error', 'Start time must be before end time')
+      )
+      startValid = false
+    }
 
-      # toggle error class on each as appropriate
-      @$date.toggleClass 'error', not dateValid
-      @$end_time.toggleClass 'error', not endValid
-      @$start_time.toggleClass 'error', not startValid
+    // and end is in the future
+    if (end && end < fcUtil.now()) {
+      this.$end_time.errorBox(
+        I18n.t('ends_in_past_error', 'You cannot create an appointment slot that ends in the past')
+      )
+      endValid = false
+    }
 
-      # valid if all are valid
-      return dateValid and startValid and endValid
+    // toggle error class on each as appropriate
+    this.$date.toggleClass('error', !dateValid)
+    this.$end_time.toggleClass('error', !endValid)
+    this.$start_time.toggleClass('error', !startValid)
 
-    timeToDate: (date, time) ->
-      return unless date and time
+    // valid if all are valid
+    return dateValid && startValid && endValid
+  }
 
-      # set all three values at once to handle potential
-      # conflicts in how month rollover happens
-      time.year(date.year())
-      time.month(date.month())
-      time.date(date.date())
+  timeToDate(date, time) {
+    if (!date || !time) return
 
-      return time
+    // set all three values at once to handle potential
+    // conflicts in how month rollover happens
+    time.year(date.year())
+    time.month(date.month())
+    time.date(date.date())
 
-    startAt: ->
-      date = fcUtil.wrap(@$date.data("unfudged-date"))
-      time = fcUtil.wrap(@$start_time.data("unfudged-date"))
-      @timeToDate(date, time)
+    return time
+  }
 
-    endAt: ->
-      date = fcUtil.wrap(@$date.data("unfudged-date"))
-      time = fcUtil.wrap(@$end_time.data("unfudged-date"))
-      @timeToDate(date, time)
+  startAt() {
+    const date = fcUtil.wrap(this.$date.data('unfudged-date'))
+    const time = fcUtil.wrap(this.$start_time.data('unfudged-date'))
+    return this.timeToDate(date, time)
+  }
 
-    getData: ->
-      [@startAt(), @endAt(), !!@locked]
+  endAt() {
+    const date = fcUtil.wrap(this.$date.data('unfudged-date'))
+    const time = fcUtil.wrap(this.$end_time.data('unfudged-date'))
+    return this.timeToDate(date, time)
+  }
 
-    blank: ->
-      @$date.data('blank') and @$start_time.data('blank') and @$end_time.data('blank')
+  getData() {
+    return [this.startAt(), this.endAt(), !!this.locked]
+  }
 
-    incomplete: ->
-      not @blank() and (@$date.data('blank') or @$start_time.data('blank') or @$end_time.data('blank'))
+  blank() {
+    return (this.$date.data('blank') && this.$start_time.data('blank') && this.$end_time.data('blank'))
+  }
+
+  incomplete() {
+    return (!this.blank() && (this.$date.data('blank') || this.$start_time.data('blank') || this.$end_time.data('blank')))
+  }
+}
