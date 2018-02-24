@@ -681,8 +681,13 @@ http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator
 ```
 ## Canvas.xuser.allRoles [duplicates ext_roles which is sent by default]
 Returns list of [LIS role full URNs](https://www.imsglobal.org/specs/ltiv1p0/implementation-guide#toc-16).
-Note that this will include all roles the user has across the entire root account. Roles will not
-be scoped to the context of the LTI launch.
+Note that this will include all roles the user has.
+There are 3 different levels of roles defined: Context, Institution, System.
+Context role urns start with "urn:lti:ims" and include roles for the context where the launch occurred.
+Institution role urns start with "urn:lti:instrole" and include roles the user has in the institution. This
+will include roles they have in other courses or at the account level. Note that there is not a TA role at the
+Institution level. Instead Users with a TA enrollment will have an institution role of Instructor.
+System role urns start with "urn:lti:sysrole" and include roles for the entire system.
 
 **Availability**: *always*  
 
