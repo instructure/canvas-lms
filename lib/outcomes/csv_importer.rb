@@ -22,6 +22,8 @@ module Outcomes
   class CsvImporter
     include Outcomes::Import
 
+    class ParseError < RuntimeError; end
+
     REQUIRED_FIELDS = %i[
       title
       vendor_guid
@@ -84,7 +86,7 @@ module Outcomes
             utf8_row = row.map(&method(:check_encoding))
             import_row(headers, utf8_row)
             []
-          rescue ParseError => e
+          rescue ParseError, InvalidDataError => e
             [[line, e.message]]
           rescue ActiveRecord::RecordInvalid => e
             errors = e.record.errors
@@ -141,11 +143,11 @@ module Outcomes
     def parse_ratings(ratings)
       prior = nil
       drop_trailing_nils(ratings).each_slice(2).to_a.map.with_index(1) do |(points, description), index|
-        raise ParseError, I18n.t("Points for rating tier %{index} not present", index: index) if points.nil? || points.blank?
+        raise InvalidDataError, I18n.t("Points for rating tier %{index} not present", index: index) if points.nil? || points.blank?
         points = strict_parse_int(points, index)
 
         if prior.present? && prior < points
-          raise ParseError, I18n.t(
+          raise InvalidDataError, I18n.t(
             "Points for tier %{index} must be less than points for prior tier (%{points} is greater than %{prior})",
             index: index, prior: prior, points: points
           )
@@ -159,7 +161,7 @@ module Outcomes
     def strict_parse_int(v, index)
       Integer(v)
     rescue ArgumentError
-      raise ParseError, I18n.t('Invalid points for rating tier %{index}: "%{i}"', index: index, i: v)
+      raise InvalidDataError, I18n.t('Invalid points for rating tier %{index}: "%{i}"', index: index, i: v)
     end
 
     def drop_trailing_nils(array)

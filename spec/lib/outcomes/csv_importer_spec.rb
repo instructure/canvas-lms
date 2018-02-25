@@ -262,7 +262,7 @@ describe Outcomes::CsvImporter do
           group_row(vendor_guid: 'a'),
           outcome_row(vendor_guid: 'child', parent_guids: 'a b c'),
         ],
-        [[3, 'Missing parent groups: ["b", "c"]']]
+        [[3, 'Parent references not found prior to this row: ["b", "c"]']]
       )
     end
 
