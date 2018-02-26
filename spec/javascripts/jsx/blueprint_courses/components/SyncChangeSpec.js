@@ -58,3 +58,18 @@ test('displays the correct exception count', () => {
   const pill = tree.find('.pill')
   equal(pill.at(0).text(), '3 exceptions')
 })
+
+test('displays the correct exception types', () => {
+  const props = defaultProps()
+  props.isLoadingHistory = true
+  const tree = enzyme.mount(<SyncChange {...props} />)
+  tree.instance().setState({ isExpanded: true })
+  const exceptionGroups = tree.find('li.bcs__history-item__change-exceps__group')
+  let exceptionGroup = exceptionGroups.at(0).find('span').at(0)
+  equal(exceptionGroup.text(), "Points changed exceptions:")
+  exceptionGroup = exceptionGroups.at(1).find('span').at(0)
+  equal(exceptionGroup.text(), "Content changed exceptions:")
+  exceptionGroup = exceptionGroups.at(2).find('span').at(0)
+  equal(exceptionGroup.text(), "Deleted content exceptions:")
+
+})

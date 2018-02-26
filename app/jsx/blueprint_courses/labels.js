@@ -54,6 +54,7 @@ const exceptionTypeLabels = {
   due_dates: I18n.t('Due Dates changed exceptions:'),
   availability_dates: I18n.t('Availability Dates changed exceptions:'),
   settings: I18n.t('Settings changed exceptions:'),
+  deleted: I18n.t('Deleted content exceptions:')
 }
 
 const lockTypeLabel = {

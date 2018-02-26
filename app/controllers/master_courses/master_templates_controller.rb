@@ -673,6 +673,10 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   end
 
   def change_classes(klass, columns)
+    # if we skipped it because it's deleted, there's no sense
+    # in going on and seeing if they also edited it first
+    return ['deleted'] if columns.include?("manually_deleted")
+    
     classes = []
     columns.each do |col|
       klass.restricted_column_settings.each do |k, v|
