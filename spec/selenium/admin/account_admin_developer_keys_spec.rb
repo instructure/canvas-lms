@@ -21,10 +21,10 @@ describe 'developer keys' do
   include_context 'in-process server selenium tests'
 
   before(:each) do
-    course_with_admin_logged_in
+    admin_logged_in
   end
 
-  def add_developer_key
+  let(:developer_key) do
     Account.default.developer_keys.create!(
       name: 'Cool Tool',
       email: 'admin@example.com',
@@ -33,7 +33,7 @@ describe 'developer keys' do
     )
   end
 
-  it 'should create without error', priority: "1", test_id: 344077 do
+  it "allows creation through 'add developer key button'", test_id: 344077 do
     get "/accounts/#{Account.default.id}/developer_keys"
     expect(f("#keys")).not_to contain_css("tbody tr")
 
@@ -56,8 +56,8 @@ describe 'developer keys' do
     expect(ff("#keys tbody tr").length).to eq 1
   end
 
-  it 'should update without error', priority: "1", test_id: 344078 do
-    add_developer_key
+  it "allows update through 'edit this key button'", test_id: 344078 do
+    developer_key
     get "/accounts/#{Account.default.id}/developer_keys"
     f("#keys tbody tr.key .edit_link").click
     expect(f("#edit_dialog")).to be_displayed
@@ -78,8 +78,8 @@ describe 'developer keys' do
     expect(ff("#keys tbody tr").length).to eq 1
   end
 
-  it 'allows editing of legacy redirect URI' do
-    dk = add_developer_key
+  it 'allows editing of legacy redirect URI', test_id: 3469351 do
+    dk = developer_key
     dk.update_attribute(:redirect_uri, "http://a/")
     get "/accounts/#{Account.default.id}/developer_keys"
     f("#keys tbody tr.key .edit_link").click
@@ -102,9 +102,25 @@ describe 'developer keys' do
     expect(ff("#keys tbody tr").length).to eq 1
   end
 
-  it 'should delete without error', priority: "1", test_id: 344079 do
+  it "allows deactivation through 'deactivate this key button'", test_id: 3469389 do
+    developer_key
+    get "/accounts/#{Account.default.id}/developer_keys"
+    f("#keys tbody tr.key .icon-lock").click
+    expect(f("#keys tbody")).to contain_css(".key.inactive")
+    expect(developer_key.reload.workflow_state).to eq 'inactive'
+  end
+
+  it "allows activation through 'activate this key button'", test_id: 3469390 do
+    developer_key.update(workflow_state: 'inactive')
+    get "/accounts/#{Account.default.id}/developer_keys"
+    f("#keys tbody tr.key .icon-unlock").click
+    expect(f("#keys tbody")).not_to contain_css(".key.inactive")
+    expect(developer_key.reload.workflow_state).to eq 'active'
+  end
+
+  it "allows deletion through 'delete this key button'", test_id: 344079 do
     skip_if_safari(:alert)
-    add_developer_key
+    developer_key
     get "/accounts/#{Account.default.id}/developer_keys"
     f("#keys tbody tr.key .edit_link").click
     expect(f("#edit_dialog")).to be_displayed
@@ -125,11 +141,10 @@ describe 'developer keys' do
     expect(Account.default.developer_keys.nondeleted.count).to eq 0
   end
 
-  it "should be paginated", priority: "1", test_id: 344532 do
+  it "allows for pagination", test_id: 344532 do
     11.times { |i| Account.default.developer_keys.create!(name: "tool #{i}") }
     get "/accounts/#{Account.default.id}/developer_keys"
     expect(f("#loading")).not_to have_class('loading')
-    # pagination should load 10 objects by default
     expect(ff("#keys tbody tr")).to have_size(10)
     expect(f('#loading')).to have_class('show_more')
     f("#loading .show_all").click
