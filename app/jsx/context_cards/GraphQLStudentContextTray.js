@@ -10,6 +10,7 @@ const client = new ApolloClient({
     opts: {
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
+        'GraphQL-Metrics': true,
         'X-CSRF-Token': $.cookie('_csrf_token') // TODO: probably need to move this io a middleware (http://dev.apollodata.com/core/network.html)
       },
       credentials: 'same-origin'
