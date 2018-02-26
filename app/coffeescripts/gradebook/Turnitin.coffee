@@ -53,10 +53,10 @@ define [
         type = "vericite"
       if submission?.has_originality_report
         type = "originality_report"
-      return {} unless data and data[key] and data[key].similarity_score?
+      return {} unless data and data[key] and (data[key].similarity_score? or data[key].status == 'pending')
       data = data[key]
       data.state = "#{data.state || 'no'}_score"
-      data.score = "#{data.similarity_score}%"
+      data.score = if data.similarity_score then "#{data.similarity_score}%"
       data.reportUrl = "#{urlPrefix}/assignments/#{submission.assignment_id}/submissions/#{submission.user_id}/#{type}/#{key}"
       data.tooltip = I18n.t('tooltip.score', 'Similarity Score - See detailed report')
       data

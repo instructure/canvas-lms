@@ -93,10 +93,9 @@ test('uses originality_report type in url if submission has an OriginalityReport
 })
 
 test('uses turnitin or vericite type if no OriginalityReport is present for the submission', () => {
-  const submissionWithoutReport = submissionWithReport
-  submissionWithoutReport.has_originality_report = null
+  submissionWithReport.has_originality_report = null
   const tii_data = Turnitin.extractDataForTurnitin(
-    submissionWithoutReport,
+    submissionWithReport,
     'attachment_103',
     '/courses/2'
   )
@@ -114,4 +113,15 @@ test('it uses vericite type if vericite data is present', () => {
     '/courses/2'
   )
   equal(tii_data.reportUrl, '/courses/2/assignments/52/submissions/2/vericite/attachment_103')
+})
+
+test('returns undefined for score if originality_score is blank', () => {
+  submissionWithReport.turnitin_data.attachment_103.similarity_score = null
+  const tii_data = Turnitin.extractDataForTurnitin(submissionWithReport, 'attachment_103', '/courses/2')
+  equal(tii_data.score, undefined)
+})
+
+test('returns the score percentage if originality_score is present', () => {
+  const tii_data = Turnitin.extractDataForTurnitin(submissionWithReport, 'attachment_103', '/courses/2')
+  equal(tii_data.score, '0.8%')
 })
