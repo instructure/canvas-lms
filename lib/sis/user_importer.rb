@@ -19,9 +19,9 @@
 module SIS
   class UserImporter < BaseImporter
 
-    def process(updates_every, messages)
+    def process(messages)
       start = Time.now
-      importer = Work.new(@batch, @root_account, @logger, updates_every, messages)
+      importer = Work.new(@batch, @root_account, @logger, messages)
       User.skip_updating_account_associations do
         User.process_as_sis(@sis_options) do
           Pseudonym.process_as_sis(@sis_options) do
@@ -47,11 +47,10 @@ module SIS
           :pseudos_to_set_sis_batch_ids, :users_to_add_account_associations,
           :users_to_update_account_associations
 
-      def initialize(batch, root_account, logger, updates_every, messages)
+      def initialize(batch, root_account, logger, messages)
         @batch = batch
         @root_account = root_account
         @logger = logger
-        @updates_every = updates_every
         @batched_users = []
         @messages = messages
         @success_count = 0
@@ -72,7 +71,7 @@ module SIS
         raise ImportError, "Improper status for user #{user.user_id}" unless user.status =~ /\A(active|deleted)/i
 
         @batched_users << user
-        process_batch if @batched_users.size >= @updates_every
+        process_batch if @batched_users.size >= Setting.get("sis_user_batch_size", "100").to_i
       end
 
       def any_left_to_process?

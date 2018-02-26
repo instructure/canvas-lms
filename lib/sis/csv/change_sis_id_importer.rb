@@ -31,10 +31,9 @@ module SIS
       # possible columns:
       # old_id, new_id, old_integration_id, new_integration_id, type
       def process(csv, index=nil, count=nil)
-        @sis.counts[:change_sis_ids] += SIS::ChangeSisIdImporter.new(@root_account, importer_opts).process do |i|
+        count = SIS::ChangeSisIdImporter.new(@root_account, importer_opts).process do |i|
           csv_rows(csv, index, count) do |row|
             update_progress
-
             begin
               i.process_change_sis_id(create_change_data(row))
             rescue ImportError => e
@@ -42,6 +41,7 @@ module SIS
             end
           end
         end
+        count
       end
 
       private
