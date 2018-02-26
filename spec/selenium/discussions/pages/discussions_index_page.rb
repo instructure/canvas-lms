@@ -93,6 +93,14 @@ class DiscussionsIndex
       discussion_unread_pill(title).text
     end
 
+    def publish_button(title)
+      f('.publish-button', discussion(title))
+    end
+
+    def subscribe_button(title)
+      f('.subscribe-button', discussion(title))
+    end
+
     # ---------------------- Discussion Menu ----------------------
     def discussion_menu(title)
       f('.ic-item-row__manage-menu button', discussion(title))
@@ -181,6 +189,14 @@ class DiscussionsIndex
 
     def click_add_discussion
        add_discussion_button.click
+    end
+
+    def click_publish_button(title)
+      publish_button(title).click
+    end
+
+    def click_subscribe_button(title)
+      subscribe_button(title).click
     end
   end
 end

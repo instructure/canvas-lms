@@ -25,13 +25,15 @@ import 'jquery.instructure_date_and_time'
 import { DragSource } from 'react-dnd';
 import Container from '@instructure/ui-core/lib/components/Container'
 import Text from '@instructure/ui-core/lib/components/Text'
+import { MenuItem } from '@instructure/ui-core/lib/components/Menu'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import IconTimer from 'instructure-icons/lib/Line/IconTimerLine'
 import IconAssignmentLine from 'instructure-icons/lib/Line/IconAssignmentLine'
 import IconRssLine from 'instructure-icons/lib/Line/IconRssLine'
 import IconRssSolid from 'instructure-icons/lib/Solid/IconRssSolid'
-import { MenuItem } from '@instructure/ui-core/lib/components/Menu'
+import IconPublishSolid from 'instructure-icons/lib/Solid/IconPublishSolid'
+import IconPublishLine from 'instructure-icons/lib/Line/IconPublishLine'
 import IconCopySolid from 'instructure-icons/lib/Solid/IconCopySolid'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 
 import DiscussionModel from 'compiled/models/DiscussionTopic'
 import SectionsTooltip from '../SectionsTooltip'
@@ -64,7 +66,8 @@ const discussionTarget = {
 
 export default function DiscussionRow ({ discussion, masterCourseData, rowRef, onSelectedChanged,
                                          connectDragSource, connectDragPreview, draggable,
-                                         onToggleSubscribe, canManage, duplicateDiscussion, cleanDiscussionFocus }) {
+                                         onToggleSubscribe, updateDiscussion, canManage, canPublish,
+                                         duplicateDiscussion, cleanDiscussionFocus }) {
   const onManageDiscussion = (e, { action, id }) => {
     switch (action) {
      case 'duplicate':
@@ -94,8 +97,19 @@ export default function DiscussionRow ({ discussion, masterCourseData, rowRef, o
       onToggleOn={() => onToggleSubscribe(discussion)}
       onToggleOff={() => onToggleSubscribe(discussion)}
       disabled={discussion.subscription_hold !== undefined}
+      className="subscribe-button"
     />
   )
+  const publishButton = canPublish
+    ? (<ToggleIcon
+         toggled={discussion.published}
+         OnIcon={<IconPublishSolid title={I18n.t('Publish %{title}', { title: discussion.title })} />}
+         OffIcon={<IconPublishLine title={I18n.t('Unpublish %{title}', { title: discussion.title })} />}
+         onToggleOn={() => updateDiscussion(discussion, {published: true}, {})}
+         onToggleOff={() => updateDiscussion(discussion, {published: false}, {})}
+         className="publish-button"
+       />)
+    : null
 
   // The permissions required to duplicate are less stringent than those needed to show
   // the menu, so go ahead and unconditionally have the menu item here.
@@ -166,7 +180,7 @@ export default function DiscussionRow ({ discussion, masterCourseData, rowRef, o
             <Text color="secondary" size="small" as="p">{$.datetimeString(timestamp.date, {format: 'medium'})}</Text>
           </div>
         }
-        actionsContent={[readCount, subscribeButton]}
+        actionsContent={[readCount, subscribeButton, publishButton]}
       />
     </span>
   )
@@ -184,7 +198,9 @@ DiscussionRow.propTypes = {
   canManage: bool.isRequired,
   onManageSubscription: func.isRequired,
   duplicateDiscussion: func.isRequired,
-  cleanDiscussionFocus: func.isRequired
+  cleanDiscussionFocus: func.isRequired,
+  updateDiscussion: func.isRequired,
+  canPublish: bool.isRequired,
 }
 
 DiscussionRow.defaultProps = {

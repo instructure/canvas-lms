@@ -22,18 +22,20 @@ import React from 'react'
 import Button from '@instructure/ui-core/lib/components/Button'
 
 export default function ToggleIcon ({ toggled, OnIcon, OffIcon, onToggleOn,
-                                      onToggleOff, disabled }) {
+                                      onToggleOff, disabled, className }) {
   return (
-    <Button
-      variant="ghost"
-      margin="0 x-small small 0"
-      size="small"
-      theme={{borderWidth: "0"}}
-      disabled={disabled}
-      onClick={toggled ? onToggleOff : onToggleOn}
-    >
-      {toggled ? OnIcon : OffIcon }
-    </Button>
+    <span className={className}>
+      <Button
+        variant="ghost"
+        margin="0 0 small x-small"
+        size="x-small"
+        theme={{borderWidth: "0"}}
+        disabled={disabled}
+        onClick={toggled ? onToggleOff : onToggleOn}
+      >
+        {toggled ? OnIcon : OffIcon }
+      </Button>
+    </span>
   )
 }
 
@@ -43,9 +45,11 @@ ToggleIcon.propTypes = {
   OffIcon: PropTypes.element.isRequired,
   onToggleOn: PropTypes.func.isRequired,
   onToggleOff: PropTypes.func.isRequired,
-  disabled: PropTypes.bool
+  disabled: PropTypes.bool,
+  className: PropTypes.string,
 }
 
 ToggleIcon.defaultProps = {
-  disabled: false
+  disabled: false,
+  className: "",
 }

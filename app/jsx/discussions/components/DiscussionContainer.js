@@ -102,10 +102,12 @@ export default class DiscussionsContainer extends Component {
             key={discussion.id}
             discussion={discussion}
             canManage={this.props.permissions.manage_content}
+            canPublish={this.props.permissions.publish}
             masterCourseData={this.props.masterCourseData}
             onToggleSubscribe={this.props.toggleSubscribe}
             duplicateDiscussion={this.props.duplicateDiscussion}
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
+            updateDiscussion={this.props.updateDiscussion}
             draggable
           />
         )
@@ -115,10 +117,12 @@ export default class DiscussionsContainer extends Component {
             key={discussion.id}
             discussion={discussion}
             canManage={this.props.permissions.manage_content}
+            canPublish={this.props.permissions.publish}
             masterCourseData={this.props.masterCourseData}
             onToggleSubscribe={this.props.toggleSubscribe}
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
             duplicateDiscussion={this.props.duplicateDiscussion}
+            updateDiscussion={this.props.updateDiscussion}
             draggable={false}
           />
         )

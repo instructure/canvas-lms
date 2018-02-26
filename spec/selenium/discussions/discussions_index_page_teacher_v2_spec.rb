@@ -71,6 +71,26 @@ describe "discussions index" do
       expect(driver.current_url).to include(DiscussionsIndex.new_discussion_url)
     end
 
+    it 'clicking the publish botton changes the published status' do
+      # Cannot use @discussion[12] here because unpublish requires there to be no posts
+      discussion1 = @course.discussion_topics.create!(title: 'foo', message: 'foo', user: @teacher)
+      discussion1.save!
+      expect(discussion1.published?).to be true
+
+      DiscussionsIndex.visit(@course)
+      DiscussionsIndex.click_publish_button('foo')
+      wait_for_ajaximations
+      discussion1.reload
+      expect(discussion1.published?).to be false
+    end
+
+    it 'clicking the subscribe botton changes the subscribed status' do
+      expect(@discussion1.subscribed? @teacher).to be true
+      DiscussionsIndex.click_subscribe_button(discussion1_title)
+      wait_for_ajaximations
+      expect(@discussion1.subscribed? @teacher).to be false
+    end
+
     it 'discussion can be moved between groups using Pin menu item' do
       skip('Add with COMMS-727')
       DiscussionsIndex.click_pin_menu_option(discussion1_title)

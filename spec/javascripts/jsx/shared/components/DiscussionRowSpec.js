@@ -44,7 +44,7 @@ const makeProps = (props = {}) => _.merge({
     html_url: '',
     user_count: 10,
   },
-  canManage: false,
+  canPublish: false,
   masterCourseData: {},
 }, props)
 
@@ -68,11 +68,17 @@ test('renders UnreadBadge if discussion has replies == 0', () => {
 })
 
 test('renders the subscription ToggleIcon', () => {
-  const discussion = { discussion_subentry_count: 5 }
-  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const tree = mount(<DiscussionRow {...makeProps()} />)
   const node = tree.find('ToggleIcon')
   ok(node.exists())
   strictEqual(node.length, 1)
+})
+
+test('renders the publish ToggleIcon', () => {
+  const tree = mount(<DiscussionRow {...makeProps({canPublish: true})} />)
+  const node = tree.find('ToggleIcon')
+  ok(node.exists())
+  strictEqual(node.length, 2)
 })
 
 test('renders "Delayed until" date label if discussion is delayed', () => {

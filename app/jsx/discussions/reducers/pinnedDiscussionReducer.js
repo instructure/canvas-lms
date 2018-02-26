@@ -15,16 +15,29 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import orderBy from 'lodash/orderBy'
+
 import { handleActions } from 'redux-actions'
 import { actionTypes } from '../actions'
 import subscriptionReducerMap from './subscriptionReducerMap'
 import duplicationReducerMap from './duplicationReducerMap'
 import cleanDiscussionFocusReducerMap from './cleanDiscussionFocusReducerMap'
 
+// We need to not change the ordering of the diccussions here, ie we can't
+// use the same .sort that we use in the GET_DISCUSSIONS_SUCCESS. This is
+// because the position/ordering of subsequent stuff in here (via tha move
+// menu) is handled by id, and not by position (even though the position
+// eventually gets saved in the backend).
 function copyAndUpdateDiscussionState(oldState, updatedDiscussion) {
-  const newState = oldState.filter((disc) => disc.id !== updatedDiscussion.id)
-  if (updatedDiscussion.pinned) {
-    newState.push(updatedDiscussion)
+  const newState = oldState.slice()
+  const discussionIndex = newState.map(d => d.id).indexOf(updatedDiscussion.id)
+
+  if (!updatedDiscussion.pinned && discussionIndex !== -1) {
+    newState.splice(discussionIndex, 1)
+  } else if (updatedDiscussion.pinned && discussionIndex === -1) {
+    newState.unshift(updatedDiscussion)
+  } else if (updatedDiscussion.pinned && discussionIndex !== -1) {
+    newState[discussionIndex] = updatedDiscussion
   }
   return newState
 }
@@ -35,7 +48,7 @@ const reducerMap = {
     if(action.payload.data) {
       pinnedDiscussions = action.payload.data.filter((disc) => disc.pinned)
     }
-    return pinnedDiscussions
+    return orderBy(pinnedDiscussions, ['position'], ['asc'])
   },
   [actionTypes.UPDATE_DISCUSSION_START]: (state, action) => (
     copyAndUpdateDiscussionState(state, action.payload.discussion)

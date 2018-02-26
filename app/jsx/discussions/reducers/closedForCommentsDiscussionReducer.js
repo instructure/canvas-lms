@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import orderBy from 'lodash/orderBy'
+
 import { handleActions } from 'redux-actions'
 import { actionTypes } from '../actions'
 import subscriptionReducerMap from './subscriptionReducerMap'
@@ -22,9 +24,15 @@ import duplicationReducerMap from './duplicationReducerMap'
 import cleanDiscussionFocusReducerMap from './cleanDiscussionFocusReducerMap'
 
 function copyAndUpdateDiscussionState(oldState, updatedDiscussion) {
-  const newState = oldState.filter((disc) => disc.id !== updatedDiscussion.id)
-  if (!updatedDiscussion.pinned && updatedDiscussion.locked) {
-    newState.push(updatedDiscussion)
+  const newState = oldState.slice()
+  const discussionIndex = newState.map(d => d.id).indexOf(updatedDiscussion.id)
+
+  if ((updatedDiscussion.pinned || !updatedDiscussion.locked) && discussionIndex !== -1) {
+    newState.splice(discussionIndex, 1)
+  } else if (!updatedDiscussion.pinned && updatedDiscussion.locked && discussionIndex === -1) {
+    newState.unshift(updatedDiscussion)
+  } else if (!updatedDiscussion.pinned && updatedDiscussion.locked && discussionIndex !== -1) {
+    newState[discussionIndex] = updatedDiscussion
   }
   return newState
 }
@@ -35,7 +43,7 @@ const reducerMap = {
     if(action.payload.data) {
       closedDiscussions = action.payload.data.filter((disc) => !disc.pinned && disc.locked)
     }
-    return closedDiscussions
+    return orderBy(closedDiscussions, ((d) => new Date(d.last_reply_at)), 'desc')
   },
   [actionTypes.UPDATE_DISCUSSION_START]: (state, action) => (
     copyAndUpdateDiscussionState(state, action.payload.discussion)
