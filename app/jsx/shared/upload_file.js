@@ -90,16 +90,31 @@ export function completeUpload(preflightResponse, file, options={}) {
 
   // finalize upload
   return upload.then((response) => {
+    let location, query = {};
     if (success_url) {
-      // s3 upload, need to ping success_url to finalize and get back
-      // attachment information
+      // s3 upload, follow-up at success_url with s3 data to finalize
       const { Bucket, Key, ETag } = response.data;
-      return ajaxLib.get(success_url, { bucket: Bucket, key: Key, etag: ETag });
+      location = success_url;
+      query = { bucket: Bucket, key: Key, etag: ETag };
     } else if (response.status === 201 && !options.ignoreResult) {
-      // inst-fs upload, need to request attachment information from
-      // location
-      let { location } = response.data;
-      if (options.includeAvatar) { location = `${location}?include=avatar`; }
+      // inst-fs upload, follow-up at location from response
+      location = response.data.location;
+      query = {};
+    }
+    if (location) {
+      // include avatar in query if necessary
+      if (options.includeAvatar) {
+        query.include = "avatar";
+      }
+      // send request to follow-up url with query
+      query = qs.stringify(query);
+      if (query) {
+        if (location.indexOf('?') !== -1) {
+          location = `${location}&${query}`;
+        } else {
+          location = `${location}?${query}`;
+        }
+      }
       return ajaxLib.get(location);
     } else {
       // local-storage upload, this _is_ the attachment information

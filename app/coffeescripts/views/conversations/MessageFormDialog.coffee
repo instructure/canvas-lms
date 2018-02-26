@@ -282,7 +282,7 @@ define [
         property_validations:
           token_capture: => I18n.t("Invalid recipient name.") if @recipientView and !@recipientView.tokens.length
         handle_files: (attachments, data) ->
-          data.attachment_ids = (a.attachment.id for a in attachments)
+          data.attachment_ids = (a.id for a in attachments)
           data
         processData: (formData) =>
           formData.context_code ||= @launchParams?.context || @options.account_context_code

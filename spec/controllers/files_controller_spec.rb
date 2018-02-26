@@ -527,8 +527,13 @@ describe FilesController do
 
       it "is included in newly uploaded files" do
         user_session(@teacher)
-        post 'create', params: {:course_id => @course.id, :attachment => {:display_name => "bob", :uploaded_data => io}}, :format => 'json'
-        expect(json_parse['attachment']['canvadoc_session_url']).to be_present
+
+        attachment = factory_with_protected_attributes(Attachment, context: @course, file_state: 'deleted', filename: 'test.txt')
+        attachment.uploaded_data = io
+        attachment.save!
+
+        get 'api_create_success', params: {id: attachment.id, uuid: attachment.uuid}, :format => 'json'
+        expect(json_parse['canvadoc_session_url']).to be_present
       end
     end
   end
@@ -684,88 +689,6 @@ describe FilesController do
         assert_unauthorized
       end
 
-    end
-  end
-
-  describe "POST 'create'" do
-    it "should require authorization" do
-      post 'create', params: {:course_id => @course.id, :attachment => {:display_name => "bob"}}
-      assert_unauthorized
-    end
-
-    it "should create file" do
-      user_session(@teacher)
-      post 'create', params: {:course_id => @course.id, :attachment => {:display_name => "bob", :uploaded_data => io}}
-      expect(response).to be_redirect
-      expect(assigns[:attachment]).not_to be_nil
-      expect(assigns[:attachment].display_name).to eql("bob")
-    end
-
-    it "should create unpublished files if usage rights required" do
-      @course.account.allow_feature! :usage_rights_required
-      @course.enable_feature! :usage_rights_required
-      user_session(@teacher)
-      post 'create', params: {:course_id => @course.id, :attachment => {:display_name => "wat", :uploaded_data => io}}
-      expect(assigns[:attachment]).to be_locked
-    end
-
-    it "should reject an upload that would exceed quota" do
-      user_session(@teacher)
-      Setting.set('user_default_quota', 7) # seven... seven bytes.
-      post 'create', params: {:user_id => @teacher.id, :attachment => {:display_name => "bob", :uploaded_data => io}}, :format => :json
-      expect(response.status).to eq 400
-      expect(response.body).to include 'quota exceeded'
-    end
-
-    it "does not check quota for local-storage submission uploads" do
-      local_storage!
-      user_session(@student)
-      Setting.set('user_default_quota', 7)
-      file = @student.attachments.build
-      file.file_state = 'deleted'
-      file.workflow_state = 'unattached'
-      file.save!
-      post 'create', params: {:user_id => @student.id,
-           :check_quota_after => '0',
-           :filename => 'submission.doc',
-           :attachment => {
-             :unattached_attachment_id => file.id,
-             :uploaded_data => io
-           }},
-           :format => 'json'
-      expect(response).to be_success
-      expect(file.reload).to be_available
-    end
-
-    it "refuses to create a file in a submissions folder" do
-      user_session(@student)
-      post 'create', params: {:user_id => @student.id, :attachment => {:display_name => 'blah', :uploaded_data => io, :folder_id => @student.submissions_folder.id}}, :format => :json
-      expect(response.status).to eq 401
-    end
-
-    context "sharding" do
-      specs_require_sharding
-
-      it "should create when an unattached file is on another shard" do
-        root_attachment = factory_with_protected_attributes(Attachment, :context => @course, :file_state => 'deleted', :workflow_state => 'unattached', :filename => 'test.txt', :content_type => 'text')
-        root_attachment.uploaded_data = io
-        root_attachment.save!
-
-        @shard1.activate do
-          @student = user_factory(active_user: true)
-          @attachment = factory_with_protected_attributes(Attachment, :context => @student, :file_state => 'deleted', :workflow_state => 'unattached', :filename => 'test.txt', :content_type => 'text')
-        end
-
-        @course.enroll_user(@student, "StudentEnrollment").accept!
-        @assignment = @course.assignments.create!(:title => 'upload_assignment', :submission_types => 'online_upload')
-
-        user_session(@student)
-        post 'create', params: {:attachment => {:display_name => "bob", :uploaded_data => io, :unattached_attachment_id => @attachment.id}}
-        expect(response).to be_redirect
-        expect(assigns[:attachment]).not_to be_nil
-        expect(assigns[:attachment].display_name).to eql("bob")
-        expect(assigns[:attachment].shard).to eql @shard1
-      end
     end
   end
 
@@ -926,7 +849,6 @@ describe FilesController do
       expect(assigns[:attachment][:user_id]).not_to be_nil
       json = json_parse
       expect(json).not_to be_nil
-      expect(json['id']).to eql(assigns[:attachment].id)
       expect(json['upload_url']).not_to be_nil
       expect(json['upload_params']).not_to be_nil
       expect(json['upload_params']).not_to be_empty
@@ -945,7 +867,6 @@ describe FilesController do
       expect(assigns[:attachment][:user_id]).not_to be_nil
       json = json_parse
       expect(json).not_to be_nil
-      expect(json['id']).to eql(assigns[:attachment].id)
       expect(json['upload_url']).not_to be_nil
       expect(json['upload_params']).to be_present
       expect(json['upload_params']['x-amz-credential']).to start_with('stub_id')
@@ -970,9 +891,10 @@ describe FilesController do
       Setting.set('user_default_quota', -1)
       post 'create_pending', params: {:attachment => {
         :context_code => @student.asset_string,
-        :filename => "bob.txt"
+        :filename => "bob.txt",
+        :size => 1
       }}
-      expect(response).to be_redirect
+      expect(response).to be_bad_request
       expect(assigns[:quota_used]).to be > assigns[:quota]
     end
 
@@ -992,7 +914,6 @@ describe FilesController do
       expect(assigns[:attachment].id).not_to be_nil
       json = json_parse
       expect(json).not_to be_nil
-      expect(json['id']).to eql(assigns[:attachment].id)
       expect(json['upload_url']).not_to be_nil
       expect(json['upload_params']).to be_present
       expect(json['upload_params']['x-amz-credential']).to start_with('stub_id')
@@ -1124,7 +1045,6 @@ describe FilesController do
         expect(assigns[:attachment].shard).to eq @shard1
         json = json_parse
         expect(json).not_to be_nil
-        expect(json['id']).to eql(assigns[:attachment].id)
         expect(json['upload_url']).not_to be_nil
         expect(json['upload_params']).not_to be_nil
         expect(json['upload_params']).not_to be_empty
@@ -1153,7 +1073,6 @@ describe FilesController do
         expect(assigns[:attachment].shard).to eq @shard1
         json = json_parse
         expect(json).not_to be_nil
-        expect(json['id']).to eql(assigns[:attachment].id)
         expect(json['upload_url']).not_to be_nil
         expect(json['upload_params']).not_to be_nil
         expect(json['upload_params']).not_to be_empty

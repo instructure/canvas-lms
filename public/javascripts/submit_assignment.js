@@ -209,7 +209,7 @@ import 'jqueryui/tabs'
           handle_files: function(attachments, data) {
             var ids = (data['submission[attachment_ids]'] || "").split(",");
             for(var idx in attachments) {
-              ids.push(attachments[idx].attachment.id);
+              ids.push(attachments[idx].id);
             }
             data['submission[attachment_ids]'] = ids.join(",");
             return data;

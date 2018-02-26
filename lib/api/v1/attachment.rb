@@ -38,6 +38,7 @@ module Api::V1::Attachment
   def attachment_json(attachment, user, url_options = {}, options = {})
     hash = {
       'id' => attachment.id,
+      'uuid' => attachment.uuid,
       'folder_id' => attachment.folder_id,
       'display_name' => attachment.display_name,
       'filename' => attachment.filename,
@@ -130,7 +131,7 @@ module Api::V1::Attachment
     if includes.include? "context_asset_string"
       hash['context_asset_string'] = attachment.context.try(:asset_string)
     end
-    if includes.include? 'avatar' && respond_to?(:avatar_json)
+    if includes.include?('avatar') && respond_to?(:avatar_json)
       hash['avatar'] = avatar_json(user, attachment, type: 'attachment')
     end
 
@@ -153,7 +154,7 @@ module Api::V1::Attachment
     if !context.respond_to?(:folders)
       nil
     elsif params[:parent_folder_id]
-      context.folders.find(params[:parent_folder_id])
+      context.folders.active.where(id: params[:parent_folder_id]).first
     elsif params[:parent_folder_path].is_a?(String)
       Folder.assert_path(params[:parent_folder_path], context)
     end
@@ -249,7 +250,7 @@ module Api::V1::Attachment
       @attachment.folder = folder
       @attachment.set_publish_state_for_usage_rights
       @attachment.file_state = 'deleted'
-      @attachment.workflow_state = 'unattached'
+      @attachment.workflow_state = opts[:temporary] ? 'unattached_temporary' : 'unattached'
       @attachment.modified_at = Time.now.utc
       @attachment.save!
 
