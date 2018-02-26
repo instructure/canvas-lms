@@ -555,6 +555,12 @@ TEXT
                   <%= f.text_area :turnitin_pledge, :style => "width: 90%; height: 50px;" %>
                 </td>
               </tr>
+              <tr>
+                <td><label for="account_turnitin_originality"><%= I18n.t('Students can see originality score') %></label></td>
+                <td>
+                  <%= f.select :turnitin_originality, options_for_select(turnitin_originality_options, @account.turnitin_originality)%>
+                </td>
+              </tr>
             </table>
           </fieldset>
 
