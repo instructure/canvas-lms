@@ -229,7 +229,8 @@ class BZGrading
     response_object["field_name"] = magic_field_name
     response_object["field_value"] = value
     response_object["field_timing"] = time_answer_given
-    response_object["points_given"] = false
+    response_object["points_given"] = false # did the score go up?
+    response_object["points_changed"] = false # did the score change at all? (on incorrect checkboxes it may go down!)
     response_object["points_amount"] = 0
     response_object["points_possible"] = 0
     response_object["points_reason"] = "N/A"
@@ -274,9 +275,11 @@ class BZGrading
         end
       end
 
+      response_object["points_changed"] = step != 0
+      response_object["points_amount"] = step
+
       if step > 0
         response_object["points_given"] = true
-        response_object["points_amount"] = step
         if response_object["points_reason"] == 'partial_credit'
           response_object["points_reason"] += ":" + (answer.nil? ? "participation" : "mastery")
         else
