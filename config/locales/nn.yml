@@ -5735,7 +5735,7 @@ nn:
   default_template_f2a759ed: Standardmal
   default_templates_are_used_as_starting_points_for__f06f9e33: "Standardmalar blir nytta som utgangspunkt for nye tema og kan ikke slettast. "
   default_to_modules_for_the_course_home_page_d6a951a7: "Standard for modular på emnet si startside"
-  define_general_settings_for_locked_objects_in_this_20da2981: "Definer generelle innstillingar for låste element i dette emnet."
+  define_general_settings_for_locked_objects_in_this_20da2981: "Definer generelle innstillingar for låste element i dette emnet. "
   define_settings_by_type_for_locked_objects_in_this_676197bf: "Definer innstillingar etter type for låste element i dette emnet."
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Skriv inn teksta som skal stå før og etter rullegardinmenyen og set saman ei samling moglege svar."
   delay_posting_this_topic_until_aa483eec: "Utsett å poste dette emnet til"
