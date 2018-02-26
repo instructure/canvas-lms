@@ -25,8 +25,6 @@ describe GraphQLController do
   end
 
   context "graphiql" do
-    before { Account.default.enable_feature!("graphql") }
-
     it "requires a user" do
       get :graphiql
       expect(response.location).to match /\/login$/
@@ -56,8 +54,6 @@ describe GraphQLController do
   end
 
   context "graphql" do
-    before { Account.default.enable_feature!("graphql") }
-
     it "works" do
       post :execute, params: {query: "{}"}
       expect(JSON.parse(response.body)["errors"]).not_to be_blank

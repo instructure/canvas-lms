@@ -576,14 +576,6 @@ END
       beta: true,
       development: false
     },
-    'graphql' =>
-    {
-      display_name: -> { I18n.t("GraphQL API") },
-      description: -> { I18n.t("EXPERIMENTAL GraphQL API.") },
-      applies_to: "RootAccount",
-      state: "on",
-      beta: true,
-    },
     'rubric_criterion_range' =>
     {
       display_name: -> { I18n.t('Rubric Criterion Range') },
