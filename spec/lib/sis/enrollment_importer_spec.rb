@@ -40,7 +40,7 @@ module SIS
       let(:messages) { [] }
 
       before do
-        EnrollmentImporter.new(Account.default, {}).process(messages, 2) do |importer|
+        EnrollmentImporter.new(Account.default, {}).process(messages) do |importer|
           importer.add_enrollment(enrollment)
         end
       end
@@ -60,7 +60,7 @@ module SIS
         @pseudonym.sis_user_id = @student.id
         @pseudonym.save!
         Account.default.pseudonyms << @pseudonym
-        EnrollmentImporter.new(Account.default, {}).process(@messages, 2) do |importer|
+        EnrollmentImporter.new(Account.default, {}).process(@messages) do |importer|
           an_enrollment = SIS::Models::Enrollment.new(
             course_id: 1,
             section_id: 2,

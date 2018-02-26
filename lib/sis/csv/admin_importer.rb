@@ -32,10 +32,9 @@ module SIS
       # user_id, account_id, role_id, role
       def process(csv, index=nil, count=nil)
         messages = []
-        @sis.counts[:admins] += SIS::AdminImporter.new(@root_account, importer_opts).process(messages) do |i|
+        count = SIS::AdminImporter.new(@root_account, importer_opts).process(messages) do |i|
           csv_rows(csv, index, count) do |row|
             update_progress
-
             begin
               i.process_admin(user_id: row['user_id'], account_id: row['account_id'],
                               role_id: row['role_id'], role: row['role'],
@@ -47,6 +46,7 @@ module SIS
           end
         end
         messages.each { |message| add_warning(csv, message) }
+        count
       end
     end
   end

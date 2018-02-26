@@ -40,7 +40,7 @@ module SIS
       end
 
       def logger
-        @sis.logger
+        @sis.logger || Rails.logger
       end
 
       def add_error(csv, message)
@@ -52,7 +52,7 @@ module SIS
       end
 
       def update_progress
-        @sis.update_progress
+        @sis.update_progress unless @sis.use_parallel_imports?
       end
 
       # This will skip rows unless they are bigger than or equal to the index

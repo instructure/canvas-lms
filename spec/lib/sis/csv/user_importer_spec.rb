@@ -567,13 +567,13 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user1@example.com,active"
     )
-    expect(importer.counts[:users]).to eq 1
+    expect(importer.batch.reload.data[:counts][:users]).to eq 1
 
     importer = process_csv_data(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno-Dos,user1@example.com,active"
     )
-    expect(importer.counts[:users]).to eq 1
+    expect(importer.batch.reload.data[:counts][:users]).to eq 1
   end
 
   it "should allow a user to update display name specifically" do

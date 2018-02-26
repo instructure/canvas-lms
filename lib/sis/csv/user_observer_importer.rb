@@ -31,10 +31,9 @@ module SIS
       # possible columns:
       # observer_id, student_id, status
       def process(csv, index=nil, count=nil)
-        @sis.counts[:user_observers] += SIS::UserObserverImporter.new(@root_account, importer_opts).process do |i|
+        count = SIS::UserObserverImporter.new(@root_account, importer_opts).process do |i|
           csv_rows(csv, index, count) do |row|
             update_progress
-
             begin
               i.process_user_observer(row['observer_id'], row['student_id'], row['status'])
             rescue ImportError => e
@@ -42,6 +41,7 @@ module SIS
             end
           end
         end
+        count
       end
     end
   end

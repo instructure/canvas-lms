@@ -690,7 +690,7 @@ describe SIS::CSV::CourseImporter do
         :batch => @account.sis_batches.create!(:user => @admin, :data => {})
       )
       mm = @template.master_migrations.last
-      expect(mm).to be_queued
+      expect(mm).to be_completed # jobs should have kept running now
     end
   end
 end

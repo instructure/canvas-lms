@@ -55,7 +55,8 @@ describe SisBatch do
     create_csv_data(data) do |batch|
       batch.update_attributes(opts) if opts.present?
       batch.process_without_send_later
-      batch
+      run_jobs
+      batch.reload
     end
   end
 
@@ -75,6 +76,16 @@ describe SisBatch do
     expect(atts.pluck(:content_type)).to match_array %w(unknown/unknown text/csv text/csv)
   end
 
+  it 'should make parallel importers' do
+    @account.enable_feature!(:sis_imports_refactor)
+    batch = process_csv_data([%{user_id,login_id,status
+                                user_1,user_1,active},
+                              %{course_id,short_name,long_name,term_id,status
+                                course_1,course_1,course_1,term_1,active}])
+    expect(batch.parallel_importers.count).to eq 2
+    expect(batch.parallel_importers.pluck(:importer_type)).to match_array %w(course user)
+  end
+
   it "should keep the batch in initializing state during create_with_attachment" do
     batch = SisBatch.create_with_attachment(@account, 'instructure_csv', stub_file_data('test.csv', 'abc', 'text'), user_factory) do |batch|
       expect(batch.attachment).not_to be_new_record
@@ -86,6 +97,28 @@ describe SisBatch do
     expect(batch).not_to be_new_record
     expect(batch.changed?).to be_falsey
     expect(batch.options[:override_sis_stickiness]).to eq true
+  end
+
+  describe "parallel imports" do
+    it "should do cool stuff" do
+      PluginSetting.create!(:name => 'sis_import', :settings => {:minimum_rows_for_parallel => 2})
+      @account.enable_feature!(:sis_imports_refactor)
+      batch = process_csv_data([
+        %{user_id,login_id,status
+          user_1,user_1,active
+          user_2,user_2,active
+          user_3,user_3,active},
+        %{course_id,short_name,long_name,term_id,status
+          course_1,course_1,course_1,term_1,active
+          course_2,course_2,course_2,term_1,active
+          course_3,course_3,course_3,term_1,active
+          course_4,course_4,course_4,term_1,active}
+      ])
+      expect(batch.reload).to be_imported
+      expect(batch.parallel_importers.group(:importer_type).count).to eq({"course" => 2, "user" => 2})
+      expect(Pseudonym.where(:sis_user_id => %w{user_1 user_2 user_3}).count).to eq 3
+      expect(Course.where(:sis_source_id => %w{course_1 course_2 course_3 course_4}).count).to eq 4
+    end
   end
 
   describe ".process_all_for_account" do
@@ -101,6 +134,7 @@ describe SisBatch do
       expect_any_instantiation_of(b2).to receive(:process_without_send_later).never
       expect_any_instantiation_of(b5).to receive(:process_without_send_later).never
       SisBatch.process_all_for_account(@a1)
+      run_jobs
       [b1, b2, b4].each { |batch| expect([:imported, :imported_with_messages]).to be_include(batch.reload.state) }
     end
 
@@ -381,9 +415,10 @@ s2,test_1,section2,active},
       batch = create_csv_data([%{user_id,login_id,status
                                  user_1,user_1,active}])
       batch.update_attributes(batch_mode: true, batch_mode_term: @term)
-      expect(batch).to receive(:remove_previous_imports).once
-      expect(batch).to receive(:non_batch_courses_scope).never
+      expect_any_instantiation_of(batch).to receive(:remove_previous_imports).once
+      expect_any_instantiation_of(batch).to receive(:non_batch_courses_scope).never
       batch.process_without_send_later
+      run_jobs
     end
 
     it "should only do batch mode removals for supplied data types" do
@@ -772,12 +807,13 @@ test_1,u1,student,active}
             batch.options[:multi_term_batch_mode] = true
             batch.save!
             batch.process_without_send_later
+            run_jobs
           end
           expect(@e1.reload).to be_deleted
           expect(@e2.reload).to be_deleted
           expect(@c1.reload).to be_deleted
           expect(@c2.reload).to be_deleted
-          expect(batch.workflow_state).to eq 'imported'
+          expect(batch.reload.workflow_state).to eq 'imported'
         end
 
         it 'should not use multi_term_batch_mode if no terms are passed' do
@@ -790,6 +826,7 @@ test_1,u1,student,active}
             batch.options[:multi_term_batch_mode] = true
             batch.save!
             batch.process_without_send_later
+            run_jobs
           end
           expect(@e1.reload).to be_active
           expect(@e2.reload).to be_active
