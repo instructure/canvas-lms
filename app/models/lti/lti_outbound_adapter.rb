@@ -57,20 +57,20 @@ module Lti
       lti_account = Lti::LtiAccountCreator.new(@context, @tool).convert
 
       @tool_launch = LtiOutbound::ToolLaunch.new(
-          {
-              url: launch_url,
-              link_code: link_code,
-              return_url: return_url,
-              resource_type: resource_type,
-              selected_html: selected_html,
-              outgoing_email_address: HostUrl.outgoing_email_address,
-              context: lti_context,
-              user: lti_user,
-              tool: lti_tool,
-              account: lti_account,
-              variable_expander: variable_expander,
-              link_params: link_params
-          }
+        {
+            url: launch_url,
+            link_code: link_code,
+            return_url: return_url,
+            resource_type: resource_type,
+            selected_html: selected_html,
+            outgoing_email_address: HostUrl.outgoing_email_address,
+            context: lti_context,
+            user: lti_user,
+            tool: lti_tool,
+            account: lti_account,
+            variable_expander: variable_expander,
+            link_params: link_params
+        }
       )
       self
     end
@@ -84,7 +84,8 @@ module Lti
         @tool_launch.url,
         @tool.consumer_key,
         @tool.shared_secret,
-        @root_account.feature_enabled?(:disable_lti_post_only) || @tool.extension_setting(:oauth_compliant))
+        disable_post_only?
+      )
     end
 
     def generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
@@ -101,9 +102,9 @@ module Lti
       generate_post_payload
     end
 
-    def launch_url
+    def launch_url(post_only: false)
       raise('Called launch_url before calling prepare_tool_launch') unless @tool_launch
-      @tool_launch.url
+      post_only && !disable_post_only? ? @tool_launch.url.split('?').first : @tool_launch.url
     end
 
     # this is the lis_result_sourcedid field in the launch, and the
@@ -123,6 +124,7 @@ module Lti
     end
 
     private
+
     def default_launch_url(resource_type = nil)
       resource_type ? @tool.extension_setting(resource_type, :url) : @tool.url
     end
@@ -131,6 +133,8 @@ module Lti
       @tool.opaque_identifier_for(@context)
     end
 
-
+    def disable_post_only?
+      @root_account.feature_enabled?(:disable_lti_post_only) || @tool.extension_setting(:oauth_compliant)
+    end
   end
 end

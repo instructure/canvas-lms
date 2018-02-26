@@ -182,11 +182,21 @@ describe Lti::LtiOutboundAdapter do
 
   describe "#launch_url" do
     it "returns the launch url from the prepared tool launch" do
-      tool_launch = double('tool launch', url: '/launch/url')
+      tool_launch = double('tool launch', url: '/launch/url?with_param')
       allow(LtiOutbound::ToolLaunch).to receive(:new).and_return(tool_launch)
       adapter.prepare_tool_launch(return_url, variable_expander)
 
-      expect(adapter.launch_url).to eq '/launch/url'
+      expect(adapter.launch_url).to eq '/launch/url?with_param'
+    end
+
+    context 'with post_only set to true' do
+      it 'removes the params from the url' do
+        tool_launch = double('tool launch', url: '/launch/url?with_param')
+        allow(LtiOutbound::ToolLaunch).to receive(:new).and_return(tool_launch)
+        adapter.prepare_tool_launch(return_url, variable_expander)
+
+        expect(adapter.launch_url(post_only: true)).to eq '/launch/url'
+      end
     end
 
     it "raises a not prepared error if the tool launch has not been prepared" do
@@ -207,6 +217,29 @@ describe Lti::LtiOutboundAdapter do
     it "does not copy query params to the post body if oauth_compliant tool setting is enabled" do
       allow(account).to receive(:all_account_users_for).with(user).and_return([])
       tool.settings = {oauth_compliant: true}
+      adapter.prepare_tool_launch(return_url, variable_expander)
+      payload = adapter.generate_post_payload
+      expect(payload['firstname']).to be_nil
+    end
+
+    it "does not copy query params to the post body if post_only is set and  oauth_compliant tool setting is enabled" do
+      allow(account).to receive(:all_account_users_for).with(user).and_return([])
+      tool.settings = {oauth_compliant: true, post_only: true}
+      adapter.prepare_tool_launch(return_url, variable_expander)
+      payload = adapter.generate_post_payload
+      expect(payload['firstname']).to be_nil
+    end
+
+    it "does copy query params to the post body if oauth_compliant tool setting not set and :disable_post_only is disabled on root account" do
+      allow(account).to receive(:all_account_users_for).with(user).and_return([])
+      adapter.prepare_tool_launch(return_url, variable_expander)
+      payload = adapter.generate_post_payload
+      expect(payload['firstname']).to eq 'rory'
+    end
+
+    it "does not copy query params to the post body if :disable_post_only is set on root_Account" do
+      allow(account).to receive(:all_account_users_for).with(user).and_return([])
+      allow(account).to receive(:feature_enabled?).with(:disable_lti_post_only).and_return(true)
       adapter.prepare_tool_launch(return_url, variable_expander)
       payload = adapter.generate_post_payload
       expect(payload['firstname']).to be_nil
