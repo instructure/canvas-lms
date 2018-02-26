@@ -31,7 +31,7 @@ const defaultProps = () => ({
   isLoadingDiscussions: false,
   hasLoadedDiscussions: false,
   getDiscussions: () => {},
-  roles: ["student", "user"],
+  roles: ["student", "user"]
 })
 
 QUnit.module('DiscussionContainer component')
@@ -42,11 +42,16 @@ test('renders the component', () => {
   ok(node.exists())
 })
 
-test('renders placeholder when no discussions are present', () => {
+test('renders passed in component when renderContainerBackground is present', () => {
   const props = defaultProps()
   props.discussions = []
+  props.renderContainerBackground = () => (
+    <div className="discussions-v2__test-image">
+      <p>testing</p>
+    </div>
+  )
   const tree = shallow(<DiscussionContainer {...props} />)
-  const node = tree.find('.discussions-v2__placeholder')
+  const node = tree.find('.discussions-v2__test-image')
   ok(node.exists())
 })
 
@@ -64,4 +69,3 @@ test('renders a draggable discussion row when user has moderate permissions', ()
   const node = tree.find('DragSource(DiscussionRow)')
   ok(node.exists())
 })
-

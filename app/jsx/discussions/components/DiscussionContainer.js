@@ -81,6 +81,7 @@ export default class DiscussionsContainer extends Component {
     closedState: bool,
     connectDropTarget: func,
     roles: arrayOf(string),
+    renderContainerBackground: func.isRequired
   }
 
   static defaultProps = {
@@ -88,7 +89,7 @@ export default class DiscussionsContainer extends Component {
     connectDropTarget (component) {return component},
     pinned: undefined,
     closedState: undefined,
-    roles: ['user', 'student'],
+    roles: ['user', 'student']
   }
 
   renderDiscussions () {
@@ -119,10 +120,10 @@ export default class DiscussionsContainer extends Component {
     })
   }
 
-  renderPlaceholder() {
+  renderBackgroundImage() {
     return (
-      <div className="discussions-v2__placeholder">
-        <Text color="secondary"> placeholder </Text>
+      <div className="discussions-v2__container-image">
+        {this.props.renderContainerBackground()}
       </div>
     )
   }
@@ -137,7 +138,7 @@ export default class DiscussionsContainer extends Component {
             {
               this.props.discussions.length
                 ? this.renderDiscussions()
-                : this.renderPlaceholder()
+                : this.renderBackgroundImage()
             }
         </ToggleDetails>
       </div>

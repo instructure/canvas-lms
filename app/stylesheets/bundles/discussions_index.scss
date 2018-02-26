@@ -46,6 +46,16 @@
   background-color: #f9f9f9;
 }
 
+.discussions-v2__container-image {
+  padding: 12px;
+  margin: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: $ic-color-light;
+  border: 1px dashed #ccc;
+}
+
 .discussions-v2__placeholder {
   padding: 12px;
   margin: 6px;

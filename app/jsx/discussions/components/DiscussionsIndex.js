@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!discussions_v2'
 import React, { Component } from 'react'
-import { func, bool, string, arrayOf } from 'prop-types'
+import { func, bool, string, arrayOf, number } from 'prop-types'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { DragDropContext } from 'react-dnd';
@@ -31,6 +31,7 @@ import Heading from '@instructure/ui-core/lib/components/Heading'
 import Text from '@instructure/ui-core/lib/components/Text'
 import masterCourseDataShape from '../../shared/proptypes/masterCourseData'
 import DiscussionsContainer, { DroppableDiscussionsContainer } from './DiscussionContainer'
+import { pinnedDiscussionBackground, unpinnedDiscussionsBackground, closedDiscussionBackground } from './DiscussionBackgrounds'
 
 import select from '../../shared/select'
 import { selectPaginationState } from '../../shared/reduxPagination'
@@ -41,6 +42,8 @@ import actions from '../actions'
 export default class DiscussionsIndex extends Component {
   static propTypes = {
     updateDiscussion: func.isRequired,
+    contextType: string.isRequired,
+    contextId: number.isRequired,
     closedForCommentsDiscussions: discussionList,
     getDiscussions: func.isRequired,
     hasLoadedDiscussions: bool.isRequired,
@@ -83,7 +86,7 @@ export default class DiscussionsIndex extends Component {
     }
   }
 
-  renderStudentView () {
+renderStudentView () {
     return (
       <Container margin="medium">
         {this.props.pinnedDiscussions.length
@@ -109,6 +112,11 @@ export default class DiscussionsIndex extends Component {
             toggleSubscribe={this.props.toggleSubscriptionState}
             updateDiscussion={this.props.updateDiscussion}
             roles={this.props.roles}
+            renderContainerBackground={() =>
+              pinnedDiscussionBackground({
+                permissions: this.props.permissions,
+              })
+            }
           />
         </div>
         <div className="closed-for-comments-discussions-v2__wrapper">
@@ -119,6 +127,11 @@ export default class DiscussionsIndex extends Component {
             masterCourseData={this.props.masterCourseData}
             toggleSubscribe={this.props.toggleSubscriptionState}
             roles={this.props.roles}
+            renderContainerBackground={() =>
+              closedDiscussionBackground({
+                permissions: this.props.permissions,
+              })
+            }
           />
         </div>
       </Container>
@@ -138,6 +151,11 @@ export default class DiscussionsIndex extends Component {
           updateDiscussion={this.props.updateDiscussion}
           roles={this.props.roles}
           pinned
+          renderContainerBackground={() =>
+            pinnedDiscussionBackground({
+              permissions: this.props.permissions,
+            })
+          }
         />
       </div>
       <div className="unpinned-discussions-v2__wrapper">
@@ -151,6 +169,13 @@ export default class DiscussionsIndex extends Component {
           pinned={false}
           closedState={false}
           roles={this.props.roles}
+          renderContainerBackground={() =>
+            unpinnedDiscussionsBackground({
+              permissions: this.props.permissions,
+              contextID: this.props.contextId,
+              contextType: this.props.contextType
+            })
+          }
         />
       </div>
         <div className="closed-for-comments-discussions-v2__wrapper">
@@ -164,6 +189,11 @@ export default class DiscussionsIndex extends Component {
             roles={this.props.roles}
             pinned={false}
             closedState
+            renderContainerBackground={() =>
+              closedDiscussionBackground({
+                permissions: this.props.permissions,
+              })
+            }
           />
         </div>
       </Container>
@@ -187,6 +217,8 @@ const connectState = state => Object.assign({
   // other props here
 }, selectPaginationState(state, 'discussions'), select(state,
   ['permissions',
+    'contextType',
+    'contextId',
     'roles',
     'masterCourseData',
     'pinnedDiscussions',

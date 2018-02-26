@@ -27,7 +27,6 @@ const identity = (defaultState = null) => (
   state => (state === undefined ? defaultState : state)
 )
 
-
 export default combineReducers({
   pinnedDiscussions: pinnedDiscussionReducer,
   closedForCommentsDiscussions: closedForCommentsDiscussionReducer,
