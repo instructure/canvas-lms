@@ -574,8 +574,8 @@ class BzController < ApplicationController
             score_set_to = bzg.add_to_user_grade(participation_assignment, @current_user, graded_checkboxes_that_are_supposed_to_be_empty_weight, internal_response["points_possible"], internal_response["points_amount"])
 
             response_object["score_set_to"] = score_set_to
-          elsif internal_response["points_given"] = "past_due"
-            Rails.logger.warn("### set_user_retained_data - for user #{@current_user.name} the magic field #{params[:name]} was completed on #{DateTime.now} which is after the due date of #{effective_due_at}")
+          elsif internal_response["points_reason"] == "past_due"
+            Rails.logger.warn("### set_user_retained_data - for user #{@current_user.name} the magic field #{params[:name]} was completed on #{DateTime.now} which is after the due date")
 
             # if they haven't yet made a submission (no participation) and try to past due,
             # go ahead and make it an automatic 0. This allows TAs to see it was submitted
