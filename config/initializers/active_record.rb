@@ -646,7 +646,7 @@ module UsefulFindInBatches
     # prefer copy unless we're in a transaction (which would be bad,
     # because we might open a separate connection in the block, and not
     # see the contents of our current transaction)
-    if connection.open_transactions == 0
+    if connection.open_transactions == 0 && !options[:start]
       self.activate { |r| r.find_in_batches_with_copy(options, &block) }
     elsif should_use_cursor? && !options[:start]
       self.activate { |r| r.find_in_batches_with_cursor(options, &block) }
