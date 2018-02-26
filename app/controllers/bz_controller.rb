@@ -570,7 +570,7 @@ class BzController < ApplicationController
           response_object["points_reason"] = internal_response["points_reason"]
           response_object["points_possible"] = internal_response["points_possible"]
 
-          if internal_response["points_given"]
+          if internal_response["points_changed"]
             score_set_to = bzg.add_to_user_grade(participation_assignment, @current_user, graded_checkboxes_that_are_supposed_to_be_empty_weight, internal_response["points_possible"], internal_response["points_amount"])
 
             response_object["score_set_to"] = score_set_to
