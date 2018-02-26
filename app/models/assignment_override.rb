@@ -165,6 +165,12 @@ class AssignmentOverride < ActiveRecord::Base
     end
   end
 
+  def undestroy(active_state: 'active')
+    self.workflow_state = active_state
+    save!
+    true
+  end
+
   scope :active, -> { where(:workflow_state => 'active') }
 
   scope :visible_students_only, -> (visible_ids) do

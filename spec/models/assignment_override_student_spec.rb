@@ -146,6 +146,16 @@ describe AssignmentOverrideStudent do
     expect(@ao.reload).to be_deleted
   end
 
+  it 'undeletes its override if it is undeletd and the override is deleted' do
+    adhoc_override_with_student
+
+    @override_student.destroy
+    @ao.reload
+
+    @override_student.undestroy
+    expect(@ao.reload).not_to be_deleted
+  end
+
   describe "clean_up_for_assignment" do
     it "if callbacks aren't run clean_up_for_assignment should delete invalid overrides" do
       adhoc_override_with_student

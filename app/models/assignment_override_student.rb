@@ -27,6 +27,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   after_create :update_cached_due_dates
   after_destroy :update_cached_due_dates
   after_destroy :destroy_override_if_needed
+  after_update :undelete_override_if_deleted
   before_validation :default_values
   before_validation :clean_up_assignment_if_override_student_orphaned
 
@@ -81,6 +82,11 @@ class AssignmentOverrideStudent < ActiveRecord::Base
     assignment_override.destroy_if_empty_set
   end
   protected :destroy_override_if_needed
+
+  def undelete_override_if_deleted
+    assignment_override.undestroy if workflow_state_was == 'deleted' && active? && assignment_override&.deleted?
+  end
+  protected :undelete_override_if_deleted
 
   def self.clean_up_for_assignment(assignment)
     return unless assignment.context_type == "Course"
