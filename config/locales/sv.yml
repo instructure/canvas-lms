@@ -3015,7 +3015,7 @@ sv:
   button: 
     submit_assignment: "Lämna in uppgift"
   buttons: 
-    add_item: "Lägg till föremål"
+    add_item: "Lägg till objekt"
     apply: Tillämpa
     authorize_google_docs: "Tillåt tillgång för Google Docs"
     authorize_google_drive: "Tillåt tillgång för Google Drive"
@@ -4460,7 +4460,7 @@ sv:
       no_preprequisites: "Inga förutsättningar har definierats"
     buttons: 
       add: "Lägg till modul"
-      add_item: "Lägg till föremål"
+      add_item: "Lägg till objekt"
       add_module: Modul
       add_module_first: "Lägg till en ny modul"
       update: "Uppdatera modul"
@@ -16506,7 +16506,7 @@ sv:
     select_content_error: "Du måste välja ett innehållsalternativ"
   select_content_dialog: 
     buttons: 
-      add_item: "Lägg till föremål"
+      add_item: "Lägg till objekt"
     errors: 
       assignment_name_blank: "Uppgiftsnamn kan inte vara blankt."
       external_tool_url: "Ett externt verktyg kan inte sparas utan en URL."
@@ -16515,7 +16515,7 @@ sv:
     invalid_lti_resource_selection: "Ett problem uppstod när en giltig länk hämtades från ett externt verktyg"
     link_from_external_tool: "Länkresurs från externt-verktyg"
     titles: 
-      add_item_to_module: "Lägg till föremål i modul"
+      add_item_to_module: "Lägg till objekt i modul"
       find_links_using_service: "Hitta länkar med hjälp av %{service}"
   select_conversation_subject_3f36074a: "Välj konversation %{subject}"
   select_country_d21cb85a: "Välj land"
