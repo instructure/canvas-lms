@@ -1,96 +1,107 @@
-#
-# Copyright (C) 2014 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+/*
+ * Copyright (C) 2014 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-define [
-  'jquery'
-  'i18n!folder_tree'
-  'react'
-  'react-dom'
-  'prop-types'
-  '../modules/BBTreeBrowserView'
-  '../../views/RootFoldersFinder'
-  '../modules/customPropTypes'
-  '../../react_files/modules/filesEnv',
-  'page',
-  '../../jquery.rails_flash_notifications'
-], ($, I18n, React, ReactDOM, PropTypes, BBTreeBrowserView, RootFoldersFinder, customPropTypes, filesEnv, page) ->
+import $ from 'jquery'
+import I18n from 'i18n!folder_tree'
+import ReactDOM from 'react-dom'
+import PropTypes from 'prop-types'
+import BBTreeBrowserView from '../modules/BBTreeBrowserView'
+import RootFoldersFinder from '../../views/RootFoldersFinder'
+import customPropTypes from '../modules/customPropTypes'
+import filesEnv from '../../react_files/modules/filesEnv'
+import page from 'page'
+import '../../jquery.rails_flash_notifications'
 
-  FolderTree =
-    displayName: 'FolderTree'
+export default {
+  displayName: 'FolderTree',
 
-    propTypes:
-      rootFoldersToShow: PropTypes.arrayOf(customPropTypes.folder).isRequired
-      rootTillCurrentFolder: PropTypes.arrayOf(customPropTypes.folder)
+  propTypes: {
+    rootFoldersToShow: PropTypes.arrayOf(customPropTypes.folder).isRequired,
+    rootTillCurrentFolder: PropTypes.arrayOf(customPropTypes.folder)
+  },
 
-    componentDidMount: ->
-      rootFoldersFinder = new RootFoldersFinder({
-        rootFoldersToShow: @props.rootFoldersToShow
-      })
+  componentDidMount() {
+    const rootFoldersFinder = new RootFoldersFinder({
+      rootFoldersToShow: this.props.rootFoldersToShow
+    })
 
-      @treeBrowserId = BBTreeBrowserView.create({
-          onlyShowSubtrees: true,
-          rootModelsFinder: rootFoldersFinder
-          onClick: @onClick
-          dndOptions: @props.dndOptions
-          href: @hrefFor
-          focusStyleClass: @focusStyleClass
-          selectedStyleClass: @selectedStyleClass
-          autoFetch: true
-          fetchItAll: "to heck"
-        },
-        {
-          render: true
-          element: ReactDOM.findDOMNode(@refs.FolderTreeHolder)
-        }).index
+    this.treeBrowserId = BBTreeBrowserView.create(
+      {
+        onlyShowSubtrees: true,
+        rootModelsFinder: rootFoldersFinder,
+        onClick: this.onClick,
+        dndOptions: this.props.dndOptions,
+        href: this.hrefFor,
+        focusStyleClass: this.focusStyleClass,
+        selectedStyleClass: this.selectedStyleClass,
+        autoFetch: true,
+        fetchItAll: 'to heck'
+      },
+      {
+        render: true,
+        element: ReactDOM.findDOMNode(this.refs.FolderTreeHolder)
+      }
+    ).index
 
-      @expandTillCurrentFolder(@props)
+    this.expandTillCurrentFolder(this.props)
+  },
 
-    componentWillUnmount: ->
-      BBTreeBrowserView.remove(@treeBrowserViewId)
+  componentWillUnmount() {
+    BBTreeBrowserView.remove(this.treeBrowserViewId)
+  },
 
-    componentWillReceiveProps: (newProps) ->
-      @expandTillCurrentFolder(newProps)
+  componentWillReceiveProps(newProps) {
+    this.expandTillCurrentFolder(newProps)
+  },
 
-    onClick: (event, folder) ->
-      event.preventDefault()
-      $(ReactDOM.findDOMNode(@refs.FolderTreeHolder)).find('.' + @focusStyleClass).each( (key, value) => $(value).removeClass(@focusStyleClass))
-      $(ReactDOM.findDOMNode(@refs.FolderTreeHolder)).find('.' + @selectedStyleClass).each( (key, value) => $(value).removeClass(@selectedStyleClass))
-      if folder.get('locked_for_user')
-        message = I18n.t('This folder is currently locked and unavailable to view.')
-        $.flashError message
-        $.screenReaderFlashMessage message
-      else
-        $.screenReaderFlashMessageExclusive I18n.t('File list updated')
-        page("#{filesEnv.baseUrl}/folder/#{folder.urlPath()}")
+  onClick(event, folder) {
+    event.preventDefault()
+    $(ReactDOM.findDOMNode(this.refs.FolderTreeHolder))
+      .find(`.${this.focusStyleClass}`)
+      .each((key, value) => $(value).removeClass(this.focusStyleClass))
+    $(ReactDOM.findDOMNode(this.refs.FolderTreeHolder))
+      .find(`.${this.selectedStyleClass}`)
+      .each((key, value) => $(value).removeClass(this.selectedStyleClass))
+    if (folder.get('locked_for_user')) {
+      const message = I18n.t('This folder is currently locked and unavailable to view.')
+      $.flashError(message)
+      $.screenReaderFlashMessage(message)
+    } else {
+      $.screenReaderFlashMessageExclusive(I18n.t('File list updated'))
+      page(`${filesEnv.baseUrl}/folder/${folder.urlPath()}`)
+    }
+  },
 
+  hrefFor(folder) {},
+  // @makeHref (if folder.urlPath() then 'folder' else 'rootFolder'), splat: folder.urlPath()
 
+  focusStyleClass: 'FolderTree__folderItem--focused',
+  selectedStyleClass: 'FolderTree__folderItem--selected',
 
-    hrefFor: (folder) ->
-      # @makeHref (if folder.urlPath() then 'folder' else 'rootFolder'), splat: folder.urlPath()
+  expandTillCurrentFolder(props) {
+    function expandFolder(folderIndex) {
+      const folder = props.rootTillCurrentFolder && props.rootTillCurrentFolder[folderIndex]
+      if (!folder) return
+      return folder
+        .expand(false, {onlyShowSubtrees: true})
+        .then(() => expandFolder(folderIndex + 1))
+    }
 
-
-
-    focusStyleClass: 'FolderTree__folderItem--focused'
-    selectedStyleClass: 'FolderTree__folderItem--selected'
-
-
-    expandTillCurrentFolder: (props) ->
-      expandFolder = (folderIndex) ->
-        return unless folder = props.rootTillCurrentFolder?[folderIndex]
-        folder.expand(false, {onlyShowSubtrees: true}).then ->
-          expandFolder(folderIndex + 1)
-      expandFolder(0)
+    return expandFolder(0)
+  }
+}

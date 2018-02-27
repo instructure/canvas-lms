@@ -1,99 +1,127 @@
-#
-# Copyright (C) 2014 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+/*
+ * Copyright (C) 2014 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-define [
-  'jquery'
-  './BaseUploader'
-], ($, BaseUploader) ->
+// Zips that are to be expanded take a different upload workflow
+import $ from 'jquery'
+import BaseUploader from './BaseUploader'
 
-  # Zips that are to be expanded take a different upload workflow
-  class ZipUploader extends BaseUploader
-    constructor: (fileOptions, folder, contextId, contextType)->
-      super fileOptions, folder
-      @contextId = contextId
-      @contextType = contextType
-      @migrationProgress = 0
+export default class ZipUploader extends BaseUploader {
+  constructor(fileOptions, folder, contextId, contextType) {
+    super(fileOptions, folder)
 
-    createPreFlightParams: ->
-      params =
-        migration_type: 'zip_file_importer',
-        settings:
-          folder_id: @folder.id
-        pre_attachment:
-          name: @options.name || @file.name
-          size: @file.size
-          content_type: @file.type
-          on_duplicate: @options.dup || 'rename'
-          no_redirect: true
+    this.onPreflightComplete = this.onPreflightComplete.bind(this)
+    this.onUploadPosted = this.onUploadPosted.bind(this)
+    this.getContentMigration = this.getContentMigration.bind(this)
+    this.pullMigrationProgress = this.pullMigrationProgress.bind(this)
+    this.trackProgress = this.trackProgress.bind(this)
 
-    getPreflightUrl: ->
-      "/api/v1/#{@contextType}/#{@contextId}/content_migrations"
+    this.contextId = contextId
+    this.contextType = contextType
+    this.migrationProgress = 0
+  }
 
-    onPreflightComplete: (data) =>
-      @uploadData = data.pre_attachment
-      @contentMigrationId = data.id
-      @_actualUpload()
+  createPreFlightParams() {
+    let params
+    return (params = {
+      migration_type: 'zip_file_importer',
+      settings: {
+        folder_id: this.folder.id
+      },
+      pre_attachment: {
+        name: this.options.name || this.file.name,
+        size: this.file.size,
+        content_type: this.file.type,
+        on_duplicate: this.options.dup || 'rename',
+        no_redirect: true
+      }
+    })
+  }
 
-    onUploadPosted: =>
-      @getContentMigration()
+  getPreflightUrl() {
+    return `/api/v1/${this.contextType}/${this.contextId}/content_migrations`
+  }
 
-    # get the content migration when ready and use progress api to pull migration progress
-    getContentMigration: =>
-      $.getJSON("/api/v1/#{@contextType}/#{@contextId}/content_migrations/#{@contentMigrationId}").then (results) =>
-        if (!results.progress_url)
-          setTimeout( =>
-            @getContentMigration()
-          , 500)
-        else
-          @pullMigrationProgress(results.progress_url)
+  onPreflightComplete(data) {
+    this.uploadData = data.pre_attachment
+    this.contentMigrationId = data.id
+    return this._actualUpload()
+  }
 
-    pullMigrationProgress: (url) =>
-      $.getJSON(url).then (results) =>
-        @trackMigrationProgress(results.completion || 0)
-        if (results.workflow_state == 'failed')
-          @deferred.reject()
-        else if (results.completion < 100)
-          setTimeout( =>
-            @pullMigrationProgress(url)
-          , 1000)
-        else
-          @onMigrationComplete()
+  onUploadPosted() {
+    return this.getContentMigration()
+  }
 
-    onMigrationComplete: ->
-      # reload to get new files to appear
-      @folder.folders.fetch({reset: true}).then =>
-        @folder.files.fetch({reset: true}).then =>
-          @deferred.resolve()
+  // get the content migration when ready and use progress api to pull migration progress
+  getContentMigration() {
+    return $.getJSON(
+      `/api/v1/${this.contextType}/${this.contextId}/content_migrations/${this.contentMigrationId}`
+    ).then(results => {
+      if (!results.progress_url) {
+        return setTimeout(() => this.getContentMigration(), 500)
+      } else {
+        return this.pullMigrationProgress(results.progress_url)
+      }
+    })
+  }
 
-    trackProgress: (e) =>
-      @progress = (e.loaded/ e.total)
-      @onProgress(@progress, @file)
+  pullMigrationProgress(url) {
+    return $.getJSON(url).then(results => {
+      this.trackMigrationProgress(results.completion || 0)
+      if (results.workflow_state === 'failed') {
+        return this.deferred.reject()
+      } else if (results.completion < 100) {
+        setTimeout(() => {
+          this.pullMigrationProgress(url)
+        }, 1000)
+      } else {
+        return this.onMigrationComplete()
+      }
+    })
+  }
 
-    # migration progress is [0..100]
-    trackMigrationProgress: (value) ->
-      @migrationProgress = value / 100
+  onMigrationComplete() {
+    // reload to get new files to appear
+    return this.folder.folders
+      .fetch({reset: true})
+      .then(() => this.folder.files.fetch({reset: true}).then(() => this.deferred.resolve()))
+  }
 
-    # progress counts for halp, migragtion for the other
-    getProgress: ->
-      (@progress + @migrationProgress) / 2
+  trackProgress(e) {
+    this.progress = e.loaded / e.total
+    return this.onProgress(this.progress, this.file)
+  }
 
-    roundProgress: ->
-      value = @getProgress() || 0
-      Math.min(Math.round(value * 100), 100)
+  // migration progress is [0..100]
+  trackMigrationProgress(value) {
+    return (this.migrationProgress = value / 100)
+  }
 
-    getFileName: ->
-      @options.name || @file.name
+  // progress counts for halp, migragtion for the other
+  getProgress() {
+    return (this.progress + this.migrationProgress) / 2
+  }
+
+  roundProgress() {
+    const value = this.getProgress() || 0
+    return Math.min(Math.round(value * 100), 100)
+  }
+
+  getFileName() {
+    return this.options.name || this.file.name
+  }
+}

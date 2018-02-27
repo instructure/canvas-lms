@@ -1,93 +1,110 @@
-#
-# Copyright (C) 2014 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+/*
+ * Copyright (C) 2014 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-define [
-  'underscore'
-  './FileUploader'
-  './ZipUploader'
-], (_, FileUploader, ZipUploader) ->
+import _ from 'underscore'
+import FileUploader from './FileUploader'
+import ZipUploader from './ZipUploader'
 
-  class UploadQueue
-    _uploading: false
-    _queue: []
+class UploadQueue {
+  length() {
+    return this._queue.length
+  }
 
-    length: ->
-      @_queue.length
+  flush() {
+    return (this._queue = [])
+  }
 
-    flush: ->
-      @_queue = []
+  getAllUploaders() {
+    let all = this._queue.slice()
+    if (this.currentUploader) {
+      all = all.concat(this.currentUploader)
+    }
+    return all.reverse()
+  }
 
-    getAllUploaders: ->
-      all = @_queue.slice()
-      all = all.concat(@currentUploader) if @currentUploader
-      all.reverse()
+  getCurrentUploader() {
+    return this.currentUploader
+  }
 
-    getCurrentUploader: ->
-      @currentUploader
+  onChange() {}
+  // noop, set by components who care about it
 
-    onChange: ->
-      #noop, set by components who care about it
+  createUploader(fileOptions, folder, contextId, contextType) {
+    const uploader = fileOptions.expandZip
+      ? new ZipUploader(fileOptions, folder, contextId, contextType)
+      : new FileUploader(fileOptions, folder)
+    uploader.cancel = () => {
+      if (uploader._xhr != null) {
+        uploader._xhr.abort()
+      }
+      this._queue = _.without(this._queue, uploader)
+      if (this.currentUploader === uploader) this.currentUploader = null
+      return this.onChange()
+    }
 
-    createUploader: (fileOptions, folder, contextId, contextType) ->
-      uploader = if fileOptions.expandZip
-        new ZipUploader(fileOptions, folder, contextId, contextType)
-      else
-        new FileUploader(fileOptions, folder)
-      uploader.cancel = =>
-        uploader._xhr?.abort()
-        @_queue = _.without(@_queue, uploader)
-        @currentUploader = null if @currentUploader is uploader
-        @onChange()
+    return uploader
+  }
 
-      uploader
+  enqueue(fileOptions, folder, contextId, contextType) {
+    const uploader = this.createUploader(fileOptions, folder, contextId, contextType)
+    this._queue.push(uploader)
+    return this.attemptNextUpload()
+  }
 
-    enqueue: (fileOptions, folder, contextId, contextType) ->
-      uploader = @createUploader(fileOptions, folder, contextId, contextType)
-      @_queue.push uploader
-      @attemptNextUpload()
+  dequeue() {
+    const firstNonErroredUpload = _.find(this._queue, upload => !upload.error)
+    this._queue = _.without(this._queue, firstNonErroredUpload)
+    return firstNonErroredUpload
+  }
 
-    dequeue: ->
-      firstNonErroredUpload = _.find @_queue, (upload) -> !upload.error
-      @_queue = _.without(@_queue, firstNonErroredUpload)
-      firstNonErroredUpload
+  pageChangeWarning() {
+    return 'You currently have uploads in progress. If you leave this page, the uploads will stop.'
+  }
 
-    pageChangeWarning: ->
-      "You currently have uploads in progress. If you leave this page, the uploads will stop."
+  attemptNextUpload() {
+    let uploader
+    this.onChange()
+    if (this._uploading || this._queue.length === 0) return
+    this.currentUploader = uploader = this.dequeue()
+    if (uploader) {
+      this.onChange()
+      this._uploading = true
+      $(window).on('beforeunload', this.pageChangeWarning)
 
-    attemptNextUpload: ->
-      @onChange()
-      return if @_uploading || @_queue.length == 0
-      @currentUploader = uploader = @dequeue()
-      if uploader
-        @onChange()
-        @_uploading = true
-        $(window).on 'beforeunload', @pageChangeWarning
+      const promise = uploader.upload()
+      promise.fail(failReason => {
+        // put it back in the queue unless the user aborted it
+        if (failReason !== 'user_aborted_upload') {
+          return this._queue.unshift(uploader)
+        }
+      })
 
-        promise = uploader.upload()
-        promise.fail (failReason) =>
-          # put it back in the queue unless the user aborted it
-          unless failReason is 'user_aborted_upload'
-            @_queue.unshift(uploader)
+      return promise.always(() => {
+        this._uploading = false
+        this.currentUploader = null
+        $(window).off('beforeunload', this.pageChangeWarning)
+        this.onChange()
+        return this.attemptNextUpload()
+      })
+    }
+  }
+}
+UploadQueue.prototype._uploading = false
+UploadQueue.prototype._queue = []
 
-        promise.always =>
-          @_uploading = false
-          @currentUploader = null
-          $(window).off 'beforeunload', @pageChangeWarning
-          @onChange()
-          @attemptNextUpload()
-
-  new UploadQueue()
+export default new UploadQueue()
