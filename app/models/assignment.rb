@@ -2391,9 +2391,7 @@ class Assignment < ActiveRecord::Base
   def update_cached_due_dates
     return unless update_cached_due_dates?
 
-    relevant_changes = changes.slice(:due_at, :workflow_state, :only_visible_to_overrides).inspect
-    Rails.logger.info "GRADES: recalculating because scope changed for Assignment #{global_id}: #{relevant_changes}"
-    DueDateCacher.recompute(self, update_grades: true)
+    DueDateCacher.recompute(self)
   end
 
   def update_cached_due_dates?
@@ -2557,14 +2555,12 @@ class Assignment < ActiveRecord::Base
     self.relock_modules!(relocked_modules, student_ids)
     each_submission_type { |submission| submission&.relock_modules!(relocked_modules, student_ids)}
 
-    update_grades = if only_visible_to_overrides?
-      Rails.logger.info "GRADES: recalculating because assignment overrides on #{global_id} changed."
-      true
-    else
-      false
-    end
+    DueDateCacher.recompute(self)
 
-    DueDateCacher.recompute(self, update_grades: update_grades)
+    if only_visible_to_overrides?
+      Rails.logger.info "GRADES: recalculating because assignment overrides on #{global_id} changed."
+      context.recompute_student_scores
+    end
   end
 
   def run_if_overrides_changed_later!(student_ids=nil)
