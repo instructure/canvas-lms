@@ -32,7 +32,9 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
     document.body.appendChild($fixture)
     setFixtureHtml($fixture)
 
-    gradebook = createGradebook()
+    const defaultGradingScheme = [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0.0]]
+    gradebook = createGradebook({default_grading_standard: defaultGradingScheme})
+
     formatter = new AssignmentCellFormatter(gradebook)
     gradebook.setAssignments({
       2301: {id: '2301', name: 'Algebra 1', grading_type: 'points', points_possible: 10}
@@ -252,6 +254,28 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
       gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
       renderCell()
       equal(getRenderedGrade().innerHTML.trim(), 'A')
+    })
+
+    test('escapes html in the grade', () => {
+      gradebook.getDefaultGradingScheme().data[0][0] = '<img src=null onerror=alert(1) >'
+      gradebook.getAssignment('2301').grading_type = 'letter_grade'
+      gradebook.updateEnterGradesAsSetting('2301', 'gradingScheme');
+      submission.score = 10
+      renderCell()
+      equal(getRenderedGrade().innerHTML.trim(), '&lt;img src=null onerror=alert(1) &gt;')
+    })
+
+    test('escapes html in the pending grade', () => {
+      const pendingGradeInfo = {
+        enteredAs: 'points',
+        excused: false,
+        grade: '<img src=null onerror=alert(1) >',
+        score: 9.1,
+        valid: true
+      }
+      gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
+      renderCell()
+      equal(getRenderedGrade().innerHTML.trim(), '&lt;img src=null onerror=alert(1) &gt;')
     })
 
     test('displays the grade as "Excused" when the submission is being excused', () => {

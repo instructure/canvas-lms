@@ -184,6 +184,6 @@ export default class AssignmentCellFormatter {
       grade = formatGrade(submissionData, assignment, this.options)
     }
 
-    return renderTemplate(grade, options);
+    return renderTemplate(htmlEscape(grade), options)
   };
 }
