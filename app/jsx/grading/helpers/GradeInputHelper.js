@@ -63,7 +63,7 @@ function parseAsGradingScheme(value, options) {
 
 function parseAsPercent(value, options) {
   const percentage = numberHelper.parse(value.replace(/[%％﹪٪]/, ''))
-  if (Number.isNaN(percentage)) {
+  if (isNaN(percentage)) {
     return null
   }
 
@@ -72,7 +72,7 @@ function parseAsPercent(value, options) {
 
   if (!options.pointsPossible) {
     points = numberHelper.parse(value)
-    if (Number.isNaN(points)) {
+    if (isNaN(points)) {
       percent = 0
       points = 0
     }
@@ -88,7 +88,7 @@ function parseAsPercent(value, options) {
 
 function parseAsPoints(value, options) {
   const points = numberHelper.parse(value)
-  if (Number.isNaN(points)) {
+  if (isNaN(points)) {
     return null
   }
 
