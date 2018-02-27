@@ -2398,6 +2398,21 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  # Suspend any callbacks that could lead to DueDateCacher running.  This means, for now, the
+  # update_cached_due_dates callbacks on:
+  # * Assignment
+  # * AssignmentOverride and
+  # * AssignmentOverrideStudent
+  def self.suspend_due_date_caching
+    Assignment.suspend_callbacks(:update_cached_due_dates) do
+      AssignmentOverride.suspend_callbacks(:update_cached_due_dates) do
+        AssignmentOverrideStudent.suspend_callbacks(:update_cached_due_dates) do
+          yield
+        end
+      end
+    end
+  end
+
   def update_cached_due_dates
     return unless update_cached_due_dates?
 
@@ -2578,11 +2593,15 @@ class Assignment < ActiveRecord::Base
   end
 
   def run_if_overrides_changed_later!(student_ids=nil)
-    if student_ids
-      self.send_later_if_production_enqueue_args(:run_if_overrides_changed!, {:strand => "assignment_overrides_changed_for_students_#{self.global_id}"}, student_ids)
+    return if self.class.suspended_callback?(:update_cached_due_dates, :save)
+
+    enqueuing_args = if student_ids
+      { strand: "assignment_overrides_changed_for_students_#{self.global_id}" }
     else
-      self.send_later_if_production_enqueue_args(:run_if_overrides_changed!, {:singleton => "assignment_overrides_changed_#{self.global_id}"})
+      { singleton: "assignment_overrides_changed_#{self.global_id}" }
     end
+
+    self.send_later_if_production_enqueue_args(:run_if_overrides_changed!, enqueuing_args, student_ids)
   end
 
   def validate_overrides_for_sis(overrides)

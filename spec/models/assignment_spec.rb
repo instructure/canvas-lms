@@ -4879,6 +4879,32 @@ describe Assignment do
     end
   end
 
+  describe '.suspend_due_date_caching' do
+    it 'suspends the update_cached_due_dates after_save callback on Assignment' do
+      Assignment.suspend_due_date_caching do
+        expect(Assignment.send(:suspended_callback?, :update_cached_due_dates, :save, :after)).to be true
+      end
+    end
+
+    it 'suspends the update_cached_due_dates after_commit callback on AssignmentOverride' do
+      Assignment.suspend_due_date_caching do
+        expect(AssignmentOverride.send(:suspended_callback?, :update_cached_due_dates, :commit, :after)).to be true
+      end
+    end
+
+    it 'suspends the update_cached_due_dates after_create callback on AssignmentOverrideStudent' do
+      Assignment.suspend_due_date_caching do
+        expect(AssignmentOverrideStudent.send(:suspended_callback?, :update_cached_due_dates, :create, :after)).to be true
+      end
+    end
+
+    it 'suspends the update_cached_due_dates after_destroy callback on AssignmentOverrideStudent' do
+      Assignment.suspend_due_date_caching do
+        expect(AssignmentOverrideStudent.send(:suspended_callback?, :update_cached_due_dates, :destroy, :after)).to be true
+      end
+    end
+  end
+
   describe '.with_student_submission_count' do
     specs_require_sharding
 

@@ -1413,6 +1413,107 @@ describe Quizzes::QuizzesController do
       expect(overrides.length).to eq 1
     end
 
+    describe "DueDateCacher" do
+      before :each do
+        user_session(@teacher)
+        @quiz = @course.quizzes.build( :title => "Update Overrides Quiz")
+        @quiz.save!
+        section = @course.course_sections.build
+        section.save!
+        course_due_date = 3.days.from_now.iso8601
+        section_due_date = 5.days.from_now.iso8601
+        @quiz.save!
+
+        @quiz_only = {
+          course_id: @course.id,
+          id: @quiz.id,
+          quiz: {
+            title: "overridden quiz",
+            due_at: course_due_date,
+            assignment_overrides: [
+              {
+                course_section_id: section.id,
+                due_at: section_due_date,
+                due_at_overridden: true
+              }
+            ]
+          }
+        }
+
+        @overrides_only = {
+          course_id: @course.id,
+          id: @quiz.id,
+          quiz: {
+            assignment_overrides: [
+              {
+                course_section_id: section.id,
+                due_at: section_due_date,
+                due_at_overridden: true
+              }
+            ]
+          }
+        }
+
+        @quiz_and_overrides = {
+          course_id: @course.id,
+          id: @quiz.id,
+          quiz: {
+            assignment_overrides: [
+              {
+                course_section_id: section.id,
+                due_at: section_due_date,
+                due_at_overridden: true
+              }
+            ]
+          }
+        }
+
+        @no_changes = {
+          course_id: @course.id,
+          id: @quiz.id,
+          quiz: {
+            assignment_overrides: []
+          }
+        }
+      end
+
+      it "runs DueDateCacher only once when overrides are updated" do
+        due_date_cacher = instance_double(DueDateCacher)
+        allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
+
+        expect(due_date_cacher).to receive(:recompute).once
+
+        post 'update', params: @overrides_only
+      end
+
+      it "runs DueDateCacher only once when quiz due date is updated" do
+        due_date_cacher = instance_double(DueDateCacher)
+        allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
+
+        expect(due_date_cacher).to receive(:recompute).once
+
+        post 'update', params: @quiz_only
+      end
+
+      it "runs DueDateCacher only once when quiz due date and overrides are updated" do
+        due_date_cacher = instance_double(DueDateCacher)
+        allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
+
+        expect(due_date_cacher).to receive(:recompute).once
+
+        post 'update', params: @quiz_and_overrides
+      end
+
+      it "does not runs DueDateCacher when nothing is updated" do
+        due_date_cacher = instance_double(DueDateCacher)
+        allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
+
+        expect(due_date_cacher).to receive(:recompute).once
+
+        post 'update', params: @quiz_and_overrides
+      end
+    end
+
     it "deletes overrides for a quiz if assignment_overrides params is 'false'" do
       user_session(@teacher)
       quiz = @course.quizzes.build(:title => "Delete overrides!")
