@@ -31,6 +31,14 @@ describe "instfs file uploads" do
   let(:folder) { Folder.root_folders(admin_guy).first }
   let(:token) {Canvas::Security.create_jwt({}, nil, InstFS.jwt_secret)}
 
+  def enable_instfs
+    setting = PluginSetting.find_by(name: 'inst_fs') || PluginSetting.new(name: 'inst_fs')
+    setting.disabled = false
+    setting.settings = {}
+    setting.save
+    allow(InstFS).to receive(:enabled?).and_return true
+  end
+
   def get_instfs_url(context_var, user, folder_location, filename, file_type)
     instfs_stuff = InstFS.upload_preflight_json(
       context: context_var,
@@ -68,34 +76,73 @@ describe "instfs file uploads" do
     http.request(request)
   end
 
+  def compare_md5s(image_element_src, original_file_path)
+    # if a file is less than 10K, it will return a StringIO, not a file object.
+    # in that case it needs to stream to a temp file
+    downloaded_data = open(image_element_src)
+    if downloaded_data.class == StringIO
+      temp_file = Tempfile.new("cool")
+      IO.copy_stream(downloaded_data, temp_file.path)
+    else
+      temp_file = downloaded_data
+    end
+    if temp_file.size > 0
+      temp_md5 = Digest::MD5.hexdigest File.read(temp_file)
+      original_md5 = Digest::MD5.hexdigest File.read(original_file_path)
+      return temp_md5 == original_md5
+    else
+      return false
+    end
+  end
+
+  def get_file_id_from_response(response)
+    response_json = json_parse(response.body)
+    file_location = response_json["location"].split("?").first
+    file_location.split("/").last
+  end
+
   context 'when uploading to instfs as an admin' do
     before do
       user_session(admin_guy)
       course_with_teacher(account: @root_account, active_all: true, password: 'lolwut12')
-      setting = PluginSetting.find_by(name: 'inst_fs') || PluginSetting.new(name: 'inst_fs')
-      setting.disabled = false
-      setting.settings = {}
-      setting.save
-      allow(InstFS).to receive(:enabled?).and_return true
+      enable_instfs
     end
 
     it "should upload a file to instfs on the files page", priority: "1", test_id: 3399288 do
       filename = "test_image.jpg"
-      # filename = "files/instructure.png"
       file_path = File.join(ActionController::TestCase.fixture_path, filename)
       upload_file_to_instfs(file_path, admin_guy, admin_guy, folder)
       get "/files"
       wait_for_ajaximations
       file_element = f(".ef-name-col__link")
-      # if a file is less than 10K, "open" will return a StringIO, not a file object.
-      # need to stream to a temp file just in case
-      downloaded_data = open(file_element.attribute("href"))
-      temp_file = Tempfile.new("cool")
-      IO.copy_stream(downloaded_data, temp_file.path)
-      temp_md5 = Digest::MD5.hexdigest File.read(temp_file)
-      original_md5 = Digest::MD5.hexdigest File.read(file_path)
-      expect(temp_file.size).to be > 0
-      expect(temp_md5).to eq original_md5
+      image_element_source = file_element.attribute("href")
+      expect(compare_md5s(image_element_source, file_path)).to be true
+    end
+  end
+
+  context 'when using instfs as a teacher' do
+    before do
+      course_with_teacher_logged_in
+      enable_instfs
+      enrollment = student_in_course(:workflow_state => 'active', :course_section => @section)
+      @student_folder = Folder.root_folders(@student).first
+      enrollment.accept!
+      @ass = @course.assignments.create!({title: "some assignment", submission_types: "online_upload"})
+    end
+
+    it 'should allow the teacher to see the uploaded file on speedgrader', priority: "1", test_id: 3399286 do
+      filename = "files/instructure.png"
+      file_path = File.join(ActionController::TestCase.fixture_path, filename)
+      response = upload_file_to_instfs(file_path, @student, @student, @student_folder)
+      student_file_id = get_file_id_from_response(response)
+      attachment = Attachment.find(student_file_id)
+      @ass.submit_homework(@student, attachments: [attachment], submission_type: 'online_upload')
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@ass.id}"
+      wait_for_ajaximations
+      fln("instructure.png").click
+      image_element = f('#iframe_holder img')
+      image_element_source = image_element.attribute("src")
+      expect(compare_md5s(image_element_source, file_path)).to be true
     end
   end
 end
