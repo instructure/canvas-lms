@@ -126,8 +126,8 @@ describe "instfs file uploads" do
       course_with_teacher_logged_in
       enable_instfs
       enrollment = student_in_course(:workflow_state => 'active', :course_section => @section)
-      @student_folder = Folder.root_folders(@student).first
       enrollment.accept!
+      @student_folder = Folder.root_folders(@student).first
       @ass = @course.assignments.create!({title: "some assignment", submission_types: "online_upload"})
     end
 
@@ -143,6 +143,22 @@ describe "instfs file uploads" do
       fln("instructure.png").click
       image_element = f('#iframe_holder img')
       image_element_source = image_element.attribute("src")
+      expect(compare_md5s(image_element_source, file_path)).to be true
+    end
+
+    it "should allow Rich Content Editor to access InstFS files", priority: "1", test_id: 3399287 do
+      course_folder = Folder.root_folders(@course).first
+      filename = "test_image.jpg"
+      file_path = File.join(ActionController::TestCase.fixture_path, filename)
+      upload_file_to_instfs(file_path, @course, @teacher, course_folder)
+      get "/courses/#{@course.id}/assignments/#{@ass.id}/edit"
+      wait_for_ajaximations
+      f('a[href="#editor_tabs_3"]').click
+      fxpath("//span[.='course files ']").click
+      f('li[title="test_image.jpg"]').click
+      f(".btn-primary").click
+      image_element = f('a[title="test_image.jpg"]')
+      image_element_source = image_element.attribute("href")
       expect(compare_md5s(image_element_source, file_path)).to be true
     end
   end
