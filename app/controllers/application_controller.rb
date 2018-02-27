@@ -1575,7 +1575,11 @@ class ApplicationController < ActionController::Base
         adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(@return_url, variable_expander, opts)
 
         if tag.try(:context_module)
-          add_crumb tag.context_module.name, context_url(@context, :context_context_modules_url)
+          # if you change this, see also url_show.html.erb
+          cu = context_url(@context, :context_context_modules_url)
+          cu = "#{cu}/#{tag.context_module.id}"
+          add_crumb tag.context_module.name, cu
+          add_crumb @tag.title
         end
 
         if @assignment
