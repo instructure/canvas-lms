@@ -55,7 +55,7 @@ describe Lti::LtiUserCreator do
       expect(lti_user.sis_source_id).to eq 'sis id!'
       expect(lti_user.opaque_identifier).to eq 'this is opaque'
 
-      expect(lti_user.avatar_url).to include 'https://secure.gravatar.com/avatar/'
+      expect(lti_user.avatar_url).to include 'http://localhost/images/messages/avatar-50.png'
       expect(lti_user.login_id).to eq 'login_id'
       expect(lti_user.id).to eq canvas_user.id
       expect(lti_user.timezone).to eq 'my/zone'

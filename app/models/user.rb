@@ -1311,7 +1311,9 @@ class User < ActiveRecord::Base
       @avatar_url ||= self.avatar_image_url
     end
     @avatar_url ||= fallback if self.avatar_image_source == 'no_pic'
-    @avatar_url ||= gravatar_url(size, fallback, request) if avatar_setting == 'enabled'
+    if (avatar_setting == 'enabled') && (self.avatar_image_source == 'gravatar')
+      @avatar_url ||= gravatar_url(size, fallback, request)
+    end
     @avatar_url ||= fallback
   end
 

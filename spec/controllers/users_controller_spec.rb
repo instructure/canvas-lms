@@ -1107,14 +1107,14 @@ describe UsersController do
       expect(response).to redirect_to User.default_avatar_fallback
     end
 
-    it "should pass along the default fallback to gravatar" do
+    it "should pass along the default fallback to placeholder image" do
       course_with_student_logged_in(:active_all => true)
       @account = Account.default
       @account.enable_service(:avatars)
       @account.save!
       expect(@account.service_enabled?(:avatars)).to be_truthy
       get 'avatar_image', params: {:user_id  => @user.id}
-      expect(response).to redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI.escape("http://test.host/images/messages/avatar-50.png")}"
+      expect(response).to redirect_to "http://test.host/images/messages/avatar-50.png"
     end
 
     it "should take an invalid id and return silhouette" do
