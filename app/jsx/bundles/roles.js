@@ -98,7 +98,7 @@ $(document).on('click', (event) => {
   return true
 })
 
-$(document).on('click', '.btn.dropdown-toggle', function (event) {
+$(document).on('click', '.btn .dropdown-toggle', function (event) {
   event.preventDefault()
   const previousState = $(this).parent().hasClass('open')
   $('.btn-group').removeClass('open')
