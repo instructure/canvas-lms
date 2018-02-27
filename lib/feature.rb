@@ -639,7 +639,14 @@ END
         applies_to: 'RootAccount',
         state: 'hidden',
         development: true
-      }
+      },
+    'common_cartridge_page_conversion' => {
+      display_name: -> { I18n.t('Common Cartridge HTML File to Page Conversion') },
+      description: -> { I18n.t('If enabled, Common Cartridge importers will convert HTML files into Pages') },
+      applies_to: 'Course',
+      state: 'hidden',
+      beta: true
+    }
   )
 
   def self.definitions

@@ -668,6 +668,30 @@ describe "other cc files" do
     end
   end
 
+  describe "cc optional html file to page conversation" do
+    it "should do some possibly broken converting" do
+      Account.default.enable_feature!(:common_cartridge_page_conversion)
+      import_cc_file("cc_file_to_page_test.zip")
+      img = @course.attachments.where(:migration_id => "I_00001_R_1").first
+
+      page = @course.wiki_pages.where(:migration_id => "I_00001_R").first
+      expect(page.title).to eq "Some kind of file or page thingy"
+      expect(page.body).to match_ignoring_whitespace("<p>THis is an image or something <img src=\"/courses/#{@course.id}/files/#{img.id}/preview\"></p>")
+
+      tag = @course.context_module_tags.first
+      expect(tag.content).to eq page
+    end
+
+    it "should just bring them over as files without the feature" do
+      import_cc_file("cc_file_to_page_test.zip")
+      expect(@course.wiki_pages.count).to eq 0
+
+      att = @course.attachments.where(:migration_id => "I_00001_R").first
+      tag = @course.context_module_tags.first
+      expect(tag.content).to eq att
+    end
+  end
+
   describe "cc pattern match questions" do
     it "should produce a warning" do
       next unless Qti.qti_enabled?
