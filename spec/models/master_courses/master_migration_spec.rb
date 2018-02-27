@@ -209,11 +209,12 @@ describe MasterCourses::MasterMigration do
       expect(cm2.migration_settings[:imported_assets]["WikiPage"]).to eq page_to.id.to_s
     end
 
-    it "syncs deletions in incremental updates (excepting items modified downstream)" do
+    it "syncs deletions in incremental updates (except items modified downstream, unless locked)" do
       @copy_to = course_factory
       @template.add_child_course!(@copy_to)
 
       assmt = @copy_from.assignments.create!
+      @template.content_tag_for(assmt).update_attribute(:restrictions, {:points => true})
       topic = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
       ann = @copy_from.announcements.create!(:message => "goodbye")
       page = @copy_from.wiki_pages.create!(:title => "wiki", :body => "ohai")
@@ -244,6 +245,7 @@ describe MasterCourses::MasterMigration do
       Timecop.freeze(10.minutes.from_now) do
         page2_to.update_attribute(:body, 'changed!')
         quiz2_to.update_attribute(:title, 'blargh!')
+        assmt_to.update_attribute(:title, 'blergh!')
 
         assmt.destroy
         topic.destroy

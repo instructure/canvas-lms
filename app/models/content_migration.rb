@@ -607,7 +607,7 @@ class ContentMigration < ActiveRecord::Base
       end
       item_scope.each do |content|
         child_tag = master_course_subscription.content_tag_for(content)
-        if child_tag.downstream_changes.any?
+        if child_tag.downstream_changes.any? && !content.editing_restricted?(:any)
           Rails.logger.debug("skipping deletion sync for #{content.asset_string} due to downstream changes #{child_tag.downstream_changes}")
           add_skipped_item(child_tag)
         else
