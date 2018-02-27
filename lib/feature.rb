@@ -256,6 +256,20 @@ END
           end
         elsif context.is_a?(Account)
           transitions['on']['locked'] = true if transitions&.dig('on')
+
+          new_gradebook_feature_flag = FeatureFlag.where(feature: :new_gradebook, state: :on)
+          all_active_sub_account_ids = Account.sub_account_ids_recursive(context.id)
+          relevant_accounts = Account.joins(:feature_flags).where(id: [context.id].concat(all_active_sub_account_ids))
+          relevant_courses = Course.joins(:feature_flags).where(account_id: all_active_sub_account_ids)
+
+          accounts_with_feature = relevant_accounts.merge(new_gradebook_feature_flag)
+          courses_with_feature = relevant_courses.merge(new_gradebook_feature_flag)
+
+          if accounts_with_feature.exists? || courses_with_feature.exists?
+            transitions['off']['locked'] = true
+            transitions['off']['warning'] =
+              I18n.t("This feature can't be disabled because there is at least one sub-account or course with this feature enabled.")
+          end
         end
       end
     },

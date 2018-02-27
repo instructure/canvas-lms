@@ -27,6 +27,7 @@ describe Course do
 
   describe 'relationships' do
     it { is_expected.to have_one(:late_policy).dependent(:destroy).inverse_of(:course) }
+    it { is_expected.to have_many(:feature_flags) }
   end
 
   describe 'lti2 proxies' do
