@@ -205,7 +205,6 @@ define [
     defaultGradingScheme = null
     if options.default_grading_standard
       defaultGradingScheme = {
-        title: I18n.t('Default Grading Scheme')
         data: options.default_grading_standard
       }
 

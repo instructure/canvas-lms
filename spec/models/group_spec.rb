@@ -101,6 +101,27 @@ describe Group do
     expect(@group.inactive?).to eq false
   end
 
+  describe '#grading_standard_or_default' do
+    context 'when the Group belongs to a Course' do
+      it 'returns the grading scheme being used by the course, if one exists' do
+        standard = grading_standard_for(@course)
+        @course.update!(default_grading_standard: standard)
+        expect(@group.grading_standard_or_default).to be standard
+      end
+
+      it 'returns the Canvas default grading scheme if the course is not using a grading scheme' do
+        expect(@group.grading_standard_or_default.data).to eq GradingStandard.default_grading_standard
+      end
+    end
+
+    context 'Group belonging to an Account' do
+      it 'returns the Canvas default grading scheme' do
+        group = group_model(context: Account.default)
+        expect(group.grading_standard_or_default.data).to eq GradingStandard.default_grading_standard
+      end
+    end
+  end
+
   context "#peer_groups" do
     it "should find all peer groups" do
       context = course_model

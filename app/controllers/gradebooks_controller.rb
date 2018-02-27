@@ -102,16 +102,13 @@ class GradebooksController < ApplicationController
 
     ags_json = light_weight_ags_json(@presenter.groups, {student: @presenter.student})
 
-    grading_scheme = @context.grading_standard.try(:data) ||
-                     GradingStandard.default_grading_standard
-
     js_env(
       submissions: submissions_json,
       assignment_groups: ags_json,
       assignment_sort_options: @presenter.sort_options,
       group_weighting_scheme: @context.group_weighting_scheme,
       show_total_grade_as_points: @context.show_total_grade_as_points?,
-      grading_scheme: grading_scheme,
+      grading_scheme: @context.grading_standard_or_default.data,
       current_grading_period_id: @current_grading_period_id,
       current_assignment_sort_order: @presenter.assignment_order,
       grading_period_set: grading_period_group_json,
@@ -298,6 +295,7 @@ class GradebooksController < ApplicationController
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(teacher_notes: true).first
     ag_includes = [:assignments, :assignment_visibility]
     last_exported_attachment = @last_exported_gradebook_csv.try(:attachment)
+    grading_standard = @context.grading_standard_or_default
     {
       STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards),
       GRADEBOOK_OPTIONS: {
@@ -342,11 +340,8 @@ class GradebooksController < ApplicationController
         context_code: @context.asset_string,
         context_sis_id: @context.sis_source_id,
         group_weighting_scheme: @context.group_weighting_scheme,
-        grading_standard: (
-          @context.grading_standard_enabled? &&
-          (@context.grading_standard.try(:data) || GradingStandard.default_grading_standard)
-        ),
-        default_grading_standard: GradingStandard.default_grading_standard,
+        grading_standard: @context.grading_standard_enabled? && grading_standard.data,
+        default_grading_standard: grading_standard.data,
         course_is_concluded: @context.completed?,
         course_name: @context.name,
         gradebook_is_editable: @gradebook_is_editable,

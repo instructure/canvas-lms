@@ -3128,6 +3128,10 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def grading_standard_or_default
+    default_grading_standard || GradingStandard.default_instance
+  end
+
   private
 
   def effective_due_dates

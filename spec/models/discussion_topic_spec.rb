@@ -24,6 +24,60 @@ describe DiscussionTopic do
     student_in_course(:active_all => true)
   end
 
+  describe '#grading_standard_or_default' do
+    context 'when the DiscussionTopic belongs to a Course' do
+      before(:once) do
+        @assignment = @course.assignments.create(title: "discussion assignment", points_possible: 20)
+        @topic = @course.discussion_topics.create!(assignment: @assignment)
+        @grading_standard = grading_standard_for(@course)
+      end
+
+      it 'returns the grading scheme used by the discussion topic, if one exists' do
+        @assignment.update!(grading_standard: @grading_standard)
+        expect(@topic.grading_standard_or_default).to be @grading_standard
+      end
+
+      it 'returns the grading scheme used by the course, if one exists and the discussion topic is not using one' do
+        @course.update!(default_grading_standard: @grading_standard)
+        expect(@topic.grading_standard_or_default).to be @grading_standard
+      end
+
+      it 'returns the grading scheme used by the topic if the topic and course are using a grading scheme' do
+        @assignment.update!(grading_standard: @grading_standard)
+        course_standard = grading_standard_for(@course, title: 'new scheme')
+        @course.update!(default_grading_standard: course_standard)
+        expect(@topic.grading_standard_or_default).to be @grading_standard
+      end
+
+      it 'returns the Canvas default grading scheme if neither the topic nor course are not using a grading scheme' do
+        expect(@course.grading_standard_or_default.data).to eq GradingStandard.default_grading_standard
+      end
+    end
+
+    context 'when the DiscussionTopic belongs to a Group' do
+      before(:once) do
+        group = @course.groups.create!
+        @topic = group.discussion_topics.create!
+        @grading_standard = grading_standard_for(@course)
+      end
+
+      it 'returns the grading scheme used by the course, if one exists' do
+        @course.update!(default_grading_standard: @grading_standard)
+        expect(@topic.grading_standard_or_default).to be @grading_standard
+      end
+
+      it 'returns the Canvas default grading scheme if neither the topic nor course are not using a grading scheme' do
+        expect(@topic.grading_standard_or_default.data).to eq GradingStandard.default_grading_standard
+      end
+
+      it 'returns the Canvas default grading scheme if the Group belongs to an Account' do
+        group = @course.root_account.groups.create!
+        @topic.update!(context: group)
+        expect(@topic.grading_standard_or_default.data).to eq GradingStandard.default_grading_standard
+      end
+    end
+  end
+
   describe "default values for boolean attributes" do
     before(:once) do
       @topic = @course.discussion_topics.create!

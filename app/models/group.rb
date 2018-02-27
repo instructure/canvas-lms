@@ -762,4 +762,12 @@ class Group < ActiveRecord::Base
         .first_or_create!(name: I18n.t('Submissions'))
     end
   end
+
+  def grading_standard_or_default
+    if context.respond_to?(:grading_standard_or_default)
+      context.grading_standard_or_default
+    else
+      GradingStandard.default_instance
+    end
+  end
 end

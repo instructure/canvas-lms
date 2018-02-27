@@ -727,6 +727,20 @@ describe GradebooksController do
         user_session(@teacher)
       end
 
+      describe "default_grading_standard" do
+        it "uses the course's grading standard" do
+          grading_standard = grading_standard_for(@course)
+          @course.update!(default_grading_standard: grading_standard)
+          get :show, params: { course_id: @course.id }
+          expect(gradebook_options.fetch(:default_grading_standard)).to eq grading_standard.data
+        end
+
+        it "uses the Canvas default grading standard if the course does not have one" do
+          get :show, params: { course_id: @course.id }
+          expect(gradebook_options.fetch(:default_grading_standard)).to eq GradingStandard.default_grading_standard
+        end
+      end
+
       it "includes colors if New Gradebook is enabled" do
         @course.enable_feature!(:new_gradebook)
         get :show, params: {course_id: @course.id}

@@ -83,6 +83,19 @@ describe Course do
     expect(@course.inactive?).to eq true
   end
 
+  describe '#grading_standard_or_default' do
+    it 'returns the grading scheme being used by the course, if one exists' do
+      @course.save!
+      standard = grading_standard_for(@course)
+      @course.update!(default_grading_standard: standard)
+      expect(@course.grading_standard_or_default).to be standard
+    end
+
+    it 'returns the Canvas default grading scheme if the course is not using a grading scheme' do
+      expect(@course.grading_standard_or_default.data).to eq GradingStandard.default_grading_standard
+    end
+  end
+
   describe "#recompute_student_scores" do
     it "should use all student ids except concluded and deleted if none are passed" do
       @course.save!

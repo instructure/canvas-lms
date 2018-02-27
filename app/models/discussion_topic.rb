@@ -1436,4 +1436,14 @@ class DiscussionTopic < ActiveRecord::Base
   def create_materialized_view
     DiscussionTopic::MaterializedView.for(self).update_materialized_view_without_send_later(xlog_location: self.class.current_xlog_location)
   end
+
+  def grading_standard_or_default
+    grading_standard_context = assignment || context
+
+    if grading_standard_context.present?
+      grading_standard_context.grading_standard_or_default
+    else
+      GradingStandard.default_instance
+    end
+  end
 end

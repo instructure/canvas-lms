@@ -83,6 +83,16 @@ describe GradingStandard do
     compare_schemes(standard.data, GradingStandard.default_grading_standard)
   end
 
+  describe '#default_standard?' do
+    it 'returns true for the default instance' do
+      expect(GradingStandard.default_instance).to be_default_standard
+    end
+
+    it 'returns false for a non-default instance' do
+      expect(GradingStandard.new).not_to be_default_standard
+    end
+  end
+
   context "#for" do
     it "should return standards that match the context" do
       grading_standard_for @course
