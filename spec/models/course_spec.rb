@@ -4886,6 +4886,16 @@ describe Course, '#module_items_visible_to' do
     @course.complete!
     expect(@course.module_items_visible_to(@teacher).map(&:title)).to match_array %w(published unpublished)
   end
+
+  context "sharding" do
+    specs_require_sharding
+
+    it "shouldn't kersplud on a different shard" do
+      @shard1.activate do
+        expect(@course.module_items_visible_to(@student).first.title).to eq 'published'
+      end
+    end
+  end
 end
 
 describe Course, '#update_enrolled_users' do
