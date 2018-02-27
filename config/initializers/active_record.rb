@@ -1338,6 +1338,30 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     end
   end
 
+  def find_foreign_key(from_table, to_table, column: nil)
+    column ||= "#{to_table.to_s.singularize}_id"
+    foreign_keys(from_table).find do |key|
+      key.to_table == to_table.to_s && key.column == column.to_s
+    end&.name
+  end
+
+  def alter_constraint(table, constraint, new_name: nil, deferrable: nil)
+    raise ArgumentError, "must specify deferrable or a new name" if new_name.nil? || deferrable.nil?
+
+    # can't rename and alter options in the same statement, so do the rename first
+    if new_name && new_name != constraint
+      execute("ALTER TABLE #{quote_table_name(table)}
+               ALTER CONSTRAINT #{quote_column_name(constraint)} RENAME TO #{quote_column_name(new_name)}")
+      constraint = new_name
+    end
+
+    unless deferrable.nil?
+      options = deferrable ? "DEFERRABLE" : "NOT DEFERRABLE"
+      execute("ALTER TABLE #{quote_table_name(table)}
+               ALTER CONSTRAINT #{quote_column_name(constraint)} #{options}")
+    end
+  end
+
   def remove_foreign_key_if_exists(table, options = {})
     return unless foreign_key_exists?(table, options)
     remove_foreign_key(table, options)
