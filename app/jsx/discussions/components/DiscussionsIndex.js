@@ -37,7 +37,6 @@ import { selectPaginationState } from '../../shared/reduxPagination'
 import { discussionList } from '../../shared/proptypes/discussion'
 import propTypes from '../propTypes'
 import actions from '../actions'
-import DRAG_AND_DROP_ROLES from '../../shared/DragAndDropRoles'
 
 export default class DiscussionsIndex extends Component {
   static propTypes = {
@@ -178,7 +177,7 @@ export default class DiscussionsIndex extends Component {
           <Heading level="h1">{I18n.t('Announcements')}</Heading>
         </ScreenReaderContent>
         {this.renderSpinner(this.props.isLoadingDiscussions, I18n.t('Loading Discussions'))}
-        {this.props.roles.some((role) => DRAG_AND_DROP_ROLES.includes(role)) ? this.renderTeacherView() : this.renderStudentView()}
+        {this.props.permissions.moderate ? this.renderTeacherView() : this.renderStudentView()}
       </div>
     )
   }

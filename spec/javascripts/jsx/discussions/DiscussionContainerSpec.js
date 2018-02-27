@@ -50,16 +50,16 @@ test('renders placeholder when no discussions are present', () => {
   ok(node.exists())
 })
 
-test('renders regular discussion row when student', () => {
+test('renders regular discussion row when user does not have moderate permissions', () => {
   const props = defaultProps()
   const tree = shallow(<DiscussionContainer {...props} />)
   const node = tree.find('DiscussionRow')
   ok(node.exists())
 })
 
-test('renders a draggable discussion row when a teacher', () => {
+test('renders a draggable discussion row when user has moderate permissions', () => {
   const props = defaultProps()
-  props.roles = ["teacher", "admin"]
+  props.permissions.moderate = true
   const tree = shallow(<DiscussionContainer {...props} />)
   const node = tree.find('DragSource(DiscussionRow)')
   ok(node.exists())

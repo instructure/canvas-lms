@@ -83,7 +83,7 @@ test('does not render droppable container when student', () => {
 
 test('renders three containers for teachers', () => {
   const props = defaultProps()
-  props.roles = ['teacher', 'ta', 'admin']
+  props.permissions.moderate = true
   const tree = shallow(<DiscussionsIndex {...props} />)
   equal(tree.find('.closed-for-comments-discussions-v2__wrapper').length, 1)
   equal(tree.find('.unpinned-discussions-v2__wrapper').length, 1)

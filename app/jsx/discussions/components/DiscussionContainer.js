@@ -28,7 +28,6 @@ import DiscussionRow, { DraggableDiscussionRow } from '../../shared/components/D
 import { discussionList } from '../../shared/proptypes/discussion'
 import masterCourseDataShape from '../../shared/proptypes/masterCourseData'
 import propTypes from '../propTypes'
-import DRAG_AND_DROP_ROLES from '../../shared/DragAndDropRoles'
 
 // We need to look at the previous state of a discussion as well as where it is
 // trying to be drag and dropped into in order to create a decent screenreader
@@ -70,8 +69,6 @@ const discussionTarget = {
   },
 }
 
-const includesRoles = (role) => DRAG_AND_DROP_ROLES.includes(role)
-
 export default class DiscussionsContainer extends Component {
   static propTypes = {
     discussions: discussionList.isRequired,
@@ -96,15 +93,17 @@ export default class DiscussionsContainer extends Component {
 
   renderDiscussions () {
     return this.props.discussions.map(discussion => {
-      if (this.props.roles.some(includesRoles)){
-        return (<DraggableDiscussionRow
-          key={discussion.id}
-          discussion={discussion}
-          canManage={this.props.permissions.manage_content}
-          masterCourseData={this.props.masterCourseData}
-          onToggleSubscribe={this.props.toggleSubscribe}
-          draggable
-        />)
+      if (this.props.permissions.moderate) {
+        return (
+          <DraggableDiscussionRow
+            key={discussion.id}
+            discussion={discussion}
+            canManage={this.props.permissions.manage_content}
+            masterCourseData={this.props.masterCourseData}
+            onToggleSubscribe={this.props.toggleSubscribe}
+            draggable
+          />
+        )
       } else {
         return (
           <DiscussionRow
