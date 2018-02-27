@@ -299,6 +299,11 @@ QUnit.module('GradeInputHelper', () => {
         strictEqual(parseTextValue('83.4%').score, 8.34)
       })
 
+      test('converts a percentage using alternate points possible', () => {
+        options.pointsPossible = 15
+        strictEqual(parseTextValue('80%').score, 12)
+      })
+
       test('does not round a converted percentage', () => {
         strictEqual(parseTextValue('83.123456789%').score, 8.3123456789)
       })
@@ -353,6 +358,11 @@ QUnit.module('GradeInputHelper', () => {
 
       test('converts a grading scheme value to points for the score', () => {
         strictEqual(parseTextValue('B').score, 8.9)
+      })
+
+      test('converts a grading scheme value using alternate points possible', () => {
+        options.pointsPossible = 15
+        strictEqual(parseTextValue('B').score, 13.35)
       })
 
       test('ignores whitespace from the given value when setting the grade', () => {
@@ -620,6 +630,11 @@ QUnit.module('GradeInputHelper', () => {
         strictEqual(parseTextValue('83.4%').score, 8.34)
       })
 
+      test('converts a percentage using alternate points possible', () => {
+        options.pointsPossible = 15
+        strictEqual(parseTextValue('80%').score, 12)
+      })
+
       test('does not round a converted percentage score', () => {
         strictEqual(parseTextValue('83.123456789%').score, 8.3123456789)
       })
@@ -674,6 +689,11 @@ QUnit.module('GradeInputHelper', () => {
 
       test('converts a grading scheme value to points for the score', () => {
         strictEqual(parseTextValue('B').score, 8.9)
+      })
+
+      test('converts a grading scheme value using alternate points possible', () => {
+        options.pointsPossible = 15
+        strictEqual(parseTextValue('B').score, 13.35)
       })
 
       test('ignores whitespace from the given value when setting the grade', () => {
@@ -899,6 +919,11 @@ QUnit.module('GradeInputHelper', () => {
 
       test('sets the score to the matching scheme value when given a scheme key', () => {
         strictEqual(parseTextValue('B').score, 8.9)
+      })
+
+      test('sets the score using alternate points possible', () => {
+        options.pointsPossible = 15
+        strictEqual(parseTextValue('B').score, 13.35)
       })
 
       test('sets the score to the value when given an integer', () => {

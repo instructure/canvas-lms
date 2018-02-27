@@ -51,12 +51,10 @@ function parseAsGradingScheme(value, options) {
     return null
   }
 
-  const percent = options.pointsPossible ? percentage : 0
-
   return {
     enteredAs: 'gradingScheme',
-    percent,
-    points: options.pointsPossible ? percentage / options.pointsPossible : 0,
+    percent: options.pointsPossible ? percentage : 0,
+    points: options.pointsPossible ? percentage / 100 * options.pointsPossible : 0,
     schemeKey: scoreToGrade(percentage, options.gradingScheme)
   }
 }
