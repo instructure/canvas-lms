@@ -57,8 +57,8 @@ test('renders', function() {
   ok(this.dueDateCalendarPicker.isMounted())
 })
 
-test('formattedDate returns a nicely formatted Date', function() {
-  equal('Feb 1, 2012 at 7:01am', this.dueDateCalendarPicker.formattedDate())
+test('formattedDate returns a date in the same format used by DatetimeField', function() {
+  equal('Feb 1, 2012 7:01am', this.dueDateCalendarPicker.formattedDate())
 })
 
 test('formattedDate returns a localized Date', function() {
@@ -68,10 +68,9 @@ test('formattedDate returns a localized Date', function() {
   I18nStubber.setLocale('fr_FR')
   I18nStubber.stub('fr_FR', {
     'date.formats.medium': '%-d %b %Y',
-    'time.formats.tiny': '%-k:%M',
-    'time.event': '%{date} à %{time}'
+    'time.formats.tiny': '%-k:%M'
   })
-  equal('1 févr. 2012 à 7:01', this.dueDateCalendarPicker.formattedDate())
+  equal('1 févr. 2012 7:01', this.dueDateCalendarPicker.formattedDate())
   I18nStubber.popFrame()
   tz.restore(snapshot)
 })
