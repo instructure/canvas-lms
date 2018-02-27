@@ -67,7 +67,6 @@ describe "discussions index" do
     end
 
     it 'clicking the Add Discussion button redirects to new discussion page' do
-      skip("Add with COMMS-722")
       expect_new_page_load { DiscussionsIndex.click_add_discussion }
       expect(driver.current_url).to include(DiscussionsIndex.new_discussion_url)
     end
@@ -89,9 +88,8 @@ describe "discussions index" do
     end
 
     it 'clicking the discussion goes to the discussion page' do
-      skip('Add with COMMS-693')
       expect_new_page_load { DiscussionsIndex.click_on_discussion(discussion1_title) }
-      expect(driver.current_url).to include(DiscussionsIndex.individual_discussion_url(@announcement1))
+      expect(driver.current_url).to include(DiscussionsIndex.individual_discussion_url(@discussion1))
     end
 
     it 'a discussion can be deleted by using Delete menu item' do
@@ -110,6 +108,15 @@ describe "discussions index" do
     it 'pill on announcement displays correct number of unread replies' do
       skip('Add with COMMS-693')
       expect(DiscussionsIndex.discussion_unread_pill(discussion1_title)).to eq "2"
+    end
+
+    it "should allow teachers to edit discussions settings" do
+      DiscussionsIndex.click_discussion_settings_button
+      DiscussionsIndex.click_create_discussions_checkbox
+      DiscussionsIndex.submit_discussion_settings
+      wait_for_stale_element(".discussion-settings-v2-spinner-container")
+      @course.reload
+      expect(@course.allow_student_discussion_topics).to eq false
     end
   end
 end

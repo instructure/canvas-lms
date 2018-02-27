@@ -59,6 +59,10 @@ class DiscussionsIndex
       f('#confirm_delete_discussion')
     end
 
+    def discussion_css(title)
+      "a:contains(#{title})"
+    end
+
     def discussion_group(group_name)
       fj("div:contains('#{group_name}')")
     end
@@ -94,6 +98,10 @@ class DiscussionsIndex
       f('.ic-item-row__manage-menu button', discussion(title))
     end
 
+    def discussion_settings_button
+      f('#discussion_settings')
+    end
+
     def delete_menu_option
       f('#delete-discussion-menu-option')
     end
@@ -112,6 +120,14 @@ class DiscussionsIndex
 
     def duplicate_v2_menu_option
       f('#copy-discussion-menu-option')
+    end
+
+    def create_discussions_checkbox
+      fj("label:contains('Create discussion')")
+    end
+
+    def discussion_settings_submit_button
+      f('#submit_discussion_settings')
     end
 
     # ---------------------- Actions ----------------------
@@ -152,6 +168,19 @@ class DiscussionsIndex
 
     def click_on_discussion(title)
       discussion_title(title).click
+    end
+
+    def click_discussion_settings_button
+      discussion_settings_button.click
+      wait_for_ajax_requests
+    end
+
+    def click_create_discussions_checkbox
+      create_discussions_checkbox.click
+    end
+
+    def submit_discussion_settings
+      discussion_settings_submit_button.click
     end
 
     def click_add_discussion

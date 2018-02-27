@@ -93,6 +93,7 @@ export default function DiscussionRow ({ discussion, masterCourseData, rowRef, o
       <CourseItemRow
         ref={rowRef}
         className="ic-discussion-row"
+        key={discussion.id}
         id={discussion.id}
         draggable={draggable}
         connectDragSource={connectDragSource}

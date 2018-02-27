@@ -32,6 +32,7 @@ import Text from '@instructure/ui-core/lib/components/Text'
 import masterCourseDataShape from '../../shared/proptypes/masterCourseData'
 import DiscussionsContainer, { DroppableDiscussionsContainer } from './DiscussionContainer'
 import { pinnedDiscussionBackground, unpinnedDiscussionsBackground, closedDiscussionBackground } from './DiscussionBackgrounds'
+import {ConnectedIndexHeader} from './IndexHeader'
 
 import select from '../../shared/select'
 import { selectPaginationState } from '../../shared/reduxPagination'
@@ -206,6 +207,7 @@ renderStudentView () {
         <ScreenReaderContent>
           <Heading level="h1">{I18n.t('Announcements')}</Heading>
         </ScreenReaderContent>
+        <ConnectedIndexHeader searchInputRef={(c) => { this.searchInput = c }} />
         {this.renderSpinner(this.props.isLoadingDiscussions, I18n.t('Loading Discussions'))}
         {this.props.permissions.moderate ? this.renderTeacherView() : this.renderStudentView()}
       </div>

@@ -22,21 +22,30 @@ import { createPaginatedReducer } from '../shared/reduxPagination'
 import pinnedDiscussionReducer from './reducers/pinnedDiscussionReducer'
 import unpinnedDiscussionReducer from './reducers/unpinnedDiscussionReducer'
 import closedForCommentsDiscussionReducer from './reducers/closedForCommentsDiscussionReducer'
+import userSettingsReducer from './reducers/userSettingsReducer'
+import courseSettingsReducer from './reducers/courseSettingsReducer'
+import isSavingSettingsReducer from './reducers/isSavingSettingsReducer'
+import isSettingsModalOpenReducer from './reducers/isSettingsModalOpenReducer'
 
 const identity = (defaultState = null) => (
   state => (state === undefined ? defaultState : state)
 )
 
 export default combineReducers({
-  pinnedDiscussions: pinnedDiscussionReducer,
   closedForCommentsDiscussions: closedForCommentsDiscussionReducer,
-  unpinnedDiscussions: unpinnedDiscussionReducer,
   contextCodes: identity([]),
-  contextType: identity(null),
   contextId: identity(null),
-  permissions: identity({}),
-  roles: identity({}),
-  masterCourseData: identity(null),
+  contextType: identity(null),
+  courseSettings: courseSettingsReducer,
+  currentUserId: identity(null),
   discussions: createPaginatedReducer('discussions'),
+  isSavingSettings: isSavingSettingsReducer,
+  isSettingsModalOpen: isSettingsModalOpenReducer,
+  masterCourseData: identity(null),
   notifications: reduceNotifications,
+  permissions: identity({}),
+  pinnedDiscussions: pinnedDiscussionReducer,
+  roles: identity({}),
+  unpinnedDiscussions: unpinnedDiscussionReducer,
+  userSettings: userSettingsReducer,
 })

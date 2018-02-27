@@ -30,13 +30,25 @@ function fetchDiscussions(dispatch, getState, payload) {
       .catch(err => reject({ err, message: I18n.t('An error ocurred while loading discussions') }))
   }
 }
+
 const discussionActions = createPaginationActions('discussions', fetchDiscussions)
 
 const types = [
   ...discussionActions.actionTypes,
+  'TOGGLE_MODAL_OPEN',
+  'TOGGLE_SUBSCRIBE_START',
   'TOGGLE_SUBSCRIBE_START',
   'TOGGLE_SUBSCRIBE_SUCCESS',
   'TOGGLE_SUBSCRIBE_FAIL',
+  'GET_USER_SETTINGS_START',
+  'GET_USER_SETTINGS_SUCCESS',
+  'GET_USER_SETTINGS_FAIL',
+  'GET_COURSE_SETTINGS_START',
+  'GET_COURSE_SETTINGS_SUCCESS',
+  'GET_COURSE_SETTINGS_FAIL',
+  'SAVING_SETTINGS_START',
+  'SAVING_SETTINGS_SUCCESS',
+  'SAVING_SETTINGS_FAIL',
   'UPDATE_DISCUSSION_START',
   'UPDATE_DISCUSSION_SUCCESS',
   'UPDATE_DISCUSSION_FAIL',
@@ -81,6 +93,65 @@ actions.updateDiscussion = function(discussion, updatedFields, { successMessage,
           discussion,
           err
         }))
+      })
+  }
+}
+
+actions.fetchUserSettings = function() {
+  return (dispatch, getState) => {
+    dispatch(actions.getUserSettingsStart())
+    apiClient.getUserSettings(getState())
+      .then(resp => {
+        dispatch(actions.getUserSettingsSuccess(resp.data))
+      })
+      .catch(err => {
+        dispatch(actions.getUserSettingsFail({err}))
+      })
+  }
+}
+
+actions.fetchCourseSettings = function() {
+  return (dispatch, getState) => {
+    dispatch(actions.getCourseSettingsStart())
+    apiClient.getCourseSettings(getState())
+      .then(resp => {
+        dispatch(actions.getCourseSettingsSuccess(resp.data))
+      })
+      .catch(err => {
+        dispatch(actions.getCourseSettingsFail({err}))
+      })
+  }
+}
+
+function saveCourseSettings(dispatch, getState, userSettings, courseSettings) {
+  apiClient.saveCourseSettings(getState(), courseSettings)
+    .then(resp => {
+      $.screenReaderFlashMessage(I18n.t('Saved discussion settings successfully'))
+      dispatch(actions.savingSettingsSuccess({userSettings, courseSettings: resp.data}))
+    })
+    .catch(err => {
+      $.screenReaderFlashMessage(I18n.t('Error saving discussion settings'))
+      dispatch(actions.savingSettingsFail({err}))
+    })
+}
+
+actions.saveSettings = function(userSettings, courseSettings) {
+  return (dispatch, getState) => {
+    dispatch(actions.savingSettingsStart())
+    const userSettingsCopy = Object.assign(getState().userSettings, {})
+    userSettingsCopy.manual_mark_as_read = userSettings.markAsRead
+    apiClient.saveUserSettings(getState(), userSettingsCopy)
+      .then(resp => {
+        if(courseSettings) {
+          saveCourseSettings(dispatch, getState, resp.data, courseSettings)
+        } else {
+          $.screenReaderFlashMessage(I18n.t('Saved discussion settings successfully'))
+          dispatch(actions.savingSettingsSuccess({userSettings: resp.data}))
+        }
+      })
+      .catch(err => {
+        $.screenReaderFlashMessage(I18n.t('Error saving discussion settings'))
+        dispatch(actions.savingSettingsFail({err}))
       })
   }
 }

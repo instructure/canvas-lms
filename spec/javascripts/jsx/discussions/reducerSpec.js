@@ -155,3 +155,58 @@ test('TOGGLE_SUBSCRIBE_SUCCESS should only update the state of the supplied id',
   deepEqual(newState.pinnedDiscussions, [])
   deepEqual(newState.unpinnedDiscussions, [])
 })
+
+test('TOGGLE_MODAL_OPEN should toggle isSettingsModalOpen', () => {
+  const newState = reduce(actions.toggleModalOpen())
+  deepEqual(newState.isSettingsModalOpen, true)
+})
+
+test('SAVING_SETTINGS_SUCCESS should set isSettingsModalOpen to false', () => {
+  const newState = reduce(actions.savingSettingsSuccess({courseSettings: {}, userSettings: {}}))
+  deepEqual(newState.isSettingsModalOpen, false)
+})
+
+test('SAVING_SETTINGS_FAIL should set isSettingsModalOpen to true', () => {
+  const newState = reduce(actions.savingSettingsFail())
+  deepEqual(newState.isSettingsModalOpen, true)
+})
+
+test('SAVING_SETTINGS_START should toggle isSavingSettings', () => {
+  const newState = reduce(actions.savingSettingsStart())
+  deepEqual(newState.isSavingSettings, true)
+})
+
+test('SAVING_SETTINGS_SUCCESS should set isSavingSettings to false', () => {
+  const newState = reduce(actions.savingSettingsSuccess({courseSettings: {}, userSettings: {}}))
+  deepEqual(newState.isSavingSettings, false)
+})
+
+test('SAVING_SETTINGS_FAIL should toggle isSavingSettings', () => {
+  const newState = reduce(actions.savingSettingsFail())
+  deepEqual(newState.isSavingSettings, false)
+})
+
+test('GET_COURSE_SETTINGS_SUCCESS should return paylod', () => {
+  const newState = reduce(actions.getCourseSettingsSuccess({courseSettings: "blah"}))
+  deepEqual(newState.courseSettings, {courseSettings: "blah"})
+})
+
+test('SAVING_SETTINGS_SUCCESS should return paylod if returned', () => {
+  const newState = reduce(actions.savingSettingsSuccess({courseSettings: "blah", userSettings: 'blee'}))
+  deepEqual(newState.courseSettings, "blah")
+})
+
+test('SAVING_SETTINGS_SUCCESS should return old state if nothing is returned', () => {
+  const newState = reduce(actions.savingSettingsSuccess({userSettings: 'blee'}), {courseSettings: "blah"})
+  deepEqual(newState.courseSettings, "blah")
+})
+
+test('GET_COURSE_SETTINGS_SUCCESS should return paylod for user settings', () => {
+  const newState = reduce(actions.getUserSettingsSuccess({userSettings: "blah"}))
+  deepEqual(newState.userSettings, {userSettings: "blah"})
+})
+
+test('SAVING_SETTINGS_SUCCESS should return paylod for user settings', () => {
+  const newState = reduce(actions.savingSettingsSuccess({courseSettings: "blah", userSettings: 'blee'}))
+  deepEqual(newState.userSettings, "blee")
+})

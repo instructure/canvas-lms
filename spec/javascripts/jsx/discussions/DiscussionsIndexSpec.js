@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import { Provider } from 'react-redux'
 import { mount, shallow } from 'enzyme'
 
 import DiscussionsIndex from 'jsx/discussions/components/DiscussionsIndex'
@@ -34,11 +35,54 @@ const defaultProps = () => ({
   roles: ["student", "user"],
 })
 
+// necessary to mock this because we have a child Container/"Smart" component
+// that need to pull their props from the store state
+const store = {
+  getState: () => ({
+
+    closedForCommentsDiscussions: [],
+    courseSettings: {collapse_global_nav: false, manual_mark_as_read: false},
+    currentUserId: 1,
+    discussions: [],
+    isSavingSettings: false,
+    isSettingsModalOpen: false,
+    pinnedDiscussions: [],
+    roles: ['user', 'teacher'],
+    unpinnedDiscussions: [],
+    userSettings: {collapse_global_nav: false, manual_mark_as_read: false},
+    contextType: 'course',
+    contextId: '1',
+    permissions: {
+      create: true,
+      manage_content: true,
+      moderate: true,
+    },
+  }),
+  // we only need to define these functions so that we match the react-redux contextTypes
+  // shape for a store otherwise react-redux thinks our store is invalid
+  dispatch() {},
+  subscribe() {},
+}
+
 QUnit.module('DiscussionsIndex component')
 
 test('renders the component', () => {
-  const tree = mount(<DiscussionsIndex {...defaultProps()} />)
+  const tree = mount(
+    <Provider store={store}>
+      <DiscussionsIndex {...defaultProps()} />
+    </Provider>
+  )
   const node = tree.find('DiscussionsIndex')
+  ok(node.exists())
+})
+
+test('renders the IndexHeaderComponent component', () => {
+  const tree = mount(
+    <Provider store={store}>
+      <DiscussionsIndex {...defaultProps()} />
+    </Provider>
+  )
+  const node = tree.find('IndexHeader')
   ok(node.exists())
 })
 
@@ -53,7 +97,11 @@ test('displays spinner when loading discussions', () => {
 test('calls getDiscussions if hasLoadedDiscussions is false', () => {
   const props = defaultProps()
   props.getDiscussions = sinon.spy()
-  mount(<DiscussionsIndex {...props} />)
+  mount(
+    <Provider store={store}>
+      <DiscussionsIndex {...props} />
+    </Provider>
+  )
   equal(props.getDiscussions.callCount, 1)
 })
 

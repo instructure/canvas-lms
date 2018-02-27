@@ -15,32 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import { handleActions } from 'redux-actions'
+import { actionTypes } from '../actions'
 
-import { shape, bool, number } from 'prop-types'
+const isSettingsModalOpenReducer = handleActions({
+  [actionTypes.TOGGLE_MODAL_OPEN]: (state) => !state,
+  [actionTypes.SAVING_SETTINGS_SUCCESS]: () => false,
+  [actionTypes.SAVING_SETTINGS_FAIL]: () => true,
+}, false)
 
-const propTypes = {}
-
-propTypes.permissions = shape({
-  create: bool.isRequired,
-  manage_content: bool.isRequired,
-  moderate: bool.isRequired,
-})
-
-propTypes.courseSettings = shape({
-allow_student_discussion_editing: bool,
-allow_student_discussion_topics: bool,
-allow_student_forum_attachments: bool,
-allow_student_organized_groups: bool,
-grading_standard_enabled: bool,
-grading_standard_id: bool,
-hide_distribution_graphs: bool,
-hide_final_grades: bool,
-home_page_announcement_limit: number,
-})
-
-propTypes.userSettings = shape({
-  collapse_global_nav: bool,
-  manual_mark_as_read: bool,
-})
-
-export default propTypes
+export default isSettingsModalOpenReducer

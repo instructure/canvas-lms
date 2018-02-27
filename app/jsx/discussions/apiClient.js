@@ -49,3 +49,20 @@ export function subscribeToTopic ({ contextType, contextId }, { id }) {
 export function unsubscribeFromTopic ({ contextType, contextId }, { id }) {
   return axios.delete(`/api/v1/${contextType}s/${contextId}/discussion_topics/${id}/subscribed`)
 }
+
+export function getUserSettings ({currentUserId}) {
+  return axios.get(`/api/v1/users/${currentUserId}/settings`)
+}
+
+export function getCourseSettings ({contextId}) {
+  return axios.get(`/api/v1/courses/${contextId}/settings`)
+}
+
+export function saveCourseSettings ({contextId}, settings) {
+  return axios.put(`/api/v1/courses/${contextId}/settings`, settings)
+}
+
+export function saveUserSettings ({currentUserId}, settings) {
+  return axios.put(`/api/v1/users/${currentUserId}/settings`, settings)
+}
+

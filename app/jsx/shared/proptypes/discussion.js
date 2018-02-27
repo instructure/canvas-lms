@@ -20,7 +20,7 @@ import { author } from './user'
 
 const discussion = shape({
   id: string.isRequired,
-  position: number.isRequired,
+  position: number,
   published: bool.isRequired,
   title: string.isRequired,
   message: string.isRequired,

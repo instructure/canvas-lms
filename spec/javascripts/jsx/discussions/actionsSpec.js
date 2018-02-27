@@ -255,3 +255,116 @@ test('dispatches toggleSubscribeFail in an error occures on the API call', funct
     done()
   })
 })
+
+test('saveSettings dispatches SAVING_SETTINGS_START', () => {
+  const courseSettings = {
+    allow_student_discussion_topics: true,
+    allow_student_forum_attachments: true,
+    allow_student_discussion_editing: true,
+    grading_standard_enabled: false,
+    grading_standard_id: null,
+    allow_student_organized_groups: true,
+    hide_final_grades: false,
+    hide_distribution_graphs: false,
+    lock_all_announcements: true,
+    restrict_student_past_view: false,
+    restrict_student_future_view: false,
+    show_announcements_on_home_page: false,
+    home_page_announcement_limit: 3,
+    image_url: null,
+    image_id: null,
+    image: null,
+  }
+  const userSettings = {
+    manual_mark_as_read: false,
+    collapse_global_nav: false,
+  }
+  const state = {contextId: "1", currentUserId: "1", userSettings}
+  const dispatchSpy = sinon.spy()
+  actions.saveSettings(userSettings, courseSettings)(dispatchSpy, () => state)
+  const expected = [
+    {
+      type: "SAVING_SETTINGS_START"
+    }
+  ]
+  deepEqual(dispatchSpy.firstCall.args, expected)
+})
+
+test('saveSettings calls screenReaderFlash if successful with only user settings', (assert) => {
+  const done = assert.async()
+  const userSettings = {
+    markAsRead: false,
+    collapse_global_nav: false,
+  }
+  const state = {contextId: "1", currentUserId: "1", userSettings}
+  const dispatchSpy = sinon.spy()
+  const flashStub = sinon.spy($, 'screenReaderFlashMessage')
+
+  mockSuccess('saveUserSettings', {})
+  actions.saveSettings(userSettings)(dispatchSpy, () => state)
+
+  setTimeout(() => {
+    deepEqual(flashStub.firstCall.args, ["Saved discussion settings successfully"])
+    flashStub.restore()
+    done()
+  })
+})
+
+test('saveSettings calls screenReaderFlash if successful with course settings', (assert) => {
+  const done = assert.async()
+  const userSettings = {
+    markAsRead: false,
+    collapse_global_nav: false,
+  }
+  const courseSettings = {
+    allow_student_discussion_topics: true,
+    allow_student_forum_attachments: true,
+    allow_student_discussion_editing: true,
+    grading_standard_enabled: false,
+    grading_standard_id: null,
+    allow_student_organized_groups: true,
+    hide_final_grades: false,
+  }
+  const state = {contextId: "1", currentUserId: "1", userSettings}
+  const dispatchSpy = sinon.spy()
+  const flashStub = sinon.spy($, 'screenReaderFlashMessage')
+
+  mockSuccess('saveUserSettings', {})
+  mockSuccess('saveCourseSettings', {})
+  actions.saveSettings(userSettings, courseSettings)(dispatchSpy, () => state)
+
+  setTimeout(() => {
+    deepEqual(flashStub.firstCall.args, ["Saved discussion settings successfully"])
+    flashStub.restore()
+    done()
+  })
+})
+
+test('saveSettings calls screenReaderFlash if failed with course settings', (assert) => {
+  const done = assert.async()
+  const userSettings = {
+    markAsRead: false,
+    collapse_global_nav: false,
+  }
+  const courseSettings = {
+    allow_student_discussion_topics: true,
+    allow_student_forum_attachments: true,
+    allow_student_discussion_editing: true,
+    grading_standard_enabled: false,
+    grading_standard_id: null,
+    allow_student_organized_groups: true,
+    hide_final_grades: false,
+  }
+  const state = {contextId: "1", currentUserId: "1", userSettings}
+  const dispatchSpy = sinon.spy()
+  const flashStub = sinon.spy($, 'screenReaderFlashMessage')
+
+  mockFail('saveCourseSettings', {})
+  actions.saveSettings(userSettings, courseSettings)(dispatchSpy, () => state)
+
+  setTimeout(() => {
+    deepEqual(flashStub.firstCall.args, ["Error saving discussion settings"])
+    flashStub.restore()
+    done()
+  })
+})
