@@ -524,6 +524,41 @@ describe "student planner" do
     end
   end
 
+  context "with new activity button" do
+    before :once do
+      @old, @older, @oldest = new_activities_in_the_past
+      graded_discussion_in_the_future
+    end
+
+    before :each do
+      user_session(@student1)
+    end
+
+    it "scrolls to the next immediate new activity", priority: "1", test_id: 3468774 do
+      skip('fragile, need to skip now')
+      go_to_list_view
+      new_activity_button.click
+      wait_for_spinner
+      expect(first_item_on_page).to contain_link(@old.title.to_s)
+      new_activity_button.click
+      expect(first_item_on_page).to contain_link(@older.title.to_s)
+      new_activity_button.click
+      expect(first_item_on_page).to contain_link(@oldest.title.to_s)
+    end
+
+    it "shows new activity if there are activity above the current scroll position", priority: "1", test_id: 3468775 do
+      skip("fragile, need to skip now")
+      past_discussion = graded_discussion_in_the_past
+      graded_discussion_in_the_future
+      go_to_list_view
+      new_activity_button.click
+      expect(f('.PlannerApp')).to contain_link(past_discussion.title.to_s)
+      expect(f('.PlannerApp')).not_to contain_css("button:contains('New Activity')")
+      scroll_page_to_bottom
+      expect(f('.PlannerApp')).to contain_css("button:contains('New Activity')")
+    end
+  end
+
   it "completes and collapses an item", priority: "1", test_id: 3263155 do
     skip("often times out in jenkins. Ticket ADMIN-618 exists to fix this.")
     @course.assignments.create!(name: 'assignment 1',

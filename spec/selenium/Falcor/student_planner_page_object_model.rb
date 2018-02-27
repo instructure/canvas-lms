@@ -93,11 +93,11 @@ module PlannerPageObject
     @modal = todo_sidebar_modal(@student_to_do.title)
   end
 
-  def graded_discussion_in_the_past
+  def graded_discussion_in_the_past(due = Time.zone.now - 2.days, title = 'Graded discussion')
     assignment = @course.assignments.create!(name: 'assignment 1',
-                                              due_at: Time.zone.now - 2.days)
+                                              due_at: due)
     discussion = @course.discussion_topics.create!(user: @teacher,
-                                                    title: 'Graded discussion',
+                                                    title: title,
                                                     message: 'Discussion topic message',
                                                     assignment: assignment)
     discussion.discussion_entries.create!(user: @teacher,
@@ -167,11 +167,22 @@ module PlannerPageObject
 
   def wait_for_spinner
     fj("title:contains('Loading')", f('.PlannerApp')) # the loading spinner appears
-    expect(f('.PlannerApp')).not_to contain_css('title') # and disappears
+    expect(f('.PlannerApp')).not_to contain_jqcss("title:contains('Loading')")
   end
 
   def items_displayed
     ff('li', f('.PlannerApp'))
+  end
+
+  def first_item_on_page
+    items_displayed[0]
+  end
+
+  def new_activities_in_the_past
+    old = graded_discussion_in_the_past
+    older = graded_discussion_in_the_past(Time.zone.now-4.days, 'older')
+    oldest = graded_discussion_in_the_past(Time.zone.now-6.days, 'oldest')
+    [old, older, oldest]
   end
 
   def todo_info_holder
