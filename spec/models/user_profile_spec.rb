@@ -34,6 +34,13 @@ describe UserProfile do
       expect(tabs.map { |t| t[:id] }).to include UserProfile::TAB_PROFILE
     end
 
+    it "should be i18n'd" do
+      student_in_course(:active_all => true)
+      I18n.locale = :es
+      tabs = @student.profile.tabs_available(@user, :root_account => account)
+      expect(tabs.detect{|t| t[:id] == UserProfile::TAB_FILES }[:label]).to_not eq "Files"
+    end
+
     context 'with lti tabs' do
       let(:visibility) { 'public' }
       let(:additional_settings) do
