@@ -18,6 +18,10 @@
 
 @import "base/environment";
 
+.center-content {
+  text-align: center;
+}
+
 #keys {
   tr:hover {
     td {
@@ -102,4 +106,3 @@
     padding: 3px 2px;
   }
 }
-

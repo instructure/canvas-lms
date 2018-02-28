@@ -22,7 +22,6 @@ import 'jqueryui/dialog'
 import I18n from 'i18n!react_developer_keys'
 import React from 'react'
 import PropTypes from 'prop-types'
-import buildForm from './lib/buildForm'
 
 
 class DeveloperKey extends React.Component {
@@ -71,12 +70,14 @@ class DeveloperKey extends React.Component {
   editLinkHandler (event)
   {
     event.preventDefault()
-    const form = buildForm(this.props.developerKey)
-
-    $('#edit_dialog')
-      .empty()
-      .append(form)
-      .dialog('open')
+    this.props.store.dispatch(
+      this.props.actions.setEditingDeveloperKey(
+        this.props.developerKey
+      )
+    )
+    this.props.store.dispatch(
+      this.props.actions.developerKeysModalOpen()
+    )
   }
 
   developerName (developerKey) {
@@ -256,6 +257,8 @@ DeveloperKey.propTypes = {
     activateDeveloperKey: PropTypes.func.isRequired,
     deactivateDeveloperKey: PropTypes.func.isRequired,
     deleteDeveloperKey: PropTypes.func.isRequired,
+    setEditingDeveloperKey: PropTypes.func.isRequired,
+    developerKeysModalOpen: PropTypes.func.isRequired
   }).isRequired,
   developerKey: PropTypes.shape({
     id: PropTypes.string.isRequired,

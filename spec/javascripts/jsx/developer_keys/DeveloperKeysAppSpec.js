@@ -27,6 +27,7 @@ test('displays the show more button', () => {
   const list = [...Array(10).keys()].map(n => ({id: `${n}`, api_key: "abc12345678", created_at: "2012-06-07T20:36:50Z"}))
 
   const applicationState = {
+    createOrEditDeveloperKey: {},
     listDeveloperKeys: {
       listDeveloperKeysPending: false,
       listDeveloperKeysSuccessful: false,
@@ -46,6 +47,7 @@ test('displays the show more button', () => {
 
 test('renders the list of developer_keys when there are some', () => {
   const applicationState = {
+    createOrEditDeveloperKey: {},
     listDeveloperKeys: {
       listDeveloperKeysPending: false,
       listDeveloperKeysSuccessful: false,
@@ -66,6 +68,7 @@ test('renders the list of developer_keys when there are some', () => {
 
 test('renders the spinner', () => {
   const applicationState = {
+    createOrEditDeveloperKey: {},
     listDeveloperKeys: {
       listDeveloperKeysPending: true,
       listDeveloperKeysSuccessful: false,
@@ -84,4 +87,44 @@ test('renders the spinner', () => {
   const renderedText = ReactDOM.findDOMNode(TestUtils.findRenderedDOMComponentWithTag(component, 'svg')).innerHTML;
 
   ok(renderedText.includes("Loading"))
+})
+
+test('opens the modal when the create button is clicked', () => {
+  const openSpy = sinon.spy()
+
+  const applicationState = {
+    createOrEditDeveloperKey: {},
+    listDeveloperKeys: {
+      listDeveloperKeysPending: true,
+      listDeveloperKeysSuccessful: false,
+      list: [
+        {
+          id: "111",
+          api_key: "abc12345678",
+          created_at: "2012-06-07T20:36:50Z"
+        }
+      ]
+    },
+  };
+
+  const fakeStore = {
+    dispatch: () => {}
+  }
+
+  const fakeActions = {
+    developerKeysModalOpen: openSpy
+  }
+
+  const component = TestUtils.renderIntoDocument(
+    <DeveloperKeysApp
+      applicationState={applicationState}
+      actions={fakeActions}
+      store={ fakeStore }
+    />
+  );
+  const componentNode = ReactDOM.findDOMNode(component)
+  const button = componentNode.querySelector('.ic-Action-header__Secondary button')
+  TestUtils.Simulate.click(button)
+
+  ok(openSpy.called)
 })

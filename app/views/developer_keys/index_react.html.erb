@@ -21,24 +21,4 @@
 <% css_bundle :developer_keys %>
 <% js_bundle(:developer_keys_react) %>
 
-<div class="ic-Action-header">
-  <div class="ic-Action-header__Primary">
-    <h2 class="ic-Action-header__Heading"><%= t :developer_keys, "Developer Keys" %></h2>
-  </div>
-  <div class="ic-Action-header__Secondary">
-    <button
-      type="button"
-      class="Button Button--primary add_key"
-      title="<%= t :add_developer_key, "Add Developer Key" %>"
-      aria-label="<%= t :add_developer_key, "Add Developer Key" %>"
-    >
-      <i class="icon-plus" aria-hidden="true"></i>&nbsp;
-      <%= t('Developer Key') %>
-    </button>
-  </div>
-</div>
-
 <div id="reactContent"></div>
-
-<div id='edit_dialog' title='<%= t :key_settings, "Key Settings" %>'>
-</div>

@@ -45,8 +45,13 @@ class DeveloperKeysTable extends React.Component {
         </thead>
         <tbody id="tbody-id">
         {this.props.developerKeysList.map(developerKey => (
-          <DeveloperKey ref={(key) => {this[`developerKey-${developerKey.id}`] = key}} key={developerKey.id}
-            developerKey={developerKey} store={this.props.store} actions={this.props.actions} />
+          <DeveloperKey
+            ref={(key) => {this[`developerKey-${developerKey.id}`] = key}}
+            key={developerKey.id}
+            developerKey={developerKey}
+            store={this.props.store}
+            actions={this.props.actions}
+          />
         ))}
         </tbody>
       </Table>

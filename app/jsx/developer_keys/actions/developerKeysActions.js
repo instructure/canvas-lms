@@ -68,6 +68,48 @@ actions.activateDeveloperKeySuccessful = (payload) => ({ type: actions.ACTIVATE_
 actions.ACTIVATE_DEVELOPER_KEY_FAILED = 'ACTIVATE_DEVELOPER_KEY_FAILED';
 actions.activateDeveloperKeyFailed = (error) => ({ type: actions.ACTIVATE_DEVELOPER_KEY_FAILED, error: true, payload: error });
 
+actions.CREATE_OR_EDIT_DEVELOPER_KEY_START = 'CREATE_OR_EDIT_DEVELOPER_KEY_START';
+actions.createOrEditDeveloperKeyStart = () => ({ type: actions.CREATE_OR_EDIT_DEVELOPER_KEY_START })
+
+actions.CREATE_OR_EDIT_DEVELOPER_KEY_SUCCESSFUL = 'CREATE_OR_EDIT_DEVELOPER_KEY_SUCCESSFUL';
+actions.createOrEditDeveloperKeySuccessful = () => ({ type: actions.CREATE_OR_EDIT_DEVELOPER_KEY_SUCCESSFUL })
+
+actions.CREATE_OR_EDIT_DEVELOPER_KEY_FAILED = 'CREATE_OR_EDIT_DEVELOPER_KEY_FAILED';
+actions.createOrEditDeveloperKeyFailed = () => ({ type: actions.CREATE_OR_EDIT_DEVELOPER_KEY_FAILED })
+
+actions.SET_EDITING_DEVELOPER_KEY = 'SET_EDITING_DEVELOPER_KEY';
+actions.setEditingDeveloperKey = (payload) => ({type: actions.SET_EDITING_DEVELOPER_KEY, payload})
+
+actions.DEVELOPER_KEYS_MODAL_OPEN = 'DEVELOPER_KEYS_MODAL_OPEN';
+actions.developerKeysModalOpen = () => ({type: actions.DEVELOPER_KEYS_MODAL_OPEN})
+
+actions.DEVELOPER_KEYS_MODAL_CLOSE = 'DEVELOPER_KEYS_MODAL_CLOSE';
+actions.developerKeysModalClose = () => ({type: actions.DEVELOPER_KEYS_MODAL_CLOSE})
+
+actions.createOrEditDeveloperKey = (formData, url, method) => (dispatch) => {
+  dispatch(actions.createOrEditDeveloperKeyStart())
+
+  axios({
+    method,
+    url,
+    data: formData,
+    config: { headers: {'Content-Type': 'multipart/form-data' }}
+  }).then((response) => {
+    if (method === 'post') {
+      dispatch(actions.listDeveloperKeysPrepend(response.data))
+    } else {
+      dispatch(actions.listDeveloperKeysReplace(response.data))
+    }
+    dispatch(actions.createOrEditDeveloperKeySuccessful())
+    dispatch(actions.developerKeysModalClose())
+  }).catch(error => {
+    $.flashError(error.message)
+    dispatch(actions.createOrEditDeveloperKeyFailed())
+  }).finally(() => {
+    dispatch(actions.setEditingDeveloperKey())
+  })
+}
+
 actions.getDeveloperKeys = (url, newSearch) => (dispatch, _getState) => {
   dispatch(actions.listDeveloperKeysStart(newSearch));
 
@@ -145,4 +187,3 @@ actions.deleteDeveloperKey = (developerKey) => (dispatch, _getState) => {
 };
 
 export default actions
-
