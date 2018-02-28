@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+require_relative '../../common'
 
 class DiscussionsIndex
   class << self
@@ -58,9 +59,13 @@ class DiscussionsIndex
       f('#confirm_delete_discussion')
     end
 
+    def discussion_group(group_name)
+      fj("div:contains('#{group_name}')")
+    end
+
     # ---------------------- Discussion ----------------------
     def discussion(title)
-      fj(".ic-discussion-row:contains('#{title}')")
+      fj(discussion_css(title))
     end
 
     def discussion_title_css(title)
