@@ -66,7 +66,7 @@ module ApplicationHelper
           end
 
           #  give it some wiggle room with >= instead of == for edits where we remove something
-          return data.value.to_s >= final_position.to_s ? 'completed' : "started"
+          return data.value.to_i >= final_position.to_i ? 'completed' : "started"
         end
       end
     end
