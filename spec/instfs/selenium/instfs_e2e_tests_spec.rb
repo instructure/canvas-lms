@@ -110,7 +110,7 @@ describe "instfs file uploads" do
 
   def get_id_from_canvas_link(file_link)
     # http://172.18.0.18:34175/files/146/download?download_frd=1"
-    file_id = file_link.split("/download?").first
+    file_id = file_link.split("/download").first
     file_id.split("/files/").last
   end
 
@@ -149,7 +149,7 @@ describe "instfs file uploads" do
 
   context 'when using instfs as a teacher' do
     before do
-      course_with_teacher_logged_in
+      course_with_teacher_logged_in(:username => 'coolteacher@example.com')
       enable_instfs
       enrollment = student_in_course(:workflow_state => 'active',:name => "coolguy", :course_section => @section)
       enrollment.accept!
@@ -278,6 +278,42 @@ describe "instfs file uploads" do
       # verify that the attachment has an instfs uuid and that it's identical to the original file
       expect(attachment.instfs_uuid).not_to be_nil
       expect(compare_md5s(file_link, file_path)).to be true
+    end
+
+    it 'should allow the teacher to see the uploaded file on a quiz submission', priority: "1", test_id: 3399299 do
+      file_path = File.join(ActionController::TestCase.fixture_path, "files/instructure.png")
+      quiz = @course.quizzes.create
+      quiz.workflow_state = "available"
+      quiz.quiz_questions.create!(:question_data => {
+        :name => "1stQ",
+        'question_type' => 'file_upload_question',
+        'question_text' => 'cooool',
+        :points_possible => 1
+      })
+      quiz.save!
+
+      # take the quiz as the student
+      user_logged_in(:user => @student)
+      get "/courses/#{@course.id}/quizzes/#{quiz.id}/take"
+      wait_for_ajaximations
+      f('#take_quiz_link').click
+      wait_for_ajaximations
+      f(".question_input").send_keys(file_path)
+      wait_for_new_page_load
+      f("#submit_quiz_button").click
+
+      # grade the quiz as the teacher
+      user_session(@teacher)
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{quiz.assignment_id}"
+      wait_for_ajaximations
+      saved_window_handle = driver.window_handle
+      driver.switch_to.frame('speedgrader_iframe')
+      file_link = fln("instructure.png").attribute("href")
+      attachment = Attachment.find(get_id_from_canvas_link(file_link))
+      # verify that the attachment has an instfs uuid and that it's identical to the original file
+      expect(attachment.instfs_uuid).not_to be_nil
+      expect(compare_md5s(file_link, file_path)).to be true
+      driver.switch_to.window saved_window_handle
     end
   end
 
