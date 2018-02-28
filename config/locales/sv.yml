@@ -4639,7 +4639,7 @@ sv:
         student_progression: "Modul framsteg för studenten"
     titles: 
       add: "Lägg till modul"
-      add_item: "Lägg till föremål till %{module}"
+      add_item: "Lägg till objekt till %{module}"
       add_prerequisite: "Lägg till förutsättning för %{module}"
       edit: "Redigera inställningar för modul"
       edit_item: "Redigera föremålsdetaljer"
