@@ -49,6 +49,18 @@ module ApplicationHelper
         else
           doc = Nokogiri::HTML(page.body)
           final_position = 0
+
+          # pull in sandwiched modules
+          doc.css('[data-replace-with-page]').each do |o|
+            p = o.attr('data-replace-with-page')
+
+            all_pages = @mod.course.wiki_pages.active
+            page = all_pages.where(:title => p)
+            if page.any?
+              o.inner_html = page.first.body
+            end
+          end
+
           doc.css('.bz-box .bz-toggle-all-next').each do |o|
             final_position += 1
           end
