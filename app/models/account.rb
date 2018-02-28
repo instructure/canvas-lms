@@ -1025,7 +1025,10 @@ class Account < ActiveRecord::Base
     end
 
     given { |user| !self.account_users_for(user).empty? }
-    can :read and can :read_as_admin and can :manage and can :update and can :delete and can :read_outcomes
+    can :read and can :read_as_admin and can :manage and can :update and can :delete and can :read_outcomes and can :read_terms
+
+    given { |user| self.root_account? && self.all_account_users_for(user).any? }
+    can :read_terms
 
     given { |user|
       result = false
