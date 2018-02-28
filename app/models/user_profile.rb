@@ -31,21 +31,21 @@ class UserProfile < ActiveRecord::Base
   BASE_TABS = [
     {
       id: TAB_COMMUNICATION_PREFERENCES,
-      label: I18n.t('#user_profile.tabs.notifications', "Notifications"),
+      label: -> { I18n.t('#user_profile.tabs.notifications', "Notifications") },
       css_class: 'notifications',
       href: :communication_profile_path,
       no_args: true
     }.freeze,
     {
       id: TAB_FILES,
-      label: I18n.t('#tabs.files', "Files"),
+      label: -> { I18n.t('#tabs.files', "Files") },
       css_class: 'files',
       href: :files_path,
       no_args: true
     }.freeze,
     {
       id: TAB_PROFILE_SETTINGS,
-      label: I18n.t('#user_profile.tabs.settings', 'Settings'),
+      label: -> { I18n.t('#user_profile.tabs.settings', 'Settings') },
       css_class: 'profile_settings',
       href: :settings_profile_path,
       no_args: true
@@ -63,7 +63,11 @@ class UserProfile < ActiveRecord::Base
 
   def tabs_available(user=nil, opts={})
     @tabs ||= begin
-      tabs = BASE_TABS.dup
+      tabs = BASE_TABS.map do |tab|
+        new_tab = tab.dup
+        new_tab[:label] = tab[:label].call
+        new_tab
+      end
       insert_profile_tab(tabs, user, opts)
       insert_eportfolios_tab(tabs, user)
       insert_lti_tool_tabs(tabs, user, opts) if user && opts[:root_account]
