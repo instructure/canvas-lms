@@ -55,6 +55,8 @@ export default class DiscussionsIndex extends Component {
     roles: arrayOf(string).isRequired,
     toggleSubscriptionState: func.isRequired,
     unpinnedDiscussions: discussionList,
+    duplicateDiscussion: func.isRequired,
+    cleanDiscussionFocus: func.isRequired,
   }
 
   static defaultProps = {
@@ -111,7 +113,9 @@ renderStudentView () {
             permissions={this.props.permissions}
             masterCourseData={this.props.masterCourseData}
             toggleSubscribe={this.props.toggleSubscriptionState}
+            duplicateDiscussion={this.props.duplicateDiscussion}
             updateDiscussion={this.props.updateDiscussion}
+            cleanDiscussionFocus={this.props.cleanDiscussionFocus}
             roles={this.props.roles}
             renderContainerBackground={() =>
               pinnedDiscussionBackground({
@@ -127,6 +131,8 @@ renderStudentView () {
             permissions={this.props.permissions}
             masterCourseData={this.props.masterCourseData}
             toggleSubscribe={this.props.toggleSubscriptionState}
+            duplicateDiscussion={this.props.duplicateDiscussion}
+            cleanDiscussionFocus={this.props.cleanDiscussionFocus}
             roles={this.props.roles}
             renderContainerBackground={() =>
               closedDiscussionBackground({
@@ -150,6 +156,8 @@ renderStudentView () {
           masterCourseData={this.props.masterCourseData}
           toggleSubscribe={this.props.toggleSubscriptionState}
           updateDiscussion={this.props.updateDiscussion}
+          duplicateDiscussion={this.props.duplicateDiscussion}
+          cleanDiscussionFocus={this.props.cleanDiscussionFocus}
           roles={this.props.roles}
           pinned
           renderContainerBackground={() =>
@@ -167,6 +175,8 @@ renderStudentView () {
           masterCourseData={this.props.masterCourseData}
           toggleSubscribe={this.props.toggleSubscriptionState}
           updateDiscussion={this.props.updateDiscussion}
+          duplicateDiscussion={this.props.duplicateDiscussion}
+          cleanDiscussionFocus={this.props.cleanDiscussionFocus}
           pinned={false}
           closedState={false}
           roles={this.props.roles}
@@ -187,6 +197,8 @@ renderStudentView () {
             masterCourseData={this.props.masterCourseData}
             toggleSubscribe={this.props.toggleSubscriptionState}
             updateDiscussion={this.props.updateDiscussion}
+            duplicateDiscussion={this.props.duplicateDiscussion}
+            cleanDiscussionFocus={this.props.cleanDiscussionFocus}
             roles={this.props.roles}
             pinned={false}
             closedState
@@ -205,7 +217,7 @@ renderStudentView () {
     return (
       <div className="discussions-v2__wrapper">
         <ScreenReaderContent>
-          <Heading level="h1">{I18n.t('Announcements')}</Heading>
+          <Heading level="h1">{I18n.t('Discussions')}</Heading>
         </ScreenReaderContent>
         <ConnectedIndexHeader searchInputRef={(c) => { this.searchInput = c }} />
         {this.renderSpinner(this.props.isLoadingDiscussions, I18n.t('Loading Discussions'))}
@@ -230,5 +242,7 @@ const connectState = state => Object.assign({
 const connectActions = dispatch => bindActionCreators(
   select(actions, ['getDiscussions',
                    'toggleSubscriptionState',
-                   'updateDiscussion']), dispatch)
+                   'updateDiscussion',
+                   'duplicateDiscussion',
+                   'cleanDiscussionFocus']), dispatch)
 export const ConnectedDiscussionsIndex = DragDropContext(HTML5Backend)(connect(connectState, connectActions)(DiscussionsIndex))

@@ -367,7 +367,8 @@ class DiscussionTopic < ActiveRecord::Base
       :allow_rating => self.allow_rating,
       :only_graders_can_rate => self.only_graders_can_rate,
       :sort_by_rating => self.sort_by_rating,
-      :todo_date => self.todo_date
+      :todo_date => self.todo_date,
+      :is_section_specific => self.is_section_specific
     })
   end
 
@@ -392,6 +393,19 @@ class DiscussionTopic < ActiveRecord::Base
         :copy_title => result.title
       })
     end
+
+    result.discussion_topic_section_visibilities = []
+    if self.is_section_specific
+      original_visibilities = self.discussion_topic_section_visibilities.active
+      original_visibilities.each do |visibility|
+        new_visibility = DiscussionTopicSectionVisibility.new(
+          :discussion_topic => result,
+          :course_section => visibility.course_section
+        )
+        result.discussion_topic_section_visibilities << new_visibility
+      end
+    end
+
     # For some reason, the relation doesn't take care of this for us. Don't understand why.
     # Without this line, *two* discussion topic duplicates appear when a save is performed.
     result.assignment&.discussion_topic = result

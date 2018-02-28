@@ -2369,6 +2369,8 @@ describe DiscussionTopic do
     before :once do
       course_with_teacher(:active_all => true)
       student_in_course(:active_all => true)
+      @course_section1 = @course.course_sections.create!
+      @course_section2 = @course.course_sections.create!
     end
 
     it "without custom opts" do
@@ -2399,6 +2401,32 @@ describe DiscussionTopic do
       @topic.save!
       new_topic = @topic.duplicate({ :user => @student })
       expect(new_topic.user_id).to eq @student.id
+    end
+
+    it "duplicates sections" do
+      @course.root_account.enable_feature!(:section_specific_discussions)
+      discussion_topic_model(:context => @course)
+      @topic.is_section_specific = true
+      @topic.course_sections = [@course_section1, @course_section2]
+      @topic.save!
+      new_topic = @topic.duplicate
+      expect(new_topic.discussion_topic_section_visibilities.length).to eq 2
+      new_course_sections = new_topic.discussion_topic_section_visibilities.map(&:course_section_id).to_set
+      expect(new_course_sections).to eq [@course_section1.id, @course_section2.id].to_set
+      expect(new_topic).to be_valid
+    end
+
+    it "does not duplicate deleted visibilities" do
+      @course.root_account.enable_feature!(:section_specific_discussions)
+      discussion_topic_model(:context => @course)
+      @topic.is_section_specific = true
+      @topic.course_sections = [@course_section1, @course_section2]
+      @topic.discussion_topic_section_visibilities.second.destroy!
+      @topic.save!
+      new_topic = @topic.duplicate
+      expect(new_topic.discussion_topic_section_visibilities.length).to eq 1
+      expect(new_topic.discussion_topic_section_visibilities.first.course_section_id).to eq @course_section1.id
+      expect(new_topic).to be_valid
     end
   end
 end

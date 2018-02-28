@@ -29,6 +29,9 @@ import IconTimer from 'instructure-icons/lib/Line/IconTimerLine'
 import IconAssignmentLine from 'instructure-icons/lib/Line/IconAssignmentLine'
 import IconRssLine from 'instructure-icons/lib/Line/IconRssLine'
 import IconRssSolid from 'instructure-icons/lib/Solid/IconRssSolid'
+import { MenuItem } from '@instructure/ui-core/lib/components/Menu'
+import IconCopySolid from 'instructure-icons/lib/Solid/IconCopySolid'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 
 import DiscussionModel from 'compiled/models/DiscussionTopic'
 import SectionsTooltip from '../SectionsTooltip'
@@ -61,7 +64,17 @@ const discussionTarget = {
 
 export default function DiscussionRow ({ discussion, masterCourseData, rowRef, onSelectedChanged,
                                          connectDragSource, connectDragPreview, draggable,
-                                         onToggleSubscribe }) {
+                                         onToggleSubscribe, canManage, duplicateDiscussion, cleanDiscussionFocus }) {
+  const onManageDiscussion = (e, { action, id }) => {
+    switch (action) {
+     case 'duplicate':
+       duplicateDiscussion(id)
+       break;
+     default:
+       throw new Error(I18n.t('Unknown manage discussion action encountered'))
+    }
+  }
+
   const timestamp = makeTimestamp(discussion)
   const readCount = discussion.discussion_subentry_count > 0
     ? (
@@ -84,6 +97,21 @@ export default function DiscussionRow ({ discussion, masterCourseData, rowRef, o
     />
   )
 
+  // The permissions required to duplicate are less stringent than those needed to show
+  // the menu, so go ahead and unconditionally have the menu item here.
+  const menuList = [
+    <MenuItem
+      key="duplicate"
+      value={{ action: 'duplicate', id: discussion.id, lock: false }}
+      id="duplicate-discussion-menu-option"
+    >
+      <span aria-hidden='true'>
+        <IconCopySolid />&nbsp;&nbsp;{I18n.t('Duplicate')}
+      </span>
+      <ScreenReaderContent> { I18n.t('Duplicate discussion %{title}', { title: discussion.title }) } </ScreenReaderContent>
+    </MenuItem>
+  ]
+
   // necessary because discussions return html from RCE
   const contentWrapper = document.createElement('span')
   contentWrapper.innerHTML = discussion.message
@@ -95,6 +123,7 @@ export default function DiscussionRow ({ discussion, masterCourseData, rowRef, o
         className="ic-discussion-row"
         key={discussion.id}
         id={discussion.id}
+        shouldFocusOnTitle={discussion.shouldGetFocus}
         draggable={draggable}
         connectDragSource={connectDragSource}
         icon={
@@ -114,6 +143,10 @@ export default function DiscussionRow ({ discussion, masterCourseData, rowRef, o
         }
         itemUrl={discussion.html_url}
         onSelectedChanged={onSelectedChanged}
+        showManageMenu={canManage}
+        onManageMenuSelect={onManageDiscussion}
+        clearFocusDirectives={cleanDiscussionFocus}
+        manageMenuOptions={menuList}
         masterCourse={{
           courseData: masterCourseData || {},
           getLockOptions: () => ({
@@ -148,6 +181,10 @@ DiscussionRow.propTypes = {
   connectDragPreview: func,
   draggable: bool,
   onToggleSubscribe: func.isRequired,
+  canManage: bool.isRequired,
+  onManageSubscription: func.isRequired,
+  duplicateDiscussion: func.isRequired,
+  cleanDiscussionFocus: func.isRequired
 }
 
 DiscussionRow.defaultProps = {

@@ -143,3 +143,20 @@ test('removes non-text content from discussion message', () => {
   ok(node.textContent.includes('Hello World!'))
   ok(node.textContent.includes('foo bar'))
 })
+
+test('renders manage menu if permitted', () => {
+  const tree = mount(<DiscussionRow {...makeProps({ canManage: true })} />)
+  const manageMenuNode = tree.find('PopoverMenu')
+  ok(manageMenuNode.exists())
+  const courseItemRow = tree.find('CourseItemRow')
+  ok(courseItemRow.exists())
+  ok(courseItemRow.props().manageMenuOptions.length > 0)
+  const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
+  ok(allKeys.includes('duplicate'))
+})
+
+test('does not render manage menu if not permitted', () => {
+  const tree = mount(<DiscussionRow {...makeProps({ canManage: false })} />)
+  const node = tree.find('PopoverMenu')
+  notOk(node.exists())
+})

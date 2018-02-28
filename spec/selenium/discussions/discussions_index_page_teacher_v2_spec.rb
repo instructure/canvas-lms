@@ -100,8 +100,7 @@ describe "discussions index" do
     end
 
     it 'a discussion can be duplicated by using Duplicate menu item' do
-      skip('Add with COMMS-833')
-      DiscussionsIndex.click_duplicatate_menu_option(discussion1_title)
+      DiscussionsIndex.click_duplicate_menu_option(discussion1_title)
       expect(DiscussionsIndex.discussion(discussion1_title + " Copy")).to be_displayed
     end
 

@@ -52,7 +52,12 @@ const types = [
   'UPDATE_DISCUSSION_START',
   'UPDATE_DISCUSSION_SUCCESS',
   'UPDATE_DISCUSSION_FAIL',
+  'DUPLICATE_DISCUSSION_START',
+  'DUPLICATE_DISCUSSION_SUCCESS',
+  'DUPLICATE_DISCUSSION_FAIL',
+  'CLEAN_DISCUSSION_FOCUS'
 ]
+
 const actions = Object.assign(
   createActions(...types),
   discussionActions.actionCreators,
@@ -153,6 +158,25 @@ actions.saveSettings = function(userSettings, courseSettings) {
         $.screenReaderFlashMessage(I18n.t('Error saving discussion settings'))
         dispatch(actions.savingSettingsFail({err}))
       })
+  }
+}
+
+actions.duplicateDiscussion = function(discussionId) {
+  return (dispatch, getState) => {
+    // This is a no-op, just here to maintain a pattern
+    dispatch(actions.duplicateDiscussionStart())
+    apiClient.duplicateDiscussion(getState(), discussionId).then(response => {
+      const successMessage = I18n.t('Duplication of %{title} succeeded', { title: response.data.title })
+      $.screenReaderFlashMessageExclusive(successMessage)
+      dispatch(actions.duplicateDiscussionSuccess({ newDiscussion: response.data, originalId: discussionId }))
+    }).catch(err => {
+      const failMessage = I18n.t('Duplication failed')
+      $.screenReaderFlashMessageExclusive(failMessage)
+      dispatch(actions.duplicateDiscussionFail({
+        message: failMessage,
+        err
+      }))
+    })
   }
 }
 

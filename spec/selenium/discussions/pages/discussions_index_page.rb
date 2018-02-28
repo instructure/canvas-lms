@@ -69,7 +69,7 @@ class DiscussionsIndex
 
     # ---------------------- Discussion ----------------------
     def discussion(title)
-      fj(discussion_css(title))
+      fj(discussion_title_css(title))
     end
 
     def discussion_title_css(title)
@@ -114,12 +114,8 @@ class DiscussionsIndex
       f('#lock-discussion-menu-option')
     end
 
-    def duplicatate_menu_option
-      f('.duplicate-discussion')
-    end
-
-    def duplicate_v2_menu_option
-      f('#copy-discussion-menu-option')
+    def duplicate_menu_option
+      f('#duplicate-discussion-menu-option')
     end
 
     def create_discussions_checkbox

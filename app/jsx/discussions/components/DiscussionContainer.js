@@ -77,6 +77,8 @@ export default class DiscussionsContainer extends Component {
     title: string.isRequired,
     toggleSubscribe: func.isRequired,
     updateDiscussion: func.isRequired,
+    duplicateDiscussion: func.isRequired,
+    cleanDiscussionFocus: func.isRequired,
     pinned: bool,
     closedState: bool,
     connectDropTarget: func,
@@ -102,6 +104,8 @@ export default class DiscussionsContainer extends Component {
             canManage={this.props.permissions.manage_content}
             masterCourseData={this.props.masterCourseData}
             onToggleSubscribe={this.props.toggleSubscribe}
+            duplicateDiscussion={this.props.duplicateDiscussion}
+            cleanDiscussionFocus={this.props.cleanDiscussionFocus}
             draggable
           />
         )
@@ -113,6 +117,8 @@ export default class DiscussionsContainer extends Component {
             canManage={this.props.permissions.manage_content}
             masterCourseData={this.props.masterCourseData}
             onToggleSubscribe={this.props.toggleSubscribe}
+            cleanDiscussionFocus={this.props.cleanDiscussionFocus}
+            duplicateDiscussion={this.props.duplicateDiscussion}
             draggable={false}
           />
         )

@@ -63,6 +63,8 @@ export default class CourseItemRow extends Component {
     onManageMenuSelect: func,
     sectionToolTip: node,
     replyButton: node,
+    shouldFocusOnTitle: bool,
+    clearFocusDirectives: func, // Required if shouldFocusOnTitle is true
   }
 
   static defaultProps = {
@@ -92,6 +94,8 @@ export default class CourseItemRow extends Component {
     onManageMenuSelect () {},
     sectionToolTip: null,
     replyButton: null,
+    shouldFocusOnTitle: false,
+    clearFocusDirectives: () => {}
   }
 
   state = {
@@ -100,6 +104,13 @@ export default class CourseItemRow extends Component {
 
   componentWillUnmount () {
     this.unmountMasterCourseLock()
+  }
+
+  componentDidMount () {
+    if (this.props.shouldFocusOnTitle) {
+      this._titleElement.focus()
+      this.props.clearFocusDirectives()
+    }
   }
 
   onSelectChanged = (e) => {
@@ -128,9 +139,15 @@ export default class CourseItemRow extends Component {
     }
   }
 
-  renderClickableDiv (component) {
+  renderClickableDiv (component, refName = undefined) {
+    const refFn = (c) => {
+      if (refName) {
+        this[refName] = c
+      }
+    }
+
     return (
-      <a className="ic-item-row__content-link" href={this.props.itemUrl}>
+      <a className="ic-item-row__content-link" ref={refFn} href={this.props.itemUrl}>
         <div className="ic-item-row__content-link-container">
           {component}
         </div>
@@ -176,7 +193,7 @@ export default class CourseItemRow extends Component {
         </div>)}
         <div className="ic-item-row__content-col">
           {!this.props.isRead && <ScreenReaderContent>{I18n.t('Unread')}</ScreenReaderContent>}
-          {this.renderClickableDiv(<Heading level="h3">{this.props.title}</Heading>)}
+          {this.renderClickableDiv(<Heading level="h3">{this.props.title}</Heading>, "_titleElement")}
           {this.props.sectionToolTip}
           {this.props.body ? this.renderClickableDiv(this.props.body) : null}
           {this.props.replyButton ? this.renderClickableDiv(this.props.replyButton) : null}

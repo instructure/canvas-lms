@@ -18,6 +18,8 @@
 import { handleActions } from 'redux-actions'
 import { actionTypes } from '../actions'
 import subscriptionReducerMap from './subscriptionReducerMap'
+import duplicationReducerMap from './duplicationReducerMap'
+import cleanDiscussionFocusReducerMap from './cleanDiscussionFocusReducerMap'
 
 function copyAndUpdateDiscussionState(oldState, updatedDiscussion) {
   const newState = oldState.filter((disc) => disc.id !== updatedDiscussion.id)
@@ -44,5 +46,7 @@ const reducerMap = {
 }
 
 Object.assign(reducerMap, subscriptionReducerMap)
+Object.assign(reducerMap, duplicationReducerMap)
+Object.assign(reducerMap, cleanDiscussionFocusReducerMap)
 const unpinnedDiscussionReducer = handleActions(reducerMap, [])
 export default unpinnedDiscussionReducer

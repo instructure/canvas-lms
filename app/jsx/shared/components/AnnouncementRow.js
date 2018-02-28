@@ -91,7 +91,9 @@ export default function AnnouncementRow (
       value={{ action: 'delete', id: announcement.id }}
       id="delete-announcement-menu-option"
     >
-      <IconTrash />&nbsp;&nbsp;{I18n.t('Delete')}
+      <span aria-hidden='true'>
+        <IconTrash />&nbsp;&nbsp;{I18n.t('Delete')}
+      </span>
       <ScreenReaderContent>{I18n.t('Delete announcement %{title}', { title: announcement.title })}</ScreenReaderContent>
     </MenuItem>,
   ]
@@ -102,7 +104,9 @@ export default function AnnouncementRow (
         value={{ action: 'lock', id: announcement.id, lock: !announcement.locked }}
         id="lock-announcement-menu-option"
       >
-        <IconReply />&nbsp;&nbsp;{announcement.locked ? I18n.t('Allow Comments') : I18n.t('Disallow Comments')}
+        <span aria-hidden='true'>
+          <IconReply />&nbsp;&nbsp;{announcement.locked ? I18n.t('Allow Comments') : I18n.t('Disallow Comments')}
+        </span>
         <ScreenReaderContent>
         { announcement.locked
           ? I18n.t('Allow replies for %{title}', { title: announcement.title })

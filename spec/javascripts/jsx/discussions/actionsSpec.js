@@ -170,10 +170,10 @@ test('updateDiscussion throws exception if updating a field that does not exist 
   )
 })
 
-QUnit.module('Discussion toggleSubscriptionState actions', {
+QUnit.module('Discussion actions', {
   setup () {
     this.dispatchSpy = sinon.spy()
-    this.getState = () => ({foo: 'bar'})
+    this.getState = () => ([{ id: 1 }, { id: 2, shouldGetFocus: true }] )
   },
 
   teardown () {
@@ -365,6 +365,42 @@ test('saveSettings calls screenReaderFlash if failed with course settings', (ass
   setTimeout(() => {
     deepEqual(flashStub.firstCall.args, ["Error saving discussion settings"])
     flashStub.restore()
+    done()
+  })
+})
+
+test('calls api for duplicating if requested', function() {
+  mockSuccess('duplicateDiscussion', {})
+  actions.duplicateDiscussion(1)(this.dispatchSpy, this.getState)
+  equal(apiClient.duplicateDiscussion.callCount, 1)
+  deepEqual(apiClient.duplicateDiscussion.firstCall.args, [this.getState(), 1])
+})
+
+test('dispatches duplicateDiscussionSuccess if api call succeeds', function(assert) {
+  const done = assert.async()
+  mockSuccess('duplicateDiscussion', { data: { id: 3 }})
+  actions.duplicateDiscussion(1)(this.dispatchSpy, this.getState)
+  setTimeout(() => {
+    const expectedArgs = [{
+      payload: { originalId: 1, newDiscussion: { id: 3 }},
+      type: "DUPLICATE_DISCUSSION_SUCCESS"
+    }]
+    deepEqual(this.dispatchSpy.secondCall.args, expectedArgs)
+    done()
+  })
+})
+
+test('dispatches duplicateDiscussionFail if api call fails', function(assert) {
+  const done = assert.async()
+  const discussion = { id: 1 }
+  mockFail('duplicateDiscussion', "YOU FAILED, YOU IDIOT")
+  actions.duplicateDiscussion(discussion.id)(this.dispatchSpy, this.getState)
+  setTimeout(() => {
+    const expectedArgs = [{
+      payload: { message: 'Duplication failed', err: "YOU FAILED, YOU IDIOT" },
+      type: "DUPLICATE_DISCUSSION_FAIL"
+    }]
+    deepEqual(this.dispatchSpy.secondCall.args, expectedArgs)
     done()
   })
 })
