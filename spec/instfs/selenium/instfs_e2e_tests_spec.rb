@@ -25,7 +25,7 @@ describe "instfs file uploads" do
   include_context "in-process server selenium tests"
   include FilesCommon
   include Helpers
-  # include EportfoliosCommon
+  include EportfoliosCommon
   include CanvasHttp
   let(:admin_guy) {account_admin_user(account: Account.site_admin)}
   let(:folder) { Folder.root_folders(admin_guy).first }
@@ -172,6 +172,47 @@ describe "instfs file uploads" do
       f('li[title="test_image.jpg"]').click
       f(".btn-primary").click
       image_element = f('a[title="test_image.jpg"]')
+      image_element_source = image_element.attribute("href")
+      expect(compare_md5s(image_element_source, file_path)).to be true
+    end
+  end
+
+  context 'when interacting with instfs as a student' do
+    before do
+      course_with_student_logged_in
+      enable_instfs
+    end
+
+    it "should upload a file to instfs with eportfolios", priority: "1", test_id: 3399289 do
+      filename = "files/instructure.png"
+      file_path = File.join(ActionController::TestCase.fixture_path, filename)
+      response = upload_file_to_instfs(file_path, @student, @student, @student_folder)
+      student_file_id = get_file_id_from_response(response)
+      sub_file = Attachment.find(student_file_id)
+      eportfolio_model({:user => @student, :name => "student content"})
+      get "/eportfolios/#{@eportfolio.id}?view=preview"
+      wait_for_ajaximations
+      f("#right-side .edit_content_link").click
+      wait_for_ajaximations
+      f('.add_file_link').click
+      wait_for_ajaximations
+      fj('.file_list:visible .sign:visible').click
+      wait_for_ajaximations
+      fj('.folder:visible .sign:visible').click
+      wait_for_ajaximations
+      file = fj('li.file .text:visible')
+      expect(file).to include_text sub_file.filename
+      wait_for_ajaximations
+      file.click
+      wait_for_ajaximations
+      f('.upload_file_button').click
+      wait_for_ajaximations
+      download = fj('.eportfolio_download:visible')
+      expect(download).to be_present
+      submit_form('.form_content')
+      wait_for_ajaximations
+      refresh_page
+      image_element = f(".attachment a")
       image_element_source = image_element.attribute("href")
       expect(compare_md5s(image_element_source, file_path)).to be true
     end
