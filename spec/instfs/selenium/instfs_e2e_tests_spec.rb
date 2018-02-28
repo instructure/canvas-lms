@@ -119,6 +119,20 @@ describe "instfs file uploads" do
       image_element_source = file_element.attribute("href")
       expect(compare_md5s(image_element_source, file_path)).to be true
     end
+
+    it "should display a thumbnail from instfs", priority: "1", test_id: 3399295 do
+      filename = "files/instructure.png"
+      file_path = File.join(ActionController::TestCase.fixture_path, filename)
+      upload_file_to_instfs(file_path, admin_guy, admin_guy, folder)
+      get "/files"
+      wait_for_ajaximations
+      thumbnail_link = f(".media-object")["style"]
+      expect(thumbnail_link).to include("instfs.docker/thumbnails")
+      file_link = thumbnail_link.split('background-image: url("').last
+      file_link = file_link.split('"').first
+      downloaded_file = open(file_link)
+      expect(downloaded_file.size).to be > 0
+    end
   end
 
   context 'when using instfs as a teacher' do
