@@ -262,6 +262,14 @@ describe "AuthenticationProviders API", type: :request do
       expect(aac.idp_entity_id).to eq 'hahahaha'
     end
 
+
+    it "should return error when it fails to update" do
+      aac = @account.authentication_providers.create!(@saml_hash)
+      @saml_hash['metadata_uri'] = 'hahahaha_super_invalid'
+      json = call_update(aac.id, @saml_hash, 422)
+      expect(json['errors'].first['field']).to eq 'metadata_uri'
+    end
+
     it "updates federated attributes" do
       aac = @account.authentication_providers.create!(@saml_hash)
       json = call_update(aac.id, 'auth_type' => 'saml',
