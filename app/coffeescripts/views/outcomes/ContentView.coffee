@@ -67,6 +67,10 @@ define [
       @render()
       @innerView.screenreaderTitleFocus() if @innerView instanceof OutcomeView
 
+    resetContent: () =>
+      @innerView = null
+      @render()
+
     render: ->
       @attachEvents()
       html = if @innerView

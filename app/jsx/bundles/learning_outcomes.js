@@ -27,6 +27,8 @@ import instructionsTemplate from 'jst/outcomes/mainInstructions'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import OutcomesActionsPopoverMenu from '../outcomes/OutcomesActionsPopoverMenu'
+import {showImportOutcomesModal} from '../outcomes/ImportOutcomesModal'
+import {showOutcomesImporter} from '../outcomes/OutcomesImporter'
 
 const renderInstructions = ENV.PERMISSIONS.manage_outcomes
 
@@ -60,11 +62,31 @@ export const content = new ContentView({
   renderInstructions
 })
 
+// events for Outcome sync
+const disableOutcomeViews = () => {
+  sidebar.$sidebar.hide()
+  toolbar.disable()
+}
+
+const resetOutcomeViews = () => {
+  toolbar.enable()
+  sidebar.resetSidebar()
+  content.resetContent()
+  sidebar.$sidebar.show()
+}
+
 // toolbar events
 toolbar.on('goBack', sidebar.goBack)
 toolbar.on('add', sidebar.addAndSelect)
 toolbar.on('add', content.add)
 toolbar.on('find', () => sidebar.findDialog(FindDialog))
+toolbar.on('import', () => showImportOutcomesModal({toolbar}))
+toolbar.on('start_sync', (file) => showOutcomesImporter({
+  file,
+  disableOutcomeViews,
+  resetOutcomeViews,
+  mount: content.$el[0]
+}))
 
 // sidebar events
 sidebar.on('select', model => content.show(model))
