@@ -203,6 +203,14 @@ module Lti
         expect(subject.account_enrollments).to eq [enrollment]
       end
 
+      it 'does not return deleted account enrollments' do
+        set_up_persistance!
+        enrollment = account.account_users.create!(:user => user)
+        enrollment.destroy
+
+        expect(subject.account_enrollments).to eq []
+      end
+
       it 'returns enrollments in an account chain for a user' do
         set_up_persistance!
         enrollment = root_account.account_users.create!(:user => user)
