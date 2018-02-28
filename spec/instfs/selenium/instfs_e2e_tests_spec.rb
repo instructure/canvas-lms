@@ -204,6 +204,24 @@ describe "instfs file uploads" do
       expect(attachment.instfs_uuid).not_to be_nil
       expect(compare_md5s(file_link, file_path)).to be true
     end
+
+    it 'should allow the teacher to see the uploaded file on submissions page', priority: "1", test_id: 3399291 do
+      filename = "test_image.jpg"
+      file_path = File.join(ActionController::TestCase.fixture_path, filename)
+      response = upload_file_to_instfs(file_path, @student, @student, @student_folder)
+      student_file_id = get_file_id_from_response(response)
+      attachment = Attachment.find(student_file_id)
+      @ass.submit_homework(@student, attachments: [attachment], submission_type: 'online_upload')
+      get "/courses/#{@course.id}/assignments/#{@ass.id}/submissions/#{@student.id}"
+      wait_for_ajaximations
+      saved_window_handle = driver.window_handle
+      # switch driver to preview area so it can find the right element
+      driver.switch_to.frame('preview_frame')
+      image_element = f("div .file-upload-submission-info a")
+      image_element_source = image_element.attribute("href")
+      expect(compare_md5s(image_element_source, file_path)).to be true
+      driver.switch_to.window saved_window_handle
+    end
   end
 
   context 'when interacting with instfs as a student' do
