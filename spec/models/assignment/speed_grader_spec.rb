@@ -768,6 +768,14 @@ describe Assignment::SpeedGrader do
       keys = json['submissions'].first['submission_history'].first['submission']['turnitin_data'].keys
       expect(keys).to include submission.asset_string, attachment.asset_string
     end
+
+    it 'does not override "turnitin_data"' do
+      submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
+      submission.update_attribute(:turnitin_data, {test_key: 1})
+      json = Assignment::SpeedGrader.new(assignment, test_teacher).json
+      keys = json['submissions'].first['submission_history'].first['submission']['turnitin_data'].keys
+      expect(keys).to include 'test_key'
+    end
   end
 
   context "honoring gradebook preferences" do
