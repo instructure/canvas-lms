@@ -24,17 +24,6 @@ describe GraphQLController do
     student_in_course
   end
 
-  context "feature flag is disabled" do
-    before { user_session(@student) }
-
-    it "404s for all endpoints" do
-      %w[graphiql execute].each do |endpoint|
-        get endpoint
-        expect(response.status).to eq 404
-      end
-    end
-  end
-
   context "graphiql" do
     before { Account.default.enable_feature!("graphql") }
 
