@@ -79,17 +79,9 @@ describe "instfs file uploads" do
   end
 
   def compare_md5s(image_element_src, original_file_path)
-    # if a file is less than 10K, it will return a StringIO, not a file object.
-    # in that case it needs to stream to a temp file
-    downloaded_data = open(image_element_src)
-    if downloaded_data.class == StringIO
-      temp_file = Tempfile.new("cool")
-      IO.copy_stream(downloaded_data, temp_file.path)
-    else
-      temp_file = downloaded_data
-    end
-    if temp_file.size > 0
-      temp_md5 = Digest::MD5.hexdigest File.read(temp_file)
+    downloaded_data = download_file(image_element_src)
+    if downloaded_data != false
+      temp_md5 = Digest::MD5.hexdigest(downloaded_data)
       original_md5 = Digest::MD5.hexdigest File.read(original_file_path)
       return temp_md5 == original_md5
     else
@@ -121,6 +113,24 @@ describe "instfs file uploads" do
     res['location']
   end
 
+  def check_file_link(file_link)
+    downloaded_data = open(file_link)
+    downloaded_data.size > 0
+  end
+
+  def download_file(file_link)
+    # if a file is less than 10K, it will return a StringIO, not a file object.
+    # in that case get the string from the StringIO
+    downloaded_data = open(file_link)
+    if downloaded_data.class == StringIO
+      downloaded_data = downloaded_data.string
+    elsif downloaded_data.size > 0
+      downloaded_data = File.read(downloaded_data)
+    else
+      return false
+    end
+    downloaded_data
+  end
 
   context 'when uploading to instfs as an admin' do
     before do
@@ -174,6 +184,19 @@ describe "instfs file uploads" do
       # verify that the canvas link redirects through instfs
       redirect_url = get_link_redirect_path(image_element_source)
       expect(redirect_url).to include(InstFS.app_host)
+    end
+
+    it "should upload a file to instfs with content exports", priority: "1", test_id: 3399292 do
+      get "/courses/#{@course.id}/content_exports"
+      yield if block_given?
+      submit_form('#exporter_form')
+      @export = keep_trying_until { ContentExport.last }
+      @export.export_without_send_later
+      file_link = f("#export_files a").attribute("href")
+      attachment = Attachment.find(get_id_from_canvas_link(file_link))
+      # verify that the file export is not empty and that the attachment has an instfs uuid
+      expect(check_file_link(file_link)).to be true
+      expect(attachment.instfs_uuid).not_to be_nil
     end
   end
 
