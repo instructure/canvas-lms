@@ -1499,6 +1499,7 @@ nn:
   additional_settings_for_sis_syncing_f926973e: "Tilleggsinnstillingar for SIS-synkronisering"
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "Fleire alternativ for SIS-synkroniserte oppgåver, quizar og diskusjonar"
   addressbook_microservice_a4940422: "Mikroservice for adressebok"
+  addressbook_performance_tap_98ddf67: "Sjå yteevna til adresseboka"
   adjust_final_grade_fa45e7e0: "Juster sluttkarakter"
   admin_4d3ba42f: Admin
   admin_csv_f8d1b3eb: "CSV-fil over administratorar"
@@ -12196,7 +12197,7 @@ nn:
   peru_51_d3d38d1f: "Peru (+51)"
   peru_7dcfdc91: Peru
   philippines_37a6289e: Filippinene
-  philippines_63_a4f62138: "Filippinene (+63)"
+  philippines_63_a4f62138: "Filippinane (+63)"
   pick_a_destination_we_ll_send_you_errors_fa0cb0e0: "vel ein destinasjon og vi sender deg feila"
   pick_a_name_to_save_this_theme_as_9773cb1a: "Vel eit namn du kan lagre tema som"
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "vel eit endepunkt, vi postar feilrapportane der"
@@ -16029,6 +16030,7 @@ nn:
   space_ec476863: Mellomrom
   spain_34_d5286826: "Spania (+34)"
   spain_817a5961: Spania
+  specify_max_and_min_points_to_clarify_boundaries_o_1c4d732a: "Spesifiser maksimum- og minimumsverdiar for å definere ramma for kriterievurderingane."
   specify_the_transparency_of_the_watermark_backgrou_f4d5cc1d: "Spesifiser transparens for vassmerket som bakgrunnsbilde."
   speech_recognition_c1c0b7f7: Taleattkjenning
   speed_grader: 
@@ -16143,6 +16145,7 @@ nn:
       i forhold til læringsmål for emnet. Måla er presenterte i eit karakterbokliknande
       format, og framgangen blir vist både som numerisk resultat og som meistring/nær
       meistring/trengst forbetring.
+  student_planner_date_4cc73abb: "Studenttimeplan dato:"
   student_sis_6721040e: Student-SIS
   student_sis_d9f0cd39: student-SIS
   student_viewed_document_9065adb8: "Student opna dokumentet"
@@ -16403,6 +16406,25 @@ nn:
   syllabus_visibility_options_a81ef419: "Alternativ for emneoversikt-synlegheit"
   sync_68e5c167: Synkroniser
   sync_completed_successfully_8f68b542: "Synkronisering er fullført"
+  sync_grades_a16622ca: "Synkroniser karakterar"
+  sync_grades_to_sis_4e7fbc08: "Synkroniser karakterar til SIS"
+  sync_grades_to_sis_checkbox_is_enabled_by_default__fad7a785: "\"Send karakterar til SIS\" er slått på som standard for oppgåver, karaktergivande diskusjonar og quizar"
+  sync_grades_to_sis_fd01f7fd: "Synkroniser karakterar til SIS"
+  sync_history_3d46eb19: Synkroniseringshistorikk
+  sync_in_progress_12ff1d3c: "Synkronisering i gang"
+  sync_to_name_6f04716d: "Synkronisert til %{name}"
+  sync_to_name_disabled_click_to_toggle_53a1396f: "Synkroniser til %{name}er deaktivert. Klikk for å slå på."
+  sync_to_name_enabled_click_to_toggle_ddaef134: "Synkroniser til %{name} er aktivert. Klikk for å slå av."
+  sync_to_name_successfully_disabled_8045ad95: "Synkroniser til %{name} er deaktivert"
+  sync_to_posttosisname_9837a8bf: "Synkroniser til %{postToSISName}:"
+  sync_to_posttosisname_dffd5c9: "Synkroniser til %{postToSISName}"
+  sync_to_sisname_f343e59: "Synkroniser til %{sisName}"
+  synced_97764882: Synkronisert
+  synced_message_20469c8f: "Synkronisert: %{message}"
+  syncing_3061cc8d: Synkroniserer...
+  syncing_e67b8a9f: Synkroniserer
+  syncing_grades_to_sis_d63112e0: "Synkroniserer karakterar til SIS..."
+  syncing_message_416fdc58: "Synkroniserer: %{message}"
   system_default_language_28a1052d: "Systemstandard (%{language})"
   tab_1_3d6b3fb: "Fane 1"
   tab_1_content_8944c219: "Fane 1 innhald"
@@ -16441,17 +16463,21 @@ nn:
     syllabus: Emneoversikt
     tab_location_error: "Faneplasseringa er ugyldig"
     tab_unmanagable_error: "%{css_class} kan ikkje behandlast"
+  taiwan_886_9a5b6bbf: "Taiwan (+886)"
+  take_a_snapshot_now_5b622d85: "Ta eit augneblinksbilde no"
   take_the_quiz_87214d7e: "Ta quizen"
   take_the_quiz_again_8ea51a6c: "Ta quizen på nytt"
   take_the_survey_ada59508: "Ta undersøkinga"
   take_the_survey_again_24ce22c2: "Ta undersøkinga på nytt"
   teacher_5a73b637: Faglærar
+  teacher_s_fdefb2c: Faglærar(ar)
   teachers_52e2423f: Faglærarar
   teal_f729a294: Blågrøn
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Forklar oss korleis og når du vil motta meldingar om hendingar i Canvas."
   templates_4ca13d07: Malar
   tenant_d2a41f78: Tenant
   term_41f37cae: semester
+  term_42976f1c: "Semester:"
   term_created_27d27c2b: "Semester oppretta"
   term_e1c1d390: Semester
   term_id_2e802ed1: Semester-ID
@@ -16462,6 +16488,7 @@ nn:
   term_starting_5bd5e070: "Semester startar"
   terms: 
     index: 
+      add_term: "Legg til semester"
       date: 
         term_end: semesterslutt
         term_start: semesterstart
@@ -16515,10 +16542,14 @@ nn:
         unspecified: "når som helst"
       timespan: "%{start_at} *til* %{end_at}"
   terms_35d91184: "Semester:"
+  terms_not_found_terms_must_be_included_with_multi__ca2e5c25: "Finn ikkje semester. Semester må vere inkludert i multi_term_batch_mode"
+  terms_of_service_attributes_not_valid_f3f9fca9: "Attributtar knytta til vilkår for bruk er ugyldig"
+  terms_of_service_f183ff7f: "Vilkår for bruk"
   text_document_eacbcdb7: Tekstdokument
   text_entry_submission_7b0ae0c5: "Send inn teksten"
   text_entry_submission_cannot_be_empty_3d187cae: "Tekstboksen kan ikkje vere tom"
   text_input_d3480b8c: Tekstoppføring
+  thailand_66_5b3ef324: "Thailand (+66)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "Brukarkontoen er sletta.  Kontakt systemansvarleg og få kontoen aktivert på nytt."
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "Konto-ID for kontoen der rapporteringsbrukaren tilhøyrer"
   the_announcement_title_could_not_be_linked_to_the__78c747f3: "Kunngjeringa \"%{title}\" kunne ikkje knyttast til modulen \"%{mod_title}\""
@@ -16538,18 +16569,21 @@ nn:
       er fullført.
   the_error_stack_trace_if_there_is_one_b7e008a1: "Feil stabelsporing, om gjeldande"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "I kategorien Filer kan du dele forelesingsdokument, eksempeldokument, studiehjelp – alt studentane vil laste ned.  Opplasting og organisering av filene er enkelt i Canvas.  Vi  viser deg korleis du gjer det."
+  the_following_content_is_partner_provided_ed1da756: "Følgande innhald er lagt til av partnar"
   the_following_fields_are_invalid_fields_b3565800: "Følgande felt er ugyldige: %{fields}"
   the_following_users_are_ready_to_be_added_to_the_c_1ea01560: "Følgande brukarar kan leggast til emnet. "
   the_following_users_could_not_be_created_2573360a: "Følgande brukarar kunne ikkje opprettast. "
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "Fullstendig vertsnamn for kontoen (something.instructure.com, for eksempel)"
   the_grade_for_this_assignment_will_not_sync_to_the_3bb4f6f5: "Resultatet for denne oppgåva vil ikkje bli synkronisert til studentsystemet/SIS. "
   the_grade_for_this_assignment_will_sync_to_the_stu_5d32cedb: "Resultatet for denne oppgåva vil bli synkronisert til studentsystemet/SIS. "
+  the_grading_period_cannot_be_found_646a8a24: "Finn ikkje karaktersetjingsperiode"
   the_grading_period_set_was_deleted_cce5d8f6: "Settet med karaktersetjingsperiodar er sletta"
   the_grading_period_set_was_updated_successfully_d8dd5d0f: "Settet med karaktersetjingsperiodar er oppdatert."
   the_grading_period_was_deleted_7814a349: "Karaktersetjingsperioden er sletta"
   the_imported_question_text_for_this_question_was_t_83b4e6fb: "Den importerte spørsmålsteksten for dette spørsmålet er for lang."
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "Institusjonen der du logga på er ikkje konfigurert på denne kontoen."
   the_launched_tool_returned_an_invalid_resource_for_24512878: "Det oppstarta verktøyet returnerte ein ugyldig ressurs for denne oppgåva"
+  the_link_you_used_has_expired_click_forgot_passwor_80569899: "Lenka du har brukt er utgått. Klikk \"Gløymd passord?\" for å få ei ny lenke for å tilbakestille passord."
   the_material_is_in_the_public_domain_279c39a3: "Materialet er ikkje opphavsrettbeskytta"
   the_material_is_licensed_under_creative_commons_3242cb5e: "Materialet er lisensiert under Creative Commons"
   the_material_is_subject_to_fair_use_exception_41bc6a4b: "Materialet er brukt i samsvar med sitatretten"
@@ -16566,6 +16600,8 @@ nn:
   the_module_item_is_locked_27fe420b: "Modulelementet er låst."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Det siste resultata for brukar %{current_user_name} og læringsmål %{outcome_name}."
   the_next_available_appointment_in_this_course_is_o_da10316c: "Neste tilgjengelege avtale på dette emnet er *%{date}*"
+  the_preceding_content_is_partner_provided_d753928c: "Det føregåande innhaldet er lagt til av partnar"
+  the_previous_sis_batch_was_aborted_d7d89955: "Førre SIS-jobb vart avbroten"
   the_profile_picture_has_been_reported_d609d6dd: "Profilbildet er rapportert"
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: "Academic Benchmark-fila som ligg ved har ein feil"
   the_question_text_for_the_question_question_name_w_3a68a2c7: "Den importerte spørsmålsteksten for spørsmålet \"%{question_name}\" er for lang."
@@ -16589,23 +16625,41 @@ nn:
   theme_editor_changes_have_been_cancelled_2af5cc5f: "Endringar i temaredigeringsprogram er avbrotne."
   theme_name_68f46e09: Temanamn
   themes_89bfe9c4: Tema
+  there_are_count_associations_906edb03: 
+    one: "Det er ein - 1 - forbindelse"
+    other: "Det er %{count} forbindelsar"
   there_are_count_results_in_the_list_e74f6e36: 
     one: "Det er 1 resultat i lista"
     other: "Det er %{count} resultat i lista"
+  there_are_count_unsynced_changes_25ed3bed: 
+    one: "Det er ein - 1 - usynkronisert endring"
+    other: "Det er %{count} usynkroniserte endringar"
+  there_are_currently_no_associated_courses_fba1754f: "Det er ingen tilknytta emne akkurat no. "
   there_are_no_announcements_for_this_course_5ee649c3: "Finn ikkje kunngjeringar for dette emnet."
   there_are_no_available_signups_for_this_course_26b05c56: "Det er ingen ledige plassar på dette emnet."
   there_are_no_unsaved_changes_9276e87c: "Det finst ingen endringar som ikkje er lagra"
+  there_are_no_unsynced_changes_4e8f0838: "Det finst ingen endringar som ikkje er synkronisert"
   there_was_a_failure_logging_out_at_your_idp_30070527: "Det oppstod eit problem hjå IdP-en under utlogging"
+  there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "Det oppstod eit problem under oppretting av notatkolonne for faglærar. "
+  there_was_a_problem_deleting_the_comment_93053aa9: "Det oppstod eit problem under sletting av kommentaren"
   there_was_a_problem_deleting_the_grading_period_50ce07c5: "Det oppstod eit problem under sletting av karaktersetjingsperioden"
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: "Det oppstod eit problem under sletting av karaktersetjingsskjemaet"
   there_was_a_problem_exporting_c33dc250: "Det oppstod eit problem under eksporteringa."
   there_was_a_problem_fetching_periods_bdc09a8f: "Det oppstod eit problem under henting av periodar"
+  there_was_a_problem_hiding_the_teacher_notes_colum_3f03014: "Det oppstod eit problem under skjuling av notatkolonnen for faglærar. "
   there_was_a_problem_loading_the_gradebook_69b2a17: "Det oppstod eit problem under lastinga av karakterboka."
   there_was_a_problem_logging_in_at_institution_5a298155: "Det oppstod eit problem under pålogging til %{institution}"
+  there_was_a_problem_posting_the_comment_75d15646: "Det oppstod eit problem under sending av kommentaren"
   there_was_a_problem_saving_the_grading_period_243bed6c: "Det oppstod eit problem under lagring av karaktersetjingsperioden"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Det oppstod eit problem under lagring av karaktersetjingsskjemaet"
   there_was_a_problem_sending_your_message_22b249a5: "Det oppstod eit problem under sending av meldinga."
+  there_was_a_problem_showing_the_teacher_notes_colu_a6e4a2bc: "Det oppstod eit problem ved vising av notatkolonnen til faglærar. "
   there_was_a_problem_submitting_your_set_27ca2ed0: "Det oppstod eit problem under innleveringa"
+  there_was_a_problem_toggling_the_content_lock_2a5d678b: "Kunne ikkje slå av/på innhaldslås"
+  there_was_a_problem_updating_the_comment_5f3595b9: "Det oppstod eit problem under oppdatering av  kommentar"
+  there_was_a_problem_updating_the_submission_6e5280a1: "Det oppstod eit problem under oppdatering av innleveringa. "
+  there_was_an_error_fetching_outcome_results_45c57590: "Det oppstod ein feil under henting av læringsmålresultat"
+  there_was_an_error_fetching_submission_comments_ce153077: "Det oppstod ein feil under henting av innleveringskommentarar"
   there_was_an_error_generating_the_tool_launch_fb3f47ac: "Det oppstod ein feil under oppstarten av verktyet"
   there_was_an_error_in_processing_your_request_6513a49a: "Det oppstod ein feil under handsaming av førespurnaden"
   there_was_an_error_removing_the_image_c83acffe: "Det oppstod feil under fjerning av bildet"
@@ -16617,20 +16671,30 @@ nn:
   there_was_an_error_updating_this_assignment_please_59fc608d: "Det oppstod ein feil under oppdatering av oppgåva Oppdater sida og prøv på nytt."
   there_was_an_error_uploading_the_image_932fc4ce: "Det oppstod feil under opplasting av bildet"
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "Det oppstod ein feil med spørjinga, prøv eit anna søk"
+  there_was_an_unexpected_problem_with_the_sync_be079a67: "Det oppstod ein uventa feil med synkroniseringa"
+  there_was_an_unknown_error_registering_the_tool_b9a29954: "Det oppstod ein ukjend feil under registrering av verktøyet"
   there_were_errors_with_the_form_errors_ab5b559a: "Det oppstod feil i skjemaet: %{errors}"
+  there_were_several_possible_matches_with_the_impor_ad58bcd0: "Det var fleire moglege treff i importen. Sjå nedanfor. "
+  these_backup_codes_can_be_used_if_your_multi_facto_ca30a3df: "Backup-kodane kan brukast dersom eininga du brukar til fleirfaktorautentisering ikkje er tilgjengeleg. Skriv dei ut og oppbevar dei ein trygg stad. "
   these_credentials_are_for_academic_benchmark_api_v_324baaa4: "Denne legitimasjonen er for Academic Benchmark API v3. Ved å utelate partnarnøkkelen vil importfunksjonen bruke Academic Benchmark API v1 som standard. "
   these_credentials_are_for_academic_benchmark_api_v_952718b1: "Denne legitimasjonen er for Academic Benchmark API v1, som vil bli nedprioritert i framtidige versjonar. "
   these_grading_periods_were_created_for_you_by_an_a_e977c2b5: "Desse karaktersetjingsperiodane er oppretta for deg av ein administrator."
   this_action_has_been_disabled_by_your_admin_5e34bfa0: "Funksjonen er deaktivert av administrator. "
+  this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Her skriv ein inn kommentarar som er relatert til kriteriet."
   this_assignment_does_not_count_toward_the_final_gr_29ede05f: "Denne oppgåva blir ikkje rekna med i sluttresultatet"
   this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "Denne oppgåva blir ikkje rekna med i sluttresultatet"
   this_assignment_has_been_excused_87f1dc13: "Oppgåva er fritatt."
+  this_assignment_is_currently_muted_that_means_stud_94d63139: "Denne oppgåva er skjult. Det betyr at studentane ikkje kan sjå karakterane og tilbakemeldingane. Vil du oppheve skjuling?"
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Oppgåva er fjerna og er ikkje med i den totale utrekninga"
   this_assignment_is_excused_and_will_not_be_conside_5892de1f: "Oppgåva er fritatt og er ikkje med i den totale utrekninga"
   this_assignment_is_in_a_closed_grading_period_for__a22bb4ed: "Oppgåva er i ein lukka karaktersetjingsperiode for denne studenten"
   this_assignment_is_muted_915e2dab: "Denne oppgåva er skjult"
+  this_assignment_is_not_applicable_to_this_student_c149a5ad: "Oppgåva er ikkje relevant for denne studenten"
+  this_assignment_is_not_graded_576f1244: "Oppgåva er ikkje karaktersett. "
   this_assignment_is_overdue_a44bea3b: "Innleveringsfristen for oppgåva er passert"
   this_assignment_is_still_unpublished_a9185624: "Denne oppgåva er framleis upublisert"
+  this_assignment_is_unpublished_64c0f46c: "Oppgåva er ikkje publisert "
+  this_assignment_submission_is_my_own_original_work_e820ce4b: "Den leverte oppgåva er mitt eige, sjølvstendige arbeid"
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "Denne oppgåva tel ikkje lenger for karakteren din."
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: "Dette vedlegget er avpublisert av forfattaren"
   this_conference_may_be_recorded_f76deeeb: "Det kan bli opptak av konferansen."
@@ -16638,6 +16702,7 @@ nn:
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: "Emnet har ikkje starta enno. Du kan ikkje delta på emnet før %{date}."
   this_course_is_claimed_and_ready_but_you_ll_need_t_25b95a0a: "Emnet er fullført og klargjort, men du må avslutte registreringsprosessen før du kan publisere det. Du skal ha mottatt ein e-post frå Canvas med ei lenke for å avslutte prosessen. Hugs å sjekke Søppelpost."
   this_course_is_visible_only_to_teachers_until_it_i_ce972f0: "Emnet er synleg berre for faglærarar før det er publisert."
+  this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Kriteriet er kopla til eit læringsmål"
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Dette elementet er ei meir tilgjengeleg løysing for omorganisering enn å dra og sleppe. Trykk Enter eller Mellomromtasten for å flytte dette spørsmålet. "
   this_email_address_is_unconfirmed_f0fc8c6e: "E-postadressa er ikkje stadfesta"
   this_enables_an_updated_navigation_new_dashboard_a_8bd4cae: "Dette mogleggjer ein oppdatert navigasjon, nytt dashbord og eit enklare, meir moderne uttrykk."
@@ -16646,6 +16711,7 @@ nn:
   this_field_is_required_fa58c4a: "Dette feltet er obligatorisk"
   this_field_name_is_required_988caebc: "Feltet \"%{name}\" er obligatorisk."
   this_field_name_is_required_b9196401: "Feltet \"name\" er obligatorisk."
+  this_file_16b24f02: "denne fila"
   this_file_9443cda1: "Denne fila"
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "Denne fila må ha usage_rights klarert før ho kan publiserast."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Denne mappa er låst og kan ikkje visast."
@@ -16653,18 +16719,22 @@ nn:
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Dette bildet er synleg som eit vassmerke i bakgrunnen på sida di. Godkjende format: .png, .svg, .gif og .jpeg"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Dette er ei kommadelt liste med klarerte URL-adresser. URL-adresser frå denne lista omgår CSRF-token ved pålogging i Canvas."
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "Dette er eit avslutta kurs og difor er berre avslutta påmeldingar tilgjengelege."
+  this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: "Funksjonen tillet utvikling av responsive nettsider "
   this_is_a_message_for_name_7abf1e39: "Dette er ei melding til *%{name}*"
   this_is_a_preview_of_the_draft_version_of_the_quiz_910a02e0: "Dette er ei førehandsvising av utkastet til quizen"
   this_is_a_preview_of_the_published_version_of_the__70e0c8: "Dette er ei førehandsvising av den publiserte versjonen av quizen"
   this_is_a_what_if_score_cbdc04f9: "Dette er kva-skjer-dersom-resultat"
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: "Denne karakteren er valt for denne studenten akkurat no."
   this_is_the_default_email_address_f3c421fb: "Dette er standard e-postadresse"
+  this_is_your_course_landing_page_33d445ec: "Dette er heimesida til emnet ditt"
   this_is_your_current_theme_4331709b: "Dette er gjeldande tema"
   this_item_will_reappear_when_a_new_submission_is_m_fcccfc76: "Dette elementet viser på ny når det kjem ei ny innlevering."
   this_item_will_reappear_when_there_are_new_grades__8f9e5383: "Dette elementet viser på ny når det ikkje er fleire resultat å vurdere."
   this_login_is_for_provider_6f17462: "Pålogginga er for %{provider}"
+  this_may_take_a_bit_48fe4235: "Dette kan ta ei stund..."
   this_may_take_a_bit_c061d0f6: "dette kan ta ei stund..."
   this_message_includes_media_comments_to_listen_or__5fc98641: "Meldinga inneheld mediekommentarar. Om du vil lytte eller svare, kan du klikke på lenka: %{link}."
+  this_message_includes_media_comments_to_listen_or__df72d662: "Meldinga inkluderer multimediainnhald og -kommentarar. For å høyre på eller svare, klikk på lenka: %{link}.  Om du vil sende med eit vedlegg, må du logge inn i Canvas og kommentere innleveringa der. "
   this_module_is_locked_until_completing_all_of_the__ddf06070: "Modulen er låst til alle krav for følgande modular er fullførte: %{prerequisites}"
   this_module_is_locked_until_datetime_b2486751: "Modulen er låst til %{datetime}"
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Mest sannsynleg skjedde dette fordi du har importert emneinnhald utan tilknytte filer."
@@ -16672,6 +16742,7 @@ nn:
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "Faglærar brukar namnet for karaktersetjing."
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Læringsmålet har blitt brukt til å vurdere ein student og kan ikkje lenger oppdaterast"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Læringsmålet har blitt brukt til å vurdere ein student og kan ikkje lenger redigerast og slettast"
+  this_outcome_has_been_used_to_assess_a_student_onl_4b4c1e95: "Læringsmålet har blitt brukt til å vurdere ein student. Berre tekstfelt kan oppdaterast "
   this_package_includes_apip_file_s_which_are_not_co_b50b30a7: "Denne pakka inkluderer APIP-fil(ar) som ikkje er kompatible med Canvas, og er difor ikkje inkludert i importen."
   this_package_includes_curriculum_standards_which_a_1a137060: "Denne pakka inkluderer Curriculum Standards som ikkje er kompatibel med Canvas, og er difor ikkje inkludert i importen."
   this_package_includes_epub3_file_s_which_are_not_c_bbafef30: "Denne pakka inkluderer EPub3-fil(ar) som ikkje er kompatible med Canvas, og er difor ikkje inkludert i importen."
@@ -16689,13 +16760,22 @@ nn:
   this_report_shows_all_the_courses_for_a_given_term_9102a3d7: "Rapporten viser alle kursa for eit bestemt semester. Den endelege CSV-fila inneheld ei rad per kurs og viser kurs-ID-en, kurs-SIS-ID-en, kurset sitt kortnamn, kursnamnet, konto-ID, konto-SIS-ID, kontonamn og lagringskapasitet brukt i MB."
   this_report_shows_grading_period_grades_and_overal_a86346a: "Rapporten viser alle karaktersetjingsperiodane (og alle karakterar) for kvar student som er påmeldt i eit bestemt semester. Den endelege csv-fila inneheld ei rad per brukarpåmelding."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Eksempelsida inneheld vanlege UI-element i Canvas, som kan hjelpe deg med å lage din eigen utsjånad. Når du gjer endringar i fargeverdiar og bilde i venstre sidestolpe, ser du knappen *Førehandsvis endringane*. Klikk på knappen for å oppdatere sida og sjå på endringane."
+  this_student_s_enrollment_has_been_concluded_c03bfafe: "Påmeldinga til studenten er avslutta. "
   this_student_was_just_awarded_an_unusually_high_gr_9ad835f3: "Denne studenten har fått ein uvanleg høg karakter."
   this_student_was_just_awarded_negative_points_55741a37: "Denne studenten har fått negative poeng."
   this_student_wrote_f1a3f22d: "Studenten skriv:"
   this_submission_has_already_been_graded_and_is_rea_8ec61c52: "Innleveringa er allereie karaktersett og er klar for moderering."
+  this_submission_is_in_a_closed_grading_period_45a723d3: "Innleveringa er i ein lukka karaktersetjingsperiode. "
   this_submission_is_in_a_closed_grading_period_cc9ecb8a: "Innleveringa er i ein lukka karaktersetjingsperiode"
-  this_submission_is_in_another_grading_period_36bc720b: "Innleveringa er i annan karaktersetjingsperiode"
+  this_submission_is_in_another_grading_period_36bc720b: "Innleveringa er i ein annan karaktersetjingsperiode"
+  this_submission_is_in_another_grading_period_f0498cdd: "Innleveringa er i ein annan karaktersetjingsperiode. "
+  this_submission_is_not_being_autograded_4fd68d32: "Oppgåva er ikkje maskinretta"
+  this_submission_is_not_in_any_grading_period_cbbd2f8: "Innleveringa er ikkje knytt til karaktersetjingsperiode"
+  this_submission_is_not_in_any_grading_period_d4c728db: "Innleveringa er ikkje knytt til karaktersetjingsperiode. "
+  this_tool_has_already_been_installed_in_this_conte_b73ea29c: "Verktøyet er allereie installert. Vil du installere likevel? "
   this_topic_is_closed_for_comments_3dd10c00: "Dette emnet er stengt for kommentarar."
+  this_topic_is_closed_for_comments_5bacad6: "Dette emnet er stengt for kommentarar"
+  this_topic_is_used_for_grading_efc6ca89: "Dette emnet er brukt til karaktersetjing"
   this_user_has_multiple_roles_in_the_course_changin_8cbd82d4: "Brukaren har fleire roller i emnet. Endring av rolla her vil skrive over alle gjeldande påmeldingar. "
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "Brukaren har ikkje tilgang til emnet"
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "\"Brukaren har ikkje tilgang til emnet\""
@@ -16728,6 +16808,9 @@ nn:
       times: "%{start_time} til %{end_time}"
     with_ago: "%{time} sidan"
   time_2b5aac58: Tidspunkt
+  time_block_5a7cda5c: Tidsbolk
+  time_left_in_your_instant_trial_5dd0392b: "%{time} er attende av prøvetida"
+  time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} er attende av prøvetida *(utvid no)*"
   time_limit_a6f1a51e: Tidsgrense
   time_zone_f56f5183: Tidssone
   time_zones: 
@@ -16771,13 +16854,16 @@ nn:
     chihuahua: Chihuahua
     chongqing: Chongqing
     copenhagen: København
+    cuiaba: Cuiaba
     darwin: Darwin
     dhaka: Dhaka
     dublin: Dublin
     eastern_time_us_canada: "Eastern Time (USA & Canada)"
     edinburgh: Edinburgh
+    eirunepe: Eirunepe
     ekaterinburg: Jekaterinburg
     fiji: Fiji
+    fortaleza: Fortaleza
     georgetown: Georgetown
     greenland: Grønland
     guadalajara: Guadalajara
@@ -16812,6 +16898,7 @@ nn:
     london: London
     madrid: Madrid
     magadan: Magadan
+    manaus: Manaus
     marshall_is: Marshalløyane
     mazatlan: Mazatlán
     melbourne: Melbourne
@@ -16830,12 +16917,14 @@ nn:
     new_caledonia: Ny-Caledonia
     new_delhi: "New Delhi"
     newfoundland: Newfoundland
+    noronha: Noronha
     novosibirsk: Novosibirsk
     nukualofa: Nukualofa
     osaka: Osaka
     pacific_time_us_canada: "Pacific Time (USA & Canada)"
     paris: Paris
     perth: Perth
+    philippines: Filippinane
     port_moresby: "Port Moresby"
     prague: Praha
     pretoria: Pretoria
@@ -16882,8 +16971,10 @@ nn:
     yakutsk: Jakutsk
     yerevan: Jerevan
     zagreb: Zagreb
+    zurich: Zürich
   timeline_of_messages_between_the_student_and_instr_6dbd9ad3: "Tidslinje for meldingar mellom studenten og underviserane"
   timeline_showing_when_assignments_were_turned_in_bb44c8a1: "Tidslinje som viser når oppgåver blei levert inn"
+  timeout_when_searching_5c24ff9d: "Tidsavbrot under søkjing"
   tinymce: 
     insert_update_image_view: 
       alt_help_text: "Skildre bildet for å betre tilgang"
@@ -16907,10 +16998,13 @@ nn:
   title_52b8638d: "Tittel:"
   title_appointment_group_you_can_sign_up_for_this_1c254712: "*%{title} avtalegruppe* Du kan **melde deg** på."
   title_ee03d132: Tittel
+  title_is_locked_click_to_unlock_21548cfb: "%{title} er låst. Klikk for å låse opp "
   title_is_off_6c823e2d: "%{title} er av"
   title_is_on_2b72a9b7: "%{title} er på"
   title_is_required_437f9993: "Tittel er obligatorisk"
+  title_is_required_8bb13295: "Tittel er obligatorisk! "
   title_is_too_long_must_be_under_length_characters_ab694ae4: "Tittelen er for lang, må vere under %{length} teikn"
+  title_is_unlocked_click_to_lock_6a20cfcb: "%{title} er ulåst. Klikk for å låse "
   title_separator: ": "
   titles: 
     aligned_items: "Justerte element"
@@ -16930,21 +17024,32 @@ nn:
   to_35c6baa2: "til "
   to_51406be9: Til
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "For å aktivere SMS må du leggje inn den firesifra koden som blei sendt til %{sms_number}."
+  to_be_added_2959cc72: "Skal leggast til"
+  to_be_removed_d4b48586: "Skal fjernast"
   to_c4c44f4b: til
+  to_change_sis_account_id_the_user_must_have_manage_4b8a37a8: "For å endre sis_account_id må brukaren ha manage_sis_permission. "
   to_configure_an_openid_connect_provider_you_need_t_5c937249: |-
       Om du vil konfigurere ein OpenID Connect-leverandør, må du ha URL-adressene til godkjenning og token, og
       klient-ID og klienthemmelegheit.
       
       Om leverandøren kan konfigurere gyldig tilbakeringing eller omdirigere URI-ar, bruk %{callback_url}.
+  to_date_can_t_come_before_from_date_cf9e18aa: "Til-dato kan ikkje vere før Frå-dato"
   to_do_1d554f36: "Å gjere"
+  to_do_5526f10a: "Å gjere: "
+  to_do_items_loading_d1cdfcd5: "Lastar innhald i Å gjere-oversikta"
+  to_do_list_dashboard_d741f64e: "Dashbord for Å gjere-oversikta"
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Om du vil lenke emneobservatøren *%{name}* til ein student, kan du skrive og finne studenten sitt namn nedanfor og deretter klikke på Oppdater."
   to_minscore_43e5452e: "to %{minScore}%"
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "For å førehandvise endringar i temaredigeringsprogrammet, må du *slå av høgkontrast-UI*."
   to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "For å avgrense tilgangen til brukarar frå eit spesifikt Clever-district, legg inn kvart distrikt sine Clever-ID-ar her. Det er eit krav for at Clever Instant Login kan fungere i eit multi-tenar-miljø. "
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "For å hindre brukartilgong til spesifikke Google Apps-domene, list domena her."
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: "For å avgrense tilgangen til berre Azure Active Directory-brukarar, registrer tenaren her. "
+  to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "Dersom du vil sjå alle varslingane som er sende til ein Canvas-brukar, må du markere brukaren og datointervallet for søket."
   today_76e10f9c: "I dag"
+  toggle_course_card_color_overlays_b5b8137a: "Slå av/på fargelag på emnekort"
   toggle_editing_answer_text_as_html_9a93fe6: "Bytt tekst for redigeringssvar til HTML"
+  toggle_select_course_name_310fdee4: "Brytar for emneval %{name}"
+  toggle_title_grading_period_visibility_462b2136: "Vis/sjul %{title} karaktersetjingsperiode "
   tolerance_value_9e96573c: Toleranseverdi
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "For mange påloggingsforsøk. Prøv på nytt seinare eller ta kontakt med systemadministrator."
   too_many_members_b8b15069: "For mange medlemmar"
@@ -16961,15 +17066,22 @@ nn:
     incomplete: "ikkje fullført"
     vdd: 
       more_message: "og %{count} fleire..."
+  top_66e0adb6: Topp
   top_box_background_6db383e9: "Bakgrunn for øvste boks"
   top_box_border_94cee4a7: "Kantlinje rundt øvste boks"
   topic_podcast_feed_dff98ab0: "Tema podkaststraum"
   total_71a4807: Totalt
   total_column_options_4e6a6032: "Kolonnealternativ totalt"
+  total_messages_af025be6: "Meldingar totalt"
+  total_options_351e2682: "Alle alternativ"
   total_range_45c8549a: "Totalt spenn"
+  total_results_outcomedetails_cnt_30ff1f8d: "Totalresultat: %{outcomeDetails.cnt}"
+  track_individual_student_and_class_progress_c13cf2d1: "Spor progresjon til enkeltstudentar og klasse"
   treat_ungraded_as_0_d38c2b41: "Behandle ikkje karaktersett som 0"
   tree_browser: 
     folder_tree_instructions: "Bruk navigasjonspilene opp eller ned for å bla gjennom trestrukturen. Trykk høgre for å vise mappene, trykk venstre for å skjule dei og trykk på Enter for elementet du har valt."
+  trinidad_and_tobago_1_fc2d8d1c: "Trinidad og Tobago (+1)"
+  turning_off_this_tutorial_will_remove_the_tutorial_dfd81b3a: "Dersom du slår av opplæringsmanualen forsvinn opplæringsmenyen frå alle emna dine. Du kan slå han på igjen under funksjonsval i innstillingar på din brukarprofil. "
   turnitin: 
     error_1007: "Den opplasta fila er for stor."
     error_1009: "Ugyldig filtype. (Gyldige filtypar er MS Word, Acrobat PDF, Postscript, Text, HTML, WordPerfect (WPD) og Rich Text Format.)"
@@ -16985,15 +17097,18 @@ nn:
       score: "Likskapsresultat – sjå detaljrapport"
   turnitin_info: 
     buttons: 
-      resubmit_to_turnitin: "Lever til Turnitin på nytt"
+      resubmit_to_turnitin: "Send på nytt"
   turnitin_settings: 
     originality_report_never: Aldri
     originality_report_visible_after_due_date: "Etter innleveringsfristen"
     originality_report_visible_after_grading: "Etter at oppgåva er karaktersett"
     originality_report_visible_immediately: "Med ein gong"
   twitter_fcef6b54: Twitter
+  type_a_few_letters_to_start_searching_3334657b: "Skriv eit par bokstavar for å starte søkjinga"
   type_c8106334: Type
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "'%{type}' er ikkje ein gyldig bildetype (prøv JPG, PNG eller GIF)"
+  type_of_change_1cb24a0e: "Type endring"
+  type_of_item_8a37f69d: "Type element"
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Uff. Kontakt ein Catalog-utviklar. Feilmelding: %{message}"
   unable_to_accept_update_fd53a7e2: "Kan ikkje oppdatere"
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Kan ikkje normalfordele karakterar fordi innleveringsfristen for oppgåva ligg innanfor ein lukka karaktersetjingsperiode for minst ein student"
@@ -17006,13 +17121,20 @@ nn:
   unauthorized_message: "JWT-signatur er ugyldig"
   unauthorized_to_delete_this_file_a1271224: "Har ikkje autorisasjon til å fjerne denne fila"
   unavailable_46d2c344: Utilgjengeleg
+  unbookmark_bank_70569249: "Fjern bokmerke %{bank}"
   unbookmark_this_question_bank_d87d1a07: "Fjern bokmerke for denne spørsmålsbanken"
   unchanged_aca18e02: "[Uendra]"
   undated_15c2e5fe: "Utan dato"
   undated_items_toggle_list_visibility_6219e641: "Udaterte element  i liste ein kan vise/skjule"
   undelivered_message_459916a9: "Ikkje levert melding"
+  underline_all_links_description: |-
+      Understreka lenker viser hyperlenker i navigasjonsmenyar, på dashbordet og i sidestolpar som
+      *understreka tekst*. Funksjonen gjeld ikkje lenker i brukargenerert innhald frå
+      rikt innhald-editoren. Der blir alltid alle lenker understreka for alle brukarar.
   underline_links_e7cf9b4f: "Bruk understreka lenker"
   undo_a7be8fef: Angre
+  undo_remove_course_association_name_68eb4037: "Angre fjerning av emneforbindelse %{name}"
+  unenrolled_bc89d5e3: "Meldt av"
   unenrolled_users_e7632d24: "Brukarar utan emnepåmeldingar"
   ungraded_147a0dce: "ikkje karaktersett"
   ungraded_answers_31ef2df7: "Svar som ikkje er karaktersette"
@@ -17029,9 +17151,12 @@ nn:
   unknown_47a3b725: Ukjent
   unknown_account_74d30b82: "Ukjent konto"
   unknown_answers_9688a2bc: "Ukjende svar"
+  unknown_compression_method_b6a850b5: "ukjend pakkemetode"
   unknown_content_type_ae6d08e8: "Ukjent innhaldstype"
   unknown_question_bank: "Ukjent spørsmålsbank"
   unknown_quiz: "Ukjent quiz"
+  unknown_status_status_35331e1d: "Ukjend status, %{status}"
+  unknown_status_status_message_3a4ed4d5: "Ukjend status, %{status}: %{message}"
   unknown_user_url_82196ba7: "Ukjent brukar-URL"
   unlock_at_bb930b34: "Lås opp"
   unlock_at_time_a0bbfb9: "Lås opp: %{time}"
@@ -17040,23 +17165,33 @@ nn:
   unlock_date_cannot_be_before_course_start_9c7b8524: "Opplåsingsdato kan ikkje vere før emnestart"
   unlock_date_cannot_be_before_section_start_793ddc66: "Opplåsingsdato kan ikkje vere før klassestart"
   unlock_date_cannot_be_before_term_start_d3c01813: "Opplåsingsdato kan ikkje vere før semesterstart"
+  unlock_f6196bf5: "Lås opp"
   unlock_module_on_date_17144fbd: "Lås opp modul på dato"
+  unlocked_beee43de: Ulåst
+  unlocked_click_to_lock_53262ce7: "Ulåst. Klikk for å opne. "
+  unlocking_a6b5c02d: "Låser opp..."
   unmute_assignment_29a49038: "Opphev skjuling av oppgåve"
   unnamed_account_id_e688ad87: "Konto utan namn (%{id})"
   unpin_a318452a: Løyse
+  unposted_8d9932ec: "Ikkje sendt"
   unprocessable_entity: "eining som ikkje kan behandlast"
   unprocessable_entity_message: "Signert møte-ID er ugyldig"
   unpublish_9f2d730b: "Opphev publisering"
   unpublished_8b6107d6: "Ikkje publisert"
+  unpublished_assignments_9cdbcc87: "Upubliserte oppgåver"
   unpublished_click_to_modify_60f9051: "Ikkje publisert – klikk for å endre"
+  unpublished_click_to_publish_6a6d12e1: "Ikkje publisert. Klikk for å publisere. "
   unpublished_click_to_publish_c073631a: "Ikkje publisert. Klikk for å publisere."
   unpublished_click_to_publish_item_name_614c4952: "Ikkje publisert. Klikk for å publisere %{item_name}."
   unpublished_click_to_publish_module_name_89f8601c: "Ikkje publisert. Klikk for å publisere %{module_name}."
   unpublished_click_to_publish_name_10104b5c: "Upublisert. Klikk for å publisere %{name}"
+  unpublished_click_to_publish_title_7c57293f: "Ikkje publisert. Klikk for å publisere %{title}. "
   unpublished_courses_title: "Upubliserte emne"
   unpublished_dfd8801: upublisert
   unread_e9c1b19c: "Ikkje lest"
   unregister_service_985238e9: "Fjern denne tenesta"
+  unreserved_e86b7425: "Ikkje reservert"
+  unsafe_file_link_8a18eceb: "usikker fil-lenke"
   unstarted_932f2990: "Ikkje starta"
   unsupported_package: "Innhaldspakke som ikkje er støtta"
   until_4a1f8cda: Til
