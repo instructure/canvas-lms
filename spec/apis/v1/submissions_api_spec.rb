@@ -30,7 +30,7 @@ describe 'Submissions API', type: :request do
 
   def submit_homework(assignment, student, opts = {:body => "test!"})
     @submit_homework_time ||= Time.zone.at(0)
-    @submit_homework_time += 1.hour
+    @submit_homework_time += 1.hour # each submission in a test is separated by an hour
     sub = assignment.find_or_create_submission(student)
     if sub.versions.size == 1
       Version.where(:id => sub.versions.first).update_all(:created_at => @submit_homework_time)
@@ -239,7 +239,7 @@ describe 'Submissions API', type: :request do
 
     it 'returns submissions based on submitted_since' do
       assignment = Assignment.create!(course: @course)
-      @submit_homework_time = 6.hours.ago
+      @submit_homework_time = 12.hours.ago
       submit_homework(assignment, @student1)
       json = api_call(:get,
                       "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
@@ -253,7 +253,7 @@ describe 'Submissions API', type: :request do
                       "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
                       {controller: 'submissions_api', action: 'for_students',
                        format: 'json', section_id: 'sis_section_id:my-section-sis-id'},
-                      submitted_since: 5.hours.ago.iso8601,
+                      submitted_since: 6.hours.ago.iso8601,
                       student_ids: 'all')
       expect(json.size).to eq 1
 
