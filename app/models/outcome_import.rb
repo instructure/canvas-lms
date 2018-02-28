@@ -95,4 +95,37 @@ class OutcomeImport < ApplicationRecord
     data["processing_errors"] = self.outcome_import_errors.limit(25).pluck(:row, :message)
     data
   end
+
+  def run
+    job_started!
+    file = self.attachment.open(need_local_file: true)
+    begin
+      Outcomes::CsvImporter.new(self, file).run do |status|
+        status[:errors].each do |row, error|
+          add_error row, error
+        end
+        self.update!(progress: status[:progress])
+      end
+
+      if outcome_import_errors.count == 0
+        job_completed!
+      else
+        job_failed!
+      end
+    rescue
+      add_error(1, I18n.t('An unexpected error has occurred'))
+      job_failed!
+      raise
+    ensure
+      file.close
+    end
+  end
+
+  def add_error(row, error)
+    OutcomeImportError.create!(
+      outcome_import: self,
+      row: row,
+      message: error
+    )
+  end
 end

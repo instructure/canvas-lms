@@ -18,8 +18,69 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Outcomes::CsvImporter do
-  def csv_path(name)
-    File.expand_path(File.dirname(__FILE__) + "/fixtures/#{name}.csv")
+  def csv_file(name)
+    path = File.expand_path(File.dirname(__FILE__) + "/fixtures/#{name}.csv")
+    File.open(path, 'rb')
+  end
+
+  def import_fake_csv(rows, &updates)
+    Tempfile.open do |tf|
+      CSV.open(tf.path, 'wb') do |csv|
+        rows.each { |r| csv << r }
+      end
+      tf.binmode
+      Outcomes::CsvImporter.new(import, tf).run(&updates)
+    end
+  end
+
+  def outcome_row(**changes)
+    valid = {
+      title: 'title',
+      vendor_guid: SecureRandom.uuid,
+      object_type: 'outcome',
+      parent_guids: '',
+      calculation_method: 'highest',
+      calculation_int: '',
+      workflow_state: ''
+    }
+
+    row = valid.merge(changes)
+    headers.map { |k| row[k.to_sym] }
+  end
+
+  def group_row(**changes)
+    valid = {
+      title: 'title',
+      vendor_guid: SecureRandom.uuid,
+      object_type: 'group',
+      parent_guids: '',
+      calculation_method: '',
+      calculation_int: '',
+      workflow_state: ''
+    }
+
+    row = valid.merge(changes)
+    headers.map { |k| row[k.to_sym] }
+  end
+
+  before :once do
+    account_model
+  end
+
+  let(:import) do
+    OutcomeImport.create!(context: @account)
+  end
+
+  let(:headers) do
+    %w[
+      title
+      vendor_guid
+      object_type
+      parent_guids
+      calculation_method
+      calculation_int
+      workflow_state
+    ]
   end
 
   describe 'the csv importer' do
@@ -30,18 +91,19 @@ describe Outcomes::CsvImporter do
     end
 
     def expect_ok_import(path)
-      errors = Outcomes::CsvImporter.new(path, nil).run
-      expect(errors).to eq([])
+      Outcomes::CsvImporter.new(import, path).run do |status|
+        expect(status[:errors]).to eq([])
+      end
     end
 
     it 'can import the demo csv file' do
-      expect_ok_import(csv_path('demo'))
+      expect_ok_import(csv_file('demo'))
       expect(LearningOutcomeGroup.count).to eq(3)
       expect(LearningOutcome.count).to eq(1)
     end
 
     it 'imports group attributes correctly' do
-      expect_ok_import(csv_path('demo'))
+      expect_ok_import(csv_file('demo'))
 
       group = by_guid['b']
       expect(group.title).to eq('B')
@@ -50,7 +112,7 @@ describe Outcomes::CsvImporter do
     end
 
     it 'imports outcome attributes correctly' do
-      expect_ok_import(csv_path('demo'))
+      expect_ok_import(csv_file('demo'))
 
       outcome = by_guid['c']
       expect(outcome.title).to eq('C')
@@ -66,7 +128,7 @@ describe Outcomes::CsvImporter do
     end
 
     it 'imports ratings correctly' do
-      expect_ok_import(csv_path('scoring'))
+      expect_ok_import(csv_file('scoring'))
 
       criteria = by_guid['c'].rubric_criterion
       ratings = criteria[:ratings].sort_by { |r| r[:points] }
@@ -80,13 +142,13 @@ describe Outcomes::CsvImporter do
     end
 
     it 'works when no ratings are present' do
-      expect_ok_import(csv_path('no-ratings'))
+      expect_ok_import(csv_file('no-ratings'))
 
       expect(by_guid['c'].rubric_criterion).to eq(nil)
     end
 
     it 'properly sets scoring types' do
-      expect_ok_import(csv_path('scoring'))
+      expect_ok_import(csv_file('scoring'))
 
       by_method = LearningOutcome.all.to_a.group_by(&:calculation_method)
 
@@ -99,28 +161,32 @@ describe Outcomes::CsvImporter do
 
     it 'can import a utf-8 csv file with non-ascii characters' do
       guid = 'søren'
-      expect_ok_import(csv_path('nor'))
+      expect_ok_import(csv_file('nor'))
       expect(LearningOutcomeGroup.where(vendor_guid: guid).count).to eq(1)
     end
 
     it 'can import csv files with chinese characters' do
       guid = '作戰'
-      expect_ok_import(csv_path('chn'))
+      expect_ok_import(csv_file('chn'))
       expect(LearningOutcomeGroup.where(vendor_guid: guid).count).to eq(1)
     end
-  end
 
-  def import_fake_csv(rows)
-    Tempfile.open do |tf|
-      CSV.open(tf.path, 'wb') do |csv|
-        rows.each { |r| csv << r }
+    it 'reports import progress' do
+      stub_const('Outcomes::CsvImporter::BATCH_SIZE', 2)
+
+      increments = []
+      import_fake_csv([headers] + (1..3).map { |ix| group_row(vendor_guid: ix) }.to_a) do |status|
+        increments.push(status[:progress])
       end
-      Outcomes::CsvImporter.new(tf.path, nil).run
+      expect(increments).to eq([0, 50, 100])
     end
   end
 
   def expect_import_error(rows, expected)
-    errors = import_fake_csv(rows)
+    errors = []
+    import_fake_csv(rows) do |status|
+      errors += status[:errors]
+    end
     expect(errors).to eq(expected)
   end
 
@@ -148,47 +214,6 @@ describe Outcomes::CsvImporter do
   end
 
   describe 'throws user-friendly row errors' do
-    let(:headers) do
-      %w[
-        title
-        vendor_guid
-        object_type
-        parent_guids
-        calculation_method
-        calculation_int
-        workflow_state
-      ]
-    end
-
-    def outcome_row(**changes)
-      valid = {
-        title: 'title',
-        vendor_guid: SecureRandom.uuid,
-        object_type: 'outcome',
-        parent_guids: '',
-        calculation_method: 'highest',
-        calculation_int: '',
-        workflow_state: ''
-      }
-
-      row = valid.merge(changes)
-      headers.map { |k| row[k.to_sym] }
-    end
-
-    def group_row(**changes)
-      valid = {
-        title: 'title',
-        vendor_guid: SecureRandom.uuid,
-        object_type: 'group',
-        parent_guids: '',
-        calculation_method: '',
-        calculation_int: '',
-        workflow_state: ''
-      }
-
-      row = valid.merge(changes)
-      headers.map { |k| row[k.to_sym] }
-    end
 
     it 'if rating tiers have points missing' do
       expect_import_error(

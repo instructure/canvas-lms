@@ -57,7 +57,7 @@ module Outcomes
       parent = parents.first
 
       LearningOutcomeGroup.create!(
-        context: @context,
+        context: context,
         vendor_guid: group[:vendor_guid],
         title: group[:title],
         description: group[:description] || '',
@@ -70,7 +70,7 @@ module Outcomes
       parents = find_parents(outcome)
 
       imported = LearningOutcome.new(
-        context: @context,
+        context: context,
         title: outcome[:title],
         vendor_guid: outcome[:vendor_guid],
         description: outcome[:description] || '',
@@ -94,7 +94,7 @@ module Outcomes
     end
 
     def root_parent
-      @root ||= LearningOutcomeGroup.find_or_create_root(@context, true)
+      @root ||= LearningOutcomeGroup.find_or_create_root(context, true)
     end
 
     def find_parents(object)

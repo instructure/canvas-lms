@@ -40,25 +40,41 @@ module Outcomes
 
     BATCH_SIZE = 1000
 
-    def initialize(path, context)
-      @path = path
-      @context = context
+    def initialize(import, file)
+      @import = import
+      @file = file
     end
 
-    def run
-      headers = nil
-      errors = []
-      begin
-        rows = CSV.new(File.new(@path, 'rb')).to_enum
-        rows.with_index(1).each_slice(BATCH_SIZE) do |batch|
-          headers ||= validate_headers(*batch.shift)
-          errors += parse_batch(headers, batch)
-        end
-      rescue ParseError => e
-        return [[1, e.message]]
-      end
+    delegate :context, to: :@import
 
-      errors
+    def run(&update)
+      status = { progress: 0, errors: [] }
+      yield status
+
+      begin
+        parse_file(&update)
+      rescue ParseError => e
+        status = {
+          errors: [[1, e.message]],
+          progress: 100,
+        }
+        yield status
+      end
+    end
+
+    def parse_file
+      headers = nil
+      total = file_line_count
+      rows = CSV.new(@file).to_enum
+      rows.with_index(1).each_slice(BATCH_SIZE) do |batch|
+        headers ||= validate_headers(*batch.shift)
+        errors = parse_batch(headers, batch)
+        status = {
+          errors: errors,
+          progress: (batch.last[1].to_f / total * 100).floor
+        }
+        yield status
+      end
     end
 
     def parse_batch(headers, batch)
@@ -82,6 +98,12 @@ module Outcomes
     end
 
     private
+
+    def file_line_count
+      count = @file.each.inject(0) { |c, _line| c + 1}
+      @file.rewind
+      count
+    end
 
     def check_encoding(str)
       encoded = str&.force_encoding('utf-8')

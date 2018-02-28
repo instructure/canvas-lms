@@ -79,4 +79,88 @@ describe OutcomeImport, type: :model do
     json = import.as_json
     expect(json["processing_errors"].length).to eq 25
   end
+
+  describe '.run handles outcome import' do
+    before :once do
+      account_model
+    end
+
+    def mock_importer(updates)
+      importer = instance_double(Outcomes::CsvImporter)
+      expect(importer).to receive(:run) do |&block|
+        updates.each do |up|
+          block.call(up)
+        end
+      end
+      expect(Outcomes::CsvImporter).to receive(:new).and_return(importer)
+    end
+
+    def fake_file
+      instance_double(File).tap do |file_double|
+        expect(file_double).to receive(:close)
+      end
+    end
+
+    def fake_attachment(file)
+      instance_double(Attachment).tap do |attachment_double|
+        allow(attachment_double).to receive(:open).with(:need_local_file => true).and_return(file)
+      end
+    end
+
+    def fake_import(attachment)
+      OutcomeImport.create!(context: @account).tap do |import|
+        import.update!(workflow_state: 'created')
+        allow(import).to receive(:attachment).and_return(attachment)
+      end
+    end
+
+    it 'destroys content and sets proper workflow_state on successful completion' do
+      mock_importer([
+        { progress: 0, errors: [] },
+        { progress: 100, errors: [] }
+      ])
+
+      attachment = fake_attachment(fake_file)
+      import = fake_import(attachment)
+      expect(import).to receive(:job_started!).and_call_original
+      import.run
+
+      expect(import.outcome_import_errors.all.to_a).to eq([])
+      expect(import.progress).to eq(100)
+      expect(import.workflow_state).to eq('succeeded')
+    end
+
+    it 'sets outcome_import_errors' do
+      mock_importer([
+        { progress: 0, errors: [] },
+        { progress: 50, errors: [[1, 'Very Bad Error']] },
+        { progress: 100, errors: [] }
+      ])
+
+      attachment = fake_attachment(fake_file)
+      import = fake_import(attachment)
+      import.run
+
+      errors = import.outcome_import_errors.all.to_a
+      expect(errors.pluck(:row, :message)).to eq([
+        [1, 'Very Bad Error']
+      ])
+      expect(import.progress).to eq(100)
+      expect(import.workflow_state).to eq('failed')
+    end
+
+    it 'has a catch-all for unexpected errors' do
+      expect(Outcomes::CsvImporter).to receive(:new).and_return(nil)
+
+      attachment = fake_attachment(fake_file)
+      import = fake_import(attachment)
+      expect(import).to receive(:job_started!).and_call_original
+      expect { import.run }.to raise_error(NoMethodError)
+
+      errors = import.outcome_import_errors.all.to_a
+      expect(errors.pluck(:row, :message)).to eq([
+        [1, 'An unexpected error has occurred']
+      ])
+    end
+  end
 end
