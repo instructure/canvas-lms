@@ -61,6 +61,37 @@ describe Quizzes::QuizRegrader::Submission do
                                           :question_regrades => question_regrades)
   end
 
+  let(:attempts) do
+    double(
+      :version_models => [double(:submission_data => submission_data)],
+      :last_versions => []
+    )
+  end
+
+  let(:multiple_attempts_submission_data) do
+    4.upto(6).map {|i| {:question_id => i} }
+  end
+
+  let(:multiple_attempts_submission) do
+    double(
+      :attempts => attempts,
+      :score => 0,
+      :score_before_regrade => 1,
+      :quiz_data => quiz_data,
+      :score= => nil,
+      :score_before_regrade= => nil,
+      :submission_data => multiple_attempts_submission_data,
+      :write_attribute => {}
+    )
+  end
+
+  let(:multiple_attempts_wrapper) do
+    Quizzes::QuizRegrader::Submission.new(
+      :submission => multiple_attempts_submission,
+      :question_regrades => question_regrades
+    )
+  end
+
 
   describe "#initialize" do
     it "saves a reference to the passed submission" do
@@ -74,7 +105,7 @@ describe Quizzes::QuizRegrader::Submission do
 
   describe "#regrade!" do
     it "wraps each answer in the submisison's submission_data and regrades" do
-      submission_data.each do |answer|
+      submission_data.each do
         answer_stub = double
         expect(answer_stub).to receive(:regrade!).once.and_return(1)
         expect(Quizzes::QuizRegrader::Answer).to receive(:new).and_return answer_stub
@@ -90,28 +121,52 @@ describe Quizzes::QuizRegrader::Submission do
       expect(submission).to receive(:score_before_regrade).and_return nil
       expect(submission).to receive(:score_before_regrade=).with(0)
       expect(submission).to receive(:quiz_data=)
-      expect(submission).to receive_messages(:attempts => double(:last_versions => []))
+      expect(submission).to receive_messages(
+        :attempts => double(:version_models => [], :last_versions => [])
+      )
 
       wrapper.regrade!
+    end
+
+    it "handles multiple attempts" do
+      # These should never be called.
+      # The ones that need regrading were part of a different attempt
+      multiple_attempts_submission_data.each do
+        answer_stub = double
+        expect(answer_stub).to receive(:regrade!).never
+      end
+
+      # submission should still update and save correct data
+      # even though none of the questions in submission_data needed regrading,
+      # since there were questions in the submission_data for
+      # attempts.version_models which did need regrading
+      expect(multiple_attempts_submission).to receive(:score=)
+      expect(multiple_attempts_submission).to receive(:score_before_regrade).and_return nil
+      expect(multiple_attempts_submission).to receive(:score_before_regrade=).with(0)
+      expect(multiple_attempts_submission).to receive(:quiz_data=)
+      expect(multiple_attempts_submission).to receive(:save_with_versioning!).once
+
+      multiple_attempts_wrapper.regrade!
     end
   end
 
   describe "#rescored_submission" do
     before do
-      regraded_quiz_data = question_regrades.map do |key, qr|
+      regraded_quiz_data = question_regrades.map do |key, _|
         Quizzes::QuizQuestionBuilder.decorate_question_for_submission({
           id: key,
           points_possible: question_group.question_points
         }, key)
       end
 
-      expect(submission).to receive(:quiz_data=).with(regraded_quiz_data)
+      expect(submission).to receive(:quiz_data=).with(regraded_quiz_data) # rubocop:disable Rspec/ExpectInHook
 
       @regrade_submission = Quizzes::QuizRegrader::Submission.new(
         :submission        => submission,
-        :question_regrades => question_regrades)
+        :question_regrades => question_regrades
+      )
 
-      expect(@regrade_submission).to receive(:answers_to_grade).and_return []
+      expect(@regrade_submission).to receive(:answers_to_grade).and_return [] # rubocop:disable Rspec/ExpectInHook
     end
 
     it "scores the submission based on the regraded answers" do

@@ -26,13 +26,14 @@ class Quizzes::QuizRegrader::Submission
   end
 
   def regrade!
-    return unless answers_to_grade.size > 0
+    return unless answers_to_grade.size > 0 || needs_regrade?
 
     # regrade all previous versions
     submission.attempts.last_versions.each do |version|
       Quizzes::QuizRegrader::AttemptVersion.new(
         :version => version,
-        :question_regrades => question_regrades).regrade!
+        :question_regrades => question_regrades
+      ).regrade!
     end
 
     # save this version
@@ -48,6 +49,13 @@ class Quizzes::QuizRegrader::Submission
   end
 
   private
+
+  def needs_regrade?
+    # needs regrade if any attempt includes the question
+    submission.attempts.version_models.any? do |version|
+      version.submission_data.any? { |answer| question_regrades[answer[:question_id]] }
+    end
+  end
 
   def answers_to_grade
     @answers_to_grade ||= submitted_answers.map do |answer|
@@ -65,7 +73,7 @@ class Quizzes::QuizRegrader::Submission
     @submitted_answer_ids ||= submitted_answers.map { |q| q[:question_id] }.to_set
   end
 
-  REGRADE_KEEP_FIELDS = (%w{id position name question_name published_at}).to_set
+  REGRADE_KEEP_FIELDS = %w{id position name question_name published_at}.freeze
 
   def regraded_question_data
     pos = 0
@@ -76,16 +84,16 @@ class Quizzes::QuizRegrader::Submission
       pos += 1 unless question[:question_type] == Quizzes::QuizQuestion::Q_TEXT_ONLY
 
       if submitted_answer_ids.include?(id)
-        question.keep_if {|k, v| REGRADE_KEEP_FIELDS.include?(k.to_s) }
+        question.keep_if { |k| REGRADE_KEEP_FIELDS.include?(k.to_s) }
 
         quiz_question = question_regrades[id].quiz_question
-        data  = Quizzes::QuizQuestionBuilder.decorate_question_for_submission(
+        data = Quizzes::QuizQuestionBuilder.decorate_question_for_submission(
           quiz_question.question_data,
           pos
         )
         group = quiz_question.quiz_group
 
-        if group && group.pick_count
+        if group&.pick_count
           data[:points_possible] = group.question_points
         end
 
