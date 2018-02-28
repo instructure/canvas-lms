@@ -46,12 +46,12 @@ const generateDragAndDropMessages = (props, discussion) => {
   } else if (props.closedState) {
     return {
       successMessage: I18n.t('Discussion opened for comments successfully'),
-      failMessage: I18n.t('Failed to open discussion for comments'),
+      failMessage: I18n.t('Failed to close discussion for comments'),
     }
   } else {
     return {
       successMessage: I18n.t('Discussion closed for comments successfully'),
-      failMessage: I18n.t('Failed to close discussion for comments'),
+      failMessage: I18n.t('Failed to open discussion for comments'),
     }
   }
 }
