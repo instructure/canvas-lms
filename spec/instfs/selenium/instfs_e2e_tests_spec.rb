@@ -49,7 +49,7 @@ describe "instfs file uploads" do
       on_duplicate: "overwrite",
       quota_exempt: true,
       capture_url: "http://#{HostUrl.default_host}/api/v1/files/capture",
-      domain_root_acount: Account.default
+      domain_root_account: Account.default
     )
     URI(instfs_stuff[:upload_url])
   end
@@ -102,6 +102,18 @@ describe "instfs file uploads" do
     file_location.split("/").last
   end
 
+  def get_file_link_from_bg_image(image_link)
+    file_link = image_link.split('background-image: url("').last
+    file_link.split('"').first
+  end
+
+  def get_id_from_canvas_link(file_link)
+    # http://172.18.0.18:34175/files/146/download?download_frd=1"
+    file_id = file_link.split("/download?").first
+    file_id.split("/files/").last
+  end
+
+
   context 'when uploading to instfs as an admin' do
     before do
       user_session(admin_guy)
@@ -128,8 +140,7 @@ describe "instfs file uploads" do
       wait_for_ajaximations
       thumbnail_link = f(".media-object")["style"]
       expect(thumbnail_link).to include("instfs.docker/thumbnails")
-      file_link = thumbnail_link.split('background-image: url("').last
-      file_link = file_link.split('"').first
+      file_link = get_file_link_from_bg_image(thumbnail_link)
       downloaded_file = open(file_link)
       expect(downloaded_file.size).to be > 0
     end
@@ -174,6 +185,24 @@ describe "instfs file uploads" do
       image_element = f('a[title="test_image.jpg"]')
       image_element_source = image_element.attribute("href")
       expect(compare_md5s(image_element_source, file_path)).to be true
+    end
+
+    it "should upload course image cards to instfs", priority: "1", test_id: 3455114 do
+      Account.default.enable_feature!(:course_card_images)
+      file_path = File.join(ActionController::TestCase.fixture_path, "test_image.jpg")
+      get "/courses/#{@course.id}/settings"
+      wait_for_ajaximations
+      f(".CourseImageSelector").click
+      f(".UploadArea__Content input").send_keys(file_path)
+      wait_for_new_page_load
+      image_link = f(".CourseImageSelector")["style"]
+      # get link to canvas location of file
+      file_link = get_file_link_from_bg_image(image_link)
+      # get the attachment object using the canvas id
+      attachment = Attachment.find(get_id_from_canvas_link(file_link))
+      # verify that the attachment has an instfs uuid and that it's identical to the original file
+      expect(attachment.instfs_uuid).not_to be_nil
+      expect(compare_md5s(file_link, file_path)).to be true
     end
   end
 
