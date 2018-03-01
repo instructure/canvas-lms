@@ -177,7 +177,6 @@ module.exports = {
         ],
         exclude: [
           path.resolve(__dirname, '../public/javascripts/translations'),
-          path.resolve(__dirname, '../public/javascripts/vendor/mediaelement-and-player.js'), // remove when we use npm version
           /bower\//,
         ],
         loaders: happify('babel', [
@@ -226,7 +225,11 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        loader: 'style-loader!css-loader'
+        use: ['style-loader', 'css-loader']
+      },
+      {
+        test: /\.(png|svg|gif)$/,
+        loader: 'file-loader'
       }
     ]
   },
