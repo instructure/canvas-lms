@@ -176,6 +176,7 @@ module.exports = {
           /gems\/plugins\/.*\/app\/jsx\//
         ],
         exclude: [
+          path.resolve(__dirname, '../public/javascripts/translations'),
           path.resolve(__dirname, '../public/javascripts/vendor/mediaelement-and-player.js'), // remove when we use npm version
           /bower\//,
         ],
