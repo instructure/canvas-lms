@@ -111,7 +111,7 @@ class Feature
     'sis_imports_refactor' =>
       {
         display_name: -> { I18n.t('SIS Import Refactor')},
-        description: -> { I18n.t('Update how we process SIS improts') },
+        description: -> { I18n.t('Update how we process SIS imports') },
         applies_to: 'Account',
         state: 'hidden',
         development: true
