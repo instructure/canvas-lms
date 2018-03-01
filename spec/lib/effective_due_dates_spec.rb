@@ -492,6 +492,30 @@ describe Course do
         expect(result).to eq expected
       end
 
+      it 'ignores soft-deleted adhoc overrides' do
+        override = @assignment1.assignment_overrides.create!(due_at: 7.days.from_now(@now), due_at_overridden: true)
+        override_student = override.assignment_override_students.create!(user: @student1)
+        override_student.update!(workflow_state: 'deleted')
+
+        override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
+        override.assignment_override_students.create!(user: @student1)
+
+        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+        result = edd.to_hash
+        expected = {
+          @assignment1.id => {
+            @student1.id => {
+              due_at: 3.days.from_now(@now),
+              grading_period_id: nil,
+              in_closed_grading_period: false,
+              override_id: override.id,
+              override_source: 'ADHOC'
+            }
+          }
+        }
+        expect(result).to eq(expected)
+      end
+
       it 'correctly matches adhoc overrides for different assignments' do
         @assignment2.only_visible_to_overrides = true
         @assignment2.save!

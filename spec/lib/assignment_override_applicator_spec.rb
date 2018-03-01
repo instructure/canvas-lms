@@ -99,6 +99,23 @@ describe AssignmentOverrideApplicator do
       @reoverridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@overridden_assignment, @student)
     end
 
+    it "ignores soft deleted Assignment Override Students" do
+      now = Time.zone.now.change(usec: 0)
+      adhoc_override = assignment_override_model(:assignment => @assignment)
+      override_student = adhoc_override.assignment_override_students.create!(user: @student)
+      adhoc_override.override_due_at(7.days.from_now(now))
+      adhoc_override.save!
+      override_student.update!(workflow_state: 'deleted')
+
+      adhoc_override = assignment_override_model(:assignment => @assignment)
+      adhoc_override.assignment_override_students.create!(user: @student)
+      adhoc_override.override_due_at(2.days.from_now(now))
+      adhoc_override.save!
+
+      overriden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
+      expect(overriden_assignment.due_at).to eq(adhoc_override.due_at)
+    end
+
     context "give teachers the more lenient of override.due_at or assignment.due_at" do
       before do
         teacher_in_course
