@@ -112,9 +112,8 @@ class Feature
       {
         display_name: -> { I18n.t('SIS Import Refactor')},
         description: -> { I18n.t('Update how we process SIS imports') },
-        applies_to: 'Account',
-        state: 'hidden',
-        development: true
+        applies_to: 'RootAccount',
+        state: 'hidden'
       },
     'theme_editor_refactor' =>
     {
