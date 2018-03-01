@@ -59,9 +59,10 @@ describe SIS::CSV::GroupCategoryImporter do
   it "should create group categories" do
     sub = Account.where(sis_source_id: 'A001').take
     process_csv_data_cleanly(
-      "group_category_id,account_id,category_name,status",
-      "Gc001,,Group Cat 1,active",
-      "Gc002,A001,Group Cat 2,active")
+      "group_category_id,account_id,course_id,category_name,status",
+      "Gc001,,\"\",Group Cat 1,active",
+      "Gc002,A001,,Group Cat 2,active"
+    )
     group_category = GroupCategory.where(sis_source_id: 'Gc001').take
     expect(group_category.context_id).to eq @account.id
     expect(group_category.sis_source_id).to eq 'Gc001'

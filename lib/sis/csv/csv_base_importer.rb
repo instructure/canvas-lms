@@ -26,7 +26,7 @@ module SIS
       PARSE_ARGS = {headers: :first_row,
                     skip_blanks: true,
                     header_converters: :downcase,
-                    converters: lambda {|field| field ? field.strip : field}
+                    converters: ->(field) { field&.strip&.presence }
       }
 
       def initialize(sis_csv)
