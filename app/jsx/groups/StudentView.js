@@ -127,10 +127,7 @@ import ManageGroupDialog from '../groups/components/ManageGroupDialog'
 
     _loadMore (collection) {
       if (!collection.loadedAll && !collection.fetchingNextPage) {
-        // if we specify a page before we actually need it, we lose
-        // the params being passed to the api
-        const options = collection.length === 0 ? {} : {page: 'next'}
-        collection.fetch(options)
+        collection.fetch({ page: 'next' })
       }
     },
 
