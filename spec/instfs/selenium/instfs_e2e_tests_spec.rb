@@ -43,6 +43,7 @@ describe "instfs file uploads" do
     instfs_stuff = InstFS.upload_preflight_json(
       context: context_var,
       user: user,
+      acting_as: user,
       folder: folder_location,
       filename: filename,
       content_type: file_type,
@@ -247,6 +248,34 @@ describe "instfs file uploads" do
       wait_for_ajaximations
       file_link = f(".comment_attachments a").attribute("href")
       attachment = Attachment.find(get_id_from_canvas_link(file_link))
+      expect(attachment.instfs_uuid).not_to be_nil
+      expect(compare_md5s(file_link, file_path)).to be true
+    end
+
+    it 'should upload submission discussion files to instfs', priority: "1", test_id: 3399302 do
+      ass = @course.assignments.create!({title: "some assignment", submission_types: "online_text_entry"})
+      ass.submit_homework(@student, submission_type: 'online_text_entry', body: "so cool")
+      user_logged_in(:user => @student)
+      get "/courses/#{@course.id}/assignments/#{ass.id}/submissions/#{@student.id}"
+      wait_for_ajaximations
+      filename = "file_mail.txt"
+      file_path = File.join(ActionController::TestCase.fixture_path, filename)
+      f(".attach_comment_file_link").click
+      wait_for_ajaximations
+      f(".comment_attachments input").send_keys(file_path)
+      wait_for_ajaximations
+      f(".ic-Input").send_keys("cool")
+      f(".save_comment_button").click
+      wait_for_ajaximations
+
+      # log in as teacher and verify file shows up in assignment comment
+      user_session(@teacher)
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{ass.id}"
+      wait_for_ajaximations
+      file_link = f(".comment_attachment a").attribute("href")
+      file_id = file_link.split("download=").last
+      attachment = Attachment.find(get_id_from_canvas_link(file_id))
+      # verify that the attachment has an instfs uuid and that it's identical to the original file
       expect(attachment.instfs_uuid).not_to be_nil
       expect(compare_md5s(file_link, file_path)).to be true
     end
