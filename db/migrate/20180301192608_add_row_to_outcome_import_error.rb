@@ -16,27 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class OutcomeImport < ApplicationRecord
-  include Workflow
-  belongs_to :context, polymorphic: %i[account course]
-  belongs_to :attachment
-  belongs_to :user
-  has_many :outcome_import_errors
+class AddRowToOutcomeImportError < ActiveRecord::Migration[5.0]
+  tag :predeploy
 
-  validates :context_type, presence: true
-  validates :context_id, presence: true
-  validates :workflow_state, presence: true
-
-  workflow do
-    state :initializing
-    state :created do
-      event :job_started, transitions_to: :importing
-    end
-    state :importing do
-      event :job_completed, transitions_to: :succeeded
-      event :job_failed, transitions_to: :failed
-    end
-    state :succeeded
-    state :failed
+  def change
+    add_column :outcome_import_errors, :row, :integer
   end
 end
