@@ -250,13 +250,24 @@ export default class ThemeEditor extends React.Component {
     const processedData = new FormData()
     const {properties, files} = this.state.themeStore
     Object.keys(properties).forEach(k => {
-      processedData.append(`brand_config[variables][${k}]`, properties[k])
+      const defaultVal = this.getSchemaDefault(k)
+      if (properties[k] !== defaultVal && properties[k] && properties[k][0] !== '$') {
+        processedData.append(`brand_config[variables][${k}]`, properties[k])
+      } else {
+        processedData.append(`brand_config[variables][${k}]`, '')
+      }
     })
     files.forEach(f => {
       const keyName = f.customFileUpload
         ? f.variable_name
         : `brand_config[variables][${f.variable_name}]`
       processedData.append(keyName, f.value)
+    });
+    // We need to make sure that these are present with the upload
+    ['js_overrides', 'css_overrides', 'mobile_js_overrides', 'mobile_css_overrides'].forEach(name => {
+      if (!processedData.has(name)) {
+        processedData.append(name, this.props.brandConfig[name] || '');
+      }
     })
     return processedData
   }
@@ -305,7 +316,7 @@ export default class ThemeEditor extends React.Component {
     $.ajax({
       url: `/accounts/${this.props.accountID}/brand_configs/save_to_account`,
       type: 'POST',
-      data: new FormData(this.ThemeEditorForm),
+      data: this.processThemeStoreForSubmit(),
       processData: false,
       contentType: false,
       dataType: 'json'

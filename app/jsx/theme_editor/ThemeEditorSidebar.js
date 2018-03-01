@@ -138,6 +138,8 @@ export default function ThemeEditorSidebar(props) {
         getDisplayValue={props.getDisplayValue}
         changedValues={props.changedValues}
         changeSomething={props.changeSomething}
+        themeState={props.themeState}
+        handleThemeStateChange={props.handleThemeStateChange}
       />
     </Container>
   )

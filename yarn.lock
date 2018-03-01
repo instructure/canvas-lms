@@ -4187,6 +4187,10 @@ format-message@^5.1.0, format-message@^5.1.2, format-message@^5.2.0:
     lookup-closest-locale "^5.1.0"
     object-assign "^4.1.1"
 
+formdata-polyfill@^3.0.9:
+  version "3.0.9"
+  resolved "https://registry.yarnpkg.com/formdata-polyfill/-/formdata-polyfill-3.0.9.tgz#9cdcbd90e31378f5a1e65bc5f68e0db28606a5ed"
+
 fragment-cache@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/fragment-cache/-/fragment-cache-0.2.1.tgz#4290fad27f13e89be7f33799c6bc5a0abfff0d19"
