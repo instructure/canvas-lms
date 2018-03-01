@@ -438,5 +438,25 @@ describe "instfs file uploads" do
       image_element_source = image_element.attribute("href")
       expect(compare_md5s(image_element_source, file_path)).to be true
     end
+
+    it "should upload avatar images to instfs", priority: "1", test_id: 3455115 do
+      file_path = File.join(ActionController::TestCase.fixture_path, "test_image.jpg")
+      Account.default.enable_service(:avatars)
+      Account.default.save!
+      get "/profile/settings"
+      wait_for_ajaximations
+      f(".profile_pic_link").click
+      wait_for_ajaximations
+      f("#upload-picture input").send_keys(file_path)
+      wait_for_ajaximations
+      fj('.ui-dialog:visible .btn-primary').click
+      wait_for_new_page_load
+      image_link = f(".profile_pic_link")["style"]
+      file_link = get_file_link_from_bg_image(image_link)
+      thumbnail_link = get_link_redirect_path(file_link)
+      expect(thumbnail_link).to include(InstFS.app_host + "/thumbnails")
+      downloaded_file = open(file_link)
+      expect(downloaded_file.size).to be > 0
+    end
   end
 end
