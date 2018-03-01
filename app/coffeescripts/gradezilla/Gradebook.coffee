@@ -1642,11 +1642,10 @@ define [
       $('#gradebook-grid-wrapper').show()
       @uid = @gradebookGrid.grid.getUID()
 
-      $('#content').focus ->
-        $('#accessibility_warning').removeClass('screenreader-only')
       $('#accessibility_warning').focus ->
+        $('#accessibility_warning').removeClass('screenreader-only')
         $('#accessibility_warning').blur ->
-          $('#accessibility_warning').remove()
+          $('#accessibility_warning').addClass('screenreader-only')
 
       @$grid = $('#gradebook_grid')
         .fillWindowWithMe({

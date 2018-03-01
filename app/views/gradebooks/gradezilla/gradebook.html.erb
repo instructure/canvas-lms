@@ -29,13 +29,14 @@
 <div id="gradebook_wrapper">
   <h1 class="screenreader-only"><%= t('Gradebook') %></h1>
   <div class="assignment-gradebook-container hidden">
-    <div id="gradebook-toolbar" class="toolbar">
-      <div class="accessibility_warning">
+
+    <div class="accessibility_warning">
       <%= link_to t('Warning: For improved accessibility, please click here to use the Individual View Gradebook.'),
       context_url(@context, :change_gradebook_version_context_gradebook_url, :version => "srgb"),
         :id => "accessibility_warning", :class => "screenreader-only" %>
       </div>
 
+      <div id="gradebook-toolbar" class="toolbar">
       <div class="gradebook-menus">
         <span data-component="GradebookMenu" data-variant="DefaultGradebook"></span>
         <span data-component="ViewOptionsMenu"></span>
