@@ -271,3 +271,39 @@ test('should accept localized strings and return them fudged', () => {
   const fudged = $.fudgeDateForProfileTimezone('2015-08-03 22:06:00Z')
   equal(+parsed, +fudged)
 })
+
+QUnit.module('$.datepicker time picker', {
+  setup () {
+    this.container = document.createElement('div')
+    this.field = document.createElement('input')
+    this.container.appendChild(this.field)
+    document.body.appendChild(this.container)
+    $(this.field).datepicker({ timePicker: true })
+    $(this.field).focus()
+    this.$hour = $('.ui-datepicker-time-hour')
+    this.$ampm = $('.ui-datepicker-time-ampm')
+  },
+  teardown () {
+    document.body.removeChild(this.container)
+  }
+})
+
+test('sets ampm select to am if empty and hour is changed to 0', function () {
+  this.$hour.val('0').trigger('change')
+  equal(this.$ampm.val(), 'am')
+})
+
+test('sets ampm select to am if empty and hour is changed to 00', function () {
+  this.$hour.val('00').trigger('change')
+  equal(this.$ampm.val(), 'am')
+})
+
+test('sets ampm select to pm if empty and hour is changed to > 0', function () {
+  this.$hour.val('1').trigger('change')
+  equal(this.$ampm.val(), 'pm')
+})
+
+test('sets hour to 12 if ampm exists and hour is changed to 0', function () {
+  this.$hour.val('0').trigger('change')
+  equal(this.$hour.val(), '12')
+})

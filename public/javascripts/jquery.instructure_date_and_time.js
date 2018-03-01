@@ -210,7 +210,21 @@ import 'jqueryui/widget'
       $(document).delegate(".ui-datepicker-time-hour", 'change keypress focus blur', function(event) {
         var cur = $.datepicker._curInst;
         if(cur) {
-          var val = $(this).val();
+          const $this = $(this)
+          let val = $this.val();
+          const $ampm = $this.closest('.ui-datepicker-time').find(".ui-datepicker-time-ampm")
+          if (event.type === 'change' && val && $ampm.length && !$ampm.val()) {
+            let ampmVal
+            if (parseInt(val, 10) === 0) {
+              ampmVal = I18n.t('#time.am')
+              val = '12'
+              $this.val(val)
+            } else {
+              ampmVal = I18n.t('#time.pm')
+            }
+            $ampm.val(ampmVal)
+            cur.input.data('time-ampm', ampmVal);
+          }
           cur.input.data('time-hour', val);
         }
       }).delegate(".ui-datepicker-time-minute", 'change keypress focus blur', function(event) {
