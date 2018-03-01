@@ -145,7 +145,7 @@ module AssignmentOverrideApplicator
   def self.preload_student_ids_for_adhoc_overrides(adhoc_overrides, visible_user_ids)
     if adhoc_overrides.any?
       override_ids_to_student_ids = {}
-      scope = AssignmentOverrideStudent.where(assignment_override_id: adhoc_overrides)
+      scope = AssignmentOverrideStudent.where(assignment_override_id: adhoc_overrides).active
       scope = if ActiveRecord::Relation === visible_user_ids
           return adhoc_overrides if visible_user_ids.is_a?(ActiveRecord::NullRelation)
           scope.
@@ -177,7 +177,7 @@ module AssignmentOverrideApplicator
       overrides.first
     else
       key = assignment_or_quiz.is_a?(Quizzes::Quiz) ? :quiz_id : :assignment_id
-      AssignmentOverrideStudent.where(key => assignment_or_quiz, :user_id => user).first
+      AssignmentOverrideStudent.where(key => assignment_or_quiz, :user_id => user).active.first
     end
   end
 
@@ -198,8 +198,6 @@ module AssignmentOverrideApplicator
       else
         assignment_or_quiz.assignment_overrides.where(:set_type => 'Group', :set_id => group.id).first
       end
-    else
-      nil
     end
   end
 
@@ -410,7 +408,8 @@ module AssignmentOverrideApplicator
     ActiveRecord::Associations::Preloader.new.preload(assignments, [:quiz, :assignment_overrides])
 
     if assignments.any?
-      override_students = AssignmentOverrideStudent.where(:assignment_id => assignments, :user_id => user).index_by(&:assignment_id)
+      override_students =
+        AssignmentOverrideStudent.where(assignment_id: assignments, user_id: user).active.index_by(&:assignment_id)
       assignments.each do |a|
         a.preloaded_override_students ||= {}
         a.preloaded_override_students[user.id] = Array(override_students[a.id])
@@ -423,7 +422,7 @@ module AssignmentOverrideApplicator
     ActiveRecord::Associations::Preloader.new.preload(quizzes, :assignment_overrides)
 
     if quizzes.any?
-      override_students = AssignmentOverrideStudent.where(:quiz_id => quizzes, :user_id => user).index_by(&:quiz_id)
+      override_students = AssignmentOverrideStudent.where(quiz_id: quizzes, user_id: user).active.index_by(&:quiz_id)
       quizzes.each do |q|
         q.preloaded_override_students ||= {}
         q.preloaded_override_students[user.id] = Array(override_students[q.id])
