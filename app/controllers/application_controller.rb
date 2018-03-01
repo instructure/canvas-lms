@@ -369,6 +369,7 @@ class ApplicationController < ActionController::Base
   def logged_in_user
     @real_current_user || @current_user
   end
+  helper_method :logged_in_user
 
   def not_fake_student_user
     @current_user && @current_user.fake_student? ? logged_in_user : @current_user
@@ -1911,8 +1912,8 @@ class ApplicationController < ActionController::Base
   end
 
   def logout_current_user
-    @current_user.try(:stamp_logout_time!)
-    InstFS.logout(@current_user)
+    logged_in_user.try(:stamp_logout_time!)
+    InstFS.logout(logged_in_user)
     destroy_session
   end
 

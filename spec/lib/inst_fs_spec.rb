@@ -81,6 +81,16 @@ describe InstFS do
       expect(claims[:user_id]).to eql(user.global_id.to_s)
     end
 
+    it "includes distinct global acting_as_user_id claim in the token if acting_as provided" do
+      user1 = user_model
+      user2 = user_model
+      url = InstFS.authenticated_url(@attachment, user: user1, acting_as: user2)
+      token = url.split(/token=/).last
+      claims = Canvas::Security.decode_jwt(token, [ @secret ])
+      expect(claims[:user_id]).to eql(user1.global_id.to_s)
+      expect(claims[:acting_as_user_id]).to eql(user2.global_id.to_s)
+    end
+
     it "includes omits user_id claim in the token if no user provided" do
       url = InstFS.authenticated_url(@attachment)
       token = url.split(/token=/).last
@@ -129,6 +139,7 @@ describe InstFS do
   context "upload_preflight_json" do
     let(:context) { instance_double("Course", id: 1, global_id: 101, root_account: Account.default) }
     let(:user) { instance_double("User", id: 2, global_id: 102) }
+    let(:acting_as) { instance_double("User", id: 4, global_id: 104) }
     let(:folder) { instance_double("Folder", id: 3, global_id: 103) }
     let(:filename) { 'test.txt' }
     let(:content_type) { 'text/plain' }
@@ -140,6 +151,7 @@ describe InstFS do
       InstFS.upload_preflight_json(
         context: context,
         user: user,
+        acting_as: acting_as,
         folder: folder,
         filename: filename,
         content_type: content_type,
@@ -175,6 +187,11 @@ describe InstFS do
         Canvas::Security.decode_jwt(token, [ @secret ])
       end
 
+      it "embeds the user_id and acting_as_user_id in the token" do
+        expect(jwt['user_id']).to eq user.global_id.to_s
+        expect(jwt['acting_as_user_id']).to eq acting_as.global_id.to_s
+      end
+
       it "embeds a capture_url in the token" do
         expect(jwt['capture_url']).to eq capture_url
       end
@@ -191,8 +208,8 @@ describe InstFS do
           expect(capture_params['context_id']).to eq context.global_id.to_s
         end
 
-        it "include the user" do
-          expect(capture_params['user_id']).to eq user.global_id.to_s
+        it "include the acting_as user" do
+          expect(capture_params['user_id']).to eq acting_as.global_id.to_s
         end
 
         it "include the folder" do

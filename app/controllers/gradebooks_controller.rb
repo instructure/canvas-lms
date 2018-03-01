@@ -371,7 +371,7 @@ class GradebooksController < ApplicationController
         ),
         export_gradebook_csv_url: course_gradebook_csv_url,
         gradebook_csv_progress: @last_exported_gradebook_csv.try(:progress),
-        attachment_url: last_exported_attachment && last_exported_attachment.download_url_for_user(@current_user),
+        attachment_url: last_exported_attachment&.download_url_for_user(logged_in_user, @current_user),
         attachment: last_exported_attachment,
         sis_app_url: Setting.get('sis_app_url', nil),
         sis_app_token: Setting.get('sis_app_token', nil),

@@ -774,6 +774,7 @@ class Attachment < ActiveRecord::Base
     else
       # attachment_fu doesn't like the extra option when building s3 urls
       options.delete(:user)
+      options.delete(:acting_as)
       should_download = options.delete(:download)
       disposition = should_download ? "attachment" : "inline"
       options[:response_content_disposition] = "#{disposition}; #{disposition_filename}"
@@ -781,28 +782,24 @@ class Attachment < ActiveRecord::Base
     end
   end
 
-  def authenticated_url_for_user(user, **options)
-    authenticated_url(options.merge(user: user))
+  def download_url_for_user(user, acting_as, ttl = url_ttl)
+    authenticated_url(user: user, acting_as: acting_as, expires_in: ttl, download: true)
   end
 
-  def download_url_for_user(user, ttl = url_ttl)
-    authenticated_url_for_user(user, expires_in: ttl, download: true)
-  end
-
-  def inline_url_for_user(user, ttl = url_ttl)
-    authenticated_url_for_user(user, expires_in: ttl, download: false)
+  def inline_url_for_user(user, acting_as, ttl = url_ttl)
+    authenticated_url(user: user, acting_as: acting_as, expires_in: ttl, download: false)
   end
 
   def public_url(**options)
-    authenticated_url_for_user(nil, options)
+    authenticated_url(options.merge(user: nil))
   end
 
   def public_inline_url(ttl = url_ttl)
-    inline_url_for_user(nil, ttl)
+    authenticated_url(user: nil, expires_in: ttl, download: false)
   end
 
   def public_download_url(ttl = url_ttl)
-    download_url_for_user(nil, ttl)
+    authenticated_url(user: nil, expires_in: ttl, download: true)
   end
 
   def url_ttl

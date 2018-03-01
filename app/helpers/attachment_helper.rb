@@ -72,9 +72,9 @@ module AttachmentHelper
       send_file_headers!( :length=> attachment.s3object.content_length, :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type_with_encoding)
       render body: attachment.s3object.get.body.read
     elsif inline
-      redirect_to attachment.inline_url_for_user(@current_user)
+      redirect_to attachment.inline_url_for_user(logged_in_user, @current_user)
     else
-      redirect_to attachment.download_url_for_user(@current_user)
+      redirect_to attachment.download_url_for_user(logged_in_user, @current_user)
     end
   end
 

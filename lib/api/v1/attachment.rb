@@ -228,7 +228,8 @@ module Api::V1::Attachment
       else
         json = InstFS.upload_preflight_json(
           context: context,
-          user: @current_user,
+          user: logged_in_user,
+          acting_as: @current_user,
           domain_root_account: @domain_root_account,
           folder: folder,
           filename: infer_upload_filename(params),

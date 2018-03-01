@@ -667,10 +667,7 @@ class SubmissionsController < ApplicationController
 
     respond_to do |format|
       if attachment.zipped?
-        if Attachment.s3_storage?
-          format.html { redirect_to attachment.inline_url_for_user(@current_user) }
-          format.zip { redirect_to attachment.inline_url_for_user(@current_user) }
-        else
+        if attachment.stored_locally?
           cancel_cache_buster
 
           format.html do
@@ -686,6 +683,10 @@ class SubmissionsController < ApplicationController
               :disposition => 'inline'
             })
           end
+        else
+          inline_url = attachment.inline_url_for_user(logged_in_user, @current_user)
+          format.html { redirect_to inline_url }
+          format.zip { redirect_to inline_url }
         end
         format.json { render :json => attachment.as_json(:methods => :readable_size) }
       else

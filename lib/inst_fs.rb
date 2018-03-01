@@ -61,12 +61,12 @@ module InstFS
       Base64.decode64(setting("secret"))
     end
 
-    def upload_preflight_json(context:, user:, folder:, filename:, content_type:, quota_exempt:, on_duplicate:, capture_url:, domain_root_account:)
-      token = upload_jwt(user, capture_url, domain_root_account.domain,
+    def upload_preflight_json(context:, user:, acting_as:, folder:, filename:, content_type:, quota_exempt:, on_duplicate:, capture_url:, domain_root_account:)
+      token = upload_jwt(user, acting_as, capture_url, domain_root_account.domain,
         context_type: context.class.to_s,
         context_id: context.global_id.to_s,
-        user_id: user.global_id.to_s,
-        folder_id: folder && folder.global_id.to_s,
+        user_id: acting_as.global_id.to_s,
+        folder_id: folder&.global_id.to_s,
         root_account_id: context.respond_to?(:root_account) && context.root_account.global_id.to_s,
         quota_exempt: !!quota_exempt,
         on_duplicate: on_duplicate)
@@ -132,24 +132,32 @@ module InstFS
     def access_jwt(attachment, options={})
       expires_in = Setting.get('instfs.access_jwt.expiration_hours', '24').to_i.hours
       expires_in = options[:expires_in] || expires_in
-      Canvas::Security.create_jwt({
+      claims = {
         iat: Time.now.utc.to_i,
         user_id: options[:user]&.global_id&.to_s,
         resource: attachment.instfs_uuid,
         host: Attachment.domain_namespace_account.domain,
-      }, expires_in.from_now, self.jwt_secret)
+      }
+      if options[:acting_as] && options[:acting_as] != options[:user]
+        claims[:acting_as_user_id] = options[:acting_as].global_id.to_s
+      end
+      Canvas::Security.create_jwt(claims, expires_in.from_now, self.jwt_secret)
     end
 
-    def upload_jwt(user, capture_url, host, capture_params)
+    def upload_jwt(user, acting_as, capture_url, host, capture_params)
       expires_in = Setting.get('instfs.upload_jwt.expiration_minutes', '10').to_i.minutes
-      Canvas::Security.create_jwt({
+      claims = {
         iat: Time.now.utc.to_i,
         user_id: user.global_id.to_s,
         resource: upload_url,
         capture_url: capture_url,
         host: host,
         capture_params: capture_params
-      }, expires_in.from_now, self.jwt_secret)
+      }
+      unless acting_as == user
+        claims[:acting_as_user_id] = acting_as.global_id.to_s
+      end
+      Canvas::Security.create_jwt(claims, expires_in.from_now, self.jwt_secret)
     end
 
     def direct_upload_jwt(host)
