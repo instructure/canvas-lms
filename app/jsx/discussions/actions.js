@@ -23,15 +23,11 @@ import $ from 'jquery'
 import * as apiClient from './apiClient'
 import { createPaginationActions } from '../shared/reduxPagination'
 
-function fetchDiscussions(dispatch, getState, payload) {
-  return (resolve, reject) => {
-    apiClient.getDiscussions(getState(), payload)
-      .then(resolve)
-      .catch(err => reject({ err, message: I18n.t('An error ocurred while loading discussions') }))
-  }
+const getDiscussionOpts = {
+  fetchAll: true,
+  headThunk: apiClient.headDiscussions,
 }
-
-const discussionActions = createPaginationActions('discussions', fetchDiscussions)
+const discussionActions = createPaginationActions('discussions', apiClient.getDiscussions, getDiscussionOpts)
 
 const types = [
   ...discussionActions.actionTypes,

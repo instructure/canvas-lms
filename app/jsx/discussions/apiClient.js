@@ -19,22 +19,31 @@
 import axios from 'axios'
 import { encodeQueryString } from '../shared/queryString'
 
-export function getDiscussions ({ contextType, contextId, discussions }, { page }) {
+function discussionQueryString(contextType, page) {
   const params = [
     { per_page: 40 },
     { plain_messages: true },
     { exclude_assignment_descriptions: true },
     { exclude_context_module_locked_topics: true },
-    { page: page || discussions.currentPage }, // TODO get all discussions. See COMMS-851
+    { page },
   ]
 
   if (contextType === 'course') {
     params.push({ 'include[]': 'sections_user_count' })
     params.push({ 'include[]': 'sections' })
   }
+  return encodeQueryString(params)
+}
 
-  const queryString = encodeQueryString(params)
+export function getDiscussions ({ contextType, contextId }, { page }) {
+  const queryString = discussionQueryString(contextType, page)
   return axios.get(`/api/v1/${contextType}s/${contextId}/discussion_topics?${queryString}`)
+}
+
+export function headDiscussions ({ contextType, contextId}) {
+  const page = 1
+  const queryString = discussionQueryString(contextType, page)
+  return axios.head(`/api/v1/${contextType}s/${contextId}/discussion_topics?${queryString}`)
 }
 
 export function updateDiscussion ({ contextType, contextId }, discussion, updatedFields) {

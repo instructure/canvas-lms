@@ -15,10 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import flatMap from 'lodash/flatMap'
 
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import parseLinkHeader from './helpers/parseLinkHeader'
+import makePromisePool from '../shared/makePromisePool'
 
 const DEFAULT_PAGE = 1
 
@@ -174,6 +176,34 @@ function wrapGetPageThunk (actions, name, thunk) {
   }
 }
 
+function fetchAllEntries(actions, headThunk, getThunk) {
+  return () => (dispatch, getState) => {
+    dispatch({ type: actions.start, payload: { page: 1 }})
+    const state = getState()
+
+    headThunk(state)
+      .then(headResults => {
+        const links = parseLinkHeader(headResults)
+        const lastPage = Number(/[&?]page=([0-9]+)&/.exec(links.last)[1])
+        const pages = Array(lastPage).fill().map((_, i) => i+1)
+        const makePromise = (page) => getThunk(state, { page })
+        return makePromisePool(pages, makePromise)
+      })
+      .then(getResults => {
+        const allDiscussions = flatMap(getResults.successes, (e) => e.res.data)
+        const successPayload = {
+          page: 1,
+          lastPage: 1,
+          data: allDiscussions,
+        }
+        dispatch({ type: actions.success, payload: successPayload})
+      })
+      .catch(err => {
+        dispatch({ type: actions.fail, payload: { page: 1, ...err } })
+      })
+  }
+}
+
 /**
  * Creates actions types and action creators for paginating a set of data
  *
@@ -188,6 +218,7 @@ function wrapGetPageThunk (actions, name, thunk) {
  *
  * @param {string} name name of the data set
  * @param {function} thunk function that will get our data
+ * @param {Object} options
  *
  * thunk must follow a promise-like interface:
  * @example
@@ -208,14 +239,27 @@ function wrapGetPageThunk (actions, name, thunk) {
  *
  * // calls fetchItems but dispatches START/SUCCESS/FAIL to store for the page
  * itemActions.actionCreators.getItems({ page: 3 })
+ *
+ * This also supports getting all paginated items at once. They will be stored
+ * as a single page in the redux store. To use this, you need to pass in
+ * `fetchAll` and a thunk that performs a HEAD request to your target
+ * endpoint. The endpoint must also support link headers, which contain how
+ * many pages need to be gathered.
  */
-export function createPaginationActions (name, thunk) {
+export function createPaginationActions (name, thunk, opts = {}) {
+  const fetchAll = opts.fetchAll || false
+  const headThunk = opts.headThunk
+
   const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1)
   const actionTypes = createActionTypes(name)
+  const fetchFunction = fetchAll
+    ? () => fetchAllEntries(actionTypes, headThunk, thunk)
+    : () => wrapGetPageThunk(actionTypes, name, thunk)
+
   return {
     actionTypes: Object.keys(actionTypes).map(key => actionTypes[key]),
     actionCreators: {
-      [`get${capitalizedName}`]: wrapGetPageThunk(actionTypes, name, thunk),
+      [`get${capitalizedName}`]: fetchFunction()
     },
   }
 }
