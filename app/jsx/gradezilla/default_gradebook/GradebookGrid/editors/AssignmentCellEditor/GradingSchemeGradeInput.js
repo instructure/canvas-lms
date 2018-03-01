@@ -214,13 +214,12 @@ export default class GradingSchemeInput extends Component {
         <div className="Grid__AssignmentRowCell__GradingSchemeMenu">
           <PopoverMenu
             contentRef={this.props.menuContentRef}
-            disabled={this.props.disabled}
             onClose={this.props.onMenuClose}
             onToggle={this.handleToggle}
             onSelect={this.handleSelect}
             placement="bottom"
             trigger={
-              <Button buttonRef={this.bindButton} size="small" variant="icon">
+              <Button buttonRef={this.bindButton} disabled={this.props.disabled} size="small" variant="icon">
                 <IconArrowOpenDownLine title={I18n.t('Open Grading Scheme menu')} />
               </Button>
             }

@@ -90,7 +90,7 @@ export default class AssignmentCellEditor {
    * SlickGrid Editor Interface Method (required)
    */
   serializeValue () {
-    return this.component.serializeValue();
+    return null;
   }
 
   /*
@@ -99,7 +99,6 @@ export default class AssignmentCellEditor {
    * @param {object} item – The data object for the row.
    */
   loadValue(/* item */) {
-    this.component.loadValue();
     this.renderComponent();
   }
 

@@ -191,21 +191,13 @@ QUnit.module('AssignmentCellEditor', (suiteHooks) => {
   });
 
   QUnit.module('#serializeValue', () => {
-    test('returns the result of calling .serializeValue on the AssignmentRowCell component', function () {
+    test('returns null', function () {
       createEditor();
-      sinon.stub(editor.component, 'serializeValue').returns('9.7');
-      strictEqual(editor.serializeValue(), '9.7');
+      strictEqual(editor.serializeValue(), null);
     });
   });
 
   QUnit.module('#loadValue', () => {
-    test('calls .loadValue on the AssignmentRowCell component', () => {
-      createEditor();
-      sinon.spy(editor.component, 'loadValue');
-      editor.loadValue()
-      strictEqual(editor.component.loadValue.callCount, 1);
-    });
-
     test('renders the component', () => {
       createEditor();
       sinon.stub(editor, 'renderComponent');

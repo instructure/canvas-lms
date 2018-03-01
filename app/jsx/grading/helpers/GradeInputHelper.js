@@ -156,7 +156,7 @@ function parseForPoints(value, options) {
 
 function parseForPassFail(value, options) {
   const cleanValue = value.toLowerCase()
-  const result = {enteredAs: 'passFail', grade: cleanValue, valid: true}
+  const result = {enteredAs: 'passFail', excused: false, grade: cleanValue, valid: true}
 
   if (cleanValue === 'complete') {
     result.score = options.pointsPossible || 0

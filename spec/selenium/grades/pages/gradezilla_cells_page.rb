@@ -39,12 +39,16 @@ class Gradezilla
         f("#{grading_cell_selector(student, assignment)} input[type='text']")
       end
 
-      def grading_cell_scheme_menu_button(student, assignment)
-        f("#{grading_cell_selector(student, assignment)} .Grid__AssignmentRowCell__GradingSchemeMenu button")
+      def grading_cell_menu_button(student, assignment, menu_selector:)
+        f("#{grading_cell_selector(student, assignment)} .Grid__AssignmentRowCell__#{menu_selector}Menu button")
       end
 
       def get_grade(student, assignment)
         grading_cell(student, assignment).text
+      end
+
+      def get_complete_incomplete_icon(student, assignment)
+        f("#{grading_cell_selector(student, assignment)} .Grid__AssignmentRowCell__CompleteIncompleteValue svg")
       end
 
       # TODO: remove with GRADE-76
@@ -65,9 +69,17 @@ class Gradezilla
       end
 
       def select_scheme_grade(student, assignment, grade)
-        f(grading_cell_selector(student, assignment)).click
+        select_grade_from_menu(student, assignment, grade, 'GradingScheme')
+      end
 
-        button = grading_cell_scheme_menu_button(student, assignment)
+      def select_complete_incomplete_grade(student, assignment, grade)
+        select_grade_from_menu(student, assignment, grade, 'CompleteIncomplete')
+      end
+
+      def select_grade_from_menu(student, assignment, grade, menu_selector)
+        grading_cell(student, assignment).click
+
+        button = grading_cell_menu_button(student, assignment, menu_selector: menu_selector)
         button.click
 
         grade_item = ff("ul[aria-labelledby='#{button.attribute('id')}'] li").detect do |element|
@@ -75,7 +87,7 @@ class Gradezilla
         end
         grade_item.click
 
-        grading_cell_input(student, assignment).send_keys(:return) # commit the grade change
+        button.send_keys(:down) # commit the grade change
       end
 
       def send_keyboard_shortcut(student, assignment, key)

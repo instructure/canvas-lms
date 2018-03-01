@@ -22,7 +22,6 @@ import ApplyTheme from '@instructure/ui-core/lib/components/ApplyTheme'
 import Button from '@instructure/ui-core/lib/components/Button'
 import Text from '@instructure/ui-core/lib/components/Text'
 import TextInput from '@instructure/ui-core/lib/components/TextInput'
-import SubmissionCell from 'compiled/gradezilla/SubmissionCell'
 import IconExpandLeftLine from 'instructure-icons/lib/Line/IconExpandLeftLine'
 import I18n from 'i18n!gradebook'
 import InvalidGradeIndicator from '../GradebookGrid/editors/AssignmentCellEditor/InvalidGradeIndicator'
@@ -99,13 +98,7 @@ export default class AssignmentRowCell extends Component {
   }
 
   componentDidMount() {
-    if (this.props.enterGradesAs === 'passFail') {
-      // eslint-disable-next-line new-cap
-      this.submissionCell = new SubmissionCell.pass_fail({
-        ...this.props.editorOptions,
-        container: this.contentContainer
-      })
-    } else if (!this.props.submissionIsUpdating && this.trayButton !== document.activeElement) {
+    if (!this.props.submissionIsUpdating && this.trayButton !== document.activeElement) {
       this.gradeInput.focus()
     }
   }
@@ -115,19 +108,12 @@ export default class AssignmentRowCell extends Component {
       prevProps.submissionIsUpdating && !this.props.submissionIsUpdating
 
     if (
-      this.props.enterGradesAs !== 'passFail' &&
       submissionFinishedUpdating &&
       this.trayButton !== document.activeElement
     ) {
       // the cell was reactivated while the grade was updating
       // set the focus on the input by default
       this.gradeInput.focus()
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.submissionCell) {
-      this.submissionCell.destroy()
     }
   }
 
@@ -170,36 +156,15 @@ export default class AssignmentRowCell extends Component {
   }
 
   focus() {
-    if (this.submissionCell) {
-      this.submissionCell.focus()
-    } else {
-      this.gradeInput.focus()
-    }
+    this.gradeInput.focus()
   }
 
-  gradeSubmission(item, state) {
-    if (this.props.enterGradesAs === 'passFail') {
-      this.submissionCell.applyValue(item, state)
-    } else {
-      this.props.onGradeSubmission(this.props.submission, this.gradeInput.gradeInfo)
-    }
+  gradeSubmission() {
+    this.props.onGradeSubmission(this.props.submission, this.gradeInput.gradeInfo)
   }
 
   isValueChanged() {
-    if (this.props.enterGradesAs === 'passFail') {
-      return this.submissionCell.isValueChanged()
-    }
     return this.gradeInput.hasGradeChanged()
-  }
-
-  loadValue() {
-    if (this.submissionCell) {
-      this.submissionCell.loadValue()
-    }
-  }
-
-  serializeValue() {
-    return this.submissionCell ? this.submissionCell.serializeValue() : null
   }
 
   render() {
@@ -223,17 +188,15 @@ export default class AssignmentRowCell extends Component {
           </div>
 
           <div className="Grid__AssignmentRowCell__Content" ref={this.bindContainerRef}>
-            {this.props.enterGradesAs !== 'passFail' && (
-              <GradeInput
-                assignment={this.props.assignment}
-                enterGradesAs={this.props.enterGradesAs}
-                disabled={this.props.submissionIsUpdating}
-                gradingScheme={this.props.gradingScheme}
-                pendingGradeInfo={this.props.pendingGradeInfo}
-                ref={this.bindGradeInput}
-                submission={this.props.submission}
-              />
-            )}
+            <GradeInput
+              assignment={this.props.assignment}
+              enterGradesAs={this.props.enterGradesAs}
+              disabled={this.props.submissionIsUpdating}
+              gradingScheme={this.props.gradingScheme}
+              pendingGradeInfo={this.props.pendingGradeInfo}
+              ref={this.bindGradeInput}
+              submission={this.props.submission}
+            />
           </div>
 
           <div className="Grid__AssignmentRowCell__EndContainer">

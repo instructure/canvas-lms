@@ -642,6 +642,16 @@ $gradebook_cell_padding_top: 8px;
   }
 }
 
+.Grid__AssignmentRowCell__CompleteIncompleteValue {
+  display: flex;
+  flex-grow: 1;
+  justify-content: center;
+
+  svg {
+    display: flex;
+  }
+}
+
 .Grid__AssignmentRowCell__EndText {
   align-items: center;
   box-sizing: border-box;
@@ -656,6 +666,7 @@ $gradebook_cell_padding_top: 8px;
   white-space: nowrap;
 }
 
+.Grid__AssignmentRowCell__CompleteIncompleteMenu,
 .Grid__AssignmentRowCell__GradingSchemeMenu,
 .Grid__AssignmentRowCell__Options {
   align-items: center;
@@ -666,6 +677,7 @@ $gradebook_cell_padding_top: 8px;
   width: $cell-icon-width;
 }
 
+.Grid__AssignmentRowCell__CompleteIncompleteMenu,
 .Grid__AssignmentRowCell__GradingSchemeMenu {
   flex-basis: auto;
   flex-grow: 0;

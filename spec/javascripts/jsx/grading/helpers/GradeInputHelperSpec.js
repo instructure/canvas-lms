@@ -1211,7 +1211,15 @@ QUnit.module('GradeInputHelper', () => {
         strictEqual(parseTextValue('EX').excused, true)
       })
 
-      test('sets excused to false for any other value', () => {
+      test('sets excused to false when the value is "complete"', () => {
+        strictEqual(parseTextValue('complete').excused, false)
+      })
+
+      test('sets excused to false when the value is "incomplete"', () => {
+        strictEqual(parseTextValue('incomplete').excused, false)
+      })
+
+      test('sets excused to false for invalid values', () => {
         strictEqual(parseTextValue('E X').excused, false)
       })
 

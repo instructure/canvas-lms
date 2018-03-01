@@ -87,6 +87,50 @@ QUnit.module('GradeInput', suiteHooks => {
     strictEqual(getTextInputValue(), 'Excused')
   })
 
+  QUnit.module('when the "enter grades as" setting is "passFail"', contextHooks => {
+    const getInputValue = () =>
+      wrapper.find('.Grid__AssignmentRowCell__CompleteIncompleteValue').node.textContent
+
+    contextHooks.beforeEach(() => {
+      props.enterGradesAs = 'passFail'
+      props.submission.enteredGrade = 'complete'
+      props.submission.enteredScore = 10
+    })
+
+    test('renders a button trigger for the menu', () => {
+      mountComponent()
+      const button = wrapper.find('.Grid__AssignmentRowCell__CompleteIncompleteMenu button')
+      strictEqual(button.length, 1)
+    })
+
+    test('sets the input value to "–" when the submission is not graded and not excused', () => {
+      props.submission.enteredGrade = null
+      props.submission.enteredScore = null
+      mountComponent()
+      strictEqual(getInputValue(), '–')
+    })
+
+    test('sets the input value to "Excused" when the submission is excused', () => {
+      props.submission.enteredGrade = null
+      props.submission.enteredScore = null
+      props.submission.excused = true
+      mountComponent()
+      strictEqual(getInputValue(), 'Excused')
+    })
+
+    test('sets the value to "Complete" when the submission is complete', () => {
+      mountComponent()
+      strictEqual(getInputValue(), 'Complete')
+    })
+
+    test('sets the value to "Incomplete" when the submission is inccomplete', () => {
+      props.submission.enteredGrade = 'incomplete'
+      props.submission.enteredScore = 0
+      mountComponent()
+      strictEqual(getInputValue(), 'Incomplete')
+    })
+  })
+
   QUnit.module('when the "enter grades as" setting is "points"', contextHooks => {
     contextHooks.beforeEach(() => {
       props.enterGradesAs = 'points'
@@ -324,7 +368,13 @@ QUnit.module('GradeInput', suiteHooks => {
 
     QUnit.module('when the submission has a pending grade', hooks => {
       hooks.beforeEach(() => {
-        props.pendingGradeInfo = {enteredAs: 'points', excused: false, grade: 'B', score: 8.6, valid: true}
+        props.pendingGradeInfo = {
+          enteredAs: 'points',
+          excused: false,
+          grade: 'B',
+          score: 8.6,
+          valid: true
+        }
         mountComponent()
       })
 

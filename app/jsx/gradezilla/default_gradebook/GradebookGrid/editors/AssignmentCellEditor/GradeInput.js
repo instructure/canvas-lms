@@ -20,12 +20,13 @@ import React, {Component} from 'react'
 import {bool, instanceOf, oneOf, number, shape, string} from 'prop-types'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import I18n from 'i18n!gradebook'
+import CompleteIncompleteGradeInput from './CompleteIncompleteGradeInput'
 import GradingSchemeGradeInput from './GradingSchemeGradeInput'
 import TextGradeInput from './TextGradeInput'
 
 const CLASSNAME_FOR_ENTER_GRADES_AS = {
   gradingScheme: 'Grid__AssignmentRowCell__GradingSchemeInput',
-  passFail: 'Grid__AssignmentRowCell__PassFailInput',
+  passFail: 'Grid__AssignmentRowCell__CompleteIncompleteInput',
   percent: 'Grid__AssignmentRowCell__PercentInput',
   points: 'Grid__AssignmentRowCell__PointsInput'
 }
@@ -34,6 +35,9 @@ function inputComponentFor(enterGradesAs) {
   switch(enterGradesAs) {
     case 'gradingScheme': {
       return GradingSchemeGradeInput
+    }
+    case 'passFail': {
+      return CompleteIncompleteGradeInput
     }
     default: {
       return TextGradeInput
@@ -48,7 +52,7 @@ export default class GradeInput extends Component {
     }).isRequired,
     disabled: bool,
     enterGradesAs: oneOf(['gradingScheme', 'passFail', 'percent', 'points']).isRequired,
-    gradingScheme: instanceOf(Array).isRequired,
+    gradingScheme: instanceOf(Array),
     pendingGradeInfo: shape({
       excused: bool.isRequired,
       grade: string,
@@ -63,6 +67,7 @@ export default class GradeInput extends Component {
 
   static defaultProps = {
     disabled: false,
+    gradingScheme: null,
     pendingGradeInfo: null
   }
 

@@ -149,6 +149,13 @@ QUnit.module('GradeInput using GradingSchemeGradeInput', suiteHooks => {
     strictEqual(input.prop('disabled'), true)
   })
 
+  test('optionally disables the menu button', () => {
+    props.disabled = true
+    mountComponent()
+    const button = wrapper.find('button').node
+    strictEqual(button.disabled, true)
+  })
+
   test('sets as the input value the grade corresponding to the entered score', () => {
     props.submission = {...props.submission, enteredScore: 7.8, enteredGrade: 'C+'}
     mountComponent()
@@ -600,7 +607,7 @@ QUnit.module('GradeInput using GradingSchemeGradeInput', suiteHooks => {
       strictEqual(getGradeInfo().excused, true)
     })
 
-    QUnit.module('when an grading scheme option is clicked', hooks => {
+    QUnit.module('when a grading scheme option is clicked', hooks => {
       hooks.beforeEach(() => {
         mountComponent()
         return openAndClick('B+')

@@ -252,24 +252,22 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
         props.enterGradesAs = 'passFail'
       })
 
-      test('renders an "pass_fail" SubmissionCell', () => {
+      test('renders a GradeInput', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.node.submissionCell.constructor, SubmissionCell.pass_fail)
+        strictEqual(wrapper.find('GradeInput').length, 1)
       })
 
-      test('renders the SubmissionCell within the AssignmentRowCell', () => {
+      test('sets focus on the button', () => {
         wrapper = mountComponent()
-        ok(
-          wrapper.node.contentContainer.querySelector('.gradebook-cell'),
-          'container includes a gradebook cell'
-        )
+        const node = wrapper.find('GradeInput button')
+        strictEqual(node.getDOMNode(), document.activeElement)
       })
 
-      test('includes editor options when rendering the SubmissionCell', () => {
-        wrapper = mountComponent();
-        deepEqual(wrapper.node.submissionCell.opts.item, props.editorOptions.item)
-      });
-    });
+      test('does not render end text', () => {
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__AssignmentRowCell__EndText').length, 0)
+      })
+    })
   });
 
   QUnit.module('#handleKeyDown', () => {
@@ -355,70 +353,23 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
         })
       })
     })
-
-    QUnit.module('with a SubmissionCell', hooks => {
-      hooks.beforeEach(() => {
-        props.enterGradesAs = 'passFail'
-      })
-
-      test('skips SlickGrid default behavior when tabbing from grade input', () => {
-        wrapper = mountComponent();
-        wrapper.node.submissionCell.focus();
-        const continueHandling = simulateKeyDown(9, false); // tab to tray button trigger
-        strictEqual(continueHandling, false);
-      });
-
-      test('skips SlickGrid default behavior when shift-tabbing from tray button', () => {
-        wrapper = mountComponent();
-        wrapper.node.trayButton.focus();
-        const continueHandling = simulateKeyDown(9, true); // shift+tab back to grade input
-        strictEqual(continueHandling, false);
-      });
-
-      test('does not skip SlickGrid default behavior when tabbing from tray button', () => {
-        wrapper = mountComponent();
-        wrapper.node.trayButton.focus();
-        const continueHandling = simulateKeyDown(9, false); // tab into next cell
-        equal(typeof continueHandling, 'undefined');
-      });
-
-      test('does not skip SlickGrid default behavior when shift-tabbing from grade input', () => {
-        wrapper = mountComponent();
-        wrapper.node.submissionCell.focus();
-        const continueHandling = simulateKeyDown(9, true); // shift+tab out of grid
-        equal(typeof continueHandling, 'undefined');
-      });
-
-      test('skips SlickGrid default behavior when entering into tray button', () => {
-        wrapper = mountComponent();
-        wrapper.node.trayButton.focus();
-        const continueHandling = simulateKeyDown(13); // enter into tray button
-        strictEqual(continueHandling, false);
-      });
-
-      test('does not skip SlickGrid default behavior when pressing enter on grade input', () => {
-        wrapper = mountComponent();
-        wrapper.node.submissionCell.focus();
-        const continueHandling = simulateKeyDown(13); // enter on grade input (commit editor)
-        equal(typeof continueHandling, 'undefined');
-      });
-    });
   });
 
   QUnit.module('#focus', () => {
-    test('sets focus on the text input for a GradeInput', () => {
+    test('sets focus on the text input, if one exists, for a GradeInput', () => {
       props.assignment.gradingType = 'points'
       wrapper = mountComponent()
       wrapper.node.focus()
-      const node = wrapper.find('GradeInput input')
-      strictEqual(node.getDOMNode(), document.activeElement)
+      const input = wrapper.find('GradeInput input')
+      strictEqual(input.node, document.activeElement)
     })
 
-    test('sets focus on the button for a Complete/Incomplete SubmissionCell', () => {
+    test('sets focus on the button for a GradeInput if no text input exists', () => {
       props.enterGradesAs = 'passFail'
       wrapper = mountComponent()
       wrapper.node.focus()
-      strictEqual(document.activeElement, wrapper.node.submissionCell.$input[0])
+      const button = wrapper.find('GradeInput button')
+      strictEqual(button.node, document.activeElement)
     })
   })
 
@@ -428,45 +379,6 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
       wrapper = mountComponent()
       sinon.stub(wrapper.find('GradeInput').node, 'hasGradeChanged').returns(true)
       strictEqual(wrapper.node.isValueChanged(), true)
-    })
-
-    test('delegates to the "isValueChanged" method for a Complete/Incomplete SubmissionCell', () => {
-      props.enterGradesAs = 'passFail'
-      wrapper = mountComponent()
-      sinon.stub(wrapper.node.submissionCell, 'isValueChanged').returns(true)
-      strictEqual(wrapper.node.isValueChanged(), true)
-    })
-  })
-
-  QUnit.module('#serializeValue', () => {
-    test('returns null', () => {
-      props.assignment.gradingType = 'points'
-      wrapper = mountComponent()
-      strictEqual(wrapper.node.serializeValue(), null)
-    })
-
-    test('delegates to the "serializeValue" method for a Complete/Incomplete SubmissionCell', () => {
-      props.enterGradesAs = 'passFail'
-      wrapper = mountComponent()
-      sinon.stub(wrapper.node.submissionCell, 'serializeValue').returns('9.7')
-      strictEqual(wrapper.node.serializeValue(), '9.7')
-    })
-  })
-
-  QUnit.module('#loadValue', () => {
-    test('ignores the absence of a SubmissionCell', () => {
-      props.assignment.gradingType = 'points'
-      wrapper = mountComponent()
-      wrapper.node.loadValue()
-      ok(true, 'SubmissionCell is not assumed')
-    })
-
-    test('delegates to the "loadValue" method for a Complete/Incomplete SubmissionCell', () => {
-      props.enterGradesAs = 'passFail'
-      wrapper = mountComponent()
-      sinon.spy(wrapper.node.submissionCell, 'loadValue')
-      wrapper.node.loadValue()
-      strictEqual(wrapper.node.submissionCell.loadValue.callCount, 1)
     })
   })
 
@@ -493,26 +405,7 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
       wrapper.setProps({submissionIsUpdating: false})
       strictEqual(document.activeElement, button)
     })
-
-    test('does not change focus when the "enter grades as" setting is "passFail"', () => {
-      props.enterGradesAs = 'passFail'
-      props.submissionIsUpdating = true
-      wrapper = mountComponent()
-      const previousFocusElement = document.activeElement
-      wrapper.setProps({submissionIsUpdating: false})
-      strictEqual(document.activeElement, previousFocusElement)
-    })
   })
-
-  QUnit.module('#componentWillUnmount', () => {
-    test('destroys the SubmissionCell when present', () => {
-      props.enterGradesAs = 'passFail'
-      wrapper = mountComponent();
-      sinon.spy(wrapper.node.submissionCell, 'destroy');
-      wrapper.unmount();
-      strictEqual(wrapper.node.submissionCell.destroy.callCount, 1);
-    });
-  });
 
   QUnit.module('"Toggle Tray" Button', () => {
     const buttonSelector = '.Grid__AssignmentRowCell__Options button'
