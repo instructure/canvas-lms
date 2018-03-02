@@ -126,6 +126,35 @@ describe AccountAuthorizationConfig::SAML do
       expect(saml).not_to be_valid
       expect(saml.metadata_uri).to eq AccountAuthorizationConfig::SAML::InCommon::URN
     end
+
+    it "overwrite sig_alg field as appropriate" do
+      # defaults to RSA-SHA256
+      saml = AccountAuthorizationConfig::SAML.new
+      expect(saml.sig_alg).to eq SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA256
+
+      entity = SAML2::Entity.new
+      idp = SAML2::IdentityProvider.new
+      entity.roles << idp
+
+      # not specified; ignore
+      saml.populate_from_metadata(entity)
+      expect(saml.sig_alg).to eq SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA256
+
+      # don't overwrite when requested
+      idp.want_authn_requests_signed = true
+      saml.populate_from_metadata(entity)
+      expect(saml.sig_alg).to eq SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA256
+
+      # always sets to nil if they don't want them signed
+      idp.want_authn_requests_signed = false
+      saml.populate_from_metadata(entity)
+      expect(saml.sig_alg).to be_nil
+
+      # defaults to RSA-SHA1 when we don't have a value
+      idp.want_authn_requests_signed = true
+      saml.populate_from_metadata(entity)
+      expect(saml.sig_alg).to eq SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA1
+    end
   end
 
   describe '.resolve_saml_key_path' do
