@@ -485,7 +485,7 @@ class Attachment < ActiveRecord::Base
       # I've added the root_account_id accessor above, but I didn't verify there
       # isn't any code still accessing the namespace for the account id directly.
       ns = root_attachment.try(:namespace) if root_attachment_id
-      ns ||= Attachment.domain_namespace
+      ns ||= Attachment.current_namespace
       ns ||= self.context.root_account.file_namespace rescue nil
       ns ||= self.context.account.file_namespace rescue nil
       if Rails.env.development? && Attachment.local_storage?
@@ -1621,17 +1621,22 @@ class Attachment < ActiveRecord::Base
     file
   end
 
-  def self.domain_namespace=(val)
-    @domain_namespace = val
+  def self.current_root_account=(account)
+    # TODO rename to @current_root_account
+    @domain_namespace = account
   end
 
-  def self.domain_namespace
+  def self.current_root_account
+    @domain_namespace
+  end
+
+  def self.current_namespace
     @domain_namespace.respond_to?(:file_namespace) ? @domain_namespace.file_namespace : @domain_namespace
   end
 
-  def self.domain_namespace_account
-    @domain_namespace
-  end
+  # deprecated
+  def self.domain_namespace=(val); self.current_root_account = val; end
+  def self.domain_namespace; self.current_namespace; end
 
   def self.serialization_methods; [:mime_class, :currently_locked, :crocodoc_available?]; end
   cattr_accessor :skip_thumbnails

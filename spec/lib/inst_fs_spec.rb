@@ -31,7 +31,7 @@ describe InstFS do
         'app-host' => @app_host,
         'secret' => Base64.encode64(@secret)
       })
-    allow(Attachment).to receive(:domain_namespace_account).and_return(double(domain: 'mydomain'))
+    allow(Attachment).to receive(:current_root_account).and_return(double(domain: 'mydomain'))
   end
 
   it "returns decoded base 64 secret" do

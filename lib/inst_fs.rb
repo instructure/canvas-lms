@@ -136,7 +136,7 @@ module InstFS
         iat: Time.now.utc.to_i,
         user_id: options[:user]&.global_id&.to_s,
         resource: attachment.instfs_uuid,
-        host: Attachment.domain_namespace_account.domain,
+        host: Attachment.current_root_account.domain
       }
       if options[:acting_as] && options[:acting_as] != options[:user]
         claims[:acting_as_user_id] = options[:acting_as].global_id.to_s

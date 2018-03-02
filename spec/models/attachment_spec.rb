@@ -1117,7 +1117,7 @@ describe Attachment do
     end
 
     it "should immediately infer the namespace if not yet set" do
-      Attachment.domain_namespace = nil
+      Attachment.current_root_account = nil
       @a = Attachment.new(:context => @course)
       expect(@a).to be_new_record
       expect(@a.read_attribute(:namespace)).to be_nil
@@ -1127,7 +1127,7 @@ describe Attachment do
     end
 
     it "should not infer the namespace if it's not a new record" do
-      Attachment.domain_namespace = nil
+      Attachment.current_root_account = nil
       attachment_model(:context => submission_model)
       expect(@attachment).not_to be_new_record
       expect(@attachment.read_attribute(:namespace)).to be_nil
@@ -1139,7 +1139,7 @@ describe Attachment do
       specs_require_sharding
 
       it "stores a local id on the birth shard" do
-        Attachment.domain_namespace = Account.default
+        Attachment.current_root_account = Account.default
         att = Attachment.new
         att.infer_namespace
         expect(att.namespace).to eq Account.default.asset_string
@@ -1154,7 +1154,7 @@ describe Attachment do
         att = nil
         @shard1.activate do
           a = Account.create!
-          Attachment.domain_namespace = a
+          Attachment.current_root_account = a
           att = Attachment.new
           att.infer_namespace
           expect(att.namespace).to eq a.global_asset_string
@@ -1176,7 +1176,7 @@ describe Attachment do
       end
 
       it "stores ID for a cross-shard attachment" do
-        Attachment.domain_namespace = Account.default
+        Attachment.current_root_account = Account.default
         att = nil
         @shard1.activate do
           att = Attachment.new
@@ -1266,7 +1266,7 @@ describe Attachment do
 
     before :each do
       s3_storage!
-      Attachment.domain_namespace = @old_account.file_namespace
+      Attachment.current_root_account = @old_account
       @root = attachment_model(filename: 'unknown 2.loser')
       @child = attachment_model(:root_attachment => @root)
 
@@ -1420,7 +1420,7 @@ describe Attachment do
 
     context "instfs attachment" do
       before do
-        allow(Attachment).to receive(:domain_namespace_account).and_return(double(domain: 'mydomain'))
+        allow(Attachment).to receive(:current_root_account).and_return(double(domain: 'mydomain'))
         allow(InstFS).to receive(:enabled?).and_return true
         allow(InstFS).to receive(:jwt_secret).and_return 'secret'
         allow(InstFS).to receive(:app_host).and_return 'instfs'
