@@ -3,7 +3,8 @@ require_relative './linter'
 
 linter_options = {
   linter_name: "eslint",
-  file_regex: /\.js$/,
+  # ignore packages subdirectory
+  file_regex: /^(?!(?:packages\/)).*\.js$/,
   format: "eslint",
   command: "node_modules/.bin/eslint",
   campsite_mode: false,
@@ -18,3 +19,17 @@ linter_options = {
 
 eslint = Linter.new(linter_options)
 eslint.run
+
+puts "Linting sub-packages"
+
+linter_options[:command] = "yarn lint"
+linter_options[:base_dir] = "../../"
+package_dirs = `ls -1 packages/*/package.json 2> /dev/null`.split(/\n/).map { |d| d.sub("/package.json", "")}
+cwd = Dir.pwd
+package_dirs.each do |d|
+  puts "working sub-package dir #{d}"
+  Dir.chdir d
+  linter_options[:file_regex] = /#{d}\/.*\.js$/
+  eslint = Linter.new(linter_options)
+  eslint.run
+end
