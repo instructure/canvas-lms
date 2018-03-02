@@ -624,7 +624,7 @@ nn:
       account_reports: 
         ccp: 
           filter_online: 
-            check_box: "Berre undervisning på nettet"
+            check_box: "Berre undervising på nettet"
     confirm_delete_user: 
       confirm_delete: "Er du sikker på at du vil slette denne brukaren frå kontoen %{account}? Det fjernar brukardataa (inkludert karakterar) frå alle emne og grupper. Du kan ikkje angre kommandoen."
       delete_button: "slett %{user}"
@@ -1147,7 +1147,7 @@ nn:
       tab_settings: Innstillingar
       transifex_message: "Bli med i [Canvas Translation Community](%{transifex_url})"
       turnitin_comments_help: "desse kommentarane blir viste til studentar når dei leverer inn ei Turnitin-aktivert oppgåve"
-      turnitin_pledge_help: "studentane må merke av eit felt som viser at dei samtykkjer i løftet"
+      turnitin_pledge_help: "studentane må krysse av for å vise at dei samtykkjer i løftet"
       turnitin_settings_title: Turnitin-innstillingar
       update_settings_button: "Oppdater innstillingar"
     show: 
@@ -1517,7 +1517,7 @@ nn:
   after_last_attempt_c9168da2: "Etter siste forsøk"
   after_the_assignment_is_graded_53754607: "Etter at oppgåva er karaktersett"
   after_the_due_date_eee89c9c: "Etter innleveringsfristen"
-  ahead_21f22939: Kommande
+  ahead_21f22939: Komande
   ajax_errors: 
     error_heading: "AJAX-feil: %{status_code}"
     errors: 
@@ -5863,7 +5863,7 @@ nn:
       principal: Rektor
       provost: Rektor
       school_administrator: Institusjonsleiar
-      school_technology_coordinator: "Koordinator for undervisningsteknologi"
+      school_technology_coordinator: "Koordinator for undervisingsteknologi"
       sign_up_to_canvas: "Skriv under og prøv Canvas"
       south_america_central_america_and_caribbean: "Sør-Afrika, Mellom-Amerika og Karibia"
       student: Student
@@ -12113,7 +12113,7 @@ nn:
         url: URL-adresse
         user_agent: Brukaragent
   page_views_eb64cf53: Sidevisingar
-  page_views_only_312b7577: "Kun sidevisningar"
+  page_views_only_312b7577: "Kun sidevisingar"
   pages: 
     cancel_button: Avbryt
     cannot_unpublish_front_page: "Kan ikkje avslutte publisering av startsida"
@@ -18054,7 +18054,7 @@ nn:
   you_can_try_to_log_in_again_2b23ef0f: "Du kan prøve å *logge på igjen*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Du kan oppdatere noko av denne brukaren sin informasjon, men dei kan endre det om dei vil."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Du kan bruke ei enkelt ico-fil på 16 x 16, 32 x 32, 48 x 48."
-  you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "Ved å bruke \"Kva-skjer-dersom\"-utrekning, kan du vurdere korleis karakterane dine vert påverka av kommande innleveringar eller innleveringar som leverast på nytt. Du kan rekne ut resultat for ei oppgåve som allereie har fått ei vurdering, eller ei oppgåve som ikkje er vurdert enno. "
+  you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "Ved å bruke \"Kva-skjer-dersom\"-utrekning, kan du vurdere korleis karakterane dine vert påverka av komande innleveringar eller innleveringar som leverast på nytt. Du kan rekne ut resultat for ei oppgåve som allereie har fått ei vurdering, eller ei oppgåve som ikkje er vurdert enno. "
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Du kan ikkje tilordne ei gruppe utanfor oppgåva sitt gruppesett"
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Du kan ikkje redigere emne for denne underkontoen."
   you_cannot_remove_this_enrollment_c87be1cb: "Du kan ikkje fjerne denne påmeldinga."
