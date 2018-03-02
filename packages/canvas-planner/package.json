@@ -39,7 +39,7 @@
   "author": "Instructure, Inc.",
   "license": "AGPL-3.0",
   "dependencies": {
-    "@instructure/ui-core": "^4.7.1",
+    "@instructure/ui-core": "^4.7.2",
     "axios": "^0.16.0",
     "babel-plugin-inline-react-svg": "^0.4.0",
     "change-case": "^3.0.1",

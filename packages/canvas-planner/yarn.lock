@@ -79,12 +79,12 @@
   version "4.7.1"
   resolved "https://registry.yarnpkg.com/@instructure/postcss-themeable-styles/-/postcss-themeable-styles-4.7.1.tgz#61e3f6c7d162039cb3c19b77a5c1a8f6c8ef685c"
 
-"@instructure/ui-core@^4.7.1":
-  version "4.7.1"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-core/-/ui-core-4.7.1.tgz#05f48e7f5eb469c97850bd517c266a13e2a9ec5b"
+"@instructure/ui-core@^4.7.2":
+  version "4.7.2"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-core/-/ui-core-4.7.2.tgz#82b3652923eafcc575c32bfbbce4f1fc605b4ee1"
   dependencies:
-    "@instructure/ui-themeable" "^4.7.1"
-    "@instructure/ui-utils" "^4.7.1"
+    "@instructure/ui-themeable" "^4.7.2"
+    "@instructure/ui-utils" "^4.7.2"
     bowser "^1.7.0"
     classnames "^2.2.5"
     decimal.js "^7.2.1"
@@ -181,11 +181,11 @@
     sinon "^4.1.2"
     sinon-chai "^2.12.0"
 
-"@instructure/ui-themeable@^4.7.1":
-  version "4.7.1"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-themeable/-/ui-themeable-4.7.1.tgz#fe99079b8748391e939b98bf5e662d6e69d71206"
+"@instructure/ui-themeable@^4.7.2":
+  version "4.7.2"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-themeable/-/ui-themeable-4.7.2.tgz#2c4365d1a035f3064fde74e4fbab339a8492f59f"
   dependencies:
-    "@instructure/ui-utils" "^4.7.1"
+    "@instructure/ui-utils" "^4.7.2"
     bowser "^1.7.0"
     deep-equal "^1.0.1"
     glamor "^2.20.37"
@@ -196,9 +196,9 @@
   version "4.7.1"
   resolved "https://registry.yarnpkg.com/@instructure/ui-themes/-/ui-themes-4.7.1.tgz#b4b51ddea50d94e83517297b46e470f5a2755e1a"
 
-"@instructure/ui-utils@^4.7.1":
-  version "4.7.1"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-utils/-/ui-utils-4.7.1.tgz#93884d08cfecbc55c510a52dc71b70918ff14c4b"
+"@instructure/ui-utils@^4.7.2":
+  version "4.7.2"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-utils/-/ui-utils-4.7.2.tgz#79ae4671989d11ac15ab228e388ec10bf702c7fc"
   dependencies:
     bowser "^1.7.0"
     decimal.js "^7.2.1"
@@ -9770,10 +9770,10 @@ webpack-dev-server@^2.9.4:
     sockjs "0.3.19"
     sockjs-client "1.1.4"
     spdy "^3.4.1"
-    strip-ansi "^3.0.0"
+    strip-ansi "^4.0.0"
     supports-color "^5.1.0"
     webpack-dev-middleware "1.12.2"
-    yargs "6.6.0"
+    yargs "^10.0.3"
 
 webpack-sources@^1.0.1:
   version "1.1.0"
@@ -10017,6 +10017,24 @@ yargs-parser@^8.0.0:
   dependencies:
     camelcase "^4.1.0"
 
+yargs@6.6.0, yargs@^6.0.0:
+  version "6.6.0"
+  resolved "https://registry.yarnpkg.com/yargs/-/yargs-6.6.0.tgz#782ec21ef403345f830a808ca3d513af56065208"
+  dependencies:
+    camelcase "^3.0.0"
+    cliui "^3.2.0"
+    decamelize "^1.1.1"
+    get-caller-file "^1.0.1"
+    os-locale "^1.4.0"
+    read-pkg-up "^1.0.1"
+    require-directory "^2.1.1"
+    require-main-filename "^1.0.1"
+    set-blocking "^2.0.0"
+    string-width "^1.0.2"
+    which-module "^1.0.0"
+    y18n "^3.2.1"
+    yargs-parser "^4.2.0"
+
 yargs@^10.0.3:
   version "10.0.3"
   resolved "https://registry.yarnpkg.com/yargs/-/yargs-10.0.3.tgz#6542debd9080ad517ec5048fb454efe9e4d4aaae"
@@ -10045,24 +10063,6 @@ yargs@^3.21.0:
     string-width "^1.0.1"
     window-size "^0.1.4"
     y18n "^3.2.0"
-
-yargs@6.6.0, yargs@^6.0.0:
-  version "6.6.0"
-  resolved "https://registry.yarnpkg.com/yargs/-/yargs-6.6.0.tgz#782ec21ef403345f830a808ca3d513af56065208"
-  dependencies:
-    camelcase "^3.0.0"
-    cliui "^3.2.0"
-    decamelize "^1.1.1"
-    get-caller-file "^1.0.1"
-    os-locale "^1.4.0"
-    read-pkg-up "^1.0.1"
-    require-directory "^2.1.1"
-    require-main-filename "^1.0.1"
-    set-blocking "^2.0.0"
-    string-width "^1.0.2"
-    which-module "^1.0.0"
-    y18n "^3.2.1"
-    yargs-parser "^4.2.0"
 
 yargs@^8.0.2:
   version "8.0.2"

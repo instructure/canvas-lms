@@ -88,7 +88,7 @@
     normalize-path "^2.0.1"
     through2 "^2.0.3"
 
-"@instructure/ui-core@^4.1.0", "@instructure/ui-core@^4.7.1", "@instructure/ui-core@^4.7.2":
+"@instructure/ui-core@^4.1.0", "@instructure/ui-core@^4.7.2":
   version "4.7.2"
   resolved "https://registry.yarnpkg.com/@instructure/ui-core/-/ui-core-4.7.2.tgz#82b3652923eafcc575c32bfbbce4f1fc605b4ee1"
   dependencies:
@@ -2151,7 +2151,7 @@ caniuse-lite@^1.0.30000792, caniuse-lite@^1.0.30000805, caniuse-lite@^1.0.300008
 "canvas-planner@file:./packages/canvas-planner/copy-of-what-gets-published-to-npm-registry":
   version "1.0.16"
   dependencies:
-    "@instructure/ui-core" "^4.7.1"
+    "@instructure/ui-core" "^4.7.2"
     axios "^0.16.0"
     babel-plugin-inline-react-svg "^0.4.0"
     change-case "^3.0.1"
