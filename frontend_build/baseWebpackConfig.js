@@ -289,7 +289,7 @@ module.exports = {
 
     // don't include any of the moment locales in the common bundle (otherwise it is huge!)
     // we load them explicitly onto the page in include_js_bundles from rails.
-    new webpack.IgnorePlugin(/^\.\/locale$/, /^moment$/),
+    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
 
     // outputs a json file so Rails knows which hash fingerprints to add to each script url
     new ManifestPlugin({fileName: 'webpack-manifest.json'}),
