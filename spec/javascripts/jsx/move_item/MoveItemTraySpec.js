@@ -66,42 +66,39 @@ test('close sets the state.open to false', () => {
   notOk(instance.state.open)
 })
 
-test('closing the tray calls onExited', (assert) => {
-  const done = assert.async()
+test('closing the tray calls onExited', () => {
   const props = defaultProps()
   props.onExited = sinon.spy()
   const tree = enzyme.mount(<MoveItemTray {...props} />)
   const instance = tree.instance()
+  const clock = sinon.useFakeTimers()
   instance.close()
-  setTimeout(() => {
-    ok(props.onExited.calledOnce)
-    done()
-  }, 500)
+  clock.tick(500)
+  ok(props.onExited.calledOnce)
+  clock.restore()
 })
 
-test('onMoveSelect calls onMoveSuccess with move data', (assert) => {
-  const done = assert.async()
+test('onMoveSelect calls onMoveSuccess with move data', () => {
   const props = defaultProps()
   props.onMoveSuccess = sinon.spy()
   const tree = enzyme.mount(<MoveItemTray {...props} />)
   const instance = tree.instance()
+  const clock = sinon.useFakeTimers()
   instance.onMoveSelect({ order: ['1', '2', '3'], groupId: '5', itemIds: ['2'] })
-  setTimeout(() => {
-    ok(props.onMoveSuccess.calledWith, { data: ['1', '2', '3'], groupId: '5', itemIda: ['2'] })
-    done()
-  })
+  clock.tick(500)
+  ok(props.onMoveSuccess.calledWith, { data: ['1', '2', '3'], groupId: '5', itemIda: ['2'] })
+  clock.restore()
 })
 
-test('calls onFocus on the result of focusOnExit on close', (assert) => {
-  const done = assert.async()
+test('calls onFocus on the result of focusOnExit on close', () => {
   const focusItem = { focus: sinon.spy() }
   const props = defaultProps()
   props.focusOnExit = () => focusItem
   const tree = enzyme.mount(<MoveItemTray {...props} />)
   const instance = tree.instance()
+  const clock = sinon.useFakeTimers()
   instance.close()
-  setTimeout(() => {
-    ok(focusItem.focus.calledOnce)
-    done()
-  }, 500)
+  clock.tick(500)
+  ok(focusItem.focus.calledOnce)
+  clock.restore()
 })

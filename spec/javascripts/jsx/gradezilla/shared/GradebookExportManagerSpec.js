@@ -29,13 +29,18 @@ define([
     attachmentId: 'attachmentId'
   };
 
+  let qunitTimeout
+
   QUnit.module('GradebookExportManager - constructor', {
     setup () {
+      qunitTimeout = QUnit.config.testTimeout
+      QUnit.config.testTimeout = 1500
       moxios.install();
     },
 
     teardown () {
       moxios.uninstall();
+      QUnit.config.testTimeout = qunitTimeout
     }
   });
 
@@ -77,6 +82,8 @@ define([
 
   QUnit.module('GradebookExportManager - monitoringUrl', {
     setup () {
+      qunitTimeout = QUnit.config.testTimeout
+      QUnit.config.testTimeout = 1500
       moxios.install();
 
       this.subject = new GradebookExportManager(exportingUrl, currentUserId, workingExport);
@@ -86,6 +93,7 @@ define([
       moxios.uninstall();
 
       this.subject = undefined;
+      QUnit.config.testTimeout = qunitTimeout
     }
   });
 
@@ -107,6 +115,8 @@ define([
 
   QUnit.module('GradebookExportManager - attachmentUrl', {
     setup () {
+      qunitTimeout = QUnit.config.testTimeout
+      QUnit.config.testTimeout = 1500
       moxios.install();
 
       this.subject = new GradebookExportManager(exportingUrl, currentUserId, workingExport);
@@ -116,6 +126,7 @@ define([
       moxios.uninstall();
 
       this.subject = undefined;
+      QUnit.config.testTimeout = qunitTimeout
     }
   });
 
@@ -137,6 +148,8 @@ define([
 
   QUnit.module('GradebookExportManager - startExport', {
     setup () {
+      qunitTimeout = QUnit.config.testTimeout
+      QUnit.config.testTimeout = 1500
       moxios.install();
 
       const expectedExportFromServer = {
@@ -156,6 +169,7 @@ define([
 
       this.subject.clearMonitor();
       this.subject = undefined;
+      QUnit.config.testTimeout = qunitTimeout
     }
   });
 
@@ -202,8 +216,7 @@ define([
     });
   });
 
-  test('starts polling for progress and returns a rejected promise on progress failure', function (assert) {
-    const done = assert.async();
+  test('starts polling for progress and returns a rejected promise on progress failure', function () {
     const expectedMonitoringUrl = `${monitoringBase}/newProgressId`;
 
     this.subject = new GradebookExportManager(exportingUrl, currentUserId, null, 1);
@@ -218,12 +231,10 @@ define([
 
     return this.subject.startExport().catch((reason) => {
       equal(reason, 'Error exporting gradebook: Arbitrary failure');
-      done();
     });
   });
 
-  test('starts polling for progress and returns a rejected promise on unknown progress status', function (assert) {
-    const done = assert.async();
+  test('starts polling for progress and returns a rejected promise on unknown progress status', function () {
     const expectedMonitoringUrl = `${monitoringBase}/newProgressId`;
 
     this.subject = new GradebookExportManager(exportingUrl, currentUserId, null, 1);
@@ -238,12 +249,10 @@ define([
 
     return this.subject.startExport().catch((reason) => {
       equal(reason, 'Error exporting gradebook: Pattern buffer degradation');
-      done();
     });
   });
 
-  test('starts polling for progress and returns a fulfilled promise on progress completion', function (assert) {
-    const done = assert.async();
+  test('starts polling for progress and returns a fulfilled promise on progress completion', function () {
     const expectedMonitoringUrl = `${monitoringBase}/newProgressId`;
     const expectedAttachmentUrl = `${attachmentBase}/newAttachmentId`;
 
@@ -272,7 +281,6 @@ define([
         updatedAt: '2009-01-20T17:00:00Z'
       };
       deepEqual(resolution, expectedResolution);
-      done();
     });
   });
 });
