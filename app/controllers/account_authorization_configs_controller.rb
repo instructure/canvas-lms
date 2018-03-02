@@ -99,6 +99,11 @@
 #           "example": "nameid",
 #           "type": "string"
 #         },
+#         "sig_alg": {
+#           "description": "Valid for SAML providers.",
+#           "example": "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
+#           "type": "string"
+#         },
 #         "jit_provisioning": {
 #           "description": "Just In Time provisioning. Valid for all providers except Canvas (which has the similar in concept self_registration setting).",
 #           "type": "boolean"
@@ -557,6 +562,16 @@ class AccountAuthorizationConfigsController < ApplicationController
   # - requested_authn_context [Optional]
   #
   #   The SAML AuthnContext
+  #
+  # - sig_alg [Optional]
+  #
+  #   If set, +AuthnRequest+, +LogoutRequest+, and +LogoutResponse+ messages
+  #   are signed with the corresponding algorithm. Supported algorithms are:
+  #
+  #   - {http://www.w3.org/2000/09/xmldsig#rsa-sha1}
+  #   - {http://www.w3.org/2001/04/xmldsig-more#rsa-sha256}
+  #
+  #   RSA-SHA1 and RSA-SHA256 are acceptable aliases.
   #
   # - federated_attributes [Optional]
   #
