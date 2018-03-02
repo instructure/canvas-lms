@@ -28,4 +28,18 @@ describe Plannable do
       expect(announcement.send(:root_account_for_model, announcement)).to eq @account
     end
   end
+
+  context 'planner_override_for' do
+    before :once do
+      course_with_student(active_all: true)
+    end
+
+    it 'should not return deleted overrides' do
+      assignment = assignment_model
+      override = assignment.planner_overrides.create!(user: @student)
+      override.destroy!
+      expect(override.workflow_state).to eq 'deleted'
+      expect(assignment.planner_override_for(@student)).to be_nil
+    end
+  end
 end

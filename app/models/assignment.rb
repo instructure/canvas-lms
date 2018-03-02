@@ -2162,6 +2162,17 @@ class Assignment < ActiveRecord::Base
           assignment_overrides.due_at BETWEEN ? AND ?', start, ending, start, ending)
   }
 
+  scope :due_between_for_user, -> (start, ending, user) do
+    with_user_due_date(user).where(user_due_date: start..ending)
+  end
+
+  scope :with_user_due_date, -> (user) do
+    from("(SELECT s.cached_due_date AS user_due_date, a.*
+          FROM #{Assignment.quoted_table_name} a
+          INNER JOIN #{Submission.quoted_table_name} AS s ON s.assignment_id = a.id
+          WHERE s.user_id = #{User.connection.quote(user)} AND s.workflow_state <> 'deleted') AS assignments")
+  end
+
   scope :updated_after, lambda { |*args|
     if args.first
       where("assignments.updated_at IS NULL OR assignments.updated_at>?", args.first)
