@@ -116,6 +116,9 @@ describe SisBatch do
       ])
       expect(batch.reload).to be_imported
       expect(batch.parallel_importers.group(:importer_type).count).to eq({"course" => 2, "user" => 2})
+      expect(batch.parallel_importers.order(:id).pluck(:importer_type, :rows_processed)).to eq [
+        ['course', 2], ['course', 2], ['user', 2], ['user', 1]
+      ]
       expect(Pseudonym.where(:sis_user_id => %w{user_1 user_2 user_3}).count).to eq 3
       expect(Course.where(:sis_source_id => %w{course_1 course_2 course_3 course_4}).count).to eq 4
     end
