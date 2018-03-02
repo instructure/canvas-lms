@@ -221,7 +221,8 @@ module SIS
           att = parallel_importer.attachment
           file = att.open
           parallel_importer.start
-          count = importerObject.process(:fullpath => file.path, :file => att.display_name)
+          csv = {:fullpath => file.path, :file => att.display_name}
+          count = importerObject.process(csv, parallel_importer.index, parallel_importer.batch_size)
           update_progress # just update progress on completetion - the parallel jobs should be short enough
           parallel_importer.complete(:rows_processed => count)
         rescue => e
