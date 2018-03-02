@@ -81,6 +81,23 @@ module InstFS
       }
     end
 
+    def direct_upload(host:, file_name:, file_object:)
+      # example of a call to direct_upload:
+      # > res = InstFS.direct_upload(
+      # >   host: "canvas.docker",
+      # >   file_name: "a.png",
+      # >   file_object: File.open("public/images/a.png")
+      # > )
+
+      token = direct_upload_jwt(host)
+      url = "#{app_host}/files?token=#{token}"
+
+      data = {}
+      data[file_name] = file_object
+
+      CanvasHttp.post(url, form_data: data, multipart:true)
+    end
+
     private
     def setting(key)
       Canvas::DynamicSettings.find(service: "inst-fs", default_ttl: 5.minutes)[key]
@@ -132,6 +149,16 @@ module InstFS
         capture_url: capture_url,
         host: host,
         capture_params: capture_params
+      }, expires_in.from_now, self.jwt_secret)
+    end
+
+    def direct_upload_jwt(host)
+      expires_in = Setting.get('instfs.upload_jwt.expiration_minutes', '10').to_i.minutes
+      Canvas::Security.create_jwt({
+        iat: Time.now.utc.to_i,
+        user_id: nil,
+        host: host,
+        resource: "/files",
       }, expires_in.from_now, self.jwt_secret)
     end
 
