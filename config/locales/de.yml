@@ -5991,19 +5991,19 @@ de:
       tomorrow: Morgen
       yesterday: Gestern
     formats: 
-      date_at_time: "%b %-d um %l:%M%P"
-      default: "%Y-%m-%d"
-      full: "%b %-d, %Y %-l:%M%P"
-      full_with_weekday: "%a %b %-d, %Y %-l:%M%P"
-      long: "%B %-d, %Y"
-      long_with_weekday: "%A, %B %-d"
-      medium: "%b %-d, %Y"
+      date_at_time: "%-d %b um %k:%M"
+      default: "%d/%m/%Y"
+      full: "%-d %b, %Y %-k:%M"
+      full_with_weekday: "%a %-d %b, %Y %-k:%M"
+      long: "%-d %B, %Y"
+      long_with_weekday: "%A, %-d %B"
+      medium: "%-d %b, %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %b %-d, %Y"
-      short: "%b %-d"
+      medium_with_weekday: "%a %-d %b, %Y"
+      short: "%-d %b"
       short_month: "%b"
       short_weekday: "%a"
-      short_with_weekday: "%a, %b %-d"
+      short_with_weekday: "%a, %-d %b"
       weekday: "%A"
     month_names: 
       - ~
@@ -12760,7 +12760,7 @@ de:
   number: 
     currency: 
       format: 
-        delimiter: ","
+        delimiter: "."
         format: "%u%n"
         precision: 2
         separator: ","
@@ -12768,7 +12768,7 @@ de:
         strip_insignificant_zeros: false
         unit: $
     format: 
-      delimiter: ","
+      delimiter: "."
       precision: 3
       separator: ","
       significant: false
@@ -18210,8 +18210,8 @@ de:
       default: "%a, %d %b %Y %H:%M:%S %z"
       long: "%B %d, %Y %H:%M"
       short: "%d %b %H:%M"
-      tiny: "%l:%M%P"
-      tiny_on_the_hour: "%l%P"
+      tiny: "%k:%M"
+      tiny_on_the_hour: "%k:%M"
     less_than_a_minute_ago: "vor weniger als einer Minute"
     pm: nachmittags
     ranges: 
