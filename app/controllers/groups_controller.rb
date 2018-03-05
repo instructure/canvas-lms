@@ -281,7 +281,7 @@ class GroupsController < ApplicationController
           categories_json = @categories.map{ |cat| group_category_json(cat, @current_user, session, include: ["progress_url", "unassigned_users_count", "groups_count"]) }
           uncategorized = @context.groups.active.uncategorized.to_a
           if uncategorized.present?
-            json = group_category_json(GroupCategory.uncategorized.preload(:root_account), @current_user, session)
+            json = group_category_json(GroupCategory.uncategorized(context: @context), @current_user, session)
             json["groups"] = uncategorized.map{ |group| group_json(group, @current_user, session) }
             categories_json << json
           end

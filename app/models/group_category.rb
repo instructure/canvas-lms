@@ -107,8 +107,10 @@ class GroupCategory < ActiveRecord::Base
       role_category_for_context('communities', context)
     end
 
-    def uncategorized
-      GroupCategory.new(name: name_for_role('uncategorized'), role: 'uncategorized')
+    def uncategorized(context: nil)
+      gc = GroupCategory.new(name: name_for_role('uncategorized'), role: 'uncategorized', context: context)
+      gc.set_root_account_id
+      gc
     end
 
     protected
