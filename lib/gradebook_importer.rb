@@ -86,7 +86,19 @@ class GradebookImporter
     @students = []
     @pp_row = []
 
+    is_first_row = true
+    had_email_column = false
+
     csv_stream do |row|
+      if is_first_row
+        if !row[2].blank? && row[2].strip.downcase == 'email'
+          had_email_column = true
+        end
+        is_first_row = false
+      end
+      if had_email_column
+        row.delete_at(2) # delete the email column because we added that to export for informational purposes and it is irrelevant on import and throws off the column count in future code
+      end
       already_processed = check_for_non_student_row(row)
       unless already_processed
         @students << process_student(row)

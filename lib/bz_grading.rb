@@ -37,7 +37,7 @@
   # adjust for special past due partial credit rule
   score = 0.0
   response_object["audit_trace"].each do |at|
-    if at["points_given"]
+    if at["points_changed"]
       score += at["points_amount"]
     elsif at["points_reason"] == "past_due"
       score += at["points_possible"] / 2
