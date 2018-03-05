@@ -37,7 +37,7 @@ describe OutcomeImportsApiController, type: :request do
 
   it 'should kick off an outcome import via multipart attachment' do
     json = nil
-    strand = "OutcomeImport\#run::shard.#{@account.root_account.shard.id}"
+    strand = "OutcomeImport::run::#{@account.root_account.global_id}"
     expect do
       json = api_call(:post,
             "/api/v1/accounts/#{@account.id}/outcome_imports",

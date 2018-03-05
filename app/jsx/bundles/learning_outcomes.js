@@ -85,7 +85,8 @@ toolbar.on('start_sync', (file) => showOutcomesImporter({
   file,
   disableOutcomeViews,
   resetOutcomeViews,
-  mount: content.$el[0]
+  mount: content.$el[0],
+  contextUrlRoot: ENV.CONTEXT_URL_ROOT,
 }))
 
 // sidebar events

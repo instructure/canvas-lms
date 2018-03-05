@@ -110,7 +110,7 @@ describe OutcomeImport, type: :model do
       end
     end
 
-    it 'destroys content and sets proper workflow_state on successful completion' do
+    it 'sets proper workflow_state on successful completion' do
       mock_importer([
         { progress: 0, errors: [] },
         { progress: 100, errors: [] }
@@ -124,6 +124,109 @@ describe OutcomeImport, type: :model do
       expect(import.outcome_import_errors.all.to_a).to eq([])
       expect(import.progress).to eq(100)
       expect(import.workflow_state).to eq('succeeded')
+    end
+
+    it 'emails user on successful completion' do
+      mock_importer([
+        { progress: 0, errors: [] },
+        { progress: 100, errors: [] }
+      ])
+
+      attachment = fake_attachment(fake_file)
+      import = fake_import(attachment)
+      import.user = user_factory
+      import.save!
+      message = Message.new
+      expect(message).to receive(:communication_channel=).with(import.user.email_channel).and_call_original
+      expect(message).to receive(:user=).with(import.user).and_call_original
+      expect(Message).to receive(:new).with({
+        to: import.user.email,
+        from: "notifications@instructure.com",
+        subject: 'Outcomes Import Completed',
+        body: "Hello #{import.user.name},
+
+          Your outcomes were successfully imported. You can now manage them at http://localhost/accounts/#{@account.id}/outcomes
+
+          Thank you,
+          Instructure".gsub(/^ +/, ''),
+        delay_for: 0,
+        context: nil,
+        path_type: 'email',
+        from_name: "Instructure Canvas"
+      }).and_return(message)
+      expect(message).to receive(:deliver)
+      import.run
+    end
+
+    it 'emails user on failed completion' do
+      mock_importer([
+        { progress: 0, errors: [] },
+        { progress: 50, errors: [[1, 'Very Bad Error']] },
+        { progress: 100, errors: [] }
+      ])
+
+      attachment = fake_attachment(fake_file)
+      import = fake_import(attachment)
+      import.user = user_factory
+      import.save!
+      message = Message.new
+      expect(message).to receive(:communication_channel=).with(import.user.email_channel).and_call_original
+      expect(message).to receive(:user=).with(import.user).and_call_original
+      expect(Message).to receive(:new).with({
+        to: import.user.email,
+        from: "notifications@instructure.com",
+        subject: 'Outcomes Import Failed',
+        body: "Hello #{import.user.name},
+
+          Your outcomes import failed due to 1 error with your import. Please examine your file and attempt the upload again at http://localhost/accounts/#{@account.id}/outcomes
+
+          The following errors occurred:
+          Row 1: Very Bad Error
+
+          Thank you,
+          Instructure".gsub(/^ +/, ''),
+        delay_for: 0,
+        context: nil,
+        path_type: 'email',
+        from_name: "Instructure Canvas"
+      }).and_return(message)
+      expect(message).to receive(:deliver)
+      import.run
+    end
+
+    it 'limits the number of errors emailed on failed completion' do
+      mock_importer([
+        { progress: 0, errors: [] },
+        { progress: 50, errors: [[1, 'Very Bad Error']] * 200 },
+        { progress: 100, errors: [] }
+      ])
+
+      attachment = fake_attachment(fake_file)
+      import = fake_import(attachment)
+      import.user = user_factory
+      import.save!
+      message = Message.new
+      expect(message).to receive(:communication_channel=).with(import.user.email_channel).and_call_original
+      expect(message).to receive(:user=).with(import.user).and_call_original
+      expect(Message).to receive(:new).with({
+        to: import.user.email,
+        from: "notifications@instructure.com",
+        subject: 'Outcomes Import Failed',
+        body: "Hello #{import.user.name},
+
+          Your outcomes import failed due to 200 errors with your import. Please examine your file and attempt the upload again at http://localhost/accounts/#{@account.id}/outcomes
+
+          Here are the first 100 errors that occurred:
+          #{"Row 1: Very Bad Error\n" * 100}
+          Thank you,
+          Instructure".gsub(/^ +/, ''),
+        delay_for: 0,
+        context: nil,
+        path_type: 'email',
+        from_name: "Instructure Canvas"
+      }).and_return(message)
+      expect(message).to receive(:deliver)
+      import.run
     end
 
     it 'sets outcome_import_errors' do

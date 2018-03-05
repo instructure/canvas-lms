@@ -101,11 +101,9 @@ class OutcomeImport < ApplicationRecord
   end
 
   def schedule
-    send_later_enqueue_args(:run, singleton: delayed_job_strand)
-  end
-
-  def delayed_job_strand
-    "OutcomeImport\#run::shard.#{root_account.shard.id}"
+    send_later_enqueue_args(:run, {
+      strand: "OutcomeImport::run::#{root_account.global_id}"
+    })
   end
 
   def run
@@ -120,7 +118,7 @@ class OutcomeImport < ApplicationRecord
           self.update!(progress: status[:progress])
         end
 
-        if outcome_import_errors.count == 0
+        if error_count == 0
           job_completed!
         else
           job_failed!
@@ -131,15 +129,85 @@ class OutcomeImport < ApplicationRecord
         raise
       ensure
         file.close
+        notify_user
       end
     end
   end
 
   def add_error(row, error)
-    OutcomeImportError.create!(
-      outcome_import: self,
+    outcome_import_errors.create!(
       row: row,
       message: error
     )
+  end
+
+  private
+
+  def notify_user
+    return unless user
+
+    subject, body = import_message_body
+    message = Message.new({
+      to: user.email,
+      from: "notifications@instructure.com",
+      subject: subject,
+      body: body,
+      delay_for: 0,
+      context: nil,
+      path_type: 'email',
+      from_name: "Instructure Canvas"
+    })
+    message.communication_channel = user.email_channel
+    message.user = user
+    message.save
+    message.deliver
+  end
+
+  def error_count
+    return outcome_import_errors.count unless succeeded? || failed?
+    @error_count ||= outcome_import_errors.loaded? ? outcome_import_errors.size : outcome_import_errors.count
+  end
+
+  def n_errors(n = 25)
+    if outcome_import_errors.loaded?
+      outcome_import_errors[0, n].map { |e| [e.row, e.message] }
+    else
+      outcome_import_errors.limit(n).pluck(:row, :message)
+    end
+  end
+
+  def import_message_body
+    url = "#{HostUrl.protocol}://#{HostUrl.context_host(context)}/#{context.class.to_s.downcase.pluralize}/#{context_id}/outcomes"
+    if succeeded?
+      subject = I18n.t 'Outcomes Import Completed'
+      user_name = user.name.split('@').first
+      body = I18n.t(<<-BODY, name: user_name, url: url).gsub(/^ +/, '')
+      Hello %{name},
+
+      Your outcomes were successfully imported. You can now manage them at %{url}
+
+      Thank you,
+      Instructure
+      BODY
+    else
+      subject = I18n.t 'Outcomes Import Failed'
+      user_name = user.name.split('@').first
+      errors_count = I18n.t({one: "1 error", other: "%{count} errors"}, count: error_count)
+      errors_lead = error_count <= 100 ? I18n.t('The following errors occurred:') : I18n.t('Here are the first 100 errors that occurred:')
+      rows = n_errors(100).map { |r, m| I18n.t("Row %{row}: %{message}", row: r, message: m) }.join("\n")
+      body = I18n.t(<<-BODY, name: user_name, errors_count: errors_count, errors_lead: errors_lead, rows: rows, url: url).gsub(/^ +/, '')
+      Hello %{name},
+
+      Your outcomes import failed due to %{errors_count} with your import. Please examine your file and attempt the upload again at %{url}
+
+      %{errors_lead}
+      %{rows}
+
+      Thank you,
+      Instructure
+      BODY
+    end
+
+    [subject, body]
   end
 end
