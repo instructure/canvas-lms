@@ -1603,7 +1603,12 @@ define [
 
       @gradebookGrid.gridSupport.events.onActiveLocationChanged.subscribe (event, location) =>
         if location.columnId == 'student' && location.region == 'body'
-          @gradebookGrid.gridSupport.state.getActiveNode().querySelector('.student-grades-link')?.focus()
+          # In IE11, if we're navigating into the student column from a grade
+          # input cell with no text, this focus() call will select the <body>
+          # instead of the grades link.  Delaying the call (even with no actual
+          # delay) fixes the issue.
+          @delayedCall 0, =>
+            @gradebookGrid.gridSupport.state.getActiveNode().querySelector('.student-grades-link')?.focus()
 
       @gradebookGrid.gridSupport.events.onKeyDown.subscribe (event, location) =>
         if (location.region == 'header')
@@ -1627,7 +1632,9 @@ define [
 
       @gradebookGrid.gridSupport.events.onNavigateUp.subscribe (event, location) =>
         if (location.region == 'header')
-          @getHeaderComponentRef(location.columnId)?.focusAtStart()
+          # As above, "delay" the call so that we properly focus the header cell
+          # when navigating from a grade input cell with no text.
+          @delayedCall 0, => @getHeaderComponentRef(location.columnId)?.focusAtStart()
 
       @onGridInit()
 

@@ -4156,29 +4156,41 @@ QUnit.module('Gradebook Grid Events', function (suiteHooks) {
   });
 
   test('sets focus on the student grades link when a "student" body cell becomes active', function () {
+    const clock = sinon.useFakeTimers();
     this.stub(this.gradebook.gradebookGrid.gridSupport.state, 'getActiveNode')
       .returns($fixtures.querySelector('#example-gradebook-cell'));
     this.triggerEvent('onActiveLocationChanged', {}, { columnId: 'student', region: 'body' });
+    clock.tick(0);
     strictEqual(document.activeElement, this.$studentGradesLink);
+    clock.restore();
   });
 
   test('does nothing when a "student" body cell without a student grades link becomes active', function () {
+    const clock = sinon.useFakeTimers();
     const previousActiveElement = document.activeElement;
     $fixtures.querySelector('#example-gradebook-cell').innerHTML = 'Student Name';
     this.stub(this.gradebook.gradebookGrid.gridSupport.state, 'getActiveNode')
       .returns($fixtures.querySelector('#example-gradebook-cell'));
     this.triggerEvent('onActiveLocationChanged', {}, { columnId: 'student', region: 'body' });
+    clock.tick(0);
     strictEqual(document.activeElement, previousActiveElement);
+    clock.restore();
   });
 
   test('does not change focus when a "student" header cell becomes active', function () {
+    const clock = sinon.useFakeTimers();
     this.triggerEvent('onActiveLocationChanged', {}, { columnId: 'student', region: 'header' });
+    clock.tick(0);
     notEqual(document.activeElement, this.$studentGradesLink);
+    clock.restore();
   });
 
   test('does not change focus when body cells of other columns become active', function () {
+    const clock = sinon.useFakeTimers();
     this.triggerEvent('onActiveLocationChanged', {}, { columnId: 'total_grade', region: 'body' });
+    clock.tick(0);
     notEqual(document.activeElement, this.$studentGradesLink);
+    clock.restore();
   });
 
   QUnit.module('onKeyDown');
@@ -4287,19 +4299,28 @@ QUnit.module('Gradebook Grid Events', function (suiteHooks) {
   QUnit.module('onNavigateUp');
 
   test('calls focusAtStart on the column header component associated with the event location', function () {
+    const clock = sinon.useFakeTimers();
     this.triggerEvent('onNavigateUp', {}, { columnId: 'student', region: 'header' });
+    clock.tick(0);
     strictEqual(this.studentColumnHeader.focusAtStart.callCount, 1);
+    clock.restore();
   });
 
   test('does nothing when the location region is not "header"', function () {
+    const clock = sinon.useFakeTimers();
     this.triggerEvent('onNavigateUp', {}, { columnId: 'student', region: 'body' });
+    clock.tick(0);
     strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0);
+    clock.restore();
   });
 
   test('does nothing when no component is referenced for the given column', function () {
+    const clock = sinon.useFakeTimers();
     this.gradebook.removeHeaderComponentRef('student');
     this.triggerEvent('onNavigateUp', {}, { columnId: 'student', region: 'header' });
+    clock.tick(0);
     strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0);
+    clock.restore();
   });
 
   QUnit.module('onColumnsReordered', (hooks) => {
@@ -6450,7 +6471,14 @@ QUnit.module('Gradebook#onGridBlur', {
       }
     })
     this.gradebook.assignmentGroups = {9000: {group_weight: 100}}
+
+    // Since the activeLocationChanged handlers use delayed calls, we need to
+    // hijack timers and tick() before calling setActiveLocation() below.
+    const clock = sinon.useFakeTimers();
+    clock.tick(0);
     this.gradebook.gradebookGrid.gridSupport.state.setActiveLocation('body', { cell: 0, row: 0 });
+    clock.restore();
+
     this.spy(this.gradebook.gradebookGrid.gridSupport.state, 'blur');
   },
 
