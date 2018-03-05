@@ -21,7 +21,7 @@ const cleanDiscussionFocusReducerMap = {
   [actionTypes.CLEAN_DISCUSSION_FOCUS]: (state, _action) => (
     state.map((discussion) => {
       const newDiscussion = Object.assign(discussion)
-      delete newDiscussion.shouldGetFocus
+      delete newDiscussion.focusOn
       return newDiscussion
     }
   ))

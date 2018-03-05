@@ -35,6 +35,8 @@ import IconPublishSolid from 'instructure-icons/lib/Solid/IconPublishSolid'
 import IconPublishLine from 'instructure-icons/lib/Line/IconPublishLine'
 import IconCopySolid from 'instructure-icons/lib/Solid/IconCopySolid'
 import IconUpdownLine from 'instructure-icons/lib/Line/IconUpdownLine'
+import IconPinSolid from 'instructure-icons/lib/Solid/IconPinSolid'
+import IconPinLine from 'instructure-icons/lib/Line/IconPinLine'
 
 import DiscussionModel from 'compiled/models/DiscussionTopic'
 import SectionsTooltip from '../SectionsTooltip'
@@ -68,15 +70,30 @@ const discussionTarget = {
 export default function DiscussionRow ({ discussion, masterCourseData, rowRef, onSelectedChanged,
                                          connectDragSource, connectDragPreview, draggable,
                                          onToggleSubscribe, updateDiscussion, canManage, canPublish,
+
                                          duplicateDiscussion, cleanDiscussionFocus, onMoveDiscussion }) {
+  const makePinSuccessFailMessages = () => {
+    const successMessage = discussion.pinned ?
+      I18n.t('Unpin of discussion %{title} succeeded', { title: discussion.title }) :
+      I18n.t('Pin of discussion %{title} succeeded', { title: discussion.title })
+    const failMessage = discussion.pinned ?
+      I18n.t('Unpin of discussion %{title} failed', { title: discussion.title }) :
+      I18n.t('Pin of discussion %{title} failed', { title: discussion.title })
+    return { successMessage, failMessage }
+  }
+
   const onManageDiscussion = (e, { action, id }) => {
     switch (action) {
      case 'duplicate':
        duplicateDiscussion(id)
-       break;
+       break
      case 'moveTo':
        onMoveDiscussion({ id, title: discussion.title })
-       break;
+       break
+     case 'togglepinned':
+       updateDiscussion(discussion, { pinned: !discussion.pinned },
+         makePinSuccessFailMessages(discussion), 'manageMenu')
+       break
      default:
        throw new Error(I18n.t('Unknown manage discussion action encountered'))
     }
@@ -115,19 +132,47 @@ export default function DiscussionRow ({ discussion, masterCourseData, rowRef, o
        />)
     : null
 
+  const pinMenuItemDisplay = () =>{
+    if (discussion.pinned) {
+      return (
+        <span aria-hidden='true'>
+          <IconPinLine />&nbsp;&nbsp;{I18n.t('Unpin')}
+        </span>
+      )
+    } else {
+      return (
+        <span aria-hidden='true'>
+          <IconPinSolid />&nbsp;&nbsp;{I18n.t('Pin')}
+        </span>
+      )
+    }
+  }
+
   // The permissions required to duplicate are less stringent than those needed to show
   // the menu, so go ahead and unconditionally have the menu item here.
   const menuList = [
     <MenuItem
       key="duplicate"
-      value={{ action: 'duplicate', id: discussion.id, lock: false }}
+      value={{ action: 'duplicate', id: discussion.id }}
       id="duplicate-discussion-menu-option"
     >
       <span aria-hidden='true'>
         <IconCopySolid />&nbsp;&nbsp;{I18n.t('Duplicate')}
       </span>
       <ScreenReaderContent> { I18n.t('Duplicate discussion %{title}', { title: discussion.title }) } </ScreenReaderContent>
-    </MenuItem>
+    </MenuItem>,
+    <MenuItem
+      key="togglepinned"
+      value={{ action: 'togglepinned', id: discussion.id }}
+      id="togglepinned-discussion-menu-option"
+    >
+      {pinMenuItemDisplay()}
+      <ScreenReaderContent>
+      { discussion.pinned
+        ? I18n.t('Unpin discussion %{title}', { title: discussion.title })
+        : I18n.t('Pin discussion %{title}', { title: discussion.title })}
+      </ScreenReaderContent>
+    </MenuItem>,
   ]
 
   if(onMoveDiscussion) {
@@ -156,7 +201,7 @@ export default function DiscussionRow ({ discussion, masterCourseData, rowRef, o
         className="ic-discussion-row"
         key={discussion.id}
         id={discussion.id}
-        shouldFocusOnTitle={discussion.shouldGetFocus}
+        focusOn={discussion.focusOn}
         draggable={draggable}
         connectDragSource={connectDragSource}
         icon={

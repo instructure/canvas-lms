@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!shared_components'
 import React, { Component } from 'react'
-import { bool, node, string, func, shape, arrayOf } from 'prop-types'
+import { bool, node, string, func, shape, arrayOf, oneOf } from 'prop-types'
 import cx from 'classnames'
 
 import Heading from '@instructure/ui-core/lib/components/Heading'
@@ -63,8 +63,8 @@ export default class CourseItemRow extends Component {
     onManageMenuSelect: func,
     sectionToolTip: node,
     replyButton: node,
-    shouldFocusOnTitle: bool,
-    clearFocusDirectives: func, // Required if shouldFocusOnTitle is true
+    focusOn: oneOf(['title', 'manageMenu']),
+    clearFocusDirectives: func, // Required if focusOn is provided
   }
 
   static defaultProps = {
@@ -94,7 +94,7 @@ export default class CourseItemRow extends Component {
     onManageMenuSelect () {},
     sectionToolTip: null,
     replyButton: null,
-    shouldFocusOnTitle: false,
+    focusOn: null,
     clearFocusDirectives: () => {}
   }
 
@@ -107,8 +107,17 @@ export default class CourseItemRow extends Component {
   }
 
   componentDidMount () {
-    if (this.props.shouldFocusOnTitle) {
-      this._titleElement.focus()
+    if (this.props.focusOn) {
+      switch (this.props.focusOn) {
+        case 'title':
+          this._titleElement.focus()
+          break;
+        case 'manageMenu':
+          this._manageMenu.focus()
+          break;
+        default:
+          throw new Error(I18n.t('Illegal element focus request'))
+      }
       this.props.clearFocusDirectives()
     }
   }
@@ -205,6 +214,7 @@ export default class CourseItemRow extends Component {
             {this.props.showManageMenu && this.props.manageMenuOptions.length > 0 &&
               (<span className="ic-item-row__manage-menu">
                 <PopoverMenu
+                  ref={(c) => { this._manageMenu = c }}
                   onSelect={this.props.onManageMenuSelect}
                   trigger={
                     <Button variant="icon" size="small">

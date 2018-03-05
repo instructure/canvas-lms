@@ -60,7 +60,7 @@ const actions = Object.assign(
   discussionActions.actionCreators,
 )
 
-function copyAndUpdateDiscussion(discussion, updatedFields) {
+function copyAndUpdateDiscussion(discussion, updatedFields, focusOn) {
   const discussionCopy = Object.assign({}, discussion);
   Object.keys(updatedFields).forEach(key => {
     if (!Object.prototype.hasOwnProperty.call(discussion, key)) {
@@ -68,6 +68,9 @@ function copyAndUpdateDiscussion(discussion, updatedFields) {
     }
     discussionCopy[key] = updatedFields[key]
   })
+  if (focusOn) {
+    discussionCopy.focusOn = focusOn
+  }
   return discussionCopy
 }
 
@@ -76,9 +79,12 @@ const defaultFailMessage = I18n.t('Updating discussion failed')
 // We are assuming success here (mostly for the sake of drag and drop, where
 // it would look really awkward to drop it, have it snap back to the original
 // position, and then snap to the new position shortly after).
-actions.updateDiscussion = function(discussion, updatedFields, { successMessage, failMessage }) {
+// focusOn must be one of 'title' or 'manageMenu' (or can be left unspecified)
+// If set to a value, it will cause focus to end up on the title or manage menu
+// of the updated discussion.
+actions.updateDiscussion = function(discussion, updatedFields, { successMessage, failMessage }, focusOn) {
   return (dispatch, getState) => {
-    const discussionCopy = copyAndUpdateDiscussion(discussion, updatedFields)
+    const discussionCopy = copyAndUpdateDiscussion(discussion, updatedFields, focusOn)
     dispatch(actions.updateDiscussionStart({discussion: discussionCopy}))
 
     apiClient.updateDiscussion(getState(), discussion, updatedFields)

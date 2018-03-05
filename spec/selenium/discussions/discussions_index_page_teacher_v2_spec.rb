@@ -23,6 +23,8 @@ describe "discussions index" do
   context "as a teacher" do
     discussion1_title = 'Meaning of life'
     discussion2_title = 'Meaning of the universe'
+    discussion3_title = 'Discussion about landon'
+    discussion4_title = 'Discussion about aaron'
 
     before :once do
       @teacher = user_with_pseudonym(active_user: true)
@@ -34,13 +36,30 @@ describe "discussions index" do
       @discussion1 = @course.discussion_topics.create!(
         title: discussion1_title,
         message: 'Is it really 42?',
-        user: @teacher
+        user: @teacher,
+        pinned: false
       )
       @discussion2 = @course.discussion_topics.create!(
         title: discussion2_title,
         message: 'Could it be 43?',
         delayed_post_at: 1.day.from_now,
         user: @teacher
+      )
+      @discussion3 = @course.discussion_topics.create!(
+        title: discussion3_title,
+        message: 'Could it be 43?',
+        delayed_post_at: 1.day.from_now,
+        user: @teacher,
+        locked: false,
+        pinned: true
+      )
+      @discussion4 = @course.discussion_topics.create!(
+        title: discussion4_title,
+        message: 'Could it be 43?',
+        delayed_post_at: 1.day.from_now,
+        user: @teacher,
+        locked: true,
+        pinned: true
       )
 
       @discussion1.discussion_entries.create!(user: @student, message: "I think I read that somewhere...")
@@ -92,11 +111,27 @@ describe "discussions index" do
     end
 
     it 'discussion can be moved between groups using Pin menu item' do
-      skip('Add with COMMS-727')
       DiscussionsIndex.click_pin_menu_option(discussion1_title)
-      group = DiscussionsIndex.discussion_group("Pinned Disscussions")
-      expect(group).to contain_css(DiscussionsIndex.discussion_title_css(discussion1_title))
+      group = DiscussionsIndex.discussion_group("Pinned Discussions")
+      expect(group).to include_text(discussion1_title)
+      @discussion1.reload
       expect(@discussion1.pinned).to be true
+    end
+
+    it 'unpinning an unlocked discussion goes to the regular bin' do
+      DiscussionsIndex.click_pin_menu_option(discussion3_title)
+      group = DiscussionsIndex.discussion_group("Discussions")
+      expect(group).to include_text(discussion3_title)
+      @discussion3.reload
+      expect(@discussion3.pinned).to be false
+    end
+
+    it 'unpinning a locked discussion goes to the locked bin' do
+      DiscussionsIndex.click_pin_menu_option(discussion4_title)
+      group = DiscussionsIndex.discussion_group("Closed for Comments")
+      expect(group).to include_text(discussion4_title)
+      @discussion4.reload
+      expect(@discussion4.pinned).to be false
     end
 
     it 'discussion can be moved to Closed For Comments group using menu item' do

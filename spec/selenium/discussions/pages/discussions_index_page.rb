@@ -115,7 +115,7 @@ class DiscussionsIndex
     end
 
     def pin_menu_option
-      f('#pin-discussion-menu-option')
+      f('#togglepinned-discussion-menu-option')
     end
 
     def close_for_comment_menu_option

@@ -25,7 +25,7 @@ const duplicationReducerMap = {
     ))
     if (oldIndex >= 0) {
       const newStateBeginning = state.slice(0, oldIndex + 1)
-      newDiscussion.shouldGetFocus = true
+      newDiscussion.focusOn = 'title'
       newStateBeginning.push(newDiscussion)
       const newStateEnd = state.slice(oldIndex + 1, state.length)
       return newStateBeginning.concat(newStateEnd)

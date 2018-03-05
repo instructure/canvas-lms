@@ -158,6 +158,7 @@ renderStudentView () {
             toggleSubscribe={this.props.toggleSubscriptionState}
             duplicateDiscussion={this.props.duplicateDiscussion}
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
+            updateDiscussion={this.props.updateDiscussion}
             roles={this.props.roles}
             renderContainerBackground={() =>
               closedDiscussionBackground({

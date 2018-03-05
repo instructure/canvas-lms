@@ -159,6 +159,7 @@ test('renders manage menu if permitted', () => {
   ok(courseItemRow.props().manageMenuOptions.length > 0)
   const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
   ok(allKeys.includes('duplicate'))
+  ok(allKeys.includes('togglepinned'))
 })
 
 test('renders move-to in manage menu if permitted', () => {
