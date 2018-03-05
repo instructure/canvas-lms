@@ -1099,7 +1099,7 @@ class Course < ActiveRecord::Base
     # Let's get them all!
     student_ids = admin_visible_student_enrollments.pluck(:user_id) unless student_ids.present?
 
-    Rails.logger.info "GRADES: recomputing scores in course=#{global_id} students=#{student_ids.inspect}"
+    Rails.logger.debug "GRADES: recomputing scores in course=#{global_id} students=#{student_ids.inspect}"
     Enrollment.recompute_final_score(
       student_ids,
       self.id,

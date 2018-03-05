@@ -30,7 +30,7 @@ class DueDateCacher
   SQL_FRAGMENT
 
   def self.recompute(assignment, update_grades: false)
-    Rails.logger.info "DDC.recompute(#{assignment&.id}) - #{caller(1..1).first}"
+    Rails.logger.debug "DDC.recompute(#{assignment&.id}) - #{caller(1..1).first}"
     return unless assignment.active?
     opts = {
       assignments: [assignment.id],
@@ -45,7 +45,7 @@ class DueDateCacher
   end
 
   def self.recompute_course(course, assignments: nil, inst_jobs_opts: {}, run_immediately: false, update_grades: false, original_caller: nil)
-    Rails.logger.info "DDC.recompute_course(#{course.inspect}, #{assignments.inspect}, #{inst_jobs_opts.inspect}) - #{caller(1..1).first}"
+    Rails.logger.debug "DDC.recompute_course(#{course.inspect}, #{assignments.inspect}, #{inst_jobs_opts.inspect}) - #{caller(1..1).first}"
     course = Course.find(course) unless course.is_a?(Course)
     inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Course:#{course.global_id}" if assignments.nil?
 
@@ -84,9 +84,9 @@ class DueDateCacher
   end
 
   def recompute
-    Rails.logger.info "DUE DATE CACHER STARTS: #{Time.zone.now.to_i}"
-    Rails.logger.info "DDC#recompute() - original caller: #{@original_caller}"
-    Rails.logger.info "DDC#recompute() - current caller: #{caller(1..1).first}"
+    Rails.logger.debug "DUE DATE CACHER STARTS: #{Time.zone.now.to_i}"
+    Rails.logger.debug "DDC#recompute() - original caller: #{@original_caller}"
+    Rails.logger.debug "DDC#recompute() - current caller: #{caller(1..1).first}"
     # in a transaction on the correct shard:
     @course.shard.activate do
       values = []

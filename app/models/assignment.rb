@@ -487,7 +487,7 @@ class Assignment < ActiveRecord::Base
 
   def update_grades_if_details_changed
     if needs_to_recompute_grade?
-      Rails.logger.info "GRADES: recalculating because assignment #{global_id} changed. (#{changes.inspect})"
+      Rails.logger.debug "GRADES: recalculating because assignment #{global_id} changed. (#{changes.inspect})"
       self.class.connection.after_transaction_commit { self.context.recompute_student_scores }
     end
     true
@@ -1314,7 +1314,7 @@ class Assignment < ActiveRecord::Base
       :graded_at => Time.zone.now.utc
     }) unless submissions_to_save.empty?
 
-    Rails.logger.info "GRADES: recalculating because assignment #{global_id} had default grade set (#{options.inspect})"
+    Rails.logger.debug "GRADES: recalculating because assignment #{global_id} had default grade set (#{options.inspect})"
     self.context.recompute_student_scores
     student_ids = context.student_ids
     send_later_if_production(:multiple_module_actions, student_ids, :scored, score)
@@ -2402,7 +2402,7 @@ class Assignment < ActiveRecord::Base
     return unless update_cached_due_dates?
 
     relevant_changes = changes.slice(:due_at, :workflow_state, :only_visible_to_overrides).inspect
-    Rails.logger.info "GRADES: recalculating because scope changed for Assignment #{global_id}: #{relevant_changes}"
+    Rails.logger.debug "GRADES: recalculating because scope changed for Assignment #{global_id}: #{relevant_changes}"
     DueDateCacher.recompute(self, update_grades: true)
   end
 
@@ -2568,7 +2568,7 @@ class Assignment < ActiveRecord::Base
     each_submission_type { |submission| submission&.relock_modules!(relocked_modules, student_ids)}
 
     update_grades = if only_visible_to_overrides?
-      Rails.logger.info "GRADES: recalculating because assignment overrides on #{global_id} changed."
+      Rails.logger.debug "GRADES: recalculating because assignment overrides on #{global_id} changed."
       true
     else
       false
