@@ -35,7 +35,7 @@
     "location-origin": "^1.1.4",
     "lodash": "^4.16.4",
     "md5": "^2.2.1",
-    "moment": "~2.11.2",
+    "moment": "~2.19.3",
     "page": "visionmedia/page.js#1.6.4",
     "parse-decimal-number": "1.0.0",
     "prop-types": "^15.5.9",
