@@ -419,6 +419,43 @@ describe MasterCourses::MasterMigration do
       expect(quiz_to.reload.quiz_questions.where(:migration_id => mig_id(@new_qq)).first).to_not be_nil
     end
 
+    it "shouldn't delete an assignment group if it's not empty downstream" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      ag1 = @copy_from.assignment_groups.create!(:name => "group1")
+      a1 = @copy_from.assignments.create!(:title => "assmt1", :assignment_group => ag1)
+      ag2 = @copy_from.assignment_groups.create!(:name => "group2")
+      a2 = @copy_from.assignments.create!(:title => "assmt2", :assignment_group => ag2)
+      ag3 = @copy_from.assignment_groups.create!(:name => "group3")
+      a3 = @copy_from.assignments.create!(:title => "assmt3", :assignment_group => ag3)
+
+      run_master_migration
+
+      ag1_to = @copy_to.assignment_groups.where(:migration_id => mig_id(ag1)).first
+      a1_to = ag1_to.assignments.first
+      ag2_to = @copy_to.assignment_groups.where(:migration_id => mig_id(ag2)).first
+      a2_to = ag2_to.assignments.first
+      ag3_to = @copy_to.assignment_groups.where(:migration_id => mig_id(ag3)).first
+      a3_to = ag3_to.assignments.first
+
+      Timecop.freeze(30.seconds.from_now) do
+        [ag1, ag2, ag3].each(&:destroy!)
+        a2_to.update_attribute(:name, "some other downstream name")
+        @new_assmt = @copy_to.assignments.create!(:title => "a new assignment created downstream", :assignment_group => ag3_to)
+      end
+
+      run_master_migration
+
+      expect(ag1_to.reload).to be_deleted # should still delete
+      expect(a1_to.reload).to be_deleted
+      expect(ag2_to.reload).to_not be_deleted # should skip deletion because a2's deletion was skipped
+      expect(a2_to.reload).to_not be_deleted
+      expect(ag3_to.reload).to_not be_deleted # should skip deletion because of @new_assmt
+      expect(a3_to.reload).to be_deleted # but should have still deleted the assigment
+      expect(@new_assmt.reload).to_not be_deleted
+    end
+
     it "should sync unpublished quiz points possible" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
