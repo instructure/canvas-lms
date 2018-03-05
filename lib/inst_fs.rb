@@ -53,6 +53,11 @@ module InstFS
       thumbnail_url(attachment, query_params)
     end
 
+    def export_references_url
+      query_params = { token: export_references_jwt}
+      service_url("/references", query_params)
+    end
+
     def app_host
       setting("app-host")
     end
@@ -186,6 +191,14 @@ module InstFS
         iat: Time.now.utc.to_i,
         user_id: user.global_id&.to_s,
         resource: '/session'
+      }, expires_in.from_now, self.jwt_secret)
+    end
+
+    def export_references_jwt
+      expires_in = Setting.get('instfs.logout_jwt.expiration_minutes', '5').to_i.minutes
+      Canvas::Security.create_jwt({
+        iat: Time.now.utc.to_i,
+        resource: '/resources'
       }, expires_in.from_now, self.jwt_secret)
     end
   end
