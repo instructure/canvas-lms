@@ -3709,7 +3709,8 @@ describe ContentImportsController, type: :request do
     # check queued state
     json = api_call(:get, "/api/v1/courses/#{@course.id}/link_validation",
       { :controller => 'courses', :action => 'link_validation', :format => 'json', :course_id => @course.id.to_param })
-    expect(json).to eq({'state' => 'queued'})
+    expect(json['workflow_state']).to eq('queued')
+    expect(json).not_to have_key('results')
 
     allow_any_instance_of(CourseLinkValidator).to receive(:check_course)
     allow_any_instance_of(CourseLinkValidator).to receive(:issues).and_return(['mock_issue'])
@@ -3718,8 +3719,8 @@ describe ContentImportsController, type: :request do
     # check results
     json = api_call(:get, "/api/v1/courses/#{@course.id}/link_validation",
                     { :controller => 'courses', :action => 'link_validation', :format => 'json', :course_id => @course.id.to_param })
-    expect(json['state']).to eq('completed')
-    expect(json['issues']).to eq(['mock_issue'])
+    expect(json['workflow_state']).to eq('completed')
+    expect(json['results']['issues']).to eq(['mock_issue'])
   end
 end
 

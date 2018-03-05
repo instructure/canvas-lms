@@ -2795,11 +2795,7 @@ class CoursesController < ApplicationController
     return unless authorized_action(@context, @current_user, :manage_content)
 
     if progress = CourseLinkValidator.current_progress(@context)
-      hash = {:state => progress.workflow_state}
-      if !progress.pending? && progress.results
-        hash.merge!(progress.results)
-      end
-      render :json => hash
+      render :json => progress_json(progress, @current_user, session)
     else
       render :json => {}
     end
