@@ -19,4 +19,17 @@ import 'mediaelement/src/js/mep-feature-googleanalytics'
 import 'mediaelement/build/mediaelementplayer.min.css'
 import '../../../app/stylesheets/base/_custom_mediaelementplayer.css'
 
+
+// Tell mediaelementJS to use strings for the user's locale.
+// when we start doing locale-specific webpack builds,
+// change window.ENV.LOCALE to process.env.BUILD_LOCALE
+let strings
+try {
+  strings = require(`mediaelement/build/lang/me-i18n-locale-${window.ENV.LOCALE}`)
+} catch (error) {
+  // medialementjs doesn't have strings for this locale
+}
+if (strings) window.mejs.i18n.locale.language = window.ENV.LOCALE
+
+
 export default window.mejs
