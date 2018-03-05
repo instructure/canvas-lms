@@ -216,6 +216,18 @@ describe CoursesController do
         expect(assigns[:future_enrollments]).to be_empty
       end
 
+      it "should not include hard-inactive enrollments even in the future" do
+        course1 = Account.default.courses.create!(start_at: 1.month.from_now, restrict_enrollments_to_course_dates: true)
+        course1.offer!
+        enrollment = course_with_student course: course1, user: @student, active_all: true
+        enrollment.deactivate
+
+        user_session(@student)
+        get 'index'
+        expect(response).to be_success
+        expect(assigns[:future_enrollments]).to be_empty
+      end
+
       it "should not include 'invited' enrollments whose term is past" do
         @student = user_factory
 

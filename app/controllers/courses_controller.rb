@@ -470,7 +470,7 @@ class CoursesController < ApplicationController
           if [:completed, :rejected].include?(state) ||
             ([:active, :invited].include?(state) && e.section_or_course_date_in_past?) # strictly speaking, these enrollments are perfectly active but enrollment dates are terrible
             @past_enrollments << e unless e.workflow_state == "invited"
-          else
+          elsif !e.hard_inactive?
             start_at, end_at = e.enrollment_dates.first
             if start_at && start_at > Time.now.utc
               @future_enrollments << e unless e.restrict_future_listing?
