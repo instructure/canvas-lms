@@ -17,7 +17,7 @@
  */
 
 import axios from 'axios'
-import I18n from 'i18n!assignment_index_menu'
+
   const IndexMenuActions = {
 
     // Define 'constants' for types

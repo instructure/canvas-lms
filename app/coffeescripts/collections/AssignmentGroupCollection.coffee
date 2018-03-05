@@ -21,10 +21,9 @@ define [
   '../collections/PaginatedCollection'
   '../models/AssignmentGroup'
   'underscore'
-  'i18n!assignments'
   '../collections/SubmissionCollection'
   '../collections/ModuleCollection'
-], ($, Backbone, PaginatedCollection, AssignmentGroup, _, I18n, SubmissionCollection, ModuleCollection) ->
+], ($, Backbone, PaginatedCollection, AssignmentGroup, _, SubmissionCollection, ModuleCollection) ->
 
   PER_PAGE_LIMIT = 50
 

@@ -17,13 +17,12 @@
 #
 
 define [
-  'i18n!dialog'
   'jquery'
   'underscore'
   'Backbone'
   '../DialogBaseView'
   'jst/quiz/regrade'
-], (I18n, $, _, Backbone, DialogBaseView, template) ->
+], ($, _, Backbone, DialogBaseView, template) ->
 
   class QuizRegradeView extends DialogBaseView
 

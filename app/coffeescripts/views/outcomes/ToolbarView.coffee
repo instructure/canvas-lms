@@ -17,13 +17,12 @@
 #
 
 define [
-  'i18n!outcomes'
   'jquery'
   'underscore'
   'Backbone'
   '../../models/Outcome'
   '../../models/OutcomeGroup'
-], (I18n, $, _, Backbone, Outcome, OutcomeGroup) ->
+], ($, _, Backbone, Outcome, OutcomeGroup) ->
 
   # Manage the toolbar buttons.
   class ToolbarView extends Backbone.View

@@ -16,10 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'i18n!groups'
   'Backbone'
   'jst/groups/manage/groupUser'
-], (I18n, {View}, template) ->
+], ({View}, template) ->
 
   class GroupUserView extends View
 

@@ -16,7 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'i18n!groups'
   'jquery'
   './GroupUsersView'
   './AssignToGroupMenu'
@@ -24,7 +23,7 @@ define [
   './GroupCategoryCloneView'
   'jst/groups/manage/groupUsers'
   '../../../util/groupHasSubmissions'
-], (I18n, $, GroupUsersView, AssignToGroupMenu, Scrollable, GroupCategoryCloneView, template, groupHasSubmissions) ->
+], ($, GroupUsersView, AssignToGroupMenu, Scrollable, GroupCategoryCloneView, template, groupHasSubmissions) ->
 
   class UnassignedUsersView extends GroupUsersView
 

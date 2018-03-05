@@ -17,7 +17,7 @@
  */
 
 import round from 'compiled/util/round';
-import I18n from 'i18n!gradebook';
+import I18n from 'i18nObj';
 
 function getGradePercentage (score, pointsPossible) {
   const grade = (score / pointsPossible) * 100;

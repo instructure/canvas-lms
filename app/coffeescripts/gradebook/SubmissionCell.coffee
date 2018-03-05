@@ -18,7 +18,7 @@
 define [
   'jquery'
   'underscore'
-  'i18n!gradebook'
+  'i18nObj'
   'jsx/shared/helpers/numberHelper'
   'jsx/gradebook/shared/helpers/GradeFormatHelper'
   '../gradebook/GradebookTranslations'

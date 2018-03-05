@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import i18n from 'i18n!react_collaborations'
+import I18n from 'i18n!react_collaborations'
   class Spinner extends React.Component {
     render () {
       return (
@@ -26,7 +26,7 @@ import i18n from 'i18n!react_collaborations'
             className='circle'
             role="img"
             aria-labelledby='LoadingSpinner'>
-            <title id='LoadingSpinner'>{i18n.t('Loading collaborations')}</title>
+            <title id='LoadingSpinner'>{I18n.t('Loading collaborations')}</title>
             <g role="presentation">
               <circle className='circleShadow' cx="50%" cy="50%" r='1.75em' />
               <circle className='circleTrack' cx="50%" cy="50%" r='1.75em' />

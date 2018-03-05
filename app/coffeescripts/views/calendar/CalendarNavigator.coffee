@@ -16,13 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'i18n!calendar',
   'jquery'
   'underscore'
   'Backbone',
   'jst/calendar/calendarNavigator',
   'jquery.instructure_date_and_time' # $.date_field
-], (I18n, $, _, Backbone, template) ->
+], ($, _, Backbone, template) ->
 
   class CalendarNavigator extends Backbone.View
     template: template

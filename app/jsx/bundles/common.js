@@ -19,7 +19,6 @@
 // true modules that we use in this file
 import $ from 'jquery'
 import _ from 'underscore'
-import I18n from 'i18n!common'
 import Backbone from 'Backbone'
 import updateSubnavMenuToggle from '../subnav_menu/updateSubnavMenuToggle'
 import splitAssetString from 'compiled/str/splitAssetString'
