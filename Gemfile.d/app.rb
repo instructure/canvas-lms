@@ -21,7 +21,7 @@ else
   gem 'rails', '5.1.5'
 end
 
-gem 'rack', '2.0.3'
+gem 'rack', '2.0.4'
 
 # oauth2-1.4.0 caused issues with google oauth login flow, which needs to be
 # investigated as part of a future gem bump.
