@@ -20,8 +20,8 @@ class GradeCalculator
   attr_accessor :assignments, :groups
 
   def initialize(user_ids, course, opts = {})
-    Rails.logger.info "GRADE CALCULATOR STARTS (initialize): #{Time.zone.now.to_i}"
-    Rails.logger.info "GRADE CALCULATOR - caller: #{caller(1..1).first}"
+    Rails.logger.debug "GRADE CALCULATOR STARTS (initialize): #{Time.zone.now.to_i}"
+    Rails.logger.debug "GRADE CALCULATOR - caller: #{caller(1..1).first}"
     opts = opts.reverse_merge(
       ignore_muted: true,
       update_all_grading_period_scores: true,
@@ -30,9 +30,9 @@ class GradeCalculator
       only_update_points: false
     )
 
-    Rails.logger.info("GRADES: calc args: user_ids=#{user_ids.inspect}")
-    Rails.logger.info("GRADES: calc args: course=#{course.inspect}")
-    Rails.logger.info("GRADES: calc args: opts=#{opts.inspect}")
+    Rails.logger.debug("GRADES: calc args: user_ids=#{user_ids.inspect}")
+    Rails.logger.debug("GRADES: calc args: course=#{course.inspect}")
+    Rails.logger.debug("GRADES: calc args: opts=#{opts.inspect}")
 
     @course = course.is_a?(Course) ? course : Course.find(course)
 
@@ -66,8 +66,8 @@ class GradeCalculator
 
   # recomputes the scores and saves them to each user's Enrollment
   def self.recompute_final_score(user_ids, course_id, compute_score_opts = {})
-    Rails.logger.info "GRADE CALCULATOR STARTS (recompute_final_score): #{Time.zone.now.to_i}"
-    Rails.logger.info "GRADE CALCULATOR - caller: #{caller(1..1).first}"
+    Rails.logger.debug "GRADE CALCULATOR STARTS (recompute_final_score): #{Time.zone.now.to_i}"
+    Rails.logger.debug "GRADE CALCULATOR - caller: #{caller(1..1).first}"
     user_ids = Array(user_ids).uniq.map(&:to_i)
     return if user_ids.empty?
     course = course_id.is_a?(Course) ? course_id : Course.active.where(id: course_id).take
@@ -97,7 +97,7 @@ class GradeCalculator
         where(assignment_id: @assignments).
         select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state")
 
-      Rails.logger.info "GRADE CALCULATOR - submissions: #{submissions.size} - #{Time.zone.now.to_i}"
+      Rails.logger.debug "GRADE CALCULATOR - submissions: #{submissions.size} - #{Time.zone.now.to_i}"
       submissions
     end
   end
@@ -168,7 +168,7 @@ class GradeCalculator
         final: calculate_total_from_group_scores(group_sums[:final])
       }
     end
-    Rails.logger.info "GRADES: calculated: #{scores.inspect}"
+    Rails.logger.debug "GRADES: calculated: #{scores.inspect}"
     scores
   end
 
@@ -715,9 +715,9 @@ class GradeCalculator
       group_submissions.each { |s| s[:score] ||= 0 }
 
       logged_submissions = group_submissions.map { |s| loggable_submission(s) }
-      Rails.logger.info "GRADES: calculating for assignment_group=#{group.global_id} user=#{user_id}"
-      Rails.logger.info "GRADES: calculating... ignore_ungraded=#{ignore_ungraded}"
-      Rails.logger.info "GRADES: calculating... submissions=#{logged_submissions.inspect}"
+      Rails.logger.debug "GRADES: calculating for assignment_group=#{group.global_id} user=#{user_id}"
+      Rails.logger.debug "GRADES: calculating... ignore_ungraded=#{ignore_ungraded}"
+      Rails.logger.debug "GRADES: calculating... submissions=#{logged_submissions.inspect}"
 
       kept = drop_assignments(group_submissions, group.rules_hash)
       dropped_submissions = (group_submissions - kept).map { |s| s[:submission]&.id }.compact
@@ -735,7 +735,7 @@ class GradeCalculator
         grade:     ((score.to_f / possible * 100).round(2) if possible > 0),
         dropped:   dropped_submissions
       }.tap { |group_grade_info|
-        Rails.logger.info "GRADES: calculated #{group_grade_info.inspect}"
+        Rails.logger.debug "GRADES: calculated #{group_grade_info.inspect}"
       }
     end
   end
@@ -747,7 +747,7 @@ class GradeCalculator
     never_drop_ids = rules[:never_drop] || []
     return submissions if drop_lowest.zero? && drop_highest.zero?
 
-    Rails.logger.info "GRADES: dropping assignments! #{rules.inspect}"
+    Rails.logger.debug "GRADES: dropping assignments! #{rules.inspect}"
 
     cant_drop = []
     if never_drop_ids.present? || @ignore_muted
@@ -776,7 +776,7 @@ class GradeCalculator
 
     (kept + cant_drop).tap do |all_kept|
       loggable_kept = all_kept.map { |s| loggable_submission(s) }
-      Rails.logger.info "GRADES.calculating... kept=#{loggable_kept.inspect}"
+      Rails.logger.debug "GRADES.calculating... kept=#{loggable_kept.inspect}"
     end
   end
 
