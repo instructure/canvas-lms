@@ -8,11 +8,13 @@
 
 .contentPrimary {
   margin-bottom: var(--bottomMarginPhoneUp);
+  margin-left: var(--gutterWidth);
   box-sizing: border-box;
   min-width: 1px;
 }
 
 .contentSecondary {
+  margin-left: var(--gutterWidth);
   box-sizing: border-box;
   min-width: 1px;
 }

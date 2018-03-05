@@ -25,7 +25,7 @@ export default function generator ({ borders, colors, spacing, typography }) {
     paddingMedium: `${spacing.small}`,
     paddingLarge: `${spacing.small} ${spacing.medium}`,
 
-    gutterWidth: spacing.small,
+    gutterWidth: spacing.medium,
     gutterWidthXLarge: spacing.medium,
 
     bottomMargin: spacing.xSmall,

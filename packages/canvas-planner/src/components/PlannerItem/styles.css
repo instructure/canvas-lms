@@ -11,9 +11,10 @@
 }
 
 .completed,
-.icon {
+.icon,
+.layout {
   box-sizing: border-box;
-  margin-right: var(--gutterWidth);
+  margin-left: var(--gutterWidth);
 }
 
 .completed {

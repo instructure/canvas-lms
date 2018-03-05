@@ -230,6 +230,7 @@ export class PlannerHeader extends Component {
       <div className={styles.root}>
         <Button
           variant="icon"
+          margin="0 medium 0 0"
           onClick={this.toggleUpdateItemTray}
           ref={(b) => { this.addNoteBtn = b; }}
         >
@@ -246,6 +247,7 @@ export class PlannerHeader extends Component {
             <Button
               onClick={this.toggleOpportunitiesDropdown}
               variant="icon"
+              margin="0 medium 0 0"
               ref={(b) => { this.opportunitiesButton = b; }}
               buttonRef={(b) => { this.opportunitiesHtmlButton = b; }}
             >
