@@ -81,10 +81,6 @@ describe OutcomeImport, type: :model do
   end
 
   describe '.run handles outcome import' do
-    before :once do
-      account_model
-    end
-
     def mock_importer(updates)
       importer = instance_double(Outcomes::CsvImporter)
       expect(importer).to receive(:run) do |&block|

@@ -168,6 +168,7 @@ class OutcomeImportsApiController < ApplicationController
       end
 
       import = OutcomeImport.create_with_attachment(@context, params[:import_type], file_obj, @current_user)
+      import.schedule
 
       render json: outcome_import_json(import, @current_user, session)
     end

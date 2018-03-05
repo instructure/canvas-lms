@@ -30,52 +30,53 @@ describe OutcomeImportsApiController, type: :request do
   end
 
   def expect_keys(json, keys)
-    keys.each do |key|
-      expect(json).to be_key key
-      json.delete(key)
-    end
+    expect(keys - json.keys).to eq([])
+    keys.each { |k| json.delete(k) }
+    json
   end
 
   it 'should kick off an outcome import via multipart attachment' do
-    # TODO: Once OUT-1997 is merged, we can uncomment this out?
-    # json = nil
-    # expect {
-    json = api_call(:post,
-          "/api/v1/accounts/#{@account.id}/outcome_imports",
-          { :controller => 'outcome_imports_api', :action => 'create',
-            :format => 'json', :account_id => @account.id.to_s },
-          { :import_type => 'instructure_csv',
-            :attachment => fixture_file_upload("files/outcomes/test_outcomes_1.csv", 'text/csv') })
-    # }.to change { Delayed::Job.strand_size("sis_batch:account:#{@account.id}") }.by(1)
-    expect_keys(json, %w[created_at updated_at ended_at user])
+    json = nil
+    strand = "OutcomeImport\#run::shard.#{@account.root_account.shard.id}"
+    expect do
+      json = api_call(:post,
+            "/api/v1/accounts/#{@account.id}/outcome_imports",
+            { :controller => 'outcome_imports_api', :action => 'create',
+              :format => 'json', :account_id => @account.id.to_s },
+            { :import_type => 'instructure_csv',
+              :attachment => fixture_file_upload("files/outcomes/test_outcomes_1.csv", 'text/csv') })
+    end.to change { Delayed::Job.strand_size(strand) }.by(1)
+
+    remaining_json = expect_keys(json, %w[created_at updated_at ended_at user])
     import = OutcomeImport.last
-    expect(json).to eq({
-          "data" => { "import_type"=>"instructure_csv"},
-          "progress" => 0,
-          "id" => import.id,
-          "processing_errors" => [],
-          "workflow_state"=>"created"
+    expect(remaining_json).to eq({
+      "data" => { "import_type"=>"instructure_csv"},
+      "progress" => 0,
+      "id" => import.id,
+      "processing_errors" => [],
+      "workflow_state"=>"created"
     })
 
     expect(OutcomeImport.count).to eq @import_count + 1
     run_jobs
-    # TODO: Once OUT-1997 is merged, we can uncomment this out
-    # expect(LearningOutcome.count).to eq @outcome_count + 1
-    # expect(LearningOutcomeGroup.count).to eq @group_count + 2
-    # expect(Outcome.last.title).to eq "REPLACE ME"
+
+    expect(LearningOutcome.count).to eq @outcome_count + 1
+    expect(LearningOutcomeGroup.count).to eq @group_count + 3
+    expect(LearningOutcome.last.title).to eq "C"
 
     json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_imports/#{import.id}",
           { :controller => 'outcome_imports_api', :action => 'show', :format => 'json',
             :account_id => @account.id.to_s, :id => import.id.to_s })
     expect(json).to be_truthy
-    expect_keys(json, %w[created_at updated_at ended_at user])
-    # TODO: Once OUT-1997 is merged, we can uncomment this out
-    # expect(json).to eq({
-    #       "data" => { "import_type" => "instructure_csv" },
-    #       "progress" => 100,
-    #       "id" => import.id,
-    #       "workflow_state"=>"imported"
-    # })
+    remaining_json = expect_keys(json, %w[created_at updated_at ended_at user])
+
+    expect(remaining_json).to eq({
+      "data" => { "import_type" => "instructure_csv" },
+      "processing_errors" => [],
+      "progress" => 100,
+      "id" => import.id,
+      "workflow_state" => "succeeded"
+    })
   end
 
   it "should allow raw post without content-type" do

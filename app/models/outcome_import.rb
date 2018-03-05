@@ -96,28 +96,42 @@ class OutcomeImport < ApplicationRecord
     data
   end
 
-  def run
-    job_started!
-    file = self.attachment.open(need_local_file: true)
-    begin
-      Outcomes::CsvImporter.new(self, file).run do |status|
-        status[:errors].each do |row, error|
-          add_error row, error
-        end
-        self.update!(progress: status[:progress])
-      end
+  def root_account
+    context.root_account
+  end
 
-      if outcome_import_errors.count == 0
-        job_completed!
-      else
+  def schedule
+    send_later_enqueue_args(:run, singleton: delayed_job_strand)
+  end
+
+  def delayed_job_strand
+    "OutcomeImport\#run::shard.#{root_account.shard.id}"
+  end
+
+  def run
+    root_account.shard.activate do
+      job_started!
+      file = self.attachment.open(need_local_file: true)
+      begin
+        Outcomes::CsvImporter.new(self, file).run do |status|
+          status[:errors].each do |row, error|
+            add_error row, error
+          end
+          self.update!(progress: status[:progress])
+        end
+
+        if outcome_import_errors.count == 0
+          job_completed!
+        else
+          job_failed!
+        end
+      rescue
+        add_error(1, I18n.t('An unexpected error has occurred'))
         job_failed!
+        raise
+      ensure
+        file.close
       end
-    rescue
-      add_error(1, I18n.t('An unexpected error has occurred'))
-      job_failed!
-      raise
-    ensure
-      file.close
     end
   end
 
