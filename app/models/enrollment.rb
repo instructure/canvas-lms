@@ -1345,12 +1345,6 @@ class Enrollment < ActiveRecord::Base
       override_scope
         .where(assignment_id: assignment_ids)
         .find_each(&:destroy)
-    elsif being_restored? || being_reactivated? || being_uncompleted?
-      return unless (assignment_ids = assignment_scope.pluck(:id)).any?
-
-      override_scope
-        .where(assignment_id: assignment_ids)
-        .find_each(&:undestroy)
     end
   end
 
