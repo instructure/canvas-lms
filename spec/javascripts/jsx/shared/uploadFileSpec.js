@@ -33,7 +33,7 @@ test('uploadFile posts form data instead of json if necessary', assert => {
   const postStub = sinon.stub();
   const getStub = sinon.stub();
   postStub.onCall(0).returns(preflightResponse);
-  postStub.onCall(1).returns(Promise.resolve({ data: {} }));
+  postStub.onCall(1).resolves({ data: {} });
   const fakeAjaxLib = {
     post: postStub,
     get: getStub
@@ -66,7 +66,7 @@ test('uploadFile requests no_redirect in preflight even if not specified', asser
   const postStub = sinon.stub();
   const getStub = sinon.stub();
   postStub.onCall(0).returns(preflightResponse);
-  postStub.onCall(1).returns(Promise.resolve({ data: {} }));
+  postStub.onCall(1).resolves({ data: {} });
   const fakeAjaxLib = {
     post: postStub,
     get: getStub
@@ -98,8 +98,8 @@ test('uploadFile threads through in direct to S3 case', assert => {
   const postStub = sinon.stub();
   const getStub = sinon.stub();
   postStub.onCall(0).returns(preflightResponse);
-  postStub.onCall(1).returns(Promise.resolve({ data: {} }));
-  getStub.returns(Promise.resolve({ data: {} }));
+  postStub.onCall(1).resolves({ data: {} });
+  getStub.resolves({ data: {} });
 
   const fakeAjaxLib = {
     post: postStub,
@@ -139,7 +139,7 @@ test('uploadFile threads through in inst-fs case', assert => {
   const getStub = sinon.stub();
   postStub.onCall(0).returns(preflightResponse);
   postStub.onCall(1).returns(postResponse);
-  getStub.returns(Promise.resolve({ data: {} }));
+  getStub.resolves({ data: {} });
 
   const fakeAjaxLib = {
     post: postStub,
@@ -177,7 +177,7 @@ test('uploadFile threads through in local-storage case', assert => {
   const getStub = sinon.stub();
   postStub.onCall(0).returns(preflightResponse);
   postStub.onCall(1).returns(postResponse);
-  getStub.returns(Promise.resolve({ data: {} }));
+  getStub.resolves({ data: {} });
 
   const fakeAjaxLib = {
     post: postStub,
@@ -202,7 +202,7 @@ test('completeUpload upacks embedded "attachments" wrapper if any', assert => {
   };
 
   const postStub = sinon.stub();
-  postStub.returns(Promise.resolve({ data: {} }));
+  postStub.resolves({ data: {} });
   const fakeAjaxLib = { post: postStub };
 
   const file = sinon.stub();
@@ -218,7 +218,7 @@ test('completeUpload wires up progress callback if any', assert => {
   const done = assert.async();
 
   const postStub = sinon.stub();
-  postStub.returns(Promise.resolve({ data: {} }));
+  postStub.resolves({ data: {} });
   const fakeAjaxLib = { post: postStub };
 
   const preflightResponse = { upload_url: 'http://uploadUrl' };
@@ -250,7 +250,7 @@ test('completeUpload skips GET after inst-fs upload if options.ignoreResult', as
   const postStub = sinon.stub();
   const getStub = sinon.stub();
   postStub.returns(postResponse);
-  getStub.returns(Promise.resolve({ data: {} }));
+  getStub.resolves({ data: {} });
 
   const fakeAjaxLib = {
     post: postStub,
@@ -270,7 +270,7 @@ test('completeUpload skips GET after inst-fs upload if options.ignoreResult', as
   }).catch(done);
 })
 
-test('completeUpload appends avatar include in GET after inst-fs upload if options.includeAvatar', assert => {
+test('completeUpload appends avatar include in GET after upload if options.includeAvatar', assert => {
   const done = assert.async()
   const successUrl = 'http://successUrl';
 
@@ -284,7 +284,7 @@ test('completeUpload appends avatar include in GET after inst-fs upload if optio
   const postStub = sinon.stub();
   const getStub = sinon.stub();
   postStub.returns(postResponse);
-  getStub.returns(Promise.resolve({ data: {} }));
+  getStub.resolves({ data: {} });
 
   const fakeAjaxLib = {
     post: postStub,
@@ -310,8 +310,8 @@ test('completeUpload to S3 posts withCredentials false', assert => {
 
   const postStub = sinon.stub();
   const getStub = sinon.stub();
-  postStub.returns(Promise.resolve({ data: {} }));
-  getStub.returns(Promise.resolve({ data: {} }));
+  postStub.resolves({ data: {} });
+  getStub.resolves({ data: {} });
 
   const fakeAjaxLib = {
     post: postStub,
@@ -338,8 +338,8 @@ test('completeUpload to non-S3 posts withCredentials true', assert => {
 
   const postStub = sinon.stub();
   const getStub = sinon.stub();
-  postStub.returns(Promise.resolve({ data: {} }));
-  getStub.returns(Promise.resolve({ data: {} }));
+  postStub.resolves({ data: {} });
+  getStub.resolves({ data: {} });
 
   const fakeAjaxLib = {
     post: postStub,
@@ -357,3 +357,80 @@ test('completeUpload to non-S3 posts withCredentials true', assert => {
     done();
   }).catch(done);
 })
+
+test('completeUpload does not add a null file to the upload POST', assert => {
+  const done = assert.async()
+
+  const postStub = sinon.stub();
+  postStub.resolves({ data: {} });
+
+  const fakeAjaxLib = {
+    post: postStub
+  };
+
+  const preflightResponse = { upload_url: 'http://uploadUrl', progress: { workflow_state: 'completed', results: {} } };
+  const file = null;
+  const options = { ajaxLib: fakeAjaxLib };
+
+  completeUpload(preflightResponse, file, options).then(() => {
+    ok(postStub.calledWith(
+      sinon.match.any,
+      sinon.match((formData) => !formData.has('file')),
+      sinon.match.any
+    ), 'no file in formData');
+    done();
+  }).catch(done);
+});
+
+test('completeUpload immediately waits on progress if given a progress and no upload_url', assert => {
+  const done = assert.async()
+
+  const results = { id: 1 };
+  const postStub = sinon.stub();
+  const getStub = sinon.stub();
+  postStub.resolves({ data: {} });
+  getStub.resolves({ data: { workflow_state: 'completed', results } });
+
+  const fakeAjaxLib = {
+    post: postStub,
+    get: getStub
+  };
+
+  const preflightResponse = { progress: { workflow_state: 'queued', url: 'http://progressUrl' } };
+  const file = null;
+  const options = { ajaxLib: fakeAjaxLib };
+
+  completeUpload(preflightResponse, file, options).then((data) => {
+    ok(!postStub.called, 'no POST made');
+    deepEqual(data, results, 'returned data is from the Progress polling');
+    done();
+  }).catch(done);
+});
+
+test('completeUpload waits on progress after upload POST if given both a progress and upload URL', assert => {
+  const done = assert.async()
+
+  const results = { id: 1 };
+  const postStub = sinon.stub();
+  const getStub = sinon.stub();
+  postStub.resolves({ data: {} });
+  getStub.resolves({ data: { workflow_state: 'completed', results } });
+
+  const fakeAjaxLib = {
+    post: postStub,
+    get: getStub
+  };
+
+  const preflightResponse = {
+    progress: { workflow_state: 'queued', url: 'http://progressUrl' },
+    upload_url: 'http://uploadUrl'
+  };
+  const file = null;
+  const options = { ajaxLib: fakeAjaxLib };
+
+  completeUpload(preflightResponse, file, options).then((data) => {
+    ok(postStub.called, 'upload POST still made');
+    deepEqual(data, results, 'returned data is from the Progress polling');
+    done();
+  }).catch(done);
+});
