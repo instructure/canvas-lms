@@ -159,6 +159,7 @@ class ApplicationController < ActionController::Base
       @js_env[:ping_url] = polymorphic_url([:api_v1, @context, :ping]) if @context.is_a?(Course)
       @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier if !@js_env[:TIMEZONE]
       @js_env[:CONTEXT_TIMEZONE] = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
+      @js_env[:GRAPHQL_ENABLED] = @domain_root_account.try(:feature_enabled?, :graphql)
       unless @js_env[:LOCALE]
         @js_env[:LOCALE] = I18n.locale.to_s
         @js_env[:BIGEASY_LOCALE] = I18n.bigeasy_locale

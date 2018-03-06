@@ -24,7 +24,20 @@ describe GraphQLController do
     student_in_course
   end
 
+  context "feature flag is disabled" do
+    before { user_session(@student) }
+
+    it "404s for all endpoints" do
+      %w[graphiql execute].each do |endpoint|
+        get endpoint
+        expect(response.status).to eq 404
+      end
+    end
+  end
+
   context "graphiql" do
+    before { Account.default.enable_feature!("graphql") }
+
     it "requires a user" do
       get :graphiql
       expect(response.location).to match /\/login$/
@@ -54,6 +67,8 @@ describe GraphQLController do
   end
 
   context "graphql" do
+    before { Account.default.enable_feature!("graphql") }
+
     it "works" do
       post :execute, params: {query: "{}"}
       expect(JSON.parse(response.body)["errors"]).not_to be_blank
