@@ -150,6 +150,11 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
         wrapper = mountComponent()
         strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
       })
+
+      test('renders the AssignmentRowCell div with the "points" class', () => {
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__AssignmentRowCell').hasClass('points'), true)
+      })
     })
 
     QUnit.module('when the "enter grades as setting" is "percent"', hooks => {
@@ -200,6 +205,11 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
         wrapper = mountComponent()
         strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
       })
+
+      test('renders the AssignmentRowCell div with the "percent" class', () => {
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__AssignmentRowCell').hasClass('percent'), true)
+      })
     })
 
     QUnit.module('when the "enter grades as setting" is "gradingScheme"', hooks => {
@@ -245,6 +255,11 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
         wrapper = mountComponent()
         strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
       })
+
+      test('renders the AssignmentRowCell div with the "gradingScheme" class', () => {
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__AssignmentRowCell').hasClass('gradingScheme'), true)
+      })
     })
 
     QUnit.module('when the "enter grades as setting" is "passFail"', hooks => {
@@ -267,7 +282,12 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
         wrapper = mountComponent()
         strictEqual(wrapper.find('.Grid__AssignmentRowCell__EndText').length, 0)
       })
-    })
+
+      test('renders the AssignmentRowCell div with the "passFail" class', () => {
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__AssignmentRowCell').hasClass('passFail'), true)
+      })
+    });
   });
 
   QUnit.module('#handleKeyDown', () => {

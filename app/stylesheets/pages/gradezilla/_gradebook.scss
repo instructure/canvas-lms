@@ -582,14 +582,10 @@ $gradebook_cell_padding_top: 8px;
 .Grid__AssignmentRowCell__StartContainer,
 .Grid__AssignmentRowCell__EndContainer {
   display: flex;
-  flex-basis: 0;
+  flex-basis: $cell-icon-width * 2;
   flex-grow: 1;
   flex-shrink: 1;
   white-space: nowrap;
-}
-
-.Grid__AssignmentRowCell__StartContainer {
-  min-width: $cell-icon-width * 2;
 }
 
 .Grid__AssignmentRowCell__EndContainer {
@@ -600,6 +596,15 @@ $gradebook_cell_padding_top: 8px;
   flex-basis: auto;
   flex-grow: 0;
   flex-shrink: 0;
+}
+
+.Grid__AssignmentRowCell {
+  &.gradingScheme,
+  &.passFail {
+    .Grid__AssignmentRowCell__EndContainer {
+      flex-basis: $cell-icon-width;
+    }
+  }
 }
 
 .Grid__AssignmentRowCell {

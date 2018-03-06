@@ -180,7 +180,7 @@ export default class AssignmentRowCell extends Component {
 
     return (
       <ApplyTheme theme={themeOverrides}>
-        <div className="Grid__AssignmentRowCell">
+        <div className={`Grid__AssignmentRowCell ${this.props.enterGradesAs}`}>
           <div className="Grid__AssignmentRowCell__StartContainer">
             {gradeIsInvalid && (
               <InvalidGradeIndicator elementRef={this.bindInvalidGradeIndicatorRef} />
