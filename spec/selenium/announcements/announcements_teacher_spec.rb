@@ -33,7 +33,7 @@ describe "announcements" do
       user_session(@teacher)
     end
 
-    it "should allow saving of section announcement" do
+    it "should allow saving of section announcement", test_id:3469728, priority: "1" do
       @course.root_account.enable_feature!(:section_specific_announcements)
       @course.course_sections.create!(name: "Section 1")
       @course.course_sections.create!(name: "Section 2")
@@ -46,7 +46,7 @@ describe "announcements" do
                                             individual_announcement_url(Announcement.last))
     end
 
-    it "should not allow empty sections" do
+    it "should not allow empty sections", test_id:3469730, priority: "1" do
       @course.root_account.enable_feature!(:section_specific_announcements)
       @course.course_sections.create!(name: "Section 1")
       @course.course_sections.create!(name: "Section 2")
