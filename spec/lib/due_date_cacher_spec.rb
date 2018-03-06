@@ -27,37 +27,23 @@ describe DueDateCacher do
   describe ".recompute" do
     before do
       @instance = double('instance', :recompute => nil)
+      @new_expectation = expect(DueDateCacher).to receive(:new).and_return(@instance)
     end
 
-    it "wraps assignment in an array" do
-      expect(DueDateCacher).to receive(:new).with(@course, [@assignment.id], hash_including(update_grades: false)).
-        and_return(@instance)
+    it "should wrap assignment in an array" do
+      @new_expectation.with(@course, [@assignment.id])
       DueDateCacher.recompute(@assignment)
     end
 
-    it "delegates to an instance" do
-      expect(DueDateCacher).to receive(:new).and_return(@instance)
+    it "should delegate to an instance" do
       expect(@instance).to receive(:recompute)
       DueDateCacher.recompute(@assignment)
     end
 
-    it "queues a delayed job in an assignment-specific singleton in production" do
-      expect(DueDateCacher).to receive(:new).and_return(@instance)
+    it "should queue a delayed job in an assignment-specific singleton in production" do
       expect(@instance).to receive(:send_later_if_production_enqueue_args).
         with(:recompute, singleton: "cached_due_date:calculator:Assignment:#{@assignment.global_id}")
       DueDateCacher.recompute(@assignment)
-    end
-
-    it "calls recompute with the value of update_grades if it is set to true" do
-      expect(DueDateCacher).to receive(:new).with(@course, [@assignment.id], hash_including(update_grades: true)).
-        and_return(@instance)
-      DueDateCacher.recompute(@assignment, update_grades: true)
-    end
-
-    it "calls recompute with the value of update_grades if it is set to false" do
-      expect(DueDateCacher).to receive(:new).with(@course, [@assignment.id], hash_including(update_grades: false)).
-        and_return(@instance)
-      DueDateCacher.recompute(@assignment, update_grades: false)
     end
   end
 
@@ -66,69 +52,49 @@ describe DueDateCacher do
       @assignments = [@assignment]
       @assignments << assignment_model(:course => @course)
       @instance = double('instance', :recompute => nil)
+      @new_expectation = expect(DueDateCacher).to receive(:new).and_return(@instance)
     end
 
     it "passes along the whole array" do
-      expect(DueDateCacher).to receive(:new).with(@course, @assignments, hash_including(update_grades: false)).
-        and_return(@instance)
+      @new_expectation.with(@course, @assignments)
       DueDateCacher.recompute_course(@course, assignments: @assignments)
     end
 
     it "defaults to all assignments in the context" do
-      expect(DueDateCacher).to receive(:new).
-        with(@course, match_array(@assignments.map(&:id)), hash_including(update_grades: false)).and_return(@instance)
+      @new_expectation.with(@course, match_array(@assignments.map(&:id)))
       DueDateCacher.recompute_course(@course)
     end
 
     it "delegates to an instance" do
-      expect(DueDateCacher).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:recompute)
       DueDateCacher.recompute_course(@course, assignments: @assignments)
     end
 
-    it "calls recompute with the value of update_grades if it is set to true" do
-      expect(DueDateCacher).to receive(:new).
-        with(@course, match_array(@assignments.map(&:id)), hash_including(update_grades: true)).and_return(@instance)
-      DueDateCacher.recompute_course(@course, update_grades: true)
-    end
-
-    it "calls recompute with the value of update_grades if it is set to false" do
-      expect(DueDateCacher).to receive(:new).
-        with(@course, match_array(@assignments.map(&:id)), hash_including(update_grades: false)).and_return(@instance)
-      DueDateCacher.recompute_course(@course, update_grades: false)
-    end
-
     it "queues a delayed job in a singleton in production if assignments.nil" do
-      expect(DueDateCacher).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:send_later_if_production_enqueue_args).
-        with(:recompute, singleton: "cached_due_date:calculator:Course:#{@course.global_id}")
+          with(:recompute, singleton: "cached_due_date:calculator:Course:#{@course.global_id}")
       DueDateCacher.recompute_course(@course)
     end
 
     it "queues a delayed job without a singleton if assignments is passed" do
-      expect(DueDateCacher).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:send_later_if_production_enqueue_args).with(:recompute, {})
       DueDateCacher.recompute_course(@course, assignments: @assignments)
     end
 
     it "does not queue a delayed job when passed run_immediately: true" do
-      expect(DueDateCacher).to receive(:new).and_return(@instance)
       expect(@instance).not_to receive(:send_later_if_production_enqueue_args).with(:recompute, {})
       DueDateCacher.recompute_course(@course, assignments: @assignments, run_immediately: true)
     end
 
     it "calls the recompute method when passed run_immediately: true" do
-      expect(DueDateCacher).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:recompute).with(no_args)
       DueDateCacher.recompute_course(@course, assignments: @assignments, run_immediately: true)
     end
 
     it "operates on a course id" do
-      expect(DueDateCacher).to receive(:new).
-        with(@course, match_array(@assignments.map(&:id).sort), hash_including(update_grades: false)).
-        and_return(@instance)
       expect(@instance).to receive(:send_later_if_production_enqueue_args).
-        with(:recompute, singleton: "cached_due_date:calculator:Course:#{@course.global_id}")
+          with(:recompute, singleton: "cached_due_date:calculator:Course:#{@course.global_id}")
+      @new_expectation.with(@course, match_array(@assignments.map(&:id).sort))
       DueDateCacher.recompute_course(@course.id)
     end
   end
@@ -151,37 +117,19 @@ describe DueDateCacher do
 
     it "passes along the whole user array" do
       expect(DueDateCacher).to receive(:new).and_return(instance).
-        with(@course, Assignment.active.where(context: @course).pluck(:id), student_ids,
-          hash_including(update_grades: false))
+        with(@course, Assignment.active.where(context: @course).pluck(:id), student_ids)
       DueDateCacher.recompute_users_for_course(student_ids, @course)
-    end
-
-    it "calls recompute with the value of update_grades if it is set to true" do
-      expect(DueDateCacher).to receive(:new).
-        with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(update_grades: true)).
-        and_return(instance)
-      expect(instance).to receive(:recompute)
-      DueDateCacher.recompute_users_for_course(student_1.id, @course, assignments.map(&:id), update_grades: true)
-    end
-
-    it "calls recompute with the value of update_grades if it is set to false" do
-      expect(DueDateCacher).to receive(:new).
-        with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(update_grades: false)).
-        and_return(instance)
-      expect(instance).to receive(:recompute)
-      DueDateCacher.recompute_users_for_course(student_1.id, @course, assignments.map(&:id), update_grades: false)
     end
 
     it "passes assignments if it has any specified" do
       expect(DueDateCacher).to receive(:new).and_return(instance).
-        with(@course, assignments, student_ids, hash_including(update_grades: false))
+        with(@course, assignments, student_ids)
       DueDateCacher.recompute_users_for_course(student_ids, @course, assignments)
     end
 
     it "handles being called with a course id" do
       expect(DueDateCacher).to receive(:new).and_return(instance).
-        with(@course, Assignment.active.where(context: @course).pluck(:id), student_ids,
-          hash_including(update_grades: false))
+        with(@course, Assignment.active.where(context: @course).pluck(:id), student_ids)
       DueDateCacher.recompute_users_for_course(student_ids, @course.id)
     end
 
@@ -634,41 +582,17 @@ describe DueDateCacher do
       end
     end
 
-    it "kicks off a LatePolicyApplicator job on completion when called with a single assignment" do
+    it 'kicks off a LatePolicyApplicator job on completion when called with a single assignment' do
       expect(LatePolicyApplicator).to receive(:for_assignment).with(@assignment)
 
       @cacher.recompute
     end
 
-    it "does not kick off a LatePolicyApplicator job when called with multiple assignments" do
+    it 'does not kick off a LatePolicyApplicator job when called with multiple assignments' do
       @assignment1 = @assignment
       @assignment2 = assignment_model(course: @course)
 
       expect(LatePolicyApplicator).not_to receive(:for_assignment)
-
-      DueDateCacher.new(@course, [@assignment1, @assignment2]).recompute
-    end
-
-    it "runs the GradeCalculator inline when update_grades is true" do
-      expect(@course).to receive(:recompute_student_scores_without_send_later)
-
-      DueDateCacher.new(@course, [@assignment], update_grades: true).recompute
-    end
-
-    it "runs the GradeCalculator inline with student ids when update_grades is true and students are given" do
-      expect(@course).to receive(:recompute_student_scores_without_send_later).with([@student.id])
-
-      DueDateCacher.new(@course, [@assignment], [@student.id], update_grades: true).recompute
-    end
-
-    it "does not run the GradeCalculator inline when update_grades is false" do
-      expect(@course).not_to receive(:recompute_student_scores_without_send_later)
-
-      DueDateCacher.new(@course, [@assignment1, @assignment2], update_grades: false).recompute
-    end
-
-    it "does not run the GradeCalculator inline when update_grades is not specified" do
-      expect(@course).not_to receive(:recompute_student_scores_without_send_later)
 
       DueDateCacher.new(@course, [@assignment1, @assignment2]).recompute
     end
