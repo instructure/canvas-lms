@@ -107,6 +107,18 @@ class DeveloperKeysController < ApplicationController
   end
 
   def developer_key_params
-    params.require(:developer_key).permit(:api_key, :name, :icon_url, :redirect_uri, :redirect_uris, :email, :auto_expire_tokens, :notes, :access_token_count, :vendor_code)
+    params.require(:developer_key).permit(
+      :access_token_count,
+      :api_key,
+      :auto_expire_tokens,
+      :email,
+      :icon_url,
+      :name,
+      :notes,
+      :redirect_uri,
+      :redirect_uris,
+      :vendor_code,
+      :visible,
+    )
   end
 end

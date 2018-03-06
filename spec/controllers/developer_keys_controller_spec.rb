@@ -81,6 +81,14 @@ describe DeveloperKeysController do
         get 'index', params: {account_id: Account.site_admin.id}
         expect(assigns[:keys].first.vendor_code).to eq 'test_vendor_code'
       end
+
+      it "should include the key's 'visibility'" do
+        user_session(@admin)
+        key = DeveloperKey.create!
+        get 'index', params: {account_id: Account.site_admin.id}, format: :json
+        developer_key = json_parse(response.body).first
+        expect(developer_key['visible']).to eq(key.visible)
+      end
     end
 
     describe "POST 'create'" do
@@ -238,7 +246,6 @@ describe DeveloperKeysController do
         expect(response).to be_redirect
         expect(flash[:error]).to eq "You don't have permission to access that page"
       end
-
     end
   end
 end
