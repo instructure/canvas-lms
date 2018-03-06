@@ -211,9 +211,6 @@
         <% end %>
       <% end %>
     </div>
-  <% cache('global_dialogs_render') do %>
-    <%= render :partial => "shared/global_dialogs" %>
-  <% end %>
   <div id='aria_alerts' class='hide-text affix' role="alert" aria-live="assertive"></div>
   <div id='StudentTray__Container'></div>
   <% if tutorials_enabled? %>
