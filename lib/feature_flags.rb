@@ -84,10 +84,12 @@ module FeatureFlags
     return [Account.site_admin.global_id] if is_a?(User)
 
     RequestCache.cache('feature_flag_account_ids', self) do
-      Rails.cache.fetch(['feature_flag_account_ids', self].cache_key) do
-        chain = account_chain(include_site_admin: true)
-        chain.shift if is_a?(Account)
-        chain.reverse.map(&:global_id)
+      shard.activate do
+        Rails.cache.fetch(['feature_flag_account_ids', self].cache_key) do
+          chain = account_chain(include_site_admin: true)
+          chain.shift if is_a?(Account)
+          chain.reverse.map(&:global_id)
+        end
       end
     end
   end
