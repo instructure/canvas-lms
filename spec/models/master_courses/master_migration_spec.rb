@@ -1499,6 +1499,35 @@ describe MasterCourses::MasterMigration do
       end
     end
 
+    it "copies module prerequisites selectively" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      mod1 = @copy_from.context_modules.create! :name => 'wun'
+      mod2 = @copy_from.context_modules.create! :name => 'too'
+
+      run_master_migration
+
+      mod1_to = @copy_to.context_modules.where(:migration_id => mig_id(mod1)).first
+      mod2_to = @copy_to.context_modules.where(:migration_id => mig_id(mod2)).first
+
+      Timecop.freeze(2.minutes.from_now) do
+        mod2.prerequisites = "module_#{mod1.id}"
+        mod2.save!
+      end
+
+      run_master_migration
+      expect(mod2_to.reload.prerequisites[0][:id]).to eql(mod1_to.id)
+
+      Timecop.freeze(3.minutes.from_now) do
+        mod2.prerequisites = ""
+        mod2.save!
+      end
+
+      run_master_migration
+      expect(mod2_to.reload.prerequisites).to be_empty
+    end
+
     it "should work with links to files copied in previous sync" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)

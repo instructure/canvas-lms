@@ -143,7 +143,7 @@ module Importers
             end
           end
         end
-        item.prerequisites = preqs if preqs.length > 0
+        item.prerequisites = preqs if preqs.length > 0 || migration.for_master_course_import?
       end
       item.save!
 
