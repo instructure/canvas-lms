@@ -18,6 +18,10 @@
 
 
 module PlannerHelper
+  def planner_meta_cache_key
+    ['planner_items_meta', @current_user].cache_key
+  end
+
   def formatted_planner_date(input, val, default = nil, end_of_day: false)
     @errors ||= {}
     if val.present? && val.is_a?(String)

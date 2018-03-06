@@ -173,8 +173,12 @@ class PlannerOverridesController < ApplicationController
   # ]
   def items_index
     ensure_valid_planner_params or return
+    # fetch a meta key so we can invalidate just this info and not the whole of the user's cache
+    planner_overrides_meta_key = Rails.cache.fetch(planner_meta_cache_key, expires_in: 120.minutes) do
+      SecureRandom.uuid
+    end
 
-    items_json = Rails.cache.fetch(['planner_items', @current_user, page, params[:filter], default_opts].cache_key, expires_in: 120.minutes) do
+    items_json = Rails.cache.fetch(['planner_items', planner_overrides_meta_key, page, params[:filter], default_opts].cache_key, expires_in: 120.minutes) do
       items = params[:filter] == 'new_activity' ? unread_items : planner_items
       items = Api.paginate(items, self, api_v1_planner_items_url)
       planner_items_json(items, @current_user, session, {start_at: start_date, due_after: start_date, due_before: end_date})
@@ -228,6 +232,7 @@ class PlannerOverridesController < ApplicationController
     planner_override.dismissed = value_to_boolean(params[:dismissed])
 
     if planner_override.save
+      Rails.cache.delete(planner_meta_cache_key)
       render json: planner_override_json(planner_override, @current_user, session), status: :ok
     else
       render json: planner_override.errors, status: :bad_request
@@ -264,6 +269,7 @@ class PlannerOverridesController < ApplicationController
       user: @current_user, dismissed: value_to_boolean(params[:dismissed]))
 
     if planner_override.save
+      Rails.cache.delete(planner_meta_cache_key)
       render json: planner_override_json(planner_override, @current_user, session), status: :created
     else
       render json: planner_override.errors, status: :bad_request
@@ -280,6 +286,7 @@ class PlannerOverridesController < ApplicationController
     planner_override = PlannerOverride.find(params[:id])
 
     if planner_override.destroy
+      Rails.cache.delete(planner_meta_cache_key)
       render json: planner_override_json(planner_override, @current_user, session), status: :ok
     else
       render json: planner_override.errors, status: :bad_request
@@ -390,8 +397,8 @@ class PlannerOverridesController < ApplicationController
     # Since a range is needed, set values that weren't passed to a date
     # in the far past/future as to get all values before or after whichever
     # date was passed
-    @start_date = formatted_planner_date('start_date', @start_date, 10.years.ago)
-    @end_date   = formatted_planner_date('end_date', @end_date, 10.years.from_now)
+    @start_date = formatted_planner_date('start_date', @start_date, 10.years.ago.beginning_of_day)
+    @end_date   = formatted_planner_date('end_date', @end_date, 10.years.from_now.beginning_of_day)
   end
 
   def set_params

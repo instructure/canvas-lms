@@ -209,6 +209,7 @@ class PlannerNotesController < ApplicationController
       end
     end
     if note.update_attributes(update_params)
+      Rails.cache.delete(planner_meta_cache_key)
       render json: planner_note_json(note, @current_user, session), status: :ok
     else
       render json: note.errors, status: :bad_request
@@ -261,6 +262,7 @@ class PlannerNotesController < ApplicationController
     note = @current_user.planner_notes.new(create_params)
     begin
       if note.save
+        Rails.cache.delete(planner_meta_cache_key)
         render json: planner_note_json(note, @current_user, session), status: :created
       else
         render json: note.errors, status: :bad_request
@@ -279,6 +281,7 @@ class PlannerNotesController < ApplicationController
     note = PlannerNote.find(params[:id])
 
     if note.destroy
+      Rails.cache.delete(planner_meta_cache_key)
       render json: planner_note_json(note, @current_user, session), status: :ok
     else
       render json: note.errors, status: :bad_request
