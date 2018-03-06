@@ -35,6 +35,7 @@ module CanvasKaltura
   end
 
   def self.cache
+    return @cache.call if @cache.is_a?(Proc)
     @cache
   end
 

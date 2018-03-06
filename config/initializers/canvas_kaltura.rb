@@ -20,6 +20,6 @@ Rails.configuration.to_prepare do
     Canvas.timeout_protection("kaltura", options, &block)
   end
   CanvasKaltura.logger = Rails.logger
-  CanvasKaltura.cache = Rails.cache
+  CanvasKaltura.cache = -> { Rails.cache }
   CanvasKaltura.plugin_settings = -> { Canvas::Plugin.find(:kaltura) }
 end
