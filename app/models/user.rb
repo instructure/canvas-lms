@@ -2484,8 +2484,10 @@ class User < ActiveRecord::Base
     return user_roles(root_account, true) if exclude_deleted_accounts
 
     return @roles if @roles
-    @roles = Rails.cache.fetch(['user_roles_for_root_account3', self, root_account].cache_key) do
-      user_roles(root_account)
+    root_account.shard.activate do
+      @roles = Rails.cache.fetch(['user_roles_for_root_account3', self, root_account].cache_key) do
+        user_roles(root_account)
+      end
     end
   end
 
