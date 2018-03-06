@@ -195,8 +195,9 @@ export default class MoveSelect extends React.Component {
         {(
           <Container textAlign="end" display="block">
             <hr />
-            <Button onClick={this.props.onClose} margin="0 x-small 0 0">{I18n.t('Cancel')}</Button>
+            <Button id="move-item-tray-cancel-button" onClick={this.props.onClose} margin="0 x-small 0 0">{I18n.t('Cancel')}</Button>
             <Button
+              id="move-item-tray-submit-button"
               disabled={!this.isDoneSelecting()}
               type="submit" variant="primary"
               onClick={this.submitSelection}

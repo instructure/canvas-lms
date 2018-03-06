@@ -43,19 +43,30 @@ function copyAndUpdateDiscussionState(oldState, updatedDiscussion) {
 }
 
 const reducerMap = {
+  [actionTypes.ARRANGE_PINNED_DISCUSSIONS]: (state, action) => {
+    if (!action.payload.order) {
+      return state
+    }
+    const oldDiscussionList = state.slice()
+    const newPinnedDiscussions = action.payload.order.map(id => {
+      const currentDiscussion = oldDiscussionList.find(
+        discussion => discussion.id === id
+      )
+      return currentDiscussion
+    })
+    return newPinnedDiscussions
+  },
   [actionTypes.GET_DISCUSSIONS_SUCCESS]: (state, action) => {
     let pinnedDiscussions = []
-    if(action.payload.data) {
-      pinnedDiscussions = action.payload.data.filter((disc) => disc.pinned)
+    if (action.payload.data) {
+      pinnedDiscussions = action.payload.data.filter(disc => disc.pinned)
     }
     return orderBy(pinnedDiscussions, ['position'], ['asc'])
   },
-  [actionTypes.UPDATE_DISCUSSION_START]: (state, action) => (
+  [actionTypes.UPDATE_DISCUSSION_START]: (state, action) =>
+    copyAndUpdateDiscussionState(state, action.payload.discussion),
+  [actionTypes.UPDATE_DISCUSSION_FAIL]: (state, action) =>
     copyAndUpdateDiscussionState(state, action.payload.discussion)
-  ),
-  [actionTypes.UPDATE_DISCUSSION_FAIL]: (state, action) => (
-    copyAndUpdateDiscussionState(state, action.payload.discussion)
-  ),
 }
 
 Object.assign(reducerMap, subscriptionReducerMap)

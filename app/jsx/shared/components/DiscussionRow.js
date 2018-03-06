@@ -34,6 +34,7 @@ import IconRssSolid from 'instructure-icons/lib/Solid/IconRssSolid'
 import IconPublishSolid from 'instructure-icons/lib/Solid/IconPublishSolid'
 import IconPublishLine from 'instructure-icons/lib/Line/IconPublishLine'
 import IconCopySolid from 'instructure-icons/lib/Solid/IconCopySolid'
+import IconUpdownLine from 'instructure-icons/lib/Line/IconUpdownLine'
 
 import DiscussionModel from 'compiled/models/DiscussionTopic'
 import SectionsTooltip from '../SectionsTooltip'
@@ -67,11 +68,14 @@ const discussionTarget = {
 export default function DiscussionRow ({ discussion, masterCourseData, rowRef, onSelectedChanged,
                                          connectDragSource, connectDragPreview, draggable,
                                          onToggleSubscribe, updateDiscussion, canManage, canPublish,
-                                         duplicateDiscussion, cleanDiscussionFocus }) {
+                                         duplicateDiscussion, cleanDiscussionFocus, onMoveDiscussion }) {
   const onManageDiscussion = (e, { action, id }) => {
     switch (action) {
      case 'duplicate':
        duplicateDiscussion(id)
+       break;
+     case 'moveTo':
+       onMoveDiscussion({ id, title: discussion.title })
        break;
      default:
        throw new Error(I18n.t('Unknown manage discussion action encountered'))
@@ -125,6 +129,21 @@ export default function DiscussionRow ({ discussion, masterCourseData, rowRef, o
       <ScreenReaderContent> { I18n.t('Duplicate discussion %{title}', { title: discussion.title }) } </ScreenReaderContent>
     </MenuItem>
   ]
+
+  if(onMoveDiscussion) {
+    menuList.push(
+      <MenuItem
+        key="move"
+        value={{ action: 'moveTo', id: discussion.id, title: discussion.title }}
+        id="move-discussion-menu-option"
+      >
+        <span aria-hidden='true'>
+          <IconUpdownLine />&nbsp;&nbsp;{I18n.t('Move To')}
+        </span>
+        <ScreenReaderContent> { I18n.t('Move discussion %{title}', { title: discussion.title }) } </ScreenReaderContent>
+      </MenuItem>
+    )
+  }
 
   // necessary because discussions return html from RCE
   const contentWrapper = document.createElement('span')

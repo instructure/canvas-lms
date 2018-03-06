@@ -83,7 +83,8 @@ export default class DiscussionsContainer extends Component {
     closedState: bool,
     connectDropTarget: func,
     roles: arrayOf(string),
-    renderContainerBackground: func.isRequired
+    renderContainerBackground: func.isRequired,
+    onMoveDiscussion: func
   }
 
   static defaultProps = {
@@ -91,7 +92,8 @@ export default class DiscussionsContainer extends Component {
     connectDropTarget (component) {return component},
     pinned: undefined,
     closedState: undefined,
-    roles: ['user', 'student']
+    roles: ['user', 'student'],
+    onMoveDiscussion: null
   }
 
   renderDiscussions () {
@@ -108,6 +110,7 @@ export default class DiscussionsContainer extends Component {
             duplicateDiscussion={this.props.duplicateDiscussion}
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
             updateDiscussion={this.props.updateDiscussion}
+            onMoveDiscussion={this.props.onMoveDiscussion}
             draggable
           />
         )
@@ -123,6 +126,7 @@ export default class DiscussionsContainer extends Component {
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
             duplicateDiscussion={this.props.duplicateDiscussion}
             updateDiscussion={this.props.updateDiscussion}
+            onMoveDiscussion={this.props.onMoveDiscussion}
             draggable={false}
           />
         )

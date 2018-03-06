@@ -161,6 +161,20 @@ test('renders manage menu if permitted', () => {
   ok(allKeys.includes('duplicate'))
 })
 
+test('renders move-to in manage menu if permitted', () => {
+  const tree = mount(<DiscussionRow {...makeProps({
+    canManage: true,
+    onMoveDiscussion: ()=>{}
+   })} />)
+  const manageMenuNode = tree.find('PopoverMenu')
+  ok(manageMenuNode.exists())
+  const courseItemRow = tree.find('CourseItemRow')
+  ok(courseItemRow.exists())
+  ok(courseItemRow.props().manageMenuOptions.length > 0)
+  const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
+  ok(allKeys.includes('move'))
+})
+
 test('does not render manage menu if not permitted', () => {
   const tree = mount(<DiscussionRow {...makeProps({ canManage: false })} />)
   const node = tree.find('PopoverMenu')

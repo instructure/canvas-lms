@@ -238,3 +238,19 @@ test('SAVING_SETTINGS_SUCCESS should return paylod for user settings', () => {
   const newState = reduce(actions.savingSettingsSuccess({courseSettings: "blah", userSettings: 'blee'}))
   deepEqual(newState.userSettings, "blee")
 })
+test('ARRANGE_PINNED_DISCUSSIONS should update unpinned discussion', () => {
+  const newState = reduce(actions.arrangePinnedDiscussions({ order: [10, 5, 2, 1] }), {
+    pinnedDiscussions: [
+      { title: "landon", id: 1, pinned: true, locked: false },
+      { title: "venk", id: 5, pinned: true, locked: false },
+      { title: "steven", id: 2, pinned: true, locked: false },
+      { title: "aaron", id: 10, pinned: true, locked: false }
+    ]
+  })
+  deepEqual(newState.pinnedDiscussions, [
+    { title: "aaron", id: 10, pinned: true, locked: false },
+    { title: "venk", id: 5, pinned: true, locked: false },
+    { title: "steven", id: 2, pinned: true, locked: false },
+    { title: "landon", id: 1, pinned: true, locked: false }
+  ])
+})

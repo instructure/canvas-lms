@@ -34,11 +34,13 @@ import DiscussionsContainer, { DroppableDiscussionsContainer } from './Discussio
 import { pinnedDiscussionBackground, unpinnedDiscussionsBackground, closedDiscussionBackground } from './DiscussionBackgrounds'
 import {ConnectedIndexHeader} from './IndexHeader'
 
+import { renderTray } from '../../move_item'
 import select from '../../shared/select'
 import { selectPaginationState } from '../../shared/reduxPagination'
 import { discussionList } from '../../shared/proptypes/discussion'
 import propTypes from '../propTypes'
 import actions from '../actions'
+import { reorderDiscussionsURL } from '../utils'
 
 export default class DiscussionsIndex extends Component {
   static propTypes = {
@@ -57,6 +59,7 @@ export default class DiscussionsIndex extends Component {
     unpinnedDiscussions: discussionList,
     duplicateDiscussion: func.isRequired,
     cleanDiscussionFocus: func.isRequired,
+    arrangePinnedDiscussions: func.isRequired,
   }
 
   static defaultProps = {
@@ -88,6 +91,28 @@ export default class DiscussionsIndex extends Component {
       return null
     }
   }
+
+renderMoveDiscussionTray = (item) => {
+  const moveSibilings = this.props.pinnedDiscussions
+    .map((disc) => ({ id: disc.id, title: disc.title}))
+    .filter((disc) => (disc.id !== item.id))
+
+  const moveProps = {
+    title: I18n.t('Move Discussion'),
+    items: [
+      item
+    ],
+    moveOptions: {
+      siblings: moveSibilings,
+    },
+    focusOnExit: () => {},
+    onMoveSuccess: (res) => {
+      this.props.arrangePinnedDiscussions({order: res.data.order})
+    },
+    formatSaveUrl: () => reorderDiscussionsURL({ contextType: this.props.contextType, contextId: this.props.contextId})
+  }
+  renderTray(moveProps)
+}
 
 renderStudentView () {
     return (
@@ -158,6 +183,7 @@ renderStudentView () {
           updateDiscussion={this.props.updateDiscussion}
           duplicateDiscussion={this.props.duplicateDiscussion}
           cleanDiscussionFocus={this.props.cleanDiscussionFocus}
+          onMoveDiscussion={this.renderMoveDiscussionTray}
           roles={this.props.roles}
           pinned
           renderContainerBackground={() =>
@@ -237,12 +263,15 @@ const connectState = state => Object.assign({
     'masterCourseData',
     'pinnedDiscussions',
     'closedForCommentsDiscussions',
-    'unpinnedDiscussions']
+    'unpinnedDiscussions',
+    'contextId',
+    'contextType']
 ))
 const connectActions = dispatch => bindActionCreators(
   select(actions, ['getDiscussions',
                    'toggleSubscriptionState',
                    'updateDiscussion',
                    'duplicateDiscussion',
-                   'cleanDiscussionFocus']), dispatch)
+                   'cleanDiscussionFocus',
+                   'arrangePinnedDiscussions']), dispatch)
 export const ConnectedDiscussionsIndex = DragDropContext(HTML5Backend)(connect(connectState, connectActions)(DiscussionsIndex))
