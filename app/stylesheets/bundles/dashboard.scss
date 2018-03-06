@@ -18,92 +18,17 @@
 
 @import "pages/dashboard/dashboard_activity";
 
-
-// Note: all the calculations in the following 20+ lines are done to give IE
-// a sticky header through fixed positioning. Once all browsers support position: sticky,
-// we can remove all this and use the CSS under @supports (position: sticky)
-
-$nav-collapsed-width: $ic-header-primary-width - 30;
-$nav-expanded-width: $ic-header-primary-width;
-$content-padding: $ic-sp * 4;
-$non-main-content-width-collapsed: $nav-collapsed-width + $content-padding;
-$non-main-content-width-expanded: $nav-expanded-width + $content-padding;
-$ie11-header-height: 2.5rem;
-
-// If the planner is showing, serve up a fixed-position header
-body.dashboard-is-planner {
-  .ic-dashboard-app {
-    padding-top: $ie11-header-height;
-  }
-
-  .ic-Dashboard-header {
-    position: fixed;
-    top: 0;
-    z-index: 20;
-    left: $nav-collapsed-width + ($ic-sp * 2);
-    width: calc(100% - #{$non-main-content-width-collapsed});
-    height: $ie11-header-height;
-    margin-top: 0;
-  }
-
-  &.primary-nav-expanded {
-    .ic-Dashboard-header {
-      left: $nav-expanded-width + ($ic-sp * 2);
-      width: calc(100% - #{$non-main-content-width-expanded});
-    }
-  }
-
-  .ic-Dashboard-header__layout {
-    padding-top: $ic-sp;
-  }
-}
-
-@supports (position: sticky) or (position: -webkit-sticky) {
-  // If the browser supports sticky positioning:
-  // 1) Give ALL dashboard headers sticky positioning per product design
-  .ic-Dashboard-header,
-  body.dashboard-is-planner .ic-Dashboard-header {
-    position: sticky;
-    top: 0;
-    z-index: 5;
-  }
-
-  // 2) Undo all the fixed positioning CSS rules we needed for IE
-  body.dashboard-is-planner {
-    .ic-dashboard-app {
-      padding-top: 0;
-    }
-
-    .ic-Dashboard-header {
-      left: auto;
-      width: auto;
-      margin-top: -($ic-sp / 2);
-      height: auto;
-    }
-
-    &.primary-nav-expanded {
-      .ic-Dashboard-header {
-        left: auto;
-        width: auto;
-      }
-    }
-
-    .ic-Dashboard-header__layout {
-      padding-top: 0;
-    }
-  }
-}
-
-.ic-Dashboard-header {
-  margin-top: -($ic-sp / 2);
+.ic-dashboard-app {
+  margin-top: -($ic-sp * 2);
 }
 
 .ic-Dashboard-header__layout {
   display: flex;
   align-items: center;
-  padding: 0 0 ($ic-sp * 0.75);
   border-bottom: 1px solid $ic-border-light;
   background: rgba($ic-color-light, 0.95);
+  box-sizing: border-box;
+  height: $ic-breadcrumbs-height;
 }
 
 .ic-Dashboard-Activity { padding: $ic-sp; }
@@ -121,4 +46,73 @@ body.dashboard-is-planner {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+}
+
+// Note: all the calculations in the following 20+ lines are done to give IE11
+// a sticky-like header for Planner. Once all browsers support position: sticky,
+// we can remove all this and use the CSS under @supports (position: sticky)
+
+$nav-collapsed-width: $ic-header-primary-width - 30;
+$nav-expanded-width: $ic-header-primary-width;
+$content-padding: $ic-sp * 4;
+$non-main-content-width-collapsed: $nav-collapsed-width + $content-padding;
+$non-main-content-width-expanded: $nav-expanded-width + $content-padding;
+
+// If the planner is showing, serve up a fixed-position header
+body.dashboard-is-planner {
+  .ic-dashboard-app {
+    padding-top: $ic-breadcrumbs-height;
+  }
+
+  .ic-Dashboard-header {
+    position: fixed;
+    top: 0;
+    z-index: 20;
+    left: $nav-collapsed-width + ($ic-sp * 2);
+    width: calc(100% - #{$non-main-content-width-collapsed});
+    margin-top: 0;
+  }
+
+  &.primary-nav-expanded {
+    .ic-Dashboard-header {
+      left: $nav-expanded-width + ($ic-sp * 2);
+      width: calc(100% - #{$non-main-content-width-expanded});
+    }
+  }
+}
+
+@supports (position: sticky) or (position: -webkit-sticky) {
+  // If the browser supports sticky positioning:
+  // 1) Give ALL dashboard headers sticky positioning per product design
+  .ic-Dashboard-header,
+  body.dashboard-is-planner .ic-Dashboard-header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+
+  .ic-Dashboard-header__layout {
+    height: auto;
+    min-height: $ic-breadcrumbs-height;
+  }
+
+  // 2) Undo all the fixed positioning CSS rules we needed for IE for Planner
+  body.dashboard-is-planner {
+    .ic-dashboard-app {
+      padding-top: 0;
+    }
+
+    .ic-Dashboard-header {
+      left: auto;
+      width: auto;
+      height: auto;
+    }
+
+    &.primary-nav-expanded {
+      .ic-Dashboard-header {
+        left: auto;
+        width: auto;
+      }
+    }
+  }
 }

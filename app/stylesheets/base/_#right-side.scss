@@ -34,9 +34,8 @@
   h2, .h2 {
     @include fontSize($ic-font-size--small);
     overflow: hidden;
-    line-height: 1.2em;
     border-bottom: 1px solid $ic-border-light;
-    padding-bottom: $ic-sp / 3;
+    padding-bottom: $ic-sp / 2;
     margin: 0 0 $ic-sp / 2;
     font-weight: bold;
   }
@@ -156,7 +155,7 @@
 }
 
 #right-side .todo-list-header {
-  margin-top: 29px; // magic number to align with header bottom border
+  margin-top: 1.0625rem; // magic number to align with header bottom border
 }
 #right-side .right-side-list .todo-badge-wrapper {
   display: inline-block;

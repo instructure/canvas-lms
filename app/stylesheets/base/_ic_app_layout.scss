@@ -259,7 +259,8 @@ body:not(.course-menu-expanded) {
   align-items: center;
   border-bottom: 1px solid $ic-border-light;
   margin: 0 $ic-sp*2;
-  padding: 16px 0;
+  min-height: $ic-breadcrumbs-height;
+  box-sizing: border-box;
 }
 
 .ic-app-course-nav-toggle {
