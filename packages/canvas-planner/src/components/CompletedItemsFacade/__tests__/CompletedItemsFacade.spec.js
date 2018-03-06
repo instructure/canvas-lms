@@ -38,7 +38,7 @@ it('calls the onClick prop when clicked', () => {
     />
   );
 
-  wrapper.find('Checkbox').simulate('click');
+  wrapper.find('Button').simulate('click');
   expect(fakeOnClick).toHaveBeenCalled();
 });
 

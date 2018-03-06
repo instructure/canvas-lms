@@ -1427,7 +1427,13 @@ exports[`renders Note correctly with everything 1`] = `
       }
     }
   >
-    <IconNoteLightLine />
+    <Avatar
+      inline={true}
+      name="Jane"
+      size="small"
+      src="/picture/is/here"
+      variant="circle"
+    />
   </div>
   <div>
     <div>
@@ -1499,7 +1505,13 @@ exports[`renders Note correctly without Course 1`] = `
       }
     }
   >
-    <IconNoteLightLine />
+    <Avatar
+      inline={true}
+      name="Jane"
+      size="small"
+      src="/picture/is/here"
+      variant="circle"
+    />
   </div>
   <div>
     <div>

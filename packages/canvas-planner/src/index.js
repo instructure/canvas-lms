@@ -36,6 +36,7 @@ import {DynamicUiManager, DynamicUiProvider} from './dynamic-ui';
 const defaultOptions = {
   locale: 'en',
   timeZone: moment.tz.guess(),
+  currentUser: {},
   theme: 'canvas',
   courses: [],
   groups: [],
@@ -79,6 +80,7 @@ export function render (element, options) {
           stickyZIndex={opts.stickyZIndex}
           changeToDashboardCardView={opts.changeToDashboardCardView}
           plannerActive={plannerActive}
+          currentUser={opts.currentUser}
         />
       </Provider>
     </DynamicUiProvider>
@@ -140,7 +142,11 @@ export default function loadPlannerDashboard ({changeToCardView, getActiveApp, f
     },
     locale: env.LOCALE,
     timeZone: env.TIMEZONE,
-    userId: env.current_user_id,
+    currentUser: {
+      id: env.current_user.id,
+      displayName: env.current_user.display_name,
+      avatarUrl: env.current_user.avatar_image_url
+    },
     ariaHideElement: document.getElementById('application'),
     theme: '',
     // the new activity button isn't sticky in IE yet, so make sure it slides

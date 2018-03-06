@@ -21,6 +21,7 @@ import classnames from 'classnames';
 import containerQuery from '@instructure/ui-utils/lib/react/containerQuery';
 import { partition } from 'lodash';
 import { arrayOf, string, number, shape, bool, func } from 'prop-types';
+import { userShape, itemShape } from '../plannerPropTypes';
 import styles from './styles.css';
 import theme from './theme.js';
 import PlannerItem from '../PlannerItem';
@@ -34,11 +35,7 @@ import { animatable } from '../../dynamic-ui';
 
 export class Grouping extends Component {
   static propTypes = {
-    items: arrayOf(shape({
-      context: shape({
-        inform_students_of_overdue_submissions: bool
-      })
-    })).isRequired,
+    items: arrayOf(shape(itemShape)).isRequired,
     animatableIndex: number,
     title: string,
     color: string,
@@ -49,6 +46,7 @@ export class Grouping extends Component {
     updateTodo: func,
     registerAnimatable: func,
     deregisterAnimatable: func,
+    currentUser: shape(userShape),
   }
 
   static defaultProps = {
@@ -137,6 +135,7 @@ export class Grouping extends Component {
           badges={this.state.badgeMap[item.id]}
           details={item.details}
           toggleAPIPending={item.toggleAPIPending}
+          currentUser={this.props.currentUser}
         />
       </li>
     ));

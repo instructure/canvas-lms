@@ -35,7 +35,8 @@ function defaultProps (option = {}) {
       points: option.points,
       html_url: option.html_url,
       toggleCompletion: () => {},
-      updateTodo: () => {}
+      updateTodo: () => {},
+      currentUser: {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here'},
   };
 }
 
@@ -49,7 +50,8 @@ function noteProps (option) {
       completed: !!option.completed,
       title: option.title || "A note about note taking",
       toggleCompletion: () => {},
-      updateTodo: () => {}
+      updateTodo: () => {},
+      currentUser: {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here'},
   };
 }
 
@@ -74,7 +76,8 @@ function groupProps (option) {
     "html_url": "/groups/9/pages/this-is-an-account-level-group-page",
     "badges": [],
     toggleCompletion: () => {},
-    updateTodo: () => {}
+    updateTodo: () => {},
+    currentUser: {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here'},
   };
 }
 

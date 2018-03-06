@@ -23,17 +23,18 @@ import Checkbox from '@instructure/ui-core/lib/components/Checkbox';
 import Link from '@instructure/ui-core/lib/components/Link';
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
 import Pill from '@instructure/ui-core/lib/components/Pill';
+import Avatar from '@instructure/ui-core/lib/components/Avatar';
 import Assignment from 'instructure-icons/lib/Line/IconAssignmentLine';
 import Quiz from 'instructure-icons/lib/Line/IconQuizLine';
 import Announcement from 'instructure-icons/lib/Line/IconAnnouncementLine';
 import Discussion from 'instructure-icons/lib/Line/IconDiscussionLine';
-import Note from 'instructure-icons/lib/Line/IconNoteLightLine';
 import Calendar from 'instructure-icons/lib/Line/IconCalendarMonthLine';
 import Page from 'instructure-icons/lib/Line/IconMsWordLine';
 import BadgeList from '../BadgeList';
 import styles from './styles.css';
 import theme from './theme.js';
 import { arrayOf, bool, number, string, func, shape, object } from 'prop-types';
+import { badgeShape, userShape } from '../plannerPropTypes';
 import { momentObj } from 'react-moment-proptypes';
 import formatMessage from '../../format-message';
 import {animatable} from '../../dynamic-ui';
@@ -56,13 +57,11 @@ export class PlannerItem extends Component {
     html_url: string,
     toggleCompletion: func,
     updateTodo: func.isRequired,
-    badges: arrayOf(shape({
-      text: string,
-      variant: string
-    })),
+    badges: arrayOf(shape(badgeShape)),
     registerAnimatable: func,
     deregisterAnimatable: func,
     toggleAPIPending: bool,
+    currentUser: shape(userShape),
   };
 
   static defaultProps = {
@@ -126,6 +125,8 @@ export class PlannerItem extends Component {
   }
 
   renderIcon = () => {
+    const currentUser = this.props.currentUser || {};
+
     switch(this.props.associated_item) {
         case "Assignment":
           return <Assignment />;
@@ -140,7 +141,7 @@ export class PlannerItem extends Component {
         case "Page":
           return <Page />;
         default:
-          return <Note />;
+          return <Avatar name={currentUser.displayName || '?'} src={currentUser.avatarUrl} size="small" />;
     }
   }
 
@@ -221,9 +222,9 @@ export class PlannerItem extends Component {
 
 
   render () {
-    let assignmentType = this.props.associated_item ?
+    const assignmentType = this.props.associated_item ?
       this.props.associated_item : formatMessage('Task');
-    let checkboxLabel = this.state.completed ?
+    const checkboxLabel = this.state.completed ?
       formatMessage('{assignmentType} {title} is complete',
         { assignmentType: assignmentType, title: this.props.title }) :
       formatMessage('{assignmentType} {title} is incomplete',
@@ -240,7 +241,7 @@ export class PlannerItem extends Component {
           />
         </div>
         <div
-          className={styles.icon}
+          className={assignmentType === 'To Do' ? styles.avatar : styles.icon}
           style={{ color: this.props.color }}
           aria-hidden="true"
         >

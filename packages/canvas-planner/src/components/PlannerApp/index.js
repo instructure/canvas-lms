@@ -21,6 +21,7 @@ import Container from '@instructure/ui-core/lib/components/Container';
 import Spinner from '@instructure/ui-core/lib/components/Spinner';
 import { arrayOf, oneOfType, shape, bool, object, string, number, func } from 'prop-types';
 import { momentObj } from 'react-moment-proptypes';
+import { userShape } from '../plannerPropTypes';
 import Day from '../Day';
 import ShowOnFocusButton from '../ShowOnFocusButton';
 import StickyButton from '../StickyButton';
@@ -62,6 +63,7 @@ export class PlannerApp extends Component {
     ui: shape({
       naiAboveScreen: bool,
     }),
+    currentUser: shape(userShape),
   };
 
   static defaultProps = {
@@ -196,6 +198,7 @@ export class PlannerApp extends Component {
         key={dayKey}
         toggleCompletion={this.props.togglePlannerItemCompletion}
         updateTodo={this.props.updateTodo}
+        currentUser={this.props.currentUser}
       />;
     });
 

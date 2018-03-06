@@ -6,9 +6,13 @@
   border-bottom: var(--borderWidth) solid var(--borderColor);
 }
 
+.showLabel {
+  margin-left: var(--gutterWidth);
+}
+
 .contentPrimary {
   margin-bottom: var(--bottomMarginPhoneUp);
-  margin-left: var(--gutterWidth);
+  margin-left: calc(var(--gutterWidth) - var(--buttonPadding)); /* account for the padding inside the button */
   box-sizing: border-box;
   min-width: 1px;
 }
@@ -21,7 +25,6 @@
 
 [data-media-medium] {
   &.root {
-    padding: var(--paddingMedium);
     display: flex;
     align-items: center;
   }
@@ -38,6 +41,5 @@
 
 [data-media-x-large] {
   &.root {
-    padding: var(--paddingLarge);
   }
 }
