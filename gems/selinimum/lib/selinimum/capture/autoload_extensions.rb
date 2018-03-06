@@ -212,7 +212,9 @@ module Selinimum
         # remove the cached :klass within each reflection of each relevant
         # model
         def reset_reflection_classes!
-          classes_to_remove = current_autoloads.values.select { |klass| klass < ActiveRecord::Base }
+          classes_to_remove = current_autoloads.values.select do |klass|
+            klass.respond_to?(:<) && klass < ActiveRecord::Base
+          end
           classes = preloaded_models + classes_to_remove
           classes_to_remove = Set.new(classes_to_remove)
           classes.each do |klass|
