@@ -7237,9 +7237,9 @@ media-typer@0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/media-typer/-/media-typer-0.3.0.tgz#8710d7af0aa626f8fffa1ce00168545263255748"
 
-"mediaelement@https://github.com/instructure/mediaelement.git#e4e415b":
+"mediaelement@https://github.com/instructure/mediaelement.git#master":
   version "2.23.5"
-  resolved "https://github.com/instructure/mediaelement.git#e4e415b5093855eddbf310d07ddb3a12e81ae1d4"
+  resolved "https://github.com/instructure/mediaelement.git#f4cd6f82355dbda008091dcc152c90ae29f721e3"
 
 mem@^1.1.0:
   version "1.1.0"

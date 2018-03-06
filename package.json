@@ -35,7 +35,7 @@
     "location-origin": "^1.1.4",
     "lodash": "^4.16.4",
     "md5": "^2.2.1",
-    "mediaelement": "https://github.com/instructure/mediaelement.git#e4e415b",
+    "mediaelement": "https://github.com/instructure/mediaelement.git#master",
     "moment": "~2.10.6",
     "page": "visionmedia/page.js#1.6.4",
     "parse-decimal-number": "1.0.0",
