@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../helpers/gradezilla_common'
+require_relative '../pages/gradezilla_cells_page'
 require_relative '../pages/gradezilla_page'
 
 describe "Gradezilla" do
@@ -35,13 +36,13 @@ describe "Gradezilla" do
 
     it 'should allow pass grade on assignments worth 0 points', priority: "1", test_id: 330310 do
       Gradezilla.visit(@course)
-      expect(f('button.gradebook-checkbox.gradebook-checkbox-pass')).to include_text('pass')
+      expect(Gradezilla::Cells.get_grade(@students[0], @assignment)).to eq 'Complete'
     end
 
     it 'should display pass/fail correctly when total points possible is changed', priority: "1", test_id: 419288 do
       @assignment.update_attributes(points_possible: 1)
       Gradezilla.visit(@course)
-      expect(f('button.gradebook-checkbox.gradebook-checkbox-pass')).to include_text('pass')
+      expect(Gradezilla::Cells.get_grade(@students[0], @assignment)).to eq 'Complete'
     end
   end
 end

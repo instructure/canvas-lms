@@ -628,17 +628,6 @@ QUnit.module('GradeFormatHelper', (suiteHooks) => {
         submission.score = 0; // "final" score is made "incomplete"
         equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'Incomplete');
       });
-
-      test('returns "ungraded" when the score is null', () => {
-        submission.score = null;
-        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'ungraded');
-      });
-
-      test('returns "ungraded" for the "entered" version when the entered score is null', () => {
-        submission.enteredScore = null;
-        options.version = 'entered';
-        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'ungraded');
-      });
     });
 
     QUnit.module('when formatting as "passFail" for an assignment with no points possible', (contextHooks) => {

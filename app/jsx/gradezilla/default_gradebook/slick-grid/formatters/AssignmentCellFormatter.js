@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import I18n from 'i18n!gradebook'
 import htmlEscape from 'str/htmlEscape';
-import SubmissionCell from 'compiled/gradezilla/SubmissionCell';
 import { extractDataTurnitin } from 'compiled/gradezilla/Turnitin';
 import GradeFormatHelper from '../../../../gradebook/shared/helpers/GradeFormatHelper';
 import { classNamesForAssignmentCell } from '../../../../gradezilla/default_gradebook/slick-grid/shared/CellStyles';
@@ -30,7 +30,11 @@ function getTurnitinState (submission) {
   return null;
 }
 
-function needsGrading (submission) {
+function needsGrading(submission, pendingGradeInfo) {
+  if (pendingGradeInfo && pendingGradeInfo.grade != null) {
+    return false
+  }
+
   if (submission.excused || !submission.submission_type) {
     return false;
   }
@@ -86,7 +90,9 @@ function renderTemplate(grade, options = {}) {
 
   return `<div class="${htmlEscape(classNames.join(' '))}">
     ${renderStartContainer(options)}
-    <div class="Grid__AssignmentRowCell__Content">${content}</div>
+    <div class="Grid__AssignmentRowCell__Content">
+      <span class="Grade">${content}</span>
+    </div>
     <div class="Grid__AssignmentRowCell__EndContainer"></div>
   </div>`
 }
@@ -130,14 +136,6 @@ export default class AssignmentCellFormatter {
     }
 
     const assignment = this.options.getAssignment(submission.assignment_id);
-    if (assignment.grading_type === 'pass_fail') {
-      const options = {
-        needsGrading: needsGrading(submission)
-      };
-      const GradingTypeSubmissionCell = SubmissionCell.pass_fail;
-      const gradingTypeFormatter = GradingTypeSubmissionCell.formatter.bind(GradingTypeSubmissionCell);
-      return gradingTypeFormatter(row, cell, submission, assignment, student, options);
-    }
 
     const assignmentData = {
       id: assignment.id,
@@ -149,7 +147,7 @@ export default class AssignmentCellFormatter {
     const submissionData = {
       dropped: submission.drop,
       excused: submission.excused,
-      grade: submission.grade,
+      grade: assignment.grading_type === 'pass_fail' ? submission.rawGrade : submission.grade,
       late: submission.late,
       missing: submission.missing,
       resubmitted: submission.grade_matches_current_submission === false,
@@ -161,6 +159,7 @@ export default class AssignmentCellFormatter {
       userId: student.id
     })
     if (pendingGradeInfo) {
+      submissionData.grade = pendingGradeInfo.grade
       submissionData.excused = pendingGradeInfo.excused
     }
 
@@ -173,8 +172,24 @@ export default class AssignmentCellFormatter {
       turnitinState: getTurnitinState(submission)
     };
 
-    if (needsGrading(submission)) {
-      return renderTemplate('<i class="icon-not-graded"></i>', options);
+    if (needsGrading(submission, pendingGradeInfo)) {
+      const text = `<span class="screenreader-only">${I18n.t('Needs Grading')}</span>`
+      const icon = '<i class="icon-not-graded icon-Solid"></i>'
+      return renderTemplate(`${text}${icon}`, options)
+    }
+
+    if (assignment.grading_type === 'pass_fail') {
+      if (submissionData.grade === 'complete') {
+        const text = `<span class="screenreader-only">${I18n.t('Complete')}</span>`
+        const icon = '<i class="icon-check icon-Solid Grade--complete"></i>'
+        return renderTemplate(`${text}${icon}`, options)
+      }
+
+      if (submissionData.grade === 'incomplete') {
+        const text = `<span class="screenreader-only">${I18n.t('Incomplete')}</span>`
+        const icon = '<i class="icon-x icon-Solid Grade--incomplete"></i>'
+        return renderTemplate(`${text}${icon}`, options)
+      }
     }
 
     let grade

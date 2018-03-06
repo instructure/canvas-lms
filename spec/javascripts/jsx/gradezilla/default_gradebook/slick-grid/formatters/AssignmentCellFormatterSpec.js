@@ -76,11 +76,12 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
   }
 
   function getRenderedGrade() {
-    return $fixture.querySelector('.Grid__AssignmentRowCell__Content')
+    return $fixture.querySelector('.Grid__AssignmentRowCell__Content .Grade')
   }
 
   function excuseSubmission() {
     submission.grade = null
+    submission.rawGrade = null
     submission.score = null
     submission.excused = true
   }
@@ -243,37 +244,11 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
       ok(renderCell().classList.contains('muted'))
     })
 
-    test('displays the pending grade when present', () => {
-      const pendingGradeInfo = {
-        enteredAs: 'points',
-        excused: false,
-        grade: 'A',
-        score: 9.1,
-        valid: true
-      }
-      gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
-      renderCell()
-      equal(getRenderedGrade().innerHTML.trim(), 'A')
-    })
-
     test('escapes html in the grade', () => {
       gradebook.getDefaultGradingScheme().data[0][0] = '<img src=null onerror=alert(1) >'
       gradebook.getAssignment('2301').grading_type = 'letter_grade'
       gradebook.updateEnterGradesAsSetting('2301', 'gradingScheme');
       submission.score = 10
-      renderCell()
-      equal(getRenderedGrade().innerHTML.trim(), '&lt;img src=null onerror=alert(1) &gt;')
-    })
-
-    test('escapes html in the pending grade', () => {
-      const pendingGradeInfo = {
-        enteredAs: 'points',
-        excused: false,
-        grade: '<img src=null onerror=alert(1) >',
-        score: 9.1,
-        valid: true
-      }
-      gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
       renderCell()
       equal(getRenderedGrade().innerHTML.trim(), '&lt;img src=null onerror=alert(1) &gt;')
     })
@@ -316,32 +291,121 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
       equal(getRenderedGrade().innerHTML.trim(), '–')
     })
 
-    test('displays an invalid grade indicator when the pending grade is invalid', () => {
-      const pendingGradeInfo = {
-        enteredAs: null,
-        excused: false,
-        grade: 'invalid',
-        score: null,
-        valid: false
-      }
-      gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
-      strictEqual(renderCell().querySelectorAll('.Grid__AssignmentRowCell__InvalidGrade').length, 1)
-    })
-
-    test('does not display an invalid grade indicator when the pending grade is valid', () => {
-      const pendingGradeInfo = {
-        enteredAs: null,
-        excused: false,
-        grade: null,
-        score: null,
-        valid: true
-      }
-      gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
-      strictEqual(renderCell().querySelectorAll('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
-    })
-
     test('does not display an invalid grade indicator when no grade is pending', () => {
       strictEqual(renderCell().querySelectorAll('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
+    })
+
+    QUnit.module('when a grade is pending', contextHooks => {
+      let pendingGradeInfo
+
+      contextHooks.beforeEach(() => {
+        pendingGradeInfo = {
+          enteredAs: 'points',
+          excused: false,
+          grade: 'A',
+          score: 9.1,
+          valid: true
+        }
+      })
+
+      test('displays the pending grade', () => {
+        gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
+        renderCell()
+        equal(getRenderedGrade().innerHTML.trim(), 'A')
+      })
+
+      test('displays the pending grade when the submission otherwise needs grading', () => {
+        submission.grade = null
+        submission.score = null
+        submission.workflow_state = 'pending_review'
+        gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
+        renderCell()
+        equal(getRenderedGrade().innerHTML.trim(), 'A')
+      })
+
+      test('escapes html in the pending grade', () => {
+        pendingGradeInfo = {
+          enteredAs: 'points',
+          excused: false,
+          grade: '<img src=null onerror=alert(1) >',
+          score: 9.1,
+          valid: true
+        }
+        gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
+        renderCell()
+        equal(getRenderedGrade().innerHTML.trim(), '&lt;img src=null onerror=alert(1) &gt;')
+      })
+
+      test('displays an invalid grade indicator when the pending grade is invalid', () => {
+        pendingGradeInfo = {
+          enteredAs: null,
+          excused: false,
+          grade: 'invalid',
+          score: null,
+          valid: false
+        }
+        gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
+        strictEqual(renderCell().querySelectorAll('.Grid__AssignmentRowCell__InvalidGrade').length, 1)
+      })
+
+      test('does not display an invalid grade indicator when the pending grade is valid', () => {
+        pendingGradeInfo = {
+          enteredAs: null,
+          excused: false,
+          grade: null,
+          score: null,
+          valid: true
+        }
+        gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
+        strictEqual(renderCell().querySelectorAll('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
+      })
+    })
+
+    QUnit.module('when the grade is being cleared', contextHooks => {
+      let pendingGradeInfo
+
+      contextHooks.beforeEach(() => {
+        pendingGradeInfo = {
+          enteredAs: null,
+          excused: false,
+          grade: null,
+          score: null,
+          valid: true
+        }
+      })
+
+      test('renders "–" (en dash) when the submission is unsubmitted', () => {
+        submission.grade = null
+        submission.rawGrade = null
+        submission.score = null
+        submission.submission_type = null
+        gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
+        renderCell()
+        equal(getRenderedGrade().innerHTML.trim(), '–')
+      })
+
+      test('renders the "needs grading" icon when the submission was graded and cleared', () => {
+        submission.grade = null
+        submission.score = null
+        submission.workflow_state = 'graded'
+        gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
+        strictEqual(renderCell().querySelectorAll('i.icon-not-graded').length, 1)
+      })
+
+      test('renders the "needs grading" icon when the submission was resubmitted', () => {
+        submission.workflow_state = 'submitted'
+        submission.grade_matches_current_submission = false
+        gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
+        strictEqual(renderCell().querySelectorAll('i.icon-not-graded').length, 1)
+      })
+
+      test('renders the "needs grading" icon when the submission is ungraded and pending review', () => {
+        submission.grade = null
+        submission.score = null
+        submission.workflow_state = 'pending_review'
+        gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
+        strictEqual(renderCell().querySelectorAll('i.icon-not-graded').length, 1)
+      })
     })
 
     QUnit.module('with a "points" assignment submission', contextHooks => {
@@ -473,14 +537,14 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
       })
 
       test('renders a checkmark when the grade is "complete"', () => {
-        strictEqual(renderCell().querySelectorAll('button i.icon-check').length, 1)
+        strictEqual(renderCell().querySelectorAll('i.icon-check.Grade--complete').length, 1)
       })
 
       test('renders a checkmark when the grade is "incomplete"', () => {
         submission.grade = 'Incomplete (i18n)'
         submission.rawGrade = 'incomplete'
         submission.score = 0
-        strictEqual(renderCell().querySelectorAll('button i.icon-x').length, 1)
+        strictEqual(renderCell().querySelectorAll('i.icon-x.Grade--incomplete').length, 1)
       })
 
       test('renders "–" (en dash) when the submission is unsubmitted', () => {
@@ -488,7 +552,8 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
         submission.rawGrade = null
         submission.score = null
         submission.submission_type = null
-        equal(renderCell().firstChild.wholeText.trim(), '–')
+        renderCell()
+        equal(getRenderedGrade().innerHTML.trim(), '–')
       })
 
       test('renders the "needs grading" icon when the submission was graded and cleared', () => {
@@ -514,7 +579,20 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
 
       test('renders "Excused" when the submission is excused', () => {
         excuseSubmission()
-        equal(renderCell().innerHTML.trim(), 'Excused')
+        renderCell()
+        equal(getRenderedGrade().innerHTML.trim(), 'Excused')
+      })
+
+      test('uses the pending grade when present', () => {
+        const pendingGradeInfo = {
+          enteredAs: 'passFail',
+          excused: false,
+          grade: 'incomplete',
+          score: 0,
+          valid: true
+        }
+        gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
+        strictEqual(renderCell().querySelectorAll('i.icon-x.Grade--incomplete').length, 1)
       })
     })
 

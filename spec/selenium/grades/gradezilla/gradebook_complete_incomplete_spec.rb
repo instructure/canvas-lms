@@ -44,7 +44,7 @@ describe "Gradezilla" do
     it 'is maintained on page refresh post grade update', priority: '1', test_id: 3435317 do
       Gradezilla::Cells.select_complete_incomplete_grade(@students[0], @assignment, 'Incomplete')
       refresh_page
-      expect(Gradezilla::Cells.get_grade(@students[0], @assignment)).to eq 'fail'
+      expect(Gradezilla::Cells.get_grade(@students[0], @assignment)).to eq 'Incomplete'
     end
   end
 end

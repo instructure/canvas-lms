@@ -596,6 +596,14 @@ $gradebook_cell_padding_top: 8px;
   flex-basis: auto;
   flex-grow: 0;
   flex-shrink: 0;
+
+  .Grade {
+    display: flex;
+  }
+
+  .Grade--complete {
+    color: $ic-color-success;
+  }
 }
 
 .Grid__AssignmentRowCell {
@@ -615,10 +623,14 @@ $gradebook_cell_padding_top: 8px;
     width: 78px;
   }
 
-  .Grid__AssignmentRowCell__GradingSchemeInput,
-  .Grid__AssignmentRowCell__PassFailInput {
-    // wide enough to fit "Excused" and the grading scheme menu button
+  .Grid__AssignmentRowCell__GradingSchemeInput {
+    // wide enough to fit "Excused," input padding, and the menu button
     width: 78px + $cell-icon-width;
+  }
+
+  .Grid__AssignmentRowCell__CompleteIncompleteInput {
+    // wide enough to fit "Excused" and the menu button
+    width: 64px + $cell-icon-width;
   }
 
   .HorizontalFlex {
@@ -651,6 +663,13 @@ $gradebook_cell_padding_top: 8px;
   display: flex;
   flex-grow: 1;
   justify-content: center;
+  overflow: hidden;
+
+  > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 
   svg {
     display: flex;
