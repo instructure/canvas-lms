@@ -22,6 +22,8 @@ export default {
     let locale = I18n.locale || 'en-US'
     const locale_map = {zh_Hant: 'zh-Hant'}
     locale = locale_map[locale] || locale
+    // if you change these settings, also match the settings in best_unicode_collation_key
+    // and Canvas::ICU.collator
     return x.localeCompare(y, locale, {
       sensitivity: 'variant',
       ignorePunctuation: false,

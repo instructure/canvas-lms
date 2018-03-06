@@ -402,6 +402,8 @@ class ActiveRecord::Base
         # The collation level of 3 is the default, but is explicitly specified here and means that
         # case, accents and base characters are all taken into account when creating a collation key
         # for a string - more at https://pgxn.org/dist/pg_collkey/0.5.1/
+        # if you change these arguments, you need to rebuild all db indexes that use them,
+        # and you should also match the settings with Canvas::ICU::Collator and natcompare.js
         "#{schema}.collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 3, true)"
       else
         "CAST(LOWER(replace(#{col}, '\\', '\\\\')) AS bytea)"
