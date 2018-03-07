@@ -626,7 +626,9 @@ describe "context modules" do
       f("#context_module_item_#{tag.id} .al-trigger").click
       f('.edit_item_link').click
       click_option("#content_tag_indent_select", "Indent 1 Level")
-      submit_dialog_form("#edit_item_form")
+      form = f('#edit_item_form')
+      form.submit
+      wait_for_ajaximations
       expect(f("#context_module_item_#{tag.id}")).to have_class('indent_1')
 
       tag.reload
@@ -782,7 +784,8 @@ describe "context modules" do
       f('.edit_item_link').click
 
       click_option("#content_tag_indent_select", "Don't Indent")
-      submit_dialog_form("#edit_item_form")
+      form = f('#edit_item_form')
+      form.submit
 
       module_item = f("#context_module_item_#{tag.id}")
       due_date_assertion
