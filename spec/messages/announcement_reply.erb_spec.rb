@@ -47,6 +47,24 @@ describe 'announcement_reply' do
       expect(msg.body.include?("replying to this message")).to eq true
     end
 
+    it "should render correct email signature with cdn" do
+      expect(Canvas::Cdn.config).to receive(:host).and_return("http://blah.com")
+      expect(Canvas::Cdn::RevManifest).to receive(:gulp_manifest).
+        and_return({"images/email_signature.png" => "images/email_signature-stuff.png"})
+      IncomingMailProcessor::MailboxAccount.reply_to_enabled = true
+      msg = generate_message(notification_name, path_type, asset)
+      expect(msg.html_body).to include("http://blah.com/dist/images/email_signature-stuff.png")
+    end
+
+    it "should render correct email signature without cdn" do
+      expect(Canvas::Cdn.config).to receive(:host).and_return(nil)
+      expect(Canvas::Cdn::RevManifest).to receive(:gulp_manifest).
+        and_return({"images/email_signature.png" => "images/email_signature-stuff.png"})
+      IncomingMailProcessor::MailboxAccount.reply_to_enabled = true
+      msg = generate_message(notification_name, path_type, asset)
+      expect(msg.html_body).to include("http://#{HostUrl.default_host}/dist/images/email_signature-stuff.png")
+    end
+
     it "should render correct footer if replys are disabled" do
       IncomingMailProcessor::MailboxAccount.reply_to_enabled = false
       msg = generate_message(notification_name, path_type, asset)

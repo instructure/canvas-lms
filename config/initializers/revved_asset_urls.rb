@@ -26,12 +26,23 @@ require 'action_view/helpers'
 
 module RevAssetPaths
   def path_to_asset(source, options = {})
-    original_path = super
+    if options.key?(:host)
+      new_options = options.dup
+      new_options.delete(:host)
+      original_path = super(source, new_options)
+      full_path = super
+    else
+      new_options = options
+      full_path = original_path = super
+    end
     revved_url = Canvas::Cdn::RevManifest.url_for(original_path)
     if revved_url
-      File.join(compute_asset_host(revved_url, options).to_s, revved_url)
+      if options.key?(:host)
+        new_options[:host] = Canvas::Cdn.config.host || options[:host]
+      end
+      File.join(compute_asset_host(revved_url, new_options).to_s, revved_url)
     else
-      original_path
+      full_path
     end
   end
 end
