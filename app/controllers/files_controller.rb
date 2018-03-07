@@ -773,6 +773,12 @@ class FilesController < ApplicationController
     head :ok
   end
 
+  # intentionally narrower than the list on `Attachment.belongs_to :context`
+  VALID_ATTACHMENT_CONTEXTS = [
+    'User', 'Course', 'Group', 'Assignment', 'ContentMigration',
+    'Quizzes::QuizSubmission', 'ContentMigration', 'Quizzes::QuizSubmission'
+  ].freeze
+
   def api_capture
     unless InstFS.enabled?
       head :not_found
@@ -793,17 +799,14 @@ class FilesController < ApplicationController
       return
     end
 
-    case params[:context_type]
-    when 'ContentMigration'
-      @context = ContentMigration.find(params[:context_id])
-      @attachment = Attachment.where(context: @context).build
-    when 'Quizzes::QuizSubmission'
-      @context = Quizzes::QuizSubmission.find(params[:context_id])
-      @attachment = @context.attachments.build
-    else
-      @context = Context.find_polymorphic(params[:context_type], params[:context_id])
-      @attachment = @context.attachments.build
+    unless VALID_ATTACHMENT_CONTEXTS.include?(params[:context_type])
+      head :bad_request
+      return
     end
+
+    model = Object.const_get(params[:context_type])
+    @context = model.where(id: params[:context_id]).first
+    @attachment = Attachment.where(context: @context).build
 
     # service metadata
     @attachment.filename = params[:name]

@@ -1235,6 +1235,29 @@ describe FilesController do
       post "api_capture", params: params
       assert_status(201)
     end
+
+    it "works with an Assignment as the context" do
+      course = Course.create!
+      user = User.create!(name: "me")
+      folder = course.folders.create!(name: "submissions")
+      assignment = course.assignments.create!
+
+      params = {
+        id: 1,
+        user_id: user.id,
+        context_type: "Assignment",
+        context_id: assignment.id,
+        token: @token,
+        name: "test.txt",
+        size: 42,
+        content_type: "text/plain",
+        instfs_uuid: 1,
+        folder_id: folder.id
+      }
+
+      post "api_capture", params: params
+      assert_status(201)
+    end
   end
 
   describe "public_url" do
