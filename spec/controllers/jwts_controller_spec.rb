@@ -23,8 +23,7 @@ describe JwtsController do
   let(:other_user){ user_factory(active_user: true) }
   let(:translate_token) do
     ->(resp){
-      un_csrfd_body = resp.body.gsub("while(1);", "")
-      utf8_token_string = JSON.parse(un_csrfd_body)['token']
+      utf8_token_string = json_parse(resp.body)['token']
       decoded_crypted_token = Canvas::Security.base64_decode(utf8_token_string)
       return Canvas::Security.decrypt_services_jwt(decoded_crypted_token)
     }
@@ -41,8 +40,7 @@ describe JwtsController do
       before(:each){ user_session(token_user) }
       let(:translate_token) do
         ->(resp){
-          un_csrfd_body = resp.body.gsub("while(1);", "")
-          utf8_token_string = JSON.parse(un_csrfd_body)['token']
+          utf8_token_string = json_parse(resp.body)['token']
           decoded_crypted_token = Canvas::Security.base64_decode(utf8_token_string)
           return Canvas::Security.decrypt_services_jwt(decoded_crypted_token)
         }

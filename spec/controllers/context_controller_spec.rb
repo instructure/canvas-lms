@@ -404,7 +404,7 @@ describe ContextController do
       get :roster_user_usage, params: {course_id: @course.id, user_id: @student.id}, format: :json
 
       expect(response).to be_success
-      expect(JSON.parse(response.body.gsub("while(1);", "")).length).to eq 1
+      expect(json_parse(response.body).length).to eq 1
     end
   end
 end
