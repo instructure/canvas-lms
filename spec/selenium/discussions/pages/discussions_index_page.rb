@@ -119,7 +119,7 @@ class DiscussionsIndex
     end
 
     def close_for_comment_menu_option
-      f('#lock-discussion-menu-option')
+      f('#togglelocked-discussion-menu-option')
     end
 
     def duplicate_menu_option

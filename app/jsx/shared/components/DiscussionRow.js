@@ -37,6 +37,7 @@ import IconCopySolid from 'instructure-icons/lib/Solid/IconCopySolid'
 import IconUpdownLine from 'instructure-icons/lib/Line/IconUpdownLine'
 import IconPinSolid from 'instructure-icons/lib/Solid/IconPinSolid'
 import IconPinLine from 'instructure-icons/lib/Line/IconPinLine'
+import IconReply from 'instructure-icons/lib/Line/IconReplyLine'
 
 import DiscussionModel from 'compiled/models/DiscussionTopic'
 import SectionsTooltip from '../SectionsTooltip'
@@ -94,6 +95,10 @@ export default function DiscussionRow ({ discussion, masterCourseData, rowRef, o
        updateDiscussion(discussion, { pinned: !discussion.pinned },
          makePinSuccessFailMessages(discussion), 'manageMenu')
        break
+     case 'togglelocked':
+       updateDiscussion(discussion, { locked: !discussion.locked },
+         makePinSuccessFailMessages(discussion), 'manageMenu')
+       break
      default:
        throw new Error(I18n.t('Unknown manage discussion action encountered'))
     }
@@ -148,8 +153,6 @@ export default function DiscussionRow ({ discussion, masterCourseData, rowRef, o
     }
   }
 
-  // The permissions required to duplicate are less stringent than those needed to show
-  // the menu, so go ahead and unconditionally have the menu item here.
   const menuList = [
     <MenuItem
       key="duplicate"
@@ -171,6 +174,22 @@ export default function DiscussionRow ({ discussion, masterCourseData, rowRef, o
       { discussion.pinned
         ? I18n.t('Unpin discussion %{title}', { title: discussion.title })
         : I18n.t('Pin discussion %{title}', { title: discussion.title })}
+      </ScreenReaderContent>
+    </MenuItem>,
+    <MenuItem
+      key="togglelocked"
+      value={{ action: 'togglelocked', id: discussion.id }}
+      id="togglelocked-discussion-menu-option"
+    >
+      <span aria-hidden='true'>
+        <IconReply />&nbsp;&nbsp;{ discussion.locked
+          ? I18n.t('Open for comments')
+          : I18n.t('Close for comments') }
+      </span>
+      <ScreenReaderContent>
+      { discussion.locked
+        ? I18n.t('Open discussion %{title} for comments', { title: discussion.title })
+        : I18n.t('Close discussion %{title} for comments', { title: discussion.title })}
       </ScreenReaderContent>
     </MenuItem>,
   ]

@@ -25,6 +25,8 @@ describe "discussions index" do
     discussion2_title = 'Meaning of the universe'
     discussion3_title = 'Discussion about landon'
     discussion4_title = 'Discussion about aaron'
+    discussion5_title = 'Pinned discussion i want to lock'
+    discussion6_title = 'Unpinned discussion i want to unlock'
 
     before :once do
       @teacher = user_with_pseudonym(active_user: true)
@@ -61,7 +63,22 @@ describe "discussions index" do
         locked: true,
         pinned: true
       )
-
+      @discussion5 = @course.discussion_topics.create!(
+        title: discussion5_title,
+        message: 'Could it be 43?',
+        delayed_post_at: 1.day.from_now,
+        user: @teacher,
+        locked: false,
+        pinned: true
+      )
+      @discussion6 = @course.discussion_topics.create!(
+        title: discussion6_title,
+        message: 'Could it be 43?',
+        delayed_post_at: 1.day.from_now,
+        user: @teacher,
+        locked: true,
+        pinned: false
+      )
       @discussion1.discussion_entries.create!(user: @student, message: "I think I read that somewhere...")
       @discussion1.discussion_entries.create!(user: @student, message: ":eyeroll:")
     end
@@ -135,11 +152,27 @@ describe "discussions index" do
     end
 
     it 'discussion can be moved to Closed For Comments group using menu item' do
-      skip('Add with COMMS-728')
       DiscussionsIndex.click_close_for_comments_menu_option(discussion1_title)
       group = DiscussionsIndex.discussion_group("Closed for Comments")
-      expect(group).to contain_css(DiscussionsIndex.discussion_title_css(discussion1_title))
-      expect(@discussion1.closed_for_comments).to be true
+      expect(group).to include_text(discussion1_title)
+      @discussion1.reload
+      expect(@discussion1.locked).to be true
+    end
+
+    it 'closing a pinned discussion stays pinned' do
+      DiscussionsIndex.click_close_for_comments_menu_option(discussion5_title)
+      group = DiscussionsIndex.discussion_group("Pinned Discussions")
+      expect(group).to include_text(discussion1_title)
+      @discussion5.reload
+      expect(@discussion5.locked).to be true
+    end
+
+    it 'opening an unpinned discussion moves to "regular"' do
+      DiscussionsIndex.click_close_for_comments_menu_option(discussion6_title)
+      group = DiscussionsIndex.discussion_group("Discussions")
+      expect(group).to include_text(discussion1_title)
+      @discussion6.reload
+      expect(@discussion6.locked).to be false
     end
 
     it 'clicking the discussion goes to the discussion page' do
