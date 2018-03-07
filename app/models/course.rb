@@ -199,7 +199,6 @@ class Course < ActiveRecord::Base
   prepend Profile::Association
 
   before_save :assign_uuid
-  before_save :assign_default_view
   before_validation :assert_defaults
   before_save :update_enrollments_later
   before_save :update_show_total_grade_as_on_weighting_scheme_change
@@ -218,6 +217,7 @@ class Course < ActiveRecord::Base
   before_validation :verify_unique_ids
   validate :validate_course_dates
   validate :validate_course_image
+  validate :validate_default_view
   validates_presence_of :account_id, :root_account_id, :enrollment_term_id, :workflow_state
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
@@ -401,6 +401,19 @@ class Course < ActiveRecord::Base
 
   def valid_course_image_url?(image_url)
     URI.parse(image_url) rescue false
+  end
+
+  def validate_default_view
+    if self.default_view_changed?
+      if !%w{assignments feed modules syllabus wiki}.include?(self.default_view)
+        self.errors.add(:default_view, t("Home page is not valid"))
+        return false
+      elsif self.default_view == 'wiki' && !(self.wiki_id && self.wiki.has_front_page?)
+        self.errors.add(:default_view, t("A Front Page is required"))
+        return false
+      end
+    end
+    true
   end
 
   def image
@@ -916,6 +929,7 @@ class Course < ActiveRecord::Base
     if self.course_format && !['on_campus', 'online', 'blended'].include?(self.course_format)
       self.course_format = nil
     end
+    self.default_view ||= default_home_page
     true
   end
 
@@ -2812,10 +2826,6 @@ class Course < ActiveRecord::Base
     end
     return :preferred if self.root_account.grants_right?(user, :manage_user_logins)
     :closed
-  end
-
-  def assign_default_view
-    self.default_view ||= default_home_page
   end
 
   def default_home_page

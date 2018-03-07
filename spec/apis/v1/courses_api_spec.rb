@@ -413,7 +413,7 @@ describe CoursesController, type: :request do
     course_with_student(:user => @user, :active_all => true)
     @course2 = @course
     @course2.update_attribute(:sis_source_id, 'TEST-SIS-ONE.2011')
-    @course2.update_attribute(:default_view, 'wiki')
+    @course2.update_attributes(:default_view => 'assignments')
     @user.pseudonym.update_attribute(:sis_user_id, 'user1')
   end
 
@@ -1005,7 +1005,7 @@ describe CoursesController, type: :request do
         'hide_final_grades' => false,
         'apply_assignment_group_weights' => true,
         'restrict_enrollments_to_course_dates' => true,
-        'default_view' => 'new default view',
+        'default_view' => 'syllabus',
         'course_format' => 'on_campus',
         'time_zone' => 'Pacific/Honolulu'
       }, 'offer' => true }
@@ -1049,9 +1049,27 @@ describe CoursesController, type: :request do
         expect(@course.restrict_enrollments_to_course_dates).to be_truthy
         expect(@course.workflow_state).to eq 'available'
         expect(@course.apply_group_weights?).to eq true
-        expect(@course.default_view).to eq 'new default view'
+        expect(@course.default_view).to eq 'syllabus'
         expect(@course.course_format).to eq 'on_campus'
         expect(@course.time_zone.tzinfo.name).to eq 'Pacific/Honolulu'
+      end
+
+      it "should not be able to update default_view to arbitrary values" do
+        json = api_call(:put, @path, @params, {'course' => {'default_view' => 'somethingsilly'}}, {}, {:expected_status => 400})
+        expect(json["errors"]["default_view"].first['message']).to eq "Home page is not valid"
+      end
+
+      it "should not be able to update default_view to 'wiki' without a front page" do
+        expect(@course.wiki.front_page).to be_nil
+        json = api_call(:put, @path, @params, {'course' => {'default_view' => 'wiki'}}, {}, {:expected_status => 400})
+        expect(json["errors"]["default_view"].first['message']).to eq "A Front Page is required"
+      end
+
+      it "should be able to update default_view to 'wiki' with a front page" do
+        wp = @course.wiki_pages.create!(:title => "something")
+        wp.set_as_front_page!
+        json = api_call(:put, @path, @params, {'course' => {'default_view' => 'wiki'}}, {}, {:expected_status => 200})
+        expect(@course.reload.default_view).to eq 'wiki'
       end
 
       it "should not change dates that aren't given" do

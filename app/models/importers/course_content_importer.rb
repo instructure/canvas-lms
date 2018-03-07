@@ -318,6 +318,7 @@ module Importers
 
       # superhax to force new wiki front page if home view changed (or is master course sync)
       if settings['default_view'] && data[:wikis] && (migration.for_master_course_import? || (settings['default_view'] != course.default_view))
+        course.wiki # ensure that it exists already
         if page_hash = data[:wikis].detect{|h| h[:front_page]}
           if page = migration.find_imported_migration_item(WikiPage, page_hash[:migration_id])
             page.set_as_front_page!
