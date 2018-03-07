@@ -31,6 +31,12 @@ module Selinimum
         # irrelevant to selinimization
         return super unless relative_path
 
+        # autoloaded files from graphql contain a GraphQL::ObjectType instead
+        # of a ruby class/module which really confuses selinimum so we'll skip
+        # those
+        # NOTE: remove this after we switch to the class-based api
+        return super if relative_path =~ %r|app/graphql|
+
         # typically we'll have a const_path (e.g. `FooBar`), unless we
         # got here from a call to `require_dependency`
         const_names = const_path ? [const_path] : loadable_constants_for_path(file_path)
