@@ -150,7 +150,7 @@ describe "instfs file uploads" do
     before do
       course_with_teacher_logged_in
       enable_instfs
-      enrollment = student_in_course(:workflow_state => 'active', :course_section => @section)
+      enrollment = student_in_course(:workflow_state => 'active',:name => "coolguy", :course_section => @section)
       enrollment.accept!
       @student_folder = Folder.root_folders(@student).first
       @ass = @course.assignments.create!({title: "some assignment", submission_types: "online_upload"})
@@ -221,6 +221,34 @@ describe "instfs file uploads" do
       image_element_source = image_element.attribute("href")
       expect(compare_md5s(image_element_source, file_path)).to be true
       driver.switch_to.window saved_window_handle
+    end
+
+    it "should display an attached instfs file in a discussion for the student", priority: "1", test_id: 3455116 do
+      filename = "files/instructure.png"
+      file_path = File.join(ActionController::TestCase.fixture_path, filename)
+      discussion = @course.discussion_topics.create!(user: @teacher, title: 'cool stuff', message: 'cool message')
+      get "/courses/#{@course.id}/discussion_topics/#{discussion.id}"
+      wait_for_ajaximations
+      f(".discussion-reply-action").click
+      wait_for_ajaximations
+      scroll_to(f(".discussion-reply-add-attachment"))
+      f(".discussion-reply-add-attachment").click
+      wait_for_ajaximations
+      f(".discussion-reply-attachments input").send_keys(file_path)
+      wait_for_ajaximations
+      type_in_tiny("textarea", "cool reply")
+      f(".btn-primary").click
+      wait_for_ajaximations
+      get "/logout"
+      f('#Button--logout-confirm').click
+      wait_for_new_page_load
+      user_logged_in(:user => @student)
+      get "/courses/#{@course.id}/discussion_topics/#{discussion.id}"
+      wait_for_ajaximations
+      file_link = f(".comment_attachments a").attribute("href")
+      attachment = Attachment.find(get_id_from_canvas_link(file_link))
+      expect(attachment.instfs_uuid).not_to be_nil
+      expect(compare_md5s(file_link, file_path)).to be true
     end
   end
 
