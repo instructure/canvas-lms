@@ -93,6 +93,10 @@ module LoginAndSessionMethods
     wait_for_ajaximations
   end
 
+  def leave_student_view
+    expect_new_page_load { f('.leave_student_view').click }
+  end
+
   def fill_in_login_form(username, password)
     user_element = f('#pseudonym_session_unique_id')
     user_element.send_keys(username)

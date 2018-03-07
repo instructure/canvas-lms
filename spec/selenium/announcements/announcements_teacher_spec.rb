@@ -378,9 +378,10 @@ describe "announcements" do
       # Create reply as a student
       enter_student_view
       reply_to_announcement(@announcement.id, student_entry)
-      expect_logout_link_present.click
+      leave_student_view
 
-      #As a teacher, verify that you can see the student's reply even though you have not responded
+      # As a teacher, verify that you can see the student's reply even though
+      # you have not responded
       get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
       expect(ff('.discussion_entry .message')[1]).to include_text(student_entry)
     end
