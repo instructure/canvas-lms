@@ -638,7 +638,7 @@ END
         description: -> { I18n.t('React UI rewrite Developer Key management') },
         applies_to: 'RootAccount',
         state: 'hidden',
-        beta: true
+        development: true
       }
   )
 
