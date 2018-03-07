@@ -51,7 +51,7 @@ if (process.env.SENTRY_DSN) {
 }
 
 testWebpackConfig.resolve.alias['spec/jsx'] = path.resolve(__dirname, 'spec/javascripts/jsx')
-
+testWebpackConfig.mode = 'development'
 testWebpackConfig.module.rules.unshift({
   test: [
     /\/spec\/coffeescripts\//,

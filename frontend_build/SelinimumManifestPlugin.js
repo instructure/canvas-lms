@@ -78,9 +78,18 @@ class SelinimumManifestPlugin {
     compiler.plugin('emit', (compilation, done) => {
       const stats = compilation.getStats().toJson({chunkModules: true})
       const entrypointsByBundle = this.getEntrypointsByModule(stats)
+
+      const outputName = 'selinimum-manifest.json'
+      const output = JSON.stringify(entrypointsByBundle)
+
+      compilation.assets[outputName] = {
+        source: () => output,
+        size: () => output.length
+      }
+
       mkdirp.sync(compiler.options.output.path)
-      const manifestPath = path.join(compiler.options.output.path, 'selinimum-manifest.json')
-      fs.writeFileSync(manifestPath, JSON.stringify(entrypointsByBundle))
+      const manifestPath = path.join(compiler.options.output.path, outputName)
+      fs.writeFileSync(manifestPath, output)
       done()
     })
   }

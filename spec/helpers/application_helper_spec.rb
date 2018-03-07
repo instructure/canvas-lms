@@ -636,64 +636,6 @@ describe ApplicationHelper do
 
   end
 
-
-  describe "include_head_js" do
-    before do
-      allow(helper).to receive(:js_bundles).and_return([[:some_bundle], [:some_plugin_bundle, :some_plugin], [:another_bundle, nil]])
-    end
-
-    it "creates the correct javascript tags" do
-      allow(helper).to receive(:js_env).and_return({
-        BIGEASY_LOCALE: 'nb_NO',
-        MOMENT_LOCALE: 'nb',
-        TIMEZONE: 'America/La_Paz',
-        CONTEXT_TIMEZONE: 'America/Denver'
-      })
-      base_url = helper.use_optimized_js? ? 'dist/webpack-production' : 'dist/webpack-dev'
-      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/vendor.js').and_return('vendor_url')
-      allow(Canvas::Cdn::RevManifest).to receive(:revved_url_for).with('timezone/America/La_Paz.js').and_return('La_Paz_url')
-      allow(Canvas::Cdn::RevManifest).to receive(:revved_url_for).with('timezone/America/Denver.js').and_return('Denver_url')
-      allow(Canvas::Cdn::RevManifest).to receive(:revved_url_for).with('timezone/nb_NO.js').and_return('nb_NO_url')
-      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/moment/locale/nb.js').and_return('nb_url')
-      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/appBootstrap.js').and_return('app_bootstrap_url')
-      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/common.js').and_return('common_url')
-      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/some_bundle.js').and_return('some_bundle_url')
-      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/some_plugin-some_plugin_bundle.js').and_return('plugin_url')
-      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/another_bundle.js').and_return('another_bundle_url')
-
-      expect(helper.include_head_js).to eq %{
-<script src="/vendor_url" defer="defer"></script>
-<script src="/La_Paz_url" defer="defer"></script>
-<script src="/Denver_url" defer="defer"></script>
-<script src="/nb_NO_url" defer="defer"></script>
-<script src="/nb_url" defer="defer"></script>
-<script src="/app_bootstrap_url" defer="defer"></script>
-<script src="/common_url" defer="defer"></script>
-<script src="/some_bundle_url" defer="defer"></script>
-<script src="/plugin_url" defer="defer"></script>
-<script src="/another_bundle_url" defer="defer"></script>
-      }.strip
-    end
-  end
-
-  describe "include_js_bundles" do
-    before do
-      allow(helper).to receive(:js_bundles).and_return([[:some_bundle], [:some_plugin_bundle, :some_plugin], [:another_bundle, nil]])
-    end
-    it "creates the correct javascript tags" do
-      base_url = helper.use_optimized_js? ? 'dist/webpack-production' : 'dist/webpack-dev'
-      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/some_bundle.js').and_return('some_bundle_url')
-      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/some_plugin-some_plugin_bundle.js').and_return('plugin_url')
-      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/another_bundle.js').and_return('another_bundle_url')
-
-      expect(helper.include_js_bundles).to eq %{
-<script src="/some_bundle_url" defer="defer"></script>
-<script src="/plugin_url" defer="defer"></script>
-<script src="/another_bundle_url" defer="defer"></script>
-      }.strip
-    end
-  end
-
   describe "map_groups_for_planner" do
     context "with planner enabled" do
       before(:each) do

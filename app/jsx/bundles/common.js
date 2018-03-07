@@ -73,5 +73,10 @@ if (!supportsCSSVars) {
 }
 
 $(() => {
-  if (isMathMLOnPage()) loadMathJax('TeX-MML-AM_HTMLorMML')
+  // This is in a setTimeout to have it run on the next time through the event loop
+  // so that the code that actually renders the user_content runs first,
+  // because it has to be rendered before we can check if isMathMLOnPage
+  setTimeout(() => {
+    if (isMathMLOnPage()) loadMathJax('TeX-MML-AM_HTMLorMML')
+  }, 5)
 })

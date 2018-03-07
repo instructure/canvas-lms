@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2018 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,25 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-module.exports = {
-  presets: [
-    [
-      '@instructure/ui-babel-preset',
-      {
-        esModules:
-          'USE_ES_MODULES' in process.env
-            ? process.env.USE_ES_MODULES !== 'false'
-            : !process.env.JEST_WORKER_ID,
-        node: !!process.env.JEST_WORKER_ID
-      }
-    ]
-  ],
-  env: {
-    production: {
-      plugins: [
-        'transform-react-remove-prop-types',
-        '@babel/plugin-transform-react-inline-elements'
-      ]
-    }
-  }
-}
+import 'setWebpackCdnHost'
+import 'jquery.instructure_jquery_patches' // this needs to be before anything else that requires jQuery
+
+import './appBootstrap'
+import './bundles/common'
+
+import loadBundle from 'bundles-generated'
+
+if (!window.bundles) window.bundles = []
+window.bundles.push = loadBundle
+// process any queued ones
+window.bundles.forEach(loadBundle)

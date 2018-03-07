@@ -17,6 +17,8 @@
  */
 
 const glob = require('glob')
+const fs = require('fs')
+const momentLocaleBundles = require('./momentBundles')
 
 const entries = {}
 
@@ -37,7 +39,7 @@ const nonEntryPoints = ['modules/account_quota_settings', 'modules/content_migra
 appBundles.forEach(entryFilepath => {
   const entryBundlePath = entryFilepath.replace(
     /^.*app\/(coffeescripts|jsx)\/bundles/,
-    (_, dir) => `./app/${dir}/bundles`
+    (_, dir) => `../app/${dir}/bundles`
   )
   const entryName = bundleNameRegexp.exec(entryBundlePath)[2]
   if (!nonEntryPoints.includes(entryName)) {
@@ -46,10 +48,50 @@ appBundles.forEach(entryFilepath => {
 })
 
 pluginBundles.forEach(entryFilepath => {
+  const relativePath = entryFilepath.replace(/.*\/gems\/plugins/, '../gems/plugins')
   const pluginName = pluginNameRegexp.exec(entryFilepath)[1]
   const fileName = fileNameRegexp.exec(entryFilepath)[1]
   const bundleName = `${pluginName}-${fileName}`
-  entries[bundleName] = entryFilepath
+  entries[bundleName] = relativePath
 })
+
+fs.writeFileSync(
+  './node_modules/bundles-generated.js',
+  `
+
+if (typeof ENV !== 'undefined' && ENV.MOMENT_LOCALE && ENV.MOMENT_LOCALE !== 'en') {
+  function loadLocale(locale) {
+    switch (locale) {
+      ${Object.entries(momentLocaleBundles)
+        .map(
+          ([assetName, jsFile]) => `
+        case "${assetName}": return import(/* webpackChunkName: "${assetName}" */ "${jsFile}");
+      `
+        )
+        .join('')}
+
+      default:
+        console.warn("couldn't load moment/locale/", locale)
+    }
+  }
+  loadLocale('moment/locale/' + ENV.MOMENT_LOCALE)
+}
+
+export default function loadBundle(bundleName) {
+  switch (bundleName) {
+    ${Object.entries(entries)
+      .map(
+        ([entryName, entryBundlePath]) => `
+      case "${entryName}": return import(/* webpackChunkName: "${entryName}" */ "${entryBundlePath}");
+    `
+      )
+      .join('')}
+
+    default:
+      throw new Error("couldn't find bundle " + bundleName)
+  }
+}
+`
+)
 
 module.exports = entries

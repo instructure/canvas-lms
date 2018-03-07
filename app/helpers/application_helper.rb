@@ -170,38 +170,57 @@ module ApplicationHelper
     (use_optimized_js? ? '/dist/webpack-production' : '/dist/webpack-dev').freeze
   end
 
+  # puts the "main" webpack entry and the moment & timezone files in the <head> of the document
   def include_head_js
-    # This contains the webpack runtime, it needs to be loaded first
-    paths = ["#{js_base_url}/vendor"]
-
+    paths = []
     # We preemptive load these timezone/locale data files so they are ready
     # by the time our app-code runs and so webpack doesn't need to know how to load them
     paths << "/timezone/#{js_env[:TIMEZONE]}.js" if js_env[:TIMEZONE]
     paths << "/timezone/#{js_env[:CONTEXT_TIMEZONE]}.js" if js_env[:CONTEXT_TIMEZONE]
     paths << "/timezone/#{js_env[:BIGEASY_LOCALE]}.js" if js_env[:BIGEASY_LOCALE]
-    paths << "#{js_base_url}/moment/locale/#{js_env[:MOMENT_LOCALE]}" if js_env[:MOMENT_LOCALE] && js_env[:MOMENT_LOCALE] != 'en'
 
-    paths << "#{js_base_url}/appBootstrap"
-    paths << "#{js_base_url}/common"
-
-    js_bundles.each do |(bundle, plugin)|
-      paths << "#{js_base_url}/#{plugin ? "#{plugin}-" : ''}#{bundle}"
+    @script_chunks = []
+    # if there is a moment locale besides english set, put a script tag for it
+    # so it is loaded and ready before we run any of our app code
+    if js_env[:MOMENT_LOCALE] && js_env[:MOMENT_LOCALE] != 'en'
+      @script_chunks += Canvas::Cdn::RevManifest.all_webpack_chunks_for("moment/locale/#{js_env[:MOMENT_LOCALE]}")
     end
-    # now that we've rendered out a script tag for each bundle we were told about in controllers,
-    # empty out the js_bundles array so we don't re-render them later
-    @js_bundles_included_in_head = js_bundles.dup
-    js_bundles.clear
+    @script_chunks += Canvas::Cdn::RevManifest.all_webpack_chunks_for("main")
+    @script_chunks.uniq!
 
-    javascript_include_tag(*paths, defer: true)
+    chunk_urls = @script_chunks.map{ |s| "#{js_base_url}/#{s}"}
+
+    capture do
+      # if we don't also put preload tags for these, the browser will prioritize and
+      # download the bundle chunks we preload below before these scripts
+      chunk_urls.each { |url| concat preload_link_tag(url) }
+
+      concat javascript_include_tag(*(paths + chunk_urls), defer: true)
+    end
   end
 
-  # Returns a <script> tag for each registered js_bundle
   def include_js_bundles
-    paths = []
-    (js_bundles - (@js_bundles_included_in_head || [])).each do |(bundle, plugin)|
-      paths << "#{js_base_url}/#{plugin ? "#{plugin}-" : ''}#{bundle}"
+    # This is purely a performance optimization to reduce the steps of the waterfall
+    # and let the browser know it needs to start downloading all of these chunks
+    # even before any webpack code runs. It will put a <link rel="preload" ...>
+    # for every chunk that is needed by any of the things you `js_bundle` in your rails controllers/views
+    preload_chunks = js_bundles.map do |(bundle, plugin)|
+      key = "#{plugin ? "#{plugin}-" : ''}#{bundle}"
+      Canvas::Cdn::RevManifest.all_webpack_chunks_for(key)
+    end.flatten.uniq - @script_chunks # subtract out the ones we already preloaded in the <head>
+
+    capture do
+      preload_chunks.each { |url| concat preload_link_tag("#{js_base_url}/#{url}") }
+
+      # if you look the app/jsx/main.js, there is a function there that will
+      # process anything on window.bundles and knows how to load everything it needs
+      # to load that "js_bundle". And by the time that runs, the browser will have already
+      # started downloading those script urls because of those preload tags above,
+      # so it will not cause a new request to be made.
+      concat javascript_tag js_bundles.map { |(bundle, plugin)|
+        "(window.bundles || (window.bundles = [])).push('#{plugin ? "#{plugin}-" : ''}#{bundle}');"
+      }.join("\n")
     end
-    javascript_include_tag(*paths, defer: true)
   end
 
   def include_css_bundles
@@ -1171,6 +1190,18 @@ module ApplicationHelper
     # deferred redirect through route because it may be saved for later use
     # after a direct link to attachment.thumbnail_url would have expired
     super(attachment, uuid || attachment.uuid, url_options)
+  end
+
+  if CANVAS_RAILS5_1
+    # this is for rails 5.1. it can be deleted when we upgrade to RAILS_5.2. rails 5.2 includes a preload_link_tag method
+    def preload_link_tag(source, options = {})
+      tag.link({
+        rel: "preload",
+        href: asset_path(source),
+        as: "script",
+        type: "text/javascript"
+      }.merge(options.symbolize_keys))
+    end
   end
 
   def browser_performance_monitor_embed
