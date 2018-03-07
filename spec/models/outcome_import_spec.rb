@@ -194,10 +194,12 @@ describe OutcomeImport, type: :model do
       import.run
     end
 
-    it 'limits the number of errors emailed on failed completion' do
+    it 'limits the errors emailed to first 100 rows on failed completion' do
+      errors = (1..200).map{|n| [n, 'Very Bad Error']}
+      printed_errors = (1..100).map{|n| "Row #{n}: Very Bad Error"}.join("\n")
       mock_importer([
         { progress: 0, errors: [] },
-        { progress: 50, errors: [[1, 'Very Bad Error']] * 200 },
+        { progress: 50, errors: errors },
         { progress: 100, errors: [] }
       ])
 
@@ -217,7 +219,8 @@ describe OutcomeImport, type: :model do
           Your outcomes import failed due to 200 errors with your import. Please examine your file and attempt the upload again at http://localhost/accounts/#{@account.id}/outcomes
 
           Here are the first 100 errors that occurred:
-          #{"Row 1: Very Bad Error\n" * 100}
+          #{printed_errors}
+
           Thank you,
           Instructure".gsub(/^ +/, ''),
         delay_for: 0,

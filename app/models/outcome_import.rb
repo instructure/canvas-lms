@@ -92,7 +92,7 @@ class OutcomeImport < ApplicationRecord
       "workflow_state" => self.workflow_state,
       "data" => self.data
     }
-    data["processing_errors"] = self.outcome_import_errors.limit(25).pluck(:row, :message)
+    data["processing_errors"] = self.outcome_import_errors.order(:row).limit(25).pluck(:row, :message)
     data
   end
 
@@ -170,9 +170,9 @@ class OutcomeImport < ApplicationRecord
 
   def n_errors(n = 25)
     if outcome_import_errors.loaded?
-      outcome_import_errors[0, n].map { |e| [e.row, e.message] }
+      outcome_import_errors.sort_by(&:row).first(n).pluck(:row, :message)
     else
-      outcome_import_errors.limit(n).pluck(:row, :message)
+      outcome_import_errors.order(:row).limit(n).pluck(:row, :message)
     end
   end
 
