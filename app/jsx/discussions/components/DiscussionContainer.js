@@ -141,6 +141,10 @@ export default class DiscussionsContainer extends Component {
   render () {
     return this.props.connectDropTarget (
       <div className="discussions-container__wrapper">
+        {!this.props.pinned ?
+        <span className="recent-activity-text-container">
+          <Text fontStyle="italic">{I18n.t('Ordered by Recent Activity')}</Text>
+        </span> : null }
         <ToggleDetails
           defaultExpanded
           summary={<Text weight="bold">{this.props.title}</Text>}
