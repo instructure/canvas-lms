@@ -80,7 +80,7 @@ Margin is capitalized to fix Outlook.com
         <table class="logo" style="width:100%; box-sizing:border-box; border-collapse:separate; mso-table-lspace:0pt; mso-table-rspace:0pt; ">
           <tr>
             <td class="logocell" style="text-align:center; vertical-align:top; box-sizing:border-box; padding:10px;">
-              <img src="<%= custom_logo || "https://lh3.googleusercontent.com/D1pgZeJZrBFc_n_EnEWpj9BQpVUaQ6xj2FYl1ZaxhDN4c-x8X69DqfJ258Eb0u7sXyuvYI533FkaCouBv6131tpxMbd1CpjZDEMr2kN4t8_Epitm77c" %>" alt="">
+              <img src="<%= custom_logo || image_path("email_signature.png", host: HostUrl.context_host(link_root_account || Account.default), protocol: HostUrl.protocol) %>" alt="">
             </td>
           </tr>
         </table>
