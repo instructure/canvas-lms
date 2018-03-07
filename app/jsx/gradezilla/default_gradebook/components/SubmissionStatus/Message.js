@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {oneOf, string} from 'prop-types'
-import Container from '@instructure/ui-core/lib/components/Container'
+import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid'
 import Text from '@instructure/ui-core/lib/components/Text'
 import IconInfoLine from 'instructure-icons/lib/Line/IconInfoLine'
 import IconWarningLine from 'instructure-icons/lib/Line/IconWarningLine'
@@ -31,18 +31,24 @@ const VARIANT_MAP = {
 const Message = ({message, variant}) => {
   const { Icon, color } = VARIANT_MAP[variant]
   return (
-    <div style={{display: 'flex', alignItems: 'flex-start'}}>
-      <Container as="span" padding="xx-small 0 0 0">
-        <Text color={color}>
-          <Icon title={message} />
-        </Text>
-      </Container>
-      <Container as="span" padding="0 0 0 x-small">
-        <Text color={color} size="small">
-          {message}
-        </Text>
-      </Container>
-    </div>
+    <Grid>
+      <GridRow
+        vAlign="middle"
+        hAlign="start"
+        colSpacing="small"
+      >
+        <GridCol width="auto" textAlign="start">
+          <Text color={color}>
+            <Icon title={message} style={{display: 'block'}} />
+          </Text>
+        </GridCol>
+        <GridCol>
+          <Text color={color} size="small">
+            {message}
+          </Text>
+        </GridCol>
+      </GridRow>
+    </Grid>
   )
 }
 

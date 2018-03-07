@@ -103,7 +103,7 @@ export default class SubmissionStatus extends React.Component {
     }
 
     if (this.props.isNotCountedForScore) {
-      const isNotCountedForScoreMessage = I18n.t('Will not factor in final grade')
+      const isNotCountedForScoreMessage = I18n.t('Not calculated in final grade')
 
       statusNotificationComponents.push(
         <div key="is-not-counted-for-score-status" style={statusNotificationContainerStyle}>
