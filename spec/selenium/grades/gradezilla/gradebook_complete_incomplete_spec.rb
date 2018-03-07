@@ -37,8 +37,8 @@ describe "Gradezilla" do
 
     it 'is maintained in editable mode', priority: '1', test_id: 3426618 do
       Gradezilla::Cells.grading_cell(@students[0], @assignment).click
-      icon = Gradezilla::Cells.get_complete_incomplete_icon(@students[0], @assignment)
-      expect(icon.attribute(:name)).to eq 'IconCheckSolid'
+      title = f("#{Gradezilla::Cells.grading_cell_selector(@students[0], @assignment)} title")
+      expect(title.attribute(:innerHTML)).to eq 'Complete'
     end
 
     it 'is maintained on page refresh post grade update', priority: '1', test_id: 3435317 do

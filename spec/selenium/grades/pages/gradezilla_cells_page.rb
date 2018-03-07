@@ -47,17 +47,6 @@ class Gradezilla
         grading_cell(student, assignment).text
       end
 
-      def get_complete_incomplete_icon(student, assignment)
-        f("#{grading_cell_selector(student, assignment)} .Grid__AssignmentRowCell__CompleteIncompleteValue svg")
-      end
-
-      # TODO: remove with GRADE-76
-      def grade_cell_input(student, assignment)
-        cell_selector = grading_cell_selector(student, assignment)
-        f(cell_selector).click
-        f("#{cell_selector} .grade")
-      end
-
       def edit_grade(student, assignment, grade)
         cell_selector = grading_cell_selector(student, assignment)
         f(cell_selector).click
