@@ -20,12 +20,14 @@ require_relative '../../selenium/helpers/files_common'
 require_relative '../../apis/api_spec_helper'
 require_relative '../../selenium/helpers/eportfolios_common'
 require_relative '../../../gems/canvas_http/lib/canvas_http'
+require_relative '../../selenium/helpers/context_modules_common'
 
 describe "instfs file uploads" do
   include_context "in-process server selenium tests"
   include FilesCommon
   include Helpers
   include EportfoliosCommon
+  include ContextModulesCommon
   include CanvasHttp
   let(:admin_guy) {account_admin_user(account: Account.site_admin)}
   let(:folder) { Folder.root_folders(admin_guy).first }
@@ -102,8 +104,18 @@ describe "instfs file uploads" do
 
   def get_id_from_canvas_link(file_link)
     # http://172.18.0.18:34175/files/146/download?download_frd=1"
-    file_id = file_link.split("/download").first
-    file_id.split("/files/").last
+    # http://172.18.0.18:44030/courses/266/assignments/195/submissions/597?download=189&inline=1
+    # http://172.18.0.18:33011/courses/314/assignments/235/submissions/702?comment_id=20&download=236
+    if ["/files/", "/download"].all? { |cool| file_link.include? cool }
+      split_link = file_link.split("/download").first
+      file_id = split_link.split("/files/").last
+    elsif ["/courses/", "/assignments/", "/submissions/", "comment_id"].all? { |cool| file_link.include? cool }
+      file_id = file_link.split("&download=").last
+    elsif ["/courses/", "/assignments/", "/submissions/"].all? { |cool| file_link.include? cool }
+      split_link = file_link.split("?download=").last
+      file_id =  split_link.split("&inline").first
+    end
+    file_id
   end
 
   def get_link_redirect_path(file_link)
@@ -132,6 +144,19 @@ describe "instfs file uploads" do
     downloaded_data
   end
 
+  def expect_valid_instfs_link(image_element_source, file_path)
+    attachment = Attachment.find(get_id_from_canvas_link(image_element_source))
+    # verify that the attachment has an instfs uuid and that it's identical to the original file
+    expect(attachment.instfs_uuid).not_to be_nil
+    expect(compare_md5s(image_element_source, file_path)).to be true
+    # verify that the canvas link redirects through instfs
+    redirect_url = get_link_redirect_path(image_element_source)
+    if redirect_url
+      expect(redirect_url).to include(InstFS.app_host)
+    end
+  end
+
+
   context 'when uploading to instfs as an admin' do
     before do
       user_session(admin_guy)
@@ -147,10 +172,7 @@ describe "instfs file uploads" do
       wait_for_ajaximations
       file_element = f(".ef-name-col__link")
       image_element_source = file_element.attribute("href")
-      attachment = Attachment.find(get_id_from_canvas_link(image_element_source))
-      # verify that the attachment has an instfs uuid and that it's identical to the original file
-      expect(attachment.instfs_uuid).not_to be_nil
-      expect(compare_md5s(image_element_source, file_path)).to be true
+      expect_valid_instfs_link(image_element_source, file_path)
     end
 
     it "should display a thumbnail from instfs", priority: "1", test_id: 3399295 do
@@ -160,7 +182,7 @@ describe "instfs file uploads" do
       get "/files"
       wait_for_ajaximations
       thumbnail_link = f(".media-object")["style"]
-      expect(thumbnail_link).to include("instfs.docker/thumbnails")
+      expect(thumbnail_link).to include(InstFS.app_host + "/thumbnails")
       file_link = get_file_link_from_bg_image(thumbnail_link)
       downloaded_file = open(file_link)
       expect(downloaded_file.size).to be > 0
@@ -177,13 +199,7 @@ describe "instfs file uploads" do
       setting.save
       file_element = f(".ef-name-col__link")
       image_element_source = file_element.attribute("href")
-      attachment = Attachment.find(get_id_from_canvas_link(image_element_source))
-      # verify that the attachment has an instfs uuid and that it's identical to the original file
-      expect(attachment.instfs_uuid).not_to be_nil
-      expect(compare_md5s(image_element_source, file_path)).to be true
-      # verify that the canvas link redirects through instfs
-      redirect_url = get_link_redirect_path(image_element_source)
-      expect(redirect_url).to include(InstFS.app_host)
+      expect_valid_instfs_link(image_element_source, file_path)
     end
 
     it "should upload a file to instfs with content exports", priority: "1", test_id: 3399292 do
@@ -220,9 +236,8 @@ describe "instfs file uploads" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@ass.id}"
       wait_for_ajaximations
       fln("instructure.png").click
-      image_element = f('#iframe_holder img')
-      image_element_source = image_element.attribute("src")
-      expect(compare_md5s(image_element_source, file_path)).to be true
+      image_element_source = f('#iframe_holder img').attribute("src")
+      expect_valid_instfs_link(image_element_source, file_path)
     end
 
     it "should allow Rich Content Editor to access InstFS files", priority: "1", test_id: 3399287 do
@@ -238,7 +253,7 @@ describe "instfs file uploads" do
       f(".btn-primary").click
       image_element = f('a[title="test_image.jpg"]')
       image_element_source = image_element.attribute("href")
-      expect(compare_md5s(image_element_source, file_path)).to be true
+      expect_valid_instfs_link(image_element_source, file_path)
     end
 
     it "should upload course image cards to instfs", priority: "1", test_id: 3455114 do
@@ -250,13 +265,8 @@ describe "instfs file uploads" do
       f(".UploadArea__Content input").send_keys(file_path)
       wait_for_new_page_load
       image_link = f(".CourseImageSelector")["style"]
-      # get link to canvas location of file
       file_link = get_file_link_from_bg_image(image_link)
-      # get the attachment object using the canvas id
-      attachment = Attachment.find(get_id_from_canvas_link(file_link))
-      # verify that the attachment has an instfs uuid and that it's identical to the original file
-      expect(attachment.instfs_uuid).not_to be_nil
-      expect(compare_md5s(file_link, file_path)).to be true
+      expect_valid_instfs_link(file_link, file_path)
     end
 
     it 'should allow the teacher to see the uploaded file on submissions page', priority: "1", test_id: 3399291 do
@@ -268,13 +278,15 @@ describe "instfs file uploads" do
       @ass.submit_homework(@student, attachments: [attachment], submission_type: 'online_upload')
       get "/courses/#{@course.id}/assignments/#{@ass.id}/submissions/#{@student.id}"
       wait_for_ajaximations
-      saved_window_handle = driver.window_handle
       # switch driver to preview area so it can find the right element
-      driver.switch_to.frame('preview_frame')
-      image_element = f("div .file-upload-submission-info a")
-      image_element_source = image_element.attribute("href")
-      expect(compare_md5s(image_element_source, file_path)).to be true
-      driver.switch_to.window saved_window_handle
+      begin
+        saved_window_handle = driver.window_handle
+        driver.switch_to.frame('preview_frame')
+        image_element_source = f("div .file-upload-submission-info a").attribute("href")
+      ensure
+        driver.switch_to.window saved_window_handle
+      end
+      expect_valid_instfs_link(image_element_source, file_path)
     end
 
     it "should display an attached instfs file in a discussion for the student", priority: "1", test_id: 3455116 do
@@ -300,9 +312,7 @@ describe "instfs file uploads" do
       get "/courses/#{@course.id}/discussion_topics/#{discussion.id}"
       wait_for_ajaximations
       file_link = f(".comment_attachments a").attribute("href")
-      attachment = Attachment.find(get_id_from_canvas_link(file_link))
-      expect(attachment.instfs_uuid).not_to be_nil
-      expect(compare_md5s(file_link, file_path)).to be true
+      expect_valid_instfs_link(file_link, file_path)
     end
 
     it 'should upload submission discussion files to instfs', priority: "1", test_id: 3399302 do
@@ -326,11 +336,7 @@ describe "instfs file uploads" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{ass.id}"
       wait_for_ajaximations
       file_link = f(".comment_attachment a").attribute("href")
-      file_id = file_link.split("download=").last
-      attachment = Attachment.find(get_id_from_canvas_link(file_id))
-      # verify that the attachment has an instfs uuid and that it's identical to the original file
-      expect(attachment.instfs_uuid).not_to be_nil
-      expect(compare_md5s(file_link, file_path)).to be true
+      expect_valid_instfs_link(file_link, file_path)
     end
 
     it 'should allow the teacher to see the uploaded file on a quiz submission', priority: "1", test_id: 3399299 do
@@ -359,14 +365,37 @@ describe "instfs file uploads" do
       user_session(@teacher)
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{quiz.assignment_id}"
       wait_for_ajaximations
-      saved_window_handle = driver.window_handle
-      driver.switch_to.frame('speedgrader_iframe')
-      file_link = fln("instructure.png").attribute("href")
-      attachment = Attachment.find(get_id_from_canvas_link(file_link))
-      # verify that the attachment has an instfs uuid and that it's identical to the original file
-      expect(attachment.instfs_uuid).not_to be_nil
-      expect(compare_md5s(file_link, file_path)).to be true
-      driver.switch_to.window saved_window_handle
+      begin
+        saved_window_handle = driver.window_handle
+        driver.switch_to.frame('speedgrader_iframe')
+        file_link = fln("instructure.png").attribute("href")
+      ensure
+        driver.switch_to.window saved_window_handle
+      end
+      expect_valid_instfs_link(file_link, file_path)
+    end
+
+    it 'should display instfs images on course modules', priority: "1", test_id: 3455117 do
+      file_path = File.join(ActionController::TestCase.fixture_path, "files/cn_image.jpg")
+      get "/courses/#{@course.id}/modules"
+      wait_for_ajaximations
+      add_module('FileModule')
+      f('.ig-header-admin .al-trigger').click
+      wait_for_ajaximations
+      f('.add_module_item_link').click
+      wait_for_ajaximations
+      select_module_item('#add_module_item_select', 'File')
+      wait_for_ajaximations
+      click_option('#attachments_select .module_item_select', 'new', :value)
+      wait_for_ajaximations
+      f("#module_attachment_uploaded_data").send_keys(file_path)
+      wait_for_ajaximations
+      f('.add_item_button.ui-button').click
+      wait_for_ajaximations
+      fln("cn_image.jpg").click
+      wait_for_ajaximations
+      file_link = f(".ic-Layout-contentMain a").attribute("href")
+      expect_valid_instfs_link(file_link, file_path)
     end
   end
 
