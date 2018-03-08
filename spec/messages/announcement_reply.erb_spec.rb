@@ -47,28 +47,16 @@ describe 'announcement_reply' do
       expect(msg.body.include?("replying to this message")).to eq true
     end
 
-    it "should render correct email signature with cdn" do
-      expect(Canvas::Cdn.config).to receive(:host).and_return("http://blah.com")
-      expect(Canvas::Cdn::RevManifest).to receive(:gulp_manifest).
-        and_return({"images/email_signature.png" => "images/email_signature-stuff.png"})
-      IncomingMailProcessor::MailboxAccount.reply_to_enabled = true
-      msg = generate_message(notification_name, path_type, asset)
-      expect(msg.html_body).to include("http://blah.com/dist/images/email_signature-stuff.png")
-    end
-
-    it "should render correct email signature without cdn" do
-      expect(Canvas::Cdn.config).to receive(:host).and_return(nil)
-      expect(Canvas::Cdn::RevManifest).to receive(:gulp_manifest).
-        and_return({"images/email_signature.png" => "images/email_signature-stuff.png"})
-      IncomingMailProcessor::MailboxAccount.reply_to_enabled = true
-      msg = generate_message(notification_name, path_type, asset)
-      expect(msg.html_body).to include("http://#{HostUrl.default_host}/dist/images/email_signature-stuff.png")
-    end
-
     it "should render correct footer if replys are disabled" do
       IncomingMailProcessor::MailboxAccount.reply_to_enabled = false
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.body.include?("replying to this message")).to eq false
+    end
+
+    it "the url to the image should exist on the internet" do
+      # this is the image we are counting on in our templates to exist, if it ever gets removed from the internet
+      # we need to do something about it
+      expect(Faraday.head('https://du11hjcvx0uqb.cloudfront.net/dist/images/email_signature-ea0b2cda73.png').status).to eq 200
     end
   end
 

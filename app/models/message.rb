@@ -28,8 +28,6 @@ class Message < ActiveRecord::Base
   include HtmlTextHelper
   include Workflow
   include Messages::PeerReviewsHelper
-  include ActionView::Helpers::AssetUrlHelper
-  include RevAssetPaths
 
   extend TextHelper
 
