@@ -55,7 +55,7 @@ class Enrollment::BatchStateUpdater
       touch_and_update_associations(user_ids)
       clear_email_caches(invited_user_ids) unless invited_user_ids.empty?
       cancel_future_appointments(courses, user_ids)
-      disassociate_cross_shard_users
+      disassociate_cross_shard_users(user_ids)
       update_linked_enrollments(students)
       touch_all_graders_if_needed(students)
       reset_notifications_cache(user_course_tuples)
@@ -70,7 +70,7 @@ class Enrollment::BatchStateUpdater
   def self.mark_enrollments_as_deleted(batch)
     Enrollment.where(id: batch).update_all(workflow_state: 'deleted', updated_at: Time.now.utc)
     EnrollmentState.where(enrollment_id: batch).update_all(state: 'deleted', state_valid_until: nil)
-    Score.where(enrollment_id: batch).update_all(workflow_state: 'deleted')
+    Score.where(enrollment_id: batch).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
   end
 
   def self.touch_and_update_associations(user_ids)
@@ -83,9 +83,9 @@ class Enrollment::BatchStateUpdater
       gm_ids = GroupMembership.active.joins(:group).
         where(groups: {context_type: 'Course', context_id: c},
               user_id: user_ids).where.not(user_id: c.enrollments.where.not(id: batch).pluck(:user_id))
-      GroupMembership.where(id: gm_ids).update_all(workflow_state: 'deleted')
+      GroupMembership.where(id: gm_ids).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
       leader_change_groups = Group.joins(:group_memberships).where(group_memberships: {id: gm_ids}, leader_id: user_ids)
-      leader_change_groups.update_all(leader_id: nil)
+      leader_change_groups.update_all(leader_id: nil, updated_at: Time.zone.now)
       leader_change_groups.each(&:auto_reassign_leader)
       Group.joins(:group_memberships).where(group_memberships: {id: gm_ids}).touch_all
     end
@@ -110,11 +110,11 @@ class Enrollment::BatchStateUpdater
       next if user_ids.empty?
       c.appointment_participants.active.current.
         where(context_id: user_ids, context_type: 'User').
-        update_all(workflow_state: 'deleted')
+        update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
     end
   end
 
-  def self.disassociate_cross_shard_users; end
+  def self.disassociate_cross_shard_users(user_ids); end
 
   def self.update_linked_enrollments(students)
     students.each(&:update_linked_enrollments)
