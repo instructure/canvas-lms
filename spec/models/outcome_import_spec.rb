@@ -183,6 +183,8 @@ describe OutcomeImport, type: :model do
           The following errors occurred:
           Row 1: Very Bad Error
 
+          To view the proper import format, please review the Canvas API Docs at http://localhost/doc/api/file.outcomes_csv.html
+
           Thank you,
           Instructure".gsub(/^ +/, ''),
         delay_for: 0,
@@ -220,6 +222,8 @@ describe OutcomeImport, type: :model do
 
           Here are the first 100 errors that occurred:
           #{printed_errors}
+
+          To view the proper import format, please review the Canvas API Docs at http://localhost/doc/api/file.outcomes_csv.html
 
           Thank you,
           Instructure".gsub(/^ +/, ''),

@@ -25,6 +25,8 @@ import Heading from '@instructure/ui-core/lib/components/Heading'
 import FileDrop from '@instructure/ui-core/lib/components/FileDrop'
 import Billboard from '@instructure/ui-core/lib/components/Billboard'
 import Text from '@instructure/ui-core/lib/components/Text'
+import Link from '@instructure/ui-core/lib/components/Link'
+import Container from '@instructure/ui-core/lib/components/Container'
 import SVGWrapper from '../shared/SVGWrapper'
 
 export function showImportOutcomesModal (props) {
@@ -115,6 +117,9 @@ export default class ImportOutcomesModal extends Component {
               </div>
             }
           />
+          <Container as="div" margin="large auto" textAlign='center'>
+            <Link href="/doc/api/file.outcomes_csv.html">{I18n.t('Outcomes CSV Format')}</Link>
+          </Container>
         </ModalBody>
       </Modal>
     )

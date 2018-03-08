@@ -192,16 +192,19 @@ class OutcomeImport < ApplicationRecord
     else
       subject = I18n.t 'Outcomes Import Failed'
       user_name = user.name.split('@').first
+      doc_url = "#{HostUrl.protocol}://#{HostUrl.context_host(context)}/doc/api/file.outcomes_csv.html"
       errors_count = I18n.t({one: "1 error", other: "%{count} errors"}, count: error_count)
       errors_lead = error_count <= 100 ? I18n.t('The following errors occurred:') : I18n.t('Here are the first 100 errors that occurred:')
       rows = n_errors(100).map { |r, m| I18n.t("Row %{row}: %{message}", row: r, message: m) }.join("\n")
-      body = I18n.t(<<-BODY, name: user_name, errors_count: errors_count, errors_lead: errors_lead, rows: rows, url: url).gsub(/^ +/, '')
+      body = I18n.t(<<-BODY, name: user_name, errors_count: errors_count, errors_lead: errors_lead, rows: rows, doc_url: doc_url, url: url).gsub(/^ +/, '')
       Hello %{name},
 
       Your outcomes import failed due to %{errors_count} with your import. Please examine your file and attempt the upload again at %{url}
 
       %{errors_lead}
       %{rows}
+
+      To view the proper import format, please review the Canvas API Docs at %{doc_url}
 
       Thank you,
       Instructure
