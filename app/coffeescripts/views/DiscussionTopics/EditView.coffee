@@ -401,11 +401,16 @@ define [
     sectionsAreRequired: ->
       if !ENV.context_asset_string.startsWith("course")
         return false
-
       isAnnouncement = ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement
       announcementsFlag = ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED
       discussionsFlag = ENV.SECTION_SPECIFIC_DISCUSSIONS_ENABLED
-      if isAnnouncement then announcementsFlag else discussionsFlag
+      if isAnnouncement
+        return announcementsFlag
+      else
+        # Apparently, the sections autocomplete box is conditonal on
+        # "canAttach" -- if they can't see the autocomplete, don't
+        # make them fill it
+        return discussionsFlag && @permissions.CAN_ATTACH
 
     validateBeforeSave: (data, errors) =>
       if data.delay_posting == "0"
