@@ -22,6 +22,7 @@ import { actionTypes } from '../actions'
 import subscriptionReducerMap from './subscriptionReducerMap'
 import duplicationReducerMap from './duplicationReducerMap'
 import cleanDiscussionFocusReducerMap from './cleanDiscussionFocusReducerMap'
+import searchReducerMap from './searchReducerMap'
 
 function copyAndUpdateDiscussionState(oldState, updatedDiscussion) {
   const newState = oldState.slice()
@@ -39,10 +40,13 @@ function copyAndUpdateDiscussionState(oldState, updatedDiscussion) {
 
 const reducerMap = {
   [actionTypes.GET_DISCUSSIONS_SUCCESS]: (state, action) => {
-    let closedDiscussions = []
-    if(action.payload.data) {
-      closedDiscussions = action.payload.data.filter((disc) => !disc.pinned && disc.locked)
-    }
+    const discussions = action.payload.data || []
+    const closedDiscussions = discussions.reduce((accumlator, discussion) => {
+      if (!discussion.pinned && discussion.locked) {
+        accumlator.push({ ...discussion, filtered: false })
+      }
+      return accumlator
+    }, [])
     return orderBy(closedDiscussions, ((d) => new Date(d.last_reply_at)), 'desc')
   },
   [actionTypes.UPDATE_DISCUSSION_START]: (state, action) => (
@@ -53,9 +57,8 @@ const reducerMap = {
   ),
 }
 
-Object.assign(reducerMap, subscriptionReducerMap)
-Object.assign(reducerMap, duplicationReducerMap)
-Object.assign(reducerMap, cleanDiscussionFocusReducerMap)
+Object.assign(reducerMap, subscriptionReducerMap, duplicationReducerMap,
+              cleanDiscussionFocusReducerMap, searchReducerMap)
 
 const closedForCommentsDiscussionReducer = handleActions(reducerMap, [])
 export default closedForCommentsDiscussionReducer

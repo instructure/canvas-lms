@@ -97,10 +97,13 @@ export default class DiscussionsContainer extends Component {
   }
 
   renderDiscussions () {
-    return this.props.discussions.map(discussion => {
-      if (this.props.permissions.moderate) {
-        return (
-          <DraggableDiscussionRow
+    return this.props.discussions.reduce((accumlator, discussion) => {
+      if (discussion.filtered) {
+        return accumlator
+      }
+
+      const row = this.props.permissions.moderate
+        ? <DraggableDiscussionRow
             key={discussion.id}
             discussion={discussion}
             canManage={this.props.permissions.manage_content}
@@ -113,10 +116,7 @@ export default class DiscussionsContainer extends Component {
             onMoveDiscussion={this.props.onMoveDiscussion}
             draggable
           />
-        )
-      } else {
-        return (
-          <DiscussionRow
+        : <DiscussionRow
             key={discussion.id}
             discussion={discussion}
             canManage={this.props.permissions.manage_content}
@@ -129,9 +129,9 @@ export default class DiscussionsContainer extends Component {
             onMoveDiscussion={this.props.onMoveDiscussion}
             draggable={false}
           />
-        )
-      }
-    })
+      accumlator.push(row)
+      return accumlator
+    }, [])
   }
 
   renderBackgroundImage() {
@@ -154,7 +154,7 @@ export default class DiscussionsContainer extends Component {
           summary={<Text weight="bold">{this.props.title}</Text>}
         >
             {
-              this.props.discussions.length
+              this.props.discussions.filter(d => !d.filtered).length
                 ? this.renderDiscussions()
                 : this.renderBackgroundImage()
             }

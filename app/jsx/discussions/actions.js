@@ -31,6 +31,7 @@ const discussionActions = createPaginationActions('discussions', apiClient.getDi
 
 const types = [
   ...discussionActions.actionTypes,
+  'UPDATE_DISCUSSIONS_SEARCH',
   'TOGGLE_MODAL_OPEN',
   'TOGGLE_SUBSCRIBE_START',
   'ARRANGE_PINNED_DISCUSSIONS',
@@ -102,6 +103,19 @@ actions.updateDiscussion = function(discussion, updatedFields, { successMessage,
           err
         }))
       })
+  }
+}
+
+actions.searchDiscussions = function searchDiscussions ({ searchTerm, filter }) {
+  return (dispatch, getState) => {
+    dispatch(actions.updateDiscussionsSearch({ searchTerm, filter }))
+    const state = getState()
+    const pinned = state.pinnedDiscussions
+    const unpinned = state.unpinnedDiscussions
+    const closed = state.closedForCommentsDiscussions
+    const allDiscussions = pinned.concat(unpinned).concat(closed)
+    const numDisplayed = allDiscussions.filter(d => !d.filtered).length
+    $.screenReaderFlashMessageExclusive(I18n.t('%{count} discussions found.', { count: numDisplayed }))
   }
 }
 

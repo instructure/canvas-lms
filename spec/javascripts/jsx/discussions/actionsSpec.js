@@ -404,3 +404,41 @@ test('dispatches duplicateDiscussionFail if api call fails', function(assert) {
     done()
   })
 })
+
+test('searchDiscussions dispatches UPDATE_DISCUSSIONS_SEARCH', function() {
+  const dispatchSpy = sinon.spy()
+  const state = {
+    pinnedDiscussions: [],
+    unpinnedDiscussions: [],
+    closedForCommentsDiscussions: [],
+  }
+  actions.searchDiscussions({ searchTerm: 'foobar', filter: 'unread' })(dispatchSpy, () => state)
+  const expected = [
+    {
+      payload: {
+        searchTerm: 'foobar',
+        filter: 'unread',
+      },
+      type: "UPDATE_DISCUSSIONS_SEARCH"
+    }
+  ]
+  deepEqual(dispatchSpy.firstCall.args, expected)
+})
+
+test('searchDiscussions announces number of results found to screenreader', function(assert) {
+  const done = assert.async()
+  const dispatchSpy = sinon.spy()
+  const flashStub = sinon.spy($, 'screenReaderFlashMessageExclusive')
+  const state = {
+    pinnedDiscussions: [{filtered: true}, {filtered: false}],
+    unpinnedDiscussions: [{filtered: true}, {filtered: false}],
+    closedForCommentsDiscussions: [{filtered: true}, {filtered: false}],
+  }
+  actions.searchDiscussions({ searchTerm: 'foobar', filter: 'unread' })(dispatchSpy, () => state)
+
+  setTimeout(() => {
+    deepEqual(flashStub.firstCall.args, ["3 discussions found."])
+    flashStub.restore()
+    done()
+  })
+})

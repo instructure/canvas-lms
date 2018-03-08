@@ -246,7 +246,7 @@ renderStudentView () {
         <ScreenReaderContent>
           <Heading level="h1">{I18n.t('Discussions')}</Heading>
         </ScreenReaderContent>
-        <ConnectedIndexHeader searchInputRef={(c) => { this.searchInput = c }} />
+        <ConnectedIndexHeader/>
         {this.renderSpinner(this.props.isLoadingDiscussions, I18n.t('Loading Discussions'))}
         {this.props.permissions.moderate ? this.renderTeacherView() : this.renderStudentView()}
       </div>

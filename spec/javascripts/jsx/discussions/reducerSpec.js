@@ -254,3 +254,37 @@ test('ARRANGE_PINNED_DISCUSSIONS should update unpinned discussion', () => {
     { title: "landon", id: 1, pinned: true, locked: false }
   ])
 })
+
+test('UPDATE_DISCUSSIONS_SEARCH should set the filter flag on discussions', () => {
+  const initialState = {
+    pinnedDiscussions: [
+      {title: 'foo', pinned: true, locked: false, filtered: false, read_state: 'read',   unread_count: 1},
+      {title: 'foo', pinned: true, locked: false, filtered: false, read_state: 'read',   unread_count: 0},
+      {title: 'foo', pinned: true, locked: true,  filtered: false, read_state: 'unread', unread_count: 0},
+      {title: 'bar', pinned: true, locked: true,  filtered: false, read_state: 'unread', unread_count: 1},
+    ],
+    unpinnedDiscussions: [
+      {title: 'foo', pinned: false, locked: false, filtered: false, read_state: 'read',   unread_count: 1},
+      {title: 'foo', pinned: false, locked: false, filtered: false, read_state: 'read',   unread_count: 0},
+      {title: 'foo', pinned: true, locked: true,  filtered: false, read_state: 'unread', unread_count: 0},
+      {title: 'bar', pinned: false, locked: false, filtered: false, read_state: 'unread', unread_count: 1},
+    ],
+    closedForCommentsDiscussions: [
+      {title: 'foo', pinned: false, locked: true, filtered: false, read_state: 'read',   unread_count: 1},
+      {title: 'foo', pinned: false, locked: true, filtered: false, read_state: 'read',   unread_count: 0},
+      {title: 'foo', pinned: true, locked: true,  filtered: false, read_state: 'unread', unread_count: 0},
+      {title: 'bar', pinned: false, locked: true, filtered: false, read_state: 'unread', unread_count: 1},
+    ]
+  }
+
+  const dispatchData = {
+    searchTerm: 'foo',
+    filter: 'unread',
+  }
+
+  const newState = reduce(actions.updateDiscussionsSearch(dispatchData), initialState)
+
+  deepEqual(newState.pinnedDiscussions.map(d => d.filtered), [false, true, false, true])
+  deepEqual(newState.unpinnedDiscussions.map(d => d.filtered), [false, true, false, true])
+  deepEqual(newState.closedForCommentsDiscussions.map(d => d.filtered), [false, true, false, true])
+})

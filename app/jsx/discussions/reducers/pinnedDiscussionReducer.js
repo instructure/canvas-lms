@@ -22,6 +22,7 @@ import { actionTypes } from '../actions'
 import subscriptionReducerMap from './subscriptionReducerMap'
 import duplicationReducerMap from './duplicationReducerMap'
 import cleanDiscussionFocusReducerMap from './cleanDiscussionFocusReducerMap'
+import searchReducerMap from './searchReducerMap'
 
 // We need to not change the ordering of the diccussions here, ie we can't
 // use the same .sort that we use in the GET_DISCUSSIONS_SUCCESS. This is
@@ -57,10 +58,13 @@ const reducerMap = {
     return newPinnedDiscussions
   },
   [actionTypes.GET_DISCUSSIONS_SUCCESS]: (state, action) => {
-    let pinnedDiscussions = []
-    if (action.payload.data) {
-      pinnedDiscussions = action.payload.data.filter(disc => disc.pinned)
-    }
+    const discussions = action.payload.data || []
+    const pinnedDiscussions = discussions.reduce((accumlator, discussion) => {
+      if (discussion.pinned) {
+        accumlator.push({ ...discussion, filtered: false })
+      }
+      return accumlator
+    }, [])
     return orderBy(pinnedDiscussions, ['position'], ['asc'])
   },
   [actionTypes.UPDATE_DISCUSSION_START]: (state, action) =>
@@ -69,9 +73,8 @@ const reducerMap = {
     copyAndUpdateDiscussionState(state, action.payload.discussion)
 }
 
-Object.assign(reducerMap, subscriptionReducerMap)
-Object.assign(reducerMap, duplicationReducerMap)
-Object.assign(reducerMap, cleanDiscussionFocusReducerMap)
+Object.assign(reducerMap, subscriptionReducerMap, duplicationReducerMap,
+              cleanDiscussionFocusReducerMap, searchReducerMap)
 
 const pinnedDiscussionReducer = handleActions(reducerMap, [])
 export default pinnedDiscussionReducer
