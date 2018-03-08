@@ -18,7 +18,6 @@
 
 import React from 'react';
 import { mount } from 'enzyme';
-import SubmissionCell from 'compiled/gradezilla/SubmissionCell';
 import AssignmentRowCell from 'jsx/gradezilla/default_gradebook/components/AssignmentRowCell';
 
 QUnit.module('AssignmentRowCell', (suiteHooks) => {
