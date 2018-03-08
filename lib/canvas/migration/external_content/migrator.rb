@@ -37,7 +37,9 @@ module Canvas::Migration::ExternalContent
         self.registered_services.each do |key, service|
           if service.applies_to_course?(course)
             begin
-              pending_exports[key] = service.begin_export(course, opts)
+              if export = service.begin_export(course, opts)
+                pending_exports[key] = export
+              end
             rescue => e
               Canvas::Errors.capture_exception(:external_content_migration, e)
             end

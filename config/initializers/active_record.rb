@@ -646,12 +646,17 @@ module UsefulFindInBatches
     # prefer copy unless we're in a transaction (which would be bad,
     # because we might open a separate connection in the block, and not
     # see the contents of our current transaction)
-    if connection.open_transactions == 0
+    if connection.open_transactions == 0 && !options[:start] && eager_load_values.empty?
       self.activate { |r| r.find_in_batches_with_copy(options, &block) }
-    elsif should_use_cursor? && !options[:start]
+    elsif should_use_cursor? && !options[:start] && eager_load_values.empty?
       self.activate { |r| r.find_in_batches_with_cursor(options, &block) }
     elsif find_in_batches_needs_temp_table?
-      raise ArgumentError.new("GROUP and ORDER are incompatible with :start, as is an explicit select without the primary key") if options[:start]
+      if options[:start]
+        raise ArgumentError.new("GROUP and ORDER are incompatible with :start, as is an explicit select without the primary key")
+      end
+      unless eager_load_values.empty?
+        raise ArgumentError.new("GROUP and ORDER are incompatible with `eager_load`, as is an explicit select without the primary key")
+      end
       self.activate { |r| r.find_in_batches_with_temp_table(options, &block) }
     else
       super
@@ -741,6 +746,7 @@ ActiveRecord::Relation.class_eval do
     limited_query = limit(0).to_sql
     full_query = "COPY (#{to_sql}) TO STDOUT"
     conn = connection
+    full_query = conn.annotate_sql(full_query) if defined?(Marginalia)
     pool = conn.pool
     # remove the connection from the pool so that any queries executed
     # while we're running this will get a new connection

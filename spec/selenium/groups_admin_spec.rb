@@ -1,3 +1,4 @@
+#
 # Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -13,23 +14,24 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-class CreateParallelImporters < ActiveRecord::Migration[5.0]
-  tag :predeploy
+require File.expand_path(File.dirname(__FILE__) + '/common')
 
-  def change
-    drop_table :parallel_importers if ActiveRecord::Base.connection.table_exists? 'parallel_importers'
-    create_table :parallel_importers do |t|
-      t.integer :sis_batch_id, null: false, limit: 8
-      t.string :workflow_state, null: false, limit: 255
-      t.integer :index, null: false, limit: 8
-      t.integer :batch_size, null: false, limit: 8
-      t.timestamps null: false
-      t.datetime :started_at
-      t.datetime :ended_at
+describe 'account groups' do
+  include_context 'in-process server selenium tests'
+  include GroupsCommon
+
+  describe 'as an admin' do
+    it 'should list uncategorized groups' do
+      a = Account.default
+      admin_logged_in
+      # no group category means uncategorized
+      group = a.groups.create(name: 'anugroup', context: a)
+      group.add_user @user
+
+      get "/accounts/#{a.id}/groups/"
+      expect(f("body")).to include_text("anugroup")
     end
-    add_foreign_key :parallel_importers, :sis_batches
-    add_index :parallel_importers, :sis_batch_id
   end
 end
+

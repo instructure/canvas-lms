@@ -1,3 +1,4 @@
+#
 # Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -15,21 +16,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CreateParallelImporters < ActiveRecord::Migration[5.0]
+class AddIndexToSubmissionsGradedAt < ActiveRecord::Migration[5.0]
   tag :predeploy
+  disable_ddl_transaction!
 
   def change
-    drop_table :parallel_importers if ActiveRecord::Base.connection.table_exists? 'parallel_importers'
-    create_table :parallel_importers do |t|
-      t.integer :sis_batch_id, null: false, limit: 8
-      t.string :workflow_state, null: false, limit: 255
-      t.integer :index, null: false, limit: 8
-      t.integer :batch_size, null: false, limit: 8
-      t.timestamps null: false
-      t.datetime :started_at
-      t.datetime :ended_at
+    # brin indexes are only available on Postgres versions 9.5+
+    if connection.send(:postgresql_version) >= 90500
+      add_index :submissions, :graded_at, algorithm: :concurrently, using: :brin
+    else
+      add_index :submissions, :graded_at, algorithm: :concurrently
     end
-    add_foreign_key :parallel_importers, :sis_batches
-    add_index :parallel_importers, :sis_batch_id
   end
 end

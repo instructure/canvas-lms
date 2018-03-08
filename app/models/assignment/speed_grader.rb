@@ -212,7 +212,7 @@ class Assignment
               version_json['submission']['has_originality_report'] = version.has_originality_report?
               version_json['submission']['has_plagiarism_tool'] = version.assignment.assignment_configuration_tool_lookup_ids.present?
               version_json['submission']['has_originality_score'] = version.originality_reports_for_display.any? { |o| o.originality_score.present? }
-              version_json["submission"]['turnitin_data'] = version.originality_data
+              version_json['submission']['turnitin_data'].merge!(version.originality_data)
 
               if version_json['submission'][:submission_type] == 'discussion_topic'
                 url_opts[:enable_annotations] = false

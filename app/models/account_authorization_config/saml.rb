@@ -45,7 +45,8 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
       :parent_registration,
       :jit_provisioning,
       :metadata,
-      :metadata_uri
+      :metadata_uri,
+      :sig_alg
     ].freeze
   end
 
@@ -62,6 +63,10 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
 
   before_validation :set_saml_defaults
   before_validation :download_metadata
+  after_initialize do |ap|
+    # default to the most secure signature we support, but only for new objects
+    ap.sig_alg ||= 'RSA-SHA256' if ap.new_record?
+  end
 
   def auth_provider_filter
     [nil, self]
@@ -138,6 +143,26 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     settings['signing_certificates'] ||= []
   end
 
+  def sig_alg
+    settings['sig_alg'].presence
+  end
+
+  def sig_alg=(value)
+    value = value.presence
+    value = SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA1 if value&.downcase == 'rsa-sha1'
+    value = SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA256 if value&.downcase == 'rsa-sha256'
+    # support using 'false' to disable
+    value = nil if ::Canvas::Plugin.value_to_boolean(value, ignore_unrecognized: true) == false
+
+    unless [nil,
+            SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA1,
+            SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA256].include?(value)
+      errors.add("Unsupported signing algorithm #{value}")
+      return
+    end
+    settings['sig_alg'] = value
+  end
+
   def populate_from_metadata(entity)
     idps = entity.identity_providers
     raise "Must provide exactly one IDPSSODescriptor; found #{idps.length}" unless idps.length == 1
@@ -148,6 +173,16 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     self.certificate_fingerprint = (idp.signing_keys.first || idp.keys.first).try(:fingerprint)
     self.identifier_format = (idp.name_id_formats & Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS).first
     self.settings[:signing_certificates] = idp.signing_keys.map(&:x509)
+    case idp.want_authn_requests_signed?
+    when true
+      # use ||= to not overwrite a specific algorithm that has otherwise been
+      # chosen
+      self.sig_alg ||= 'RSA-SHA1'
+    when false
+      self.sig_alg = nil
+    # else nil
+    # don't change the user settings
+    end
   end
 
   def populate_from_metadata_xml(xml)
@@ -258,8 +293,8 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     end
     authn_request.force_authn = true if parent_registration
     private_key = self.class.private_key
-    private_key = nil if account.settings[:dont_sign_saml_authn_requests]
-    forward_url = SAML2::Bindings::HTTPRedirect.encode(authn_request, private_key: private_key)
+    private_key = nil if sig_alg.nil?
+    forward_url = SAML2::Bindings::HTTPRedirect.encode(authn_request, private_key: private_key, sig_alg: sig_alg)
 
     if debugging? && !debug_get(:request_id)
       debug_set(:request_id, authn_request.id)
@@ -409,7 +444,11 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     )
 
     # sign the response
-    result = SAML2::Bindings::HTTPRedirect.encode(logout_request, private_key: AccountAuthorizationConfig::SAML.private_key)
+    private_key = AccountAuthorizationConfig::SAML.private_key
+    private_key = nil if sig_alg.nil?
+    result = SAML2::Bindings::HTTPRedirect.encode(logout_request,
+                                                  private_key: private_key,
+                                                  sig_alg: sig_alg)
 
     if debugging? && debug_get(:logged_in_user_id) == current_user.id
       debug_set(:logout_request_id, logout_request.id)

@@ -58,6 +58,7 @@ class Enrollment < ActiveRecord::Base
   validate :valid_course?
   validate :valid_section?
 
+  # update bulk destroy if changing or adding an after save
   before_save :assign_uuid
   before_validation :assert_section
   after_save :recalculate_enrollment_state
@@ -78,6 +79,8 @@ class Enrollment < ActiveRecord::Base
   after_save :add_to_favorites_later
   after_commit :update_cached_due_dates
   after_save :update_assignment_overrides_if_needed
+  after_create :needs_grading_count_updated, if: :active_student?
+  after_update :needs_grading_count_updated, if: :active_student_changed?
 
   attr_accessor :already_enrolled, :need_touch_user, :skip_touch_user
   scope :current, -> { joins(:course).where(QueryBuilder.new(:active).conditions).readonly(false) }
@@ -169,8 +172,6 @@ class Enrollment < ActiveRecord::Base
       update_all(["updated_at=?", Time.now.utc])
   end
 
-  after_create :needs_grading_count_updated, if: :active_student?
-  after_update :needs_grading_count_updated, if: :active_student_changed?
   def needs_grading_count_updated
     self.class.connection.after_transaction_commit do
       touch_assignments
@@ -1344,12 +1345,6 @@ class Enrollment < ActiveRecord::Base
       override_scope
         .where(assignment_id: assignment_ids)
         .find_each(&:destroy)
-    elsif being_restored? || being_reactivated? || being_uncompleted?
-      return unless (assignment_ids = assignment_scope.pluck(:id)).any?
-
-      override_scope
-        .where(assignment_id: assignment_ids)
-        .find_each(&:undestroy)
     end
   end
 

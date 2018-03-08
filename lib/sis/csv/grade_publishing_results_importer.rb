@@ -27,10 +27,9 @@ module SIS
       # expected columns
       # enrollment_id,grade_publishing_status
       def process(csv, index=nil, count=nil)
-        @sis.counts[:grade_publishing_results] += SIS::GradePublishingResultsImporter.new(@root_account, importer_opts).process do |importer|
+        count = SIS::GradePublishingResultsImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
             update_progress
-
             begin
               importer.add_grade_publishing_result(row['enrollment_id'], row['grade_publishing_status'], row['message'])
             rescue ImportError => e
@@ -38,6 +37,7 @@ module SIS
             end
           end
         end
+        count
       end
     end
   end

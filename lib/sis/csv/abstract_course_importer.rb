@@ -27,10 +27,9 @@ module SIS
       # expected columns
       # abstract_course_id,short_name,long_name,account_id,term_id,status
       def process(csv, index=nil, count=nil)
-        @sis.counts[:abstract_courses] += SIS::AbstractCourseImporter.new(@root_account, importer_opts).process do |importer|
+        count = SIS::AbstractCourseImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
             update_progress
-
             begin
               importer.add_abstract_course(row['abstract_course_id'], row['short_name'], row['long_name'], row['status'], row['term_id'], row['account_id'], row['fallback_account_id'])
             rescue ImportError => e
@@ -38,6 +37,7 @@ module SIS
             end
           end
         end
+        count
       end
     end
   end

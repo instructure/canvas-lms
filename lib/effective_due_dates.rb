@@ -216,7 +216,8 @@ class EffectiveDueDates
               1 AS priority
             FROM
               overrides o
-            INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} os ON os.assignment_override_id = o.id
+            INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} os ON os.assignment_override_id = o.id AND
+              os.workflow_state = 'active'
             WHERE
               o.set_type = 'ADHOC'
               #{filter_students_sql('os')}

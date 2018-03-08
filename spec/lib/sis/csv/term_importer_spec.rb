@@ -23,7 +23,7 @@ describe SIS::CSV::TermImporter do
   before { account_model }
 
   it 'should skip bad content' do
-    before_count = EnrollmentTerm.count
+    before_count = EnrollmentTerm.where.not(:sis_source_id => nil).count
     importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
       "T001,Winter11,active,,",
@@ -31,7 +31,7 @@ describe SIS::CSV::TermImporter do
       "T002,Winter10,inactive,,",
       "T003,,active,,"
     )
-    expect(EnrollmentTerm.count).to eq before_count + 1
+    expect(EnrollmentTerm.where.not(:sis_source_id => nil).count).to eq before_count + 1
 
     errors = importer.errors.map { |r| r.last }
     expect(errors).to eq ["No term_id given for a term",
@@ -40,14 +40,14 @@ describe SIS::CSV::TermImporter do
   end
 
   it 'should create terms' do
-    before_count = EnrollmentTerm.count
+    before_count = EnrollmentTerm.where.not(:sis_source_id => nil).count
     importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
       "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00",
       "T002,Winter12,active,2012-13-05 00:00:00,2012-14-14 00:00:00",
       "T003,Winter13,active,,"
     )
-    expect(EnrollmentTerm.count).to eq before_count + 3
+    expect(EnrollmentTerm.where.not(:sis_source_id => nil).count).to eq before_count + 3
 
     t1 = @account.enrollment_terms.where(sis_source_id: 'T001').first
     expect(t1).not_to be_nil
@@ -65,11 +65,11 @@ describe SIS::CSV::TermImporter do
   end
 
   it 'should support stickiness' do
-    before_count = EnrollmentTerm.count
+    before_count = EnrollmentTerm.where.not(:sis_source_id => nil).count
     importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
       "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00")
-    expect(EnrollmentTerm.count).to eq before_count + 1
+    expect(EnrollmentTerm.where.not(:sis_source_id => nil).count).to eq before_count + 1
     EnrollmentTerm.last.tap do |t|
       expect(t.name).to eq "Winter11"
       expect(t.start_at).to eq DateTime.parse("2011-1-05 00:00:00")
@@ -78,7 +78,7 @@ describe SIS::CSV::TermImporter do
     importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
       "T001,Winter12,active,2010-1-05 00:00:00,2010-4-14 00:00:00")
-    expect(EnrollmentTerm.count).to eq before_count + 1
+    expect(EnrollmentTerm.where.not(:sis_source_id => nil).count).to eq before_count + 1
     EnrollmentTerm.last.tap do |t|
       expect(t.name).to eq "Winter12"
       expect(t.start_at).to eq DateTime.parse("2010-1-05 00:00:00")
@@ -91,7 +91,7 @@ describe SIS::CSV::TermImporter do
     importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
       "T001,Fall12,active,2011-1-05 00:00:00,2011-4-14 00:00:00")
-    expect(EnrollmentTerm.count).to eq before_count + 1
+    expect(EnrollmentTerm.where.not(:sis_source_id => nil).count).to eq before_count + 1
     EnrollmentTerm.last.tap do |t|
       expect(t.name).to eq "Fall11"
       expect(t.start_at).to eq DateTime.parse("2009-1-05 00:00:00")

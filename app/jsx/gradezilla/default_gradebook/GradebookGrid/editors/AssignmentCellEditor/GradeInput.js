@@ -106,8 +106,14 @@ export default class GradeInput extends Component {
   }
 
   hasGradeChanged() {
-    const inputData = getGradingData(this.state.grade, this.props)
+    const {assignment, enterGradesAs, gradingScheme, submission} = this.props
+    const formattedGrade = formatGrade(submission, assignment, gradingScheme, enterGradesAs)
 
+    if (formattedGrade === this.state.grade.trim()) {
+      return false
+    }
+
+    const inputData = getGradingData(this.state.grade, this.props)
     if (inputData.excused !== this.props.submission.excused) {
       return true
     }

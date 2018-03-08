@@ -22,10 +22,10 @@ require 'zip'
 
 module SIS
   module CSV
-    class Import
+    class ImportRefactored
 
-      attr_accessor :root_account, :batch, :finished, :counts, :updates_every,
-        :override_sis_stickiness, :add_sis_stickiness, :clear_sis_stickiness
+      attr_accessor :root_account, :batch, :finished, :counts,
+        :override_sis_stickiness, :add_sis_stickiness, :clear_sis_stickiness, :logger
 
       IGNORE_FILES = /__macosx|desktop d[bf]|\A\..*/i
 
@@ -55,8 +55,6 @@ module SIS
         @override_sis_stickiness = opts[:override_sis_stickiness]
         @add_sis_stickiness = opts[:add_sis_stickiness]
         @clear_sis_stickiness = opts[:clear_sis_stickiness]
-        @counts = {}
-        IMPORTERS.each { |importer| @counts[importer.to_s.pluralize.to_sym] = 0 }
 
         @total_rows = 1
         @current_row = 0
@@ -69,27 +67,19 @@ module SIS
         @finished = false
 
         settings = PluginSetting.settings_for_plugin('sis_import')
-
-        @allow_printing = opts[:allow_printing].nil? ? true : opts[:allow_printing]
-        @parallelism = opts[:parallelism]
-        @parallelism ||= settings[:parallelism].to_i
-        @parallelism = 1 if @parallelism < 1
-        @parallelism = 1 unless @batch
         @minimum_rows_for_parallel = settings[:minimum_rows_for_parallel].to_i
         @minimum_rows_for_parallel = 1000 if @minimum_rows_for_parallel < 1
-        @parallel_queue = settings[:queue_for_parallel_jobs]
-        @parallel_queue = nil if @parallel_queue.blank?
         update_pause_vars
       end
 
       def self.process(root_account, opts = {})
-        importer = Import.new(root_account, opts)
+        importer = self.new(root_account, opts)
         importer.process
         importer
       end
 
       def use_parallel_imports?
-        false
+        true
       end
 
       def prepare
@@ -106,20 +96,27 @@ module SIS
                 process_file(tmp_dir, file_name, att)
               end
             elsif File.extname(file).downcase == '.csv'
-              att = @batch.attachment
+              att = @batch.attachment unless @batch.attachment&.filename != File.basename(file)
               att ||= create_batch_attachment file
               process_file(File.dirname(file), File.basename(file), att)
             end
           end
         end
         @files = nil
+        @parallel_importers = {}
 
         IMPORTERS.each do |importer|
           @csvs[importer].reject! do |csv|
             begin
               rows = 0
               ::CSV.open(csv[:fullpath], "rb", CSVBaseImporter::PARSE_ARGS) do |faster_csv|
-                rows += 1 while faster_csv.shift
+                while faster_csv.shift
+                  if rows % @minimum_rows_for_parallel == 0
+                    @parallel_importers[importer] ||= []
+                    @parallel_importers[importer] << create_parallel_importer(csv, importer, rows)
+                  end
+                  rows += 1
+                end
               end
               @rows[importer] += rows
               @total_rows += rows
@@ -134,6 +131,14 @@ module SIS
         @csvs
       end
 
+      def create_parallel_importer(csv, importer, rows)
+        @batch.parallel_importers.create!(workflow_state: 'pending',
+                                          importer_type: importer.to_s,
+                                          attachment: csv[:attachment],
+                                          index: rows,
+                                          batch_size: @minimum_rows_for_parallel)
+      end
+
       def create_batch_attachment(path)
         return if File.stat(path).size == 0
         data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
@@ -143,63 +148,19 @@ module SIS
       def process
         prepare
 
-        @parallelism = 1 if @total_rows <= @minimum_rows_for_parallel
-
-        # calculate how often we should update progress to get 1% resolution
-        # but don't leave us hanging for more than 500 rows at a time
-        # and don't do it more often than we have work to do
-        @updates_every = [ [ @total_rows / @parallelism / 100, 500 ].min, 10 ].max
-
-        if @batch
-          @batch.data[:supplied_batches] = []
-          IMPORTERS.each do |importer|
-            @batch.data[:supplied_batches] << importer if @csvs[importer].present?
-          end
-          @batch.save!
+        @batch.data[:supplied_batches] = []
+        @batch.data[:counts] ||= {}
+        IMPORTERS.each do |importer|
+          @batch.data[:supplied_batches] << importer if @csvs[importer].present?
+          @batch.data[:counts][importer.to_s.pluralize.to_sym] = 0
         end
+        @batch.data[:completed_importers] = []
+        @batch.save!
 
-        if (@parallelism > 1)
-          # re-balance the CSVs
-          @batch.data[:importers] = {}
-          IMPORTERS.each do |importer|
-            if (importer != :account)
-              rebalance_csvs(importer)
-            end
-            @batch.data[:importers][importer] = @csvs[importer].length
-            @batch.data[:counts] = {}
-            @batch.data[:current_row] = 0
-          end
-          @batch.save!
-          @rows = nil
-          @headers = nil
-          run_next_importer(IMPORTERS.first)
-          @batch.reload
-          while @batch.workflow_state.to_sym == :importing
-            sleep(0.5)
-            @batch.reload
-          end
-          @finished = [:imported, :imported_with_messages].include?(@batch.workflow_state.to_sym)
-        else
-          IMPORTERS.each do |importer|
-            importerObject = SIS::CSV.const_get(importer.to_s.camelcase + 'Importer').new(self)
-            @csvs[importer].each { |csv| @counts[importer.to_s.pluralize.to_sym] += importerObject.process(csv) }
-          end
-          @finished = true
-        end
+        queue_next_importer_set
       rescue => e
         if @batch
-          return @batch if @batch.workflow_state == 'aborted'
-          message = "Importing CSV for account"\
-            ": #{@root_account.id} (#{@root_account.name}) "\
-            "sis_batch_id: #{@batch.id}: #{e}"
-          err_id = Canvas::Errors.capture(e,{
-            type: :sis_import,
-            message: message,
-            during_tests: false
-          })[:error_report]
-          error_message = I18n.t("Error while importing CSV. Please contact support."\
-                                 " (Error report %{number})", number: err_id.to_s)
-          add_error(nil, error_message, failure: true)
+          fail_with_error!(e)
         else
           add_error(nil, "#{e.message}\n#{e.backtrace.join "\n"}", failure: true)
           raise e
@@ -208,15 +169,6 @@ module SIS
         @tmp_dirs.each do |tmp_dir|
           FileUtils.rm_rf(tmp_dir, :secure => true) if File.directory?(tmp_dir)
         end
-
-        if @batch && @parallelism == 1
-          @batch.data[:counts] = @counts
-          @batch.save
-        end
-      end
-
-      def logger
-        @logger ||= Rails.logger
       end
 
       def errors
@@ -244,34 +196,11 @@ module SIS
       end
 
       def update_progress
-        @current_row += 1
-        @current_row_for_pause_vars += 1
         return unless @batch
-
         if update_progress?
-          if @parallelism > 1
-            begin
-              SisBatch.transaction do
-                @batch.reload(select: 'data, progress, workflow_state', lock: :no_key_update)
-                raise SisBatch::Aborted if @batch.workflow_state == 'aborted'
-                @current_row += @batch.data[:current_row]
-                @batch.data[:current_row] = @current_row
-                @batch.progress = [calculate_progress, 99].min
-                @batch.save
-                @current_row = 0
-              end
-            rescue ActiveRecord::RecordNotFound
-              return
-            end
-          else
-            @batch.fast_update_progress( (((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100)
-          end
-          @last_progress_update = Time.now
-        end
-
-        if @current_row_for_pause_vars % @pause_every == 0
-          sleep(@pause_duration)
-          update_pause_vars
+          completed_count = @batch.parallel_importers.where(:workflow_state => "completed").count
+          current_progress = (completed_count.to_f * 100 / @parallel_importers.values.map(&:count).sum).round
+          SisBatch.where(:id => @batch).where("progress IS NULL or progress < ?", current_progress).update_all(:progress => current_progress)
         end
       end
 
@@ -281,68 +210,86 @@ module SIS
         @last_progress_update < update_interval.seconds.ago
       end
 
-      def run_single_importer(importer, csv)
+      def run_parallel_importer(parallel_importer)
         begin
-          importerObject = SIS::CSV.const_get(importer.to_s.camelcase + 'Importer').new(self)
-          if csv[:attachment]
-            file = csv[:attachment].open
-            csv[:fullpath] = file.path
+          if @batch.workflow_state == 'aborted'
+            parallel_importer.abort
+            return
           end
-          importerObject.process(csv)
-          run_next_importer(IMPORTERS[IMPORTERS.index(importer) + 1]) if complete_importer(importer)
+          importer_type = parallel_importer.importer_type.to_sym
+          importerObject = SIS::CSV.const_get(importer_type.to_s.camelcase + 'Importer').new(self)
+          att = parallel_importer.attachment
+          file = att.open
+          parallel_importer.start
+          csv = {:fullpath => file.path, :file => att.display_name}
+          count = importerObject.process(csv, parallel_importer.index, parallel_importer.batch_size)
+          update_progress # just update progress on completetion - the parallel jobs should be short enough
+          parallel_importer.complete(:rows_processed => count)
         rescue => e
-          return @batch if @batch.workflow_state == 'aborted'
-          message = "Importing CSV for account: "\
-            "#{@root_account.id} (#{@root_account.name}) sis_batch_id: #{@batch.id}: #{e}"
-          err_id = Canvas::Errors.capture(e, {
-            type: :sis_import,
-            message: message,
-            during_tests: false
-          })[:error_report]
-          error_message = I18n.t("Error while importing CSV. Please contact support. "\
-                                 "(Error report %{number})", number: err_id.to_s)
-          add_error(nil, error_message, failure: true, backtrace: e)
-          @batch.workflow_state = :failed_with_messages
-          @batch.save!
+          parallel_importer.fail
+          fail_with_error!(e)
         ensure
           file.close if file
+          if is_last_parallel_importer_of_type?(parallel_importer)
+            queue_next_importer_set unless %w{aborted failed failed_with_messages}.include?(@batch.workflow_state)
+          end
         end
+      end
+
+      def fail_with_error!(e)
+        return @batch if @batch.workflow_state == 'aborted'
+        message = "Importing CSV for account: "\
+            "#{@root_account.id} (#{@root_account.name}) sis_batch_id: #{@batch.id}: #{e}"
+        err_id = Canvas::Errors.capture(e, {
+          type: :sis_import,
+          message: message,
+          during_tests: false
+        })[:error_report]
+        error_message = I18n.t("Error while importing CSV. Please contact support. "\
+                                 "(Error report %{number})", number: err_id.to_s)
+        add_error(nil, error_message, failure: true, backtrace: e)
+        @batch.workflow_state = :failed_with_messages
+        @batch.save!
       end
 
       private
 
-      def run_next_importer(importer)
-        return finish if importer.nil? || @batch.workflow_state == 'aborted'
-        return run_next_importer(IMPORTERS[IMPORTERS.index(importer) + 1]) if @csvs[importer].empty?
-        if (importer == :account)
-          @csvs[importer].each { |csv| run_single_importer(importer, csv) }
-          return
+      def queue_next_importer_set
+        next_importer_type = IMPORTERS.detect{|i| !@batch.data[:completed_importers].include?(i) && @parallel_importers[i].present?}
+        return finish unless next_importer_type
+
+        enqueue_args = { :priority => Delayed::LOW_PRIORITY, :on_permanent_failure => :fail_with_error! }
+        if next_importer_type == :account
+          enqueue_args[:strand] = "sis_account_import:#{@root_account.global_id}" # run one at a time
+        else
+          enqueue_args[:n_strand] = ["sis_parallel_import", @root_account.global_id]
         end
-        # logger doesn't serialize well
-        @logger = nil
-        enqueue_args = { :priority => Delayed::LOW_PRIORITY }
-        enqueue_args[:queue] = @queue if @queue
-        @csvs[importer].each { |csv| self.send_later_enqueue_args(:run_single_importer, enqueue_args, importer, csv) }
+
+        importers_to_queue = @parallel_importers[next_importer_type]
+        updated_count = @batch.parallel_importers.where(:id => importers_to_queue, :workflow_state => "pending").
+          update_all(:workflow_state => "queued")
+        if updated_count != importers_to_queue.count
+          raise "state mismatch error queuing parallel import jobs"
+        end
+        importers_to_queue.each do |pi|
+          self.send_later_enqueue_args(:run_parallel_importer, enqueue_args, pi)
+        end
       end
 
+      def is_last_parallel_importer_of_type?(parallel_importer)
+        importer_type = parallel_importer.importer_type.to_sym
+        return false if @batch.parallel_importers.where(:importer_type => importer_type, :workflow_state => %w{queued running}).exists?
 
-      def complete_importer(importer)
-        return unless @batch
         SisBatch.transaction do
           @batch.reload(:lock => true)
-          @batch.data[:importers][importer] -= 1
-          @batch.data[:counts] ||= {}
-          @counts.each do |k, v|
-            @batch.data[:counts][k] ||= 0
-            @batch.data[:counts][k] += v
-            @counts[k] = 0
+          if !@batch.data[:completed_importers].include?(importer_type) # check for race condition
+            @batch.data[:completed_importers] << importer_type
+            @batch.data[:counts][importer_type.to_s.pluralize.to_sym] = @batch.parallel_importers.where(:importer_type => importer_type).sum(:rows_processed).to_i
+            @batch.save
+            true
+          else
+            false
           end
-          @current_row += @batch.data[:current_row] if @batch.data[:current_row]
-          @batch.data[:current_row] = @current_row
-          @batch.progress = (((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100
-          @current_row = 0
-          @batch.save
-          @batch.data[:importers][importer] == 0
         end
       end
 
@@ -360,62 +307,6 @@ module SIS
         @batch.data ||= {}
         @pause_every = (@batch.data[:pause_every] || Setting.get('sis_batch_pause_every', 100)).to_i
         @pause_duration = (@batch.data[:pause_duration] || Setting.get('sis_batch_pause_duration', 0)).to_f
-      end
-
-      def rebalance_csvs(importer)
-        rows_per_batch = (@rows[importer].to_f / @parallelism).ceil.to_i
-        new_csvs = []
-        out_csv = nil
-        tmp_dir = Dir.mktmpdir
-        @tmp_dirs << tmp_dir
-        temp_file = 0
-        headers = @headers[importer].to_a
-        path = nil
-        begin
-          Attachment.skip_3rd_party_submits
-          @csvs[importer].each do |csv|
-            remaining_in_batch = 0
-            ::CSV.foreach(csv[:fullpath], CSVBaseImporter::PARSE_ARGS) do |row|
-              if remaining_in_batch == 0
-                temp_file += 1
-                if out_csv
-                  out_csv.close
-                  out_csv = nil
-                  att = Attachment.new
-                  att.context = @batch
-                  att.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
-                  att.display_name = new_csvs.last[:file]
-                  att.save!
-                  new_csvs.last.delete(:fullpath)
-                  new_csvs.last[:attachment] = att
-                end
-                path = File.join(tmp_dir, "#{importer}#{temp_file}.csv")
-                out_csv = ::CSV.open(path, "wb", {:headers => headers, :write_headers => true})
-                new_csvs << {:file => csv[:file]}
-                remaining_in_batch = rows_per_batch
-              end
-              out_row = ::CSV::Row.new(headers, []);
-              headers.each { |header| out_row[header] = row[header] }
-              out_csv << out_row
-              remaining_in_batch -= 1
-            end
-          end
-          if out_csv
-            out_csv.close
-            out_csv = nil
-            att = Attachment.new
-            att.context = @batch
-            att.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
-            att.display_name = new_csvs.last[:file]
-            att.save!
-            new_csvs.last.delete(:fullpath)
-            new_csvs.last[:attachment] = att
-          end
-        ensure
-          out_csv.close if out_csv
-          Attachment.skip_3rd_party_submits(false)
-        end
-        @csvs[importer] = new_csvs
       end
 
       def process_file(base, file, att)

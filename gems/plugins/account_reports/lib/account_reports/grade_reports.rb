@@ -215,7 +215,7 @@ module AccountReports
     end
 
     def grading_period_scores_for_student(student, grading_period, scores)
-      scores["#{student['enrollment_id']}:#{grading_period.id}"] || []
+      scores["#{student['enrollment_id']}:#{grading_period.id}"] || {}
     end
 
     def student_grade_scope

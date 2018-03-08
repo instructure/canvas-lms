@@ -108,6 +108,13 @@ class Feature
   # TODO: register built-in features here
   # (plugins may register additional features during application initialization)
   register(
+    'sis_imports_refactor' =>
+      {
+        display_name: -> { I18n.t('SIS Import Refactor')},
+        description: -> { I18n.t('Update how we process SIS imports') },
+        applies_to: 'RootAccount',
+        state: 'hidden'
+      },
     'theme_editor_refactor' =>
     {
       display_name: -> { I18n.t('Theme Editor Refactor')},
@@ -574,7 +581,7 @@ END
       display_name: -> { I18n.t("GraphQL API") },
       description: -> { I18n.t("EXPERIMENTAL GraphQL API.") },
       applies_to: "RootAccount",
-      state: "hidden_in_prod",
+      state: "on",
       beta: true,
     },
     'rubric_criterion_range' =>
@@ -597,6 +604,7 @@ END
       description: -> { I18n.t('Create assessments with Quizzes.Next and migrate existing Canvas Quizzes.') },
       applies_to: 'Course',
       state: 'allowed',
+      beta: true,
       visible_on: ->(context) do
         root_account = context.root_account
         is_provisioned = Rails.env.development? || root_account.settings&.dig(:provision, 'lti').present?
