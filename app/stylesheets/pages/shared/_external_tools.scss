@@ -49,18 +49,18 @@ $app_height: 143px;
 }
 
 #external_tools {
-  .AddExternalToolButton{
+  .AddExternalToolButton {
     display: flex;
   }
 
-  .page-header{
+  .page-header {
     display: flex;
   }
 
-  .externalApps_label_text{
+  .externalApps_label_text {
     flex: 1 1;
   }
-  .externalApps_buttons_container{
+  .externalApps_buttons_container {
     display: flex;
     justify-content: flex-end;
     flex: 2 2;
@@ -300,7 +300,8 @@ fieldset.rate_app_wrapper {
   }
 }
 
-.ExternalAppsRoot, .ReactModal__Content--canvas {
+.ExternalAppsRoot,
+.ReactModal__Content--canvas {
   .control-group {
     margin-bottom: 2px;
   }

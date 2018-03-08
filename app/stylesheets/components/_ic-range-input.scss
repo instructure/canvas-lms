@@ -58,11 +58,12 @@
   width: 100%;
 
   // Style range input
-  input[type=range] {
+  input[type='range'] {
     -webkit-appearance: none;
     width: 100%; // for Firefox
     outline: none;
-    margin: 0; padding: 0; // for IE
+    margin: 0;
+    padding: 0; // for IE
 
     // Slider Handle/Thumb
     @include range-input-handle-selector {
@@ -72,7 +73,7 @@
       border-radius: 50%;
       background: $range-input-handle-color;
       cursor: pointer;
-      transition: all .15s ease-in-out;
+      transition: all 0.15s ease-in-out;
 
       &:hover {
         background: $range-input-handle-color-hover;
@@ -87,8 +88,7 @@
     &:active {
       outline: none;
       @include range-input-handle-selector {
-        box-shadow: 0 0 0 3px $ic-color-light,
-                    0 0 0 4px var(--ic-brand-primary);
+        box-shadow: 0 0 0 3px $ic-color-light, 0 0 0 4px var(--ic-brand-primary);
       }
     }
 
@@ -160,7 +160,7 @@
     margin-left: 7px;
 
     &:after {
-      content: "";
+      content: '';
       position: absolute;
       top: 8px;
       left: -6px;

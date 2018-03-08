@@ -62,12 +62,14 @@ $gradebook_cell_padding_top: 8px;
 
 .container_0,
 .container_1 {
-  .slick-header.ui-state-default { // header container with full width of grid
+  .slick-header.ui-state-default {
+    // header container with full width of grid
     background: transparent;
     border: none;
   }
 
-  .slick-cell { // each cell of the body
+  .slick-cell {
+    // each cell of the body
     border-bottom: 1px solid $grid-border-color;
     border-right: 1px solid $grid-border-color;
     padding: 0;
@@ -164,7 +166,9 @@ $gradebook_cell_padding_top: 8px;
 }
 
 .student-grades-link {
-  @if $use_high_contrast { color: var(--ic-link-color-darkened-10); }
+  @if $use_high_contrast {
+    color: var(--ic-link-color-darkened-10);
+  }
 }
 
 .student-placeholder {
@@ -256,7 +260,8 @@ $gradebook_cell_padding_top: 8px;
     button {
       opacity: 0;
 
-      &:focus, &:hover {
+      &:focus,
+      &:hover {
         opacity: 1;
       }
     }
@@ -330,7 +335,7 @@ $gradebook_cell_padding_top: 8px;
 }
 
 // my styles
-.slick-row.ui-state-active  .slick-cell {
+.slick-row.ui-state-active .slick-cell {
   background-color: #dfe9f2;
 }
 
@@ -339,7 +344,7 @@ $gradebook_cell_padding_top: 8px;
 }
 
 .slick-cell.ungraded {
-  background-image: url("/images/4_percent_opacity.png");
+  background-image: url('/images/4_percent_opacity.png');
   background-repeat: repeat;
 }
 
@@ -355,7 +360,7 @@ $gradebook_cell_padding_top: 8px;
     position: absolute;
     width: 0;
     left: 15px;
-    content: "";
+    content: '';
     border-top-color: transparent;
     border-left-color: transparent;
     border-right-color: transparent;
@@ -385,13 +390,16 @@ $gradebook_cell_padding_top: 8px;
     bottom: -5px;
     width: 0;
     left: 15px;
-    content: "";
+    content: '';
   }
-  .slick-cell.hover &, .slick-cell.focus &, .slick-cell.selected & {
+  .slick-cell.hover &,
+  .slick-cell.focus &,
+  .slick-cell.selected & {
     visibility: visible;
     opacity: 1;
   }
-  .slick-cell.active &, .slick-cell.editable & {
+  .slick-cell.active &,
+  .slick-cell.editable & {
     visibility: visible;
     opacity: 1;
   }
@@ -563,7 +571,8 @@ $gradebook_cell_padding_top: 8px;
     .divider {
       padding: 0 1px 0 2px;
     }
-    .outof, .grade {
+    .outof,
+    .grade {
       width: 200px;
       display: inline-block;
       background: transparent;
@@ -572,7 +581,9 @@ $gradebook_cell_padding_top: 8px;
       user-select: none;
       text-align: left;
       // if high contrast, no color value (default to regular dark text color)
-      @if $use_high_contrast == false { color: #888888; }
+      @if $use_high_contrast == false {
+        color: #888888;
+      }
     }
     .grade {
       border: none;
@@ -593,7 +604,7 @@ $gradebook_checkbox_size: 16px;
   position: absolute;
   left: 50%;
   top: 50%;
-  margin-top: -($gradebook_checkbox_size / 2) - ( $gradebook_cell_padding_top / 2 );
+  margin-top: -($gradebook_checkbox_size / 2) - ($gradebook_cell_padding_top / 2);
   margin-left: -$gradebook_checkbox_size / 2;
 }
 
@@ -665,7 +676,7 @@ $gradebook_checkbox_size: 16px;
   // This nesting is required to ensure higher specificity than InstUI styles
   .Grid__AssignmentRowCell__PercentInput,
   .Grid__AssignmentRowCell__PointsInput {
-    label input[type="text"] {
+    label input[type='text'] {
       text-align: center;
     }
 
@@ -794,8 +805,11 @@ $gradebook_checkbox_size: 16px;
   line-height: 19px;
   color: $gradebook_letter-grade-font;
   .muted & {
-    @if $use_high_contrast { color: darken($ic-hint-text, 20%); }
-    @else { color: $ic-hint-text; }
+    @if $use_high_contrast {
+      color: darken($ic-hint-text, 20%);
+    } @else {
+      color: $ic-hint-text;
+    }
   }
 
   .total_grade & {
@@ -807,10 +821,12 @@ $gradebook_checkbox_size: 16px;
   margin-left: -16px;
 }
 
-.gradebook_dropdown, .export_dropdown {
-  li, label {
+.gradebook_dropdown,
+.export_dropdown {
+  li,
+  label {
     @include gradebook_menu_label(13px);
-    cursor:pointer;
+    cursor: pointer;
   }
 }
 
@@ -867,7 +883,7 @@ $gradebook_checkbox_size: 16px;
 .Gradebook__StatusModalListItem {
   padding: 7px;
   margin-bottom: 5px;
-  border: 1px solid #C7CDD1;
+  border: 1px solid #c7cdd1;
   border-radius: 3px;
 }
 
@@ -887,7 +903,7 @@ $gradebook_checkbox_size: 16px;
   justify-content: space-around;
   flex-direction: column;
 
-  input[type="text"] {
+  input[type='text'] {
     height: auto;
     line-height: 1;
     margin: 0;
@@ -903,7 +919,7 @@ $gradebook_checkbox_size: 16px;
 }
 
 .NumberInput__Container-LeftIndent {
-  margin-left: 1.5rem
+  margin-left: 1.5rem;
 }
 
 .SubmissionTray__Container {
@@ -911,7 +927,7 @@ $gradebook_checkbox_size: 16px;
   height: 100%;
   padding: 1.5rem;
 
-  input[type="text"] {
+  input[type='text'] {
     height: auto;
     line-height: 1;
     margin: 0;

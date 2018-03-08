@@ -1,16 +1,9 @@
-module.exports = { // eslint-disable-line import/no-commonjs
+module.exports = {
+  // eslint-disable-line import/no-commonjs
   name: 'nn_NO',
   day: {
     abbrev: ['sø.', 'må.', 'ty.', 'on.', 'to.', 'fr.', 'la.'],
-    full: [
-      'sundag',
-      'måndag',
-      'tysdag',
-      'onsdag',
-      'torsdag',
-      'fredag',
-      'laurdag'
-    ]
+    full: ['sundag', 'måndag', 'tysdag', 'onsdag', 'torsdag', 'fredag', 'laurdag']
   },
   month: {
     abbrev: [

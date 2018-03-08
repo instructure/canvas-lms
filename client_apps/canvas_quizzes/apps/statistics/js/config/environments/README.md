@@ -10,7 +10,7 @@ embedded inside Canvas.
 
 ## `development.js`
 
-This file will *not* be included in the built version. Use this to define
+This file will _not_ be included in the built version. Use this to define
 helpers helpers and config defaults that facilitate development. This will be
 checked in to git and shared between the team.
 
@@ -24,23 +24,23 @@ This file is also a good place to swap in fixtures instead of API endpoints if
 you want to speed things up and not hit the actual Canvas API. For example:
 
 ```javascript
-  return {
-    apiToken: 'MY_API_TOKEN',
+return {
+  apiToken: 'MY_API_TOKEN',
 
-    // You can hit against the actual Canvas API if you got reverse proxy
-    // going on:
-    //
-    // quizStatisticsUrl: '/api/v1/courses/1/quizzes/1/statistics',
-    // quizReportsUrl: '/api/v1/courses/1/quizzes/1/reports',
+  // You can hit against the actual Canvas API if you got reverse proxy
+  // going on:
+  //
+  // quizStatisticsUrl: '/api/v1/courses/1/quizzes/1/statistics',
+  // quizReportsUrl: '/api/v1/courses/1/quizzes/1/reports',
 
-    // Or just use the fixtures for speed:
-    quizStatisticsUrl: '/fixtures/quiz_statistics_all_types.json',
-    quizReportsUrl: '/fixtures/quiz_reports.json',
-  };
+  // Or just use the fixtures for speed:
+  quizStatisticsUrl: '/fixtures/quiz_statistics_all_types.json',
+  quizReportsUrl: '/fixtures/quiz_reports.json'
+}
 ```
 
 ## `test.js`
 
-This file will *not* be included in the built version, nor in the browser,but only when we're running tests.
+This file will _not_ be included in the built version, nor in the browser,but only when we're running tests.
 
 Useful for making timeouts very short and throwing errors when we may gracefully handle them in other environments. You have access to `jasmine` and other test frameworks at the time the script is run.

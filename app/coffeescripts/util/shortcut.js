@@ -16,9 +16,9 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 // like rails' delegate, but named shortcut to avoid confusion with $.delegate
-export default function shortcut (Delegator, receiver, ...methods) {
-  methods.forEach((method) => {
-    Delegator.prototype[method] = function (...args) {
+export default function shortcut(Delegator, receiver, ...methods) {
+  methods.forEach(method => {
+    Delegator.prototype[method] = function(...args) {
       return this[receiver][method](...args)
     }
   })

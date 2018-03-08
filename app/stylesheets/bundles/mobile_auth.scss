@@ -16,17 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "components/ic-typography";
-@import "components/ic-forms";
-@import "components/buttons";
-@import "components/show_hide_opacity";
+@import 'base/environment';
+@import 'components/ic-typography';
+@import 'components/ic-forms';
+@import 'components/buttons';
+@import 'components/show_hide_opacity';
 
 * {
   margin: 0px;
   padding: 0px;
 }
-html, body {
+html,
+body {
   height: 100%;
   background: $ic-color-light;
   margin: 0;
@@ -50,7 +51,7 @@ html, body {
 
 .mobileLogin-Header {
   z-index: 1;
-  background-image: url("/images/mobile_login/canvas_logo_login.svg");
+  background-image: url('/images/mobile_login/canvas_logo_login.svg');
   background-position: center;
   background-repeat: no-repeat;
   background-size: 156px 108px;
@@ -76,7 +77,8 @@ p {
   margin: 15px 0;
 }
 
-.flip-to-back, .flip-to-front {
+.flip-to-back,
+.flip-to-front {
   margin: 0;
 }
 .forgotBlock {
@@ -84,7 +86,9 @@ p {
   margin: $ic-sp*2 auto 0;
   text-align: center;
 }
-input[type="text"], [type="email"], [type="password"] {
+input[type='text'],
+[type='email'],
+[type='password'] {
   padding: 0px 12px;
   @include fontSize(16px);
 }
@@ -102,5 +106,5 @@ input::-webkit-input-placeholder {
   display: none;
 }
 .button_box .Button {
-  padding-bottom: $ic-sp/2;  
+  padding-bottom: $ic-sp/2;
 }

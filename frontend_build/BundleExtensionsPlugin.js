@@ -47,7 +47,7 @@ const extensions = (() => {
   const pluginExtensions = glob.sync(pluginExtensionsPattern, [])
   const extensionsMap = {}
   const extensionPartsRegexp = /plugins\/([^/]*)\/app\/coffeescripts\/extensions\/(.*)\.coffee/
-  pluginExtensions.forEach((extension) => {
+  pluginExtensions.forEach(extension => {
     const extractions = extension.match(extensionPartsRegexp)
     const pluginName = extractions[1]
     const fileName = extractions[2]
@@ -63,14 +63,14 @@ const unextendedRegexp = /^unextended!/
 const extensionRequirementRegexp = /\/extensions\//
 
 class BundleExtensionsPlugin {
-  apply (compiler) {
-    compiler.plugin('normal-module-factory', (nmf) => {
+  apply(compiler) {
+    compiler.plugin('normal-module-factory', nmf => {
       nmf.plugin('before-resolve', (result, callback) => {
         let addLoadersFor = []
         // if we're resolving an extension, we don't want to try to
         // extend the extension itself, so skip the check and move on
         if (!extensionRequirementRegexp.test(result.request)) {
-          Object.keys(extensions).forEach((key) => {
+          Object.keys(extensions).forEach(key => {
             if (result.request.includes(key)) {
               if (unextendedRegexp.test(result.request)) {
                 // skip, unextended loader means we really want the original

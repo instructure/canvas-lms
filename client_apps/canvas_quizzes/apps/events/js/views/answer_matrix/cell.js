@@ -18,20 +18,17 @@
  */
 
 define(function(require) {
-  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
-  var _ = require('lodash');
-  var K = require('../../constants');
-  var Emblem = require('jsx!./emblem');
-  var findWhere = _.findWhere;
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps')
+  var _ = require('lodash')
+  var K = require('../../constants')
+  var Emblem = require('jsx!./emblem')
+  var findWhere = _.findWhere
 
   // These questions types will have their answer cells truncated if it goes
   // over the character visibility threshold:
-  var FREE_FORM_QUESTION_TYPES = [
-    K.Q_ESSAY,
-    K.Q_SHORT_ANSWER
-  ];
+  var FREE_FORM_QUESTION_TYPES = [K.Q_ESSAY, K.Q_SHORT_ANSWER]
 
-  var MAX_VISIBLE_CHARS = K.MAX_VISIBLE_CHARS;
+  var MAX_VISIBLE_CHARS = K.MAX_VISIBLE_CHARS
 
   /**
    * @class Cell
@@ -47,54 +44,48 @@ define(function(require) {
         shouldTruncate: false,
         event: {},
         question: {}
-      };
+      }
     },
 
     render: function() {
-      var contents, formattedAnswer, answerSz, encodeAsJson;
-      var props = this.props;
+      var contents, formattedAnswer, answerSz, encodeAsJson
+      var props = this.props
       var record = findWhere(props.event.data, {
         quizQuestionId: props.question.id
-      });
+      })
 
       if (record) {
-        formattedAnswer = record.answer;
-        encodeAsJson = true;
+        formattedAnswer = record.answer
+        encodeAsJson = true
 
         // show the answer only if the expandAll option is turned on, or the
         // current event is activated (i.e, the row was clicked):
         if (props.expanded) {
           if (FREE_FORM_QUESTION_TYPES.indexOf(props.question.questionType) > -1) {
-            encodeAsJson = false;
+            encodeAsJson = false
 
             if (props.shouldTruncate) {
-              formattedAnswer = record.answer || '';
-              answerSz = formattedAnswer.length;
+              formattedAnswer = record.answer || ''
+              answerSz = formattedAnswer.length
 
               if (answerSz > MAX_VISIBLE_CHARS) {
-                formattedAnswer = formattedAnswer.substr(0, MAX_VISIBLE_CHARS);
-                formattedAnswer += '...';
+                formattedAnswer = formattedAnswer.substr(0, MAX_VISIBLE_CHARS)
+                formattedAnswer += '...'
               }
             }
           }
 
           return (
-            <pre>
-              {encodeAsJson ?
-                JSON.stringify(formattedAnswer, null, 2) :
-                formattedAnswer
-              }
-            </pre>
-          );
-        }
-        else {
-          return Emblem(record);
+            <pre>{encodeAsJson ? JSON.stringify(formattedAnswer, null, 2) : formattedAnswer}</pre>
+          )
+        } else {
+          return Emblem(record)
         }
       }
 
-      return null;
+      return null
     }
-  });
+  })
 
-  return Cell;
-});
+  return Cell
+})

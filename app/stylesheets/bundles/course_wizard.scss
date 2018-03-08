@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 //============================
 // Layout Functional Variables
@@ -34,22 +34,29 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   height: 100%;
   background: $ic-wizard-color-dark-neutral;
   position: fixed;
-  bottom: 0; left: 0;
+  bottom: 0;
+  left: 0;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  background: url("/images/wizard-bg.jpg") no-repeat center center;
+  background: url('/images/wizard-bg.jpg') no-repeat center center;
   background-size: cover;
-  transform: translate3d(0,100%,0);
+  transform: translate3d(0, 100%, 0);
   opacity: 0;
-  @include breakpoint(desktop) { flex-direction: row; }
+  @include breakpoint(desktop) {
+    flex-direction: row;
+  }
 
   .ReactModal__Overlay.ReactModal__Overlay--after-open & {
-    transform: translate3d(0,0,0);
+    transform: translate3d(0, 0, 0);
     opacity: 1;
   }
 
-  *, *:before, *:after { box-sizing: border-box; }
+  *,
+  *:before,
+  *:after {
+    box-sizing: border-box;
+  }
 }
 
 .ic-wizard-box__header {
@@ -57,8 +64,11 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   display: flex;
   flex-direction: column;
   order: 1;
-  @if $use_high_contrast { background: $ic-wizard-color-dark-neutral; }
-  @else { background: rgba($ic-wizard-color-dark-neutral, 0.9); }
+  @if $use_high_contrast {
+    background: $ic-wizard-color-dark-neutral;
+  } @else {
+    background: rgba($ic-wizard-color-dark-neutral, 0.9);
+  }
 
   @include breakpoint(mini-tablet) {
     flex-direction: row;
@@ -71,12 +81,13 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 }
 
 .ic-wizard-box__logo-link {
-  background: url("/images/canvas-logo.svg") no-repeat $ic-sp+4 50%;
+  background: url('/images/canvas-logo.svg') no-repeat $ic-sp+4 50%;
   background-size: 114px 27px;
   border-left: 4px solid transparent;
   flex: 0 0 36px;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     border-color: var(--ic-brand-primary);
     background-color: rgba($ic-color-light, 0.1);
   }
@@ -89,7 +100,6 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   @include breakpoint(desktop) {
     flex: 0 0 $ic-sp*9;
   }
-
 }
 
 .ic-wizard-box__nav {
@@ -99,7 +109,9 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   @include breakpoint(mini-tablet) {
     flex: 2;
   }
-  @include breakpoint(desktop) { flex: 1; }
+  @include breakpoint(desktop) {
+    flex: 1;
+  }
 }
 
 .ic-wizard-box__nav-checklist {
@@ -124,34 +136,41 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   user-select: none;
   padding: 0 $ic-sp 0 $ic-sp*4;
   border-left: 4px solid transparent;
-  background: url("/images/wizard-todo-unchecked.svg") no-repeat $ic-sp 50%;
+  background: url('/images/wizard-todo-unchecked.svg') no-repeat $ic-sp 50%;
   background-size: 18px 18px;
 
   @if $use_high_contrast {
     color: $ic-color-light;
-    &:hover, &:focus, &.ic-wizard-box__content-trigger--active {
+    &:hover,
+    &:focus,
+    &.ic-wizard-box__content-trigger--active {
       background-color: var(--ic-brand-primary);
       color: canvas-light;
     }
-  }
-  @else {
+  } @else {
     color: rgba($ic-color-light, 0.9);
-    &:hover, &:focus, &.ic-wizard-box__content-trigger--active {
+    &:hover,
+    &:focus,
+    &.ic-wizard-box__content-trigger--active {
       background-color: rgba($ic-color-light, 0.1);
       color: $ic-color-light;
     }
   }
 
-  @include breakpoint(desktop) { @include fontSize(15px); }
+  @include breakpoint(desktop) {
+    @include fontSize(15px);
+  }
 
-  &:hover, &:focus, &.ic-wizard-box__content-trigger--active {
+  &:hover,
+  &:focus,
+  &.ic-wizard-box__content-trigger--active {
     border-left-color: var(--ic-brand-primary);
     text-decoration: none;
     color: $ic-color-light;
   }
 
   &.ic-wizard-box__content-trigger--checked {
-    background-image: url("/images/wizard-todo-checked.svg");
+    background-image: url('/images/wizard-todo-checked.svg');
   }
 }
 
@@ -160,8 +179,15 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   display: flex;
   flex-direction: column;
 
-  @if $use_high_contrast { background: rgba( $ic-wizard-color-dark-neutral, 0.9); }
-  @else { background: linear-gradient(to bottom, rgba($ic-wizard-color-dark-neutral, 0.75) 0%,rgba(0,0,0,0) 100%); }
+  @if $use_high_contrast {
+    background: rgba($ic-wizard-color-dark-neutral, 0.9);
+  } @else {
+    background: linear-gradient(
+      to bottom,
+      rgba($ic-wizard-color-dark-neutral, 0.75) 0%,
+      rgba(0, 0, 0, 0) 100%
+    );
+  }
 }
 
 .ic-wizard-box__content {
@@ -201,7 +227,6 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   align-items: center;
 }
 
-
 .ic-wizard-box__message-layout {
   position: relative;
   perspective: 500px;
@@ -224,14 +249,16 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   @include breakpoint(mini-tablet) {
     transition: all 1s $ic-transition;
     opacity: 0;
-    transform: scale(0) translate3d(0,50%,0);
+    transform: scale(0) translate3d(0, 50%, 0);
 
     display: block;
     background: $ic-wizard-color-dark-neutral;
-    width: 72px; height: 72px;
+    width: 72px;
+    height: 72px;
     border-radius: 100%;
     position: absolute;
-    left: 50%; top: -36px;
+    left: 50%;
+    top: -36px;
     z-index: 1;
     margin-left: -36px;
     display: flex;
@@ -240,11 +267,13 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 
     &.ic-wizard-box__message-icon--is-fired {
       opacity: 1;
-      transform: scale(1) translate3d(0,0,0);
+      transform: scale(1) translate3d(0, 0, 0);
     }
 
-    i[class*=icon-], i[class^=icon-] {
-      width: auto; height: auto;
+    i[class*='icon-'],
+    i[class^='icon-'] {
+      width: auto;
+      height: auto;
       color: $ic-color-light;
       line-height: 1;
       &:before {
@@ -252,30 +281,36 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
         top: 0;
       }
     }
-
   }
 
   @include breakpoint(tablet) {
-    i[class*=icon-], i[class^=icon-] {
-      &:before { font-size: $ic-sp*3; }
+    i[class*='icon-'],
+    i[class^='icon-'] {
+      &:before {
+        font-size: $ic-sp*3;
+      }
     }
   }
 
   @include breakpoint(desktop) {
-    width: 120px; height: 120px;
-    top: -60px; left: 50%;
+    width: 120px;
+    height: 120px;
+    top: -60px;
+    left: 50%;
     margin-left: -60px;
-    i[class*=icon-], i[class^=icon-] {
-      &:before { font-size: $ic-sp*5; }
+    i[class*='icon-'],
+    i[class^='icon-'] {
+      &:before {
+        font-size: $ic-sp*5;
+      }
     }
   }
-
 }
 
 .ic-wizard-box__message-inner {
   transition: all 1s $ic-transition;
   opacity: 0;
-  transform: translate3d(0,50%,0);
+  transform: translate3d(0, 50%, 0);
   background: rgba($ic-color-light, 0.9);
   padding: $ic-sp*4 $ic-sp*2 $ic-sp*2 $ic-sp*2;
   box-shadow: 0 1px 4px 1px rgba(black, 0.3);
@@ -283,17 +318,21 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 
   &.ic-wizard-box__message-inner--is-fired {
     opacity: 1;
-    transform: translate3d(0,0,0);
+    transform: translate3d(0, 0, 0);
   }
 
-  @if $use_high_contrast { background: $ic-color-light; }
-  @else { background: rgba($ic-color-light, 0.9); }
+  @if $use_high_contrast {
+    background: $ic-color-light;
+  } @else {
+    background: rgba($ic-color-light, 0.9);
+  }
 
   @include breakpoint(mini-tablet) {
     border-radius: $baseBorderRadius;
   }
-  @include breakpoint(desktop) { padding: $ic-sp*7 $ic-sp*2 $ic-sp*2 $ic-sp*2; }
-
+  @include breakpoint(desktop) {
+    padding: $ic-sp*7 $ic-sp*2 $ic-sp*2 $ic-sp*2;
+  }
 }
 
 .ic-wizard-box__message-button {
@@ -309,6 +348,5 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   }
 }
 
-
 // Styles for specific React Components
-@import "pages/course_wizard/CourseWizard";
+@import 'pages/course_wizard/CourseWizard';

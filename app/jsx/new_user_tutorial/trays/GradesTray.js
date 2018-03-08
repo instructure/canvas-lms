@@ -28,13 +28,11 @@ const GradesTray = () => (
     image="/images/tutorial-tray-images/grades.svg"
   >
     <Text as="p">
-      {
-        I18n.t(`Input and distribute grades for students. Display grades as
+      {I18n.t(`Input and distribute grades for students. Display grades as
           points, percentages, complete or incomplete, pass or fail, GPA scale,
-          and letter grades. Group assignments for grade weighting.`)
-      }
+          and letter grades. Group assignments for grade weighting.`)}
     </Text>
   </TutorialTrayContent>
-);
+)
 
 export default GradesTray

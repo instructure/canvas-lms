@@ -17,7 +17,7 @@
  */
 
 define(function(require) {
-  var Dispatcher = require('../../core/dispatcher');
+  var Dispatcher = require('../../core/dispatcher')
 
   /**
    * @class Statistics.Mixins.Components.ActorMixin
@@ -29,36 +29,36 @@ define(function(require) {
     getInitialState: function() {
       return {
         actionIndex: null
-      };
+      }
     },
 
     getDefaultProps: function() {
       return {
         storeError: null
-      };
+      }
     },
 
     componentWillReceiveProps: function(nextProps) {
-      var storeError = nextProps.storeError;
+      var storeError = nextProps.storeError
 
       if (storeError && storeError.actionIndex === this.state.actionIndex) {
-        this.setState({ storeError: storeError });
+        this.setState({storeError: storeError})
       }
     },
 
     componentDidUpdate: function() {
       if (this.state.storeError) {
         if (this.onStoreError) {
-          this.onStoreError(this.state.storeError);
+          this.onStoreError(this.state.storeError)
         }
 
         // Consume it so that the handling code doesn't get called repeatedly.
-        this.setState({ storeError: null });
+        this.setState({storeError: null})
       }
     },
 
     componentWillUnmount: function() {
-      this.lastAction = undefined;
+      this.lastAction = undefined
     },
 
     /**
@@ -69,7 +69,7 @@ define(function(require) {
      */
     consume: function(e) {
       if (e) {
-        e.preventDefault();
+        e.preventDefault()
       }
     },
 
@@ -100,21 +100,21 @@ define(function(require) {
      *         an error that adheres to the UIError interface.
      */
     sendAction: function(action, params, options) {
-      var service;
-      var setState;
+      var service
+      var setState
 
-      service = Dispatcher.dispatch(action, params);
+      service = Dispatcher.dispatch(action, params)
 
       if (options && options.track === false) {
-        return;
+        return
       }
 
-      setState = this.setState.bind(this);
-      this.lastAction = service.promise;
+      setState = this.setState.bind(this)
+      this.lastAction = service.promise
 
       setState({
         actionIndex: service.index
-      });
+      })
 
       service.promise.then(null, function(error) {
         setState({
@@ -122,12 +122,12 @@ define(function(require) {
             actionIndex: service.index,
             error: error
           }
-        });
-      });
+        })
+      })
 
-      return service.promise;
+      return service.promise
     }
-  };
+  }
 
-  return ActorMixin;
-});
+  return ActorMixin
+})

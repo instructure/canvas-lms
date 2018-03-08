@@ -165,7 +165,7 @@ Because it is, and you can use flexbox.
 
 */
 
-@import "base/environment";
+@import 'base/environment';
 
 $c-grid-sp: $ic-sp;
 $c-grid-columns: 12;
@@ -203,19 +203,42 @@ $c-grid-columns: 12;
     }
   }
 
-  .start-#{$size}  { justify-content: flex-start; text-align: start; }
-  .center-#{$size} { justify-content: center;     text-align: center; }
-  .end-#{$size}    { justify-content: flex-end;   text-align: end; }
+  .start-#{$size} {
+    justify-content: flex-start;
+    text-align: start;
+  }
+  .center-#{$size} {
+    justify-content: center;
+    text-align: center;
+  }
+  .end-#{$size} {
+    justify-content: flex-end;
+    text-align: end;
+  }
 
-  .top-#{$size}    { align-items: flex-start; }
-  .middle-#{$size} { align-items: center; }
-  .bottom-#{$size} { align-items: flex-end; }
+  .top-#{$size} {
+    align-items: flex-start;
+  }
+  .middle-#{$size} {
+    align-items: center;
+  }
+  .bottom-#{$size} {
+    align-items: flex-end;
+  }
 
-  .around-#{$size}  { justify-content: space-around; }
-  .between-#{$size} { justify-content: space-between; }
+  .around-#{$size} {
+    justify-content: space-around;
+  }
+  .between-#{$size} {
+    justify-content: space-between;
+  }
 
-  .first-#{$size} { order: -1; }
-  .last-#{$size}  { order: 1; }
+  .first-#{$size} {
+    order: -1;
+  }
+  .last-#{$size} {
+    order: 1;
+  }
 }
 
 .grid-row {

@@ -15,11 +15,13 @@
     "brandable_css": "0.1.0",
     "canvas-planner": "1.0.16",
     "canvas-rce": "2.6.3",
-    "canvas_offline_course_viewer": "https://github.com/instructure/canvas_offline_course_viewer.git#1.2.0",
+    "canvas_offline_course_viewer":
+      "https://github.com/instructure/canvas_offline_course_viewer.git#1.2.0",
     "classnames": "^2.2.5",
     "color-slicer": "0.8.0",
     "d3": "3.5.17",
-    "fullcalendar": "https://github.com/instructure/fullcalendar.git#1108dd1c991a029ec6fd7de3337737ec5295ba97",
+    "fullcalendar":
+      "https://github.com/instructure/fullcalendar.git#1108dd1c991a029ec6fd7de3337737ec5295ba97",
     "graphiql": "^0.11.2",
     "graphql": "^0.10.0",
     "ic-ajax": "~2.0.1",
@@ -50,7 +52,8 @@
     "react-dom": "0.14.9",
     "react-modal": "1.6.5",
     "react-redux": "4.4.5",
-    "react-select-box": "https://github.com/instructure-react/react-select-box.git#b1ddd39223d48793fbe3dc4e87aca00d57197b5f",
+    "react-select-box":
+      "https://github.com/instructure-react/react-select-box.git#b1ddd39223d48793fbe3dc4e87aca00d57197b5f",
     "react-tokeninput": "2.4.0",
     "react-tray": "2.0.4",
     "redux": "^3.5.2",
@@ -154,10 +157,13 @@
   "repository": "instructure/canvas-lms",
   "scripts": {
     "test": "concurrently --names \"jest,karma\" \"jest\" \"yarn test:karma:headless\"",
-    "test:watch": "concurrently --names \"jest,karma\" \"jest --watch .\" \"yarn test:karma:watch\"",
-    "test:jest": "echo 'this is here just so you know you can use jest, but just use the `jest` cli directly' && jest",
+    "test:watch":
+      "concurrently --names \"jest,karma\" \"jest --watch .\" \"yarn test:karma:watch\"",
+    "test:jest":
+      "echo 'this is here just so you know you can use jest, but just use the `jest` cli directly' && jest",
     "test:karma": "karma start --single-run",
-    "test:karma:concurrently": "concurrently --names \"coffee,js1,js2\" \"JSPEC_GROUP=coffee yarn test:karma:headless\" \"JSPEC_GROUP=js1 yarn test:karma:headless\" \"JSPEC_GROUP=js2 yarn test:karma:headless\"",
+    "test:karma:concurrently":
+      "concurrently --names \"coffee,js1,js2\" \"JSPEC_GROUP=coffee yarn test:karma:headless\" \"JSPEC_GROUP=js1 yarn test:karma:headless\" \"JSPEC_GROUP=js2 yarn test:karma:headless\"",
     "test:karma:headless": "karma start --single-run --browsers ChromeHeadlessNoSandbox",
     "test:karma:watch": "karma start",
     "test:karma:watch:headless": "karma start --browsers ChromeHeadlessNoSandbox",
@@ -171,7 +177,8 @@
     "build:js:watch": "yarn run webpack",
     "webpack": "gulp rev & webpack --progress --color --watch",
     "webpack-development": "gulp rev & webpack --progress --color",
-    "webpack-production": "NODE_ENV=production gulp rev & node --max_old_space_size=4096 $(yarn bin)/webpack --color --config webpack.production.config.js",
+    "webpack-production":
+      "NODE_ENV=production gulp rev & node --max_old_space_size=4096 $(yarn bin)/webpack --color --config webpack.production.config.js",
     "jspec": "./spec/jspec.sh",
     "jspec-watch": "./spec/jspec.sh --watch",
     "a11y-report": "./spec/jspec.sh --a11y"

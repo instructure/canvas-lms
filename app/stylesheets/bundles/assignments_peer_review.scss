@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 .peer_review {
   padding: 2px 5px;
 }
-.peer_review.submission-hover, .peer_review.focusWithin {
+.peer_review.submission-hover,
+.peer_review.focusWithin {
   background-color: $ic-color-medium-light;
   -moz-border-radius: 3px;
 }

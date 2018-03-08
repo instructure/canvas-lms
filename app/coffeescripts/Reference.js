@@ -5,11 +5,11 @@ window.stupidlyAwesomeGlobalFunction = message => console.log(message)
 // this isn't real production code, it's just a module to hook up
 // specs against to demonstrate some best practices for JS spec writing
 export default class Reference {
-  sum (a, b) {
+  sum(a, b) {
     return a + b
   }
 
-  sendMessage (message) {
+  sendMessage(message) {
     return window.stupidlyAwesomeGlobalFunction(message)
   }
 }

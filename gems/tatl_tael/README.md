@@ -14,5 +14,3 @@ linter.ensure_specs do
        " but no spec additions or modifications."
 end
 ```
-
-

@@ -17,12 +17,12 @@
  */
 
 @import 'base/environment';
-@import "deprecated/bootstrap/mixins";
+@import 'deprecated/bootstrap/mixins';
 @import 'vendor/bootstrap/button-groups';
 
-$border-dark:  #c1c7cf;
+$border-dark: #c1c7cf;
 $border-light: #e1e3e4;
-$left-offset:  16px;
+$left-offset: 16px;
 
 #tab-features .alert {
   margin-bottom: 20px;
@@ -48,7 +48,8 @@ $left-offset:  16px;
   }
 }
 
-.feature-flag .element_toggler, .feature-flag .element_toggler:hover {
+.feature-flag .element_toggler,
+.feature-flag .element_toggler:hover {
   color: $ic-font-color-dark;
   text-decoration: none;
 }
@@ -56,7 +57,9 @@ $left-offset:  16px;
 .feature-flag .element_toggler {
   transition: outline-offset 0.2s ease-out;
   @include ic-focus-base;
-  &:focus { @include ic-focus-variant; }
+  &:focus {
+    @include ic-focus-variant;
+  }
 }
 
 .feature-flag .ui-button {
@@ -75,7 +78,8 @@ $left-offset:  16px;
   margin-right: 8px;
 }
 
-.feature-release, .feature-release-notes-link {
+.feature-release,
+.feature-release-notes-link {
   @include fontSize(12px);
 }
 
@@ -120,7 +124,7 @@ $switch-text: rgba($ic-color-light, 0.8);
   &.ff-left {
     border-radius: 20px 0 0 20px;
   }
-  &.ff-right{
+  &.ff-right {
     border-radius: 0 20px 20px 0;
   }
 }
@@ -150,9 +154,7 @@ $switch-text: rgba($ic-color-light, 0.8);
       border-color: $switch-background;
       box-shadow: 0 3px 6px rgba(black, 0.3);
       &.ui-state-focus {
-        box-shadow:
-          inset 0 0 0 1px $ic-color-light,
-          inset 0 0 0 3px $switch-background,
+        box-shadow: inset 0 0 0 1px $ic-color-light, inset 0 0 0 3px $switch-background,
           0 3px 6px rgba(black, 0.3);
       }
     }

@@ -8,10 +8,15 @@
  * http://docs.jquery.com/UI/Autocomplete#theming
  */
 
-.ui-autocomplete { position: absolute; cursor: default; }
+.ui-autocomplete {
+  position: absolute;
+  cursor: default;
+}
 
 /* workarounds */
-* html .ui-autocomplete { width:1px; } /* without this, the menu expands to 100% in IE6 */
+* html .ui-autocomplete {
+  width: 1px;
+} /* without this, the menu expands to 100% in IE6 */
 
 /*
  * jQuery UI Menu 1.8.21
@@ -23,14 +28,16 @@
  * http://docs.jquery.com/UI/Menu#theming
  */
 .ui-menu {
-  list-style:none;
+  list-style: none;
   padding: 2px;
   margin: 0;
-  display:block;
+  display: block;
   float: left;
-  .ui-menu { margin-top: -3px; }
+  .ui-menu {
+    margin-top: -3px;
+  }
   .ui-menu-item {
-    margin:0;
+    margin: 0;
     padding: 0;
     zoom: 1;
     float: left;
@@ -38,11 +45,11 @@
     width: 100%;
 
     a {
-      text-decoration:none;
-      display:block;
-      padding:.2em .4em;
-      line-height:1.5;
-      zoom:1;
+      text-decoration: none;
+      display: block;
+      padding: 0.2em 0.4em;
+      line-height: 1.5;
+      zoom: 1;
 
       &.ui-state-hover,
       &.ui-state-active,

@@ -29,6 +29,6 @@ app.configure({
   allowMatrixView: ENV.can_view_answer_audits
 })
 
-app.mount(document.body.querySelector('#content')).then(() =>
-  console.log('Yeah, a canvas quiz app has been loaded!!!')
-)
+app
+  .mount(document.body.querySelector('#content'))
+  .then(() => console.log('Yeah, a canvas quiz app has been loaded!!!'))

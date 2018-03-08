@@ -23,12 +23,9 @@ import Backbone from 'Backbone'
 
 const routeStripper = /^[#\/]/
 const matchesBackboneRoute = url =>
-  _.any(Backbone.history.handlers, handler =>
-    handler.route.test(url.replace(routeStripper, '')
-  )
-)
+  _.any(Backbone.history.handlers, handler => handler.route.test(url.replace(routeStripper, '')))
 
-$(document).on('click', 'a[href]', function (event) {
+$(document).on('click', 'a[href]', function(event) {
   const url = $(this).attr('href')
   if (matchesBackboneRoute(url)) {
     Backbone.history.navigate(url, {trigger: true})

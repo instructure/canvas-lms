@@ -24,10 +24,10 @@ import LockManager from '../blueprint_courses/apps/LockManager'
 import 'compiled/jquery/ModuleSequenceFooter'
 
 const lockManager = new LockManager()
-lockManager.init({ itemType: 'wiki_page', page: 'show' })
+lockManager.init({itemType: 'wiki_page', page: 'show'})
 
 $(() =>
-  $('#content').on('click', '#mark-as-done-checkbox', function () {
+  $('#content').on('click', '#mark-as-done-checkbox', function() {
     MarkAsDone.toggle(this)
   })
 )

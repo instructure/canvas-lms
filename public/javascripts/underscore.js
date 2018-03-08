@@ -22,4 +22,4 @@
 import _ from 'vendor/lodash.underscore'
 
 // grab the global '_' variable, make it not global and return it
-export default _.noConflict();
+export default _.noConflict()

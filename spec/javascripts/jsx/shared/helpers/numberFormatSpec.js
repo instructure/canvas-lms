@@ -16,13 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/shared/helpers/numberFormat',
-  'i18nObj'
-], (numberFormat, I18n) => {
-
+define(['jsx/shared/helpers/numberFormat', 'i18nObj'], (numberFormat, I18n) => {
   QUnit.module('numberFormat _format', {
-    teardown () {
+    teardown() {
       if (I18n.n.restore) {
         I18n.n.restore()
       }
@@ -36,8 +32,8 @@ define([
 
   test('proxies to I18n for numbers', () => {
     sinon.stub(I18n, 'n').returns('1,23')
-    equal(numberFormat._format(1.23, { foo: 'bar' }), '1,23')
-    ok(I18n.n.calledWithMatch(1.23, { foo: 'bar' }))
+    equal(numberFormat._format(1.23, {foo: 'bar'}), '1,23')
+    ok(I18n.n.calledWithMatch(1.23, {foo: 'bar'}))
   })
 
   QUnit.module('numberFormat outcomeScore')

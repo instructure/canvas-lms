@@ -17,14 +17,14 @@
 
 import $ from 'jquery'
 
-function fireKeyclick (e) {
+function fireKeyclick(e) {
   const kce = $.Event('keyclick')
   $(e.target).trigger(kce)
   if (kce.isDefaultPrevented()) e.preventDefault()
   if (kce.isPropagationStopped()) e.stopPropagation()
 }
 
-function keydownHandler (e) {
+function keydownHandler(e) {
   switch (e.which) {
     case 13:
       return fireKeyclick(e)
@@ -34,14 +34,14 @@ function keydownHandler (e) {
   }
 }
 
-function keyupHandler (e) {
+function keyupHandler(e) {
   switch (e.which) {
     case 32:
       return fireKeyclick(e)
   }
 }
 
-$.fn.activate_keyclick = function (selector = null) {
+$.fn.activate_keyclick = function(selector = null) {
   this.on('keydown', selector, keydownHandler)
   return this.on('keyup', selector, keyupHandler)
 }

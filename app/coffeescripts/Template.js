@@ -21,7 +21,7 @@ export default class Template {
   //   @locals (object: optional):
   //     Object literal of key:value pairs for use as local vars in the template.
   //
-  constructor (name, locals) {
+  constructor(name, locals) {
     this.name = name
     this.locals = locals
     if (!(this instanceof Template)) {
@@ -37,7 +37,7 @@ export default class Template {
   //
   // Returns:
   //   String - and HTML string
-  toHTML (locals = this.locals) {
+  toHTML(locals = this.locals) {
     return Handlebars.templates[this.name](locals)
   }
 
@@ -50,7 +50,7 @@ export default class Template {
   //
   // Returns:
   //   jQuery Element Collection
-  toElement (locals) {
+  toElement(locals) {
     const html = this.toHTML(locals)
     return jQuery('<div/>').html(html)
   }

@@ -16,10 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/grading/quizzesNextSpeedGrading'
-], (quizzesNextSpeedGrading) => {
-
+define(['jsx/grading/quizzesNextSpeedGrading'], quizzesNextSpeedGrading => {
   let postMessageStub = sinon.stub()
   let fakeIframeHolder = {
     children: sinon.stub().returns([
@@ -58,7 +55,7 @@ define([
     showSubmissionDetails: showSubmissionDetailsStub
   }
 
-  let resetStubs = function () {
+  let resetStubs = function() {
     registerCbStub.reset()
     refreshGradesCbStub.reset()
     addEventListenerStub.reset()
@@ -72,36 +69,60 @@ define([
     showSubmissionDetailsStub.reset()
   }
 
-  QUnit.module("quizzesNextSpeedGrading", {
-    teardown: function () {
-      resetStubs();
+  QUnit.module('quizzesNextSpeedGrading', {
+    teardown: function() {
+      resetStubs()
     }
-  });
+  })
 
-  test("adds a message event listener to window", function() {
-    let fns = quizzesNextSpeedGrading(fakeEG, fakeIframeHolder, registerCbStub, refreshGradesCbStub, speedGraderWindow)
+  test('adds a message event listener to window', function() {
+    let fns = quizzesNextSpeedGrading(
+      fakeEG,
+      fakeIframeHolder,
+      registerCbStub,
+      refreshGradesCbStub,
+      speedGraderWindow
+    )
     ok(addEventListenerStub.calledWith('message'))
-  });
+  })
 
-  test("sets grade to read only with a quizzesNext.register message", function() {
-    let fns = quizzesNextSpeedGrading(fakeEG, fakeIframeHolder, registerCbStub, refreshGradesCbStub, speedGraderWindow)
+  test('sets grade to read only with a quizzesNext.register message', function() {
+    let fns = quizzesNextSpeedGrading(
+      fakeEG,
+      fakeIframeHolder,
+      registerCbStub,
+      refreshGradesCbStub,
+      speedGraderWindow
+    )
     fns.onMessage({data: {subject: 'quizzesNext.register'}})
     ok(fakeEG.setGradeReadOnly.calledWith(true))
-  });
+  })
 
-  test("calls the registerCallback with a quizzesNext.register message", function() {
-    let fns = quizzesNextSpeedGrading(fakeEG, fakeIframeHolder, registerCbStub, refreshGradesCbStub, speedGraderWindow)
+  test('calls the registerCallback with a quizzesNext.register message', function() {
+    let fns = quizzesNextSpeedGrading(
+      fakeEG,
+      fakeIframeHolder,
+      registerCbStub,
+      refreshGradesCbStub,
+      speedGraderWindow
+    )
     fns.onMessage({data: {subject: 'quizzesNext.register'}})
     ok(registerCbStub.calledWith(fns.postChangeSubmissionMessage))
-  });
+  })
 
-  test("calls the refreshGradesCb with a quizzesNext.submissionUpdate message", function() {
-    let fns = quizzesNextSpeedGrading(fakeEG, fakeIframeHolder, registerCbStub, refreshGradesCbStub, speedGraderWindow)
+  test('calls the refreshGradesCb with a quizzesNext.submissionUpdate message', function() {
+    let fns = quizzesNextSpeedGrading(
+      fakeEG,
+      fakeIframeHolder,
+      registerCbStub,
+      refreshGradesCbStub,
+      speedGraderWindow
+    )
     fns.onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
     ok(refreshGradesCbStub.calledWith(fns.quizzesNextChange))
-  });
+  })
 
-  test("calls the correct functions on EG", function() {
+  test('calls the correct functions on EG', function() {
     let fnsToCallOnEG = [
       'refreshSubmissionsToView',
       'showGrade',
@@ -112,23 +133,37 @@ define([
       'setGradeReadOnly'
     ]
 
-    let fns = quizzesNextSpeedGrading(fakeEG, fakeIframeHolder, registerCbStub, refreshGradesCbStub, speedGraderWindow)
+    let fns = quizzesNextSpeedGrading(
+      fakeEG,
+      fakeIframeHolder,
+      registerCbStub,
+      refreshGradesCbStub,
+      speedGraderWindow
+    )
     let fakeSubmissionData = {}
     fns.quizzesNextChange(fakeSubmissionData)
 
-    fnsToCallOnEG.forEach(function (egFunction) {
+    fnsToCallOnEG.forEach(function(egFunction) {
       ok(fakeEG[egFunction].called)
     })
-  });
+  })
 
-  test("postChangeSubmissionMessage postMessage with the submission data", function() {
-    let fns = quizzesNextSpeedGrading(fakeEG, fakeIframeHolder, registerCbStub, refreshGradesCbStub, speedGraderWindow)
+  test('postChangeSubmissionMessage postMessage with the submission data', function() {
+    let fns = quizzesNextSpeedGrading(
+      fakeEG,
+      fakeIframeHolder,
+      registerCbStub,
+      refreshGradesCbStub,
+      speedGraderWindow
+    )
     let arbitrarySubmissionData = {}
     fns.postChangeSubmissionMessage(arbitrarySubmissionData)
     ok(showSubmissionDetailsStub.called)
-    ok(postMessageStub.calledWith({
-      submission: arbitrarySubmissionData,
-      subject: 'canvas.speedGraderSubmissionChange'
-    }))
-  });
-});
+    ok(
+      postMessageStub.calledWith({
+        submission: arbitrarySubmissionData,
+        subject: 'canvas.speedGraderSubmissionChange'
+      })
+    )
+  })
+})

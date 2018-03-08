@@ -47,28 +47,32 @@ The quiz taking police has arrived.
        });
      }
 */
-define([], function () {
+define([], function() {
   if (!window.Worker) {
     // if this browser doesn't support web workers, this module does nothing
     return
   }
 
-  function worker () {
+  function worker() {
     var stopwatch
 
-    self.addEventListener('message', function (e) {
-      var message = e.data || {}
-      switch (message.code) {
-        case 'startStopwatch':
-          stopwatch = setInterval(function () {
-            self.postMessage('stopwatchTick')
-          }, message.frequency || 1000)
-          break
-        case 'stop':
-          clearInterval(stopwatch)
-          break
-      }
-    }, false)
+    self.addEventListener(
+      'message',
+      function(e) {
+        var message = e.data || {}
+        switch (message.code) {
+          case 'startStopwatch':
+            stopwatch = setInterval(function() {
+              self.postMessage('stopwatchTick')
+            }, message.frequency || 1000)
+            break
+          case 'stop':
+            clearInterval(stopwatch)
+            break
+        }
+      },
+      false
+    )
   }
   var code = worker.toString()
   code = code.substring(code.indexOf('{') + 1, code.lastIndexOf('}'))

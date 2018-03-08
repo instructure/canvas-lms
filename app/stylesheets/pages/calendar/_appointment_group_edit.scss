@@ -79,7 +79,8 @@
   width: 135px;
 }
 
-.TimeBlockSelectorRow {  // until container supports flex this is a wrapping div for alignment
+.TimeBlockSelectorRow {
+  // until container supports flex this is a wrapping div for alignment
   font-family: $ic-font-family;
   display: flex;
   align-items: flex-start;

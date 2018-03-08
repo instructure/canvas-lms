@@ -63,26 +63,15 @@ const mimeClasses = {
   },
   flash: {
     displayName: I18n.t('Flash'),
-    mimeTypes: [
-      'application/x-shockwave-flash'
-    ]
+    mimeTypes: ['application/x-shockwave-flash']
   },
   html: {
     displayName: I18n.t('Web page'),
-    mimeTypes: [
-      'text/html',
-      'application/xhtml+xml'
-    ]
+    mimeTypes: ['text/html', 'application/xhtml+xml']
   },
   image: {
     displayName: I18n.t('Image'),
-    mimeTypes: [
-      'image/png',
-      'image/x-psd',
-      'image/gif',
-      'image/pjpeg',
-      'image/jpeg'
-    ]
+    mimeTypes: ['image/png', 'image/x-psd', 'image/gif', 'image/pjpeg', 'image/jpeg']
   },
   ppt: {
     displayName: I18n.t('Presentation'),
@@ -93,16 +82,11 @@ const mimeClasses = {
   },
   pdf: {
     displayName: I18n.t('PDF'),
-    mimeTypes: [
-      'application/pdf'
-    ]
+    mimeTypes: ['application/pdf']
   },
   text: {
     displayName: I18n.t('Plain text'),
-    mimeTypes: [
-      'text',
-      'text/plain'
-    ]
+    mimeTypes: ['text', 'text/plain']
   },
   video: {
     displayName: I18n.t('Video'),
@@ -138,17 +122,17 @@ const mimeClasses = {
   }
 }
 
-export default function mimeClass (contentType) {
+export default function mimeClass(contentType) {
   return mimeClass.mimeClasses[contentType] || 'file'
 }
 
-mimeClass.displayName = function (contentType) {
+mimeClass.displayName = function(contentType) {
   const found = mimeClasses[mimeClass(contentType)]
-  return found && found.displayName || I18n.t('Unknown')
+  return (found && found.displayName) || I18n.t('Unknown')
 }
 
 mimeClass.mimeClasses = {}
 for (const cls in mimeClasses) {
   const value = mimeClasses[cls]
-  value.mimeTypes.forEach(mimeType => mimeClass.mimeClasses[mimeType] = cls)
+  value.mimeTypes.forEach(mimeType => (mimeClass.mimeClasses[mimeType] = cls))
 }

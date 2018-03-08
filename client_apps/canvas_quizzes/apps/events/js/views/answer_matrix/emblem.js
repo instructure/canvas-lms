@@ -18,7 +18,7 @@
  */
 
 define(function(require) {
-  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps')
 
   /**
    * @class Events.Views.AnswerMatrix.Emblem
@@ -36,30 +36,28 @@ define(function(require) {
    */
   var Emblem = React.createClass({
     getDefaultProps: function() {
-      return {};
+      return {}
     },
 
     shouldComponentUpdate: function(nextProps, nextState) {
-      return false;
+      return false
     },
 
     render: function() {
-      var record = this.props;
-      var className = 'ic-AnswerMatrix__Emblem';
+      var record = this.props
+      var className = 'ic-AnswerMatrix__Emblem'
 
       if (record.answered && record.last) {
-        className += ' is-answered is-last';
-      }
-      else if (record.answered) {
-        className += ' is-answered';
-      }
-      else {
-        className += ' is-empty';
+        className += ' is-answered is-last'
+      } else if (record.answered) {
+        className += ' is-answered'
+      } else {
+        className += ' is-empty'
       }
 
-      return <i className={className} />;
+      return <i className={className} />
     }
-  });
+  })
 
-  return Emblem;
-});
+  return Emblem
+})

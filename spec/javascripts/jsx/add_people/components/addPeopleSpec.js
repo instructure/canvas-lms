@@ -16,12 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'enzyme',
-  'jsx/add_people/components/add_people',
-], (React, enzyme, AddPeople) => {
-  QUnit.module('AddPeople');
+define(['react', 'enzyme', 'jsx/add_people/components/add_people'], (React, enzyme, AddPeople) => {
+  QUnit.module('AddPeople')
 
   const props = {
     isOpen: true,
@@ -33,28 +29,23 @@ define([
       isPending: 0
     },
     inputParams: {
-      nameList: '',
+      nameList: ''
     }
-  };
+  }
 
   test('renders the component', () => {
-    const container = document.createElement('div');
-    container.id = 'application';
-    document.body.appendChild(container);
+    const container = document.createElement('div')
+    container.id = 'application'
+    document.body.appendChild(container)
 
     const wrapper = enzyme.mount(
-      <AddPeople
-        validateUsers={() => {}}
-        enrollUsers={() => {}}
-        reset={() => {}}
-        {...props}
-      />,
-      { attachTo: document.getElementById('fixtures') }
-    );
+      <AddPeople validateUsers={() => {}} enrollUsers={() => {}} reset={() => {}} {...props} />,
+      {attachTo: document.getElementById('fixtures')}
+    )
 
-    ok(document.getElementById('add_people_modal'));
+    ok(document.getElementById('add_people_modal'))
 
-    wrapper.unmount();
-    document.body.removeChild(container);
-  });
-});
+    wrapper.unmount()
+    document.body.removeChild(container)
+  })
+})

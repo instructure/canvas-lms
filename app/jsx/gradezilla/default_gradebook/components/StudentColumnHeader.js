@@ -16,24 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { arrayOf, bool, func, oneOf, shape, string } from 'prop-types';
-import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid';
-import Button from '@instructure/ui-core/lib/components/Button';
-import Container from '@instructure/ui-core/lib/components/Container';
-import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid';
+import React from 'react'
+import {arrayOf, bool, func, oneOf, shape, string} from 'prop-types'
+import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Container from '@instructure/ui-core/lib/components/Container'
+import Grid, {GridCol, GridRow} from '@instructure/ui-core/lib/components/Grid'
 import {
   MenuItem,
   MenuItemFlyout,
   MenuItemGroup,
   MenuItemSeparator
-} from '@instructure/ui-core/lib/components/Menu';
-import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu';
-import Text from '@instructure/ui-core/lib/components/Text';
-import studentRowHeaderConstants from '../../../gradezilla/default_gradebook/constants/studentRowHeaderConstants';
-import I18n from 'i18n!gradebook';
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
-import ColumnHeader from '../../../gradezilla/default_gradebook/components/ColumnHeader';
+} from '@instructure/ui-core/lib/components/Menu'
+import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
+import Text from '@instructure/ui-core/lib/components/Text'
+import studentRowHeaderConstants from '../../../gradezilla/default_gradebook/constants/studentRowHeaderConstants'
+import I18n from 'i18n!gradebook'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import ColumnHeader from '../../../gradezilla/default_gradebook/components/ColumnHeader'
 
 export default class StudentColumnHeader extends ColumnHeader {
   static propTypes = {
@@ -52,53 +52,70 @@ export default class StudentColumnHeader extends ColumnHeader {
       onSortBySortableNameDescending: func.isRequired,
       settingKey: string.isRequired
     }).isRequired,
-    selectedEnrollmentFilters: arrayOf(oneOf(studentRowHeaderConstants.enrollmentFilterKeys)).isRequired,
+    selectedEnrollmentFilters: arrayOf(oneOf(studentRowHeaderConstants.enrollmentFilterKeys))
+      .isRequired,
     onToggleEnrollmentFilter: func.isRequired,
     disabled: bool.isRequired,
     onMenuClose: func.isRequired,
     ...ColumnHeader.propTypes
-  };
+  }
 
   static defaultProps = {
     loginHandleName: null,
     sisName: null,
     ...ColumnHeader.defaultProps
-  };
-
-  onShowSectionNames = () => { this.onSelectSecondaryInfo('section'); };
-  onHideSecondaryInfo = () => { this.onSelectSecondaryInfo('none'); };
-  onShowSisId = () => { this.onSelectSecondaryInfo('sis_id'); };
-  onShowLoginId = () => { this.onSelectSecondaryInfo('login_id'); };
-
-  onShowFirstLastNames = () => { this.onSelectPrimaryInfo('first_last'); };
-  onShowLastFirstNames = () => { this.onSelectPrimaryInfo('last_first'); };
-
-  onToggleInactive = () => { this.onToggleEnrollmentFilter('inactive'); };
-  onToggleConcluded = () => { this.onToggleEnrollmentFilter('concluded'); };
-
-  onSelectSecondaryInfo (secondaryInfoKey) {
-    this.props.onSelectSecondaryInfo(secondaryInfoKey);
   }
 
-  onSelectPrimaryInfo (primaryInfoKey) {
-    this.props.onSelectPrimaryInfo(primaryInfoKey);
+  onShowSectionNames = () => {
+    this.onSelectSecondaryInfo('section')
+  }
+  onHideSecondaryInfo = () => {
+    this.onSelectSecondaryInfo('none')
+  }
+  onShowSisId = () => {
+    this.onSelectSecondaryInfo('sis_id')
+  }
+  onShowLoginId = () => {
+    this.onSelectSecondaryInfo('login_id')
   }
 
-  onToggleEnrollmentFilter (enrollmentFilterKey) {
-    this.props.onToggleEnrollmentFilter(enrollmentFilterKey);
+  onShowFirstLastNames = () => {
+    this.onSelectPrimaryInfo('first_last')
+  }
+  onShowLastFirstNames = () => {
+    this.onSelectPrimaryInfo('last_first')
   }
 
-  bindDisplayAsMenuContent = (ref) => {
-    this.displayAsMenuContent = ref;
-    this.bindFlyoutMenu(ref, this.displayAsMenuContent);
-  };
+  onToggleInactive = () => {
+    this.onToggleEnrollmentFilter('inactive')
+  }
+  onToggleConcluded = () => {
+    this.onToggleEnrollmentFilter('concluded')
+  }
 
-  bindSecondaryInfoMenuContent = (ref) => {
-    this.secondaryInfoMenuContent = ref;
-    this.bindFlyoutMenu(ref, this.secondaryInfoMenuContent);
-  };
+  onSelectSecondaryInfo(secondaryInfoKey) {
+    this.props.onSelectSecondaryInfo(secondaryInfoKey)
+  }
 
-  render () {
+  onSelectPrimaryInfo(primaryInfoKey) {
+    this.props.onSelectPrimaryInfo(primaryInfoKey)
+  }
+
+  onToggleEnrollmentFilter(enrollmentFilterKey) {
+    this.props.onToggleEnrollmentFilter(enrollmentFilterKey)
+  }
+
+  bindDisplayAsMenuContent = ref => {
+    this.displayAsMenuContent = ref
+    this.bindFlyoutMenu(ref, this.displayAsMenuContent)
+  }
+
+  bindSecondaryInfoMenuContent = ref => {
+    this.secondaryInfoMenuContent = ref
+    this.bindFlyoutMenu(ref, this.secondaryInfoMenuContent)
+  }
+
+  render() {
     const {
       sortBySetting: {
         isSortColumn,
@@ -108,19 +125,21 @@ export default class StudentColumnHeader extends ColumnHeader {
         onSortBySortableNameAscending,
         onSortBySortableNameDescending
       }
-    } = this.props;
-    const selectedSortSetting = isSortColumn && settingKey;
-    const menuShown = this.state.menuShown;
-    const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`;
+    } = this.props
+    const selectedSortSetting = isSortColumn && settingKey
+    const menuShown = this.state.menuShown
+    const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`
 
     return (
       <div className="Gradebook__ColumnHeaderContent">
-        <div style={{ flex: 1, minWidth: '1px' }}>
+        <div style={{flex: 1, minWidth: '1px'}}>
           <Grid colSpacing="none" hAlign="space-between" vAlign="middle">
             <GridRow>
               <GridCol textAlign="start">
                 <Container className="Gradebook__ColumnHeaderDetail" padding="0 0 0 small">
-                  <Text fontStyle="normal" size="x-small" weight="bold">{ I18n.t('Student Name') }</Text>
+                  <Text fontStyle="normal" size="x-small" weight="bold">
+                    {I18n.t('Student Name')}
+                  </Text>
                 </Container>
               </GridCol>
 
@@ -130,17 +149,30 @@ export default class StudentColumnHeader extends ColumnHeader {
                     contentRef={this.bindOptionsMenuContent}
                     shouldFocusTriggerOnClose={false}
                     trigger={
-                      <Button buttonRef={this.bindOptionsMenuTrigger} margin="0" size="small" variant="icon">
+                      <Button
+                        buttonRef={this.bindOptionsMenuTrigger}
+                        margin="0"
+                        size="small"
+                        variant="icon"
+                      >
                         <IconMoreSolid title={I18n.t('Student Name Options')} />
                       </Button>
                     }
                     onToggle={this.onToggle}
                     onClose={this.props.onMenuClose}
                   >
-                    <MenuItemFlyout label={I18n.t('Sort by')} contentRef={this.bindSortByMenuContent} disabled={this.props.disabled}>
-                      <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
+                    <MenuItemFlyout
+                      label={I18n.t('Sort by')}
+                      contentRef={this.bindSortByMenuContent}
+                      disabled={this.props.disabled}
+                    >
+                      <MenuItemGroup
+                        label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
+                      >
                         <MenuItem
-                          selected={selectedSortSetting === 'sortable_name' && direction === 'ascending'}
+                          selected={
+                            selectedSortSetting === 'sortable_name' && direction === 'ascending'
+                          }
                           disabled={disabled}
                           onSelect={onSortBySortableNameAscending}
                         >
@@ -148,7 +180,9 @@ export default class StudentColumnHeader extends ColumnHeader {
                         </MenuItem>
 
                         <MenuItem
-                          selected={selectedSortSetting === 'sortable_name' && direction === 'descending'}
+                          selected={
+                            selectedSortSetting === 'sortable_name' && direction === 'descending'
+                          }
                           disabled={disabled}
                           onSelect={onSortBySortableNameDescending}
                         >
@@ -157,8 +191,14 @@ export default class StudentColumnHeader extends ColumnHeader {
                       </MenuItemGroup>
                     </MenuItemFlyout>
 
-                    <MenuItemFlyout label={I18n.t('Display as')} contentRef={this.bindDisplayAsMenuContent} disabled={this.props.disabled}>
-                      <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Display as')}</ScreenReaderContent>}>
+                    <MenuItemFlyout
+                      label={I18n.t('Display as')}
+                      contentRef={this.bindDisplayAsMenuContent}
+                      disabled={this.props.disabled}
+                    >
+                      <MenuItemGroup
+                        label={<ScreenReaderContent>{I18n.t('Display as')}</ScreenReaderContent>}
+                      >
                         <MenuItem
                           key="first_last"
                           selected={this.props.selectedPrimaryInfo === 'first_last'}
@@ -181,9 +221,12 @@ export default class StudentColumnHeader extends ColumnHeader {
                       disabled={this.props.disabled}
                       label={I18n.t('Secondary info')}
                     >
-                      <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Secondary info')}</ScreenReaderContent>}>
-                        {
-                          this.props.sectionsEnabled &&
+                      <MenuItemGroup
+                        label={
+                          <ScreenReaderContent>{I18n.t('Secondary info')}</ScreenReaderContent>
+                        }
+                      >
+                        {this.props.sectionsEnabled && (
                           <MenuItem
                             key="section"
                             selected={this.props.selectedSecondaryInfo === 'section'}
@@ -191,13 +234,14 @@ export default class StudentColumnHeader extends ColumnHeader {
                           >
                             {studentRowHeaderConstants.secondaryInfoLabels.section}
                           </MenuItem>
-                        }
+                        )}
                         <MenuItem
                           key="sis_id"
                           selected={this.props.selectedSecondaryInfo === 'sis_id'}
                           onSelect={this.onShowSisId}
                         >
-                          {this.props.sisName || studentRowHeaderConstants.secondaryInfoLabels.sis_id}
+                          {this.props.sisName ||
+                            studentRowHeaderConstants.secondaryInfoLabels.sis_id}
                         </MenuItem>
 
                         <MenuItem
@@ -205,7 +249,8 @@ export default class StudentColumnHeader extends ColumnHeader {
                           selected={this.props.selectedSecondaryInfo === 'login_id'}
                           onSelect={this.onShowLoginId}
                         >
-                          {this.props.loginHandleName || studentRowHeaderConstants.secondaryInfoLabels.login_id}
+                          {this.props.loginHandleName ||
+                            studentRowHeaderConstants.secondaryInfoLabels.login_id}
                         </MenuItem>
 
                         <MenuItem
@@ -246,6 +291,6 @@ export default class StudentColumnHeader extends ColumnHeader {
           </Grid>
         </div>
       </div>
-    );
+    )
   }
 }

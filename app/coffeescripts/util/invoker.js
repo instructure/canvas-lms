@@ -15,14 +15,14 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-export default function invoker (obj) {
-  obj.invoke = function (method) {
+export default function invoker(obj) {
+  obj.invoke = function(method) {
     const args = [].splice.call(arguments, 0, 1)
     return (this[method] || this.noMethod).apply(this, arguments)
   }
 
   if (!obj.noMethod) {
-    obj.noMethod = function () {}
+    obj.noMethod = function() {}
   }
 
   return obj

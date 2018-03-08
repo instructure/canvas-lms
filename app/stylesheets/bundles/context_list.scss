@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 ul.context_list {
   li {
@@ -52,7 +52,8 @@ ul.context_list {
     }
   }
   .unpublished {
-    a, i {
+    a,
+    i {
       color: $ic-font-color--subdued;
       font-weight: normal;
     }

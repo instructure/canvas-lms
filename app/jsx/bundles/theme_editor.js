@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import ThemeEditor from '../theme_editor/ThemeEditor'
 
-  // framebust out so we don't ever get theme editor inside theme editor
+// framebust out so we don't ever get theme editor inside theme editor
 if (window.top.location !== self.location) {
   window.top.location = self.location.href
 }

@@ -22,8 +22,9 @@ If you would rather do things manually, read on!
 ## Recommendations
 
 By default `docker-compose` will look at 2 files
-- docker-compose.yml
-- docker-compose.override.yml
+
+* docker-compose.yml
+* docker-compose.override.yml
 
 If you need more than what the default override provides you should use a `.env` file to set your `COMPOSE_FILE` environment variable.
 
@@ -32,9 +33,9 @@ If you need more than what the default override provides you should use a `.env`
 In order to tweak your local environment (which you may want to do for any of several reasons),
 you can create your own [docker-compose overrides file](https://docs.docker.com/compose/compose-file/).
 To get docker-compose to pick up your file and use its settings, you'll want to set an
-environment variable `COMPOSE_FILE`.  The place to do this is in a `.env` file.
+environment variable `COMPOSE_FILE`. The place to do this is in a `.env` file.
 Create a `docker-compose.local.<username>.yml` and add a `COMPOSE_FILE` environment variable.
-This variable can then have a list of files, separated by `:`.  You need to keep the main docker-compose and docker-compose.override otherwise everything will be ruined.
+This variable can then have a list of files, separated by `:`. You need to keep the main docker-compose and docker-compose.override otherwise everything will be ruined.
 
 ```bash
 echo "COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose.local.`whoami`.yml" >> .env
@@ -47,6 +48,7 @@ echo "version: '2'" > docker-compose.local.`whoami`.yml
 ```
 
 ## Getting Started
+
 After you have [installed the dependencies](getting_docker.md). You'll need to copy
 over the required configuration files.
 
@@ -60,9 +62,9 @@ $ cp docker-compose/config/* config/
 
 Now you're ready to build all of the containers. This will take a while as a lot is going on here.
 
-- Images are downloaded and built
-- Database is created and initial setup is run
-- Assets are compiled
+* Images are downloaded and built
+* Database is created and initial setup is run
+* Assets are compiled
 
 ```bash
 docker-compose run --rm web bundle install
@@ -70,6 +72,7 @@ docker-compose run --rm web bundle exec rake db:create db:initial_setup canvas:c
 ```
 
 Now you should be able to start up and access canvas like you would any other container.
+
 ```bash
 docker-compose up
 open http://web.canvaslms.docker
@@ -135,6 +138,7 @@ you can do instead is use `pry-remote`.
 2. Run `docker-compose run --rm web bundle install` to install `pry-remote`
 3. Add `binding.remote_pry` in code where you want execution to yield a pry REPL
 4. Launch pry-remote and have it wait for execution to yield to you:
+
 ```
 docker-compose exec web pry-remote --wait
 ```
@@ -179,7 +183,6 @@ Now just run your choice of selenium specs:
 docker-compose run --rm web bundle exec rspec spec/selenium/dashboard_spec.rb
 ```
 
-
 ## Extra Services
 
 ### Cassandra
@@ -188,8 +191,9 @@ If you're using the analytics package, you'll also need Cassandra. The
 Cassandra configuration isn't enabled by default. Add `docker-compose/cassandra.override.yml` to your `COMPOSE_FILE` var in `.env`
 
 Then:
-- Uncomment configuration in config/cassandra.yml
-- See config/cassandra.yml.example for further setup instructions
+
+* Uncomment configuration in config/cassandra.yml
+* See config/cassandra.yml.example for further setup instructions
 
 ### Mail Catcher
 
@@ -215,7 +219,7 @@ Now you can just run commands like `dcrx rake db:migrate` or `dcr bundle install
 
 ## Troubleshooting
 
-If you are having trouble running the `web` container, make sure that permissions on the directory are permissive.  You can try the owner change (less disruptive):
+If you are having trouble running the `web` container, make sure that permissions on the directory are permissive. You can try the owner change (less disruptive):
 
 ```
 chown -R 1000:1000 canvas-lms
@@ -235,7 +239,6 @@ $ sestatus
 ...
 Current mode:                   disabled
 ...
-
 ```
 
 If so, it can be disabled temporarily with:

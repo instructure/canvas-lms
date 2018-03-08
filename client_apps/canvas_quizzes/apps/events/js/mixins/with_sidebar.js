@@ -18,7 +18,7 @@
  */
 
 define(function(require) {
-  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps')
   return {
     render: function() {
       return (
@@ -37,7 +37,7 @@ define(function(require) {
             </aside>
           </div>
         </div>
-      );
+      )
     }
   }
-});
+})

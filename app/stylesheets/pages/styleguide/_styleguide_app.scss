@@ -21,11 +21,10 @@
   // the gutters of flexgrid. It's a known problem and there's
   // currently an issue reported. If things change we'll fix it.
   //
-  overflow-x:hidden;
+  overflow-x: hidden;
 }
 .Sg-Section {
   padding-bottom: 100px; // adds some padding between our sections and headers
-
 }
 $sg-Header-height: 85px;
 .Sg-Header {
@@ -62,7 +61,9 @@ $sg-Header-height: 85px;
   }
 }
 // For hiding sections from nav
-.isHidden {display: none;}
+.isHidden {
+  display: none;
+}
 .styleguide-section__accordion-demo-element {
   padding: $ic-sp*2;
   color: darken($ic-color-neutral, 15%);
@@ -70,7 +71,8 @@ $sg-Header-height: 85px;
 /////
 ////// React Modal
 /////
-.ReactModal__Content.ReactModal__Content--canvas.ReactModal__Content--demo-styleguide .ReactModal__Layout {
+.ReactModal__Content.ReactModal__Content--canvas.ReactModal__Content--demo-styleguide
+  .ReactModal__Layout {
   transform: none;
   opacity: 1;
   width: 100%;
@@ -95,20 +97,45 @@ $sg-Header-height: 85px;
   padding: 10px;
 }
 
-.Colorguide-color--primary        {background: var(--ic-brand-primary);}
-.Colorguide-color--success        {background: $ic-color-success;}
-.Colorguide-color--action         {background: $ic-color-action;}
-.Colorguide-color--danger         {background: $ic-color-danger;}
-.Colorguide-color--alert          {background: $ic-color-alert;}
-.Colorguide-color--dark           {background: $ic-color-dark;}
-.Colorguide-color--medium-darker  {background: $ic-color-medium-darker;}
-.Colorguide-color--medium         {background: $ic-color-medium;}
-.Colorguide-color--medium-lighter {background: $ic-color-medium-lighter;}
-.Colorguide-color--border-dark    {background: $ic-border-dark;}
-.Colorguide-color--border-light   {background: $ic-border-light;}
-.Colorguide-color--medium-light   {background: $ic-color-medium-light;}
-.Colorguide-color--light          {background: $ic-color-light;}
-
+.Colorguide-color--primary {
+  background: var(--ic-brand-primary);
+}
+.Colorguide-color--success {
+  background: $ic-color-success;
+}
+.Colorguide-color--action {
+  background: $ic-color-action;
+}
+.Colorguide-color--danger {
+  background: $ic-color-danger;
+}
+.Colorguide-color--alert {
+  background: $ic-color-alert;
+}
+.Colorguide-color--dark {
+  background: $ic-color-dark;
+}
+.Colorguide-color--medium-darker {
+  background: $ic-color-medium-darker;
+}
+.Colorguide-color--medium {
+  background: $ic-color-medium;
+}
+.Colorguide-color--medium-lighter {
+  background: $ic-color-medium-lighter;
+}
+.Colorguide-color--border-dark {
+  background: $ic-border-dark;
+}
+.Colorguide-color--border-light {
+  background: $ic-border-light;
+}
+.Colorguide-color--medium-light {
+  background: $ic-color-medium-light;
+}
+.Colorguide-color--light {
+  background: $ic-color-light;
+}
 
 .sg-bg-color-example {
   background: $ic-bg-light-primary;

@@ -1,30 +1,31 @@
 {
-    "incorrect_comments":"",
-    "question_text":"How could chance lead to a complex metabolic cycle?",
-    "question_type":"multiple_answers_question",
-    "answers":[
-        {
-            "weight":100,
-            "text":"Chance can't; natural selection from a common ancestor can.",
-            "id":4150,
-            "migration_id":"MC0"
-        },
-        {
-            "weight":100,
-            "text":"Biology does not claim that evolution is \"chance\".",
-            "id":1369,
-            "migration_id":"MC1"
-        },
-        {
-            "weight":0,
-            "text":"Chance can't; this is a big problem for evolution. BTW, rockets are cool: ",
-            "html":"Chance can't; this is a big problem for evolution. BTW, rockets are cool: <img src=\"rocket.png\">",
-            "id":390,
-            "migration_id":"MC2"
-        }
-    ],
-    "question_name":"natural selection is not chance ",
-    "correct_comments":"",
-    "migration_id":"URN-X-WEBCT-VISTA_V2-790EA1350E1A681DE0440003BA07D9B4",
-    "points_possible":1
+  "incorrect_comments": "",
+  "question_text": "How could chance lead to a complex metabolic cycle?",
+  "question_type": "multiple_answers_question",
+  "answers": [
+    {
+      "weight": 100,
+      "text": "Chance can't; natural selection from a common ancestor can.",
+      "id": 4150,
+      "migration_id": "MC0"
+    },
+    {
+      "weight": 100,
+      "text": "Biology does not claim that evolution is \"chance\".",
+      "id": 1369,
+      "migration_id": "MC1"
+    },
+    {
+      "weight": 0,
+      "text": "Chance can't; this is a big problem for evolution. BTW, rockets are cool: ",
+      "html":
+        "Chance can't; this is a big problem for evolution. BTW, rockets are cool: <img src=\"rocket.png\">",
+      "id": 390,
+      "migration_id": "MC2"
+    }
+  ],
+  "question_name": "natural selection is not chance ",
+  "correct_comments": "",
+  "migration_id": "URN-X-WEBCT-VISTA_V2-790EA1350E1A681DE0440003BA07D9B4",
+  "points_possible": 1
 }

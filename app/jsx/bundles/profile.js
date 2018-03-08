@@ -22,7 +22,7 @@ import 'profile'
 import 'user_sortable_name'
 import 'communication_channels'
 
-const hiddenFlags = [];
+const hiddenFlags = []
 if (!ENV.NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT) {
   hiddenFlags.push('new_user_tutorial_on_off')
 }

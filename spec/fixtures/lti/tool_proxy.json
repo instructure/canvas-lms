@@ -90,7 +90,7 @@
       {
         "message_type": "basic-lti-launch-request",
         "path": "handler/launchRequest",
-        "enabled_capability": [ ],
+        "enabled_capability": [],
         "parameter": [
           {
             "name": "discipline",
@@ -158,12 +158,14 @@
     "tool_service": [
       {
         "@type": "RestServiceProfile",
-        "service": "http://lms.example.com/profile/b6ffa601-ce1d-4549-9ccf-145670a964d4#ToolProxy.collection",
+        "service":
+          "http://lms.example.com/profile/b6ffa601-ce1d-4549-9ccf-145670a964d4#ToolProxy.collection",
         "action": ["POST"]
       },
       {
         "@type": "RestServiceProfile",
-        "service": "http://lms.example.com/profile/b6ffa601-ce1d-4549-9ccf-145670a964d4#ToolProxy.item",
+        "service":
+          "http://lms.example.com/profile/b6ffa601-ce1d-4549-9ccf-145670a964d4#ToolProxy.item",
         "action": ["GET"]
       }
     ],

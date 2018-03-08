@@ -17,7 +17,7 @@
  */
 
 define(function() {
-  var INTERPOLATER = /\%\{([^\}]+)\}/g;
+  var INTERPOLATER = /\%\{([^\}]+)\}/g
 
   /**
    * @member Util
@@ -37,15 +37,15 @@ define(function() {
    *         The interpolated text.
    */
   return function i18nInterpolate(contents, options) {
-    var variables = contents.match(INTERPOLATER);
+    var variables = contents.match(INTERPOLATER)
 
     if (variables) {
       variables.forEach(function(variable) {
-        var optionKey = variable.substr(2, variable.length - 3);
-        contents = contents.replace(new RegExp(variable, 'g'), options[optionKey]);
-      });
+        var optionKey = variable.substr(2, variable.length - 3)
+        contents = contents.replace(new RegExp(variable, 'g'), options[optionKey])
+      })
     }
 
-    return contents;
-  };
-});
+    return contents
+  }
+})

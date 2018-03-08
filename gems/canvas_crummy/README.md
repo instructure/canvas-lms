@@ -70,7 +70,7 @@ Then in your view:
   </code>
 </pre>
 
-h2. Options for render_crumb_
+h2. Options for render*crumb*
 
 render_crumbs renders the list of crumbs as either html or xml
 
@@ -86,7 +86,7 @@ The seperator text. It does not assume you want spaces on either side so you mus
 
 Render links in the output. Defaults to +true+
 
-<code>:link => boolean</code>        
+<code>:link => boolean</code>
 
 h3. Examples
 
@@ -97,11 +97,12 @@ h3. Examples
   render_crumbs :format => :xml     #=> <crumb href="/">Home</crumb><crumb href="/businesses">Businesses</crumb>
  </code>
 </pre>
+
 A crumb with a nil link will just output plain text.
 
 h2. Notes
 
-The variable set is set to @_crumbs as to not conflict with your code.
+The variable set is set to @\_crumbs as to not conflict with your code.
 
 h2. Todo
 

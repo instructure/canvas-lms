@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 .bcs__trigger {
   position: fixed;
@@ -26,7 +26,7 @@
   padding: 10px 3px;
   border-bottom-left-radius: 5px;
   background-color: $electric;
-  box-shadow: -1px 1px 2px 0 rgba(0,0,0,.2);
+  box-shadow: -1px 1px 2px 0 rgba(0, 0, 0, 0.2);
 
   &:after {
     content: '';
@@ -37,7 +37,7 @@
     bottom: 0;
     width: 8px;
     background-color: $electric;
-    box-shadow: -1px 0 1px 0 rgba(0,0,0,.2)
+    box-shadow: -1px 0 1px 0 rgba(0, 0, 0, 0.2);
   }
 }
 
@@ -53,7 +53,8 @@
   margin-bottom: 3em;
 }
 
-.bcs__history-item__title, .bcs__unsynced-item__title {
+.bcs__history-item__title,
+.bcs__unsynced-item__title {
   border-bottom: 2px solid $ic-color-medium;
   padding-bottom: 0.5em;
   margin-bottom: 1.5em;
@@ -79,7 +80,7 @@
 
       .bcs__history-item__content-grid {
         > span > span > span:first-child {
-          padding-left: 0,
+          padding-left: 0;
         }
       }
     }
@@ -88,7 +89,7 @@
       left: 0;
 
       > span > span > span:first-child {
-        padding-left: 30px,
+        padding-left: 30px;
       }
     }
 
@@ -142,7 +143,7 @@
 }
 
 .bcs__history-item__change-exceps__group {
-    margin: 1.5em 0 1em;
+  margin: 1.5em 0 1em;
 }
 
 .bcs__history-item__change-exceps__courses {
@@ -161,8 +162,12 @@
 }
 
 @keyframes spinning {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .bcs__sync-btn-icon {
@@ -204,7 +209,7 @@
   position: relative;
   text-align: center;
   padding: 1.2em 1.75em 1.2em 0;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .2);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 .bcs__close-wrapper {
@@ -234,7 +239,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255,255,255,.85);
+  background: rgba(255, 255, 255, 0.85);
   text-align: center;
 }
 
@@ -245,14 +250,17 @@
 }
 
 .bca__footer {
-  display: flex; justify-content: flex-end; flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
+  flex: 0 0 auto;
 }
 
 .bca-course-filter {
   border: 1px solid $ic-border-color;
   border-radius: $ic-border-radius;
 
-  input, select {
+  input,
+  select {
     // overwrite instui borders to match design
     border: none !important;
   }
@@ -267,7 +275,7 @@
   margin-top: 1em;
   position: relative;
 
-  &> div > div {
+  & > div > div {
     // overwrite instui padding to match design
     padding-left: 0 !important;
   }
@@ -280,7 +288,7 @@
   left: 1px;
   right: 1px;
   bottom: 1px;
-  background: rgba(255,255,255,.65);
+  background: rgba(255, 255, 255, 0.65);
   text-align: center;
   padding-top: 100px;
   border-radius: $ic-border-radius;
@@ -339,8 +347,8 @@
 
         &.bca-table__no-results {
           td {
-           box-shadow: none;
-         }
+            box-shadow: none;
+          }
         }
       }
     }
@@ -391,13 +399,13 @@
 .bcs__history-settings > label,
 .bcs__history-notification__add-message,
 .bcs__history-notification__message {
-  margin-bottom:.5em;
+  margin-bottom: 0.5em;
 }
 
 .bcs__history-notification__add-message {
   margin-left: 1em;
   label {
-    margin-right: .5em;
+    margin-right: 0.5em;
   }
 }
 
@@ -410,14 +418,14 @@
   padding-right: 2em;
 
   &:before {
-      content: '';
-      background: $ic-color-medium;
-      width: 1px;
-      display: block;
-      position: absolute;
-      top: 10px;
-      bottom: 100px;
-      left: 50%;
+    content: '';
+    background: $ic-color-medium;
+    width: 1px;
+    display: block;
+    position: absolute;
+    top: 10px;
+    bottom: 100px;
+    left: 50%;
   }
 }
 
@@ -425,7 +433,7 @@
   padding: 1em;
   background: $ic-color-medium-light;
   width: 235px;
-  box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .2);
+  box-shadow: 0 1px 2px 1px rgba(0, 0, 0, 0.2);
   position: relative;
 
   header {
@@ -455,10 +463,10 @@
   top: 2px;
   font-size: 1.25em;
 
-  .bpc__lock-no__toggle-icon  {
+  .bpc__lock-no__toggle-icon {
     position: relative;
     top: 4px;
-    margin-right: 6px
+    margin-right: 6px;
   }
 }
 

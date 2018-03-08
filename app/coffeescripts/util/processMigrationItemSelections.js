@@ -24,14 +24,14 @@ const reAllSelection = /copy\[all_([^\]]*)\]/
 // removes the individually selected items if the all_item option is chosen for it
 // see the test for a simple example
 // matches copy[folders][I_00001_R] and puts "folder" in first capture and the id in second
-export default function processMigrationItemSelections (data) {
+export default function processMigrationItemSelections(data) {
   const newData = {
     items_to_copy: {}
   }
   const allSelections = []
   const copyEverything = data['copy[everything]'] === '1'
 
-  Object.keys(data || {}).forEach((key) => {
+  Object.keys(data || {}).forEach(key => {
     const value = data[key]
     let matchData = key.match(reAssetId)
     if (matchData) {
@@ -43,7 +43,7 @@ export default function processMigrationItemSelections (data) {
       }
       if (copyEverything) return
       if (value === '1') {
-        (newData.items_to_copy[assetType] || (newData.items_to_copy[assetType] = [])).push(assetID)
+        ;(newData.items_to_copy[assetType] || (newData.items_to_copy[assetType] = [])).push(assetID)
       }
     } else {
       if ((matchData = key.match(reAllSelection))) {

@@ -1,5 +1,4 @@
-Uploading Files
-===============
+# Uploading Files
 
 There are two ways to upload a file to Canvas: either by sending the
 file data in a POST request, or by sending Canvas a publicly
@@ -75,7 +74,7 @@ upload the actual file data, by POSTing a specially formulated request to
 the URL given in the `upload_url` field of the response.
 
 Depending on how Canvas is configured, this upload URL might be another URL
-in the same domain, or a Amazon S3 bucket, or some other URL.  In order to
+in the same domain, or a Amazon S3 bucket, or some other URL. In order to
 work with all Canvas installations, applications should be very careful to
 follow this documentation and not make any undocumented assumptions about
 the upload workflow.
@@ -84,7 +83,7 @@ This second request must be POSTed as a multipart/form-data request to
 accomodate the file data. The parameters POSTed with this request come
 directly from the `upload_params` part of the JSON response in Step 1.
 
-The only addition is the `file` parameter which *must* be posted as the
+The only addition is the `file` parameter which _must_ be posted as the
 last parameter following all the others.
 
 Example Request:
@@ -103,8 +102,8 @@ Example Response:
     HTTP/1.1 301 Moved Permanently
     Location: https://<canvas>/api/v1/s3_success/1234?uuid=ABCDE
 
-IMPORTANT:  The request is signed, and will be denied if any parameters
-from the `upload_params` response are added, removed or modified.  The
+IMPORTANT: The request is signed, and will be denied if any parameters
+from the `upload_params` response are added, removed or modified. The
 parameters in `upload_params` may vary over time, and between Canvas
 installs. It's important for the application to copy over all of the
 parameters, and not rely on the names or values of the params for any

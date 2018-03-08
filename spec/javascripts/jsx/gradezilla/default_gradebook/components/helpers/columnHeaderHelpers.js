@@ -16,39 +16,39 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { ReactWrapper } from 'enzyme';
+import {ReactWrapper} from 'enzyme'
 
 const MENU_CONTENT_REF_MAP = {
   'Sort by': 'sortByMenuContent',
   'Display as': 'displayAsMenuContent',
-  'Secondary info': 'secondaryInfoMenuContent',
-};
+  'Secondary info': 'secondaryInfoMenuContent'
+}
 
 // the only requirement is that the individual spec files define their own
 // `mountAndOpenOptions` function on `this`.
-function findMenuContent (props) {
-  this.wrapper = this.mountAndOpenOptions(props);
-  return new ReactWrapper([this.wrapper.node.optionsMenuContent], this.wrapper.node);
+function findMenuContent(props) {
+  this.wrapper = this.mountAndOpenOptions(props)
+  return new ReactWrapper([this.wrapper.node.optionsMenuContent], this.wrapper.node)
 }
 
-function findFlyout (props, flyoutLabel) {
+function findFlyout(props, flyoutLabel) {
   const menuContent = findMenuContent.call(this, props)
-  const flyouts = menuContent.find('MenuItemFlyout').map(flyout => flyout);
-  return flyouts.find(menuItem => menuItem.text().trim() === flyoutLabel);
+  const flyouts = menuContent.find('MenuItemFlyout').map(flyout => flyout)
+  return flyouts.find(menuItem => menuItem.text().trim() === flyoutLabel)
 }
 
-function findFlyoutMenuContent (props, flyoutLabel) {
+function findFlyoutMenuContent(props, flyoutLabel) {
   const flyout = findFlyout.call(this, props, flyoutLabel)
   // find menu item
-  flyout.find('button').simulate('mouseOver');
-  const flyoutContentRefFn = MENU_CONTENT_REF_MAP[flyoutLabel];
-  return new ReactWrapper([this.wrapper.node[flyoutContentRefFn]], this.wrapper.node);
+  flyout.find('button').simulate('mouseOver')
+  const flyoutContentRefFn = MENU_CONTENT_REF_MAP[flyoutLabel]
+  return new ReactWrapper([this.wrapper.node[flyoutContentRefFn]], this.wrapper.node)
 }
 
-function findMenuItem (props, firstMenuItemLabel, secondMenuItemLabel) {
-  const menuContent = findFlyoutMenuContent.call(this, props, firstMenuItemLabel);
-  const subMenuItems = menuContent.find('MenuItem').map(menuItem => menuItem);
-  return subMenuItems.find(menuItem => menuItem.text().trim() === secondMenuItemLabel);
+function findMenuItem(props, firstMenuItemLabel, secondMenuItemLabel) {
+  const menuContent = findFlyoutMenuContent.call(this, props, firstMenuItemLabel)
+  const subMenuItems = menuContent.find('MenuItem').map(menuItem => menuItem)
+  return subMenuItems.find(menuItem => menuItem.text().trim() === secondMenuItemLabel)
 }
 
-export { findMenuItem, findFlyoutMenuContent, findFlyout, findMenuContent };
+export {findMenuItem, findFlyoutMenuContent, findFlyout, findMenuContent}

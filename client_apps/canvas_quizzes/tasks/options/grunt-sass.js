@@ -28,7 +28,7 @@ module.exports = {
     },
 
     files: {
-      "dist/<%= grunt.config.get('pkg.name') %>.css": 'apps/common/css/main.scss',
+      "dist/<%= grunt.config.get('pkg.name') %>.css": 'apps/common/css/main.scss'
     }
   }
-};
+}

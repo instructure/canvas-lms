@@ -17,7 +17,7 @@
  */
 
 import I18n from 'i18n!blueprint_courses'
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 
 import Button from '@instructure/ui-core/lib/components/Button'
@@ -68,15 +68,15 @@ export default class LockToggle extends Component {
   static propTypes = {
     isLocked: PropTypes.bool.isRequired,
     isToggleable: PropTypes.bool,
-    onClick: PropTypes.func,
+    onClick: PropTypes.func
   }
 
   static defaultProps = {
     isToggleable: false,
-    onClick: () => {},
+    onClick: () => {}
   }
 
-  static setupRootNode (wrapperSelector, childIndex, cb) {
+  static setupRootNode(wrapperSelector, childIndex, cb) {
     const toggleNode = document.createElement('span')
     // sometimes we have to wait for the DOM to settle down first
     const intId = setInterval(() => {
@@ -89,7 +89,7 @@ export default class LockToggle extends Component {
     }, 200)
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {}
 
@@ -116,7 +116,7 @@ export default class LockToggle extends Component {
     }
   }
 
-  render () {
+  render() {
     const Icon = this.state.mode.icon
     const text = <span className="bpc-lock-toggle__label">{this.state.mode.label || '-'}</span>
     let toggle = null
@@ -124,7 +124,9 @@ export default class LockToggle extends Component {
     if (this.props.isToggleable) {
       const variant = this.state.mode.variant
       const tooltip = this.state.mode.tooltip
-      const srLabel = this.props.isLocked ? I18n.t('Locked. Click to unlock.') : I18n.t('Unlocked. Click to lock.')
+      const srLabel = this.props.isLocked
+        ? I18n.t('Locked. Click to unlock.')
+        : I18n.t('Unlocked. Click to lock.')
 
       toggle = (
         <Tooltip tip={tooltip} placement="top" variant="inverse" on={['hover', 'focus']}>
@@ -146,14 +148,14 @@ export default class LockToggle extends Component {
     } else {
       toggle = (
         <span className="bpc__lock-no__toggle">
-          <span className="bpc__lock-no__toggle-icon"><Icon /></span>
+          <span className="bpc__lock-no__toggle-icon">
+            <Icon />
+          </span>
           <Text size="small">{text}</Text>
         </span>
       )
     }
 
-    return (
-      <span className="bpc-lock-toggle">{toggle}</span>
-    )
+    return <span className="bpc-lock-toggle">{toggle}</span>
   }
 }

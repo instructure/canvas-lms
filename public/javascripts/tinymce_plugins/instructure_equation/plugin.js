@@ -18,29 +18,29 @@
 
 import tinymce from 'compiled/editor/stocktiny'
 import I18n from 'i18n!editor'
-import htmlEscape from  '../../str/htmlEscape'
+import htmlEscape from '../../str/htmlEscape'
 
-  tinymce.create('tinymce.plugins.InstructureEquation', {
-    init : function(ed, url) {
-      ed.addCommand('instructureEquation', function() {
-        require(['compiled/views/tinymce/EquationEditorView'], function(EquationEditorView){
-          new EquationEditorView(ed);
-        });
-      });
+tinymce.create('tinymce.plugins.InstructureEquation', {
+  init: function(ed, url) {
+    ed.addCommand('instructureEquation', function() {
+      require(['compiled/views/tinymce/EquationEditorView'], function(EquationEditorView) {
+        new EquationEditorView(ed)
+      })
+    })
 
-      ed.addButton('instructure_equation', {
-        title: htmlEscape(I18n.t('Insert Math Equation')),
-        cmd: 'instructureEquation',
-        icon: 'equation icon-equation',
-        onPostRender: function(){
-          var btn = this;
-          ed.on('NodeChange', function(e){
-            btn.active(e.nodeName == 'IMG' && e.className == 'equation_image');
-          });
-        }
-      });
-    }
-  });
+    ed.addButton('instructure_equation', {
+      title: htmlEscape(I18n.t('Insert Math Equation')),
+      cmd: 'instructureEquation',
+      icon: 'equation icon-equation',
+      onPostRender: function() {
+        var btn = this
+        ed.on('NodeChange', function(e) {
+          btn.active(e.nodeName == 'IMG' && e.className == 'equation_image')
+        })
+      }
+    })
+  }
+})
 
-  // Register plugin
-  tinymce.PluginManager.add('instructure_equation', tinymce.plugins.InstructureEquation);
+// Register plugin
+tinymce.PluginManager.add('instructure_equation', tinymce.plugins.InstructureEquation)

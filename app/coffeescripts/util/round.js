@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 // rounds a number to m digits
-export default function round (n, digits = 0) {
+export default function round(n, digits = 0) {
   if (typeof n !== 'number' && !(n instanceof Number)) {
     n = parseFloat(n)
   }

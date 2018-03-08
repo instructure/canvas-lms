@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "bundles/profile_edit";
+@import 'base/environment';
+@import 'bundles/profile_edit';
 
 .not-editing {
   .show-if-editing {
@@ -50,7 +50,7 @@
   }
 
   i {
-    background: rgba(0, 0, 0, .75);
+    background: rgba(0, 0, 0, 0.75);
     bottom: 2px;
     color: #fff;
     height: 30px;
@@ -137,7 +137,7 @@
 }
 .profileLink__Item {
   list-style: none;
-  line-height: 2.0;
+  line-height: 2;
   & a {
     padding-left: $ic-sp/2;
   }
@@ -243,7 +243,7 @@
 
 .ic-Profile-layout__Primary {
   flex: 2;
-    @include breakpoint(desktop) {
+  @include breakpoint(desktop) {
     flex: 3;
   }
 }

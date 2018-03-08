@@ -61,7 +61,7 @@ $ apt-get install docker.io
 
 ### Start and optionally enable the docker service
 
-In order to use docker, the docker service must be running.  You can start the
+In order to use docker, the docker service must be running. You can start the
 service using systemd:
 
 ```
@@ -78,11 +78,11 @@ systemctl enable docker.service
 ### Avoid requiring sudo to run the docker command (optional)
 
 Because docker itelf runs with root privileges, you must be root
-in order to command it.  Unfortunately, this is very
-inconvenient and super annoying.  Fortunately, there is an elegant
+in order to command it. Unfortunately, this is very
+inconvenient and super annoying. Fortunately, there is an elegant
 work-around that simply involves creating a 'docker' group and
 adding any users to that group that should have permission to
-run docker.  First, add the docker group:
+run docker. First, add the docker group:
 
 ```
 groupadd docker
@@ -99,13 +99,13 @@ Note that you _will_ need to log out and back in for the group
 addition to take effect.
 
 NOTE: Adding non-privileged users to the docker group can be
-a security risk.  Don't add users to this group that shouldn't
-have root privileges.  Dev responsibly my friends.
+a security risk. Don't add users to this group that shouldn't
+have root privileges. Dev responsibly my friends.
 
 ### Install dory (optional)
 
 People using dinghy will have a reverse proxy that allows them to access
-canvas at `http://canvas.docker`.  On Linux and Docker for Mac, you will need
+canvas at `http://canvas.docker`. On Linux and Docker for Mac, you will need
 to run your own reverse proxy (or access your containers via IP/port).
 
 Many people at Instructure are using [dory](https://github.com/FreedomBen/dory)
@@ -131,7 +131,7 @@ $ brew install docker-compose --without-boot2docker
 
 ### Arch Linux
 
-Install docker-compose from the AUR using your preferred method.  For example with aura:
+Install docker-compose from the AUR using your preferred method. For example with aura:
 
 ```
 aura -A docker-compose
@@ -147,7 +147,7 @@ $ dnf install docker-compose
 
 ### Ubuntu and others
 
-If you have [python pip](https://en.wikipedia.org/wiki/Pip_(package_manager)) installed, you can use it to install docker-compose:
+If you have [python pip](<https://en.wikipedia.org/wiki/Pip_(package_manager)>) installed, you can use it to install docker-compose:
 
 ```
 $ pip install docker-compose

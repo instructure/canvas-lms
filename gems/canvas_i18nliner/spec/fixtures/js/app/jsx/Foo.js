@@ -16,6 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(['i18n!jsx'], (I18n) => {
-  return I18n.t("yay jsx");
-});
+define(['i18n!jsx'], I18n => {
+  return I18n.t('yay jsx')
+})

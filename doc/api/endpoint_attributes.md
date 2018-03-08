@@ -1,5 +1,4 @@
-API Endpoint Attributes
-=======================
+# API Endpoint Attributes
 
 Canvas adds attributes to links in returned HTML snippets to make it easier for
 API consumers to digest the referenced resources. These attributes are as follows:
@@ -8,7 +7,7 @@ API consumers to digest the referenced resources. These attributes are as follow
 * `data-api-returntype` - The type of data returned
 
 For example, consider an assignment description containing a link to a wiki page in
-the same course.  The description returned by the Get Assignment API might look
+the same course. The description returned by the Get Assignment API might look
 like this:
 
 ```html

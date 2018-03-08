@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 .mini_month {
   padding: $ic-sp 0 0;
@@ -55,29 +55,44 @@
     width: 14%;
     @include fontSize($ic-font-size--xsmall);
     border-radius: $baseBorderRadius;
-    &.has_event { background-color: darken($lightBackground, 4%); }
-    &.today { background-color: $ic-bg-light-alert; }
-    .event_link_text, .today_text, .previous_month_text, .next_month_text {
+    &.has_event {
+      background-color: darken($lightBackground, 4%);
+    }
+    &.today {
+      background-color: $ic-bg-light-alert;
+    }
+    .event_link_text,
+    .today_text,
+    .previous_month_text,
+    .next_month_text {
       display: none;
     }
-    &.other_month { color: #888; }
-    &:hover, &.related, &.drop_target { background-image: url("/images/4_percent_opacity.png"); }
-    &.drop_target { background-color: #aaa; }
+    &.other_month {
+      color: #888;
+    }
+    &:hover,
+    &.related,
+    &.drop_target {
+      background-image: url('/images/4_percent_opacity.png');
+    }
+    &.drop_target {
+      background-color: #aaa;
+    }
   }
   .day.today {
-      .today_text {
-          display: block;
-      }
+    .today_text {
+      display: block;
+    }
   }
   .day.previous_month {
-      .previous_month_text {
-          display: block;
-      }
+    .previous_month_text {
+      display: block;
+    }
   }
   .day.next_month {
-      .next_month_text {
-          display: block;
-      }
+    .next_month_text {
+      display: block;
+    }
   }
   .day.has_event {
     .event_link_text {

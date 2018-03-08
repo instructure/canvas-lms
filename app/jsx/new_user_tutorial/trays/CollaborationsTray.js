@@ -28,12 +28,10 @@ const CollaborationsTray = () => (
     image="/images/tutorial-tray-images/collaborations.svg"
   >
     <Text as="p">
-      {
-        I18n.t(`Provide a space for users to work on a single Google Doc
-          simultaneously, from within your Canvas course.`)
-      }
+      {I18n.t(`Provide a space for users to work on a single Google Doc
+          simultaneously, from within your Canvas course.`)}
     </Text>
   </TutorialTrayContent>
-);
+)
 
-export default CollaborationsTray;
+export default CollaborationsTray

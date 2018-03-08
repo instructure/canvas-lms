@@ -55,20 +55,24 @@ describe('Sections Autocomplete', () => {
   it('removes the all sections except the all option when all section is added', () => {
     const wrapper = shallow(<SectionsAutocomplete {...defaultProps()} />)
     wrapper.instance().onAutocompleteChange(null, [{id: '3', value: 'other thing'}])
-    wrapper.instance().onAutocompleteChange(null, [
-      {id: '3', value: 'other thing'},
-      {id: 'all', value: 'All my sections'}
-    ])
+    wrapper
+      .instance()
+      .onAutocompleteChange(null, [
+        {id: '3', value: 'other thing'},
+        {id: 'all', value: 'All my sections'}
+      ])
     expect(wrapper.instance().state.selectedSectionsValue).toEqual(['all'])
   })
 
   it('adds sections accordingly', () => {
     const wrapper = shallow(<SectionsAutocomplete {...defaultProps()} />)
     wrapper.instance().onAutocompleteChange(null, [{id: '3', value: 'other thing'}])
-    wrapper.instance().onAutocompleteChange(null, [
-      {id: '3', value: 'other thing'},
-      {id: '1', value: 'awesome section'}
-    ])
+    wrapper
+      .instance()
+      .onAutocompleteChange(null, [
+        {id: '3', value: 'other thing'},
+        {id: '1', value: 'awesome section'}
+      ])
     expect(wrapper.instance().state.selectedSectionsValue).toEqual(['3', '1'])
   })
 })

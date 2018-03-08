@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 .users-container {
   max-height: 500px;
@@ -37,7 +37,9 @@
     margin-left: 0;
     list-style-type: none;
   }
-  .message { margin-bottom: 1.5em; }
+  .message {
+    margin-bottom: 1.5em;
+  }
   .message-body {
     margin: 0 1em 1em;
     overflow-y: auto;
@@ -53,21 +55,25 @@
     font-weight: bold;
     line-height: 14px;
     padding: 1px 4px 2px;
-    text-shadow: 0 -1px 0 rgba(black, .25);
+    text-shadow: 0 -1px 0 rgba(black, 0.25);
     vertical-align: baseline;
     white-space: nowrap;
     float: right;
 
-    &.label-sent, &.label-dashboard {
+    &.label-sent,
+    &.label-dashboard {
       background-color: $successText;
     }
 
-    &.label-created, &.label-staged, &.label-sending {
-      background-color: #3A87AD;
+    &.label-created,
+    &.label-staged,
+    &.label-sending {
+      background-color: #3a87ad;
     }
 
-    &.label-cancelled, &.label-bounced {
-      background-color: #B94A48;
+    &.label-cancelled,
+    &.label-bounced {
+      background-color: #b94a48;
     }
 
     &.label-closed {
@@ -96,4 +102,3 @@
   border: 1px solid $ic-border-light;
   border-radius: $ic-border-radius;
 }
-

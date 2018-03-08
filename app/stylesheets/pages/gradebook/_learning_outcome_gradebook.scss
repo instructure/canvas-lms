@@ -20,14 +20,13 @@
 
 $border-light: #d3d9d9;
 $border-sidebar: #c9d0d6;
-$border-dark:  #bbb;
+$border-dark: #bbb;
 $default-link-color: #0088cc;
 $font-color: #555;
 $header-child-margin: 10px 8px 2px 8px;
 $header-font-color: #627382;
 $page-light: #f3f5f7;
 $page-dark: #ebeff2;
-
 
 /* bootstrap overrides */
 .nav-pills li a {
@@ -37,7 +36,6 @@ $page-dark: #ebeff2;
 .gradebook-navigation-pills {
   margin: 0;
 }
-
 
 /* page overrides */
 #breadcrumbs {
@@ -53,7 +51,8 @@ $page-dark: #ebeff2;
   @include fontSize($ic-font-size--medium);
   padding: 8px;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     border-color: $border-light;
   }
 }
@@ -70,7 +69,7 @@ $page-dark: #ebeff2;
   width: 18px;
 }
 
-.checkbox[aria-checked=false] {
+.checkbox[aria-checked='false'] {
   border: 1px solid #999;
 }
 
@@ -88,7 +87,8 @@ $page-dark: #ebeff2;
   padding-top: 19px;
 }
 
-.outcome-gradebook-wrapper, .outcome-gradebook-sidebar {
+.outcome-gradebook-wrapper,
+.outcome-gradebook-sidebar {
   box-sizing: border-box;
   height: 100%;
 }
@@ -145,7 +145,6 @@ $page-dark: #ebeff2;
   }
 }
 
-
 .outcome-gradebook-sidebar-content {
   width: auto;
   padding-left: 12px;
@@ -165,9 +164,13 @@ $page-dark: #ebeff2;
   @include clearfix;
   padding-top: $ic-sp;
   + .assignment-gradebook-container {
-    #gradebook-toolbar { border-top: 1px solid $ic-border-light; }
+    #gradebook-toolbar {
+      border-top: 1px solid $ic-border-light;
+    }
   }
-  .gradebook-navigation { margin-top: 3px; }
+  .gradebook-navigation {
+    margin-top: 3px;
+  }
 
   .header-buttons {
     flex: 1;
@@ -204,7 +207,8 @@ $page-dark: #ebeff2;
     color: $font-color;
   }
 
-  .slick-header-column.ui-state-hover, .slick-header-column.slick-header-column-active {
+  .slick-header-column.ui-state-hover,
+  .slick-header-column.slick-header-column-active {
     background: none;
   }
 
@@ -212,7 +216,8 @@ $page-dark: #ebeff2;
     display: none;
   }
 
-  .slick-header-column-sorted, .slick-header-column-sorted:hover {
+  .slick-header-column-sorted,
+  .slick-header-column-sorted:hover {
     background: #fff;
     font-style: normal;
     font-weight: bold;
@@ -226,7 +231,8 @@ $page-dark: #ebeff2;
     background: none;
   }
 
-  .even, .odd {
+  .even,
+  .odd {
     .slick-cell {
       background: none;
       border: none;
@@ -255,7 +261,8 @@ $page-dark: #ebeff2;
     }
   }
 
-  .slick-headerrow, .slick-header {
+  .slick-headerrow,
+  .slick-header {
     border-left: 1px solid transparent;
   }
 
@@ -292,7 +299,8 @@ $page-dark: #ebeff2;
     }
   }
 
-  .even, .odd {
+  .even,
+  .odd {
     .slick-cell {
       border: 1px solid transparent;
       border-top: none;
@@ -350,8 +358,16 @@ $page-dark: #ebeff2;
   margin-left: 10px;
   vertical-align: text-top;
 
-  &.exceeds      { background: $exceeds-color; }
-  &.mastery      { background: $mastery-color; }
-  &.near-mastery { background: $near-color; }
-  &.remedial     { background: $remedial-color; }
+  &.exceeds {
+    background: $exceeds-color;
+  }
+  &.mastery {
+    background: $mastery-color;
+  }
+  &.near-mastery {
+    background: $near-color;
+  }
+  &.remedial {
+    background: $remedial-color;
+  }
 }

@@ -18,7 +18,8 @@
         "content-type": "text/csv",
         "display_name": "CNVS-4338 Quiz Student Analysis Report.csv",
         "filename": "quiz_student_analysis_report.csv",
-        "url": "http://localhost:3000/files/154/download?download_frd=1&verifier=XDl5emZ8E5KHjrmkcMUArhyLCHEJsi6DxNoLqsd4",
+        "url":
+          "http://localhost:3000/files/154/download?download_frd=1&verifier=XDl5emZ8E5KHjrmkcMUArhyLCHEJsi6DxNoLqsd4",
         "size": 1093,
         "created_at": "2014-04-29T09:08:55Z",
         "updated_at": "2014-04-29T09:08:55Z",

@@ -29,26 +29,38 @@ import toUnderscore from '../str/underscore'
 // declare all used i18n keys here to cluttering up the logic
 const keys = {
   limited: {
-    TeacherEnrollment: I18n.t('enrolled_as_limited_teacher', 'enrolled as a teacher with section-only access'),
+    TeacherEnrollment: I18n.t(
+      'enrolled_as_limited_teacher',
+      'enrolled as a teacher with section-only access'
+    ),
     TaEnrollment: I18n.t('enrolled_as_limited_ta', 'enrolled as a TA with section-only access'),
-    ObserverEnrollment: I18n.t('enrolled_as_limited_observer', 'enrolled as a observer with section-only access'),
-    CourseDesignerEnrollment: I18n.t('enrolled_as_limited_designer', 'enrolled as a designer with section-only access'),
-    StudentEnrollment: I18n.t('enrolled_as_limited_student', 'enrolled as a student with section-only access'),
+    ObserverEnrollment: I18n.t(
+      'enrolled_as_limited_observer',
+      'enrolled as a observer with section-only access'
+    ),
+    CourseDesignerEnrollment: I18n.t(
+      'enrolled_as_limited_designer',
+      'enrolled as a designer with section-only access'
+    ),
+    StudentEnrollment: I18n.t(
+      'enrolled_as_limited_student',
+      'enrolled as a student with section-only access'
+    )
   },
   standard: {
     TeacherEnrollment: I18n.t('enrolled_as_teacher', 'enrolled as a teacher'),
     TaEnrollment: I18n.t('enrolled_as_ta', 'enrolled as a TA'),
     ObserverEnrollment: I18n.t('enrolled_as_observer', 'enrolled as a observer'),
     CourseDesignerEnrollment: I18n.t('enrolled_as_designer', 'enrolled as a designer'),
-    StudentEnrollment: I18n.t('enrolled_as_student', 'enrolled as a student'),
-  },
+    StudentEnrollment: I18n.t('enrolled_as_student', 'enrolled as a student')
+  }
 }
 
 // #
 // begin returned function here
 // @param {array} array of enrollments returned from /courses/:course_id/enrollments
 export default data =>
-  _.map(data, (enrollment) => {
+  _.map(data, enrollment => {
     const scope = enrollment.limit_privileges_to_course_section ? 'limited' : 'standard'
 
     // add extra fields to enrollments

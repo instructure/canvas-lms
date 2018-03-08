@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import { string, number, oneOfType, node } from 'prop-types'
+import {string, number, oneOfType, node} from 'prop-types'
 import Tooltip from 'instructure-ui/lib/components/Tooltip'
 
-export default function UnreadBadge ({ unreadCount, totalCount, unreadLabel, totalLabel }) {
+export default function UnreadBadge({unreadCount, totalCount, unreadLabel, totalLabel}) {
   return (
     <span className="ic-unread-badge">
       <Tooltip tip={unreadLabel} variant="inverse">
@@ -37,5 +37,5 @@ UnreadBadge.propTypes = {
   unreadCount: oneOfType([string, number]).isRequired,
   totalCount: oneOfType([string, number]).isRequired,
   unreadLabel: oneOfType([string, node]).isRequired,
-  totalLabel: oneOfType([string, node]).isRequired,
+  totalLabel: oneOfType([string, node]).isRequired
 }

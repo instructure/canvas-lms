@@ -17,29 +17,41 @@
  */
 
 $turnitin_blue: #397af4;
-@if $use_high_contrast { $turnitin_blue: #0d5bed; }
+@if $use_high_contrast {
+  $turnitin_blue: #0d5bed;
+}
 
 $turnitin_green: #009917;
-@if $use_high_contrast { $turnitin_green: #007010; }
+@if $use_high_contrast {
+  $turnitin_green: #007010;
+}
 
 $turnitin_yellow: #897b01;
-@if $use_high_contrast { $turnitin_yellow: #746801; }
+@if $use_high_contrast {
+  $turnitin_yellow: #746801;
+}
 
 $turnitin_orange: #c86604;
-@if $use_high_contrast { $turnitin_orange: #9b5003; }
+@if $use_high_contrast {
+  $turnitin_orange: #9b5003;
+}
 
 $turnitin_red: #ad393a;
-@if $use_high_contrast { $turnitin_red: #a03536; }
+@if $use_high_contrast {
+  $turnitin_red: #a03536;
+}
 
 $turnitin_gray: #808080;
-@if $use_high_contrast { $turnitin_gray: #666666; }
+@if $use_high_contrast {
+  $turnitin_gray: #666666;
+}
 
 .turnitin_score_container_caret {
   position: absolute;
   width: 0;
   height: 0;
   top: 50%;
-  content: "";
+  content: '';
   border-width: 4px;
   border-color: transparent;
   border-style: solid;
@@ -60,7 +72,8 @@ $turnitin_gray: #808080;
   &.failure_score {
     border-right-color: $turnitin_red;
   }
-  &.submission_error, &.submission_pending {
+  &.submission_error,
+  &.submission_pending {
     border-right-color: $turnitin_gray;
   }
 }
@@ -99,7 +112,8 @@ $turnitin_gray: #808080;
   &.failure_score {
     background-color: $turnitin_red;
   }
-  &.submission_error, &.submission_pending {
+  &.submission_error,
+  &.submission_pending {
     background-color: $turnitin_gray;
   }
 }

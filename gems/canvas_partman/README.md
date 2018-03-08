@@ -35,13 +35,12 @@ That's actually all you need to get started. However, you should be aware that d
 
 We'll see how to manage the partition schema in the next section.
 
-
 ### Partition schema management
 
 `canvas-partman` defines a custom migration type you can use to manage the schema of all existing (and to-be-created) partition tables. The migrations work, and read, just like regular ActiveRecord migrations but are run in two different ways depending on the context. Basically:
 
-1. all *partition migrations* are run along with the regular ones when using `rake db:migrate`
-2. all *partition migrations* for a specific master table are run when a new partition of that master table is created (this is handled implicitly by the PartitionManager)
+1. all _partition migrations_ are run along with the regular ones when using `rake db:migrate`
+2. all _partition migrations_ for a specific master table are run when a new partition of that master table is created (this is handled implicitly by the PartitionManager)
 
 Item #2 ensures that all newly-created partitions have a consistent schema with their predecessors which may have been migrated over time into their current schema.
 
@@ -111,7 +110,7 @@ end
 
 A few notes:
 
-- Partition migration files *must* be "scoped" for `canvas-partman` to identify them and pick them up when creating new partitions. A scope is an identifier that comes after the name of the migration file and right before the `rb` extension, prefixed by a dot. In the example above, the scope is `partitions`. You can customize this by overriding `CanvasPartman.migrations_scope = 'my_scope'` but **DO NOT LEAVE IT EMPTY.**
+* Partition migration files _must_ be "scoped" for `canvas-partman` to identify them and pick them up when creating new partitions. A scope is an identifier that comes after the name of the migration file and right before the `rb` extension, prefixed by a dot. In the example above, the scope is `partitions`. You can customize this by overriding `CanvasPartman.migrations_scope = 'my_scope'` but **DO NOT LEAVE IT EMPTY.**
 
 #### Cascading changes
 
@@ -155,7 +154,7 @@ class MigrateVersionsToPartitions < ActiveRecord::Migration
 
     # create tables to hold the existing data
     partman.create_initial_partitions
-    
+
     # then move the data over
     partman.migrate_data_to_partitions
   end
@@ -164,5 +163,5 @@ end
 
 # TODO
 
-- We need to configure postgres's constraint_exclusion to be `partition` - see: http://www.postgresql.org/docs/9.1/static/runtime-config-query.html#GUC-CONSTRAINT-EXCLUSION [**Update**: this is not necessary as it is the default setting]
-- Need to come up with a way to use regular, multiple/successive migrations for partition schemas instead of a single "snapshot" of how the latest version of the schema looks like [**Done** as of 11/15/2014]
+* We need to configure postgres's constraint_exclusion to be `partition` - see: http://www.postgresql.org/docs/9.1/static/runtime-config-query.html#GUC-CONSTRAINT-EXCLUSION [**Update**: this is not necessary as it is the default setting]
+* Need to come up with a way to use regular, multiple/successive migrations for partition schemas instead of a single "snapshot" of how the latest version of the schema looks like [**Done** as of 11/15/2014]

@@ -18,8 +18,8 @@
 
 /* jshint node:true */
 
-var K = require('./constants');
-var config;
+var K = require('./constants')
+var config
 
 /**
  * Extract the r.js config we use in development, which includes paths and maps
@@ -34,21 +34,22 @@ var config;
  *         Object passed to requirejs.config() in that file.
  */
 module.exports = function() {
-  var noConflict = global.requirejs;
+  var noConflict = global.requirejs
 
-  if (config) { // cache
-    return config;
+  if (config) {
+    // cache
+    return config
   }
 
   global.requirejs = {
     config: function(inConfig) {
-      config = inConfig;
+      config = inConfig
     }
-  };
+  }
 
-  K.require('config/requirejs/development');
+  K.require('config/requirejs/development')
 
-  global.requirejs = noConflict;
+  global.requirejs = noConflict
 
-  return config;
-};
+  return config
+}

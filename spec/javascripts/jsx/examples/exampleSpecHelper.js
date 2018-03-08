@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(function () {
+define(function() {
   return {
     text: 'Example Text'
-  };
-});
+  }
+})

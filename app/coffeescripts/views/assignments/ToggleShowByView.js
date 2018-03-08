@@ -42,7 +42,7 @@ export default class ToggleShowByView extends Backbone.View {
   initializeCache() {
     if (this.course.get('id') == null) return
     $.extend(true, this, Cache)
-    if (hasLocalStorage && (ENV.current_user_id != null)) this.cache.use('localStorage')
+    if (hasLocalStorage && ENV.current_user_id != null) this.cache.use('localStorage')
     if (this.cache.get(this.cacheKey()) == null) this.cache.set(this.cacheKey(), true)
     return this.initialized.resolve()
   }
@@ -129,8 +129,7 @@ export default class ToggleShowByView extends Backbone.View {
       >
         <RadioInput id="show_by_date" label={I18n.t('Show by Date')} value="date" context="off" />
         <RadioInput id="show_by_type" label={I18n.t('Show by Type')} value="type" context="off" />
-      </RadioInputGroup>
-      ,
+      </RadioInputGroup>,
       this.el
     )
   }
@@ -139,15 +138,16 @@ export default class ToggleShowByView extends Backbone.View {
     let groups = this.showByDate() ? this.groupedByDate : this.groupedByAG
     this.setAssignmentGroupAssociations(groups)
     groups = _.select(groups, group => {
-      const hasWeight = this.course.get('apply_assignment_group_weights') && group.get('group_weight') > 0
+      const hasWeight =
+        this.course.get('apply_assignment_group_weights') && group.get('group_weight') > 0
       return group.get('assignments').length > 0 || hasWeight
     })
     return this.assignmentGroups.reset(groups)
   }
 
   setAssignmentGroupAssociations(groups) {
-    (groups || []).forEach(assignment_group => {
-      (assignment_group.get('assignments').models || []).forEach(assignment => {
+    ;(groups || []).forEach(assignment_group => {
+      ;(assignment_group.get('assignments').models || []).forEach(assignment => {
         // we are keeping this change on the frontend only (for keyboard nav), will not persist in the db
         assignment.collection = assignment_group
         assignment.set('assignment_group_id', assignment_group.id)
@@ -161,7 +161,13 @@ export default class ToggleShowByView extends Backbone.View {
   }
 
   cacheKey() {
-    return ['course', this.course.get('id'), 'user', ENV.current_user_id, 'assignments_show_by_date']
+    return [
+      'course',
+      this.course.get('id'),
+      'user',
+      ENV.current_user_id,
+      'assignments_show_by_date'
+    ]
   }
 
   toggleShowBy(sort) {

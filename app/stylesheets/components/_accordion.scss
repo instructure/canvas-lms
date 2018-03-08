@@ -93,7 +93,6 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
 // in the jQuery UI accordion styles
 
 .ui-accordion {
-
   .ui-accordion-content {
     padding: 0;
     margin-top: 0;
@@ -118,9 +117,13 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
       border-color: $ic-border-light;
       border-bottom: 1px solid $ic-border-light;
       &.ui-state-focus {
-        a { @include button-focus-light; }
+        a {
+          @include button-focus-light;
+        }
       }
-      &.ui-state-hover { background: $ic-color-neutral; }
+      &.ui-state-hover {
+        background: $ic-color-neutral;
+      }
       &.ui-state-active {
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
@@ -130,7 +133,9 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
         &.ui-state-focus {
           border-color: var(--ic-brand-primary-darkened-10);
           border-bottom: 1px solid var(--ic-brand-primary-darkened-10);
-          a { @include button-focus-dark; }
+          a {
+            @include button-focus-dark;
+          }
         }
       }
     }
@@ -145,7 +150,9 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
       outline: none;
     }
 
-    .ui-icon { left: $ic-sp - 2; }
+    .ui-icon {
+      left: $ic-sp - 2;
+    }
   }
 
   // Style overwrites for "mini accordion", used in Pages sidebar
@@ -157,9 +164,10 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
       a {
         @include fontSize(13px);
         padding: $ic-sp/2 $ic-sp $ic-sp/2 $ic-sp*2;
-
       }
-      .ui-icon { left: $ic-sp/2 - 2; }
+      .ui-icon {
+        left: $ic-sp/2 - 2;
+      }
     }
     .ui-accordion-content {
       &.ui-accordion-content-active {

@@ -18,10 +18,10 @@
 
 import React from 'react'
 import Pagination, {PaginationButton} from '@instructure/ui-core/lib/components/Pagination'
-import { array, func, string, shape } from 'prop-types'
+import {array, func, string, shape} from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 
-export default function SearchMessage({ collection, setPage, noneFoundMessage }) {
+export default function SearchMessage({collection, setPage, noneFoundMessage}) {
   if (!collection || collection.loading) {
     return <div className="text-center pad-box">{I18n.t('Loading...')}</div>
   } else if (collection.error) {
@@ -51,21 +51,28 @@ export default function SearchMessage({ collection, setPage, noneFoundMessage })
         labelNext={I18n.t('Next Page')}
         labelPrev={I18n.t('Previous Page')}
       >
-        {Array.from(Array(Number(lastKnownPage.page))).map((v, i) => {
-          const pageNumber = i + 1
-          return (
-            <PaginationButton
-              key={pageNumber}
-              onClick={() => setPage(pageNumber)}
-              current={pageNumber === Number(collection.links.current.page)}
-            >
-              {I18n.n(pageNumber)}
-            </PaginationButton>
-          )
-        }).concat(pageCountIsUnknown
-          ? <span key="page-count-is-unknown-indicator" aria-hidden>...</span>
-          : []
-        )}
+        {Array.from(Array(Number(lastKnownPage.page)))
+          .map((v, i) => {
+            const pageNumber = i + 1
+            return (
+              <PaginationButton
+                key={pageNumber}
+                onClick={() => setPage(pageNumber)}
+                current={pageNumber === Number(collection.links.current.page)}
+              >
+                {I18n.n(pageNumber)}
+              </PaginationButton>
+            )
+          })
+          .concat(
+            pageCountIsUnknown ? (
+              <span key="page-count-is-unknown-indicator" aria-hidden>
+                ...
+              </span>
+            ) : (
+              []
+            )
+          )}
       </Pagination>
     )
   } else {

@@ -17,7 +17,7 @@
  */
 
 import I18n from 'i18nObj'
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import tz from 'timezone'
 import _ from 'underscore'
@@ -26,15 +26,12 @@ import 'jquery.instructure_date_and_time'
 
 class FriendlyDatetime extends Component {
   static propTypes = {
-    dateTime: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.instanceOf(Date)
-    ]).isRequired,
-    format: PropTypes.string,
+    dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]).isRequired,
+    format: PropTypes.string
   }
 
   static defaultProps = {
-    format: null,
+    format: null
   }
 
   // The original render function is really slow because of all
@@ -44,21 +41,28 @@ class FriendlyDatetime extends Component {
   render = _.memoize(() => {
     let datetime = this.props.dateTime
     if (!datetime) {
-      return (<time />)
+      return <time />
     }
     if (!_.isDate(datetime)) {
       datetime = tz.parse(datetime)
     }
     const fudged = $.fudgeDateForProfileTimezone(datetime)
-    const friendly = this.props.format ? tz.format(datetime, this.props.format) : $.friendlyDatetime(fudged)
+    const friendly = this.props.format
+      ? tz.format(datetime, this.props.format)
+      : $.friendlyDatetime(fudged)
 
     const timeProps = Object.assign({}, this.props, {
       title: $.datetimeString(datetime),
-      dateTime: datetime.toISOString(),
+      dateTime: datetime.toISOString()
     })
 
     return (
-      <time {...timeProps} ref={(c) => { this.time = c }}>
+      <time
+        {...timeProps}
+        ref={c => {
+          this.time = c
+        }}
+      >
         <span className="visible-desktop">
           {/* something like: Mar 6, 2014 */}
           {friendly}

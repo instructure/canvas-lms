@@ -21,41 +21,41 @@ import htmlEscape from '../../str/htmlEscape'
 import {send} from 'jsx/shared/rce/RceCommandShim'
 import '../../media_comments'
 
-  var mediaEditorLoader = {
-    insertCode: function(ed, mediaCommentId, mediaType, title){
-      var $editor = $("#" + ed.id);
-      var linkCode = this.makeLinkHtml(mediaCommentId, mediaType, title)
-      send($editor, 'insert_code', linkCode);
-    },
+var mediaEditorLoader = {
+  insertCode: function(ed, mediaCommentId, mediaType, title) {
+    var $editor = $('#' + ed.id)
+    var linkCode = this.makeLinkHtml(mediaCommentId, mediaType, title)
+    send($editor, 'insert_code', linkCode)
+  },
 
-    makeLinkHtml: function(mediaCommentId, mediaType, title) {
-      return $('<a />')
-                 .attr({href:`/media_objects/${htmlEscape(mediaCommentId)}`})
-                 .addClass('instructure_inline_media_comment')
-                 .addClass(`${htmlEscape(mediaType || 'video')}_comment`)
-                 .attr({id:`media_comment_${htmlEscape(mediaCommentId)}`})
-                 .attr({'data-alt':htmlEscape(title)})
-                 .text('this is a media comment')[0].outerHTML
-    },
+  makeLinkHtml: function(mediaCommentId, mediaType, title) {
+    return $('<a />')
+      .attr({href: `/media_objects/${htmlEscape(mediaCommentId)}`})
+      .addClass('instructure_inline_media_comment')
+      .addClass(`${htmlEscape(mediaType || 'video')}_comment`)
+      .attr({id: `media_comment_${htmlEscape(mediaCommentId)}`})
+      .attr({'data-alt': htmlEscape(title)})
+      .text('this is a media comment')[0].outerHTML
+  },
 
-    getComment: function(ed, mediaCommentId){
-      return $(ed.getBody()).find("#media_comment_"+mediaCommentId+" + br")[0];
-    },
+  getComment: function(ed, mediaCommentId) {
+    return $(ed.getBody()).find('#media_comment_' + mediaCommentId + ' + br')[0]
+  },
 
-    collapseMediaComment: function(ed, mediaCommentId){
-      var commentDiv = this.getComment(ed)
-      ed.selection.select(commentDiv);
-      ed.selection.collapse(true);
-    },
+  collapseMediaComment: function(ed, mediaCommentId) {
+    var commentDiv = this.getComment(ed)
+    ed.selection.select(commentDiv)
+    ed.selection.collapse(true)
+  },
 
-    commentCreatedCallback: function(ed, mediaCommentId, mediaType, title) {
-      this.insertCode(ed, mediaCommentId, mediaType, title)
-      this.collapseMediaComment(ed, mediaCommentId)
-    },
+  commentCreatedCallback: function(ed, mediaCommentId, mediaType, title) {
+    this.insertCode(ed, mediaCommentId, mediaType, title)
+    this.collapseMediaComment(ed, mediaCommentId)
+  },
 
-    insertEditor: function(ed){
-      $.mediaComment('create', 'any', this.commentCreatedCallback.bind(this, ed))
-    }
+  insertEditor: function(ed) {
+    $.mediaComment('create', 'any', this.commentCreatedCallback.bind(this, ed))
   }
+}
 
-export default mediaEditorLoader;
+export default mediaEditorLoader

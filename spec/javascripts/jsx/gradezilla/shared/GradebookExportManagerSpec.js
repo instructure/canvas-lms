@@ -16,263 +16,265 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'moxios',
-  'jsx/gradezilla/shared/GradebookExportManager',
-], (moxios, GradebookExportManager) => {
-  const currentUserId = 42;
-  const exportingUrl = 'http://exportingUrl';
-  const monitoringBase = GradebookExportManager.DEFAULT_MONITORING_BASE_URL;
-  const attachmentBase = `${GradebookExportManager.DEFAULT_ATTACHMENT_BASE_URL}/${currentUserId}/files`;
-  const workingExport = {
-    progressId: 'progressId',
-    attachmentId: 'attachmentId'
-  };
-
-  QUnit.module('GradebookExportManager - constructor', {
-    setup () {
-      moxios.install();
-    },
-
-    teardown () {
-      moxios.uninstall();
+define(
+  ['moxios', 'jsx/gradezilla/shared/GradebookExportManager'],
+  (moxios, GradebookExportManager) => {
+    const currentUserId = 42
+    const exportingUrl = 'http://exportingUrl'
+    const monitoringBase = GradebookExportManager.DEFAULT_MONITORING_BASE_URL
+    const attachmentBase = `${
+      GradebookExportManager.DEFAULT_ATTACHMENT_BASE_URL
+    }/${currentUserId}/files`
+    const workingExport = {
+      progressId: 'progressId',
+      attachmentId: 'attachmentId'
     }
-  });
 
-  test('sets the polling interval with a sensible default', function () {
-    const manager = new GradebookExportManager(exportingUrl, currentUserId, undefined, 5000);
+    QUnit.module('GradebookExportManager - constructor', {
+      setup() {
+        moxios.install()
+      },
 
-    equal(manager.pollingInterval, 5000);
+      teardown() {
+        moxios.uninstall()
+      }
+    })
 
-    const anotherManager = new GradebookExportManager(exportingUrl, currentUserId, workingExport);
+    test('sets the polling interval with a sensible default', function() {
+      const manager = new GradebookExportManager(exportingUrl, currentUserId, undefined, 5000)
 
-    equal(anotherManager.pollingInterval, GradebookExportManager.DEFAULT_POLLING_INTERVAL);
-  });
+      equal(manager.pollingInterval, 5000)
 
-  test('sets the existing export if it is not already completed or failed', function () {
-    ['completed', 'failed'].forEach((workflowState) => {
-      const existingExport = {
-        progressId: workingExport.progressId,
-        attachmentId: workingExport.attachmentId,
-        workflowState
-      };
+      const anotherManager = new GradebookExportManager(exportingUrl, currentUserId, workingExport)
 
-      const manager = new GradebookExportManager(exportingUrl, currentUserId, existingExport);
+      equal(anotherManager.pollingInterval, GradebookExportManager.DEFAULT_POLLING_INTERVAL)
+    })
 
-      deepEqual(manager.export, undefined);
-    });
+    test('sets the existing export if it is not already completed or failed', function() {
+      ;['completed', 'failed'].forEach(workflowState => {
+        const existingExport = {
+          progressId: workingExport.progressId,
+          attachmentId: workingExport.attachmentId,
+          workflowState
+        }
 
-    ['discombobulated', undefined].forEach((workflowState) => {
-      const existingExport = {
-        progressId: workingExport.progressId,
-        attachmentId: workingExport.attachmentId,
-        workflowState
-      };
+        const manager = new GradebookExportManager(exportingUrl, currentUserId, existingExport)
 
-      const manager = new GradebookExportManager(exportingUrl, currentUserId, existingExport);
+        deepEqual(manager.export, undefined)
+      })
 
-      deepEqual(manager.export, existingExport);
-    });
-  });
+      ;['discombobulated', undefined].forEach(workflowState => {
+        const existingExport = {
+          progressId: workingExport.progressId,
+          attachmentId: workingExport.attachmentId,
+          workflowState
+        }
 
-  QUnit.module('GradebookExportManager - monitoringUrl', {
-    setup () {
-      moxios.install();
+        const manager = new GradebookExportManager(exportingUrl, currentUserId, existingExport)
 
-      this.subject = new GradebookExportManager(exportingUrl, currentUserId, workingExport);
-    },
+        deepEqual(manager.export, existingExport)
+      })
+    })
 
-    teardown () {
-      moxios.uninstall();
+    QUnit.module('GradebookExportManager - monitoringUrl', {
+      setup() {
+        moxios.install()
 
-      this.subject = undefined;
-    }
-  });
+        this.subject = new GradebookExportManager(exportingUrl, currentUserId, workingExport)
+      },
 
-  test('returns an appropriate url if all relevant pieces are present', function () {
-    equal(this.subject.monitoringUrl(), `${monitoringBase}/progressId`);
-  });
+      teardown() {
+        moxios.uninstall()
 
-  test('returns undefined if export is missing', function () {
-    this.subject.export = undefined;
+        this.subject = undefined
+      }
+    })
 
-    equal(this.subject.monitoringUrl(), undefined);
-  });
+    test('returns an appropriate url if all relevant pieces are present', function() {
+      equal(this.subject.monitoringUrl(), `${monitoringBase}/progressId`)
+    })
 
-  test('returns undefined if progressId is missing', function () {
-    this.subject.export.progressId = undefined;
+    test('returns undefined if export is missing', function() {
+      this.subject.export = undefined
 
-    equal(this.subject.monitoringUrl(), undefined);
-  });
+      equal(this.subject.monitoringUrl(), undefined)
+    })
 
-  QUnit.module('GradebookExportManager - attachmentUrl', {
-    setup () {
-      moxios.install();
+    test('returns undefined if progressId is missing', function() {
+      this.subject.export.progressId = undefined
 
-      this.subject = new GradebookExportManager(exportingUrl, currentUserId, workingExport);
-    },
+      equal(this.subject.monitoringUrl(), undefined)
+    })
 
-    teardown () {
-      moxios.uninstall();
+    QUnit.module('GradebookExportManager - attachmentUrl', {
+      setup() {
+        moxios.install()
 
-      this.subject = undefined;
-    }
-  });
+        this.subject = new GradebookExportManager(exportingUrl, currentUserId, workingExport)
+      },
 
-  test('returns an appropriate url if all relevant pieces are present', function () {
-    equal(this.subject.attachmentUrl(), `${attachmentBase}/attachmentId`);
-  });
+      teardown() {
+        moxios.uninstall()
 
-  test('returns undefined if export is missing', function () {
-    this.subject.export = undefined;
+        this.subject = undefined
+      }
+    })
 
-    equal(this.subject.attachmentUrl(), undefined);
-  });
+    test('returns an appropriate url if all relevant pieces are present', function() {
+      equal(this.subject.attachmentUrl(), `${attachmentBase}/attachmentId`)
+    })
 
-  test('returns undefined if attachmentId is missing', function () {
-    this.subject.export.attachmentId = undefined;
+    test('returns undefined if export is missing', function() {
+      this.subject.export = undefined
 
-    equal(this.subject.attachmentUrl(), undefined);
-  });
+      equal(this.subject.attachmentUrl(), undefined)
+    })
 
-  QUnit.module('GradebookExportManager - startExport', {
-    setup () {
-      moxios.install();
+    test('returns undefined if attachmentId is missing', function() {
+      this.subject.export.attachmentId = undefined
 
-      const expectedExportFromServer = {
-        progress_id: 'newProgressId',
-        attachment_id: 'newAttachmentId'
-      };
+      equal(this.subject.attachmentUrl(), undefined)
+    })
 
-      // Initial request to start the export
-      moxios.stubRequest(exportingUrl, {
+    QUnit.module('GradebookExportManager - startExport', {
+      setup() {
+        moxios.install()
+
+        const expectedExportFromServer = {
+          progress_id: 'newProgressId',
+          attachment_id: 'newAttachmentId'
+        }
+
+        // Initial request to start the export
+        moxios.stubRequest(exportingUrl, {
+          status: 200,
+          responseText: expectedExportFromServer
+        })
+      },
+
+      teardown() {
+        moxios.uninstall()
+
+        this.subject.clearMonitor()
+        this.subject = undefined
+      }
+    })
+
+    test('returns a rejected promise if the manager has no exportingUrl set', function() {
+      this.subject = new GradebookExportManager(exportingUrl, currentUserId)
+      this.subject.exportingUrl = undefined
+
+      return this.subject.startExport().catch(reason => {
+        equal(reason, 'No way to export gradebooks provided!')
+      })
+    })
+
+    test('returns a rejected promise if the manager already has an export going', function() {
+      this.subject = new GradebookExportManager(exportingUrl, currentUserId, workingExport)
+
+      return this.subject.startExport().catch(reason => {
+        equal(reason, 'An export is already in progress.')
+      })
+    })
+
+    test('sets a new existing export and returns a fulfilled promise', function() {
+      const expectedExport = {
+        progressId: 'newProgressId',
+        attachmentId: 'newAttachmentId'
+      }
+
+      this.subject = new GradebookExportManager(exportingUrl, currentUserId)
+      this.subject.monitorExport = (resolve, _reject) => {
+        resolve('success')
+      }
+
+      return this.subject.startExport().then(() => {
+        deepEqual(this.subject.export, expectedExport)
+      })
+    })
+
+    test('clears any new export and returns a rejected promise if no monitoring is possible', function() {
+      this.stub(GradebookExportManager.prototype, 'monitoringUrl').returns(undefined)
+      this.subject = new GradebookExportManager(exportingUrl, currentUserId)
+
+      return this.subject.startExport().catch(reason => {
+        equal(reason, 'No way to monitor gradebook exports provided!')
+        equal(this.subject.export, undefined)
+      })
+    })
+
+    test('starts polling for progress and returns a rejected promise on progress failure', function(assert) {
+      const done = assert.async()
+      const expectedMonitoringUrl = `${monitoringBase}/newProgressId`
+
+      this.subject = new GradebookExportManager(exportingUrl, currentUserId, null, 1)
+
+      moxios.stubRequest(expectedMonitoringUrl, {
         status: 200,
-        responseText: expectedExportFromServer
-      });
-    },
+        responseText: {
+          workflow_state: 'failed',
+          message: 'Arbitrary failure'
+        }
+      })
 
-    teardown () {
-      moxios.uninstall();
+      return this.subject.startExport().catch(reason => {
+        equal(reason, 'Error exporting gradebook: Arbitrary failure')
+        done()
+      })
+    })
 
-      this.subject.clearMonitor();
-      this.subject = undefined;
-    }
-  });
+    test('starts polling for progress and returns a rejected promise on unknown progress status', function(assert) {
+      const done = assert.async()
+      const expectedMonitoringUrl = `${monitoringBase}/newProgressId`
 
-  test('returns a rejected promise if the manager has no exportingUrl set', function () {
-    this.subject = new GradebookExportManager(exportingUrl, currentUserId);
-    this.subject.exportingUrl = undefined;
+      this.subject = new GradebookExportManager(exportingUrl, currentUserId, null, 1)
 
-    return this.subject.startExport().catch((reason) => {
-      equal(reason, 'No way to export gradebooks provided!');
-    });
-  });
+      moxios.stubRequest(expectedMonitoringUrl, {
+        status: 200,
+        responseText: {
+          workflow_state: 'discombobulated',
+          message: 'Pattern buffer degradation'
+        }
+      })
 
-  test('returns a rejected promise if the manager already has an export going', function () {
-    this.subject = new GradebookExportManager(exportingUrl, currentUserId, workingExport);
+      return this.subject.startExport().catch(reason => {
+        equal(reason, 'Error exporting gradebook: Pattern buffer degradation')
+        done()
+      })
+    })
 
-    return this.subject.startExport().catch((reason) => {
-      equal(reason, 'An export is already in progress.');
-    });
-  });
+    test('starts polling for progress and returns a fulfilled promise on progress completion', function(assert) {
+      const done = assert.async()
+      const expectedMonitoringUrl = `${monitoringBase}/newProgressId`
+      const expectedAttachmentUrl = `${attachmentBase}/newAttachmentId`
 
-  test('sets a new existing export and returns a fulfilled promise', function () {
-    const expectedExport = {
-      progressId: 'newProgressId',
-      attachmentId: 'newAttachmentId'
-    };
+      this.subject = new GradebookExportManager(exportingUrl, currentUserId, null, 1)
 
-    this.subject = new GradebookExportManager(exportingUrl, currentUserId);
-    this.subject.monitorExport = (resolve, _reject) => {
-      resolve('success');
-    };
+      moxios.stubRequest(expectedMonitoringUrl, {
+        status: 200,
+        responseText: {
+          workflow_state: 'completed'
+        }
+      })
 
-    return this.subject.startExport().then(() => {
-      deepEqual(this.subject.export, expectedExport);
-    });
-  });
+      moxios.stubRequest(expectedAttachmentUrl, {
+        status: 200,
+        responseText: {
+          url: 'http://completedAttachmentUrl',
+          updated_at: '2009-01-20T17:00:00Z'
+        }
+      })
 
-  test('clears any new export and returns a rejected promise if no monitoring is possible', function () {
-    this.stub(GradebookExportManager.prototype, 'monitoringUrl').returns(undefined);
-    this.subject = new GradebookExportManager(exportingUrl, currentUserId);
+      return this.subject.startExport().then(resolution => {
+        equal(this.subject.export, undefined)
 
-    return this.subject.startExport().catch((reason) => {
-      equal(reason, 'No way to monitor gradebook exports provided!');
-      equal(this.subject.export, undefined);
-    });
-  });
-
-  test('starts polling for progress and returns a rejected promise on progress failure', function (assert) {
-    const done = assert.async();
-    const expectedMonitoringUrl = `${monitoringBase}/newProgressId`;
-
-    this.subject = new GradebookExportManager(exportingUrl, currentUserId, null, 1);
-
-    moxios.stubRequest(expectedMonitoringUrl, {
-      status: 200,
-      responseText: {
-        workflow_state: 'failed',
-        message: 'Arbitrary failure'
-      }
-    });
-
-    return this.subject.startExport().catch((reason) => {
-      equal(reason, 'Error exporting gradebook: Arbitrary failure');
-      done();
-    });
-  });
-
-  test('starts polling for progress and returns a rejected promise on unknown progress status', function (assert) {
-    const done = assert.async();
-    const expectedMonitoringUrl = `${monitoringBase}/newProgressId`;
-
-    this.subject = new GradebookExportManager(exportingUrl, currentUserId, null, 1);
-
-    moxios.stubRequest(expectedMonitoringUrl, {
-      status: 200,
-      responseText: {
-        workflow_state: 'discombobulated',
-        message: 'Pattern buffer degradation'
-      }
-    });
-
-    return this.subject.startExport().catch((reason) => {
-      equal(reason, 'Error exporting gradebook: Pattern buffer degradation');
-      done();
-    });
-  });
-
-  test('starts polling for progress and returns a fulfilled promise on progress completion', function (assert) {
-    const done = assert.async();
-    const expectedMonitoringUrl = `${monitoringBase}/newProgressId`;
-    const expectedAttachmentUrl = `${attachmentBase}/newAttachmentId`;
-
-    this.subject = new GradebookExportManager(exportingUrl, currentUserId, null, 1);
-
-    moxios.stubRequest(expectedMonitoringUrl, {
-      status: 200,
-      responseText: {
-        workflow_state: 'completed'
-      }
-    });
-
-    moxios.stubRequest(expectedAttachmentUrl, {
-      status: 200,
-      responseText: {
-        url: 'http://completedAttachmentUrl',
-        updated_at: '2009-01-20T17:00:00Z'
-      }
-    });
-
-    return this.subject.startExport().then((resolution) => {
-      equal(this.subject.export, undefined);
-
-      const expectedResolution = {
-        attachmentUrl: 'http://completedAttachmentUrl',
-        updatedAt: '2009-01-20T17:00:00Z'
-      };
-      deepEqual(resolution, expectedResolution);
-      done();
-    });
-  });
-});
+        const expectedResolution = {
+          attachmentUrl: 'http://completedAttachmentUrl',
+          updatedAt: '2009-01-20T17:00:00Z'
+        }
+        deepEqual(resolution, expectedResolution)
+        done()
+      })
+    })
+  }
+)

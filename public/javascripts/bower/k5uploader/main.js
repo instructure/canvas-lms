@@ -1,4 +1,3 @@
 define('k5uploader', ['./lib/k5uploader'], function(K5Uploader) {
-  return K5Uploader;
-});
-
+  return K5Uploader
+})

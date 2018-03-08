@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 #gradebook_uploader_container {
   overflow: scroll;
@@ -39,7 +39,7 @@
       padding: 0;
       outline: default;
       margin: 0;
-      height:28px;
+      height: 28px;
       background: none;
       box-shadow: none !important;
     }
@@ -55,7 +55,7 @@
     }
 
     .slick-header-column:nth-child(even) {
-      border-right-style:dashed;
+      border-right-style: dashed;
     }
 
     .slick-cell {
@@ -65,8 +65,8 @@
   }
 
   .slick-header {
-    background-image:none;
-    border:none;
+    background-image: none;
+    border: none;
   }
 
   .slick-row.even {
@@ -74,16 +74,17 @@
   }
 
   .slick-cell {
-    border-right-style:dashed;
+    border-right-style: dashed;
   }
 
-  .slick-cell.editable, .slick-cell.active {
+  .slick-cell.editable,
+  .slick-cell.active {
     box-shadow: 0 0 5px var(--ic-brand-primary-lightened-10);
     border: 1px solid var(--ic-brand-primary);
   }
 
   .slick-cell:nth-child(odd) {
-    border-right-style:solid;
+    border-right-style: solid;
   }
 
   .slick-header-column {
@@ -96,7 +97,7 @@
     border-left-color: $ic-color-danger;
     border-top-color: $ic-color-danger;
     border-bottom-color: $ic-color-danger;
-    color:$ic-color-danger;
+    color: $ic-color-danger;
     font-weight: bold;
   }
 
@@ -106,8 +107,7 @@
     border-right-color: $ic-color-danger;
     border-top-color: $ic-color-danger;
     border-bottom-color: $ic-color-danger;
-    color:$ic-color-danger;
+    color: $ic-color-danger;
     font-weight: bold;
   }
 }
-

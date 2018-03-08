@@ -15,10 +15,10 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-export default function processItemSelections (data) {
+export default function processItemSelections(data) {
   const newData = {items_to_copy: []}
   const reAssetString = /copy\[([^\]]*)\]$/
-  Object.keys(data || {}).forEach((key) => {
+  Object.keys(data || {}).forEach(key => {
     const value = data[key]
     const matchData = key.match(reAssetString)
     if (matchData) {
@@ -31,7 +31,6 @@ export default function processItemSelections (data) {
     } else {
       newData[key] = value
     }
-
   })
 
   return newData

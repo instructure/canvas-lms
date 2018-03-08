@@ -22,9 +22,9 @@
 
 #### Essay Questions
 
-- Question parametric type: `essay_question`
-- Parameter type: **`Text`**
-- Parameter synopsis: `{ "answer": "Answer text." }`
+* Question parametric type: `essay_question`
+* Parameter type: **`Text`**
+* Parameter synopsis: `{ "answer": "Answer text." }`
 
 **Example request**
 
@@ -53,12 +53,11 @@
   </tbody>
 </table>
 
-
 #### Fill In Multiple Blanks Questions
 
-- Question parametric type: `fill_in_multiple_blanks_question`
-- Parameter type: **`Hash{String => String}`**
-- Parameter synopsis: `{ "answer": { "variable": "Answer string." } }`
+* Question parametric type: `fill_in_multiple_blanks_question`
+* Parameter type: **`Hash{String => String}`**
+* Parameter synopsis: `{ "answer": { "variable": "Answer string." } }`
 
 **Example request**
 
@@ -97,12 +96,11 @@ Given that the question accepts answers to two variables, `color1` and `color2`:
   </tbody>
 </table>
 
-
 #### Fill In The Blank Questions
 
-- Question parametric type: `short_answer_question`
-- Parameter type: **`String`**
-- Parameter synopsis: `{ "answer": "Some sentence." }`
+* Question parametric type: `short_answer_question`
+* Parameter type: **`String`**
+* Parameter synopsis: `{ "answer": "Some sentence." }`
 
 **Example request**
 
@@ -120,9 +118,9 @@ Similar to the errors produced by [Essay Questions](#essay-questions).
 
 #### Formula Questions
 
-- Question parametric type: `calculated_question`
-- Parameter type: **`Decimal`**
-- Parameter synopsis: `{ "answer": decimal }` where `decimal` is either a rational
+* Question parametric type: `calculated_question`
+* Parameter type: **`Decimal`**
+* Parameter synopsis: `{ "answer": decimal }` where `decimal` is either a rational
   number, or a literal version of it (String)
 
 **Example request**
@@ -162,13 +160,11 @@ With a string for a number:
   </tbody>
 </table>
 
-
-
 #### Matching Questions
 
-- Question parametric type: `matching_question`
-- Parameter type: **`Array<Hash>`**
-- Parameter synopsis: `{ "answer": [{ "answer_id": id, "match_id": id }] }` where
+* Question parametric type: `matching_question`
+* Parameter type: **`Array<Hash>`**
+* Parameter synopsis: `{ "answer": [{ "answer_id": id, "match_id": id }] }` where
   the IDs must identify answers and matches accepted by the question.
 
 **Example request**
@@ -190,9 +186,9 @@ with IDs: `[ 10, 11, 12, 13, 14, 15 ]`:
 
 The above request:
 
-  - pairs `answer#6` with `match#10`
-  - pairs `answer#3` with `match#14`
-  - leaves `answer#9` *un-matched*
+* pairs `answer#6` with `match#10`
+* pairs `answer#3` with `match#14`
+* leaves `answer#9` _un-matched_
 
 **Possible errors**
 
@@ -252,22 +248,17 @@ The above request:
       <td>A <code>match_id</code> you supplied does not identify a valid match
       for that question.</td>
     </tr>
+
   </tbody>
 </table>
 
-
-
-
-
-
 <a class="bookmark" id="multiple-choice-questions"></a>
-
 
 #### Multiple Choice Questions
 
-- Question parametric type: `multiple_choice_question`
-- Parameter type: **`Integer`**
-- Parameter synopsis: `{ "answer": answer_id }` where `answer_id` is an ID of
+* Question parametric type: `multiple_choice_question`
+* Parameter type: **`Integer`**
+* Parameter synopsis: `{ "answer": answer_id }` where `answer_id` is an ID of
   one of the question's answers.
 
 **Example request**
@@ -306,9 +297,9 @@ Given an answer with an ID of 5:
 
 #### Multiple Dropdowns Questions
 
-- Question parametric type: `multiple_dropdowns_question`
-- Parameter type: **`Hash{String => Integer}`**
-- Parameter synopsis: `{ "answer": { "variable": answer_id } }` where the keys
+* Question parametric type: `multiple_dropdowns_question`
+* Parameter type: **`Hash{String => Integer}`**
+* Parameter synopsis: `{ "answer": { "variable": answer_id } }` where the keys
   are variables accepted by the question, and their values are IDs of answers
   provided by the question.
 
@@ -353,9 +344,9 @@ ids `[ 3, 6, 9 ]`:
 
 #### Multiple Answers Questions
 
-- Question parametric type: `multiple_answers_question`
-- Parameter type: **`Array<Integer>`**
-- Parameter synopsis: `{ "answer": [ answer_id ] }` where the array items are
+* Question parametric type: `multiple_answers_question`
+* Parameter type: **`Array<Integer>`**
+* Parameter synopsis: `{ "answer": [ answer_id ] }` where the array items are
   IDs of answers accepted by the question.
 
 **Example request**
@@ -397,12 +388,13 @@ want to select the answers `3` and `6`:
       <td>An answer ID you supplied in the selection set does not identify a
         valid answer for that question.</td>
     </tr>
+
   </tbody>
 </table>
 
 #### Numerical Questions
 
-- Question parametric type: `numerical_question`
+* Question parametric type: `numerical_question`
 
 This is similar to [Formula Questions](#formula-questions).
 
@@ -410,6 +402,6 @@ This is similar to [Formula Questions](#formula-questions).
 
 #### True/False Questions
 
-- Question parametric type: `true_false_question`
+* Question parametric type: `true_false_question`
 
 The rest is similar to [Multiple Choice questions](#multiple-choice-questions).

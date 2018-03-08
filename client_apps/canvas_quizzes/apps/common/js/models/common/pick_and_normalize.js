@@ -17,10 +17,10 @@
  */
 
 define(function(require) {
-  var convertCase = require('../../util/convert_case');
-  var _ = require('lodash');
-  var pick = _.pick;
-  var camelize = convertCase.camelize;
+  var convertCase = require('../../util/convert_case')
+  var _ = require('lodash')
+  var pick = _.pick
+  var camelize = convertCase.camelize
 
   /**
    * @method pickAndNormalize
@@ -33,6 +33,6 @@ define(function(require) {
    * @return {Object}
    */
   return function pickAndNormalize(set, keys) {
-    return camelize(pick(set || {}, keys));
-  };
-});
+    return camelize(pick(set || {}, keys))
+  }
+})

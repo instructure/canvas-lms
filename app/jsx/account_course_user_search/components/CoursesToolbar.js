@@ -111,7 +111,7 @@ export default function CoursesToolbar({
                 </GridRow>
               </Grid>
             </GridCol>
-            { can_create_courses && (
+            {can_create_courses && (
               <GridCol width="auto">
                 <NewCourseModal terms={terms}>
                   <Button>
@@ -144,11 +144,8 @@ CoursesToolbar.propTypes = {
 }
 
 CoursesToolbar.defaultProps = {
-  can_create_courses: (
-    window.ENV &&
-    window.ENV.PERMISSIONS &&
-    window.ENV.PERMISSIONS.can_create_courses
-  ),
+  can_create_courses:
+    window.ENV && window.ENV.PERMISSIONS && window.ENV.PERMISSIONS.can_create_courses,
   terms: {
     data: [],
     loading: false

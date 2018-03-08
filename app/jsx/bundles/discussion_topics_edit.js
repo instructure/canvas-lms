@@ -31,12 +31,18 @@ import SectionsAutocomplete from '../shared/SectionsAutocomplete'
 import 'grading_standards'
 
 const lockManager = new LockManager()
-lockManager.init({ itemType: 'discussion_topic', page: 'edit' })
+lockManager.init({itemType: 'discussion_topic', page: 'edit'})
 
 const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
 
-const isAnnouncement = ENV.DISCUSSION_TOPIC.ATTRIBUTES != null ? ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement : undefined
-const model = new (isAnnouncement ? Announcement : DiscussionTopic)(ENV.DISCUSSION_TOPIC.ATTRIBUTES, {parse: true})
+const isAnnouncement =
+  ENV.DISCUSSION_TOPIC.ATTRIBUTES != null
+    ? ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement
+    : undefined
+const model = new (isAnnouncement ? Announcement : DiscussionTopic)(
+  ENV.DISCUSSION_TOPIC.ATTRIBUTES,
+  {parse: true}
+)
 model.urlRoot = ENV.DISCUSSION_TOPIC.URL_ROOT
 const assignment = model.get('assignment')
 
@@ -57,29 +63,36 @@ const view = new EditView({
       availabilityDatesReadonly: !!lockedItems.availability_dates
     })
   },
-  lockedItems: model.id ? lockedItems : {},  // if no id, creating a new discussion
+  lockedItems: model.id ? lockedItems : {}, // if no id, creating a new discussion
   announcementsLocked
 })
 
-if ((contextType === 'courses') && !isAnnouncement && ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT) {
-  const agc = new AssignmentGroupCollection();
-  agc.options.params = {};
-  agc.contextAssetString = ENV.context_asset_string;
-  view.assignmentGroupCollection = agc;
+if (
+  contextType === 'courses' &&
+  !isAnnouncement &&
+  ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT
+) {
+  const agc = new AssignmentGroupCollection()
+  agc.options.params = {}
+  agc.contextAssetString = ENV.context_asset_string
+  view.assignmentGroupCollection = agc
 }
 $(() => {
   view.render().$el.appendTo('#content')
   document.querySelector('#discussion-title').focus()
   const container = document.querySelector('#sections_autocomplete_root')
-  const sectionSpecificAnnouncement = ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement
-                                        && ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED
-                                        && ENV.context_asset_string.startsWith("course")
+  const sectionSpecificAnnouncement =
+    ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement &&
+    ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED &&
+    ENV.context_asset_string.startsWith('course')
   if (container && sectionSpecificAnnouncement) {
     ReactDOM.render(
       <SectionsAutocomplete
         selectedSections={ENV.SELECTED_SECTION_LIST}
-        sections={ENV.SECTION_LIST}/>
-      , container)
+        sections={ENV.SECTION_LIST}
+      />,
+      container
+    )
   }
 })
 

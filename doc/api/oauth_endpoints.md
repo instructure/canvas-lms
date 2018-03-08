@@ -1,14 +1,14 @@
-OAuth2 Endpoints
-================
+# OAuth2 Endpoints
 
 <div class="warning-message"> Developer keys issued after Oct 2015 generate tokens with a 1 hour expiration. Applications must use <a href="file.oauth.html#using-refresh-tokens">refresh tokens</a> to generate new access tokens.</div>
 
-- [GET login/oauth2/auth](#get-login-oauth2-auth)
-- [POST login/oauth2/token](#post-login-oauth2-token)
-- [DELETE login/oauth2/token](#delete-login-oauth2-token)
-- [GET login/session_token](#get-login-session-token)
+* [GET login/oauth2/auth](#get-login-oauth2-auth)
+* [POST login/oauth2/token](#post-login-oauth2-token)
+* [DELETE login/oauth2/token](#delete-login-oauth2-token)
+* [GET login/session_token](#get-login-session-token)
 
 <a name="get-login-oauth2-auth"></a>
+
 ## GET login/oauth2/auth
 
 <div class="method_details">
@@ -45,6 +45,7 @@ that domain.
 For native applications, currently the only supported value is
 <code>urn:ietf:wg:oauth:2.0:oob</code>, signifying that the credentials will be
 retrieved out-of-band using an embedded browser or other functionality.
+
 </td>
     </tr>
     <tr>
@@ -90,10 +91,10 @@ wrong person in, as <a href="http://homakov.blogspot.com/2012/07/saferweb-most-c
 
 </div>
 
-
-
 <a name="post-login-oauth2-token"></a>
+
 ## POST login/oauth2/token
+
 <div class="method_details">
 
 See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a> of the OAuth2 RFC for more information about this process.
@@ -136,10 +137,9 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
     </tbody>
   </table>
 
-
   <h4>Example responses</h4>
 
-  When using grant_type=code:
+When using grant_type=code:
 
   <pre class="example_code">
   {
@@ -151,8 +151,8 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
   }
   </pre>
 
-  When using grant_type=refresh_token, the response will not contain a new
-  refresh token since the same refresh token can be used multiple times:
+When using grant_type=refresh_token, the response will not contain a new
+refresh token since the same refresh token can be used multiple times:
 
   <pre class="example_code">
   {
@@ -163,10 +163,10 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
   }
   </pre>
 
-  If scope=auth/userinfo was specified in the
-  <a href=oauth_endpoints.html#get-login-oauth2-auth>GET login/oauth2/auth</a> request
-  then the response that results from
-  <a href=oauth_endpoints.html#post-login-oauth2-token>POST login/oauth2/token</a> would be:
+If scope=auth/userinfo was specified in the
+<a href=oauth_endpoints.html#get-login-oauth2-auth>GET login/oauth2/auth</a> request
+then the response that results from
+<a href=oauth_endpoints.html#post-login-oauth2-token>POST login/oauth2/token</a> would be:
 
   <pre class="example_code">
   {
@@ -209,16 +209,16 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
 </div>
 
 <a name="delete-login-oauth2-token"></a>
-## DELETE login/oauth2/token
 
+## DELETE login/oauth2/token
 
 <div class="method_details">
 
-  If your application supports logout functionality, you can revoke your own
-  access token. This is useful for security reasons, as well as removing your
-  application from the list of tokens on the user's profile page. Simply make
-  an authenticated request to the following endpoint by including an Authorization
-  header or providing the access_token as a request parameter.
+If your application supports logout functionality, you can revoke your own
+access token. This is useful for security reasons, as well as removing your
+application from the list of tokens on the user's profile page. Simply make
+an authenticated request to the following endpoint by including an Authorization
+header or providing the access_token as a request parameter.
 
   <h3 class="endpoint">DELETE /login/oauth2/token</h3>
 
@@ -241,15 +241,15 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
 </div>
 
 <a name="get-login-session-token"></a>
-## GET login/session_token
 
+## GET login/session_token
 
 <div class="method_details">
 
-  If your application needs to begin a normal web session in order to access
-  features not supported via API (such as quiz taking), you can use your API
-  access token in order to get a time-limited URL that can be fed to a
-  browser or web view to begin a new web session.
+If your application needs to begin a normal web session in order to access
+features not supported via API (such as quiz taking), you can use your API
+access token in order to get a time-limited URL that can be fed to a
+browser or web view to begin a new web session.
 
   <h3 class="endpoint">GET /login/session_token</h3>
 
@@ -269,7 +269,6 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
     </tbody>
   </table>
 
-
   <h4>Example responses</h4>
 
   <pre class="example_code">
@@ -277,4 +276,5 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
     "session_url": "https://canvas.instructure.com/opaque_url"
   }
   </pre>
+
 </div>

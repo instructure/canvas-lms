@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createActions } from 'redux-actions';
-import axios from 'axios';
-import parseLinkHeader from 'parse-link-header';
+import {createActions} from 'redux-actions'
+import axios from 'axios'
+import parseLinkHeader from 'parse-link-header'
 
 export const {
   itemsLoading,
@@ -36,71 +36,87 @@ export const {
   'ITEM_SAVED',
   'ITEM_SAVING_FAILED',
   'ALL_ITEMS_LOADED'
-);
+)
 
-export const loadNextItems = () => (
-  (dispatch, getState) => {
-    if (!getState().loaded && getState().nextUrl) {
-      dispatch(itemsLoading());
-      axios.get(getState().nextUrl, { params: {
-        order: 'asc'
-      }}).then((response) => {
+export const loadNextItems = () => (dispatch, getState) => {
+  if (!getState().loaded && getState().nextUrl) {
+    dispatch(itemsLoading())
+    axios
+      .get(getState().nextUrl, {
+        params: {
+          order: 'asc'
+        }
+      })
+      .then(response => {
         if (parseLinkHeader(response.headers.link).next) {
-          dispatch(itemsLoaded({ items: response.data, nextUrl: parseLinkHeader(response.headers.link).next.url }));
-          dispatch(loadNextItems());
+          dispatch(
+            itemsLoaded({
+              items: response.data,
+              nextUrl: parseLinkHeader(response.headers.link).next.url
+            })
+          )
+          dispatch(loadNextItems())
         } else {
           dispatch(allItemsLoaded())
-          dispatch(itemsLoaded({ items: response.data, nextUrl: null }));
+          dispatch(itemsLoaded({items: response.data, nextUrl: null}))
         }
-      }).catch(response => dispatch(itemsLoadingFailed(response)));
-    }
+      })
+      .catch(response => dispatch(itemsLoadingFailed(response)))
   }
-);
+}
 
-export const loadInitialItems = currentMoment => (
-  (dispatch) => {
-    dispatch(itemsLoading());
-    const firstMomentDate = currentMoment.clone().subtract(2, 'weeks');
-    const lastMomentDate = currentMoment.clone().add(2, 'weeks');
-    axios.get('/api/v1/planner/items', { params: {
-      start_date: firstMomentDate.format(),
-      end_date: lastMomentDate.format(),
-      order: 'asc'
-    }}).then((response) => {
-      if (parseLinkHeader(response.headers.link).next) {
-        dispatch(itemsLoaded({ items: response.data, nextUrl: parseLinkHeader(response.headers.link).next.url }));
-        dispatch(loadNextItems());
-      } else {
-        dispatch(itemsLoaded({ items: response.data, nextUrl: null }));
+export const loadInitialItems = currentMoment => dispatch => {
+  dispatch(itemsLoading())
+  const firstMomentDate = currentMoment.clone().subtract(2, 'weeks')
+  const lastMomentDate = currentMoment.clone().add(2, 'weeks')
+  axios
+    .get('/api/v1/planner/items', {
+      params: {
+        start_date: firstMomentDate.format(),
+        end_date: lastMomentDate.format(),
+        order: 'asc'
       }
-    }).catch(response => dispatch(itemsLoadingFailed(response)));
-  }
-);
+    })
+    .then(response => {
+      if (parseLinkHeader(response.headers.link).next) {
+        dispatch(
+          itemsLoaded({
+            items: response.data,
+            nextUrl: parseLinkHeader(response.headers.link).next.url
+          })
+        )
+        dispatch(loadNextItems())
+      } else {
+        dispatch(itemsLoaded({items: response.data, nextUrl: null}))
+      }
+    })
+    .catch(response => dispatch(itemsLoadingFailed(response)))
+}
 
-export const completeItem = (itemType, itemId) => (
-  (dispatch, getState) => {
-    dispatch(itemSaving());
+export const completeItem = (itemType, itemId) => (dispatch, getState) => {
+  dispatch(itemSaving())
 
-    const itemToUpdate = getState().items.find(item => (
-      item.plannable_id === itemId &&
-      item.plannable_type === itemType
-    ));
-    if (itemToUpdate.planner_override) {
+  const itemToUpdate = getState().items.find(
+    item => item.plannable_id === itemId && item.plannable_type === itemType
+  )
+  if (itemToUpdate.planner_override) {
+    const plannerOverride = itemToUpdate.planner_override
+    plannerOverride.marked_complete = true
 
-      const plannerOverride = itemToUpdate.planner_override;
-      plannerOverride.marked_complete = true;
-
-      axios.put(`/api/v1/planner/overrides/${plannerOverride.id}`, {
+    axios
+      .put(`/api/v1/planner/overrides/${plannerOverride.id}`, {
         ...plannerOverride
-      }).then(response => dispatch(itemSaved(response.data)))
-        .catch(response => dispatch(itemSavingFailed(response)));
-    } else {
-      axios.post('/api/v1/planner/overrides', {
+      })
+      .then(response => dispatch(itemSaved(response.data)))
+      .catch(response => dispatch(itemSavingFailed(response)))
+  } else {
+    axios
+      .post('/api/v1/planner/overrides', {
         marked_complete: true,
         plannable_type: itemToUpdate.plannable_type,
         plannable_id: itemToUpdate.plannable_id
-      }).then(response => dispatch(itemSaved(response.data)))
-        .catch(response => dispatch(itemSavingFailed(response)));
-    }
+      })
+      .then(response => dispatch(itemSaved(response.data)))
+      .catch(response => dispatch(itemSavingFailed(response)))
   }
-)
+}

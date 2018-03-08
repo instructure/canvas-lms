@@ -6,11 +6,13 @@ const testWebpackConfig = require('./frontend_build/baseWebpackConfig')
 
 testWebpackConfig.entry = undefined
 
-testWebpackConfig.plugins.push(new webpack.EnvironmentPlugin({
-  JSPEC_PATH: null,
-  JSPEC_GROUP: null,
-  A11Y_REPORT: false
-}))
+testWebpackConfig.plugins.push(
+  new webpack.EnvironmentPlugin({
+    JSPEC_PATH: null,
+    JSPEC_GROUP: null,
+    A11Y_REPORT: false
+  })
+)
 
 // These externals are necessary for Enzyme
 // See http://airbnb.io/enzyme/docs/guides/webpack.html
@@ -37,9 +39,7 @@ testWebpackConfig.module.rules.unshift({
   // These imports loaders make it so they are avalable as local variables
   // inside of a closure, without truly making them globals.
   // We should get rid of this and just change our actual source to s/test/qunit.test/ and s/module/qunit.module/
-  loaders: [
-    'imports-loader?test=>QUnit.test',
-  ]
+  loaders: ['imports-loader?test=>QUnit.test']
 })
 
 module.exports = testWebpackConfig

@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/_environment.scss";
-@import "components/conditional_release";
+@import 'base/_environment.scss';
+@import 'components/conditional_release';
 
 .removeAttachment {
   @include fontSize(20px);

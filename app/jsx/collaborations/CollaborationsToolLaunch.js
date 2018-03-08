@@ -23,7 +23,7 @@ import iframeAllowances from '../external_apps/lib/iframeAllowances'
 let main
 
 class CollaborationsToolLaunch extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       height: 500,
@@ -38,28 +38,28 @@ class CollaborationsToolLaunch extends React.Component {
     this.setHeight = this.setHeight.bind(this)
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.setHeight()
     window.addEventListener('resize', this.setHeight)
 
     if (this.iframe) {
-      this.iframe.setAttribute('allow', iframeAllowances());
+      this.iframe.setAttribute('allow', iframeAllowances())
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.removeEventListener('resize', this.setHeight)
   }
 
-  setHeight () {
+  setHeight() {
     this.setState({
       height: main.getBoundingClientRect().height - 48
     })
   }
 
-  handleAlertFocus (event) {
+  handleAlertFocus(event) {
     const newState = {
-      iframeStyle: { border: '2px solid #008EE2', width: `${(this.iframe.offsetWidth - 4)}px` }
+      iframeStyle: {border: '2px solid #008EE2', width: `${this.iframe.offsetWidth - 4}px`}
     }
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = ''
@@ -69,9 +69,9 @@ class CollaborationsToolLaunch extends React.Component {
     this.setState(newState)
   }
 
-  handleAlertBlur (event) {
+  handleAlertBlur(event) {
     const newState = {
-      iframeStyle: { border: 'none', width: '100%' }
+      iframeStyle: {border: 'none', width: '100%'}
     }
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = 'screenreader-only'
@@ -81,9 +81,13 @@ class CollaborationsToolLaunch extends React.Component {
     this.setState(newState)
   }
 
-  render () {
-    const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`
-    const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
+  render() {
+    const beforeAlertStyles = `before_external_content_info_alert ${
+      this.state.beforeExternalContentAlertClass
+    }`
+    const afterAlertStyles = `after_external_content_info_alert ${
+      this.state.afterExternalContentAlertClass
+    }`
 
     return (
       <div className="CollaborationsToolLaunch" style={{height: this.state.height}}>
@@ -104,7 +108,9 @@ class CollaborationsToolLaunch extends React.Component {
           className="tool_launch"
           src={this.props.launchUrl}
           style={this.state.iframeStyle}
-          ref={(e) => { this.iframe = e; }}
+          ref={e => {
+            this.iframe = e
+          }}
         />
         <div
           onFocus={this.handleAlertFocus}

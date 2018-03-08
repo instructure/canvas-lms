@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "../blocks/event_stream";
-@import "../blocks/question_anchors";
-@import "./ic_quiz_inspector/question_inspector";
-@import "./ic_quiz_inspector/question_listing";
-@import "./ic_quiz_inspector/session";
-@import "./ic_quiz_inspector/answer_matrix";
+@import '../blocks/event_stream';
+@import '../blocks/question_anchors';
+@import './ic_quiz_inspector/question_inspector';
+@import './ic_quiz_inspector/question_listing';
+@import './ic_quiz_inspector/session';
+@import './ic_quiz_inspector/answer_matrix';
 
 #ic-QuizInspector {
   padding: $whitespace;
@@ -48,7 +48,7 @@
     margin: 0 $whitespace 0 0;
     font-size: inherit;
 
-    input[type="checkbox"] {
+    input[type='checkbox'] {
       margin-top: -1px;
       margin-right: $whitespace / 3;
     }

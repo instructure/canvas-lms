@@ -18,7 +18,7 @@
  */
 
 define(function(require) {
-  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps')
 
   /**
    * @class Components.ScreenReaderContent
@@ -49,18 +49,18 @@ define(function(require) {
       return {
         tagName: 'span',
         forceSentenceDelimiter: false
-      };
+      }
     },
 
     render: function() {
-      var tag = React.DOM[this.props.tagName];
-      var tagProps = {};
-      var customChildren = [];
+      var tag = React.DOM[this.props.tagName]
+      var tagProps = {}
+      var customChildren = []
 
-      tagProps.className = "screenreader-only";
+      tagProps.className = 'screenreader-only'
 
       if (this.props.forceSentenceDelimiter) {
-        customChildren.push(this.generateSentenceDelimiter());
+        customChildren.push(this.generateSentenceDelimiter())
       }
 
       if (customChildren.length) {
@@ -89,28 +89,22 @@ define(function(require) {
             'further accessibility enhancements.',
 
             'Try setting that property on a passed child instead.'
-          );
+          )
         } else {
-          tagProps.children = [ this.props.children, customChildren ];
+          tagProps.children = [this.props.children, customChildren]
         }
-      }
-      else { // no custom children, pass children as-is:
-        tagProps.children = this.props.children;
+      } else {
+        // no custom children, pass children as-is:
+        tagProps.children = this.props.children
       }
 
-      return this.transferPropsTo(tag(tagProps, tagProps.children));
+      return this.transferPropsTo(tag(tagProps, tagProps.children))
     },
 
     generateSentenceDelimiter: function() {
-      return (
-        <em
-          role="presentation"
-          aria-role="presentation"
-          aria-hidden
-          children=". " />
-      );
+      return <em role="presentation" aria-role="presentation" aria-hidden children=". " />
     }
-  });
+  })
 
-  return ScreenReaderContent;
-});
+  return ScreenReaderContent
+})

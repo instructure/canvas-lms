@@ -42,7 +42,7 @@ import DiscussionTopicKeyboardShortcutModal from '../discussion_topics/Discussio
 import '../context_cards/StudentContextCardTrigger'
 
 const lockManager = new LockManager()
-lockManager.init({ itemType: 'discussion_topic', page: 'show' })
+lockManager.init({itemType: 'discussion_topic', page: 'show'})
 
 const descendants = 5
 const children = 10
@@ -50,9 +50,9 @@ const children = 10
 // create the objects ...
 const router = new Backbone.Router()
 
-const data = ENV.DISCUSSION.THREADED ?
-  new MaterializedDiscussionTopic({root_url: ENV.DISCUSSION.ROOT_URL}) :
-  new SideCommentDiscussionTopic({root_url: ENV.DISCUSSION.ROOT_URL})
+const data = ENV.DISCUSSION.THREADED
+  ? new MaterializedDiscussionTopic({root_url: ENV.DISCUSSION.ROOT_URL})
+  : new SideCommentDiscussionTopic({root_url: ENV.DISCUSSION.ROOT_URL})
 
 const entries = new EntryCollection(null)
 
@@ -67,13 +67,15 @@ ReactDOM.render(
 
 // Rendering of the section tooltip
 const container = document.querySelector('#section_tooltip_root')
-const sectionSpecificAnnouncement = ENV.DISCUSSION.TOPIC.IS_ANNOUNCEMENT
-                                    && (ENV.TOTAL_USER_COUNT || ENV.DISCUSSION.TOPIC.COURSE_SECTIONS)
+const sectionSpecificAnnouncement =
+  ENV.DISCUSSION.TOPIC.IS_ANNOUNCEMENT &&
+  (ENV.TOTAL_USER_COUNT || ENV.DISCUSSION.TOPIC.COURSE_SECTIONS)
 if (container && sectionSpecificAnnouncement) {
   ReactDOM.render(
     <SectionsTooltip
       totalUserCount={ENV.TOTAL_USER_COUNT}
-      sections={ENV.DISCUSSION.TOPIC.COURSE_SECTIONS}/>,
+      sections={ENV.DISCUSSION.TOPIC.COURSE_SECTIONS}
+    />,
     container
   )
 }
@@ -107,7 +109,7 @@ const filterView = new DiscussionFilterResultsView({
 const $container = $(window)
 const $subentries = $('#discussion_subentries')
 
-function scrollToTop () {
+function scrollToTop() {
   $container.scrollTo($subentries, {offset: -49})
 }
 
@@ -120,13 +122,13 @@ data.on('change', () => {
 
 // define function that syncs a discussion entry's
 // read state back to the materialized view data.
-function updateMaterializedViewReadState (id, read_state) {
+function updateMaterializedViewReadState(id, read_state) {
   const e = data.flattened[id]
   if (e) e.read_state = read_state
 }
 
 // propagate mark all read/unread changes to all views
-function setAllReadStateAllViews (newReadState) {
+function setAllReadStateAllViews(newReadState) {
   entries.setAllReadState(newReadState)
   EntryView.setAllReadState(newReadState)
   return filterView.setAllReadState(newReadState)
@@ -161,13 +163,9 @@ filterView.on('readStateChanged', (id, read_state) =>
   updateMaterializedViewReadState(id, read_state)
 )
 
-filterView.on('clickEntry', entry =>
-  router.navigate(`entry-${entry.get('id')}`, true)
-)
+filterView.on('clickEntry', entry => router.navigate(`entry-${entry.get('id')}`, true))
 
-toolbarView.on('showDeleted', show =>
-  entriesView.showDeleted(show)
-)
+toolbarView.on('showDeleted', show => entriesView.showDeleted(show))
 
 toolbarView.on('expandAll', () => {
   EntryView.expandRootEntries()
@@ -198,24 +196,24 @@ filterModel.on('reset', () => EntryView.expandRootEntries())
 const canReadReplies = () => ENV.DISCUSSION.PERMISSIONS.CAN_READ_REPLIES
 
 // routes
-router.route('topic', 'topic', function () {
+router.route('topic', 'topic', function() {
   $container.scrollTop($('#discussion_topic'))
-  setTimeout(function () {
+  setTimeout(function() {
     $('#discussion_topic .author').focus()
     $container.one('scroll', () => router.navigate(''))
   }, 10)
 })
 router.route('entry-:id', 'id', entriesView.goToEntry)
-router.route('page-:page', 'page', function (page) {
+router.route('page-:page', 'page', function(page) {
   entriesView.render(page)
   // TODO: can get a little bouncy when the page isn't as tall as the previous
   scrollToTop()
 })
 
-function initEntries (initialEntry) {
+function initEntries(initialEntry) {
   if (canReadReplies()) {
     data.fetch({
-      success () {
+      success() {
         entriesView.render()
         Backbone.history.start({
           pushState: true,
@@ -223,7 +221,9 @@ function initEntries (initialEntry) {
         })
         if (initialEntry) {
           const fetchedModel = entries.get(initialEntry.id)
-          if (fetchedModel) { entries.remove(fetchedModel) }
+          if (fetchedModel) {
+            entries.remove(fetchedModel)
+          }
           entries.add(initialEntry)
           entriesView.render()
           router.navigate(`entry-${initialEntry.get('id')}`, true)
@@ -231,7 +231,7 @@ function initEntries (initialEntry) {
       }
     })
 
-    topicView.on('addReply', (entry) => {
+    topicView.on('addReply', entry => {
       entries.add(entry)
       router.navigate(`entry-${entry.get('id')}`, true)
     })
@@ -256,7 +256,7 @@ if (ENV.DISCUSSION.SEQUENCE != null) {
 
 // Get the party started
 if (ENV.DISCUSSION.INITIAL_POST_REQUIRED) {
-  const once = (entry) => {
+  const once = entry => {
     initEntries(entry)
     topicView.off('addReply', once)
   }

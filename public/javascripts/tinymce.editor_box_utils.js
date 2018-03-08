@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * A collection of functions that extract business logic
  * from the sphaghetti that is tinymce.editor_box.js
@@ -32,7 +31,6 @@
  * @exports
  */
 
-
 /**
  * transforms an input url to make a link out of
  * into a correctly formed url.  If it's clearly a mailing link,
@@ -43,7 +41,7 @@
  *
  * @returns {string} a well formed url
  */
-export function cleanUrl (input) {
+export function cleanUrl(input) {
   let url = input
   if (url.includes('@') && !url.includes('/') && !input.startsWith('mailto:')) {
     url = `mailto:${input}`

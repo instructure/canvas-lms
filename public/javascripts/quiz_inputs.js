@@ -17,36 +17,38 @@
  */
 
 import $ from 'jquery'
-  var inputMethods = {
-    disableInputs: function(inputs) {
-      var $body       = $('body'),
-          $inputCover = $('<div />', { 'class': 'input_cover' });
+var inputMethods = {
+  disableInputs: function(inputs) {
+    var $body = $('body'),
+      $inputCover = $('<div />', {class: 'input_cover'})
 
-      $inputCover.on('mouseleave', function(e) { $(this).remove(); });
+    $inputCover.on('mouseleave', function(e) {
+      $(this).remove()
+    })
 
-      $(inputs).on('mouseenter', function(e) {
-        var $el    = $(this),
-            $cover = $inputCover.clone(true);
+    $(inputs).on('mouseenter', function(e) {
+      var $el = $(this),
+        $cover = $inputCover.clone(true)
 
-        $cover.css({
-          height   : $el.height() + 12,
-          width    : $el.width() + 12,
-          position : 'absolute',
-          left     : $el.offset().left - 6,
-          top      : $el.offset().top - 6,
-          zIndex   : 15,
-          background: 'url(/images/blank.png) 0 0 repeat'
-        });
+      $cover.css({
+        height: $el.height() + 12,
+        width: $el.width() + 12,
+        position: 'absolute',
+        left: $el.offset().left - 6,
+        top: $el.offset().top - 6,
+        zIndex: 15,
+        background: 'url(/images/blank.png) 0 0 repeat'
+      })
 
-        $body.append($cover);
-      });
-    },
+      $body.append($cover)
+    })
+  },
 
-    setWidths: function(selector) {
-      $(selector || '.answer input[type=text]').each(function() {
-        $(this).width( $(this).val().length * 9.5 );
-      });
-    }
-  };
+  setWidths: function(selector) {
+    $(selector || '.answer input[type=text]').each(function() {
+      $(this).width($(this).val().length * 9.5)
+    })
+  }
+}
 
-export default inputMethods;
+export default inputMethods

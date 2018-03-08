@@ -16,33 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
+import React from 'react'
 import I18n from 'i18n!dashboard'
-import DashboardOptionsMenu from '../dashboard_card/DashboardOptionsMenu';
-import { bool } from 'prop-types';
+import DashboardOptionsMenu from '../dashboard_card/DashboardOptionsMenu'
+import {bool} from 'prop-types'
 
 /**
  * This component renders the header for the user dashboard.
  */
 class DashboardHeader extends React.Component {
+  constructor(props) {
+    super(props)
 
-  constructor (props) {
-    super(props);
-
-    let currentDashboard;
+    let currentDashboard
 
     if (props.show_planner) {
-      currentDashboard = 'planner';
+      currentDashboard = 'planner'
     } else if (props.show_recent_activity) {
-      currentDashboard = 'activity';
+      currentDashboard = 'activity'
     } else {
-      currentDashboard = 'cards';
+      currentDashboard = 'cards'
     }
 
-    this.state = { currentDashboard };
+    this.state = {currentDashboard}
   }
 
-  render () {
+  render() {
     return (
       <div className="ic-Dashboard-header__layout">
         <h1 className="ic-Dashboard-header__title">{I18n.t('Dashboard')}</h1>
@@ -51,7 +50,7 @@ class DashboardHeader extends React.Component {
             <div
               id="dashboard-planner-header"
               className="CanvasPlanner__HeaderContainer"
-              style={{ display: (this.props.planner_selected) ? 'block' : 'none' }}
+              style={{display: this.props.planner_selected ? 'block' : 'none'}}
             />
           )}
           <div id="DashboardOptionsMenu_Container">
@@ -60,20 +59,20 @@ class DashboardHeader extends React.Component {
               hide_dashcard_color_overlays={this.props.hide_dashcard_color_overlays}
               planner_enabled={this.props.planner_enabled}
               planner_selected={this.props.planner_selected}
-              onDashboardChange={(newDashboard) => {
-                this.setState({ currentDashboard: newDashboard }, function afterDashboardChange () {
+              onDashboardChange={newDashboard => {
+                this.setState({currentDashboard: newDashboard}, function afterDashboardChange() {
                   if (this.state.currentDashboard === 'planner') {
-                    document.body.classList.add('dashboard-is-planner');
+                    document.body.classList.add('dashboard-is-planner')
                   } else if (document.body.classList.contains('dashboard-is-planner')) {
-                    document.body.classList.remove('dashboard-is-planner');
+                    document.body.classList.remove('dashboard-is-planner')
                   }
-                });
+                })
               }}
             />
           </div>
         </div>
       </div>
-    );
+    )
   }
 }
 
@@ -89,4 +88,4 @@ DashboardHeader.defaultProps = {
   hide_dashcard_color_overlays: false
 }
 
-export default DashboardHeader;
+export default DashboardHeader

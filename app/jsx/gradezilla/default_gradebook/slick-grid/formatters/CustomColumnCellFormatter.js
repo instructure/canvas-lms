@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import htmlEscape from 'str/htmlEscape';
+import htmlEscape from 'str/htmlEscape'
 
 export default class CustomColumnCellFormatter {
-  render (_row, _cell, content /* value */, _columnDef, _dataContext) {
-    return (content == null) ? '' : htmlEscape(content);
+  render(_row, _cell, content /* value */, _columnDef, _dataContext) {
+    return content == null ? '' : htmlEscape(content)
   }
 }

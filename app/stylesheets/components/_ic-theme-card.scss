@@ -56,7 +56,6 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
       opacity: 1;
     }
   }
-
 }
 
 .ic-ThemeCard-thumbnail__primary-content {
@@ -71,9 +70,11 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
 }
 
 .ic-ThemeCard-thumbnail__nav {
-  height: 100%; width: $ic-sp*3;
+  height: 100%;
+  width: $ic-sp*3;
   position: absolute;
-  top: 0; left: 0;
+  top: 0;
+  left: 0;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -87,7 +88,8 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
   justify-content: center;
   svg {
     display: block;
-    width: 16px; height: 16px;
+    width: 16px;
+    height: 16px;
   }
 }
 
@@ -102,33 +104,27 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
   position: relative;
   height: 38px;
   width: 100%;
-  box-shadow:
-    inset 0 2px 0 $ic-border-light,
-    inset 0 6px 0 $ic-color-light,
-    inset 0 8px 0 $ic-border-light,
-    inset 0 12px 0 $ic-color-light,
-    inset 0 14px 0 $ic-border-light,
-    inset 0 18px 0 $ic-color-light,
-    inset 0 20px 0 $ic-border-light,
-    inset 0 24px 0 $ic-color-light,
-    inset 0 26px 0 $ic-border-light,
-    inset 0 30px 0 $ic-color-light,
-    inset 0 32px 0 $ic-border-light,
-    inset 0 36px 0 $ic-color-light,
-    inset 0 38px 0 $ic-border-light;
+  box-shadow: inset 0 2px 0 $ic-border-light, inset 0 6px 0 $ic-color-light,
+    inset 0 8px 0 $ic-border-light, inset 0 12px 0 $ic-color-light, inset 0 14px 0 $ic-border-light,
+    inset 0 18px 0 $ic-color-light, inset 0 20px 0 $ic-border-light, inset 0 24px 0 $ic-color-light,
+    inset 0 26px 0 $ic-border-light, inset 0 30px 0 $ic-color-light, inset 0 32px 0 $ic-border-light,
+    inset 0 36px 0 $ic-color-light, inset 0 38px 0 $ic-border-light;
   margin-bottom: 10px;
   &:after {
-    content: "";
-    height: 3px; width: 34%;
+    content: '';
+    height: 3px;
+    width: 34%;
     background: $ic-color-light;
     position: absolute;
-    bottom: 0; right: 0;
+    bottom: 0;
+    right: 0;
   }
 }
 
 .ic-ThemeCard-fake-button {
   box-sizing: border-box;
-  width: 100%; height: 14px;
+  width: 100%;
+  height: 14px;
   border: 1px solid rgba(black, 0.18);
   border-radius: $baseBorderRadius;
   margin-bottom: $ic-sp/2;
@@ -136,8 +132,10 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
 
 .ic-ThemeCard-fake-progressbar {
   box-sizing: border-box;
-  width: 100%; height: 10px;
-  border-width: 1px; border-style: solid;
+  width: 100%;
+  height: 10px;
+  border-width: 1px;
+  border-style: solid;
   border-radius: $baseBorderRadius;
   position: relative;
   margin-bottom: $ic-sp;
@@ -145,24 +143,29 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
 
 .ic-ThemeCard-fake-progressbar__inner {
   position: absolute;
-  top: 0; left: 0;
-  width: 66%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 66%;
+  height: 100%;
   border-top-left-radius: $baseBorderRadius - 1;
   border-bottom-left-radius: $baseBorderRadius - 1;
 }
 
 .ic-ThemeCard-fake-radio {
-  width: 100%; height: 14px;
+  width: 100%;
+  height: 14px;
   position: relative;
   box-sizing: border-box;
   margin-bottom: 8px;
   &:after {
-    content: "";
+    content: '';
     box-sizing: border-box;
     position: absolute;
-    right: 0; top: 50%;
+    right: 0;
+    top: 50%;
     margin-top: -1px;
-    height: 2px; width: calc(100% - 24px);
+    height: 2px;
+    width: calc(100% - 24px);
     background: $ic-border-light;
   }
 }
@@ -170,22 +173,27 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
 .ic-ThemeCard-fake-radio__inner {
   box-sizing: border-box;
   border-radius: 100%;
-  width: 14px; height: 14px;
+  width: 14px;
+  height: 14px;
   box-shadow: inset 0 0 0 2px $ic-color-light;
-  border-width: 2px; border-style: solid;
+  border-width: 2px;
+  border-style: solid;
 }
 
 .ic-ThemeCard-fake-checkbox {
-  width: 100%; height: 14px;
+  width: 100%;
+  height: 14px;
   position: relative;
   box-sizing: border-box;
   &:after {
-    content: "";
+    content: '';
     box-sizing: border-box;
     position: absolute;
-    right: 0; top: 50%;
+    right: 0;
+    top: 50%;
     margin-top: -1px;
-    height: 2px; width: calc(100% - 24px);
+    height: 2px;
+    width: calc(100% - 24px);
     background: $ic-border-light;
   }
 }
@@ -193,13 +201,15 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
 .ic-ThemeCard-fake-checkbox__inner {
   box-sizing: border-box;
   border-radius: $baseBorderRadius;
-  width: 14px; height: 14px;
+  width: 14px;
+  height: 14px;
   position: relative;
   @include overwrite-default-icon-size(8px);
-  > i[class^=icon-] {
+  > i[class^='icon-'] {
     color: $ic-color-light;
     position: absolute;
-    top: 2px; left: 3px;
+    top: 2px;
+    left: 3px;
     line-height: 8px;
   }
 }
@@ -217,7 +227,8 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
   white-space: nowrap;
   text-overflow: ellipsis;
 
-  &:focus, &:hover {
+  &:focus,
+  &:hover {
     text-decoration: underline;
   }
 
@@ -260,9 +271,11 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
 .ic-ThemeCard-overlay {
   transition: all 0.2s ease-out;
   position: absolute;
-  top: 0; left: 0;
+  top: 0;
+  left: 0;
   z-index: 1;
-  height: 100%; width: 100%;
+  height: 100%;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -20,13 +20,13 @@
 // because out old build would register them manually in a rewrite.
 // We should be able to find them by referencing them relative to the jst directory
 
-function addPartialLeader (fullName) {
+function addPartialLeader(fullName) {
   const refPieces = fullName.split('/')
   refPieces[refPieces.length - 1] = `_${refPieces[refPieces.length - 1]}`
   return refPieces.join('/')
 }
 
-module.exports = function (input) {
+module.exports = function(input) {
   this.cacheable()
   const partialsRegexp = /\{\{>(.+)( |})/g
   // search for all things that look like partial references {{>partial}},

@@ -30,7 +30,7 @@ import Actions from '../actions'
 import CourseImagePicker from './CourseImagePicker'
 
 export default class CourseImageSelector extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = props.store.getState()
   }
@@ -68,9 +68,11 @@ export default class CourseImageSelector extends React.Component {
               }
             >
               <MenuItem onClick={this.changeImage}>
-                <IconEditLine /> {I18n.t('Choose image')}</MenuItem>
+                <IconEditLine /> {I18n.t('Choose image')}
+              </MenuItem>
               <MenuItem onClick={this.removeImage}>
-                <IconTrashLine /> {I18n.t('Remove image')}</MenuItem>
+                <IconTrashLine /> {I18n.t('Remove image')}
+              </MenuItem>
             </PopoverMenu>
           ) : (
             <Button onClick={this.changeImage}>{I18n.t('Choose Image')}</Button>
@@ -85,8 +87,12 @@ export default class CourseImageSelector extends React.Component {
           <CourseImagePicker
             courseId={this.props.courseId}
             handleClose={this.handleModalClose}
-            handleFileUpload={(e, courseId) => this.props.store.dispatch(Actions.uploadFile(e, courseId))}
-            handleFlickrUrlUpload={flickrUrl => this.props.store.dispatch(Actions.uploadFlickrUrl(flickrUrl, this.props.courseId))}
+            handleFileUpload={(e, courseId) =>
+              this.props.store.dispatch(Actions.uploadFile(e, courseId))
+            }
+            handleFlickrUrlUpload={flickrUrl =>
+              this.props.store.dispatch(Actions.uploadFlickrUrl(flickrUrl, this.props.courseId))
+            }
             uploadingImage={this.state.uploadingImage}
           />
         </Modal>

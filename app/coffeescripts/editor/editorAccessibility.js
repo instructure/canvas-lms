@@ -22,13 +22,13 @@ import htmlEscape from 'str/htmlEscape'
 // #
 // Used to insert accessibility titles into core TinyMCE components
 export default class EditorAccessiblity {
-  constructor (editor) {
+  constructor(editor) {
     this.editor = editor
     this.id_prepend = editor.id
     this.$el = $(`#${editor.editorContainer.id}`)
   }
 
-  accessiblize () {
+  accessiblize() {
     this._cacheElements()
     this._addTitles()
     this._addLabels()
@@ -37,28 +37,35 @@ export default class EditorAccessiblity {
   }
 
   /* PRIVATE FUNCTIONS */
-  _cacheElements () {
+  _cacheElements() {
     this.$iframe = this.$el.find('.mce-edit-area iframe')
   }
 
-  _addLabels () {
+  _addLabels() {
     this.$el.attr('aria-label', I18n.t('Rich Content Editor'))
-    this.$el.find("div[aria-label='Font Sizes']")
-            .attr('aria-label', I18n.t('titles.font_size', 'Font Size, press down to select'))
-    this.$el.find('div.mce-listbox.mce-last:not([aria-label])')
-            .attr('aria-label', I18n.t('titles.formatting', 'Formatting, press down to select'))
-    this.$el.find("div[aria-label='Text color']")
-            .attr('aria-label', I18n.t('accessibles.forecolor', 'Text Color, press down to select'))
-    this.$el.find("div[aria-label='Background color'")
-            .attr('aria-label', I18n.t('accessibles.background_color', 'Background Color, press down to select'))
+    this.$el
+      .find("div[aria-label='Font Sizes']")
+      .attr('aria-label', I18n.t('titles.font_size', 'Font Size, press down to select'))
+    this.$el
+      .find('div.mce-listbox.mce-last:not([aria-label])')
+      .attr('aria-label', I18n.t('titles.formatting', 'Formatting, press down to select'))
+    this.$el
+      .find("div[aria-label='Text color']")
+      .attr('aria-label', I18n.t('accessibles.forecolor', 'Text Color, press down to select'))
+    this.$el
+      .find("div[aria-label='Background color'")
+      .attr(
+        'aria-label',
+        I18n.t('accessibles.background_color', 'Background Color, press down to select')
+      )
   }
 
-  _addTitles () {
+  _addTitles() {
     this.$iframe.attr('title', I18n.t('titles.rte_help', 'Rich Text Area. Press ALT+F8 for help'))
   }
 
   // Hide the menubar until ALT+F9 is pressed.
-  _accessiblizeMenubar () {
+  _accessiblizeMenubar() {
     const $menubar = this.$el.find('.mce-menubar')
     const $firstMenu = $menubar.find('.mce-menubtn').first()
     $menubar.hide()
@@ -72,7 +79,7 @@ export default class EditorAccessiblity {
 
   // keyboard only nav gets permastuck in the statusbar in FF. If you can't
   // click with a mouse, the only way out is to refresh the page.
-  _removeStatusbarFromTabindex () {
+  _removeStatusbarFromTabindex() {
     const $statusbar = this.$el.find('.mce-statusbar > .mce-container-body')
     $statusbar.attr('tabindex', -1)
   }

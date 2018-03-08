@@ -17,10 +17,10 @@
 */
 import Backbone from 'Backbone'
 
- // need a bit of a model for plugging the LockIconView into the modules page
- // where we don't have the individual item's models, because we're getting lock state
- // after the module page loads via an api request.
- // See public/javascripts/context_modules.js
+// need a bit of a model for plugging the LockIconView into the modules page
+// where we don't have the individual item's models, because we're getting lock state
+// after the module page loads via an api request.
+// See public/javascripts/context_modules.js
 const MasterCourseModuleLock = Backbone.Model.extend({
   defaults: {
     is_master_course_master_content: false,

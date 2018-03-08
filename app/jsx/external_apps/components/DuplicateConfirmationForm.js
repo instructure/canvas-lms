@@ -21,34 +21,45 @@ import PropTypes from 'prop-types'
 import Button from 'instructure-ui/lib/components/Button'
 import I18n from 'i18n!external_tools'
 
-
 export default class DuplicateConfirmationForm extends React.Component {
   forceSaveTool = () => {
-    const data = this.props.toolData;
-    data.verifyUniqueness = undefined;
-    this.props.store.save(this.props.configurationType, data, this.props.onSuccess, this.props.onError);
+    const data = this.props.toolData
+    data.verifyUniqueness = undefined
+    this.props.store.save(
+      this.props.configurationType,
+      data,
+      this.props.onSuccess,
+      this.props.onError
+    )
   }
 
-  render () {
+  render() {
     return (
       <div id="duplicate-confirmation-form">
         <div className="ReactModal__Body">
           <p>
-            {I18n.t('This tool has already been installed in this context. Would you like to install it anyway?')}
+            {I18n.t(
+              'This tool has already been installed in this context. Would you like to install it anyway?'
+            )}
           </p>
         </div>
         <div className="ReactModal__Footer">
           <div className="ReactModal__Footer-Actions">
-            <Button id='cancel-install' variant="primary" margin="0 x-small 0 0" onClick={this.props.onCancel} >
+            <Button
+              id="cancel-install"
+              variant="primary"
+              margin="0 x-small 0 0"
+              onClick={this.props.onCancel}
+            >
               {I18n.t('No, Cancel Installation')}
             </Button>
-            <Button id='continue-install' onClick={this.forceSaveTool}>
+            <Button id="continue-install" onClick={this.forceSaveTool}>
               {I18n.t('Yes, Install Tool')}
             </Button>
           </div>
         </div>
       </div>
-    );
+    )
   }
 }
 

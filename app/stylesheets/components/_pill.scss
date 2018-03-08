@@ -33,7 +33,7 @@
   margin: 0;
   list-style: none;
   border-radius: 1em;
-  border: 1px solid rgba(0,0,0,0.25);
+  border: 1px solid rgba(0, 0, 0, 0.25);
   box-shadow: 0 1px 0 #fff;
 }
 
@@ -45,11 +45,11 @@
 
   &:first-child {
     padding-left: 10px;
-    border-radius: 1em 0 0 1em
+    border-radius: 1em 0 0 1em;
   }
   &:last-child {
     padding-right: 10px;
     border-right: none;
-    border-radius: 0 1em 1em 0
+    border-radius: 0 1em 1em 0;
   }
 }

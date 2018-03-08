@@ -17,18 +17,18 @@
  */
 
 var classMunger = function(staticClassName, conditionalClassNames) {
-  var classNames = [];
+  var classNames = []
   if (typeof conditionalClassNames == 'undefined') {
-    conditionalClassNames = staticClassName;
+    conditionalClassNames = staticClassName
   } else {
-    classNames.push(staticClassName);
+    classNames.push(staticClassName)
   }
   for (var className in conditionalClassNames) {
     if (!!conditionalClassNames[className]) {
-      classNames.push(className);
+      classNames.push(className)
     }
   }
-  return classNames.join(' ');
-};
+  return classNames.join(' ')
+}
 
 export default classMunger

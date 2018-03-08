@@ -22,23 +22,27 @@
 
 $ef-thumbnail-size: 36px;
 
-
 @mixin hideForPhone {
-  @media (max-width:800px){
+  @media (max-width: 800px) {
     display: none;
   }
 }
 
 body.files {
-  .ic-Layout-contentMain { padding-top: 0; }
+  .ic-Layout-contentMain {
+    padding-top: 0;
+  }
   .ic-app-nav-toggle-and-crumbs {
     /* display: none; */
-    &.ic-app-nav-toggle-and-crumbs--files { display: flex; }
+    &.ic-app-nav-toggle-and-crumbs--files {
+      display: flex;
+    }
   }
 }
 
 .ic-app-nav-toggle-and-crumbs.ic-app-nav-toggle-and-crumbs--files {
-  margin-left: 0; margin-right: 0;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 // hides the course menu hamburger in the personal files breadcrumb
@@ -49,7 +53,8 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 }
 
 .ef-main-buttons {
-  .ui-buttonset, .ui-button {
+  .ui-buttonset,
+  .ui-button {
     display: inline-block;
   }
 }
@@ -108,14 +113,16 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   flex: 1;
   display: flex;
   justify-content: flex-end;
-  > * { margin-left: $ic-sp/3; }
+  > * {
+    margin-left: $ic-sp/3;
+  }
 }
 
-.ef-main{
+.ef-main {
   min-height: 300px;
   display: flex;
 
-  .ef-folder-content{
+  .ef-folder-content {
     display: flex;
     flex-direction: column;
     flex: 1 1 0%;
@@ -141,27 +148,27 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
       }
     }
 
-    [aria-selected=true] > .ef-folder-header{
+    [aria-selected='true'] > .ef-folder-header {
       background-color: #f2f2f2;
       font-weight: bold;
     }
 
-    .ef-folder-header{
+    .ef-folder-header {
       padding-top: $ic-sp/3;
       padding-bottom: $ic-sp/3;
 
-      &:hover{
+      &:hover {
         background-color: #f2f2f2;
       }
     }
 
-    .ef-folder-list{
+    .ef-folder-list {
       flex: 10 10 0;
       @include fontSize($ic-font-size--xsmall);
       overflow: auto;
     }
 
-    .ef-folder-totals{
+    .ef-folder-totals {
       display: flex;
       align-items: center;
       justify-content: flex-start;
@@ -173,7 +180,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
     }
   }
 }
-.ef-directory{
+.ef-directory {
   position: relative;
   margin: 10px;
   flex: 3;
@@ -186,14 +193,17 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
     max-width: 75%;
   }
 }
-.ef-directory-header{
+.ef-directory-header {
   display: flex;
   align-items: center;
   border-bottom: 1px solid $ic-border-light;
   padding: $ic-sp/3;
 }
 
-.ef-plain-link, .ef-plain-link:hover { color: $ic-font-color-dark; }
+.ef-plain-link,
+.ef-plain-link:hover {
+  color: $ic-font-color-dark;
+}
 
 .ef-item-row {
   display: flex;
@@ -202,15 +212,18 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   user-select: none; /* so that we can shift-click to select */
   margin-bottom: 1px;
   box-sizing: border-box;
-  @if $use_high_contrast { border: 1px solid transparent; }
+  @if $use_high_contrast {
+    border: 1px solid transparent;
+  }
 
   // :hover style needs to be before 'selected' so item that is both hovered and selected gets selected color
   &:hover {
     @if $use_high_contrast {
       border-color: $ic-color-dark;
       border-style: dotted;
+    } @else {
+      background-color: $ic-bg-light-primary;
     }
-    @else { background-color: $ic-bg-light-primary; }
   }
   &.ef-item-selected {
     background-color: $ic-bg-light-primary;
@@ -220,26 +233,32 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
       content: '';
       position: absolute;
       left: 0;
-      top:0;
+      top: 0;
       width: 4px;
       height: 100%;
       background: var(--ic-brand-primary);
     }
   }
 
-  .al-trigger { opacity: 0 }
+  .al-trigger {
+    opacity: 0;
+  }
 
   &:hover .al-trigger,
-   .al-trigger.ui-state-active,
-   .al-trigger:focus {
-    opacity: 1
+  .al-trigger.ui-state-active,
+  .al-trigger:focus {
+    opacity: 1;
   }
 
   .btn-link {
     border-width: 0;
     padding-right: 15px;
-    &.restricted { color: $ic-color-alert; }
-    &.hiddenState { color: $ic-color-alert; }
+    &.restricted {
+      color: $ic-color-alert;
+    }
+    &.hiddenState {
+      color: $ic-color-alert;
+    }
   }
 }
 
@@ -259,11 +278,12 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 .ef-hidden-flex {
   flex: 0 0 0;
   visibility: hidden;
-  height: 0; width: 0;
+  height: 0;
+  width: 0;
   overflow: hidden;
 }
 
-.ef-name-col{
+.ef-name-col {
   flex: 8;
   display: flex;
   align-items: center;
@@ -271,11 +291,14 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   padding-right: $ic-sp/2;
   box-sizing: border-box;
   a {
-    @if $use_high_contrast { @extend .ef-plain-link; }
+    @if $use_high_contrast {
+      @extend .ef-plain-link;
+    }
   }
 }
 
-.ef-name-col__link, .ef-name-col__click-wrapper {
+.ef-name-col__link,
+.ef-name-col__click-wrapper {
   display: flex;
   align-items: center;
   overflow: hidden;
@@ -288,28 +311,28 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   display: block;
 }
 
-.ef-date-created-col{
+.ef-date-created-col {
   flex: 3;
   @include hideForPhone;
 }
 
-.ef-date-modified-col{
+.ef-date-modified-col {
   flex: 3;
   @include hideForPhone;
 }
 
-.ef-modified-by-col{
+.ef-modified-by-col {
   flex: 3;
   @include hideForPhone;
 }
 
-.ef-size-col{
+.ef-size-col {
   flex: 2;
   @include hideForPhone;
 }
 
 .ef-usage-rights-col {
-  flex: 1
+  flex: 1;
 }
 
 .ef-name-col,
@@ -319,7 +342,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 .ef-size-col {
   @include fontSize(13px);
 
-  &[role="columnheader"] {
+  &[role='columnheader'] {
     font-weight: $ic-font-weight;
   }
 }
@@ -329,7 +352,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   margin-left: 5px;
 }
 
-.ef-links-col{
+.ef-links-col {
   display: flex;
   flex: 2 0 63px;
   justify-content: flex-end;
@@ -341,7 +364,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
 }
 
 .ef-edit-name-form {
@@ -381,7 +404,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   left: -9999px;
   top: 15px;
   opacity: 0;
-  transition: opacity .2s;
+  transition: opacity 0.2s;
   width: auto;
   &.open {
     left: -23px;
@@ -420,7 +443,8 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 }
 
 // Putting this here because it's used in two components...
-.ShowFolder__accessbilityMessage, .SearchResults__accessbilityMessage {
+.ShowFolder__accessbilityMessage,
+.SearchResults__accessbilityMessage {
   @include accessibility-prompt($is-link: false);
   // We need to override these to effetively hide it until it is given focus.
   height: 0;
@@ -438,11 +462,12 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 
 // the lock
 .ef-main {
-  .lock-icon {  // align it with the adjacent buttons
+  .lock-icon {
+    // align it with the adjacent buttons
     margin-right: $ic-sp/2;
     padding-top: $ic-sp/2;
     &.lock-icon button.unlocked {
-      color:  $ic-color-icon-disabled;
+      color: $ic-color-icon-disabled;
     }
     &.lock-icon button.locked {
       color: var(--ic-brand-primary);

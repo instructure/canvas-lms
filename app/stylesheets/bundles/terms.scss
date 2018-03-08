@@ -48,7 +48,9 @@
 #terms td {
   vertical-align: top;
 }
-#terms td.header, #terms td.permissions, #terms td.links {
+#terms td.header,
+#terms td.permissions,
+#terms td.links {
   border-bottom: 1px solid #aaa;
   padding: 2px 0;
 }

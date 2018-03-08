@@ -88,10 +88,10 @@ export default function UsersToolbar(props) {
               </Button>
             }
           >
-            <MenuItem onClick={() => window.location = `/accounts/${props.accountId}/avatars`}>
+            <MenuItem onClick={() => (window.location = `/accounts/${props.accountId}/avatars`)}>
               <IconStudentViewLine /> {I18n.t('Manage profile pictures')}
             </MenuItem>
-            <MenuItem onClick={() => window.location = `/accounts/${props.accountId}/groups`}>
+            <MenuItem onClick={() => (window.location = `/accounts/${props.accountId}/groups`)}>
               <IconGroupLine /> {I18n.t('View user groups')}
             </MenuItem>
           </PopoverMenu>

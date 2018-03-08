@@ -86,7 +86,7 @@ $borderColor: #ddd;
 // Try to use a semantically clear name for these variables so we know what's
 // going on.
 
-$summaryPercentileChartBarColor: #BEDFF1;
+$summaryPercentileChartBarColor: #bedff1;
 $activeOrHoverQuestionBoxBg: #f4f4f4;
 
 $visitedLinkFg: #609;
@@ -105,4 +105,4 @@ $visitedLinkFg: #609;
 //
 //   - http://webaim.org/resources/contrastchecker/
 //   - http://www.dasplankton.de/ContrastA/
-@import "./variables_high_contrast";
+@import './variables_high_contrast';

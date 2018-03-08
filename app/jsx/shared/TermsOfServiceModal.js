@@ -25,59 +25,63 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!terms_of_service_modal'
 import RichContentEditor from './rce/RichContentEditor'
 
-const { bool } = PropTypes
+const {bool} = PropTypes
 const termsOfServiceText = I18n.t('Acceptable Use Policy')
 
 export default class TermsOfServiceModal extends React.Component {
   static propTypes = {
-    preview: bool,
+    preview: bool
   }
 
   static defaultProps = {
     preview: false
   }
 
-
   state = {
-    open: false,
+    open: false
   }
 
   handleCloseModal = () => {
     this.link.focus()
-    this.setState({ open: false })
+    this.setState({open: false})
   }
 
   handleLinkClick = () => {
     const $rce_container = $('#custom_tos_rce_container')
     if ($rce_container.length > 0) {
-      const $textarea = $rce_container.find('textarea');
+      const $textarea = $rce_container.find('textarea')
       ENV.TERMS_OF_SERVICE_CUSTOM_CONTENT = RichContentEditor.callOnRCE($textarea, 'get_code')
     }
-    this.setState((state) => ({ open: !state.open }))
+    this.setState(state => ({open: !state.open}))
   }
 
   render() {
     return (
       <span id="terms_of_service_modal">
-       <Link ref={(c) => { this.link = c; }} onClick={this.handleLinkClick}>
-         {this.props.preview ? I18n.t('Preview') : termsOfServiceText}
-       </Link>
-       <Modal
-         open={this.state.open}
-         onDismiss={this.handleCloseModal}
-         size="fullscreen"
-         label={termsOfServiceText}
-         shouldCloseOnOverlayClick
-         closeButtonLabel={I18n.t('Close')}
-         applicationElement={() => [document.getElementById('main')] }
-       >
-         <ModalHeader>
-           <Heading>{termsOfServiceText}</Heading>
-         </ModalHeader>
-         <ModalBody>
-           <div dangerouslySetInnerHTML={{__html: ENV.TERMS_OF_SERVICE_CUSTOM_CONTENT}} />
-         </ModalBody>
-       </Modal>
+        <Link
+          ref={c => {
+            this.link = c
+          }}
+          onClick={this.handleLinkClick}
+        >
+          {this.props.preview ? I18n.t('Preview') : termsOfServiceText}
+        </Link>
+        <Modal
+          open={this.state.open}
+          onDismiss={this.handleCloseModal}
+          size="fullscreen"
+          label={termsOfServiceText}
+          shouldCloseOnOverlayClick
+          closeButtonLabel={I18n.t('Close')}
+          applicationElement={() => [document.getElementById('main')]}
+        >
+          <ModalHeader>
+            <Heading>{termsOfServiceText}</Heading>
+          </ModalHeader>
+          <ModalBody>
+            <div dangerouslySetInnerHTML={{__html: ENV.TERMS_OF_SERVICE_CUSTOM_CONTENT}} />
+          </ModalBody>
+        </Modal>
       </span>
     )
   }

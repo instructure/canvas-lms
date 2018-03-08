@@ -69,13 +69,7 @@ export default class AnnouncementsIndex extends Component {
 
   renderEmptyAnnouncements() {
     if (this.props.hasLoadedAnnouncements && !this.props.announcements.length) {
-      return (
-        <AnnouncementEmptyState
-          canCreate={
-            this.props.permissions.create
-          }
-        />
-      )
+      return <AnnouncementEmptyState canCreate={this.props.permissions.create} />
     } else {
       return null
     }

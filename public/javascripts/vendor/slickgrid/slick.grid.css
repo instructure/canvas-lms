@@ -6,13 +6,15 @@ No built-in (selected, editable, highlight, flashing, invalid, loading, :focus) 
 classes should alter those!
 */
 
-.slick-header.ui-state-default, .slick-headerrow.ui-state-default {
+.slick-header.ui-state-default,
+.slick-headerrow.ui-state-default {
   width: 100%;
   overflow: hidden;
   border-left: 0px;
 }
 
-.slick-header-columns, .slick-headerrow-columns {
+.slick-header-columns,
+.slick-headerrow-columns {
   position: relative;
   white-space: nowrap;
   cursor: default;
@@ -81,13 +83,15 @@ classes should alter those!
   outline: 0;
 }
 
-.slick-row.ui-widget-content, .slick-row.ui-state-active {
+.slick-row.ui-widget-content,
+.slick-row.ui-state-active {
   position: absolute;
   border: 0px;
   width: 100%;
 }
 
-.slick-cell, .slick-headerrow-column {
+.slick-cell,
+.slick-headerrow-column {
   position: absolute;
   border: 1px solid transparent;
   border-right: 1px dotted silver;

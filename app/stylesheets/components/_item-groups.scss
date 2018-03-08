@@ -296,7 +296,8 @@
 
     @if $use-high-contrast == false {
       text-decoration: none;
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         text-decoration: underline;
       }
     }
@@ -315,9 +316,8 @@
   }
 
   &.ig-published:not(.student-view) {
-
     &:before {
-      content: "";
+      content: '';
       box-sizing: border-box;
       position: absolute;
       top: -1px;
@@ -332,12 +332,12 @@
     &.student-view .ig-title {
       color: $ic-font-color-dark;
     }
-
   }
 
   &.ig-row-empty {
     box-sizing: border-box;
-    height: $ic-sp*3; line-height: $ic-sp*3;
+    height: $ic-sp*3;
+    line-height: $ic-sp*3;
     padding: 0;
     border: 1px solid $ic-border-light;
     background: $ic-color-light;
@@ -391,10 +391,12 @@
   }
 
   &:after {
-    content: "\00a0\00a0|\00a0\00a0";
+    content: '\00a0\00a0|\00a0\00a0';
   }
   &:last-of-type {
-    &:after { display: none; }
+    &:after {
+      display: none;
+    }
   }
 }
 
@@ -402,12 +404,17 @@
   box-sizing: border-box;
   white-space: nowrap;
   padding-left: $ic-sp;
-  @include breakpoint(desktop) { padding-left: 0; }
+  @include breakpoint(desktop) {
+    padding-left: 0;
+  }
 
-  .publish-icon, .lock-icon {
+  .publish-icon,
+  .lock-icon {
     margin-right: $ic-sp/2;
-    i[class*=icon-]:before,
-    i[class^=icon-]:before { @include fontSize(18px); }
+    i[class*='icon-']:before,
+    i[class^='icon-']:before {
+      @include fontSize(18px);
+    }
   }
 
   > a {
@@ -429,11 +436,11 @@
   color: $ic-font-color-dark;
 }
 
-.ig-details [class^=span] {
+.ig-details [class^='span'] {
   white-space: nowrap;
 }
 
-[class^=ig-indent] {
+[class^='ig-indent'] {
   // anything > 2 is still 60px;
   margin-left: 60px;
 }

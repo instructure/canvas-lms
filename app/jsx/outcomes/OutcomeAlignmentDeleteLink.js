@@ -21,51 +21,51 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!outcomes'
 import $ from 'jquery'
 
-  class OutcomeAlignmentDeleteLink extends React.Component {
-    static propTypes = {
-      url: PropTypes.string.isRequired,
-      has_rubric_association: PropTypes.string
-    }
-
-    handleClick = (e) => {
-      const $li = $(e.target).parents('li.alignment');
-
-      e.preventDefault();
-      $(e.target).confirmDelete({
-        success () {
-          $li.fadeOut('slow', function () {
-            this.remove();
-          });
-        },
-        url: this.props.url
-      });
-    }
-
-    hasRubricAssociation () {
-      return this.props.has_rubric_association;
-    }
-
-    render () {
-      if (this.hasRubricAssociation()) {
-        return (
-          <span className="locked_alignment_link">
-            <i className="icon-lock" aria-hidden="true" />
-            <span className="screenreader-only"> {I18n.t(
-              "Can't delete alignments based on rubric associations.  To remove these associations you need to remove the row from the asset's rubric"
-            )} </span>
-          </span>
-        );
-      }
-      return (
-        <a
-          className="delete_alignment_link no-hover"
-          href="" onClick={this.handleClick}
-        >
-          <i className="icon-end" aria-hidden="true" />
-          <span className="screenreader-only">{I18n.t('Delete alignment')}</span>
-        </a>
-      );
-    }
+class OutcomeAlignmentDeleteLink extends React.Component {
+  static propTypes = {
+    url: PropTypes.string.isRequired,
+    has_rubric_association: PropTypes.string
   }
+
+  handleClick = e => {
+    const $li = $(e.target).parents('li.alignment')
+
+    e.preventDefault()
+    $(e.target).confirmDelete({
+      success() {
+        $li.fadeOut('slow', function() {
+          this.remove()
+        })
+      },
+      url: this.props.url
+    })
+  }
+
+  hasRubricAssociation() {
+    return this.props.has_rubric_association
+  }
+
+  render() {
+    if (this.hasRubricAssociation()) {
+      return (
+        <span className="locked_alignment_link">
+          <i className="icon-lock" aria-hidden="true" />
+          <span className="screenreader-only">
+            {' '}
+            {I18n.t(
+              "Can't delete alignments based on rubric associations.  To remove these associations you need to remove the row from the asset's rubric"
+            )}{' '}
+          </span>
+        </span>
+      )
+    }
+    return (
+      <a className="delete_alignment_link no-hover" href="" onClick={this.handleClick}>
+        <i className="icon-end" aria-hidden="true" />
+        <span className="screenreader-only">{I18n.t('Delete alignment')}</span>
+      </a>
+    )
+  }
+}
 
 export default OutcomeAlignmentDeleteLink

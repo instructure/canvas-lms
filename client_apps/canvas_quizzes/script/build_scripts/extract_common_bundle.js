@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var glob = require('glob');
-var readJSON = require('../helpers/read_json');
-var K = require('./constants');
+var glob = require('glob')
+var readJSON = require('../helpers/read_json')
+var K = require('./constants')
 
 /**
  * Prepare a set of module IDs for use inside the "bundles" r.js config hash.
@@ -39,6 +39,6 @@ module.exports = function(commonModules) {
   return commonModules.map(function(moduleId) {
     // Since we're excluding the JSX plugin from the build, we need to discard
     // the loader plugin prefix from the module identifiers:
-    return moduleId.replace('jsx!', '');
-  });
-};
+    return moduleId.replace('jsx!', '')
+  })
+}

@@ -26,10 +26,10 @@
 // * @param {Integer} v Value as a value between 0 - 100 %
 // * @returns {Array} The RGB values  EG: [r,g,b], [255,255,255]
 // */
-export default function hsvToRgb (h, s, v) {
+export default function hsvToRgb(h, s, v) {
   s = s / 100
   v = v / 100
-  const hi = Math.floor(h / 60 % 6)
+  const hi = Math.floor((h / 60) % 6)
   const f = h / 60 - hi
   const p = v * (1 - s)
   const q = v * (1 - f * s)

@@ -23,11 +23,11 @@ import initialState from '../store/initialState'
 const emailRegex = /([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})/i
 
 /**
-   * Handles setting the editUserDialogOpen state
-   * state - the redux state
-   * action - the redux action
-   * visibility - boolean that editUserDialogOpen should be set to.
-   */
+ * Handles setting the editUserDialogOpen state
+ * state - the redux state
+ * action - the redux action
+ * visibility - boolean that editUserDialogOpen should be set to.
+ */
 function setEditUserDialogOpenState(state, action, visibility) {
   return {
     ...state,

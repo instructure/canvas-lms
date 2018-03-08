@@ -1,87 +1,91 @@
-import Ember from 'ember';
+import Ember from 'ember'
 //import QUnit from 'qunit'; // Assumed global in runner
-import testContext from './test-context';
-import isolatedContainer from './isolated-container';
+import testContext from './test-context'
+import isolatedContainer from './isolated-container'
 
 export default function moduleFor(fullName, description, callbacks, delegate) {
-  var container;
-  var context;
-  
+  var container
+  var context
+
   var _callbacks = {
-    setup: function(){
-      callbacks = callbacks || { };
+    setup: function() {
+      callbacks = callbacks || {}
 
-      var needs = [fullName].concat(callbacks.needs || []);
-      container = isolatedContainer(needs);
+      var needs = [fullName].concat(callbacks.needs || [])
+      container = isolatedContainer(needs)
 
-      callbacks.subject   = callbacks.subject || defaultSubject;
+      callbacks.subject = callbacks.subject || defaultSubject
 
-      callbacks.setup     = callbacks.setup    || function() { };
-      callbacks.teardown  = callbacks.teardown || function() { };
-      
+      callbacks.setup = callbacks.setup || function() {}
+      callbacks.teardown = callbacks.teardown || function() {}
+
       function factory() {
-        return container.lookupFactory(fullName);
+        return container.lookupFactory(fullName)
       }
-      
+
       testContext.set({
-        container:            container,
-        factory:              factory,
-        dispatcher:           null,
+        container: container,
+        factory: factory,
+        dispatcher: null,
         __setup_properties__: callbacks
-      });
-      
-      context = testContext.get();
+      })
+
+      context = testContext.get()
 
       if (delegate) {
-        delegate(container, context, defaultSubject);
+        delegate(container, context, defaultSubject)
       }
-      
+
       if (Ember.$('#ember-testing').length === 0) {
-        Ember.$('<div id="ember-testing"/>').appendTo(document.body);
+        Ember.$('<div id="ember-testing"/>').appendTo(document.body)
       }
-      
-      buildContextVariables(context);
-      callbacks.setup.call(context, container);
+
+      buildContextVariables(context)
+      callbacks.setup.call(context, container)
     },
 
-    teardown: function(){
-      Ember.run(function(){
-        container.destroy();
-        
-        if (context.dispatcher) {
-          context.dispatcher.destroy();
-        }
-      });
-      
-      callbacks.teardown(container);
-      Ember.$('#ember-testing').empty();
-    }
-  };
+    teardown: function() {
+      Ember.run(function() {
+        container.destroy()
 
-  QUnit.module(description || fullName, _callbacks);
+        if (context.dispatcher) {
+          context.dispatcher.destroy()
+        }
+      })
+
+      callbacks.teardown(container)
+      Ember.$('#ember-testing').empty()
+    }
+  }
+
+  QUnit.module(description || fullName, _callbacks)
 }
 
 function defaultSubject(options, factory) {
-  return factory.create(options);
+  return factory.create(options)
 }
 
 // allow arbitrary named factories, like rspec let
 function buildContextVariables(context) {
-  var cache     = { };
-  var callbacks = context.__setup_properties__;
-  var container = context.container;
-  var factory   = context.factory;
-    
-  Ember.keys(callbacks).filter(function(key){
-    // ignore the default setup/teardown keys
-    return key !== 'setup' && key !== 'teardown';
-  }).forEach(function(key){
-    context[key] = function(options) {
-      if (cache[key]) { return cache[key]; }
+  var cache = {}
+  var callbacks = context.__setup_properties__
+  var container = context.container
+  var factory = context.factory
 
-      var result = callbacks[key](options, factory(), container);
-      cache[key] = result;
-      return result;
-    };
-  });
+  Ember.keys(callbacks)
+    .filter(function(key) {
+      // ignore the default setup/teardown keys
+      return key !== 'setup' && key !== 'teardown'
+    })
+    .forEach(function(key) {
+      context[key] = function(options) {
+        if (cache[key]) {
+          return cache[key]
+        }
+
+        var result = callbacks[key](options, factory(), container)
+        cache[key] = result
+        return result
+      }
+    })
 }

@@ -22,11 +22,21 @@
   display: inline-block;
   color: $ic-color-icon-disabled;
   cursor: pointer;
-  &:focus { @include ic-focus-variant; }
-  &.lock-icon-unlocked { color: $ic-color-icon-disabled; }
-  &.lock-icon-locked { color: var(--ic-brand-primary); }
-    &.disabled { color: $ic-color-icon-disabled; }
-  &.disabled { cursor: default; }
+  &:focus {
+    @include ic-focus-variant;
+  }
+  &.lock-icon-unlocked {
+    color: $ic-color-icon-disabled;
+  }
+  &.lock-icon-locked {
+    color: var(--ic-brand-primary);
+  }
+  &.disabled {
+    color: $ic-color-icon-disabled;
+  }
+  &.disabled {
+    cursor: default;
+  }
 }
 
 .lock-text {

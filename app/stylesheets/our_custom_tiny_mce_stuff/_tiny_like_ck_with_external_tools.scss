@@ -22,7 +22,7 @@ $menu-item-text-disabled-color: $ic-font-color-dark;
 $menu-item-keyboard-shortcut-color: $ic-font-color-dark;
 
 // puts the blue glow around each little color sqare in the tinyMCE text/bg color picker
-.mce-container .mce-grid td.mce-grid-cell div:focus{
+.mce-container .mce-grid td.mce-grid-cell div:focus {
   outline: thin dotted #333;
   outline: 5px auto -webkit-focus-ring-color;
   outline-offset: -2px;
@@ -31,7 +31,7 @@ $menu-item-keyboard-shortcut-color: $ic-font-color-dark;
 
 .mce-container .mce-primary {
   @if $use_high_contrast {
-    @include canvas-button(#0770A3, $ic-color-light);
+    @include canvas-button(#0770a3, $ic-color-light);
   } @else {
     @include canvas-button(
       var(--ic-brand-button--primary-bgd),
@@ -54,12 +54,15 @@ $menu-item-keyboard-shortcut-color: $ic-font-color-dark;
     color: $menu-item-keyboard-shortcut-color;
   }
 
-  &:focus, &:hover {
-    .mce-ico, .mce-menu-shortcut, .mce-text {
+  &:focus,
+  &:hover {
+    .mce-ico,
+    .mce-menu-shortcut,
+    .mce-text {
       color: $menu-item-text-hover-focus-color;
     }
     .mce-caret {
-      border-left-color: $menu-item-text-hover-focus-color
+      border-left-color: $menu-item-text-hover-focus-color;
     }
   }
 }
@@ -73,6 +76,6 @@ $menu-item-keyboard-shortcut-color: $ic-font-color-dark;
 }
 
 .mce-container.mce-tinymce :focus,
-.mce-container.mce-tinyrce :focus{
+.mce-container.mce-tinyrce :focus {
   outline: 2px solid var(--ic-link-color);
 }

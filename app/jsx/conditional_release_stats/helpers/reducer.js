@@ -39,4 +39,4 @@ export const handleActions = (actionHandler, def) => {
 
 export const getPayload = (state, action) => action.payload
 
-export const identity = (def = '') => (s, a) => s === undefined ? def : s
+export const identity = (def = '') => (s, a) => (s === undefined ? def : s)

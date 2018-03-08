@@ -21,4 +21,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import FileNotFound from '../shared/FileNotFound'
 
-ReactDOM.render(<FileNotFound contextCode={window.ENV.context_asset_string} />, $('#sendMessageForm')[0])
+ReactDOM.render(
+  <FileNotFound contextCode={window.ENV.context_asset_string} />,
+  $('#sendMessageForm')[0]
+)

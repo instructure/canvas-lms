@@ -16,63 +16,63 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { bool, func, number, shape, string } from 'prop-types';
-import FormFieldGroup from '@instructure/ui-core/lib/components/FormFieldGroup';
-import SubmissionTrayRadioInput from '../../../gradezilla/default_gradebook/components/SubmissionTrayRadioInput';
-import { statusesTitleMap } from '../../../gradezilla/default_gradebook/constants/statuses';
-import NumberHelper from '../../../shared/helpers/numberHelper';
-import I18n from 'i18n!gradebook';
+import React from 'react'
+import {bool, func, number, shape, string} from 'prop-types'
+import FormFieldGroup from '@instructure/ui-core/lib/components/FormFieldGroup'
+import SubmissionTrayRadioInput from '../../../gradezilla/default_gradebook/components/SubmissionTrayRadioInput'
+import {statusesTitleMap} from '../../../gradezilla/default_gradebook/constants/statuses'
+import NumberHelper from '../../../shared/helpers/numberHelper'
+import I18n from 'i18n!gradebook'
 
-function checkedValue (submission) {
+function checkedValue(submission) {
   if (submission.excused) {
-    return 'excused';
+    return 'excused'
   } else if (submission.missing) {
-    return 'missing';
+    return 'missing'
   } else if (submission.late) {
-    return 'late';
+    return 'late'
   }
 
-  return 'none';
+  return 'none'
 }
 
-function isNumeric (input) {
-  return NumberHelper.validate(input);
+function isNumeric(input) {
+  return NumberHelper.validate(input)
 }
 
 export default class SubmissionTrayRadioInputGroup extends React.Component {
-  handleNumberInputBlur = ({ target: { value } }) => {
+  handleNumberInputBlur = ({target: {value}}) => {
     if (!isNumeric(value)) {
-      return;
+      return
     }
 
-    let secondsLateOverride = NumberHelper.parse(value) * 3600;
+    let secondsLateOverride = NumberHelper.parse(value) * 3600
     if (this.props.latePolicy.lateSubmissionInterval === 'day') {
-      secondsLateOverride *= 24;
+      secondsLateOverride *= 24
     }
 
     this.props.updateSubmission({
       latePolicyStatus: 'late',
       secondsLateOverride: Math.trunc(secondsLateOverride)
-    });
+    })
   }
 
-  handleRadioInputChanged = ({ target: { value } }) => {
-    const alreadyChecked = checkedValue(this.props.submission) === value;
+  handleRadioInputChanged = ({target: {value}}) => {
+    const alreadyChecked = checkedValue(this.props.submission) === value
     if (alreadyChecked || this.props.submissionUpdating) {
-      return;
+      return
     }
 
-    const data = value === 'excused' ? { excuse: true } : { latePolicyStatus: value };
+    const data = value === 'excused' ? {excuse: true} : {latePolicyStatus: value}
     if (value === 'late') {
-      data.secondsLateOverride = 0;
+      data.secondsLateOverride = 0
     }
 
-    this.props.updateSubmission(data);
+    this.props.updateSubmission(data)
   }
 
-  render () {
-    const radioOptions = ['none', 'late', 'missing', 'excused'].map(status =>
+  render() {
+    const radioOptions = ['none', 'late', 'missing', 'excused'].map(status => (
       <SubmissionTrayRadioInput
         key={status}
         checked={checkedValue(this.props.submission) === status}
@@ -86,7 +86,7 @@ export default class SubmissionTrayRadioInputGroup extends React.Component {
         text={statusesTitleMap[status] || I18n.t('None')}
         value={status}
       />
-    );
+    ))
 
     return (
       <FormFieldGroup
@@ -97,7 +97,7 @@ export default class SubmissionTrayRadioInputGroup extends React.Component {
       >
         {radioOptions}
       </FormFieldGroup>
-    );
+    )
   }
 }
 
@@ -120,4 +120,4 @@ SubmissionTrayRadioInputGroup.propTypes = {
   }).isRequired,
   submissionUpdating: bool.isRequired,
   updateSubmission: func.isRequired
-};
+}

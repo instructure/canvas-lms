@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "base/mixins/misc";
+@import 'base/environment';
+@import 'base/mixins/misc';
 
 /* header */
 .header-bar-right {
-  margin-bottom: $ic-sp;  // the buttons need some space between the input
+  margin-bottom: $ic-sp; // the buttons need some space between the input
 }
 
 #edit_assignment_header-cr {
@@ -75,7 +75,8 @@ div.form-column-left {
   display: none;
 }
 /* for grouped and un-grouped form els */
-div.form-column-right, div.overrides-column-right {
+div.form-column-right,
+div.overrides-column-right {
   display: inline-block;
   width: 380px;
 
@@ -87,13 +88,14 @@ div.form-column-right, div.overrides-column-right {
     border-color: #ccc;
     padding: 15px 0px;
     margin-top: 20px;
-    select, .subtitle {
+    select,
+    .subtitle {
       margin-left: 15px;
     }
   }
 
   label:hover {
-    background: #E7F4FF;
+    background: #e7f4ff;
   }
 
   /* if form field is first item in box */
@@ -101,7 +103,8 @@ div.form-column-right, div.overrides-column-right {
     margin: 0px;
   }
 
-  label:not(.ic-Label), label.date_field {
+  label:not(.ic-Label),
+  label.date_field {
     margin: 0px;
     padding: 10px 0px 10px 40px;
   }
@@ -115,13 +118,16 @@ div.form-column-right, div.overrides-column-right {
 
   /* nested form els within a group */
   .nested {
-    label.checkbox, label.radio {
+    label.checkbox,
+    label.radio {
       padding-left: 60px;
     }
-    select, a, .explanation {
+    select,
+    a,
+    .explanation {
       margin-left: 40px;
     }
-    input[type=text] {
+    input[type='text'] {
       margin-left: 60px;
     }
     button.Button {
@@ -144,7 +150,8 @@ div.form-column-right, div.overrides-column-right {
   }
 }
 
-.assignment-edit-group-alert, .assignment-edit-external-tool-alert{
+.assignment-edit-group-alert,
+.assignment-edit-external-tool-alert {
   margin: 15px 20px 0;
 }
 
@@ -153,29 +160,36 @@ div.form-column-right, div.overrides-column-right {
 }
 
 /* support for master class locked input fields */
-#edit_assignment_form, #discussion-edit-view {
-   h1.title {
-     clear: both;
-   }
+#edit_assignment_form,
+#discussion-edit-view {
+  h1.title {
+    clear: both;
+  }
 
-   .to .ic-Form-control.readonly,
-   .from .ic-Form-control.readonly {  // locked availability dates
-     margin-bottom: 0;                // removes white space at bottom of assign box
-   }
+  .to .ic-Form-control.readonly,
+  .from .ic-Form-control.readonly {
+    // locked availability dates
+    margin-bottom: 0; // removes white space at bottom of assign box
+  }
 
-  .ContainerDueDate { // date inputs
+  .ContainerDueDate {
+    // date inputs
     .Available-from-to {
-      .from, .to {  // or the from and to collapse on each other in ie11
+      .from,
+      .to {
+        // or the from and to collapse on each other in ie11
         width: 50%;
       }
     }
     // make the box of dates layout look right
     .ic-Form-control.readonly {
-      input[type="text"].ic-Input[readonly] { // all that to override existing css selectors
+      input[type='text'].ic-Input[readonly] {
+        // all that to override existing css selectors
         height: 1.4em;
         padding: 0;
       }
-      label {                             // tighten it up
+      label {
+        // tighten it up
         margin-bottom: 0;
       }
     }
@@ -186,11 +200,11 @@ div.form-column-right, div.overrides-column-right {
   .assignment_description {
     background-color: $ic-color-light;
   }
-  #assignment_points_possible[readonly] { // points possible
-    margin-top: -3px;   // because it sits too low
+  #assignment_points_possible[readonly] {
+    // points possible
+    margin-top: -3px; // because it sits too low
   }
 }
-
 
 #discussion-edit-view {
   .discussion-description {

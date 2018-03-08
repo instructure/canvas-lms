@@ -1,5 +1,4 @@
-Compound Documents
-==================
+# Compound Documents
 
 Compound documents contain multiple collections to allow for
 side-loading of related objects. Side-loading is desirable when nested

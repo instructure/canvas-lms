@@ -17,7 +17,9 @@
  */
 class SharedDashboardData {
   changeToCardView = () => {}
-  init (changeCardView) { this.changeToCardView = changeCardView }
+  init(changeCardView) {
+    this.changeToCardView = changeCardView
+  }
 }
 
 export const sharedDashboardInstance = new SharedDashboardData()

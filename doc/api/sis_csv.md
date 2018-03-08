@@ -1,5 +1,4 @@
-SIS Import Format Documentation
-===============================
+# SIS Import Format Documentation
 
 Instructure Canvas can integrate with an institution's Student Information Services (SIS) in
 several ways. The simplest way involves providing Canvas with several CSV files describing
@@ -9,21 +8,20 @@ These files can be zipped together and uploaded to the Account admin area.
 Standard CSV rules apply:
 
 * The first row will be interpreted as a header defining the ordering of your columns. This
-header row is mandatory.
+  header row is mandatory.
 * Fields that contain a comma must be surrounded by double-quotes.
 * Fields that contain double-quotes must also be surrounded by double-quotes, with the
-internal double-quotes doubled. Example: Chevy "The Man" Chase would be included in
-the CSV as "Chevy ""The Man"" Chase".
+  internal double-quotes doubled. Example: Chevy "The Man" Chase would be included in
+  the CSV as "Chevy ""The Man"" Chase".
 
 All text should be UTF-8 encoded.
 
-All timestamps are sent and returned in ISO 8601 format.  All timestamps default to UTC time zone
+All timestamps are sent and returned in ISO 8601 format. All timestamps default to UTC time zone
 unless specified.
 
     YYYY-MM-DDTHH:MM:SSZ
 
-Batch Mode
-----------
+## Batch Mode
 
 If the option to do a "full batch update" is selected in the UI, then this SIS upload is considered
 to be the new canonical set of data, and data from previous SIS imports that isn't present in
@@ -48,8 +46,7 @@ The change_threshold can be set to any integer between 1 and 100.
 
 change_threshold also impacts diffing mode.
 
-Multi Term Batch Mode
----------------------
+## Multi Term Batch Mode
 
 Multi term batch mode is just like batch mode except against multiple terms.
 Multi term batch mode is run against all terms included in the same import for
@@ -57,14 +54,13 @@ the batch. To use multi term batch mode you must also set a change_threshold. If
 you intend to remove all items with multi term batch mode, you can set the
 change_threshold to 100.
 
-Diffing Mode
-------------
+## Diffing Mode
 
 If your account has a SIS integration that is sending its entire data set on
 each import, rather than just sending what has changed, you can speed up
 the import process by enabling diffing mode. In diffing mode, a
 preprocessing step in Canvas will compare the current SIS import against
-the last successful SIS import with the same *data set identifier*, and
+the last successful SIS import with the same _data set identifier_, and
 only apply the difference between the two imports.
 
 For instance, If user A is created by import 1, and then the name is changed for
@@ -82,14 +78,14 @@ It is important to note that if any SIS data was changed outside of that
 previous CSV import, the changes will not be noticed by the diffing
 code. For example:
 
-  1. Import 1 sets user A state to "active".
-  2. An admin sets user A state to "deleted" either through the Canvas
-     UI, or a non-diff SIS import.
-  3. Import 2 sets user A state to "active" again, and is configured to
-     diff against Import 1.
-  4. Because only the difference between Import 1 and Import 2 is
-     applied, and the user's state is "active" in both CSVs, the user
-     remains deleted.
+1. Import 1 sets user A state to "active".
+2. An admin sets user A state to "deleted" either through the Canvas
+   UI, or a non-diff SIS import.
+3. Import 2 sets user A state to "active" again, and is configured to
+   diff against Import 1.
+4. Because only the difference between Import 1 and Import 2 is
+   applied, and the user's state is "active" in both CSVs, the user
+   remains deleted.
 
 Diffing mode is enabled by passing the `diffing_data_set_identifier`
 option in the "Import SIS Data" API call. This is a unique, non-changing
@@ -104,8 +100,8 @@ relevant details to differentiate this data set from other import data
 sets that may come concurrently or later. This might include things such
 as source system, data type, and term id. Some examples of good identifiers:
 
- * users:fall-2015
- * source-system-1:all-data:spring-2016
+* users:fall-2015
+* source-system-1:all-data:spring-2016
 
 Diffing mode by default marks objects as "deleted" when they are not included
 for an import, but enrollments can be marked as 'completed' or 'inactive' if the
@@ -114,7 +110,7 @@ for an import, but enrollments can be marked as 'completed' or 'inactive' if the
 If changes are made to SIS-managed objects outside of the normal import
 process, as in the example given above, it may be necessary to process a SIS
 import with the same data set identifier, but apply the entire import
-rather than applying just the diff.  To enable this mode, set the
+rather than applying just the diff. To enable this mode, set the
 `diffing_remaster_data_set=true` option when creating the import, and it
 will be applied without diffing. The next import for the same data
 set will still diff against that import.
@@ -129,22 +125,20 @@ The change_threshold can be set to any integer between 1 and 100.
 
 change_threshold also impacts batch mode.
 
-Stickiness
-----------
+## Stickiness
+
 When a user makes a change to imported data in Canvas (e.g., changes a name),
 this change is "sticky" and is set as the new default. By default, these "sticky"
 changes are not overwritten on the next SIS import. This can be overridden by
 selecting the Override UI option, which allows Canvas to overwrite any "sticky"
-data updated in the Canvas UI.  Otherwise, changes from an import with
+data updated in the Canvas UI. Otherwise, changes from an import with
 conflicting data would be disregarded and the existing user data would not be
 changed. See below for an indication of which fields have this "sticky"
 property
 
-CSV Data Formats
-================
+# CSV Data Formats
 
-users.csv
----------
+## users.csv
 
 <table class="sis_csv">
 <tr>
@@ -280,7 +274,6 @@ still be provided.</td>
 <p>At least one form of name should be supplied. If a user is being created and no name is given,
 the login_id will be used as the name.</p>
 
-
 <p>When a user is 'deleted' it will delete the login tied to the sis_id.
 If the login is the last one, all of the users enrollments will also be deleted
 and they won't be able to log in to the school's account. If you still want the
@@ -295,8 +288,7 @@ Sample:
 13aa3,psue01,7,,Peggy,Sue,,peggy.sue@myschool.edu,active
 </pre>
 
-accounts.csv
-------------
+## accounts.csv
 
 <table class="sis_csv">
 <tr>
@@ -359,8 +351,7 @@ A002,A001,English,active
 A003,A001,Spanish,active
 </pre>
 
-terms.csv
-------------
+## terms.csv
 
 <table class="sis_csv">
 <tr>
@@ -439,8 +430,7 @@ T002,Spring2011,active,2013-1-03 00:00:00,2013-05-03 00:00:00-06:00
 T003,Fall2011,active,,
 </pre>
 
-courses.csv
-------------
+## courses.csv
 
 <table class="sis_csv">
 <tr>
@@ -552,8 +542,7 @@ R001104,BIO300,"Biology 300: Rocking it, Bio Style",A004,Fall2011,active
 A110035,ART105,"Art 105: ""Art as a Medium""",A001,,active
 </pre>
 
-sections.csv
-------------
+## sections.csv
 
 <table class="sis_csv">
 <tr>
@@ -627,8 +616,7 @@ S002,E411208,Section 2,active,,
 S003,R001104,Section 1,active,,
 </pre>
 
-enrollments.csv
----------------
+## enrollments.csv
 
 <table class="sis_csv">
 <tr>
@@ -717,8 +705,8 @@ Ignored for any role other than observer</td>
 </tr>
 </table>
 
-&#42; course_id or section_id is required, role or role_id is required, and
- user_id or user_integration_id is required.
+\* course_id or section_id is required, role or role_id is required, and
+user_id or user_integration_id is required.
 
 When an enrollment is in a 'completed' state the student is limited to read-only access to the
 course.
@@ -734,8 +722,7 @@ E411208,13834,student,2A,active
 E411208,13aa3,teacher,2A,active
 </pre>
 
-group_categories.csv
-------------
+## group_categories.csv
 
 <table class="sis_csv">
 <tr>
@@ -793,8 +780,7 @@ GC07,,,GC7,active
 GC10,,,GC10,deleted
 </pre>
 
-groups.csv
-------------
+## groups.csv
 
 <table class="sis_csv">
 <tr>
@@ -862,8 +848,7 @@ G411208,,Group2,available
 G411208,,Group3,deleted
 </pre>
 
-groups_membership.csv
-------------
+## groups_membership.csv
 
 <table class="sis_csv">
 <tr>
@@ -904,8 +889,7 @@ G411208,U002,accepted
 G411208,U003,deleted
 </pre>
 
-xlists.csv
-----------
+## xlists.csv
 
 <table class="sis_csv">
 <tr>
@@ -954,8 +938,7 @@ E411208,2A,active
 E411208,2A,active
 </pre>
 
-user_observers.csv
-----------
+## user_observers.csv
 
 <table class="sis_csv">
 <tr>
@@ -1001,8 +984,7 @@ u411208,u411295,active
 u413405,u411385,deleted
 </pre>
 
-admins.csv
----------------
+## admins.csv
 
 <table class="sis_csv">
 <tr>
@@ -1071,10 +1053,9 @@ E411208,13834,AccountAdmin,deleted
 E411208,13aa3,CustomAdmin,active
 </pre>
 
-&#42; role or role_id is required.
+\* role or role_id is required.
 
-change_sis_id.csv
-----------
+## change_sis_id.csv
 
 <table class="sis_csv">
 <tr>
@@ -1124,7 +1105,7 @@ remove the integration_id from the object.</td>
 </tr>
 </table>
 
-&#42; old_id or old_integration_id is required, new_id or new_integration_id is
+\* old_id or old_integration_id is required, new_id or new_integration_id is
 required.
 
 change_sis_id.csv is optional. The goal of change_sis_id.csv is to provide a

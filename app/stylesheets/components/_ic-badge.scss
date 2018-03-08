@@ -46,13 +46,11 @@ You can easily create notification badges in two ways:
 ```
 */
 
-
 @mixin ic-badge-maker(
   $circle-size: 20px,
   $background-color: var(--ic-brand-primary),
   $text-color: $ic-color-light,
   $font-size: 11px) {
-
   @include fontSize($font-size);
   min-width: $circle-size;
   line-height: $circle-size;
@@ -64,7 +62,6 @@ You can easily create notification badges in two ways:
   text-align: center;
   box-sizing: border-box;
   padding: 0 6px;
-
 }
 
 .ic-badge {
@@ -73,7 +70,13 @@ You can easily create notification badges in two ways:
     background: $ic-bg-light-neutral;
     color: $ic-font-color-dark;
   }
-  &.ic-badge--success { background: $ic-color-success; }
-  &.ic-badge--alert { background: $ic-color-alert; }
-  &.ic-badge--danger { background: $ic-color-danger; }
+  &.ic-badge--success {
+    background: $ic-color-success;
+  }
+  &.ic-badge--alert {
+    background: $ic-color-alert;
+  }
+  &.ic-badge--danger {
+    background: $ic-color-danger;
+  }
 }

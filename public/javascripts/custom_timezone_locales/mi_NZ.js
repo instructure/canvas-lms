@@ -1,32 +1,12 @@
-module.exports = { // eslint-disable-line import/no-commonjs
+module.exports = {
+  // eslint-disable-line import/no-commonjs
   name: 'mi_NZ',
   day: {
     abbrev: ['Ta', 'Ma', 'Tū', 'We', 'Tāi', 'Pa', 'Hā'],
-    full: [
-      'Rātapu',
-      'Mane',
-      'Tūrei',
-      'Wenerei',
-      'Tāite',
-      'Paraire',
-      'Hātarei'
-    ]
+    full: ['Rātapu', 'Mane', 'Tūrei', 'Wenerei', 'Tāite', 'Paraire', 'Hātarei']
   },
   month: {
-    abbrev: [
-      'Hān',
-      'Pēp',
-      'Māe',
-      'Āpe',
-      'Mei',
-      'Hun',
-      'Hūr',
-      'Āku',
-      'Hep',
-      'Oke',
-      'Noe',
-      'Tīh'
-    ],
+    abbrev: ['Hān', 'Pēp', 'Māe', 'Āpe', 'Mei', 'Hun', 'Hūr', 'Āku', 'Hep', 'Oke', 'Noe', 'Tīh'],
     full: [
       'Kohi-tātea',
       'Hui-tanguru',

@@ -31,10 +31,12 @@ import 'jqueryui/button'
 import 'jqueryui/tooltip'
 import 'jquery.instructure_date_and_time'
 
-const dialog = $('#dialog-buttons-dialog').dialog({
-  autoOpen: false,
-  height: 200
-}).data('dialog')
+const dialog = $('#dialog-buttons-dialog')
+  .dialog({
+    autoOpen: false,
+    height: 200
+  })
+  .data('dialog')
 $('#show-dialog-buttons-dialog').click(() => dialog.open())
 
 // React Modal
@@ -58,9 +60,15 @@ ReactDOM.render(
 // # OLD STYLEGUIDE ##
 
 const iconEventsMap = {
-  mouseover () { $(this).addClass('hover') },
-  click () { $(this).addClass('active') },
-  mouseout () { $(this).removeClass('hover active') }
+  mouseover() {
+    $(this).addClass('hover')
+  },
+  click() {
+    $(this).addClass('active')
+  },
+  mouseout() {
+    $(this).removeClass('hover active')
+  }
 }
 
 $('#content').on(iconEventsMap, '.demo-icons')
@@ -72,13 +80,15 @@ $('#styleguide-tabs-demo-minimal').tabs()
 // Datepicker
 // $("#datepicker").datepicker().children().show()
 
-
 // hover states on the static widgets
-$('ul#icons li').hover(function () {
-  $(this).addClass('ui-state-hover')
-}, function () {
-  $(this).removeClass('ui-state-hover')
-})
+$('ul#icons li').hover(
+  function() {
+    $(this).addClass('ui-state-hover')
+  },
+  function() {
+    $(this).removeClass('ui-state-hover')
+  }
+)
 
 // Button
 $('.styleguide-turnIntoUiButton, .styleguide-turnAllIntoUiButton > *').button()
@@ -98,7 +108,6 @@ $('#bothIconButton').button({
 // Button Set
 $('#radio1').buttonset()
 
-
 // Publish Button
 // --
 // Hooks into a 'publishable' Backbone model. The backbone model requires
@@ -111,21 +120,21 @@ const Publishable = Backbone.Model.extend({
     publishable: true
   },
 
-  publish () {
+  publish() {
     this.set('published', true)
     const deferred = $.Deferred()
     setTimeout(deferred.resolve, 1000)
     return deferred
   },
 
-  unpublish () {
+  unpublish() {
     this.set('published', false)
     const deferred = $.Deferred()
     setTimeout(deferred.resolve, 1000)
     return deferred
   },
 
-  disabledMessage () {
+  disabledMessage() {
     return "Can't unpublish"
   }
 })
@@ -146,32 +155,33 @@ model = new Publishable({published: true, publishable: false})
 btnView = new PublishButtonView({model, el: '#published-disabled'}).render()
 
 // publish icon
-_.each($('.publish-icon'), ($el) => {
+_.each($('.publish-icon'), $el => {
   model = new Publishable({published: false, publishable: true})
   btnView = new PublishIconView({model, el: $el}).render()
 })
 
-
 // Element Toggler
 $('.element_toggler').click(e =>
-  $(e.currentTarget).find('i')
+  $(e.currentTarget)
+    .find('i')
     .toggleClass('icon-mini-arrow-down')
     .toggleClass('icon-mini-arrow-right')
 )
 
-
 // Progressbar
-$('#progressbar').progressbar({value: 37}).width(500)
-$('#animateProgress').click(preventDefault(() => {
-  const randNum = Math.random() * 90
-  $('#progressbar div').animate({width: `${randNum}%`})
-}))
-
+$('#progressbar')
+  .progressbar({value: 37})
+  .width(500)
+$('#animateProgress').click(
+  preventDefault(() => {
+    const randNum = Math.random() * 90
+    $('#progressbar div').animate({width: `${randNum}%`})
+  })
+)
 
 // Combinations
 $('#tabs2').tabs()
 $('#accordion2').accordion({header: 'h4'})
-
 
 // Toolbar
 $('#play, #shuffle').button()
@@ -180,7 +190,7 @@ $('#repeat').buttonset()
 $('.styleguide-datetime_field-example').datetime_field()
 
 // Global Navigation Hide/Show Subnav
-function selectCategory (event) {
+function selectCategory(event) {
   event.preventDefault()
   const SgNavType = $(this).data('sg-category')
   $('.Sg-header__Subnavigation section').addClass('isHidden')

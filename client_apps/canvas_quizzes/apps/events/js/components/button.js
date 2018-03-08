@@ -18,8 +18,8 @@
  */
 
 define(function(require) {
-  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
-  var classSet = require('canvas_quizzes/util/class_set');
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps')
+  var classSet = require('canvas_quizzes/util/class_set')
 
   /**
    * @class Events.Components.Button
@@ -31,27 +31,28 @@ define(function(require) {
     getDefaultProps: function() {
       return {
         type: 'default'
-      };
+      }
     },
 
     render: function() {
-      var className = {};
-      var type = this.props.type;
+      var className = {}
+      var type = this.props.type
 
-      className['btn'] = true;
-      className['btn-default'] = type === 'default';
-      className['btn-danger'] = type === 'danger';
-      className['btn-success'] = type === 'success';
+      className['btn'] = true
+      className['btn-default'] = type === 'default'
+      className['btn-danger'] = type === 'danger'
+      className['btn-success'] = type === 'success'
 
-      return(
+      return (
         <button
           onClick={this.props.onClick}
           type="button"
           className={classSet(className)}
-          children={this.props.children} />
-      );
+          children={this.props.children}
+        />
+      )
     }
-  });
+  })
 
-  return Button;
-});
+  return Button
+})

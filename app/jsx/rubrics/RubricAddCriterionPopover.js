@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
-import { MenuItem, MenuItemSeparator, MenuItemGroup } from '@instructure/ui-core/lib/components/Menu'
+import {MenuItem, MenuItemSeparator, MenuItemGroup} from '@instructure/ui-core/lib/components/Menu'
 import Text from '@instructure/ui-core/lib/components/Text'
 import I18n from 'i18n!edit_rubric'
 import $ from 'jquery'
@@ -27,42 +27,59 @@ import $ from 'jquery'
 class RubricAddCriterionPopover extends React.Component {
   static propTypes = {
     rubric: PropTypes.object.isRequired, // eslint-disable-line
-    duplicateFunction: PropTypes.func.isRequired,
+    duplicateFunction: PropTypes.func.isRequired
   }
 
-  render () {
+  render() {
     const {rubric, duplicateFunction} = this.props
-    const rubric_data = rubric.find(".criterion:not(.blank)").map(function(i) {
-      const $criterion = $(this);
-      const vals = $criterion.getTemplateData({textValues: ['description']});
-      return {index: i, description: vals.description};
-    }).toArray();
+    const rubric_data = rubric
+      .find('.criterion:not(.blank)')
+      .map(function(i) {
+        const $criterion = $(this)
+        const vals = $criterion.getTemplateData({textValues: ['description']})
+        return {index: i, description: vals.description}
+      })
+      .toArray()
 
     return (
       <span>
         <PopoverMenu
           placement="bottom"
           trigger={
-            <a className="icon-plus" href="#" >{I18n.t("Criterion")}</a>
+            <a className="icon-plus" href="#">
+              {I18n.t('Criterion')}
+            </a>
           }
         >
-          <MenuItem id="add_criterion_button" onClick={() => $("#add_criterion_link").trigger("click")}>
-            <Text size="small" weight="bold">{I18n.t("New Criterion")}</Text>
+          <MenuItem
+            id="add_criterion_button"
+            onClick={() => $('#add_criterion_link').trigger('click')}
+          >
+            <Text size="small" weight="bold">
+              {I18n.t('New Criterion')}
+            </Text>
           </MenuItem>
           <MenuItemSeparator />
-          <MenuItemGroup id="criterion_duplicate_menu" label={I18n.t("Duplicate")}>
-            {rubric_data.map(
-              item => <MenuItem
-                        onClick={() => duplicateFunction(rubric, item.index)}
-                        key={item.index}><div className="ellipsis popover_menu_width">{item.description}</div>
-                      </MenuItem>
-            )}
+          <MenuItemGroup id="criterion_duplicate_menu" label={I18n.t('Duplicate')}>
+            {rubric_data.map(item => (
+              <MenuItem onClick={() => duplicateFunction(rubric, item.index)} key={item.index}>
+                <div className="ellipsis popover_menu_width">{item.description}</div>
+              </MenuItem>
+            ))}
           </MenuItemGroup>
         </PopoverMenu>
-        <a href="#" id="add_learning_outcome_link" className="icon-search find_outcome_link outcome">{I18n.t("Find Outcome")}</a>
-        <a href="#" id="add_criterion_link" className="hidden icon-plus add_criterion_link">{I18n.t("New Criterion")}</a>
+        <a
+          href="#"
+          id="add_learning_outcome_link"
+          className="icon-search find_outcome_link outcome"
+        >
+          {I18n.t('Find Outcome')}
+        </a>
+        <a href="#" id="add_criterion_link" className="hidden icon-plus add_criterion_link">
+          {I18n.t('New Criterion')}
+        </a>
       </span>
-    );
+    )
   }
 }
 

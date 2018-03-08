@@ -33,7 +33,7 @@ import RadioInput from '@instructure/ui-core/lib/components/RadioInput'
 import RadioInputGroup from '@instructure/ui-core/lib/components/RadioInputGroup'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import ToggleDetails from '@instructure/ui-core/lib/components/ToggleDetails'
-import { ConnectedRSSFeedList } from './RSSFeedList'
+import {ConnectedRSSFeedList} from './RSSFeedList'
 
 import actions from '../actions'
 import select from '../../shared/select'
@@ -124,7 +124,7 @@ export default class AddExternalFeed extends React.Component {
     )
   }
 
-  toggleRef = (c) => {
+  toggleRef = c => {
     this.toggleBtn = c && c.querySelector('button')
   }
 
@@ -150,7 +150,7 @@ export default class AddExternalFeed extends React.Component {
         textAlign="start"
         className="announcements-tray__rss-feed-root"
       >
-        <ConnectedRSSFeedList focusLastElement={this.focusOnToggleHeader}/>
+        <ConnectedRSSFeedList focusLastElement={this.focusOnToggleHeader} />
       </Container>
     )
   }
@@ -207,7 +207,9 @@ export default class AddExternalFeed extends React.Component {
           <Checkbox
             checked={this.state.phraseChecked}
             onChange={this.handleCheckboxPhraseChecked}
-            label={I18n.t('Check this box to add posts with specific phrase in the title using text box below')}
+            label={I18n.t(
+              'Check this box to add posts with specific phrase in the title using text box below'
+            )}
             name="external-rss-feed__phrase-checkbox"
           />
           {this.state.phraseChecked &&

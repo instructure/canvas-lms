@@ -1,13 +1,12 @@
-(function ($) {
+;(function($) {
   // register namespace
   $.extend(true, window, {
-    "Slick": {
-      "Plugins": {
-        "HeaderButtons": HeaderButtons
+    Slick: {
+      Plugins: {
+        HeaderButtons: HeaderButtons
       }
     }
-  });
-
+  })
 
   /***
    * A plugin to add custom buttons to column headers.
@@ -63,115 +62,114 @@
    * @constructor
    */
   function HeaderButtons(options) {
-    var _grid;
-    var _self = this;
-    var _handler = new Slick.EventHandler();
+    var _grid
+    var _self = this
+    var _handler = new Slick.EventHandler()
     var _defaults = {
-      buttonCssClass: "slick-header-button"
-    };
-
+      buttonCssClass: 'slick-header-button'
+    }
 
     function init(grid) {
-      options = $.extend(true, {}, _defaults, options);
-      _grid = grid;
+      options = $.extend(true, {}, _defaults, options)
+      _grid = grid
       _handler
         .subscribe(_grid.onHeaderCellRendered, handleHeaderCellRendered)
-        .subscribe(_grid.onBeforeHeaderCellDestroy, handleBeforeHeaderCellDestroy);
+        .subscribe(_grid.onBeforeHeaderCellDestroy, handleBeforeHeaderCellDestroy)
 
       // Force the grid to re-render the header now that the events are hooked up.
-      _grid.setColumns(_grid.getColumns());
+      _grid.setColumns(_grid.getColumns())
     }
-
 
     function destroy() {
-      _handler.unsubscribeAll();
+      _handler.unsubscribeAll()
     }
 
-
     function handleHeaderCellRendered(e, args) {
-      var column = args.column;
+      var column = args.column
 
       if (column.header && column.header.buttons) {
         // Append buttons in reverse order since they are floated to the right.
-        var i = column.header.buttons.length;
+        var i = column.header.buttons.length
         while (i--) {
-          var button = column.header.buttons[i];
-          var btn = $("<div></div>")
+          var button = column.header.buttons[i]
+          var btn = $('<div></div>')
             .addClass(options.buttonCssClass)
-            .data("column", column)
-            .data("button", button);
+            .data('column', column)
+            .data('button', button)
 
           if (button.showOnHover) {
-            btn.addClass("slick-header-button-hidden");
+            btn.addClass('slick-header-button-hidden')
           }
 
           if (button.image) {
-            btn.css("backgroundImage", "url(" + button.image + ")");
+            btn.css('backgroundImage', 'url(' + button.image + ')')
           }
 
           if (button.cssClass) {
-            btn.addClass(button.cssClass);
+            btn.addClass(button.cssClass)
           }
 
           if (button.tooltip) {
-            btn.attr("title", button.tooltip);
+            btn.attr('title', button.tooltip)
           }
 
           if (button.command) {
-            btn.data("command", button.command);
+            btn.data('command', button.command)
           }
 
           if (button.handler) {
-            btn.bind("click", button.handler);
+            btn.bind('click', button.handler)
           }
 
-          btn
-            .bind("click", handleButtonClick)
-            .appendTo(args.node);
+          btn.bind('click', handleButtonClick).appendTo(args.node)
         }
       }
     }
 
-
     function handleBeforeHeaderCellDestroy(e, args) {
-      var column = args.column;
+      var column = args.column
 
       if (column.header && column.header.buttons) {
         // Removing buttons via jQuery will also clean up any event handlers and data.
         // NOTE: If you attach event handlers directly or using a different framework,
         //       you must also clean them up here to avoid memory leaks.
-        $(args.node).find("." + options.buttonCssClass).remove();
+        $(args.node)
+          .find('.' + options.buttonCssClass)
+          .remove()
       }
     }
 
-
     function handleButtonClick(e) {
-      var command = $(this).data("command");
-      var columnDef = $(this).data("column");
-      var button = $(this).data("button");
+      var command = $(this).data('command')
+      var columnDef = $(this).data('column')
+      var button = $(this).data('button')
 
       if (command != null) {
-        _self.onCommand.notify({
-            "grid": _grid,
-            "column": columnDef,
-            "command": command,
-            "button": button
-          }, e, _self);
+        _self.onCommand.notify(
+          {
+            grid: _grid,
+            column: columnDef,
+            command: command,
+            button: button
+          },
+          e,
+          _self
+        )
 
         // Update the header in case the user updated the button definition in the handler.
-        _grid.updateColumnHeader(columnDef.id);
+        _grid.updateColumnHeader(columnDef.id)
       }
 
       // Stop propagation so that it doesn't register as a header click event.
-      e.preventDefault();
-      e.stopPropagation();
+      e.preventDefault()
+      e.stopPropagation()
     }
 
     $.extend(this, {
-      "init": init,
-      "destroy": destroy,
+      init: init,
+      destroy: destroy,
 
-      "onCommand": new Slick.Event()
-    });
+      onCommand: new Slick.Event()
+    })
   }
-})(jQuery);
+})(jQuery)

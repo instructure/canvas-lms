@@ -20,17 +20,22 @@
 
 .tree {
   @include fontSize(12px);
-  &, ul {
+  &,
+  ul {
     @include reset-list;
   }
-  ul { margin-left: 8px; }
+  ul {
+    margin-left: 8px;
+  }
   li a {
     padding-bottom: 2px;
     display: flex;
     white-space: nowrap;
-    &.active { background-color: $activeBG; }
+    &.active {
+      background-color: $activeBG;
+    }
   }
-  li[aria-selected="true"] > a {
+  li[aria-selected='true'] > a {
     outline: thin dotted #333;
     outline: 5px auto -webkit-focus-ring-color;
     outline-offset: -2px;
@@ -46,14 +51,22 @@
       max-height: 100%;
     }
   }
-  .icon-folder:before, .icon-folder-locked:before {
+  .icon-folder:before,
+  .icon-folder-locked:before {
     @include fontSize(11px);
     padding-right: $ic-sp/2;
     vertical-align: middle;
   }
 
-  i[class*=icon-], i[class^=icon-] { color: $ic-font-color-dark }
+  i[class*='icon-'],
+  i[class^='icon-'] {
+    color: $ic-font-color-dark;
+  }
 
-  .icon-mini-arrow-right { transition: transform 0.2s }
-  .expanded .icon-mini-arrow-right { transform: rotate(90deg) }
+  .icon-mini-arrow-right {
+    transition: transform 0.2s;
+  }
+  .expanded .icon-mini-arrow-right {
+    transform: rotate(90deg);
+  }
 }

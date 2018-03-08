@@ -70,7 +70,9 @@ $preview-html-background: whitesmoke;
   /// is visible
   flex: 0 0 216px;
   box-sizing: border-box;
-  @include breakpoint(desktop) { flex: 2; }
+  @include breakpoint(desktop) {
+    flex: 2;
+  }
 }
 
 /// Third container: Image Preview w/ Arrows
@@ -88,7 +90,9 @@ $preview-html-background: whitesmoke;
   display: flex;
   align-items: center;
   box-sizing: border-box;
-  * { box-sizing: border-box; }
+  * {
+    box-sizing: border-box;
+  }
   border-bottom: 1px solid $preview-border-color;
   background-color: $preview-bg;
 }
@@ -138,9 +142,17 @@ $preview-html-background: whitesmoke;
   align-items: center;
   background: $preview-bg;
   white-space: nowrap;
-  @include breakpoint(desktop) { padding: 0 24px; }
-  &:hover, &:focus { color: $ic-color-light; text-decoration: none;}
-  [class^=icon-] { margin-right: 3px; }
+  @include breakpoint(desktop) {
+    padding: 0 24px;
+  }
+  &:hover,
+  &:focus {
+    color: $ic-color-light;
+    text-decoration: none;
+  }
+  [class^='icon-'] {
+    margin-right: 3px;
+  }
 
   &:focus {
     text-decoration: underline;
@@ -164,7 +176,8 @@ $preview-html-background: whitesmoke;
 
 // To support flex in buttons, we need to use an internal div
 // see https://bugzilla.mozilla.org/show_bug.cgi?id=984869
-a.ef-file-preview-button, button.ef-file-preview-button div {
+a.ef-file-preview-button,
+button.ef-file-preview-button div {
   display: flex;
 }
 
@@ -173,7 +186,7 @@ a.ef-file-preview-button, button.ef-file-preview-button div {
 #media_preview {
   color: $preview-font-color;
 }
-.ef-file-not-found{
+.ef-file-not-found {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -187,7 +200,7 @@ a.ef-file-preview-button, button.ef-file-preview-button div {
   justify-content: center;
   align-items: center;
 }
-.ef-not-found-icon{
+.ef-not-found-icon {
   width: 100px;
   height: 100px;
   margin-bottom: 10px;
@@ -199,7 +212,8 @@ a.ef-file-preview-button, button.ef-file-preview-button div {
 .ef-file-preview-container-arrow-link {
   align-self: center;
   outline: none;
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     .ef-file-preview-arrow-link {
       background: var(--ic-brand-primary);
       border-color: var(--ic-brand-primary);
@@ -230,7 +244,9 @@ a.ef-file-preview-button, button.ef-file-preview-button div {
   height: 100vh - $preview-header-height; // IE fix for main container height
 }
 
-.ef-file-preview-frame { border: none; }
+.ef-file-preview-frame {
+  border: none;
+}
 
 // Information Tab
 ////////////////////////////////
@@ -244,7 +260,9 @@ a.ef-file-preview-button, button.ef-file-preview-button div {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  td, th, a {
+  td,
+  th,
+  a {
     text-align: left;
     color: $preview-font-color;
   }

@@ -51,7 +51,8 @@ $new-total-padding: 5px;
 $new-total-border-radius: 3px;
 
 .new-and-total-badge {
-  .new-items, .total-items {
+  .new-items,
+  .total-items {
     color: white;
     border-radius: $new-total-border-radius;
     padding: 0 $new-total-padding;

@@ -1,7 +1,4 @@
-define([
-  'jsx/shared/jwt',
-  'axios'
-], (jwt, axios) => {
+define(['jsx/shared/jwt', 'axios'], (jwt, axios) => {
   let thenStub
   let promise
   let token
@@ -9,20 +6,20 @@ define([
   let refreshFn
 
   QUnit.module('Jwt refreshFn', {
-    setup () {
+    setup() {
       token = 'testjwt'
       newToken = 'newtoken'
       promise = Promise.resolve(newToken)
       sinon.spy(promise, 'then')
       thenStub = sinon.stub().returns(promise)
-      this.stub(axios, 'post').returns({ then: thenStub })
+      this.stub(axios, 'post').returns({then: thenStub})
       refreshFn = jwt.refreshFn(token)
     }
   })
 
   test('posts token to refresh endpoint', () => {
     refreshFn()
-    ok(axios.post.calledWithMatch('/api/v1/jwts/refresh', { jwt: token }))
+    ok(axios.post.calledWithMatch('/api/v1/jwts/refresh', {jwt: token}))
   })
 
   test('only posts once if called multiple times before response', () => {
@@ -43,13 +40,13 @@ define([
 
   test('gets token from response data', () => {
     refreshFn()
-    equal(thenStub.firstCall.args[0]({ data: { token: newToken } }), newToken)
+    equal(thenStub.firstCall.args[0]({data: {token: newToken}}), newToken)
   })
 
   test('updates token in closure', () => {
     refreshFn()
-    thenStub.firstCall.args[0]({ data: { token: newToken } })
+    thenStub.firstCall.args[0]({data: {token: newToken}})
     refreshFn()
-    ok(axios.post.calledWithMatch('/api/v1/jwts/refresh', { jwt: newToken }))
+    ok(axios.post.calledWithMatch('/api/v1/jwts/refresh', {jwt: newToken}))
   })
 })

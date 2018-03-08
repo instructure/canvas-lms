@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 .rs-section {
   padding: 13px 0;
@@ -92,7 +92,9 @@
     cursor: pointer;
     line-height: 22px;
     position: relative;
-    &:hover { background: $lightBackground; }
+    &:hover {
+      background: $lightBackground;
+    }
   }
   .context-list-toggle-box {
     width: 11px;

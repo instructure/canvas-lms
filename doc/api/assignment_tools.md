@@ -1,5 +1,4 @@
-Grade Passback Tools
-====================
+# Grade Passback Tools
 
 Graded external tools are configured just like regular external tools. The
 difference is that rather than adding the tool to a course as a link in a
@@ -156,7 +155,7 @@ If the external tool wants to supply this value, it can augment the POX sent
 with the grading value. <a href="http://www.imsglobal.org/LTI/v1p1/ltiIMGv1p1.html#_Toc319560473">LTI replaceResult POX</a>
 
 Simply add a node called `resultTotalScore` instead of `resultScore`. If both are
-sent, then `resultScore` will be ignored. The `textString` value  should be
+sent, then `resultScore` will be ignored. The `textString` value should be
 an Integer or Float value.
 
 ```xml

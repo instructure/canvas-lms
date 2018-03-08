@@ -17,27 +17,31 @@
  */
 
 import React from 'react'
-import { mount, shallow } from 'enzyme'
-import { Provider } from 'react-redux'
+import {mount, shallow} from 'enzyme'
+import {Provider} from 'react-redux'
 import _ from 'lodash'
 
 import AnnouncementsIndex from 'jsx/announcements/components/AnnouncementsIndex'
 import sampleData from '../sampleData'
 
-const makeProps = (props = {}) => _.merge({
-  announcements: [],
-  announcementsPage: 1,
-  isLoadingAnnouncements: false,
-  hasLoadedAnnouncements: false,
-  announcementsLastPage: 5,
-  permissions: {
-    create: true,
-    manage_content: true,
-    moderate: true,
-  },
-  getAnnouncements () {},
-  setAnnouncementSelection () {},
-}, props)
+const makeProps = (props = {}) =>
+  _.merge(
+    {
+      announcements: [],
+      announcementsPage: 1,
+      isLoadingAnnouncements: false,
+      hasLoadedAnnouncements: false,
+      announcementsLastPage: 5,
+      permissions: {
+        create: true,
+        manage_content: true,
+        moderate: true
+      },
+      getAnnouncements() {},
+      setAnnouncementSelection() {}
+    },
+    props
+  )
 
 // necessary to mock this because we have a child Container/"Smart" component
 // that need to pull their props from the store state
@@ -47,14 +51,14 @@ const store = {
     permissions: {
       create: true,
       manage_content: true,
-      moderate: true,
+      moderate: true
     },
-    selectedAnnouncements: [],
+    selectedAnnouncements: []
   }),
   // we only need to define these functions so that we match the react-redux contextTypes
   // shape for a store otherwise react-redux thinks our store is invalid
   dispatch() {},
-  subscribe() {},
+  subscribe() {}
 }
 
 QUnit.module('AnnouncementsIndex component')
@@ -70,7 +74,7 @@ test('renders the component', () => {
 })
 
 test('displays spinner when loading announcements', () => {
-  const tree = shallow(<AnnouncementsIndex {...makeProps({ isLoadingAnnouncements: true })} />)
+  const tree = shallow(<AnnouncementsIndex {...makeProps({isLoadingAnnouncements: true})} />)
   const node = tree.find('Spinner')
   ok(node.exists())
 })
@@ -79,7 +83,7 @@ test('calls getAnnouncements if hasLoadedAnnouncements is false', () => {
   const getAnnouncements = sinon.spy()
   mount(
     <Provider store={store}>
-      <AnnouncementsIndex {...makeProps({ getAnnouncements })} />
+      <AnnouncementsIndex {...makeProps({getAnnouncements})} />
     </Provider>
   )
   equal(getAnnouncements.callCount, 1)
@@ -88,7 +92,7 @@ test('calls getAnnouncements if hasLoadedAnnouncements is false', () => {
 test('should render IndexHeader if we have manage_content permissions', () => {
   const tree = mount(
     <Provider store={store}>
-      <AnnouncementsIndex {...makeProps({ permissions: { manage_content: true } })} />
+      <AnnouncementsIndex {...makeProps({permissions: {manage_content: true}})} />
     </Provider>
   )
   const node = tree.find('IndexHeader')
@@ -98,14 +102,14 @@ test('should render IndexHeader if we have manage_content permissions', () => {
 test('should render IndexHeader even if we do not have manage_content permissions', () => {
   const tree = mount(
     <Provider store={store}>
-      <AnnouncementsIndex {...makeProps({ permissions: { manage_content: false } })} />
+      <AnnouncementsIndex {...makeProps({permissions: {manage_content: false}})} />
     </Provider>
   )
   const node = tree.find('IndexHeader')
   ok(node.exists())
 })
 
-test('clicking announcement checkbox triggers setAnnouncementSelection with correct data', (assert) => {
+test('clicking announcement checkbox triggers setAnnouncementSelection with correct data', assert => {
   const done = assert.async()
   const selectSpy = sinon.spy()
   const props = {
@@ -113,8 +117,8 @@ test('clicking announcement checkbox triggers setAnnouncementSelection with corr
     setAnnouncementSelection: selectSpy,
     hasLoadedAnnouncements: true,
     permissions: {
-      moderate: true,
-    },
+      moderate: true
+    }
   }
   const tree = mount(
     <Provider store={store}>
@@ -122,10 +126,10 @@ test('clicking announcement checkbox triggers setAnnouncementSelection with corr
     </Provider>
   )
 
-  tree.find('input[type="checkbox"]').simulate('change', { target: { checked: true } })
+  tree.find('input[type="checkbox"]').simulate('change', {target: {checked: true}})
   setTimeout(() => {
     equal(selectSpy.callCount, 1)
-    deepEqual(selectSpy.firstCall.args, [{ selected: true, id: sampleData.announcements[0].id }])
+    deepEqual(selectSpy.firstCall.args, [{selected: true, id: sampleData.announcements[0].id}])
     done()
   })
 })

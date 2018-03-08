@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "./variables";
-@import "./summary_statistics";
-@import "./question_statistics";
-@import "../../../vendor/css/jquery.qtip";
-@import "./ext/qtip";
-@import "./components/ic_spinner";
+@import './variables';
+@import './summary_statistics';
+@import './question_statistics';
+@import '../../../vendor/css/jquery.qtip';
+@import './ext/qtip';
+@import './components/ic_spinner';
 
 #canvas-quiz-statistics {
   padding: 25px 35px 55px 35px;
@@ -64,7 +64,8 @@
         margin-left: $whitespace / 2;
       }
 
-      &.active, &:hover {
+      &.active,
+      &:hover {
         background: $activeBg;
         color: $activeFg;
         cursor: pointer;
@@ -128,7 +129,7 @@
     left: 50%;
     position: absolute;
     float: none;
-    transform: translate(-50%, -20%)
+    transform: translate(-50%, -20%);
   }
   p {
     text-align: center;

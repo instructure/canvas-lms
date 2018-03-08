@@ -16,14 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/calendar/scheduler/reducer'
-], (reducer) => {
-
-  QUnit.module('Scheduler Reducer');
+define(['jsx/calendar/scheduler/reducer'], reducer => {
+  QUnit.module('Scheduler Reducer')
 
   test('sets inFindAppointmentMode on SET_FIND_APPOINTMENT_MODE', () => {
-
     const initialState = {
       inFindAppointmentMode: false,
       setCourse: {}
@@ -38,15 +34,14 @@ define([
   })
 
   test('sets selectedCourse on SET_COURSE', () => {
-
     const initialState = {
       inFindAppointmentMode: false,
-      selectedCourse : null
+      selectedCourse: null
     }
 
     const newState = reducer(initialState, {
       type: 'SET_COURSE',
-      payload: {id: 1, name: "blah"}
+      payload: {id: 1, name: 'blah'}
     })
 
     ok(newState.selectedCourse)

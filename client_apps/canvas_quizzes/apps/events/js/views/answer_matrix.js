@@ -18,16 +18,16 @@
  */
 
 define(function(require) {
-  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
-  var ReactRouter = require('old_version_of_react-router_used_by_canvas_quizzes_client_apps');
-  var K = require('../constants');
-  var I18n = require('i18n!quiz_log_auditing.table_view');
-  var Legend = require('jsx!./answer_matrix/legend');
-  var Emblem = require('jsx!./answer_matrix/emblem');
-  var Option = require('jsx!./answer_matrix/option');
-  var Table = require('jsx!./answer_matrix/table');
-  var InvertedTable = require('jsx!./answer_matrix/inverted_table');
-  var Link = ReactRouter.Link;
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps')
+  var ReactRouter = require('old_version_of_react-router_used_by_canvas_quizzes_client_apps')
+  var K = require('../constants')
+  var I18n = require('i18n!quiz_log_auditing.table_view')
+  var Legend = require('jsx!./answer_matrix/legend')
+  var Emblem = require('jsx!./answer_matrix/emblem')
+  var Option = require('jsx!./answer_matrix/option')
+  var Table = require('jsx!./answer_matrix/table')
+  var InvertedTable = require('jsx!./answer_matrix/inverted_table')
+  var Link = ReactRouter.Link
 
   var AnswerMatrix = React.createClass({
     getInitialState: function() {
@@ -35,7 +35,7 @@ define(function(require) {
         activeEventId: null,
         shouldTruncate: false,
         expandAll: false
-      };
+      }
     },
 
     getDefaultProps: function() {
@@ -43,23 +43,23 @@ define(function(require) {
         questions: [],
         events: [],
         submission: {
-          createdAt: (new Date()).toJSON()
+          createdAt: new Date().toJSON()
         }
-      };
+      }
     },
 
     render: function() {
       var events = this.props.events.filter(function(e) {
-        return e.type === K.EVT_QUESTION_ANSWERED;
-      });
+        return e.type === K.EVT_QUESTION_ANSWERED
+      })
 
-      var className;
+      var className
 
       if (this.state.expandAll) {
-        className = 'expanded';
+        className = 'expanded'
       }
 
-      return(
+      return (
         <div id="ic-AnswerMatrix" className={className}>
           <h1 className="ic-QuizInspector__Header">
             {I18n.t('page_header', 'Answer Sequence')}
@@ -69,19 +69,22 @@ define(function(require) {
                 onChange={this.setOption}
                 name="shouldTruncate"
                 label={I18n.t('options.truncate', 'Truncate textual answers')}
-                checked={this.state.shouldTruncate} />
+                checked={this.state.shouldTruncate}
+              />
 
               <Option
                 onChange={this.setOption}
                 name="expandAll"
                 label={I18n.t('options.expand_all', 'Expand all answers')}
-                checked={this.state.expandAll} />
+                checked={this.state.expandAll}
+              />
 
               <Option
                 onChange={this.setOption}
                 name="invert"
                 label={I18n.t('options.invert', 'Invert')}
-                checked={this.state.invert} />
+                checked={this.state.invert}
+              />
 
               <Link to="app" className="btn btn-default" query={this.props.query}>
                 {I18n.t('buttons.go_to_stream', 'View Stream')}
@@ -95,7 +98,7 @@ define(function(require) {
             {this.state.invert ? this.renderInverted(events) : this.renderNormal(events)}
           </div>
         </div>
-      );
+      )
     },
 
     renderNormal: function(events) {
@@ -105,7 +108,7 @@ define(function(require) {
         submission: this.props.submission,
         expandAll: this.state.expandAll,
         shouldTruncate: this.state.shouldTruncate
-      });
+      })
     },
 
     renderInverted: function(events) {
@@ -116,17 +119,17 @@ define(function(require) {
         expandAll: this.state.expandAll,
         shouldTruncate: this.state.shouldTruncate,
         activeEventId: this.state.activeEventId
-      });
+      })
     },
 
     setOption: function(option, isChecked) {
-      var newState = {};
+      var newState = {}
 
-      newState[option] = isChecked;
+      newState[option] = isChecked
 
-      this.setState(newState);
+      this.setState(newState)
     }
-  });
+  })
 
-  return AnswerMatrix;
-});
+  return AnswerMatrix
+})

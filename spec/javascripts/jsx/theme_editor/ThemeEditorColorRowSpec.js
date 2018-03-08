@@ -16,136 +16,116 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-dom',
-  'jquery',
-  'jsx/theme_editor/ThemeEditorColorRow'
-], (React, ReactDOM, jQuery, ThemeEditorColorRow) => {
+define(
+  ['react', 'react-dom', 'jquery', 'jsx/theme_editor/ThemeEditorColorRow'],
+  (React, ReactDOM, jQuery, ThemeEditorColorRow) => {
+    let elem, props
 
-  let elem, props
+    QUnit.module('ThemeEditorColorRow Component', {
+      setup() {
+        elem = document.createElement('div')
+        props = {
+          varDef: {},
+          onChange: sinon.spy()
+        }
+        // element needs to be attached to test focus
+        document.body.appendChild(elem)
+      },
 
-  QUnit.module('ThemeEditorColorRow Component', {
-    setup () {
-      elem = document.createElement('div')
-      props = {
-        varDef: {},
-        onChange: sinon.spy()
+      teardown() {
+        document.body.removeChild(elem)
       }
-      // element needs to be attached to test focus
-      document.body.appendChild(elem)
-    },
+    })
 
-    teardown () {
-      document.body.removeChild(elem)
-    }
-  })
+    test('showWarning', () => {
+      let component = ReactDOM.render(<ThemeEditorColorRow {...props} />, elem)
+      notOk(component.showWarning(), 'not invalid')
+      props.userInput = {invalid: true}
+      sinon.stub(component, 'inputNotFocused').returns(false)
+      component = ReactDOM.render(<ThemeEditorColorRow {...props} />, elem)
+      notOk(component.showWarning(), 'invalid but input focused')
+      component.inputNotFocused.returns(true)
+      ok(component.showWarning(), 'invalid and input not focused')
+    })
 
-  test('showWarning', () => {
-    let component = ReactDOM.render(<ThemeEditorColorRow {...props} />, elem)
-    notOk(component.showWarning(), 'not invalid')
-    props.userInput = {invalid: true}
-    sinon.stub(component, 'inputNotFocused').returns(false)
-    component = ReactDOM.render(<ThemeEditorColorRow {...props} />, elem)
-    notOk(component.showWarning(), 'invalid but input focused')
-    component.inputNotFocused.returns(true)
-    ok(component.showWarning(), 'invalid and input not focused')
-  })
+    test('changedColor', () => {
+      const component = ReactDOM.render(<ThemeEditorColorRow {...props} />, elem)
+      equal(
+        component.changedColor('foo'),
+        null,
+        'returns null if background color is invalid string'
+      )
 
-  test('changedColor', () => {
-    const component = ReactDOM.render(<ThemeEditorColorRow {...props} />, elem)
-    equal(
-      component.changedColor('foo'),
-      null,
-      'returns null if background color is invalid string'
-    )
+      equal(
+        component.changedColor('#fff'),
+        'rgb(255, 255, 255)',
+        'accepts and returns valid values in rgb'
+      )
 
-    equal(
-      component.changedColor('#fff'),
-      'rgb(255, 255, 255)',
-      'accepts and returns valid values in rgb'
-    )
+      equal(component.changedColor('red'), 'red', 'accepts valid color words')
 
-    equal(
-      component.changedColor('red'),
-      'red',
-      'accepts valid color words'
-    )
+      equal(component.changedColor('transparent'), 'transparent', 'accepts transparent as a value')
 
-    equal(
-      component.changedColor('transparent'),
-      'transparent',
-      'accepts transparent as a value'
-    )
+      equal(component.changedColor(undefined), null, 'rejects undefined params')
 
-    equal(
-      component.changedColor(undefined),
-      null,
-      'rejects undefined params'
-    )
+      equal(
+        component.changedColor('rgb(123,123,123)'),
+        'rgb(123, 123, 123)',
+        'accepts valid rgb values'
+      )
 
-    equal(
-      component.changedColor('rgb(123,123,123)'),
-      'rgb(123, 123, 123)',
-      'accepts valid rgb values'
-    )
+      equal(
+        component.changedColor('rgba(255, 255, 255, 255)'),
+        'rgb(255, 255, 255)',
+        'accepts and compresses rgba values'
+      )
 
-    equal(
-      component.changedColor('rgba(255, 255, 255, 255)'),
-      'rgb(255, 255, 255)',
-      'accepts and compresses rgba values'
-    )
+      equal(component.changedColor('rgba(foo)'), null, 'rejects bad rgba values')
+    })
 
-    equal(
-      component.changedColor('rgba(foo)'),
-      null,
-      'rejects bad rgba values'
-    )
+    test('invalidHexString', () => {
+      const component = ReactDOM.render(<ThemeEditorColorRow {...props} />, elem)
+      notOk(component.invalidHexString('foo'), 'hex string is not valid')
+      ok(component.invalidHexString('#aabbccc'), 'hex string is valid')
+      ok(component.invalidHexString('#abcc'), 'short hex string is valid')
+    })
 
-  })
+    test('inputChange', () => {
+      const component = ReactDOM.render(<ThemeEditorColorRow {...props} />, elem)
+      const expected = 'foo'
+      sinon.stub(component, 'changedColor').returns(true)
+      sinon.stub(component, 'invalidHexString').returns(false)
 
-  test('invalidHexString', () => {
-    const component = ReactDOM.render(<ThemeEditorColorRow {...props} />, elem)
-    notOk(component.invalidHexString('foo'), 'hex string is not valid')
-    ok(component.invalidHexString('#aabbccc'), 'hex string is valid')
-    ok(component.invalidHexString('#abcc'), 'short hex string is valid')
-  })
+      component.inputChange(expected)
+      ok(
+        props.onChange.calledWith(expected, false),
+        'calls onChange with value and invalid false when valid'
+      )
 
-  test('inputChange', () => {
-    const component = ReactDOM.render(<ThemeEditorColorRow {...props} />, elem)
-    const expected = 'foo'
-    sinon.stub(component, 'changedColor').returns(true)
-    sinon.stub(component, 'invalidHexString').returns(false)
+      component.changedColor.returns(false)
+      props.onChange.reset()
+      component.inputChange(expected)
+      ok(
+        props.onChange.calledWith(expected, true),
+        'calls onChange with value and invalid true when invalid'
+      )
 
-    component.inputChange(expected)
-    ok(
-      props.onChange.calledWith(expected, false),
-      'calls onChange with value and invalid false when valid'
-    )
+      component.changedColor.returns(true)
+      component.invalidHexString.returns(true)
+      props.onChange.reset()
+      component.inputChange(expected)
+      ok(
+        props.onChange.calledWith(expected, true),
+        'calls onChange with value and invalid true when invalid'
+      )
+    })
 
-    component.changedColor.returns(false)
-    props.onChange.reset()
-    component.inputChange(expected)
-    ok(
-      props.onChange.calledWith(expected, true),
-      'calls onChange with value and invalid true when invalid'
-    )
-
-    component.changedColor.returns(true)
-    component.invalidHexString.returns(true)
-    props.onChange.reset()
-    component.inputChange(expected)
-    ok(
-      props.onChange.calledWith(expected, true),
-      'calls onChange with value and invalid true when invalid'
-    )
-  })
-
-  test('inputNotFocused', () => {
-    const component = ReactDOM.render(<ThemeEditorColorRow {...props} />, elem)
-    document.body.focus()
-    ok(component.inputNotFocused, 'input is not focused')
-    component.refs.textInput.getDOMNode().focus()
-    notOk(component.inputNotFocused(), 'input is focused')
-  })
-})
+    test('inputNotFocused', () => {
+      const component = ReactDOM.render(<ThemeEditorColorRow {...props} />, elem)
+      document.body.focus()
+      ok(component.inputNotFocused, 'input is not focused')
+      component.refs.textInput.getDOMNode().focus()
+      notOk(component.inputNotFocused(), 'input is focused')
+    })
+  }
+)

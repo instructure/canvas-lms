@@ -19,7 +19,8 @@
 .form-inline label {
   margin: 0;
 }
-.form-inline input, .form-inline button {
+.form-inline input,
+.form-inline button {
   margin-left: 0.5em;
 }
 #course_summaries {
@@ -35,7 +36,10 @@
 .course_text {
   display: block;
   position: absolute;
-  top: 0; left: 0; bottom: 0; right: 0;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
   color: #333;
 }
 .course_text:hover {
@@ -45,7 +49,11 @@ h3 {
   font-size: 1.2em;
   line-height: normal;
   margin: 0;
-  a, a:hover {color: #fff; text-decoration: none;}
+  a,
+  a:hover {
+    color: #fff;
+    text-decoration: none;
+  }
 }
 p {
   margin: 0.25em 0;

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- @import "components/ic-unread-badge";
+@import 'components/ic-unread-badge';
 
 .ic-item-row__select-col + .ic-item-row__author-col {
   margin-left: 11px;
@@ -55,7 +55,8 @@
   }
 
   & > .ic-item-row__content-link {
-    &, &:link {
+    &,
+    &:link {
       color: inherit;
     }
     &:hover {
@@ -73,7 +74,9 @@
     margin: 0;
   }
 
-  p, h4, .ic-announcement-row__content {
+  p,
+  h4,
+  .ic-announcement-row__content {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

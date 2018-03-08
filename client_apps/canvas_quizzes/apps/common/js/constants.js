@@ -24,15 +24,12 @@ define({
     'workflow_state'
   ],
 
-  ATTACHMENT_ATTRS: [
-    'created_at',
-    'url'
-  ],
+  ATTACHMENT_ATTRS: ['created_at', 'url'],
 
   PROGRESS_QUEUED: 'queued',
   PROGRESS_ACTIVE: 'running',
   PROGRESS_COMPLETE: 'completed',
   PROGRESS_FAILED: 'failed',
 
-  KC_RETURN: 13,
-});
+  KC_RETURN: 13
+})

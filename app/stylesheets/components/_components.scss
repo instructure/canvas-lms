@@ -20,7 +20,9 @@
   padding: $contentBoxPadding / 2;
   @include fontSize($ic-font-size--small);
   line-height: $baseLineHeight;
-  .header { @include fontSize($ic-font-size--medium); }
+  .header {
+    @include fontSize($ic-font-size--medium);
+  }
 }
 
 // List View
@@ -71,7 +73,8 @@
           text-decoration: underline;
         }
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           background: lighten($ic-color-neutral, 5%);
         }
 
@@ -95,7 +98,10 @@
     background-color: var(--ic-brand-primary);
     font-weight: bold;
     color: $ic-color-light;
-    &:hover, &:focus { background-color: var(--ic-brand-primary); }
+    &:hover,
+    &:focus {
+      background-color: var(--ic-brand-primary);
+    }
     .nav-badge {
       background: $ic-color-light;
       color: var(--ic-brand-primary);
@@ -115,7 +121,7 @@
 }
 
 .box-shadow {
-  box-shadow: 0 2px 4px rgba(0,0,0,.25)
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
 }
 
 .page-action-list {
@@ -127,11 +133,14 @@
     font-weight: bold;
     border-bottom: 1px solid $ic-border-light;
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       color: var(--ic-link-color);
     }
 
-    @if $use_high_contrast { text-decoration: none; }
+    @if $use_high_contrast {
+      text-decoration: none;
+    }
 
     &:active {
       color: $grayLight;
@@ -139,4 +148,6 @@
   }
 }
 
-* + .page-action-list { margin-top: $ic-sp; }
+* + .page-action-list {
+  margin-top: $ic-sp;
+}

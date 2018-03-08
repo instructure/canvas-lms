@@ -18,16 +18,16 @@
  */
 
 define(function(require) {
-  var React = require('../../ext/react');
-  var $ = require('jquery');
-  var Status = require('jsx!./report/status');
-  var Popup = require('jsx!canvas_quizzes/components/popup');
-  var ScreenReaderContent = require('jsx!canvas_quizzes/components/screen_reader_content');
-  var SightedUserContent = require('jsx!canvas_quizzes/components/sighted_user_content');
-  var Descriptor = require('../../models/quiz_report_descriptor');
+  var React = require('../../ext/react')
+  var $ = require('jquery')
+  var Status = require('jsx!./report/status')
+  var Popup = require('jsx!canvas_quizzes/components/popup')
+  var ScreenReaderContent = require('jsx!canvas_quizzes/components/screen_reader_content')
+  var SightedUserContent = require('jsx!canvas_quizzes/components/sighted_user_content')
+  var Descriptor = require('../../models/quiz_report_descriptor')
 
   var Report = React.createClass({
-    mixins: [ React.addons.ActorMixin ],
+    mixins: [React.addons.ActorMixin],
 
     propTypes: {
       generatable: React.PropTypes.bool
@@ -37,7 +37,7 @@ define(function(require) {
       return {
         tooltipContent: '',
         statusLayer: null
-      };
+      }
     },
 
     getDefaultProps: function() {
@@ -46,25 +46,24 @@ define(function(require) {
         generatable: true,
         isGenerated: false,
         downloadUrl: undefined
-      };
+      }
     },
 
-    componentDidUpdate: function(prevProps/*, prevState*/) {
+    componentDidUpdate: function(prevProps /*, prevState*/) {
       // Restore focus to the generation button which is now the download button
       if (!prevProps.isGenerated && this.props.isGenerated) {
         if (this.refs.popup.screenReaderContentHasFocus()) {
-          this.refs.popup.focusAnchor();
+          this.refs.popup.focusAnchor()
         }
-      }
-      else if (!prevProps.isGenerating && this.props.isGenerating) {
+      } else if (!prevProps.isGenerating && this.props.isGenerating) {
         if (!this.refs.popup.screenReaderContentHasFocus()) {
-          this.refs.popup.focusScreenReaderContent(true);
+          this.refs.popup.focusScreenReaderContent(true)
         }
       }
     },
 
     render: function() {
-      var id = this.props.reportType;
+      var id = this.props.reportType
 
       return (
         <div className="report-generator inline">
@@ -79,58 +78,55 @@ define(function(require) {
             file={this.props.file}
             reactivePositioning
             anchorSelector=".btn"
-            popupOptions={
-              {
-                show: {
-                  event: 'mouseenter focusin',
-                  delay: 0,
-                  effect: false,
-                  solo: true
-                },
+            popupOptions={{
+              show: {
+                event: 'mouseenter focusin',
+                delay: 0,
+                effect: false,
+                solo: true
+              },
 
-                hide: {
-                  event: 'mouseleave focusout',
-                  delay: 350,
-                  effect: false,
-                  fixed: true,
-                },
+              hide: {
+                event: 'mouseleave focusout',
+                delay: 350,
+                effect: false,
+                fixed: true
+              },
 
-                position: {
-                  my: 'bottom center',
-                  at: 'top center'
-                }
+              position: {
+                my: 'bottom center',
+                at: 'top center'
               }
-            }>
-            {this.props.isGenerated ?
-              this.renderDownloader() :
-              this.renderGenerator()
-            }
+            }}
+          >
+            {this.props.isGenerated ? this.renderDownloader() : this.renderGenerator()}
           </Popup>
         </div>
-      );
+      )
     },
 
     renderGenerator: function() {
-      var srLabel = Descriptor.getInteractionLabel(this.props);
+      var srLabel = Descriptor.getInteractionLabel(this.props)
 
       return (
         <button
           disabled={!this.props.generatable}
           onClick={this.generate}
           onKeyPress={this.generateAndFocusContent}
-          className="btn generate-report">
-            <ScreenReaderContent children={srLabel} />
-            <SightedUserContent>
-              <i className="icon-analytics" /> {this.props.readableType}
-            </SightedUserContent>
+          className="btn generate-report"
+        >
+          <ScreenReaderContent children={srLabel} />
+          <SightedUserContent>
+            <i className="icon-analytics" /> {this.props.readableType}
+          </SightedUserContent>
         </button>
-      );
+      )
     },
 
     renderDownloader: function() {
-      var srLabel = Descriptor.getInteractionLabel(this.props);
+      var srLabel = Descriptor.getInteractionLabel(this.props)
 
-      return(
+      return (
         <a href={this.props.file.url} className="btn download-report">
           <ScreenReaderContent children={srLabel} />
 
@@ -138,21 +134,21 @@ define(function(require) {
             <i className="icon-analytics" /> {this.props.readableType}
           </SightedUserContent>
         </a>
-      );
+      )
     },
 
     generate: function(e) {
-      e.preventDefault();
+      e.preventDefault()
 
-      this.sendAction('quizReports:generate', this.props.reportType);
+      this.sendAction('quizReports:generate', this.props.reportType)
     },
 
     generateAndFocusContent: function(e) {
-      e.preventDefault();
+      e.preventDefault()
 
-      this.sendAction('quizReports:generate', this.props.reportType);
+      this.sendAction('quizReports:generate', this.props.reportType)
     }
-  });
+  })
 
-  return Report;
-});
+  return Report
+})

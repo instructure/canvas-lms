@@ -73,15 +73,15 @@ $contrastColor: #2a333b;
 $highlightColor: #349e67;
 
 // Colors for Answer Table formatting
-$rowHighlightBackgroundColor: #E1F1E8;
-$questionTableBackgroundColor: #F5F5F5;
+$rowHighlightBackgroundColor: #e1f1e8;
+$questionTableBackgroundColor: #f5f5f5;
 $rowTextHighlightColor: #0a6129;
 
 // You could use this for anything abnormal, or for negative numbers.
 $negativeColor: $ic-color-danger;
 
 // An accessible, mid-tone grey.
-$borderColor: #CAD0D7;
+$borderColor: #cad0d7;
 
 // Functional Colors
 // =================
@@ -91,7 +91,7 @@ $borderColor: #CAD0D7;
 // Try to use a semantically clear name for these variables so we know what's
 // going on.
 
-$summaryPercentileChartBarColor: #BEDFF1;
+$summaryPercentileChartBarColor: #bedff1;
 $activeOrHoverQuestionBoxBg: #f4f4f4;
 
 // Uncomment this if you want to test the app in hi-contrast mode.
@@ -108,4 +108,4 @@ $activeOrHoverQuestionBoxBg: #f4f4f4;
 //
 //   - http://webaim.org/resources/contrastchecker/
 //   - http://www.dasplankton.de/ContrastA/
-@import "./variables_high_contrast";
+@import './variables_high_contrast';

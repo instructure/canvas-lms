@@ -17,7 +17,7 @@
  */
 
 import cyoeClient from './cyoe-api'
-import { createActions } from './helpers/actions'
+import {createActions} from './helpers/actions'
 
 const actionDefs = [
   'SET_INITIAL_DATA',
@@ -35,10 +35,10 @@ const actionDefs = [
   'LOAD_INITIAL_DATA_START',
   'LOAD_INITIAL_DATA_END',
   'LOAD_STUDENT_DETAILS_START',
-  'LOAD_STUDENT_DETAILS_END',
+  'LOAD_STUDENT_DETAILS_END'
 ]
 
-export const { actions, actionTypes } = createActions(actionDefs)
+export const {actions, actionTypes} = createActions(actionDefs)
 
 actions.closeSidebarFrd = actions.closeSidebar
 
@@ -50,11 +50,12 @@ actions.closeSidebar = () => {
   }
 }
 
-actions.loadInitialData = (assignment) => {
+actions.loadInitialData = assignment => {
   return (dispatch, getState) => {
     dispatch(actions.loadInitialDataStart())
 
-    cyoeClient.loadInitialData(getState())
+    cyoeClient
+      .loadInitialData(getState())
       .then(data => {
         dispatch(actions.setInitialData(data))
         dispatch(actions.loadInitialDataEnd())
@@ -66,13 +67,14 @@ actions.loadInitialData = (assignment) => {
   }
 }
 
-actions.loadStudent = (studentId) => {
+actions.loadStudent = studentId => {
   return (dispatch, getState) => {
     dispatch(actions.loadStudentDetailsStart())
 
-    cyoeClient.loadStudent(getState(), studentId)
+    cyoeClient
+      .loadStudent(getState(), studentId)
       .then(data => {
-        dispatch(actions.addStudentToCache({ studentId, data }))
+        dispatch(actions.addStudentToCache({studentId, data}))
         dispatch(actions.loadStudentDetailsEnd())
       })
       .catch(errors => {
@@ -82,15 +84,11 @@ actions.loadStudent = (studentId) => {
   }
 }
 
-actions.selectStudent = (studentIndex) => {
+actions.selectStudent = studentIndex => {
   return (dispatch, getState) => {
-    dispatch({ type: actionTypes.SELECT_STUDENT, payload: studentIndex })
+    dispatch({type: actionTypes.SELECT_STUDENT, payload: studentIndex})
 
-    const {
-      studentCache,
-      ranges,
-      selectedPath,
-    } = getState()
+    const {studentCache, ranges, selectedPath} = getState()
 
     const student = ranges[selectedPath.range].students[studentIndex]
 

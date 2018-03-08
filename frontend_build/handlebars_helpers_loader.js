@@ -28,7 +28,7 @@ const fs = require('fs')
 const path = require('path')
 const coffee = require('coffee-script')
 
-function loadHelpersAST () {
+function loadHelpersAST() {
   const filename = path.join(__dirname, '..', 'app/coffeescripts/handlebars_helpers.coffee')
   const source = fs.readFileSync(filename, 'utf8')
   return coffee.nodes(source)
@@ -37,18 +37,19 @@ function loadHelpersAST () {
 // we're looking in the helpers AST for the for loop that goes through a javascript
 // object (the "source" object) and calls "registerHelper" with each property
 //   We want to make those same properties into "known" helpers.
-function isHandlebarsAssignmentNode (node) {
-  return node.body.contains(childNode =>
-    childNode.constructor.name === 'Call' &&
-    childNode.variable.base.value === 'Handlebars' &&
-    childNode.variable.contains(registerNode =>
-      registerNode.constructor.name === 'Access' &&
-      registerNode.name.value === 'registerHelper'
-    )
+function isHandlebarsAssignmentNode(node) {
+  return node.body.contains(
+    childNode =>
+      childNode.constructor.name === 'Call' &&
+      childNode.variable.base.value === 'Handlebars' &&
+      childNode.variable.contains(
+        registerNode =>
+          registerNode.constructor.name === 'Access' && registerNode.name.value === 'registerHelper'
+      )
   )
 }
 
-function findHelperNodes (helpersAST) {
+function findHelperNodes(helpersAST) {
   let helpersCollection = null
   helpersAST.traverseChildren(true, child => {
     if (child.constructor.name === 'For') {
@@ -64,7 +65,7 @@ function findHelperNodes (helpersAST) {
 // given an array of nodes (which are functions assigned to property names),
 // return an array of property names in the "knownHelpers" query format for
 // the handlebars loader.
-function buildQueryStringElements (helperNodes) {
+function buildQueryStringElements(helperNodes) {
   const queryElements = []
   helperNodes.forEach(helper => {
     const helperName = helper.variable.base.value

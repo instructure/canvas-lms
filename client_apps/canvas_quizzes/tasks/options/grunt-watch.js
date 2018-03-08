@@ -18,12 +18,12 @@
 
 module.exports = {
   options: {
-    spawn: false,
+    spawn: false
   },
 
   css: {
     files: '{apps/*/css,vendor/css}/**/*.{scss,css}',
-    tasks: [ 'compile_css' ],
+    tasks: ['compile_css'],
     options: {
       spawn: true
     }
@@ -31,7 +31,7 @@ module.exports = {
 
   compiled_css: {
     files: 'dist/*.css',
-    tasks: [ 'noop' ],
+    tasks: ['noop'],
     options: {
       livereload: {
         port: 9224
@@ -40,11 +40,7 @@ module.exports = {
   },
 
   tests: {
-    files: [
-      'apps/*/{js,test}/**/*.j{s,sx}',
-      'tasks/*.js',
-      'vendor/packages/**/*.js'
-    ],
-    tasks: [ "jasmine:<%= grunt.config.get('currentApp') %>" ],
-  },
-};
+    files: ['apps/*/{js,test}/**/*.j{s,sx}', 'tasks/*.js', 'vendor/packages/**/*.js'],
+    tasks: ["jasmine:<%= grunt.config.get('currentApp') %>"]
+  }
+}

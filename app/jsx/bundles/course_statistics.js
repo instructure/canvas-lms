@@ -21,7 +21,9 @@ import UserCollection from 'compiled/collections/UserCollection'
 import RecentStudentCollectionView from 'compiled/views/RecentStudents/RecentStudentCollectionView'
 
 $(() => {
-  $('#reports-tabs').tabs().show()
+  $('#reports-tabs')
+    .tabs()
+    .show()
 
   const recentStudentCollection = new UserCollection()
   recentStudentCollection.url = ENV.RECENT_STUDENTS_URL

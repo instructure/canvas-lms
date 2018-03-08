@@ -16,14 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/variables";
-@import "base/mixins/typography";
-@import "vendor/bootstrap/variables";
-@import "deprecated/bootstrap/mixins";
-@import "vendor/bootstrap/grid";
-@import "vendor/bootstrap/forms";
-@import "vendor/bootstrap/tables";
-
+@import 'base/variables';
+@import 'base/mixins/typography';
+@import 'vendor/bootstrap/variables';
+@import 'deprecated/bootstrap/mixins';
+@import 'vendor/bootstrap/grid';
+@import 'vendor/bootstrap/forms';
+@import 'vendor/bootstrap/tables';
 
 // expanded checkbox label with hover
 div.checkbox {
@@ -48,11 +47,14 @@ table.table {
   border: 1px solid darken($grayLighter, 10%);
   @include fontSize($ic-font-size--xsmall);
 
-  th, td {
+  th,
+  td {
     padding: 12px;
     border: 1px solid darken($grayLighter, 10%);
   }
-  th, td, tr {
+  th,
+  td,
+  tr {
     text-align: center;
   }
   th {
@@ -62,7 +64,8 @@ table.table {
 
   // left align the first column for student info tables
   &.left-first {
-    th:first-child, td:first-child {
+    th:first-child,
+    td:first-child {
       text-align: left;
     }
   }
@@ -91,13 +94,16 @@ table.table {
 }
 
 // padding helper for vertical spacing
-h3.assignment_selection { margin-bottom: 0px; }
+h3.assignment_selection {
+  margin-bottom: 0px;
+}
 
 ic-tab {
   padding: 6px 12px;
   margin: 2px;
   border-radius: 5px;
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     background-color: $grayLighter;
   }
   &[selected] {
@@ -119,7 +125,8 @@ select.grading_box.pass_fail {
   width: inherit;
 }
 
-span.late-pill, span.missing-pill {
+span.late-pill,
+span.missing-pill {
   padding-left: 12px;
   text-transform: uppercase;
 }
@@ -146,9 +153,9 @@ span.late-pill, span.missing-pill {
 .deduction-box {
   display: flex;
   .deduction-box-labels {
-    margin-right: .5em;
+    margin-right: 0.5em;
   }
   .deduction-box-values {
-    flex: 1
+    flex: 1;
   }
 }

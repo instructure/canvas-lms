@@ -168,7 +168,8 @@
         {
           "id": "13",
           "question_type": "multiple_choice_question",
-          "question_text": "<p>D, A, B, or C?</p>\n<p><img src=\"http://kodoware.com/hadooken.gif\" alt=\"Impressive!\" width=\"400\" height=\"180\">This is a longer description. I'ma embed an image too.</p>",
+          "question_text":
+            "<p>D, A, B, or C?</p>\n<p><img src=\"http://kodoware.com/hadooken.gif\" alt=\"Impressive!\" width=\"400\" height=\"180\">This is a longer description. I'ma embed an image too.</p>",
           "position": 3,
           "responses": 156,
           "answers": [
@@ -434,7 +435,8 @@
         {
           "id": "18",
           "question_type": "essay_question",
-          "question_text": "<p>Summarize your feelings towards life, the universe, and everything in decimal numbers.</p>",
+          "question_text":
+            "<p>Summarize your feelings towards life, the universe, and everything in decimal numbers.</p>",
           "position": 8,
           "responses": 90,
           "graded": 1,
@@ -653,7 +655,8 @@
         {
           "id": "21",
           "question_type": "numerical_question",
-          "question_text": "<p>[Numerical:Exact] What's 9 plus 3, 2.5 minus 1, or 4 minus zero?</p>",
+          "question_text":
+            "<p>[Numerical:Exact] What's 9 plus 3, 2.5 minus 1, or 4 minus zero?</p>",
           "position": 11,
           "responses": 150,
           "full_credit": 138,
@@ -665,10 +668,7 @@
               "text": "12.00",
               "correct": true,
               "responses": 108,
-              "value": [
-                12,
-                12
-              ],
+              "value": [12, 12],
               "margin": 0,
               "is_range": false
             },
@@ -677,10 +677,7 @@
               "text": "[3.00..6.00]",
               "correct": true,
               "responses": 22,
-              "value": [
-                3,
-                6
-              ],
+              "value": [3, 6],
               "margin": 0,
               "is_range": true
             },
@@ -689,10 +686,7 @@
               "text": "4.00",
               "correct": true,
               "responses": 0,
-              "value": [
-                4,
-                4
-              ],
+              "value": [4, 4],
               "margin": 0,
               "is_range": false
             },
@@ -701,10 +695,7 @@
               "text": "1.50",
               "correct": true,
               "responses": 8,
-              "value": [
-                0.5,
-                2.5
-              ],
+              "value": [0.5, 2.5],
               "margin": 1,
               "is_range": false
             },

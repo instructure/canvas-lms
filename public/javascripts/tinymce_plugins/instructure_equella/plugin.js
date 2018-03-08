@@ -23,29 +23,29 @@ import $ from 'jquery'
 import initializeEquella from 'tinymce_plugins/instructure_equella/initializeEquella'
 import 'jqueryui/dialog'
 
-  tinymce.create('tinymce.plugins.InstructureEquella', {
-    init : function(ed, url) {
-      ed.addCommand('instructureEquella', function () {
-        initializeEquella(ed)
-      })
+tinymce.create('tinymce.plugins.InstructureEquella', {
+  init: function(ed, url) {
+    ed.addCommand('instructureEquella', function() {
+      initializeEquella(ed)
+    })
 
-      ed.addButton('instructure_equella', {
-        title: 'Insert Equella Links',
-        cmd: 'instructureEquella',
-        icon: 'equella icon-equella'
-      });
-    },
+    ed.addButton('instructure_equella', {
+      title: 'Insert Equella Links',
+      cmd: 'instructureEquella',
+      icon: 'equella icon-equella'
+    })
+  },
 
-    getInfo : function() {
-      return {
-        longname : 'InstructureEquella',
-        author : 'Brian Whitmer',
-        authorurl : 'http://www.instructure.com',
-        infourl : 'http://www.instructure.com',
-        version : tinymce.majorVersion + "." + tinymce.minorVersion
-      };
+  getInfo: function() {
+    return {
+      longname: 'InstructureEquella',
+      author: 'Brian Whitmer',
+      authorurl: 'http://www.instructure.com',
+      infourl: 'http://www.instructure.com',
+      version: tinymce.majorVersion + '.' + tinymce.minorVersion
     }
-  });
+  }
+})
 
-  // Register plugin
-  tinymce.PluginManager.add('instructure_equella', tinymce.plugins.InstructureEquella);
+// Register plugin
+tinymce.PluginManager.add('instructure_equella', tinymce.plugins.InstructureEquella)

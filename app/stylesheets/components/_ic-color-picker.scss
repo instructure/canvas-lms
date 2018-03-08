@@ -22,18 +22,21 @@
 @keyframes color-picker-enter {
   from {
     opacity: 0;
-    transform: translate3d(-20%,0,0);
+    transform: translate3d(-20%, 0, 0);
   }
   to {
     opacity: 1;
-    transform: translate3d(0,0,0);
+    transform: translate3d(0, 0, 0);
   }
 }
 
-.ColorPicker__Overlay { background-color: rgba(0,0,0,0); }
+.ColorPicker__Overlay {
+  background-color: rgba(0, 0, 0, 0);
+}
 
 .ColorPicker__Title {
-  margin: 0 0 $ic-sp; padding: 0;
+  margin: 0 0 $ic-sp;
+  padding: 0;
   line-height: 1.1;
   @include fontSize($ic-font-size--small);
   font-weight: bold;
@@ -60,17 +63,20 @@
   border: 1px solid $ic-border-light;
 }
 
-.ColorPicker__Container.with-arrow{
-  &:after, &:before {
-    right: 100%; top: $ic-sp*2;
+.ColorPicker__Container.with-arrow {
+  &:after,
+  &:before {
+    right: 100%;
+    top: $ic-sp*2;
     border: solid transparent;
-    content: "";
-    height: 0; width: 0;
+    content: '';
+    height: 0;
+    width: 0;
     position: absolute;
     pointer-events: none;
   }
   &:after {
-    border-color: rgba(255,255,255,0);
+    border-color: rgba(255, 255, 255, 0);
     border-right-color: $ic-color-light;
     border-width: $ic-sp - 1;
     margin-top: -($ic-sp - 1);
@@ -84,22 +90,27 @@
 }
 
 .right > .ColorPicker__Container {
-  transform: translate3d(20%,0,0);
-  &:after, &:before {
-    right: auto; left: 100%;
+  transform: translate3d(20%, 0, 0);
+  &:after,
+  &:before {
+    right: auto;
+    left: 100%;
   }
   &:after {
-    border-right-color: rgba(255,255,255,0);
+    border-right-color: rgba(255, 255, 255, 0);
     border-left-color: $ic-color-light;
   }
   &:before {
-    border-right-color: rgba(255,255,255,0);
+    border-right-color: rgba(255, 255, 255, 0);
     border-left-color: darken($ic-border-light, 4%);
   }
 }
 
 .middle > .ColorPicker__Container {
-  &:after, &:before { top: 50%; }
+  &:after,
+  &:before {
+    top: 50%;
+  }
 }
 
 .ColorPicker__ColorContainer {
@@ -111,7 +122,7 @@
 
 .ColorPicker__ColorBlock {
   transition: all 0.2s;
-  transform: translate3d(0,0,0);
+  transform: translate3d(0, 0, 0);
   display: inline-block;
   width: 24px;
   height: 24px;
@@ -126,7 +137,7 @@
   border: 2px solid $ic-border-color;
 
   &:before {
-    content: "";
+    content: '';
     position: absolute;
     top: -4px;
     left: -4px;
@@ -152,8 +163,8 @@
     transform: scale(1.15);
   }
 
-  i[class*=icon-],
-  i[class^=icon-] {
+  i[class*='icon-'],
+  i[class^='icon-'] {
     &:before {
       vertical-align: text-bottom;
     }
@@ -177,16 +188,21 @@
 }
 
 .ColorPicker__ColorBlock.with-dark-check {
-  i[class*=icon-], i[class^=icon-] {
+  i[class*='icon-'],
+  i[class^='icon-'] {
     color: $ic-color-dark;
   }
 }
 
 .ColorPicker__ColorBlock.with-box-shadow {
-  &:hover { box-shadow: 0 1px 2px rgba(black, 0.25); }
+  &:hover {
+    box-shadow: 0 1px 2px rgba(black, 0.25);
+  }
   &:focus {
     box-shadow: 0 1px 2px rgba(black, 0.25), inset 0 0 0 1px $ic-color-light;
-    @if $use_high_contrast == false { outline: none; }
+    @if $use_high_contrast == false {
+      outline: none;
+    }
   }
 }
 
@@ -211,19 +227,21 @@
   &:focus {
     outline: none;
   }
-  i[class*=icon-], i[class^=icon-] {
+  i[class*='icon-'],
+  i[class^='icon-'] {
     margin: 0 auto;
     color: $ic-color-alert;
   }
 }
 
 .ColorPicker__Actions {
-  margin-top: $ic-sp*.5;
+  margin-top: $ic-sp*0.5;
   display: flex;
   justify-content: flex-end;
   body.chrome & {
     // fixes weird Chrome bug, where left border of first button gets cut off
-    .Button:first-of-type { margin-left: 1px; }
+    .Button:first-of-type {
+      margin-left: 1px;
+    }
   }
-
 }

@@ -17,25 +17,29 @@
  */
 
 import React from 'react'
-import { mount, ReactWrapper } from 'enzyme'
+import {mount, ReactWrapper} from 'enzyme'
 import _ from 'lodash'
 
-import IndexHeader, { SEARCH_TIME_DELAY } from 'jsx/announcements/components/IndexHeader'
+import IndexHeader, {SEARCH_TIME_DELAY} from 'jsx/announcements/components/IndexHeader'
 
-const makeProps = (props = {}) => _.merge({
-  courseId: '5',
-  permissions: {
-    create: true,
-    manage_content: true,
-    moderate: true,
-  },
-  isBusy: false,
-  selectedCount: 0,
-  searchAnnouncements () {},
-  lockAnnouncements () {},
-  deleteAnnouncements () {},
-  applicationElement: () => document.getElementById('fixtures'),
-}, props)
+const makeProps = (props = {}) =>
+  _.merge(
+    {
+      courseId: '5',
+      permissions: {
+        create: true,
+        manage_content: true,
+        moderate: true
+      },
+      isBusy: false,
+      selectedCount: 0,
+      searchAnnouncements() {},
+      lockAnnouncements() {},
+      deleteAnnouncements() {},
+      applicationElement: () => document.getElementById('fixtures')
+    },
+    props
+  )
 
 QUnit.module('IndexHeader component')
 
@@ -46,43 +50,35 @@ test('renders the component', () => {
 })
 
 test('renders create announcement button if we have create permissions', () => {
-  const tree = mount(
-    <IndexHeader {...makeProps({ permissions: { create: true } })} />
-  )
+  const tree = mount(<IndexHeader {...makeProps({permissions: {create: true}})} />)
   const node = tree.find('#add_announcement')
   ok(node.exists())
 })
 
 test('does not render create announcement button if we do not have create permissions', () => {
-  const tree = mount(
-    <IndexHeader {...makeProps({ permissions: { create: false } })} />
-  )
+  const tree = mount(<IndexHeader {...makeProps({permissions: {create: false}})} />)
   const node = tree.find('#add_announcement')
   notOk(node.exists())
 })
 
-test('onSearch calls searchAnnouncements with searchInput value after debounce timeout', (assert) => {
+test('onSearch calls searchAnnouncements with searchInput value after debounce timeout', assert => {
   const done = assert.async()
   const searchSpy = sinon.spy()
-  const tree = mount(
-    <IndexHeader {...makeProps({ searchAnnouncements: searchSpy })} />
-  )
+  const tree = mount(<IndexHeader {...makeProps({searchAnnouncements: searchSpy})} />)
 
   tree.find('input[name="announcements_search"]').node.value = 'foo'
   tree.instance().onSearch()
 
   setTimeout(() => {
-    deepEqual(searchSpy.firstCall.args[0], { term: 'foo' })
+    deepEqual(searchSpy.firstCall.args[0], {term: 'foo'})
     done()
   }, SEARCH_TIME_DELAY)
 })
 
-test('onSearch calls searchAnnouncements with searchInput value only once within debounce timeout', (assert) => {
+test('onSearch calls searchAnnouncements with searchInput value only once within debounce timeout', assert => {
   const done = assert.async()
   const searchSpy = sinon.spy()
-  const tree = mount(
-    <IndexHeader {...makeProps({ searchAnnouncements: searchSpy })} />
-  )
+  const tree = mount(<IndexHeader {...makeProps({searchAnnouncements: searchSpy})} />)
 
   tree.find('input[name="announcements_search"]').node.value = 'foo'
   tree.instance().onSearch()
@@ -90,109 +86,85 @@ test('onSearch calls searchAnnouncements with searchInput value only once within
   tree.instance().onSearch()
 
   setTimeout(() => {
-    deepEqual(searchSpy.firstCall.args[0], { term: 'foo' })
+    deepEqual(searchSpy.firstCall.args[0], {term: 'foo'})
     equal(searchSpy.callCount, 1)
     done()
   }, SEARCH_TIME_DELAY)
 })
 
 test('renders the filter select component', () => {
-  const tree = mount(
-    <IndexHeader {...makeProps()} />
-  )
+  const tree = mount(<IndexHeader {...makeProps()} />)
   const node = tree.find('Select')
   ok(node.exists())
 })
 
 test('renders two options in the filter select component', () => {
-  const tree = mount(
-    <IndexHeader {...makeProps()} />
-  )
+  const tree = mount(<IndexHeader {...makeProps()} />)
   const node = tree.find('option')
   equal(node.length, 2)
 })
 
 test('onChange on the filter select calls searchAnnouncements with filter value', () => {
   const filterSpy = sinon.spy()
-  const tree = mount(
-    <IndexHeader {...makeProps({ searchAnnouncements: filterSpy })} />
-  )
+  const tree = mount(<IndexHeader {...makeProps({searchAnnouncements: filterSpy})} />)
   const node = tree.find('Select')
   node.props().onChange({target: {value: 'unread'}})
-  deepEqual(filterSpy.firstCall.args[0], { filter: 'unread' })
+  deepEqual(filterSpy.firstCall.args[0], {filter: 'unread'})
   equal(filterSpy.callCount, 1)
 })
 
 test('renders lock announcements button if we have manage_content permissions', () => {
-  const tree = mount(
-    <IndexHeader {...makeProps({ permissions: { manage_content: true } })} />
-  )
+  const tree = mount(<IndexHeader {...makeProps({permissions: {manage_content: true}})} />)
   const node = tree.find('#lock_announcements')
   ok(node.exists())
 })
 
 test('does not render lock announcements button if we do not have manage_content permissions', () => {
-  const tree = mount(
-    <IndexHeader {...makeProps({ permissions: { manage_content: false } })} />
-  )
+  const tree = mount(<IndexHeader {...makeProps({permissions: {manage_content: false}})} />)
   const node = tree.find('#lock_announcements')
   notOk(node.exists())
 })
 
 test('lock announcements button is disabled if isBusy', () => {
-  const tree = mount(
-    <IndexHeader {...makeProps({ isBusy: true })} />
-  )
+  const tree = mount(<IndexHeader {...makeProps({isBusy: true})} />)
   const node = tree.find('#lock_announcements')
   ok(node.is('[disabled]'))
 })
 
 test('lock announcements button is disabled if selectedCount is 0', () => {
-  const tree = mount(
-    <IndexHeader {...makeProps({ selectedCount: 0 })} />
-  )
+  const tree = mount(<IndexHeader {...makeProps({selectedCount: 0})} />)
   const node = tree.find('#lock_announcements')
   ok(node.is('[disabled]'))
 })
 
 test('renders delete announcements button if we have manage_content permissions', () => {
-  const tree = mount(
-    <IndexHeader {...makeProps({ permissions: { manage_content: true } })} />
-  )
+  const tree = mount(<IndexHeader {...makeProps({permissions: {manage_content: true}})} />)
   const node = tree.find('#delete_announcements')
   ok(node.exists())
 })
 
 test('does not render delete announcements button if we do not have manage_content permissions', () => {
-  const tree = mount(
-    <IndexHeader {...makeProps({ permissions: { manage_content: false } })} />
-  )
+  const tree = mount(<IndexHeader {...makeProps({permissions: {manage_content: false}})} />)
   const node = tree.find('#delete_announcements')
   notOk(node.exists())
 })
 
 test('delete announcements button is disabled if isBusy', () => {
-  const tree = mount(
-    <IndexHeader {...makeProps({ isBusy: true })} />
-  )
+  const tree = mount(<IndexHeader {...makeProps({isBusy: true})} />)
   const node = tree.find('#delete_announcements')
   ok(node.is('[disabled]'))
 })
 
 test('delete announcements button is disabled if selectedCount is 0', () => {
-  const tree = mount(
-    <IndexHeader {...makeProps({ selectedCount: 0 })} />
-  )
+  const tree = mount(<IndexHeader {...makeProps({selectedCount: 0})} />)
   const node = tree.find('#delete_announcements')
   ok(node.is('[disabled]'))
 })
 
-test('clicking lock announcements button should call lockAnnouncements prop', (assert) => {
+test('clicking lock announcements button should call lockAnnouncements prop', assert => {
   const done = assert.async()
   const lockSpy = sinon.spy()
-  const tree = mount(
-    <IndexHeader {...makeProps({ lockAnnouncements: lockSpy, selectedCount: 1 })} />
-  )
+  const tree = mount(<IndexHeader {...makeProps({lockAnnouncements: lockSpy, selectedCount: 1})} />)
 
   tree.find('#lock_announcements').simulate('click')
   setTimeout(() => {
@@ -201,11 +173,9 @@ test('clicking lock announcements button should call lockAnnouncements prop', (a
   })
 })
 
-test('clicking delete announcements button should show a confirm modal', (assert) => {
+test('clicking delete announcements button should show a confirm modal', assert => {
   const done = assert.async()
-  const tree = mount(
-    <IndexHeader {...makeProps({ selectedCount: 1 })} />
-  )
+  const tree = mount(<IndexHeader {...makeProps({selectedCount: 1})} />)
   const instance = tree.instance()
 
   tree.find('#delete_announcements').simulate('click')
@@ -216,11 +186,11 @@ test('clicking delete announcements button should show a confirm modal', (assert
   })
 })
 
-test('confirm delete modal should call deleteAnnouncements prop on confirming delete', (assert) => {
+test('confirm delete modal should call deleteAnnouncements prop on confirming delete', assert => {
   const done = assert.async()
   const deleteSpy = sinon.spy()
   const tree = mount(
-    <IndexHeader {...makeProps({ selectedCount: 1, deleteAnnouncements: deleteSpy })} />
+    <IndexHeader {...makeProps({selectedCount: 1, deleteAnnouncements: deleteSpy})} />
   )
   const instance = tree.instance()
 
@@ -240,11 +210,11 @@ test('confirm delete modal should call deleteAnnouncements prop on confirming de
   })
 })
 
-test('confirm delete modal should not call deleteAnnouncements prop on cancel delete, and it should close the modal', (assert) => {
+test('confirm delete modal should not call deleteAnnouncements prop on cancel delete, and it should close the modal', assert => {
   const done = assert.async()
   const deleteSpy = sinon.spy()
   const tree = mount(
-    <IndexHeader {...makeProps({ selectedCount: 1, deleteAnnouncements: deleteSpy })} />
+    <IndexHeader {...makeProps({selectedCount: 1, deleteAnnouncements: deleteSpy})} />
   )
   const instance = tree.instance()
 

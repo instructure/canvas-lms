@@ -26,12 +26,15 @@ const AccountsTreeStore = createStore({
 
   loadTree() {
     // fetch the account itself first, then get its subaccounts
-    return this._load(this.getKey(), `/api/v1/accounts/${this.context.accountId}`, {}, {wrap: true}).then(() =>
-      this.loadAll(null, true)
-    )
+    return this._load(
+      this.getKey(),
+      `/api/v1/accounts/${this.context.accountId}`,
+      {},
+      {wrap: true}
+    ).then(() => this.loadAll(null, true))
   },
 
-  normalizeParams()  {
+  normalizeParams() {
     return {recursive: true}
   },
 

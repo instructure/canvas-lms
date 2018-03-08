@@ -16,14 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 .submission_details {
-  .bold { font-weight: bold; }
-  .error { color: $ic-color-danger; }
-  td { padding-left: 1em; }
-  th { font-weight: normal; }
-  td, th { text-align: right; }
+  .bold {
+    font-weight: bold;
+  }
+  .error {
+    color: $ic-color-danger;
+  }
+  td {
+    padding-left: 1em;
+  }
+  th {
+    font-weight: normal;
+  }
+  td,
+  th {
+    text-align: right;
+  }
 }
 
 .submission-details-header {
@@ -79,7 +90,9 @@
 
 .submission-details-frame {
   box-sizing: border-box;
-  @include breakpoint(desktop) { flex: 1; }
+  @include breakpoint(desktop) {
+    flex: 1;
+  }
 }
 
 .submission-details-comments {
@@ -93,7 +106,9 @@
     height: 300px;
     overflow: auto;
     background-color: $ic-bg-light-neutral;
-    @include breakpoint(desktop) { border-left: 1px solid $ic-border-light; }
+    @include breakpoint(desktop) {
+      border-left: 1px solid $ic-border-light;
+    }
   }
 }
 
@@ -103,7 +118,9 @@
   background: $ic-color-light;
   padding: $ic-sp $ic-sp/2;
   border-bottom: 1px solid $ic-border-light;
-  &:last-of-type { border-bottom: none; }
+  &:last-of-type {
+    border-bottom: none;
+  }
 }
 
 .file-upload-submission-info {

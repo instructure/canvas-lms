@@ -16,21 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/quizzes/question_bank/moveMultipleQuestionBanks'
-  ], (moveMultipleQuestionBanks) => {
+define(['jsx/quizzes/question_bank/moveMultipleQuestionBanks'], moveMultipleQuestionBanks => {
   var $modal = null
 
-  QUnit.module("Move Multiple Question Banks", {
+  QUnit.module('Move Multiple Question Banks', {
     setup() {
       $modal = $('#fixtures').html(
-        "<div id='parent'>"                                +
-        "  <div id='move_question_dialog'>"                +
-        "  </div>"                                         +
-        "  <a class='ui-dialog-titlebar-close' href='#'>"  +
-        "  </a>"                                           +
-        "  </div>"                                         +
-        "</div>"
+        "<div id='parent'>" +
+          "  <div id='move_question_dialog'>" +
+          '  </div>' +
+          "  <a class='ui-dialog-titlebar-close' href='#'>" +
+          '  </a>' +
+          '  </div>' +
+          '</div>'
       )
     },
 
@@ -38,7 +36,6 @@ define([
       $('#fixtures').empty()
     }
   })
-
 
   test('is an object', () => {
     ok(typeof moveMultipleQuestionBanks === 'object')
@@ -52,4 +49,4 @@ define([
     moveMultipleQuestionBanks.onClick({preventDefault: e => e})
     ok(focusesButton === document.activeElement)
   })
-});
+})

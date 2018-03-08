@@ -16,29 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-dom',
-  'jsx/help_dialog/CreateTicketForm'
-], (React, ReactDOM, CreateTicketForm) => {
+define(
+  ['react', 'react-dom', 'jsx/help_dialog/CreateTicketForm'],
+  (React, ReactDOM, CreateTicketForm) => {
+    const container = document.getElementById('fixtures')
 
-  const container = document.getElementById('fixtures')
+    QUnit.module('<CreateTicketForm/>', {
+      render(overrides = {}) {
+        const props = {
+          ...overrides
+        }
 
-  QUnit.module('<CreateTicketForm/>', {
-    render(overrides={}) {
-      const props = {
-        ...overrides
+        return ReactDOM.render(<CreateTicketForm {...props} />, container)
+      },
+      teardown() {
+        ReactDOM.unmountComponentAtNode(container)
       }
+    })
 
-      return ReactDOM.render(<CreateTicketForm {...props} />, container)
-    },
-    teardown() {
-      ReactDOM.unmountComponentAtNode(container)
-    }
-  })
-
-  test('render()', function () {
-    const subject = this.render()
-    ok(ReactDOM.findDOMNode(subject))
-  })
-})
+    test('render()', function() {
+      const subject = this.render()
+      ok(ReactDOM.findDOMNode(subject))
+    })
+  }
+)

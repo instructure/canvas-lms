@@ -28,11 +28,9 @@ const PeopleTray = () => (
     image="/images/tutorial-tray-images/people.svg"
   >
     <Text as="p">
-      {
-        I18n.t('Manage enrollment status, create groups, and add users from this page.')
-      }
+      {I18n.t('Manage enrollment status, create groups, and add users from this page.')}
     </Text>
   </TutorialTrayContent>
-);
+)
 
 export default PeopleTray

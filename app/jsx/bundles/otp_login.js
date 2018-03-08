@@ -20,7 +20,9 @@ import $ from 'jquery'
 import 'jquery.fancyplaceholder'
 
 $('.field-with-fancyplaceholder input').fancyPlaceholder()
-$('#login_form').find(':text:first').select()
+$('#login_form')
+  .find(':text:first')
+  .select()
 
 const $select_phone_form = $('#select_phone_form')
 const $new_phone_form = $('#new_phone_form')
@@ -32,7 +34,7 @@ $phone_select.change(() => {
   }
 })
 
-$('#back_to_choose_number_link').click((event) => {
+$('#back_to_choose_number_link').click(event => {
   $new_phone_form.hide()
   $select_phone_form.show()
   $phone_select.find('option:first').attr('selected', 'selected')

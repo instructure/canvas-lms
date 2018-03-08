@@ -28,7 +28,9 @@
     li {
       margin-bottom: 10px;
       margin-left: 10px;
-      a.active { background-color: darken($activeBG, 25%); }
+      a.active {
+        background-color: darken($activeBG, 25%);
+      }
     }
   }
 }
@@ -40,7 +42,7 @@
       margin-bottom: 10px;
       margin-left: 10px;
     }
-    img { 
+    img {
       width: 40px;
       height: 40px;
     }

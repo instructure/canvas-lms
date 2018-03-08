@@ -48,7 +48,7 @@ const isLink = /^<a [^>]+>[^<]+<\/a>$/
  * @param {EditorBoxList} editorList our instance of the editor registry
  *   that keeps track of all the editors we know about.
  */
-export function remove (editorNode, editorList) {
+export function remove(editorNode, editorList) {
   const id = editorNode.attr('id')
   editorNode.data('rich_text', false)
   if (tinymce && tinymce.execCommand) {
@@ -57,15 +57,15 @@ export function remove (editorNode, editorList) {
   }
 }
 
-export function isOnlyText (maybeHtml) {
+export function isOnlyText(maybeHtml) {
   return !(openTag.test(maybeHtml) && (!isLink.test(maybeHtml) || !maybeHtml.includes('href=')))
 }
 
-export function isLinkInsideTD (editor) {
+export function isLinkInsideTD(editor) {
   return (
-      editor.selection.dom.getParent(editor.selection.getNode(), 'td') &&
-      editor.selection.dom.getParent(editor.selection.getNode(), 'a') &&
-      editor.selection.getNode().tagName !== 'TD'
+    editor.selection.dom.getParent(editor.selection.getNode(), 'td') &&
+    editor.selection.dom.getParent(editor.selection.getNode(), 'a') &&
+    editor.selection.getNode().tagName !== 'TD'
   )
 }
 
@@ -79,10 +79,11 @@ export function isLinkInsideTD (editor) {
  *   create a link
  * @param {Hash} linkAttrs other attributes for the link (class, target, etc)
  */
-export function buildHtmlLink (editor, content, linkAttrs) {
+export function buildHtmlLink(editor, content, linkAttrs) {
   if (editor.selection.getNode().tagName === 'A') {
     return editor.dom.create('a', linkAttrs, content)
-  } else { // selection as surrounding html tags
+  } else {
+    // selection as surrounding html tags
     return editor.dom.create('a', linkAttrs, editor.selection.getNode())
   }
 }
@@ -101,7 +102,7 @@ export function buildHtmlLink (editor, content, linkAttrs) {
  *
  * @returns {DOM Node} returns a raw dom node
  */
-export function insertLink (id, content, linkAttrs) {
+export function insertLink(id, content, linkAttrs) {
   const editor = tinymce.get(id)
   editor.focus()
 

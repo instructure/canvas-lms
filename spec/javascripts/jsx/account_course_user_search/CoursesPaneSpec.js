@@ -16,31 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { shallow } from 'enzyme';
-import CoursesPane from 'jsx/account_course_user_search/components/CoursesPane';
-import CoursesStore from 'jsx/account_course_user_search/store/CoursesStore';
+import React from 'react'
+import {shallow} from 'enzyme'
+import CoursesPane from 'jsx/account_course_user_search/components/CoursesPane'
+import CoursesStore from 'jsx/account_course_user_search/store/CoursesStore'
 
 QUnit.module('Account Course User Search CoursesPane View', {
-  setup () {
-    CoursesStore.reset({ accountId: '1' });
+  setup() {
+    CoursesStore.reset({accountId: '1'})
   },
-  teardown () {
-    CoursesStore.reset({});
+  teardown() {
+    CoursesStore.reset({})
   }
-});
+})
 
 test('onUpdateFilters calls debouncedApplyFilters after updating state', () => {
   const wrapper = shallow(
     <CoursesPane
       accountId="1"
-      roles={[{id: '1' }]}
+      roles={[{id: '1'}]}
       queryParams={{}}
-      onUpdateQueryParams={function(){}}
+      onUpdateQueryParams={function() {}}
     />
-  );
-  const instance = wrapper.instance();
-  const spy = sinon.spy(instance, 'debouncedApplyFilters');
-  instance.onUpdateFilters();
-  ok(spy.called);
-});
+  )
+  const instance = wrapper.instance()
+  const spy = sinon.spy(instance, 'debouncedApplyFilters')
+  instance.onUpdateFilters()
+  ok(spy.called)
+})

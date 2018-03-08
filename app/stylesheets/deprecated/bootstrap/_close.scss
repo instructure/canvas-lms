@@ -2,17 +2,19 @@
 // Close icons
 // --------------------------------------------------
 
-
 .close {
   float: right;
   @include fontSize(20px);
   font-weight: bold;
   line-height: $baseLineHeight;
   color: $black;
-  text-shadow: 0 1px 0 rgba(255,255,255,1);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 1);
   opacity: 0.8;
-  @if $use_high_contrast { text-decoration: none; }
-  &:hover, &:focus {
+  @if $use_high_contrast {
+    text-decoration: none;
+  }
+  &:hover,
+  &:focus {
     color: $ic-font-color-dark;
     text-decoration: none;
     cursor: pointer;

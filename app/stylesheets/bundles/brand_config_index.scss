@@ -16,11 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "components/ic-theme-card";
+@import 'base/environment';
+@import 'components/ic-theme-card';
 
 .ic-ThemeCard-container {
-  + .ic-ThemeCard-container { margin-bottom: $ic-sp*3; }
+  + .ic-ThemeCard-container {
+    margin-bottom: $ic-sp*3;
+  }
 }
 
 .ic-ThemeCard-container__Main {
@@ -37,10 +39,12 @@
   color: $ic-font-color--subdued;
   margin: 0 0 $ic-sp*2;
   &:before {
-    content: "";
+    content: '';
     position: absolute;
-    top: 50%; left: 0;
-    height: 1px; width: 100%;
+    top: 50%;
+    left: 0;
+    height: 1px;
+    width: 100%;
     background: $ic-border-light;
   }
 }

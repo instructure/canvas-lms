@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-module.exports = function (input) {
+module.exports = function(input) {
   throw "Should not ever make it to the actual i18n loader because those resources don't exist"
 }
 
@@ -24,7 +24,7 @@ module.exports = function (input) {
 // the i18nObj when required with a given format require('i18n!some_scope').  We
 // should probably phase this out over time in favor of not specifying loaders
 // in require statements, but it seems to replace the functionality for now.
-module.exports.pitch = function (remainingRequest, precedingRequest, data) {
+module.exports.pitch = function(remainingRequest, precedingRequest, data) {
   this.cacheable()
   let scopeName = this.query.replace('?', '')
 
@@ -46,10 +46,13 @@ module.exports.pitch = function (remainingRequest, precedingRequest, data) {
 
   // in development, we can save bandwidth and build time by not bothering
   // to include translation artifacts during the build.
-  const shouldTranslate = process.env.RAILS_LOAD_ALL_LOCALES || process.env.RAILS_ENV == 'production' || process.env.NODE_ENV == 'production'
-  const translationDependency = shouldTranslate ?
-    ` 'translations/${scopeName}', 'translations/_core',` :
-    ''
+  const shouldTranslate =
+    process.env.RAILS_LOAD_ALL_LOCALES ||
+    process.env.RAILS_ENV == 'production' ||
+    process.env.NODE_ENV == 'production'
+  const translationDependency = shouldTranslate
+    ? ` 'translations/${scopeName}', 'translations/_core',`
+    : ''
 
   const scopedJavascript = `
     define(['i18nObj',${translationDependency} 'translations/_core_en'], function(I18n) {

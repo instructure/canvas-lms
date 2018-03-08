@@ -22,21 +22,25 @@ import ReactDOM from 'react-dom'
 import UsageRightsSelectBox from 'jsx/files/UsageRightsSelectBox' // Usage rights select boxes (React component)
 import splitAssetString from '../str/splitAssetString'
 
-
 export default class UsageRights {
   static usageRightsRequired = false
 
-  static getContext () {
+  static getContext() {
     const context = splitAssetString(window.ENV.context_asset_string)
     return {
       contextType: context[0],
-      contextId: context[1],
+      contextId: context[1]
     }
   }
 
-  static setFileUsageRights (attachment) {
+  static setFileUsageRights(attachment) {
     const context = this.getContext()
-    if (this.usageRightsRequired && context.contextId && context.contextType === 'courses' && this.usageRightsFields) {
+    if (
+      this.usageRightsRequired &&
+      context.contextId &&
+      context.contextType === 'courses' &&
+      this.usageRightsFields
+    ) {
       const attrs = this.usageRightsFields.getValues()
       const usageRightSelected = attrs.use_justification && attrs.use_justification !== 'choose'
       if (usageRightSelected) {
@@ -53,16 +57,19 @@ export default class UsageRights {
             }
           },
 
-          success (resp) {
+          success(resp) {
             return $.flashMessage(
-              I18n.t('%{filename} has been published with the following usage right: %{usage_right}', {
-                filename: attachment.display_name,
-                usage_right: resp.license_name
-              })
+              I18n.t(
+                '%{filename} has been published with the following usage right: %{usage_right}',
+                {
+                  filename: attachment.display_name,
+                  usage_right: resp.license_name
+                }
+              )
             )
           },
 
-          error (responseText, jqXhr, responseCode) {
+          error(responseText, jqXhr, responseCode) {
             return $.flashError(
               I18n.t('An error occurred when setting the usage right for %{filename}', {
                 filename: attachment.display_name
@@ -74,7 +81,7 @@ export default class UsageRights {
     }
   }
 
-  static render (elementId = '') {
+  static render(elementId = '') {
     const $element = $(elementId)
     this.usageRightsRequired = $element.data('usageRightsRequired')
 

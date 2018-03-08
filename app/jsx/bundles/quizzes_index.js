@@ -28,7 +28,6 @@ import QuizOverrideLoader from 'compiled/models/QuizOverrideLoader'
 import vddTooltip from 'compiled/util/vddTooltip'
 
 const QuizzesIndexRouter = Backbone.Router.extend({
-
   routes: {
     '': 'index'
   },
@@ -40,18 +39,30 @@ const QuizzesIndexRouter = Backbone.Router.extend({
     toggleMessage: I18n.t('toggle_message', 'toggle quiz visibility')
   },
 
-  initialize () {
+  initialize() {
     this.allQuizzes = ENV.QUIZZES
 
     this.quizzes = {
-      assignment: this.createQuizItemGroupView(this.allQuizzes.assignment, this.translations.assignmentQuizzes, 'assignment'),
-      open: this.createQuizItemGroupView(this.allQuizzes.open, this.translations.practiceQuizzes, 'open'),
-      surveys: this.createQuizItemGroupView(this.allQuizzes.surveys, this.translations.surveys, 'surveys'),
+      assignment: this.createQuizItemGroupView(
+        this.allQuizzes.assignment,
+        this.translations.assignmentQuizzes,
+        'assignment'
+      ),
+      open: this.createQuizItemGroupView(
+        this.allQuizzes.open,
+        this.translations.practiceQuizzes,
+        'open'
+      ),
+      surveys: this.createQuizItemGroupView(
+        this.allQuizzes.surveys,
+        this.translations.surveys,
+        'surveys'
+      ),
       noQuizzes: new NoQuizzesView()
     }
   },
 
-  index () {
+  index() {
     this.view = new IndexView({
       assignmentView: this.quizzes.assignment,
       openView: this.quizzes.open,
@@ -65,22 +76,21 @@ const QuizzesIndexRouter = Backbone.Router.extend({
     if (this.shouldLoadOverrides()) this.loadOverrides()
   },
 
-  loadOverrides () {
-    const quizModels = ['assignment', 'open', 'surveys'].reduce((out, quizType) =>
-      out.concat(this.quizzes[quizType].collection.models)
-    , [])
+  loadOverrides() {
+    const quizModels = ['assignment', 'open', 'surveys'].reduce(
+      (out, quizType) => out.concat(this.quizzes[quizType].collection.models),
+      []
+    )
 
     return QuizOverrideLoader.loadQuizOverrides(quizModels, ENV.URLS.assignment_overrides)
   },
 
-  createQuizItemGroupView (collection, title, type) {
-    const { options } = this.allQuizzes
+  createQuizItemGroupView(collection, title, type) {
+    const {options} = this.allQuizzes
 
     // get quiz attributes from root container and add options
     return new QuizItemGroupView({
-      collection: new QuizCollection(_.map(collection, quiz =>
-        $.extend(quiz, options[quiz.id]))
-      ),
+      collection: new QuizCollection(_.map(collection, quiz => $.extend(quiz, options[quiz.id]))),
       isSurvey: type === 'surveys',
       listId: `${type}-quizzes`,
       title,
@@ -88,7 +98,7 @@ const QuizzesIndexRouter = Backbone.Router.extend({
     })
   },
 
-  shouldLoadOverrides () {
+  shouldLoadOverrides() {
     return true
   }
 })

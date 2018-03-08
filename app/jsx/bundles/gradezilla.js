@@ -27,7 +27,7 @@ const getGradebookTab = () => UserSettings.contextGet('gradebook_tab')
 const setGradebookTab = view => UserSettings.contextSet('gradebook_tab', view)
 
 class GradebookRouter extends Backbone.Router {
-  static initClass () {
+  static initClass() {
     this.prototype.routes = {
       '': 'tab',
       'tab-assignment': 'tabAssignment',
@@ -36,33 +36,38 @@ class GradebookRouter extends Backbone.Router {
     }
   }
 
-  initialize () {
+  initialize() {
     this.isLoaded = false
     this.views = {}
-    ENV.GRADEBOOK_OPTIONS.assignmentOrOutcome = getGradebookTab();
-    ENV.GRADEBOOK_OPTIONS.navigate = this.navigate.bind(this);
-    this.views.assignment = new Gradebook(this.gradebookOptions());
-    this.views.assignment.initialize();
-    if (ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled) { this.views.outcome = this.initOutcomes() }
+    ENV.GRADEBOOK_OPTIONS.assignmentOrOutcome = getGradebookTab()
+    ENV.GRADEBOOK_OPTIONS.navigate = this.navigate.bind(this)
+    this.views.assignment = new Gradebook(this.gradebookOptions())
+    this.views.assignment.initialize()
+    if (ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled) {
+      this.views.outcome = this.initOutcomes()
+    }
 
     return this
   }
 
-  gradebookOptions () {
+  gradebookOptions() {
     return {
       ...ENV.GRADEBOOK_OPTIONS,
       locale: ENV.LOCALE,
       currentUserId: ENV.current_user_id
-    };
+    }
   }
 
-  initOutcomes () {
-    const book = new OutcomeGradebookView({el: $('.outcome-gradebook'), gradebook: this.views.assignment})
+  initOutcomes() {
+    const book = new OutcomeGradebookView({
+      el: $('.outcome-gradebook'),
+      gradebook: this.views.assignment
+    })
     book.render()
     return book
   }
 
-  tabOutcome () {
+  tabOutcome() {
     window.tab = 'outcome'
     $('.assignment-gradebook-container').addClass('hidden')
     $('.outcome-gradebook-container > div').removeClass('hidden')
@@ -70,7 +75,7 @@ class GradebookRouter extends Backbone.Router {
     return setGradebookTab('outcome')
   }
 
-  tabAssignment () {
+  tabAssignment() {
     window.tab = 'assignment'
     $('.outcome-gradebook-container > div').addClass('hidden')
     $('.assignment-gradebook-container').removeClass('hidden')
@@ -78,10 +83,10 @@ class GradebookRouter extends Backbone.Router {
     return setGradebookTab('assignment')
   }
 
-  tab () {
+  tab() {
     let view = getGradebookTab()
     window.tab = view
-    if ((view !== 'outcome') || !this.views.outcome) {
+    if (view !== 'outcome' || !this.views.outcome) {
       view = 'assignment'
     }
     $('.assignment-gradebook-container, .outcome-gradebook-container > div').addClass('hidden')
@@ -89,7 +94,7 @@ class GradebookRouter extends Backbone.Router {
     this.views[view].onShow()
     return setGradebookTab(view)
   }
-  }
+}
 GradebookRouter.initClass()
 
 new GradebookRouter()

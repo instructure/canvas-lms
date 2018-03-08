@@ -16,12 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/quizzes/question_bank/loadBanks'
-], (loadBanks) => {
-  QUnit.module("loadBanks");
+define(['jsx/quizzes/question_bank/loadBanks'], loadBanks => {
+  QUnit.module('loadBanks')
 
-  test("is a function", () => {
+  test('is a function', () => {
     ok(typeof loadBanks === 'function')
   })
-});
+})

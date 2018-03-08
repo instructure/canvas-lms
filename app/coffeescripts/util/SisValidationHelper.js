@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 export default class SisValidationHelper {
-  constructor (params) {
+  constructor(params) {
     this.postToSIS = params.postToSIS
     this.allDates = params.allDates
     this.dueDateRequired = params.dueDateRequired
@@ -26,7 +26,7 @@ export default class SisValidationHelper {
     this.maxNameLength = params.maxNameLength
   }
 
-  nameTooLong () {
+  nameTooLong() {
     if (!this.postToSIS) return false
     if (this.maxNameLengthRequired) {
       return this.nameLengthComparison()
@@ -35,26 +35,28 @@ export default class SisValidationHelper {
     }
   }
 
-  nameLengthComparison () {
+  nameLengthComparison() {
     return this.modelName.length > this.maxNameLength
   }
 
-  dueAtNotValid (date) {
-    if(!date) return true
-    return (date.dueAt === null || date.dueAt === undefined || date.dueAt === '')
+  dueAtNotValid(date) {
+    if (!date) return true
+    return date.dueAt === null || date.dueAt === undefined || date.dueAt === ''
   }
 
-  dueDateMissingDifferentiated () {
+  dueDateMissingDifferentiated() {
     if (!this.allDates) return false
-    return (this.allDates.map(this.dueAtNotValid).indexOf(true) !== -1)
+    return this.allDates.map(this.dueAtNotValid).indexOf(true) !== -1
   }
 
-  baseDueDateMissing () {
-    return ((!this.allDates || this.allDates.length === 0) && !this.dueDate)
+  baseDueDateMissing() {
+    return (!this.allDates || this.allDates.length === 0) && !this.dueDate
   }
 
-  dueDateMissing () {
+  dueDateMissing() {
     if (!this.postToSIS) return false
-    return this.dueDateRequired && (this.baseDueDateMissing() || this.dueDateMissingDifferentiated())
+    return (
+      this.dueDateRequired && (this.baseDueDateMissing() || this.dueDateMissingDifferentiated())
+    )
   }
 }

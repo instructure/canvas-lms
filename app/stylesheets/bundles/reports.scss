@@ -16,19 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 .report_description {
   display: none;
 }
 
-table.report_example, table.report {
+table.report_example,
+table.report {
   border-collapse: collapse;
   page-break-inside: avoid;
-  thead, th {
+  thead,
+  th {
     background-color: #ccc;
   }
-  td, th {
+  td,
+  th {
     border: 1px solid #aaa;
     padding: 2px 5px;
   }
@@ -43,10 +46,10 @@ table.report_example, table.report {
     width: 90%;
     border-collapse: collapse;
     tr.reports {
-      border-bottom: 1px solid #DDD;
+      border-bottom: 1px solid #ddd;
       th.reports {
         padding: 5px;
-        background-color: #DDD;
+        background-color: #ddd;
         font-weight: bold;
       }
       td.reports {

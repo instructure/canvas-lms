@@ -28,7 +28,8 @@
     vertical-align: middle;
     display: inline-block;
   }
-  a, button {
+  a,
+  button {
     color: $ic-font-color-dark;
     padding-right: $contentBoxPadding;
     cursor: pointer;
@@ -46,7 +47,8 @@
   border-radius: $borderRadius;
   cursor: default;
   position: relative;
-  &.cannot_remove, &.cannot_remove:hover {
+  &.cannot_remove,
+  &.cannot_remove:hover {
     div {
       padding-right: $contentBoxPadding;
     }

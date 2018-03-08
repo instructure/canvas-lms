@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 .bcs_sub-menu {
   display: none;
@@ -26,55 +26,54 @@
   display: block;
 }
 
-
 .bcs_sub-menu-item {
-    margin-left: 2.5em;
-    margin-bottom: .75em;
-    max-width: 500px;
-    white-space: normal;
-  }
+  margin-left: 2.5em;
+  margin-bottom: 0.75em;
+  max-width: 500px;
+  white-space: normal;
+}
 
 .bcs__object-tab {
-  padding: .6em;
+  padding: 0.6em;
   border-top: 1px solid $ic-border-color;
   border-left: 1px solid $ic-border-color;
   border-right: 1px solid $ic-border-color;
 
-    &:first-of-type {
-      border-top-right-radius: 3px;
-      border-top-left-radius: 3px;
-    }
-
-    &:last-of-type {
-      border-bottom: 1px solid $ic-border-color;
-      border-bottom-right-radius: 3px;
-      border-bottom-left-radius: 3px;
-    }
-
-    .bcs_tab-icon {
-      padding-top: .45em;
-    }
-
-    .bcs_tab-text {
-      padding-top: .4em;
-    }
-
-    .bcs_tab_indicator-icon {
-      padding: 0em;
-    }
+  &:first-of-type {
+    border-top-right-radius: 3px;
+    border-top-left-radius: 3px;
   }
 
+  &:last-of-type {
+    border-bottom: 1px solid $ic-border-color;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+  }
+
+  .bcs_tab-icon {
+    padding-top: 0.45em;
+  }
+
+  .bcs_tab-text {
+    padding-top: 0.4em;
+  }
+
+  .bcs_tab_indicator-icon {
+    padding: 0em;
+  }
+}
+
 .bcs_check-box {
-  margin-bottom: .75em;
+  margin-bottom: 0.75em;
 }
 
 .bcs_check_box-group {
-  margin-top: .75em;
-  margin-bottom: .75em;
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
   margin-left: 2.5em;
 }
 
 .bcs_radio_input-group {
   margin-left: 2em;
-  padding-bottom: .75em;
+  padding-bottom: 0.75em;
 }

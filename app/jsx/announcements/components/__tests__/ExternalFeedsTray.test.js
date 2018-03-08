@@ -18,12 +18,12 @@
 
 import '@instructure/ui-themes/lib/canvas'
 import React from 'react'
-import { mount, shallow } from 'enzyme'
+import {mount, shallow} from 'enzyme'
 import ExternalFeedsTray from '../ExternalFeedsTray'
-import { ConnectedRSSFeedList } from '../RSSFeedList'
+import {ConnectedRSSFeedList} from '../RSSFeedList'
 
 const defaultProps = () => ({
-  atomFeedUrl: "www.test.com",
+  atomFeedUrl: 'www.test.com',
   permissions: {
     create: false,
     manage_content: false,
@@ -37,7 +37,7 @@ test('renders the ExternalFeedsTray component', () => {
 })
 
 test('renders the AddExternalFeed component when user has permissions', () => {
-  const props = defaultProps();
+  const props = defaultProps()
   props.permissions = {
     create: true,
     manage_content: false,
@@ -49,7 +49,7 @@ test('renders the AddExternalFeed component when user has permissions', () => {
 })
 
 test('does not render the AddExternalFeed component when user is student', () => {
-  const props = defaultProps();
+  const props = defaultProps()
   props.permissions = {
     create: false,
     manage_content: false,
@@ -61,7 +61,7 @@ test('does not render the AddExternalFeed component when user is student', () =>
 })
 
 test('does not render the RSSFeedList component when user is student', () => {
-  const props = defaultProps();
+  const props = defaultProps()
   props.permissions = {
     create: false,
     manage_content: false,

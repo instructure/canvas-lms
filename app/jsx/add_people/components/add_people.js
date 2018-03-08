@@ -255,7 +255,9 @@ export default class AddPeople extends React.Component {
         onNext = this.searchNext
         readyForNext = this.props.inputParams.nameList.length > 0
         panelLabel = I18n.t('User search panel')
-        panelDescription = I18n.t('Use this panel to search for people you wish to add to this course.')
+        panelDescription = I18n.t(
+          'Use this panel to search for people you wish to add to this course.'
+        )
         break
       case PEOPLEVALIDATIONISSUES:
         currentPanel = (
@@ -271,7 +273,9 @@ export default class AddPeople extends React.Component {
         onBack = this.peopleValidationIssuesOnBack
         readyForNext = arePeopleValidationIssuesResolved(this.props)
         panelLabel = I18n.t('User vaildation issues panel')
-        panelDescription = I18n.t('Use this panel to resolve duplicate results or people not found with your search.')
+        panelDescription = I18n.t(
+          'Use this panel to resolve duplicate results or people not found with your search.'
+        )
         break
       case PEOPLEREADYLIST:
         currentPanel = (
@@ -303,7 +307,9 @@ export default class AddPeople extends React.Component {
         label={modalTitle}
         applicationElement={() => document.getElementById('application')}
         onDismiss={this.close}
-        ref={node => { this.node = node }}
+        ref={node => {
+          this.node = node
+        }}
         shouldCloseOnOverlayClick={false}
         size="medium"
         tabIndex="-1"
@@ -315,7 +321,9 @@ export default class AddPeople extends React.Component {
           <div
             className="addpeople"
             tabIndex="-1"
-            ref={elem => { this.content = elem }}
+            ref={elem => {
+              this.content = elem
+            }}
             aria-label={panelLabel}
             aria-describedby="addpeople_panelDescription"
           >

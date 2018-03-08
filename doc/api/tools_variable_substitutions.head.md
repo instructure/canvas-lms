@@ -7,31 +7,30 @@
   then run `script/generate_lti_variable_substitution_markdown`
 -->
 
-LTI Variable Substitutions
-==========================
+# LTI Variable Substitutions
 
 Variable substitution (aka variable expansion) is where custom variables really start to
-shine.  They provide a mechanism for tool providers to request that specific, contextual
-information be sent across in the launch.  When the tool consumer processes the launch request,
+shine. They provide a mechanism for tool providers to request that specific, contextual
+information be sent across in the launch. When the tool consumer processes the launch request,
 it detects requested variable substitutions and sends the appropriate data where possible.
 Adding variable substitutions is exactly the same as adding custom variables, except the values
-are variables instead of constants.  This is denoted by prefixing the value with a $.  If the
+are variables instead of constants. This is denoted by prefixing the value with a $. If the
 tool consumer doesn't recognize, or can't substitute, the value it will just send the variable
 as if it were are regular custom variable (i.e. the name of the substitution variable will be
 sent rather than the value).
 
 This allows Canvas to expose data as LTI launch parameters during the LTI launch rather than
-requiring access to the Canvas API, which can be expensive for Canvas and the tool.  It allows
+requiring access to the Canvas API, which can be expensive for Canvas and the tool. It allows
 tool providers to be much more surgical when requesting user data, and it paves the way for us
 to be more transparent to tool installers, by showing them exactly what data the LTI tool will
 be given access to. Additionally, variable substitutions are generally simple to add to Canvas
 relative to gaining API access.
 
-There are currently over 80 substitutions available.  Many of the substitutions simply
-give access to additional user and context information.  An LTI tool can request things
-like SIS ids, names, an avatar image, and an email address.  Other variable substitutions
+There are currently over 80 substitutions available. Many of the substitutions simply
+give access to additional user and context information. An LTI tool can request things
+like SIS ids, names, an avatar image, and an email address. Other variable substitutions
 assist tools with accessibility (prefersHighContrast), course copy (previousCourseIds), and
-masquerading users.  Additionally, when we don't provide enough information or customization
+masquerading users. Additionally, when we don't provide enough information or customization
 directly through LTI, tools can request everything they need to use the Canvas API for an even
 richer experience.
 
@@ -41,9 +40,11 @@ Some substitutions may be used as 'enabled_capabilities' for LTI2 tools. These s
 For more information on variable substitution, see the <a href="https://www.imsglobal.org/specs/ltiv1p1p1/implementation-guide#toc-9">IMS LTI specification</a>.
 
 # Usage/Configuration
+
 Variable substitutions can be configured for a tool in 3 ways:
 
 ## Via UI
+
 Custom fields can be <a href="https://community.canvaslms.com/docs/DOC-3033">configured via UI</a> by editing the tool configuration and adding the
 desired variable to the Custom Fields text box.
 
@@ -54,9 +55,11 @@ arbitrary_name=$Canvas.api.domain
 ```
 
 ## Via API
+
 Custom fields can also be <a href="/doc/api/external_tools.html#method.external_tools.create">configured via API</a>.
 
 This would install a course-level tool with domain as a custom field:
+
 ```
 curl 'https://<domain>.instructure.com/api/v1/courses/<course_id>/external_tools' \
   -X POST \
@@ -70,10 +73,12 @@ curl 'https://<domain>.instructure.com/api/v1/courses/<course_id>/external_tools
 ```
 
 ## Via XML Configuration
+
 Custom fields can also be <a href="http://canvas.docker/doc/api/file.tools_xml.html">configured via XML</a>.
 
 This would create a tool in a course with custom fields, some of which are specific for a
 particular placement:
+
 ```
 <?xml version="1.0" encoding="UTF-8"?>
    <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"

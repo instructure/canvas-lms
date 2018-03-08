@@ -1,4 +1,5 @@
-module.exports = { // eslint-disable-line import/no-commonjs
+module.exports = {
+  // eslint-disable-line import/no-commonjs
   name: 'is_IS',
   day: {
     abbrev: ['Sun', 'Mán', 'Þri', 'Mið', 'Fim', 'Fös', 'Lau'],
@@ -13,20 +14,7 @@ module.exports = { // eslint-disable-line import/no-commonjs
     ]
   },
   month: {
-    abbrev: [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'Maí',
-      'Jún',
-      'Júl',
-      'Ágú',
-      'Sep',
-      'Okt',
-      'Nóv',
-      'Des'
-    ],
+    abbrev: ['Jan', 'Feb', 'Mar', 'Apr', 'Maí', 'Jún', 'Júl', 'Ágú', 'Sep', 'Okt', 'Nóv', 'Des'],
     full: [
       'Janúar',
       'Febrúar',

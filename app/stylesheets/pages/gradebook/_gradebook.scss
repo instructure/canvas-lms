@@ -71,7 +71,9 @@ $cell_height: 33px;
 }
 
 .student-grades-link {
-  @if $use_high_contrast { color: var(--ic-link-color-darkened-10); }
+  @if $use_high_contrast {
+    color: var(--ic-link-color-darkened-10);
+  }
 }
 
 .meta-cell .avatar {
@@ -93,7 +95,8 @@ $cell_height: 33px;
   @include fontSize(12px);
 }
 
-.secondary_identifier_cell, .custom_column {
+.secondary_identifier_cell,
+.custom_column {
   color: #333333;
   @include fontSize(12px);
   text-align: center;
@@ -102,7 +105,8 @@ $cell_height: 33px;
 
 // show and hide student names using a parent css class.
 .hide-students {
-  .student-name, .avatar {
+  .student-name,
+  .avatar {
     display: none;
   }
   .student-placeholder {
@@ -148,9 +152,13 @@ $cell_height: 33px;
     text-overflow: ellipsis;
     white-space: nowrap;
     @if $use_high_contrast {
-      &:hover, &:focus { text-decoration: underline; }
+      &:hover,
+      &:focus {
+        text-decoration: underline;
+      }
+    } @else {
+      color: var(--ic-link-color);
     }
-    @else { color: var(--ic-link-color); }
   }
   .muted i {
     color: $ic-color-medium-darker;
@@ -161,9 +169,11 @@ $cell_height: 33px;
     margin: {
       left: 10px;
       right: 14px;
-    };
+    }
     // If high contrast, default to regular dark text
-    @if not $use_high_contrast { color: var(--ic-brand-font-color-dark-lightened-15); }
+    @if not $use_high_contrast {
+      color: var(--ic-brand-font-color-dark-lightened-15);
+    }
   }
   .gradebook-header-drop {
     //put it above the "out of"
@@ -179,30 +189,30 @@ $cell_height: 33px;
     border: 0 none;
 
     @if $use_high_contrast {
-      background: url("/images/jqueryui/gradebook-header-drop2-high-contrast.png") no-repeat top left;
+      background: url('/images/jqueryui/gradebook-header-drop2-high-contrast.png') no-repeat top
+        left;
       @media (min--moz-device-pixel-ratio: 1.5),
-      (-o-min-device-pixel-ratio: 3/2),
-      (-webkit-min-device-pixel-ratio: 1.5),
-      (min-device-pixel-ratio: 1.5),
-      (min-resolution: 1.5dppx) {
-        background-image: url("/images/jqueryui/gradebook-header-drop2-high-contrast@2x.png");
+        (-o-min-device-pixel-ratio: 3/2),
+        (-webkit-min-device-pixel-ratio: 1.5),
+        (min-device-pixel-ratio: 1.5),
+        (min-resolution: 1.5dppx) {
+        background-image: url('/images/jqueryui/gradebook-header-drop2-high-contrast@2x.png');
+        background-size: 14px 28px;
+      }
+    } @else {
+      background: url('/images/jqueryui/gradebook-header-drop2.png') no-repeat top left;
+      @media (min--moz-device-pixel-ratio: 1.5),
+        (-o-min-device-pixel-ratio: 3/2),
+        (-webkit-min-device-pixel-ratio: 1.5),
+        (min-device-pixel-ratio: 1.5),
+        (min-resolution: 1.5dppx) {
+        background-image: url('/images/jqueryui/gradebook-header-drop2@2x.png');
         background-size: 14px 28px;
       }
     }
 
-    @else {
-      background: url("/images/jqueryui/gradebook-header-drop2.png") no-repeat top left;
-      @media (min--moz-device-pixel-ratio: 1.5),
-      (-o-min-device-pixel-ratio: 3/2),
-      (-webkit-min-device-pixel-ratio: 1.5),
-      (min-device-pixel-ratio: 1.5),
-      (min-resolution: 1.5dppx) {
-        background-image: url("/images/jqueryui/gradebook-header-drop2@2x.png");
-        background-size: 14px 28px;
-      }
-    }
-
-    &:hover, &.ui-menu-trigger-menu-is-open {
+    &:hover,
+    &.ui-menu-trigger-menu-is-open {
       background-position: bottom left;
       opacity: 1;
     }
@@ -245,7 +255,7 @@ $cell_height: 33px;
 }
 
 // my styles
-.slick-row.ui-state-active  .slick-cell {
+.slick-row.ui-state-active .slick-cell {
   background-color: #dfe9f2;
 }
 
@@ -269,7 +279,7 @@ $cell_height: 33px;
 }
 
 .slick-cell.ungraded {
-  background-image: url("/images/4_percent_opacity.png");
+  background-image: url('/images/4_percent_opacity.png');
   background-repeat: repeat;
 }
 
@@ -285,7 +295,7 @@ $cell_height: 33px;
     position: absolute;
     width: 0;
     left: 15px;
-    content: "";
+    content: '';
     border-top-color: transparent;
     border-left-color: transparent;
     border-right-color: transparent;
@@ -315,13 +325,16 @@ $cell_height: 33px;
     bottom: -5px;
     width: 0;
     left: 15px;
-    content: "";
+    content: '';
   }
-  .slick-cell.hover &, .slick-cell.focus &, .slick-cell.selected & {
+  .slick-cell.hover &,
+  .slick-cell.focus &,
+  .slick-cell.selected & {
     visibility: visible;
     opacity: 1;
   }
-  .slick-cell.active &, .slick-cell.editable & {
+  .slick-cell.active &,
+  .slick-cell.editable & {
     visibility: visible;
     opacity: 1;
   }
@@ -369,10 +382,10 @@ $gradebook_cell_padding_top: 8px;
   background-repeat: repeat;
   border: none;
   &.late {
-    background-image: url("/images/gradebook-late-indicator.png");
+    background-image: url('/images/gradebook-late-indicator.png');
   }
   &.resubmitted {
-    background-image: url("/images/gradebook-resubmitted-indicator.png");
+    background-image: url('/images/gradebook-resubmitted-indicator.png');
   }
   &.grayed-out {
     background-color: $grayLighter;
@@ -380,7 +393,7 @@ $gradebook_cell_padding_top: 8px;
 }
 
 .slick-cell.dropped {
-  background-image: url("/images/gradebook-dropped-indicator.png");
+  background-image: url('/images/gradebook-dropped-indicator.png');
   background-repeat: repeat;
 }
 
@@ -429,29 +442,26 @@ $gradebook_cell_padding_top: 8px;
   overflow: hidden;
 
   @if $use_high_contrast {
-    background: url("/images/gradebook-comments-sprite3-high-contrast.png") no-repeat 100% 0;
+    background: url('/images/gradebook-comments-sprite3-high-contrast.png') no-repeat 100% 0;
     @media (min--moz-device-pixel-ratio: 1.5),
-    (-o-min-device-pixel-ratio: 3/2),
-    (-webkit-min-device-pixel-ratio: 1.5),
-    (min-device-pixel-ratio: 1.5),
-    (min-resolution: 1.5dppx) {
-      background-image: url("/images/gradebook-comments-sprite3-high-contrast@2x.png");
+      (-o-min-device-pixel-ratio: 3/2),
+      (-webkit-min-device-pixel-ratio: 1.5),
+      (min-device-pixel-ratio: 1.5),
+      (min-resolution: 1.5dppx) {
+      background-image: url('/images/gradebook-comments-sprite3-high-contrast@2x.png');
+      background-size: 17px 105px;
+    }
+  } @else {
+    background: url('/images/gradebook-comments-sprite3.png') no-repeat 100% 0;
+    @media (min--moz-device-pixel-ratio: 1.5),
+      (-o-min-device-pixel-ratio: 3/2),
+      (-webkit-min-device-pixel-ratio: 1.5),
+      (min-device-pixel-ratio: 1.5),
+      (min-resolution: 1.5dppx) {
+      background-image: url('/images/gradebook-comments-sprite3@2x.png');
       background-size: 17px 105px;
     }
   }
-
-  @else {
-    background: url("/images/gradebook-comments-sprite3.png") no-repeat 100% 0;
-    @media (min--moz-device-pixel-ratio: 1.5),
-    (-o-min-device-pixel-ratio: 3/2),
-    (-webkit-min-device-pixel-ratio: 1.5),
-    (min-device-pixel-ratio: 1.5),
-    (min-resolution: 1.5dppx) {
-      background-image: url("/images/gradebook-comments-sprite3@2x.png");
-      background-size: 17px 105px;
-    }
-  }
-
 
   #gradebook_grid.editable &:hover,
   #gradebook_grid.editable &:focus {
@@ -543,7 +553,8 @@ $gradebook_cell_padding_top: 8px;
     .divider {
       padding: 0 1px 0 2px;
     }
-    .outof, .grade {
+    .outof,
+    .grade {
       width: 200px;
       display: inline-block;
       background: transparent;
@@ -552,7 +563,9 @@ $gradebook_cell_padding_top: 8px;
       user-select: none;
       text-align: left;
       // if high contrast, no color value (default to regular dark text color)
-      @if $use_high_contrast == false { color: #888888; }
+      @if $use_high_contrast == false {
+        color: #888888;
+      }
     }
     .grade {
       border: none;
@@ -573,7 +586,7 @@ $gradebook_checkbox_size: 16px;
   position: absolute;
   left: 50%;
   top: 50%;
-  margin-top: -($gradebook_checkbox_size / 2) - ( $gradebook_cell_padding_top / 2 );
+  margin-top: -($gradebook_checkbox_size / 2) - ($gradebook_cell_padding_top / 2);
   margin-left: -$gradebook_checkbox_size / 2;
 }
 
@@ -582,7 +595,7 @@ $gradebook_checkbox_size: 16px;
 }
 
 .minimized {
-  background-image: url("/images/4_percent_opacity.png");
+  background-image: url('/images/4_percent_opacity.png');
   .gradebook-cell {
     font-size: 0px;
     * {
@@ -663,22 +676,23 @@ $gradebook_checkbox_size: 16px;
   background-position: center center;
   background-repeat: no-repeat;
   .online_text_entry & {
-    background-image: url("/images/text_entry.png");
+    background-image: url('/images/text_entry.png');
   }
   .discussion_topic & {
-    background-image: url("/images/word_bubble.png");
+    background-image: url('/images/word_bubble.png');
   }
   .online_upload & {
-    background-image: url("/images/file.png");
+    background-image: url('/images/file.png');
   }
   .pending_review & {
-    background-image: url("/images/pending_review.png");
+    background-image: url('/images/pending_review.png');
   }
-  .media_comment &, .media_recording & {
-    background-image: url("/images/media_comment.gif");
+  .media_comment &,
+  .media_recording & {
+    background-image: url('/images/media_comment.gif');
   }
   .quiz & {
-    background-image: url("/images/quiz.png");
+    background-image: url('/images/quiz.png');
   }
 }
 
@@ -690,8 +704,11 @@ $gradebook_checkbox_size: 16px;
   line-height: 19px;
   color: $gradebook_letter-grade-font;
   .muted & {
-    @if $use_high_contrast { color: darken($ic-hint-text, 20%); }
-    @else { color: $ic-hint-text; }
+    @if $use_high_contrast {
+      color: darken($ic-hint-text, 20%);
+    } @else {
+      color: $ic-hint-text;
+    }
   }
 }
 
@@ -699,10 +716,12 @@ $gradebook_checkbox_size: 16px;
   margin-left: -16px;
 }
 
-.gradebook_dropdown, .export_dropdown {
-  li, label {
+.gradebook_dropdown,
+.export_dropdown {
+  li,
+  label {
     @include gradebook_menu_label(13px);
-    cursor:pointer;
+    cursor: pointer;
   }
 }
 

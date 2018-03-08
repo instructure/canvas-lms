@@ -27,17 +27,21 @@ import 'tinymce/plugins/directionality/plugin'
 import 'tinymce/plugins/lists/plugin'
 
 // prevent tiny from loading any CSS assets
-tinymce.DOM.loadCSS = function () {}
+tinymce.DOM.loadCSS = function() {}
 
 // CNVS-36555 fix for setBaseAndExtent() bug in tinymce ~4.1.4 - 4.5.3 .
 // replace when we upgrade tinymce to 4.5.4+. see CNVS-36555
 const _init = tinymce.Editor.prototype.init
-tinymce.Editor.prototype.init = function () {
+tinymce.Editor.prototype.init = function() {
   const ret = _init.apply(this, arguments)
   const editor = this
   const _tmceSel = editor.getWin().Selection.prototype
-  _tmceSel.setBaseAndExtent = function (an, ao, focusNode, focusOffset) {
-    if (!focusNode.hasChildNodes() && focusOffset === 1 && editor.dom.getContentEditableParent(focusNode) !== 'false') {
+  _tmceSel.setBaseAndExtent = function(an, ao, focusNode, focusOffset) {
+    if (
+      !focusNode.hasChildNodes() &&
+      focusOffset === 1 &&
+      editor.dom.getContentEditableParent(focusNode) !== 'false'
+    ) {
       return editor.selection.select(focusNode)
     }
   }

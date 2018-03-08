@@ -16,9 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/quizzes/moderate/openModerateStudentDialog'
-], (openModerateStudentDialog) => {
+define(['jsx/quizzes/moderate/openModerateStudentDialog'], openModerateStudentDialog => {
   let $fixture = null
   QUnit.module('openModerateStudentDialog', {
     setup() {
@@ -29,8 +27,7 @@ define([
             <a class='ui-dialog-titlebar-close' href='#'>
             </a>                                           
             </div>                                         
-          </div>`
-      )
+          </div>`)
     },
 
     teardown() {

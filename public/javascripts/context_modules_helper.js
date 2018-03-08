@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-  var Helper = {}
+var Helper = {}
 
-  Helper.setWindowLocation = function (url) {
-    window.location = url
-  }
+Helper.setWindowLocation = function(url) {
+  window.location = url
+}
 
-  Helper.externalUrlLinkClick = function (event, $elt) {
-    event.preventDefault()
-    this.setWindowLocation($elt.attr('data-item-href'))
-  }.bind(Helper)
+Helper.externalUrlLinkClick = function(event, $elt) {
+  event.preventDefault()
+  this.setWindowLocation($elt.attr('data-item-href'))
+}.bind(Helper)
 
 export default Helper

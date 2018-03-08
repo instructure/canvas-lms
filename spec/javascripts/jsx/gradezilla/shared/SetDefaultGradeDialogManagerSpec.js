@@ -16,133 +16,150 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jquery',
-  'compiled/gradezilla/SetDefaultGradeDialog',
-  'jsx/gradezilla/shared/SetDefaultGradeDialogManager',
-], ($, SetDefaultGradeDialog, SetDefaultGradeDialogManager) => {
-  function createAssignmentProp () {
-    return {
-      id: '1',
-      htmlUrl: 'http://assignment_htmlUrl',
-      invalid: false,
-      muted: false,
-      name: 'Assignment #1',
-      omitFromFinalGrade: false,
-      pointsPossible: 13,
-      submissionTypes: ['online_text_entry'],
-      courseId: '42'
-    }
-  }
-
-  function createStudentsProp () {
-    return [
-      {
-        id: '11',
-        name: 'Clark Kent',
-        isInactive: false,
-        submission: {
-          score: 7,
-          submittedAt: null
-        }
-      },
-      {
-        id: '13',
-        name: 'Barry Allen',
-        isInactive: false,
-        submission: {
-          score: 8,
-          submittedAt: new Date('Thu Feb 02 2017 16:33:19 GMT-0500 (EST)')
-        }
-      },
-      {
-        id: '15',
-        name: 'Bruce Wayne',
-        isInactive: false,
-        submission: {
-          score: undefined,
-          submittedAt: undefined
-        }
+define(
+  [
+    'jquery',
+    'compiled/gradezilla/SetDefaultGradeDialog',
+    'jsx/gradezilla/shared/SetDefaultGradeDialogManager'
+  ],
+  ($, SetDefaultGradeDialog, SetDefaultGradeDialogManager) => {
+    function createAssignmentProp() {
+      return {
+        id: '1',
+        htmlUrl: 'http://assignment_htmlUrl',
+        invalid: false,
+        muted: false,
+        name: 'Assignment #1',
+        omitFromFinalGrade: false,
+        pointsPossible: 13,
+        submissionTypes: ['online_text_entry'],
+        courseId: '42'
       }
-    ];
-  }
-
-  QUnit.module('SetDefaultGradeDialogManager#isDialogEnabled');
-
-  test('returns true when submissions are loaded', function () {
-    const manager = new SetDefaultGradeDialogManager(
-      createAssignmentProp(), createStudentsProp(), 'contextId', 'selectedSection', false, true
-    );
-
-    ok(manager.isDialogEnabled());
-  });
-
-  test('returns false when submissions are not loaded', function () {
-    const manager = new SetDefaultGradeDialogManager(
-      createAssignmentProp(), createStudentsProp(), 'contextId', 'selectedSection', false, false
-    );
-
-    notOk(manager.isDialogEnabled());
-  });
-
-  QUnit.module('SetDefaultGradeDialogManager#showDialog', {
-    setupDialogManager (opts) {
-      const assignment = {
-        ...createAssignmentProp(),
-        inClosedGradingPeriod: opts.inClosedGradingPeriod
-      };
-
-      return new SetDefaultGradeDialogManager(
-        assignment, createStudentsProp(), 'contextId', 'selectedSection', opts.isAdmin, true
-      );
-    },
-
-    setup () {
-      this.flashErrorStub = this.stub($, 'flashError');
-      this.showDialogStub = this.stub(SetDefaultGradeDialog.prototype, 'show');
     }
-  });
 
-  test('shows the SetDefaultGradeDialog when assignment is not in a closed grading period', function () {
-    const manager = this.setupDialogManager({ inClosedGradingPeriod: false, isAdmin: false });
-    manager.showDialog();
+    function createStudentsProp() {
+      return [
+        {
+          id: '11',
+          name: 'Clark Kent',
+          isInactive: false,
+          submission: {
+            score: 7,
+            submittedAt: null
+          }
+        },
+        {
+          id: '13',
+          name: 'Barry Allen',
+          isInactive: false,
+          submission: {
+            score: 8,
+            submittedAt: new Date('Thu Feb 02 2017 16:33:19 GMT-0500 (EST)')
+          }
+        },
+        {
+          id: '15',
+          name: 'Bruce Wayne',
+          isInactive: false,
+          submission: {
+            score: undefined,
+            submittedAt: undefined
+          }
+        }
+      ]
+    }
 
-    equal(this.showDialogStub.callCount, 1);
-  });
+    QUnit.module('SetDefaultGradeDialogManager#isDialogEnabled')
 
-  test('does not show an error when assignment is not in a closed grading period', function () {
-    const manager = this.setupDialogManager({ inClosedGradingPeriod: false, isAdmin: false });
-    manager.showDialog();
+    test('returns true when submissions are loaded', function() {
+      const manager = new SetDefaultGradeDialogManager(
+        createAssignmentProp(),
+        createStudentsProp(),
+        'contextId',
+        'selectedSection',
+        false,
+        true
+      )
 
-    equal(this.flashErrorStub.callCount, 0);
-  });
+      ok(manager.isDialogEnabled())
+    })
 
-  test('shows the SetDefaultGradeDialog when assignment is in a closed grading period but isAdmin is true', function () {
-    const manager = this.setupDialogManager({ inClosedGradingPeriod: true, isAdmin: true });
-    manager.showDialog();
+    test('returns false when submissions are not loaded', function() {
+      const manager = new SetDefaultGradeDialogManager(
+        createAssignmentProp(),
+        createStudentsProp(),
+        'contextId',
+        'selectedSection',
+        false,
+        false
+      )
 
-    equal(this.showDialogStub.callCount, 1);
-  });
+      notOk(manager.isDialogEnabled())
+    })
 
-  test('does not show an error when assignment is in a closed grading period but isAdmin is true', function () {
-    const manager = this.setupDialogManager({ inClosedGradingPeriod: true, isAdmin: true });
-    manager.showDialog();
+    QUnit.module('SetDefaultGradeDialogManager#showDialog', {
+      setupDialogManager(opts) {
+        const assignment = {
+          ...createAssignmentProp(),
+          inClosedGradingPeriod: opts.inClosedGradingPeriod
+        }
 
-    equal(this.flashErrorStub.callCount, 0);
-  });
+        return new SetDefaultGradeDialogManager(
+          assignment,
+          createStudentsProp(),
+          'contextId',
+          'selectedSection',
+          opts.isAdmin,
+          true
+        )
+      },
 
-  test('shows an error message when assignment is in a closed grading period and isAdmin is false', function () {
-    const manager = this.setupDialogManager({ inClosedGradingPeriod: true, isAdmin: false });
-    manager.showDialog();
+      setup() {
+        this.flashErrorStub = this.stub($, 'flashError')
+        this.showDialogStub = this.stub(SetDefaultGradeDialog.prototype, 'show')
+      }
+    })
 
-    equal(this.flashErrorStub.callCount, 1);
-  });
+    test('shows the SetDefaultGradeDialog when assignment is not in a closed grading period', function() {
+      const manager = this.setupDialogManager({inClosedGradingPeriod: false, isAdmin: false})
+      manager.showDialog()
 
-  test('does not show the SetDefaultGradeDialog when assignment is in a closed grading period and isAdmin is false', function () {
-    const manager = this.setupDialogManager({ inClosedGradingPeriod: true, isAdmin: false });
-    manager.showDialog();
+      equal(this.showDialogStub.callCount, 1)
+    })
 
-    equal(this.showDialogStub.callCount, 0);
-  });
-});
+    test('does not show an error when assignment is not in a closed grading period', function() {
+      const manager = this.setupDialogManager({inClosedGradingPeriod: false, isAdmin: false})
+      manager.showDialog()
 
+      equal(this.flashErrorStub.callCount, 0)
+    })
+
+    test('shows the SetDefaultGradeDialog when assignment is in a closed grading period but isAdmin is true', function() {
+      const manager = this.setupDialogManager({inClosedGradingPeriod: true, isAdmin: true})
+      manager.showDialog()
+
+      equal(this.showDialogStub.callCount, 1)
+    })
+
+    test('does not show an error when assignment is in a closed grading period but isAdmin is true', function() {
+      const manager = this.setupDialogManager({inClosedGradingPeriod: true, isAdmin: true})
+      manager.showDialog()
+
+      equal(this.flashErrorStub.callCount, 0)
+    })
+
+    test('shows an error message when assignment is in a closed grading period and isAdmin is false', function() {
+      const manager = this.setupDialogManager({inClosedGradingPeriod: true, isAdmin: false})
+      manager.showDialog()
+
+      equal(this.flashErrorStub.callCount, 1)
+    })
+
+    test('does not show the SetDefaultGradeDialog when assignment is in a closed grading period and isAdmin is false', function() {
+      const manager = this.setupDialogManager({inClosedGradingPeriod: true, isAdmin: false})
+      manager.showDialog()
+
+      equal(this.showDialogStub.callCount, 0)
+    })
+  }
+)

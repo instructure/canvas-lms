@@ -28,13 +28,11 @@ const AssignmentsTray = () => (
     image="/images/tutorial-tray-images/assignments.svg"
   >
     <Text as="p">
-      {
-        I18n.t(`Create assignments on the Assignments page. Organize assignments
+      {I18n.t(`Create assignments on the Assignments page. Organize assignments
                 into groups like Homework, In-class Work, Essays, Discussions
-                and Quizzes. Assignment groups can be weighted.`)
-      }
+                and Quizzes. Assignment groups can be weighted.`)}
     </Text>
   </TutorialTrayContent>
-);
+)
 
 export default AssignmentsTray

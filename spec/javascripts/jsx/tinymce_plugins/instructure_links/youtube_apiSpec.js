@@ -25,25 +25,33 @@ const vidTitle = 'this is my video title'
 let ytApi
 
 QUnit.module('YouTube API', {
-  setup () {
-    $.youTubeID = () => {return videoId}
+  setup() {
+    $.youTubeID = () => {
+      return videoId
+    }
     ytApi = new YouTubeApi()
   },
-  teardown () {
+  teardown() {
     $.youTubeID = undefined
   }
 })
 
 test('titleYouTubeText changes the text of a link to match the title', () => {
   sinon.stub(ytApi, 'fetchYouTubeTitle').callsArgWith(1, vidTitle)
-  const mock = sinon.mock(link).expects('text').withArgs(vidTitle)
+  const mock = sinon
+    .mock(link)
+    .expects('text')
+    .withArgs(vidTitle)
   ytApi.titleYouTubeText(link)
   mock.verify()
 })
 
 test('titleYouTubeText increments the failure count on failure', () => {
   sinon.stub(ytApi, 'fetchYouTubeTitle').callsArgWith(1, null, {responseText: 'error'})
-  const mock = sinon.mock(link).expects('attr').thrice()
+  const mock = sinon
+    .mock(link)
+    .expects('attr')
+    .thrice()
   ytApi.titleYouTubeText(link)
   mock.verify()
 })

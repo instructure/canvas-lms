@@ -65,14 +65,16 @@
     .x.axis {
       fill: $muteFg;
 
-      line, path {
+      line,
+      path {
         display: none;
       }
     }
     .y.axis {
       fill: $muteFg;
 
-      line, path {
+      line,
+      path {
         fill: none;
         stroke-width: 1px;
         stroke: $muteFg;

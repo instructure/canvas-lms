@@ -16,15 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "components/ic-range-input";
-@import "components/ProgressBar";
+@import 'base/environment';
+@import 'components/ic-range-input';
+@import 'components/ProgressBar';
 
 //// Vertical content alignment on elements in Theme editor
 ///////
 .te-Flex {
   display: flex;
-  .te-Flex__block {flex: 1;}
+  .te-Flex__block {
+    flex: 1;
+  }
   .te-Flex__end {
     align-self: flex-end;
   }
@@ -34,13 +36,20 @@
 }
 //// Make sure we're using border-box
 ///////
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 //// Suppress scroll on the body for Theme Editor
 
-html, body { height: 100%; }
+html,
+body {
+  height: 100%;
+}
 
-body { overflow: hidden; }
+body {
+  overflow: hidden;
+}
 
 .ic-Layout-columns {
   height: 100%;
@@ -61,12 +70,19 @@ $te-footer-height: 72px;
 
 //// Layout for Theme editor
 ///////
-@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
 
 .Theme__container {
   margin: 0; // overwrite default margin on forms
   animation: fadeIn ease-in 1;
-  animation-fill-mode:forwards;
+  animation-fill-mode: forwards;
   animation-duration: 0.2s;
 }
 
@@ -88,7 +104,9 @@ $te-footer-height: 72px;
   box-shadow: 2px 0 4px rgba(black, 0.3);
 }
 
-.Theme__preview { flex: 1; }
+.Theme__preview {
+  flex: 1;
+}
 
 .Theme__preview-overlay {
   background: rgba(black, 0.5);
@@ -96,16 +114,20 @@ $te-footer-height: 72px;
   width: calc(100% - #{$te-width});
   z-index: 8000;
   position: absolute;
-  left: $te-width; top: 0;
+  left: $te-width;
+  top: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   .Theme__layout--is-active-theme & {
-    top: 4px; left: $te-width + 4;
+    top: 4px;
+    left: $te-width + 4;
     height: calc(100% - #{$te-footer-height + 4});
     width: calc(100% - #{$te-width + 8});
   }
-  .Button { border-color: rgba(black, 0.5); }
+  .Button {
+    border-color: rgba(black, 0.5);
+  }
 }
 
 .Theme__preview-button-text {
@@ -124,14 +146,19 @@ $te-footer-height: 72px;
 
 .Theme__header {
   position: fixed;
-  left: 0; bottom: 0;
+  left: 0;
+  bottom: 0;
   width: 100%;
   background: $te-bgd-dark;
   color: $ic-color-light;
-  .Button { border-color: darken($te-bgd-dark, 8); }
+  .Button {
+    border-color: darken($te-bgd-dark, 8);
+  }
   &.Theme__header--is-active-theme {
     background: $ic-color-success;
-    .Button { border-color: darken($ic-color-success, 8); }
+    .Button {
+      border-color: darken($ic-color-success, 8);
+    }
   }
 }
 
@@ -140,7 +167,6 @@ $te-footer-height: 72px;
   display: flex;
   align-items: center;
   padding: 0 $ic-sp*1.5;
-
 }
 
 .Theme__header-primary {
@@ -177,7 +203,8 @@ $te-footer-height: 72px;
     cursor: pointer;
     font-weight: normal;
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       color: $te-tab-text-color-hover;
     }
   }
@@ -185,22 +212,25 @@ $te-footer-height: 72px;
   .Theme__editor-tabs_input {
     opacity: 0;
     position: absolute;
-    top: 0; left: 0;
+    top: 0;
+    left: 0;
   }
 
   #te-editor:checked ~ .Theme__editor-tab-label-layout #te-editor-tab,
   #te-upload:checked ~ .Theme__editor-tab-label-layout #te-upload-tab {
-     position: relative;
-     cursor: default;
+    position: relative;
+    cursor: default;
 
     &:before {
-      content: "";
+      content: '';
       border: 8px transparent solid;
-      width: 0; height: 0;
+      width: 0;
+      height: 0;
       border-bottom-color: $te-content-bgd;
       position: absolute;
       bottom: -1px;
-      left: 0; right: 0;
+      left: 0;
+      right: 0;
       margin: 0 auto;
     }
 
@@ -225,7 +255,6 @@ $te-footer-height: 72px;
   border-bottom: 1px solid $ic-color-light;
 }
 
-
 //// File Upload styles for Theme Editor
 ///////
 
@@ -247,10 +276,16 @@ $te-footer-height: 72px;
   .Theme__editor-upload-warning_icon {
     width: 60px;
     text-align: center;
-    i {color: $ic-color-alert;}
+    i {
+      color: $ic-color-alert;
+    }
   } // added so icon div gets a width
-  p {margin: 0;} // override canvas global margins on p tags
-  .Theme__editor-upload-warning_text-emphasis {padding-bottom: $ic-sp;}
+  p {
+    margin: 0;
+  } // override canvas global margins on p tags
+  .Theme__editor-upload-warning_text-emphasis {
+    padding-bottom: $ic-sp;
+  }
 }
 .ThemeEditorFileUpload {
   padding: $ic-sp;
@@ -261,9 +296,10 @@ $te-footer-height: 72px;
   flex: 1;
   overflow: hidden;
 
-  input[type="file"] {
+  input[type='file'] {
     position: absolute;
-    top: 0; left: -9999px;
+    top: 0;
+    left: -9999px;
     opacity: 0;
   }
 }
@@ -276,7 +312,7 @@ $te-footer-height: 72px;
   display: inline-block;
   cursor: default;
 
-  input[type="file"]:focus ~ & {
+  input[type='file']:focus ~ & {
     border-color: var(--ic-brand-primary);
   }
 }
@@ -290,9 +326,10 @@ $te-footer-height: 72px;
     cursor: default;
   }
 
-  @if $use_high_contrast == false { outline: none; }
+  @if $use_high_contrast == false {
+    outline: none;
+  }
 }
-
 
 .ThemeEditorFileUpload__view-file {
   float: right;
@@ -350,14 +387,13 @@ $te-footer-height: 72px;
           color: $ic-color-light;
         }
       }
-      &.ui-state-hover
-        {
+      &.ui-state-hover {
         background: $te-accordion-hover;
         &,
         a:hover,
         &.ui-state-hover a:hover,
         &.ui-state-hover a {
-        color: $ic-color-light;
+          color: $ic-color-light;
         }
         .Theme__editor-accordion-icon {
           @include animate-icon;
@@ -391,7 +427,8 @@ $te-footer-height: 72px;
           color: $ic-font-color-dark;
         }
         &.ui-state-focus {
-          a, a:hover {
+          a,
+          a:hover {
             box-shadow: none;
             outline: none;
             @if $use_high_contrast {
@@ -405,7 +442,9 @@ $te-footer-height: 72px;
         }
       }
       // Takes out un-needed jquery icon
-      > span {display: none;}
+      > span {
+        display: none;
+      }
     }
   }
   .ui-accordion-content {
@@ -478,17 +517,19 @@ $te-footer-height: 72px;
     height: $te-input-height;
     box-shadow: none;
   }
-  input[type="text"].Theme__editor-color-block_input--has-error {
-    &, &:focus{
+  input[type='text'].Theme__editor-color-block_input--has-error {
+    &,
+    &:focus {
       border-color: $ic-color-danger;
     }
   }
-  .ic-Form-message.ic-Form-message--error{
+  .ic-Form-message.ic-Form-message--error {
     position: absolute;
     top: 40px;
     right: 40px;
     left: auto;
-    height: auto; width: auto;
+    height: auto;
+    width: auto;
     .ic-Form-message__Layout {
       flex-direction: row;
       max-width: 200px; // allows for better presentation for longer string errors
@@ -543,13 +584,13 @@ $te-footer-height: 72px;
       box-sizing: border-box;
       text-align: center;
       overflow: hidden;
-      height: 75px; width: 75px;
+      height: 75px;
+      width: 75px;
       display: flex;
       align-items: center;
       justify-content: center;
       img {
         max-height: 100%;
-
       }
     }
     &.Theme__editor_preview-img-container--ic-brand-header-image {
@@ -561,11 +602,13 @@ $te-footer-height: 72px;
     &.Theme__editor_preview-img-container--ic-brand-apple-touch-icon {
       background: #212121;
       .Theme__editor_preview-img {
-        img {border-radius: 15px;}
+        img {
+          border-radius: 15px;
+        }
       }
     }
     &.Theme__editor_preview-img-container--ic-brand-msapplication-tile-square,
-    &.Theme__editor_preview-img-container--ic-brand-msapplication-tile-wide{
+    &.Theme__editor_preview-img-container--ic-brand-msapplication-tile-wide {
       background: var(--ic-brand-msapplication-tile-color);
     }
   }
@@ -587,7 +630,8 @@ $te-footer-height: 72px;
     }
     .Theme__editor-input_upload {
       position: absolute;
-      top: 0; left: -9999px;
+      top: 0;
+      left: -9999px;
       opacity: 0;
 
       &:focus + .Theme__editor-button_upload {
@@ -615,7 +659,9 @@ $te-footer-height: 72px;
   display: flex;
   align-items: center;
 
-  &:first-of-type { border-top: none; }
+  &:first-of-type {
+    border-top: none;
+  }
 }
 
 .Theme-editor-progress-list-item__title {

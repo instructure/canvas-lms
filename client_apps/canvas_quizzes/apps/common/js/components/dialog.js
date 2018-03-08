@@ -18,12 +18,12 @@
  */
 
 define(function(require) {
-  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
-  var jQueryUIDialog = require('canvas_packages/jqueryui/dialog');
-  var $ = require('jquery');
-  var _ = require('lodash');
-  var K = require('../constants');
-  var omit = _.omit;
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps')
+  var jQueryUIDialog = require('canvas_packages/jqueryui/dialog')
+  var $ = require('jquery')
+  var _ = require('lodash')
+  var K = require('../constants')
+  var omit = _.omit
 
   /**
    * @class Components.Dialog
@@ -169,7 +169,7 @@ define(function(require) {
        * That, coupled with a role of "button" will help the user understand
        * what the toggle element really is.
        */
-      "aria-label": React.PropTypes.string,
+      'aria-label': React.PropTypes.string,
 
       /**
        * @property {String} [autoFocus="a.ui-dialog-titlebar-close"]
@@ -189,7 +189,7 @@ define(function(require) {
         content: null,
         container: null,
         $container: null
-      };
+      }
     },
 
     getDefaultProps: function() {
@@ -202,41 +202,40 @@ define(function(require) {
         width: 300,
         keyboardAccessible: true,
         autoFocus: 'a.ui-dialog-titlebar-close'
-      };
+      }
     },
 
     componentDidMount: function() {
-      var props = this.props;
+      var props = this.props
 
       // Create the dialog:
       if (props.content) {
-        this.__renderDialog(props.content, props);
-      }
-      else {
-        console.warn("You are attempting to create a dialog without any content.");
+        this.__renderDialog(props.content, props)
+      } else {
+        console.warn('You are attempting to create a dialog without any content.')
       }
     },
 
     componentDidUpdate: function(/*prevProps, prevState*/) {
-      var props = this.props;
+      var props = this.props
 
       // Create the dialog if it hasn't been created yet:
       if (!this.state.content && props.content) {
-        this.__renderDialog(props.content, props);
+        this.__renderDialog(props.content, props)
       }
 
       // Update the component within the dialog:
       if (this.state.content) {
-        this.state.content.setProps(this.__getContentProps(props));
+        this.state.content.setProps(this.__getContentProps(props))
       }
     },
 
     componentWillUnmount: function() {
-      this.__removeDialog();
+      this.__removeDialog()
     },
 
     render: function() {
-      var tag = React.DOM[this.props.tagName];
+      var tag = React.DOM[this.props.tagName]
 
       return (
         <tag
@@ -246,37 +245,38 @@ define(function(require) {
           children={this.props.children}
           role={this.props.role}
           aria-label={this.props['aria-label']}
-          tabIndex={this.props.keyboardAccessible ? "0" : undefined} />
-      );
+          tabIndex={this.props.keyboardAccessible ? '0' : undefined}
+        />
+      )
     },
 
     /** Open the dialog */
     open: function() {
-      this.__send('open');
+      this.__send('open')
     },
 
     openOnReturn: function(e) {
       if (this.props.keyboardAccessible && e.which === K.KC_RETURN) {
-        e.preventDefault();
-        this.open();
+        e.preventDefault()
+        this.open()
       }
     },
 
     /** Close the dialog */
     close: function() {
-      this.__send('close');
+      this.__send('close')
     },
 
     /** Is the dialog open? */
     isOpen: function() {
-      return this.__send('isOpen');
+      return this.__send('isOpen')
     },
 
     toggle: function() {
       if (this.isOpen()) {
-        this.close();
+        this.close()
       } else {
-        this.open();
+        this.open()
       }
     },
 
@@ -284,9 +284,9 @@ define(function(require) {
      * @private
      */
     __renderDialog: function(content, props) {
-      var container = document.createElement('div');
-      var renderedContent = React.renderComponent(content(), container);
-      var autoFocusSelector = this.props.autoFocus;
+      var container = document.createElement('div')
+      var renderedContent = React.renderComponent(content(), container)
+      var autoFocusSelector = this.props.autoFocus
 
       $(container).dialog({
         autoOpen: props.autoOpen,
@@ -294,25 +294,28 @@ define(function(require) {
         width: props.width,
         open: function(event, ui) {
           if (autoFocusSelector) {
-            $(container).closest('.ui-dialog').find(autoFocusSelector).focus();
+            $(container)
+              .closest('.ui-dialog')
+              .find(autoFocusSelector)
+              .focus()
           }
         }
-      });
+      })
 
       this.setState({
         content: renderedContent,
         container: container,
         $container: $(container)
-      });
+      })
     },
 
     __removeDialog: function() {
       if (this.state.$container) {
         // No need to remove the container as it was not really attached to
         // the DOM, simply unmounting the component will suffice.
-        React.unmountComponentAtNode(this.state.container);
+        React.unmountComponentAtNode(this.state.container)
 
-        this.state.$container.dialog('destroy');
+        this.state.$container.dialog('destroy')
       }
     },
 
@@ -327,18 +330,25 @@ define(function(require) {
      */
     __send: function(command) {
       if (this.state.$container) {
-        return this.state.$container.dialog(command);
+        return this.state.$container.dialog(command)
       }
     },
 
     __getContentProps: function(props) {
       return omit(props, [
-        'className', 'tagName', 'content', 'children',
-        'width', 'title', 'autoOpen',
-        'aria-label', 'role', 'keyboardAccessible'
-      ]);
+        'className',
+        'tagName',
+        'content',
+        'children',
+        'width',
+        'title',
+        'autoOpen',
+        'aria-label',
+        'role',
+        'keyboardAccessible'
+      ])
     }
-  });
+  })
 
-  return Dialog;
-});
+  return Dialog
+})

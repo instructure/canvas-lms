@@ -23,18 +23,23 @@
     font-size: 1.2em;
     line-height: 42px;
   }
-  h1, .h1 {
+  h1,
+  .h1 {
     margin: 20px 0 0;
     padding: 0 12px;
     @include fontSize(23px);
   }
   .submission-details {
     padding: 10px;
-    h1, .h1 {
+    h1,
+    .h1 {
       margin: 0 -10px 15px;
       border-bottom: 1px solid #bbb;
     }
-    h2, h2 select, .h2, .h2 select {
+    h2,
+    h2 select,
+    .h2,
+    .h2 select {
       @include fontSize(15px);
     }
   }
@@ -60,7 +65,7 @@
     border-top: 1px solid #bbb;
     padding: 0 12px;
     position: relative;
-    background: #A3A3A3 url(/images/messages/messages-background.png) 0 0 repeat;
+    background: #a3a3a3 url(/images/messages/messages-background.png) 0 0 repeat;
   }
   .comment {
     background: #fff;
@@ -96,7 +101,7 @@
 .submission_details_add_comment_form {
   position: relative;
   border-top: 1px solid #bbb;
-  background-color: #F2F2F2;
+  background-color: #f2f2f2;
   margin: 0px;
   padding: 5px 10px;
   label {

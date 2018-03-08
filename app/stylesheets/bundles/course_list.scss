@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 .course-list-table {
   table-layout: fixed;
@@ -33,7 +33,7 @@
   .course-list-enrolled-as-column {
     width: 15%;
   }
-.course-list-published-column {
+  .course-list-published-column {
     width: 7%;
   }
   .course-list-nickname-column {
@@ -67,7 +67,7 @@
 }
 
 .course-color-block:before {
-  content:'\25A0';
+  content: '\25A0';
   @include fontSize(21px);
   padding-right: $ic-sp/2;
   vertical-align: baseline;

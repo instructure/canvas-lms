@@ -16,16 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-dom',
-  'jsx/theme_editor/RangeInput',
-], (React, ReactDOM, RangeInput) => {
-
+define(['react', 'react-dom', 'jsx/theme_editor/RangeInput'], (React, ReactDOM, RangeInput) => {
   let elem, props
 
   QUnit.module('RangeInput Component', {
-    setup () {
+    setup() {
       elem = document.createElement('div')
       props = {
         min: 1,
@@ -67,14 +62,7 @@ define([
     sinon.spy(component, 'setState')
     const event = {target: {value: 8}}
     component.handleChange(event)
-    ok(
-      component.setState.calledWithMatch({value: event.target.value}),
-      'updates value in state'
-    )
-    ok(
-      props.onChange.calledWith(event.target.value),
-      'calls onChange with the new value'
-    )
+    ok(component.setState.calledWithMatch({value: event.target.value}), 'updates value in state')
+    ok(props.onChange.calledWith(event.target.value), 'calls onChange with the new value')
   })
 })
-

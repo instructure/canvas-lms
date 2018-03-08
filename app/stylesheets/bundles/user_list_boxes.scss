@@ -16,14 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/mixins/typography";
+@import 'base/mixins/typography';
 
 // these are the things that show up when you try to import names w/emails into your course
 #user_list_boxes {
   position: relative;
   min-height: 165px;
   margin-top: 10px;
-  #user_list_textarea_container, #user_list_processing, #user_list_parsed {
+  #user_list_textarea_container,
+  #user_list_processing,
+  #user_list_parsed {
     min-height: 165px;
     width: 100%;
     background-color: white;
@@ -45,23 +47,24 @@
     .person {
       display: inline-block;
       position: relative;
-      background: #FFF;
+      background: #fff;
       margin: 0 8px 8px 0;
       padding: 4px;
       @include fontSize(11px);
       min-height: 21px;
-      box-shadow: inset 33px 0 0 #F7F7F7, inset 34px 0 0 #CCC;
+      box-shadow: inset 33px 0 0 #f7f7f7, inset 34px 0 0 #ccc;
       div {
         margin: 2px 0 0 33px;
       }
       .name::after {
-        content: " ";
+        content: ' ';
       }
-      .address, .login {
+      .address,
+      .login {
         font-weight: normal;
       }
       &::before {
-        content: "";
+        content: '';
         display: block;
         height: 100%;
         background: url(/images/circle-plus.png) no-repeat center center;

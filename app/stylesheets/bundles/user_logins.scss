@@ -21,7 +21,8 @@
     border-collapse: collapse;
     width: 100%;
   }
-  tr.login > th, tr.login > td {
+  tr.login > th,
+  tr.login > td {
     padding-top: 0;
     padding-bottom: 5px;
     border-bottom: 1px solid #eee;
@@ -36,7 +37,7 @@
     }
   }
   .account_name {
-    line-height: 3.0;
+    line-height: 3;
   }
   .login_details {
     padding: 0;
@@ -46,8 +47,8 @@
   }
   .login_details:last-child {
     & td {
-     border-bottom: none;
-  }
+      border-bottom: none;
+    }
   }
   .login_details_link {
     font-style: italic;

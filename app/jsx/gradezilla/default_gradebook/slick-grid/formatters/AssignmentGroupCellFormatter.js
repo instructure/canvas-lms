@@ -16,43 +16,43 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import round from 'compiled/util/round';
-import I18n from 'i18n!gradebook';
+import round from 'compiled/util/round'
+import I18n from 'i18n!gradebook'
 
-function getGradePercentage (score, pointsPossible) {
-  const grade = (score / pointsPossible) * 100;
-  return round(grade, round.DEFAULT);
+function getGradePercentage(score, pointsPossible) {
+  const grade = score / pointsPossible * 100
+  return round(grade, round.DEFAULT)
 }
 
-function render (options) {
-  const percentage = options.possible ? options.percentage : '-';
+function render(options) {
+  const percentage = options.possible ? options.percentage : '-'
 
   return `
     <div class="gradebook-cell">
       <div class="gradebook-tooltip">${options.score} / ${options.possible}</div>
       <span class="percentage">${percentage}</span>
     </div>
-  `;
+  `
 }
 
 export default class AssignmentGroupCellFormatter {
   render = (_row, _cell, value, _columnDef, _dataContext) => {
     if (value == null) {
-      return '';
+      return ''
     }
 
-    let percentage = getGradePercentage(value.score, value.possible);
-    percentage = isFinite(percentage) ? percentage : 0;
+    let percentage = getGradePercentage(value.score, value.possible)
+    percentage = isFinite(percentage) ? percentage : 0
 
-    let possible = round(value.possible, round.DEFAULT);
-    possible = possible ? I18n.n(possible) : possible;
+    let possible = round(value.possible, round.DEFAULT)
+    possible = possible ? I18n.n(possible) : possible
 
     const templateOpts = {
-      percentage: I18n.n(round(percentage, round.DEFAULT), { percentage: true }),
+      percentage: I18n.n(round(percentage, round.DEFAULT), {percentage: true}),
       possible,
       score: I18n.n(round(value.score, round.DEFAULT))
-    };
+    }
 
-    return render(templateOpts);
+    return render(templateOpts)
   }
 }

@@ -85,17 +85,22 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
         font-weight: normal;
         padding: 8px 14px;
         text-shadow: none;
-        @if $use_high_contrast { text-decoration: underline; }
+        @if $use_high_contrast {
+          text-decoration: underline;
+        }
         &:focus {
-          @if $use_high_contrast { @include ic-focus-variant(var(--ic-link-color), -4px); }
-          @else {
+          @if $use_high_contrast {
+            @include ic-focus-variant(var(--ic-link-color), -4px);
+          } @else {
             text-decoration: underline;
             outline: none;
           }
         }
 
         // special handling for Calendar tabs with solid-color header backgrounds
-        #edit_event & { color: $ic-color-light; }
+        #edit_event & {
+          color: $ic-color-light;
+        }
       }
       &.ui-state-hover,
       &:hover {
@@ -103,10 +108,14 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
         border-color: $ic-border-light;
         a {
           color: $ic-font-color-dark;
-          @if $use_high_contrast { text-decoration: none; }
+          @if $use_high_contrast {
+            text-decoration: none;
+          }
 
           // special handling for Calendar tabs with solid-color header backgrounds
-          #edit_event & { color: var(--ic-link-color); }
+          #edit_event & {
+            color: var(--ic-link-color);
+          }
         }
       }
       &.ui-state-focus,
@@ -115,8 +124,9 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
         border-color: $ic-border-light;
         background: $ic-color-light;
         a {
-          @if $use_high_contrast { @include ic-focus-variant(var(--ic-link-color), -4px); }
-          @else {
+          @if $use_high_contrast {
+            @include ic-focus-variant(var(--ic-link-color), -4px);
+          } @else {
             text-decoration: underline;
             outline: none;
           }
@@ -128,10 +138,14 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
         border-color: $ic-border-light;
         background: $ic-color-light;
         a {
-          @if $use_high_contrast { text-decoration: none; }
+          @if $use_high_contrast {
+            text-decoration: none;
+          }
 
           // special handling for Calendar tabs with solid-color header backgrounds
-          #edit_event & { color: $ic-font-color-dark; }
+          #edit_event & {
+            color: $ic-font-color-dark;
+          }
         }
       }
     }
@@ -140,7 +154,9 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
   &.ui-tabs--mini {
     .ui-tabs-nav {
       li {
-        a { padding: 4px 8px; }
+        a {
+          padding: 4px 8px;
+        }
       }
     }
   }

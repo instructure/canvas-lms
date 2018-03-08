@@ -19,7 +19,6 @@
 // Buttons
 // --------------------------------------------------
 
-
 // Base styles
 // --------------------------------------------------
 
@@ -168,19 +167,22 @@ listen to the "click" and "keyclick" events and add `tabindex="0"` and `role="bu
   &:focus {
     text-decoration: none;
     outline: none;
-    @if not $use_high_contrast { outline: none; }
+    @if not $use_high_contrast {
+      outline: none;
+    }
   }
 
-  &:hover { text-decoration: none; }
+  &:hover {
+    text-decoration: none;
+  }
 
-  &.disabled, &[disabled] {
+  &.disabled,
+  &[disabled] {
     cursor: not-allowed;
     pointer-events: none;
     opacity: 0.5;
   }
-
 }
-
 
 // Button Sizes
 // --------------------------------------------------
@@ -192,19 +194,22 @@ listen to the "click" and "keyclick" events and add `tabindex="0"` and `role="bu
   @include fontSize($ic-font-size--medium);
   border-radius: $borderRadiusLarge;
 
-  [class^="icon-"], [class*=" icon-"] { margin-top: 2px; }
-
+  [class^='icon-'],
+  [class*=' icon-'] {
+    margin-top: 2px;
+  }
 }
-
 
 // Small
 .btn-small, // <-- deprecated- do not use
 .Button--small {
   padding: $paddingSmall;
   @include fontSize($ic-font-size--xsmall);
-  [class^="icon-"], [class*=" icon-"] { margin-top: 0; }
+  [class^='icon-'],
+  [class*=' icon-'] {
+    margin-top: 0;
+  }
 }
-
 
 // Mini
 .btn-mini, // <-- deprecated- do not use
@@ -213,7 +218,6 @@ listen to the "click" and "keyclick" events and add `tabindex="0"` and `role="bu
   @include fontSize(10px);
   border-radius: $borderRadiusSmall;
 }
-
 
 // Block button
 // -------------------------
@@ -228,13 +232,19 @@ listen to the "click" and "keyclick" events and add `tabindex="0"` and `role="bu
 }
 
 // Vertically space out stacked block buttons
-.btn-block + .btn-block, .Button--block + .Button--block { margin-top: 6px; }
+.btn-block + .btn-block,
+.Button--block + .Button--block {
+  margin-top: 6px;
+}
 
 // Specificity overrides
-input[type="submit"],
-input[type="reset"],
-input[type="button"] {
-  &.btn-block, &.Button--block { width: 100%; }
+input[type='submit'],
+input[type='reset'],
+input[type='button'] {
+  &.btn-block,
+  &.Button--block {
+    width: 100%;
+  }
 }
 
 // The colors for these come from app/stylesheets/brandable_variables.json
@@ -244,7 +254,7 @@ input[type="button"] {
 .btn-primary, // <-- deprecated- do not use
 .Button--primary {
   @if $use_high_contrast {
-    @include canvas-button(#0770A3, $ic-color-light);
+    @include canvas-button(#0770a3, $ic-color-light);
   } @else {
     @include canvas-button(
       var(--ic-brand-button--primary-bgd),
@@ -286,7 +296,6 @@ input[type="button"] {
   }
 }
 
-
 // Link buttons
 // --------------------------------------------------
 
@@ -325,24 +334,32 @@ input[type="button"] {
     body.Underline-All-Links__enabled & {
       text-decoration: none;
     }
-    &:focus { color: var(--ic-link-color); }
+    &:focus {
+      color: var(--ic-link-color);
+    }
   }
 
-  &:focus { color: var(--ic-link-color); }
+  &:focus {
+    color: var(--ic-link-color);
+  }
 
-  &.active, &.Button--active, &:active {
+  &.active,
+  &.Button--active,
+  &:active {
     background: rgba($ic-color-dark, 0.05);
     box-shadow: none;
     border-color: transparent;
     color: var(--ic-link-color);
   }
 
-  &.disabled, &[disabled] {
+  &.disabled,
+  &[disabled] {
     color: $textColor;
     background: transparent;
   }
 
-  i[class*=icon-], i[class^=icon-] {
+  i[class*='icon-'],
+  i[class^='icon-'] {
     margin-right: 3px;
   }
 }
@@ -368,11 +385,14 @@ input[type="button"] {
   padding: 2px 4px;
   border-radius: 0;
   color: $ic-icon-link-color;
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     background: transparent;
     color: $ic-icon-link-color-hover;
   }
-  &.active, &.Button--active, &:active {
+  &.active,
+  &.Button--active,
+  &:active {
     background: transparent;
     box-shadow: none;
     border-color: transparent;
@@ -384,27 +404,38 @@ input[type="button"] {
 .Button--icon-action-rev {
   @extend .Button--icon-action;
   color: $ic-color-light;
-  &:hover, &:focus { color: $ic-color-light; }
-  &:focus { @include button-focus-dark; }
+  &:hover,
+  &:focus {
+    color: $ic-color-light;
+  }
+  &:focus {
+    @include button-focus-dark;
+  }
 }
-
 
 .ui-button {
   position: relative;
   @extend .Button;
-  &.ui-state-hover { @extend .Button:hover }
-  &.ui-state-focus { @extend .Button:focus }
+  &.ui-state-hover {
+    @extend .Button:hover;
+  }
+  &.ui-state-focus {
+    @extend .Button:focus;
+  }
   &.ui-state-active {
     @extend .Button--active;
-    &:hover { @extend .Button--active; }
+    &:hover {
+      @extend .Button--active;
+    }
   }
-  &.ui-state-disabled { @extend .Button.disabled; }
+  &.ui-state-disabled {
+    @extend .Button.disabled;
+  }
 }
 
 .Button--theme-editor-apply {
   text-decoration: none;
 }
-
 
 // "Beta" buttons
 // --------------------------------------------------

@@ -1,4 +1,5 @@
 # Using Docker to run Canvas
+
 ## Prerequisites
 
 You need Docker. Don't have Docker yet? Go [here](getting_docker.md) for details on getting it setup.

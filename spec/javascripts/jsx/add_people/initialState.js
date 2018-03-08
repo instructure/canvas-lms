@@ -34,7 +34,7 @@ define([], () => {
     },
     apiState: {
       pendingCount: 0,
-      error: undefined,
+      error: undefined
     },
     userValidationResult: {
       validUsers: [],
@@ -43,7 +43,7 @@ define([], () => {
     },
     usersToBeEnrolled: [],
     usersEnrolled: false
-  };
+  }
 
-  return INITIAL_STATE;
-});
+  return INITIAL_STATE
+})

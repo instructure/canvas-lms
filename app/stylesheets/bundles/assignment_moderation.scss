@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 .grade-moderation-table {
   tr {
@@ -26,7 +26,7 @@
 
   .ModeratedColumnHeader {
     padding-bottom: 5px;
-    border-bottom: 1px solid #8495A0;
+    border-bottom: 1px solid #8495a0;
     @include fontSize(11px);
     font-weight: bold;
 
@@ -58,7 +58,7 @@
 
   .ColumnHeader {
     padding-bottom: 5px;
-    border-bottom: 1px solid #8495A0;
+    border-bottom: 1px solid #8495a0;
     @include fontSize(11px);
     font-weight: bold;
 
@@ -89,14 +89,14 @@
   }
 
   .ModeratedAssignmentList {
-    border-top: 1px solid #F0F0F0;
+    border-top: 1px solid #f0f0f0;
     margin: 0;
     list-style: none;
   }
 
   .ModeratedAssignmentList__Item {
     height: 60px;
-    border-bottom: 1px solid #F0F0F0;
+    border-bottom: 1px solid #f0f0f0;
     padding-top: 15px;
     padding-bottom: 15px;
   }
@@ -124,14 +124,14 @@
   }
 
   .AssignmentList {
-    border-top: 1px solid #F0F0F0;
+    border-top: 1px solid #f0f0f0;
     margin: 0;
     list-style: none;
   }
 
   .AssignmentList__Item {
     height: 60px;
-    border-bottom: 1px solid #F0F0F0;
+    border-bottom: 1px solid #f0f0f0;
     padding-top: 15px;
     padding-bottom: 15px;
   }
@@ -155,7 +155,7 @@
     margin: 0 5px 0 5px;
   }
 
-  .AssignmentList_Grade{
+  .AssignmentList_Grade {
     width: 50px;
   }
 

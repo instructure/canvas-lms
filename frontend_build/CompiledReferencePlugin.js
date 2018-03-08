@@ -32,12 +32,13 @@ const fs = require('fs')
 
 const specRoot = path.resolve(__dirname, '../spec')
 
-function addExt (requestString, context='') {
+function addExt(requestString, context = '') {
   let ext = /\/templates\//.test(requestString) ? '.hbs' : '.coffee'
   // temporarily handle .js files in app/coffeescripts. if there is a .js file with the same name,
   // it takes precedence
   if (ext === '.coffee') {
-    const jsFileToStat = path.join((requestString.startsWith('.') ? context : 'app'), requestString) + '.js'
+    const jsFileToStat =
+      path.join(requestString.startsWith('.') ? context : 'app', requestString) + '.js'
     if (fs.existsSync(jsFileToStat)) {
       ext = '.js'
     }
@@ -48,7 +49,7 @@ function addExt (requestString, context='') {
 const pluginTranspiledRegexp = /^([^/]+)\/compiled\//
 const jsxRegexp = /compiled\/jsx/
 
-function rewritePluginPath (requestString) {
+function rewritePluginPath(requestString) {
   const pluginName = pluginTranspiledRegexp.exec(requestString)[1]
   const relativePath = requestString.replace(`${pluginName}/compiled/`, '')
   if (jsxRegexp.test(requestString)) {
@@ -62,8 +63,8 @@ function rewritePluginPath (requestString) {
 }
 
 class CompiledReferencePlugin {
-  apply (compiler) {
-    compiler.plugin('normal-module-factory', (nmf) => {
+  apply(compiler) {
+    compiler.plugin('normal-module-factory', nmf => {
       nmf.plugin('before-resolve', (input, callback) => {
         const result = input
         const requestString = result.request
@@ -80,10 +81,11 @@ class CompiledReferencePlugin {
           // extension while we still have a require-js build or we risk loading
           // its compiled js instead
           result.request = `${requestString}.handlebars`
-        } else if ((
-          /^compiled\//.test(requestString) ||
-          requestString.includes('ic-submission-download-dialog')
-        ) && !requestString.includes('dummyI18nResource')) {
+        } else if (
+          (/^compiled\//.test(requestString) ||
+            requestString.includes('ic-submission-download-dialog')) &&
+          !requestString.includes('dummyI18nResource')
+        ) {
           // this references either a coffeescript or ember handlebars file in canvas
           result.request = addExt(requestString.replace('compiled/', 'coffeescripts/'))
         } else if (process.env.NODE_ENV === 'test') {

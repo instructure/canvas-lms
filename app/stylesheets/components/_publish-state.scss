@@ -100,14 +100,18 @@ The publish button has two states on click (publish and published) and a hover s
 .btn-unpublish {
   @include buttonBackground($btnDangerBackground, $btnDangerBackgroundHighlight);
   box-shadow: none;
-  &:focus { @include button-focus-dark; }
+  &:focus {
+    @include button-focus-dark;
+  }
 }
 
 .btn-published.disabled,
 .btn-published.disabled:hover,
 .btn-unpublish.disabled,
 .btn-unpublish.disabled:hover {
-  @if $use_high_contrast { opacity: 1; }
+  @if $use_high_contrast {
+    opacity: 1;
+  }
 }
 
 .publish-icon {
@@ -115,17 +119,28 @@ The publish button has two states on click (publish and published) and a hover s
   display: inline-block;
   color: $ic-color-icon-disabled;
   cursor: pointer;
-  &:focus { @include ic-focus-variant; }
-  &.publish-icon-unpublish { color: $ic-color-icon-disabled; }
-  &.publish-icon-published { color: $ic-color-success; }
-  .publish-text { display: none; }
+  &:focus {
+    @include ic-focus-variant;
+  }
+  &.publish-icon-unpublish {
+    color: $ic-color-icon-disabled;
+  }
+  &.publish-icon-published {
+    color: $ic-color-success;
+  }
+  .publish-text {
+    display: none;
+  }
 }
 
 .published-status {
   &.published {
     font-weight: bold;
-    @if $use_high_contrast { color: darken($ic-color-success, 4%); }
-    @else { color: $ic-color-success; }
+    @if $use_high_contrast {
+      color: darken($ic-color-success, 4%);
+    } @else {
+      color: $ic-color-success;
+    }
   }
 
   &.unpublished {

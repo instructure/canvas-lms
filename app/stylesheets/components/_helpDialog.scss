@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 #help-dialog {
   padding: 0;
@@ -45,9 +45,12 @@
           outline: none;
           box-shadow: inset 0 0 0 1px var(--ic-link-color);
         }
-        &:focus, &:hover {
+        &:focus,
+        &:hover {
           background-color: $ic-bg-light-neutral;
-          .text { text-decoration: underline; }
+          .text {
+            text-decoration: underline;
+          }
         }
       }
       &.user li.user,
@@ -75,7 +78,8 @@
     color: #555;
     margin-top: -6px;
   }
-  .ui-state-error, .ui-state-highlight {
+  .ui-state-error,
+  .ui-state-highlight {
     border-radius: 4px !important;
     padding: 10px 10px 10px 35px;
     position: relative;

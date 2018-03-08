@@ -17,7 +17,7 @@
  */
 
 @import 'base/environment';
-@import "deprecated/bootstrap/mixins";
+@import 'deprecated/bootstrap/mixins';
 @import 'vendor/bootstrap/button-groups';
 
 #calendar_header {
@@ -51,23 +51,28 @@
   }
 }
 
-.calendar_navigator, .scheduler_navigator {
+.calendar_navigator,
+.scheduler_navigator {
   display: inline-block;
 
-  .datetime_suggest, .input-append {
+  .datetime_suggest,
+  .input-append {
     display: inline-block;
     vertical-align: middle;
     margin-bottom: 0;
   }
 
-  .input-append input, .input-append button {
+  .input-append input,
+  .input-append button {
     vertical-align: middle;
   }
 }
 
 .scheduler_navigator {
   margin-bottom: $ic-sp;
-  .navigation_buttons { bottom: auto; }
+  .navigation_buttons {
+    bottom: auto;
+  }
 }
 
 .navigation_buttons {
@@ -75,7 +80,8 @@
   bottom: 3px;
 }
 
-.navigation_title, .appointment_group_title {
+.navigation_title,
+.appointment_group_title {
   display: inline;
   line-height: 32px;
   padding-left: 5px;
@@ -84,7 +90,7 @@
 }
 
 #refresh_calendar_link {
-  background-image: url("/images/ajax-loader-black-on-white-static.gif");
+  background-image: url('/images/ajax-loader-black-on-white-static.gif');
   background-position: 50% 50%;
   display: block;
   float: right;
@@ -94,7 +100,7 @@
   top: 8px;
   width: 16px;
   &.loading {
-    background-image: url("/images/ajax-loader-black-on-white.gif");
+    background-image: url('/images/ajax-loader-black-on-white.gif');
   }
 }
 

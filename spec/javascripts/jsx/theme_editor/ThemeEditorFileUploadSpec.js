@@ -23,7 +23,7 @@ import ThemeEditorFileUpload from 'jsx/theme_editor/ThemeEditorFileUpload'
 let elem, props
 
 QUnit.module('ThemeEditorFileUpload Component', {
-  setup () {
+  setup() {
     elem = document.createElement('div')
     props = {
       onChange: this.spy()
@@ -86,7 +86,7 @@ test('hasUserInput', () => {
   ok(component.hasUserInput(), 'non null input value')
 })
 
-test('handleFileChanged', function () {
+test('handleFileChanged', function() {
   var expected = {}
   this.stub(window.URL, 'createObjectURL').returns(expected)
   const component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
@@ -98,14 +98,11 @@ test('handleFileChanged', function () {
     component.setState.calledWithMatch({selectedFileName: file.name}),
     'sets selectedFileName in state'
   )
-  ok(
-    window.URL.createObjectURL.calledWith(file),
-    'creates object url with file'
-  )
+  ok(window.URL.createObjectURL.calledWith(file), 'creates object url with file')
   ok(props.onChange.calledWith(expected), 'calls onChange with object url')
 })
 
-test('handleResetClicked', function () {
+test('handleResetClicked', function() {
   const component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
   const subject = component.refs.fileInput.getDOMNode()
   subject.setAttribute('type', 'text')
@@ -127,14 +124,10 @@ test('handleResetClicked', function () {
   ok(props.onChange.calledWith(''), 'calls onChange empty string')
 })
 
-test('displayValue', function () {
+test('displayValue', function() {
   let component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
   this.stub(component, 'hasUserInput').returns(false)
-  equal(
-    component.displayValue(),
-    '',
-    'no input or current value, returns empty string'
-  )
+  equal(component.displayValue(), '', 'no input or current value, returns empty string')
 
   props.userInput = {val: 'foo'}
   component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
@@ -148,11 +141,7 @@ test('displayValue', function () {
 
   props.currentValue = 'bar'
   component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
-  equal(
-    component.displayValue(),
-    props.currentValue,
-    'returns current value'
-  )
+  equal(component.displayValue(), props.currentValue, 'returns current value')
 })
 
 test('sets accept on file input from prop', () => {

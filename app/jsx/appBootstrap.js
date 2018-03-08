@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 import canvasTheme from '@instructure/ui-themes/lib/canvas'
 import moment from 'moment'
 import tz from 'timezone_core'
@@ -36,8 +35,8 @@ if (typeof ENV !== 'undefined') {
 
 // setup the inst-ui default theme
 if (ENV.use_high_contrast) {
-  canvasTheme.use({ accessible: true })
+  canvasTheme.use({accessible: true})
 } else {
   const brandvars = window.CANVAS_ACTIVE_BRAND_VARIABLES || {}
-  canvasTheme.use({ overrides: brandvars })
+  canvasTheme.use({overrides: brandvars})
 }

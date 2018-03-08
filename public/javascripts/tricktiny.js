@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-  window.tinyMCEPreInit = {
-    base: '/javascripts/tinymce/jscripts/tiny_mce',
-    suffix: '',
-    query: ''
-  };
+window.tinyMCEPreInit = {
+  base: '/javascripts/tinymce/jscripts/tiny_mce',
+  suffix: '',
+  query: ''
+}

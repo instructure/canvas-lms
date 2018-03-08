@@ -28,12 +28,10 @@ const AnnouncementsTray = () => (
     image="/images/tutorial-tray-images/announcements.svg"
   >
     <Text as="p">
-      {
-        I18n.t(`Share important information with all users in your course.
-          Choose to get a copy of your own announcements in Notifications.`)
-      }
+      {I18n.t(`Share important information with all users in your course.
+          Choose to get a copy of your own announcements in Notifications.`)}
     </Text>
   </TutorialTrayContent>
-);
+)
 
 export default AnnouncementsTray

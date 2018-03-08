@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 /*
 Old Forms
@@ -68,13 +68,14 @@ controls on the bottom required this.
 
 */
 
-input[type=text].loading {
+input[type='text'].loading {
   background-image: url('/images/ajax-reload-animated.gif');
   background-repeat: no-repeat;
   background-position: 98% center;
 }
 
-.loadingIndicator, .paginatedLoadingIndicator {
+.loadingIndicator,
+.paginatedLoadingIndicator {
   background-image: url('/images/ajax-reload-animated.gif');
   background-repeat: no-repeat;
   background-position: center center;
@@ -135,4 +136,3 @@ input + .hint-text {
     padding: 20px;
   }
 }
-

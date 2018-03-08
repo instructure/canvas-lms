@@ -13,7 +13,7 @@ details.
 This implements one of the suggestion mitigation strategies from
 the paper:
 
-*Masking Secrets*: The Rails CSRF token is 'masked' by encrypting it
+_Masking Secrets_: The Rails CSRF token is 'masked' by encrypting it
 with a 32-byte one-time pad, and the pad and encrypted token are
 returned to the browser, instead of the "real" CSRF token. This only
 protects the CSRF token from an attacker; it does not protect other
@@ -26,7 +26,6 @@ gem offers only partial protection for Rails applications. If you're
 concerned about the security of your web app, you should review the
 BREACH paper and look for other, application-specific things you can
 do to prevent or mitigate this class of attacks.
-
 
 ## Gotchas
 

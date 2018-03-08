@@ -52,8 +52,5 @@ test('renders the right zones', () => {
   )
 
   const allOptions = wrapper.find('optgroup[label="All Timezones"] option')
-  deepEqual(
-    allOptions.map(e => ({name: e.prop('value'), localized_name: e.text()})),
-    timezones
-  )
+  deepEqual(allOptions.map(e => ({name: e.prop('value'), localized_name: e.text()})), timezones)
 })

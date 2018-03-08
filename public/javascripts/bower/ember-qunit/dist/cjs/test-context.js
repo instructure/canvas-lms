@@ -1,12 +1,13 @@
-"use strict";
-var __test_context__;
+'use strict'
+var __test_context__
 
 function set(context) {
-  __test_context__ = context;
+  __test_context__ = context
 }
 
-exports.set = set;function get() {
-  return __test_context__;
+exports.set = set
+function get() {
+  return __test_context__
 }
 
-exports.get = get;
+exports.get = get

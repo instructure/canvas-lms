@@ -47,13 +47,13 @@ $usage-rights-alert-text: $ic-color-light;
   list-style: none;
   margin-left: 0;
   li:before {
-    content:'';
-    display:inline-block;
-    height:1em;
-    width:1em;
-    background-image:url('/images/mimeClassIcons/folder.svg');
-    background-size:contain;
-    background-repeat:no-repeat;
+    content: '';
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    background-image: url('/images/mimeClassIcons/folder.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
   }
 }
 

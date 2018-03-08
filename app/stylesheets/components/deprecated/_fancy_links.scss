@@ -268,8 +268,7 @@ a.icon-grading {
   @include icon_link;
   @if $use_high_contrast {
     background-image: url(/images/icon-checkmark-plus-success-high-contrast.svg);
-  }
-  @else {
+  } @else {
     background-image: url(/images/icon-checkmark-plus-success.svg);
   }
   background-repeat: no-repeat;
@@ -284,7 +283,7 @@ a.icon-grading-gray {
 }
 
 a.admin {
-  color: #D15545;
+  color: #d15545;
 }
 
 @mixin attachment_link {
@@ -297,63 +296,66 @@ a.admin {
 a {
   &.file {
     @include attachment_link;
-    background-image: url("/images/inst_tree/file_types/page_white.png") !important;
+    background-image: url('/images/inst_tree/file_types/page_white.png') !important;
   }
   &.pdf {
     @include attachment_link;
-    background-image: url("/images/inst_tree/file_types/page_white_acrobat.png") !important;
+    background-image: url('/images/inst_tree/file_types/page_white_acrobat.png') !important;
   }
   &.image {
     @include attachment_link;
-    background-image: url("/images/inst_tree/file_types/page_white_picture.png") !important;
+    background-image: url('/images/inst_tree/file_types/page_white_picture.png') !important;
   }
   &.spreadsheet {
     @include attachment_link;
-    background-image: url("/images/inst_tree/file_types/page_white_excel.png") !important;
+    background-image: url('/images/inst_tree/file_types/page_white_excel.png') !important;
   }
   &.xls {
     @include attachment_link;
-    background-image: url("/images/inst_tree/file_types/page_white_excel.png") !important;
+    background-image: url('/images/inst_tree/file_types/page_white_excel.png') !important;
   }
-  &.word, &.doc {
+  &.word,
+  &.doc {
     @include attachment_link;
-    background-image: url("/images/inst_tree/file_types/page_white_word.png") !important;
+    background-image: url('/images/inst_tree/file_types/page_white_word.png') !important;
   }
   &.ppt {
     @include attachment_link;
-    background-image: url("/images/inst_tree/file_types/page_white_powerpoint.png") !important;
+    background-image: url('/images/inst_tree/file_types/page_white_powerpoint.png') !important;
   }
   &.zip {
     @include attachment_link;
-    background-image: url("/images/inst_tree/file_types/page_white_zip.png") !important;
+    background-image: url('/images/inst_tree/file_types/page_white_zip.png') !important;
   }
   &.html {
     @include attachment_link;
-    background-image: url("/images/inst_tree/file_types/page_white_world.png") !important;
+    background-image: url('/images/inst_tree/file_types/page_white_world.png') !important;
   }
   &.code {
     @include attachment_link;
-    background-image: url("/images/inst_tree/file_types/page_white_code.png") !important;
+    background-image: url('/images/inst_tree/file_types/page_white_code.png') !important;
   }
   &.text {
     @include attachment_link;
-    background-image: url("/images/inst_tree/file_types/page_white_text.png") !important;
+    background-image: url('/images/inst_tree/file_types/page_white_text.png') !important;
   }
   &.audio {
     @include attachment_link;
-    background-image: url("/images/inst_tree/file_types/sound_none.png") !important;
+    background-image: url('/images/inst_tree/file_types/sound_none.png') !important;
   }
   &.video {
     @include attachment_link;
-    background-image: url("/images/inst_tree/file_types/page_white_camera.png") !important;
+    background-image: url('/images/inst_tree/file_types/page_white_camera.png') !important;
   }
   &.flash {
     @include attachment_link;
-    background-image: url("/images/inst_tree/file_types/page_white_flash.png") !important;
+    background-image: url('/images/inst_tree/file_types/page_white_flash.png') !important;
   }
 }
 
-a.no-underline, a.no-underline:hover, a.no-underline:focus {
+a.no-underline,
+a.no-underline:hover,
+a.no-underline:focus {
   text-decoration: none;
 }
 
@@ -361,7 +363,9 @@ a.no-underline, a.no-underline:hover, a.no-underline:focus {
 // these classes make it so you can have links like <a class="atr-reply">reply to this topic</a> and have only
 // a reply.png icon show up.
 
-.atr-reply, .atr-edit, .atr-delete {
+.atr-reply,
+.atr-edit,
+.atr-delete {
   text-indent: -119988px;
   overflow: hidden;
   text-align: left;
@@ -372,13 +376,13 @@ a.no-underline, a.no-underline:hover, a.no-underline:focus {
 }
 
 .atr-reply {
-  background-image: url("/images/reply.png");
+  background-image: url('/images/reply.png');
 }
 
 .atr-edit {
-  background-image: url("/images/edit.png");
+  background-image: url('/images/edit.png');
 }
 
 .atr-delete {
-  background-image: url("/images/delete.png");
+  background-image: url('/images/delete.png');
 }

@@ -16,50 +16,46 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'helpers/fakeENV',
-  'jsx/shared/conditional_release/CyoeHelper',
-], (fakeENV, CyoeHelper) => {
+define(['helpers/fakeENV', 'jsx/shared/conditional_release/CyoeHelper'], (fakeENV, CyoeHelper) => {
   const cyoeEnv = () => ({
     CONDITIONAL_RELEASE_SERVICE_ENABLED: true,
     CONDITIONAL_RELEASE_ENV: {
-      active_rules: [{
-        trigger_assignment: '1',
-        trigger_assignment_model: {
-          grading_type: 'percentage',
-        },
-        scoring_ranges: [
-          {
-            upper_bound: 1,
-            lower_bound: 0.7,
-            assignment_sets: [
-              { assignments: [{ assignment_id: '2' }] },
-            ],
+      active_rules: [
+        {
+          trigger_assignment: '1',
+          trigger_assignment_model: {
+            grading_type: 'percentage'
           },
-        ],
-      }],
-    },
+          scoring_ranges: [
+            {
+              upper_bound: 1,
+              lower_bound: 0.7,
+              assignment_sets: [{assignments: [{assignment_id: '2'}]}]
+            }
+          ]
+        }
+      ]
+    }
   })
 
-  const setEnv = (env) => {
+  const setEnv = env => {
     fakeENV.setup(env)
     CyoeHelper.reloadEnv()
   }
 
   const testSetup = {
-    setup () {
+    setup() {
       setEnv({
         CONDITIONAL_RELEASE_SERVICE_ENABLED: false,
-        CONDITIONAL_RELEASE_ENV: null,
+        CONDITIONAL_RELEASE_ENV: null
       })
     },
-    teardown () {
+    teardown() {
       fakeENV.teardown()
-    },
+    }
   }
 
   QUnit.module('CYOE Helper', () => {
-
     QUnit.module('isEnabled', testSetup)
 
     test('returns false if not enabled', () => {

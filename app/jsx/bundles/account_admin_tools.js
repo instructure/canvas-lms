@@ -33,7 +33,7 @@ import CommMessageItemView from 'compiled/views/accounts/admin_tools/CommMessage
 import messagesSearchResultsTemplate from 'jst/accounts/admin_tools/commMessagesSearchResults'
 import usersTemplate from 'jst/accounts/usersList'
 
-  // This is used by admin tools to display search results
+// This is used by admin tools to display search results
 const restoreModel = new CourseRestoreModel({account_id: ENV.ACCOUNT_ID})
 
 const messages = new CommMessageCollection(null, {params: {perPage: 10}})
@@ -43,7 +43,8 @@ const messagesContentView = new CommMessagesContentPaneView({
   searchForm: new UserDateRangeSearchFormView({
     formName: 'messages',
     inputFilterView: new InputFilterView({
-      collection: messagesUsers}),
+      collection: messagesUsers
+    }),
     usersView: new PaginatedCollectionView({
       collection: messagesUsers,
       itemView: UserView,
@@ -60,7 +61,7 @@ const messagesContentView = new CommMessagesContentPaneView({
   collection: messages
 })
 
-    // Render tabs
+// Render tabs
 const app = new AdminToolsView({
   el: '#admin-tools-app',
   tabs: {

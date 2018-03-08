@@ -20,83 +20,89 @@ import INST from './INST'
 import $ from 'jquery'
 import './jquery.ajaxJSON'
 
-  $(document).ready(function(){
-    var interactionSeconds = 0,
-        update_url = window.ENV.page_view_update_url;
-        eventInTime = false;
+$(document).ready(function() {
+  var interactionSeconds = 0,
+    update_url = window.ENV.page_view_update_url
+  eventInTime = false
 
-    INST.interaction_contexts = {};
+  INST.interaction_contexts = {}
 
-    if(document.cookie && document.cookie.match(/last_page_view/)) {
-      var match = document.cookie.match(/last_page_view=([^;]+)/);
-      if(match && match[1]) {
-        try {
-          var data = $.parseJSON(unescape(match[1]));
-          if(data && data.url && data.seconds) {
-            setTimeout(function() {
-              $.ajaxJSON(data.url, "PUT", {interaction_seconds: data.seconds}, function() {
-              }, function() {}, 3000);
-            });
-          }
-        } catch(e) {
+  if (document.cookie && document.cookie.match(/last_page_view/)) {
+    var match = document.cookie.match(/last_page_view=([^;]+)/)
+    if (match && match[1]) {
+      try {
+        var data = $.parseJSON(unescape(match[1]))
+        if (data && data.url && data.seconds) {
+          setTimeout(function() {
+            $.ajaxJSON(
+              data.url,
+              'PUT',
+              {interaction_seconds: data.seconds},
+              function() {},
+              function() {},
+              3000
+            )
+          })
         }
+      } catch (e) {}
+    }
+    document.cookie = 'last_page_view=; Path=/; expires=Thu, 01-Jan-1970 00:00:01 GMT'
+  }
+
+  if (update_url) {
+    var secondsSinceLastEvent = 0
+    var intervalInSeconds = 60 * 5
+
+    $(document).bind('page_view_update_url_received', function(event, new_update_url) {
+      update_url = new_update_url
+    })
+
+    var updateTrigger
+    $(document).bind('page_view_update', function(event, force) {
+      var data = {}
+
+      if (force || (interactionSeconds > 10 && secondsSinceLastEvent < intervalInSeconds)) {
+        data.interaction_seconds = interactionSeconds
+        $.ajaxJSON(update_url, 'PUT', data, null, function(result, xhr) {
+          if (xhr.status === 422) {
+            clearInterval(updateTrigger)
+          }
+        })
+        interactionSeconds = 0
       }
-      document.cookie = "last_page_view=; Path=/; expires=Thu, 01-Jan-1970 00:00:01 GMT";
-    }
+    })
 
-    if (update_url) {
-      var secondsSinceLastEvent = 0;
-      var intervalInSeconds = 60 * 5;
+    updateTrigger = setInterval(function() {
+      $(document).triggerHandler('page_view_update')
+    }, 1000 * intervalInSeconds)
 
-      $(document).bind('page_view_update_url_received', function(event, new_update_url) {
-        update_url = new_update_url;
-      });
+    window.addEventListener('beforeunload', function(e) {
+      if (interactionSeconds > 30) {
+        var value = JSON.stringify({url: update_url, seconds: interactionSeconds})
+        document.cookie = 'last_page_view=' + escape(value) + '; Path=/;'
+      }
+    })
 
-      var updateTrigger;
-      $(document).bind('page_view_update', function(event, force) {
-        var data = {};
-
-        if(force || (interactionSeconds > 10 && secondsSinceLastEvent < intervalInSeconds)) {
-          data.interaction_seconds = interactionSeconds;
-          $.ajaxJSON(update_url, "PUT", data, null, function(result, xhr) {
-            if(xhr.status === 422) {
-              clearInterval(updateTrigger);
-            }
-          });
-          interactionSeconds = 0;
+    var eventInTime = false
+    $(document).bind('mousemove keypress mousedown focus', function() {
+      eventInTime = true
+    })
+    setInterval(function() {
+      if (eventInTime) {
+        interactionSeconds++
+        if (INST && INST.interaction_context && INST.interaction_contexts) {
+          INST.interaction_contexts[INST.interaction_context] =
+            (INST.interaction_contexts[INST.interaction_context] || 0) + 1
         }
-      });
-
-      updateTrigger = setInterval(function() {
-        $(document).triggerHandler('page_view_update');
-      }, 1000 * intervalInSeconds);
-
-      window.addEventListener('beforeunload', function(e) {
-        if(interactionSeconds > 30) {
-          var value = JSON.stringify({url: update_url, seconds: interactionSeconds});
-          document.cookie = "last_page_view=" + escape(value) + "; Path=/;";
+        eventInTime = false
+        if (secondsSinceLastEvent >= intervalInSeconds) {
+          secondsSinceLastEvent = 0
+          $(document).triggerHandler('page_view_update')
         }
-      });
-
-      var eventInTime = false;
-      $(document).bind('mousemove keypress mousedown focus', function() {
-        eventInTime = true;
-      });
-      setInterval(function() {
-        if(eventInTime) {
-          interactionSeconds++;
-          if(INST && INST.interaction_context && INST.interaction_contexts) {
-            INST.interaction_contexts[INST.interaction_context] = (INST.interaction_contexts[INST.interaction_context] || 0) + 1;
-          }
-          eventInTime = false;
-          if(secondsSinceLastEvent >= intervalInSeconds) {
-            secondsSinceLastEvent = 0;
-            $(document).triggerHandler('page_view_update');
-          }
-          secondsSinceLastEvent = 0;
-        } else {
-          secondsSinceLastEvent++;
-        }
-      }, 1000);
-    }
-  });
+        secondsSinceLastEvent = 0
+      } else {
+        secondsSinceLastEvent++
+      }
+    }, 1000)
+  }
+})

@@ -28,8 +28,11 @@
 
   &.enabled {
     font-weight: bold;
-    @if $use_high_contrast { color: darken($ic-color-success, 4%); }
-    @else { color: $ic-color-success; }
+    @if $use_high_contrast {
+      color: darken($ic-color-success, 4%);
+    } @else {
+      color: $ic-color-success;
+    }
   }
 
   &.disabled {

@@ -21,7 +21,7 @@ import $ from 'jquery'
 
 let addClasses = true
 
-function classifyIE (version) {
+function classifyIE(version) {
   version = parseInt(version, 10)
   INST.browser[`ie${version}`] = INST.browser.ie = true
   INST.browser.version = version
@@ -53,10 +53,9 @@ if (!INST.browser.ie) {
     // don't add the special "ie" class for IE10+ because their renderer is
     // not far behind Gecko and Webkit
     addClasses = false
-  }
-  // need to eval here because the optimizer will strip any comments, so using
-  // /*@cc_on@*/ will not make it through:
-  else if (eval('/*@cc_on!@*/0')) {
+  } else if (eval('/*@cc_on!@*/0')) {
+    // need to eval here because the optimizer will strip any comments, so using
+    // /*@cc_on@*/ will not make it through:
     classifyIE(10)
     addClasses = false
   }
@@ -69,7 +68,12 @@ if (window.devicePixelRatio && !INST.browser.ie) {
   INST.browser.webkit = true
 
   // from: http://www.byond.com/members/?command=view_post&post=53727
-  INST.browser[(escape(navigator.javaEnabled.toString()) == 'function%20javaEnabled%28%29%20%7B%20%5Bnative%20code%5D%20%7D') ? 'chrome' : 'safari'] = true
+  INST.browser[
+    escape(navigator.javaEnabled.toString()) ==
+    'function%20javaEnabled%28%29%20%7B%20%5Bnative%20code%5D%20%7D'
+      ? 'chrome'
+      : 'safari'
+  ] = true
 }
 
 // this is just using jquery's browser sniffing result of if its firefox, it
@@ -84,7 +88,7 @@ INST.browser['no-touch'] = !INST.browser.touch
 // so for example, if you were on IE6 the body would have the classes "ie" AND "ie6"
 if (addClasses) {
   const classesToAdd = $.map(INST.browser, (v, k) => (v === true ? k : undefined)).join(' ')
-  $(function () {
+  $(function() {
     $('body').addClass(classesToAdd)
   })
 }

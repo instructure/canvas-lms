@@ -22,33 +22,35 @@ import PropTypes from 'prop-types'
 import InputMixin from 'jsx/external_apps/mixins/InputMixin'
 
 export default React.createClass({
-    displayName: 'CheckboxInput',
+  displayName: 'CheckboxInput',
 
-    mixins: [InputMixin],
+  mixins: [InputMixin],
 
-    propTypes: {
-      defaultValue: PropTypes.string,
-      checked:      PropTypes.bool,
-      label:        PropTypes.string,
-      id:           PropTypes.string,
-      required:     PropTypes.bool,
-      errors:       PropTypes.object,
-      name:         PropTypes.string
-    },
+  propTypes: {
+    defaultValue: PropTypes.string,
+    checked: PropTypes.bool,
+    label: PropTypes.string,
+    id: PropTypes.string,
+    required: PropTypes.bool,
+    errors: PropTypes.object,
+    name: PropTypes.string
+  },
 
-    render() {
-      return (
-        <div className={"checkbox " + this.getClassNames()}>
-          <label>
-            <input type="checkbox"
-                   ref="input"
-                   defaultChecked={this.props.checked}
-                   onChange={this.handleCheckChange}
-                   aria-invalid={!!this.getErrorMessage()}
-                   name={this.props.name || null} />
-            {this.props.label}
-          </label>
-        </div>
-      )
-    }
-  });
+  render() {
+    return (
+      <div className={'checkbox ' + this.getClassNames()}>
+        <label>
+          <input
+            type="checkbox"
+            ref="input"
+            defaultChecked={this.props.checked}
+            onChange={this.handleCheckChange}
+            aria-invalid={!!this.getErrorMessage()}
+            name={this.props.name || null}
+          />
+          {this.props.label}
+        </label>
+      </div>
+    )
+  }
+})

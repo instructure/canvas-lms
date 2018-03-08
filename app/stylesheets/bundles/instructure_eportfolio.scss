@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 $eportfolio-name--disabled: #777;
 
@@ -79,7 +79,9 @@ a {
 #page_content {
   .section {
     position: relative;
-    .links, .section_type_name, .move_link {
+    .links,
+    .section_type_name,
+    .move_link {
       display: none;
     }
   }
@@ -160,7 +162,9 @@ a {
         padding: 0;
         text-align: left;
       }
-      .section:hover .move_link, .section:hover .links, .section_type_name {
+      .section:hover .move_link,
+      .section:hover .links,
+      .section_type_name {
         display: none;
       }
     }
@@ -171,7 +175,8 @@ a {
   display: none;
 }
 
-.submission_list, .submission_list.instTree {
+.submission_list,
+.submission_list.instTree {
   padding-left: 0px;
   max-height: 150px;
   overflow: auto;
@@ -303,15 +308,16 @@ ul.submission_list.instTree li.submission.leaf {
   margin: 0;
   padding: 0;
   list-style: none;
-  border-top: 1px solid #C6C6C6;
+  border-top: 1px solid #c6c6c6;
   li {
     .section_url {
       color: #4b7092;
       display: block;
       @include fontSize(14px);
       padding: 5px 0 5px 25px;
-      border-bottom: 1px solid lighten(#C6C6C6, 4%);
-      &:hover, &:focus {
+      border-bottom: 1px solid lighten(#c6c6c6, 4%);
+      &:hover,
+      &:focus {
         background-color: darken(#e4e7e9, 2%);
         // color: #fff
         position: static;
@@ -330,19 +336,19 @@ ul.submission_list.instTree li.submission.leaf {
       position: relative;
       padding: 7px 0 7px 23px;
       // color: #2C4C5E
-
     }
   }
   .section.hidden {
     .section_url {
-      color: #AAAAAA;
+      color: #aaaaaa;
     }
   }
 }
 
 .eportfolio-name {
   padding: 10px;
-  h3, .h3 {
+  h3,
+  .h3 {
     @include fontSize(14px);
     margin: 0;
     line-height: normal;

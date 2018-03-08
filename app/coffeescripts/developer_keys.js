@@ -26,7 +26,7 @@ import 'jqueryui/dialog'
 
 let page = 0
 
-function buildKey (key) {
+function buildKey(key) {
   key.icon_image_url = key.icon_url || '/images/blank.png'
   if (!key.name) key.name = I18n.t('unnamed_tool', 'Unnamed Tool')
 
@@ -40,17 +40,16 @@ function buildKey (key) {
   return $key.data('key', key)
 }
 
-function buildForm (key = {}, $orig) {
-
+function buildForm(key = {}, $orig) {
   key._formAction = !key.id ? accountEndpoint() : rawEndpoint()
 
   const $form = $(developerKeyFormTemplate(key))
   $form.formSubmit({
-    beforeSubmit () {
+    beforeSubmit() {
       $('#edit_dialog button.submit').text(I18n.t('button.saving', 'Saving Key...'))
     },
     disableWhileLoading: true,
-    success (key) {
+    success(key) {
       $('#edit_dialog').dialog('close')
       const $key = buildKey(key)
       if ($orig) {
@@ -60,7 +59,7 @@ function buildForm (key = {}, $orig) {
       }
       $key.find('.edit_link')[0].focus()
     },
-    error () {
+    error() {
       $('#edit_dialog button.submit').text(I18n.t('button.saving_failed', 'Saving Key Failed'))
     }
   })
@@ -68,21 +67,21 @@ function buildForm (key = {}, $orig) {
 }
 
 const sendEvent = (event, $orig, focus_selector) =>
-  $.ajaxJSON(`${rawEndpoint()}/${$orig.data('key').id}`, 'PUT', {developer_key: {event}}, (data) => {
-      const $key = buildKey(data)
-      $orig.after($key).remove()
-      if (focus_selector) $key.find(focus_selector)[0].focus()
+  $.ajaxJSON(`${rawEndpoint()}/${$orig.data('key').id}`, 'PUT', {developer_key: {event}}, data => {
+    const $key = buildKey(data)
+    $orig.after($key).remove()
+    if (focus_selector) $key.find(focus_selector)[0].focus()
   })
 
 const rawEndpoint = () => '/api/v1/developer_keys'
 
 const accountEndpoint = () => ENV.accountEndpoint
 
-function nextPage () {
+function nextPage() {
   let req
   $('#loading').attr('class', 'loading')
   page++
-  return (req = $.ajaxJSON(`${accountEndpoint()}?page=${page}`, 'GET', {}, (data) => {
+  return (req = $.ajaxJSON(`${accountEndpoint()}?page=${page}`, 'GET', {}, data => {
     data.forEach(key => {
       const $key = buildKey(key)
       $('#keys tbody').append($key)
@@ -102,39 +101,64 @@ function nextPage () {
 
 nextPage()
 $('#keys')
-  .on('click', '.delete_link', preventDefault(function () {
-    const $key = $(this).closest('.key')
-    const $prevKey = $key.prev()
-    const $toFocus = $prevKey.length ? $prevKey.find('.delete_link')[0] : $('.add_key')[0]
-    const key = $key.data('key')
-    $key.confirmDelete({
-      url: `/api/v1/developer_keys/${key.id}`,
-      message: I18n.t('messages.confirm_delete', 'Are you sure you want to delete this developer key?'),
-      success () {
-        $key.remove()
-        $toFocus.focus()
-      }
+  .on(
+    'click',
+    '.delete_link',
+    preventDefault(function() {
+      const $key = $(this).closest('.key')
+      const $prevKey = $key.prev()
+      const $toFocus = $prevKey.length ? $prevKey.find('.delete_link')[0] : $('.add_key')[0]
+      const key = $key.data('key')
+      $key.confirmDelete({
+        url: `/api/v1/developer_keys/${key.id}`,
+        message: I18n.t(
+          'messages.confirm_delete',
+          'Are you sure you want to delete this developer key?'
+        ),
+        success() {
+          $key.remove()
+          $toFocus.focus()
+        }
+      })
     })
-  }))
-  .on('click','.edit_link', preventDefault(function () {
-    const $key = $(this).closest('.key')
-    const key = $key.data('key')
-    const $form = buildForm(key, $key)
-    $('#edit_dialog').empty().append($form).dialog('open')
-  }))
-  .on('click', '.deactivate_link', preventDefault(function () {
-    const $key = $(this).closest('.key')
-    sendEvent('deactivate', $key, '.activate_link')
-  }))
-  .on('click', '.activate_link', preventDefault(function () {
-    const $key = $(this).closest('.key')
-    sendEvent('activate', $key, '.deactivate_link')
-  }))
+  )
+  .on(
+    'click',
+    '.edit_link',
+    preventDefault(function() {
+      const $key = $(this).closest('.key')
+      const key = $key.data('key')
+      const $form = buildForm(key, $key)
+      $('#edit_dialog')
+        .empty()
+        .append($form)
+        .dialog('open')
+    })
+  )
+  .on(
+    'click',
+    '.deactivate_link',
+    preventDefault(function() {
+      const $key = $(this).closest('.key')
+      sendEvent('deactivate', $key, '.activate_link')
+    })
+  )
+  .on(
+    'click',
+    '.activate_link',
+    preventDefault(function() {
+      const $key = $(this).closest('.key')
+      sendEvent('activate', $key, '.deactivate_link')
+    })
+  )
 
-$('.add_key').click((event) => {
+$('.add_key').click(event => {
   event.preventDefault()
   const $form = buildForm()
-  $('#edit_dialog').empty().append($form).dialog('open')
+  $('#edit_dialog')
+    .empty()
+    .append($form)
+    .dialog('open')
 })
 
 $('#edit_dialog')

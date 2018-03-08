@@ -3,11 +3,11 @@
 ## Testing
 
 To test all the gems:
+
 ```
 cd gems
 ./test_all_gems.sh
 ```
-
 
 ### To test an individual gem
 
@@ -18,5 +18,3 @@ cd gems/google_drive
 bundle
 rspec
 ```
-
-

@@ -25,7 +25,8 @@
   padding: 0;
   margin: 0;
 
-  td, th {
+  td,
+  th {
     padding: 0 $whitespace 0 0;
   }
 }
@@ -88,7 +89,8 @@
     margin: 0 $whitespace/2 0 0;
   }
 
-  input, input + span {
+  input,
+  input + span {
     vertical-align: middle;
   }
 }

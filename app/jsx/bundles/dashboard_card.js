@@ -29,5 +29,6 @@ ReactDOM.render(
     courseCards={ENV.DASHBOARD_COURSES}
     reorderingEnabled={ENV.DASHBOARD_REORDERING_ENABLED}
     hideColorOverlays={ENV.PREFERENCES.hide_dashcard_color_overlays}
-  />, dashboardContainer
+  />,
+  dashboardContainer
 )

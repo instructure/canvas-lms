@@ -4,9 +4,8 @@ module.exports = function(broccoli) {
     packageName: 'ember-qunit',
     main: 'main',
     shim: {
-      'ember': 'Ember',
-      'qunit': 'QUnit'
+      ember: 'Ember',
+      qunit: 'QUnit'
     }
-  });
-};
-
+  })
+}

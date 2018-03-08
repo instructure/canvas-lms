@@ -18,17 +18,17 @@
 
 import $ from 'jquery'
 import React from 'react'
-import { mount } from 'enzyme'
+import {mount} from 'enzyme'
 import AddExternalToolButton from 'jsx/external_apps/components/AddExternalToolButton'
 
 let spy
 
 QUnit.module('AddExternalToolButton#handleLti2ToolInstalled flash errors', {
-  setup () {
+  setup() {
     spy = sinon.spy($, 'flashError')
   },
 
-  teardown () {
+  teardown() {
     $.flashError.restore()
   }
 })
@@ -51,4 +51,3 @@ test('it displays a default flash message when there is an error without a messa
   wrapper.instance().handleLti2ToolInstalled(toolData)
   ok(spy.calledWith('There was an unknown error registering the tool'))
 })
-

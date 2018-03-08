@@ -1,211 +1,231 @@
-
-[{
-  "group_key": "global_branding",
-  "variables": [{
-    "variable_name": "ic-brand-primary",
-    "type": "color",
-    "default": "#008EE2"
-  },{
-    "variable_name": "ic-brand-font-color-dark",
-    "type": "color",
-    "default": "#2D3B45"
-  },{
-    "variable_name": "ic-link-color",
-    "type": "color",
-    "default": "#008EE2"
-  },{
-    "variable_name": "ic-brand-button--primary-bgd",
-    "type": "color",
-    "default": "$ic-brand-primary"
-  },{
-    "variable_name": "ic-brand-button--primary-text",
-    "type": "color",
-    "default": "#ffffff"
-  },{
-    "variable_name": "ic-brand-button--secondary-bgd",
-    "type": "color",
-    "default": "#2D3B45"
-  },{
-    "variable_name": "ic-brand-button--secondary-text",
-    "type": "color",
-    "default": "#ffffff"
-  }
-]},
-{
-  "group_key": "global_navigation",
-  "variables": [
+[
   {
-    "variable_name": "ic-brand-global-nav-bgd",
-    "type": "color",
-    "default": "#394B58"
+    "group_key": "global_branding",
+    "variables": [
+      {
+        "variable_name": "ic-brand-primary",
+        "type": "color",
+        "default": "#008EE2"
+      },
+      {
+        "variable_name": "ic-brand-font-color-dark",
+        "type": "color",
+        "default": "#2D3B45"
+      },
+      {
+        "variable_name": "ic-link-color",
+        "type": "color",
+        "default": "#008EE2"
+      },
+      {
+        "variable_name": "ic-brand-button--primary-bgd",
+        "type": "color",
+        "default": "$ic-brand-primary"
+      },
+      {
+        "variable_name": "ic-brand-button--primary-text",
+        "type": "color",
+        "default": "#ffffff"
+      },
+      {
+        "variable_name": "ic-brand-button--secondary-bgd",
+        "type": "color",
+        "default": "#2D3B45"
+      },
+      {
+        "variable_name": "ic-brand-button--secondary-text",
+        "type": "color",
+        "default": "#ffffff"
+      }
+    ]
   },
   {
-    "variable_name": "ic-brand-global-nav-ic-icon-svg-fill",
-    "type": "color",
-    "default": "#ffffff"
+    "group_key": "global_navigation",
+    "variables": [
+      {
+        "variable_name": "ic-brand-global-nav-bgd",
+        "type": "color",
+        "default": "#394B58"
+      },
+      {
+        "variable_name": "ic-brand-global-nav-ic-icon-svg-fill",
+        "type": "color",
+        "default": "#ffffff"
+      },
+      {
+        "variable_name": "ic-brand-global-nav-ic-icon-svg-fill--active",
+        "type": "color",
+        "default": "$ic-brand-primary"
+      },
+      {
+        "variable_name": "ic-brand-global-nav-menu-item__text-color",
+        "type": "color",
+        "default": "#ffffff"
+      },
+      {
+        "variable_name": "ic-brand-global-nav-menu-item__text-color--active",
+        "type": "color",
+        "default": "$ic-link-color"
+      },
+      {
+        "variable_name": "ic-brand-global-nav-avatar-border",
+        "type": "color",
+        "default": "#ffffff"
+      },
+      {
+        "variable_name": "ic-brand-global-nav-menu-item__badge-bgd",
+        "type": "color",
+        "default": "$ic-brand-primary"
+      },
+      {
+        "variable_name": "ic-brand-global-nav-menu-item__badge-text",
+        "type": "color",
+        "default": "#ffffff"
+      },
+      {
+        "variable_name": "ic-brand-global-nav-logo-bgd",
+        "type": "color",
+        "default": "#394B58"
+      },
+      {
+        "variable_name": "ic-brand-header-image",
+        "type": "image",
+        "accept": "image/png,image/gif,image/jpeg,image/svg+xml,image/svg",
+        "default": "/images/canvas_logomark_only@2x.png"
+      }
+    ]
   },
   {
-    "variable_name": "ic-brand-global-nav-ic-icon-svg-fill--active",
-    "type": "color",
-    "default": "$ic-brand-primary"
+    "group_key": "watermarks",
+    "variables": [
+      {
+        "variable_name": "ic-brand-watermark",
+        "type": "image",
+        "accept": "image/png,image/svg+xml,image/svg,image/gif,image/jpeg",
+        "default": ""
+      },
+      {
+        "variable_name": "ic-brand-watermark-opacity",
+        "type": "percentage",
+        "default": "1.0"
+      },
+      {
+        "variable_name": "ic-brand-favicon",
+        "type": "image",
+        "accept": "image/vnd.microsoft.icon,image/x-icon,image/png,image/gif",
+        "default": "/images/favicon.ico"
+      },
+      {
+        "variable_name": "ic-brand-apple-touch-icon",
+        "type": "image",
+        "accept": "image/png",
+        "default": "/images/apple-touch-icon.png"
+      },
+      {
+        "variable_name": "ic-brand-msapplication-tile-color",
+        "type": "color",
+        "default": "$ic-brand-primary"
+      },
+      {
+        "variable_name": "ic-brand-msapplication-tile-square",
+        "type": "image",
+        "accept": "image/png,image/gif,image/jpeg",
+        "default": "/images/windows-tile.png"
+      },
+      {
+        "variable_name": "ic-brand-msapplication-tile-wide",
+        "type": "image",
+        "accept": "image/png,image/gif,image/jpeg",
+        "default": "/images/windows-tile-wide.png"
+      },
+      {
+        "variable_name": "ic-brand-right-sidebar-logo",
+        "type": "image",
+        "accept": "image/svg+xml,image/svg,image/png,image/gif,image/jpeg",
+        "default": ""
+      }
+    ]
   },
   {
-    "variable_name": "ic-brand-global-nav-menu-item__text-color",
-    "type": "color",
-    "default": "#ffffff"
-  },
-  {
-    "variable_name": "ic-brand-global-nav-menu-item__text-color--active",
-    "type": "color",
-    "default": "$ic-link-color"
-  },
-  {
-    "variable_name": "ic-brand-global-nav-avatar-border",
-    "type": "color",
-    "default": "#ffffff"
-  },
-  {
-    "variable_name": "ic-brand-global-nav-menu-item__badge-bgd",
-    "type": "color",
-    "default": "$ic-brand-primary"
-  },
-  {
-    "variable_name": "ic-brand-global-nav-menu-item__badge-text",
-    "type": "color",
-    "default": "#ffffff"
-  },
-  {
-    "variable_name": "ic-brand-global-nav-logo-bgd",
-    "type": "color",
-    "default": "#394B58"
-  },
-  {
-    "variable_name": "ic-brand-header-image",
-    "type": "image",
-    "accept": "image/png,image/gif,image/jpeg,image/svg+xml,image/svg",
-    "default": "/images/canvas_logomark_only@2x.png"
-  }
-]},
-{
-  "group_key": "watermarks",
-  "variables": [{
-    "variable_name": "ic-brand-watermark",
-    "type": "image",
-    "accept": "image/png,image/svg+xml,image/svg,image/gif,image/jpeg",
-    "default": ""
-  },{
-    "variable_name": "ic-brand-watermark-opacity",
-    "type": "percentage",
-    "default": "1.0"
-  },{
-    "variable_name": "ic-brand-favicon",
-    "type": "image",
-    "accept": "image/vnd.microsoft.icon,image/x-icon,image/png,image/gif",
-    "default": "/images/favicon.ico"
-  },{
-    "variable_name": "ic-brand-apple-touch-icon",
-    "type": "image",
-    "accept": "image/png",
-    "default": "/images/apple-touch-icon.png"
-  },{
-    "variable_name": "ic-brand-msapplication-tile-color",
-    "type": "color",
-    "default": "$ic-brand-primary"
-  },{
-    "variable_name": "ic-brand-msapplication-tile-square",
-    "type": "image",
-    "accept": "image/png,image/gif,image/jpeg",
-    "default": "/images/windows-tile.png"
-  },{
-    "variable_name": "ic-brand-msapplication-tile-wide",
-    "type": "image",
-    "accept": "image/png,image/gif,image/jpeg",
-    "default": "/images/windows-tile-wide.png"
-  },{
-    "variable_name": "ic-brand-right-sidebar-logo",
-    "type": "image",
-    "accept": "image/svg+xml,image/svg,image/png,image/gif,image/jpeg",
-    "default": ""
-  }
-]},
-{
-  "group_key": "login",
-  "variables": [{
-    "variable_name": "ic-brand-Login-body-bgd-color",
-    "type": "color",
-    "default": "#394B58"
-  },
-  {
-    "variable_name": "ic-brand-Login-body-bgd-image",
-    "type": "image",
-    "accept": "image/png,image/svg+xml,image/svg,image/gif,image/jpeg",
-    "default": ""
-  },
-  {
-    "variable_name": "ic-brand-Login-body-bgd-shadow-color",
-    "type": "color",
-    "default": "#2D3B45"
-  },
-  {
-    "variable_name": "ic-brand-Login-logo",
-    "type": "image",
-    "accept": "image/png,image/gif,image/jpeg, image/svg+xml,image/svg",
-    "default": "/images/login/canvas-logo.svg"
-  },
-  {
-    "variable_name": "ic-brand-Login-Content-bgd-color",
-    "type": "color",
-    "default": "none"
-  },
-  {
-    "variable_name": "ic-brand-Login-Content-border-color",
-    "type": "color",
-    "default": "none"
-  },
-  {
-    "variable_name": "ic-brand-Login-Content-inner-bgd",
-    "type": "color",
-    "default": "none"
-  },
-  {
-    "variable_name": "ic-brand-Login-Content-inner-border",
-    "type": "color",
-    "default": "none"
-  },
-  {
-    "variable_name": "ic-brand-Login-Content-inner-body-bgd",
-    "type": "color",
-    "default": "none"
-  },
-  {
-    "variable_name": "ic-brand-Login-Content-inner-body-border",
-    "type": "color",
-    "default": "none"
-  },
-  {
-    "variable_name": "ic-brand-Login-Content-label-text-color",
-    "type": "color",
-    "default": "#ffffff"
-  },
-  {
-    "variable_name": "ic-brand-Login-Content-password-text-color",
-    "type": "color",
-    "default": "#ffffff"
-  },
-  {
-    "variable_name": "ic-brand-Login-footer-link-color",
-    "type": "color",
-    "default": "#ffffff"
-  },
-  {
-    "variable_name": "ic-brand-Login-footer-link-color-hover",
-    "type": "color",
-    "default": "#ffffff"
-  },
-  {
-    "variable_name": "ic-brand-Login-instructure-logo",
-    "type": "color",
-    "default": "#ffffff"
+    "group_key": "login",
+    "variables": [
+      {
+        "variable_name": "ic-brand-Login-body-bgd-color",
+        "type": "color",
+        "default": "#394B58"
+      },
+      {
+        "variable_name": "ic-brand-Login-body-bgd-image",
+        "type": "image",
+        "accept": "image/png,image/svg+xml,image/svg,image/gif,image/jpeg",
+        "default": ""
+      },
+      {
+        "variable_name": "ic-brand-Login-body-bgd-shadow-color",
+        "type": "color",
+        "default": "#2D3B45"
+      },
+      {
+        "variable_name": "ic-brand-Login-logo",
+        "type": "image",
+        "accept": "image/png,image/gif,image/jpeg, image/svg+xml,image/svg",
+        "default": "/images/login/canvas-logo.svg"
+      },
+      {
+        "variable_name": "ic-brand-Login-Content-bgd-color",
+        "type": "color",
+        "default": "none"
+      },
+      {
+        "variable_name": "ic-brand-Login-Content-border-color",
+        "type": "color",
+        "default": "none"
+      },
+      {
+        "variable_name": "ic-brand-Login-Content-inner-bgd",
+        "type": "color",
+        "default": "none"
+      },
+      {
+        "variable_name": "ic-brand-Login-Content-inner-border",
+        "type": "color",
+        "default": "none"
+      },
+      {
+        "variable_name": "ic-brand-Login-Content-inner-body-bgd",
+        "type": "color",
+        "default": "none"
+      },
+      {
+        "variable_name": "ic-brand-Login-Content-inner-body-border",
+        "type": "color",
+        "default": "none"
+      },
+      {
+        "variable_name": "ic-brand-Login-Content-label-text-color",
+        "type": "color",
+        "default": "#ffffff"
+      },
+      {
+        "variable_name": "ic-brand-Login-Content-password-text-color",
+        "type": "color",
+        "default": "#ffffff"
+      },
+      {
+        "variable_name": "ic-brand-Login-footer-link-color",
+        "type": "color",
+        "default": "#ffffff"
+      },
+      {
+        "variable_name": "ic-brand-Login-footer-link-color-hover",
+        "type": "color",
+        "default": "#ffffff"
+      },
+      {
+        "variable_name": "ic-brand-Login-instructure-logo",
+        "type": "color",
+        "default": "#ffffff"
+      }
+    ]
   }
 ]
-}]

@@ -19,10 +19,13 @@
 const statesList = ['not_loaded', 'loading', 'loaded']
 const loadStates = {
   statesList,
-  states: statesList.reduce((map, state) =>
-    Object.assign(map, {
-      [state]: state,
-    }), {})
+  states: statesList.reduce(
+    (map, state) =>
+      Object.assign(map, {
+        [state]: state
+      }),
+    {}
+  )
 }
 
 loadStates.isLoading = state => state === loadStates.states.loading

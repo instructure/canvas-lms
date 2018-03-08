@@ -18,20 +18,20 @@
  */
 
 define(function(require) {
-  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
-  var Actions = require('../actions');
-  var I18n = require('i18n!quiz_log_auditing');
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps')
+  var Actions = require('../actions')
+  var I18n = require('i18n!quiz_log_auditing')
 
   var AppRoute = React.createClass({
     getInitialState: function() {
       return {
         isLoading: false
-      };
+      }
     },
 
     componentDidUpdate: function(prevProps, prevState) {
       if (this.props.query.attempt) {
-        Actions.setActiveAttempt(this.props.query.attempt);
+        Actions.setActiveAttempt(this.props.query.attempt)
       }
     },
 
@@ -43,7 +43,7 @@ define(function(require) {
         </div>
       )
     }
-  });
+  })
 
-  return AppRoute;
-});
+  return AppRoute
+})

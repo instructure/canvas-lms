@@ -16,9 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/shared/helpers/urlHelper',
-], ({ encodeSpecialChars, decodeSpecialChars }) => {
+define(['jsx/shared/helpers/urlHelper'], ({encodeSpecialChars, decodeSpecialChars}) => {
   QUnit.module('Url Helper')
 
   test('encodes % properly', () => {

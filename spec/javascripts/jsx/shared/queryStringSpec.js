@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { encodeQueryString, decodeQueryString } from 'jsx/shared/queryString'
+import {encodeQueryString, decodeQueryString} from 'jsx/shared/queryString'
 
 QUnit.module('Query String util')
 
 QUnit.module('encodeQueryString')
 
 test('encodes a query string from array of params', () => {
-  const params = [{ foo: 'bar' }, { hello: 'world' }]
+  const params = [{foo: 'bar'}, {hello: 'world'}]
   const query = encodeQueryString(params)
   equal(query, 'foo=bar&hello=world')
 })
 
 test('encodes a query string from array of params with duplicate keys', () => {
-  const params = [{ 'foo[]': 'bar' }, { 'foo[]': 'world' }]
+  const params = [{'foo[]': 'bar'}, {'foo[]': 'world'}]
   const query = encodeQueryString(params)
   equal(query, 'foo[]=bar&foo[]=world')
 })
@@ -38,10 +38,10 @@ QUnit.module('decodeQueryString')
 
 test('decodes a query string into an array of params', () => {
   const params = decodeQueryString('foo=bar&hello=world')
-  deepEqual(params, [{ foo: 'bar' }, { hello: 'world' }])
+  deepEqual(params, [{foo: 'bar'}, {hello: 'world'}])
 })
 
 test('decodes a query string with duplicate keys into an array of params', () => {
   const params = decodeQueryString('foo[]=bar&foo[]=world')
-  deepEqual(params, [{ 'foo[]': 'bar' }, { 'foo[]': 'world' }])
+  deepEqual(params, [{'foo[]': 'bar'}, {'foo[]': 'world'}])
 })

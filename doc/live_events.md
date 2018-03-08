@@ -29,11 +29,11 @@ it:
 | AWS Access Key ID     | key                 |
 | AWS Secret Access Key | secret              |
 
-- or -
+* or -
 
-| Setting Name           | Value               |
-| ---------------------- | ------------------- |
-| Configure using consul | checked             |
+| Setting Name           | Value   |
+| ---------------------- | ------- |
+| Configure using consul | checked |
 
 Restart Canvas, and events should start flowing to your kinesis stream.
 You can view the stream with the `tail_kinesis` tool:

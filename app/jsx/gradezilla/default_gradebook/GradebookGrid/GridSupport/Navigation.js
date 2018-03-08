@@ -16,139 +16,139 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GridHelper from './GridHelper';
+import GridHelper from './GridHelper'
 
-function isLeftArrow (event) {
-  return event.which === 37;
+function isLeftArrow(event) {
+  return event.which === 37
 }
 
-function isRightArrow (event) {
-  return event.which === 39;
+function isRightArrow(event) {
+  return event.which === 39
 }
 
-function isUpArrow (event) {
-  return event.which === 38;
+function isUpArrow(event) {
+  return event.which === 38
 }
 
-function isDownArrow (event) {
-  return event.which === 40;
+function isDownArrow(event) {
+  return event.which === 40
 }
 
-function isTab (event) {
-  return event.which === 9 && !event.shiftKey;
+function isTab(event) {
+  return event.which === 9 && !event.shiftKey
 }
 
-function isShiftTab (event) {
-  return event.which === 9 && event.shiftKey;
+function isShiftTab(event) {
+  return event.which === 9 && event.shiftKey
 }
 
-function skipSlickGridDefaults (event) {
-  (event.originalEvent || event).skipSlickGridDefaults = true; // eslint-disable-line no-param-reassign
+function skipSlickGridDefaults(event) {
+  ;(event.originalEvent || event).skipSlickGridDefaults = true // eslint-disable-line no-param-reassign
 }
 
 export default class Navigation {
-  constructor (grid, gridSupport) {
-    this.grid = grid;
-    this.gridSupport = gridSupport;
-    this.helper = new GridHelper(grid);
+  constructor(grid, gridSupport) {
+    this.grid = grid
+    this.gridSupport = gridSupport
+    this.helper = new GridHelper(grid)
   }
 
-  initialize () {
-    this.grid.onKeyDown.subscribe(this.handleKeyDown);
+  initialize() {
+    this.grid.onKeyDown.subscribe(this.handleKeyDown)
 
-    const $gridContainer = this.grid.getContainerNode();
-    const $headers = $gridContainer.querySelectorAll('.slick-header');
-    Array.prototype.forEach.call($headers, ($header) => {
-      $header.addEventListener('click', this.handleClick, false);
-      $header.addEventListener('keydown', this.handleKeyDown, false);
-    });
+    const $gridContainer = this.grid.getContainerNode()
+    const $headers = $gridContainer.querySelectorAll('.slick-header')
+    Array.prototype.forEach.call($headers, $header => {
+      $header.addEventListener('click', this.handleClick, false)
+      $header.addEventListener('keydown', this.handleKeyDown, false)
+    })
   }
 
-  handleClick = (event) => {
-    const { region, ...location } = this.getEventLocation(event);
-    this.gridSupport.state.setActiveLocation(region, location);
-  };
+  handleClick = event => {
+    const {region, ...location} = this.getEventLocation(event)
+    this.gridSupport.state.setActiveLocation(region, location)
+  }
 
   handleKeyDown = (sourceEvent, obj = {}) => {
-    const event = sourceEvent.originalEvent || sourceEvent;
-    const location = this.getEventLocation(event, obj);
+    const event = sourceEvent.originalEvent || sourceEvent
+    const location = this.getEventLocation(event, obj)
 
-    const continueHandling = this.gridSupport.events.onKeyDown.trigger(event, location);
+    const continueHandling = this.gridSupport.events.onKeyDown.trigger(event, location)
 
     if (continueHandling === false) {
       // prevent SlickGrid behavior to prevent interference with handler behavior
-      skipSlickGridDefaults(event);
+      skipSlickGridDefaults(event)
     } else if (location.region === 'header') {
-      this.handleHeaderKeyDown(event, location);
+      this.handleHeaderKeyDown(event, location)
     } else if (location.region === 'body') {
-      this.handleBodyKeyDown(event, location);
+      this.handleBodyKeyDown(event, location)
     } else if (location.region === 'beforeGrid') {
-      this.handleBeforeGridKeyDown(event, location);
+      this.handleBeforeGridKeyDown(event, location)
     } else if (location.region === 'afterGrid') {
-      this.handleAfterGridKeyDown(event, location);
+      this.handleAfterGridKeyDown(event, location)
     }
 
-    this.helper.syncScrollPositions();
-  };
+    this.helper.syncScrollPositions()
+  }
 
-  handleHeaderKeyDown (event, location) {
+  handleHeaderKeyDown(event, location) {
     if (isTab(event)) {
-      const columns = this.grid.getColumns();
-      const lastCell = columns.length - 1;
+      const columns = this.grid.getColumns()
+      const lastCell = columns.length - 1
 
       if (location.cell === lastCell) {
         // Tab into the body: Activate the first cell of the first row.
-        this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 0 });
+        this.gridSupport.state.setActiveLocation('body', {row: 0, cell: 0})
       } else {
         // Tab within the header: Activate the next cell.
-        this.gridSupport.state.setActiveLocation('header', { cell: location.cell + 1 });
+        this.gridSupport.state.setActiveLocation('header', {cell: location.cell + 1})
       }
 
-      this.trigger('onNavigateNext', event);
+      this.trigger('onNavigateNext', event)
 
       // prevent both SlickGrid and default browser behavior
-      event.preventDefault();
+      event.preventDefault()
     }
 
     if (isShiftTab(event)) {
       if (location.cell === 0) {
         // Shift+Tab back out of the header: Activate "before grid" region.
-        this.gridSupport.state.setActiveLocation('beforeGrid');
-        this.trigger('onNavigatePrev', event);
+        this.gridSupport.state.setActiveLocation('beforeGrid')
+        this.trigger('onNavigatePrev', event)
 
         // prevent SlickGrid behavior, but allow default browser behavior
       } else {
         // Shift+Tab back within the header: Activate the previous cell.
-        this.gridSupport.state.setActiveLocation('header', { cell: location.cell - 1 });
-        this.trigger('onNavigatePrev', event);
+        this.gridSupport.state.setActiveLocation('header', {cell: location.cell - 1})
+        this.trigger('onNavigatePrev', event)
 
         // prevent both SlickGrid and default browser behavior
-        event.preventDefault();
+        event.preventDefault()
       }
     }
 
     if (isLeftArrow(event)) {
       if (location.cell !== 0) {
         // Left Arrow within the header: Activate the previous cell.
-        this.gridSupport.state.setActiveLocation('header', { cell: location.cell - 1 });
-        this.trigger('onNavigateLeft', event);
+        this.gridSupport.state.setActiveLocation('header', {cell: location.cell - 1})
+        this.trigger('onNavigateLeft', event)
 
         // prevent both SlickGrid and default browser behavior
-        event.preventDefault();
+        event.preventDefault()
       }
     }
 
     if (isRightArrow(event)) {
-      const columns = this.grid.getColumns();
-      const lastCell = columns.length - 1;
+      const columns = this.grid.getColumns()
+      const lastCell = columns.length - 1
 
       if (location.cell !== lastCell) {
         // Right Arrow within the header: Activate the next cell.
-        this.gridSupport.state.setActiveLocation('header', { cell: location.cell + 1 });
-        this.trigger('onNavigateRight', event);
+        this.gridSupport.state.setActiveLocation('header', {cell: location.cell + 1})
+        this.trigger('onNavigateRight', event)
 
         // prevent both SlickGrid and default browser behavior
-        event.preventDefault();
+        event.preventDefault()
       }
     }
 
@@ -157,28 +157,28 @@ export default class Navigation {
 
     if (isDownArrow(event)) {
       // Down Arrow within header: Activate the related cell of the first row.
-      this.gridSupport.state.setActiveLocation('body', { row: 0, cell: location.cell });
-      this.trigger('onNavigateDown', event);
+      this.gridSupport.state.setActiveLocation('body', {row: 0, cell: location.cell})
+      this.trigger('onNavigateDown', event)
 
       // prevent both SlickGrid and default browser behavior
-      event.preventDefault();
+      event.preventDefault()
     }
 
     // prevent SlickGrid behavior for all header cells
-    skipSlickGridDefaults(event);
+    skipSlickGridDefaults(event)
   }
 
-  handleBodyKeyDown (event, location) {
+  handleBodyKeyDown(event, location) {
     if (isShiftTab(event)) {
       if (location.row === 0 && location.cell === 0) {
         // Shift+Tab back out of the body: Activate the last header cell.
-        const lastCell = this.grid.getColumns().length - 1;
-        this.gridSupport.state.setActiveLocation('header', { cell: lastCell });
-        this.trigger('onNavigatePrev', event);
+        const lastCell = this.grid.getColumns().length - 1
+        this.gridSupport.state.setActiveLocation('header', {cell: lastCell})
+        this.trigger('onNavigatePrev', event)
 
         // prevent both SlickGrid and default browser behavior
-        event.preventDefault();
-        skipSlickGridDefaults(event);
+        event.preventDefault()
+        skipSlickGridDefaults(event)
       }
 
       // Shift+Tab within the body: Activate the previous cell.
@@ -186,15 +186,15 @@ export default class Navigation {
     }
 
     if (isTab(event)) {
-      const lastRow = this.grid.getDataLength() - 1;
-      const lastCell = this.grid.getColumns().length - 1;
+      const lastRow = this.grid.getDataLength() - 1
+      const lastCell = this.grid.getColumns().length - 1
 
       if (location.row === lastRow && location.cell === lastCell) {
         // Tab out of the body: Activate the "after grid" region.
-        this.gridSupport.state.setActiveLocation('afterGrid');
+        this.gridSupport.state.setActiveLocation('afterGrid')
 
         // prevent SlickGrid behavior, but allow default browser behavior
-        skipSlickGridDefaults(event);
+        skipSlickGridDefaults(event)
       }
 
       // Tab within the body: Activate the next cell.
@@ -206,10 +206,10 @@ export default class Navigation {
         // Left Arrow in first cell of a row: Commit any edits
         // * this preserves focus for cells without an editor
         // * this also prevents a bug in SlickGrid when in the last row
-        this.helper.commitCurrentEdit();
+        this.helper.commitCurrentEdit()
 
         // prevent SlickGrid behavior, but allow default browser behavior
-        skipSlickGridDefaults(event);
+        skipSlickGridDefaults(event)
       }
 
       // Left Arrow within the body: Activate the previous cell.
@@ -219,12 +219,12 @@ export default class Navigation {
     if (isUpArrow(event)) {
       if (location.row === 0) {
         // Up Arrow in top row of body: Activate the related header cell.
-        this.gridSupport.state.setActiveLocation('header', { cell: location.cell });
-        this.trigger('onNavigateUp', event);
+        this.gridSupport.state.setActiveLocation('header', {cell: location.cell})
+        this.trigger('onNavigateUp', event)
 
         // prevent both SlickGrid and default browser behavior
-        event.preventDefault();
-        skipSlickGridDefaults(event);
+        event.preventDefault()
+        skipSlickGridDefaults(event)
       }
 
       // Up Arrow within the body: Activate the adjacent cell of the previous row.
@@ -234,85 +234,88 @@ export default class Navigation {
     // All other keys are either handled by SlickGrid or altogether ignored.
   }
 
-  handleBeforeGridKeyDown (event, _location) {
+  handleBeforeGridKeyDown(event, _location) {
     if (isTab(event)) {
       // Tab into the header: Activate the first cell.
-      this.gridSupport.state.setActiveLocation('header', { cell: 0 });
-      this.trigger('onNavigateNext', event);
+      this.gridSupport.state.setActiveLocation('header', {cell: 0})
+      this.trigger('onNavigateNext', event)
 
       // prevent both SlickGrid and default browser behavior
-      event.preventDefault();
+      event.preventDefault()
     }
 
     // prevent SlickGrid behavior for all other keys
-    skipSlickGridDefaults(event);
+    skipSlickGridDefaults(event)
   }
 
-  handleAfterGridKeyDown (event, _location) {
+  handleAfterGridKeyDown(event, _location) {
     if (isShiftTab(event)) {
       // Shift+Tab back into the body: Activate the last cell.
-      const lastRow = this.grid.getDataLength() - 1;
-      const lastCell = this.grid.getColumns().length - 1;
+      const lastRow = this.grid.getDataLength() - 1
+      const lastCell = this.grid.getColumns().length - 1
 
-      this.gridSupport.state.setActiveLocation('body', { row: lastRow, cell: lastCell });
-      this.trigger('onNavigatePrev', event);
+      this.gridSupport.state.setActiveLocation('body', {row: lastRow, cell: lastCell})
+      this.trigger('onNavigatePrev', event)
 
       // prevent both SlickGrid and default browser behavior
-      event.preventDefault();
+      event.preventDefault()
     }
 
     if (isTab(event)) {
       // Tab away from the grid: No change.
-      this.gridSupport.state.setActiveLocation('unknown');
-      this.trigger('onNavigateNext', event);
+      this.gridSupport.state.setActiveLocation('unknown')
+      this.trigger('onNavigateNext', event)
 
       // prevent SlickGrid behavior, but allow default browser behavior
     }
 
     // prevent SlickGrid behavior for all other keys
-    skipSlickGridDefaults(event);
+    skipSlickGridDefaults(event)
   }
 
-  trigger (handlerName, event) {
-    const gridEvent = this.gridSupport.events[handlerName];
+  trigger(handlerName, event) {
+    const gridEvent = this.gridSupport.events[handlerName]
     if (gridEvent) {
-      return gridEvent.trigger(event.originalEvent || event, this.gridSupport.state.getActiveLocation());
+      return gridEvent.trigger(
+        event.originalEvent || event,
+        this.gridSupport.state.getActiveLocation()
+      )
     }
 
     /* istanbul ignore next */
-    return undefined;
+    return undefined
   }
 
-  getEventLocation (event, obj = {}) {
-    const columns = this.grid.getColumns();
+  getEventLocation(event, obj = {}) {
+    const columns = this.grid.getColumns()
 
     if (typeof obj.row === 'number' && typeof obj.cell === 'number') {
-      return { region: 'body', row: obj.row, cell: obj.cell, columnId: columns[obj.cell].id };
+      return {region: 'body', row: obj.row, cell: obj.cell, columnId: columns[obj.cell].id}
     }
 
-    const index = columns.findIndex((column) => {
-      const $headerNode = this.helper.getColumnHeaderNode(column.id);
-      return $headerNode === event.target || $headerNode.contains(event.target);
-    });
+    const index = columns.findIndex(column => {
+      const $headerNode = this.helper.getColumnHeaderNode(column.id)
+      return $headerNode === event.target || $headerNode.contains(event.target)
+    })
 
     if (index !== -1) {
-      return { region: 'header', cell: index, columnId: columns[index].id };
+      return {region: 'header', cell: index, columnId: columns[index].id}
     }
 
-    const activeLocation = this.gridSupport.state.getActiveLocation();
+    const activeLocation = this.gridSupport.state.getActiveLocation()
 
-    const $beforeGrid = this.helper.getBeforeGridNode();
-    const $afterGrid = this.helper.getAfterGridNode();
+    const $beforeGrid = this.helper.getBeforeGridNode()
+    const $afterGrid = this.helper.getAfterGridNode()
 
     if (event.target === $beforeGrid || event.target === $afterGrid) {
       if (activeLocation.region === 'header' || activeLocation.region === 'body') {
-        return activeLocation;
+        return activeLocation
       }
 
-      return { region: event.target === $beforeGrid ? 'beforeGrid' : 'afterGrid' };
+      return {region: event.target === $beforeGrid ? 'beforeGrid' : 'afterGrid'}
     }
 
     /* istanbul ignore next */
-    return { region: 'unknown' };
+    return {region: 'unknown'}
   }
 }

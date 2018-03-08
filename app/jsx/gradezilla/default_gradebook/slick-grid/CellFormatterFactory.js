@@ -16,26 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssignmentCellFormatter from '../../../gradezilla/default_gradebook/slick-grid/formatters/AssignmentCellFormatter';
-import AssignmentGroupCellFormatter from '../../../gradezilla/default_gradebook/slick-grid/formatters/AssignmentGroupCellFormatter';
-import CustomColumnCellFormatter from '../../../gradezilla/default_gradebook/slick-grid/formatters/CustomColumnCellFormatter';
-import StudentCellFormatter from '../../../gradezilla/default_gradebook/slick-grid/formatters/StudentCellFormatter';
-import TotalGradeCellFormatter from '../../../gradezilla/default_gradebook/slick-grid/formatters/TotalGradeCellFormatter';
+import AssignmentCellFormatter from '../../../gradezilla/default_gradebook/slick-grid/formatters/AssignmentCellFormatter'
+import AssignmentGroupCellFormatter from '../../../gradezilla/default_gradebook/slick-grid/formatters/AssignmentGroupCellFormatter'
+import CustomColumnCellFormatter from '../../../gradezilla/default_gradebook/slick-grid/formatters/CustomColumnCellFormatter'
+import StudentCellFormatter from '../../../gradezilla/default_gradebook/slick-grid/formatters/StudentCellFormatter'
+import TotalGradeCellFormatter from '../../../gradezilla/default_gradebook/slick-grid/formatters/TotalGradeCellFormatter'
 
 class CellFormatterFactory {
-  constructor (gradebook) {
+  constructor(gradebook) {
     this.formatters = {
       assignment: new AssignmentCellFormatter(gradebook),
       assignment_group: new AssignmentGroupCellFormatter(),
       custom_column: new CustomColumnCellFormatter(),
       student: new StudentCellFormatter(gradebook),
       total_grade: new TotalGradeCellFormatter(gradebook)
-    };
+    }
   }
 
-  getFormatter (column) {
-    return (this.formatters[column.type] || {}).render;
+  getFormatter(column) {
+    return (this.formatters[column.type] || {}).render
   }
 }
 
-export default CellFormatterFactory;
+export default CellFormatterFactory

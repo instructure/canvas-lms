@@ -1,5 +1,4 @@
-Throttling
-==========
+# Throttling
 
 Canvas includes a built in dynamic throttling mechanism to prevent a single
 user from abusing the system and causing adverse effects for others. It

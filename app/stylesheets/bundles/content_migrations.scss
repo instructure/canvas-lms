@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/_environment.scss";
+@import 'base/_environment.scss';
 
-[type=radio].styled-radio {
+[type='radio'].styled-radio {
   margin: 4px 7px 2px 2px;
   float: left;
 }
@@ -104,7 +104,7 @@ hr {
   .treeitem-heading {
     min-height: 22px;
   }
-  input[type=checkbox] {
+  input[type='checkbox'] {
     margin: 0 10px 3px 0px;
     float: none;
     padding-right: 5px;
@@ -156,16 +156,17 @@ hr {
   li.small-spacing {
     margin: 5px 0px 5px 0px;
   }
-  li[aria-selected=true] {
+  li[aria-selected='true'] {
     border-radius: 5px;
     > .treeitem-heading {
       background-color: var(--ic-brand-primary);
-      label, a {
+      label,
+      a {
         color: white;
       }
     }
   }
-  li[aria-expanded=true] {
+  li[aria-expanded='true'] {
     .icon-arrow-right {
       display: none;
     }
@@ -176,7 +177,7 @@ hr {
       display: block;
     }
   }
-  li[aria-expanded=false] {
+  li[aria-expanded='false'] {
     .icon-arrow-right {
       display: inline-block;
     }
@@ -199,4 +200,3 @@ i.course_select_warning {
   font-style: italic;
   padding-left: $ic-sp;
 }
-

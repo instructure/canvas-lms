@@ -15,31 +15,32 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import Planner from 'canvas-planner';
-import $ from 'jquery';
-import 'compiled/jquery.rails_flash_notifications';
-import {sharedDashboardInstance} from '../dashboardPlannerHelper';
+import Planner from 'canvas-planner'
+import $ from 'jquery'
+import 'compiled/jquery.rails_flash_notifications'
+import {sharedDashboardInstance} from '../dashboardPlannerHelper'
 
-const stickyElement = document.getElementById('dashboard_header_container');
-const element = document.getElementById('dashboard-planner');
-const headerElement = document.getElementById('dashboard-planner-header');
+const stickyElement = document.getElementById('dashboard_header_container')
+const element = document.getElementById('dashboard-planner')
+const headerElement = document.getElementById('dashboard-planner-header')
 
 const courses = window.ENV.STUDENT_PLANNER_COURSES.map(dc => ({
   ...dc,
   color: window.ENV.PREFERENCES.custom_colors[dc.assetString]
-}));
+}))
 
-const groups = window.ENV.STUDENT_PLANNER_GROUPS ?
-  window.ENV.STUDENT_PLANNER_GROUPS.map(dg => ({
-    ...dg,
-    color: window.ENV.PREFERENCES.custom_colors[dg.assetString] || '#666666'
-  })) : [];
+const groups = window.ENV.STUDENT_PLANNER_GROUPS
+  ? window.ENV.STUDENT_PLANNER_GROUPS.map(dg => ({
+      ...dg,
+      color: window.ENV.PREFERENCES.custom_colors[dg.assetString] || '#666666'
+    }))
+  : []
 
 const stickyElementRect = stickyElement.getBoundingClientRect()
 const stickyOffset = stickyElementRect.bottom - stickyElementRect.top
 
 const changeToDashboardCardView = () => {
-  sharedDashboardInstance.changeToCardView();
+  sharedDashboardInstance.changeToCardView()
 }
 
 const options = {
@@ -60,12 +61,12 @@ const options = {
   courses,
   groups,
   changeToDashboardCardView
-};
+}
 
 if (element) {
-  Planner.render(element, options);
+  Planner.render(element, options)
 }
 
 if (headerElement) {
-  Planner.renderHeader(headerElement, options);
+  Planner.renderHeader(headerElement, options)
 }

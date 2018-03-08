@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-
+@import 'base/environment';
 
 ///////////
 /// New React Token Input
@@ -25,8 +24,12 @@
 
 // These are classes used in Token Input Component
 // We should figure out a way to use our own instead
-.flex {display: flex;}
-.inline-flex {display: inline-flex;}
+.flex {
+  display: flex;
+}
+.inline-flex {
+  display: inline-flex;
+}
 
 .ic-tokeninput {
   display: inline-block;
@@ -77,16 +80,17 @@
 }
 
 .ic-tokeninput-button:active {
-  color: #4095BF;
+  color: #4095bf;
 }
 
-.ic-tokeninput-option, .ic-tokeninput-header {
+.ic-tokeninput-option,
+.ic-tokeninput-header {
   display: block;
   padding: 2px 16px;
   cursor: default;
 }
 
-.ic-tokeninput-header{
+.ic-tokeninput-header {
   font-weight: bold;
 }
 
@@ -102,7 +106,7 @@
   left: 4px;
 }
 
-.token-input-wrapper{
+.token-input-wrapper {
   width: 204px;
   min-height: 50px;
   float: left;
@@ -165,19 +169,19 @@ $ic-token-padding: 3px 15px;
 /// Legacy Token Input
 ///////////
 .token_input {
-    position: relative;
-    min-height: 0;
-    height: 38px;
-    box-sizing: border-box;
-    background:$ic-color-light;
-    border: 1px solid $ic-border-light;
-    border-radius: $borderRadius;
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-    cursor: text;
-    overflow: hidden;
-    vertical-align: middle;
-    padding: $contentBoxPadding/4;
-    transition: border linear 0.2s, box-shadow linear 0.2s;
+  position: relative;
+  min-height: 0;
+  height: 38px;
+  box-sizing: border-box;
+  background: $ic-color-light;
+  border: 1px solid $ic-border-light;
+  border-radius: $borderRadius;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  cursor: text;
+  overflow: hidden;
+  vertical-align: middle;
+  padding: $contentBoxPadding/4;
+  transition: border linear 0.2s, box-shadow linear 0.2s;
 
   a.browser {
     position: absolute;
@@ -249,5 +253,5 @@ $ic-token-padding: 3px 15px;
 }
 
 .token_input.active {
-  box-shadow: 0 0 3px 2px #68B4DF;
+  box-shadow: 0 0 3px 2px #68b4df;
 }

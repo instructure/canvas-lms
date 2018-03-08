@@ -32,20 +32,24 @@ const collections = [
 
 // Don't show appointment groups for non-logged in users
 if (ENV.current_user_id) {
-  collections.push(new SyllabusAppointmentGroupsCollection([ENV.context_asset_string], 'reservable'))
-  collections.push(new SyllabusAppointmentGroupsCollection([ENV.context_asset_string], 'manageable'))
+  collections.push(
+    new SyllabusAppointmentGroupsCollection([ENV.context_asset_string], 'reservable')
+  )
+  collections.push(
+    new SyllabusAppointmentGroupsCollection([ENV.context_asset_string], 'manageable')
+  )
 }
 
 // Perform a fetch on each collection
 //   The fetch continues fetching until no next link is returned
-const deferreds = _.map(collections, (collection) => {
+const deferreds = _.map(collections, collection => {
   const deferred = $.Deferred()
 
   const error = () => deferred.reject()
 
   const success = () => {
     if (collection.canFetch('next')) {
-      return collection.fetch({page: 'next', success, error })
+      return collection.fetch({page: 'next', success, error})
     } else {
       return deferred.resolve()
     }
@@ -86,4 +90,3 @@ $(() => {
   SyllabusBehaviors.bindToEditSyllabus()
   SyllabusBehaviors.bindToMiniCalendar()
 })
-

@@ -19,69 +19,67 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!student_context_tray'
-import InstUIMetricsList, { MetricsListItem } from '@instructure/ui-core/lib/components/MetricsList'
-  class MetricsList extends React.Component {
-    static propTypes = {
-      analytics: PropTypes.object,
-      user: PropTypes.object
+import InstUIMetricsList, {MetricsListItem} from '@instructure/ui-core/lib/components/MetricsList'
+class MetricsList extends React.Component {
+  static propTypes = {
+    analytics: PropTypes.object,
+    user: PropTypes.object
+  }
+
+  static defaultProps = {
+    analytics: null,
+    user: {}
+  }
+
+  get grade() {
+    if (typeof this.props.user.enrollments === 'undefined') {
+      return null
     }
 
-    static defaultProps = {
-      analytics: null,
-      user: {}
-    }
-
-    get grade () {
-      if (typeof this.props.user.enrollments === 'undefined') {
-        return null
-      }
-
-      const enrollment = this.props.user.enrollments[0]
-      if (enrollment) {
-        const grades = enrollment.grades
-        if (grades.current_grade) {
-          return grades.current_grade
-        } else if (grades.current_score) {
-          return `${grades.current_score}%`
-        }
-        return '-'
+    const enrollment = this.props.user.enrollments[0]
+    if (enrollment) {
+      const grades = enrollment.grades
+      if (grades.current_grade) {
+        return grades.current_grade
+      } else if (grades.current_score) {
+        return `${grades.current_score}%`
       }
       return '-'
     }
+    return '-'
+  }
 
-    get missingCount () {
-      if (!this.props.analytics.tardiness_breakdown) {
-        return null
-      }
-
-      return `${this.props.analytics.tardiness_breakdown.missing}`
+  get missingCount() {
+    if (!this.props.analytics.tardiness_breakdown) {
+      return null
     }
 
-    get lateCount () {
-      if (!this.props.analytics.tardiness_breakdown) {
-        return null
-      }
+    return `${this.props.analytics.tardiness_breakdown.missing}`
+  }
 
-      return `${this.props.analytics.tardiness_breakdown.late}`
+  get lateCount() {
+    if (!this.props.analytics.tardiness_breakdown) {
+      return null
     }
 
-    render () {
-      if (
-        typeof this.props.user.enrollments !== 'undefined' &&
-        this.props.analytics
-      ) {
-        return (
-          <section
-            className="StudentContextTray__Section StudentContextTray-MetricsList">
-            <InstUIMetricsList>
-              <MetricsListItem label={I18n.t('Grade')} value={this.grade} />
-              <MetricsListItem label={I18n.t('Missing')} value={this.missingCount} />
-              <MetricsListItem label={I18n.t('Late')} value={this.lateCount} />
-            </InstUIMetricsList>
-          </section>
-        )
-      } else { return null }
+    return `${this.props.analytics.tardiness_breakdown.late}`
+  }
+
+  render() {
+    if (typeof this.props.user.enrollments !== 'undefined' && this.props.analytics) {
+      return (
+        <section className="StudentContextTray__Section StudentContextTray-MetricsList">
+          <InstUIMetricsList>
+            <MetricsListItem label={I18n.t('Grade')} value={this.grade} />
+            <MetricsListItem label={I18n.t('Missing')} value={this.missingCount} />
+            <MetricsListItem label={I18n.t('Late')} value={this.lateCount} />
+          </InstUIMetricsList>
+        </section>
+      )
+    } else {
+      return null
     }
   }
+}
 
 export default MetricsList

@@ -1,45 +1,41 @@
-Ember QUnit
-===========
+# Ember QUnit
 
 [![Build Status](https://travis-ci.org/rpflorence/ember-qunit.png)](https://travis-ci.org/rpflorence/ember-qunit)
 
 [WIP] Unit test helpers for Ember.
 
-About
------
+## About
 
 Ember QUnit uses your application's resolver to find and automatically
 create test subjects for you with the `moduleFor` and `test` helpers.
 
-*This is a work in progress* but its also quite handy already. Feedback
+_This is a work in progress_ but its also quite handy already. Feedback
 is highly encouraged.
 
-Module Formats
---------------
+## Module Formats
 
 You will find all the popular formats in `dist/`. If using globals, all
 methods are found on `window.emq`.
 
-Examples
---------
+## Examples
 
 ### Global build setup:
 
 ```js
 // inject test helpers onto window
-emq.globalize();
+emq.globalize()
 ```
 
 ### Setting the resolver
 
 ```js
 // if you don't have a custom resolver, do it like this:
-setResolver(Ember.DefaultResolver.create({namespace: App}));
+setResolver(Ember.DefaultResolver.create({namespace: App}))
 
 // otherwise something like:
-import Resolver from './path/to/resolver';
-import {setResolver} from 'ember-qunit';
-setResolver(Resolver.create());
+import Resolver from './path/to/resolver'
+import {setResolver} from 'ember-qunit'
+setResolver(Resolver.create())
 ```
 
 ### Simple example:
@@ -47,20 +43,20 @@ setResolver(Resolver.create());
 ```js
 // tell ember qunit what you are testing, it will find it from the
 // resolver
-moduleForComponent('x-foo', 'XFooComponent');
+moduleForComponent('x-foo', 'XFooComponent')
 
 // run a test
 test('it renders', function() {
-  expect(2);
+  expect(2)
 
   // creates the component instance
-  var component = this.subject();
-  equal(component.state, 'preRender');
+  var component = this.subject()
+  equal(component.state, 'preRender')
 
   // appends the component to the page
-  this.append();
-  equal(component.state, 'inDOM');
-});
+  this.append()
+  equal(component.state, 'inDOM')
+})
 ```
 
 ### Complex example
@@ -104,32 +100,30 @@ test('selects first tab and shows the panel', function() {
 });
 ```
 
-Helpers
--------
+## Helpers
 
 ### `moduleFor(fullName [, description [, callbacks]])`
 
-- `fullName`: (String) - The full name of the unit, ie
+* `fullName`: (String) - The full name of the unit, ie
   `controller:application`, `route:index`.
 
-- `description`: (String) optional - The description of the module
+* `description`: (String) optional - The description of the module
 
-- `callbacks`: (Object) optional - Normal QUnit callbacks (setup and
+* `callbacks`: (Object) optional - Normal QUnit callbacks (setup and
   teardown), with addition to `needs`, which allows you specify the
   other units the tests will need.
 
 ### `moduleForComponent(name, [description, callbacks])`
 
-- `name`: (String) - the short name of the component that you'd use in a
+* `name`: (String) - the short name of the component that you'd use in a
   template, ie `x-foo`, `ic-tabs`, etc.
 
 ### `moduleForModel(name, [description, callbacks])`
 
-- `name`: (String) - the short name of the model you'd use in `store`
+* `name`: (String) - the short name of the model you'd use in `store`
   operations ie `user`, `assignmentGroup`, etc.
 
-Contributing
-------------
+## Contributing
 
 ```sh
 $ npm install
@@ -138,4 +132,3 @@ $ broccoli serve
 # new tab
 $ karma start
 ```
-

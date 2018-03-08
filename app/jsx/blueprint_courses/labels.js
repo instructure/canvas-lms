@@ -39,13 +39,13 @@ const itemTypeLabelPlurals = {
   quiz: I18n.t('Quizzes'),
   discussion_topic: I18n.t('Discussions'),
   wiki_page: I18n.t('Pages'),
-  attachment: I18n.t('Files'),
+  attachment: I18n.t('Files')
 }
 
 const changeTypeLabels = {
   created: I18n.t('Created'),
   updated: I18n.t('Updated'),
-  deleted: I18n.t('Deleted'),
+  deleted: I18n.t('Deleted')
 }
 
 const exceptionTypeLabels = {
@@ -53,12 +53,12 @@ const exceptionTypeLabels = {
   content: I18n.t('Content changed exceptions:'),
   due_dates: I18n.t('Due Dates changed exceptions:'),
   availability_dates: I18n.t('Availability Dates changed exceptions:'),
-  settings: I18n.t('Settings changed exceptions:'),
+  settings: I18n.t('Settings changed exceptions:')
 }
 
 const lockTypeLabel = {
   locked: I18n.t('Locked'),
-  unlocked: I18n.t('Unlocked'),
+  unlocked: I18n.t('Unlocked')
 }
 
 const lockLabels = {
@@ -66,7 +66,14 @@ const lockLabels = {
   points: I18n.t('Points'),
   settings: I18n.t('Settings'),
   due_dates: I18n.t('Due Dates'),
-  availability_dates: I18n.t('Availability Dates'),
+  availability_dates: I18n.t('Availability Dates')
 }
 
-export {itemTypeLabels, changeTypeLabels, exceptionTypeLabels, lockTypeLabel, lockLabels, itemTypeLabelPlurals}
+export {
+  itemTypeLabels,
+  changeTypeLabels,
+  exceptionTypeLabels,
+  lockTypeLabel,
+  lockLabels,
+  itemTypeLabelPlurals
+}

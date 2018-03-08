@@ -19,42 +19,41 @@
 //add variable modifications to the global _variables.scss
 //they will override bootstrap styles
 
-@import "deprecated/bootstrap/mixins";
+@import 'deprecated/bootstrap/mixins';
 
 // Grid system and page structure
-@import "vendor/bootstrap/grid";
-@import "vendor/bootstrap/layouts";
+@import 'vendor/bootstrap/grid';
+@import 'vendor/bootstrap/layouts';
 
 // Base CSS
-@import "vendor/bootstrap/forms";
-@import "vendor/bootstrap/tables";
+@import 'vendor/bootstrap/forms';
+@import 'vendor/bootstrap/tables';
 
 // Components: common
-@import "vendor/bootstrap/dropdowns";
-@import "deprecated/bootstrap/close";
+@import 'vendor/bootstrap/dropdowns';
+@import 'deprecated/bootstrap/close';
 
 // Components: Nav
-@import "deprecated/bootstrap/navs";
-@import "vendor/bootstrap/pagination";
+@import 'deprecated/bootstrap/navs';
+@import 'vendor/bootstrap/pagination';
 
 // Components: Popovers
-@import "vendor/bootstrap/popovers";
+@import 'vendor/bootstrap/popovers';
 
 // Components: Misc
-@import "vendor/bootstrap/thumbnails";
-
+@import 'vendor/bootstrap/thumbnails';
 
 // Components: Misc
-@import "vendor/bootstrap/thumbnails";
-@import "deprecated/bootstrap/labels-badges";
-@import "deprecated/bootstrap/progress-bars";
-@import "vendor/bootstrap/media";
+@import 'vendor/bootstrap/thumbnails';
+@import 'deprecated/bootstrap/labels-badges';
+@import 'deprecated/bootstrap/progress-bars';
+@import 'vendor/bootstrap/media';
 
 // MEDIA QUERIES
 // ------------------
 
 // Large desktops
-@import "deprecated/bootstrap/responsive-1200px-min";
+@import 'deprecated/bootstrap/responsive-1200px-min';
 
 // Tablets to regular desktops
-@import "deprecated/bootstrap/responsive-768px-979px";
+@import 'deprecated/bootstrap/responsive-768px-979px';

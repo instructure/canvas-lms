@@ -18,14 +18,14 @@
  */
 
 define(function(require) {
-  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
-  var $ = require('jquery');
-  var _ = require('lodash');
-  var jQuery_qTip = require('qtip');
-  var ScreenReaderContent = require('jsx!./screen_reader_content');
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps')
+  var $ = require('jquery')
+  var _ = require('lodash')
+  var jQuery_qTip = require('qtip')
+  var ScreenReaderContent = require('jsx!./screen_reader_content')
 
-  var omit = _.omit;
-  var merge = _.extend;
+  var omit = _.omit
+  var merge = _.extend
   var POPUP_PROPS = Object.freeze([
     'content',
     'popupOptions',
@@ -36,7 +36,7 @@ define(function(require) {
     'reactivePositioning',
     'onShow',
     'onHide'
-  ]);
+  ])
 
   /**
    * @class Components.Popup
@@ -148,7 +148,7 @@ define(function(require) {
       /**
        * Callback triggered when the pop-up has been closed.
        */
-      onHide: React.PropTypes.func,
+      onHide: React.PropTypes.func
     },
 
     getInitialState: function() {
@@ -171,7 +171,7 @@ define(function(require) {
          * The rendered popup content component.
          */
         content: null
-      };
+      }
     },
 
     getDefaultProps: function() {
@@ -181,21 +181,21 @@ define(function(require) {
         anchorSelector: '.popup-anchor',
         reactivePositioning: false,
         screenReaderSupport: true
-      };
+      }
     },
 
     componentDidMount: function() {
-      var $this = $(this.getDOMNode());
-      var $container = $('<div class="popup-content" />');
-      var options;
+      var $this = $(this.getDOMNode())
+      var $container = $('<div class="popup-content" />')
+      var options
 
       if (!this.props.content) {
-        throw new Error("You must provide a 'content' component for a popup!");
+        throw new Error("You must provide a 'content' component for a popup!")
       }
 
-      options = this.qTipOptions($this, $container);
-      this.qTip = $this.qtip(options).qtip('api');
-      this.__disableInherentAccessibilityLayer(this.qTip);
+      options = this.qTipOptions($this, $container)
+      this.qTip = $this.qtip(options).qtip('api')
+      this.__disableInherentAccessibilityLayer(this.qTip)
 
       this.setState({
         container: $container[0],
@@ -203,14 +203,14 @@ define(function(require) {
           this.props.content(this.getContentProps(this.props)),
           $container[0]
         )
-      });
+      })
     },
 
     componentWillUnmount: function() {
-      React.unmountComponentAtNode(this.state.container);
+      React.unmountComponentAtNode(this.state.container)
 
       if (this.qTip) {
-        this.qTip.destroy(true);
+        this.qTip.destroy(true)
       }
     },
 
@@ -220,19 +220,19 @@ define(function(require) {
      * Update the content with the new properties.
      */
     componentDidUpdate: function() {
-      var content = this.state.content;
+      var content = this.state.content
 
       if (content) {
-        content.setProps(this.getContentProps(this.props), this.contentDidUpdate);
+        content.setProps(this.getContentProps(this.props), this.contentDidUpdate)
       }
     },
 
     contentDidUpdate: function() {
-      this.reposition();
+      this.reposition()
 
       if (this.focusScreenReaderContentOnUpdate) {
-        this.focusScreenReaderContentOnUpdate = false;
-        this.focusScreenReaderContent();
+        this.focusScreenReaderContentOnUpdate = false
+        this.focusScreenReaderContent()
       }
     },
 
@@ -242,7 +242,7 @@ define(function(require) {
       return (
         <div className="inline">
           {this.props.children}
-          {this.props.screenReaderSupport &&
+          {this.props.screenReaderSupport && (
             <ScreenReaderContent
               ref="srContent"
               tabIndex="-1"
@@ -252,9 +252,9 @@ define(function(require) {
               role="note"
               children={this.props.content(screenReaderProps)}
             />
-          }
+          )}
         </div>
-      );
+      )
     },
 
     /**
@@ -270,26 +270,27 @@ define(function(require) {
         .removeAttr('role')
         .removeAttr('aria-live')
         .removeAttr('aria-atomic')
-        .removeAttr('aria-describedby');
+        .removeAttr('aria-describedby')
     },
 
     getContentProps: function(props) {
-      return omit(props, POPUP_PROPS);
+      return omit(props, POPUP_PROPS)
     },
 
     getAnchor: function() {
-      var $this = $(this.getDOMNode());
-      var $anchor = $this.find(this.props.anchorSelector);
+      var $this = $(this.getDOMNode())
+      var $anchor = $this.find(this.props.anchorSelector)
 
       if (!$anchor.length) {
         console.warn(
           'Popup anchor was not found, defaulting to $(this).',
-          'Selector: %s', this.props.anchorSelector
-        );
-        $anchor = $this;
+          'Selector: %s',
+          this.props.anchorSelector
+        )
+        $anchor = $this
       }
 
-      return $anchor;
+      return $anchor
     },
 
     /**
@@ -302,76 +303,80 @@ define(function(require) {
      * The content (or content element) of the popup.
      */
     qTipOptions: function($buttons, $content) {
-      var options = merge({}, {
-        overwrite: false,
-        prerender: true,
-        show: {
-          event: 'click focusin',
-          delay: 0,
-          target: $buttons,
-          effect: false,
-          solo: false
-        },
+      var options = merge(
+        {},
+        {
+          overwrite: false,
+          prerender: true,
+          show: {
+            event: 'click focusin',
+            delay: 0,
+            target: $buttons,
+            effect: false,
+            solo: false
+          },
 
-        hide: {
-          event: 'click focusout',
-          effect: false,
-          fixed: true,
-          target: $buttons
-        },
+          hide: {
+            event: 'click focusout',
+            effect: false,
+            fixed: true,
+            target: $buttons
+          },
 
-        style: {
-          classes: 'qtip-default',
-          def: false,
-          tip: {
-            width: 10,
-            height: 5
+          style: {
+            classes: 'qtip-default',
+            def: false,
+            tip: {
+              width: 10,
+              height: 5
+            }
+          },
+
+          position: {
+            my: 'right center',
+            at: 'left center',
+            target: false,
+            adjust: {
+              x: 0,
+              y: 0
+            }
+          },
+
+          content: {
+            text: $content
+          },
+
+          events: {
+            show: this.__onShow,
+            hide: this.__onHide
           }
         },
-
-        position: {
-          my: 'right center',
-          at: 'left center',
-          target: false,
-          adjust: {
-            x: 0,
-            y: 0
-          }
-        },
-
-        content: {
-          text: $content
-        },
-
-        events: {
-          show: this.__onShow,
-          hide: this.__onHide
-        }
-      }, this.props.popupOptions);
+        this.props.popupOptions
+      )
 
       // Default targets are the popup anchor
       if (!options.show.target) {
-        options.show.target = $buttons;
+        options.show.target = $buttons
       }
 
       if (!options.hide.target) {
-        options.hide.target = $buttons;
+        options.hide.target = $buttons
       }
 
-      return options;
+      return options
     },
 
     isOpen: function() {
-      return !!this.qTip.shown;
+      return !!this.qTip.shown
     },
 
     // You don't have to call this manually if you set the #reactivePositioning
     // flag on.
     reposition: function() {
-      var qTip = this.qTip;
+      var qTip = this.qTip
 
       if (qTip && !!this.props.reactivePositioning) {
-        qTip.reposition();
+        qTip.reposition()
       }
     },
 
@@ -382,22 +387,22 @@ define(function(require) {
      */
     focusScreenReaderContent: function(queue) {
       if (queue === true) {
-        this.focusScreenReaderContentOnUpdate = true;
-        return;
+        this.focusScreenReaderContentOnUpdate = true
+        return
       }
 
-      this.getDOMNode().focus();
-      this.refs.srContent.getDOMNode().focus();
+      this.getDOMNode().focus()
+      this.refs.srContent.getDOMNode().focus()
     },
 
     screenReaderContentHasFocus: function() {
-      return document.activeElement === this.refs.srContent.getDOMNode();
+      return document.activeElement === this.refs.srContent.getDOMNode()
     },
 
     /** Set the focus on the anchor element that controls the pop-up. */
     focusAnchor: function() {
-      this.getDOMNode().focus();
-      this.getAnchor()[0].focus();
+      this.getDOMNode().focus()
+      this.getAnchor()[0].focus()
     },
 
     /**
@@ -405,31 +410,31 @@ define(function(require) {
      */
     close: function() {
       if (this.qTip.shown) {
-        this.qTip.hide();
-        this.getAnchor().focus();
+        this.qTip.hide()
+        this.getAnchor().focus()
       }
     },
 
     __onShow: function(event, api) {
-      api.shown = true;
+      api.shown = true
 
       if (this.props.onShow) {
-        this.props.onShow(this.state.container, api);
+        this.props.onShow(this.state.container, api)
       }
     },
 
     __onHide: function(event, api) {
-      api.shown = false;
+      api.shown = false
 
       if (this.props.onHide) {
-        this.props.onHide();
+        this.props.onHide()
       }
     },
 
     __getApi: function() {
-      return this.qTip;
+      return this.qTip
     }
-  });
+  })
 
-  return Popup;
-});
+  return Popup
+})

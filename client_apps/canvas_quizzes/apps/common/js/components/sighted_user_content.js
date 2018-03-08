@@ -18,7 +18,7 @@
  */
 
 define(function(require) {
-  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps')
 
   /**
    * @class Components.SightedUserContent
@@ -45,26 +45,31 @@ define(function(require) {
     getDefaultProps: function() {
       return {
         tagName: 'span'
-      };
+      }
     },
 
     render: function() {
-      var tagFactory = React.DOM[this.props.tagName];
+      var tagFactory = React.DOM[this.props.tagName]
 
-      return this.transferPropsTo(tagFactory({
-        // HTML5 [hidden] works in many screen-readers and in some cases, like
-        // VoiceOver's Say-All mode, is the only thing that works for skipping
-        // content. However, this clearly has the downside of hiding the
-        // content from sighted users as well, so we resort to CSS to get the
-        // items back into display and we win-win.
-        'hidden': true,
-        'aria-hidden': true,
-        'role': 'presentation',
-        'aria-role': 'presentation',
-        'className': 'sighted-user-content'
-      }, this.props.children));
+      return this.transferPropsTo(
+        tagFactory(
+          {
+            // HTML5 [hidden] works in many screen-readers and in some cases, like
+            // VoiceOver's Say-All mode, is the only thing that works for skipping
+            // content. However, this clearly has the downside of hiding the
+            // content from sighted users as well, so we resort to CSS to get the
+            // items back into display and we win-win.
+            hidden: true,
+            'aria-hidden': true,
+            role: 'presentation',
+            'aria-role': 'presentation',
+            className: 'sighted-user-content'
+          },
+          this.props.children
+        )
+      )
     }
-  });
+  })
 
-  return SightedUserContent;
-});
+  return SightedUserContent
+})

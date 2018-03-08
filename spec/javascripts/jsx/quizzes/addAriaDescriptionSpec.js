@@ -16,13 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'quiz_labels',
-  'helpers/fixtures'
-], (addAriaDescription, fixtures) => {
+define(['quiz_labels', 'helpers/fixtures'], (addAriaDescription, fixtures) => {
   var $elem = null
 
-  QUnit.module("Add aria descriptions", {
+  QUnit.module('Add aria descriptions', {
     setup() {
       $elem = $(
         '<div>' +
@@ -31,7 +28,7 @@ define([
           '<div class="editAnswerId"></div>' +
           '<div class="commentAnswerId"></div>' +
           '<div class="selectAsCorrectAnswerId"></div>' +
-        '</div>'
+          '</div>'
       )
 
       $('#fixtures').html($elem[0])
@@ -40,7 +37,7 @@ define([
     teardown() {
       $('#fixtures').empty()
     }
-  });
+  })
 
   test('add aria descriptions to quiz answer options', () => {
     addAriaDescription($elem, '1')
@@ -50,4 +47,4 @@ define([
     equal($elem.find('.commentAnswerId').text(), 'Answer 1')
     equal($elem.find('.selectAsCorrectAnswerId').text(), 'Answer 1')
   })
-});
+})

@@ -16,114 +16,117 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import htmlEscape from 'str/htmlEscape';
-import SubmissionCell from 'compiled/gradezilla/SubmissionCell';
-import { extractDataTurnitin } from 'compiled/gradezilla/Turnitin';
-import GradeFormatHelper from '../../../../gradebook/shared/helpers/GradeFormatHelper';
-import { classNamesForAssignmentCell } from '../../../../gradezilla/default_gradebook/slick-grid/shared/CellStyles';
+import htmlEscape from 'str/htmlEscape'
+import SubmissionCell from 'compiled/gradezilla/SubmissionCell'
+import {extractDataTurnitin} from 'compiled/gradezilla/Turnitin'
+import GradeFormatHelper from '../../../../gradebook/shared/helpers/GradeFormatHelper'
+import {classNamesForAssignmentCell} from '../../../../gradezilla/default_gradebook/slick-grid/shared/CellStyles'
 
-function getTurnitinState (submission) {
-  const turnitin = extractDataTurnitin(submission);
+function getTurnitinState(submission) {
+  const turnitin = extractDataTurnitin(submission)
   if (turnitin) {
-    return htmlEscape(turnitin.state);
+    return htmlEscape(turnitin.state)
   }
-  return null;
+  return null
 }
 
-function needsGrading (submission) {
+function needsGrading(submission) {
   if (submission.excused || !submission.submission_type) {
-    return false;
+    return false
   }
 
-  return submission.workflow_state === 'pending_review' || (
+  return (
+    submission.workflow_state === 'pending_review' ||
     // the submission exists and/or has been graded
-    ['submitted', 'graded'].includes(submission.workflow_state) &&
-    // the score has been cleared, or the submission has been resubmitted
-    (submission.score == null || submission.grade_matches_current_submission === false)
-  );
+    (['submitted', 'graded'].includes(submission.workflow_state) &&
+      // the score has been cleared, or the submission has been resubmitted
+      (submission.score == null || submission.grade_matches_current_submission === false))
+  )
 }
 
-function formatGrade (submissionData, assignment, options) {
+function formatGrade(submissionData, assignment, options) {
   const formatOptions = {
     formatType: options.getEnterGradesAsSetting(assignment.id),
     gradingScheme: options.getGradingSchemeData(assignment.id),
     pointsPossible: assignment.points_possible,
     version: 'final'
-  };
+  }
 
-  return GradeFormatHelper.formatSubmissionGrade(submissionData, formatOptions);
+  return GradeFormatHelper.formatSubmissionGrade(submissionData, formatOptions)
 }
 
-function renderTemplate (grade, options = {}) {
-  let classNames = ['gradebook-cell'];
-  let content = grade;
+function renderTemplate(grade, options = {}) {
+  let classNames = ['gradebook-cell']
+  let content = grade
 
   if (options.classNames) {
-    classNames = [...classNames, ...options.classNames];
+    classNames = [...classNames, ...options.classNames]
   }
 
   if (options.dimmed) {
-    classNames.push('grayed-out');
+    classNames.push('grayed-out')
   }
 
   if (options.disabled) {
-    classNames.push('cannot_edit');
+    classNames.push('cannot_edit')
   }
 
   if (options.turnitinState) {
-    classNames.push('turnitin');
-    content += `<span class='gradebook-cell-turnitin ${options.turnitinState}-score' />`;
+    classNames.push('turnitin')
+    content += `<span class='gradebook-cell-turnitin ${options.turnitinState}-score' />`
   }
 
-  return `<div class="${htmlEscape(classNames.join(' '))}">${content}</div>`;
+  return `<div class="${htmlEscape(classNames.join(' '))}">${content}</div>`
 }
 
 export default class AssignmentCellFormatter {
-  constructor (gradebook) {
+  constructor(gradebook) {
     this.options = {
-      getAssignment (assignmentId) {
-        return gradebook.getAssignment(assignmentId);
+      getAssignment(assignmentId) {
+        return gradebook.getAssignment(assignmentId)
       },
-      getEnterGradesAsSetting (assignmentId) {
-        return gradebook.getEnterGradesAsSetting(assignmentId);
+      getEnterGradesAsSetting(assignmentId) {
+        return gradebook.getEnterGradesAsSetting(assignmentId)
       },
-      getGradingSchemeData (assignmentId) {
-        return gradebook.getAssignmentGradingScheme(assignmentId).data;
+      getGradingSchemeData(assignmentId) {
+        return gradebook.getAssignmentGradingScheme(assignmentId).data
       },
-      getStudent (studentId) {
-        return gradebook.student(studentId);
+      getStudent(studentId) {
+        return gradebook.student(studentId)
       },
-      getSubmissionState (submission) {
-        return gradebook.submissionStateMap.getSubmissionState(submission);
+      getSubmissionState(submission) {
+        return gradebook.submissionStateMap.getSubmissionState(submission)
       },
       getUpdatingSubmission(submission) {
         return gradebook.getUpdatingSubmission(submission)
       }
-    };
+    }
   }
 
   render = (row, cell, submission /* value */, _columnDef, student /* dataContext */) => {
-    let submissionState;
+    let submissionState
     if (submission) {
-      submissionState = this.options.getSubmissionState(submission);
+      submissionState = this.options.getSubmissionState(submission)
     }
 
     if (!student.loaded || !student.initialized || !submissionState) {
-      return renderTemplate('');
+      return renderTemplate('')
     }
 
     if (submissionState.hideGrade) {
-      return renderTemplate('', { dimmed: true });
+      return renderTemplate('', {dimmed: true})
     }
 
-    const assignment = this.options.getAssignment(submission.assignment_id);
+    const assignment = this.options.getAssignment(submission.assignment_id)
     if (assignment.grading_type === 'pass_fail') {
       const options = {
         needsGrading: needsGrading(submission)
-      };
-      const GradingTypeSubmissionCell = SubmissionCell.pass_fail;
-      const gradingTypeFormatter = GradingTypeSubmissionCell.formatter.bind(GradingTypeSubmissionCell);
-      return gradingTypeFormatter(row, cell, submission, assignment, student, options);
+      }
+      const GradingTypeSubmissionCell = SubmissionCell.pass_fail
+      const gradingTypeFormatter = GradingTypeSubmissionCell.formatter.bind(
+        GradingTypeSubmissionCell
+      )
+      return gradingTypeFormatter(row, cell, submission, assignment, student, options)
     }
 
     const assignmentData = {
@@ -131,7 +134,7 @@ export default class AssignmentCellFormatter {
       muted: assignment.muted,
       pointsPossible: assignment.points_possible,
       submissionTypes: assignment.submission_types
-    };
+    }
 
     const submissionData = {
       dropped: submission.drop,
@@ -141,7 +144,7 @@ export default class AssignmentCellFormatter {
       missing: submission.missing,
       resubmitted: submission.grade_matches_current_submission === false,
       score: submission.score
-    };
+    }
 
     const updatingSubmission = this.options.getUpdatingSubmission({
       assignmentId: assignment.id,
@@ -159,14 +162,14 @@ export default class AssignmentCellFormatter {
       disabled: student.isConcluded || submissionState.locked,
       hidden: submissionState.hideGrade,
       turnitinState: getTurnitinState(submission)
-    };
-
-    if (needsGrading(submission)) {
-      return renderTemplate('<i class="icon-not-graded"></i>', options);
     }
 
-    const grade = formatGrade(submissionData, assignment, this.options);
+    if (needsGrading(submission)) {
+      return renderTemplate('<i class="icon-not-graded"></i>', options)
+    }
 
-    return renderTemplate(grade, options);
-  };
+    const grade = formatGrade(submissionData, assignment, this.options)
+
+    return renderTemplate(grade, options)
+  }
 }

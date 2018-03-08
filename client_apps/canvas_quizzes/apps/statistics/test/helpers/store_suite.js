@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-require([ 'core/dispatcher' ], function(Dispatcher) {
-  var global = this;
+require(['core/dispatcher'], function(Dispatcher) {
+  var global = this
 
   /**
    * Store-testing facilities for jasmine suites.
@@ -66,28 +66,28 @@ require([ 'core/dispatcher' ], function(Dispatcher) {
    *         store.__reset__().
    */
   jasmine.Suite.prototype.storeSuite = function(store) {
-    this.promiseSuite = true;
+    this.promiseSuite = true
     this.beforeEach(function() {
-      var onChange = global.onChange = jasmine.createSpy('onChange');
-      var onError = global.onError = jasmine.createSpy('onError');
+      var onChange = (global.onChange = jasmine.createSpy('onChange'))
+      var onError = (global.onError = jasmine.createSpy('onError'))
 
       this.sendAction = function(action, payload, _onChange, _onError) {
-        var svc = Dispatcher.dispatch(action, payload);
+        var svc = Dispatcher.dispatch(action, payload)
 
-        _onChange = _onChange || onChange;
-        _onError = _onError || onError;
+        _onChange = _onChange || onChange
+        _onError = _onError || onError
 
-        svc.promise.then(_onChange, _onError);
-        this.flush();
+        svc.promise.then(_onChange, _onError)
+        this.flush()
 
-        return svc.promise;
-      };
-    });
+        return svc.promise
+      }
+    })
 
     this.afterEach(function() {
       if (store) {
-        store.__reset__();
+        store.__reset__()
       }
-    });
-  };
-});
+    })
+  }
+})

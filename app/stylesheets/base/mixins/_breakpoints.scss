@@ -19,15 +19,20 @@
 // Breakpoints
 @mixin breakpoint($breakpoint) {
   @if $breakpoint == mini-tablet {
-    @media only screen and (min-width: 500px) { @content; }
-  }
-  @else if $breakpoint == tablet {
-    @media only screen and (min-width: 768px) { @content; }
-  }
-  @else if $breakpoint == desktop {
-    @media only screen and (min-width: 992px) { @content; }
-  }
-  @else if $breakpoint == desktop--nav-open {
-    @media only screen and (min-width: 1140px) { @content; }
+    @media only screen and (min-width: 500px) {
+      @content;
+    }
+  } @else if $breakpoint == tablet {
+    @media only screen and (min-width: 768px) {
+      @content;
+    }
+  } @else if $breakpoint == desktop {
+    @media only screen and (min-width: 992px) {
+      @content;
+    }
+  } @else if $breakpoint == desktop--nav-open {
+    @media only screen and (min-width: 1140px) {
+      @content;
+    }
   }
 }

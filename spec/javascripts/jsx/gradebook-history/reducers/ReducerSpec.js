@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import history from 'jsx/gradebook-history/reducers/HistoryReducer';
-import searchForm from 'jsx/gradebook-history/reducers/SearchFormReducer';
-import { allReducers } from 'jsx/gradebook-history/reducers/Reducer';
+import history from 'jsx/gradebook-history/reducers/HistoryReducer'
+import searchForm from 'jsx/gradebook-history/reducers/SearchFormReducer'
+import {allReducers} from 'jsx/gradebook-history/reducers/Reducer'
 
-QUnit.module('Reducer');
+QUnit.module('Reducer')
 
-test('should combine all the reducers available', function () {
-  const expectedReducers = { history, searchForm };
+test('should combine all the reducers available', function() {
+  const expectedReducers = {history, searchForm}
 
-  deepEqual(allReducers(), expectedReducers);
-});
+  deepEqual(allReducers(), expectedReducers)
+})

@@ -1,32 +1,12 @@
-module.exports = { // eslint-disable-line import/no-commonjs
+module.exports = {
+  // eslint-disable-line import/no-commonjs
   name: 'tr_TR',
   day: {
     abbrev: ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'],
-    full: [
-      'Pazar',
-      'Pazartesi',
-      'Salı',
-      'Çarşamba',
-      'Perşembe',
-      'Cuma',
-      'Cumartesi'
-    ]
+    full: ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi']
   },
   month: {
-    abbrev: [
-      'Oca',
-      'Şub',
-      'Mar',
-      'Nis',
-      'May',
-      'Haz',
-      'Tem',
-      'Ağu',
-      'Eyl',
-      'Eki',
-      'Kas',
-      'Ara'
-    ],
+    abbrev: ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'],
     full: [
       'Ocak',
       'Şubat',

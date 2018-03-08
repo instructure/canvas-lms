@@ -353,7 +353,6 @@ File Upload question statistics look just like the statistics for [Essays](#essa
 
 Formula question statistics look just like the statistics for [Essays](#essay-question-stats).
 
-
 #### Numerical
 
 ```javascript

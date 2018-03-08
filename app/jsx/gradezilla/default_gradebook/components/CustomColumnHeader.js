@@ -21,22 +21,25 @@ import PropTypes from 'prop-types'
 import Text from '@instructure/ui-core/lib/components/Text'
 import ColumnHeader from '../../../gradezilla/default_gradebook/components/ColumnHeader'
 
-const { string } = PropTypes;
+const {string} = PropTypes
 
 export default class CustomColumnHeader extends ColumnHeader {
   static propTypes = {
     title: string.isRequired
-  };
+  }
 
-  render () {
+  render() {
     return (
       <div className="Gradebook__ColumnHeaderContent">
-        <span className="Gradebook__ColumnHeaderDetail" style={{ textAlign: 'center', width: '100%' }}>
+        <span
+          className="Gradebook__ColumnHeaderDetail"
+          style={{textAlign: 'center', width: '100%'}}
+        >
           <Text tag="span" size="x-small">
-            { this.props.title }
+            {this.props.title}
           </Text>
         </span>
       </div>
-    );
+    )
   }
 }

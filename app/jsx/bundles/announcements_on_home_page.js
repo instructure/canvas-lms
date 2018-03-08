@@ -39,14 +39,17 @@ if (ENV.SHOW_ANNOUNCEMENTS) {
 
   const params = {
     'context_codes[]': `course_${ENV.ANNOUNCEMENT_COURSE_ID}`,
-    per_page: (ENV.ANNOUNCEMENT_LIMIT || 3),
+    per_page: ENV.ANNOUNCEMENT_LIMIT || 3,
     page: '1',
     start_date: '1900-01-01',
     end_date: new Date().toISOString(),
     active_only: true
   }
 
-  axios.get(url, { params }).then(response => {
-    ReactDOM.render(<AnnouncementList announcements={response.data.map(presentAnnouncement)} />, container)
+  axios.get(url, {params}).then(response => {
+    ReactDOM.render(
+      <AnnouncementList announcements={response.data.map(presentAnnouncement)} />,
+      container
+    )
   })
 }

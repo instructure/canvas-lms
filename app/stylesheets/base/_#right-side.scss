@@ -31,7 +31,8 @@
     border-width: 1px 0 0;
     margin: 17px 0 20px;
   }
-  h2, .h2 {
+  h2,
+  .h2 {
     @include fontSize($ic-font-size--small);
     overflow: hidden;
     line-height: 1.2em;
@@ -59,21 +60,21 @@
       @if $use_high_contrast {
         text-decoration: underline;
 
-      &:hover,
-      &:focus {
-        text-decoration: underline;
+        &:hover,
+        &:focus {
+          text-decoration: underline;
 
-        @if $use_high_contrast {
-          text-decoration: none;
+          @if $use_high_contrast {
+            text-decoration: none;
+          }
         }
       }
-    }
       // this is to give todo and event icons some breathing room
       > i {
-          min-width: $ic-sp * 2;
-          padding-right: $ic-sp;
-          box-sizing: border-box;
-          color: lighten( $grayDark, 15% );
+        min-width: $ic-sp * 2;
+        padding-right: $ic-sp;
+        box-sizing: border-box;
+        color: lighten($grayDark, 15%);
       }
     }
     &:last-child a {
@@ -86,20 +87,23 @@
       font-style: italic;
       @include fontSize(13px);
     }
-    b, em, p {
+    b,
+    em,
+    p {
       font-weight: normal;
       display: block;
       line-height: $ic-label-line-height;
     }
-    p, .more_link {
+    p,
+    .more_link {
       @include fontSize(12px);
       margin-bottom: 0;
     }
-    em, p {
+    em,
+    p {
       @if $use_high_contrast {
         color: #555;
-      }
-      @else {
+      } @else {
         color: #777;
       }
     }
@@ -109,7 +113,7 @@
     }
   }
   .recent_feedback_icon {
-    background-position: 0 $ic-sp*.75;
+    background-position: 0 $ic-sp*0.75;
   }
   .recent_feedback_title {
     line-height: 1.3;
@@ -177,7 +181,9 @@
   @include overwrite-default-icon-size(0.75rem);
 }
 
-@mixin sidebar-logo {display: block;}
+@mixin sidebar-logo {
+  display: block;
+}
 
 .ic-sidebar-logo {
   display: none;

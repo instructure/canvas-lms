@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 .account > .header .edit_account {
   display: none;
@@ -53,7 +53,8 @@
 }
 
 .header {
-  .courses_count, .sub_accounts_count {
+  .courses_count,
+  .sub_accounts_count {
     color: $ic-font-color--subdued;
     @include fontSize(12px);
   }

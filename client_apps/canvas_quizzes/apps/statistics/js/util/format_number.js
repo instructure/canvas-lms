@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([ '../config' ], function(config) {
+define(['../config'], function(config) {
   /**
    * @member Util
    * @method formatNumber
@@ -40,13 +40,13 @@ define([ '../config' ], function(config) {
    */
   return function formatNumber(n, precision) {
     if (precision === undefined) {
-      precision = config.precision;
+      precision = config.precision
     }
 
     if (typeof n !== 'number' || !(n instanceof Number)) {
-      n = parseFloat(n);
+      n = parseFloat(n)
     }
 
-    return n.toFixed(parseInt(precision, 10));
-  };
-});
+    return n.toFixed(parseInt(precision, 10))
+  }
+})

@@ -21,11 +21,11 @@ import React from 'react'
 import Text from '@instructure/ui-core/lib/components/Text'
 import Container from '@instructure/ui-core/lib/components/Container'
 
-import { IconLock, IconUnlock } from './BlueprintLocks'
+import {IconLock, IconUnlock} from './BlueprintLocks'
 import propTypes from '../propTypes'
 import {itemTypeLabels, changeTypeLabels} from '../labels'
 
-const UnsyncedChange = (props) => {
+const UnsyncedChange = props => {
   const {asset_type, asset_name, change_type, locked} = props.change
   const changeLabel = changeTypeLabels[change_type] || change_type
   const typeLabel = itemTypeLabels[asset_type] || asset_type
@@ -38,20 +38,25 @@ const UnsyncedChange = (props) => {
             {locked ? <IconLock /> : <IconUnlock />}
           </Text>
           <Container padding="0 0 0 small">
-            <Text size="small" weight="bold">{asset_name}</Text>
+            <Text size="small" weight="bold">
+              {asset_name}
+            </Text>
           </Container>
         </div>
       </td>
       <td>
-        <Text size="small" weight="bold">{changeLabel}</Text>
+        <Text size="small" weight="bold">
+          {changeLabel}
+        </Text>
       </td>
       <td>
-        <Text size="small" weight="bold">{typeLabel}</Text>
+        <Text size="small" weight="bold">
+          {typeLabel}
+        </Text>
       </td>
     </tr>
   )
 }
-
 
 UnsyncedChange.propTypes = {
   change: propTypes.unsyncedChange.isRequired

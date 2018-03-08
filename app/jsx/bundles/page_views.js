@@ -35,9 +35,9 @@ const pageViewsView = new PageViewView({
   fetchOptions
 })
 
-  // Add events
+// Add events
 pageViews.on('reset', pageViewsView.render, pageViewsView)
 
-  // Fetch page views
+// Fetch page views
 const fetchParams = {per_page: 100}
 pageViewsView.$el.disableWhileLoading(pageViews.fetch({data: fetchParams}))

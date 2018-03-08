@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var glob = require('glob');
-var K = require('./constants');
-var commonModules;
+var glob = require('glob')
+var K = require('./constants')
+var commonModules
 
 /**
  * Go through all the files within the common app (/apps/common/js) and generate
@@ -31,28 +31,32 @@ var commonModules;
  *         `jsx!`.
  */
 module.exports = function() {
-  if (commonModules) { // cache
-    return commonModules;
+  if (commonModules) {
+    // cache
+    return commonModules
   }
 
-  var PKG_NAME = K.pkgName;
-  var COMMON_ROOT = K.commonRoot + '/js';
+  var PKG_NAME = K.pkgName
+  var COMMON_ROOT = K.commonRoot + '/js'
 
-  commonModules = [ 'js', 'jsx' ]
+  commonModules = ['js', 'jsx']
     // Find all the source files in the common bundle and extract their names
     // without the extensions (i.e, module ids):
     .reduce(function(modules, ext) {
-      var pattern = '**/*.' + ext;
-      var extStripper = new RegExp("\\." + ext + '$');
-      var prefix = ext === 'jsx' ? 'jsx!' : '';
+      var pattern = '**/*.' + ext
+      var extStripper = new RegExp('\\.' + ext + '$')
+      var prefix = ext === 'jsx' ? 'jsx!' : ''
 
-      return glob.sync(pattern, { cwd: COMMON_ROOT }).map(function(file) {
-        if (!file.length) {
-          return '';
-        }
+      return glob
+        .sync(pattern, {cwd: COMMON_ROOT})
+        .map(function(file) {
+          if (!file.length) {
+            return ''
+          }
 
-        return prefix + file.replace(extStripper, '');
-      }).concat(modules);
+          return prefix + file.replace(extStripper, '')
+        })
+        .concat(modules)
     }, [])
 
     // Prefix all common modules with the package's name, e.g:
@@ -62,11 +66,10 @@ module.exports = function() {
     // This is because app modules reference the common modules by specifying
     // the package name as a prefix.
     .map(function prefixByPackageName(moduleId) {
-      if (moduleId.substr(0,4) === 'jsx!') {
-        return moduleId.replace('jsx!', 'jsx!' + PKG_NAME + '/');
-      }
-      else {
-        return [ PKG_NAME, moduleId ].join('/');
+      if (moduleId.substr(0, 4) === 'jsx!') {
+        return moduleId.replace('jsx!', 'jsx!' + PKG_NAME + '/')
+      } else {
+        return [PKG_NAME, moduleId].join('/')
       }
     })
 
@@ -77,8 +80,7 @@ module.exports = function() {
     // "requirejs.bundledDependencies" key.
     //
     // See package.json for those dependencies.
-    .concat(K.bundledDependencies);
+    .concat(K.bundledDependencies)
 
-  return commonModules;
-};
-
+  return commonModules
+}

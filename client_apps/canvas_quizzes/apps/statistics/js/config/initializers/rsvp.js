@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([ 'rsvp' ], function(RSVP) {
+define(['rsvp'], function(RSVP) {
   RSVP.on('error', function(e) {
-    console.error('RSVP error:', JSON.stringify(e));
+    console.error('RSVP error:', JSON.stringify(e))
 
     if (e && e.message) {
-      console.error(e.message);
+      console.error(e.message)
     }
     if (e && e.stack) {
-      console.error(e.stack);
+      console.error(e.stack)
     }
-  });
+  })
 
-  return RSVP;
-});
+  return RSVP
+})

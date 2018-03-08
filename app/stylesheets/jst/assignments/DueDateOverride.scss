@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "components/token_input";
+@import 'base/environment';
+@import 'components/token_input';
 
 $assign-border-color: #ccc;
 
@@ -25,18 +25,20 @@ $assign-border-color: #ccc;
 // Note: a lot of these are overrides due to
 // legacy code.
 #edit_assignment_wrapper .overrides-column-right.overrideFormFlex {
-
-  select, .subtitle {
+  select,
+  .subtitle {
     margin-left: 0;
   }
   label:not(.ic-Label) {
     padding: 0;
     margin: 0;
-    &:hover {background: none;}
+    &:hover {
+      background: none;
+    }
   }
 }
 
-.quiz-overrides-column-right{
+.quiz-overrides-column-right {
   display: inline-block;
   margin-left: 20px;
   margin-top: -15px;
@@ -51,7 +53,7 @@ $assign-border-color: #ccc;
   border-bottom-right-radius: 5px;
   width: 100%;
 }
-.Date__label{
+.Date__label {
   font-weight: bold;
 }
 .ContainerDueDate {
@@ -95,7 +97,6 @@ $assign-border-color: #ccc;
   display: inline;
 }
 
-
 .Available-from-to {
   display: flex;
   .from {
@@ -111,12 +112,12 @@ $assign-border-color: #ccc;
   }
 }
 
-.tokenInputThrobber{
+.tokenInputThrobber {
   z-index: 9999;
   text-align: center;
-  color:#e9e9e9;
+  color: #e9e9e9;
   @include fontSize(10px);
-  background: url("/images/load.gif") no-repeat 50% 80%;
+  background: url('/images/load.gif') no-repeat 50% 80%;
   background-size: 16px;
   margin-bottom: -3px;
   min-width: 25px;

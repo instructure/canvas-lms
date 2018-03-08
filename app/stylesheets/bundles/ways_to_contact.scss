@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/_environment.scss";
+@import 'base/_environment.scss';
 
 .channel_list {
   border-collapse: separate;
 }
 .channel_list .channel .default_link {
   opacity: 0;
-  filter:alpha(opacity=0);
+  filter: alpha(opacity=0);
 }
 .channel_list.single .hidden_for_single {
   display: none;
@@ -36,25 +36,25 @@
   display: none;
 }
 .channel_list .channel.unconfirmed .unconfirmed_text {
-    display: block;
+  display: block;
 }
 .channel_list .unconfirmed_text {
-    display: none;
+  display: none;
 }
 .channel_list .channel.default .default_link,
 .channel_list .channel.default:hover .default_link {
   display: block;
-  opacity: 1.0;
+  opacity: 1;
   cursor: default;
 }
 .channel_list .channel.default .delete_channel_link {
   display: none;
 }
 .channel_list .channel.default .cant_delete_default_text {
-    display: block;
+  display: block;
 }
 .channel_list .cant_delete_default_text {
-    display: none;
+  display: none;
 }
 #right-side table.channel_list tr.channel.unconfirmed > td a {
 }
@@ -73,7 +73,7 @@
   color: $ic-font-color-dark;
 }
 .intl_rates_may_apply {
-  font-size: 0.8em
+  font-size: 0.8em;
 }
 .contact_channel_path {
   @include breakpoint(desktop) {

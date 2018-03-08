@@ -31,8 +31,8 @@
 // a functional variable in ours.
 ////////
 $sg-background: #fff !default;
-$sg-codefont: "Monaco", "Courier", monospace !default;
-$sg-font: "Helvetica Neue", "Helvetica", Arial, sans-serif !default;
+$sg-codefont: 'Monaco', 'Courier', monospace !default;
+$sg-font: 'Helvetica Neue', 'Helvetica', Arial, sans-serif !default;
 
 $sg-background-global-nav: $ic-color-medium-darker !default;
 $sg-background-sub-nav: $ic-color-dark !default;
@@ -68,6 +68,6 @@ $sg-example-title-color: $ic-color-light !default;
 // be taken out by commenting out the code below, or changed for a
 // different logo by editing the path.
 @mixin sg-header-logo {
-  background: transparent url("/images/sg-logo.svg") 1% 50% no-repeat;
+  background: transparent url('/images/sg-logo.svg') 1% 50% no-repeat;
   background-size: 23px;
 }

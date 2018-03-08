@@ -53,7 +53,7 @@
     border-top-style: none;
   }
 
-  .row-fluid [class*=span] {
+  .row-fluid [class*='span'] {
     min-height: 0;
   }
 
@@ -75,9 +75,13 @@
     background-color: $droppableBackground;
   }
 
-  .show-group-full { display: none; }
+  .show-group-full {
+    display: none;
+  }
   &.slots-full {
-    .show-group-full { display: inline-block; }
+    .show-group-full {
+      display: inline-block;
+    }
   }
 }
 
