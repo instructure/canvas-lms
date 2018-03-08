@@ -114,6 +114,13 @@ describe "instfs file uploads" do
     file_id.split("/files/").last
   end
 
+  def get_link_redirect_path(file_link)
+    url = URI.parse(file_link)
+    req = Net::HTTP.new(url.host, url.port)
+    res = req.request_head(url.path)
+    res['location']
+  end
+
 
   context 'when uploading to instfs as an admin' do
     before do
@@ -123,13 +130,16 @@ describe "instfs file uploads" do
     end
 
     it "should upload a file to instfs on the files page", priority: "1", test_id: 3399288 do
-      filename = "test_image.jpg"
-      file_path = File.join(ActionController::TestCase.fixture_path, filename)
-      upload_file_to_instfs(file_path, admin_guy, admin_guy, folder)
+      file_path = File.join(ActionController::TestCase.fixture_path, "test_image.jpg")
       get "/files"
+      wait_for_ajaximations
+      f(".ef-actions input[type=file]").send_keys(file_path)
       wait_for_ajaximations
       file_element = f(".ef-name-col__link")
       image_element_source = file_element.attribute("href")
+      attachment = Attachment.find(get_id_from_canvas_link(image_element_source))
+      # verify that the attachment has an instfs uuid and that it's identical to the original file
+      expect(attachment.instfs_uuid).not_to be_nil
       expect(compare_md5s(image_element_source, file_path)).to be true
     end
 
@@ -144,6 +154,26 @@ describe "instfs file uploads" do
       file_link = get_file_link_from_bg_image(thumbnail_link)
       downloaded_file = open(file_link)
       expect(downloaded_file.size).to be > 0
+    end
+
+    it "should download an instfs file with instfs disabled", priority: "1", test_id: 3399305 do
+      file_path = File.join(ActionController::TestCase.fixture_path, "files/cn_image.jpg")
+      upload_file_to_instfs(file_path, admin_guy, admin_guy, folder)
+      get "/files"
+      wait_for_ajaximations
+      setting = PluginSetting.find_by(name: 'inst_fs') || PluginSetting.new(name: 'inst_fs')
+      setting.disabled = true
+      setting.settings = {}
+      setting.save
+      file_element = f(".ef-name-col__link")
+      image_element_source = file_element.attribute("href")
+      attachment = Attachment.find(get_id_from_canvas_link(image_element_source))
+      # verify that the attachment has an instfs uuid and that it's identical to the original file
+      expect(attachment.instfs_uuid).not_to be_nil
+      expect(compare_md5s(image_element_source, file_path)).to be true
+      # verify that the canvas link redirects through instfs
+      redirect_url = get_link_redirect_path(image_element_source)
+      expect(redirect_url).to include(InstFS.app_host)
     end
   end
 
