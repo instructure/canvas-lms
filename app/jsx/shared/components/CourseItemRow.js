@@ -110,8 +110,16 @@ export default class CourseItemRow extends Component {
   }
 
   componentDidMount () {
-    if (this.props.focusOn) {
-      switch (this.props.focusOn) {
+    this.onFocusManage(this.props)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.onFocusManage(nextProps)
+  }
+
+  onFocusManage(props) {
+    if (props.focusOn) {
+      switch (props.focusOn) {
         case 'title':
           this._titleElement.focus()
           break;

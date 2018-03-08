@@ -238,6 +238,7 @@ test('SAVING_SETTINGS_SUCCESS should return payload for user settings', () => {
   const newState = reduce(actions.savingSettingsSuccess({courseSettings: "blah", userSettings: 'blee'}))
   deepEqual(newState.userSettings, "blee")
 })
+
 test('ARRANGE_PINNED_DISCUSSIONS should update unpinned discussion', () => {
   const newState = reduce(actions.arrangePinnedDiscussions({ order: [10, 5, 2, 1] }), {
     pinnedDiscussions: [
@@ -354,4 +355,58 @@ test('UPDATE_DISCUSSIONS_SEARCH should set the filter flag on discussions', () =
   deepEqual(newState.pinnedDiscussions.map(d => d.filtered), [false, true, false, true])
   deepEqual(newState.unpinnedDiscussions.map(d => d.filtered), [false, true, false, true])
   deepEqual(newState.closedForCommentsDiscussions.map(d => d.filtered), [false, true, false, true])
+})
+
+test('DELETE_DISCUSSION_SUCCESS should delete correct discussion', () => {
+  const newState = reduce(actions.deleteDiscussionSuccess({ discussion: { title: "venk", id: 5, pinned: true, locked: false } }), {
+    pinnedDiscussions: [
+      { title: "landon", id: 1, pinned: true, locked: false },
+      { title: "venk", id: 5, pinned: true, locked: false },
+      { title: "steven", id: 2, pinned: true, locked: false },
+      { title: "aaron", id: 10, pinned: true, locked: false }
+    ],
+    unpinnedDiscussions: [],
+    closedDiscussions: [],
+  })
+  deepEqual(newState.pinnedDiscussions, [
+    { title: "landon", id: 1, pinned: true, locked: false, focusOn: "manageMenu" },
+    { title: "steven", id: 2, pinned: true, locked: false },
+    { title: "aaron", id: 10, pinned: true, locked: false }
+  ])
+})
+
+test('DELETE_DISCUSSION_SUCCESS should delete last discussion', () => {
+  const newState = reduce(actions.deleteDiscussionSuccess({ discussion: { title: "venk", id: 5, pinned: true, locked: false } }), {
+    pinnedDiscussions: [
+      { title: "venk", id: 5, pinned: true, locked: false },
+    ],
+    unpinnedDiscussions: [],
+    closedDiscussions: [],
+  })
+  deepEqual(newState.pinnedDiscussions, [
+  ])
+})
+
+test('DELETE_DISCUSSION_SUCCESS should not delete discussions not specified', () => {
+  const newState = reduce(actions.deleteDiscussionSuccess({ discussion: { title: "venk", id: 5, pinned: true, locked: false } }), {
+    pinnedDiscussions: [
+      { title: "landon", id: 1, pinned: true, locked: false },
+      { title: "venk", id: 5, pinned: true, locked: false },
+      { title: "steven", id: 2, pinned: true, locked: false },
+      { title: "aaron", id: 10, pinned: true, locked: false }
+    ],
+    unpinnedDiscussions: [],
+    closedForCommentsDiscussions: [
+      { title: "landon-boss", id: 30, pinned: true, locked: false },
+      { title: "tiny-venk", id: 42, pinned: true, locked: false },
+      { title: "silly-steven", id: 23, pinned: true, locked: false },
+      { title: "me-aaron", id: 10, pinned: true, locked: false }
+    ],
+  })
+  deepEqual(newState.closedForCommentsDiscussions, [
+    { title: "landon-boss", id: 30, pinned: true, locked: false },
+    { title: "tiny-venk", id: 42, pinned: true, locked: false },
+    { title: "silly-steven", id: 23, pinned: true, locked: false },
+    { title: "me-aaron", id: 10, pinned: true, locked: false }
+  ])
 })

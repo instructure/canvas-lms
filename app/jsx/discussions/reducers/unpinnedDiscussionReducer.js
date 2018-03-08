@@ -23,6 +23,7 @@ import subscriptionReducerMap from './subscriptionReducerMap'
 import duplicationReducerMap from './duplicationReducerMap'
 import cleanDiscussionFocusReducerMap from './cleanDiscussionFocusReducerMap'
 import searchReducerMap from './searchReducerMap'
+import deleteReducerMap from './deleteReducerMap'
 
 function copyAndUpdateDiscussionState(oldState, updatedDiscussion) {
   const newState = oldState.slice()
@@ -58,7 +59,7 @@ const reducerMap = {
 }
 
 Object.assign(reducerMap, subscriptionReducerMap, duplicationReducerMap,
-              cleanDiscussionFocusReducerMap, searchReducerMap)
+              cleanDiscussionFocusReducerMap, searchReducerMap, deleteReducerMap)
 
 const unpinnedDiscussionReducer = handleActions(reducerMap, [])
 export default unpinnedDiscussionReducer

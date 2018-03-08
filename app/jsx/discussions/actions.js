@@ -53,6 +53,9 @@ const types = [
   'DUPLICATE_DISCUSSION_START',
   'DUPLICATE_DISCUSSION_SUCCESS',
   'DUPLICATE_DISCUSSION_FAIL',
+  'DELETE_DISCUSSION_START',
+  'DELETE_DISCUSSION_SUCCESS',
+  'DELETE_DISCUSSION_FAIL',
   'CLEAN_DISCUSSION_FOCUS'
 ]
 
@@ -118,6 +121,27 @@ actions.searchDiscussions = function searchDiscussions ({ searchTerm, filter }) 
     $.screenReaderFlashMessageExclusive(I18n.t('%{count} discussions found.', { count: numDisplayed }))
   }
 }
+
+actions.deleteDiscussion = function(discussion) {
+  return (dispatch, getState) => {
+    const discussionCopy = copyAndUpdateDiscussion(discussion, {})
+    dispatch(actions.deleteDiscussionStart())
+    apiClient.deleteDiscussion(getState(), {discussion: discussionCopy})
+      .then(_ => {
+        dispatch(actions.deleteDiscussionSuccess({discussion: discussionCopy}))
+        $.screenReaderFlashMessage(I18n.t('Successfully deleted discussion %{title}', { title: discussion.title }))
+      })
+      .catch(err => {
+        $.screenReaderFlashMessage(I18n.t('Failed to delete discussion %{title}', { title: discussion.title }))
+        dispatch(actions.deleteDiscussionFails({
+          message: I18n.t('Failed to delete discussion %{title}', { title: discussion.title }),
+          discussion,
+          err
+        }))
+      })
+  }
+}
+
 
 actions.fetchUserSettings = function() {
   return (dispatch, getState) => {

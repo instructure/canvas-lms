@@ -114,6 +114,10 @@ class DiscussionsIndex
       f('#delete-discussion-menu-option')
     end
 
+    def confirm_delete_modal_button
+      f('#confirm_delete_discussions')
+    end
+
     def pin_menu_option
       f('#togglepinned-discussion-menu-option')
     end
@@ -149,6 +153,10 @@ class DiscussionsIndex
     def click_delete_menu_option(title)
       discussion_menu(title).click
       delete_menu_option.click
+    end
+
+    def click_delete_modal_confirm
+      confirm_delete_modal_button.click
     end
 
     def click_pin_menu_option(title)

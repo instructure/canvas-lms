@@ -22,6 +22,7 @@ import { actionTypes } from '../actions'
 import subscriptionReducerMap from './subscriptionReducerMap'
 import duplicationReducerMap from './duplicationReducerMap'
 import cleanDiscussionFocusReducerMap from './cleanDiscussionFocusReducerMap'
+import deleteReducerMap from './deleteReducerMap'
 import searchReducerMap from './searchReducerMap'
 
 function copyAndUpdateDiscussionState(oldState, updatedDiscussion) {
@@ -58,7 +59,7 @@ const reducerMap = {
 }
 
 Object.assign(reducerMap, subscriptionReducerMap, duplicationReducerMap,
-              cleanDiscussionFocusReducerMap, searchReducerMap)
+              cleanDiscussionFocusReducerMap, searchReducerMap, deleteReducerMap)
 
 const closedForCommentsDiscussionReducer = handleActions(reducerMap, [])
 export default closedForCommentsDiscussionReducer

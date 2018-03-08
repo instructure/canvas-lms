@@ -194,12 +194,12 @@ describe "discussions index" do
       expect(driver.current_url).to include(DiscussionsIndex.individual_discussion_url(@discussion1))
     end
 
-    it 'a discussion can be deleted by using Delete menu item' do
-      skip('Add with COMMS-925')
+    it 'a discussion can be deleted by using Delete menu item and modal' do
       login_and_visit_course(@teacher, @course)
       DiscussionsIndex.click_delete_menu_option(discussion1_title)
+      DiscussionsIndex.click_delete_modal_confirm
       expect(f('#content')).not_to contain_jqcss(DiscussionsIndex.discussion_title_css(discussion1_title))
-      expect(Announcement.where(title: announcement1_title).first.workflow_state).to eq 'deleted'
+      expect(DiscussionTopic.where(title: discussion1_title).first.workflow_state).to eq 'deleted'
     end
 
     it 'a discussion can be duplicated by using Duplicate menu item' do

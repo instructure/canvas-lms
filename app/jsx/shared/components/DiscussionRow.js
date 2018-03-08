@@ -37,6 +37,7 @@ import IconPublishSolid from 'instructure-icons/lib/Solid/IconPublishSolid'
 import IconPublishLine from 'instructure-icons/lib/Line/IconPublishLine'
 import IconCopySolid from 'instructure-icons/lib/Solid/IconCopySolid'
 import IconUpdownLine from 'instructure-icons/lib/Line/IconUpdownLine'
+import IconTrashSolid from 'instructure-icons/lib/Solid/IconTrashSolid'
 import IconPinSolid from 'instructure-icons/lib/Solid/IconPinSolid'
 import IconPinLine from 'instructure-icons/lib/Line/IconPinLine'
 import IconReply from 'instructure-icons/lib/Line/IconReplyLine'
@@ -73,8 +74,8 @@ const discussionTarget = {
 export default function DiscussionRow ({ discussion, masterCourseData, rowRef, onSelectedChanged,
                                          connectDragSource, connectDragPreview, draggable,
                                          onToggleSubscribe, updateDiscussion, canManage, canPublish,
-
-                                         duplicateDiscussion, cleanDiscussionFocus, onMoveDiscussion }) {
+                                         duplicateDiscussion, cleanDiscussionFocus, onMoveDiscussion,
+                                         deleteDiscussion }) {
   const makePinSuccessFailMessages = () => {
     const successMessage = discussion.pinned ?
       I18n.t('Unpin of discussion %{title} succeeded', { title: discussion.title }) :
@@ -96,6 +97,9 @@ export default function DiscussionRow ({ discussion, masterCourseData, rowRef, o
      case 'togglepinned':
        updateDiscussion(discussion, { pinned: !discussion.pinned },
          makePinSuccessFailMessages(discussion), 'manageMenu')
+       break
+     case 'delete':
+       deleteDiscussion(discussion)
        break
      case 'togglelocked':
        updateDiscussion(discussion, { locked: !discussion.locked },
@@ -177,6 +181,16 @@ export default function DiscussionRow ({ discussion, masterCourseData, rowRef, o
         ? I18n.t('Unpin discussion %{title}', { title: discussion.title })
         : I18n.t('Pin discussion %{title}', { title: discussion.title })}
       </ScreenReaderContent>
+    </MenuItem>,
+    <MenuItem
+      key="delete"
+      value={{ action: 'delete', id: discussion.id }}
+      id="delete-discussion-menu-option"
+    >
+      <span aria-hidden='true'>
+        <IconTrashSolid />&nbsp;&nbsp;{I18n.t('Delete')}
+      </span>
+      <ScreenReaderContent> { I18n.t('Delete discussion %{title}', { title: discussion.title }) } </ScreenReaderContent>
     </MenuItem>,
     <MenuItem
       key="togglelocked"
@@ -300,6 +314,7 @@ DiscussionRow.propTypes = {
   cleanDiscussionFocus: func.isRequired,
   updateDiscussion: func.isRequired,
   canPublish: bool.isRequired,
+  deleteDiscussion: func.isRequired,
 }
 
 DiscussionRow.defaultProps = {

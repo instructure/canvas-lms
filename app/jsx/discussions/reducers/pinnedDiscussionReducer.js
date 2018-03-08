@@ -21,6 +21,7 @@ import { handleActions } from 'redux-actions'
 import { actionTypes } from '../actions'
 import subscriptionReducerMap from './subscriptionReducerMap'
 import duplicationReducerMap from './duplicationReducerMap'
+import deleteReducerMap from './deleteReducerMap'
 import cleanDiscussionFocusReducerMap from './cleanDiscussionFocusReducerMap'
 import searchReducerMap from './searchReducerMap'
 
@@ -73,8 +74,7 @@ const reducerMap = {
     copyAndUpdateDiscussionState(state, action.payload.discussion)
 }
 
-Object.assign(reducerMap, subscriptionReducerMap, duplicationReducerMap,
-              cleanDiscussionFocusReducerMap, searchReducerMap)
+Object.assign(reducerMap, subscriptionReducerMap, duplicationReducerMap, cleanDiscussionFocusReducerMap, searchReducerMap, deleteReducerMap)
 
 const pinnedDiscussionReducer = handleActions(reducerMap, [])
 export default pinnedDiscussionReducer

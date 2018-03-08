@@ -51,6 +51,11 @@ export function updateDiscussion ({ contextType, contextId }, discussion, update
   return axios.put(url, updatedFields)
 }
 
+export function deleteDiscussion ({ contextType, contextId }, { discussion }) {
+  const url = `/api/v1/${contextType}s/${contextId}/discussion_topics/${discussion.id}`
+  return axios.delete(url)
+}
+
 export function subscribeToTopic ({ contextType, contextId }, { id }) {
   return axios.put(`/api/v1/${contextType}s/${contextId}/discussion_topics/${id}/subscribed`)
 }

@@ -84,7 +84,8 @@ export default class DiscussionsContainer extends Component {
     connectDropTarget: func,
     roles: arrayOf(string),
     renderContainerBackground: func.isRequired,
-    onMoveDiscussion: func
+    onMoveDiscussion: func,
+    deleteDiscussion: func,
   }
 
   static defaultProps = {
@@ -93,7 +94,26 @@ export default class DiscussionsContainer extends Component {
     pinned: undefined,
     closedState: undefined,
     roles: ['user', 'student'],
-    onMoveDiscussion: null
+    onMoveDiscussion: null,
+    deleteDiscussion: null
+  }
+
+  componentWillReceiveProps(newProps) {
+    if((this.props.discussions.length >= 1
+      && newProps.discussions.length === 0)
+      || (newProps.discussions[0]
+      && newProps.discussions[0].focusOn === "toggleButton")) {
+      if(this.toggleBtn) {
+        setTimeout(() => {
+          this.toggleBtn.focus()
+          this.props.cleanDiscussionFocus()
+        });
+      }
+    }
+  }
+
+  wrapperToggleRef = (c) => {
+    this.toggleBtn = c && c.querySelector('button')
   }
 
   renderDiscussions () {
@@ -114,6 +134,7 @@ export default class DiscussionsContainer extends Component {
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
             updateDiscussion={this.props.updateDiscussion}
             onMoveDiscussion={this.props.onMoveDiscussion}
+            deleteDiscussion={this.props.deleteDiscussion}
             draggable
           />
         : <DiscussionRow
@@ -127,6 +148,7 @@ export default class DiscussionsContainer extends Component {
             duplicateDiscussion={this.props.duplicateDiscussion}
             updateDiscussion={this.props.updateDiscussion}
             onMoveDiscussion={this.props.onMoveDiscussion}
+            deleteDiscussion={this.props.deleteDiscussion}
             draggable={false}
           />
       accumlator.push(row)
@@ -149,16 +171,18 @@ export default class DiscussionsContainer extends Component {
         <span className="recent-activity-text-container">
           <Text fontStyle="italic">{I18n.t('Ordered by Recent Activity')}</Text>
         </span> : null }
-        <ToggleDetails
-          defaultExpanded
-          summary={<Text weight="bold">{this.props.title}</Text>}
-        >
-            {
-              this.props.discussions.filter(d => !d.filtered).length
-                ? this.renderDiscussions()
-                : this.renderBackgroundImage()
-            }
-        </ToggleDetails>
+        <span ref={this.wrapperToggleRef}>
+          <ToggleDetails
+            defaultExpanded
+            summary={<Text weight="bold">{this.props.title}</Text>}
+          >
+              {
+                this.props.discussions.filter(d => !d.filtered).length
+                  ? this.renderDiscussions()
+                  : this.renderBackgroundImage()
+              }
+          </ToggleDetails>
+        </span>
       </div>
     )
   }

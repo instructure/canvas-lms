@@ -182,6 +182,7 @@ test('renders manage menu if permitted', () => {
   ok(allKeys.includes('duplicate'))
   ok(allKeys.includes('togglepinned'))
   ok(allKeys.includes('togglelocked'))
+  ok(allKeys.includes('delete'))
 })
 
 test('renders move-to in manage menu if permitted', () => {
