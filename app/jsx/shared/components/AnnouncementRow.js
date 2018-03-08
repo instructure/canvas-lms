@@ -18,16 +18,18 @@
 
 import I18n from 'i18n!shared_components'
 import React from 'react'
-import { bool, func } from 'prop-types'
+import {bool, func} from 'prop-types'
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
 
 import Container from '@instructure/ui-core/lib/components/Container'
 import Text from '@instructure/ui-core/lib/components/Text'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
-import { MenuItem } from '@instructure/ui-core/lib/components/Menu'
+import {MenuItem} from '@instructure/ui-core/lib/components/Menu'
 import IconTimer from 'instructure-icons/lib/Line/IconTimerLine'
 import IconReply from 'instructure-icons/lib/Line/IconReplyLine'
+import IconLock from 'instructure-icons/lib/Line/IconLockLine'
+import IconUnlock from 'instructure-icons/lib/Line/IconUnlockLine'
 import IconTrash from 'instructure-icons/lib/Line/IconTrashLine'
 
 import AnnouncementModel from 'compiled/models/Announcement'
@@ -37,80 +39,91 @@ import UnreadBadge from './UnreadBadge'
 import announcementShape from '../proptypes/announcement'
 import masterCourseDataShape from '../proptypes/masterCourseData'
 
-function makeTimestamp ({ delayed_post_at, posted_at }) {
+function makeTimestamp({delayed_post_at, posted_at}) {
   return delayed_post_at
-  ? {
-      title: (
-        <span>
-          <Container margin="0 x-small">
-            <Text color="secondary"><IconTimer /></Text>
-          </Container>
-          {I18n.t('Delayed until:')}
-        </span>
-      ),
-      date: delayed_post_at
-  }
-  : { title: I18n.t('Posted on:'), date: posted_at }
+    ? {
+        title: (
+          <span>
+            <Container margin="0 x-small">
+              <Text color="secondary">
+                <IconTimer />
+              </Text>
+            </Container>
+            {I18n.t('Delayed until:')}
+          </span>
+        ),
+        date: delayed_post_at
+      }
+    : {title: I18n.t('Posted on:'), date: posted_at}
 }
 
-export default function AnnouncementRow (
-  { announcement, canManage, masterCourseData, rowRef, onSelectedChanged,
-    onManageMenuSelect, canHaveSections, announcementsLocked }) {
+export default function AnnouncementRow({
+  announcement,
+  canManage,
+  masterCourseData,
+  rowRef,
+  onSelectedChanged,
+  onManageMenuSelect,
+  canHaveSections,
+  announcementsLocked
+}) {
   const timestamp = makeTimestamp(announcement)
-  const readCount = announcement.discussion_subentry_count > 0
-    ? (
+  const readCount =
+    announcement.discussion_subentry_count > 0 ? (
       <UnreadBadge
         unreadCount={announcement.unread_count}
-        unreadLabel={I18n.t('%{count} unread replies', { count: announcement.unread_count })}
+        unreadLabel={I18n.t('%{count} unread replies', {count: announcement.unread_count})}
         totalCount={announcement.discussion_subentry_count}
-        totalLabel={I18n.t('%{count} replies', { count: announcement.discussion_subentry_count })}
+        totalLabel={I18n.t('%{count} replies', {count: announcement.discussion_subentry_count})}
       />
-    )
-    : null
+    ) : null
 
-  const sectionsToolTip = canHaveSections
-    ? (
-      <SectionsTooltip
-        totalUserCount={announcement.user_count}
-        sections={announcement.sections}
-      />
-    )
-    : null
+  const sectionsToolTip = canHaveSections ? (
+    <SectionsTooltip totalUserCount={announcement.user_count} sections={announcement.sections} />
+  ) : null
 
-  const replyButton = announcement.locked
-      ? null
-      : (
-        <Container display="block" margin="x-small 0 0">
-          <Text color="brand"><IconReply /> {I18n.t('Reply')}</Text>
-        </Container>
-      )
+  const replyButton = announcement.locked ? null : (
+    <Container display="block" margin="x-small 0 0">
+      <Text color="brand">
+        <IconReply /> {I18n.t('Reply')}
+      </Text>
+    </Container>
+  )
 
   const MenuList = [
     <MenuItem
       key="delete"
-      value={{ action: 'delete', id: announcement.id }}
+      value={{action: 'delete', id: announcement.id}}
       id="delete-announcement-menu-option"
     >
-      <span aria-hidden='true'>
+      <span aria-hidden="true">
         <IconTrash />&nbsp;&nbsp;{I18n.t('Delete')}
       </span>
-      <ScreenReaderContent>{I18n.t('Delete announcement %{title}', { title: announcement.title })}</ScreenReaderContent>
-    </MenuItem>,
+      <ScreenReaderContent>
+        {I18n.t('Delete announcement %{title}', {title: announcement.title})}
+      </ScreenReaderContent>
+    </MenuItem>
   ]
   if (!announcementsLocked) {
     MenuList.push(
       <MenuItem
         key="lock"
-        value={{ action: 'lock', id: announcement.id, lock: !announcement.locked }}
+        value={{action: 'lock', id: announcement.id, lock: !announcement.locked}}
         id="lock-announcement-menu-option"
       >
-        <span aria-hidden='true'>
-          <IconReply />&nbsp;&nbsp;{announcement.locked ? I18n.t('Allow Comments') : I18n.t('Disallow Comments')}
-        </span>
+        {announcement.locked ? (
+          <span aria-hidden="true">
+            <IconUnlock />&nbsp;&nbsp;{I18n.t('Allow Comments')}
+          </span>
+        ) : (
+          <span aria-hidden="true">
+            <IconLock />&nbsp;&nbsp;{I18n.t('Disallow Comments')}
+          </span>
+        )}
         <ScreenReaderContent>
-        { announcement.locked
-          ? I18n.t('Allow replies for %{title}', { title: announcement.title })
-          : I18n.t('Disallow replies for %{title}', { title: announcement.title })}
+          {announcement.locked
+            ? I18n.t('Allow replies for %{title}', {title: announcement.title})
+            : I18n.t('Disallow replies for %{title}', {title: announcement.title})}
         </ScreenReaderContent>
       </MenuItem>
     )
@@ -144,21 +157,25 @@ export default function AnnouncementRow (
           lockedText: I18n.t('%{title} is locked. Click to unlock', {title: announcement.title}),
           course_id: masterCourseData.masterCourse.id,
           content_id: announcement.id,
-          content_type: 'discussion_topic',
-        }),
+          content_type: 'discussion_topic'
+        })
       }}
       metaContent={
         <div>
           <span className="ic-item-row__meta-content-heading">
-            <Text size="small" as="p">{timestamp.title}</Text>
+            <Text size="small" as="p">
+              {timestamp.title}
+            </Text>
           </span>
-          <Text color="secondary" size="small" as="p">{$.datetimeString(timestamp.date, {format: 'medium'})}</Text>
+          <Text color="secondary" size="small" as="p">
+            {$.datetimeString(timestamp.date, {format: 'medium'})}
+          </Text>
         </div>
       }
       actionsContent={readCount}
       showManageMenu={canManage}
       onManageMenuSelect={onManageMenuSelect}
-      manageMenuOptions={canManage && MenuList || null}
+      manageMenuOptions={(canManage && MenuList) || null}
       hasReadBadge
     />
   )
@@ -172,15 +189,15 @@ AnnouncementRow.propTypes = {
   rowRef: func,
   onSelectedChanged: func,
   onManageMenuSelect: func,
-  announcementsLocked: bool,
+  announcementsLocked: bool
 }
 
 AnnouncementRow.defaultProps = {
   canManage: false,
   canHaveSections: false,
   masterCourseData: null,
-  rowRef () {},
-  onSelectedChanged () {},
-  onManageMenuSelect () {},
-  announcementsLocked: false,
+  rowRef() {},
+  onSelectedChanged() {},
+  onManageMenuSelect() {},
+  announcementsLocked: false
 }
