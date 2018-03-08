@@ -95,7 +95,7 @@ module InstFS
       }
     end
 
-    def direct_upload(host:, file_name:, file_object:)
+    def direct_upload(file_name:, file_object:)
       # example of a call to direct_upload:
       # > res = InstFS.direct_upload(
       # >   host: "canvas.docker",
@@ -103,13 +103,20 @@ module InstFS
       # >   file_object: File.open("public/images/a.png")
       # > )
 
-      token = direct_upload_jwt(host)
+      token = direct_upload_jwt
       url = "#{app_host}/files?token=#{token}"
 
       data = {}
       data[file_name] = file_object
 
-      CanvasHttp.post(url, form_data: data, multipart:true)
+      response = CanvasHttp.post(url, form_data: data, multipart:true)
+      if response.class == Net::HTTPCreated
+        json_response = JSON.parse(response.body)
+        return json_response["uuid"] if json_response.key?("uuid")
+
+        raise InstFS::DirectUploadError, "upload succeeded, but response did not containe a \"uuid\" key"
+      end
+      raise InstFS::DirectUploadError, "received code \"#{response.code}\" from service"
     end
 
     private
@@ -173,12 +180,12 @@ module InstFS
       Canvas::Security.create_jwt(claims, expires_in.from_now, self.jwt_secret)
     end
 
-    def direct_upload_jwt(host)
+    def direct_upload_jwt
       expires_in = Setting.get('instfs.upload_jwt.expiration_minutes', '10').to_i.minutes
       Canvas::Security.create_jwt({
         iat: Time.now.utc.to_i,
         user_id: nil,
-        host: host,
+        host: "canvas",
         resource: "/files",
       }, expires_in.from_now, self.jwt_secret)
     end
@@ -210,4 +217,6 @@ module InstFS
       }, expires_in.from_now, self.jwt_secret)
     end
   end
+
+  class DirectUploadError < StandardError; end
 end

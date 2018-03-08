@@ -301,14 +301,18 @@ describe InstFS do
 
   context "direct upload" do
     it "makes a network request to the inst-fs endpoint" do
-      allow(CanvasHttp).to receive(:post).and_return(Net::HTTPSuccess.new("foo", 200, "created"))
+      uuid = "1234-abcd"
+      allow(CanvasHttp).to receive(:post).and_return(double(
+        class: Net::HTTPCreated,
+        code: 200,
+        body: {uuid: uuid}.to_json
+      ))
 
       res = InstFS.direct_upload(
-        host: "canvas.docker",
         file_name: "a.png",
         file_object: File.open("public/images/a.png")
       )
-      expect(res).to be_instance_of(Net::HTTPSuccess)
+      expect(res).to eq(uuid)
     end
   end
 end
