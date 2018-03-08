@@ -25,13 +25,19 @@ Delayed::Backend::Base.class_eval do
   end
 end
 
-# use a module to avoid redefining this if it's already defined
+# if the method was defined by a previous module, use the existing
+# implementation, but provide a default otherwise
 module Delayed::Backend::DefaultJobAccount
   def account
-    Account.default
+    if defined?(super)
+      super
+    else
+      Account.default
+    end
   end
 end
-Delayed::Backend::Base.prepend(Delayed::Backend::DefaultJobAccount)
+Delayed::Backend::ActiveRecord::Job.include(Delayed::Backend::DefaultJobAccount)
+Delayed::Backend::Redis::Job.include(Delayed::Backend::DefaultJobAccount)
 
 Delayed::Settings.max_attempts              = 1
 Delayed::Settings.queue                     = "canvas_queue"
