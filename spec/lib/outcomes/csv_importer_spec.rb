@@ -23,9 +23,14 @@ describe Outcomes::CsvImporter do
     File.open(path, 'rb')
   end
 
-  def import_fake_csv(rows, &updates)
+  def import_fake_csv(rows, separator: ',', &updates)
+    no_errors = lambda do |status|
+      expect(status[:errors]).to eq([])
+    end
+
+    updates ||= no_errors
     Tempfile.open do |tf|
-      CSV.open(tf.path, 'wb') do |csv|
+      CSV.open(tf.path, 'wb', col_sep: separator) do |csv|
         rows.each { |r| csv << r }
       end
       tf.binmode
@@ -165,6 +170,12 @@ describe Outcomes::CsvImporter do
       expect(LearningOutcomeGroup.where(vendor_guid: guid).count).to eq(1)
     end
 
+    it 'can import a utf-8 csv file exported from excel' do
+      guid = 'søren'
+      expect_ok_import(csv_file('nor-excel'))
+      expect(LearningOutcomeGroup.where(vendor_guid: guid).count).to eq(1)
+    end
+
     it 'can import csv files with chinese characters' do
       guid = '作戰'
       expect_ok_import(csv_file('chn'))
@@ -180,6 +191,34 @@ describe Outcomes::CsvImporter do
       end
       expect(increments).to eq([0, 50, 100])
     end
+
+    it 'properly sets mastery_points' do
+      uuid = SecureRandom.uuid
+      import_fake_csv([
+        headers + ['mastery_points', 'ratings'],
+        outcome_row(vendor_guid: uuid) + ['3,14', '5.34', 'awesome', '1.2', 'adequate']
+      ])
+
+      outcome = LearningOutcome.find_by(vendor_guid: uuid)
+      expect(outcome.rubric_criterion[:mastery_points]).to eq(3.14)
+    end
+
+    it 'can import a file with i18n decimal numbers' do
+      uuid = SecureRandom.uuid
+      import_fake_csv([
+        headers + ['ratings'],
+        outcome_row(vendor_guid: uuid) + [' 0012,34.5678 ', 'gal nummer']
+      ]) { }
+
+      outcome = LearningOutcome.find_by(vendor_guid: uuid)
+      expect(outcome.rubric_criterion[:ratings][0][:points]).to eq(1234.5678)
+    end
+
+    it 'automatically detects column separator from header' do
+      rows = [headers] + (1..3).map { |ix| group_row(vendor_guid: ix) }.to_a
+      import_fake_csv(rows, separator: ';')
+      expect(LearningOutcomeGroup.count).to eq(4)
+    end
   end
 
   def expect_import_error(rows, expected)
@@ -191,6 +230,17 @@ describe Outcomes::CsvImporter do
   end
 
   describe 'throws user-friendly header errors' do
+    it 'when the csv file is totally malformed' do
+      rows = [headers] + (1..3).map { |ix| group_row(vendor_guid: ix) }.to_a
+      errors = []
+      import_fake_csv(rows, separator: ':(') do |status|
+        errors += status[:errors]
+      end
+      expect(errors).to eq([
+        [1, 'Invalid CSV File']
+      ])
+    end
+
     it 'when required headers are missing' do
       expect_import_error(
         [['parent_guids', 'ratings']],
@@ -231,7 +281,7 @@ describe Outcomes::CsvImporter do
           headers + ['ratings'],
           outcome_row + ['1', 'Sad Trombone', 'bwaaaaaa bwa bwaaaaa', 'Zesty Trombone']
         ],
-        [[2, 'Invalid points for rating tier 2: "bwaaaaaa bwa bwaaaaa"']]
+        [[2, 'Invalid value for rating tier 2 threshold: "bwaaaaaa bwa bwaaaaa"']]
       )
     end
 
@@ -241,7 +291,7 @@ describe Outcomes::CsvImporter do
           headers + ['ratings'],
           outcome_row + ['1', 'Sad Trombone', '2', 'Zesty Trombone']
         ],
-        [[2, 'Points for tier 2 must be less than points for prior tier (2 is greater than 1)']]
+        [[2, 'Points for tier 2 must be less than points for prior tier (2.0 is greater than 1.0)']]
       )
     end
 
