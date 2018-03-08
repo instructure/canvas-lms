@@ -37,6 +37,7 @@ module Outcomes
       display_name
       calculation_method
       calculation_int
+      mastery_points
       workflow_state
     ].freeze
 
@@ -55,6 +56,12 @@ module Outcomes
 
       begin
         parse_file(&update)
+      rescue CSV::MalformedCSVError
+        status = {
+          errors: [[1, I18n.t("Invalid CSV File")]],
+          progress: 100,
+        }
+        yield status
       rescue ParseError => e
         status = {
           errors: [[1, e.message]],
@@ -67,7 +74,8 @@ module Outcomes
     def parse_file
       headers = nil
       total = file_line_count
-      rows = CSV.new(@file).to_enum
+      separator = test_header_i18n
+      rows = CSV.new(@file, col_sep: separator).to_enum
       rows.with_index(1).each_slice(BATCH_SIZE) do |batch|
         headers ||= validate_headers(*batch.shift)
         errors = parse_batch(headers, batch)
@@ -84,7 +92,7 @@ module Outcomes
         results = batch.map do |row, line|
           begin
             utf8_row = row.map(&method(:check_encoding))
-            import_row(headers, utf8_row)
+            import_row(headers, utf8_row) unless utf8_row.all?(&:blank?)
             []
           rescue ParseError, InvalidDataError => e
             [[line, e.message]]
@@ -100,6 +108,14 @@ module Outcomes
     end
 
     private
+
+    def test_header_i18n
+      header = @file.readline
+      has_bom = header.start_with? "\xEF\xBB\xBF".force_encoding('ASCII-8BIT')
+      @file.rewind
+      @file.read(3) if has_bom
+      header.count(';') > header.count(',') ? ';' : ','
+    end
 
     def file_line_count
       count = @file.each.inject(0) { |c, _line| c + 1}
@@ -137,6 +153,9 @@ module Outcomes
 
       object = simple.to_h
       object[:ratings] = parse_ratings(ratings)
+      if object[:mastery_points].present?
+        object[:mastery_points] = strict_parse_float(object[:mastery_points], I18n.t('mastery points'))
+      end
       import_object(object)
     end
 
@@ -144,7 +163,7 @@ module Outcomes
       prior = nil
       drop_trailing_nils(ratings).each_slice(2).to_a.map.with_index(1) do |(points, description), index|
         raise InvalidDataError, I18n.t("Points for rating tier %{index} not present", index: index) if points.nil? || points.blank?
-        points = strict_parse_int(points, index)
+        points = strict_parse_float(points, I18n.t('rating tier %{index} threshold', index: index))
 
         if prior.present? && prior < points
           raise InvalidDataError, I18n.t(
@@ -158,10 +177,23 @@ module Outcomes
       end
     end
 
-    def strict_parse_int(v, index)
-      Integer(v)
+    def normalize_i18n(string)
+      raise ArgumentError if string.blank?
+      no_leading_zeros = string.strip.gsub(/^0*/, '')
+      number_parts = no_leading_zeros.split(/[,.]/)
+      last_number_part = number_parts.pop
+
+      if number_parts.empty?
+        last_number_part
+      else
+        [number_parts.join(), last_number_part].join('.')
+      end
+    end
+
+    def strict_parse_float(v, name)
+      Float(normalize_i18n(v))
     rescue ArgumentError
-      raise InvalidDataError, I18n.t('Invalid points for rating tier %{index}: "%{i}"', index: index, i: v)
+      raise InvalidDataError, I18n.t('Invalid value for %{name}: "%{i}"', name: name, i: v)
     end
 
     def drop_trailing_nils(array)
