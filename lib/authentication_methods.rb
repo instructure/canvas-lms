@@ -35,6 +35,9 @@ module AuthenticationMethods
   class AccessTokenError < Exception
   end
 
+  class AccessTokenScopeError < StandardError
+  end
+
   class LoggedOutError < Exception
   end
 
@@ -82,6 +85,22 @@ module AuthenticationMethods
     end
   end
 
+  def validate_scopes
+    if @access_token && @domain_root_account.feature_enabled?(:api_token_scoping)
+      developer_key = @access_token.developer_key
+      request_method = request.method.casecmp('HEAD') == 0 ? 'GET' : request.method.upcase
+
+      if developer_key.try(:require_scopes)
+        if @access_token.url_scopes_for_method(request_method).any? { |scope| scope =~ request.path }
+          params.delete :include
+          params.delete :includes
+        else
+          raise AccessTokenScopeError
+        end
+      end
+    end
+  end
+
   def load_pseudonym_from_access_token
     return unless api_request? ||
       (params[:controller] == 'oauth2_provider' && params[:action] == 'destroy') ||
@@ -104,6 +123,8 @@ module AuthenticationMethods
       unless @current_user && @current_pseudonym
         raise AccessTokenError
       end
+
+      validate_scopes
       @access_token.used!
 
       RequestContextGenerator.add_meta_header('at', @access_token.global_id)

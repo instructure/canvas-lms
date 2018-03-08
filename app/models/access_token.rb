@@ -45,8 +45,11 @@ class AccessToken < ActiveRecord::Base
   scope :not_deleted, -> { where(:workflow_state => "active") }
 
   TOKEN_SIZE = 64
-  OAUTH2_SCOPE_NAMESPACE = '/auth/'
-  ALLOWED_SCOPES = ["#{OAUTH2_SCOPE_NAMESPACE}userinfo"]
+  OAUTH2_SCOPE_NAMESPACE = '/auth/'.freeze
+  ALLOWED_SCOPES = [
+    "#{OAUTH2_SCOPE_NAMESPACE}userinfo",
+    *TokenScopes::SCOPES # this will need to change once we start capturing scopes on developer keys
+  ].freeze
 
   before_create :generate_token
   before_create :generate_refresh_token
@@ -203,7 +206,20 @@ class AccessToken < ActiveRecord::Base
     end
   end
 
-  #Scoped token convenience method
+  def url_scopes_for_method(method)
+    re = /^url:#{method}\|/
+    scopes.select { |scope| re =~ scope }.map do |scope|
+      path = scope.split('|').last
+      # build up the scope matching regexp from the route path
+      path = path.gsub(/:[^\/\)]+/, '[^/]+') # handle dynamic segments /courses/:course_id -> /courses/[^/]+
+      path = path.gsub(/\*[^\/\)]+/, '.+') # handle glob segments /files/*path -> /files/.+
+      path = path.gsub(/\(/, '(?:').gsub(/\)/, '|)') # handle optional segments /files(/[^/]+) -> /files(?:/[^/]+|)
+      path = "#{path}(?:\.[^/]+|)" # handle format segments /files(.:format) -> /files(\.[^/]+|)
+      Regexp.new("^#{path}$")
+    end
+  end
+
+  # Scoped token convenience method
   def scoped_to?(req_scopes)
     self.class.scopes_match?(scopes, req_scopes)
   end

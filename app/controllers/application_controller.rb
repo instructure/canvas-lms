@@ -1419,6 +1419,8 @@ class ApplicationController < ActionController::Base
     when AuthenticationMethods::AccessTokenError
       add_www_authenticate_header
       data = { errors: [{message: 'Invalid access token.'}] }
+    when AuthenticationMethods::AccessTokenScopeError
+      data = { errors: [{message: 'Insufficient scopes on access token.'}] }
     when ActionController::ParameterMissing
       data = { errors: [{message: "#{exception.param} is missing"}] }
     when BasicLTI::BasicOutcomes::Unauthorized,

@@ -663,6 +663,13 @@ END
       applies_to: 'Course',
       state: 'hidden',
       beta: true
+    },
+    'api_token_scoping' => {
+      display_name: -> { I18n.t('API Token Scoping')},
+      description: -> { I18n.t('If enabled, scopes will be validated on API requests if the developer key being used requires scopes.') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      development: true
     }
   )
 

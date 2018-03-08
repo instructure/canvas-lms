@@ -199,6 +199,44 @@ describe AccessToken do
     end
   end
 
+  context "url scopes" do
+    let(:token) do
+      token = AccessToken.new
+      token.scopes = %w{
+        blah/scope
+        url:GET|/api/v1/accounts
+        url:POST|/api/v1/courses
+        url:PUT|/api/v1/courses/:id
+        url:DELETE|/api/v1/courses/:course_id/assignments/:id
+      }
+      token
+    end
+
+    it "returns regexes that correspond to the http method" do
+      expect(token.url_scopes_for_method('GET')).to match_array [/^\/api\/v1\/accounts(?:.[^\/]+|)$/]
+    end
+
+    it "accounts for format segments" do
+      token = AccessToken.new(scopes: %w{url:GET|/blah})
+      expect(token.url_scopes_for_method('GET')).to match_array [/^\/blah(?:.[^\/]+|)$/]
+    end
+
+    it "accounts for glob segments" do
+      token = AccessToken.new(scopes: %w{url:GET|/*blah})
+      expect(token.url_scopes_for_method('GET')).to match_array [/^\/.+(?:.[^\/]+|)$/]
+    end
+
+    it "accounts for dynamic segments" do
+      token = AccessToken.new(scopes: %w{url:GET|/courses/:id})
+      expect(token.url_scopes_for_method('GET')).to match_array [/^\/courses\/[^\/]+(?:.[^\/]+|)$/]
+    end
+
+    it "accounts for optional segments" do
+      token = AccessToken.new(scopes: %w{url:GET|/courses(/:course_id)(/*blah)})
+      expect(token.url_scopes_for_method('GET')).to match_array [/^\/courses(?:\/[^\/]+|)(?:\/.+|)(?:.[^\/]+|)$/]
+    end
+  end
+
   describe "account scoped access" do
 
     before :once do
