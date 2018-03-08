@@ -21,7 +21,7 @@ require_relative 'pact_helper'
 describe 'Courses', :pact => true do
 
   subject(:coursesApi) {CoursesApiClient.new}
-  
+
   before do
     CoursesApiClient.base_uri 'localhost:1234'
   end
@@ -30,7 +30,7 @@ describe 'Courses', :pact => true do
     it 'should return JSON body' do
       canvas_api.given('a student in a course').
         upon_receiving('List Your Courses').
-        with(method: :get, 
+        with(method: :get,
           headers: {
             "Authorization" => Pact.term(
               generate: "Bearer token",
@@ -39,11 +39,11 @@ describe 'Courses', :pact => true do
             "Connection": "close",
             "Host": "localhost:1234",
             "Version": "HTTP/1.1"
-          }, 
-          path: '/api/v1/courses', 
+          },
+          path: '/api/v1/courses',
           query: '').
         will_respond_with(
-          status: 200, 
+          status: 200,
           body: Pact.each_like(
             "id":9,"name":"Course1A","account_id":3,
             "uuid":"9TzDqnM8dX56QI1YvlA2wKUHB4HtEZkV4i7VIJt0",
@@ -65,13 +65,13 @@ describe 'Courses', :pact => true do
 
       response = coursesApi.list_your_courses()
       expect(response[0]['id']).to eq 9
-      expect(response[0]['name']).to eq 'Course1A' 
+      expect(response[0]['name']).to eq 'Course1A'
     end
   end
 
   context 'List Students' do
     it 'should return JSON body' do
-      canvas_api.given('Canvas Test').
+      canvas_api.given('a student in a course').
         upon_receiving('List Students').
         with(
           method: :get, headers: {
@@ -83,7 +83,10 @@ describe 'Courses', :pact => true do
             "Host": "localhost:1234",
             "Version": "HTTP/1.1"
           },
-          path: '/api/v1/courses/1/students',
+          'path' => Pact.term(
+            generate: '/api/v1/courses/1/students',
+            matcher: /\/api\/v1\/courses\/[0-9]+\/students/
+          ),
           query: ''
         ).
         will_respond_with(
@@ -98,7 +101,7 @@ describe 'Courses', :pact => true do
 
       response = coursesApi.list_students(1)
       expect(response[0]['id']).to eq 3
-      expect(response[0]['name']).to eq 'student1' 
+      expect(response[0]['name']).to eq 'student1'
     end
   end
 end

@@ -28,7 +28,7 @@ describe 'Assignments', :pact => true do
 
   context 'List Assignments' do
     it 'should return JSON body' do
-      canvas_api.given('a student in a course').
+      canvas_api.given('a student in a course with an assignment').
         upon_receiving('List Assignments').
         with(method: :get,
           headers: {
@@ -40,8 +40,12 @@ describe 'Assignments', :pact => true do
             "Host": "localhost:1234",
             "Version": "HTTP/1.1"
           },
-          path: '/api/v1/courses/1/assignments',
-          query: '').
+          'path' => Pact.term(
+            generate: '/api/v1/courses/1/assignments',
+            matcher: /\/api\/v1\/courses\/[0-9]+\/assignments]/
+          ),
+          query: ''
+        ).
         will_respond_with(
           status: 200,
           body: Pact.each_like(
@@ -52,7 +56,7 @@ describe 'Assignments', :pact => true do
 
       response = assignmentsApi.list_assignments(1)
       expect(response[0]['id']).to eq 5
-      expect(response[0]['name']).to eq 'some assignment' 
+      expect(response[0]['name']).to eq 'some assignment'
     end
   end
 end

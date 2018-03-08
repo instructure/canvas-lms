@@ -26,7 +26,7 @@ class AssignmentsApiClient
   # TODO: modify these to use params
   def list_assignments(course_id, params={})
     JSON.parse(self.class.get("/api/v1/courses/#{course_id}/assignments").body)
-  rescue 
+  rescue
     nil
   end
 end
