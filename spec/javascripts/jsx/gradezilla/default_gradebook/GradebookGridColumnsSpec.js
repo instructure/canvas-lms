@@ -18,12 +18,12 @@
 
 import $ from 'jquery';
 import fakeENV from 'helpers/fakeENV';
+import DataLoader from 'jsx/gradezilla/DataLoader'
 import {
   createGradebook,
   setFixtureHtml
-} from '../../gradezilla/default_gradebook/GradebookSpecHelper';
-import SlickGridSpecHelper from '../../gradezilla/default_gradebook/slick-grid/SlickGridSpecHelper';
-import DataLoader from 'jsx/gradezilla/DataLoader';
+} from '../../gradezilla/default_gradebook/GradebookSpecHelper'
+import SlickGridSpecHelper from '../../gradezilla/default_gradebook/GradebookGrid/GridSupport/SlickGridSpecHelper'
 
 QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
   let $fixture;
