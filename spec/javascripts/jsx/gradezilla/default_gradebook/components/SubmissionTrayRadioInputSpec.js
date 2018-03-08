@@ -89,6 +89,11 @@ test('renders with the NumberInput disabled when disabled is true', function () 
   strictEqual(this.numberInput().props().disabled, true);
 });
 
+test('renders a radio option with a name of "SubmissionTrayRadioInput"', function () {
+  this.wrapper = this.mountComponent();
+  strictEqual(this.radioInput().node.name, 'SubmissionTrayRadioInput');
+});
+
 test('renders with the radio option enabled when disabled is false', function () {
   this.wrapper = this.mountComponent({ disabled: false });
   strictEqual(this.wrapper.find('RadioInput').props().disabled, false);
@@ -121,7 +126,7 @@ test('the text next to the NumberInput reads "Day(s)" if the late policy interva
   strictEqual(this.numberInputDescription(), 'Day(s)');
 });
 
-test('the text next to the NumberInput reads "Day(s)" if the late policy interval is "day"', function () {
+test('the text next to the NumberInput reads "Hour(s)" if the late policy interval is "day"', function () {
   this.wrapper = this.mountComponent({ value: 'late', checked: true, latePolicy: { lateSubmissionInterval: 'hour' } });
   strictEqual(this.numberInputDescription(), 'Hour(s)');
 });

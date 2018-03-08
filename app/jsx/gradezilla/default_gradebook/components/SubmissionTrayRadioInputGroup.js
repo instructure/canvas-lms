@@ -41,6 +41,15 @@ function isNumeric (input) {
 }
 
 export default class SubmissionTrayRadioInputGroup extends React.Component {
+  state = { pendingUpdateData: null }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.submissionUpdating && !nextProps.submissionUpdating && this.state.pendingUpdateData) {
+      this.props.updateSubmission(this.state.pendingUpdateData)
+      this.setState({ pendingUpdateData: null })
+    }
+  }
+
   handleNumberInputBlur = ({ target: { value } }) => {
     if (!isNumeric(value)) {
       return;
@@ -59,8 +68,8 @@ export default class SubmissionTrayRadioInputGroup extends React.Component {
 
   handleRadioInputChanged = ({ target: { value } }) => {
     const alreadyChecked = checkedValue(this.props.submission) === value;
-    if (alreadyChecked || this.props.submissionUpdating) {
-      return;
+    if (alreadyChecked && !this.props.submissionUpdating) {
+      return
     }
 
     const data = value === 'excused' ? { excuse: true } : { latePolicyStatus: value };
@@ -68,7 +77,11 @@ export default class SubmissionTrayRadioInputGroup extends React.Component {
       data.secondsLateOverride = 0;
     }
 
-    this.props.updateSubmission(data);
+    if (this.props.submissionUpdating) {
+      this.setState({ pendingUpdateData: data })
+    } else {
+      this.props.updateSubmission(data)
+    }
   }
 
   render () {

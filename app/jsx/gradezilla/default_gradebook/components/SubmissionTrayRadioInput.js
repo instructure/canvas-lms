@@ -58,7 +58,7 @@ export default function SubmissionTrayRadioInput (props) {
       <RadioInput
         checked={props.checked}
         disabled={props.disabled}
-        name={props.value}
+        name="SubmissionTrayRadioInput"
         label={props.text}
         onChange={props.onChange}
         value={props.value}
