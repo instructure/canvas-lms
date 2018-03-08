@@ -104,7 +104,7 @@ export default class GradeInput extends React.Component {
     onSubmissionUpdate: func,
     pendingGradeInfo: shape({
       excused: bool.isRequired,
-      grade: string.isRequired,
+      grade: string,
       valid: bool.isRequired
     }),
     submission: shape({

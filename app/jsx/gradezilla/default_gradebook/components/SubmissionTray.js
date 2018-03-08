@@ -100,7 +100,7 @@ export default class SubmissionTray extends React.Component {
     onRequestClose: func.isRequired,
     pendingGradeInfo: shape({
       excused: bool.isRequired,
-      grade: string.isRequired,
+      grade: string,
       valid: bool.isRequired
     }),
     student: shape({
