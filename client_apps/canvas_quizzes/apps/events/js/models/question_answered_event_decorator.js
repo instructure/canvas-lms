@@ -17,60 +17,60 @@
  */
 
 define(function(require) {
-  var _ = require('lodash');
-  var K = require('../constants');
-  var findWhere = _.findWhere;
-  var keys = Object.keys;
-  var QuestionAnsweredEventDecorator = {};
+  var _ = require('lodash')
+  var K = require('../constants')
+  var findWhere = _.findWhere
+  var keys = Object.keys
+  var QuestionAnsweredEventDecorator = {}
 
   QuestionAnsweredEventDecorator.decorateAnswerRecord = function(question, record) {
-    var answered = false;
-    var answer = record.answer;
-    var blank;
+    var answered = false
+    var answer = record.answer
+    var blank
 
-    switch(question.questionType) {
+    switch (question.questionType) {
       case K.Q_NUMERICAL:
       case K.Q_CALCULATED:
       case K.Q_MULTIPLE_CHOICE:
       case K.Q_SHORT_ANSWER:
       case K.Q_ESSAY:
-        answered = answer !== null;
-        break;
+        answered = answer !== null
+        break
 
       case K.Q_FILL_IN_MULTIPLE_BLANKS:
       case K.Q_MULTIPLE_DROPDOWNS:
         for (blank in answer) {
           if (answer.hasOwnProperty(blank)) {
-            answered = answer[blank] !== null;
+            answered = answer[blank] !== null
           }
 
           if (answered) {
-            break;
+            break
           }
         }
-        break;
+        break
 
       case K.Q_MATCHING:
         if (answer instanceof Array && answer.length > 0) {
           // watch out that at this point, the attributes are not normalized
           // and not camelCased:
           answered = answer.some(function(pair) {
-            return pair.match_id !== null;
-          });
+            return pair.match_id !== null
+          })
         }
 
-        break;
+        break
       case K.Q_MULTIPLE_ANSWERS:
       case K.Q_FILE_UPLOAD:
-        answered = answer instanceof Array && answer.length > 0;
-        break;
+        answered = answer instanceof Array && answer.length > 0
+        break
 
       default:
-        answered = answer !== null;
+        answered = answer !== null
     }
 
-    record.answered = answered;
-  };
+    record.answered = answered
+  }
 
   /**
    * Extend the raw event attributes as received from the API with some stuff
@@ -107,30 +107,30 @@ define(function(require) {
    *         attributes.
    */
   QuestionAnsweredEventDecorator.run = function(events, questions) {
-    var finalAnswerEvents = {};
+    var finalAnswerEvents = {}
 
     events.forEach(function(event) {
       event.attributes.data.forEach(function(record) {
         var question = questions.filter(function(question) {
-          return question.id === record.quizQuestionId;
-        })[0];
+          return question.id === record.quizQuestionId
+        })[0]
 
-        finalAnswerEvents[question.id] = event;
+        finalAnswerEvents[question.id] = event
 
-        QuestionAnsweredEventDecorator.decorateAnswerRecord(question, record);
-      });
-    });
+        QuestionAnsweredEventDecorator.decorateAnswerRecord(question, record)
+      })
+    })
 
     keys(finalAnswerEvents).forEach(function(quizQuestionId) {
-      var event = finalAnswerEvents[quizQuestionId];
+      var event = finalAnswerEvents[quizQuestionId]
 
       findWhere(event.attributes.data, {
         quizQuestionId: quizQuestionId
-      }).last = true;
-    });
+      }).last = true
+    })
 
-    finalAnswerEvents = null;
-  };
+    finalAnswerEvents = null
+  }
 
-  return QuestionAnsweredEventDecorator;
-});
+  return QuestionAnsweredEventDecorator
+})

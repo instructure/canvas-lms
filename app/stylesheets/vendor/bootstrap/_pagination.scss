@@ -15,7 +15,7 @@
   margin-bottom: 0;
   // Visuals
   @include border-radius($baseBorderRadius);
-  @include box-shadow(0 1px 2px rgba(0,0,0,.05));
+  @include box-shadow(0 1px 2px rgba(0,0,0,0.05));
 }
 .pagination ul > li {
   display: inline; // Remove list-style and block-level defaults
@@ -57,7 +57,6 @@
   @include border-right-radius($baseBorderRadius);
 }
 
-
 // Alignment
 // --------------------------------------------------
 
@@ -67,7 +66,6 @@
 .pagination-right {
   text-align: right;
 }
-
 
 // Sizing
 // --------------------------------------------------

@@ -64,7 +64,8 @@ let assignmentSettingsView = false
 let assignmentSyncSettingsView = false
 let createGroupView = false
 let showByView = false
-const indexEl = window.location.href.indexOf('assignments') === -1 ? '#course_home_content' : '#content'
+const indexEl =
+  window.location.href.indexOf('assignments') === -1 ? '#course_home_content' : '#content'
 
 if (ENV.PERMISSIONS.manage_assignments) {
   assignmentSettingsView = new AssignmentSettingsView({
@@ -106,11 +107,10 @@ const app = new IndexView({
 app.render()
 
 // kick it all off
-Promise.all([
-  courseFetch,
-  assignmentGroups.fetch({reset: true})
-]).then(() => {
-  if (ENV.HAS_GRADING_PERIODS) { app.filterResults() }
+Promise.all([courseFetch, assignmentGroups.fetch({reset: true})]).then(() => {
+  if (ENV.HAS_GRADING_PERIODS) {
+    app.filterResults()
+  }
   if (ENV.PERMISSIONS.manage) {
     assignmentGroups.loadModuleNames()
   } else {

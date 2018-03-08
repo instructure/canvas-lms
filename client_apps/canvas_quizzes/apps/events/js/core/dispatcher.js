@@ -17,9 +17,9 @@
  */
 
 define(function(require) {
-  var CoreDispatcher = require('canvas_quizzes/core/dispatcher');
-  var config = require("../config");
+  var CoreDispatcher = require('canvas_quizzes/core/dispatcher')
+  var config = require('../config')
 
-  singleton = new CoreDispatcher(config);
-  return singleton;
-});
+  singleton = new CoreDispatcher(config)
+  return singleton
+})

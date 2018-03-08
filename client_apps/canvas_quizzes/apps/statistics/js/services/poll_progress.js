@@ -17,53 +17,56 @@
  */
 
 define(function(require) {
-  var RSVP = require('rsvp');
-  var $ = require('jquery');
-  var CoreAdapter = require('canvas_quizzes/core/adapter');
-  var K = require('../constants');
-  var config = require('../config');
-  var Adapter = new CoreAdapter(config);
-  var pickAndNormalize = require('canvas_quizzes/models/common/pick_and_normalize');;
+  var RSVP = require('rsvp')
+  var $ = require('jquery')
+  var CoreAdapter = require('canvas_quizzes/core/adapter')
+  var K = require('../constants')
+  var config = require('../config')
+  var Adapter = new CoreAdapter(config)
+  var pickAndNormalize = require('canvas_quizzes/models/common/pick_and_normalize')
 
   var fetchProgress = function(url) {
     return Adapter.request({
       type: 'GET',
-      url: url,
+      url: url
     }).then(function(payload) {
-      return pickAndNormalize(payload, K.PROGRESS_ATTRS);
-    });
-  };
+      return pickAndNormalize(payload, K.PROGRESS_ATTRS)
+    })
+  }
 
   return function pollProgress(url, options) {
-    var poll, poller;
-    var service = RSVP.defer();
+    var poll, poller
+    var service = RSVP.defer()
 
-    options = options || {};
+    options = options || {}
 
     $(window).on('beforeunload.progress', function() {
-      return clearTimeout(poller);
-    });
+      return clearTimeout(poller)
+    })
 
     poll = function() {
-      fetchProgress(url).then(function(data) {
-        if (options.onTick) {
-          options.onTick(data.completion, data);
+      fetchProgress(url).then(
+        function(data) {
+          if (options.onTick) {
+            options.onTick(data.completion, data)
+          }
+
+          if (data.workflowState === K.PROGRESS_FAILED) {
+            service.reject()
+          } else if (data.workflowState === K.PROGRESS_COMPLETE) {
+            service.resolve()
+          } else {
+            poller = setTimeout(poll, options.interval || config.pollingFrequency)
+          }
+        },
+        function() {
+          service.reject()
         }
+      )
+    }
 
-        if (data.workflowState === K.PROGRESS_FAILED) {
-          service.reject();
-        } else if (data.workflowState === K.PROGRESS_COMPLETE) {
-          service.resolve();
-        } else {
-          poller = setTimeout(poll, options.interval || config.pollingFrequency);
-        }
-      }, function() {
-        service.reject();
-      });
-    };
+    poll()
 
-    poll();
-
-    return service.promise;
-  };
-});
+    return service.promise
+  }
+})

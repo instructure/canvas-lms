@@ -16,22 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery';
+import $ from 'jquery'
 
 export default class JQuerySelectorCache {
-  constructor () {
-    this.cache = {};
+  constructor() {
+    this.cache = {}
   }
 
-  get (selector) {
+  get(selector) {
     if (this.cache[selector] === undefined) {
-      this.set(selector);
+      this.set(selector)
     }
 
-    return this.cache[selector];
+    return this.cache[selector]
   }
 
-  set (selector) {
-    this.cache[selector] = $(selector);
+  set(selector) {
+    this.cache[selector] = $(selector)
   }
 }

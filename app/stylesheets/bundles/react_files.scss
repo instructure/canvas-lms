@@ -16,22 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "components/_MimeClassIcons.scss";
-@import "components/ProgressBar";
+@import 'base/environment';
+@import 'components/_MimeClassIcons.scss';
+@import 'components/ProgressBar';
 
-
-@import "pages/react_files/react_files";
+@import 'pages/react_files/react_files';
 
 // Styles for specific React Components
-@import "pages/react_files/FilePreview";
-@import "pages/react_files/RestrictedDialogForm";
-@import "pages/react_files/RestrictedRadioButtons";
-@import "pages/react_files/UploadDropZone";
-@import "pages/react_files/MoveDialog";
-@import "pages/react_files/FolderTree";
-@import "pages/react_files/UsageRightsIndicator";
-@import "pages/react_files/UsageRightsDialog";
-@import "pages/react_files/UsageRightsSelectBox";
-@import "pages/react_files/DialogPreview";
-@import "pages/react_files/Toolbar";
+@import 'pages/react_files/FilePreview';
+@import 'pages/react_files/RestrictedDialogForm';
+@import 'pages/react_files/RestrictedRadioButtons';
+@import 'pages/react_files/UploadDropZone';
+@import 'pages/react_files/MoveDialog';
+@import 'pages/react_files/FolderTree';
+@import 'pages/react_files/UsageRightsIndicator';
+@import 'pages/react_files/UsageRightsDialog';
+@import 'pages/react_files/UsageRightsSelectBox';
+@import 'pages/react_files/DialogPreview';
+@import 'pages/react_files/Toolbar';

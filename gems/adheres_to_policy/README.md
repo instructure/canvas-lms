@@ -1,21 +1,19 @@
-AdheresToPolicy
-===============
+# AdheresToPolicy
 
 This allows us to do something like:
 
 class Account < ActiveRecord::Base
-  set_policy do
-    given { |u| self.user == u }
-    can :read and can :write
-  end
+set_policy do
+given { |u| self.user == u }
+can :read and can :write
+end
 end
 
 u = User.first
 a = Account.first
 a.check_policy(u)
 
-License
-=======
+# License
 
 Copyright (C) 2014 - present Instructure, Inc.
 

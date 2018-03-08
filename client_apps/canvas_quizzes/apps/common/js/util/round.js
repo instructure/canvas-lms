@@ -35,19 +35,19 @@ define([], function() {
    *         The rounded number, ready for human-consumption.
    */
   return function round(n, digits) {
-    var scale;
+    var scale
 
     if (digits === undefined) {
-      digits = 0;
+      digits = 0
     }
 
     if (typeof n !== 'number' || !(n instanceof Number)) {
-      n = parseFloat(n);
+      n = parseFloat(n)
     }
 
-    scale = Math.pow(10, parseInt(digits, 10));
-    n = Math.round(n * scale) / scale;
+    scale = Math.pow(10, parseInt(digits, 10))
+    n = Math.round(n * scale) / scale
 
-    return n;
-  };
-});
+    return n
+  }
+})

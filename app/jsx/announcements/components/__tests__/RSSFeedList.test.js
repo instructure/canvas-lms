@@ -18,7 +18,7 @@
 
 import '@instructure/ui-themes/lib/canvas'
 import React from 'react'
-import { mount } from 'enzyme'
+import {mount} from 'enzyme'
 import RSSFeedList from '../RSSFeedList'
 
 const defaultProps = () => ({
@@ -58,7 +58,7 @@ const defaultFeeds = () => [
     id: '55',
     external_feed_entries_count: 5,
     url: 'donotcare.com'
-  },
+  }
 ]
 
 test('renders the RSSFeedList component', () => {
@@ -129,5 +129,5 @@ test('calls deleteExternalFeed with correct feed ID when deleting feed', () => {
   const instance = tree.instance()
   instance.deleteExternalFeed('22')
   expect(props.deleteExternalFeed.mock.calls).toHaveLength(1)
-  expect(props.deleteExternalFeed.mock.calls[0][0]).toEqual({ feedId: '22'})
+  expect(props.deleteExternalFeed.mock.calls[0][0]).toEqual({feedId: '22'})
 })

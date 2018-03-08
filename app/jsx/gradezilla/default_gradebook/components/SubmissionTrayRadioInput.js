@@ -16,42 +16,41 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { func, number, shape, string, bool } from 'prop-types';
-import I18n from 'i18n!gradebook';
-import Container from '@instructure/ui-core/lib/components/Container';
-import NumberInput from '@instructure/ui-core/lib/components/NumberInput';
-import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent';
-import Text from '@instructure/ui-core/lib/components/Text';
-import RadioInput from '@instructure/ui-core/lib/components/RadioInput';
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
-import classnames from 'classnames';
-import round from 'coffeescripts/util/round';
+import React from 'react'
+import {func, number, shape, string, bool} from 'prop-types'
+import I18n from 'i18n!gradebook'
+import Container from '@instructure/ui-core/lib/components/Container'
+import NumberInput from '@instructure/ui-core/lib/components/NumberInput'
+import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent'
+import Text from '@instructure/ui-core/lib/components/Text'
+import RadioInput from '@instructure/ui-core/lib/components/RadioInput'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import classnames from 'classnames'
+import round from 'coffeescripts/util/round'
 
-function defaultDurationLate (interval, secondsLate) {
-  let durationLate = secondsLate / 3600;
+function defaultDurationLate(interval, secondsLate) {
+  let durationLate = secondsLate / 3600
 
   if (interval === 'day') {
-    durationLate /= 24;
+    durationLate /= 24
   }
 
-  return round(durationLate, 2).toString();
+  return round(durationLate, 2).toString()
 }
 
-export default function SubmissionTrayRadioInput (props) {
-  const showNumberInput = props.value === 'late' && props.checked;
-  const interval = props.latePolicy.lateSubmissionInterval;
-  const numberInputLabel = interval === 'day' ? I18n.t('Days late') : I18n.t('Hours late');
-  const numberInputText = interval === 'day' ? I18n.t('Day(s)') : I18n.t('Hour(s)');
+export default function SubmissionTrayRadioInput(props) {
+  const showNumberInput = props.value === 'late' && props.checked
+  const interval = props.latePolicy.lateSubmissionInterval
+  const numberInputLabel = interval === 'day' ? I18n.t('Days late') : I18n.t('Hours late')
+  const numberInputText = interval === 'day' ? I18n.t('Day(s)') : I18n.t('Hour(s)')
   const styles = {
     backgroundColor: props.color,
     height: showNumberInput ? '5rem' : '2rem'
-  };
+  }
 
-  const radioInputClasses = classnames(
-    'SubmissionTray__RadioInput',
-    { 'SubmissionTray__RadioInput-WithBackground': props.color !== 'transparent' }
-  );
+  const radioInputClasses = classnames('SubmissionTray__RadioInput', {
+    'SubmissionTray__RadioInput-WithBackground': props.color !== 'transparent'
+  })
 
   return (
     <div className={radioInputClasses} style={styles}>
@@ -64,30 +63,29 @@ export default function SubmissionTrayRadioInput (props) {
         value={props.value}
       />
 
-      {
-        showNumberInput &&
-          <span className="NumberInput__Container NumberInput__Container-LeftIndent">
-            <NumberInput
-              defaultValue={defaultDurationLate(interval, props.submission.secondsLate)}
-              disabled={props.disabled}
-              inline
-              label={<ScreenReaderContent>{numberInputLabel}</ScreenReaderContent>}
-              locale={props.locale}
-              min="0"
-              onBlur={props.onNumberInputBlur}
-              showArrows={false}
-              width="5rem"
-            />
+      {showNumberInput && (
+        <span className="NumberInput__Container NumberInput__Container-LeftIndent">
+          <NumberInput
+            defaultValue={defaultDurationLate(interval, props.submission.secondsLate)}
+            disabled={props.disabled}
+            inline
+            label={<ScreenReaderContent>{numberInputLabel}</ScreenReaderContent>}
+            locale={props.locale}
+            min="0"
+            onBlur={props.onNumberInputBlur}
+            showArrows={false}
+            width="5rem"
+          />
 
-            <PresentationContent>
-              <Container as="div" margin="0 small">
-                <Text>{numberInputText}</Text>
-              </Container>
-            </PresentationContent>
-          </span>
-      }
+          <PresentationContent>
+            <Container as="div" margin="0 small">
+              <Text>{numberInputText}</Text>
+            </Container>
+          </PresentationContent>
+        </span>
+      )}
     </div>
-  );
+  )
 }
 
 SubmissionTrayRadioInput.propTypes = {
@@ -105,8 +103,8 @@ SubmissionTrayRadioInput.propTypes = {
   }).isRequired,
   text: string.isRequired,
   value: string.isRequired
-};
+}
 
 SubmissionTrayRadioInput.defaultProps = {
   color: 'transparent'
-};
+}

@@ -17,11 +17,11 @@
  */
 
 define(function(require) {
-  var $ = require('jquery');
+  var $ = require('jquery')
 
   // We're already logging errors in config/initializers/rsvp.js
-  if(typeof(jasmine) !== "undefined" && typeof(jasmine !== undefined)){
-    jasmine.RSVP.logRSVPErrors = false;
+  if (typeof jasmine !== 'undefined' && typeof (jasmine !== undefined)) {
+    jasmine.RSVP.logRSVPErrors = false
   }
 
   return {
@@ -32,7 +32,7 @@ define(function(require) {
     },
 
     onError: function(message) {
-      throw new Error(message);
+      throw new Error(message)
     }
-  };
-});
+  }
+})

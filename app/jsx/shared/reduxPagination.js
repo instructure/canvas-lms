@@ -16,37 +16,40 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { combineReducers } from 'redux'
-import { handleActions } from 'redux-actions'
+import {combineReducers} from 'redux'
+import {handleActions} from 'redux-actions'
 import parseLinkHeader from './helpers/parseLinkHeader'
 
 const DEFAULT_PAGE = 1
 
 // enum-like helper for load states
-export const LoadStates = (function initLoadStates () {
+export const LoadStates = (function initLoadStates() {
   const statesList = ['NOT_LOADED', 'LOADING', 'LOADED', 'ERRORED']
-  const states = statesList.reduce((map, state) =>
-    Object.assign(map, {
-      [state]: state,
-    }), {})
+  const states = statesList.reduce(
+    (map, state) =>
+      Object.assign(map, {
+        [state]: state
+      }),
+    {}
+  )
 
   return {
     ...states,
     statesList,
     isLoading: state => state === states.LOADING,
     hasLoaded: state => state === states.LOADED,
-    isNotLoaded: state => state === states.NOT_LOADED,
+    isNotLoaded: state => state === states.NOT_LOADED
   }
-}())
+})()
 
-function createActionTypes (name) {
+function createActionTypes(name) {
   const upperName = name.toUpperCase()
   return {
     select: `SELECT_${upperName}_PAGE`,
     start: `GET_${upperName}_START`,
     success: `GET_${upperName}_SUCCESS`,
     fail: `GET_${upperName}_FAIL`,
-    clear: `CLEAR_${upperName}_PAGE`,
+    clear: `CLEAR_${upperName}_PAGE`
   }
 }
 
@@ -56,18 +59,24 @@ function createActionTypes (name) {
  *
  * @param {object} actions object returned by createActionTypes
  */
- function createReducePage (actions) {
+function createReducePage(actions) {
   return combineReducers({
-    loadState: handleActions({
-      [actions.start]: () => LoadStates.LOADING,
-      [actions.success]: () => LoadStates.LOADED,
-      [actions.fail]: () => LoadStates.ERRORED,
-      [actions.clear]: () => LoadStates.NOT_LOADED,
-    }, LoadStates.NOT_LOADED),
-    items: handleActions({
-      [actions.success]: (state, action) => action.payload.data,
-      [actions.clear]: () => [],
-    }, []),
+    loadState: handleActions(
+      {
+        [actions.start]: () => LoadStates.LOADING,
+        [actions.success]: () => LoadStates.LOADED,
+        [actions.fail]: () => LoadStates.ERRORED,
+        [actions.clear]: () => LoadStates.NOT_LOADED
+      },
+      LoadStates.NOT_LOADED
+    ),
+    items: handleActions(
+      {
+        [actions.success]: (state, action) => action.payload.data,
+        [actions.clear]: () => []
+      },
+      []
+    )
   })
 }
 
@@ -76,20 +85,20 @@ function createActionTypes (name) {
  *
  * @param {object} actions object returned by createActionTypes
  */
-function createPagesReducer (actions) {
-  return function reducePages (state = {}, action) {
+function createPagesReducer(actions) {
+  return function reducePages(state = {}, action) {
     const page = action.payload ? action.payload.page : null
     const pages = action.payload ? action.payload.pages : null
     if (page) {
       const pageState = state[page]
       return Object.assign({}, state, {
-        [page]: createReducePage(actions)(pageState, action),
+        [page]: createReducePage(actions)(pageState, action)
       })
     } else if (pages) {
       return pages.reduce((newState, curPage) => {
         const pageState = state[curPage]
         return Object.assign(newState, {
-          [curPage]: createReducePage(actions)(pageState, action),
+          [curPage]: createReducePage(actions)(pageState, action)
         })
       }, Object.assign({}, state))
     } else {
@@ -118,20 +127,26 @@ function createPagesReducer (actions) {
  *  items: createPaginatedReducer('items'),
  * })
  */
-export function createPaginatedReducer (name) {
+export function createPaginatedReducer(name) {
   const actions = createActionTypes(name)
   return combineReducers({
-    currentPage: handleActions({
-      [actions.select]: (state, action) => action.payload.page,
-    }, DEFAULT_PAGE),
-    lastPage: handleActions({
-      [actions.success]: (state, action) => action.payload.lastPage || state,
-    }, DEFAULT_PAGE),
-    pages: createPagesReducer(actions),
+    currentPage: handleActions(
+      {
+        [actions.select]: (state, action) => action.payload.page
+      },
+      DEFAULT_PAGE
+    ),
+    lastPage: handleActions(
+      {
+        [actions.success]: (state, action) => action.payload.lastPage || state
+      },
+      DEFAULT_PAGE
+    ),
+    pages: createPagesReducer(actions)
   })
 }
 
-function wrapGetPageThunk (actions, name, thunk) {
+function wrapGetPageThunk(actions, name, thunk) {
   /**
    * payload params:
    * @param {integer} page page to select/fetch
@@ -140,36 +155,36 @@ function wrapGetPageThunk (actions, name, thunk) {
    */
   return (payload = {}) => (dispatch, getState) => {
     if (payload.select) {
-      dispatch({ type: actions.select, payload: { page: payload.page } })
+      dispatch({type: actions.select, payload: {page: payload.page}})
     }
 
     const state = getState()
-    const page =  payload.page || state[name].currentPage
+    const page = payload.page || state[name].currentPage
     const pageData = state[name].pages[page] || {}
 
     // only fetch page data is it has not been loaded or we are force getting it
     if (!LoadStates.hasLoaded(pageData.loadState) || payload.forceGet) {
-      dispatch({ type: actions.start, payload: { page }})
+      dispatch({type: actions.start, payload: {page}})
 
-      new Promise(thunk(dispatch, getState, { page }))
-      .then(res => {
-        const successPayload = { page, data: res.data }
+      new Promise(thunk(dispatch, getState, {page}))
+        .then(res => {
+          const successPayload = {page, data: res.data}
 
-        // sometimes the canvas API provides us with link header that gives
-        // us the URL to the last page. we can try parse that URL to determine
-        // how many pages there are in total
-        // works only with axios res objects, aka assumes thunk is axios promise
-        const links = parseLinkHeader(res)
-        if (links.last) {
-          try {
-            successPayload.lastPage = Number(/&page=([0-9]+)&/.exec(links.last)[1])
-          } catch (e) {} // eslint-disable-line
-        }
-        dispatch({ type: actions.success, payload: successPayload })
-      })
-      .catch(err => {
-        dispatch({ type: actions.fail, payload: { page, ...err } })
-      })
+          // sometimes the canvas API provides us with link header that gives
+          // us the URL to the last page. we can try parse that URL to determine
+          // how many pages there are in total
+          // works only with axios res objects, aka assumes thunk is axios promise
+          const links = parseLinkHeader(res)
+          if (links.last) {
+            try {
+              successPayload.lastPage = Number(/&page=([0-9]+)&/.exec(links.last)[1])
+            } catch (e) {} // eslint-disable-line
+          }
+          dispatch({type: actions.success, payload: successPayload})
+        })
+        .catch(err => {
+          dispatch({type: actions.fail, payload: {page, ...err}})
+        })
     }
   }
 }
@@ -209,14 +224,14 @@ function wrapGetPageThunk (actions, name, thunk) {
  * // calls fetchItems but dispatches START/SUCCESS/FAIL to store for the page
  * itemActions.actionCreators.getItems({ page: 3 })
  */
-export function createPaginationActions (name, thunk) {
+export function createPaginationActions(name, thunk) {
   const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1)
   const actionTypes = createActionTypes(name)
   return {
     actionTypes: Object.keys(actionTypes).map(key => actionTypes[key]),
     actionCreators: {
-      [`get${capitalizedName}`]: wrapGetPageThunk(actionTypes, name, thunk),
-    },
+      [`get${capitalizedName}`]: wrapGetPageThunk(actionTypes, name, thunk)
+    }
   }
 }
 
@@ -227,7 +242,7 @@ export function createPaginationActions (name, thunk) {
  * @param {obj} state redux store state to look into
  * @param {string} name key into state for paginated data
  */
-export function selectPaginationState (state, name) {
+export function selectPaginationState(state, name) {
   const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1)
   const itemsState = state[name]
   const page = itemsState.pages[itemsState.currentPage] || {}
@@ -236,6 +251,6 @@ export function selectPaginationState (state, name) {
     [`${name}Page`]: itemsState.currentPage,
     [`${name}LastPage`]: itemsState.lastPage,
     [`isLoading${capitalizedName}`]: LoadStates.isLoading(page.loadState),
-    [`hasLoaded${capitalizedName}`]: LoadStates.hasLoaded(page.loadState),
+    [`hasLoaded${capitalizedName}`]: LoadStates.hasLoaded(page.loadState)
   }
 }

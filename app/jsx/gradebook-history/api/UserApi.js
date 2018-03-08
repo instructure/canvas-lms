@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from 'axios';
+import axios from 'axios'
 
 const userMetaTypes = {
   graders: ['teacher', 'ta'],
   students: ['student', 'student_view']
-};
+}
 
-function getUsersByName (courseId, userType, searchTerm) {
+function getUsersByName(courseId, userType, searchTerm) {
   if (searchTerm.length < 3) {
     // the endpoint doesn't allow searching by 2 letters or less
-    return Promise.resolve({ response: {data: []} });
+    return Promise.resolve({response: {data: []}})
   }
 
   const params = {
@@ -35,13 +35,13 @@ function getUsersByName (courseId, userType, searchTerm) {
       enrollment_type: userMetaTypes[userType]
     }
   }
-  const url = encodeURI(`/api/v1/courses/${courseId}/users`);
+  const url = encodeURI(`/api/v1/courses/${courseId}/users`)
 
-  return axios.get(url, params);
+  return axios.get(url, params)
 }
 
-function getUsersNextPage (url) {
-  return axios.get(encodeURI(url));
+function getUsersNextPage(url) {
+  return axios.get(encodeURI(url))
 }
 
 export default {

@@ -17,56 +17,61 @@
  */
 
 define(function(require) {
-  var _ = require('lodash');
-  var extend = _.extend;
+  var _ = require('lodash')
+  var extend = _.extend
 
   var Store = function(key, proto, Dispatcher) {
-    var emitChange = this.emitChange.bind(this);
+    var emitChange = this.emitChange.bind(this)
 
-    extend(this, proto || {});
+    extend(this, proto || {})
 
-    this._key = key;
-    this.__reset__();
+    this._key = key
+    this.__reset__()
 
-    Object.keys(this.actions).forEach(function(action) {
-      var handler = this.actions[action].bind(this);
-      var scopedAction = [ key, action ].join(':');
+    Object.keys(this.actions).forEach(
+      function(action) {
+        var handler = this.actions[action].bind(this)
+        var scopedAction = [key, action].join(':')
 
-      // console.debug('Store action:', scopedAction);
+        // console.debug('Store action:', scopedAction);
 
-      Dispatcher.register(scopedAction, function(params, resolve, reject) {
-        try {
-          handler(params, function onChange(rc) {
-            resolve(rc);
-            emitChange();
-          }, reject);
-        } catch(e) {
-          reject(e);
-        }
-      });
+        Dispatcher.register(scopedAction, function(params, resolve, reject) {
+          try {
+            handler(
+              params,
+              function onChange(rc) {
+                resolve(rc)
+                emitChange()
+              },
+              reject
+            )
+          } catch (e) {
+            reject(e)
+          }
+        })
+      }.bind(this)
+    )
 
-    }.bind(this));
-
-    return this;
-  };
+    return this
+  }
 
   extend(Store.prototype, {
     actions: {},
     addChangeListener: function(callback) {
-      this._callbacks.push(callback);
+      this._callbacks.push(callback)
     },
 
     removeChangeListener: function(callback) {
-      var index = this._callbacks.indexOf(callback);
+      var index = this._callbacks.indexOf(callback)
       if (index > -1) {
-        this._callbacks.splice(index, 1);
+        this._callbacks.splice(index, 1)
       }
     },
 
     emitChange: function() {
       this._callbacks.forEach(function(callback) {
-        callback();
-      });
+        callback()
+      })
     },
 
     /**
@@ -79,19 +84,19 @@ define(function(require) {
      * Store, but in tests we do.
      */
     __reset__: function() {
-      this._callbacks = [];
-      this.state = this.getInitialState();
+      this._callbacks = []
+      this.state = this.getInitialState()
     },
 
     getInitialState: function() {
-      return {};
+      return {}
     },
 
     setState: function(newState) {
-      extend(this.state, newState);
-      this.emitChange();
+      extend(this.state, newState)
+      this.emitChange()
     }
-  });
+  })
 
-  return Store;
-});
+  return Store
+})

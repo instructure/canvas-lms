@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "pages/shared/move_dialog";
+@import 'base/environment';
+@import 'pages/shared/move_dialog';
 
 $announcements_disscussion-summary-color: $ic-font-color-dark;
 
@@ -40,25 +40,32 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
       &:nth-child(odd) {
         background-color: $lightBackground;
         body.ff & {
-          .ellipsis::after { @include firefox-white-space-bug-fix-gradient($lightBackground); }
+          .ellipsis::after {
+            @include firefox-white-space-bug-fix-gradient($lightBackground);
+          }
         }
       }
     }
-    &.unread .discussion-title{ font-weight: bold; }
+    &.unread .discussion-title {
+      font-weight: bold;
+    }
     &.selected {
       background-color: $ic-bg-light-primary;
     }
   }
   .discussion-summary {
     max-width: 740px;
-    @media screen and (max-width: 1100px) { max-width: 520px; }
+    @media screen and (max-width: 1100px) {
+      max-width: 520px;
+    }
   }
 
   .discussion-actions-container {
     float: right;
     margin-top: -50px;
   }
-  .discussion-unread-container, .discussion-last-reply {
+  .discussion-unread-container,
+  .discussion-last-reply {
     display: inline-block;
     padding: $ic-sp 10px 0;
     // 'not-important' styles
@@ -72,9 +79,16 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
       padding: 0 $ic-sp/2;
     }
   }
-  .discussion-unread-container { width: 56px; }
-  .discussion-author { @include fontSize(12px); }
-  .discussion-summary { @include fontSize(12px); color: $announcements_disscussion-summary-color; }
+  .discussion-unread-container {
+    width: 56px;
+  }
+  .discussion-author {
+    @include fontSize(12px);
+  }
+  .discussion-summary {
+    @include fontSize(12px);
+    color: $announcements_disscussion-summary-color;
+  }
   .discussion-title {
     @include fontSize(14px);
     line-height: $ic-label-line-height;
@@ -90,7 +104,9 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
   label.discussion-column {
     margin: 0;
   }
-  .toggleSelected { margin: 0 8px 0 0; }
+  .toggleSelected {
+    margin: 0 8px 0 0;
+  }
 }
 
 .discussion-drag-handle {
@@ -104,9 +120,15 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
   float: left;
   cursor: ns-resize;
   opacity: 0;
-  .touch &, .discussion-topic:hover & { opacity: 0.5; }
-  .ui-sortable & { display: block; }
-  &:hover, &:focus {
+  .touch &,
+  .discussion-topic:hover & {
+    opacity: 0.5;
+  }
+  .ui-sortable & {
+    display: block;
+  }
+  &:hover,
+  &:focus {
     opacity: 1 !important;
   }
 }
@@ -123,13 +145,19 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
   margin-bottom: 16px;
   padding: 8px 0;
 
-  h1,h2,h3,h4,h5,h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @include fontSize(16px);
     font-weight: bold;
     line-height: 20px;
     margin: 0 0 8px 16px;
 
-    &, a {
+    &,
+    a {
       color: #3a4652;
       text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.75);
 
@@ -162,9 +190,10 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
   &.droppable-hover {
     @if $use_high_contrast {
       box-shadow: inset 0 0 0 2px var(--ic-link-color);
-    }
-    @else {
-      > * { opacity: 0.5; }
+    } @else {
+      > * {
+        opacity: 0.5;
+      }
     }
   }
 
@@ -212,7 +241,7 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
 
   &:after {
     clear: both;
-    content: "";
+    content: '';
     display: table;
   }
 
@@ -226,7 +255,9 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
     background: transparent;
     border: none;
     border-radius: 0;
-    &.al-trigger { display: inline-block; }
+    &.al-trigger {
+      display: inline-block;
+    }
   }
 
   .discussion-content {
@@ -252,10 +283,13 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
     > div {
       display: table-cell;
       vertical-align: middle;
-      &.discussion-title small { white-space: nowrap; }
+      &.discussion-title small {
+        white-space: nowrap;
+      }
     }
     &.discussion-unpublished {
-      .discussion-type, .discussion-title a {
+      .discussion-type,
+      .discussion-title a {
         color: #696969;
       }
     }
@@ -271,7 +305,7 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
 
   .draggable-handle {
     width: 16px;
-    color: #B4B7BA;
+    color: #b4b7ba;
     cursor: pointer;
   }
 
@@ -281,7 +315,10 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
     padding-right: $ic-sp;
   }
 
-  .discussion-date-available, .discussion-due-date { @include fontSize(12px); }
+  .discussion-date-available,
+  .discussion-due-date {
+    @include fontSize(12px);
+  }
 
   .discussion-date-available {
     width: 200px;
@@ -302,19 +339,24 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
     width: 84px;
     white-space: nowrap;
 
-    .publish-icon, .lock-icon {
+    .publish-icon,
+    .lock-icon {
       margin-right: 10px;
     }
 
     .subscription-toggler {
       @include ic-focus-base;
       padding: 4px;
-      &:focus { @include ic-focus-variant; }
-      &:before { margin: 0; }
+      &:focus {
+        @include ic-focus-variant;
+      }
+      &:before {
+        margin: 0;
+      }
     }
 
-    a[class*=icon-] {
-       text-decoration: none;
+    a[class*='icon-'] {
+      text-decoration: none;
     }
 
     .icon-discussion-check {

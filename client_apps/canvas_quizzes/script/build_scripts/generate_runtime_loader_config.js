@@ -18,12 +18,12 @@
 
 /* jshint node:true */
 
-var glob = require('glob');
-var fs = require('fs');
-var readJSON = require('../helpers/read_json');
-var CANVAS_PACKAGE_MAP = readJSON('config/requirejs/build/map.json');
-var K = require('./constants');
-var PKG_NAME = K.pkgName;
+var glob = require('glob')
+var fs = require('fs')
+var readJSON = require('../helpers/read_json')
+var CANVAS_PACKAGE_MAP = readJSON('config/requirejs/build/map.json')
+var K = require('./constants')
+var PKG_NAME = K.pkgName
 
 /**
  * Generate r.js config to pass to requirejs.config() at RUN-TIME so that the
@@ -40,13 +40,13 @@ var PKG_NAME = K.pkgName;
  *         Configuration to pass to requirejs.config() in the output file.
  */
 module.exports = function generateRuntimeLoaderConfig(commonBundle, appName) {
-  var config = {};
+  var config = {}
 
-  config.map = {};
+  config.map = {}
 
   // Mapping of libraries we're using from Canvas to the IDs Canvas actually
   // defines:
-  config.map[PKG_NAME] = CANVAS_PACKAGE_MAP;
+  config.map[PKG_NAME] = CANVAS_PACKAGE_MAP
 
   // The common config "loader" script will require a file that should be
   // resolved within the *current running app*. This allows us to define the
@@ -60,8 +60,8 @@ module.exports = function generateRuntimeLoaderConfig(commonBundle, appName) {
   //   current app's module id.
   // """
   config.map[PKG_NAME + '/config'] = {
-    'app': [ K.pkgName, 'apps', appName ].join('/')
-  };
+    app: [K.pkgName, 'apps', appName].join('/')
+  }
 
   // Tell r.js of all the modules that are contained inside the the common
   // bundle file, so that referencing any of these modules can be resolved
@@ -73,8 +73,8 @@ module.exports = function generateRuntimeLoaderConfig(commonBundle, appName) {
   //
   // Will look for that module inside the file where "canvas_quizzes" is
   // located (e.g, /client_apps/canvas_quizzes.js).
-  config.bundles = {};
-  config.bundles[PKG_NAME] = commonBundle;
+  config.bundles = {}
+  config.bundles[PKG_NAME] = commonBundle
 
-  return config;
-};
+  return config
+}

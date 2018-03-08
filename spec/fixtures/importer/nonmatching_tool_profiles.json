@@ -36,9 +36,7 @@
           {
             "default_base_url": "https://www.samplelaunch.com",
             "selector": {
-              "applies_to": [
-                "MessageHandler"
-              ]
+              "applies_to": ["MessageHandler"]
             }
           }
         ],

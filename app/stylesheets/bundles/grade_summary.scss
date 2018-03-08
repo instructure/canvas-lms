@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 @import 'pages/shared/_outcome_colors';
 
 // print button for grades summary page
@@ -124,10 +124,12 @@
   white-space: nowrap;
 }
 
-#grades_summary td a, #grades_summary th a {
+#grades_summary td a,
+#grades_summary th a {
   @if $use_high-contrast {
     text-decoration: underline;
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       text-decoration: none;
     }
   }
@@ -137,11 +139,12 @@
   text-align: right;
   padding-left: 0;
   white-space: nowrap;
-  min-width: 80px;  // equals 4 x 20 pixel icons
+  min-width: 80px; // equals 4 x 20 pixel icons
 
   & a {
     color: $ic-icon-link-color;
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       color: $ic-icon-link-color-hover;
     }
     &.turnitin_similarity_score {
@@ -197,7 +200,8 @@
 }
 
 #grades_summary tr.group_total {
-  td, th[scope=row] {
+  td,
+  th[scope='row'] {
     font-weight: bold;
     @media print {
       text-transform: uppercase;
@@ -218,7 +222,8 @@
   top: 0px;
   left: -5px;
   display: none;
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     opacity: 0.7;
   }
 }
@@ -230,25 +235,29 @@
   @if $use_high_contrast {
     text-decoration: none;
   }
-  .grade:hover, .grade:focus {
+  .grade:hover,
+  .grade:focus {
     text-decoration: none;
-    .tooltip_wrap, .tooltip_text {
+    .tooltip_wrap,
+    .tooltip_text {
       visibility: visible;
     }
   }
   &:active {
     outline: none;
     text-decoration: none;
-    .tooltip_wrap, .tooltip_text {
+    .tooltip_wrap,
+    .tooltip_text {
       visibility: visible;
     }
   }
-  .tooltip_wrap, .tooltip_text {
+  .tooltip_wrap,
+  .tooltip_text {
     display: block;
     visibility: hidden;
   }
   .tooltip_wrap {
-    background: url("/images/tooltip_carat.png") no-repeat left bottom;
+    background: url('/images/tooltip_carat.png') no-repeat left bottom;
     bottom: 15px;
     padding-bottom: 3px;
     position: absolute;
@@ -287,7 +296,6 @@
 }
 
 #grades_summary table.score_details_table {
-
   .error {
     color: $ic-color-danger;
   }
@@ -329,7 +337,8 @@ div.rubric-toggle {
   .btn {
     margin-left: 0.5em;
   }
-  a[class*=icon-]:before, a[class^=icon-]:before {
+  a[class*='icon-']:before,
+  a[class^='icon-']:before {
     margin: 0;
   }
 }
@@ -338,7 +347,7 @@ div.rubric-toggle {
   padding: 1em 0;
 }
 
-$outcome-border: 1px solid #BCC2CA;
+$outcome-border: 1px solid #bcc2ca;
 
 #outcomes {
   h2 {
@@ -411,7 +420,7 @@ $outcome-border: 1px solid #BCC2CA;
     color: $remedial-color;
   }
   .undefined > i {
-    color: #C0C0C0;
+    color: #c0c0c0;
   }
   .outcomes {
     background-color: #f7f7f7;
@@ -440,7 +449,8 @@ $outcome-border: 1px solid #BCC2CA;
     i.collapsed-arrow {
       display: none;
     }
-    i.expanded-arrow, li.outcome {
+    i.expanded-arrow,
+    li.outcome {
       display: block;
     }
   }
@@ -488,7 +498,9 @@ $outcome-border: 1px solid #BCC2CA;
 }
 
 @media print {
-  #navpills, .course_selector, .outcome-toggles {
+  #navpills,
+  .course_selector,
+  .outcome-toggles {
     display: none;
   }
   #outcomes {

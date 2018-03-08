@@ -18,18 +18,17 @@
  */
 
 define(function(require) {
-  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
-  var d3 = require('d3');
-  var _ = require('lodash');
-  var AnswerRow = require('jsx!./answer_table/answer_row');
-  var I18n = require("i18n!quiz_statistics.answer_table");
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps')
+  var d3 = require('d3')
+  var _ = require('lodash')
+  var AnswerRow = require('jsx!./answer_table/answer_row')
+  var I18n = require('i18n!quiz_statistics.answer_table')
 
-  var SPECIAL_DATUM_IDS = [ 'other', 'none' ];
+  var SPECIAL_DATUM_IDS = ['other', 'none']
 
   var AnswerTable = React.createClass({
-
     propTypes: {
-      answers: React.PropTypes.array.isRequired,
+      answers: React.PropTypes.array.isRequired
     },
 
     getDefaultProps: function() {
@@ -59,71 +58,72 @@ define(function(require) {
         maxWidth: 150,
 
         useAnswerBuckets: false
-      };
+      }
     },
 
     buildParams: function(answers) {
       return answers.map(function(answer) {
         return {
-          id: ''+answer.id,
+          id: '' + answer.id,
           count: answer.responses,
           correct: answer.correct || answer.full_credit,
           special: SPECIAL_DATUM_IDS.indexOf(answer.id) > -1,
           answer: answer
-        };
-      });
+        }
+      })
     },
 
     render: function() {
-      var data = this.buildParams(this.props.answers);
-      var highest = d3.max(_.map(data, 'count'));
-      var xScale = d3.scale.linear()
-        .domain([ highest, 0 ])
-        .range([ this.props.maxWidth, 0 ]);
-      var visibilityThreshold = Math.max(this.props.visibilityThreshold, xScale(highest) / 100.0);
+      var data = this.buildParams(this.props.answers)
+      var highest = d3.max(_.map(data, 'count'))
+      var xScale = d3.scale
+        .linear()
+        .domain([highest, 0])
+        .range([this.props.maxWidth, 0])
+      var visibilityThreshold = Math.max(this.props.visibilityThreshold, xScale(highest) / 100.0)
       var globalParams = {
         xScale: xScale,
         visibilityThreshold: visibilityThreshold,
         maxWidth: this.props.maxWidth,
         barHeight: this.props.barHeight,
         useAnswerBuckets: this.props.useAnswerBuckets
-      };
+      }
 
       return (
         <table className="answer-drilldown-table detail-section">
           <caption className="screenreader-only">
-            {I18n.t("A table of answers and brief statistics regarding student answer choices.")}
+            {I18n.t('A table of answers and brief statistics regarding student answer choices.')}
           </caption>
           {this.renderTableHeader()}
-          <tbody>
-            {this.renderTableRows(data, globalParams)}
-          </tbody>
+          <tbody>{this.renderTableRows(data, globalParams)}</tbody>
         </table>
-      );
+      )
     },
 
     renderTableHeader: function() {
-      var firstColumnLabel = this.props.useAnswerBuckets ? I18n.t("Answer Description") : I18n.t("Answer Text");
+      var firstColumnLabel = this.props.useAnswerBuckets
+        ? I18n.t('Answer Description')
+        : I18n.t('Answer Text')
       return (
         <thead className="screenreader-only">
           <tr>
             <th scope="col">{firstColumnLabel}</th>
-            <th scope="col">{I18n.t("Number of Respondents")}</th>
-            <th scope="col">{I18n.t("Percent of respondents selecting this answer")}</th>
-            <th scope="col" aria-hidden>{I18n.t("Answer Distribution")}</th>
+            <th scope="col">{I18n.t('Number of Respondents')}</th>
+            <th scope="col">{I18n.t('Percent of respondents selecting this answer')}</th>
+            <th scope="col" aria-hidden>
+              {I18n.t('Answer Distribution')}
+            </th>
           </tr>
         </thead>
-      );
+      )
     },
 
     renderTableRows: function(data, globalParams) {
       return data.map(function(datum) {
-        return (
-          <AnswerRow key={datum.id} datum={datum} globalSettings={globalParams} />
-        );
-      });
+        return <AnswerRow key={datum.id} datum={datum} globalSettings={globalParams} />
+      })
     }
-  });
+  })
 
-  return AnswerTable;
-});
+  return AnswerTable
+})

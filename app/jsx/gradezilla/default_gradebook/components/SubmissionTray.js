@@ -16,36 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { arrayOf, bool, func, number, oneOf, shape, string } from 'prop-types';
-import I18n from 'i18n!gradebook';
-import Avatar from '@instructure/ui-core/lib/components/Avatar';
-import Button from '@instructure/ui-core/lib/components/Button';
-import Container from '@instructure/ui-core/lib/components/Container';
-import Heading from '@instructure/ui-core/lib/components/Heading';
-import Link from '@instructure/ui-core/lib/components/Link';
-import Spinner from '@instructure/ui-core/lib/components/Spinner';
-import Tray from '@instructure/ui-core/lib/components/Tray';
-import Text from '@instructure/ui-core/lib/components/Text';
-import IconSpeedGraderLine from 'instructure-icons/lib/Line/IconSpeedGraderLine';
-import Carousel from '../../../gradezilla/default_gradebook/components/Carousel';
-import GradeInput from '../../../gradezilla/default_gradebook/components/GradeInput';
-import LatePolicyGrade from '../../../gradezilla/default_gradebook/components/LatePolicyGrade';
-import CommentPropTypes from '../../../gradezilla/default_gradebook/propTypes/CommentPropTypes';
-import SubmissionCommentListItem from '../../../gradezilla/default_gradebook/components/SubmissionCommentListItem';
-import SubmissionCommentCreateForm from '../../../gradezilla/default_gradebook/components/SubmissionCommentCreateForm';
-import SubmissionStatus from '../../../gradezilla/default_gradebook/components/SubmissionStatus';
-import SubmissionTrayRadioInputGroup from '../../../gradezilla/default_gradebook/components/SubmissionTrayRadioInputGroup';
+import React from 'react'
+import {arrayOf, bool, func, number, oneOf, shape, string} from 'prop-types'
+import I18n from 'i18n!gradebook'
+import Avatar from '@instructure/ui-core/lib/components/Avatar'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Container from '@instructure/ui-core/lib/components/Container'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import Link from '@instructure/ui-core/lib/components/Link'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import Tray from '@instructure/ui-core/lib/components/Tray'
+import Text from '@instructure/ui-core/lib/components/Text'
+import IconSpeedGraderLine from 'instructure-icons/lib/Line/IconSpeedGraderLine'
+import Carousel from '../../../gradezilla/default_gradebook/components/Carousel'
+import GradeInput from '../../../gradezilla/default_gradebook/components/GradeInput'
+import LatePolicyGrade from '../../../gradezilla/default_gradebook/components/LatePolicyGrade'
+import CommentPropTypes from '../../../gradezilla/default_gradebook/propTypes/CommentPropTypes'
+import SubmissionCommentListItem from '../../../gradezilla/default_gradebook/components/SubmissionCommentListItem'
+import SubmissionCommentCreateForm from '../../../gradezilla/default_gradebook/components/SubmissionCommentCreateForm'
+import SubmissionStatus from '../../../gradezilla/default_gradebook/components/SubmissionStatus'
+import SubmissionTrayRadioInputGroup from '../../../gradezilla/default_gradebook/components/SubmissionTrayRadioInputGroup'
 
-function renderAvatar (name, avatarUrl) {
+function renderAvatar(name, avatarUrl) {
   return (
     <div id="SubmissionTray__Avatar">
       <Avatar name={name} src={avatarUrl} size="auto" />
     </div>
-  );
+  )
 }
 
-function renderSpeedGraderLink (speedGraderUrl) {
+function renderSpeedGraderLink(speedGraderUrl) {
   return (
     <Container as="div" textAlign="center">
       <Button href={speedGraderUrl} variant="link">
@@ -53,26 +53,24 @@ function renderSpeedGraderLink (speedGraderUrl) {
         {I18n.t('SpeedGrader')}
       </Button>
     </Container>
-  );
+  )
 }
 
-function renderTraySubHeading (headingText) {
+function renderTraySubHeading(headingText) {
   return (
     <Heading level="h4" as="h2" margin="auto auto small">
-      <Text weight="bold">
-        {headingText}
-      </Text>
+      <Text weight="bold">{headingText}</Text>
     </Heading>
-  );
+  )
 }
 
 export default class SubmissionTray extends React.Component {
   static defaultProps = {
     contentRef: undefined,
     gradingDisabled: false,
-    latePolicy: { lateSubmissionInterval: 'day' },
-    submission: { drop: false }
-  };
+    latePolicy: {lateSubmissionInterval: 'day'},
+    submission: {drop: false}
+  }
 
   static propTypes = {
     assignment: shape({
@@ -140,13 +138,13 @@ export default class SubmissionTray extends React.Component {
     isInOtherGradingPeriod: bool.isRequired,
     isInClosedGradingPeriod: bool.isRequired,
     isInNoGradingPeriod: bool.isRequired
-  };
+  }
 
   cancelCommenting = () => {
-    this.props.editSubmissionComment(null);
-  };
+    this.props.editSubmissionComment(null)
+  }
 
-  renderSubmissionCommentList () {
+  renderSubmissionCommentList() {
     return this.props.submissionComments.map(comment => (
       <SubmissionCommentListItem
         author={comment.author}
@@ -160,17 +158,19 @@ export default class SubmissionTray extends React.Component {
         editing={!!this.props.editedCommentId && this.props.editedCommentId === comment.id}
         id={comment.id}
         key={comment.id}
-        last={this.props.submissionComments[this.props.submissionComments.length - 1].id === comment.id}
+        last={
+          this.props.submissionComments[this.props.submissionComments.length - 1].id === comment.id
+        }
         deleteSubmissionComment={this.props.deleteSubmissionComment}
         editSubmissionComment={this.props.editSubmissionComment}
         updateSubmissionComment={this.props.updateSubmissionComment}
         processing={this.props.processing}
         setProcessing={this.props.setProcessing}
       />
-    ));
+    ))
   }
 
-  renderSubmissionComments () {
+  renderSubmissionComments() {
     if (this.props.submissionCommentsLoaded) {
       return (
         <div>
@@ -178,47 +178,49 @@ export default class SubmissionTray extends React.Component {
 
           {this.renderSubmissionCommentList()}
 
-          {
-            !this.props.editedCommentId &&
-              <SubmissionCommentCreateForm
-                cancelCommenting={this.cancelCommenting}
-                createSubmissionComment={this.props.createSubmissionComment}
-                processing={this.props.processing}
-                setProcessing={this.props.setProcessing}
-              />
-          }
+          {!this.props.editedCommentId && (
+            <SubmissionCommentCreateForm
+              cancelCommenting={this.cancelCommenting}
+              createSubmissionComment={this.props.createSubmissionComment}
+              processing={this.props.processing}
+              setProcessing={this.props.setProcessing}
+            />
+          )}
         </div>
-      );
+      )
     }
 
     return (
-      <div style={{ textAlign: 'center' }}>
+      <div style={{textAlign: 'center'}}>
         <Spinner title={I18n.t('Loading comments')} size="large" />
       </div>
-    );
+    )
   }
 
-  render () {
-    const { name, avatarUrl } = this.props.student;
-    const assignmentParam = `assignment_id=${this.props.submission.assignmentId}`;
-    const studentParam = `#%7B%22student_id%22%3A${this.props.student.id}%7D`;
-    const speedGraderUrl = `/courses/${this.props.courseId}/gradebook/speed_grader?${assignmentParam}${studentParam}`;
+  render() {
+    const {name, avatarUrl} = this.props.student
+    const assignmentParam = `assignment_id=${this.props.submission.assignmentId}`
+    const studentParam = `#%7B%22student_id%22%3A${this.props.student.id}%7D`
+    const speedGraderUrl = `/courses/${
+      this.props.courseId
+    }/gradebook/speed_grader?${assignmentParam}${studentParam}`
     const submissionCommentsProps = {
       submissionComments: this.props.submissionComments,
       submissionCommentsLoaded: this.props.submissionCommentsLoaded,
       deleteSubmissionComment: this.props.deleteSubmissionComment,
       createSubmissionComment: this.props.createSubmissionComment,
       processing: this.props.processing,
-      setProcessing: this.props.setProcessing,
-    };
-    const trayIsBusy = this.props.processing || this.props.submissionUpdating || !this.props.submissionCommentsLoaded;
+      setProcessing: this.props.setProcessing
+    }
+    const trayIsBusy =
+      this.props.processing || this.props.submissionUpdating || !this.props.submissionCommentsLoaded
 
-    let carouselContainerStyleOverride = '0 0 0 0';
+    let carouselContainerStyleOverride = '0 0 0 0'
 
     if (!avatarUrl) {
       // When we don't have an avatar, let's ensure there's enough space between the tray close button and the student
       // carousel's previous student arrow
-      carouselContainerStyleOverride = 'small 0 0 0';
+      carouselContainerStyleOverride = 'small 0 0 0'
     }
 
     return (
@@ -234,7 +236,7 @@ export default class SubmissionTray extends React.Component {
         onClose={this.props.onClose}
       >
         <div className="SubmissionTray__Container">
-          <div id="SubmissionTray__Content" style={{ display: 'flex', flexDirection: 'column' }}>
+          <div id="SubmissionTray__Content" style={{display: 'flex', flexDirection: 'column'}}>
             <Container as="div" padding={carouselContainerStyleOverride}>
               {avatarUrl && renderAvatar(name, avatarUrl)}
 
@@ -248,9 +250,7 @@ export default class SubmissionTray extends React.Component {
                 onRightArrowClick={this.props.selectNextStudent}
                 rightArrowDescription={I18n.t('Next student')}
               >
-                <Link href={this.props.student.gradesUrl}>
-                  {name}
-                </Link>
+                <Link href={this.props.student.gradesUrl}>{name}</Link>
               </Carousel>
 
               <Container as="div" margin="small 0" className="hr" />
@@ -265,17 +265,15 @@ export default class SubmissionTray extends React.Component {
                 onRightArrowClick={this.props.selectNextAssignment}
                 rightArrowDescription={I18n.t('Next assignment')}
               >
-                <Link href={this.props.assignment.htmlUrl}>
-                  {this.props.assignment.name}
-                </Link>
+                <Link href={this.props.assignment.htmlUrl}>{this.props.assignment.name}</Link>
               </Carousel>
 
-              { this.props.speedGraderEnabled && renderSpeedGraderLink(speedGraderUrl) }
+              {this.props.speedGraderEnabled && renderSpeedGraderLink(speedGraderUrl)}
 
               <Container as="div" margin="small 0" className="hr" />
             </Container>
 
-            <Container as="div" style={{ overflowY: 'auto', flex: '1 1 auto' }}>
+            <Container as="div" style={{overflowY: 'auto', flex: '1 1 auto'}}>
               <SubmissionStatus
                 assignment={this.props.assignment}
                 isConcluded={this.props.student.isConcluded}
@@ -295,7 +293,7 @@ export default class SubmissionTray extends React.Component {
                 submissionUpdating={this.props.submissionUpdating}
               />
 
-              {!!this.props.submission.pointsDeducted &&
+              {!!this.props.submission.pointsDeducted && (
                 <Container as="div" margin="small 0 0 0">
                   <LatePolicyGrade
                     assignment={this.props.assignment}
@@ -304,7 +302,7 @@ export default class SubmissionTray extends React.Component {
                     submission={this.props.submission}
                   />
                 </Container>
-              }
+              )}
 
               <Container as="div" margin="small 0" className="hr" />
 
@@ -329,6 +327,6 @@ export default class SubmissionTray extends React.Component {
           </div>
         </div>
       </Tray>
-    );
+    )
   }
 }

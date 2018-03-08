@@ -23,8 +23,9 @@
 // %b %-d, %Y
 import tz from 'timezone'
 
-export default function datePickerFormat (format) {
-  return tz.adjustFormat(format)
+export default function datePickerFormat(format) {
+  return tz
+    .adjustFormat(format)
     .replace(/%Y/, 'yy') // Year (eg. 2017)
     .replace(/%b/, 'M') // Month (eg. May)
     .replace(/%-?d/, 'd') // Day of Month (eg. 3)

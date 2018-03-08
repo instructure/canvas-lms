@@ -26,11 +26,12 @@
   background-color: $tooltipBackground;
   color: $tooltipColor;
 
-  .qtip-titlebar { // TODO: port from jQueryUI dialog
-    background-color: #FFEF93;
+  .qtip-titlebar {
+    // TODO: port from jQueryUI dialog
+    background-color: #ffef93;
 
     .qtip-close {
-      border-color: #AAA;
+      border-color: #aaa;
       color: #111;
     }
   }
@@ -44,9 +45,10 @@
     line-height: 16px;
   }
 
-  .qtip-icon { // TODO: port from jQueryUI dialog
-    border-color: #CCC;
-    background: #F1F1F1;
+  .qtip-icon {
+    // TODO: port from jQueryUI dialog
+    border-color: #ccc;
+    background: #f1f1f1;
     color: #777;
   }
 }

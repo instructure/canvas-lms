@@ -18,30 +18,30 @@
  */
 
 define(function(require) {
-  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
-  var Actions = require('../actions');
-  var I18n = require('i18n!quizzes');
-  var NotificationRenderers = [];
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps')
+  var Actions = require('../actions')
+  var I18n = require('i18n!quizzes')
+  var NotificationRenderers = []
 
   var Notifications = React.createClass({
     getDefaultProps: function() {
       return {
         notifications: []
-      };
+      }
     },
 
     render: function() {
-      return(
+      return (
         <ul aria-relevant="additions" aria-live="assertive" id="notifications">
           {this.props.notifications.map(this.renderNotification)}
         </ul>
-      );
+      )
     },
 
     renderNotification: function(notification) {
       var renderer = NotificationRenderers.filter(function(type) {
-        return type.code === notification.code;
-      })[0];
+        return type.code === notification.code
+      })[0]
 
       return (
         <li key={notification.id}>
@@ -52,19 +52,20 @@ define(function(require) {
           <a
             className="dismiss-notification"
             href="#"
-            onClick={this.dismiss.bind(null, notification.id)}>
+            onClick={this.dismiss.bind(null, notification.id)}
+          >
             {I18n.t('dismiss_notification', 'Dismiss')}
           </a>
         </li>
-      );
+      )
     },
 
     dismiss: function(id, e) {
-      e.preventDefault();
+      e.preventDefault()
 
-      Actions.dismissNotification(id);
+      Actions.dismissNotification(id)
     }
-  });
+  })
 
-  return Notifications;
-});
+  return Notifications
+})

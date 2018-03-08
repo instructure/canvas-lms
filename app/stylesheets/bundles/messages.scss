@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 /*-- element styles --*/
 dl {
@@ -30,7 +30,9 @@ dt {
   font-weight: bold;
   margin-right: 8px;
 
-  &:after { content: ":"; }
+  &:after {
+    content: ':';
+  }
 }
 
 dd {
@@ -100,20 +102,24 @@ table.grid tr:first-child td {
   font-weight: bold;
   line-height: 14px;
   padding: 1px 4px 2px;
-  text-shadow: 0 -1px 0 rgba(black, .25);
+  text-shadow: 0 -1px 0 rgba(black, 0.25);
   vertical-align: baseline;
   white-space: nowrap;
 
-  &.label-sent, &.label-dashboard {
+  &.label-sent,
+  &.label-dashboard {
     background-color: $successText;
   }
 
-  &.label-created, &.label-staged, &.label-sending {
-    background-color: #3A87AD;
+  &.label-created,
+  &.label-staged,
+  &.label-sending {
+    background-color: #3a87ad;
   }
 
-  &.label-cancelled, &.label-bounced {
-    background-color: #B94A48;
+  &.label-cancelled,
+  &.label-bounced {
+    background-color: #b94a48;
   }
 
   &.label-closed {
@@ -126,7 +132,11 @@ table.grid tr:first-child td {
   overflow: hidden;
   padding: 4px 12px;
 
-  li { display: inline; float: left; margin: 0 16px 0 0; }
+  li {
+    display: inline;
+    float: left;
+    margin: 0 16px 0 0;
+  }
 }
 
 a.icon-off {

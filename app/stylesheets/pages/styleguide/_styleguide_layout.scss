@@ -166,7 +166,9 @@ body.Sg-only {
     text-align: center;
     margin: 0;
   }
-  > ul, > dl, > ol {
+  > ul,
+  > dl,
+  > ol {
     margin: 10px 20px;
     li {
       @include fontSize($ic-font-size--medium);
@@ -182,11 +184,11 @@ body.Sg-only {
       border-top: 1px dotted $sg-content-hr-border-color;
     }
   }
- .sg-src-file-path {
+  .sg-src-file-path {
     text-align: center;
     padding: 5px 0;
     background: var(--ic-brand-primary);
-    border-top:1px solid $sg-src-file-path-border-color;
+    border-top: 1px solid $sg-src-file-path-border-color;
     color: $sg-src-file-path-font-color;
   }
 }

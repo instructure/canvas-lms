@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-  // based on this solution:
-  // http://stackoverflow.com/questions/7394748/whats-the-right-way-to-decode-a-string-that-has-special-html-entities-in-it
+// based on this solution:
+// http://stackoverflow.com/questions/7394748/whats-the-right-way-to-decode-a-string-that-has-special-html-entities-in-it
 
-  // javascript doesn't have a clean way to HTML decode a string, so we use a
-  // round trip through a textarea to do it. this seems to be a best practice,
-  // as far as we can tell.
+// javascript doesn't have a clean way to HTML decode a string, so we use a
+// round trip through a textarea to do it. this seems to be a best practice,
+// as far as we can tell.
 
-export default function(encodedString){
-    var textArea = document.createElement('textarea');
-    textArea.innerHTML = encodedString;
-    return textArea.value;
-  }
+export default function(encodedString) {
+  var textArea = document.createElement('textarea')
+  textArea.innerHTML = encodedString
+  return textArea.value
+}

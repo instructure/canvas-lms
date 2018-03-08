@@ -86,20 +86,19 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
   right: 0;
   bottom: 0;
 
-
   &.ReactModal__Overlay--after-open {
     opacity: 1;
   }
 }
 
-
 @mixin ReactModalPadding {
   padding: $ic-sp/2;
-  @include breakpoint(tablet) { padding: $ic-sp; }
+  @include breakpoint(tablet) {
+    padding: $ic-sp;
+  }
 }
 
 .ReactModal__Content {
-
   // Because of changes in the way react-modal works, we need to put all the
   // default styles here.
   position: absolute;
@@ -127,10 +126,16 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
     justify-content: center;
     height: 100%;
     padding: $ic-sp/2;
-    @include breakpoint(mini-tablet) { padding: $ic-sp; }
-    @include breakpoint(tablet) { padding: 0; }
+    @include breakpoint(mini-tablet) {
+      padding: $ic-sp;
+    }
+    @include breakpoint(tablet) {
+      padding: 0;
+    }
 
-    form { margin: 0; } // override Canvas default margin on forms
+    form {
+      margin: 0;
+    } // override Canvas default margin on forms
 
     .ReactModal__Layout {
       max-height: 100%;
@@ -144,7 +149,6 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
         opacity: 0;
         transform: rotateX(60deg) scale(0.8);
       }
-
     }
 
     &.ReactModal__Content--after-open .ReactModal__Layout {
@@ -156,7 +160,9 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
 
     &.ReactModal__Content--mini-modal {
       .ReactModal__Layout {
-        @include breakpoint(tablet) { max-width: 384px; }
+        @include breakpoint(tablet) {
+          max-width: 384px;
+        }
       }
     }
 
@@ -179,22 +185,30 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
       flex: 1;
       overflow: hidden;
       // remove margin from heading elements
-      * { margin: 0; }
+      * {
+        margin: 0;
+      }
     }
 
-    .ReactModal__Header-Actions { text-align: right; }
+    .ReactModal__Header-Actions {
+      text-align: right;
+    }
 
     .ReactModal__Body {
       padding: $ic-sp;
       background: $ic-color-light;
       border-top-left-radius: $baseBorderRadius;
       border-top-right-radius: $baseBorderRadius;
-      @include breakpoint(desktop) { padding: $ic-sp*1.5; }
+      @include breakpoint(desktop) {
+        padding: $ic-sp*1.5;
+      }
       &:last-child {
         border-bottom-left-radius: $baseBorderRadius;
         border-bottom-right-radius: $baseBorderRadius;
       }
-      &.ReactModal__Body--force-no-padding { padding: 0; }
+      &.ReactModal__Body--force-no-padding {
+        padding: 0;
+      }
     }
 
     .ReactModal__Footer {
@@ -227,12 +241,13 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
         display: flex;
         justify-content: flex-end;
       }
-      .Button, .btn {
+      .Button,
+      .btn {
         margin-left: $ic-sp/3;
-        &:first-of-type { margin-left: 0; }
+        &:first-of-type {
+          margin-left: 0;
+        }
       }
     }
-
   }
-
 }

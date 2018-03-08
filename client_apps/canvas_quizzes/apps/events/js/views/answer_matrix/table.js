@@ -18,10 +18,10 @@
  */
 
 define(function(require) {
-  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
-  var I18n = require('i18n!quiz_log_auditing.table_view');
-  var secondsToTime = require('canvas_quizzes/util/seconds_to_time');
-  var Cell = require('jsx!./cell');
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps')
+  var I18n = require('i18n!quiz_log_auditing.table_view')
+  var secondsToTime = require('canvas_quizzes/util/seconds_to_time')
+  var Cell = require('jsx!./cell')
 
   /**
    * @class Events.Views.AnswerMatrix.Table
@@ -39,7 +39,7 @@ define(function(require) {
     getInitialState: function() {
       return {
         activeEventId: null
-      };
+      }
     },
 
     getDefaultProps: function() {
@@ -47,7 +47,7 @@ define(function(require) {
         questions: [],
         events: [],
         submission: {}
-      };
+      }
     },
 
     render: function() {
@@ -63,16 +63,14 @@ define(function(require) {
             </tr>
           </thead>
 
-          <tbody>
-            {this.props.events.map(this.renderContentRow)}
-          </tbody>
+          <tbody>{this.props.events.map(this.renderContentRow)}</tbody>
         </table>
-      );
+      )
     },
 
     renderHeaderCell: function(question) {
       return (
-        <th key={"question-"+question.id}>
+        <th key={'question-' + question.id}>
           <div>
             {I18n.t('headers.question', 'Question %{position}', {
               position: question.position
@@ -85,46 +83,46 @@ define(function(require) {
     },
 
     renderContentRow: function(event) {
-      var className;
-      var expanded = this.props.expandAll || event.id === this.state.activeEventId;
-      var shouldTruncate = this.props.shouldTruncate;
-      var secondsSinceStart = (
-        new Date(event.createdAt) - new Date(this.props.submission.startedAt)
-      ) / 1000;
+      var className
+      var expanded = this.props.expandAll || event.id === this.state.activeEventId
+      var shouldTruncate = this.props.shouldTruncate
+      var secondsSinceStart =
+        (new Date(event.createdAt) - new Date(this.props.submission.startedAt)) / 1000
 
       if (this.props.activeEventId === event.id) {
-        className = 'active';
+        className = 'active'
       }
 
       return (
         <tr
-          key={"event-"+event.id}
+          key={'event-' + event.id}
           className={className}
-          onClick={this.toggleAnswerVisibility.bind(null, event)}>
+          onClick={this.toggleAnswerVisibility.bind(null, event)}
+        >
           <td>{secondsToTime(secondsSinceStart)}</td>
 
           {this.props.questions.map(function(question) {
             return (
-              <td key={[ 'q', question.id, 'e', event.id ].join('_')}>{
-                Cell({
+              <td key={['q', question.id, 'e', event.id].join('_')}>
+                {Cell({
                   question: question,
                   event: event,
                   expanded: expanded,
                   shouldTruncate: shouldTruncate
-                })
-              }</td>
-            );
+                })}
+              </td>
+            )
           })}
         </tr>
-      );
+      )
     },
 
     toggleAnswerVisibility: function(event) {
       this.setState({
         activeEventId: event.id === this.state.activeEventId ? null : event.id
-      });
-    },
-  });
+      })
+    }
+  })
 
-  return Table;
-});
+  return Table
+})

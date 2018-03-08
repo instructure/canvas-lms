@@ -17,17 +17,17 @@
  */
 
 import I18n from 'i18n!blueprint_courses'
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
 import shortId from '../../shared/shortid'
 
-import Grid, { GridRow, GridCol } from '@instructure/ui-core/lib/components/Grid'
+import Grid, {GridRow, GridCol} from '@instructure/ui-core/lib/components/Grid'
 import Text from '@instructure/ui-core/lib/components/Text'
-import { IconLock, IconUnlock } from './BlueprintLocks'
+import {IconLock, IconUnlock} from './BlueprintLocks'
 
 import propTypes from '../propTypes'
-import { itemTypeLabels, changeTypeLabels } from '../labels'
+import {itemTypeLabels, changeTypeLabels} from '../labels'
 
 export default class ChangeLogRow extends Component {
   static propTypes = {
@@ -36,54 +36,72 @@ export default class ChangeLogRow extends Component {
     col3: PropTypes.string.isRequired,
     col4: PropTypes.string.isRequired,
     isHeading: PropTypes.bool,
-    children: PropTypes.node,
+    children: PropTypes.node
   }
 
   static defaultProps = {
     isHeading: false,
-    children: null,
+    children: null
   }
 
   colIds = [shortId(), shortId(), shortId(), shortId()]
 
-  renderText = text => <Text size="small" weight={this.props.isHeading ? 'bold' : 'normal'}>{text}</Text>
+  renderText = text => (
+    <Text size="small" weight={this.props.isHeading ? 'bold' : 'normal'}>
+      {text}
+    </Text>
+  )
 
-  renderRow () {
-    const { col1, col2, col3, col4, isHeading } = this.props
+  renderRow() {
+    const {col1, col2, col3, col4, isHeading} = this.props
     const cellRole = isHeading ? 'columnheader' : 'gridcell'
     return (
       <Grid colSpacing="none">
         <GridRow>
-          <GridCol width={6}><span id={this.colIds[0]} role={cellRole}>{this.renderText(col1)}</span></GridCol>
-          <GridCol width={2}><span id={this.colIds[1]} role={cellRole}>{this.renderText(col2)}</span></GridCol>
-          <GridCol width={3}><span id={this.colIds[2]} role={cellRole}>{this.renderText(col3)}</span></GridCol>
-          <GridCol width={1}><span id={this.colIds[3]} role={cellRole}>{this.renderText(col4)}</span></GridCol>
+          <GridCol width={6}>
+            <span id={this.colIds[0]} role={cellRole}>
+              {this.renderText(col1)}
+            </span>
+          </GridCol>
+          <GridCol width={2}>
+            <span id={this.colIds[1]} role={cellRole}>
+              {this.renderText(col2)}
+            </span>
+          </GridCol>
+          <GridCol width={3}>
+            <span id={this.colIds[2]} role={cellRole}>
+              {this.renderText(col3)}
+            </span>
+          </GridCol>
+          <GridCol width={1}>
+            <span id={this.colIds[3]} role={cellRole}>
+              {this.renderText(col4)}
+            </span>
+          </GridCol>
         </GridRow>
       </Grid>
     )
   }
 
-  render () {
+  render() {
     const classes = cx({
       'bcs__history-item__change': true,
       'bcs__history-item__change-log-row': true,
-      'bcs__history-item__change-log-row__heading': this.props.isHeading,
+      'bcs__history-item__change-log-row__heading': this.props.isHeading
     })
 
     return (
       <div className={classes} role="row" aria-owns={this.colIds.join(' ')}>
         <div className="bcs__history-item__content">
           {this.props.children}
-          <div className="bcs__history-item__content-grid">
-            {this.renderRow()}
-          </div>
+          <div className="bcs__history-item__content-grid">{this.renderRow()}</div>
         </div>
       </div>
     )
   }
 }
 
-export const ChangeRow = ({ change }) => (
+export const ChangeRow = ({change}) => (
   <ChangeLogRow
     col1={change.asset_name}
     col2={itemTypeLabels[change.asset_type]}
@@ -91,11 +109,13 @@ export const ChangeRow = ({ change }) => (
     col4={change.exceptions && change.exceptions.length ? I18n.t('No') : I18n.t('Yes')}
   >
     <div className="bcs__history-item__lock-icon">
-      <Text size="large" color="secondary">{change.locked ? <IconLock /> : <IconUnlock />}</Text>
+      <Text size="large" color="secondary">
+        {change.locked ? <IconLock /> : <IconUnlock />}
+      </Text>
     </div>
   </ChangeLogRow>
 )
 
 ChangeRow.propTypes = {
-  change: propTypes.migrationChange.isRequired,
+  change: propTypes.migrationChange.isRequired
 }

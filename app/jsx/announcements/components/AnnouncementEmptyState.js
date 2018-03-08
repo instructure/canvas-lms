@@ -29,7 +29,7 @@ import SVGWrapper from '../../shared/SVGWrapper'
 const AnnouncementEmptyState = props => (
   <Container margin="large auto" textAlign="center" display="block">
     <Container margin="small auto" size="x-small" display="block">
-      <SVGWrapper url="/images/announcements/announcements-airhorn.svg"/>
+      <SVGWrapper url="/images/announcements/announcements-airhorn.svg" />
     </Container>
     <Heading margin="x-small">{I18n.t('No Announcements')}</Heading>
     {props.canCreate ? (

@@ -16,15 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jquery',
-  'jsx/theme_editor/submitHtmlForm'
-], (jQuery, submitHtmlForm) => {
-
+define(['jquery', 'jsx/theme_editor/submitHtmlForm'], (jQuery, submitHtmlForm) => {
   let action, method, md5, csrfToken, form
 
   QUnit.module('submitHtmlForm', {
-    setup () {
+    setup() {
       this.spy(jQuery.fn, 'appendTo')
       this.stub(jQuery.fn, 'submit')
       action = '/foo'

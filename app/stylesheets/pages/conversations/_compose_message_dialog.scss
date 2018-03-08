@@ -16,18 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "components/context_search";
+@import 'components/context_search';
 
 $subtleBorderColor: #e5e5e5;
 
-.compose-message-dialog, .submission-comment-reply-dialog {
+.compose-message-dialog,
+.submission-comment-reply-dialog {
   overflow: visible;
 
   .ui-dialog-titlebar {
     border-bottom: 1px solid $subtleBorderColor;
     background-color: #f5f5f5;
     background-image: none;
-
   }
 
   .ui-dialog-buttonset.attachments {
@@ -36,7 +36,7 @@ $subtleBorderColor: #e5e5e5;
     .ui-button {
       padding: 4px 5px;
       color: #555555;
-      margin: .5em 0;
+      margin: 0.5em 0;
     }
   }
 
@@ -48,7 +48,6 @@ $subtleBorderColor: #e5e5e5;
   }
 
   .ui-dialog-titlebar-close {
-
   }
 
   .ui-dialog-buttonpane {
@@ -64,7 +63,8 @@ $subtleBorderColor: #e5e5e5;
   }
 }
 
-#compose-new-message, #submission-comment-reply {
+#compose-new-message,
+#submission-comment-reply {
   padding: 0;
   overflow: visible;
   margin: 0;
@@ -162,7 +162,9 @@ $subtleBorderColor: #e5e5e5;
     padding: 1px;
   }
 
-  .attachment:hover .remove_link, .attachment:focus .remove_link, .remove_link:focus {
+  .attachment:hover .remove_link,
+  .attachment:focus .remove_link,
+  .remove_link:focus {
     left: 0;
   }
 
@@ -175,7 +177,7 @@ $subtleBorderColor: #e5e5e5;
   }
 
   .attachment:focus .attachment-icon {
-    box-shadow: 0 0 5px #0088CC;
+    box-shadow: 0 0 5px #0088cc;
   }
 
   .attachment-icon i:before {
@@ -222,7 +224,8 @@ $subtleBorderColor: #e5e5e5;
     overflow-x: hidden;
   }
 
-  .conversation_body, .reply_body {
+  .conversation_body,
+  .reply_body {
     min-height: 200px;
     width: 100%;
     bottom: 0;
@@ -287,7 +290,7 @@ $subtleBorderColor: #e5e5e5;
           box-shadow: 0 0 0 1px var(--ic-link-color);
         }
       }
-      input[type="text"] {
+      input[type='text'] {
         margin: 0;
       }
     }
@@ -303,7 +306,8 @@ $subtleBorderColor: #e5e5e5;
       clear: right;
     }
 
-    .context-date, .context-body {
+    .context-date,
+    .context-body {
       color: #777;
     }
 
@@ -323,18 +327,17 @@ $subtleBorderColor: #e5e5e5;
       padding: 0px;
     }
   }
-
 }
 
-::-webkit-input-placeholder { 
-    color: #666;
-    opacity: 1;
+::-webkit-input-placeholder {
+  color: #666;
+  opacity: 1;
 }
-::-moz-placeholder { 
-    color: #666;
-    opacity: 1;
+::-moz-placeholder {
+  color: #666;
+  opacity: 1;
 }
-:-ms-input-placeholder { 
-    color: #666;
-    opacity: 1;
+:-ms-input-placeholder {
+  color: #666;
+  opacity: 1;
 }

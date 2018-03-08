@@ -37,21 +37,21 @@ export default React.createClass({
     disableSyncToSis: React.PropTypes.func.isRequired,
     sisName: React.PropTypes.string.isRequired,
     postToSisDefault: React.PropTypes.bool.isRequired,
-    hasAssignments: React.PropTypes.bool.isRequired,
+    hasAssignments: React.PropTypes.bool.isRequired
   },
 
-  getInitialState () {
-    return this.props.store.getState();
+  getInitialState() {
+    return this.props.store.getState()
   },
 
-  componentWillMount () {
-    this.setState(this.getInitialState());
+  componentWillMount() {
+    this.setState(this.getInitialState())
   },
 
-  componentDidMount () {
+  componentDidMount() {
     this.unsubscribe = this.props.store.subscribe(() => {
-      this.setState(this.props.store.getState());
-    });
+      this.setState(this.props.store.getState())
+    })
 
     const toolsUrl = [
       '/api/v1/',
@@ -59,80 +59,84 @@ export default React.createClass({
       's/',
       this.props.contextId,
       '/lti_apps/launch_definitions?placements[]=course_assignments_menu'
-    ].join('');
+    ].join('')
 
-    this.props.store.dispatch(Actions.apiGetLaunches(null, toolsUrl));
-    this.props.setTrigger(this.refs.trigger);
-    this.props.setDisableTrigger(this.disableTrigger);
-    this.props.registerWeightToggle('weightedToggle', this.onWeightedToggle, this);
+    this.props.store.dispatch(Actions.apiGetLaunches(null, toolsUrl))
+    this.props.setTrigger(this.refs.trigger)
+    this.props.setDisableTrigger(this.disableTrigger)
+    this.props.registerWeightToggle('weightedToggle', this.onWeightedToggle, this)
   },
 
-  componentWillUnmount () {
-    this.unsubscribe();
+  componentWillUnmount() {
+    this.unsubscribe()
   },
 
-  onWeightedToggle (value) {
-    this.props.store.dispatch(Actions.setWeighted(value));
+  onWeightedToggle(value) {
+    this.props.store.dispatch(Actions.setWeighted(value))
   },
 
-  onLaunchTool (tool) {
-    return (e) => {
-      e.preventDefault();
-      this.props.store.dispatch(Actions.launchTool(tool));
-    };
-  },
-
-  closeModal () {
-    this.props.store.dispatch(Actions.setModalOpen(false));
-  },
-
-  renderWeightIcon () {
-    if (this.state && this.state.weighted) {
-      return <i className="icon-check" />;
+  onLaunchTool(tool) {
+    return e => {
+      e.preventDefault()
+      this.props.store.dispatch(Actions.launchTool(tool))
     }
-    return <i className="icon-blank" />;
   },
 
-  renderDisablePostToSis () {
+  closeModal() {
+    this.props.store.dispatch(Actions.setModalOpen(false))
+  },
+
+  renderWeightIcon() {
+    if (this.state && this.state.weighted) {
+      return <i className="icon-check" />
+    }
+    return <i className="icon-blank" />
+  },
+
+  renderDisablePostToSis() {
     if (this.props.hasAssignments && this.props.postToSisDefault) {
       return (
         <li role="menuitem">
           <a
-            ref={(node) => { this.disableTrigger = node; }}
-            href="#" role="button"
+            ref={node => {
+              this.disableTrigger = node
+            }}
+            href="#"
+            role="button"
             id="assignmentDisableSyncCog"
             title={I18n.t('Disable Sync to %{name}', {name: this.props.sisName})}
             aria-label={I18n.t('Disable Sync to %{name}', {name: this.props.sisName})}
             data-focus-returns-to="course_assignment_settings_link"
-            onClick={() =>
-                  {
-                    this.props.setDisableTrigger(this.disableTrigger);
-                    this.props.disableSyncToSis();
-                  }}
+            onClick={() => {
+              this.props.setDisableTrigger(this.disableTrigger)
+              this.props.disableSyncToSis()
+            }}
           >
-            { I18n.t('Disable Sync to %{name}', {name: this.props.sisName}) }
+            {I18n.t('Disable Sync to %{name}', {name: this.props.sisName})}
           </a>
         </li>
-      );
+      )
     }
   },
 
-  renderTools () {
-    return this.state.externalTools.map(tool =>
+  renderTools() {
+    return this.state.externalTools.map(tool => (
       <li key={tool.definition_id} role="menuitem">
         <a aria-label={tool.name} href="#" onClick={this.onLaunchTool(tool)}>
-          <i className="icon-import"></i>
-          { tool.name }
+          <i className="icon-import" />
+          {tool.name}
         </a>
       </li>
-    );
+    ))
   },
 
-  render () {
+  render() {
     return (
       <div
         className="inline-block"
-        ref={(node) => { this.node = node; }}
+        ref={node => {
+          this.node = node
+        }}
       >
         <a
           className="al-trigger btn"
@@ -142,23 +146,22 @@ export default React.createClass({
           title={I18n.t('Assignments Settings')}
           aria-label={I18n.t('Assignments Settings')}
         >
-          <i className="icon-more" aria-hidden="true"/>
+          <i className="icon-more" aria-hidden="true" />
           <span className="screenreader-only">{I18n.t('Assignment Options')}</span>
         </a>
-        <ul
-          className="al-options"
-          role="menu"
-        >
+        <ul className="al-options" role="menu">
           <li role="menuitem">
             <a
               ref="trigger"
-              href="#" id="assignmentSettingsCog" role="button"
+              href="#"
+              id="assignmentSettingsCog"
+              role="button"
               title={I18n.t('Assignment Groups Weight')}
               data-focus-returns-to="course_assignment_settings_link"
               aria-label={I18n.t('Assignment Groups Weight')}
             >
-              { this.renderWeightIcon() }
-              { I18n.t('Assignment Groups Weight')}
+              {this.renderWeightIcon()}
+              {I18n.t('Assignment Groups Weight')}
             </a>
           </li>
           {this.renderDisablePostToSis()}
@@ -171,9 +174,12 @@ export default React.createClass({
           contextType={this.props.contextType}
           contextId={this.props.contextId}
           launchType="course_assignments_menu"
-          title={this.state.selectedTool && this.state.selectedTool.placements.course_assignments_menu.title}
+          title={
+            this.state.selectedTool &&
+            this.state.selectedTool.placements.course_assignments_menu.title
+          }
         />
       </div>
-    );
+    )
   }
-});
+})

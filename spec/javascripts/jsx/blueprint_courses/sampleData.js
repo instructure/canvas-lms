@@ -17,23 +17,17 @@
  */
 
 export default {
-  terms: [
-    { id: '1', name: 'Term One' },
-    { id: '2', name: 'Term Two' },
-  ],
-  subAccounts: [
-    { id: '1', name: 'Account One' },
-    { id: '2', name: 'Account Two' },
-  ],
+  terms: [{id: '1', name: 'Term One'}, {id: '2', name: 'Term Two'}],
+  subAccounts: [{id: '1', name: 'Account One'}, {id: '2', name: 'Account Two'}],
   childCourse: {
     id: '1',
     enrollment_term_id: '1',
-    name: 'Course 1',
+    name: 'Course 1'
   },
   masterCourse: {
     id: '2',
     enrollment_term_id: '1',
-    name: 'Course 2',
+    name: 'Course 2'
   },
   courses: [
     {
@@ -42,12 +36,14 @@ export default {
       course_code: 'course_1',
       term: {
         id: '1',
-        name: 'Term One',
+        name: 'Term One'
       },
-      teachers: [{
-        display_name: 'Teacher One',
-      }],
-      sis_course_id: '1001',
+      teachers: [
+        {
+          display_name: 'Teacher One'
+        }
+      ],
+      sis_course_id: '1001'
     },
     {
       id: '2',
@@ -55,12 +51,14 @@ export default {
       course_code: 'course_2',
       term: {
         id: '2',
-        name: 'Term Two',
+        name: 'Term Two'
       },
-      teachers: [{
-        display_name: 'Teacher Two',
-      }],
-      sis_course_id: '1001',
+      teachers: [
+        {
+          display_name: 'Teacher Two'
+        }
+      ],
+      sis_course_id: '1001'
     }
   ],
   history: [
@@ -80,24 +78,24 @@ export default {
               course_id: '1',
               conflicting_changes: ['points'],
               name: 'Course 1',
-              term: { name: 'Default Term' },
+              term: {name: 'Default Term'}
             },
             {
               course_id: '5',
               conflicting_changes: ['content'],
               name: 'Course 5',
-              term: { name: 'Default Term' },
+              term: {name: 'Default Term'}
             },
             {
               course_id: '56',
               conflicting_changes: ['points'],
               name: 'Course 56',
-              term: { name: 'Default Term' },
+              term: {name: 'Default Term'}
             }
-          ],
+          ]
         }
-      ],
-    },
+      ]
+    }
   ],
   unsyncedChanges: [
     {

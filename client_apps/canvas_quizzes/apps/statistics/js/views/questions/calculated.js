@@ -18,15 +18,15 @@
  */
 
 define(function(require) {
-  var React = require('../../ext/react');
-  var Essay = require('jsx!./essay');
+  var React = require('../../ext/react')
+  var Essay = require('jsx!./essay')
 
   var Calculated = React.createClass({
     render: Essay.type.prototype.render,
     renderLinkButton: function() {
-      return false;
+      return false
     }
-  });
+  })
 
-  return Calculated;
-});
+  return Calculated
+})

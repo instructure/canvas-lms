@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Fixtures from '../../gradebook-history/Fixtures';
-import parseLinkHeader from 'jsx/shared/parseLinkHeader';
-import reducer from 'jsx/gradebook-history/reducers/SearchFormReducer';
+import Fixtures from '../../gradebook-history/Fixtures'
+import parseLinkHeader from 'jsx/shared/parseLinkHeader'
+import reducer from 'jsx/gradebook-history/reducers/SearchFormReducer'
 import {
   CLEAR_RECORDS,
   FETCH_RECORDS_START,
@@ -27,39 +27,37 @@ import {
   FETCH_RECORDS_NEXT_PAGE_START,
   FETCH_RECORDS_NEXT_PAGE_SUCCESS,
   FETCH_RECORDS_NEXT_PAGE_FAILURE
-} from 'jsx/gradebook-history/actions/SearchFormActions';
+} from 'jsx/gradebook-history/actions/SearchFormActions'
 
-const defaultState = () => (
-  {
-    records: {
-      assignments: {
-        fetchStatus: null,
-        items: [],
-        nextPage: null
-      },
-      graders: {
-        fetchStatus: null,
-        items: [],
-        nextPage: null
-      },
-      students: {
-        fetchStatus: null,
-        items: [],
-        nextPage: null
-      }
+const defaultState = () => ({
+  records: {
+    assignments: {
+      fetchStatus: null,
+      items: [],
+      nextPage: null
     },
+    graders: {
+      fetchStatus: null,
+      items: [],
+      nextPage: null
+    },
+    students: {
+      fetchStatus: null,
+      items: [],
+      nextPage: null
+    }
   }
-);
+})
 
-QUnit.module('SearchFormReducer');
+QUnit.module('SearchFormReducer')
 
-test('returns the current state by default', function () {
-  const currState = defaultState();
-  deepEqual(reducer(currState, {}), currState);
-});
+test('returns the current state by default', function() {
+  const currState = defaultState()
+  deepEqual(reducer(currState, {}), currState)
+})
 
-test('handles FETCH_RECORDS_START for given record type', function () {
-  const defaults = defaultState();
+test('handles FETCH_RECORDS_START for given record type', function() {
+  const defaults = defaultState()
   const initialState = {
     ...defaults,
     records: {
@@ -69,7 +67,7 @@ test('handles FETCH_RECORDS_START for given record type', function () {
         fetchStatus: null
       }
     }
-  };
+  }
   const newState = {
     ...initialState,
     records: {
@@ -79,24 +77,25 @@ test('handles FETCH_RECORDS_START for given record type', function () {
         fetchStatus: 'started'
       }
     }
-  };
+  }
   const action = {
     type: FETCH_RECORDS_START,
     payload: {
       recordType: 'assignments'
     }
-  };
+  }
 
-  deepEqual(reducer(initialState, action), newState);
-});
+  deepEqual(reducer(initialState, action), newState)
+})
 
-test('handles FETCH_RECORDS_SUCCESS on success for given record type', function () {
+test('handles FETCH_RECORDS_SUCCESS on success for given record type', function() {
   const payload = {
     recordType: 'graders',
     data: Fixtures.userArray(),
-    link: '<http://example.com/3?&page=first>; rel="current",<http://example.com/3?&page=bookmark:asdf>; rel="next"'
-  };
-  const initialState = defaultState();
+    link:
+      '<http://example.com/3?&page=first>; rel="current",<http://example.com/3?&page=bookmark:asdf>; rel="next"'
+  }
+  const initialState = defaultState()
   const newState = {
     ...initialState,
     records: {
@@ -107,17 +106,17 @@ test('handles FETCH_RECORDS_SUCCESS on success for given record type', function 
         nextPage: parseLinkHeader(payload.link).next
       }
     }
-  };
+  }
   const action = {
     type: FETCH_RECORDS_SUCCESS,
     payload
-  };
+  }
 
-  deepEqual(reducer(initialState, action), newState);
-});
+  deepEqual(reducer(initialState, action), newState)
+})
 
-test('handles FETCH_RECORDS_FAILURE on failure for given record type', function () {
-  const defaults = defaultState();
+test('handles FETCH_RECORDS_FAILURE on failure for given record type', function() {
+  const defaults = defaultState()
   const initialState = {
     ...defaults,
     records: {
@@ -128,7 +127,7 @@ test('handles FETCH_RECORDS_FAILURE on failure for given record type', function 
         nextPage: null
       }
     }
-  };
+  }
   const newState = {
     ...initialState,
     records: {
@@ -139,17 +138,17 @@ test('handles FETCH_RECORDS_FAILURE on failure for given record type', function 
         nextPage: null
       }
     }
-  };
+  }
   const action = {
     type: FETCH_RECORDS_FAILURE,
-    payload: { recordType: 'students' }
-  };
+    payload: {recordType: 'students'}
+  }
 
-  deepEqual(reducer(initialState, action), newState);
-});
+  deepEqual(reducer(initialState, action), newState)
+})
 
-test('handles FETCH_RECORDS_NEXT_PAGE_START on start for given record type', function () {
-  const defaults = defaultState();
+test('handles FETCH_RECORDS_NEXT_PAGE_START on start for given record type', function() {
+  const defaults = defaultState()
   const initialState = {
     ...defaults,
     records: {
@@ -160,7 +159,7 @@ test('handles FETCH_RECORDS_NEXT_PAGE_START on start for given record type', fun
         nextPage: 'https://example.com'
       }
     }
-  };
+  }
   const newState = {
     ...initialState,
     records: {
@@ -171,22 +170,23 @@ test('handles FETCH_RECORDS_NEXT_PAGE_START on start for given record type', fun
         nextPage: null
       }
     }
-  };
+  }
   const action = {
     type: FETCH_RECORDS_NEXT_PAGE_START,
-    payload: { recordType: 'students' }
-  };
+    payload: {recordType: 'students'}
+  }
 
-  deepEqual(reducer(initialState, action), newState);
-});
+  deepEqual(reducer(initialState, action), newState)
+})
 
-test('handles FETCH_RECORDS_NEXT_PAGE_SUCCESS for given record type', function () {
-  const defaults = defaultState();
+test('handles FETCH_RECORDS_NEXT_PAGE_SUCCESS for given record type', function() {
+  const defaults = defaultState()
   const payload = {
     recordType: 'graders',
     data: Fixtures.userArray(),
-    link: '<http://example.com/3?&page=first>; rel="current",<http://example.com/3?&page=bookmark:asdf>; rel="next"'
-  };
+    link:
+      '<http://example.com/3?&page=first>; rel="current",<http://example.com/3?&page=bookmark:asdf>; rel="next"'
+  }
   const initialState = {
     ...defaults,
     records: {
@@ -197,7 +197,7 @@ test('handles FETCH_RECORDS_NEXT_PAGE_SUCCESS for given record type', function (
         nextPage: null
       }
     }
-  };
+  }
   const newState = {
     ...initialState,
     records: {
@@ -209,17 +209,17 @@ test('handles FETCH_RECORDS_NEXT_PAGE_SUCCESS for given record type', function (
         nextPage: parseLinkHeader(payload.link).next
       }
     }
-  };
+  }
   const action = {
     type: FETCH_RECORDS_NEXT_PAGE_SUCCESS,
     payload
-  };
+  }
 
-  deepEqual(reducer(initialState, action), newState);
-});
+  deepEqual(reducer(initialState, action), newState)
+})
 
-test('handles FETCH_RECORDS_NEXT_PAGE_FAILURE for given record type', function () {
-  const defaults = defaultState();
+test('handles FETCH_RECORDS_NEXT_PAGE_FAILURE for given record type', function() {
+  const defaults = defaultState()
   const initialState = {
     ...defaults,
     records: {
@@ -230,7 +230,7 @@ test('handles FETCH_RECORDS_NEXT_PAGE_FAILURE for given record type', function (
         nextPage: 'https://example.com'
       }
     }
-  };
+  }
   const newState = {
     ...initialState,
     records: {
@@ -241,17 +241,17 @@ test('handles FETCH_RECORDS_NEXT_PAGE_FAILURE for given record type', function (
         nextPage: null
       }
     }
-  };
+  }
   const action = {
     type: FETCH_RECORDS_NEXT_PAGE_FAILURE,
-    payload: { recordType: 'students' }
-  };
+    payload: {recordType: 'students'}
+  }
 
-  deepEqual(reducer(initialState, action), newState);
-});
+  deepEqual(reducer(initialState, action), newState)
+})
 
-test('handles CLEAR_RECORDS for given record type', function () {
-  const defaults = defaultState();
+test('handles CLEAR_RECORDS for given record type', function() {
+  const defaults = defaultState()
   const initialState = {
     ...defaults,
     records: {
@@ -262,7 +262,7 @@ test('handles CLEAR_RECORDS for given record type', function () {
         nextPage: 'https://example.com'
       }
     }
-  };
+  }
   const newState = {
     ...initialState,
     records: {
@@ -273,11 +273,11 @@ test('handles CLEAR_RECORDS for given record type', function () {
         nextPage: null
       }
     }
-  };
+  }
   const action = {
     type: CLEAR_RECORDS,
-    payload: { recordType: 'students' }
-  };
+    payload: {recordType: 'students'}
+  }
 
-  deepEqual(reducer(initialState, action), newState);
-});
+  deepEqual(reducer(initialState, action), newState)
+})

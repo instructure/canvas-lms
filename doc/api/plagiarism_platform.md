@@ -1,27 +1,34 @@
- Plagiarism Detection Platform
-==============
+# Plagiarism Detection Platform
+
 The plagiarism detection platform provides a standard way for LTI2 tool providers (TPs) to seamlessly integrate plagiarism detection tools with Canvas. Part of this platform is the introduction of Originality Reports which can be created, edited, and retrieved by TPs. TPs are also given a means of subscribing to webhooks to notify them of changes to assignments and submissions.
 
 This document provides details to guide TPs toward leveraging the plagiarism detection platform. The document is divided into three sections that cover the plagiarism detection platform:
 
 #### Section 1 - Tool Registration
+
 TPs leveraging the new plagiarism detection platform must go through the standard LTI2 registration flow, with some additional steps along the way.
 
 #### Section 2 - Tool Launch & Webhooks
+
 Once registered, tools will be provided with an LTI tool placement in the Canvas assignment create/edit UI to launch a configuration page. Canvas will automatically create a subscription on behalf of the tool for a submissions webhook, allowing the TP to be notified when a submission has been made.
 
 #### Section 3 - Originality Reports
+
 The webhook sent to the TP contains the data needed for the tool to retrieve the submission from Canvas. The TP can then process the submission, determine its "originality score", and create an Originality Report. This data is then sent back to Canvas and associated with the submission via the Canvas Originality Report API.
 
 #### Section 4 - Other Features
+
 Descriptions of optional features tool providers may use.
 
 For additional help please see the following reference tools:
+
 * [Plagiarism Detection Reference Tool](https://github.com/instructure/lti_originality_report_example)
 * [LTI 2.1 Reference Tool](https://github.com/instructure/lti2_reference_tool_provider)
 
 ### 1. Tool Registration
+
 Canvas’ plagiarism platform requires the TP to support LTI2 and obtain a Canvas developer key. During the standard LTI2 registration flow, the TP should take the following steps:
+
 1. Include a JWT access token in the Authorization header of the request to get the Tool Consumer Profile (see section 1.1).
 2. Add the `Canvas.placements.similarityDetection` capability to the Tool Profile’s Resource Handler enabled capabilities (See section 1.2).
 3. Add the `vnd.Canvas.OriginalityReport` service to the Tool Proxy’s Security Contract (see section 1.3).
@@ -29,11 +36,13 @@ Canvas’ plagiarism platform requires the TP to support LTI2 and obtain a Canva
 5. Include a JWT access token in the Authorization header of the Tool Proxy create POST request (see section 1.5).
 
 #### 1.1 Include JWT Access Token in Tool Consumer Profile Request
+
 Requesting a TCP is the second step of registering an LTI2 Tool (See [LTI2 implementation guide](https://www.imsglobal.org/specs/ltiv2p0/implementation-guide#toc-100))
 
 Canvas will include a restricted set of services/capabilities in the TCP if the request to retrieve the TCP contains a JWT access token in the Authorization header.
 
 Canvas requires that the TP use the following restricted capabilities/services:
+
 * `vnd.Canvas.OriginalityReport` service
 * `vnd.Canvas.submission` service
 * `Canvas.placements.similarityDetection` capability
@@ -45,7 +54,9 @@ Authorization Bearer <JWT access token>
 ```
 
 #### 1.2 Adding the Similarity Detection Placement
+
 Tool Providers who wish to use the plagiarism detection platform must add the similarity detection placement capability to the Tool Profile’s Resource Handler:
+
 ```json
 {
 …
@@ -64,7 +75,9 @@ Tool Providers who wish to use the plagiarism detection platform must add the si
 …
 }
 ```
+
 This placement is listed in the TCP request as described in section 1.1:
+
 ```json
 {
 …
@@ -77,9 +90,11 @@ This placement is listed in the TCP request as described in section 1.1:
 …
 }
 ```
+
 Note that the `Canvas.placements.similarityDetection` capability should be enabled in both the resource handler and in the `enabled_capability` array at the root of the tool proxy.
 
 #### 1.3 Adding the Services to the Security Contract
+
 The following example security contract shows the services required to use the plagiarism platform:
 
 ```json
@@ -104,10 +119,13 @@ The following example security contract shows the services required to use the p
   …
 }
 ```
+
 For each tool service object, the `service` field must match the `@id` of the `service` given in the TCP (see section 1.1) and the value of `action` must be a subset of the actions provided in the TCP (see section 1.1).
 
 #### 1.4 Adding the Security.splitSecret Capability
+
 The `Security.splitSecret` capability must be used by the TP when using the similarity detection platform in Canvas. Specify this capability in the Tool Proxy:
+
 ```json
 {
   …
@@ -117,10 +135,13 @@ The `Security.splitSecret` capability must be used by the TP when using the simi
   …
 }
 ```
+
 The following excerpt regarding the split secret capability is from the LTI 2.1 Implementation Guide (in draft) and may change in the future:
+
 > The shared secret is used to digitally sign launch requests in accordance with the OAuth [sic]. If the Tool Consumer offers a capability of `Security.splitSecret` and this is enabled in the Tool Proxy, then the security contract should include an element named `tp_half_shared_secret` with a value of 128 hexadecimal characters (all in lowercase). This represents the second half of the string to use as the shared secret; the first half will be generated by the Tool Consumer and passed to the Tool Provider in its acceptance response (see section 10.1) as a parameter named `tc_half_shared_secret` (along with the Tool Proxy GUID value); this should also be a 128 string of lowercase hexadecimal characters. Each 128-character hexadecimal string should be generated from 64 bytes of random data. If the split secret capability was not offered or enabled, then the security contract should include the full shared secret in an element named `shared_secret`. The Tool Proxy should never contain both the `tp_half_shared_secret` and `shared_secret` elements; just one or the other.
 
 #### 1.5 The Tool Proxy Create Request
+
 The next-to-last step in the standard LTI2 registration flow is creating a Tool Proxy in the Tool Consumer (see [LTI2 implementation guide](https://www.imsglobal.org/specs/ltiv2p0/implementation-guide#toc-101)).
 
 To register a Tool Proxy that uses restricted capabilities/services (like the originality report service) from a custom TCP the Tool Proxy creation `POST` request should include a JWT access token in the `Authorization` header. For information on retrieving a JWT access token for this purpose see <a href="jwt_access_tokens.html">JWT access tokens</a> section 1.0. This may be the same token used to retrieve the tool consumer profile.
@@ -128,9 +149,11 @@ To register a Tool Proxy that uses restricted capabilities/services (like the or
 Standard LTI2 registration requires requests to be signed with a temporary `reg_key` and `reg_password` (see [LTI@ implementation guide](https://www.imsglobal.org/specs/ltiv2p0/implementation-guide#toc-60)). When using a JWT access token in the authorization header this is not necessary (see <a href="jwt_access_tokens.html">JWT access tokens</a> section 1.0).
 
 ### 2. Tool Launch & Webhooks
+
 Tools configured as described in section 1 of this document will be launchable from the assignment create/edit page in Canvas (see section 2.1). Once an assignment is created and associated with a plagiarism tool Canvas will automatically create a subscription to notify the tool when submissions are created by students(see section 2.2).
 
 #### 2.1 The Similarity Detection Placement
+
 Tools configured as described in section 1 of this document will be made available to assignments using “File Upload” submission types. Other submission types are not supported at this time. Once “File Upload” submission type is selected, a “Plagiarism Review” dropdown box becomes available so that the user can associate the assignment to the plagiarism tool. Note that the plagiarism platform feature flag must be enabled in Canvas.
 
 Selecting a tool in the "Plagiarism Review" selector initiates a standard LTI launch to the launch URL provided in the resource handler during the registration phase (see 1.2). This launch is intended to allow configuration of the plagiarism review tool during the assignment creation process.
@@ -156,7 +179,9 @@ While we strive to maintain very low latency, this is not guaranteed at all time
 Additional JSON keys may be added in the future. Consumers should be permissive in what they accept in this regard.
 
 #### 2.3 Subscribing to Webhooks
+
 Once an assignment is created that uses a plagiarism detection tool a webhook subscription is automatically created and configured as specified by the `SubmissionEvent` service in the Tool Profile’s `service_offered` section. Below is an example of how to configure this service in the Tool Profile:
+
 ```json
 {
   …
@@ -171,9 +196,11 @@ Once an assignment is created that uses a plagiarism detection tool a webhook su
   …
 }
 ```
+
 This automatic subscription will cause a webhook to be sent to the endpoint specified by the SubmissionEvent whenever a submission is created or updated or when a user clicks the “resubmit to plagiarism detection service” button in the Canvas UI.
 
 #### 2.4 Webhook payload format
+
 HTTPS Webhooks will be transmitted over HTTPS via a POST request with a content type of application/json to the endpoint you specify in your subscriptions.
 
 SQS Webhooks will contain the same JSON body as the body of the SQS Message.
@@ -197,7 +224,8 @@ A JSON body example is shown below.
     "request_id": "1602a2f9-4c28-44ec-9cb2-372cbac73224",
     "session_id": "337e3af6f38cd4ff31539d1ae677a288",
     "hostname": "sandbox.beta.instructure.com",
-    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:54.0) Gecko/20100101 Firefox/54.0",
+    "user_agent":
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:54.0) Gecko/20100101 Firefox/54.0",
     "producer": "canvas",
     "event_name": "submission_updated",
     "event_time": "2017-05-23T09:58:31Z"
@@ -223,7 +251,9 @@ A JSON body example is shown below.
   }
 }
 ```
+
 ### 3. Originality Reports
+
 Once the TP has been notified of a new submission (see section 2.2), it may access the submission through the <a href="plagiarism_detection_submissions.html">Canvas LTI Submissions API</a> for processing. The payload from this request will contain URLs for retrieving the submission’s attachment.
 
 After processing the submission, an Originality Report may be created for the submission.
@@ -233,10 +263,13 @@ For more details on creating originality reports see the <a href="originality_re
 Using the Originality Report and Submissions APIs requires a JWT access token be sent in the authorization header. For more information on using JWT tokens in Canvas see <a href="jwt_access_tokens.html">JWT access tokens</a>.
 
 ### 4. Other Features
+
 The following are optional features the tool provider may wish to implement.
 
 #### Course Copy
+
 The plagiarism platform automatically handles most of the work required for course copy to work with TPs. When a Course that contains assignments associated with a plagiarism detection TP is copied in Canvas the following occurs:
+
 * The copies of assignments in the new course are automatically associated with the correct tool.
 * A webhook subscription is automatically created on behalf of the tool for the newly copied assignments.
 * Tool Settings associated with the course are copied to the new course (See _Using the LTI Tool Settings Service_ below).
@@ -248,9 +281,11 @@ Once the course copy has occurred TPs should be aware that they will begin recei
 TPs often have a configuration that is set on a per-assignment basis via their UI by the instructor creating the assignment and stored by the TP. There are two ways of handeling these TP configurations during a course copy: using reasonable defaults or using the LTI Tool Settings Service.
 
 ##### Option 1: Using Defaults
+
 When receiving a `submission_created` webhook for an assignment that has never had an associated LTI launch, TP configuration items have not been set by the instructor. In these cases, TPs should use good defaults for any custom configuration they typically offer to instructors when configuring assignments. TPs may even wish to provide a resource handler that uses the `Canvas.placements.accountNavigation` placement in order to provide Canvas administrators the ability to set account-level default configurations.
 
 ##### Option 2: Using the LTI Tool Settings Service
+
 The LTI Tool Settings service may be used as a key/value store associated with a particular LTI launch. This means that a TP may store their custom per-assignment configuration in a Tool Setting associated with the Canvas assignment. When a course is copied all Tool Settings will be copied to the new course and be associated with the proper assignments in the new context. The following describes how to create a Tool Setting associated with an assignment and leverage it for course copy:
 
 1. Use `LtiLink.custom.url` variable expansion
@@ -258,9 +293,10 @@ The LTI Tool Settings service may be used as a key/value store associated with a
 3. When receiving a `submission_created` webhook for an unknown assignment, use the LTI assignment API to fetch assignment data
 4. When receiving a `submission_created` webhook for an unknown assignment, use the `lti_assignment_id` and the Tool Setting Service to retrieve TP assignment-level configuration
 
-
 ##### 1. Using `LtiLink.custom.url`
+
 The `LtiLink.custom.url` variable expansion should be used in the same message handler that handles `Canvas.placements.similarityDetection` launches:
+
 ```json
 ...
 "message":[
@@ -282,12 +318,14 @@ The `LtiLink.custom.url` variable expansion should be used in the same message h
 Canvas will then create a Tool Setting for the TP associated with the assignment when the `Canvas.placements.similarityDetection` launch occurs for the first time. This Tool Setting can be used to store TP specific assignment-level configuration that will be copied to the new context during a course copy.
 
 ##### 2. Store assignment-level custom configuration in Tool Settings
+
 ```
 PUT
 /api/lti/tool_proxy/<tool proxy guid>/courses/24/resource_link_id/<lti assignment id>/tool_setting
 ```
 
 Example Request:
+
 ```
 curl -X PUT \
   http://canvas.docker/api/lti/tool_proxy/0ce4dbf1-b8c5-407d-85ac-618d7615a5a5/courses/24/resource_link_id/b2d9b916-5128-42ad-ad17-b54091a52be2/tool_setting \
@@ -295,23 +333,30 @@ curl -X PUT \
   -H 'Cache-Control: no-cache' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
 ```
-When using the update endpoint the request body should contain JSON defining the key/value pairs the TP wishes Canvas to store in the Tool Setting. Canvas will *replace* the contents of the Tool Setting with whatever keys/values are sent in the request:
+
+When using the update endpoint the request body should contain JSON defining the key/value pairs the TP wishes Canvas to store in the Tool Setting. Canvas will _replace_ the contents of the Tool Setting with whatever keys/values are sent in the request:
+
 ```json
 {"tp_custom_setting": "some value"}
 ```
+
 This endpoint is defined in the tool consumer profile.
 
 ##### 3. use the LTI assignment API to fetch assignment data
+
 When a `submission_created` webhook is received for an assignment the TP has not seen before, it means that the submission is for an assignment that was copied from an assignment the TP _was_ configured on within another course. The TP should still process the submission. To fetch assignment information for a submission that has not been seen before, use the <a href="plagiarism_detection_platform_assignments.html">Canvas LTI Assignments API</a>
 
 ##### 4. use the `lti_assignment_id` and the Tool Setting Service to retrieve TP assignment-level configuration
+
 If the TP has been leveraging Tool Settings in Canvas to store TP specific assignment-level configurations, those Tool Settings will be copied to the new assignment as well. To access the Tool Setting note the `lti_assignment_id` in the `submission_created` webhook. The Tool Setting that should be requested will have a `resource_link_id` that matches this value:
+
 ```
 GET
 /api/lti/tool_proxy/<tool proxy guid>/courses/24/resource_link_id/<lti assignment id>/tool_setting
-
 ```
+
 Example Request:
+
 ```
 curl -X GET \
   http://canvas.docker/api/lti/tool_proxy/0ce4dbf1-b8c5-407d-85ac-618d7615a5a5/courses/24/resource_link_id/b2d9b916-5128-42ad-ad17-b54091a52be2/tool_setting \
@@ -321,19 +366,23 @@ curl -X GET \
 ```
 
 Response:
+
 ```
 {"tp_custom_setting": "some value"}
 ```
 
-
 #### End-User License Agreement Verification
+
 ##### Description
+
 This feature provides a mechanism for a tool provider to specify a link to a EULA or terms of service they wish to show to students submitting homework.
 
 This feature also guarantees that the user has agreed to the EULA/terms of service before they submit homework. The timestamp of when the user agreed is also provided to the tool provider during the normal submission/attachment retrieval flow.
 
 ##### Implementation
+
 To implement this feature a tool provider must add the `vnd.Canvas.Eula` service to the `service_offered` array of their tool proxy:
+
 ```json
 {
   …
@@ -360,26 +409,28 @@ Once the tool is registered in Canvas and associated with an assignment, student
 <img style="width:35vw;" src="./images/eula.png" alt="Submission details" />
 
 When the tool provider retrieves the assignment details from Canvas the body of the response payload will contain a property named `eula_agreement_timestamp` which contains the timestamp indicating when the user clicked the checkbox:
+
 ```json
 {
-   "id":215,
-   "submitted_at":"2017-10-17T14:28:09Z",
-   "assignment_id":216,
-   "user_id":"86157096483e6b3a50bfedc6bac902c0b20a824f",
-   "submission_type":"online_upload",
-   "workflow_state":"submitted",
-   "attempt":1,
-   "eula_agreement_timestamp":"1508250487578",
-   "attachments":[
-      {
-         "id":230,
-         "size":14942,
-         "filename":"1508250488_822__Test_Student_Submission.doc",
-         "display_name":"Test_Student_Submission.doc",
-         "created_at":"2017-10-17T14:28:08Z",
-         "updated_at":"2017-10-17T14:28:08Z",
-         "url":"http://canvas.docker/api/lti/assignments/10000000000216/submissions/10000000000215/attachment/10000000000230"
-      }
-   ]
+  "id": 215,
+  "submitted_at": "2017-10-17T14:28:09Z",
+  "assignment_id": 216,
+  "user_id": "86157096483e6b3a50bfedc6bac902c0b20a824f",
+  "submission_type": "online_upload",
+  "workflow_state": "submitted",
+  "attempt": 1,
+  "eula_agreement_timestamp": "1508250487578",
+  "attachments": [
+    {
+      "id": 230,
+      "size": 14942,
+      "filename": "1508250488_822__Test_Student_Submission.doc",
+      "display_name": "Test_Student_Submission.doc",
+      "created_at": "2017-10-17T14:28:08Z",
+      "updated_at": "2017-10-17T14:28:08Z",
+      "url":
+        "http://canvas.docker/api/lti/assignments/10000000000216/submissions/10000000000215/attachment/10000000000230"
+    }
+  ]
 }
 ```

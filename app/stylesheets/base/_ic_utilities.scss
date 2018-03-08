@@ -65,7 +65,7 @@
 .hide-text {
   text-indent: -119988px;
   overflow: hidden;
-  text-align: left; 
+  text-align: left;
 }
 
 // Uses box-sizing mixin, so must be defined here
@@ -83,25 +83,43 @@
 // Visibility utilities
 
 // For desktops
-.hidden-phone      { }
-.hidden-tablet     { }
-.hidden-desktop    { display: none !important; }
-.visible-desktop   { display: inherit !important; }
+.hidden-phone {
+}
+.hidden-tablet {
+}
+.hidden-desktop {
+  display: none !important;
+}
+.visible-desktop {
+  display: inherit !important;
+}
 
 // Tablets & small desktops only
 @media (min-width: 768px) and (max-width: 979px) {
   // Hide everything else
-  .hidden-desktop    { display: inherit !important; }
-  .visible-desktop   { display: none !important ; }
+  .hidden-desktop {
+    display: inherit !important;
+  }
+  .visible-desktop {
+    display: none !important;
+  }
   // Hide
-  .hidden-tablet     { display: none !important; }
+  .hidden-tablet {
+    display: none !important;
+  }
 }
 
 // Phones only
 @media (max-width: 767px) {
   // Hide everything else
-  .hidden-desktop    { display: inherit !important; }
-  .visible-desktop   { display: none !important; }
+  .hidden-desktop {
+    display: inherit !important;
+  }
+  .visible-desktop {
+    display: none !important;
+  }
   // Hide
-  .hidden-phone      { display: none !important; }
+  .hidden-phone {
+    display: none !important;
+  }
 }

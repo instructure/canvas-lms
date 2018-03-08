@@ -30,10 +30,10 @@ import 'jquery.instructure_forms'
 import LockManager from '../blueprint_courses/apps/LockManager'
 
 const lockManager = new LockManager()
-lockManager.init({ itemType: 'assignment', page: 'show' })
+lockManager.init({itemType: 'assignment', page: 'show'})
 
 $(() =>
-  $('#content').on('click', '#mark-as-done-checkbox', function () {
+  $('#content').on('click', '#mark-as-done-checkbox', function() {
     return MarkAsDone.toggle(this)
   })
 )
@@ -48,8 +48,7 @@ $(() => {
     })
     model.doNotParse()
 
-    new SpeedgraderLinkView({model, el: '#assignment-speedgrader-link'})
-        .render()
+    new SpeedgraderLinkView({model, el: '#assignment-speedgrader-link'}).render()
     const pbv = new PublishButtonView({model, el: $el})
     pbv.render()
 
@@ -58,7 +57,7 @@ $(() => {
     pbv.on('unpublish', () => $('#moderated_grading_button').hide())
   }
 
-    // Add module sequence footer
+  // Add module sequence footer
   $('#sequence_footer').moduleSequenceFooter({
     courseID: ENV.COURSE_ID,
     assetType: 'Assignment',
@@ -69,20 +68,20 @@ $(() => {
   return vddTooltip()
 })
 
-  // -- This is all for the _grade_assignment sidebar partial
+// -- This is all for the _grade_assignment sidebar partial
 $(() => {
-  $('.upload_submissions_link').click((event) => {
+  $('.upload_submissions_link').click(event => {
     event.preventDefault()
     $('#re_upload_submissions_form').slideToggle()
   })
 
-  $('.download_submissions_link').click(function (event) {
+  $('.download_submissions_link').click(function(event) {
     event.preventDefault()
     INST.downloadSubmissions($(this).attr('href'))
     $('.upload_submissions_link').slideDown()
   })
 
-  $('#re_upload_submissions_form').submit(function (event) {
+  $('#re_upload_submissions_form').submit(function(event) {
     const data = $(this).getFormData()
     if (!data.submissions_zip) {
       event.preventDefault()
@@ -91,7 +90,8 @@ $(() => {
       event.preventDefault()
       event.stopPropagation()
       $(this).formErrors({
-        submissions_zip: I18n.t('Please upload files as a .zip')})
+        submissions_zip: I18n.t('Please upload files as a .zip')
+      })
     }
   })
 

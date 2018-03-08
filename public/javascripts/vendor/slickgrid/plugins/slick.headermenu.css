@@ -28,7 +28,6 @@
   cursor: default;
 }
 
-
 /* Menu items */
 .slick-header-menuitem {
   list-style: none;
@@ -51,7 +50,6 @@
   display: inline-block;
   vertical-align: middle;
 }
-
 
 /* Disabled */
 .slick-header-menuitem-disabled {

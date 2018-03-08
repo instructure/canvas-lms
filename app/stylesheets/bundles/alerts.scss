@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 .alert_separator {
   border-top: 1px dotted #aaa;
@@ -37,7 +37,7 @@
     font-weight: bold;
     margin-top: 5px;
   }
-  .labelled_region{
+  .labelled_region {
     margin-bottom: 15px;
     color: $ic-font-color-dark;
   }
@@ -46,7 +46,7 @@
     opacity: 0.5;
     color: $ic-font-color-dark;
     &:hover {
-      opacity: 1.0;
+      opacity: 1;
     }
   }
   .repetition_group {
@@ -58,13 +58,14 @@
     width: 400px;
     clear: right;
     .delete_item_link {
-      float: right
+      float: right;
     }
   }
-  .add_criteria_line select, .add_recipients_line select, .repetition_group input[type="text"] {
+  .add_criteria_line select,
+  .add_recipients_line select,
+  .repetition_group input[type='text'] {
     vertical-align: baseline;
   }
-
 }
 
 .alert.blank {

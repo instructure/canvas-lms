@@ -24,17 +24,15 @@
 /// Repeat - this is a work in progress, iterative approach to handing typography in Canvas.
 /// There's a lot here we don't want, and a lot more we need to re-work, but not all in one go.
 
-
 ///////==============
 /// Global Settings
 ///////==============
 
-
 @font-face {
   font-family: 'LatoWeb';
   src: url('/fonts/lato/latin/LatoLatin-Regular.woff2') format('woff2'),
-       url('/fonts/lato/latin/LatoLatin-Regular.woff') format('woff'),
-       url('/fonts/lato/latin/LatoLatin-Regular.ttf') format('truetype');
+    url('/fonts/lato/latin/LatoLatin-Regular.woff') format('woff'),
+    url('/fonts/lato/latin/LatoLatin-Regular.ttf') format('truetype');
   font-style: normal;
   font-weight: normal;
 }
@@ -42,8 +40,8 @@
 @font-face {
   font-family: 'LatoWeb';
   src: url('/fonts/lato/latin/LatoLatin-Italic.woff2') format('woff2'),
-       url('/fonts/lato/latin/LatoLatin-Italic.woff') format('woff'),
-       url('/fonts/lato/latin/LatoLatin-Italic.ttf') format('truetype');
+    url('/fonts/lato/latin/LatoLatin-Italic.woff') format('woff'),
+    url('/fonts/lato/latin/LatoLatin-Italic.ttf') format('truetype');
   font-style: italic;
   font-weight: normal;
 }
@@ -51,8 +49,8 @@
 @font-face {
   font-family: 'LatoWeb';
   src: url('/fonts/lato/latin/LatoLatin-Bold.woff2') format('woff2'),
-       url('/fonts/lato/latin/LatoLatin-Bold.woff') format('woff'),
-       url('/fonts/lato/latin/LatoLatin-Bold.ttf') format('truetype');
+    url('/fonts/lato/latin/LatoLatin-Bold.woff') format('woff'),
+    url('/fonts/lato/latin/LatoLatin-Bold.ttf') format('truetype');
   font-style: normal;
   font-weight: bold;
 }
@@ -60,8 +58,8 @@
 @font-face {
   font-family: 'LatoWeb';
   src: url('/fonts/lato/latin/LatoLatin-Light.woff2') format('woff2'),
-       url('/fonts/lato/latin/LatoLatin-Light.woff') format('woff'),
-       url('/fonts/lato/latin/LatoLatin-Light.ttf') format('truetype');
+    url('/fonts/lato/latin/LatoLatin-Light.woff') format('woff'),
+    url('/fonts/lato/latin/LatoLatin-Light.ttf') format('truetype');
   font-style: normal;
   font-weight: 300;
 }
@@ -112,26 +110,50 @@ cite {
   line-height: $ic-line-height * 1.5;
 }
 .muted {
-  @if $use_high_contrast { color: darken($ic-hint-text, 20%); }
-  @else { color: $ic-hint-text; }
+  @if $use_high_contrast {
+    color: darken($ic-hint-text, 20%);
+  } @else {
+    color: $ic-hint-text;
+  }
 }
-.text-warning { color: $ic-color-alert; }
-a.text-warning:hover { color: darken($ic-color-alert, 10%); }
+.text-warning {
+  color: $ic-color-alert;
+}
+a.text-warning:hover {
+  color: darken($ic-color-alert, 10%);
+}
 
-.text-error { color: $ic-color-danger; }
-a.text-error:hover { color: darken($ic-color-danger, 10%); }
+.text-error {
+  color: $ic-color-danger;
+}
+a.text-error:hover {
+  color: darken($ic-color-danger, 10%);
+}
 
-.text-info { color: var(--ic-brand-primary); }
-a.text-info:hover { color: var(--ic-brand-primary-darkened-10); }
+.text-info {
+  color: var(--ic-brand-primary);
+}
+a.text-info:hover {
+  color: var(--ic-brand-primary-darkened-10);
+}
 
-.text-success { color: $ic-color-success; }
-a.text-success:hover { color: darken($ic-color-success, 10%); }
+.text-success {
+  color: $ic-color-success;
+}
+a.text-success:hover {
+  color: darken($ic-color-success, 10%);
+}
 
 ///////==============
 /// Heading Settings
 ///////==============
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin: $ic-sp/2 0;
   font-family: $ic-font-family;
   font-weight: $ic-font-weight;
@@ -144,28 +166,63 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-h1 { font-size: $ic-font-size * 2.375; } // ~38px
-h2 { font-size: $ic-font-size * 2.00; } // ~32px
-h3 { font-size: $ic-font-size * 1.50; } // ~24px
-h4 { font-size: $ic-font-size * 1.125; } // ~18px
-h5 { font-size: $ic-font-size; }
-h6 { font-size: $ic-font-size * 0.75; } // ~12px
+h1 {
+  font-size: $ic-font-size * 2.375;
+} // ~38px
+h2 {
+  font-size: $ic-font-size * 2;
+} // ~32px
+h3 {
+  font-size: $ic-font-size * 1.5;
+} // ~24px
+h4 {
+  font-size: $ic-font-size * 1.125;
+} // ~18px
+h5 {
+  font-size: $ic-font-size;
+}
+h6 {
+  font-size: $ic-font-size * 0.75;
+} // ~12px
 
-h1 small { font-size: $ic-font-size * 1.50; } // ~24px
-h2 small { font-size: $ic-font-size * 1.125; } // ~18px
-h3 small { font-size: $ic-font-size; }
-h4 small { font-size: $ic-font-size; }
+h1 small {
+  font-size: $ic-font-size * 1.5;
+} // ~24px
+h2 small {
+  font-size: $ic-font-size * 1.125;
+} // ~18px
+h3 small {
+  font-size: $ic-font-size;
+}
+h4 small {
+  font-size: $ic-font-size;
+}
 
 // now tweak them all a bit to be less shouty
 
-h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
   font-weight: normal;
 }
-h1, h2, .h1, .h2 {
+h1,
+h2,
+.h1,
+.h2 {
   font-size: 1.8em;
   line-height: $ic-line-height;
 }
-h3, .h3 {
+h3,
+.h3 {
   font-size: 1.5em;
 }
 
@@ -181,22 +238,28 @@ h3, .h3 {
 
 a {
   color: var(--ic-link-color);
-  &:focus, &:hover {
+  &:focus,
+  &:hover {
     color: var(--ic-link-color-darkened-10);
   }
 
   @if $use_high_contrast {
     text-decoration: underline;
-    &:focus, &:hover { text-decoration: none; }
+    &:focus,
+    &:hover {
+      text-decoration: none;
+    }
     @include ic-focus-base;
-    &:focus { @include ic-focus-variant($color: var(--ic-link-color), $offset: -1px); }
-  }
-
-  @else {
+    &:focus {
+      @include ic-focus-variant($color: var(--ic-link-color), $offset: -1px);
+    }
+  } @else {
     text-decoration: none;
-    &:focus, &:hover { text-decoration: underline; }
+    &:focus,
+    &:hover {
+      text-decoration: underline;
+    }
   }
-
 }
 ////////=============
 /// Underline All Links Feature Flag
@@ -204,9 +267,14 @@ a {
 .Underline-All-Links__enabled {
   a:not(.Button, .btn, .ui-button, .ui-tabs-anchor) {
     text-decoration: underline;
-    &:focus, &:hover { text-decoration: none; }
+    &:focus,
+    &:hover {
+      text-decoration: none;
+    }
     @include ic-focus-base;
-    &:focus { @include ic-focus-variant($color: var(--ic-link-color), $offset: -1px); }
+    &:focus {
+      @include ic-focus-variant($color: var(--ic-link-color), $offset: -1px);
+    }
   }
 }
 
@@ -221,7 +289,8 @@ a {
 ///////==============
 
 // Unordered and Ordered lists
-ul, ol {
+ul,
+ol {
   padding: 0;
   margin: 0 0 6px 25px;
 }
@@ -293,15 +362,22 @@ sub {
 // have to make labels inline-block by default,
 // boostrap makes them all block but we have a ton of
 // existing forms that count on them being inline.
-label { display: inline-block; }
+label {
+  display: inline-block;
+}
 
 // because sometimes an input-mini is just too big
-.input-micro { width: 30px; }
+.input-micro {
+  width: 30px;
+}
 
 // if you are making a bootstrap style form and need to get your labels to look right (be block),
 // add the class .bootstrap-form to the <form>. this is the only need for .bootstrap-form, you
 // dont need to add the .bootstrap-form class if you already have the .form-horizontal class.
-.form-horizontal label, .bootstrap-form label { display: block;}
+.form-horizontal label,
+.bootstrap-form label {
+  display: block;
+}
 
 // make labels in paragraphs the same size as regular text (as opposed to slightly larger)
 p label {
@@ -345,22 +421,22 @@ select.un-bootrstrapify {
 
 // for checkboxes not wrapped in a label.checkbox, make them look decent,
 // should remove this eventually.
-input[type=checkbox] + label,
-input[type=radio] + label {
+input[type='checkbox'] + label,
+input[type='radio'] + label {
   vertical-align: -4px;
 }
 
 // align inline form buttons to prevent staggering
 .form-inline {
-  input[type=checkbox] + label,
-  input[type=radio] + label {
+  input[type='checkbox'] + label,
+  input[type='radio'] + label {
     vertical-align: middle;
   }
 }
 
 // all the browsers render this differently, remove line-height so the text doesn't
 // get ridiculously misaligned.
-input[type=file] {
+input[type='file'] {
   line-height: 1em;
 }
 
@@ -373,7 +449,8 @@ input[type=file] {
   background: #e4e9ed;
 }
 .table-vertically-center {
-  th, td {
+  th,
+  td {
     vertical-align: middle;
   }
 }
@@ -395,8 +472,10 @@ input[type=file] {
   }
 }
 .table-hover tbody {
-  tr:hover, tr.table-hover-row {
-    td, th {
+  tr:hover,
+  tr.table-hover-row {
+    td,
+    th {
       background: $ic-color-neutral;
     }
   }
@@ -416,8 +495,11 @@ iframe#tool_content {
 // z-index, even if the element is inside the dialog (in which case the
 // z-index is not actually lower. so dumb)
 .ui-dialog {
-  .input-append, .input-prepend {
-    input, select, .uneditable-input {
+  .input-append,
+  .input-prepend {
+    input,
+    select,
+    .uneditable-input {
       &:focus {
         z-index: 1001;
       }
@@ -426,7 +508,9 @@ iframe#tool_content {
 }
 
 // fixes bug in Cal1 where not-allowed cursor appears over checkboxes set to readonly
-.calendar_links input[readonly] { cursor: auto; }
+.calendar_links input[readonly] {
+  cursor: auto;
+}
 
 blockquote p {
   font-size: inherit;
@@ -508,7 +592,7 @@ q:before,
 q:after,
 blockquote:before,
 blockquote:after {
-  content: "";
+  content: '';
 }
 
 // Addresses
@@ -555,9 +639,9 @@ Here's an accessible way to do it for popovers without a header.
   background-color: $popoverBackground;
   opacity: 1;
   border: 1px solid #ccc;
-  border: 1px solid rgba(0,0,0,.2);
+  border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 6px;
-  box-shadow: 0 5px 10px rgba(0,0,0,.2);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
 .ui-widget.ui-tooltip.popover-padded {
@@ -566,14 +650,15 @@ Here's an accessible way to do it for popovers without a header.
 
 $popoverArrowDistanceFromCorner: $popoverArrowOuterWidth;
 .ui-tooltip.popover {
-  &:before, &:after {
+  &:before,
+  &:after {
     border-color: transparent transparent $popoverArrowOuterColor transparent;
     position: absolute;
-    border-style:solid;
+    border-style: solid;
     border-width: $popoverArrowOuterWidth;
-    width:0;
-    height:0;
-    content: "";
+    width: 0;
+    height: 0;
+    content: '';
     top: -$popoverArrowOuterWidth * 2;
     left: $popoverArrowDistanceFromCorner;
   }
@@ -679,7 +764,7 @@ $popoverArrowDistanceFromCorner: $popoverArrowOuterWidth;
 
 @keyframes highlight-shadow-fade {
   from {
-    box-shadow: 0 0 8px rgba(82,168,236,1);
+    box-shadow: 0 0 8px rgba(82, 168, 236, 1);
   }
   to {
     box-shadow: none;

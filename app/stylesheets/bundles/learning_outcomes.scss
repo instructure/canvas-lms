@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "pages/rubrics";
+@import 'base/environment';
+@import 'pages/rubrics';
 
 .outcomes-browser {
   min-width: 840px;
@@ -105,7 +105,9 @@
     .outcome_information_link i {
       margin-bottom: -3px;
     }
-    .move_button, .edit_button, .delete_button {
+    .move_button,
+    .edit_button,
+    .delete_button {
       margin-left: 1em;
       margin-bottom: 1em;
     }
@@ -130,7 +132,8 @@ ul.outcome-level {
   overflow-x: hidden;
   overflow-y: auto;
   box-sizing: border-box;
-  &.outcome-level-hover, &.outcome-level-hover li {
+  &.outcome-level-hover,
+  &.outcome-level-hover li {
     background: white;
   }
   li {
@@ -139,10 +142,11 @@ ul.outcome-level {
     overflow: hidden;
     list-style: none;
     width: 200px;
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       background-color: $ic-bg-light-primary;
 
-      i[class*=icon-] {
+      i[class*='icon-'] {
         background-image: url(/images/blue/canvas-icons-16x16-blue.png);
       }
     }
@@ -169,7 +173,7 @@ ul.outcome-level {
           content: '';
           position: absolute;
           left: 0;
-          top:0;
+          top: 0;
           width: 4px;
           height: 100%;
           background: var(--ic-brand-primary);
@@ -193,7 +197,8 @@ ul.outcome-level {
     a.loading-more {
       background-color: darken($lightBackground, 3%);
     }
-    &[aria-grabbed=true] a, &[aria-grabbed=true] i {
+    &[aria-grabbed='true'] a,
+    &[aria-grabbed='true'] i {
       opacity: 0.75;
     }
   }
@@ -227,7 +232,8 @@ table.criterion td {
   position: relative;
 }
 
-h5, .h5 {
+h5,
+.h5 {
   margin-top: 0;
   margin-bottom: 10px;
   color: var(--ic-link-color);
@@ -271,8 +277,7 @@ table.criterion .insert {
   a {
     @if $use_high_contrast {
       color: $ic-font-color-dark;
-    }
-    @else {
+    } @else {
       color: $grayLight;
     }
     text-decoration: none;
@@ -299,8 +304,7 @@ table.criterion .insert {
   display: block;
   @if $use_high_contrast {
     border-top-color: $ic-font-color-dark;
-  }
-  @else {
+  } @else {
     border-top-color: $grayLight;
   }
 }

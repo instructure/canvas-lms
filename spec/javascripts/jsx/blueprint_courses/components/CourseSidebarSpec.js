@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { Provider } from 'react-redux'
+import {Provider} from 'react-redux'
 import * as enzyme from 'enzyme'
 import moxios from 'moxios'
 
@@ -36,15 +36,17 @@ const initialState = {
   migrationStatus: MigrationStates.states.unknown,
   canManageCourse: true,
   hasLoadedAssociations: true,
-  hasLoadedUnsyncedChanges: true,
+  hasLoadedUnsyncedChanges: true
 }
 
 const defaultProps = () => ({
-  contentRef: (cr) => { sidebarContentRef = cr },
-  routeTo: () => {},
+  contentRef: cr => {
+    sidebarContentRef = cr
+  },
+  routeTo: () => {}
 })
 
-function connect (props = defaultProps(), storeState = initialState) {
+function connect(props = defaultProps(), storeState = initialState) {
   return (
     <Provider store={mockStore(storeState)}>
       <ConnectedCourseSidebar {...props} />
@@ -53,7 +55,7 @@ function connect (props = defaultProps(), storeState = initialState) {
 }
 
 QUnit.module('Course Sidebar component', {
-  setup () {
+  setup() {
     clock = sinon.useFakeTimers()
     const appElement = document.createElement('div')
     appElement.id = 'application'
@@ -62,10 +64,10 @@ QUnit.module('Course Sidebar component', {
     moxios.install()
     moxios.stubRequest('/api/v1/courses/4/blueprint_templates/default/migrations', {
       status: 200,
-      response: [{id: '1'}],
+      response: [{id: '1'}]
     })
   },
-  teardown () {
+  teardown() {
     moxios.uninstall()
     document.getElementById('fixtures').innerHTML = ''
     clock.restore()
@@ -89,17 +91,52 @@ test('renders the open CourseSidebar component', () => {
   const rows = sidebar.find('.bcs__row')
 
   // associations
-  ok(rows.at(0).find('button#mcSidebarAsscBtn').exists(), 'Associations button')
-  equal(rows.at(0).text().trim(), `Associations${initialState.existingAssociations.length}`, 'Associations count')
+  ok(
+    rows
+      .at(0)
+      .find('button#mcSidebarAsscBtn')
+      .exists(),
+    'Associations button'
+  )
+  equal(
+    rows
+      .at(0)
+      .text()
+      .trim(),
+    `Associations${initialState.existingAssociations.length}`,
+    'Associations count'
+  )
 
   // sync history
-  ok(rows.at(1).find('button#mcSyncHistoryBtn').exists(), 'sync history button')
+  ok(
+    rows
+      .at(1)
+      .find('button#mcSyncHistoryBtn')
+      .exists(),
+    'sync history button'
+  )
 
   // unsynced changes
-  ok(rows.at(2).find('button#mcUnsyncedChangesBtn').exists(), 'unsynced changes button')
-  equal(rows.at(2).find('span').at(0).text(), 'Unsynced Changes')
+  ok(
+    rows
+      .at(2)
+      .find('button#mcUnsyncedChangesBtn')
+      .exists(),
+    'unsynced changes button'
+  )
+  equal(
+    rows
+      .at(2)
+      .find('span')
+      .at(0)
+      .text(),
+    'Unsynced Changes'
+  )
 
-  const count = rows.at(2).find('.bcs__row-right-content').text()
+  const count = rows
+    .at(2)
+    .find('.bcs__row-right-content')
+    .text()
   equal(count, initialState.unsyncedChanges.length, 'unsynced changes count')
   tree.unmount()
 })

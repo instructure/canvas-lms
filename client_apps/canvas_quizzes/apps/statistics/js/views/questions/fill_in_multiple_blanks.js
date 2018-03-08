@@ -18,59 +18,59 @@
  */
 
 define(function(require) {
-  var React = require('../../ext/react');
-  var I18n = require('i18n!quiz_statistics');
-  var Question = require('jsx!../question');
-  var QuestionHeader = require('jsx!./header');
-  var CorrectAnswerDonut = require('jsx!../charts/correct_answer_donut');
-  var AnswerTable = require('jsx!./answer_table');
-  var calculateResponseRatio = require('../../models/ratio_calculator');
-  var round = require('canvas_quizzes/util/round');
-  var classSet = require('canvas_quizzes/util/class_set');
+  var React = require('../../ext/react')
+  var I18n = require('i18n!quiz_statistics')
+  var Question = require('jsx!../question')
+  var QuestionHeader = require('jsx!./header')
+  var CorrectAnswerDonut = require('jsx!../charts/correct_answer_donut')
+  var AnswerTable = require('jsx!./answer_table')
+  var calculateResponseRatio = require('../../models/ratio_calculator')
+  var round = require('canvas_quizzes/util/round')
+  var classSet = require('canvas_quizzes/util/class_set')
 
   var FillInMultipleBlanks = React.createClass({
     getInitialState: function() {
       return {
-        answerSetId: undefined,
-      };
+        answerSetId: undefined
+      }
     },
 
     getDefaultProps: function() {
       return {
         answerSets: []
-      };
+      }
     },
 
     getAnswerPool: function() {
-      var answerSets = this.props.answerSets;
-      var answerSetId = this.state.answerSetId || (answerSets[0] || {}).id;
+      var answerSets = this.props.answerSets
+      var answerSetId = this.state.answerSetId || (answerSets[0] || {}).id
       var answerSet = answerSets.filter(function(answerSet) {
-        return answerSet.id === answerSetId;
-      })[0] || { answers: [] };
-      if(answerSet.answers){
+        return answerSet.id === answerSetId
+      })[0] || {answers: []}
+      if (answerSet.answers) {
         answerSet.answers.forEach(function(answer) {
-          answer.poolId = answerSet.id;
-        });
+          answer.poolId = answerSet.id
+        })
       }
-      return answerSet.answers;
+      return answerSet.answers
     },
 
     componentDidMount: function() {
       // Make sure we always have an active answer set:
-      this.ensureAnswerSetSelection(this.props);
+      this.ensureAnswerSetSelection(this.props)
     },
 
     componentWillReceiveProps: function(nextProps) {
-      this.ensureAnswerSetSelection(nextProps);
+      this.ensureAnswerSetSelection(nextProps)
     },
 
     render: function() {
       var crr = calculateResponseRatio(this.getAnswerPool(), this.props.participantCount, {
         questionType: this.props.questionType
-      });
-      var answerPool = this.getAnswerPool();
+      })
+      var answerPool = this.getAnswerPool()
 
-      return(
+      return (
         <Question>
           <div className="grid-row">
             <div className="col-sm-8 question-top-left">
@@ -78,19 +78,21 @@ define(function(require) {
                 responseCount={this.props.responses}
                 participantCount={this.props.participantCount}
                 questionText={this.props.questionText}
-                position={this.props.position} />
+                position={this.props.position}
+              />
 
               <div
                 className="question-text"
                 aria-hidden
-                dangerouslySetInnerHTML={{ __html: this.props.questionText }} />
+                dangerouslySetInnerHTML={{__html: this.props.questionText}}
+              />
 
               <nav className="row-fluid answer-set-tabs">
                 {this.props.answerSets.map(this.renderAnswerSetTab)}
               </nav>
             </div>
 
-            <div className="col-sm-4 question-top-right"></div>
+            <div className="col-sm-4 question-top-right" />
           </div>
 
           <div className="grid-row">
@@ -101,46 +103,46 @@ define(function(require) {
             <div className="col-sm-4 question-bottom-right">
               <CorrectAnswerDonut
                 correctResponseRatio={crr}
-                label={I18n.t(
-                  '%{ratio}% responded correctly', {
-                    ratio: round(crr * 100.0, 0)
-                  }
-                )} />
+                label={I18n.t('%{ratio}% responded correctly', {
+                  ratio: round(crr * 100.0, 0)
+                })}
+              />
             </div>
           </div>
         </Question>
-      );
+      )
     },
 
     renderAnswerSetTab: function(answerSet) {
-      var id = answerSet.id;
+      var id = answerSet.id
       var className = classSet({
-        'active': this.state.answerSetId === id
-      });
+        active: this.state.answerSetId === id
+      })
 
       return (
         <button
           key={'answerSet-' + id}
           onClick={this.switchAnswerSet.bind(null, id)}
           className={className}
-          children={answerSet.text} />
-      );
+          children={answerSet.text}
+        />
+      )
     },
 
     ensureAnswerSetSelection: function(props) {
       if (!this.state.answerSetId && props.answerSets.length) {
-        this.setState({ answerSetId: props.answerSets[0].id });
+        this.setState({answerSetId: props.answerSets[0].id})
       }
     },
 
     switchAnswerSet: function(answerSetId, e) {
-      e.preventDefault();
+      e.preventDefault()
 
       this.setState({
         answerSetId: answerSetId
-      });
+      })
     }
-  });
+  })
 
-  return FillInMultipleBlanks;
-});
+  return FillInMultipleBlanks
+})

@@ -23,11 +23,12 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Alert from '@instructure/ui-core/lib/components/Alert'
 
-
-export default function GroupSubmissionAlert ({groupType}) {
+export default function GroupSubmissionAlert({groupType}) {
   return (
     <Alert variant="warning" margin="medium 0">
-     {I18n.t('Keep in mind, this submission will count for everyone in your %{groupType} group.', {groupType})}
+      {I18n.t('Keep in mind, this submission will count for everyone in your %{groupType} group.', {
+        groupType
+      })}
     </Alert>
   )
 }

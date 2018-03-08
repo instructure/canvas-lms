@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Gradebook from 'compiled/gradezilla/Gradebook';
+import Gradebook from 'compiled/gradezilla/Gradebook'
 
-export function createGradebook (options = {}) {
+export function createGradebook(options = {}) {
   const gradebook = new Gradebook({
     colors: {},
     context_allows_gradebook_uploads: true,
     context_id: '1',
     context_url: '/courses/1/',
     currentUserId: '1',
-    default_grading_standard: [['A', 0.90], ['B', 0.80], ['C', 0.70], ['D', 0.60], ['F', 0.0]],
+    default_grading_standard: [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0.0]],
     editable: true,
     export_gradebook_csv_url: 'http://example.com/export',
     gradebook_column_order_settings_url: 'http://example.com/gradebook_column_order_settings_url',
@@ -33,7 +33,11 @@ export function createGradebook (options = {}) {
     gradebook_is_editable: true,
     graded_late_submissions_exist: false,
     grading_schemes: [
-      { id: '2801', data: [['😂', 0.9], ['🙂', 0.8], ['😐', 0.7], ['😢', 0.6], ['💩', 0]], title: 'Emoji Grades' }
+      {
+        id: '2801',
+        data: [['😂', 0.9], ['🙂', 0.8], ['😐', 0.7], ['😢', 0.6], ['💩', 0]],
+        title: 'Emoji Grades'
+      }
     ],
     locale: 'en',
     latePolicyStatusDisabled: false,
@@ -49,23 +53,23 @@ export function createGradebook (options = {}) {
     closed_grading_period_ids: [],
     speed_grader_enabled: true,
     ...options
-  });
+  })
   gradebook.keyboardNav = {
-    addGradebookElement () {},
-    removeGradebookElement () {}
-  };
+    addGradebookElement() {},
+    removeGradebookElement() {}
+  }
   gradebook.gradebookGrid.gridSupport = {
     columns: {
-      updateColumnHeaders () {},
-      scrollToStart () {},
-      scrollToEnd () {}
+      updateColumnHeaders() {},
+      scrollToStart() {},
+      scrollToEnd() {}
     }
   }
 
-  return gradebook;
+  return gradebook
 }
 
-export function setFixtureHtml ($fixture) {
+export function setFixtureHtml($fixture) {
   /* eslint-disable no-param-reassign */
   $fixture.innerHTML = `
     <div id="application">
@@ -83,10 +87,10 @@ export function setFixtureHtml ($fixture) {
         <div id="gradebook_grid"></div>
       </div>
     </div>
-  `;
+  `
   /* eslint-enable no-param-reassign */
 }
 
 export default {
   createGradebook
-};
+}

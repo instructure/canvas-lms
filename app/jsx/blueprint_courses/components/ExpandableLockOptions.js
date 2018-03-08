@@ -27,15 +27,14 @@ import IconArrowOpenRightSolid from 'instructure-icons/lib/Solid/IconArrowOpenRi
 import IconArrowOpenDownSolid from 'instructure-icons/lib/Solid/IconArrowOpenDownSolid'
 import Button from '@instructure/ui-core/lib/components/Button'
 import Text from '@instructure/ui-core/lib/components/Text'
-import Grid, { GridRow, GridCol } from '@instructure/ui-core/lib/components/Grid'
+import Grid, {GridRow, GridCol} from '@instructure/ui-core/lib/components/Grid'
 
-import { IconLock, IconUnlock } from './BlueprintLocks'
+import {IconLock, IconUnlock} from './BlueprintLocks'
 import LockCheckList from './LockCheckList'
 
 import propTypes from '../propTypes'
 import {formatLockObject} from '../LockItemFormat'
 import {itemTypeLabelPlurals} from '../labels'
-
 
 // ExpandableLockOptions is a single expandable tab that has a list of checkboxes as children
 // The tab has the toggle icon, the title of the tab, the lock icon that indicates whether the
@@ -51,7 +50,7 @@ export default class ExpandableLockOptions extends React.Component {
     objectType: PropTypes.string.isRequired,
     locks: propTypes.itemLocks,
     isOpen: PropTypes.bool,
-    lockableAttributes: propTypes.lockableAttributeList.isRequired,
+    lockableAttributes: propTypes.lockableAttributeList.isRequired
   }
 
   static defaultProps = {
@@ -60,25 +59,25 @@ export default class ExpandableLockOptions extends React.Component {
       content: false,
       points: false,
       due_dates: false,
-      availability_dates: false,
+      availability_dates: false
     }
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       open: props.isOpen,
-      locks: Object.assign({}, props.locks),
+      locks: Object.assign({}, props.locks)
     }
   }
 
-  onChange = (locks) => {
+  onChange = locks => {
     this.setState({
       locks
     })
   }
 
-  onKeyDown = (e) => {
+  onKeyDown = e => {
     if (e.keyCode === 32) {
       this.toggle()
     }
@@ -90,12 +89,14 @@ export default class ExpandableLockOptions extends React.Component {
     })
   }
 
-  renderIndicatorIcon () {
+  renderIndicatorIcon() {
     const Icon = this.state.open ? IconArrowOpenDownSolid : IconArrowOpenRightSolid
     return (
       <div className="bcs_tab_indicator-icon" onKeyDown={this.onKeyDown}>
-        <Button variant="icon" onClick={this.toggle} >
-          <Text size="medium" ><Icon /></Text>
+        <Button variant="icon" onClick={this.toggle}>
+          <Text size="medium">
+            <Icon />
+          </Text>
           <ScreenReaderContent>
             {`${itemTypeLabelPlurals[this.props.objectType]},
             ${this.state.open ? I18n.t('Expanded') : I18n.t('Collapsed')},
@@ -107,20 +108,20 @@ export default class ExpandableLockOptions extends React.Component {
     )
   }
 
-// The toggle icon and the title of the tab are in a subgrid because the spacing
-// If we don't do a subgrid the space between the toggle icon and the title either cuts the icon
-// or renders a large space between the icon and the title
-  renderTitle () {
+  // The toggle icon and the title of the tab are in a subgrid because the spacing
+  // If we don't do a subgrid the space between the toggle icon and the title either cuts the icon
+  // or renders a large space between the icon and the title
+  renderTitle() {
     return (
       <Grid>
         <GridRow>
-          <GridCol width={4}>
-            {this.renderIndicatorIcon()}
-          </GridCol>
+          <GridCol width={4}>{this.renderIndicatorIcon()}</GridCol>
           <GridCol width={8}>
             <PresentationContent>
-              <div className="bcs_tab-text" >
-                <Text size="small" weight="normal">{itemTypeLabelPlurals[this.props.objectType]}</Text>
+              <div className="bcs_tab-text">
+                <Text size="small" weight="normal">
+                  {itemTypeLabelPlurals[this.props.objectType]}
+                </Text>
               </div>
             </PresentationContent>
           </GridCol>
@@ -129,21 +130,19 @@ export default class ExpandableLockOptions extends React.Component {
     )
   }
 
-  renderLockIcon () {
-    const hasLocks = Object.keys(this.state.locks)
-      .reduce((isLocked, lockProp) => isLocked || this.state.locks[lockProp], false)
-    const Icon = hasLocks ? <IconLock /> : <IconUnlock />
-    return (
-      <div className="bcs_tab-icon">
-        {Icon}
-      </div>
+  renderLockIcon() {
+    const hasLocks = Object.keys(this.state.locks).reduce(
+      (isLocked, lockProp) => isLocked || this.state.locks[lockProp],
+      false
     )
+    const Icon = hasLocks ? <IconLock /> : <IconUnlock />
+    return <div className="bcs_tab-icon">{Icon}</div>
   }
 
-  renderSubList () {
+  renderSubList() {
     const viewableClasses = cx({
       'bcs_sub-menu': true,
-      'bcs_sub-menu-viewable': this.state.open,
+      'bcs_sub-menu-viewable': this.state.open
     })
     return (
       <div className={viewableClasses}>
@@ -157,25 +156,22 @@ export default class ExpandableLockOptions extends React.Component {
     )
   }
 
-
-  render () {
+  render() {
     return (
       <div className="bcs__object-tab">
         <div onClick={this.toggle}>
           <Grid>
             <GridRow>
-              <GridCol width={4}>
-                {this.renderTitle()}
-              </GridCol>
+              <GridCol width={4}>{this.renderTitle()}</GridCol>
               <GridCol width={1}>
-                <PresentationContent>
-                  {this.renderLockIcon()}
-                </PresentationContent>
+                <PresentationContent>{this.renderLockIcon()}</PresentationContent>
               </GridCol>
               <GridCol width={7}>
                 <PresentationContent>
-                  <div className="bcs_tab-text" >
-                    <Text size="small" weight="normal" >{formatLockObject(this.state.locks)}</Text>
+                  <div className="bcs_tab-text">
+                    <Text size="small" weight="normal">
+                      {formatLockObject(this.state.locks)}
+                    </Text>
                   </div>
                 </PresentationContent>
               </GridCol>

@@ -25,7 +25,7 @@ QUnit.module('CourseFilter component')
 
 const defaultProps = () => ({
   subAccounts: data.subAccounts,
-  terms: data.terms,
+  terms: data.terms
 })
 
 test('renders the CourseFilter component', () => {
@@ -34,10 +34,10 @@ test('renders the CourseFilter component', () => {
   ok(node.exists())
 })
 
-test('onChange fires with search filter when text is entered in search box', (assert) => {
+test('onChange fires with search filter when text is entered in search box', assert => {
   const done = assert.async()
   const props = defaultProps()
-  props.onChange = (filter) => {
+  props.onChange = filter => {
     equal(filter.search, 'giraffe')
     done()
   }
@@ -47,10 +47,10 @@ test('onChange fires with search filter when text is entered in search box', (as
   input.simulate('change')
 })
 
-test('onChange fires with term filter when term is selected', (assert) => {
+test('onChange fires with term filter when term is selected', assert => {
   const done = assert.async()
   const props = defaultProps()
-  props.onChange = (filter) => {
+  props.onChange = filter => {
     equal(filter.term, '1')
     done()
   }
@@ -60,10 +60,10 @@ test('onChange fires with term filter when term is selected', (assert) => {
   input.simulate('change')
 })
 
-test('onChange fires with subaccount filter when a subaccount is selected', (assert) => {
+test('onChange fires with subaccount filter when a subaccount is selected', assert => {
   const done = assert.async()
   const props = defaultProps()
-  props.onChange = (filter) => {
+  props.onChange = filter => {
     equal(filter.subAccount, '1')
     done()
   }
@@ -82,7 +82,7 @@ test('onActivate fires when filters are focussed', () => {
   ok(props.onActivate.calledOnce)
 })
 
-test('onChange not fired when < 3 chars are entered in search text input', (assert) => {
+test('onChange not fired when < 3 chars are entered in search text input', assert => {
   const done = assert.async()
   const props = defaultProps()
   props.onChange = sinon.spy()
@@ -96,7 +96,7 @@ test('onChange not fired when < 3 chars are entered in search text input', (asse
   }, 0)
 })
 
-test('onChange fired when 3 chars are entered in search text input', (assert) => {
+test('onChange fired when 3 chars are entered in search text input', assert => {
   const done = assert.async()
   const props = defaultProps()
   props.onChange = sinon.spy()

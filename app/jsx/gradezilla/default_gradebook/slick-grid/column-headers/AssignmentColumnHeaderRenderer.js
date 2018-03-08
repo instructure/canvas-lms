@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import AssignmentColumnHeader from '../../../../gradezilla/default_gradebook/components/AssignmentColumnHeader';
-import { optionsForGradingType } from '../../../../gradezilla/shared/EnterGradesAsSetting';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import AssignmentColumnHeader from '../../../../gradezilla/default_gradebook/components/AssignmentColumnHeader'
+import {optionsForGradingType} from '../../../../gradezilla/shared/EnterGradesAsSetting'
 
-function getSubmission (student, assignmentId) {
-  const submission = student[`assignment_${assignmentId}`];
+function getSubmission(student, assignmentId) {
+  const submission = student[`assignment_${assignmentId}`]
 
   if (!submission) {
-    return { excused: false, latePolicyStatus: null, score: null, submittedAt: null };
+    return {excused: false, latePolicyStatus: null, score: null, submittedAt: null}
   }
 
   return {
@@ -33,29 +33,29 @@ function getSubmission (student, assignmentId) {
     latePolicyStatus: submission.late_policy_status,
     score: submission.score,
     submittedAt: submission.submitted_at
-  };
+  }
 }
 
-function getProps (column, gradebook, options) {
-  const assignmentId = column.assignmentId;
-  const columnId = column.id;
-  const sortRowsBySetting = gradebook.getSortRowsBySetting();
-  const assignment = gradebook.getAssignment(column.assignmentId);
+function getProps(column, gradebook, options) {
+  const assignmentId = column.assignmentId
+  const columnId = column.id
+  const sortRowsBySetting = gradebook.getSortRowsBySetting()
+  const assignment = gradebook.getAssignment(column.assignmentId)
 
   const gradeSortDataLoaded =
     gradebook.contentLoadStates.assignmentsLoaded &&
     gradebook.contentLoadStates.studentsLoaded &&
-    gradebook.contentLoadStates.submissionsLoaded;
+    gradebook.contentLoadStates.submissionsLoaded
 
-  const visibleStudentsForAssignment = Object.values(gradebook.studentsThatCanSeeAssignment(assignmentId));
-  const students = visibleStudentsForAssignment.map((student) => (
-    {
-      id: student.id,
-      isInactive: student.isInactive,
-      name: student.name,
-      submission: getSubmission(student, assignmentId)
-    }
-  ));
+  const visibleStudentsForAssignment = Object.values(
+    gradebook.studentsThatCanSeeAssignment(assignmentId)
+  )
+  const students = visibleStudentsForAssignment.map(student => ({
+    id: student.id,
+    isInactive: student.isInactive,
+    name: student.name,
+    submission: getSubmission(student, assignmentId)
+  }))
 
   return {
     ref: options.ref,
@@ -77,16 +77,18 @@ function getProps (column, gradebook, options) {
 
     enterGradesAsSetting: {
       hidden: optionsForGradingType(assignment.grading_type).length < 2, // show only multiple options
-      onSelect (value) {
-        gradebook.updateEnterGradesAsSetting(assignmentId, value);
+      onSelect(value) {
+        gradebook.updateEnterGradesAsSetting(assignmentId, value)
       },
       selected: gradebook.getEnterGradesAsSetting(assignmentId),
-      showGradingSchemeOption: optionsForGradingType(assignment.grading_type).includes('gradingScheme')
+      showGradingSchemeOption: optionsForGradingType(assignment.grading_type).includes(
+        'gradingScheme'
+      )
     },
 
     muteAssignmentAction: gradebook.getMuteAssignmentAction(assignmentId),
-    onHeaderKeyDown: (event) => {
-      gradebook.handleHeaderKeyDown(event, columnId);
+    onHeaderKeyDown: event => {
+      gradebook.handleHeaderKeyDown(event, columnId)
     },
     onMenuClose: gradebook.handleColumnHeaderMenuClose,
     removeGradebookElement: gradebook.keyboardNav.removeGradebookElement,
@@ -99,39 +101,39 @@ function getProps (column, gradebook, options) {
       disabled: !gradeSortDataLoaded,
       isSortColumn: sortRowsBySetting.columnId === columnId,
       onSortByGradeAscending: () => {
-        gradebook.setSortRowsBySetting(columnId, 'grade', 'ascending');
+        gradebook.setSortRowsBySetting(columnId, 'grade', 'ascending')
       },
       onSortByGradeDescending: () => {
-        gradebook.setSortRowsBySetting(columnId, 'grade', 'descending');
+        gradebook.setSortRowsBySetting(columnId, 'grade', 'descending')
       },
       onSortByLate: () => {
-        gradebook.setSortRowsBySetting(columnId, 'late', 'ascending');
+        gradebook.setSortRowsBySetting(columnId, 'late', 'ascending')
       },
       onSortByMissing: () => {
-        gradebook.setSortRowsBySetting(columnId, 'missing', 'ascending');
+        gradebook.setSortRowsBySetting(columnId, 'missing', 'ascending')
       },
       onSortByUnposted: () => {
-        gradebook.setSortRowsBySetting(columnId, 'unposted', 'ascending');
+        gradebook.setSortRowsBySetting(columnId, 'unposted', 'ascending')
       },
       settingKey: sortRowsBySetting.settingKey
     },
 
     students,
     submissionsLoaded: gradebook.contentLoadStates.submissionsLoaded
-  };
+  }
 }
 
 export default class AssignmentColumnHeaderRenderer {
-  constructor (gradebook) {
-    this.gradebook = gradebook;
+  constructor(gradebook) {
+    this.gradebook = gradebook
   }
 
-  render (column, $container, _gridSupport, options) {
-    const props = getProps(column, this.gradebook, options);
-    ReactDOM.render(<AssignmentColumnHeader {...props} />, $container);
+  render(column, $container, _gridSupport, options) {
+    const props = getProps(column, this.gradebook, options)
+    ReactDOM.render(<AssignmentColumnHeader {...props} />, $container)
   }
 
-  destroy (column, $container, _gridSupport) {
-    ReactDOM.unmountComponentAtNode($container);
+  destroy(column, $container, _gridSupport) {
+    ReactDOM.unmountComponentAtNode($container)
   }
 }

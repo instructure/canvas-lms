@@ -39,4 +39,3 @@ if (document.getElementById('custom_help_link_settings')) {
     document.getElementById('custom_help_link_settings')
   )
 }
-

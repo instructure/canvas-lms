@@ -24,4 +24,3 @@ import EpubExportsApp from '../epub_exports/App'
 $('.course-epub-exports-app').each((_i, element) => {
   ReactDOM.render(<EpubExportsApp />, element)
 })
-

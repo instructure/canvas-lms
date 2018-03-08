@@ -26,7 +26,7 @@ QUnit.module('MasterChildStack component')
 const defaultProps = () => ({
   child: sampleData.childCourse,
   master: sampleData.masterCourse,
-  terms: sampleData.terms,
+  terms: sampleData.terms
 })
 
 test('renders the MasterChildStack component', () => {

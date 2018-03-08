@@ -18,6 +18,6 @@
 
 // Extra layer here for specificity to override the default behavior
 .btn-view.Toolbar__ViewBtn--onlyfolders {
-    cursor: not-allowed;
-    pointer-events: auto;
+  cursor: not-allowed;
+  pointer-events: auto;
 }

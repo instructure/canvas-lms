@@ -25,7 +25,7 @@ import propTypes from './proptypes/sectionShape'
 const ALL_MY_SECTIONS_OBJ = {id: 'all', name: I18n.t('All my sections')}
 
 function extractIds(arr) {
-  return arr.map((element) => element.id)
+  return arr.map(element => element.id)
 }
 
 export default class SectionsAutocomplete extends React.Component {
@@ -44,11 +44,16 @@ export default class SectionsAutocomplete extends React.Component {
   }
 
   onAutocompleteChange = (_, value) => {
-    if(!value.length) {
-      this.setState({selectedSectionsValue: [], messages: [{ text: I18n.t('A section is required'), type: 'error' }]})
+    if (!value.length) {
+      this.setState({
+        selectedSectionsValue: [],
+        messages: [{text: I18n.t('A section is required'), type: 'error'}]
+      })
     } else if (this.state.selectedSectionsValue.includes(ALL_MY_SECTIONS_OBJ.id)) {
       this.setState({
-        selectedSectionsValue: extractIds(value.filter((section) => section.id !== ALL_MY_SECTIONS_OBJ.id)),
+        selectedSectionsValue: extractIds(
+          value.filter(section => section.id !== ALL_MY_SECTIONS_OBJ.id)
+        ),
         messages: []
       })
     } else if (extractIds(value).includes(ALL_MY_SECTIONS_OBJ.id)) {
@@ -58,27 +63,23 @@ export default class SectionsAutocomplete extends React.Component {
     }
   }
 
-  render () {
+  render() {
     return (
-      <Container
-        display="block"
-        margin="0 0 large 0"
-      >
-        <input
-          name="specific_sections"
-          type="hidden"
-          value={this.state.selectedSectionsValue}/>
+      <Container display="block" margin="0 0 large 0">
+        <input name="specific_sections" type="hidden" value={this.state.selectedSectionsValue} />
         <Autocomplete
           label={I18n.t('Post to')}
           selectedOption={this.state.selectedSectionsValue}
           messages={this.state.messages}
           multiple
           onChange={this.onAutocompleteChange}
-          formatSelectedOption={(tag) => (
-            <AccessibleContent alt={I18n.t(`Remove %{label}`, {label: tag.label})}>{tag.label}</AccessibleContent>
+          formatSelectedOption={tag => (
+            <AccessibleContent alt={I18n.t(`Remove %{label}`, {label: tag.label})}>
+              {tag.label}
+            </AccessibleContent>
           )}
         >
-          {this.state.sections.map((section) => (
+          {this.state.sections.map(section => (
             <option key={section.id} value={section.id}>
               {section.name}
             </option>

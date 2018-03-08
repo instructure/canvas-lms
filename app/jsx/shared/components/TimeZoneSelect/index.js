@@ -21,9 +21,14 @@ import {arrayOf, shape, string} from 'prop-types'
 import Select from '@instructure/ui-core/lib/components/Select'
 import I18n from 'i18n!edit_timezone'
 
-export default function TimeZoneSelect({label, timezones, priority_zones, ...otherPropsToPassOnToSelect}) {
+export default function TimeZoneSelect({
+  label,
+  timezones,
+  priority_zones,
+  ...otherPropsToPassOnToSelect
+}) {
   return (
-    <Select {...otherPropsToPassOnToSelect} label={label} >
+    <Select {...otherPropsToPassOnToSelect} label={label}>
       <option value="" />
       {[
         {label: I18n.t('Common Timezones'), timezones: priority_zones},

@@ -24,7 +24,6 @@ import DiscussionListView from 'compiled/views/DiscussionTopics/DiscussionListVi
 import IndexView from 'compiled/views/DiscussionTopics/IndexView'
 
 const DiscussionIndexRouter = Backbone.Router.extend({
-
   // Public: I18n strings.
   messages: {
     lists: {
@@ -43,8 +42,10 @@ const DiscussionIndexRouter = Backbone.Router.extend({
     '': 'index'
   },
 
-  initialize () {
-    ['moveModel', '_onPipelineEnd', '_onPipelineLoad'].forEach(method => this[method] = this[method].bind(this))
+  initialize() {
+    ;['moveModel', '_onPipelineEnd', '_onPipelineLoad'].forEach(
+      method => (this[method] = this[method].bind(this))
+    )
     this.discussions = {
       open: this._createListView('open', {
         comparator: 'dateComparator',
@@ -62,12 +63,12 @@ const DiscussionIndexRouter = Backbone.Router.extend({
         destination: '.open.discussion-list, .locked.discussion-list',
         sortable: true,
         pinned: true
-      }),
+      })
     }
   },
 
   // Public: The index page action.
-  index () {
+  index() {
     this.view = new IndexView({
       openDiscussionView: this.discussions.open,
       lockedDiscussionView: this.discussions.locked,
@@ -84,7 +85,7 @@ const DiscussionIndexRouter = Backbone.Router.extend({
   // DiscussionTopicsCollection and then sort/filter results on the client.
   //
   // Returns nothing.
-  fetchDiscussions () {
+  fetchDiscussions() {
     const pipeline = new DiscussionTopicsCollection()
     pipeline.fetch({
       data: {
@@ -106,7 +107,7 @@ const DiscussionIndexRouter = Backbone.Router.extend({
   //   'locked', and 'pinned'.
   //
   // Returns a DiscussionListView object.
-  _createListView (type, options = {}) {
+  _createListView(type, options = {}) {
     const comparator = DiscussionTopicsCollection[options.comparator]
     delete options.comparator
     return new DiscussionListView({
@@ -121,7 +122,7 @@ const DiscussionIndexRouter = Backbone.Router.extend({
       pinned: !!options.pinned,
       sortable: !!options.sortable,
       title: this.messages.lists[type],
-      titleHelp: (_.include(['open', 'locked'], type) ? this.messages.help.title : null),
+      titleHelp: _.include(['open', 'locked'], type) ? this.messages.help.title : null,
       toggleMessage: this.messages.toggleMessage
     })
   },
@@ -129,7 +130,7 @@ const DiscussionIndexRouter = Backbone.Router.extend({
   // Internal: Attach events to the discussion topic collections.
   //
   // Returns nothing.
-  _attachCollections () {
+  _attachCollections() {
     for (const key in this.discussions) {
       const view = this.discussions[key]
       view.collection.on('change:locked change:pinned', this.moveModel)
@@ -143,18 +144,18 @@ const DiscussionIndexRouter = Backbone.Router.extend({
   // models - The models fetched from the server.
   //
   // Returns nothing.
-  _onPipelineLoad (collection, models) {
+  _onPipelineLoad(collection, models) {
     this._sortCollection(models)
     if (collection.urls.next) {
       setTimeout(() => collection.fetch({page: 'next'}), 0)
     }
   },
 
-    // Internal: Handle the last page of discussion topic results, propagating
-    // the event down to all of the filtered collections.
-    //
-    // Returns nothing.
-  _onPipelineEnd () {
+  // Internal: Handle the last page of discussion topic results, propagating
+  // the event down to all of the filtered collections.
+  //
+  // Returns nothing.
+  _onPipelineEnd() {
     for (const key in this.discussions) {
       const view = this.discussions[key]
       view.collection.trigger('fetched:last')
@@ -163,18 +164,22 @@ const DiscussionIndexRouter = Backbone.Router.extend({
       this.discussions.pinned.$el.remove()
     }
 
-    if (this.discussions.pinned.collection.length && !this.discussions.open.collection.length && !ENV.permissions.moderate) {
+    if (
+      this.discussions.pinned.collection.length &&
+      !this.discussions.open.collection.length &&
+      !ENV.permissions.moderate
+    ) {
       this.discussions.open.$el.remove()
     }
   },
 
-    // Internal: Sort the given collection into the open, locked, and pinned
-    // collections of topics.
-    //
-    // pipeline - The collection to filter.
-    //
-    // Returns nothing.
-  _sortCollection (pipeline) {
+  // Internal: Sort the given collection into the open, locked, and pinned
+  // collections of topics.
+  //
+  // pipeline - The collection to filter.
+  //
+  // Returns nothing.
+  _sortCollection(pipeline) {
     const group = this._groupModels(pipeline)
 
     // add silently and just render whole sorted collection once all the pages have been fetched
@@ -189,8 +194,8 @@ const DiscussionIndexRouter = Backbone.Router.extend({
   // pipeline - The collection to group.
   //
   // Returns an object.
-  _groupModels (pipeline) {
-    const defaults = { pinned: [], locked: [], open: [] }
+  _groupModels(pipeline) {
+    const defaults = {pinned: [], locked: [], open: []}
     return _.extend(defaults, _.groupBy(pipeline, this._modelBucket))
   },
 
@@ -199,13 +204,18 @@ const DiscussionIndexRouter = Backbone.Router.extend({
   // model - A discussion topic model.
   //
   // Returns a string.
-  _modelBucket (model) {
+  _modelBucket(model) {
     if (model.attributes) {
       if (model.get('pinned')) return 'pinned'
-      if (model.get('locked') || (model.get('locked_for_user') && (model.get('lock_info').unlock_at == null))) return 'locked'
+      if (
+        model.get('locked') ||
+        (model.get('locked_for_user') && model.get('lock_info').unlock_at == null)
+      )
+        return 'locked'
     } else {
       if (model.pinned) return 'pinned'
-      if (model.locked || (model.locked_for_user && (model.lock_info.unlock_at == null))) return 'locked'
+      if (model.locked || (model.locked_for_user && model.lock_info.unlock_at == null))
+        return 'locked'
     }
     return 'open'
   },
@@ -215,7 +225,7 @@ const DiscussionIndexRouter = Backbone.Router.extend({
   // model - The model to transition.
   //
   // Returns nothing.
-  moveModel (model) {
+  moveModel(model) {
     const bucket = this.discussions[this._modelBucket(model)].collection
     if (bucket === model.collection) return
     model.collection.remove(model)

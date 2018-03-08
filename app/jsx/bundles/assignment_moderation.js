@@ -39,19 +39,19 @@ const store = configureStore({
   assignment: {
     published: window.ENV.GRADES_PUBLISHED,
     title: window.ENV.ASSIGNMENT_TITLE,
-    course_id: window.ENV.COURSE_ID,
+    course_id: window.ENV.COURSE_ID
   },
   flashMessage: {
     error: false,
     message: '',
     time: Date.now()
   },
-  urls: window.ENV.URLS,
+  urls: window.ENV.URLS
 })
 
 const permissions = {
   viewGrades: window.ENV.PERMISSIONS.view_grades,
-  editGrades: window.ENV.PERMISSIONS.edit_grades,
+  editGrades: window.ENV.PERMISSIONS.edit_grades
 }
 
 ReactDOM.render(<ModerationApp {...{store, permissions}} />, $('#assignment_moderation')[0])

@@ -21,7 +21,9 @@
 /// we needed to ensure we share the right styles with these sections, but
 /// still enforce different breakpoints when needed
 
-@mixin shared-main-content {display: flex;}
+@mixin shared-main-content {
+  display: flex;
+}
 @mixin shared-primary {
   flex: 1;
   // Fix Firefox and IE Edge issues with contents breaking out of flex container
@@ -82,7 +84,9 @@ body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
 /// Layout when the course nav IS OPEN
 body.course-menu-expanded {
   &:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
-    @include breakpoint(desktop--nav-open) { @include shared-main-content; }
+    @include breakpoint(desktop--nav-open) {
+      @include shared-main-content;
+    }
   }
   &:not(.ic-no-flex-layout):not(.embedded) .ic-Layout-contentWrapper {
     @include breakpoint(desktop--nav-open) {
@@ -99,9 +103,11 @@ body.course-menu-expanded {
 /// Layout when the course nav IS CLOSED
 body:not(.course-menu-expanded) {
   &:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
-    @include breakpoint(desktop) { @include shared-main-content; }
+    @include breakpoint(desktop) {
+      @include shared-main-content;
+    }
   }
-  &:not(.ic-no-flex-layout):not(.embedded)  .ic-Layout-contentWrapper {
+  &:not(.ic-no-flex-layout):not(.embedded) .ic-Layout-contentWrapper {
     @include breakpoint(desktop) {
       @include shared-primary;
     }
@@ -143,7 +149,10 @@ body:not(.course-menu-expanded) {
   }
   @include breakpoint(desktop) {
     justify-content: flex-end;
-    a { margin-right: 0; margin-left: $ic-sp; }
+    a {
+      margin-right: 0;
+      margin-left: $ic-sp;
+    }
   }
 }
 
@@ -191,7 +200,8 @@ body:not(.course-menu-expanded) {
     min-width: 1px;
   }
 
-  body.course-menu-expanded:not(.ic-no-flex-layout):not(.embedded):not(.is-inside-submission-frame) & {
+  body.course-menu-expanded:not(.ic-no-flex-layout):not(.embedded):not(.is-inside-submission-frame)
+    & {
     margin-left: $ic-left-side-width;
 
     .ic-Layout-watermark {
@@ -217,8 +227,9 @@ body:not(.course-menu-expanded) {
 
   // HACK workaround for IE10 and IE11 flexbox bug
   // https://connect.microsoft.com/IE/feedback/details/802625/min-height-and-flexbox-flex-direction-column-dont-work-together-in-ie-10-11-preview
-  @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) { min-height: 93.5vh; }
-
+  @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+    min-height: 93.5vh;
+  }
 }
 
 .ic-Layout-watermark {
@@ -237,16 +248,17 @@ body:not(.course-menu-expanded) {
 .ic-app-course-menu {
   transition: transform 1s ease-in-out;
   transition-delay: 0.75s;
-  transform: translate3d(0,0,0);
+  transform: translate3d(0, 0, 0);
   box-sizing: border-box;
   position: absolute;
-  top: 0; right: 100%;
+  top: 0;
+  right: 100%;
   width: $ic-left-side-width;
   padding: $ic-sp*2 $ic-sp $ic-sp $ic-sp*2;
   opacity: 0;
   body.course-menu-expanded & {
     opacity: 1;
-    transform: translate3d(0,0,0);
+    transform: translate3d(0, 0, 0);
   }
   // account for the course term showing in the left-hand sub-nav
   #section-tabs-header-subtitle {
@@ -265,9 +277,13 @@ body:not(.course-menu-expanded) {
 .ic-app-course-nav-toggle {
   margin-right: $ic-sp;
   padding: 0;
-  width: $ic-sp*3; height: ($ic-sp*3) - ($ic-sp/2);
+  width: $ic-sp*3;
+  height: ($ic-sp*3) - ($ic-sp/2);
   @include overwrite-default-icon-size(1.5rem);
-  i[class*=icon-], i[class^=icon-] { margin-right: 0; }
+  i[class*='icon-'],
+  i[class^='icon-'] {
+    margin-right: 0;
+  }
 }
 
 .ic-app-crumbs {

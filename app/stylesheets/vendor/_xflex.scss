@@ -122,7 +122,7 @@
   /* 2012 */
   -webkit-flex-wrap: nowrap;
   -ms-flex-wrap: nowrap;
-  flex-wrap: nowrap
+  flex-wrap: nowrap;
 }
 
 .flex-wrap,
@@ -336,40 +336,124 @@
 /* Flex proportion */
 
 .flex-1,
-%flex-1 { -webkit-box-flex: 1; -moz-box-flex: 1; box-flex: 1; -ms-flex: 1; -webkit-flex: 1; flex: 1; }
+%flex-1 {
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  -ms-flex: 1;
+  -webkit-flex: 1;
+  flex: 1;
+}
 
 .flex-2,
-%flex-2 { -webkit-box-flex: 2; -moz-box-flex: 2; box-flex: 2; -ms-flex: 2; -webkit-flex: 2; flex: 2; }
+%flex-2 {
+  -webkit-box-flex: 2;
+  -moz-box-flex: 2;
+  box-flex: 2;
+  -ms-flex: 2;
+  -webkit-flex: 2;
+  flex: 2;
+}
 
 .flex-3,
-%flex-3 { -webkit-box-flex: 3; -moz-box-flex: 3; box-flex: 3; -ms-flex: 3; -webkit-flex: 3; flex: 3; }
+%flex-3 {
+  -webkit-box-flex: 3;
+  -moz-box-flex: 3;
+  box-flex: 3;
+  -ms-flex: 3;
+  -webkit-flex: 3;
+  flex: 3;
+}
 
 .flex-4,
-%flex-4 { -webkit-box-flex: 4; -moz-box-flex: 4; box-flex: 4; -ms-flex: 4; -webkit-flex: 4; flex: 4; }
+%flex-4 {
+  -webkit-box-flex: 4;
+  -moz-box-flex: 4;
+  box-flex: 4;
+  -ms-flex: 4;
+  -webkit-flex: 4;
+  flex: 4;
+}
 
 .flex-5,
-%flex-5 { -webkit-box-flex: 5; -moz-box-flex: 5; box-flex: 5; -ms-flex: 5; -webkit-flex: 5; flex: 5; }
+%flex-5 {
+  -webkit-box-flex: 5;
+  -moz-box-flex: 5;
+  box-flex: 5;
+  -ms-flex: 5;
+  -webkit-flex: 5;
+  flex: 5;
+}
 
 .flex-6,
-%flex-6 { -webkit-box-flex: 6; -moz-box-flex: 6; box-flex: 6; -ms-flex: 6; -webkit-flex: 6; flex: 6; }
+%flex-6 {
+  -webkit-box-flex: 6;
+  -moz-box-flex: 6;
+  box-flex: 6;
+  -ms-flex: 6;
+  -webkit-flex: 6;
+  flex: 6;
+}
 
 .flex-7,
-%flex-7 { -webkit-box-flex: 7; -moz-box-flex: 7; box-flex: 7; -ms-flex: 7; -webkit-flex: 7; flex: 7; }
+%flex-7 {
+  -webkit-box-flex: 7;
+  -moz-box-flex: 7;
+  box-flex: 7;
+  -ms-flex: 7;
+  -webkit-flex: 7;
+  flex: 7;
+}
 
 .flex-8,
-%flex-8 { -webkit-box-flex: 8; -moz-box-flex: 8; box-flex: 8; -ms-flex: 8; -webkit-flex: 8; flex: 8; }
+%flex-8 {
+  -webkit-box-flex: 8;
+  -moz-box-flex: 8;
+  box-flex: 8;
+  -ms-flex: 8;
+  -webkit-flex: 8;
+  flex: 8;
+}
 
 .flex-9,
-%flex-9 { -webkit-box-flex: 9; -moz-box-flex: 9; box-flex: 9; -ms-flex: 9; -webkit-flex: 9; flex: 9; }
+%flex-9 {
+  -webkit-box-flex: 9;
+  -moz-box-flex: 9;
+  box-flex: 9;
+  -ms-flex: 9;
+  -webkit-flex: 9;
+  flex: 9;
+}
 
 .flex-10,
-%flex-10 { -webkit-box-flex: 10; -moz-box-flex: 10; box-flex: 10; -ms-flex: 10; -webkit-flex: 10; flex: 10; }
+%flex-10 {
+  -webkit-box-flex: 10;
+  -moz-box-flex: 10;
+  box-flex: 10;
+  -ms-flex: 10;
+  -webkit-flex: 10;
+  flex: 10;
+}
 
 .flex-11,
-%flex-11 { -webkit-box-flex: 11; -moz-box-flex: 11; box-flex: 11; -ms-flex: 11; -webkit-flex: 11; flex: 11; }
+%flex-11 {
+  -webkit-box-flex: 11;
+  -moz-box-flex: 11;
+  box-flex: 11;
+  -ms-flex: 11;
+  -webkit-flex: 11;
+  flex: 11;
+}
 
 .flex-12,
-%flex-12 { -webkit-box-flex: 12; -moz-box-flex: 12; box-flex: 12; -ms-flex: 12; -webkit-flex: 12; flex: 12; }
+%flex-12 {
+  -webkit-box-flex: 12;
+  -moz-box-flex: 12;
+  box-flex: 12;
+  -ms-flex: 12;
+  -webkit-flex: 12;
+  flex: 12;
+}
 
 .flex-order-1,
 %flex-order-1 {
@@ -385,7 +469,7 @@
 
   /* 2012 */
   -webkit-order: 1;
-  order: 1
+  order: 1;
 }
 .flex-order-2,
 %flex-order-2 {
@@ -396,7 +480,7 @@
   -ms-flex-order: 2;
   -o-flex-order: 2;
   -webkit-order: 2;
-  order: 2
+  order: 2;
 }
 .flex-order-3,
 %flex-order-3 {
@@ -407,7 +491,7 @@
   -ms-flex-order: 3;
   -o-flex-order: 3;
   -webkit-order: 3;
-  order: 3
+  order: 3;
 }
 .flex-order-4,
 %flex-order-4 {
@@ -418,7 +502,7 @@
   -ms-flex-order: 4;
   -o-flex-order: 4;
   -webkit-order: 4;
-  order: 4
+  order: 4;
 }
 .flex-order-5,
 %flex-order-5 {
@@ -429,7 +513,7 @@
   -ms-flex-order: 5;
   -o-flex-order: 5;
   -webkit-order: 5;
-  order: 5
+  order: 5;
 }
 .flex-order-6,
 %flex-order-6 {
@@ -440,7 +524,7 @@
   -ms-flex-order: 6;
   -o-flex-order: 6;
   -webkit-order: 6;
-  order: 6
+  order: 6;
 }
 .flex-order-7,
 %flex-order-7 {
@@ -451,7 +535,7 @@
   -ms-flex-order: 7;
   -o-flex-order: 7;
   -webkit-order: 7;
-  order: 7
+  order: 7;
 }
 .flex-order-8,
 %flex-order-8 {
@@ -462,7 +546,7 @@
   -ms-flex-order: 8;
   -o-flex-order: 8;
   -webkit-order: 8;
-  order: 8
+  order: 8;
 }
 .flex-order-9,
 %flex-order-9 {
@@ -473,7 +557,7 @@
   -ms-flex-order: 9;
   -o-flex-order: 9;
   -webkit-order: 9;
-  order: 9
+  order: 9;
 }
 .flex-order-10,
 %flex-order-10 {
@@ -484,7 +568,7 @@
   -ms-flex-order: 10;
   -o-flex-order: 10;
   -webkit-order: 10;
-  order: 10
+  order: 10;
 }
 .flex-order-11,
 %flex-order-11 {
@@ -495,7 +579,7 @@
   -ms-flex-order: 11;
   -o-flex-order: 11;
   -webkit-order: 11;
-  order: 11
+  order: 11;
 }
 .flex-order-12,
 %flex-order-12 {
@@ -506,5 +590,5 @@
   -ms-flex-order: 12;
   -o-flex-order: 12;
   -webkit-order: 12;
-  order: 12
+  order: 12;
 }

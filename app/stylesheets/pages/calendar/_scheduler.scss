@@ -16,14 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 .scheduler-content {
   padding: 1em;
   background-color: $bodyBackground;
   border: 1px solid $ic-border-light;
   margin-left: 0px;
-  h3, .h3 {
+  h3,
+  .h3 {
     margin-top: 0px;
   }
 }
@@ -62,7 +63,8 @@
   min-height: 68px;
   padding: 6px 0 26px;
   clear: both;
-  h3, .h3 {
+  h3,
+  .h3 {
     margin-bottom: 0;
   }
   .alert {
@@ -104,9 +106,10 @@
   padding-top: 10px;
 }
 
-.time-block-list-header, .time-block-list-body-wrapper {
+.time-block-list-header,
+.time-block-list-body-wrapper {
   width: 100%;
-  border-bottom: 1px solid #DDD;
+  border-bottom: 1px solid #ddd;
   padding-bottom: 10px;
 }
 
@@ -154,12 +157,13 @@
     width: $time_column_width - 30;
   }
   .error {
-    border: 1px solid #EE5F5B;
+    border: 1px solid #ee5f5b;
     padding: 2px;
     box-shadow: 0 0 4px #f8b9b7;
   }
-  .invalid_datetime, .error {
-    color: #B94A48;
+  .invalid_datetime,
+  .error {
+    color: #b94a48;
   }
   .datetime_suggest {
     display: none;
@@ -179,7 +183,8 @@
   td {
     vertical-align: top;
   }
-  .context_id, .group_select select {
+  .context_id,
+  .group_select select {
     width: 150px;
   }
   .section_select ul {
@@ -279,7 +284,8 @@
 }
 
 .splitter {
-  input[type="number"], .split-link.btn {
+  input[type='number'],
+  .split-link.btn {
     vertical-align: baseline;
   }
   .split-link {
@@ -290,10 +296,11 @@
 .ag-options {
   margin: 0;
   padding: 0;
-  input[type="checkbox"] {
+  input[type='checkbox'] {
     vertical-align: 1px;
   }
-  input[type="checkbox"] + label, input[type="number"] {
+  input[type='checkbox'] + label,
+  input[type='number'] {
     vertical-align: baseline;
   }
 }
@@ -364,5 +371,5 @@
 }
 
 .scheduler-event-details-footer {
-    display: none;
+  display: none;
 }

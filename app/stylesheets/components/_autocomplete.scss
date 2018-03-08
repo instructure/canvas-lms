@@ -56,14 +56,13 @@ A generic, accessible autocomplete widget.
 
 */
 
-
-ul[class*=ac-] {
+ul[class*='ac-'] {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-[class*=ac-][aria-hidden=true] {
+[class*='ac-'][aria-hidden='true'] {
   display: none;
 }
 
@@ -110,7 +109,7 @@ ul[class*=ac-] {
   border-radius: 0 3px 3px 0;
   display: table-cell;
   &.disabled {
-    color: #A6A6A6;
+    color: #a6a6a6;
   }
 }
 
@@ -150,7 +149,8 @@ ul[class*=ac-] {
     @include fontSize(20px);
   }
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     outline: none;
 
     i:before {
@@ -188,7 +188,8 @@ ul[class*=ac-] {
     border-color: #6f94e6;
   }
 
-  &:hover a, a:focus {
+  &:hover a,
+  a:focus {
     right: -1px;
   }
 
@@ -198,16 +199,17 @@ ul[class*=ac-] {
     top: 0;
   }
 
-	a, a i:before {
-		color: #fff;
+  a,
+  a i:before {
+    color: #fff;
     cursor: pointer;
     @include fontSize($ic-font-size--xsmall);
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, .4);
-	}
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
+  }
 }
 // This styles the 'x' better when a new recipient is added
 // to a new conversation
-i[class*=icon-].icon-messageRecipient--cancel {
+i[class*='icon-'].icon-messageRecipient--cancel {
   &:before {
     background: var(--ic-brand-primary);
     border-radius: 10px;
@@ -221,8 +223,9 @@ i[class*=icon-].icon-messageRecipient--cancel {
 .ac-result-wrapper {
   display: none;
 
-  &:before, &:after {
-    content: "";
+  &:before,
+  &:after {
+    content: '';
     height: 0;
     position: absolute;
     right: 15px;
@@ -250,7 +253,7 @@ i[class*=icon-].icon-messageRecipient--cancel {
   border: 1px solid $ic-border-light;
   border-radius: 10px;
   box-sizing: border-box;
-	box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   @include fontSize($ic-font-size--xsmall);
   max-height: 250px;
   min-height: 50px;
@@ -263,7 +266,7 @@ i[class*=icon-].icon-messageRecipient--cancel {
 }
 
 .ac-result {
-	cursor: pointer;
+  cursor: pointer;
   line-height: 16px;
   padding: 5px 8px 2px 8px;
 
@@ -275,14 +278,16 @@ i[class*=icon-].icon-messageRecipient--cancel {
     border-radius: 0 0 10px 10px;
   }
 
-  &.selected, &:hover {
+  &.selected,
+  &:hover {
     background: $ic-bg-light-primary;
     color: var(--ic-brand-primary);
   }
 }
 
 .ac-result-list {
-  .context, .everyone {
+  .context,
+  .everyone {
     border-bottom: 1px solid $ic-border-light;
     color: var(--ic-brand-primary);
   }

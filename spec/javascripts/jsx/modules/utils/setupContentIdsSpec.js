@@ -16,12 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jquery',
-  'jsx/modules/utils/setupContentIds'
-], ($, setupContentIds) => {
-
-  QUnit.module('Modules Utilities: setupContentIds');
+define(['jquery', 'jsx/modules/utils/setupContentIds'], ($, setupContentIds) => {
+  QUnit.module('Modules Utilities: setupContentIds')
 
   test('It puts the proper attribute values in place when called', () => {
     const fakeModuleHtml = `<div>
@@ -30,14 +26,21 @@ define([
         <span id="place2" aria-controls="context_module_content_"></span>
       </div>
       <div class="content" id="context_module_content_"></div>
-    </div>`;
+    </div>`
 
-    const $fakeModule = $(fakeModuleHtml);
-    setupContentIds($fakeModule, 42);
+    const $fakeModule = $(fakeModuleHtml)
+    setupContentIds($fakeModule, 42)
 
-    equal($fakeModule.find('#context_module_content_42').length, 1, 'finds the proper id');
-    equal($fakeModule.find('#place1').attr('aria-controls'), 'context_module_content_42', 'sets the aria-controls of the first header element');
-    equal($fakeModule.find('#place2').attr('aria-controls'), 'context_module_content_42', 'sets the aria-controls of the second header element');
-
-  });
-});
+    equal($fakeModule.find('#context_module_content_42').length, 1, 'finds the proper id')
+    equal(
+      $fakeModule.find('#place1').attr('aria-controls'),
+      'context_module_content_42',
+      'sets the aria-controls of the first header element'
+    )
+    equal(
+      $fakeModule.find('#place2').attr('aria-controls'),
+      'context_module_content_42',
+      'sets the aria-controls of the second header element'
+    )
+  })
+})

@@ -8,65 +8,65 @@
  * Available under MIT license <http://lodash.com/license>
  */
 ;(function() {
-
   /** Used as a safe reference for `undefined` in pre ES5 environments */
-  var undefined;
+  var undefined
 
   /** Used to pool arrays and objects used internally */
-  var arrayPool = [];
+  var arrayPool = []
 
   /** Used to generate unique IDs */
-  var idCounter = 0;
+  var idCounter = 0
 
   /** Used internally to indicate various things */
-  var indicatorObject = {};
+  var indicatorObject = {}
 
   /** Used to prefix keys to avoid issues with `__proto__` and properties on `Object.prototype` */
-  var keyPrefix = +new Date + '';
+  var keyPrefix = +new Date() + ''
 
   /** Used as the max size of the `arrayPool` and `objectPool` */
-  var maxPoolSize = 40;
+  var maxPoolSize = 40
 
   /** Used to match regexp flags from their coerced string values */
-  var reFlags = /\w*$/;
+  var reFlags = /\w*$/
 
   /** Used to match "interpolate" template delimiters */
-  var reInterpolate = /<%=([\s\S]+?)%>/g;
+  var reInterpolate = /<%=([\s\S]+?)%>/g
 
   /** Used to ensure capturing order of template delimiters */
-  var reNoMatch = /($^)/;
+  var reNoMatch = /($^)/
 
   /** Used to match unescaped characters in compiled string literals */
-  var reUnescapedString = /['\n\r\t\u2028\u2029\\]/g;
+  var reUnescapedString = /['\n\r\t\u2028\u2029\\]/g
 
   /** `Object#toString` result shortcuts */
   var argsClass = '[object Arguments]',
-      arrayClass = '[object Array]',
-      boolClass = '[object Boolean]',
-      dateClass = '[object Date]',
-      funcClass = '[object Function]',
-      numberClass = '[object Number]',
-      objectClass = '[object Object]',
-      regexpClass = '[object RegExp]',
-      stringClass = '[object String]';
+    arrayClass = '[object Array]',
+    boolClass = '[object Boolean]',
+    dateClass = '[object Date]',
+    funcClass = '[object Function]',
+    numberClass = '[object Number]',
+    objectClass = '[object Object]',
+    regexpClass = '[object RegExp]',
+    stringClass = '[object String]'
 
   /** Used to identify object classifications that `_.clone` supports */
-  var cloneableClasses = {};
-  cloneableClasses[funcClass] = false;
-  cloneableClasses[argsClass] = cloneableClasses[arrayClass] =
-  cloneableClasses[boolClass] = cloneableClasses[dateClass] =
-  cloneableClasses[numberClass] = cloneableClasses[objectClass] =
-  cloneableClasses[regexpClass] = cloneableClasses[stringClass] = true;
+  var cloneableClasses = {}
+  cloneableClasses[funcClass] = false
+  cloneableClasses[argsClass] = cloneableClasses[arrayClass] = cloneableClasses[
+    boolClass
+  ] = cloneableClasses[dateClass] = cloneableClasses[numberClass] = cloneableClasses[
+    objectClass
+  ] = cloneableClasses[regexpClass] = cloneableClasses[stringClass] = true
 
   /** Used to determine if values are of the language type Object */
   var objectTypes = {
-    'boolean': false,
-    'function': true,
-    'object': true,
-    'number': false,
-    'string': false,
-    'undefined': false
-  };
+    boolean: false,
+    function: true,
+    object: true,
+    number: false,
+    string: false,
+    undefined: false
+  }
 
   /** Used to escape characters for inclusion in compiled string literals */
   var stringEscapes = {
@@ -77,15 +77,15 @@
     '\t': 't',
     '\u2028': 'u2028',
     '\u2029': 'u2029'
-  };
+  }
 
   /** Used as a reference to the global object */
-  var root = (objectTypes[typeof window] && window) || this;
+  var root = (objectTypes[typeof window] && window) || this
 
   /** Detect free variable `global` from Node.js or Browserified code and use it as `root` */
-  var freeGlobal = objectTypes[typeof global] && global;
+  var freeGlobal = objectTypes[typeof global] && global
   if (freeGlobal && (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal)) {
-    root = freeGlobal;
+    root = freeGlobal
   }
 
   /*--------------------------------------------------------------------------*/
@@ -102,14 +102,14 @@
    */
   function baseIndexOf(array, value, fromIndex) {
     var index = (fromIndex || 0) - 1,
-        length = array ? array.length : 0;
+      length = array ? array.length : 0
 
     while (++index < length) {
       if (array[index] === value) {
-        return index;
+        return index
       }
     }
-    return -1;
+    return -1
   }
 
   /**
@@ -123,20 +123,20 @@
    */
   function compareAscending(a, b) {
     var ac = a.criteria,
-        bc = b.criteria,
-        index = -1,
-        length = ac.length;
+      bc = b.criteria,
+      index = -1,
+      length = ac.length
 
     while (++index < length) {
       var value = ac[index],
-          other = bc[index];
+        other = bc[index]
 
       if (value !== other) {
         if (value > other || typeof value == 'undefined') {
-          return 1;
+          return 1
         }
         if (value < other || typeof other == 'undefined') {
-          return -1;
+          return -1
         }
       }
     }
@@ -146,7 +146,7 @@
     //
     // This also ensures a stable sort in V8 and other engines.
     // See http://code.google.com/p/v8/issues/detail?id=90
-    return a.index - b.index;
+    return a.index - b.index
   }
 
   /**
@@ -158,7 +158,7 @@
    * @returns {string} Returns the escaped character.
    */
   function escapeStringChar(match) {
-    return '\\' + stringEscapes[match];
+    return '\\' + stringEscapes[match]
   }
 
   /**
@@ -168,7 +168,7 @@
    * @returns {Array} The array from the pool.
    */
   function getArray() {
-    return arrayPool.pop() || [];
+    return arrayPool.pop() || []
   }
 
   /**
@@ -178,9 +178,9 @@
    * @param {Array} [array] The array to release.
    */
   function releaseArray(array) {
-    array.length = 0;
+    array.length = 0
     if (arrayPool.length < maxPoolSize) {
-      arrayPool.push(array);
+      arrayPool.push(array)
     }
   }
 
@@ -198,18 +198,18 @@
    * @returns {Array} Returns the new array.
    */
   function slice(array, start, end) {
-    start || (start = 0);
+    start || (start = 0)
     if (typeof end == 'undefined') {
-      end = array ? array.length : 0;
+      end = array ? array.length : 0
     }
     var index = -1,
-        length = end - start || 0,
-        result = Array(length < 0 ? 0 : length);
+      length = end - start || 0,
+      result = Array(length < 0 ? 0 : length)
 
     while (++index < length) {
-      result[index] = array[start + index];
+      result[index] = array[start + index]
     }
-    return result;
+    return result
   }
 
   /*--------------------------------------------------------------------------*/
@@ -220,51 +220,53 @@
    * Normally `Array.prototype` would suffice, however, using an array literal
    * avoids issues in Narwhal.
    */
-  var arrayRef = [];
+  var arrayRef = []
 
   /** Used for native method references */
-  var objectProto = Object.prototype;
+  var objectProto = Object.prototype
 
   /** Used to restore the original `_` reference in `noConflict` */
-  var oldDash = root._;
+  var oldDash = root._
 
   /** Used to resolve the internal [[Class]] of values */
-  var toString = objectProto.toString;
+  var toString = objectProto.toString
 
   /** Used to detect if a method is native */
-  var reNative = RegExp('^' +
-    String(toString)
-      .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-      .replace(/toString| for [^\]]+/g, '.*?') + '$'
-  );
+  var reNative = RegExp(
+    '^' +
+      String(toString)
+        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        .replace(/toString| for [^\]]+/g, '.*?') +
+      '$'
+  )
 
   /** Native method shortcuts */
   var ceil = Math.ceil,
-      floor = Math.floor,
-      hasOwnProperty = objectProto.hasOwnProperty,
-      push = arrayRef.push,
-      propertyIsEnumerable = objectProto.propertyIsEnumerable;
+    floor = Math.floor,
+    hasOwnProperty = objectProto.hasOwnProperty,
+    push = arrayRef.push,
+    propertyIsEnumerable = objectProto.propertyIsEnumerable
 
   /* Native method shortcuts for methods with the same name as other `lodash` methods */
-  var nativeCreate = isNative(nativeCreate = Object.create) && nativeCreate,
-      nativeIsArray = isNative(nativeIsArray = Array.isArray) && nativeIsArray,
-      nativeIsFinite = root.isFinite,
-      nativeIsNaN = root.isNaN,
-      nativeKeys = isNative(nativeKeys = Object.keys) && nativeKeys,
-      nativeMax = Math.max,
-      nativeMin = Math.min,
-      nativeRandom = Math.random;
+  var nativeCreate = isNative((nativeCreate = Object.create)) && nativeCreate,
+    nativeIsArray = isNative((nativeIsArray = Array.isArray)) && nativeIsArray,
+    nativeIsFinite = root.isFinite,
+    nativeIsNaN = root.isNaN,
+    nativeKeys = isNative((nativeKeys = Object.keys)) && nativeKeys,
+    nativeMax = Math.max,
+    nativeMin = Math.min,
+    nativeRandom = Math.random
 
   /** Used to lookup a built-in constructor by [[Class]] */
-  var ctorByClass = {};
-  ctorByClass[arrayClass] = Array;
-  ctorByClass[boolClass] = Boolean;
-  ctorByClass[dateClass] = Date;
-  ctorByClass[funcClass] = Function;
-  ctorByClass[objectClass] = Object;
-  ctorByClass[numberClass] = Number;
-  ctorByClass[regexpClass] = RegExp;
-  ctorByClass[stringClass] = String;
+  var ctorByClass = {}
+  ctorByClass[arrayClass] = Array
+  ctorByClass[boolClass] = Boolean
+  ctorByClass[dateClass] = Date
+  ctorByClass[funcClass] = Function
+  ctorByClass[objectClass] = Object
+  ctorByClass[numberClass] = Number
+  ctorByClass[regexpClass] = RegExp
+  ctorByClass[stringClass] = String
 
   /*--------------------------------------------------------------------------*/
 
@@ -334,9 +336,7 @@
    * // => true
    */
   function lodash(value) {
-    return (value instanceof lodash)
-      ? value
-      : new lodashWrapper(value);
+    return value instanceof lodash ? value : new lodashWrapper(value)
   }
 
   /**
@@ -348,11 +348,11 @@
    * @returns {Object} Returns a `lodash` instance.
    */
   function lodashWrapper(value, chainAll) {
-    this.__chain__ = !!chainAll;
-    this.__wrapped__ = value;
+    this.__chain__ = !!chainAll
+    this.__wrapped__ = value
   }
   // ensure `new lodashWrapper` is an instance of `lodash`
-  lodashWrapper.prototype = lodash.prototype;
+  lodashWrapper.prototype = lodash.prototype
 
   /**
    * An object used to flag environments features.
@@ -361,10 +361,10 @@
    * @memberOf _
    * @type Object
    */
-  var support = {};
+  var support = {}
 
-  (function() {
-    var object = { '0': 1, 'length': 1 };
+  ;(function() {
+    var object = {'0': 1, length: 1}
 
     /**
      * Detect if `Array#shift` and `Array#splice` augment array-like objects correctly.
@@ -378,8 +378,8 @@
      * @memberOf _.support
      * @type boolean
      */
-    support.spliceObjects = (arrayRef.splice.call(object, 0, 1), !object[0]);
-  }(1));
+    support.spliceObjects = (arrayRef.splice.call(object, 0, 1), !object[0])
+  })(1)
 
   /**
    * By default, the template delimiters used by Lo-Dash are similar to those in
@@ -391,14 +391,13 @@
    * @type Object
    */
   lodash.templateSettings = {
-
     /**
      * Used to detect `data` property values to be HTML-escaped.
      *
      * @memberOf _.templateSettings
      * @type RegExp
      */
-    'escape': /<%-([\s\S]+?)%>/g,
+    escape: /<%-([\s\S]+?)%>/g,
 
     /**
      * Used to detect code to be evaluated.
@@ -406,7 +405,7 @@
      * @memberOf _.templateSettings
      * @type RegExp
      */
-    'evaluate': /<%([\s\S]+?)%>/g,
+    evaluate: /<%([\s\S]+?)%>/g,
 
     /**
      * Used to detect `data` property values to inject.
@@ -414,7 +413,7 @@
      * @memberOf _.templateSettings
      * @type RegExp
      */
-    'interpolate': reInterpolate,
+    interpolate: reInterpolate,
 
     /**
      * Used to reference the data object in the template text.
@@ -422,8 +421,8 @@
      * @memberOf _.templateSettings
      * @type string
      */
-    'variable': ''
-  };
+    variable: ''
+  }
 
   /*--------------------------------------------------------------------------*/
 
@@ -437,8 +436,8 @@
    */
   function baseBind(bindData) {
     var func = bindData[0],
-        partialArgs = bindData[2],
-        thisArg = bindData[4];
+      partialArgs = bindData[2],
+      thisArg = bindData[4]
 
     function bound() {
       // `Function#bind` spec
@@ -447,20 +446,20 @@
         // avoid `arguments` object deoptimizations by using `slice` instead
         // of `Array.prototype.slice.call` and not assigning `arguments` to a
         // variable as a ternary expression
-        var args = slice(partialArgs);
-        push.apply(args, arguments);
+        var args = slice(partialArgs)
+        push.apply(args, arguments)
       }
       // mimic the constructor's `return` behavior
       // http://es5.github.io/#x13.2.2
       if (this instanceof bound) {
         // ensure `new bound` is an instance of `func`
         var thisBinding = baseCreate(func.prototype),
-            result = func.apply(thisBinding, args || arguments);
-        return isObject(result) ? result : thisBinding;
+          result = func.apply(thisBinding, args || arguments)
+        return isObject(result) ? result : thisBinding
       }
-      return func.apply(thisArg, args || arguments);
+      return func.apply(thisArg, args || arguments)
     }
-    return bound;
+    return bound
   }
 
   /**
@@ -477,82 +476,81 @@
    */
   function baseClone(value, isDeep, callback, stackA, stackB) {
     if (callback) {
-      var result = callback(value);
+      var result = callback(value)
       if (typeof result != 'undefined') {
-        return result;
+        return result
       }
     }
     // inspect [[Class]]
-    var isObj = isObject(value);
+    var isObj = isObject(value)
     if (isObj) {
-      var className = toString.call(value);
+      var className = toString.call(value)
       if (!cloneableClasses[className]) {
-        return value;
+        return value
       }
-      var ctor = ctorByClass[className];
+      var ctor = ctorByClass[className]
       switch (className) {
         case boolClass:
         case dateClass:
-          return new ctor(+value);
+          return new ctor(+value)
 
         case numberClass:
         case stringClass:
-          return new ctor(value);
+          return new ctor(value)
 
         case regexpClass:
-          result = ctor(value.source, reFlags.exec(value));
-          result.lastIndex = value.lastIndex;
-          return result;
+          result = ctor(value.source, reFlags.exec(value))
+          result.lastIndex = value.lastIndex
+          return result
       }
     } else {
-      return value;
+      return value
     }
-    var isArr = isArray(value);
+    var isArr = isArray(value)
     if (isDeep) {
       // check for circular references and return corresponding clone
-      var initedStack = !stackA;
-      stackA || (stackA = getArray());
-      stackB || (stackB = getArray());
+      var initedStack = !stackA
+      stackA || (stackA = getArray())
+      stackB || (stackB = getArray())
 
-      var length = stackA.length;
+      var length = stackA.length
       while (length--) {
         if (stackA[length] == value) {
-          return stackB[length];
+          return stackB[length]
         }
       }
-      result = isArr ? ctor(value.length) : {};
-    }
-    else {
-      result = isArr ? slice(value) : assign({}, value);
+      result = isArr ? ctor(value.length) : {}
+    } else {
+      result = isArr ? slice(value) : assign({}, value)
     }
     // add array properties assigned by `RegExp#exec`
     if (isArr) {
       if (hasOwnProperty.call(value, 'index')) {
-        result.index = value.index;
+        result.index = value.index
       }
       if (hasOwnProperty.call(value, 'input')) {
-        result.input = value.input;
+        result.input = value.input
       }
     }
     // exit for shallow clone
     if (!isDeep) {
-      return result;
+      return result
     }
     // add the source value to the stack of traversed objects
     // and associate it with its clone
-    stackA.push(value);
-    stackB.push(result);
+    stackA.push(value)
+    stackB.push(result)
 
     // recursively populate clone (susceptible to call stack limits)
-    (isArr ? forEach : forOwn)(value, function(objValue, key) {
-      result[key] = baseClone(objValue, isDeep, callback, stackA, stackB);
-    });
+    ;(isArr ? forEach : forOwn)(value, function(objValue, key) {
+      result[key] = baseClone(objValue, isDeep, callback, stackA, stackB)
+    })
 
     if (initedStack) {
-      releaseArray(stackA);
-      releaseArray(stackB);
+      releaseArray(stackA)
+      releaseArray(stackB)
     }
-    return result;
+    return result
   }
 
   /**
@@ -564,7 +562,7 @@
    * @returns {Object} Returns the new object.
    */
   function baseCreate(prototype, properties) {
-    return isObject(prototype) ? nativeCreate(prototype) : {};
+    return isObject(prototype) ? nativeCreate(prototype) : {}
   }
   // fallback for browsers without `Object.create`
   if (!nativeCreate) {
@@ -572,13 +570,13 @@
       function Object() {}
       return function(prototype) {
         if (isObject(prototype)) {
-          Object.prototype = prototype;
-          var result = new Object;
-          Object.prototype = null;
+          Object.prototype = prototype
+          var result = new Object()
+          Object.prototype = null
         }
-        return result || root.Object();
-      };
-    }());
+        return result || root.Object()
+      }
+    })()
   }
 
   /**
@@ -593,27 +591,31 @@
    */
   function baseCreateCallback(func, thisArg, argCount) {
     if (typeof func != 'function') {
-      return identity;
+      return identity
     }
     // exit early for no `thisArg` or already bound by `Function#bind`
     if (typeof thisArg == 'undefined' || !('prototype' in func)) {
-      return func;
+      return func
     }
     switch (argCount) {
-      case 1: return function(value) {
-        return func.call(thisArg, value);
-      };
-      case 2: return function(a, b) {
-        return func.call(thisArg, a, b);
-      };
-      case 3: return function(value, index, collection) {
-        return func.call(thisArg, value, index, collection);
-      };
-      case 4: return function(accumulator, value, index, collection) {
-        return func.call(thisArg, accumulator, value, index, collection);
-      };
+      case 1:
+        return function(value) {
+          return func.call(thisArg, value)
+        }
+      case 2:
+        return function(a, b) {
+          return func.call(thisArg, a, b)
+        }
+      case 3:
+        return function(value, index, collection) {
+          return func.call(thisArg, value, index, collection)
+        }
+      case 4:
+        return function(accumulator, value, index, collection) {
+          return func.call(thisArg, accumulator, value, index, collection)
+        }
     }
-    return bind(func, thisArg);
+    return bind(func, thisArg)
   }
 
   /**
@@ -626,46 +628,53 @@
    */
   function baseCreateWrapper(bindData) {
     var func = bindData[0],
-        bitmask = bindData[1],
-        partialArgs = bindData[2],
-        partialRightArgs = bindData[3],
-        thisArg = bindData[4],
-        arity = bindData[5];
+      bitmask = bindData[1],
+      partialArgs = bindData[2],
+      partialRightArgs = bindData[3],
+      thisArg = bindData[4],
+      arity = bindData[5]
 
     var isBind = bitmask & 1,
-        isBindKey = bitmask & 2,
-        isCurry = bitmask & 4,
-        isCurryBound = bitmask & 8,
-        key = func;
+      isBindKey = bitmask & 2,
+      isCurry = bitmask & 4,
+      isCurryBound = bitmask & 8,
+      key = func
 
     function bound() {
-      var thisBinding = isBind ? thisArg : this;
+      var thisBinding = isBind ? thisArg : this
       if (partialArgs) {
-        var args = slice(partialArgs);
-        push.apply(args, arguments);
+        var args = slice(partialArgs)
+        push.apply(args, arguments)
       }
       if (partialRightArgs || isCurry) {
-        args || (args = slice(arguments));
+        args || (args = slice(arguments))
         if (partialRightArgs) {
-          push.apply(args, partialRightArgs);
+          push.apply(args, partialRightArgs)
         }
         if (isCurry && args.length < arity) {
-          bitmask |= 16 & ~32;
-          return baseCreateWrapper([func, (isCurryBound ? bitmask : bitmask & ~3), args, null, thisArg, arity]);
+          bitmask |= 16 & ~32
+          return baseCreateWrapper([
+            func,
+            isCurryBound ? bitmask : bitmask & ~3,
+            args,
+            null,
+            thisArg,
+            arity
+          ])
         }
       }
-      args || (args = arguments);
+      args || (args = arguments)
       if (isBindKey) {
-        func = thisBinding[key];
+        func = thisBinding[key]
       }
       if (this instanceof bound) {
-        thisBinding = baseCreate(func.prototype);
-        var result = func.apply(thisBinding, args);
-        return isObject(result) ? result : thisBinding;
+        thisBinding = baseCreate(func.prototype)
+        var result = func.apply(thisBinding, args)
+        return isObject(result) ? result : thisBinding
       }
-      return func.apply(thisBinding, args);
+      return func.apply(thisBinding, args)
     }
-    return bound;
+    return bound
   }
 
   /**
@@ -679,17 +688,17 @@
    */
   function baseDifference(array, values) {
     var index = -1,
-        indexOf = getIndexOf(),
-        length = array ? array.length : 0,
-        result = [];
+      indexOf = getIndexOf(),
+      length = array ? array.length : 0,
+      result = []
 
     while (++index < length) {
-      var value = array[index];
+      var value = array[index]
       if (indexOf(values, value) < 0) {
-        result.push(value);
+        result.push(value)
       }
     }
-    return result;
+    return result
   }
 
   /**
@@ -705,31 +714,35 @@
    */
   function baseFlatten(array, isShallow, isStrict, fromIndex) {
     var index = (fromIndex || 0) - 1,
-        length = array ? array.length : 0,
-        result = [];
+      length = array ? array.length : 0,
+      result = []
 
     while (++index < length) {
-      var value = array[index];
+      var value = array[index]
 
-      if (value && typeof value == 'object' && typeof value.length == 'number'
-          && (isArray(value) || isArguments(value))) {
+      if (
+        value &&
+        typeof value == 'object' &&
+        typeof value.length == 'number' &&
+        (isArray(value) || isArguments(value))
+      ) {
         // recursively flatten arrays (susceptible to call stack limits)
         if (!isShallow) {
-          value = baseFlatten(value, isShallow, isStrict);
+          value = baseFlatten(value, isShallow, isStrict)
         }
         var valIndex = -1,
-            valLength = value.length,
-            resIndex = result.length;
+          valLength = value.length,
+          resIndex = result.length
 
-        result.length += valLength;
+        result.length += valLength
         while (++valIndex < valLength) {
-          result[resIndex++] = value[valIndex];
+          result[resIndex++] = value[valIndex]
         }
       } else if (!isStrict) {
-        result.push(value);
+        result.push(value)
       }
     }
-    return result;
+    return result
   }
 
   /**
@@ -747,106 +760,115 @@
    */
   function baseIsEqual(a, b, stackA, stackB) {
     if (a === b) {
-      return a !== 0 || (1 / a == 1 / b);
+      return a !== 0 || 1 / a == 1 / b
     }
     var type = typeof a,
-        otherType = typeof b;
+      otherType = typeof b
 
-    if (a === a &&
-        !(a && objectTypes[type]) &&
-        !(b && objectTypes[otherType])) {
-      return false;
+    if (a === a && !(a && objectTypes[type]) && !(b && objectTypes[otherType])) {
+      return false
     }
     if (a == null || b == null) {
-      return a === b;
+      return a === b
     }
     var className = toString.call(a),
-        otherClass = toString.call(b);
+      otherClass = toString.call(b)
 
     if (className != otherClass) {
-      return false;
+      return false
     }
     switch (className) {
       case boolClass:
       case dateClass:
-        return +a == +b;
+        return +a == +b
 
       case numberClass:
-        return a != +a
-          ? b != +b
-          : (a == 0 ? (1 / a == 1 / b) : a == +b);
+        return a != +a ? b != +b : a == 0 ? 1 / a == 1 / b : a == +b
 
       case regexpClass:
       case stringClass:
-        return a == String(b);
+        return a == String(b)
     }
-    var isArr = className == arrayClass;
+    var isArr = className == arrayClass
     if (!isArr) {
       var aWrapped = a instanceof lodash,
-          bWrapped = b instanceof lodash;
+        bWrapped = b instanceof lodash
 
       if (aWrapped || bWrapped) {
-        return baseIsEqual(aWrapped ? a.__wrapped__ : a, bWrapped ? b.__wrapped__ : b, stackA, stackB);
+        return baseIsEqual(
+          aWrapped ? a.__wrapped__ : a,
+          bWrapped ? b.__wrapped__ : b,
+          stackA,
+          stackB
+        )
       }
       if (className != objectClass) {
-        return false;
+        return false
       }
       var ctorA = a.constructor,
-          ctorB = b.constructor;
+        ctorB = b.constructor
 
-      if (ctorA != ctorB &&
-            !(isFunction(ctorA) && ctorA instanceof ctorA && isFunction(ctorB) && ctorB instanceof ctorB) &&
-            ('constructor' in a && 'constructor' in b)
-          ) {
-        return false;
+      if (
+        ctorA != ctorB &&
+        !(
+          isFunction(ctorA) &&
+          ctorA instanceof ctorA &&
+          isFunction(ctorB) &&
+          ctorB instanceof ctorB
+        ) &&
+        ('constructor' in a && 'constructor' in b)
+      ) {
+        return false
       }
     }
-    stackA || (stackA = []);
-    stackB || (stackB = []);
+    stackA || (stackA = [])
+    stackB || (stackB = [])
 
-    var length = stackA.length;
+    var length = stackA.length
     while (length--) {
       if (stackA[length] == a) {
-        return stackB[length] == b;
+        return stackB[length] == b
       }
     }
     var result = true,
-        size = 0;
+      size = 0
 
-    stackA.push(a);
-    stackB.push(b);
+    stackA.push(a)
+    stackB.push(b)
 
     if (isArr) {
-      size = b.length;
-      result = size == a.length;
+      size = b.length
+      result = size == a.length
 
       if (result) {
         while (size--) {
           if (!(result = baseIsEqual(a[size], b[size], stackA, stackB))) {
-            break;
+            break
           }
         }
       }
-    }
-    else {
+    } else {
       forIn(b, function(value, key, b) {
         if (hasOwnProperty.call(b, key)) {
-          size++;
-          return !(result = hasOwnProperty.call(a, key) && baseIsEqual(a[key], value, stackA, stackB)) && indicatorObject;
+          size++
+          return (
+            !(result = hasOwnProperty.call(a, key) && baseIsEqual(a[key], value, stackA, stackB)) &&
+            indicatorObject
+          )
         }
-      });
+      })
 
       if (result) {
         forIn(a, function(value, key, a) {
           if (hasOwnProperty.call(a, key)) {
-            return !(result = --size > -1) && indicatorObject;
+            return !(result = --size > -1) && indicatorObject
           }
-        });
+        })
       }
     }
-    stackA.pop();
-    stackB.pop();
-    return result;
+    stackA.pop()
+    stackB.pop()
+    return result
   }
 
   /**
@@ -859,7 +881,7 @@
    * @returns {number} Returns a random number.
    */
   function baseRandom(min, max) {
-    return min + floor(nativeRandom() * (max - min + 1));
+    return min + floor(nativeRandom() * (max - min + 1))
   }
 
   /**
@@ -874,26 +896,23 @@
    */
   function baseUniq(array, isSorted, callback) {
     var index = -1,
-        indexOf = getIndexOf(),
-        length = array ? array.length : 0,
-        result = [],
-        seen = callback ? [] : result;
+      indexOf = getIndexOf(),
+      length = array ? array.length : 0,
+      result = [],
+      seen = callback ? [] : result
 
     while (++index < length) {
       var value = array[index],
-          computed = callback ? callback(value, index, array) : value;
+        computed = callback ? callback(value, index, array) : value
 
-      if (isSorted
-            ? !index || seen[seen.length - 1] !== computed
-            : indexOf(seen, computed) < 0
-          ) {
+      if (isSorted ? !index || seen[seen.length - 1] !== computed : indexOf(seen, computed) < 0) {
         if (callback) {
-          seen.push(computed);
+          seen.push(computed)
         }
-        result.push(value);
+        result.push(value)
       }
     }
-    return result;
+    return result
   }
 
   /**
@@ -908,24 +927,24 @@
    */
   function createAggregator(setter) {
     return function(collection, callback, thisArg) {
-      var result = {};
-      callback = createCallback(callback, thisArg, 3);
+      var result = {}
+      callback = createCallback(callback, thisArg, 3)
 
       var index = -1,
-          length = collection ? collection.length : 0;
+        length = collection ? collection.length : 0
 
       if (typeof length == 'number') {
         while (++index < length) {
-          var value = collection[index];
-          setter(result, value, callback(value, index, collection), collection);
+          var value = collection[index]
+          setter(result, value, callback(value, index, collection), collection)
         }
       } else {
         forOwn(collection, function(value, key, collection) {
-          setter(result, value, callback(value, key, collection), collection);
-        });
+          setter(result, value, callback(value, key, collection), collection)
+        })
       }
-      return result;
-    };
+      return result
+    }
   }
 
   /**
@@ -952,26 +971,26 @@
    */
   function createWrapper(func, bitmask, partialArgs, partialRightArgs, thisArg, arity) {
     var isBind = bitmask & 1,
-        isBindKey = bitmask & 2,
-        isCurry = bitmask & 4,
-        isCurryBound = bitmask & 8,
-        isPartial = bitmask & 16,
-        isPartialRight = bitmask & 32;
+      isBindKey = bitmask & 2,
+      isCurry = bitmask & 4,
+      isCurryBound = bitmask & 8,
+      isPartial = bitmask & 16,
+      isPartialRight = bitmask & 32
 
     if (!isBindKey && !isFunction(func)) {
-      throw new TypeError;
+      throw new TypeError()
     }
     if (isPartial && !partialArgs.length) {
-      bitmask &= ~16;
-      isPartial = partialArgs = false;
+      bitmask &= ~16
+      isPartial = partialArgs = false
     }
     if (isPartialRight && !partialRightArgs.length) {
-      bitmask &= ~32;
-      isPartialRight = partialRightArgs = false;
+      bitmask &= ~32
+      isPartialRight = partialRightArgs = false
     }
     // fast path for `_.bind`
-    var creater = (bitmask == 1 || bitmask === 17) ? baseBind : baseCreateWrapper;
-    return creater([func, bitmask, partialArgs, partialRightArgs, thisArg, arity]);
+    var creater = bitmask == 1 || bitmask === 17 ? baseBind : baseCreateWrapper
+    return creater([func, bitmask, partialArgs, partialRightArgs, thisArg, arity])
   }
 
   /**
@@ -982,7 +1001,7 @@
    * @returns {string} Returns the escaped character.
    */
   function escapeHtmlChar(match) {
-    return htmlEscapes[match];
+    return htmlEscapes[match]
   }
 
   /**
@@ -994,8 +1013,8 @@
    * @returns {Function} Returns the "indexOf" function.
    */
   function getIndexOf() {
-    var result = (result = lodash.indexOf) === indexOf ? baseIndexOf : result;
-    return result;
+    var result = (result = lodash.indexOf) === indexOf ? baseIndexOf : result
+    return result
   }
 
   /**
@@ -1006,7 +1025,7 @@
    * @returns {boolean} Returns `true` if the `value` is a native function, else `false`.
    */
   function isNative(value) {
-    return typeof value == 'function' && reNative.test(value);
+    return typeof value == 'function' && reNative.test(value)
   }
 
   /**
@@ -1017,7 +1036,7 @@
    * @returns {string} Returns the unescaped character.
    */
   function unescapeHtmlChar(match) {
-    return htmlUnescapes[match];
+    return htmlUnescapes[match]
   }
 
   /*--------------------------------------------------------------------------*/
@@ -1039,15 +1058,26 @@
    * // => false
    */
   function isArguments(value) {
-    return value && typeof value == 'object' && typeof value.length == 'number' &&
-      toString.call(value) == argsClass || false;
+    return (
+      (value &&
+        typeof value == 'object' &&
+        typeof value.length == 'number' &&
+        toString.call(value) == argsClass) ||
+      false
+    )
   }
   // fallback for browsers that can't detect `arguments` objects by [[Class]]
   if (!isArguments(arguments)) {
     isArguments = function(value) {
-      return value && typeof value == 'object' && typeof value.length == 'number' &&
-        hasOwnProperty.call(value, 'callee') && !propertyIsEnumerable.call(value, 'callee') || false;
-    };
+      return (
+        (value &&
+          typeof value == 'object' &&
+          typeof value.length == 'number' &&
+          hasOwnProperty.call(value, 'callee') &&
+          !propertyIsEnumerable.call(value, 'callee')) ||
+        false
+      )
+    }
   }
 
   /**
@@ -1067,10 +1097,17 @@
    * _.isArray([1, 2, 3]);
    * // => true
    */
-  var isArray = nativeIsArray || function(value) {
-    return value && typeof value == 'object' && typeof value.length == 'number' &&
-      toString.call(value) == arrayClass || false;
-  };
+  var isArray =
+    nativeIsArray ||
+    function(value) {
+      return (
+        (value &&
+          typeof value == 'object' &&
+          typeof value.length == 'number' &&
+          toString.call(value) == arrayClass) ||
+        false
+      )
+    }
 
   /**
    * A fallback implementation of `Object.keys` which produces an array of the
@@ -1082,16 +1119,18 @@
    * @returns {Array} Returns an array of property names.
    */
   var shimKeys = function(object) {
-    var index, iterable = object, result = [];
-    if (!iterable) return result;
-    if (!(objectTypes[typeof object])) return result;
-      for (index in iterable) {
-        if (hasOwnProperty.call(iterable, index)) {
-          result.push(index);
-        }
+    var index,
+      iterable = object,
+      result = []
+    if (!iterable) return result
+    if (!objectTypes[typeof object]) return result
+    for (index in iterable) {
+      if (hasOwnProperty.call(iterable, index)) {
+        result.push(index)
       }
+    }
     return result
-  };
+  }
 
   /**
    * Creates an array composed of the own enumerable property names of an object.
@@ -1106,12 +1145,14 @@
    * _.keys({ 'one': 1, 'two': 2, 'three': 3 });
    * // => ['one', 'two', 'three'] (property order is not guaranteed across environments)
    */
-  var keys = !nativeKeys ? shimKeys : function(object) {
-    if (!isObject(object)) {
-      return [];
-    }
-    return nativeKeys(object);
-  };
+  var keys = !nativeKeys
+    ? shimKeys
+    : function(object) {
+        if (!isObject(object)) {
+          return []
+        }
+        return nativeKeys(object)
+      }
 
   /**
    * Used to convert characters to HTML entities:
@@ -1127,14 +1168,14 @@
     '>': '&gt;',
     '"': '&quot;',
     "'": '&#x27;'
-  };
+  }
 
   /** Used to convert HTML entities to characters */
-  var htmlUnescapes = invert(htmlEscapes);
+  var htmlUnescapes = invert(htmlEscapes)
 
   /** Used to match HTML entities and HTML characters */
   var reEscapedHtml = RegExp('(' + keys(htmlUnescapes).join('|') + ')', 'g'),
-      reUnescapedHtml = RegExp('[' + keys(htmlEscapes).join('') + ']', 'g');
+    reUnescapedHtml = RegExp('[' + keys(htmlEscapes).join('') + ']', 'g')
 
   /*--------------------------------------------------------------------------*/
 
@@ -1170,17 +1211,17 @@
    */
   function assign(object) {
     if (!object) {
-      return object;
+      return object
     }
     for (var argsIndex = 1, argsLength = arguments.length; argsIndex < argsLength; argsIndex++) {
-      var iterable = arguments[argsIndex];
+      var iterable = arguments[argsIndex]
       if (iterable) {
         for (var key in iterable) {
-          object[key] = iterable[key];
+          object[key] = iterable[key]
         }
       }
     }
-    return object;
+    return object
   }
 
   /**
@@ -1227,11 +1268,15 @@
     // allows working with "Collections" methods without using their `index`
     // and `collection` arguments for `isDeep` and `callback`
     if (typeof isDeep != 'boolean' && isDeep != null) {
-      thisArg = callback;
-      callback = isDeep;
-      isDeep = false;
+      thisArg = callback
+      callback = isDeep
+      isDeep = false
     }
-    return baseClone(value, isDeep, typeof callback == 'function' && baseCreateCallback(callback, thisArg, 1));
+    return baseClone(
+      value,
+      isDeep,
+      typeof callback == 'function' && baseCreateCallback(callback, thisArg, 1)
+    )
   }
 
   /**
@@ -1276,7 +1321,11 @@
    * // => false
    */
   function cloneDeep(value, callback, thisArg) {
-    return baseClone(value, true, typeof callback == 'function' && baseCreateCallback(callback, thisArg, 1));
+    return baseClone(
+      value,
+      true,
+      typeof callback == 'function' && baseCreateCallback(callback, thisArg, 1)
+    )
   }
 
   /**
@@ -1301,19 +1350,19 @@
    */
   function defaults(object) {
     if (!object) {
-      return object;
+      return object
     }
     for (var argsIndex = 1, argsLength = arguments.length; argsIndex < argsLength; argsIndex++) {
-      var iterable = arguments[argsIndex];
+      var iterable = arguments[argsIndex]
       if (iterable) {
         for (var key in iterable) {
           if (typeof object[key] == 'undefined') {
-            object[key] = iterable[key];
+            object[key] = iterable[key]
           }
         }
       }
     }
-    return object;
+    return object
   }
 
   /**
@@ -1348,14 +1397,16 @@
    * // => logs 'x', 'y', and 'move' (property order is not guaranteed across environments)
    */
   var forIn = function(collection, callback) {
-    var index, iterable = collection, result = iterable;
-    if (!iterable) return result;
-    if (!objectTypes[typeof iterable]) return result;
-      for (index in iterable) {
-        if (callback(iterable[index], index, collection) === indicatorObject) return result;
-      }
+    var index,
+      iterable = collection,
+      result = iterable
+    if (!iterable) return result
+    if (!objectTypes[typeof iterable]) return result
+    for (index in iterable) {
+      if (callback(iterable[index], index, collection) === indicatorObject) return result
+    }
     return result
-  };
+  }
 
   /**
    * Iterates over own enumerable properties of an object, executing the callback
@@ -1379,16 +1430,18 @@
    * // => logs '0', '1', and 'length' (property order is not guaranteed across environments)
    */
   var forOwn = function(collection, callback) {
-    var index, iterable = collection, result = iterable;
-    if (!iterable) return result;
-    if (!objectTypes[typeof iterable]) return result;
-      for (index in iterable) {
-        if (hasOwnProperty.call(iterable, index)) {
-          if (callback(iterable[index], index, collection) === indicatorObject) return result;
-        }
+    var index,
+      iterable = collection,
+      result = iterable
+    if (!iterable) return result
+    if (!objectTypes[typeof iterable]) return result
+    for (index in iterable) {
+      if (hasOwnProperty.call(iterable, index)) {
+        if (callback(iterable[index], index, collection) === indicatorObject) return result
       }
+    }
     return result
-  };
+  }
 
   /**
    * Creates a sorted array of property names of all enumerable properties,
@@ -1406,13 +1459,13 @@
    * // => ['all', 'any', 'bind', 'bindAll', 'clone', 'compact', 'compose', ...]
    */
   function functions(object) {
-    var result = [];
+    var result = []
     forIn(object, function(value, key) {
       if (isFunction(value)) {
-        result.push(key);
+        result.push(key)
       }
-    });
-    return result.sort();
+    })
+    return result.sort()
   }
 
   /**
@@ -1431,7 +1484,7 @@
    * // => true
    */
   function has(object, key) {
-    return object ? hasOwnProperty.call(object, key) : false;
+    return object ? hasOwnProperty.call(object, key) : false
   }
 
   /**
@@ -1449,15 +1502,15 @@
    */
   function invert(object) {
     var index = -1,
-        props = keys(object),
-        length = props.length,
-        result = {};
+      props = keys(object),
+      length = props.length,
+      result = {}
 
     while (++index < length) {
-      var key = props[index];
-      result[object[key]] = key;
+      var key = props[index]
+      result[object[key]] = key
     }
-    return result;
+    return result
   }
 
   /**
@@ -1474,8 +1527,12 @@
    * // => false
    */
   function isBoolean(value) {
-    return value === true || value === false ||
-      value && typeof value == 'object' && toString.call(value) == boolClass || false;
+    return (
+      value === true ||
+      value === false ||
+      (value && typeof value == 'object' && toString.call(value) == boolClass) ||
+      false
+    )
   }
 
   /**
@@ -1492,7 +1549,7 @@
    * // => true
    */
   function isDate(value) {
-    return value && typeof value == 'object' && toString.call(value) == dateClass || false;
+    return (value && typeof value == 'object' && toString.call(value) == dateClass) || false
   }
 
   /**
@@ -1509,7 +1566,7 @@
    * // => true
    */
   function isElement(value) {
-    return value && value.nodeType === 1 || false;
+    return (value && value.nodeType === 1) || false
   }
 
   /**
@@ -1535,17 +1592,17 @@
    */
   function isEmpty(value) {
     if (!value) {
-      return true;
+      return true
     }
     if (isArray(value) || isString(value)) {
-      return !value.length;
+      return !value.length
     }
     for (var key in value) {
       if (hasOwnProperty.call(value, key)) {
-        return false;
+        return false
       }
     }
-    return true;
+    return true
   }
 
   /**
@@ -1587,7 +1644,7 @@
    * // => true
    */
   function isEqual(a, b) {
-    return baseIsEqual(a, b);
+    return baseIsEqual(a, b)
   }
 
   /**
@@ -1619,7 +1676,7 @@
    * // => false
    */
   function isFinite(value) {
-    return nativeIsFinite(value) && !nativeIsNaN(parseFloat(value));
+    return nativeIsFinite(value) && !nativeIsNaN(parseFloat(value))
   }
 
   /**
@@ -1636,13 +1693,13 @@
    * // => true
    */
   function isFunction(value) {
-    return typeof value == 'function';
+    return typeof value == 'function'
   }
   // fallback for older versions of Chrome and Safari
   if (isFunction(/x/)) {
     isFunction = function(value) {
-      return typeof value == 'function' && toString.call(value) == funcClass;
-    };
+      return typeof value == 'function' && toString.call(value) == funcClass
+    }
   }
 
   /**
@@ -1670,7 +1727,7 @@
     // http://es5.github.io/#x8
     // and avoid a V8 bug
     // http://code.google.com/p/v8/issues/detail?id=2291
-    return !!(value && objectTypes[typeof value]);
+    return !!(value && objectTypes[typeof value])
   }
 
   /**
@@ -1701,7 +1758,7 @@
   function isNaN(value) {
     // `NaN` as a primitive is the only value that is not equal to itself
     // (perform the [[Class]] check first to avoid errors with some host objects in IE)
-    return isNumber(value) && value != +value;
+    return isNumber(value) && value != +value
   }
 
   /**
@@ -1721,7 +1778,7 @@
    * // => false
    */
   function isNull(value) {
-    return value === null;
+    return value === null
   }
 
   /**
@@ -1740,8 +1797,11 @@
    * // => true
    */
   function isNumber(value) {
-    return typeof value == 'number' ||
-      value && typeof value == 'object' && toString.call(value) == numberClass || false;
+    return (
+      typeof value == 'number' ||
+      (value && typeof value == 'object' && toString.call(value) == numberClass) ||
+      false
+    )
   }
 
   /**
@@ -1758,7 +1818,7 @@
    * // => true
    */
   function isRegExp(value) {
-    return value && objectTypes[typeof value] && toString.call(value) == regexpClass || false;
+    return (value && objectTypes[typeof value] && toString.call(value) == regexpClass) || false
   }
 
   /**
@@ -1775,8 +1835,11 @@
    * // => true
    */
   function isString(value) {
-    return typeof value == 'string' ||
-      value && typeof value == 'object' && toString.call(value) == stringClass || false;
+    return (
+      typeof value == 'string' ||
+      (value && typeof value == 'object' && toString.call(value) == stringClass) ||
+      false
+    )
   }
 
   /**
@@ -1793,7 +1856,7 @@
    * // => true
    */
   function isUndefined(value) {
-    return typeof value == 'undefined';
+    return typeof value == 'undefined'
   }
 
   /**
@@ -1823,21 +1886,21 @@
    * // => { 'name': 'fred' }
    */
   function omit(object) {
-    var props = [];
+    var props = []
     forIn(object, function(value, key) {
-      props.push(key);
-    });
-    props = baseDifference(props, baseFlatten(arguments, true, false, 1));
+      props.push(key)
+    })
+    props = baseDifference(props, baseFlatten(arguments, true, false, 1))
 
     var index = -1,
-        length = props.length,
-        result = {};
+      length = props.length,
+      result = {}
 
     while (++index < length) {
-      var key = props[index];
-      result[key] = object[key];
+      var key = props[index]
+      result[key] = object[key]
     }
-    return result;
+    return result
   }
 
   /**
@@ -1856,15 +1919,15 @@
    */
   function pairs(object) {
     var index = -1,
-        props = keys(object),
-        length = props.length,
-        result = Array(length);
+      props = keys(object),
+      length = props.length,
+      result = Array(length)
 
     while (++index < length) {
-      var key = props[index];
-      result[index] = [key, object[key]];
+      var key = props[index]
+      result[index] = [key, object[key]]
     }
-    return result;
+    return result
   }
 
   /**
@@ -1896,17 +1959,17 @@
    */
   function pick(object) {
     var index = -1,
-        props = baseFlatten(arguments, true, false, 1),
-        length = props.length,
-        result = {};
+      props = baseFlatten(arguments, true, false, 1),
+      length = props.length,
+      result = {}
 
     while (++index < length) {
-      var key = props[index];
+      var key = props[index]
       if (key in object) {
-        result[key] = object[key];
+        result[key] = object[key]
       }
     }
-    return result;
+    return result
   }
 
   /**
@@ -1924,14 +1987,14 @@
    */
   function values(object) {
     var index = -1,
-        props = keys(object),
-        length = props.length,
-        result = Array(length);
+      props = keys(object),
+      length = props.length,
+      result = Array(length)
 
     while (++index < length) {
-      result[index] = object[props[index]];
+      result[index] = object[props[index]]
     }
-    return result;
+    return result
   }
 
   /*--------------------------------------------------------------------------*/
@@ -1965,16 +2028,16 @@
    */
   function contains(collection, target) {
     var indexOf = getIndexOf(),
-        length = collection ? collection.length : 0,
-        result = false;
+      length = collection ? collection.length : 0,
+      result = false
     if (length && typeof length == 'number') {
-      result = indexOf(collection, target) > -1;
+      result = indexOf(collection, target) > -1
     } else {
       forOwn(collection, function(value) {
-        return (result = value === target) && indicatorObject;
-      });
+        return (result = value === target) && indicatorObject
+      })
     }
-    return result;
+    return result
   }
 
   /**
@@ -2012,8 +2075,8 @@
    * // => { '3': 2, '5': 1 }
    */
   var countBy = createAggregator(function(result, value, key) {
-    (hasOwnProperty.call(result, key) ? result[key]++ : result[key] = 1);
-  });
+    hasOwnProperty.call(result, key) ? result[key]++ : (result[key] = 1)
+  })
 
   /**
    * Checks if the given callback returns truey value for **all** elements of
@@ -2057,24 +2120,24 @@
    * // => false
    */
   function every(collection, callback, thisArg) {
-    var result = true;
-    callback = createCallback(callback, thisArg, 3);
+    var result = true
+    callback = createCallback(callback, thisArg, 3)
 
     var index = -1,
-        length = collection ? collection.length : 0;
+      length = collection ? collection.length : 0
 
     if (typeof length == 'number') {
       while (++index < length) {
         if (!(result = !!callback(collection[index], index, collection))) {
-          break;
+          break
         }
       }
     } else {
       forOwn(collection, function(value, index, collection) {
-        return !(result = !!callback(value, index, collection)) && indicatorObject;
-      });
+        return !(result = !!callback(value, index, collection)) && indicatorObject
+      })
     }
-    return result;
+    return result
   }
 
   /**
@@ -2118,27 +2181,27 @@
    * // => [{ 'name': 'barney', 'age': 36, 'blocked': false }]
    */
   function filter(collection, callback, thisArg) {
-    var result = [];
-    callback = createCallback(callback, thisArg, 3);
+    var result = []
+    callback = createCallback(callback, thisArg, 3)
 
     var index = -1,
-        length = collection ? collection.length : 0;
+      length = collection ? collection.length : 0
 
     if (typeof length == 'number') {
       while (++index < length) {
-        var value = collection[index];
+        var value = collection[index]
         if (callback(value, index, collection)) {
-          result.push(value);
+          result.push(value)
         }
       }
     } else {
       forOwn(collection, function(value, index, collection) {
         if (callback(value, index, collection)) {
-          result.push(value);
+          result.push(value)
         }
-      });
+      })
     }
-    return result;
+    return result
   }
 
   /**
@@ -2185,27 +2248,27 @@
    * // => { 'name': 'fred', 'age': 40, 'blocked': true }
    */
   function find(collection, callback, thisArg) {
-    callback = createCallback(callback, thisArg, 3);
+    callback = createCallback(callback, thisArg, 3)
 
     var index = -1,
-        length = collection ? collection.length : 0;
+      length = collection ? collection.length : 0
 
     if (typeof length == 'number') {
       while (++index < length) {
-        var value = collection[index];
+        var value = collection[index]
         if (callback(value, index, collection)) {
-          return value;
+          return value
         }
       }
     } else {
-      var result;
+      var result
       forOwn(collection, function(value, index, collection) {
         if (callback(value, index, collection)) {
-          result = value;
-          return indicatorObject;
+          result = value
+          return indicatorObject
         }
-      });
-      return result;
+      })
+      return result
     }
   }
 
@@ -2233,7 +2296,7 @@
    * // => { 'name': 'beet', 'organic': false, 'type': 'vegetable' }
    */
   function findWhere(object, properties) {
-    return where(object, properties, true);
+    return where(object, properties, true)
   }
 
   /**
@@ -2264,17 +2327,20 @@
    */
   function forEach(collection, callback, thisArg) {
     var index = -1,
-        length = collection ? collection.length : 0;
+      length = collection ? collection.length : 0
 
-    callback = callback && typeof thisArg == 'undefined' ? callback : baseCreateCallback(callback, thisArg, 3);
+    callback =
+      callback && typeof thisArg == 'undefined'
+        ? callback
+        : baseCreateCallback(callback, thisArg, 3)
     if (typeof length == 'number') {
       while (++index < length) {
         if (callback(collection[index], index, collection) === indicatorObject) {
-          break;
+          break
         }
       }
     } else {
-      forOwn(collection, callback);
+      forOwn(collection, callback)
     }
   }
 
@@ -2296,20 +2362,20 @@
    * // => logs each number from right to left and returns '3,2,1'
    */
   function forEachRight(collection, callback) {
-    var length = collection ? collection.length : 0;
+    var length = collection ? collection.length : 0
     if (typeof length == 'number') {
       while (length--) {
         if (callback(collection[length], length, collection) === false) {
-          break;
+          break
         }
       }
     } else {
-      var props = keys(collection);
-      length = props.length;
+      var props = keys(collection)
+      length = props.length
       forOwn(collection, function(value, key, collection) {
-        key = props ? props[--length] : --length;
-        return callback(collection[key], key, collection) === false && indicatorObject;
-      });
+        key = props ? props[--length] : --length
+        return callback(collection[key], key, collection) === false && indicatorObject
+      })
     }
   }
 
@@ -2349,8 +2415,8 @@
    * // => { '3': ['one', 'two'], '5': ['three'] }
    */
   var groupBy = createAggregator(function(result, value, key) {
-    (hasOwnProperty.call(result, key) ? result[key] : result[key] = []).push(value);
-  });
+    ;(hasOwnProperty.call(result, key) ? result[key] : (result[key] = [])).push(value)
+  })
 
   /**
    * Creates an object composed of keys generated from the results of running
@@ -2392,8 +2458,8 @@
    * // => { 'a': { 'dir': 'left', 'code': 97 }, 'd': { 'dir': 'right', 'code': 100 } }
    */
   var indexBy = createAggregator(function(result, value, key) {
-    result[key] = value;
-  });
+    result[key] = value
+  })
 
   /**
    * Invokes the method named by `methodName` on each element in the `collection`
@@ -2419,15 +2485,15 @@
    */
   function invoke(collection, methodName) {
     var args = slice(arguments, 2),
-        index = -1,
-        isFunc = typeof methodName == 'function',
-        length = collection ? collection.length : 0,
-        result = Array(typeof length == 'number' ? length : 0);
+      index = -1,
+      isFunc = typeof methodName == 'function',
+      length = collection ? collection.length : 0,
+      result = Array(typeof length == 'number' ? length : 0)
 
     forEach(collection, function(value) {
-      result[++index] = (isFunc ? methodName : value[methodName]).apply(value, args);
-    });
-    return result;
+      result[++index] = (isFunc ? methodName : value[methodName]).apply(value, args)
+    })
+    return result
   }
 
   /**
@@ -2471,21 +2537,21 @@
    */
   function map(collection, callback, thisArg) {
     var index = -1,
-        length = collection ? collection.length : 0;
+      length = collection ? collection.length : 0
 
-    callback = createCallback(callback, thisArg, 3);
+    callback = createCallback(callback, thisArg, 3)
     if (typeof length == 'number') {
-      var result = Array(length);
+      var result = Array(length)
       while (++index < length) {
-        result[index] = callback(collection[index], index, collection);
+        result[index] = callback(collection[index], index, collection)
       }
     } else {
-      result = [];
+      result = []
       forOwn(collection, function(value, key, collection) {
-        result[++index] = callback(value, key, collection);
-      });
+        result[++index] = callback(value, key, collection)
+      })
     }
-    return result;
+    return result
   }
 
   /**
@@ -2530,35 +2596,35 @@
    */
   function max(collection, callback, thisArg) {
     var computed = -Infinity,
-        result = computed;
+      result = computed
 
     // allows working with functions like `_.map` without using
     // their `index` argument as a callback
     if (typeof callback != 'function' && thisArg && thisArg[callback] === collection) {
-      callback = null;
+      callback = null
     }
     var index = -1,
-        length = collection ? collection.length : 0;
+      length = collection ? collection.length : 0
 
     if (callback == null && typeof length == 'number') {
       while (++index < length) {
-        var value = collection[index];
+        var value = collection[index]
         if (value > result) {
-          result = value;
+          result = value
         }
       }
     } else {
-      callback = createCallback(callback, thisArg, 3);
+      callback = createCallback(callback, thisArg, 3)
 
       forEach(collection, function(value, index, collection) {
-        var current = callback(value, index, collection);
+        var current = callback(value, index, collection)
         if (current > computed) {
-          computed = current;
-          result = value;
+          computed = current
+          result = value
         }
-      });
+      })
     }
-    return result;
+    return result
   }
 
   /**
@@ -2603,35 +2669,35 @@
    */
   function min(collection, callback, thisArg) {
     var computed = Infinity,
-        result = computed;
+      result = computed
 
     // allows working with functions like `_.map` without using
     // their `index` argument as a callback
     if (typeof callback != 'function' && thisArg && thisArg[callback] === collection) {
-      callback = null;
+      callback = null
     }
     var index = -1,
-        length = collection ? collection.length : 0;
+      length = collection ? collection.length : 0
 
     if (callback == null && typeof length == 'number') {
       while (++index < length) {
-        var value = collection[index];
+        var value = collection[index]
         if (value < result) {
-          result = value;
+          result = value
         }
       }
     } else {
-      callback = createCallback(callback, thisArg, 3);
+      callback = createCallback(callback, thisArg, 3)
 
       forEach(collection, function(value, index, collection) {
-        var current = callback(value, index, collection);
+        var current = callback(value, index, collection)
         if (current < computed) {
-          computed = current;
-          result = value;
+          computed = current
+          result = value
         }
-      });
+      })
     }
-    return result;
+    return result
   }
 
   /**
@@ -2654,7 +2720,7 @@
    * _.pluck(characters, 'name');
    * // => ['barney', 'fred']
    */
-  var pluck = map;
+  var pluck = map
 
   /**
    * Reduces a collection to a value which is the accumulated result of running
@@ -2687,28 +2753,28 @@
    * // => { 'a': 3, 'b': 6, 'c': 9 }
    */
   function reduce(collection, callback, accumulator, thisArg) {
-    if (!collection) return accumulator;
-    var noaccum = arguments.length < 3;
-    callback = createCallback(callback, thisArg, 4);
+    if (!collection) return accumulator
+    var noaccum = arguments.length < 3
+    callback = createCallback(callback, thisArg, 4)
 
     var index = -1,
-        length = collection.length;
+      length = collection.length
 
     if (typeof length == 'number') {
       if (noaccum) {
-        accumulator = collection[++index];
+        accumulator = collection[++index]
       }
       while (++index < length) {
-        accumulator = callback(accumulator, collection[index], index, collection);
+        accumulator = callback(accumulator, collection[index], index, collection)
       }
     } else {
       forOwn(collection, function(value, index, collection) {
         accumulator = noaccum
-          ? (noaccum = false, value)
+          ? ((noaccum = false), value)
           : callback(accumulator, value, index, collection)
-      });
+      })
     }
-    return accumulator;
+    return accumulator
   }
 
   /**
@@ -2731,14 +2797,14 @@
    * // => [4, 5, 2, 3, 0, 1]
    */
   function reduceRight(collection, callback, accumulator, thisArg) {
-    var noaccum = arguments.length < 3;
-    callback = createCallback(callback, thisArg, 4);
+    var noaccum = arguments.length < 3
+    callback = createCallback(callback, thisArg, 4)
     forEachRight(collection, function(value, index, collection) {
       accumulator = noaccum
-        ? (noaccum = false, value)
-        : callback(accumulator, value, index, collection);
-    });
-    return accumulator;
+        ? ((noaccum = false), value)
+        : callback(accumulator, value, index, collection)
+    })
+    return accumulator
   }
 
   /**
@@ -2780,10 +2846,10 @@
    * // => [{ 'name': 'fred', 'age': 40, 'blocked': true }]
    */
   function reject(collection, callback, thisArg) {
-    callback = createCallback(callback, thisArg, 3);
+    callback = createCallback(callback, thisArg, 3)
     return filter(collection, function(value, index, collection) {
-      return !callback(value, index, collection);
-    });
+      return !callback(value, index, collection)
+    })
   }
 
   /**
@@ -2807,14 +2873,14 @@
    */
   function sample(collection, n, guard) {
     if (collection && typeof collection.length != 'number') {
-      collection = values(collection);
+      collection = values(collection)
     }
     if (n == null || guard) {
-      return collection ? collection[baseRandom(0, collection.length - 1)] : undefined;
+      return collection ? collection[baseRandom(0, collection.length - 1)] : undefined
     }
-    var result = shuffle(collection);
-    result.length = nativeMin(nativeMax(0, n), result.length);
-    return result;
+    var result = shuffle(collection)
+    result.length = nativeMin(nativeMax(0, n), result.length)
+    return result
   }
 
   /**
@@ -2833,15 +2899,15 @@
    */
   function shuffle(collection) {
     var index = -1,
-        length = collection ? collection.length : 0,
-        result = Array(typeof length == 'number' ? length : 0);
+      length = collection ? collection.length : 0,
+      result = Array(typeof length == 'number' ? length : 0)
 
     forEach(collection, function(value) {
-      var rand = baseRandom(0, ++index);
-      result[index] = result[rand];
-      result[rand] = value;
-    });
-    return result;
+      var rand = baseRandom(0, ++index)
+      result[index] = result[rand]
+      result[rand] = value
+    })
+    return result
   }
 
   /**
@@ -2865,8 +2931,8 @@
    * // => 7
    */
   function size(collection) {
-    var length = collection ? collection.length : 0;
-    return typeof length == 'number' ? length : keys(collection).length;
+    var length = collection ? collection.length : 0
+    return typeof length == 'number' ? length : keys(collection).length
   }
 
   /**
@@ -2912,24 +2978,24 @@
    * // => false
    */
   function some(collection, callback, thisArg) {
-    var result;
-    callback = createCallback(callback, thisArg, 3);
+    var result
+    callback = createCallback(callback, thisArg, 3)
 
     var index = -1,
-        length = collection ? collection.length : 0;
+      length = collection ? collection.length : 0
 
     if (typeof length == 'number') {
       while (++index < length) {
         if ((result = callback(collection[index], index, collection))) {
-          break;
+          break
         }
       }
     } else {
       forOwn(collection, function(value, index, collection) {
-        return (result = callback(value, index, collection)) && indicatorObject;
-      });
+        return (result = callback(value, index, collection)) && indicatorObject
+      })
     }
-    return !!result;
+    return !!result
   }
 
   /**
@@ -2983,24 +3049,24 @@
    */
   function sortBy(collection, callback, thisArg) {
     var index = -1,
-        length = collection ? collection.length : 0,
-        result = Array(typeof length == 'number' ? length : 0);
+      length = collection ? collection.length : 0,
+      result = Array(typeof length == 'number' ? length : 0)
 
-    callback = createCallback(callback, thisArg, 3);
+    callback = createCallback(callback, thisArg, 3)
     forEach(collection, function(value, key, collection) {
       result[++index] = {
-        'criteria': [callback(value, key, collection)],
-        'index': index,
-        'value': value
-      };
-    });
+        criteria: [callback(value, key, collection)],
+        index: index,
+        value: value
+      }
+    })
 
-    length = result.length;
-    result.sort(compareAscending);
+    length = result.length
+    result.sort(compareAscending)
     while (length--) {
-      result[length] = result[length].value;
+      result[length] = result[length].value
     }
-    return result;
+    return result
   }
 
   /**
@@ -3018,12 +3084,12 @@
    */
   function toArray(collection) {
     if (isArray(collection)) {
-      return slice(collection);
+      return slice(collection)
     }
     if (collection && typeof collection.length == 'number') {
-      return map(collection);
+      return map(collection)
     }
-    return values(collection);
+    return values(collection)
   }
 
   /**
@@ -3052,9 +3118,9 @@
    * // => [{ 'name': 'fred', 'age': 40, 'pets': ['baby puss', 'dino'] }]
    */
   function where(collection, properties, first) {
-    return (first && isEmpty(properties))
+    return first && isEmpty(properties)
       ? undefined
-      : (first ? find : filter)(collection, properties);
+      : (first ? find : filter)(collection, properties)
   }
 
   /*--------------------------------------------------------------------------*/
@@ -3075,16 +3141,16 @@
    */
   function compact(array) {
     var index = -1,
-        length = array ? array.length : 0,
-        result = [];
+      length = array ? array.length : 0,
+      result = []
 
     while (++index < length) {
-      var value = array[index];
+      var value = array[index]
       if (value) {
-        result.push(value);
+        result.push(value)
       }
     }
-    return result;
+    return result
   }
 
   /**
@@ -3103,7 +3169,7 @@
    * // => [1, 3, 4]
    */
   function difference(array) {
-    return baseDifference(array, baseFlatten(arguments, true, true, 1));
+    return baseDifference(array, baseFlatten(arguments, true, true, 1))
   }
 
   /**
@@ -3159,21 +3225,21 @@
    */
   function first(array, callback, thisArg) {
     var n = 0,
-        length = array ? array.length : 0;
+      length = array ? array.length : 0
 
     if (typeof callback != 'number' && callback != null) {
-      var index = -1;
-      callback = createCallback(callback, thisArg, 3);
+      var index = -1
+      callback = createCallback(callback, thisArg, 3)
       while (++index < length && callback(array[index], index, array)) {
-        n++;
+        n++
       }
     } else {
-      n = callback;
+      n = callback
       if (n == null || thisArg) {
-        return array ? array[0] : undefined;
+        return array ? array[0] : undefined
       }
     }
-    return slice(array, 0, nativeMin(nativeMax(0, n), length));
+    return slice(array, 0, nativeMin(nativeMax(0, n), length))
   }
 
   /**
@@ -3218,7 +3284,7 @@
    * // => ['hoppy', 'baby puss', 'dino']
    */
   function flatten(array, isShallow) {
-    return baseFlatten(array, isShallow);
+    return baseFlatten(array, isShallow)
   }
 
   /**
@@ -3247,13 +3313,13 @@
    */
   function indexOf(array, value, fromIndex) {
     if (typeof fromIndex == 'number') {
-      var length = array ? array.length : 0;
-      fromIndex = (fromIndex < 0 ? nativeMax(0, length + fromIndex) : fromIndex || 0);
+      var length = array ? array.length : 0
+      fromIndex = fromIndex < 0 ? nativeMax(0, length + fromIndex) : fromIndex || 0
     } else if (fromIndex) {
-      var index = sortedIndex(array, value);
-      return array[index] === value ? index : -1;
+      var index = sortedIndex(array, value)
+      return array[index] === value ? index : -1
     }
-    return baseIndexOf(array, value, fromIndex);
+    return baseIndexOf(array, value, fromIndex)
   }
 
   /**
@@ -3308,18 +3374,18 @@
    */
   function initial(array, callback, thisArg) {
     var n = 0,
-        length = array ? array.length : 0;
+      length = array ? array.length : 0
 
     if (typeof callback != 'number' && callback != null) {
-      var index = length;
-      callback = createCallback(callback, thisArg, 3);
+      var index = length
+      callback = createCallback(callback, thisArg, 3)
       while (index-- && callback(array[index], index, array)) {
-        n++;
+        n++
       }
     } else {
-      n = (callback == null || thisArg) ? 1 : callback || n;
+      n = callback == null || thisArg ? 1 : callback || n
     }
-    return slice(array, 0, nativeMin(nativeMax(0, length - n), length));
+    return slice(array, 0, nativeMin(nativeMax(0, length - n), length))
   }
 
   /**
@@ -3338,35 +3404,34 @@
    */
   function intersection() {
     var args = [],
-        argsIndex = -1,
-        argsLength = arguments.length;
+      argsIndex = -1,
+      argsLength = arguments.length
 
     while (++argsIndex < argsLength) {
-      var value = arguments[argsIndex];
-       if (isArray(value) || isArguments(value)) {
-         args.push(value);
-       }
-    }
-    var array = args[0],
-        index = -1,
-        indexOf = getIndexOf(),
-        length = array ? array.length : 0,
-        result = [];
-
-    outer:
-    while (++index < length) {
-      value = array[index];
-      if (indexOf(result, value) < 0) {
-        var argsIndex = argsLength;
-        while (--argsIndex) {
-          if (indexOf(args[argsIndex], value) < 0) {
-            continue outer;
-          }
-        }
-        result.push(value);
+      var value = arguments[argsIndex]
+      if (isArray(value) || isArguments(value)) {
+        args.push(value)
       }
     }
-    return result;
+    var array = args[0],
+      index = -1,
+      indexOf = getIndexOf(),
+      length = array ? array.length : 0,
+      result = []
+
+    outer: while (++index < length) {
+      value = array[index]
+      if (indexOf(result, value) < 0) {
+        var argsIndex = argsLength
+        while (--argsIndex) {
+          if (indexOf(args[argsIndex], value) < 0) {
+            continue outer
+          }
+        }
+        result.push(value)
+      }
+    }
+    return result
   }
 
   /**
@@ -3421,21 +3486,21 @@
    */
   function last(array, callback, thisArg) {
     var n = 0,
-        length = array ? array.length : 0;
+      length = array ? array.length : 0
 
     if (typeof callback != 'number' && callback != null) {
-      var index = length;
-      callback = createCallback(callback, thisArg, 3);
+      var index = length
+      callback = createCallback(callback, thisArg, 3)
       while (index-- && callback(array[index], index, array)) {
-        n++;
+        n++
       }
     } else {
-      n = callback;
+      n = callback
       if (n == null || thisArg) {
-        return array ? array[length - 1] : undefined;
+        return array ? array[length - 1] : undefined
       }
     }
-    return slice(array, nativeMax(0, length - n));
+    return slice(array, nativeMax(0, length - n))
   }
 
   /**
@@ -3466,16 +3531,17 @@
    * // => 1
    */
   function lastIndexOf(array, value, fromIndex) {
-    var index = array ? array.length : 0;
+    var index = array ? array.length : 0
     if (typeof fromIndex == 'number') {
-      index = (fromIndex < 0 ? nativeMax(0, index + fromIndex) : nativeMin(fromIndex, index - 1)) + 1;
+      index =
+        (fromIndex < 0 ? nativeMax(0, index + fromIndex) : nativeMin(fromIndex, index - 1)) + 1
     }
     while (index--) {
       if (array[index] === value) {
-        return index;
+        return index
       }
     }
-    return -1;
+    return -1
   }
 
   /**
@@ -3511,24 +3577,24 @@
    * // => []
    */
   function range(start, end, step) {
-    start = +start || 0;
-    step =  (+step || 1);
+    start = +start || 0
+    step = +step || 1
 
     if (end == null) {
-      end = start;
-      start = 0;
+      end = start
+      start = 0
     }
     // use `Array(length)` so engines like Chakra and V8 avoid slower modes
     // http://youtu.be/XAqIpGU8ZZk#t=17m25s
     var index = -1,
-        length = nativeMax(0, ceil((end - start) / step)),
-        result = Array(length);
+      length = nativeMax(0, ceil((end - start) / step)),
+      result = Array(length)
 
     while (++index < length) {
-      result[index] = start;
-      start += step;
+      result[index] = start
+      start += step
     }
-    return result;
+    return result
   }
 
   /**
@@ -3586,17 +3652,17 @@
   function rest(array, callback, thisArg) {
     if (typeof callback != 'number' && callback != null) {
       var n = 0,
-          index = -1,
-          length = array ? array.length : 0;
+        index = -1,
+        length = array ? array.length : 0
 
-      callback = createCallback(callback, thisArg, 3);
+      callback = createCallback(callback, thisArg, 3)
       while (++index < length && callback(array[index], index, array)) {
-        n++;
+        n++
       }
     } else {
-      n = (callback == null || thisArg) ? 1 : nativeMax(0, callback);
+      n = callback == null || thisArg ? 1 : nativeMax(0, callback)
     }
-    return slice(array, n);
+    return slice(array, n)
   }
 
   /**
@@ -3649,19 +3715,17 @@
    */
   function sortedIndex(array, value, callback, thisArg) {
     var low = 0,
-        high = array ? array.length : low;
+      high = array ? array.length : low
 
     // explicitly reference `identity` for better inlining in Firefox
-    callback = callback ? createCallback(callback, thisArg, 1) : identity;
-    value = callback(value);
+    callback = callback ? createCallback(callback, thisArg, 1) : identity
+    value = callback(value)
 
     while (low < high) {
-      var mid = (low + high) >>> 1;
-      (callback(array[mid]) < value)
-        ? low = mid + 1
-        : high = mid;
+      var mid = (low + high) >>> 1
+      callback(array[mid]) < value ? (low = mid + 1) : (high = mid)
     }
-    return low;
+    return low
   }
 
   /**
@@ -3679,7 +3743,7 @@
    * // => [1, 2, 3, 5, 4]
    */
   function union() {
-    return baseUniq(baseFlatten(arguments, true, true));
+    return baseUniq(baseFlatten(arguments, true, true))
   }
 
   /**
@@ -3729,14 +3793,15 @@
   function uniq(array, isSorted, callback, thisArg) {
     // juggle arguments
     if (typeof isSorted != 'boolean' && isSorted != null) {
-      thisArg = callback;
-      callback = (typeof isSorted != 'function' && thisArg && thisArg[isSorted] === array) ? null : isSorted;
-      isSorted = false;
+      thisArg = callback
+      callback =
+        typeof isSorted != 'function' && thisArg && thisArg[isSorted] === array ? null : isSorted
+      isSorted = false
     }
     if (callback != null) {
-      callback = createCallback(callback, thisArg, 3);
+      callback = createCallback(callback, thisArg, 3)
     }
-    return baseUniq(array, isSorted, callback);
+    return baseUniq(array, isSorted, callback)
   }
 
   /**
@@ -3755,7 +3820,7 @@
    * // => [2, 3, 4]
    */
   function without(array) {
-    return baseDifference(array, slice(arguments, 1));
+    return baseDifference(array, slice(arguments, 1))
   }
 
   /**
@@ -3776,13 +3841,13 @@
    */
   function zip() {
     var index = -1,
-        length = max(pluck(arguments, 'length')),
-        result = Array(length < 0 ? 0 : length);
+      length = max(pluck(arguments, 'length')),
+      result = Array(length < 0 ? 0 : length)
 
     while (++index < length) {
-      result[index] = pluck(arguments, index);
+      result[index] = pluck(arguments, index)
     }
-    return result;
+    return result
   }
 
   /**
@@ -3805,21 +3870,21 @@
    */
   function zipObject(keys, values) {
     var index = -1,
-        length = keys ? keys.length : 0,
-        result = {};
+      length = keys ? keys.length : 0,
+      result = {}
 
     if (!values && length && !isArray(keys[0])) {
-      values = [];
+      values = []
     }
     while (++index < length) {
-      var key = keys[index];
+      var key = keys[index]
       if (values) {
-        result[key] = values[index];
+        result[key] = values[index]
       } else if (key) {
-        result[key[0]] = key[1];
+        result[key[0]] = key[1]
       }
     }
-    return result;
+    return result
   }
 
   /*--------------------------------------------------------------------------*/
@@ -3850,13 +3915,13 @@
    */
   function after(n, func) {
     if (!isFunction(func)) {
-      throw new TypeError;
+      throw new TypeError()
     }
     return function() {
       if (--n < 1) {
-        return func.apply(this, arguments);
+        return func.apply(this, arguments)
       }
-    };
+    }
   }
 
   /**
@@ -3884,7 +3949,7 @@
   function bind(func, thisArg) {
     return arguments.length > 2
       ? createWrapper(func, 17, slice(arguments, 2), null, thisArg)
-      : createWrapper(func, 1, null, null, thisArg);
+      : createWrapper(func, 1, null, null, thisArg)
   }
 
   /**
@@ -3913,14 +3978,14 @@
    */
   function bindAll(object) {
     var funcs = arguments.length > 1 ? baseFlatten(arguments, true, false, 1) : functions(object),
-        index = -1,
-        length = funcs.length;
+      index = -1,
+      length = funcs.length
 
     while (++index < length) {
-      var key = funcs[index];
-      object[key] = createWrapper(object[key], 1, null, null, object);
+      var key = funcs[index]
+      object[key] = createWrapper(object[key], 1, null, null, object)
     }
-    return object;
+    return object
   }
 
   /**
@@ -3955,22 +4020,22 @@
    */
   function compose() {
     var funcs = arguments,
-        length = funcs.length;
+      length = funcs.length
 
     while (length--) {
       if (!isFunction(funcs[length])) {
-        throw new TypeError;
+        throw new TypeError()
       }
     }
     return function() {
       var args = arguments,
-          length = funcs.length;
+        length = funcs.length
 
       while (length--) {
-        args = [funcs[length].apply(this, args)];
+        args = [funcs[length].apply(this, args)]
       }
-      return args[0];
-    };
+      return args[0]
+    }
   }
 
   /**
@@ -4014,103 +4079,101 @@
    */
   function debounce(func, wait, options) {
     var args,
-        maxTimeoutId,
-        result,
-        stamp,
-        thisArg,
-        timeoutId,
-        trailingCall,
-        lastCalled = 0,
-        maxWait = false,
-        trailing = true;
+      maxTimeoutId,
+      result,
+      stamp,
+      thisArg,
+      timeoutId,
+      trailingCall,
+      lastCalled = 0,
+      maxWait = false,
+      trailing = true
 
     if (!isFunction(func)) {
-      throw new TypeError;
+      throw new TypeError()
     }
-    wait = nativeMax(0, wait) || 0;
+    wait = nativeMax(0, wait) || 0
     if (options === true) {
-      var leading = true;
-      trailing = false;
+      var leading = true
+      trailing = false
     } else if (isObject(options)) {
-      leading = options.leading;
-      maxWait = 'maxWait' in options && (nativeMax(wait, options.maxWait) || 0);
-      trailing = 'trailing' in options ? options.trailing : trailing;
+      leading = options.leading
+      maxWait = 'maxWait' in options && (nativeMax(wait, options.maxWait) || 0)
+      trailing = 'trailing' in options ? options.trailing : trailing
     }
     var delayed = function() {
-      var remaining = wait - (now() - stamp);
+      var remaining = wait - (now() - stamp)
       if (remaining <= 0) {
         if (maxTimeoutId) {
-          clearTimeout(maxTimeoutId);
+          clearTimeout(maxTimeoutId)
         }
-        var isCalled = trailingCall;
-        maxTimeoutId = timeoutId = trailingCall = undefined;
+        var isCalled = trailingCall
+        maxTimeoutId = timeoutId = trailingCall = undefined
         if (isCalled) {
-          lastCalled = now();
-          result = func.apply(thisArg, args);
+          lastCalled = now()
+          result = func.apply(thisArg, args)
           if (!timeoutId && !maxTimeoutId) {
-            args = thisArg = null;
+            args = thisArg = null
           }
         }
       } else {
-        timeoutId = setTimeout(delayed, remaining);
+        timeoutId = setTimeout(delayed, remaining)
       }
-    };
+    }
 
     var maxDelayed = function() {
       if (timeoutId) {
-        clearTimeout(timeoutId);
+        clearTimeout(timeoutId)
       }
-      maxTimeoutId = timeoutId = trailingCall = undefined;
-      if (trailing || (maxWait !== wait)) {
-        lastCalled = now();
-        result = func.apply(thisArg, args);
+      maxTimeoutId = timeoutId = trailingCall = undefined
+      if (trailing || maxWait !== wait) {
+        lastCalled = now()
+        result = func.apply(thisArg, args)
         if (!timeoutId && !maxTimeoutId) {
-          args = thisArg = null;
+          args = thisArg = null
         }
       }
-    };
+    }
 
     return function() {
-      args = arguments;
-      stamp = now();
-      thisArg = this;
-      trailingCall = trailing && (timeoutId || !leading);
+      args = arguments
+      stamp = now()
+      thisArg = this
+      trailingCall = trailing && (timeoutId || !leading)
 
       if (maxWait === false) {
-        var leadingCall = leading && !timeoutId;
+        var leadingCall = leading && !timeoutId
       } else {
         if (!maxTimeoutId && !leading) {
-          lastCalled = stamp;
+          lastCalled = stamp
         }
         var remaining = maxWait - (stamp - lastCalled),
-            isCalled = remaining <= 0;
+          isCalled = remaining <= 0
 
         if (isCalled) {
           if (maxTimeoutId) {
-            maxTimeoutId = clearTimeout(maxTimeoutId);
+            maxTimeoutId = clearTimeout(maxTimeoutId)
           }
-          lastCalled = stamp;
-          result = func.apply(thisArg, args);
-        }
-        else if (!maxTimeoutId) {
-          maxTimeoutId = setTimeout(maxDelayed, remaining);
+          lastCalled = stamp
+          result = func.apply(thisArg, args)
+        } else if (!maxTimeoutId) {
+          maxTimeoutId = setTimeout(maxDelayed, remaining)
         }
       }
       if (isCalled && timeoutId) {
-        timeoutId = clearTimeout(timeoutId);
-      }
-      else if (!timeoutId && wait !== maxWait) {
-        timeoutId = setTimeout(delayed, wait);
+        timeoutId = clearTimeout(timeoutId)
+      } else if (!timeoutId && wait !== maxWait) {
+        timeoutId = setTimeout(delayed, wait)
       }
       if (leadingCall) {
-        isCalled = true;
-        result = func.apply(thisArg, args);
+        isCalled = true
+        result = func.apply(thisArg, args)
       }
       if (isCalled && !timeoutId && !maxTimeoutId) {
-        args = thisArg = null;
+        args = thisArg = null
       }
-      return result;
-    };
+      return result
+    }
   }
 
   /**
@@ -4130,10 +4193,12 @@
    */
   function defer(func) {
     if (!isFunction(func)) {
-      throw new TypeError;
+      throw new TypeError()
     }
-    var args = slice(arguments, 1);
-    return setTimeout(function() { func.apply(undefined, args); }, 1);
+    var args = slice(arguments, 1)
+    return setTimeout(function() {
+      func.apply(undefined, args)
+    }, 1)
   }
 
   /**
@@ -4154,10 +4219,12 @@
    */
   function delay(func, wait) {
     if (!isFunction(func)) {
-      throw new TypeError;
+      throw new TypeError()
     }
-    var args = slice(arguments, 2);
-    return setTimeout(function() { func.apply(undefined, args); }, wait);
+    var args = slice(arguments, 2)
+    return setTimeout(function() {
+      func.apply(undefined, args)
+    }, wait)
   }
 
   /**
@@ -4198,13 +4265,13 @@
    * // => { 'name': 'penelope', 'age': 1 }
    */
   function memoize(func, resolver) {
-    var cache = {};
+    var cache = {}
     return function() {
-      var key = resolver ? resolver.apply(this, arguments) : keyPrefix + arguments[0];
+      var key = resolver ? resolver.apply(this, arguments) : keyPrefix + arguments[0]
       return hasOwnProperty.call(cache, key)
         ? cache[key]
-        : (cache[key] = func.apply(this, arguments));
-    };
+        : (cache[key] = func.apply(this, arguments))
+    }
   }
 
   /**
@@ -4225,23 +4292,22 @@
    * // `initialize` executes `createApplication` once
    */
   function once(func) {
-    var ran,
-        result;
+    var ran, result
 
     if (!isFunction(func)) {
-      throw new TypeError;
+      throw new TypeError()
     }
     return function() {
       if (ran) {
-        return result;
+        return result
       }
-      ran = true;
-      result = func.apply(this, arguments);
+      ran = true
+      result = func.apply(this, arguments)
 
       // clear the `func` variable so the function may be garbage collected
-      func = null;
-      return result;
-    };
+      func = null
+      return result
+    }
   }
 
   /**
@@ -4263,7 +4329,7 @@
    * // => 'hi fred'
    */
   function partial(func) {
-    return createWrapper(func, 16, slice(arguments, 1));
+    return createWrapper(func, 16, slice(arguments, 1))
   }
 
   /**
@@ -4299,23 +4365,23 @@
    */
   function throttle(func, wait, options) {
     var leading = true,
-        trailing = true;
+      trailing = true
 
     if (!isFunction(func)) {
-      throw new TypeError;
+      throw new TypeError()
     }
     if (options === false) {
-      leading = false;
+      leading = false
     } else if (isObject(options)) {
-      leading = 'leading' in options ? options.leading : leading;
-      trailing = 'trailing' in options ? options.trailing : trailing;
+      leading = 'leading' in options ? options.leading : leading
+      trailing = 'trailing' in options ? options.trailing : trailing
     }
-    options = {};
-    options.leading = leading;
-    options.maxWait = wait;
-    options.trailing = trailing;
+    options = {}
+    options.leading = leading
+    options.maxWait = wait
+    options.trailing = trailing
 
-    return debounce(func, wait, options);
+    return debounce(func, wait, options)
   }
 
   /**
@@ -4340,7 +4406,7 @@
    * // => '<p>Fred, Wilma, &amp; Pebbles</p>'
    */
   function wrap(value, wrapper) {
-    return createWrapper(wrapper, 16, [value]);
+    return createWrapper(wrapper, 16, [value])
   }
 
   /*--------------------------------------------------------------------------*/
@@ -4377,26 +4443,26 @@
    * // => [{ 'name': 'fred', 'age': 40 }]
    */
   function createCallback(func, thisArg, argCount) {
-    var type = typeof func;
+    var type = typeof func
     if (func == null || type == 'function') {
-      return baseCreateCallback(func, thisArg, argCount);
+      return baseCreateCallback(func, thisArg, argCount)
     }
     // handle "_.pluck" style callback shorthands
     if (type != 'object') {
-      return property(func);
+      return property(func)
     }
-    var props = keys(func);
+    var props = keys(func)
     return function(object) {
       var length = props.length,
-          result = false;
+        result = false
 
       while (length--) {
         if (!(result = object[props[length]] === func[props[length]])) {
-          break;
+          break
         }
       }
-      return result;
-    };
+      return result
+    }
   }
 
   /**
@@ -4414,7 +4480,7 @@
    * // => 'Fred, Wilma, &amp; Pebbles'
    */
   function escape(string) {
-    return string == null ? '' : String(string).replace(reUnescapedHtml, escapeHtmlChar);
+    return string == null ? '' : String(string).replace(reUnescapedHtml, escapeHtmlChar)
   }
 
   /**
@@ -4432,7 +4498,7 @@
    * // => true
    */
   function identity(value) {
-    return value;
+    return value
   }
 
   /**
@@ -4465,18 +4531,16 @@
    */
   function mixin(object) {
     forEach(functions(object), function(methodName) {
-      var func = lodash[methodName] = object[methodName];
+      var func = (lodash[methodName] = object[methodName])
 
       lodash.prototype[methodName] = function() {
-        var args = [this.__wrapped__];
-        push.apply(args, arguments);
+        var args = [this.__wrapped__]
+        push.apply(args, arguments)
 
-        var result = func.apply(lodash, args);
-        return this.__chain__
-          ? new lodashWrapper(result, true)
-          : result;
-      };
-    });
+        var result = func.apply(lodash, args)
+        return this.__chain__ ? new lodashWrapper(result, true) : result
+      }
+    })
   }
 
   /**
@@ -4492,8 +4556,8 @@
    * var lodash = _.noConflict();
    */
   function noConflict() {
-    root._ = oldDash;
-    return this;
+    root._ = oldDash
+    return this
   }
 
   /**
@@ -4525,9 +4589,11 @@
    * _.defer(function() { console.log(_.now() - stamp); });
    * // => logs the number of milliseconds it took for the deferred function to be called
    */
-  var now = isNative(now = Date.now) && now || function() {
-    return new Date().getTime();
-  };
+  var now =
+    (isNative((now = Date.now)) && now) ||
+    function() {
+      return new Date().getTime()
+    }
 
   /**
    * Creates a "_.pluck" style function, which returns the `key` value of a
@@ -4555,8 +4621,8 @@
    */
   function property(key) {
     return function(object) {
-      return object[key];
-    };
+      return object[key]
+    }
   }
 
   /**
@@ -4588,16 +4654,16 @@
    */
   function random(min, max) {
     if (min == null && max == null) {
-      max = 1;
+      max = 1
     }
-    min = +min || 0;
+    min = +min || 0
     if (max == null) {
-      max = min;
-      min = 0;
+      max = min
+      min = 0
     } else {
-      max = +max || 0;
+      max = +max || 0
     }
-    return min + floor(nativeRandom() * (max - min + 1));
+    return min + floor(nativeRandom() * (max - min + 1))
   }
 
   /**
@@ -4629,8 +4695,8 @@
    */
   function result(object, key) {
     if (object) {
-      var value = object[key];
-      return isFunction(value) ? object[key]() : value;
+      var value = object[key]
+      return isFunction(value) ? object[key]() : value
     }
   }
 
@@ -4722,58 +4788,71 @@
    */
   function template(text, data, options) {
     var _ = lodash,
-        settings = _.templateSettings;
+      settings = _.templateSettings
 
-    text = String(text || '');
-    options = defaults({}, options, settings);
+    text = String(text || '')
+    options = defaults({}, options, settings)
 
     var index = 0,
-        source = "__p += '",
-        variable = options.variable;
+      source = "__p += '",
+      variable = options.variable
 
     var reDelimiters = RegExp(
-      (options.escape || reNoMatch).source + '|' +
-      (options.interpolate || reNoMatch).source + '|' +
-      (options.evaluate || reNoMatch).source + '|$'
-    , 'g');
+      (options.escape || reNoMatch).source +
+        '|' +
+        (options.interpolate || reNoMatch).source +
+        '|' +
+        (options.evaluate || reNoMatch).source +
+        '|$',
+      'g'
+    )
 
-    text.replace(reDelimiters, function(match, escapeValue, interpolateValue, evaluateValue, offset) {
-      source += text.slice(index, offset).replace(reUnescapedString, escapeStringChar);
+    text.replace(reDelimiters, function(
+      match,
+      escapeValue,
+      interpolateValue,
+      evaluateValue,
+      offset
+    ) {
+      source += text.slice(index, offset).replace(reUnescapedString, escapeStringChar)
       if (escapeValue) {
-        source += "' +\n_.escape(" + escapeValue + ") +\n'";
+        source += "' +\n_.escape(" + escapeValue + ") +\n'"
       }
       if (evaluateValue) {
-        source += "';\n" + evaluateValue + ";\n__p += '";
+        source += "';\n" + evaluateValue + ";\n__p += '"
       }
       if (interpolateValue) {
-        source += "' +\n((__t = (" + interpolateValue + ")) == null ? '' : __t) +\n'";
+        source += "' +\n((__t = (" + interpolateValue + ")) == null ? '' : __t) +\n'"
       }
-      index = offset + match.length;
-      return match;
-    });
+      index = offset + match.length
+      return match
+    })
 
-    source += "';\n";
+    source += "';\n"
     if (!variable) {
-      variable = 'obj';
-      source = 'with (' + variable + ' || {}) {\n' + source + '\n}\n';
+      variable = 'obj'
+      source = 'with (' + variable + ' || {}) {\n' + source + '\n}\n'
     }
-    source = 'function(' + variable + ') {\n' +
+    source =
+      'function(' +
+      variable +
+      ') {\n' +
       "var __t, __p = '', __j = Array.prototype.join;\n" +
       "function print() { __p += __j.call(arguments, '') }\n" +
       source +
-      'return __p\n}';
+      'return __p\n}'
 
     try {
-      var result = Function('_', 'return ' + source)(_);
-    } catch(e) {
-      e.source = source;
-      throw e;
+      var result = Function('_', 'return ' + source)(_)
+    } catch (e) {
+      e.source = source
+      throw e
     }
     if (data) {
-      return result(data);
+      return result(data)
     }
-    result.source = source;
-    return result;
+    result.source = source
+    return result
   }
 
   /**
@@ -4800,15 +4879,15 @@
    * // => also calls `mage.castSpell(n)` three times
    */
   function times(n, callback, thisArg) {
-    n = (n = +n) > -1 ? n : 0;
+    n = (n = +n) > -1 ? n : 0
     var index = -1,
-        result = Array(n);
+      result = Array(n)
 
-    callback = baseCreateCallback(callback, thisArg, 1);
+    callback = baseCreateCallback(callback, thisArg, 1)
     while (++index < n) {
-      result[index] = callback(index);
+      result[index] = callback(index)
     }
-    return result;
+    return result
   }
 
   /**
@@ -4827,7 +4906,7 @@
    * // => 'Fred, Barney & Pebbles'
    */
   function unescape(string) {
-    return string == null ? '' : String(string).replace(reEscapedHtml, unescapeHtmlChar);
+    return string == null ? '' : String(string).replace(reEscapedHtml, unescapeHtmlChar)
   }
 
   /**
@@ -4847,8 +4926,8 @@
    * // => '105'
    */
   function uniqueId(prefix) {
-    var id = ++idCounter + '';
-    return prefix ? prefix + id : id;
+    var id = ++idCounter + ''
+    return prefix ? prefix + id : id
   }
 
   /*--------------------------------------------------------------------------*/
@@ -4878,9 +4957,9 @@
    * // => 'pebbles is 1'
    */
   function chain(value) {
-    value = new lodashWrapper(value);
-    value.__chain__ = true;
-    return value;
+    value = new lodashWrapper(value)
+    value.__chain__ = true
+    return value
   }
 
   /**
@@ -4904,8 +4983,8 @@
    * // => [3, 2, 1]
    */
   function tap(value, interceptor) {
-    interceptor(value);
-    return value;
+    interceptor(value)
+    return value
   }
 
   /**
@@ -4934,8 +5013,8 @@
    * // => { 'age': 36 }
    */
   function wrapperChain() {
-    this.__chain__ = true;
-    return this;
+    this.__chain__ = true
+    return this
   }
 
   /**
@@ -4952,140 +5031,140 @@
    * // => [1, 2, 3]
    */
   function wrapperValueOf() {
-    return this.__wrapped__;
+    return this.__wrapped__
   }
 
   /*--------------------------------------------------------------------------*/
 
   // add functions that return wrapped values when chaining
-  lodash.after = after;
-  lodash.bind = bind;
-  lodash.bindAll = bindAll;
-  lodash.chain = chain;
-  lodash.compact = compact;
-  lodash.compose = compose;
-  lodash.countBy = countBy;
-  lodash.debounce = debounce;
-  lodash.defaults = defaults;
-  lodash.defer = defer;
-  lodash.delay = delay;
-  lodash.difference = difference;
-  lodash.filter = filter;
-  lodash.flatten = flatten;
-  lodash.forEach = forEach;
-  lodash.functions = functions;
-  lodash.groupBy = groupBy;
-  lodash.indexBy = indexBy;
-  lodash.initial = initial;
-  lodash.intersection = intersection;
-  lodash.invert = invert;
-  lodash.invoke = invoke;
-  lodash.keys = keys;
-  lodash.map = map;
-  lodash.max = max;
-  lodash.memoize = memoize;
-  lodash.min = min;
-  lodash.omit = omit;
-  lodash.once = once;
-  lodash.pairs = pairs;
-  lodash.partial = partial;
-  lodash.pick = pick;
-  lodash.pluck = pluck;
-  lodash.range = range;
-  lodash.reject = reject;
-  lodash.rest = rest;
-  lodash.shuffle = shuffle;
-  lodash.sortBy = sortBy;
-  lodash.tap = tap;
-  lodash.throttle = throttle;
-  lodash.times = times;
-  lodash.toArray = toArray;
-  lodash.union = union;
-  lodash.uniq = uniq;
-  lodash.values = values;
-  lodash.where = where;
-  lodash.without = without;
-  lodash.wrap = wrap;
-  lodash.zip = zip;
+  lodash.after = after
+  lodash.bind = bind
+  lodash.bindAll = bindAll
+  lodash.chain = chain
+  lodash.compact = compact
+  lodash.compose = compose
+  lodash.countBy = countBy
+  lodash.debounce = debounce
+  lodash.defaults = defaults
+  lodash.defer = defer
+  lodash.delay = delay
+  lodash.difference = difference
+  lodash.filter = filter
+  lodash.flatten = flatten
+  lodash.forEach = forEach
+  lodash.functions = functions
+  lodash.groupBy = groupBy
+  lodash.indexBy = indexBy
+  lodash.initial = initial
+  lodash.intersection = intersection
+  lodash.invert = invert
+  lodash.invoke = invoke
+  lodash.keys = keys
+  lodash.map = map
+  lodash.max = max
+  lodash.memoize = memoize
+  lodash.min = min
+  lodash.omit = omit
+  lodash.once = once
+  lodash.pairs = pairs
+  lodash.partial = partial
+  lodash.pick = pick
+  lodash.pluck = pluck
+  lodash.range = range
+  lodash.reject = reject
+  lodash.rest = rest
+  lodash.shuffle = shuffle
+  lodash.sortBy = sortBy
+  lodash.tap = tap
+  lodash.throttle = throttle
+  lodash.times = times
+  lodash.toArray = toArray
+  lodash.union = union
+  lodash.uniq = uniq
+  lodash.values = values
+  lodash.where = where
+  lodash.without = without
+  lodash.wrap = wrap
+  lodash.zip = zip
 
   // add aliases
-  lodash.collect = map;
-  lodash.drop = rest;
-  lodash.each = forEach;
-  lodash.extend = assign;
-  lodash.methods = functions;
-  lodash.object = zipObject;
-  lodash.select = filter;
-  lodash.tail = rest;
-  lodash.unique = uniq;
+  lodash.collect = map
+  lodash.drop = rest
+  lodash.each = forEach
+  lodash.extend = assign
+  lodash.methods = functions
+  lodash.object = zipObject
+  lodash.select = filter
+  lodash.tail = rest
+  lodash.unique = uniq
 
   /*--------------------------------------------------------------------------*/
 
   // add functions that return unwrapped values when chaining
-  lodash.clone = clone;
-  lodash.cloneDeep = cloneDeep;
-  lodash.contains = contains;
-  lodash.escape = escape;
-  lodash.every = every;
-  lodash.find = find;
-  lodash.has = has;
-  lodash.identity = identity;
-  lodash.indexOf = indexOf;
-  lodash.isArguments = isArguments;
-  lodash.isArray = isArray;
-  lodash.isBoolean = isBoolean;
-  lodash.isDate = isDate;
-  lodash.isElement = isElement;
-  lodash.isEmpty = isEmpty;
-  lodash.isEqual = isEqual;
-  lodash.isFinite = isFinite;
-  lodash.isFunction = isFunction;
-  lodash.isNaN = isNaN;
-  lodash.isNull = isNull;
-  lodash.isNumber = isNumber;
-  lodash.isObject = isObject;
-  lodash.isRegExp = isRegExp;
-  lodash.isString = isString;
-  lodash.isUndefined = isUndefined;
-  lodash.lastIndexOf = lastIndexOf;
-  lodash.mixin = mixin;
-  lodash.noConflict = noConflict;
-  lodash.random = random;
-  lodash.reduce = reduce;
-  lodash.reduceRight = reduceRight;
-  lodash.result = result;
-  lodash.size = size;
-  lodash.some = some;
-  lodash.sortedIndex = sortedIndex;
-  lodash.template = template;
-  lodash.unescape = unescape;
-  lodash.uniqueId = uniqueId;
+  lodash.clone = clone
+  lodash.cloneDeep = cloneDeep
+  lodash.contains = contains
+  lodash.escape = escape
+  lodash.every = every
+  lodash.find = find
+  lodash.has = has
+  lodash.identity = identity
+  lodash.indexOf = indexOf
+  lodash.isArguments = isArguments
+  lodash.isArray = isArray
+  lodash.isBoolean = isBoolean
+  lodash.isDate = isDate
+  lodash.isElement = isElement
+  lodash.isEmpty = isEmpty
+  lodash.isEqual = isEqual
+  lodash.isFinite = isFinite
+  lodash.isFunction = isFunction
+  lodash.isNaN = isNaN
+  lodash.isNull = isNull
+  lodash.isNumber = isNumber
+  lodash.isObject = isObject
+  lodash.isRegExp = isRegExp
+  lodash.isString = isString
+  lodash.isUndefined = isUndefined
+  lodash.lastIndexOf = lastIndexOf
+  lodash.mixin = mixin
+  lodash.noConflict = noConflict
+  lodash.random = random
+  lodash.reduce = reduce
+  lodash.reduceRight = reduceRight
+  lodash.result = result
+  lodash.size = size
+  lodash.some = some
+  lodash.sortedIndex = sortedIndex
+  lodash.template = template
+  lodash.unescape = unescape
+  lodash.uniqueId = uniqueId
 
   // add aliases
-  lodash.all = every;
-  lodash.any = some;
-  lodash.detect = find;
-  lodash.findWhere = findWhere;
-  lodash.foldl = reduce;
-  lodash.foldr = reduceRight;
-  lodash.include = contains;
-  lodash.inject = reduce;
+  lodash.all = every
+  lodash.any = some
+  lodash.detect = find
+  lodash.findWhere = findWhere
+  lodash.foldl = reduce
+  lodash.foldr = reduceRight
+  lodash.include = contains
+  lodash.inject = reduce
 
   /*--------------------------------------------------------------------------*/
 
   // add functions capable of returning wrapped and unwrapped values when chaining
-  lodash.first = first;
-  lodash.last = last;
-  lodash.sample = sample;
+  lodash.first = first
+  lodash.last = last
+  lodash.sample = sample
 
   // add aliases
-  lodash.take = first;
-  lodash.head = first;
+  lodash.take = first
+  lodash.head = first
 
   /*--------------------------------------------------------------------------*/
 
   // add functions to `lodash.prototype`
-  mixin(lodash);
+  mixin(lodash)
 
   /**
    * The semantic version number.
@@ -5094,49 +5173,51 @@
    * @memberOf _
    * @type string
    */
-  lodash.VERSION = '2.4.1';
+  lodash.VERSION = '2.4.1'
 
   // add "Chaining" functions to the wrapper
-  lodash.prototype.chain = wrapperChain;
-  lodash.prototype.value = wrapperValueOf;
+  lodash.prototype.chain = wrapperChain
+  lodash.prototype.value = wrapperValueOf
 
-    // add `Array` mutator functions to the wrapper
-    forEach(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function(methodName) {
-      var func = arrayRef[methodName];
-      lodash.prototype[methodName] = function() {
-        var value = this.__wrapped__;
-        func.apply(value, arguments);
+  // add `Array` mutator functions to the wrapper
+  forEach(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function(methodName) {
+    var func = arrayRef[methodName]
+    lodash.prototype[methodName] = function() {
+      var value = this.__wrapped__
+      func.apply(value, arguments)
 
-        // avoid array-like object bugs with `Array#shift` and `Array#splice`
-        // in Firefox < 10 and IE < 9
-        if (!support.spliceObjects && value.length === 0) {
-          delete value[0];
-        }
-        return this;
-      };
-    });
+      // avoid array-like object bugs with `Array#shift` and `Array#splice`
+      // in Firefox < 10 and IE < 9
+      if (!support.spliceObjects && value.length === 0) {
+        delete value[0]
+      }
+      return this
+    }
+  })
 
-    // add `Array` accessor functions to the wrapper
-    forEach(['concat', 'join', 'slice'], function(methodName) {
-      var func = arrayRef[methodName];
-      lodash.prototype[methodName] = function() {
-        var value = this.__wrapped__,
-            result = func.apply(value, arguments);
+  // add `Array` accessor functions to the wrapper
+  forEach(['concat', 'join', 'slice'], function(methodName) {
+    var func = arrayRef[methodName]
+    lodash.prototype[methodName] = function() {
+      var value = this.__wrapped__,
+        result = func.apply(value, arguments)
 
-        if (this.__chain__) {
-          result = new lodashWrapper(result);
-          result.__chain__ = true;
-        }
-        return result;
-      };
-    });
+      if (this.__chain__) {
+        result = new lodashWrapper(result)
+        result.__chain__ = true
+      }
+      return result
+    }
+  })
 
   /*--------------------------------------------------------------------------*/
   if (typeof exports === 'object' && typeof module === 'object') {
-    module.exports = lodash;
+    module.exports = lodash
   } else if (typeof define === 'function' && define.amd) {
-    define([], function(){ return lodash })
+    define([], function() {
+      return lodash
+    })
   } else {
-    root._ = lodash;
+    root._ = lodash
   }
-}.call(this));
+}.call(this))

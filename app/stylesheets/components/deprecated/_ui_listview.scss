@@ -17,7 +17,7 @@
  */
 
 .ui-listview {
-  box-shadow: 0px 1px 4px rgba(0,0,0,.3);
+  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.3);
   padding: 0;
   list-style: none;
   min-width: 300px;
@@ -27,19 +27,20 @@
     border-top-right-radius: 0.6em;
     border-top-left-radius: 0.6em;
   }
-  li:last-child  {
+  li:last-child {
     border-bottom-right-radius: 0.6em;
     border-bottom-left-radius: 0.6em;
   }
 
   &.ui-listview-no-rounded-bottom {
-    &, li:last-child {
+    &,
+    li:last-child {
       border-bottom-right-radius: 0;
       border-bottom-left-radius: 0;
     }
   }
 
-/*  &, li:first-child, li:last-child {
+  /*  &, li:first-child, li:last-child {
     @include background-clip(padding-box);
   }*/
 
@@ -52,36 +53,43 @@
     text-shadow: 0 1px 1px #f6f6f6;
     text-decoration: none;
     @include vertical-gradient(#fdfdfd, #eeeeee);
-    .ui-listview-text{
+    .ui-listview-text {
       display: block;
       position: relative;
       height: 100%;
-      padding: .7em 15px .7em 44px;
-      text-overflow: ellipsis; overflow: hidden; white-space: nowrap;
+      padding: 0.7em 15px 0.7em 44px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
       font-size: 1em; /*this is to override the .file, .pdf, .doc etc 10px size*/
       background-position: 15px center; /*overrides background-position left of attachment_links*/
     }
     &:hover {
       border-color: #bbb;
-      background:       #dadada;
+      background: #dadada;
       font-weight: bold;
-      color:          #101010;
+      color: #101010;
       text-decoration: none;
-      text-shadow: 0 1px 1px  #fff;
+      text-shadow: 0 1px 1px #fff;
       @include vertical-gradient(#ededed, #dadada);
-      a{ text-decoration: none;}
+      a {
+        text-decoration: none;
+      }
     }
-    &:active, &.active {
-      border: 1px solid     #999;
-      background:       #999;
+    &:active,
+    &.active {
+      border: 1px solid #999;
+      background: #999;
       font-weight: bold;
-      color:          #fff;
+      color: #fff;
       cursor: pointer;
       text-shadow: 0 -1px 1px #999;
       text-decoration: none;
       @include vertical-gradient(#ccc, #aaa);
       outline: none;
-      a { color: #fff; }
+      a {
+        color: #fff;
+      }
     }
     .ui-listview-right {
       display: block;
@@ -91,8 +99,9 @@
       }
     }
 
-    &.ui-listview-header, &.ui-listview-header:hover  {
-      padding: .5em 15px;
+    &.ui-listview-header,
+    &.ui-listview-header:hover {
+      padding: 0.5em 15px;
       @include fontSize($ic-font-size--small);
       border: 1px solid #b3cbbc;
       background: #5e87b0;

@@ -10,21 +10,21 @@ Traditionally, the responsibility of displaying notifications regarding a certai
 
 A notification watcher is a simple function that gets run anytime something interesting happens, like starting a quiz report generation process, or receiving an update about its completion status.
 
-For our purposes, what we'll do is define a watcher that watches that store for its "change" event and then look for all reports that had *failed* and spawn a notification for each one.
+For our purposes, what we'll do is define a watcher that watches that store for its "change" event and then look for all reports that had _failed_ and spawn a notification for each one.
 
-Before we start implementing our watcher, however, we must assign our notification a unique *code* in `constants.js` that other components can 
+Before we start implementing our watcher, however, we must assign our notification a unique _code_ in `constants.js` that other components can
 use to identify the type of notifications we'll be spawning, like the view
-for example. We'll choose `NOTIFICATION_REPORT_GENERATION_FAILED` - the 
-value of this key is any integer that's not occupied by another 
+for example. We'll choose `NOTIFICATION_REPORT_GENERATION_FAILED` - the
+value of this key is any integer that's not occupied by another
 notification code which you can see in the list.
 
 ```javascript
 /** src/js/constants.js */
 define({
-    // ...
-    NOTIFICATION_REPORT_GENERATION_FAILED: 123,
-    // ...
-});
+  // ...
+  NOTIFICATION_REPORT_GENERATION_FAILED: 123
+  // ...
+})
 ```
 
 Now we're ready to write our watcher. We'll create a new file in `notifications/report_generation_failed.js` and get cooking.
@@ -33,40 +33,39 @@ Now we're ready to write our watcher. We'll create a new file in `notifications/
 /** src/js/notifications/report_generation_failed.js */
 // omitting r.js and irrelevant shizzle for brevity
 
-var K = require('constants');
-var ReportStore = require('stores/reports');
+var K = require('constants')
+var ReportStore = require('stores/reports')
 
 var watchForReportGenerationFailures = function() {
-    // 1. find all reports that are being generated and have failed:
-    var failedReports = reportStore.getAll().filter(function(report) {
-        return report.get('isGenerating') &&
-               report.get('progress').workflowState === 'failed';
-    });
+  // 1. find all reports that are being generated and have failed:
+  var failedReports = reportStore.getAll().filter(function(report) {
+    return report.get('isGenerating') && report.get('progress').workflowState === 'failed'
+  })
 
-    // 2. spawn a notification for every one that did:
-    return failedReports.map(function(report) {
-        var notification = new Notification();
+  // 2. spawn a notification for every one that did:
+  return failedReports.map(function(report) {
+    var notification = new Notification()
 
-        // stamp the notification with the code we defined earlier:
-        notification.code = K.NOTIFICATION_REPORT_GENERATION_FAILED;
+    // stamp the notification with the code we defined earlier:
+    notification.code = K.NOTIFICATION_REPORT_GENERATION_FAILED
 
-        // we must generate a unique *id* for this notification instance
-        // so that we can do funny things with it, like dismissing it
-        //
-        // the id will make use of the report's id and we'll prefix it
-        // with a relatively unique string as to not clash with other
-        // notifications
-        notification.id = 'report_generation_failures_' + report.id;
+    // we must generate a unique *id* for this notification instance
+    // so that we can do funny things with it, like dismissing it
+    //
+    // the id will make use of the report's id and we'll prefix it
+    // with a relatively unique string as to not clash with other
+    // notifications
+    notification.id = 'report_generation_failures_' + report.id
 
-        // finally, we'll also attach some context so that our view can
-        // present a nice message
-        notification.context = {
-            reportId: report.id, // more on this later
-            reportType: report.reportType
-        };
+    // finally, we'll also attach some context so that our view can
+    // present a nice message
+    notification.context = {
+      reportId: report.id, // more on this later
+      reportType: report.reportType
+    }
 
-        return notification;
-    });
+    return notification
+  })
 }
 ```
 

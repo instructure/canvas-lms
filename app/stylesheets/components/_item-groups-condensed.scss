@@ -284,7 +284,9 @@
     border-top-left-radius: $baseBorderRadius;
     border-top-right-radius: $baseBorderRadius;
     border-top: 1px solid $ic-border-light;
-    &.ig-row-empty { border-top: 1px solid #dcdee0; }
+    &.ig-row-empty {
+      border-top: 1px solid #dcdee0;
+    }
   }
 
   .ig-list li:last-child .ig-row,
@@ -292,7 +294,9 @@
   .last_visible .ig-row {
     border-bottom-left-radius: $baseBorderRadius;
     border-bottom-right-radius: $baseBorderRadius;
-    &.ig-row-empty { border-bottom: 1px solid $ic-border-light; }
+    &.ig-row-empty {
+      border-bottom: 1px solid $ic-border-light;
+    }
   }
 
   .item-group-expandable {
@@ -301,7 +305,9 @@
     border: 1px solid $ic-border-light;
 
     .ig-list {
-      li { margin: 0; }
+      li {
+        margin: 0;
+      }
       li .ig-row {
         background: none;
         border: none;
@@ -322,7 +328,7 @@
     }
 
     li:not(:last-child) .ig-sublist,
-    li:not(:last-of-type) .ig-sublist{
+    li:not(:last-of-type) .ig-sublist {
       box-shadow: inset 0 1px 0 #f0f0f0, inset 0 -1px 0 #f0f0f0;
     }
 
@@ -337,7 +343,7 @@
       border-bottom: 1px solid $ic-border-light;
 
       ul {
-        list-style:none;
+        list-style: none;
         padding: 0;
         margin: 0;
 
@@ -365,5 +371,4 @@
       }
     }
   }
-
 }

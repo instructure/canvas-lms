@@ -1201,7 +1201,9 @@ Reduce the width of your screen to see how the example components below both sca
 */
 
 $ic-Input-border: lighten($ic-color-dark, 65);
-@if $use_high_contrast { $ic-Input-border: $ic-color-dark; }
+@if $use_high_contrast {
+  $ic-Input-border: $ic-color-dark;
+}
 
 $ic-Input-standard-height: 38px;
 
@@ -1222,20 +1224,29 @@ $ic-Input-standard-height: 38px;
   }
 }
 
-select, textarea,
-input[type="text"], input[type="password"],
-input[type="datetime"], input[type="datetime-local"],
-input[type="date"], input[type="month"],
-input[type="time"], input[type="week"],
-input[type="number"], input[type="email"],
-input[type="url"], input[type="search"],
-input[type="tel"], input[type="color"], .uneditable-input {
-
+select,
+textarea,
+input[type='text'],
+input[type='password'],
+input[type='datetime'],
+input[type='datetime-local'],
+input[type='date'],
+input[type='month'],
+input[type='time'],
+input[type='week'],
+input[type='number'],
+input[type='email'],
+input[type='url'],
+input[type='search'],
+input[type='tel'],
+input[type='color'],
+.uneditable-input {
   // .ic-Input is the base class for the updated form controls.
 
   &.ic-Input {
     // Overwrite legacy forms styles from Bootstrap 2.
-    width: 100%; height: $ic-Input-standard-height;
+    width: 100%;
+    height: $ic-Input-standard-height;
     display: block;
     margin-top: 0;
     margin-bottom: 0;
@@ -1259,8 +1270,7 @@ input[type="tel"], input[type="color"], .uneditable-input {
     @if $use_high_contrast {
       outline-style: dotted;
       outline-width: 1px;
-    }
-    @else {
+    } @else {
       outline-style: solid;
       outline-width: $ic-sp;
     }
@@ -1271,39 +1281,51 @@ input[type="tel"], input[type="color"], .uneditable-input {
         outline-width: 1px;
         outline-offset: -3px;
         outline-color: $ic-color-dark;
-      }
-      @else {
+      } @else {
         outline-width: 2px;
         outline-offset: -2px;
       }
     }
 
     // If a form message follows the input, bump it up a bit to overlap with the input
-    ~ .ic-Form-message { transform: translate3d(0,-$ic-sp/3,0); }
+    ~ .ic-Form-message {
+      transform: translate3d(0, -$ic-sp/3, 0);
+    }
 
     // Focus then moves the form message out of the way
     &:focus {
-      ~ .ic-Form-message { transform: translate3d(0,$ic-sp/2,0); }
+      ~ .ic-Form-message {
+        transform: translate3d(0, $ic-sp/2, 0);
+      }
     }
 
     // Disabled state
-    &[disabled], &[readonly] {
+    &[disabled],
+    &[readonly] {
       cursor: not-allowed;
       background-color: lighten($ic-color-neutral, 5%);
       opacity: 0.8;
     }
 
     // Input variants
-    &.ic-Input--has-error, .ic-Form-control--has-error & { @include ic-input-variant($ic-color-danger, $ic-color-danger); }
-    &.ic-Input--has-warning, .ic-Form-control--has-warning & { @include ic-input-variant($ic-color-alert, $ic-color-alert); }
-    &.ic-Input--has-success, .ic-Form-control--has-success & { @include ic-input-variant($ic-color-success, $ic-color-success); }
-
+    &.ic-Input--has-error,
+    .ic-Form-control--has-error & {
+      @include ic-input-variant($ic-color-danger, $ic-color-danger);
+    }
+    &.ic-Input--has-warning,
+    .ic-Form-control--has-warning & {
+      @include ic-input-variant($ic-color-alert, $ic-color-alert);
+    }
+    &.ic-Input--has-success,
+    .ic-Form-control--has-success & {
+      @include ic-input-variant($ic-color-success, $ic-color-success);
+    }
   }
-
 }
 
 // special styles for select
-select.ic-Input, input[type="file"].ic-Input {
+select.ic-Input,
+input[type='file'].ic-Input {
   padding: 0 0 0 $ic-sp;
 }
 
@@ -1320,7 +1342,7 @@ textarea.ic-Input {
 
 @mixin add-arrow-for-webkit-and-ie-edge($bg-position-x) {
   background-color: $ic-color-light;
-  background-image: url("/images/forms/ic-icon-arrow-down.svg");
+  background-image: url('/images/forms/ic-icon-arrow-down.svg');
   background-repeat: no-repeat;
   background-size: 10px 5.667px;
   background-position: $bg-position-x 50%;
@@ -1333,15 +1355,14 @@ select.ic-Input:not(*:root) {
 }
 
 // IE Edge hack (doesn't support calc here, so we need to use a percentage)
-@supports (-ms-accelerator:true) {
-  select.ic-Input { @include add-arrow-for-webkit-and-ie-edge(99%); }
+@supports (-ms-accelerator: true) {
+  select.ic-Input {
+    @include add-arrow-for-webkit-and-ie-edge(99%);
+  }
 }
 
-
 .ic-Form-group {
-
   &.ic-Form-group--inline {
-
     @include breakpoint(tablet) {
       display: flex;
       align-items: flex-end;
@@ -1356,20 +1377,23 @@ select.ic-Input:not(*:root) {
       .ic-Checkbox-group {
         flex: 1;
         margin: 0 $ic-sp/2;
-        &:first-child { margin-left: 0; }
-        &:last-child { margin-right: 0; }
+        &:first-child {
+          margin-left: 0;
+        }
+        &:last-child {
+          margin-right: 0;
+        }
 
-        .ic-Form-message { margin-left: 0; }
+        .ic-Form-message {
+          margin-left: 0;
+        }
       }
-
     }
   }
 
   &.ic-Form-group--horizontal {
     @include breakpoint(tablet) {
-
       > .ic-Form-control {
-
         &:not(.ic-Form-control--checkbox):not(.ic-Form-control--radio) {
           display: flex;
           flex-wrap: wrap;
@@ -1383,7 +1407,9 @@ select.ic-Input:not(*:root) {
           > .ic-Input,
           > .ic-Input-group,
           > .ic-Multi-input,
-          > .ic-Forms-component { flex: 1; }
+          > .ic-Forms-component {
+            flex: 1;
+          }
 
           > .ic-Form-message {
             display: block;
@@ -1416,22 +1442,21 @@ select.ic-Input:not(*:root) {
 
         > .ic-Legend {
           position: absolute;
-          top: 5px; left: 0;
+          top: 5px;
+          left: 0;
           width: $ic-horizontal-form-offset - ($ic-sp * 2);
           margin-bottom: 0;
         }
       }
     }
-
   }
-
 }
 
 // HACK - whole thing can be removed once IE11/Win7 support is dropped
 @include breakpoint(tablet) {
-  _:-ms-input-placeholder, :root  {
+  _:-ms-input-placeholder,
+  :root {
     .ic-Form-group.ic-Form-group--horizontal {
-
       > .ic-Form-control:not(.ic-Form-control--checkbox):not(.ic-Form-control--radio) {
         .ic-Form-help-text {
           padding-left: $ic-horizontal-form-offset + $ic-sp*2;
@@ -1445,9 +1470,7 @@ select.ic-Input:not(*:root) {
           width: $ic-horizontal-form-offset;
         }
       }
-
     }
-
   }
 }
 
@@ -1458,7 +1481,9 @@ select.ic-Input:not(*:root) {
       background: darken($color, 5%);
       border-right: 1px solid darken($color, 12%);
     }
-    &:after { border-bottom-color: darken($color, 5%); }
+    &:after {
+      border-bottom-color: darken($color, 5%);
+    }
   }
 }
 
@@ -1469,19 +1494,29 @@ select.ic-Input:not(*:root) {
   z-index: 1;
   transition: all 0.2s $ic-transition;
   box-sizing: border-box;
-  &.ic-Form-message--error { @include form-message-variant($ic-color-danger); }
-  &.ic-Form-message--success { @include form-message-variant($ic-color-success); }
-  &.ic-Form-message--warning { @include form-message-variant($ic-color-alert); }
+  &.ic-Form-message--error {
+    @include form-message-variant($ic-color-danger);
+  }
+  &.ic-Form-message--success {
+    @include form-message-variant($ic-color-success);
+  }
+  &.ic-Form-message--warning {
+    @include form-message-variant($ic-color-alert);
+  }
 }
 
 // Make error message styles work with ic-Super-toggle
-.ic-Form-group:not(.ic-Form-group--horizontal) [class^="ic-Super-toggle--"] + .ic-Form-message {
+.ic-Form-group:not(.ic-Form-group--horizontal) [class^='ic-Super-toggle--'] + .ic-Form-message {
   display: block;
   margin-left: 0;
-  .ic-Form-message__Layout { display: inline-flex; }
+  .ic-Form-message__Layout {
+    display: inline-flex;
+  }
 }
 
-.ic-Input-group + .ic-Form-message { margin-left: 0; }
+.ic-Input-group + .ic-Form-message {
+  margin-left: 0;
+}
 
 .ic-Form-message__Layout {
   position: relative;
@@ -1495,19 +1530,22 @@ select.ic-Input:not(*:root) {
   box-sizing: border-box;
 
   &:before {
-    content: "";
+    content: '';
     width: 32px;
     height: 100%;
     position: absolute;
-    left: 0; top: 0;
+    left: 0;
+    top: 0;
     box-sizing: border-box;
   }
 
   &:after {
-    bottom: 100%; left: 16px;
+    bottom: 100%;
+    left: 16px;
     border: solid transparent;
-    content: "";
-    height: 0; width: 0;
+    content: '';
+    height: 0;
+    width: 0;
     position: absolute;
     pointer-events: none;
     border-color: rgba(white, 0);
@@ -1520,14 +1558,17 @@ select.ic-Input:not(*:root) {
   a {
     color: $ic-color-light;
     text-decoration: underline;
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       color: $ic-color-light;
       text-decoration: none;
     }
   }
 
-  i[class*=icon-], i[class^=icon-] {
-    width: 32px; height: auto;
+  i[class*='icon-'],
+  i[class^='icon-'] {
+    width: 32px;
+    height: auto;
     flex: 0 0 32px;
     line-height: 1;
     margin-right: $ic-sp - 4;
@@ -1539,7 +1580,9 @@ select.ic-Input:not(*:root) {
 }
 
 // Overwrite default margin on form element
-form.ic-Form-group { margin: 0; }
+form.ic-Form-group {
+  margin: 0;
+}
 
 .ic-Form-control {
   display: block;
@@ -1557,10 +1600,14 @@ form.ic-Form-group { margin: 0; }
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    .ic-Form-message__Layout:after { display: none; }
+    .ic-Form-message__Layout:after {
+      display: none;
+    }
 
     &.ic-Form-control--checkbox,
-    .ic-Radio { padding-right: $ic-sp*1.5; }
+    .ic-Radio {
+      padding-right: $ic-sp*1.5;
+    }
   }
 
   &.ic-Form-control--has-error {
@@ -1594,8 +1641,12 @@ form.ic-Form-group { margin: 0; }
     > .ic-Input-group {
       margin: 0 $ic-sp/3;
       flex: 1;
-      &:first-child { margin-left: 0; }
-      &:last-child { margin-right: 0; }
+      &:first-child {
+        margin-left: 0;
+      }
+      &:last-child {
+        margin-right: 0;
+      }
     }
   }
 }
@@ -1673,30 +1724,38 @@ form.ic-Form-group { margin: 0; }
 
     &:before {
       transition: all 0.2s ease-out;
-      content: "";
+      content: '';
       box-sizing: border-box;
       border-radius: 100%;
-      width: 16px; height: 16px;
+      width: 16px;
+      height: 16px;
       border: 1px solid $ic-Input-border;
       position: absolute;
-      top: 5px; left: 0;
+      top: 5px;
+      left: 0;
       background: $ic-color-light;
     }
-
   }
 
-  ~ .ic-Form-message { margin-left: $ic-radio-checkbox-left-offset; }
+  ~ .ic-Form-message {
+    margin-left: $ic-radio-checkbox-left-offset;
+  }
 
-  input[type="radio"] {
+  input[type='radio'] {
     opacity: 0;
     position: absolute;
-    top: 0; left: 0;
+    top: 0;
+    left: 0;
 
     // overwrite Bootstrap
-    ~ .ic-Label { vertical-align: baseline; }
+    ~ .ic-Label {
+      vertical-align: baseline;
+    }
 
     &:not([disabled]):hover {
-      ~ .ic-Label:before { border-color: var(--ic-brand-primary); }
+      ~ .ic-Label:before {
+        border-color: var(--ic-brand-primary);
+      }
     }
 
     &:checked {
@@ -1711,7 +1770,8 @@ form.ic-Form-group { margin: 0; }
       ~ .ic-Label {
         @include high-contrast-focus;
         &:before {
-          box-shadow: inset 0 0 0 2px var(--ic-brand-primary-lightened-15), inset 0 0 0 4px $ic-color-light;
+          box-shadow: inset 0 0 0 2px var(--ic-brand-primary-lightened-15),
+            inset 0 0 0 4px $ic-color-light;
           background: var(--ic-brand-primary);
         }
       }
@@ -1752,7 +1812,7 @@ form.ic-Form-group { margin: 0; }
       }
     }
 
-    input[type="radio"] {
+    input[type='radio'] {
       &:checked {
         ~ .ic-Label {
           border-color: var(--ic-brand-primary);
@@ -1761,16 +1821,12 @@ form.ic-Form-group { margin: 0; }
       }
       &:focus {
         ~ .ic-Label {
-
           @if $use_high_contrast {
             outline: 1px dotted $ic-color-dark;
             outline-offset: -5px;
+          } @else {
+            box-shadow: inset 0 0 0 3px var(--ic-brand-primary-lightened-15);
           }
-          @else {
-            box-shadow:
-              inset 0 0 0 3px var(--ic-brand-primary-lightened-15);
-          }
-
         }
       }
     }
@@ -1778,7 +1834,6 @@ form.ic-Form-group { margin: 0; }
 }
 
 .ic-Checkbox-group {
-
   &.ic-Checkbox-group--inline {
     @include breakpoint(tablet) {
       display: flex;
@@ -1786,10 +1841,11 @@ form.ic-Form-group { margin: 0; }
       .ic-Form-control.ic-Form-control--checkbox {
         margin-right: $ic-sp*1.5;
       }
-      .ic-Form-message { display: block; }
+      .ic-Form-message {
+        display: block;
+      }
     }
   }
-
 }
 
 .ic-Form-control.ic-Form-control--checkbox {
@@ -1799,7 +1855,9 @@ form.ic-Form-group { margin: 0; }
   &.ic-Form-control--has-error,
   &.ic-Form-control--has-success,
   &.ic-Form-control--has-warning {
-    .ic-Label { display: block; }
+    .ic-Label {
+      display: block;
+    }
   }
 
   .ic-Label {
@@ -1811,14 +1869,17 @@ form.ic-Form-group { margin: 0; }
     display: inline-block;
 
     &:before {
-      content: "";
-      transition: border-color 0.2s ease-out, outline-offset 0.2s ease-out, outline-color 0.2s ease-out;
+      content: '';
+      transition: border-color 0.2s ease-out, outline-offset 0.2s ease-out,
+        outline-color 0.2s ease-out;
       box-sizing: border-box;
       position: absolute;
-      top: 5px; left: 0;
-      width: 16px; height: 16px;
+      top: 5px;
+      left: 0;
+      width: 16px;
+      height: 16px;
       border-radius: $baseBorderRadius;
-      background: url("/images/forms/ic-checkbox-bg.svg") no-repeat center bottom $ic-color-light;
+      background: url('/images/forms/ic-checkbox-bg.svg') no-repeat center bottom $ic-color-light;
       background-size: 16px 48px;
       border: 1px solid $ic-Input-border;
       outline: 2px solid transparent;
@@ -1831,14 +1892,17 @@ form.ic-Form-group { margin: 0; }
     vertical-align: middle;
   }
 
-  input[type="checkbox"] {
+  input[type='checkbox'] {
     margin: 0;
     opacity: 0;
     position: absolute;
-    top: 0; left: 0;
+    top: 0;
+    left: 0;
 
     &:not([disabled]):hover {
-      ~ .ic-Label:before { border-color: var(--ic-brand-primary); }
+      ~ .ic-Label:before {
+        border-color: var(--ic-brand-primary);
+      }
     }
 
     &:focus {
@@ -1849,7 +1913,6 @@ form.ic-Form-group { margin: 0; }
           outline-offset: -3px;
           outline-color: var(--ic-brand-primary-lightened-15);
         }
-
       }
     }
 
@@ -1875,7 +1938,6 @@ form.ic-Form-group { margin: 0; }
         pointer-events: none;
       }
     }
-
   }
 }
 
@@ -1883,7 +1945,9 @@ form.ic-Form-group { margin: 0; }
   display: flex;
   box-sizing: border-box;
 
-  .ic-Action-header__Primary & { flex: 1; }
+  .ic-Action-header__Primary & {
+    flex: 1;
+  }
 
   .ic-Input {
     width: auto;
@@ -1900,17 +1964,20 @@ form.ic-Form-group { margin: 0; }
   }
 
   .Button {
-
     &:first-child {
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
-      &:not(.Button--primary):not(.Button--secondary):not(.Button--success):not(.Button--warning):not(.Button--danger) { border-right: none; }
+      &:not(.Button--primary):not(.Button--secondary):not(.Button--success):not(.Button--warning):not(.Button--danger) {
+        border-right: none;
+      }
     }
 
     &:last-child {
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
-      &:not(.Button--primary):not(.Button--secondary):not(.Button--success):not(.Button--warning):not(.Button--danger) { border-left: none; }
+      &:not(.Button--primary):not(.Button--secondary):not(.Button--success):not(.Button--warning):not(.Button--danger) {
+        border-left: none;
+      }
     }
   }
 
@@ -1940,8 +2007,9 @@ form.ic-Form-group { margin: 0; }
     box-sizing: border-box;
   }
 
-  .ic-Label { margin-bottom: 0; }
-
+  .ic-Label {
+    margin-bottom: 0;
+  }
 }
 
 .ic-Action-header {
@@ -1974,7 +2042,9 @@ form.ic-Form-group { margin: 0; }
       }
       > .Button,
       > .btn,
-      > .ui-button { margin-left: $ic-sp/4; }
+      > .ui-button {
+        margin-left: $ic-sp/4;
+      }
     }
 
     .ic-Action-header__Primary + .ic-Action-header__Secondary {
@@ -1983,7 +2053,9 @@ form.ic-Form-group { margin: 0; }
   }
 }
 
-.ic-Action-header__Heading { margin: 0; }
+.ic-Action-header__Heading {
+  margin: 0;
+}
 
 .ic-Action-header__Primary {
   margin-bottom: $ic-sp/2;
@@ -1994,18 +2066,23 @@ form.ic-Form-group { margin: 0; }
   align-items: flex-start;
   box-sizing: border-box;
   margin-bottom: $ic-sp*2;
-  @include breakpoint(desktop) { margin-bottom: $ic-sp; }
+  @include breakpoint(desktop) {
+    margin-bottom: $ic-sp;
+  }
 
   .ic-Form-control {
     margin-bottom: $ic-sp/2;
     @include breakpoint(desktop) {
       margin: 0 $ic-sp/3;
       flex: 1;
-      &:first-child { margin-left: 0; }
-      &:last-of-type { margin-right: 0; }
+      &:first-child {
+        margin-left: 0;
+      }
+      &:last-of-type {
+        margin-right: 0;
+      }
     }
   }
-
 }
 
 .ic-Form-action-box__Form {

@@ -16,43 +16,43 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import timezone from 'timezone';
-import GradingPeriodsHelper from '../grading/helpers/GradingPeriodsHelper';
+import _ from 'lodash'
+import timezone from 'timezone'
+import GradingPeriodsHelper from '../grading/helpers/GradingPeriodsHelper'
 
-export function scopeToUser (dueDateData, userId) {
-  const scopedData = {};
+export function scopeToUser(dueDateData, userId) {
+  const scopedData = {}
   _.forEach(dueDateData, (dueDateDataByUserId, assignmentId) => {
     if (dueDateDataByUserId[userId]) {
-      scopedData[assignmentId] = dueDateDataByUserId[userId];
+      scopedData[assignmentId] = dueDateDataByUserId[userId]
     }
-  });
-  return scopedData;
+  })
+  return scopedData
 }
 
-export function updateWithSubmissions (effectiveDueDates, submissions, gradingPeriods = []) {
-  const helper = new GradingPeriodsHelper(gradingPeriods);
-  const sortedPeriods = _.sortBy(gradingPeriods, 'startDate');
+export function updateWithSubmissions(effectiveDueDates, submissions, gradingPeriods = []) {
+  const helper = new GradingPeriodsHelper(gradingPeriods)
+  const sortedPeriods = _.sortBy(gradingPeriods, 'startDate')
 
-  submissions.forEach((submission) => {
-    const dueDate = timezone.parse(submission.cached_due_date);
+  submissions.forEach(submission => {
+    const dueDate = timezone.parse(submission.cached_due_date)
 
-    let gradingPeriod = null;
+    let gradingPeriod = null
     if (gradingPeriods.length) {
       if (dueDate) {
-        gradingPeriod = helper.gradingPeriodForDueAt(dueDate);
+        gradingPeriod = helper.gradingPeriodForDueAt(dueDate)
       } else {
-        gradingPeriod = sortedPeriods[sortedPeriods.length - 1];
+        gradingPeriod = sortedPeriods[sortedPeriods.length - 1]
       }
     }
 
-    const assignmentDueDates = effectiveDueDates[submission.assignment_id] || {};
+    const assignmentDueDates = effectiveDueDates[submission.assignment_id] || {}
     assignmentDueDates[submission.user_id] = {
       due_at: submission.cached_due_date,
       grading_period_id: gradingPeriod ? gradingPeriod.id : null,
       in_closed_grading_period: gradingPeriod ? gradingPeriod.isClosed : false
-    };
+    }
 
-    effectiveDueDates[submission.assignment_id] = assignmentDueDates; // eslint-disable-line no-param-reassign
-  });
+    effectiveDueDates[submission.assignment_id] = assignmentDueDates // eslint-disable-line no-param-reassign
+  })
 }

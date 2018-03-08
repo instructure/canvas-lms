@@ -111,7 +111,7 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
 .al-options {
   display: none;
   -webkit-font-smoothing: antialiased;
-  &.ui-menu{
+  &.ui-menu {
     display: block;
   }
 }
@@ -125,14 +125,16 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
   border-color: $ic-border-light;
   text-align: left;
 
-  * { box-sizing: border-box; }
+  * {
+    box-sizing: border-box;
+  }
 
   &.ui-state-open {
     animation-duration: 0.2s;
     animation-name: al-slide-down;
     animation-fill-mode: forwards;
-    animation-timing-function: cubic-bezier(0,1,0.5,1);
-    transform-origin: top
+    animation-timing-function: cubic-bezier(0, 1, 0.5, 1);
+    transform-origin: top;
   }
 
   .ui-menu-item {
@@ -143,8 +145,10 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
       min-width: 180px;
       padding: $ic-sp/2 $ic-sp;
 
-      & i[class*=icon-]:before,
-      & i[class^=icon-]:before { margin-right: 8px; }
+      & i[class*='icon-']:before,
+      & i[class^='icon-']:before {
+        margin-right: 8px;
+      }
     }
 
     a.disabled.ui-state-focus {
@@ -175,8 +179,10 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
     cursor: not-allowed;
     color: darken($ic-color-neutral, 20%);
   }
-  .ui-menu-carat span { border-color: $ic-color-light transparent; }
-  .ui-state-focus{
+  .ui-menu-carat span {
+    border-color: $ic-color-light transparent;
+  }
+  .ui-state-focus {
     margin: 0 !important;
     border: none;
     text-shadow: none;
@@ -185,14 +191,19 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
 
 .al-trigger-gray {
   color: $ic-font-color--subdued;
-  &:hover, &:focus { color: $ic-font-color-dark; }
+  &:hover,
+  &:focus {
+    color: $ic-font-color-dark;
+  }
 }
 
 .admin-link-hover-area:hover .al-trigger,
 .admin-link-hover-area.active .al-trigger,
 .al-trigger.ui-state-active,
 .al-trigger:focus,
-.al-trigger:hover { text-decoration: none; }
+.al-trigger:hover {
+  text-decoration: none;
+}
 
 .al-trigger {
   padding-left: 8px;

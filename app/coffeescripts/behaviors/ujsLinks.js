@@ -24,7 +24,7 @@ import htmlEscape from 'str/htmlEscape'
 // #
 // Handles "data-method" on links such as:
 // <a data-url="/users/5" data-method="delete" rel="nofollow" data-confirm="Are you sure?">Delete</a>
-function handleMethod (link) {
+function handleMethod(link) {
   link.data('handled', true)
   const href = link.data('url') || link.attr('href')
   const method = link.data('method')
@@ -36,19 +36,23 @@ function handleMethod (link) {
   `
 
   if (target) form.attr('target', target)
-  form.hide().append(metadataInputHtml).appendTo('body').submit()
+  form
+    .hide()
+    .append(metadataInputHtml)
+    .appendTo('body')
+    .submit()
 }
 
 // For 'data-confirm' attribute:
 //  - Shows the confirmation dialog
-function allowAction (element) {
+function allowAction(element) {
   const message = element.data('confirm')
   if (!message) return true
 
   return confirm(message)
 }
 
-$(document).delegate('a[data-confirm], a[data-method], a[data-remove]', 'click', function (event) {
+$(document).delegate('a[data-confirm], a[data-method], a[data-remove]', 'click', function(event) {
   const $link = $(this)
 
   if ($link.data('handled') || !allowAction($link)) return false
@@ -69,14 +73,17 @@ $(document).delegate('a[data-confirm], a[data-method], a[data-remove]', 'click',
 //   Clicking the × will make the .user div go away, if the ajax request fails it will reappear.
 //   <a class="close" href="#" data-url="/users/5" data-remove=".user" data-confirm="Are you sure?"> × </a>
 // </div>
-function handleRemove ($link) {
+function handleRemove($link) {
   const selector = $link.data('remove')
   let $startLookingFrom = $link
   const url = $link.data('url')
 
   // special case for handling links inside of a KyleMenu that were appendedTo the body and are
   // no longer children of where they should be
-  const closestKyleMenu = $link.closest(':ui-popup').popup('option', 'trigger').data('KyleMenu')
+  const closestKyleMenu = $link
+    .closest(':ui-popup')
+    .popup('option', 'trigger')
+    .data('KyleMenu')
   if (closestKyleMenu && closestKyleMenu.opts.appendMenuTo) {
     $startLookingFrom = closestKyleMenu.$placeholder
   }
@@ -86,8 +93,12 @@ function handleRemove ($link) {
   // bind the 'beforeremove' and 'remove' events if you want to handle this with your own code
   // if you stop propigation this will not remove it
   $elToRemove.bind({
-    beforeremove () { $elToRemove.hide() },
-    remove () { $elToRemove.remove() }
+    beforeremove() {
+      $elToRemove.hide()
+    },
+    remove() {
+      $elToRemove.remove()
+    }
   })
 
   $elToRemove.trigger('beforeremove')

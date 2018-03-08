@@ -19,26 +19,26 @@
 import tinymce from 'compiled/editor/stocktiny'
 import mediaEditorLoader from 'tinymce_plugins/instructure_record/mediaEditorLoader'
 
-  tinymce.create('tinymce.plugins.InstructureRecord', {
-    init : function(ed, url) {
-      ed.addCommand('instructureRecord', mediaEditorLoader.insertEditor.bind(mediaEditorLoader, ed));
-      ed.addButton('instructure_record', {
-        title: 'Record/Upload Media',
-        cmd: 'instructureRecord',
-        icon: 'video icon-video'
-      });
-    },
+tinymce.create('tinymce.plugins.InstructureRecord', {
+  init: function(ed, url) {
+    ed.addCommand('instructureRecord', mediaEditorLoader.insertEditor.bind(mediaEditorLoader, ed))
+    ed.addButton('instructure_record', {
+      title: 'Record/Upload Media',
+      cmd: 'instructureRecord',
+      icon: 'video icon-video'
+    })
+  },
 
-    getInfo : function() {
-      return {
-        longname : 'InstructureRecord',
-        author : 'Brian Whitmer',
-        authorurl : 'http://www.instructure.com',
-        infourl : 'http://www.instructure.com',
-        version : tinymce.majorVersion + "." + tinymce.minorVersion
-      };
+  getInfo: function() {
+    return {
+      longname: 'InstructureRecord',
+      author: 'Brian Whitmer',
+      authorurl: 'http://www.instructure.com',
+      infourl: 'http://www.instructure.com',
+      version: tinymce.majorVersion + '.' + tinymce.minorVersion
     }
-  });
+  }
+})
 
-  // Register plugin
-  tinymce.PluginManager.add('instructure_record', tinymce.plugins.InstructureRecord);
+// Register plugin
+tinymce.PluginManager.add('instructure_record', tinymce.plugins.InstructureRecord)

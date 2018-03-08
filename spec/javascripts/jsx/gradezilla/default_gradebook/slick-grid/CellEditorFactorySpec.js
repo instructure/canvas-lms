@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CellEditorFactory from 'jsx/gradezilla/default_gradebook/slick-grid/CellEditorFactory';
-import AssignmentCellEditor from 'jsx/gradezilla/default_gradebook/slick-grid/editors/AssignmentCellEditor';
+import CellEditorFactory from 'jsx/gradezilla/default_gradebook/slick-grid/CellEditorFactory'
+import AssignmentCellEditor from 'jsx/gradezilla/default_gradebook/slick-grid/editors/AssignmentCellEditor'
 
-QUnit.module('CellEditorFactory');
+QUnit.module('CellEditorFactory')
 
-test('#getEditor returns AssignmentCellEditor for columns of type "assignment"', function () {
-  const factory = new CellEditorFactory();
-  equal(factory.getEditor({ type: 'assignment' }), AssignmentCellEditor);
-});
+test('#getEditor returns AssignmentCellEditor for columns of type "assignment"', function() {
+  const factory = new CellEditorFactory()
+  equal(factory.getEditor({type: 'assignment'}), AssignmentCellEditor)
+})
 
-test('#getEditor returns undefined for unhandled column types', function () {
-  const factory = new CellEditorFactory();
-  equal(typeof factory.getEditor({ type: 'unknown' }), 'undefined');
-});
+test('#getEditor returns undefined for unhandled column types', function() {
+  const factory = new CellEditorFactory()
+  equal(typeof factory.getEditor({type: 'unknown'}), 'undefined')
+})

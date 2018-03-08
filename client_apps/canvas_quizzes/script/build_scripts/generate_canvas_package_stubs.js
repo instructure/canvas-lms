@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var glob = require('glob');
-var path = require('path');
-var K = require('./constants');
-var PKG_PATH = path.join(K.root, 'vendor/packages');
-var PKG_PATH_RJS = '../../../vendor/packages';
+var glob = require('glob')
+var path = require('path')
+var K = require('./constants')
+var PKG_PATH = path.join(K.root, 'vendor/packages')
+var PKG_PATH_RJS = '../../../vendor/packages'
 
 // Look for all the packages in vendor/packages/**/*.js and create an "empty:"
 // map containing all the package paths.
@@ -50,11 +50,11 @@ var PKG_PATH_RJS = '../../../vendor/packages';
 //     }
 //
 module.exports = function() {
-  var devConfig = require('./extract_development_config')();
-  var pkgMap = glob.sync('**/*.js', { cwd: PKG_PATH }).reduce(function(set, pkg) {
-    var pkgName = pkg.replace(/\.js$/, '');
+  var devConfig = require('./extract_development_config')()
+  var pkgMap = glob.sync('**/*.js', {cwd: PKG_PATH}).reduce(function(set, pkg) {
+    var pkgName = pkg.replace(/\.js$/, '')
 
-    set[PKG_PATH_RJS + '/' + pkgName] = 'empty:';
+    set[PKG_PATH_RJS + '/' + pkgName] = 'empty:'
 
     // We'll also have to stub aliases to commonly used canvas packages, like
     // "react" for example.
@@ -62,11 +62,11 @@ module.exports = function() {
     // These aliases are defined in /config/requirejs/development.js and
     // commented as such.
     if (devConfig.paths.hasOwnProperty(pkgName)) {
-      set[pkgName] = 'empty:';
+      set[pkgName] = 'empty:'
     }
 
-    return set;
-  }, {});
+    return set
+  }, {})
 
-  return pkgMap;
-};
+  return pkgMap
+}

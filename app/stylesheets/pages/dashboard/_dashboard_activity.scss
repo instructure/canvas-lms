@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 #right-side .placeholder {
   height: 200px;
@@ -152,8 +152,7 @@ $ignore-col-width: 50px;
     &:hover {
       text-decoration: underline;
     }
-  }
-  @else {
+  } @else {
     &:hover {
       text-decoration: none;
     }
@@ -192,8 +191,7 @@ $dashboardIconSize: 28px;
   &:before {
     @if $use_high_contrast {
       color: $ic-font-color-dark;
-    }
-    @else {
+    } @else {
       color: darken($ic-color-light, 30%);
     }
     font-size: $dashboardIconSize;

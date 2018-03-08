@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { mount } from 'enzyme'
+import {mount} from 'enzyme'
 import DashboardCardMenu from 'jsx/dashboard_card/DashboardCardMenu'
 
 const defaultProps = () => ({
@@ -44,22 +44,22 @@ const defaultMovementMenuProps = () => ({
   }
 })
 
-const getTabWithText = (text) => {
+const getTabWithText = text => {
   const tabs = Array.from(document.querySelectorAll('[role="tab"]'))
   return tabs.filter(tab => tab.textContent.trim() === text)[0]
 }
 
 QUnit.module('DashboardCardMenu - reordering disabled', {
-  setup () {
+  setup() {
     this.wrapper = mount(<DashboardCardMenu {...defaultProps()} />)
   },
 
-  teardown () {
+  teardown() {
     this.wrapper.unmount()
   }
 })
 
-test('it should render with only a color picker if reordering is not enabled', function (assert) {
+test('it should render with only a color picker if reordering is not enabled', function(assert) {
   const done = assert.async()
 
   const handleShow = () => {
@@ -68,22 +68,22 @@ test('it should render with only a color picker if reordering is not enabled', f
     done()
   }
 
-  this.wrapper.setProps({ handleShow }, () => {
+  this.wrapper.setProps({handleShow}, () => {
     this.wrapper.find('button').simulate('click')
   })
 })
 
 QUnit.module('DashboardCardMenu - reordering enabled', {
-  setup () {
+  setup() {
     this.wrapper = mount(<DashboardCardMenu {...defaultProps()} {...defaultMovementMenuProps()} />)
   },
 
-  teardown () {
+  teardown() {
     this.wrapper.unmount()
   }
 })
 
-test('it should render a tabList with colorpicker and movement menu with reordering enabled', function (assert) {
+test('it should render a tabList with colorpicker and movement menu with reordering enabled', function(assert) {
   const done = assert.async()
 
   const handleShow = () => {
@@ -94,16 +94,16 @@ test('it should render a tabList with colorpicker and movement menu with reorder
     done()
   }
 
-  this.wrapper.setProps({ handleShow }, () => {
+  this.wrapper.setProps({handleShow}, () => {
     this.wrapper.find('button').simulate('click')
   })
 })
 
-test('it should close the popover on close button click', function (assert) {
+test('it should close the popover on close button click', function(assert) {
   const done = assert.async()
 
   let popoverContent
-  const popoverContentRef = (c) => {
+  const popoverContentRef = c => {
     popoverContent = c
   }
 
@@ -113,16 +113,16 @@ test('it should close the popover on close button click', function (assert) {
     done()
   }
 
-  this.wrapper.setProps({ handleShow, popoverContentRef }, () => {
+  this.wrapper.setProps({handleShow, popoverContentRef}, () => {
     this.wrapper.find('button').simulate('click')
   })
 })
 
-test('it should close the popover on color picker close', function (assert) {
+test('it should close the popover on color picker close', function(assert) {
   const done = assert.async()
 
   let popoverContent
-  const popoverContentRef = (c) => {
+  const popoverContentRef = c => {
     popoverContent = c
   }
 
@@ -132,16 +132,16 @@ test('it should close the popover on color picker close', function (assert) {
     done()
   }
 
-  this.wrapper.setProps({ handleShow, popoverContentRef }, () => {
+  this.wrapper.setProps({handleShow, popoverContentRef}, () => {
     this.wrapper.find('button').simulate('click')
   })
 })
 
-test('it should close the popover on movement menu option select', function (assert) {
+test('it should close the popover on movement menu option select', function(assert) {
   const done = assert.async()
 
   let popoverContent
-  const popoverContentRef = (c) => {
+  const popoverContentRef = c => {
     popoverContent = c
   }
 
@@ -152,8 +152,7 @@ test('it should close the popover on movement menu option select', function (ass
     done()
   }
 
-  this.wrapper.setProps({ handleShow, popoverContentRef }, () => {
+  this.wrapper.setProps({handleShow, popoverContentRef}, () => {
     this.wrapper.find('button').simulate('click')
   })
 })
-

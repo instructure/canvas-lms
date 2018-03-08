@@ -16,120 +16,124 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { func } from 'prop-types';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {func} from 'prop-types'
 
 export default class ColumnHeader extends React.Component {
   static propTypes = {
     addGradebookElement: func,
     removeGradebookElement: func,
     onHeaderKeyDown: func
-  };
-
-  static defaultProps = {
-    addGradebookElement () {},
-    removeGradebookElement () {},
-    onHeaderKeyDown () {}
-  };
-
-  constructor (props) {
-    super(props);
-
-    this.handleKeyDown = this.handleKeyDown.bind(this);
   }
 
-  state = { menuShown: false, skipFocusOnClose: false };
+  static defaultProps = {
+    addGradebookElement() {},
+    removeGradebookElement() {},
+    onHeaderKeyDown() {}
+  }
 
-  bindOptionsMenuTrigger = (ref) => { this.optionsMenuTrigger = ref };
+  constructor(props) {
+    super(props)
+
+    this.handleKeyDown = this.handleKeyDown.bind(this)
+  }
+
+  state = {menuShown: false, skipFocusOnClose: false}
+
+  bindOptionsMenuTrigger = ref => {
+    this.optionsMenuTrigger = ref
+  }
 
   bindFlyoutMenu = (ref, savedRef) => {
     // instructure-ui components return references to react components.
     // At this time the only way to get dom node refs is via findDOMNode.
     if (ref) {
       // eslint-disable-next-line react/no-find-dom-node
-      const domNode = ReactDOM.findDOMNode(ref);
-      this.props.addGradebookElement(domNode);
-      domNode.addEventListener('keydown', this.handleMenuKeyDown);
+      const domNode = ReactDOM.findDOMNode(ref)
+      this.props.addGradebookElement(domNode)
+      domNode.addEventListener('keydown', this.handleMenuKeyDown)
     } else if (savedRef) {
       // eslint-disable-next-line react/no-find-dom-node
-      this.props.removeGradebookElement(ReactDOM.findDOMNode(savedRef));
+      this.props.removeGradebookElement(ReactDOM.findDOMNode(savedRef))
     }
   }
 
-  bindSortByMenuContent = (ref) => {
-    this.bindFlyoutMenu(ref, this.sortByMenuContent);
-    this.sortByMenuContent = ref;
-  };
+  bindSortByMenuContent = ref => {
+    this.bindFlyoutMenu(ref, this.sortByMenuContent)
+    this.sortByMenuContent = ref
+  }
 
-  bindOptionsMenuContent = (ref) => {
+  bindOptionsMenuContent = ref => {
     // instructure-ui components return references to react components.
     // At this time the only way to get dom node refs is via findDOMNode.
     if (ref) {
-      this.optionsMenuContent = ref;
+      this.optionsMenuContent = ref
       // eslint-disable-next-line react/no-find-dom-node
-      this.optionsMenuContentDOMNode = ReactDOM.findDOMNode(ref);
+      this.optionsMenuContentDOMNode = ReactDOM.findDOMNode(ref)
     }
-    this.bindFlyoutMenu(ref, this.optionsMenuContent);
-  };
+    this.bindFlyoutMenu(ref, this.optionsMenuContent)
+  }
 
   focusAtStart = () => {
     if (this.optionsMenuTrigger) {
-      this.optionsMenuTrigger.focus();
+      this.optionsMenuTrigger.focus()
     }
-  };
+  }
 
   focusAtEnd = () => {
     if (this.optionsMenuTrigger) {
-      this.optionsMenuTrigger.focus();
+      this.optionsMenuTrigger.focus()
     }
-  };
+  }
 
-  onToggle = (menuShown) => {
-    const newState = { menuShown };
-    let callback;
+  onToggle = menuShown => {
+    const newState = {menuShown}
+    let callback
 
     if (this.state.menuShown && !menuShown) {
       if (this.state.skipFocusOnClose) {
-        newState.skipMenuOnClose = false;
+        newState.skipMenuOnClose = false
       } else {
-        callback = this.focusAtEnd;
+        callback = this.focusAtEnd
       }
     }
 
     if (!this.state.menuShown && menuShown) {
-      newState.skipFocusOnClose = false;
+      newState.skipFocusOnClose = false
     }
 
     this.setState(newState, () => {
       if (typeof callback === 'function') {
-        callback();
+        callback()
       }
 
       if (!menuShown) {
-        this.optionsMenuContent = null;
-        this.optionsMenuContentDOMNode = null;
+        this.optionsMenuContent = null
+        this.optionsMenuContentDOMNode = null
       }
-    });
-  };
+    })
+  }
 
-  handleMenuKeyDown = (event) => {
-    if (event.which === 9) { // Tab
-      this.setState({ menuShown: false, skipFocusOnClose: true });
-      this.props.onHeaderKeyDown(event);
-      return false;
+  handleMenuKeyDown = event => {
+    if (event.which === 9) {
+      // Tab
+      this.setState({menuShown: false, skipFocusOnClose: true})
+      this.props.onHeaderKeyDown(event)
+      return false
     }
-    return true;
-  };
+    return true
+  }
 
-  handleKeyDown (event) {
+  handleKeyDown(event) {
     if (document.activeElement === this.optionsMenuTrigger) {
-      if (event.which === 13) { // Enter
-        this.optionsMenuTrigger.click();
-        return false; // prevent Grid behavior
+      if (event.which === 13) {
+        // Enter
+        this.optionsMenuTrigger.click()
+        return false // prevent Grid behavior
       }
     }
 
-    return undefined;
+    return undefined
   }
 }

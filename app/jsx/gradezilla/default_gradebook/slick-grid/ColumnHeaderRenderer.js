@@ -16,44 +16,39 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssignmentColumnHeaderRenderer
-from '../../../gradezilla/default_gradebook/slick-grid/column-headers/AssignmentColumnHeaderRenderer';
-import AssignmentGroupColumnHeaderRenderer
-from '../../../gradezilla/default_gradebook/slick-grid/column-headers/AssignmentGroupColumnHeaderRenderer';
-import CustomColumnHeaderRenderer
-from '../../../gradezilla/default_gradebook/slick-grid/column-headers/CustomColumnHeaderRenderer';
-import StudentColumnHeaderRenderer
-from '../../../gradezilla/default_gradebook/slick-grid/column-headers/StudentColumnHeaderRenderer';
-import TotalGradeColumnHeaderRenderer
-from '../../../gradezilla/default_gradebook/slick-grid/column-headers/TotalGradeColumnHeaderRenderer';
+import AssignmentColumnHeaderRenderer from '../../../gradezilla/default_gradebook/slick-grid/column-headers/AssignmentColumnHeaderRenderer'
+import AssignmentGroupColumnHeaderRenderer from '../../../gradezilla/default_gradebook/slick-grid/column-headers/AssignmentGroupColumnHeaderRenderer'
+import CustomColumnHeaderRenderer from '../../../gradezilla/default_gradebook/slick-grid/column-headers/CustomColumnHeaderRenderer'
+import StudentColumnHeaderRenderer from '../../../gradezilla/default_gradebook/slick-grid/column-headers/StudentColumnHeaderRenderer'
+import TotalGradeColumnHeaderRenderer from '../../../gradezilla/default_gradebook/slick-grid/column-headers/TotalGradeColumnHeaderRenderer'
 
 export default class ColumnHeaderRenderer {
-  constructor (gradebook) {
-    this.gradebook = gradebook;
+  constructor(gradebook) {
+    this.gradebook = gradebook
     this.factories = {
       assignment: new AssignmentColumnHeaderRenderer(gradebook),
       assignment_group: new AssignmentGroupColumnHeaderRenderer(gradebook),
       custom_column: new CustomColumnHeaderRenderer(gradebook),
       student: new StudentColumnHeaderRenderer(gradebook),
       total_grade: new TotalGradeColumnHeaderRenderer(gradebook)
-    };
-  }
-
-  renderColumnHeader (column, $container, gridSupport) {
-    if (this.factories[column.type]) {
-      const options = {
-        ref: (header) => {
-          this.gradebook.setHeaderComponentRef(column.id, header);
-        }
-      };
-      this.factories[column.type].render(column, $container, gridSupport, options);
     }
   }
 
-  destroyColumnHeader (column, $container, gridSupport) {
+  renderColumnHeader(column, $container, gridSupport) {
     if (this.factories[column.type]) {
-      this.gradebook.removeHeaderComponentRef(column.id);
-      this.factories[column.type].destroy(column, $container, gridSupport);
+      const options = {
+        ref: header => {
+          this.gradebook.setHeaderComponentRef(column.id, header)
+        }
+      }
+      this.factories[column.type].render(column, $container, gridSupport, options)
+    }
+  }
+
+  destroyColumnHeader(column, $container, gridSupport) {
+    if (this.factories[column.type]) {
+      this.gradebook.removeHeaderComponentRef(column.id)
+      this.factories[column.type].destroy(column, $container, gridSupport)
     }
   }
 }

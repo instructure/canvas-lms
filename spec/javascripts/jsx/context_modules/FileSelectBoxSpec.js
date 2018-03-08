@@ -21,8 +21,7 @@ import FileSelectBox from 'jsx/context_modules/FileSelectBox'
 
 let wrapper
 
-const renderComponent = () =>
-  ReactDOM.render(<FileSelectBox contextString='test_3' />, wrapper)
+const renderComponent = () => ReactDOM.render(<FileSelectBox contextString="test_3" />, wrapper)
 
 QUnit.module('FileSelectBox', {
   setup() {

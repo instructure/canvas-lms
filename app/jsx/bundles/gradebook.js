@@ -29,7 +29,7 @@ const GradebookRouter = Backbone.Router.extend({
     'tab-:viewName': 'tab'
   },
 
-  initialize () {
+  initialize() {
     this.isLoaded = false
     this.views = {}
     this.views.assignment = new Gradebook(ENV.GRADEBOOK_OPTIONS)
@@ -39,7 +39,7 @@ const GradebookRouter = Backbone.Router.extend({
     }
   },
 
-  initOutcomes () {
+  initOutcomes() {
     const book = new OutcomeGradebookView({
       el: $('.outcome-gradebook-container'),
       gradebook: this.views.assignment
@@ -50,15 +50,19 @@ const GradebookRouter = Backbone.Router.extend({
     return book
   },
 
-  handlePillChange (viewname) {
+  handlePillChange(viewname) {
     if (viewname) this.navigate(`tab-${viewname}`, {trigger: true})
   },
 
-  tab (viewName) {
+  tab(viewName) {
     if (!viewName) viewName = userSettings.contextGet('gradebook_tab')
     window.tab = viewName
-    if ((viewName !== 'outcome') || !this.views.outcome) { viewName = 'assignment' }
-    if (this.navigation) { this.navigation.setActiveView(viewName) }
+    if (viewName !== 'outcome' || !this.views.outcome) {
+      viewName = 'assignment'
+    }
+    if (this.navigation) {
+      this.navigation.setActiveView(viewName)
+    }
     $('.assignment-gradebook-container, .outcome-gradebook-container').addClass('hidden')
     $(`.${viewName}-gradebook-container`).removeClass('hidden')
     this.views[viewName].onShow()

@@ -23,7 +23,7 @@ const app = createAnnouncementsIndex(root, {
   atomFeedUrl: ENV.atom_feed_url,
   courseId: ENV.COURSE_ID,
   masterCourseData: ENV.BLUEPRINT_COURSES_DATA,
-  permissions: ENV.permissions,
+  permissions: ENV.permissions
 })
 
 app.render()

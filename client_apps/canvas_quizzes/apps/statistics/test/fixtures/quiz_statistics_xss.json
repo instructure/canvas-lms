@@ -14,7 +14,8 @@
         {
           "id": "76",
           "question_type": "multiple_choice_question",
-          "question_text": "<p>Hello from Multiple Choice! sos &lt;script&gt;alert(\"Multiple-Choice!\");&lt;/script&gt; eos</p>",
+          "question_text":
+            "<p>Hello from Multiple Choice! sos &lt;script&gt;alert(\"Multiple-Choice!\");&lt;/script&gt; eos</p>",
           "position": 1,
           "responses": 0,
           "answers": [
@@ -70,7 +71,8 @@
         {
           "id": "77",
           "question_type": "true_false_question",
-          "question_text": "<p>Hello from True/False! sos &lt;script&gt;alert(\"True/False!\");&lt;/script&gt; eos</p>",
+          "question_text":
+            "<p>Hello from True/False! sos &lt;script&gt;alert(\"True/False!\");&lt;/script&gt; eos</p>",
           "position": 2,
           "responses": 0,
           "answers": [
@@ -126,7 +128,8 @@
         {
           "id": "78",
           "question_type": "short_answer_question",
-          "question_text": "<p>Hello from FITB! sos &lt;script&gt;alert('FITB');&lt;/script&gt; eos</p>",
+          "question_text":
+            "<p>Hello from FITB! sos &lt;script&gt;alert('FITB');&lt;/script&gt; eos</p>",
           "position": 3,
           "responses": 0,
           "answers": [
@@ -154,7 +157,8 @@
         {
           "id": "79",
           "question_type": "fill_in_multiple_blanks_question",
-          "question_text": "<p>Hello from [FIMB]! sos &lt;script&gt;alert('FIMB');&lt;/script&gt; eos</p>\n<p>This image should show properly: <img src=\"http://placehold.it/120x100%22\" alt=\"\"></p>\n<p>While this should show as plain text: &lt;script&gt;alert(\"XSS-Quiz!\");&lt;/script&gt;</p>",
+          "question_text":
+            "<p>Hello from [FIMB]! sos &lt;script&gt;alert('FIMB');&lt;/script&gt; eos</p>\n<p>This image should show properly: <img src=\"http://placehold.it/120x100%22\" alt=\"\"></p>\n<p>While this should show as plain text: &lt;script&gt;alert(\"XSS-Quiz!\");&lt;/script&gt;</p>",
           "position": 4,
           "responses": 0,
           "answered": 0,
@@ -191,7 +195,8 @@
         {
           "id": "80",
           "question_type": "multiple_answers_question",
-          "question_text": "<p>Hello from MA! sos &lt;script&gt;alert('MA');&lt;/script&gt; eos</p>",
+          "question_text":
+            "<p>Hello from MA! sos &lt;script&gt;alert('MA');&lt;/script&gt; eos</p>",
           "position": 5,
           "responses": 0,
           "correct": 0,
@@ -220,7 +225,8 @@
         {
           "id": "81",
           "question_type": "multiple_dropdowns_question",
-          "question_text": "<p>Hello from MD! sos &lt;script&gt;alert('MD');&lt;/script&gt; eos . What would [color1] be? And [color2]?</p>",
+          "question_text":
+            "<p>Hello from MD! sos &lt;script&gt;alert('MD');&lt;/script&gt; eos . What would [color1] be? And [color2]?</p>",
           "position": 6,
           "responses": 0,
           "answered": 0,
@@ -281,7 +287,8 @@
         {
           "id": "82",
           "question_type": "matching_question",
-          "question_text": "<p>Hello from Matching! sos &lt;script&gt;alert('Matching');&lt;/script&gt; eos</p>",
+          "question_text":
+            "<p>Hello from Matching! sos &lt;script&gt;alert('Matching');&lt;/script&gt; eos</p>",
           "position": 7,
           "correct": 0,
           "partially_correct": 0,
@@ -358,7 +365,8 @@
         {
           "id": "83",
           "question_type": "numerical_question",
-          "question_text": "<p>Hello from Numerical! sos &lt;script&gt;alert('Numerical');&lt;/script&gt; eos</p>",
+          "question_text":
+            "<p>Hello from Numerical! sos &lt;script&gt;alert('Numerical');&lt;/script&gt; eos</p>",
           "position": 8,
           "responses": 0,
           "full_credit": 0,
@@ -370,10 +378,7 @@
               "text": "42.00",
               "correct": true,
               "responses": 0,
-              "value": [
-                42,
-                42
-              ],
+              "value": [42, 42],
               "margin": 0,
               "is_range": false
             },
@@ -382,10 +387,7 @@
               "text": "0.00",
               "correct": true,
               "responses": 0,
-              "value": [
-                0,
-                0
-              ],
+              "value": [0, 0],
               "margin": 0,
               "is_range": false
             },
@@ -400,7 +402,8 @@
         {
           "id": "84",
           "question_type": "calculated_question",
-          "question_text": "<p>Hello from Formula! sos &lt;script&gt;alert('Formula');&lt;/script&gt; eos What is 5 plus [x]?</p>",
+          "question_text":
+            "<p>Hello from Formula! sos &lt;script&gt;alert('Formula');&lt;/script&gt; eos What is 5 plus [x]?</p>",
           "position": 9,
           "responses": 0,
           "graded": 0,
@@ -415,7 +418,8 @@
         {
           "id": "85",
           "question_type": "essay_question",
-          "question_text": "<p>Hello from Essay! sos &lt;script&gt;alert('Essay');&lt;/script&gt; eos</p>",
+          "question_text":
+            "<p>Hello from Essay! sos &lt;script&gt;alert('Essay');&lt;/script&gt; eos</p>",
           "position": 10,
           "responses": 0,
           "graded": 0,
@@ -430,7 +434,8 @@
         {
           "id": "86",
           "question_type": "file_upload_question",
-          "question_text": "<p>Hello from FU! sos &lt;script&gt;alert('FU');&lt;/script&gt; eos</p>",
+          "question_text":
+            "<p>Hello from FU! sos &lt;script&gt;alert('FU');&lt;/script&gt; eos</p>",
           "position": 11,
           "responses": 0,
           "graded": 0,
@@ -444,10 +449,7 @@
         }
       ],
       "submission_statistics": {
-        "user_ids": [
-          2,
-          4
-        ],
+        "user_ids": [2, 4],
         "logged_out_users": [],
         "scores": {
           "0": 2

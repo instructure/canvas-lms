@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 #media_record_option_holder .record_option {
   display: block;
@@ -31,7 +31,9 @@
   background: #eee;
 }
 
-#media_record_option_holder, #video_record_holder_holder, #audio_record_holder_holder {
+#media_record_option_holder,
+#video_record_holder_holder,
+#audio_record_holder_holder {
   float: left;
 }
 
@@ -40,10 +42,12 @@
   background: #ccc;
 }
 
-#audio_record_holder_holder, #video_record_holder_holder {
+#audio_record_holder_holder,
+#video_record_holder_holder {
   overflow: hidden;
   position: relative;
-  #audio_record_holder_message, #video_record_holder_message {
+  #audio_record_holder_message,
+  #video_record_holder_message {
     width: 600px;
     height: 600px;
     z-index: 9999;
@@ -64,19 +68,22 @@
   }
 }
 
-#audio_upload_under button, #video_upload_under button {
+#audio_upload_under button,
+#video_upload_under button {
   width: 180px;
   height: 50px;
   font-size: 1.2em;
   font-weight: bold;
 }
 
-#audio_upload, #video_upload {
+#audio_upload,
+#video_upload {
   position: absolute;
   z-index: 9999;
 }
 
-div#audio_upload, div#video_upload {
+div#audio_upload,
+div#video_upload {
   background: #fff;
   font-size: 1.2em;
 }
@@ -112,7 +119,8 @@ div#audio_upload, div#video_upload {
   font-weight: bold;
 }
 
-#audio_record_holder, #video_record_holder {
+#audio_record_holder,
+#video_record_holder {
   width: 400px;
   height: 300px;
   overflow: hidden;
@@ -123,7 +131,8 @@ div#audio_upload, div#video_upload {
   margin: 10px;
 }
 
-#audio_record, #video_record {
+#audio_record,
+#video_record {
   border: 0px solid #888;
   height: 300px;
 }

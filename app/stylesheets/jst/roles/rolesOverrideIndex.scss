@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- @import "base/environment";
+@import 'base/environment';
 
 .role-tab {
   padding-bottom: 200px !important;
@@ -41,7 +41,7 @@
 
 .roles_table .toolbar {
   background-color: $ic-color-light !important;
-  color:$ic-color-medium-darker;
+  color: $ic-color-medium-darker;
 
   &:not(:first-of-type) th {
     padding-top: $ic-sp*2;

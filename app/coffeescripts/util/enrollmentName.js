@@ -22,9 +22,9 @@ const types = {
   TeacherEnrollment: I18n.t('teacher', 'Teacher'),
   TaEnrollment: I18n.t('teacher_assistant', 'TA'),
   ObserverEnrollment: I18n.t('observer', 'Observer'),
-  DesignerEnrollment: I18n.t('course_designer', 'Course Designer'),
+  DesignerEnrollment: I18n.t('course_designer', 'Course Designer')
 }
 
-export default function enrollmentName (type) {
+export default function enrollmentName(type) {
   return types[type] || type
 }

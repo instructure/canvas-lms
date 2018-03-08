@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "pages/shared/move_dialog";
-@import "base/mixins/misc";
+@import 'base/environment';
+@import 'pages/shared/move_dialog';
+@import 'base/mixins/misc';
 
 .drag_and_drop_warning {
   @include accessibility-prompt($is-link: false);
@@ -60,7 +60,9 @@
 }
 
 .assignment {
-  .default-dates .status-description { font-weight: bold; }
+  .default-dates .status-description {
+    font-weight: bold;
+  }
 }
 
 @media screen and (max-width: 1280px) {
@@ -140,7 +142,8 @@
   margin-right: 5px;
 }
 
-.sortable-handle, .draggable-handle {
+.sortable-handle,
+.draggable-handle {
   cursor: pointer;
   color: darken($ic-color-neutral, 40%);
   a {
@@ -206,8 +209,11 @@
 .accessible-toggler {
   @include ic-focus-base;
   color: #333;
-  &:focus { @include ic-focus-variant; }
-  &:hover, &:focus {
+  &:focus {
+    @include ic-focus-variant;
+  }
+  &:hover,
+  &:focus {
     color: #333;
     text-decoration: none;
   }
@@ -240,7 +246,8 @@ form[data-view='edit-assignment'] {
     input.datetime_field {
       margin-top: -3px;
     }
-    button.ui-datepicker-trigger, .datetime_suggest {
+    button.ui-datepicker-trigger,
+    .datetime_suggest {
       display: none;
     }
   }

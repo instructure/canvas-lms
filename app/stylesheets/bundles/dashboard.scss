@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "pages/dashboard/dashboard_activity";
-
+@import 'pages/dashboard/dashboard_activity';
 
 // Note: all the calculations in the following 20+ lines are done to give IE
 // a sticky header through fixed positioning. Once all browsers support position: sticky,
@@ -106,7 +105,9 @@ body.dashboard-is-planner {
   background: rgba($ic-color-light, 0.95);
 }
 
-.ic-Dashboard-Activity { padding: $ic-sp; }
+.ic-Dashboard-Activity {
+  padding: $ic-sp;
+}
 
 .ic-Dashboard-header__title {
   margin-top: 0;

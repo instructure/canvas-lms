@@ -17,7 +17,7 @@
  */
 
 define(function(require) {
-  var $ = require('jquery');
+  var $ = require('jquery')
 
   return {
     xhr: {
@@ -36,7 +36,7 @@ define(function(require) {
     courseSectionsUrl: '/api/v1/courses/1/sections',
 
     onError: function(message) {
-      throw new Error(message);
+      throw new Error(message)
     }
-  };
-});
+  }
+})

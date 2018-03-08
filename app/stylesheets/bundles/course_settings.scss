@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "components/context_search";
-@import "pages/course_settings/course_settings";
-@import "pages/course_settings/CourseImageSelector.scss";
-@import "pages/shared/external_tools";
-@import "pages/shared/feature_flags";
-@import "pages/shared/grading_standards";
-@import "pages/course_settings/blueprint_settings";
+@import 'base/environment';
+@import 'components/context_search';
+@import 'pages/course_settings/course_settings';
+@import 'pages/course_settings/CourseImageSelector.scss';
+@import 'pages/shared/external_tools';
+@import 'pages/shared/feature_flags';
+@import 'pages/shared/grading_standards';
+@import 'pages/course_settings/blueprint_settings';

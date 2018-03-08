@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createStore, applyMiddleware } from 'redux'
+import {createStore, applyMiddleware} from 'redux'
 import ReduxThunk from 'redux-thunk'
 import rootReducer from 'jsx/blueprint_courses/reducer'
 
-export default function mockStore (initialState) {
+export default function mockStore(initialState) {
   return applyMiddleware(ReduxThunk)(createStore)(rootReducer, initialState)
 }

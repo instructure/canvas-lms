@@ -16,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 #progression_modules {
   min-height: 450px;
-  .message, .student-header {
+  .message,
+  .student-header {
     margin: 0;
     line-height: 1.2;
   }
@@ -31,7 +32,8 @@
       .progression-module {
         background-color: $lightBackground;
         padding: 0;
-        .name, .status.no_subtitle {
+        .name,
+        .status.no_subtitle {
           padding: $ic-sp;
         }
         .status {
@@ -86,7 +88,8 @@
       float: right;
     }
   }
-  .header, li {
+  .header,
+  li {
     padding: $ic-sp/2 $ic-sp;
   }
   .collectionViewItems {
@@ -109,7 +112,9 @@
         background-color: $btnBackground;
         border-bottom: solid 1px $ic-border-light;
         margin-left: -1px;
-        a { color: var(--ic-link-color); }
+        a {
+          color: var(--ic-link-color);
+        }
       }
     }
     .student + .student.active {
@@ -127,11 +132,15 @@
   flex: 1;
   box-sizing: border-box;
   padding-right: $ic-sp;
-  @include breakpoint(desktop) { padding-right: $ic-sp*2; }
+  @include breakpoint(desktop) {
+    padding-right: $ic-sp*2;
+  }
 }
 
 .module-progress-view__students {
   box-sizing: border-box;
   flex: 0 0 $ic-sp*16;
-  @include breakpoint(desktop) { flex: 0 0 $ic-sp*20; }
+  @include breakpoint(desktop) {
+    flex: 0 0 $ic-sp*20;
+  }
 }

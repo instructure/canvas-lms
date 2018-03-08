@@ -17,11 +17,11 @@
  */
 
 define(function(require) {
-  var quizStatistics = require('../stores/statistics');
-  var quizReports = require('../stores/reports');
-  var notifications = require('../stores/notifications');
-  var config = require('../config');
-  var update;
+  var quizStatistics = require('../stores/statistics')
+  var quizReports = require('../stores/reports')
+  var notifications = require('../stores/notifications')
+  var config = require('../config')
+  var update
 
   var onChange = function() {
     update({
@@ -30,8 +30,8 @@ define(function(require) {
       canBeLoaded: quizStatistics.canBeLoaded(),
       quizReports: quizReports.getAll(),
       notifications: notifications.getAll()
-    });
-  };
+    })
+  }
 
   /**
    * @class Statistics.Core.Controller
@@ -41,7 +41,6 @@ define(function(require) {
    * data layer.
    */
   var Controller = {
-
     /**
      * Start listening to data updates.
      *
@@ -60,13 +59,13 @@ define(function(require) {
      *        See Stores.Statistics#getQuizReports().
      */
     start: function(onUpdate) {
-      update = onUpdate;
-      quizStatistics.addChangeListener(onChange);
-      quizReports.addChangeListener(onChange);
-      notifications.addChangeListener(onChange);
+      update = onUpdate
+      quizStatistics.addChangeListener(onChange)
+      quizReports.addChangeListener(onChange)
+      notifications.addChangeListener(onChange)
 
       if (config.loadOnStartup) {
-        Controller.load();
+        Controller.load()
       }
     },
 
@@ -75,14 +74,13 @@ define(function(require) {
      */
     load: function() {
       if (config.quizStatisticsUrl) {
-        quizStatistics.load();
-        quizReports.load();
-      }
-      else {
+        quizStatistics.load()
+        quizReports.load()
+      } else {
         console.warn(
           'You have requested to load on start-up, but have not',
           'provided a url to load from in CQS.config.quizStatisticsUrl.'
-        );
+        )
       }
     },
 
@@ -90,13 +88,13 @@ define(function(require) {
      * Stop listening to data changes.
      */
     stop: function() {
-      quizStatistics.removeChangeListener(onChange);
-      quizReports.removeChangeListener(onChange);
-      notifications.removeChangeListener(onChange);
+      quizStatistics.removeChangeListener(onChange)
+      quizReports.removeChangeListener(onChange)
+      notifications.removeChangeListener(onChange)
 
-      update = undefined;
+      update = undefined
     }
-  };
+  }
 
-  return Controller;
-});
+  return Controller
+})

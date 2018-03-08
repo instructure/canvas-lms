@@ -32,7 +32,8 @@
   }
   .icon-refreshing {
     &.inactive {
-      display:none {}
+      display:none {
+      }
     }
     position: relative;
     left: -2px;
@@ -44,20 +45,24 @@
   td {
     text-align: center;
   }
-  th.name, td.name {
+  th.name,
+  td.name {
     text-align: left;
   }
-  th.unlocked_col, td.unlocked_col {
+  th.unlocked_col,
+  td.unlocked_col {
     padding: 8px 2px;
   }
-  th.edit, td.edit {
+  th.edit,
+  td.edit {
     width: 50px;
     padding: 8px 2px;
   }
   th a.icon-refresh:before {
     font-size: 100%;
   }
-  th a.icon-refresh, td a.icon-edit {
+  th a.icon-refresh,
+  td a.icon-edit {
     color: #444;
   }
   .student {
@@ -104,7 +109,7 @@
       float: right;
       width: 160px;
       margin-top: 6px;
-      input[type="text"] {
+      input[type='text'] {
         float: left;
         width: 50px;
       }
@@ -115,7 +120,8 @@
       }
     }
   }
-  .manually_unlock, .one_time_results {
+  .manually_unlock,
+  .one_time_results {
     input {
       float: left;
       margin-right: 10px;

@@ -1,5 +1,4 @@
-Welcome to the Canvas LMS API Documentation
-===========================================
+# Welcome to the Canvas LMS API Documentation
 
 Canvas LMS includes a REST API for accessing and modifying data
 externally from the main application, in your own programs and scripts.
@@ -8,8 +7,7 @@ This documentation describes the resources that make up the API.
 To get started, you'll want to review the general basics, including the
 information below and the page on <a href="oauth.html">Authentication using OAuth2</a>.
 
-Schema
-------
+## Schema
 
 All API access is over HTTPS, against your normal Canvas domain.
 
@@ -37,15 +35,14 @@ name=test+name&file_ids[]=1&file_ids[]=2&sub[name]=foo&sub[message]=bar&flag=y
 would translate into this JSON request:
 
 ```json
-{ "name": "test name", "file_ids": [1,2], "sub": { "name": "foo", "message": "bar" }, "flag": true }
+{"name": "test name", "file_ids": [1, 2], "sub": {"name": "foo", "message": "bar"}, "flag": true}
 ```
 
 With either encoding, all timestamps are sent and returned in ISO 8601 format (UTC time zone):
 
     YYYY-MM-DDTHH:MM:SSZ
 
-Authentication
---------------
+## Authentication
 
 API authentication is done with OAuth2. If possible, using the HTTP
 Authorization header is recommended. Sending the access token in the
@@ -65,21 +62,18 @@ curl "https://canvas.instructure.com/api/v1/courses?access_token=<ACCESS-TOKEN>"
 
 Read more about <a href="oauth.html">OAuth2 and how to get access tokens.</a>
 
-API Terms of Service
---------------------
+## API Terms of Service
 
 Please carefully review <a href="http://www.instructure.com/policies/api-policy">The Canvas Cloud API Terms of Service</a> before using the API.
 
-SSL
----
+## SSL
 
 Note that if you make an API call using HTTP instead of HTTPS, you will
 be redirected to HTTPS. However, at that point, the credentials
 have already been sent in clear over the internet. Please make
 sure that you are using HTTPS.
 
-About this Documentation
-------------------------
+## About this Documentation
 
 This documentation is generated directly from the Canvas LMS code
 itself. You can generate this documentation yourself if you've set up a

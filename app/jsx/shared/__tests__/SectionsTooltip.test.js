@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- /* global expect */
+/* global expect */
 import '@instructure/ui-themes/lib/canvas'
 import React from 'react'
-import { mount, shallow } from 'enzyme'
+import {mount, shallow} from 'enzyme'
 import SectionTooltip from '../SectionsTooltip'
 
 const defaultProps = () => ({
   sections: [{id: 2, name: 'sections name', user_count: 4}],
-  totalUserCount: 5,
+  totalUserCount: 5
 })
 
 test('renders the SectionTooltip component', () => {
@@ -51,7 +51,11 @@ test('renders all sections if no sections are given', () => {
 test('renders tooltip text correcly with sections', () => {
   const tree = shallow(<SectionTooltip {...defaultProps()} />)
   const node = tree.find('Tooltip')
-  expect(mount(node.prop('tip')[0]).find('Container Text').text()).toBe('sections name (4 Users)')
+  expect(
+    mount(node.prop('tip')[0])
+      .find('Container Text')
+      .text()
+  ).toBe('sections name (4 Users)')
 })
 
 test('renders multiple sections into tooltip', () => {
@@ -60,7 +64,11 @@ test('renders multiple sections into tooltip', () => {
   const tree = shallow(<SectionTooltip {...props} />)
   const node = tree.find('Tooltip')
   expect(node.prop('tip')).toHaveLength(2)
-  expect(mount(node.prop('tip')[1]).find('Container Text').text()).toBe('section other name (8 Users)')
+  expect(
+    mount(node.prop('tip')[1])
+      .find('Container Text')
+      .text()
+  ).toBe('section other name (8 Users)')
 })
 
 test('renders tooltip text correcly without', () => {
@@ -68,5 +76,9 @@ test('renders tooltip text correcly without', () => {
   props.sections = null
   const tree = shallow(<SectionTooltip {...props} />)
   const node = tree.find('Tooltip')
-  expect(mount(node.prop('tip')).find('Container Text').text()).toBe('(5 Users)')
+  expect(
+    mount(node.prop('tip'))
+      .find('Container Text')
+      .text()
+  ).toBe('(5 Users)')
 })

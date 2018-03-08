@@ -1,5 +1,4 @@
-Pagination
-==========
+# Pagination
 
 Requests that return multiple items will be paginated to 10 items by default.
 You can set a custom per-page amount with the `?per_page` parameter. There is
@@ -29,5 +28,5 @@ The possible `rel` values are:
 * last - link to the last page of results.
 
 These will only be included if they are relevant. For example, the first page
-of results will not contain a rel="prev" link.  rel="last" may also be excluded
+of results will not contain a rel="prev" link. rel="last" may also be excluded
 if the total count is too expensive to compute on each request.

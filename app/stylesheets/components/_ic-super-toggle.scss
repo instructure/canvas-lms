@@ -33,17 +33,14 @@ See Forms section.
 // Please do not edit the default parameters and note that if you alter
 // anything in this mixin, it will affect ALL ic-Super-toggles
 
-@mixin super-toggle-designer (
-  $toggle-width: $ic-sp*5,
+@mixin super-toggle-designer ($toggle-width: $ic-sp*5,
   $toggle-color-switch: $ic-color-light,
   $toggle-background-OFF: $ic-color-medium-darker,
   $toggle-background-ON: $ic-color-success,
   $toggle-color-left-unchecked: $ic-color-light,
   $toggle-color-left-checked: $ic-color-light,
   $toggle-color-right-unchecked: $ic-color-light,
-  $toggle-color-right-checked: $ic-color-light
-  ) {
-
+  $toggle-color-right-checked: $ic-color-light) {
   position: relative; // or the hidden checkbox input can end up in weird places
   margin-bottom: 0; // override the default margin on labels in Canvas
 
@@ -53,23 +50,29 @@ See Forms section.
       align-items: center;
       flex-wrap: wrap;
       width: 100%;
-      .ic-Super-toggle__container { flex: 1; }
+      .ic-Super-toggle__container {
+        flex: 1;
+      }
     }
   }
 
   .ic-Super-toggle__switch {
-    width: $toggle-width; height: $toggle-width/2;
+    width: $toggle-width;
+    height: $toggle-width/2;
     background: $toggle-background-OFF;
     border: 2px solid $toggle-background-OFF;
     border-radius: ($toggle-width/4) + 2;
 
-    &::after { // handle
+    &::after {
+      // handle
       background-color: $toggle-color-switch;
-      width: $toggle-width/2; height: $toggle-width/2;
+      width: $toggle-width/2;
+      height: $toggle-width/2;
     }
 
-    &::before { // focus outline ring
-      content: "";
+    &::before {
+      // focus outline ring
+      content: '';
       position: absolute;
       top: -0.375rem;
       left: -0.375rem;
@@ -84,12 +87,16 @@ See Forms section.
 
   .ic-Super-toggle__option--LEFT {
     color: $toggle-color-left-unchecked;
-    svg > * { fill: $toggle-color-left-unchecked; }
+    svg > * {
+      fill: $toggle-color-left-unchecked;
+    }
   }
 
   .ic-Super-toggle__option--RIGHT {
     color: $toggle-color-right-unchecked;
-    svg > * { fill: $toggle-color-right-unchecked; }
+    svg > * {
+      fill: $toggle-color-right-unchecked;
+    }
   }
 
   svg {
@@ -119,21 +126,20 @@ See Forms section.
   }
 
   @include super-toggle-state ('focus') {
-    .ic-Super-toggle__switch::before { // handle
+    .ic-Super-toggle__switch::before {
+      // handle
       opacity: 1;
     }
   }
 
-  @include super-toggle-state ('focus:checked') {
-    .ic-Super-toggle__switch::before { // handle
+  @include super-toggle-state ('focus: checked') {
+    .ic-Super-toggle__switch::before {
+      // handle
       opacity: 1;
     }
   }
-
-
 }
 // END mixin
-
 
 // START base/global styles for ic-Super-toggle elements
 // Editing these styles will affect ALL ic-Super-toggles
@@ -149,7 +155,8 @@ See Forms section.
 .ic-Super-toggle__input {
   opacity: 0;
   position: absolute;
-  top: 0; left: 0;
+  top: 0;
+  left: 0;
 }
 
 .ic-Super-toggle__switch {
@@ -158,22 +165,24 @@ See Forms section.
   line-height: 1;
   background-clip: padding-box;
 
-  &::after { // handle
+  &::after {
+    // handle
     transition: all 0.1s ease-in-out;
-    content: "";
+    content: '';
     position: absolute;
-    top: 0; left: 0;
-    transform: translate3d(0,0,0);
+    top: 0;
+    left: 0;
+    transform: translate3d(0, 0, 0);
     border-radius: 100%;
     box-shadow: 0 3px 6px rgba(black, 0.3);
-    background-image: url("/images/toggle-handle.svg");
+    background-image: url('/images/toggle-handle.svg');
     background-position: 50% 50%;
     background-repeat: no-repeat;
     background-size: 20px;
   }
 }
 
-[class^="ic-Super-toggle__option--"] {
+[class^='ic-Super-toggle__option--'] {
   transition: all 0.2s ease-out;
   text-align: center;
   position: relative;
@@ -188,31 +197,33 @@ See Forms section.
 }
 
 @include super-toggle-state ('checked') {
-  .ic-Super-toggle__switch::after { // handle
-    transform: translate3d(100%,0,0);
+  .ic-Super-toggle__switch::after {
+    // handle
+    transform: translate3d(100%, 0, 0);
   }
 }
 
 @include super-toggle-state ('disabled') {
   .ic-Super-toggle__switch,
-  [class^="ic-Super-toggle__option--"] {
+  [class^='ic-Super-toggle__option--'] {
     display: none;
   }
-  &::before { // disabled message
+  &::before {
+    // disabled message
     font-style: italic;
     opacity: 0.8;
     content: attr(data-unchecked);
   }
 }
 
-@include super-toggle-state ('disabled:checked') {
-  &::before { // disabled message
+@include super-toggle-state ('disabled: checked') {
+  &::before {
+    // disabled message
     content: attr(data-checked);
   }
 }
 
 // END base styles for ic-Super-toggle
-
 
 // START ic-Super-toggle variant #1
 // This is a basic ON/OFF toggle switch
@@ -228,7 +239,7 @@ See Forms section.
     align-items: center;
   }
 
-  [class^="ic-Super-toggle__option--"] {
+  [class^='ic-Super-toggle__option--'] {
     transition-delay: 0.1s; // Make checkmark and X animate and fade in when checkbox is checked/unchecked
     flex: 0 0 50%;
   }
@@ -256,7 +267,6 @@ See Forms section.
 }
 // END ic-Super-toggle variant #1
 
-
 // START ic-Super-toggle variant #2
 // This is a toggle that switches between 2 states, indicated by icons
 // on the left and right of the toggle.
@@ -264,14 +274,14 @@ See Forms section.
 .ic-Super-toggle--ui-switch {
   // Call in the toggle mixin, overwriting the default parameters
   @include super-toggle-designer(
-    $ic-sp*5, // width
-    $ic-color-light, // switch bg color
-    $ic-color-dark, // background color when checkbox is unchecked
-    $ic-color-dark, // background color when checkbox is checked
-    var(--ic-brand-primary), // left unchecked
-    $ic-icon-link-color, // left checked
-    $ic-icon-link-color, // right unchecked
-    var(--ic-brand-primary) // right checked
+    $ic-sp*5, 
+    $ic-color-light, 
+    $ic-color-dark, 
+    $ic-color-dark, 
+    var(--ic-brand-primary), 
+    $ic-icon-link-color, 
+    $ic-icon-link-color, 
+    var(--ic-brand-primary) 
   );
 
   .ic-Super-toggle__container {
@@ -279,14 +289,16 @@ See Forms section.
     align-items: center;
   }
 
-  .ic-Super-toggle__switch { display: block; }
+  .ic-Super-toggle__switch {
+    display: block;
+  }
 
   svg {
     max-width: 18px; // SVGs look nicer a bit larger than the default for this variant of the toggle
     max-height: 18px;
   }
 
-  [class^="ic-Super-toggle__option--"] {
+  [class^='ic-Super-toggle__option--'] {
     min-width: 24px;
   }
 

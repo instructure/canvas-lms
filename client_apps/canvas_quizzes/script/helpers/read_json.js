@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var fs = require('fs');
+var fs = require('fs')
 
 module.exports = function readJSON(filePath) {
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
-};
+  return JSON.parse(fs.readFileSync(filePath, 'utf8'))
+}

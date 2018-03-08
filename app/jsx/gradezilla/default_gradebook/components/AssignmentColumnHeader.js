@@ -16,58 +16,56 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { arrayOf, bool, func, instanceOf, number, shape, string } from 'prop-types';
-import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid';
-import Button from '@instructure/ui-core/lib/components/Button';
-import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid';
-import Link from '@instructure/ui-core/lib/components/Link';
+import React from 'react'
+import {arrayOf, bool, func, instanceOf, number, shape, string} from 'prop-types'
+import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Grid, {GridCol, GridRow} from '@instructure/ui-core/lib/components/Grid'
+import Link from '@instructure/ui-core/lib/components/Link'
 import {
   MenuItem,
   MenuItemFlyout,
   MenuItemGroup,
   MenuItemSeparator
-} from '@instructure/ui-core/lib/components/Menu';
-import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu';
-import Text from '@instructure/ui-core/lib/components/Text';
-import 'message_students';
-import MessageStudentsWhoHelper from '../../../gradezilla/shared/helpers/messageStudentsWhoHelper';
-import I18n from 'i18n!gradebook';
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
-import ColumnHeader from '../../../gradezilla/default_gradebook/components/ColumnHeader';
+} from '@instructure/ui-core/lib/components/Menu'
+import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
+import Text from '@instructure/ui-core/lib/components/Text'
+import 'message_students'
+import MessageStudentsWhoHelper from '../../../gradezilla/shared/helpers/messageStudentsWhoHelper'
+import I18n from 'i18n!gradebook'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import ColumnHeader from '../../../gradezilla/default_gradebook/components/ColumnHeader'
 
-function SecondaryDetailLine (props) {
+function SecondaryDetailLine(props) {
   if (!props.assignment.published) {
     return (
       <span className="Gradebook__ColumnHeaderDetailLine Gradebook__ColumnHeaderDetail--secondary">
         <Text color="error" size="x-small" transform="uppercase" weight="bold">
-          { I18n.t('Unpublished') }
+          {I18n.t('Unpublished')}
         </Text>
       </span>
-    );
+    )
   }
 
-  const pointsPossible = I18n.n(props.assignment.pointsPossible || 0);
+  const pointsPossible = I18n.n(props.assignment.pointsPossible || 0)
   return (
     <span className="Gradebook__ColumnHeaderDetailLine Gradebook__ColumnHeaderDetail--secondary">
       <span className="assignment-points-possible">
         <Text weight="normal" fontStyle="normal" size="x-small">
-          { I18n.t('Out of %{pointsPossible}', { pointsPossible }) }
+          {I18n.t('Out of %{pointsPossible}', {pointsPossible})}
         </Text>
       </span>
 
-      {
-        props.assignment.muted && (
-          <span>
-            &nbsp;
-            <Text size="x-small" transform="uppercase" weight="bold">
-              { I18n.t('Muted') }
-            </Text>
-          </span>
-        )
-      }
+      {props.assignment.muted && (
+        <span>
+          &nbsp;
+          <Text size="x-small" transform="uppercase" weight="bold">
+            {I18n.t('Muted')}
+          </Text>
+        </span>
+      )}
     </span>
-  );
+  )
 }
 
 SecondaryDetailLine.propTypes = {
@@ -76,7 +74,7 @@ SecondaryDetailLine.propTypes = {
     pointsPossible: number,
     published: bool.isRequired
   }).isRequired
-};
+}
 
 export default class AssignmentColumnHeader extends ColumnHeader {
   static propTypes = {
@@ -106,17 +104,19 @@ export default class AssignmentColumnHeader extends ColumnHeader {
       onSortByUnposted: func.isRequired,
       settingKey: string.isRequired
     }).isRequired,
-    students: arrayOf(shape({
-      isInactive: bool.isRequired,
-      id: string.isRequired,
-      name: string.isRequired,
-      submission: shape({
-        excused: bool.isRequired,
-        latePolicyStatus: string,
-        score: number,
-        submittedAt: instanceOf(Date)
-      }).isRequired,
-    })).isRequired,
+    students: arrayOf(
+      shape({
+        isInactive: bool.isRequired,
+        id: string.isRequired,
+        name: string.isRequired,
+        submission: shape({
+          excused: bool.isRequired,
+          latePolicyStatus: string,
+          score: number,
+          submittedAt: instanceOf(Date)
+        }).isRequired
+      })
+    ).isRequired,
     submissionsLoaded: bool.isRequired,
     setDefaultGradeAction: shape({
       disabled: bool.isRequired,
@@ -136,61 +136,80 @@ export default class AssignmentColumnHeader extends ColumnHeader {
     }).isRequired,
     onMenuClose: func.isRequired,
     showUnpostedMenuItem: bool.isRequired
-  };
+  }
 
   static defaultProps = {
     ...ColumnHeader.defaultProps
-  };
-
-  bindAssignmentLink = (ref) => { this.assignmentLink = ref };
-  bindEnterGradesAsMenuContent = (ref) => { this.enterGradesAsMenuContent = ref };
-
-  curveGrades = () => { this.invokeAndSkipFocus(this.props.curveGradesAction) };
-  setDefaultGrades = () => { this.invokeAndSkipFocus(this.props.setDefaultGradeAction) };
-  muteAssignment = () => { this.invokeAndSkipFocus(this.props.muteAssignmentAction) };
-  downloadSubmissions = () => { this.invokeAndSkipFocus(this.props.downloadSubmissionsAction) };
-  reuploadSubmissions = () => { this.invokeAndSkipFocus(this.props.reuploadSubmissionsAction) };
-
-  invokeAndSkipFocus (action) {
-    this.setState({ skipFocusOnClose: true });
-    action.onSelect(this.focusAtEnd);
   }
 
-  focusAtStart = () => { this.assignmentLink.focus() };
+  bindAssignmentLink = ref => {
+    this.assignmentLink = ref
+  }
+  bindEnterGradesAsMenuContent = ref => {
+    this.enterGradesAsMenuContent = ref
+  }
 
-  handleKeyDown = (event) => {
+  curveGrades = () => {
+    this.invokeAndSkipFocus(this.props.curveGradesAction)
+  }
+  setDefaultGrades = () => {
+    this.invokeAndSkipFocus(this.props.setDefaultGradeAction)
+  }
+  muteAssignment = () => {
+    this.invokeAndSkipFocus(this.props.muteAssignmentAction)
+  }
+  downloadSubmissions = () => {
+    this.invokeAndSkipFocus(this.props.downloadSubmissionsAction)
+  }
+  reuploadSubmissions = () => {
+    this.invokeAndSkipFocus(this.props.reuploadSubmissionsAction)
+  }
+
+  invokeAndSkipFocus(action) {
+    this.setState({skipFocusOnClose: true})
+    action.onSelect(this.focusAtEnd)
+  }
+
+  focusAtStart = () => {
+    this.assignmentLink.focus()
+  }
+
+  handleKeyDown = event => {
     if (event.which === 9) {
       if (this.assignmentLink.focused && !event.shiftKey) {
-        event.preventDefault();
-        this.optionsMenuTrigger.focus();
-        return false; // prevent Grid behavior
+        event.preventDefault()
+        this.optionsMenuTrigger.focus()
+        return false // prevent Grid behavior
       }
 
       if (document.activeElement === this.optionsMenuTrigger && event.shiftKey) {
-        event.preventDefault();
-        this.assignmentLink.focus();
-        return false; // prevent Grid behavior
+        event.preventDefault()
+        this.assignmentLink.focus()
+        return false // prevent Grid behavior
       }
     }
 
-    return ColumnHeader.prototype.handleKeyDown.call(this, event);
-  };
+    return ColumnHeader.prototype.handleKeyDown.call(this, event)
+  }
 
   onEnterGradesAsSettingSelect = (_event, values) => {
-    this.props.enterGradesAsSetting.onSelect(values[0]);
+    this.props.enterGradesAsSetting.onSelect(values[0])
   }
 
   showMessageStudentsWhoDialog = () => {
-    this.setState({ skipFocusOnClose: true });
-    const settings = MessageStudentsWhoHelper.settings(this.props.assignment, this.activeStudentDetails());
-    settings.onClose = this.focusAtEnd;
-    window.messageStudents(settings);
+    this.setState({skipFocusOnClose: true})
+    const settings = MessageStudentsWhoHelper.settings(
+      this.props.assignment,
+      this.activeStudentDetails()
+    )
+    settings.onClose = this.focusAtEnd
+    window.messageStudents(settings)
   }
 
-  activeStudentDetails () {
-    const activeStudents = this.props.students.filter(student => !student.isInactive);
-    return activeStudents.map((student) => {
-      const { excused, latePolicyStatus, score, submittedAt } = student.submission;
+  activeStudentDetails() {
+    const activeStudents = this.props.students.filter(student => !student.isInactive)
+    return activeStudents.map(student => {
+      const {excused, latePolicyStatus, score, submittedAt} = student.submission
       return {
         excused,
         id: student.id,
@@ -198,12 +217,12 @@ export default class AssignmentColumnHeader extends ColumnHeader {
         name: student.name,
         score,
         submittedAt
-      };
-    });
+      }
+    })
   }
 
-  renderAssignmentLink () {
-    const assignment = this.props.assignment;
+  renderAssignmentLink() {
+    const assignment = this.props.assignment
 
     return (
       <span className="assignment-name">
@@ -211,24 +230,26 @@ export default class AssignmentColumnHeader extends ColumnHeader {
           {assignment.name}
         </Link>
       </span>
-    );
+    )
   }
 
-  renderTrigger () {
-    const optionsTitle = I18n.t('%{name} Options', { name: this.props.assignment.name });
+  renderTrigger() {
+    const optionsTitle = I18n.t('%{name} Options', {name: this.props.assignment.name})
 
     return (
       <Button buttonRef={this.bindOptionsMenuTrigger} size="small" variant="icon">
         <IconMoreSolid className="Gradebook__ColumnHeaderActionIcon" title={optionsTitle} />
       </Button>
-    );
+    )
   }
 
-  renderMenu () {
-    if (!this.props.assignment.published) { return null; }
+  renderMenu() {
+    if (!this.props.assignment.published) {
+      return null
+    }
 
-    const { sortBySetting } = this.props;
-    const selectedSortSetting = sortBySetting.isSortColumn && sortBySetting.settingKey;
+    const {sortBySetting} = this.props
+    const selectedSortSetting = sortBySetting.isSortColumn && sortBySetting.settingKey
 
     return (
       <PopoverMenu
@@ -272,16 +293,15 @@ export default class AssignmentColumnHeader extends ColumnHeader {
               {I18n.t('Late')}
             </MenuItem>
 
-            {
-              this.props.showUnpostedMenuItem &&
-                <MenuItem
-                  selected={selectedSortSetting === 'unposted'}
-                  disabled={sortBySetting.disabled}
-                  onSelect={sortBySetting.onSortByUnposted}
-                >
-                  {I18n.t('Unposted')}
-                </MenuItem>
-            }
+            {this.props.showUnpostedMenuItem && (
+              <MenuItem
+                selected={selectedSortSetting === 'unposted'}
+                disabled={sortBySetting.disabled}
+                onSelect={sortBySetting.onSortByUnposted}
+              >
+                {I18n.t('Unposted')}
+              </MenuItem>
+            )}
           </MenuItemGroup>
         </MenuItemFlyout>
 
@@ -292,10 +312,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
           <span data-menu-item-id="message-students-who">{I18n.t('Message Students Who')}</span>
         </MenuItem>
 
-        <MenuItem
-          disabled={this.props.curveGradesAction.isDisabled}
-          onSelect={this.curveGrades}
-        >
+        <MenuItem disabled={this.props.curveGradesAction.isDisabled} onSelect={this.curveGrades}>
           <span data-menu-item-id="curve-grades">{I18n.t('Curve Grades')}</span>
         </MenuItem>
 
@@ -315,66 +332,54 @@ export default class AssignmentColumnHeader extends ColumnHeader {
           </span>
         </MenuItem>
 
-        { !this.props.enterGradesAsSetting.hidden && <MenuItemSeparator /> }
+        {!this.props.enterGradesAsSetting.hidden && <MenuItemSeparator />}
 
-        {
-          !this.props.enterGradesAsSetting.hidden && (
-            <MenuItemFlyout contentRef={this.bindEnterGradesAsMenuContent} label={I18n.t('Enter Grades as')}>
-              <MenuItemGroup
-                label={<ScreenReaderContent>{I18n.t('Enter Grades as')}</ScreenReaderContent>}
-                onSelect={this.onEnterGradesAsSettingSelect}
-                selected={[this.props.enterGradesAsSetting.selected]}
-              >
-                <MenuItem value="points">
-                  { I18n.t('Points') }
-                </MenuItem>
+        {!this.props.enterGradesAsSetting.hidden && (
+          <MenuItemFlyout
+            contentRef={this.bindEnterGradesAsMenuContent}
+            label={I18n.t('Enter Grades as')}
+          >
+            <MenuItemGroup
+              label={<ScreenReaderContent>{I18n.t('Enter Grades as')}</ScreenReaderContent>}
+              onSelect={this.onEnterGradesAsSettingSelect}
+              selected={[this.props.enterGradesAsSetting.selected]}
+            >
+              <MenuItem value="points">{I18n.t('Points')}</MenuItem>
 
-                <MenuItem value="percent">
-                  { I18n.t('Percentage') }
-                </MenuItem>
+              <MenuItem value="percent">{I18n.t('Percentage')}</MenuItem>
 
-                {
-                  this.props.enterGradesAsSetting.showGradingSchemeOption && (
-                    <MenuItem value="gradingScheme">
-                      { I18n.t('Grading Scheme') }
-                    </MenuItem>
-                  )
-                }
-              </MenuItemGroup>
-            </MenuItemFlyout>
-          )
-        }
+              {this.props.enterGradesAsSetting.showGradingSchemeOption && (
+                <MenuItem value="gradingScheme">{I18n.t('Grading Scheme')}</MenuItem>
+              )}
+            </MenuItemGroup>
+          </MenuItemFlyout>
+        )}
 
-        {
-          !(
-            this.props.downloadSubmissionsAction.hidden &&
-            this.props.reuploadSubmissionsAction.hidden
-          ) && <MenuItemSeparator />
-        }
+        {!(
+          this.props.downloadSubmissionsAction.hidden && this.props.reuploadSubmissionsAction.hidden
+        ) && <MenuItemSeparator />}
 
-        {
-          !this.props.downloadSubmissionsAction.hidden &&
+        {!this.props.downloadSubmissionsAction.hidden && (
           <MenuItem onSelect={this.downloadSubmissions}>
             <span data-menu-item-id="download-submissions">{I18n.t('Download Submissions')}</span>
           </MenuItem>
-        }
+        )}
 
-        {
-          !this.props.reuploadSubmissionsAction.hidden &&
+        {!this.props.reuploadSubmissionsAction.hidden && (
           <MenuItem onSelect={this.reuploadSubmissions}>
             <span data-menu-item-id="reupload-submissions">{I18n.t('Re-Upload Submissions')}</span>
           </MenuItem>
-        }
+        )}
       </PopoverMenu>
-    );
+    )
   }
 
-  render () {
-    const classes = `Gradebook__ColumnHeaderAction ${this.state.menuShown ? 'menuShown' : ''}`;
+  render() {
+    const classes = `Gradebook__ColumnHeaderAction ${this.state.menuShown ? 'menuShown' : ''}`
 
     return (
       <div className="Gradebook__ColumnHeaderContent">
-        <div style={{ flex: 1, minWidth: '1px' }}>
+        <div style={{flex: 1, minWidth: '1px'}}>
           <Grid colSpacing="none" hAlign="space-between" vAlign="middle">
             <GridRow>
               <GridCol textAlign="center" width="auto">
@@ -384,7 +389,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
               <GridCol textAlign="center">
                 <span className="Gradebook__ColumnHeaderDetail">
                   <span className="Gradebook__ColumnHeaderDetailLine Gradebook__ColumnHeaderDetail--primary">
-                    { this.renderAssignmentLink() }
+                    {this.renderAssignmentLink()}
                   </span>
 
                   <SecondaryDetailLine assignment={this.props.assignment} />
@@ -392,14 +397,12 @@ export default class AssignmentColumnHeader extends ColumnHeader {
               </GridCol>
 
               <GridCol textAlign="center" width="auto">
-                <div className={classes}>
-                  {this.renderMenu()}
-                </div>
+                <div className={classes}>{this.renderMenu()}</div>
               </GridCol>
             </GridRow>
           </Grid>
         </div>
       </div>
-    );
+    )
   }
 }

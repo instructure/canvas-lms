@@ -35,31 +35,31 @@ const outerClick = 'outerclick'
 const eventName = `click.${outerClick}-special`
 
 $.event.special[outerClick] = {
-  setup () {
+  setup() {
     $els = $els.add(this)
     if ($els.length === 1) {
       $doc.on(eventName, handleEvent)
     }
   },
 
-  teardown () {
+  teardown() {
     $els = $els.not(this)
     if ($els.length === 0) {
       $doc.off(eventName)
     }
   },
 
-  add (handleObj) {
+  add(handleObj) {
     const oldHandler = handleObj.handler
-    handleObj.handler = function (event, el) {
+    handleObj.handler = function(event, el) {
       event.target = el
       return oldHandler.apply(this, arguments)
     }
   }
 }
 
-export default function handleEvent (event) {
-  return $els.each(function () {
+export default function handleEvent(event) {
+  return $els.each(function() {
     const $el = $(this)
     if (this !== event.target && $el.has(event.target).length === 0) {
       $el.triggerHandler(outerClick, [event.target])

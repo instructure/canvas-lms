@@ -53,8 +53,10 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-(function (factory) {
-  var global = (function () { return this }())
+;(function(factory) {
+  var global = (function() {
+    return this
+  })()
   if (typeof module === 'object' && module.exports) {
     var sinon = require('sinon')
 
@@ -69,11 +71,11 @@
   } else {
     factory(global, global.QUnit, global.sinon)
   }
-}(function (global, QUnit, sinon) {
-  sinon.assert.fail = function (msg) {
+})(function(global, QUnit, sinon) {
+  sinon.assert.fail = function(msg) {
     return QUnit.ok(false, msg)
   }
-  sinon.assert.pass = function (assertion) {
+  sinon.assert.pass = function(assertion) {
     return QUnit.ok(true, assertion)
   }
 
@@ -82,36 +84,36 @@
     injectInto: null,
     properties: ['spy', 'stub', 'mock', 'clock', 'sandbox'],
     useFakeTimers: false,
-    useFakeServer: false,
+    useFakeServer: false
   }
 
   var qModule = QUnit.module
   var wrappingSandbox
 
-  var setup = function () {
+  var setup = function() {
     var config = Object.assign({}, sinon.defaultConfig, sinon.config)
-    config.injectInto = config.injectIntoThis && this || config.injectInto
+    config.injectInto = (config.injectIntoThis && this) || config.injectInto
     wrappingSandbox = sinon.sandbox.create(config)
   }
 
-  var teardown = function () {
+  var teardown = function() {
     return wrappingSandbox.verifyAndRestore()
   }
 
-  QUnit.module = global.module = function (name, lifecycle) {
+  QUnit.module = global.module = function(name, lifecycle) {
     lifecycle = lifecycle || {}
     var origSetup = lifecycle.setup
     var origTeardown = lifecycle.teardown
 
-    lifecycle.setup = function () {
+    lifecycle.setup = function() {
       setup.call(this)
       origSetup && origSetup.call(this)
     }
-    lifecycle.teardown = function () {
+    lifecycle.teardown = function() {
       teardown.call(this)
       origTeardown && origTeardown.call(this)
     }
 
     qModule(name, lifecycle)
   }
-}))
+})

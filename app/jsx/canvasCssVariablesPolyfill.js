@@ -28,11 +28,13 @@ const images = brandableVariables
 const variablesMap = window.CANVAS_ACTIVE_BRAND_VARIABLES || {}
 
 // makes a regex that will match any occurrence of any of the brandable css variables in a stylesheet
-const variablesRegex = new RegExp(`\\bvar\\(\\s*--(${Object.keys(variablesMap).join('|')})\\s*\\)`, 'g')
+const variablesRegex = new RegExp(
+  `\\bvar\\(\\s*--(${Object.keys(variablesMap).join('|')})\\s*\\)`,
+  'g'
+)
 
-export default function processSheet (element) {
-
-  const replaceCssVariablesWithStaticValues = (cssText) => {
+export default function processSheet(element) {
+  const replaceCssVariablesWithStaticValues = cssText => {
     let replacedAtLeastOneVar = false
     const replacedCss = cssText.replace(variablesRegex, (match, name) => {
       // if this variable exists in CANVAS_ACTIVE_BRAND_VARIABLES, replace it with it's value.
@@ -68,7 +70,7 @@ export default function processSheet (element) {
     // and issue a new http request or that cloudfront would include `access-control-allow-origin: *` even
     // when an `origin:` header is not present, then we wouldn't need this.
     const urlWithCacheBuster = `${url}?forceEdgeToDownloadNewResourceSoItHasAccessControlAllowOriginHeader`
-    get(urlWithCacheBuster).then((cssText) => {
+    get(urlWithCacheBuster).then(cssText => {
       replaceCssVariablesWithStaticValues(cssText)
       sessionStorage.setItem(cacheKey, cssText)
     })
@@ -76,4 +78,4 @@ export default function processSheet (element) {
 }
 
 // run polyfill against all stylesheets on the page
-[].forEach.call(document.querySelectorAll('link[rel="stylesheet"]'), processSheet)
+;[].forEach.call(document.querySelectorAll('link[rel="stylesheet"]'), processSheet)

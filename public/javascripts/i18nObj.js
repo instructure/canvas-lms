@@ -120,7 +120,7 @@ I18n.n = I18n.localizeNumber = (value, options = {}) => {
   return I18n[method](value, format)
 }
 
-const padding = (n, pad='00', len=2) => {
+const padding = (n, pad = '00', len = 2) => {
   const s = pad + n.toString()
   return s.substr(s.length - len)
 }
@@ -135,7 +135,8 @@ I18n.strftime = function(date, format) {
   const day = date.getDate()
   const year = date.getFullYear()
   const month = date.getMonth() + 1
-  const dayOfYear = 1 + Math.round((new Date(year, month - 1, day) - new Date(year, 0, 1)) / 86400000)
+  const dayOfYear =
+    1 + Math.round((new Date(year, month - 1, day) - new Date(year, 0, 1)) / 86400000)
   const hour = date.getHours()
   let hour12 = hour
   const meridian = hour > 11 ? 1 : 0
@@ -146,13 +147,9 @@ I18n.strftime = function(date, format) {
   const epochOffset = Math.floor(date.getTime() / 1000)
   const absOffsetHours = Math.floor(Math.abs(offset / 60))
   const absOffsetMinutes = Math.abs(offset) - absOffsetHours * 60
-  const timezoneoffset = `${
-      offset > 0 ? '-' : '+'
-    }${
-      absOffsetHours.toString().length < 2 ? `0${absOffsetHours}` : absOffsetHours
-    }${
-      absOffsetMinutes.toString().length < 2 ? `0${absOffsetMinutes}` : absOffsetMinutes
-    }`
+  const timezoneoffset = `${offset > 0 ? '-' : '+'}${
+    absOffsetHours.toString().length < 2 ? `0${absOffsetHours}` : absOffsetHours
+  }${absOffsetMinutes.toString().length < 2 ? `0${absOffsetMinutes}` : absOffsetMinutes}`
 
   if (hour12 > 12) {
     hour12 -= 12
@@ -172,14 +169,17 @@ I18n.strftime = function(date, format) {
   */
   let optionsNeeded = false
   const f = format
-    .replace(/%([DFrRTv])/g, (str, p1) => ({
-        D: '%m/%d/%y',
-        F: '%Y-%m-%d',
-        r: '%I:%M:%S %p',
-        R: '%H:%M',
-        T: '%H:%M:%S',
-        v: '%e-%b-%Y'
-      }[p1])
+    .replace(
+      /%([DFrRTv])/g,
+      (str, p1) =>
+        ({
+          D: '%m/%d/%y',
+          F: '%Y-%m-%d',
+          r: '%I:%M:%S %p',
+          R: '%H:%M',
+          T: '%H:%M:%S',
+          v: '%e-%b-%Y'
+        }[p1])
     )
     .replace(/%(%|\-?[a-zA-Z]|3N)/g, (str, p1) => {
       // check to see if we need an options object
@@ -198,42 +198,78 @@ I18n.strftime = function(date, format) {
       }
 
       switch (p1) {
-        case 'a':  return options.abbr_day_names[weekDay]
-        case 'A':  return options.day_names[weekDay]
-        case 'b':  return options.abbr_month_names[month]
-        case 'B':  return options.month_names[month]
-        case 'd':  return padding(day)
-        case '-d': return day
-        case 'e':  return padding(day, ' ')
-        case 'h':  return options.abbr_month_names[month]
-        case 'H':  return padding(hour)
-        case '-H': return hour
-        case 'I':  return padding(hour12)
-        case '-I': return hour12
-        case 'j':  return padding(dayOfYear, '00', 3)
-        case 'k':  return padding(hour, ' ')
-        case 'l':  return padding(hour12, ' ')
-        case 'L':  return padding(mils, '00', 3)
-        case 'm':  return padding(month)
-        case '-m': return month
-        case 'M':  return padding(mins)
-        case '-M': return mins
-        case 'n':  return '\n'
-        case '3N': return padding(mils, '00', 3)
-        case 'p':  return options.meridian[meridian]
-        case 'P':  return options.meridian[meridian].toLowerCase()
-        case 's':  return epochOffset
-        case 'S':  return padding(secs)
-        case '-S': return secs
-        case 't':  return '\t'
-        case 'u':  return weekDay || weekDay + 7
-        case 'w':  return weekDay
-        case 'y':  return padding(year)
-        case '-y': return padding(year).replace(/^0+/, '')
-        case 'Y':  return year
-        case 'z':  return timezoneoffset
-        case '%':  return '%'
-        default:   return str
+        case 'a':
+          return options.abbr_day_names[weekDay]
+        case 'A':
+          return options.day_names[weekDay]
+        case 'b':
+          return options.abbr_month_names[month]
+        case 'B':
+          return options.month_names[month]
+        case 'd':
+          return padding(day)
+        case '-d':
+          return day
+        case 'e':
+          return padding(day, ' ')
+        case 'h':
+          return options.abbr_month_names[month]
+        case 'H':
+          return padding(hour)
+        case '-H':
+          return hour
+        case 'I':
+          return padding(hour12)
+        case '-I':
+          return hour12
+        case 'j':
+          return padding(dayOfYear, '00', 3)
+        case 'k':
+          return padding(hour, ' ')
+        case 'l':
+          return padding(hour12, ' ')
+        case 'L':
+          return padding(mils, '00', 3)
+        case 'm':
+          return padding(month)
+        case '-m':
+          return month
+        case 'M':
+          return padding(mins)
+        case '-M':
+          return mins
+        case 'n':
+          return '\n'
+        case '3N':
+          return padding(mils, '00', 3)
+        case 'p':
+          return options.meridian[meridian]
+        case 'P':
+          return options.meridian[meridian].toLowerCase()
+        case 's':
+          return epochOffset
+        case 'S':
+          return padding(secs)
+        case '-S':
+          return secs
+        case 't':
+          return '\t'
+        case 'u':
+          return weekDay || weekDay + 7
+        case 'w':
+          return weekDay
+        case 'y':
+          return padding(year)
+        case '-y':
+          return padding(year).replace(/^0+/, '')
+        case 'Y':
+          return year
+        case 'z':
+          return timezoneoffset
+        case '%':
+          return '%'
+        default:
+          return str
       }
     })
 
@@ -254,7 +290,6 @@ I18n.pluralize = function(count, scope, options) {
   if (!translation) {
     return this.missingTranslation(scope)
   }
-
 
   options = this.prepareOptions(options, {precision: 0})
   options.count = this.localizeNumber(count, options)

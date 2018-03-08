@@ -31,11 +31,13 @@ import OutcomesActionsPopoverMenu from '../outcomes/OutcomesActionsPopoverMenu'
 const renderInstructions = ENV.PERMISSIONS.manage_outcomes
 
 const $el = $('#outcomes')
-$el.html(browserTemplate({
-  canManageOutcomes: ENV.PERMISSIONS.manage_outcomes,
-  canManageRubrics: ENV.PERMISSIONS.manage_rubrics,
-  contextUrlRoot: ENV.CONTEXT_URL_ROOT
-}))
+$el.html(
+  browserTemplate({
+    canManageOutcomes: ENV.PERMISSIONS.manage_outcomes,
+    canManageRubrics: ENV.PERMISSIONS.manage_rubrics,
+    contextUrlRoot: ENV.CONTEXT_URL_ROOT
+  })
+)
 
 ReactDOM.render(
   <OutcomesActionsPopoverMenu

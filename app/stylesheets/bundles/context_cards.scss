@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "components/message_students";
+@import 'base/environment';
+@import 'components/message_students';
 
 .StudentContextTray {
   box-sizing: border-box;
@@ -105,7 +105,7 @@
     width: 100%;
     text-align: center;
     line-height: 1rem;
-    margin-top:.25rem;
+    margin-top: 0.25rem;
   }
 }
 

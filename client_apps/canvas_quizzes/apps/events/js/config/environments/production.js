@@ -82,7 +82,7 @@ define([], function() {
      *         An explanation of the error.
      */
     onError: function(message) {
-      console.error(message);
+      console.error(message)
     }
-  };
-});
+  }
+})

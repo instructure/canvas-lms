@@ -16,13 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createStore, applyMiddleware } from 'redux'
+import {createStore, applyMiddleware} from 'redux'
 import ReduxThunk from 'redux-thunk'
 import FlickrReducer from '../reducers/FlickrReducer'
 import FlickrInitialState from './FlickrInitialState'
 
-  const createStoreWithMiddleware = applyMiddleware(
-    ReduxThunk
-  )(createStore);
+const createStoreWithMiddleware = applyMiddleware(ReduxThunk)(createStore)
 
 export default createStoreWithMiddleware(FlickrReducer, FlickrInitialState)

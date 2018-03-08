@@ -21,47 +21,44 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import HelpDialog from '../../help_dialog/HelpDialog'
 
-  var HelpTray = React.createClass({
-    propTypes: {
-      trayTitle: PropTypes.string,
-      closeTray: PropTypes.func.isRequired,
-      links: PropTypes.array,
-      hasLoaded: PropTypes.bool
-    },
+var HelpTray = React.createClass({
+  propTypes: {
+    trayTitle: PropTypes.string,
+    closeTray: PropTypes.func.isRequired,
+    links: PropTypes.array,
+    hasLoaded: PropTypes.bool
+  },
 
-    getDefaultProps() {
-      return {
-        trayTitle: I18n.t('Help'),
-        hasLoaded: false,
-        links: []
-      };
-    },
-
-    render() {
-      return (
-        <div id="help_tray">
-          <div className="ic-NavMenu__header">
-            <h1 className="ic-NavMenu__headline">
-              {this.props.trayTitle}
-            </h1>
-            <button
-              className="Button Button--icon-action ic-NavMenu__closeButton"
-              type="button"
-              onClick={this.props.closeTray}
-            >
-              <i className="icon-x" aria-hidden="true"></i>
-              <span className="screenreader-only">
-                {I18n.t('Close')}
-              </span>
-            </button>
-          </div>
-          <HelpDialog
-            links={this.props.links}
-            hasLoaded={this.props.hasLoaded}
-            onFormSubmit={this.props.closeTray} />
-        </div>
-      );
+  getDefaultProps() {
+    return {
+      trayTitle: I18n.t('Help'),
+      hasLoaded: false,
+      links: []
     }
-  });
+  },
+
+  render() {
+    return (
+      <div id="help_tray">
+        <div className="ic-NavMenu__header">
+          <h1 className="ic-NavMenu__headline">{this.props.trayTitle}</h1>
+          <button
+            className="Button Button--icon-action ic-NavMenu__closeButton"
+            type="button"
+            onClick={this.props.closeTray}
+          >
+            <i className="icon-x" aria-hidden="true" />
+            <span className="screenreader-only">{I18n.t('Close')}</span>
+          </button>
+        </div>
+        <HelpDialog
+          links={this.props.links}
+          hasLoaded={this.props.hasLoaded}
+          onFormSubmit={this.props.closeTray}
+        />
+      </div>
+    )
+  }
+})
 
 export default HelpTray

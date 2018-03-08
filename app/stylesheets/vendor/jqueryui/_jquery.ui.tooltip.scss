@@ -1,9 +1,9 @@
-@import "base/environment";
+@import 'base/environment';
 
 .ui-widget.ui-tooltip {
-  padding:5px;
-  position:absolute;
-  z-index:$zindexTooltip;
+  padding: 5px;
+  position: absolute;
+  z-index: $zindexTooltip;
   display: block;
   @include fontSize(11px);
   max-width: 200px;
@@ -20,11 +20,11 @@
   &:before {
     border-color: transparent transparent $bgColorTooltip transparent;
     position: absolute;
-    border-style:solid;
+    border-style: solid;
     border-width: $tooltipCaretSize;
-    width:0;
-    height:0;
-    content: "";
+    width: 0;
+    height: 0;
+    content: '';
     top: -$tooltipCaretSize * 2;
     left: 5px;
   }

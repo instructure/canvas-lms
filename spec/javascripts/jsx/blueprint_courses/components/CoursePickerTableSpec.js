@@ -26,7 +26,7 @@ QUnit.module('CoursePickerTable component')
 const defaultProps = () => ({
   courses: data.courses,
   selectedCourses: [],
-  onSelectedChanged: () => {},
+  onSelectedChanged: () => {}
 })
 
 test('renders the CoursePickerTable component', () => {
@@ -49,8 +49,22 @@ test('displays correct table data', () => {
   const rows = tree.find('.bca-table__course-row')
 
   equal(rows.length, props.courses.length)
-  equal(rows.at(0).find('td').at(1).text(), props.courses[0].name)
-  equal(rows.at(1).find('td').at(1).text(), props.courses[1].name)
+  equal(
+    rows
+      .at(0)
+      .find('td')
+      .at(1)
+      .text(),
+    props.courses[0].name
+  )
+  equal(
+    rows
+      .at(1)
+      .find('td')
+      .at(1)
+      .text(),
+    props.courses[1].name
+  )
 })
 
 test('calls onSelectedChanged when courses are selected', () => {
@@ -58,10 +72,10 @@ test('calls onSelectedChanged when courses are selected', () => {
   props.onSelectedChanged = sinon.spy()
   const tree = enzyme.mount(<CoursePickerTable {...props} />)
   const checkbox = tree.find('.bca-table__course-row input[type="checkbox"]')
-  checkbox.at(0).simulate('change', { target: { checked: true, value: '1' } })
+  checkbox.at(0).simulate('change', {target: {checked: true, value: '1'}})
 
   equal(props.onSelectedChanged.callCount, 1)
-  deepEqual(props.onSelectedChanged.getCall(0).args[0], { added: ['1'], removed: [] })
+  deepEqual(props.onSelectedChanged.getCall(0).args[0], {added: ['1'], removed: []})
 })
 
 test('calls onSelectedChanged when courses are unselected', () => {
@@ -70,10 +84,10 @@ test('calls onSelectedChanged when courses are unselected', () => {
   props.onSelectedChanged = sinon.spy()
   const tree = enzyme.mount(<CoursePickerTable {...props} />)
   const checkbox = tree.find('.bca-table__course-row input[type="checkbox"]')
-  checkbox.at(0).simulate('change', { target: { checked: false, value: '1' } })
+  checkbox.at(0).simulate('change', {target: {checked: false, value: '1'}})
 
   equal(props.onSelectedChanged.callCount, 1)
-  deepEqual(props.onSelectedChanged.getCall(0).args[0], { removed: ['1'], added: [] })
+  deepEqual(props.onSelectedChanged.getCall(0).args[0], {removed: ['1'], added: []})
 })
 
 test('calls onSelectedChanged with correct data when "Select All" is selected', () => {
@@ -82,10 +96,10 @@ test('calls onSelectedChanged with correct data when "Select All" is selected', 
   const tree = enzyme.mount(<CoursePickerTable {...props} />)
 
   const checkbox = tree.find('.btps-table__header-wrapper input[type="checkbox"]')
-  checkbox.at(0).simulate('change', { target: { checked: true, value: 'all' } })
+  checkbox.at(0).simulate('change', {target: {checked: true, value: 'all'}})
 
   equal(props.onSelectedChanged.callCount, 1)
-  deepEqual(props.onSelectedChanged.getCall(0).args[0], { added: ['1', '2'], removed: [] })
+  deepEqual(props.onSelectedChanged.getCall(0).args[0], {added: ['1', '2'], removed: []})
 })
 
 test('handleFocusLoss focuses the next item', () => {

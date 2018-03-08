@@ -83,9 +83,7 @@ export default function CoursesList(props) {
               tipAsc={I18n.t('Click to sort by sub-account descending')}
             />
           </th>
-          <th width="1">
-            {I18n.t('Students')}
-          </th>
+          <th width="1">{I18n.t('Students')}</th>
           <th width="1">
             <ScreenReaderContent>{I18n.t('Course option links')}</ScreenReaderContent>
           </th>

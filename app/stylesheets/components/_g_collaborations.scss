@@ -25,7 +25,8 @@ $highlight-blue: #00b5fe;
   overflow: hidden;
   margin-bottom: 14px;
 
-  h1, .h1 {
+  h1,
+  .h1 {
     float: left;
     margin: 0;
   }
@@ -45,7 +46,8 @@ $highlight-blue: #00b5fe;
   }
 
   .collaboration-header {
-    h2, .h2 {
+    h2,
+    .h2 {
       float: left;
       font-family: arial, sans-serif;
       font-size: 1.2em;
@@ -65,7 +67,9 @@ $highlight-blue: #00b5fe;
   }
 
   .edit_collaboration {
-    .header, .content, .footer {
+    .header,
+    .content,
+    .footer {
       margin: 0;
       padding: 0;
     }
@@ -100,25 +104,38 @@ $highlight-blue: #00b5fe;
   .list-wrapper li {
     position: relative;
 
-    .icon-end, .icon-add {
+    .icon-end,
+    .icon-add {
       display: none;
       position: absolute;
       right: 5px;
       top: 4px;
     }
 
-    &:hover .icon-end, &:hover .icon-add,
-    a:focus .icon-end, a:focus .icon-add {
+    &:hover .icon-end,
+    &:hover .icon-add,
+    a:focus .icon-end,
+    a:focus .icon-add {
       display: block;
     }
   }
 
-  .loading-wrapper { text-align: center; }
-  .loading-wrapper img { margin: 16px auto; }
+  .loading-wrapper {
+    text-align: center;
+  }
+  .loading-wrapper img {
+    margin: 16px auto;
+  }
 
-  .list-wrapper ul             { display: none; }
-  .list-wrapper ul:first-child { display: block; }
-  .members-list-wrapper ul     { display: block; }
+  .list-wrapper ul {
+    display: none;
+  }
+  .list-wrapper ul:first-child {
+    display: block;
+  }
+  .members-list-wrapper ul {
+    display: block;
+  }
 
   .box-with-header .box-content {
     overflow: hidden;
@@ -162,22 +179,27 @@ $highlight-blue: #00b5fe;
     padding: 0;
   }
 
-  > a:hover { background: none; }
+  > a:hover {
+    background: none;
+  }
 }
 
 .members-list-wrapper {
   li {
     background: $green;
 
-    &:hover, &:hover a, a:focus {
+    &:hover,
+    &:hover a,
+    a:focus {
       background: none;
       color: #b72d1e;
       outline: 0;
     }
-
   }
 
-  a { cursor: pointer; }
+  a {
+    cursor: pointer;
+  }
 
   .remove-button {
     display: none;
@@ -200,4 +222,3 @@ $highlight-blue: #00b5fe;
     text-align: center;
   }
 }
-

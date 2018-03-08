@@ -151,16 +151,18 @@ export default class TimeBlockSelector extends React.Component {
         <FormFieldGroup
           layout="columns"
           vAlign="bottom"
-          description={<ScreenReaderContent>{I18n.t('Divide into equal time slots (in minutes')}</ScreenReaderContent>}
+          description={
+            <ScreenReaderContent>
+              {I18n.t('Divide into equal time slots (in minutes')}
+            </ScreenReaderContent>
+          }
         >
           <NumberInput
             label={I18n.t('Divide into equal slots (value is in minutes)')}
             defaultValue="30"
             id="TimeBlockSelector__DivideSection-Input"
           />
-          <Button onClick={this.handleSlotDivision}>
-            {I18n.t('Create Slots')}
-          </Button>
+          <Button onClick={this.handleSlotDivision}>{I18n.t('Create Slots')}</Button>
         </FormFieldGroup>
       </div>
     )

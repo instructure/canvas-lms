@@ -24,22 +24,22 @@ import CourseListItem from '../epub_exports/CourseListItem'
 const CourseList = React.createClass({
   displayName: 'CourseList',
   propTypes: {
-    courses: PropTypes.object,
+    courses: PropTypes.object
   },
 
   //
   // Rendering
   //
 
-  render () {
+  render() {
     return (
       <ul className="ig-list">
-        {_.map(this.props.courses, function (course, key) {
-          return <CourseListItem key={key} course={course} />;
+        {_.map(this.props.courses, function(course, key) {
+          return <CourseListItem key={key} course={course} />
         })}
       </ul>
-    );
+    )
   }
-});
+})
 
 export default CourseList

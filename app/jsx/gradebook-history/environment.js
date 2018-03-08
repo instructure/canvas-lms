@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import splitAssetString from 'coffeescripts/str/splitAssetString';
+import splitAssetString from 'coffeescripts/str/splitAssetString'
 
-function courseId () {
-  return ENV.context_asset_string ? splitAssetString(ENV.context_asset_string)[1] : '';
+function courseId() {
+  return ENV.context_asset_string ? splitAssetString(ENV.context_asset_string)[1] : ''
 }
 
-function timezone () {
-  return ENV.TIMEZONE;
+function timezone() {
+  return ENV.TIMEZONE
 }
 
 export default {

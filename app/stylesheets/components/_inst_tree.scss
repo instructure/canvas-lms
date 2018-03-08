@@ -44,16 +44,16 @@ ul.instTree {
       @include fontSize(12px);
     }
     &.node {
-      background-image: url("/images/mimeClassIcons/folder.svg");
+      background-image: url('/images/mimeClassIcons/folder.svg');
       &.collaborations {
-        background-image: url("/images/collaboration_folder.png");
+        background-image: url('/images/collaboration_folder.png');
       }
       &.groups {
-        background-image: url("/images/groups_folder.png");
+        background-image: url('/images/groups_folder.png');
       }
     }
     &.leaf {
-      background-image: url("/images/mimeClassIcons/file.svg");
+      background-image: url('/images/mimeClassIcons/file.svg');
       &:hover {
         background-color: #eee;
       }
@@ -87,10 +87,10 @@ ul.instTree {
         left: -4px;
         top: 0;
         &.plus {
-          background: url("/images/inst_tree/plus.gif") 5px 50% no-repeat;
+          background: url('/images/inst_tree/plus.gif') 5px 50% no-repeat;
         }
         &.minus {
-          background: url("/images/inst_tree/minus.gif") 5px 50% no-repeat;
+          background: url('/images/inst_tree/minus.gif') 5px 50% no-repeat;
         }
       }
     }
@@ -110,56 +110,65 @@ ul.instTree {
   position: absolute;
   &.node {
     // FIXME: this background image doesn't exist
-    background: #C3E1FF url("/images/inst_tree/node-drag.gif") left 3px no-repeat;
+    background: #c3e1ff url('/images/inst_tree/node-drag.gif') left 3px no-repeat;
   }
   &.leaf {
-    background: #C3E1FF url("/images/inst_tree/leaf-drag.gif") left 3px no-repeat;
+    background: #c3e1ff url('/images/inst_tree/leaf-drag.gif') left 3px no-repeat;
   }
 }
 
 ul.instTree {
   li.separator.dd-hover {
-    background: transparent url("/images/inst_tree/separator-drag.gif") 3px 1px no-repeat;
+    background: transparent url('/images/inst_tree/separator-drag.gif') 3px 1px no-repeat;
   }
   li.leaf {
     &.dd-hover {
       background-color: yellow;
     }
     &.pdf {
-      background-image: url("/images/mimeClassIcons/pdf.svg");
+      background-image: url('/images/mimeClassIcons/pdf.svg');
     }
-    &.image, &.jpeg, &.jpg, &.png, &.svg {
-      background-image: url("/images/mimeClassIcons/image.svg");
+    &.image,
+    &.jpeg,
+    &.jpg,
+    &.png,
+    &.svg {
+      background-image: url('/images/mimeClassIcons/image.svg');
     }
-    &.xls, &.xlsx, &.spreadsheet {
-      background-image: url("/images/mimeClassIcons/xls.svg");
+    &.xls,
+    &.xlsx,
+    &.spreadsheet {
+      background-image: url('/images/mimeClassIcons/xls.svg');
     }
-    &.word, &.doc, &.docx {
-      background-image: url("/images/mimeClassIcons/doc.svg");
+    &.word,
+    &.doc,
+    &.docx {
+      background-image: url('/images/mimeClassIcons/doc.svg');
     }
-    &.ppt, &.pptx {
-      background-image: url("/images/mimeClassIcons/ppt.svg");
+    &.ppt,
+    &.pptx {
+      background-image: url('/images/mimeClassIcons/ppt.svg');
     }
     &.audio {
-      background-image: url("/images/mimeClassIcons/audio.svg");
+      background-image: url('/images/mimeClassIcons/audio.svg');
     }
     &.zip {
-      background-image: url("/images/mimeClassIcons/zip.svg");
+      background-image: url('/images/mimeClassIcons/zip.svg');
     }
     &.video {
-      background-image: url("/images/mimeClassIcons/video.svg");
+      background-image: url('/images/mimeClassIcons/video.svg');
     }
     &.html {
-      background-image: url("/images/mimeClassIcons/html.svg");
+      background-image: url('/images/mimeClassIcons/html.svg');
     }
     &.google_docs {
-      background-image: url("/images/google_docs_icon.ico");
+      background-image: url('/images/google_docs_icon.ico');
     }
     &.etherpad {
-      background-image: url("/images/etherpad_icon.ico");
+      background-image: url('/images/etherpad_icon.ico');
     }
     &.loading {
-      background-image: url("/images/ajax-loader-small.gif");
+      background-image: url('/images/ajax-loader-small.gif');
     }
   }
 }

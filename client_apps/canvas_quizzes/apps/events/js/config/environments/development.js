@@ -17,7 +17,7 @@
  */
 
 define(function(require) {
-  var $ = require('jquery');
+  var $ = require('jquery')
 
   return {
     xhr: {
@@ -29,7 +29,7 @@ define(function(require) {
     ajax: $.ajax,
 
     onError: function(message) {
-      throw new Error(message);
+      throw new Error(message)
     }
-  };
-});
+  }
+})

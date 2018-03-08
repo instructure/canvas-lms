@@ -22,26 +22,25 @@ import 'jqueryui/dialog'
 import 'vendor/jquery.ba-tinypubsub'
 
 const assignmentRubricDialog = {
-
   // the markup for the trigger should look like:
   // <a class="rubric_dialog_trigger" href="#" data-rubric-exists="<%= !!attached_rubric %>" data-url="<%= context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) %>">
   //   <%= attached_rubric ? t(:show_rubric, "Show Rubric") : t(:add_rubric, "Add Rubric") %>
   // </a>
-  initTriggers () {
+  initTriggers() {
     const $trigger = $('.rubric_dialog_trigger')
     if ($trigger) {
       this.noRubricExists = $trigger.data('noRubricExists')
       this.url = $trigger.data('url')
       this.$focusReturnsTo = $($trigger.data('focusReturnsTo'))
 
-      $trigger.click((event) => {
+      $trigger.click(event => {
         event.preventDefault()
         assignmentRubricDialog.openDialog()
       })
     }
   },
 
-  initDialog () {
+  initDialog() {
     this.dialogInited = true
 
     this.$dialog = $(`<div><h4>${htmlEscape(I18n.t('loading', 'Loading...'))}</h4></div>`).dialog({
@@ -53,11 +52,13 @@ const assignmentRubricDialog = {
       close: () => this.$focusReturnsTo.focus()
     })
 
-    return $.get(this.url, (html) => {
+    return $.get(this.url, html => {
       // if there is not already a rubric, we want to click the "add rubric" button for them,
       // since that is the point of why they clicked the link.
       if (assignmentRubricDialog.noRubricExists) {
-        $.subscribe('edit_rubric/initted', () => assignmentRubricDialog.$dialog.find('.btn.add_rubric_link').click())
+        $.subscribe('edit_rubric/initted', () =>
+          assignmentRubricDialog.$dialog.find('.btn.add_rubric_link').click()
+        )
       }
 
       // weird hackery because the server returns a <div id="rubrics" style="display:none">
@@ -66,7 +67,7 @@ const assignmentRubricDialog = {
     })
   },
 
-  openDialog () {
+  openDialog() {
     if (!this.dialogInited) this.initDialog()
     this.$dialog.dialog('open')
   }

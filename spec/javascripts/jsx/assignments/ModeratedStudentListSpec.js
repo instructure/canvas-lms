@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { mount } from 'enzyme';
-import ModeratedStudentList from 'jsx/assignments/ModeratedStudentList';
+import React from 'react'
+import {mount} from 'enzyme'
+import ModeratedStudentList from 'jsx/assignments/ModeratedStudentList'
 
-function fakeStudentList () {
+function fakeStudentList() {
   return {
     students: [
       {
@@ -44,10 +44,10 @@ function fakeStudentList () {
         ]
       }
     ]
-  };
+  }
 }
 
-function fakeUngradedStudentList () {
+function fakeUngradedStudentList() {
   return {
     students: [
       {
@@ -59,16 +59,16 @@ function fakeUngradedStudentList () {
         selected_provisional_grade_id: null
       }
     ]
-  };
+  }
 }
 
-QUnit.module('ModeratedStudentList');
+QUnit.module('ModeratedStudentList')
 
-test('renders provisional scores i18ned', function () {
-  const newFakeStudentList = fakeStudentList();
-  const firstStudent = newFakeStudentList.students[0];
-  firstStudent.in_moderation_set = true;
-  firstStudent.provisional_grades[0].score = 4000.1;
+test('renders provisional scores i18ned', function() {
+  const newFakeStudentList = fakeStudentList()
+  const firstStudent = newFakeStudentList.students[0]
+  firstStudent.in_moderation_set = true
+  firstStudent.provisional_grades[0].score = 4000.1
   const props = {
     urls: {
       assignment_speedgrader_url: 'speedgraderUrl'
@@ -81,22 +81,26 @@ test('renders provisional scores i18ned', function () {
     },
     handleCheckbox: this.stub(),
     onSelectProvisionalGrade: this.stub()
-  };
+  }
 
-  const wrapper = mount(<table><ModeratedStudentList {...props} /></table>);
-  const moderatedColumns = wrapper.find('.ModeratedAssignmentList__Mark');
+  const wrapper = mount(
+    <table>
+      <ModeratedStudentList {...props} />
+    </table>
+  )
+  const moderatedColumns = wrapper.find('.ModeratedAssignmentList__Mark')
 
-  equal(moderatedColumns.at(0).text(), '4,000.1');
+  equal(moderatedColumns.at(0).text(), '4,000.1')
 
-  wrapper.unmount();
-});
+  wrapper.unmount()
+})
 
-test('renders final scores i18ned', function () {
-  const newFakeStudentList = fakeStudentList();
-  const firstStudent = newFakeStudentList.students[0];
-  firstStudent.in_moderation_set = true;
-  firstStudent.provisional_grades[0].score = 4000.1;
-  firstStudent.provisional_grades[0].final = true;
+test('renders final scores i18ned', function() {
+  const newFakeStudentList = fakeStudentList()
+  const firstStudent = newFakeStudentList.students[0]
+  firstStudent.in_moderation_set = true
+  firstStudent.provisional_grades[0].score = 4000.1
+  firstStudent.provisional_grades[0].final = true
   const props = {
     urls: {
       assignment_speedgrader_url: 'speedgraderUrl'
@@ -109,19 +113,23 @@ test('renders final scores i18ned', function () {
     },
     handleCheckbox: () => {},
     onSelectProvisionalGrade: () => {}
-  };
+  }
 
-  const wrapper = mount(<table><ModeratedStudentList {...props} /></table>);
-  const gradeColumns = wrapper.find('.AssignmentList_Grade');
+  const wrapper = mount(
+    <table>
+      <ModeratedStudentList {...props} />
+    </table>
+  )
+  const gradeColumns = wrapper.find('.AssignmentList_Grade')
 
-  equal(gradeColumns.at(0).text(), '4,000.1');
+  equal(gradeColumns.at(0).text(), '4,000.1')
 
-  wrapper.unmount();
-});
+  wrapper.unmount()
+})
 
-test('only shows the next speedgrader link when in moderation set', function () {
-  const newFakeStudentList = fakeStudentList();
-  newFakeStudentList.students[0].in_moderation_set = true;
+test('only shows the next speedgrader link when in moderation set', function() {
+  const newFakeStudentList = fakeStudentList()
+  newFakeStudentList.students[0].in_moderation_set = true
   const props = {
     urls: {
       assignment_speedgrader_url: 'speedgraderUrl'
@@ -134,21 +142,25 @@ test('only shows the next speedgrader link when in moderation set', function () 
     },
     handleCheckbox: () => {},
     onSelectProvisionalGrade: () => {}
-  };
+  }
 
-  const wrapper = mount(<table><ModeratedStudentList {...props} /></table>);
-  const moderatedColumns = wrapper.find('.ModeratedAssignmentList__Mark');
-  const columns = wrapper.find('.AssignmentList__Mark');
+  const wrapper = mount(
+    <table>
+      <ModeratedStudentList {...props} />
+    </table>
+  )
+  const moderatedColumns = wrapper.find('.ModeratedAssignmentList__Mark')
+  const columns = wrapper.find('.AssignmentList__Mark')
 
-  equal(moderatedColumns.at(0).text(), '4', 'displays the grade in the first column');
-  equal(moderatedColumns.at(1).text(), 'SpeedGrader™', 'displays speedgrader link in the second');
-  equal(columns.at(0).text(), '-', 'third column is a dash');
+  equal(moderatedColumns.at(0).text(), '4', 'displays the grade in the first column')
+  equal(moderatedColumns.at(1).text(), 'SpeedGrader™', 'displays speedgrader link in the second')
+  equal(columns.at(0).text(), '-', 'third column is a dash')
 
-  wrapper.unmount();
-});
+  wrapper.unmount()
+})
 
-test('show a dash in in the first column when not in the moderation set', function () {
-  const newFakeStudentList = fakeStudentList();
+test('show a dash in in the first column when not in the moderation set', function() {
+  const newFakeStudentList = fakeStudentList()
   const props = {
     urls: {
       assignment_speedgrader_url: 'speedgraderUrl'
@@ -161,17 +173,21 @@ test('show a dash in in the first column when not in the moderation set', functi
     },
     handleCheckbox: () => {},
     onSelectProvisionalGrade: () => {}
-  };
+  }
 
-  const wrapper = mount(<table><ModeratedStudentList {...props} /></table>);
-  const columns = wrapper.find('.AssignmentList__Mark');
+  const wrapper = mount(
+    <table>
+      <ModeratedStudentList {...props} />
+    </table>
+  )
+  const columns = wrapper.find('.AssignmentList__Mark')
 
-  equal(columns.at(0).text(), '-', 'shows a dash for non moderation set students');
+  equal(columns.at(0).text(), '-', 'shows a dash for non moderation set students')
 
-  wrapper.unmount();
-});
+  wrapper.unmount()
+})
 
-test('only shows one column when includeModerationSetHeaders is false', function () {
+test('only shows one column when includeModerationSetHeaders is false', function() {
   const props = {
     urls: {
       assignment_speedgrader_url: 'speedgraderUrl'
@@ -184,21 +200,25 @@ test('only shows one column when includeModerationSetHeaders is false', function
     },
     handleCheckbox: () => {},
     onSelectProvisionalGrade: () => {}
-  };
+  }
 
-  const wrapper = mount(<table><ModeratedStudentList {...props} /></table>);
-  const columns = wrapper.find('.AssignmentList__Mark');
-  const moderatedColumns = wrapper.find('.ModeratedAssignmentList__Mark');
+  const wrapper = mount(
+    <table>
+      <ModeratedStudentList {...props} />
+    </table>
+  )
+  const columns = wrapper.find('.AssignmentList__Mark')
+  const moderatedColumns = wrapper.find('.ModeratedAssignmentList__Mark')
 
-  equal(columns.length, 1, 'only show one column');
-  equal(moderatedColumns.length, 0, 'no moderated columns shown');
+  equal(columns.length, 1, 'only show one column')
+  equal(moderatedColumns.length, 0, 'no moderated columns shown')
 
-  wrapper.unmount();
-});
+  wrapper.unmount()
+})
 
-test('shows the grade column when there is a selected_provisional_grade_id', function () {
-  const newFakeStudentList = fakeStudentList();
-  newFakeStudentList.students[0].selected_provisional_grade_id = 10;
+test('shows the grade column when there is a selected_provisional_grade_id', function() {
+  const newFakeStudentList = fakeStudentList()
+  newFakeStudentList.students[0].selected_provisional_grade_id = 10
   const props = {
     urls: {
       assignment_speedgrader_url: 'speedgraderUrl'
@@ -211,18 +231,22 @@ test('shows the grade column when there is a selected_provisional_grade_id', fun
     },
     handleCheckbox: () => {},
     onSelectProvisionalGrade: () => {}
-  };
+  }
 
-  const wrapper = mount(<table><ModeratedStudentList {...props} /></table>);
-  const gradeColumns = wrapper.find('.AssignmentList_Grade');
+  const wrapper = mount(
+    <table>
+      <ModeratedStudentList {...props} />
+    </table>
+  )
+  const gradeColumns = wrapper.find('.AssignmentList_Grade')
 
-  equal(gradeColumns.at(0).text(), '4');
+  equal(gradeColumns.at(0).text(), '4')
 
-  wrapper.unmount();
-});
+  wrapper.unmount()
+})
 
-test('properly renders final grade if there are no provisional grades', function () {
-  const newFakeStudentList = fakeUngradedStudentList();
+test('properly renders final grade if there are no provisional grades', function() {
+  const newFakeStudentList = fakeUngradedStudentList()
   const props = {
     urls: {
       assignment_speedgrader_url: 'speedgraderUrl'
@@ -235,18 +259,22 @@ test('properly renders final grade if there are no provisional grades', function
     },
     handleCheckbox: () => {},
     onSelectProvisionalGrade: () => {}
-  };
+  }
 
-  const wrapper = mount(<table><ModeratedStudentList {...props} /></table>);
-  const gradeColumns = wrapper.find('.AssignmentList_Grade');
+  const wrapper = mount(
+    <table>
+      <ModeratedStudentList {...props} />
+    </table>
+  )
+  const gradeColumns = wrapper.find('.AssignmentList_Grade')
 
-  equal(gradeColumns.at(0).text(), '-', 'grade column is a dash');
+  equal(gradeColumns.at(0).text(), '-', 'grade column is a dash')
 
-  wrapper.unmount();
-});
+  wrapper.unmount()
+})
 
-test('does not show radio button if there is only one provisional grade', function () {
-  const newFakeStudentList = fakeStudentList();
+test('does not show radio button if there is only one provisional grade', function() {
+  const newFakeStudentList = fakeStudentList()
   const props = {
     urls: {
       assignment_speedgrader_url: 'speedgraderUrl'
@@ -259,18 +287,22 @@ test('does not show radio button if there is only one provisional grade', functi
     },
     handleCheckbox: () => {},
     onSelectProvisionalGrade: () => {}
-  };
+  }
 
-  const wrapper = mount(<table><ModeratedStudentList {...props} /></table>);
-  const radioInputs = wrapper.find('input[type="radio"]');
+  const wrapper = mount(
+    <table>
+      <ModeratedStudentList {...props} />
+    </table>
+  )
+  const radioInputs = wrapper.find('input[type="radio"]')
 
-  equal(radioInputs.length, 0, 'does not render any radio buttons');
+  equal(radioInputs.length, 0, 'does not render any radio buttons')
 
-  wrapper.unmount();
-});
+  wrapper.unmount()
+})
 
-test('shows radio button if there is more than 1 provisional grade', function () {
-  const newFakeStudentList = fakeStudentList();
+test('shows radio button if there is more than 1 provisional grade', function() {
+  const newFakeStudentList = fakeStudentList()
   newFakeStudentList.students[0].provisional_grades.push({
     grade: '4',
     score: 4,
@@ -280,7 +312,7 @@ test('shows radio button if there is more than 1 provisional grade', function ()
     provisional_grade_id: '11',
     grade_matches_current_submission: true,
     speedgrader_url: 'speedgraderUrl'
-  });
+  })
 
   const props = {
     urls: {
@@ -294,20 +326,24 @@ test('shows radio button if there is more than 1 provisional grade', function ()
     },
     handleCheckbox: () => {},
     onSelectProvisionalGrade: () => {}
-  };
+  }
 
-  const wrapper = mount(<table><ModeratedStudentList {...props} /></table>);
-  const radioInputs = wrapper.find('input[type="radio"]');
+  const wrapper = mount(
+    <table>
+      <ModeratedStudentList {...props} />
+    </table>
+  )
+  const radioInputs = wrapper.find('input[type="radio"]')
 
-  equal(radioInputs.length, 2, 'renders two radio buttons');
+  equal(radioInputs.length, 2, 'renders two radio buttons')
 
-  wrapper.unmount();
-});
+  wrapper.unmount()
+})
 
-QUnit.module('Persist provisional grades');
+QUnit.module('Persist provisional grades')
 
-test('selecting provisional grade triggers handleSelectProvisionalGrade handler', function () {
-  const newFakeStudentList = fakeStudentList();
+test('selecting provisional grade triggers handleSelectProvisionalGrade handler', function() {
+  const newFakeStudentList = fakeStudentList()
   newFakeStudentList.students[0].provisional_grades.push({
     grade: '4',
     score: 4,
@@ -317,9 +353,9 @@ test('selecting provisional grade triggers handleSelectProvisionalGrade handler'
     provisional_grade_id: '11',
     grade_matches_current_submission: true,
     speedgrader_url: 'speedgraderUrl'
-  });
-  newFakeStudentList.students[0].in_moderation_set = true;
-  const callback = this.spy();
+  })
+  newFakeStudentList.students[0].in_moderation_set = true
+  const callback = this.spy()
   const props = {
     onSelectProvisionalGrade: callback,
     urls: {
@@ -332,14 +368,18 @@ test('selecting provisional grade triggers handleSelectProvisionalGrade handler'
       course_id: '1'
     },
     handleCheckbox: () => {}
-  };
+  }
 
-  const wrapper = mount(<table><ModeratedStudentList {...props} /></table>);
-  const radioInputs = wrapper.find('input[type="radio"]');
+  const wrapper = mount(
+    <table>
+      <ModeratedStudentList {...props} />
+    </table>
+  )
+  const radioInputs = wrapper.find('input[type="radio"]')
 
-  radioInputs.at(0).simulate('change');
+  radioInputs.at(0).simulate('change')
 
-  ok(callback.called, 'called selectProvisionalGrade');
+  ok(callback.called, 'called selectProvisionalGrade')
 
-  wrapper.unmount();
-});
+  wrapper.unmount()
+})

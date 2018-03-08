@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { mount } from 'enzyme';
-import ModeratedColumnHeader from 'jsx/assignments/ModeratedColumnHeader';
-import Constants from 'jsx/assignments/constants';
+import React from 'react'
+import {mount} from 'enzyme'
+import ModeratedColumnHeader from 'jsx/assignments/ModeratedColumnHeader'
+import Constants from 'jsx/assignments/constants'
 
 QUnit.module('ModeratedColumnHeader', {
-  setup () {
+  setup() {
     this.props = {
       markColumn: Constants.markColumnNames.MARK_ONE,
       currentSortDirection: Constants.sortDirections.DESCENDING,
@@ -34,149 +34,206 @@ QUnit.module('ModeratedColumnHeader', {
       permissions: {
         viewGrades: true
       }
-    };
+    }
   }
-});
+})
 
-test('calls the handleSortMark1 function when mark1 sort is pressed', function () {
-  const callback = this.spy();
+test('calls the handleSortMark1 function when mark1 sort is pressed', function() {
+  const callback = this.spy()
 
-  this.props.handleSortMark1 = callback;
-  this.props.includeModerationSetHeaders = false;
+  this.props.handleSortMark1 = callback
+  this.props.includeModerationSetHeaders = false
 
-  const wrapper = mount(<table><ModeratedColumnHeader {...this.props} /></table>);
-  wrapper.find('a').at(0).simulate('click');
+  const wrapper = mount(
+    <table>
+      <ModeratedColumnHeader {...this.props} />
+    </table>
+  )
+  wrapper
+    .find('a')
+    .at(0)
+    .simulate('click')
 
-  ok(callback.called);
+  ok(callback.called)
 
-  wrapper.unmount();
-});
+  wrapper.unmount()
+})
 
-test('calls the handleSortMark2 function when mark2 sort is pressed', function () {
-  const callback = this.spy();
+test('calls the handleSortMark2 function when mark2 sort is pressed', function() {
+  const callback = this.spy()
 
-  this.props.markColumn = Constants.markColumnNames.MARK_TWO;
-  this.props.handleSortMark2 = callback;
+  this.props.markColumn = Constants.markColumnNames.MARK_TWO
+  this.props.handleSortMark2 = callback
 
-  const wrapper = mount(<table><ModeratedColumnHeader {...this.props} /></table>);
-  wrapper.find('a').at(1).simulate('click');
+  const wrapper = mount(
+    <table>
+      <ModeratedColumnHeader {...this.props} />
+    </table>
+  )
+  wrapper
+    .find('a')
+    .at(1)
+    .simulate('click')
 
-  ok(callback.called);
+  ok(callback.called)
 
-  wrapper.unmount();
-});
+  wrapper.unmount()
+})
 
-test('calls the handleSortMark3 function when mark3 sort is pressed', function () {
-  const callback = this.spy();
+test('calls the handleSortMark3 function when mark3 sort is pressed', function() {
+  const callback = this.spy()
 
-  this.props.markColumn = Constants.markColumnNames.MARK_THREE;
-  this.props.currentSortDirection = Constants.sortDirections.DESCENDING;
-  this.props.handleSortMark3 = callback;
+  this.props.markColumn = Constants.markColumnNames.MARK_THREE
+  this.props.currentSortDirection = Constants.sortDirections.DESCENDING
+  this.props.handleSortMark3 = callback
 
-  const wrapper = mount(<table><ModeratedColumnHeader {...this.props} /></table>);
-  wrapper.find('a').at(2).simulate('click');
+  const wrapper = mount(
+    <table>
+      <ModeratedColumnHeader {...this.props} />
+    </table>
+  )
+  wrapper
+    .find('a')
+    .at(2)
+    .simulate('click')
 
-  ok(callback.called);
+  ok(callback.called)
 
-  wrapper.unmount();
-});
+  wrapper.unmount()
+})
 
-test('calls the handleSelectAll function when the select all checkbox is checked', function () {
-  const callback = this.spy();
+test('calls the handleSelectAll function when the select all checkbox is checked', function() {
+  const callback = this.spy()
 
-  this.props.handleSelectAll = callback;
-  const wrapper = mount(<table><ModeratedColumnHeader {...this.props} /></table>);
-  wrapper.find('input[type="checkbox"]').simulate('change');
+  this.props.handleSelectAll = callback
+  const wrapper = mount(
+    <table>
+      <ModeratedColumnHeader {...this.props} />
+    </table>
+  )
+  wrapper.find('input[type="checkbox"]').simulate('change')
 
-  ok(callback.called);
+  ok(callback.called)
 
-  wrapper.unmount();
-});
+  wrapper.unmount()
+})
 
-test('displays down arrow when sort direction is DESCENDING', function () {
-  this.props.markColumn = Constants.markColumnNames.MARK_ONE;
-  this.props.sortDirection = Constants.sortDirections.DESCENDING;
-  this.props.includeModerationSetHeaders = false;
+test('displays down arrow when sort direction is DESCENDING', function() {
+  this.props.markColumn = Constants.markColumnNames.MARK_ONE
+  this.props.sortDirection = Constants.sortDirections.DESCENDING
+  this.props.includeModerationSetHeaders = false
 
-  const wrapper = mount(<table><ModeratedColumnHeader {...this.props} /></table>);
-  const downArrowIcon = wrapper.find('.icon-mini-arrow-down');
-  ok(downArrowIcon, 'finds the down arrow');
+  const wrapper = mount(
+    <table>
+      <ModeratedColumnHeader {...this.props} />
+    </table>
+  )
+  const downArrowIcon = wrapper.find('.icon-mini-arrow-down')
+  ok(downArrowIcon, 'finds the down arrow')
 
-  wrapper.unmount();
-});
+  wrapper.unmount()
+})
 
-test('displays up arrow when sort direction is ASCENDING', function () {
-  this.props.markColumn = Constants.markColumnNames.MARK_ONE;
-  this.props.sortDirection = Constants.sortDirections.ASCENDING;
-  this.props.includeModerationSetHeaders = false;
+test('displays up arrow when sort direction is ASCENDING', function() {
+  this.props.markColumn = Constants.markColumnNames.MARK_ONE
+  this.props.sortDirection = Constants.sortDirections.ASCENDING
+  this.props.includeModerationSetHeaders = false
 
-  const wrapper = mount(<table><ModeratedColumnHeader {...this.props} /></table>);
-  const upArrowIcon = wrapper.find('.icon-mini-arrow-up');
+  const wrapper = mount(
+    <table>
+      <ModeratedColumnHeader {...this.props} />
+    </table>
+  )
+  const upArrowIcon = wrapper.find('.icon-mini-arrow-up')
 
-  ok(upArrowIcon, 'finds the up arrow');
+  ok(upArrowIcon, 'finds the up arrow')
 
-  wrapper.unmount();
-});
+  wrapper.unmount()
+})
 
-test('only shows two columns when includeModerationSetHeaders is false', function () {
-  this.props.includeModerationSetHeaders = false;
+test('only shows two columns when includeModerationSetHeaders is false', function() {
+  this.props.includeModerationSetHeaders = false
 
-  const wrapper = mount(<table><ModeratedColumnHeader {...this.props} /></table>);
-  const headers = wrapper.find('.ColumnHeader__Item');
+  const wrapper = mount(
+    <table>
+      <ModeratedColumnHeader {...this.props} />
+    </table>
+  )
+  const headers = wrapper.find('.ColumnHeader__Item')
 
-  equal(headers.length, 2, 'only shows two header columns');
+  equal(headers.length, 2, 'only shows two header columns')
 
-  wrapper.unmount();
-});
+  wrapper.unmount()
+})
 
-test('only shows all columns when includeModerationSetHeaders is true', function () {
-  const wrapper = mount(<table><ModeratedColumnHeader {...this.props} /></table>);
-  const headers = wrapper.find('.ColumnHeader__Item');
+test('only shows all columns when includeModerationSetHeaders is true', function() {
+  const wrapper = mount(
+    <table>
+      <ModeratedColumnHeader {...this.props} />
+    </table>
+  )
+  const headers = wrapper.find('.ColumnHeader__Item')
 
-  equal(headers.length, 5, 'show all headers when true');
+  equal(headers.length, 5, 'show all headers when true')
 
-  wrapper.unmount();
-});
+  wrapper.unmount()
+})
 
-test('includes the checkbox if the user has permission to view grades', function () {
-  const wrapper = mount(<table><ModeratedColumnHeader {...this.props} /></table>);
-  const checkboxes = wrapper.find('input[type="checkbox"]');
+test('includes the checkbox if the user has permission to view grades', function() {
+  const wrapper = mount(
+    <table>
+      <ModeratedColumnHeader {...this.props} />
+    </table>
+  )
+  const checkboxes = wrapper.find('input[type="checkbox"]')
 
-  equal(checkboxes.length, 1);
+  equal(checkboxes.length, 1)
 
-  wrapper.unmount();
-});
+  wrapper.unmount()
+})
 
-test('does not include the checkbox if the user does not have permission to view grades', function () {
-  this.props.permissions.viewGrades = false;
+test('does not include the checkbox if the user does not have permission to view grades', function() {
+  this.props.permissions.viewGrades = false
 
-  const wrapper = mount(<table><ModeratedColumnHeader {...this.props} /></table>);
-  const checkboxes = wrapper.find('input[type="checkbox"]');
+  const wrapper = mount(
+    <table>
+      <ModeratedColumnHeader {...this.props} />
+    </table>
+  )
+  const checkboxes = wrapper.find('input[type="checkbox"]')
 
-  equal(checkboxes.length, 0);
+  equal(checkboxes.length, 0)
 
-  wrapper.unmount();
-});
+  wrapper.unmount()
+})
 
-test('includes the checkbox if the user has permission to view grades without moderation set headers', function () {
-  this.props.includeModerationSetHeaders = false;
+test('includes the checkbox if the user has permission to view grades without moderation set headers', function() {
+  this.props.includeModerationSetHeaders = false
 
-  const wrapper = mount(<table><ModeratedColumnHeader {...this.props} /></table>);
-  const checkboxes = wrapper.find('input[type="checkbox"]');
+  const wrapper = mount(
+    <table>
+      <ModeratedColumnHeader {...this.props} />
+    </table>
+  )
+  const checkboxes = wrapper.find('input[type="checkbox"]')
 
-  equal(checkboxes.length, 1);
+  equal(checkboxes.length, 1)
 
-  wrapper.unmount();
-});
+  wrapper.unmount()
+})
 
-test('does not include the checkbox if the user does not have permission to view grades without moderation set headers', function () {
-  this.props.permissions.viewGrades = false;
-  this.props.includeModerationSetHeaders = false;
+test('does not include the checkbox if the user does not have permission to view grades without moderation set headers', function() {
+  this.props.permissions.viewGrades = false
+  this.props.includeModerationSetHeaders = false
 
-  const wrapper = mount(<table><ModeratedColumnHeader {...this.props} /></table>);
-  const checkboxes = wrapper.find('input[type="checkbox"]');
+  const wrapper = mount(
+    <table>
+      <ModeratedColumnHeader {...this.props} />
+    </table>
+  )
+  const checkboxes = wrapper.find('input[type="checkbox"]')
 
-  equal(checkboxes.length, 0);
+  equal(checkboxes.length, 0)
 
-  wrapper.unmount();
-});
+  wrapper.unmount()
+})

@@ -27,7 +27,7 @@ $(() => {
   const $registration_form = $('#registration_confirmation_form')
   const $disambiguation_box = $('.disambiguation_box')
 
-  function showPane (paneToShow) {
+  function showPane(paneToShow) {
     $.each([$disambiguation_box, $registration_form, $where_to_log_in], (i, $pane) =>
       $pane.showIf($pane.is(paneToShow))
     )
@@ -37,7 +37,7 @@ $(() => {
 
   $('.btn#register').click(preventDefault(() => showPane($registration_form)))
 
-  const $merge_link = $('.btn#merge').click((event) => {
+  const $merge_link = $('.btn#merge').click(event => {
     if ($merge_link.attr('href') === 'new_user_account') {
       showPane($registration_form)
       event.preventDefault()
@@ -55,16 +55,19 @@ $(() => {
       window.location = $merge_link.attr('href')
     })
 
-    $merge_link.click((event) => {
+    $merge_link.click(event => {
       event.preventDefault()
       showPane($where_to_log_in)
     })
   }
 
-  $registration_form.find(':text:first').focus().select()
+  $registration_form
+    .find(':text:first')
+    .focus()
+    .select()
   $registration_form.formSubmit({
     disableWhileLoading: 'spin_on_success',
     errorFormatter: registrationErrors,
-    success: data => location.href = (data.url || '/')
+    success: data => (location.href = data.url || '/')
   })
 })

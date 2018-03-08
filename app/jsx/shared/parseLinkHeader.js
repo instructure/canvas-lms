@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default function (linkHeader) {
-    if (!linkHeader) {
-      return []
-    }
-    var retVal = {}
-    linkHeader.split(',').map((partOfHeader) => partOfHeader.split('; '))
-    .forEach(function (link) {
+export default function(linkHeader) {
+  if (!linkHeader) {
+    return []
+  }
+  var retVal = {}
+  linkHeader
+    .split(',')
+    .map(partOfHeader => partOfHeader.split('; '))
+    .forEach(function(link) {
       var myUrl = link[0].substring(1, link[0].length - 1)
       var urlRel = link[1].split('=')
       urlRel = urlRel[1]
@@ -30,5 +32,5 @@ export default function (linkHeader) {
 
       retVal[urlRel] = myUrl
     })
-    return retVal
-  }
+  return retVal
+}

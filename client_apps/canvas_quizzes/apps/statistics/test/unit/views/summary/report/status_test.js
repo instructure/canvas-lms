@@ -17,15 +17,15 @@
  */
 
 define(function(require) {
-  var Subject = require('jsx!views/summary/report/status');
-  var $ = require('jquery');
+  var Subject = require('jsx!views/summary/report/status')
+  var $ = require('jquery')
 
   describe('Views.Summary.Report.Status', function() {
     this.reactSuite({
       type: Subject
-    });
+    })
 
-    it('should render', function() {});
+    it('should render', function() {})
 
     describe('when not yet generated', function() {
       it('should read a message', function() {
@@ -33,11 +33,11 @@ define(function(require) {
           generatable: true,
           file: {},
           progress: {}
-        });
+        })
 
-        expect(subject.getDOMNode().innerText).toMatch('never been generated');
-      });
-    });
+        expect(subject.getDOMNode().innerText).toMatch('never been generated')
+      })
+    })
 
     describe('when generating', function() {
       it('should show a progress bar', function() {
@@ -45,33 +45,33 @@ define(function(require) {
           generatable: true,
           isGenerating: true,
           progress: {
-            completion: 0,
+            completion: 0
           }
-        });
+        })
 
-        expect('.progress').toExist();
-      });
+        expect('.progress').toExist()
+      })
 
       it('should fill up the progress bar', function() {
         setProps({
           generatable: true,
           isGenerating: true,
           progress: {
-            completion: 0,
+            completion: 0
           }
-        });
+        })
 
-        expect(find('.progress .bar').style.width).toBe('0%');
+        expect(find('.progress .bar').style.width).toBe('0%')
 
         setProps({
           progress: {
             completion: 25
           }
-        });
+        })
 
-        expect(find('.progress .bar').style.width).toBe('25%');
-      });
-    });
+        expect(find('.progress .bar').style.width).toBe('25%')
+      })
+    })
 
     describe('when generated', function() {
       it('should read the time of generation', function() {
@@ -82,10 +82,10 @@ define(function(require) {
             createdAt: new Date(2013, 6, 18)
           },
           progress: {}
-        });
+        })
 
-        expect(subject.getDOMNode().innerText).toMatch('Generated: .* 2013');
-      });
-    });
-  });
-});
+        expect(subject.getDOMNode().innerText).toMatch('Generated: .* 2013')
+      })
+    })
+  })
+})

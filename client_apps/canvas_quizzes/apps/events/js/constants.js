@@ -27,32 +27,13 @@ define({
   EVT_FLAG_WARNING: 'warning',
   EVT_FLAG_OK: 'ok',
 
-  EVENT_ATTRS: [
-    'id',
-    'event_type',
-    'event_data',
-    'created_at',
-  ],
+  EVENT_ATTRS: ['id', 'event_type', 'event_data', 'created_at'],
 
-  EVENT_DATA_ATTRS: [
-    'quiz_question_id',
-    'answer'
-  ],
+  EVENT_DATA_ATTRS: ['quiz_question_id', 'answer'],
 
-  SUBMISSION_ATTRS: [
-    'id',
-    'started_at',
-    'attempt'
-  ],
+  SUBMISSION_ATTRS: ['id', 'started_at', 'attempt'],
 
-  QUESTION_ATTRS: [
-    'id',
-    'question_type',
-    'question_text',
-    'position',
-    'answers',
-    'matches'
-  ],
+  QUESTION_ATTRS: ['id', 'question_type', 'question_text', 'position', 'answers', 'matches'],
 
   Q_CALCULATED: 'calculated_question',
   Q_ESSAY: 'essay_question',
@@ -69,4 +50,4 @@ define({
   // Answer text longer than this will be truncated for questions of types
   // "essay" and other free-form input ones. This applies to the table view.
   MAX_VISIBLE_CHARS: 50
-});
+})

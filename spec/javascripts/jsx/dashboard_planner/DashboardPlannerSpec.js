@@ -19,9 +19,9 @@ import {sharedDashboardInstance} from 'jsx/dashboardPlannerHelper'
 
 QUnit.module('Dashboard Tests for Student Planner')
 
-test('Planner helper inits properly', function () {
+test('Planner helper inits properly', function() {
   const spy = sinon.spy()
-  sharedDashboardInstance.init(spy);
+  sharedDashboardInstance.init(spy)
   sharedDashboardInstance.changeToCardView()
   ok(spy.calledOnce)
 })

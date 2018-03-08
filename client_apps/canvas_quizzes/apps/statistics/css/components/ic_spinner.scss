@@ -43,8 +43,8 @@
   }
 
   .rect3 {
-    -webkit-animation-delay: -1.0s;
-    animation-delay: -1.0s;
+    -webkit-animation-delay: -1s;
+    animation-delay: -1s;
   }
 
   .rect4 {
@@ -59,24 +59,28 @@
 }
 
 @-webkit-keyframes ic-Spinner__stretchdelay {
-  0%, 40%, 100% {
+  0%,
+  40%,
+  100% {
     -webkit-transform: scaleY(0.4);
-            transform: scaleY(0.4);
+    transform: scaleY(0.4);
   }
   20% {
-    -webkit-transform: scaleY(1.0);
-            transform: scaleY(1.0);
+    -webkit-transform: scaleY(1);
+    transform: scaleY(1);
   }
 }
 
 @keyframes ic-Spinner__stretchdelay {
-  0%, 40%, 100% {
+  0%,
+  40%,
+  100% {
     -webkit-transform: scaleY(0.4);
-            transform: scaleY(0.4);
+    transform: scaleY(0.4);
   }
 
   20% {
-    -webkit-transform: scaleY(1.0);
-            transform: scaleY(1.0);
+    -webkit-transform: scaleY(1);
+    transform: scaleY(1);
   }
 }

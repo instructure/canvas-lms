@@ -22,105 +22,114 @@ import 'compiled/jquery/ModuleSequenceFooter'
 import MarkAsDone from 'compiled/util/markAsDone'
 import ToolLaunchResizer from './lti/tool_launch_resizer'
 
-var $toolForm = $("#tool_form")
+var $toolForm = $('#tool_form')
 
-var launchToolManually = function(){
-  var $button = $toolForm.find('button');
+var launchToolManually = function() {
+  var $button = $toolForm.find('button')
 
-  $toolForm.show();
+  $toolForm.show()
 
   // Firefox remembers disabled state after page reloads
-  $button.attr('disabled', false);
+  $button.attr('disabled', false)
   setTimeout(function() {
     // LTI links have a time component in the signature and will
     // expire after a few minutes.
-    $button.attr('disabled', true).text($button.data('expired_message'));
-  }, 60 * 2.5 * 1000);
-
+    $button.attr('disabled', true).text($button.data('expired_message'))
+  }, 60 * 2.5 * 1000)
 
   $toolForm.submit(function() {
-    $(this).find(".load_tab,.tab_loaded").toggle();
-  });
+    $(this)
+      .find('.load_tab,.tab_loaded')
+      .toggle()
+  })
 }
 
-var launchToolInNewTab = function(){
-  $toolForm.attr('target', '_blank');
-  launchToolManually();
+var launchToolInNewTab = function() {
+  $toolForm.attr('target', '_blank')
+  launchToolManually()
 }
 
-switch($toolForm.data('tool-launch-type')){
+switch ($toolForm.data('tool-launch-type')) {
   case 'window':
-    $toolForm.show();
-    launchToolInNewTab();
-    break;
+    $toolForm.show()
+    launchToolInNewTab()
+    break
   case 'self':
     $toolForm.removeAttr('target')
     try {
-      $toolForm.submit();
-    } catch(e){}
-    break;
+      $toolForm.submit()
+    } catch (e) {}
+    break
   default:
     //Firefox throws an error when submitting insecure content
     try {
-      $toolForm.submit();
-    } catch(e){}
+      $toolForm.submit()
+    } catch (e) {}
 
-    $("#tool_content").bind("load", function(){
-      if(document.location.protocol !== "https:" || $("#tool_form")[0].action.indexOf("https:") > -1) {
-        $('#insecure_content_msg').hide();
-        $toolForm.hide();
+    $('#tool_content').bind('load', function() {
+      if (
+        document.location.protocol !== 'https:' ||
+        $('#tool_form')[0].action.indexOf('https:') > -1
+      ) {
+        $('#insecure_content_msg').hide()
+        $toolForm.hide()
       }
-    });
-    setTimeout(function(){
-      if($('#insecure_content_msg').is(":visible")){
+    })
+    setTimeout(function() {
+      if ($('#insecure_content_msg').is(':visible')) {
         $('#load_failure').show()
-        launchToolInNewTab();
+        launchToolInNewTab()
       }
-    }, 3 * 1000);
-    break;
+    }, 3 * 1000)
+    break
 }
 
 //Google analytics tracking code
-var toolName = $toolForm.data('tool-id') || "unknown";
-var toolPath = $toolForm.data('tool-path');
-var messageType = $toolForm.data('message-type') || 'tool_launch';
-$.trackEvent(messageType, toolName, toolPath);
+var toolName = $toolForm.data('tool-id') || 'unknown'
+var toolPath = $toolForm.data('tool-path')
+var messageType = $toolForm.data('message-type') || 'tool_launch'
+$.trackEvent(messageType, toolName, toolPath)
 
 //Iframe resize handler
-var $tool_content_wrapper;
-var min_tool_height, canvas_chrome_height;
+var $tool_content_wrapper
+var min_tool_height, canvas_chrome_height
 
 $(function() {
-  var $window = $(window);
-  $tool_content_wrapper = $('.tool_content_wrapper');
-  const toolResizer = new ToolLaunchResizer(min_tool_height);
+  var $window = $(window)
+  $tool_content_wrapper = $('.tool_content_wrapper')
+  const toolResizer = new ToolLaunchResizer(min_tool_height)
   const $tool_content = $('iframe#tool_content')
 
-  const $external_content_info_alerts = $tool_content_wrapper
-    .find('.before_external_content_info_alert, .after_external_content_info_alert');
+  const $external_content_info_alerts = $tool_content_wrapper.find(
+    '.before_external_content_info_alert, .after_external_content_info_alert'
+  )
 
   $external_content_info_alerts.on('focus', function(e) {
-    $tool_content_wrapper.find('iframe').css('border', '2px solid #008EE2');
-    $(this).removeClass('screenreader-only');
+    $tool_content_wrapper.find('iframe').css('border', '2px solid #008EE2')
+    $(this).removeClass('screenreader-only')
   })
 
   $external_content_info_alerts.on('blur', function(e) {
-    $tool_content_wrapper.find('iframe').css('border', 'none');
-    $(this).addClass('screenreader-only');
+    $tool_content_wrapper.find('iframe').css('border', 'none')
+    $(this).addClass('screenreader-only')
   })
 
-  if ( !$('body').hasClass('ic-full-screen-lti-tool') ) {
-    canvas_chrome_height = $tool_content_wrapper.offset().top + $('#footer').outerHeight(true);
+  if (!$('body').hasClass('ic-full-screen-lti-tool')) {
+    canvas_chrome_height = $tool_content_wrapper.offset().top + $('#footer').outerHeight(true)
   }
 
   // Only calculate height on resize if body does not have
   // .ic-full-screen-lti-tool class
-  if ( $tool_content_wrapper.length && !$('body').hasClass('ic-full-screen-lti-tool') ) {
-    $window.resize(function () {
-      if (!$tool_content_wrapper.data('height_overridden')) {
-        toolResizer.resize_tool_content_wrapper($window.height() - canvas_chrome_height - $('#sequence_footer').outerHeight(true));
-      }
-    }).triggerHandler('resize');
+  if ($tool_content_wrapper.length && !$('body').hasClass('ic-full-screen-lti-tool')) {
+    $window
+      .resize(function() {
+        if (!$tool_content_wrapper.data('height_overridden')) {
+          toolResizer.resize_tool_content_wrapper(
+            $window.height() - canvas_chrome_height - $('#sequence_footer').outerHeight(true)
+          )
+        }
+      })
+      .triggerHandler('resize')
   }
 
   if (ENV.LTI != null && ENV.LTI.SEQUENCE != null) {
@@ -128,69 +137,74 @@ $(function() {
       assetType: 'Lti',
       assetID: ENV.LTI.SEQUENCE.ASSET_ID,
       courseID: ENV.LTI.SEQUENCE.COURSE_ID
-    });
+    })
   }
 
-  $('#content').on('click', '#mark-as-done-checkbox', function () {
+  $('#content').on('click', '#mark-as-done-checkbox', function() {
     MarkAsDone.toggle(this)
   })
-});
+})
 
 window.addEventListener('message', function(e) {
   try {
-    var message = JSON.parse(e.data);
+    var message = JSON.parse(e.data)
     switch (message.subject) {
       case 'lti.frameResize':
-        const toolResizer = new ToolLaunchResizer();
-        var height = message.height;
-        if (height <= 0) height = 1;
+        const toolResizer = new ToolLaunchResizer()
+        var height = message.height
+        if (height <= 0) height = 1
 
-        const container = toolResizer.tool_content_wrapper(message.token || e.origin).data('height_overridden', true);
-        toolResizer.resize_tool_content_wrapper(height, container);
-        break;
+        const container = toolResizer
+          .tool_content_wrapper(message.token || e.origin)
+          .data('height_overridden', true)
+        toolResizer.resize_tool_content_wrapper(height, container)
+        break
 
       case 'lti.showModuleNavigation':
-        if(message.show === true || message.show === false){
-          $('.module-sequence-footer').toggle(message.show);
+        if (message.show === true || message.show === false) {
+          $('.module-sequence-footer').toggle(message.show)
         }
-        break;
+        break
 
       case 'lti.scrollToTop':
-        $('html,body').animate({
-           scrollTop: $('.tool_content_wrapper').offset().top
-         }, 'fast');
-        break;
+        $('html,body').animate(
+          {
+            scrollTop: $('.tool_content_wrapper').offset().top
+          },
+          'fast'
+        )
+        break
 
       case 'lti.setUnloadMessage':
-        setUnloadMessage(message.message);
-        break;
+        setUnloadMessage(message.message)
+        break
 
       case 'lti.removeUnloadMessage':
-        removeUnloadMessage();
-        break;
+        removeUnloadMessage()
+        break
 
       case 'lti.screenReaderAlert':
         $.screenReaderFlashMessageExclusive(message.body)
-        break;
+        break
     }
-  } catch(err) {
-    (console.error || console.log).call(console, 'invalid message received from');
+  } catch (err) {
+    ;(console.error || console.log).call(console, 'invalid message received from')
   }
-});
+})
 
-var beforeUnloadHandler;
+var beforeUnloadHandler
 function setUnloadMessage(msg) {
-  removeUnloadMessage();
+  removeUnloadMessage()
 
   beforeUnloadHandler = function(e) {
-    return (e.returnValue = msg || "");
+    return (e.returnValue = msg || '')
   }
-  window.addEventListener('beforeunload', beforeUnloadHandler);
+  window.addEventListener('beforeunload', beforeUnloadHandler)
 }
 
 function removeUnloadMessage() {
   if (beforeUnloadHandler) {
-    window.removeEventListener('beforeunload', beforeUnloadHandler);
-    beforeUnloadHandler = null;
+    window.removeEventListener('beforeunload', beforeUnloadHandler)
+    beforeUnloadHandler = null
   }
 }

@@ -19,7 +19,7 @@ import initializeExternalTools from 'tinymce_plugins/instructure_external_tools/
 import INST from 'INST'
 import Links from 'tinymce_plugins/instructure_links/links'
 
-export default function loadEventListeners (callbacks = {}) {
+export default function loadEventListeners(callbacks = {}) {
   const validCallbacks = [
     'equationCB',
     'linksCB',
@@ -29,18 +29,24 @@ export default function loadEventListeners (callbacks = {}) {
     'recordCB'
   ]
 
-  validCallbacks.forEach((cbName) => {
+  validCallbacks.forEach(cbName => {
     if (callbacks[cbName] === undefined) {
-      callbacks[cbName] = function () { /* no-op*/ }
+      callbacks[cbName] = function() {
+        /* no-op*/
+      }
     }
   })
 
   document.addEventListener('tinyRCE/initEquation', ({detail}) => {
-    require.ensure([], (require) => {
-      const EquationEditorView = require('compiled/views/tinymce/EquationEditorView')
-      const view = new EquationEditorView(detail.ed)
-      callbacks.equationCB(view)
-    }, 'initEquationAsyncChunk2')
+    require.ensure(
+      [],
+      require => {
+        const EquationEditorView = require('compiled/views/tinymce/EquationEditorView')
+        const view = new EquationEditorView(detail.ed)
+        callbacks.equationCB(view)
+      },
+      'initEquationAsyncChunk2'
+    )
   })
 
   document.addEventListener('tinyRCE/initLinks', ({detail}) => {
@@ -48,32 +54,44 @@ export default function loadEventListeners (callbacks = {}) {
     callbacks.linksCB()
   })
 
-  document.addEventListener('tinyRCE/initImagePicker', (e) => {
-    require.ensure([], (require) => {
-      const InsertUpdateImageView = require('compiled/views/tinymce/InsertUpdateImageView')
-      const view = new InsertUpdateImageView(e.detail.ed, e.detail.selectedNode)
-      callbacks.imagePickerCB(view)
-    }, 'initImagePickerAsyncChunk')
+  document.addEventListener('tinyRCE/initImagePicker', e => {
+    require.ensure(
+      [],
+      require => {
+        const InsertUpdateImageView = require('compiled/views/tinymce/InsertUpdateImageView')
+        const view = new InsertUpdateImageView(e.detail.ed, e.detail.selectedNode)
+        callbacks.imagePickerCB(view)
+      },
+      'initImagePickerAsyncChunk'
+    )
   })
 
-  document.addEventListener('tinyRCE/initEquella', (e) => {
-    require.ensure([], (require) => {
-      const initializeEquella = require('tinymce_plugins/instructure_equella/initializeEquella')
-      initializeEquella(e.detail.ed)
-      callbacks.equellaCB()
-    }, 'initEquellaAsyncChunk')
+  document.addEventListener('tinyRCE/initEquella', e => {
+    require.ensure(
+      [],
+      require => {
+        const initializeEquella = require('tinymce_plugins/instructure_equella/initializeEquella')
+        initializeEquella(e.detail.ed)
+        callbacks.equellaCB()
+      },
+      'initEquellaAsyncChunk'
+    )
   })
 
-  document.addEventListener('tinyRCE/initExternalTools', (e) => {
+  document.addEventListener('tinyRCE/initExternalTools', e => {
     initializeExternalTools.init(e.detail.ed, e.detail.url, INST)
     callbacks.externalToolCB()
   })
 
-  document.addEventListener('tinyRCE/initRecord', (e) => {
-    require.ensure([], (require) => {
-      const mediaEditorLoader = require('tinymce_plugins/instructure_record/mediaEditorLoader')
-      mediaEditorLoader.insertEditor(e.detail.ed)
-      callbacks.recordCB()
-    }, 'initRecordAsyncChunk')
+  document.addEventListener('tinyRCE/initRecord', e => {
+    require.ensure(
+      [],
+      require => {
+        const mediaEditorLoader = require('tinymce_plugins/instructure_record/mediaEditorLoader')
+        mediaEditorLoader.insertEditor(e.detail.ed)
+        callbacks.recordCB()
+      },
+      'initRecordAsyncChunk'
+    )
   })
 }

@@ -10,14 +10,19 @@
       "id": "1p0*******************MYS-kJYhmhvfw8",
       "etag": "\"XTBboRWlttiWhZ_feOHVV3sFYJs/MTQ1MjcyMTI4NDUwOA\"",
       "selfLink": "https://www.googleapis.com/drive/v2/files/1p0*******************MYS-kJYhmhvfw8",
-      "alternateLink": "https://docs.google.com/a/instructure.com/spreadsheets/d/1p0*******************MYS-kJYhmhvfw8/edit?usp=drivesdk",
-      "embedLink": "https://docs.google.com/a/instructure.com/spreadsheets/d/1p0*******************MYS-kJYhmhvfw8/htmlembed",
+      "alternateLink":
+        "https://docs.google.com/a/instructure.com/spreadsheets/d/1p0*******************MYS-kJYhmhvfw8/edit?usp=drivesdk",
+      "embedLink":
+        "https://docs.google.com/a/instructure.com/spreadsheets/d/1p0*******************MYS-kJYhmhvfw8/htmlembed",
       "openWithLinks": {
-        "1083656409722": "https://docs.google.com/a/instructure.com/spreadsheets/d/1p0*******************MYS-kJYhmhvfw8/edit?usp=drive_web"
+        "1083656409722":
+          "https://docs.google.com/a/instructure.com/spreadsheets/d/1p0*******************MYS-kJYhmhvfw8/edit?usp=drive_web"
       },
-      "defaultOpenWithLink": "https://docs.google.com/a/instructure.com/spreadsheets/d/1p0*******************MYS-kJYhmhvfw8/edit?usp=drive_web",
+      "defaultOpenWithLink":
+        "https://docs.google.com/a/instructure.com/spreadsheets/d/1p0*******************MYS-kJYhmhvfw8/edit?usp=drive_web",
       "iconLink": "https://ssl.gstatic.com/docs/doclist/images/icon_11_spreadsheet_list.png",
-      "thumbnailLink": "https://docs.google.com/a/instructure.com/feeds/vt?gd=true&id=1p0*******************MYS-kJYhmhvfw8&v=0&s=AMedNn****************MCMDEc&sz=s220",
+      "thumbnailLink":
+        "https://docs.google.com/a/instructure.com/feeds/vt?gd=true&id=1p0*******************MYS-kJYhmhvfw8&v=0&s=AMedNn****************MCMDEc&sz=s220",
       "title": "Top Secret Documents",
       "mimeType": "application/vnd.google-apps.spreadsheet",
       "labels": {
@@ -35,30 +40,35 @@
       "version": "459452",
       "parents": [],
       "exportLinks": {
-        "text/csv": "https://docs.google.com/spreadsheets/export?id=1p0*******************MYS-kJYhmhvfw8&exportFormat=csv",
-        "application/x-vnd.oasis.opendocument.spreadsheet": "https://docs.google.com/spreadsheets/export?id=1p0*******************MYS-kJYhmhvfw8&exportFormat=ods",
-        "application/zip": "https://docs.google.com/spreadsheets/export?id=1p0*******************MYS-kJYhmhvfw8&exportFormat=zip",
-        "application/pdf": "https://docs.google.com/spreadsheets/export?id=1p0*******************MYS-kJYhmhvfw8&exportFormat=pdf",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "https://docs.google.com/spreadsheets/export?id=1p0*******************MYS-kJYhmhvfw8&exportFormat=xlsx"
+        "text/csv":
+          "https://docs.google.com/spreadsheets/export?id=1p0*******************MYS-kJYhmhvfw8&exportFormat=csv",
+        "application/x-vnd.oasis.opendocument.spreadsheet":
+          "https://docs.google.com/spreadsheets/export?id=1p0*******************MYS-kJYhmhvfw8&exportFormat=ods",
+        "application/zip":
+          "https://docs.google.com/spreadsheets/export?id=1p0*******************MYS-kJYhmhvfw8&exportFormat=zip",
+        "application/pdf":
+          "https://docs.google.com/spreadsheets/export?id=1p0*******************MYS-kJYhmhvfw8&exportFormat=pdf",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+          "https://docs.google.com/spreadsheets/export?id=1p0*******************MYS-kJYhmhvfw8&exportFormat=xlsx"
       },
       "userPermission": {
         "kind": "drive#permission",
         "etag": "\"XTBboRWlttiWhZ_feOHVV3sFYJs/fAeh6NlrWb23aHSXwPR-vOdwE0o\"",
         "id": "me",
-        "selfLink": "https://www.googleapis.com/drive/v2/files/1p0*******************MYS-kJYhmhvfw8/permissions/me",
+        "selfLink":
+          "https://www.googleapis.com/drive/v2/files/1p0*******************MYS-kJYhmhvfw8/permissions/me",
         "role": "writer",
         "type": "user"
       },
       "quotaBytesUsed": "0",
-      "ownerNames": [
-        "Montgomery Montgomery"
-      ],
+      "ownerNames": ["Montgomery Montgomery"],
       "owners": [
         {
           "kind": "drive#user",
           "displayName": "Montgomery Montgomery",
           "picture": {
-            "url": "https://lh6.googleusercontent.com/-x0Cip_5Wrw0/AAAAAAAAAAI/AAAAAAAAAGM/**********/s64/photo.jpg"
+            "url":
+              "https://lh6.googleusercontent.com/-x0Cip_5Wrw0/AAAAAAAAAAI/AAAAAAAAAGM/**********/s64/photo.jpg"
           },
           "isAuthenticatedUser": false,
           "permissionId": "0024957*******0999547",
@@ -79,19 +89,20 @@
       "shared": true,
       "explicitlyTrashed": false,
       "appDataContents": false,
-      "spaces": [
-        "drive"
-      ]
+      "spaces": ["drive"]
     },
     {
       "kind": "drive#file",
       "id": "1p0*******************MYS-kJYhmhvfw9",
       "etag": "\"c-g_*******************Q4WBoXLp3Zv9s/MTQ*******************DYxNQ\"",
       "selfLink": "https://www.googleapis.com/drive/v2/files/0B8e2*******************JDdE0",
-      "webContentLink": "https://docs.google.com/a/instructure.com/uc?id=0B8e2e*******************E0&export=download",
-      "alternateLink": "https://drive.google.com/a/instructure.com/file/d/0B8e2C2*******************E0/view?usp=drivesdk",
+      "webContentLink":
+        "https://docs.google.com/a/instructure.com/uc?id=0B8e2e*******************E0&export=download",
+      "alternateLink":
+        "https://drive.google.com/a/instructure.com/file/d/0B8e2C2*******************E0/view?usp=drivesdk",
       "iconLink": "https://ssl.gstatic.com/docs/doclist/images/icon_***_image_list.png",
-      "thumbnailLink": "https://lh6.googleusercontent.com/fEDPMNasogAPKp1z_*******************1s89-OeQ=s220",
+      "thumbnailLink":
+        "https://lh6.googleusercontent.com/fEDPMNasogAPKp1z_*******************1s89-OeQ=s220",
       "title": "someImage.png",
       "mimeType": "image/png",
       "labels": {
@@ -108,12 +119,14 @@
       "markedViewedByMeDate": "1970-01-01T00:00:00.000Z",
       "version": "12705",
       "parents": [],
-      "downloadUrl": "https://doc-0k-2s-docs.googleusercontent.com/docs/securesc/gojlvk**********s&e=download&gd=true",
+      "downloadUrl":
+        "https://doc-0k-2s-docs.googleusercontent.com/docs/securesc/gojlvk**********s&e=download&gd=true",
       "userPermission": {
         "kind": "drive#permission",
         "etag": "\"c-g**********v9s/KCO*******************hk\"",
         "id": "me",
-        "selfLink": "https://www.googleapis.com/drive/v2/files/0B*******************JDdE0/permissions/me",
+        "selfLink":
+          "https://www.googleapis.com/drive/v2/files/0B*******************JDdE0/permissions/me",
         "role": "owner",
         "type": "user"
       },
@@ -122,15 +135,14 @@
       "md5Checksum": "68c**********108",
       "fileSize": "27489",
       "quotaBytesUsed": "27489",
-      "ownerNames": [
-        "Montgomery Montgomery"
-      ],
+      "ownerNames": ["Montgomery Montgomery"],
       "owners": [
         {
           "kind": "drive#user",
           "displayName": "Montgomery Montgomery",
           "picture": {
-            "url": "https://lh6.googleusercontent.com/-x0Cip_5Wrw0/AAAAAAAAAAI/AAAAAAAAAGM/**********/s64/photo.jpg"
+            "url":
+              "https://lh6.googleusercontent.com/-x0Cip_5Wrw0/AAAAAAAAAAI/AAAAAAAAAGM/**********/s64/photo.jpg"
           },
           "isAuthenticatedUser": false,
           "permissionId": "0024957*******0999547",
@@ -157,9 +169,7 @@
         "height": 358,
         "rotation": 0
       },
-      "spaces": [
-        "drive"
-      ]
+      "spaces": ["drive"]
     }
   ]
 }

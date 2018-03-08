@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { canvas } from '@instructure/ui-themes/lib'
+import {canvas} from '@instructure/ui-themes/lib'
 import './support/sinon/sinon-qunit-1.0.0'
 
 const fixturesDiv = document.createElement('div')
@@ -42,10 +42,11 @@ if (process.env.JSPEC_PATH) {
   }
 } else {
   // run specs for ember screenreader gradebook
-  requireAll(require.context('../../app/coffeescripts', !!'includeSubdirectories', /\.spec.coffee$/))
+  requireAll(
+    require.context('../../app/coffeescripts', !!'includeSubdirectories', /\.spec.coffee$/)
+  )
 
   requireAll(require.context('../coffeescripts', !!'includeSubdirectories', /Spec.coffee$/))
 
   requireAll(require.context('./jsx', !!'includeSubdirectories', /Spec$/))
-
 }

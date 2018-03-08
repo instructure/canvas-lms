@@ -1,5 +1,4 @@
-External Tools Introduction
-==============
+# External Tools Introduction
 
 Canvas, like many LMSs, supports loading external resources inline using the
 <a href="http://www.imsglobal.org/lti/">IMS LTI standard</a>.
@@ -23,71 +22,69 @@ Canvas currently supports the following types of tool extensions:
 
 [External tool assignments, with grades passed back from the tool to Canvas](assignment_tools.html):
 
-  This type of integration is part of the
-  [LTI 1.1 specification](http://www.imsglobal.org/LTI/v1p1/ltiIMGv1p1.html),
-  and is important in that it allows external services to take care of things
-  that can be graded automatically, or outside the LMS scope.
+This type of integration is part of the
+[LTI 1.1 specification](http://www.imsglobal.org/LTI/v1p1/ltiIMGv1p1.html),
+and is important in that it allows external services to take care of things
+that can be graded automatically, or outside the LMS scope.
 
-   Example use cases might include:
+Example use cases might include:
 
-  - Administering a timed, auto-graded coding project
-  - Evaluating a student's ability to correctly draw notes at different musical intervals
-  - Giving students credit for participating in an interactive lesson on the Civil War
+* Administering a timed, auto-graded coding project
+* Evaluating a student's ability to correctly draw notes at different musical intervals
+* Giving students credit for participating in an interactive lesson on the Civil War
 
 [Adding a link/tab to the course navigation](navigation_tools.html#course_navigation):
 
-  Example use cases might include:
+Example use cases might include:
 
-  - Building a specialized attendance/seating chart tool
-  - Adding an "ebooks" link with course required reading
-  - Connecting to study room scheduling tool
-  - Linking to campus communication hub
+* Building a specialized attendance/seating chart tool
+* Adding an "ebooks" link with course required reading
+* Connecting to study room scheduling tool
+* Linking to campus communication hub
 
 [Adding a link/tab to the account navigation](navigation_tools.html#account_navigation):
 
-  Example use cases might include:
+Example use cases might include:
 
-  - Including outside reports in the Canvas UI
-  - Building helper libraries for campus-specific customizations
-  - Leveraging single sign-on for access to other systems, like SIS
+* Including outside reports in the Canvas UI
+* Building helper libraries for campus-specific customizations
+* Leveraging single sign-on for access to other systems, like SIS
 
 [Adding a link/tab to the user profile navigation](navigation_tools.html#user_navigation):
 
-  Example use cases might include:
+Example use cases might include:
 
-  - Leveraging single sign-on to student portal from within Canvas
-  - Linking to an external user profile
+* Leveraging single sign-on to student portal from within Canvas
+* Linking to an external user profile
 
 [Selecting content to add to a variety of locations](content_item.html):
 
-  Example use cases might include:
+Example use cases might include:
 
-  - adding a button to embed content to the Rich Content Editor:
+* adding a button to embed content to the Rich Content Editor:
 
-   * Embedding resources from campus video/image repository
-   * Inserting custom-designed chemistry diagrams into quiz question text
-   * Building integrations with new or subject-area-specialized web authoring services
+- Embedding resources from campus video/image repository
+- Inserting custom-designed chemistry diagrams into quiz question text
+- Building integrations with new or subject-area-specialized web authoring services
 
-  - selecting links for modules or external tools
+* selecting links for modules or external tools
 
-   * Building and then linking to a remixed version of an online Physics textbook
-   * Selecting from a list of pre-built, interactive quizzes on blood vessels
-   * Choosing a specific chapter from an e-textbook to add to a module
+- Building and then linking to a remixed version of an online Physics textbook
+- Selecting from a list of pre-built, interactive quizzes on blood vessels
+- Choosing a specific chapter from an e-textbook to add to a module
 
-  - creating custom assignments for Canvas
+* creating custom assignments for Canvas
 
-   * Creating a Canvas assignment that launches the student to a custom assessment
+- Creating a Canvas assignment that launches the student to a custom assessment
   that can be automatically graded by the tool and synced with the Canvas Gradebook
-   * Launching the student to an assessment with interactive videos. Once complete,
+- Launching the student to an assessment with interactive videos. Once complete,
   the tool returns an LTI launch url that allows the teacher to see the submission
   without leaving Canvas.
 
-  - allowing a student to submit attachments to assignments
+* allowing a student to submit attachments to assignments
 
-   * A student launches a custom video recording tool and submits the recording to Canvas
-   * A student chooses an item from a portfolio tool and submits the item to Canvas
-
-
+- A student launches a custom video recording tool and submits the recording to Canvas
+- A student chooses an item from a portfolio tool and submits the item to Canvas
 
 ### How to Configure/Import Integrated Tools
 

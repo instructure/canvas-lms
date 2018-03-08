@@ -20,30 +20,28 @@ import React from 'react'
 import TestUtils from 'react-addons-test-utils'
 import ConfigurationForm from 'jsx/external_apps/components/ConfigurationForm'
 
-QUnit.module('ConfigurationForm#defaultState');
+QUnit.module('ConfigurationForm#defaultState')
 
 test('returns object where allow_membership_service_access is false', () => {
-  const component = TestUtils.renderIntoDocument (
-    <ConfigurationForm
-      handleSubmit={() => {}}
-      tool={{}}
-      configurationType='manual' />
-  );
-  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationForm);
-  equal(app.defaultState().allow_membership_service_access, false);
-});
+  const component = TestUtils.renderIntoDocument(
+    <ConfigurationForm handleSubmit={() => {}} tool={{}} configurationType="manual" />
+  )
+  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationForm)
+  equal(app.defaultState().allow_membership_service_access, false)
+})
 
-QUnit.module('ConfigurationForm#reset');
+QUnit.module('ConfigurationForm#reset')
 
 test('resets internal state of component', () => {
-  const component = TestUtils.renderIntoDocument (
+  const component = TestUtils.renderIntoDocument(
     <ConfigurationForm
       handleSubmit={() => {}}
       tool={{}}
-      configurationType='goofy'
-      showConfigurationSelector={true} />
-  );
-  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationForm);
+      configurationType="goofy"
+      showConfigurationSelector={true}
+    />
+  )
+  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationForm)
   app.reset()
   deepEqual(app.state, {
     configurationType: 'goofy',
@@ -60,21 +58,21 @@ test('resets internal state of component', () => {
     registrationUrl: '',
     xml: '',
     allow_membership_service_access: false
-  });
-});
+  })
+})
 
-
-QUnit.module('ConfigurationForm#defaultState');
+QUnit.module('ConfigurationForm#defaultState')
 
 test('returns a default state', () => {
-  const component = TestUtils.renderIntoDocument (
+  const component = TestUtils.renderIntoDocument(
     <ConfigurationForm
       handleSubmit={() => {}}
       tool={{}}
-      configurationType='goofy'
-      showConfigurationSelector={true} />
-  );
-  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationForm);
+      configurationType="goofy"
+      showConfigurationSelector={true}
+    />
+  )
+  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationForm)
   app.reset()
   deepEqual(app.defaultState(), {
     configurationType: 'goofy',
@@ -91,5 +89,5 @@ test('returns a default state', () => {
     registrationUrl: '',
     xml: '',
     allow_membership_service_access: false
-  });
-});
+  })
+})

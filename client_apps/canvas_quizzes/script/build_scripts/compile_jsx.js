@@ -16,30 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var fs = require('fs-extra');
-var glob = require('glob');
-var path = require('path');
-var transform = require('react-tools').transform;
-var convertTextBlocks = require('canvas_react_i18n');
+var fs = require('fs-extra')
+var glob = require('glob')
+var path = require('path')
+var transform = require('react-tools').transform
+var convertTextBlocks = require('canvas_react_i18n')
 
 var processJSX = function(rawJSX) {
-  return transform(convertTextBlocks(rawJSX));
-};
+  return transform(convertTextBlocks(rawJSX))
+}
 
 module.exports = function(srcDir, destDir) {
   if (!destDir) {
-    destDir = srcDir;
+    destDir = srcDir
   }
 
-  glob.sync('**/*.js', { cwd: srcDir }).forEach(function(file) {
-    var compiled, outfile;
+  glob.sync('**/*.js', {cwd: srcDir}).forEach(function(file) {
+    var compiled, outfile
 
-    console.log('Compiling JSX:', file);
+    console.log('Compiling JSX:', file)
 
-    compiled = processJSX(fs.readFileSync(path.join(srcDir, file), 'utf8'));
-    outfile = path.join(destDir, file.replace(/\.js$/, '.js'));
+    compiled = processJSX(fs.readFileSync(path.join(srcDir, file), 'utf8'))
+    outfile = path.join(destDir, file.replace(/\.js$/, '.js'))
 
-    fs.ensureDirSync(path.dirname(outfile));
-    fs.writeFileSync(outfile, compiled);
-  });
-};
+    fs.ensureDirSync(path.dirname(outfile))
+    fs.writeFileSync(outfile, compiled)
+  })
+}

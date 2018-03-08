@@ -16,16 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 /* Helper classes */
-.align-center { text-align: center; }
-.align-right  { text-align: right; }
-.padding-r    { padding-right: 16px; }
-.table        { display: table; }
-.table-row    { display: table-row; }
-.table-cell   { display: table-cell; }
-.ellipsis     {
+.align-center {
+  text-align: center;
+}
+.align-right {
+  text-align: right;
+}
+.padding-r {
+  padding-right: 16px;
+}
+.table {
+  display: table;
+}
+.table-row {
+  display: table-row;
+}
+.table-cell {
+  display: table-cell;
+}
+.ellipsis {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -43,7 +55,8 @@ header:not(.ic-app-header) {
   color: #434343;
 
   a {
-    &.btn-primary, &.btn-primary:hover {
+    &.btn-primary,
+    &.btn-primary:hover {
       color: #fff;
     }
 
@@ -52,7 +65,6 @@ header:not(.ic-app-header) {
       text-decoration: none;
     }
   }
-
 }
 
 .ig-row-label {
@@ -83,7 +95,8 @@ header:not(.ic-app-header) {
   min-width: 700px;
 }
 
-#web_conference_title, #web_conference_description {
+#web_conference_title,
+#web_conference_description {
   min-width: 500px;
 }
 

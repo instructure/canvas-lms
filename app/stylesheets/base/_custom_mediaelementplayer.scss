@@ -54,13 +54,15 @@
   bottom: 0;
   left: 0;
   right: 0;
-  outline: 5px auto rgb(59,153,252);
+  outline: 5px auto rgb(59, 153, 252);
   outline-offset: 1px;
   content: ' ';
 }
 
 /* style menu items without a radio button */
-.mejs-captions-selector, .mejs-speed-selector, .mejs-sourcechooser-selector {
+.mejs-captions-selector,
+.mejs-speed-selector,
+.mejs-sourcechooser-selector {
   padding: 0 !important;
 
   /* compensate for above 0 padding */
@@ -71,7 +73,7 @@
   /* add a hover effect */
   ul li:hover {
     background-color: rgb(200, 200, 200) !important;
-    background-color: rgba(255,255,255,.4) !important;
+    background-color: rgba(255, 255, 255, 0.4) !important;
   }
 
   /* Hide radio button inputs */

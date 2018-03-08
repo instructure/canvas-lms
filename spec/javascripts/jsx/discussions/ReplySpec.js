@@ -23,10 +23,10 @@ import $ from 'jquery'
 let sandbox
 
 QUnit.module('Discussion Reply', {
-  setup () {
+  setup() {
     sandbox = sinon.sandbox.create()
   },
-  teardown () {
+  teardown() {
     sandbox.restore()
   }
 })
@@ -43,8 +43,14 @@ test('submit calls get_code on rce only once', () => {
   sandbox.stub(Entry.prototype)
   reply.removeAttachments = () => {}
   const mock = sandbox.mock(RichContentEditor)
-  mock.expects('callOnRCE').once().withExactArgs(reply.textArea, 'get_code')
-  mock.expects('destroyRCE').once().withExactArgs(reply.textArea)
+  mock
+    .expects('callOnRCE')
+    .once()
+    .withExactArgs(reply.textArea, 'get_code')
+  mock
+    .expects('destroyRCE')
+    .once()
+    .withExactArgs(reply.textArea)
   reply.submit()
   mock.verify()
 })

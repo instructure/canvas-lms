@@ -44,9 +44,9 @@ textarea {
 }
 
 button::-moz-focus-inner,
-[type="button"]::-moz-focus-inner,
-[type="reset"]::-moz-focus-inner,
-[type="submit"]::-moz-focus-inner {
+[type='button']::-moz-focus-inner,
+[type='reset']::-moz-focus-inner,
+[type='submit']::-moz-focus-inner {
   border-style: none;
   padding: 0;
 }
@@ -59,13 +59,14 @@ input[type="submit"] {
   cursor: pointer;
 }
 
-input[type="search"] { // Appearance in Safari/Chrome
+input[type='search'] {
+  // Appearance in Safari/Chrome
   box-sizing: content-box;
   -webkit-appearance: textfield;
 }
 
-input[type="search"]::-webkit-search-decoration,
-input[type="search"]::-webkit-search-cancel-button {
+input[type='search']::-webkit-search-decoration,
+input[type='search']::-webkit-search-cancel-button {
   -webkit-appearance: none; // Inner-padding issues in Chrome OSX, Safari 5
 }
 

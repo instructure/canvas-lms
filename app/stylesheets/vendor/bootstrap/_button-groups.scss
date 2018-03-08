@@ -2,7 +2,6 @@
 // Button groups
 // --------------------------------------------------
 
-
 // Make the div behave like a button
 .btn-group {
   position: relative;
@@ -56,41 +55,41 @@
 // Set corners individual because sometimes a single button can be in a .btn-group and we need :first-child and :last-child to both match
 .btn-group > .btn:first-child {
   margin-left: 0;
-     -webkit-border-top-left-radius: 4px;
-         -moz-border-radius-topleft: 4px;
-             border-top-left-radius: 4px;
+  -webkit-border-top-left-radius: 4px;
+  -moz-border-radius-topleft: 4px;
+  border-top-left-radius: 4px;
   -webkit-border-bottom-left-radius: 4px;
-      -moz-border-radius-bottomleft: 4px;
-          border-bottom-left-radius: 4px;
+  -moz-border-radius-bottomleft: 4px;
+  border-bottom-left-radius: 4px;
 }
 // Need .dropdown-toggle since :last-child doesn't apply given a .dropdown-menu immediately after it
 .btn-group > .btn:last-child,
 .btn-group > .dropdown-toggle {
-     -webkit-border-top-right-radius: 4px;
-         -moz-border-radius-topright: 4px;
-             border-top-right-radius: 4px;
+  -webkit-border-top-right-radius: 4px;
+  -moz-border-radius-topright: 4px;
+  border-top-right-radius: 4px;
   -webkit-border-bottom-right-radius: 4px;
-      -moz-border-radius-bottomright: 4px;
-          border-bottom-right-radius: 4px;
+  -moz-border-radius-bottomright: 4px;
+  border-bottom-right-radius: 4px;
 }
 // Reset corners for large buttons
 .btn-group > .btn.large:first-child {
   margin-left: 0;
-     -webkit-border-top-left-radius: 6px;
-         -moz-border-radius-topleft: 6px;
-             border-top-left-radius: 6px;
+  -webkit-border-top-left-radius: 6px;
+  -moz-border-radius-topleft: 6px;
+  border-top-left-radius: 6px;
   -webkit-border-bottom-left-radius: 6px;
-      -moz-border-radius-bottomleft: 6px;
-          border-bottom-left-radius: 6px;
+  -moz-border-radius-bottomleft: 6px;
+  border-bottom-left-radius: 6px;
 }
 .btn-group > .btn.large:last-child,
 .btn-group > .large.dropdown-toggle {
-     -webkit-border-top-right-radius: 6px;
-         -moz-border-radius-topright: 6px;
-             border-top-right-radius: 6px;
+  -webkit-border-top-right-radius: 6px;
+  -moz-border-radius-topright: 6px;
+  border-top-right-radius: 6px;
   -webkit-border-bottom-right-radius: 6px;
-      -moz-border-radius-bottomright: 6px;
-          border-bottom-right-radius: 6px;
+  -moz-border-radius-bottomright: 6px;
+  border-bottom-right-radius: 6px;
 }
 
 // On hover/focus/active, bring the proper btn to front
@@ -107,8 +106,6 @@
   outline: 0;
 }
 
-
-
 // Split button dropdowns
 // ----------------------
 
@@ -116,7 +113,7 @@
 .btn-group > .btn + .dropdown-toggle {
   padding-left: 8px;
   padding-right: 8px;
-  @include box-shadow(inset 1px 0 0 rgba(255,255,255,.125), inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05));
+  @include box-shadow(inset 1px 0 0 rgba(255,255,255,0.125), inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.05));
   *padding-top: 5px;
   *padding-bottom: 5px;
 }
@@ -137,17 +134,18 @@
   *padding-bottom: 7px;
 }
 
-.btn-group > [class*="btn"].active {
-  &:focus { @include button-focus-dark; }
+.btn-group > [class*='btn'].active {
+  &:focus {
+    @include button-focus-dark;
+  }
 }
 
 .btn-group.open {
-
   // The clickable button for toggling the menu
   // Remove the gradient and set the same inset shadow as the :active state
   .dropdown-toggle {
     background-image: none;
-    @include box-shadow(inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05));
+    @include box-shadow(inset 0 2px 4px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.05));
   }
 
   // Keep the hover's background when dropdown is open
@@ -171,7 +169,6 @@
   }
 }
 
-
 // Reposition the caret
 .btn .caret {
   margin-top: 8px;
@@ -184,16 +181,14 @@
   margin-top: 6px;
 }
 .btn-large .caret {
-  border-left-width:  5px;
+  border-left-width: 5px;
   border-right-width: 5px;
-  border-top-width:   5px;
+  border-top-width: 5px;
 }
 // Upside down carets for .dropup
 .dropup .btn-large .caret {
   border-bottom-width: 5px;
 }
-
-
 
 // Account for other colors
 .btn-primary,

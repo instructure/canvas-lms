@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!gradebook';
-import GradebookFilter from './GradebookFilter';
+import I18n from 'i18n!gradebook'
+import GradebookFilter from './GradebookFilter'
 
 class ModuleFilter extends GradebookFilter {
   static defaultProps = {
     disabled: false,
     filterLabel: I18n.t('Module Filter'),
     allItemsLabel: I18n.t('All Modules')
-  };
+  }
 }
 
-export default ModuleFilter;
+export default ModuleFilter

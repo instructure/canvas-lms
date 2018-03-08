@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 .Reminder__course-setup {
   .Reminder__course-setup-title {
@@ -27,12 +27,12 @@
   .Reminder__course-setup-subttitle {
     float: right;
     @include fontSize(11px);
-    padding-top: .1563rem;
+    padding-top: 0.1563rem;
     text-transform: capitalize;
   }
   .Reminder__course-setup-body {
     text-align: center;
-    border-top: 1px solid #aaa;;
+    border-top: 1px solid #aaa;
     p {
       @include fontSize(15px);
       margin-bottom: 0;

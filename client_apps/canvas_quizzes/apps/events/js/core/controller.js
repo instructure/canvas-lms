@@ -17,9 +17,9 @@
  */
 
 define(function(require) {
-  var EventStore = require('../stores/events');
-  var config = require('../config');
-  var update;
+  var EventStore = require('../stores/events')
+  var config = require('../config')
+  var update
 
   var onChange = function() {
     update({
@@ -28,9 +28,9 @@ define(function(require) {
       events: EventStore.getAll(),
       isLoading: EventStore.isLoading(),
       attempt: EventStore.getAttempt(),
-      availableAttempts: EventStore.getAvailableAttempts(),
-    });
-  };
+      availableAttempts: EventStore.getAvailableAttempts()
+    })
+  }
 
   /**
    * @class Events.Core.Controller
@@ -40,7 +40,6 @@ define(function(require) {
    * data layer.
    */
   var Controller = {
-
     /**
      * Start listening to data updates.
      *
@@ -59,11 +58,11 @@ define(function(require) {
      *        See Stores.Statistics#getQuizReports().
      */
     start: function(onUpdate) {
-      update = onUpdate;
-      EventStore.addChangeListener(onChange);
+      update = onUpdate
+      EventStore.addChangeListener(onChange)
 
       if (config.loadOnStartup) {
-        Controller.load();
+        Controller.load()
       }
     },
 
@@ -71,16 +70,16 @@ define(function(require) {
      * Load initial application data; quiz statistics and reports.
      */
     load: function() {
-      EventStore.loadInitialData().then(EventStore.load.bind(EventStore));
+      EventStore.loadInitialData().then(EventStore.load.bind(EventStore))
     },
 
     /**
      * Stop listening to data changes.
      */
     stop: function() {
-      update = undefined;
+      update = undefined
     }
-  };
+  }
 
-  return Controller;
-});
+  return Controller
+})

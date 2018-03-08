@@ -25,9 +25,10 @@
 const Handlebars = require('handlebars')
 const EmberHandlebars = require('ember-template-compiler').EmberHandlebars
 const ScopedHbsExtractor = require(__dirname + '/../gems/canvas_i18nliner/js/scoped_hbs_extractor')
-const PreProcessor = require(__dirname + '/../gems/canvas_i18nliner/node_modules/i18nliner-handlebars/dist/lib/pre_processor').default
+const PreProcessor = require(__dirname +
+  '/../gems/canvas_i18nliner/node_modules/i18nliner-handlebars/dist/lib/pre_processor').default
 
-function compileHandlebars (data) {
+function compileHandlebars(data) {
   const {path, source} = data
   try {
     let translationCount = 0
@@ -49,19 +50,17 @@ function compileHandlebars (data) {
   }
 }
 
-function resourceName (path) {
-  return path
-    .replace(/^.+?\/templates\//, '')
-    .replace(/\.hbs$/, '')
+function resourceName(path) {
+  return path.replace(/^.+?\/templates\//, '').replace(/\.hbs$/, '')
 }
 
-function emitTemplate (path, name, result, dependencies) {
+function emitTemplate(path, name, result, dependencies) {
   return `define(${JSON.stringify(dependencies)}, function(Ember){
     Ember.TEMPLATES['${name}'] = Ember.Handlebars.template(${result.template});
   });`
 }
 
-module.exports = function (source) {
+module.exports = function(source) {
   this.cacheable()
   const name = resourceName(this.resourcePath)
   const dependencies = ['ember', 'coffeescripts/ember/shared/helpers/common.coffee']

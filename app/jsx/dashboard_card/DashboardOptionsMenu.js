@@ -23,7 +23,7 @@ import axios from 'axios'
 
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
-import { MenuItem, MenuItemGroup, MenuItemSeparator } from '@instructure/ui-core/lib/components/Menu'
+import {MenuItem, MenuItemGroup, MenuItemSeparator} from '@instructure/ui-core/lib/components/Menu'
 import Button from '@instructure/ui-core/lib/components/Button'
 import IconMoreLine from 'instructure-icons/lib/Line/IconMoreLine'
 
@@ -46,11 +46,11 @@ export default class DashboardOptionsMenu extends React.Component {
     onDashboardChange: () => {}
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     sharedDashboardInstance.init(this.changeToCardView)
 
-    let view;
+    let view
     if (props.planner_enabled && props.planner_selected) {
       view = ['planner']
     } else if (props.recent_activity_dashboard) {
@@ -83,14 +83,17 @@ export default class DashboardOptionsMenu extends React.Component {
   }
 
   handleColorOverlayOptionSelect = (e, newSelected) => {
-    this.setState({
-      colorOverlays: newSelected
-    }, this.toggleColorOverlays)
+    this.setState(
+      {
+        colorOverlays: newSelected
+      },
+      this.toggleColorOverlays
+    )
 
     this.postToggleColorOverlays()
   }
 
-  toggleDashboardView (newView) {
+  toggleDashboardView(newView) {
     const fakeObj = {
       style: {}
     }
@@ -120,42 +123,48 @@ export default class DashboardOptionsMenu extends React.Component {
       rightSideContent.style.display = 'block'
     }
 
-    this.props.onDashboardChange(newView[0]);
+    this.props.onDashboardChange(newView[0])
   }
 
-  toggleColorOverlays () {
+  toggleColorOverlays() {
     const dashcardHeaders = Array.from(document.getElementsByClassName('ic-DashboardCard__header'))
-    dashcardHeaders.forEach((dashcardHeader) => {
-      const dashcardImageHeader = dashcardHeader.getElementsByClassName('ic-DashboardCard__header_image')[0]
+    dashcardHeaders.forEach(dashcardHeader => {
+      const dashcardImageHeader = dashcardHeader.getElementsByClassName(
+        'ic-DashboardCard__header_image'
+      )[0]
       if (dashcardImageHeader) {
-        const dashcardOverlay = dashcardImageHeader.getElementsByClassName('ic-DashboardCard__header_hero')[0]
+        const dashcardOverlay = dashcardImageHeader.getElementsByClassName(
+          'ic-DashboardCard__header_hero'
+        )[0]
         dashcardOverlay.style.opacity = this.colorOverlays ? 0.6 : 0
 
-        const headerButtonBg = dashcardHeader.getElementsByClassName('ic-DashboardCard__header-button-bg')[0]
+        const headerButtonBg = dashcardHeader.getElementsByClassName(
+          'ic-DashboardCard__header-button-bg'
+        )[0]
         headerButtonBg.style.opacity = this.colorOverlays ? 0 : 1
       }
     })
   }
 
-  postDashboardToggle () {
+  postDashboardToggle() {
     axios.put('/dashboard/view', {
       dashboard_view: this.state.view[0]
     })
   }
 
-  postToggleColorOverlays () {
-    axios.post('/users/toggle_hide_dashcard_color_overlays');
+  postToggleColorOverlays() {
+    axios.post('/users/toggle_hide_dashcard_color_overlays')
   }
 
-  get cardView () {
+  get cardView() {
     return this.state.view.includes('cards')
   }
 
-  get colorOverlays () {
+  get colorOverlays() {
     return this.state.colorOverlays.includes('colorOverlays')
   }
 
-  render () {
+  render() {
     const cardView = this.cardView
 
     return (
@@ -166,7 +175,9 @@ export default class DashboardOptionsMenu extends React.Component {
             <IconMoreLine />
           </Button>
         }
-        contentRef={(el) => { this.menuContentRef = el; }}
+        contentRef={el => {
+          this.menuContentRef = el
+        }}
       >
         <MenuItemGroup
           label={I18n.t('Dashboard View')}
@@ -174,15 +185,11 @@ export default class DashboardOptionsMenu extends React.Component {
           selected={this.state.view}
         >
           <MenuItem value="cards">{I18n.t('Card View')}</MenuItem>
-          {
-            (this.props.planner_enabled) && (
-              <MenuItem value="planner">{I18n.t('List View')}</MenuItem>
-            )
-          }
+          {this.props.planner_enabled && <MenuItem value="planner">{I18n.t('List View')}</MenuItem>}
           <MenuItem value="activity">{I18n.t('Recent Activity')}</MenuItem>
         </MenuItemGroup>
-        { cardView && <MenuItemSeparator /> }
-        { cardView && (
+        {cardView && <MenuItemSeparator />}
+        {cardView && (
           <MenuItemGroup
             label={
               <ScreenReaderContent>
@@ -192,9 +199,7 @@ export default class DashboardOptionsMenu extends React.Component {
             onSelect={this.handleColorOverlayOptionSelect}
             selected={this.state.colorOverlays}
           >
-            <MenuItem value="colorOverlays">
-              { I18n.t('Color Overlay') }
-            </MenuItem>
+            <MenuItem value="colorOverlays">{I18n.t('Color Overlay')}</MenuItem>
           </MenuItemGroup>
         )}
       </PopoverMenu>

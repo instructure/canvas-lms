@@ -16,11 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "/vendor/canvas_public/stylesheets_compiled/new_styles_normal_contrast/pages/g_vendor.css";
-@import "/vendor/canvas_public/stylesheets_compiled/new_styles_normal_contrast/base/c-common.css";
-@import "/dist/canvas_quizzes.css";
+@import '/vendor/canvas_public/stylesheets_compiled/new_styles_normal_contrast/pages/g_vendor.css';
+@import '/vendor/canvas_public/stylesheets_compiled/new_styles_normal_contrast/base/c-common.css';
+@import '/dist/canvas_quizzes.css';
 
-.seed-data { display: none; }
+.seed-data {
+  display: none;
+}
 .seed-name {
   cursor: pointer;
 }

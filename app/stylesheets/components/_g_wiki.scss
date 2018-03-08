@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "pages/wiki_animations.scss";
-@import "pages/shared/menu_tools.scss";
+@import 'pages/wiki_animations.scss';
+@import 'pages/shared/menu_tools.scss';
 
 $subdued-text-color: #696969;
 $darkened-text-color: #4d4d4d;
@@ -115,7 +115,8 @@ $revision-button-color: $ic-color-dark;
       }
       .flex-container {
         display: flex;
-        align-items:center {}
+        align-items:center {
+        }
       }
     }
   }
@@ -160,7 +161,8 @@ $revision-button-color: $ic-color-dark;
       margin-bottom: 0;
       border-collapse: separate;
       border-spacing: 0;
-      td, th {
+      td,
+      th {
         &:first-child {
           padding-left: 12px;
         }
@@ -168,7 +170,6 @@ $revision-button-color: $ic-color-dark;
           padding-right: 12px;
         }
       }
-
     }
     .table thead {
       background: $index-background;
@@ -322,7 +323,8 @@ $revision-button-color: $ic-color-dark;
     .front-page.label {
       margin: 6px 12px 6px 0;
     }
-    .published, .unpublished {
+    .published,
+    .unpublished {
       display: inline-block;
       margin: 6px 8px 6px 5px;
     }
@@ -335,7 +337,9 @@ $revision-button-color: $ic-color-dark;
     overflow-x: auto;
     box-sizing: border-box;
     padding: 0 $ic-sp;
-    @include breakpoint(desktop) { padding: 0 $ic-sp*2 0 $ic-sp; }
+    @include breakpoint(desktop) {
+      padding: 0 $ic-sp*2 0 $ic-sp;
+    }
   }
   .floating_links {
     margin-right: 15px;
@@ -460,7 +464,8 @@ $revision-button-color: $ic-color-dark;
 
     border-left: 2px solid transparent;
 
-    &.selected, &.latest {
+    &.selected,
+    &.latest {
       height: 56px;
       transition: height 400ms;
     }
@@ -515,7 +520,7 @@ $revision-button-color: $ic-color-dark;
     .prev-button {
       position: absolute;
       left: 0;
-      top: 0
+      top: 0;
     }
     .next-button {
       position: absolute;
@@ -526,7 +531,8 @@ $revision-button-color: $ic-color-dark;
 }
 
 @media print {
-  #breadcrumbs, .header-bar-outer-container {
+  #breadcrumbs,
+  .header-bar-outer-container {
     display: none;
   }
   .pages.show.revisions {
@@ -549,7 +555,8 @@ $revision-button-color: $ic-color-dark;
   font-size: 0.8em;
   margin-bottom: 10px;
   margin-right: 2px;
-  h3, .h3 {
+  h3,
+  .h3 {
     margin: 0px 20px 10px;
     font-size: 1.5em;
     color: #444;

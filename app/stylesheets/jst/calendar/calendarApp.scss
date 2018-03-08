@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 #calendar-app {
   position: relative;
 }
 
-.calendar, #calendar-drag-and-drop-container {
+.calendar,
+#calendar-drag-and-drop-container {
   .fc-view-container {
     background-color: white;
   }
@@ -33,7 +34,8 @@
     color: $ic-font-color--subdued;
     font-weight: bold;
   }
-  .fc-row .fc-content-skeleton td, .fc-row .fc-helper-skeleton td {
+  .fc-row .fc-content-skeleton td,
+  .fc-row .fc-helper-skeleton td {
     border-color: $ic-border-light;
   }
   .fc-head thead .fc-widget-header {
@@ -46,7 +48,8 @@
   opacity: 0.5;
 }
 
-.fc-event.assignment, .fc-event.assignment_override {
+.fc-event.assignment,
+.fc-event.assignment_override {
   .fc-event-inner div {
     display: inline;
   }
@@ -54,7 +57,8 @@
 }
 
 .event-details {
-  h3, .h3 {
+  h3,
+  .h3 {
     margin-bottom: 0;
 
     a:focus {
@@ -75,7 +79,8 @@
     padding-bottom: 3px;
     padding-right: 8px;
   }
-  td,th {
+  td,
+  th {
     vertical-align: top;
   }
   .event-details-content {
@@ -118,7 +123,7 @@
 }
 
 .event-details-content table {
-  th[scope=row] {
+  th[scope='row'] {
     width: 55px;
   }
 }
@@ -213,13 +218,15 @@
 }
 
 .Button.ui-button {
-    font-weight: 300;
+  font-weight: 300;
 }
 .fc-month-view .fc-widget-content .fc-day-number {
   text-align: left;
 }
 
-.fc-event-title { line-height: 1.3; }
+.fc-event-title {
+  line-height: 1.3;
+}
 
 .calendar__event--completed {
   text-decoration: line-through;
@@ -252,6 +259,6 @@
 }
 
 // to change the size/color of the event time only within the event container
-.fc-agendaWeek-view .fc-event-container a[class*="group_"] .fc-content .fc-time {
+.fc-agendaWeek-view .fc-event-container a[class*='group_'] .fc-content .fc-time {
   color: $ic-font-color-dark;
 }

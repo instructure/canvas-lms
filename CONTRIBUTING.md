@@ -1,5 +1,4 @@
-Contributing
------------
+## Contributing
 
 There are two wonderful ways you can contribute to Canvas: filing issues and
 submitting pull requests.
@@ -31,11 +30,11 @@ We’ll try to get back to you in a timely manner and let you know if we need mo
 and any status we can provide on expectation for a fix.
 
 **Feature Requests** should instead be filed on our Canvas community site (https://community.canvaslms.com).
-In order to log in and participate in the community you will need a Canvas account.  If you don’t already have one,
+In order to log in and participate in the community you will need a Canvas account. If you don’t already have one,
 the easiest way to get one is to go to http://www.canvaslms.com/try-canvas, and click “Build It” and register as a teacher for a free account.
 
 **Configuration Issues** are generally best answered either on our user group mailing list or
-in #canvas-lms on Freenode.  See https://github.com/instructure/canvas-lms/wiki#getting-help
+in #canvas-lms on Freenode. See https://github.com/instructure/canvas-lms/wiki#getting-help
 for a full list of options for getting help.
 
 ## Submitting Pull Requests
@@ -56,52 +55,52 @@ very confused if you are attempting to contribute changesets against stable.
 If you choose to contribute a pull request to Canvas, following these guidelines will make things easier
 for you and for us:
 
- - Your pull request should generally consist of a single commit.  This helps keep the git history clean
-   by keeping each commit focused on a single purpose.  If you have multiple commits that keep that focus
-   then that is acceptable, however "train of thought" commits should not be in the history.
- - Your commit message should follow this general format:
+* Your pull request should generally consist of a single commit. This helps keep the git history clean
+  by keeping each commit focused on a single purpose. If you have multiple commits that keep that focus
+  then that is acceptable, however "train of thought" commits should not be in the history.
+* Your commit message should follow this general format:
 
-   ```
-    Summary of the commit (Subject)
+  ```
+   Summary of the commit (Subject)
 
-    Further explanation of the commit, generally focusing on why you chose
-    the approach you did in making this change.
+   Further explanation of the commit, generally focusing on why you chose
+   the approach you did in making this change.
 
-    closes gh-123 (if this closes a GitHub Issue)
+   closes gh-123 (if this closes a GitHub Issue)
 
-    Test Plan:
-      - Use this space to enumerate steps that need to be taken to test this commit
-      - This is important for our in house QA personnel to be able to test it.
-   ```
+   Test Plan:
+     - Use this space to enumerate steps that need to be taken to test this commit
+     - This is important for our in house QA personnel to be able to test it.
+  ```
 
-   This format is the format that Instructure engineers follow.  You could look at previous commits in the
-   repository for real world examples.
- - The process your pull request goes through is as follows:
-    - An Instructure engineer will pull the request down and run it through our automated test suite.
-      They will report back with results of the testing.  You can help this process along by running targeted
-      tests locally prior to submitting the pull request.  You should also run `script/rlint` to make sure
-      your commit passes our linter.
-    - Once the test passes against our test suites, one or two engineers will look over the code and provide
-      a code review.
-    - Once the code review has been successful our QA engineers will run through the test plan that has
-      been provided and make sure that everything is good to go.
-    - If your commit touches any UI elements or behavior of the application, one of our product managers
-      will review the changes as well to make sure it is consistent with our product direction
-    - Once all these things have occurred then an engineer will merge your commit into the repository.
-    - Congratulations! You are now a Canvas contributor!  Thank you for helping make Canvas great.
+  This format is the format that Instructure engineers follow. You could look at previous commits in the
+  repository for real world examples.
 
-Guidelines
-----------
+* The process your pull request goes through is as follows:
+  * An Instructure engineer will pull the request down and run it through our automated test suite.
+    They will report back with results of the testing. You can help this process along by running targeted
+    tests locally prior to submitting the pull request. You should also run `script/rlint` to make sure
+    your commit passes our linter.
+  * Once the test passes against our test suites, one or two engineers will look over the code and provide
+    a code review.
+  * Once the code review has been successful our QA engineers will run through the test plan that has
+    been provided and make sure that everything is good to go.
+  * If your commit touches any UI elements or behavior of the application, one of our product managers
+    will review the changes as well to make sure it is consistent with our product direction
+  * Once all these things have occurred then an engineer will merge your commit into the repository.
+  * Congratulations! You are now a Canvas contributor! Thank you for helping make Canvas great.
 
-- All new UI should be built in [React](https://github.com/instructure/canvas-lms/tree/stable/app/jsx) using the documented [API](https://canvas.instructure.com/doc/api/).
-- Contributed code should pass our linters, but sweeping changes solely to correct lint errors in existing code should be avoided. The following scripts can be used to run the linters against changes in your code: `script/eslint` for JavaScript code, `script/rlint` for Ruby code, and `script/stylelint` for (S)CSS code.
+## Guidelines
+
+* All new UI should be built in [React](https://github.com/instructure/canvas-lms/tree/stable/app/jsx) using the documented [API](https://canvas.instructure.com/doc/api/).
+* Contributed code should pass our linters, but sweeping changes solely to correct lint errors in existing code should be avoided. The following scripts can be used to run the linters against changes in your code: `script/eslint` for JavaScript code, `script/rlint` for Ruby code, and `script/stylelint` for (S)CSS code.
 
 ## CLA
 
 ### What is it and why do I need to sign it?
 
-The Instructure Contributor Agreement (ICA) is a contributor license agreement which grants us intellectual property rights in material you contribute to a project we own or manage.  Signing the agreement creates a written record which allows us to track our legal rights when we use and distribute any project containing contributor material.  
+The Instructure Contributor Agreement (ICA) is a contributor license agreement which grants us intellectual property rights in material you contribute to a project we own or manage. Signing the agreement creates a written record which allows us to track our legal rights when we use and distribute any project containing contributor material.
 
-### What rights am I giving to Instructure? 
+### What rights am I giving to Instructure?
 
 When you sign the ICA you don’t give up ownership in the material. Instead, you are declaring that (a) you own the material you contribute, (b) that it doesn’t infringe on other intellectual property rights and (c) you are giving us joint-ownership or a license in the material.

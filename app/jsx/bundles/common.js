@@ -60,19 +60,25 @@ import 'moment'
 
 $('html').removeClass('scripts-not-loaded')
 
-$('.help_dialog_trigger').click((event) => {
+$('.help_dialog_trigger').click(event => {
   event.preventDefault()
-  require.ensure([], (require) => {
-    const helpDialog = require('compiled/helpDialog')
-    helpDialog.open()
-  }, 'helpDialogAsyncChunk')
+  require.ensure(
+    [],
+    require => {
+      const helpDialog = require('compiled/helpDialog')
+      helpDialog.open()
+    },
+    'helpDialogAsyncChunk'
+  )
 })
 
-$('#skip_navigation_link').on('click', function (event) {
+$('#skip_navigation_link').on('click', function(event) {
   // preventDefault so we dont change the hash
   // this will make nested apps that use the hash happy
   event.preventDefault()
-  $($(this).attr('href')).attr('tabindex', -1).focus()
+  $($(this).attr('href'))
+    .attr('tabindex', -1)
+    .focus()
 })
 
 // show and hide the courses vertical menu when the user clicks the hamburger button
@@ -80,12 +86,12 @@ $('#skip_navigation_link').on('click', function (event) {
 // load that bundle.
 const WIDE_BREAKPOINT = 1200
 
-function resetMenuItemTabIndexes () {
+function resetMenuItemTabIndexes() {
   // in testing this, it seems that $(document).width() returns 15px less than what it should.
-  const tabIndex = (
-    $('body').hasClass('course-menu-expanded') ||
-    $(document).width() >= WIDE_BREAKPOINT - 15
-  ) ? 0 : -1
+  const tabIndex =
+    $('body').hasClass('course-menu-expanded') || $(document).width() >= WIDE_BREAKPOINT - 15
+      ? 0
+      : -1
   $('#section-tabs li a').attr('tabIndex', tabIndex)
 }
 
@@ -102,7 +108,7 @@ $('body').on('click', '#courseMenuToggle', () => {
 })
 
 // Backbone routes
-$('body').on('click', '[data-pushstate]', function (event) {
+$('body').on('click', '[data-pushstate]', function(event) {
   event.preventDefault()
   Backbone.history.navigate($(this).attr('href'), true)
 })
@@ -110,22 +116,32 @@ $('body').on('click', '[data-pushstate]', function (event) {
 if (
   window.ENV.NEW_USER_TUTORIALS &&
   window.ENV.NEW_USER_TUTORIALS.is_enabled &&
-  (window.ENV.context_asset_string && (splitAssetString(window.ENV.context_asset_string)[0] === 'courses'))
+  (window.ENV.context_asset_string &&
+    splitAssetString(window.ENV.context_asset_string)[0] === 'courses')
 ) {
-  require.ensure([], (require) => {
-    const initializeNewUserTutorials = require('../new_user_tutorial/initializeNewUserTutorials')
-    initializeNewUserTutorials()
-  }, 'NewUserTutorialsAsyncChunk')
+  require.ensure(
+    [],
+    require => {
+      const initializeNewUserTutorials = require('../new_user_tutorial/initializeNewUserTutorials')
+      initializeNewUserTutorials()
+    },
+    'NewUserTutorialsAsyncChunk'
+  )
 }
 
 // edge < 15 does not support css vars
 // edge >= 15 claims to, but is currently broken
-const edge = window.navigator.userAgent.indexOf("Edge") > -1
-const supportsCSSVars = !edge && window.CSS && window.CSS.supports && window.CSS.supports('(--foo: red)')
+const edge = window.navigator.userAgent.indexOf('Edge') > -1
+const supportsCSSVars =
+  !edge && window.CSS && window.CSS.supports && window.CSS.supports('(--foo: red)')
 if (!supportsCSSVars) {
-  require.ensure([], (require) => {
-    window.canvasCssVariablesPolyfill = require('../canvasCssVariablesPolyfill')
-  }, 'canvasCssVariablesPolyfill')
+  require.ensure(
+    [],
+    require => {
+      window.canvasCssVariablesPolyfill = require('../canvasCssVariablesPolyfill')
+    },
+    'canvasCssVariablesPolyfill'
+  )
 }
 
 $(() => {

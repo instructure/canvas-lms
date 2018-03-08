@@ -16,36 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ReactDOM from 'react-dom';
-import AssignmentRowCellPropFactory from 'jsx/gradezilla/default_gradebook/components/AssignmentRowCellPropFactory';
-import AssignmentCellEditor from 'jsx/gradezilla/default_gradebook/slick-grid/editors/AssignmentCellEditor';
-import GridEvent from 'jsx/gradezilla/default_gradebook/GradebookGrid/GridSupport/GridEvent';
-import { createGradebook } from '../../GradebookSpecHelper';
+import ReactDOM from 'react-dom'
+import AssignmentRowCellPropFactory from 'jsx/gradezilla/default_gradebook/components/AssignmentRowCellPropFactory'
+import AssignmentCellEditor from 'jsx/gradezilla/default_gradebook/slick-grid/editors/AssignmentCellEditor'
+import GridEvent from 'jsx/gradezilla/default_gradebook/GradebookGrid/GridSupport/GridEvent'
+import {createGradebook} from '../../GradebookSpecHelper'
 
-QUnit.module('AssignmentCellEditor', (suiteHooks) => {
-  let $container;
-  let editor;
-  let editorOptions;
-  let gridSupport;
+QUnit.module('AssignmentCellEditor', suiteHooks => {
+  let $container
+  let editor
+  let editorOptions
+  let gridSupport
 
-  function createEditor () {
-    editor = new AssignmentCellEditor({ ...editorOptions, container: $container });
+  function createEditor() {
+    editor = new AssignmentCellEditor({...editorOptions, container: $container})
   }
 
   suiteHooks.beforeEach(() => {
-    $container = document.createElement('div');
-    document.body.appendChild($container);
+    $container = document.createElement('div')
+    document.body.appendChild($container)
 
     gridSupport = {
       events: {
         onKeyDown: new GridEvent()
       }
-    };
+    }
 
-    const assignment = { grading_type: 'points', id: '2301', points_possible: 10 };
+    const assignment = {grading_type: 'points', id: '2301', points_possible: 10}
     const gradebook = createGradebook()
 
-    gradebook.students['1101'] = { id: '1101' }
+    gradebook.students['1101'] = {id: '1101'}
     gradebook.setAssignments({2301: assignment})
     gradebook.updateSubmission({
       assignment_id: '2301',
@@ -60,183 +60,191 @@ QUnit.module('AssignmentCellEditor', (suiteHooks) => {
       column: {
         assignmentId: '2301',
         field: 'assignment_2301',
-        getGridSupport () { return gridSupport },
+        getGridSupport() {
+          return gridSupport
+        },
         object: assignment,
         propFactory: new AssignmentRowCellPropFactory(gradebook)
       },
       grid: {
         onKeyDown: {
-          subscribe () {},
-          unsubscribe () {}
+          subscribe() {},
+          unsubscribe() {}
         }
       },
-      item: { // student row object
+      item: {
+        // student row object
         id: '1101',
-        assignment_2301: { // submission
+        assignment_2301: {
+          // submission
           user_id: '1101'
         }
       }
-    };
-  });
+    }
+  })
 
   suiteHooks.afterEach(() => {
     if ($container.childNodes.length > 0) {
-      editor.destroy();
+      editor.destroy()
     }
-    $container.remove();
-  });
+    $container.remove()
+  })
 
-  QUnit.module('initialization', (hooks) => {
+  QUnit.module('initialization', hooks => {
     hooks.beforeEach(() => {
-      sinon.spy(ReactDOM, 'render');
-    });
+      sinon.spy(ReactDOM, 'render')
+    })
 
     hooks.afterEach(() => {
-      ReactDOM.render.restore();
-    });
+      ReactDOM.render.restore()
+    })
 
     test('renders with React', () => {
-      createEditor();
-      strictEqual(ReactDOM.render.callCount, 1);
-    });
+      createEditor()
+      strictEqual(ReactDOM.render.callCount, 1)
+    })
 
     test('renders an AssignmentRowCell', () => {
-      createEditor();
-      const [element] = ReactDOM.render.lastCall.args;
-      equal(element.type.name, 'AssignmentRowCell');
-    });
+      createEditor()
+      const [element] = ReactDOM.render.lastCall.args
+      equal(element.type.name, 'AssignmentRowCell')
+    })
 
     test('renders into the given container', () => {
-      createEditor();
-      const [/* element */, container] = ReactDOM.render.lastCall.args;
-      strictEqual(container, $container);
-    });
+      createEditor()
+      const [, /* element */ container] = ReactDOM.render.lastCall.args
+      strictEqual(container, $container)
+    })
 
     test('stores a reference to the rendered AssignmentRowCell component', () => {
-      createEditor();
-      equal(editor.component.constructor.name, 'AssignmentRowCell');
-    });
+      createEditor()
+      equal(editor.component.constructor.name, 'AssignmentRowCell')
+    })
 
     test('includes editor options in AssignmentRowCell props', () => {
-      createEditor();
-      equal(editor.component.props.editorOptions, editor.options);
-    });
-  });
+      createEditor()
+      equal(editor.component.props.editorOptions, editor.options)
+    })
+  })
 
   QUnit.module('"onKeyDown" event', () => {
     test('calls .handleKeyDown on the AssignmentRowCell component when triggered', () => {
-      createEditor();
-      sinon.spy(editor.component, 'handleKeyDown');
-      const keyboardEvent = new KeyboardEvent('example');
-      gridSupport.events.onKeyDown.trigger(keyboardEvent);
-      strictEqual(editor.component.handleKeyDown.callCount, 1);
-    });
+      createEditor()
+      sinon.spy(editor.component, 'handleKeyDown')
+      const keyboardEvent = new KeyboardEvent('example')
+      gridSupport.events.onKeyDown.trigger(keyboardEvent)
+      strictEqual(editor.component.handleKeyDown.callCount, 1)
+    })
 
     test('passes the event when calling handleKeyDown', () => {
-      createEditor();
-      sinon.spy(editor.component, 'handleKeyDown');
-      const keyboardEvent = new KeyboardEvent('example');
-      gridSupport.events.onKeyDown.trigger(keyboardEvent);
-      const [event] = editor.component.handleKeyDown.lastCall.args;
-      strictEqual(event, keyboardEvent);
-    });
+      createEditor()
+      sinon.spy(editor.component, 'handleKeyDown')
+      const keyboardEvent = new KeyboardEvent('example')
+      gridSupport.events.onKeyDown.trigger(keyboardEvent)
+      const [event] = editor.component.handleKeyDown.lastCall.args
+      strictEqual(event, keyboardEvent)
+    })
 
     test('returns the return value from the AssignmentRowCell component', () => {
-      createEditor();
-      sinon.stub(editor.component, 'handleKeyDown').returns(false);
-      const keyboardEvent = new KeyboardEvent('example');
-      const returnValue = gridSupport.events.onKeyDown.trigger(keyboardEvent);
-      strictEqual(returnValue, false);
-    });
-  });
+      createEditor()
+      sinon.stub(editor.component, 'handleKeyDown').returns(false)
+      const keyboardEvent = new KeyboardEvent('example')
+      const returnValue = gridSupport.events.onKeyDown.trigger(keyboardEvent)
+      strictEqual(returnValue, false)
+    })
+  })
 
   QUnit.module('#destroy', () => {
     test('removes the reference to the AssignmentRowCell component', () => {
-      createEditor();
-      editor.destroy();
-      strictEqual(editor.component, null);
-    });
+      createEditor()
+      editor.destroy()
+      strictEqual(editor.component, null)
+    })
 
     test('unsubscribes from gridSupport.events.onKeyDown', () => {
-      createEditor();
-      editor.destroy();
-      const keyboardEvent = new KeyboardEvent('example');
-      const returnValue = gridSupport.events.onKeyDown.trigger(keyboardEvent);
-      strictEqual(returnValue, true, '"true" is the default return value when the event has no subscribers');
-    });
+      createEditor()
+      editor.destroy()
+      const keyboardEvent = new KeyboardEvent('example')
+      const returnValue = gridSupport.events.onKeyDown.trigger(keyboardEvent)
+      strictEqual(
+        returnValue,
+        true,
+        '"true" is the default return value when the event has no subscribers'
+      )
+    })
 
     test('unmounts the AssignmentRowCell component', () => {
-      createEditor();
-      editor.destroy();
-      const unmounted = ReactDOM.unmountComponentAtNode($container);
-      strictEqual(unmounted, false, 'component was already unmounted');
-    });
-  });
+      createEditor()
+      editor.destroy()
+      const unmounted = ReactDOM.unmountComponentAtNode($container)
+      strictEqual(unmounted, false, 'component was already unmounted')
+    })
+  })
 
   QUnit.module('#focus', () => {
     test('calls .focus on the AssignmentRowCell component', () => {
-      createEditor();
-      sinon.spy(editor.component, 'focus');
-      editor.focus();
-      strictEqual(editor.component.focus.callCount, 1);
-    });
-  });
+      createEditor()
+      sinon.spy(editor.component, 'focus')
+      editor.focus()
+      strictEqual(editor.component.focus.callCount, 1)
+    })
+  })
 
   QUnit.module('#isValueChanged', () => {
     test('returns the result of calling .isValueChanged on the AssignmentRowCell component', () => {
-      createEditor();
-      sinon.stub(editor.component, 'isValueChanged').returns(true);
-      strictEqual(editor.isValueChanged(), true);
-    });
-  });
+      createEditor()
+      sinon.stub(editor.component, 'isValueChanged').returns(true)
+      strictEqual(editor.isValueChanged(), true)
+    })
+  })
 
   QUnit.module('#serializeValue', () => {
-    test('returns the result of calling .serializeValue on the AssignmentRowCell component', function () {
-      createEditor();
-      sinon.stub(editor.component, 'serializeValue').returns('9.7');
-      strictEqual(editor.serializeValue(), '9.7');
-    });
-  });
+    test('returns the result of calling .serializeValue on the AssignmentRowCell component', function() {
+      createEditor()
+      sinon.stub(editor.component, 'serializeValue').returns('9.7')
+      strictEqual(editor.serializeValue(), '9.7')
+    })
+  })
 
   QUnit.module('#loadValue', () => {
     test('calls .loadValue on the AssignmentRowCell component', () => {
-      createEditor();
-      sinon.spy(editor.component, 'loadValue');
+      createEditor()
+      sinon.spy(editor.component, 'loadValue')
       editor.loadValue()
-      strictEqual(editor.component.loadValue.callCount, 1);
-    });
+      strictEqual(editor.component.loadValue.callCount, 1)
+    })
 
     test('renders the component', () => {
-      createEditor();
-      sinon.stub(editor, 'renderComponent');
+      createEditor()
+      sinon.stub(editor, 'renderComponent')
       editor.loadValue()
-      strictEqual(editor.renderComponent.callCount, 1);
-    });
-  });
+      strictEqual(editor.renderComponent.callCount, 1)
+    })
+  })
 
-  QUnit.module('#applyValue', (hooks) => {
+  QUnit.module('#applyValue', hooks => {
     hooks.beforeEach(() => {
-      createEditor();
+      createEditor()
       sinon.stub(editor.component, 'gradeSubmission')
-    });
+    })
 
     test('calls .gradeSubmission on the AssignmentRowCell component', () => {
-      editor.applyValue({ id: '1101' }, '9.7');
+      editor.applyValue({id: '1101'}, '9.7')
       strictEqual(editor.component.gradeSubmission.callCount, 1)
-    });
+    })
 
     test('includes the given item when applying the value', () => {
-      editor.applyValue({ id: '1101' }, '9.7');
+      editor.applyValue({id: '1101'}, '9.7')
       const [item] = editor.component.gradeSubmission.lastCall.args
-      deepEqual(item, { id: '1101' });
-    });
+      deepEqual(item, {id: '1101'})
+    })
 
     test('includes the given value when applying the value', () => {
-      editor.applyValue({ id: '1101' }, '9.7');
-      const [/* item */, value] = editor.component.gradeSubmission.lastCall.args;
-      strictEqual(value, '9.7');
-    });
-  });
+      editor.applyValue({id: '1101'}, '9.7')
+      const [, /* item */ value] = editor.component.gradeSubmission.lastCall.args
+      strictEqual(value, '9.7')
+    })
+  })
 
   QUnit.module('#validate', () => {
     test('returns an empty validation success', () => {
@@ -244,4 +252,4 @@ QUnit.module('AssignmentCellEditor', (suiteHooks) => {
       deepEqual(editor.validate(), {msg: null, valid: true})
     })
   })
-});
+})

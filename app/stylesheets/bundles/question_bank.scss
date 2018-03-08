@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 #move_question_dialog .question_name {
 }
@@ -36,7 +36,9 @@
   font-size: 0.8em;
   max-height: 1.7em;
   overflow: hidden;
-  > *:first-child { margin-top: 0; }
+  > *:first-child {
+    margin-top: 0;
+  }
 }
 
 #move_question_dialog ul.banks {

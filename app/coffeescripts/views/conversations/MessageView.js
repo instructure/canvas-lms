@@ -64,7 +64,8 @@ export default class MessageView extends View {
     if (
       (e && e.target.className.match(/star|read-state/)) ||
       this.$selectCheckbox[0].contains(e.target)
-    ) return
+    )
+      return
 
     if (e.shiftKey) return this.model.collection.selectRange(this.model)
 
@@ -159,11 +160,11 @@ Object.assign(MessageView.prototype, {
     '.select-checkbox': '$selectCheckbox'
   },
   events: {
-    'click': 'onSelect',
+    click: 'onSelect',
     'click .open-message': 'onSelect',
     'click .star-btn': 'toggleStar',
     'click .read-state': 'toggleRead',
-    'mousedown': 'onMouseDown'
+    mousedown: 'onMouseDown'
   },
   messages: {
     read: I18n.t('Mark as read'),

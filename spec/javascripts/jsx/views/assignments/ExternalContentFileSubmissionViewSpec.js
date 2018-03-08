@@ -33,7 +33,7 @@ let model
 let view
 
 QUnit.module('ExternalContentFileSubmissionView#uploadFileFromUrl', {
-  setup () {
+  setup() {
     sandbox = sinon.sandbox.create()
     fakeENV.setup()
     window.ENV.COURSE_ID = 42
@@ -42,25 +42,26 @@ QUnit.module('ExternalContentFileSubmissionView#uploadFileFromUrl', {
       ID: 24
     }
     model = new Backbone.Model(contentItem)
-    view = new ExternalContentFileSubmissionView
-      externalTool: {}
-      model: model
+    view = new ExternalContentFileSubmissionView()
+    externalTool: {
+    }
+    model: model
   },
 
-  teardown () {
+  teardown() {
     fakeENV.teardown()
     $('#fixtures').empty()
     sandbox.restore()
   }
 })
 
-test("hits the course url", () => {
+test('hits the course url', () => {
   const spy = sandbox.spy($, 'ajaxJSON')
   view.uploadFileFromUrl({}, model)
   ok(spy.calledWith('/api/v1/courses/42/assignments/24/submissions/5/files'))
 })
 
-test("hits the group url", () => {
+test('hits the group url', () => {
   window.ENV.SUBMIT_ASSIGNMENT.GROUP_ID_FOR_USER = 2
 
   const spy = sandbox.spy($, 'ajaxJSON')

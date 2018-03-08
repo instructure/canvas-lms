@@ -18,25 +18,25 @@
 
 import AssignmentMuter from 'compiled/AssignmentMuter'
 
-  class AssignmentMuterDialogManager {
-    constructor (assignment, url, submissionsLoaded) {
-      this.assignment = assignment;
-      this.url = url;
-      this.submissionsLoaded = submissionsLoaded;
-      this.showDialog = this.showDialog.bind(this);
-      this.isDialogEnabled = this.isDialogEnabled.bind(this);
-    }
-
-    showDialog (cb) {
-      const assignmentMuter = new AssignmentMuter(
-        null, this.assignment, this.url, null, { openDialogInstantly: true }
-      );
-      assignmentMuter.show(cb);
-    }
-
-    isDialogEnabled () {
-      return this.submissionsLoaded;
-    }
+class AssignmentMuterDialogManager {
+  constructor(assignment, url, submissionsLoaded) {
+    this.assignment = assignment
+    this.url = url
+    this.submissionsLoaded = submissionsLoaded
+    this.showDialog = this.showDialog.bind(this)
+    this.isDialogEnabled = this.isDialogEnabled.bind(this)
   }
+
+  showDialog(cb) {
+    const assignmentMuter = new AssignmentMuter(null, this.assignment, this.url, null, {
+      openDialogInstantly: true
+    })
+    assignmentMuter.show(cb)
+  }
+
+  isDialogEnabled() {
+    return this.submissionsLoaded
+  }
+}
 
 export default AssignmentMuterDialogManager

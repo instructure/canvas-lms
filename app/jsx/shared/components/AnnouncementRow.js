@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!shared_components'
 import React from 'react'
-import { bool, func } from 'prop-types'
+import {bool, func} from 'prop-types'
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
 
@@ -35,34 +35,41 @@ import UnreadBadge from './UnreadBadge'
 import announcementShape from '../proptypes/announcement'
 import masterCourseDataShape from '../proptypes/masterCourseData'
 
-function makeTimestamp ({ delayed_post_at, posted_at }) {
+function makeTimestamp({delayed_post_at, posted_at}) {
   return delayed_post_at
-  ? {
-      title: (
-        <span>
-          <Container margin="0 x-small">
-            <Text color="secondary"><IconTimer /></Text>
-          </Container>
-          {I18n.t('Delayed until:')}
-        </span>
-      ),
-      date: delayed_post_at
-  }
-  : { title: I18n.t('Posted on:'), date: posted_at }
+    ? {
+        title: (
+          <span>
+            <Container margin="0 x-small">
+              <Text color="secondary">
+                <IconTimer />
+              </Text>
+            </Container>
+            {I18n.t('Delayed until:')}
+          </span>
+        ),
+        date: delayed_post_at
+      }
+    : {title: I18n.t('Posted on:'), date: posted_at}
 }
 
-export default function AnnouncementRow ({ announcement, canManage, masterCourseData, rowRef, onSelectedChanged }) {
+export default function AnnouncementRow({
+  announcement,
+  canManage,
+  masterCourseData,
+  rowRef,
+  onSelectedChanged
+}) {
   const timestamp = makeTimestamp(announcement)
-  const readCount = announcement.discussion_subentry_count > 0
-    ? (
+  const readCount =
+    announcement.discussion_subentry_count > 0 ? (
       <UnreadBadge
         unreadCount={announcement.unread_count}
-        unreadLabel={I18n.t('%{count} unread replies', { count: announcement.unread_count })}
+        unreadLabel={I18n.t('%{count} unread replies', {count: announcement.unread_count})}
         totalCount={announcement.discussion_subentry_count}
-        totalLabel={I18n.t('%{count} replies', { count: announcement.discussion_subentry_count })}
+        totalLabel={I18n.t('%{count} replies', {count: announcement.discussion_subentry_count})}
       />
-    )
-    : null
+    ) : null
 
   // necessary because announcements return html from RCE
   const contentWrapper = document.createElement('span')
@@ -88,28 +95,33 @@ export default function AnnouncementRow ({ announcement, canManage, masterCourse
           lockedText: I18n.t('%{title} is locked. Click to unlock', {title: announcement.title}),
           course_id: masterCourseData.masterCourse.id,
           content_id: announcement.id,
-          content_type: 'discussion_topic',
-        }),
+          content_type: 'discussion_topic'
+        })
       }}
       metaContent={
         <div>
           <span className="ic-item-row__meta-content-heading">
-            <Text size="small" as="p">{timestamp.title}</Text>
+            <Text size="small" as="p">
+              {timestamp.title}
+            </Text>
           </span>
-          <Text color="secondary" size="small" as="p">{$.datetimeString(timestamp.date, {format: 'full'})}</Text>
+          <Text color="secondary" size="small" as="p">
+            {$.datetimeString(timestamp.date, {format: 'full'})}
+          </Text>
         </div>
       }
       actionsContent={readCount}
     >
       <Heading level="h3">{announcement.title}</Heading>
-      <SectionsTooltip
-        totalUserCount={announcement.user_count}
-        sections={announcement.sections} />
+      <SectionsTooltip totalUserCount={announcement.user_count} sections={announcement.sections} />
       <div className="ic-announcement-row__content">{textContent}</div>
-      {!announcement.locked &&
+      {!announcement.locked && (
         <Container display="block" margin="x-small 0 0">
-          <Text color="brand"><IconReply /> {I18n.t('Reply')}</Text>
-        </Container>}
+          <Text color="brand">
+            <IconReply /> {I18n.t('Reply')}
+          </Text>
+        </Container>
+      )}
     </CourseItemRow>
   )
 }
@@ -119,12 +131,12 @@ AnnouncementRow.propTypes = {
   canManage: bool,
   masterCourseData: masterCourseDataShape,
   rowRef: func,
-  onSelectedChanged: func,
+  onSelectedChanged: func
 }
 
 AnnouncementRow.defaultProps = {
   canManage: false,
   masterCourseData: null,
-  rowRef () {},
-  onSelectedChanged () {},
+  rowRef() {},
+  onSelectedChanged() {}
 }

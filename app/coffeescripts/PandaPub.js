@@ -2,12 +2,11 @@ import INST from 'INST'
 import $ from 'jquery'
 
 class Client {
-
   // Is truthy if PandaPub is enabled.
   //
   enabled = INST.pandaPubSettings
 
-  constructor () {
+  constructor() {
     this.subscribe = this.subscribe.bind(this)
     this.on = this.on.bind(this)
     this.authExtension = this.authExtension.bind(this)
@@ -26,9 +25,9 @@ class Client {
     this.tokens[fullChannel] = token
 
     const dfd = new $.Deferred()
-    dfd.cancel = function () {}
+    dfd.cancel = function() {}
 
-    this.client((faye) => {
+    this.client(faye => {
       const subscription = faye.subscribe(fullChannel, message => cb(message))
 
       subscription.then(dfd.resolve, dfd.reject)
@@ -40,8 +39,7 @@ class Client {
 
   // Subscribe to transport-level events, transport:down or
   // transport:up. See http://faye.jcoglan.com/browser/transport.html
-  on = (event, cb) =>
-    this.client(faye => faye.on(event, cb))
+  on = (event, cb) => this.client(faye => faye.on(event, cb))
 
   // @api private
   authExtension = () => {
@@ -49,7 +47,7 @@ class Client {
       outgoing: (message, cb) => {
         if (message.channel === '/meta/subscribe') {
           if (message.subscription in this.tokens) {
-            (message.ext || (message.ext = {})).auth = {
+            ;(message.ext || (message.ext = {})).auth = {
               token: this.tokens[message.subscription]
             }
           }
@@ -63,7 +61,7 @@ class Client {
   // if necessary.
   //
   // @api private
-  client (cb) {
+  client(cb) {
     if (this.faye) cb(this.faye)
 
     if (!this.faye) {

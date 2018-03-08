@@ -43,28 +43,26 @@ var uploader = new K5Uploader(opts);
 uploader.addEventListener('K5.ready', function()() {
   uploader.uploadFile(file);
 });
-
 ```
 
 ## Events
 
 The K5Uploader dispatches several events during the upload process. Listen to them or ignore them as your needs dictate.
 
-|Event | Description|
-|:---- |:---------- |
-|`K5.uiconfError` | there has been an error loading data from the `uiconfUrl` |
-| `K5.ready` | a valid kaltura session and uiconf serivce data is loaded. now save to upload |
-| `K5.fileError` | uploaded filetype is not included in the `allowedMediaTypes` options |
-| `K5.progress` | upload progress is detected |
-| `K5.complete` | upload is complete |
-| `K5.error` | error uploading file or adding upload via `entryUrl` |
+| Event            | Description                                                                   |
+| :--------------- | :---------------------------------------------------------------------------- |
+| `K5.uiconfError` | there has been an error loading data from the `uiconfUrl`                     |
+| `K5.ready`       | a valid kaltura session and uiconf serivce data is loaded. now save to upload |
+| `K5.fileError`   | uploaded filetype is not included in the `allowedMediaTypes` options          |
+| `K5.progress`    | upload progress is detected                                                   |
+| `K5.complete`    | upload is complete                                                            |
+| `K5.error`       | error uploading file or adding upload via `entryUrl`                          |
 
 ### Dealing with events
 
 In order to register an event handler, the `K5Uploader` includes the following methods:
 
 ```javascript
-k5Uploader.addEventListener(eventName, callback);
+k5Uploader.addEventListener(eventName, callback)
 k5Uploader.removeEventListener(eventName, callback)
 ```
-

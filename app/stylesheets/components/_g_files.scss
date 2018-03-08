@@ -20,7 +20,8 @@
   padding: 0px;
   margin: 0px;
   height: 350px;
-  a:hover, a:focus {
+  a:hover,
+  a:focus {
     background-color: transparent;
   }
   li {
@@ -44,7 +45,8 @@
     }
     &.folder {
       background-image: url(/images/folder_big.png);
-      &.currently_locked_folder, &.folder_locked {
+      &.currently_locked_folder,
+      &.folder_locked {
         background-image: url(/images/folder_big_locked.png);
       }
       &.drop_target {
@@ -53,7 +55,8 @@
     }
     &.file {
       background-image: url(/images/file_big.png);
-      &.currently_locked, &.locked {
+      &.currently_locked,
+      &.locked {
         background-image: url(/images/file_big_locked.png);
       }
     }
@@ -72,7 +75,8 @@
         }
       }
     }
-    &.selected, .temp_selected {
+    &.selected,
+    .temp_selected {
       background-color: #fea;
       font-weight: bold;
       .links {
@@ -160,7 +164,8 @@
           border-bottom: 1px solid #eee;
         }
       }
-      &.currently_locked_folder, &.folder_locked {
+      &.currently_locked_folder,
+      &.folder_locked {
         .folder_name {
           background-image: url(/images/folder_locked.png);
         }

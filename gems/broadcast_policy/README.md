@@ -1,21 +1,20 @@
-BroadcastPolicy
-===============
+# BroadcastPolicy
 
 This allows us to do something like:
 
 class Model < ActiveRecord::Base
-  has_a_broadcast_policy
+has_a_broadcast_policy
 
-  set_broadcast_policy do |p|
-    p.dispatch :notification_name
-    p.to { some_endpoints }
-    p.whenever { |record|
-      record.foo_is_true? && record.bar_is_false?
-    }
-  end
+set_broadcast_policy do |p|
+p.dispatch :notification_name
+p.to { some_endpoints }
+p.whenever { |record|
+record.foo_is_true? && record.bar_is_false?
+}
+end
 
 end
-  
+
 ## Usage
 
 In order to use the gem in Rails, you'll need an initializer something like this:
@@ -24,8 +23,8 @@ config/initializers/broadcast_policy.rb
 
 require 'broadcast_policy'
 Rails.configuration.to_prepare do
-  BroadcastPolicy.notifier = lambda { Notifier.new }
-  BroadcastPolicy.notification_finder = lambda { NotificationFinder.new(Notification.all_cached) }
+BroadcastPolicy.notifier = lambda { Notifier.new }
+BroadcastPolicy.notification_finder = lambda { NotificationFinder.new(Notification.all_cached) }
 end
 ActiveRecord::Base.send(:extend, BroadcastPolicy::ClassMethods)
 

@@ -17,7 +17,9 @@
  */
 
 a.external {
-  &:hover, &:focus, &:active {
+  &:hover,
+  &:focus,
+  &:active {
     text-decoration: none;
     span {
       text-decoration: underline;

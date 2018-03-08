@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "components/ui.selectmenu";
-@import "components/conditional_release";
+@import 'base/environment';
+@import 'components/ui.selectmenu';
+@import 'components/conditional_release';
 
-$border: #C1C7CF;
+$border: #c1c7cf;
 $borderRadius: 3px;
 $discussion-dark-text: $ic-color-dark;
 
@@ -68,7 +68,8 @@ $discussion-dark-text: $ic-color-dark;
     padding: 0;
     margin: $ic-sp 0 $ic-sp*2 $ic-sp*2;
 
-    &.collapsed, .entry {
+    &.collapsed,
+    .entry {
       margin: 16px 0 16px 18px;
     }
 
@@ -146,7 +147,7 @@ $discussion-dark-text: $ic-color-dark;
     margin: 0;
     a {
       display: inline-block;
-      margin-left: 3px
+      margin-left: 3px;
     }
   }
   .icon-peer-review {
@@ -165,7 +166,7 @@ $discussion-dark-text: $ic-color-dark;
   width: 100%;
 
   @media screen and (min-width: 1100px) {
-    min-height: 129px
+    min-height: 129px;
   }
 }
 
@@ -215,7 +216,7 @@ $discussion-dark-text: $ic-color-dark;
 }
 
 .discussion-assignment-section {
-  .row-fluid [class*="span"] {
+  .row-fluid [class*='span'] {
     min-height: 0;
   }
   .discussion-title {
@@ -223,7 +224,6 @@ $discussion-dark-text: $ic-color-dark;
     font-size: 0.875rem !important;
   }
 }
-
 
 .discussion-fyi {
   font-style: italic;
@@ -261,12 +261,13 @@ $discussion-dark-text: $ic-color-dark;
   left: -32px;
 }
 
-.discussion-reply-action, .discussion-rate-action {
-
+.discussion-reply-action,
+.discussion-rate-action {
   color: $ic-font-color-dark;
   text-decoration: none;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     text-decoration: none;
     color: #444;
   }
@@ -278,18 +279,22 @@ $discussion-dark-text: $ic-color-dark;
 
 .discussion-rate-action--checked {
   color: var(--ic-link-color);
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     color: var(--ic-link-color);
   }
 }
 
 .discussion-rating {
-  @if $use_high_contrast { color: #666; }
-  @else {color: $ic-font-color-dark;}
+  @if $use_high_contrast {
+    color: #666;
+  } @else {
+    color: $ic-font-color-dark;
+  }
 }
 
-.entry, .discussion_entry {
-
+.entry,
+.discussion_entry {
   .show-if-replying {
     display: none;
   }
@@ -311,7 +316,6 @@ $discussion-dark-text: $ic-color-dark;
   padding: 0 0.8em;
   border: 1px solid $ic-border-light;
 }
-
 
 .entry-content {
   .avatar {
@@ -351,7 +355,7 @@ $discussion-dark-text: $ic-color-dark;
 
 .entry {
   .cancel_button {
-  @include fontSize(11px);
+    @include fontSize(11px);
   }
 }
 
@@ -393,7 +397,8 @@ $discussion-dark-text: $ic-color-dark;
   float: right;
 }
 
-.message-notification, .notification {
+.message-notification,
+.notification {
   background: #ffffcc;
 }
 
@@ -424,7 +429,7 @@ $discussion-dark-text: $ic-color-dark;
     float: left;
     text-transform: uppercase;
     &:after {
-      content: "";
+      content: '';
       display: inline-block;
       position: relative;
       left: 4px;
@@ -505,7 +510,8 @@ $discussion-dark-text: $ic-color-dark;
 }
 
 .new-and-total-badge {
-  .new-items, .total-items {
+  .new-items,
+  .total-items {
     font-weight: normal;
     @include fontSize(10px);
   }
@@ -527,10 +533,13 @@ $discussion-dark-text: $ic-color-dark;
   border: 1px solid #d4d5d7;
   margin: 15px 0;
 
-  @if $use_high_contrast { color: $ic-font-color-dark; }
+  @if $use_high_contrast {
+    color: $ic-font-color-dark;
+  }
   transition: border-color 0.2s;
   padding: $ic-sp/2 $ic-sp;
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     color: #444;
     text-decoration: none;
     border-color: var(--ic-link-color);
@@ -556,7 +565,8 @@ $discussion-dark-text: $ic-color-dark;
     background: none;
     border-color: white;
   }
-  .al-trigger:hover, .al-trigger.ui-state-active {
+  .al-trigger:hover,
+  .al-trigger.ui-state-active {
     border-color: #c2c2c2;
     border-bottom-color: #bfbfbf;
   }
@@ -567,11 +577,12 @@ $discussion-dark-text: $ic-color-dark;
   @include fontSize(14px);
 }
 
-.collapsable:hover, .collapsable:focus {
+.collapsable:hover,
+.collapsable:focus {
   cursor: pointer;
   &:before {
     display: block;
-    content: "";
+    content: '';
     position: absolute;
     top: 2px;
     left: 50%;
@@ -643,7 +654,9 @@ $discussion-dark-text: $ic-color-dark;
   background: white;
   min-height: 50px;
   &#discussion-toolbar {
-    + .discussion-entry-reply-area { margin-top: -1px; }
+    + .discussion-entry-reply-area {
+      margin-top: -1px;
+    }
   }
   .admin-links {
     text-align: left;
@@ -663,12 +676,14 @@ $discussion-dark-text: $ic-color-dark;
   }
   .headerBar:after {
     clear: both;
-    content: "";
+    content: '';
     display: block;
   }
   .sticky {
     position: fixed;
-    top: 0; left: 0; right: 0;
+    top: 0;
+    left: 0;
+    right: 0;
     z-index: 15; // increase for discussions sticky toolbar
     border-color: $ic-border-light;
     background: $lightBackground;
@@ -693,13 +708,21 @@ $discussion-dark-text: $ic-color-dark;
 }
 
 #discussion-toolbar {
-  .topic-subscribe-button { display:none; }
-  .topic-unsubscribe-button { display:none; }
+  .topic-subscribe-button {
+    display: none;
+  }
+  .topic-unsubscribe-button {
+    display: none;
+  }
 
   &.unsubscribed {
-    .topic-subscribe-button { display:inline-block; }
+    .topic-subscribe-button {
+      display: inline-block;
+    }
   }
   &.subscribed {
-    .topic-unsubscribe-button { display:inline-block; }
+    .topic-unsubscribe-button {
+      display: inline-block;
+    }
   }
 }

@@ -26,7 +26,7 @@
 // public/javascripts/dummyI18nResource
 
 class I18nPlugin {
-  apply (compiler) {
+  apply(compiler) {
     compiler.plugin('normal-module-factory', nmf => {
       nmf.plugin('before-resolve', (result, callback) => {
         if (/^i18n!/.test(result.request)) {

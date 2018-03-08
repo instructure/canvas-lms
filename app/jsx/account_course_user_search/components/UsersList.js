@@ -29,30 +29,32 @@ import {arrayOf, string, object, func} from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 import UsersListRow from './UsersListRow'
 
-
-export default function UsersList (props) {
-
-  function UserListHeader ({id, tipAsc, tipDesc, label}) {
+export default function UsersList(props) {
+  function UserListHeader({id, tipAsc, tipDesc, label}) {
     const {sort, order, search_term, role_filter_id} = props.userList.searchFilter
-    const newOrder = (sort === id && order === 'asc') || (!sort && id === 'username')
-      ? 'desc'
-      : 'asc'
+    const newOrder =
+      (sort === id && order === 'asc') || (!sort && id === 'username') ? 'desc' : 'asc'
 
     return (
       <th>
         <ApplyTheme theme={{[Link.theme]: {fontWeight: 'bold'}}}>
           <Tooltip
             as={Link}
-            tip={(sort === id && order === 'asc') ? tipAsc : tipDesc}
+            tip={sort === id && order === 'asc' ? tipAsc : tipDesc}
             onClick={preventDefault(() => {
               props.onUpdateFilters({search_term, sort: id, order: newOrder, role_filter_id})
             })}
           >
             {label}
-            {sort === id ?
-              (order === 'asc' ? <IconMiniArrowDownSolid /> : <IconMiniArrowUpSolid />) :
+            {sort === id ? (
+              order === 'asc' ? (
+                <IconMiniArrowDownSolid />
+              ) : (
+                <IconMiniArrowUpSolid />
+              )
+            ) : (
               ''
-            }
+            )}
           </Tooltip>
         </ApplyTheme>
       </th>
@@ -93,7 +95,7 @@ export default function UsersList (props) {
         </tr>
       </thead>
       <tbody data-automation="users list">
-        {props.users.map(user =>
+        {props.users.map(user => (
           <UsersListRow
             handlers={props.handlers}
             key={user.id}
@@ -101,7 +103,7 @@ export default function UsersList (props) {
             user={user}
             permissions={props.permissions}
           />
-        )}
+        ))}
       </tbody>
     </Table>
   )

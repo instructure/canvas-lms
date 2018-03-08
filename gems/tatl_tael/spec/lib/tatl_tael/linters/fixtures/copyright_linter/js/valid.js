@@ -24,7 +24,7 @@
 import I18n from 'i18n!dateformat'
 
 var accessibleDateFormat = () => {
-  return I18n.t("YYYY-MM-DD hh:mm");
-};
+  return I18n.t('YYYY-MM-DD hh:mm')
+}
 
 export default accessibleDateFormat

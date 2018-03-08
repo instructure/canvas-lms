@@ -16,21 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createStore, applyMiddleware } from 'redux';
-import reduxThunk from 'redux-thunk';
-import reducer from './reducer';
+import {createStore, applyMiddleware} from 'redux'
+import reduxThunk from 'redux-thunk'
+import reducer from './reducer'
 
 const middleware = [
   reduxThunk,
 
   // this is so redux-logger is not included in the production webpack bundle
-  (process.env.NODE_ENV !== 'production') && require('redux-logger')()
+  process.env.NODE_ENV !== 'production' && require('redux-logger')()
 ].filter(Boolean)
 
-export default function configureStore (defaultState = {}) {
-  return createStore(
-    reducer,
-    defaultState,
-    applyMiddleware(...middleware)
-  );
+export default function configureStore(defaultState = {}) {
+  return createStore(reducer, defaultState, applyMiddleware(...middleware))
 }

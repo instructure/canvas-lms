@@ -29,8 +29,7 @@
 // This imports the variables needed to support accessibility ($use_high_contrast)
 // You can also use the sass function that helps ensure color contrast ratio.
 // Look in /sass-functions/ for more information on how that is used
-@import "variant_variables";
-
+@import 'variant_variables';
 
 //=======================
 // Canvas LMS Color Sheet
@@ -47,43 +46,62 @@
 //====================================
 // Abstract Color Variables
 //====================================
-$electric:                  #008EE2; // blue
-@if $use_high_contrast {    $electric: #0770A3; }
-$shamrock:                  #00AC18; // green
-@if $use_high_contrast {    $shamrock: #127A1B; }
-$barney:                    #BF32A4; // magenta
-@if $use_high_contrast {    $barney: #B8309E; }
-$crimson:                   #EE0612; // red
-@if $use_high_contrast {    $crimson: #D01A19; }
-$fire:                      #FC5E13; // orange
-@if $use_high_contrast {    $fire: #C23C0D; }
+$electric: #008ee2; // blue
+@if $use_high_contrast {
+  $electric: #0770a3;
+}
+$shamrock: #00ac18; // green
+@if $use_high_contrast {
+  $shamrock: #127a1b;
+}
+$barney: #bf32a4; // magenta
+@if $use_high_contrast {
+  $barney: #b8309e;
+}
+$crimson: #ee0612; // red
+@if $use_high_contrast {
+  $crimson: #d01a19;
+}
+$fire: #fc5e13; // orange
+@if $use_high_contrast {
+  $fire: #c23c0d;
+}
 
 //====================================
 // Default Functional Swatches
 //====================================
-$ic-color-success:          $shamrock;
-$ic-color-action:           $barney;
-$ic-color-danger:           $crimson;
-$ic-color-alert:            $fire;
+$ic-color-success: $shamrock;
+$ic-color-action: $barney;
+$ic-color-danger: $crimson;
+$ic-color-alert: $fire;
 
 //====================================
 // Gray-ish Scale
 //====================================
 
-$ic-color-dark:              #2D3B45; // licorice
-$ic-color-medium-darker:     #394B58; // oxford
-$ic-color-medium:            #73818C; // slate
-@if $use_high_contrast {     $ic-color-medium: #556572; }
-$ic-color-medium-lighter:    #8B969E; // ash
-@if $use_high_contrast {     $ic-color-medium-lighter: #556572; }
-$heather:                    #A5AFB5; // heather
-@if $use_high_contrast {     $ic-border-dark: #556572; }
-$tiara:                      #C7CDD1; // tiara
-@if $use_high_contrast {     $ic-border-color: #667887; }
-$ic-color-medium-light:      #F5F5F5; // porcelain
-@if $use_high_contrast {     $ic-color-medium-light: #FFFFFF; }
-$ic-color-light:             #FFFFFF; // white
-
+$ic-color-dark: #2d3b45; // licorice
+$ic-color-medium-darker: #394b58; // oxford
+$ic-color-medium: #73818c; // slate
+@if $use_high_contrast {
+  $ic-color-medium: #556572;
+}
+$ic-color-medium-lighter: #8b969e; // ash
+@if $use_high_contrast {
+  $ic-color-medium-lighter: #556572;
+}
+$heather: #a5afb5; // heather
+@if $use_high_contrast {
+  $ic-border-dark: #556572;
+}
+$tiara: #c7cdd1; // tiara
+@if $use_high_contrast {
+  $ic-border-color: #667887;
+}
+$ic-color-medium-light: #f5f5f5; // porcelain
+@if $use_high_contrast {
+  $ic-color-medium-light: #ffffff;
+}
+$ic-color-light: #ffffff; // white
 
 //================================
 // Global light background colors
@@ -91,50 +109,68 @@ $ic-color-light:             #FFFFFF; // white
 // These background color variables can be used on hover states or focus states
 // and meet our contrast needs when used with our main color variables
 
-$ic-bg-light-neutral:       $ic-color-medium-light;
-$ic-bg-light-neutral-text:  #394B58;
-@if $use_high_contrast { $ic-bg-light-neutral: #EBEDEE; }
-$ic-bg-light-primary:       #E5F2F8;
-@if $use_high_contrast { $ic-bg-light-primary: #E6F1F7;}
-$ic-bg-light-primary-text:  #0078BD;
-@if $use_high_contrast { $ic-bg-light-primary-text: #0770A3; }
-$ic-bg-light-success:       #E8F6E9;
-@if $use_high_contrast { $ic-bg-light-success: #E8F2E9; }
-$ic-bg-light-success-text:  #008A13;
-@if $use_high_contrast { $ic-bg-light-success-text: $ic-color-success; }
-$ic-bg-light-alert:         #FBEDE7;
-@if $use_high_contrast { $ic-bg-light-alert: #F9ECE8; }
-$ic-bg-light-alert-text:    #D14604;
-@if $use_high_contrast { $ic-bg-light-alert-text: $ic-color-alert; }
-$ic-bg-light-danger:        #FCE8E7;
-@if $use_high_contrast { $ic-bg-light-danger: #FBE8E8; }
-$ic-bg-light-danger-text:   #EE0612;
-@if $use_high_contrast { $ic-bg-light-danger-text: $ic-color-danger; }
+$ic-bg-light-neutral: $ic-color-medium-light;
+$ic-bg-light-neutral-text: #394b58;
+@if $use_high_contrast {
+  $ic-bg-light-neutral: #ebedee;
+}
+$ic-bg-light-primary: #e5f2f8;
+@if $use_high_contrast {
+  $ic-bg-light-primary: #e6f1f7;
+}
+$ic-bg-light-primary-text: #0078bd;
+@if $use_high_contrast {
+  $ic-bg-light-primary-text: #0770a3;
+}
+$ic-bg-light-success: #e8f6e9;
+@if $use_high_contrast {
+  $ic-bg-light-success: #e8f2e9;
+}
+$ic-bg-light-success-text: #008a13;
+@if $use_high_contrast {
+  $ic-bg-light-success-text: $ic-color-success;
+}
+$ic-bg-light-alert: #fbede7;
+@if $use_high_contrast {
+  $ic-bg-light-alert: #f9ece8;
+}
+$ic-bg-light-alert-text: #d14604;
+@if $use_high_contrast {
+  $ic-bg-light-alert-text: $ic-color-alert;
+}
+$ic-bg-light-danger: #fce8e7;
+@if $use_high_contrast {
+  $ic-bg-light-danger: #fbe8e8;
+}
+$ic-bg-light-danger-text: #ee0612;
+@if $use_high_contrast {
+  $ic-bg-light-danger-text: $ic-color-danger;
+}
 
 //====================================
 // DEPRECATED COLORS - DO NOT USE
 //====================================
 
-$ic-color-neutral:       hsl(0,0, 90%);
-$gray-darker:            $ic-color-dark;
-$gray-dark:              $ic-color-medium-darker;
-$gray:                   $ic-color-medium;
-$gray-light:             $ic-color-medium-light;
-$gray-lighter:           $ic-color-light;
+$ic-color-neutral: hsl(0, 0, 90%);
+$gray-darker: $ic-color-dark;
+$gray-dark: $ic-color-medium-darker;
+$gray: $ic-color-medium;
+$gray-light: $ic-color-medium-light;
+$gray-lighter: $ic-color-light;
 
 //==================
 // Layout Variables
 //==================
-$right_side_width:          286px;
-$right_side_margin:         13px;
-$left_side_width:           175px;
-$min_main_width:            510px;
-$max_main_width:            1100px;
-$ic-sp:                     12px;
-$ic-border-radius:          $ic-sp/2;
-$spacing-width:             20px; // TODO - would be nice to phase this one out for $ic-sp
-$borderRadius:              4px;
-$contentBoxPadding:         8px;
+$right_side_width: 286px;
+$right_side_margin: 13px;
+$left_side_width: 175px;
+$min_main_width: 510px;
+$max_main_width: 1100px;
+$ic-sp: 12px;
+$ic-border-radius: $ic-sp/2;
+$spacing-width: 20px; // TODO - would be nice to phase this one out for $ic-sp
+$borderRadius: 4px;
+$contentBoxPadding: 8px;
 
 //============================
 // Typography Variables
@@ -144,111 +180,117 @@ $contentBoxPadding:         8px;
 // Once all of those have been adjusted to use the new variable we can get rid of this
 $ic-line-height: 1.5;
 
-$ic-font-family: "LatoWeb", "Helvetica Neue", Helvetica, Arial, sans-serif;
-$ic-font-family-fallback: "Helvetica Neue", Helvetica, Arial, sans-serif;
-$ic-font-family-monospace: Monaco, Menlo, Consolas, "Courier New", monospace;
+$ic-font-family: 'LatoWeb', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$ic-font-family-fallback: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$ic-font-family-monospace: Monaco, Menlo, Consolas, 'Courier New', monospace;
 
 $ic-font-weight: bold; // we can phase this var out now we're on Lato
 
 $ic-font-size: 16px;
 
-$ic-font-size--xlarge:   $ic-font-size + 14;
-$ic-font-size--large:    $ic-font-size + 9;
-$ic-font-size--medium:   $ic-font-size + 2;
-$ic-font-size--small:    $ic-font-size;
-$ic-font-size--xsmall:   $ic-font-size - 2;
+$ic-font-size--xlarge: $ic-font-size + 14;
+$ic-font-size--large: $ic-font-size + 9;
+$ic-font-size--medium: $ic-font-size + 2;
+$ic-font-size--small: $ic-font-size;
+$ic-font-size--xsmall: $ic-font-size - 2;
 
 /* Legacy variables. Discontinue to use these: */
-$h1-font-size:  23px;
-$h2-font-size:  14px;
-$h3-font-size:  19px;
+$h1-font-size: 23px;
+$h2-font-size: 14px;
+$h3-font-size: 19px;
 
 //============================
 // Layout Functional Variables
 //============================
-$ic-body-background-color:      lighten($ic-color-neutral, 4);
-$ic-content-background-color:   $ic-color-light;
-$ic-content-padding:            15px;
-$ic-header-background:          #34444f;
-$ic-header-primary-width:       84px;
+$ic-body-background-color: lighten($ic-color-neutral, 4);
+$ic-content-background-color: $ic-color-light;
+$ic-content-padding: 15px;
+$ic-header-background: #34444f;
+$ic-header-primary-width: 84px;
 $ic-header-primary-expanded-width: $ic-sp*15;
 $ic-right-side-width: $ic-sp*24;
 
 //============================
 // List Functional Variables
 //============================
-$ic-list-item-background--hover:      #eef7ff;
-$ic-list-item-background--selected:   #d9edf9;
+$ic-list-item-background--hover: #eef7ff;
+$ic-list-item-background--selected: #d9edf9;
 
 //=====================
 // Global border colors
 //=====================
-$ic-border-color:         $tiara;
+$ic-border-color: $tiara;
 // If it's a light border, it should be this color.
-$ic-border-light:         $tiara;
+$ic-border-light: $tiara;
 // If it's a dark border, it should be this color.
 // the most often use case for this is when the line is
 // dashed on a light gray background so it visually
 // looks the same as the outer border
-$ic-border-dark:          $heather;
+$ic-border-dark: $heather;
 
 //=====================
 // Text-color variables
 //=====================
-$ic-font-color-light:     $ic-color-light;
-$ic-font-color-dark:      var(--ic-brand-font-color-dark);
-@if $use_high_contrast { $ic-font-color-dark: $ic-color-dark; }
-$ic-font-color--subdued:  var(--ic-brand-font-color-dark-lightened-15);
-@if $use_high_contrast { $ic-font-color--subdued:  $ic-color-medium-darker; }
-$ic-hint-text:            var(--ic-brand-font-color-dark-lightened-30);
-@if $use_high_contrast { $ic-hint-text: $ic-color-medium; }
+$ic-font-color-light: $ic-color-light;
+$ic-font-color-dark: var(--ic-brand-font-color-dark);
+@if $use_high_contrast {
+  $ic-font-color-dark: $ic-color-dark;
+}
+$ic-font-color--subdued: var(--ic-brand-font-color-dark-lightened-15);
+@if $use_high_contrast {
+  $ic-font-color--subdued: $ic-color-medium-darker;
+}
+$ic-hint-text: var(--ic-brand-font-color-dark-lightened-30);
+@if $use_high_contrast {
+  $ic-hint-text: $ic-color-medium;
+}
 
 // textColor is a deprecated Bootstrap 2 variable. Please use $ic-font-color-dark!
-$textColor:               $ic-font-color-dark; // deprecated - do not use
+$textColor: $ic-font-color-dark; // deprecated - do not use
 
 //=============================
 // Link-color-related variables
 //=============================
 $ic-icon-link-color-hover: var(--ic-brand-font-color-dark-lightened-15);
 @if $use_high_contrast {
-$ic-icon-link-color-hover: $ic-font-color-dark;
+  $ic-icon-link-color-hover: $ic-font-color-dark;
 }
 
-$ic-icon-link-color:       var(--ic-brand-font-color-dark-lightened-30);
+$ic-icon-link-color: var(--ic-brand-font-color-dark-lightened-30);
 @if $use_high_contrast {
-$ic-icon-link-color:       lighten($ic-font-color-dark, 12%);
+  $ic-icon-link-color: lighten($ic-font-color-dark, 12%);
 }
 
 // linkColor is a deprecated Bootstrap 2 variable
-$linkColor:                 var(--ic-link-color); // deprecated - do not use
-$linkColorHover:            var(--ic-link-color-darkened-10); // deprecated - do not use
+$linkColor: var(--ic-link-color); // deprecated - do not use
+$linkColorHover: var(--ic-link-color-darkened-10); // deprecated - do not use
 
 //=====================
 // Course Nav Variables
 //=====================
 // These variables control the active and hover
 // states we have on the global left-hand sidenav in Canvas
-$ic-course-sidenav_list-item--bg-color:               $ic-color-light;
+$ic-course-sidenav_list-item--bg-color: $ic-color-light;
 @if $use_high_contrast {
-$ic-course-sidenav_list-item--bg-color:               $ic-color-dark;
+  $ic-course-sidenav_list-item--bg-color: $ic-color-dark;
 }
-$ic-course-sidenav_list-item--active-font-color:      var(--ic-brand-primary);
+$ic-course-sidenav_list-item--active-font-color: var(--ic-brand-primary);
 @if $use_high_contrast {
-$ic-course-sidenav_list-item--active-font-color:      $ic-color-light;
+  $ic-course-sidenav_list-item--active-font-color: $ic-color-light;
 }
-$ic-course-sidenav_list-item--inactive-font-color:    darken($ic-color-neutral, 12);
+$ic-course-sidenav_list-item--inactive-font-color: darken($ic-color-neutral, 12);
 
 //===============
 // Icon Variables
 //===============
 //To be used for any disabled icon states
-$ic-color-icon-disabled:        darken($ic-color-neutral, 40);
+$ic-color-icon-disabled: darken($ic-color-neutral, 40);
 @if $use_high_contrast {
-$ic-color-icon-disabled:        darken($ic-color-neutral, 60);
+  $ic-color-icon-disabled: darken($ic-color-neutral, 60);
 }
-$ic-dim-helper-text:            darken($ic-color-neutral, 45);
+$ic-dim-helper-text: darken($ic-color-neutral, 45);
 @if $use_high_contrast {
-$ic-dim-helper-text:            darken($ic-color-neutral, 55);
+  $ic-dim-helper-text: darken($ic-color-neutral, 55);
 }
 
 //==========================================================
@@ -266,29 +308,28 @@ $ic-dim-helper-text:            darken($ic-color-neutral, 55);
 // their use in Canvas in order to properly phase them out
 // Nothing changes in the legacy UI.
 
-$lightBackground:               $ic-color-medium-light;
-$wellBackground:                $ic-color-light;
-$altBG:                         $ic-bg-light-neutral;
-$borderColor:                   $ic-border-light;
-$activeBG:                      $ic-bg-light-primary;
+$lightBackground: $ic-color-medium-light;
+$wellBackground: $ic-color-light;
+$altBG: $ic-bg-light-neutral;
+$borderColor: $ic-border-light;
+$activeBG: $ic-bg-light-primary;
 
 //=====================
 // Transition Variables
 //=====================
 // This is a pleasing transition that can be used when you need
 // a transition timing function
-$ic-transition: cubic-bezier(0,1,0.5,1);
+$ic-transition: cubic-bezier(0, 1, 0.5, 1);
 
 //=======================
 // Form-related variables
 //=======================
-$ic-horizontal-form-offset:       $ic-sp*16;
-$ic-label-line-height:            1.3;
-$ic-radio-checkbox-left-offset:   22px;
-
+$ic-horizontal-form-offset: $ic-sp*16;
+$ic-label-line-height: 1.3;
+$ic-radio-checkbox-left-offset: 22px;
 
 // override bootstrap green buttons
 $green: #34832b !default;
 
 // override default opacity for disabled classes
-$ic-opacity-disabled: 0.6
+$ic-opacity-disabled: 0.6;

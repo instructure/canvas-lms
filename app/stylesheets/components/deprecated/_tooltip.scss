@@ -32,14 +32,18 @@
   position: relative;
   z-index: 2;
   outline: none;
-  &:hover, &:active, &:focus {
+  &:hover,
+  &:active,
+  &:focus {
     outline: none;
     text-decoration: none;
-    .tooltip_wrap, .tooltip_text {
+    .tooltip_wrap,
+    .tooltip_text {
       visibility: visible;
     }
   }
-  .tooltip_wrap, .tooltip_text {
+  .tooltip_wrap,
+  .tooltip_text {
     display: block;
     visibility: hidden;
   }

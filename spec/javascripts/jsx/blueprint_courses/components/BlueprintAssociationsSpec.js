@@ -38,7 +38,7 @@ const defaultProps = () => ({
   isSavingAssociations: false,
   hasUnsyncedChanges: false,
   subAccounts: sampleData.subAccounts,
-  terms: sampleData.terms,
+  terms: sampleData.terms
 })
 
 test('renders the BlueprintAssociations component', () => {

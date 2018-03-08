@@ -16,18 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 #editCalendarEventFull {
   label.label_with_checkbox {
     margin-bottom: 10px;
-    input[type="checkbox"] {
+    input[type='checkbox'] {
       margin: 0 5px 0 0;
     }
   }
   .date_start_end_row {
     @include clearfix;
-    th, td {
+    th,
+    td {
       vertical-align: top;
       padding: 0 5px 0 0;
       &:first-child {
@@ -37,7 +38,8 @@
         padding-top: 10px;
       }
     }
-    input[type="text"], div.input-append {
+    input[type='text'],
+    div.input-append {
       margin-bottom: 0px;
     }
     span {
@@ -77,7 +79,7 @@
     }
   }
 }
-.duplicate_div{
+.duplicate_div {
   float: left;
   display: inline-block;
   margin: 0 5px;
@@ -85,18 +87,18 @@
   width: 35px;
   text-align: right;
 }
-.duplicate_td{
+.duplicate_td {
   vertical-align: top;
   padding-left: 20px;
   min-width: 300px;
 }
-#duplicate_interval{
+#duplicate_interval {
   width: 50px;
   float: left;
   display: inline-block;
   margin: 0 5px;
 }
-.duplicate_for_div{
+.duplicate_for_div {
   float: left;
   display: inline-block;
   margin: 0 5px;
@@ -104,19 +106,19 @@
   width: 35px;
   text-align: right;
 }
-#duplicate_count{
+#duplicate_count {
   width: 50px;
   float: left;
   display: inline-block;
   margin: 0 5px;
 }
-.occurences_div{
+.occurences_div {
   float: left;
   display: inline-block;
   margin: 0 5px;
   line-height: 38px;
 }
-.duplicate_tooltip_td{
+.duplicate_tooltip_td {
   vertical-align: top;
   padding-left: 20px;
   width: 35px;

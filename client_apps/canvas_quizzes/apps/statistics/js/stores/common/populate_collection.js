@@ -35,17 +35,15 @@ define(function() {
    *
    */
   return function populateCollection(collection, payload, replace) {
-    var setter, setterOptions;
+    var setter, setterOptions
 
     if (arguments.length === 2) {
-      replace = true;
+      replace = true
     }
 
-    setter = replace ? 'reset' : 'add';
-    setterOptions = replace ?
-      { parse: true } :
-      { parse: true, merge: true };
+    setter = replace ? 'reset' : 'add'
+    setterOptions = replace ? {parse: true} : {parse: true, merge: true}
 
-    collection[setter].call(collection, payload, setterOptions);
-  };
-});
+    collection[setter].call(collection, payload, setterOptions)
+  }
+})

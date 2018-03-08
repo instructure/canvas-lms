@@ -18,7 +18,7 @@
 
 import '@instructure/ui-themes/lib/canvas'
 import React from 'react'
-import { mount } from 'enzyme'
+import {mount} from 'enzyme'
 import AnnouncementEmptyState from '../AnnouncementEmptyState'
 
 const defaultProps = () => ({

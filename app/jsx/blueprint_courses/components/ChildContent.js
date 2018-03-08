@@ -17,14 +17,14 @@
  */
 
 import I18n from 'i18n!blueprint_courses'
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
+import {connect} from 'react-redux'
+import {bindActionCreators} from 'redux'
 
 import BlueprintModal from './BlueprintModal'
 import MasterChildStack from './MasterChildStack'
-import { ConnectedChildChangeLog as ChildChangeLog } from './ChildChangeLog'
+import {ConnectedChildChangeLog as ChildChangeLog} from './ChildChangeLog'
 
 import actions from '../actions'
 import propTypes from '../propTypes'
@@ -37,14 +37,14 @@ export default class ChildContent extends Component {
     selectChangeLog: PropTypes.func.isRequired,
     terms: propTypes.termList.isRequired,
     childCourse: propTypes.courseInfo.isRequired,
-    masterCourse: propTypes.courseInfo.isRequired,
+    masterCourse: propTypes.courseInfo.isRequired
   }
 
   static defaultProps = {
-    realRef: () => {},
+    realRef: () => {}
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.realRef(this)
   }
 
@@ -52,16 +52,16 @@ export default class ChildContent extends Component {
     this.props.routeTo('#!/')
   }
 
-  showChangeLog (params) {
+  showChangeLog(params) {
     this.props.selectChangeLog(params)
   }
 
-  hideChangeLog () {
+  hideChangeLog() {
     this.props.selectChangeLog(null)
   }
 
-  render () {
-    const { terms, childCourse, masterCourse, isChangeLogOpen } = this.props
+  render() {
+    const {terms, childCourse, masterCourse, isChangeLogOpen} = this.props
     const childTerm = terms.find(term => term.id === childCourse.enrollment_term_id)
     const childTermName = childTerm ? childTerm.name : ''
 
@@ -69,18 +69,17 @@ export default class ChildContent extends Component {
       <div className="bcc__wrapper">
         <BlueprintModal
           wide
-          title={I18n.t('Blueprint Course Information: %{term} - %{course}', { term: childTermName, course: childCourse.name })}
+          title={I18n.t('Blueprint Course Information: %{term} - %{course}', {
+            term: childTermName,
+            course: childCourse.name
+          })}
           isOpen={isChangeLogOpen}
           onCancel={this.clearRoutes}
         >
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <MasterChildStack
-                terms={terms}
-                child={childCourse}
-                master={masterCourse}
-              />
-              <div style={{ width: '870px' }}>
+            <div style={{display: 'flex', justifyContent: 'space-between'}}>
+              <MasterChildStack terms={terms} child={childCourse} master={masterCourse} />
+              <div style={{width: '870px'}}>
                 <ChildChangeLog />
               </div>
             </div>
@@ -95,7 +94,7 @@ const connectState = state => ({
   isChangeLogOpen: !!state.selectedChangeLog,
   childCourse: state.course,
   masterCourse: state.masterCourse,
-  terms: state.terms,
+  terms: state.terms
 })
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
 export const ConnectedChildContent = connect(connectState, connectActions)(ChildContent)

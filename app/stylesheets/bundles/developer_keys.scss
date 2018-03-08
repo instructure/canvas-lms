@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 #keys {
   tr:hover {
@@ -40,7 +40,7 @@
       width: 15%;
       > div {
         max-height: 100px;
-        overflow-x: auto
+        overflow-x: auto;
       }
     }
     .api_key {
@@ -68,7 +68,8 @@
 #loading {
   text-align: center;
   margin-top: 10px;
-  .show_all, .loader {
+  .show_all,
+  .loader {
     display: none;
   }
   &.loading {

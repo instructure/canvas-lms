@@ -19,20 +19,20 @@
 import $ from 'jquery'
 
 export default class ToolLaunchResizer {
-  constructor (minToolHeight) {
-    this.minToolHeight = minToolHeight || 450;
+  constructor(minToolHeight) {
+    this.minToolHeight = minToolHeight || 450
   }
 
-  tool_content_wrapper (wrapperId) {
-    let container = $(`div[data-tool-wrapper-id*='${wrapperId}']`);
+  tool_content_wrapper(wrapperId) {
+    let container = $(`div[data-tool-wrapper-id*='${wrapperId}']`)
     if (container.length <= 0 && $('.tool_content_wrapper').length === 1) {
-      container = $('.tool_content_wrapper');
+      container = $('.tool_content_wrapper')
     }
-    return container;
+    return container
   }
 
-  resize_tool_content_wrapper (height, container) {
-    const toolWrapper = container || this.tool_content_wrapper();
-    toolWrapper.height(!height || this.minToolHeight > height ? this.minToolHeight : height);
+  resize_tool_content_wrapper(height, container) {
+    const toolWrapper = container || this.tool_content_wrapper()
+    toolWrapper.height(!height || this.minToolHeight > height ? this.minToolHeight : height)
   }
 }

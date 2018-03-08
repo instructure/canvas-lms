@@ -18,7 +18,7 @@
 const loadedStylesheets = {}
 
 const brandableCss = {
-  getCssVariant () {
+  getCssVariant() {
     const variant = window.ENV.use_responsive_layout ? 'responsive_layout' : 'new_styles'
     const contrast = window.ENV.use_high_contrast ? 'high_contrast' : 'normal_contrast'
     return `${variant}_${contrast}`
@@ -27,10 +27,8 @@ const brandableCss = {
   // combinedChecksum should be like '09f833ef7a'
   // and includesNoVariables should be true if this bundle does not
   // "@include" variables.scss, brand_variables.scss or variant_variables.scss
-  urlFor (bundleName, {combinedChecksum, includesNoVariables}) {
-    const brandAndVariant = includesNoVariables
-      ? 'no_variables'
-      : brandableCss.getCssVariant()
+  urlFor(bundleName, {combinedChecksum, includesNoVariables}) {
+    const brandAndVariant = includesNoVariables ? 'no_variables' : brandableCss.getCssVariant()
 
     return [
       window.ENV.ASSET_HOST || '',
@@ -42,7 +40,7 @@ const brandableCss = {
   },
 
   // bundleName should be something like 'jst/foo'
-  loadStylesheet (bundleName, opts) {
+  loadStylesheet(bundleName, opts) {
     if (bundleName in loadedStylesheets) return
 
     const linkElement = document.createElement('link')

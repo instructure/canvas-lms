@@ -16,10 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "components/ui.selectmenu";
-@import "vendor/_xflex.scss";
-
+@import 'base/environment';
+@import 'components/ui.selectmenu';
+@import 'vendor/_xflex.scss';
 
 .ic-Layout-contentMain {
   padding: 0;
@@ -126,7 +125,7 @@ $icon-size: 1.4rem;
   margin: 0;
   padding: 0;
 }
-.assignmentDetails__Info{
+.assignmentDetails__Info {
   @include fontSize(11px);
   font-weight: $ic-font-weight;
   white-space: nowrap;
@@ -200,7 +199,8 @@ $icon-size: 1.4rem;
   display: block;
 }
 
-#settings_link, #mute_link {
+#settings_link,
+#mute_link {
   position: relative;
   .ui-icon {
     display: inline-block;
@@ -262,7 +262,9 @@ $icon-size: 1.4rem;
   }
 }
 
-#enrollment_inactive_notice, #enrollment_concluded_notice, #closed_gp_notice {
+#enrollment_inactive_notice,
+#enrollment_concluded_notice,
+#closed_gp_notice {
   width: 100%;
   border-bottom: 1px solid $ic-border-light;
   border-radius: 0;
@@ -302,7 +304,8 @@ $icon-size: 1.4rem;
           margin: 6px 14px;
           display: inline-block;
         }
-        &.selected button, &.pending button {
+        &.selected button,
+        &.pending button {
           display: none;
         }
       }
@@ -324,7 +327,8 @@ $icon-size: 1.4rem;
           }
         }
       }
-      .selected_icon, button {
+      .selected_icon,
+      button {
         display: none;
       }
     }
@@ -344,7 +348,12 @@ $icon-size: 1.4rem;
   bottom: 0;
   left: 0;
   right: 25%;
-  #submissions_container, #left_side_inner, iframe, #doc_preview_holder, #iframe_holder, #resize_overlay {
+  #submissions_container,
+  #left_side_inner,
+  iframe,
+  #doc_preview_holder,
+  #iframe_holder,
+  #resize_overlay {
     height: 100%;
     width: 100%;
     border: 0 none;
@@ -354,7 +363,8 @@ $icon-size: 1.4rem;
     top: -100%;
     z-index: 1;
   }
-  h3, .h3 {
+  h3,
+  .h3 {
     margin: 0;
     padding: 2em;
     text-align: center;
@@ -371,13 +381,13 @@ $icon-size: 1.4rem;
   top: 0;
   bottom: 0;
   left: 0;
-  background: #bbb url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%;
+  background: #bbb url('/images/splitpane_handle-ew.gif') no-repeat scroll 50% 50%;
   cursor: pointer;
   width: 7px;
   border-right: 1px solid #838383;
   z-index: 2;
   &.highlight {
-    background-color: #FBEC88;
+    background-color: #fbec88;
   }
 }
 
@@ -430,22 +440,24 @@ $icon-size: 1.4rem;
       @include fontSize(12px);
       text-align: right;
     }
-    .delete_comment_link, .submit_comment_button {
+    .delete_comment_link,
+    .submit_comment_button {
       flex: none;
       height: 24px;
       margin-left: 0.5em;
       @if $use_high_contrast {
         color: lighten($ic-color-dark, 12%);
-      }
-      @else {
+      } @else {
         color: lighten($ic-color-dark, 25%);
       }
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         color: $ic-font-color-dark;
       }
     }
   }
-  h2, .h2 {
+  h2,
+  .h2 {
     @include fontSize(14px);
     font-weight: bold;
   }
@@ -485,7 +497,7 @@ $icon-size: 1.4rem;
     position: absolute;
     top: 50%;
     left: 0px;
-    background: transparent url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%;
+    background: transparent url('/images/splitpane_handle-ew.gif') no-repeat scroll 50% 50%;
     cursor: pointer;
     height: 20px;
     width: 7px;
@@ -513,7 +525,6 @@ $icon-size: 1.4rem;
 }
 
 #add_a_comment {
-
   #media_media_recording {
     margin: 0 -2px;
   }
@@ -565,7 +576,7 @@ body .ui-selectmenu-dropdown {
   border-radius: 0;
   color: var(--ic-brand-global-nav-ic-icon-svg-fill) !important;
   height: 1.3125em;
-  background-color: transparent;;
+  background-color: transparent;
   background-image: none;
   border: none;
   font-weight: normal !important;
@@ -581,7 +592,7 @@ body .ui-selectmenu-dropdown {
     .ui-icon {
       top: 3px !important;
       &:after {
-        content: "\f15c";
+        content: '\f15c';
       }
     }
   }
@@ -600,11 +611,10 @@ body .ui-selectmenu-dropdown {
   }
 }
 
-body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .ui-selectmenu-icon {
+body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon,
+body .ui-state-active .ui-selectmenu-icon {
   background-position: (-17px) 0;
   color: var(--ic-brand-global-nav-ic-icon-svg-fill);
-;
-
 }
 
 #students_selectmenu-menu {
@@ -685,8 +695,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   .not_submitted & {
     @if $use_high_contrast {
       color: lighten($ic-color-dark, 20%);
-    }
-    @else {
+    } @else {
       color: lighten($ic-color-dark, 50%);
     }
   }
@@ -720,7 +729,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
     @include fontSize(14px);
   }
   .on_time {
-    color: #004B00;
+    color: #004b00;
   }
   .late {
     color: #d12f19;
@@ -769,7 +778,8 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
         @include fontSize(12px);
         text-align: center;
         width: 34px;
-        &.submission_error, &.submission_pending {
+        &.submission_error,
+        &.submission_pending {
           padding: 1px;
         }
         &:hover {
@@ -793,7 +803,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
       }
     }
     .submission-file-selected {
-      background: #DCECFB url("/images/pass.png") no-repeat center left;
+      background: #dcecfb url('/images/pass.png') no-repeat center left;
       font-weight: bold;
     }
   }
@@ -810,7 +820,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
     height: 19px;
     margin-left: 8px;
     padding-left: 29px;
-    background: url("/images/arrow_left.png") no-repeat center left;
+    background: url('/images/arrow_left.png') no-repeat center left;
     overflow: hidden;
     white-space: nowrap;
     color: $ic-font-color-dark;
@@ -822,7 +832,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   }
   ul {
     position: absolute;
-    top:0;
+    top: 0;
     left: -200px;
     width: 200px;
     background-color: $ic-color-light;
@@ -871,12 +881,12 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   height: 15px;
 }
 
-#record_button[recording=false] div {
+#record_button[recording='false'] div {
   background-color: $red;
   border-radius: 15px;
 }
 
-#record_button[recording=true] div {
+#record_button[recording='true'] div {
   background-color: $black;
 }
 
@@ -906,16 +916,16 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 
 #deduction-box {
   display: flex;
-  margin: 0 .25em;
+  margin: 0 0.25em;
 
   &.hidden {
     display: none;
   }
   .deduction-box-labels {
-    margin-right: .5em;
+    margin-right: 0.5em;
   }
   .deduction-box-values {
-    flex: 1
+    flex: 1;
   }
   .error {
     color: $ic-color-danger;
@@ -926,7 +936,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   }
 }
 
-#settings_form input[type=checkbox][disabled] + label {
+#settings_form input[type='checkbox'][disabled] + label {
   opacity: 0.5;
 }
 

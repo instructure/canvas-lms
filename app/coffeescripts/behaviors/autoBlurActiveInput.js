@@ -20,7 +20,7 @@ import $ from 'jquery'
 let blurActiveInput = false
 let initialized = false
 
-export default function (enable = true) {
+export default function(enable = true) {
   blurActiveInput = enable
   if (initialized) return
   initialized = true
@@ -34,14 +34,19 @@ export default function (enable = true) {
   // click into tiny (iframe, so a separate window), or click on the chrome
   // outside of the viewport (e.g. change tabs). see #7475
   $(window).bind({
-    blur (e) {
+    blur(e) {
       if (blurActiveInput && document.activeElement && window === e.target) {
-        $(document.activeElement).filter(':input').change().triggerHandler('blur')
+        $(document.activeElement)
+          .filter(':input')
+          .change()
+          .triggerHandler('blur')
       }
     },
-    focus (e) {
+    focus(e) {
       if (blurActiveInput && document.activeElement && window === e.target) {
-        $(document.activeElement).filter(':input').triggerHandler('focus')
+        $(document.activeElement)
+          .filter(':input')
+          .triggerHandler('focus')
       }
     }
   })

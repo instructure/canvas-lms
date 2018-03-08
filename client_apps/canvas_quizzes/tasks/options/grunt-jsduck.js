@@ -16,24 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var grunt = require('grunt');
+var grunt = require('grunt')
 
 module.exports = {
   main: {
-    src: [ 'apps/*/js/**/*.js', 'tmp/compiled_jsx/**/*.js' ],
+    src: ['apps/*/js/**/*.js', 'tmp/compiled_jsx/**/*.js'],
     dest: 'doc/api',
     options: {
-      'title': "<%= grunt.config.get('pkg.title') %> Reference",
+      title: "<%= grunt.config.get('pkg.title') %> Reference",
       'builtin-classes': false,
-      'color': true,
+      color: true,
       'no-source': false,
-      'tests': true,
-      'processes': 2,
-      'warnings': [],
-      'guides': 'doc/guides.json',
+      tests: true,
+      processes: 2,
+      warnings: [],
+      guides: 'doc/guides.json',
       'head-html': 'doc/head.html',
-      'tags': grunt.file.expand('doc/ext/jsduck/tags/*.rb'),
-      'external': [
+      tags: grunt.file.expand('doc/ext/jsduck/tags/*.rb'),
+      external: [
         'React',
         'React.Component',
         'React.Class',
@@ -42,8 +42,8 @@ module.exports = {
         'jQuery',
         'QTip',
         'qTip',
-        'Promise',
+        'Promise'
       ]
     }
   }
-};
+}

@@ -43,7 +43,7 @@
   }
   .small_description {
     font-style: italic;
-    margin-top: .5rem;
+    margin-top: 0.5rem;
   }
 
   &.editing {
@@ -53,14 +53,14 @@
     tr.criterion .description {
       clear: both;
     }
-    label[for=rubric-title] {
+    label[for='rubric-title'] {
       font-weight: bold;
     }
     tr.criterion .container .add_rating_link {
       position: absolute;
       float: right;
       top: 50%;
-      right: -.5%;
+      right: -0.5%;
       transform: translateY(-50%);
       line-height: 0;
       width: 0;
@@ -74,8 +74,8 @@
       display: table-cell;
     }
     .add_rating_link i::before {
-      font-size: .75rem;
-      padding: .1875rem;
+      font-size: 0.75rem;
+      padding: 0.1875rem;
     }
     .add_rating_link i {
       color: $ic-color-light;
@@ -99,7 +99,8 @@
   thead th {
     background-color: $ic-color-medium-light;
   }
-  td, th {
+  td,
+  th {
     border: 1px solid $ic-border-color;
     padding: 7px 10px;
   }
@@ -129,7 +130,8 @@
       display: table-cell;
       vertical-align: middle;
     }
-    .learning_outcome_flag, .threshold {
+    .learning_outcome_flag,
+    .threshold {
       display: none;
     }
     .long_description_holder {
@@ -141,7 +143,8 @@
     }
     .assessment-comments {
       @include fontSize(10px);
-      h6, .h6 {
+      h6,
+      .h6 {
         margin-top: 10px;
       }
     }
@@ -259,7 +262,8 @@
   }
   &.editing {
     @include mode-visibility($edit: block, $disp: none, $igno: none);
-    td.editing, th.editing {
+    td.editing,
+    th.editing {
       display: table-cell;
     }
     table.ratings td {
@@ -362,7 +366,8 @@
   margin-bottom: $ic-sp/2;
 }
 
-#edit_rating_form div, #edit_criterion_form div{
+#edit_rating_form div,
+#edit_criterion_form div {
   margin-top: 30px;
   width: 100%;
 }

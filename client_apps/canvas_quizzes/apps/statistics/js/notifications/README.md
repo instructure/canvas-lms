@@ -22,35 +22,33 @@ slipping on a street off of a banana and generating notifications anytime
 it happens.
 
 ```javascript
-var UserStore = require('stores/users');
-var Notification = require('models/notification');
-var K = require('constants');
+var UserStore = require('stores/users')
+var Notification = require('models/notification')
+var K = require('constants')
 
 function watchForPeopleSlippingOffOfBananas() {
-    var peopleWhoSlipped = UserStore.findPeopleWhoSlipped();
+  var peopleWhoSlipped = UserStore.findPeopleWhoSlipped()
 
-    return peopleWhoSlipped.map(function(user) {
-        return new Notification({
-            id: [ 'someone_slipped_off_of_a_banana', user.id ].join('_'),
+  return peopleWhoSlipped.map(function(user) {
+    return new Notification({
+      id: ['someone_slipped_off_of_a_banana', user.id].join('_'),
 
-            // this should be defined in constants.js with a key like:
-            // NOTIFICATION_SOMEONE_SLIPPED_OFF_OF_A_BANANA
-            code: K.NOTIFICATION_SOMEONE_SLIPPED_OFF_OF_A_BANANA,
+      // this should be defined in constants.js with a key like:
+      // NOTIFICATION_SOMEONE_SLIPPED_OFF_OF_A_BANANA
+      code: K.NOTIFICATION_SOMEONE_SLIPPED_OFF_OF_A_BANANA,
 
-            // You can specify any additional context that the view can make
-            // use of, like the name of the street the person slipped on:
-            context: {
-                streetName: "strönd"
-            }
-        });
-    });
+      // You can specify any additional context that the view can make
+      // use of, like the name of the street the person slipped on:
+      context: {
+        streetName: 'strönd'
+      }
+    })
+  })
 }
 
-watchForPeopleSlippingOffOfBananas.watchTargets = [
-  UserStore
-];
+watchForPeopleSlippingOffOfBananas.watchTargets = [UserStore]
 
-return watchForPeopleSlippingOffOfBananas;
+return watchForPeopleSlippingOffOfBananas
 ```
 
 Finally, make sure you register your notification watcher in `bundles/notifications.js`.

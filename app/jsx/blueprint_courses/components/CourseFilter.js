@@ -25,7 +25,7 @@ import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReade
 import Grid, {GridCol, GridRow} from '@instructure/ui-core/lib/components/Grid'
 import propTypes from '../propTypes'
 
-const { func } = PropTypes
+const {func} = PropTypes
 const MIN_SEACH = 3 // min search term length for API
 
 export default class CourseFilter extends React.Component {
@@ -33,28 +33,30 @@ export default class CourseFilter extends React.Component {
     onChange: func,
     onActivate: func,
     terms: propTypes.termList.isRequired,
-    subAccounts: propTypes.accountList.isRequired,
+    subAccounts: propTypes.accountList.isRequired
   }
 
   static defaultProps = {
     onChange: () => {},
-    onActivate: () => {},
+    onActivate: () => {}
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       isActive: false,
       search: '',
       term: '',
-      subAccount: '',
+      subAccount: ''
     }
   }
 
-  componentDidUpdate (prevProps, prevState) {
-    if (prevState.search !== this.state.search ||
-        prevState.term !== this.state.term ||
-        prevState.subAccount !== this.state.subAccount) {
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevState.search !== this.state.search ||
+      prevState.term !== this.state.term ||
+      prevState.subAccount !== this.state.subAccount
+    ) {
       this.props.onChange(this.state)
     }
   }
@@ -63,22 +65,25 @@ export default class CourseFilter extends React.Component {
     this.setState({
       search: this.getSearchText(),
       term: this.termInput.value,
-      subAccount: this.subAccountInput.value,
+      subAccount: this.subAccountInput.value
     })
   }
 
-  getSearchText () {
+  getSearchText() {
     const searchText = this.searchInput.value.trim().toLowerCase()
     return searchText.length >= MIN_SEACH ? searchText : ''
   }
 
   handleFocus = () => {
     if (!this.state.isActive) {
-      this.setState({
-        isActive: true,
-      }, () => {
-        this.props.onActivate()
-      })
+      this.setState(
+        {
+          isActive: true
+        },
+        () => {
+          this.props.onActivate()
+        }
+      )
     }
   }
 
@@ -93,62 +98,75 @@ export default class CourseFilter extends React.Component {
 
         if (isEmpty && !this.wrapper.contains(document.activeElement)) {
           this.setState({
-            isActive: false,
+            isActive: false
           })
         }
       }
     }, 0)
   }
 
-  render () {
+  render() {
     return (
-      <div className="bca-course-filter" ref={(c) => { this.wrapper = c }}>
+      <div
+        className="bca-course-filter"
+        ref={c => {
+          this.wrapper = c
+        }}
+      >
         <Grid colSpacing="none">
           <GridRow>
             <GridCol width={7}>
               <TextInput
-                ref={(c) => { this.searchInput = c }}
+                ref={c => {
+                  this.searchInput = c
+                }}
                 type="search"
                 onChange={this.onChange}
                 onFocus={this.handleFocus}
                 onBlur={this.handleBlur}
                 placeholder={I18n.t('Search by title, short name, or SIS ID')}
-                label={
-                  <ScreenReaderContent>{I18n.t('Search Courses')}</ScreenReaderContent>
-                }
+                label={<ScreenReaderContent>{I18n.t('Search Courses')}</ScreenReaderContent>}
               />
             </GridCol>
             <GridCol width={2}>
               <Select
-                selectRef={(c) => { this.termInput = c }}
+                selectRef={c => {
+                  this.termInput = c
+                }}
                 key="terms"
                 onChange={this.onChange}
                 onFocus={this.handleFocus}
                 onBlur={this.handleBlur}
-                label={
-                  <ScreenReaderContent>{I18n.t('Select Term')}</ScreenReaderContent>
-                }
+                label={<ScreenReaderContent>{I18n.t('Select Term')}</ScreenReaderContent>}
               >
-                <option key="all" value="">{I18n.t('Any Term')}</option>
+                <option key="all" value="">
+                  {I18n.t('Any Term')}
+                </option>
                 {this.props.terms.map(term => (
-                  <option key={term.id} value={term.id}>{term.name}</option>
+                  <option key={term.id} value={term.id}>
+                    {term.name}
+                  </option>
                 ))}
               </Select>
             </GridCol>
             <GridCol width={3}>
               <Select
-                selectRef={(c) => { this.subAccountInput = c }}
+                selectRef={c => {
+                  this.subAccountInput = c
+                }}
                 key="subAccounts"
                 onChange={this.onChange}
                 onFocus={this.handleFocus}
                 onBlur={this.handleBlur}
-                label={
-                  <ScreenReaderContent>{I18n.t('Select Sub-Account')}</ScreenReaderContent>
-                }
+                label={<ScreenReaderContent>{I18n.t('Select Sub-Account')}</ScreenReaderContent>}
               >
-                <option key="all" value="">{I18n.t('Any Sub-Account')}</option>
+                <option key="all" value="">
+                  {I18n.t('Any Sub-Account')}
+                </option>
                 {this.props.subAccounts.map(account => (
-                  <option key={account.id} value={account.id}>{account.name}</option>
+                  <option key={account.id} value={account.id}>
+                    {account.name}
+                  </option>
                 ))}
               </Select>
             </GridCol>

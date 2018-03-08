@@ -24,46 +24,52 @@ import Container from '@instructure/ui-core/lib/components/Container'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import I18n from 'i18n!sections_tooltip'
 
-function sectionsOrTotalCount (props, propName, componentName) {
+function sectionsOrTotalCount(props, propName, componentName) {
   if (!props.totalUserCount && !props.sections) {
-    return new Error(`One of props 'totalUserCount' or 'sections' was not specified in '${componentName}'.`);
+    return new Error(
+      `One of props 'totalUserCount' or 'sections' was not specified in '${componentName}'.`
+    )
   }
   return null
 }
 
-export default function SectionsTooltip ({ sections, totalUserCount}) {
-  let tipContent = ""
+export default function SectionsTooltip({sections, totalUserCount}) {
+  let tipContent = ''
   const nonNullSections = sections ? sections : []
-  let sectionsCountText = ""
+  let sectionsCountText = ''
   if (sections) {
-    tipContent = sections.map((sec) =>
-      <Container key={sec.id} as='div' margin='xx-small'>
-        <Text size='small'>{I18n.t('%{name} (%{count} Users)', {name: sec.name, count: sec.user_count})}</Text>
+    tipContent = sections.map(sec => (
+      <Container key={sec.id} as="div" margin="xx-small">
+        <Text size="small">
+          {I18n.t('%{name} (%{count} Users)', {name: sec.name, count: sec.user_count})}
+        </Text>
       </Container>
-    )
-    sectionsCountText =  I18n.t({
+    ))
+    sectionsCountText = I18n.t(
+      {
         one: '1 Section',
         other: '%{count} Sections'
-      }, { count: (sections ? sections.length : 0) })
+      },
+      {count: sections ? sections.length : 0}
+    )
   } else {
     tipContent = (
-      <Container as='div' margin='xx-small'>
-        <Text size='small'>{I18n.t('(%{count} Users)', {count: totalUserCount})}</Text>
+      <Container as="div" margin="xx-small">
+        <Text size="small">{I18n.t('(%{count} Users)', {count: totalUserCount})}</Text>
       </Container>
     )
     sectionsCountText = I18n.t('All Sections')
   }
 
   return (
-    <span className='ic-section-tooltip'>
-      <Tooltip tip={tipContent} placement='bottom'>
+    <span className="ic-section-tooltip">
+      <Tooltip tip={tipContent} placement="bottom">
         <Link>
           {
-            <Text size='small'>{sectionsCountText}
+            <Text size="small">
+              {sectionsCountText}
               {nonNullSections.map(sec => (
-                <ScreenReaderContent key={sec.id}>
-                  {sec.name}
-                </ScreenReaderContent>
+                <ScreenReaderContent key={sec.id}>{sec.name}</ScreenReaderContent>
               ))}
             </Text>
           }
@@ -80,5 +86,5 @@ SectionsTooltip.propTypes = {
 
 SectionsTooltip.defaultProps = {
   sections: null,
-  totalUserCount: 0,
+  totalUserCount: 0
 }

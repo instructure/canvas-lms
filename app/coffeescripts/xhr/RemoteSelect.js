@@ -32,7 +32,6 @@ import optGroupTpl from 'jst/util/select/optgroups'
 import optsTpl from 'jst/util/select/options'
 
 export default class RemoteSelect {
-
   // #
   // default options:
   //   * cache all requests
@@ -43,7 +42,7 @@ export default class RemoteSelect {
     formatter: d => d,
     requestParams: {},
     start: true,
-    url: window.location.href,
+    url: window.location.href
   }
 
   // #
@@ -54,9 +53,8 @@ export default class RemoteSelect {
     radius: 3,
     speed: 1,
     trail: 60,
-    width: 2,
+    width: 2
   }
-
 
   // #
   // class constructor.
@@ -70,7 +68,7 @@ export default class RemoteSelect {
   //       of data returned from the server.
   //   * url {String} - the url to fetch data from.
   // @api public
-  constructor (el, options) {
+  constructor(el, options) {
     this.el = el
     this.options = options
     this.options = _.extend({}, this.defaultOptions, this.options)
@@ -97,7 +95,7 @@ export default class RemoteSelect {
   //   with the request.
   // @return jqXHR|Boolean
   // @api public
-  makeRequest (params = {}) {
+  makeRequest(params = {}) {
     params = _.extend({}, this.options.requestParams, params)
     this.el.prop('disabled', true)
 
@@ -115,7 +113,7 @@ export default class RemoteSelect {
 
     // append some extra properties to @currentRequest and then
     // return it
-    return _.tap(this.currentRequest, (obj) => {
+    return _.tap(this.currentRequest, obj => {
       obj.url = this.options.url
       obj.params = params
       return obj.error(this.stopSpinner)
@@ -126,7 +124,7 @@ export default class RemoteSelect {
   // add data to <select> in @el.
   // @param data {Object|Array} - data returned from the ajax call.
   // @api private
-  onResponse = (data) => {
+  onResponse = data => {
     const fData = this.options.formatter(data)
     const template = this.getTemplate(fData)
 
@@ -135,7 +133,10 @@ export default class RemoteSelect {
       this.cache.set(this.currentKey(), data)
     }
 
-    this.el.empty().append(this.options.placeholder).append(template(fData))
+    this.el
+      .empty()
+      .append(this.options.placeholder)
+      .append(template(fData))
 
     this.stopSpinner()
     return this.el.prop('disabled', false)
@@ -145,7 +146,7 @@ export default class RemoteSelect {
   // return the cache key information for the current request
   // @return Array
   // @api private
-  currentKey () {
+  currentKey() {
     return [this.options.url, this.currentRequest.params]
   }
 
@@ -155,7 +156,7 @@ export default class RemoteSelect {
   //   into a cache key
   // @return Boolean
   // @api private
-  shouldCache (...key) {
+  shouldCache(...key) {
     return this.options.cache && !this.cache.get(key)
   }
 
@@ -165,7 +166,7 @@ export default class RemoteSelect {
   // @param data {Object|Array}
   // @return Function
   // @api private
-  getTemplate (data) {
+  getTemplate(data) {
     if (_.isArray(data)) {
       return optsTpl
     } else {
@@ -176,7 +177,7 @@ export default class RemoteSelect {
   // #
   // display loading spinner
   // @api private
-  startSpinner () {
+  startSpinner() {
     this.spinner = $(new Spinner(this.spinnerOptions).spin().el)
     this.spinner.css(this.toTheRightOf(this.el))
     return this.body.append(this.spinner)
@@ -193,7 +194,7 @@ export default class RemoteSelect {
   // @param el {jQueryEl}
   // @return Object
   // @api private
-  toTheRightOf (el) {
+  toTheRightOf(el) {
     return (
       this.spinnerCss ||
       (this.spinnerCss = {

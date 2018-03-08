@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  '../notifications/report_generation_failed'
-], function() {
-  return [].slice.call(arguments);
-});
+define(['../notifications/report_generation_failed'], function() {
+  return [].slice.call(arguments)
+})

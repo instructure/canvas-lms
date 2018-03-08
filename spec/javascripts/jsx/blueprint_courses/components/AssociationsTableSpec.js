@@ -33,7 +33,7 @@ const defaultProps = () => ({
   removedAssociations: [],
   onRemoveAssociations: () => {},
   isLoadingAssociations: false,
-  focusManager,
+  focusManager
 })
 
 test('renders the AssociationsTable component', () => {
@@ -48,8 +48,22 @@ test('displays correct table data', () => {
   const rows = tree.find('.bca-associations__course-row')
 
   equal(rows.length, props.existingAssociations.length)
-  equal(rows.at(0).find('td').at(0).text(), props.existingAssociations[0].name)
-  equal(rows.at(1).find('td').at(0).text(), props.existingAssociations[1].name)
+  equal(
+    rows
+      .at(0)
+      .find('td')
+      .at(0)
+      .text(),
+    props.existingAssociations[0].name
+  )
+  equal(
+    rows
+      .at(1)
+      .find('td')
+      .at(0)
+      .text(),
+    props.existingAssociations[1].name
+  )
 })
 
 test('calls onRemoveAssociations when association remove button is clicked', () => {

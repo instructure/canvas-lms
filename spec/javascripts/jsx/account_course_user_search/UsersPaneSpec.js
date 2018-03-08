@@ -16,18 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { shallow } from 'enzyme';
-import UsersPane from 'jsx/account_course_user_search/components/UsersPane';
-import UserActions from 'jsx/account_course_user_search/actions/UserActions';
+import React from 'react'
+import {shallow} from 'enzyme'
+import UsersPane from 'jsx/account_course_user_search/components/UsersPane'
+import UserActions from 'jsx/account_course_user_search/actions/UserActions'
 
-QUnit.module('Account Course User Search UsersPane View');
+QUnit.module('Account Course User Search UsersPane View')
 
-test('handleUpdateSearchFilter dispatches applySearchFilter action', (assert) => {
-  const done = assert.async();
+test('handleUpdateSearchFilter dispatches applySearchFilter action', assert => {
+  const done = assert.async()
   const fakeStore = {
-    dispatch () {},
-    getState () {
+    dispatch() {},
+    getState() {
       return {
         userList: {
           users: [],
@@ -37,26 +37,26 @@ test('handleUpdateSearchFilter dispatches applySearchFilter action', (assert) =>
           searchFilter: {search_term: ''},
           permissions: {},
           accountId: 1
-        },
+        }
       }
     },
-    subscribe () {}
-  };
+    subscribe() {}
+  }
 
   const wrapper = shallow(
     <UsersPane
       store={fakeStore}
       roles={['a']}
       queryParams={{}}
-      onUpdateQueryParams={function(){}}
+      onUpdateQueryParams={function() {}}
     />
-  );
+  )
 
-  const spy = sinon.spy(UserActions, 'applySearchFilter');
-  const instance = wrapper.instance();
-  instance.handleUpdateSearchFilter();
+  const spy = sinon.spy(UserActions, 'applySearchFilter')
+  const instance = wrapper.instance()
+  instance.handleUpdateSearchFilter()
   setTimeout(() => {
-    ok(spy.called);
-    done();
-  }, 250);
-});
+    ok(spy.called)
+    done()
+  }, 250)
+})

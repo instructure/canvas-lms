@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/_environment.scss";
+@import 'base/_environment.scss';
 
 #edit_course_home_content_form div.form_group {
   padding-top: 2px;
@@ -24,7 +24,7 @@
 }
 
 .public-license-image-link {
-  float:left;
+  float: left;
   margin-right: 5px;
   margin-left: 5px;
   margin-bottom: 5px;
@@ -34,7 +34,7 @@
   font-size: 0.8em;
   display: block;
   line-height: 1.5em;
-  padding-left:5px;
+  padding-left: 5px;
 }
 
 #course_status h3 {

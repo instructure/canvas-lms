@@ -37,46 +37,48 @@ const ModeratedColumnHeader = React.createClass({
     }).isRequired
   },
 
-  onSelectAllBlurred () {
-    this.checkbox.setAttribute('aria-label', '');
+  onSelectAllBlurred() {
+    this.checkbox.setAttribute('aria-label', '')
   },
 
-  onSelectAllFocused () {
-    this.checkbox.setAttribute('aria-label', I18n.t('Select all students'));
+  onSelectAllFocused() {
+    this.checkbox.setAttribute('aria-label', I18n.t('Select all students'))
   },
 
-  labelSortOrder (mark) {
+  labelSortOrder(mark) {
     if (mark !== this.props.markColumn) {
-      return '';
+      return ''
     }
 
     switch (this.props.sortDirection) {
       case Constants.sortDirections.DESCENDING:
-        return I18n.t('sorted descending');
+        return I18n.t('sorted descending')
       case Constants.sortDirections.ASCENDING:
-        return I18n.t('sorted ascending');
+        return I18n.t('sorted ascending')
       default:
-        return '';
+        return ''
     }
   },
 
-  renderLinkArrow (mark) {
+  renderLinkArrow(mark) {
     if (mark !== this.props.markColumn) {
-      return null;
+      return null
     }
 
     if (this.props.sortDirection === Constants.sortDirections.DESCENDING) {
-      return (<i className="icon-mini-arrow-down" />);
+      return <i className="icon-mini-arrow-down" />
     }
 
-    return (<i className="icon-mini-arrow-up" />);
+    return <i className="icon-mini-arrow-up" />
   },
 
-  renderCheckbox () {
+  renderCheckbox() {
     if (!this.props.permissions.viewGrades) {
       return (
-        <th scope="col" className="ColumnHeader__Selector">&nbsp;</th>
-      );
+        <th scope="col" className="ColumnHeader__Selector">
+          &nbsp;
+        </th>
+      )
     }
 
     return (
@@ -87,38 +89,41 @@ const ModeratedColumnHeader = React.createClass({
         onFocus={this.onSelectAllFocused}
       >
         <input
-          ref={(c) => { this.checkbox = c; }}
+          ref={c => {
+            this.checkbox = c
+          }}
           type="checkbox"
           onChange={this.props.handleSelectAll}
         />
       </th>
-    );
+    )
   },
 
-  renderStudentColumnHeader () {
+  renderStudentColumnHeader() {
     return (
       <th scope="col" className="ModeratedColumnHeader__StudentName ColumnHeader__Item">
         <span>{I18n.t('Student')}</span>
       </th>
-    );
+    )
   },
 
-  renderFirstReviewerColumnHeader () {
+  renderFirstReviewerColumnHeader() {
     return (
       <th scope="col" className="ModeratedColumnHeader__Mark ColumnHeader__Item">
-        <a
-          href="#"
-          onClick={this.props.handleSortMark1}
-        >
-          <span aria-label={I18n.t('First reviewer %{sortOrder}', { sortOrder: this.labelSortOrder(Constants.markColumnNames.MARK_ONE) })}>
+        <a href="#" onClick={this.props.handleSortMark1}>
+          <span
+            aria-label={I18n.t('First reviewer %{sortOrder}', {
+              sortOrder: this.labelSortOrder(Constants.markColumnNames.MARK_ONE)
+            })}
+          >
             {I18n.t('1st Reviewer')}&nbsp;{this.renderLinkArrow(Constants.markColumnNames.MARK_ONE)}
           </span>
         </a>
       </th>
-    );
+    )
   },
 
-  render () {
+  render() {
     if (this.props.includeModerationSetHeaders) {
       return (
         <thead>
@@ -128,23 +133,29 @@ const ModeratedColumnHeader = React.createClass({
             {this.renderFirstReviewerColumnHeader()}
 
             <th scope="col" className="ModeratedColumnHeader__Mark ColumnHeader__Item">
-              <a
-                href="#"
-                onClick={this.props.handleSortMark2}
-              >
-                <span aria-label={`${I18n.t('Second reviewer')} ${this.labelSortOrder(Constants.markColumnNames.MARK_TWO)}`}>
-                  {I18n.t('2nd Reviewer')}&nbsp;{this.renderLinkArrow(Constants.markColumnNames.MARK_TWO)}
+              <a href="#" onClick={this.props.handleSortMark2}>
+                <span
+                  aria-label={`${I18n.t('Second reviewer')} ${this.labelSortOrder(
+                    Constants.markColumnNames.MARK_TWO
+                  )}`}
+                >
+                  {I18n.t('2nd Reviewer')}&nbsp;{this.renderLinkArrow(
+                    Constants.markColumnNames.MARK_TWO
+                  )}
                 </span>
               </a>
             </th>
 
             <th scope="col" className="ModeratedColumnHeader__Mark ColumnHeader__Item">
-              <a
-                href="#"
-                onClick={this.props.handleSortMark3}
-              >
-                <span aria-label={I18n.t('Moderator %{sortOrder}', { sortOrder: this.labelSortOrder(Constants.markColumnNames.MARK_THREE) })}>
-                  {I18n.t('Moderator')}&nbsp;{this.renderLinkArrow(Constants.markColumnNames.MARK_THREE)}
+              <a href="#" onClick={this.props.handleSortMark3}>
+                <span
+                  aria-label={I18n.t('Moderator %{sortOrder}', {
+                    sortOrder: this.labelSortOrder(Constants.markColumnNames.MARK_THREE)
+                  })}
+                >
+                  {I18n.t('Moderator')}&nbsp;{this.renderLinkArrow(
+                    Constants.markColumnNames.MARK_THREE
+                  )}
                 </span>
               </a>
             </th>
@@ -154,7 +165,7 @@ const ModeratedColumnHeader = React.createClass({
             </th>
           </tr>
         </thead>
-      );
+      )
     }
 
     return (
@@ -165,8 +176,8 @@ const ModeratedColumnHeader = React.createClass({
           {this.renderFirstReviewerColumnHeader()}
         </tr>
       </thead>
-    );
+    )
   }
-});
+})
 
 export default ModeratedColumnHeader

@@ -21,7 +21,7 @@ import 'jqueryui/dialog'
 import 'jquery.instructure_misc_plugins'
 import 'jquery.loadingImg'
 
-$('.visibility_help_link').live('click', (event) => {
+$('.visibility_help_link').live('click', event => {
   event.preventDefault()
   let $dialog = $('#visibility_help_dialog')
   if ($dialog.length === 0) {
@@ -36,10 +36,8 @@ $('.visibility_help_link').live('click', (event) => {
         width: 330
       })
     $.get('/partials/_course_visibility_help.html', html =>
-        $dialog
-          .loadingImage('remove')
-          .html(html)
-      )
+      $dialog.loadingImage('remove').html(html)
+    )
   }
   $dialog.dialog('open')
 })

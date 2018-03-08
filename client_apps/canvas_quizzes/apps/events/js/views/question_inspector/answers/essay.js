@@ -18,38 +18,35 @@
  */
 
 define(function(require) {
-  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
-  var K = require('../../../constants');
-  var Button = require('jsx!../../../components/button');
-  var I18n = require('i18n!quiz_log_auditing.question_answers.essay');
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps')
+  var K = require('../../../constants')
+  var Button = require('jsx!../../../components/button')
+  var I18n = require('i18n!quiz_log_auditing.question_answers.essay')
 
   var Essay = React.createClass({
     statics: {
-      questionTypes: [ K.Q_ESSAY ]
+      questionTypes: [K.Q_ESSAY]
     },
 
     getDefaultProps: function() {
       return {
         answer: ''
-      };
+      }
     },
 
     getInitialState: function() {
       return {
         htmlView: false
-      };
+      }
     },
 
     render: function() {
-      var content;
+      var content
 
       if (this.state.htmlView) {
-        content = (
-          <div dangerouslySetInnerHTML={{__html: this.props.answer }} />
-        );
-      }
-      else {
-        content = <pre>{this.props.answer}</pre>;
+        content = <div dangerouslySetInnerHTML={{__html: this.props.answer}} />
+      } else {
+        content = <pre>{this.props.answer}</pre>
       }
 
       return (
@@ -57,19 +54,18 @@ define(function(require) {
           {content}
 
           <Button type="default" onClick={this.toggleView}>
-            {this.state.htmlView ?
-              I18n.t('view_plain_answer', 'View Plain') :
-              I18n.t('view_html_answer', 'View HTML')
-            }
+            {this.state.htmlView
+              ? I18n.t('view_plain_answer', 'View Plain')
+              : I18n.t('view_html_answer', 'View HTML')}
           </Button>
         </div>
-      );
+      )
     },
 
     toggleView: function() {
-      this.setState({ htmlView: !this.state.htmlView });
+      this.setState({htmlView: !this.state.htmlView})
     }
-  });
+  })
 
-  return Essay;
-});
+  return Essay
+})

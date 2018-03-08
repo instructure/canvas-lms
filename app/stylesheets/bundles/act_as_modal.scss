@@ -1,4 +1,4 @@
-@import "base/environment";
+@import 'base/environment';
 
 .ActAs__body {
   display: flex;
@@ -26,17 +26,25 @@
 }
 
 .ActAs__mask {
-  filter: drop-shadow(0px 0px 2px rgba(0,0,0,.75));
+  filter: drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.75));
   animation: pandaMasquerade 3s infinite;
   animation-direction: alternate-reverse;
   animation-timing-function: ease-in-out;
 }
 
 @keyframes pandaMasquerade {
-  0% { transform: rotate(0deg) translate3d(0px,0px,0px); }
-  33% { transform: rotate(0deg) translate3d(0px,0px,0px); }
-  66% { transform: rotate(-20deg) translate3d(-100px,0px,0px); }
-  100% { transform: rotate(-20deg) translate3d(-100px,0px,0px); }
+  0% {
+    transform: rotate(0deg) translate3d(0px, 0px, 0px);
+  }
+  33% {
+    transform: rotate(0deg) translate3d(0px, 0px, 0px);
+  }
+  66% {
+    transform: rotate(-20deg) translate3d(-100px, 0px, 0px);
+  }
+  100% {
+    transform: rotate(-20deg) translate3d(-100px, 0px, 0px);
+  }
 }
 
 .ActAs__mask-1 {
@@ -62,7 +70,7 @@
 }
 
 .ActAs__mask-2 {
-  opacity: .7;
+  opacity: 0.7;
 }
 
 .ActAs__mask-3,
@@ -95,11 +103,11 @@
 }
 
 .ActAs__mask-8 {
-  fill:#822b00;
+  fill: #822b00;
 }
 
 .ActAs__mask-9 {
-  fill:#999;
+  fill: #999;
 }
 
 .ActAs__panda-1,
@@ -110,7 +118,7 @@
 .ActAs__panda-1,
 .ActAs__panda-2 {
   stroke: #32434f;
-  stroke-width:2px;
+  stroke-width: 2px;
 }
 
 .ActAs__panda-2,
@@ -126,7 +134,7 @@
   fill: none;
   stroke: #86939d;
   stroke-linecap: round;
-  stroke-width:5px
+  stroke-width: 5px;
 }
 
 .ActAs__panda-7 {

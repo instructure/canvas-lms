@@ -1,38 +1,35 @@
-SanitizeField
-=============
+# SanitizeField
 
 We want to be able to mix model fields with Sanitize configuration and
 implement a sanitization in a before_save callback.
 
-An alternative to this plugin might be using a Rails whitelist.  This
+An alternative to this plugin might be using a Rails whitelist. This
 isn't developed, but is an idea on http://wonko.com/post/sanitize
 
-  Rails::Initializer.run do |config|
-    config.action_view.white_list_sanitizer = Sanitizer.new
-    config.action_view.sanitized_allowed_tags = ‘table’, ‘tr’, ‘td’
-    config.action_view.sanitized_allowed_attributes = ‘id’, ‘class’, ‘style’
-  end
+Rails::Initializer.run do |config|
+config.action_view.white_list_sanitizer = Sanitizer.new
+config.action_view.sanitized_allowed_tags = ‘table’, ‘tr’, ‘td’
+config.action_view.sanitized_allowed_attributes = ‘id’, ‘class’, ‘style’
+end
 
 Our approach is finer-grained, and should work better for now at least.
 There is also talk about an alternative 1.9/nokogiri approach to the
-Sanitizer gem for more optimal performance.  Keeping our eyes open
+Sanitizer gem for more optimal performance. Keeping our eyes open
 about these issues.
 
-Example
-=======
+# Example
 
 class BasicExample < ActiveRecord::Base
-  sanitize :body, Sanitize::Config::RELAXED
+sanitize :body, Sanitize::Config::RELAXED
 end
 
 class Whatever < ActiveRecord::Base
-  sanitize :body, :title, :elements => ['a', 'span'],
-    :attributes => {'a' => ['href', 'title'], 'span' => ['class']},
-    :protocols => {'a' => {'href' => ['http', 'https', 'mailto']}}
+sanitize :body, :title, :elements => ['a', 'span'],
+:attributes => {'a' => ['href', 'title'], 'span' => ['class']},
+:protocols => {'a' => {'href' => ['http', 'https', 'mailto']}}
 end
 
-License
-=======
+# License
 
 Copyright (C) 2011 - present Instructure, Inc.
 

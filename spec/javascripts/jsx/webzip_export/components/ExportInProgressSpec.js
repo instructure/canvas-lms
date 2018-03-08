@@ -16,31 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-dom',
-  'enzyme',
-  'jsx/webzip_export/components/ExportInProgress',
-], (React, ReactDOM, enzyme, ExportInProgress) => {
-  QUnit.module('ExportInProgress')
+define(
+  ['react', 'react-dom', 'enzyme', 'jsx/webzip_export/components/ExportInProgress'],
+  (React, ReactDOM, enzyme, ExportInProgress) => {
+    QUnit.module('ExportInProgress')
 
-  test('renders the ExportInProgress component', () => {
-    const webzip = {progressId: '117'}
-    const tree = enzyme.shallow(<ExportInProgress webzip={webzip} loadExports={() => {}} />)
+    test('renders the ExportInProgress component', () => {
+      const webzip = {progressId: '117'}
+      const tree = enzyme.shallow(<ExportInProgress webzip={webzip} loadExports={() => {}} />)
 
-    const node = tree.find('.webzipexport__inprogress')
+      const node = tree.find('.webzipexport__inprogress')
 
-    ok(node.exists())
-  })
+      ok(node.exists())
+    })
 
-  test('doesnt render when completed is true', () => {
-    const webzip = {progressId: '117'}
-    const tree = enzyme.shallow(<ExportInProgress webzip={webzip} loadExports={() => {}} />)
+    test('doesnt render when completed is true', () => {
+      const webzip = {progressId: '117'}
+      const tree = enzyme.shallow(<ExportInProgress webzip={webzip} loadExports={() => {}} />)
 
-    tree.setState({completed: true})
+      tree.setState({completed: true})
 
-    const node = tree.find('.webzipexport__inprogress')
+      const node = tree.find('.webzipexport__inprogress')
 
-    equal(node.length, 0)
-  })
-})
+      equal(node.length, 0)
+    })
+  }
+)

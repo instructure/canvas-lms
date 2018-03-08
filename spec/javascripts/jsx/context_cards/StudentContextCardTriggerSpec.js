@@ -16,42 +16,42 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery';
-import moxios from 'moxios';
-import handleClickEvent from 'jsx/context_cards/StudentContextCardTrigger';
+import $ from 'jquery'
+import moxios from 'moxios'
+import handleClickEvent from 'jsx/context_cards/StudentContextCardTrigger'
 
 QUnit.module('StudentContextCardTrigger', {
-  setup () {
-    $('#fixtures').append('<button class="student_context_card_trigger">Open</button>');
-    $('#fixtures').append('<div id="StudentTray__Container"></div>');
-    $('#fixtures').append('<div id="application"></div>');
+  setup() {
+    $('#fixtures').append('<button class="student_context_card_trigger">Open</button>')
+    $('#fixtures').append('<div id="StudentTray__Container"></div>')
+    $('#fixtures').append('<div id="application"></div>')
     window.ENV.STUDENT_CONTEXT_CARDS_ENABLED = true
-    moxios.install();
+    moxios.install()
   },
 
-  teardown () {
-    $('#fixtures').empty();
-    moxios.uninstall();
+  teardown() {
+    $('#fixtures').empty()
+    moxios.uninstall()
     delete window.ENV.STUDENT_CONTEXT_CARDS_ENABLED
   }
-});
+})
 
-test('it works with really large student and course ids', (assert) => {
-  const done = assert.async();
-  const bigStringId = '109007199254740991';
-  $('.student_context_card_trigger').attr('data-student_id', bigStringId);
-  $('.student_context_card_trigger').attr('data-course_id', bigStringId);
+test('it works with really large student and course ids', assert => {
+  const done = assert.async()
+  const bigStringId = '109007199254740991'
+  $('.student_context_card_trigger').attr('data-student_id', bigStringId)
+  $('.student_context_card_trigger').attr('data-course_id', bigStringId)
   const fakeEvent = {
     target: $('.student_context_card_trigger'),
-    preventDefault () {}
-  };
+    preventDefault() {}
+  }
 
-  handleClickEvent(fakeEvent);
+  handleClickEvent(fakeEvent)
 
   moxios.wait(() => {
-    const request = moxios.requests.mostRecent();
-    const regexp = new RegExp(bigStringId);
-    ok(regexp.test(request.url));
-    done();
+    const request = moxios.requests.mostRecent()
+    const regexp = new RegExp(bigStringId)
+    ok(regexp.test(request.url))
+    done()
   })
-});
+})

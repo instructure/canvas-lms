@@ -1,5 +1,4 @@
-Masquerading
-============
+# Masquerading
 
 Masquerading is making an API call on behalf of another user. It will behave as if the target user had made the API
 call with his own access token (even if he doesn't have one), including permission checks, enrollments, etc. In order
@@ -17,7 +16,7 @@ curl 'https://<canvas>/api/v1/users/self/activity_stream?as_user_id=sis_user_id:
 
 Masquerading could be useful in a number of use cases:
 
- * For developing an admin tool
- * For accessing APIs that can only be called on self (i.e. the activity stream as shown above)
- * For a portal type application that's already tightly integrated with an SIS and is managed
-   by the school, to avoid going through the OAuth flow for every student
+* For developing an admin tool
+* For accessing APIs that can only be called on self (i.e. the activity stream as shown above)
+* For a portal type application that's already tightly integrated with an SIS and is managed
+  by the school, to avoid going through the OAuth flow for every student

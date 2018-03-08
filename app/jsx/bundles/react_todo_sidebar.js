@@ -16,29 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import ToDoSidebar from '../dashboard/ToDoSidebar';
-import configureStore from '../dashboard/ToDoSidebar/store';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {Provider} from 'react-redux'
+import ToDoSidebar from '../dashboard/ToDoSidebar'
+import configureStore from '../dashboard/ToDoSidebar/store'
 
-const store = configureStore({});
+const store = configureStore({})
 
 /**
-* This handles rendering this properly.  Because the sidebar itself is loaded
-* via a Rails render without layout, it can't render out the script tag for this
-* bundle.  So we load this bundle at the main application, but we need to wait for
-* the sidebar to render.  This makes it so we check every 500ms for the proper
-* container to be there, once it is there, we stop.
-*/
+ * This handles rendering this properly.  Because the sidebar itself is loaded
+ * via a Rails render without layout, it can't render out the script tag for this
+ * bundle.  So we load this bundle at the main application, but we need to wait for
+ * the sidebar to render.  This makes it so we check every 500ms for the proper
+ * container to be there, once it is there, we stop.
+ */
 const interval = window.setInterval(() => {
   const container = document.querySelector('.Sidebar__TodoListContainer')
   if (container) {
     ReactDOM.render(
       <Provider store={store}>
         <ToDoSidebar courses={window.ENV.STUDENT_PLANNER_COURSES} timeZone={window.ENV.TIMEZONE} />
-      </Provider>
-      , document.querySelector('.Sidebar__TodoListContainer'));
-    window.clearInterval(interval);
+      </Provider>,
+      document.querySelector('.Sidebar__TodoListContainer')
+    )
+    window.clearInterval(interval)
   }
-}, 500);
+}, 500)

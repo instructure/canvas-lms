@@ -42,10 +42,10 @@
   font-size: -1.8em;
   pointer: cursor;
 }
-i[class*=UploadDropZone__instructions--icon-upload]:before {
+i[class*='UploadDropZone__instructions--icon-upload']:before {
   font-size: 100px;
 }
-i[class*=UploadDropZone__instructions--icon-upload] {
+i[class*='UploadDropZone__instructions--icon-upload'] {
   color: var(--ic-brand-primary);
   width: 100px;
   height: 100px;

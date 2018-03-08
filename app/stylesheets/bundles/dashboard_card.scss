@@ -18,9 +18,8 @@
 
 // Styles for Dashboard Card Component
 
-@import "base/environment";
-@import "components/ic-badge";
-
+@import 'base/environment';
+@import 'components/ic-badge';
 
 $ic-DashboardCard-width: 262px;
 $ic-DashboardCard-icon-size: 24px;
@@ -38,7 +37,9 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
 }
 
 @keyframes placeholder {
-  to { opacity: 0.5; }
+  to {
+    opacity: 0.5;
+  }
 }
 
 .ic-DashboardCard__placeholder-svg {
@@ -52,7 +53,7 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
     animation-iteration-count: infinite;
     @for $i from 2 through 7 {
       &:nth-child(#{$i}) {
-       animation-delay: 0.1s * $i;
+        animation-delay: 0.1s * $i;
       }
     }
   }
@@ -69,7 +70,9 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
   vertical-align: top;
   margin: 0 $ic-sp*3 $ic-sp*3 0;
   .no-touch & {
-    &:hover { box-shadow: 0 4px 10px rgba(black, 0.35); }
+    &:hover {
+      box-shadow: 0 4px 10px rgba(black, 0.35);
+    }
   }
 }
 
@@ -99,7 +102,8 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
 
 @mixin dashcardHeaderButton {
   position: absolute;
-  top: $ic-sp; right: $ic-sp;
+  top: $ic-sp;
+  right: $ic-sp;
   width: $ic-sp*3;
   height: $ic-sp*3;
   border-radius: 50%;
@@ -121,7 +125,7 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
 
 .ic-DashboardCard__header-title {
   transition: all 0.2s ease-out;
-  transform: translate3d(0,0,0);
+  transform: translate3d(0, 0, 0);
   padding: 0;
   margin: 0;
   line-height: 1.3;
@@ -156,7 +160,8 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
   @include ic-badge-maker(18px, var(--ic-brand-primary), $ic-color-light);
   transition: all 0.2s;
   position: absolute;
-  top: -0.5rem; right: -0.875rem;
+  top: -0.5rem;
+  right: -0.875rem;
   z-index: 1; // when dashcard links get squished, don't cut off badges
 }
 
@@ -182,10 +187,13 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
       @if $use_high_contrast {
         outline: 1px solid var(--ic-link-color);
         outline-offset: 0.125rem;
+      } @else {
+        outline: none;
       }
-      @else { outline: none; }
     }
-    &:hover { color: var(--ic-brand-primary); }
+    &:hover {
+      color: var(--ic-brand-primary);
+    }
   }
 }
 

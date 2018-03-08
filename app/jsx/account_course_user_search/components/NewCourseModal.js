@@ -142,9 +142,7 @@ export default class NewCourseModal extends React.Component {
                       {term.name}
                     </option>
                   ))}
-                  {terms.loading && (
-                    <option disabled>{I18n.t('Loading more terms...')}</option>
-                  )}
+                  {terms.loading && <option disabled>{I18n.t('Loading more terms...')}</option>}
                 </Select>
               </FormFieldGroup>
             </ModalBody>

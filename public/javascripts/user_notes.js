@@ -24,81 +24,96 @@ import './jquery.instructure_date_and_time'
 import './jquery.instructure_misc_plugins'
 import './vendor/jquery.pageless'
 
-  if (ENV.user_note_list_pageless_options) {
-    $('#user_note_list').pageless(ENV.user_note_list_pageless_options);
+if (ENV.user_note_list_pageless_options) {
+  $('#user_note_list').pageless(ENV.user_note_list_pageless_options)
+}
+
+$('.cancel_button')
+  .click(function() {
+    $('#create_entry').slideUp()
+  })
+  .end()
+  .find(':text')
+  .keycodes('esc', function() {
+    $('.cancel_button').click()
+  })
+
+$('#new_user_note_button').click(function(event) {
+  event.preventDefault()
+  $('#create_entry').slideDown()
+  $('#add_entry_form')
+    .find(':text:first')
+    .focus()
+    .select()
+})
+
+$('#add_entry_form').formSubmit({
+  resetForm: true,
+  beforeSubmit: function(data) {
+    $('#create_entry').slideUp()
+    $('#proccessing').loadingImage()
+    return true
+  },
+  success: function(data) {
+    $('#no_user_notes_message').hide()
+    $(this)
+      .find('.title')
+      .val('')
+    $(this)
+      .find('.note')
+      .val('')
+    var user_note = data.user_note
+    user_note.created_at = $.datetimeString(user_note.updated_at)
+    var action = $('#add_entry_form').attr('action') + '/' + user_note.id
+    $('#proccessing').loadingImage('remove')
+    $('#user_note_blank')
+      .clone(true)
+      .prependTo($('#user_note_list'))
+      .attr('id', 'user_note_' + user_note.id)
+      .fillTemplateData({data: user_note})
+      .find('.delete_user_note_link')
+      .attr('href', action)
+      .attr('title', function(i, oldTitle) {
+        return oldTitle.replace('{{ title }}', user_note.title)
+      })
+      .find('.screenreader-only')
+      .text(function(i, oldText) {
+        return oldText.replace('{{ title }}', user_note.title)
+      })
+      .end()
+      .end()
+      .find('.formatted_note')
+      .html($.raw(user_note.formatted_note))
+      .end()
+      .slideDown()
+  },
+  error: function(data) {
+    $('#proccessing').loadingImage('remove')
+    $('#create_entry').slideDown()
   }
+})
 
-  $(".cancel_button").click(function() {
-    $("#create_entry").slideUp();
-  }).end().find(":text").keycodes('esc', function() {
-    $(".cancel_button").click();
-  });
-
-  $("#new_user_note_button").click(function(event) {
-    event.preventDefault();
-    $("#create_entry").slideDown();
-    $("#add_entry_form").find(":text:first").focus().select();
-  });
-
-  $("#add_entry_form").formSubmit({
-    resetForm: true,
-    beforeSubmit: function(data) {
-      $("#create_entry").slideUp();
-      $('#proccessing').loadingImage();
-      return true;
-    },
-    success: function(data) {
-      $("#no_user_notes_message").hide();
-      $(this).find('.title').val('');
-      $(this).find('.note').val('');
-      var user_note = data.user_note;
-      user_note.created_at = $.datetimeString(user_note.updated_at);
-      var action = $("#add_entry_form").attr('action') + '/' + user_note.id;
-      $('#proccessing').loadingImage('remove');
-      $('#user_note_blank').clone(true)
-        .prependTo($("#user_note_list"))
-        .attr('id', 'user_note_' + user_note.id)
-        .fillTemplateData({data:user_note})
-        .find('.delete_user_note_link')
-          .attr('href', action)
-          .attr('title', function (i, oldTitle) {
-            return oldTitle.replace('{{ title }}', user_note.title)
-          })
-          .find('.screenreader-only')
-            .text(function (i, oldText) {
-              return oldText.replace('{{ title }}', user_note.title)
-            })
-            .end()
-          .end()
-        .find('.formatted_note')
-          .html($.raw(user_note.formatted_note))
-          .end()
-        .slideDown();
+$('.delete_user_note_link').click(function(event) {
+  event.preventDefault()
+  var token = $('form:first').getFormData().authenticity_token
+  var $user_note = $(this).parents('.user_note')
+  $user_note.confirmDelete({
+    message: I18n.t(
+      'confirms.delete_journal_entry',
+      'Are you sure you want to delete this journal entry?'
+    ),
+    token: token,
+    url: $(this).attr('href'),
+    success: function() {
+      $(this).fadeOut('slow', function() {
+        $(this).remove()
+        if (!$('#user_note_list > .user_note').length) {
+          $('#no_user_notes_message').show()
+        }
+      })
     },
     error: function(data) {
-      $('#proccessing').loadingImage('remove');
-      $("#create_entry").slideDown();
+      $(this).formErrors(data)
     }
-  });
-
-  $(".delete_user_note_link").click(function(event) {
-    event.preventDefault();
-    var token = $("form:first").getFormData().authenticity_token;
-    var $user_note = $(this).parents(".user_note");
-    $user_note.confirmDelete({
-      message: I18n.t('confirms.delete_journal_entry', "Are you sure you want to delete this journal entry?"),
-      token: token,
-      url: $(this).attr('href'),
-      success: function() {
-        $(this).fadeOut('slow', function() {
-          $(this).remove();
-          if (!$('#user_note_list > .user_note').length) {
-            $("#no_user_notes_message").show();
-          }
-        });
-      },
-      error: function(data) {
-        $(this).formErrors(data);
-      }
-    });
-  });
+  })
+})

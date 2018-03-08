@@ -2,7 +2,6 @@
 // Dropdown menus
 // --------------------------------------------------
 
-
 // Use the .menu class on any <li> element within the topbar or ul.tabs and you'll get some superfancy dropdowns
 .dropup,
 .dropdown {
@@ -24,10 +23,10 @@
   width: 0;
   height: 0;
   vertical-align: top;
-  border-top:   4px solid $black;
+  border-top: 4px solid $black;
   border-right: 4px solid transparent;
-  border-left:  4px solid transparent;
-  content: "";
+  border-left: 4px solid transparent;
+  content: '';
 }
 
 // Place the caret
@@ -55,10 +54,10 @@
   *border-right-width: 2px;
   *border-bottom-width: 2px;
   border-radius: 6px;
-  @include box-shadow(0 5px 10px rgba(0,0,0,.2));
+  @include box-shadow(0 5px 10px rgba(0,0,0,0.2));
   -webkit-background-clip: padding-box;
-     -moz-background-clip: padding;
-          background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box;
 
   // Aligns the dropdown menu to right
   &.pull-right {
@@ -137,7 +136,6 @@
   left: auto;
 }
 
-
 // Sub menus
 // ---------------------------
 .dropdown-submenu {
@@ -150,19 +148,18 @@
   margin-top: -6px;
   margin-left: -1px;
   -webkit-border-radius: 0 6px 6px 6px;
-     -moz-border-radius: 0 6px 6px 6px;
-          border-radius: 0 6px 6px 6px;
+  -moz-border-radius: 0 6px 6px 6px;
+  border-radius: 0 6px 6px 6px;
 }
 .dropdown-submenu a:focus + .dropdown-menu, /* INSTRUCTURE */
 .dropdown-submenu:hover > .dropdown-menu {
   display: block;
 }
 
-
 // Caret to indicate there is a submenu
 .dropdown-submenu > a:after {
   display: block;
-  content: " ";
+  content: ' ';
   float: right;
   width: 0;
   height: 0;
@@ -188,7 +185,7 @@
     left: -100%;
     margin-left: 10px;
     -webkit-border-radius: 6px 0 6px 6px;
-       -moz-border-radius: 6px 0 6px 6px;
-            border-radius: 6px 0 6px 6px;
+    -moz-border-radius: 6px 0 6px 6px;
+    border-radius: 6px 0 6px 6px;
   }
 }

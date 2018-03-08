@@ -22,36 +22,34 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!moderated_grading'
 import 'compiled/jquery.rails_flash_notifications'
 
-  var FlashMessageHolder = React.createClass({
-    displayName: 'FlashMessageHolder',
+var FlashMessageHolder = React.createClass({
+  displayName: 'FlashMessageHolder',
 
-    propTypes: {
-      time: PropTypes.number.isRequired,
-      message: PropTypes.string.isRequired,
-      error: PropTypes.bool,
-      onError: PropTypes.func,
-      onSuccess: PropTypes.func
-    },
+  propTypes: {
+    time: PropTypes.number.isRequired,
+    message: PropTypes.string.isRequired,
+    error: PropTypes.bool,
+    onError: PropTypes.func,
+    onSuccess: PropTypes.func
+  },
 
-    shouldComponentUpdate (nextProps, nextState) {
-      return nextProps.time > this.props.time;
-    },
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextProps.time > this.props.time
+  },
 
-    componentWillUpdate (nextProps, nextState) {
-      if (nextProps.error) {
-        (nextProps.onError) ?
-        nextProps.onError(nextProps.message) :
-        $.flashError(nextProps.message);
-      } else {
-        (nextProps.onSuccess) ?
-        nextProps.onSuccess(nextProps.message) :
-        $.flashMessage(nextProps.message);
-      }
-    },
-
-    render () {
-      return null;
+  componentWillUpdate(nextProps, nextState) {
+    if (nextProps.error) {
+      nextProps.onError ? nextProps.onError(nextProps.message) : $.flashError(nextProps.message)
+    } else {
+      nextProps.onSuccess
+        ? nextProps.onSuccess(nextProps.message)
+        : $.flashMessage(nextProps.message)
     }
-  });
+  },
+
+  render() {
+    return null
+  }
+})
 
 export default FlashMessageHolder

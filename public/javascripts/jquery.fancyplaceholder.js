@@ -31,46 +31,48 @@
 // then: $(".field-with-fancyplaceholder input").fancyPlaceholder();
 
 import $ from 'jquery'
-	$.fn.fancyPlaceholder = function() {
-	  var pollingInterval,
-	  	  foundInputsAndLables = [];
+$.fn.fancyPlaceholder = function() {
+  var pollingInterval,
+    foundInputsAndLables = []
 
-    function hideOrShowLabels(){
-      $.each(foundInputsAndLables, function(i, inputAndLable){
-        inputAndLable[1][inputAndLable[0].val() ? 'hide' : 'show']();
-      });
-    }
+  function hideOrShowLabels() {
+    $.each(foundInputsAndLables, function(i, inputAndLable) {
+      inputAndLable[1][inputAndLable[0].val() ? 'hide' : 'show']()
+    })
+  }
 
-	  return this.each(function() {
-	    var $input = $(this),
-	        $label = $("label[for="+$input.attr('id')+"]");
+  return this.each(function() {
+    var $input = $(this),
+      $label = $('label[for=' + $input.attr('id') + ']')
 
-	    $label.addClass('placeholder').wrapInner("<span/>").css({
-	      'font-family'   : $input.css('font-family'),
-        'font-size'     : $input.css('font-size')
-	    });
+    $label
+      .addClass('placeholder')
+      .wrapInner('<span/>')
+      .css({
+        'font-family': $input.css('font-family'),
+        'font-size': $input.css('font-size')
+      })
 
-	    $input
-        .focus(function(){
-          $label.addClass('focus', 300);
-        })
-        .blur(function(){
-          $label.removeClass('focus', 300);
-        })
-        .bind('keyup', hideOrShowLabels);
+    $input
+      .focus(function() {
+        $label.addClass('focus', 300)
+      })
+      .blur(function() {
+        $label.removeClass('focus', 300)
+      })
+      .bind('keyup', hideOrShowLabels)
 
-      // if this was already focused before we got here, make it light gray now. sorry, ie7 cant do :focus selector, it doesn't get this.
-      try {
-        if ($("input:focus").get(0) == this) {
-          $input.triggerHandler('focus');
-        }
-      } catch(e) {}
-
-
-      foundInputsAndLables.push([$input, $label]);
-
-      if (!pollingInterval) {
-        window.setInterval(hideOrShowLabels, 100);
+    // if this was already focused before we got here, make it light gray now. sorry, ie7 cant do :focus selector, it doesn't get this.
+    try {
+      if ($('input:focus').get(0) == this) {
+        $input.triggerHandler('focus')
       }
- 	  });
-	};
+    } catch (e) {}
+
+    foundInputsAndLables.push([$input, $label])
+
+    if (!pollingInterval) {
+      window.setInterval(hideOrShowLabels, 100)
+    }
+  })
+}

@@ -4,6 +4,7 @@ The process of testing JavaScript sometimes confuses people. This document's goa
 is to alleviate that confusion and establish how to run JavaScript tests.
 
 ## Jest
+
 Whenever possible, which for now means when you are testing something that only imports
 stuff that does not use AMD imports (eg, it only requires
 stuff from app/jsx or node_modules), you should write your js tests for
@@ -47,9 +48,9 @@ import ReactDOM from 'react-dom'
 import SomeComponent from './SomeComponent'
 
 it('renders without crashing', () => {
-  const div = document.createElement('div');
-  ReactDOM.render(<App />, div);
-});
+  const div = document.createElement('div')
+  ReactDOM.render(<App />, div)
+})
 ```
 
 This test mounts a component and makes sure that it didn’t throw during rendering. Tests like this provide a lot value with very little effort so they are great as a starting point.
@@ -59,13 +60,13 @@ When you encounter bugs caused by changing components, you will gain a deeper in
 If you’d like to test components in isolation from the child components they render, we recommend using [`shallow()` rendering API](http://airbnb.io/enzyme/docs/api/shallow.html) from [Enzyme](http://airbnb.io/enzyme/). You can write a smoke test with it too:
 
 ```js
-import React from 'react';
-import { shallow } from 'enzyme';
-import App from './App';
+import React from 'react'
+import {shallow} from 'enzyme'
+import App from './App'
 
 it('renders without crashing', () => {
-  shallow(<App />);
-});
+  shallow(<App />)
+})
 ```
 
 Unlike the previous smoke test using `ReactDOM.render()`, this test only renders `<App>` and doesn’t go deeper. For example, even if `<App>` itself renders a `<Button>` that throws, this test will pass. Shallow rendering is great for isolated unit tests, but you may still want to create some full rendering tests to ensure the components integrate correctly. Enzyme supports [full rendering with `mount()`](http://airbnb.io/enzyme/docs/api/mount.html), and you can also use it for testing state changes and component lifecycle.
@@ -115,8 +116,8 @@ docker-compose run --rm js-tests
 ## With Docker and Webpack
 
 This is becoming the go to standard for running Canvas and compiling your not-JavaScript
-(CoffeeScript, JSX, Handlebars, etc.) code into JavaScript code.  You should likely
-be following this path when doing front-end development on Canvas.  If you need help
+(CoffeeScript, JSX, Handlebars, etc.) code into JavaScript code. You should likely
+be following this path when doing front-end development on Canvas. If you need help
 getting started with that please see [development_with_docker.md](https://github.com/instructure/canvas-lms/blob/master/doc/development_with_docker.md)
 and [working_with_webpack.md](https://github.com/instructure/canvas-lms/blob/master/doc/working_with_webpack.md).
 
@@ -128,46 +129,46 @@ of files. Inside your `.env` file, add the phantomjs-tests override in your
 
 The `jspec` npm script allows you to build and run specific JavaScript specs as follows:
 
-1) `yarn run jspec path/to/specs`
-  This will build the specified specs using webpack and run them locally using Chrome.
+1. `yarn run jspec path/to/specs`
+   This will build the specified specs using webpack and run them locally using Chrome.
 
-  You can specify a directory or a single spec file to build and run. If no path
-  is provided, all javascript specs are built and ran.
+You can specify a directory or a single spec file to build and run. If no path
+is provided, all javascript specs are built and ran.
 
-2) `yarn run jspec-watch path/to/specs`
-  This will get webpack building the specified specs in watch mode, making it so your
-  changes are instantly (or close to instantly) reflected in the test bundle.
+2. `yarn run jspec-watch path/to/specs`
+   This will get webpack building the specified specs in watch mode, making it so your
+   changes are instantly (or close to instantly) reflected in the test bundle.
 
-  You can specify a directory or a single spec file to watch and build. If no path
-  is provided, all javascript specs are watched and built.
+You can specify a directory or a single spec file to watch and build. If no path
+is provided, all javascript specs are watched and built.
 
-  Using `jspec` in this way assumes you will run the specs yourself using PhantomJS
-  (see below) or by using `yarn test` to run them locally in Chrome.
+Using `jspec` in this way assumes you will run the specs yourself using PhantomJS
+(see below) or by using `yarn test` to run them locally in Chrome.
 
 ### PhantomJS
 
 To run javascript specs using PhantomJS you can do so as follow:
 
-1) `yarn run jspec-watch path/to/specs`
+1. `yarn run jspec-watch path/to/specs`
    This will get webpack building the test bundle in watch mode, making it so your
    changes are instantly (or close to instantly) reflected in the test bundle.
 
    You can specify a directory or a single spec file to watch and build. If no path
    is provided, all javascript specs are watched and built.
 
-2) `docker-compose run --rm phantomjs-tests`
+2. `docker-compose run --rm phantomjs-tests`
    This will start the PhantomJS container in watch mode running the test bundle
    anytime the test bundle gets updated.
 
 So you'll now see PhantomJS almost instantly complete the test suite for you.
-Unfortunately, you'll also see some failures :(. Don't worry though!  The reason
+Unfortunately, you'll also see some failures :(. Don't worry though! The reason
 you see failures is the lack of full support for some browser standards in PhantomJS.
 We don't polyfill for PhantomJS (at least when this is being written) so you'll generally
 see a few failures there.
 
 Now navigate in your browser to http://phantom.docker and your tests will run inside
-the browser you have open (in addition to PhantomJS).  This will give you the chance
-to debug them as well as see how they work in a fully functional browser.  Our JS
+the browser you have open (in addition to PhantomJS). This will give you the chance
+to debug them as well as see how they work in a fully functional browser. Our JS
 specs currently run in Chrome so make sure that your tests pass there.
 
 ## Javascript Test Coverage

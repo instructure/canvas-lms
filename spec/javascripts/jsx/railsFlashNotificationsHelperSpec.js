@@ -16,390 +16,393 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!shared.flash_notices',
-  'jquery',
-  'underscore',
-  'str/htmlEscape',
-  'jsx/railsFlashNotificationsHelper'
-], (I18n, $, _, htmlEscape, NotificationsHelper) => {
-  let helper;
-  let fixtures;
-
-  QUnit.module('RailsFlashNotificationsHelper#holderReady', {
-    setup: function() {
-      fixtures = document.getElementById('fixtures');
-      helper = new NotificationsHelper();
-    },
-    teardown: function() {
-      fixtures.innerHTML = '';
-    }
-  });
+define(
+  [
+    'i18n!shared.flash_notices',
+    'jquery',
+    'underscore',
+    'str/htmlEscape',
+    'jsx/railsFlashNotificationsHelper'
+  ],
+  (I18n, $, _, htmlEscape, NotificationsHelper) => {
+    let helper
+    let fixtures
+
+    QUnit.module('RailsFlashNotificationsHelper#holderReady', {
+      setup: function() {
+        fixtures = document.getElementById('fixtures')
+        helper = new NotificationsHelper()
+      },
+      teardown: function() {
+        fixtures.innerHTML = ''
+      }
+    })
+
+    test('returns false if holder is initilialized without the flash message holder in the DOM', () => {
+      fixtures.innerHTML = ''
 
-  test('returns false if holder is initilialized without the flash message holder in the DOM', () => {
-    fixtures.innerHTML = '';
+      helper.initHolder()
+
+      ok(!helper.holderReady())
+    })
+
+    test('returns false before the holder is initialized even with flash message holder in the DOM', () => {
+      fixtures.innerHTML = '<div id="flash_message_holder"></div>'
 
-    helper.initHolder();
+      ok(!helper.holderReady())
+    })
 
-    ok(!helper.holderReady());
-  });
+    test('returns true after the holder is initialized with flash message holder in the DOM', () => {
+      fixtures.innerHTML = '<div id="flash_message_holder"></div>'
 
-  test('returns false before the holder is initialized even with flash message holder in the DOM', () => {
-    fixtures.innerHTML = '<div id="flash_message_holder"></div>';
+      helper.initHolder()
 
-    ok(!helper.holderReady());
-  });
+      ok(helper.holderReady())
+    })
 
-  test('returns true after the holder is initialized with flash message holder in the DOM', () => {
-    fixtures.innerHTML = '<div id="flash_message_holder"></div>';
+    QUnit.module('RailsFlashNotificationsHelper#getIconType', {
+      setup: function() {
+        helper = new NotificationsHelper()
+      }
+    })
 
-    helper.initHolder();
+    test('returns check when given success', () => {
+      equal(helper.getIconType('success'), 'check')
+    })
 
-    ok(helper.holderReady());
-  });
+    test('returns warning when given warning', () => {
+      equal(helper.getIconType('warning'), 'warning')
+    })
 
-  QUnit.module('RailsFlashNotificationsHelper#getIconType', {
-    setup: function() {
-      helper = new NotificationsHelper();
-    }
-  });
+    test('returns warning when given error', () => {
+      equal(helper.getIconType('error'), 'warning')
+    })
 
-  test('returns check when given success', () => {
-    equal(helper.getIconType('success'), 'check');
-  });
+    test('returns info when given any other input', () => {
+      equal(helper.getIconType('some input'), 'info')
+    })
 
-  test('returns warning when given warning', () => {
-    equal(helper.getIconType('warning'), 'warning');
-  });
+    QUnit.module('RailsFlashNotificationsHelper#generateNodeHTML', {
+      setup: function() {
+        helper = new NotificationsHelper()
+      }
+    })
 
-  test('returns warning when given error', () => {
-    equal(helper.getIconType('error'), 'warning');
-  });
+    test('properly injects type, icon, and content into html', () => {
+      let result = helper.generateNodeHTML('success', 'Some Data')
 
-  test('returns info when given any other input', () => {
-    equal(helper.getIconType('some input'), 'info');
-  });
+      ok(result.search('class="ic-flash-success"') !== -1)
+      ok(result.search('class="icon-check"') !== -1)
+      ok(result.search('Some Data') !== -1)
+    })
 
-  QUnit.module('RailsFlashNotificationsHelper#generateNodeHTML', {
-    setup: function() {
-      helper = new NotificationsHelper();
-    }
-  });
+    QUnit.module('RailsFlashNotificationsHelper#createNode', {
+      setup: function() {
+        fixtures = document.getElementById('fixtures')
+        fixtures.innerHTML = '<div id="flash_message_holder"></div>'
 
-  test('properly injects type, icon, and content into html', () => {
-    let result = helper.generateNodeHTML('success', 'Some Data');
+        helper = new NotificationsHelper()
+      },
+      teardown: function() {
+        fixtures.innerHTML = ''
+      }
+    })
 
-    ok(result.search('class="ic-flash-success"') !== -1);
-    ok(result.search('class="icon-check"') !== -1);
-    ok(result.search('Some Data') !== -1);
-  });
+    test('does not create a node before the holder is initialized', () => {
+      helper.createNode('success', 'Some Data')
 
-  QUnit.module('RailsFlashNotificationsHelper#createNode', {
-    setup: function() {
-      fixtures = document.getElementById('fixtures');
-      fixtures.innerHTML = '<div id="flash_message_holder"></div>';
+      let holder = document.getElementById('flash_message_holder')
 
-      helper = new NotificationsHelper();
-    },
-    teardown: function() {
-      fixtures.innerHTML = '';
-    }
-  })
+      equal(holder.firstChild, null)
+    })
 
-  test('does not create a node before the holder is initialized', () => {
-    helper.createNode('success', 'Some Data');
+    test('creates a node', () => {
+      helper.initHolder()
+      helper.createNode('success', 'Some Other Data')
 
-    let holder = document.getElementById('flash_message_holder');
+      let holder = document.getElementById('flash_message_holder')
 
-    equal(holder.firstChild, null);
-  });
+      equal(holder.firstChild.tagName, 'LI')
+    })
 
-  test('creates a node', () => {
-    helper.initHolder();
-    helper.createNode('success', 'Some Other Data');
+    test('properly adds css options when creating a node', () => {
+      helper.initHolder()
 
-    let holder = document.getElementById('flash_message_holder');
+      let css = {width: '300px', direction: 'rtl'}
 
-    equal(holder.firstChild.tagName, 'LI');
-  });
+      helper.createNode('success', 'Some Third Data', 3000, css)
 
-  test('properly adds css options when creating a node', ()  => {
-    helper.initHolder();
+      let holder = document.getElementById('flash_message_holder')
 
-    let css = {'width': '300px', 'direction': 'rtl'};
+      equal(holder.firstChild.style.zIndex, '2')
+      equal(holder.firstChild.style.width, '300px')
+      equal(holder.firstChild.style.direction, 'rtl')
+    })
 
-    helper.createNode('success', 'Some Third Data', 3000, css);
+    test('closes when the close button is clicked', () => {
+      helper.initHolder()
+      helper.createNode('success', 'Closable Alert')
 
-    let holder = document.getElementById('flash_message_holder');
+      let holder = document.getElementById('flash_message_holder')
+      let button = holder.getElementsByClassName('close_link')
 
-    equal(holder.firstChild.style.zIndex, '2');
-    equal(holder.firstChild.style.width, '300px');
-    equal(holder.firstChild.style.direction, 'rtl');
-  });
+      equal(button.length, 1)
 
-  test('closes when the close button is clicked', () => {
-    helper.initHolder();
-    helper.createNode('success', 'Closable Alert');
+      $(button[0]).click()
 
-    let holder = document.getElementById('flash_message_holder');
-    let button = holder.getElementsByClassName('close_link');
+      equal(holder.firstChild, null)
+    })
 
-    equal(button.length, 1);
+    test('closes when the alert is clicked', () => {
+      helper.initHolder()
+      helper.createNode('success', 'Closable Alert')
 
-    $(button[0]).click();
+      let holder = document.getElementById('flash_message_holder')
+      let alert = holder.getElementsByTagName('LI')
 
-    equal(holder.firstChild, null);
-  });
+      equal(alert.length, 1)
 
-  test('closes when the alert is clicked', () => {
-    helper.initHolder();
-    helper.createNode('success', 'Closable Alert');
+      $(alert[0]).click()
 
-    let holder = document.getElementById('flash_message_holder');
-    let alert = holder.getElementsByTagName('LI');
+      equal(holder.firstChild, null)
+    })
 
-    equal(alert.length, 1);
+    QUnit.module('RailsFlashNotificationsHelper#screenreaderHolderReady', {
+      setup: function() {
+        fixtures = document.getElementById('fixtures')
+        helper = new NotificationsHelper()
+      },
+      teardown: function() {
+        fixtures.innerHTML = ''
+      }
+    })
 
-    $(alert[0]).click();
+    test('returns false if screenreader holder is initialized without the screenreader message holder in the DOM', () => {
+      fixtures.innerHTML = ''
 
-    equal(holder.firstChild, null);
-  });
+      helper.initScreenreaderHolder()
 
-  QUnit.module('RailsFlashNotificationsHelper#screenreaderHolderReady', {
-    setup: function() {
-      fixtures = document.getElementById('fixtures');
-      helper = new NotificationsHelper();
-    },
-    teardown: function() {
-      fixtures.innerHTML = '';
-    }
-  });
+      ok(!helper.screenreaderHolderReady())
+    })
 
-  test('returns false if screenreader holder is initialized without the screenreader message holder in the DOM', () => {
-    fixtures.innerHTML = '';
+    test('returns false before the screenreader holder is initialized even with screenreader message holder in the DOM', () => {
+      fixtures.innerHTML = '<div id="flash_screenreader_holder"></div>'
 
-    helper.initScreenreaderHolder();
+      ok(!helper.screenreaderHolderReady())
+    })
 
-    ok(!helper.screenreaderHolderReady());
-  });
+    test('returns true after the screenreader holder is initialized', () => {
+      fixtures.innerHTML = '<div id="flash_screenreader_holder"></div>'
 
-  test('returns false before the screenreader holder is initialized even with screenreader message holder in the DOM', () => {
-    fixtures.innerHTML = '<div id="flash_screenreader_holder"></div>';
+      helper.initScreenreaderHolder()
 
-    ok(!helper.screenreaderHolderReady());
-  });
+      ok(helper.screenreaderHolderReady())
+    })
 
-  test('returns true after the screenreader holder is initialized', () => {
-    fixtures.innerHTML = '<div id="flash_screenreader_holder"></div>';
+    QUnit.module('RailsFlashNotificationsHelper#setScreenreaderAttributes', {
+      setup: function() {
+        fixtures = document.getElementById('fixtures')
+        fixtures.innerHTML = '<div id="flash_screenreader_holder"></div>'
 
-    helper.initScreenreaderHolder();
+        helper = new NotificationsHelper()
+      },
+      teardown: function() {
+        fixtures.innerHTML = ''
+      }
+    })
 
-    ok(helper.screenreaderHolderReady());
-  });
+    test('does not apply attributes if screenreader holder is not initialized', () => {
+      helper.setScreenreaderAttributes()
 
-  QUnit.module('RailsFlashNotificationsHelper#setScreenreaderAttributes', {
-    setup: function() {
-      fixtures = document.getElementById('fixtures');
-      fixtures.innerHTML = '<div id="flash_screenreader_holder"></div>';
+      let screenreaderHolder = document.getElementById('flash_screenreader_holder')
 
-      helper = new NotificationsHelper();
-    },
-    teardown: function() {
-      fixtures.innerHTML = '';
-    }
-  });
+      equal(screenreaderHolder.getAttribute('role'), null)
+      equal(screenreaderHolder.getAttribute('aria-live'), null)
+      equal(screenreaderHolder.getAttribute('aria-relevant'), null)
+    })
 
-  test('does not apply attributes if screenreader holder is not initialized', () => {
-    helper.setScreenreaderAttributes();
+    test('applies attributes on initialization of screenreader holder', () => {
+      helper.initScreenreaderHolder()
 
-    let screenreaderHolder = document.getElementById('flash_screenreader_holder');
+      let screenreaderHolder = document.getElementById('flash_screenreader_holder')
 
-    equal(screenreaderHolder.getAttribute('role'), null);
-    equal(screenreaderHolder.getAttribute('aria-live'), null);
-    equal(screenreaderHolder.getAttribute('aria-relevant'), null);
-  });
+      equal(screenreaderHolder.getAttribute('role'), 'alert')
+      equal(screenreaderHolder.getAttribute('aria-live'), 'assertive')
+      equal(screenreaderHolder.getAttribute('aria-relevant'), 'additions')
+    })
 
-  test('applies attributes on initialization of screenreader holder', () => {
-    helper.initScreenreaderHolder();
+    test('does not break when attributes already exist', () => {
+      helper.initScreenreaderHolder()
+      helper.setScreenreaderAttributes()
 
-    let screenreaderHolder = document.getElementById('flash_screenreader_holder');
+      let screenreaderHolder = document.getElementById('flash_screenreader_holder')
 
-    equal(screenreaderHolder.getAttribute('role'), 'alert');
-    equal(screenreaderHolder.getAttribute('aria-live'), 'assertive');
-    equal(screenreaderHolder.getAttribute('aria-relevant'), 'additions');
-  });
+      equal(screenreaderHolder.getAttribute('role'), 'alert')
+      equal(screenreaderHolder.getAttribute('aria-live'), 'assertive')
+      equal(screenreaderHolder.getAttribute('aria-relevant'), 'additions')
+    })
 
-  test('does not break when attributes already exist', () => {
-    helper.initScreenreaderHolder();
-    helper.setScreenreaderAttributes();
+    QUnit.module('RailsFlashNotificationsHelper#resetScreenreaderAttributes', {
+      setup: function() {
+        fixtures = document.getElementById('fixtures')
+        fixtures.innerHTML = '<div id="flash_screenreader_holder"></div>'
 
-    let screenreaderHolder = document.getElementById('flash_screenreader_holder');
+        helper = new NotificationsHelper()
+      },
+      teardown: function() {
+        fixtures.innerHTML = ''
+      }
+    })
 
-    equal(screenreaderHolder.getAttribute('role'), 'alert');
-    equal(screenreaderHolder.getAttribute('aria-live'), 'assertive');
-    equal(screenreaderHolder.getAttribute('aria-relevant'), 'additions');
-  });
+    test('does not break when the screen reader holder is not initialized', () => {
+      helper.resetScreenreaderAttributes()
 
-  QUnit.module('RailsFlashNotificationsHelper#resetScreenreaderAttributes', {
-    setup: function() {
-      fixtures = document.getElementById('fixtures');
-      fixtures.innerHTML = '<div id="flash_screenreader_holder"></div>';
+      let screenreaderHolder = document.getElementById('flash_screenreader_holder')
 
-      helper = new NotificationsHelper();
-    },
-    teardown: function() {
-      fixtures.innerHTML = '';
-    }
-  });
+      equal(screenreaderHolder.getAttribute('role'), null)
+      equal(screenreaderHolder.getAttribute('aria-live'), null)
+      equal(screenreaderHolder.getAttribute('aria-relevant'), null)
+    })
 
-  test('does not break when the screen reader holder is not initialized', () => {
-    helper.resetScreenreaderAttributes();
+    test('removes attributes from the screenreader holder', () => {
+      helper.initScreenreaderHolder()
+      helper.resetScreenreaderAttributes()
 
-    let screenreaderHolder = document.getElementById('flash_screenreader_holder');
+      let screenreaderHolder = document.getElementById('flash_screenreader_holder')
 
-    equal(screenreaderHolder.getAttribute('role'), null);
-    equal(screenreaderHolder.getAttribute('aria-live'), null);
-    equal(screenreaderHolder.getAttribute('aria-relevant'), null);
-  });
+      equal(screenreaderHolder.getAttribute('role'), null)
+      equal(screenreaderHolder.getAttribute('aria-live'), null)
+      equal(screenreaderHolder.getAttribute('aria-relevant'), null)
+    })
 
-  test('removes attributes from the screenreader holder', () => {
-    helper.initScreenreaderHolder();
-    helper.resetScreenreaderAttributes();
+    test('does not break when attributes do not exist', () => {
+      helper.initScreenreaderHolder()
+      helper.resetScreenreaderAttributes()
+      helper.resetScreenreaderAttributes()
 
-    let screenreaderHolder = document.getElementById('flash_screenreader_holder');
+      let screenreaderHolder = document.getElementById('flash_screenreader_holder')
 
-    equal(screenreaderHolder.getAttribute('role'), null);
-    equal(screenreaderHolder.getAttribute('aria-live'), null);
-    equal(screenreaderHolder.getAttribute('aria-relevant'), null);
-  });
+      equal(screenreaderHolder.getAttribute('role'), null)
+      equal(screenreaderHolder.getAttribute('aria-live'), null)
+      equal(screenreaderHolder.getAttribute('aria-relevant'), null)
+    })
 
-  test('does not break when attributes do not exist', () => {
-    helper.initScreenreaderHolder();
-    helper.resetScreenreaderAttributes();
-    helper.resetScreenreaderAttributes();
+    QUnit.module('RailsFlashNotificationsHelper#generateScreenreaderNodeHTML', {
+      setup: function() {
+        helper = new NotificationsHelper()
+      }
+    })
 
-    let screenreaderHolder = document.getElementById('flash_screenreader_holder');
+    test('properly injects content into html', () => {
+      let result = helper.generateScreenreaderNodeHTML('Some Data')
 
-    equal(screenreaderHolder.getAttribute('role'), null);
-    equal(screenreaderHolder.getAttribute('aria-live'), null);
-    equal(screenreaderHolder.getAttribute('aria-relevant'), null);
-  });
+      ok(result.search('Some Data') !== -1)
+    })
 
-  QUnit.module('RailsFlashNotificationsHelper#generateScreenreaderNodeHTML', {
-    setup: function() {
-      helper = new NotificationsHelper();
-    }
-  });
+    test('properly includes the indication to close when given true', () => {
+      let result = helper.generateScreenreaderNodeHTML('Some Data', true)
 
-  test('properly injects content into html', () => {
-    let result = helper.generateScreenreaderNodeHTML('Some Data');
+      ok(result.search(htmlEscape(I18n.t('close', 'Close'))) !== -1)
+    })
 
-    ok(result.search("Some Data") !== -1);
-  });
+    test('properly excludes the indication to close when given false', () => {
+      let result = helper.generateScreenreaderNodeHTML('Some Data', false)
 
-  test('properly includes the indication to close when given true', () => {
-    let result = helper.generateScreenreaderNodeHTML('Some Data', true);
+      ok(result.search(htmlEscape(I18n.t('close', 'Close'))) == -1)
+    })
 
-    ok(result.search(htmlEscape(I18n.t('close', 'Close'))) !== -1);
-  });
+    QUnit.module('RailsFlashNotificationsHelper#createScreenreaderNode', {
+      setup: function() {
+        fixtures = document.getElementById('fixtures')
+        fixtures.innerHTML = '<div id="flash_screenreader_holder"></div>'
 
-  test('properly excludes the indication to close when given false', () => {
-    let result = helper.generateScreenreaderNodeHTML('Some Data', false);
+        helper = new NotificationsHelper()
+        helper.initScreenreaderHolder()
+      },
+      teardown: function() {
+        fixtures.innerHTML = ''
+      }
+    })
 
-    ok(result.search(htmlEscape(I18n.t('close', 'Close'))) == -1);
-  });
+    test('creates a screenreader node', () => {
+      helper.createScreenreaderNode('Some Other Data')
 
-  QUnit.module('RailsFlashNotificationsHelper#createScreenreaderNode', {
-    setup: function() {
-      fixtures = document.getElementById('fixtures');
-      fixtures.innerHTML = '<div id="flash_screenreader_holder"></div>';
+      let screenreaderHolder = document.getElementById('flash_screenreader_holder')
 
-      helper = new NotificationsHelper();
-      helper.initScreenreaderHolder();
-    },
-    teardown: function() {
-      fixtures.innerHTML = '';
-    }
-  });
+      equal(screenreaderHolder.firstChild.tagName, 'SPAN')
+    })
 
-  test('creates a screenreader node', () => {
-    helper.createScreenreaderNode('Some Other Data');
+    QUnit.module('RailsFlashNotificationsHelper#createScreenreaderNodeExclusive', {
+      setup: function() {
+        fixtures = document.getElementById('fixtures')
+        fixtures.innerHTML = '<div id="flash_screenreader_holder"></div>'
 
-    let screenreaderHolder = document.getElementById('flash_screenreader_holder');
+        helper = new NotificationsHelper()
+        helper.initScreenreaderHolder()
+      },
+      teardown: function() {
+        fixtures.innerHTML = ''
+      }
+    })
 
-    equal(screenreaderHolder.firstChild.tagName, 'SPAN');
-  });
+    test('properly clears existing screenreader nodes and creates a new one', () => {
+      helper.createScreenreaderNode('Some Data')
+      helper.createScreenreaderNode('Some Second Data')
+      helper.createScreenreaderNode('Some Third Data')
 
-  QUnit.module('RailsFlashNotificationsHelper#createScreenreaderNodeExclusive', {
-    setup: function() {
-      fixtures = document.getElementById('fixtures');
-      fixtures.innerHTML = '<div id="flash_screenreader_holder"></div>';
+      let screenreaderHolder = document.getElementById('flash_screenreader_holder')
 
-      helper = new NotificationsHelper();
-      helper.initScreenreaderHolder();
-    },
-    teardown: function() {
-      fixtures.innerHTML = '';
-    }
-  });
+      equal(screenreaderHolder.childNodes.length, 3)
 
-  test('properly clears existing screenreader nodes and creates a new one', () => {
-    helper.createScreenreaderNode('Some Data');
-    helper.createScreenreaderNode('Some Second Data');
-    helper.createScreenreaderNode('Some Third Data');
+      helper.createScreenreaderNodeExclusive('Some New Data')
 
-    let screenreaderHolder = document.getElementById('flash_screenreader_holder');
+      equal(screenreaderHolder.childNodes.length, 1)
+    })
 
-    equal(screenreaderHolder.childNodes.length, 3);
+    test('does not toggles polite aria-live when polite is false', () => {
+      const polite = false
+      helper.createScreenreaderNodeExclusive('a message', polite)
+      const screenreaderHolder = document.getElementById('flash_screenreader_holder')
+      equal(screenreaderHolder.getAttribute('aria-live'), 'assertive')
+    })
 
-    helper.createScreenreaderNodeExclusive('Some New Data');
+    test('optionally toggles polite aria-live', () => {
+      const polite = true
+      helper.createScreenreaderNodeExclusive('a message', polite)
+      const screenreaderHolder = document.getElementById('flash_screenreader_holder')
+      equal(screenreaderHolder.getAttribute('aria-live'), 'polite')
+    })
 
-    equal(screenreaderHolder.childNodes.length, 1);
-  });
+    QUnit.module('RailsFlashNotificationsHelper#escapeContent', {
+      setup: function() {
+        helper = new NotificationsHelper()
+      }
+    })
 
-  test('does not toggles polite aria-live when polite is false', () => {
-    const polite = false;
-    helper.createScreenreaderNodeExclusive('a message', polite);
-    const screenreaderHolder = document.getElementById('flash_screenreader_holder');
-    equal(screenreaderHolder.getAttribute('aria-live'), 'assertive');
-  });
+    test('returns html if content has html property', () => {
+      let content = {}
+      content.html = '<script>Some Script</script>'
 
-  test('optionally toggles polite aria-live', () => {
-    const polite = true;
-    helper.createScreenreaderNodeExclusive('a message', polite);
-    const screenreaderHolder = document.getElementById('flash_screenreader_holder');
-    equal(screenreaderHolder.getAttribute('aria-live'), 'polite');
-  });
+      let result = helper.escapeContent(content)
 
-  QUnit.module('RailsFlashNotificationsHelper#escapeContent', {
-    setup: function() {
-      helper = new NotificationsHelper();
-    }
-  });
+      equal(result, content.html)
+    })
 
-  test('returns html if content has html property', () => {
-    let content = {};
-    content.html = '<script>Some Script</script>';
+    test('returns html if content has string property', () => {
+      let content = {}
+      content.string = '<script>Some String</script>'
 
-    let result = helper.escapeContent(content);
+      let result = helper.escapeContent(content)
 
-    equal(result, content.html);
-  });
+      equal(result, content)
+    })
 
-  test('returns html if content has string property', () => {
-    let content = {};
-    content.string = '<script>Some String</script>';
+    test('returns escaped content if content has no string or html property', () => {
+      let content = '<script>Some Data</script>'
 
-    let result = helper.escapeContent(content);
+      let result = helper.escapeContent(content)
 
-    equal(result, content);
-  });
-
-  test('returns escaped content if content has no string or html property', () => {
-    let content = '<script>Some Data</script>';
-
-    let result = helper.escapeContent(content);
-
-    equal(result, htmlEscape(content));
-  });
-});
+      equal(result, htmlEscape(content))
+    })
+  }
+)

@@ -27,7 +27,9 @@
 //  </div>
 
 $dimmedOpacity: 0.6;
-@if $use_high_contrast { $dimmedOpacity: 0.9; }
+@if $use_high_contrast {
+  $dimmedOpacity: 0.9;
+}
 
 .hide-till-hover {
   opacity: 0;
@@ -38,12 +40,11 @@ $dimmedOpacity: 0.6;
     opacity: $dimmedOpacity;
   }
 
-  &:focus, &:hover {
+  &:focus,
+  &:hover {
     opacity: 1 !important; // the !important part is to win specificity with the rule above this
   }
 }
-
-
 
 //  Example markup:
 //  <a class="dim-till-hover">
@@ -51,9 +52,11 @@ $dimmedOpacity: 0.6;
 //  </a>
 .dim-till-hover {
   opacity: $dimmedOpacity;
-  &:hover, &:focus { opacity: 1 }
+  &:hover,
+  &:focus {
+    opacity: 1;
+  }
 }
-
 
 // Completely hide, but make available to screenreader so it can read it.
 .screenreader-only {

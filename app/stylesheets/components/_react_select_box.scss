@@ -24,7 +24,7 @@
   border-radius: $borderRadius;
   border: 1px solid $ic-border-color;
   text-align: left;
-  box-shadow: 0 0 2px rgba(0, 0, 0, .3);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
 }
 .react-select-box {
   padding: $ic-sp 0;
@@ -185,7 +185,6 @@
 .react-select-box-multi .react-select-box-option-selected:before {
   content: '✓';
 }
-
 
 .react-select-box-multi .react-select-box-option-selected {
   color: $ic-font-color-dark;

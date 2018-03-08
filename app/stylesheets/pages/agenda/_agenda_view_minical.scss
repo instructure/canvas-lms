@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 $mini-cal-highlight-border: #fa0;
 
@@ -37,11 +37,20 @@ $mini-cal-highlight-border: #fa0;
     align-items: center; // allow divs to center align vertically
     justify-content: space-around; // allows the divs to space evenly, regardless of content
     // Set order of divs
-    .fc-left {order: 1;}
-    .fc-center {order: 2;}
-    .fc-right {order: 3;}
-    .fc-clear {display: none;} // old way of clearing, don't need div for flexbox (it'll also break it)
-    h2, .h2 {
+    .fc-left {
+      order: 1;
+    }
+    .fc-center {
+      order: 2;
+    }
+    .fc-right {
+      order: 3;
+    }
+    .fc-clear {
+      display: none;
+    } // old way of clearing, don't need div for flexbox (it'll also break it)
+    h2,
+    .h2 {
       color: #666;
       border-bottom: none;
       margin: 0;
@@ -109,9 +118,11 @@ $mini-cal-highlight-border: #fa0;
       height: 1.2em;
       right: 1px;
       border: 1px solid $ic-color-dark;
-      content: " ";
+      content: ' ';
     }
 
-    .fc-day-content { display: none; }
+    .fc-day-content {
+      display: none;
+    }
   }
 }

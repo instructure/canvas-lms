@@ -22,7 +22,7 @@ import walk from '../arr/walk'
 // ex:
 //   obj = {a:[{a:[{a:[{}]}]}]}
 //   countTree(object, 'a') is 3
-export default function countTree (obj, prop) {
+export default function countTree(obj, prop) {
   let count = 0
   if (!obj[prop]) return count
   walk(obj[prop], prop, () => count++)

@@ -1,27 +1,23 @@
 This directory is temporary until we rework the front-end build [This is
 where we are headed][1].
 
-Stuff you can do in Canvas JSX files
-====================================
+# Stuff you can do in Canvas JSX files
 
-BUT WAIT!
----------
+## BUT WAIT!
 
 Your file needs to:
 
 1. Have a file name with the `.jsx` extension.
 
-JSX
----
+## JSX
 
 ```js
 function foo(paths) {
-  return <svg>{paths}</svg>;
+  return <svg>{paths}</svg>
 }
 ```
 
-Arrow Functions
----------------
+## Arrow Functions
 
 [Arrow Function Reference][arrows]
 
@@ -52,11 +48,9 @@ var obj = {
 };
 ```
 
-Classes
--------
+## Classes
 
 [Class Reference][class]
-
 
 ```
 class EventEmitter {
@@ -86,8 +80,8 @@ Extending and calling `super`.
 ```js
 class Domain extends EventEmitter {
   constructor() {
-    super();
-    this.members = [];
+    super()
+    this.members = []
   }
 }
 ```
@@ -95,23 +89,21 @@ class Domain extends EventEmitter {
 Creating instances
 
 ```js
-var domain = new Domain();
+var domain = new Domain()
 ```
 
-Destructuring
--------------
+## Destructuring
 
 ```js
 // es5
-var map = _.map;
-var each = _.each;
+var map = _.map
+var each = _.each
 
 // es6
-var {map, each} = _;
+var {map, each} = _
 ```
 
-Concise Object Methods
-----------------------
+## Concise Object Methods
 
 ```js
 // es5
@@ -127,8 +119,7 @@ var obj = {
 };
 ```
 
-Object Short Notation
----------------------
+## Object Short Notation
 
 ```js
 // es5
@@ -144,8 +135,7 @@ function() {
 }
 ```
 
-Rest Parameters
----------------
+## Rest Parameters
 
 [Rest Parameters Reference][rest]
 
@@ -162,8 +152,7 @@ function multiply(multiplier, ...numbers) {
 }
 ```
 
-String Templates
-----------------
+## String Templates
 
 [String Template Reference][templates]
 
@@ -171,31 +160,28 @@ Multiline strings:
 
 ```js
 // es5
-console.log("string text line 1" +
-"string text line 2");
+console.log('string text line 1' + 'string text line 2')
 
 // es6
 console.log(`string text line 1
-string text line 2`);
+string text line 2`)
 ```
 
 Interpolated strings
 
 ```js
-var a = 5;
-var b = 10;
+var a = 5
+var b = 10
 
 // es5
-console.log("Fifteen is " + (a + b) + " and not " + (2 * a + b) + ".");
+console.log('Fifteen is ' + (a + b) + ' and not ' + (2 * a + b) + '.')
 
 // es6
-console.log(`Fifteen is ${a + b} and not ${2 * a + b}.`);
+console.log(`Fifteen is ${a + b} and not ${2 * a + b}.`)
 ```
 
-
-  [1]:https://github.com/instructure-wfx/RFCs/blob/master/active/canvas-js-structure-build.md
-  [arrows]:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions
-  [class]:http://tc39wiki.calculist.org/es6/classes/
-  [rest]:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters
-  [templates]:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/template_strings
-
+[1]: https://github.com/instructure-wfx/RFCs/blob/master/active/canvas-js-structure-build.md
+[arrows]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions
+[class]: http://tc39wiki.calculist.org/es6/classes/
+[rest]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters
+[templates]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/template_strings

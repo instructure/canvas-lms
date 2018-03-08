@@ -1,5 +1,3 @@
-define(['./messenger'], function(Messenger){
-
-  return  new Messenger();
-
-});
+define(['./messenger'], function(Messenger) {
+  return new Messenger()
+})

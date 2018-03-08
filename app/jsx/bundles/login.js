@@ -20,17 +20,14 @@ import $ from 'jquery'
 import LoginFormSwitcher from '../login/LoginFormSwitcher'
 import 'login'
 
-const switcher = new LoginFormSwitcher(
-    $('#login_form'),
-    $('#forgot_password_form')
-  )
+const switcher = new LoginFormSwitcher($('#login_form'), $('#forgot_password_form'))
 
-$('.forgot_password_link').click((event) => {
+$('.forgot_password_link').click(event => {
   event.preventDefault()
   return switcher.switchToForgotPassword()
 })
 
-$('.login_link').click((event) => {
+$('.login_link').click(event => {
   event.preventDefault()
   return switcher.switchToLogin()
 })

@@ -76,7 +76,6 @@
 // Alerts
 ////////////////////////
 
-
 // Base styles
 
 .alert {
@@ -135,7 +134,10 @@
 //// Flash Notifications
 ////////////////////////
 
-.ic-flash-info, .ic-flash-success, .ic-flash-warning, .ic-flash-error {
+.ic-flash-info,
+.ic-flash-success,
+.ic-flash-warning,
+.ic-flash-error {
   position: relative;
   box-sizing: border-box;
   padding: $ic-sp/2 40px $ic-sp/2 $ic-sp*4;
@@ -173,13 +175,12 @@
     justify-content: center;
     color: $ic-color-light;
 
-    i[class*=icon-],
-    i[class^=icon-] {
+    i[class*='icon-'],
+    i[class^='icon-'] {
       &:before {
         left: -1px; // account for left border, so icon looks centered
       }
     }
-
   }
 
   &.ic-flash-static {
@@ -190,28 +191,38 @@
 
 .ic-flash-info {
   border-color: var(--ic-brand-primary);
-  .ic-flash__icon { background-color: var(--ic-brand-primary); }
+  .ic-flash__icon {
+    background-color: var(--ic-brand-primary);
+  }
 }
 
 .ic-flash-success {
   border-color: $ic-color-success;
-  .ic-flash__icon { background-color: $ic-color-success; }
+  .ic-flash__icon {
+    background-color: $ic-color-success;
+  }
 }
 
 .ic-flash-warning {
   border-color: $ic-color-alert;
-  .ic-flash__icon { background-color: $ic-color-alert; }
+  .ic-flash__icon {
+    background-color: $ic-color-alert;
+  }
 }
 
 .ic-flash-error {
   border-color: $ic-color-danger;
-  .ic-flash__icon { background-color: $ic-color-danger; }
+  .ic-flash__icon {
+    background-color: $ic-color-danger;
+  }
 }
 
 .ic-flash--Theme-Editor {
   border-color: $ic-color-dark;
   text-align: center; // need this or text is obscured by theme editor sidebar
-  .ic-flash__icon { background-color: $ic-color-dark; }
+  .ic-flash__icon {
+    background-color: $ic-color-dark;
+  }
 }
 
 .ic-flash__headline {
@@ -221,8 +232,12 @@
 
 .ic-flash__text {
   margin: $ic-sp/2 0;
-  &:first-of-type { margin-top: 0; }
-  &:last-child { margin-bottom: 0; }
+  &:first-of-type {
+    margin-top: 0;
+  }
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
 // Buttons in Flash actions
@@ -246,16 +261,18 @@ a.Button--flash {
   // This adds a fixed top border for the fixed bottom alert,
   // so the top border doesn't disappear on scroll
   &:after {
-    content: "";
+    content: '';
     position: fixed;
-    top: 0; left: 0;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 3px;
     background: $ic-color-action;
   }
 
   .avatar {
-    width: $ic-sp*3; height: $ic-sp*3;
+    width: $ic-sp*3;
+    height: $ic-sp*3;
   }
 }
 
@@ -264,13 +281,17 @@ a.Button--flash {
 // it is inside a frame.
 body.is-masquerading-or-student-view {
   border-right: 3px solid $ic-color-action;
-  .ic-app-header { border-left: 3px solid $ic-color-action; }
+  .ic-app-header {
+    border-left: 3px solid $ic-color-action;
+  }
 }
 
 .ic-alert-masquerade-student-view-module {
   flex: 1;
   padding: 0 $ic-sp/2;
-  &:first-of-type { padding-left: 0; }
+  &:first-of-type {
+    padding-left: 0;
+  }
   &:last-of-type {
     padding-right: 0;
     &.ic-alert-masquerade-student-view-module--buttons {
@@ -287,13 +308,14 @@ body.is-masquerading-or-student-view {
   }
 }
 
-
 $ic-notification-icon-size: 22px;
 $ic-notification-border-thickness: 2px;
 
 @mixin ic-notification-color-scheme($color) {
   border-color: $color;
-  .ic-notification__icon { background: $color; }
+  .ic-notification__icon {
+    background: $color;
+  }
 }
 
 // .ic-notification
@@ -304,25 +326,38 @@ $ic-notification-border-thickness: 2px;
   box-shadow: 0 1px 6px rgba(black, 0.2);
   border-radius: $baseBorderRadius;
   box-sizing: border-box;
-  form { margin: 0; }
-  &.ic-notification--success { @include ic-notification-color-scheme($ic-color-success); }
-  &.ic-notification--alert { @include ic-notification-color-scheme($ic-color-alert); }
-  &.ic-notification--danger { @include ic-notification-color-scheme($ic-color-danger); }
+  form {
+    margin: 0;
+  }
+  &.ic-notification--success {
+    @include ic-notification-color-scheme($ic-color-success);
+  }
+  &.ic-notification--alert {
+    @include ic-notification-color-scheme($ic-color-alert);
+  }
+  &.ic-notification--danger {
+    @include ic-notification-color-scheme($ic-color-danger);
+  }
   // variant for global notifications created by admin via Settings
   &.ic-notification--admin-created {
     .ic-notification__content {
       display: flex;
-      @include breakpoint(desktop) { align-items: flex-start; }
+      @include breakpoint(desktop) {
+        align-items: flex-start;
+      }
     }
-    .ic-notification__message { flex: 1; }
+    .ic-notification__message {
+      flex: 1;
+    }
     .ic-notification__actions {
       margin-left: $ic-sp*2;
-      @include breakpoint(desktop) { margin-left: $ic-sp*3; }
+      @include breakpoint(desktop) {
+        margin-left: $ic-sp*3;
+      }
     }
     .ic-notification__title {
       display: block;
-      @include fontSize($ic-font-size--medium)
-      margin: 0 0 $ic-sp/2;
+      @include fontSize($ic-font-size--medium) margin: 0 0 $ic-sp/2;
     }
   }
 }
@@ -338,7 +373,8 @@ $ic-notification-border-thickness: 2px;
   border-bottom-left-radius: ($baseBorderRadius - $ic-notification-border-thickness);
   box-sizing: border-box;
   @include overwrite-default-icon-size($ic-notification-icon-size);
-  i[class*=icon-], i[class^=icon-] {
+  i[class*='icon-'],
+  i[class^='icon-'] {
     color: $ic-color-light;
     text-shadow: none;
   }
@@ -361,7 +397,9 @@ $ic-notification-border-thickness: 2px;
 
 .ic-notification__message {
   box-sizing: border-box;
-  p:last-of-type { margin-bottom: 0; }
+  p:last-of-type {
+    margin-bottom: 0;
+  }
 }
 
 .ic-notification__actions {

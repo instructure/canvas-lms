@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { shape, string } from 'prop-types'
+import {shape, string} from 'prop-types'
 
 // we might add more comprehensive user shapes in the future
 // eslint-disable-next-line
@@ -24,5 +24,5 @@ export const author = shape({
   id: string.isRequired,
   display_name: string.isRequired,
   avatar_image_url: string,
-  html_url: string.isRequired,
+  html_url: string.isRequired
 })

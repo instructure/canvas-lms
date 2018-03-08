@@ -17,14 +17,14 @@
  */
 
 ///
-  /// How to update Icons
-  //
-  //  The Instructure Icons repo is available at
-  //  https://github.com/instructure/instructure-icons
-  //
-  //  - Add your new icon to the repo and release
-  //  - Update the instructure-icons version in package.json
-  //
+/// How to update Icons
+//
+//  The Instructure Icons repo is available at
+//  https://github.com/instructure/instructure-icons
+//
+//  - Add your new icon to the repo and release
+//  - Update the instructure-icons version in package.json
+//
 ///
 
 /* @styleguide Icons
@@ -76,25 +76,28 @@ Either use `<a>` with icon desired icon class added or insert `<i>` inside `<but
 
 */
 
-@import "../../../node_modules/instructure-icons/fonts/Line/InstructureIcons-Line_icon-map.scss";
-@import "../../../node_modules/instructure-icons/fonts/Solid/InstructureIcons-Solid_icon-map.scss";
+@import '../../../node_modules/instructure-icons/fonts/Line/InstructureIcons-Line_icon-map.scss';
+@import '../../../node_modules/instructure-icons/fonts/Solid/InstructureIcons-Solid_icon-map.scss';
 
-$icon_default: "Line";
+$icon_default: 'Line';
 
 // this could be refactored if/when sass allows for variable interpolation
 $icon_index: (
-  "Line": $icons-Line,
-  "Solid": $icons-Solid
+  'Line': $icons-Line,
+  'Solid': $icons-Solid
 );
 
 @mixin InstIconFontFace($variant) {
   @font-face {
-    font-family: "InstructureIcons-#{$variant}";
+    font-family: 'InstructureIcons-#{$variant}';
     src: url('/fonts/instructure_icons/#{$variant}/InstructureIcons-#{$variant}.eot');
-    src: url('/fonts/instructure_icons/#{$variant}/InstructureIcons-#{$variant}.eot?#iefix') format('eot'),
+    src: url('/fonts/instructure_icons/#{$variant}/InstructureIcons-#{$variant}.eot?#iefix')
+        format('eot'),
       url('/fonts/instructure_icons/#{$variant}/InstructureIcons-#{$variant}.woff') format('woff'),
-      url('/fonts/instructure_icons/#{$variant}/InstructureIcons-#{$variant}.ttf') format('truetype'),
-      url('/fonts/instructure_icons/#{$variant}/InstructureIcons-#{$variant}.svg#InstructureIcons-#{$variant}') format('svg');
+      url('/fonts/instructure_icons/#{$variant}/InstructureIcons-#{$variant}.ttf')
+        format('truetype'),
+      url('/fonts/instructure_icons/#{$variant}/InstructureIcons-#{$variant}.svg#InstructureIcons-#{$variant}')
+        format('svg');
     font-weight: normal;
     font-style: normal;
   }
@@ -103,22 +106,22 @@ $icon_index: (
 @each $variant, $icon_map in $icon_index {
   @include InstIconFontFace($variant);
 
-  i[class*=icon-].icon-#{$variant},
-  i[class^=icon-].icon-#{$variant},
-  a[class*=icon-].icon-#{$variant},
-  a[class^=icon-].icon-#{$variant} {
+  i[class*='icon-'].icon-#{$variant},
+  i[class^='icon-'].icon-#{$variant},
+  a[class*='icon-'].icon-#{$variant},
+  a[class^='icon-'].icon-#{$variant} {
     &:before {
-      font-family: "InstructureIcons-#{$variant}";
+      font-family: 'InstructureIcons-#{$variant}';
     }
   }
 }
 
-i[class*=icon-],
-i[class^=icon-],
-a[class*=icon-],
-a[class^=icon-] {
+i[class*='icon-'],
+i[class^='icon-'],
+a[class*='icon-'],
+a[class^='icon-'] {
   &:before {
-    font-family: "InstructureIcons-#{$icon_default}";
+    font-family: 'InstructureIcons-#{$icon_default}';
     display: inline-block;
     vertical-align: top;
     line-height: 1;
@@ -133,10 +136,10 @@ a[class^=icon-] {
     font-weight: normal !important;
     font-style: normal !important;
   }
-
 }
 
-i[class*=icon-], i[class^=icon-] {
+i[class*='icon-'],
+i[class^='icon-'] {
   display: inline-block;
   font-style: normal !important;
   line-height: 1;
@@ -145,7 +148,9 @@ i[class*=icon-], i[class^=icon-] {
   .btn-large &,
   .Button--large & {
     line-height: 1;
-    &:before{ font-size: 1.125rem; }
+    &:before {
+      font-size: 1.125rem;
+    }
   }
 
   // most icons do not look good this small, so use sparingly.
@@ -153,14 +158,16 @@ i[class*=icon-], i[class^=icon-] {
   .btn-mini &,
   .Button--mini {
     line-height: 1;
-    &:before{ font-size: 0.75rem; }
+    &:before {
+      font-size: 0.75rem;
+    }
   }
-
 }
 
 // when an icon is applied directly to a link, add a little left margin to make
 // things look nicer
-a[class*=icon-], a[class^=icon-] {
+a[class*='icon-'],
+a[class^='icon-'] {
   &:before {
     margin-right: 4px;
     vertical-align: text-bottom;
@@ -179,24 +186,29 @@ a[class*=icon-], a[class^=icon-] {
 }
 
 // change vertical alignment of icons used with common typographic elements to line them up better
-h1, h2, h3, h4, .h1, .h2, .h3, .h4, p {
-
-  i[class*=icon-]:before, i[class^=icon-]:before {
+h1,
+h2,
+h3,
+h4,
+.h1,
+.h2,
+.h3,
+.h4,
+p {
+  i[class*='icon-']:before,
+  i[class^='icon-']:before {
     vertical-align: baseline;
   }
-
 }
 
 @each $variant, $icon_map in $icon_index {
-
   @if ($variant == $icon_default) {
     @each $icon_name, $unicode in $icon_map {
       .icon-#{$icon_name}:before {
         content: $unicode;
       }
     }
-  }
-  @else {
+  } @else {
     @each $icon_name, $unicode in $icon_map {
       .icon-#{$icon_name}.icon-#{$variant}:before {
         content: $unicode;

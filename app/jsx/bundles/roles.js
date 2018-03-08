@@ -32,7 +32,7 @@ const coursePermissions = ENV.COURSE_PERMISSIONS
 const accountPermissions = ENV.ACCOUNT_PERMISSIONS
 
 const courseBaseTypes = []
-_.each(ENV.COURSE_ROLES, (role) => {
+_.each(ENV.COURSE_ROLES, role => {
   if (role.role === role.base_role_type) {
     courseBaseTypes.push({
       value: role.base_role_type,
@@ -90,27 +90,34 @@ rolesOverrideIndexView.render()
 // ============================================================
 // DELETE ME SOMEDAY!
 // ============================================================
-$(document).on('click', (event) => {
+$(document).on('click', event => {
   const container = $('.btn-group')
   if (container.has(event.target).length === 0 && !$(event.target).hasClass('.btn')) {
     container.removeClass('open')
   }
   return true
 })
-$(document).on('focus', 'label', (e) => {
+$(document).on('focus', 'label', e => {
   return false
 })
-$(document).on('click', '.btn.dropdown-toggle', function (event) {
+$(document).on('click', '.btn.dropdown-toggle', function(event) {
   event.preventDefault()
-  const previousState = $(this).parent().hasClass('open')
+  const previousState = $(this)
+    .parent()
+    .hasClass('open')
   $('.btn-group').removeClass('open')
 
   if (previousState === false && !$(this).attr('disabled')) {
-    $(this).parent().addClass('open')
-    const inputFocus = $(this).siblings('.dropdown-menu').find('input:checked').attr('id')
+    $(this)
+      .parent()
+      .addClass('open')
+    const inputFocus = $(this)
+      .siblings('.dropdown-menu')
+      .find('input:checked')
+      .attr('id')
     $(`[for=${inputFocus}]`).focus()
   }
-  $(document).on('keyup', (event) => {
+  $(document).on('keyup', event => {
     if (event.keyCode === 27) {
       $('.btn-group').removeClass('open')
       $(this).focus()

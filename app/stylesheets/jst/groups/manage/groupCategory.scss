@@ -27,7 +27,7 @@
   height: 1px;
   overflow: hidden;
   @include fontSize(12px);
-  &:focus{
+  &:focus {
     left: 0;
     top: 36px;
     width: auto;

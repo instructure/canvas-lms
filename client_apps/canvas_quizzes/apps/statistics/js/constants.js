@@ -25,7 +25,7 @@ define({
     'points_possible',
     'speed_grader_url',
     'anonymous_survey',
-    'quiz_submissions_zip_url',
+    'quiz_submissions_zip_url'
   ],
 
   SUBMISSION_STATISTICS_ATTRS: [
@@ -35,7 +35,7 @@ define({
     'score_stdev',
     'scores',
     'duration_average',
-    'unique_count',
+    'unique_count'
   ],
 
   QUESTION_STATISTICS_ATTRS: [
@@ -69,12 +69,7 @@ define({
     'point_distribution'
   ],
 
-  POINT_BISERIAL_ATTRS: [
-    'answer_id',
-    'correct',
-    'distractor',
-    'point_biserial',
-  ],
+  POINT_BISERIAL_ATTRS: ['answer_id', 'correct', 'distractor', 'point_biserial'],
 
   QUIZ_REPORT_ATTRS: [
     'id',
@@ -92,12 +87,10 @@ define({
     'workflow_state'
   ],
 
-  ATTACHMENT_ATTRS: [
-    'created_at',
-    'url'
-  ],
+  ATTACHMENT_ATTRS: ['created_at', 'url'],
 
-  DISCRIMINATION_INDEX_HELP_ARTICLE_URL: "http://guides.instructure.com/m/4152/l/41484-once-i-publish-my-quiz-what-kinds-of-quiz-statistics-are-available",
+  DISCRIMINATION_INDEX_HELP_ARTICLE_URL:
+    'http://guides.instructure.com/m/4152/l/41484-once-i-publish-my-quiz-what-kinds-of-quiz-statistics-are-available',
 
   PROGRESS_QUEUED: 'queued',
   PROGRESS_ACTIVE: 'running',
@@ -107,4 +100,4 @@ define({
   KC_RETURN: 13,
 
   NOTIFICATION_REPORT_GENERATION_FAILED: 123
-});
+})

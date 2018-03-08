@@ -39,8 +39,6 @@
   }
 }
 
-
-
 // CONDENSED TABLE W/ HALF PADDING
 // -------------------------------
 
@@ -50,7 +48,6 @@
     padding: 4px 5px;
   }
 }
-
 
 // BORDERED VERSION
 // ----------------
@@ -81,14 +78,14 @@
   thead:first-child tr:first-child th:first-child,
   tbody:first-child tr:first-child td:first-child {
     -webkit-border-top-left-radius: 4px;
-            border-top-left-radius: 4px;
-        -moz-border-radius-topleft: 4px;
+    border-top-left-radius: 4px;
+    -moz-border-radius-topleft: 4px;
   }
   thead:first-child tr:first-child th:last-child,
   tbody:first-child tr:first-child td:last-child {
     -webkit-border-top-right-radius: 4px;
-            border-top-right-radius: 4px;
-        -moz-border-radius-topright: 4px;
+    border-top-right-radius: 4px;
+    -moz-border-radius-topright: 4px;
   }
   // For first th or td in the first row in the first thead or tbody
   thead:last-child tr:last-child th:first-child,
@@ -96,15 +93,15 @@
   tfoot:last-child tr:last-child td:first-child {
     @include border-radius(0 0 0 4px);
     -webkit-border-bottom-left-radius: 4px;
-            border-bottom-left-radius: 4px;
-        -moz-border-radius-bottomleft: 4px;
+    border-bottom-left-radius: 4px;
+    -moz-border-radius-bottomleft: 4px;
   }
   thead:last-child tr:last-child th:last-child,
   tbody:last-child tr:last-child td:last-child,
   tfoot:last-child tr:last-child td:last-child {
     -webkit-border-bottom-right-radius: 4px;
-            border-bottom-right-radius: 4px;
-        -moz-border-radius-bottomright: 4px;
+    border-bottom-right-radius: 4px;
+    -moz-border-radius-bottomright: 4px;
   }
 
   // Special fixes to round the left border on the first td/th
@@ -113,22 +110,18 @@
   colgroup + thead tr:first-child th:first-child,
   colgroup + tbody tr:first-child td:first-child {
     -webkit-border-top-left-radius: 4px;
-            border-top-left-radius: 4px;
-        -moz-border-radius-topleft: 4px;
+    border-top-left-radius: 4px;
+    -moz-border-radius-topleft: 4px;
   }
   caption + thead tr:first-child th:last-child,
   caption + tbody tr:first-child td:last-child,
   colgroup + thead tr:first-child th:last-child,
   colgroup + tbody tr:first-child td:last-child {
     -webkit-border-top-right-radius: 4px;
-            border-top-right-radius: 4px;
-         -moz-border-radius-topright: 4px;
+    border-top-right-radius: 4px;
+    -moz-border-radius-topright: 4px;
   }
-
 }
-
-
-
 
 // ZEBRA-STRIPING
 // --------------
@@ -143,7 +136,6 @@
   }
 }
 
-
 // HOVER EFFECT
 // ------------
 // Placed here since it has to come after the potential zebra striping
@@ -156,15 +148,14 @@
   }
 }
 
-
 // TABLE CELL SIZING
 // -----------------
 
 // Reset default grid behavior
-table td[class*="span"],
-table th[class*="span"],
-.row-fluid table td[class*="span"],
-.row-fluid table th[class*="span"] {
+table td[class*='span'],
+table th[class*='span'],
+.row-fluid table td[class*='span'],
+.row-fluid table th[class*='span'] {
   display: table-cell;
   float: none; // undo default grid column styles
   margin-left: 0; // undo default grid column styles
@@ -174,11 +165,11 @@ table th[class*="span"],
 .table td,
 .table th {
   @for $i from 1 through 12 {
-    &.span#{$i} { @include tableColumns($i); }
+    &.span#{$i} {
+      @include tableColumns($i);
+    }
   }
 }
-
-
 
 // TABLE BACKGROUNDS
 // -----------------

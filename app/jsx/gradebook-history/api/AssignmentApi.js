@@ -16,30 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from 'axios';
+import axios from 'axios'
 
-function getAssignmentsByName (courseId, searchTerm) {
+function getAssignmentsByName(courseId, searchTerm) {
   if (searchTerm.length < 3) {
     // the endpoint doesn't allow searching by 2 letters or less
-    return Promise.resolve({ response: { data: [] } });
+    return Promise.resolve({response: {data: []}})
   }
 
   const params = {
     params: {
       search_term: searchTerm
     }
-  };
+  }
 
-  const url = encodeURI(`/api/v1/courses/${courseId}/assignments`);
+  const url = encodeURI(`/api/v1/courses/${courseId}/assignments`)
 
-  return axios.get(url, params);
+  return axios.get(url, params)
 }
 
-function getAssignmentsNextPage (url) {
-  return axios.get(url);
+function getAssignmentsNextPage(url) {
+  return axios.get(url)
 }
 
 export default {
   getAssignmentsByName,
   getAssignmentsNextPage
-};
+}

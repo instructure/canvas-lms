@@ -5,8 +5,9 @@ Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiac
 */
 
 pre code {
-  display: block; padding: 0.5em;
-  background: #F0F0F0;
+  display: block;
+  padding: 0.5em;
+  background: #f0f0f0;
 }
 
 pre code,
@@ -91,7 +92,7 @@ pre .markdown .link_label,
 pre .vhdl .attribute,
 pre .clojure .attribute,
 pre .coffeescript .property {
-  color: #88F
+  color: #88f;
 }
 
 pre .keyword,

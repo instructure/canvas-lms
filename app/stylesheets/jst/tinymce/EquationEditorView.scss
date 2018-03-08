@@ -28,11 +28,9 @@
 @font-face {
   font-family: Symbola;
   src: url(/fonts/Symbola.eot);
-  src: local("Symbola Regular"),
-       local("Symbola"),
-       url(/fonts/Symbola.ttf) format("truetype"),
-       url(/fonts/Symbola.otf) format("opentype"),
-       url(/fonts/Symbola.svg#webfont7MzkO3xs) format("svg");
+  src: local('Symbola Regular'), local('Symbola'), url(/fonts/Symbola.ttf) format('truetype'),
+    url(/fonts/Symbola.otf) format('opentype'),
+    url(/fonts/Symbola.svg#webfont7MzkO3xs) format('svg');
 }
 
 div.math-dialog > span {
@@ -81,7 +79,8 @@ div.math-dialog > span {
   margin: 0px 10px;
 }
 
-#mathjax-preview, .MathJax_Display {
+#mathjax-preview,
+.MathJax_Display {
   min-height: 100px;
 }
 
@@ -94,6 +93,7 @@ div.math-dialog > span {
   padding-right: 10px;
 }
 
-#mathquill-view, #mathjax-view {
+#mathquill-view,
+#mathjax-view {
   min-height: 403px;
 }

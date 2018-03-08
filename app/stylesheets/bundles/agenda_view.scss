@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "pages/agenda/agenda_view_minical";
+@import 'base/environment';
+@import 'pages/agenda/agenda_view_minical';
 
 /*.ic-app-main-content__secondary {
   @include breakpoint(desktop) {
@@ -26,7 +26,6 @@
 }*/
 
 #right-side {
-
   .element_toggler {
     padding: 0;
     @include fontSize(14px);
@@ -82,7 +81,8 @@
   cursor: pointer;
   padding: $ic-sp;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     box-shadow: inset 3px 0 0 var(--ic-brand-primary);
   }
 }
@@ -92,7 +92,8 @@
   flex: 0 0 2rem;
   padding-left: $ic-sp/4;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     background: none;
   }
 }
@@ -106,7 +107,8 @@
   font-weight: 500;
   flex: 1;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     background: none;
   }
 }
@@ -147,7 +149,8 @@ span.agendaView--no-assignments {
     vertical-align: middle;
   }
 
-  .navigation_title, .appointment_group_title {
+  .navigation_title,
+  .appointment_group_title {
     vertical-align: middle;
     padding-left: $ic-sp/4;
   }
@@ -169,7 +172,8 @@ span.agendaView--no-assignments {
   border-radius: 3px;
 }*/
 
-#calendar-app,#calendar-drag-and-drop-container {
+#calendar-app,
+#calendar-drag-and-drop-container {
   .fc-view-container {
     background: none;
   }
@@ -183,7 +187,8 @@ span.agendaView--no-assignments {
       padding-bottom: 0;
     }
 
-    .fc-widget-header, .fc-axis {
+    .fc-widget-header,
+    .fc-axis {
       box-sizing: border-box;
       background: none;
       border-left: none;
@@ -199,7 +204,8 @@ span.agendaView--no-assignments {
       padding: 3px 6px;
     }
 
-    .fc-axis td, span {
+    .fc-axis td,
+    span {
       background: none;
     }
 
@@ -218,14 +224,14 @@ span.agendaView--no-assignments {
     }
     .fc-day-grid .fc-today {
       background-color: transparent;
-      box-shadow: .5px -6px 0px 0px var(--ic-brand-primary);
+      box-shadow: 0.5px -6px 0px 0px var(--ic-brand-primary);
       border: 3px solid $ic-border-light;
     }
     // this is to hide the border-right that is being added inline within the all-day row
     .fc-day-grid .fc-row {
       border-right-color: $ic-color-light;
     }
-    .fc-time-grid  .fc-today {
+    .fc-time-grid .fc-today {
       background-color: transparent;
       border: 3px solid $ic-border-light;
     }
@@ -236,7 +242,7 @@ span.agendaView--no-assignments {
     }
 
     .calendar-nowline {
-      background-color: #FACE90;
+      background-color: #face90;
       position: absolute;
       right: 0;
       height: 2px;
@@ -283,7 +289,7 @@ span.agendaView--no-assignments {
 
   .loading-spinner {
     display: inline-block;
-    background-image: url("/images/ajax-loader-black-on-white.gif");
+    background-image: url('/images/ajax-loader-black-on-white.gif');
     background-position: 50% 50%;
     height: 16px;
     margin-left: 3px;
@@ -297,17 +303,22 @@ span.agendaView--no-assignments {
   border: none;
   padding: 0;
   margin: 0 0 $ic-sp*2;
-  &:last-of-type { margin-bottom: 0; }
+  &:last-of-type {
+    margin-bottom: 0;
+  }
 }
 
-#context-list-holder, #undated-events {
+#context-list-holder,
+#undated-events {
   background-color: #fff;
   max-height: 300px;
   overflow-y: auto;
 
   ul {
     margin-bottom: 10px;
-    &:last-of-type { margin-bottom: 0; }
+    &:last-of-type {
+      margin-bottom: 0;
+    }
   }
 }
 

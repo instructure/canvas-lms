@@ -22,7 +22,7 @@ import $ from 'jquery'
 // useful when positioning menus and such when there are intermediate
 // positioned elements and/or you don't want it relative to the body (e.g.
 // menu inside a scrolling div)
-$.fn.offsetFrom = function ($other) {
+$.fn.offsetFrom = function($other) {
   const own = $(this).offset()
   const other = $other.offset()
   return {

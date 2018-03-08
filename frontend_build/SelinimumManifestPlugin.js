@@ -29,7 +29,7 @@ const mkdirp = require('mkdirp')
 const path = require('path')
 
 class SelinimumManifestPlugin {
-  getEntrypointsByModule (stats) {
+  getEntrypointsByModule(stats) {
     // figure out the initial chunk(s) for all secondary chunks, so we can
     // work out which modules belong to each entry point
     const initialDependencies = {}
@@ -38,17 +38,17 @@ class SelinimumManifestPlugin {
         initialDependencies[chunk.id] = initialDependencies[chunk.id] || new Set()
         initialDependencies[chunk.id].add(dependency)
       } else {
-        chunk.parents.forEach((parentId) => {
+        chunk.parents.forEach(parentId => {
           setInitialDependencies(stats.chunks[parentId], dependency)
         })
       }
     }
-    stats.chunks.forEach((chunk) => {
+    stats.chunks.forEach(chunk => {
       if (!chunk.initial) setInitialDependencies(chunk, chunk.id)
     })
 
     const result = {}
-    Object.keys(stats.entrypoints).forEach((entrypoint) => {
+    Object.keys(stats.entrypoints).forEach(entrypoint => {
       const chunks = stats.entrypoints[entrypoint].chunks
 
       // vendor has one chunk, the rest have two (vendor and the bundle itself)
@@ -60,8 +60,8 @@ class SelinimumManifestPlugin {
         chunksFrd = chunksFrd.concat(Array.from(initialDependencies[chunk]))
       }
 
-      chunksFrd.forEach((chunkId) => {
-        stats.chunks[chunkId].modules.forEach((module) => {
+      chunksFrd.forEach(chunkId => {
+        stats.chunks[chunkId].modules.forEach(module => {
           // only frd files in the app, no node_modules or pitch loaders
           if (!module.name.match(/^\.\/[^~]/) || module.name.match(/!/)) return
 
@@ -74,7 +74,7 @@ class SelinimumManifestPlugin {
     return result
   }
 
-  apply (compiler) {
+  apply(compiler) {
     compiler.plugin('emit', (compilation, done) => {
       const stats = compilation.getStats().toJson({chunkModules: true})
       const entrypointsByBundle = this.getEntrypointsByModule(stats)

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 $stripeColor: #f3f4f8;
 
@@ -58,7 +58,8 @@ thead th {
       border-top-right-radius: 4px !important;
     }
   }
-  .channel-name, .channel-addr {
+  .channel-name,
+  .channel-addr {
     opacity: 100;
   }
 }
@@ -80,7 +81,8 @@ thead th {
   min-width: 125px;
 }
 
-.channel-name, .channel-addr {
+.channel-name,
+.channel-addr {
   opacity: 0;
 }
 
@@ -165,7 +167,8 @@ thead th {
   }
 }
 
-h2, .h2 {
+h2,
+.h2 {
   position: relative;
   #notifications_save_status {
     position: absolute;

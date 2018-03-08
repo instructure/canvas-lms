@@ -21,70 +21,72 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['JSXTransformer', 'text'], function (JSXTransformer, text) {
-  'use strict';
+define(['JSXTransformer', 'text'], function(JSXTransformer, text) {
+  'use strict'
 
-  var buildMap = {};
+  var buildMap = {}
   var jsx = {
     version: '0.2.1',
 
-    load: function (name, req, onLoadNative, config) {
-      var fileExtension = config.jsx && config.jsx.fileExtension || '.js';
-      var fileName = name;
-      var moduleId;
+    load: function(name, req, onLoadNative, config) {
+      var fileExtension = (config.jsx && config.jsx.fileExtension) || '.js'
+      var fileName = name
+      var moduleId
 
       var onLoad = function(content) {
         if (config.isBuild) {
-          buildMap[name] = content;
-          onLoadNative.fromText(name, content);
-        }
-        else {
+          buildMap[name] = content
+          onLoadNative.fromText(name, content)
+        } else {
           try {
             if (-1 === content.indexOf('@jsx React.DOM')) {
-              content = "/** @jsx React.DOM */\n" + content;
+              content = '/** @jsx React.DOM */\n' + content
             }
-            content = JSXTransformer.transform(content).code;
+            content = JSXTransformer.transform(content).code
           } catch (err) {
-            onLoadNative.error(err);
+            onLoadNative.error(err)
           }
 
-          content += "\n//# sourceURL=" + location.protocol + "//" + location.hostname +
-            config.baseUrl + name + fileExtension;
+          content +=
+            '\n//# sourceURL=' +
+            location.protocol +
+            '//' +
+            location.hostname +
+            config.baseUrl +
+            name +
+            fileExtension
 
-          onLoadNative.fromText(content);
+          onLoadNative.fromText(content)
         }
-      };
+      }
 
       if (config.isBuild) {
-        moduleId = '';
-        fileExtension = '.js';
+        moduleId = ''
+        fileExtension = '.js'
 
         if (config.jsx) {
-          moduleId = config.jsx.moduleId || '';
+          moduleId = config.jsx.moduleId || ''
         }
 
         if (moduleId.length) {
-          fileName = (moduleId + '/') +
-            fileName
-              .replace(moduleId, '')
-              .replace(/^\//, '');
+          fileName = moduleId + '/' + fileName.replace(moduleId, '').replace(/^\//, '')
         }
       }
 
-      fileName += fileExtension;
+      fileName += fileExtension
 
       // console.log('Loading JSX file "' + fileName + '" (relative to: "' + config.baseUrl + '")');
 
-      text.load(fileName, req, onLoad, config);
+      text.load(fileName, req, onLoad, config)
     },
 
-    write: function (pluginName, moduleName, write) {
+    write: function(pluginName, moduleName, write) {
       if (buildMap.hasOwnProperty(moduleName)) {
-        var content = buildMap[moduleName];
-        write.asModule(moduleName, content);
+        var content = buildMap[moduleName]
+        write.asModule(moduleName, content)
       }
     }
-  };
+  }
 
-  return jsx;
-});
+  return jsx
+})

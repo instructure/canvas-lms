@@ -17,24 +17,27 @@
  */
 
 import I18n from 'i18n!announcements_v2'
-import { createActions } from 'redux-actions'
+import {createActions} from 'redux-actions'
 import isEqual from 'lodash/isEqual'
 import range from 'lodash/range'
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 
 import * as apiClient from './apiClient'
-import { createPaginationActions } from '../shared/reduxPagination'
-import { notificationActions } from '../shared/reduxNotifications'
+import {createPaginationActions} from '../shared/reduxPagination'
+import {notificationActions} from '../shared/reduxNotifications'
 
 function fetchAnnouncements(dispatch, getState, payload) {
   return (resolve, reject) => {
-    apiClient.getAnnouncements(getState(), payload)
+    apiClient
+      .getAnnouncements(getState(), payload)
       .then(res => {
-        $.screenReaderFlashMessage(I18n.t('%{count} announcements found.', { count: res.data.length }))
+        $.screenReaderFlashMessage(
+          I18n.t('%{count} announcements found.', {count: res.data.length})
+        )
         resolve(res)
       })
-      .catch(err => reject({ err, message: I18n.t('An error ocurred while loading announcements') }))
+      .catch(err => reject({err, message: I18n.t('An error ocurred while loading announcements')}))
   }
 }
 const announcementActions = createPaginationActions('announcements', fetchAnnouncements)
@@ -61,12 +64,9 @@ const types = [
   'DELETE_ANNOUNCEMENTS_FAIL'
 ]
 
-const actions = Object.assign(
-  createActions(...types),
-  announcementActions.actionCreators,
-)
+const actions = Object.assign(createActions(...types), announcementActions.actionCreators)
 
-actions.searchAnnouncements = function searchAnnouncements (searchOpts) {
+actions.searchAnnouncements = function searchAnnouncements(searchOpts) {
   return (dispatch, getState) => {
     const oldSearch = getState().announcementsSearch
     dispatch(actions.updateAnnouncementsSearch(searchOpts))
@@ -75,138 +75,174 @@ actions.searchAnnouncements = function searchAnnouncements (searchOpts) {
 
     if (!isEqual(oldSearch, newSearch)) {
       // uncache pages if we change the search query
-      dispatch(actions.clearAnnouncementsPage({ pages: range(1, state.announcements.lastPage + 1) }))
-      dispatch(actions.getAnnouncements({ page: 1, select: true }))
+      dispatch(actions.clearAnnouncementsPage({pages: range(1, state.announcements.lastPage + 1)}))
+      dispatch(actions.getAnnouncements({page: 1, select: true}))
     }
   }
 }
 
-actions.getExternalFeeds = function () {
+actions.getExternalFeeds = function() {
   return (dispatch, getState) => {
     dispatch(actions.loadingExternalFeedStart())
-    apiClient.getExternalFeeds({ courseId : getState().courseId })
+    apiClient
+      .getExternalFeeds({courseId: getState().courseId})
       .then(resp => {
-        dispatch(actions.loadingExternalFeedSuccess({ feeds: resp.data }))
-      }).catch((err) => {
-        dispatch(actions.loadingExternalFeedFail({
-          message: I18n.t('Failed to Load External Feeds'),
-          err
-        }))
+        dispatch(actions.loadingExternalFeedSuccess({feeds: resp.data}))
+      })
+      .catch(err => {
+        dispatch(
+          actions.loadingExternalFeedFail({
+            message: I18n.t('Failed to Load External Feeds'),
+            err
+          })
+        )
       })
   }
 }
 
-actions.deleteExternalFeed = function ({ feedId }) {
+actions.deleteExternalFeed = function({feedId}) {
   return (dispatch, getState) => {
-    if(!getState().externalRssFeed.isDeleting) {
+    if (!getState().externalRssFeed.isDeleting) {
       dispatch(actions.deleteExternalFeedStart())
-      apiClient.deleteExternalFeed({ courseId : getState().courseId, feedId })
-      .then(() => {
-        dispatch(actions.deleteExternalFeedSuccess({ feedId }))
-        const successMessage = I18n.t('External Feed deleted successfully')
-        $.screenReaderFlashMessage(successMessage)
-        dispatch(notificationActions.notifyInfo({ message: successMessage }))
-      })
-      .catch((err) => {
-        const failMessage = I18n.t('Failed to delete external feed')
-        $.screenReaderFlashMessage(failMessage)
-        dispatch(actions.deleteExternalFeedFail({
-          message: failMessage,
-          err
-        }))
-      })
+      apiClient
+        .deleteExternalFeed({courseId: getState().courseId, feedId})
+        .then(() => {
+          dispatch(actions.deleteExternalFeedSuccess({feedId}))
+          const successMessage = I18n.t('External Feed deleted successfully')
+          $.screenReaderFlashMessage(successMessage)
+          dispatch(notificationActions.notifyInfo({message: successMessage}))
+        })
+        .catch(err => {
+          const failMessage = I18n.t('Failed to delete external feed')
+          $.screenReaderFlashMessage(failMessage)
+          dispatch(
+            actions.deleteExternalFeedFail({
+              message: failMessage,
+              err
+            })
+          )
+        })
     }
   }
 }
 
 actions.lockAnnouncements = () => (dispatch, getState) => {
   const state = getState()
-  const { announcements } = state
-  const { items } = announcements.pages[announcements.currentPage]
+  const {announcements} = state
+  const {items} = announcements.pages[announcements.currentPage]
 
-  const selectedItems = items.filter(item =>
-    state.selectedAnnouncements.includes(item.id))
+  const selectedItems = items.filter(item => state.selectedAnnouncements.includes(item.id))
 
   // if all the selected items are locked, we want to unlock
   // if any of the selected items are unlocked, we lock everything
-  const hasUnlockedItems = selectedItems
-    .reduce((hasAnyUnlocked, item) => hasAnyUnlocked || !item.locked, false)
+  const hasUnlockedItems = selectedItems.reduce(
+    (hasAnyUnlocked, item) => hasAnyUnlocked || !item.locked,
+    false
+  )
 
   dispatch(actions.lockAnnouncementsStart())
-  apiClient.lockAnnouncements(state, state.selectedAnnouncements, hasUnlockedItems)
+  apiClient
+    .lockAnnouncements(state, state.selectedAnnouncements, hasUnlockedItems)
     .then(res => {
       if (res.successes.length) {
-        dispatch(actions.lockAnnouncementsSuccess({ res, locked: hasUnlockedItems }))
+        dispatch(actions.lockAnnouncementsSuccess({res, locked: hasUnlockedItems}))
         if (hasUnlockedItems) {
-          dispatch(notificationActions.notifyInfo({ message: I18n.t('Announcements locked successfully') }))
+          dispatch(
+            notificationActions.notifyInfo({message: I18n.t('Announcements locked successfully')})
+          )
         } else {
-          dispatch(notificationActions.notifyInfo({ message: I18n.t('Announcements unlocked successfully') }))
+          dispatch(
+            notificationActions.notifyInfo({message: I18n.t('Announcements unlocked successfully')})
+          )
         }
       } else if (res.failures.length) {
-        dispatch(actions.lockAnnouncementsFail({
-          err: res.failures,
-          message: I18n.t('An error occurred while updating announcements locked state.'),
-        }))
+        dispatch(
+          actions.lockAnnouncementsFail({
+            err: res.failures,
+            message: I18n.t('An error occurred while updating announcements locked state.')
+          })
+        )
       }
     })
     .catch(err => {
-      dispatch(actions.lockAnnouncementsFail({ err, message: I18n.t('An error occurred while locking announcements.') }))
+      dispatch(
+        actions.lockAnnouncementsFail({
+          err,
+          message: I18n.t('An error occurred while locking announcements.')
+        })
+      )
     })
 }
 
 actions.deleteAnnouncements = () => (dispatch, getState) => {
   const state = getState()
   dispatch(actions.deleteAnnouncementsStart())
-  apiClient.deleteAnnouncements(state, state.selectedAnnouncements)
+  apiClient
+    .deleteAnnouncements(state, state.selectedAnnouncements)
     .then(res => {
       if (res.successes.length) {
         const pageState = getState().announcements
         dispatch(actions.deleteAnnouncementsSuccess(res))
 
         // uncache all pages after this page, as they are no longer correct once you delete items
-        dispatch(actions.clearAnnouncementsPage({ pages: range(pageState.currentPage, pageState.lastPage + 1) }))
+        dispatch(
+          actions.clearAnnouncementsPage({
+            pages: range(pageState.currentPage, pageState.lastPage + 1)
+          })
+        )
 
-        dispatch(notificationActions.notifyInfo({ message: I18n.t('Announcements deleted successfully') }))
+        dispatch(
+          notificationActions.notifyInfo({message: I18n.t('Announcements deleted successfully')})
+        )
 
         // reload current page after deleting items
-        dispatch(actions.getAnnouncements({ page: pageState.currentPage, select: true }))
+        dispatch(actions.getAnnouncements({page: pageState.currentPage, select: true}))
       } else if (res.failures.length) {
-        dispatch(actions.deleteAnnouncementsFail({
-          err: res.failures,
-          message: I18n.t('An error occurred while deleting announcements.'),
-        }))
+        dispatch(
+          actions.deleteAnnouncementsFail({
+            err: res.failures,
+            message: I18n.t('An error occurred while deleting announcements.')
+          })
+        )
       }
     })
     .catch(err => {
-      dispatch(actions.deleteAnnouncementsFail({
-        err,
-        message: I18n.t('An error occurred while deleting announcements.'),
-      }))
+      dispatch(
+        actions.deleteAnnouncementsFail({
+          err,
+          message: I18n.t('An error occurred while deleting announcements.')
+        })
+      )
     })
 }
 
-actions.addExternalFeed = function (payload) {
+actions.addExternalFeed = function(payload) {
   return (dispatch, getState) => {
     dispatch(actions.addExternalFeedStart())
-    apiClient.addExternalFeed({ courseId : getState().courseId, ...payload })
+    apiClient
+      .addExternalFeed({courseId: getState().courseId, ...payload})
       .then(resp => {
-        dispatch(actions.addExternalFeedSuccess({ feed: resp.data}))
+        dispatch(actions.addExternalFeedSuccess({feed: resp.data}))
         const successMessage = I18n.t('External feed successfully added')
         $.screenReaderFlashMessage(successMessage)
-        dispatch(notificationActions.notifyInfo({ message: successMessage }))
+        dispatch(notificationActions.notifyInfo({message: successMessage}))
       })
-      .catch((err) => {
+      .catch(err => {
         const failMessage = I18n.t('Failed to add new feed')
         $.screenReaderFlashMessage(failMessage)
-        dispatch(actions.addExternalFeedFail({
-          message: failMessage,
-          err
-        }))
+        dispatch(
+          actions.addExternalFeedFail({
+            message: failMessage,
+            err
+          })
+        )
       })
   }
 }
 
-const actionTypes = types.reduce((typesMap, actionType) =>
-  Object.assign(typesMap, { [actionType]: actionType }), {})
+const actionTypes = types.reduce(
+  (typesMap, actionType) => Object.assign(typesMap, {[actionType]: actionType}),
+  {}
+)
 
-export { actionTypes, actions as default }
+export {actionTypes, actions as default}

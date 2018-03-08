@@ -16,6 +16,7 @@ persistence in the Consul container so users don't have to constantly refresh
 the values in the KV store.
 
 ## Enabling Consul
+
 To enable use of Consul with Docker there are three things that you need to do.
 
 1. Add `docker-compose/consul.override.yml` to your `COMPOSE_FILE` env var.

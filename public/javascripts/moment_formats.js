@@ -21,7 +21,6 @@ import I18n from 'i18nObj'
 import moment from 'moment'
 
 export default {
-
   i18nToMomentHash: {
     '%A': 'dddd',
     '%B': 'MMMM',
@@ -50,73 +49,87 @@ export default {
   basicMomentFormats: [
     moment.ISO_8601,
     'YYYY',
-    'LT', 'LTS', 'L', 'l', 'LL', 'll', 'LLL', 'lll', 'LLLL', 'llll',
+    'LT',
+    'LTS',
+    'L',
+    'l',
+    'LL',
+    'll',
+    'LLL',
+    'lll',
+    'LLLL',
+    'llll',
     'D MMM YYYY',
     'H:mm'
   ],
 
-  getFormats () {
+  getFormats() {
     let formatsToTransform = this.formatsForLocale()
     formatsToTransform = this.formatsIncludingImplicitMinutes(formatsToTransform)
     return this.transformFormats(formatsToTransform)
   },
 
-  formatsIncludingImplicitMinutes (formats) {
-    const arrayOfArrays = _.map(formats, format => format.match(/:%-?M/) ?
-          [format, format.replace(/:%-?M/, '')] :
-          [format])
+  formatsIncludingImplicitMinutes(formats) {
+    const arrayOfArrays = _.map(
+      formats,
+      format => (format.match(/:%-?M/) ? [format, format.replace(/:%-?M/, '')] : [format])
+    )
     return _.flatten(arrayOfArrays)
   },
 
-  transformFormats: _.memoize(function (formats) {
+  transformFormats: _.memoize(function(formats) {
     const localeSpecificFormats = _.map(formats, this.i18nToMomentFormat, this)
     return _.union(this.basicMomentFormats, localeSpecificFormats)
   }),
 
-    // examples are from en_US. order is significant since if an input matches
-    // multiple formats, the format earlier in the list will be preferred
+  // examples are from en_US. order is significant since if an input matches
+  // multiple formats, the format earlier in the list will be preferred
   orderedFormats: [
-    'time.formats.default',             // %a, %d %b %Y %H:%M:%S %z
-    'date.formats.full_with_weekday',   // %a %b %-d, %Y %-l:%M%P
-    'date.formats.full',                // %b %-d, %Y %-l:%M%P
-    'date.formats.date_at_time',        // %b %-d at %l:%M%P
-    'date.formats.long_with_weekday',   // %A, %B %-d
+    'time.formats.default', // %a, %d %b %Y %H:%M:%S %z
+    'date.formats.full_with_weekday', // %a %b %-d, %Y %-l:%M%P
+    'date.formats.full', // %b %-d, %Y %-l:%M%P
+    'date.formats.date_at_time', // %b %-d at %l:%M%P
+    'date.formats.long_with_weekday', // %A, %B %-d
     'date.formats.medium_with_weekday', // %a %b %-d, %Y
-    'date.formats.short_with_weekday',  // %a, %b %-d
-    'time.formats.long',                // %B %d, %Y %H:%M
-    'date.formats.long',                // %B %-d, %Y
-    'date.formats.medium',              // %b %-d, %Y
-    'time.formats.short',               // %d %b %H:%M
-    'date.formats.short',               // %b %-d
-    'date.formats.default',             // %Y-%m-%d
-    'time.formats.tiny',                // %l:%M%P
-    'time.formats.tiny_on_the_hour',    // %l%P
-    'date.formats.weekday',             // %A
-    'date.formats.short_weekday'        // %a
+    'date.formats.short_with_weekday', // %a, %b %-d
+    'time.formats.long', // %B %d, %Y %H:%M
+    'date.formats.long', // %B %-d, %Y
+    'date.formats.medium', // %b %-d, %Y
+    'time.formats.short', // %d %b %H:%M
+    'date.formats.short', // %b %-d
+    'date.formats.default', // %Y-%m-%d
+    'time.formats.tiny', // %l:%M%P
+    'time.formats.tiny_on_the_hour', // %l%P
+    'date.formats.weekday', // %A
+    'date.formats.short_weekday' // %a
   ],
 
-  formatsForLocale () {
+  formatsForLocale() {
     return _.compact(_.map(this.orderedFormats, I18n.lookup, I18n))
   },
 
-  i18nToMomentFormat (fullString) {
+  i18nToMomentFormat(fullString) {
     const withEscapes = this.escapeSubStrings(fullString)
     return this.replaceDateKeys(withEscapes)
   },
 
-  escapeSubStrings (formatString) {
+  escapeSubStrings(formatString) {
     const substrings = formatString.split(' ')
     const escapedSubs = _.map(substrings, this.escapedUnlessi18nKey, this)
     return escapedSubs.join(' ')
   },
 
-  escapedUnlessi18nKey (string) {
+  escapedUnlessi18nKey(string) {
     const isKey = _.detect(_.keys(this.i18nToMomentHash), k => string.indexOf(k) > -1)
 
     return isKey ? string : `[${string}]`
   },
 
-  replaceDateKeys (formatString) {
-    return _.reduce(this.i18nToMomentHash, (string, forMoment, forBase) => string.replace(forBase, forMoment), formatString)
+  replaceDateKeys(formatString) {
+    return _.reduce(
+      this.i18nToMomentHash,
+      (string, forMoment, forBase) => string.replace(forBase, forMoment),
+      formatString
+    )
   }
 }

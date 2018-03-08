@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * filters `items` to just the ones who don't require any unavailable permissions.
  */

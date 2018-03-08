@@ -24,7 +24,7 @@ import data from '../sampleData'
 QUnit.module('SyncChange component')
 
 const defaultProps = () => ({
-  change: data.history[0].changes[0],
+  change: data.history[0].changes[0]
 })
 
 test('renders the SyncChange component', () => {
@@ -37,7 +37,7 @@ test('renders the SyncChange component expanded when state.isExpanded = true', (
   const props = defaultProps()
   props.isLoadingHistory = true
   const tree = enzyme.shallow(<SyncChange {...props} />)
-  tree.instance().setState({ isExpanded: true })
+  tree.instance().setState({isExpanded: true})
   const node = tree.find('.bcs__history-item__change__expanded')
   ok(node.exists())
 })

@@ -1,46 +1,35 @@
-import React from "react";
-import PropTypes from "prop-types";
-import StudentContextTray from "../context_cards/StudentContextTray";
-import StudentCardStore from "../context_cards/StudentCardStore";
+import React from 'react'
+import PropTypes from 'prop-types'
+import StudentContextTray from '../context_cards/StudentContextTray'
+import StudentCardStore from '../context_cards/StudentCardStore'
 
 export default class RestStudentContextTray extends React.Component {
   static propTypes = {
     studentId: PropTypes.string.isRequired,
     courseId: PropTypes.string.isRequired
-  };
+  }
 
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       loading: true
-    };
-    this.store = new StudentCardStore(
-      this.props.studentId,
-      this.props.courseId
-    );
-    this.store.load();
-    this.store.onChange = () =>
-      this.setState(this.mungeState(this.store.getState()));
+    }
+    this.store = new StudentCardStore(this.props.studentId, this.props.courseId)
+    this.store.load()
+    this.store.onChange = () => this.setState(this.mungeState(this.store.getState()))
   }
 
   componentWillUnmount() {
-    this.store.onChange = null;
+    this.store.onChange = null
   }
 
   mungeState(state) {
-    const {
-      loading,
-      course,
-      user,
-      submissions,
-      permissions,
-      analytics
-    } = state;
+    const {loading, course, user, submissions, permissions, analytics} = state
 
     const sectionsById = course.sections.reduce((obj, section) => {
-      obj[section.id] = section;
-      return obj;
-    }, {});
+      obj[section.id] = section
+      return obj
+    }, {})
 
     return {
       loading: loading,
@@ -49,7 +38,7 @@ export default class RestStudentContextTray extends React.Component {
         submissionsConnection: {
           edges: submissions.map(submission => ({
             submission: {
-              user: { _id: submission.user_id },
+              user: {_id: submission.user_id},
               ...submission
             }
           }))
@@ -81,10 +70,10 @@ export default class RestStudentContextTray extends React.Component {
           grades: e.grades
         }))
       }
-    };
+    }
   }
 
   render() {
-    return <StudentContextTray {...this.props} data={this.state} />;
+    return <StudentContextTray {...this.props} data={this.state} />
   }
 }

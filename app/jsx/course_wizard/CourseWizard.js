@@ -26,113 +26,128 @@ import Checklist from './Checklist'
 import userSettings from 'compiled/userSettings'
 import 'compiled/jquery.rails_flash_notifications'
 
-  const modalOverrides = {
-    overlay : {
-      backgroundColor: 'transparent'
-    },
-    content : {
-      position: 'static',
-      top: '0',
-      left: '0',
-      right: 'auto',
-      bottom: 'auto',
-      borderRadius: '0',
-      border: 'none',
-      padding: '0'
+const modalOverrides = {
+  overlay: {
+    backgroundColor: 'transparent'
+  },
+  content: {
+    position: 'static',
+    top: '0',
+    left: '0',
+    right: 'auto',
+    bottom: 'auto',
+    borderRadius: '0',
+    border: 'none',
+    padding: '0'
+  }
+}
+
+var CourseWizard = React.createClass({
+  displayName: 'CourseWizard',
+
+  propTypes: {
+    showWizard: PropTypes.bool,
+    overlayClassName: PropTypes.string
+  },
+
+  getInitialState: function() {
+    return {
+      showWizard: this.props.showWizard,
+      selectedItem: ''
     }
-  };
+  },
 
-  var CourseWizard = React.createClass({
-      displayName: 'CourseWizard',
+  componentDidMount: function() {
+    this.refs.closeLink.getDOMNode().focus()
+    $(this.refs.wizardBox.getDOMNode()).removeClass('ic-wizard-box--is-closed')
+    $.screenReaderFlashMessageExclusive(I18n.t('Course Setup Wizard is showing.'))
+  },
 
-      propTypes: {
-        showWizard: PropTypes.bool,
-        overlayClassName: PropTypes.string
+  componentWillReceiveProps: function(nextProps) {
+    this.setState(
+      {
+        showWizard: nextProps.showWizard
       },
+      () => {
+        $(this.refs.wizardBox.getDOMNode()).removeClass('ic-wizard-box--is-closed')
+        if (this.state.showWizard) {
+          this.refs.closeLink.getDOMNode().focus()
+        }
+      }
+    )
+  },
 
-      getInitialState: function () {
-        return {
-          showWizard: this.props.showWizard,
-          selectedItem: ''
-        };
-      },
+  /**
+   * Handles what should happen when a checklist item is clicked.
+   */
+  checklistClickHandler: function(itemToShowKey) {
+    this.setState({
+      selectedItem: itemToShowKey
+    })
+  },
 
-      componentDidMount: function () {
-        this.refs.closeLink.getDOMNode().focus();
-        $(this.refs.wizardBox.getDOMNode()).removeClass('ic-wizard-box--is-closed');
-        $.screenReaderFlashMessageExclusive(I18n.t("Course Setup Wizard is showing."));
-      },
+  closeModal: function(event) {
+    if (event) {
+      event.preventDefault()
+    }
 
-      componentWillReceiveProps: function (nextProps) {
-        this.setState({
-          showWizard: nextProps.showWizard
-        }, () => {
-          $(this.refs.wizardBox.getDOMNode()).removeClass('ic-wizard-box--is-closed');
-          if (this.state.showWizard) {
-            this.refs.closeLink.getDOMNode().focus();
-          }
-        });
-      },
+    var pathname = window.location.pathname
+    userSettings.set('hide_wizard_' + pathname, true)
 
-      /**
-       * Handles what should happen when a checklist item is clicked.
-       */
-      checklistClickHandler: function (itemToShowKey) {
-        this.setState({
-          selectedItem: itemToShowKey
-        });
-      },
+    this.setState({
+      showWizard: false
+    })
+  },
 
-      closeModal: function (event) {
-        if (event) {
-          event.preventDefault()
-        };
-
-        var pathname = window.location.pathname;
-        userSettings.set('hide_wizard_' + pathname, true);
-
-        this.setState({
-          showWizard: false
-        })
-      },
-
-      render: function () {
-        return (
-          <ReactModal
-            isOpen={this.state.showWizard}
-            onRequestClose={this.closeModal}
-            style={modalOverrides}
-            overlayClassName={this.props.overlayClassName}
-          >
-            <main role='main'>
-              <div ref='wizardBox' className='ic-wizard-box'>
-                <div className='ic-wizard-box__header'>
-                  <a href='/' className='ic-wizard-box__logo-link'>
-                    <span className='screenreader-only'>{I18n.t('My dashboard')}</span>
-                  </a>
-                  <Checklist className='ic-wizard-box__nav'
-                             selectedItem={this.state.selectedItem}
-                             clickHandler={this.checklistClickHandler}
-                  />
-                </div>
-                <div className='ic-wizard-box__main'>
-                  <div className='ic-wizard-box__close'>
-                    <div className='ic-Expand-link ic-Expand-link--from-right'>
-                      <a ref='closeLink' href='#' className='ic-Expand-link__trigger' onClick={this.closeModal}>
-                        <div className='ic-Expand-link__layout'>
-                          <i className='icon-x ic-Expand-link__icon'></i>
-                          <span className='ic-Expand-link__text'>{I18n.t('Close and return to Canvas')}</span>
-                        </div>
-                      </a>
+  render: function() {
+    return (
+      <ReactModal
+        isOpen={this.state.showWizard}
+        onRequestClose={this.closeModal}
+        style={modalOverrides}
+        overlayClassName={this.props.overlayClassName}
+      >
+        <main role="main">
+          <div ref="wizardBox" className="ic-wizard-box">
+            <div className="ic-wizard-box__header">
+              <a href="/" className="ic-wizard-box__logo-link">
+                <span className="screenreader-only">{I18n.t('My dashboard')}</span>
+              </a>
+              <Checklist
+                className="ic-wizard-box__nav"
+                selectedItem={this.state.selectedItem}
+                clickHandler={this.checklistClickHandler}
+              />
+            </div>
+            <div className="ic-wizard-box__main">
+              <div className="ic-wizard-box__close">
+                <div className="ic-Expand-link ic-Expand-link--from-right">
+                  <a
+                    ref="closeLink"
+                    href="#"
+                    className="ic-Expand-link__trigger"
+                    onClick={this.closeModal}
+                  >
+                    <div className="ic-Expand-link__layout">
+                      <i className="icon-x ic-Expand-link__icon" />
+                      <span className="ic-Expand-link__text">
+                        {I18n.t('Close and return to Canvas')}
+                      </span>
                     </div>
-                  </div>
-                  <InfoFrame className='ic-wizard-box__content' itemToShow={this.state.selectedItem} closeModal={this.closeModal} />
+                  </a>
                 </div>
               </div>
-            </main>
-          </ReactModal>
-          );
-      }
-  });
+              <InfoFrame
+                className="ic-wizard-box__content"
+                itemToShow={this.state.selectedItem}
+                closeModal={this.closeModal}
+              />
+            </div>
+          </div>
+        </main>
+      </ReactModal>
+    )
+  }
+})
 
 export default CourseWizard

@@ -33,7 +33,7 @@ const blankConfig = {
   }
 }
 
-const isSystemTheme = (sharedBrandConfig) => !sharedBrandConfig.account_id
+const isSystemTheme = sharedBrandConfig => !sharedBrandConfig.account_id
 
 export default React.createClass({
   displayName: 'CollectionView',
@@ -46,14 +46,14 @@ export default React.createClass({
     baseBrandableVariables: customTypes.variables
   },
 
-  getInitialState () {
+  getInitialState() {
     return {
       newThemeModalIsOpen: false,
       brandConfigBeingDeleted: null
     }
   },
 
-  brandVariableValue (brandConfig, variableName) {
+  brandVariableValue(brandConfig, variableName) {
     const explicitValue = brandConfig && brandConfig.variables[variableName]
     if (explicitValue) return explicitValue
 
@@ -75,20 +75,27 @@ export default React.createClass({
       md5ToActivate = undefined
     }
     if (sharedBrandConfigToStartEditing) {
-      sessionStorage.setItem('sharedBrandConfigBeingEdited', JSON.stringify(sharedBrandConfigToStartEditing))
+      sessionStorage.setItem(
+        'sharedBrandConfigBeingEdited',
+        JSON.stringify(sharedBrandConfigToStartEditing)
+      )
     } else {
       sessionStorage.removeItem('sharedBrandConfigBeingEdited')
     }
-    submitHtmlForm(`/accounts/${this.props.accountID}/brand_configs/save_to_user_session`, 'POST', md5ToActivate)
+    submitHtmlForm(
+      `/accounts/${this.props.accountID}/brand_configs/save_to_user_session`,
+      'POST',
+      md5ToActivate
+    )
   },
 
-  deleteSharedBrandConfig (sharedBrandConfigId) {
+  deleteSharedBrandConfig(sharedBrandConfigId) {
     $.ajaxJSON(`/api/v1/shared_brand_configs/${sharedBrandConfigId}`, 'DELETE', {}, () => {
       window.location.reload()
     })
   },
 
-  isActiveBrandConfig (brandConfig) {
+  isActiveBrandConfig(brandConfig) {
     if (this.props.activeBrandConfig) {
       return brandConfig.md5 === this.props.activeBrandConfig.md5
     } else {
@@ -96,28 +103,30 @@ export default React.createClass({
     }
   },
 
-  isActiveEditableTheme (sharedBrandConfig) {
-    return !isSystemTheme(sharedBrandConfig) && (
-      this.props.activeBrandConfig &&
-      this.props.activeBrandConfig.md5 === sharedBrandConfig.brand_config.md5
+  isActiveEditableTheme(sharedBrandConfig) {
+    return (
+      !isSystemTheme(sharedBrandConfig) &&
+      (this.props.activeBrandConfig &&
+        this.props.activeBrandConfig.md5 === sharedBrandConfig.brand_config.md5)
     )
   },
 
-  multipleThemesReflectActiveOne () {
+  multipleThemesReflectActiveOne() {
     return this.props.sharedBrandConfigs.filter(this.isActiveEditableTheme).length > 1
   },
 
-  isDeletable (sharedBrandConfig) {
+  isDeletable(sharedBrandConfig) {
     // Globally-shared themes and the active theme (if there is only one active) are not deletable
-    return !isSystemTheme(sharedBrandConfig) && (
-      !this.isActiveBrandConfig(sharedBrandConfig.brand_config) ||
-      this.multipleThemesReflectActiveOne()
+    return (
+      !isSystemTheme(sharedBrandConfig) &&
+      (!this.isActiveBrandConfig(sharedBrandConfig.brand_config) ||
+        this.multipleThemesReflectActiveOne())
     )
   },
 
-  thingsToShow () {
+  thingsToShow() {
     const thingsToShow = [blankConfig].concat(this.props.sharedBrandConfigs)
-    const isActive = (sharedBrandConfig) => this.isActiveBrandConfig(sharedBrandConfig.brand_config)
+    const isActive = sharedBrandConfig => this.isActiveBrandConfig(sharedBrandConfig.brand_config)
 
     // Add in a tile for the active theme if it is otherwise not present in the shared ones
     if (this.props.activeBrandConfig && !_.find(this.props.sharedBrandConfigs, isActive)) {
@@ -132,10 +141,10 @@ export default React.createClass({
     const sorted = _.sortBy(thingsToShow, thing => !isActive(thing))
 
     // split the globally shared themes and the ones that people in this account have shared apart
-    return _.groupBy(sorted, (sbc) => isSystemTheme(sbc) ? 'globalThemes' : 'accountSpecificThemes')
+    return _.groupBy(sorted, sbc => (isSystemTheme(sbc) ? 'globalThemes' : 'accountSpecificThemes'))
   },
 
-  renderCard (sharedConfig) {
+  renderCard(sharedConfig) {
     const onClick = () => {
       const isReadOnly = isSystemTheme(sharedConfig)
       this.startEditing({
@@ -146,29 +155,31 @@ export default React.createClass({
 
     // even if this theme's md5 is active, don't mark it as active if it is a system theme
     // and there is an account-shared theme that also matches the active md5
-    const isActiveBrandConfig = this.isActiveBrandConfig(sharedConfig.brand_config) && (
-      !isSystemTheme(sharedConfig) ||
-      !this.props.sharedBrandConfigs.some(this.isActiveEditableTheme)
-    )
+    const isActiveBrandConfig =
+      this.isActiveBrandConfig(sharedConfig.brand_config) &&
+      (!isSystemTheme(sharedConfig) ||
+        !this.props.sharedBrandConfigs.some(this.isActiveEditableTheme))
 
     return (
       <ThemeCard
         key={sharedConfig.id + sharedConfig.brand_config.md5}
         name={sharedConfig.name}
         isActiveBrandConfig={isActiveBrandConfig}
-        showMultipleCurrentThemesMessage={isActiveBrandConfig && this.multipleThemesReflectActiveOne()}
-        getVariable   ={this.brandVariableValue.bind(this, sharedConfig.brand_config)}
-        open          ={onClick}
-        isDeletable   ={this.isDeletable(sharedConfig)}
+        showMultipleCurrentThemesMessage={
+          isActiveBrandConfig && this.multipleThemesReflectActiveOne()
+        }
+        getVariable={this.brandVariableValue.bind(this, sharedConfig.brand_config)}
+        open={onClick}
+        isDeletable={this.isDeletable(sharedConfig)}
         isBeingDeleted={this.state.brandConfigBeingDeleted === sharedConfig}
-        startDeleting ={() => this.setState({brandConfigBeingDeleted: sharedConfig})}
+        startDeleting={() => this.setState({brandConfigBeingDeleted: sharedConfig})}
         cancelDeleting={() => this.setState({brandConfigBeingDeleted: null})}
-        onDelete      ={() => this.deleteSharedBrandConfig(sharedConfig.id)}
+        onDelete={() => this.deleteSharedBrandConfig(sharedConfig.id)}
       />
     )
   },
 
-  render () {
+  render() {
     const thingsToShow = this.thingsToShow()
     return (
       <div>
@@ -194,36 +205,37 @@ export default React.createClass({
                 <li className="ui-menu-item ui-menu-item--helper-text">
                   {I18n.t('Create theme based on')} &hellip;
                 </li>
-                {
-                  ['globalThemes', 'accountSpecificThemes'].map(collection =>
-                    _.map(thingsToShow[collection], sharedConfig =>
-                      <li>
-                        <a
-                          role="button"
-                          href="javascript:;"
-                          onClick={() => this.startEditing({md5ToActivate: sharedConfig.brand_config.md5})}
-                        >
-                          {sharedConfig.name}
-                        </a>
-                      </li>
-                    )
-                  )
-                }
+                {['globalThemes', 'accountSpecificThemes'].map(collection =>
+                  _.map(thingsToShow[collection], sharedConfig => (
+                    <li>
+                      <a
+                        role="button"
+                        href="javascript:;"
+                        onClick={() =>
+                          this.startEditing({md5ToActivate: sharedConfig.brand_config.md5})
+                        }
+                      >
+                        {sharedConfig.name}
+                      </a>
+                    </li>
+                  ))
+                )}
               </ul>
             </div>
           </div>
         </div>
-        {thingsToShow.globalThemes &&
+        {thingsToShow.globalThemes && (
           <div className="ic-ThemeCard-container">
-
             <h3 className="ic-ThemeCard-container__Heading">
               <span className="ic-ThemeCard-container__Heading-text">
                 {I18n.t('Templates')}
                 <button
                   type="button"
                   className="Button Button--icon-action"
-                  data-tooltip='{"tooltipClass":"popover popover-padded", "position":"left"}'
-                  title={I18n.t('Default templates are used as starting points for new themes and cannot be deleted.')}
+                  data-tooltip="{&quot;tooltipClass&quot;:&quot;popover popover-padded&quot;, &quot;position&quot;:&quot;left&quot;}"
+                  title={I18n.t(
+                    'Default templates are used as starting points for new themes and cannot be deleted.'
+                  )}
                 >
                   <i className="icon-question" aria-hidden="true" />
                 </button>
@@ -233,23 +245,19 @@ export default React.createClass({
             <div className="ic-ThemeCard-container__Main">
               {thingsToShow.globalThemes.map(this.renderCard)}
             </div>
-
           </div>
-        }
+        )}
 
-        {thingsToShow.accountSpecificThemes &&
+        {thingsToShow.accountSpecificThemes && (
           <div className="ic-ThemeCard-container">
             <h3 className="ic-ThemeCard-container__Heading">
-              <span className="ic-ThemeCard-container__Heading-text">
-                {I18n.t('My Themes')}
-              </span>
+              <span className="ic-ThemeCard-container__Heading-text">{I18n.t('My Themes')}</span>
             </h3>
             <div className="ic-ThemeCard-container__Main">
               {thingsToShow.accountSpecificThemes.map(this.renderCard)}
             </div>
           </div>
-        }
-
+        )}
       </div>
     )
   }

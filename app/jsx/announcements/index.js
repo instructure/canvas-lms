@@ -18,20 +18,20 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Provider } from 'react-redux'
+import {Provider} from 'react-redux'
 
-import { subscribeFlashNotifications } from '../shared/reduxNotifications'
-import { ConnectedAnnouncementsIndex } from './components/AnnouncementsIndex'
+import {subscribeFlashNotifications} from '../shared/reduxNotifications'
+import {ConnectedAnnouncementsIndex} from './components/AnnouncementsIndex'
 import createStore from './store'
 
-export default function createAnnouncementsIndex (root, data = {}) {
+export default function createAnnouncementsIndex(root, data = {}) {
   const store = createStore(data)
 
-  function unmount () {
+  function unmount() {
     ReactDOM.unmountComponentAtNode(root)
   }
 
-  function render () {
+  function render() {
     ReactDOM.render(
       <Provider store={store}>
         <ConnectedAnnouncementsIndex />
@@ -42,5 +42,5 @@ export default function createAnnouncementsIndex (root, data = {}) {
 
   subscribeFlashNotifications(store)
 
-  return { unmount, render }
+  return {unmount, render}
 }

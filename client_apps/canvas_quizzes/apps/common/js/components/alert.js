@@ -18,22 +18,22 @@
  */
 
 define(function(require) {
-  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
-  var classSet = require('../util/class_set');
-  var $ = require('jquery');
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps')
+  var classSet = require('../util/class_set')
+  var $ = require('jquery')
 
   // TODO: use $.fn.is(':in_viewport') when it becomes available
   var isInViewport = function(el) {
     var $el = $(el)
-    var $window = $(window);
+    var $window = $(window)
 
-    var vpTop    = $window.scrollTop();
-    var vpBottom = vpTop + $window.height();
-    var elTop    = $el.offset().top;
-    var elBottom = elTop + $el.height();
+    var vpTop = $window.scrollTop()
+    var vpBottom = vpTop + $window.height()
+    var elTop = $el.offset().top
+    var elBottom = elTop + $el.height()
 
-    return vpTop < elTop && vpBottom > elBottom;
-  };
+    return vpTop < elTop && vpBottom > elBottom
+  }
 
   /**
    * @class Components.Alert
@@ -57,28 +57,28 @@ define(function(require) {
       return {
         type: 'danger',
         autoFocus: false
-      };
+      }
     },
 
     componentDidMount: function() {
       if (this.props.autoFocus) {
-        var myself = this.getDOMNode();
+        var myself = this.getDOMNode()
 
         if (isInViewport(myself)) {
           setTimeout(function() {
-            myself.focus();
-          }, 1);
+            myself.focus()
+          }, 1)
         }
       }
     },
 
     render: function() {
-      var className = {};
+      var className = {}
 
-      className['alert'] = true;
-      className['alert-' + this.props.type] = true;
+      className['alert'] = true
+      className['alert-' + this.props.type] = true
 
-      return(
+      return (
         <div
           tabIndex="-1"
           aria-role="alert"
@@ -86,10 +86,11 @@ define(function(require) {
           aria-relevant="all"
           onClick={this.props.onClick}
           className={classSet(className)}
-          children={this.props.children} />
-      );
+          children={this.props.children}
+        />
+      )
     }
-  });
+  })
 
-  return Alert;
-});
+  return Alert
+})

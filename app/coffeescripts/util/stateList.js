@@ -75,7 +75,7 @@ export default {
     ['Washington', 'WA'],
     ['West Virginia', 'WV'],
     ['Wisconsin', 'WI'],
-    ['Wyoming', 'WY'],
+    ['Wyoming', 'WY']
   ],
   Canada: [
     ['Alberta', 'AB'],
@@ -89,6 +89,6 @@ export default {
     ['Ontario', 'ON'],
     ['Prince Edward Island', 'PE'],
     ['Quebec', 'QC'],
-    ['Saskatchewan', 'SK'],
-  ],
+    ['Saskatchewan', 'SK']
+  ]
 }

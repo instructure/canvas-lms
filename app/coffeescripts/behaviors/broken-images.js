@@ -15,12 +15,16 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import $ from  'jquery';
+import $ from 'jquery'
 
-export default function attachErrorHandler (imgElement) {
-  $(imgElement).on('error', (e) => $(e.currentTarget).addClass('broken-image'));
+export default function attachErrorHandler(imgElement) {
+  $(imgElement).on('error', e => $(e.currentTarget).addClass('broken-image'))
 }
 
 // this behavior will set up all broken images on the page with an error handler that
 // can apply the broken-image class if there is an error loading the image.
-$(document).ready(() => $('img').toArray().forEach(attachErrorHandler));
+$(document).ready(() =>
+  $('img')
+    .toArray()
+    .forEach(attachErrorHandler)
+)

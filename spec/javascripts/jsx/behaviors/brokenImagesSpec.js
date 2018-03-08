@@ -14,21 +14,21 @@
 //
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
-import $ from 'jquery';
-import attachErrorHandler from 'compiled/behaviors/broken-images';
+import $ from 'jquery'
+import attachErrorHandler from 'compiled/behaviors/broken-images'
 
 QUnit.module('Broken Images Behavior', {
-  setup () {
-    $('#fixtures').html('<img id="borked" src="broken_image.jpg">');
+  setup() {
+    $('#fixtures').html('<img id="borked" src="broken_image.jpg">')
   },
-  teardown () {
-    $('#fixtures').empty();
+  teardown() {
+    $('#fixtures').empty()
   }
-});
+})
 
 test('on error handler attaches the proper class to images when called', () => {
-  const $imgElement = $('#borked');
-  attachErrorHandler($imgElement);
-  $imgElement.triggerHandler('error');
-  ok($imgElement.hasClass('broken-image'));
+  const $imgElement = $('#borked')
+  attachErrorHandler($imgElement)
+  $imgElement.triggerHandler('error')
+  ok($imgElement.hasClass('broken-image'))
 })

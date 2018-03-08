@@ -17,7 +17,7 @@
  */
 
 import I18n from 'i18n!roster'
-import { Model } from 'Backbone'
+import {Model} from 'Backbone'
 import CreateUserList from 'compiled/models/CreateUserList'
 import Role from 'compiled/models/Role'
 import CreateUsersView from 'compiled/views/courses/roster/CreateUsersView'
@@ -37,7 +37,14 @@ import $ from 'jquery'
 import '../context_cards/StudentContextCardTrigger'
 
 const fetchOptions = {
-  include: ['avatar_url', 'enrollments', 'email', 'observed_users', 'can_be_removed', 'custom_links'],
+  include: [
+    'avatar_url',
+    'enrollments',
+    'email',
+    'observed_users',
+    'can_be_removed',
+    'custom_links'
+  ],
   per_page: 50
 }
 const users = new RosterUserCollection(null, {
@@ -45,7 +52,9 @@ const users = new RosterUserCollection(null, {
   sections: new SectionCollection(ENV.SECTIONS),
   params: fetchOptions
 })
-const rolesCollection = new RolesCollection(Array.from(ENV.ALL_ROLES).map(attributes => new Role(attributes)))
+const rolesCollection = new RolesCollection(
+  Array.from(ENV.ALL_ROLES).map(attributes => new Role(attributes))
+)
 const course = new Model(ENV.course)
 const inputFilterView = new InputFilterView({collection: users})
 const usersView = new PaginatedCollectionView({
@@ -110,9 +119,13 @@ users.once('reset', () =>
     } else if (numUsers === 1) {
       msg = I18n.t('filter_one_user_found', '1 user found.')
     } else {
-      msg = I18n.t('filter_multiple_users_found', '%{userCount} users found.', {userCount: numUsers})
+      msg = I18n.t('filter_multiple_users_found', '%{userCount} users found.', {
+        userCount: numUsers
+      })
     }
-    return $('#aria_alerts').empty().text(msg)
+    return $('#aria_alerts')
+      .empty()
+      .text(msg)
   })
 )
 

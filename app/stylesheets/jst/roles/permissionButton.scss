@@ -16,75 +16,78 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- @import "base/environment";
+@import 'base/environment';
 
- //since each item is treated as a row header don't want to color the border darker
-.roles_table.ic-Table th[role="rowheader"] {
+//since each item is treated as a row header don't want to color the border darker
+.roles_table.ic-Table th[role='rowheader'] {
   border-bottom-color: $ic-border-light;
 }
 
 table.roles_table.ic-Table td.permissionButtonView {
   position: relative;
 
-    .default_permission {
-      opacity: 0.5;
-    }
+  .default_permission {
+    opacity: 0.5;
+  }
 
-    .icon-x {
-      color: $ic-color-danger;
-    }
+  .icon-x {
+    color: $ic-color-danger;
+  }
 
-    .icon-check {
-      color: $ic-color-success;
-    }
+  .icon-check {
+    color: $ic-color-success;
+  }
 
-    .btn-group {
-      margin: 0 auto;
-      width: 40px;
+  .btn-group {
+    margin: 0 auto;
+    width: 40px;
+    position: relative;
+
+    .btn.dropdown-toggle {
       position: relative;
+      min-width: 35px;
 
-      .btn.dropdown-toggle{
-        position: relative;
-        min-width: 35px;
+      &:disabled,
+      &[disabled] {
+        background: none;
+        border: none;
 
-        &:disabled, &[disabled] {
-          background: none;
-          border: none;
-
-          & .icon-lock {
-            display: none;
-          }
+        & .icon-lock {
+          display: none;
         }
       }
     }
+  }
 
   .dropdown-menu {
     text-align: left;
 
-    input[type=radio] {
+    input[type='radio'] {
       /* Display none breaks ie so we position it off the page */
       position: absolute;
       left: -9999px;
     }
 
-    label{
+    label {
       display: block;
       padding: 5px;
     }
 
-    span.text{
+    span.text {
       float: right;
       text-align: left !important;
       width: 110px;
 
-      &:last{
+      &:last {
         float: none;
         text-align: center;
         display: block;
       }
     }
 
-    label:hover, label:focus, input:checked+label {
+    label:hover,
+    label:focus,
+    input:checked + label {
       text-decoration: none;
       color: white;
       background-color: var(--ic-brand-primary);
@@ -92,6 +95,7 @@ table.roles_table.ic-Table td.permissionButtonView {
   }
 }
 
-table#course_roles thead, table#account_roles thead {
+table#course_roles thead,
+table#account_roles thead {
   background: #fff;
 }

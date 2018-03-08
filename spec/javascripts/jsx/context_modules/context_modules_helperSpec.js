@@ -19,13 +19,13 @@
 import Helper from 'context_modules_helper'
 
 QUnit.module('ContextModulesHelper', {
-  setup () {
+  setup() {
     sinon.stub(Helper, 'setWindowLocation')
   },
 
-  teardown () {
+  teardown() {
     Helper.setWindowLocation.restore()
-  },
+  }
 })
 
 test('externalUrlLinkClick', () => {

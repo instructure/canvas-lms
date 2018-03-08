@@ -8,7 +8,8 @@
   "question_type": "essay_question",
   "question_name": "[Essay] Question",
   "name": "[Essay] Question",
-  "question_text": "<p>[Essay] Summarize your feelings towards life, the universe, and everything in decimal numbers.</p>",
+  "question_text":
+    "<p>[Essay] Summarize your feelings towards life, the universe, and everything in decimal numbers.</p>",
   "answers": [],
   "text_after_answers": "",
   "comments": "",

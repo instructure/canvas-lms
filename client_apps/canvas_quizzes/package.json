@@ -16,14 +16,11 @@
     }
   ],
   "licenses": [],
-  "repository" :{
-    "type" : "git",
-    "url" : "https://github.com/instructure/canvas-lms.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/instructure/canvas-lms.git"
   },
-  "keywords": [
-    "canvas",
-    "lms"
-  ],
+  "keywords": ["canvas", "lms"],
   "scripts": {
     "start": "./node_modules/grunt-cli/bin/grunt",
     "test": "./node_modules/grunt-cli/bin/grunt test",
@@ -55,7 +52,8 @@
     "grunt-contrib-watch": "1.0.0",
     "grunt-jsduck": "1.0.1",
     "grunt-sass": "^2.1.0",
-    "grunt-template-jasmine-requirejs": "git://github.com/amireh/grunt-template-jasmine-requirejs.git#0.2.0",
+    "grunt-template-jasmine-requirejs":
+      "git://github.com/amireh/grunt-template-jasmine-requirejs.git#0.2.0",
     "jasmine_react": "1.2.4",
     "jasmine_rsvp": "1.0.0",
     "jasmine_xhr": "1.0.2",

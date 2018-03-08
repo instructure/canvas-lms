@@ -111,7 +111,6 @@
     padding-top: $ic-sp*2;
     border-top: 1px solid $ic-border-light;
   }
-
 }
 
 #self_registration_type_radios {
@@ -122,11 +121,11 @@
   margin-left: 50px;
 }
 
-.small-input{
+.small-input {
   width: 45px;
 }
 
-.name-length-wrapper{
+.name-length-wrapper {
   display: inline;
 }
 
@@ -139,14 +138,15 @@
   display: none;
 }
 
-
 #account_settings,
 .account_settings {
   .unbreakable {
     white-space: nowrap;
   }
   .formtable {
-    input, select, td {
+    input,
+    select,
+    td {
       vertical-align: baseline;
     }
     p {
@@ -158,12 +158,13 @@
     input.same-width-as-select {
       width: 265px;
     }
-    input[type="checkbox"] {
+    input[type='checkbox'] {
       vertical-align: -3px;
     }
   }
   fieldset {
-    select, input[type="text"] {
+    select,
+    input[type='text'] {
       vertical-align: baseline;
     }
     .remove_domain_link img {
@@ -209,7 +210,8 @@
   display: none;
 }
 
-textarea#account_notification_message, .edit_notification_form textarea {
+textarea#account_notification_message,
+.edit_notification_form textarea {
   width: 500px;
 }
 

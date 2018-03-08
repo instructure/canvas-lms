@@ -24,7 +24,7 @@ QUnit.module('LockToggle component')
 
 const defaultProps = () => ({
   isLocked: true,
-  isToggleable: true,
+  isToggleable: true
 })
 
 test('renders the LockToggle component', () => {

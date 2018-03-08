@@ -41,20 +41,22 @@ class CourseHomeDialog extends React.Component {
     courseId: PropTypes.string.isRequired,
     isPublishing: PropTypes.bool.isRequired,
     onSubmit: PropTypes.func,
-    returnFocusTo: PropTypes.instanceOf(Element),
+    returnFocusTo: PropTypes.instanceOf(Element)
   }
 
   static defaultProps = {
-    onSubmit: () => { window.location.reload() },
-    wikiFrontPageTitle: null,
+    onSubmit: () => {
+      window.location.reload()
+    },
+    wikiFrontPageTitle: null
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = props.store.getState()
   }
 
-  renderWikiLabelContent () {
+  renderWikiLabelContent() {
     const {wikiUrl, wikiFrontPageTitle} = this.props
     if (wikiFrontPageTitle) {
       return (
@@ -62,8 +64,7 @@ class CourseHomeDialog extends React.Component {
           <Text size="small" color="secondary">
             &nbsp;&nbsp;
             <i>{wikiFrontPageTitle}</i>
-            &nbsp;
-            [<Link href={wikiUrl}>{I18n.t('Change')}</Link>]
+            &nbsp; [<Link href={wikiUrl}>{I18n.t('Change')}</Link>]
           </Text>
         </span>
       )
@@ -72,15 +73,13 @@ class CourseHomeDialog extends React.Component {
       <span>
         <AccessibleContent>*</AccessibleContent>
         <ScreenReaderContent>
-          <Link href={wikiUrl}>
-            {I18n.t('Front page must be set first')}
-          </Link>
+          <Link href={wikiUrl}>{I18n.t('Front page must be set first')}</Link>
         </ScreenReaderContent>
       </span>
     )
   }
 
-  renderWikiLabel () {
+  renderWikiLabel() {
     return (
       <span>
         {I18n.t('Pages Front Page')}
@@ -89,7 +88,7 @@ class CourseHomeDialog extends React.Component {
     )
   }
 
-  render () {
+  render() {
     const {selectedDefaultView} = this.state
     const {wikiFrontPageTitle, wikiUrl} = this.props
 
@@ -122,9 +121,11 @@ class CourseHomeDialog extends React.Component {
       }
     ]
 
-    const instructions = this.props.isPublishing ?
-      I18n.t('Before publishing your course, you must either publish a module in the Modules page, or choose a different home page.') :
-      I18n.t("Select what you'd like to display on the home page.")
+    const instructions = this.props.isPublishing
+      ? I18n.t(
+          'Before publishing your course, you must either publish a module in the Modules page, or choose a different home page.'
+        )
+      : I18n.t("Select what you'd like to display on the home page.")
 
     return (
       <Modal
@@ -137,7 +138,9 @@ class CourseHomeDialog extends React.Component {
         onClose={this.onClose}
       >
         <ModalHeader>
-          <Heading tag="h2" level="h3">{I18n.t('Choose Home Page')}</Heading>
+          <Heading tag="h2" level="h3">
+            {I18n.t('Choose Home Page')}
+          </Heading>
         </ModalHeader>
         <ModalBody>
           <div className="content-box-mini" style={{marginTop: '0'}}>
@@ -153,27 +156,22 @@ class CourseHomeDialog extends React.Component {
             onChange={this.onChange}
             defaultValue={selectedDefaultView}
           >
-            {inputs.map(input =>
+            {inputs.map(input => (
               <RadioInput
                 key={input.value}
                 checked={input.checked}
                 value={input.value}
                 label={input.label}
                 disabled={input.disabled}
-              />)
-            }
+              />
+            ))}
           </RadioInputGroup>
 
-          {
-            wikiFrontPageTitle ? (
-              null
-            ) : (
-              <div className="content-box-mini">
-              * <Link href={wikiUrl}>{I18n.t('Front page must be set first')}
-              </Link></div>
-            )
-          }
-
+          {wikiFrontPageTitle ? null : (
+            <div className="content-box-mini">
+              * <Link href={wikiUrl}>{I18n.t('Front page must be set first')}</Link>
+            </div>
+          )}
         </ModalBody>
 
         <ModalFooter>
@@ -182,19 +180,19 @@ class CourseHomeDialog extends React.Component {
             onClick={this.onSubmit}
             disabled={this.props.isPublishing && this.state.selectedDefaultView === 'modules'}
             variant="primary"
-          >{
-            this.props.isPublishing ? I18n.t('Choose and Publish') : I18n.t('Save')
-          }</Button>
+          >
+            {this.props.isPublishing ? I18n.t('Choose and Publish') : I18n.t('Save')}
+          </Button>
         </ModalFooter>
       </Modal>
-    );
+    )
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.store.addChangeListener(this.onStoreChange)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.store.removeChangeListener(this.onStoreChange)
   }
 
@@ -214,20 +212,22 @@ class CourseHomeDialog extends React.Component {
     const {selectedDefaultView, savedDefaultView} = this.state
     let savingPromise
     if (selectedDefaultView !== savedDefaultView) {
-      savingPromise = axios.put(`/api/v1/courses/${this.props.courseId}`, {
-        course: {default_view: this.state.selectedDefaultView}
-      }).then(({data: course}) => course.default_view)
+      savingPromise = axios
+        .put(`/api/v1/courses/${this.props.courseId}`, {
+          course: {default_view: this.state.selectedDefaultView}
+        })
+        .then(({data: course}) => course.default_view)
     } else {
       savingPromise = Promise.resolve(savedDefaultView)
     }
 
-    savingPromise.then((newDefaultView) => {
+    savingPromise.then(newDefaultView => {
       this.props.store.setState({savedDefaultView: newDefaultView})
       this.props.onSubmit()
     })
   }
 
-  onChange = (value) => {
+  onChange = value => {
     this.props.store.setState({selectedDefaultView: value})
   }
 }

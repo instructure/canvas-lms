@@ -1,18 +1,18 @@
-Using Content Item to Select Resources
-=================================
+# Using Content Item to Select Resources
+
 ## Introduction
 
 Content-Item is an extension to LTI that allows data to be passed back to the
 Tool Consumer (i.e., Canvas) in context of an LTI Launch. A few common use cases
- are:
+are:
 
-*   Providing a teacher the ability to select a customized LTI launch link from
-the tool provider to be placed in the tool consumer.
+* Providing a teacher the ability to select a customized LTI launch link from
+  the tool provider to be placed in the tool consumer.
 
-*   Allowing a student to submit an attachment for an assignment that is
-provided by a tool provider (i.e., the external tool).
+* Allowing a student to submit an attachment for an assignment that is
+  provided by a tool provider (i.e., the external tool).
 
-*   Embedding custom content into a rich text editor from a tool provider.
+* Embedding custom content into a rich text editor from a tool provider.
 
 To see the full spec for content item and other code examples see the
 [IMS Documentation](https://www.imsglobal.org/specs/lticiv1p0)
@@ -27,27 +27,25 @@ below:
 ### ContentItemRequest: Tool Consumer -> Tool Provider
 
 ```
-
     lti_message_type: ContentItemSelectionRequest
     lti_version: LTI-1p0
     accept_media_types: application/vnd.ims.lti.v1.ltilink
     accept_presentation_document_targets: frame,window
     content_item_return_url:
     http://lms.example/courses/5/external_content/success/external_tool_dialog
-
 ```
 
 Some of the important parameters are: **accept_media_types**,
 **accept_presentation_document_targets**, and **content_item_return_url**.
 
 **accept_media_types** is a comma separated list of MIME types the Tool Consumer
- supports.
+supports.
 
 **accept_presentation_document_targets** is a comma separated list of
 presentation formats the Tool Consumer supports.
 
 **content_item_return_url** is where the tool provider should redirect to at the
- end of the content-item process.
+end of the content-item process.
 
 After the Tool Provider receives the `ContentItemSelectionRequest` message it
 will need to send back a `ContentItemSelection` message that includes the
@@ -57,7 +55,6 @@ below:
 ### ContentItemSelection: Tool Consumer <- Tool Provider
 
 ```
-
     lti_message_type: ContentItemSelection
     lti_version: LTI-1p0
     content_items: {
@@ -76,21 +73,18 @@ below:
                        }
                      ]
                    }
-
 ```
 
 The main points of interest here is the `content_items` parameter. It contains a
- JSON object that includes an array of content-item objects. Inside the JSON
- object, the `@graph` object contains an array that holds all of the
- content-item objects.
+JSON object that includes an array of content-item objects. Inside the JSON
+object, the `@graph` object contains an array that holds all of the
+content-item objects.
 
 The content-item object in this example is sending back a single LTI link that
 is to be launched in the current frame. the `url` specifies the lti launch point
 , and the `mediaType` specifies that it is an lti launch.
 
-
 # Configuring Content-item
-
 
 To use content-item, the tool provider must be configured correctly. The
 following is an overview of how to configure the tool provider to use
@@ -100,6 +94,7 @@ content-item.
 
 Below is an example of a bare-bones tool provider LTI configuration that
 _does not_ use content-item:
+
 ```
     <?xml version="1.0" encoding="UTF-8"?><cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
       <blti:title>Example Tool Provider</blti:title>
@@ -110,7 +105,6 @@ _does not_ use content-item:
         <lticm:property name="selection_width">500</lticm:property>
       </blti:extensions>
     </cartridge_basiclti_link>
-
 ```
 
 **Note:** for more on the basics of LTI tool configuration see
@@ -122,17 +116,14 @@ case) know where the tool should be placed within the LMS. For example, adding
 the following node as a child of the **blti:extensions** element in the above
 XML would tell Canvas to add a link in the course navigation to the LTI tool:
 
-
-
 ```
     <lticm:options name="course_navigation">
       <lticm:property name="url">http://localhost:4040/messages/blti</lticm:property>
     </lticm:options>
 ```
 
-
 Content-item is not applicable to all placements in Canvas, but can be used with
- the following placements:
+the following placements:
 
 **editor_button**
 
@@ -147,9 +138,7 @@ Content-item is not applicable to all placements in Canvas, but can be used with
 For our example we will use **assignment_selection**.
 
 To enable content-item with the **assignment_selection** placement, we add lines
- 6-9 to the example from above:
-
-
+6-9 to the example from above:
 
 ```
      1 <?xml version="1.0" encoding="UTF-8"?><cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
@@ -168,7 +157,6 @@ To enable content-item with the **assignment_selection** placement, we add lines
     14 </cartridge_basiclti_link>
 ```
 
-
 Adding the element on line 6 lets Canvas know the tool should be placed in the
 assignments menu. Line 7 tells Canvas the tool is using content-item, and line 8
- provides Canvas the launch URL.
+provides Canvas the launch URL.

@@ -16,10 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 body.embedded {
-
   // New UI adds more layout elements, so needs
   // this for the self-enrollments footer to
   // stick at the bottom of the iframe-modal.

@@ -37,28 +37,34 @@
 // for hover states where the background color of the parent changes
 
 @mixin firefox-white-space-bug-fix-gradient($fade-out-color) {
-  background: linear-gradient(to right, rgba(255,255,255,0) 0%,$fade-out-color 75%);
+  background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, $fade-out-color 75%);
 }
 
 @mixin firefox-white-space-bug-fix($gradient-color: $ic-color-light, $gradient-color-hover: null) {
   body.ff & {
-    .ellipses, .ellipsis {
+    .ellipses,
+    .ellipsis {
       white-space: normal;
       height: $baseLineHeight;
       position: relative;
       &:after {
         @include firefox-white-space-bug-fix-gradient($gradient-color);
-        content: "";
+        content: '';
         position: absolute;
-        right: 0; top: 0;
-        height: $baseLineHeight; width: $ic-sp*2.5;
+        right: 0;
+        top: 0;
+        height: $baseLineHeight;
+        width: $ic-sp*2.5;
         z-index: 1;
       }
     }
     @if ($gradient-color-hover) {
       &:hover {
-        .ellipses, .ellipsis {
-          &:after { @include firefox-white-space-bug-fix-gradient($gradient-color-hover); }
+        .ellipses,
+        .ellipsis {
+          &:after {
+            @include firefox-white-space-bug-fix-gradient($gradient-color-hover);
+          }
         }
       }
     }
@@ -71,7 +77,8 @@
 // children of your class will show at the size specified in the
 // $new-icon-size parameter
 @mixin overwrite-default-icon-size($new-icon-size) {
-  i[class*=icon-], i[class^=icon-] {
+  i[class*='icon-'],
+  i[class^='icon-'] {
     line-height: 1;
     &:before {
       font-size: $new-icon-size;
@@ -82,14 +89,14 @@
 // make <input readonly> look like plain text
 @mixin readonly-input {
   input[readonly] {
-     background-color: transparent;
-     border-color: transparent;
-     box-shadow: none;
-     font-weight: bold;
-     cursor: default;
-     &:focus {
-       border-color: transparent;
-       outline-style: none;
-     }
-   }
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    font-weight: bold;
+    cursor: default;
+    &:focus {
+      border-color: transparent;
+      outline-style: none;
+    }
+  }
 }

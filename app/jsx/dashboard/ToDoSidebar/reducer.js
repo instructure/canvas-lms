@@ -16,40 +16,53 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { handleActions } from 'redux-actions';
-import { combineReducers } from 'redux';
+import {handleActions} from 'redux-actions'
+import {combineReducers} from 'redux'
 
-const items = handleActions({
-  ITEMS_LOADED: (state, action) => state.concat(action.payload.items),
-  ITEM_SAVED: (state, action) => {
-    const newState = state.slice();
+const items = handleActions(
+  {
+    ITEMS_LOADED: (state, action) => state.concat(action.payload.items),
+    ITEM_SAVED: (state, action) => {
+      const newState = state.slice()
 
-    const itemToUpdate = newState.find(item => (
-      item.plannable_id === action.payload.plannable_id &&
-      item.plannable_type === action.payload.plannable_type
-    ));
-    itemToUpdate.planner_override = action.payload;
-    return newState;
-  }
-}, []);
+      const itemToUpdate = newState.find(
+        item =>
+          item.plannable_id === action.payload.plannable_id &&
+          item.plannable_type === action.payload.plannable_type
+      )
+      itemToUpdate.planner_override = action.payload
+      return newState
+    }
+  },
+  []
+)
 
-const nextUrl = handleActions({
-  ITEMS_LOADED: (state, action) => action.payload.nextUrl
-}, null);
+const nextUrl = handleActions(
+  {
+    ITEMS_LOADED: (state, action) => action.payload.nextUrl
+  },
+  null
+)
 
-const loading = handleActions({
-  ITEMS_LOADING: () => true,
-  ITEMS_LOADED: () => false,
-  ITEMS_LOADING_FAILED: () => false
-}, false);
+const loading = handleActions(
+  {
+    ITEMS_LOADING: () => true,
+    ITEMS_LOADED: () => false,
+    ITEMS_LOADING_FAILED: () => false
+  },
+  false
+)
 
-const loaded = handleActions({
-  ALL_ITEMS_LOADED: () => true
-}, false);
+const loaded = handleActions(
+  {
+    ALL_ITEMS_LOADED: () => true
+  },
+  false
+)
 
 export default combineReducers({
   items,
   loading,
   nextUrl,
   loaded
-});
+})

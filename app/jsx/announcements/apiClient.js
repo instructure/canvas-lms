@@ -17,61 +17,63 @@
  */
 
 import axios from 'axios'
-import { encodeQueryString } from '../shared/queryString'
+import {encodeQueryString} from '../shared/queryString'
 import makePromisePool from '../shared/makePromisePool'
 
 const MAX_CONCURRENT_REQS = 5
 
-export function getAnnouncements ({ courseId, announcements, announcementsSearch }, { page }) {
-  const { term, filter } = announcementsSearch
+export function getAnnouncements({courseId, announcements, announcementsSearch}, {page}) {
+  const {term, filter} = announcementsSearch
   const params = encodeQueryString([
-    { only_announcements: true },
-    { 'include[]': 'sections_user_count' },
-    { 'include[]': 'sections' },
-    { per_page: 40 },
-    { page: page || announcements.currentPage },
-    { search_term: term || null },
-    { filter_by: filter || null }
+    {only_announcements: true},
+    {'include[]': 'sections_user_count'},
+    {'include[]': 'sections'},
+    {per_page: 40},
+    {page: page || announcements.currentPage},
+    {search_term: term || null},
+    {filter_by: filter || null}
   ])
 
   return axios.get(`/api/v1/courses/${courseId}/discussion_topics?${params}`)
 }
 
-export function getExternalFeeds ({ courseId }) {
-  const params = encodeQueryString([
-    { per_page: 100 }
-  ])
+export function getExternalFeeds({courseId}) {
+  const params = encodeQueryString([{per_page: 100}])
   return axios.get(`/api/v1/courses/${courseId}/external_feeds?${params}`)
 }
 
-export function deleteExternalFeed ({ courseId, feedId }) {
+export function deleteExternalFeed({courseId, feedId}) {
   return axios.delete(`/api/v1/courses/${courseId}/external_feeds/${feedId}`)
 }
 
-export function lockAnnouncements ({ courseId }, announcements, locked = true) {
-  return makePromisePool(announcements, (annId) => {
-    const url = `/api/v1/courses/${courseId}/discussion_topics/${annId}`
-    return axios.put(url, { locked })
-  }, {
-    poolSize: MAX_CONCURRENT_REQS,
-  })
+export function lockAnnouncements({courseId}, announcements, locked = true) {
+  return makePromisePool(
+    announcements,
+    annId => {
+      const url = `/api/v1/courses/${courseId}/discussion_topics/${annId}`
+      return axios.put(url, {locked})
+    },
+    {
+      poolSize: MAX_CONCURRENT_REQS
+    }
+  )
 }
 
-export function deleteAnnouncements ({ courseId }, announcements) {
-  return makePromisePool(announcements, (annId) => {
-    const url = `/api/v1/courses/${courseId}/discussion_topics/${annId}`
-    return axios.delete(url)
-  }, {
-    poolSize: MAX_CONCURRENT_REQS,
-  })
+export function deleteAnnouncements({courseId}, announcements) {
+  return makePromisePool(
+    announcements,
+    annId => {
+      const url = `/api/v1/courses/${courseId}/discussion_topics/${annId}`
+      return axios.delete(url)
+    },
+    {
+      poolSize: MAX_CONCURRENT_REQS
+    }
+  )
 }
 
-export function addExternalFeed ({ courseId, url, verbosity, header_match }) {
-  const params = encodeQueryString([
-    { url },
-    { verbosity },
-    { header_match: header_match || null }
-  ])
+export function addExternalFeed({courseId, url, verbosity, header_match}) {
+  const params = encodeQueryString([{url}, {verbosity}, {header_match: header_match || null}])
 
   return axios.post(`/api/v1/courses/${courseId}/external_feeds?${params}`)
 }

@@ -17,14 +17,12 @@
  */
 
 @keyframes rotate {
-
   to {
     transform: rotate(360deg);
   }
 }
 
 @keyframes morph {
-
   0% {
     stroke-dashoffset: 190%;
   }
@@ -73,7 +71,6 @@
     stroke-dasharray: 10.5em;
     transform-origin: calc(5em / 2);
   }
-
 }
 
 .circle {
@@ -114,7 +111,6 @@
 }
 
 .LoadingSpinner-darkBg {
-
   .circleShadow {
     stroke: rgba(0, 0, 0, 0.3);
   }

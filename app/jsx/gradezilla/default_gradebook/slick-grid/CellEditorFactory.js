@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssignmentCellEditor from '../../../gradezilla/default_gradebook/slick-grid/editors/AssignmentCellEditor';
+import AssignmentCellEditor from '../../../gradezilla/default_gradebook/slick-grid/editors/AssignmentCellEditor'
 
 class CellEditorFactory {
-  getEditor (column) {
+  getEditor(column) {
     switch (column.type) {
       case 'assignment':
-        return AssignmentCellEditor;
+        return AssignmentCellEditor
       default:
-        return undefined;
+        return undefined
     }
   }
 }
 
-export default CellEditorFactory;
+export default CellEditorFactory

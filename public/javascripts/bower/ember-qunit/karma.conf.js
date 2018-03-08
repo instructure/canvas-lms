@@ -1,6 +1,5 @@
 module.exports = function(config) {
   config.set({
-
     frameworks: ['qunit'],
 
     files: [
@@ -32,7 +31,5 @@ module.exports = function(config) {
     captureTimeout: 60000,
 
     singleRun: false
-
-  });
-};
-
+  })
+}

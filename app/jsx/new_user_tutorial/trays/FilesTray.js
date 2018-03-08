@@ -28,13 +28,11 @@ const FilesTray = () => (
     image="/images/tutorial-tray-images/files.svg"
   >
     <Text as="p">
-      {
-        I18n.t(`Upload course files, syllabi, readings, or other documents.
+      {I18n.t(`Upload course files, syllabi, readings, or other documents.
           Lock folders to keep them hidden from students. Add files to Modules,
-          Assignments, Discussions, or Pages.`)
-      }
+          Assignments, Discussions, or Pages.`)}
     </Text>
   </TutorialTrayContent>
-);
+)
 
 export default FilesTray

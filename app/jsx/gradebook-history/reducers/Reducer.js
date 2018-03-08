@@ -16,16 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { combineReducers } from 'redux';
-import history from '../../gradebook-history/reducers/HistoryReducer';
-import searchForm from '../../gradebook-history/reducers/SearchFormReducer';
+import {combineReducers} from 'redux'
+import history from '../../gradebook-history/reducers/HistoryReducer'
+import searchForm from '../../gradebook-history/reducers/SearchFormReducer'
 
-const allReducers = () => (
-  { history, searchForm }
-)
+const allReducers = () => ({history, searchForm})
 
-const gradebookHistory = combineReducers(allReducers());
+const gradebookHistory = combineReducers(allReducers())
 
-export default gradebookHistory;
+export default gradebookHistory
 
-export { allReducers };
+export {allReducers}

@@ -19,20 +19,18 @@
 //add variable modifications to the global _variables.scss
 //they will override bootstrap styles
 
-
 // Clearfix - Use to clear floats
 @mixin clearfix {
   &:before,
   &:after {
     display: table;
-    content: "";
+    content: '';
     line-height: 0;
   }
   &:after {
     clear: both;
   }
 }
-
 
 // Accessibility prompts - visible through KO focus
 // If the prompt is not a clickable link, set $is-link: false
@@ -49,10 +47,11 @@
     color: #fff;
   }
   @if $is-link {
-    &:focus { text-decoration: underline; }
+    &:focus {
+      text-decoration: underline;
+    }
   }
 }
-
 
 // :focus style mixins
 @mixin ic-focus-base {
@@ -67,23 +66,32 @@
 }
 
 @mixin button-focus-light {
-  @if $use_high_contrast { box-shadow: inset 0 0 0 2px var(--ic-link-color); }
-  @else { box-shadow: inset 0 0 0 1px var(--ic-link-color); }
+  @if $use_high_contrast {
+    box-shadow: inset 0 0 0 2px var(--ic-link-color);
+  } @else {
+    box-shadow: inset 0 0 0 1px var(--ic-link-color);
+  }
 }
 
 @mixin button-focus-dark {
-  @if $use_high_contrast { box-shadow: inset 0 0 0 2px $ic-color-light; }
-  @else { box-shadow: inset 0 0 0 1px $ic-color-light;  }
+  @if $use_high_contrast {
+    box-shadow: inset 0 0 0 2px $ic-color-light;
+  } @else {
+    box-shadow: inset 0 0 0 1px $ic-color-light;
+  }
 }
 
-
 // Bootstrap button background - DEPRECATED - DO NOT USE
-@mixin buttonBackground($startColor, $endColor, $textColor: #fff, $textShadow: 0 -1px 0 rgba(0,0,0,.25)) {
+@mixin buttonBackground($startColor, $endColor, $textColor: #fff, $textShadow: 0 -1px 0 rgba(0,0,0,0.25)) {
   // gradientBar will set the background to a pleasing blend of these, to support IE<=9
   @include gradientBar($startColor, $endColor, $textColor, $textShadow);
 
   // in these cases the gradient won't cover the background, so we override
-  &:hover, &:active, &.active, &.disabled, &[disabled] {
+  &:hover,
+  &:active,
+  &.active,
+  &.disabled,
+  &[disabled] {
     color: $textColor;
     background-color: $endColor;
   }
@@ -94,7 +102,6 @@
     text-decoration: none;
   }
 }
-
 
 // Button styles for all non-InstUI buttons
 @mixin canvas-button(
@@ -108,13 +115,14 @@
   color: $text-color;
   border: 1px solid;
 
-  &:focus { color: $text-color; }
+  &:focus {
+    color: $text-color;
+  }
   &:hover {
     @if $use_high_contrast {
       background: darken($ic-color-dark, 20%);
       color: $ic-color-light;
-    }
-    @else  {
+    } @else {
       background: $button-color-darkened-5;
       color: $text-color;
     }
@@ -124,8 +132,7 @@
       @if $use_high_contrast {
         background: darken($ic-color-dark, 20%);
         color: $ic-color-light;
-      }
-      @else {
+      } @else {
         background: $button-color-darkened-5;
         color: $text-color;
         border-color: $button-color-darkened-15;
@@ -136,25 +143,38 @@
   @if $button-background-is-lighter-than-text {
     border-color: $ic-border-color;
 
-    &.active, &.Button--active, &:active { box-shadow: none; }
-    &.active, &.Button--active {
+    &.active,
+    &.Button--active,
+    &:active {
+      box-shadow: none;
+    }
+    &.active,
+    &.Button--active {
       background: darken($button-color, 55%);
       border-color: darken($button-color, 65%);
       color: $ic-color-light;
     }
-    &:focus { @include button-focus-light; }
+    &:focus {
+      @include button-focus-light;
+    }
     // handle jquery UI ui-button states
     &.ui-state-focus.ui-state-active {
-      &:focus { @include button-focus-dark; }
+      &:focus {
+        @include button-focus-dark;
+      }
     }
-    &:active { background: darken($button-color, 8%); }
-  }
-
-  @else {
+    &:active {
+      background: darken($button-color, 8%);
+    }
+  } @else {
     border-color: $button-color-darkened-15;
 
-    &:focus { @include button-focus-dark; }
-    &.active, &.Button--active, &:active {
+    &:focus {
+      @include button-focus-dark;
+    }
+    &.active,
+    &.Button--active,
+    &:active {
       background: $button-color-darkened-5;
       box-shadow: none;
     }

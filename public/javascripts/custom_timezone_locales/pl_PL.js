@@ -1,32 +1,12 @@
-module.exports = { // eslint-disable-line import/no-commonjs
+module.exports = {
+  // eslint-disable-line import/no-commonjs
   name: 'pl_PL',
   day: {
     abbrev: ['nie', 'pon', 'wto', 'śro', 'czw', 'pią', 'sob'],
-    full: [
-      'niedziela',
-      'poniedziałek',
-      'wtorek',
-      'środa',
-      'czwartek',
-      'piątek',
-      'sobota'
-    ]
+    full: ['niedziela', 'poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota']
   },
   month: {
-    abbrev: [
-      'Sty',
-      'Lut',
-      'Mar',
-      'Kwi',
-      'Maj',
-      'Czer',
-      'Lip',
-      'Sie',
-      'Wrz',
-      'Paz',
-      'Lis',
-      'Gru'
-    ],
+    abbrev: ['Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Czer', 'Lip', 'Sie', 'Wrz', 'Paz', 'Lis', 'Gru'],
     full: [
       'styczeń',
       'luty',

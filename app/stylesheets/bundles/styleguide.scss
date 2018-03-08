@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 //// Stylesheet compiler list
 ////////
-@import "pages/styleguide/styleguide_setup.scss";
-@import "pages/styleguide/styleguide_syntax.scss";
-@import "pages/styleguide/styleguide_layout.scss";
+@import 'pages/styleguide/styleguide_setup.scss';
+@import 'pages/styleguide/styleguide_syntax.scss';
+@import 'pages/styleguide/styleguide_layout.scss';
 
 //// Specific App Styling
 ////////
-@import "pages/styleguide/styleguide_app.scss";
+@import 'pages/styleguide/styleguide_app.scss';

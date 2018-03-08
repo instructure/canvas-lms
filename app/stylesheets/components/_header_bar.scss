@@ -161,7 +161,7 @@
     height: 33px;
     min-width: 623px;
     border-color: #c1c7cf;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   }
   // helpers for alignment, use .row-fluid and .span classes to align where possible instead of these
   .header-bar-right {
@@ -176,10 +176,11 @@
 }
 
 // classes for grouping buttons on the right
-.header-group-left{
+.header-group-left {
   margin-right: 10px;
 }
-.header-group-left, .header-group-right{
+.header-group-left,
+.header-group-right {
   float: left;
 }
 

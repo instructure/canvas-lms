@@ -41,15 +41,20 @@ export default class ActAsModal extends React.Component {
       avatar_image_url: React.PropTypes.string,
       sortable_name: React.PropTypes.string,
       email: React.PropTypes.string,
-      pseudonyms: React.PropTypes.arrayOf(React.PropTypes.shape({
-        login_id: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
-        sis_id: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
-        integration_id: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string])
-      }))
+      pseudonyms: React.PropTypes.arrayOf(
+        React.PropTypes.shape({
+          login_id: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
+          sis_id: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
+          integration_id: React.PropTypes.oneOfType([
+            React.PropTypes.number,
+            React.PropTypes.string
+          ])
+        })
+      )
     }).isRequired
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
@@ -59,7 +64,7 @@ export default class ActAsModal extends React.Component {
     this._button = null
   }
 
-  componentWillMount () {
+  componentWillMount() {
     if (window.location.href === document.referrer) {
       this.setState({isLoading: true})
       window.location.href = '/'
@@ -67,7 +72,7 @@ export default class ActAsModal extends React.Component {
   }
 
   componentDidMount() {
-    this.closeButton.focus();
+    this.closeButton.focus()
   }
 
   handleModalRequestClose = () => {
@@ -89,7 +94,7 @@ export default class ActAsModal extends React.Component {
     this.setState({isLoading: true})
   }
 
-  handleClick = (e) => {
+  handleClick = e => {
     if (e.keyCode && (e.keyCode === keycode.codes.space || e.keyCode === keycode.codes.enter)) {
       // for the data to post correctly, we need an actual click
       // on enter and space press, we simulate a click event and return
@@ -99,13 +104,17 @@ export default class ActAsModal extends React.Component {
     this.setState({isLoading: true})
   }
 
-  renderInfoTable (caption, renderRows) {
+  renderInfoTable(caption, renderRows) {
     return (
       <Table caption={<ScreenReaderContent>{caption}</ScreenReaderContent>}>
         <thead>
           <tr>
-            <th><ScreenReaderContent>{I18n.t('Category')}</ScreenReaderContent></th>
-            <th><ScreenReaderContent>{I18n.t('User information')}</ScreenReaderContent></th>
+            <th>
+              <ScreenReaderContent>{I18n.t('Category')}</ScreenReaderContent>
+            </th>
+            <th>
+              <ScreenReaderContent>{I18n.t('User information')}</ScreenReaderContent>
+            </th>
           </tr>
         </thead>
         {renderRows()}
@@ -133,21 +142,15 @@ export default class ActAsModal extends React.Component {
     </tbody>
   )
 
-  renderUserRow (category, info) {
+  renderUserRow(category, info) {
     return (
       <tr>
         <td>
           <Text size="small">{category}</Text>
         </td>
         <td>
-          <Container
-            as="div"
-            textAlign="end"
-          >
-            <Text
-              size="small"
-              weight="bold"
-            >
+          <Container as="div" textAlign="end">
+            <Text size="small" weight="bold">
               {info}
             </Text>
           </Container>
@@ -156,7 +159,7 @@ export default class ActAsModal extends React.Component {
     )
   }
 
-  render () {
+  render() {
     const user = this.props.user
 
     return (
@@ -168,20 +171,18 @@ export default class ActAsModal extends React.Component {
           label={I18n.t('Act as User')}
           closeButtonLabel={I18n.t('Close')}
           applicationElement={() => document.getElementById('application')}
-          closeButtonRef={(el) => this.closeButton = el}
+          closeButtonRef={el => (this.closeButton = el)}
           open
         >
           <ModalHeader>
-            <Text size="large">
-              {I18n.t('Act as User')}
-            </Text>
+            <Text size="large">{I18n.t('Act as User')}</Text>
           </ModalHeader>
           <ModalBody>
-            {this.state.isLoading ?
+            {this.state.isLoading ? (
               <div className="ActAs__loading">
                 <Spinner title={I18n.t('Loading')} />
               </div>
-            :
+            ) : (
               <div className="ActAs__body">
                 <div className="ActAs__svgContainer">
                   <div className="ActAs__svg">
@@ -192,43 +193,25 @@ export default class ActAsModal extends React.Component {
                   </div>
                 </div>
                 <div className="ActAs__text">
-                  <Container
-                    as="div"
-                    size="small"
-                  >
-                    <Container
-                      as="div"
-                      textAlign="center"
-                      padding="0 0 x-small 0"
-                    >
-                      <Text
-                        size="x-large"
-                        weight="light"
-                      >
-                        {I18n.t('Act as %{name}', { name: user.short_name })}
+                  <Container as="div" size="small">
+                    <Container as="div" textAlign="center" padding="0 0 x-small 0">
+                      <Text size="x-large" weight="light">
+                        {I18n.t('Act as %{name}', {name: user.short_name})}
                       </Text>
                     </Container>
-                    <Container
-                      as="div"
-                      textAlign="center"
-                    >
-                      <Text
-                        lineHeight="condensed"
-                        size="small"
-                      >
-                        {I18n.t('"Act as" is essentially logging in as this user ' +
-                          'without a password. You will be able to take any action ' +
-                          'as if you were this user, and from other users\' points ' +
-                          'of views, it will be as if this user performed them. However, ' +
-                          'audit logs record that you were the one who performed the ' +
-                          'actions on behalf of this user.'
+                    <Container as="div" textAlign="center">
+                      <Text lineHeight="condensed" size="small">
+                        {I18n.t(
+                          '"Act as" is essentially logging in as this user ' +
+                            'without a password. You will be able to take any action ' +
+                            "as if you were this user, and from other users' points " +
+                            'of views, it will be as if this user performed them. However, ' +
+                            'audit logs record that you were the one who performed the ' +
+                            'actions on behalf of this user.'
                         )}
                       </Text>
                     </Container>
-                    <Container
-                      as="div"
-                      textAlign="center"
-                    >
+                    <Container as="div" textAlign="center">
                       <Avatar
                         name={user.short_name}
                         src={user.avatar_image_url}
@@ -236,34 +219,29 @@ export default class ActAsModal extends React.Component {
                         margin="medium 0 x-small 0"
                       />
                     </Container>
-                    <Container
-                      as="div"
-                      textAlign="center"
-                    >
+                    <Container as="div" textAlign="center">
                       {this.renderInfoTable(I18n.t('User details'), this.renderUserInfoRows)}
                     </Container>
                     {user.pseudonyms.map(pseudonym => (
-                        <Container
-                          as="div"
-                          textAlign="center"
-                          margin="large 0 0 0"
-                          key={pseudonym.login_id}
-                        >
-                          {this.renderInfoTable(I18n.t('Login info'), () => this.renderLoginInfoRows(pseudonym))}
-                        </Container>
-                      )
-                    )}
-                    <Container
-                      as="div"
-                      textAlign="center"
-                    >
+                      <Container
+                        as="div"
+                        textAlign="center"
+                        margin="large 0 0 0"
+                        key={pseudonym.login_id}
+                      >
+                        {this.renderInfoTable(I18n.t('Login info'), () =>
+                          this.renderLoginInfoRows(pseudonym)
+                        )}
+                      </Container>
+                    ))}
+                    <Container as="div" textAlign="center">
                       <Button
                         variant="primary"
                         href={`/users/${user.id}/masquerade`}
                         data-method="post"
                         onClick={this.handleClick}
                         margin="large 0 0 0"
-                        buttonRef={(el) => this.proceedButton = el}
+                        buttonRef={el => (this.proceedButton = el)}
                       >
                         {I18n.t('Proceed')}
                       </Button>
@@ -271,7 +249,7 @@ export default class ActAsModal extends React.Component {
                   </Container>
                 </div>
               </div>
-            }
+            )}
           </ModalBody>
         </Modal>
       </div>

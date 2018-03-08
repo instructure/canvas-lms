@@ -24,12 +24,12 @@
 //
 this.xhrResponse = function(statusCode, body, headers) {
   if (!headers) {
-    headers = {};
+    headers = {}
   }
 
   if (!headers['Content-Type']) {
-    headers['Content-Type'] = 'application/json';
+    headers['Content-Type'] = 'application/json'
   }
 
-  return [ statusCode, headers, JSON.stringify(body) ];
-};
+  return [statusCode, headers, JSON.stringify(body)]
+}

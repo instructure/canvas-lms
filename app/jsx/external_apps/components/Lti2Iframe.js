@@ -32,7 +32,7 @@ export default React.createClass({
     hideComponent: PropTypes.bool
   },
 
-  getInitialState () {
+  getInitialState() {
     return {
       beforeExternalContentAlertClass: 'screenreader-only',
       afterExternalContentAlertClass: 'screenreader-only',
@@ -40,32 +40,36 @@ export default React.createClass({
     }
   },
 
-  componentDidMount () {
-    window.addEventListener('message', function (e) {
-      var message = e.data;
-      if (typeof message !== 'object') {
-        message = JSON.parse(e.data);
-      }
-      if (message.subject === 'lti.lti2Registration') {
-        this.props.handleInstall(message, e);
-      }
-    }.bind(this), false);
+  componentDidMount() {
+    window.addEventListener(
+      'message',
+      function(e) {
+        var message = e.data
+        if (typeof message !== 'object') {
+          message = JSON.parse(e.data)
+        }
+        if (message.subject === 'lti.lti2Registration') {
+          this.props.handleInstall(message, e)
+        }
+      }.bind(this),
+      false
+    )
 
     if (this.iframe) {
-      this.iframe.setAttribute('allow', iframeAllowances());
+      this.iframe.setAttribute('allow', iframeAllowances())
     }
   },
 
-  getLaunchUrl () {
+  getLaunchUrl() {
     if (this.props.reregistration) {
       return this.props.registrationUrl
     }
-    return 'about:blank';
+    return 'about:blank'
   },
 
-  handleAlertFocus (event) {
+  handleAlertFocus(event) {
     const newState = {
-      iframeStyle: { border: '2px solid #008EE2', width: `${(this.iframe.offsetWidth - 4)}px` }
+      iframeStyle: {border: '2px solid #008EE2', width: `${this.iframe.offsetWidth - 4}px`}
     }
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = ''
@@ -75,9 +79,9 @@ export default React.createClass({
     this.setState(newState)
   },
 
-  handleAlertBlur (event) {
+  handleAlertBlur(event) {
     const newState = {
-      iframeStyle: { border: 'none', width: '100%' }
+      iframeStyle: {border: 'none', width: '100%'}
     }
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = 'screenreader-only'
@@ -87,12 +91,16 @@ export default React.createClass({
     this.setState(newState)
   },
 
-  render () {
-    const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`
-    const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
+  render() {
+    const beforeAlertStyles = `before_external_content_info_alert ${
+      this.state.beforeExternalContentAlertClass
+    }`
+    const afterAlertStyles = `after_external_content_info_alert ${
+      this.state.afterExternalContentAlertClass
+    }`
 
     return (
-      <div id='lti2-iframe-container' style={this.props.hideComponent ? {display: 'none'} : {}}>
+      <div id="lti2-iframe-container" style={this.props.hideComponent ? {display: 'none'} : {}}>
         <div className="ReactModal__Body" style={{padding: '0px !important', overflow: 'auto'}}>
           <div
             onFocus={this.handleAlertFocus}
@@ -113,7 +121,9 @@ export default React.createClass({
             className="tool_launch"
             title={I18n.t('Tool Content')}
             style={this.state.iframeStyle}
-            ref={(e) => { this.iframe = e; }}
+            ref={e => {
+              this.iframe = e
+            }}
           />
           <div
             onFocus={this.handleAlertFocus}
@@ -133,4 +143,4 @@ export default React.createClass({
       </div>
     )
   }
-});
+})

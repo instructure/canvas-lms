@@ -16,10 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "components/ProgressBar";
+@import 'base/environment';
+@import 'components/ProgressBar';
 
-.theme-preview__page-header { margin-top: 0; }
+.theme-preview__page-header {
+  margin-top: 0;
+}
 .ic-app-nav-toggle-and-crumbs--theme-preview {
   margin-left: 0;
   margin-right: 0;

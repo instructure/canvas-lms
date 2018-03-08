@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "deprecated/bootstrap/mixins";
-@import "vendor/bootstrap/button-groups";
-@import "components/autocomplete";
+@import 'deprecated/bootstrap/mixins';
+@import 'vendor/bootstrap/button-groups';
+@import 'components/autocomplete';
 
 #not_right_side,
 .ic-Layout-contentWrapper,
@@ -37,7 +37,8 @@
 
 .ic-Layout-columns {
   position: absolute;
-  top: 0; bottom: 0;
+  top: 0;
+  bottom: 0;
   margin-bottom: 0;
   display: none;
   width: 100%;
@@ -93,7 +94,9 @@
     // TODO: revisit when breakpoint fixed
     // until we have a better breakpoint for desktop
     // need to put in direct amount for better ux
-    @media only screen and (min-width: 1200px) { white-space: nowrap; }
+    @media only screen and (min-width: 1200px) {
+      white-space: nowrap;
+    }
     > div {
       display: inline-block;
       vertical-align: middle;
@@ -102,7 +105,7 @@
   }
 
   .btn.ui-state-active {
-    background-color: #E6E6E6;
+    background-color: #e6e6e6;
     background-image: none;
   }
 
@@ -133,9 +136,12 @@
   border-bottom: none;
 }
 
-.conversations .panel, .message-header {
+.conversations .panel,
+.message-header {
   button {
-    &[disabled], &[disabled]:focus, &[disabled]:hover {
+    &[disabled],
+    &[disabled]:focus,
+    &[disabled]:hover {
       color: #a6a6a6;
     }
   }
@@ -151,7 +157,8 @@
   left: 8px;
   float: right;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     color: #0088cc;
     text-decoration: none;
   }
@@ -201,7 +208,9 @@
   position: absolute;
   bottom: 0;
   top: 112px;
-  @media only screen and (min-width: 1200px) { top: 62px; }
+  @media only screen and (min-width: 1200px) {
+    top: 62px;
+  }
 }
 
 .message-list-scroller {
@@ -258,7 +267,9 @@
     .message-middle-column {
       flex-grow: 1;
       padding: 0 10px;
-      max-width: calc(100% - 70px); // 70px comes from the padding of the parent + the width of the siblings
+      max-width: calc(
+        100% - 70px
+      ); // 70px comes from the padding of the parent + the width of the siblings
     }
 
     .message-right-column {
@@ -269,7 +280,8 @@
       align-items: center;
     }
 
-    &.active, &:hover {
+    &.active,
+    &:hover {
       .star-btn {
         transform: translateX(0);
       }
@@ -372,7 +384,8 @@
     transform: translateX(50px);
     text-decoration: none;
 
-    &:focus, &.active {
+    &:focus,
+    &.active {
       transform: translateX(0);
     }
 
@@ -406,10 +419,13 @@
   left: -9999px;
   position: absolute;
   &:focus {
-    left: auto; top: auto;
-    right: 0; bottom: 0;
+    left: auto;
+    top: auto;
+    right: 0;
+    bottom: 0;
     z-index: 1;
-    width: auto; height: auto;
+    width: auto;
+    height: auto;
   }
 }
 
@@ -530,7 +546,7 @@
   .actions li {
     border: none;
     float: left;
-    margin:0 0 0 8px;
+    margin: 0 0 0 8px;
     padding: 0;
   }
 
@@ -538,7 +554,8 @@
   .actions li a {
     color: darken($ic-color-neutral, 50);
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       color: #333;
       outline: none;
       text-decoration: none;
@@ -551,21 +568,23 @@
   top: 24px;
 }
 
-.touch .message-item-view:hover, .touch .message-metadata.hover {
+.touch .message-item-view:hover,
+.touch .message-metadata.hover {
   .date {
     right: 0;
   }
 }
 
-.message-item-view:hover, .message-metadata.hover {
-
+.message-item-view:hover,
+.message-metadata.hover {
   .actions {
     display: block;
     right: -7px;
   }
 }
 
-.bootstrap-select.btn-group, .bootstrap-select.btn-group[class*="span"] {
+.bootstrap-select.btn-group,
+.bootstrap-select.btn-group[class*='span'] {
   margin-bottom: 0;
 }
 

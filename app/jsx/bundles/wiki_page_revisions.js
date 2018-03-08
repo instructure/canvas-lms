@@ -24,7 +24,10 @@ import WikiPageRevisionsView from 'compiled/views/wiki/WikiPageRevisionsView'
 
 $('body').addClass('show revisions')
 
-const wikiPage = new WikiPage(ENV.WIKI_PAGE, {revision: ENV.WIKI_PAGE_REVISION, contextAssetString: ENV.context_asset_string})
+const wikiPage = new WikiPage(ENV.WIKI_PAGE, {
+  revision: ENV.WIKI_PAGE_REVISION,
+  contextAssetString: ENV.context_asset_string
+})
 const revisions = new WikiPageRevisionsCollection([], {parentModel: wikiPage})
 
 const revisionsView = new WikiPageRevisionsView({
@@ -37,9 +40,9 @@ contentView.$el.appendTo('#wiki_page_revisions')
 contentView.on('render', () => revisionsView.reposition())
 contentView.render()
 
-revisionsView.on('selectionChanged', (newSelection) => {
+revisionsView.on('selectionChanged', newSelection => {
   contentView.setModel(newSelection.model)
-  if (!newSelection.model.get('title') || (newSelection.model.get('title') === '')) {
+  if (!newSelection.model.get('title') || newSelection.model.get('title') === '') {
     return contentView.$el.disableWhileLoading(newSelection.model.fetch())
   }
 })

@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-  const constants = {
-    MAX_NOTE_LENGTH: 255
-  };
+const constants = {
+  MAX_NOTE_LENGTH: 255
+}
 
 export default constants

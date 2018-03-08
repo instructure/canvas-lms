@@ -28,7 +28,8 @@
       border-color: #aaa;
       overflow: hidden;
     }
-    .bar-left, .bar-right {
+    .bar-left,
+    .bar-right {
       height: 10px;
       width: 0px;
       margin: 5px 0px;
@@ -37,7 +38,8 @@
       left: 0;
       border-width: 2px 0 2px 2px;
     }
-    .none-left, .none-right {
+    .none-left,
+    .none-right {
       height: 11px;
       border-bottom-width: 2px;
     }
@@ -70,7 +72,8 @@
 
 #assignment-details-dialog-stats-table {
   font-size: 1.2em;
-  th, td {
+  th,
+  td {
     padding: 2px 5px;
     white-space: nowrap;
   }

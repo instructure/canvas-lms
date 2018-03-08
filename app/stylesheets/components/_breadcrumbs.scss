@@ -30,8 +30,12 @@
       @include fontSize(18px);
       // temporary solution for new styles before crumbs are re-done:
       // we do not want to see the home link
-      &:first-of-type { display: none; }
-      &:nth-child(2):before { display: none; }
+      &:first-of-type {
+        display: none;
+      }
+      &:nth-child(2):before {
+        display: none;
+      }
 
       // We need to give the <span class="ellipsis"> a display other than inline so
       // it can do the ellipsis thing. But if we use block or inline-block we get
@@ -53,11 +57,12 @@
 
       + li {
         &:before {
-          content: "";
-          width: 5px; height: 9px;
+          content: '';
+          width: 5px;
+          height: 9px;
           display: inline-block;
           margin: 0 ($ic-sp - 3);
-          background: url("/images/breadcrumb-arrow-light.svg") no-repeat 50% 50%;
+          background: url('/images/breadcrumb-arrow-light.svg') no-repeat 50% 50%;
           background-size: 5px 9px;
         }
         &:last-of-type a {

@@ -1,5 +1,4 @@
-Suspend Callbacks
-=================
+# Suspend Callbacks
 
 ActiveSupport's Callbacks module allows you to define a callback hook
 and then register methods to be run before/after/around that hook.
@@ -15,55 +14,63 @@ won't.
 But what if you want to suspend callbacks, regardless of subclass, but
 only for a duration of time? That's when you want to suspend callbacks.
 
-Example
-=======
+# Example
 
 class MyModel < ActiveRecord::Base
-  include ActiveSupport::Callbacks::Suspension
+include ActiveSupport::Callbacks::Suspension
 
-  before :save, :expensive_callback
-  after :save, :other_callback
+before :save, :expensive_callback
+after :save, :other_callback
 
-  def expensive_callback
-    # stuff
-  end
+def expensive_callback # stuff
+end
 
-  def other_callback
-    # stuff
-  end
+def other_callback # stuff
+end
 end
 
 instance1 = MyModel.new
 instance2 = MyModel.new
 
 MyModel.suspend_callbacks do
-  # neither callback will run for either instance
-  instance1.save
-  instance2.save
+
+# neither callback will run for either instance
+
+instance1.save
+instance2.save
 end
 
 MyModel.suspend_callbacks(kind: :save) do
-  # same
-  instance1.save
-  instance2.save
+
+# same
+
+instance1.save
+instance2.save
 end
 
 MyModel.suspend_callbacks(:expensive_callback) do
-  # expensive_callback won't run, but other_callback will
-  instance1.save
-  instance2.save
+
+# expensive_callback won't run, but other_callback will
+
+instance1.save
+instance2.save
 end
 
 MyModel.suspend_callbacks(type: :before) do
-  # same
-  instance1.save
-  instance2.save
+
+# same
+
+instance1.save
+instance2.save
 end
 
 instance1.suspend_callbacks do
-  # callbacks won't run this time...
-  instance1.save
 
-  # ... but they will this time.
-  instance2.save
+# callbacks won't run this time...
+
+instance1.save
+
+# ... but they will this time.
+
+instance2.save
 end

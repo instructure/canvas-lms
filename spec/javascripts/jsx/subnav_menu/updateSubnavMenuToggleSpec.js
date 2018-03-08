@@ -16,14 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jquery',
-  'jsx/subnav_menu/updateSubnavMenuToggle'
-], ($, updateSubnavMenuToggle) => {
+define(['jquery', 'jsx/subnav_menu/updateSubnavMenuToggle'], ($, updateSubnavMenuToggle) => {
   const container = $('#fixtures')
 
   QUnit.module('SubnavMenuToggle', {
-    setup () {
+    setup() {
       $('<button/>', {
         id: 'courseMenuToggle',
         className: 'Button Button--link Button--small ic-app-course-nav-toggle',
@@ -32,12 +29,12 @@ define([
         ariaLive: 'polite'
       }).appendTo(container)
     },
-    teardown () {
+    teardown() {
       container.empty()
     }
   })
 
-  test('it should toggle the title and aria-label text correctly for show and hide on click', function () {
+  test('it should toggle the title and aria-label text correctly for show and hide on click', function() {
     const subnavMenuToggle = $('#courseMenuToggle')
     subnavMenuToggle.click(() => {
       $('body').toggleClass('course-menu-expanded')
@@ -53,7 +50,7 @@ define([
     equal(subnavMenuToggle.attr('aria-label'), 'Show Navigation Menu')
   })
 
-  test('it should correctly generate title and aria-label text based on the pathname', function () {
+  test('it should correctly generate title and aria-label text based on the pathname', function() {
     const subnavMenuToggle = $('#courseMenuToggle')
 
     subnavMenuToggle.click(updateSubnavMenuToggle('/profile/communication'))

@@ -18,20 +18,20 @@
  */
 
 define(function(require) {
-  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
-  var ScreenReaderContent = require('jsx!./screen_reader_content');
-  var SightedUserContent = require('jsx!./sighted_user_content');
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps')
+  var ScreenReaderContent = require('jsx!./screen_reader_content')
+  var SightedUserContent = require('jsx!./sighted_user_content')
   var Icon = React.createClass({
     getDefaultProps: function() {
       return {
         icon: '',
         alt: null
-      };
+      }
     },
 
     render: function() {
-      var isAccessible = !!this.props.alt;
-      var className = 'ic-Icon ' + this.props.icon;
+      var isAccessible = !!this.props.alt
+      var className = 'ic-Icon ' + this.props.icon
 
       if (isAccessible) {
         content = (
@@ -39,15 +39,14 @@ define(function(require) {
             <ScreenReaderContent>{this.props.alt}</ScreenReaderContent>
             <SightedUserContent tagName="i" className={className} />
           </span>
-        );
-      }
-      else {
-        content = <i className={className} />;
+        )
+      } else {
+        content = <i className={className} />
       }
 
-      return content;
+      return content
     }
-  });
+  })
 
-  return Icon;
-});
+  return Icon
+})

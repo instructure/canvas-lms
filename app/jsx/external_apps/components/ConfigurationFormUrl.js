@@ -26,111 +26,123 @@ import CheckboxInput from '../../external_apps/components/CheckboxInput'
 import 'compiled/jquery.rails_flash_notifications'
 
 export default React.createClass({
-    displayName: 'ConfigurationFormUrl',
+  displayName: 'ConfigurationFormUrl',
 
-    propTypes: {
-      name                                : PropTypes.string,
-      consumerKey                         : PropTypes.string,
-      sharedSecret                        : PropTypes.string,
-      configUrl                           : PropTypes.string,
-      allowMembershipServiceAccess        : PropTypes.bool,
-      membershipServiceFeatureFlagEnabled : PropTypes.bool
-    },
+  propTypes: {
+    name: PropTypes.string,
+    consumerKey: PropTypes.string,
+    sharedSecret: PropTypes.string,
+    configUrl: PropTypes.string,
+    allowMembershipServiceAccess: PropTypes.bool,
+    membershipServiceFeatureFlagEnabled: PropTypes.bool
+  },
 
-    getInitialState: function() {
-      return {
-        errors: {}
-      };
-    },
-
-    isValid() {
-      var fields     = ['name', 'configUrl']
-        , errors     = {}
-        , formErrors = [];
-
-      fields.forEach(function(field) {
-        var value = this.refs[field].state.value;
-        if (!value) {
-          errors[field] = I18n.t('This field is required');
-          formErrors.push(I18n.t('This field "%{name}" is required.', { name: field }));
-        }
-      }.bind(this));
-      this.setState({errors: errors});
-
-      var isValid = true;
-      if (_.keys(errors).length > 0) {
-        isValid = false;
-        $.screenReaderFlashError(I18n.t('There were errors with the form: %{errors}', { errors: formErrors.join(' ')}));
-      }
-      return isValid;
-    },
-
-    getFormData() {
-      var data = {
-        name:             this.refs.name.state.value,
-        consumerKey:      this.refs.consumerKey.state.value,
-        sharedSecret:     this.refs.sharedSecret.state.value,
-        configUrl:        this.refs.configUrl.state.value,
-        verifyUniqueness: 'true'
-      };
-
-      if (this.props.membershipServiceFeatureFlagEnabled) {
-        data.allow_membership_service_access = this.refs.allow_membership_service_access.state.value;
-      }
-
-      return data;
-    },
-
-    renderMembershipServiceOption() {
-      if (this.props.membershipServiceFeatureFlagEnabled) {
-        return <CheckboxInput id="allow_membership_service_access"
-                              ref="allow_membership_service_access"
-                              label={I18n.t('Allow this tool to access the IMS Names and Role Provisioning Service')}
-                              checked={this.props.allowMembershipServiceAccess}
-                              errors={this.state.errors} />
-      }
-    },
-
-    render() {
-      return (
-        <div className="ConfigurationFormUrl">
-          <TextInput
-            ref="name"
-            id="name"
-            defaultValue={this.props.name}
-            label={I18n.t('Name')}
-            required={true}
-            errors={this.state.errors} />
-          <div className="grid-row">
-            <div className="col-xs-6">
-              <TextInput
-                ref="consumerKey"
-                id="consumerKey"
-                defaultValue={this.props.consumerKey}
-                label={I18n.t('Consumer Key')}
-                errors={this.state.errors} />
-            </div>
-            <div className="col-xs-6">
-              <TextInput
-                ref="sharedSecret"
-                id="sharedSecret"
-                defaultValue={this.props.sharedSecret}
-                label={I18n.t('Shared Secret')}
-                errors={this.state.errors} />
-            </div>
-          </div>
-
-          {this.renderMembershipServiceOption()}
-
-          <TextInput
-            ref="configUrl"
-            id="configUrl"
-            defaultValue={this.props.configUrl}
-            label={I18n.t('Config URL')}
-            hintText={I18n.t('Example: https://example.com/config.xml')}
-            required={true}
-            errors={this.state.errors} />
-        </div>
-      );
+  getInitialState: function() {
+    return {
+      errors: {}
     }
-  });
+  },
+
+  isValid() {
+    var fields = ['name', 'configUrl'],
+      errors = {},
+      formErrors = []
+
+    fields.forEach(
+      function(field) {
+        var value = this.refs[field].state.value
+        if (!value) {
+          errors[field] = I18n.t('This field is required')
+          formErrors.push(I18n.t('This field "%{name}" is required.', {name: field}))
+        }
+      }.bind(this)
+    )
+    this.setState({errors: errors})
+
+    var isValid = true
+    if (_.keys(errors).length > 0) {
+      isValid = false
+      $.screenReaderFlashError(
+        I18n.t('There were errors with the form: %{errors}', {errors: formErrors.join(' ')})
+      )
+    }
+    return isValid
+  },
+
+  getFormData() {
+    var data = {
+      name: this.refs.name.state.value,
+      consumerKey: this.refs.consumerKey.state.value,
+      sharedSecret: this.refs.sharedSecret.state.value,
+      configUrl: this.refs.configUrl.state.value,
+      verifyUniqueness: 'true'
+    }
+
+    if (this.props.membershipServiceFeatureFlagEnabled) {
+      data.allow_membership_service_access = this.refs.allow_membership_service_access.state.value
+    }
+
+    return data
+  },
+
+  renderMembershipServiceOption() {
+    if (this.props.membershipServiceFeatureFlagEnabled) {
+      return (
+        <CheckboxInput
+          id="allow_membership_service_access"
+          ref="allow_membership_service_access"
+          label={I18n.t('Allow this tool to access the IMS Names and Role Provisioning Service')}
+          checked={this.props.allowMembershipServiceAccess}
+          errors={this.state.errors}
+        />
+      )
+    }
+  },
+
+  render() {
+    return (
+      <div className="ConfigurationFormUrl">
+        <TextInput
+          ref="name"
+          id="name"
+          defaultValue={this.props.name}
+          label={I18n.t('Name')}
+          required={true}
+          errors={this.state.errors}
+        />
+        <div className="grid-row">
+          <div className="col-xs-6">
+            <TextInput
+              ref="consumerKey"
+              id="consumerKey"
+              defaultValue={this.props.consumerKey}
+              label={I18n.t('Consumer Key')}
+              errors={this.state.errors}
+            />
+          </div>
+          <div className="col-xs-6">
+            <TextInput
+              ref="sharedSecret"
+              id="sharedSecret"
+              defaultValue={this.props.sharedSecret}
+              label={I18n.t('Shared Secret')}
+              errors={this.state.errors}
+            />
+          </div>
+        </div>
+
+        {this.renderMembershipServiceOption()}
+
+        <TextInput
+          ref="configUrl"
+          id="configUrl"
+          defaultValue={this.props.configUrl}
+          label={I18n.t('Config URL')}
+          hintText={I18n.t('Example: https://example.com/config.xml')}
+          required={true}
+          errors={this.state.errors}
+        />
+      </div>
+    )
+  }
+})

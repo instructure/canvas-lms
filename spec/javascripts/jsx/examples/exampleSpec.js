@@ -16,12 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  '../examples/exampleSpecHelper'
-], function (exampleSpecHelper) {
-  QUnit.module('Example JSX Spec');
+define(['../examples/exampleSpecHelper'], function(exampleSpecHelper) {
+  QUnit.module('Example JSX Spec')
 
-  test('this is true', function () {
-    equal(exampleSpecHelper.text, 'Example Text');
-  });
-});
+  test('this is true', function() {
+    equal(exampleSpecHelper.text, 'Example Text')
+  })
+})

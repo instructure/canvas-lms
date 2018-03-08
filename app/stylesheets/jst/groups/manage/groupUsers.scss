@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 .group-user {
   border: 1px solid #ccc;
@@ -37,7 +37,7 @@
   }
   .al-trigger {
     padding: 0;
-    text-align:right;
+    text-align: right;
   }
 }
 
@@ -51,8 +51,8 @@
     color: $ic-icon-link-color;
     font-size: 0.8em;
   }
-  .icon-mini-arrow-down{
-    text-align:left;
+  .icon-mini-arrow-down {
+    text-align: left;
   }
 }
 

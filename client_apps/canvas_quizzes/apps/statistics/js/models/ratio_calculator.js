@@ -17,7 +17,7 @@
  */
 
 define(function() {
-  var MULTIPLE_ANSWERS = 'multiple_answers_question';
+  var MULTIPLE_ANSWERS = 'multiple_answers_question'
 
   /**
    * @member Statistics.Models
@@ -47,30 +47,29 @@ define(function() {
    * @return {Number} A scalar, the ratio.
    */
   return function calculateResponseRatio(answerPool, participantCount, suppl) {
-    var questionType, correctResponseCount;
+    var questionType, correctResponseCount
 
-    participantCount = parseInt(participantCount || 0, 10);
+    participantCount = parseInt(participantCount || 0, 10)
 
     if (participantCount <= 0) {
-      return 0;
+      return 0
     }
 
     if (suppl) {
-      questionType = suppl.questionType;
+      questionType = suppl.questionType
     }
 
     // Multiple-Answer question stats already come served with a "correct"
     // field that denotes the count of students who provided a fully correct
     // answer, so we don't have to calculate anything for it.
     if (MULTIPLE_ANSWERS === questionType) {
-      correctResponseCount = suppl.correctResponseCount || 0;
-    }
-    else {
+      correctResponseCount = suppl.correctResponseCount || 0
+    } else {
       correctResponseCount = answerPool.reduce(function(sum, answer) {
-        return (answer.correct) ? sum + answer.responses : sum;
-      }, 0);
+        return answer.correct ? sum + answer.responses : sum
+      }, 0)
     }
 
-    return parseFloat(correctResponseCount) / participantCount;
-  };
-});
+    return parseFloat(correctResponseCount) / participantCount
+  }
+})

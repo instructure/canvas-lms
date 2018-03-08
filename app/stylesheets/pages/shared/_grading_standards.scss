@@ -59,7 +59,8 @@
   .editing_tr {
     display: none;
   }
-  .min_score, .max_score {
+  .min_score,
+  .max_score {
     width: 100px;
   }
   &.editing {

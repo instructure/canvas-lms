@@ -36,20 +36,20 @@ import tinymce from 'compiled/editor/stocktiny'
 import 'vendor/jquery.ba-tinypubsub'
 
 export default class EditorBoxList {
-  constructor () {
+  constructor() {
     this._textareas = {}
     this._editors = {}
     this._editor_boxes = {}
   }
 
-  _addEditorBox (id, box) {
+  _addEditorBox(id, box) {
     $.publish('editorBox/add', id, box)
     this._editor_boxes[id] = box
     this._editors[id] = tinymce.get(id)
     this._textareas[id] = $(`textarea#${id}`)
   }
 
-  _removeEditorBox (id) {
+  _removeEditorBox(id) {
     delete this._editor_boxes[id]
     delete this._editors[id]
     delete this._textareas[id]
@@ -57,21 +57,21 @@ export default class EditorBoxList {
     if ($.isEmptyObject(this._editors)) $.publish('editorBox/removeAll')
   }
 
-  _getTextArea (id) {
+  _getTextArea(id) {
     if (!this._textareas[id]) {
       this._textareas[id] = $(`textarea#${id}`)
     }
     return this._textareas[id]
   }
 
-  _getEditor (id) {
+  _getEditor(id) {
     if (!this._editors[id]) {
       this._editors[id] = tinymce.get(id)
     }
     return this._editors[id]
   }
 
-  _getEditorBox (id) {
+  _getEditorBox(id) {
     return this._editor_boxes[id]
   }
 }

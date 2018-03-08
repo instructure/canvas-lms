@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "./context_modules2.scss";
+@import './context_modules2.scss';
 
 .cmp-wrapper {
   h2 {
@@ -31,7 +31,7 @@
   }
 
   &.cmp-option__disabled {
-    opacity: .5;
+    opacity: 0.5;
   }
 
   .context_module {
@@ -66,7 +66,7 @@
 
     span:last-child {
       &:after {
-        content: "\00a0\00a0|\00a0\00a0";
+        content: '\00a0\00a0|\00a0\00a0';
       }
     }
 

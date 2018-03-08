@@ -33,7 +33,8 @@
   color: #4f5f6e;
 }
 
-.outcome-details, .outcome-details-dialog {
+.outcome-details,
+.outcome-details-dialog {
   .title {
     @include fontSize(14px);
     padding-bottom: 10px;
@@ -43,7 +44,7 @@
   .chart {
     @include fontSize(11px);
     text-align: center;
-    height: 150px
+    height: 150px;
   }
   .line-graph {
     @include fontSize(10px);
@@ -63,7 +64,7 @@
     }
     .mastery-percentage-guide {
       .tick {
-        stroke: #00B416;
+        stroke: #00b416;
         opacity: 0.5;
       }
       path {
@@ -71,10 +72,10 @@
       }
     }
     .trendline {
-      stroke: #9f9f9f
+      stroke: #9f9f9f;
     }
     svg {
-      background: #f7f7f7
+      background: #f7f7f7;
     }
     .domain {
       fill: none;

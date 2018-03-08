@@ -135,9 +135,24 @@ test('should show modules column', () => {
   a1.set('modules', ['One', 'Two'])
   a2.set('modules', ['Three'])
 
-  ok(view.$('#assignment_1 .modules .tooltip_link').text().match(/Multiple Modules/))
-  ok(view.$('#assignment_1 .modules').text().match(/One\s+Two/))
-  ok(view.$('#assignment_2 .modules').text().match(/Three Module/))
+  ok(
+    view
+      .$('#assignment_1 .modules .tooltip_link')
+      .text()
+      .match(/Multiple Modules/)
+  )
+  ok(
+    view
+      .$('#assignment_1 .modules')
+      .text()
+      .match(/One\s+Two/)
+  )
+  ok(
+    view
+      .$('#assignment_2 .modules')
+      .text()
+      .match(/Three Module/)
+  )
 })
 
 test("should show 'Add Quiz/Test' button if quiz lti is enabled", () => {

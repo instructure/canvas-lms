@@ -16,30 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { mount } from 'enzyme';
-import SubmissionCell from 'compiled/gradezilla/SubmissionCell';
-import AssignmentRowCell from 'jsx/gradezilla/default_gradebook/components/AssignmentRowCell';
+import React from 'react'
+import {mount} from 'enzyme'
+import SubmissionCell from 'compiled/gradezilla/SubmissionCell'
+import AssignmentRowCell from 'jsx/gradezilla/default_gradebook/components/AssignmentRowCell'
 
-QUnit.module('AssignmentRowCell', (suiteHooks) => {
-  let $container;
-  let props;
-  let wrapper;
+QUnit.module('AssignmentRowCell', suiteHooks => {
+  let $container
+  let props
+  let wrapper
 
-  function mountComponent () {
-    return mount(<AssignmentRowCell {...props} />, { attachTo: $container });
+  function mountComponent() {
+    return mount(<AssignmentRowCell {...props} />, {attachTo: $container})
   }
 
-  function simulateKeyDown (keyCode, shiftKey = false) {
-    const event = new Event('keydown');
+  function simulateKeyDown(keyCode, shiftKey = false) {
+    const event = new Event('keydown')
     event.which = keyCode
-    event.shiftKey = shiftKey;
-    return wrapper.node.handleKeyDown(event);
+    event.shiftKey = shiftKey
+    return wrapper.node.handleKeyDown(event)
   }
 
   suiteHooks.beforeEach(() => {
-    $container = document.createElement('div');
-    document.body.appendChild($container);
+    $container = document.createElement('div')
+    document.body.appendChild($container)
 
     props = {
       assignment: {
@@ -58,9 +58,11 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
           }
         },
         grid: {},
-        item: { // student row object
+        item: {
+          // student row object
           id: '1101',
-          assignment_2301: { // submission
+          assignment_2301: {
+            // submission
             user_id: '1101'
           }
         }
@@ -79,13 +81,13 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
         userId: '1101'
       },
       submissionIsUpdating: false
-    };
-  });
+    }
+  })
 
   suiteHooks.afterEach(() => {
-    wrapper.unmount();
-    $container.remove();
-  });
+    wrapper.unmount()
+    $container.remove()
+  })
 
   QUnit.module('#render', () => {
     test('assigns a reference to its child SubmissionCell container', () => {
@@ -212,11 +214,11 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
       })
 
       test('includes editor options when rendering the SubmissionCell', () => {
-        wrapper = mountComponent();
+        wrapper = mountComponent()
         deepEqual(wrapper.node.submissionCell.opts.item, props.editorOptions.item)
-      });
-    });
-  });
+      })
+    })
+  })
 
   QUnit.module('#handleKeyDown', () => {
     QUnit.module('with a GradeInput', hooks => {
@@ -273,48 +275,48 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
       })
 
       test('skips SlickGrid default behavior when tabbing from grade input', () => {
-        wrapper = mountComponent();
-        wrapper.node.submissionCell.focus();
-        const continueHandling = simulateKeyDown(9, false); // tab to tray button trigger
-        strictEqual(continueHandling, false);
-      });
+        wrapper = mountComponent()
+        wrapper.node.submissionCell.focus()
+        const continueHandling = simulateKeyDown(9, false) // tab to tray button trigger
+        strictEqual(continueHandling, false)
+      })
 
       test('skips SlickGrid default behavior when shift-tabbing from tray button', () => {
-        wrapper = mountComponent();
-        wrapper.node.trayButton.focus();
-        const continueHandling = simulateKeyDown(9, true); // shift+tab back to grade input
-        strictEqual(continueHandling, false);
-      });
+        wrapper = mountComponent()
+        wrapper.node.trayButton.focus()
+        const continueHandling = simulateKeyDown(9, true) // shift+tab back to grade input
+        strictEqual(continueHandling, false)
+      })
 
       test('does not skip SlickGrid default behavior when tabbing from tray button', () => {
-        wrapper = mountComponent();
-        wrapper.node.trayButton.focus();
-        const continueHandling = simulateKeyDown(9, false); // tab into next cell
-        equal(typeof continueHandling, 'undefined');
-      });
+        wrapper = mountComponent()
+        wrapper.node.trayButton.focus()
+        const continueHandling = simulateKeyDown(9, false) // tab into next cell
+        equal(typeof continueHandling, 'undefined')
+      })
 
       test('does not skip SlickGrid default behavior when shift-tabbing from grade input', () => {
-        wrapper = mountComponent();
-        wrapper.node.submissionCell.focus();
-        const continueHandling = simulateKeyDown(9, true); // shift+tab back to previous cell
-        equal(typeof continueHandling, 'undefined');
-      });
+        wrapper = mountComponent()
+        wrapper.node.submissionCell.focus()
+        const continueHandling = simulateKeyDown(9, true) // shift+tab back to previous cell
+        equal(typeof continueHandling, 'undefined')
+      })
 
       test('skips SlickGrid default behavior when entering into tray button', () => {
-        wrapper = mountComponent();
-        wrapper.node.trayButton.focus();
-        const continueHandling = simulateKeyDown(13); // enter into tray button
-        strictEqual(continueHandling, false);
-      });
+        wrapper = mountComponent()
+        wrapper.node.trayButton.focus()
+        const continueHandling = simulateKeyDown(13) // enter into tray button
+        strictEqual(continueHandling, false)
+      })
 
       test('does not skip SlickGrid default behavior when pressing enter on grade input', () => {
-        wrapper = mountComponent();
-        wrapper.node.submissionCell.focus();
-        const continueHandling = simulateKeyDown(13); // enter on grade input (commit editor)
-        equal(typeof continueHandling, 'undefined');
-      });
-    });
-  });
+        wrapper = mountComponent()
+        wrapper.node.submissionCell.focus()
+        const continueHandling = simulateKeyDown(13) // enter on grade input (commit editor)
+        equal(typeof continueHandling, 'undefined')
+      })
+    })
+  })
 
   QUnit.module('#focus', () => {
     test('sets focus on the text input for a GradeInput', () => {
@@ -417,12 +419,12 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
   QUnit.module('#componentWillUnmount', () => {
     test('destroys the SubmissionCell when present', () => {
       props.enterGradesAs = 'passFail'
-      wrapper = mountComponent();
-      sinon.spy(wrapper.node.submissionCell, 'destroy');
-      wrapper.unmount();
-      strictEqual(wrapper.node.submissionCell.destroy.callCount, 1);
-    });
-  });
+      wrapper = mountComponent()
+      sinon.spy(wrapper.node.submissionCell, 'destroy')
+      wrapper.unmount()
+      strictEqual(wrapper.node.submissionCell.destroy.callCount, 1)
+    })
+  })
 
   QUnit.module('"Toggle Tray" Button', () => {
     const buttonSelector = '.Grid__AssignmentRowCell__Options button'
@@ -440,17 +442,17 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
     })
 
     test('calls onToggleSubmissionTrayOpen when clicked', () => {
-      props.onToggleSubmissionTrayOpen = sinon.stub();
-      wrapper = mountComponent();
+      props.onToggleSubmissionTrayOpen = sinon.stub()
+      wrapper = mountComponent()
       wrapper.find(buttonSelector).simulate('click')
-      strictEqual(props.onToggleSubmissionTrayOpen.callCount, 1);
-    });
+      strictEqual(props.onToggleSubmissionTrayOpen.callCount, 1)
+    })
 
     test('calls onToggleSubmissionTrayOpen with the student id and assignment id', () => {
-      props.onToggleSubmissionTrayOpen = sinon.stub();
-      wrapper = mountComponent();
+      props.onToggleSubmissionTrayOpen = sinon.stub()
+      wrapper = mountComponent()
       wrapper.find(buttonSelector).simulate('click')
-      deepEqual(props.onToggleSubmissionTrayOpen.getCall(0).args, ['1101', '2301']);
-    });
-  });
-});
+      deepEqual(props.onToggleSubmissionTrayOpen.getCall(0).args, ['1101', '2301'])
+    })
+  })
+})

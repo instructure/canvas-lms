@@ -25,14 +25,14 @@ import UsersToolbar from './UsersToolbar'
 import SearchMessage from './SearchMessage'
 import UserActions from '../actions/UserActions'
 
-const MIN_SEARCH_LENGTH = 3;
+const MIN_SEARCH_LENGTH = 3
 
 export default class UsersPane extends React.Component {
   static propTypes = {
     store: shape({
       getState: func.isRequired,
       dispatch: func.isRequired,
-      subscribe: func.isRequired,
+      subscribe: func.isRequired
     }).isRequired,
     roles: UsersToolbar.propTypes.roles,
     onUpdateQueryParams: func.isRequired,
@@ -41,18 +41,18 @@ export default class UsersPane extends React.Component {
       search_term: string,
       role_filter_id: string
     }).isRequired
-  };
+  }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
-      userList: props.store.getState().userList,
+      userList: props.store.getState().userList
     }
   }
 
   componentDidMount = () => {
-    this.unsubscribe = this.props.store.subscribe(this.handleStateChange);
+    this.unsubscribe = this.props.store.subscribe(this.handleStateChange)
 
     // make page reflect what the querystring params asked for
     const {search_term, role_filter_id} = {...UsersToolbar.defaultProps, ...this.props.queryParams}
@@ -62,11 +62,11 @@ export default class UsersPane extends React.Component {
   }
 
   componentWillUnmount = () => {
-    this.unsubscribe();
+    this.unsubscribe()
   }
 
   handleStateChange = () => {
-    this.setState({userList: this.props.store.getState().userList});
+    this.setState({userList: this.props.store.getState().userList})
   }
 
   handleApplyingSearchFilter = () => {
@@ -81,46 +81,48 @@ export default class UsersPane extends React.Component {
 
   debouncedDispatchApplySearchFilter = _.debounce(this.handleApplyingSearchFilter, 250)
 
-  handleUpdateSearchFilter = (searchFilter) => {
-    this.props.store.dispatch(UserActions.updateSearchFilter({page: null, ...searchFilter}));
-    this.debouncedDispatchApplySearchFilter();
+  handleUpdateSearchFilter = searchFilter => {
+    this.props.store.dispatch(UserActions.updateSearchFilter({page: null, ...searchFilter}))
+    this.debouncedDispatchApplySearchFilter()
   }
 
   handleSubmitEditUserForm = (attributes, id) => {
     this.handleApplyingSearchFilter()
   }
 
-  handleSetPage = (page) => {
+  handleSetPage = page => {
     this.props.store.dispatch(UserActions.updateSearchFilter({page}))
     this.handleApplyingSearchFilter()
   }
 
-  render () {
+  render() {
     const {links, accountId, users, isLoading, errors, searchFilter} = this.state.userList
     return (
       <div>
-        {<UsersToolbar
-          onUpdateFilters={this.handleUpdateSearchFilter}
-          onApplyFilters={this.handleApplyingSearchFilter}
-          errors={errors}
-          {...searchFilter}
-          accountId={accountId.toString()}
-          roles={this.props.roles}
-        />}
+        {
+          <UsersToolbar
+            onUpdateFilters={this.handleUpdateSearchFilter}
+            onApplyFilters={this.handleApplyingSearchFilter}
+            errors={errors}
+            {...searchFilter}
+            accountId={accountId.toString()}
+            roles={this.props.roles}
+          />
+        }
 
-        {!_.isEmpty(users) &&
-        <UsersList
-          userList={this.state.userList}
-          onUpdateFilters={this.handleUpdateSearchFilter}
-          onApplyFilters={this.handleApplyingSearchFilter}
-          accountId={accountId.toString()}
-          users={users}
-          handlers={{
-            handleSubmitEditUserForm: this.handleSubmitEditUserForm,
-          }}
-          permissions={this.state.userList.permissions}
-        />
-          }
+        {!_.isEmpty(users) && (
+          <UsersList
+            userList={this.state.userList}
+            onUpdateFilters={this.handleUpdateSearchFilter}
+            onApplyFilters={this.handleApplyingSearchFilter}
+            accountId={accountId.toString()}
+            users={users}
+            handlers={{
+              handleSubmitEditUserForm: this.handleSubmitEditUserForm
+            }}
+            permissions={this.state.userList.permissions}
+          />
+        )}
 
         <SearchMessage
           collection={{data: users, loading: isLoading, links}}

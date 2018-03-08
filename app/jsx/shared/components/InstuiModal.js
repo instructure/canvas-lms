@@ -36,9 +36,10 @@ to
 import Modal, {ModalBody, ModalFooter} from '../shared/components/InstuiModal'
 ---
 */
-export default function InstuiModal ({label, children, ...otherPropsToPassOnToModal}) {
+export default function InstuiModal({label, children, ...otherPropsToPassOnToModal}) {
   return (
-    <Modal {...otherPropsToPassOnToModal}
+    <Modal
+      {...otherPropsToPassOnToModal}
       label={label}
       closeButtonLabel={I18n.t('Close')}
       applicationElement={() => document.getElementById('application')}

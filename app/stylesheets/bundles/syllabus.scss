@@ -16,20 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+@import 'base/environment';
 
 #syllabus {
   width: 100%;
   table-layout: fixed;
   margin-bottom: 10px;
-  thead th, td {
+  thead th,
+  td {
     text-align: left;
     @include fontSize(14px);
   }
   tr.date {
-
     &.date_passed {
-      > td, > th {
+      > td,
+      > th {
         background-color: $ic-color-medium-light;
       }
     }
@@ -60,7 +61,8 @@
       }
     }
     &.date_passed {
-      td, th {
+      td,
+      th {
         background-color: $ic-color-medium-light;
       }
       &.details {
@@ -69,8 +71,10 @@
     }
     // when you hover over a date on the mini-calendar on the right, it will add the .related
     // class to the row that is showing the assignments for that date
-    &.related, &.selected {
-      td, th {
+    &.related,
+    &.selected {
+      td,
+      th {
         background-color: $ic-bg-light-primary;
       }
     }
