@@ -42,7 +42,7 @@ describe 'Assignments', :pact => true do
           },
           'path' => Pact.term(
             generate: '/api/v1/courses/1/assignments',
-            matcher: /\/api\/v1\/courses\/[0-9]+\/assignments]/
+            matcher: /\/api\/v1\/courses\/[0-9]+\/assignments/
           ),
           query: ''
         ).
