@@ -60,10 +60,16 @@ describe "assignment rubrics" do
 
     it "should add a new rubric", priority: "2", test_id: 56587 do
       get "/courses/#{@course.id}/outcomes"
-      expect_new_page_load do
-        f('#popoverMenu button').click
-        f('[data-reactid*="manage-rubrics"]').click
-      end
+      expect_new_page_load{f(' .manage_rubrics').click}
+
+      # this was originally added in OUT-465. It will eventually be moved over
+      # into the below popover menu, so leaving the blow code in place for
+      # when that happens
+
+      # expect_new_page_load do
+      #   f('#popoverMenu button').click
+      #   f('[data-reactid*="manage-rubrics"]').click
+      # end
       expect do
        f('.add_rubric_link').click
        f('#add_criterion_container a:nth-of-type(1)').click
