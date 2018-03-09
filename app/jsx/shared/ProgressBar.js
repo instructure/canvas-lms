@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import I18n from 'i18n!react_files'
 import classnames from 'classnames'
 
     var ProgressBar = React.createClass({
