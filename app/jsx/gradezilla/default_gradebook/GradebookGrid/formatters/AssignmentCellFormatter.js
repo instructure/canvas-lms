@@ -174,7 +174,7 @@ export default class AssignmentCellFormatter {
 
     if (needsGrading(submission, pendingGradeInfo)) {
       const text = `<span class="screenreader-only">${I18n.t('Needs Grading')}</span>`
-      const icon = '<i class="icon-not-graded icon-Solid"></i>'
+      const icon = '<i class="icon-not-graded icon-Line"></i>'
       return renderTemplate(`${text}${icon}`, options)
     }
 
