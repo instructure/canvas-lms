@@ -43,7 +43,6 @@ module Filters::QuizSubmissions
     end
 
     unless @quiz_submission = scope.where(query).first
-      # TODO: Should be a 404 Not Found, not a 500 error
       raise ActiveRecord::RecordNotFound.new('Quiz Submission not found')
     end
 
@@ -57,7 +56,7 @@ module Filters::QuizSubmissions
 
   def retrieve_quiz_submission_attempt!(attempt)
     unless @quiz_submission = @quiz_submission.model_for_attempt(attempt.to_i)
-      reject! "unable to find a submission with that attempt", 404
+      raise ActiveRecord::RecordNotFound.new('Unable to find a submission with that attempt')
     end
   end
 
