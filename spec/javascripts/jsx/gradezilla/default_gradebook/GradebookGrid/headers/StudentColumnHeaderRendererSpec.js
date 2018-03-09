@@ -40,6 +40,7 @@ QUnit.module('StudentColumnHeaderRenderer', function (suiteHooks) {
       login_handle_name: 'a_jones',
       sis_name: 'Example SIS'
     });
+    sinon.stub(gradebook, 'saveSettings')
     renderer = new StudentColumnHeaderRenderer(gradebook);
   });
 

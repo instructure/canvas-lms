@@ -41,6 +41,7 @@ QUnit.module('AssignmentColumnHeaderRenderer', function (suiteHooks) {
     setFixtureHtml($container);
 
     gradebook = createGradebook();
+    sinon.stub(gradebook, 'saveSettings')
 
     assignment = {
       id: '2301',

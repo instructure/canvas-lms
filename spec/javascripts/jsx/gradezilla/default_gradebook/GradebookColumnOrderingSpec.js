@@ -30,7 +30,6 @@ QUnit.module('Gradebook Grid Column Ordering', function (suiteHooks) {
   let gridSpecHelper;
   let gradebook;
   let dataLoader;
-  let server;
 
   let assignmentGroups;
   let assignments;
@@ -178,7 +177,6 @@ QUnit.module('Gradebook Grid Column Ordering', function (suiteHooks) {
     fakeENV.setup({
       current_user_id: '1101'
     });
-    server = sinon.fakeServer.create();
 
     dataLoader = {
       gotAssignmentGroups: $.Deferred(),
@@ -203,7 +201,6 @@ QUnit.module('Gradebook Grid Column Ordering', function (suiteHooks) {
     gradebook.destroy();
     DataLoader.loadGradebookData.restore();
     DataLoader.getDataForColumn.restore();
-    server.restore();
     fakeENV.teardown();
     $fixture.remove();
   });

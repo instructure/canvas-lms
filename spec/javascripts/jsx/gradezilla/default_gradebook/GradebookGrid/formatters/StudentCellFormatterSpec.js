@@ -31,6 +31,7 @@ QUnit.module('StudentCellFormatter', function (hooks) {
     setFixtureHtml($fixture);
 
     gradebook = createGradebook({});
+    sinon.stub(gradebook, 'saveSettings')
     formatter = new StudentCellFormatter(gradebook);
 
     gradebook.setSections([

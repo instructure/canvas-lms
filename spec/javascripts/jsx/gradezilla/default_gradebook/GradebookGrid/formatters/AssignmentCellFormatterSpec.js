@@ -34,6 +34,7 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
 
     const defaultGradingScheme = [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0.0]]
     gradebook = createGradebook({default_grading_standard: defaultGradingScheme})
+    sinon.stub(gradebook, 'saveSettings')
 
     formatter = new AssignmentCellFormatter(gradebook)
     gradebook.setAssignments({

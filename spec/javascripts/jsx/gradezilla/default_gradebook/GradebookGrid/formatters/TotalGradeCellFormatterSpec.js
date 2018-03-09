@@ -37,6 +37,7 @@ QUnit.module('TotalGradeCellFormatter', function (hooks) {
     sinon.stub(gradebook, 'getTotalPointsPossible').returns(10);
     sinon.stub(gradebook, 'listInvalidAssignmentGroups').returns([]);
     sinon.stub(gradebook, 'listMutedAssignments').returns([]);
+    sinon.stub(gradebook, 'saveSettings')
     formatter = new TotalGradeCellFormatter(gradebook);
 
     grade = { score: 8, possible: 10 };

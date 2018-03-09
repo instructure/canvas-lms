@@ -31,6 +31,7 @@ QUnit.module('AssignmentGroupCellFormatter', function (hooks) {
     setFixtureHtml($fixture);
 
     gradebook = createGradebook();
+    sinon.stub(gradebook, 'saveSettings')
     formatter = new AssignmentGroupCellFormatter(gradebook);
 
     grade = { score: 8, possible: 10 };

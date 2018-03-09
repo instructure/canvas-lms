@@ -40,6 +40,7 @@ QUnit.module('TotalGradeColumnHeaderRenderer', function (suiteHooks) {
     setFixtureHtml($container);
 
     gradebook = createGradebook();
+    sinon.stub(gradebook, 'saveSettings')
     columns = {
       frozen: [{ id: 'student' }],
       scrollable: [{ id: 'assignment_2301' }, { id: 'total_grade' }]

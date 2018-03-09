@@ -30,7 +30,6 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
   let gridSpecHelper;
   let gradebook;
   let dataLoader;
-  let server;
 
   let assignmentGroups;
   let assignments;
@@ -112,6 +111,9 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
 
   function createGradebookAndAddData (options) {
     gradebook = createGradebook(options);
+    sinon.stub(gradebook, 'saveSettings').callsFake((settings, onSuccess = () => {}) => {
+      onSuccess(settings)
+    })
     gradebook.initialize();
     addGridData();
   }
@@ -124,8 +126,6 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
     fakeENV.setup({
       current_user_id: '1101'
     });
-    server = sinon.fakeServer.create({ respondImmediately: true })
-    server.respondWith([200, {}, '{}'])
 
     dataLoader = {
       gotAssignmentGroups: $.Deferred(),
@@ -149,7 +149,6 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
     gradebook.destroy();
     DataLoader.loadGradebookData.restore();
     DataLoader.getDataForColumn.restore();
-    server.restore();
     fakeENV.teardown();
     $fixture.remove();
   });
@@ -434,6 +433,9 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
           ]
         }
       });
+      sinon.stub(gradebook, 'saveSettings').callsFake((settings, onSuccess = () => {}) => {
+        onSuccess(settings)
+      })
     });
 
     test('excludes assignment group columns when setting is disabled', function () {
