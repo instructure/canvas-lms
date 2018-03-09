@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2018 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -7,7 +7,7 @@
  * the terms of the GNU Affero General Public License as published by the Free
  * Software Foundation, version 3 of the License.
  *
- * Canvas is distributed in the hope that they will be useful, but WITHOUT ANY
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
  * details.
@@ -16,16 +16,5 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export function createDynamicUiMiddleware (uiManager) {
-  return store => {
-    uiManager.setStore(store);
-    return next => action => {
-      const beforeState = store.getState();
-      uiManager.handleAction(action);
-      const result = next(action);
-      const afterState = store.getState();
-      if (beforeState === afterState) uiManager.uiStateUnchanged(action);
-      return result;
-    };
-  };
-}
+export * from './scroll-to-last-loaded-new-activity';
+export * from './scroll-to-new-activity';

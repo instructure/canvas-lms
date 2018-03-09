@@ -43,16 +43,47 @@ class MockStore {
   getState = jest.fn(() => ({}))
 }
 
+function mockAnimationClass (callback) {
+  return class MockAnimation {
+    constructor(expectedActions, manager) {
+      this.expectedActions = expectedActions;
+      this.manager = manager;
+      callback(this);
+    }
+    isReady = jest.fn()
+    acceptAction = jest.fn()
+    invokeUiWillUpdate = jest.fn()
+    invokeUiDidUpdate = jest.fn()
+    reset = jest.fn()
+  };
+}
+
+function defaultMockActionsToAnimations (animations) {
+  const push = inst => animations.push(inst);
+  return [
+    {expected: ['first-mock-action'], animation: mockAnimationClass(push)},
+    {expected: ['second-mock-action'], animation: mockAnimationClass(push)},
+  ];
+}
+
 function createManagerWithMocks (opts = {}) {
+  let animations = [];
   opts = Object.assign({
     animator: new MockAnimator(),
     document: new MockDocument(),
+    actionsToAnimations: defaultMockActionsToAnimations(animations),
   }, opts);
   const manager = new Manager(opts);
   const store = new MockStore();
   manager.setStore(store);
   manager.setStickyOffset(42);
-  return {manager, animator: opts.animator, doc: opts.document, store };
+  return {
+    manager,
+    animator: opts.animator,
+    doc: opts.document,
+    store,
+    animations,
+  };
 }
 
 function registerStandardDays (manager, opts = {}) {
@@ -144,6 +175,42 @@ describe('action handling', () => {
     ));
     expect(srAlertMock).toHaveBeenCalled();
   });
+
+  it('dispatches actions to the animations', () => {
+    const {manager, animations} = createManagerWithMocks();
+    const theAction = {type: 'some-action'};
+    manager.handleAction(theAction);
+    animations.forEach((animation) => {
+      expect(animation.acceptAction).toHaveBeenCalledWith(theAction);
+    });
+  });
+
+  it('calls invokeUiWillUpdate lifecycle methods on ready animations', () => {
+    const {manager, animations} = createManagerWithMocks();
+    animations[1].isReady.mockReturnValue(true);
+    manager.preTriggerUpdates();
+    expect(animations[0].invokeUiWillUpdate).not.toHaveBeenCalled();
+    expect(animations[1].invokeUiWillUpdate).toHaveBeenCalled();
+  });
+
+  it('calls invokeUiDidUpdate lifecycle methods on ready animations', () => {
+    const {manager, animations} = createManagerWithMocks();
+    animations[1].isReady.mockReturnValue(true);
+    manager.triggerUpdates();
+    expect(animations[0].invokeUiDidUpdate).not.toHaveBeenCalled();
+    expect(animations[1].invokeUiDidUpdate).toHaveBeenCalled();
+  });
+
+  it('calls both invokeUiWillUpdate and invokeUiDidUpdate when the ui state is unchanged', () => {
+    const {manager, animations} = createManagerWithMocks();
+    animations[0].isReady.mockReturnValue(true);
+    const theAction = {some: 'action'};
+    manager.uiStateUnchanged(theAction);
+    expect(animations[0].invokeUiWillUpdate).toHaveBeenCalled();
+    expect(animations[0].invokeUiDidUpdate).toHaveBeenCalled();
+    expect(animations[1].invokeUiWillUpdate).not.toHaveBeenCalled();
+    expect(animations[1].invokeUiDidUpdate).not.toHaveBeenCalled();
+  });
 });
 
 describe('getting past items', () => {
@@ -158,66 +225,6 @@ describe('getting past items', () => {
     expect(animator.recordFixedElement).toHaveBeenCalledWith('fixed-element');
     manager.triggerUpdates();
     expect(animator.maintainViewportPosition).toHaveBeenCalled();
-  });
-});
-
-describe('getting new activity', () => {
-  it('just scrolls when a new activity indicator is above the screen', () => {
-    const {manager, animator, store} = createManagerWithMocks();
-    registerStandardDays(manager);
-    animator.isAboveScreen.mockReturnValueOnce(false).mockReturnValueOnce(true);
-    manager.triggerUpdates(53);
-    manager.handleAction(scrollToNewActivity());
-    expect(animator.isAboveScreen).toHaveBeenCalledWith('scrollable-nai-day-2-group-2', 42 + 53);
-    expect(animator.isAboveScreen).toHaveBeenCalledWith('scrollable-nai-day-2-group-1', 42 + 53);
-    expect(animator.scrollTo).toHaveBeenCalledWith('scrollable-nai-day-2-group-1', 42 + 53);
-    expect(store.dispatch).not.toHaveBeenCalled();
-  });
-
-  it('dispatches loadPastUntilNewActivity when items need to be loaded', () => {
-    const {manager, store} = createManagerWithMocks();
-    manager.handleAction(scrollToNewActivity({additionalOffset: 53}));
-    expect(store.dispatch).toHaveBeenCalled();
-    const thunk = store.dispatch.mock.calls[0][0];
-    expect(thunk(store.dispatch, store.getState)).toEqual('loadPastUntilNewActivity');
-  });
-
-  it('does animations when getting new activity requires loading', () => {
-    const {manager, animator} = createManagerWithMocks();
-    manager.handleAction(scrollToNewActivity());
-    manager.preTriggerUpdates('fixed-element', 'app');
-    manager.triggerUpdates(53);
-    expect(animator.maintainViewportPosition).toHaveBeenCalled();
-    expect(animator.scrollToTop).toHaveBeenCalled();
-
-    manager.handleAction(gettingPastItems({seekingNewActivity: true}));
-    manager.handleAction(gotItemsSuccess([
-        {uniqueId: 'day-0-group-2-item-2'},
-        {uniqueId: 'day-0-group-1-item-1', newActivity: true},
-    ]));
-    registerStandardDays(manager);
-    manager.preTriggerUpdates('fixed-element-again', 'app');
-    manager.triggerUpdates(53);
-    expect(animator.maintainViewportPosition).toHaveBeenCalled();
-    expect(animator.focusElement).toHaveBeenCalledWith('focusable-day-0-group-1');
-    expect(animator.scrollTo).toHaveBeenCalledWith('scrollable-nai-day-0-group-1', 42 + 53);
-  });
-
-  it('handles the case when there is no new activity in the new items', () => {
-    const {manager, animator} = createManagerWithMocks();
-    manager.handleAction(scrollToNewActivity({additionalOffset: 53}));
-    manager.handleAction(gettingPastItems({seekingNewActivity: true}));
-    manager.handleAction(gotItemsSuccess([
-      {uniqueId: 'day-0-group-0-item0'},
-    ]));
-    registerStandardDays(manager);
-    manager.preTriggerUpdates('fixed-element', 'app');
-    manager.triggerUpdates();
-    // can still maintain the viewport position for the new load
-    expect(animator.maintainViewportPosition).toHaveBeenCalled();
-    // other animations don't happen because we don't know what to animate to.
-    expect(animator.focusElement).not.toHaveBeenCalled();
-    expect(animator.scrollTo).not.toHaveBeenCalled();
   });
 });
 
@@ -374,7 +381,7 @@ describe('update handling', () => {
 describe('managing nai scroll position', () => {
   function naiFixture (naiAboveScreen) {
     const {manager, store} = createManagerWithMocks();
-    store.getState.mockReturnValue({ui: {naiAboveScreen}})
+    store.getState.mockReturnValue({ui: {naiAboveScreen}});
     const gbcr = jest.fn();
     const nai = {
       getScrollable () {
