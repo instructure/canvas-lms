@@ -266,6 +266,7 @@ END
           courses_with_feature = relevant_courses.merge(new_gradebook_feature_flag)
 
           if accounts_with_feature.exists? || courses_with_feature.exists?
+            transitions['off'] ||= {}
             transitions['off']['locked'] = true
             transitions['off']['warning'] =
               I18n.t("This feature can't be disabled because there is at least one sub-account or course with this feature enabled.")
