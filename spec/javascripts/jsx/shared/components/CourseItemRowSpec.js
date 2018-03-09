@@ -134,8 +134,8 @@ test('renders no avatar if showAvatar: false', () => {
 
 test('renders unread indicator if isRead: false', () => {
   const tree = mount(<CourseItemRow {...makeProps({ isRead: false })} />)
-  const rowNode = tree.find('.ic-item-row')
-  ok(rowNode.hasClass('ic-item-row__unread'))
+  const rowNode = tree.find('Badge')
+  ok(rowNode.exists())
 
   const srNode = tree.find('.ic-item-row__content-col ScreenReaderContent')
   ok(srNode.exists())

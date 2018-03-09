@@ -60,7 +60,28 @@ test('renders UnreadBadge if discussion has replies > 0', () => {
   ok(node.exists())
 })
 
-test('renders UnreadBadge if discussion has replies == 0', () => {
+test('does not render UnreadBadge if discussion has replies == 0', () => {
+  const discussion = { discussion_subentry_count: 0 }
+  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const node = tree.find('UnreadBadge')
+  notOk(node.exists())
+})
+
+test('renders ReadBadge if discussion is unread', () => {
+  const discussion = { read_state: "unread" }
+  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const node = tree.find('Badge')
+  ok(node.exists())
+})
+
+test('does not render ReadBadge if discussion is read', () => {
+  const discussion = { read_state: "read" }
+  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const node = tree.find('Badge')
+  notOk(node.exists())
+})
+
+test('renders ReadBadge if discussion has replies == 0', () => {
   const discussion = { discussion_subentry_count: 0 }
   const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
   const node = tree.find('UnreadBadge')

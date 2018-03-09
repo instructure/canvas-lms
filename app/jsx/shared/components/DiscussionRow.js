@@ -24,7 +24,9 @@ import 'jquery.instructure_date_and_time'
 
 import { DragSource } from 'react-dnd';
 import Container from '@instructure/ui-core/lib/components/Container'
+import Badge from '@instructure/ui-core/lib/components/Badge'
 import Text from '@instructure/ui-core/lib/components/Text'
+import Grid, { GridCol, GridRow} from '@instructure/ui-core/lib/components/Grid'
 import { MenuItem } from '@instructure/ui-core/lib/components/Menu'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import IconTimer from 'instructure-icons/lib/Line/IconTimerLine'
@@ -214,58 +216,72 @@ export default function DiscussionRow ({ discussion, masterCourseData, rowRef, o
   contentWrapper.innerHTML = discussion.message
   const textContent = contentWrapper.textContent.trim()
   return connectDragPreview (
-    <span>
-      <CourseItemRow
-        ref={rowRef}
-        className="ic-discussion-row"
-        key={discussion.id}
-        id={discussion.id}
-        focusOn={discussion.focusOn}
-        draggable={draggable}
-        connectDragSource={connectDragSource}
-        icon={
-          <Text color={draggable ? "success" : "secondary"} size="large">
-            <IconAssignmentLine />
-          </Text>
-        }
-        isRead={discussion.read_state === 'read'}
-        author={discussion.author}
-        title={discussion.title}
-        body={textContent ? <div className="ic-discussion-row__content">{textContent}</div> : null}
-        sectionToolTip={
-          <SectionsTooltip
-            totalUserCount={discussion.user_count}
-            sections={discussion.sections}
-          />
-        }
-        itemUrl={discussion.html_url}
-        onSelectedChanged={onSelectedChanged}
-        showManageMenu={canManage}
-        onManageMenuSelect={onManageDiscussion}
-        clearFocusDirectives={cleanDiscussionFocus}
-        manageMenuOptions={menuList}
-        masterCourse={{
-          courseData: masterCourseData || {},
-          getLockOptions: () => ({
-            model: new DiscussionModel(discussion),
-            unlockedText: I18n.t('%{title} is unlocked. Click to lock.', {title: discussion.title}),
-            lockedText: I18n.t('%{title} is locked. Click to unlock', {title: discussion.title}),
-            course_id: masterCourseData.masterCourse.id,
-            content_id: discussion.id,
-            content_type: 'discussion_topic',
-          }),
-        }}
-        metaContent={
-          <div>
-            <span className="ic-item-row__meta-content-heading">
-              <Text size="small" as="p">{timestamp.title}</Text>
-            </span>
-            <Text color="secondary" size="small" as="p">{$.datetimeString(timestamp.date, {format: 'medium'})}</Text>
-          </div>
-        }
-        actionsContent={[readCount, subscribeButton, publishButton]}
-      />
-    </span>
+    <div>
+      <Grid startAt="medium" vAlign="middle" colSpacing="none">
+        <GridRow>
+          {/* discussion topics is different for badges so we use our own read indicator instead of passing to isRead */}
+          <GridCol width="auto">
+            {!(discussion.read_state === "read")
+            ? <Badge margin="0 small x-small 0" standalone type="notification" />
+            : <Container display="block" margin="0 small x-small 0">
+            <Container display="block" margin="0 small x-small 0" />
+          </Container>}
+          </GridCol>
+          <GridCol>
+            <CourseItemRow
+              ref={rowRef}
+              className="ic-discussion-row"
+              key={discussion.id}
+              id={discussion.id}
+              focusOn={discussion.focusOn}
+              draggable={draggable}
+              connectDragSource={connectDragSource}
+              icon={
+                <Text color={draggable ? "success" : "secondary"} size="large">
+                  <IconAssignmentLine />
+                </Text>
+              }
+              isRead
+              author={discussion.author}
+              title={discussion.title}
+              body={textContent ? <div className="ic-discussion-row__content">{textContent}</div> : null}
+              sectionToolTip={
+                <SectionsTooltip
+                  totalUserCount={discussion.user_count}
+                  sections={discussion.sections}
+                />
+              }
+              itemUrl={discussion.html_url}
+              onSelectedChanged={onSelectedChanged}
+              showManageMenu={canManage}
+              onManageMenuSelect={onManageDiscussion}
+              clearFocusDirectives={cleanDiscussionFocus}
+              manageMenuOptions={menuList}
+              masterCourse={{
+                courseData: masterCourseData || {},
+                getLockOptions: () => ({
+                  model: new DiscussionModel(discussion),
+                  unlockedText: I18n.t('%{title} is unlocked. Click to lock.', {title: discussion.title}),
+                  lockedText: I18n.t('%{title} is locked. Click to unlock', {title: discussion.title}),
+                  course_id: masterCourseData.masterCourse.id,
+                  content_id: discussion.id,
+                  content_type: 'discussion_topic',
+                }),
+              }}
+              metaContent={
+                <div>
+                  <span className="ic-item-row__meta-content-heading">
+                    <Text size="small" as="p">{timestamp.title}</Text>
+                  </span>
+                  <Text color="secondary" size="small" as="p">{$.datetimeString(timestamp.date, {format: 'medium'})}</Text>
+                </div>
+              }
+              actionsContent={[readCount, subscribeButton, publishButton]}
+            />
+          </GridCol>
+        </GridRow>
+      </Grid>
+    </div>
   )
 }
 

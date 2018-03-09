@@ -159,6 +159,7 @@ export default function AnnouncementRow (
       showManageMenu={canManage}
       onManageMenuSelect={onManageMenuSelect}
       manageMenuOptions={canManage && MenuList || null}
+      hasReadBadge
     />
   )
 }

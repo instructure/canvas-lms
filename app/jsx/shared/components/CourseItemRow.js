@@ -23,6 +23,7 @@ import cx from 'classnames'
 
 import Heading from '@instructure/ui-core/lib/components/Heading'
 import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
+import Container from '@instructure/ui-core/lib/components/Container'
 import Avatar from '@instructure/ui-core/lib/components/Avatar'
 import Badge from '@instructure/ui-core/lib/components/Badge'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
@@ -65,6 +66,7 @@ export default class CourseItemRow extends Component {
     replyButton: node,
     focusOn: oneOf(['title', 'manageMenu']),
     clearFocusDirectives: func, // Required if focusOn is provided
+    hasReadBadge: bool,
   }
 
   static defaultProps = {
@@ -95,7 +97,8 @@ export default class CourseItemRow extends Component {
     sectionToolTip: null,
     replyButton: null,
     focusOn: null,
-    clearFocusDirectives: () => {}
+    clearFocusDirectives: () => {},
+    hasReadBadge: false
   }
 
   state = {
@@ -165,9 +168,7 @@ export default class CourseItemRow extends Component {
   }
 
   render () {
-    const classes = cx('ic-item-row', {
-      'ic-item-row__unread': !this.props.isRead,
-    })
+    const classes = cx('ic-item-row')
     return (
       <div className={`${classes} ${this.props.className}`}>
         {(this.props.draggable && this.props.connectDragSource && <div className="ic-item-row__drag-col">
@@ -179,13 +180,18 @@ export default class CourseItemRow extends Component {
             </span>, {dropEffect: 'copy'})
           }
         </div>)}
-        {(this.props.icon &&
-        <div className={this.props.draggable ? "ic-item-row__icon-col-teacher" : "ic-item-row__icon-col-student"}>
-          {!this.props.isRead ?
-            <Badge margin="0 small 0 0 " standalone type="notification" />
-          : null}
-          {this.props.icon}
-        </div>)}
+        {
+          !this.props.isRead ? (
+            <Container display="block" margin="0 medium 0 0">
+              <Badge margin="0 0 0 0" standalone type="notification" />
+            </Container>
+          ) : this.props.hasReadBadge ? (
+            <Container display="block" margin="0 small 0 0">
+              <Container display="block" margin="0 medium 0 0" />
+            </Container>
+          ) : null
+        }
+        {this.props.icon}
         {(this.props.selectable && <div className="ic-item-row__select-col">
           <Checkbox
             defaultChecked={this.props.defaultSelected}

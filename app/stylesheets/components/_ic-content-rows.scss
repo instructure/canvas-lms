@@ -39,17 +39,6 @@
   justify-content: space-between;
   align-items: center;
   position: relative;
-
-  &.ic-item-row__unread:before {
-    content: '';
-    display: block;
-    position: absolute;
-    left: -25px;
-    width: 12px;
-    height: 12px;
-    background: $electric;
-    border-radius: 50%;
-  }
 }
 
 .ic-item-row__content-link {
