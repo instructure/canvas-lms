@@ -39,13 +39,17 @@ $el.html(browserTemplate({
   contextUrlRoot: ENV.CONTEXT_URL_ROOT
 }))
 
-ReactDOM.render(
-  <OutcomesActionsPopoverMenu
-    contextUrlRoot={ENV.CONTEXT_URL_ROOT}
-    permissions={ENV.PERMISSIONS}
-  />,
-  $el.find('#popoverMenu')[0]
-)
+// The below functionality and its accompanying DOM element (popover-menu)
+// have been disabled since the feature has been shelved for now. However,
+// it's still on the roadmap eventually.
+
+// ReactDOM.render(
+//   <OutcomesActionsPopoverMenu
+//     contextUrlRoot={ENV.CONTEXT_URL_ROOT}
+//     permissions={ENV.PERMISSIONS}
+//   />,
+//   $el.find('#popoverMenu')[0]
+// )
 
 export const toolbar = new ToolbarView({el: $el.find('.toolbar')})
 
