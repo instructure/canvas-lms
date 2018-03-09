@@ -35,6 +35,14 @@ describe OutcomeImportsApiController, type: :request do
     json
   end
 
+  it "should return 404 when no latest import is available" do
+    raw_api_call(:get,
+          "/api/v1/accounts/#{@account.id}/outcome_imports/latest",
+          { :controller => 'outcome_imports_api', :action => 'show',
+            :format => 'json', :account_id => @account.id.to_s, id: 'latest' })
+    assert_status(404)
+  end
+
   it 'should kick off an outcome import via multipart attachment' do
     json = nil
     strand = "OutcomeImport::run::#{@account.root_account.global_id}"
