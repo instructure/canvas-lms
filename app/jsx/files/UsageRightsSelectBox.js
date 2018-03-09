@@ -16,9 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import React from 'react'
+import ReactDOM from 'react-dom'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!react_files'
-import UsageRightsSelectBox from 'compiled/react_files/components/UsageRightsSelectBox'
+import filesEnv from 'compiled/react_files/modules/filesEnv'
+
+function omitEmptyValues(obj) {
+  Object.keys(obj).forEach(k => {
+    if (obj[k] == null) delete obj[k]
+  })
+  return obj
+}
 
 const CONTENT_OPTIONS = [
   {
@@ -47,7 +57,82 @@ const CONTENT_OPTIONS = [
   }
 ]
 
-  UsageRightsSelectBox.renderContentOptions = function() {
+export default class UsageRightsSelectBox extends React.Component {
+  propTypes = {
+    use_justification: PropTypes.oneOf(Object.values(CONTENT_OPTIONS).map(o => o.value)),
+    copyright: PropTypes.string,
+    showMessage: PropTypes.bool,
+    contextType: PropTypes.string,
+    contextId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  }
+
+  state = {
+    showTextBox: this.props.use_justification !== 'choose',
+    showCreativeCommonsOptions:
+      this.props.use_justification === 'creative_commons' && this.props.copyright != null,
+    licenseOptions: [],
+    showMessage: this.props.showMessage,
+    usageRightSelectionValue: this.props.use_justification
+      ? this.props.use_justification
+      : undefined
+  }
+
+  componentDidMount() {
+    this.getUsageRightsOptions()
+  }
+
+  apiUrl() {
+    return `/api/v1/${filesEnv.contextType || this.props.contextType}/${filesEnv.contextId ||
+      this.props.contextId}/content_licenses`
+  }
+
+  // Exposes the selected values to the outside world.
+  getValues() {
+    let x
+    const obj = {
+      use_justification: ReactDOM.findDOMNode(this.refs.usageRightSelection).value,
+      copyright: this.state.showTextBox
+        ? (x = ReactDOM.findDOMNode(this.refs.copyright)) && x.value
+        : undefined,
+      cc_license: this.state.showCreativeCommonsOptions
+        ? (x = ReactDOM.findDOMNode(this.refs.creativeCommons)) && x.value
+        : undefined
+    }
+
+    return omitEmptyValues(obj)
+  }
+
+  getUsageRightsOptions() {
+    return $.get(this.apiUrl(), data => {
+      this.setState({
+        licenseOptions: data
+      })
+    })
+  }
+
+  handleChange(event) {
+    this.setState({
+      usageRightSelectionValue: event.target.value,
+      showTextBox: event.target.value !== 'choose',
+      showCreativeCommonsOptions: event.target.value === 'creative_commons',
+      showMessage: this.props.showMessage && event.target.value === 'choose'
+    })
+  }
+
+  // This method only really applies to firefox which doesn't handle onChange
+  // events on select boxes like every other browser.
+  handleChooseKeyPress(event) {
+    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+      this.setState(
+        {
+          usageRightSelectionValue: event.target.value
+        },
+        this.handleChange(event)
+      )
+    }
+  }
+
+  renderContentOptions() {
     return CONTENT_OPTIONS.map(contentOption => (
       <option key={contentOption.value} value={contentOption.value}>
         {contentOption.display}
@@ -55,7 +140,7 @@ const CONTENT_OPTIONS = [
     ))
   }
 
-  UsageRightsSelectBox.renderCreativeCommonsOptions = function() {
+  renderCreativeCommonsOptions() {
     const onlyCC = this.state.licenseOptions.filter(license => license.id.indexOf('cc') === 0)
 
     return onlyCC.map(license => (
@@ -65,7 +150,7 @@ const CONTENT_OPTIONS = [
     ))
   }
 
-  UsageRightsSelectBox.renderShowCreativeCommonsOptions = function() {
+  renderShowCreativeCommonsOptions() {
     const renderShowCreativeCommonsOptions = (
       <div className="control-group">
         <label className="control-label" htmlFor="creativeCommonsSelection">
@@ -86,7 +171,7 @@ const CONTENT_OPTIONS = [
     return this.state.showCreativeCommonsOptions ? renderShowCreativeCommonsOptions : null
   }
 
-  UsageRightsSelectBox.renderShowMessage = function() {
+  renderShowMessage() {
     const renderShowMessage = (
       <div ref="showMessageAlert" className="alert">
         <span>
@@ -102,7 +187,7 @@ const CONTENT_OPTIONS = [
     return this.state.showMessage ? renderShowMessage : null
   }
 
-  UsageRightsSelectBox.render = function() {
+  render() {
     return (
       <div className="UsageRightsSelectBox__container">
         <div className="control-group">
@@ -113,8 +198,8 @@ const CONTENT_OPTIONS = [
             <select
               id="usageRightSelector"
               className="UsageRightsSelectBox__select"
-              onChange={this.handleChange}
-              onKeyUp={this.handleChooseKeyPress}
+              onChange={e => this.handleChange(e)}
+              onKeyUp={e => this.handleChooseKeyPress(e)}
               ref="usageRightSelection"
               value={this.state.usageRightSelectionValue}
             >
@@ -132,7 +217,7 @@ const CONTENT_OPTIONS = [
               id="copyrightHolder"
               type="text"
               ref="copyright"
-              defaultValue={this.props.copyright && this.props.copyright}
+              defaultValue={this.props.copyright}
               placeholder={I18n.t('(c) 2001 Acme Inc.')}
             />
           </div>
@@ -141,5 +226,4 @@ const CONTENT_OPTIONS = [
       </div>
     )
   }
-
-export default React.createClass(UsageRightsSelectBox)
+}

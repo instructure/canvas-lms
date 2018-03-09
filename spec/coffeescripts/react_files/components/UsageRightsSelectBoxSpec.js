@@ -18,28 +18,23 @@
 
 import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
+import {shallow, mount} from 'enzyme'
 import UsageRightsSelectBox from 'jsx/files/UsageRightsSelectBox'
 
 QUnit.module('UsageRightsSelectBox', {
-  setup() {},
   teardown() {
     return $('div.error_box').remove()
   }
 })
 
 test('shows alert message if nothing is chosen and component is setup for a message', () => {
-  const props = {showMessage: true}
-  const uRSB = TestUtils.renderIntoDocument(<UsageRightsSelectBox {...props} />)
-  ok(uRSB.refs.showMessageAlert !== undefined, 'message is being shown')
-  ReactDOM.unmountComponentAtNode(uRSB.getDOMNode().parentNode)
+  const wrapper = shallow(<UsageRightsSelectBox showMessage />)
+  ok(wrapper.find('.alert').text().includes("If you do not select usage rights now, this file will be unpublished after it's uploaded."), 'message is being shown')
 })
 
 test('fetches license options when component mounts', () => {
   const server = sinon.fakeServer.create()
-  const props = {showMessage: false}
-  const uRSB = TestUtils.renderIntoDocument(<UsageRightsSelectBox {...props} />)
+  const wrapper = mount(<UsageRightsSelectBox showMessage={false} />)
   server.respond('GET', '', [
     200,
     {'Content-Type': 'application/json'},
@@ -50,28 +45,25 @@ test('fetches license options when component mounts', () => {
       }
     ])
   ])
-  equal(uRSB.state.licenseOptions[0].id, 'cc_some_option', 'sets data just fine')
+  equal(wrapper.instance().state.licenseOptions[0].id, 'cc_some_option', 'sets data just fine')
   server.restore()
-  ReactDOM.unmountComponentAtNode(uRSB.getDOMNode().parentNode)
 })
 
 test('inserts copyright into textbox when passed in', () => {
   const copyright = 'all dogs go to taco bell'
-  const props = {copyright}
-  const uRSB = TestUtils.renderIntoDocument(<UsageRightsSelectBox {...props} />)
-  equal(uRSB.refs.copyright.getDOMNode().value, copyright)
-  ReactDOM.unmountComponentAtNode(uRSB.getDOMNode().parentNode)
+  const wrapper = shallow(<UsageRightsSelectBox copyright={copyright} />)
+  equal(wrapper.find('#copyrightHolder').find('input').prop('defaultValue'), copyright)
+
 })
 
 test('shows creative commons options when set up', () => {
   const server = sinon.fakeServer.create()
-  const cc_value = 'helloooo_nurse'
   const props = {
     copyright: 'loony',
     use_justification: 'creative_commons',
-    cc_value
+    cc_value: 'helloooo_nurse'
   }
-  const uRSB = TestUtils.renderIntoDocument(<UsageRightsSelectBox {...props} />)
+  const wrapper = mount(<UsageRightsSelectBox {...props} />)
   server.respond('GET', '', [
     200,
     {'Content-Type': 'application/json'},
@@ -82,11 +74,11 @@ test('shows creative commons options when set up', () => {
       }
     ])
   ])
+
   equal(
-    uRSB.refs.creativeCommons.getDOMNode().value,
+    wrapper.instance().refs.creativeCommons.value,
     'cc_some_option',
     'shows creative commons option'
   )
   server.restore()
-  ReactDOM.unmountComponentAtNode(uRSB.getDOMNode().parentNode)
 })
