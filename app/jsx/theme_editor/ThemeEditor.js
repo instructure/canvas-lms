@@ -312,7 +312,7 @@ export default class ThemeEditor extends React.Component {
     $.ajax({
       url: `/accounts/${this.props.accountID}/brand_configs/save_to_account`,
       type: 'POST',
-      data: new FormData(this.refs.ThemeEditorForm.getDOMNode()),
+      data: new FormData(this.ThemeEditorForm.getDOMNode()),
       processData: false,
       contentType: false,
       dataType: 'json'

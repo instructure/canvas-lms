@@ -80,6 +80,7 @@ $ic-tooltip-arrow-size: 0.375rem;
   &.ic-app-header__menu-list-item--active {
     .ic-app-header__menu-list-link {
       background: $ic-color-light;
+      outline: 1px solid $ic-color-light;
 
       body:not(.primary-nav-expanded) & {
         &:hover, &:focus {
@@ -90,6 +91,9 @@ $ic-tooltip-arrow-size: 0.375rem;
             opacity: 0;
           }
         }
+      }
+      &:focus {
+        border-color: var(--ic-brand-global-nav-menu-item__text-color--active);
       }
     }
     .ic-icon-svg {
@@ -116,6 +120,8 @@ $ic-tooltip-arrow-size: 0.375rem;
   text-align: center;
   display: block;
   color: var(--ic-brand-global-nav-menu-item__text-color);
+  margin: 2px 1px;
+  border: 2px solid transparent;
 
   &:not(.ic-app-header__menu-list-link--nav-toggle) {
     padding: 0.25rem 0;
@@ -125,21 +131,17 @@ $ic-tooltip-arrow-size: 0.375rem;
   }
 
   &.ic-app-header__menu-list-link--nav-toggle {
-    height: 2.5rem;
+    width: 100%;
     perspective: 600px;
 
     .ic-icon-svg--navtoggle {
-      position: absolute;
-      left: 50%;
-      margin-left: -13px;
-      top: 50%;
-      margin-top: -10px;
       transition: all 0.4s;
     }
   }
 
   &:hover, &:focus {
     background-color: $ic-global-nav-link-hover;
+    outline-color: var(--ic-brand-global-nav-bgd);
     @if $use_high_contrast == false {
       text-decoration: none;
       outline: none;
@@ -152,6 +154,10 @@ $ic-tooltip-arrow-size: 0.375rem;
       transform: translate3d($ic-tooltip-arrow-size, 0, 0);
       opacity: 1;
     }
+  }
+
+  &:focus {
+    border-color: var(--ic-brand-global-nav-menu-item__text-color);
   }
 
   &:active {
@@ -193,9 +199,9 @@ $ic-tooltip-arrow-size: 0.375rem;
 
 button.ic-app-header__menu-list-link {
   background: transparent;
-  border: none;
-  width: 100%;
   outline: none;
+  margin: 1px auto;
+  border: 2px solid transparent;
 }
 
 .ic-avatar {
@@ -290,22 +296,30 @@ button.ic-app-header__menu-list-link {
 
 .ic-app-header__logomark {
   display: block;
-  width: 100%;
   overflow: hidden;
-  margin: 0 auto;
+  margin: 2px 1px;
+  border: 2px solid transparent;
   background-image: var(--ic-brand-header-image);
   background-position: 50%;
   background-repeat: no-repeat;
-  background-size: contain;
+  background-size: cover;
   transition: transform 0.3s;
   height: 75px;
 
   body.primary-nav-expanded & {
     height: 85px;
   }
+  &:focus {
+    border-color: var(--ic-brand-global-nav-menu-item__text-color);
+    outline-style: none;
+  }
 }
 // set to block to avoid any exta inline spacing at bottom
 .ic-app-header__uploaded-logo { display: block; }
+
+.ic-app-header__menu-list-link {
+  padding: 0.5625rem 0;
+}
 
 // stuff that changes when the nav is expanded
 body.primary-nav-expanded {
@@ -331,16 +345,12 @@ body.primary-nav-expanded {
         color: var(--ic-link-color);
       }
       @else {
-        color: var(--ic-brand-global-nav-menu-item__text-color--active);
+        color: $ic-course-sidenav_list-item--active-font-color;
       }
     }
   }
 
   .ic-app-header__menu-list-link {
-    &:not(.ic-app-header__menu-list-link--nav-toggle) {
-      padding: 0.5625rem 0;
-    }
-
     &.ic-app-header__menu-list-link--nav-toggle {
       .ic-icon-svg--navtoggle {
         transform: rotate3d(0, 1, 0, -180deg);
