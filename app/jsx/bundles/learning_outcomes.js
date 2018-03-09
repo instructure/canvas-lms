@@ -28,7 +28,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import OutcomesActionsPopoverMenu from '../outcomes/OutcomesActionsPopoverMenu'
 import {showImportOutcomesModal} from '../outcomes/ImportOutcomesModal'
-import {showOutcomesImporter} from '../outcomes/OutcomesImporter'
+import {showOutcomesImporter, showOutcomesImporterIfInProgress} from '../outcomes/OutcomesImporter'
 
 const renderInstructions = ENV.PERMISSIONS.manage_outcomes
 
@@ -90,8 +90,15 @@ toolbar.on('start_sync', (file) => showOutcomesImporter({
   disableOutcomeViews,
   resetOutcomeViews,
   mount: content.$el[0],
-  contextUrlRoot: ENV.CONTEXT_URL_ROOT,
+  contextUrlRoot: ENV.CONTEXT_URL_ROOT
 }))
+
+showOutcomesImporterIfInProgress({
+  disableOutcomeViews,
+  resetOutcomeViews,
+  mount: content.$el[0],
+  contextUrlRoot: ENV.CONTEXT_URL_ROOT
+}, ENV.current_user.id)
 
 // sidebar events
 sidebar.on('select', model => content.show(model))
