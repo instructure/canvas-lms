@@ -237,6 +237,24 @@ describe 'Submissions API', type: :request do
       expect(json.size).to eq 1
     end
 
+    it 'returns submissions based on submitted_since' do
+      json = api_call(:get,
+                      "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
+                      {controller: 'submissions_api', action: 'for_students',
+                       format: 'json', section_id: 'sis_section_id:my-section-sis-id'},
+                      submitted_since: 1.day.ago.iso8601,
+                      student_ids: 'all')
+      expect(json.size).to eq 1
+
+      json = api_call(:get,
+                      "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
+                      {controller: 'submissions_api', action: 'for_students',
+                       format: 'json', section_id: 'sis_section_id:my-section-sis-id'},
+                      submitted_since: Time.zone.now.iso8601,
+                      student_ids: 'all')
+      expect(json.size).to eq 0
+    end
+
     it 'should scope call to enrollment_state with post_to_sis' do
       @a1.post_to_sis = true
       @a1.save!
@@ -1955,17 +1973,24 @@ describe 'Submissions API', type: :request do
       @student1 = user_factory(active_all: true)
       @student2 = user_with_pseudonym(:active_all => true)
 
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
+      ta_in_course
 
       @course.enroll_student(@student1).accept!
       @course.enroll_student(@student2).accept!
 
-      @a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
-      @a2 = @course.assignments.create!(:title => 'assignment2', :grading_type => 'letter_grade', :points_possible => 25)
+      @a1 = @course.assignments.create!(
+        title: 'assignment1', grading_type: 'letter_grade',
+        points_possible: 15
+      )
+      @a2 = @course.assignments.create!(
+        title: 'assignment2', grading_type: 'letter_grade',
+        points_possible: 25, muted: true
+      )
 
-      submit_homework(@a1, @student1)
-      submit_homework(@a2, @student1)
-      submit_homework(@a1, @student2)
+      @a1.grade_student(@student1, grader: @teacher, grade: 15)
+      @a2.grade_student(@student1, grader: @teacher, grade: 5)
+      @a1.grade_student(@student2, grader: @teacher, excused: true)
     end
 
     it "returns student submissions grouped by student" do
@@ -2014,6 +2039,140 @@ describe 'Submissions API', type: :request do
         { :student_ids => ["all"], :grouped => '1', :per_page => '1', :page => 2 })
       expect(json2.size).to eq 1
       expect((json + json2).map{|r| r["user_id"]}).to match_array([@student1.id, @student2.id])
+    end
+
+    describe "current and final scores" do
+      context "when accessing as a teacher with default permissions" do
+        let(:json) do
+          api_call(:get,
+            "/api/v1/courses/#{@course.id}/students/submissions.json",
+            { controller: 'submissions_api', action: 'for_students',
+              format: 'json', course_id: @course.to_param },
+            { student_ids: [@student1.to_param], include: ['total_scores'], grouped: '1' })
+        end
+
+        it "returns a single record" do
+          expect(json.size).to eq 1
+        end
+
+        it "returns the computed_current_score" do
+          expect(json[0]['computed_current_score']).to eq 100
+        end
+
+        it "returns the unposted_current_score" do
+          expect(json[0]['unposted_current_score']).to eq 50
+        end
+
+        it "returns the computed_final_score" do
+          expect(json[0]['computed_final_score']).to eq 37.5
+        end
+
+        it "returns the unposted_final_score" do
+          expect(json[0]['unposted_final_score']).to eq 50
+        end
+      end
+
+      context "when the requester does not have permissions to see unposted scores" do
+        let(:json) do
+          api_call_as_user(@student1, :get,
+           "/api/v1/courses/#{@course.id}/students/submissions.json",
+           { controller: 'submissions_api', action: 'for_students',
+             format: 'json', course_id: @course.to_param },
+           { student_ids: [@student1.to_param], include: ['total_scores'], grouped: '1' })
+        end
+
+        it "returns a single record" do
+          expect(json.size).to eq 1
+        end
+
+        it "returns the computed_current_score" do
+          expect(json[0]['computed_current_score']).to eq 100
+        end
+
+        it "omits the unposted_current_score" do
+          expect(json[0]).not_to include 'unposted_current_score'
+        end
+
+        it "returns the computed_final_score" do
+          expect(json[0]['computed_final_score']).to eq 37.5
+        end
+
+        it "omits the unposted_final_score" do
+          expect(json[0]).not_to include 'unposted_final_score'
+        end
+      end
+
+      context "when the requester can manage grades" do
+        before(:once) do
+          @course.root_account.role_overrides.create!(permission: 'view_all_grades', role: ta_role, enabled: false)
+          @course.root_account.role_overrides.create!(permission: 'manage_grades', role: ta_role, enabled: true)
+        end
+
+        let(:json) do
+          api_call_as_user(@ta, :get,
+            "/api/v1/courses/#{@course.id}/students/submissions.json",
+            { controller: 'submissions_api', action: 'for_students',
+              format: 'json', course_id: @course.to_param },
+            { student_ids: [@student1.to_param], include: ['total_scores'], grouped: '1' })
+        end
+
+        it "returns a single record" do
+          expect(json.size).to eq 1
+        end
+
+        it "returns the computed_current_score" do
+          expect(json[0]['computed_current_score']).to eq 100
+        end
+
+        it "returns the unposted_current_score" do
+          expect(json[0]['unposted_current_score']).to eq 50
+        end
+
+        it "returns the computed_final_score" do
+          expect(json[0]['computed_final_score']).to eq 37.5
+        end
+
+        it "returns the unposted_final_score" do
+          expect(json[0]['unposted_final_score']).to eq 50
+        end
+      end
+
+      context "when the requester can view all grades" do
+        before(:once) do
+          @course.root_account.role_overrides.create!(permission: 'view_all_grades', role: designer_role, enabled: true)
+          @course.root_account.role_overrides.create!(permission: 'manage_grades', role: designer_role, enabled: false)
+
+          course_with_designer(course: @course)
+        end
+
+        let(:json) do
+          api_call_as_user(@designer, :get,
+            "/api/v1/courses/#{@course.id}/students/submissions.json",
+            { controller: 'submissions_api', action: 'for_students',
+              format: 'json', course_id: @course.to_param },
+            { student_ids: [@student1.to_param], include: ['total_scores'], grouped: '1' })
+        end
+
+        it "returns a single record" do
+          expect(json.size).to eq 1
+        end
+
+        it "returns the computed_current_score" do
+          expect(json[0]['computed_current_score']).to eq 100
+        end
+
+        it "returns the unposted_current_score" do
+          expect(json[0]['unposted_current_score']).to eq 50
+        end
+
+        it "returns the computed_final_score" do
+          expect(json[0]['computed_final_score']).to eq 37.5
+        end
+
+        it "returns the unposted_final_score" do
+          expect(json[0]['unposted_final_score']).to eq 50
+        end
+      end
     end
   end
 

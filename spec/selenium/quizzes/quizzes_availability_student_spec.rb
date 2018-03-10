@@ -29,7 +29,8 @@ describe 'Taking a quiz as a student' do
   context 'when the available from date is in the future' do
     before(:each) do
       create_quiz_with_due_date(
-        unlock_at: default_time_for_unlock_date(Time.zone.now.advance(days:1))
+        unlock_at: default_time_for_unlock_date(1.day.from_now),
+        due_at: default_time_for_due_date(2.days.from_now)
       )
     end
 
@@ -44,7 +45,8 @@ describe 'Taking a quiz as a student' do
   context 'when the available until date is in the past' do
     before(:each) do
       create_quiz_with_due_date(
-        lock_at: default_time_for_lock_date(Time.zone.now.advance(days:-1))
+        due_at: default_time_for_due_date(2.days.ago),
+        lock_at: default_time_for_lock_date(1.day.ago)
       )
     end
 

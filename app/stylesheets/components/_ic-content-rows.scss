@@ -16,10 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- @import "components/ic-unread-badge";
+@import 'components/ic-unread-badge';
 
 .ic-item-row__select-col + .ic-item-row__author-col {
   margin-left: 11px;
+}
+
+.ic-item-row__drag-col {
+  margin-right: 11px;
+}
+
+.ic-item-row__icon-col {
+  margin-right: -11px;
 }
 
 .ic-item-row {
@@ -42,20 +50,28 @@
   }
 }
 
+.ic-item-row__content-link {
+  display: block;
+  @include ic-focus-base;
+  &:focus {
+    @include ic-focus-variant;
+  }
+}
+
 .ic-item-row__content-col {
   // necessary because min-width: auto by default
   // without this, the text force-expands the width of the container instead of being truncated
   min-width: 0;
   flex-grow: 1;
   margin: 0 22px;
-  overflow: hidden;
 
   &:first-child {
     margin-left: 0;
   }
 
   & > .ic-item-row__content-link {
-    &, &:link {
+    &,
+    &:link {
       color: inherit;
     }
     &:hover {
@@ -63,17 +79,24 @@
     }
   }
 
+  .ic-item-row__content-link-container {
+    width: auto;
+  }
+
   h3 {
     font-weight: 600;
     font-size: 1rem;
     margin-bottom: 4px;
+    overflow: hidden;
   }
 
   p {
     margin: 0;
   }
 
-  p, h4, .ic-announcement-row__content {
+  p,
+  h4,
+  .ic-announcement-row__content {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -90,7 +113,7 @@
   text-align: right;
 
   .ic-item-row__meta-actions {
-    height: 20px;
+    height: 23px;
   }
 
   .ic-item-row__meta-content {
@@ -112,10 +135,6 @@
   }
 
   .ic-item-row__meta-actions {
-    .ic-unread-badge {
-      transform: translateY(-2px);
-    }
-
     .ic-item-row__master-course-lock {
       vertical-align: text-bottom;
       margin-left: 10px;
@@ -128,4 +147,10 @@
       font-size: 1.2rem;
     }
   }
+}
+
+.ic-item-row__manage-menu {
+  display: inline-block;
+  margin: 0 -10px;
+  transform: translateY(-5px);
 }

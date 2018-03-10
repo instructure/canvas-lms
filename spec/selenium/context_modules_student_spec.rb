@@ -278,56 +278,6 @@ describe "context modules" do
     end
 
     context "next and previous buttons", priority: "2" do
-
-      def verify_next_and_previous_buttons_display
-        wait_for_ajaximations
-        expect(f('.module-sequence-footer-button--previous')).to be_displayed
-        expect(f('.module-sequence-footer-button--next')).to be_displayed
-      end
-
-      def module_setup
-
-        @module = @course.context_modules.create!(:name => "module")
-
-        #create module items
-        #add first and last module items to get previous and next displayed
-        @assignment1 = @course.assignments.create!(:title => 'first item in module')
-        @assignment2 = @course.assignments.create!(:title => 'assignment')
-        @assignment3 = @course.assignments.create!(:title => 'last item in module')
-        @quiz = @course.quizzes.create!(:title => 'quiz assignment')
-        @quiz.publish!
-        @wiki = @course.wiki_pages.create!(:title => "wiki", :body => 'hi')
-        @discussion = @course.discussion_topics.create!(:title => 'discussion')
-
-        #add items to module
-        @module.add_item :type => 'assignment', :id => @assignment1.id
-        @module.add_item :type => 'assignment', :id => @assignment2.id
-        @module.add_item :type => 'quiz', :id => @quiz.id
-        @module.add_item :type => 'wiki_page', :id => @wiki.id
-        @module.add_item :type => 'discussion_topic', :id => @discussion.id
-        @module.add_item :type => 'assignment', :id => @assignment3.id
-
-        #add external tool
-        @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
-        @external_tool_tag = @module.add_item({
-                                                  :type => 'context_external_tool',
-                                                  :title => 'Example',
-                                                  :url => 'http://www.example.com',
-                                                  :new_tab => '0'
-                                              })
-        @external_tool_tag.publish!
-        #add external url
-        @external_url_tag = @module.add_item({
-                                                 :type => 'external_url',
-                                                 :title => 'pls view',
-                                                 :url => 'http://example.com/lolcats'
-                                             })
-        @external_url_tag.publish!
-
-        #add another assignment at the end to create a bookend, provides next and previous for external url
-        @module.add_item :type => 'assignment', :id => @assignment3.id
-      end
-
       before :each do
         user_session(@teacher)
       end
@@ -412,23 +362,8 @@ describe "context modules" do
     end
 
     context 'mark as done' do
-      def setup
-        @mark_done_module = create_context_module('Mark Done Module')
-        page = @course.wiki_pages.create!(:title => "The page", :body => 'hi')
-        @tag = @mark_done_module.add_item({:id => page.id, :type => 'wiki_page'})
-        @mark_done_module.completion_requirements = {@tag.id => {:type => 'must_mark_done'}}
-        @mark_done_module.save!
-      end
-
-      def navigate_to_wikipage(title)
-        els = ff('.context_module_item')
-        el = els.find {|e| e.text =~ /#{title}/}
-        el.find_element(:css, 'a.title').click
-        wait_for_ajaximations
-      end
-
       it "On the modules page: the user sees an incomplete module with a 'mark as done' requirement. The user clicks on the module item, marks it as done, and back on the modules page can now see that the module is completed" do
-        setup
+        mark_as_done_setup
         go_to_modules
 
         validate_context_module_status_icon(@mark_done_module.id, @no_icon)
@@ -514,19 +449,6 @@ describe "context modules" do
     end
 
     describe "module header icons" do
-      def create_additional_assignment_for_module_1
-        @assignment_4 = @course.assignments.create!(:title => "assignment 4")
-        @tag_4 = @module_1.add_item({:id => @assignment_4.id, :type => 'assignment'})
-        @module_1.completion_requirements = {@tag_1.id => {:type => 'must_view'},
-                                             @tag_4.id => {:type => 'must_view'}}
-        @module_1.save!
-      end
-
-      def make_module_1_complete_one
-        @module_1.requirement_count = 1
-        @module_1.save!
-      end
-
       it "should show a pill message that says 'Complete All Items'", priority: "1", test_id: 250296 do
         go_to_modules
         vaildate_correct_pill_message(@module_1.id, 'Complete All Items')
@@ -539,14 +461,14 @@ describe "context modules" do
         vaildate_correct_pill_message(@module_1.id, 'Complete One Item')
       end
 
-      it "should show a completed icon when module is complete for 'Complete All Items' requirement" do
+      it "shows a completed icon and unlocks next when module is complete for 'Complete All Items' requirement", priority: "1", test_id: 248902 do
         create_additional_assignment_for_module_1
+        # navigate to module items to satisfy must_view_requirement
+        get "/courses/#{@course.id}/assignments/#{@assignment_1.id}?module_item_id=#{@tag_1.id}"
+        get "/courses/#{@course.id}/assignments/#{@assignment_4.id}?module_item_id=#{@tag_4.id}"
         go_to_modules
-
-        navigate_to_module_item(0, @assignment_1.title)
-        navigate_to_module_item(0, @assignment_4.title)
-        vaildate_correct_pill_message(@module_1.id, 'Complete All Items')
         validate_context_module_status_icon(@module_1.id, @completed_icon)
+        validate_context_module_status_icon(@module_2.id, @no_icon)
       end
 
       it "should show a completed icon when module is complete for 'Complete One Item' requirement", priority: "1", test_id: 250542 do
@@ -559,9 +481,23 @@ describe "context modules" do
         validate_context_module_status_icon(@module_1.id, @completed_icon)
       end
 
+      it "unlocks the next module when module is complete with 'Complete 1 requirement'", priority: "1", test_id: 255037 do
+        create_additional_assignment_for_module_1
+        make_module_1_complete_one
+        go_to_modules
+        navigate_to_module_item(0, @assignment_1.title)
+        validate_context_module_status_icon(@module_2.id, @no_icon)
+      end
+
       it "should show a locked icon when module is locked", priority:"1", test_id: 250541 do
         go_to_modules
         validate_context_module_status_icon(@module_2.id, @locked_icon)
+      end
+
+      it "should show a tooltip for locked icon when module is locked", priority:"1", test_id: 255918 do
+        go_to_modules
+        driver.mouse.move_to(f("#context_module_#{@module_2.id} .completion_status .icon-lock"), 0, 0)
+        expect(fj('.ui-tooltip:visible')).to include_text('Locked')
       end
 
       it "should show a warning in-progress icon when module has been started", priority: "1", test_id: 250543 do
@@ -579,30 +515,6 @@ describe "context modules" do
     end
 
     describe "module item icons" do
-      def add_non_requirement
-        @assignment_4 = @course.assignments.create!(:title => "assignment 4")
-        @tag_4 = @module_1.add_item({:id => @assignment_4.id, :type => 'assignment'})
-        @module_1.save!
-      end
-
-      def add_min_score_assignment
-        @assignment_4 = @course.assignments.create!(:title => "assignment 4")
-        @tag_4 = @module_1.add_item({:id => @assignment_4.id, :type => 'assignment'})
-        @module_1.completion_requirements = {@tag_1.id => {:type => 'must_view'},
-                                             @tag_4.id => {:type => 'min_score', :min_score => 90}}
-        @module_1.require_sequential_progress = false
-        @module_1.save!
-      end
-
-      def make_past_due
-        @assignment_4.submission_types = 'online_text_entry'
-        @assignment_4.due_at = '2015-01-01'
-        @assignment_4.save!
-      end
-
-      def grade_assignment(score)
-        @assignment_4.grade_student(@user, grade: score, grader: @teacher)
-      end
 
       it "should show a completed icon when module item is completed", priority: "1", test_id: 250546 do
         go_to_modules
@@ -645,56 +557,57 @@ describe "context modules" do
         validate_context_module_item_icon(tag.id, @open_item_icon)
       end
 
-      it "should show a warning icon when module item is a min score requirement that didn't meet score requirment", priority: "1", test_id: 250547 do
-        add_min_score_assignment
-        grade_assignment(50)
-        go_to_modules
+      context "when adding min score assignment" do
+        before :once do
+          add_min_score_assignment
+        end
 
-        validate_context_module_item_icon(@tag_4.id, @in_progress_icon)
-      end
+        it "should show a warning icon when module item is a min score requirement that didn't meet score requirment", priority: "1", test_id: 250547 do
+          grade_assignment(50)
+          go_to_modules
+          validate_context_module_item_icon(@tag_4.id, @in_progress_icon)
+        end
 
-      it "shows tool tip text when hovering over the warning icon for a min score requirement", priority: "1", test_id: 255916 do
-        add_min_score_assignment
-        grade_assignment(50)
-        go_to_modules
-        driver.mouse.move_to(f('.ig-header-admin .completion_status .icon-minimize'), 0, 0)
-        expect(fj('.ui-tooltip:visible')).to include_text('Started')
-      end
+        it "shows tool tip text when hovering over the warning icon for a min score requirement", priority: "1", test_id: 255916 do
+          grade_assignment(50)
+          go_to_modules
+          driver.mouse.move_to(f('.ig-header-admin .completion_status .icon-minimize'), 0, 0)
+          expect(fj('.ui-tooltip:visible')).to include_text('Started')
+        end
 
-      it "should show an info icon when module item is a min score requirement that has not yet been graded" do
-        add_min_score_assignment
-        @assignment_4.submission_types = 'online_text_entry'
-        @assignment_4.save!
+        it "shows tooltip warning for a min score assignemnt", priority: "1", test_id: 255917 do
+          grade_assignment(50)
+          go_to_modules
+          driver.mouse.move_to(f('.ig-row .module-item-status-icon .icon-minimize'), 0, 0)
+          expect(fj('.ui-tooltip:visible')).to include_text('You scored a 50. Must score at least a 90.0.')
+        end
 
-        @assignment_4.submit_homework(@user, :body => "body")
-        go_to_modules
+        it "should show an info icon when module item is a min score requirement that has not yet been graded" do
+          @assignment_4.submission_types = 'online_text_entry'
+          @assignment_4.save!
+          @assignment_4.submit_homework(@user, :body => "body")
+          go_to_modules
+          validate_context_module_item_icon(@tag_4.id, 'icon-info')
+        end
 
-        validate_context_module_item_icon(@tag_4.id, 'icon-info')
-      end
+        it "should show a completed icon when module item is a min score requirement that met the score requirement" do
+          grade_assignment(100)
+          go_to_modules
+          validate_context_module_item_icon(@tag_4.id, @completed_icon)
+        end
 
-      it "should show a completed icon when module item is a min score requirement that met the score requirement" do
-        add_min_score_assignment
-        grade_assignment(100)
-        go_to_modules
+        it "should show a warning icon when module item is past due and not submitted" do
+          make_past_due
+          go_to_modules
+          validate_context_module_item_icon(@tag_4.id, @in_progress_icon)
+        end
 
-        validate_context_module_item_icon(@tag_4.id, @completed_icon)
-      end
-
-      it "should show a warning icon when module item is past due and not submitted" do
-        add_min_score_assignment
-        make_past_due
-        go_to_modules
-
-        validate_context_module_item_icon(@tag_4.id, @in_progress_icon)
-      end
-
-      it "should show a completed icon when module item is past due but submitted" do
-        add_min_score_assignment
-        make_past_due
-        grade_assignment(100)
-        go_to_modules
-
-        validate_context_module_item_icon(@tag_4.id, @completed_icon)
+        it "should show a completed icon when module item is past due but submitted" do
+          make_past_due
+          grade_assignment(100)
+          go_to_modules
+          validate_context_module_item_icon(@tag_4.id, @completed_icon)
+        end
       end
     end
   end

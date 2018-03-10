@@ -31,16 +31,29 @@ class DueDateCacher
 
   def self.recompute(assignment)
     return unless assignment.active?
-    recompute_course(assignment.context, [assignment.id],
-      singleton: "cached_due_date:calculator:Assignment:#{assignment.global_id}")
+    opts = {
+      assignments: [assignment.id],
+      inst_jobs_opts: {
+        singleton: "cached_due_date:calculator:Assignment:#{assignment.global_id}"
+      }
+    }
+
+    recompute_course(assignment.context, opts)
   end
 
-  def self.recompute_course(course, assignments = nil, inst_jobs_opts = {})
+  def self.recompute_course(course, assignments: nil, inst_jobs_opts: {}, run_immediately: false)
     course = Course.find(course) unless course.is_a?(Course)
     inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Course:#{course.global_id}" if assignments.nil?
-    assignments ||= Assignment.active.where(context: course).pluck(:id)
-    return if assignments.empty?
-    new(course, assignments).send_later_if_production_enqueue_args(:recompute, inst_jobs_opts)
+
+    assignments_to_recompute = assignments || Assignment.active.where(context: course).pluck(:id)
+    return if assignments_to_recompute.empty?
+
+    due_date_cacher = new(course, assignments_to_recompute)
+    if run_immediately
+      due_date_cacher.recompute
+    else
+      due_date_cacher.send_later_if_production_enqueue_args(:recompute, inst_jobs_opts)
+    end
   end
 
   def self.recompute_users_for_course(user_ids, course, assignments = nil, inst_jobs_opts = {})

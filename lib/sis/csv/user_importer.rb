@@ -32,10 +32,9 @@ module SIS
       # user_id,login_id,first_name,last_name,email,status
       def process(csv, index=nil, count=nil)
         messages = []
-        @sis.counts[:users] += SIS::UserImporter.new(@root_account, importer_opts).process(@sis.updates_every, messages) do |importer|
+        count = SIS::UserImporter.new(@root_account, importer_opts).process(messages) do |importer|
           csv_rows(csv, index, count) do |row|
             update_progress
-
             begin
               importer.add_user(create_user(row))
             rescue ImportError => e
@@ -44,6 +43,7 @@ module SIS
           end
         end
         messages.each { |message| add_warning(csv, message) }
+        count
       end
 
       private

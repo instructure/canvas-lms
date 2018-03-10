@@ -19,3 +19,9 @@
 @import "base/environment";
 @import "components/ic-content-rows";
 @import "components/announcement-rss-tray";
+
+#delete_announcements, #lock_announcements {
+  svg {
+    margin-right: 0 !important;
+  }
+}

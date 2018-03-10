@@ -59,7 +59,9 @@ class User < ActiveRecord::Base
   has_many :observer_enrollments
   has_many :observee_enrollments, :foreign_key => :associated_user_id, :class_name => 'ObserverEnrollment'
   has_many :user_observers, dependent: :destroy, inverse_of: :user
-  has_many :observers, -> { where("user_observers.workflow_state <> 'deleted'") }, :through => :user_observers, :class_name => 'User'
+  has_many :active_user_observers, -> { where.not(:workflow_state => 'deleted') }, :class_name => "UserObserver", inverse_of: :user
+  has_many :observers, :through => :active_user_observers, :class_name => 'User'
+
   has_many :user_observees,
            class_name: 'UserObserver',
            foreign_key: :observer_id,
@@ -634,10 +636,6 @@ class User < ActiveRecord::Base
 
   def <=>(other)
     self.name <=> other.name
-  end
-
-  def default_pseudonym_id
-    self.pseudonyms.active.first.id
   end
 
   def available?
@@ -2486,8 +2484,10 @@ class User < ActiveRecord::Base
     return user_roles(root_account, true) if exclude_deleted_accounts
 
     return @roles if @roles
-    @roles = Rails.cache.fetch(['user_roles_for_root_account3', self, root_account].cache_key) do
-      user_roles(root_account)
+    root_account.shard.activate do
+      @roles = Rails.cache.fetch(['user_roles_for_root_account3', self, root_account].cache_key) do
+        user_roles(root_account)
+      end
     end
   end
 
@@ -2942,9 +2942,9 @@ class User < ActiveRecord::Base
     !!@all_active_pseudonyms
   end
 
-  def current_groups_in_region?
-    return true if self.current_groups.exists?
-    return true if self.current_groups.shard(self.in_region_associated_shards).exists?
+  def current_active_groups?
+    return true if self.current_groups.preload(:context).any?(&:context_available?)
+    return true if self.current_groups.shard(self.in_region_associated_shards).preload(:context).any?(&:context_available?)
     false
   end
 

@@ -22,11 +22,13 @@ import { bool, func } from 'prop-types'
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
 
-import Heading from '@instructure/ui-core/lib/components/Heading'
 import Container from '@instructure/ui-core/lib/components/Container'
 import Text from '@instructure/ui-core/lib/components/Text'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import { MenuItem } from '@instructure/ui-core/lib/components/Menu'
 import IconTimer from 'instructure-icons/lib/Line/IconTimerLine'
 import IconReply from 'instructure-icons/lib/Line/IconReplyLine'
+import IconTrash from 'instructure-icons/lib/Line/IconTrashLine'
 
 import AnnouncementModel from 'compiled/models/Announcement'
 import SectionsTooltip from '../SectionsTooltip'
@@ -51,7 +53,9 @@ function makeTimestamp ({ delayed_post_at, posted_at }) {
   : { title: I18n.t('Posted on:'), date: posted_at }
 }
 
-export default function AnnouncementRow ({ announcement, canManage, masterCourseData, rowRef, onSelectedChanged }) {
+export default function AnnouncementRow (
+  { announcement, canManage, masterCourseData, rowRef, onSelectedChanged,
+    onManageMenuSelect, canHaveSections, announcementsLocked }) {
   const timestamp = makeTimestamp(announcement)
   const readCount = announcement.discussion_subentry_count > 0
     ? (
@@ -64,12 +68,61 @@ export default function AnnouncementRow ({ announcement, canManage, masterCourse
     )
     : null
 
+  const sectionsToolTip = canHaveSections
+    ? (
+      <SectionsTooltip
+        totalUserCount={announcement.user_count}
+        sections={announcement.sections}
+      />
+    )
+    : null
+
+  const replyButton = announcement.locked
+      ? null
+      : (
+        <Container display="block" margin="x-small 0 0">
+          <Text color="brand"><IconReply /> {I18n.t('Reply')}</Text>
+        </Container>
+      )
+
+  const MenuList = [
+    <MenuItem
+      key="delete"
+      value={{ action: 'delete', id: announcement.id }}
+      id="delete-announcement-menu-option"
+    >
+      <IconTrash />&nbsp;&nbsp;{I18n.t('Delete')}
+      <ScreenReaderContent>{I18n.t('Delete announcement %{title}', { title: announcement.title })}</ScreenReaderContent>
+    </MenuItem>,
+  ]
+  if (!announcementsLocked) {
+    MenuList.push(
+      <MenuItem
+        key="lock"
+        value={{ action: 'lock', id: announcement.id, lock: !announcement.locked }}
+        id="lock-announcement-menu-option"
+      >
+        <IconReply />&nbsp;&nbsp;{announcement.locked ? I18n.t('Allow Comments') : I18n.t('Disallow Comments')}
+        <ScreenReaderContent>
+        { announcement.locked
+          ? I18n.t('Allow replies for %{title}', { title: announcement.title })
+          : I18n.t('Disallow replies for %{title}', { title: announcement.title })}
+        </ScreenReaderContent>
+      </MenuItem>
+    )
+  }
+
   // necessary because announcements return html from RCE
   const contentWrapper = document.createElement('span')
   contentWrapper.innerHTML = announcement.message
   const textContent = contentWrapper.textContent.trim()
+
   return (
     <CourseItemRow
+      title={announcement.title}
+      body={<div className="ic-announcement-row__content">{textContent}</div>}
+      sectionToolTip={sectionsToolTip}
+      replyButton={replyButton}
       ref={rowRef}
       className="ic-announcement-row"
       selectable={canManage}
@@ -77,7 +130,6 @@ export default function AnnouncementRow ({ announcement, canManage, masterCourse
       id={announcement.id}
       isRead={announcement.read_state === 'read'}
       author={announcement.author}
-      title={announcement.title}
       itemUrl={announcement.html_url}
       onSelectedChanged={onSelectedChanged}
       masterCourse={{
@@ -96,35 +148,34 @@ export default function AnnouncementRow ({ announcement, canManage, masterCourse
           <span className="ic-item-row__meta-content-heading">
             <Text size="small" as="p">{timestamp.title}</Text>
           </span>
-          <Text color="secondary" size="small" as="p">{$.datetimeString(timestamp.date, {format: 'full'})}</Text>
+          <Text color="secondary" size="small" as="p">{$.datetimeString(timestamp.date, {format: 'medium'})}</Text>
         </div>
       }
       actionsContent={readCount}
-    >
-      <Heading level="h3">{announcement.title}</Heading>
-      <SectionsTooltip
-        totalUserCount={announcement.user_count}
-        sections={announcement.sections} />
-      <div className="ic-announcement-row__content">{textContent}</div>
-      {!announcement.locked &&
-        <Container display="block" margin="x-small 0 0">
-          <Text color="brand"><IconReply /> {I18n.t('Reply')}</Text>
-        </Container>}
-    </CourseItemRow>
+      showManageMenu={canManage}
+      onManageMenuSelect={onManageMenuSelect}
+      manageMenuOptions={canManage && MenuList || null}
+    />
   )
 }
 
 AnnouncementRow.propTypes = {
   announcement: announcementShape.isRequired,
   canManage: bool,
+  canHaveSections: bool,
   masterCourseData: masterCourseDataShape,
   rowRef: func,
   onSelectedChanged: func,
+  onManageMenuSelect: func,
+  announcementsLocked: bool,
 }
 
 AnnouncementRow.defaultProps = {
   canManage: false,
+  canHaveSections: false,
   masterCourseData: null,
   rowRef () {},
   onSelectedChanged () {},
+  onManageMenuSelect () {},
+  announcementsLocked: false,
 }

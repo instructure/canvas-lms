@@ -75,15 +75,16 @@
 class AccountNotificationsController < ApplicationController
   include Api::V1::AccountNotifications
   before_action :require_user
-  before_action :require_account_admin, except: [:user_index, :user_close_notification, :show]
+  before_action :require_account_admin, only: [:create, :update, :destroy]
+  before_action :check_user_param, only: [:user_index_deprecated, :user_close_notification_deprecated, :show_deprecated]
 
   # @API Index of active global notification for the user
-  # Returns a list of all global notifications in the account for this user
+  # Returns a list of all global notifications in the account for the current user
   # Any notifications that have been closed by the user will not be returned
   #
   # @example_request
   #   curl -H 'Authorization: Bearer <token>' \
-  #   https://<canvas>/api/v1/accounts/2/users/4/account_notifications
+  #   https://<canvas>/api/v1/accounts/2/users/self/account_notifications
   #
   # @returns [AccountNotification]
   def user_index
@@ -91,13 +92,17 @@ class AccountNotificationsController < ApplicationController
     render :json => account_notifications_json(notifications, @current_user, session)
   end
 
+  def user_index_deprecated
+    user_index
+  end
+
   # @API Show a global notification
-  # Returns a global notification
+  # Returns a global notification for the current user
   # A notification that has been closed by the user will not be returned
   #
   # @example_request
   #   curl -H 'Authorization: Bearer <token>' \
-  #   https://<canvas>/api/v1/accounts/2/users/4/account_notifications/4
+  #   https://<canvas>/api/v1/accounts/2/users/self/account_notifications/4
   #
   # @returns AccountNotification
   def show
@@ -110,18 +115,26 @@ class AccountNotificationsController < ApplicationController
     end
   end
 
+  def show_deprecated
+    show
+  end
+
   # @API Close notification for user
-  # If the user no long wants to see this notification it can be excused with this call
+  # If the current user no long wants to see this notification it can be excused with this call
   #
   # @example_request
   #   curl -X DELETE -H 'Authorization: Bearer <token>' \
-  #   https://<canvas>/api/v1/accounts/2/users/4/account_notifications/4
+  #   https://<canvas>/api/v1/accounts/2/users/self/account_notifications/4
   #
   # @returns AccountNotification
   def user_close_notification
     notification = AccountNotification.find(params[:id])
     @current_user.close_announcement(notification)
     render :json => account_notification_json(notification, @current_user, session)
+  end
+
+  def user_close_notification_deprecated
+    user_close_notification
   end
 
   # @API Create a global notification
@@ -287,6 +300,10 @@ class AccountNotificationsController < ApplicationController
   end
 
   protected
+  def check_user_param
+    raise ActiveRecord::RecordNotFound unless api_find(User, params[:user_id]) == @current_user
+  end
+
   def require_account_admin
     require_account_context
     return false unless authorized_action(@account, @current_user, :manage_alerts)

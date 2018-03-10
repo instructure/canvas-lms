@@ -1,0 +1,206 @@
+{
+  "add_to_do_7def3c37": {
+    "message": "Bæta við Verkefni"
+  },
+  "all_items_loaded_aa256183": {
+    "message": "Öllum atriðum hefur verið hlaðið"
+  },
+  "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
+    "message": "  Ertu viss um að þú viljir eyða þessu skipulagi?"
+  },
+  "assignmenttype_title_is_complete_813e54f8": {
+    "message": "{ assignmentType } { title } er lokið"
+  },
+  "assignmenttype_title_is_incomplete_a1d5fac0": {
+    "message": "{ assignmentType } { title } er ekki lokið"
+  },
+  "beginning_of_your_to_do_history_61ef2dce": {
+    "message": "Upphaf verkefnasögu þinnar"
+  },
+  "canvas_planner_98ed106": {
+    "message": "Canvas-skipuleggjari"
+  },
+  "close_d634289d": {
+    "message": "Loka"
+  },
+  "close_opportunities_popover_f4e50551": {
+    "message": "Loka sprettiglugga yfir kostum"
+  },
+  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+    "message": "{ count, plural,\n     =0 {# Kostir}\n    one {# kostur}\n  other {# kostir}\n}"
+  },
+  "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
+    "message": "{ count, plural,\n    one {Sýna # lokið atriði}\n  other {Sýna # lokin atriði}\n}"
+  },
+  "course_8a63b4a3": {
+    "message": "Námskeið"
+  },
+  "course_to_do_bcbbab54": {
+    "message": "{ course } VERKEFNI"
+  },
+  "date_at_time_dbdb1b99": {
+    "message": "{ date } á { time }"
+  },
+  "date_ee500367": {
+    "message": "Dagsetning"
+  },
+  "date_is_required_8660ec22": {
+    "message": "Dagsetningar er krafist"
+  },
+  "delete_a6efa79d": {
+    "message": "Eyða"
+  },
+  "details_98a31b68": {
+    "message": "Upplýsingar"
+  },
+  "dismiss_opportunityname_5995176f": {
+    "message": "Hafna { opportunityName }"
+  },
+  "due_5d7267be": {
+    "message": "Skiladagur:"
+  },
+  "due_date_8ce289b6": {
+    "message": "SKILADAGSETNING { date }"
+  },
+  "edit_title_72e5a21e": {
+    "message": "Breyta { title }"
+  },
+  "error_loading_more_items_3f109d9f": {
+    "message": "Villa kom upp við að hlaða fleiri atriðum"
+  },
+  "error_loading_past_items_2881dbb1": {
+    "message": "Villa kom upp við að hlaða eldri atriðum"
+  },
+  "excused_cf8792eb": {
+    "message": "Ekki með"
+  },
+  "failed_to_delete_to_do_64edff49": {
+    "message": "Mistókst að eyða Verkefni"
+  },
+  "failed_to_get_new_activity_17e7ec7c": {
+    "message": "Mistókst að sækja nýja virkni"
+  },
+  "failed_to_load_opportunities_52ab6404": {
+    "message": "Mistókst að hlaða kostum"
+  },
+  "failed_to_save_to_do_ddc7503b": {
+    "message": "Mistókst að vista Verkefni"
+  },
+  "feedback_6dcc1991": {
+    "message": "Endurgjöf"
+  },
+  "go_to_dashboard_card_view_10398ef6": {
+    "message": "Fara í sýn skjáborðskorts"
+  },
+  "graded_25cd3fcd": {
+    "message": "Metið"
+  },
+  "late_2be42b88": {
+    "message": "Seint"
+  },
+  "load_more_a36f9cf9": {
+    "message": "Hlaða meira"
+  },
+  "load_prior_dates_f2b0f6f0": {
+    "message": "Hlaða fyrri dagsetningum"
+  },
+  "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
+    "message": "Hlaðin { count, plural,\n     =0 {# atriði}\n    one {# atriði}\n  other {# atriði}\n}"
+  },
+  "loading_25990131": {
+    "message": "Hleður..."
+  },
+  "loading_past_items_ca499e75": {
+    "message": "Hlaða fyrri atriðum"
+  },
+  "loading_planner_items_947a813d": {
+    "message": "Hleður skipulögðum atriðum"
+  },
+  "looks_like_there_isn_t_anything_here_d9bcef49": {
+    "message": "Lítur út fyrir að vera autt"
+  },
+  "missing_1a256b3b": {
+    "message": "Vantar"
+  },
+  "missing_items_for_5ef30cea": {
+    "message": "Atriði sem vantar fyrir "
+  },
+  "new_activity_8b84847d": {
+    "message": "Ný virkni"
+  },
+  "new_activity_for_ac84f6e6": {
+    "message": "Ný virkni fyrir "
+  },
+  "next_month_749b1778": {
+    "message": "Næsti mánuður"
+  },
+  "no_due_dates_assigned_e8f5bac8": {
+    "message": "Engum skiladagsetningum úthlutað"
+  },
+  "no_to_do_s_for_this_day_yet_90c5873d": {
+    "message": "Engin „verkefni“ eru enn fyrir þennan dag,"
+  },
+  "nothing_new_needs_attention_3ac548d4": {
+    "message": "Ekkert nýtt sem krefst athygli."
+  },
+  "optional_add_course_ef0d70fc": {
+    "message": "Valkvætt: Bæta við námskeiði"
+  },
+  "points_bceb5005": {
+    "message": "punktar"
+  },
+  "points_points_63e59cce": {
+    "message": "{ points } punktar"
+  },
+  "previous_month_bb1e3c84": {
+    "message": "Fyrri mánuður"
+  },
+  "pts_699bd9aa": {
+    "message": "punktar"
+  },
+  "replies_4a8577c8": {
+    "message": "Svör"
+  },
+  "save_11a80ec3": {
+    "message": "Vista"
+  },
+  "submitted_318fad53": {
+    "message": "Skilað"
+  },
+  "task_16b0ef38": {
+    "message": "Verki"
+  },
+  "title_ee03d132": {
+    "message": "Titill"
+  },
+  "title_is_required_6ddcab69": {
+    "message": "titill er áskilinn"
+  },
+  "to_do_1d554f36": {
+    "message": "Verkefni"
+  },
+  "today_76e10f9c": {
+    "message": "Í dag"
+  },
+  "today_at_date_8ac30d6": {
+    "message": "Í dag kl. { date }"
+  },
+  "tomorrow_9a6c9a00": {
+    "message": "Á morgun"
+  },
+  "tomorrow_at_date_b53f2cf1": {
+    "message": "Á morgun kl.  { date }"
+  },
+  "unable_to_mark_as_complete_8141856d": {
+    "message": "Ekki tókst að merkja þetta sem fullklárað."
+  },
+  "yesterday_at_date_1aa6d18e": {
+    "message": "Í gær kl.  { date }"
+  },
+  "yesterday_c6bd6abf": {
+    "message": "Í gær"
+  },
+  "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
+    "message": "Þú hefur skrunað aftur í fyrsta verkefnið þitt!"
+  }
+}

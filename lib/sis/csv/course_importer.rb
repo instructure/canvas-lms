@@ -33,10 +33,9 @@ module SIS
       def process(csv, index=nil, count=nil)
         course_ids = {}
         messages = []
-        @sis.counts[:courses] += SIS::CourseImporter.new(@root_account, importer_opts).process(messages) do |importer|
+        count =  SIS::CourseImporter.new(@root_account, importer_opts).process(messages) do |importer|
+          update_progress
           csv_rows(csv, index, count) do |row|
-            update_progress
-
             start_date = nil
             end_date = nil
             begin
@@ -55,6 +54,7 @@ module SIS
           end
         end
         messages.each { |message| add_warning(csv, message) }
+        count
       end
     end
   end

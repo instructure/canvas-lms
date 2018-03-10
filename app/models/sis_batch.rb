@@ -112,10 +112,17 @@ class SisBatch < ActiveRecord::Base
   class Aborted < RuntimeError; end
 
   def add_errors(messages, failure: true)
-    messages.each do |message|
-      self.sis_batch_errors.create!(root_account: self.account,
-                                    failute: failure,
-                                    message: message)
+    messages.each_slice(1000) do |batch|
+      records = batch.map do |message|
+        {
+          root_account_id: self.account.id,
+          created_at: Time.zone.now,
+          sis_batch_id: self.id,
+          failute: failure,
+          message: message
+        }
+      end
+      SisBatchError.bulk_insert(records)
     end
   end
 
@@ -123,13 +130,19 @@ class SisBatch < ActiveRecord::Base
     add_errors(messages, failure: false)
   end
 
-  def self.queue_job_for_account(account)
-    process_delay = Setting.get('sis_batch_process_start_delay', '0').to_f
-    job_args = {:singleton => "sis_batch:account:#{Shard.birth.activate { account.id }}",
-                :priority => Delayed::LOW_PRIORITY,
-                :max_attempts => 1}
-    if process_delay > 0
-      job_args[:run_at] = process_delay.seconds.from_now
+  def self.queue_job_for_account(account, run_at=nil)
+    job_args = {:priority => Delayed::LOW_PRIORITY, :max_attempts => 1}
+
+    key = use_parallel_importers?(account) ? :strand : :singleton
+    job_args[key] = strand_for_account(account)
+
+    if run_at
+      job_args[:run_at] = run_at
+    else
+      process_delay = Setting.get('sis_batch_process_start_delay', '0').to_f
+      if process_delay > 0
+        job_args[:run_at] = process_delay.seconds.from_now
+      end
     end
 
     work = SisBatch::Work.new(SisBatch, :process_all_for_account, [account])
@@ -213,17 +226,37 @@ class SisBatch < ActiveRecord::Base
   scope :not_completed, -> { where(workflow_state: %w[initializing created importing cleanup_batch]) }
   scope :succeeded, -> { where(:workflow_state => %w[imported imported_with_messages]) }
 
+  def self.use_parallel_importers?(account)
+    account.feature_enabled?(:sis_imports_refactor)
+  end
+
+  def self.strand_for_account(account)
+    "sis_batch:account:#{Shard.birth.activate { account.id }}"
+  end
+
   def self.process_all_for_account(account)
-    start_time = Time.now
-    loop do
-      batches = account.sis_batches.needs_processing.limit(50).order(:created_at).to_a
-      break if batches.empty?
-      batches.each do |batch|
-        batch.process_without_send_later
-        if Time.now - start_time > Setting.get('max_time_per_sis_batch', 60).to_i
-          # requeue the job to continue processing more batches
-          queue_job_for_account(account)
-          return
+    if use_parallel_importers?(account)
+      if account.sis_batches.importing.exists?
+        delay = Setting.get('sis_batch_recheck_delay', 5.minutes).to_i
+        queue_job_for_account(account, delay.seconds.from_now) # requeue another job to check a little later
+      else
+        batch_to_run = account.sis_batches.needs_processing.order(:created_at).first
+        if batch_to_run
+          batch_to_run.process_without_send_later
+        end
+      end
+    else
+      start_time = Time.now
+      loop do
+        batches = account.sis_batches.needs_processing.limit(50).order(:created_at).to_a
+        break if batches.empty?
+        batches.each do |batch|
+          batch.process_without_send_later
+          if Time.now - start_time > Setting.get('max_time_per_sis_batch', 60).to_i
+            # requeue the job to continue processing more batches
+            queue_job_for_account(account)
+            return
+          end
         end
       end
     end
@@ -249,13 +282,15 @@ class SisBatch < ActiveRecord::Base
     download_zip
     generate_diff
 
-    importer = SIS::CSV::Import.process(self.account,
+    use_parallel = self.class.use_parallel_importers?(self.account)
+    import_class = use_parallel ? SIS::CSV::ImportRefactored : SIS::CSV::Import
+    importer = import_class.process(self.account,
                                         files: [@data_file.path],
                                         batch: self,
                                         override_sis_stickiness: options[:override_sis_stickiness],
                                         add_sis_stickiness: options[:add_sis_stickiness],
                                         clear_sis_stickiness: options[:clear_sis_stickiness])
-    finish importer.finished
+    finish importer.finished unless use_parallel
   end
 
   def generate_diff
@@ -305,6 +340,13 @@ class SisBatch < ActiveRecord::Base
     self.progress = 100
     self.ended_at = Time.now.utc
     self.save!
+
+    if self.class.use_parallel_importers?(account)
+      # set waiting jobs as available - or queue another job if there are none
+      if Delayed::Job.where(:strand => self.class.strand_for_account(account), :locked_by => nil).update_all(:run_at => Time.now.utc) == 0
+        self.class.queue_job_for_account(account)
+      end
+    end
   end
 
   def finalize_workflow_state(import_finished)
@@ -344,9 +386,9 @@ class SisBatch < ActiveRecord::Base
     end
   end
 
-  def remove_non_batch_courses(courses, total_rows)
+  def remove_non_batch_courses(courses, total_rows, current_row)
     # delete courses that weren't in this batch, in the selected term
-    current_row = 0
+    current_row ||= 0
     courses.find_each do |course|
       course.clear_sis_stickiness(:workflow_state)
       course.skip_broadcasts = true
@@ -377,7 +419,7 @@ class SisBatch < ActiveRecord::Base
 
   def remove_non_batch_sections(sections, total_rows, current_row)
     section_count = 0
-    current_row = 0 unless current_row
+    current_row ||= 0
     # delete sections who weren't in this batch, whose course was in the selected term
     sections.find_each do |section|
       section.destroy
@@ -404,15 +446,24 @@ class SisBatch < ActiveRecord::Base
 
   def remove_non_batch_enrollments(enrollments, total_rows, current_row)
     enrollment_count = 0
-    current_row = 0 unless current_row
+    current_row ||= 0
     # delete enrollments for courses that weren't in this batch, in the selected term
-    enrollments.find_each do |enrollment|
-      enrollment.destroy
-      enrollment_count += 1
-      current_row += 1
+    enrollments.find_in_batches do |batch|
+      if account.feature_enabled?(:sis_imports_refactor)
+        count = Enrollment::BatchStateUpdater.destroy_batch(batch)
+        enrollment_count += count
+        current_row += count
+      else
+        batch.each do |enrollment|
+          enrollment.destroy
+          enrollment_count += 1
+          current_row += 1
+        end
+      end
       self.fast_update_progress(current_row.to_f/total_rows * 100)
     end
     self.data[:counts][:batch_enrollments_deleted] = enrollment_count
+    current_row
   end
 
   def remove_previous_imports
@@ -430,9 +481,9 @@ class SisBatch < ActiveRecord::Base
       enrollments = non_batch_enrollments_scope
 
       count = detect_changes(count, courses, enrollments, sections)
-      row = remove_non_batch_courses(courses, count) if courses
+      row = remove_non_batch_enrollments(enrollments, count, row) if enrollments
       row = remove_non_batch_sections(sections, count, row) if sections
-      remove_non_batch_enrollments(enrollments, count, row) if enrollments
+      remove_non_batch_courses(courses, count, row) if courses
     rescue SisBatch::Aborted
       return self.reload
     end

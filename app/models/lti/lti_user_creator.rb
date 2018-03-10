@@ -47,7 +47,6 @@ module Lti
       user.name = @canvas_user.name
       user.opaque_identifier = @opaque_identifier
       user.timezone = Time.zone.tzinfo.name
-      user.current_roles = -> { current_roles() }
       user.currently_active_in_course = -> { currently_active_in_course?() }
       user.concluded_roles = -> { concluded_roles() }
       user.login_id = -> { pseudonym ? pseudonym.unique_id : nil }

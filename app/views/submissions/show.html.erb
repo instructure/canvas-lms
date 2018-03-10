@@ -228,6 +228,7 @@
         partial: 'shared/rubric',
         object: @assignment.rubric,
         locals: {
+          rubric_association: @assignment.rubric_association,
           assessing: @submission.grants_right?(@current_user, :grade) || currently_peer_reviewing
         }}) %>
     <% end %>

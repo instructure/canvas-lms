@@ -325,18 +325,6 @@ class Pseudonym < ActiveRecord::Base
     !self.login_count || self.login_count == 0
   end
 
-  def login
-    self.unique_id
-  end
-
-  def login=(val)
-    self.unique_id = val
-  end
-
-  def login_changed?
-    self.unique_id_changed?
-  end
-
   def user_code
     self.user.uuid rescue nil
   end

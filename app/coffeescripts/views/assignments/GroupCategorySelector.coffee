@@ -50,6 +50,10 @@ define [
       events[ "change #{HAS_GROUP_CATEGORY}" ] = 'toggleGroupCategoryOptions'
       events
 
+    initialize: (options) ->
+      super
+      @renderSectionsAutocomplete = options.renderSectionsAutocomplete
+
     @optionProperty 'parentModel'
     @optionProperty 'groupCategories'
     @optionProperty 'nested'
@@ -87,14 +91,25 @@ define [
         @$groupCategoryID.toggleAccessibly true
       view.open()
 
+    groupDiscussionChecked: =>
+      @$hasGroupCategory.prop('checked')
+
+    disableGroupDiscussionCheckbox: =>
+      @$hasGroupCategory.prop('disabled', true)
+
+    enableGroupDiscussionCheckbox: =>
+      @$hasGroupCategory.prop('disabled', false)
+
     toggleGroupCategoryOptions: =>
-      isGrouped = @$hasGroupCategory.prop('checked')
+      isGrouped = @groupDiscussionChecked()
       @$groupCategoryOptions.toggleAccessibly isGrouped
 
       selectedGroupSetId = if isGrouped then @$groupCategoryID.val() else null
       StudentGroupStore.setSelectedGroupSet(selectedGroupSetId)
       if isGrouped and _.isEmpty(@groupCategories)
         @showGroupCategoryCreateDialog()
+
+      @renderSectionsAutocomplete() if @renderSectionsAutocomplete?
 
     toJSON: =>
       frozenAttributes = @parentModel.frozenAttributes?() || []

@@ -24,12 +24,13 @@ class GradeCalculator
       ignore_muted: true,
       update_all_grading_period_scores: true,
       update_course_score: true,
-      only_update_course_gp_metadata: false
+      only_update_course_gp_metadata: false,
+      only_update_points: false
     )
 
-    Rails.logger.info("GRADES: calc args: user_ids=#{user_ids.inspect}")
-    Rails.logger.info("GRADES: calc args: course=#{course.inspect}")
-    Rails.logger.info("GRADES: calc args: opts=#{opts.inspect}")
+    Rails.logger.debug("GRADES: calc args: user_ids=#{user_ids.inspect}")
+    Rails.logger.debug("GRADES: calc args: course=#{course.inspect}")
+    Rails.logger.debug("GRADES: calc args: opts=#{opts.inspect}")
 
     @course = course.is_a?(Course) ? course : Course.find(course)
 
@@ -58,6 +59,7 @@ class GradeCalculator
     @periods = opts[:periods]
     @submissions = opts[:submissions]
     @only_update_course_gp_metadata = opts[:only_update_course_gp_metadata]
+    @only_update_points = opts[:only_update_points]
   end
 
   # recomputes the scores and saves them to each user's Enrollment
@@ -85,10 +87,10 @@ class GradeCalculator
 
   def submissions
     @submissions ||= @course.submissions.
-      except(:order, :select).
-      for_user(@user_ids).
-      where(assignment_id: @assignments).
-      select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state")
+                       except(:order, :select).
+                       for_user(@user_ids).
+                       where(assignment_id: @assignments).
+                       select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state")
   end
 
   def compute_scores
@@ -157,13 +159,13 @@ class GradeCalculator
         final: calculate_total_from_group_scores(group_sums[:final])
       }
     end
-    Rails.logger.info "GRADES: calculated: #{scores.inspect}"
+    Rails.logger.debug "GRADES: calculated: #{scores.inspect}"
     scores
   end
 
   def update_changes_hash_for_user(user_id, scores, group_sums)
-    @current_updates[user_id] = scores[:current][:grade]
-    @final_updates[user_id] = scores[:final][:grade]
+    @current_updates[user_id] = scores[:current]
+    @final_updates[user_id] = scores[:final]
     @current_groups[user_id] = group_sums[:current]
     @final_groups[user_id] = group_sums[:final]
     @dropped_updates[user_id] = {
@@ -208,6 +210,7 @@ class GradeCalculator
         score = nil
       end
       adjusted_scores[score_type][:grade] = score ? score.round(2) : score
+      adjusted_scores[score_type][:total] = adjusted_scores[score_type][:grade]
     end
   end
 
@@ -252,7 +255,8 @@ class GradeCalculator
       effective_due_dates: effective_due_dates,
       enrollments: enrollments,
       submissions: submissions,
-      only_update_course_gp_metadata: @only_update_course_gp_metadata
+      only_update_course_gp_metadata: @only_update_course_gp_metadata,
+      only_update_points: @only_update_points
     )
     GradeCalculator.new(@user_ids, @course, opts).compute_and_save_scores
   end
@@ -312,12 +316,24 @@ class GradeCalculator
 
   def group_score_rows
     enrollments_by_user.keys.map do |user_id|
-      current = @current_groups[user_id].pluck(:global_id, :grade).to_h
-      final = @final_groups[user_id].pluck(:global_id, :grade).to_h
+      current_group_scores = @current_groups[user_id].map { |group| [group[:global_id], group] }.to_h
+      final_group_scores = @final_groups[user_id].map { |group| [group[:global_id], group] }.to_h
       @groups.map do |group|
         agid = group.global_id
+        current = current_group_scores[agid]
+        final = final_group_scores[agid]
         enrollments_by_user[user_id].map do |enrollment|
-          "(#{enrollment.id}, #{group.id}, #{number_or_null(current[agid])}, #{number_or_null(final[agid])})"
+          fields = [enrollment.id, group.id]
+
+          unless @only_update_points
+            fields << number_or_null(current[:grade])
+            fields << number_or_null(final[:grade])
+          end
+
+          fields << number_or_null(current[:score])
+          fields << number_or_null(final[:score])
+
+          "(#{fields.join(', ')})"
         end
       end
     end.flatten
@@ -344,12 +360,20 @@ class GradeCalculator
     @updated_at ||= Score.connection.quote(Time.now.utc)
   end
 
+  def column_prefix
+    @ignore_muted ? '': 'unposted_'
+  end
+
   def current_score_column
-    @ignore_muted ? 'current_score' : 'unposted_current_score'
+    "#{column_prefix}current_score"
   end
 
   def final_score_column
-    @ignore_muted ? 'final_score' : 'unposted_final_score'
+    "#{column_prefix}final_score"
+  end
+
+  def points_column(type)
+    "#{column_prefix}#{type}_points"
   end
 
   def save_scores
@@ -376,29 +400,68 @@ class GradeCalculator
     end
   end
 
+  def user_specific_updates(updates:, default_value:, key:)
+    specific_values = updates.flat_map do |user_id, score_details|
+      enrollments_by_user[user_id].map do |enrollment|
+        "WHEN #{enrollment.id} THEN #{number_or_null(score_details[key])}"
+      end
+    end
+
+    "#{specific_values.join(' ')} ELSE #{default_value}"
+  end
+
+  def update_values_for(column, updates: {}, key: :grade)
+    return unless column
+
+    actual_updates = user_specific_updates(updates: updates, default_value: column, key: key)
+
+    "#{column} = CASE enrollment_id #{actual_updates} END"
+  end
+
+  def insert_values_for(column, updates: {}, key: :grade)
+    return unless column
+
+    actual_updates = user_specific_updates(updates: updates, default_value: 'NULL', key: key)
+
+    "CASE enrollments.id #{actual_updates} END :: float AS #{column}"
+  end
+
+  def columns_to_insert_or_update
+    return @columns_to_insert_or_update if defined? @columns_to_insert_or_update
+
+    # Use a hash with Array values to ensure ordering of data
+    column_list = { columns: [], insert_values: [], update_values: [] }
+
+    unless @only_update_points
+      column_list[:columns] << current_score_column
+      column_list[:insert_values] << insert_values_for(current_score_column, updates: @current_updates)
+      column_list[:update_values] << update_values_for(current_score_column, updates: @current_updates)
+
+      column_list[:columns] << final_score_column
+      column_list[:insert_values] << insert_values_for(final_score_column, updates: @final_updates)
+      column_list[:update_values] << update_values_for(final_score_column, updates: @final_updates)
+    end
+
+    column_list[:columns] << points_column(:current)
+    column_list[:insert_values] << insert_values_for(points_column(:current), updates: @current_updates, key: :total)
+    column_list[:update_values] << update_values_for(points_column(:current), updates: @current_updates, key: :total)
+
+    column_list[:columns] << points_column(:final)
+    column_list[:insert_values] << insert_values_for(points_column(:final), updates: @final_updates, key: :total)
+    column_list[:update_values] << update_values_for(points_column(:final), updates: @final_updates, key: :total)
+
+    @columns_to_insert_or_update = column_list
+  end
+
   def save_course_and_grading_period_scores
     return if @only_update_course_gp_metadata
+
     # Construct upsert statement to update existing Scores or create them if needed,
     # for course and grading period Scores.
     Score.connection.execute("
       UPDATE #{Score.quoted_table_name}
           SET
-            #{current_score_column} = CASE enrollment_id
-              #{@current_updates.map do |user_id, score|
-                enrollments_by_user[user_id].map do |enrollment|
-                  "WHEN #{enrollment.id} THEN #{number_or_null(score)}"
-                end.join(' ')
-              end.join(' ')}
-              ELSE #{current_score_column}
-            END,
-            #{final_score_column} = CASE enrollment_id
-              #{@final_updates.map do |user_id, score|
-                enrollments_by_user[user_id].map do |enrollment|
-                  "WHEN #{enrollment.id} THEN #{number_or_null(score)}"
-                end.join(' ')
-              end.join(' ')}
-              ELSE #{final_score_column}
-            END,
+            #{columns_to_insert_or_update[:update_values].join(', ')},
             updated_at = #{updated_at},
             -- if workflow_state was previously deleted for some reason, update it to active
             workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), 'active')
@@ -407,26 +470,15 @@ class GradeCalculator
             assignment_group_id IS NULL AND
             #{@grading_period ? "grading_period_id = #{@grading_period.id}" : 'course_score IS TRUE'};
       INSERT INTO #{Score.quoted_table_name}
-          (enrollment_id, grading_period_id, #{current_score_column}, #{final_score_column}, course_score, created_at, updated_at)
+          (
+            enrollment_id, grading_period_id,
+            #{columns_to_insert_or_update[:columns].join(', ')},
+            course_score, created_at, updated_at
+          )
           SELECT
             enrollments.id as enrollment_id,
             #{@grading_period.try(:id) || 'NULL'} as grading_period_id,
-            CASE enrollments.id
-              #{@current_updates.map do |user_id, score|
-                enrollments_by_user[user_id].map do |enrollment|
-                  "WHEN #{enrollment.id} THEN #{number_or_null(score)}"
-                end.join(' ')
-              end.join(' ')}
-              ELSE NULL
-            END :: float AS #{current_score_column},
-            CASE enrollments.id
-              #{@final_updates.map do |user_id, score|
-                enrollments_by_user[user_id].map do |enrollment|
-                  "WHEN #{enrollment.id} THEN #{number_or_null(score)}"
-                end.join(' ')
-              end.join(' ')}
-              ELSE NULL
-            END :: float AS #{final_score_column},
+            #{columns_to_insert_or_update[:insert_values].join(', ')},
             #{@grading_period ? 'FALSE' : 'TRUE'} AS course_score,
             #{updated_at} as created_at,
             #{updated_at} as updated_at
@@ -491,33 +543,67 @@ class GradeCalculator
     ")
   end
 
+  def assignment_group_columns_to_insert_or_update
+    return @assignment_group_columns_to_insert_or_update if defined? @assignment_group_columns_to_insert_or_update
+
+    column_list = { value_names: [], update_columns: [], update_values: [], insert_columns: [], insert_values: [] }
+
+    unless @only_update_points
+      column_list[:value_names] << 'current_score'
+      column_list[:update_columns] << "#{current_score_column} = val.current_score"
+      column_list[:insert_columns] << "val.current_score AS #{current_score_column}"
+
+      column_list[:value_names] << 'final_score'
+      column_list[:update_columns] << "#{final_score_column} = val.final_score"
+      column_list[:insert_columns] << "val.final_score AS #{final_score_column}"
+    end
+
+    column_list[:value_names] << 'current_points'
+    column_list[:update_columns] << "#{points_column(:current)} = val.current_points"
+    column_list[:insert_columns] << "val.current_points AS #{points_column(:current)}"
+
+    column_list[:value_names] << 'final_points'
+    column_list[:update_columns] << "#{points_column(:final)} = val.final_points"
+    column_list[:insert_columns] << "val.final_points AS #{points_column(:final)}"
+
+    @assignment_group_columns_to_insert_or_update = column_list
+  end
+
   def save_assignment_group_scores(score_values, dropped_values)
     # Construct upsert statement to update existing Scores or create them if needed,
     # for assignment group Scores.
     Score.connection.execute("
       UPDATE #{Score.quoted_table_name} scores
           SET
-            #{current_score_column} = val.current_score,
-            #{final_score_column} = val.final_score,
+            #{assignment_group_columns_to_insert_or_update[:update_columns].join(', ')},
             updated_at = #{updated_at},
             workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), 'active')
           FROM (VALUES #{score_values}) val
-            (enrollment_id, assignment_group_id, current_score, final_score)
+            (
+              enrollment_id,
+              assignment_group_id,
+              #{assignment_group_columns_to_insert_or_update[:value_names].join(', ')}
+            )
           WHERE val.enrollment_id = scores.enrollment_id AND
             val.assignment_group_id = scores.assignment_group_id;
-      INSERT INTO #{Score.quoted_table_name}
-          (enrollment_id, assignment_group_id, #{current_score_column}, #{final_score_column},
-            course_score, created_at, updated_at)
+      INSERT INTO #{Score.quoted_table_name} (
+          enrollment_id, assignment_group_id,
+          #{assignment_group_columns_to_insert_or_update[:value_names].join(', ')},
+          course_score, created_at, updated_at
+          )
           SELECT
             val.enrollment_id AS enrollment_id,
             val.assignment_group_id as assignment_group_id,
-            val.current_score AS #{current_score_column},
-            val.final_score AS #{final_score_column},
+            #{assignment_group_columns_to_insert_or_update[:insert_columns].join(', ')},
             FALSE AS course_score,
             #{updated_at} AS created_at,
             #{updated_at} AS updated_at
           FROM (VALUES #{score_values}) val
-            (enrollment_id, assignment_group_id, current_score, final_score)
+            (
+              enrollment_id,
+              assignment_group_id,
+              #{assignment_group_columns_to_insert_or_update[:value_names].join(', ')}
+            )
           LEFT OUTER JOIN #{Score.quoted_table_name} sc ON
             sc.enrollment_id = val.enrollment_id AND
             sc.assignment_group_id = val.assignment_group_id
@@ -620,9 +706,9 @@ class GradeCalculator
       group_submissions.each { |s| s[:score] ||= 0 }
 
       logged_submissions = group_submissions.map { |s| loggable_submission(s) }
-      Rails.logger.info "GRADES: calculating for assignment_group=#{group.global_id} user=#{user_id}"
-      Rails.logger.info "GRADES: calculating... ignore_ungraded=#{ignore_ungraded}"
-      Rails.logger.info "GRADES: calculating... submissions=#{logged_submissions.inspect}"
+      Rails.logger.debug "GRADES: calculating for assignment_group=#{group.global_id} user=#{user_id}"
+      Rails.logger.debug "GRADES: calculating... ignore_ungraded=#{ignore_ungraded}"
+      Rails.logger.debug "GRADES: calculating... submissions=#{logged_submissions.inspect}"
 
       kept = drop_assignments(group_submissions, group.rules_hash)
       dropped_submissions = (group_submissions - kept).map { |s| s[:submission]&.id }.compact
@@ -640,7 +726,7 @@ class GradeCalculator
         grade:     ((score.to_f / possible * 100).round(2) if possible > 0),
         dropped:   dropped_submissions
       }.tap { |group_grade_info|
-        Rails.logger.info "GRADES: calculated #{group_grade_info.inspect}"
+        Rails.logger.debug "GRADES: calculated #{group_grade_info.inspect}"
       }
     end
   end
@@ -652,7 +738,7 @@ class GradeCalculator
     never_drop_ids = rules[:never_drop] || []
     return submissions if drop_lowest.zero? && drop_highest.zero?
 
-    Rails.logger.info "GRADES: dropping assignments! #{rules.inspect}"
+    Rails.logger.debug "GRADES: dropping assignments! #{rules.inspect}"
 
     cant_drop = []
     if never_drop_ids.present? || @ignore_muted
@@ -681,7 +767,7 @@ class GradeCalculator
 
     (kept + cant_drop).tap do |all_kept|
       loggable_kept = all_kept.map { |s| loggable_submission(s) }
-      Rails.logger.info "GRADES.calculating... kept=#{loggable_kept.inspect}"
+      Rails.logger.debug "GRADES.calculating... kept=#{loggable_kept.inspect}"
     end
   end
 
@@ -809,11 +895,13 @@ class GradeCalculator
         final_grade *= 100.0 / full_weight
       end
 
-      {grade: final_grade.try(:round, 2), dropped: dropped}
-    else
-      total, possible = group_sums.reduce([0,0]) { |(m,n),gs|
-        [m + gs[:score], n + gs[:possible]]
+      {
+        grade: final_grade.try(:round, 2),
+        total: final_grade.try(:round, 2),
+        dropped: dropped
       }
+    else
+      total, possible = group_sums.reduce([0,0]) { |(m,n),gs| [m + gs[:score], n + gs[:possible]] }
       if possible > 0
         final_grade = (total.to_f / possible) * 100
         {
@@ -823,7 +911,11 @@ class GradeCalculator
           dropped: dropped
         }
       else
-        {grade: nil, total: total.to_f, dropped: dropped}
+        {
+          grade: nil,
+          total: total.to_f,
+          dropped: dropped
+        }
       end
     end
   end

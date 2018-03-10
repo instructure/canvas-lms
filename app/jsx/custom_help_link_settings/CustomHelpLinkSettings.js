@@ -27,8 +27,6 @@ import CustomHelpLinkForm from './CustomHelpLinkForm'
 import CustomHelpLinkMenu from './CustomHelpLinkMenu'
 import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
 
-let counter = 0 // counter to ensure unique ids for links
-
 export default class CustomHelpLinkSettings extends React.Component {
   static propTypes = {
     name: PropTypes.string,
@@ -46,13 +44,11 @@ export default class CustomHelpLinkSettings extends React.Component {
 
   constructor(props) {
     super(props)
-    // set ids to the original index so that we can have unique keys
+    let nextIndex = this.nextLinkIndex(props.links)
     const links = props.links.map(link => {
-      counter++
-
       return {
         ...link,
-        id: link.id || `link${counter}`,
+        id: link.id || `link${nextIndex++}`,
         available_to: link.available_to || [],
         state: link.state || 'active'
       }
@@ -71,6 +67,18 @@ export default class CustomHelpLinkSettings extends React.Component {
       ...link,
       is_disabled: linkTexts.indexOf(link.text) > -1
     }))
+  }
+
+  nextLinkIndex = (links) => {
+    let max = 0;
+    links.forEach(link => {
+      const match = link.id && link.id.match(/^link(\d+)$/)
+      const index = match && parseInt(match[1], 10)
+      if (index && index > max) {
+        max = index
+      }
+    })
+    return max + 1
   }
 
   // define handlers here so that we don't create one for each render
@@ -171,10 +179,8 @@ export default class CustomHelpLinkSettings extends React.Component {
   }
 
   add = link => {
-    counter++
-
     const links = [...this.state.links]
-    const id = link.id || `link${counter}`
+    const id = link.id || `link${this.nextLinkIndex(links)}`
 
     links.splice(0, 0, {
       ...link,

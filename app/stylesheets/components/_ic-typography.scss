@@ -70,10 +70,10 @@ html {
   font-size: 100%;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
-  font-family: $ic-font-family-fallback;
-  &.lato-font-loaded {
-    font-family: $ic-font-family;
+  &.lato-font-not-loaded-yet {
+    font-family: $ic-font-family-fallback;
   }
+  font-family: $ic-font-family;
 }
 
 body {

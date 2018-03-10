@@ -201,10 +201,17 @@ class UsersController < ApplicationController
 
     grading_period_id = generate_grading_period_id(params[:grading_period_id])
     opts = { grading_period_id: grading_period_id } if grading_period_id
-    render json: {
+
+    grade_data = {
       grade: enrollment.computed_current_score(opts),
       hide_final_grades: enrollment.course.hide_final_grades?
     }
+
+    if enrollment.course.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
+      grade_data[:unposted_grade] = enrollment.unposted_current_score(opts)
+    end
+
+    render json: grade_data
   end
 
   def oauth
@@ -490,7 +497,7 @@ class UsersController < ApplicationController
           sortable_name: @user.sortable_name,
           email: @user.email,
           pseudonyms: @user.all_active_pseudonyms.map do |pseudonym|
-            { login_id: pseudonym.login,
+            { login_id: pseudonym.unique_id,
               sis_id: pseudonym.sis_user_id,
               integration_id: pseudonym.integration_id }
           end
@@ -846,11 +853,13 @@ class UsersController < ApplicationController
 
     grading_scope = @current_user.assignments_needing_grading(scope_only: true).
       reorder(:due_at, :id)
-    submitting_scope = @current_user.assignments_needing_submitting(
+    submitting_scope = @current_user.
+      assignments_needing_submitting(
         include_ungraded: true,
         limit: ToDoListPresenter::ASSIGNMENT_LIMIT,
-        scope_only: true ).
-      where('assignments.due_at > ?', Time.zone.now).
+        scope_only: true
+      ).
+      where('assignments.due_at IS NULL OR assignments.due_at > ?', Time.zone.now).
       reorder(:due_at, :id)
 
     grading_collection = BookmarkedCollection.wrap(bookmark, grading_scope)
@@ -868,10 +877,12 @@ class UsersController < ApplicationController
 
     if Array(params[:include]).include? 'ungraded_quizzes'
       quizzes_bookmark = BookmarkedCollection::SimpleBookmarker.new(Quizzes::Quiz, :due_at, :id)
-      quizzes_scope = @current_user.ungraded_quizzes(
+      quizzes_scope = @current_user.
+        ungraded_quizzes(
           :needing_submitting => true,
-          :scope_only => true).
-        where('quizzes.due_at >= ?', Time.zone.now).
+          :scope_only => true
+        ).
+        where('quizzes.due_at IS NULL OR quizzes.due_at >= ?', Time.zone.now).
         reorder(:due_at, :id)
       quizzes_collection = BookmarkedCollection.wrap(quizzes_bookmark, quizzes_scope)
       quizzes_collection = BookmarkedCollection.transform(quizzes_collection) do |a|
@@ -1628,7 +1639,9 @@ class UsersController < ApplicationController
     end
   end
 
-  # @API Get dashboard postions
+  # @API Get dashboard positions
+  # @beta
+  #
   # Returns all dashboard positions that have been saved for a user.
   #
   # @example_request
@@ -1652,6 +1665,8 @@ class UsersController < ApplicationController
   end
 
   # @API Update dashboard positions
+  # @beta
+  #
   # Updates the dashboard positions for a user for a given context.  This allows
   # positions for the dashboard cards and elsewhere to be customized on a per
   # user basis.
@@ -1760,11 +1775,6 @@ class UsersController < ApplicationController
     @user = api_request? ?
       api_find(User, params[:id]) :
       params[:id] ? api_find(User, params[:id]) : @current_user
-
-    if params[:default_pseudonym_id] && authorized_action(@user, @current_user, :manage)
-      @default_pseudonym = @user.pseudonyms.find(params[:default_pseudonym_id])
-      @default_pseudonym.move_to_top
-    end
 
     update_email = @user.grants_right?(@current_user, :manage_user_details) && user_params[:email]
     managed_attributes = []

@@ -82,7 +82,7 @@ class Submission < ActiveRecord::Base
   has_many :provisional_grades, class_name: 'ModeratedGrading::ProvisionalGrade'
   has_many :originality_reports
   has_one :rubric_assessment, -> { where(assessment_type: 'grading') }, as: :artifact, inverse_of: :artifact
-  has_one :lti_result, inverse_of: :submission, class_name: 'Lti::Result'
+  has_one :lti_result, inverse_of: :submission, class_name: 'Lti::Result', dependent: :destroy
 
   # we no longer link submission comments and conversations, but we haven't fixed up existing
   # linked conversations so this relation might be useful
@@ -292,6 +292,7 @@ class Submission < ActiveRecord::Base
   after_save :check_for_media_object
   after_save :update_quiz_submission
   after_save :update_participation
+  after_save :update_line_item_result
 
   def autograded?
     # AutoGrader == (quiz_id * -1)
@@ -492,9 +493,9 @@ class Submission < ActiveRecord::Base
     if score_changed? || excused_changed? ||
         (workflow_state_was == "pending_review" && workflow_state == "graded")
       if skip_grade_calc
-        Rails.logger.info "GRADES: NOT recomputing scores for submission #{global_id} because skip_grade_calc was set"
+        Rails.logger.debug "GRADES: NOT recomputing scores for submission #{global_id} because skip_grade_calc was set"
       else
-        Rails.logger.info "GRADES: submission #{global_id} score changed. recomputing grade for course #{context.global_id} user #{user_id}."
+        Rails.logger.debug "GRADES: submission #{global_id} score changed. recomputing grade for course #{context.global_id} user #{user_id}."
         self.class.connection.after_transaction_commit do
           Enrollment.recompute_final_score_in_singleton(
             self.user_id,
@@ -1333,11 +1334,16 @@ class Submission < ActiveRecord::Base
   def apply_late_policy(late_policy=nil, incoming_assignment=nil)
     return if points_deducted_changed? || grading_period&.closed?
     incoming_assignment ||= assignment
-    return unless late_policy_status_manually_applied? || incoming_assignment.expects_submission?
+    return unless late_policy_status_manually_applied? || incoming_assignment.expects_submission? || submitted_to_lti_assignment?(incoming_assignment)
     late_policy ||= incoming_assignment.course.late_policy
     return score_missing(late_policy, incoming_assignment.points_possible, incoming_assignment.grading_type) if missing?
     score_late_or_none(late_policy, incoming_assignment.points_possible, incoming_assignment.grading_type)
   end
+
+  def submitted_to_lti_assignment?(assignment_submitted_to)
+    submitted_at.present? && assignment_submitted_to.external_tool?
+  end
+  private :submitted_to_lti_assignment?
 
   def score_missing(late_policy, points_possible, grading_type)
     if self.points_deducted.present?
@@ -1863,7 +1869,7 @@ class Submission < ActiveRecord::Base
 
   def add_comment(opts={})
     opts = opts.symbolize_keys
-    opts[:author] ||= opts[:commenter] || opts[:author] || opts[:user] || self.user
+    opts[:author] ||= opts[:commenter] || opts[:author] || opts[:user] || self.user unless opts[:skip_author]
     opts[:comment] = opts[:comment].try(:strip) || ""
     opts[:attachments] ||= opts[:comment_attachments]
     opts[:draft] = !!opts[:draft_comment]
@@ -2180,6 +2186,11 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def update_line_item_result
+    return if lti_result.nil?
+    lti_result.update(result_score: score) if score_changed?
+  end
+
   def point_data?
     !!(self.score || self.grade)
   end
@@ -2356,7 +2367,7 @@ class Submission < ActiveRecord::Base
     end
   ensure
     user_ids = graded_user_ids.to_a
-    Rails.logger.info "GRADES: recomputing scores in course #{context.id} for users #{user_ids} because of bulk submission update"
+    Rails.logger.debug "GRADES: recomputing scores in course #{context.id} for users #{user_ids} because of bulk submission update"
     context.recompute_student_scores(user_ids)
   end
 

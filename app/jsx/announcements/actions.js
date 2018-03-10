@@ -31,7 +31,7 @@ function fetchAnnouncements(dispatch, getState, payload) {
   return (resolve, reject) => {
     apiClient.getAnnouncements(getState(), payload)
       .then(res => {
-        $.screenReaderFlashMessage(I18n.t('%{count} announcements found.', { count: res.data.length }))
+        $.screenReaderFlashMessageExclusive(I18n.t('%{count} announcements found.', { count: res.data.length }))
         resolve(res)
       })
       .catch(err => reject({ err, message: I18n.t('An error ocurred while loading announcements') }))
@@ -84,7 +84,7 @@ actions.searchAnnouncements = function searchAnnouncements (searchOpts) {
 actions.getExternalFeeds = function () {
   return (dispatch, getState) => {
     dispatch(actions.loadingExternalFeedStart())
-    apiClient.getExternalFeeds({ courseId : getState().courseId })
+    apiClient.getExternalFeeds(getState())
       .then(resp => {
         dispatch(actions.loadingExternalFeedSuccess({ feeds: resp.data }))
       }).catch((err) => {
@@ -100,44 +100,32 @@ actions.deleteExternalFeed = function ({ feedId }) {
   return (dispatch, getState) => {
     if(!getState().externalRssFeed.isDeleting) {
       dispatch(actions.deleteExternalFeedStart())
-      apiClient.deleteExternalFeed({ courseId : getState().courseId, feedId })
-      .then(() => {
-        dispatch(actions.deleteExternalFeedSuccess({ feedId }))
-        const successMessage = I18n.t('External Feed deleted successfully')
-        $.screenReaderFlashMessage(successMessage)
-        dispatch(notificationActions.notifyInfo({ message: successMessage }))
-      })
-      .catch((err) => {
-        const failMessage = I18n.t('Failed to delete external feed')
-        $.screenReaderFlashMessage(failMessage)
-        dispatch(actions.deleteExternalFeedFail({
-          message: failMessage,
-          err
-        }))
-      })
+      apiClient.deleteExternalFeed(getState(), feedId)
+        .then(() => {
+          dispatch(actions.deleteExternalFeedSuccess({ feedId }))
+          const successMessage = I18n.t('External Feed deleted successfully')
+          $.screenReaderFlashMessage(successMessage)
+          dispatch(notificationActions.notifyInfo({ message: successMessage }))
+        })
+        .catch((err) => {
+          const failMessage = I18n.t('Failed to delete external feed')
+          $.screenReaderFlashMessage(failMessage)
+          dispatch(actions.deleteExternalFeedFail({
+            message: failMessage,
+            err
+          }))
+        })
     }
   }
 }
 
-actions.lockAnnouncements = () => (dispatch, getState) => {
-  const state = getState()
-  const { announcements } = state
-  const { items } = announcements.pages[announcements.currentPage]
-
-  const selectedItems = items.filter(item =>
-    state.selectedAnnouncements.includes(item.id))
-
-  // if all the selected items are locked, we want to unlock
-  // if any of the selected items are unlocked, we lock everything
-  const hasUnlockedItems = selectedItems
-    .reduce((hasAnyUnlocked, item) => hasAnyUnlocked || !item.locked, false)
-
+actions.toggleAnnouncementsLock = (announcements, isLocking = true) => (dispatch, getState) => {
   dispatch(actions.lockAnnouncementsStart())
-  apiClient.lockAnnouncements(state, state.selectedAnnouncements, hasUnlockedItems)
+  apiClient.lockAnnouncements(getState(), [].concat(announcements), isLocking)
     .then(res => {
       if (res.successes.length) {
-        dispatch(actions.lockAnnouncementsSuccess({ res, locked: hasUnlockedItems }))
-        if (hasUnlockedItems) {
+        dispatch(actions.lockAnnouncementsSuccess({ res, locked: isLocking }))
+        if (isLocking) {
           dispatch(notificationActions.notifyInfo({ message: I18n.t('Announcements locked successfully') }))
         } else {
           dispatch(notificationActions.notifyInfo({ message: I18n.t('Announcements unlocked successfully') }))
@@ -154,10 +142,25 @@ actions.lockAnnouncements = () => (dispatch, getState) => {
     })
 }
 
-actions.deleteAnnouncements = () => (dispatch, getState) => {
+actions.toggleSelectedAnnouncementsLock = () => (dispatch, getState) => {
   const state = getState()
+  const { announcements } = state
+  const { items } = announcements.pages[announcements.currentPage]
+
+  const selectedItems = items.filter(item =>
+    state.selectedAnnouncements.includes(item.id))
+
+  // if all the selected items are locked, we want to unlock
+  // if any of the selected items are unlocked, we lock everything
+  const hasUnlockedItems = selectedItems
+    .reduce((hasAnyUnlocked, item) => hasAnyUnlocked || !item.locked, false)
+
+  actions.toggleAnnouncementsLock(state.selectedAnnouncements, hasUnlockedItems)(dispatch, getState)
+}
+
+actions.deleteAnnouncements = (announcements) => (dispatch, getState) => {
   dispatch(actions.deleteAnnouncementsStart())
-  apiClient.deleteAnnouncements(state, state.selectedAnnouncements)
+  apiClient.deleteAnnouncements(getState(), [].concat(announcements))
     .then(res => {
       if (res.successes.length) {
         const pageState = getState().announcements
@@ -185,10 +188,15 @@ actions.deleteAnnouncements = () => (dispatch, getState) => {
     })
 }
 
+actions.deleteSelectedAnnouncements = () => (dispatch, getState) => {
+  const state = getState()
+  actions.deleteAnnouncements(state.selectedAnnouncements)(dispatch, getState)
+}
+
 actions.addExternalFeed = function (payload) {
   return (dispatch, getState) => {
     dispatch(actions.addExternalFeedStart())
-    apiClient.addExternalFeed({ courseId : getState().courseId, ...payload })
+    apiClient.addExternalFeed(getState(), payload)
       .then(resp => {
         dispatch(actions.addExternalFeedSuccess({ feed: resp.data}))
         const successMessage = I18n.t('External feed successfully added')

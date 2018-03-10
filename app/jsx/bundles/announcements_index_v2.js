@@ -19,11 +19,13 @@
 import createAnnouncementsIndex from '../announcements'
 
 const root = document.querySelector('#content')
+const [contextType, contextId] = ENV.context_asset_string.split('_')
 const app = createAnnouncementsIndex(root, {
   atomFeedUrl: ENV.atom_feed_url,
-  courseId: ENV.COURSE_ID,
+  contextType, contextId,
   masterCourseData: ENV.BLUEPRINT_COURSES_DATA,
   permissions: ENV.permissions,
+  announcementsLocked: ENV.ANNOUNCEMENTS_LOCKED,
 })
 
 app.render()

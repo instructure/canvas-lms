@@ -500,7 +500,7 @@ describe Account do
       hash[k][:user] = user
     end
 
-    limited_access = [ :read, :read_as_admin, :manage, :update, :delete, :read_outcomes ]
+    limited_access = [ :read, :read_as_admin, :manage, :update, :delete, :read_outcomes, :read_terms ]
     conditional_access = RoleOverride.permissions.select { |_, v| v[:account_allows] }.map(&:first)
     full_access = RoleOverride.permissions.keys +
                   limited_access - conditional_access +
@@ -531,8 +531,8 @@ describe Account do
     hash.each do |k, v|
       next unless k == :site_admin || k == :root
       account = v[:account]
-      expect(account.check_policy(hash[:sub][:admin])).to match_array(k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
-      expect(account.check_policy(hash[:sub][:user])).to match_array(k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
+      expect(account.check_policy(hash[:sub][:admin])).to match_array(k == :site_admin ? [:read_global_outcomes] : [:read_outcomes, :read_terms])
+      expect(account.check_policy(hash[:sub][:user])).to match_array(k == :site_admin ? [:read_global_outcomes] : [:read_outcomes, :read_terms])
     end
     hash.each do |k, v|
       next if k == :site_admin || k == :root
@@ -576,8 +576,8 @@ describe Account do
     hash.each do |k, v|
       next unless k == :site_admin || k == :root
       account = v[:account]
-      expect(account.check_policy(hash[:sub][:admin])).to match_array(k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
-      expect(account.check_policy(hash[:sub][:user])).to match_array(k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
+      expect(account.check_policy(hash[:sub][:admin])).to match_array(k == :site_admin ? [:read_global_outcomes] : [:read_outcomes, :read_terms])
+      expect(account.check_policy(hash[:sub][:user])).to match_array(k == :site_admin ? [:read_global_outcomes] : [:read_outcomes, :read_terms])
     end
     hash.each do |k, v|
       next if k == :site_admin || k == :root
@@ -779,6 +779,16 @@ describe Account do
 
       tabs = account.tabs_available(nil)
       expect(tabs.map{|t| t[:id] }).not_to be_include(Account::TAB_DEVELOPER_KEYS)
+    end
+
+    it "should include 'Developer Keys' for the admin users of a sub account" do
+      account = Account.create!
+      Account.site_admin.allow_feature!(:developer_key_management)
+      account.enable_feature!(:developer_key_management)
+      sub_account = Account.create!(parent_account: account)
+      admin = account_admin_user(:account => sub_account)
+      tabs = sub_account.tabs_available(admin)
+      expect(tabs.map{|t| t[:id] }).to include(Account::TAB_DEVELOPER_KEYS)
     end
 
     it "should not include 'Developer Keys' for non-site_admin accounts" do
@@ -1635,4 +1645,6 @@ describe Account do
 
     expect(Account.default.settings[:blah]).to eq true
   end
+
+  it_behaves_like 'a learning outcome context'
 end

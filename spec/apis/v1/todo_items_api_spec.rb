@@ -248,7 +248,45 @@ describe UsersController, type: :request do
     expect(response).to be_success
   end
 
-  context 'pagination' do
+  context 'when the assignment is differentiated/ has overrides' do
+    before :each do
+      @course = course_factory(active_all: true)
+      @section = @course.course_sections.create!
+
+      @user = user_factory(active_all: true)
+      @course.enroll_student(@user, { :section => @section }).accept!
+
+      ao = differentiated_assignment(:context => @course, :course_section => @section, :due_at => nil)
+      ao.due_at = 1.day.from_now
+      ao.due_at_overridden = true
+      ao.save!
+
+      survey = @course.quizzes.create!(quiz_type: 'survey', only_visible_to_overrides: true, :due_at => nil)
+      so = survey.assignment_overrides.create!(:set => @section)
+      so.due_at = 1.day.from_now
+      so.due_at_overridden = true
+      so.save!
+      survey.publish!
+    end
+
+
+    it "includes assignments/quizzes with no due_at (users controller)" do
+      json = api_call(:get, "/api/v1/users/self/todo?include[]=ungraded_quizzes",
+                      :controller => "users", :action => "todo_items",
+                      :format => "json", :include => %w(ungraded_quizzes))
+      expect(json.count).to be(2)
+    end
+
+    it "includes assignments/quizzes with no due_at (courses controller)" do
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/todo?include[]=ungraded_quizzes",
+                      :controller => "courses", :action => "todo_items",
+                      :format => "json", :course_id => @course.to_param,
+                      :include => %w(ungraded_quizzes))
+      expect(json.count).to be(2)
+    end
+  end
+
+  context 'with pagination' do
     before :each do
       @teacher = course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_all => true))
       @teacher_course = @course

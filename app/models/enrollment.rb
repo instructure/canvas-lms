@@ -58,13 +58,13 @@ class Enrollment < ActiveRecord::Base
   validate :valid_course?
   validate :valid_section?
 
+  # update bulk destroy if changing or adding an after save
   before_save :assign_uuid
   before_validation :assert_section
   after_save :recalculate_enrollment_state
   after_save :update_user_account_associations_if_necessary
   before_save :audit_groups_for_deleted_enrollments
   before_validation :ensure_role_id
-  before_validation :infer_privileges
   after_create :create_linked_enrollments
   after_create :create_enrollment_state
   after_save :copy_scores_from_existing_enrollment, if: :need_to_copy_scores?
@@ -75,11 +75,12 @@ class Enrollment < ActiveRecord::Base
   after_save :set_update_cached_due_dates
   after_save :touch_graders_if_needed
   after_save :reset_notifications_cache
-  after_save :update_assignment_overrides_if_needed
   after_save :dispatch_invitations_later
   after_save :add_to_favorites_later
   after_commit :update_cached_due_dates
   after_save :update_assignment_overrides_if_needed
+  after_create :needs_grading_count_updated, if: :active_student?
+  after_update :needs_grading_count_updated, if: :active_student_changed?
 
   attr_accessor :already_enrolled, :need_touch_user, :skip_touch_user
   scope :current, -> { joins(:course).where(QueryBuilder.new(:active).conditions).readonly(false) }
@@ -171,8 +172,6 @@ class Enrollment < ActiveRecord::Base
       update_all(["updated_at=?", Time.now.utc])
   end
 
-  after_create :needs_grading_count_updated, if: :active_student?
-  after_update :needs_grading_count_updated, if: :active_student_changed?
   def needs_grading_count_updated
     self.class.connection.after_transaction_commit do
       touch_assignments
@@ -578,11 +577,6 @@ class Enrollment < ActiveRecord::Base
     self.root_account_id ||= self.course.root_account_id rescue nil
   end
 
-  def infer_privileges
-    self.limit_privileges_to_course_section = false if self.limit_privileges_to_course_section.nil?
-    true
-  end
-
   def course_name(display_user = nil)
     self.course.nickname_for(display_user) || t('#enrollment.default_course_name', "Course")
   end
@@ -694,6 +688,7 @@ class Enrollment < ActiveRecord::Base
     state :active do
       event :reject, :transitions_to => :rejected do self.user.touch; end
       event :complete, :transitions_to => :completed
+      # TODO: remove pend, there's no `state :pending`
       event :pend, :transitions_to => :pending
     end
 
@@ -1350,12 +1345,6 @@ class Enrollment < ActiveRecord::Base
       override_scope
         .where(assignment_id: assignment_ids)
         .find_each(&:destroy)
-    elsif being_restored? || being_reactivated? || being_uncompleted?
-      return unless (assignment_ids = assignment_scope.pluck(:id)).any?
-
-      override_scope
-        .where(assignment_id: assignment_ids)
-        .find_each(&:undestroy)
     end
   end
 

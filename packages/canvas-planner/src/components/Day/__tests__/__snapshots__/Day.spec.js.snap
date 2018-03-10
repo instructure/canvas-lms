@@ -1,0 +1,146 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders grouping correctly when having itemsForDay 1`] = `
+<div>
+  <Heading
+    border="none"
+    color="inherit"
+    ellipsis={false}
+    level="h2"
+  >
+    <Text
+      as="div"
+      letterSpacing="normal"
+      lineHeight="condensed"
+      size="medium"
+      transform="uppercase"
+    >
+      Tuesday
+    </Text>
+    <Text
+      as="div"
+      letterSpacing="normal"
+      lineHeight="condensed"
+      size="medium"
+    >
+      April 25, 2017
+    </Text>
+  </Heading>
+  <div>
+    <Animatable(Grouping)
+      animatableIndex={0}
+      items={
+        Array [
+          Object {
+            "context": Object {
+              "id": 128,
+              "inform_students_of_overdue_submissions": true,
+              "type": "Course",
+              "url": "http://www.non_default_url.com",
+            },
+            "title": "Black Friday",
+          },
+        ]
+      }
+      theme={
+        Object {
+          "titleColor": null,
+        }
+      }
+      timeZone="America/Denver"
+      url="http://www.non_default_url.com"
+    />
+    <Animatable(Grouping)
+      animatableIndex={1}
+      items={
+        Array [
+          Object {
+            "context": Object {
+              "id": 256,
+              "inform_students_of_overdue_submissions": true,
+              "type": "Course",
+              "url": "http://www.non_default_url.com",
+            },
+            "title": "San Juan",
+          },
+          Object {
+            "context": Object {
+              "id": 256,
+              "inform_students_of_overdue_submissions": true,
+              "type": "Course",
+              "url": "http://www.non_default_url.com",
+            },
+            "title": "Roll for the Galaxy",
+          },
+        ]
+      }
+      theme={
+        Object {
+          "titleColor": null,
+        }
+      }
+      timeZone="America/Denver"
+      url="http://www.non_default_url.com"
+    />
+    <Animatable(Grouping)
+      animatableIndex={2}
+      items={
+        Array [
+          Object {
+            "context": Object {
+              "id": 256,
+              "inform_students_of_overdue_submissions": false,
+              "type": "Group",
+            },
+            "title": "Same id, different type",
+          },
+        ]
+      }
+      theme={
+        Object {
+          "titleColor": null,
+        }
+      }
+      timeZone="America/Denver"
+    />
+  </div>
+</div>
+`;
+
+exports[`renders the base component with required props 1`] = `
+<div>
+  <Heading
+    border="bottom"
+    color="inherit"
+    ellipsis={false}
+    level="h2"
+  >
+    <Text
+      as="div"
+      letterSpacing="normal"
+      lineHeight="condensed"
+      size="medium"
+      transform="uppercase"
+    >
+      Tuesday
+    </Text>
+    <Text
+      as="div"
+      letterSpacing="normal"
+      lineHeight="condensed"
+      size="medium"
+    >
+      April 25, 2017
+    </Text>
+  </Heading>
+  <div>
+    <Container
+      display="block"
+      margin="small 0 0 0"
+      textAlign="center"
+    >
+      No "To-Do's" for this day yet.
+    </Container>
+  </div>
+</div>
+`;

@@ -1,0 +1,140 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders nothing if no opportunities 1`] = `
+<div
+  id="opportunities_parent"
+  onKeyDown={[Function]}
+  style={
+    Object {
+      "maxHeight": "none",
+    }
+  }
+>
+  <div>
+    <Button
+      as="button"
+      buttonRef={[Function]}
+      fluidWidth={false}
+      margin="0"
+      onClick={[Function]}
+      size="medium"
+      title="Close opportunities popover"
+      type="button"
+      variant="link"
+    >
+      <IconXLine />
+      <span>
+        Close
+      </span>
+    </Button>
+  </div>
+  <ol>
+    Nothing new needs attention.
+  </ol>
+</div>
+`;
+
+exports[`renders the base component correctly with one opportunity 1`] = `
+<div
+  id="opportunities_parent"
+  onKeyDown={[Function]}
+  style={
+    Object {
+      "maxHeight": "none",
+    }
+  }
+>
+  <div>
+    <Button
+      as="button"
+      buttonRef={[Function]}
+      fluidWidth={false}
+      margin="0"
+      onClick={[Function]}
+      size="medium"
+      title="Close opportunities popover"
+      type="button"
+      variant="link"
+    >
+      <IconXLine />
+      <span>
+        Close
+      </span>
+    </Button>
+  </div>
+  <ol>
+    <li>
+      <Animatable(Opportunity)
+        animatableIndex={0}
+        courseName="Course Short Name"
+        dismiss={[Function]}
+        dueAt="2017-03-09T20:40:35Z"
+        id="1"
+        opportunityTitle="learning object title"
+        showPill={true}
+        timeZone="America/Denver"
+        url="http://www.non_default_url.com"
+      />
+    </li>
+  </ol>
+</div>
+`;
+
+exports[`renders the right course with the right opportunity 1`] = `
+<div
+  id="opportunities_parent"
+  onKeyDown={[Function]}
+  style={
+    Object {
+      "maxHeight": "none",
+    }
+  }
+>
+  <div>
+    <Button
+      as="button"
+      buttonRef={[Function]}
+      fluidWidth={false}
+      margin="0"
+      onClick={[Function]}
+      size="medium"
+      title="Close opportunities popover"
+      type="button"
+      variant="link"
+    >
+      <IconXLine />
+      <span>
+        Close
+      </span>
+    </Button>
+  </div>
+  <ol>
+    <li>
+      <Animatable(Opportunity)
+        animatableIndex={0}
+        courseName="Course Short Name"
+        dismiss={[Function]}
+        dueAt="2017-03-09T20:40:35Z"
+        id="1"
+        opportunityTitle="learning object title"
+        showPill={true}
+        timeZone="America/Denver"
+        url="http://www.non_default_url.com"
+      />
+    </li>
+    <li>
+      <Animatable(Opportunity)
+        animatableIndex={1}
+        courseName="A different Course Name"
+        dismiss={[Function]}
+        dueAt="2017-03-09T20:40:35Z"
+        id="2"
+        opportunityTitle="other learning object"
+        showPill={true}
+        timeZone="America/Denver"
+        url="http://www.non_default_url.com"
+      />
+    </li>
+  </ol>
+</div>
+`;

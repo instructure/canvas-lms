@@ -22,15 +22,18 @@ import {bool} from 'prop-types'
 
 import Container from '@instructure/ui-core/lib/components/Container'
 import Heading from '@instructure/ui-core/lib/components/Heading'
+import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent'
 import Text from '@instructure/ui-core/lib/components/Text'
 
 import SVGWrapper from '../../shared/SVGWrapper'
 
 const AnnouncementEmptyState = props => (
   <Container margin="large auto" textAlign="center" display="block">
-    <Container margin="small auto" size="x-small" display="block">
-      <SVGWrapper url="/images/announcements/announcements-airhorn.svg"/>
-    </Container>
+    <PresentationContent>
+      <Container margin="small auto" size="x-small" display="block">
+        <SVGWrapper url="/images/announcements/announcements-airhorn.svg"/>
+      </Container>
+    </PresentationContent>
     <Heading margin="x-small">{I18n.t('No Announcements')}</Heading>
     {props.canCreate ? (
       <Text margin="x-small auto">{I18n.t('Create announcements above')}</Text>

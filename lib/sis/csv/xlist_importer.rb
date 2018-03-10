@@ -31,10 +31,9 @@ module SIS
       # possible columns:
       # xlist_course_id, section_id, status
       def process(csv, index=nil, count=nil)
-        @sis.counts[:xlists] += SIS::XlistImporter.new(@root_account, importer_opts).process do |importer|
+        count = SIS::XlistImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
             update_progress
-
             begin
               importer.add_crosslist(row['xlist_course_id'], row['section_id'], row['status'])
             rescue ImportError => e
@@ -42,6 +41,7 @@ module SIS
             end
           end
         end
+        count
       end
     end
   end

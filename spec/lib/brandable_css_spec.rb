@@ -38,7 +38,7 @@ describe BrandableCSS do
     describe "when called with a brand config" do
       before :once do
         parent_account = Account.default
-        parent_config = BrandConfig.create(variables: {"ic-brand-primary" => "#321"})
+        parent_config = BrandConfig.create(variables: {"ic-brand-primary" => "red"})
 
         subaccount_bc = BrandConfig.for(
           variables: {"ic-brand-global-nav-bgd" => "#123"},
@@ -57,7 +57,23 @@ describe BrandableCSS do
       end
 
       it "includes custom variables from parent brand config" do
-        expect(@brand_variables["ic-brand-primary"]).to eq '#321'
+        expect(@brand_variables["ic-brand-primary"]).to eq 'red'
+      end
+
+      it "handles named html colors when lightening/darkening" do
+        {
+          "ic-brand-primary" => 'red',
+          "ic-brand-primary-darkened-5" => "#F30000",
+          "ic-brand-primary-darkened-10" => "#E60000",
+          "ic-brand-primary-darkened-15" => "#D90000",
+          "ic-brand-primary-lightened-5" => "#FF0C0C",
+          "ic-brand-primary-lightened-10" => "#FF1919",
+          "ic-brand-primary-lightened-15" => "#FF2626",
+          "ic-brand-button--primary-bgd-darkened-5" => "#F30000",
+          "ic-brand-button--primary-bgd-darkened-15" => "#D90000"
+        }.each do |key, val|
+          expect(@brand_variables[key]).to eq val
+        end
       end
 
       it "includes default variables not found in brand config" do

@@ -18,20 +18,25 @@
 
 import I18n from 'i18n!shared_components'
 import React, { Component } from 'react'
-import { bool, node, string, func, shape } from 'prop-types'
+import { bool, node, string, func, shape, arrayOf } from 'prop-types'
 import cx from 'classnames'
 
+import Heading from '@instructure/ui-core/lib/components/Heading'
 import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
 import Avatar from '@instructure/ui-core/lib/components/Avatar'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import Text from '@instructure/ui-core/lib/components/Text'
+import Button from '@instructure/ui-core/lib/components/Button'
+import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
+import IconMore from 'instructure-icons/lib/Line/IconMoreLine'
 
+import IconDragHandleLine from 'instructure-icons/lib/Line/IconDragHandleLine'
 import LockIconView from 'compiled/views/LockIconView'
 import { author as authorShape } from '../proptypes/user'
 import masterCourseDataShape from '../proptypes/masterCourseData'
 
 export default class CourseItemRow extends Component {
   static propTypes = {
-    children: node.isRequired,
     actionsContent: node,
     metaContent: node,
     masterCourse: shape({
@@ -40,14 +45,22 @@ export default class CourseItemRow extends Component {
     }),
     author: authorShape,
     title: string.isRequired,
+    body: node.isRequired,
     id: string,
     className: string,
     itemUrl: string,
     selectable: bool,
+    draggable: bool,
     defaultSelected: bool,
     isRead: bool,
     showAvatar: bool,
     onSelectedChanged: func,
+    icon: node,
+    showManageMenu: bool,
+    manageMenuOptions: arrayOf(node),
+    onManageMenuSelect: func,
+    sectionToolTip: node,
+    replyButton: node,
   }
 
   static defaultProps = {
@@ -55,7 +68,7 @@ export default class CourseItemRow extends Component {
     metaContent: null,
     masterCourse: null,
     author: {
-      id: '4',
+      id: null,
       display_name: '',
       html_url: '',
       avatar_image_url: null,
@@ -64,10 +77,17 @@ export default class CourseItemRow extends Component {
     className: '',
     itemUrl: null,
     selectable: false,
+    draggable: false,
     defaultSelected: false,
     isRead: true,
+    icon: null,
     showAvatar: false,
     onSelectedChanged () {},
+    showManageMenu: false,
+    manageMenuOptions: [],
+    onManageMenuSelect () {},
+    sectionToolTip: null,
+    replyButton: null,
   }
 
   state = {
@@ -104,16 +124,14 @@ export default class CourseItemRow extends Component {
     }
   }
 
-  renderChildren () {
-    if (this.props.itemUrl) {
-      return (
-        <a className="ic-item-row__content-link" href={this.props.itemUrl}>
-          {this.props.children}
-        </a>
-      )
-    } else {
-      return this.props.children
-    }
+  renderClickableDiv (component) {
+    return (
+      <a className="ic-item-row__content-link" href={this.props.itemUrl}>
+        <div className="ic-item-row__content-link-container">
+          {component}
+        </div>
+      </a>
+    )
   }
 
   render () {
@@ -123,6 +141,14 @@ export default class CourseItemRow extends Component {
 
     return (
       <div className={`${classes} ${this.props.className}`}>
+        {(this.props.draggable && <div className="ic-item-row__drag-col">
+          <Text color="secondary" size="large">
+            <IconDragHandleLine />
+          </Text>
+        </div>)}
+        {(this.props.icon && <div className="ic-item-row__icon-col">
+          {this.props.icon}
+        </div>)}
         {(this.props.selectable && <div className="ic-item-row__select-col">
           <Checkbox
             defaultChecked={this.props.defaultSelected}
@@ -139,12 +165,26 @@ export default class CourseItemRow extends Component {
         </div>)}
         <div className="ic-item-row__content-col">
           {!this.props.isRead && <ScreenReaderContent>{I18n.t('Unread')}</ScreenReaderContent>}
-          {this.renderChildren()}
+          {this.renderClickableDiv(<Heading level="h3">{this.props.title}</Heading>)}
+          {this.props.sectionToolTip}
+          {this.renderClickableDiv(this.props.body)}
+          {this.props.replyButton ? this.renderClickableDiv(this.props.replyButton) : null}
         </div>
         <div className="ic-item-row__meta-col">
           <div className="ic-item-row__meta-actions">
             {this.props.actionsContent}
             <span ref={this.initializeMasterCourseIcon} className="ic-item-row__master-course-lock" />
+            {this.props.showManageMenu && this.props.manageMenuOptions.length > 0 &&
+              (<span className="ic-item-row__manage-menu">
+                <PopoverMenu
+                  onSelect={this.props.onManageMenuSelect}
+                  trigger={
+                    <Button variant="icon" size="small">
+                      <IconMore />
+                      <ScreenReaderContent>{I18n.t('Manage options for %{name}', { name: this.props.title })}</ScreenReaderContent>
+                    </Button>
+                  }>{this.props.manageMenuOptions}</PopoverMenu>
+              </span>)}
           </div>
           <div className="ic-item-row__meta-content">
             {this.props.metaContent}

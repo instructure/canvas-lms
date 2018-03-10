@@ -128,6 +128,12 @@ describe ApplicationController do
       expect { controller.js_env(:REAL_SLIM_SHADY => 'poser') }.to raise_error("js_env key REAL_SLIM_SHADY is already taken")
     end
 
+    it "should overwrite a key if told explicitly to do so" do
+      controller.js_env :REAL_SLIM_SHADY => 'please stand up'
+      controller.js_env({:REAL_SLIM_SHADY => 'poser'}, true)
+      expect(controller.js_env[:REAL_SLIM_SHADY]).to eq 'poser'
+    end
+
     it 'gets appropriate settings from the root account' do
       root_account = double(global_id: 1, feature_enabled?: false, open_registration?: true, settings: {})
       allow(HostUrl).to receive_messages(file_host: 'files.example.com')

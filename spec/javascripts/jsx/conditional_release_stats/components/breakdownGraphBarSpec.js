@@ -67,6 +67,6 @@ define([
     const component = renderComponent(defaultProps())
 
     const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-link-button')
-    equal(renderedList[0].textContent, '50 out of 100 students', 'renders correct amoutn of students')
+    equal(renderedList[0].textContent, '50 out of 100 students', 'renders correct amount of students')
   })
 })

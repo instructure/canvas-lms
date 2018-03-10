@@ -45,7 +45,8 @@ shared_examples 'home_page' do |context|
   it "should have a working link to add an announcement from the group home page", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273604, teacher: 319911) do
     get url
     expect_new_page_load { fln('Announcement').click }
-    expect(f('.btn-primary')).to be_displayed
+    add_announcement_url = "/groups/#{@testgroup.first.id}/discussion_topics/new?is_announcement=true"
+    expect(f("a[href=\"#{add_announcement_url}\"]")).to be_displayed
   end
 
   it "should display recent activity feed on the group home page", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273605, teacher: 319912) do
@@ -122,6 +123,67 @@ shared_examples 'announcements_page' do |context|
     @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @teacher)
     get announcements_page
     expect(f('.btn[title="RSS feed"]')).to be_displayed
+  end
+end
+
+shared_examples 'announcements_page_v2' do
+  include GroupsCommon
+  include SharedExamplesCommon
+
+  it "should display the announcement button" do
+    get announcements_page
+    expect(f('#add_announcement')).to be_displayed
+  end
+
+  it "should list all announcements" do
+    # Create 5 announcements in the group
+    announcements = []
+    5.times do |n|
+      announcements << @testgroup.first.announcements.create!(
+        title: "Announcement #{n+1}",
+        message: "Message #{n+1}",
+        user: @teacher
+      )
+    end
+
+    get announcements_page
+    expect(ff('.ic-announcement-row').size).to eq 5
+  end
+
+  it "should only list in-group announcements in the content right pane" do
+    # create group and course announcements
+    @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @teacher)
+    @course.announcements.create!(title: 'Course Announcement', message: 'Course',user: @teacher)
+
+    get announcements_page
+    expect_new_page_load { f('#add_announcement').click }
+    expect(f('#editor_tabs')).to be_displayed
+    fj(".ui-accordion-header a:contains('Announcements')").click
+    expect(fln('Group Announcement')).to be_displayed
+    expect(f("#content")).not_to contain_link('Course Announcement')
+  end
+
+  it "should only access group files in announcements right content pane" do
+    add_test_files
+    get announcements_page
+    expect_new_page_load { f('#add_announcement').click }
+    expand_files_on_content_pane
+    expect(ffj('.file .text:visible').size).to eq 1
+  end
+
+  it "should have an Add External Feed link on announcements" do
+    get announcements_page
+    f('#external_feed').click
+    wait_for_ajaximations
+    f('#external-rss-feed__toggle-button').click
+    wait_for_ajaximations
+    expect(f('#external-rss-feed__submit-button-group')).to be_displayed
+  end
+
+  it "should have an RSS feed button on announcements" do
+    @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @teacher)
+    get announcements_page
+    expect(f('button[id="external_feed"]')).to be_displayed
   end
 end
 

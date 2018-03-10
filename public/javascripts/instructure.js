@@ -459,15 +459,6 @@ function handleYoutubeLink () {
       RichContentEditor.destroyRCE($editor);
     });
 
-    $(".cant_record_link").click(function(event) {
-      event.preventDefault();
-      $("#cant_record_dialog").dialog({
-        modal: true,
-        title: I18n.t('titles.cant_create_recordings', "Can't Create Recordings?"),
-        width: 400
-      });
-    });
-
     $(".communication_message .content .links .show_users_link,.communication_message .header .show_users_link").click(function(event) {
       event.preventDefault();
       $(this).parents(".communication_message").find(".content .users_list").slideToggle();

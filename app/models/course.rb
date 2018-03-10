@@ -327,18 +327,6 @@ class Course < ActiveRecord::Base
     end
 
     tags = DifferentiableAssignment.scope_filter(tags, user, self, is_teacher: user_is_teacher)
-    return tags if user.blank? || user_is_teacher
-
-    if ConditionalRelease::Service.enabled_in_context?(self)
-      path_visible_pages = self.wiki_pages.active.left_outer_joins(assignment: :submissions).
-        except(:preload).
-        where("assignments.id is null or submissions.user_id = ?", user.id).
-        select(:id)
-
-      tags = tags.where.not(content_type: 'WikiPage')
-      tags = tags.union(ContentTag.where(content_type: 'WikiPage', content_id: path_visible_pages))
-    end
-
     tags
   end
 
@@ -1070,31 +1058,40 @@ class Course < ActiveRecord::Base
 
   def recompute_student_scores(student_ids = nil, grading_period_id: nil,
                                                   update_all_grading_period_scores: true,
-                                                  update_course_score: true)
-    inst_job_opts = {}
-    if student_ids.blank? && grading_period_id.nil? && update_all_grading_period_scores && update_course_score
-      # if we have all default args, let's queue this job in a singleton to avoid duplicates
-      inst_job_opts[:singleton] = "recompute_student_scores:#{global_id}"
-    elsif student_ids.blank? && grading_period_id.present?
-      # A migration that changes a lot of due dates in a grading period
-      # situation can kick off a job storm and redo work. Let's avoid
-      # that by putting it into a singleton.
-      inst_job_opts[:singleton] = "recompute_student_scores:#{global_id}:#{grading_period_id}"
-    end
+                                                  update_course_score: true,
+                                                  run_immediately: false)
+    if run_immediately
+      recompute_student_scores_without_send_later(
+        student_ids,
+        grading_period_id: grading_period_id,
+        update_all_grading_period_scores: update_all_grading_period_scores
+      )
+    else
+      inst_job_opts = {}
+      if student_ids.blank? && grading_period_id.nil? && update_all_grading_period_scores && update_course_score
+        # if we have all default args, let's queue this job in a singleton to avoid duplicates
+        inst_job_opts[:singleton] = "recompute_student_scores:#{global_id}"
+      elsif student_ids.blank? && grading_period_id.present?
+        # A migration that changes a lot of due dates in a grading period
+        # situation can kick off a job storm and redo work. Let's avoid
+        # that by putting it into a singleton.
+        inst_job_opts[:singleton] = "recompute_student_scores:#{global_id}:#{grading_period_id}"
+      end
 
-    send_later_if_production_enqueue_args(
-      :recompute_student_scores_without_send_later,
-      inst_job_opts,
-      student_ids,
-      grading_period_id: grading_period_id,
-      update_all_grading_period_scores: update_all_grading_period_scores
-    )
+      send_later_if_production_enqueue_args(
+        :recompute_student_scores_without_send_later,
+        inst_job_opts,
+        student_ids,
+        grading_period_id: grading_period_id,
+        update_all_grading_period_scores: update_all_grading_period_scores
+      )
+    end
   end
 
   def recompute_student_scores_without_send_later(student_ids = nil, opts = {})
     student_ids = admin_visible_student_enrollments.where(user_id: student_ids).pluck(:user_id) if student_ids
     student_ids ||= admin_visible_student_enrollments.pluck(:user_id)
-    Rails.logger.info "GRADES: recomputing scores in course=#{global_id} students=#{student_ids.inspect}"
+    Rails.logger.debug "GRADES: recomputing scores in course=#{global_id} students=#{student_ids.inspect}"
     Enrollment.recompute_final_score(
       student_ids,
       self.id,
@@ -1824,7 +1821,7 @@ class Course < ActiveRecord::Base
     enrollment_state = opts[:enrollment_state]
     enrollment_state ||= 'active' if type == 'ObserverEnrollment' && user.registered?
     section = opts[:section]
-    limit_privileges_to_course_section = opts[:limit_privileges_to_course_section]
+    limit_privileges_to_course_section = opts[:limit_privileges_to_course_section] || false
     associated_user_id = opts[:associated_user_id]
 
     role = opts[:role] || Enrollment.get_built_in_role_for_type(type)
@@ -1860,7 +1857,7 @@ class Course < ActiveRecord::Base
         } if e.completed? || e.rejected? || e.deleted? || e.workflow_state != enrollment_state
       end
       # if we're reusing an enrollment and +limit_privileges_to_course_section+ was supplied, apply it
-      e.limit_privileges_to_course_section = limit_privileges_to_course_section if e unless limit_privileges_to_course_section.nil?
+      e.limit_privileges_to_course_section = limit_privileges_to_course_section if e
       # if we're creating a new enrollment, we want to return it as the correct
       # subclass, but without using associations, we need to manually activate
       # sharding. We should probably find a way to go back to using the

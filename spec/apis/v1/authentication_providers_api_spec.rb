@@ -206,6 +206,7 @@ describe "AuthenticationProviders API", type: :request do
       @saml_hash['unknown_user_url'] = nil
       @saml_hash['parent_registration'] = false
       @saml_hash['metadata_uri'] = nil
+      @saml_hash['sig_alg'] = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
       expect(json).to eq @saml_hash
     end
 

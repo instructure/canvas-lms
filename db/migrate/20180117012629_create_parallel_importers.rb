@@ -23,7 +23,6 @@ class CreateParallelImporters < ActiveRecord::Migration[5.0]
     create_table :parallel_importers do |t|
       t.integer :sis_batch_id, null: false, limit: 8
       t.string :workflow_state, null: false, limit: 255
-      t.string :type, null: false, limit: 255
       t.integer :index, null: false, limit: 8
       t.integer :batch_size, null: false, limit: 8
       t.timestamps null: false

@@ -274,6 +274,13 @@ class SubmissionsApiController < ApplicationController
   #   submissions for assignments that have the post_to_sis flag set to true and
   #   user enrollments that were added through sis.
   #
+  # @argument submitted_since [DateTime]
+  #   If this argument is set, the response will only include submissions that
+  #   were submitted after the specified date_time. This will exclude
+  #   submissions that do not have a submitted_at which will exclude unsubmitted
+  #   submissions.
+  #   The value must be formatted as ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
+  #
   # @argument grading_period_id [Integer]
   #   The id of the grading period in which submissions are being requested
   #   (Requires grading periods to exist on the account)
@@ -424,6 +431,14 @@ class SubmissionsApiController < ApplicationController
     assignments.each { |a| a.context = @context }
     assignments_hash = assignments.index_by(&:id)
 
+    if params[:submitted_since].present?
+      if params[:submitted_since] !~ Api::ISO8601_REGEX
+        return render(json: {errors: {submitted_since: t('Invalid datetime for submitted_since')}}, status: 400)
+      else
+        submitted_since_date = Time.zone.parse(params[:submitted_since])
+      end
+    end
+
     if params[:grouped].present?
       scope = (@section || @context).all_student_enrollments.
         preload(:root_account, :sis_pseudonym, :user => :pseudonyms).
@@ -431,6 +446,7 @@ class SubmissionsApiController < ApplicationController
       student_enrollments = Api.paginate(scope, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))
 
       submissions_scope = Submission.active.where(user_id: student_enrollments.map(&:user_id), assignment_id: assignments)
+      submissions_scope = submissions_scope.where("submitted_at>?", submitted_since_date) if submitted_since_date
       if params[:workflow_state].present?
         submissions_scope = submissions_scope.where(:workflow_state => params[:workflow_state])
       end
@@ -472,10 +488,13 @@ class SubmissionsApiController < ApplicationController
           end
         end
         if includes.include?('total_scores')
-          hash.merge!(
-            :computed_final_score => enrollment.computed_final_score,
-            :computed_current_score => enrollment.computed_current_score
-          )
+          hash[:computed_final_score] = enrollment.computed_final_score
+          hash[:computed_current_score] = enrollment.computed_current_score
+
+          if can_view_all
+            hash[:unposted_final_score] = enrollment.unposted_final_score
+            hash[:unposted_current_score] = enrollment.unposted_current_score
+          end
         end
         result << hash
       end
@@ -486,6 +505,7 @@ class SubmissionsApiController < ApplicationController
       submissions = @context.submissions.except(:order).where(user_id: student_ids).order(order)
       submissions = submissions.where(:assignment_id => assignments)
       submissions = submissions.where(:workflow_state => params[:workflow_state]) if params[:workflow_state].present?
+      submissions = submissions.where("submitted_at>?", submitted_since_date) if submitted_since_date
       submissions = submissions.preload(:user, :originality_reports, :quiz_submission)
 
       submissions = Api.paginate(submissions, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))

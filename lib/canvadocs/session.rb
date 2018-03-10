@@ -23,8 +23,8 @@ module Canvadocs
 
     def canvadoc_permissions_for_user(user, enable_annotations, moderated_grading_whitelist=nil)
       return {} unless enable_annotations && canvadocs_can_annotate?(user)
-      return canvadocs_default_options_for_user(user) if submissions.empty?
-      opts = canvadocs_default_options_for_user(user, observing?(user))
+      opts = canvadocs_default_options_for_user(user)
+      return opts if submissions.empty?
 
       opts[:read_grade] = submissions.any? { |s| s.grants_right? user, :read_grade }
       opts.delete :user_filter if opts[:read_grade]
@@ -40,18 +40,22 @@ module Canvadocs
     end
     private :canvadoc_permissions_for_user
 
-    def observing?(user)
-      user.enrollments.each do |enrollment|
-        next unless enrollment.type == "ObserverEnrollment"
-        submissions.each do |submission|
-          if submission.assignment.context_id == enrollment.course_id &&
-            submission.user_id == enrollment.associated_user_id
-            return true
-          end
-        end
-      end
-      false
+    def submission_context_ids
+      @submission_context_ids ||= submissions.map { |s| s.assignment.context_id }.uniq
     end
+
+    def observing?(user)
+      user.observer_enrollments.active.where(course_id: submission_context_ids,
+        associated_user_id: submissions.map(&:user_id)).exists?
+    end
+
+    def managing?(user)
+      is_teacher = user.teacher_enrollments.active.where(course_id: submission_context_ids).exists?
+      return true if is_teacher
+      course = submissions.first.assignment.course
+      course.account_membership_allows(user)
+    end
+    private :managing?
 
     def canvadocs_can_annotate?(user)
       user.present?
@@ -81,13 +85,20 @@ module Canvadocs
     end
     private :canvadocs_annotation_context
 
-    def canvadocs_default_options_for_user(user, observing=false)
+    def canvadocs_permissions(user)
+      return 'readwrite' if submissions.empty?
+      return 'readwritemanage' if managing?(user)
+      return 'read' if observing?(user)
+      'readwrite'
+    end
+    private :canvadocs_permissions
+
+    def canvadocs_default_options_for_user(user)
       opts = {
         annotation_context: canvadocs_annotation_context,
-        permissions: observing ? 'read' : 'readwrite',
+        permissions: canvadocs_permissions(user),
         user_id: user.global_id.to_s,
         user_name: user.short_name.delete(","),
-        user_role: "",
         user_filter: user.global_id.to_s,
       }
       opts[:user_crocodoc_id] = user.crocodoc_id if user.crocodoc_id

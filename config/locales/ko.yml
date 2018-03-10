@@ -2,6 +2,12 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 ko: 
+  451_message: 
+    description: "미국의 무역 제한 국가에서 접속 중이므로 접근하실 수 없습니다."
+    headings: 
+      page: "승인되지 않음"
+    title: "승인되지 않음"
+  558x558_png_jpg_gif_1_8x_the_standard_tile_size_so_c56cc472: "558x558 png, jpg, gif (표준 타일 크기의 1.8배이며, 필요에 따라 확대 혹은 축소될 수 있습니다.)"
   EditAppointmentGroupDetails: 
     affect_reservations: "이것이 예약에 미치는 영향은 무엇입니까?"
     and_n_contexts: "외 %{n}명"
@@ -23,9 +29,13 @@ ko:
     user_count: 
       one: "사용자 %{count}명"
       other: "사용자 %{count}명"
+  GroupUserCollection: 
+    flash: 
+      userAlreadyInGroup: "경고: %{user} 는 이미 %{group}의 멤버입니다."
   LongTextEditor: 
     cancel: 취소
     save: 저장
+  _at_the_bottom__4360f2b4: "-- 맨 밑으로 --"
   academic_benchmark: 
     api_error: "기관 %{auth}에 대한 표준을 업데이트할 수 없습니다."
     bad_ab_file: "제공한 Academic Benchmark 파일에 오류가 있습니다."
@@ -10939,6 +10949,9 @@ ko:
       new_course_name_placeholder: "과목 이름"
       sample_course_code: 과목-101
       start_a_new_course: "새 과목 시작하기"
+    new_nav_header: 
+      links: 
+        dashboard: 대시보드
     no_recent_activity: 
       empty_stream_message: "아직 스트림에 표시할 메시지가 없습니다. 과목에 참여를 시작하면 토론에서 온 메시지, 평가 업데이트, 다른 사람과의 비공개 메시지 등으로 채워집니다. "
       no_recent_messages: "최근 메시지 없음"

@@ -21,7 +21,7 @@ import autocompleteItemTemplate from 'jst/courses/autocomplete_item'
 import 'jqueryui/autocomplete'
 
 $(document).ready(() => {
-  const $courseSearchField = $('#course_name')
+  const $courseSearchField = $('#course_name:visible')
   if ($courseSearchField.length) {
     const autocompleteSource = $courseSearchField.data('autocomplete-source')
     $courseSearchField.autocomplete({

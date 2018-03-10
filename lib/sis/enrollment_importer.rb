@@ -21,9 +21,9 @@ require "set"
 module SIS
   class EnrollmentImporter < BaseImporter
 
-    def process(messages, updates_every)
+    def process(messages)
       start = Time.now
-      i = Work.new(@batch, @root_account, @logger, updates_every, messages)
+      i = Work.new(@batch, @root_account, @logger, messages)
 
       Enrollment.skip_touch_callbacks(:course) do
         Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
@@ -69,11 +69,10 @@ module SIS
           :incrementally_update_account_associations_user_ids, :update_account_association_user_ids,
           :account_chain_cache, :users_to_touch_ids, :success_count, :courses_to_recache_due_dates
 
-      def initialize(batch, root_account, logger, updates_every, messages)
+      def initialize(batch, root_account, logger, messages)
         @batch = batch
         @root_account = root_account
         @logger = logger
-        @updates_every = updates_every
         @messages = messages
 
         @update_account_association_user_ids = Set.new
@@ -97,7 +96,7 @@ module SIS
         raise ImportError, "Improper status \"#{enrollment.status}\" for an enrollment" unless enrollment.valid_status?
 
         @enrollment_batch << enrollment
-        process_batch if @enrollment_batch.size >= @updates_every
+        process_batch if @enrollment_batch.size >= Setting.get("sis_enrollment_batch_size", "100").to_i # no idea if this is a good number
       end
 
       def any_left_to_process?

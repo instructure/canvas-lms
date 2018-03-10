@@ -388,29 +388,27 @@ describe GradingPeriod do
       grading_period.destroy
     end
 
-    it 'runs DueDateCacher for courses from the same enrollment term' do
+    it 'runs DueDateCacher for courses from the same enrollment term when the grading period is deleted' do
       course2 = account.courses.create!
       course2.enrollment_term = account.enrollment_terms.create!
       course2.save!
       student_in_course(course: course2)
       a = course2.assignments.create!
       a.submissions.find_by(user_id: @student).update(grading_period_id: grading_period.id)
-
-      expect(DueDateCacher).to receive(:recompute_course).with(course)
-      expect(DueDateCacher).not_to receive(:recompute_course).with(course2)
+      expect(DueDateCacher).to receive(:recompute_course).with(course, any_args)
+      expect(DueDateCacher).not_to receive(:recompute_course).with(course2, any_args)
       grading_period.destroy
     end
 
-    it 'runs DueDateCacher for courses with submissions that have this grading period' do
+    it 'runs DueDateCacher for courses from the same enrollment term when the grading period set is deleted' do
       course2 = account.courses.create!
       course2.enrollment_term = account.enrollment_terms.create!
       course2.save!
       student_in_course(course: course2)
       a = course2.assignments.create!
       a.submissions.find_by(user_id: @student).update(grading_period_id: grading_period.id)
-
-      expect(DueDateCacher).not_to receive(:recompute_course).with(course)
-      expect(DueDateCacher).to receive(:recompute_course).with(course2)
+      expect(DueDateCacher).to receive(:recompute_course).with(course, any_args)
+      expect(DueDateCacher).not_to receive(:recompute_course).with(course2, any_args)
       grading_period_group.destroy
     end
 

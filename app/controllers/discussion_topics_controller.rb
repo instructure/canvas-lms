@@ -512,6 +512,9 @@ class DiscussionTopicsController < ApplicationController
       js_hash[:SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED] = @context.account.
         feature_enabled?(:section_specific_announcements)
 
+
+      js_hash[:SECTION_SPECIFIC_DISCUSSIONS_ENABLED] = @context.account.feature_enabled?(:section_specific_discussions)
+
       js_hash[:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.name_length_required_for_account?(@context)
       js_hash[:MAX_NAME_LENGTH] = AssignmentUtil.assignment_max_name_length(@context)
       js_hash[:DUE_DATE_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.due_date_required_for_account?(@context)
@@ -1006,12 +1009,21 @@ class DiscussionTopicsController < ApplicationController
 
 
   def set_sections
-    return unless params[:specific_sections] && params[:specific_sections] != "all"
-    @topic.is_section_specific = true
-    @topic.course_sections = CourseSection.find(params[:specific_sections].split(","))
+    if params[:specific_sections] != "all"
+      @topic.is_section_specific = true
+      @topic.course_sections = CourseSection.find(params[:specific_sections].split(","))
+    else
+      @topic.is_section_specific = false
+    end
   end
 
   def process_discussion_topic(is_new = false)
+    ActiveRecord::Base.transaction do
+      process_discussion_topic_runner(is_new)
+    end
+  end
+
+  def process_discussion_topic_runner(is_new = false)
     @errors = {}
     model_type = if value_to_boolean(params[:is_announcement]) &&
         @context.announcements.temp_record.grants_right?(@current_user, session, :create)
@@ -1019,32 +1031,23 @@ class DiscussionTopicsController < ApplicationController
                  else
                     :discussion_topics
                  end
-    if @context.is_a?(Group) && params[:specific_sections] && params[:specific_sections] != "all"
-      @errors[:specific_sections] = t("You cannot assign sections to a group discussion topic")
-    end
 
     if is_new
       @topic = @context.send(model_type).build
       prior_version = @topic.dup
       if model_type == :announcements && @context.is_a?(Course)
         @topic.locked = true
-        set_sections if @context.account.feature_enabled?(:section_specific_announcements) &&
-          params[:specific_sections] != "all"
       end
     else
       @topic = @context.send(model_type).active.find(params[:id] || params[:topic_id])
       prior_version = DiscussionTopic.find(@topic.id)
-      if model_type == :announcements &&
-              @context.account.feature_enabled?(:section_specific_announcements) &&
-              @topic.is_section_specific &&
-              params[:specific_sections] == "all" &&
-              @context.is_a?(Course)
-        @topic.is_section_specific = false
-      elsif model_type == :announcements && @context.is_a?(Course)
-              @context.account.feature_enabled?(:section_specific_announcements)
-        set_sections
-      end
     end
+
+    # It's possible customers already are using this API and haven't updated to
+    # use the `specific_sections` key yet. In this case, we don't want to nuke
+    # any specific setions out from under them when their existing scrit runs.
+    # This is where a versioned API would come in handy.
+    set_sections if params[:specific_sections]
 
     allowed_fields = @context.is_a?(Group) ? API_ALLOWED_TOPIC_FIELDS_FOR_GROUP : API_ALLOWED_TOPIC_FIELDS
     discussion_topic_hash = params.permit(*allowed_fields)
@@ -1090,6 +1093,9 @@ class DiscussionTopicsController < ApplicationController
     else
       @topic.skip_broadcasts = true
       DiscussionTopic.transaction do
+        if !@topic.is_section_specific
+          @topic.course_sections = []
+        end
         @topic.update_attributes(discussion_topic_hash)
         @topic.root_topic.try(:save)
       end

@@ -914,6 +914,64 @@ describe Submission do
         end
       end
     end
+
+    context 'when submitting to an LTI assignment' do
+      before(:once) do
+        @date = Time.zone.local(2017, 1, 15, 12)
+        @assignment.update!(due_at: @date - 3.hours, points_possible: 1_000, submission_types: 'external_tool')
+        @late_policy = late_policy_factory(course: @course, deduct: 10.0, every: :hour, missing: 80.0)
+      end
+
+      it "deducts a percentage per interval late if submitted late" do
+        Timecop.freeze(@date) do
+          @assignment.submit_homework(@student, body: "a body")
+          @assignment.grade_student(@student, grade: 700, grader: @teacher)
+          expect(submission.points_deducted).to eq 300
+        end
+      end
+
+      it "applies the deduction to the awarded score if submitted late" do
+        Timecop.freeze(@date) do
+          @assignment.submit_homework(@student, body: "a body")
+          @assignment.grade_student(@student, grade: 700, grader: @teacher)
+          expect(submission.score).to eq 400
+        end
+      end
+
+      it "does not grade missing submissions" do
+        Timecop.freeze(@date) do
+          submission.apply_late_policy
+          expect(submission.score).to be_nil
+        end
+      end
+
+      it "deducts a percentage per interval late if the submission is manually marked late" do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.late_policy_status = 'late'
+        submission.seconds_late_override = 4.hours
+        submission.score = 700
+        submission.apply_late_policy(@late_policy, @assignment)
+        expect(submission.points_deducted).to eq 400
+      end
+
+      it "applies the deduction to the awarded score if the submission is manually marked late" do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.late_policy_status = 'late'
+        submission.seconds_late_override = 4.hours
+        submission.score = 700
+        submission.apply_late_policy(@late_policy, @assignment)
+        expect(submission.score).to eq 300
+      end
+
+      it "applies the missing policy if the submission is manually marked missing" do
+        Timecop.freeze(@date + 1.day) do
+          submission.score = nil
+          submission.late_policy_status = 'missing'
+          submission.apply_late_policy(@late_policy, @assignment)
+          expect(submission.score).to eq 200
+        end
+      end
+    end
   end
 
   describe "#apply_late_policy_before_save" do
@@ -3700,6 +3758,12 @@ describe Submission do
 
       expect(comment).not_to be_draft
     end
+
+    it 'creates a comment without an author when skip_author option is true' do
+      comment = @submission.add_comment(comment: '42', skip_author: true)
+
+      expect(comment.author).to be_nil
+    end
   end
 
   describe "#last_teacher_comment" do
@@ -4381,17 +4445,42 @@ describe Submission do
     end
   end
 
+  describe '#update_line_item_result' do
+    it 'does nothing if lti_result does not exist' do
+      submission = submission_model assignment: @assignment
+      expect(submission).to receive(:update_line_item_result)
+      submission.save!
+    end
+
+    context 'with lti_result' do
+      let(:lti_result) { lti_result_model({ assignment: @assignment }) }
+      let(:submission) { lti_result.submission }
+
+      it 'does nothing if score has not changed' do
+        lti_result
+        expect(lti_result).not_to receive(:update)
+        submission.save!
+      end
+
+      it 'updates the lti_result score_given if the score has changed' do
+        expect(lti_result.result_score).to eq submission.score
+        submission.update!(score: 1)
+        expect(lti_result.result_score).to eq submission.score
+      end
+    end
+  end
+
   def submission_spec_model(opts={})
     opts = @valid_attributes.merge(opts)
     assignment = opts.delete(:assignment) || Assignment.find(opts.delete(:assignment_id))
     user = opts.delete(:user) || User.find(opts.delete(:user_id))
     submit_homework = opts.delete(:submit_homework)
 
-    if submit_homework
-      @submission = assignment.submit_homework(user)
-    else
-      @submission = assignment.submissions.find_by!(user: user)
-    end
+    @submission = if submit_homework
+                    assignment.submit_homework(user)
+                  else
+                    assignment.submissions.find_by!(user: user)
+                  end
     @submission.update!(opts)
     @submission
   end

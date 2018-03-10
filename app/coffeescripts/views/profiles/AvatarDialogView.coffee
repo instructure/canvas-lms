@@ -212,4 +212,4 @@ define [
     toJSON: ->
       hasFileReader = !!window.FileReader
       hasUserMedia = !!(navigator.getUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.webkitGetUserMedia)
-      { hasFileReader: hasFileReader, hasGetUserMedia: hasUserMedia }
+      { hasFileReader: hasFileReader, hasGetUserMedia: hasUserMedia, enableGravatar: ENV.enable_gravatar }

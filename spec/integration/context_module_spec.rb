@@ -142,7 +142,11 @@ describe ContextModule do
 
         # verify the second item is locked (doesn't display)
         get @test_url
-        expect(response).to be_success
+        if @test_url.match?('files')
+          expect(response.status).to eq(403)
+        else
+          expect(response).to be_success
+        end
         html = Nokogiri::HTML(response.body)
         expect(html.css('#test_content').length).to eq(@test_content_length || 0)
 

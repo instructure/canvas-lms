@@ -1,0 +1,206 @@
+{
+  "add_to_do_7def3c37": {
+    "message": "Добавить в задачи"
+  },
+  "all_items_loaded_aa256183": {
+    "message": "Все элементы загружены"
+  },
+  "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
+    "message": "Вы уверены, что хотите удалить этот элемент планировщика?"
+  },
+  "assignmenttype_title_is_complete_813e54f8": {
+    "message": "{ assignmentType } { title } завершено"
+  },
+  "assignmenttype_title_is_incomplete_a1d5fac0": {
+    "message": "{ assignmentType } { title } не завершено"
+  },
+  "beginning_of_your_to_do_history_61ef2dce": {
+    "message": "Начало вашей истории задач"
+  },
+  "canvas_planner_98ed106": {
+    "message": "Планировщик Canvas"
+  },
+  "close_d634289d": {
+    "message": "Закрыть"
+  },
+  "close_opportunities_popover_f4e50551": {
+    "message": "Закрыть всплывающее меню дополнительных возможностей"
+  },
+  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+    "message": "{ count, plural,\n     =0 {# возможности}\n    one {# возможность}\n  other {# возможности}\n}"
+  },
+  "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
+    "message": "{ count, plural,\n    one {Показать # завершенное событие}\n  other {Показать # завершенные события}\n}"
+  },
+  "course_8a63b4a3": {
+    "message": "Курс"
+  },
+  "course_to_do_bcbbab54": {
+    "message": "{ course } ЗАДАЧИ"
+  },
+  "date_at_time_dbdb1b99": {
+    "message": "{ date } в { time }"
+  },
+  "date_ee500367": {
+    "message": "Дата"
+  },
+  "date_is_required_8660ec22": {
+    "message": "Необходимо указать дату"
+  },
+  "delete_a6efa79d": {
+    "message": "Удалить"
+  },
+  "details_98a31b68": {
+    "message": "Подробные сведения"
+  },
+  "dismiss_opportunityname_5995176f": {
+    "message": "Отклонить { opportunityName }"
+  },
+  "due_5d7267be": {
+    "message": "Срок выполнения:"
+  },
+  "due_date_8ce289b6": {
+    "message": "СРОК: { date }"
+  },
+  "edit_title_72e5a21e": {
+    "message": "Редактировать { title }"
+  },
+  "error_loading_more_items_3f109d9f": {
+    "message": "Ошибка загрузки дополнительных элементов"
+  },
+  "error_loading_past_items_2881dbb1": {
+    "message": "Ошибка загрузки прошлых элементов"
+  },
+  "excused_cf8792eb": {
+    "message": "По уважительной причине"
+  },
+  "failed_to_delete_to_do_64edff49": {
+    "message": "Не удалось выполнить удаление"
+  },
+  "failed_to_get_new_activity_17e7ec7c": {
+    "message": "Не удалось получить новую активность"
+  },
+  "failed_to_load_opportunities_52ab6404": {
+    "message": "Не удалось загрузить варианты"
+  },
+  "failed_to_save_to_do_ddc7503b": {
+    "message": "Не удалось выполнить сохранение"
+  },
+  "feedback_6dcc1991": {
+    "message": "Отзывы"
+  },
+  "go_to_dashboard_card_view_10398ef6": {
+    "message": "Перейти к виду карты приборной панели"
+  },
+  "graded_25cd3fcd": {
+    "message": "С оценкой"
+  },
+  "late_2be42b88": {
+    "message": "Поздно"
+  },
+  "load_more_a36f9cf9": {
+    "message": "Загрузить еще"
+  },
+  "load_prior_dates_f2b0f6f0": {
+    "message": "Загрузить предыдущие даты"
+  },
+  "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
+    "message": "Загруженные { count, plural,\n     =0{# элементы}\n    one {# элемент}\n  other {# элементы}\n}"
+  },
+  "loading_25990131": {
+    "message": "Выполняется загрузка..."
+  },
+  "loading_past_items_ca499e75": {
+    "message": "Загрузка прошлых элементов"
+  },
+  "loading_planner_items_947a813d": {
+    "message": "Загрузка событий планировщика"
+  },
+  "looks_like_there_isn_t_anything_here_d9bcef49": {
+    "message": "Похоже, здесь ничего нет"
+  },
+  "missing_1a256b3b": {
+    "message": "Отсутствует"
+  },
+  "missing_items_for_5ef30cea": {
+    "message": "Отсутствуют элементы для "
+  },
+  "new_activity_8b84847d": {
+    "message": "Новая активность"
+  },
+  "new_activity_for_ac84f6e6": {
+    "message": "Новая активность для "
+  },
+  "next_month_749b1778": {
+    "message": "Следующий месяц"
+  },
+  "no_due_dates_assigned_e8f5bac8": {
+    "message": "Даты выполнения не заданы"
+  },
+  "no_to_do_s_for_this_day_yet_90c5873d": {
+    "message": "Задачи на сегодняшний день пока отсутствуют."
+  },
+  "nothing_new_needs_attention_3ac548d4": {
+    "message": "Нет новых пунктов, требующих внимания."
+  },
+  "optional_add_course_ef0d70fc": {
+    "message": "Опционально: Добавить курс"
+  },
+  "points_bceb5005": {
+    "message": "баллов"
+  },
+  "points_points_63e59cce": {
+    "message": "{ points } баллов"
+  },
+  "previous_month_bb1e3c84": {
+    "message": "Предыдущий месяц"
+  },
+  "pts_699bd9aa": {
+    "message": "баллы"
+  },
+  "replies_4a8577c8": {
+    "message": "Ответы"
+  },
+  "save_11a80ec3": {
+    "message": "Сохранить"
+  },
+  "submitted_318fad53": {
+    "message": "Отправлено"
+  },
+  "task_16b0ef38": {
+    "message": "Задача"
+  },
+  "title_ee03d132": {
+    "message": "Заголовок"
+  },
+  "title_is_required_6ddcab69": {
+    "message": "необходим заголовок"
+  },
+  "to_do_1d554f36": {
+    "message": "Задачи"
+  },
+  "today_76e10f9c": {
+    "message": "Сегодня"
+  },
+  "today_at_date_8ac30d6": {
+    "message": "Сегодня в { date }"
+  },
+  "tomorrow_9a6c9a00": {
+    "message": "Завтра"
+  },
+  "tomorrow_at_date_b53f2cf1": {
+    "message": "Завтра в { date }"
+  },
+  "unable_to_mark_as_complete_8141856d": {
+    "message": "Невозможно отметить как завершенный."
+  },
+  "yesterday_at_date_1aa6d18e": {
+    "message": "Вчера в { date }"
+  },
+  "yesterday_c6bd6abf": {
+    "message": "Вчера"
+  },
+  "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
+    "message": "Вы перешли к самой первой своей задаче!"
+  }
+}

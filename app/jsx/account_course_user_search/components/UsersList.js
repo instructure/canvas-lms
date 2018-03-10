@@ -60,7 +60,7 @@ export default function UsersList (props) {
   }
 
   return (
-    <Table>
+    <Table margin="small 0" caption={<ScreenReaderContent>{I18n.t('Users')}</ScreenReaderContent>}>
       <thead>
         <tr>
           <UserListHeader

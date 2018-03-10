@@ -317,6 +317,9 @@ class GradebookImporter
 
   def strip_non_assignment_columns(row)
     drop_student_information_columns(row)
+
+    # This regex will also include columns for unposted scores, which
+    # will be one of these values with "Unposted" prepended.
     while row.last =~ /Current Score|Current Points|Current Grade|Final Score|Final Points|Final Grade/
       row.pop
     end

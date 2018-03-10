@@ -52,6 +52,19 @@ describe User do
     expect(@user.name).to eql('bill')
   end
 
+  it "should correctly identify active courses when there are no active groups" do
+    user = User.create(:name => "longname1", :short_name => "shortname1")
+    expect(user.current_active_groups?).to eql(false)
+  end
+
+  it "should correctly identify active courses when there are active groups" do
+    account1 = account_model
+    course_with_student(:account => account1)
+    group_model(:group_category => @communities, :is_public => true, :context => @course)
+    group.add_user(@student)
+    expect(@student.current_active_groups?).to eql(true)
+  end
+
   it "should update account associations when a course account changes" do
     account1 = account_model
     account2 = account_model
@@ -3834,7 +3847,7 @@ describe User do
     end
 
     it 'should show if user has group_membership' do
-      expect(@student.current_groups_in_region?).to eq true
+      expect(@student.current_active_groups?).to eq true
     end
 
   end

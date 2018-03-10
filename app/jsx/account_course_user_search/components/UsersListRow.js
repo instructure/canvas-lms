@@ -46,7 +46,7 @@ export default function UsersListRow({accountId, user, permissions, handlers}) {
         {permissions.can_masquerade && (
           <Tooltip tip={I18n.t('Act as %{name}', {name: user.name})}>
             <Button variant="icon" size="small" href={`/users/${user.id}/masquerade`}>
-              <IconMasqueradeLine />
+              <IconMasqueradeLine title={I18n.t('Act as %{name}', {name: user.name})} />
             </Button>
           </Tooltip>
         )}
@@ -57,7 +57,7 @@ export default function UsersListRow({accountId, user, permissions, handlers}) {
               size="small"
               href={`/conversations?user_name=${user.name}&user_id=${user.id}`}
             >
-              <IconMessageLine />
+              <IconMessageLine title={I18n.t('Send message to %{name}', {name: user.name})} />
             </Button>
           </Tooltip>
         )}
@@ -70,7 +70,7 @@ export default function UsersListRow({accountId, user, permissions, handlers}) {
               afterSave={handlers.handleSubmitEditUserForm}
             >
               <Button variant="icon" size="small">
-                <IconEditLine />
+                <IconEditLine title={I18n.t('Edit %{name}', {name: user.name})} />
               </Button>
             </CreateOrUpdateUserModal>
           </Tooltip>

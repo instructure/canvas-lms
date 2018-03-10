@@ -101,7 +101,7 @@ describe SIS::CSV::EnrollmentImporter do
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"
     )
-    batch = process_csv_data(
+    importer = process_csv_data(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user@example.com,active",
       "user_2,user2,User,Dos,user2@example.com,active",
@@ -111,9 +111,9 @@ describe SIS::CSV::EnrollmentImporter do
       "user_7,user7,User,Siete,user7@example.com,active",
       ",,,,,"
     )
-    expect(batch.errors).to eq []
+    expect(importer.errors).to eq []
     # should skip empty lines without error or warning
-    expect(batch.counts[:users]).to eq 6
+    expect(importer.batch.reload.data[:counts][:users]).to eq 6
 
     process_csv_data_cleanly(
       "section_id,course_id,name,status,start_date,end_date",
@@ -701,7 +701,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(SisPseudonym).to receive(:for).with(user, @account, type: :implicit, require_sis: false).and_return(user.pseudonyms.first)
 
     warnings = []
-    work = SIS::EnrollmentImporter::Work.new(nil, @account, Rails.logger, 1000, warnings)
+    work = SIS::EnrollmentImporter::Work.new(nil, @account, Rails.logger, warnings)
     expect(work).to receive(:root_account_from_id).with('account2').once.and_return(account2)
     expect(SIS::EnrollmentImporter::Work).to receive(:new).with(any_args).and_return(work)
 
@@ -730,7 +730,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(SisPseudonym).to receive(:for).with(user, @account, type: :implicit, require_sis: false).once.and_return(nil)
 
     warnings = []
-    work = SIS::EnrollmentImporter::Work.new(nil, @account, Rails.logger, 1000, warnings)
+    work = SIS::EnrollmentImporter::Work.new(nil, @account, Rails.logger, warnings)
     expect(work).to receive(:root_account_from_id).with('account2').once.and_return(account2)
     expect(SIS::EnrollmentImporter::Work).to receive(:new).with(any_args).and_return(work)
     # the enrollments
@@ -759,7 +759,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(SisPseudonym).to receive(:for).with(user, @account, type: :implicit, require_sis: false).never
 
     warnings = []
-    work = SIS::EnrollmentImporter::Work.new(nil, @account, Rails.logger, 1000, warnings)
+    work = SIS::EnrollmentImporter::Work.new(nil, @account, Rails.logger, warnings)
     expect(work).to receive(:root_account_from_id).with('account2').once.and_return(nil)
     expect(SIS::EnrollmentImporter::Work).to receive(:new).with(any_args).and_return(work)
     # the enrollments

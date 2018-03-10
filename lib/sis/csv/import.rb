@@ -88,6 +88,10 @@ module SIS
         importer
       end
 
+      def use_parallel_imports?
+        false
+      end
+
       def prepare
         @tmp_dirs = []
         @files.each do |file|
@@ -97,10 +101,14 @@ module SIS
               @tmp_dirs << tmp_dir
               CanvasUnzip::extract_archive(file, tmp_dir)
               Dir[File.join(tmp_dir, "**/**")].each do |fn|
-                process_file(tmp_dir, fn[tmp_dir.size+1 .. -1])
+                file_name = fn[tmp_dir.size+1 .. -1]
+                att = create_batch_attachment(File.join(tmp_dir, file_name))
+                process_file(tmp_dir, file_name, att)
               end
             elsif File.extname(file).downcase == '.csv'
-              process_file(File.dirname(file), File.basename(file))
+              att = @batch.attachment
+              att ||= create_batch_attachment file
+              process_file(File.dirname(file), File.basename(file), att)
             end
           end
         end
@@ -124,6 +132,12 @@ module SIS
         end
 
         @csvs
+      end
+
+      def create_batch_attachment(path)
+        return if File.stat(path).size == 0
+        data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+        SisBatch.create_data_attachment(@batch, data, File.basename(path))
       end
 
       def process
@@ -168,7 +182,7 @@ module SIS
         else
           IMPORTERS.each do |importer|
             importerObject = SIS::CSV.const_get(importer.to_s.camelcase + 'Importer').new(self)
-            @csvs[importer].each { |csv| importerObject.process(csv) }
+            @csvs[importer].each { |csv| @counts[importer.to_s.pluralize.to_sym] += importerObject.process(csv) }
           end
           @finished = true
         end
@@ -328,7 +342,7 @@ module SIS
           @batch.progress = (((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100
           @current_row = 0
           @batch.save
-          return @batch.data[:importers][importer] == 0
+          @batch.data[:importers][importer] == 0
         end
       end
 
@@ -404,8 +418,8 @@ module SIS
         @csvs[importer] = new_csvs
       end
 
-      def process_file(base, file)
-        csv = { :base => base, :file => file, :fullpath => File.join(base, file) }
+      def process_file(base, file, att)
+        csv = {base: base, file: file, fullpath: File.join(base, file), attachment: att}
         if File.file?(csv[:fullpath]) && File.extname(csv[:fullpath]).downcase == '.csv'
           unless valid_utf8?(csv[:fullpath])
             add_error(csv, I18n.t("Invalid UTF-8"), failure: true)

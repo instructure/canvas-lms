@@ -33,10 +33,9 @@ module SIS
       # course_id,user_id,role,section_id,status
       def process(csv, index=nil, count=nil)
         messages = []
-        @sis.counts[:enrollments] += SIS::EnrollmentImporter.new(@root_account, importer_opts).process(messages, @sis.updates_every) do |importer|
+        count = SIS::EnrollmentImporter.new(@root_account, importer_opts).process(messages) do |importer|
           csv_rows(csv, index, count) do |row|
             update_progress
-
             begin
               importer.add_enrollment(create_enrollment(row, messages))
             rescue ImportError => e
@@ -46,6 +45,7 @@ module SIS
           end
         end
         messages.each { |message| add_warning(csv, message) }
+        count
       end
 
       private

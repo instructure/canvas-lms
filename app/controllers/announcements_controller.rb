@@ -24,6 +24,12 @@ class AnnouncementsController < ApplicationController
   before_action :require_context, :except => :public_feed
   before_action { |c| c.active_tab = "announcements" }
 
+  def announcements_locked?
+    return true if @context.account.lock_all_announcements[:locked]
+    return false unless @context.is_a?(Course)
+    @context.lock_all_announcements?
+  end
+
   def index
     return unless authorized_action(@context, @current_user, :read)
     return if @context.class.const_defined?('TAB_ANNOUNCEMENTS') && !tab_enabled?(@context.class::TAB_ANNOUNCEMENTS)
@@ -41,6 +47,7 @@ class AnnouncementsController < ApplicationController
         js_env is_showing_announcements: true
         js_env atom_feed_url: feeds_announcements_format_path((@context_enrollment || @context).feed_code, :atom)
         js_env(COURSE_ID: @context.id.to_s) if @context.is_a?(Course)
+        js_env ANNOUNCEMENTS_LOCKED: announcements_locked?
 
         if @context.account.feature_enabled?(:section_specific_announcements)
           js_bundle :announcements_index_v2

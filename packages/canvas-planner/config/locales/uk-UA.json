@@ -1,0 +1,68 @@
+{
+  "close_d634289d": {
+    "message": "Закрити"
+  },
+  "course_8a63b4a3": {
+    "message": "Курс"
+  },
+  "date_ee500367": {
+    "message": "Дата"
+  },
+  "delete_a6efa79d": {
+    "message": "Видалити"
+  },
+  "details_98a31b68": {
+    "message": "Подробиці"
+  },
+  "due_5d7267be": {
+    "message": "Очікується:"
+  },
+  "excused_cf8792eb": {
+    "message": "Поважно"
+  },
+  "graded_25cd3fcd": {
+    "message": "Оцінено"
+  },
+  "late_2be42b88": {
+    "message": "Пізніше"
+  },
+  "load_more_a36f9cf9": {
+    "message": "Завантажити більше"
+  },
+  "loading_25990131": {
+    "message": "Завантаження..."
+  },
+  "missing_1a256b3b": {
+    "message": "Втрачено"
+  },
+  "points_bceb5005": {
+    "message": "бали"
+  },
+  "previous_month_bb1e3c84": {
+    "message": "Попередній місяць"
+  },
+  "pts_699bd9aa": {
+    "message": "бали"
+  },
+  "save_11a80ec3": {
+    "message": "Зберегти"
+  },
+  "submitted_318fad53": {
+    "message": "Підтверджено"
+  },
+  "title_ee03d132": {
+    "message": "Заголовок"
+  },
+  "to_do_1d554f36": {
+    "message": "Зробити"
+  },
+  "today_76e10f9c": {
+    "message": "Сьогодні"
+  },
+  "tomorrow_9a6c9a00": {
+    "message": "Завтра"
+  },
+  "yesterday_c6bd6abf": {
+    "message": "Вчора"
+  }
+}

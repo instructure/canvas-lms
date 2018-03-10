@@ -1,0 +1,157 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders the base component correctly with two buttons and a tray 1`] = `
+<div>
+  <Button
+    as="button"
+    buttonRef={[Function]}
+    fluidWidth={false}
+    margin="0"
+    onClick={[Function]}
+    size="medium"
+    type="button"
+    variant="icon"
+  >
+    <IconPlusLine
+      title="Add To Do"
+    />
+  </Button>
+  <Popover
+    alignArrow={false}
+    applicationElement={null}
+    closeButtonLabel={null}
+    closeButtonRef={[Function]}
+    constrain="none"
+    contentRef={[Function]}
+    defaultFocusElement={null}
+    defaultShow={false}
+    insertAt="bottom"
+    label={null}
+    mountNode={null}
+    offsetX={0}
+    offsetY={0}
+    on="click"
+    onBlur={[Function]}
+    onClick={[Function]}
+    onDismiss={[Function]}
+    onFocus={[Function]}
+    onMouseOut={[Function]}
+    onMouseOver={[Function]}
+    onPositionChanged={[Function]}
+    onPositioned={[Function]}
+    onShow={[Function]}
+    onToggle={[Function]}
+    placement="bottom end"
+    positionTarget={null}
+    shouldCloseOnDocumentClick={true}
+    shouldCloseOnEscape={true}
+    shouldContainFocus={false}
+    shouldRenderOffscreen={false}
+    shouldReturnFocus={true}
+    show={false}
+    trackPosition={true}
+    variant="default"
+    withArrow={true}
+  >
+    <PopoverTrigger>
+      <Button
+        as="button"
+        buttonRef={[Function]}
+        fluidWidth={false}
+        margin="0"
+        onClick={[Function]}
+        size="medium"
+        type="button"
+        variant="icon"
+      >
+        <Badge
+          count={1}
+          formatOverflowText={[Function]}
+          placement="top end"
+          pulse={false}
+          standalone={false}
+          type="count"
+          variant="primary"
+        >
+          <IconAlertsLine
+            title="1 opportunity"
+          />
+        </Badge>
+      </Button>
+    </PopoverTrigger>
+    <PopoverContent>
+      <Animatable(Opportunities)
+        courses={
+          Array [
+            Object {
+              "id": "1",
+              "informStudentsOfOverdueSubmissions": true,
+              "shortName": "Course Short Name",
+            },
+          ]
+        }
+        dismiss={[Function]}
+        maxHeight="none"
+        opportunities={
+          Array [
+            Object {
+              "course_id": "1",
+              "due_at": "2017-03-09T20:40:35Z",
+              "html_url": "http://www.non_default_url.com",
+              "id": "1",
+              "name": "learning object title",
+            },
+          ]
+        }
+        timeZone="America/Denver"
+        togglePopover={[Function]}
+      />
+    </PopoverContent>
+  </Popover>
+  <Tray
+    applicationElement={[Function]}
+    border={false}
+    closeButtonLabel="Close"
+    closeButtonRef={[Function]}
+    closeButtonVariant="icon"
+    contentRef={[Function]}
+    defaultFocusElement={null}
+    insertAt="bottom"
+    label="Add To Do"
+    mountNode={null}
+    onClose={[Function]}
+    onDismiss={[Function]}
+    onEnter={[Function]}
+    onEntered={[Function]}
+    onEntering={[Function]}
+    onExit={[Function]}
+    onExited={[Function]}
+    onExiting={[Function]}
+    onOpen={[Function]}
+    open={false}
+    placement="end"
+    shadow={true}
+    shouldCloseOnDocumentClick={false}
+    shouldContainFocus={true}
+    shouldReturnFocus={true}
+    size="small"
+  >
+    <UpdateItemTray
+      courses={
+        Array [
+          Object {
+            "id": "1",
+            "informStudentsOfOverdueSubmissions": true,
+            "shortName": "Course Short Name",
+          },
+        ]
+      }
+      locale="en"
+      noteItem={null}
+      onDeletePlannerItem={[Function]}
+      onSavePlannerItem={[Function]}
+      timeZone="America/Denver"
+    />
+  </Tray>
+</div>
+`;

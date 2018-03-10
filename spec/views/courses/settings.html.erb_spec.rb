@@ -21,7 +21,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "courses/settings.html.erb" do
   before do
-    course_with_teacher(:active_all => true)
+    @subaccount = Account.default.sub_accounts.create!(:name => 'subaccount')
+    course_with_teacher(:active_all => true, :account => @subaccount)
     @course.sis_source_id = "so_special_sis_id"
     @course.workflow_state = 'claimed'
     @course.save!
@@ -51,6 +52,15 @@ describe "courses/settings.html.erb" do
     it "should not show to non-sis admin" do
       role = custom_account_role('NoSissy', :account => @course.root_account)
       admin = account_admin_user_with_role_changes(:account => @course.root_account, :role_changes => {'manage_sis' => false}, :role => role)
+      view_context(@course, admin)
+      assign(:current_user, admin)
+      render
+      expect(response).not_to have_tag("input#course_sis_source_id")
+    end
+
+    it "should not show to subaccount admin" do
+      role = custom_account_role('CustomAdmin', :account => @course.root_account)
+      admin = account_admin_user_with_role_changes(:account => @subaccount, :role_changes => {'manage_sis' => true, 'manage_courses' => true}, :role => role)
       view_context(@course, admin)
       assign(:current_user, admin)
       render

@@ -26,11 +26,15 @@
 <%= form_tag update_profile_profile_path, { :method => :put, :id => :edit_profile_form, :class => "ic-Form-control" } do %>
   <div class="image-block">
     <div class="image-block-image profile-avatar-wrapper">
-      <% if @user_data[:can_edit] %>
-        <%= avatar(@user_data[:id], size: 128, url: '#', edit: true, class: "profile-link", title: t('titles.click_to_change_profile_pic', "Click to change profile pic")) %>
+      <% if @user_data[:can_edit_avatar] %>
+        <%= avatar(@user_data[:id], size: 128, url: '#', edit: true, class: "profile-link",
+            title: t('titles.click_to_change_profile_pic', "Click to change profile pic"),
+            sr_content: t('Click to change profile picture for %{display_name}', :display_name => @user.short_name)) %>
       <% elsif @user != @current_user %>
         <%= avatar(@user, size: 128, url: report_avatar_image_url(@user.id),
-          class: "report_avatar_link", title: t("Click to report profile picture"), show_flag: true) %>
+            class: "report_avatar_link", show_flag: true,
+            title: t("Click to report profile picture"),
+            sr_content: t('Click to report profile picture for %{display_name}', :display_name => @user.short_name)) %>
       <% else %>
         <%= avatar(@user_data[:id], size: 128, url: nil) %>
       <% end %>

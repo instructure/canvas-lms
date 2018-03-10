@@ -83,6 +83,10 @@ module.exports = {
   }, bundleEntries, momentLocaleBundles),
 
   output: {
+    // NOTE: hashSalt was added when HashedModuleIdsPlugin was installed, since
+    // chunkhashes are insensitive to moduleid changes. It should be changed again
+    // if this plugin is reconfigured or removed, or if there is another reason to
+    // prevent previously cached assets from being mixed with those from the new build
     hashSalt: '2018-01-29',
     path: path.join(__dirname, '../public', webpackPublicPath),
 

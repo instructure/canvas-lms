@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders as a div with a Checkbox and a string of text indicating count 1`] = `
+<div>
+  <div>
+    <Checkbox
+      defaultChecked={true}
+      disabled={false}
+      inline={true}
+      label="Show 3 completed items"
+      onClick={[Function]}
+      size="medium"
+      variant="simple"
+    />
+  </div>
+  <div />
+</div>
+`;

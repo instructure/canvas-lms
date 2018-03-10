@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Canvas Planner</title>
+  <style>
+    body {
+      /* simulate Canvas' line-height */
+      line-height: 1.5;
+    }
+    #header {
+      display: flex;
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    #demo_only_mount {
+      flex: .8;
+      margin-right: 20px;
+    }
+
+    #header_mount_point {
+      flex: .2;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+</head>
+<body>
+  <div id="header">
+    <div id="demo_only_mount"></div>
+    <div id="header_mount_point"></div>
+  </div>
+  <div id="mount_point"></div>
+  <script src="ie11-polyfill.js"></script>
+  <script src="canvas-planner.js"></script>
+</body>
+</html>

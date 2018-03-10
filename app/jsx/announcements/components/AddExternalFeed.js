@@ -64,7 +64,9 @@ export default class AddExternalFeed extends React.Component {
   }
 
   focusOnToggleHeader = () => {
-    this.toggleBtn.focus()
+    setTimeout(() => {
+      this.toggleBtn.focus();
+    })
   }
 
   addRssSelection = () => {
@@ -80,7 +82,7 @@ export default class AddExternalFeed extends React.Component {
     $.screenReaderFlashMessage(I18n.t('dropdown changed state to %{expanded}.', {expanded}))
     this.setState({
       isOpen: expanded
-    })
+    }, this.focusOnToggleHeader)
   }
 
   clearAddRSS = () => {
@@ -233,7 +235,7 @@ export default class AddExternalFeed extends React.Component {
             expanded={this.state.isOpen}
             name="external-rss-feed__toggle"
           >
-            <Dialog open={this.state.isOpen} shouldReturnFocus>
+            <Dialog open={this.state.isOpen} shouldReturnFocus defaultFocusElement={() => this.toggleBtn}>
               {this.renderTextInput(
                 this.state.feedURL,
                 I18n.t('Feed url'),

@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {string, bool, func, shape, oneOf} from 'prop-types'
+import {arrayOf, string, bool, func, shape, oneOf} from 'prop-types'
+import {isEqual, groupBy, map} from 'lodash'
 import IconPlusLine from 'instructure-icons/lib/Line/IconPlusLine'
 import Button from '@instructure/ui-core/lib/components/Button'
 import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
@@ -30,6 +31,18 @@ import preventDefault from 'compiled/fn/preventDefault'
 import {propType as termsPropType} from '../store/TermsStore'
 import NewCourseModal from './NewCourseModal'
 
+function termGroup(term) {
+  if (term.start_at && new Date(term.start_at) > new Date()) return 'future'
+  if (term.end_at && new Date(term.end_at) < new Date()) return 'past'
+  return 'active'
+}
+
+const termGroups = {
+  active: I18n.t('Active Terms'),
+  future: I18n.t('Future Terms'),
+  past: I18n.t('Past Terms')
+}
+
 export default function CoursesToolbar({
   can_create_courses,
   terms,
@@ -37,8 +50,10 @@ export default function CoursesToolbar({
   onUpdateFilters,
   isLoading,
   errors,
-  draftFilters
+  draftFilters,
+  show_blueprint_courses_checkbox
 }) {
+  const groupedTerms = groupBy(terms.data, termGroup)
   const searchLabel =
     draftFilters.search_by === 'teacher'
       ? I18n.t('Search courses by teacher...')
@@ -62,15 +77,20 @@ export default function CoursesToolbar({
                         <option key="all" value="">
                           {I18n.t('All Terms')}
                         </option>
-                        {(terms.data || []).map(term => (
-                          <option key={term.id} value={term.id}>
-                            {term.name}
-                          </option>
-                        ))}
-                        {terms.loading && (
-                          <option disabled>{I18n.t('Loading more terms...')}</option>
-                        )}
                       </optgroup>
+                      {map(termGroups, (label, key) =>
+                        groupedTerms[key] && (
+                          <optgroup key={key} label={label}>
+                            {groupedTerms[key].map(term => (
+                              <option key={term.id} value={term.id}>
+                                {term.name}
+                              </option>
+                            ))}
+                          </optgroup>
+                      ))}
+                      {terms.loading && (
+                        <option disabled>{I18n.t('Loading more terms...')}</option>
+                      )}
                     </Select>
                   </GridCol>
                   <GridCol width="2">
@@ -101,17 +121,26 @@ export default function CoursesToolbar({
                   </GridCol>
                 </GridRow>
                 <GridRow>
-                  <GridCol>
+                  <GridCol width="auto">
                     <Checkbox
-                      checked={draftFilters.with_students}
-                      onChange={e => onUpdateFilters({with_students: e.target.checked})}
-                      label={I18n.t('Hide courses without enrollments')}
+                      checked={isEqual(draftFilters.enrollment_type, ['student'])}
+                      onChange={e => onUpdateFilters({enrollment_type: e.target.checked ? ['student'] : null})}
+                      label={I18n.t('Hide courses without students')}
                     />
                   </GridCol>
+                  {show_blueprint_courses_checkbox &&
+                    <GridCol>
+                      <Checkbox
+                        checked={draftFilters.blueprint}
+                        onChange={e => onUpdateFilters({blueprint: e.target.checked ? true : null})}
+                        label={I18n.t('Show only blueprint courses')}
+                      />
+                    </GridCol>
+                  }
                 </GridRow>
               </Grid>
             </GridCol>
-            { can_create_courses && (
+            {can_create_courses && (
               <GridCol width="auto">
                 <NewCourseModal terms={terms}>
                   <Button>
@@ -130,11 +159,14 @@ export default function CoursesToolbar({
 
 CoursesToolbar.propTypes = {
   can_create_courses: bool,
+  show_blueprint_courses_checkbox: bool,
   onUpdateFilters: func.isRequired,
   onApplyFilters: func.isRequired,
   isLoading: bool.isRequired,
   draftFilters: shape({
-    with_students: bool.isRequired,
+    enrollment_type: arrayOf(
+      oneOf(['teacher', 'student', 'ta', 'observer', 'designer']).isRequired
+    ),
     search_by: oneOf(['course', 'teacher']).isRequired,
     search_term: string.isRequired,
     enrollment_term_id: string.isRequired
@@ -148,6 +180,10 @@ CoursesToolbar.defaultProps = {
     window.ENV &&
     window.ENV.PERMISSIONS &&
     window.ENV.PERMISSIONS.can_create_courses
+  ),
+  show_blueprint_courses_checkbox: (
+    window.ENV &&
+    window.ENV['master_courses?']
   ),
   terms: {
     data: [],
