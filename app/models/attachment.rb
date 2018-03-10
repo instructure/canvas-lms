@@ -859,7 +859,43 @@ class Attachment < ActiveRecord::Base
   # path will be used instead of the default system temporary path. It'll be
   # created if necessary.
   def open(opts = {}, &block)
-    store.open(opts, &block)
+    if instfs_hosted?
+      if block_given?
+        streaming_download(&block)
+      else
+        create_tempfile(opts) do |tempfile|
+          streaming_download(tempfile)
+        end
+      end
+    else
+      store.open(opts, &block)
+    end
+  end
+
+  # GETs this attachment's public_url and streams the response to the
+  # passed block; this is a helper function for #open
+  # (you should call #open instead of this)
+  private def streaming_download(dest=nil, &block)
+    uri = URI(public_url)
+    Net::HTTP.start(uri.host, uri.port) do |http|
+      request = Net::HTTP::Get.new uri
+
+      http.request(request) do |response|
+        response.read_body(dest, &block)
+      end
+    end
+  end
+
+  def create_tempfile(opts)
+    if opts[:temp_folder].present? && !File.exist?(opts[:temp_folder])
+      FileUtils.mkdir_p(opts[:temp_folder])
+    end
+    tempfile = Tempfile.new(["attachment_#{id}", extension],
+                            opts[:temp_folder].presence || Dir.tmpdir)
+    tempfile.binmode
+    yield tempfile
+    tempfile.rewind
+    tempfile
   end
 
   def has_thumbnail?

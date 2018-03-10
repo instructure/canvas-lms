@@ -105,11 +105,9 @@ class Attachments::S3Storage
     if opts[:temp_folder].present? && !File.exist?(opts[:temp_folder])
       FileUtils.mkdir_p(opts[:temp_folder])
     end
-    tempfile = Tempfile.new(["attachment_#{attachment.id}", attachment.extension],
-                            opts[:temp_folder].presence || Dir::tmpdir)
-    tempfile.binmode
-    attachment.s3object.get(response_target: tempfile)
-    tempfile.rewind
+    tempfile = attachment.create_tempfile(opts) do |file|
+      attachment.s3object.get(response_target: file)
+    end
 
     if block_given?
       File.open(tempfile.path, 'rb') do |file|

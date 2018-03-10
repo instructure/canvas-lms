@@ -1735,6 +1735,36 @@ describe Attachment do
   end
 
   context "#open" do
+    include WebMock::API
+
+    context "instfs branch" do
+      before do
+        user_model
+        attachment_model(:context => @user)
+        public_url = 'http://www.example.com/foo'
+        allow(@attachment).to receive(:instfs_hosted?).and_return true
+        allow(@attachment).to receive(:public_url).and_return public_url
+
+        stub_request(:get, public_url).
+          to_return(status: 200, body: "test response body", headers: {})
+      end
+
+      it "should stream data to the block given" do
+        callback = false
+        @attachment.open do |data|
+          expect(data).to eq "test response body"
+          callback = true
+        end
+        expect(callback).to eq true
+      end
+
+      it "should stream to a tempfile without a block given" do
+        file = @attachment.open
+        expect(file).to be_a(Tempfile)
+        expect(file.read).to eq("test response body")
+      end
+    end
+
     context "s3_storage" do
       before do
         s3_storage!
