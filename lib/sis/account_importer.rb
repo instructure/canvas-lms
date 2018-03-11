@@ -86,6 +86,8 @@ module SIS
           if status =~ /active/i
             account.workflow_state = 'active'
           elsif status =~ /deleted/i
+            raise ImportError, "Cannot delete the sub_account with ID: #{account_id} because it has active sub accounts." if account.sub_accounts.active.exists?
+            raise ImportError, "Cannot delete the sub_account with ID: #{account_id} because it has active courses." if account.courses.active.exists?
             account.workflow_state = 'deleted'
           end
         end
