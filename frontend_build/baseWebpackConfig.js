@@ -28,7 +28,6 @@ const ClientAppsPlugin = require('./clientAppPlugin')
 const CompiledReferencePlugin = require('./CompiledReferencePlugin')
 const I18nPlugin = require('./i18nPlugin')
 const SelinimumManifestPlugin = require('./SelinimumManifestPlugin')
-const WebpackHooks = require('./webpackHooks')
 const webpackPublicPath = require('./webpackPublicPath')
 const WebpackCleanupPlugin = require('webpack-cleanup-plugin')
 const HappyPack = require('happypack')
@@ -270,8 +269,6 @@ module.exports = {
 
     // handle the way we hook into bundles from our rails plugins like analytics
     new BundleExtensionsPlugin(),
-
-    new WebpackHooks(),
 
     // avoids warnings caused by
     // https://github.com/graphql/graphql-language-service/issues/111, should
