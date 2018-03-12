@@ -101,39 +101,6 @@ describe Login::SamlController do
     expect(response).to redirect_to(login_url)
   end
 
-  it "does not enforce a valid entity id" do
-    unique_id = 'foo@example.com'
-
-    account1 = account_with_saml
-    account1.settings[:allow_mismatched_entity_id] = true
-    account1.save!
-    user1 = user_with_pseudonym({:active_all => true, :username => unique_id})
-    @pseudonym.account = account1
-    @pseudonym.save!
-
-    allow(Onelogin::Saml::Response).to receive(:new).and_return(
-        double('response',
-             is_valid?: true,
-             success_status?: true,
-             name_id: unique_id,
-             name_identifier_format: nil,
-             name_qualifier: nil,
-             sp_name_qualifier: nil,
-             session_index: nil,
-             process: nil,
-             issuer: "such a lie",
-             saml_attributes: {},
-             used_key: nil
-        )
-    )
-
-    controller.request.env['canvas.domain_root_account'] = account1
-    post :create, params: {:SAMLResponse => "foo"}
-    expect(response).to redirect_to(dashboard_url(:login_success => 1))
-    expect(session[:saml_unique_id]).to eq unique_id
-    expect(Pseudonym.find(session['pseudonym_credentials_id'])).to eq user1.pseudonyms.first
-  end
-
   it "should redirect when a user is authenticated but is not found in canvas" do
     unique_id = 'foo@example.com'
 
