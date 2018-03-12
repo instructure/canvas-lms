@@ -18,62 +18,48 @@
 
 import I18n from 'i18n!new_nav'
 import React from 'react'
-import PropTypes from 'prop-types'
-import SVGWrapper from '../../shared/SVGWrapper'
-import Spinner from 'instructure-ui/lib/components/Spinner'
+import {bool, arrayOf, shape, string} from 'prop-types'
+import Container from '@instructure/ui-core/lib/components/Container'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import Link from '@instructure/ui-core/lib/components/Link'
+import List, {ListItem} from '@instructure/ui-core/lib/components/List'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
 
-  var AccountsTray = React.createClass({
-    propTypes: {
-      accounts: PropTypes.array.isRequired,
-      closeTray: PropTypes.func.isRequired,
-      hasLoaded: PropTypes.bool.isRequired
-    },
-
-    getDefaultProps() {
-      return {
-        accounts: []
-      };
-    },
-
-    renderAccounts() {
-      if (!this.props.hasLoaded) {
-        return (
-          <li className="ic-NavMenu-list-item ic-NavMenu-list-item--loading-message">
+export default function AccountsTray({accounts, hasLoaded}) {
+  return (
+    <Container as="div" padding="medium">
+      <Heading level="h3" as="h1">{I18n.t('Admin')}</Heading>
+      <hr />
+      <List variant="unstyled" margin="small 0" itemSpacing="small">
+        {hasLoaded ? (
+          accounts.map(account =>
+            <ListItem key={account.id}>
+              <Link href={`/accounts/${account.id}`}>{account.name}</Link>
+            </ListItem>
+          ).concat([
+            <ListItem key="hr"><hr /></ListItem>,
+            <ListItem key="all">
+              <Link href="/accounts">{I18n.t('All Accounts')}</Link>
+            </ListItem>
+          ])
+        ) : (
+          <ListItem>
             <Spinner size="small" title={I18n.t('Loading')} />
-          </li>
-        );
-      }
-      var accounts = this.props.accounts.map((account) => {
-        return (
-          <li key={account.id} className='ic-NavMenu-list-item'>
-            <a href={`/accounts/${account.id}`} className='ic-NavMenu-list-item__link'>{account.name}</a>
-          </li>
-        );
-      });
-      accounts.push(
-        <li key='allAccountLink' className='ic-NavMenu-list-item ic-NavMenu-list-item--feature-item'>
-          <a href='/accounts' className='ic-NavMenu-list-item__link'>{I18n.t('All Accounts')}</a>
-        </li>
-      );
-      return accounts;
-    },
+          </ListItem>
+        )}
+      </List>
+    </Container>
+  )
+}
 
-    render() {
-      return (
-        <div>
-          <div className="ic-NavMenu__header">
-            <h1 className="ic-NavMenu__headline">{I18n.t('Admin')}</h1>
-            <button className="Button Button--icon-action ic-NavMenu__closeButton" type="button" onClick={this.props.closeTray}>
-              <i className="icon-x"></i>
-              <span className="screenreader-only">{I18n.t('Close')}</span>
-            </button>
-          </div>
-          <ul className="ic-NavMenu__link-list">
-            {this.renderAccounts()}
-          </ul>
-        </div>
-      );
-    }
-  });
+AccountsTray.propTypes = {
+  accounts: arrayOf(shape({
+    id: string.isRequired,
+    name: string.isRequired
+  })).isRequired,
+  hasLoaded: bool.isRequired
+}
 
-export default AccountsTray
+AccountsTray.defaultProps = {
+  accounts: []
+}

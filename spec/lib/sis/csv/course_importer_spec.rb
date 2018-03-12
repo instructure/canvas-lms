@@ -61,8 +61,8 @@ describe SIS::CSV::CourseImporter do
       "T004,Fall14,active,,"
     )
     process_csv_data_cleanly(
-      "course_id,short_name,long_name,account_id,term_id,status",
-      "test_1,TC 101,Test Course 101,,T001,active"
+      "course_id,short_name,long_name,account_id,term_id,status,blueprint_course_id",
+      "test_1,TC 101,Test Course 101,,T001,active,\"\""
     )
     @account.courses.where(sis_source_id: "test_1").first.tap do |course|
       expect(course.enrollment_term).to eq EnrollmentTerm.where(sis_source_id: 'T001').first

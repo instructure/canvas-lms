@@ -67,11 +67,20 @@ describe "new account user search" do
   end
 
   it "should not show the create users button for non-root acocunts" do
-    sub_account = Account.create!(:name => "sub", :parent_account => @account)
+    sub_account = Account.create!(name: "sub", parent_account: @account)
+    account_admin_user(account: sub_account, active_all: true)
+    user_session(@user)
 
     get "/accounts/#{sub_account.id}/users"
 
     expect(f("#content")).not_to contain_jqcss('button:has([name="IconPlusLine"]):contains("People")')
+  end
+
+  it "should show the create users button user has permission on the root_account" do
+    sub_account = Account.create!(name: "sub", parent_account: @account)
+    get "/accounts/#{sub_account.id}/users"
+
+    expect(f("#content")).to contain_jqcss('button:has([name="IconPlusLine"]):contains("People")')
   end
 
   it "should be able to create users" do

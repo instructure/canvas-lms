@@ -20,6 +20,7 @@ class DefaultLimitPrivilegesToCourseSection < ActiveRecord::Migration[5.0]
 
   def up
     change_column_default(:enrollments, :limit_privileges_to_course_section, false)
+    DataFixup::BackfillNulls.run(Enrollment, [:limit_privileges_to_course_section])
     change_column_null(:enrollments, :limit_privileges_to_course_section, false)
   end
 

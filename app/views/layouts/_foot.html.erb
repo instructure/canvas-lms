@@ -1,4 +1,4 @@
-<%= InstFS.login_pixel(@current_user, session) %>
+<%= InstFS.login_pixel(logged_in_user, session, @domain_root_account) %>
 
 <script>
   INST = <%= raw(inst_env.to_json) %>;

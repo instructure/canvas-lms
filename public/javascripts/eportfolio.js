@@ -452,13 +452,12 @@ import 'jqueryui/sortable'
           return false;
         }
       },
-      success: function(data) {
+      success: function(attachment) {
         var $section = $(this).data('section');
-        var attachment = data.attachment;
         $section.find(".attachment_id").text(attachment.id);
         var url = $(".eportfolio_download_url").attr('href');
         url = $.replaceTags(url, 'uuid', attachment.uuid);
-        if(attachment.content_type.indexOf("image") != -1) {
+        if(attachment['content-type'].indexOf("image") != -1) {
           var $image = $("#eportfolio_view_image").clone(true).removeAttr('id');
           $image.find(".eportfolio_image").attr('src', url).attr('alt', attachment.display_name);
           $image.find(".eportfolio_download").attr('href', url);

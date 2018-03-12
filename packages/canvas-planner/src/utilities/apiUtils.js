@@ -56,8 +56,8 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
   }
   // Standardize 00:00:00 date to 11:59PM on the current day to make due date less confusing
   let currentDay = moment(details.date);
-  if (currentDay.tz(timeZone).format('HH:mm:ss') === '00:00:00') {
-    details.date = currentDay.endOf('day').format();
+  if (isMidnight(currentDay, timeZone)) {
+    details.date = currentDay.endOf('day').toISOString();
   }
   return details;
 };
@@ -224,4 +224,11 @@ function getGroupContext(apiResponse, group) {
     color: group.color,
     url: group.url
   };
+}
+
+function isMidnight(currentDay, timeZone) {
+  // in languages like Arabic, moment.format returns strings in the native characters
+  // so this doesn't work
+  //currentDay.tz(timeZone).format('HH:mm:ss') === '00:00:00'
+  return currentDay.hours() === currentDay.minutes() === currentDay.seconds() === 0;
 }

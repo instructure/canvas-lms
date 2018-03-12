@@ -177,10 +177,7 @@ describe DiscussionTopicsController do
       group_id = group_topic.child_topics.first.group.id
       get 'index', params: { group_id: group_id }, :format => :json
       expect(response).to be_success
-      response_body = response.body
-      # Remove the prepending while loop so the parser doesn't choke
-      response_body.sub!('while(1);', '')
-      parsed_json = JSON.parse response_body
+      parsed_json = json_parse(response.body)
       expect(parsed_json.length).to eq 1
       parsed_topic = parsed_json.first
       # barf

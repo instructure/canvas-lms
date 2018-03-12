@@ -17,13 +17,12 @@
 #
 
 define [
-  'i18n!user'
   'jquery'
   'underscore'
   'Backbone'
   '../str/TextHelper'
   'jquery.instructure_misc_helpers' # $.parseUserAgentString
-], (I18n, $, _, Backbone, {truncateText}) ->
+], ($, _, Backbone, {truncateText}) ->
 
   class PageView extends Backbone.Model
 

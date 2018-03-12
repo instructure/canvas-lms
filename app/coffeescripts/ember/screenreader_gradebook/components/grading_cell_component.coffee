@@ -26,7 +26,8 @@ define [
   'ember'
   'jquery'
   'jquery.ajaxJSON'
-], (I18n, GRADEBOOK_TRANSLATIONS, GradebookHelpers, GradeFormatHelper, OutlierScoreHelper, numberHelper, _, Ember, $) ->
+], (I18n, GRADEBOOK_TRANSLATIONS, GradebookHelpers, GradeFormatHelper,
+  { default:  OutlierScoreHelper }, numberHelper, _, Ember, $) ->
 
   GradingCellComponent = Ember.Component.extend
 

@@ -172,7 +172,9 @@ module Canvas::LiveEvents
       lock_at: assignment.lock_at,
       updated_at: assignment.updated_at,
       points_possible: assignment.points_possible,
-      lti_assignment_id: assignment.lti_context_id
+      lti_assignment_id: assignment.lti_context_id,
+      lti_resource_link_id: assignment.lti_resource_link_id,
+      lti_resource_link_id_duplicated_from: assignment.duplicate_of&.lti_resource_link_id
     }
   end
 

@@ -16,12 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'i18n!roster'
   'jquery'
   'underscore'
   'Backbone'
   'jst/courses/roster/rosterTabs'
-], (I18n, $, _, Backbone, template) ->
+], ($, _, Backbone, template) ->
 
   class RosterTabsView extends Backbone.View
     template: template

@@ -95,12 +95,7 @@ describe InfoController do
       user_session(admin)
 
       get 'help_links'
-
-      # because this is a normal application session, the response is prepended
-      # with our anti-csrf measure
-      json = response.body
-      anti_csrf = 'while(1);'
-      links = JSON.parse(json[anti_csrf.length..json.length-1])
+      links = json_parse(response.body)
       expect(links.select {|link| link[:text] == 'Ask Your Instructor a Question'}.size).to eq 0
     end
   end

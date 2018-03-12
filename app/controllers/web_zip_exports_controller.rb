@@ -17,7 +17,6 @@
 #
 
 # API Web Zip Exports
-# @beta
 #
 # API for viewing offline exports for a course
 #

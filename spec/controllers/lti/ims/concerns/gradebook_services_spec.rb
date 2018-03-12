@@ -24,18 +24,11 @@ module Lti
     describe GradebookServices, type: :controller do
       controller(ApplicationController) do
         include Lti::Ims::Concerns::GradebookServices
-        before_action :verify_user_in_context, :verify_line_item_in_context, only: [:show]
+        before_action :verify_user_in_context, :verify_line_item_in_context
 
-        def test_filter
-          render json: [output]
-        end
-
-        def test_verification
+        def index
+          return render_error(params[:error_message]) if params.key?(:error_message)
           render json: output
-        end
-
-        def show_error
-          render_error('Test message', :bad_request)
         end
 
         private
@@ -50,25 +43,14 @@ module Lti
         end
       end
 
-      let_once(:context) { course_model }
+      let_once(:context) { course_model(workflow_state: 'available') }
       let_once(:user) { student_in_course(course: context).user }
       let_once(:assignment) { assignment_model context: context }
       let_once(:line_item) { line_item_model assignment: assignment }
       let(:parsed_response_body) { JSON.parse(response.body) }
+      let(:valid_params) { {course_id: context.id, userId: user.id, line_item_id: line_item.id} }
 
       describe '#before_actions' do
-        xit 'populates the resource helper methods correctly' do
-          get :test_filter
-          expect(parsed_response_body).to eq(
-            {
-              line_item_id: line_item.id,
-              context_id: context.id,
-              tool_id: tool.id,
-              user_id: user.id
-            }
-          )
-        end
-
         context 'with tool in context' do
           it 'allows access'
         end
@@ -89,25 +71,62 @@ module Lti
           it 'does not allow access'
         end
 
-        context 'with user in context' do
-          it 'processes the request'
+        context 'with user and line item in context' do
+          before { user.enrollments.first.update!(workflow_state: 'active') }
+
+          it 'processes the request' do
+            get :index, params: valid_params
+            expect(response).to be_success
+          end
+        end
+
+        context 'with user not active context' do
+          it 'fails to process the request' do
+            get :index, params: valid_params
+            expect(response.code).to eq '422'
+          end
         end
 
         context 'with user not in context' do
-          it 'fails to process the request'
+          before { user.enrollments.destroy_all }
+
+          it 'fails to process the request' do
+            get :index, params: valid_params
+            expect(response.code).to eq '422'
+          end
         end
 
-        context 'with line_item in context' do
-          it 'processes the request'
-        end
+        context 'when line item does not exist' do
+          before { user.enrollments.first.update!(workflow_state: 'active') }
 
-        context 'with user not in context' do
-          it 'fails to process the request'
+          it 'fails to process the request' do
+            get :index, params: {course_id: context.id, userId: user.id, line_item_id: LineItem.last.id + 1}
+            expect(response).to be_not_found
+          end
         end
       end
 
       describe '#render_error' do
-        it 'returns the error message and response correctly'
+        before { user.enrollments.first.update!(workflow_state: 'active') }
+        let(:error_message) { 'test error message' }
+        let(:params) do
+          {
+            error_message: error_message,
+            course_id: context.id,
+            userId: user.id,
+            line_item_id: line_item.id
+          }
+        end
+
+        it 'returns the error message correctly' do
+          get :index, params: params
+          expect(parsed_response_body.dig('errors', 'message')).to eq error_message
+        end
+
+        it 'returns the correct response code' do
+          get :index, params: params
+          expect(response.code).to eq '412'
+        end
       end
     end
   end

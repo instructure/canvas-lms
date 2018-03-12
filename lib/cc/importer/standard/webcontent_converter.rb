@@ -21,8 +21,10 @@ module CC::Importer::Standard
 
     def create_file_map
       new_assignments = []
+      new_pages = []
+
       resources_by_type(WEBCONTENT, "associatedcontent").each do |res|
-        if res[:intended_use]
+        if res[:intended_use] || @convert_html_to_pages
           path = get_full_path(res[:href])
           if path && File.exists?(path) && Attachment.mimetype(path) =~ /html/
             case res[:intended_use]
@@ -31,6 +33,10 @@ module CC::Importer::Standard
             when "syllabus"
               @course[:course] ||= {}
               @course[:course][:syllabus_body] = File.read(path)
+            else
+              if @convert_html_to_pages
+                new_pages << {:migration_id => res[:migration_id], :text => File.read(path)}
+              end
             end
           end
         end
@@ -70,6 +76,12 @@ module CC::Importer::Standard
       new_assignments.each do |a|
         a[:description] = replace_urls(a[:description])
         @course[:assignments] << a
+      end
+
+      @course[:wikis] ||= []
+      new_pages.each do |p|
+        p[:text] = replace_urls(p[:text])
+        @course[:wikis] << p
       end
     end
 

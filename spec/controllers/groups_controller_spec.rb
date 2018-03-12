@@ -137,8 +137,7 @@ describe GroupsController do
       user_session(student1)
       get 'index', params: {:course_id => @course.id, :include => 'users',
         :include_inactive_users => true}, format: :json
-      response_body = response.body.sub('while(1);', '')
-      parsed_json = JSON.parse response_body
+      parsed_json = json_parse(response.body)
       expect(parsed_json.length).to eq 1
       users_json = parsed_json.first["users"]
       expect(users_json).not_to be_nil
@@ -707,13 +706,12 @@ describe GroupsController do
       })
       file = Attachment.create! context: @student, filename: "homework.pdf", uploaded_data: StringIO.new("blah blah blah")
       @sub = assignment.submit_homework(@student, attachments: [file], submission_type: "online_upload")
-      @json_prefix = 'while(1);'
     end
 
     it "should include group submissions if param is present" do
       user_session(@teacher)
       get 'users', params: {:group_id => @group.id, include: ['group_submissions']}
-      json = JSON.parse(response.body[@json_prefix.length, response.body.length])
+      json = json_parse(response.body)
 
       expect(response).to be_success
       expect(json.count).to be_equal 1
@@ -723,7 +721,7 @@ describe GroupsController do
     it "should not include group submissions if param is absent" do
       user_session(@teacher)
       get 'users', params: {:group_id => @group.id}
-      json = JSON.parse(response.body[@json_prefix.length, response.body.length])
+      json = json_parse(response.body)
 
       expect(response).to be_success
       expect(json.count).to be_equal 1
@@ -747,7 +745,7 @@ describe GroupsController do
       it "include active status if requested" do
         user_session(@teacher)
         get 'users', params: { :group_id => @group.id, include: ['active_status'] }
-        json = JSON.parse(response.body[@json_prefix.length, response.body.length])
+        json = json_parse(response.body)
         expect(json.length).to eq 3
         expect(json.detect{|r| r['id'] == @student1.id}['is_inactive']).to be_falsey
         expect(json.detect{|r| r['id'] == @student2.id}['is_inactive']).to be_truthy
@@ -757,7 +755,7 @@ describe GroupsController do
       it "don't include active status if not requested" do
         user_session(@teacher)
         get 'users', params: { :group_id => @group.id }
-        json = JSON.parse(response.body[@json_prefix.length, response.body.length])
+        json = json_parse(response.body)
         expect(json.first['is_inactive']).to be_nil
       end
     end

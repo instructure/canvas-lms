@@ -20,6 +20,7 @@ import I18n from 'i18n!blueprint_settings'
 
 const itemTypeLabels = {
   assignment: I18n.t('Assignment'),
+  assignment_group: I18n.t('Assignment Group'),
   quiz: I18n.t('Quiz'),
   discussion_topic: I18n.t('Discussion'),
   wiki_page: I18n.t('Page'),
@@ -54,6 +55,7 @@ const exceptionTypeLabels = {
   due_dates: I18n.t('Due Dates changed exceptions:'),
   availability_dates: I18n.t('Availability Dates changed exceptions:'),
   settings: I18n.t('Settings changed exceptions:'),
+  deleted: I18n.t('Deleted content exceptions:')
 }
 
 const lockTypeLabel = {

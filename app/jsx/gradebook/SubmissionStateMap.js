@@ -17,8 +17,6 @@
  */
 
 import _ from 'underscore'
-import tz from 'timezone'
-import I18n from 'i18n!gradebook'
 import GradingPeriodsHelper from '../grading/helpers/GradingPeriodsHelper'
 
   const TOOLTIP_KEYS = {

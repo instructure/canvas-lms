@@ -19,6 +19,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Account do
+  include_examples "outcome import context examples"
+
+  describe 'relationships' do
+    it { is_expected.to have_many(:feature_flags) }
+  end
 
   it "should provide a list of courses" do
     expect{ Account.new.courses }.not_to raise_error

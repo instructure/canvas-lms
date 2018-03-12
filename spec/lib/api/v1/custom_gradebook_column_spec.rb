@@ -31,7 +31,7 @@ describe "Api::V1::CustomGradebookColumn" do
 
   describe "custom_gradebook_column_json" do
     it "works" do
-      json = @col.attributes.slice(*%w(id title position teacher_notes))
+      json = @col.attributes.slice(*%w(id title position teacher_notes read_only))
       json["hidden"] = false
       expect(controller.custom_gradebook_column_json(@col, @teacher, nil)).to eq json
     end

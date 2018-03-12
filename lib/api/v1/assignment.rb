@@ -192,7 +192,7 @@ module Api::V1::Assignment
       hash['external_tool_tag_attributes'] = {
         'url' => external_tool_tag.url,
         'new_tab' => external_tool_tag.new_tab,
-        'resource_link_id' => ContextExternalTool.opaque_identifier_for(external_tool_tag, assignment.shard)
+        'resource_link_id' => assignment.lti_resource_link_id
       }
       hash['url'] = sessionless_launch_url(@context,
                                            :launch_type => 'assessment',
@@ -421,13 +421,21 @@ module Api::V1::Assignment
     prepared_create = prepare_assignment_create_or_update(assignment, assignment_params, user, context)
     return false unless prepared_create[:valid]
 
-    assignment.quiz_lti! if assignment_params.key?(:quiz_lti)
-    if prepared_create[:overrides].present?
-      create_api_assignment_with_overrides(prepared_create, user)
-    else
-      prepared_create[:assignment].save!
-      return :created
+    response = :created
+
+    Assignment.suspend_due_date_caching do
+      assignment.quiz_lti! if assignment_params.key?(:quiz_lti)
+
+      response = if prepared_create[:overrides].present?
+        create_api_assignment_with_overrides(prepared_create, user)
+      else
+        prepared_create[:assignment].save!
+        :created
+      end
     end
+
+    DueDateCacher.recompute(prepared_create[:assignment], update_grades: true)
+    response
   rescue ActiveRecord::RecordInvalid
     false
   rescue Lti::AssignmentSubscriptionsHelper::AssignmentSubscriptionError => e
@@ -441,12 +449,23 @@ module Api::V1::Assignment
     prepared_update = prepare_assignment_create_or_update(assignment, assignment_params, user, context)
     return false unless prepared_update[:valid]
 
-    if prepared_update[:overrides]
-      update_api_assignment_with_overrides(prepared_update, user)
-    else
-      prepared_update[:assignment].save!
-      :ok
+    cached_due_dates_changed = prepared_update[:assignment].update_cached_due_dates?
+    response = :ok
+
+    Assignment.suspend_due_date_caching do
+      response = if prepared_update[:overrides]
+        update_api_assignment_with_overrides(prepared_update, user)
+      else
+        prepared_update[:assignment].save!
+        :ok
+      end
     end
+
+    if @overrides_affected.to_i > 0 || cached_due_dates_changed
+      DueDateCacher.recompute(prepared_update[:assignment], update_grades: true)
+    end
+
+    response
   rescue ActiveRecord::RecordInvalid
     false
   rescue Lti::AssignmentSubscriptionsHelper::AssignmentSubscriptionError => e

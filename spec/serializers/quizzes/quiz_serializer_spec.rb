@@ -77,6 +77,7 @@ describe Quizzes::QuizSerializer do
     expect(json[:html_url]).to eq 'http://example.com/courses/1/quizzes/1'
   end
 
+
   describe "description" do
     it "serializes description with a formatter if given" do
       @serializer = quiz_serializer(
@@ -84,11 +85,29 @@ describe Quizzes::QuizSerializer do
           description_formatter: -> (_) {return "description from formatter"}
         }
       )
-      @json = @serializer.as_json[:quiz]
+      json = @serializer.as_json[:quiz]
 
       expect(json[:description]).to eq "description from formatter"
     end
+
     it "returns desctiption otherwise" do
+      expect(json[:description]).to eq quiz.description
+    end
+  end
+
+  describe "description for locked quiz" do
+    it "returns an empty string for students" do
+      serializer = quiz_serializer()
+      allow(serializer).to receive('quiz_locked_for_user?').and_return true
+      allow(serializer).to receive('user_is_student?').and_return true
+      json = serializer.as_json[:quiz]
+      expect(json[:description]).to eq ''
+    end
+
+    it "returns description for non-students" do
+      json = serializer.as_json[:quiz]
+      allow(serializer).to receive('quiz_locked_for_user?').and_return true
+      allow(serializer).to receive('user_is_student?').and_return false
       expect(json[:description]).to eq quiz.description
     end
   end
@@ -204,7 +223,6 @@ describe Quizzes::QuizSerializer do
     end
 
     it "doesn't if skip_lock_tests is on" do
-      expect(quiz).to receive(:locked_for?).never
       json = quiz_serializer({
         serializer_options: {
           skip_lock_tests: true

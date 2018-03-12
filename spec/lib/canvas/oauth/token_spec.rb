@@ -139,13 +139,13 @@ module Canvas::Oauth
       it 'deletes existing tokens for the same key when requested' do
         old_token = user.access_tokens.create! :developer_key => key
         token.create_access_token_if_needed(true)
-        expect(AccessToken.exists?(old_token.id)).to be(false)
+        expect(AccessToken.not_deleted.where(:id => old_token.id).exists?).to be(false)
       end
 
       it 'does not delete existing tokens for the same key when not requested' do
         old_token = user.access_tokens.create! :developer_key => key
         token.create_access_token_if_needed
-        expect(AccessToken.exists?(old_token.id)).to be(true)
+        expect(AccessToken.not_deleted.where(:id => old_token.id).exists?).to be(true)
       end
     end
 

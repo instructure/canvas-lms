@@ -85,6 +85,8 @@ export default {
     'date.formats.short_with_weekday',  // %a, %b %-d
     'time.formats.long',                // %B %d, %Y %H:%M
     'date.formats.long',                // %B %-d, %Y
+    'date.formats.medium+_+time.formats.tiny',
+    'date.formats.medium+_+time.formats.tiny_on_the_hour',
     'date.formats.medium',              // %b %-d, %Y
     'time.formats.short',               // %d %b %H:%M
     'date.formats.short',               // %b %-d
@@ -96,7 +98,10 @@ export default {
   ],
 
   formatsForLocale () {
-    return _.compact(_.map(this.orderedFormats, I18n.lookup, I18n))
+    return _.compact(_.map(this.orderedFormats, key => key.split('+')
+      .map(format => format !== '_' ? I18n.lookup(format) : ' ')
+      .reduce((a, b) => a + b)
+    ))
   },
 
   i18nToMomentFormat (fullString) {

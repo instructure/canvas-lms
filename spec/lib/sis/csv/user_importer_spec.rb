@@ -618,13 +618,16 @@ describe SIS::CSV::UserImporter do
     expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.sortable_name).to eq "Two, User"
   end
 
-  it "should allow a user to update emails specifically" do
+  it "should allow a user to update emails and bounce count specifically" do
     enable_cache do
       Timecop.travel(1.minute.ago) do
         process_csv_data_cleanly(
           "user_id,login_id,first_name,last_name,email,status",
           "user_1,user1,User,Uno,user1@example.com,active"
         )
+        @cc = Pseudonym.where(account_id: @account, sis_user_id: "user_1").take.communication_channels.take
+        @cc.bounce_count = 3
+        @cc.save!
         expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.email).to eq "user1@example.com"
       end
 
@@ -632,6 +635,7 @@ describe SIS::CSV::UserImporter do
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user2@example.com,active"
       )
+      expect(@cc.reload.bounce_count).to eq 0
       expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.email).to eq "user2@example.com"
     end
   end

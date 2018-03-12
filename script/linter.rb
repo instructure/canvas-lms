@@ -20,6 +20,7 @@ class Linter
     plugin: ENV['GERRIT_PROJECT'],
     skip_file_size_check: false,
     skip_wips: false,
+    base_dir: nil
   }.freeze
 
   def initialize(options = {})
@@ -37,17 +38,17 @@ class Linter
   def run
     if git_dir && !Dir.exist?(git_dir)
       puts "No plugin #{plugin} found"
-      exit 0
+      return
     end
 
     if skip_wips && wip?
       puts "WIP detected, #{linter_name} will not run."
-      exit 0
+      return
     end
 
     if !skip_file_size_check && files.size == 0
       puts "No #{file_regex} file changes found, skipping #{linter_name} check!"
-      exit 0
+      return
     end
 
     if heavy_mode
@@ -81,7 +82,8 @@ class Linter
               :plugin,
               :severe_levels,
               :skip_file_size_check,
-              :skip_wips
+              :skip_wips,
+              :base_dir
 
   def git_dir
     @git_dir ||= plugin && "gems/plugins/#{plugin}/"
@@ -92,7 +94,7 @@ class Linter
   end
 
   def dr_diff
-    @dr_diff ||= ::DrDiff::Manager.new(git_dir: git_dir, sha: env_sha, campsite: campsite_mode)
+    @dr_diff ||= ::DrDiff::Manager.new(git_dir: git_dir, sha: env_sha, campsite: campsite_mode, base_dir: base_dir)
   end
 
   def wip?
@@ -137,7 +139,6 @@ class Linter
       puts "-- -- -- -- -- -- -- -- -- -- --"
       puts "No relevant #{linter_name} errors found!"
       puts "-- -- -- -- -- -- -- -- -- -- --"
-      exit(0)
     end
 
     if gerrit_patchset
@@ -147,7 +148,6 @@ class Linter
       if auto_correct
         puts "Errors detected and possibly auto corrected."
         puts "Fix and/or git add the corrections and try to commit again."
-        exit 1
       end
     end
   end

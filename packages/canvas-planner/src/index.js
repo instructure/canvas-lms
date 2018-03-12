@@ -46,7 +46,7 @@ const defaultOptions = {
 const dynamicUiManager = new DynamicUiManager();
 export const store = configureStore(dynamicUiManager);
 
-let plannerActive =  () => { return false }
+let plannerActive = () => { return false; };
 
 function handleScrollIntoPastAttempt () {
   if (!plannerActive()) return;
@@ -62,7 +62,7 @@ export function render (element, options) {
   moment.locale(opts.locale);
   moment.tz.setDefault(opts.timeZone);
   dynamicUiManager.setStickyOffset(opts.stickyOffset);
-  registerScrollEvents(handleScrollIntoPastAttempt);
+  registerScrollEvents(handleScrollIntoPastAttempt, pos => dynamicUiManager.handleScrollPositionChange(pos));
   if (!opts.flashAlertFunctions) {
     throw new Error('You must provide callbacks to handle flash messages');
   }
@@ -128,9 +128,9 @@ export default function loadPlannerDashboard ({changeToCardView, getActiveApp, f
       color: env.PREFERENCES.custom_colors[dg.assetString] || '#666666'
     })) : [];
 
-  const stickyElementRect = stickyElement.getBoundingClientRect()
-  const stickyOffset = stickyElementRect.bottom - stickyElementRect.top
-  plannerActive = () => getActiveApp() === 'planner'
+  const stickyElementRect = stickyElement.getBoundingClientRect();
+  const stickyOffset = stickyElementRect.bottom - stickyElementRect.top;
+  plannerActive = () => getActiveApp() === 'planner';
 
   const options = {
     flashAlertFunctions: {

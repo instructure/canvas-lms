@@ -91,8 +91,8 @@ describe "calendar2" do
         group(:context => @course)
 
         get "/groups/#{@group.id}"
-        expect_new_page_load { f('.event-list-view-calendar').click }
-        event_name = 'some name'
+        get "/calendar?include_contexts=group_#{@group.id}"
+        event_name = 'Test Event'
         create_calendar_event(event_name, false, false, false)
 
         event = @group.calendar_events.last

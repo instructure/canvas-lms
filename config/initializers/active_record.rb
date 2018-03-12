@@ -1497,7 +1497,7 @@ module ExplainAnalyze
         yield
       else
         # fold in switchman's override
-        self.activate { |relation| relation.exec_queries }
+        self.activate { |relation| relation.send(:exec_queries) }
       end
     end, analyze: analyze)
   end

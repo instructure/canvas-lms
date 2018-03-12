@@ -16,7 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # @API Shared Brand Configs
-# @beta
 # This is how you can share Themes with other people in your account or
 # so you can come back to them later without having to apply them to your account
 #

@@ -48,7 +48,8 @@ module Selinimum
       # so if they change, we test all the things
       GLOBAL_FILES = %r{\A(
         app/views/(layouts|shared)/.*\.erb |
-        app/controllers/application_controller.rb
+        app/controllers/application_controller.rb |
+        app/graphql/.*\.rb
       )\z}x
     end
   end

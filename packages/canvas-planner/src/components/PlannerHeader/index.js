@@ -110,7 +110,7 @@ export class PlannerHeader extends Component {
   }
 
   componentWillUpdate () {
-    this.props.preTriggerDynamicUiUpdates(document.getElementById('planner-app-fixed-element'));
+    this.props.preTriggerDynamicUiUpdates(document.getElementById('planner-app-fixed-element'), 'header');
   }
 
   componentDidUpdate () {

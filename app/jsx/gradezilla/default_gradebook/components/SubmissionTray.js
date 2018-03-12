@@ -71,7 +71,8 @@ export default class SubmissionTray extends React.Component {
     contentRef: undefined,
     gradingDisabled: false,
     latePolicy: { lateSubmissionInterval: 'day' },
-    submission: { drop: false }
+    submission: { drop: false },
+    pendingGradeInfo: null,
   };
 
   static propTypes = {
@@ -97,6 +98,11 @@ export default class SubmissionTray extends React.Component {
     onClose: func.isRequired,
     onGradeSubmission: func.isRequired,
     onRequestClose: func.isRequired,
+    pendingGradeInfo: shape({
+      excused: bool.isRequired,
+      grade: string,
+      valid: bool.isRequired
+    }),
     student: shape({
       id: string.isRequired,
       avatarUrl: string,
@@ -139,7 +145,8 @@ export default class SubmissionTray extends React.Component {
     setProcessing: func.isRequired,
     isInOtherGradingPeriod: bool.isRequired,
     isInClosedGradingPeriod: bool.isRequired,
-    isInNoGradingPeriod: bool.isRequired
+    isInNoGradingPeriod: bool.isRequired,
+    isNotCountedForScore: bool.isRequired
   };
 
   cancelCommenting = () => {
@@ -282,6 +289,7 @@ export default class SubmissionTray extends React.Component {
                 isInOtherGradingPeriod={this.props.isInOtherGradingPeriod}
                 isInClosedGradingPeriod={this.props.isInClosedGradingPeriod}
                 isInNoGradingPeriod={this.props.isInNoGradingPeriod}
+                isNotCountedForScore={this.props.isNotCountedForScore}
                 submission={this.props.submission}
               />
 
@@ -290,6 +298,7 @@ export default class SubmissionTray extends React.Component {
                 disabled={this.props.gradingDisabled}
                 enterGradesAs={this.props.enterGradesAs}
                 gradingScheme={this.props.gradingScheme}
+                pendingGradeInfo={this.props.pendingGradeInfo}
                 onSubmissionUpdate={this.props.onGradeSubmission}
                 submission={this.props.submission}
                 submissionUpdating={this.props.submissionUpdating}

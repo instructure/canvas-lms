@@ -95,7 +95,7 @@ class CompiledReferencePlugin {
             // `spec/coffescripts` to `resolve.modules` and '.coffee' to `resolve.extensions` (which
             // would slow everything down because it would add to the # of files it has to stat when
             // looking for things), we rewrite those requests here
-            result.request = `${specRoot}/coffeescripts/${requestString}.coffee`
+            result.request = `${specRoot}/coffeescripts/${requestString}`
           }
         }
 

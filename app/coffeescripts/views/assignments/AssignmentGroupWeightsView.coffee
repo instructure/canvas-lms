@@ -19,10 +19,9 @@ define [
   'jquery'
   '../../util/round'
   'Backbone'
-  'i18n!assignments'
   'jst/assignments/AssignmentGroupWeights'
   'jsx/shared/helpers/numberHelper'
-], ($, round, Backbone, I18n, AssignmentGroupWeightsTemplate, numberHelper) ->
+], ($, round, Backbone, AssignmentGroupWeightsTemplate, numberHelper) ->
 
   class AssignmentGroupWeightsView extends Backbone.View
     template: AssignmentGroupWeightsTemplate

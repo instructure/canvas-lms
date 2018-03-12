@@ -19,6 +19,8 @@
 require 'aws-sdk-sns'
 
 class NotificationEndpoint < ActiveRecord::Base
+  include Canvas::SoftDeletable
+
   belongs_to :access_token
 
   validates_presence_of :token, :access_token

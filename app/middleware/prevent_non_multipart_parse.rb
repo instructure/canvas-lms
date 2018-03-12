@@ -22,7 +22,8 @@
 class PreventNonMultipartParse
   def initialize(app)
     @app = app
-    @considered_paths = [ /\A\/api\/.*\/sis_imports[^\/]*(\/|)\z/ ]
+    @considered_paths = [ /\A\/api\/.*\/sis_imports[^\/]*(\/|)\z/,
+                          /\A\/api\/.*\/outcome_imports[^\/]*(\/|)\z/ ]
     @ignored_content_types = [ /\Amultipart\/form-data/i ]
   end
 

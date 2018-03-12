@@ -116,7 +116,7 @@ describe "links", priority: "2" do
       it "should navigate user to user settings page after settings link is clicked" do
         expect_new_page_load {
           f('#global_nav_profile_link').click
-          fj('a.ic-NavMenu-list-item__link:contains("Settings")').click
+          fj('[aria-label="Global navigation tray"] a:contains("Settings")').click
         }
         expect(f("a.edit_settings_link")).to be_displayed
       end

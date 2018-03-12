@@ -18,7 +18,6 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!help_dialog'
 import CreateTicketForm from './CreateTicketForm'
 import TeacherFeedbackForm from './TeacherFeedbackForm'
 import HelpLinks from './HelpLinks'

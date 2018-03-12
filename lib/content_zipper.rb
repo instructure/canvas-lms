@@ -462,7 +462,7 @@ class ContentZipper
   end
 
   def sanitize_file_name(filename)
-    filename.gsub(/[^\w]/, '').downcase
+    filename.gsub(/[^[[:word:]]]/, '').downcase
   end
 
   def sanitize_user_name(user_name)

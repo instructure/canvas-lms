@@ -160,6 +160,31 @@ describe "blueprint courses assignments" do
       expect(f("#due_at").attribute("readonly")).to eq "true"
       expect(f("#unlock_at").attribute("readonly")).to eq "true"
       expect(f("#lock_at").attribute("readonly")).to eq "true"
+      expect(f('#assignment_grading_type')).to contain_css('option[value="points"]')
+      expect(f('#assignment_grading_type')).not_to contain_css('option[value="not_graded"]')
+    end
+
+    it "should not allow making a non-graded assignment graded when points are locked" do
+      not_graded_assignment = @copy_from.assignments.create!(
+        title: "eh", description: "meh", submission_types: "not_graded", grading_type: 'not_graded'
+      )
+      nga_tag = @template.create_content_tag_for!(not_graded_assignment)
+
+      # fake the copy instead of doing a full migration
+      nga_copy = @copy_to.assignments.create(
+        title: "eh", description: "meh", submission_types: "not_graded", grading_type: 'not_graded'
+      )
+      nga_copy.migration_id = nga_tag.migration_id
+      nga_copy.save!
+
+      nga_tag.update(restrictions: {content: true, points: true, due_dates: true, availability_dates: true})
+
+      get "/courses/#{@copy_to.id}/assignments/#{nga_copy.id}/edit"
+
+      node = f "#assignment_grading_type"
+      expect(node.tag_name).to eq 'input'
+      expect(node.attribute('readonly')).to eq 'true'
+      expect(f('input[name="grading_type"][type="hidden"]').attribute('value')).to eq 'not_graded'
     end
 
     it "should not allow popup editing of restricted items" do

@@ -148,7 +148,8 @@ module PlannerPageObject
   end
 
   def todo_details
-    f('textarea')
+    modal = todo_sidebar_modal
+    f('textarea', modal)
   end
 
   def todo_sidebar_modal(title = nil)

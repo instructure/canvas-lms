@@ -16,10 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'i18n!quizzes'
   'Backbone'
   '../models/Quiz'
-], (I18n, Backbone, Quiz) ->
+], (Backbone, Quiz) ->
 
   class QuizCollection extends Backbone.Collection
 

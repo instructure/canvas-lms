@@ -809,6 +809,49 @@ module Lti
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq course.course_code
         end
+
+        context 'when the course has groups' do
+          let(:course_with_groups) do
+            course = variable_expander.context
+            course.save!
+            course
+          end
+
+          let!(:group_one) { course_with_groups.groups.create!(name: 'Group One') }
+          let!(:group_two) { course_with_groups.groups.create!(name: 'Group Two') }
+
+          describe '$com.instructure.Course.groupIds' do
+            it 'has substitution' do
+              exp_hash = {test: '$com.instructure.Course.groupIds'}
+              variable_expander.expand_variables!(exp_hash)
+              expect(exp_hash[:test]).to eq [group_two, group_one].map(&:id).join(',')
+            end
+
+            it 'does not include groups outside of the course' do
+              second_course = variable_expander.context.dup
+              second_course.update!(sis_source_id: SecureRandom.uuid)
+              second_course.groups.create!(name: 'Group Three')
+              exp_hash = {test: '$com.instructure.Course.groupIds'}
+              variable_expander.expand_variables!(exp_hash)
+              expect(exp_hash[:test]).to eq [group_two, group_one].map(&:id).join(',')
+            end
+
+            it 'only includes active group ids' do
+              group_one.update!(workflow_state: 'deleted')
+              exp_hash = {test: '$com.instructure.Course.groupIds'}
+              variable_expander.expand_variables!(exp_hash)
+              expect(exp_hash[:test]).to eq group_two.id.to_s
+            end
+
+            it 'guards against the course being nil' do
+              no_course_expander = VariableExpander.new(root_account, nil, controller, current_user: user)
+              exp_hash = {test: '$com.instructure.Course.groupIds'}
+              expect do
+                no_course_expander.expand_variables!(exp_hash)
+              end.not_to raise_exception
+            end
+          end
+        end
       end
 
       context 'context is a course and there is a user' do

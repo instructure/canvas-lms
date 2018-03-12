@@ -31,6 +31,7 @@ class UserObserver < ActiveRecord::Base
 
   # shadow_record param is private
   def self.create_or_restore(observee: , observer: , shadow_record: false)
+    raise ArgumentError, 'observee and observer are required' unless observee && observer
     shard = shadow_record ? observer.shard : observee.shard
     result = shard.activate do
       UserObserver.unique_constraint_retry do

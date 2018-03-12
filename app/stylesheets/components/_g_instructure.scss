@@ -329,15 +329,6 @@
   }
   .events_list {
     margin-bottom: $ic-sp * 1.5;
-    .event-list-view-calendar {
-      float: right;
-      @include fontSize(12px);
-      font-weight: normal;
-      &[class*=icon-]:before, &[class^=icon-]:before {
-        @include fontSize(16px);
-        vertical-align: middle;
-      }
-    }
   }
   * + .events_list { margin-top: $ic-sp * 1.5; }
   .details {

@@ -153,7 +153,7 @@ describe "help dialog" do
       wait_for_ajaximations
       f('#global_nav_help_link').click
       wait_for_ajaximations
-      expect(ff("#help_tray .ic-NavMenu-list-item__link").last).to include_text("Customize this menu")
+      expect(f("#help_tray")).to include_text("Customize this menu")
     end
 
     it "should not show the link to sub account admins" do
@@ -163,7 +163,7 @@ describe "help dialog" do
       wait_for_ajaximations
       f('#global_nav_help_link').click
       wait_for_ajaximations
-      expect(ff("#help_tray .ic-NavMenu-list-item__link").last).to_not include_text("Customize this menu")
+      expect(f("#help_tray")).to_not include_text("Customize this menu")
     end
   end
 end

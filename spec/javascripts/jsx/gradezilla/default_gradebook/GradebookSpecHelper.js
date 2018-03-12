@@ -46,6 +46,7 @@ export function createGradebook (options = {}) {
       show_concluded_enrollments: 'false',
       show_inactive_enrollments: 'false'
     },
+    settings_update_url: '/path/to/settingsUpdateUrl',
     closed_grading_period_ids: [],
     speed_grader_enabled: true,
     ...options
@@ -73,6 +74,10 @@ export function setFixtureHtml ($fixture) {
         <div data-component="GridColor"></div>
         <div data-component="ViewOptionsMenu"></div>
         <div data-component="ActionMenu"></div>
+        <div id="assignment-group-filter-container"></div>
+        <div id="grading-periods-filter-container"></div>
+        <div id="modules-filter-container"></div>
+        <div id="sections-filter-container"></div>
         <div id="search-filter-container">
           <input type="text" />
         </div>

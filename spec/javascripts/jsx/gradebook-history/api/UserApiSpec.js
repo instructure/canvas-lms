@@ -35,7 +35,8 @@ test('getUsersByName for graders searches by teachers and TAs in a course', func
   const params = {
     params: {
       search_term: searchTerm,
-      enrollment_type: ['teacher', 'ta']
+      enrollment_type: ['teacher', 'ta'],
+      enrollment_state: []
     }
   };
   const promise = UserApi.getUsersByName(this.courseId, 'graders', searchTerm);
@@ -53,10 +54,69 @@ test('getUsersByName for students searches by students', function () {
   const params = {
     params: {
       search_term: searchTerm,
-      enrollment_type: ['student', 'student_view']
+      enrollment_type: ['student', 'student_view'],
+      enrollment_state: []
     }
   };
   const promise = UserApi.getUsersByName(this.courseId, 'students', searchTerm);
+
+  return promise.then(() => {
+    strictEqual(this.getStub.callCount, 1);
+    strictEqual(this.getStub.firstCall.args[0], url);
+    deepEqual(this.getStub.firstCall.args[1], params);
+  });
+});
+
+test('getUsersByName restricts results by enrollment state if specified', function() {
+  const searchTerm = 'Norval';
+  const enrollmentState = ['completed'];
+  const url = `/api/v1/courses/${this.courseId}/users`;
+  const params = {
+    params: {
+      search_term: searchTerm,
+      enrollment_type: ['student', 'student_view'],
+      enrollment_state: enrollmentState
+    }
+  };
+  const promise = UserApi.getUsersByName(this.courseId, 'students', searchTerm, ['completed']);
+
+  return promise.then(() => {
+    strictEqual(this.getStub.callCount, 1);
+    strictEqual(this.getStub.firstCall.args[0], url);
+    deepEqual(this.getStub.firstCall.args[1], params);
+  });
+});
+
+test('getUsersByName does not restrict results by enrollment state if argument omitted', function() {
+  const searchTerm = 'Norval';
+  const url = `/api/v1/courses/${this.courseId}/users`;
+  const params = {
+    params: {
+      search_term: searchTerm,
+      enrollment_type: ['student', 'student_view'],
+      enrollment_state: []
+    }
+  };
+  const promise = UserApi.getUsersByName(this.courseId, 'students', searchTerm);
+
+  return promise.then(() => {
+    strictEqual(this.getStub.callCount, 1);
+    strictEqual(this.getStub.firstCall.args[0], url);
+    deepEqual(this.getStub.firstCall.args[1], params);
+  });
+});
+
+test('getUsersByName does not restrict results by enrollment state if passed an empty array', function() {
+  const searchTerm = 'Norval';
+  const url = `/api/v1/courses/${this.courseId}/users`;
+  const params = {
+    params: {
+      search_term: searchTerm,
+      enrollment_type: ['student', 'student_view'],
+      enrollment_state: []
+    }
+  };
+  const promise = UserApi.getUsersByName(this.courseId, 'students', searchTerm, []);
 
   return promise.then(() => {
     strictEqual(this.getStub.callCount, 1);

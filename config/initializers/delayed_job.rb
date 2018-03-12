@@ -25,6 +25,20 @@ Delayed::Backend::Base.class_eval do
   end
 end
 
+# if the method was defined by a previous module, use the existing
+# implementation, but provide a default otherwise
+module Delayed::Backend::DefaultJobAccount
+  def account
+    if defined?(super)
+      super
+    else
+      Account.default
+    end
+  end
+end
+Delayed::Backend::ActiveRecord::Job.include(Delayed::Backend::DefaultJobAccount)
+Delayed::Backend::Redis::Job.include(Delayed::Backend::DefaultJobAccount)
+
 Delayed::Settings.max_attempts              = 1
 Delayed::Settings.queue                     = "canvas_queue"
 Delayed::Settings.sleep_delay               = ->{ Setting.get('delayed_jobs_sleep_delay', '2.0').to_f }
@@ -85,6 +99,10 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
 
   LiveEvents.set_context(job.live_events_context)
 
+  HostUrl.reset_cache!
+  old_root_account = Attachment.current_root_account
+  Attachment.current_root_account = job.account
+
   starting_mem = Canvas.sample_memory()
   starting_cpu = Process.times()
   lag = ((Time.now - job.run_at) * 1000).round
@@ -96,6 +114,7 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
   stats = ["delayedjob.queue", "delayedjob.queue.tag.#{obj_tag}.#{method_tag}", "delayedjob.queue.shard.#{shard_id}"]
   stats << "delayedjob.queue.jobshard.#{job.shard.id}" if job.respond_to?(:shard)
   CanvasStatsd::Statsd.timing(stats, lag)
+
   begin
     stats = ["delayedjob.perform", "delayedjob.perform.tag.#{obj_tag}.#{method_tag}", "delayedjob.perform.shard.#{shard_id}"]
     stats << "delayedjob.perform.jobshard.#{job.shard.id}" if job.respond_to?(:shard)
@@ -107,6 +126,8 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
     ending_mem = Canvas.sample_memory()
     user_cpu = ending_cpu.utime - starting_cpu.utime
     system_cpu = ending_cpu.stime - starting_cpu.stime
+
+    Attachment.current_root_account = old_root_account
 
     LiveEvents.clear_context!
 

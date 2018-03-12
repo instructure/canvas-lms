@@ -22,11 +22,13 @@
   margin-left: 11px;
 }
 
-.ic-item-row__drag-col {
-  margin-right: 11px;
+.ic-item-row__icon-col-student{
+  display: flex;
+  align-items: center;
+  margin-left: 11px;
 }
 
-.ic-item-row__icon-col {
+.ic-item-row__icon-col-teacher{
   margin-right: -11px;
 }
 

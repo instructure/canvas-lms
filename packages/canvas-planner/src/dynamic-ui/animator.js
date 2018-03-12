@@ -62,9 +62,17 @@ export class Animator {
     });
   }
 
+  scrollToTop () {
+    this.scrollTo(document.documentElement, 0);
+  }
+
   queueAnimation (fn, pushType='push', ) {
     this.animationQueue[pushType](fn);
     this.window.requestAnimationFrame(this.runAnimationQueue);
+  }
+
+  isAboveScreen (elt, offset) {
+    return elt.getBoundingClientRect().top < offset;
   }
 
   runAnimationQueue = () => {

@@ -18,6 +18,7 @@
 
 import axios from 'axios'
 import qs from 'qs'
+import resolveProgress from './resolve_progress'
 
 /*
  * preflightUrl: usually something like
@@ -31,6 +32,12 @@ import qs from 'qs'
  *   To get this off of a drop event: `e.dataTransfer.files[0]`
  */
 export function uploadFile(preflightUrl, preflightData, file, ajaxLib = axios) {
+  if (!file && !preflightData.url) {
+    throw new Error("expected either a file to upload or a url to clone", { file, preflightData });
+  } else if (file && preflightData.url) {
+    throw new Error("can't upload with both a file object and a url to clone", { file, preflightData });
+  }
+
   // force "no redirect" behavior. redirecting from the S3 POST breaks under
   // CORS in this pathway
   preflightData.no_redirect = true;
@@ -60,28 +67,42 @@ export function uploadFile(preflightUrl, preflightData, file, ajaxLib = axios) {
  *     metadata after upload.
  */
 export function completeUpload(preflightResponse, file, options={}) {
+  const ajaxLib = options.ajaxLib || axios;
+
   // account for attachments wrapped in array per JSON API format
   if (preflightResponse && preflightResponse.attachments && preflightResponse.attachments[0]) {
     preflightResponse = preflightResponse.attachments[0];
   }
 
-  if (!preflightResponse || !preflightResponse.upload_url) {
+  if (!preflightResponse) {
+    throw new Error("expected a preflightResponse");
+  } else if (file && !preflightResponse.upload_url) {
     throw new Error("expected a preflightResponse with an upload_url", { preflightResponse });
+  } else if (!file && !preflightResponse.progress) {
+    throw new Error("expected a preflightResponse with a progress", { preflightResponse });
   }
 
-  const { upload_url } = preflightResponse;
+  const { upload_url, progress } = preflightResponse;
+
+  if (!upload_url) {
+    // cloning a url and don't need to repost elsewhere, just wait on progress
+    return resolveProgress(progress, { ajaxLib });
+  }
+
   let { file_param, upload_params, success_url } = preflightResponse;
   file_param = file_param || 'file';
   upload_params = upload_params || {};
   success_url = success_url || upload_params.success_url;
-  const ajaxLib = options.ajaxLib || axios;
   const isToS3 = !!success_url;
 
   // post upload
   // xsslint xssable.receiver.whitelist formData
   const formData = new FormData();
   Object.entries(upload_params).forEach(([key, value]) => formData.append(key, value));
-  formData.append(file_param, file, options.filename);
+  if (file) {
+    formData.append(file_param, file, options.filename);
+  }
+
   const upload = ajaxLib.post(upload_url, formData, {
     responseType: (isToS3 ? 'document' : 'json'),
     onUploadProgress: options.onProgress,
@@ -90,20 +111,40 @@ export function completeUpload(preflightResponse, file, options={}) {
 
   // finalize upload
   return upload.then((response) => {
+    if (progress) {
+      // cloning a url, wait on the progress object to complete, the return its
+      // results as the data
+      return resolveProgress(progress, { ajaxLib });
+    }
+    let location, query = {};
     if (success_url) {
-      // s3 upload, need to ping success_url to finalize and get back
-      // attachment information
+      // s3 upload, follow-up at success_url with s3 data to finalize
       const { Bucket, Key, ETag } = response.data;
-      return ajaxLib.get(success_url, { bucket: Bucket, key: Key, etag: ETag });
+      location = success_url;
+      query = { bucket: Bucket, key: Key, etag: ETag };
     } else if (response.status === 201 && !options.ignoreResult) {
-      // inst-fs upload, need to request attachment information from
-      // location
-      let { location } = response.data;
-      if (options.includeAvatar) { location = `${location}?include=avatar`; }
-      return ajaxLib.get(location);
+      // inst-fs upload, follow-up at location from response
+      location = response.data.location;
+      query = {};
+    }
+    if (location) {
+      // include avatar in query if necessary
+      if (options.includeAvatar) {
+        query.include = "avatar";
+      }
+      // send request to follow-up url with query
+      query = qs.stringify(query);
+      if (query) {
+        if (location.indexOf('?') !== -1) {
+          location = `${location}&${query}`;
+        } else {
+          location = `${location}?${query}`;
+        }
+      }
+      return ajaxLib.get(location).then(({ data }) => data);
     } else {
       // local-storage upload, this _is_ the attachment information
-      return response;
+      return response.data;
     }
-  }).then((response) => response.data);
+  });
 }

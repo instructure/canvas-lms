@@ -38,7 +38,7 @@ module Lti
         )
       end
 
-      shared_examples 'lti_link tool check' do
+      shared_examples 'external tool check' do
         context 'when owned by the tool' do
           it 'is allowed to access'
         end
@@ -69,7 +69,7 @@ module Lti
           )
         end
 
-        it_behaves_like 'lti_link tool check'
+        it_behaves_like 'external tool check'
 
         shared_examples 'the line item create endpoint' do
           let(:create_params) { raise 'set in example' }
@@ -214,7 +214,7 @@ module Lti
           )
         end
 
-        it_behaves_like 'lti_link tool check'
+        it_behaves_like 'external tool check'
 
         it 'updates the score maximum' do
           new_score_maximum = 88.2
@@ -330,7 +330,7 @@ module Lti
           )
         end
 
-        it_behaves_like 'lti_link tool check'
+        it_behaves_like 'external tool check'
 
         it 'correctly formats the requested line item' do
           get url, headers: request_headers
@@ -425,7 +425,8 @@ module Lti
           parsed_response_body.map { |li| LineItem.find(li['id'].split('/').last) }
         end
 
-        it 'does not include line items not owned by the tool'
+        it_behaves_like 'external tool check'
+
         it 'responds with 404 if context does not exist' do
           bad_url = Rails.application.routes.url_helpers.lti_line_item_index_path(
             course_id: course.id + 50,
@@ -489,7 +490,7 @@ module Lti
       end
 
       describe 'destroy' do
-        it_behaves_like 'lti_link tool check'
+        it_behaves_like 'external tool check'
 
         shared_examples 'the line item destroy endpoint' do
           let(:line_item) { raise 'override in spec' }

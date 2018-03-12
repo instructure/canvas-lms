@@ -3,61 +3,44 @@ canvas-planner
 
 Canvas Planner is the UI component for the List View Dashboard feature in [Canvas](https://github.com/instructure/canvas-lms).
 
-## Production
-
-### Usage
-
-```bash
-yarn add canvas-planner
-```
-
-```js
-import Planner from 'canvas-planner';
-```
-
-### Polyfill
-
-Canvas Planner is developed using modern JavaScript and supports modern browsers.
-If you are using it in an environment such as IE 11 where some core browser features
-are unavailable, then you should make sure to polyfill appropriately.  This package
-does not ship any polyfills to maintain a smaller footprint.
-
-
 ## Development
 
 ### Getting Started
 
-```bash
-yarn
-yarn start
+Canvas Planner includes a `prepublish` script which runs a build anytime it's installed. As canvas
+resolves its dependencies, this builds planner before it's installed into `canvas-lms/node_modules`.
+
+To facilitate active development, create a link between planner and canvas. Since the normal
+`yarn install` process copies planner into `canvas-lms/node_modules/canvas-planner`, changes in planner's source
+won't be reflected in canvas until `yarn` is rerun.  This inconvenience can be dealt with by linking
+the two together.
+
+- From the `canvas-lms/packages/canvas-planner` directory, run `yarn link`.
+  - This only needs to be done once
+- Then from the root `canvas-lms` directory, run `yarn link canvas-planner`.
+  - This needs to be rerun anytime canvas' dependencies are reinstalled (say after `rm -fr node_modules`).
+
+These steps create a symbolic link between the planner source subdirectory
+and canvas' `node_modules`. You can confirm this by running `ls -l node_modules/canvas-planner` from the `canvas-lms` root directory, which should respond with
 ```
-
-Go to your browser to http://localhost:3005 to see the app.  This will
-also start a json-server instance at http://localhost:3004 which api requests
-will be proxied from webpack-dev-server to eliminating the need to have an
-instance of Canvas running to do development.
-
-#### Running without a delay
-
-By default, all requests to the json-server have a 1.5 second delay introduced
-to help us develop for proper loading states.  If you want to run without the
-delay you'll need to instead run:
-
-```bash
-yarn run start:json-server:no-delay
+node_modules/canvas-planner -> ../packages/canvas-planner
 ```
+and not the contents of the directory.
 
-And then in a separate terminal tab/session/window/etc.
+Finally, start watched builds
+- In `canvas-lms/packages/canvas-planner`, run `yarn build:watch`
+- In `canvas-lms`, run `yarn build:watch`
 
-```bash
-yarn run start:webpack-dev
-```
+Now any changes to the planner source will trigger a planner incremental build, which will in turn trigger
+a canvas incremental build.
+
+> *Any commands discussed in the rest of this document assume your current working directory is `canvas-lms/packages/canvas-planner`.*
 
 ### Linting
 
 This project uses [eslint-config-react-app](https://github.com/facebookincubator/create-react-app/tree/master/packages/eslint-config-react-app)
 for linting JS files.  Linting is enforced at the build level.  ESLint errors will cause the build to fail.
-You can run the linter by running `yarn run lint`
+You can run the linter by running `yarn lint`.
 
 ### Testing
 
@@ -68,35 +51,12 @@ It should be as simple as `brew install watchman` on a Mac, no configuration is 
 issues see the discussion on the issue, [watch mode stopped working on macOS Sierra](https://github.com/facebook/jest/issues/1767).
 We require test coverage percentages to be maintained.  Run the test coverage by running `yarn run test:coverage`
 
-### Testing a local Canvas Planner version
-
-If you want to test a version of the planner locally without publishing it you can
-do so by using [yarn link](https://yarnpkg.com/en/docs/cli/link).
-
-The way it is done is as follows:
-
-```bash
-cd canvas-planner
-yarn run build # Build the proper transpiled versions of the files
-yarn link
-
-cd ./canvas-lms
-yarn link canvas-planner
+You can limit the scope of your testing to a single file by providing it on the command line.
+```
+yarn test src/components/BadgeList/__test__/BadgeList.spec.js
 ```
 
-Once you've done those things, run the proper build steps for your Canvas
-installation and you'll see your local copy of canvas-planner working inside
-Canvas.
-
-### Deploying
-
-To deploy a new version of canvas-planner to npm first update the version field in the package.json.
-You will then commit that version to canvas-planner and in your commit message paste the output
-of the command below.
-`git log v(enter previous version here)...origin/master --pretty=format:"[%h] (%an)  %s"`
-Next run `./scripts/release` if you have already updated the planner version in your package.json
-you can press enter otherwise follow the instructions on screen.
-
-After published go to your canvas-lms directory and open the package.json.  Update the canvas-planner
-dependency to the one you just released.  After that you will need to remove your node_modules and reinstall
-using `yarn`.  From there you should commit the yarn.lock and the diff in the package.json.
+## Production
+When canvas is built for production, the same process applies. When satisfying its `canvas-planner` dependency,
+planner is built and installed it into `node_modules`. From there it is packaged
+and minified by canvas' webpack build process.

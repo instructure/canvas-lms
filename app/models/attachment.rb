@@ -53,6 +53,7 @@ class Attachment < ActiveRecord::Base
        :content_export, :content_migration, :course, :eportfolio, :epub_export,
        :gradebook_upload, :group, :submission, :purgatory,
        { context_folder: 'Folder', context_sis_batch: 'SisBatch',
+         context_outcome_import: 'OutcomeImport',
          context_user: 'User', quiz: 'Quizzes::Quiz',
          quiz_statistics: 'Quizzes::QuizStatistics',
          quiz_submission: 'Quizzes::QuizSubmission' }]
@@ -484,7 +485,7 @@ class Attachment < ActiveRecord::Base
       # I've added the root_account_id accessor above, but I didn't verify there
       # isn't any code still accessing the namespace for the account id directly.
       ns = root_attachment.try(:namespace) if root_attachment_id
-      ns ||= Attachment.domain_namespace
+      ns ||= Attachment.current_namespace
       ns ||= self.context.root_account.file_namespace rescue nil
       ns ||= self.context.account.file_namespace rescue nil
       if Rails.env.development? && Attachment.local_storage?
@@ -773,6 +774,7 @@ class Attachment < ActiveRecord::Base
     else
       # attachment_fu doesn't like the extra option when building s3 urls
       options.delete(:user)
+      options.delete(:acting_as)
       should_download = options.delete(:download)
       disposition = should_download ? "attachment" : "inline"
       options[:response_content_disposition] = "#{disposition}; #{disposition_filename}"
@@ -780,28 +782,24 @@ class Attachment < ActiveRecord::Base
     end
   end
 
-  def authenticated_url_for_user(user, **options)
-    authenticated_url(options.merge(user: user))
+  def download_url_for_user(user, acting_as, ttl = url_ttl)
+    authenticated_url(user: user, acting_as: acting_as, expires_in: ttl, download: true)
   end
 
-  def download_url_for_user(user, ttl = url_ttl)
-    authenticated_url_for_user(user, expires_in: ttl, download: true)
-  end
-
-  def inline_url_for_user(user, ttl = url_ttl)
-    authenticated_url_for_user(user, expires_in: ttl, download: false)
+  def inline_url_for_user(user, acting_as, ttl = url_ttl)
+    authenticated_url(user: user, acting_as: acting_as, expires_in: ttl, download: false)
   end
 
   def public_url(**options)
-    authenticated_url_for_user(nil, options)
+    authenticated_url(options.merge(user: nil))
   end
 
   def public_inline_url(ttl = url_ttl)
-    inline_url_for_user(nil, ttl)
+    authenticated_url(user: nil, expires_in: ttl, download: false)
   end
 
   def public_download_url(ttl = url_ttl)
-    download_url_for_user(nil, ttl)
+    authenticated_url(user: nil, expires_in: ttl, download: true)
   end
 
   def url_ttl
@@ -861,7 +859,43 @@ class Attachment < ActiveRecord::Base
   # path will be used instead of the default system temporary path. It'll be
   # created if necessary.
   def open(opts = {}, &block)
-    store.open(opts, &block)
+    if instfs_hosted?
+      if block_given?
+        streaming_download(&block)
+      else
+        create_tempfile(opts) do |tempfile|
+          streaming_download(tempfile)
+        end
+      end
+    else
+      store.open(opts, &block)
+    end
+  end
+
+  # GETs this attachment's public_url and streams the response to the
+  # passed block; this is a helper function for #open
+  # (you should call #open instead of this)
+  private def streaming_download(dest=nil, &block)
+    uri = URI(public_url)
+    Net::HTTP.start(uri.host, uri.port) do |http|
+      request = Net::HTTP::Get.new uri
+
+      http.request(request) do |response|
+        response.read_body(dest, &block)
+      end
+    end
+  end
+
+  def create_tempfile(opts)
+    if opts[:temp_folder].present? && !File.exist?(opts[:temp_folder])
+      FileUtils.mkdir_p(opts[:temp_folder])
+    end
+    tempfile = Tempfile.new(["attachment_#{id}", extension],
+                            opts[:temp_folder].presence || Dir.tmpdir)
+    tempfile.binmode
+    yield tempfile
+    tempfile.rewind
+    tempfile
   end
 
   def has_thumbnail?
@@ -1623,13 +1657,22 @@ class Attachment < ActiveRecord::Base
     file
   end
 
-  def self.domain_namespace=(val)
-    @domain_namespace = val
+  def self.current_root_account=(account)
+    # TODO rename to @current_root_account
+    @domain_namespace = account
   end
 
-  def self.domain_namespace
+  def self.current_root_account
+    @domain_namespace
+  end
+
+  def self.current_namespace
     @domain_namespace.respond_to?(:file_namespace) ? @domain_namespace.file_namespace : @domain_namespace
   end
+
+  # deprecated
+  def self.domain_namespace=(val); self.current_root_account = val; end
+  def self.domain_namespace; self.current_namespace; end
 
   def self.serialization_methods; [:mime_class, :currently_locked, :crocodoc_available?]; end
   cattr_accessor :skip_thumbnails

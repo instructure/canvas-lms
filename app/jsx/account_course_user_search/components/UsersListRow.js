@@ -62,18 +62,20 @@ export default function UsersListRow({accountId, user, permissions, handlers}) {
           </Tooltip>
         )}
         {permissions.can_edit_users && (
-          <Tooltip tip={I18n.t('Edit %{name}', {name: user.name})}>
-            <CreateOrUpdateUserModal
-              createOrUpdate="update"
-              url={`/accounts/${accountId}/users/${user.id}`}
-              user={user}
-              afterSave={handlers.handleSubmitEditUserForm}
-            >
-              <Button variant="icon" size="small">
-                <IconEditLine title={I18n.t('Edit %{name}', {name: user.name})} />
-              </Button>
-            </CreateOrUpdateUserModal>
-          </Tooltip>
+          <CreateOrUpdateUserModal
+            createOrUpdate="update"
+            url={`/accounts/${accountId}/users/${user.id}`}
+            user={user}
+            afterSave={handlers.handleSubmitEditUserForm}
+          >
+            <span>
+              <Tooltip tip={I18n.t('Edit %{name}', {name: user.name})}>
+                <Button variant="icon" size="small">
+                  <IconEditLine title={I18n.t('Edit %{name}', {name: user.name})} />
+                </Button>
+              </Tooltip>
+            </span>
+          </CreateOrUpdateUserModal>
         )}
       </td>
     </tr>

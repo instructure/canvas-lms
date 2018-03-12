@@ -53,7 +53,7 @@ define [
   'jsx/gradezilla/default_gradebook/apis/SubmissionCommentApi'
   'jsx/gradezilla/default_gradebook/GradebookGrid'
   'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants'
-  'jsx/gradezilla/default_gradebook/components/AssignmentRowCellPropFactory'
+  'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/AssignmentRowCellPropFactory'
   'jsx/gradezilla/default_gradebook/components/GradebookMenu'
   'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu'
   'jsx/gradezilla/default_gradebook/components/ActionMenu'
@@ -76,6 +76,7 @@ define [
   'jsx/gradezilla/shared/AssignmentMuterDialogManager'
   'jsx/gradezilla/shared/helpers/assignmentHelper'
   'jsx/gradezilla/shared/helpers/TextMeasure'
+  'jsx/grading/helpers/GradeInputHelper'
   'jsx/grading/helpers/OutlierScoreHelper'
   'jsx/grading/LatePolicyApplicator'
   '@instructure/ui-core/lib/components/Button'
@@ -103,8 +104,8 @@ define [
   AssignmentGroupFilter, GradingPeriodFilter, ModuleFilter, SectionFilter, GridColor, StatusesModal, SubmissionTray,
   GradebookSettingsModal, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp, SubmissionStateMap,
   DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GradebookKeyboardNav,
-  AssignmentMuterDialogManager, assignmentHelper, TextMeasure, OutlierScoreHelper, LatePolicyApplicator, { default: Button },
-  { default: IconSettingsSolid }, FlashAlert) ->
+  AssignmentMuterDialogManager, assignmentHelper, TextMeasure, GradeInputHelper, { default: OutlierScoreHelper },
+  LatePolicyApplicator, { default: Button }, { default: IconSettingsSolid }, FlashAlert) ->
 
   isAdmin = =>
     _.contains(ENV.current_user_roles, 'admin')
@@ -204,7 +205,6 @@ define [
     defaultGradingScheme = null
     if options.default_grading_standard
       defaultGradingScheme = {
-        title: I18n.t('Default Grading Scheme')
         data: options.default_grading_standard
       }
 
@@ -224,7 +224,7 @@ define [
 
   getInitialActionStates = () ->
     {
-      submissionsUpdating: []
+      pendingGradeInfo: []
     }
 
   class Gradebook
@@ -1061,9 +1061,11 @@ define [
           disabled: !@contentLoadStates.studentsLoaded
 
         @sectionFilterMenu = renderComponent(SectionFilter, mountPoint, props)
-      else if @sectionFilterMenu
-        ReactDOM.unmountComponentAtNode(mountPoint)
-        @sectionFilterMenu = null
+      else
+        @updateCurrentSection(null)
+        if @sectionFilterMenu
+          ReactDOM.unmountComponentAtNode(mountPoint)
+          @sectionFilterMenu = null
 
     updateCurrentSection: (sectionId) =>
       sectionId = if sectionId == '0' then null else sectionId
@@ -1071,8 +1073,8 @@ define [
       if currentSection != sectionId
         @setFilterRowsBySetting('sectionId', sectionId)
         @postGradesStore.setSelectedSection(sectionId)
-        @updateSectionFilterVisibility()
         @saveSettings({}, =>
+          @updateSectionFilterVisibility()
           @reloadStudentData()
         )
 
@@ -1094,9 +1096,11 @@ define [
           selectedItemId: @getAssignmentGroupToShow()
 
         @assignmentGroupFilterMenu = renderComponent(AssignmentGroupFilter, mountPoint, props)
-      else if @assignmentGroupFilterMenu?
-        ReactDOM.unmountComponentAtNode(mountPoint)
-        @assignmentGroupFilterMenu = null
+      else
+        @updateCurrentAssignmentGroup(null)
+        if @assignmentGroupFilterMenu?
+          ReactDOM.unmountComponentAtNode(mountPoint)
+          @assignmentGroupFilterMenu = null
 
     updateCurrentAssignmentGroup: (group) =>
       if @getFilterColumnsBySetting('assignmentGroupId') != group
@@ -1120,9 +1124,11 @@ define [
           selectedItemId: @getGradingPeriodToShow()
 
         @gradingPeriodFilterMenu = renderComponent(GradingPeriodFilter, mountPoint, props)
-      else if @gradingPeriodFilterMenu?
-        ReactDOM.unmountComponentAtNode(mountPoint)
-        @gradingPeriodFilterMenu = null
+      else
+        @updateCurrentGradingPeriod(null)
+        if @gradingPeriodFilterMenu?
+          ReactDOM.unmountComponentAtNode(mountPoint)
+          @gradingPeriodFilterMenu = null
 
     updateCurrentGradingPeriod: (period) =>
       if @getFilterColumnsBySetting('gradingPeriodId') != period
@@ -1155,9 +1161,11 @@ define [
           selectedItemId: @getFilterColumnsBySetting('contextModuleId') || '0'
 
         @moduleFilterMenu = renderComponent(ModuleFilter, mountPoint, props)
-      else if @moduleFilterMenu?
-        ReactDOM.unmountComponentAtNode(mountPoint)
-        @moduleFilterMenu = null
+      else
+        @updateCurrentModule(null)
+        if @moduleFilterMenu?
+          ReactDOM.unmountComponentAtNode(mountPoint)
+          @moduleFilterMenu = null
 
     initSubmissionStateMap: =>
       @submissionStateMap = new SubmissionStateMap
@@ -1273,12 +1281,14 @@ define [
 
     getFilterSettingsViewOptionsMenuProps: =>
       available: @listAvailableViewOptionsFilters()
-      onSelect: (filters) =>
-        @setSelectedViewOptionsFilters(filters)
-        @renderViewOptionsMenu()
-        @renderFilters()
-        @saveSettings()
+      onSelect: @updateFilterSettings
       selected: @listSelectedViewOptionsFilters()
+
+    updateFilterSettings: (filters) =>
+      @setSelectedViewOptionsFilters(filters)
+      @renderViewOptionsMenu()
+      @renderFilters()
+      @saveSettings()
 
     getViewOptionsMenuProps: ->
       teacherNotes: @getTeacherNotesViewOptionsMenuProps()
@@ -1603,7 +1613,12 @@ define [
 
       @gradebookGrid.gridSupport.events.onActiveLocationChanged.subscribe (event, location) =>
         if location.columnId == 'student' && location.region == 'body'
-          @gradebookGrid.gridSupport.state.getActiveNode().querySelector('.student-grades-link')?.focus()
+          # In IE11, if we're navigating into the student column from a grade
+          # input cell with no text, this focus() call will select the <body>
+          # instead of the grades link.  Delaying the call (even with no actual
+          # delay) fixes the issue.
+          @delayedCall 0, =>
+            @gradebookGrid.gridSupport.state.getActiveNode().querySelector('.student-grades-link')?.focus()
 
       @gradebookGrid.gridSupport.events.onKeyDown.subscribe (event, location) =>
         if (location.region == 'header')
@@ -1627,7 +1642,9 @@ define [
 
       @gradebookGrid.gridSupport.events.onNavigateUp.subscribe (event, location) =>
         if (location.region == 'header')
-          @getHeaderComponentRef(location.columnId)?.focusAtStart()
+          # As above, "delay" the call so that we properly focus the header cell
+          # when navigating from a grade input cell with no text.
+          @delayedCall 0, => @getHeaderComponentRef(location.columnId)?.focusAtStart()
 
       @onGridInit()
 
@@ -1641,11 +1658,10 @@ define [
       $('#gradebook-grid-wrapper').show()
       @uid = @gradebookGrid.grid.getUID()
 
-      $('#content').focus ->
-        $('#accessibility_warning').removeClass('screenreader-only')
       $('#accessibility_warning').focus ->
+        $('#accessibility_warning').removeClass('screenreader-only')
         $('#accessibility_warning').blur ->
-          $('#accessibility_warning').remove()
+          $('#accessibility_warning').addClass('screenreader-only')
 
       @$grid = $('#gradebook_grid')
         .fillWindowWithMe({
@@ -1678,6 +1694,8 @@ define [
 
     # The target cell will enter editing mode
     onBeforeEditCell: (event, obj) =>
+      if obj.column.type == 'custom_column' && @getCustomColumn(obj.column.customColumnId)?.read_only
+        return false
       return true if obj.column.type != 'assignment'
       return false unless student = @student(obj.item.id)
       return false if student.isConcluded
@@ -2121,6 +2139,7 @@ define [
       isLastStudent = activeLocation.row == (@listRows().length - 1)
 
       submissionState = @submissionStateMap.getSubmissionState({ user_id: studentId, assignment_id: assignmentId })
+      isGroupWeightZero = @assignmentGroups[assignment.assignment_group_id].group_weight == 0
 
       assignment: ConvertCase.camelize(assignment)
       colors: @getGridColors()
@@ -2137,6 +2156,7 @@ define [
       isLastAssignment: isLastAssignment
       isFirstStudent: isFirstStudent
       isLastStudent: isLastStudent
+      isNotCountedForScore: assignment.omit_from_final_grade or isGroupWeightZero
       isOpen: open
       key: "grade_details_tray"
       latePolicy: @courseContent.latePolicy
@@ -2144,6 +2164,7 @@ define [
       onClose: => @gradebookGrid.gridSupport.helper.focus()
       onGradeSubmission: @gradeSubmission
       onRequestClose: @closeSubmissionTray
+      pendingGradeInfo: @getPendingGradeInfo({ assignmentId, userId: studentId })
       selectNextAssignment: => @loadTrayAssignment('next')
       selectPreviousAssignment: => @loadTrayAssignment('previous')
       selectNextStudent: => @loadTrayStudent('next')
@@ -2309,23 +2330,24 @@ define [
     setSubmissionsLoaded: (loaded) =>
       @contentLoadStates.submissionsLoaded = loaded
 
-    setSubmissionUpdating: (submission, updating) =>
-      if updating
-        @actionStates.submissionsUpdating.push(submission)
-      else
-        @actionStates.submissionsUpdating = _.reject(@actionStates.submissionsUpdating, (sub) ->
-          sub.userId == submission.userId and sub.assignmentId == submission.assignmentId
-        )
+    addPendingGradeInfo: (submission, gradeInfo) =>
+      { userId, assignmentId } = submission
+      pendingGradeInfo = Object.assign({ assignmentId, userId }, gradeInfo)
+      @removePendingGradeInfo(submission)
+      @actionStates.pendingGradeInfo.push(pendingGradeInfo)
 
-    submissionIsUpdating: (submission) ->
-      @actionStates.submissionsUpdating.some((sub) ->
-        sub.userId == submission.userId and sub.assignmentId == submission.assignmentId
+    removePendingGradeInfo: (submission) =>
+      @actionStates.pendingGradeInfo = _.reject(@actionStates.pendingGradeInfo, (info) ->
+        info.userId == submission.userId and info.assignmentId == submission.assignmentId
       )
 
-    getUpdatingSubmission: (submission) ->
-      @actionStates.submissionsUpdating.find((sub) ->
-        sub.userId == submission.userId and sub.assignmentId == submission.assignmentId
+    getPendingGradeInfo: (submission) =>
+      @actionStates.pendingGradeInfo.find((info) ->
+        info.userId == submission.userId and info.assignmentId == submission.assignmentId
       ) or null
+
+    submissionIsUpdating: (submission) ->
+      Boolean(@getPendingGradeInfo(submission)?.valid)
 
     setTeacherNotesColumnUpdating: (updating) =>
       @contentLoadStates.teacherNotesColumnUpdating = updating
@@ -2669,54 +2691,62 @@ define [
           @setTeacherNotesColumnUpdating(false)
           @renderViewOptionsMenu()
 
-    apiUpdateSubmission: (submission, updatingSubmission) =>
+    apiUpdateSubmission: (submission, gradeInfo) =>
       { userId, assignmentId } = submission
       student = @student(userId)
-      @setSubmissionUpdating(updatingSubmission, true)
+      @addPendingGradeInfo(submission, gradeInfo)
       @renderSubmissionTray(student) if @getSubmissionTrayState().open
       GradebookApi.updateSubmission(@options.context_id, assignmentId, userId, submission)
         .then((response) =>
-          @setSubmissionUpdating(updatingSubmission, false)
+          @removePendingGradeInfo(submission)
           @updateSubmissionsFromExternal(response.data.all_submissions)
           @renderSubmissionTray(student) if @getSubmissionTrayState().open
           response
         ).catch((response) =>
-          @setSubmissionUpdating(updatingSubmission, false)
+          @removePendingGradeInfo(submission)
           @updateRowCellsForStudentIds([userId])
           $.flashError I18n.t('There was a problem updating the submission.')
           @renderSubmissionTray(student) if @getSubmissionTrayState().open
           Promise.reject(response)
         )
 
-    gradeSubmission: (submission, gradingData) =>
-      submissionData =
-        assignmentId: submission.assignmentId
-        userId: submission.userId
+    gradeSubmission: (submission, gradeInfo) =>
+      if gradeInfo.valid
+        gradeChangeOptions =
+          enterGradesAs: @getEnterGradesAsSetting(submission.assignmentId)
+          gradingScheme: @getAssignmentGradingScheme(submission.assignmentId).data
+          pointsPossible: @getAssignment(submission.assignmentId).points_possible
 
-      if gradingData.excused
-        submissionData.excuse = true
-      else if gradingData.enteredAs == null
-        submissionData.posted_grade = ''
-      else if ['passFail', 'gradingScheme'].includes(gradingData.enteredAs)
-        submissionData.posted_grade = gradingData.grade
+        if GradeInputHelper.hasGradeChanged(submission, gradeInfo, gradeChangeOptions)
+          submissionData =
+            assignmentId: submission.assignmentId
+            userId: submission.userId
+
+          if gradeInfo.excused
+            submissionData.excuse = true
+          else if gradeInfo.enteredAs == null
+            submissionData.posted_grade = ''
+          else if ['passFail', 'gradingScheme'].includes(gradeInfo.enteredAs)
+            submissionData.posted_grade = gradeInfo.grade
+          else
+            submissionData.posted_grade = gradeInfo.score
+
+          @apiUpdateSubmission(submissionData, gradeInfo)
+            .then((response) =>
+              assignment = @getAssignment(submission.assignmentId)
+              outlierScoreHelper = new OutlierScoreHelper(response.data.score, assignment.points_possible)
+              $.flashWarning(outlierScoreHelper.warningMessage()) if outlierScoreHelper.hasWarning()
+            )
+        else
+          @removePendingGradeInfo(submission)
+          @renderSubmissionTray() if @getSubmissionTrayState().open
       else
-        submissionData.posted_grade = gradingData.score
-
-      updatingSubmission =
-        assignmentId: submission.assignmentId
-        enteredGrade: gradingData.grade
-        enteredScore: gradingData.score
-        excused: gradingData.excused
-        grade: gradingData.grade
-        score: gradingData.score
-        userId: submission.userId
-
-      @apiUpdateSubmission(submissionData, updatingSubmission)
-        .then((response) =>
-          assignment = @getAssignment(submission.assignmentId)
-          outlierScoreHelper = new OutlierScoreHelper(response.data.score, assignment.points_possible)
-          $.flashWarning(outlierScoreHelper.warningMessage()) if outlierScoreHelper.hasWarning()
-        )
+        FlashAlert.showFlashAlert({
+          message: I18n.t('You have entered an invalid grade for this student. Check the value and the grading type and try again.'),
+          type: 'error'
+        })
+        @addPendingGradeInfo(submission, gradeInfo)
+        @renderSubmissionTray() if @getSubmissionTrayState().open
 
     updateSubmissionAndRenderSubmissionTray: (data) =>
       { studentId, assignmentId } = @getSubmissionTrayState()
@@ -2725,9 +2755,15 @@ define [
         userId: studentId
       }, data)
 
-      updatingSubmission = ConvertCase.camelize(@getSubmission(studentId, assignmentId))
+      submission = @getSubmission(studentId, assignmentId)
 
-      @apiUpdateSubmission(submissionData, updatingSubmission)
+      gradeInfo =
+        excused: submission.excused
+        grade: submission.entered_grade
+        score: submission.entered_score
+        valid: true
+
+      @apiUpdateSubmission(submissionData, gradeInfo)
 
     destroy: =>
       $(window).unbind('resize.fillWindowWithMe')

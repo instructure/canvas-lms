@@ -182,11 +182,11 @@ it('changes state when new date is typed in', () => {
   const mockCallback = jest.fn();
   const wrapper = mount(<UpdateItemTray {...defaultProps} onSavePlannerItem={mockCallback} noteItem={noteItem} />);
   const newDate = moment('2017-10-16');
-  wrapper.instance().handleDateChange({}, newDate.format());
+  wrapper.instance().handleDateChange({}, newDate.toISOString());
   wrapper.instance().handleSave();
   expect(mockCallback).toHaveBeenCalledWith({
     title: noteItem.title,
-    date: newDate.format(),
+    date: newDate.toISOString(),
     context: {
       id: null
     }
@@ -258,7 +258,7 @@ it('invokes save callback with updated data', () => {
   wrapper.instance().handleChange('details', 'new details');
   wrapper.instance().handleSave();
   expect(saveMock).toHaveBeenCalledWith({
-    title: 'new title', date: moment('2017-05-01').format(), context: {id: '43'}, details: 'new details',
+    title: 'new title', date: moment('2017-05-01').toISOString(), context: {id: '43'}, details: 'new details',
   });
 });
 

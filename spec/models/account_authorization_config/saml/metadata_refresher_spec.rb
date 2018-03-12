@@ -61,6 +61,14 @@ describe AccountAuthorizationConfig::SAML::MetadataRefresher do
 
       subject.refresh_providers
     end
+
+    it "ignores nil/blank metadata_uris" do
+      AccountAuthorizationConfig::SAML.where(id: saml1.id).update_all(metadata_uri: nil)
+      saml2 = Account.default.authentication_providers.create!(auth_type: 'saml', metadata_uri: '')
+      expect(subject).to receive(:refresh_if_necessary).never
+
+      subject.refresh_providers
+    end
   end
 
   describe ".refresh_if_necessary" do

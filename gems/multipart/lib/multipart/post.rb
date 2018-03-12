@@ -18,7 +18,7 @@
 module Multipart
   class Post
     BOUNDARY = ::CanvasSlug.generate('canvas-rules', 15)
-    HEADER = {"Content-type" => "multipart/form-data, boundary=" + BOUNDARY}
+    HEADER = {"Content-type" => "multipart/form-data; boundary=" + BOUNDARY}
 
     def prepare_query (params, field_priority=[])
       fp = []
@@ -47,7 +47,7 @@ module Multipart
         end
       end
       params.each { |k, v| fp.push(file_param(k, v)) unless completed_fields.has_key?(k) }
-      query = fp.collect { |p| "--" + BOUNDARY + "\r\n" + p.to_multipart }.join("") + "--" + BOUNDARY + "--"
+      query = fp.collect { |p| "--" + BOUNDARY + "\r\n" + p.to_multipart }.join("") + "--" + BOUNDARY + "--" + "\r\n"
       return query, HEADER
     end
   end

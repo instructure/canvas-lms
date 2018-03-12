@@ -19,7 +19,7 @@
 import $ from 'jquery';
 import { Editors, Grid } from 'vendor/slickgrid';
 import GridSupport from 'jsx/gradezilla/default_gradebook/GradebookGrid/GridSupport';
-import SlickGridSpecHelper from '../../slick-grid/SlickGridSpecHelper';
+import SlickGridSpecHelper from './SlickGridSpecHelper'
 
 function createColumns () {
   return [1, 2, 3, 4].map(id => (

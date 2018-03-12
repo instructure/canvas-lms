@@ -653,6 +653,20 @@ enrollments.csv
 <td>The domain of the account to search for the user.</td>
 </tr>
 <tr>
+<td>start_date</td>
+<td>date</td>
+<td></td>
+<td>✓</td>
+<td>The enrollment start date. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
+</tr>
+<tr>
+<td>end_date</td>
+<td>date</td>
+<td></td>
+<td>✓</td>
+<td>The enrollment end date The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
+</tr>
+<tr>
 <td>user_id</td>
 <td>text</td>
 <td>✓&#42;</td>

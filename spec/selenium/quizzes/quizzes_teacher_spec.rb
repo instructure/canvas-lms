@@ -113,6 +113,7 @@ describe "quizzes" do
       expect(pick_count_field).to have_attribute(:value, "1")
 
       click_new_question_button # 1 total, ok
+      wait_for_ajaximations
       group_form.find_element(:css, '.edit_group_link').click
       pick_count.call('999') # 1000 total, ok
 

@@ -1,15 +1,27 @@
+#
+# Copyright (C) 2018 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 class AssignmentOverrideInstrumenter
   # NOTES ON THIS INSTRUMENTER:
   #
   # This thing is amazing because it provides the foundation
   # overriding assignments only when necessary (for example, when the
   # due date is requested).  Thoughts/potential issues/caveats:
-  #
-  # * the implementation of needs_overriding? needs to be done frd.
-  # There are many other factors that should be considered.  At the
-  # very least: when lock_at/unlock_at are requested; if
-  # assignment#only_visible_to_overrides is true.  Probably other
-  # things.
   #
   # * I love that this automatically applies to assignments no matter
   # where they appear in the schema.  I don't love that this is
@@ -56,8 +68,15 @@ class AssignmentOverrideInstrumenter
     end
   end
 
-  # TODO: make this real
+  ATTRIBUTES_NEED_OVERRIDING = %w[dueAt allDay dallDayDate unlockAt lockAt].freeze
+
+  # assignments are automatically overridden in graphql whenever one of the
+  # dueAt/lockAt/unlockAt fields are requested *UNLESS* the user is also
+  # requesting the list of assignment_overrides.  The rationale is that the
+  # user won't have a way of seeing the assignment's default due date if it's
+  # overriden
   def self.needs_overriding?(selections)
-    selections.key? "dueAt"
+    ATTRIBUTES_NEED_OVERRIDING.any? { |attr| selections.key?(attr) } &&
+      !selections.key?("assignmentOverrides")
   end
 end

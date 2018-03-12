@@ -61,6 +61,67 @@ describe Group do
     expect(@group.time_zone.to_s).to match /Mountain Time/
   end
 
+  it "should correctly identify group as active" do
+    course_with_student(:active_all => true)
+    group_model(:group_category => @communities, :is_public => true)
+    group.add_user(@student)
+    expect(@group.inactive?).to eq false
+  end
+
+  it "should correctly identify destroyed course as not active" do
+    course_with_student(:active_all => true)
+    group_model(:group_category => @communities, :is_public => true)
+    group.add_user(@student)
+    @group.context = @course
+    @course.destroy!
+    expect(@group.inactive?).to eq true
+  end
+
+  it "should correctly identify concluded course as not active" do
+    course_with_student(:active_all => true)
+    group_model(:group_category => @communities, :is_public => true)
+    group.add_user(@student)
+    @group.context = @course
+    @course.complete!
+    expect(@group.inactive?).to eq true
+  end
+
+  it "should correctly identify account group as not active" do
+    @account = account_model
+    group_model(:group_category => @communities, :is_public => true, :context => @account)
+    group.add_user(@student)
+    @group.context.destroy
+    expect(@group.inactive?).to eq true
+  end
+
+  it "should correctly identify account group as active" do
+    @account = account_model
+    group_model(:group_category => @communities, :is_public => true, :context => @account)
+    group.add_user(@student)
+    expect(@group.inactive?).to eq false
+  end
+
+  describe '#grading_standard_or_default' do
+    context 'when the Group belongs to a Course' do
+      it 'returns the grading scheme being used by the course, if one exists' do
+        standard = grading_standard_for(@course)
+        @course.update!(default_grading_standard: standard)
+        expect(@group.grading_standard_or_default).to be standard
+      end
+
+      it 'returns the Canvas default grading scheme if the course is not using a grading scheme' do
+        expect(@group.grading_standard_or_default.data).to eq GradingStandard.default_grading_standard
+      end
+    end
+
+    context 'Group belonging to an Account' do
+      it 'returns the Canvas default grading scheme' do
+        group = group_model(context: Account.default)
+        expect(group.grading_standard_or_default.data).to eq GradingStandard.default_grading_standard
+      end
+    end
+  end
+
   context "#peer_groups" do
     it "should find all peer groups" do
       context = course_model

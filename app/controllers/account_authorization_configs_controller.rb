@@ -715,7 +715,7 @@ class AccountAuthorizationConfigsController < ApplicationController
           flash[:error] = aac.errors.full_messages
           redirect_to(account_authentication_providers_path(@account))
         end
-        format.json { raise ActiveRecord::RecordInvalid.new(account_config) }
+        format.json { raise ActiveRecord::RecordInvalid.new(aac) }
       end
       return
     end

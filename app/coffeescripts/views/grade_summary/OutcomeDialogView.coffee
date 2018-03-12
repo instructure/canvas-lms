@@ -16,13 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'i18n!outcomes'
   'jquery'
   'underscore'
   '../DialogBaseView'
   './OutcomeLineGraphView'
   'jst/outcomes/outcomePopover'
-], (I18n, $, _, DialogBaseView, OutcomeLineGraphView, template) ->
+], ($, _, DialogBaseView, OutcomeLineGraphView, template) ->
   class OutcomeResultsDialogView extends DialogBaseView
     @optionProperty 'model'
     $target: null

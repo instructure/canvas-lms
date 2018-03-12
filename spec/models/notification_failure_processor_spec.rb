@@ -112,8 +112,9 @@ describe NotificationFailureProcessor do
 
       expect(sns_client).to receive(:delete_endpoint).with(endpoint_arn: bad_arn)
       nfp.process
-      expect(NotificationEndpoint.where(arn: good_arn)).not_to be_empty
-      expect(NotificationEndpoint.where(arn: bad_arn)).to be_empty
+      expect(NotificationEndpoint.active.where(arn: good_arn)).not_to be_empty
+      expect(NotificationEndpoint.active.where(arn: bad_arn)).to be_empty
+      expect(NotificationEndpoint.where(arn: bad_arn).first).to be_deleted
     end
 
     it "fails silently when given an invalid message id" do

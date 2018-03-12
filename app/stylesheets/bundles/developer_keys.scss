@@ -32,6 +32,13 @@
     }
   }
   td {
+    &.icon_react a {
+      margin-right: 5px;
+      margin-bottom: 3px;
+    }
+    &.icon_react {
+      min-width: 90px;
+    }
     span.name {
       font-weight: bold;
       @include fontSize(14px);
@@ -95,3 +102,4 @@
     padding: 3px 2px;
   }
 }
+

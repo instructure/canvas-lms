@@ -45,6 +45,32 @@ describe Rubric do
       }
     end
 
+    it "should allow updating learning outcome criteria" do
+      @outcome.short_description = 'alpha'
+      @outcome.description = 'beta'
+      criterion = {
+        :mastery_points => 3,
+        :ratings => [
+          { :points => 7, :description => "Exceeds Expectations" },
+          { :points => 3, :description => "Meets Expectations" },
+          { :points => 0, :description => "Does Not Meet Expectations" }
+        ]
+      }
+      @outcome.rubric_criterion = criterion
+      @rubric.update_learning_outcome_criteria(@outcome)
+      rubric_criterion = @rubric.criteria_object.first
+      expect(rubric_criterion.description).to eq 'alpha'
+      expect(rubric_criterion.long_description).to eq 'beta'
+      expect(rubric_criterion.ratings.length).to eq 3
+      expect(rubric_criterion.ratings.map(&:description)).to eq [
+        'Exceeds Expectations',
+        'Meets Expectations',
+        'Does Not Meet Expectations'
+      ]
+      expect(rubric_criterion.ratings.map(&:points)).to eq [7.0, 3.0, 0.0]
+      expect(@rubric.points_possible).to eq 12
+    end
+
     it "should allow learning outcome rows in the rubric" do
       expect(@rubric).not_to be_new_record
       expect(@rubric.learning_outcome_alignments.reload).not_to be_empty

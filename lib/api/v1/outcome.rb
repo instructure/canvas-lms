@@ -44,6 +44,7 @@ module Api::V1::Outcome
     api_json(outcome, user, session, :only => json_attributes, :methods => [:title]).tap do |hash|
       hash['url'] = api_v1_outcome_path :id => outcome.id
       hash['can_edit'] = can_edit.call
+      hash['has_updateable_rubrics'] = outcome.updateable_rubrics?
       unless opts[:outcome_style] == :abbrev
         hash['description'] = outcome.description
 

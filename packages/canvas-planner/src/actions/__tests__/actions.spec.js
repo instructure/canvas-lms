@@ -292,13 +292,13 @@ describe('api actions', () => {
     });
 
     it('does set default time of 11:59 pm for planner date', () => {
-      const plannerItem = {date: moment('2017-06-22T10:05:54').tz("Atlantic/Azores").format()};
+      const plannerItem = {date: moment('2017-06-22T10:05:54').tz("Atlantic/Azores").toISOString()};
       Actions.savePlannerItem(plannerItem)(() => {});
       return moxiosWait((request) => {
         expect(request.config.method).toBe('post');
         expect(request.url).toBe('api/v1/planner_notes');
         expect(JSON.parse(request.config.data).transformedToApi).toBeTruthy();
-        expect(moment(JSON.parse(request.config.data).date).tz("Atlantic/Azores").format()).toBe(moment('2017-06-22T23:59:59').tz("Atlantic/Azores").format());
+        expect(moment(JSON.parse(request.config.data).date).tz("Atlantic/Azores").toISOString()).toBe(moment('2017-06-22T23:59:59').tz("Atlantic/Azores").toISOString());
       });
     });
 

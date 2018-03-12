@@ -5,35 +5,35 @@
 </div>
 
 <div class="form-column-right">
-  <select id="assignment_grading_type"
-    name="{{#if nested}}assignment[grading_type]{{else}}grading_type{{/if}}"
-    {{#if inClosedGradingPeriod}}
-      readonly
-      aria-readonly="true"
-    {{/if}}
-    aria-controls="graded_assignment_fields view-grading-levels"
-    {{disabledIfIncludes frozenAttributes "grading_type"}}>
-    <option value="percent" {{selectedIf gradingType "percent"}}>
-      {{#t "grading_type_options.percent"}}Percentage{{/t}}
-    </option>
-    <option value="pass_fail" {{selectedIf gradingType "pass_fail" }}>
-      {{#t "grading_type_options.pass_fail"}}Complete/Incomplete{{/t}}
-    </option>
-    <option value="points" {{selectedIf gradingType "points"}}>
-      {{#t "grading_type_options.points"}}Points{{/t}}
-    </option>
-    <option value="letter_grade" {{selectedIf gradingType "letter_grade"}}>
-      {{#t "grading_type_options.letter_grade"}}Letter Grade{{/t}}
-    </option>
-    <option value="gpa_scale" {{selectedIf gradingType "gpa_scale"}}>
-      {{#t "grading_type_options.gpa_scale"}}GPA Scale{{/t}}
-    </option>
-    {{#unless preventNotGraded}}
-      <option value="not_graded" {{selectedIf isNotGraded}}>
-        {{#t "grading_type_options.not_graded"}}Not Graded{{/t}}
+  {{#if freezeGradingType}}
+    <input type="text" id="assignment_grading_type" readonly value="{{lookup gradingTypeMap gradingType}}"/>
+    <input type="hidden" name="{{#if nested}}assignment[grading_type]{{else}}grading_type{{/if}}" value="{{gradingType}}"/>
+  {{else}}
+    <select id="assignment_grading_type"
+      name="{{#if nested}}assignment[grading_type]{{else}}grading_type{{/if}}"
+      aria-controls="graded_assignment_fields view-grading-levels">
+      <option value="percent" {{selectedIf gradingType "percent"}}>
+        {{gradingTypeMap.percent}}
       </option>
-    {{/unless}}
-  </select>
+      <option value="pass_fail" {{selectedIf gradingType "pass_fail" }}>
+        {{gradingTypeMap.pass_fail}}
+      </option>
+      <option value="points" {{selectedIf gradingType "points"}}>
+        {{gradingTypeMap.points}}
+      </option>
+      <option value="letter_grade" {{selectedIf gradingType "letter_grade"}}>
+        {{gradingTypeMap.letter_grade}}
+      </option>
+      <option value="gpa_scale" {{selectedIf gradingType "gpa_scale"}}>
+        {{gradingTypeMap.gpa_scale}}
+      </option>
+      {{#unless preventNotGraded}}
+        <option value="not_graded" {{selectedIf isNotGraded}}>
+          {{gradingTypeMap.not_graded}}
+        </option>
+      {{/unless}}
+    </select>
+  {{/if}}
   <a id=gpa-scale-question
      href="#"
      aria-label="{{gpaScaleQuestionLabel}}"

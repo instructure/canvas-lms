@@ -19,8 +19,10 @@
 require_relative '../../spec_helper'
 
 RSpec.describe Lti::Result, type: :model do
+  let_once(:assignment) { assignment_model }
+
   context 'when validating' do
-    let(:result) { lti_result_model }
+    let(:result) { lti_result_model assignment: assignment }
 
     it 'requires "line_item"' do
       expect do
@@ -58,8 +60,8 @@ RSpec.describe Lti::Result, type: :model do
       )
     end
 
-    describe '#score_maximum' do
-      let(:result) { lti_result_model result_score: result_score, result_maximum: result_maximum}
+    describe '#result_maximum' do
+      let(:result) { lti_result_model assignment: assignment, result_score: result_score, result_maximum: result_maximum}
       let(:result_score) { 10 }
       let(:result_maximum) { 10 }
 
@@ -91,6 +93,38 @@ RSpec.describe Lti::Result, type: :model do
           expect do
             result
           end.not_to raise_error
+        end
+      end
+
+      context 'with result_maximum less than 0' do
+        let(:result_maximum) { -1 }
+
+        it 'raises an error' do
+          expect do
+            result
+          end.to raise_error(
+            ActiveRecord::RecordInvalid,
+            "Validation failed: Result maximum must be greater than 0"
+          )
+        end
+      end
+    end
+
+    describe '#result_score' do
+      let(:result) { lti_result_model assignment: assignment, result_score: result_score, result_maximum: result_maximum}
+      let(:result_score) { 10 }
+      let(:result_maximum) { 10 }
+
+      context 'with result_score less than 0' do
+        let(:result_score) { -1 }
+
+        it 'raises an error' do
+          expect do
+            result
+          end.to raise_error(
+            ActiveRecord::RecordInvalid,
+            "Validation failed: Result score must be greater than or equal to 0"
+          )
         end
       end
     end

@@ -18,16 +18,18 @@
 
 import $ from 'jquery';
 import fakeENV from 'helpers/fakeENV';
-import DataLoader from 'jsx/gradezilla/DataLoader';
-import { createGradebook, setFixtureHtml } from '../../gradezilla/default_gradebook/GradebookSpecHelper';
-import SlickGridSpecHelper from '../../gradezilla/default_gradebook/slick-grid/SlickGridSpecHelper';
+import DataLoader from 'jsx/gradezilla/DataLoader'
+import {
+  createGradebook,
+  setFixtureHtml
+} from '../../gradezilla/default_gradebook/GradebookSpecHelper'
+import SlickGridSpecHelper from '../../gradezilla/default_gradebook/GradebookGrid/GridSupport/SlickGridSpecHelper'
 
 QUnit.module('Gradebook Grid Column Widths', (suiteHooks) => {
   let $fixture;
   let gridSpecHelper;
   let gradebook;
   let dataLoader;
-  let server;
 
   let assignmentGroups;
   let assignments;
@@ -171,7 +173,6 @@ QUnit.module('Gradebook Grid Column Widths', (suiteHooks) => {
     fakeENV.setup({
       current_user_id: '1101'
     });
-    server = sinon.fakeServer.create();
 
     dataLoader = {
       gotAssignmentGroups: $.Deferred(),
@@ -197,7 +198,6 @@ QUnit.module('Gradebook Grid Column Widths', (suiteHooks) => {
     $(document).unbind('gridready');
     DataLoader.loadGradebookData.restore();
     DataLoader.getDataForColumn.restore();
-    server.restore();
     fakeENV.teardown();
     $fixture.remove();
   });

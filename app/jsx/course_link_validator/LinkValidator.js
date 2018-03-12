@@ -41,16 +41,16 @@ import ValidatorResults from './ValidatorResults'
         dataType: 'json',
         success: (data) => {
           // Keep trying until the request has been completed
-          if (data.state === 'queued' || data.state === 'running') {
+          if (data.workflow_state === 'queued' || data.workflow_state === 'running') {
             setTimeout(() => {
               this.getResults();
             }, 10000);
           } else {
-            if (data.state === 'completed') {
+            if (data.workflow_state === 'completed') {
               this.setState({
                 buttonMessage: I18n.t("Restart Link Validation"),
                 buttonDisabled: false,
-                results: data.issues,
+                results: data.results.issues,
                 displayResults: true,
                 error: false,
               });
@@ -60,7 +60,7 @@ import ValidatorResults from './ValidatorResults'
                 buttonMessage: I18n.t("Start Link Validation"),
                 buttonDisabled: false
               });
-              if (data.state === 'failed' && !initial_load) {
+              if (data.workflow_state === 'failed' && !initial_load) {
                 this.setState({
                   error: true
                 });

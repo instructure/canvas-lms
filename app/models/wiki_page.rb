@@ -173,6 +173,8 @@ class WikiPage < ActiveRecord::Base
 
   has_a_broadcast_policy
   simply_versioned :exclude => SIMPLY_VERSIONED_EXCLUDE_FIELDS, :when => Proc.new { |wp|
+    # always create a version when restoring a deleted page
+    next true if wp.workflow_state_changed? && wp.workflow_state_was == 'deleted'
     # :user_id and :updated_at do not merit creating a version, but should be saved
     exclude_fields = [:user_id, :updated_at].concat(SIMPLY_VERSIONED_EXCLUDE_FIELDS).map(&:to_s)
     (wp.changes.keys.map(&:to_s) - exclude_fields).present?

@@ -18,8 +18,69 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Outcomes::CsvImporter do
-  def csv_path(name)
-    File.expand_path(File.dirname(__FILE__) + "/fixtures/#{name}.csv")
+  def csv_file(name)
+    path = File.expand_path(File.dirname(__FILE__) + "/fixtures/#{name}.csv")
+    File.open(path, 'rb')
+  end
+
+  def import_fake_csv(rows, &updates)
+    Tempfile.open do |tf|
+      CSV.open(tf.path, 'wb') do |csv|
+        rows.each { |r| csv << r }
+      end
+      tf.binmode
+      Outcomes::CsvImporter.new(import, tf).run(&updates)
+    end
+  end
+
+  def outcome_row(**changes)
+    valid = {
+      title: 'title',
+      vendor_guid: SecureRandom.uuid,
+      object_type: 'outcome',
+      parent_guids: '',
+      calculation_method: 'highest',
+      calculation_int: '',
+      workflow_state: ''
+    }
+
+    row = valid.merge(changes)
+    headers.map { |k| row[k.to_sym] }
+  end
+
+  def group_row(**changes)
+    valid = {
+      title: 'title',
+      vendor_guid: SecureRandom.uuid,
+      object_type: 'group',
+      parent_guids: '',
+      calculation_method: '',
+      calculation_int: '',
+      workflow_state: ''
+    }
+
+    row = valid.merge(changes)
+    headers.map { |k| row[k.to_sym] }
+  end
+
+  before :once do
+    account_model
+  end
+
+  let(:import) do
+    OutcomeImport.create!(context: @account)
+  end
+
+  let(:headers) do
+    %w[
+      title
+      vendor_guid
+      object_type
+      parent_guids
+      calculation_method
+      calculation_int
+      workflow_state
+    ]
   end
 
   describe 'the csv importer' do
@@ -29,14 +90,20 @@ describe Outcomes::CsvImporter do
       outcomes.merge(groups)
     end
 
+    def expect_ok_import(path)
+      Outcomes::CsvImporter.new(import, path).run do |status|
+        expect(status[:errors]).to eq([])
+      end
+    end
+
     it 'can import the demo csv file' do
-      Outcomes::CsvImporter.new(csv_path('demo'), nil).run
+      expect_ok_import(csv_file('demo'))
       expect(LearningOutcomeGroup.count).to eq(3)
       expect(LearningOutcome.count).to eq(1)
     end
 
     it 'imports group attributes correctly' do
-      Outcomes::CsvImporter.new(csv_path('demo'), nil).run
+      expect_ok_import(csv_file('demo'))
 
       group = by_guid['b']
       expect(group.title).to eq('B')
@@ -45,7 +112,7 @@ describe Outcomes::CsvImporter do
     end
 
     it 'imports outcome attributes correctly' do
-      Outcomes::CsvImporter.new(csv_path('demo'), nil).run
+      expect_ok_import(csv_file('demo'))
 
       outcome = by_guid['c']
       expect(outcome.title).to eq('C')
@@ -61,7 +128,7 @@ describe Outcomes::CsvImporter do
     end
 
     it 'imports ratings correctly' do
-      Outcomes::CsvImporter.new(csv_path('scoring'), nil).run
+      expect_ok_import(csv_file('scoring'))
 
       criteria = by_guid['c'].rubric_criterion
       ratings = criteria[:ratings].sort_by { |r| r[:points] }
@@ -75,13 +142,13 @@ describe Outcomes::CsvImporter do
     end
 
     it 'works when no ratings are present' do
-      Outcomes::CsvImporter.new(csv_path('no-ratings'), nil).run
+      expect_ok_import(csv_file('no-ratings'))
 
       expect(by_guid['c'].rubric_criterion).to eq(nil)
     end
 
     it 'properly sets scoring types' do
-      Outcomes::CsvImporter.new(csv_path('scoring'), nil).run
+      expect_ok_import(csv_file('scoring'))
 
       by_method = LearningOutcome.all.to_a.group_by(&:calculation_method)
 
@@ -94,16 +161,190 @@ describe Outcomes::CsvImporter do
 
     it 'can import a utf-8 csv file with non-ascii characters' do
       guid = 'søren'
-      Outcomes::CsvImporter.new(csv_path('nor'), nil).run
+      expect_ok_import(csv_file('nor'))
       expect(LearningOutcomeGroup.where(vendor_guid: guid).count).to eq(1)
     end
 
     it 'can import csv files with chinese characters' do
       guid = '作戰'
-      Outcomes::CsvImporter.new(csv_path('chn'), nil).run
+      expect_ok_import(csv_file('chn'))
       expect(LearningOutcomeGroup.where(vendor_guid: guid).count).to eq(1)
+    end
+
+    it 'reports import progress' do
+      stub_const('Outcomes::CsvImporter::BATCH_SIZE', 2)
+
+      increments = []
+      import_fake_csv([headers] + (1..3).map { |ix| group_row(vendor_guid: ix) }.to_a) do |status|
+        increments.push(status[:progress])
+      end
+      expect(increments).to eq([0, 50, 100])
     end
   end
 
-  # OUT-1885 : need lots of specs for testing error messages on invalid row content
+  def expect_import_error(rows, expected)
+    errors = []
+    import_fake_csv(rows) do |status|
+      errors += status[:errors]
+    end
+    expect(errors).to eq(expected)
+  end
+
+  describe 'throws user-friendly header errors' do
+    it 'when required headers are missing' do
+      expect_import_error(
+        [['parent_guids', 'ratings']],
+        [[1, 'Missing required fields: ["title", "vendor_guid", "object_type"]']]
+      )
+    end
+
+    it 'when other headers are after the ratings header' do
+      expect_import_error(
+        [['parent_guids', 'ratings', 'vendor_guid', '', 'blagh', nil]],
+        [[1, 'Invalid fields after ratings: ["vendor_guid", "blagh"]']]
+      )
+    end
+
+    it 'when invalid headers are present' do
+      expect_import_error(
+        [['vendor_guid', 'title', 'object_type', 'spanish_inquisition', 'parent_guids', 'ratings']],
+        [[1, 'Invalid fields: ["spanish_inquisition"]']]
+      )
+    end
+  end
+
+  describe 'throws user-friendly row errors' do
+
+    it 'if rating tiers have points missing' do
+      expect_import_error(
+        [
+          headers + ['ratings'],
+          outcome_row + ['1', 'Sad Trombone', '', 'Zesty Trombone']
+        ],
+        [[2, 'Points for rating tier 2 not present']]
+      )
+    end
+
+    it 'if rating tiers have invalid points values' do
+      expect_import_error(
+        [
+          headers + ['ratings'],
+          outcome_row + ['1', 'Sad Trombone', 'bwaaaaaa bwa bwaaaaa', 'Zesty Trombone']
+        ],
+        [[2, 'Invalid points for rating tier 2: "bwaaaaaa bwa bwaaaaa"']]
+      )
+    end
+
+    it 'if rating tiers have points in wrong order' do
+      expect_import_error(
+        [
+          headers + ['ratings'],
+          outcome_row + ['1', 'Sad Trombone', '2', 'Zesty Trombone']
+        ],
+        [[2, 'Points for tier 2 must be less than points for prior tier (2 is greater than 1)']]
+      )
+    end
+
+    it 'if object_type is incorrect' do
+      expect_import_error(
+        [
+          headers,
+          group_row(object_type: 'giraffe'),
+        ],
+        [[2, 'Invalid object_type: "giraffe"']]
+      )
+    end
+
+    it 'if parent_guids refers to missing outcomes' do
+      expect_import_error(
+        [
+          headers,
+          group_row(vendor_guid: 'a'),
+          outcome_row(vendor_guid: 'child', parent_guids: 'a b c'),
+        ],
+        [[3, 'Parent references not found prior to this row: ["b", "c"]']]
+      )
+    end
+
+    it 'if required fields are missing' do
+      expect_import_error(
+        [
+          headers,
+          outcome_row(object_type: 'group', title: ''),
+        ],
+        [[2, 'The "title" field is required']]
+      )
+
+      expect_import_error(
+        [
+          headers,
+          outcome_row(vendor_guid: ''),
+        ],
+        [[2, 'The "vendor_guid" field is required']]
+      )
+    end
+
+    it 'if vendor_guid is invalid' do
+      expect_import_error(
+        [
+          headers,
+          outcome_row(vendor_guid: 'look some spaces'),
+        ],
+        [[2, 'The "vendor_guid" field must have no spaces']]
+      )
+    end
+
+    it 'if workflow_state is invalid' do
+      expect_import_error(
+        [
+          headers,
+          outcome_row(workflow_state: 'limbo'),
+          group_row(workflow_state: 'limbo'),
+        ],
+        [
+          [2, '"workflow_state" must be either "active" or "deleted"'],
+          [3, '"workflow_state" must be either "active" or "deleted"'],
+        ]
+      )
+    end
+
+    it 'if a value has an invalid utf-8 byte sequence' do
+      expect_import_error(
+        [
+          headers,
+          outcome_row(title: "evil \xFF utf-8".force_encoding("ASCII-8BIT")),
+        ],
+        [
+          [2, "Not a valid utf-8 string: \"evil \\xFF utf-8\""]
+        ]
+      )
+    end
+
+    it 'if a validation fails' do
+      methods = '["decaying_average", "n_mastery", "highest", "latest"]'
+      expect_import_error(
+        [
+          headers,
+          outcome_row(calculation_method: 'goofy'),
+        ],
+        [
+          [2, "Calculation method calculation_method must be one of the following: #{methods}"],
+        ]
+      )
+    end
+
+    it 'if a group receives invalid fields' do
+      expect_import_error(
+        [
+          headers + ['ratings'],
+          group_row(
+            vendor_guid: 'a',
+            calculation_method: 'n_mastery',
+            calculation_int: '5',
+          ) + ['1', 'Sad Trombone'],
+        ],
+        [[2, 'Invalid fields for a group: ["calculation_method", "calculation_int", "ratings"]']]
+      )
+    end
+  end
 end

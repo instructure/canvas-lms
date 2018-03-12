@@ -297,10 +297,13 @@ TEXT
           <% js_env(:TERMS_OF_SERVICE_CUSTOM_CONTENT => @account.terms_of_service_content&.content) %>
           <% js_bundle :terms_of_service_modal%>
           <fieldset>
-            <legend><%= t("Terms of Service") %></legend>
+            <legend><%= t("Acceptable Use Policy") %></legend>
             <%= f.fields_for :terms_of_service do |tos| %>
               <%= tos.label :terms_type, t("License Type") %>
-              <%= tos.select :terms_type, options_for_select(TermsOfService.type_dropdown_options, @account.terms_of_service.terms_type) %>
+              <% if TermsOfService.type_dropdown_options_for_account(@account)[0][1] == "built_in:default" %>
+                <label> (<%= t("Old Policy") %>)</label>
+              <% end %>
+              <%= tos.select :terms_type, options_for_select(TermsOfService.type_dropdown_options_for_account(@account), @account.terms_of_service.terms_type) %>
               <br>
               <%= tos.check_box :passive, :checked => @account.terms_of_service.passive %>
               <%= tos.label :passive, t("Allow passive acceptance of Terms of Service")%>
@@ -553,6 +556,12 @@ TEXT
                     <%= t(:turnitin_pledge_help, "students must check a box acknowledging that they agree with this pledge") %>
                   </span>
                   <%= f.text_area :turnitin_pledge, :style => "width: 90%; height: 50px;" %>
+                </td>
+              </tr>
+              <tr>
+                <td><label for="account_turnitin_originality"><%= I18n.t('Students can see originality score') %></label></td>
+                <td>
+                  <%= f.select :turnitin_originality, options_for_select(turnitin_originality_options, @account.turnitin_originality)%>
                 </td>
               </tr>
             </table>

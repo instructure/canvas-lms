@@ -470,7 +470,7 @@ class CoursesController < ApplicationController
           if [:completed, :rejected].include?(state) ||
             ([:active, :invited].include?(state) && e.section_or_course_date_in_past?) # strictly speaking, these enrollments are perfectly active but enrollment dates are terrible
             @past_enrollments << e unless e.workflow_state == "invited"
-          else
+          elsif !e.hard_inactive?
             start_at, end_at = e.enrollment_dates.first
             if start_at && start_at > Time.now.utc
               @future_enrollments << e unless e.restrict_future_listing?
@@ -891,7 +891,7 @@ class CoursesController < ApplicationController
       params[:per_page] ||= params[:limit]
 
       search_params = params.slice(:search_term, :enrollment_role, :enrollment_role_id, :enrollment_type, :enrollment_state)
-      include_inactive = @context.grants_right?(@current_user, session, :read_as_admin) && (!params.has_key?(:include_inactive) || value_to_boolean(params[:include_inactive]))
+      include_inactive = @context.grants_right?(@current_user, session, :read_as_admin) && value_to_boolean(params[:include_inactive])
 
       search_params[:include_inactive_enrollments] = true if include_inactive
       search_term = search_params[:search_term].presence
@@ -2795,11 +2795,7 @@ class CoursesController < ApplicationController
     return unless authorized_action(@context, @current_user, :manage_content)
 
     if progress = CourseLinkValidator.current_progress(@context)
-      hash = {:state => progress.workflow_state}
-      if !progress.pending? && progress.results
-        hash.merge!(progress.results)
-      end
-      render :json => hash
+      render :json => progress_json(progress, @current_user, session)
     else
       render :json => {}
     end

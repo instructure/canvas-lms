@@ -162,6 +162,7 @@ Simple/CoffeeSpecsLinter:
     - "app/coffeescripts/bundles/**"
   Requirement:
     Include:
+    - "app/jsx/**/__tests__/**"
     - "spec/coffeescripts/**.coffee"
     - "spec/coffeescripts/jsx/**"
     - "spec/javascripts/jsx/**"
@@ -175,6 +176,7 @@ Simple/JsxSpecsLinter:
     - "app/jsx/**.js"
   Requirement:
     Include:
+    - "app/jsx/**/__tests__/**"
     - "spec/coffeescripts/jsx/**"
     - "spec/javascripts/jsx/**"
   Message: Your commit includes coffee changes, but does not include coffee or jsx
@@ -193,6 +195,7 @@ Simple/PublicJsSpecsLinter:
     - "**/symlink_to_node_modules/**"
   Requirement:
     Include:
+    - "app/jsx/**/__tests__/**"
     - "spec/coffeescripts/**"
     - "spec/javascripts/**"
   Message: Your commit includes changes to public/javascripts, but does not include

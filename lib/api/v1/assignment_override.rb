@@ -440,6 +440,9 @@ module Api::V1::AssignmentOverride
     prepared_overrides[:overrides_to_create].each(&:save!)
     prepared_overrides[:overrides_to_update].each(&:save!)
 
+    @overrides_affected = prepared_overrides[:overrides_to_delete].size +
+      prepared_overrides[:overrides_to_create].size + prepared_overrides[:overrides_to_update].size
+
     assignment.touch # invalidate cached list of overrides for the assignment
     assignment.run_if_overrides_changed_later!
   end

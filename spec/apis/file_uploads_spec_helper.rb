@@ -42,6 +42,7 @@ shared_examples_for "file uploads api" do
   def attachment_json(attachment, options = {})
     json = {
       'id' => attachment.id,
+      'uuid' => attachment.uuid,
       'folder_id' => attachment.folder_id,
       'url' => file_download_url(attachment, :verifier => attachment.uuid, :download => '1', :download_frd => '1'),
       'content-type' => attachment.content_type,
@@ -64,6 +65,13 @@ shared_examples_for "file uploads api" do
 
     if options[:include] && options[:include].include?("enhanced_preview_url") && (attachment.context.is_a?(Course) || attachment.context.is_a?(User) || attachment.context.is_a?(Group))
       json.merge!({ 'preview_url' => context_url(attachment.context, :context_file_file_preview_url, attachment, annotate: 0) })
+    end
+
+    unless options[:no_doc_preview]
+      json.merge!({
+        'canvadoc_session_url' => nil,
+        'crocodoc_session_url' => nil
+      })
     end
 
     json
@@ -99,6 +107,7 @@ shared_examples_for "file uploads api" do
     json = json_parse(response.body)
     expected_json = {
         'id' => attachment.id,
+        'uuid' => attachment.uuid,
         'folder_id' => attachment.folder_id,
         'url' => file_download_url(attachment, :verifier => attachment.uuid, :download => '1', :download_frd => '1'),
         'content-type' => attachment.content_type,
@@ -116,7 +125,9 @@ shared_examples_for "file uploads api" do
         'thumbnail_url' => attachment.thumbnail_url,
         'modified_at' => attachment.modified_at.as_json,
         'mime_class' => attachment.mime_class,
-        'media_entry_id' => attachment.media_entry_id
+        'media_entry_id' => attachment.media_entry_id,
+        'canvadoc_session_url' => nil,
+        'crocodoc_session_url' => nil
     }
 
     if attachment.context.is_a?(User) || attachment.context.is_a?(Course) || attachment.context.is_a?(Group)
@@ -189,7 +200,7 @@ shared_examples_for "file uploads api" do
 
     expect(json).to eq({
       'upload_status' => 'ready',
-      'attachment' => attachment_json(attachment.reload),
+      'attachment' => attachment_json(attachment.reload, no_doc_preview: true),
     })
     expect(attachment.file_state).to eq 'available'
     expect(attachment.size).to eq 4

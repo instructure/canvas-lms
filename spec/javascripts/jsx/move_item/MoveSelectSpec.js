@@ -21,7 +21,7 @@ import * as enzyme from 'enzyme'
 import MoveSelect from 'jsx/move_item/MoveSelect'
 import { positions } from 'jsx/move_item/positions'
 
-QUnit.module('MoveItemTray component')
+QUnit.module('MoveSelect component')
 
 const defaultProps = () => ({
   items: [{

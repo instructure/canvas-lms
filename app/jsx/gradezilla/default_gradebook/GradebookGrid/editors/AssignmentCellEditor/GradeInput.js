@@ -19,35 +19,30 @@
 import React, {Component} from 'react'
 import {bool, instanceOf, oneOf, number, shape, string} from 'prop-types'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
-import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
-import {parseTextValue} from '../../../../../grading/helpers/GradeInputHelper'
-import CellTextInput from './CellTextInput'
+import I18n from 'i18n!gradebook'
+import CompleteIncompleteGradeInput from './CompleteIncompleteGradeInput'
+import GradingSchemeGradeInput from './GradingSchemeGradeInput'
+import TextGradeInput from './TextGradeInput'
 
 const CLASSNAME_FOR_ENTER_GRADES_AS = {
   gradingScheme: 'Grid__AssignmentRowCell__GradingSchemeInput',
-  passFail: 'Grid__AssignmentRowCell__PassFailInput',
+  passFail: 'Grid__AssignmentRowCell__CompleteIncompleteInput',
   percent: 'Grid__AssignmentRowCell__PercentInput',
   points: 'Grid__AssignmentRowCell__PointsInput'
 }
 
-function formatGrade(submission, assignment, gradingScheme, enterGradesAs) {
-  const formatOptions = {
-    defaultValue: '',
-    formatType: enterGradesAs,
-    gradingScheme,
-    pointsPossible: assignment.pointsPossible,
-    version: 'entered'
+function inputComponentFor(enterGradesAs) {
+  switch(enterGradesAs) {
+    case 'gradingScheme': {
+      return GradingSchemeGradeInput
+    }
+    case 'passFail': {
+      return CompleteIncompleteGradeInput
+    }
+    default: {
+      return TextGradeInput
+    }
   }
-
-  return GradeFormatHelper.formatSubmissionGrade(submission, formatOptions)
-}
-
-function getGradingData(value, props) {
-  return parseTextValue(value, {
-    enterGradesAs: props.enterGradesAs,
-    gradingScheme: props.gradingScheme,
-    pointsPossible: props.assignment.pointsPossible
-  })
 }
 
 export default class GradeInput extends Component {
@@ -57,105 +52,68 @@ export default class GradeInput extends Component {
     }).isRequired,
     disabled: bool,
     enterGradesAs: oneOf(['gradingScheme', 'passFail', 'percent', 'points']).isRequired,
-    gradingScheme: instanceOf(Array).isRequired,
+    gradingScheme: instanceOf(Array),
+    pendingGradeInfo: shape({
+      excused: bool.isRequired,
+      grade: string,
+      valid: bool.isRequired
+    }),
     submission: shape({
       enteredGrade: string,
       enteredScore: number,
-      excused: bool.isRequired,
-      id: string.isRequired
+      excused: bool.isRequired
     }).isRequired
   }
 
   static defaultProps = {
-    disabled: false
+    disabled: false,
+    gradingScheme: null,
+    pendingGradeInfo: null
   }
 
   constructor(props) {
     super(props)
 
-    this.bindTextInput = ref => {
-      this.textInput = ref
+    this.bindGradeInput = ref => {
+      this.gradeInput = ref
     }
 
-    this.handleTextChange = this.handleTextChange.bind(this)
-
-    const {assignment, enterGradesAs, gradingScheme, submission} = props
-
-    this.state = {
-      grade: formatGrade(submission, assignment, gradingScheme, enterGradesAs)
-    }
+    this.handleKeyDown = this.handleKeyDown.bind(this)
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (!this.isFocused()) {
-      const {assignment, enterGradesAs, gradingScheme, submission} = nextProps
-
-      this.setState({
-        grade: formatGrade(submission, assignment, gradingScheme, enterGradesAs)
-      })
-    }
-  }
-
-  get gradingData() {
-    return getGradingData(this.state.grade, this.props)
+  get gradeInfo() {
+    return this.gradeInput.gradeInfo
   }
 
   focus() {
-    this.textInput.focus()
-    this.textInput.setSelectionRange(0, this.textInput.value.length)
+    this.gradeInput.focus()
+  }
+
+  handleKeyDown(event) {
+    return this.gradeInput.handleKeyDown(event)
   }
 
   hasGradeChanged() {
-    const {assignment, enterGradesAs, gradingScheme, submission} = this.props
-    const formattedGrade = formatGrade(submission, assignment, gradingScheme, enterGradesAs)
-
-    if (formattedGrade === this.state.grade.trim()) {
-      return false
-    }
-
-    const inputData = getGradingData(this.state.grade, this.props)
-    if (inputData.excused !== this.props.submission.excused) {
-      return true
-    }
-
-    if (inputData.enteredAs === 'gradingScheme') {
-      /*
-       * When the value given is a grading scheme key, it must be compared to
-       * the grade on the submission instead of the score. This avoids updating
-       * the grade when the stored score and interpreted score differ and the
-       * input value was not changed.
-       *
-       * To avoid updating the grade in cases where the stored grade is of a
-       * different type but otherwise equivalent, get the grading data for the
-       * stored grade and compare it to the grading data from the input.
-       */
-      const submissionData = getGradingData(this.props.submission.enteredGrade, this.props)
-      return submissionData.grade !== inputData.grade
-    }
-
-    return this.props.submission.enteredScore !== inputData.score
-  }
-
-  handleTextChange(event) {
-    this.setState({grade: event.target.value})
-  }
-
-  isFocused() {
-    return this.textInput === document.activeElement
+    return this.gradeInput.hasGradeChanged()
   }
 
   render() {
     const className = CLASSNAME_FOR_ENTER_GRADES_AS[this.props.enterGradesAs]
 
+    const messages = []
+    if (this.props.pendingGradeInfo && !this.props.pendingGradeInfo.valid) {
+      messages.push({type: 'error', text: I18n.t('This grade is invalid')})
+    }
+
+    const InputComponent = inputComponentFor(this.props.enterGradesAs)
+
     return (
       <div className={className}>
-        <CellTextInput
-          value={this.state.grade}
-          disabled={this.props.disabled}
-          inputRef={this.bindTextInput}
-          label={<ScreenReaderContent>Grade</ScreenReaderContent>}
-          onChange={this.handleTextChange}
-          size="small"
+        <InputComponent
+          {...this.props}
+          label={<ScreenReaderContent>{I18n.t('Grade')}</ScreenReaderContent>}
+          messages={messages}
+          ref={this.bindGradeInput}
         />
       </div>
     )

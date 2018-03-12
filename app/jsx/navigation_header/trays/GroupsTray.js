@@ -16,64 +16,51 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 import I18n from 'i18n!new_nav'
 import React from 'react'
-import PropTypes from 'prop-types'
-import SVGWrapper from '../../shared/SVGWrapper'
-import Spinner from 'instructure-ui/lib/components/Spinner'
+import {bool, arrayOf, shape, string} from 'prop-types'
+import Container from '@instructure/ui-core/lib/components/Container'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import Link from '@instructure/ui-core/lib/components/Link'
+import List, {ListItem} from '@instructure/ui-core/lib/components/List'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
 
-  var GroupsTray = React.createClass({
-    propTypes: {
-      groups: PropTypes.array.isRequired,
-      closeTray: PropTypes.func.isRequired,
-      hasLoaded: PropTypes.bool.isRequired
-    },
-
-    getDefaultProps() {
-      return {
-        groups: []
-      };
-    },
-
-    renderCurrentGroups() {
-      if (!this.props.hasLoaded) {
-        return (
-          <li className="ic-NavMenu-list-item ic-NavMenu-list-item--loading-message">
+export default function GroupsTray({groups, hasLoaded}) {
+  return (
+    <Container as="div" padding="medium">
+      <Heading level="h3" as="h1">{I18n.t('Groups')}</Heading>
+      <hr />
+      <List variant="unstyled"  margin="small 0" itemSpacing="small">
+        {hasLoaded ? (
+          groups.map(group =>
+            <ListItem key={group.id}>
+              <Link href={`/groups/${group.id}`}>{group.name}</Link>
+            </ListItem>
+          ).concat([
+            <ListItem key="hr"><hr /></ListItem>,
+            <ListItem key="all">
+              <Link href="/groups">{I18n.t('All Groups')}</Link>
+            </ListItem>
+          ])
+        ) : (
+          <ListItem>
             <Spinner size="small" title={I18n.t('Loading')} />
-          </li>
-        );
-      }
-      var groups = this.props.groups.map((group) => {
-        return (
-          <li className="ic-NavMenu-list-item" key={group.id}>
-            <a href={`/groups/${group.id}`} className='ic-NavMenu-list-item__link'>{group.name}</a>
-          </li>
-        );
-      });
-      groups.push(
-        <li key='allGroupsLink' className='ic-NavMenu-list-item ic-NavMenu-list-item--feature-item'>
-          <a href='/groups' className='ic-NavMenu-list-item__link'>{I18n.t('All Groups')}</a>
-        </li>
-      );
-      return groups;
-    },
+          </ListItem>
+        )}
+      </List>
+    </Container>
+  )
+}
 
-    render() {
-      return (
-        <div>
-          <div className="ic-NavMenu__header">
-            <h1 className="ic-NavMenu__headline">{I18n.t('Groups')}</h1>
-            <button className="Button Button--icon-action ic-NavMenu__closeButton" type="button" onClick={this.props.closeTray}>
-              <i className="icon-x"></i>
-              <span className="screenreader-only">{I18n.t('Close')}</span>
-            </button>
-          </div>
-          <ul className="ic-NavMenu__link-list">
-            {this.renderCurrentGroups()}
-          </ul>
-        </div>
-      );
-    }
-  });
+GroupsTray.propTypes = {
+  groups: arrayOf(shape({
+    id: string.isRequired,
+    name: string.isRequired
+  })).isRequired,
+  hasLoaded: bool.isRequired
+}
 
-export default GroupsTray
+GroupsTray.defaultProps = {
+  groups: []
+}

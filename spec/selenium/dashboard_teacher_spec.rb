@@ -265,7 +265,7 @@ describe "dashboard" do
         get "/"
 
         f('#global_nav_courses_link').click
-        expect(fj('.ic-NavMenu-list-item a:contains("All Courses")')).to be_present
+        expect(fj('[aria-label="Global navigation tray"] a:contains("All Courses")')).to be_present
       end
     end
   end

@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import ThemeEditor from '../theme_editor/ThemeEditor'
 
-  // framebust out so we don't ever get theme editor inside theme editor
+// framebust out so we don't ever get theme editor inside theme editor
 if (window.top.location !== self.location) {
   window.top.location = self.location.href
 }
@@ -34,7 +34,8 @@ ReactDOM.render(
       sharedBrandConfigs: window.ENV.sharedBrandConfigs,
       allowGlobalIncludes: window.ENV.allowGlobalIncludes,
       accountID: window.ENV.account_id,
-      useHighContrast: window.ENV.use_high_contrast
+      useHighContrast: window.ENV.use_high_contrast,
+      refactorEnabled: window.ENV.REFACTOR_ENABLED
     }}
   />,
   document.body

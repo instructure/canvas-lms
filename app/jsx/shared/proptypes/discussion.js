@@ -20,7 +20,7 @@ import { author } from './user'
 
 const discussion = shape({
   id: string.isRequired,
-  position: number.isRequired,
+  position: number,
   published: bool.isRequired,
   title: string.isRequired,
   message: string.isRequired,
@@ -28,6 +28,7 @@ const discussion = shape({
   author: author.isRequired,
   read_state: oneOf(['read', 'unread']).isRequired,
   unread_count: number.isRequired,
+  subscribed: bool.isRequired,
 })
 
 export const discussionList = arrayOf(discussion)

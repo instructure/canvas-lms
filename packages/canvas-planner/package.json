@@ -18,9 +18,6 @@
     "build:lib": "BABEL_ENV=production babel src --out-dir lib --ignore spec.js,test.js,demo.js --quiet",
     "build:es": "BABEL_ENV=production ES_MODULES=1 babel src --out-dir es --ignore spec.js,test.js,demo.js --quiet",
     "build:watch": "yarn run build:lib -- --watch",
-    "start": "npm-run-all --parallel start:*",
-    "start:json-server": "node ./fake_server/server.js",
-    "start:webpack-dev": "BABEL_ENV=development webpack-dev-server --port 3005 --host 0.0.0.0",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch",
@@ -42,7 +39,7 @@
   "author": "Instructure, Inc.",
   "license": "AGPL-3.0",
   "dependencies": {
-    "@instructure/ui-core": "^4.6.0",
+    "@instructure/ui-core": "^4.7.2",
     "axios": "^0.16.0",
     "babel-plugin-inline-react-svg": "^0.4.0",
     "change-case": "^3.0.1",
@@ -99,8 +96,7 @@
     "lint-staged": "^3.4.0",
     "moxios": "^0.4.0",
     "npm-run-all": "^4",
-    "webpack": "^3",
-    "webpack-dev-server": "^2"
+    "webpack": "^3"
   },
   "lint-staged": {
     "*.js": "eslint"

@@ -16,11 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'i18n!context_modules'
   'Backbone'
   'jquery'
   '../collections/ModuleItemCollection'
-], (I18n, Backbone, $, ModuleItemCollection) ->
+], (Backbone, $, ModuleItemCollection) ->
 
   class Module extends Backbone.Model
     resourceName: 'modules'

@@ -280,6 +280,7 @@ module SIS
               cc.user_id = user.id
               cc.pseudonym_id = pseudo.id
               cc.path = user_row.email
+              cc.bounce_count = 0 if cc.path_changed?
               cc.workflow_state = status_is_active ? 'active' : 'retired'
               newly_active = cc.path_changed? || (cc.active? && cc.workflow_state_changed?)
               if cc.changed?

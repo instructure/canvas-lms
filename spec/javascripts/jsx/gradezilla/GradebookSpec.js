@@ -3181,15 +3181,22 @@ test('removes the section select when filter is deselected', function () {
 
 QUnit.module('Gradebook#updateCurrentSection', {
   setup () {
-    this.gradebook = createGradebook();
+    this.server = sinon.createFakeServer({ respondImmediately: true })
+    this.server.respondWith([200, {}, ''])
+
+    this.gradebook = createGradebook({ settings_update_url: '/settingUrl' })
     this.gradebook.postGradesStore = {
       setSelectedSection: this.stub()
     };
     this.stub(this.gradebook, 'reloadStudentData');
-    this.stub(this.gradebook, 'saveSettings');
+    this.spy(this.gradebook, 'saveSettings')
     this.stub(this.gradebook, 'updateSectionFilterVisibility');
+  },
+
+  teardown () {
+    this.server.restore()
   }
-});
+})
 
 test('updates the filter setting with the given section id', function () {
   this.gradebook.updateCurrentSection('2001');
@@ -3225,10 +3232,8 @@ test('saves settings', function () {
 });
 
 test('saves settings after updating the filter setting', function () {
-  this.gradebook.saveSettings.callsFake(() => {
-    strictEqual(this.gradebook.getFilterRowsBySetting('sectionId'), '2001', 'section was already updated');
-  });
-  this.gradebook.updateCurrentSection('2001');
+  this.gradebook.updateCurrentSection('2001')
+  strictEqual(this.gradebook.getFilterRowsBySetting('sectionId'), '2001', 'section was already updated');
 });
 
 test('has no effect when the section has not changed', function () {
@@ -3240,8 +3245,7 @@ test('has no effect when the section has not changed', function () {
 });
 
 test('reloads student data after saving settings', function () {
-  this.gradebook.saveSettings.callsFake((_data, callback) => { callback() });
-  this.gradebook.updateCurrentSection('2001');
+  this.gradebook.updateCurrentSection('2001')
   strictEqual(this.gradebook.reloadStudentData.callCount, 1);
 });
 
@@ -3722,7 +3726,7 @@ test('sort gradebook rows by id when setting key and sortable name are the same'
   strictEqual(secondRow.id, '4');
 });
 
-test('descending sort gradebook rows by id when when setting key and sortable name are the same and direction is descending', function () {
+test('descending sort gradebook rows by id when setting key and sortable name are the same and direction is descending', function () {
   this.gradebook.gridData.rows = [
     { id: '3', sortable_name: 'Same Name', custom_col_501: '42' },
     { id: '4', sortable_name: 'Same Name', custom_col_501: '42' }
@@ -4156,29 +4160,41 @@ QUnit.module('Gradebook Grid Events', function (suiteHooks) {
   });
 
   test('sets focus on the student grades link when a "student" body cell becomes active', function () {
+    const clock = sinon.useFakeTimers();
     this.stub(this.gradebook.gradebookGrid.gridSupport.state, 'getActiveNode')
       .returns($fixtures.querySelector('#example-gradebook-cell'));
     this.triggerEvent('onActiveLocationChanged', {}, { columnId: 'student', region: 'body' });
+    clock.tick(0);
     strictEqual(document.activeElement, this.$studentGradesLink);
+    clock.restore();
   });
 
   test('does nothing when a "student" body cell without a student grades link becomes active', function () {
+    const clock = sinon.useFakeTimers();
     const previousActiveElement = document.activeElement;
     $fixtures.querySelector('#example-gradebook-cell').innerHTML = 'Student Name';
     this.stub(this.gradebook.gradebookGrid.gridSupport.state, 'getActiveNode')
       .returns($fixtures.querySelector('#example-gradebook-cell'));
     this.triggerEvent('onActiveLocationChanged', {}, { columnId: 'student', region: 'body' });
+    clock.tick(0);
     strictEqual(document.activeElement, previousActiveElement);
+    clock.restore();
   });
 
   test('does not change focus when a "student" header cell becomes active', function () {
+    const clock = sinon.useFakeTimers();
     this.triggerEvent('onActiveLocationChanged', {}, { columnId: 'student', region: 'header' });
+    clock.tick(0);
     notEqual(document.activeElement, this.$studentGradesLink);
+    clock.restore();
   });
 
   test('does not change focus when body cells of other columns become active', function () {
+    const clock = sinon.useFakeTimers();
     this.triggerEvent('onActiveLocationChanged', {}, { columnId: 'total_grade', region: 'body' });
+    clock.tick(0);
     notEqual(document.activeElement, this.$studentGradesLink);
+    clock.restore();
   });
 
   QUnit.module('onKeyDown');
@@ -4287,19 +4303,28 @@ QUnit.module('Gradebook Grid Events', function (suiteHooks) {
   QUnit.module('onNavigateUp');
 
   test('calls focusAtStart on the column header component associated with the event location', function () {
+    const clock = sinon.useFakeTimers();
     this.triggerEvent('onNavigateUp', {}, { columnId: 'student', region: 'header' });
+    clock.tick(0);
     strictEqual(this.studentColumnHeader.focusAtStart.callCount, 1);
+    clock.restore();
   });
 
   test('does nothing when the location region is not "header"', function () {
+    const clock = sinon.useFakeTimers();
     this.triggerEvent('onNavigateUp', {}, { columnId: 'student', region: 'body' });
+    clock.tick(0);
     strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0);
+    clock.restore();
   });
 
   test('does nothing when no component is referenced for the given column', function () {
+    const clock = sinon.useFakeTimers();
     this.gradebook.removeHeaderComponentRef('student');
     this.triggerEvent('onNavigateUp', {}, { columnId: 'student', region: 'header' });
+    clock.tick(0);
     strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0);
+    clock.restore();
   });
 
   QUnit.module('onColumnsReordered', (hooks) => {
@@ -4414,6 +4439,10 @@ QUnit.module('Gradebook Grid Events', () => {
     hooks.beforeEach(() => {
       gradebook = createGradebook();
       gradebook.initSubmissionStateMap();
+      gradebook.gradebookContent.customColumns = [
+        { id: '1', teacher_notes: false, hidden: false, title: 'Read Only', read_only: true },
+        { id: '2', teacher_notes: false, hidden: false, title: 'Not Read Only', read_only: false }
+      ];
       gradebook.students = { 1101: { id: '1101', isConcluded: false } };
       eventObject = {
         column: { assignmentId: '2301', type: 'assignment' },
@@ -4451,6 +4480,11 @@ QUnit.module('Gradebook Grid Events', () => {
     test('returns true when the cell is not in an assignment column', () => {
       eventObject.column = { type: 'custom_column' };
       strictEqual(gradebook.onBeforeEditCell(null, eventObject), true);
+    });
+
+    test('returns false when the cell is read_only', () => {
+      eventObject.column = { type: 'custom_column', customColumnId: '1' };
+      strictEqual(gradebook.onBeforeEditCell(null, eventObject), false);
     });
   });
 
@@ -4710,6 +4744,13 @@ QUnit.module('Gradebook#gotSubmissionsChunk', function (hooks) {
       }],
       user_id: '1102'
     }];
+    this.gradebook.setAssignmentGroups({
+      9000: { group_weight: 100 }
+    })
+    this.gradebook.setAssignments({
+      201: { id: '201', assignment_group_id: '9000', name: 'Math Assignment', published: true },
+      202: { id: '202', assignment_group_id: '9000', name: 'English Assignment', published: false }
+    })
   });
 
   hooks.afterEach(function () {
@@ -4725,20 +4766,12 @@ QUnit.module('Gradebook#gotSubmissionsChunk', function (hooks) {
   });
 
   test('updates effectiveDueDates on related assignments', function () {
-    this.gradebook.setAssignments({
-      201: { id: '201', name: 'Math Assignment', published: true },
-      202: { id: '202', name: 'English Assignment', published: false }
-    });
     this.gradebook.gotSubmissionsChunk(studentSubmissions);
     deepEqual(Object.keys(this.gradebook.getAssignment('201').effectiveDueDates), ['1101', '1102']);
     deepEqual(Object.keys(this.gradebook.getAssignment('202').effectiveDueDates), ['1101']);
   });
 
   test('updates inClosedGradingPeriod on related assignments', function () {
-    this.gradebook.setAssignments({
-      201: { id: '201', name: 'Math Assignment', published: true },
-      202: { id: '202', name: 'English Assignment', published: false }
-    });
     this.gradebook.gotSubmissionsChunk(studentSubmissions);
     strictEqual(this.gradebook.getAssignment('201').inClosedGradingPeriod, false);
     strictEqual(this.gradebook.getAssignment('202').inClosedGradingPeriod, false);
@@ -5815,6 +5848,12 @@ test('renders the view options menu', function () {
 
 QUnit.module('Gradebook#updateCurrentGradingPeriod', {
   setup () {
+    this.server = sinon.createFakeServer({ respondImmediately: true })
+    this.server.respondWith([200, {}, ''])
+
+    const fixtures = document.getElementById('fixtures')
+    fixtures.innerHTML = '<div id="grading-periods-filter-container"></div>'
+
     this.gradebook = createGradebook({
       grading_period_set: {
         id: '1501',
@@ -5823,14 +5862,19 @@ QUnit.module('Gradebook#updateCurrentGradingPeriod', {
       settings: {
         filter_columns_by: {
           grading_period_id: '1402'
-        }
+        },
+        selected_view_options_filters: ['gradingPeriods']
       }
     });
-    this.stub(this.gradebook, 'saveSettings');
+    this.spy(this.gradebook, 'saveSettings');
     this.stub(this.gradebook, 'resetGrading');
     this.stub(this.gradebook, 'sortGridRows');
     this.stub(this.gradebook, 'updateFilteredContentInfo');
     this.stub(this.gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+  },
+
+  teardown () {
+    this.server.restore()
   }
 });
 
@@ -5840,17 +5884,13 @@ test('updates the filter setting with the given grading period id', function () 
 });
 
 test('saves settings after updating the filter setting', function () {
-  this.gradebook.saveSettings.callsFake(() => {
-    strictEqual(this.gradebook.getFilterColumnsBySetting('gradingPeriodId'), '1401', 'setting was already updated');
-  });
   this.gradebook.updateCurrentGradingPeriod('1401');
+  strictEqual(this.gradebook.getFilterColumnsBySetting('gradingPeriodId'), '1401', 'setting was already updated')
 });
 
 test('resets grading after updating the filter setting', function () {
-  this.gradebook.resetGrading.callsFake(() => {
-    strictEqual(this.gradebook.getFilterColumnsBySetting('gradingPeriodId'), '1401', 'setting was already updated');
-  });
   this.gradebook.updateCurrentGradingPeriod('1401');
+  strictEqual(this.gradebook.resetGrading.callCount, 1)
 });
 
 test('sorts grid grows after resetting grading', function () {
@@ -5885,17 +5925,33 @@ test('has no effect when the grading period has not changed', function () {
 
 QUnit.module('Gradebook#updateCurrentModule', {
   setup () {
+    this.server = sinon.createFakeServer({ respondImmediately: true })
+    this.server.respondWith([200, {}, ''])
+
+    const fixtures = document.getElementById('fixtures')
+    fixtures.innerHTML = '<div id="modules-filter-container"></div>'
+
     this.gradebook = createGradebook({
       settings: {
         filter_columns_by: {
           context_module_id: '2'
-        }
+        },
+        selected_view_options_filters: ['modules']
       }
     });
+    this.gradebook.setContextModules([
+      { id: '1', name: 'Module 1', position: 1 },
+      { id: '2', name: 'Another Module', position: 2 },
+      { id: '3', name: 'Module 2', position: 3 },
+    ]);
     this.spy(this.gradebook, 'setFilterColumnsBySetting');
-    this.stub($, 'ajaxJSON');
+    this.spy($, 'ajaxJSON')
     this.stub(this.gradebook, 'updateFilteredContentInfo');
     this.stub(this.gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+  },
+
+  teardown () {
+    this.server.restore()
   }
 });
 
@@ -5947,17 +6003,32 @@ test('has no effect when the module has not changed', function () {
 
 QUnit.module('Gradebook#updateCurrentAssignmentGroup', {
   setup () {
+    this.server = sinon.createFakeServer({ respondImmediately: true })
+    this.server.respondWith([200, {}, ''])
+
+    const fixtures = document.getElementById('fixtures')
+    fixtures.innerHTML = '<div id="assignment-group-filter-container"></div>'
+
     this.gradebook = createGradebook({
       settings: {
         filter_columns_by: {
           assignment_group_id: '2'
-        }
+        },
+        selected_view_options_filters: ['assignmentGroups']
       }
     });
+    this.gradebook.setAssignmentGroups({
+      '1': { id: '1' },
+      '2': { id: '2' }
+    })
     this.spy(this.gradebook, 'setFilterColumnsBySetting');
-    this.stub($, 'ajaxJSON');
+    this.spy($, 'ajaxJSON')
     this.stub(this.gradebook, 'updateFilteredContentInfo');
     this.stub(this.gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+  },
+
+  teardown () {
+    this.server.restore()
   }
 });
 
@@ -6115,7 +6186,102 @@ QUnit.module('Gradebook', () => {
       strictEqual(props.publishGradesToSis.isEnabled, false);
     });
   });
-});
+
+  QUnit.module('#updateFilterSettings', (hooks) => {
+    let gradebook
+    let currentFilters
+
+    hooks.beforeEach(() => {
+      $fixtures.innerHTML = `
+        <div id="assignment-group-filter-container"></div>
+        <div id="grading-periods-filter-container"></div>
+        <div id="modules-filter-container"></div>
+        <div id="sections-filter-container"></div>
+        <div id="search-filter-container">
+          <input type="text" />
+        </div>
+      `
+      currentFilters = ['assignmentGroups', 'modules', 'gradingPeriods', 'sections']
+      gradebook = createGradebook({
+        grading_period_set: {
+          id: '1501',
+          grading_periods: [{ id: '1401', name: 'Grading Period #1' }, { id: '1402', name: 'Grading Period #2' }]
+        },
+        sections: [{ id: '2001', name: 'Freshmen' }, { id: '2002', name: 'Sophomores' }],
+        sections_enabled: true,
+        settings: {
+          filter_columns_by: {
+            assignment_group_id: '2',
+            grading_period_id: '1402',
+            context_module_id: '2'
+          },
+          filter_rows_by: {
+            section_id: '2001'
+          },
+          selected_view_options_filters: currentFilters
+        }
+      })
+      gradebook.setAssignmentGroups({
+        '1': { id: '1', name: 'Assignment Group #1' },
+        '2': { id: '2', name: 'Assignment Group #2' }
+      })
+      gradebook.setContextModules([
+        { id: '1', name: 'Module 1', position: 1 },
+        { id: '2', name: 'Another Module', position: 2 },
+        { id: '3', name: 'Module 2', position: 3 }
+      ])
+
+      sinon.spy(gradebook, 'setFilterColumnsBySetting')
+      sinon.stub(gradebook, 'saveSettings')
+      sinon.stub(gradebook, 'resetGrading')
+      sinon.stub(gradebook, 'sortGridRows')
+      sinon.stub(gradebook, 'updateFilteredContentInfo')
+      sinon.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+      sinon.stub(gradebook, 'renderViewOptionsMenu')
+    })
+
+    hooks.afterEach(() => {
+      gradebook = null
+      $fixtures.innerHTML = ''
+    })
+
+    test('getFilterColumnsBySetting returns the assignment group filter setting', () => {
+      strictEqual(gradebook.getFilterColumnsBySetting('assignmentGroupId'), '2')
+    })
+
+    test('deletes the assignment group filter setting when the filter is hidden', () => {
+      gradebook.updateFilterSettings(currentFilters.filter(type => type !== 'assignmentGroups'))
+      strictEqual(gradebook.getFilterColumnsBySetting('assignmentGroupId'), null)
+    })
+
+    test('getFilterColumnsBySetting returns the grading period filter setting', () => {
+      strictEqual(gradebook.getFilterColumnsBySetting('gradingPeriodId'), '1402')
+    })
+
+    test('deletes the grading period filter setting when the filter is hidden', () => {
+      gradebook.updateFilterSettings(currentFilters.filter(type => type !== 'gradingPeriods'))
+      strictEqual(gradebook.getFilterColumnsBySetting('gradingPeriodId'), null)
+    })
+
+    test('getFilterColumnsBySetting returns the modules filter setting', () => {
+      strictEqual(gradebook.getFilterColumnsBySetting('contextModuleId'), '2')
+    })
+
+    test('deletes the modules filter setting when the filter is hidden', () => {
+      gradebook.updateFilterSettings(currentFilters.filter(type => type !== 'modules'))
+      strictEqual(gradebook.getFilterColumnsBySetting('contextModuleId'), null)
+    })
+
+    test('getFilterColumnsBySetting returns the sections filter setting', () => {
+      strictEqual(gradebook.getFilterRowsBySetting('sectionId'), '2001')
+    })
+
+    test('deletes the sections filter setting when the filter is hidden', () => {
+      gradebook.updateFilterSettings(currentFilters.filter(type => type !== 'sections'))
+      strictEqual(gradebook.getFilterRowsBySetting('sectionId'), null)
+    })
+  })
+})
 
 QUnit.module('Gradebook#getInitialGridDisplaySettings');
 
@@ -6420,12 +6586,15 @@ QUnit.module('Gradebook#onGridBlur', {
       name: 'Adam Jones',
       assignment_2301: {
         assignment_id: '2301', id: '2501', late: false, missing: false, excused: false, seconds_late: 0
-      }
+      },
+      enrollment_state: ['active']
     }]
     this.gradebook.gotChunkOfStudents(students);
+    this.gradebook.initGrid();
     this.gradebook.setAssignments({
       2301: {
         id: '2301',
+        assignment_group_id: '9000',
         course_id: '1',
         grading_type: 'points',
         name: 'Assignment 1',
@@ -6437,9 +6606,16 @@ QUnit.module('Gradebook#onGridBlur', {
         published: true,
         submission_types: ['online_text_entry']
       }
-    });
-    this.gradebook.initGrid();
+    })
+    this.gradebook.assignmentGroups = {9000: {group_weight: 100}}
+
+    // Since the activeLocationChanged handlers use delayed calls, we need to
+    // hijack timers and tick() before calling setActiveLocation() below.
+    const clock = sinon.useFakeTimers();
+    clock.tick(0);
     this.gradebook.gradebookGrid.gridSupport.state.setActiveLocation('body', { cell: 0, row: 0 });
+    clock.restore();
+
     this.spy(this.gradebook.gradebookGrid.gridSupport.state, 'blur');
   },
 
@@ -6624,9 +6800,12 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
     gradebook = createGradebook({
       default_grading_standard: defaultGradingScheme
     });
+    gradebook.setAssignmentGroups({9000: {group_weight: 100}})
     gradebook.setAssignments({
       2301: {
         id: '2301',
+        assignment_group_id: '9000',
+        points_posible: 10,
         course_id: '1',
         grading_type: 'points',
         name: 'Assignment 1',
@@ -6638,7 +6817,7 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
         published: true,
         submission_types: ['online_text_entry']
       }
-    });
+    })
     gradebook.students = {
       1101: {
         id: '1101',
@@ -6857,6 +7036,61 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
     strictEqual(gradebook.getEnterGradesAsSetting.withArgs('2301').callCount, 1);
     strictEqual(props.enterGradesAs, 'points');
   });
+
+  test('sets isNotCountedForScore to false when the assignment is not counted toward final grade', () => {
+    gradebook.assignments[2301].omit_from_final_grade = false
+    gradebook.setSubmissionTrayState(true, '1101', '2301')
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+    strictEqual(props.isNotCountedForScore, false)
+  })
+
+  test('sets isNotCountedForScore to false when the assignment is counted toward final grade', () => {
+    gradebook.assignments[2301].omit_from_final_grade = true
+    gradebook.setSubmissionTrayState(true, '1101', '2301')
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+    strictEqual(props.isNotCountedForScore, true)
+  })
+
+  test('sets isNotCountedForScore to false when the assignment group weight is not zero', () => {
+    gradebook.assignmentGroups[9000].group_weight = 100
+
+    gradebook.setSubmissionTrayState(true, '1101', '2301')
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+    strictEqual(props.isNotCountedForScore, false)
+  })
+
+  test('sets isNotCountedForScore to true when the assignmentgroup weight is zero', () => {
+    gradebook.assignmentGroups[9000].group_weight = 0
+
+    gradebook.setSubmissionTrayState(true, '1101', '2301')
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+    strictEqual(props.isNotCountedForScore, true)
+  })
+
+  test('sets pendingGradeInfo when a pending grade exists for the current student/assignment', () => {
+    const pendingGradeInfo = {enteredAs: null, excused: false, grade: null, score: null, valid: true}
+    const submission = {assignmentId: '2301', userId: '1101'}
+
+    gradebook.addPendingGradeInfo(submission, pendingGradeInfo)
+    gradebook.setSubmissionTrayState(true, '1101', '2301')
+
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+    deepEqual(
+      props.pendingGradeInfo,
+      { ...pendingGradeInfo, assignmentId: '2301', userId: '1101' }
+    )
+  })
+
+  test('sets pendingGradeInfo to null when no pending grade exists for the current student/assignment', () => {
+    const pendingGradeInfo = {enteredAs: null, excused: false, grade: null, score: null, valid: true}
+    const submission = {assignmentId: '2302', userId: '1101'}
+
+    gradebook.addPendingGradeInfo(submission, pendingGradeInfo)
+    gradebook.setSubmissionTrayState(true, '1101', '2301')
+
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+    notOk(props.pendingGradeInfo)
+  })
 });
 
 QUnit.module('Gradebook#renderSubmissionTray', {
@@ -6870,6 +7104,7 @@ QUnit.module('Gradebook#renderSubmissionTray', {
     this.gradebook.setAssignments({
       2301: {
         id: '2301',
+        assignment_group_id: '9000',
         course_id: '1',
         grading_type: 'points',
         name: 'Assignment 1',
@@ -6881,7 +7116,8 @@ QUnit.module('Gradebook#renderSubmissionTray', {
         published: true,
         submission_types: ['online_text_entry']
       }
-    });
+    })
+    this.gradebook.setAssignmentGroups({9000: {group_weight: 100}})
     this.gradebook.students = {
       1101: {
         id: '1101',
@@ -6971,6 +7207,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
     gradebook.setAssignments({
       2301: {
         id: '2301',
+        assignment_group_id: '9000',
         course_id: '1',
         grading_type: 'points',
         name: 'Assignment 1',
@@ -6982,7 +7219,8 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
         published: true,
         submission_types: ['online_text_entry']
       }
-    });
+    })
+    gradebook.setAssignmentGroups({9000: {group_weight: 100}})
 
     gradebook.students = {
       1100: {
@@ -7613,83 +7851,174 @@ test('affects submissions that are in not-closed grading periods', function () {
 });
 
 QUnit.module('Gradebook', () => {
-  QUnit.module('#setSubmissionUpdating()', hooks => {
-    let gradebook
+  let gradebook
+
+  QUnit.module('#addPendingGradeInfo()', hooks => {
+    let pendingGradeInfo
+    let submission
 
     hooks.beforeEach(() => {
       gradebook = createGradebook()
+      pendingGradeInfo = {enteredAs: 'points', excused: false, grade: 'A', score: 10, valid: true}
+      submission = {assignmentId: '2301', userId: '1101'}
     })
 
-    test('sets a submission as updating', () => {
-      const submission = {assignmentId: '2301', userId: '1101'}
-      gradebook.setSubmissionUpdating(submission, true)
-      strictEqual(gradebook.submissionIsUpdating(submission), true)
+    test('stores the pending grade info', () => {
+      gradebook.addPendingGradeInfo(submission, pendingGradeInfo)
+      deepEqual(
+        gradebook.getPendingGradeInfo(submission),
+        {...pendingGradeInfo, assignmentId: '2301', userId: '1101'}
+      )
     })
 
-    test('sets a submission as not updating', () => {
-      const submission = {assignmentId: '2301', userId: '1101'}
-      gradebook.setSubmissionUpdating(submission, true)
-      gradebook.setSubmissionUpdating(submission, false)
-      strictEqual(gradebook.submissionIsUpdating(submission), false)
+    test('replaces existing pending grade info', () => {
+      gradebook.addPendingGradeInfo(submission, pendingGradeInfo)
+      gradebook.addPendingGradeInfo(submission, {...pendingGradeInfo, score: 9.9})
+      strictEqual(gradebook.getPendingGradeInfo(submission).score, 9.9)
     })
 
     test('does not affect other submissions for the same assignment', () => {
-      gradebook.setSubmissionUpdating({assignmentId: '2301', userId: '1101'}, true)
-      strictEqual(gradebook.submissionIsUpdating({assignmentId: '2301', userId: '1102'}), false)
+      gradebook.addPendingGradeInfo(submission, pendingGradeInfo)
+      strictEqual(gradebook.getPendingGradeInfo({assignmentId: '2301', userId: '1102'}), null)
     })
 
     test('does not affect other submissions for the same user', () => {
-      gradebook.setSubmissionUpdating({assignmentId: '2301', userId: '1101'}, true)
-      strictEqual(gradebook.submissionIsUpdating({assignmentId: '2302', userId: '1101'}), false)
+      gradebook.addPendingGradeInfo(submission, pendingGradeInfo)
+      strictEqual(gradebook.getPendingGradeInfo({assignmentId: '2302', userId: '1101'}), null)
     })
   })
 
-  QUnit.module('#getUpdatingSubmission()', hooks => {
-    let gradebook
+  QUnit.module('#getPendingGradeInfo()', hooks => {
+    let pendingGradeInfo
+    let submission
 
     hooks.beforeEach(() => {
       gradebook = createGradebook()
+      pendingGradeInfo = {enteredAs: 'points', excused: false, grade: 'A', score: 10, valid: true}
+      submission = {assignmentId: '2301', userId: '1101'}
     })
 
-    test('returns the updating submission', () => {
-      const submission = {assignmentId: '2301', userId: '1101'}
-      gradebook.setSubmissionUpdating(submission, true)
-      strictEqual(gradebook.getUpdatingSubmission({assignmentId: '2301', userId: '1101'}), submission)
-    })
-
-    test('returns null when the submission is not updating', () => {
-      const submission = {assignmentId: '2301', userId: '1101'}
-      gradebook.setSubmissionUpdating(submission, true)
-      gradebook.setSubmissionUpdating(submission, false)
-      strictEqual(gradebook.getUpdatingSubmission({assignmentId: '2301', userId: '1101'}), null)
+    test('returns null when the submission has no pending grade info', () => {
+      strictEqual(gradebook.getPendingGradeInfo(submission), null)
     })
 
     test('does not match other submissions for the same assignment', () => {
-      gradebook.setSubmissionUpdating({assignmentId: '2301', userId: '1101'}, true)
-      strictEqual(gradebook.getUpdatingSubmission({assignmentId: '2301', userId: '1102'}), null)
+      gradebook.addPendingGradeInfo(submission, pendingGradeInfo)
+      strictEqual(gradebook.getPendingGradeInfo({assignmentId: '2301', userId: '1102'}), null)
     })
 
     test('does not match other submissions for the same user', () => {
-      gradebook.setSubmissionUpdating({assignmentId: '2301', userId: '1101'}, true)
-      strictEqual(gradebook.getUpdatingSubmission({assignmentId: '2302', userId: '1101'}), null)
+      gradebook.addPendingGradeInfo(submission, pendingGradeInfo)
+      strictEqual(gradebook.getPendingGradeInfo({assignmentId: '2302', userId: '1101'}), null)
+    })
+  })
+
+  QUnit.module('#removePendingGradeInfo()', hooks => {
+    let pendingGradeInfo
+    let submission
+
+    hooks.beforeEach(() => {
+      gradebook = createGradebook()
+      pendingGradeInfo = {enteredAs: 'points', excused: false, grade: 'A', score: 10, valid: true}
+      submission = {assignmentId: '2301', userId: '1101'}
+      gradebook.addPendingGradeInfo(submission, pendingGradeInfo)
+    })
+
+    test('removes pending grade info for the submission', () => {
+      gradebook.removePendingGradeInfo(submission)
+      strictEqual(gradebook.getPendingGradeInfo(submission), null)
+    })
+
+    test('does not affect other submissions for the same assignment', () => {
+      gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1102'}, pendingGradeInfo)
+      gradebook.removePendingGradeInfo(submission)
+      deepEqual(
+        gradebook.getPendingGradeInfo({assignmentId: '2301', userId: '1102'}),
+        {...pendingGradeInfo, assignmentId: '2301', userId: '1102'}
+      )
+    })
+
+    test('does not affect other submissions for the same user', () => {
+      gradebook.addPendingGradeInfo({assignmentId: '2302', userId: '1101'}, pendingGradeInfo)
+      gradebook.removePendingGradeInfo(submission)
+      deepEqual(
+        gradebook.getPendingGradeInfo({assignmentId: '2302', userId: '1101'}),
+        {...pendingGradeInfo, assignmentId: '2302', userId: '1101'}
+      )
+    })
+  })
+
+  QUnit.module('#submissionIsUpdating()', hooks => {
+    let pendingGradeInfo
+    let submission
+
+    hooks.beforeEach(() => {
+      gradebook = createGradebook()
+      pendingGradeInfo = {enteredAs: null, excused: false, grade: null, score: null, valid: true}
+      submission = {assignmentId: '2301', userId: '1101'}
+    })
+
+    test('returns true when the submission has valid pending grade info', () => {
+      gradebook.addPendingGradeInfo(submission, pendingGradeInfo)
+      strictEqual(gradebook.submissionIsUpdating(submission), true)
+    })
+
+    test('returns false when the submission has invalid pending grade info', () => {
+      Object.assign(pendingGradeInfo, {grade: 'invalid', valid: false})
+      gradebook.addPendingGradeInfo(submission, pendingGradeInfo)
+      strictEqual(gradebook.submissionIsUpdating(submission), false)
+    })
+
+    test('returns false when the submission has no pending grade info', () => {
+      strictEqual(gradebook.submissionIsUpdating(submission), false)
+    })
+
+    test('does not match other submissions for the same assignment', () => {
+      gradebook.addPendingGradeInfo(submission, pendingGradeInfo)
+      strictEqual(gradebook.submissionIsUpdating({assignmentId: '2301', userId: '1102'}), false)
+    })
+
+    test('does not match other submissions for the same user', () => {
+      gradebook.addPendingGradeInfo(submission, pendingGradeInfo)
+      strictEqual(gradebook.submissionIsUpdating({assignmentId: '2302', userId: '1101'}), false)
     })
   })
 
   QUnit.module('#gradeSubmission()', hooks => {
     let apiPromise
-    let gradebook
     let submission
-    let gradingData
+    let gradeInfo
     let response
+    let renderSubmissionTrayStub
 
     hooks.beforeEach(() => {
-      gradebook = createGradebook()
+      const defaultGradingScheme = [['A', 0.90], ['B', 0.80], ['C', 0.70], ['D', 0.60], ['E', 0.50]]
+      gradebook = createGradebook({default_grading_standard: defaultGradingScheme})
       gradebook.setAssignments({
-        2301: {id: '2301', name: 'Math Assignment', points_possible: 10, published: true},
-        2302: {id: '2302', name: 'English Assignment', points_possible: 5, published: false}
+        2301: {
+          grading_type: 'letter_grade',
+          id: '2301',
+          name: 'Math Assignment',
+          points_possible: 10,
+          published: true
+        },
+        2302: {
+          grading_type: 'letter_grade',
+          id: '2302',
+          name: 'English Assignment',
+          points_possible: 5,
+          published: false
+        }
       })
-      submission = {id: '2501', assignmentId: '2301', userId: '1101'}
-      gradingData = {enteredAs: 'points', excused: false, grade: '10', score: 10}
+      submission = {
+        assignmentId: '2301',
+        enteredScore: 9,
+        enteredGrade: 'B',
+        excused: false,
+        id: '2501',
+        userId: '1101'
+      }
+      gradeInfo = {enteredAs: 'points', excused: false, grade: 'A', score: 10, valid: true}
       response = {
         data: {score: 10}
       }
@@ -7698,22 +8027,24 @@ QUnit.module('Gradebook', () => {
         return apiPromise
       })
       sinon.stub($, 'flashWarning')
+      renderSubmissionTrayStub = sinon.stub(gradebook, 'renderSubmissionTray')
     })
 
     hooks.afterEach(() => {
       $.flashWarning.restore()
+      renderSubmissionTrayStub.restore()
     })
 
     test('updates the submission via Gradebook.apiUpdateSubmission', () => {
-      gradebook.gradeSubmission(submission, gradingData)
+      gradebook.gradeSubmission(submission, gradeInfo)
       return apiPromise.then(() => {
         strictEqual(gradebook.apiUpdateSubmission.callCount, 1)
       })
     })
 
     test('sets "submission.excuse" to true when the submission is excused', () => {
-      gradingData = {enteredAs: 'excused', excused: true, grade: null, score: null}
-      gradebook.gradeSubmission(submission, gradingData)
+      gradeInfo = {enteredAs: 'excused', excused: true, grade: null, score: null, valid: true}
+      gradebook.gradeSubmission(submission, gradeInfo)
       return apiPromise.then(() => {
         const [submissionData] = gradebook.apiUpdateSubmission.firstCall.args
         strictEqual(submissionData.excuse, true)
@@ -7721,8 +8052,8 @@ QUnit.module('Gradebook', () => {
     })
 
     test('does not set "submission.excuse" when the submission is not excused', () => {
-      gradingData.excused = false
-      gradebook.gradeSubmission(submission, gradingData)
+      gradeInfo.excused = false
+      gradebook.gradeSubmission(submission, gradeInfo)
       return apiPromise.then(() => {
         const [submissionData] = gradebook.apiUpdateSubmission.firstCall.args
         notOk('excuse' in submissionData, 'does not set "excuse"')
@@ -7730,8 +8061,8 @@ QUnit.module('Gradebook', () => {
     })
 
     test('sets "submission.posted_grade" to the entered grade when the submission is not excused', () => {
-      gradingData.excused = false
-      gradebook.gradeSubmission(submission, gradingData)
+      gradeInfo.excused = false
+      gradebook.gradeSubmission(submission, gradeInfo)
       return apiPromise.then(() => {
         const [submissionData] = gradebook.apiUpdateSubmission.firstCall.args
         equal(submissionData.posted_grade, 10)
@@ -7739,8 +8070,8 @@ QUnit.module('Gradebook', () => {
     })
 
     test('does not set "submission.posted_grade" when the submission is excused', () => {
-      gradingData = {enteredAs: 'excused', excused: true, grade: null, score: null}
-      gradebook.gradeSubmission(submission, gradingData)
+      gradeInfo = {enteredAs: 'excused', excused: true, grade: null, score: null, valid: true}
+      gradebook.gradeSubmission(submission, gradeInfo)
       return apiPromise.then(() => {
         const [submissionData] = gradebook.apiUpdateSubmission.firstCall.args
         notOk('posted_grade' in submissionData, 'does not set "excuse"')
@@ -7748,8 +8079,8 @@ QUnit.module('Gradebook', () => {
     })
 
     test('uses the score from the grading data when the grade was entered as points', () => {
-      gradingData = {enteredAs: 'points', excused: false, grade: '78%', score: 7.8}
-      gradebook.gradeSubmission(submission, gradingData)
+      gradeInfo = {enteredAs: 'points', excused: false, grade: '78%', score: 7.8, valid: true}
+      gradebook.gradeSubmission(submission, gradeInfo)
       return apiPromise.then(() => {
         const [submissionData] = gradebook.apiUpdateSubmission.firstCall.args
         strictEqual(submissionData.posted_grade, 7.8)
@@ -7757,8 +8088,8 @@ QUnit.module('Gradebook', () => {
     })
 
     test('uses the score from the grading data when the grade was entered as a percent', () => {
-      gradingData = {enteredAs: 'percent', excused: false, grade: '78%', score: 7.8}
-      gradebook.gradeSubmission(submission, gradingData)
+      gradeInfo = {enteredAs: 'percent', excused: false, grade: '78%', score: 7.8, valid: true}
+      gradebook.gradeSubmission(submission, gradeInfo)
       return apiPromise.then(() => {
         const [submissionData] = gradebook.apiUpdateSubmission.firstCall.args
         strictEqual(submissionData.posted_grade, 7.8)
@@ -7766,8 +8097,8 @@ QUnit.module('Gradebook', () => {
     })
 
     test('uses the grade from the grading data when the grade was entered as a grading scheme key', () => {
-      gradingData = {enteredAs: 'gradingScheme', excused: false, grade: 'A', score: 7.8}
-      gradebook.gradeSubmission(submission, gradingData)
+      gradeInfo = {enteredAs: 'gradingScheme', excused: false, grade: 'A', score: 7.8, valid: true}
+      gradebook.gradeSubmission(submission, gradeInfo)
       return apiPromise.then(() => {
         const [submissionData] = gradebook.apiUpdateSubmission.firstCall.args
         strictEqual(submissionData.posted_grade, 'A')
@@ -7775,8 +8106,8 @@ QUnit.module('Gradebook', () => {
     })
 
     test('uses the grade from the grading data when the grade was entered as a pass/fail key', () => {
-      gradingData = {enteredAs: 'gradingScheme', excused: false, grade: 'complete', score: 10}
-      gradebook.gradeSubmission(submission, gradingData)
+      gradeInfo = {enteredAs: 'gradingScheme', excused: false, grade: 'complete', score: 10, valid: true}
+      gradebook.gradeSubmission(submission, gradeInfo)
       return apiPromise.then(() => {
         const [submissionData] = gradebook.apiUpdateSubmission.firstCall.args
         strictEqual(submissionData.posted_grade, 'complete')
@@ -7784,56 +8115,26 @@ QUnit.module('Gradebook', () => {
     })
 
     test('uses an empty string "" when the grade is cleared', () => {
-      gradingData = {enteredAs: null, excused: false, grade: null, score: null}
-      gradebook.gradeSubmission(submission, gradingData)
+      gradeInfo = {enteredAs: null, excused: false, grade: null, score: null, valid: true}
+      gradebook.gradeSubmission(submission, gradeInfo)
       return apiPromise.then(() => {
         const [submissionData] = gradebook.apiUpdateSubmission.firstCall.args
         strictEqual(submissionData.posted_grade, '')
       })
     })
 
-    QUnit.module('"updatingSubmission" parameter', contextHooks => {
-      let updatingSubmission
-
-      contextHooks.beforeEach(() => {
-        gradingData = {enteredAs: 'points', excused: false, grade: 'A', score: 9.5}
-        gradebook.apiUpdateSubmission.returns(new Promise(() => {}))
-        gradebook.gradeSubmission(submission, gradingData)
-        updatingSubmission = gradebook.apiUpdateSubmission.firstCall.args[1]
-      })
-
-      test('sets "updatingSubmission.assignmentId" to the assignment id of the submission', () => {
-        strictEqual(updatingSubmission.assignmentId, '2301')
-      })
-
-      test('sets "updatingSubmission.enteredGrade" to the grading data "grade"', () => {
-        equal(updatingSubmission.enteredGrade, 'A')
-      })
-
-      test('sets "updatingSubmission.enteredScore" to the grading data "score"', () => {
-        strictEqual(updatingSubmission.enteredScore, 9.5)
-      })
-
-      test('sets "updatingSubmission.excused" to the grading data "excused"', () => {
-        strictEqual(updatingSubmission.excused, false)
-      })
-
-      test('sets "updatingSubmission.grade" to the grading data "grade"', () => {
-        equal(updatingSubmission.grade, 'A')
-      })
-
-      test('sets "updatingSubmission.score" to the grading data "score"', () => {
-        strictEqual(updatingSubmission.score, 9.5)
-      })
-
-      test('sets "updatingSubmission.userId" to the user id of the submission', () => {
-        strictEqual(updatingSubmission.userId, '1101')
+    test('includes gradeInfo as the second parameter', () => {
+      gradeInfo = {enteredAs: 'points', excused: false, grade: 'A', score: 9.5, valid: true}
+      gradebook.gradeSubmission(submission, gradeInfo)
+      return apiPromise.then(() => {
+        const [, givenInfo] = gradebook.apiUpdateSubmission.firstCall.args
+        deepEqual(givenInfo, gradeInfo)
       })
     })
 
     test('warns about unusually high grades', () => {
       response.data.score = 15
-      gradebook.gradeSubmission(submission, gradingData)
+      gradebook.gradeSubmission(submission, gradeInfo)
       return apiPromise.then(() => {
         strictEqual($.flashWarning.callCount, 1)
       })
@@ -7841,18 +8142,114 @@ QUnit.module('Gradebook', () => {
 
     test('does not warn about slightly high grades', () => {
       response.data.score = 14.99
-      gradebook.gradeSubmission(submission, gradingData)
+      gradebook.gradeSubmission(submission, gradeInfo)
       return apiPromise.then(() => {
         strictEqual($.flashWarning.callCount, 0)
       })
     })
 
     test('does not warn about the given grade when the update fails', () => {
-      gradingData.grade = '1000'
+      gradeInfo.grade = '1000'
       apiPromise = Promise.reject(new Error('FAIL'))
       gradebook.apiUpdateSubmission.returns(apiPromise)
-      return gradebook.gradeSubmission(submission, gradingData).catch(() => {
+      return gradebook.gradeSubmission(submission, gradeInfo).catch(() => {
         strictEqual($.flashWarning.callCount, 0)
+      })
+    })
+
+    QUnit.module('when the grade is unchanged', contextHooks => {
+      contextHooks.beforeEach(() => {
+        const invalidGradeInfo = {
+          enteredAs: null,
+          excused: false,
+          grade: 'invalid',
+          score: null,
+          valid: false
+        }
+        gradebook.addPendingGradeInfo(submission, invalidGradeInfo)
+        Object.assign(gradeInfo, {enteredAs: 'points', grade: 'B', score: 9})
+        // return to ensure that any changes cause the hook to wait for the
+        // potential promise from the api
+        return gradebook.gradeSubmission(submission, gradeInfo)
+      })
+
+      test('removes an existing pending grade info for the submission', () => {
+        strictEqual(gradebook.getPendingGradeInfo(submission), null)
+      })
+
+      test('does not update the grade via the api', () => {
+        strictEqual(gradebook.apiUpdateSubmission.callCount, 0)
+      })
+
+      test('re-renders the submission tray if it is open', function () {
+        sinon.stub(gradebook, 'getSubmissionTrayState').callsFake(() => ({ open: true }))
+
+        gradebook.gradeSubmission(submission, gradeInfo)
+        strictEqual(gradebook.renderSubmissionTray.callCount, 1)
+
+        gradebook.getSubmissionTrayState.restore()
+      })
+
+      test('does not attempt to re-render the submission tray if it is not open', function () {
+        gradebook.gradeSubmission(submission, gradeInfo)
+        strictEqual(gradebook.renderSubmissionTray.callCount, 0)
+      })
+    })
+
+    QUnit.module('when the grade info is invalid', contextHooks => {
+      contextHooks.beforeEach(() => {
+        gradeInfo = {
+          enteredAs: null,
+          excused: false,
+          grade: 'invalid',
+          score: null,
+          valid: false
+        }
+        // return to ensure that any changes cause the hook to wait for the
+        // potential promise from the api
+        sinon.stub(FlashAlert, 'showFlashAlert')
+        return gradebook.gradeSubmission(submission, gradeInfo)
+      })
+
+      contextHooks.afterEach(() => {
+        FlashAlert.showFlashAlert.restore()
+      })
+
+      test('adds the pending grade info for the submission', () => {
+        deepEqual(
+          gradebook.getPendingGradeInfo({assignmentId: '2301', userId: '1101'}),
+          {...gradeInfo, assignmentId: '2301', userId: '1101'}
+        )
+      })
+
+      test('does not update the grade via the api', () => {
+        strictEqual(gradebook.apiUpdateSubmission.callCount, 0)
+      })
+
+      test('shows a flash alert', function () {
+        strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      })
+
+      test('uses the "error" type for the flash alert', function () {
+        const [{type}] = FlashAlert.showFlashAlert.lastCall.args
+        equal(type, 'error')
+      })
+
+      test('mentions the invalid grade in the flash alert', function () {
+        const [{message}] = FlashAlert.showFlashAlert.lastCall.args
+        ok(message.includes('invalid grade'))
+      })
+
+      test('re-renders the submission tray if it is open', function () {
+        sinon.stub(gradebook, 'getSubmissionTrayState').callsFake(() => ({ open: true }))
+        gradebook.gradeSubmission(submission, gradeInfo)
+        strictEqual(gradebook.renderSubmissionTray.callCount, 1)
+        gradebook.getSubmissionTrayState.restore()
+      })
+
+      test('does not attempt to re-render the submission tray if it is not open', function () {
+        gradebook.gradeSubmission(submission, gradeInfo)
+        strictEqual(gradebook.renderSubmissionTray.callCount, 0)
       })
     })
   })
@@ -7894,45 +8291,38 @@ QUnit.module('Gradebook#updateSubmissionAndRenderSubmissionTray', {
   }
 });
 
-test('sets the submission as updating before sending the request', function () {
+test('stores the pending grade info before sending the request', function () {
   this.stub(this.gradebook, 'renderSubmissionTray');
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
   strictEqual(this.gradebook.submissionIsUpdating(this.submission), true);
 });
 
-test('includes "enteredGrade" when setting the submission as updating', function () {
+test('includes "grade" when storing the pending grade info', function () {
   sinon.stub(this.gradebook, 'renderSubmissionTray')
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
-  const updatingSubmission = this.gradebook.getUpdatingSubmission(this.submission)
-  equal(updatingSubmission.enteredGrade, 'A')
+  const pendingGradeInfo = this.gradebook.getPendingGradeInfo(this.submission)
+  equal(pendingGradeInfo.grade, 'A')
 })
 
-test('includes "enteredScore" when setting the submission as updating', function () {
+test('includes "score" when storing the pending grade info', function () {
   sinon.stub(this.gradebook, 'renderSubmissionTray')
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
-  const updatingSubmission = this.gradebook.getUpdatingSubmission(this.submission)
-  strictEqual(updatingSubmission.enteredScore, 9.5)
+  const pendingGradeInfo = this.gradebook.getPendingGradeInfo(this.submission)
+  strictEqual(pendingGradeInfo.score, 9.5)
 })
 
-test('includes "excused" when setting the submission as updating', function () {
+test('includes "excused" when storing the pending grade info', function () {
   sinon.stub(this.gradebook, 'renderSubmissionTray')
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
-  const updatingSubmission = this.gradebook.getUpdatingSubmission(this.submission)
-  strictEqual(updatingSubmission.excused, false)
+  const pendingGradeInfo = this.gradebook.getPendingGradeInfo(this.submission)
+  strictEqual(pendingGradeInfo.excused, false)
 })
 
-test('includes "grade" when setting the submission as updating', function () {
+test('includes "valid" when storing the pending grade info', function () {
   sinon.stub(this.gradebook, 'renderSubmissionTray')
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
-  const updatingSubmission = this.gradebook.getUpdatingSubmission(this.submission)
-  equal(updatingSubmission.grade, 'B')
-})
-
-test('includes "score" when setting the submission as updating', function () {
-  sinon.stub(this.gradebook, 'renderSubmissionTray')
-  this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
-  const updatingSubmission = this.gradebook.getUpdatingSubmission(this.submission)
-  strictEqual(updatingSubmission.score, 8.5)
+  const pendingGradeInfo = this.gradebook.getPendingGradeInfo(this.submission)
+  strictEqual(pendingGradeInfo.valid, true)
 })
 
 test('renders the tray before sending the request', function () {
@@ -7941,12 +8331,12 @@ test('renders the tray before sending the request', function () {
   strictEqual(this.gradebook.renderSubmissionTray.callCount, 1);
 });
 
-test('on success the submission is not in an updating state', function () {
+test('on success the pending grade info is removed', function () {
   this.stub(this.gradebook, 'renderSubmissionTray');
   this.stub(this.gradebook, 'updateSubmissionsFromExternal');
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
   this.promise.thenFn({ data: { all_submissions: [{ id: '293', ...this.submission }] } });
-  strictEqual(this.gradebook.submissionIsUpdating(this.submission), false);
+  strictEqual(this.gradebook.getPendingGradeInfo(this.submission), null)
 });
 
 test('on success the tray has been rendered a second time', function () {
@@ -7957,11 +8347,13 @@ test('on success the tray has been rendered a second time', function () {
   strictEqual(this.gradebook.renderSubmissionTray.callCount, 2);
 });
 
-test('on failure the submission is not in an updating state', function () {
+test('on failure the pending grade info is removed', function () {
+  // without a retry strategy, clearing the request data is the only way to
+  // revert to a stable state
   this.stub(this.gradebook, 'renderSubmissionTray');
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
   return this.promise.catchFn(new Error('A failure')).catch(() => {
-    strictEqual(this.gradebook.submissionIsUpdating(this.submission), false)
+    strictEqual(this.gradebook.getPendingGradeInfo(this.submission), null)
   });
 });
 

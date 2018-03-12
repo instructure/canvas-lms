@@ -17,7 +17,6 @@
 #
 
 # @API ePub Exports
-# @beta
 #
 # API for exporting courses as an ePub
 #

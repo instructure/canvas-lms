@@ -22,6 +22,7 @@ class EffectiveDueDates
   # and assignments in a course. You can pass it a list of assignments,
   # assignment id's, or a relation, but they MUST be from the same course.
   # Also cross-shard id's won't work.
+
   def initialize(context, *assignment_collection)
     raise "Context must be a course" unless context.is_a?(Course)
     raise "Context must have an id" unless context.id

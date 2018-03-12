@@ -22,13 +22,16 @@ module UserSearch
     return User.none if search_term.strip.empty?
     base_scope = scope_for(context, searcher, options.slice(:enrollment_type, :enrollment_role,
       :enrollment_role_id, :exclude_groups, :enrollment_state, :include_inactive_enrollments, :sort, :order))
+    @db_union = nil
     if search_term.to_s =~ Api::ID_REGEX
       db_id = Shard.relative_id_for(search_term, Shard.current, Shard.current)
       scope = base_scope.where(id: db_id)
-      if scope.exists?
-        return scope
-      elsif !SearchTermHelper.valid_search_term?(search_term)
-        return User.none
+      # if the search_term is an id that is really big we will assume it is a
+      # canvas global_id
+      return scope if db_id > Shard::IDS_PER_SHARD
+      @db_union = "SELECT id FROM #{User.quoted_table_name} WHERE users.id IN (:db_id) \n UNION" if scope.exists?
+      unless SearchTermHelper.valid_search_term?(search_term)
+        return User.none unless scope.exists?
       end
       # no user found by id, so lets go ahead with the regular search, maybe this person just has a ton of numbers in their name
     end
@@ -56,9 +59,11 @@ module UserSearch
     conditions = []
 
     if complex_search_enabled? && !options[:restrict_search]
-      conditions << complex_sql << pattern << pattern << root_account << pattern << CommunicationChannel::TYPE_EMAIL << pattern
+      # db_id is only used if the search_term.to_s =~ Api::ID_REGEX
+      params = {pattern: pattern, account: root_account, path_type: CommunicationChannel::TYPE_EMAIL, db_id: search_term}
+      conditions << complex_sql << params
     else
-      conditions << like_condition('users.name') << pattern
+      conditions << like_condition('users.name') << {pattern: pattern}
     end
 
     conditions
@@ -174,14 +179,18 @@ module UserSearch
           WHERE (#{like_condition('pseudonyms.sis_user_id')} OR
             #{like_condition('pseudonyms.unique_id')})
             AND pseudonyms.workflow_state='active'
-            AND pseudonyms.account_id = ?
+            AND pseudonyms.account_id = :account
         UNION
         SELECT id FROM #{User.quoted_table_name} WHERE (#{like_condition('users.name')})
         UNION
-        SELECT user_id FROM #{CommunicationChannel.quoted_table_name}
-          WHERE communication_channels.path_type = ?
+        #{@db_union}
+        SELECT communication_channels.user_id FROM #{CommunicationChannel.quoted_table_name}
+          WHERE EXISTS (SELECT 1 FROM #{UserAccountAssociation.quoted_table_name} AS uaa
+                        WHERE uaa.account_id= :account
+                          AND uaa.user_id=communication_channels.user_id)
+            AND communication_channels.path_type = :path_type
             AND #{like_condition('communication_channels.path')}
-            AND communication_channels.workflow_state in ('active', 'unconfirmed')
+            AND communication_channels.workflow_state IN ('active', 'unconfirmed')
       )
     SQL
   end
@@ -195,7 +204,7 @@ module UserSearch
   end
 
   def self.like_condition(value)
-    ActiveRecord::Base.like_condition(value, 'lower(?)')
+    ActiveRecord::Base.like_condition(value, 'lower(:pattern)')
   end
 
   def self.wildcard_pattern(value, options)

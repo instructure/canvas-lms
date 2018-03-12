@@ -323,8 +323,9 @@ import { uploadFile as rawUploadFile } from 'jsx/shared/upload_file'
           'attachment[intent]': options.intent,
           'attachment[asset_string]': options.asset_string,
           'attachment[filename]': item.name,
+          'attachment[size]': item.size,
           'attachment[context_code]': options.context_code,
-          'attachment[duplicate_handling]': 'rename'
+          'attachment[on_duplicate]': 'rename'
         }, options.formDataTarget == 'uploadDataUrl' ? options.formData : {});
         if (item.files.length === 1) {
           attrs['attachment[content_type]'] = item.files[0].type;
@@ -1138,8 +1139,6 @@ import { uploadFile as rawUploadFile } from 'jsx/shared/upload_file'
       var field = $form.find('[name="'+name+'"]');
       if (!field.length) {return;}
       field.attr({'aria-required': 'true'});
-      // TODO: enable this, maybe when Safari supports it
-      // field.attr({required: true});
       field.each(function() {
         if (!this.id) {return;}
         var label = $('label[for="'+this.id+'"]');

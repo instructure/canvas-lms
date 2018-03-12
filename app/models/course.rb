@@ -28,6 +28,7 @@ class Course < ActiveRecord::Base
   include ContentLicenses
   include TurnitinID
   include Courses::ItemVisibilityHelper
+  include OutcomeImportContext
 
   attr_accessor :teacher_names, :master_course
   attr_writer :student_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :primary_enrollment_date, :invitation, :updating_master_template_id
@@ -198,7 +199,6 @@ class Course < ActiveRecord::Base
   prepend Profile::Association
 
   before_save :assign_uuid
-  before_save :assign_default_view
   before_validation :assert_defaults
   before_save :update_enrollments_later
   before_save :update_show_total_grade_as_on_weighting_scheme_change
@@ -217,6 +217,7 @@ class Course < ActiveRecord::Base
   before_validation :verify_unique_ids
   validate :validate_course_dates
   validate :validate_course_image
+  validate :validate_default_view
   validates_presence_of :account_id, :root_account_id, :enrollment_term_id, :workflow_state
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
@@ -400,6 +401,19 @@ class Course < ActiveRecord::Base
 
   def valid_course_image_url?(image_url)
     URI.parse(image_url) rescue false
+  end
+
+  def validate_default_view
+    if self.default_view_changed?
+      if !%w{assignments feed modules syllabus wiki}.include?(self.default_view)
+        self.errors.add(:default_view, t("Home page is not valid"))
+        return false
+      elsif self.default_view == 'wiki' && !(self.wiki_id && self.wiki.has_front_page?)
+        self.errors.add(:default_view, t("A Front Page is required"))
+        return false
+      end
+    end
+    true
   end
 
   def image
@@ -915,6 +929,7 @@ class Course < ActiveRecord::Base
     if self.course_format && !['on_campus', 'online', 'blended'].include?(self.course_format)
       self.course_format = nil
     end
+    self.default_view ||= default_home_page
     true
   end
 
@@ -1089,8 +1104,15 @@ class Course < ActiveRecord::Base
   end
 
   def recompute_student_scores_without_send_later(student_ids = nil, opts = {})
-    student_ids = admin_visible_student_enrollments.where(user_id: student_ids).pluck(:user_id) if student_ids
-    student_ids ||= admin_visible_student_enrollments.pluck(:user_id)
+    if student_ids.present?
+      # We were given student_ids.  Let's see how many of those students can even see this assignment
+      student_ids = admin_visible_student_enrollments.where(user_id: student_ids).pluck(:user_id)
+    end
+
+    # We were either not given any student_ids or none of those students could see this assignment.
+    # Let's get them all!
+    student_ids = admin_visible_student_enrollments.pluck(:user_id) unless student_ids.present?
+
     Rails.logger.debug "GRADES: recomputing scores in course=#{global_id} students=#{student_ids.inspect}"
     Enrollment.recompute_final_score(
       student_ids,
@@ -1464,6 +1486,12 @@ class Course < ActiveRecord::Base
 
   def recently_ended?
     conclude_at && conclude_at < Time.now.utc && conclude_at > 1.month.ago
+  end
+
+  # People may conclude courses and then unclude them. This is a good alias_method
+  # to check for in situations where we are dependent on those cases
+  def inactive?
+    self.deleted? || self.completed?
   end
 
   # Public: Return true if the end date for a course (or its term, if the course doesn't have one) has passed.
@@ -2800,10 +2828,6 @@ class Course < ActiveRecord::Base
     :closed
   end
 
-  def assign_default_view
-    self.default_view ||= default_home_page
-  end
-
   def default_home_page
     "modules"
   end
@@ -3112,6 +3136,10 @@ class Course < ActiveRecord::Base
     Rails.cache.fetch(['late_policy_tainted_submissions', self].cache_key, expires_in: expire_time) do
       submissions.except(:order).where(late_policy_status: ['missing', 'late', 'none']).exists?
     end
+  end
+
+  def grading_standard_or_default
+    default_grading_standard || GradingStandard.default_instance
   end
 
   private

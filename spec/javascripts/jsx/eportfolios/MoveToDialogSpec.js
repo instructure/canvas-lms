@@ -16,97 +16,95 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-dom',
-  'react-addons-test-utils',
-  'lodash',
-  'jsx/eportfolios/MoveToDialog',
-  'helpers/assertions'
-], (React, ReactDOM, TestUtils, _, MoveToDialog, assertions) => {
-  let root
-  let appRoot
-  let applicationElement
+import React from 'react'
+import ReactDOM from 'react-dom'
+import TestUtils from 'react-addons-test-utils'
+import _ from 'lodash'
+import MoveToDialog from 'jsx/eportfolios/MoveToDialog'
+import assertions from 'helpers/assertions'
 
-  const mountDialog = (opts = {}) => {
-    opts = _.extend({}, {
-      header: 'This is a dialog',
-      source: { label: 'foo', id: '0' },
-      destinations: [{ label: 'bar', id: '1' }, { label: 'baz', id: '2' }]
-    }, opts)
+let root
+let appRoot
+let applicationElement
 
-    const element = React.createElement(MoveToDialog, opts)
-    const dialog = ReactDOM.render(element, root)
-    return dialog
+const mountDialog = (opts = {}) => {
+  opts = _.extend({}, {
+    header: 'This is a dialog',
+    source: { label: 'foo', id: '0' },
+    destinations: [{ label: 'bar', id: '1' }, { label: 'baz', id: '2' }]
+  }, opts)
+
+  const element = React.createElement(MoveToDialog, opts)
+  const dialog = ReactDOM.render(element, root)
+  return dialog
+}
+
+QUnit.module('MoveToDialog', {
+  setup () {
+    root = document.createElement('div')
+    appRoot = document.createElement('div')
+    applicationElement = document.createElement('div')
+    applicationElement.id = 'application'
+    document.getElementById('fixtures').appendChild(root)
+    document.getElementById('fixtures').appendChild(appRoot)
+    document.getElementById('fixtures').appendChild(applicationElement)
+  },
+
+  teardown () {
+    ReactDOM.unmountComponentAtNode(root)
+    appRoot.removeAttribute('aria-hidden')
+    document.getElementById('fixtures').innerHTML = ''
   }
+})
 
-  QUnit.module('MoveToDialog', {
-    setup () {
-      root = document.createElement('div')
-      appRoot = document.createElement('div')
-      applicationElement = document.createElement('div')
-      applicationElement.id = 'application'
-      document.getElementById('fixtures').appendChild(root)
-      document.getElementById('fixtures').appendChild(appRoot)
-      document.getElementById('fixtures').appendChild(applicationElement)
-    },
+test('includes all destinations in select', () => {
+  const dialog = mountDialog()
+  const options = TestUtils.scryRenderedDOMComponentsWithTag(dialog.refs.select, 'option')
+  ok( options.find((opt) => (opt.label === 'bar')) )
+  ok( options.find((opt) => (opt.label === 'baz')) )
+})
 
-    teardown () {
-      ReactDOM.unmountComponentAtNode(root)
-      appRoot.removeAttribute('aria-hidden')
-      document.getElementById('fixtures').innerHTML = ''
+test('includes "at the bottom" in select', () => {
+  const dialog = mountDialog()
+  const options = TestUtils.scryRenderedDOMComponentsWithTag(dialog.refs.select, 'option')
+  ok( options.find((opt) => (opt.label === '-- At the bottom --')) )
+})
+
+test('calls onMove with a destination id when selected', (assert) => {
+  const done = assert.async()
+  const dialog = mountDialog({
+    onMove: (val) => {
+      ok(val === '1')
+      done()
     }
   })
+  const button = document.getElementById('MoveToDialog__move')
+  TestUtils.Simulate.click(button)
+})
 
-  test('includes all destinations in select', () => {
-    const dialog = mountDialog()
-    const options = TestUtils.scryRenderedDOMComponentsWithTag(dialog.refs.select, 'option')
-    ok( options.find((opt) => (opt.label === 'bar')) )
-    ok( options.find((opt) => (opt.label === 'baz')) )
+test('does not call onMove when cancelled via close button', (assert) => {
+  const done = assert.async()
+  const dialog = mountDialog({
+    onMove: (val) => {
+      ok(false)
+    },
+    onClose: () => {
+      expect(0)
+      done()
+    }
   })
+  const button = document.getElementById('MoveToDialog__cancel')
+  TestUtils.Simulate.click(button)
+})
 
-  test('includes "at the bottom" in select', () => {
-    const dialog = mountDialog()
-    const options = TestUtils.scryRenderedDOMComponentsWithTag(dialog.refs.select, 'option')
-    ok( options.find((opt) => (opt.label === '-- At the bottom --')) )
+test('does not fail when no onMove is specified', (assert) => {
+  const done = assert.async()
+  const dialog = mountDialog({
+    onClose: () => {
+      expect(0)
+      done()
+    }
   })
-
-  test('calls onMove with a destination id when selected', (assert) => {
-    const done = assert.async()
-    const dialog = mountDialog({
-      onMove: (val) => {
-        ok(val === '1')
-        done()
-      }
-    })
-    const button = document.getElementById('MoveToDialog__move')
-    TestUtils.Simulate.click(button)
-  })
-
-  test('does not call onMove when cancelled via close button', (assert) => {
-    const done = assert.async()
-    const dialog = mountDialog({
-      onMove: (val) => {
-        ok(false)
-      },
-      onClose: () => {
-        expect(0)
-        done()
-      }
-    })
-    const button = document.getElementById('MoveToDialog__cancel')
-    TestUtils.Simulate.click(button)
-  })
-
-  test('does not fail when no onMove is specified', (assert) => {
-    const done = assert.async()
-    const dialog = mountDialog({
-      onClose: () => {
-        expect(0)
-        done()
-      }
-    })
-    const button = document.getElementById('MoveToDialog__move')
-    TestUtils.Simulate.click(button)
-  })
+  const button = document.getElementById('MoveToDialog__move')
+  TestUtils.Simulate.click(button)
 })

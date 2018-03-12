@@ -37,11 +37,6 @@ shared_examples 'home_page' do |context|
     expect(f('.coming_up .event a b')).to include_text("#{event.title}")
   end
 
-  it "should display a view calendar link on the group home page", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273603, teacher: 319910) do
-    get url
-    expect(f('.event-list-view-calendar')).to be_displayed
-  end
-
   it "should have a working link to add an announcement from the group home page", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273604, teacher: 319911) do
     get url
     expect_new_page_load { fln('Announcement').click }

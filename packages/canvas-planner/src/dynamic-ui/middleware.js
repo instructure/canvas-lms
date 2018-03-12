@@ -17,8 +17,11 @@
  */
 
 export function createDynamicUiMiddleware (uiManager) {
-  return store => next => action => {
-    uiManager.handleAction(action);
-    return next(action);
+  return store => {
+    uiManager.setStore(store);
+    return next => action => {
+      uiManager.handleAction(action);
+      return next(action);
+    };
   };
 }

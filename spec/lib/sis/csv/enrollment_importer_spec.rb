@@ -535,20 +535,22 @@ describe SIS::CSV::EnrollmentImporter do
     expect(e.completed_at).to be_present
   end
 
-  it "should only queue up one DueDateCacher job per course" do
-    course_model(:account => @account, :sis_source_id => 'C001').assignments.create!
-    course_model(:account => @account, :sis_source_id => 'C002').assignments.create!
-    @course.assignments.create!
-    user_with_managed_pseudonym(:account => @account, :sis_user_id => 'U001')
-    user_with_managed_pseudonym(:account => @account, :sis_user_id => 'U002')
+  it 'should only queue up one DueDateCacher job per course' do
+    course1 = course_model(account: @account, sis_source_id: 'C001')
+    course2 = course_model(account: @account, sis_source_id: 'C002')
+    user1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
+    user2 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U002')
+    course1.enroll_user(user2)
     expect(DueDateCacher).to receive(:recompute).never
-    expect(DueDateCacher).to receive(:recompute_course).twice
+    # there are no assignments so this will just return, but we just want to see
+    # that it gets called correctly and for the users that wre imported
+    expect(DueDateCacher).to receive(:recompute_users_for_course).with([user1.id], course1.id)
+    expect(DueDateCacher).to receive(:recompute_users_for_course).with([user1.id, user2.id], course2.id)
     process_csv_data_cleanly(
-        "course_id,user_id,role,status",
-        "C001,U001,student,active",
-        "C001,U002,student,active",
-        "C002,U001,student,active",
-        "C002,U002,student,active",
+      'course_id,user_id,role,status',
+      'C001,U001,student,active',
+      'C002,U001,student,active',
+      'C002,U002,student,active'
     )
   end
 

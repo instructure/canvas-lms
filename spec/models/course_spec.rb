@@ -23,8 +23,11 @@ require 'csv'
 require 'socket'
 
 describe Course do
+  include_examples "outcome import context examples"
+
   describe 'relationships' do
     it { is_expected.to have_one(:late_policy).dependent(:destroy).inverse_of(:course) }
+    it { is_expected.to have_many(:feature_flags) }
   end
 
   describe 'lti2 proxies' do
@@ -63,6 +66,35 @@ describe Course do
     @course.save!
     expect(DueDateCacher).not_to receive(:recompute_course)
     @course.save!
+  end
+
+  it "should correctly identify course as active" do
+    @course.enrollment_term = EnrollmentTerm.create!(root_account: Account.default, workflow_state: :active)
+    expect(@course.inactive?).to eq false
+  end
+
+  it "should correctly identify destroyed course as not active" do
+    @course.enrollment_term = EnrollmentTerm.create!(root_account: Account.default, workflow_state: :active)
+    @course.destroy!
+    expect(@course.inactive?).to eq true
+  end
+
+  it "should correctly identify concluded course as not active" do
+    @course.complete!
+    expect(@course.inactive?).to eq true
+  end
+
+  describe '#grading_standard_or_default' do
+    it 'returns the grading scheme being used by the course, if one exists' do
+      @course.save!
+      standard = grading_standard_for(@course)
+      @course.update!(default_grading_standard: standard)
+      expect(@course.grading_standard_or_default).to be standard
+    end
+
+    it 'returns the Canvas default grading scheme if the course is not using a grading scheme' do
+      expect(@course.grading_standard_or_default.data).to eq GradingStandard.default_grading_standard
+    end
   end
 
   describe "#recompute_student_scores" do
@@ -4869,6 +4901,16 @@ describe Course, '#module_items_visible_to' do
   it "shows all items to teachers even when course is concluded" do
     @course.complete!
     expect(@course.module_items_visible_to(@teacher).map(&:title)).to match_array %w(published unpublished)
+  end
+
+  context "sharding" do
+    specs_require_sharding
+
+    it "shouldn't kersplud on a different shard" do
+      @shard1.activate do
+        expect(@course.module_items_visible_to(@student).first.title).to eq 'published'
+      end
+    end
   end
 end
 

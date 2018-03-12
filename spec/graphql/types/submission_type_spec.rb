@@ -41,11 +41,17 @@ describe Types::SubmissionType do
       it "returns score/grade for teachers when assignment is muted" do
         expect(submission_type.score(current_user: @teacher)).to eq @submission.score
         expect(submission_type.grade(current_user: @teacher)).to eq @submission.grade
+        expect(submission_type.enteredScore(current_user: @teacher)).to eq @submission.entered_score
+        expect(submission_type.enteredGrade(current_user: @teacher)).to eq @submission.entered_grade
+        expect(submission_type.deductedPoints(current_user: @teacher)).to eq @submission.points_deducted
       end
 
       it "doesn't return score/grade for students when assignment is muted" do
         expect(submission_type.score(current_user: @student)).to be_nil
         expect(submission_type.grade(current_user: @student)).to be_nil
+        expect(submission_type.enteredScore(current_user: @student)).to be_nil
+        expect(submission_type.enteredGrade(current_user: @student)).to be_nil
+        expect(submission_type.deductedPoints(current_user: @student)).to be_nil
       end
     end
 
@@ -53,12 +59,18 @@ describe Types::SubmissionType do
       it "returns the score and grade for authorized users" do
         expect(submission_type.score(current_user: @student)).to eq @submission.score
         expect(submission_type.grade(current_user: @student)).to eq @submission.grade
+        expect(submission_type.enteredScore(current_user: @student)).to eq @submission.entered_score
+        expect(submission_type.enteredGrade(current_user: @student)).to eq @submission.entered_grade
+        expect(submission_type.deductedPoints(current_user: @student)).to eq @submission.points_deducted
       end
 
       it "returns nil for unauthorized users" do
         @student2 = student_in_course(active_all: true).user
         expect(submission_type.score(current_user: @student2)).to be_nil
         expect(submission_type.grade(current_user: @student2)).to be_nil
+        expect(submission_type.enteredScore(current_user: @student)).to be_nil
+        expect(submission_type.enteredGrade(current_user: @student)).to be_nil
+        expect(submission_type.deductedPoints(current_user: @student)).to be_nil
       end
     end
   end

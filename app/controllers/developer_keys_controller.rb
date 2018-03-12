@@ -29,7 +29,13 @@ class DeveloperKeysController < ApplicationController
     respond_to do |format|
       format.html do
         set_navigation
-        js_env(accountEndpoint: api_v1_account_developer_keys_path(@context))
+        js_env(accountEndpoint: api_v1_account_developer_keys_path(@context), developer_keys_count: @keys.total_entries)
+
+        if use_react_for_front_end?
+          render :index_react
+        else
+          render :index
+        end
       end
       format.json { render :json => developer_keys_json(@keys, @current_user, session, account_context) }
     end
@@ -67,6 +73,19 @@ class DeveloperKeysController < ApplicationController
   end
 
   private
+
+  def use_react_for_front_end?
+    # Check if account is the site admin account.  (There's only 1 site admin account.)
+    if @context.root_account.site_admin?
+      # Check if feature is allowed, based on 3 state toggle
+      @context.root_account.feature_allowed?(:developer_key_management_ui_rewrite)
+    else
+      # allow react to be shown for http://canvas.docker/accounts/1234/developer_keys
+      Account.site_admin.feature_allowed?(:developer_key_management_ui_rewrite) &&
+        @context.root_account.feature_enabled?(:developer_key_management_ui_rewrite)
+    end
+  end
+
   def set_key
     @key = DeveloperKey.nondeleted.find(params[:id])
   end

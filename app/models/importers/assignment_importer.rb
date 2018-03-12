@@ -54,6 +54,15 @@ module Importers
         end
       end
 
+      if context.respond_to?(:assignment_group_no_drop_assignments) && context.assignment_group_no_drop_assignments
+        context.assignments.active.where.not(:migration_id => nil).
+          where(:assignment_group_id => context.assignment_group_no_drop_assignments.values).each do |item|
+          if group = context.assignment_group_no_drop_assignments[item.migration_id]
+            AssignmentGroup.add_never_drop_assignment(group, item)
+          end
+        end
+      end
+
       assignment_records.compact!
 
       assignment_ids = assignment_records.map(&:id)
@@ -364,13 +373,6 @@ module Importers
         else
           item.lti_context_id ||= SecureRandom.uuid
           create_tool_settings(hash['tool_setting'], active_proxies.first, item)
-        end
-      end
-
-
-      if context.respond_to?(:assignment_group_no_drop_assignments) && context.assignment_group_no_drop_assignments
-        if group = context.assignment_group_no_drop_assignments[item.migration_id]
-          AssignmentGroup.add_never_drop_assignment(group, item)
         end
       end
 

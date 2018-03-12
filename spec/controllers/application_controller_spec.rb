@@ -1082,11 +1082,12 @@ describe CoursesController do
   describe "set_js_wiki_data" do
     before :each do
       course_with_teacher_logged_in :active_all => true
+      @course.wiki_pages.create!(:title => 'blah').set_as_front_page!
+      @course.reload
       @course.default_view = "wiki"
       @course.show_announcements_on_home_page = true
       @course.home_page_announcement_limit = 5
       @course.save!
-      @course.wiki_pages.create!(:title => 'blah').set_as_front_page!
     end
 
     it "should populate js_env with course_home setting" do

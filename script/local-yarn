@@ -17,6 +17,12 @@ for path in $(ls -1 {gems/{,plugins/},packages/}*/package.json 2> /dev/null); do
     NODE_ENV=production
   fi
 
+  if [[ $path != *"packages"* && ($1 == "test" || $1 == "lint") ]]; then
+    # yarn test and lint are packages directory specific commands
+    popd > /dev/null
+    continue
+  fi
+
   echo "running yarn $1 for $path w/ NODE_ENV=$NODE_ENV"
   yarn $1
   popd > /dev/null

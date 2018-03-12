@@ -626,7 +626,9 @@ describe "context modules" do
       f("#context_module_item_#{tag.id} .al-trigger").click
       f('.edit_item_link').click
       click_option("#content_tag_indent_select", "Indent 1 Level")
-      submit_dialog_form("#edit_item_form")
+      form = f('#edit_item_form')
+      form.submit
+      wait_for_ajaximations
       expect(f("#context_module_item_#{tag.id}")).to have_class('indent_1')
 
       tag.reload
@@ -735,27 +737,59 @@ describe "context modules" do
       module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
       tag = ContentTag.last
 
-      expect(module_item.find_element(:css, ".due_date_display").text).not_to be_blank
-      expect(module_item.find_element(:css, ".points_possible_display")).to include_text "10"
+      def due_date_assertion
+        stale_element = true
+        attempt = 5
+        until (stale_element == true) && (attempt > 0)
+          begin
+            wait_for_dom_ready
+            expect(module_item.find_element(:css, ".due_date_display").text).not_to be_blank
+            stale_element = false
+          rescue Selenium::WebDriver::Error::StaleElementReferenceError
+            stale_element = true
+            attempt -= 1
+          end
+        end
+      end
+
+      def points_possible_assertion(module_item, tag)
+        stale_element = true
+        attempt = 5
+        module_item = f("#context_module_item_#{tag.id}")
+        until (stale_element == true) && (attempt > 0)
+          begin
+            wait_for_dom_ready
+            expect(module_item.find_element(:css, ".points_possible_display")).to include_text "10"
+            stale_element = false
+          rescue Selenium::WebDriver::Error::StaleElementReferenceError
+            stale_element = true
+            attempt -= 1
+          end
+        end
+      end
+
+      due_date_assertion
+      points_possible_assertion(module_item, tag)
 
       # change indent with arrows
       f("#context_module_item_#{tag.id} .al-trigger").click
       f('.indent_item_link').click
 
       module_item = f("#context_module_item_#{tag.id}")
-      expect(module_item.find_element(:css, ".due_date_display").text).not_to be_blank
-      expect(module_item.find_element(:css, ".points_possible_display")).to include_text "10"
+      due_date_assertion
+      points_possible_assertion(module_item, tag)
 
       # change indent from edit form
       f("#context_module_item_#{tag.id} .al-trigger").click
       f('.edit_item_link').click
 
       click_option("#content_tag_indent_select", "Don't Indent")
-      submit_dialog_form("#edit_item_form")
+      form = f('#edit_item_form')
+      form.submit
 
       module_item = f("#context_module_item_#{tag.id}")
-      expect(module_item.find_element(:css, ".due_date_display").text).not_to be_blank
-      expect(module_item.find_element(:css, ".points_possible_display")).to include_text "10"
+      due_date_assertion
+      points_possible_assertion(module_item, tag)
     end
 
     context "Keyboard Accessibility", priority: "1" do

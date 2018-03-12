@@ -90,7 +90,7 @@ export default {
             },
             {
               course_id: '56',
-              conflicting_changes: ['points'],
+              conflicting_changes: ['deleted'],
               name: 'Course 56',
               term: { name: 'Default Term' },
             }

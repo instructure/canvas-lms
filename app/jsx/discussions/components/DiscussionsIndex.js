@@ -18,34 +18,54 @@
 
 import I18n from 'i18n!discussions_v2'
 import React, { Component } from 'react'
-import { func, bool } from 'prop-types'
+import { func, bool, string, arrayOf, number } from 'prop-types'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
+import { DragDropContext } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
 
 import Container from '@instructure/ui-core/lib/components/Container'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import Spinner from '@instructure/ui-core/lib/components/Spinner'
 import Heading from '@instructure/ui-core/lib/components/Heading'
 import Text from '@instructure/ui-core/lib/components/Text'
+import masterCourseDataShape from '../../shared/proptypes/masterCourseData'
+import DiscussionsContainer, { DroppableDiscussionsContainer } from './DiscussionContainer'
+import { pinnedDiscussionBackground, unpinnedDiscussionsBackground, closedDiscussionBackground } from './DiscussionBackgrounds'
+import {ConnectedIndexHeader} from './IndexHeader'
 
-import DiscussionRow from '../../shared/components/DiscussionRow'
+import { renderTray } from '../../move_item'
 import select from '../../shared/select'
 import { selectPaginationState } from '../../shared/reduxPagination'
 import { discussionList } from '../../shared/proptypes/discussion'
-import masterCourseDataShape from '../../shared/proptypes/masterCourseData'
 import propTypes from '../propTypes'
 import actions from '../actions'
+import { reorderDiscussionsURL } from '../utils'
 
 export default class DiscussionsIndex extends Component {
   static propTypes = {
-    discussions: discussionList.isRequired,
-    isLoadingDiscussions: bool.isRequired,
-    hasLoadedDiscussions: bool.isRequired,
+    updateDiscussion: func.isRequired,
+    contextType: string.isRequired,
+    contextId: number.isRequired,
+    closedForCommentsDiscussions: discussionList,
     getDiscussions: func.isRequired,
-    permissions: propTypes.permissions.isRequired,
+    hasLoadedDiscussions: bool.isRequired,
+    isLoadingDiscussions: bool.isRequired,
     masterCourseData: masterCourseDataShape,
+    permissions: propTypes.permissions.isRequired,
+    pinnedDiscussions: discussionList,
+    roles: arrayOf(string).isRequired,
+    toggleSubscriptionState: func.isRequired,
+    unpinnedDiscussions: discussionList,
+    duplicateDiscussion: func.isRequired,
+    cleanDiscussionFocus: func.isRequired,
+    arrangePinnedDiscussions: func.isRequired,
   }
 
   static defaultProps = {
+    pinnedDiscussions: [],
+    unpinnedDiscussions: [],
+    closedForCommentsDiscussions: [],
     masterCourseData: null,
   }
 
@@ -72,29 +92,163 @@ export default class DiscussionsIndex extends Component {
     }
   }
 
-  renderDiscussions () {
-    if (this.props.hasLoadedDiscussions) {
-      return this.props.discussions.map(discussion => (
-        <DiscussionRow
-          key={discussion.id}
-          discussion={discussion}
-          canManage={this.props.permissions.manage_content}
+renderMoveDiscussionTray = (item) => {
+  const moveSibilings = this.props.pinnedDiscussions
+    .map((disc) => ({ id: disc.id, title: disc.title}))
+    .filter((disc) => (disc.id !== item.id))
+
+  const moveProps = {
+    title: I18n.t('Move Discussion'),
+    items: [
+      item
+    ],
+    moveOptions: {
+      siblings: moveSibilings,
+    },
+    focusOnExit: () => {},
+    onMoveSuccess: (res) => {
+      this.props.arrangePinnedDiscussions({order: res.data.order})
+    },
+    formatSaveUrl: () => reorderDiscussionsURL({ contextType: this.props.contextType, contextId: this.props.contextId})
+  }
+  renderTray(moveProps)
+}
+
+renderStudentView () {
+    return (
+      <Container margin="medium">
+        {this.props.pinnedDiscussions.length
+          ? (
+              <div className="pinned-discussions-v2__wrapper">
+                <DiscussionsContainer
+                  title={I18n.t("Pinned Discussions")}
+                  discussions={this.props.pinnedDiscussions}
+                  permissions={this.props.permissions}
+                  masterCourseData={this.props.masterCourseData}
+                  roles={this.props.roles}
+                />
+              </div>
+            )
+          : null
+        }
+        <div className="unpinned-discussions-v2__wrapper">
+          <DiscussionsContainer
+            title={I18n.t("Discussions")}
+            discussions={this.props.unpinnedDiscussions}
+            permissions={this.props.permissions}
+            masterCourseData={this.props.masterCourseData}
+            toggleSubscribe={this.props.toggleSubscriptionState}
+            duplicateDiscussion={this.props.duplicateDiscussion}
+            updateDiscussion={this.props.updateDiscussion}
+            cleanDiscussionFocus={this.props.cleanDiscussionFocus}
+            roles={this.props.roles}
+            renderContainerBackground={() =>
+              pinnedDiscussionBackground({
+                permissions: this.props.permissions,
+              })
+            }
+          />
+        </div>
+        <div className="closed-for-comments-discussions-v2__wrapper">
+          <DiscussionsContainer
+            title={I18n.t("Closed for Comments")}
+            discussions={this.props.closedForCommentsDiscussions}
+            permissions={this.props.permissions}
+            masterCourseData={this.props.masterCourseData}
+            toggleSubscribe={this.props.toggleSubscriptionState}
+            duplicateDiscussion={this.props.duplicateDiscussion}
+            cleanDiscussionFocus={this.props.cleanDiscussionFocus}
+            updateDiscussion={this.props.updateDiscussion}
+            roles={this.props.roles}
+            renderContainerBackground={() =>
+              closedDiscussionBackground({
+                permissions: this.props.permissions,
+              })
+            }
+          />
+        </div>
+      </Container>
+    )
+  }
+
+  renderTeacherView () {
+    return (
+      <Container margin="medium">
+      <div className="pinned-discussions-v2__wrapper">
+        <DroppableDiscussionsContainer
+          title={I18n.t("Pinned Discussions")}
+          discussions={this.props.pinnedDiscussions}
+          permissions={this.props.permissions}
           masterCourseData={this.props.masterCourseData}
+          toggleSubscribe={this.props.toggleSubscriptionState}
+          updateDiscussion={this.props.updateDiscussion}
+          duplicateDiscussion={this.props.duplicateDiscussion}
+          cleanDiscussionFocus={this.props.cleanDiscussionFocus}
+          onMoveDiscussion={this.renderMoveDiscussionTray}
+          roles={this.props.roles}
+          pinned
+          renderContainerBackground={() =>
+            pinnedDiscussionBackground({
+              permissions: this.props.permissions,
+            })
+          }
         />
-      ))
-    } else {
-      return null
-    }
+      </div>
+      <div className="unpinned-discussions-v2__wrapper">
+        <DroppableDiscussionsContainer
+          title={I18n.t("Discussions")}
+          discussions={this.props.unpinnedDiscussions}
+          permissions={this.props.permissions}
+          masterCourseData={this.props.masterCourseData}
+          toggleSubscribe={this.props.toggleSubscriptionState}
+          updateDiscussion={this.props.updateDiscussion}
+          duplicateDiscussion={this.props.duplicateDiscussion}
+          cleanDiscussionFocus={this.props.cleanDiscussionFocus}
+          pinned={false}
+          closedState={false}
+          roles={this.props.roles}
+          renderContainerBackground={() =>
+            unpinnedDiscussionsBackground({
+              permissions: this.props.permissions,
+              contextID: this.props.contextId,
+              contextType: this.props.contextType
+            })
+          }
+        />
+      </div>
+        <div className="closed-for-comments-discussions-v2__wrapper">
+          <DroppableDiscussionsContainer
+            title={I18n.t("Closed for Comments")}
+            discussions={this.props.closedForCommentsDiscussions}
+            permissions={this.props.permissions}
+            masterCourseData={this.props.masterCourseData}
+            toggleSubscribe={this.props.toggleSubscriptionState}
+            updateDiscussion={this.props.updateDiscussion}
+            duplicateDiscussion={this.props.duplicateDiscussion}
+            cleanDiscussionFocus={this.props.cleanDiscussionFocus}
+            roles={this.props.roles}
+            pinned={false}
+            closedState
+            renderContainerBackground={() =>
+              closedDiscussionBackground({
+                permissions: this.props.permissions,
+              })
+            }
+          />
+        </div>
+      </Container>
+    )
   }
 
   render () {
     return (
       <div className="discussions-v2__wrapper">
-        <Heading>{I18n.t('Disccussions')}</Heading>
+        <ScreenReaderContent>
+          <Heading level="h1">{I18n.t('Discussions')}</Heading>
+        </ScreenReaderContent>
+        <ConnectedIndexHeader searchInputRef={(c) => { this.searchInput = c }} />
         {this.renderSpinner(this.props.isLoadingDiscussions, I18n.t('Loading Discussions'))}
-        <Container margin="medium">
-          {this.renderDiscussions()}
-        </Container>
+        {this.props.permissions.moderate ? this.renderTeacherView() : this.renderStudentView()}
       </div>
     )
   }
@@ -102,6 +256,23 @@ export default class DiscussionsIndex extends Component {
 
 const connectState = state => Object.assign({
   // other props here
-}, selectPaginationState(state, 'discussions'), select(state, ['permissions', 'masterCourseData']))
-const connectActions = dispatch => bindActionCreators(select(actions, ['getDiscussions']), dispatch)
-export const ConnectedDiscussionsIndex = connect(connectState, connectActions)(DiscussionsIndex)
+}, selectPaginationState(state, 'discussions'), select(state,
+  ['permissions',
+    'contextType',
+    'contextId',
+    'roles',
+    'masterCourseData',
+    'pinnedDiscussions',
+    'closedForCommentsDiscussions',
+    'unpinnedDiscussions',
+    'contextId',
+    'contextType']
+))
+const connectActions = dispatch => bindActionCreators(
+  select(actions, ['getDiscussions',
+                   'toggleSubscriptionState',
+                   'updateDiscussion',
+                   'duplicateDiscussion',
+                   'cleanDiscussionFocus',
+                   'arrangePinnedDiscussions']), dispatch)
+export const ConnectedDiscussionsIndex = DragDropContext(HTML5Backend)(connect(connectState, connectActions)(DiscussionsIndex))

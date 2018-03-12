@@ -26,7 +26,12 @@ function timezone () {
   return ENV.TIMEZONE;
 }
 
+function courseIsConcluded() {
+  return ENV.COURSE_IS_CONCLUDED;
+}
+
 export default {
   courseId,
+  courseIsConcluded,
   timezone
 }

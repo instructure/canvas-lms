@@ -16,7 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'i18n!context_modules'
   'jquery'
   'Backbone'
   '../../collections/ModuleCollection'
@@ -24,7 +23,7 @@ define [
   'jst/modules/ProgressionModuleCollection'
   '../PaginatedCollectionView'
   '../modules/ProgressionModuleView'
-], (I18n, $, Backbone, ModuleCollection, template, collectionTemplate, PaginatedCollectionView, ProgressionModuleView) ->
+], ($, Backbone, ModuleCollection, template, collectionTemplate, PaginatedCollectionView, ProgressionModuleView) ->
 
   class ProgressionStudentView extends Backbone.View
 

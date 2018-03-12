@@ -63,9 +63,7 @@ function getNextUrls (state, action) {
 }
 
 function gotDaysSuccess (state, action) {
-  const somePastItemsLoaded = state.somePastItemsLoaded || state.loadingPast;
-  const seekingNewActivity = false;
-  const newState = {somePastItemsLoaded, seekingNewActivity};
+  const newState = {seekingNewActivity: false};
   newState.partialPastDays = purgeDuplicateDays(state.partialPastDays, action.payload.internalDays);
   newState.partialFutureDays = purgeDuplicateDays(state.partialFutureDays, action.payload.internalDays);
   return loadingState(state, newState);

@@ -63,7 +63,7 @@ export class CompletedItemsFacade extends Component {
     this.props.deregisterAnimatable('item', this, this.props.animatableItemIds);
   }
 
-  getFocusable () { return this.mainButton; }
+  getFocusable () { return this.checkboxRef; }
 
   getScrollable () { return this.rootDiv; }
 
@@ -90,6 +90,7 @@ export class CompletedItemsFacade extends Component {
       <div className={styles.root} ref={elt => this.rootDiv = elt}>
         <div className={styles.contentPrimary}>
           <Checkbox
+            ref={ref => this.checkboxRef = ref}
             defaultChecked
             inline
             label={
@@ -100,7 +101,6 @@ export class CompletedItemsFacade extends Component {
               }`, { count: this.props.itemCount })
             }
             onClick={this.props.onClick}
-            ref={elt => this.mainButton = elt}
          />
         </div>
         <div className={styles.contentSecondary}>

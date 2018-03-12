@@ -48,6 +48,21 @@
 #           "example": "complete",
 #           "type": "string"
 #         },
+#         "created_at": {
+#           "description": "The date and time the report was created.",
+#           "example": "2013-12-01T23:59:00-06:00",
+#           "type": "datetime"
+#         },
+#         "started_at": {
+#           "description": "The date and time the report started processing.",
+#           "example": "2013-12-02T00:03:21-06:00",
+#           "type": "datetime"
+#         },
+#         "ended_at": {
+#           "description": "The date and time the report finished processing.",
+#           "example": "2013-12-02T00:03:21-06:00",
+#           "type": "datetime"
+#         },
 #         "parameters": {
 #           "description": "The report parameters",
 #           "example": {"course_id": 2, "start_at": "2012-07-13T10:55:20-06:00", "end_at": "2012-07-13T10:55:20-06:00"},

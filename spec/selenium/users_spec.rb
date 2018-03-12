@@ -284,7 +284,7 @@ describe "users" do
       # close the "check your email to confirm your account" dialog
       f('.ui-dialog-titlebar-close').click
       expect(displayed_username).to eq('teacher!')
-      expect_logout_link_present
+      expect(fj('form[action="/logout"] button:contains("Logout")')).to be_present
       expect(User.last.initial_enrollment_type).to eq 'teacher'
     end
 

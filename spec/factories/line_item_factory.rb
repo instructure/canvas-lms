@@ -21,17 +21,15 @@ module Factories
     params = {
       score_maximum: 10,
       label: 'Test Line Item',
-      assignment: overrides.fetch(
-        :assignment,
+      assignment: overrides[:assignment] ||
         assignment_model(
-          course: overrides.fetch(:course, course_factory(active_course: true))
-        )
-      ),
+          course: overrides[:course] || course_factory(active_course: true)
+        ),
       resource_link: overrides.fetch(
         :resource_link,
         overrides[:with_resource_link] ? resource_link_model : nil
       )
-    }.merge(overrides.except!(:assignment, :course, :resource_link, :with_resource_link))
+    }.merge(overrides.except(:assignment, :course, :resource_link, :with_resource_link))
     Lti::LineItem.create!(params)
   end
 end

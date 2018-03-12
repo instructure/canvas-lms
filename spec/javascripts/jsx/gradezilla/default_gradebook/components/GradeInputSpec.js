@@ -26,6 +26,7 @@ QUnit.module('GradeInput', suiteHooks => {
   let $container
   let assignment
   let submission
+  let pendingGradeInfo
   let props
   let wrapper
 
@@ -37,13 +38,15 @@ QUnit.module('GradeInput', suiteHooks => {
       excused: false,
       id: '2501'
     }
+    pendingGradeInfo = null
     const gradingScheme = [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0]]
     props = {
       assignment,
       disabled: false,
       onSubmissionUpdate() {},
       submission,
-      gradingScheme
+      gradingScheme,
+      pendingGradeInfo
     }
 
     $container = document.createElement('div')
@@ -1019,5 +1022,74 @@ QUnit.module('GradeInput', suiteHooks => {
       const input = wrapper.find('select')
       strictEqual(input.prop('value'), 'complete')
     })
+  })
+
+  QUnit.module('when pendingGradeInfo is set', hooks => {
+    hooks.beforeEach(() => {
+      props.enterGradesAs = 'points'
+    })
+
+    test('does not display any errors when the pending grade is valid', () => {
+      mountComponent()
+
+      pendingGradeInfo = {grade: '7', valid: true, excused: false}
+      wrapper.setProps({pendingGradeInfo})
+
+      notOk(wrapper.text().includes('This is not a valid grade'))
+    })
+
+    test('marks the text input as invalid when the pending grade is not valid', () => {
+      mountComponent()
+
+      pendingGradeInfo = {grade: 'zzz', valid: false, excused: false}
+      wrapper.setProps({pendingGradeInfo})
+
+      ok(wrapper.text().includes('This is not a valid grade'))
+    })
+
+    test('updates the text input with the value of the pending grade when valid', () => {
+      props.pendingGradeInfo = {grade: '1234', valid: true, excused: false}
+      mountComponent()
+
+      const input = wrapper.find('input[type="text"]')
+      strictEqual(input.prop('value'), '1234')
+    })
+
+    test('updates the text input with the value of the pending grade when invalid', () => {
+      props.pendingGradeInfo = {grade: '1234', valid: false, excused: false}
+      mountComponent()
+
+      const input = wrapper.find('input[type="text"]')
+      equal(input.prop('value'), '1234')
+    })
+
+    test('sets the text input to "Excused" when the pending grade is marked as excused', () => {
+      props.pendingGradeInfo = {grade: '111', valid: false, excused: true}
+      mountComponent()
+
+      const input = wrapper.find('input[type="text"]')
+      equal(input.prop('value'), 'Excused')
+    })
+  })
+
+  test('displays a warning message when passed a negative score', () => {
+    props.enterGradesAs = 'points'
+    mountComponent()
+
+    submission = {enteredScore: -1, excused: false}
+    wrapper.setProps({submission})
+
+    ok(wrapper.text().includes('This grade has negative points'))
+  })
+
+  test('displays a warning message when passed an unusually high score', () => {
+    props.enterGradesAs = 'points'
+    mountComponent()
+
+    submission = {enteredScore: 50, excused: false}
+    assignment = {pointsPossible: 10, gradingType: 'points'}
+    wrapper.setProps({submission, assignment})
+
+    ok(wrapper.text().includes('This grade is unusually high'))
   })
 })

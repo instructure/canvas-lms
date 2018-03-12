@@ -44,7 +44,7 @@ const makeProps = (props = {}) => _.merge({
     html_url: '',
     user_count: 10,
   },
-  canManage: false,
+  canPublish: false,
   masterCourseData: {},
 }, props)
 
@@ -65,6 +65,20 @@ test('renders UnreadBadge if discussion has replies == 0', () => {
   const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
   const node = tree.find('UnreadBadge')
   notOk(node.exists())
+})
+
+test('renders the subscription ToggleIcon', () => {
+  const tree = mount(<DiscussionRow {...makeProps()} />)
+  const node = tree.find('ToggleIcon')
+  ok(node.exists())
+  strictEqual(node.length, 1)
+})
+
+test('renders the publish ToggleIcon', () => {
+  const tree = mount(<DiscussionRow {...makeProps({canPublish: true})} />)
+  const node = tree.find('ToggleIcon')
+  ok(node.exists())
+  strictEqual(node.length, 2)
 })
 
 test('renders "Delayed until" date label if discussion is delayed', () => {
@@ -117,7 +131,7 @@ test('renders master course lock icon if masterCourseData is provided', (assert)
 })
 
 test('renders drag icon', () => {
-  const tree = mount(<DiscussionRow {...makeProps()} />)
+  const tree = mount(<DiscussionRow {...makeProps({draggable: true})} />)
   const node = tree.find('IconDragHandleLine')
   ok(node.exists())
 })
@@ -134,4 +148,37 @@ test('removes non-text content from discussion message', () => {
   equal(node.childNodes[0].nodeType, 3) // nodeType === 3 is text node type
   ok(node.textContent.includes('Hello World!'))
   ok(node.textContent.includes('foo bar'))
+})
+
+test('renders manage menu if permitted', () => {
+  const tree = mount(<DiscussionRow {...makeProps({ canManage: true })} />)
+  const manageMenuNode = tree.find('PopoverMenu')
+  ok(manageMenuNode.exists())
+  const courseItemRow = tree.find('CourseItemRow')
+  ok(courseItemRow.exists())
+  ok(courseItemRow.props().manageMenuOptions.length > 0)
+  const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
+  ok(allKeys.includes('duplicate'))
+  ok(allKeys.includes('togglepinned'))
+  ok(allKeys.includes('togglelocked'))
+})
+
+test('renders move-to in manage menu if permitted', () => {
+  const tree = mount(<DiscussionRow {...makeProps({
+    canManage: true,
+    onMoveDiscussion: ()=>{}
+   })} />)
+  const manageMenuNode = tree.find('PopoverMenu')
+  ok(manageMenuNode.exists())
+  const courseItemRow = tree.find('CourseItemRow')
+  ok(courseItemRow.exists())
+  ok(courseItemRow.props().manageMenuOptions.length > 0)
+  const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
+  ok(allKeys.includes('move'))
+})
+
+test('does not render manage menu if not permitted', () => {
+  const tree = mount(<DiscussionRow {...makeProps({ canManage: false })} />)
+  const node = tree.find('PopoverMenu')
+  notOk(node.exists())
 })

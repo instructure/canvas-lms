@@ -339,9 +339,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def get_potentially_conflicting_titles(title_base)
-    result = DiscussionTopic.active.where(context_id: self.context_id)
-      .starting_with_title(title_base).pluck("title").to_set
-    result
+    DiscussionTopic.active.where(context_type: self.context_type, context_id: self.context_id).
+      starting_with_title(title_base).pluck("title").to_set
   end
 
   # This is a guess of what to copy over.
@@ -368,7 +367,8 @@ class DiscussionTopic < ActiveRecord::Base
       :allow_rating => self.allow_rating,
       :only_graders_can_rate => self.only_graders_can_rate,
       :sort_by_rating => self.sort_by_rating,
-      :todo_date => self.todo_date
+      :todo_date => self.todo_date,
+      :is_section_specific => self.is_section_specific
     })
   end
 
@@ -393,6 +393,19 @@ class DiscussionTopic < ActiveRecord::Base
         :copy_title => result.title
       })
     end
+
+    result.discussion_topic_section_visibilities = []
+    if self.is_section_specific
+      original_visibilities = self.discussion_topic_section_visibilities.active
+      original_visibilities.each do |visibility|
+        new_visibility = DiscussionTopicSectionVisibility.new(
+          :discussion_topic => result,
+          :course_section => visibility.course_section
+        )
+        result.discussion_topic_section_visibilities << new_visibility
+      end
+    end
+
     # For some reason, the relation doesn't take care of this for us. Don't understand why.
     # Without this line, *two* discussion topic duplicates appear when a save is performed.
     result.assignment&.discussion_topic = result
@@ -1435,5 +1448,15 @@ class DiscussionTopic < ActiveRecord::Base
   # synchronously create/update the materialized view
   def create_materialized_view
     DiscussionTopic::MaterializedView.for(self).update_materialized_view_without_send_later(xlog_location: self.class.current_xlog_location)
+  end
+
+  def grading_standard_or_default
+    grading_standard_context = assignment || context
+
+    if grading_standard_context.present?
+      grading_standard_context.grading_standard_or_default
+    else
+      GradingStandard.default_instance
+    end
   end
 end

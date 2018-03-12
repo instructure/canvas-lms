@@ -33,7 +33,74 @@ describe ExternalFeed do
     expect(res[2].title).to eql("The Engine That Does More")
     expect(res[3].title).to eql("Astronauts' Dirty Laundry")
   end
-  
+
+  it "rss feed should be active for active accounts" do
+    @feed = external_feed_model
+    course_with_student(course: @course, external_feeds: [@feed]).update!(workflow_state: :active)
+    @feed.context = @course
+    expect(@feed.inactive?).to be(false)
+  end
+
+  it "rss feed should be inactive for deleted accounts" do
+    @feed = external_feed_model
+    account1 = account_model
+    course_with_student(:account => account1, :course => @course).update!(workflow_state: :active)
+    Account.default.update!(workflow_state: :deleted)
+    expect(@feed.inactive?).to be(true)
+  end
+
+  it "rss feed should be active for concluded courses" do
+    account1 = account_model
+    course_with_student(:account => account1, :course => @course).update!(workflow_state: :active)
+    @feed = external_feed_model(context: @course)
+    expect(@feed.inactive?).to be(false)
+  end
+
+  it "rss feed should be inactive for concluded courses" do
+    account1 = account_model
+    course_with_student(:account => account1, :course => @course)
+    @feed = external_feed_model(context: @course)
+    @course.complete!
+    expect(@feed.inactive?).to be(true)
+  end
+
+  it "rss feed should be inactive for deleted courses" do
+    account1 = account_model
+    course_with_student(:account => account1, :course => @course)
+    @feed = external_feed_model(context: @course)
+    @course.destroy!
+    expect(@feed.inactive?).to be(true)
+  end
+
+  it "rss feed should be active for groups with active courses" do
+    account1 = account_model
+    course_with_student(:account => account1, :course => @course).update!(workflow_state: :active)
+    @feed = external_feed_model
+    @group = group_model(:is_public => true, :context => @course, :external_feeds => [@feed])
+    @feed.update!(context: @group)
+    expect(@feed.inactive?).to be(false)
+  end
+
+  it "rss feed should be inactive for groups with active courses" do
+    account1 = account_model
+    course_with_student(:account => account1, course: @course)
+    @feed = external_feed_model
+    @group = group_model(:is_public => true, :context => @course, :external_feeds => [@feed])
+    @feed.update!(context: @group)
+    @course.complete!
+    expect(@feed.inactive?).to be(true)
+  end
+
+  it "rss feed should be inactive for groups with deleted courses" do
+    account1 = account_model
+    course_with_student(:account => account1, course: @course)
+    @feed = external_feed_model
+    group_model(:is_public => true, :context => @course, :external_feeds => [@feed])
+    @feed.update!(context: @group)
+    @course.destroy!
+    expect(@feed.inactive?).to be(true)
+  end
+
   it "should add rss entries as course announcements" do
     @course = course_model
     @feed = external_feed_model(:context => @course)
@@ -50,7 +117,7 @@ describe ExternalFeed do
     @feed.add_rss_entries(rss)
     expect(@course.announcements.count).to eql(4)
   end
-  
+
   it "should add atom entries" do
     @feed = external_feed_model
     require 'atom'
@@ -61,7 +128,7 @@ describe ExternalFeed do
     expect(res[0].valid?).to be_truthy
     expect(res[0].title).to eql("Atom-Powered Robots Run Amok")
   end
-  
+
   it "should add atom entries as course announcements" do
     @course = course_model
     @feed = external_feed_model(:context => @course)
@@ -94,7 +161,7 @@ end
 def atom_example
 %{<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
- 
+
  <title>Example Feed</title>
  <subtitle>A subtitle.</subtitle>
  <link href="http://example.org/feed/" rel="self"/>
@@ -105,7 +172,7 @@ def atom_example
    <email>johndoe@example.com</email>
  </author>
  <id>urn:uuid:60a76c80-d399-11d9-b91C-0003939e0af6</id>
- 
+
  <entry>
    <title>Atom-Powered Robots Run Amok</title>
    <link href="http://example.org/2003/12/13/atom03"/>
@@ -113,7 +180,7 @@ def atom_example
    <updated>2003-12-13T18:30:02Z</updated>
    <summary>Some text.</summary>
  </entry>
- 
+
 </feed>}
 end
 
@@ -132,7 +199,7 @@ def rss_example
     <managingEditor>editor@example.com</managingEditor>
     <webMaster>webmaster@example.com</webMaster>
     <ttl>5</ttl>
- 
+
     <item>
       <title>Star City</title>
       <link>http://liftoff.msfc.nasa.gov/news/2003/news-starcity.asp</link>
@@ -142,7 +209,7 @@ def rss_example
       <pubDate>Tue, 03 Jun 2003 09:39:21 GMT</pubDate>
       <guid>http://liftoff.msfc.nasa.gov/2003/06/03.html#item573</guid>
     </item>
- 
+
     <item>
       <title>Space Exploration</title>
       <link>http://liftoff.msfc.nasa.gov/</link>
@@ -151,7 +218,7 @@ def rss_example
       <pubDate>Fri, 30 May 2003 11:06:42 GMT</pubDate>
       <guid>http://liftoff.msfc.nasa.gov/2003/05/30.html#item572</guid>
     </item>
- 
+
     <item>
       <title>The Engine That Does More</title>
       <link>http://liftoff.msfc.nasa.gov/news/2003/news-VASIMR.asp</link>
@@ -161,7 +228,7 @@ def rss_example
       <pubDate>Tue, 27 May 2003 08:37:32 GMT</pubDate>
       <guid>http://liftoff.msfc.nasa.gov/2003/05/27.html#item571</guid>
     </item>
- 
+
     <item>
       <title>Astronauts' Dirty Laundry</title>
       <link>http://liftoff.msfc.nasa.gov/news/2003/news-laundry.asp</link>

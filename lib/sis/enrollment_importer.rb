@@ -47,8 +47,8 @@ module SIS
         Course.where(id: batch).touch_all
       end
       i.courses_to_recache_due_dates.to_a.in_groups_of(1000, false) do |batch|
-        batch.each do |course_id|
-          DueDateCacher.recompute_course(course_id)
+        batch.each do |course_id, user_ids|
+          DueDateCacher.recompute_users_for_course(user_ids.uniq, course_id)
         end
       end
       # We batch these up at the end because normally a user would get several enrollments, and there's no reason
@@ -79,7 +79,7 @@ module SIS
         @incrementally_update_account_associations_user_ids = Set.new
         @users_to_touch_ids = Set.new
         @courses_to_touch_ids = Set.new
-        @courses_to_recache_due_dates = Set.new
+        @courses_to_recache_due_dates = {}
         @enrollments_to_update_sis_batch_ids = []
         @account_chain_cache = {}
         @course = @section = nil
@@ -285,7 +285,10 @@ module SIS
             enrollment.sis_pseudonym_id = pseudo.id
             if enrollment.changed?
               @users_to_touch_ids.add(user.id)
-              courses_to_recache_due_dates << enrollment.course_id if enrollment.workflow_state_changed?
+              if enrollment.workflow_state_changed?
+                courses_to_recache_due_dates[enrollment.course_id] ||=[]
+                courses_to_recache_due_dates[enrollment.course_id] << enrollment.user_id
+              end
               enrollment.sis_batch_id = enrollment_info.sis_batch_id if enrollment_info.sis_batch_id
               enrollment.sis_batch_id = @batch.id if @batch
               enrollment.skip_touch_user = true

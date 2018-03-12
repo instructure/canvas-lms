@@ -43,7 +43,7 @@
         </a>
       </div>
       <% end %>
-      <strong class="displaying title"><%= grading_standard.title %></strong>
+      <strong class="displaying title"><%= grading_standard.default_standard? ? I18n.t('Default Grading Scheme') : grading_standard.title %></strong>
       <div class="editing_box">
         <label for="grading_standard_title"><%= before_label('scheme_name', 'Scheme Name') %></label>
         <input type="text"

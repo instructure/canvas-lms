@@ -75,12 +75,13 @@ module Api
     }.freeze
 
     class UrlProxy
-      attr_reader :proxy, :context, :host, :protocol
-      def initialize(helper, context, host, protocol)
+      attr_reader :proxy, :context, :host, :protocol, :target_shard
+      def initialize(helper, context, host, protocol, target_shard: nil)
         @proxy = helper
         @context = context
         @host = host
         @protocol = protocol
+        @target_shard = target_shard || context.shard
       end
 
       def media_object_thumbnail_url(media_id)
@@ -119,7 +120,15 @@ module Api
             # otherwise if it starts with a slash, it's a path that needs to be
             # made absolute with the canvas hostname prepended
             if !url.host && url_str[0] == '/'[0]
-              element[attribute] = "#{protocol}://#{host}#{url_str}"
+              # transpose IDs in the URL
+              if context.shard != target_shard && (args = recognize_path(url_str))
+                transpose_ids(args)
+                args[:host] = host
+                args[:protocol] = protocol
+                element[attribute] = proxy.url_for(args)
+              else
+                element[attribute] = "#{protocol}://#{host}#{url_str}"
+              end
               api_endpoint_info(url_str).each do |att, val|
                 element[att] = val
               end
@@ -138,6 +147,8 @@ module Api
           helper = api_route[1]
           args = { :protocol => protocol, :host => host }
           args.merge! Hash[api_route.slice(2, match.captures.size).zip match.captures]
+          # transpose IDs in the URL
+          transpose_ids(args) if context.shard != target_shard
           if args[:url] && (return_type == 'SessionlessLaunchUrl' || (return_type == "Page" && url.include?("titleize=0")))
             args[:url] = URI.unescape(args[:url])
           end
@@ -145,6 +156,44 @@ module Api
           return { 'data-api-endpoint' => proxy.send(helper, args), 'data-api-returntype' => return_type }
         end
         {}
+      end
+
+      # based on ActionDispatch::Routing::RouteSet#recognize_path, but returning all params,
+      # not just path_params. and failures return nil, not raise an exception
+      def recognize_path(path)
+        path = ActionDispatch::Journey::Router::Utils.normalize_path(path)
+
+        begin
+          env = Rack::MockRequest.env_for(path, method: "GET")
+        rescue URI::InvalidURIError
+          return nil
+        end
+
+        req = Rails.application.routes.send(:make_request, env)
+        Rails.application.routes.router.recognize(req) do |route, params|
+          params.each do |key, value|
+            if value.is_a?(String)
+              value = value.dup.force_encoding(Encoding::BINARY)
+              params[key] = URI.parser.unescape(value)
+            end
+          end
+          req.path_parameters = params
+          app = route.app
+          if app.matches?(req) && app.dispatcher?
+            return req.params
+          end
+        end
+
+        nil
+      end
+
+      def transpose_ids(args)
+        args.each_key do |key|
+          if (key.to_s == 'id' || key.to_s.end_with?('_id')) &&
+            (new_id = Switchman::Shard.relative_id_for(args[key], context.shard, target_shard))
+            args[key] = Switchman::Shard.short_id_for(new_id)
+          end
+        end
       end
     end
   end

@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!blueprint_courses'
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
+import {string, bool, node} from 'prop-types'
 import cx from 'classnames'
 import shortId from '../../shared/shortid'
 
@@ -31,12 +31,12 @@ import { itemTypeLabels, changeTypeLabels } from '../labels'
 
 export default class ChangeLogRow extends Component {
   static propTypes = {
-    col1: PropTypes.string.isRequired,
-    col2: PropTypes.string.isRequired,
-    col3: PropTypes.string.isRequired,
-    col4: PropTypes.string.isRequired,
-    isHeading: PropTypes.bool,
-    children: PropTypes.node,
+    col1: string.isRequired,
+    col2: string.isRequired,
+    col3: string.isRequired,
+    col4: string.isRequired,
+    isHeading: bool,
+    children: node,
   }
 
   static defaultProps = {

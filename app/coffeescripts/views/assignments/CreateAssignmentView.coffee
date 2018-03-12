@@ -141,6 +141,7 @@ define [
 
     openAgain: ->
       super
+      this.hideErrors()
 
       timeField = @$el.find(".datetime_field")
       if @model.multipleDueDates() || @model.isOnlyVisibleToOverrides() || @model.nonBaseDates() || @disableDueAt()

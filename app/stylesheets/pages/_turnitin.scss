@@ -102,6 +102,11 @@ $turnitin_gray: #808080;
   &.submission_error, &.submission_pending {
     background-color: $turnitin_gray;
   }
+  &.pending_score {
+    background-image: url(/images/turnitin_submission_pending.png);
+    width: 10px;
+    height: 10px;
+  }
 }
 
 .turnitin_score_container {
