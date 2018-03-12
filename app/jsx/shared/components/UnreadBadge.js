@@ -18,7 +18,7 @@
 
 import React from 'react'
 import { string, number, oneOfType, node } from 'prop-types'
-import Tooltip from 'instructure-ui/lib/components/Tooltip'
+import Tooltip from '@instructure/ui-core/lib/components/Tooltip'
 
 export default function UnreadBadge ({ unreadCount, totalCount, unreadLabel, totalLabel }) {
   return (
