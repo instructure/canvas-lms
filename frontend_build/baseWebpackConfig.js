@@ -111,7 +111,6 @@ module.exports = {
       // don't let people import these top-level modules, because then you
       // get :allthethings: ... you need to import particular components
       'instructure-icons$': 'invalid',
-      'instructure-ui$': 'invalid',
 
       backbone: 'Backbone',
       timezone$: 'timezone_core',
