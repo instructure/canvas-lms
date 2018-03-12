@@ -17,10 +17,11 @@
 #
 
 require_relative '../spec_helper'
-require_relative '../sharding_spec_helper'
 require_relative '../lib/validates_as_url'
 
 describe Submission do
+  subject(:submission) { Submission.new }
+
   before(:once) do
     course_with_teacher(active_all: true)
     course_with_student(active_all: true, course: @course)
@@ -42,6 +43,114 @@ describe Submission do
   it { is_expected.to validate_numericality_of(:points_deducted).is_greater_than_or_equal_to(0).allow_nil }
   it { is_expected.to validate_numericality_of(:seconds_late_override).is_greater_than_or_equal_to(0).allow_nil }
   it { is_expected.to validate_inclusion_of(:late_policy_status).in_array(["none", "missing", "late"]).allow_nil }
+
+  describe '#anonymous_id' do
+    subject { submission.anonymous_id }
+
+    let(:student) { @student }
+    let(:assignment) { @assignment }
+
+    it { is_expected.to be_blank }
+
+    it 'sets an anoymous_id on validation' do
+      submission.validate
+      expect(submission.anonymous_id).to be_present
+    end
+
+    it 'does not change if already persisted' do
+      submission = assignment.submissions.find_by!(user: student)
+      expect { submission.save! }.not_to change { submission.anonymous_id }
+    end
+  end
+
+  describe '.generate_unique_anonymous_id' do
+    let(:assignment) { @assignment }
+    let(:short_id) { 'aB123' }
+
+    context 'given no existing_anonymous_ids' do
+      subject(:generate_unique_anonymous_id) do
+        -> { Submission.generate_unique_anonymous_id(assignment: assignment) }
+      end
+
+      it 'creates an anonymous_id' do
+        allow(Submission).to receive(:generate_short_id).and_return(short_id)
+        expect(generate_unique_anonymous_id.call).to eql short_id
+      end
+
+      it 'fetches existing_anonymous_ids' do
+        expect(Submission).to receive(:anonymous_ids_for).with(assignment).and_call_original
+        generate_unique_anonymous_id.call
+      end
+
+      it 'creates a unique anonymous_id when collisions happen' do
+        first_student = @student
+        second_student = student_in_course(course: @course, active_all: true).user
+        first_submission = submission_model(assignment: assignment, user: first_student)
+        second_submission = submission_model(assignment: assignment, user: second_student)
+        Submission.update_all(anonymous_id: nil)
+
+        first_anonymous_id = short_id
+        colliding_anonymous_id = first_anonymous_id
+        unused_anonymous_id = 'eeeee'
+
+        allow(Submission).to receive(:generate_short_id).exactly(3).times.and_return(
+          first_anonymous_id, colliding_anonymous_id, unused_anonymous_id
+        )
+
+        anonymous_ids = [first_submission, second_submission].map do |submission|
+          submission.update!(anonymous_id: generate_unique_anonymous_id.call)
+          submission.anonymous_id
+        end
+
+        expect(anonymous_ids).to contain_exactly(first_anonymous_id, unused_anonymous_id)
+      end
+    end
+
+    context 'given a list of existing_anonymous_ids' do
+      subject do
+        Submission.generate_unique_anonymous_id(
+          assignment: assignment,
+          existing_anonymous_ids: existing_anonymous_ids_fake
+        )
+      end
+
+      let(:existing_anonymous_ids_fake) { double('Array') }
+
+      before do
+        student_in_course(course: @course, active_all: true)
+      end
+
+      it 'queries the passed in existing_anonymous_ids' do
+        allow(Submission).to receive(:generate_short_id).and_return(short_id)
+        expect(existing_anonymous_ids_fake).to receive(:include?).with(short_id).and_return(false)
+        is_expected.to eql short_id
+      end
+    end
+  end
+
+  describe '.generate_short_id' do
+    it 'generates a short id' do
+      expect(SecureRandom).to receive(:base58).with(5)
+      Submission.generate_short_id
+    end
+  end
+
+  describe '.anonymous_ids_for' do
+    subject { Submission.anonymous_ids_for(@first_assignment) }
+
+    before do
+      student_with_anonymous_ids = @student
+      student_without_anonymous_ids = student_in_course(course: @course, active_all: true).user
+      @first_assignment = @course.assignments.create!
+      @course.assignments.create! # second_assignment
+      @first_assignment_submission = @first_assignment.submissions.find_by!(user: student_with_anonymous_ids)
+      Submission.where(user: student_without_anonymous_ids).update_all(anonymous_id: nil)
+    end
+
+    it 'only contains submissions with anonymous_ids' do
+      is_expected.to contain_exactly(@first_assignment_submission.anonymous_id)
+    end
+  end
 
   describe "with grading periods" do
     let(:in_closed_grading_period) { 9.days.ago }
@@ -2711,6 +2820,24 @@ describe Submission do
     end
   end
 
+  describe 'scope: anonymized' do
+    subject(:submissions) { assignment.all_submissions.anonymized }
+
+    let(:assignment) { @course.assignments.create! }
+    let(:first_student) { @student }
+    let(:second_student) { student_in_course(course: @course, active_all: true).user }
+    let(:submission_with_anonymous_id) { submission_model(assignment: assignment, user: first_student) }
+    let(:submission_without_anonymous_id) do
+      submission_model(assignment: assignment, user: second_student).tap do |submission|
+        submission.update_attribute(:anonymous_id, nil)
+      end
+    end
+
+    it 'only contains submissions that have anonymous_ids' do
+      is_expected.to contain_exactly(submission_with_anonymous_id)
+    end
+  end
+
   describe "scope: missing" do
     before :once do
       @now = Time.zone.now
@@ -3437,22 +3564,6 @@ describe Submission do
     end
   end
 
-  describe "cross-shard attachments" do
-    specs_require_sharding
-    it "should work" do
-      @shard1.activate do
-        @student = user_factory(active_user: true)
-        @attachment = Attachment.create! uploaded_data: StringIO.new('blah'), context: @student, filename: 'blah.txt'
-      end
-      course_factory(active_all: true)
-      @course.enroll_user(@student, "StudentEnrollment").accept!
-      @assignment = @course.assignments.create!
-
-      sub = @assignment.submit_homework(@user, attachments: [@attachment])
-      expect(sub.attachments).to eq [@attachment]
-    end
-  end
-
   describe '.process_bulk_update' do
     before(:once) do
       course_with_teacher active_all: true
@@ -3936,6 +4047,7 @@ describe Submission do
     end
 
     context "sharding" do
+      require_relative '../sharding_spec_helper'
       specs_require_sharding
 
       it "serializes relative to current scope's shard" do
@@ -3943,12 +4055,25 @@ describe Submission do
           expect(Submission.shard(Shard.default).needs_grading.count).to eq(1)
         end
       end
+
+      it "works with cross shard attachments" do
+        @shard1.activate do
+          @student = user_factory(active_user: true)
+          @attachment = Attachment.create! uploaded_data: StringIO.new('blah'), context: @student, filename: 'blah.txt'
+        end
+        course_factory(active_all: true)
+        @course.enroll_user(@student, "StudentEnrollment").accept!
+        @assignment = @course.assignments.create!
+
+        sub = @assignment.submit_homework(@user, attachments: [@attachment])
+        expect(sub.attachments).to eq [@attachment]
+      end
     end
   end
 
   describe "#needs_grading?" do
     before :once do
-      @submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'asdf')
+      @submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'a body')
     end
 
     it "returns true for submission that has not been graded" do
@@ -4373,6 +4498,16 @@ describe Submission do
   describe "scope: with_assignment" do
     it "excludes submissions to deleted assignments" do
       expect { @assignment.destroy }.to change { @student.submissions.with_assignment.count }.by(-1)
+    end
+  end
+
+  describe "scope: for_assignment" do
+    it "includes all submissions for a given assignment" do
+      first_assignment = @assignment
+      @course.assignments.create!
+
+      submissions = Submission.for_assignment(@assignment)
+      expect(submissions).to match_array(first_assignment.submissions)
     end
   end
 

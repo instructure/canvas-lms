@@ -203,7 +203,42 @@ describe DueDateCacher do
   describe "#recompute" do
     subject(:cacher) { DueDateCacher.new(@course, [@assignment]) }
 
-    let(:submission) { submission_model(assignment: @assignment, user: @student) }
+    let(:submission) { submission_model(assignment: @assignment, user: first_student) }
+    let(:first_student) { @student }
+    let(:second_student) do
+      student_in_course(active_all: true)
+      @student
+    end
+
+    describe "anonymous_id" do
+      context 'given no existing submission' do
+        before do
+          submission.delete
+          cacher.recompute
+        end
+
+        it 'creates a submission with an anoymous_id' do
+          first_student_submission = @assignment.submissions.find_by!(user: first_student)
+          expect(first_student_submission.anonymous_id).to be_present
+        end
+      end
+
+      context 'given an existing submission with an anoymous_id' do
+        it 'does not change anonymous_ids' do
+          expect { cacher.recompute }.not_to change { submission.reload.anonymous_id }
+        end
+      end
+
+      context 'given an existing submission without an anonymous_id' do
+        before do
+          submission.update_attribute(:anonymous_id, nil)
+        end
+
+        it 'sets anonymous_id for an existing submission' do
+          expect { cacher.recompute }.to change { submission.reload.anonymous_id }.from(nil).to(String)
+        end
+      end
+    end
 
     describe "cached_due_date" do
       before do

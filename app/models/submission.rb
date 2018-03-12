@@ -131,9 +131,8 @@ class Submission < ActiveRecord::Base
     limit(limit)
   }
 
-  scope :for_course, lambda { |course|
-    where(assignment_id: course.assignments.except(:order))
-  }
+  scope :for_course, -> (course) { where(assignment: course.assignments.except(:order)) }
+  scope :for_assignment, -> (assignment) { where(assignment: assignment) }
 
   scope :missing, -> do
     joins(:assignment).
@@ -206,6 +205,8 @@ class Submission < ActiveRecord::Base
     ")
   end
 
+  scope :anonymized, -> { where.not(anonymous_id: nil) }
+
   workflow do
     state :submitted do
       event :grade_it, :transitions_to => :graded
@@ -216,6 +217,33 @@ class Submission < ActiveRecord::Base
     state :deleted
   end
   alias needs_review? pending_review?
+
+  def self.anonymous_ids_for(assignment)
+    anonymized.for_assignment(assignment).pluck(:anonymous_id)
+  end
+
+  # Returns a unique short id to be used for anonymous_id. If the
+  # generated short id is already in use, loop until an available
+  # one is generated. `anonymous_ids` are unique per assignment.
+  # This method will throw a unique constraint error from the
+  # database if it has used all unique ids.
+  # An optional argument of existing_anonymous_ids can be supplied
+  # to customize the handling of existing anonymous_ids. E.g. bulk
+  # generation of anonymous ids where you wouldn't want to
+  # continuously query the database
+  def self.generate_unique_anonymous_id(assignment:, existing_anonymous_ids: anonymous_ids_for(assignment))
+    loop do
+      short_id = Submission.generate_short_id
+      break short_id unless existing_anonymous_ids.include?(short_id)
+    end
+  end
+
+  # base58 to avoid literal problems with prefixed 0 (i.e. when 0x123
+  # is interpreted as a hex value `0x123 == 291`), and similar looking
+  # characters: 0/O, I/l
+  def self.generate_short_id
+    SecureRandom.base58(5)
+  end
 
   # see #needs_grading?
   # When changing these conditions, update index_submissions_needs_grading to
@@ -274,6 +302,11 @@ class Submission < ActiveRecord::Base
                 :assignment_changed_not_sub,
                 :grading_error_message,
                 :grade_change_event_author_id
+
+  # Because set_anonymous_id makes database calls, delay it until just before
+  # validation. Otherwise if we place it in any earlier (e.g.
+  # before/after_initialize), every Submission.new will make database calls.
+  before_validation :set_anonymous_id, if: :new_record?
   before_save :apply_late_policy, if: :late_policy_relevant_changes?
   before_save :update_if_pending
   before_save :validate_single_submission, :infer_values
@@ -2401,4 +2434,9 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  private
+
+  def set_anonymous_id
+    self.anonymous_id = Submission.generate_unique_anonymous_id(assignment: anonymous_id)
+  end
 end
