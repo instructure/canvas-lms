@@ -1,26 +1,26 @@
 import React from "react"
 
 import { LiveAnnouncer, LiveMessage } from "react-aria-live"
-import Tray from "instructure-ui/lib/components/Tray"
-import Container from "instructure-ui/lib/components/Container"
-import Heading from "instructure-ui/lib/components/Heading"
-import Button from "instructure-ui/lib/components/Button"
-import Link from "instructure-ui/lib/components/Link"
-import Alert from "instructure-ui/lib/components/Alert"
-import Checkbox from "instructure-ui/lib/components/Checkbox"
-import TextInput from "instructure-ui/lib/components/TextInput"
-import TextArea from "instructure-ui/lib/components/TextArea"
-import Select from "instructure-ui/lib/components/Select"
-import ContextBox from "instructure-ui/lib/components/ContextBox"
-import Grid from "instructure-ui/lib/components/Grid"
-import GridRow from "instructure-ui/lib/components/Grid/GridRow"
-import GridCol from "instructure-ui/lib/components/Grid/GridCol"
-import Spinner from "instructure-ui/lib/components/Spinner"
+import Tray from "@instructure/ui-core/lib/components/Tray"
+import Container from "@instructure/ui-core/lib/components/Container"
+import Heading from "@instructure/ui-core/lib/components/Heading"
+import Button from "@instructure/ui-core/lib/components/Button"
+import Link from "@instructure/ui-core/lib/components/Link"
+import Alert from "@instructure/ui-core/lib/components/Alert"
+import Checkbox from "@instructure/ui-core/lib/components/Checkbox"
+import TextInput from "@instructure/ui-core/lib/components/TextInput"
+import TextArea from "@instructure/ui-core/lib/components/TextArea"
+import Select from "@instructure/ui-core/lib/components/Select"
+import ContextBox from "@instructure/ui-core/lib/components/ContextBox"
+import Grid from "@instructure/ui-core/lib/components/Grid"
+import GridRow from "@instructure/ui-core/lib/components/Grid/GridRow"
+import GridCol from "@instructure/ui-core/lib/components/Grid/GridCol"
+import Spinner from "@instructure/ui-core/lib/components/Spinner"
 import Popover, {
   PopoverTrigger,
   PopoverContent
-} from "instructure-ui/lib/components/Popover"
-import Typography from "instructure-ui/lib/components/Typography"
+} from "@instructure/ui-core/lib/components/Popover"
+import Text from "@instructure/ui-core/lib/components/Text"
 import IconQuestionLine from "instructure-icons/lib/Line/IconQuestionLine"
 import ColorField from "./color-field"
 import PlaceholderSVG from "./placeholder-svg"
@@ -346,9 +346,7 @@ export default class Checker extends React.Component {
                   >
                     <GridRow>
                       <GridCol>
-                        <Typography weight="bold">
-                          {issueNumberMessage}
-                        </Typography>
+                        <Text weight="bold">{issueNumberMessage}</Text>
                       </GridCol>
                       <GridCol width="auto">
                         <Popover
@@ -372,7 +370,7 @@ export default class Checker extends React.Component {
                               display="block"
                               style={{ width: "16rem" }}
                             >
-                              <Typography>
+                              <Text>
                                 <p>
                                   {rule.why() + " "}
                                   {rule.link &&
@@ -382,7 +380,7 @@ export default class Checker extends React.Component {
                                       </Link>
                                     )}
                                 </p>
-                              </Typography>
+                              </Text>
                             </Container>
                           </PopoverContent>
                         </Popover>
@@ -391,7 +389,7 @@ export default class Checker extends React.Component {
                   </Grid>
                 </Container>
                 <form onSubmit={this.fixIssue}>
-                  <Typography as="div">{this.errorMessage()}</Typography>
+                  <Text as="div">{this.errorMessage()}</Text>
                   {rule.form().map(f => (
                     <Container as="div" key={f.dataKey} margin="medium 0 0">
                       {this.renderField(f)}
@@ -430,11 +428,11 @@ export default class Checker extends React.Component {
             {this.state.errors.length === 0 &&
               !this.state.checking && (
                 <Container>
-                  <Typography>
+                  <Text>
                     <p>
                       {formatMessage("No accessibility issues were detected.")}
                     </p>
-                  </Typography>
+                  </Text>
                   <PlaceholderSVG />
                 </Container>
               )}
