@@ -174,7 +174,8 @@ describe "Alerts" do
       alert.find_all('.add_recipients_line select option').each do
         link.click
       end
-      expect(find('.alert.new .add_recipient_link')).not_to be_displayed
+      wait_for_ajaximations
+      expect(f('.add_recipients_line')).not_to contain_link('Recipient')
     end
 
     it "should not show the add link when all recipients are already there" do
