@@ -204,6 +204,10 @@ define [
       return @get 'anonymous_instructor_annotations' unless arguments.length > 0
       @set 'anonymous_instructor_annotations', anonymousInstructorAnnotationsBoolean
 
+    anonymousGrading: (anonymousGradingBoolean) =>
+      return @get 'anonymous_grading' unless arguments.length > 0
+      @set 'anonymous_grading', anonymousGradingBoolean
+
     peerReviews: (peerReviewBoolean) =>
       return @get 'peer_reviews' unless arguments.length > 0
       @set 'peer_reviews', peerReviewBoolean
@@ -419,7 +423,7 @@ define [
         'moderatedGrading', 'postToSISEnabled', 'isOnlyVisibleToOverrides',
         'omitFromFinalGrade', 'is_quiz_assignment', 'isQuizLTIAssignment',
         'secureParams', 'inClosedGradingPeriod', 'dueDateRequired', 'submissionTypesFrozen',
-        'anonymousInstructorAnnotations'
+        'anonymousInstructorAnnotations', 'anonymousGrading'
       ]
 
       hash =

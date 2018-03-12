@@ -915,3 +915,37 @@ test('when environment is set to true, enables editing the property', function()
   strictEqual(view.toJSON().anonymousInstructorAnnotationsEnabled, true)
   strictEqual(view.$el.find('input#assignment_anonymous_instructor_annotations').length, 1)
 })
+
+QUnit.module('EditView: anonymous grading', (hooks) => {
+  let server;
+  hooks.beforeEach(() => {
+    fakeENV.setup()
+    server = sinon.fakeServer.create()
+  });
+
+  hooks.afterEach(() => {
+    server.restore()
+    fakeENV.teardown()
+  });
+
+  test('does not show the checkbox when environment is not set', () => {
+    const view = editView()
+    strictEqual(view.toJSON().anonymousGradingEnabled, false)
+    strictEqual(view.$el.find('input#assignment_anonymous_grading').length, 0)
+  })
+
+  test('does not show the checkbox when environment set to false', () => {
+    ENV.ANONYMOUS_GRADING_ENABLED = false
+    const view = editView()
+    strictEqual(view.toJSON().anonymousGradingEnabled, false)
+    strictEqual(view.$el.find('input#assignment_anonymous_grading').length, 0)
+  })
+
+  test('shows the checkbox when environment is set to true', () => {
+    ENV.ANONYMOUS_GRADING_ENABLED = true
+    const view = editView()
+    strictEqual(view.toJSON().anonymousGradingEnabled, true)
+    strictEqual(view.$el.find('input#assignment_anonymous_grading').length, 1)
+  })
+})
+

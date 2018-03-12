@@ -175,6 +175,25 @@
       </fieldset>
     {{/unless}}
 
+    {{#if anonymousGradingEnabled}}
+      <fieldset>
+        <div class="form-column-left">{{#t}}Anonymous Grading{{/t}}</div>
+        <div id="enable-anonymous-grading" class="form-column-right" style="margin-top: 14px;">
+          <div class="border border-trbl border-round">
+            <label class="checkbox">
+              {{checkbox "anonymousGrading"
+                id="assignment_anonymous_grading"
+                name="anonymous_grading"
+              }}
+              <strong>{{#t}}Grade Anonymously{{/t}}</strong>
+
+              <p>{{#t}}Graders cannot see student names{{/t}}</p>
+            </label>
+          </div>
+        </div>
+      </fieldset>
+    {{/if}}
+
     {{#if anonymousInstructorAnnotationsEnabled}}
       <fieldset>
         <div class="form-column-left">{{#t}}Anonymous Instructor Annotations{{/t}}</div>

@@ -49,6 +49,7 @@ module Api::V1::Assignment
       moderated_grading
       omit_from_final_grade
       anonymous_instructor_annotations
+      anonymous_grading
     )
   }.freeze
 
@@ -335,6 +336,8 @@ module Api::V1::Assignment
       override = assignment.planner_override_for(user)
       hash['planner_override'] = planner_override_json(override, user, session)
     end
+
+    hash['anonymous_grading'] = value_to_boolean(assignment.anonymous_grading)
 
     hash
   end
@@ -653,6 +656,10 @@ module Api::V1::Assignment
 
     if assignment_params.key?('moderated_grading')
       assignment.moderated_grading = value_to_boolean(assignment_params['moderated_grading'])
+    end
+
+    if assignment_params.key?('anonymous_grading') && assignment.course.feature_enabled?(:anonymous_marking)
+      assignment.anonymous_grading = value_to_boolean(assignment_params['anonymous_grading'])
     end
 
     apply_report_visibility_options!(assignment_params, assignment)

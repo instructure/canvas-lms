@@ -317,6 +317,7 @@ class Assignment < ActiveRecord::Base
     omit_from_final_grade
     grading_standard_id
     anonymous_instructor_annotations
+    anonymous_grading
   ).freeze
 
   def external_tool?
@@ -646,7 +647,8 @@ class Assignment < ActiveRecord::Base
       :anonymous_peer_reviews, :turnitin_enabled, :vericite_enabled,
       :moderated_grading, :omit_from_final_grade, :freeze_on_copy,
       :copied, :only_visible_to_overrides, :post_to_sis, :peer_reviews_assigned,
-      :peer_reviews, :automatic_peer_reviews, :muted, :intra_group_peer_reviews
+      :peer_reviews, :automatic_peer_reviews, :muted, :intra_group_peer_reviews,
+      :anonymous_grading
     ].each { |attr| self[attr] = false if self[attr].nil? }
   end
   protected :default_values

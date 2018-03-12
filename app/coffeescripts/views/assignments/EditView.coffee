@@ -89,6 +89,7 @@ define [
     MODERATED_GRADING_BOX = '#assignment_moderated_grading'
     CONDITIONAL_RELEASE_TARGET = '#conditional_release_target'
     SIMILARITY_DETECTION_TOOLS = '#similarity_detection_tools'
+    ANONYMOUS_GRADING_BOX = '#assignment_anonymous_grading'
 
     els: _.extend({}, @::els, do ->
       els = {}
@@ -119,6 +120,7 @@ define [
       els["#{CONDITIONAL_RELEASE_TARGET}"] = '$conditionalReleaseTarget'
       els["#{SIMILARITY_DETECTION_TOOLS}"] = '$similarityDetectionTools'
       els["#{SECURE_PARAMS}"] = '$secureParams'
+      els["#{ANONYMOUS_GRADING_BOX}"] = '$anonymousGradingBox'
       els
     )
 
@@ -340,6 +342,7 @@ define [
         conditionalReleaseServiceEnabled: ENV?.CONDITIONAL_RELEASE_SERVICE_ENABLED or false
         lockedItems: @lockedItems
         anonymousInstructorAnnotationsEnabled: ENV?.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED or false
+        anonymousGradingEnabled: ENV?.ANONYMOUS_GRADING_ENABLED or false
 
 
     _attachEditorToDescription: =>
