@@ -186,11 +186,6 @@ class DeveloperKey extends React.Component {
     return `${lastUsed} ${lastUsedDate}`
   }
 
-  notes (developerKey) {
-    if (!developerKey.notes) { return null }
-    return (<div>{developerKey.notes}</div>)
-  }
-
   render () {
     const { developerKey } = this.props;
 
@@ -235,10 +230,6 @@ class DeveloperKey extends React.Component {
           <div>
             {this.lastUsed(developerKey)}
           </div>
-        </td>
-
-        <td className="notes">
-          {this.notes(developerKey)}
         </td>
 
         <td className="icon_react">

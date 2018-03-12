@@ -159,6 +159,3 @@ test('includes "Never" when last_used_at is null', () => {
   testWrapperOk(propsModified, 'Never')
 });
 
-test('includes notes', () => {
-  testWrapperOk(props(), "all the notas")
-});

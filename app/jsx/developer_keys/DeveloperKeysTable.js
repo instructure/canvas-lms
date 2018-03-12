@@ -39,7 +39,6 @@ class DeveloperKeysTable extends React.Component {
             <th scope="col">User</th>
             <th scope="col">Details</th>
             <th scope="col">Stats</th>
-            <th scope="col">Notes</th>
             <th scope="col" />
           </tr>
         </thead>
