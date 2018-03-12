@@ -36,7 +36,7 @@ function copyAndUpdateDiscussionState(oldState, updatedDiscussion) {
   if (!updatedDiscussion.pinned && discussionIndex !== -1) {
     newState.splice(discussionIndex, 1)
   } else if (updatedDiscussion.pinned && discussionIndex === -1) {
-    newState.unshift(updatedDiscussion)
+    newState.push(updatedDiscussion)
   } else if (updatedDiscussion.pinned && discussionIndex !== -1) {
     newState[discussionIndex] = updatedDiscussion
   }

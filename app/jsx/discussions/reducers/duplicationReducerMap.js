@@ -17,6 +17,16 @@
  */
 import { actionTypes } from '../actions'
 
+function updatePositions(discussions, updatedPositions) {
+  return discussions.map( (discussion) => {
+    if (updatedPositions[discussion.id] === discussion.position) {
+      return discussion
+    } else {
+      return Object.assign({...discussion, position: updatedPositions[discussion.id] })
+    }
+  })
+}
+
 const duplicationReducerMap = {
   [actionTypes.DUPLICATE_DISCUSSION_SUCCESS]: (state, action) => {
     const newDiscussion = Object.assign(action.payload.newDiscussion)
@@ -24,15 +34,22 @@ const duplicationReducerMap = {
       discussion.id === action.payload.originalId
     ))
     if (oldIndex >= 0) {
-      const newStateBeginning = state.slice(0, oldIndex + 1)
+      // We are in the container of the duplicated discussion, so process things
       newDiscussion.focusOn = 'title'
+      const newStateBeginning = state.slice(0, oldIndex + 1)
       newStateBeginning.push(newDiscussion)
-      const newStateEnd = state.slice(oldIndex + 1, state.length)
+      const remainingOriginalDiscussions = state.slice(oldIndex + 1, state.length)
+      // If we are in the pinned section, update the positions as needed to be
+      // consistent with the new values in the database.  Note that only
+      // discussions *after* what was duplicated might have changed positions.
+      const newStateEnd = newDiscussion.pinned ? remainingOriginalDiscussions
+        : updatePositions(remainingOriginalDiscussions, newDiscussion.new_positions)
+      delete newDiscussion.new_positions
       return newStateBeginning.concat(newStateEnd)
     } else {
       // The original discussion wasn't in this container, so the state should
       // not be changed.
-      return state.slice(0, state.length + 1)
+      return state
     }
   }
 }

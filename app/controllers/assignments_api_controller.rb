@@ -608,11 +608,11 @@ class AssignmentsApiController < ApplicationController
     old_assignment = @context.active_assignments.find_by({ id: assignment_id })
 
     if !old_assignment || old_assignment.workflow_state == "deleted"
-      return render json: { error: 'assignment does not exist' }, status: :bad_request
+      return render json: { error: t('assignment does not exist') }, status: :bad_request
     end
 
     if old_assignment.quiz
-      return render json: { error: 'quiz duplication not implemented' }, status: :bad_request
+      return render json: { error: t('quiz duplication not implemented') }, status: :bad_request
     end
 
     return unless authorized_action(old_assignment, @current_user, :create)
@@ -628,13 +628,17 @@ class AssignmentsApiController < ApplicationController
       positions_hash[id_pos_pair[0]] = id_pos_pair[1]
     end
     if new_assignment
+      assignment_topic = old_assignment.discussion_topic
+      if assignment_topic&.pinned && !assignment_topic&.position.nil?
+        new_assignment.discussion_topic.insert_at(assignment_topic.position + 1)
+      end
       # Include the updated positions in the response so the frontend can
       # update them appropriately
       result_json = assignment_json(new_assignment, @current_user, session)
       result_json['new_positions'] = positions_hash
       render :json => result_json
     else
-      render json: { error: 'cannot save new assignment' }, status: :bad_request
+      render json: { error: t('cannot save new assignment') }, status: :bad_request
     end
   end
 

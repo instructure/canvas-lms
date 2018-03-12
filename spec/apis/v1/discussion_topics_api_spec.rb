@@ -2835,6 +2835,35 @@ describe DiscussionTopicsController, type: :request do
       expect(json["sections"].length).to eq 1
       expect(json["sections"][0]["id"]).to eq section1.id
     end
+
+    it "duplicate updates positions" do
+      @user = @teacher
+      topic1 = DiscussionTopic.create!(:context => @course, :pinned => true, :position => 20,
+        :title => "Foo", :message => "bar")
+      topic2 = DiscussionTopic.create!(:context => @course, :pinned => true, :position => 21,
+        :title => "Bar", :message => "baz")
+      json = api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{topic1.id}/duplicate",
+        { :controller => "discussion_topics_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.to_param,
+          :topic_id => topic1.to_param },
+        {},
+        {},
+        :expected_status => 200)
+      # The new topic should have position 21, and topic2 should be bumped
+      # up to 22
+      new_positions = json["new_positions"]
+      topic1.reload
+      expect(new_positions[topic1.id.to_s]).to eq 20
+      expect(topic1.position).to eq 20
+      new_topic = DiscussionTopic.last
+      expect(new_positions[new_topic.id.to_s]).to eq 21
+      expect(new_topic.position).to eq 21
+      topic2.reload
+      expect(new_positions[topic2.id.to_s]).to eq 22
+      expect(topic2.position).to eq 22
+    end
   end
 
   context "public courses" do

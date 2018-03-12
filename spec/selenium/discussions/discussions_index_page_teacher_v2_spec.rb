@@ -23,8 +23,6 @@ describe "discussions index" do
   context "as a teacher" do
     discussion1_title = 'Meaning of life'
     discussion2_title = 'Meaning of the universe'
-    discussion3_title = 'Discussion about landon'
-    discussion4_title = 'Discussion about aaron'
 
     before :once do
       @teacher = user_with_pseudonym(active_user: true)
@@ -47,77 +45,79 @@ describe "discussions index" do
         locked: true,
         pinned: false
       )
-      @discussion3 = @course.discussion_topics.create!(
-        title: discussion3_title,
-        message: 'Could it be 43?',
-        delayed_post_at: 1.day.from_now,
-        user: @teacher,
-        locked: false,
-        pinned: true
-      )
-      @discussion4 = @course.discussion_topics.create!(
-        title: discussion4_title,
-        message: 'Could it be 43?',
-        delayed_post_at: 1.day.from_now,
-        user: @teacher,
-        locked: true,
-        pinned: true
-      )
+
       @discussion1.discussion_entries.create!(user: @student, message: "I think I read that somewhere...")
       @discussion1.discussion_entries.create!(user: @student, message: ":eyeroll:")
     end
 
-    before :each do
-      user_session(@teacher)
-      DiscussionsIndex.visit(@course)
+    def login_and_visit_course(teacher, course)
+      user_session(teacher)
+      DiscussionsIndex.visit(course)
+    end
+
+    def create_course_and_discussion(opts)
+      opts.reverse_merge!({ locked: false, pinned: false })
+      course = course_factory(:active_all => true)
+      discussion = course.discussion_topics.create!(
+        title: opts[:title],
+        message: opts[:message],
+        user: @teacher,
+        locked: opts[:locked],
+        pinned: opts[:pinned]
+      )
+      [course, discussion]
     end
 
     it "discussions can be filtered" do
+      login_and_visit_course(@teacher, @course)
       DiscussionsIndex.select_filter("Unread")
 
       # Attempt to make this test less brittle. It's doing client side filtering
       # with a debounce function, so we need to give it time to perform the filtering
-      wait_for_stale_element(DiscussionsIndex.discussion_title_css(discussion2_title), jquery_selector: true)
       expect(DiscussionsIndex.discussion(discussion1_title)).to be_displayed
       expect(f('#content')).not_to contain_jqcss(DiscussionsIndex.discussion_title_css(discussion2_title))
     end
 
     it "search by title works correctly" do
+      login_and_visit_course(@teacher, @course)
       DiscussionsIndex.enter_search(discussion1_title)
 
       # Attempt to make this test less brittle. It's doing client side filtering
       # with a debounce function, so we need to give it time to perform the filtering
-      wait_for_stale_element(DiscussionsIndex.discussion_title_css(discussion2_title), jquery_selector: true)
       expect(DiscussionsIndex.discussion(discussion1_title)).to be_displayed
       expect(f('#content')).not_to contain_jqcss(DiscussionsIndex.discussion_title_css(discussion2_title))
     end
 
     it 'clicking the Add Discussion button redirects to new discussion page' do
+      login_and_visit_course(@teacher, @course)
       expect_new_page_load { DiscussionsIndex.click_add_discussion }
       expect(driver.current_url).to include(DiscussionsIndex.new_discussion_url)
     end
 
     it 'clicking the publish botton changes the published status' do
       # Cannot use @discussion[12] here because unpublish requires there to be no posts
-      discussion1 = @course.discussion_topics.create!(title: 'foo', message: 'foo', user: @teacher)
-      discussion1.save!
-      expect(discussion1.published?).to be true
-
-      DiscussionsIndex.visit(@course)
+      course, discussion = create_course_and_discussion(
+        title: 'foo',
+        message: 'foo',
+      )
+      expect(discussion.published?).to be true
+      login_and_visit_course(@teacher, course)
       DiscussionsIndex.click_publish_button('foo')
       wait_for_ajaximations
-      discussion1.reload
-      expect(discussion1.published?).to be false
+      discussion.reload
+      expect(discussion.published?).to be false
     end
 
     it 'clicking the subscribe botton changes the subscribed status' do
-      expect(@discussion1.subscribed? @teacher).to be true
+      login_and_visit_course(@teacher, @course)
+      expect(@discussion1.subscribed?(@teacher)).to be true
       DiscussionsIndex.click_subscribe_button(discussion1_title)
       wait_for_ajaximations
-      expect(@discussion1.subscribed? @teacher).to be false
+      expect(@discussion1.subscribed?(@teacher)).to be false
     end
 
     it 'discussion can be moved between groups using Pin menu item' do
+      login_and_visit_course(@teacher, @course)
       DiscussionsIndex.click_pin_menu_option(discussion1_title)
       group = DiscussionsIndex.discussion_group("Pinned Discussions")
       expect(group).to include_text(discussion1_title)
@@ -126,22 +126,37 @@ describe "discussions index" do
     end
 
     it 'unpinning an unlocked discussion goes to the regular bin' do
-      DiscussionsIndex.click_pin_menu_option(discussion3_title)
+      course, discussion = create_course_and_discussion(
+        title: 'Discussion about aaron',
+        message: 'Aaron is aaron',
+        locked: false,
+        pinned: true
+      )
+      login_and_visit_course(@teacher, course)
+      DiscussionsIndex.click_pin_menu_option(discussion.title)
       group = DiscussionsIndex.discussion_group("Discussions")
-      expect(group).to include_text(discussion3_title)
-      @discussion3.reload
-      expect(@discussion3.pinned).to be false
+      expect(group).to include_text(discussion.title)
+      discussion.reload
+      expect(discussion.pinned).to be false
     end
 
     it 'unpinning a locked discussion goes to the locked bin' do
-      DiscussionsIndex.click_pin_menu_option(discussion4_title)
+      course, discussion = create_course_and_discussion(
+        title: 'Discussion about landon',
+        message: 'Landon is landon',
+        locked: true,
+        pinned: true
+      )
+      login_and_visit_course(@teacher, course)
+      DiscussionsIndex.click_pin_menu_option(discussion.title)
       group = DiscussionsIndex.discussion_group("Closed for Comments")
-      expect(group).to include_text(discussion4_title)
-      @discussion4.reload
-      expect(@discussion4.pinned).to be false
+      expect(group).to include_text(discussion.title)
+      discussion.reload
+      expect(discussion.pinned).to be false
     end
 
     it 'discussion can be moved to Closed For Comments group using menu item' do
+      login_and_visit_course(@teacher, @course)
       DiscussionsIndex.click_close_for_comments_menu_option(discussion1_title)
       group = DiscussionsIndex.discussion_group("Closed for Comments")
       expect(group).to include_text(discussion1_title)
@@ -150,14 +165,22 @@ describe "discussions index" do
     end
 
     it 'closing a pinned discussion stays pinned' do
-      DiscussionsIndex.click_close_for_comments_menu_option(discussion3_title)
+      course, discussion = create_course_and_discussion(
+        title: 'Discussion about steven',
+        message: 'Steven is steven',
+        locked: false,
+        pinned: true
+      )
+      login_and_visit_course(@teacher, course)
+      DiscussionsIndex.click_close_for_comments_menu_option(discussion.title)
       group = DiscussionsIndex.discussion_group("Pinned Discussions")
-      expect(group).to include_text(discussion1_title)
-      @discussion3.reload
-      expect(@discussion3.locked).to be true
+      expect(group).to include_text(discussion.title)
+      discussion.reload
+      expect(discussion.locked).to be true
     end
 
     it 'opening an unpinned discussion moves to "regular"' do
+      login_and_visit_course(@teacher, @course)
       DiscussionsIndex.click_close_for_comments_menu_option(discussion2_title)
       group = DiscussionsIndex.discussion_group("Discussions")
       expect(group).to include_text(discussion1_title)
@@ -166,28 +189,33 @@ describe "discussions index" do
     end
 
     it 'clicking the discussion goes to the discussion page' do
+      login_and_visit_course(@teacher, @course)
       expect_new_page_load { DiscussionsIndex.click_on_discussion(discussion1_title) }
       expect(driver.current_url).to include(DiscussionsIndex.individual_discussion_url(@discussion1))
     end
 
     it 'a discussion can be deleted by using Delete menu item' do
       skip('Add with COMMS-925')
+      login_and_visit_course(@teacher, @course)
       DiscussionsIndex.click_delete_menu_option(discussion1_title)
       expect(f('#content')).not_to contain_jqcss(DiscussionsIndex.discussion_title_css(discussion1_title))
       expect(Announcement.where(title: announcement1_title).first.workflow_state).to eq 'deleted'
     end
 
     it 'a discussion can be duplicated by using Duplicate menu item' do
+      login_and_visit_course(@teacher, @course)
       DiscussionsIndex.click_duplicate_menu_option(discussion1_title)
       expect(DiscussionsIndex.discussion(discussion1_title + " Copy")).to be_displayed
     end
 
     it 'pill on announcement displays correct number of unread replies' do
       skip('Add with COMMS-693')
+      login_and_visit_course(@teacher, @course)
       expect(DiscussionsIndex.discussion_unread_pill(discussion1_title)).to eq "2"
     end
 
     it "should allow teachers to edit discussions settings" do
+      login_and_visit_course(@teacher, @course)
       DiscussionsIndex.click_discussion_settings_button
       DiscussionsIndex.click_create_discussions_checkbox
       DiscussionsIndex.submit_discussion_settings

@@ -387,6 +387,14 @@ class DiscussionTopic < ActiveRecord::Base
       opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"), self.title)
     result = self.duplicate_base_model(copy_title, opts_with_default)
 
+    # Start with a position guaranteed to not conflict with existing ones.
+    # Clients are encouraged to set the correct position later on and do
+    # an insert_at upon save.
+
+    if self.pinned
+      result.position = self.context.discussion_topics.active.where(:pinned => true).maximum(:position) + 1
+    end
+
     if self.assignment && opts_with_default[:duplicate_assignment]
       result.assignment = self.assignment.duplicate({
         :duplicate_discussion_topic => false,
