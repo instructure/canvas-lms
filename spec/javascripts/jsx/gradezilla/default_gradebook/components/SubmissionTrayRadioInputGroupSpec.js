@@ -107,68 +107,6 @@ test('renders with "Missing" selected if the submission is not excused and is mi
   strictEqual(radio.checked, true);
 });
 
-test('handleNumberInputBlur does not call updateSubmission if the input value is an empty string', function () {
-  const updateSubmission = this.stub();
-  this.wrapper = mountComponent({ updateSubmission });
-  const event = { target: { value: '' } };
-  this.wrapper.instance().handleNumberInputBlur(event);
-  strictEqual(updateSubmission.callCount, 0);
-});
-
-test('handleNumberInputBlur does not call updateSubmission if the input value cannot be parsed as a number', function () {
-  const updateSubmission = this.stub();
-  this.wrapper = mountComponent({ updateSubmission });
-  const event = { target: { value: 'foo' } };
-  this.wrapper.instance().handleNumberInputBlur(event);
-  strictEqual(updateSubmission.callCount, 0);
-});
-
-test('handleNumberInputBlur calls updateSubmission if the input can be parsed as a number', function () {
-  const updateSubmission = this.stub();
-  this.wrapper = mountComponent({ updateSubmission });
-  const event = { target: { value: '2' } };
-  this.wrapper.instance().handleNumberInputBlur(event);
-  strictEqual(updateSubmission.callCount, 1);
-});
-
-test('handleNumberInputBlur calls updateSubmission with latePolicyStatus set to "late"', function () {
-  const updateSubmission = this.stub();
-  this.wrapper = mountComponent({ updateSubmission });
-  const event = { target: { value: '2' } };
-  this.wrapper.instance().handleNumberInputBlur(event);
-  strictEqual(updateSubmission.getCall(0).args[0].latePolicyStatus, 'late');
-});
-
-test('interval is hour: handleNumberInputBlur calls updateSubmission with the input converted to seconds', function () {
-  const updateSubmission = this.stub();
-  this.wrapper = mountComponent({ updateSubmission, latePolicy: { lateSubmissionInterval: 'hour' } });
-  const event = { target: { value: '2' } };
-  this.wrapper.instance().handleNumberInputBlur(event);
-  strictEqual(updateSubmission.callCount, 1);
-  const expectedSeconds = 2 * 3600;
-  strictEqual(updateSubmission.getCall(0).args[0].secondsLateOverride, expectedSeconds);
-});
-
-test('interval is day: handleNumberInputBlur calls updateSubmission with the input converted to seconds', function () {
-  const updateSubmission = this.stub();
-  this.wrapper = mountComponent({ updateSubmission });
-  const event = { target: { value: '2' } };
-  const expectedSeconds = 2 * 86400;
-  this.wrapper.instance().handleNumberInputBlur(event);
-  strictEqual(updateSubmission.callCount, 1);
-  strictEqual(updateSubmission.getCall(0).args[0].secondsLateOverride, expectedSeconds);
-});
-
-test('truncates the remainder if one exists', function () {
-  const updateSubmission = this.stub();
-  this.wrapper = mountComponent({ updateSubmission });
-  const event = { target: { value: '2.3737' } };
-  const expectedSeconds = Math.trunc(2.3737 * 86400);
-  this.wrapper.instance().handleNumberInputBlur(event);
-  strictEqual(updateSubmission.callCount, 1);
-  strictEqual(updateSubmission.getCall(0).args[0].secondsLateOverride, expectedSeconds);
-});
-
 QUnit.module('SubmissionTrayRadioInputGroup#handleRadioInputChanged', function(suiteHooks) {
   let wrapper
   let updateSubmission

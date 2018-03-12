@@ -21,7 +21,6 @@ import { bool, func, number, shape, string } from 'prop-types';
 import FormFieldGroup from '@instructure/ui-core/lib/components/FormFieldGroup';
 import SubmissionTrayRadioInput from '../../../gradezilla/default_gradebook/components/SubmissionTrayRadioInput';
 import { statusesTitleMap } from '../../../gradezilla/default_gradebook/constants/statuses';
-import NumberHelper from '../../../shared/helpers/numberHelper';
 import I18n from 'i18n!gradebook';
 
 function checkedValue (submission) {
@@ -36,10 +35,6 @@ function checkedValue (submission) {
   return 'none';
 }
 
-function isNumeric (input) {
-  return NumberHelper.validate(input);
-}
-
 export default class SubmissionTrayRadioInputGroup extends React.Component {
   state = { pendingUpdateData: null }
 
@@ -48,22 +43,6 @@ export default class SubmissionTrayRadioInputGroup extends React.Component {
       this.props.updateSubmission(this.state.pendingUpdateData)
       this.setState({ pendingUpdateData: null })
     }
-  }
-
-  handleNumberInputBlur = ({ target: { value } }) => {
-    if (!isNumeric(value)) {
-      return;
-    }
-
-    let secondsLateOverride = NumberHelper.parse(value) * 3600;
-    if (this.props.latePolicy.lateSubmissionInterval === 'day') {
-      secondsLateOverride *= 24;
-    }
-
-    this.props.updateSubmission({
-      latePolicyStatus: 'late',
-      secondsLateOverride: Math.trunc(secondsLateOverride)
-    });
   }
 
   handleRadioInputChanged = ({ target: { value } }) => {
@@ -94,7 +73,7 @@ export default class SubmissionTrayRadioInputGroup extends React.Component {
         latePolicy={this.props.latePolicy}
         locale={this.props.locale}
         onChange={this.handleRadioInputChanged}
-        onNumberInputBlur={this.handleNumberInputBlur}
+        updateSubmission={this.props.updateSubmission}
         submission={this.props.submission}
         text={statusesTitleMap[status] || I18n.t('None')}
         value={status}
