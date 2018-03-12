@@ -236,6 +236,7 @@ if defined?(Spec::DSL::Main)
 end
 
 RSpec::Matchers.define_negated_matcher :not_eq, :eq
+RSpec::Matchers.define_negated_matcher :not_have_key, :have_key
 
 RSpec::Matchers.define :encompass do |expected|
   match do |actual|

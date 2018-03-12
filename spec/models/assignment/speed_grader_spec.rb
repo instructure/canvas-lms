@@ -867,6 +867,192 @@ describe Assignment::SpeedGrader do
     end
   end
 
+  context "with anonymous moderated marking enabled" do
+    let_once(:course) { course_with_teacher(active_all: true, name: "Teacher").course }
+    let_once(:teacher) { @teacher }
+    let_once(:ta) do
+      course_with_ta(course: course, active_all: true)
+      @ta
+    end
+
+    let_once(:section_1) { course.course_sections.create!(name: "Section 1") }
+    let_once(:section_2) { course.course_sections.create!(name: "Section 2") }
+
+    let_once(:student_1) { user_with_pseudonym(active_all: true, username: "student1@example.com") }
+    let_once(:student_2) { user_with_pseudonym(active_all: true, username: "student2@example.com") }
+    let_once(:test_student) { course.student_view_student }
+
+    let_once(:assignment) { course.assignments.create!(title: "Example Assignment", submission_types: ['online_upload']) }
+    let_once(:rubric_association) do
+      rubric = rubric_model
+      rubric.associate_with(assignment, course, purpose: "grading", use_for_grading: true)
+    end
+
+    let(:attachment_1) { student_1.attachments.create!(uploaded_data: dummy_io, filename: "homework.png", context: student_1) }
+    let(:attachment_2) { teacher.attachments.create!(uploaded_data: dummy_io, filename: "homework.png", context: teacher) }
+
+    let(:submission_1) { assignment.submit_homework(student_1, submission_type: "online_upload", attachments: [attachment_1]) }
+    let(:submission_2) { assignment.submit_homework(student_2, submission_type: "online_upload", attachments: [attachment_2]) }
+    let(:test_submission) { Submission.find_by(user_id: test_student.id, assignment_id: assignment.id) }
+
+    before :once do
+      course.account.enable_feature!(:anonymous_moderated_marking)
+
+      course.enroll_student(student_1, section: section_1).accept!
+      course.enroll_student(student_2, section: section_2).accept!
+    end
+
+    before :each do
+      submission_1.anonymous_id = 'aaaaa'
+      submission_1.save!
+
+      submission_2.anonymous_id = 'bbbbb'
+      submission_2.save!
+
+      test_submission.anonymous_id = 'ccccc'
+      test_submission.save!
+    end
+
+    it "adds anonymous ids to student enrollments" do
+      json = Assignment::SpeedGrader.new(assignment, teacher).json
+      anonymous_ids = json['context']['enrollments'].map { |enrollment| enrollment['anonymous_id'] }
+      expect(anonymous_ids.uniq).to match_array(['aaaaa', 'bbbbb', 'ccccc'])
+    end
+
+    it "excludes user ids from student enrollments" do
+      json = Assignment::SpeedGrader.new(assignment, teacher).json
+      expect(json['context']['enrollments']).to all(not_have_key('user_id'))
+    end
+
+    it "excludes ids from students" do
+      json = Assignment::SpeedGrader.new(assignment, teacher).json
+      expect(json['context']['students']).to all(not_have_key('id'))
+    end
+
+    it "adds anonymous ids to students" do
+      json = Assignment::SpeedGrader.new(assignment, teacher).json
+      anonymous_ids = json['context']['students'].map { |student| student['anonymous_id'] }
+      expect(anonymous_ids).to match_array(['aaaaa', 'bbbbb', 'ccccc'])
+    end
+
+    it "excludes user ids from submissions" do
+      json = Assignment::SpeedGrader.new(assignment, teacher).json
+      expect(json['submissions']).to all(not_have_key('user_id'))
+    end
+
+    it "includes anonymous ids on submissions" do
+      json = Assignment::SpeedGrader.new(assignment, teacher).json
+      anonymous_ids = json['submissions'].map { |submission| submission['anonymous_id'] }
+      expect(anonymous_ids).to match_array(['aaaaa', 'bbbbb', 'ccccc'])
+    end
+
+    it "excludes user ids from rubrics" do
+      submission_1.add_comment(author: teacher, comment: "provisional comment", provisional: true)
+      provisional_grade = submission_1.provisional_grade(teacher)
+      provisional_grade.update_attribute(:score, 2)
+      rubric_association.assess(
+        artifact: provisional_grade,
+        assessment: {
+          assessment_type: 'grading',
+          criterion_crit1: {
+            points: 2,
+            comments: 'Comment',
+          }
+        },
+        assessor: teacher,
+        user: student_1
+      )
+      json = Assignment::SpeedGrader.new(assignment, teacher).json
+      student = json['context']['students'].detect { |s| s['anonymous_id'] == 'aaaaa' }
+      expect(student['rubric_assessments']).to all(not_have_key('user_id'))
+    end
+
+    it "excludes student author ids from submission comments" do
+      submission_1.add_comment(author: student_1, comment: "Example")
+      submission_1.add_comment(author: student_1, comment: "Sample")
+      json = Assignment::SpeedGrader.new(assignment, teacher).json
+      submission = json['submissions'].detect { |s| s['anonymous_id'] == 'aaaaa' }
+      expect(submission['submission_comments']).to all(not_have_key('author_id'))
+    end
+
+    it "excludes student author names from submission comments" do
+      submission_1.add_comment(author: student_1, comment: "Example")
+      submission_1.add_comment(author: student_1, comment: "Sample")
+      json = Assignment::SpeedGrader.new(assignment, teacher).json
+      submission = json['submissions'].detect { |s| s['anonymous_id'] == 'aaaaa' }
+      expect(submission['submission_comments']).to all(not_have_key('author_name'))
+    end
+
+    it "includes author ids of other graders on submission comments" do
+      submission_1.add_comment(author: student_1, comment: "Example")
+      submission_1.add_comment(author: ta, comment: "Sample")
+      json = Assignment::SpeedGrader.new(assignment, teacher).json
+      submission = json['submissions'].detect { |s| s['anonymous_id'] == 'aaaaa' }
+      anonymous_ids = submission['submission_comments'].map { |s| s['author_id'] }
+      expect(anonymous_ids).to match_array([nil, ta.id.to_s])
+    end
+
+    it "includes author names of other graders on submission comments" do
+      submission_1.add_comment(author: student_1, comment: "Example")
+      submission_1.add_comment(author: ta, comment: "Sample")
+      json = Assignment::SpeedGrader.new(assignment, teacher).json
+      submission = json['submissions'].detect { |s| s['anonymous_id'] == 'aaaaa' }
+      author_names = submission['submission_comments'].map { |s| s['author_name'] }
+      expect(author_names).to match_array([nil, ta.name])
+    end
+
+    it "uses the default avatar for students on submission comments" do
+      submission_1.add_comment(author: student_1, comment: "Example")
+      submission_1.add_comment(author: student_1, comment: "Sample")
+      json = Assignment::SpeedGrader.new(assignment, teacher, avatars: true).json
+      submission = json['submissions'].detect { |s| s['anonymous_id'] == 'aaaaa' }
+      avatars = submission['submission_comments'].map { |s| s['avatar_path'] }
+      expect(avatars).to all(eql(User.default_avatar_fallback))
+    end
+
+    it "uses the user avatar for other graders on submission comments" do
+      submission_1.add_comment(author: teacher, comment: "Example")
+      submission_1.add_comment(author: ta, comment: "Sample")
+      json = Assignment::SpeedGrader.new(assignment, teacher, avatars: true).json
+      submission = json['submissions'].detect { |s| s['anonymous_id'] == 'aaaaa' }
+      avatars = submission['submission_comments'].map { |s| s['avatar_path'] }
+      expect(avatars).to match_array([ta.avatar_path, teacher.avatar_path])
+    end
+
+    it "optionally does not include avatars" do
+      submission_1.add_comment(author: student_1, comment: "Example")
+      submission_1.add_comment(author: teacher, comment: "Sample")
+      json = Assignment::SpeedGrader.new(assignment, teacher, avatars: false).json
+      submission = json['submissions'].detect { |s| s['anonymous_id'] == 'aaaaa' }
+      expect(submission['submission_comments']).to all(not_have_key('avatar_path'))
+    end
+
+    it "adds anonymous ids to submission comments" do
+      submission_1.add_comment(author: student_1, comment: "Example")
+      submission_1.add_comment(author: student_2, comment: "Sample")
+      json = Assignment::SpeedGrader.new(assignment, teacher).json
+      submission = json['submissions'].detect { |s| s['anonymous_id'] == 'aaaaa' }
+      anonymous_ids = submission['submission_comments'].map { |s| s['anonymous_id'] }
+      expect(anonymous_ids).to match_array(['aaaaa', 'bbbbb'])
+    end
+
+    it "includes the current user's author ids on submission comments" do
+      submission_1.add_comment(author: teacher, comment: "Example")
+      submission_1.add_comment(author: teacher, comment: "Sample")
+      json = Assignment::SpeedGrader.new(assignment, teacher).json
+      submission = json['submissions'].detect { |s| s['anonymous_id'] == 'aaaaa' }
+      expect(submission['submission_comments'].map { |s| s['author_id'] }).to match_array([teacher.id.to_s] * 2)
+    end
+
+    it "includes the current user's author names on submission comments" do
+      submission_1.add_comment(author: teacher, comment: "Example")
+      submission_1.add_comment(author: teacher, comment: "Sample")
+      json = Assignment::SpeedGrader.new(assignment, teacher).json
+      submission = json['submissions'].detect { |s| s['anonymous_id'] == 'aaaaa' }
+      expect(submission['submission_comments'].map { |s| s['author_name'] }).to match_array(['Teacher'] * 2)
+    end
+  end
+
   def setup_assignment_with_homework
     setup_assignment_without_submission
     res = @assignment.submit_homework(@user, {:submission_type => 'online_text_entry', :body => 'blah'})

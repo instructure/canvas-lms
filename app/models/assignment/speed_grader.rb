@@ -23,7 +23,7 @@ class Assignment
       @assignment = assignment
       @course = @assignment.context
       @user = user
-      @avatars = avatars
+      @avatars = avatars && !@assignment.grade_as_group?
       @grading_role = grading_role
       account_context = @course.try(:account) || @course.try(:root_account)
       @should_migrate_to_canvadocs = account_context.present? && account_context.migrate_to_canvadocs?
@@ -31,19 +31,21 @@ class Assignment
 
     def json
       Attachment.skip_thumbnails = true
-      submission_fields = [:user_id, :id, :submitted_at, :workflow_state,
-                           :grade, :grade_matches_current_submission,
-                           :graded_at, :turnitin_data, :submission_type, :score,
-                           :grading_period_id, :points_deducted,
-                           :assignment_id, :submission_comments, :excused, :updated_at].freeze
+      submission_fields = %i(anonymous_id id submitted_at workflow_state grade
+                             grade_matches_current_submission graded_at turnitin_data
+                             submission_type score points_deducted assignment_id submission_comments
+                             grading_period_id excused updated_at)
 
-      comment_fields = [:comment, :id, :author_name, :created_at, :author_id,
-                        :media_comment_type, :media_comment_id,
-                        :cached_attachments, :attachments, :draft, :group_comment_id].freeze
+      submission_fields << (anonymous_moderated_marking? ? :anonymous_id : :user_id)
 
-      attachment_fields = [:id, :comment_id, :content_type, :context_id, :context_type,
-                           :display_name, :filename, :mime_class,
-                           :size, :submitter_id, :workflow_state, :viewed_at].freeze
+      comment_fields = %i(comment id author_name created_at author_id media_comment_type
+                          media_comment_id cached_attachments attachments draft
+                          group_comment_id).freeze
+
+      attachment_fields = %i(id comment_id content_type context_id context_type display_name
+                             filename mime_class size submitter_id workflow_state viewed_at).freeze
+
+      enrollment_fields = %i(course_section_id workflow_state user_id).freeze
 
       res = @assignment.as_json(
         :include => {
@@ -57,7 +59,7 @@ class Assignment
       # between provisional and real comments (also in
       # SubmissionComment#serialization_methods)
       submission_comment_methods = []
-      submission_comment_methods << :avatar_path if @avatars && !@assignment.grade_as_group?
+      submission_comment_methods << :avatar_path if @avatars
 
       res[:context][:rep_for_student] = {}
 
@@ -81,17 +83,36 @@ class Assignment
       preloaded_pg_counts = is_provisional && @assignment.provisional_grades.not_final.group("submissions.user_id").count
       ActiveRecord::Associations::Preloader.new.preload(@assignment, :moderated_grading_selections) if is_provisional
 
+      includes = [{ versions: :versionable }, :quiz_submission, :user, :attachment_associations, :assignment, :originality_reports]
+      key = @grading_role == :grader ? :submission_comments : :all_submission_comments
+
+      includes << {key => {submission: {assignment: { context: :root_account }}}}
+      submissions = @assignment.submissions.where(:user_id => students).preload(*includes)
+
+      student_ids_to_anonymous_ids = students.each_with_object({}) { |student, map| map[student.id.to_s] = nil }
+
+      student_fields = %i(name id sortable_name)
+      rubric_assessment_excludes = []
+
+      if anonymous_moderated_marking?
+        submissions.each do |submission|
+          student_ids_to_anonymous_ids[submission.user_id.to_s] = submission.anonymous_id
+        end
+
+        student_fields = []
+        rubric_assessment_excludes << :user_id
+      end
+
       res[:context][:students] = students.map do |u|
-        json = u.as_json(:include_root => false,
-                  :methods => submission_comment_methods,
-                  :only => [:name, :id, :sortable_name])
+        json = u.as_json(include_root: false, methods: submission_comment_methods, only: student_fields)
+        json[:anonymous_id] = student_ids_to_anonymous_ids[u.id.to_s]
 
         if preloaded_pg_counts
           json[:needs_provisional_grade] = @assignment.student_needs_provisional_grade?(u, preloaded_pg_counts)
         end
 
         json[:rubric_assessments] = rubric_assmnts.select{|ra| ra.user_id == u.id}.
-          as_json(:methods => [:assessor_name], :include_root => false)
+          as_json(except: rubric_assessment_excludes, methods: [:assessor_name], include_root: false)
 
         json
       end
@@ -110,19 +131,16 @@ class Assignment
         end
 
       res[:context][:enrollments] = enrollments.map do |enrollment|
-        enrollment.as_json(
-          include_root: false,
-          only: [:user_id, :course_section_id, :workflow_state]
-        )
+        enrollment_json = enrollment.as_json(include_root: false, only: enrollment_fields)
+        if anonymous_moderated_marking?
+          enrollment_json[:anonymous_id] = student_ids_to_anonymous_ids[enrollment.user_id.to_s]
+          enrollment_json.delete(:user_id)
+        end
+        enrollment_json
       end
       res[:context][:quiz] = @assignment.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
 
-      includes = [{ versions: :versionable }, :quiz_submission, :user, :attachment_associations, :assignment, :originality_reports]
-      key = @grading_role == :grader ? :submission_comments : :all_submission_comments
-      includes << {key => {submission: {assignment: { context: :root_account }}}}
-      submissions = @assignment.submissions.where(:user_id => students).preload(*includes)
-
-      attachment_includes = [:crocodoc_document, :canvadoc, :root_attachment]
+      attachment_includes = %i(crocodoc_document canvadoc root_attachment)
       # Preload attachments for later looping
       attachments_for_submission =
         Submission.bulk_load_attachments_for_submissions(submissions, preloads: attachment_includes)
@@ -175,11 +193,20 @@ class Assignment
         if @assignment.grade_as_group?
           comments = comments.reject { |comment| comment.group_comment_id.nil? }
         end
-        json[:submission_comments] = comments.as_json(
-          include_root: false,
-          methods: submission_comment_methods,
-          only: comment_fields
-        )
+        json[:submission_comments] = comments.map do |comment|
+          comment_json = comment.as_json(
+            include_root: false,
+            methods: submission_comment_methods,
+            only: comment_fields
+          )
+          if anonymous_moderated_marking? && student_ids_to_anonymous_ids.key?(comment_json[:author_id].to_s)
+            author_id = comment_json.delete(:author_id).to_s
+            comment_json.delete(:author_name)
+            comment_json[:anonymous_id] = student_ids_to_anonymous_ids[author_id]
+            comment_json[:avatar_path] = User.default_avatar_fallback if @avatars
+          end
+          comment_json
+        end
 
         # We get the attachments this way to avoid loading the
         # attachments again via the submission method that creates a
@@ -292,5 +319,10 @@ class Assignment
       Attachment.skip_thumbnails = nil
     end
 
+    private
+
+    def anonymous_moderated_marking?
+      @course.root_account.feature_enabled?(:anonymous_moderated_marking)
+    end
   end
 end
