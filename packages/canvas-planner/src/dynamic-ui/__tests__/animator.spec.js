@@ -109,6 +109,7 @@ it('maintains scroll position of element', () => {
   mocks.document.documentElement.getBoundingClientRect.mockReturnValueOnce({
     top: -5, left: 0, bottom: 123, right: 50,
   });
+  animator.recordFixedElement(elt);
   animator.maintainViewportPosition(elt);
   expect(mocks.window.scroll).not.toHaveBeenCalled();
   mocks.window.runAnimationFrames();

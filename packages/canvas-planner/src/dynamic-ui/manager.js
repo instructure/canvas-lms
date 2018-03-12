@@ -88,14 +88,9 @@ export class DynamicUiManager {
   }
 
   preTriggerUpdates = (fixedElement, triggerer) => {
-    const animationPlan = this.animationPlan;
-    if (!animationPlan.ready) return;
-
     // only the app should be allowed to muck with the scroll position (the header should not).
-    if (triggerer !== 'app') return;
-
-    if (fixedElement && this.shouldMaintainCurrentScrollingPosition()) {
-      this.animator.maintainViewportPosition(fixedElement);
+    if (triggerer === 'app') {
+      this.animator.recordFixedElement(fixedElement);
     }
   }
 
@@ -104,6 +99,10 @@ export class DynamicUiManager {
 
     const animationPlan = this.animationPlan;
     if (!animationPlan.ready) return;
+
+    if (this.shouldMaintainCurrentScrollingPosition()) {
+      this.animator.maintainViewportPosition();
+    }
 
     if (this.animationPlan.scrollToTop) {
       this.triggerScrollToTop();

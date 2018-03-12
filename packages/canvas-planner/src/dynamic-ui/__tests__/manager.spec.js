@@ -24,6 +24,7 @@ import { initialize as alertInitialize } from '../../utilities/alertUtils';
 class MockAnimator {
   animationOrder = []
   isAboveScreen = jest.fn()
+  recordFixedElement = jest.fn()
   constructor () {
     ['maintainViewportPosition', 'focusElement', 'scrollTo', 'scrollToTop'].forEach(fnName => {
       this[fnName] = jest.fn(() => {
@@ -154,8 +155,9 @@ describe('getting past items', () => {
     ));
     registerStandardDays(manager);
     manager.preTriggerUpdates('fixed-element', 'app');
+    expect(animator.recordFixedElement).toHaveBeenCalledWith('fixed-element');
     manager.triggerUpdates();
-    expect(animator.maintainViewportPosition).toHaveBeenCalledWith('fixed-element');
+    expect(animator.maintainViewportPosition).toHaveBeenCalled();
   });
 });
 
@@ -185,7 +187,7 @@ describe('getting new activity', () => {
     manager.handleAction(scrollToNewActivity());
     manager.preTriggerUpdates('fixed-element', 'app');
     manager.triggerUpdates(53);
-    expect(animator.maintainViewportPosition).toHaveBeenCalledWith('fixed-element');
+    expect(animator.maintainViewportPosition).toHaveBeenCalled();
     expect(animator.scrollToTop).toHaveBeenCalled();
 
     manager.handleAction(gettingPastItems({seekingNewActivity: true}));
@@ -196,7 +198,7 @@ describe('getting new activity', () => {
     registerStandardDays(manager);
     manager.preTriggerUpdates('fixed-element-again', 'app');
     manager.triggerUpdates(53);
-    expect(animator.maintainViewportPosition).toHaveBeenCalledWith('fixed-element-again');
+    expect(animator.maintainViewportPosition).toHaveBeenCalled();
     expect(animator.focusElement).toHaveBeenCalledWith('focusable-day-0-group-1');
     expect(animator.scrollTo).toHaveBeenCalledWith('scrollable-nai-day-0-group-1', 42 + 53);
   });
@@ -212,7 +214,7 @@ describe('getting new activity', () => {
     manager.preTriggerUpdates('fixed-element', 'app');
     manager.triggerUpdates();
     // can still maintain the viewport position for the new load
-    expect(animator.maintainViewportPosition).toHaveBeenCalledWith('fixed-element');
+    expect(animator.maintainViewportPosition).toHaveBeenCalled();
     // other animations don't happen because we don't know what to animate to.
     expect(animator.focusElement).not.toHaveBeenCalled();
     expect(animator.scrollTo).not.toHaveBeenCalled();
@@ -229,7 +231,7 @@ describe('manipulating items', () => {
     manager.triggerUpdates();
     expect(animator.focusElement).toHaveBeenCalledWith(doc.activeElement);
     // maintain and scrolling works around a chrome bug
-    expect(animator.maintainViewportPosition).toHaveBeenCalledWith('fixed-element');
+    expect(animator.maintainViewportPosition).toHaveBeenCalled();
     expect(animator.scrollTo).toHaveBeenCalledWith(doc.activeElement, 42);
   });
 
@@ -242,7 +244,7 @@ describe('manipulating items', () => {
     manager.triggerUpdates();
     expect(animator.focusElement).toHaveBeenCalledWith(doc.activeElement);
     // maintain and scrolling works around a chrome bug
-    expect(animator.maintainViewportPosition).toHaveBeenCalledWith('fixed-element');
+    expect(animator.maintainViewportPosition).toHaveBeenCalled();
     expect(animator.scrollTo).not.toHaveBeenCalled();
   });
 
@@ -255,7 +257,7 @@ describe('manipulating items', () => {
     manager.triggerUpdates();
     expect(animator.focusElement).toHaveBeenCalledWith('focusable-day-0-group-0-item-0');
     // maintain and scrolling works around a chrome bug
-    expect(animator.maintainViewportPosition).toHaveBeenCalledWith('fixed-element');
+    expect(animator.maintainViewportPosition).toHaveBeenCalled();
     expect(animator.scrollTo).toHaveBeenCalledWith('scrollable-day-0-group-0-item-0', 42);
   });
 
@@ -267,7 +269,7 @@ describe('manipulating items', () => {
     manager.preTriggerUpdates('fixed-element', 'app');
     manager.triggerUpdates();
     expect(animator.focusElement).toHaveBeenCalledWith('focusable-day-0-group-0-item-0');
-    expect(animator.maintainViewportPosition).toHaveBeenCalledWith('fixed-element');
+    expect(animator.maintainViewportPosition).toHaveBeenCalled();
     expect(animator.scrollTo).toHaveBeenCalledWith('scrollable-day-0-group-0-item-0', 42);
   });
 
