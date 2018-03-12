@@ -20,7 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!react_files'
+import I18n from 'i18n!usageRightsSelectBox'
 import filesEnv from 'compiled/react_files/modules/filesEnv'
 
 function omitEmptyValues(obj) {
