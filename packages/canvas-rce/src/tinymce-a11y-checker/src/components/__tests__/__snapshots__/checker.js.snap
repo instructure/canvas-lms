@@ -80,20 +80,21 @@ exports[`render matches snapshot with errors 1`] = `
               <GridCol
                 textAlign="inherit"
               >
-                <Typography
+                <Text
                   as="span"
                   letterSpacing="normal"
                   size="medium"
                   weight="bold"
                 >
                   Issue 1/2
-                </Typography>
+                </Text>
               </GridCol>
               <GridCol
                 textAlign="inherit"
                 width="auto"
               >
                 <Popover
+                  alignArrow={false}
                   applicationElement={[Function]}
                   closeButtonLabel="Close"
                   closeButtonRef={[Function]}
@@ -153,7 +154,7 @@ exports[`render matches snapshot with errors 1`] = `
                         }
                       }
                     >
-                      <Typography
+                      <Text
                         as="span"
                         letterSpacing="normal"
                         size="medium"
@@ -171,7 +172,7 @@ exports[`render matches snapshot with errors 1`] = `
                             Learn more
                           </Link>
                         </p>
-                      </Typography>
+                      </Text>
                     </Container>
                   </PopoverContent>
                 </Popover>
@@ -182,13 +183,13 @@ exports[`render matches snapshot with errors 1`] = `
         <form
           onSubmit={[Function]}
         >
-          <Typography
+          <Text
             as="div"
             letterSpacing="normal"
             size="medium"
           >
             Error Message
-          </Typography>
+          </Text>
           <Container
             as="div"
             display={null}
@@ -268,6 +269,7 @@ exports[`render matches snapshot with errors 1`] = `
               name="text"
               onChange={[Function]}
               size="medium"
+              textAlign="start"
               type="text"
               value="Text"
             />
@@ -415,7 +417,7 @@ exports[`render matches snapshot without errors 1`] = `
       <Container
         display={null}
       >
-        <Typography
+        <Text
           as="span"
           letterSpacing="normal"
           size="medium"
@@ -423,7 +425,7 @@ exports[`render matches snapshot without errors 1`] = `
           <p>
             No accessibility issues were detected.
           </p>
-        </Typography>
+        </Text>
         <PlaceholderSVG />
       </Container>
     </Container>

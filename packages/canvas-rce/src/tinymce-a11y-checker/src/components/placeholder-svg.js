@@ -1,5 +1,5 @@
 import React from "react"
-import InlineSVG from "instructure-ui/lib/components/InlineSVG"
+import InlineSVG from "@instructure/ui-core/lib/components/InlineSVG"
 
 export default function PlaceholderSVG() {
   return (
