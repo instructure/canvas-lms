@@ -389,6 +389,14 @@ describe PlannerOverridesController do
             end
           end
 
+          it "should include link headers in cached response" do
+            enable_cache
+            next_link = test_page
+            expect(next_link).not_to be_nil
+            next_link = test_page
+            expect(next_link).not_to be_nil
+          end
+
         end
 
 
