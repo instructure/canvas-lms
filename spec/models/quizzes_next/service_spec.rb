@@ -58,4 +58,14 @@ describe QuizzesNext::Service do
       expect(active_lti_assignments).not_to include(assignment_active)
     end
   end
+
+  describe '.assignment_not_in_export?' do
+    it 'returns true for anything except assignment not found' do
+      assignment_hash = {'$canvas_assignment_id': "1234"}
+      assignment_not_found = {'$canvas_assignment_id': Canvas::Migration::ExternalContent::Translator::NOT_FOUND}
+
+      expect(Service.assignment_not_in_export?(assignment_hash)).to eq(false)
+      expect(Service.assignment_not_in_export?(assignment_not_found)).to eq(true)
+    end
+  end
 end

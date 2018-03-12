@@ -439,6 +439,10 @@ module Canvas::LiveEvents
     post_event_stringified('course_section_updated', get_course_section_data(section))
   end
 
+  def self.quizzes_next_quiz_duplicated(payload)
+    post_event_stringified('quizzes_next_quiz_duplicated', payload)
+  end
+
   def self.get_course_section_data(section)
     {
       course_section_id: section.id,

@@ -42,7 +42,7 @@ describe QuizzesNext::ExportService do
     let(:course) { double('course') }
 
     before do
-      allow(course).to receive(:id).and_return(1234)
+      allow(course).to receive(:uuid).and_return(1234)
     end
 
     context 'no assignments' do
@@ -70,10 +70,10 @@ describe QuizzesNext::ExportService do
 
       expect(ExportService.begin_export(course, {})).to eq(
         {
-          "original_course_id": 1234,
+          "original_course_uuid": 1234,
           "assignments": [
-            {"original_link_id": "link-id-0", "$canvas_assignment_id": 0},
-            {"original_link_id": "link-id-1", "$canvas_assignment_id": 1}
+            {"original_resource_link_id": "link-id-0", "$canvas_assignment_id": 0},
+            {"original_resource_link_id": "link-id-1", "$canvas_assignment_id": 1}
           ]
         }
       )
@@ -87,6 +87,56 @@ describe QuizzesNext::ExportService do
   end
 
   describe '.send_imported_content' do
-    it 'emits live events for each copied assignment'
+    it 'emits live events for each copied assignment' do
+      new_course = double('course')
+      new_assignment1 = assignment_model(id: 100001)
+      new_assignment2 = assignment_model(id: 100002)
+
+      imported_content = {
+        'original_course_uuid': '100005',
+        'assignments': [
+          {
+            'original_resource_link_id': '1234',
+            '$canvas_assignment_id': new_assignment1.id
+          },
+          {
+            'original_resource_link_id': '5678',
+            '$canvas_assignment_id': new_assignment2.id
+          }
+        ]
+      }
+      allow(new_course).to receive(:uuid).and_return('100006')
+
+      expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).twice
+      ExportService.send_imported_content(new_course, imported_content)
+    end
+
+    it 'ignores not found assignments' do
+      new_course = double('course')
+      new_assignment1 = assignment_model(id: 100001)
+      new_assignment2 = assignment_model(id: 100002)
+
+      imported_content = {
+        'original_course_uuid': '100005',
+        'assignments': [
+          {
+            'original_resource_link_id': '1234',
+            '$canvas_assignment_id': new_assignment1.id
+          },
+          {
+            'original_resource_link_id': '5678',
+            '$canvas_assignment_id': new_assignment2.id
+          },
+          {
+            'original_resource_link_id': '5678',
+            '$canvas_assignment_id': Canvas::Migration::ExternalContent::Translator::NOT_FOUND
+          }
+        ]
+      }
+      allow(new_course).to receive(:uuid).and_return('100006')
+
+      expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).twice
+      ExportService.send_imported_content(new_course, imported_content)
+    end
   end
 end
