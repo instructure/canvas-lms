@@ -319,7 +319,7 @@ interface, this is called the SIS ID.</td>
 <td>parent_account_id</td>
 <td>text</td>
 <td>✓</td>
-<td></td>
+<td>✓</td>
 <td>The account identifier of the parent account.
 If this is blank the parent account will be the root account. Note that even if
 all values are blank, the column must be included to differentiate the file
