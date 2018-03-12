@@ -38,6 +38,7 @@ export class DynamicUiManager {
     this.animatableRegistry = new AnimatableRegistry();
     this.animationPlan = {};
     this.stickyOffset = 0;
+    this.additionalOffset = 0;
   }
 
   setStickyOffset (offset) {
@@ -46,6 +47,10 @@ export class DynamicUiManager {
 
   setStore (store) {
     this.store = store;
+  }
+
+  totalOffset () {
+    return this.stickyOffset + this.additionalOffset;
   }
 
   // If you want to register a fallback focus component when all the things in a list are deleted,
@@ -94,7 +99,9 @@ export class DynamicUiManager {
     }
   }
 
-  triggerUpdates = () => {
+  triggerUpdates = (additionalOffset) => {
+    if (additionalOffset != null) this.additionalOffset = additionalOffset;
+
     const animationPlan = this.animationPlan;
     if (!animationPlan.ready) return;
 
@@ -137,7 +144,7 @@ export class DynamicUiManager {
       this.animatableRegistry.getLastComponent('group', newActivityGroupComponentIds);
 
     this.animator.focusElement(newActivityComponent.getFocusable());
-    this.animator.scrollTo(newActivityIndicator.getScrollable(), this.stickyOffset + this.animationPlan.additionalOffset);
+    this.animator.scrollTo(newActivityIndicator.getScrollable(), this.totalOffset());
   }
 
   triggerFocusItemComponent () {
@@ -236,16 +243,14 @@ export class DynamicUiManager {
   }
 
   handleScrollToNewActivity = (action) => {
-    const totalOffset = this.stickyOffset + action.payload.additionalOffset;
     const newActivityIndicators = this.animatableRegistry.getAllNewActivityIndicatorsSorted();
     const lastOffscreenIndicator = newActivityIndicators.reverse().find(indicator => {
-      return this.animator.isAboveScreen(indicator.component.getScrollable(), totalOffset);
+      return this.animator.isAboveScreen(indicator.component.getScrollable(), this.totalOffset());
     });
     if (lastOffscreenIndicator) {
       // there's no state update, so we can just do it now and not muck with the animationPlan
-      this.animator.scrollTo(lastOffscreenIndicator.component.getScrollable(), totalOffset);
+      this.animator.scrollTo(lastOffscreenIndicator.component.getScrollable(), this.totalOffset());
     } else {
-      this.animationPlan.additionalOffset = action.payload.additionalOffset;
       // if there's more we could load, then we should do that.
       // we're assuming there is more to load if this action happens.
       this.store.dispatch(loadPastUntilNewActivity());

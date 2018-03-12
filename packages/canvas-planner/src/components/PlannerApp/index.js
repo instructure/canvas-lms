@@ -77,7 +77,10 @@ export class PlannerApp extends Component {
   }
 
   componentDidUpdate () {
-    this.props.triggerDynamicUiUpdates(this.fixedElement);
+    const additionalOffset = this.newActivityButtonRef ?
+      this.newActivityButtonRef.getBoundingClientRect().height :
+      0;
+    this.props.triggerDynamicUiUpdates(additionalOffset);
   }
 
   fixedElementRef = (elt) => {
@@ -85,9 +88,7 @@ export class PlannerApp extends Component {
   }
 
   handleNewActivityClick = () => {
-    let additionalOffset = 0;
-    if (this.newActivityButtonRef) additionalOffset = this.newActivityButtonRef.getBoundingClientRect().height;
-    this.props.scrollToNewActivity({additionalOffset});
+    this.props.scrollToNewActivity();
   }
 
   renderLoading () {

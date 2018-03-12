@@ -164,7 +164,8 @@ describe('getting new activity', () => {
     const {manager, animator, store} = createManagerWithMocks();
     registerStandardDays(manager);
     animator.isAboveScreen.mockReturnValueOnce(false).mockReturnValueOnce(true);
-    manager.handleAction(scrollToNewActivity({additionalOffset: 53}));
+    manager.triggerUpdates(53);
+    manager.handleAction(scrollToNewActivity());
     expect(animator.isAboveScreen).toHaveBeenCalledWith('scrollable-nai-day-2-group-2', 42 + 53);
     expect(animator.isAboveScreen).toHaveBeenCalledWith('scrollable-nai-day-2-group-1', 42 + 53);
     expect(animator.scrollTo).toHaveBeenCalledWith('scrollable-nai-day-2-group-1', 42 + 53);
@@ -181,9 +182,9 @@ describe('getting new activity', () => {
 
   it('does animations when getting new activity requires loading', () => {
     const {manager, animator} = createManagerWithMocks();
-    manager.handleAction(scrollToNewActivity({additionalOffset: 53}));
+    manager.handleAction(scrollToNewActivity());
     manager.preTriggerUpdates('fixed-element', 'app');
-    manager.triggerUpdates();
+    manager.triggerUpdates(53);
     expect(animator.maintainViewportPosition).toHaveBeenCalledWith('fixed-element');
     expect(animator.scrollToTop).toHaveBeenCalled();
 
@@ -194,7 +195,7 @@ describe('getting new activity', () => {
     ]));
     registerStandardDays(manager);
     manager.preTriggerUpdates('fixed-element-again', 'app');
-    manager.triggerUpdates();
+    manager.triggerUpdates(53);
     expect(animator.maintainViewportPosition).toHaveBeenCalledWith('fixed-element-again');
     expect(animator.focusElement).toHaveBeenCalledWith('focusable-day-0-group-1');
     expect(animator.scrollTo).toHaveBeenCalledWith('scrollable-nai-day-0-group-1', 42 + 53);
