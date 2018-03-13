@@ -27,9 +27,13 @@ import 'helpers/jquery.simulate'
 
 const fixtures = $('#fixtures')
 const conferenceView = function(conferenceOpts = {}) {
+  if (!('id' in conferenceOpts)) conferenceOpts.id = null
+  if (!('recordings' in conferenceOpts)) conferenceOpts.recordings = []
+  if (!('user_settings' in conferenceOpts)) conferenceOpts.user_settings = {}
   const conference = new Conference({
-    recordings: [],
-    user_settings: {},
+    id: conferenceOpts.id,
+    recordings: conferenceOpts.recordings,
+    user_settings: conferenceOpts.user_settings,
     permissions: {
       close: true,
       create: true,
@@ -83,7 +87,42 @@ test('delete calls screenreader', function() {
   ])
   this.spy($, 'screenReaderFlashMessage')
   const view = conferenceView()
-  view.delete(jQuery.Event('click'))
+  view.delete($.Event('click'))
   server.respond()
   equal($.screenReaderFlashMessage.callCount, 1)
+  server.restore()
+})
+
+test('deleteRecordings calls screenreader', function() {
+  this.stub(window, 'confirm').returns(true)
+  ENV.context_asset_string = 'course_1'
+  const server = sinon.fakeServer.create()
+  server.respondWith('POST', '/recording', [
+    200,
+    {'Content-Type': 'application/json'},
+    JSON.stringify({
+      deleted: 'true',
+    })
+  ])
+  this.spy($, 'screenReaderFlashMessage')
+  const big_blue_button_conference = {
+    id: 1,
+    recordings: [
+      {
+        duration_minutes: 0,
+        ended_at: 1518554650000,
+        playback_url: "www.blah.com",
+        recording_id: "954cc3",
+        title: "Conference"
+      }
+    ],
+    user_settings: {
+      record: true
+    }
+  }
+  conferenceView(big_blue_button_conference)
+  $('div.ig-button[data-id="954cc3"]').children('a').trigger($.Event( "click" ))
+  server.respond()
+  equal($.screenReaderFlashMessage.callCount, 1)
+  server.restore()
 })

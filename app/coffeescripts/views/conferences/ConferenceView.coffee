@@ -20,9 +20,10 @@ define [
   'jquery'
   'Backbone'
   'jst/conferences/newConference'
+  'str/htmlEscape'
   'jquery.google-analytics'
   '../../jquery.rails_flash_notifications'
-], (I18n, $, {View}, template) ->
+], (I18n, $, {View}, template, htmlEscape) ->
 
   class ConferenceView extends View
 
@@ -38,6 +39,7 @@ define [
       'click .close_conference_link': 'close'
       'click .start-button': 'start'
       'click .external_url': 'external'
+      'click .delete_recording_link': 'deleteRecording'
 
     initialize: ->
       super
@@ -126,3 +128,46 @@ define [
         else
           window.open(data[0].url)
       )
+
+    deleteRecording: (e) ->
+      e.preventDefault()
+      $deleteButton = $(e.currentTarget).parent('div.ig-button')
+      if !confirm I18n.t("Are you sure you want to delete this recording?")
+        $deleteButton.focus()
+        return
+      $.ajaxJSON($deleteButton.data('url') + "/recording", "DELETE", {
+          recording_id: $deleteButton.data("id"),
+        }
+      ).done( (data, status) =>
+        if data.deleted
+          return @removeRecordingRow($deleteButton)
+        $.flashError(I18n.t("Sorry, the action performed on this recording failed. Try again later"))
+      ).fail( (xhr, status) =>
+        $.flashError(I18n.t("Sorry, the action performed on this recording failed. Try again later"))
+      )
+
+    removeRecordingRow: ($button) =>
+      $row = $('.ig-row[data-id="' + $button.data("id") + '"]')
+      $conferenceId = $($row.parents('div.ig-sublist')).data('id')
+      $row.parents('li.recording').remove()
+      @updateConferenceDetails($conferenceId)
+      $.screenReaderFlashMessage(I18n.t('Recording was deleted'))
+
+    updateConferenceDetails: (id) =>
+      $info = $('div.ig-row#conf_' + id).find('div.ig-info')
+      $detailRecordings = $info.find('div.ig-details__item-recordings')
+      $recordings = $('.ig-sublist#conference-' + id)
+      recordings = $recordings.find('li.recording').length
+      if recordings > 1
+        $detailRecordings.text(I18n.t("%{count} Recordings", {count: recordings}))
+        return
+      if recordings == 1
+        $detailRecordings.text(I18n.t("%{count} Recording", {count: 1}))
+        return
+      $detailRecordings.remove()
+      $recordings.remove()
+      # Shift the link to text
+      $link = $info.children('a.ig-title')
+      $text = $('<span />').addClass('ig-title').html($link.text())
+      $info.prepend($text)
+      $link.remove()

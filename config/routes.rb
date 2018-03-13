@@ -162,8 +162,12 @@ CanvasRails::Application.routes.draw do
 
   concern :conferences do
     resources :conferences do
+      # rubocop:disable SymbolArray
       match :join, via: [:get, :post]
       match :close, via: [:get, :post]
+      match :recording, via: [:get]
+      match :recording, via: [:delete], to: 'conferences#delete_recording', as: :delete_recording
+      # rubocop:enable SymbolArray
       get :settings
     end
   end
