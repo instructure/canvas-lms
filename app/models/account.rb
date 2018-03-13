@@ -61,6 +61,7 @@ class Account < ActiveRecord::Base
   has_many :folders, -> { order('folders.name') }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :active_folders, -> { where("folder.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context, inverse_of: :context
   has_many :developer_keys
+  has_many :developer_key_account_bindings, inverse_of: :account
   has_many :authentication_providers,
            -> { order(:position) },
            extend: AccountAuthorizationConfig::FindWithType,
