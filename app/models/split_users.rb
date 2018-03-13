@@ -120,7 +120,7 @@ class SplitUsers
     # user is the old user that is being restored
     def move_records_to_old_user(source_user, user, records)
       fix_communication_channels(source_user, user, records.where(context_type: 'CommunicationChannel'))
-      move_user_observers(source_user, user, records.where(context_type: 'UserObserver', previous_user_id: user))
+      move_user_observers(source_user, user, records.where(context_type: ['UserObserver', 'UserObservationLink'], previous_user_id: user))
       move_attachments(source_user, user, records.where(context_type: 'Attachment'))
       enrollment_ids = records.where(context_type: 'Enrollment', previous_user_id: user).pluck(:context_id)
       enrollments = Enrollment.where(id: enrollment_ids).where.not(user_id: user)
@@ -167,11 +167,11 @@ class SplitUsers
 
     def move_user_observers(source_user, user, records)
       # skip when the user observer is between the two users. Just undlete the record
-      not_obs = UserObserver.where(user_id: [source_user, user], observer_id: [source_user, user])
-      obs = UserObserver.where(id: records.pluck(:context_id)).where.not(id: not_obs)
+      not_obs = UserObservationLink.where(user_id: [source_user, user], observer_id: [source_user, user])
+      obs = UserObservationLink.where(id: records.pluck(:context_id)).where.not(id: not_obs)
 
-      source_user.user_observers.where(id: obs).update_all(user_id: user.id)
-      source_user.user_observees.where(id: obs).update_all(observer_id: user.id)
+      source_user.as_student_observation_links.where(id: obs).update_all(user_id: user.id)
+      source_user.as_observer_observation_links.where(id: obs).update_all(observer_id: user.id)
     end
 
     def move_attachments(source_user, user, records)

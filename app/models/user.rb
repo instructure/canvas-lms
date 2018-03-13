@@ -59,16 +59,15 @@ class User < ActiveRecord::Base
   has_many :not_removed_enrollments, -> { where.not(workflow_state: ['rejected', 'deleted', 'inactive']) }, class_name: 'Enrollment', multishard: true
   has_many :observer_enrollments
   has_many :observee_enrollments, :foreign_key => :associated_user_id, :class_name => 'ObserverEnrollment'
-  has_many :user_observers, dependent: :destroy, inverse_of: :user
-  has_many :active_user_observers, -> { where.not(:workflow_state => 'deleted') }, :class_name => "UserObserver", inverse_of: :user
-  has_many :observers, :through => :active_user_observers, :class_name => 'User'
 
-  has_many :user_observees,
-           class_name: 'UserObserver',
-           foreign_key: :observer_id,
-           dependent: :destroy,
-           inverse_of: :observer
-  has_many :observed_users, :through => :user_observees, :source => :user
+  has_many :as_student_observation_links, -> { where.not(:workflow_state => 'deleted') }, class_name: 'UserObservationLink',
+    foreign_key: :user_id, dependent: :destroy, inverse_of: :student
+  has_many :as_observer_observation_links, -> { where.not(:workflow_state => 'deleted') }, class_name: 'UserObservationLink',
+    foreign_key: :observer_id, dependent: :destroy, inverse_of: :observer
+
+  has_many :linked_observers, :through => :as_student_observation_links, :source => :observer, :class_name => 'User'
+  has_many :linked_students, :through => :as_observer_observation_links, :source => :student, :class_name => 'User'
+
   has_many :all_courses, :source => :course, :through => :enrollments
   has_many :all_courses_for_active_enrollments, -> { Enrollment.active }, :source => :course, :through => :enrollments
   has_many :group_memberships, -> { preload(:group) }, dependent: :destroy
@@ -196,7 +195,6 @@ class User < ActiveRecord::Base
     self.from("(#{scopes.join("\nUNION\n")}) users")
   }
   scope :active, -> { where("users.workflow_state<>'deleted'") }
-  scope :active_user_observers, -> { where.not(user_observers: {workflow_state: 'deleted'}) }
 
   scope :has_current_student_enrollments, -> do
     where("EXISTS (?)",
@@ -888,8 +886,8 @@ class User < ActiveRecord::Base
       if root_account == :all
         # make sure to hit all shards
         enrollment_scope = self.enrollments.shard(self)
-        user_observer_scope = self.user_observers.shard(self)
-        user_observee_scope = self.user_observees.shard(self)
+        user_observer_scope = self.as_student_observation_links.shard(self)
+        user_observee_scope = self.as_observer_observation_links.shard(self)
         pseudonym_scope = self.pseudonyms.active.shard(self)
         account_users = self.account_users.active.shard(self)
         has_other_root_accounts = false
@@ -900,8 +898,8 @@ class User < ActiveRecord::Base
         # student view user won't be cross shard, so that will still be the
         # right shard
         enrollment_scope = fake_student? ? self.enrollments : root_account.enrollments.where(user_id: self)
-        user_observer_scope = self.user_observers.shard(self)
-        user_observee_scope = self.user_observees.shard(self)
+        user_observer_scope = self.as_student_observation_links.shard(self)
+        user_observee_scope = self.as_observer_observation_links.shard(self)
         pseudonym_scope = root_account.pseudonyms.active.where(user_id: self)
 
         account_users = root_account.account_users.where(user_id: self).to_a +
@@ -1081,7 +1079,7 @@ class User < ActiveRecord::Base
     end
     can :reset_mfa
 
-    given { |user| user && user.user_observees.active.where(user_id: self.id).exists? }
+    given { |user| user && user.as_observer_observation_links.where(user_id: self.id).exists? }
     can :read and can :read_as_parent
   end
 

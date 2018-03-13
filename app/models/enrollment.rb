@@ -401,7 +401,7 @@ class Enrollment < ActiveRecord::Base
   protected :audit_groups_for_deleted_enrollments
 
   def observers
-    student? ? user.observers.active : []
+    student? ? user.linked_observers.active : []
   end
 
   def create_linked_enrollments

@@ -2551,8 +2551,8 @@ class UsersController < ApplicationController
         @pseudonym.send(:skip_session_maintenance=, true)
       end
       @user.save!
-      if @observee && !@user.user_observees.where(user_id: @observee).exists?
-        UserObserver.create_or_restore(observee: @observee, observer: @user)
+      if @observee && !@user.as_observer_observation_links.where(user_id: @observee).exists?
+        UserObservationLink.create_or_restore(student: @observee, observer: @user)
       end
 
       if notify_policy.is_self_registration?

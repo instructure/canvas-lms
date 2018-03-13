@@ -1057,7 +1057,7 @@ describe AssignmentsApiController, type: :request do
     it "returns assignments for authorized observer" do
       course_with_student_submissions(:active_all => true)
       parent = User.create
-      parent.user_observees.create! do |uo|
+      parent.as_observer_observation_links.create! do |uo|
         uo.user_id = @student.id
       end
       parent.save!

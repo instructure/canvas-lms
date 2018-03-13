@@ -593,7 +593,7 @@ describe CoursesController, type: :request do
     end
     it "should return a course list for an observed students" do
       parent = User.create
-      parent.user_observees.create! do |uo|
+      parent.as_observer_observation_links.create! do |uo|
         uo.user_id = @me.id
       end
       json = api_call_as_user(parent,:get,"/api/v1/users/#{@me.id}/courses",
@@ -606,7 +606,7 @@ describe CoursesController, type: :request do
     it "should fail if trying to view courses for student that is not observee" do
       # test to make sure it doesn't crash if user has not observees
       parent = User.create
-      expect(parent.user_observees).to eq []
+      expect(parent.as_observer_observation_links).to eq []
 
       api_call_as_user(parent,:get,"/api/v1/users/#{@me.id}/courses",
                       { :user_id => @me.id, :controller => 'courses', :action => 'user_index',
@@ -618,7 +618,7 @@ describe CoursesController, type: :request do
       @shard2.activate do
         a = Account.create
         parent = user_with_pseudonym(name: 'Zombo', username: 'nobody2@example.com', account: a)
-        parent.user_observees.create! do |uo|
+        parent.as_observer_observation_links.create! do |uo|
           uo.user_id = @me.id
         end
         parent.save!

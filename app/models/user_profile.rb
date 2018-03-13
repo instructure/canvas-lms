@@ -117,7 +117,7 @@ class UserProfile < ActiveRecord::Base
   end
 
   def insert_observer_tabs(tabs, user)
-    if user&.user_observees&.active&.exists?
+    if user&.as_observer_observation_links&.active&.exists?
       tabs << {
         id: TAB_OBSERVEES,
         label: I18n.t('#tabs.observees', 'Observing'),

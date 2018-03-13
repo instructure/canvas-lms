@@ -25,7 +25,7 @@ describe SIS::CSV::UserObserverImporter do
   it 'should skip bad content' do
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U002')
-    before_count = UserObserver.active.count
+    before_count = UserObservationLink.active.count
     importer = process_csv_data(
       'observer_id,student_id,status',
       'no_observer,U001,active',
@@ -36,7 +36,7 @@ describe SIS::CSV::UserObserverImporter do
       'U001,U002,dead',
       'U001,U002,deleted'
     )
-    expect(UserObserver.active.count).to eq before_count
+    expect(UserObservationLink.active.count).to eq before_count
 
     errors = importer.errors.map(&:last)
     expect(errors).to eq ["An observer referenced a non-existent user no_observer",
@@ -51,17 +51,17 @@ describe SIS::CSV::UserObserverImporter do
   it "should add and remove user_observers" do
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U002')
-    before_count = UserObserver.active.count
+    before_count = UserObservationLink.active.count
     process_csv_data_cleanly(
       "observer_id,student_id,status",
       "U001,U002,ACTIVE"
     )
-    expect(UserObserver.active.count).to eq before_count + 1
+    expect(UserObservationLink.active.count).to eq before_count + 1
 
     process_csv_data_cleanly(
       "observer_id,student_id,status",
       "U001,U002,deleted"
     )
-    expect(UserObserver.active.count).to eq before_count
+    expect(UserObservationLink.active.count).to eq before_count
   end
 end

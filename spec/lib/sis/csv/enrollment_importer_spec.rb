@@ -788,7 +788,7 @@ describe SIS::CSV::EnrollmentImporter do
     student = Pseudonym.where(:unique_id => "user1").first.user
 
     observer = user_with_pseudonym(:account => @account)
-    student.observers << observer
+    student.linked_observers << observer
 
     process_csv_data_cleanly(
         "course_id,user_id,role,section_id,status,associated_user_id",
