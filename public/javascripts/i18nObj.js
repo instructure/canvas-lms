@@ -18,7 +18,11 @@
 
 import $ from 'jquery'
 import i18nLolcalize from 'compiled/str/i18nLolcalize'
-import I18n from './vendor/i18n_js_extension'
+import I18n from 'i18n-js'
+import extend from '../../gems/canvas_i18nliner/node_modules/i18nliner/dist/lib/extensions/i18n_js'
+// add i18nliner's runtime extensions to the global I18n object
+extend(I18n)
+
 import htmlEscape from './str/htmlEscape'
 import './vendor/date'
 
@@ -67,7 +71,7 @@ I18n.lookup = function(scope, options) {
     }
   }
 
-  if (!messages && this.isValidNode(options, 'defaultValue')) {
+  if (!messages && options.defaultValue != null) {
     messages = options.defaultValue
   }
 
@@ -262,21 +266,21 @@ I18n.pluralize = function(count, scope, options) {
   let message
   switch (Math.abs(count)) {
     case 0:
-      message = this.isValidNode(translation, 'zero')
+      message = (translation.zero != null)
         ? translation.zero
-        : this.isValidNode(translation, 'none')
+        : (translation.none != null)
           ? translation.none
-          : this.isValidNode(translation, 'other')
+          : (translation.other != null)
             ? translation.other
             : this.missingTranslation(scope, 'zero')
       break
     case 1:
-      message = this.isValidNode(translation, 'one')
+      message = (translation.one != null)
         ? translation.one
         : this.missingTranslation(scope, 'one')
       break
     default:
-      message = this.isValidNode(translation, 'other')
+      message = (translation.other != null)
         ? translation.other
         : this.missingTranslation(scope, 'other')
   }
