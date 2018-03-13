@@ -22,8 +22,9 @@ import 'helpers/jquery.simulate'
 
 const searchTerm = 'bunnies'
 const photoData = [
-  {id: 'noooooo', secret: 'whyyyyy', farm: 'moooo', owner: 'notyou', server: 'maneframe'},
-  {id: 'nooope', secret: 'sobbbbb', farm: 'sadface', owner: 'meeee', server: 'mwhahahah'}
+  {id: 'noooooo', secret: 'whyyyyy', farm: 'moooo', owner: 'notyou', server: 'maneframe', needs_interstitial: 0},
+  {id: 'nooope', secret: 'sobbbbb', farm: 'sadface', owner: 'meeee', server: 'mwhahahah', needs_interstitial: 0},
+  {id: 'nsfwid', secret: 'nsfwsecret', farm: 'nsfwfarm', owner: 'nsfwowner', server: 'nsfwserver', needs_interstitial: 1}
 ]
 
 function setupServerResponses() {
@@ -72,7 +73,7 @@ test('search', function() {
   this.form.submit()
   this.server.respond()
   const results = $('ul.flickrResults li a.thumbnail', this.form)
-  equal(results.length, 2, 'images are added to the results')
+  equal(results.length, 2, 'non-nsfw images are added to the results')
 
   for (let idx = 0; idx <= 1; idx++) {
     ok(results.eq(idx).attr('data-fullsize').includes(photoData[idx].id), 'flickr - img src has id')
