@@ -47,18 +47,18 @@ describe BigBlueButtonConference do
 
     it "should correctly generate join urls" do
       expect(@conference.config).not_to be_nil
-
       # set some vars so it thinks it's been created and doesn't do an api call
       @conference.conference_key = 'test'
       @conference.settings[:admin_key] = 'admin'
       @conference.settings[:user_key] = 'user'
       @conference.save
-
       params = {:fullName => user_factory.name, :meetingID => @conference.conference_key, :userID => user_factory.id}
       admin_params = params.merge(:password => 'admin').to_query
       user_params = params.merge(:password => 'user').to_query
-      expect(@conference.admin_join_url(@user)).to eql("https://bbb.instructure.com/bigbluebutton/api/join?#{admin_params}&checksum=" + Digest::SHA1.hexdigest("join#{admin_params}secret"))
-      expect(@conference.participant_join_url(@user)).to eql("https://bbb.instructure.com/bigbluebutton/api/join?#{user_params}&checksum=" + Digest::SHA1.hexdigest("join#{user_params}secret"))
+      expect(@conference.admin_join_url(@user)).to eql("https://bbb.instructure.com/bigbluebutton/api/join?#{admin_params}&checksum=" +
+        Digest::SHA1.hexdigest("join#{admin_params}secret"))
+      expect(@conference.participant_join_url(@user)).to eql("https://bbb.instructure.com/bigbluebutton/api/join?#{user_params}&checksum=" +
+        Digest::SHA1.hexdigest("join#{user_params}secret"))
     end
 
     it "should confirm valid config" do
@@ -68,9 +68,7 @@ describe BigBlueButtonConference do
 
     it "should recreate the conference" do
       expect(@conference).to receive(:send_request).with(:create, anything).and_return(true)
-
       expect(@conference.craft_url(@user)).to match(/\Ahttps:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
-
       # load a new instance to clear out @conference_active
       @conference = WebConference.find(@conference.id)
       expect(@conference).to receive(:send_request).with(:create, anything).and_return(true)
@@ -80,7 +78,7 @@ describe BigBlueButtonConference do
     it "should not recreate the conference if it is active" do
       expect(@conference).to receive(:send_request).once.with(:create, anything).and_return(true)
       @conference.initiate_conference
-      expect(@conference.active?).to be_truthy
+      expect(@conference).to be_active
       expect(@conference.craft_url(@user)).to match(/\Ahttps:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
     end
 
@@ -91,6 +89,8 @@ describe BigBlueButtonConference do
   end
 
   describe 'plugin setting recording_enabled is enabled' do
+    let(:get_recordings_fixture){File.read(Rails.root.join('spec', 'fixtures', 'files', 'conferences', 'big_blue_button_get_recordings_two.json'))}
+
     before do
       allow(WebConference).to receive(:plugins).and_return([
         web_conference_plugin_mock("big_blue_button", {
@@ -133,16 +133,28 @@ describe BigBlueButtonConference do
       bbb.context = course_factory
       bbb.save!
       response = {returncode: 'SUCCESS', recordings: "\n  ",
-                  messageKey: 'noRecordings', message: 'There are not
-                  recordings for the meetings'}
+                  messageKey: 'noRecordings', message: 'There are no recordings for the meeting(s).'}
       allow(bbb).to receive(:send_request).and_return(response)
-      expect(bbb.recordings).to eq []
+      recordings = bbb.recordings
+      expect(recordings).to eq []
+    end
+
+    it "should properly serialize a response with recordings" do
+      bbb = BigBlueButtonConference.new
+      allow(bbb).to receive(:conference_key).and_return('12345')
+      bbb.user_settings = { record: true }
+      bbb.user = user_factory
+      bbb.context = course_factory
+      bbb.save!
+      response = JSON.parse(get_recordings_fixture, {symbolize_names: true})
+      allow(bbb).to receive(:send_request).and_return(response)
+      recordings = bbb.recordings
+      expect(recordings).not_to eq []
     end
 
     describe "looking for recordings based on user setting" do
       before(:once) do
         @bbb = BigBlueButtonConference.new(user: user_factory, context: course_factory)
-
         # set some vars so it thinks it's been created and doesn't do an api call
         @bbb.conference_key = 'test'
         @bbb.settings[:admin_key] = 'admin'
@@ -161,6 +173,38 @@ describe BigBlueButtonConference do
         @bbb.save
         expect(@bbb).to receive(:send_request)
         @bbb.recordings
+      end
+    end
+
+    describe "delete recording" do
+      before(:once) do
+        @bbb = BigBlueButtonConference.new(user: user_factory, context: course_factory)
+        # set some vars so it thinks it's been created and doesn't do an api call
+        @bbb.conference_key = 'test'
+        @bbb.settings[:admin_key] = 'admin'
+        @bbb.settings[:user_key] = 'user'
+        @bbb.save
+      end
+
+      it "doesn't delete anything if record_id = nil" do
+        recording_id = nil
+        allow(@bbb).to receive(:send_request)
+        response = @bbb.delete_recording(recording_id)
+        expect(response[:deleted]).to eq false
+      end
+
+      it "doesn't delete the recording if record_id is not found" do
+        recording_id = ''
+        allow(@bbb).to receive(:send_request).and_return({:returncode=>"SUCCESS", :deleted=>"false"})
+        response = @bbb.delete_recording(recording_id)
+        expect(response[:deleted]).to eq false
+      end
+
+      it "does delete the recording if record_id is found" do
+        recording_id = 'abc123-xyz'
+        allow(@bbb).to receive(:send_request).and_return({:returncode=>"SUCCESS", :deleted=>"true"})
+        response = @bbb.delete_recording(recording_id)
+        expect(response[:deleted]).to eq true
       end
     end
   end

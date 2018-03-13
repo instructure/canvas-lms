@@ -1,0 +1,44 @@
+{
+  "returncode": "SUCCESS",
+  "recordings":
+  [
+    {
+      "recordID": "18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031612456",
+      "meetingID": "instructure_web_conference_oKdQ1gfiZjl0bOy8PQSytaF1vBuwOU3CxHDd4kJr",
+      "name": "Conference Development 101",
+      "published": "true",
+      "protected": "false",
+      "startTime": "1513031612000",
+      "endTime": "1513031628000",
+      "metadata": {
+        "isBreakout": "false"
+      },
+      "playback": {
+        "format": {
+                    "type": "video",
+                    "url": "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031612456/capture/",
+                    "length": "0"
+        }
+      }
+    },
+    {
+      "recordID": "18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031142256",
+      "meetingID": "instructure_web_conference_oKdQ1gfiZjl0bOy8PQSytaF1vBuwOU3CxHDd4kJr",
+      "name": "Conference Development 101",
+      "published": "true",
+      "protected": "false",
+      "startTime": "1513031142000",
+      "endTime": "1513031164000",
+      "metadata": {
+        "isBreakout": "false"
+      },
+      "playback": {
+        "format": {
+          "type": "video",
+          "url": "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031142256/capture/",
+          "length": "0"
+        }
+      }
+    }
+  ]
+}
