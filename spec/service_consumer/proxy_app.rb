@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-ENV["RAILS_ENV"] = 'test'
+# ENV["RAILS_ENV"] = 'test'
 
 class ProxyApp
   def initialize
@@ -23,12 +23,14 @@ class ProxyApp
     @real_provider_app = Rails.application
   end
 
-  def call env
+  def call(env)
     # modify request (env) here
     # See http://www.rubydoc.info/github/rack/rack/file/SPEC for contents of the ENV
-    root_user = Account.all.select{|a| a.root_account? }.first.users.first
-    api_key = User.find(1).access_tokens.create!
-    env["HTTP_AUTHORIZATION"] = "Bearer #{api_key.full_token}" if env.include?("HTTP_AUTHORIZATION")
+    # create a User
+    AccountUser.create!(account: Account.default, user: User.create!)
+    # create token
+    full_token = Account.default.users.first.access_tokens.create!.full_token
+    env["HTTP_AUTHORIZATION"] = "Bearer #{full_token}" if env.include?("HTTP_AUTHORIZATION")
     response = @real_provider_app.call(env)
     response
   end
