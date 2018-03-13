@@ -46,21 +46,23 @@ define [
       return unless query = @$('.flickrSearchTerm').val()
 
       flickrUrl = "#{@flickrUrl}/#{query}" if @flickrUrl
-      flickrUrl ||= 'https://secure.flickr.com/services/rest/?method=flickr.photos.search&format=json' +
+      flickrUrl ||= 'https://api.flickr.com/services/rest/?method=flickr.photos.search&format=json' +
                   '&api_key=734839aadcaa224c4e043eaf74391e50&sort=relevance&license=1,2,3,4,5,6' +
-                  "&text=#{query}&per_page=150&jsoncallback=?"
+                  "&text=#{query}&per_page=150&extras=needs_interstitial&jsoncallback=?"
       @request?.abort()
       @$('.flickrResults').show().disableWhileLoading @request = $.getJSON flickrUrl, (data) =>
         photos = data.photos.photo
         @renderResults(photos)
 
     renderResults: (photos) ->
-      html = _.map photos, (photo) ->
-        resultTemplate
-          thumb:    "https://farm#{photo.farm}.static.flickr.com/#{photo.server}/#{photo.id}_#{photo.secret}_s.jpg"
-          fullsize: "https://farm#{photo.farm}.static.flickr.com/#{photo.server}/#{photo.id}_#{photo.secret}.jpg"
-          source:   "https://secure.flickr.com/photos/#{photo.owner}/#{photo.id}"
-          title:    photo.title
+      html = _.reject(photos, (photo) => photo.needs_interstitial == 1)
+        .map((photo) ->
+          resultTemplate
+            thumb:    "https://farm#{photo.farm}.static.flickr.com/#{photo.server}/#{photo.id}_#{photo.secret}_s.jpg"
+            fullsize: "https://farm#{photo.farm}.static.flickr.com/#{photo.server}/#{photo.id}_#{photo.secret}.jpg"
+            source:   "https://secure.flickr.com/photos/#{photo.owner}/#{photo.id}"
+            title:    photo.title
+        )
       html = html.join('')
 
       @$('.flickrResults').showIf(!!photos.length).html html
