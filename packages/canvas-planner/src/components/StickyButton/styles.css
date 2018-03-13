@@ -20,17 +20,7 @@
   overflow: visible;
   border-bottom-left-radius: var(--borderRadius);
   border-bottom-right-radius: var(--borderRadius);
-
-  /*
-  Something about Planner's CSS build is making Firefox not recognize
-  @supports (position: sticky), hence the duplicate position rules below
-  (relative is for IE11)
-  */
-
-  /* stylelint-disable declaration-block-no-duplicate-properties */
-  position: relative;
-  position: sticky;
-  /* stylelint-enable declaration-block-no-duplicate-properties */
+  position: fixed;
 
   &::before {
     content: "";
