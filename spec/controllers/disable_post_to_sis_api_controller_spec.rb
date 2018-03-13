@@ -28,28 +28,21 @@ describe DisablePostToSisApiController do
       user_session(admin)
     end
 
-    it 'responds with 400 when post_to_sis is disabled' do
+    it 'works even when post_to_sis/new_sis_integrations disabled' do
+      assignment = assignment_model(course: course,
+                                    post_to_sis: true,
+                                    workflow_state: 'published')
+
       put 'disable_post_to_sis', params: {course_id: course.id}
 
-      parsed_json = json_parse(response.body)
-      expect(response.code).to eq "400"
-      expect(parsed_json['code']).to eq 'not_enabled'
+      expect(response).to be_success
+      expect(assignment.reload.post_to_sis).to eq false
     end
 
     context 'with bulk_sis_grade_export and new_sis_integrations enabled' do
       before do
         account.enable_feature!(:bulk_sis_grade_export)
         account.enable_feature!(:new_sis_integrations)
-      end
-
-      it 'responds with 400 when course is unpublished' do
-        course.workflow_state = 'unpublished'
-        course.save!
-        put 'disable_post_to_sis', params: {course_id: course.id}
-
-        parsed_json = json_parse(response.body)
-        expect(response.code).to eq "400"
-        expect(parsed_json['code']).to  eq 'unpublished_course'
       end
 
       it 'responds with 200' do
