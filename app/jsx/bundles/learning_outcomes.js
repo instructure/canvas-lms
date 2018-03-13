@@ -26,7 +26,6 @@ import browserTemplate from 'jst/outcomes/browser'
 import instructionsTemplate from 'jst/outcomes/mainInstructions'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import OutcomesActionsPopoverMenu from '../outcomes/OutcomesActionsPopoverMenu'
 import {showImportOutcomesModal} from '../outcomes/ImportOutcomesModal'
 import {showOutcomesImporter, showOutcomesImporterIfInProgress} from '../outcomes/OutcomesImporter'
 
@@ -38,18 +37,6 @@ $el.html(browserTemplate({
   canManageRubrics: ENV.PERMISSIONS.manage_rubrics,
   contextUrlRoot: ENV.CONTEXT_URL_ROOT
 }))
-
-// The below functionality and its accompanying DOM element (popover-menu)
-// have been disabled since the feature has been shelved for now. However,
-// it's still on the roadmap eventually.
-
-// ReactDOM.render(
-//   <OutcomesActionsPopoverMenu
-//     contextUrlRoot={ENV.CONTEXT_URL_ROOT}
-//     permissions={ENV.PERMISSIONS}
-//   />,
-//   $el.find('#popoverMenu')[0]
-// )
 
 export const toolbar = new ToolbarView({el: $el.find('.toolbar')})
 
