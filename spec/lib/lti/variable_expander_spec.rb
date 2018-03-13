@@ -824,7 +824,8 @@ module Lti
             it 'has substitution' do
               exp_hash = {test: '$com.instructure.Course.groupIds'}
               variable_expander.expand_variables!(exp_hash)
-              expect(exp_hash[:test]).to eq [group_two, group_one].map(&:id).join(',')
+              expected_ids = [group_one, group_two].map { |g| g.id.to_s }
+              expect(exp_hash[:test].split(',')).to match_array expected_ids
             end
 
             it 'does not include groups outside of the course' do
@@ -833,7 +834,8 @@ module Lti
               second_course.groups.create!(name: 'Group Three')
               exp_hash = {test: '$com.instructure.Course.groupIds'}
               variable_expander.expand_variables!(exp_hash)
-              expect(exp_hash[:test]).to eq [group_two, group_one].map(&:id).join(',')
+              expected_ids = [group_two, group_one].map { |g| g.id.to_s }
+              expect(exp_hash[:test].split(',')).to match_array expected_ids
             end
 
             it 'only includes active group ids' do
