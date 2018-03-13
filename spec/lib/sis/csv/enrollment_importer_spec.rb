@@ -120,6 +120,7 @@ describe SIS::CSV::EnrollmentImporter do
       "S001,test_1,Sec1,active,,"
     )
     # the enrollments
+    expect_any_instance_of(Enrollment).to receive(:add_to_favorites).once
     process_csv_data_cleanly(
       "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
       "test_1,user_1,teacher,,active,,,",

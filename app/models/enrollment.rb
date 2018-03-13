@@ -663,6 +663,10 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
+  def self.batch_add_to_favorites(enrollment_ids)
+    Enrollment.where(:id => enrollment_ids).each(&:add_to_favorites)
+  end
+
   def add_to_favorites
     # this method was written by Alan Smithee
     self.user.shard.activate do
