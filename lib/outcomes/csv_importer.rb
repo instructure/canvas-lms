@@ -179,15 +179,9 @@ module Outcomes
 
     def normalize_i18n(string)
       raise ArgumentError if string.blank?
-      no_leading_zeros = string.strip.gsub(/^0*/, '')
-      number_parts = no_leading_zeros.split(/[,.]/)
-      last_number_part = number_parts.pop
-
-      if number_parts.empty?
-        last_number_part
-      else
-        [number_parts.join(), last_number_part].join('.')
-      end
+      separator = I18n.t(:separator, :scope => :'number.format')
+      delimiter = I18n.t(:delimiter, :scope => :'number.format')
+      string.gsub(delimiter, '').gsub(separator, '.')
     end
 
     def strict_parse_float(v, name)

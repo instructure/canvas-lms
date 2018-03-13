@@ -196,22 +196,34 @@ describe Outcomes::CsvImporter do
       uuid = SecureRandom.uuid
       import_fake_csv([
         headers + ['mastery_points', 'ratings'],
-        outcome_row(vendor_guid: uuid) + ['3,14', '5.34', 'awesome', '1.2', 'adequate']
+        outcome_row(vendor_guid: uuid) + ['3.14', '5.34', 'awesome', '1.2', 'adequate']
       ])
 
       outcome = LearningOutcome.find_by(vendor_guid: uuid)
       expect(outcome.rubric_criterion[:mastery_points]).to eq(3.14)
     end
 
-    it 'can import a file with i18n decimal numbers' do
+    it 'can import a file with english decimal numbers' do
       uuid = SecureRandom.uuid
       import_fake_csv([
         headers + ['ratings'],
-        outcome_row(vendor_guid: uuid) + [' 0012,34.5678 ', 'gal nummer']
+        outcome_row(vendor_guid: uuid) + [' 0012,34.5678 ', 'english number']
       ]) { }
 
       outcome = LearningOutcome.find_by(vendor_guid: uuid)
       expect(outcome.rubric_criterion[:ratings][0][:points]).to eq(1234.5678)
+    end
+
+    it 'can import a file with i18n decimal numbers' do
+      I18n.locale = 'fr'
+      uuid = SecureRandom.uuid
+      import_fake_csv([
+        headers + ['ratings'],
+        outcome_row(vendor_guid: uuid) + [' 123 456,5678 ', 'bon nombre']
+      ]) { }
+
+      outcome = LearningOutcome.find_by(vendor_guid: uuid)
+      expect(outcome.rubric_criterion[:ratings][0][:points]).to eq(123456.5678)
     end
 
     it 'automatically detects column separator from header' do
