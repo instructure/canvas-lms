@@ -223,6 +223,10 @@ describe "users" do
     end
 
     it "should require terms if configured to do so" do
+      if terms = Account.default.terms_of_service
+        terms.update(passive: false)
+      end
+
       get "/register"
 
       %w{teacher student parent}.each do |type|
@@ -238,6 +242,10 @@ describe "users" do
     end
 
     it "should register a student with a join code" do
+      if terms = Account.default.terms_of_service
+        terms.update(passive: false)
+      end
+
       Account.default.allow_self_enrollment!
       course_factory(active_all: true)
       @course.update_attribute(:self_enrollment, true)
@@ -260,6 +268,10 @@ describe "users" do
     end
 
     it "should register a teacher" do
+      if terms = Account.default.terms_of_service
+        terms.update(passive: false)
+      end
+
       get '/register'
       f('#signup_teacher').click
 
@@ -289,6 +301,10 @@ describe "users" do
     end
 
     it "should register an observer" do
+      if terms = Account.default.terms_of_service
+        terms.update(passive: false)
+      end
+
       user_with_pseudonym(:active_all => true, :password => 'lolwut12')
 
       get '/register'
