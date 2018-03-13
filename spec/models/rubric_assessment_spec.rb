@@ -34,7 +34,7 @@ describe RubricAssessment do
 
   it "should htmlify the rating comments" do
     comment = "Hi, please see www.example.com.\n\nThanks."
-    @assessment = @association.assess({
+    assessment = @association.assess({
       :user => @student,
       :assessor => @teacher,
       :artifact => @assignment.find_or_create_submission(@student),
@@ -46,16 +46,16 @@ describe RubricAssessment do
         }
       }
     })
-    expect(@assessment.data.first[:comments]).to eq comment
+    expect(assessment.data.first[:comments]).to eq comment
     t = Class.new
     t.extend HtmlTextHelper
     expected = t.format_message(comment).first
-    expect(@assessment.data.first[:comments_html]).to eq expected
+    expect(assessment.data.first[:comments_html]).to eq expected
   end
 
   context "grading" do
     it "should update scores if used for grading" do
-      @assessment = @association.assess({
+      assessment = @association.assess({
         :user => @student,
         :assessor => @teacher,
         :artifact => @assignment.find_or_create_submission(@student),
@@ -66,20 +66,20 @@ describe RubricAssessment do
           }
         }
       })
-      expect(@assessment).not_to be_nil
-      expect(@assessment.user).to eql(@student)
-      expect(@assessment.assessor).to eql(@teacher)
-      expect(@assessment.artifact).not_to be_nil
-      expect(@assessment.artifact).to be_is_a(Submission)
-      expect(@assessment.artifact.user).to eql(@student)
-      expect(@assessment.artifact.grader).to eql(@teacher)
-      expect(@assessment.artifact.score).to eql(5.0)
-      expect(@assessment.data.first[:comments_html]).to be_nil
+      expect(assessment).not_to be_nil
+      expect(assessment.user).to eql(@student)
+      expect(assessment.assessor).to eql(@teacher)
+      expect(assessment.artifact).not_to be_nil
+      expect(assessment.artifact).to be_is_a(Submission)
+      expect(assessment.artifact.user).to eql(@student)
+      expect(assessment.artifact.grader).to eql(@teacher)
+      expect(assessment.artifact.score).to eql(5.0)
+      expect(assessment.data.first[:comments_html]).to be_nil
     end
 
     it "should allow observers the ability to view rubric assessments with course association" do
       submission = @assignment.find_or_create_submission(@student)
-      @assessment = @association.assess(
+      assessment = @association.assess(
           {
               :user => @student,
               :assessor => @teacher,
@@ -98,7 +98,7 @@ describe RubricAssessment do
     it "should allow observers the ability to view rubric assessments with account association" do
       submission = @assignment.find_or_create_submission(@student)
       account_association = @rubric.associate_with(@assignment, @account, :purpose => 'grading', :use_for_grading => true)
-      @assessment = account_association.assess(
+      assessment = account_association.assess(
           {
               :user => @student,
               :assessor => @teacher,
@@ -115,7 +115,7 @@ describe RubricAssessment do
     end
 
     it "should update scores anonymously if graded anonymously" do
-      @assessment = @association.assess({
+      assessment = @association.assess({
           :graded_anonymously => true,
           :user => @student,
           :assessor => @teacher,
@@ -125,11 +125,11 @@ describe RubricAssessment do
             :criterion_crit1 => { :points => 5 }
           }
         })
-      expect(@assessment.artifact.graded_anonymously).to be_truthy
+      expect(assessment.artifact.graded_anonymously).to be_truthy
     end
 
     it "should not mutate null/empty string score text to 0" do
-      @assessment = @association.assess({
+      assessment = @association.assess({
         :user => @student,
         :assessor => @teacher,
         :artifact => @assignment.find_or_create_submission(@student),
@@ -140,12 +140,12 @@ describe RubricAssessment do
           }
         }
       })
-      expect(@assessment.score).to be_nil
-      expect(@assessment.artifact.score).to eql(nil)
+      expect(assessment.score).to be_nil
+      expect(assessment.artifact.score).to eql(nil)
     end
 
     it "should allow points to exceed max points possible for criterion" do
-      @assessment = @association.assess({
+      assessment = @association.assess({
         :user => @student,
         :assessor => @teacher,
         :artifact => @assignment.find_or_create_submission(@student),
@@ -156,14 +156,58 @@ describe RubricAssessment do
           }
         }
       })
-      expect(@assessment.score).to eql(11.0)
-      expect(@assessment.artifact.score).to eql(11.0)
+      expect(assessment.score).to eql(11.0)
+      expect(assessment.artifact.score).to eql(11.0)
+    end
+
+    context "outcome criterion" do
+      before :once do
+        assignment_model
+        outcome_with_rubric
+        @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
+      end
+
+      it "should not allow points to exceed max points possible" do
+        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        assessment = @association.assess({
+          :user => @student,
+          :assessor => @teacher,
+          :artifact => @assignment.find_or_create_submission(@student),
+          :assessment => {
+            :assessment_type => 'grading',
+            criterion_id => {
+              :points => "5"
+            }
+          }
+        })
+        expect(assessment.score).to eql(3.0)
+        expect(assessment.artifact.score).to eql(3.0)
+      end
+
+      it "should allow points to exceed max points possible " +
+       "if Allow Outcome Extra Credit feature is enabled" do
+        @course.enable_feature!(:outcome_extra_credit)
+        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        assessment = @association.assess({
+          :user => @student,
+          :assessor => @teacher,
+          :artifact => @assignment.find_or_create_submission(@student),
+          :assessment => {
+            :assessment_type => 'grading',
+            criterion_id => {
+              :points => "5"
+            }
+          }
+        })
+        expect(assessment.score).to eql(5.0)
+        expect(assessment.artifact.score).to eql(5.0)
+      end
     end
 
     it "should not update scores if not used for grading" do
       rubric_model
       @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => false)
-      @assessment = @association.assess({
+      assessment = @association.assess({
         :user => @student,
         :assessor => @teacher,
         :artifact => @assignment.find_or_create_submission(@student),
@@ -174,20 +218,20 @@ describe RubricAssessment do
           }
         }
       })
-      expect(@assessment).not_to be_nil
-      expect(@assessment.user).to eql(@student)
-      expect(@assessment.assessor).to eql(@teacher)
-      expect(@assessment.artifact).not_to be_nil
-      expect(@assessment.artifact).to be_is_a(Submission)
-      expect(@assessment.artifact.user).to eql(@student)
-      expect(@assessment.artifact.grader).to eql(nil)
-      expect(@assessment.artifact.score).to eql(nil)
+      expect(assessment).not_to be_nil
+      expect(assessment.user).to eql(@student)
+      expect(assessment.assessor).to eql(@teacher)
+      expect(assessment.artifact).not_to be_nil
+      expect(assessment.artifact).to be_is_a(Submission)
+      expect(assessment.artifact.user).to eql(@student)
+      expect(assessment.artifact.grader).to eql(nil)
+      expect(assessment.artifact.score).to eql(nil)
     end
 
     it "should not update scores if not a valid grader" do
       @student2 = user_factory(active_all: true)
       @course.enroll_student(@student2).accept
-      @assessment = @association.assess({
+      assessment = @association.assess({
         :user => @student,
         :assessor => @student2,
         :artifact => @assignment.find_or_create_submission(@student),
@@ -198,14 +242,14 @@ describe RubricAssessment do
           }
         }
       })
-      expect(@assessment).not_to be_nil
-      expect(@assessment.user).to eql(@student)
-      expect(@assessment.assessor).to eql(@student2)
-      expect(@assessment.artifact).not_to be_nil
-      expect(@assessment.artifact).to be_is_a(Submission)
-      expect(@assessment.artifact.user).to eql(@student)
-      expect(@assessment.artifact.grader).to eql(nil)
-      expect(@assessment.artifact.score).to eql(nil)
+      expect(assessment).not_to be_nil
+      expect(assessment.user).to eql(@student)
+      expect(assessment.assessor).to eql(@student2)
+      expect(assessment.artifact).not_to be_nil
+      expect(assessment.artifact).to be_is_a(Submission)
+      expect(assessment.artifact.user).to eql(@student)
+      expect(assessment.artifact.grader).to eql(nil)
+      expect(assessment.artifact.score).to eql(nil)
     end
 
     describe "for assignment requiring anonymous peer reviews" do

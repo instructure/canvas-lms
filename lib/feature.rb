@@ -220,6 +220,14 @@ END
       state: 'allowed',
       root_opt_in: false
     },
+    'outcome_extra_credit' =>
+    {
+      display_name: -> { I18n.t('Allow Outcome Extra Credit') },
+      description:  -> { I18n.t('If enabled, allows more than the maximum possible score on an Outcome to be given on a rubric.')},
+      applies_to: 'Course',
+      state: 'allowed',
+      root_opt_in: true
+    },
     'post_grades' =>
     {
       display_name: -> { I18n.t('features.post_grades', 'Post Grades to SIS') },
