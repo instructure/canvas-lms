@@ -20,7 +20,6 @@ import $ from 'jquery';
 import natcompare from 'compiled/util/natcompare';
 import fakeENV from 'helpers/fakeENV';
 import JQuerySelectorCache from 'jsx/shared/helpers/JQuerySelectorCache';
-import MGP from 'jsx/speed_grader/gradingPeriod';
 import numberHelper from 'jsx/shared/helpers/numberHelper';
 import SpeedGrader from 'speed_grader';
 import SpeedgraderHelpers from 'speed_grader_helpers';
@@ -908,6 +907,7 @@ QUnit.module('handleSubmissionSelectionChange', {
         currentSelectedIndex: 1,
         score: 7,
         grade: 70,
+        grading_period_id: 8,
         submission_type: 'basic_lti_launch',
         workflow_state: 'submitted',
         submission_history: [
@@ -929,6 +929,7 @@ QUnit.module('handleSubmissionSelectionChange', {
 
     window.jsonData = {
       id: 27,
+      gradingPeriods: { 8: { id: 8, is_closed: true } },
       GROUP_GRADING_MODE: false,
       points_possible: 10,
       studentMap : {
@@ -946,10 +947,28 @@ QUnit.module('handleSubmissionSelectionChange', {
 
 test('should use submission history lti launch url', () => {
   const renderLtiLaunch = sinon.stub(SpeedGrader.EG, 'renderLtiLaunch');
-  sinon.stub(MGP, 'assignmentClosedForStudent').returns(false);
   SpeedGrader.EG.handleSubmissionSelectionChange();
   ok(renderLtiLaunch.calledWith(sinon.match.any, sinon.match.any, "bar"));
 });
+
+test('shows a "closed grading period" notice if the submission is in a closed period', () => {
+  const getFromCache = sinon.stub(JQuerySelectorCache.prototype, 'get')
+  const closedGradingPeriodNotice = { showIf: sinon.stub() }
+  getFromCache.withArgs('#closed_gp_notice').returns(closedGradingPeriodNotice)
+  SpeedGrader.EG.handleSubmissionSelectionChange()
+  ok(closedGradingPeriodNotice.showIf.calledWithExactly(true))
+  getFromCache.restore()
+})
+
+test('does not show a "closed grading period" notice if the submission is not in a closed period', () => {
+  SpeedGrader.EG.currentStudent.submission.grading_period_id = null
+  const getFromCache = sinon.stub(JQuerySelectorCache.prototype, 'get')
+  const closedGradingPeriodNotice = { showIf: sinon.stub() }
+  getFromCache.withArgs('#closed_gp_notice').returns(closedGradingPeriodNotice)
+  SpeedGrader.EG.handleSubmissionSelectionChange()
+  notOk(closedGradingPeriodNotice.showIf.calledWithExactly(true))
+  getFromCache.restore()
+})
 
 QUnit.module('SpeedGrader#isGradingTypePercent', {
   setup () {

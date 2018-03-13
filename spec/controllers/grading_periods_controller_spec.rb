@@ -170,14 +170,15 @@ describe GradingPeriodsController do
       period = create_course_grading_period(course)
       get :show, params: { course_id: course.id, id: period.to_param }
       expected_attributes = [
-        "id",
-        "grading_period_group_id",
-        "start_date",
-        "end_date",
-        "close_date",
-        "weight",
-        "title",
-        "permissions"
+        'close_date',
+        'end_date',
+        'grading_period_group_id',
+        'id',
+        'is_closed',
+        'permissions',
+        'start_date',
+        'title',
+        'weight'
       ]
       period_attributes = json_parse['grading_periods'].first.keys
       expect(period_attributes).to match_array(expected_attributes)

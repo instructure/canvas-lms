@@ -22,7 +22,6 @@ import ReactDOM from 'react-dom';
 import Alert from '@instructure/ui-core/lib/components/Alert';
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
 import TextArea from '@instructure/ui-core/lib/components/TextArea';
-import MGP from 'jsx/speed_grader/gradingPeriod';
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper';
 import quizzesNextSpeedGrading from 'jsx/grading/quizzesNextSpeedGrading';
 import StatusPill from 'jsx/grading/StatusPill';
@@ -124,7 +123,6 @@ let $submission_late_notice
 let $submission_not_newest_notice
 let $enrollment_inactive_notice
 let $enrollment_concluded_notice
-let $closed_gp_notice
 let $submission_files_container
 let $submission_files_list
 let $submission_attachment_viewed_at
@@ -1274,7 +1272,7 @@ EG = {
       $full_width_container.removeClass("with_enrollment_notice");
       $enrollment_inactive_notice.hide();
       $enrollment_concluded_notice.hide();
-      $closed_gp_notice.hide();
+      selectors.get('#closed_gp_notice').hide()
 
       EG.setGradeReadOnly(true); // disabling now will keep it from getting undisabled unintentionally by disableWhileLoading
       if (ENV.grading_role == 'moderator' && this.currentStudent.submission_state == 'not_graded') {
@@ -1825,16 +1823,18 @@ EG = {
     );
 
     var isConcluded = EG.isStudentConcluded(this.currentStudent.id);
-    var isClosedForStudent = MGP.assignmentClosedForStudent(this.currentStudent, jsonData);
     $enrollment_concluded_notice.showIf(isConcluded);
-    $closed_gp_notice.showIf(isClosedForStudent);
+
+    const gradingPeriod = jsonData.gradingPeriods[(submissionHolder || {}).grading_period_id]
+    const isClosedForSubmission = !!gradingPeriod && gradingPeriod.is_closed
+    selectors.get('#closed_gp_notice').showIf(isClosedForSubmission)
     SpeedgraderHelpers.setRightBarDisabled(isConcluded);
     EG.setGradeReadOnly((typeof submissionHolder != "undefined" &&
                          submissionHolder.submission_type === "online_quiz") ||
                         isConcluded ||
-                        (isClosedForStudent && !isAdmin));
+                        (isClosedForSubmission && !isAdmin));
 
-    if (isConcluded || isClosedForStudent) {
+    if (isConcluded || isClosedForSubmission) {
       $full_width_container.addClass("with_enrollment_notice");
     }
   },
@@ -2739,11 +2739,6 @@ EG = {
   }
 };
 
-function getAssignmentOverrides() {
-  return $.getJSON("/api/v1/courses/" + ENV.course_id +
-                   "/assignments/" + ENV.assignment_id + "/overrides");
-}
-
 function getGradingPeriods() {
   var dfd = $.Deferred();
   // treating failure as a success here since grading periods 404 when not
@@ -2758,13 +2753,9 @@ function getGradingPeriods() {
   return dfd;
 }
 
-function gotData(assignmentOverridesResponse, gradingPeriods, speedGraderJsonResponse) {
+function gotData(gradingPeriods, speedGraderJsonResponse) {
   var speedGraderJSON = speedGraderJsonResponse[0];
-  var assignmentOverrides = assignmentOverridesResponse[0];
-
-  speedGraderJSON.gradingPeriods = gradingPeriods;
-  speedGraderJSON.assignmentOverrides = assignmentOverrides;
-
+  speedGraderJSON.gradingPeriods = _.indexBy(gradingPeriods, 'id')
   window.jsonData = speedGraderJSON;
   EG.jsonReady();
 }
@@ -2801,7 +2792,6 @@ function setupSelectors() {
   $avatar_image = $('#avatar_image')
   $average_score = $('#average_score')
   $average_score_wrapper = $('#average-score-wrapper')
-  $closed_gp_notice = $('#closed_gp_notice')
   $comment_attachment_blank = $('#comment_attachment_blank').removeAttr('id').detach()
   $comment_attachment_input_blank = $('#comment_attachment_input_blank').detach()
   $comment_blank = $('#comment_blank').removeAttr('id').detach()
@@ -2883,7 +2873,7 @@ export default {
     const speedGraderJSONUrl = `${window.location.pathname}.json${window.location.search}`;
     const speedGraderJsonDfd = $.ajaxJSON(speedGraderJSONUrl, 'GET', null, null, speedGraderJSONErrorFn);
 
-    $.when(getAssignmentOverrides(), getGradingPeriods(), speedGraderJsonDfd).then(gotData);
+    $.when(getGradingPeriods(), speedGraderJsonDfd).then(gotData);
 
     //run the stuff that just attaches event handlers and dom stuff, but does not need the jsonData
     $(document).ready(function() {

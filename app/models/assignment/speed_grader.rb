@@ -34,7 +34,7 @@ class Assignment
       submission_fields = [:user_id, :id, :submitted_at, :workflow_state,
                            :grade, :grade_matches_current_submission,
                            :graded_at, :turnitin_data, :submission_type, :score,
-                           :points_deducted,
+                           :grading_period_id, :points_deducted,
                            :assignment_id, :submission_comments, :excused, :updated_at].freeze
 
       comment_fields = [:comment, :id, :author_name, :created_at, :author_id,

@@ -238,6 +238,19 @@ describe Assignment::SpeedGrader do
       end
     end
 
+    it 'returns grading_period_id on submissions' do
+      group = @course.root_account.grading_period_groups.create!
+      group.enrollment_terms << @course.enrollment_term
+      period = group.grading_periods.create!(
+        title: 'A Grading Period',
+        start_date: now - 2.months,
+        end_date: now + 2.months
+      )
+      json = Assignment::SpeedGrader.new(@assignment, @teacher).json
+      submission = json[:submissions].first
+      expect(submission.fetch('grading_period_id')).to eq period.id.to_s
+    end
+
     it "creates a non-annotatable DocViewer session for Discussion attachments" do
       course = student_in_course(active_all: true).course
       assignment = assignment_model(course: course)
