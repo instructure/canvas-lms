@@ -181,7 +181,7 @@ export default class SubmissionTray extends React.Component {
     if (this.props.submissionCommentsLoaded) {
       return (
         <div>
-          {renderTraySubHeading('Comments')}
+          {renderTraySubHeading(I18n.t('Comments'))}
 
           {this.renderSubmissionCommentList()}
 
