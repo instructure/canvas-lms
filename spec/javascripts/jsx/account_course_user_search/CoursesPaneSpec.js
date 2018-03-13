@@ -30,17 +30,22 @@ QUnit.module('Account Course User Search CoursesPane View', {
   }
 });
 
+const wrapper = shallow(
+  <CoursesPane
+    accountId="1"
+    roles={[{id: '1' }]}
+    queryParams={{}}
+    onUpdateQueryParams={function(){}}
+  />
+);
+
 test('onUpdateFilters calls debouncedApplyFilters after updating state', () => {
-  const wrapper = shallow(
-    <CoursesPane
-      accountId="1"
-      roles={[{id: '1' }]}
-      queryParams={{}}
-      onUpdateQueryParams={function(){}}
-    />
-  );
   const instance = wrapper.instance();
   const spy = sinon.spy(instance, 'debouncedApplyFilters');
   instance.onUpdateFilters();
   ok(spy.called);
 });
+
+test('have an h1 on the page', () => {
+  equal(wrapper.find('h1').length, 1, 'There is one H1 on the page')
+})

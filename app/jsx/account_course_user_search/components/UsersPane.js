@@ -20,6 +20,7 @@ import React from 'react'
 import {shape, func, arrayOf, string} from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 import _ from 'underscore'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import UsersList from './UsersList'
 import UsersToolbar from './UsersToolbar'
 import SearchMessage from './SearchMessage'
@@ -99,6 +100,10 @@ export default class UsersPane extends React.Component {
     const {links, accountId, users, isLoading, errors, searchFilter} = this.state.userList
     return (
       <div>
+        <ScreenReaderContent>
+          <h1>{I18n.t('People')}</h1>
+        </ScreenReaderContent>
+
         {<UsersToolbar
           onUpdateFilters={this.handleUpdateSearchFilter}
           onApplyFilters={this.handleApplyingSearchFilter}

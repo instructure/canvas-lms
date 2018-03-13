@@ -23,35 +23,35 @@ import UserActions from 'jsx/account_course_user_search/actions/UserActions';
 
 QUnit.module('Account Course User Search UsersPane View');
 
+const fakeStore = {
+  dispatch () {},
+  getState () {
+    return {
+      userList: {
+        users: [],
+        isLoading: true,
+        errors: {search_term: ''},
+        next: undefined,
+        searchFilter: {search_term: ''},
+        permissions: {},
+        accountId: 1
+      },
+    }
+  },
+  subscribe () {}
+};
+
+const wrapper = shallow(
+  <UsersPane
+    store={fakeStore}
+    roles={['a']}
+    queryParams={{}}
+    onUpdateQueryParams={function(){}}
+  />
+);
+
 test('handleUpdateSearchFilter dispatches applySearchFilter action', (assert) => {
   const done = assert.async();
-  const fakeStore = {
-    dispatch () {},
-    getState () {
-      return {
-        userList: {
-          users: [],
-          isLoading: true,
-          errors: {search_term: ''},
-          next: undefined,
-          searchFilter: {search_term: ''},
-          permissions: {},
-          accountId: 1
-        },
-      }
-    },
-    subscribe () {}
-  };
-
-  const wrapper = shallow(
-    <UsersPane
-      store={fakeStore}
-      roles={['a']}
-      queryParams={{}}
-      onUpdateQueryParams={function(){}}
-    />
-  );
-
   const spy = sinon.spy(UserActions, 'applySearchFilter');
   const instance = wrapper.instance();
   instance.handleUpdateSearchFilter();
@@ -60,3 +60,7 @@ test('handleUpdateSearchFilter dispatches applySearchFilter action', (assert) =>
     done();
   }, 250);
 });
+
+test('have an h1 on the page', () => {
+  equal(wrapper.find('h1').length, 1, 'There is one H1 on the page')
+})
