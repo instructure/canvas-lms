@@ -183,6 +183,7 @@ Lint/UselessAssignment:
 Lint/Debugger:
   Severity: error
 Lint/EndAlignment:
+  EnforcedStyleAlignWith: variable
   Severity: convention
 
 # Performance changes
