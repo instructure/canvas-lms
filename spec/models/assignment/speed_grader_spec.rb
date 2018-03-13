@@ -42,10 +42,10 @@ describe Assignment::SpeedGrader do
       let(:category) { @course.group_categories.create! name: "Assignment Groups" }
       let(:assignment) do
         @course.assignments.create!(
-                                    group_category_id: category.id,
-                                    grade_group_students_individually: false,
-                                    submission_types: %w(text_entry)
-                                    )
+          group_category_id: category.id,
+          grade_group_students_individually: false,
+          submission_types: %w(text_entry)
+        )
       end
       let(:homework_params) do
         {
@@ -110,8 +110,8 @@ describe Assignment::SpeedGrader do
 
       it "only shows group comments" do
         json = Assignment::SpeedGrader.new(assignment, teacher).json
-        student_A_submission = json.fetch(:submissions).select { |s| s[:user_id] == student_A.id.to_s }.first
-        comments = student_A_submission.fetch(:submission_comments).map do |comment|
+        student_a_submission = json.fetch(:submissions).select { |s| s[:user_id] == student_A.id.to_s }.first
+        comments = student_a_submission.fetch(:submission_comments).map do |comment|
           comment.slice(:author_id, :comment)
         end
         expect(comments).to include({
@@ -173,10 +173,10 @@ describe Assignment::SpeedGrader do
     it "includes only students and sections with overrides for differentiated assignments" do
       json = Assignment::SpeedGrader.new(@assignment, @teacher).json
 
-      expect(json[:context][:students].map{|s| s[:id]}.include?(@student1.id.to_s)).to be_truthy
-      expect(json[:context][:students].map{|s| s[:id]}.include?(@student2.id.to_s)).to be_falsey
-      expect(json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section1.id.to_s)).to be_truthy
-      expect(json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section2.id.to_s)).to be_falsey
+      expect(json[:context][:students].map{|s| s[:id]}).to include(@student1.id.to_s)
+      expect(json[:context][:students].map{|s| s[:id]}).not_to include(@student2.id.to_s)
+      expect(json[:context][:active_course_sections].map{|cs| cs[:id]}).to include(@section1.id.to_s)
+      expect(json[:context][:active_course_sections].map{|cs| cs[:id]}).not_to include(@section2.id.to_s)
     end
 
     it "sorts student view students last" do
@@ -190,10 +190,10 @@ describe Assignment::SpeedGrader do
       @assignment.save!
       json = Assignment::SpeedGrader.new(@assignment, @teacher).json
 
-      expect(json[:context][:students].map{|s| s[:id]}.include?(@student1.id.to_s)).to be_truthy
-      expect(json[:context][:students].map{|s| s[:id]}.include?(@student2.id.to_s)).to be_truthy
-      expect(json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section1.id.to_s)).to be_truthy
-      expect(json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section2.id.to_s)).to be_truthy
+      expect(json[:context][:students].map{|s| s[:id]}).to include(@student1.id.to_s)
+      expect(json[:context][:students].map{|s| s[:id]}).to include(@student2.id.to_s)
+      expect(json[:context][:active_course_sections].map{|cs| cs[:id]}).to include(@section1.id.to_s)
+      expect(json[:context][:active_course_sections].map{|cs| cs[:id]}).to include(@section2.id.to_s)
     end
   end
 
@@ -254,7 +254,7 @@ describe Assignment::SpeedGrader do
 
       expect(Canvadocs).to receive(:enabled?).twice.and_return(true)
       expect(Canvadocs).to receive(:config).and_return({ a: 1 })
-      expect(Canvadoc).to receive(:mime_types).and_return( "image/png")
+      expect(Canvadoc).to receive(:mime_types).and_return("image/png")
 
       json = Assignment::SpeedGrader.new(assignment, @teacher).json
       sub = json[:submissions].first[:submission_history].first[:submission]
@@ -301,7 +301,7 @@ describe Assignment::SpeedGrader do
   it "includes inline view pingback url for files" do
     assignment = @course.assignments.create! :submission_types => ['online_upload']
     attachment = @student.attachments.create! :uploaded_data => dummy_io, :filename => 'doc.doc', :display_name => 'doc.doc', :context => @student
-    submission = assignment.submit_homework @student, :submission_type => :online_upload, :attachments => [attachment]
+    assignment.submit_homework @student, :submission_type => :online_upload, :attachments => [attachment]
     json = Assignment::SpeedGrader.new(assignment, @teacher).json
     attachment_json = json['submissions'][0]['submission_history'][0]['submission']['versioned_attachments'][0]['attachment']
     expect(attachment_json['view_inline_ping_url']).to match %r{/users/#{@student.id}/files/#{attachment.id}/inline_view\z}
@@ -319,7 +319,7 @@ describe Assignment::SpeedGrader do
     before :once do
       course_with_teacher(active_all: true)
       @gc = @course.group_categories.create! name: "Assignment Groups"
-      @groups = 2.times.map { |i| @gc.groups.create! name: "Group #{i}", context: @course }
+      @groups = [1, 2].map { |i| @gc.groups.create! name: "Group #{i}", context: @course }
       students = create_users_in_course(@course, 6, return_type: :record)
       students.each_with_index { |s, i| @groups[i % @groups.size].add_user(s) }
       @assignment = @course.assignments.create!(
@@ -352,7 +352,7 @@ describe Assignment::SpeedGrader do
 
     it 'chooses the student with turnitin data to represent' do
       turnitin_submissions = @groups.map do |group|
-        rep = group.users.shuffle.first
+        rep = group.users.sample
         turnitin_submission = @assignment.grade_student(rep, grade: 10, grader: @teacher)[0]
         turnitin_submission.update_attribute :turnitin_data, {blah: 1}
         turnitin_submission
@@ -361,30 +361,30 @@ describe Assignment::SpeedGrader do
       @assignment.update_attribute :turnitin_enabled, true
       json = Assignment::SpeedGrader.new(@assignment, @teacher).json
 
-      expect(json["submissions"].map { |s|
+      expect(json["submissions"].map do |s|
         s["id"]
-      }.sort).to eq turnitin_submissions.map { |t| t.id.to_s }.sort
+      end.sort).to eq turnitin_submissions.map { |t| t.id.to_s }.sort
     end
 
     it 'prefers people with submissions' do
-      g1, _ = @groups
+      g1, = @groups
       @assignment.grade_student(g1.users.first, score: 10, grader: @teacher)
-      g1rep = g1.users.shuffle.first
+      g1rep = g1.users.sample
       s = @assignment.submission_for_student(g1rep)
       s.update_attribute :submission_type, 'online_upload'
       expect(@assignment.representatives(@teacher)).to include g1rep
     end
 
     it "prefers people who aren't excused when submission exists" do
-      g1, _ = @groups
+      g1, = @groups
       g1rep, *others = g1.users.to_a.shuffle
       @assignment.submit_homework(g1rep, {
         submission_type: 'online_text_entry',
         body: 'hi'
       })
-      others.each { |u|
+      others.each do |u|
         @assignment.grade_student(u, excuse: true, grader: @teacher)
-      }
+      end
       expect(@assignment.representatives(@teacher)).to include g1rep
     end
 
@@ -411,7 +411,7 @@ describe Assignment::SpeedGrader do
       enrollments[0].deactivate
       enrollments[1].conclude
 
-      reps = @assignment.representatives(@teacher, includes: [:inactive, :completed])
+      reps = @assignment.representatives(@teacher, includes: %i[inactive completed])
       user = reps.select { |u| u.name == group.name }.first
       expect(user.id).to eql(enrollments[2].user_id)
     end
@@ -423,7 +423,7 @@ describe Assignment::SpeedGrader do
       enrollments[1].deactivate
       enrollments[2].conclude
 
-      reps = @assignment.representatives(@teacher, includes: [:inactive, :completed])
+      reps = @assignment.representatives(@teacher, includes: %i[inactive completed])
       user = reps.select { |u| u.name == group.name }.first
       expect(user.id).to eql(enrollments[1].user_id)
     end
@@ -479,9 +479,9 @@ describe Assignment::SpeedGrader do
       assignment = quiz.assignment
       assignment.grade_student(@student, grade: 1, grader: @teacher)
       json = Assignment::SpeedGrader.new(assignment, @teacher).json
-      expect(json[:submissions].all? { |s|
-        s.has_key? 'submission_history'
-      }).to be_truthy
+      expect(json[:submissions]).to be_all do |s|
+        s.key? 'submission_history'
+      end
     end
 
     context "with quiz_submissions" do
@@ -491,9 +491,9 @@ describe Assignment::SpeedGrader do
 
       it "doesn't include quiz_submissions when there are too many attempts" do
         Setting.set('too_many_quiz_submission_versions', 3)
-        3.times {
+        3.times do
           @quiz_submission.versions.create!
-        }
+        end
         json = Assignment::SpeedGrader.new(@quiz.assignment, @teacher).json
         json[:submissions].all? { |s| expect(s["submission_history"].size).to eq 1 }
       end
@@ -560,7 +560,8 @@ describe Assignment::SpeedGrader do
             :points => 2,
             :comments => 'a comment',
           }
-        })
+        }
+      )
 
       selection.provisional_grade = teacher_pg
       selection.save!
@@ -576,7 +577,8 @@ describe Assignment::SpeedGrader do
             :points => 3,
             :comments => 'a comment',
           }
-        })
+        }
+      )
 
       @other_student = user_factory(active_all: true)
       student_in_course(:course => @course, :user => @other_student, :active_all => true)
@@ -604,7 +606,8 @@ describe Assignment::SpeedGrader do
       end
 
       it "includes only the grader's provisional comments (and the real ones)" do
-        expect(find_real_submission(@json)['submission_comments'].map { |comment| comment['comment'] }).to match_array ['other provisional comment', 'real comment']
+        comments = find_real_submission(@json)['submission_comments'].map { |comment| comment['comment'] }
+        expect(comments).to match_array ['other provisional comment', 'real comment']
       end
 
       it "only includes the grader's provisional rubric assessments" do
@@ -710,7 +713,7 @@ describe Assignment::SpeedGrader do
       group.update_attributes!(users: [user_two, test_student])
 
       submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
-      submission_two = assignment.submit_homework(user_two, submission_type: 'online_upload', attachments: [attachment])
+      assignment.submit_homework(user_two, submission_type: 'online_upload', attachments: [attachment])
 
       assignment.submissions.each do |s|
         s.update_attributes!(group: group, turnitin_data: {blah: 1})
@@ -722,7 +725,8 @@ describe Assignment::SpeedGrader do
       json = Assignment::SpeedGrader.new(assignment, test_teacher).json
 
       has_report = json['submissions'].map{ |s| s['submission_history'].first['submission']['has_originality_report'] }
-      expect(has_report).to match_array [true, true]    end
+      expect(has_report).to match_array [true, true]
+    end
 
     it "includes 'has_originality_report' in the json" do
       submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
@@ -798,8 +802,7 @@ describe Assignment::SpeedGrader do
         {
           'show_inactive_enrollments' => 'false',
           'show_concluded_enrollments' => 'false'
-        }
-      }
+        }}
     end
 
     let_once(:assignment) do
