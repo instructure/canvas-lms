@@ -324,8 +324,13 @@ test('show gets called when rendering', function() {
   ok(this.$testEl.show.called, 'show called')
 })
 
-test('resize event gets triggered', function() {
-  $(window).resize(() => ok(true, 'resize event triggered'))
+test('resize event gets triggered', function(assert) {
+  const done = assert.async()
+  $(window).resize(() => {
+    ok(true, 'resize event triggered')
+    $(window).off('resize')
+    done()
+  })
   this.server.respondWith('GET', default_course_url, server_200_response(itemTooltipData))
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
   this.server.respond()

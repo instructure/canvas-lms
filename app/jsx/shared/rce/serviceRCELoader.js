@@ -36,7 +36,7 @@ import splitAssetString from 'compiled/str/splitAssetString'
 
       this.loadRCE(function(RCE) {
         RCE.renderIntoDiv(renderingTarget, propsForRCE, function(remoteEditor) {
-          callback(textarea, polyfill.wrapEditor(remoteEditor))
+          remoteEditor.mceInstance().on('init', () => callback(textarea, polyfill.wrapEditor(remoteEditor)))
         })
       })
     },

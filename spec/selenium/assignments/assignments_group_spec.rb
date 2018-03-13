@@ -370,7 +370,7 @@ describe "assignment groups" do
         click_option('#assignment_group_id', "other")
       end
 
-      expect(f('h1.title')).to include_text('edit' + orig_title)
+      expect(f('h1.title')).to include_text(orig_title + 'edit')
       expect(@frozen_assign.reload.assignment_group.name).to eq "other"
     end
   end

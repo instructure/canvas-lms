@@ -134,9 +134,7 @@ define [
 
       unless @firstRender
         @firstRender = true
-        $ -> setTimeout(-> 
-          $('[autofocus]:not(:focus)').eq(0).focus()
-        , 1)
+        $ -> $('[autofocus]:not(:focus)').eq(0).focus()
 
       @reloadPending = false
       @reloadView = new WikiPageReloadView

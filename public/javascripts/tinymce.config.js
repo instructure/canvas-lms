@@ -83,6 +83,7 @@ export default class EditorConfig {
       // we add the menubar for a11y purposes but then
       // hide it with js for non screenreader users
       menubar: true,
+      branding: false,
       remove_script_host: true,
       resize: true,
       block_formats: 'Paragraph=p;Header 2=h2;Header 3=h3;Header 4=h4;Preformatted=pre',

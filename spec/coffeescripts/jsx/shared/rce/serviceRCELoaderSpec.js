@@ -84,7 +84,15 @@ QUnit.module('loadOnTarget', {
     fixtures.setup()
     this.$div = fixtures.create('<div><textarea id="theTarget" name="elementName" /></div>')
     this.$textarea = fixtures.find('#theTarget')
-    this.editor = {}
+    this.editor = {
+      mceInstance () {
+        return {
+          on (eventType, callback) {
+            callback()
+          }
+        }
+      }
+    }
     this.rce = {renderIntoDiv: sinon.stub().callsArgWith(2, this.editor)}
     sinon.stub(RCELoader, 'loadRCE').callsArgWith(0, this.rce)
   },
