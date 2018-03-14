@@ -1346,12 +1346,12 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
   end
 
   def alter_constraint(table, constraint, new_name: nil, deferrable: nil)
-    raise ArgumentError, "must specify deferrable or a new name" if new_name.nil? || deferrable.nil?
+    raise ArgumentError, "must specify deferrable or a new name" if new_name.nil? && deferrable.nil?
 
     # can't rename and alter options in the same statement, so do the rename first
     if new_name && new_name != constraint
       execute("ALTER TABLE #{quote_table_name(table)}
-               ALTER CONSTRAINT #{quote_column_name(constraint)} RENAME TO #{quote_column_name(new_name)}")
+               RENAME CONSTRAINT #{quote_column_name(constraint)} TO #{quote_column_name(new_name)}")
       constraint = new_name
     end
 
@@ -1527,3 +1527,4 @@ module ExplainAnalyze
   end
 end
 ActiveRecord::Relation.prepend(ExplainAnalyze)
+

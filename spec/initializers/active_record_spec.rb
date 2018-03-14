@@ -338,6 +338,11 @@ module ActiveRecord
         expect(fk_name).to be_nil
       end
 
+      it 'actually renames foreign keys' do
+        old_name = User.connection.find_foreign_key(:user_services, :users)
+        User.connection.alter_constraint(:user_services, old_name, new_name: 'test')
+        expect(User.connection.find_foreign_key(:user_services, :users)).to eq 'test'
+      end
     end
   end
 end
