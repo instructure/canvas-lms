@@ -309,6 +309,12 @@ RSpec.configure do |config|
   config.include Onceler::BasicHelpers
   config.project_source_dirs << "gems" # so that failures here are reported properly
 
+  if ENV['RAILS_LOAD_ALL_LOCALES'] && RSpec.configuration.filter.rules[:i18n]
+    config.around :each do |example|
+      SpecMultipleLocales.run(example)
+    end
+  end
+
   config.around(:each) do |example|
     Rails.logger.info "STARTING SPEC #{example.full_description}"
     SpecTimeLimit.enforce(example) do
