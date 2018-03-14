@@ -129,6 +129,30 @@
   }
 }
 
+.icon-blueprint {
+  padding: 8px 8px 0px 8px;
+  margin-bottom: 18px;
+}
+
+.icon-blueprint-lock {
+  padding: 8px 8px 0px 8px;
+  margin-bottom: 18px;
+}
+
+.ic-discussion-row {
+  .ic-item-row__meta-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    .ic-item-row__master-course-lock {
+      &:focus { @include ic-focus-variant; }
+      margin-left: 2px;
+      margin-right: 2px;
+    }
+  }
+}
+
 .ic-announcement-row {
   .ic-announcement-row__content {
     p:not(:first-of-type) {
@@ -138,8 +162,10 @@
 
   .ic-item-row__meta-actions {
     .ic-item-row__master-course-lock {
+      &:focus { @include ic-focus-variant; }
       vertical-align: text-bottom;
       margin-left: 10px;
+      margin-right: 2px;
     }
   }
 
