@@ -18,7 +18,7 @@
 define [
   'underscore'
   'Backbone'
-  'i18n!outcomes'
+  'i18nObj'
   '../../collections/OutcomeResultCollection'
   'd3'
   'jst/outcomes/accessibleLineGraph'

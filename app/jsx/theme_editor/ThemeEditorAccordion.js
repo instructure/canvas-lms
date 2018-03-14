@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!theme_editor'
+import I18n from 'i18nObj'
 import $ from 'jquery'
 import 'jqueryui/accordion'
 import Text from '@instructure/ui-core/lib/components/Text'
