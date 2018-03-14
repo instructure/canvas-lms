@@ -632,7 +632,7 @@ class RoleOverride < ActiveRecord::Base
       },
       :manage_user_observers => {
         :label => lambda { t('permissions.manage_user_observers', "Manage observers for users") },
-        :account_only => true,
+        :account_only => :root,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
       },

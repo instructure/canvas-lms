@@ -1257,9 +1257,9 @@ describe "Default Account Reports" do
       before(:once) do
         create_an_account
         create_some_users_with_pseudonyms
-        @uo1 = UserObservationLink.create_or_restore(student: @user1, observer: @user2)
-        uo2 = UserObservationLink.create_or_restore(student: @user3, observer: @user4)
-        UserObservationLink.create_or_restore(student: @user6, observer: @user7)
+        @uo1 = UserObservationLink.create_or_restore(student: @user1, observer: @user2, root_account: @account)
+        uo2 = UserObservationLink.create_or_restore(student: @user3, observer: @user4, root_account: @account)
+        UserObservationLink.create_or_restore(student: @user6, observer: @user7, root_account: @account)
         UserObservationLink.where(id: [@uo1.id, uo2.id]).update_all(sis_batch_id: @sis.id)
       end
 

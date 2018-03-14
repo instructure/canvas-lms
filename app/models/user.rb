@@ -66,8 +66,8 @@ class User < ActiveRecord::Base
   has_many :as_observer_observation_links, -> { where.not(:workflow_state => 'deleted') }, class_name: 'UserObservationLink',
     foreign_key: :observer_id, dependent: :destroy, inverse_of: :observer
 
-  has_many :linked_observers, :through => :as_student_observation_links, :source => :observer, :class_name => 'User'
-  has_many :linked_students, :through => :as_observer_observation_links, :source => :student, :class_name => 'User'
+  has_many :linked_observers, -> { distinct }, :through => :as_student_observation_links, :source => :observer, :class_name => 'User'
+  has_many :linked_students, -> { distinct }, :through => :as_observer_observation_links, :source => :student, :class_name => 'User'
 
   has_many :all_courses, :source => :course, :through => :enrollments
   has_many :all_courses_for_active_enrollments, -> { Enrollment.active }, :source => :course, :through => :enrollments
@@ -233,6 +233,12 @@ class User < ActiveRecord::Base
     else
       active_observer_scope.where("users.id NOT IN (?)", users_observing_students)
     end
+  }
+
+  scope :linked_through_root_accounts, lambda {|root_accounts|
+    root_accounts = Array(root_accounts)
+    root_accounts << nil # TODO: remove after root_account_id is populated and is not-nulled (a)
+    where(UserObservationLink.table_name => {:root_account_id => root_accounts})
   }
 
   def reload(*)

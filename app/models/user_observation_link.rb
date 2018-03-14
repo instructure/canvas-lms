@@ -25,6 +25,7 @@ class UserObservationLink < ActiveRecord::Base
 
   belongs_to :student, :class_name => 'User', inverse_of: :as_student_observation_links, :foreign_key => :user_id
   belongs_to :observer, :class_name => 'User', inverse_of: :as_observer_observation_links
+  belongs_to :root_account, :class_name => 'Account'
 
   after_create :create_linked_enrollments
 
@@ -32,20 +33,30 @@ class UserObservationLink < ActiveRecord::Base
 
   scope :active, -> { where.not(workflow_state: 'deleted') }
 
+  scope :for_root_accounts, lambda {|root_accounts|
+    root_accounts = Array(root_accounts)
+    root_accounts << nil # TODO: remove after root_account_id is populated and is not-nulled
+    where(:root_account_id => root_accounts)
+  }
+
+  attr_accessor :skip_destroy_other_record
+
+  MISSING_ROOT_ACCOUNT_ID = -1
+
   # shadow_record param is private
-  def self.create_or_restore(student: , observer: , shadow_record: false)
-    raise ArgumentError, 'student and observer are required' unless student && observer
+  def self.create_or_restore(student: , observer: , root_account: , shadow_record: false)
+    raise ArgumentError, 'student, observer and root_account are required' unless student && observer && root_account
     shard = shadow_record ? observer.shard : student.shard
     result = shard.activate do
       self.unique_constraint_retry do
-        if (uo = self.where(student: student, observer: observer).take)
+        if (uo = self.where(student: student, observer: observer).for_root_accounts(root_account).take)
           if uo.workflow_state == 'deleted'
             uo.workflow_state = 'active'
             uo.sis_batch_id = nil
             uo.save!
           end
         else
-          uo = create!(student: student, observer: observer)
+          uo = create!(student: student, observer: observer, root_account: root_account)
         end
         uo
       end
@@ -53,7 +64,7 @@ class UserObservationLink < ActiveRecord::Base
 
     if result.primary_record?
       # create the shadow record
-      create_or_restore(student: student, observer: observer, shadow_record: true) if result.cross_shard?
+      create_or_restore(student: student, observer: observer, root_account: root_account, shadow_record: true) if result.cross_shard?
 
       result.create_linked_enrollments
       result.student.touch
@@ -68,7 +79,10 @@ class UserObservationLink < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    other_record&.destroy
+    if !self.skip_destroy_other_record && (other = other_record)
+      other.skip_destroy_other_record = false
+      other.destroy
+    end
     self.workflow_state = 'deleted'
     self.save!
     remove_linked_enrollments if primary_record?
@@ -81,7 +95,14 @@ class UserObservationLink < ActiveRecord::Base
   def create_linked_enrollments
     self.class.connection.after_transaction_commit do
       User.skip_updating_account_associations do
-        student.student_enrollments.shard(student).all_active_or_pending.order("course_id").each do |enrollment|
+        scope = student.student_enrollments.all_active_or_pending.order("course_id")
+        if self.root_account
+          scope = scope.shard(self.root_account).where(:root_account_id => self.root_account)
+        else
+          scope = scope.shard(student) # TODO: can remove when all root accounts are populated
+        end
+
+        scope.each do |enrollment|
           next unless enrollment.valid?
           enrollment.create_linked_enrollment_for(observer)
         end
@@ -92,7 +113,14 @@ class UserObservationLink < ActiveRecord::Base
   end
 
   def remove_linked_enrollments
-    observer.observer_enrollments.shard(observer).where(associated_user_id: student).find_each do |enrollment|
+    scope = observer.observer_enrollments.where(associated_user_id: student)
+    if self.root_account
+      scope = scope.shard(self.root_account).where(:root_account_id => self.root_account)
+    else
+      scope = scope.shard(observer) # TODO: can remove when all root accounts are populated
+    end
+
+    scope.find_each do |enrollment|
       enrollment.workflow_state = 'deleted'
       enrollment.save!
     end
@@ -112,7 +140,7 @@ class UserObservationLink < ActiveRecord::Base
 
   def other_record
     if cross_shard?
-      primary_record? ? shadow_record : self
+      primary_record? ? shadow_record : primary_record
     end
   end
 

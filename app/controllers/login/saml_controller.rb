@@ -353,8 +353,8 @@ class Login::SamlController < ApplicationController
   def complete_observee_addition(registration_data)
     observee_unique_id = registration_data[:observee][:unique_id]
     observee = @domain_root_account.pseudonyms.by_unique_id(observee_unique_id).first.user
-    unless @current_user.as_observer_observation_links.where(user_id: observee).exists?
-      UserObservationLink.create_or_restore(student: observee, observer: @current_user)
+    unless @current_user.as_observer_observation_links.where(user_id: observee, root_account: @domain_root_account).exists?
+      UserObservationLink.create_or_restore(student: observee, observer: @current_user, root_account: @domain_root_account)
       @current_user.touch
     end
   end
@@ -391,7 +391,7 @@ class Login::SamlController < ApplicationController
 
     # set the new user (observer) to observe the target user (observee)
     observee = @domain_root_account.pseudonyms.active.by_unique_id(observee_unique_id).first.user
-    UserObservationLink.create_or_restore(student: observee, observer: user)
+    UserObservationLink.create_or_restore(student: observee, observer: user, root_account: @domain_root_account)
 
     notify_policy = Users::CreationNotifyPolicy.new(false, unique_id: observer_unique_id)
     notify_policy.dispatch!(user, pseudonym, cc)
