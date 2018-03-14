@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
+require_relative '../spec_helper'
 
 describe DueDateCacher do
   before(:once) do
@@ -201,511 +201,515 @@ describe DueDateCacher do
   end
 
   describe "#recompute" do
-    before(:once) do
-      @cacher = DueDateCacher.new(@course, [@assignment])
-      submission_model(:assignment => @assignment, :user => @student)
-      Submission.update_all(:cached_due_date => nil)
-    end
+    subject(:cacher) { DueDateCacher.new(@course, [@assignment]) }
 
-    context 'without existing submissions' do
-      it "should create submissions for enrollments that are not overridden" do
-        Submission.destroy_all
-        expect { @cacher.recompute }.to change {
-          Submission.active.where(assignment_id: @assignment.id).count
-        }.from(0).to(1)
+    let(:submission) { submission_model(assignment: @assignment, user: @student) }
+
+    describe "cached_due_date" do
+      before do
+        Submission.update_all(cached_due_date: nil)
       end
 
-      it "should delete submissions for enrollments that are deleted" do
-        @course.student_enrollments.update_all(workflow_state: 'deleted')
+      context 'without existing submissions' do
+        it "should create submissions for enrollments that are not overridden" do
+          Submission.destroy_all
+          expect { cacher.recompute }.to change {
+            Submission.active.where(assignment_id: @assignment.id).count
+          }.from(0).to(1)
+        end
 
-        expect { @cacher.recompute }.to change {
-          Submission.active.where(assignment_id: @assignment.id).count
-        }.from(1).to(0)
+        it "should delete submissions for enrollments that are deleted" do
+          @course.student_enrollments.update_all(workflow_state: 'deleted')
+
+          expect { cacher.recompute }.to change {
+            Submission.active.where(assignment_id: @assignment.id).count
+          }.from(1).to(0)
+        end
+
+        it "should create submissions for enrollments that are overridden" do
+          assignment_override_model(assignment: @assignment, set: @course.default_section)
+          @override.override_due_at(@assignment.due_at + 1.day)
+          @override.save!
+          Submission.destroy_all
+
+          expect { cacher.recompute }.to change {
+            Submission.active.where(assignment_id: @assignment.id).count
+          }.from(0).to(1)
+        end
+
+        it "should not create submissions for enrollments that are not assigned" do
+          @assignment1 = @assignment
+          @assignment2 = assignment_model(course: @course)
+          @assignment2.only_visible_to_overrides = true
+          @assignment2.save!
+
+          Submission.destroy_all
+
+          expect { DueDateCacher.recompute_course(@course) }.to change {
+            Submission.active.count
+          }.from(0).to(1)
+        end
+
+        it "does not create submissions for concluded enrollments" do
+          student2 = user_factory
+          @course.enroll_student(student2, enrollment_state: 'active')
+          student2.enrollments.find_by(course: @course).conclude
+          expect { DueDateCacher.recompute_course(@course) }.not_to change {
+            Submission.active.where(user_id: student2.id).count
+          }
+        end
       end
 
-      it "should create submissions for enrollments that are overridden" do
+      it "should not create another submission for enrollments that have a submission" do
+        expect { cacher.recompute }.not_to change {
+          Submission.active.where(assignment_id: @assignment.id).count
+        }
+      end
+
+      it "should not create another submission for enrollments that have a submission, even with an overridden" do
         assignment_override_model(assignment: @assignment, set: @course.default_section)
         @override.override_due_at(@assignment.due_at + 1.day)
         @override.save!
-        Submission.destroy_all
 
-        expect { @cacher.recompute }.to change {
+        expect { cacher.recompute }.not_to change {
           Submission.active.where(assignment_id: @assignment.id).count
-        }.from(0).to(1)
+        }
       end
 
-      it "should not create submissions for enrollments that are not assigned" do
-        @assignment1 = @assignment
-        @assignment2 = assignment_model(course: @course)
-        @assignment2.only_visible_to_overrides = true
-        @assignment2.save!
+      it "should delete submissions for enrollments that are no longer assigned" do
+        @assignment.only_visible_to_overrides = true
 
-        Submission.destroy_all
-
-        expect { DueDateCacher.recompute_course(@course) }.to change {
+        expect { @assignment.save! }.to change {
           Submission.active.count
-        }.from(0).to(1)
+        }.from(1).to(0)
       end
 
-      it "does not create submissions for concluded enrollments" do
+      it "does not delete submissions for concluded enrollments" do
         student2 = user_factory
         @course.enroll_student(student2, enrollment_state: 'active')
+        submission_model(assignment: @assignment, user: student2)
         student2.enrollments.find_by(course: @course).conclude
-        expect { DueDateCacher.recompute_course(@course) }.not_to change {
+
+        @assignment.only_visible_to_overrides = true
+        expect { @assignment.save! }.not_to change {
           Submission.active.where(user_id: student2.id).count
         }
       end
-    end
 
-    it "should not create another submission for enrollments that have a submission" do
-      expect { @cacher.recompute }.not_to change {
-        Submission.active.where(assignment_id: @assignment.id).count
-      }
-    end
-
-    it "should not create another submission for enrollments that have a submission, even with an overridden" do
-      assignment_override_model(assignment: @assignment, set: @course.default_section)
-      @override.override_due_at(@assignment.due_at + 1.day)
-      @override.save!
-
-      expect { @cacher.recompute }.not_to change {
-        Submission.active.where(assignment_id: @assignment.id).count
-      }
-    end
-
-    it "should delete submissions for enrollments that are no longer assigned" do
-      @assignment.only_visible_to_overrides = true
-
-      expect { @assignment.save! }.to change {
-        Submission.active.count
-      }.from(1).to(0)
-    end
-
-    it "does not delete submissions for concluded enrollments" do
-      student2 = user_factory
-      @course.enroll_student(student2, enrollment_state: 'active')
-      submission_model(assignment: @assignment, user: student2)
-      student2.enrollments.find_by(course: @course).conclude
-
-      @assignment.only_visible_to_overrides = true
-      expect { @assignment.save! }.not_to change {
-        Submission.active.where(user_id: student2.id).count
-      }
-    end
-
-    it "should restore submissions for enrollments that are assigned again" do
-      @assignment.submit_homework(@student, submission_type: :online_url, url: 'http://instructure.com')
-      @assignment.only_visible_to_overrides = true
-      @assignment.save!
-      expect(Submission.first.workflow_state).to eq 'deleted'
-
-      @assignment.only_visible_to_overrides = false
-      expect { @assignment.save! }.to change {
-        Submission.active.count
-      }.from(0).to(1)
-      expect(Submission.first.workflow_state).to eq 'submitted'
-    end
-
-    context "no overrides" do
-      it "should set the cached_due_date to the assignment due_at" do
-        @assignment.due_at += 1.day
+      it "should restore submissions for enrollments that are assigned again" do
+        @assignment.submit_homework(@student, submission_type: :online_url, url: 'http://instructure.com')
+        @assignment.only_visible_to_overrides = true
         @assignment.save!
+        expect(Submission.first.workflow_state).to eq 'deleted'
 
-        @cacher.recompute
-        expect(@submission.reload.cached_due_date).to eq @assignment.due_at.change(sec: 0)
+        @assignment.only_visible_to_overrides = false
+        expect { @assignment.save! }.to change {
+          Submission.active.count
+        }.from(0).to(1)
+        expect(Submission.first.workflow_state).to eq 'submitted'
       end
 
-      it "should set the cached_due_date to nil if the assignment has no due_at" do
-        @assignment.due_at = nil
-        @assignment.save!
+      context "no overrides" do
+        it "should set the cached_due_date to the assignment due_at" do
+          @assignment.due_at += 1.day
+          @assignment.save!
 
-        @cacher.recompute
-        expect(@submission.reload.cached_due_date).to be_nil
+          cacher.recompute
+          expect(submission.reload.cached_due_date).to eq @assignment.due_at.change(sec: 0)
+        end
+
+        it "should set the cached_due_date to nil if the assignment has no due_at" do
+          @assignment.due_at = nil
+          @assignment.save!
+
+          cacher.recompute
+          expect(submission.reload.cached_due_date).to be_nil
+        end
+
+        it "does not update submissions for students with concluded enrollments" do
+          student2 = user_factory
+          @course.enroll_student(student2, enrollment_state: 'active')
+          submission2 = submission_model(assignment: @assignment, user: student2)
+          submission2.update_attributes(cached_due_date: nil)
+          student2.enrollments.find_by(course: @course).conclude
+
+          DueDateCacher.new(@course, [@assignment]).recompute
+          expect(submission2.reload.cached_due_date).to be nil
+        end
       end
 
-      it "does not update submissions for students with concluded enrollments" do
-        student2 = user_factory
-        @course.enroll_student(student2, enrollment_state: 'active')
-        submission2 = submission_model(assignment: @assignment, user: student2)
-        submission2.update_attributes(cached_due_date: nil)
-        student2.enrollments.find_by(course: @course).conclude
+      context "one applicable override" do
+        before do
+          assignment_override_model(
+            :assignment => @assignment,
+            :set => @course.default_section)
+        end
 
-        DueDateCacher.new(@course, [@assignment]).recompute
-        expect(submission2.reload.cached_due_date).to be nil
-      end
-    end
+        it "should prefer override's due_at over assignment's due_at" do
+          @override.override_due_at(@assignment.due_at - 1.day)
+          @override.save!
 
-    context "one applicable override" do
-      before do
-        assignment_override_model(
-          :assignment => @assignment,
-          :set => @course.default_section)
-      end
+          cacher.recompute
+          expect(submission.reload.cached_due_date).to eq @override.due_at.change(sec: 0)
+        end
 
-      it "should prefer override's due_at over assignment's due_at" do
-        @override.override_due_at(@assignment.due_at - 1.day)
-        @override.save!
+        it "should prefer override's due_at over assignment's nil" do
+          @override.override_due_at(@assignment.due_at - 1.day)
+          @override.save!
 
-        @cacher.recompute
-        expect(@submission.reload.cached_due_date).to eq @override.due_at.change(sec: 0)
-      end
+          @assignment.due_at = nil
+          @assignment.save!
 
-      it "should prefer override's due_at over assignment's nil" do
-        @override.override_due_at(@assignment.due_at - 1.day)
-        @override.save!
+          cacher.recompute
+          expect(submission.reload.cached_due_date).to eq @override.due_at.change(sec: 0)
+        end
 
-        @assignment.due_at = nil
-        @assignment.save!
+        it "should prefer override's nil over assignment's due_at" do
+          @override.override_due_at(nil)
+          @override.save!
 
-        @cacher.recompute
-        expect(@submission.reload.cached_due_date).to eq @override.due_at.change(sec: 0)
-      end
+          cacher.recompute
+          expect(submission.reload.cached_due_date).to eq @override.due_at
+        end
 
-      it "should prefer override's nil over assignment's due_at" do
-        @override.override_due_at(nil)
-        @override.save!
+        it "should not apply override if it doesn't override due_at" do
+          @override.clear_due_at_override
+          @override.save!
 
-        @cacher.recompute
-        expect(@submission.reload.cached_due_date).to eq @override.due_at
-      end
+          cacher.recompute
+          expect(submission.reload.cached_due_date).to eq @assignment.due_at.change(sec: 0)
+        end
 
-      it "should not apply override if it doesn't override due_at" do
-        @override.clear_due_at_override
-        @override.save!
+        it "does not update submissions for students with concluded enrollments" do
+          student2 = user_factory
+          @course.enroll_student(student2, enrollment_state: 'active')
+          submission2 = submission_model(assignment: @assignment, user: student2)
+          submission2.update_attributes(cached_due_date: nil)
+          student2.enrollments.find_by(course: @course).conclude
 
-        @cacher.recompute
-        expect(@submission.reload.cached_due_date).to eq @assignment.due_at.change(sec: 0)
-      end
-
-      it "does not update submissions for students with concluded enrollments" do
-        student2 = user_factory
-        @course.enroll_student(student2, enrollment_state: 'active')
-        submission2 = submission_model(assignment: @assignment, user: student2)
-        submission2.update_attributes(cached_due_date: nil)
-        student2.enrollments.find_by(course: @course).conclude
-
-        DueDateCacher.new(@course, [@assignment]).recompute
-        expect(submission2.reload.cached_due_date).to be nil
-      end
-    end
-
-    context "adhoc override" do
-      before do
-        @student1 = @student
-        @student2 = user_factory
-        @course.enroll_student(@student2, :enrollment_state => 'active')
-
-        assignment_override_model(
-          :assignment => @assignment,
-          :due_at => @assignment.due_at + 1.day)
-        @override.assignment_override_students.create!(:user => @student2)
-
-        @submission1 = @submission
-        @submission2 = submission_model(:assignment => @assignment, :user => @student2)
-        Submission.update_all(:cached_due_date => nil)
+          DueDateCacher.new(@course, [@assignment]).recompute
+          expect(submission2.reload.cached_due_date).to be nil
+        end
       end
 
-      it "should apply to students in the adhoc set" do
-        @cacher.recompute
-        expect(@submission2.reload.cached_due_date).to eq @override.due_at.change(sec: 0)
+      context "adhoc override" do
+        before do
+          @student1 = @student
+          @student2 = user_factory
+          @course.enroll_student(@student2, :enrollment_state => 'active')
+
+          assignment_override_model(
+            :assignment => @assignment,
+            :due_at => @assignment.due_at + 1.day)
+          @override.assignment_override_students.create!(:user => @student2)
+
+          @submission1 = submission_model(:assignment => @assignment, :user => @student1)
+          @submission2 = submission_model(:assignment => @assignment, :user => @student2)
+          Submission.update_all(:cached_due_date => nil)
+        end
+
+        it "should apply to students in the adhoc set" do
+          cacher.recompute
+          expect(@submission2.reload.cached_due_date).to eq @override.due_at.change(sec: 0)
+        end
+
+        it "should not apply to students not in the adhoc set" do
+          cacher.recompute
+          expect(@submission1.reload.cached_due_date).to eq @assignment.due_at.change(sec: 0)
+        end
+
+        it "does not update submissions for students with concluded enrollments" do
+          @student2.enrollments.find_by(course: @course).conclude
+          DueDateCacher.new(@course, [@assignment]).recompute
+          expect(@submission2.reload.cached_due_date).to be nil
+        end
       end
 
-      it "should not apply to students not in the adhoc set" do
-        @cacher.recompute
-        expect(@submission1.reload.cached_due_date).to eq @assignment.due_at.change(sec: 0)
+      context "section override" do
+        before do
+          @student1 = @student
+          @student2 = user_factory
+
+          add_section('second section')
+          @course.enroll_student(@student2, :enrollment_state => 'active', :section => @course_section)
+
+          assignment_override_model(
+            :assignment => @assignment,
+            :due_at => @assignment.due_at + 1.day,
+            :set => @course_section)
+
+          @submission1 = submission_model(:assignment => @assignment, :user => @student1)
+          @submission2 = submission_model(:assignment => @assignment, :user => @student2)
+          Submission.update_all(:cached_due_date => nil)
+
+          cacher.recompute
+        end
+
+        it "should apply to students in that section" do
+          expect(@submission2.reload.cached_due_date).to eq @override.due_at.change(sec: 0)
+        end
+
+        it "should not apply to students in other sections" do
+          expect(@submission1.reload.cached_due_date).to eq @assignment.due_at.change(sec: 0)
+        end
+
+        it "should not apply to non-active enrollments in that section" do
+          @course.enroll_student(@student1,
+            :enrollment_state => 'deleted',
+            :section => @course_section,
+            :allow_multiple_enrollments => true)
+          expect(@submission1.reload.cached_due_date).to eq @assignment.due_at.change(sec: 0)
+        end
       end
 
-      it "does not update submissions for students with concluded enrollments" do
-        @student2.enrollments.find_by(course: @course).conclude
-        DueDateCacher.new(@course, [@assignment]).recompute
-        expect(@submission2.reload.cached_due_date).to be nil
-      end
-    end
+      context "group override" do
+        before do
+          @student1 = @student
+          @student2 = user_factory
+          @course.enroll_student(@student2, :enrollment_state => 'active')
 
-    context "section override" do
-      before do
-        @student1 = @student
-        @student2 = user_factory
+          @assignment.group_category = group_category
+          @assignment.save!
 
-        add_section('second section')
-        @course.enroll_student(@student2, :enrollment_state => 'active', :section => @course_section)
+          group_with_user(
+            :group_context => @course,
+            :group_category => @assignment.group_category,
+            :user => @student2,
+            :active_all => true)
 
-        assignment_override_model(
-          :assignment => @assignment,
-          :due_at => @assignment.due_at + 1.day,
-          :set => @course_section)
+          assignment_override_model(
+            :assignment => @assignment,
+            :due_at => @assignment.due_at + 1.day,
+            :set => @group)
 
-        @submission1 = @submission
-        @submission2 = submission_model(:assignment => @assignment, :user => @student2)
-        Submission.update_all(:cached_due_date => nil)
+          @submission1 = submission_model(:assignment => @assignment, :user => @student1)
+          @submission2 = submission_model(:assignment => @assignment, :user => @student2)
+          Submission.update_all(:cached_due_date => nil)
+        end
 
-        @cacher.recompute
-      end
+        it "should apply to students in that group" do
+          cacher.recompute
+          expect(@submission2.reload.cached_due_date).to eq @override.due_at.change(sec: 0)
+        end
 
-      it "should apply to students in that section" do
-        expect(@submission2.reload.cached_due_date).to eq @override.due_at.change(sec: 0)
-      end
+        it "should not apply to students not in the group" do
+          cacher.recompute
+          expect(@submission1.reload.cached_due_date).to eq @assignment.due_at.change(sec: 0)
+        end
 
-      it "should not apply to students in other sections" do
-        expect(@submission1.reload.cached_due_date).to eq @assignment.due_at.change(sec: 0)
-      end
+        it "should not apply to non-active memberships in that group" do
+          cacher.recompute
+          @group.add_user(@student1, 'deleted')
+          expect(@submission1.reload.cached_due_date).to eq @assignment.due_at.change(sec: 0)
+        end
 
-      it "should not apply to non-active enrollments in that section" do
-        @course.enroll_student(@student1,
-          :enrollment_state => 'deleted',
-          :section => @course_section,
-          :allow_multiple_enrollments => true)
-        expect(@submission1.reload.cached_due_date).to eq @assignment.due_at.change(sec: 0)
-      end
-    end
-
-    context "group override" do
-      before do
-        @student1 = @student
-        @student2 = user_factory
-        @course.enroll_student(@student2, :enrollment_state => 'active')
-
-        @assignment.group_category = group_category
-        @assignment.save!
-
-        group_with_user(
-          :group_context => @course,
-          :group_category => @assignment.group_category,
-          :user => @student2,
-          :active_all => true)
-
-        assignment_override_model(
-          :assignment => @assignment,
-          :due_at => @assignment.due_at + 1.day,
-          :set => @group)
-
-        @submission1 = @submission
-        @submission2 = submission_model(:assignment => @assignment, :user => @student2)
-        Submission.update_all(:cached_due_date => nil)
+        it "does not update submissions for students with concluded enrollments" do
+          @student2.enrollments.find_by(course: @course).conclude
+          DueDateCacher.new(@course, [@assignment]).recompute
+          expect(@submission2.reload.cached_due_date).to be nil
+        end
       end
 
-      it "should apply to students in that group" do
-        @cacher.recompute
-        expect(@submission2.reload.cached_due_date).to eq @override.due_at.change(sec: 0)
+      context "multiple overrides" do
+        before do
+          add_section('second section')
+          multiple_student_enrollment(@student, @course_section)
+
+          @override1 = assignment_override_model(
+            :assignment => @assignment,
+            :due_at => @assignment.due_at + 1.day,
+            :set => @course.default_section)
+
+          @override2 = assignment_override_model(
+            :assignment => @assignment,
+            :due_at => @assignment.due_at + 1.day,
+            :set => @course_section)
+        end
+
+        it "should prefer first override's due_at if latest" do
+          @override1.override_due_at(@assignment.due_at + 2.days)
+          @override1.save!
+
+          cacher.recompute
+          expect(submission.reload.cached_due_date).to eq @override1.due_at.change(sec: 0)
+        end
+
+        it "should prefer second override's due_at if latest" do
+          @override2.override_due_at(@assignment.due_at + 2.days)
+          @override2.save!
+
+          cacher.recompute
+          expect(submission.reload.cached_due_date).to eq @override2.due_at.change(sec: 0)
+        end
+
+        it "should be nil if first override's nil" do
+          @override1.override_due_at(nil)
+          @override1.save!
+
+          cacher.recompute
+          expect(submission.reload.cached_due_date).to be_nil
+        end
+
+        it "should be nil if second override's nil" do
+          @override2.override_due_at(nil)
+          @override2.save!
+
+          cacher.recompute
+          expect(submission.reload.cached_due_date).to be_nil
+        end
       end
 
-      it "should not apply to students not in the group" do
-        @cacher.recompute
-        expect(@submission1.reload.cached_due_date).to eq @assignment.due_at.change(sec: 0)
+      context "multiple submissions with selective overrides" do
+        before do
+          @student1 = @student
+          @student2 = user_factory
+          @student3 = user_factory
+
+          add_section('second section')
+          @course.enroll_student(@student2, :enrollment_state => 'active', :section => @course_section)
+          @course.enroll_student(@student3, :enrollment_state => 'active')
+          multiple_student_enrollment(@student3, @course_section)
+
+          @override1 = assignment_override_model(
+            :assignment => @assignment,
+            :due_at => @assignment.due_at + 2.days,
+            :set => @course.default_section)
+
+          @override2 = assignment_override_model(
+            :assignment => @assignment,
+            :due_at => @assignment.due_at + 2.days,
+            :set => @course_section)
+
+          @submission1 = submission_model(:assignment => @assignment, :user => @student1)
+          @submission2 = submission_model(:assignment => @assignment, :user => @student2)
+          @submission3 = submission_model(:assignment => @assignment, :user => @student3)
+          Submission.update_all(:cached_due_date => nil)
+        end
+
+        it "should use first override where second doesn't apply" do
+          @override1.override_due_at(@assignment.due_at + 1.day)
+          @override1.save!
+
+          cacher.recompute
+          expect(@submission1.reload.cached_due_date).to eq @override1.due_at.change(sec: 0)
+        end
+
+        it "should use second override where the first doesn't apply" do
+          @override2.override_due_at(@assignment.due_at + 1.day)
+          @override2.save!
+
+          cacher.recompute
+          expect(@submission2.reload.cached_due_date).to eq @override2.due_at.change(sec: 0)
+        end
+
+        it "should use the best override where both apply" do
+          @override1.override_due_at(@assignment.due_at + 1.day)
+          @override1.save!
+
+          cacher.recompute
+          expect(@submission2.reload.cached_due_date).to eq @override2.due_at.change(sec: 0)
+        end
       end
 
-      it "should not apply to non-active memberships in that group" do
-        @cacher.recompute
-        @group.add_user(@student1, 'deleted')
-        expect(@submission1.reload.cached_due_date).to eq @assignment.due_at.change(sec: 0)
+      context "multiple assignments, only one overridden" do
+        before do
+          @assignment1 = @assignment
+          @assignment2 = assignment_model(:course => @course)
+
+          assignment_override_model(
+            :assignment => @assignment1,
+            :due_at => @assignment1.due_at + 1.day)
+          @override.assignment_override_students.create!(:user => @student)
+
+          @submission1 = submission_model(:assignment => @assignment1, :user => @student)
+          @submission2 = submission_model(:assignment => @assignment2, :user => @student)
+          Submission.update_all(:cached_due_date => nil)
+
+          DueDateCacher.new(@course, [@assignment1, @assignment2]).recompute
+        end
+
+        it "should apply to submission on the overridden assignment" do
+          expect(@submission1.reload.cached_due_date).to eq @override.due_at.change(sec: 0)
+        end
+
+        it "should not apply to apply to submission on the other assignment" do
+          expect(@submission2.reload.cached_due_date).to eq @assignment.due_at.change(sec: 0)
+        end
       end
 
-      it "does not update submissions for students with concluded enrollments" do
-        @student2.enrollments.find_by(course: @course).conclude
-        DueDateCacher.new(@course, [@assignment]).recompute
-        expect(@submission2.reload.cached_due_date).to be nil
-      end
-    end
+      it "kicks off a LatePolicyApplicator job on completion when called with a single assignment" do
+        expect(LatePolicyApplicator).to receive(:for_assignment).with(@assignment)
 
-    context "multiple overrides" do
-      before do
-        add_section('second section')
-        multiple_student_enrollment(@student, @course_section)
-
-        @override1 = assignment_override_model(
-          :assignment => @assignment,
-          :due_at => @assignment.due_at + 1.day,
-          :set => @course.default_section)
-
-        @override2 = assignment_override_model(
-          :assignment => @assignment,
-          :due_at => @assignment.due_at + 1.day,
-          :set => @course_section)
+        cacher.recompute
       end
 
-      it "should prefer first override's due_at if latest" do
-        @override1.override_due_at(@assignment.due_at + 2.days)
-        @override1.save!
-
-        @cacher.recompute
-        expect(@submission.reload.cached_due_date).to eq @override1.due_at.change(sec: 0)
-      end
-
-      it "should prefer second override's due_at if latest" do
-        @override2.override_due_at(@assignment.due_at + 2.days)
-        @override2.save!
-
-        @cacher.recompute
-        expect(@submission.reload.cached_due_date).to eq @override2.due_at.change(sec: 0)
-      end
-
-      it "should be nil if first override's nil" do
-        @override1.override_due_at(nil)
-        @override1.save!
-
-        @cacher.recompute
-        expect(@submission.reload.cached_due_date).to be_nil
-      end
-
-      it "should be nil if second override's nil" do
-        @override2.override_due_at(nil)
-        @override2.save!
-
-        @cacher.recompute
-        expect(@submission.reload.cached_due_date).to be_nil
-      end
-    end
-
-    context "multiple submissions with selective overrides" do
-      before do
-        @student1 = @student
-        @student2 = user_factory
-        @student3 = user_factory
-
-        add_section('second section')
-        @course.enroll_student(@student2, :enrollment_state => 'active', :section => @course_section)
-        @course.enroll_student(@student3, :enrollment_state => 'active')
-        multiple_student_enrollment(@student3, @course_section)
-
-        @override1 = assignment_override_model(
-          :assignment => @assignment,
-          :due_at => @assignment.due_at + 2.days,
-          :set => @course.default_section)
-
-        @override2 = assignment_override_model(
-          :assignment => @assignment,
-          :due_at => @assignment.due_at + 2.days,
-          :set => @course_section)
-
-        @submission1 = @submission
-        @submission2 = submission_model(:assignment => @assignment, :user => @student2)
-        @submission3 = submission_model(:assignment => @assignment, :user => @student3)
-        Submission.update_all(:cached_due_date => nil)
-      end
-
-      it "should use first override where second doesn't apply" do
-        @override1.override_due_at(@assignment.due_at + 1.day)
-        @override1.save!
-
-        @cacher.recompute
-        expect(@submission1.reload.cached_due_date).to eq @override1.due_at.change(sec: 0)
-      end
-
-      it "should use second override where the first doesn't apply" do
-        @override2.override_due_at(@assignment.due_at + 1.day)
-        @override2.save!
-
-        @cacher.recompute
-        expect(@submission2.reload.cached_due_date).to eq @override2.due_at.change(sec: 0)
-      end
-
-      it "should use the best override where both apply" do
-        @override1.override_due_at(@assignment.due_at + 1.day)
-        @override1.save!
-
-        @cacher.recompute
-        expect(@submission2.reload.cached_due_date).to eq @override2.due_at.change(sec: 0)
-      end
-    end
-
-    context "multiple assignments, only one overridden" do
-      before do
+      it "does not kick off a LatePolicyApplicator job when called with multiple assignments" do
         @assignment1 = @assignment
-        @assignment2 = assignment_model(:course => @course)
+        @assignment2 = assignment_model(course: @course)
 
-        assignment_override_model(
-          :assignment => @assignment1,
-          :due_at => @assignment1.due_at + 1.day)
-        @override.assignment_override_students.create!(:user => @student)
-
-        @submission1 = @submission
-        @submission2 = submission_model(:assignment => @assignment2, :user => @student)
-        Submission.update_all(:cached_due_date => nil)
+        expect(LatePolicyApplicator).not_to receive(:for_assignment)
 
         DueDateCacher.new(@course, [@assignment1, @assignment2]).recompute
       end
 
-      it "should apply to submission on the overridden assignment" do
-        expect(@submission1.reload.cached_due_date).to eq @override.due_at.change(sec: 0)
+      it "runs the GradeCalculator inline when update_grades is true" do
+        expect(@course).to receive(:recompute_student_scores_without_send_later)
+
+        DueDateCacher.new(@course, [@assignment], update_grades: true).recompute
       end
 
-      it "should not apply to apply to submission on the other assignment" do
-        expect(@submission2.reload.cached_due_date).to eq @assignment.due_at.change(sec: 0)
-      end
-    end
+      it "runs the GradeCalculator inline with student ids when update_grades is true and students are given" do
+        expect(@course).to receive(:recompute_student_scores_without_send_later).with([@student.id])
 
-    it "kicks off a LatePolicyApplicator job on completion when called with a single assignment" do
-      expect(LatePolicyApplicator).to receive(:for_assignment).with(@assignment)
-
-      @cacher.recompute
-    end
-
-    it "does not kick off a LatePolicyApplicator job when called with multiple assignments" do
-      @assignment1 = @assignment
-      @assignment2 = assignment_model(course: @course)
-
-      expect(LatePolicyApplicator).not_to receive(:for_assignment)
-
-      DueDateCacher.new(@course, [@assignment1, @assignment2]).recompute
-    end
-
-    it "runs the GradeCalculator inline when update_grades is true" do
-      expect(@course).to receive(:recompute_student_scores_without_send_later)
-
-      DueDateCacher.new(@course, [@assignment], update_grades: true).recompute
-    end
-
-    it "runs the GradeCalculator inline with student ids when update_grades is true and students are given" do
-      expect(@course).to receive(:recompute_student_scores_without_send_later).with([@student.id])
-
-      DueDateCacher.new(@course, [@assignment], [@student.id], update_grades: true).recompute
-    end
-
-    it "does not run the GradeCalculator inline when update_grades is false" do
-      expect(@course).not_to receive(:recompute_student_scores_without_send_later)
-
-      DueDateCacher.new(@course, [@assignment1, @assignment2], update_grades: false).recompute
-    end
-
-    it "does not run the GradeCalculator inline when update_grades is not specified" do
-      expect(@course).not_to receive(:recompute_student_scores_without_send_later)
-
-      DueDateCacher.new(@course, [@assignment1, @assignment2]).recompute
-    end
-
-    context "when called for specific users" do
-      before(:once) do
-        @student_1 = @student
-        @student_2, @student_3, @student_4 = n_students_in_course(3, course: @course)
-        # The n_students_in_course helper creates the enrollments in a
-        # way that appear to skip callbacks
-        @cacher.recompute
+        DueDateCacher.new(@course, [@assignment], [@student.id], update_grades: true).recompute
       end
 
-      it "leaves other users submissions alone on enrollment destroy" do
-        @student_3.enrollments.each(&:destroy)
+      it "does not run the GradeCalculator inline when update_grades is false" do
+        expect(@course).not_to receive(:recompute_student_scores_without_send_later)
 
-        sub_ids = Submission.active.where(assignment: @assignment).order(:user_id).pluck(:user_id)
-        expect(sub_ids).to contain_exactly(@student_1.id, @student_2.id, @student_4.id)
+        DueDateCacher.new(@course, [@assignment1, @assignment2], update_grades: false).recompute
       end
 
-      it "adds submissions for a single user added to a course" do
-        new_student = user_model
-        @course.enroll_user(new_student)
+      it "does not run the GradeCalculator inline when update_grades is not specified" do
+        expect(@course).not_to receive(:recompute_student_scores_without_send_later)
 
-        submission = Submission.active.where(assignment: @assignment, user_id: new_student.id)
-        expect(submission).to exist
+        DueDateCacher.new(@course, [@assignment1, @assignment2]).recompute
       end
 
-      it "adds submissions for multiple users" do
-        new_students = n_students_in_course(2, course: @course)
-        new_student_ids = new_students.map(&:id)
+      context "when called for specific users" do
+        before(:once) do
+          @student_1 = @student
+          @student_2, @student_3, @student_4 = n_students_in_course(3, course: @course)
+          # The n_students_in_course helper creates the enrollments in a
+          # way that appear to skip callbacks
+          cacher.recompute
+        end
 
-        ddc = DueDateCacher.new(@course, @assignment, new_student_ids)
-        ddc.recompute
+        it "leaves other users submissions alone on enrollment destroy" do
+          @student_3.enrollments.each(&:destroy)
 
-        submission_count = Submission.active.where(assignment: @assignment, user_id: new_student_ids).count
-        expect(submission_count).to eq 2
+          sub_ids = Submission.active.where(assignment: @assignment).order(:user_id).pluck(:user_id)
+          expect(sub_ids).to contain_exactly(@student_1.id, @student_2.id, @student_4.id)
+        end
+
+        it "adds submissions for a single user added to a course" do
+          new_student = user_model
+          @course.enroll_user(new_student)
+
+          submission = Submission.active.where(assignment: @assignment, user_id: new_student.id)
+          expect(submission).to exist
+        end
+
+        it "adds submissions for multiple users" do
+          new_students = n_students_in_course(2, course: @course)
+          new_student_ids = new_students.map(&:id)
+
+          ddc = DueDateCacher.new(@course, @assignment, new_student_ids)
+          ddc.recompute
+
+          submission_count = Submission.active.where(assignment: @assignment, user_id: new_student_ids).count
+          expect(submission_count).to eq 2
+        end
       end
     end
   end
