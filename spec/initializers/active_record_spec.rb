@@ -239,32 +239,12 @@ module ActiveRecord
     describe "lock_with_exclusive_smarts" do
       let(:scope){ User.active }
 
-      context "with postgres 90300" do
-        before do
-          allow(scope.connection).to receive(:postgresql_version).and_return(90300)
-        end
-
-        it "uses FOR UPDATE on a normal exclusive lock" do
-          expect(scope.lock(true).lock_value).to eq true
-        end
-
-        it "substitutes 'FOR NO KEY UPDATE' if specified" do
-          expect(scope.lock(:no_key_update).lock_value).to eq "FOR NO KEY UPDATE"
-        end
+      it "uses FOR UPDATE on a normal exclusive lock" do
+        expect(scope.lock(true).lock_value).to eq true
       end
 
-      context "with postgres 90299" do
-        before do
-          allow(scope.connection).to receive(:postgresql_version).and_return(90299)
-        end
-
-        it "uses FOR UPDATE on a normal exclusive lock" do
-          expect(scope.lock(true).lock_value).to eq true
-        end
-
-        it "ignores 'FOR NO KEY UPDATE' if specified" do
-          expect(scope.lock(:no_key_update).lock_value).to eq true
-        end
+      it "substitutes 'FOR NO KEY UPDATE' if specified" do
+        expect(scope.lock(:no_key_update).lock_value).to eq "FOR NO KEY UPDATE"
       end
     end
 

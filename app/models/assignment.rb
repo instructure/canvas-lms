@@ -1544,16 +1544,6 @@ class Assignment < ActiveRecord::Base
     # to be taken on the user during submission INSERT, so to avoid
     # deadlocks, we pre-lock the users
     needs_lock = false
-    shard.activate do
-      if Submission.connection.adapter_name == 'PostgreSQL' && Submission.connection.send(:postgresql_version) < 90300
-        needs_lock = Submission.connection.open_transactions == 0
-        # we're already in a transaction, and can lock everyone at once
-        if !needs_lock
-          missing_users = students.map(&:id) - submissions_hash.keys
-          User.shard(shard).where(id: missing_users).order(:id).lock.pluck(:id)
-        end
-      end
-    end
     students.each do |student|
       submission = submissions_hash[student.id]
       if !submission

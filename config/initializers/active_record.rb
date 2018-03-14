@@ -669,12 +669,7 @@ ActiveRecord::Relation.prepend(UsefulFindInBatches)
 
 module LockForNoKeyUpdate
   def lock(lock_type = true)
-    if lock_type == :no_key_update
-      postgres_9_3_or_above = connection.adapter_name == 'PostgreSQL' &&
-        connection.send(:postgresql_version) >= 90300
-      lock_type = true
-      lock_type = 'FOR NO KEY UPDATE' if postgres_9_3_or_above
-    end
+    lock_type = 'FOR NO KEY UPDATE' if lock_type == :no_key_update
     super(lock_type)
   end
 end
@@ -1323,10 +1318,9 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     case self.adapter_name
     when 'PostgreSQL'
       foreign_key_name = foreign_key_name(from_table, options)
-      query = supports_delayed_constraint_validation? ? 'convalidated' : 'conname'
       schema = @config[:use_qualified_names] ? quote(shard.name) : 'current_schema()'
-      value = select_value("SELECT #{query} FROM pg_constraint INNER JOIN pg_namespace ON pg_namespace.oid=connamespace WHERE conname='#{foreign_key_name}' AND nspname=#{schema}")
-      if supports_delayed_constraint_validation? && value == 'f'
+      value = select_value("SELECT convalidated FROM pg_constraint INNER JOIN pg_namespace ON pg_namespace.oid=connamespace WHERE conname='#{foreign_key_name}' AND nspname=#{schema}")
+      if value == 'f'
         execute("ALTER TABLE #{quote_table_name(from_table)} DROP CONSTRAINT #{quote_table_name(foreign_key_name)}")
       elsif value
         return

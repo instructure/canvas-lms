@@ -49,14 +49,9 @@ module PostgreSQLAdapterExtensions
     end
   end
 
-  def supports_delayed_constraint_validation?
-    postgresql_version >= 90100
-  end
-
   def add_foreign_key(from_table, to_table, options = {})
     raise ArgumentError, "Cannot specify custom options with :delay_validation" if options[:options] && options[:delay_validation]
 
-    options.delete(:delay_validation) unless supports_delayed_constraint_validation?
     # pointless if we're in a transaction
     options.delete(:delay_validation) if open_transactions > 0
     options[:column] ||= "#{to_table.to_s.singularize}_id"
@@ -83,7 +78,7 @@ module PostgreSQLAdapterExtensions
   end
 
   def set_standard_conforming_strings
-    super unless postgresql_version >= 90100
+    # not needed in PG 9.1+
   end
 
   # we always use the default sequence name, so override it to not actually query the db
