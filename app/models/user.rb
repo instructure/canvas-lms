@@ -1017,7 +1017,7 @@ class User < ActiveRecord::Base
     given { |user| user == self }
     can :read and can :read_grades and can :read_profile and can :read_as_admin and can :manage and
       can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and
-      can :update_avatar and can :manage_feature_flags
+      can :update_avatar and can :manage_feature_flags and can :api_show_user
 
     given { |user| user == self && user.user_can_edit_name? }
     can :rename
@@ -1047,7 +1047,7 @@ class User < ActiveRecord::Base
     can :read and can :read_reports
 
     given {|user| self.check_accounts_right?(user, :read_roster) }
-    can :read_full_profile
+    can :read_full_profile and can :api_show_user
 
     given {|user| self.check_accounts_right?(user, :view_all_grades) }
     can :read_grades
@@ -1056,7 +1056,7 @@ class User < ActiveRecord::Base
       self.check_accounts_right?(user, :manage_user_logins) && self.adminable_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) }
     end
     can :manage_user_details and can :rename and can :read_profile and can :update_avatar and can :remove_avatar and
-      can :manage_feature_flags
+      can :manage_feature_flags and can :api_show_user
 
     given{ |user| self.pseudonyms.shard(self).any?{ |p| p.grants_right?(user, :update) } }
     can :merge
