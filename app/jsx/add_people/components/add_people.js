@@ -113,6 +113,11 @@ export default class AddPeople extends React.Component {
   }
   componentWillReceiveProps(nextProps) {
     if (nextProps.usersEnrolled) this.close()
+    if (nextProps.apiState && nextProps.apiState.error) {
+      this.setState({
+        focusToClose: true
+      })
+    }
   }
   componentDidUpdate() {
     this.manageFocus()
@@ -152,13 +157,16 @@ export default class AddPeople extends React.Component {
     if (this.state.focusToTop) {
       if (this.content) this.content.focus()
       this.setState({focusToTop: false})
+    } else if (this.state.focusToClose) {
+      if (this.modalCloseBtn) this.modalCloseBtn.focus();
+      this.setState({focusToClose: false});
     }
   }
 
   // modal next and back handlers ---------------------
   // on next callback from PeopleSearch page
   searchNext = () => {
-    this.setState({currentPage: PEOPLEVALIDATIONISSUES, focusToTop: true})
+    this.setState({currentPage: PEOPLEVALIDATIONISSUES, focusToClose: true})
     this.props.validateUsers()
   }
   // on next callback from PeopleValidationIssues page
@@ -307,6 +315,7 @@ export default class AddPeople extends React.Component {
         shouldCloseOnOverlayClick={false}
         size="medium"
         tabIndex="-1"
+        closeButtonRef={ c => { this.modalCloseBtn = c }}
       >
         <ModalHeader>
           <Heading tabIndex="-1">{modalTitle}</Heading>
