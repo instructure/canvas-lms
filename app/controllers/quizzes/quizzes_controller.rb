@@ -670,7 +670,7 @@ class Quizzes::QuizzesController < ApplicationController
         redirect_to named_context_url(@context, :context_quiz_url, @quiz)
         return
       end
-      if @quiz.muted? && !@quiz.grants_right?(@current_user, session, :grade)
+      if @quiz.muted? && !@quiz.grants_right?(@current_user, session, :review_grades)
         flash[:notice] = t('notices.cant_view_submission_while_muted', "You cannot view the quiz history while the quiz is muted.")
         redirect_to named_context_url(@context, :context_quiz_url, @quiz)
         return
