@@ -1301,4 +1301,38 @@ QUnit.module('SpeedGrader', function() {
       strictEqual($('#speedgrader_comment_textarea').length, 0)
     })
   })
+
+  QUnit.module('#setup', function(hooks) {
+    hooks.beforeEach(function() {
+      fakeENV.setup({
+        anonymous_moderated_marking_enabled: false,
+        grading_role: 'moderator',
+        show_help_menu_item: false
+      })
+
+      document.getElementById('fixtures').innerHTML = '<span id="speedgrader-settings"></span>'
+      sinon.stub($, 'getJSON')
+      sinon.stub($, 'ajaxJSON')
+    })
+
+    hooks.afterEach(function() {
+      $.ajaxJSON.restore()
+      $.getJSON.restore()
+      document.getElementById('fixtures').innerHTML = ''
+      fakeENV.teardown()
+    })
+
+    test('populates the settings mount point if anonymous_moderated_marking_enabled is true', () => {
+      ENV.anonymous_moderated_marking_enabled = true
+      SpeedGrader.setup()
+      const mountPoint = document.getElementById('speedgrader-settings')
+      strictEqual(mountPoint.textContent, 'SpeedGrader Settings')
+    })
+
+    test('does not populate the settings mount point if anonymous_moderated_marking_enabled is false', () => {
+      SpeedGrader.setup()
+      const mountPoint = document.getElementById('speedgrader-settings')
+      strictEqual(mountPoint.textContent, '')
+    })
+  })
 })

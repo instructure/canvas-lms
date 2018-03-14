@@ -28,6 +28,7 @@ import StatusPill from 'jsx/grading/StatusPill';
 import JQuerySelectorCache from 'jsx/shared/helpers/JQuerySelectorCache';
 import numberHelper from 'jsx/shared/helpers/numberHelper';
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
+import SpeedGraderSettingsMenu from 'jsx/speed_grader/SpeedGraderSettingsMenu'
 import studentViewedAtTemplate from 'jst/speed_grader/student_viewed_at';
 import submissionsDropdownTemplate from 'jst/speed_grader/submissions_dropdown';
 import speechRecognitionTemplate from 'jst/speed_grader/speech_recognition';
@@ -423,20 +424,26 @@ function setupHeader () {
     addEvents () {
       this.elements.nav.click($.proxy(this.toAssignment, this));
       this.elements.mute.link.click($.proxy(this.onMuteClick, this));
-      this.elements.settings.form.submit(this.submitSettingsForm.bind(this));
-      this.elements.settings.link.click(this.showSettingsModal.bind(this));
+
+      if (!ENV.anonymous_moderated_marking_enabled) {
+        this.elements.settings.form.submit(this.submitSettingsForm.bind(this));
+        this.elements.settings.link.click(this.showSettingsModal.bind(this));
+      }
       this.elements.keyinfo.icon.click(this.keyboardShortcutInfoModal.bind(this));
     },
     createModals () {
-      this.elements.settings.form.dialog({
-        autoOpen: false,
-        modal: true,
-        resizable: false,
-        width: 400
-      }).fixDialogButtons();
-      // FF hack - when reloading the page, firefox seems to "remember" the disabled state of this
-      // button. So here we'll manually re-enable it.
-      this.elements.settings.form.find(".submit_button").removeAttr('disabled')
+      if (!ENV.anonymous_moderated_marking_enabled) {
+        this.elements.settings.form.dialog({
+          autoOpen: false,
+          modal: true,
+          resizable: false,
+          width: 400
+        }).fixDialogButtons();
+        // FF hack - when reloading the page, firefox seems to "remember" the disabled state of this
+        // button. So here we'll manually re-enable it.
+        this.elements.settings.form.find(".submit_button").removeAttr('disabled')
+      }
+
       this.elements.mute.modal.dialog({
         autoOpen: false,
         buttons: [{
@@ -2859,8 +2866,22 @@ function setupSelectors() {
   header = setupHeader()
 }
 
+function renderSettingsMenu () {
+  const props =  {
+    showModerationMenuItem: ENV.grading_role === 'moderator',
+    showHelpMenuItem: ENV.show_help_menu_item
+  }
+
+  const settingsMenu = <SpeedGraderSettingsMenu {...props} />
+  ReactDOM.render(settingsMenu, document.getElementById('speedgrader-settings'))
+}
+
 export default {
   setup () {
+    if (ENV.anonymous_moderated_marking_enabled) {
+      renderSettingsMenu()
+    }
+
     setupSelectors()
 
     function registerQuizzesNext (overriddenShowSubmission) {
