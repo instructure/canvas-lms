@@ -19,12 +19,26 @@ class ModifySubmissionAndQuizSubmissionUserForeignKeyConstraint < ActiveRecord::
   tag :predeploy
 
   def up
-    alter_constraint(:submissions, find_foreign_key(:submissions, :users), new_name: 'fk_rails_8d85741475', deferrable: true)
-    alter_constraint(:quiz_submissions, find_foreign_key(:quiz_submissions, :users), new_name: 'fk_rails_04850db4b4', deferrable: true)
+    if connection.send(:postgresql_version) >= 90400
+      alter_constraint(:submissions, find_foreign_key(:submissions, :users), new_name: 'fk_rails_8d85741475', deferrable: true)
+      alter_constraint(:quiz_submissions, find_foreign_key(:quiz_submissions, :users), new_name: 'fk_rails_04850db4b4', deferrable: true)
+    else
+      remove_foreign_key_if_exists :quiz_submissions, :users
+      add_foreign_key :quiz_submissions, :users, deferrable: true, delay_validation: true
+      remove_foreign_key_if_exists :submissions, :users
+      add_foreign_key :submissions, :users, deferrable: true, delay_validation: true
+    end
   end
 
   def down
-    alter_constraint(:submissions, 'fk_rails_8d85741475', deferrable: false)
-    alter_constraint(:quiz_submissions, 'fk_rails_04850db4b4', deferrable: false)
+    if connection.send(:postgresql_version) >= 90400
+      alter_constraint(:submissions, 'fk_rails_8d85741475', deferrable: false)
+      alter_constraint(:quiz_submissions, 'fk_rails_04850db4b4', deferrable: false)
+    else
+      remove_foreign_key_if_exists :quiz_submissions, :users
+      add_foreign_key :quiz_submissions, :users, deferrable: false, delay_validation: true
+      remove_foreign_key_if_exists :submissions, :users
+      add_foreign_key :submissions, :users, deferrable: false, delay_validation: true
+    end
   end
 end
