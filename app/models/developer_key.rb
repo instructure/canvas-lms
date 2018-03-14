@@ -32,6 +32,7 @@ class DeveloperKey < ActiveRecord::Base
 
   before_create :generate_api_key
   before_create :set_auto_expire_tokens
+  before_create :set_visible
   before_save :nullify_empty_icon_url
   before_save :protect_default_key
   after_save :clear_cache
@@ -95,6 +96,11 @@ class DeveloperKey < ActiveRecord::Base
 
   def self.default
     get_special_key("User-Generated")
+  end
+
+  def set_visible
+    self.visible = !site_admin?
+    true
   end
 
   def authorized_for_account?(target_account)
@@ -179,5 +185,11 @@ class DeveloperKey < ActiveRecord::Base
       @sns = Aws::SNS::Client.new(settings) if settings
     end
     @sns
+  end
+
+  private
+
+  def site_admin?
+    self.account_id.nil?
   end
 end
