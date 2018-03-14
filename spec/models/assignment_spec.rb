@@ -1219,6 +1219,19 @@ describe Assignment do
       end
     end
 
+    it "converts using numbers sensitive to floating point errors" do
+      @assignment.grading_type = "letter_grade"
+      @assignment.points_possible = 100
+      gs = @assignment.context.grading_standards.build({title: "Numerical"})
+      gs.data = {"A" => 0.29, "F" => 0.00}
+      gs.assignments << @assignment
+      gs.save!
+      @assignment.save!
+
+      # 0.29 * 100 = 28.999999999999996 in ruby, which matches F instead of A
+      expect(@assignment.score_to_grade(29)).to eq("A")
+    end
+
     it "should preserve gpa scale grades with zero points possible" do
       @assignment.grading_type = 'gpa_scale'
       @assignment.points_possible = 0.0
