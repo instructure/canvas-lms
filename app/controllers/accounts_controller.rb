@@ -406,27 +406,21 @@ class AccountsController < ApplicationController
 
     if params[:search_term]
       search_term = params[:search_term]
-      is_id = search_term.to_s =~ Api::ID_REGEX
-      if is_id && @courses.except(:order).where(id: search_term).exists?
-        @courses = Course.where(id: search_term)
-      elsif is_id && !SearchTermHelper.valid_search_term?(search_term)
-        @courses = Course.none
+      SearchTermHelper.validate_search_term(search_term)
+
+      if params[:search_by] == "teacher"
+        @courses = @courses.where("EXISTS (?)", TeacherEnrollment.active.joins(:user).where(
+          ActiveRecord::Base.wildcard('users.name', params[:search_term])
+        ).where("enrollments.course_id=courses.id"))
       else
-        SearchTermHelper.validate_search_term(search_term)
+        name = ActiveRecord::Base.wildcard('courses.name', search_term)
+        code = ActiveRecord::Base.wildcard('courses.course_code', search_term)
 
-        if params[:search_by] == "teacher"
-          @courses = @courses.where("EXISTS (?)", TeacherEnrollment.active.joins(:user).where(
-            ActiveRecord::Base.wildcard('users.name', params[:search_term])).where("enrollments.course_id=courses.id"))
+        if @account.grants_any_right?(@current_user, :read_sis, :manage_sis)
+          sis_source = ActiveRecord::Base.wildcard('courses.sis_source_id', search_term)
+          @courses = @courses.merge(Course.where(:id => search_term).or(Course.where(code)).or(Course.where(name)).or(Course.where(sis_source)))
         else
-          name = ActiveRecord::Base.wildcard('courses.name', search_term)
-          code = ActiveRecord::Base.wildcard('courses.course_code', search_term)
-
-          if @account.grants_any_right?(@current_user, :read_sis, :manage_sis)
-            sis_source = ActiveRecord::Base.wildcard('courses.sis_source_id', search_term)
-            @courses = @courses.where("#{name} OR #{code} OR #{sis_source}")
-          else
-            @courses = @courses.where("#{name} OR #{code}")
-          end
+          @courses = @courses.merge(Course.where(:id => search_term).or(Course.where(code)).or(Course.where(name)))
         end
       end
     end
