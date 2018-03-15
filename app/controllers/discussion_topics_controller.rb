@@ -475,7 +475,21 @@ class DiscussionTopicsController < ApplicationController
         hash[:ATTRIBUTES][:assignment][:has_student_submissions] = @topic.assignment.has_student_submissions?
       end
 
-      sections = @context.respond_to?(:course_sections) ? @context.course_sections.active.to_a : []
+      section_visibilities =
+        if @context.respond_to?(:course_section_visibility)
+          @context.course_section_visibility(@current_user)
+        else
+          :none
+        end
+
+      sections =
+        if section_visibilities == :none
+          []
+        elsif section_visibilities == :all
+          @context.course_sections.active.to_a
+        else
+          @context.course_sections.select{ |s| s.active? && section_visibilities.include?(s.id) }
+        end
 
       js_hash = {
         CONTEXT_ACTION_SOURCE: :discussion_topic,
@@ -1017,6 +1031,29 @@ class DiscussionTopicsController < ApplicationController
     end
   end
 
+  def verify_specific_section_visibilities
+    return unless @topic.is_section_specific
+    return unless @context.is_a? Course
+    visibilities = @context.course_section_visibility(@current_user)
+
+    invalid_sections =
+      if visibilities == :all
+        []
+      elsif visibilities == :none
+        @topic.course_sections.map(&:id)
+      else
+        @topic.course_sections.map(&:id) - visibilities
+      end
+
+    unless invalid_sections.empty?
+      @errors[:specific_sections] = t(
+        :error_section_permission,
+        'You do not have permissions to create discussion for section(s) %{section_ids}',
+        section_ids: invalid_sections.join(", ")
+      )
+    end
+  end
+
   def process_discussion_topic(is_new = false)
     ActiveRecord::Base.transaction do
       process_discussion_topic_runner(is_new)
@@ -1048,6 +1085,7 @@ class DiscussionTopicsController < ApplicationController
     # any specific setions out from under them when their existing scrit runs.
     # This is where a versioned API would come in handy.
     set_sections if params[:specific_sections]
+    verify_specific_section_visibilities
 
     allowed_fields = @context.is_a?(Group) ? API_ALLOWED_TOPIC_FIELDS_FOR_GROUP : API_ALLOWED_TOPIC_FIELDS
     discussion_topic_hash = params.permit(*allowed_fields)
