@@ -1196,11 +1196,11 @@ describe Assignment do
       before do
         @gs1 = @course.grading_standards.create! standard_data: {
           a: {name: "OK", value: 100},
-          b: {name: "Bad", value: 80},
+          b: {name: "Bad", value: 0},
         }
         @gs2 = @course.grading_standards.create! standard_data: {
           a: {name: "🚀", value: 100},
-          b: {name: "🚽", value: 80},
+          b: {name: "🚽", value: 0},
         }
       end
 

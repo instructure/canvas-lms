@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,16 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Factories
-  def grading_standard_for(context, opts={})
-    @standard = context.grading_standards.create!(
-      title: opts[:title] || "My Grading Standard",
-      standard_data: {
-        "scheme_0" => { name: "A", value: "0.9" },
-        "scheme_1" => { name: "B", value: "0.8" },
-        "scheme_2" => { name: "C", value: "0.7" },
-        "scheme_3" => { name: "D", value: "0.0" }
-      }
+class UpdateGradingStandardsToFullRange < ActiveRecord::Migration[5.1]
+  tag :postdeploy
+
+  def up
+    DataFixup::UpdateGradingStandardsToFullRange.send_later_if_production_enqueue_args(
+      :run,
+      priority: Delayed::LOW_PRIORITY,
+      strand: "DataFixup::UpdateGradingStandardsToFullRange::Migration:#{Shard.current.database_server.id}"
     )
   end
 end
