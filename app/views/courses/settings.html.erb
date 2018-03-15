@@ -271,11 +271,6 @@
                            [[no_language, nil]] + available_locales.invert.sort_by { |desc, _| Canvas::ICU.collation_key(desc) },
                            {:selected => @context.locale}, {:class => 'locale'} %>
               <%= render :partial => 'shared/locale_warning' %>
-              <p> <%= mt :transifex_message, <<-TEXT, :transifex_url => "https://www.transifex.com/instructure/canvas-crowdsource/"
-  Join the [Canvas Translation Community](%{transifex_url})
-  TEXT
-              %>
-              </p>
             </div>
             <div class="aside palign">
               <%= t('language_overrides_preferences', "This will override any user/system language preferences. This is only recommended for foreign language courses") %>
