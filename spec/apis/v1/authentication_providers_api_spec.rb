@@ -218,7 +218,7 @@ describe "AuthenticationProviders API", type: :request do
       @ldap_hash['id'] = aac.id
       @ldap_hash['auth_port'] = nil
       @ldap_hash['auth_base'] = nil
-      @ldap_hash['auth_over_tls'] = nil
+      @ldap_hash['auth_over_tls'] = 'start_tls'
       @ldap_hash['identifier_format'] = nil
       @ldap_hash['position'] = 1
       expect(json).to eq @ldap_hash
