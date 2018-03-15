@@ -87,7 +87,7 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(Account, :update_all_update_account_associations)
   end
 
-  Delayed::Periodic.cron 'StreamItem.destroy_stream_items', '45 11 * * *' do
+  Delayed::Periodic.cron 'StreamItem.destroy_stream_items', '45 */6 * * *' do
     with_each_shard_by_database(StreamItem, :destroy_stream_items_using_setting)
   end
 
