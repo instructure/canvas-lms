@@ -142,12 +142,14 @@ class Pseudonym < ActiveRecord::Base
   def self.custom_find_by_unique_id(unique_id)
     return unless unique_id
     active.by_unique_id(unique_id).where("authentication_provider_id IS NULL OR EXISTS (?)",
-      AccountAuthorizationConfig.active.where(auth_type: ['canvas', 'ldap']).where("authentication_provider_id=account_authorization_configs.id")).first
+      AccountAuthorizationConfig.active.where(auth_type: ['canvas', 'ldap']).
+        where("authentication_provider_id=account_authorization_configs.id")).first
   end
 
   def self.for_auth_configuration(unique_id, aac)
     auth_id = aac.try(:auth_provider_filter)
-    active.by_unique_id(unique_id).where(authentication_provider_id: auth_id).first
+    active.by_unique_id(unique_id).where(authentication_provider_id: auth_id).
+      order("authentication_provider_id NULLS LAST").take
   end
 
   def set_password_changed
@@ -223,8 +225,8 @@ class Pseudonym < ActiveRecord::Base
     unless self.deleted?
       self.shard.activate do
         existing_pseudo = Pseudonym.active.by_unique_id(self.unique_id).where(:account_id => self.account_id,
-          :authentication_provider_id => self.authentication_provider_id).first
-        if existing_pseudo && existing_pseudo.id != self.id
+          :authentication_provider_id => self.authentication_provider_id).where.not(id: self).exists?
+        if existing_pseudo
           self.errors.add(:unique_id, :taken,
             message: t("ID already in use for this account and authentication provider"))
           throw :abort
