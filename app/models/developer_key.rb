@@ -42,6 +42,7 @@ class DeveloperKey < ActiveRecord::Base
   validate :validate_redirect_uris
 
   scope :nondeleted, -> { where("workflow_state<>'deleted'") }
+  scope :visible, -> { where(visible: true) }
 
   workflow do
     state :active do

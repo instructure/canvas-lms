@@ -23,15 +23,14 @@ class DeveloperKeysController < ApplicationController
   include Api::V1::DeveloperKey
 
   def index
-    scope = @context.site_admin? ? DeveloperKey : @context.developer_keys
-    scope = scope.nondeleted.preload(:account).order("id DESC")
+    scope = index_scope.nondeleted.preload(:account).order("id DESC")
     @keys = Api.paginate(scope, self, account_developer_keys_url(@context))
     respond_to do |format|
       format.html do
         set_navigation
         js_env(accountEndpoint: api_v1_account_developer_keys_path(@context), developer_keys_count: @keys.total_entries)
 
-        if use_react_for_front_end?
+        if use_new_dev_key_features?
           render :index_react
         else
           render :index
@@ -74,15 +73,42 @@ class DeveloperKeysController < ApplicationController
 
   private
 
-  def use_react_for_front_end?
-    # Check if account is the site admin account.  (There's only 1 site admin account.)
-    if @context.root_account.site_admin?
-      # Check if feature is allowed, based on 3 state toggle
-      @context.root_account.feature_allowed?(:developer_key_management_ui_rewrite)
-    else
-      # allow react to be shown for http://canvas.docker/accounts/1234/developer_keys
-      Account.site_admin.feature_allowed?(:developer_key_management_ui_rewrite) &&
-        @context.root_account.feature_enabled?(:developer_key_management_ui_rewrite)
+  def index_scope
+    unless use_new_dev_key_features?
+      return @context.site_admin? ? DeveloperKey : @context.developer_keys
+    end
+    return DeveloperKey if @context.site_admin?
+    DeveloperKey.where(account_id: @context.id).or(DeveloperKey.visible.where(account_id: nil))
+  end
+
+  def create_or_update_developer_key_binding(developer_key)
+    return unless use_new_dev_key_features?
+    return unless params[:account_id] && permitted_params[:binding_workflow_state]
+    developer_key.set_developer_key_account_binding_state!(
+      account: account_from_params,
+      workflow_state: permitted_params[:binding_workflow_state]
+    )
+  end
+
+  def account_from_params
+    return Account.site_admin if params[:account_id] == 'site_admin'
+    Account.find_by(id: params[:account_id])
+  end
+
+  def use_new_dev_key_features?
+    @_use_new_dev_key_features ||= begin
+      requested_context = @context || account_from_params || @key&.account
+      return unless requested_context
+
+      # Check if account is the site admin account.  (There's only 1 site admin account.)
+      if @context.root_account.site_admin?
+        # Check if feature is allowed, based on 3 state toggle
+        @context.root_account.feature_allowed?(:developer_key_management_ui_rewrite)
+      else
+        # allow react to be shown for http://canvas.docker/accounts/1234/developer_keys
+        Account.site_admin.feature_allowed?(:developer_key_management_ui_rewrite) &&
+          @context.root_account.feature_enabled?(:developer_key_management_ui_rewrite)
+      end
     end
   end
 
