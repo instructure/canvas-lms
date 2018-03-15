@@ -289,7 +289,7 @@ module SIS
             file = csv[:attachment].open
             csv[:fullpath] = file.path
           end
-          importerObject.process(csv)
+          @counts[importer.to_s.pluralize.to_sym] += importerObject.process(csv)
           run_next_importer(IMPORTERS[IMPORTERS.index(importer) + 1]) if complete_importer(importer)
         rescue => e
           return @batch if @batch.workflow_state == 'aborted'
