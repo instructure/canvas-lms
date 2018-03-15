@@ -178,13 +178,17 @@ class PlannerOverridesController < ApplicationController
       SecureRandom.uuid
     end
 
-    items_json = Rails.cache.fetch(['planner_items', planner_overrides_meta_key, page, params[:filter], default_opts].cache_key, expires_in: 120.minutes) do
+    items_response = Rails.cache.fetch(['planner_items', planner_overrides_meta_key, page, params[:filter], default_opts].cache_key, expires_in: 120.minutes) do
       items = params[:filter] == 'new_activity' ? unread_items : planner_items
       items = Api.paginate(items, self, api_v1_planner_items_url)
-      planner_items_json(items, @current_user, session, {start_at: start_date, due_after: start_date, due_before: end_date})
+      {
+        json: planner_items_json(items, @current_user, session, {start_at: start_date, due_after: start_date, due_before: end_date}),
+        link: response.headers["Link"].to_s,
+      }
     end
 
-    render json: items_json
+    response.headers["Link"] = items_response[:link]
+    render json: items_response[:json]
   end
 
   # @API List planner overrides

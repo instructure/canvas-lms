@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,12 +14,15 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-class UserMergeDataRecord < ActiveRecord::Base
-  belongs_to :previous_user, class_name: 'User'
-  belongs_to :user_merge_data
-  belongs_to :context, polymorphic: [:account_user, :enrollment, :pseudonym,:user_observer,
-                                     :attachment, :communication_channel, :user_service,
-                                     :submission, {quiz_submission: 'Quizzes::QuizSubmission'}]
 
+class ChangeSisErrorMessageToText < ActiveRecord::Migration[5.0]
+  tag :predeploy
+
+  def self.up
+    change_column :sis_batch_errors, :message, :text
+  end
+
+  def self.down
+    change_column :sis_batch_errors, :message, :string
+  end
 end

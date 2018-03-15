@@ -121,8 +121,9 @@ module Outcomes
       model.workflow_state ||= 'active' # let removing the outcome_links content tags delete the underlying outcome
 
       prior_rubric = model.rubric_criterion || {}
-      ratings_change = outcome[:ratings].present? && outcome[:ratings] != prior_rubric[:ratings]
-      model.rubric_criterion = create_rubric(outcome[:ratings]) if ratings_change
+      changed = ->(k) { outcome[k].present? && outcome[k] != prior_rubric[k] }
+      rubric_change = changed.call(:ratings) || changed.call(:mastery_points)
+      model.rubric_criterion = create_rubric(outcome[:ratings], outcome[:mastery_points]) if rubric_change
 
       if model.context == context
         model.outcome_import_id = outcome_import_id
@@ -177,9 +178,10 @@ module Outcomes
       end
     end
 
-    def create_rubric(ratings)
+    def create_rubric(ratings, mastery_points)
       rubric = {}
       rubric[:enable] = true
+      rubric[:mastery_points] = mastery_points
       rubric[:ratings] = ratings.map.with_index { |v, i| [i, v] }.to_h
       rubric
     end

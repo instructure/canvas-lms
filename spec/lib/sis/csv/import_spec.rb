@@ -320,4 +320,9 @@ describe SIS::CSV::Import do
       File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/sis/utf8.csv'))
     )}.not_to raise_error
   end
+
+  it 'should not fail on mac zip files' do
+    importer = process_csv_data(files: File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/sis/mac_sis_batch.zip'))
+    expect(importer.errors).to eq []
+  end
 end

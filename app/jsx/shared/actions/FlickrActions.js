@@ -26,8 +26,13 @@ import $ from 'jquery'
       return { type: 'START_FLICKR_SEARCH', term, page };
     },
 
-    receiveFlickrResults(results) {
-      return { type: 'RECEIVE_FLICKR_RESULTS', results };
+    receiveFlickrResults(originalResults) {
+      const photos = Object.assign({}, originalResults.photos)
+      if (photos.photo) {
+        photos.photo = photos.photo.filter(photo => photo.needs_interstitial !== 1)
+      }
+      const results = Object.assign({}, originalResults, { photos })
+      return { type: 'RECEIVE_FLICKR_RESULTS', results }
     },
 
     clearFlickrSearch() {
@@ -75,7 +80,7 @@ import $ from 'jquery'
       const per_page = '20';
       const imageSize = 'url_m';
 
-      return `https://secure.flickr.com/services/rest/?method=flickr.photos.search&format=json&nojsoncallback=true&api_key=${apiKey}&sort=${sort}&license=${licenses}&text=${term}&per_page=${per_page}&content_type=6&safe_search=1&page=${page}&privacy_filter=1&extras=license,owner_name,${imageSize}`
+      return `https://api.flickr.com/services/rest/?method=flickr.photos.search&format=json&nojsoncallback=true&api_key=${apiKey}&sort=${sort}&license=${licenses}&text=${term}&per_page=${per_page}&content_type=6&safe_search=1&page=${page}&privacy_filter=1&extras=license,owner_name,${imageSize},needs_interstitial`
     }
   };
 

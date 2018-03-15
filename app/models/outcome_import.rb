@@ -106,9 +106,18 @@ class OutcomeImport < ApplicationRecord
     })
   end
 
+  def locale
+    if context.respond_to? :account
+      context.account.default_locale
+    elsif context.respond_to? :default_locale
+      context.default_locale
+    end
+  end
+
   def run
     root_account.shard.activate do
       job_started!
+      I18n.locale = locale if locale.present?
       file = self.attachment.open(need_local_file: true)
       begin
         Outcomes::CsvImporter.new(self, file).run do |status|

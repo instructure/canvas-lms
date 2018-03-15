@@ -28,7 +28,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import OutcomesActionsPopoverMenu from '../outcomes/OutcomesActionsPopoverMenu'
 import {showImportOutcomesModal} from '../outcomes/ImportOutcomesModal'
-import {showOutcomesImporter} from '../outcomes/OutcomesImporter'
+import {showOutcomesImporter, showOutcomesImporterIfInProgress} from '../outcomes/OutcomesImporter'
 
 const renderInstructions = ENV.PERMISSIONS.manage_outcomes
 
@@ -39,13 +39,17 @@ $el.html(browserTemplate({
   contextUrlRoot: ENV.CONTEXT_URL_ROOT
 }))
 
-ReactDOM.render(
-  <OutcomesActionsPopoverMenu
-    contextUrlRoot={ENV.CONTEXT_URL_ROOT}
-    permissions={ENV.PERMISSIONS}
-  />,
-  $el.find('#popoverMenu')[0]
-)
+// The below functionality and its accompanying DOM element (popover-menu)
+// have been disabled since the feature has been shelved for now. However,
+// it's still on the roadmap eventually.
+
+// ReactDOM.render(
+//   <OutcomesActionsPopoverMenu
+//     contextUrlRoot={ENV.CONTEXT_URL_ROOT}
+//     permissions={ENV.PERMISSIONS}
+//   />,
+//   $el.find('#popoverMenu')[0]
+// )
 
 export const toolbar = new ToolbarView({el: $el.find('.toolbar')})
 
@@ -86,8 +90,15 @@ toolbar.on('start_sync', (file) => showOutcomesImporter({
   disableOutcomeViews,
   resetOutcomeViews,
   mount: content.$el[0],
-  contextUrlRoot: ENV.CONTEXT_URL_ROOT,
+  contextUrlRoot: ENV.CONTEXT_URL_ROOT
 }))
+
+showOutcomesImporterIfInProgress({
+  disableOutcomeViews,
+  resetOutcomeViews,
+  mount: content.$el[0],
+  contextUrlRoot: ENV.CONTEXT_URL_ROOT
+}, ENV.current_user.id)
 
 // sidebar events
 sidebar.on('select', model => content.show(model))

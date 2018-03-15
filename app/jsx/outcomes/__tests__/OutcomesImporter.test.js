@@ -17,9 +17,10 @@
  */
 
 import React from 'react'
-import { shallow } from 'enzyme'
+import ReactDOM from 'react-dom'
+import { render, shallow } from 'enzyme'
 import { merge } from 'lodash'
-import OutcomesImporter from '../OutcomesImporter'
+import OutcomesImporter, { showOutcomesImporterIfInProgress } from '../OutcomesImporter'
 
 jest.mock('../../shared/FlashAlert');
 import { showFlashAlert } from '../../shared/FlashAlert'
@@ -35,12 +36,13 @@ const defaultProps = (props = {}) => (
     disableOutcomeViews: () => {},
     resetOutcomeViews: () => {},
     file: {},
-    contextUrlRoot: '/accounts/1'
+    contextUrlRoot: '/accounts/1',
+    invokedImport: true
   }, props)
 )
 
 it('renders the OutcomesImporter component', () => {
-  const modal = shallow(<OutcomesImporter {...defaultProps}/>)
+  const modal = shallow(<OutcomesImporter {...defaultProps()}/>)
   expect(modal.exists()).toBe(true)
 })
 
@@ -105,4 +107,47 @@ it('completes upload when status returns succeeded or failed', async () => {
   modal.instance().pollImportStatus(0)
   await jest.advanceTimersByTime(2000);
   expect(resetOutcomeViews).toBeCalled()
+})
+
+it('renders importer if in progress', async () => {
+  const disableOutcomeViews = jest.fn()
+  const props = defaultProps({ disableOutcomeViews, file: null, importId: '9' })
+  apiClient.queryImportStatus.mockReturnValue(Promise.resolve({status: 200, data: {workflow_state: 'importing', user: {id: '1'}}}))
+  ReactDOM.render = jest.fn()
+  await showOutcomesImporterIfInProgress(props, '1')
+  expect(ReactDOM.render).toBeCalled()
+})
+
+it('does not render importer if no latest import', async () => {
+  const disableOutcomeViews = jest.fn()
+  const props = defaultProps({ disableOutcomeViews, file: null, importId: '9' })
+  apiClient.queryImportStatus.mockReturnValue(Promise.resolve({status: 404}))
+  ReactDOM.render = jest.fn()
+  await showOutcomesImporterIfInProgress(props)
+  expect(ReactDOM.render).not.toBeCalled()
+})
+
+it('starts polling for import status when an import is in progress', () => {
+  const disableOutcomeViews = jest.fn()
+  const modal = shallow(<OutcomesImporter {...defaultProps({ disableOutcomeViews, file: null, importId: '9' })}/>)
+  apiClient.queryImportStatus.mockReturnValue(Promise.resolve({data: {workflow_state: 'succeeded', processing_errors: []}}))
+  modal.instance().beginUpload()
+  expect(setInterval).toHaveBeenLastCalledWith(expect.any(Function), 1000)
+  jest.advanceTimersByTime(2000);
+  expect(apiClient.queryImportStatus).toHaveBeenLastCalledWith('/accounts/1', '9')
+})
+
+it('display "please wait" text for user that invoked upload', () => {
+  const wrapper = render(<OutcomesImporter {...defaultProps()}/>)
+  expect(wrapper.text()).toContain('Please wait')
+})
+
+it('display "ok to leave" text for user that invoked upload', () => {
+  const wrapper = render(<OutcomesImporter {...defaultProps()}/>)
+  expect(wrapper.text()).toContain('ok to leave')
+})
+
+it('display "currently in progress" text for user that did not invoke the upload', () => {
+  const wrapper = render(<OutcomesImporter {...defaultProps({invokedImport: false})}/>)
+  expect(wrapper.text()).toContain('currently in progress')
 })

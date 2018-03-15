@@ -188,12 +188,16 @@ class OutcomeImportsApiController < ApplicationController
   # @returns OutcomeImport
   def show
     if authorized_action(@context, @current_user, %i(import_outcomes manage_outcomes))
-      @import = if params[:id] == 'latest'
-                  @context.latest_outcome_import or raise ActiveRecord::RecordNotFound
-                else
-                  @context.outcome_imports.find(params[:id])
-                end
-      render json: outcome_import_json(@import, @current_user, session)
+      begin
+        @import = if params[:id] == 'latest'
+                    @context.latest_outcome_import or raise ActiveRecord::RecordNotFound
+                  else
+                    @context.outcome_imports.find(params[:id])
+                  end
+        render json: outcome_import_json(@import, @current_user, session)
+      rescue ActiveRecord::RecordNotFound => e
+        render json: { message: e.message }, status: :not_found
+      end
     end
   end
 
