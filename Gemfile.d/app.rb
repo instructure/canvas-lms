@@ -102,7 +102,7 @@ gem 'ruby-saml-mod', '0.3.7'
 gem 'saml2', '2.1.0'
   gem 'nokogiri-xmlsec-instructure', '0.9.4', require: false
 gem 'rubycas-client', '2.3.9', require: false
-gem 'rubyzip', '1.2.0', require: 'zip'
+gem 'rubyzip', '1.2.1', require: 'zip'
 gem 'safe_yaml', '1.0.4', require: false
 gem 'sanitize', '2.1.0', require: false
 gem 'shackles', '1.4.0'
