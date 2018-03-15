@@ -74,10 +74,10 @@ module Types
 
         Loaders::AssociationLoader.for(Enrollment, [:scores, :user, :course]).
           load(enrollment).then do
-            if grading_period_id = args[:gradingPeriodId]
-              grades_resolver.call(grading_period_id)
+            if args.key?(:gradingPeriodId)
+              grades_resolver.call(args[:gradingPeriodId])
             else
-              CourseGradingPeriodLoader.load(enrollment.course).then { |gp|
+              Loaders::CurrentGradingPeriodLoader.load(enrollment.course).then { |gp, _|
                 grades_resolver.call(gp&.id)
               }
             end
@@ -106,18 +106,5 @@ module Types
     value "ObserverEnrollment"
     value "DesignerEnrollment"
     value "StudentViewEnrollment"
-  end
-end
-
-class CourseGradingPeriodLoader < GraphQL::Batch::Loader
-  # NOTE: this isn't really doing any batch loading currently. it's just here
-  # to avoid re-computing which grading period goes to the same course (like
-  # when fetching grades for all students in a course)
-  # (if someone wants to modify the grading period stuff for batching then
-  # thank you)
-  def perform(courses)
-    courses.each { |course|
-      fulfill course, GradingPeriod.current_period_for(course)
-    }
   end
 end

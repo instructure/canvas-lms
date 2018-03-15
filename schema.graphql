@@ -82,6 +82,12 @@ type AssignmentEdge {
   node: Assignment
 }
 
+input AssignmentFilter {
+  #     only return assignments for the given grading period. Defaults to the
+  # current grading period. Pass `null` to not filter by grading period.
+  gradingPeriodId: ID
+}
+
 type AssignmentGroup implements Node, Timestamped {
   # legacy canvas id
   _id: ID!
@@ -212,6 +218,7 @@ type Course implements Node, Timestamped {
 
     # Returns the elements in the list that come before the specified global ID.
     before: String
+    filter: AssignmentFilter
 
     # Returns the first _n_ elements from the list.
     first: Int
