@@ -50,22 +50,30 @@ function renderSectionsAutocomplete (view) {
   if (sectionSpecificEnabled()) {
     const container = document.querySelector('#sections_autocomplete_root')
     if (container) {
-      const isGroupDiscussion = view.groupCategorySelector.groupDiscussionChecked()
+      const gcs = view.groupCategorySelector
       const isGradedDiscussion = view.gradedChecked()
+      const isGroupDiscussion = (gcs !== undefined) ? gcs.groupDiscussionChecked() : false
+      const enableDiscussionOptions = () => {
+        view.enableGradedCheckBox()
+        if (gcs !== undefined) {
+          view.groupCategorySelector.enableGroupDiscussionCheckbox()
+        }
+      }
+      const disableDiscussionOptions = () => {
+        view.disableGradedCheckBox()
+        if (gcs !== undefined) {
+          view.groupCategorySelector.disableGroupDiscussionCheckbox()
+        }
+      }
 
       ReactDOM.render(
         <SectionsAutocomplete
           selectedSections={ENV.SELECTED_SECTION_LIST}
           disabled={isGradedDiscussion || isGroupDiscussion}
-          disableDiscussionOptions={() => {
-            view.disableGradedCheckBox()
-            view.groupCategorySelector.disableGroupDiscussionCheckbox()
-          }}
-          enableDiscussionOptions={() => {
-            view.enableGradedCheckBox()
-            view.groupCategorySelector.enableGroupDiscussionCheckbox()
-          }}
-          sections={ENV.SECTION_LIST}/>
+          disableDiscussionOptions={disableDiscussionOptions}
+          enableDiscussionOptions={enableDiscussionOptions}
+          sections={ENV.SECTION_LIST}
+        />
         , container
       )
     }

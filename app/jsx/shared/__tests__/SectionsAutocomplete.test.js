@@ -34,7 +34,7 @@ describe('Sections Autocomplete', () => {
   it('rendered sectionAutocomplete contains the "all sections" option', () => {
     const wrapper = shallow(<SectionsAutocomplete {...defaultProps()} />)
     expect(
-      wrapper.instance().state.sections.filter(section => section.name === 'All my sections')
+      wrapper.instance().state.sections.filter(section => section.name === 'All Sections')
     ).toHaveLength(1)
   })
 
@@ -57,7 +57,7 @@ describe('Sections Autocomplete', () => {
     wrapper.instance().onAutocompleteChange(null, [{id: '3', value: 'other thing'}])
     wrapper.instance().onAutocompleteChange(null, [
       {id: '3', value: 'other thing'},
-      {id: 'all', value: 'All my sections'}
+      {id: 'all', value: 'All Sections'}
     ])
     expect(wrapper.instance().state.selectedSectionsValue).toEqual(['all'])
   })
