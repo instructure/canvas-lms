@@ -321,26 +321,6 @@ QUnit.module(
     )
     equal(Object.keys(errors).length, 0)
   }),
-  test('allows students to save discussions without a section', function() {
-    ENV.SECTION_SPECIFIC_DISCUSSIONS_ENABLED = true
-    ENV.CONTEXT_ID = 1
-    ENV.context_asset_string = 'course_1'
-    ENV.DISCUSSION_TOPIC = {ATTRIBUTES: {is_announcement: false}}
-    const view = this.editView({withAssignment: false})
-    // CAN_ATTACH controls whether the sections autocomplete shows
-    view.permissions.CAN_ATTACH = false
-    const title = 'a'.repeat(10)
-    const {assignment} = view
-    assignment.attributes.post_to_sis = '1'
-    const errors = view.validateBeforeSave(
-      {
-        title,
-        specific_sections: null
-      },
-      []
-    )
-    equal(Object.keys(errors).length, 0)
-  }),
   test('require section for course announcements if enabled', function() {
     ENV.should_log = true
     ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED = true
