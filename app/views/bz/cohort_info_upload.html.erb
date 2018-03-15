@@ -1,15 +1,19 @@
 <h1>Cohort Info Upload</h1>
 
 <table>
-<caption>Example Spreadsheet</caption>
-<tr><th>Section Name</th><th>LC Name</th><th>LC Email</th><th>LC Phone</th><th>TA Name</th><th>TA Email</th><th>TA Phone</th><th>TA Office Hours/Location</th><th>LL Times</th><th>LL Location</th></tr>
 <% existing = CohortInfo.where(:course_id => params[:course_id])
-
+if existing.any? %>
+  <caption>Current Spreadsheet (<a href="cohort_info_download.csv?course_id=<%= params[:course_id]%>">Download</a>)</caption>
+<% else %>
+  <caption>Example Spreadsheet (<a href="cohort_info_download.csv?course_id=<%= params[:course_id]%>">Download Skeleton</a>)</caption>
+<% end %>
+<tr><th>Section Name</th><th>LC Name</th><th>LC Email</th><th>LC Phone</th><th>TA Name</th><th>TA Email</th><th>TA Phone</th><th>TA Office Hours/Location</th><th>LL Times</th><th>LL Location</th></tr>
+<%
 if existing.any?
   existing.each do |row|
 %>
 <tr>
-  <td><%= row.section_name %></td><td><%= row.lc_name %></td><td><%= row.lc_phone %></td><td><%= row.lc_email %></td><td><%= row.ta_name %></td><td><%= row.ta_email %></td><td><%= row.ta_phone %></td><td><%= row.ta_office %></td><td><%= row.ll_times %></td><td><%= row.ll_location %></td></tr>
+  <td><%= row.section_name %></td><td><%= row.lc_name %></td><td><%= row.lc_email %></td><td><%= row.lc_phone %></td><td><%= row.ta_name %></td><td><%= row.ta_email %></td><td><%= row.ta_phone %></td><td><%= row.ta_office %></td><td><%= row.ll_times %></td><td><%= row.ll_location %></td></tr>
 </tr>
 <%
   end
@@ -21,7 +25,9 @@ else
 <% end %>
 </table>
 
-<p>The spreadsheet should include information for all cohorts in this course on Canvas. The Section Name should match exactly what we already have in Canvas and Salesforce.</p>
+<p>The spreadsheet should include information for all cohorts in this course on the Portal. The Section Name should match exactly what we already have in Portal and Salesforce. Note that if you upload a spreadsheet with only a few rows, just those rows (based on Section Name) will be updated, with the rest of the data in the Portal remaining the same.</p>
+
+<p>You can get started by downloading <a href="cohort_info_download.csv?course_id=<%= params[:course_id]%>">this spreadsheet</a> which has partial data filled in from what the Portal has so far.</p>
 
 <%= form_for :import, :html => { :multipart => true } do |f| %>
   <%= f.hidden_field :course_id, :value => @course_id %>
