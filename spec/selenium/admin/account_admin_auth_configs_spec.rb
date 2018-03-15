@@ -76,7 +76,7 @@ describe 'account authentication' do
         ldap_form = f("#edit_#{suffix}")
         ldap_form.find_element(:id, "auth_host_#{suffix}").clear
         ldap_form.find_element(:id, "auth_port_#{suffix}").clear
-        f("label[for=no_tls_#{suffix}]").click
+        f("label[for=simple_tls_#{suffix}]").click
         ldap_form.find_element(:id, "auth_base_#{suffix}").clear
         ldap_form.find_element(:id, "auth_filter_#{suffix}").clear
         ldap_form.find_element(:id, "auth_username_#{suffix}").clear
@@ -88,7 +88,7 @@ describe 'account authentication' do
         expect(ldap_aac.active.count).to eq 1
         expect(config.auth_host).to eq ''
         expect(config.auth_port).to eq nil
-        expect(config.auth_over_tls).to eq nil
+        expect(config.auth_over_tls).to eq 'simple_tls'
         expect(config.auth_base).to eq ''
         expect(config.auth_filter).to eq ''
         expect(config.auth_username).to eq ''

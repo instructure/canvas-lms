@@ -383,7 +383,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   # - auth_over_tls [Optional]
   #
-  #   Whether to use TLS. Can be '', 'simple_tls', or 'start_tls'. For backwards
+  #   Whether to use TLS. Can be 'simple_tls', or 'start_tls'. For backwards
   #   compatibility, booleans are also accepted, with true meaning simple_tls.
   #   If not provided, it will default to start_tls.
   #
