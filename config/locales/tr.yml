@@ -1554,6 +1554,7 @@ tr:
   after_last_attempt_c9168da2: "Son Teşebbüsten Sonra"
   after_the_assignment_is_graded_53754607: "Ödev notlandırıldıktan sonra"
   after_the_due_date_eee89c9c: "Bitiş tarihinden sonra"
+  ahead_21f22939: İlerde
   ajax_errors: 
     error_heading: "Ajax Hatası: %{status_code}"
     errors: 
@@ -3462,6 +3463,7 @@ tr:
       update_assignment_points: "Bu ödev için şu puanlar kullanılabilir: %{assignmentPoints}. Bu yönergeye uyumlu olması için bu puanları şu puanlarla  %{rubricPoints} değiştirmek ister misiniz?"
     titles: 
       update_assignment_points: "Değerlendirme listesi ile eşleşmesi için ödev puanları değiştirilsin mi?"
+  change_section_to_sectionname_6e947e90: "%{sectionName} bölümüne değiştirin"
   change_sis_ids_3a47154d: "ÖBS IDleri Değiştir"
   changed_item_1d16a85f: "Değiştirilmiş Öğe"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Bu sayfadan ayrılsanız da değişiklikler uygulanacak."
@@ -3505,6 +3507,8 @@ tr:
   click_here_to_see_the_file_79e2b366: "Dosyayı görmek için tıklayınız"
   click_here_to_view_ec8cb2fd: "görmek için buraya tıklayın"
   click_to_add_a_name_6cf551b0: "İsim eklemek için tıklayın"
+  click_to_create_a_new_user_for_address_325f6683: "%{address} için yeni kullanıcı oluşturmak için tıklayın"
+  click_to_create_a_new_user_for_login_56d2daf5: "%{login}için yeni kullanıcı oluşturmak için tıklayın. "
   click_to_edit_drag_to_reorder_ab725681: "Düzenlemek için tıklayın, yeniden sıralamak için sürükleyin"
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Öğrenci bu cevabı seçerse, yorum girmek için tıklayın"
   click_to_load_a020891b: "(yüklemek için tıklayın)"
@@ -3852,6 +3856,7 @@ tr:
         join: "Şimdi katıl"
     type_disabled_error: "Bu Canvas sitesinde bu türde bir canlı ders artık bulunmamakta"
   conferences_a0a8984b: "Canlı Dersler"
+  conferences_tutorial_tray_6f071ce2: "Canlı Dersler Yönerge Yan Menüsü"
   config_url_e96ceaf3: "Ayar URL'si"
   configurate_tool_app_5a721f2c: "%{tool} Uygulaması Yapılandırılsın mı?"
   configuration_location_ee0f6592: "Yapıalndırma Yeri"
