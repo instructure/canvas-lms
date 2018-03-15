@@ -28,6 +28,7 @@ describe "conversations new" do
   end
 
   it "should have correct elements on the page when composing a new message", priority: "2", test_id: 86604 do
+    skip_if_chrome('fragile in chrome')
     # For testing media comments button, we need to double Kaltura
     stub_kaltura
     conversations
@@ -66,6 +67,7 @@ describe "conversations new" do
   end
 
   it "should not show an XSS alert when XSS script is typed into a new conversation's message subject and body", priority: "1", test_id: 201426 do
+    skip_if_chrome('fragile in chrome')
     conversations
     script = "<IMG SRC=j&#X41vascript:alert('test2')> or <script>alert('xss');</script>"
     compose course: @course, to: [@s[0], @s[1]], subject: script, body: script
