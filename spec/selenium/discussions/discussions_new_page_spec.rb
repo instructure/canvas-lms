@@ -104,6 +104,13 @@ describe "discussions" do
         end
       end
 
+      it "should not display the section specific announcer if the FF is disabled" do
+        get url
+        graded_checkbox = f('input[type=checkbox][name="assignment[set_assignment]"]')
+        graded_checkbox.click
+        expect(f("body")).not_to contain_css('input[id^="Autocomplete"]')
+      end
+
       context "graded" do
         it "should allow creating multiple due dates", priority: "1", test_id: 150468 do
           assignment_group
