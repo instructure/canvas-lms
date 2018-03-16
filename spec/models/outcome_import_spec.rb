@@ -261,12 +261,14 @@ describe OutcomeImport, type: :model do
       attachment = fake_attachment(fake_file)
       import = fake_import(attachment)
       expect(import).to receive(:job_started!).and_call_original
-      expect { import.run }.to raise_error(NoMethodError)
+      import.run
 
       errors = import.outcome_import_errors.all.to_a
-      expect(errors.pluck(:row, :message)).to eq([
-        [1, 'An unexpected error has occurred']
-      ])
+      expect(errors.length).to eq 1
+      expect(errors[0]).to have_attributes(row: 1, message: /An unexpected error has .*/)
+
+      error_report_id = errors[0].message.match(/error report (\d+)/)[1]
+      expect(ErrorReport.find(error_report_id).message).to match(/undefined method/)
     end
   end
 end
