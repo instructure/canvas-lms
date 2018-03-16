@@ -20,39 +20,31 @@ module UserSearch
   def self.for_user_in_context(search_term, context, searcher, session=nil, options = {})
     search_term = search_term.to_s
     return User.none if search_term.strip.empty?
-    base_scope = scope_for(context, searcher, options.slice(:enrollment_type, :enrollment_role,
-      :enrollment_role_id, :exclude_groups, :enrollment_state, :include_inactive_enrollments, :sort, :order))
-    @db_union = nil
-    if search_term.to_s =~ Api::ID_REGEX
-      db_id = Shard.relative_id_for(search_term, Shard.current, Shard.current)
-      scope = base_scope.where(id: db_id)
-      # if the search_term is an id that is really big we will assume it is a
-      # canvas global_id
-      return scope if db_id > Shard::IDS_PER_SHARD
-      @db_union = "SELECT id FROM #{User.quoted_table_name} WHERE users.id IN (:db_id) \n UNION" if scope.exists?
-      unless SearchTermHelper.valid_search_term?(search_term)
-        return User.none unless scope.exists?
-      end
-      # no user found by id, so lets go ahead with the regular search, maybe this person just has a ton of numbers in their name
-    end
-
     SearchTermHelper.validate_search_term(search_term)
 
-    unless context.grants_right?(searcher, session, :manage_students) ||
-        context.grants_right?(searcher, session, :manage_admin_users)
-      restrict_search = true
-    end
+    @is_id = search_term =~ Api::ID_REGEX
+    @include_login = context.grants_right?(searcher, session, :view_user_logins)
+    @include_email = context.grants_right?(searcher, session, :read_email_addresses)
+    @include_sis   = context.grants_any_right?(searcher, session, :read_sis, :manage_sis)
+
     context.shard.activate do
+      base_scope = scope_for(context, searcher, options.slice(:enrollment_type, :enrollment_role,
+        :enrollment_role_id, :exclude_groups, :enrollment_state, :include_inactive_enrollments, :sort, :order))
+
       # TODO: Need to optimize this as it's not using the base scope filter for the conditions statement query
-      base_scope.where(conditions_statement(search_term, context.root_account, {restrict_search: restrict_search}))
+      base_scope.where(conditions_statement(search_term, context.root_account))
     end
+  end
+
+  def self.complex_search?
+    @include_login || @include_email || @include_sis || @is_id
   end
 
   def self.conditions_statement(search_term, root_account, options={})
     pattern = like_string_for(search_term)
     conditions = []
 
-    if complex_search_enabled? && !options[:restrict_search]
+    if complex_search_enabled? && complex_search?
       # db_id is only used if the search_term.to_s =~ Api::ID_REGEX
       params = {pattern: pattern, account: root_account, path_type: CommunicationChannel::TYPE_EMAIL, db_id: search_term}
       conditions << complex_sql << params
@@ -155,17 +147,26 @@ module UserSearch
   private
 
   def self.complex_sql
-    <<-SQL
-      users.id IN (
+    id_queries = ["SELECT id FROM #{User.quoted_table_name} WHERE (#{like_condition('users.name')})"]
+
+    if @include_login || @include_sis
+      pseudonym_conditions = []
+      pseudonym_conditions << like_condition('pseudonyms.unique_id') if @include_login
+      pseudonym_conditions << like_condition('pseudonyms.sis_user_id') if @include_sis
+      id_queries << <<-SQL
         SELECT user_id FROM #{Pseudonym.quoted_table_name}
-          WHERE (#{like_condition('pseudonyms.sis_user_id')} OR
-            #{like_condition('pseudonyms.unique_id')})
-            AND pseudonyms.workflow_state='active'
-            AND pseudonyms.account_id = :account
-        UNION
-        SELECT id FROM #{User.quoted_table_name} WHERE (#{like_condition('users.name')})
-        UNION
-        #{@db_union}
+          WHERE (#{pseudonym_conditions.join(' OR ')})
+          AND pseudonyms.workflow_state='active'
+          AND pseudonyms.account_id=:account
+      SQL
+    end
+
+    if @is_id
+      id_queries << "SELECT id FROM #{User.quoted_table_name} WHERE users.id IN (:db_id)"
+    end
+
+    if @include_email
+      id_queries << <<-SQL
         SELECT communication_channels.user_id FROM #{CommunicationChannel.quoted_table_name}
           WHERE EXISTS (SELECT 1 FROM #{UserAccountAssociation.quoted_table_name} AS uaa
                         WHERE uaa.account_id= :account
@@ -173,8 +174,10 @@ module UserSearch
             AND communication_channels.path_type = :path_type
             AND #{like_condition('communication_channels.path')}
             AND communication_channels.workflow_state IN ('active', 'unconfirmed')
-      )
-    SQL
+      SQL
+    end
+
+    "users.id IN (#{id_queries.join("\nUNION\n")})"
   end
 
   def self.gist_search_enabled?

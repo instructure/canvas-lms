@@ -22,7 +22,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper'
 describe "Groups API", type: :request do
   def group_json(group, opts = {})
     opts[:is_admin] ||= false
-    opts[:manage_users] ||= false
     opts[:include_users] ||= false
     opts[:include_category] ||= false
     opts[:include_permissions] ||= false
@@ -94,9 +93,6 @@ describe "Groups API", type: :request do
       'sortable_name' => user.sortable_name,
       'short_name' => user.short_name
     }
-    if opts[:manage_users]
-      hash['login_id'] = user.pseudonym.unique_id
-    end
     hash
   end
 
@@ -436,7 +432,7 @@ describe "Groups API", type: :request do
     expect(@community.is_public).to eq true
     expect(@community.join_level).to eq "parent_context_auto_join"
     expect(@community.avatar_attachment).to eq avatar
-    expect(json).to eq group_json(@community, :include_users => true, :include_permissions => true, :include_category => true, :manage_users => true)
+    expect(json).to eq group_json(@community, :include_users => true, :include_permissions => true, :include_category => true)
   end
 
   it "should only allow updating a group from private to public" do

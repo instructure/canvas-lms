@@ -241,6 +241,35 @@ describe Api::V1::User do
         })
     end
 
+    it "requires :view_user_logins to return login_id" do
+      RoleOverride.create!(context: Account.default, role: Role.get_built_in_role('AccountAdmin'),
+            permission: 'view_user_logins', enabled: false)
+      @user = User.create!(:name => 'Test User')
+      @user.pseudonyms.create!(:unique_id => 'abc', :account => Account.default)
+      json = @test_api.user_json(@user, @admin, {}, [], Account.default)
+      expect(json.keys).not_to include 'login_id'
+    end
+
+    context "include[]=email" do
+      before :once do
+        @user = User.create!(:name => 'User')
+        @user.pseudonyms.create!(:unique_id => 'abc', :account => Account.default)
+        @user.communication_channels.create(:path => 'abc@example.com').confirm!
+      end
+
+      it "includes email if requested" do
+        json = @test_api.user_json(@user, @admin, {}, ['email'], Account.default)
+        expect(json['email']).to eq 'abc@example.com'
+      end
+
+      it "does not include email without :read_email_addresses permission" do
+        RoleOverride.create!(context: Account.default, role: Role.get_built_in_role('AccountAdmin'),
+            permission: 'read_email_addresses', enabled: false)
+        json = @test_api.user_json(@user, @admin, {}, ['email'], Account.default)
+        expect(json.keys).not_to include 'email'
+      end
+    end
+
     context "computed scores" do
       before :once do
         @enrollment.scores.create!
@@ -295,6 +324,7 @@ describe Api::V1::User do
       expect(mock_context).to receive(:account).and_return(mock_context)
       expect(mock_context).to receive(:global_id).and_return(42)
       expect(mock_context).to receive(:grants_any_right?).with(@admin, :manage_students, :read_sis).and_return(true)
+      expect(mock_context).to receive(:grants_right?).with(@admin, {}, :view_user_logins).and_return(true)
       expect(if context_to_pass
         @test_api.user_json(@student, @admin, {}, [], context_to_pass)
       else

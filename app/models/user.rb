@@ -1059,6 +1059,12 @@ class User < ActiveRecord::Base
     given {|user| self.check_accounts_right?(user, :view_all_grades) }
     can :read_grades
 
+    given {|user| self.check_accounts_right?(user, :view_user_logins) }
+    can :view_user_logins
+
+    given {|user| self.check_accounts_right?(user, :read_email_addresses) }
+    can :read_email_addresses
+
     given do |user|
       self.check_accounts_right?(user, :manage_user_logins) && self.adminable_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) }
     end
