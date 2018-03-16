@@ -1488,6 +1488,12 @@ CanvasRails::Application.routes.draw do
       get 'groups/:group_id/folders/:id', controller: :folders, action: :show, as: 'group_folder'
     end
 
+    scope(controller: :developer_key_account_bindings) do
+      post 'accounts/:account_id/developer_keys/:developer_key_id/developer_key_account_bindings', action: :create
+      put 'accounts/:account_id/developer_keys/:developer_key_id/developer_key_account_bindings/:id', action: :update
+      get 'accounts/:account_id/developer_key_account_bindings', action: :index
+    end
+
     scope(controller: :developer_keys) do
       get 'developer_keys/:id', action: :show
       delete 'developer_keys/:id', action: :destroy
