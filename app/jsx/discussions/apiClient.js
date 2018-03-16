@@ -83,3 +83,9 @@ export function saveUserSettings ({currentUserId}, settings) {
 export function duplicateDiscussion ({ contextType, contextId }, discussionId) {
   return axios.post(`/api/v1/${contextType}s/${contextId}/discussion_topics/${discussionId}/duplicate`)
 }
+
+export function reorderPinnedDiscussions ({ contextType, contextId }, order) {
+  const postData = { order: order.join(',') }
+  const url = `/api/v1/${contextType}s/${contextId}/discussion_topics/reorder`
+  return axios.post(url, postData)
+}

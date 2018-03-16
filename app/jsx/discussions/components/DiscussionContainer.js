@@ -23,49 +23,31 @@ import I18n from 'i18n!discussions_v2'
 
 import ToggleDetails from '@instructure/ui-core/lib/components/ToggleDetails'
 import Text from '@instructure/ui-core/lib/components/Text'
+import update from 'immutability-helper'
 
 import DiscussionRow, { DraggableDiscussionRow } from '../../shared/components/DiscussionRow'
 import { discussionList } from '../../shared/proptypes/discussion'
 import masterCourseDataShape from '../../shared/proptypes/masterCourseData'
 import propTypes from '../propTypes'
 
-// We need to look at the previous state of a discussion as well as where it is
-// trying to be drag and dropped into in order to create a decent screenreader
-// success and fail message
-const generateDragAndDropMessages = (props, discussion) => {
-  if (props.pinned) {
-    return {
-      successMessage: I18n.t('Discussion pinned successfully'),
-      failMessage: I18n.t('Failed to pin discussion'),
-    }
-  } else if (discussion.pinned) {
-    return {
-      successMessage: I18n.t('Discussion unpinned successfully'),
-      failMessage: I18n.t('Failed to unpin discussion'),
-    }
-  } else if (props.closedState) {
-    return {
-      successMessage: I18n.t('Discussion opened for comments successfully'),
-      failMessage: I18n.t('Failed to close discussion for comments'),
-    }
-  } else {
-    return {
-      successMessage: I18n.t('Discussion closed for comments successfully'),
-      failMessage: I18n.t('Failed to open discussion for comments'),
-    }
-  }
-}
 
 // Handle drag and drop on a discussion. The props passed in tell us how we
 // should update the discussion if something is dragged into this container
 const discussionTarget = {
-  drop(props, monitor) {
+  drop(props, monitor, component) {
     const discussion = monitor.getItem()
     const updateFields = {}
     if (props.closedState !== undefined) updateFields.locked = props.closedState
     if (props.pinned !== undefined) updateFields.pinned =  props.pinned
-    const flashMessages = generateDragAndDropMessages(props, discussion)
-    props.updateDiscussion(discussion, updateFields, flashMessages)
+
+    // We currently cannot drag an item from a different container to a specific
+    // position in the pinned container, thus we only need to set the order when
+    // rearranging items in the pinned container, not when dragging a locked or
+    // unpinned discussion to the pinned container.
+    const order = (props.pinned && discussion.pinned)
+      ? component.state.discussions.map(d => d.id)
+      : undefined
+    props.handleDrop(discussion, updateFields, order)
   },
 }
 
@@ -77,12 +59,13 @@ export default class DiscussionsContainer extends Component {
     title: string.isRequired,
     toggleSubscribe: func.isRequired,
     updateDiscussion: func.isRequired,
+    handleDrop: func, // eslint-disable-line
     duplicateDiscussion: func.isRequired,
     cleanDiscussionFocus: func.isRequired,
     pinned: bool,
-    closedState: bool,
+    closedState: bool, // eslint-disable-line
     connectDropTarget: func,
-    roles: arrayOf(string),
+    roles: arrayOf(string), // eslint-disable-line
     renderContainerBackground: func.isRequired,
     onMoveDiscussion: func,
     deleteDiscussion: func,
@@ -95,14 +78,23 @@ export default class DiscussionsContainer extends Component {
     closedState: undefined,
     roles: ['user', 'student'],
     onMoveDiscussion: null,
-    deleteDiscussion: null
+    deleteDiscussion: null,
+    handleDrop: undefined,
   }
 
-  componentWillReceiveProps(newProps) {
+  constructor(props) {
+    super(props)
+    this.moveCard = this.moveCard.bind(this)
+    this.state = {
+      discussions: props.discussions,
+    }
+  }
+
+  componentWillReceiveProps(props) {
     if((this.props.discussions.length >= 1
-      && newProps.discussions.length === 0)
-      || (newProps.discussions[0]
-      && newProps.discussions[0].focusOn === "toggleButton")) {
+      && props.discussions.length === 0)
+      || (props.discussions[0]
+      && props.discussions[0].focusOn === "toggleButton")) {
       if(this.toggleBtn) {
         setTimeout(() => {
           this.toggleBtn.focus()
@@ -110,18 +102,36 @@ export default class DiscussionsContainer extends Component {
         });
       }
     }
+
+    if(this.props.discussions !== props.discussions) {
+      this.setState({
+        discussions: props.discussions,
+      })
+    }
   }
 
   wrapperToggleRef = (c) => {
     this.toggleBtn = c && c.querySelector('button')
   }
 
-  renderDiscussions () {
-    return this.props.discussions.reduce((accumlator, discussion) => {
-      if (discussion.filtered) {
-        return accumlator
-      }
+  moveCard(dragIndex, hoverIndex) {
+    const { discussions } = this.state
+    const dragDiscussion = discussions[dragIndex]
+    if (!dragDiscussion) {
+      return
+    }
+    const newDiscussions = update(this.state, {
+      discussions: {
+        $splice: [[dragIndex, 1], [hoverIndex, 0, dragDiscussion]],
+      },
+    })
+    newDiscussions.discussions = newDiscussions.discussions.map((discussion, index) => ({...discussion, sortableId: index}))
+    this.setState({discussions: newDiscussions.discussions})
+  }
 
+  renderDiscussions () {
+    return this.state.discussions.reduce((accumlator, discussion) => {
+      if (discussion.filtered) { return accumlator }
       const row = this.props.permissions.moderate
         ? <DraggableDiscussionRow
             key={discussion.id}
@@ -135,6 +145,7 @@ export default class DiscussionsContainer extends Component {
             updateDiscussion={this.props.updateDiscussion}
             onMoveDiscussion={this.props.onMoveDiscussion}
             deleteDiscussion={this.props.deleteDiscussion}
+            moveCard={this.moveCard}
             draggable
           />
         : <DiscussionRow

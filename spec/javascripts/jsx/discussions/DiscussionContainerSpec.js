@@ -67,7 +67,7 @@ test('renders a draggable discussion row when user has moderate permissions', ()
   const props = defaultProps()
   props.permissions.moderate = true
   const tree = shallow(<DiscussionContainer {...props} />)
-  const node = tree.find('DragSource(DiscussionRow)')
+  const node = tree.find('DropTarget(DragSource(DiscussionRow))')
   ok(node.exists())
 })
 

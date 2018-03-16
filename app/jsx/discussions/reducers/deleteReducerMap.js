@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import { actionTypes } from '../actions'
+import { setSortableId } from '../utils'
 
 const deleteReducerMap = {
   [actionTypes.DELETE_DISCUSSION_SUCCESS]: (state, action) => {
@@ -24,20 +25,20 @@ const deleteReducerMap = {
     ))
     const newState= state.slice()
     if (oldIndex < 0) {
-      return newState;
+      return newState
     }
     if(oldIndex === 0) {
       newState.splice(oldIndex, 1)
       if(newState.length) {
         newState[0] = { ...newState[0], focusOn: "toggleButton" }
       }
-      return newState;
+      return setSortableId(newState)
     } else {
       const newFocusIndex = oldIndex - 1;
       if(newState[newFocusIndex]) {
         newState[newFocusIndex] = { ...newState[newFocusIndex], focusOn: "manageMenu" }
         newState.splice(oldIndex, 1)
-        return newState
+        return setSortableId(newState)
       } else { // There is no discussions left
         return []
       }

@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!discussions_v2'
 import React, {Component} from 'react'
-import {func, bool, string, arrayOf, number} from 'prop-types'
+import {func, bool, string, arrayOf} from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import {DragDropContext} from 'react-dnd'
@@ -49,11 +49,15 @@ import {reorderDiscussionsURL} from '../utils'
 
 export default class DiscussionsIndex extends Component {
   static propTypes = {
-    updateDiscussion: func.isRequired,
-    contextType: string.isRequired,
-    contextId: number.isRequired,
+    arrangePinnedDiscussions: func.isRequired,
+    cleanDiscussionFocus: func.isRequired,
     closedForCommentsDiscussions: discussionList,
+    contextId: string.isRequired,
+    contextType: string.isRequired,
+    deleteDiscussion: func.isRequired,
+    duplicateDiscussion: func.isRequired,
     getDiscussions: func.isRequired,
+    handleDrop: func,
     hasLoadedDiscussions: bool.isRequired,
     isLoadingDiscussions: bool.isRequired,
     masterCourseData: masterCourseDataShape,
@@ -62,17 +66,14 @@ export default class DiscussionsIndex extends Component {
     roles: arrayOf(string).isRequired,
     toggleSubscriptionState: func.isRequired,
     unpinnedDiscussions: discussionList,
-    duplicateDiscussion: func.isRequired,
-    cleanDiscussionFocus: func.isRequired,
-    arrangePinnedDiscussions: func.isRequired,
-    deleteDiscussion: func.isRequired
+    updateDiscussion: func.isRequired,
   }
 
   static defaultProps = {
     pinnedDiscussions: [],
     unpinnedDiscussions: [],
     closedForCommentsDiscussions: [],
-    masterCourseData: null
+    handleDrop: undefined,
   }
 
   state = {
@@ -205,17 +206,18 @@ export default class DiscussionsIndex extends Component {
             discussions={this.props.pinnedDiscussions}
             permissions={this.props.permissions}
             masterCourseData={this.props.masterCourseData}
+            deleteDiscussion={this.openDeleteDiscussionsModal}
             toggleSubscribe={this.props.toggleSubscriptionState}
             updateDiscussion={this.props.updateDiscussion}
+            handleDrop={this.props.handleDrop}
             duplicateDiscussion={this.props.duplicateDiscussion}
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
             onMoveDiscussion={this.renderMoveDiscussionTray}
-            deleteDiscussion={this.openDeleteDiscussionsModal}
             roles={this.props.roles}
             pinned
             renderContainerBackground={() =>
               pinnedDiscussionBackground({
-                permissions: this.props.permissions
+                permissions: this.props.permissions,
               })
             }
           />
@@ -224,13 +226,14 @@ export default class DiscussionsIndex extends Component {
           <DroppableDiscussionsContainer
             title={I18n.t('Discussions')}
             discussions={this.props.unpinnedDiscussions}
+            deleteDiscussion={this.openDeleteDiscussionsModal}
             permissions={this.props.permissions}
             masterCourseData={this.props.masterCourseData}
             toggleSubscribe={this.props.toggleSubscriptionState}
             updateDiscussion={this.props.updateDiscussion}
+            handleDrop={this.props.handleDrop}
             duplicateDiscussion={this.props.duplicateDiscussion}
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
-            deleteDiscussion={this.openDeleteDiscussionsModal}
             pinned={false}
             closedState={false}
             roles={this.props.roles}
@@ -248,12 +251,13 @@ export default class DiscussionsIndex extends Component {
             title={I18n.t('Closed for Comments')}
             discussions={this.props.closedForCommentsDiscussions}
             permissions={this.props.permissions}
+            deleteDiscussion={this.openDeleteDiscussionsModal}
             masterCourseData={this.props.masterCourseData}
             toggleSubscribe={this.props.toggleSubscriptionState}
             updateDiscussion={this.props.updateDiscussion}
+            handleDrop={this.props.handleDrop}
             duplicateDiscussion={this.props.duplicateDiscussion}
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
-            deleteDiscussion={this.openDeleteDiscussionsModal}
             roles={this.props.roles}
             pinned={false}
             closedState
@@ -269,8 +273,7 @@ export default class DiscussionsIndex extends Component {
           defaultOpen
           selectedCount={1}
           applicationElement={() => document.getElementById('application')}
-        />)}
-      </Container>
+        />)} </Container>
     )
   }
 
@@ -313,6 +316,7 @@ const connectActions = dispatch =>
       'getDiscussions',
       'toggleSubscriptionState',
       'updateDiscussion',
+      'handleDrop',
       'duplicateDiscussion',
       'cleanDiscussionFocus',
       'arrangePinnedDiscussions',

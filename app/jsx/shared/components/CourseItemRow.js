@@ -39,7 +39,7 @@ import masterCourseDataShape from '../proptypes/masterCourseData'
 
 export default class CourseItemRow extends Component {
   static propTypes = {
-    actionsContent: node,
+    actionsContent: arrayOf(node),
     metaContent: node,
     masterCourse: shape({
       courseData: masterCourseDataShape,
@@ -48,7 +48,9 @@ export default class CourseItemRow extends Component {
     author: authorShape,
     title: string.isRequired,
     body: node,
+    isDragging: bool,
     connectDragSource: func,
+    connectDropTarget: func,
     id: string,
     className: string,
     itemUrl: string,
@@ -82,6 +84,7 @@ export default class CourseItemRow extends Component {
     },
     id: null,
     className: '',
+    isDragging: false,
     itemUrl: null,
     selectable: false,
     draggable: false,
@@ -89,7 +92,8 @@ export default class CourseItemRow extends Component {
     isRead: true,
     icon: null,
     showAvatar: false,
-    connectDragSource: null,
+    connectDragSource: (component) => component,
+    connectDropTarget: (component) => component,
     onSelectedChanged () {},
     showManageMenu: false,
     manageMenuOptions: [],
@@ -103,10 +107,6 @@ export default class CourseItemRow extends Component {
 
   state = {
     isSelected: this.props.defaultSelected,
-  }
-
-  componentWillUnmount () {
-    this.unmountMasterCourseLock()
   }
 
   componentDidMount () {
@@ -131,6 +131,10 @@ export default class CourseItemRow extends Component {
       }
       this.props.clearFocusDirectives()
     }
+  }
+
+  componentWillUnmount () {
+    this.unmountMasterCourseLock()
   }
 
   onSelectChanged = (e) => {
@@ -178,15 +182,14 @@ export default class CourseItemRow extends Component {
   render () {
     const classes = cx('ic-item-row')
     return (
-      <div className={`${classes} ${this.props.className}`}>
+      this.props.connectDropTarget(this.props.connectDragSource(
+      <div style={{ opacity: (this.props.isDragging) ? 0 : 1 }} className={`${classes} ${this.props.className}`}>
         {(this.props.draggable && this.props.connectDragSource && <div className="ic-item-row__drag-col">
-          {this.props.connectDragSource(
-            <span>
-              <Text color="secondary" size="large">
-                <IconDragHandleLine />
-              </Text>
-            </span>, {dropEffect: 'copy'})
-          }
+          <span>
+            <Text color="secondary" size="large">
+              <IconDragHandleLine />
+            </Text>
+          </span>
         </div>)}
         {
           !this.props.isRead ? (
@@ -242,7 +245,7 @@ export default class CourseItemRow extends Component {
             {this.props.metaContent}
           </div>
         </div>
-      </div>
+      </div>, {dropEffect: 'copy'}))
     )
   }
 }

@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import { actionTypes } from '../actions'
+import { setSortableId } from '../utils'
 
 function updatePositions(discussions, updatedPositions) {
   return discussions.map( (discussion) => {
@@ -47,7 +48,8 @@ const duplicationReducerMap = {
         : remainingOriginalDiscussions
 
       delete newDiscussion.new_positions
-      return newStateBeginning.concat(newStateEnd)
+      const unsortedDiscussions = newStateBeginning.concat(newStateEnd)
+      return setSortableId(unsortedDiscussions)
     } else {
       // The original discussion wasn't in this container, so the state should
       // not be changed.
