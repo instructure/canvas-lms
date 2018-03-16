@@ -62,11 +62,11 @@ describe SIS::UserImporter do
       Setting.set('sis_transaction_seconds', '1')
       user1 = SIS::Models::User.new(user_id: @user_id, login_id: @login_id, status: 'active',
                                     full_name: 'User One', email: 'user1@example.com')
-      SIS::UserImporter.new(@account, {}).process(messages) do |importer|
+      SIS::UserImporter.new(@account, {batch: @account.sis_batches.create!}).process(messages) do |importer|
         importer.add_user(user1)
       end
 
-      @message = messages.first
+      @message = messages.first.message
     end
 
     it 'must include the login_id' do

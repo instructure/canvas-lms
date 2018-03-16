@@ -36,18 +36,18 @@ module SIS
           csv_rows(csv, index, count) do |row|
             update_progress
             begin
-              importer.add_user(create_user(row))
+              importer.add_user(create_user(row, csv))
             rescue ImportError => e
-              messages << e.to_s
+              messages << SisBatch.build_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
             end
           end
         end
-        messages.each { |message| add_warning(csv, message) }
+        SisBatch.bulk_insert_sis_errors(messages)
         count
       end
 
       private
-      def create_user(row)
+      def create_user(row, csv)
         SIS::Models::User.new(
           user_id: row['user_id'],
           login_id: row['login_id'],
@@ -61,6 +61,8 @@ module SIS
           short_name: row['short_name'],
           full_name: row['full_name'],
           sortable_name: row['sortable_name'],
+          lineno: row['lineno'],
+          csv: csv,
           authentication_provider_id: row['authentication_provider_id']
         )
       end

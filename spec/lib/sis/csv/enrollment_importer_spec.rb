@@ -733,15 +733,15 @@ describe SIS::CSV::EnrollmentImporter do
     expect(SisPseudonym).to receive(:for).with(user, @account, type: :implicit, require_sis: false).once.and_return(nil)
 
     warnings = []
-    work = SIS::EnrollmentImporter::Work.new(nil, @account, Rails.logger, warnings)
+    work = SIS::EnrollmentImporter::Work.new(@account.sis_batches.create!, @account, Rails.logger, warnings)
     expect(work).to receive(:root_account_from_id).with('account2').once.and_return(account2)
     expect(SIS::EnrollmentImporter::Work).to receive(:new).with(any_args).and_return(work)
     # the enrollments
-    importer = process_csv_data(
+    process_csv_data(
         "course_id,root_account,user_id,role,status",
         "test_1,account2,user_1,teacher,active",
     )
-    expect(warnings).to eq ["User account2:user_1 does not have a usable login for this account"]
+    expect(warnings.first.message).to eq "User account2:user_1 does not have a usable login for this account"
     course = @account.courses.where(sis_source_id: 'test_1').first
     expect(course.teachers.to_a).to be_empty
   end

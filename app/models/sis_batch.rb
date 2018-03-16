@@ -27,7 +27,7 @@ class SisBatch < ActiveRecord::Base
   belongs_to :errors_attachment, class_name: 'Attachment'
   has_many :sis_batch_error_files
   has_many :parallel_importers, inverse_of: :sis_batch
-  has_many :sis_batch_errors, inverse_of: :sis_batch
+  has_many :sis_batch_errors, inverse_of: :sis_batch, autosave: false
   belongs_to :generated_diff, class_name: 'Attachment'
   belongs_to :batch_mode_term, class_name: 'EnrollmentTerm'
   belongs_to :user
@@ -84,6 +84,42 @@ class SisBatch < ActiveRecord::Base
     Attachment.skip_3rd_party_submits(false)
   end
 
+  def self.add_error(csv, message, sis_batch:, row: nil, failure: false, backtrace: nil, row_info: nil)
+    error = build_error(csv, message, row: row, failure: failure, backtrace: backtrace, row_info: row_info, sis_batch: sis_batch)
+    error.save!
+  end
+
+  def self.build_error(csv, message, sis_batch:, row: nil, failure: false, backtrace: nil, row_info: nil)
+    file = csv ? csv[:file] : nil
+    sis_batch.sis_batch_errors.build(root_account: sis_batch.account,
+                                     file: file,
+                                     message: message,
+                                     failure: failure,
+                                     backtrace: backtrace,
+                                     row_info: row_info,
+                                     row: row,
+                                     created_at: Time.zone.now)
+  end
+
+  def self.bulk_insert_sis_errors(errors)
+    errors.each_slice(1000) do |batch|
+      errors_hash = batch.map do |error|
+        {
+          root_account_id: error.root_account_id,
+          created_at: error.created_at,
+          sis_batch_id: error.sis_batch_id,
+          failure: error.failure,
+          file: error.file,
+          message: error.message,
+          backtrace: error.backtrace,
+          row: error.row,
+          row_info: error.row_info
+        }
+      end
+      SisBatchError.bulk_insert(errors_hash)
+    end
+  end
+
   workflow do
     state :initializing
     state :created
@@ -110,25 +146,6 @@ class SisBatch < ActiveRecord::Base
   end
 
   class Aborted < RuntimeError; end
-
-  def add_errors(messages, failure: true)
-    messages.each_slice(1000) do |batch|
-      records = batch.map do |message|
-        {
-          root_account_id: self.account.id,
-          created_at: Time.zone.now,
-          sis_batch_id: self.id,
-          failute: failure,
-          message: message
-        }
-      end
-      SisBatchError.bulk_insert(records)
-    end
-  end
-
-  def add_warnings(messages)
-    add_errors(messages, failure: false)
-  end
 
   def self.queue_job_for_account(account, run_at=nil)
     job_args = {:priority => Delayed::LOW_PRIORITY, :max_attempts => 1}
@@ -207,8 +224,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   def batch_aborted(message)
-    self.sis_batch_errors.create!(root_account: self.account,
-                                  message: message)
+    SisBatch.add_error(nil, message, sis_batch: self)
     raise SisBatch::Aborted
   end
 

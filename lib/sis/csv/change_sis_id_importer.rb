@@ -37,7 +37,7 @@ module SIS
             begin
               i.process_change_sis_id(create_change_data(row))
             rescue ImportError => e
-              add_warning(csv, e.to_s)
+              SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
             end
           end
         end
