@@ -125,6 +125,13 @@ RSpec.describe Outcomes::Import do
       expect(existing_group.reload).to have_attributes group_attributes
     end
 
+    it 'fails if outcome group has already appeared in import' do
+      importer.import_group(group_attributes)
+      expect do
+        importer.import_group(group_attributes)
+      end.to raise_error TestImporter::InvalidDataError, /already appeared/
+    end
+
     context 'with parents' do
       before do
         [parent1, parent2].each do |p|
@@ -233,6 +240,13 @@ RSpec.describe Outcomes::Import do
       importer.import_outcome(**outcome_attributes)
       existing_outcome.reload
       expect(existing_outcome.reload).to have_attributes outcome_attributes
+    end
+
+    it 'fails if outcome has already appeared in import' do
+      importer.import_outcome(outcome_attributes)
+      expect do
+        importer.import_outcome(outcome_attributes)
+      end.to raise_error TestImporter::InvalidDataError, /already appeared/
     end
 
     context 'with parents' do

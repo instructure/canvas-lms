@@ -86,6 +86,12 @@ module Outcomes
           guid: group[:vendor_guid]
         )
       end
+      if model.outcome_import_id == outcome_import_id
+        raise InvalidDataError, I18n.t(
+          'Group "%{guid}" has already appeared in this import',
+          guid: group[:vendor_guid]
+        )
+      end
       model.vendor_guid = group[:vendor_guid]
       model.title = group[:title]
       model.description = group[:description] || ''
@@ -112,6 +118,13 @@ module Outcomes
           guid: outcome[:vendor_guid]
         )
       end
+      if model.outcome_import_id == outcome_import_id
+        raise InvalidDataError, I18n.t(
+          'Outcome "%{guid}" has already appeared in this import',
+          guid: outcome[:vendor_guid]
+        )
+      end
+
       model.vendor_guid = outcome[:vendor_guid]
       model.title = outcome[:title]
       model.description = outcome[:description] || ''
