@@ -105,7 +105,7 @@ module Outcomes
       parents = find_parents(outcome)
 
       model = find_prior_outcome(outcome)
-      model.context ||= context
+      model.context = context if model.new_record?
       unless context_visible?(model.context)
         raise InvalidDataError, I18n.t(
           'Outcome "%{guid}" not in visible context',
@@ -130,8 +130,13 @@ module Outcomes
         model.save!
       elsif model.changed?
         raise InvalidDataError, I18n.t(
-          'Cannot modify fields for outcome from another context: %{changes}',
-          changes: model.changes.keys.inspect
+          'Cannot modify outcome from another context: %{changes}; outcome must be modified in %{context}',
+          changes: model.changes.keys.inspect,
+          context: if model.context.present?
+                     I18n.t('"%{name}"', name: model.context.name)
+                   else
+                     I18n.t('the global context')
+                   end
         )
       end
 
@@ -208,6 +213,7 @@ module Outcomes
     end
 
     def context_visible?(other_context)
+      return true if other_context.nil?
       other_context == context || context.account_chain.include?(other_context)
     end
 
@@ -223,7 +229,7 @@ module Outcomes
     end
 
     def outcome_import_id
-      @outcome_import_id ||= SecureRandom.random_number(2**32) # replace with OutcomeImport id
+      @outcome_import_id ||= @import&.id || SecureRandom.random_number(2**32)
     end
   end
 end

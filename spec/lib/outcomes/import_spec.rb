@@ -275,8 +275,9 @@ RSpec.describe Outcomes::Import do
       end
 
       context 'with outcomes from other contexts' do
+        let(:parent_context) { account_model }
+
         before do
-          parent_context = account_model
           context.update! parent_account: parent_context
           existing_outcome.update! context: parent_context
         end
@@ -284,13 +285,29 @@ RSpec.describe Outcomes::Import do
         it 'does not assign parents when attributes are changed' do
           expect do
             importer.import_outcome(**outcome_attributes, parent_guids: 'parent1')
-          end.to raise_error(TestImporter::InvalidDataError, /Cannot modify fields/)
+          end.to raise_error(TestImporter::InvalidDataError, /Cannot modify outcome from another context/)
         end
 
         it 'assigns parents for outcome in another context if attributes unchanged' do
           existing_outcome.update! outcome_attributes
           importer.import_outcome(**outcome_attributes, parent_guids: 'parent1')
           expect(parent1.child_outcome_links.map(&:content)).to include existing_outcome
+        end
+
+        context 'with global context' do
+          let(:parent_context) { nil }
+
+          it 'does not assign parents when attributes are changed' do
+            expect do
+              importer.import_outcome(**outcome_attributes, parent_guids: 'parent1')
+            end.to raise_error(TestImporter::InvalidDataError, /Cannot modify .* the global context/)
+          end
+
+          it 'assigns parents if attributes are unchanged' do
+            existing_outcome.update! outcome_attributes
+            importer.import_outcome(**outcome_attributes, parent_guids: 'parent1')
+            expect(parent1.child_outcome_links.map(&:content)).to include existing_outcome
+          end
         end
       end
     end
