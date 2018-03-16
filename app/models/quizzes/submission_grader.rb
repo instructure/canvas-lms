@@ -30,7 +30,7 @@ module Quizzes
       tally = 0
       user_answers = []
       data = @submission.submission_data || {}
-      @submission.questions_as_object.each do |q|
+      @submission.questions.each do |q|
         user_answer = self.class.score_question(q, data)
         user_answers << user_answer
         tally += (user_answer[:points] || 0) if user_answer[:correct]

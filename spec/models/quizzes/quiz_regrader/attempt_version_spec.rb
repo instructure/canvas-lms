@@ -36,8 +36,8 @@ describe Quizzes::QuizRegrader::AttemptVersion do
     end
   end
 
-  let(:quiz_data) do
-    question_regrades.map {|id, q| q.quiz_question.question_data.dup }
+  let(:questions) do
+    question_regrades.values.map { |q| q.quiz_question.question_data.dup }
   end
 
   let(:submission_data) do
@@ -47,7 +47,7 @@ describe Quizzes::QuizRegrader::AttemptVersion do
   let(:submission) do
     double(:score                 => 0,
          :score_before_regrade  => 1,
-         :quiz_data             => quiz_data,
+         :questions             => questions,
          :score=                => nil,
          :score_before_regrade= => nil,
          :submission_data       => submission_data,

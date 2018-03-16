@@ -29,7 +29,9 @@ describe Utf8Cleaner do
         "hai\xfba" => "haia",
         "hai\xfbab" => "haiab",
         "hai\xfbabc" => "haiabc",
-        "hai\xfbabcd" => "haiabcd"
+        "hai\xfbabcd" => "haiabcd",
+        "o\bhai" => "ohai",
+        "\x7Fohai" => "ohai"
     }
 
     test_strings.each do |input, output|

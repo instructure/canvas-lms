@@ -36,7 +36,8 @@ module Utf8Cleaner
     if string.respond_to?(:force_encoding)
       string.force_encoding(Encoding::UTF_8)
     end
-    string
+    # Strip ASCII backspace and delete characters
+    string.tr("\b\x7F", '')
   end
 
   def self.recursively_strip_invalid_utf8!(object, force_utf8 = false)

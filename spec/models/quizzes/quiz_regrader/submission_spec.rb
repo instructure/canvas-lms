@@ -36,7 +36,7 @@ describe Quizzes::QuizRegrader::Submission do
     end
   end
 
-  let(:quiz_data) do
+  let(:questions) do
     question_regrades.map do |id, q|
       q.quiz_question.question_data.dup.merge(question_name: "Question #{id}")
     end
@@ -49,7 +49,7 @@ describe Quizzes::QuizRegrader::Submission do
   let(:submission) do
     double(:score                 => 0,
          :score_before_regrade  => 1,
-         :quiz_data             => quiz_data,
+         :questions             => questions,
          :score=                => nil,
          :score_before_regrade= => nil,
          :submission_data       => submission_data,
@@ -77,7 +77,7 @@ describe Quizzes::QuizRegrader::Submission do
       :attempts => attempts,
       :score => 0,
       :score_before_regrade => 1,
-      :quiz_data => quiz_data,
+      :questions => questions,
       :score= => nil,
       :score_before_regrade= => nil,
       :submission_data => multiple_attempts_submission_data,
@@ -151,32 +151,36 @@ describe Quizzes::QuizRegrader::Submission do
   end
 
   describe "#rescored_submission" do
-    before do
-      regraded_quiz_data = question_regrades.map do |key, _|
+    let(:regraded_quiz_data) do
+      question_regrades.map do |key, _|
         Quizzes::QuizQuestionBuilder.decorate_question_for_submission({
           id: key,
           points_possible: question_group.question_points
         }, key)
       end
+    end
 
-      expect(submission).to receive(:quiz_data=).with(regraded_quiz_data) # rubocop:disable Rspec/ExpectInHook
-
-      @regrade_submission = Quizzes::QuizRegrader::Submission.new(
+    let(:regrade_submission) do
+      Quizzes::QuizRegrader::Submission.new(
         :submission        => submission,
         :question_regrades => question_regrades
       )
+    end
 
-      expect(@regrade_submission).to receive(:answers_to_grade).and_return [] # rubocop:disable Rspec/ExpectInHook
+    before do
+      allow(submission).to receive(:quiz_data=)
+      allow(regrade_submission).to receive(:answers_to_grade).and_return []
     end
 
     it "scores the submission based on the regraded answers" do
-      @regrade_submission.rescored_submission
+      regrade_submission.rescored_submission
+      expect(submission).to have_received(:quiz_data=).with(regraded_quiz_data)
     end
 
     it "doesn't change question names" do
-      allow(@regrade_submission).to receive_messages(submitted_answer_ids: quiz_data.map { |q| q[:id] })
+      allow(regrade_submission).to receive_messages(submitted_answer_ids: questions.map { |q| q[:id] })
 
-      question_names = @regrade_submission.rescored_submission.quiz_data.map do |q|
+      question_names = regrade_submission.rescored_submission.questions.map do |q|
         q[:question_name]
       end
 

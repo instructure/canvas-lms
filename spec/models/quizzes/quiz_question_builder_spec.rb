@@ -18,6 +18,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizQuestionBuilder do
+  let(:quiz_question_builder) { described_class.new }
+
   describe '#build_submission_questions' do
     before :once do
       course_with_student
@@ -33,11 +35,11 @@ describe Quizzes::QuizQuestionBuilder do
       @quiz.reload
       @quiz.generate_quiz_data
 
-      subject.build_submission_questions(@quiz.id, @quiz.stored_questions)
+      quiz_question_builder.build_submission_questions(@quiz.id, @quiz.stored_questions)
     end
 
     it 'should use a local question' do
-      questions = subject.build_submission_questions(1, [
+      questions = quiz_question_builder.build_submission_questions(1, [
         {
           id: 1,
           name: 'some question',
@@ -47,6 +49,23 @@ describe Quizzes::QuizQuestionBuilder do
 
       expect(questions.count).to eq(1)
       expect(questions[0][:id]).to eq(1)
+    end
+
+    it 'strips ascii escape characters from multiple dropdown questions' do
+      questions = quiz_question_builder.build_submission_questions(1, [
+        {
+          id: 1,
+          name: 'some question',
+          question_type: ::Quizzes::QuizQuestion::Q_MULTIPLE_DROPDOWNS,
+          question_text: 'Hello in Chinese is [blank]',
+          answers: [{
+            id: rand(1..999),
+            blank_id: 'blank',
+            text: "\b你好"
+          }]
+        }
+      ])
+      expect(questions[0][:question_text]).not_to include('\\b')
     end
 
     context 'with a question bank entry' do
@@ -213,7 +232,7 @@ describe Quizzes::QuizQuestionBuilder do
       it 'previously picked questions should still show up' do
         @quiz = @course.quizzes.create!
         @bank = @course.assessment_question_banks.create!
-        subject.options[:shuffle_questions] = false
+        quiz_question_builder.options[:shuffle_questions] = false
 
         aq1 = @bank.assessment_questions.create!({
           question_data: {
@@ -266,33 +285,33 @@ describe Quizzes::QuizQuestionBuilder do
     let(:answers) { ['a', 'b', 'c'] }
 
     context "on a shuffle answers question" do
-      before { subject.options[:shuffle_answers] = true }
+      before { quiz_question_builder.options[:shuffle_answers] = true }
 
       context "on a non-shuffleable question type" do
-        before { allow(subject).to receive(:shuffleable_question_type?).and_return(false) }
+        before { allow(quiz_question_builder).to receive(:shuffleable_question_type?).and_return(false) }
 
         it "doesn't shuffle" do
-          expect(subject.shuffle_answers(question)).to eq answers
+          expect(quiz_question_builder.shuffle_answers(question)).to eq answers
         end
       end
 
       context "on a shuffleable question type" do
-        before { allow(subject).to receive(:shuffleable_question_type?).and_return(true) }
+        before { allow(quiz_question_builder).to receive(:shuffleable_question_type?).and_return(true) }
 
         it "returns the same answers, not necessarily in the same order" do
-          expect(subject.shuffle_answers(question).sort).to eq answers.sort
+          expect(quiz_question_builder.shuffle_answers(question).sort).to eq answers.sort
         end
 
         it "shuffles" do
           expect(answers).to receive(:sort_by)
-          subject.shuffle_answers(question)
+          quiz_question_builder.shuffle_answers(question)
         end
       end
     end
 
     context "on a non-shuffle answers question" do
       it "doesn't shuffle" do
-        expect(subject.shuffle_answers(question)).to eq answers
+        expect(quiz_question_builder.shuffle_answers(question)).to eq answers
       end
     end
   end
@@ -302,15 +321,15 @@ describe Quizzes::QuizQuestionBuilder do
     let(:matches) { ['a', 'b', 'c'] }
 
     it "shuffles matches for a matching question" do
-      subject.options[:shuffle_answers] = true
+      quiz_question_builder.options[:shuffle_answers] = true
       expect(matches).to receive(:sort_by)
-      subject.shuffle_matches(question)
+      quiz_question_builder.shuffle_matches(question)
     end
 
     it "still shuffles even if shuffle_answers option is off" do
-      subject.options[:shuffle_answers] = false
+      quiz_question_builder.options[:shuffle_answers] = false
       expect(matches).to receive(:sort_by)
-      subject.shuffle_matches(question)
+      quiz_question_builder.shuffle_matches(question)
     end
   end
 end

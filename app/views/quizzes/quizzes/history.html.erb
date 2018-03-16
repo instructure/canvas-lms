@@ -37,7 +37,7 @@
     <li>
       <div id='quiz-nav-inner-wrapper'>
         <ul>
-          <% @submission.questions_as_object.each_with_index do |question, i| %>
+          <% @submission.questions.each_with_index do |question, i| %>
             <% index = i + 1 %>
             <li id='quiz_nav_<%= question['id'] %>' class="q<%= index %> quiz-nav-li" data-id='<%= question['id'] %>' data-index='<%=i%>'>
               <a class='question_<%= question['id'] %> question-nav-link' data-id='<%= question['id'] %>' href="#question_<%= question['id'] %>">

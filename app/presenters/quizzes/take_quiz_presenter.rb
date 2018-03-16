@@ -25,6 +25,8 @@ class Quizzes::TakeQuizPresenter
     :submission_data,
     :answers
 
+  delegate :one_question_at_a_time?, :cant_go_back?, :require_lockdown_browser?, to: :quiz
+
   def initialize(quiz, submission, params)
     self.quiz = quiz
     self.submission = submission
@@ -39,11 +41,7 @@ class Quizzes::TakeQuizPresenter
   end
 
   def all_questions
-    @all_questions ||= submission.questions_as_object.compact
-  end
-
-  def one_question_at_a_time?
-    quiz.one_question_at_a_time?
+    @all_questions ||= submission.questions.compact
   end
 
   def previous_question_viewable?
@@ -54,16 +52,8 @@ class Quizzes::TakeQuizPresenter
     next_question.nil? || !one_question_at_a_time?
   end
 
-  def cant_go_back?
-    quiz.cant_go_back?
-  end
-
   def can_go_back?
     !cant_go_back?
-  end
-
-  def require_lockdown_browser?
-    quiz.require_lockdown_browser?
   end
 
   def form_class

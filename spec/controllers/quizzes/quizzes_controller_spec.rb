@@ -462,6 +462,42 @@ describe Quizzes::QuizzesController do
       expect(response).to be_success
       expect(submission.reload.has_seen_results).to be_nil
     end
+
+    context "with non-utf8 multiple dropdown question" do
+      render_views
+
+      let(:answer) do
+        {
+          'id' => rand(1..999),
+          'text' => "\b你好", # the \b causes psych to store this as a binary string
+          'blank_id' => 'blank'
+        }
+      end
+
+      before do
+        course_quiz(true)
+
+        @quiz.quiz_questions.create!(question_data: {
+          'question_type' => 'multiple_dropdowns_question',
+          'question_text' => '<p>Hello in Chinese is [blank]</p>',
+          'answers' => [answer]
+        })
+        @quiz.generate_quiz_data
+        @quiz.save!
+      end
+
+      it "renders preview without error" do
+        quiz_submission = @quiz.generate_submission(@student)
+        quiz_submission.mark_completed
+        quiz_submission.quiz_data = [{ 'answers' => [answer] }]
+        quiz_submission.temporary_user_code = temporary_user_code
+        quiz_submission.save!
+
+        user_session(@teacher)
+        get 'show', params: { course_id: @course.id, id: @quiz.id, take: '1', preview: '1' }
+        expect(response).to have_http_status(:success)
+      end
+    end
   end
 
   describe "GET 'managed_quiz_data'" do

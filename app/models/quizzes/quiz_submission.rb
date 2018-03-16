@@ -113,12 +113,11 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def sanitize_responses
-    questions && questions.select { |q| q['question_type'] == 'essay_question' }.each do |q|
+    questions.select { |q| q['question_type'] == 'essay_question' }.each do |q|
       question_id = q['id']
       if graded?
-        if submission = submission_data.find { |s| s[:question_id] == question_id }
-          submission[:text] = Sanitize.clean(submission[:text] || "", CanvasSanitize::SANITIZE)
-        end
+        submission = submission_data.find { |s| s[:question_id] == question_id }
+        submission[:text] = Sanitize.clean(submission[:text] || "", CanvasSanitize::SANITIZE) if submission
       else
         question_key = "question_#{question_id}"
         if submission_data[question_key]
@@ -234,11 +233,11 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def points_possible_at_submission_time
-    self.questions_as_object.map { |q| q[:points_possible].to_f }.compact.sum || 0
+    self.questions.map { |q| q[:points_possible].to_f }.compact.sum || 0
   end
 
   def questions
-    Utf8Cleaner.recursively_strip_invalid_utf8!(self.quiz_data, true)
+    Utf8Cleaner.recursively_strip_invalid_utf8!(self.quiz_data, true) || []
   end
 
   def backup_submission_data(params)
@@ -334,14 +333,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     })
   end
 
-  def questions_as_object
-    self.quiz_data || []
-  end
-
   def quiz_question_ids
-    questions_as_object.map{ |question|
-      question["id"]
-    }.compact
+    questions.map { |question| question["id"] }.compact
   end
 
   def quiz_questions
