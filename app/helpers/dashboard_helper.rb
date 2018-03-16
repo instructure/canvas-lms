@@ -33,6 +33,10 @@ module DashboardHelper
     end
   end
 
+  def show_planner?
+    @current_user&.preferences&.dig(:dashboard_view) == 'planner'
+  end
+
   def show_welcome_message?
     @current_user.present? && !@current_user.has_active_enrollment?
   end
