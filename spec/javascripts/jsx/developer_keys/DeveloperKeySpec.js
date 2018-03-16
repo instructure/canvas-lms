@@ -62,6 +62,7 @@ function props() {
       user_name: "billy bob",
       vendor_code: "b3w9w9bf",
       workflow_state: "active",
+      visible: false,
     }
   }
 }

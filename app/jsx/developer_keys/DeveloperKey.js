@@ -18,6 +18,7 @@
 
 import classNames from 'classnames'
 import $ from 'jquery'
+import 'jquery.instructure_date_and_time'
 import 'jqueryui/dialog'
 import I18n from 'i18n!react_developer_keys'
 import React from 'react'
@@ -32,6 +33,8 @@ class DeveloperKey extends React.Component {
     this.editLinkHandler = this.editLinkHandler.bind(this);
     this.deleteLinkHandler = this.deleteLinkHandler.bind(this);
     this.focusDeleteLink = this.focusDeleteLink.bind(this);
+    this.makeVisibleLinkHandler = this.makeVisibleLinkHandler.bind(this);
+    this.makeInvisibleLinkHandler = this.makeInvisibleLinkHandler.bind(this);
   }
 
   activateLinkHandler (event)
@@ -49,6 +52,26 @@ class DeveloperKey extends React.Component {
     event.preventDefault()
     this.props.store.dispatch(
       this.props.actions.deactivateDeveloperKey(
+        this.props.developerKey
+      )
+    )
+  }
+
+  makeVisibleLinkHandler (event)
+  {
+    event.preventDefault()
+    this.props.store.dispatch(
+      this.props.actions.makeVisibleDeveloperKey(
+        this.props.developerKey
+      )
+    )
+  }
+
+  makeInvisibleLinkHandler (event)
+  {
+    event.preventDefault()
+    this.props.store.dispatch(
+      this.props.actions.makeInvisibleDeveloperKey(
         this.props.developerKey
       )
     )
@@ -100,54 +123,109 @@ class DeveloperKey extends React.Component {
     this.deleteLink.focus();
   }
 
+  getLinkHelper(options) {
+    const iconClassName = `icon-${options.iconType} standalone-icon`
+    return (
+      <a href="#"
+        role={options.role}
+        aria-checked={options.ariaChecked} aria-label={options.ariaLabel}
+        className={options.className} title={options.title}
+        ref={options.refLink}
+        onClick={options.onClick}>
+          <i className={iconClassName} />
+      </a>)
+  }
+
+  getActivateLink(developerName) {
+    return this.getLinkHelper({
+      role: "checkbox",
+      ariaChecked: "false",
+      ariaLabel: I18n.t("Activate key %{developerName}", {developerName}),
+      className: "deactivate_link",
+      title: I18n.t("Activate this key"),
+      onClick: this.activateLinkHandler,
+      iconType: "unlock",
+    })
+  }
+
+  getDeactivateLink(developerName) {
+    return this.getLinkHelper({
+      role: "checkbox",
+      ariaChecked: "true",
+      ariaLabel: I18n.t("Deactivate key %{developerName}", {developerName}),
+      className: "deactivate_link",
+      title: I18n.t("Deactivate this key"),
+      onClick: this.deactivateLinkHandler,
+      iconType: "lock"
+    })
+  }
+
+  getEditLink(developerName) {
+    return this.getLinkHelper({
+      ariaChecked: null,
+      ariaLabel: I18n.t("Edit key %{developerName}", {developerName}),
+      className: "edit_link",
+      title: I18n.t("Edit this key"),
+      onClick: this.editLinkHandler,
+      iconType: "edit"
+    })
+  }
+
+  refDeleteLink = (link) => { this.deleteLink = link; }
+
+  getDeleteLink(developerName) {
+    return this.getLinkHelper({
+      ariaChecked: null,
+      ariaLabel: I18n.t("Delete key %{developerName}", {developerName}),
+      className: "delete_link",
+      title: I18n.t("Delete this key"),
+      onClick: this.deleteLinkHandler,
+      iconType: "trash",
+      refLink: this.refDeleteLink
+    })
+  }
+
+  getMakeVisibleLink() {
+    const label = I18n.t("Make key visible")
+    return this.getLinkHelper({
+      role: "checkbox",
+      ariaChecked: false,
+      ariaLabel: label,
+      className: "deactivate_link",
+      title: label,
+      onClick: this.makeVisibleLinkHandler,
+      iconType: "off",
+    })
+  }
+
+  getMakeInvisibleLink() {
+    const label = I18n.t("Make key invisible")
+    return this.getLinkHelper({
+      role: "checkbox",
+      ariaChecked: true,
+      ariaLabel: label,
+      className: "deactivate_link",
+      title: label,
+      onClick: this.makeInvisibleLinkHandler,
+      iconType: "eye",
+    })
+  }
+
   links (developerKey) {
     const developerNameCached = this.developerName(developerKey)
 
-    const localizedActivateLabel = I18n.t("Activate key %{developerName}", {developerName: developerNameCached})
-
-    const activateLink = (
-      <a href="#" role="checkbox"
-        aria-checked="false" aria-label={localizedActivateLabel}
-        className="deactivate_link" title={I18n.t("Activate this key")}
-        onClick={this.activateLinkHandler}>
-          <i className="icon-unlock standalone-icon" />
-      </a>)
-
-    const localizedDeactivateLabel = I18n.t("Deactivate key %{developerName}", {developerName: developerNameCached})
-
-    const deactivateLink = (
-      <a href="#" role="checkbox"
-        aria-checked="true" aria-label={localizedDeactivateLabel}
-        className="deactivate_link" title={I18n.t("Deactivate this key")}
-        onClick={this.deactivateLinkHandler}>
-          <i className="icon-lock standalone-icon" />
-      </a>)
-
-    const localizedEditLabel = I18n.t("Edit key %{developerName}", {developerName: developerNameCached})
-
-    const editLink = (
-      <a href="#" className="edit_link"
-        aria-label={localizedEditLabel}
-        title={I18n.t("Edit this key")}
-        onClick={this.editLinkHandler}>
-          <i className="icon-edit standalone-icon" />
-      </a>)
-
-    const localizedDeleteLabel = I18n.t("Delete key %{developerName}", {developerName: developerNameCached})
-
-    const deleteLink = (
-      <a href="#" className="delete_link"
-        aria-label={localizedDeleteLabel}
-        title={I18n.t("Delete this key")}
-        ref={(link) => { this.deleteLink = link; }}
-        onClick={this.deleteLinkHandler}>
-          <i className="icon-trash standalone-icon" />
-      </a>)
+    const activateLink = this.getActivateLink(developerNameCached);
+    const deactivateLink = this.getDeactivateLink(developerNameCached)
+    const editLink = this.getEditLink(developerNameCached)
+    const deleteLink = this.getDeleteLink(developerNameCached)
+    const makeVisibleLink = this.getMakeVisibleLink()
+    const makeInvisibleLink = this.getMakeInvisibleLink()
 
     return (
       <div>
         {editLink}
         {this.isActive(developerKey) ? deactivateLink : activateLink}
+        {developerKey.visible ? makeInvisibleLink : makeVisibleLink}
         {deleteLink}
       </div>
     )
@@ -245,6 +323,8 @@ DeveloperKey.propTypes = {
     dispatch: PropTypes.func.isRequired,
   }).isRequired,
   actions: PropTypes.shape({
+    makeVisibleDeveloperKey: PropTypes.func.isRequired,
+    makeInvisibleDeveloperKey: PropTypes.func.isRequired,
     activateDeveloperKey: PropTypes.func.isRequired,
     deactivateDeveloperKey: PropTypes.func.isRequired,
     deleteDeveloperKey: PropTypes.func.isRequired,
