@@ -79,6 +79,7 @@ it('shows a flash alert when upload fails', () => {
     type: 'error',
     message: 'There were errors with your import, please examine your file and attempt the upload again. Check your email for more details.'
   })
+  expect(resetOutcomeViews).toBeCalled()
 })
 
 it('uploads file when the upload begins', () => {

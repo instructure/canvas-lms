@@ -189,7 +189,7 @@ describe Outcomes::CsvImporter do
       import_fake_csv([headers] + (1..3).map { |ix| group_row(vendor_guid: ix) }.to_a) do |status|
         increments.push(status[:progress])
       end
-      expect(increments).to eq([0, 50, 100])
+      expect(increments).to eq([0, 50, 100, 100])
     end
 
     it 'properly sets mastery_points' do
@@ -253,6 +253,10 @@ describe Outcomes::CsvImporter do
       ])
     end
 
+    it 'when the file is empty' do
+      expect_import_error([], [[1, 'File has no data']])
+    end
+
     it 'when required headers are missing' do
       expect_import_error(
         [['parent_guids', 'ratings']],
@@ -271,6 +275,13 @@ describe Outcomes::CsvImporter do
       expect_import_error(
         [['vendor_guid', 'title', 'object_type', 'spanish_inquisition', 'parent_guids', 'ratings']],
         [[1, 'Invalid fields: ["spanish_inquisition"]']]
+      )
+    end
+
+    it 'when no data rows are present' do
+      expect_import_error(
+        [headers + ['ratings']],
+        [[1, 'File has no outcomes data']]
       )
     end
   end

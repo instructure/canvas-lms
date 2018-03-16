@@ -54,30 +54,32 @@ module Outcomes
       status = { progress: 0, errors: [] }
       yield status
 
+      file_errors = []
       begin
         parse_file(&update)
       rescue CSV::MalformedCSVError
-        status = {
-          errors: [[1, I18n.t("Invalid CSV File")]],
-          progress: 100,
-        }
-        yield status
+        file_errors << [1, I18n.t("Invalid CSV File")]
       rescue ParseError => e
-        status = {
-          errors: [[1, e.message]],
-          progress: 100,
-        }
-        yield status
+        file_errors << [1, e.message]
       end
+      status = {
+        errors: file_errors,
+        progress: 100
+      }
+      yield status
     end
 
     def parse_file
       headers = nil
       total = file_line_count
+      raise ParseError, I18n.t('File has no data') if total < 1
+
       separator = test_header_i18n
       rows = CSV.new(@file, col_sep: separator).to_enum
       rows.with_index(1).each_slice(BATCH_SIZE) do |batch|
         headers ||= validate_headers(*batch.shift)
+        raise ParseError, I18n.t('File has no outcomes data') if batch.empty?
+
         errors = parse_batch(headers, batch)
         status = {
           errors: errors,
