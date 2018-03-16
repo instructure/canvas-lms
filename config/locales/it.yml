@@ -5281,18 +5281,18 @@ it:
       - Sab
     abbr_month_names: 
       - ~
-      - Gen
-      - Feb
-      - Mar
-      - Apr
-      - Mag
-      - Giu
-      - Lug
-      - Ago
-      - Set
-      - Ott
-      - Nov
-      - Dic
+      - gen
+      - feb
+      - mar
+      - apr
+      - mag
+      - giu
+      - lug
+      - ago
+      - set
+      - ott
+      - nov
+      - dic
     datepicker: 
       column_headings: 
         - Do
@@ -5332,18 +5332,18 @@ it:
       weekday: "%A"
     month_names: 
       - ~
-      - Gennaio
-      - Febbraio
-      - Marzo
-      - Aprile
-      - Maggio
-      - Giugno
-      - Luglio
-      - Agosto
-      - Settembre
-      - Ottobre
-      - Novembre
-      - Dicembre
+      - gennaio
+      - febbraio
+      - marzo
+      - aprile
+      - maggio
+      - giugno
+      - luglio
+      - agosto
+      - settembre
+      - ottobre
+      - novembre
+      - dicembre
   date_at_time_25a04cd2: "%{date} alle %{time}"
   date_created_87e265bc: "Data creazione"
   date_ee500367: Data
