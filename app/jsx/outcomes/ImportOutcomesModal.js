@@ -27,6 +27,7 @@ import Billboard from '@instructure/ui-core/lib/components/Billboard'
 import Text from '@instructure/ui-core/lib/components/Text'
 import Link from '@instructure/ui-core/lib/components/Link'
 import Container from '@instructure/ui-core/lib/components/Container'
+import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent'
 import SVGWrapper from '../shared/SVGWrapper'
 
 export function showImportOutcomesModal (props) {
@@ -111,7 +112,7 @@ export default class ImportOutcomesModal extends Component {
                   heading={I18n.t('Upload your Outcomes!')}
                   headingLevel='h2'
                   message={I18n.t('Drag and drop or click to browse your computer')}
-                  hero={<div style={styles}><SVGWrapper url="/images/upload_rocket.svg"/></div>}
+                  hero={<div style={styles}><PresentationContent><SVGWrapper url="/images/upload_rocket.svg"/></PresentationContent></div>}
                 />
                 <Text fontStyle="italic">{I18n.t('CSV or JSON formats only')}</Text>
               </div>
