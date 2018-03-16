@@ -151,6 +151,7 @@ class UsersController < ApplicationController
   include SectionTabHelper
   include I18nUtilities
   include CustomColorHelper
+  include DashboardHelper
 
   before_action :require_user, :only => [:grades, :merge, :kaltura_session,
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
@@ -507,16 +508,6 @@ class UsersController < ApplicationController
     end
   end
 
-  helper_method :show_planner?
-  def show_planner?
-    return false unless @current_user && @current_user.preferences
-    if @current_user.preferences[:dashboard_view]
-      @current_user.preferences[:dashboard_view] == 'planner'
-    else
-      false
-    end
-  end
-
   def user_dashboard
     if planner_enabled?
       js_bundle :react_todo_sidebar
@@ -540,7 +531,7 @@ class UsersController < ApplicationController
     js_env({
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
       :PREFERENCES => {
-        :recent_activity_dashboard => @current_user.preferences[:dashboard_view] == 'activity' || @current_user.preferences[:recent_activity_dashboard],
+        :recent_activity_dashboard => show_recent_activity?,
         :hide_dashcard_color_overlays => @current_user.preferences[:hide_dashcard_color_overlays],
         :custom_colors => @current_user.custom_colors,
         :show_planner => show_planner?
