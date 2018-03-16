@@ -17,12 +17,12 @@
  */
 import React, { Component } from 'react';
 import themeable from '@instructure/ui-themeable/lib';
-import containerQuery from '@instructure/ui-utils/lib/react/containerQuery';
 import Button from '@instructure/ui-core/lib/components/Button';
 import Pill from '@instructure/ui-core/lib/components/Pill';
 import IconArrowOpenRight from 'instructure-icons/lib/Solid/IconArrowOpenRightSolid';
 import BadgeList from '../BadgeList';
-import { func, number, string, arrayOf, shape } from 'prop-types';
+import NotificationBadge, { MissingIndicator, NewActivityIndicator} from '../NotificationBadge';
+import { func, number, string, arrayOf, shape, oneOf } from 'prop-types';
 import { badgeShape } from '../plannerPropTypes';
 import {animatable} from '../../dynamic-ui';
 
@@ -32,7 +32,6 @@ import theme from './theme.js';
 import formatMessage from '../../format-message';
 
 export class CompletedItemsFacade extends Component {
-
   static propTypes = {
     onClick: func.isRequired,
     itemCount: number.isRequired,
@@ -41,13 +40,14 @@ export class CompletedItemsFacade extends Component {
     animatableItemIds: arrayOf(string),
     registerAnimatable: func,
     deregisterAnimatable: func,
-  }
-
+    notificationBadge: oneOf(['none', 'newActivity', 'missing']),
+  };
   static defaultProps = {
     badges: [],
     registerAnimatable: () => {},
     deregisterAnimatable: () => {},
-  }
+    notificationBadge: 'none',
+  };
 
   componentDidMount () {
     this.props.registerAnimatable('item', this, this.props.animatableIndex, this.props.animatableItemIds);
@@ -84,9 +84,25 @@ export class CompletedItemsFacade extends Component {
     return null;
   }
 
+  renderNotificationBadge () {
+    if (this.props.notificationBadge === 'none') return null;
+
+    const isNewItem = this.props.notificationBadge === 'newActivity';
+    const IndicatorComponent = isNewItem ? NewActivityIndicator : MissingIndicator;
+    const badgeMessage = formatMessage('{items} completed {items, plural,=1 {item} other {items}}', {items: this.props.itemCount});
+    return (
+      <div className={styles.activityIndicator}>
+        <IndicatorComponent
+        title={badgeMessage}
+        itemIds={this.props.animatableItemIds}
+        animatableIndex={this.props.animatableIndex} />
+      </div>
+    );
+  }
   render () {
     return (
       <div className={styles.root} ref={elt => this.rootDiv = elt}>
+        <NotificationBadge>{this.renderNotificationBadge()}</NotificationBadge>
         <div className={styles.contentPrimary}>
           <Button
             variant="link"
@@ -114,11 +130,4 @@ export class CompletedItemsFacade extends Component {
   }
 }
 
-export default animatable(themeable(theme, styles)(
-  // we can update this to be whatever works for this component and its content
-  containerQuery({
-    'media-x-large': { minWidth: '68rem' },
-    'media-large': { minWidth: '58rem' },
-    'media-medium': { minWidth: '34rem' }
-  })(CompletedItemsFacade)
-));
+export default animatable(themeable(theme, styles)(CompletedItemsFacade));

@@ -2,6 +2,7 @@
 
 exports[`renders as a div with a Checkbox and a string of text indicating count 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Button
       as="button"

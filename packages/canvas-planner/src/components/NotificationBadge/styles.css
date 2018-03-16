@@ -1,0 +1,21 @@
+.root {
+}
+
+.activityIndicator {
+  width: var(--activityIndicatorWidth);
+  padding: var(--activityIndicatorPadding);
+
+  &.hasBadge {
+    background: transparent;
+    width: auto;
+    height: auto;
+    align-items: center;
+    justify-content: center;
+    position: static;
+    display: flex;
+    top: auto;
+    right: auto;
+    z-index: 1;
+    border-radius: 0;
+  }
+}

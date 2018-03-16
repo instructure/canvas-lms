@@ -41,7 +41,7 @@ export default function generator ({ borders, colors, spacing, typography }) {
 
     typeMargin: spacing.xxxSmall,
 
-    titleLineHeight: typography.lineHeightFit
+    titleLineHeight: typography.lineHeightFit,
   };
 }
 

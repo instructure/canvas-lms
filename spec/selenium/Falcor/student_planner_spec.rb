@@ -118,7 +118,7 @@ describe "student planner" do
     it "ensures time zone changes update the planner items", priority: "1", test_id: 3306207 do
       go_to_list_view
       time = calendar_time_string(@assignment.due_at).chop
-      expect(fxpath("//div[@class='PlannerApp']//span[text()[contains(.,'DUE: #{time}')]]")).
+      expect(fxpath("//div[contains(@class, 'PlannerApp')]//span[contains(text(),'DUE: #{time}')]")).
         to be_displayed
       @student1.time_zone = 'Asia/Tokyo'
       @student1.save!
@@ -126,7 +126,7 @@ describe "student planner" do
 
       # the users time zone is not converted to UTC and to balance it we subtract 6 hours from the due time
       time = calendar_time_string(@assignment.due_at+9.hours).chop
-      expect(fxpath("//div[@class='PlannerApp']//span[text()[contains(.,'DUE: #{time}')]]")).
+      expect(fxpath("//div[contains(@class, 'PlannerApp')]//span[contains(text(),'DUE: #{time}')]")).
         to be_displayed
     end
 
@@ -137,7 +137,7 @@ describe "student planner" do
       force_click("button:contains('Load prior')")
       planner = f('.PlannerApp')
       expect(planner).to be_displayed
-      assn_element = fxpath("//span[text()[contains(.,'Unnamed Course Assignment')]]", planner)
+      assn_element = fxpath("//span[contains(text(),'Unnamed Course Assignment')]", planner)
       expect(assn_element).to be_displayed
       validate_pill('Missing')
     end

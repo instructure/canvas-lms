@@ -1,5 +1,5 @@
 /*
- * Copyright (C) <%= YEAR %> - present Instructure, Inc.
+ * Copyright (C) 2018 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -15,3 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+ export default function generator ({ colors, spacing }) {
+  return {
+    activityIndicatorPadding: spacing.small,
+    activityIndicatorWidth: spacing.small,
+    activityIndicatorBorderSize: '1rem',
+    activityIndicatorBackground: colors.white,
+  };
+}

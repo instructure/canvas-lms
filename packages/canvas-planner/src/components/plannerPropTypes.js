@@ -46,10 +46,27 @@ export const opportunityShape = {
   nextUrl: PropTypes.string,
 };
 
+export const sizeShape = PropTypes.oneOf(['medium', 'large']);
+
+export const statusShape = PropTypes.oneOfType([
+  PropTypes.bool,
+  PropTypes.shape({
+    excused: PropTypes.bool,
+    graded: PropTypes.bool,
+    has_feedback: PropTypes.bool,
+    late: PropTypes.bool,
+    missing: PropTypes.bool,
+    needs_grading: PropTypes.bool,
+    submitted: PropTypes.bool,
+  })
+]);
+
 export default {
   badgeShape,
   userShape,
   courseShape,
   itemShape,
-  opportunityShape
+  opportunityShape,
+  sizeShape,
+  statusShape,
 };

@@ -17,7 +17,6 @@
  */
 import React, { Component } from 'react';
 import themeable from '@instructure/ui-themeable/lib';
-import containerQuery from '@instructure/ui-utils/lib/react/containerQuery';
 import Text from '@instructure/ui-core/lib/components/Text';
 import Checkbox from '@instructure/ui-core/lib/components/Checkbox';
 import Link from '@instructure/ui-core/lib/components/Link';
@@ -30,11 +29,13 @@ import Announcement from 'instructure-icons/lib/Line/IconAnnouncementLine';
 import Discussion from 'instructure-icons/lib/Line/IconDiscussionLine';
 import Calendar from 'instructure-icons/lib/Line/IconCalendarMonthLine';
 import Page from 'instructure-icons/lib/Line/IconMsWordLine';
+import NotificationBadge, { MissingIndicator, NewActivityIndicator } from '../NotificationBadge';
 import BadgeList from '../BadgeList';
 import styles from './styles.css';
 import theme from './theme.js';
 import { arrayOf, bool, number, string, func, shape, object } from 'prop-types';
-import { badgeShape, userShape } from '../plannerPropTypes';
+import { badgeShape, userShape, statusShape } from '../plannerPropTypes';
+import { showPillForOverdueStatus } from '../../utilities/statusUtils';
 import { momentObj } from 'react-moment-proptypes';
 import formatMessage from '../../format-message';
 import {animatable} from '../../dynamic-ui';
@@ -61,6 +62,9 @@ export class PlannerItem extends Component {
     registerAnimatable: func,
     deregisterAnimatable: func,
     toggleAPIPending: bool,
+    status: statusShape,
+    newActivity: bool,
+    showNotificationBadge: bool,
     currentUser: shape(userShape),
   };
 
@@ -220,6 +224,31 @@ export class PlannerItem extends Component {
     );
   }
 
+  renderNotificationBadge () {
+    if (!this.props.showNotificationBadge) {
+      return null;
+    }
+
+    const newItem = this.props.newActivity;
+    let missing = false;
+    if (showPillForOverdueStatus('missing', {status: this.props.status, context: this.props.context})) {
+      missing = true;
+    }
+
+    if (newItem || missing) {
+      const IndicatorComponent = newItem ? NewActivityIndicator : MissingIndicator;
+      return (
+        <div className={styles.activityIndicator}>
+          <IndicatorComponent
+          title={this.props.title}
+          itemIds={[this.props.uniqueId]}
+          animatableIndex={this.props.animatableIndex} />
+        </div>
+      );
+    } else {
+      return null;
+    }
+  }
 
   render () {
     const assignmentType = this.props.associated_item ?
@@ -231,6 +260,7 @@ export class PlannerItem extends Component {
         { assignmentType: assignmentType, title: this.props.title });
     return (
       <div className={styles.root} ref={this.registerRootDivRef}>
+        <NotificationBadge>{this.renderNotificationBadge()}</NotificationBadge>
         <div className={styles.completed}>
           <Checkbox
             ref={this.registerFocusElementRef}
@@ -256,11 +286,4 @@ export class PlannerItem extends Component {
   }
 }
 
-export default animatable(themeable(theme, styles)(
-  // we can update this to be whatever works for this component and its content
-  containerQuery({
-    'media-x-large': { minWidth: '68rem' },
-    'media-large': { minWidth: '58rem' },
-    'media-medium': { minWidth: '48rem' }
-  })(PlannerItem))
-);
+export default animatable(themeable(theme, styles)(PlannerItem));

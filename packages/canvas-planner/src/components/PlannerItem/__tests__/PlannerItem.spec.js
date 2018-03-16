@@ -551,3 +551,13 @@ it('registers itself as animatable', () => {
   wrapper.unmount();
   expect(fakeDeregister).toHaveBeenCalledWith('item', instance, ['second']);
 });
+
+it('renders a NewActivityIndicator when asked to', () => {
+  const props = defaultProps({points: 35, date: DEFAULT_DATE});
+  props.newActivity = true;
+  props.showNotificationBadge = true;
+  const wrapper = shallow(
+    <PlannerItem {...props} />
+  );
+  expect(wrapper.find('Animatable(NewActivityIndicator)')).toHaveLength(1);
+});

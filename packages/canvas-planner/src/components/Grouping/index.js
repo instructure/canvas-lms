@@ -18,20 +18,19 @@
 import React, { Component } from 'react';
 import themeable from '@instructure/ui-themeable/lib';
 import classnames from 'classnames';
-import containerQuery from '@instructure/ui-utils/lib/react/containerQuery';
 import { partition } from 'lodash';
-import { arrayOf, string, number, shape, bool, func } from 'prop-types';
-import { userShape, itemShape } from '../plannerPropTypes';
+import { arrayOf, string, number, shape, func } from 'prop-types';
+import { userShape, itemShape, sizeShape } from '../plannerPropTypes';
 import styles from './styles.css';
 import theme from './theme.js';
 import PlannerItem from '../PlannerItem';
 import CompletedItemsFacade from '../CompletedItemsFacade';
-import NewActivityIndicator from './NewActivityIndicator';
-import MissingIndicator from './MissingIndicator';
+import NotificationBadge, { MissingIndicator, NewActivityIndicator } from '../NotificationBadge';
 import moment from 'moment-timezone';
 import formatMessage from '../../format-message';
 import { getBadgesForItem, getBadgesForItems, showPillForOverdueStatus } from '../../utilities/statusUtils';
 import { animatable } from '../../dynamic-ui';
+import responsiviser from '../responsiviser';
 
 export class Grouping extends Component {
   static propTypes = {
@@ -47,19 +46,22 @@ export class Grouping extends Component {
     registerAnimatable: func,
     deregisterAnimatable: func,
     currentUser: shape(userShape),
-  }
-
+    responsiveSize: sizeShape,
+  };
   static defaultProps = {
     registerAnimatable: () => {},
     deregisterAnimatable: () => {},
-  }
+    responsiveSize: 'large',
+  };
 
   constructor (props) {
     super(props);
+
     this.state = {
       showCompletedItems: false,
-      badgeMap: this.setupItemBadgeMap(props.items)
+      badgeMap: this.setupItemBadgeMap(props.items),
     };
+
   }
 
   componentDidMount () {
@@ -102,13 +104,25 @@ export class Grouping extends Component {
     });
   }
 
+  getLayout() {
+    return this.props.responsiveSize;
+  }
+
   renderItemsAndFacade (items) {
     const [completedItems, otherItems ] = partition(items, item => (item.completed && !item.show));
     let itemsToRender = otherItems;
     if (this.state.showCompletedItems) {
       itemsToRender = items;
     }
-    const componentsToRender = itemsToRender.map((item, itemIndex) => (
+
+    const componentsToRender = this.renderItems(itemsToRender);
+    componentsToRender.push(this.renderFacade(completedItems, itemsToRender.length));
+    return componentsToRender;
+  }
+
+  renderItems (items) {
+    const showNotificationBadgeOnItem = this.getLayout() !== 'large';
+    return items.map((item, itemIndex) => (
       <li
         className={styles.item}
         key={item.uniqueId}
@@ -135,32 +149,51 @@ export class Grouping extends Component {
           badges={this.state.badgeMap[item.id]}
           details={item.details}
           toggleAPIPending={item.toggleAPIPending}
+          status={item.status}
+          newActivity={item.newActivity}
+          showNotificationBadge={showNotificationBadgeOnItem}
           currentUser={this.props.currentUser}
         />
       </li>
     ));
+  }
 
+  renderFacade (completedItems, animatableIndex) {
+    const showNotificationBadgeOnItem = this.getLayout() !== 'large';
     if (!this.state.showCompletedItems && completedItems.length > 0) {
-      // Super odd that this is keyed on length?  Sure it is.  But there should
-      // only ever be one in our grouping and this keeps react from complaining
-      const completedItemIds = completedItems.map(item => item.uniqueId);
-      componentsToRender.push(
+      let missing = false;
+      let newActivity = false;
+      const completedItemIds = completedItems.map(item => {
+        if (showPillForOverdueStatus('missing', item)) missing = true;
+        if (item.newActivity) newActivity = true;
+        return item.uniqueId;
+      });
+      let notificationBadge = 'none';
+      if (showNotificationBadgeOnItem) {
+        if (newActivity) {
+          notificationBadge = 'newActivity';
+        } else if (missing) {
+          notificationBadge = 'missing';
+        }
+      }
+
+      return (
         <li
           className={styles.item}
-          key={`length-${completedItems.length}`}
+          key='completed'
         >
           <CompletedItemsFacade
             onClick={this.handleFacadeClick}
             itemCount={completedItems.length}
             badges={getBadgesForItems(completedItems)}
-            animatableIndex={itemsToRender.length}
+            animatableIndex={animatableIndex}
             animatableItemIds={completedItemIds}
+            notificationBadge={notificationBadge}
           />
         </li>
       );
     }
-
-    return componentsToRender;
+    return null;
   }
 
   renderToDoText () {
@@ -168,6 +201,11 @@ export class Grouping extends Component {
   }
 
   renderNotificationBadge () {
+    // narrower layout puts the indicator next to the actual items
+    if (this.getLayout() !== 'large') {
+      return null;
+    }
+
     let missing = false;
     const newItem = this.props.items.find(item => {
       if (showPillForOverdueStatus('missing', item)) missing = true;
@@ -187,12 +225,12 @@ export class Grouping extends Component {
 
   // I wouldn't have broken the background and title apart, but wrapping them in a container span breaks styling
   renderGroupLinkBackground() {
-    return <span className={classnames({
+    const clazz = classnames({
       [styles.overlay]: true,
       [styles.withImage]: this.props.image_url
-    })}
-      style={{ backgroundColor: this.props.color }}
-    />;
+    });
+    const style = this.getLayout() === 'large' ? { backgroundColor: this.props.color } : null;
+    return <span className={clazz} style={style} />;
   }
 
   renderGroupLinkTitle() {
@@ -208,11 +246,12 @@ export class Grouping extends Component {
         {this.renderGroupLinkTitle()}
       </span>;
     }
+    const style = this.getLayout() === 'large' ? {backgroundImage: `url(${this.props.image_url || ''})`} : null;
     return <a
       href={this.props.url || "#"}
       ref={this.groupingLinkRef}
       className={`${styles.hero} ${styles.heroHover}`}
-      style={{backgroundImage: `url(${this.props.image_url || ''})`}}
+      style={style}
     >
       {this.renderGroupLinkBackground()}
       {this.renderGroupLinkTitle()}
@@ -222,18 +261,9 @@ export class Grouping extends Component {
   render () {
     const badge = this.renderNotificationBadge();
 
-    const activityIndicatorClasses = {
-      [styles.activityIndicator]: true,
-      [styles.hasBadge]: badge != null
-    };
-
     return (
-      <div className={styles.root}>
-        <div
-          className={classnames(activityIndicatorClasses)}
-        >
-          {badge}
-        </div>
+      <div className={classnames(styles.root, styles[this.getLayout()])}>
+        <NotificationBadge>{badge}</NotificationBadge>
         {this.renderGroupLink()}
         <ol className={styles.items} style={{ borderColor: this.props.color }}>
           { this.renderItemsAndFacade(this.props.items)}
@@ -243,11 +273,6 @@ export class Grouping extends Component {
   }
 }
 
-export default animatable(themeable(theme, styles)(
-  // we can update this to be whatever works for this component and its content
-  containerQuery({
-    'media-x-large': { minWidth: '68rem' },
-    'media-large': { minWidth: '58rem' },
-    'media-medium': { minWidth: '48rem' }
-  })(Grouping)
-));
+const ResponsiveGrouping = responsiviser()(Grouping);
+
+export default animatable(themeable(theme, styles)(ResponsiveGrouping));

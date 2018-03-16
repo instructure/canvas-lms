@@ -76,3 +76,15 @@ it('registers itself as animatable', () => {
   wrapper.unmount();
   expect(fakeDeregister).toHaveBeenCalledWith('item', instance, ['2', '3', '4']);
 });
+
+it('renders its own NotificationBadge when asked to', () => {
+  const wrapper = mount(
+    <CompletedItemsFacade
+      onClick={() => {}}
+      notificationBadge="newActivity"
+      itemCount={3}
+      animatableItemIds={['1', '2', '3']}
+    />
+  );
+  expect(wrapper.find('NewActivityIndicator')).toHaveLength(1);
+});

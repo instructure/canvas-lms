@@ -27,7 +27,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
     </Text>
   </Heading>
   <div>
-    <Animatable(Grouping)
+    <Animatable(ResponsiveComponent)
       animatableIndex={0}
       items={
         Array [
@@ -50,7 +50,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
       timeZone="America/Denver"
       url="http://www.non_default_url.com"
     />
-    <Animatable(Grouping)
+    <Animatable(ResponsiveComponent)
       animatableIndex={1}
       items={
         Array [
@@ -82,7 +82,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
       timeZone="America/Denver"
       url="http://www.non_default_url.com"
     />
-    <Animatable(Grouping)
+    <Animatable(ResponsiveComponent)
       animatableIndex={2}
       items={
         Array [

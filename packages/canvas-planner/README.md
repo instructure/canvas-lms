@@ -34,6 +34,10 @@ Finally, start watched builds
 Now any changes to the planner source will trigger a planner incremental build, which will in turn trigger
 a canvas incremental build.
 
+If you are doing a lot of CSS work, the watch commands don't track changes so well. If you find this is the case,
+you can run `yarn build:dev`. This variant does not watch, but still sets up the environment so that class
+names and theme variables are not mangled by the INSTUI themeable tooling.
+
 > *Any commands discussed in the rest of this document assume your current working directory is `canvas-lms/packages/canvas-planner`.*
 
 ### Linting

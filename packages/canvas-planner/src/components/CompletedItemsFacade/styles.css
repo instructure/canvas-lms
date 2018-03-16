@@ -1,4 +1,7 @@
 .root {
+  display: flex;
+  flex:1;
+  align-items: center;
   font-family: var(--fontFamily);
   color: var(--color);
   box-sizing: border-box;
@@ -6,40 +9,30 @@
   border-bottom: var(--borderWidth) solid var(--borderColor);
 }
 
+.activityIndicator {
+  padding-right: 0;
+  padding-left: 0;
+}
+
 .showLabel {
   margin-left: var(--gutterWidth);
 }
 
 .contentPrimary {
-  margin-bottom: var(--bottomMarginPhoneUp);
+  flex: 0 0 50%;
+  margin-bottom: 0;
   margin-left: calc(var(--gutterWidth) - var(--buttonPadding)); /* account for the padding inside the button */
   box-sizing: border-box;
   min-width: 1px;
 }
 
 .contentSecondary {
-  margin-left: var(--gutterWidth);
+  flex: 0 0 50%;
   box-sizing: border-box;
   min-width: 1px;
+  text-align: end;
 }
 
-[data-media-medium] {
-  &.root {
-    display: flex;
-    align-items: center;
-  }
-
-  .contentPrimary {
-    margin-bottom: 0;
-    flex: 1;
-  }
-
-  .contentSecondary {
-    margin-left: 1rem;
-  }
-}
-
-[data-media-x-large] {
-  &.root {
-  }
+.activityIndicator + .contentPrimary {
+  margin-left: calc(var(--gutterWidth) - var(--buttonPadding) - var(--activityIndicatorWidth));
 }

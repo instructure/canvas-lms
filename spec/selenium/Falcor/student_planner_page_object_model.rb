@@ -25,7 +25,7 @@ module PlannerPageObject
   end
 
   def select_list_view
-    fxpath("//span[text()[contains(.,'List View')]]").click
+    fxpath("//span[contains(text(),'List View')]").click
   end
 
   def select_dashboard_view
@@ -48,7 +48,7 @@ module PlannerPageObject
 
   # Pass what type of object it is. Ensure object's name starts with a capital letter
   def validate_object_displayed(object_type)
-    expect(fxpath("//*[@class='PlannerApp']//span[contains(text(),'Unnamed Course #{object_type}')]")).to be_displayed
+    expect(fxpath("//*[contains(@class, 'PlannerApp')]//span[contains(text(),'Unnamed Course #{object_type}')]")).to be_displayed
   end
 
   def validate_no_due_dates_assigned
@@ -65,11 +65,11 @@ module PlannerPageObject
   end
 
   def expand_completed_item
-    fxpath('//*[@class="PlannerApp"]//*[contains(text(),"Show 1 completed item")]').click
+    fxpath('//*[contains(@class, "PlannerApp")]//*[contains(text(),"Show 1 completed item")]').click
   end
 
   def validate_pill(pill_type)
-    expect(fxpath("//*[@class='PlannerApp']//*[contains(text(),'#{pill_type}')]")).to be_displayed
+    expect(fxpath("//*[contains(@class, 'PlannerApp')]//*[contains(text(),'#{pill_type}')]")).to be_displayed
   end
 
   def go_to_list_view

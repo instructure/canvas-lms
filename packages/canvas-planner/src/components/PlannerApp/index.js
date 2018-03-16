@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, { Component } from 'react';
+import classnames from 'classnames';
 import { connect } from 'react-redux';
 import Container from '@instructure/ui-core/lib/components/Container';
 import Spinner from '@instructure/ui-core/lib/components/Spinner';
 import { arrayOf, oneOfType, shape, bool, object, string, number, func } from 'prop-types';
 import { momentObj } from 'react-moment-proptypes';
-import { userShape } from '../plannerPropTypes';
+import { userShape, sizeShape } from '../plannerPropTypes';
 import Day from '../Day';
 import ShowOnFocusButton from '../ShowOnFocusButton';
 import StickyButton from '../StickyButton';
@@ -64,14 +65,15 @@ export class PlannerApp extends Component {
       naiAboveScreen: bool,
     }),
     currentUser: shape(userShape),
+    size: sizeShape,
   };
-
   static defaultProps = {
     isLoading: false,
     stickyOffset: 0,
     triggerDynamicUiUpdates: () => {},
     preTriggerDynamicUiUpdates: () => {},
-    plannerActive: () => {return false;}
+    plannerActive: () => {return false;},
+    size: 'large',
   };
 
   componentWillUpdate () {
@@ -165,16 +167,16 @@ export class PlannerApp extends Component {
     );
   }
 
-  renderBody (children) {
+  renderBody (children, classes) {
 
     if (children.length === 0) {
-      return <div>
+      return <div className={classes}>
         {this.renderNewActivity()}
         {this.renderNoAssignments()}
       </div>;
     }
 
-    return <div className="PlannerApp">
+    return <div className={classes}>
       {this.renderNewActivity()}
       {this.renderLoadPastButton()}
       {this.renderLoadingPast()}
@@ -185,24 +187,25 @@ export class PlannerApp extends Component {
   }
 
   render () {
+    const clazz = classnames('PlannerApp', this.props.size);
+    let children;
     if (this.props.isLoading) {
-      return this.renderBody(this.renderLoading());
+      children = this.renderLoading();
+    } else {
+      children = this.props.days.map(([dayKey, dayItems], dayIndex) => {
+        return <Day
+          timeZone={this.props.timeZone}
+          day={dayKey}
+          itemsForDay={dayItems}
+          animatableIndex={dayIndex}
+          key={dayKey}
+          toggleCompletion={this.props.togglePlannerItemCompletion}
+          updateTodo={this.props.updateTodo}
+          currentUser={this.props.currentUser}
+        />;
+      });
     }
-
-    const children = this.props.days.map(([dayKey, dayItems], dayIndex) => {
-      return <Day
-        timeZone={this.props.timeZone}
-        day={dayKey}
-        itemsForDay={dayItems}
-        animatableIndex={dayIndex}
-        key={dayKey}
-        toggleCompletion={this.props.togglePlannerItemCompletion}
-        updateTodo={this.props.updateTodo}
-        currentUser={this.props.currentUser}
-      />;
-    });
-
-    return this.renderBody(children);
+    return this.renderBody(children, clazz);
   }
 }
 

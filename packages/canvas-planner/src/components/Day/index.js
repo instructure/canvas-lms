@@ -43,7 +43,7 @@ export class Day extends Component {
     registerAnimatable: func,
     deregisterAnimatable: func,
     currentUser: shape(userShape),
-  }
+  };
 
   constructor (props) {
     super(props);

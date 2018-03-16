@@ -15,9 +15,10 @@
     "lint:fix": "eslint src/ --fix",
     "build": "./scripts/build",
     "prepublish": "yarn build",
+    "build:dev": "NODE_ENV=development BABEL_ENV=production babel src --out-dir lib --ignore spec.js,test.js,demo.js --quiet",
     "build:lib": "BABEL_ENV=production babel src --out-dir lib --ignore spec.js,test.js,demo.js --quiet",
     "build:es": "BABEL_ENV=production ES_MODULES=1 babel src --out-dir es --ignore spec.js,test.js,demo.js --quiet",
-    "build:watch": "yarn run build:lib -- --watch",
+    "build:watch": "yarn run build:dev --watch",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch",
@@ -68,7 +69,7 @@
     "velocity-animate": "^1.5.0"
   },
   "devDependencies": {
-    "@instructure/ui-presets": "^4.6.0",
+    "@instructure/ui-presets": "^4.7.2",
     "babel-cli": "^6",
     "babel-core": "^6",
     "babel-eslint": "^7",
