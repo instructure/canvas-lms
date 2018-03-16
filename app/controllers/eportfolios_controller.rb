@@ -179,7 +179,7 @@ class EportfoliosController < ApplicationController
               format.html { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }
               format.zip { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }
             else
-              inline_url = @attachment.inline_url_for_user(logged_in_user, @current_user)
+              inline_url = authenticated_inline_url(@attachment)
               format.html { redirect_to inline_url }
               format.zip { redirect_to inline_url }
             end

@@ -1098,10 +1098,12 @@ class FilesController < ApplicationController
 
   def image_thumbnail
     cancel_cache_buster
-    url = Rails.cache.fetch(['thumbnail_url', params[:uuid], params[:size]].cache_key, :expires_in => 30.minutes) do
+    # include authenticator fingerprint so we don't redirect to an
+    # authenticated thumbnail url for the wrong user
+    url = Rails.cache.fetch(['thumbnail_url', params[:uuid], params[:size], file_authenticator.fingerprint].cache_key, :expires_in => 30.minutes) do
       attachment = Attachment.active.where(id: params[:id], uuid: params[:uuid]).first if params[:id].present?
       thumb_opts = params.slice(:size)
-      url = attachment.thumbnail_url(thumb_opts) rescue nil
+      url = authenticated_thumbnail_url(attachment, thumb_opts)
       url ||= '/images/no_pic.gif'
       url
     end

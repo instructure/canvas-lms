@@ -73,7 +73,6 @@ class EpubExport < ActiveRecord::Base
   end
 
   delegate :public_download_url, to: :attachment, allow_nil: true
-  delegate :download_url_for_user, to: :attachment, allow_nil: true
   delegate :downloadable?, to: :attachment, allow_nil: true
   delegate :completion, :running?, to: :job_progress, allow_nil: true
 
