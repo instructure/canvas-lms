@@ -43,7 +43,7 @@ describe Attachment do
 
   end
 
-  context "authenticated_url" do
+  context "public_url" do
     before :each do
       local_storage!
     end
@@ -54,12 +54,12 @@ describe Attachment do
 
     it "should return http as the protocol by default" do
       attachment_with_context(@course)
-      expect(@attachment.authenticated_url).to match(/^http:\/\//)
+      expect(@attachment.public_url).to match(/^http:\/\//)
     end
 
     it "should return the protocol if specified" do
       attachment_with_context(@course)
-      expect(@attachment.authenticated_url(:secure => true)).to match(/^https:\/\//)
+      expect(@attachment.public_url(:secure => true)).to match(/^https:\/\//)
     end
 
     context "for a quiz submission upload" do
@@ -67,12 +67,12 @@ describe Attachment do
         quiz = @course.quizzes.create
         submission = Quizzes::SubmissionManager.new(quiz).find_or_create_submission(user_model)
         attachment = attachment_with_context(submission)
-        expect(get(attachment.authenticated_url)).to be_routable
+        expect(get(attachment.public_url)).to be_routable
       end
     end
   end
 
-  context "authenticated_url InstFS storage" do
+  context "public_url InstFS storage" do
     before :once do
       user_model
     end
@@ -85,24 +85,24 @@ describe Attachment do
     end
 
     it "should get url from InstFS when attachment has instfs_uuid" do
-      @attachment.authenticated_url
+      @attachment.public_url
       expect(InstFS).to have_received(:authenticated_url)
     end
 
     it "should still get url from InstFS when attachment has instfs_uuid and instfs is later disabled" do
       allow(InstFS).to receive(:enabled?).and_return false
-      @attachment.authenticated_url
+      @attachment.public_url
       expect(InstFS).to have_received(:authenticated_url)
     end
 
     it "should not get url from InstFS when instfs is enabled but attachment lacks instfs_uuid" do
       @attachment.instfs_uuid = nil
-      @attachment.authenticated_url
+      @attachment.public_url
       expect(InstFS).not_to have_received(:authenticated_url)
     end
   end
 
-  context "authenticated_url s3_storage" do
+  context "public_url s3_storage" do
     before :each do
       s3_storage!
     end
@@ -110,14 +110,8 @@ describe Attachment do
     it "should give back a signed s3 url" do
       a = attachment_model
       s3object = a.s3object
-      expect(a.authenticated_url(expires_in: 1.day)).to match(/^https:\/\//)
+      expect(a.public_url(expires_in: 1.day)).to match(/^https:\/\//)
       a.destroy_permanently!
-    end
-
-    it "should not send the user, if any, to s3 lib" do
-      u = user_model
-      a = attachment_model
-      expect(-> { a.authenticated_url(user: u, expires_in: 1.day) }).not_to raise_exception
     end
   end
 
@@ -1044,10 +1038,10 @@ describe Attachment do
 
     it 'should allow custom ttl for download_url' do
       attachment = attachment_with_context(@course, :display_name => 'foo')
-      allow(attachment).to receive(:authenticated_url) # allow other calls due to, e.g., save
-      expect(attachment).to receive(:authenticated_url).with(include(:expires_in => 3600.seconds))
+      allow(attachment).to receive(:public_url) # allow other calls due to, e.g., save
+      expect(attachment).to receive(:public_url).with(include(:expires_in => 3600.seconds))
       attachment.public_download_url
-      expect(attachment).to receive(:authenticated_url).with(include(:expires_in => 2.days))
+      expect(attachment).to receive(:public_url).with(include(:expires_in => 2.days))
       attachment.public_download_url(2.days)
     end
 
@@ -1056,7 +1050,7 @@ describe Attachment do
       root = @course.root_account
       root.settings[:s3_url_ttl_seconds] = 3.days.seconds.to_s
       root.save!
-      expect(attachment).to receive(:authenticated_url).with(include(expires_in: 3.days.to_i.seconds))
+      expect(attachment).to receive(:public_url).with(include(expires_in: 3.days.to_i.seconds))
       attachment.public_download_url
     end
 
@@ -1402,45 +1396,11 @@ describe Attachment do
     end
   end
 
-  context "thumbnail_url" do
-    context "non-instfs attachment" do
-      it "should be the thumbnail's url" do
-        attachment_model(uploaded_data: stub_png_data)
-        @attachment.thumbnail || @attachment.build_thumbnail.save!
-        expect(@attachment.thumbnail_url).to eq @attachment.thumbnail.cached_s3_url
-      end
-
-      it "should be the thumbnail's url when instfs is enabled" do
-        attachment_model(uploaded_data: stub_png_data)
-        @attachment.thumbnail || @attachment.build_thumbnail.save!
-        allow(InstFS).to receive(:enabled?).and_return true
-        expect(@attachment.thumbnail_url).to eq @attachment.thumbnail.cached_s3_url
-      end
-    end
-
-    context "instfs attachment" do
-      before do
-        allow(Attachment).to receive(:current_root_account).and_return(double(domain: 'mydomain'))
-        allow(InstFS).to receive(:enabled?).and_return true
-        allow(InstFS).to receive(:jwt_secret).and_return 'secret'
-        allow(InstFS).to receive(:app_host).and_return 'instfs'
-      end
-
-      it "should be an instfs thumbnail link when thumbnailable" do
-        attachment_model(instfs_uuid: 'abc', content_type: 'image/png')
-        expect(@attachment.thumbnail_url).to match(%r{/thumbnails/abc})
-      end
-
-      it "should still be an instfs thumbnail link when thumbnailable and instfs is later disabled" do
-        attachment_model(instfs_uuid: 'abc', content_type: 'image/png')
-        allow(InstFS).to receive(:enabled?).and_return false
-        expect(@attachment.thumbnail_url).to match(%r{/thumbnails/abc})
-      end
-
-      it "should be blank when not thumbnailable" do
-        attachment_model(instfs_uuid: 'abc', content_type: 'text/plain')
-        expect(@attachment.thumbnail_url).to be_blank
-      end
+  context "thumbnail_url (non-instfs)" do
+    it "should be the thumbnail's url" do
+      attachment_model(uploaded_data: stub_png_data)
+      @attachment.thumbnail || @attachment.build_thumbnail.save!
+      expect(@attachment.thumbnail_url).to eq @attachment.thumbnail.cached_s3_url
     end
   end
 

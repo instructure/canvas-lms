@@ -729,7 +729,7 @@ describe "Files API", type: :request do
               'hidden_for_user' => false,
               'created_at' => @att.created_at.as_json,
               'updated_at' => @att.updated_at.as_json,
-              'thumbnail_url' => @att.thumbnail_url,
+              'thumbnail_url' => thumbnail_image_url(@att, @att.uuid, host: 'www.example.com'),
               'modified_at' => @att.modified_at.as_json,
               'mime_class' => @att.mime_class,
               'media_entry_id' => @att.media_entry_id

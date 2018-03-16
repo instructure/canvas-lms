@@ -170,8 +170,7 @@ module Api::V1::ContextModule
     item = item.assignment if item.is_a?(DiscussionTopic) && item.assignment
     item = item.overridden_for(current_user) if item.respond_to?(:overridden_for)
 
-    attrs = [:usage_rights, :thumbnail_url, :locked, :hidden, :lock_explanation, :display_name, :due_at, :unlock_at, :lock_at, :points_possible]
-    attrs.delete(:thumbnail_url) if opts[:for_admin]
+    attrs = [:usage_rights, :locked, :hidden, :lock_explanation, :display_name, :due_at, :unlock_at, :lock_at, :points_possible]
 
     attrs.each do |attr|
       if item.respond_to?(attr) && val = item.try(attr)
@@ -180,6 +179,7 @@ module Api::V1::ContextModule
     end
 
     unless opts[:for_admin]
+      details[:thumbnail_url] = authenticated_thumbnail_url(item) if item.is_a?(Attachment)
       item_type = ITEM_TYPE[content_tag.content_type.to_sym] || ''
       lock_item = item && item.respond_to?(:locked_for?) ? item : content_tag
       locked_json(details, lock_item, current_user, item_type)

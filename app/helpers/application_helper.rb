@@ -906,10 +906,26 @@ module ApplicationHelper
     @domain_root_account&.feature_enabled?(:student_planner) && @current_user.has_student_enrollment?
   end
 
-  def thumbnail_image_url(attachment)
+  def file_authenticator
+    FileAuthenticator.new(logged_in_user, @current_user, request.host_with_port)
+  end
+
+  def authenticated_download_url(attachment)
+    file_authenticator.download_url(attachment)
+  end
+
+  def authenticated_inline_url(attachment)
+    file_authenticator.inline_url(attachment)
+  end
+
+  def authenticated_thumbnail_url(attachment, options={})
+    file_authenticator.thumbnail_url(attachment, options)
+  end
+
+  def thumbnail_image_url(attachment, uuid=nil, url_options={})
     # this thumbnail url is a route that redirects to local/s3 appropriately.
     # deferred redirect through route because it may be saved for later use
     # after a direct link to attachment.thumbnail_url would have expired
-    super(attachment, attachment.uuid)
+    super(attachment, uuid || attachment.uuid, url_options)
   end
 end
