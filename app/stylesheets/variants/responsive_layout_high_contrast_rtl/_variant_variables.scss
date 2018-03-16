@@ -16,19 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// These are the variables and mixins that we
-// want to run throughout canvas
-
-// Variables
-//==================
-@import "base/variables.scss";
-
-// Mixins
-//==================
-
-// provides RTL support: see https://www.npmjs.com/package/sass-direction for docs
-@import "../../../node_modules/sass-direction/_direction.scss";
-
-@import "base/ic_mixins";
-@import "base/mixins/compile_mixins";
-@import "base/mixins/typography";
+$use_high_contrast: true;
+$use_responsive_layout: true;
+$direction: rtl;

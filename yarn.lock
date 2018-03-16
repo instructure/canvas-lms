@@ -9555,6 +9555,10 @@ sane@^2.0.0:
   optionalDependencies:
     fsevents "^1.1.1"
 
+sass-direction@^1:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/sass-direction/-/sass-direction-1.2.0.tgz#84be38ed3876e4847c9924376d434203763bc26e"
+
 sass-graph@^2.2.4:
   version "2.2.4"
   resolved "https://registry.yarnpkg.com/sass-graph/-/sass-graph-2.2.4.tgz#13fbd63cd1caf0908b9fd93476ad43a51d1e0b49"

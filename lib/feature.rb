@@ -478,6 +478,22 @@ END
       development: true,
       root_opt_in: false
     },
+    'allow_rtl' =>
+    {
+      display_name: -> { I18n.t('Allow RTL users to see RTL interface') },
+      description: -> { I18n.t('This feature flag is something an account can turn on if they want to allow the users of their account that speak languages that are normally written in Right to Left (eg: Arabic, Hebrew, Farsi) to see the RTL layout while we are working on it. once the feature is "ready" this feature flag will go away and anyone that speaks one of those languages will always see the RTL interface.') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      development: true,
+    },
+    'force_rtl' =>
+    {
+      display_name: -> { I18n.t('Turn on RTL Even For Non-RTL Languages') },
+      description: -> { I18n.t('This is just a dev-only feature you can turn on to get a preview of how pages would look in a RTL environment, without having to change your language to one that is normally RTL ') },
+      applies_to: 'User',
+      state: 'hidden',
+      development: true,
+    },
     'anonymous_grading' => {
       display_name: -> { I18n.t('Anonymous Grading') },
       description: -> { I18n.t("Anonymous grading forces student names to be hidden in SpeedGrader™") },

@@ -18,10 +18,15 @@
 const loadedStylesheets = {}
 
 const brandableCss = {
+  isRTL () {
+    return document.documentElement.getAttribute('dir') === 'rtl'
+  },
+
   getCssVariant () {
     const variant = window.ENV.use_responsive_layout ? 'responsive_layout' : 'new_styles'
     const contrast = window.ENV.use_high_contrast ? 'high_contrast' : 'normal_contrast'
-    return `${variant}_${contrast}`
+    const rtl = brandableCss.isRTL() ? '_rtl' : ''
+    return `${variant}_${contrast}${rtl}`
   },
 
   // combinedChecksum should be like '09f833ef7a'

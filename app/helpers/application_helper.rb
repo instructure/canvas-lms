@@ -244,10 +244,14 @@ module ApplicationHelper
     Rails.env.test? && ENV.fetch("DISABLE_CSS_TRANSITIONS", "1") == "1"
   end
 
+  def use_rtl?
+    @current_user.try(:feature_enabled?, :force_rtl) || (@domain_root_account.try(:feature_enabled?, :allow_rtl) && I18n.rtl?)
+  end
+
   def css_variant(opts = {})
     variant = use_responsive_layout? ? 'responsive_layout' : 'new_styles'
     use_high_contrast = @current_user && @current_user.prefers_high_contrast? || opts[:force_high_contrast]
-    variant + (use_high_contrast ? '_high_contrast' : '_normal_contrast')
+    variant + (use_high_contrast ? '_high_contrast' : '_normal_contrast') + (use_rtl? ? '_rtl' : '')
   end
 
   def css_url_for(bundle_name, plugin=false, opts = {})
