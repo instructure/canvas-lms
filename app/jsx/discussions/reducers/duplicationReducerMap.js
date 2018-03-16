@@ -42,8 +42,10 @@ const duplicationReducerMap = {
       // If we are in the pinned section, update the positions as needed to be
       // consistent with the new values in the database.  Note that only
       // discussions *after* what was duplicated might have changed positions.
-      const newStateEnd = newDiscussion.pinned ? remainingOriginalDiscussions
-        : updatePositions(remainingOriginalDiscussions, newDiscussion.new_positions)
+      const newStateEnd = newDiscussion.pinned
+        ? updatePositions(remainingOriginalDiscussions, newDiscussion.new_positions)
+        : remainingOriginalDiscussions
+
       delete newDiscussion.new_positions
       return newStateBeginning.concat(newStateEnd)
     } else {

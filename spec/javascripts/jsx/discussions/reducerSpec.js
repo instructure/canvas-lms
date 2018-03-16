@@ -214,12 +214,12 @@ test('SAVING_SETTINGS_FAIL should toggle isSavingSettings', () => {
   deepEqual(newState.isSavingSettings, false)
 })
 
-test('GET_COURSE_SETTINGS_SUCCESS should return paylod', () => {
+test('GET_COURSE_SETTINGS_SUCCESS should return payload', () => {
   const newState = reduce(actions.getCourseSettingsSuccess({courseSettings: "blah"}))
   deepEqual(newState.courseSettings, {courseSettings: "blah"})
 })
 
-test('SAVING_SETTINGS_SUCCESS should return paylod if returned', () => {
+test('SAVING_SETTINGS_SUCCESS should return payload if returned', () => {
   const newState = reduce(actions.savingSettingsSuccess({courseSettings: "blah", userSettings: 'blee'}))
   deepEqual(newState.courseSettings, "blah")
 })
@@ -229,12 +229,12 @@ test('SAVING_SETTINGS_SUCCESS should return old state if nothing is returned', (
   deepEqual(newState.courseSettings, "blah")
 })
 
-test('GET_COURSE_SETTINGS_SUCCESS should return paylod for user settings', () => {
+test('GET_COURSE_SETTINGS_SUCCESS should return payload for user settings', () => {
   const newState = reduce(actions.getUserSettingsSuccess({userSettings: "blah"}))
   deepEqual(newState.userSettings, {userSettings: "blah"})
 })
 
-test('SAVING_SETTINGS_SUCCESS should return paylod for user settings', () => {
+test('SAVING_SETTINGS_SUCCESS should return payload for user settings', () => {
   const newState = reduce(actions.savingSettingsSuccess({courseSettings: "blah", userSettings: 'blee'}))
   deepEqual(newState.userSettings, "blee")
 })
@@ -253,6 +253,73 @@ test('ARRANGE_PINNED_DISCUSSIONS should update unpinned discussion', () => {
     { title: "steven", id: 2, pinned: true, locked: false },
     { title: "landon", id: 1, pinned: true, locked: false }
   ])
+})
+
+test('DUPLICATE_DISCUSSIONS_SUCCESS should update pinned discussion positions', () => {
+  const originalState = {
+    pinnedDiscussions: [
+      { title: "landon", id: 2, position: 20, pinned: true, locked: false },
+      { title: "steven", id: 3, position: 21, pinned: true, locked: false },
+      { title: "aaron", id: 4, position: 22, pinned: true, locked: false }
+    ],
+    closedForCommentsDiscussions: [],
+    unpinnedDiscussions: []
+  }
+  const payload = {
+    originalId: 3,
+    newDiscussion: {
+      id: 5,
+      title: "steven Copy",
+      position: 22,
+      pinned: true,
+      locked: false,
+      new_positions: { 2: 20, 3: 21, 5: 22, 4: 23 }
+    }
+  }
+
+  const newState = reduce(actions.duplicateDiscussionSuccess(payload), originalState)
+  const expectedPinnedDiscussions = [
+    { title: "landon", id: 2, position: 20, pinned: true, locked: false },
+    { title: "steven", id: 3, position: 21, pinned: true, locked: false },
+    { title: "steven Copy", id: 5, position: 22, pinned: true, locked: false, focusOn: 'title'},
+    { title: "aaron", id: 4, position: 23, pinned: true, locked: false },
+  ]
+  deepEqual(newState.pinnedDiscussions, expectedPinnedDiscussions)
+  deepEqual(newState.closedForCommentsDiscussions, [])
+  deepEqual(newState.unpinnedDiscussions, [])
+
+})
+
+test('DUPLICATE_DISCUSSIONS_SUCCESS should work properly for unpinned discussions', () => {
+  const originalState = {
+    pinnedDiscussions: [],
+    closedForCommentsDiscussions: [],
+    unpinnedDiscussions: [
+      { title: "landon", id: 2, pinned: false, locked: false },
+      { title: "steven", id: 5,  pinned: false, locked: false },
+      { title: "aaron", id: 1, pinned: false, locked: false }
+    ],
+  }
+  const payload = {
+    originalId: 5,
+    newDiscussion: {
+      id: 6,
+      title: "steven Copy",
+      pinned: false,
+      locked: false,
+    }
+  }
+
+  const newState = reduce(actions.duplicateDiscussionSuccess(payload), originalState)
+  const expectedUnpinnedDiscussions = [
+    { title: "landon", id: 2, pinned: false, locked: false },
+    { title: "steven", id: 5, pinned: false, locked: false },
+    { title: "steven Copy", id: 6, pinned: false, locked: false, focusOn: 'title'},
+    { title: "aaron", id: 1, pinned: false, locked: false },
+  ]
+  deepEqual(newState.unpinnedDiscussions, expectedUnpinnedDiscussions)
+  deepEqual(newState.pinnedDiscussions, [])
+  deepEqual(newState.closedForCommentsDiscussions, [])
 })
 
 test('UPDATE_DISCUSSIONS_SEARCH should set the filter flag on discussions', () => {
