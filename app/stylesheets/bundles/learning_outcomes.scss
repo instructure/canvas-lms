@@ -194,8 +194,14 @@ ul.outcome-level {
         background-color: $ic-bg-light-primary;
       }
     }
-    a.loading-more {
+    span.loading-more {
       background-color: darken($lightBackground, 3%);
+      text-decoration: none;
+      display: block;
+      white-space: nowrap;
+
+      padding: $ic-sp/2 $ic-sp;
+      color: $ic-font-color--subdued;
     }
     &[aria-grabbed=true] a, &[aria-grabbed=true] i {
       opacity: 0.75;
