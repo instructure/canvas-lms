@@ -5261,8 +5261,8 @@ nn:
         conclude: "Avslutt emnet"
         copy: "Kopier emnet"
         delete: "Slett dette emnet"
-        export_content: "Eksporter emneinnhaldet"
-        import: "Importer emneinnhaldet"
+        export_content: "Eksporter emneinnhald"
+        import: "Importer emneinnhald"
         reset: "Tilbakestill emneinnhald"
         stats: Emnestatistikk
         student_view: Studentvising
@@ -6952,7 +6952,7 @@ nn:
   expanded_f4493860: Viser
   experimental_graphql_api_75c5eb8f: "EXPERIMENTAL GraphQL API."
   export_an_existing_quiz_to_new_quizzes_2_format_8fd08a23: "Eksporter ein eksisterande quiz til eit nytt Quizzes 2-format"
-  export_course_content_f4774b74: "Eksporter emneinnhaldet"
+  export_course_content_f4774b74: "Eksporter emneinnhald"
   export_de71cd8e: Eksporter
   export_failed_5d615d6d: "Eksport mislukkast"
   export_in_progress_70db262a: "Eksport i gang"
@@ -17778,7 +17778,7 @@ nn:
   watermark_opacity_ce3d3097: Vassmerketransparens
   watermarks_other_images_e970fc6a: "Vassmerke og andre bilde"
   we_emailed_a_confirmation_link_to_email_address_cl_e5f1d2ae: "Vi har sendt ein e-post til %{email_address}. Klikk på lenka i e-posten for å fullføre registreringa. Hugs å sjå etter i Søppelpost."
-  we_found_a_different_version_of_product_name_insta_3a645773: "Vi fann ein annan versjon av \"%{product_name}\" installert på emnet ditt. Dersom verktøyet ikkje fungerer som det skal, prøv å registrere eller installere det på nytt. "
+  we_found_a_different_version_of_product_name_insta_3a645773: "Vi fann ein annan versjon av \"%{product_name}\" sett opp på emnet ditt. Dersom verktøyet ikkje fungerer som det skal, prøv å registrere det eller sette det opp på nytt. "
   we_re_sending_your_message_d586da: "Vi sender meldinga..."
   we_re_sorry_a_login_error_has_occurred_please_chec_6dae02e2: "Det har oppstått ein feil under pålogging, sjekk barnets påloggingsdetaljar og prøv på nytt seinare."
   we_were_unable_to_activate_the_app_578defe7: "Vi kan ikkje aktivere appen."
