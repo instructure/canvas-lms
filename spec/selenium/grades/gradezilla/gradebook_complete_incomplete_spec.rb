@@ -18,16 +18,15 @@
 require_relative '../../helpers/gradezilla_common'
 require_relative '../pages/gradezilla_page'
 require_relative '../pages/gradezilla_cells_page'
+require_relative '../setup/assignment_grade_type_setup'
 
 describe "Gradezilla" do
   include_context "in-process server selenium tests"
-  include GradezillaCommon
+  include AssignmentGradeTypeSetup
 
   describe 'complete/incomplete assignment grading' do
     before :once do
-      init_course_with_students 1
-      @assignment = @course.assignments.create!(grading_type: 'pass_fail', points_possible: 10)
-      @assignment.grade_student(@students[0], grade: 'pass', grader: @teacher)
+      entering_grades_setup('pass_fail','pass')
     end
 
     before :each do
