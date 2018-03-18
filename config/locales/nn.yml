@@ -1835,7 +1835,7 @@ nn:
   appointments_dcb41d23: Avtalar
   approved_c3b285d4: Godkjent
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} med presisjon %{precision}"
-  apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Appar er ein enkel måte å legge nye funksjonar i Canvas. Dei kan leggast til individuelle emne eller til alle emna i ein konto. Når dei er konfigurerte, kan du kople deg til dei gjennom emnemodular og opprette oppgåver for vurderingsverktøy."
+  apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Appar er ein enkel måte å legge nye funksjonar i Canvas. Dei kan leggast til individuelle emne eller til alle emna i ein konto. Når dei er konfigurerte, kan du kople deg til dei gjennom emnemodular og opprette oppgåver med vurderingsverktøy."
   appt_calendar_event_dialog: 
     invalid_participants: "Du må tillate at minst ein brukar deltek"
     title: "Rediger %{name}"
