@@ -793,6 +793,28 @@ describe Quizzes::QuizzesApiController, type: :request do
           @current_user = @teacher
         end
 
+        it "should allow changing due_at and lock_at with 'fancy midnight'" do
+          quiz_params = {due_at: 'Sun, 18 Mar 2018', lock_at: 'Sun, 18 Mar 2018', unlock_at: 'Fri, 16 Mar 2018', quiz_type: 'assignment'}
+          api_params = {due_at: 'Sat, 17 Mar 2018', lock_at: 'Sat, 17 Mar 2018', unlock_at: 'Fri, 16 Mar 2018'}
+          api_update_quiz(quiz_params, api_params, expected_status: 200)
+          expect(@quiz.reload.due_at.iso8601).to eq('2018-03-17T23:59:59Z')
+          expect(@quiz.reload.lock_at.iso8601).to eq('2018-03-17T23:59:59Z')
+        end
+
+        it "should allow changing due_at with 'fancy midnight'" do
+          quiz_params = {due_at: 'Sun, 18 Mar 2018', lock_at: 'Sun, 18 Mar 2018', unlock_at: 'Fri, 16 Mar 2018', quiz_type: 'assignment'}
+          api_params = {due_at: 'Sat, 17 Mar 2018'}
+          api_update_quiz(quiz_params, api_params, expected_status: 200)
+          expect(@quiz.reload.due_at.iso8601).to eq('2018-03-17T23:59:59Z')
+        end
+
+        it "should allow changing lock_at with 'fancy midnight'" do
+          quiz_params = {due_at: 'Sun, 18 Mar 2018', lock_at: 'Mon, 19 Mar 2018', unlock_at: 'Fri, 16 Mar 2018', quiz_type: 'assignment'}
+          api_params = {lock_at: 'Sun, 18 Mar 2018'}
+          api_update_quiz(quiz_params, api_params, expected_status: 200)
+          expect(@quiz.reload.lock_at.iso8601).to eq('2018-03-18T23:59:59Z')
+        end
+
         it "allows changing the due date to another date in an open grading period" do
           due_date = 3.days.from_now.iso8601
           @quiz = create_quiz(due_at: 7.days.from_now)
