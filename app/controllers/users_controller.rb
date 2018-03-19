@@ -425,11 +425,11 @@ class UsersController < ApplicationController
           page_opts = {}
           if search_term
             users = UserSearch.for_user_in_context(search_term, @context, @current_user, session,
-              {order: params[:order], sort: params[:sort], role_filter_id: params[:role_filter_id]})
+              {order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id]})
             page_opts[:total_entries] = nil # doesn't calculate a total count
           else
             users = UserSearch.scope_for(@context, @current_user,
-              {order: params[:order], sort: params[:sort], role_filter_id: params[:role_filter_id]})
+              {order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id]})
           end
 
           includes = (params[:include] || []) & %w{avatar_url email last_login time_zone}

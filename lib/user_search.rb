@@ -44,13 +44,7 @@ module UserSearch
     end
     context.shard.activate do
       # TODO: Need to optimize this as it's not using the base scope filter for the conditions statement query
-      base_scope = base_scope.where(conditions_statement(search_term, context.root_account, {restrict_search: restrict_search}))
-      if options[:role_filter_id] && options[:role_filter_id] != ""
-        base_scope = base_scope.where("#{options[:role_filter_id]} IN
-                            (SELECT role_id FROM #{Enrollment.quoted_table_name}
-                            WHERE #{Enrollment.quoted_table_name}.user_id = #{User.quoted_table_name}.id)")
-      end
-      base_scope
+      base_scope.where(conditions_statement(search_term, context.root_account, {restrict_search: restrict_search}))
     end
   end
 
@@ -131,27 +125,15 @@ module UserSearch
               users.order_by_sortable_name
             end
 
-    if options[:role_filter_id] && options[:role_filter_id] != ""
-      users = users.where("#{options[:role_filter_id]} IN
-                            (SELECT role_id FROM #{Enrollment.quoted_table_name}
-                              WHERE #{Enrollment.quoted_table_name}.user_id = #{User.quoted_table_name}.id)")
-    end
-
     if enrollment_role_ids || enrollment_roles
+      users = users.joins(:not_removed_enrollments).distinct if context.is_a?(Account)
       roles = if enrollment_role_ids
                 enrollment_role_ids.map{|id| Role.get_role_by_id(id)}.compact
               else
                 enrollment_roles.map{|name| context.is_a?(Account) ? context.get_course_role_by_name(name) :
                   context.account.get_course_role_by_name(name)}.compact
               end
-      conditions_sql = "role_id IN (?)"
-      # TODO: this can go away after we take out the enrollment role shim (after role_id has been populated)
-      roles.each do |role|
-        if role.built_in?
-          conditions_sql += " OR (role_id IS NULL AND type = #{User.connection.quote(role.name)})"
-        end
-      end
-      users = users.where(conditions_sql, roles.map(&:id))
+      users = users.where("role_id IN (?)", roles.map(&:id))
     elsif enrollment_types
       enrollment_types = enrollment_types.map { |e| "#{e.camelize}Enrollment" }
       if enrollment_types.any?{ |et| !Enrollment.readable_types.keys.include?(et) }
