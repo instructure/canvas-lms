@@ -69,6 +69,101 @@ describe DeveloperKey do
     end
   end
 
+  describe 'callbacks' do
+    context 'when site admin' do
+      it 'it creates a binding on save' do
+        key = DeveloperKey.create!(account: nil)
+        expect(key.developer_key_account_bindings.find_by(account: Account.site_admin)).to be_present
+      end
+    end
+
+    context 'when not site admin' do
+      it 'it creates a binding on save' do
+        key = DeveloperKey.create!(account: account)
+        expect(key.developer_key_account_bindings.find_by(account: account)).to be_present
+      end
+    end
+  end
+
+  describe 'associations' do
+    let(:developer_key_account_binding) { developer_key_saved.developer_key_account_bindings.first }
+
+    it 'destroys developer key account bindings when destroyed' do
+      binding_id = developer_key_account_binding.id
+      developer_key_saved.destroy_permanently!
+      expect(DeveloperKeyAccountBinding.find_by(id: binding_id)).to be_nil
+    end
+  end
+
+  describe '#account_binding_for' do
+    let(:site_admin_key) { DeveloperKey.create!(account: nil) }
+    let(:root_account_key) { DeveloperKey.create!(account: root_account) }
+    let(:root_account) { account_model }
+
+    context 'when site admin' do
+      context 'when binding state is "allow"' do
+        before do
+          site_admin_key.developer_key_account_bindings.create!(account: root_account)
+        end
+
+        it 'finds the site admin binding when requesting site admin account' do
+          binding = site_admin_key.account_binding_for(Account.site_admin)
+          expect(binding.account).to eq Account.site_admin
+        end
+
+        it 'finds the root account binding when requesting root account' do
+          binding = site_admin_key.account_binding_for(root_account)
+          expect(binding.account).to eq root_account
+        end
+      end
+
+      context 'when binding state is "on" or "off"' do
+        before do
+          site_admin_key.developer_key_account_bindings.create!(account: root_account, workflow_state: 'on')
+          sa_binding = site_admin_key.developer_key_account_bindings.find_by(account: Account.site_admin)
+          sa_binding.update!(workflow_state: 'off')
+        end
+
+        it 'finds the site admin binding when requesting site admin account' do
+          binding = site_admin_key.account_binding_for(Account.site_admin)
+          expect(binding.account).to eq Account.site_admin
+        end
+
+        it 'finds the site admin binding when requesting root account' do
+          binding = site_admin_key.account_binding_for(root_account)
+          expect(binding.account).to eq Account.site_admin
+        end
+      end
+    end
+
+    context 'when not site admin' do
+      context 'when binding state is "allow"' do
+        it 'finds the root account binding when requesting root account' do
+          binding = root_account_key.account_binding_for(root_account)
+          expect(binding.account).to eq root_account
+        end
+      end
+
+      context 'when binding state is "on" or "off"' do
+        before do
+          root_account_key.developer_key_account_bindings.create!(account: Account.site_admin, workflow_state: 'on')
+          ra_binding = root_account_key.developer_key_account_bindings.find_by(account: root_account)
+          ra_binding.update!(workflow_state: 'off')
+        end
+
+        it 'finds the site admin binding when requesting site admin account' do
+          binding = root_account_key.account_binding_for(Account.site_admin)
+          expect(binding.account).to eq Account.site_admin
+        end
+
+        it 'finds the site admin binding when requesting root account' do
+          binding = root_account_key.account_binding_for(root_account)
+          expect(binding.account).to eq Account.site_admin
+        end
+      end
+    end
+  end
+
   describe "default" do
     context "sharding" do
       specs_require_sharding
@@ -190,18 +285,21 @@ describe DeveloperKey do
         let(:vendor_code) { 'tool vendor code' }
         let(:not_site_admin_shard) { Shard.create! }
 
-        it 'finds keys in the current shard and site admin shard' do
+        it 'finds keys in the site admin shard' do
           site_admin_key = nil
-          local_key = nil
 
           Account.site_admin.shard.activate do
             site_admin_key = DeveloperKey.create!(vendor_code: vendor_code)
           end
+
           not_site_admin_shard.activate do
-            local_key = DeveloperKey.create!(vendor_code: vendor_code)
-            expect(DeveloperKey.by_cached_vendor_code(vendor_code)).to include local_key
             expect(DeveloperKey.by_cached_vendor_code(vendor_code)).to include site_admin_key
           end
+        end
+
+        it 'finds keys in the current shard' do
+          local_key = DeveloperKey.create!(vendor_code: vendor_code, account: account_model)
+          expect(DeveloperKey.by_cached_vendor_code(vendor_code)).to include local_key
         end
       end
     end

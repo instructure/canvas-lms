@@ -105,7 +105,9 @@ describe DeveloperKeysController do
         post "create", params: {account_id: Account.site_admin.id, developer_key: {
                        redirect_uri: "http://example.com/sdf"
                      }}
+
         expect(response).to be_success
+
         json_data = JSON.parse(response.body)
 
         key = DeveloperKey.find(json_data['id'])

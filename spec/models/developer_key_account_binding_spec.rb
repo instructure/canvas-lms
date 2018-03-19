@@ -78,4 +78,40 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
       end
     end
   end
+
+  describe 'find_in_account_priority' do
+    let(:root_account) { account_model }
+    let(:sub_account) { account_model(parent_account: root_account) }
+    let(:site_admin_key) { DeveloperKey.create!(account: nil) }
+    let(:root_account_binding) { site_admin_key.developer_key_account_bindings.create!(account: root_account) }
+    let(:sub_account_binding) { site_admin_key.developer_key_account_bindings.create!(account: sub_account) }
+    let(:account_ids) { [sub_account.global_id, root_account.global_id, Account.site_admin.global_id] }
+
+    before do
+      root_account_binding
+      sub_account_binding
+    end
+
+    it 'returns the first binding found in order of account_ids' do
+      found_binding = DeveloperKeyAccountBinding.find_in_account_priority(account_ids, site_admin_key.global_id, false)
+      expect(found_binding.account.id).to eq account_ids.first
+    end
+
+    it 'does not return "allow" bindings if explicitly_set is true' do
+      root_account_binding.update!(workflow_state: 'on')
+      found_binding = DeveloperKeyAccountBinding.find_in_account_priority(account_ids, site_admin_key.global_id)
+      expect(found_binding.account.id).to eq account_ids.second
+    end
+
+    it 'does return "allow" bindings if explicitly_set is false' do
+      root_account_binding.update!(workflow_state: 'on')
+      found_binding = DeveloperKeyAccountBinding.find_in_account_priority(account_ids, site_admin_key.global_id, false)
+      expect(found_binding.account.id).to eq account_ids.first
+    end
+
+    it 'does not return bindings from accounts not in the list' do
+      found_binding = DeveloperKeyAccountBinding.find_in_account_priority(account_ids[1..2], site_admin_key.global_id, false)
+      expect(found_binding.account.id).to eq account_ids.second
+    end
+  end
 end

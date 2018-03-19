@@ -104,6 +104,33 @@ actions.developerKeysModalOpen = () => ({type: actions.DEVELOPER_KEYS_MODAL_OPEN
 actions.DEVELOPER_KEYS_MODAL_CLOSE = 'DEVELOPER_KEYS_MODAL_CLOSE';
 actions.developerKeysModalClose = () => ({type: actions.DEVELOPER_KEYS_MODAL_CLOSE})
 
+actions.SET_BINDING_WORKFLOW_STATE_START = 'SET_BINDING_WORKFLOW_STATE_START';
+actions.setBindingWorkflowStateStart = () => ({ type: actions.SET_BINDING_WORKFLOW_STATE_START });
+
+actions.SET_BINDING_WORKFLOW_STATE_SUCCESSFUL = 'SET_BINDING_WORKFLOW_STATE_SUCCESSFUL';
+actions.setBindingWorkflowStateSuccessful = () => ({ type: actions.SET_BINDING_WORKFLOW_STATE_SUCCESSFUL });
+
+actions.SET_BINDING_WORKFLOW_STATE_FAILED = 'SET_BINDING_WORKFLOW_STATE_FAILED';
+actions.setBindingWorkflowStateFailed = () => ({ type: actions.SET_BINDING_WORKFLOW_STATE_FAILED });
+
+actions.setBindingWorkflowState = (developerKeyId, accountId, workflowState) => (dispatch) => {
+  dispatch(actions.setBindingWorkflowStateStart())
+  const url = `/api/v1/accounts/${accountId}/developer_keys/${developerKeyId}/developer_key_account_bindings`
+
+  axios.post(url, {
+    developer_key_account_binding: {
+      workflow_state: workflowState
+    }
+  })
+  .then(() => {
+    dispatch(actions.setBindingWorkflowStateSuccessful())
+  })
+  .catch((error) => {
+    dispatch(actions.setBindingWorkflowStateFailed())
+    $.flashError(error.message)
+  })
+}
+
 actions.createOrEditDeveloperKey = (formData, url, method) => (dispatch) => {
   dispatch(actions.createOrEditDeveloperKeyStart())
 

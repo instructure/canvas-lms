@@ -36,7 +36,8 @@ class DeveloperKeysController < ApplicationController
           render :index
         end
       end
-      format.json { render :json => developer_keys_json(@keys, @current_user, session, account_context) }
+
+      format.json { render :json => developer_keys_json(@keys, @current_user, session, account_context, use_new_dev_key_features?) }
     end
   end
 
@@ -44,7 +45,7 @@ class DeveloperKeysController < ApplicationController
     @key = DeveloperKey.new(developer_key_params)
     @key.account = @context if params[:account_id] && @context != Account.site_admin
     if @key.save
-      render :json => developer_key_json(@key, @current_user, session, account_context)
+      render :json => developer_key_json(@key, @current_user, session, account_context, use_new_dev_key_features?)
     else
       render :json => @key.errors, :status => :bad_request
     end
@@ -54,7 +55,7 @@ class DeveloperKeysController < ApplicationController
     @key.process_event!(params[:developer_key].delete(:event)) if params[:developer_key].key?(:event)
     @key.attributes = developer_key_params unless params[:developer_key].empty?
     if @key.save
-      render :json => developer_key_json(@key, @current_user, session, account_context)
+      render :json => developer_key_json(@key, @current_user, session, account_context, use_new_dev_key_features?)
     else
       render :json => @key.errors, :status => :bad_request
     end
@@ -62,7 +63,7 @@ class DeveloperKeysController < ApplicationController
 
   def destroy
     @key.destroy
-    render :json => developer_key_json(@key, @current_user, session, account_context)
+    render :json => developer_key_json(@key, @current_user, session, account_context, use_new_dev_key_features?)
   end
 
   protected
@@ -98,16 +99,16 @@ class DeveloperKeysController < ApplicationController
   def use_new_dev_key_features?
     @_use_new_dev_key_features ||= begin
       requested_context = @context || account_from_params || @key&.account
-      return unless requested_context
+      return if requested_context.blank?
 
       # Check if account is the site admin account.  (There's only 1 site admin account.)
-      if @context.root_account.site_admin?
+      if requested_context.root_account.site_admin?
         # Check if feature is allowed, based on 3 state toggle
-        @context.root_account.feature_allowed?(:developer_key_management_ui_rewrite)
+        requested_context.root_account.feature_allowed?(:developer_key_management_ui_rewrite)
       else
         # allow react to be shown for http://canvas.docker/accounts/1234/developer_keys
         Account.site_admin.feature_allowed?(:developer_key_management_ui_rewrite) &&
-          @context.root_account.feature_enabled?(:developer_key_management_ui_rewrite)
+        requested_context.root_account.feature_enabled?(:developer_key_management_ui_rewrite)
       end
     end
   end

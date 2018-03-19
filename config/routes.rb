@@ -1495,8 +1495,7 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :developer_key_account_bindings) do
-      post 'accounts/:account_id/developer_keys/:developer_key_id/developer_key_account_bindings', action: :create
-      put 'accounts/:account_id/developer_keys/:developer_key_id/developer_key_account_bindings/:id', action: :update
+      post 'accounts/:account_id/developer_keys/:developer_key_id/developer_key_account_bindings', action: :create_or_update
       get 'accounts/:account_id/developer_key_account_bindings', action: :index
     end
 

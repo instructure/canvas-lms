@@ -27,7 +27,7 @@ class DeveloperKey < ActiveRecord::Base
 
   has_many :page_views
   has_many :access_tokens, -> { where(:workflow_state => "active") }
-  has_many :developer_key_account_bindings, inverse_of: :developer_key
+  has_many :developer_key_account_bindings, inverse_of: :developer_key, dependent: :destroy
 
   has_one :tool_consumer_profile, :class_name => 'Lti::ToolConsumerProfile'
   serialize :scopes, Array
@@ -38,6 +38,7 @@ class DeveloperKey < ActiveRecord::Base
   before_save :nullify_empty_icon_url
   before_save :protect_default_key
   after_save :clear_cache
+  after_create :create_default_account_binding
 
   validates_as_url :redirect_uri, allowed_schemes: nil
   validate :validate_redirect_uris
@@ -190,7 +191,32 @@ class DeveloperKey < ActiveRecord::Base
     @sns
   end
 
+  def account_binding_for(binding_account)
+    # If no account was specified return nil to prevent unneeded searching
+    return if binding_account.blank?
+
+    # If not site admin we need to look up the account chain
+    accounts = if binding_account.site_admin?
+      [binding_account.id]
+    else
+      Account.account_chain_ids(binding_account).push(Account.site_admin.id).reverse
+    end
+
+    # First check for explicitly set bindings starting with site admin and working down
+    binding = DeveloperKeyAccountBinding.find_in_account_priority(accounts, self.id)
+
+    # If no explicity set bindings were found check for 'allow' bindings
+    binding || DeveloperKeyAccountBinding.find_in_account_priority(accounts.reverse, self.id, false)
+  end
+
   private
+
+  def create_default_account_binding
+    owner_account = account || Account.site_admin
+    developer_key_account_bindings.create!(
+      account: owner_account
+    )
+  end
 
   def site_admin?
     self.account_id.nil?

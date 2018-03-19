@@ -55,6 +55,52 @@ describe DeveloperKeysController, type: :request do
 
       confirm_valid_key_in_json(json, key)
     end
+
+    describe 'developer key account bindings' do
+      it 'does not include binding data' do
+        user_session(account_admin_user(account: Account.site_admin))
+        sa_key = DeveloperKey.create!(account: nil)
+        get '/api/v1/accounts/site_admin/developer_keys'
+
+        site_admin_key_json = json_parse.find{ |d| d['id'] == sa_key.id }
+        expect(site_admin_key_json['developer_key_account_binding']).to be_nil
+        expect(site_admin_key_json['account_owns_binding']).to eq false
+      end
+
+      context 'when new UI feature flag is enabled' do
+        before do
+          allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(true)
+          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
+        end
+
+        context 'when context is site admin' do
+          it 'includes the site admin binding for the key' do
+            user_session(account_admin_user(account: Account.site_admin))
+            sa_key = DeveloperKey.create!(account: nil)
+            get '/api/v1/accounts/site_admin/developer_keys'
+
+            site_admin_key_json = json_parse.find{ |d| d['id'] == sa_key.id }
+            expect(site_admin_key_json.dig('developer_key_account_binding', 'account_id')).to eq Account.site_admin.id
+            expect(site_admin_key_json['account_owns_binding']).to eq true
+          end
+        end
+
+        context 'when context is not site admin' do
+          let(:root_account) { account_model }
+
+          it 'includes the site admin binding if it is set' do
+            user_session(account_admin_user(account: Account.site_admin))
+            root_account_key = DeveloperKey.create!(account: root_account)
+            Account.site_admin.developer_key_account_bindings.create!(developer_key: root_account_key, workflow_state: 'off')
+
+            delete "/api/v1/developer_keys/#{root_account_key.id}.json"
+
+            expect(json_parse.dig('developer_key_account_binding', 'account_id')).to eq Account.site_admin.id
+            expect(json_parse['account_owns_binding']).to eq false
+          end
+        end
+      end
+    end
   end
 
   describe "POST 'create'" do

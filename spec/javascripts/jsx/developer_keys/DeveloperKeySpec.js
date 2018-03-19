@@ -160,3 +160,7 @@ test('includes "Never" when last_used_at is null', () => {
   testWrapperOk(propsModified, 'Never')
 });
 
+test('it renders the developer key state control', () => {
+  testWrapperOk(props(), 'Key state for the current account')
+})
+

@@ -51,35 +51,27 @@
 class DeveloperKeyAccountBindingsController < ApplicationController
   before_action :verify_feature_flags
   before_action :require_manage_developer_keys
-  before_action :developer_key_in_account, only: %i(create update)
+  before_action :developer_key_in_account, only: :create_or_update
 
   # @API Create a Developer Key Account Binding
   # Create a new Developer Key Account Binding. The developer key specified
   # in the request URL must be available in the requested account or the
-  # requeted account's account chain.
+  # requeted account's account chain. If the binding already exists for the
+  # specified account/key combination it will be updated.
   #
   # @argument workflow_state [String]
   #   The workflow state for the binding. Must be one of "on", "off", or "allow".
   #   Defaults to "allow".
   #
   # @returns DeveloperKeyAccountBinding
-  def create
-    binding = DeveloperKeyAccountBinding.create!(create_params)
-    render json: DeveloperKeyAccountBindingSerializer.new(binding), status: :created
-  end
-
-  # @API Update a Developer Key Account Binding
-  # Create a new Developer Key Account Binding
-  #
-  # @argument workflow_state [String]
-  #   The workflow state for the binding. Must be one of "on", "off", or "allow".
-  #   Defaults to "allow".
-  #
-  # @returns DeveloperKeyAccountBinding
-  def update
-    binding = account.developer_key_account_bindings.find(params[:id])
-    binding.update!(binding_params)
-    render json: DeveloperKeyAccountBindingSerializer.new(binding)
+  def create_or_update
+    # To simplify use of this intenral API we allow creating or updating via
+    # this endpoint.
+    binding = existing_binding || DeveloperKeyAccountBinding.new(create_params)
+    binding.assign_attributes workflow_state_param
+    binding.save!
+    render json: DeveloperKeyAccountBindingSerializer.new(binding),
+           status: existing_binding.present? ? :ok : :created
   end
 
   # @API List Developer Key Account Binding
@@ -88,7 +80,7 @@ class DeveloperKeyAccountBindingsController < ApplicationController
   # @returns List of DeveloperKeyAccountBinding
   def index
     account_chain_bindings = DeveloperKeyAccountBinding.where(
-      account_id: account.account_chain_ids.push(Account.site_admin)
+      account_id: account.account_chain_ids.concat([Account.site_admin.id])
     ).eager_load(:account, :developer_key)
 
     paginated_bindings = Api.paginate(
@@ -117,11 +109,22 @@ class DeveloperKeyAccountBindingsController < ApplicationController
   end
 
   def account
-    @_account ||= Account.find(params[:account_id])
+    @_account ||= begin
+      a = Account.site_admin if params[:account_id] == 'site_admin'
+      a || Account.find(params[:account_id])
+    end
+  end
+
+  def existing_binding
+    @_existing_binding ||= begin
+      account.developer_key_account_bindings.find_by(
+        developer_key_id: params[:developer_key_id]
+      )
+    end
   end
 
   def create_params
-    binding_params.merge(
+    workflow_state_param.merge(
       {
         account_id: params[:account_id],
         developer_key_id: params[:developer_key_id]
@@ -129,7 +132,7 @@ class DeveloperKeyAccountBindingsController < ApplicationController
     )
   end
 
-  def binding_params
+  def workflow_state_param
     params.require(:developer_key_account_binding).permit(
       :workflow_state
     )
@@ -143,8 +146,9 @@ class DeveloperKeyAccountBindingsController < ApplicationController
     # We still want to include them in our developer key query.
     account_chain_ids.push(nil)
 
-    valid_key_ids = DeveloperKey.where(account_id: account_chain_ids).pluck(:id)
-    head :unauthorized unless valid_key_ids.include?(params[:developer_key_id].to_i)
+    valid_key_ids = DeveloperKey.nondeleted.where(account_id: account_chain_ids).pluck(:id)
+    requested_key_id = Shard.local_id_for(params[:developer_key_id]).first
+    head :unauthorized unless valid_key_ids.include?(requested_key_id)
   end
 
   def require_manage_developer_keys

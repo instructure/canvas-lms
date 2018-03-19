@@ -44,6 +44,7 @@ class DeveloperKeysApp extends React.Component {
         store={this.props.store}
         actions={this.props.actions}
         developerKeysList={this.props.applicationState.listDeveloperKeys.list}
+        ctx={this.props.ctx}
       />
     )
   }

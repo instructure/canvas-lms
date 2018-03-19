@@ -23,6 +23,7 @@ import 'jqueryui/dialog'
 import I18n from 'i18n!react_developer_keys'
 import React from 'react'
 import PropTypes from 'prop-types'
+import DeveloperKeyStateControl from './DeveloperKeyStateControl'
 
 
 class DeveloperKey extends React.Component {
@@ -115,10 +116,6 @@ class DeveloperKey extends React.Component {
     return developerKey.workflow_state !== "inactive"
   }
 
-  inactive (developerKey) {
-    return this.isActive(developerKey) ? null : (<div><i>{I18n.t("inactive")}</i></div>)
-  }
-
   focusDeleteLink() {
     this.deleteLink.focus();
   }
@@ -134,30 +131,6 @@ class DeveloperKey extends React.Component {
         onClick={options.onClick}>
           <i className={iconClassName} />
       </a>)
-  }
-
-  getActivateLink(developerName) {
-    return this.getLinkHelper({
-      role: "checkbox",
-      ariaChecked: "false",
-      ariaLabel: I18n.t("Activate key %{developerName}", {developerName}),
-      className: "deactivate_link",
-      title: I18n.t("Activate this key"),
-      onClick: this.activateLinkHandler,
-      iconType: "unlock",
-    })
-  }
-
-  getDeactivateLink(developerName) {
-    return this.getLinkHelper({
-      role: "checkbox",
-      ariaChecked: "true",
-      ariaLabel: I18n.t("Deactivate key %{developerName}", {developerName}),
-      className: "deactivate_link",
-      title: I18n.t("Deactivate this key"),
-      onClick: this.deactivateLinkHandler,
-      iconType: "lock"
-    })
   }
 
   getEditLink(developerName) {
@@ -213,9 +186,6 @@ class DeveloperKey extends React.Component {
 
   links (developerKey) {
     const developerNameCached = this.developerName(developerKey)
-
-    const activateLink = this.getActivateLink(developerNameCached);
-    const deactivateLink = this.getDeactivateLink(developerNameCached)
     const editLink = this.getEditLink(developerNameCached)
     const deleteLink = this.getDeleteLink(developerNameCached)
     const makeVisibleLink = this.getMakeVisibleLink()
@@ -224,7 +194,6 @@ class DeveloperKey extends React.Component {
     return (
       <div>
         {editLink}
-        {this.isActive(developerKey) ? deactivateLink : activateLink}
         {developerKey.visible ? makeInvisibleLink : makeVisibleLink}
         {deleteLink}
       </div>
@@ -272,7 +241,6 @@ class DeveloperKey extends React.Component {
         <td className="name">
           {this.makeImage(developerKey)}
           {this.developerName(developerKey)}
-          {this.inactive(developerKey)}
         </td>
 
         <td>
@@ -309,7 +277,14 @@ class DeveloperKey extends React.Component {
             {this.lastUsed(developerKey)}
           </div>
         </td>
-
+        <td>
+          <DeveloperKeyStateControl
+            developerKey={developerKey}
+            store={this.props.store}
+            actions={this.props.actions}
+            ctx={this.props.ctx}
+          />
+        </td>
         <td className="icon_react">
           {this.links(developerKey)}
         </td>
@@ -335,6 +310,11 @@ DeveloperKey.propTypes = {
     id: PropTypes.string.isRequired,
     api_key: PropTypes.string.isRequired,
     created_at: PropTypes.string.isRequired
+  }).isRequired,
+  ctx: PropTypes.shape({
+    params: PropTypes.shape({
+      contextId: PropTypes.string.isRequired
+    })
   }).isRequired
 };
 

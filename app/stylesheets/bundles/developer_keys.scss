@@ -36,9 +36,12 @@
     }
   }
   td {
-    &.icon_react a {
-      margin-#{direction(right)}: 5px;
-      margin-bottom: 3px;
+    &.icon_react {
+      min-width: 87px;
+      a {
+        margin-right: 5px;
+        margin-bottom: 3px;
+      }
     }
     span.name {
       font-weight: bold;

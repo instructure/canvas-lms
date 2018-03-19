@@ -40,6 +40,7 @@ class DeveloperKeysTable extends React.Component {
             <th scope="col">Details</th>
             <th scope="col">Stats</th>
             <th scope="col" />
+            <th scope="col" />
           </tr>
         </thead>
         <tbody id="tbody-id">
@@ -50,6 +51,7 @@ class DeveloperKeysTable extends React.Component {
             developerKey={developerKey}
             store={this.props.store}
             actions={this.props.actions}
+            ctx={this.props.ctx}
           />
         ))}
         </tbody>
@@ -65,7 +67,12 @@ DeveloperKeysTable.propTypes = {
   }).isRequired,
   actions: PropTypes.shape({
   }).isRequired,
-  developerKeysList: PropTypes.arrayOf(DeveloperKey.propTypes.developerKey).isRequired
+  developerKeysList: PropTypes.arrayOf(DeveloperKey.propTypes.developerKey).isRequired,
+  ctx: PropTypes.shape({
+    params: PropTypes.shape({
+      contextId: PropTypes.string.isRequired
+    })
+  }).isRequired
 };
 
 export default DeveloperKeysTable

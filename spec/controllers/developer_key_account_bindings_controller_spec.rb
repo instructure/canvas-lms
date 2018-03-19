@@ -52,33 +52,33 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
 
     it 'renders unauthorized if the user does not have "manage_developer_keys"' do
       user_session(unauthorized_admin)
-      post :create, params: params, format: :json
+      post :create_or_update, params: params, format: :json
       expect(response).to be_unauthorized
     end
 
     it 'succeeds if the user has "manage_developer_keys"' do
       user_session(authorized_admin)
-      post :create, params: params
+      post :create_or_update, params: params
       expect(response).to be_success
     end
 
     it 'renders unauthorized if the flag is not enabled in site admin' do
       allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(false)
       user_session(authorized_admin)
-      post :create, params: params
+      post :create_or_update, params: params
       expect(response).to be_unauthorized
     end
 
     it 'renders unauthorized if the flag is not enabled in the root account' do
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(false)
       user_session(authorized_admin)
-      post :create, params: params
+      post :create_or_update, params: params
       expect(response).to be_unauthorized
     end
 
     it 'creates the binding' do
       user_session(authorized_admin)
-      post :create, params: params
+      post :create_or_update, params: params
       expect(created_binding.account_id).to eq params[:account_id]
       expect(created_binding.developer_key_id).to eq params[:developer_key_id]
       expect(created_binding.workflow_state).to eq params.dig(:developer_key_account_binding, :workflow_state)
@@ -87,8 +87,17 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
     it 'renders a properly formatted developer key account binding' do
       expected_keys = ['id', 'account_id', 'developer_key_id', 'workflow_state']
       user_session(authorized_admin)
-      post :create, params: params
+      post :create_or_update, params: params
       expect(json_parse.keys).to match_array(expected_keys)
+    end
+
+    it 'updates the binding if it already exists' do
+      user_session(authorized_admin)
+      post :create_or_update, params: params
+
+      params[:developer_key_account_binding][:workflow_state] = 'allow'
+      post :create_or_update, params: params
+      expect(created_binding.workflow_state).to eq 'allow'
     end
   end
 
@@ -100,34 +109,34 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
 
     it 'renders unauthorized if the user does not have "manage_developer_keys"' do
       user_session(unauthorized_admin)
-      put :update, params: params, format: :json
+      post :create_or_update, params: params, format: :json
       expect(response).to be_unauthorized
     end
 
     it 'renders unauthorized if the flag is not enabled in site admin' do
       allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(false)
       user_session(unauthorized_admin)
-      put :update, params: params, format: :json
+      post :create_or_update, params: params, format: :json
       expect(response).to be_unauthorized
     end
 
     it 'renders unauthorized if the flag is not enabled in the root account' do
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(false)
       user_session(unauthorized_admin)
-      put :update, params: params, format: :json
+      post :create_or_update, params: params, format: :json
       expect(response).to be_unauthorized
     end
 
     it 'allows updating the workflow_state' do
       user_session(authorized_admin)
-      put :update, params: params
+      post :create_or_update, params: params
       expect(updated_binding.workflow_state).to eq params.dig(:developer_key_account_binding, :workflow_state)
     end
 
     it 'renders a properly formatted developer key account binding' do
       expected_keys = ['id', 'account_id', 'developer_key_id', 'workflow_state']
       user_session(authorized_admin)
-      put :update, params: params
+      post :create_or_update, params: params
       expect(json_parse.keys).to match_array(expected_keys)
     end
   end
@@ -138,7 +147,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
     let(:params) { raise 'set in example' }
     let(:site_admin_key) { DeveloperKey.create!(account: nil) }
     let(:binding_index) { DeveloperKeyAccountBinding.where(id: json_parse.map{ |b| b['id'] }) }
-    let(:expected_binding_index) { DeveloperKeyAccountBinding.where(account_id: [Account.site_admin, params[:account_id]]) }
+    let(:expected_binding_index) { DeveloperKeyAccountBinding.where(account_id: account.account_chain_ids.concat([Account.site_admin.id])) }
 
     it 'renders unauthorized if the user does not have "manage_developer_keys"' do
       user_session(unauthorized_admin)
@@ -167,9 +176,8 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
     end
 
     it 'includes bindings from the site admin account' do
-      site_admin_binding = DeveloperKeyAccountBinding.create!(
-        account: Account.site_admin,
-        developer_key: site_admin_key
+      site_admin_binding = site_admin_key.developer_key_account_bindings.find_by(
+        account: Account.site_admin
       )
 
       user_session(authorized_admin)
@@ -186,15 +194,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
   end
 
   context 'when the account is a parent account' do
-    describe "POST #create" do
-      it_behaves_like 'the developer key account binding create endpoint' do
-        let(:authorized_admin) { root_account_admin }
-        let(:unauthorized_admin) { sub_account_admin }
-        let(:params) { valid_parameters }
-      end
-    end
-
-    describe "PUT #update" do
+    describe "POST #create_or_edit" do
       let(:binding_to_edit) do
         DeveloperKeyAccountBinding.create!(
           account: root_account,
@@ -203,36 +203,41 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
         )
       end
 
+      it_behaves_like 'the developer key account binding create endpoint' do
+        let(:authorized_admin) { root_account_admin }
+        let(:unauthorized_admin) { sub_account_admin }
+        let(:params) { valid_parameters }
+      end
+
       it_behaves_like 'the developer key update endpoint' do
         let(:authorized_admin) { root_account_admin }
         let(:unauthorized_admin) { sub_account_admin }
-        let(:params) { valid_parameters.merge(id: binding_to_edit) }
+        let(:params) { valid_parameters }
       end
     end
 
     describe "GET #index" do
       let(:on_binding) do
-        DeveloperKeyAccountBinding.create!(
-          account: root_account,
-          developer_key: root_account_developer_key,
-          workflow_state: 'on'
+        b = root_account_developer_key.developer_key_account_bindings.find_by(
+          account: root_account
         )
+        b.update!(workflow_state: 'on')
+        b
       end
 
       let(:off_binding) do
         off_dev_key = DeveloperKey.create!(account: root_account)
-        DeveloperKeyAccountBinding.create!(
-          account: root_account,
-          developer_key: off_dev_key,
-          workflow_state: 'off'
+        b = off_dev_key.developer_key_account_bindings.find_by(
+          account: root_account
         )
+        b.update!(workflow_state: 'off')
+        b
       end
 
       let(:allow_binding) do
         allow_dev_key = DeveloperKey.create!(account: root_account)
-        DeveloperKeyAccountBinding.create!(
-          account: root_account,
-          developer_key: allow_dev_key
+        allow_dev_key.developer_key_account_bindings.find_by(
+          account: root_account
         )
       end
 
@@ -246,6 +251,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
         let(:authorized_admin) { root_account_admin }
         let(:unauthorized_admin) { sub_account_admin }
         let(:params) { valid_parameters.except(:developer_key_account_binding) }
+        let(:account) { root_account }
       end
     end
   end
@@ -262,7 +268,15 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
       }
     end
 
-    describe "POST #create" do
+    describe "POST #create_or_edit" do
+      let(:binding_to_edit) do
+        DeveloperKeyAccountBinding.create!(
+          account: sub_account,
+          developer_key: root_account_developer_key,
+          workflow_state: 'off'
+        )
+      end
+
       it_behaves_like 'the developer key account binding create endpoint' do
         let(:authorized_admin) { sub_account_admin }
         let(:unauthorized_admin) { invalid_admin }
@@ -272,31 +286,14 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
       it 'only allows creating bindings for keys in the context account chain' do
         sub_account.update!(parent_account: account_model)
         user_session(sub_account_admin)
-        post :create, params: sub_account_params
+        post :create_or_update, params: sub_account_params
         expect(response).to be_unauthorized
-      end
-    end
-
-    describe "PUT #update" do
-      let(:binding_to_edit) do
-        DeveloperKeyAccountBinding.create!(
-          account: sub_account,
-          developer_key: root_account_developer_key,
-          workflow_state: 'off'
-        )
       end
 
       it_behaves_like 'the developer key update endpoint' do
         let(:authorized_admin) { sub_account_admin }
         let(:unauthorized_admin) { invalid_admin }
-        let(:params) { sub_account_params.merge(id: binding_to_edit) }
-      end
-
-      it 'only allows updating bindings for keys in the context account chain' do
-        sub_account.update!(parent_account: account_model)
-        user_session(sub_account_admin)
-        put :update, params: sub_account_params.merge(id: sub_account_params)
-        expect(response).to be_unauthorized
+        let(:params) { sub_account_params }
       end
     end
 
@@ -317,13 +314,12 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
         let(:authorized_admin) { sub_account_admin }
         let(:unauthorized_admin) { invalid_admin }
         let(:params) { sub_account_params.except(:developer_key_account_binding) }
+        let(:account) { sub_account }
       end
 
       it 'includes bindings from the parent account' do
-        root_account_binding = DeveloperKeyAccountBinding.create!(
-          account: root_account,
-          developer_key: root_account_developer_key,
-          workflow_state: 'on'
+        root_account_binding = root_account_developer_key.developer_key_account_bindings.find_by(
+          account: root_account
         )
 
         user_session(sub_account_admin)

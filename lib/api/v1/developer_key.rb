@@ -23,12 +23,14 @@ module Api::V1::DeveloperKey
     name created_at email user_id user_name icon_url notes workflow_state
   ).freeze
 
-  def developer_keys_json(keys, user, session, context=nil)
-    keys.map{|k| developer_key_json(k, user, session, context) }
+  def developer_keys_json(keys, user, session, context, show_bindings=false)
+    keys.map{|k| developer_key_json(k, user, session, context, show_bindings) }
   end
 
-  def developer_key_json(key, user, session, context=nil)
+  def developer_key_json(key, user, session, context, show_bindings=false)
     context ||= Account.site_admin
+    account_binding = key.account_binding_for(context)
+
     api_json(key, user, session, :only => DEVELOPER_KEY_JSON_ATTRS).tap do |hash|
       if context.grants_right?(user, session, :manage_developer_keys) || user.try(:id) == key.user_id
         hash['api_key'] = key.api_key
@@ -39,6 +41,11 @@ module Api::V1::DeveloperKey
         hash['last_used_at'] = key.last_used_at
         hash['vendor_code'] = key.vendor_code
       end
+
+      if account_binding.present? && show_bindings
+        hash['developer_key_account_binding'] = DeveloperKeyAccountBindingSerializer.new(account_binding)
+      end
+      hash['account_owns_binding'] = account_binding&.account == context && show_bindings
 
       hash['account_name'] = key.account_name
       hash['visible'] = key.visible
