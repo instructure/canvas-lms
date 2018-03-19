@@ -687,7 +687,7 @@ class GradebooksController < ApplicationController
   def grading_period_assignments
     return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
 
-    grading_period_assignments = GradebookGradingPeriodAssignments.new(@context)
+    grading_period_assignments = GradebookGradingPeriodAssignments.new(@context, gradebook_settings)
     render json: { grading_period_assignments: grading_period_assignments.to_h }
   end
 

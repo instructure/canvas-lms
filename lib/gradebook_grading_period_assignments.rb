@@ -16,11 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class GradebookGradingPeriodAssignments
-  def initialize(course)
+  def initialize(course, settings)
     raise "Context must be a course" unless course.is_a?(Course)
     raise "Context must have an id" unless course.id
 
     @course = course
+    @settings_for_course = settings.fetch(@course.id, {
+      'show_concluded_enrollments' => 'false',
+      'show_inactive_enrollments' => 'false'
+    })
   end
 
   def to_h
@@ -30,14 +34,22 @@ class GradebookGradingPeriodAssignments
 
   private
 
+  def excluded_workflow_states
+    excluded_workflow_states = ['deleted']
+    excluded_workflow_states << 'completed' if @settings_for_course['show_concluded_enrollments'] != 'true'
+    excluded_workflow_states << 'inactive' if @settings_for_course['show_inactive_enrollments'] != 'true'
+    excluded_workflow_states
+  end
+
   def the_query
-    Submission
-      .active
-      .joins(:assignment)
-      .merge(Assignment.for_course(@course).active)
-      .where.not(grading_period_id: nil)
-      .group(:grading_period_id)
-      .pluck(:grading_period_id, "array_agg(DISTINCT assignment_id)")
-      .to_h
+    Submission.
+      active.
+      joins(:assignment, user: :enrollments).
+      merge(Assignment.for_course(@course).active).
+      where(enrollments: { course_id: @course, type: ['StudentEnrollment', 'StudentViewEnrollment'] }).
+      where.not(grading_period_id: nil, enrollments: { workflow_state: excluded_workflow_states }).
+      group(:grading_period_id).
+      pluck(:grading_period_id, "array_agg(DISTINCT assignment_id)").
+      to_h
   end
 end

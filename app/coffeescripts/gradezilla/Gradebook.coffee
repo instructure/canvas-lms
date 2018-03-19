@@ -401,9 +401,7 @@ define [
         @courseContent.students.setStudentIds(response.user_ids)
         @buildRows()
 
-      dataLoader.gotGradingPeriodAssignments?.then (response) =>
-        @courseContent.gradingPeriodAssignments = response.grading_period_assignments
-
+      dataLoader.gotGradingPeriodAssignments?.then @gotGradingPeriodAssignments
       dataLoader.gotAssignmentGroups.then @gotAllAssignmentGroups
       dataLoader.gotCustomColumns.then @gotCustomColumns
       dataLoader.gotStudents.then @gotAllStudents
@@ -456,12 +454,12 @@ define [
       else
         $('#gradebook_grid').trigger('resize.fillWindowWithMe')
 
-    reloadStudentData: =>
+    reloadStudentData: (optionOverrides = {}, afterColumnsUpdated) =>
       @setStudentsLoaded(false)
       @setSubmissionsLoaded(false)
       @renderFilters()
 
-      dataLoader = DataLoader.loadGradebookData(
+      dataLoaderOptions =
         courseId: @options.context_id
         perPage: @options.api_max_per_page
         studentsURL: @options.students_stateless_url
@@ -476,7 +474,14 @@ define [
         customColumnDataPageCb: @gotCustomColumnDataChunk
         customColumnDataParams:
           include_hidden: true
-      )
+        getGradingPeriodAssignments: false
+
+      dataLoader = DataLoader.loadGradebookData(Object.assign(dataLoaderOptions, optionOverrides))
+
+      dataLoader.gotGradingPeriodAssignments?.then (response) =>
+        @gotGradingPeriodAssignments(response)
+        @updateColumns()
+        afterColumnsUpdated() if afterColumnsUpdated
 
       dataLoader.gotStudentIds.then (response) =>
         @courseContent.students.setStudentIds(response.user_ids)
@@ -563,6 +568,9 @@ define [
           assignment.due_at = tz.parse(assignment.due_at)
           @updateAssignmentEffectiveDueDates(assignment)
           @assignments[assignment.id] = assignment
+
+    gotGradingPeriodAssignments: ({ grading_period_assignments: gradingPeriodAssignments }) =>
+      @courseContent.gradingPeriodAssignments = gradingPeriodAssignments
 
     gotSections: (sections) =>
       @setSections(sections.map(htmlEscape))
@@ -2001,10 +2009,13 @@ define [
 
     ## Gradebook Bulk UI Update Methods
 
-    updateColumnsAndRenderViewOptionsMenu: =>
+    updateColumns: =>
       @setVisibleGridColumns()
       @gradebookGrid.updateColumns()
       @updateColumnHeaders()
+
+    updateColumnsAndRenderViewOptionsMenu: =>
+      @updateColumns()
       @renderViewOptionsMenu()
 
     ## React Header Component Ref Methods
@@ -2466,13 +2477,17 @@ define [
       @getEnrollmentFilters()[enrollmentFilter] = !@getEnrollmentFilters()[enrollmentFilter]
       @applyEnrollmentFilter() unless skipApply
 
-    applyEnrollmentFilter: () =>
+    updateStudentHeadersAndReloadData: =>
+      @gradebookGrid.gridSupport.columns.updateColumnHeaders(['student'])
+      optionOverrides =
+        getGradingPeriodAssignments: @gradingPeriodSet?
+      afterColumnsUpdated = => @getHeaderComponentRef('student')?.focusAtEnd()
+      @reloadStudentData(optionOverrides, afterColumnsUpdated)
+
+    applyEnrollmentFilter: =>
       showInactive = @getEnrollmentFilters().inactive
       showConcluded = @getEnrollmentFilters().concluded
-      @saveSettings({ showInactive, showConcluded }, =>
-        @gradebookGrid.gridSupport.columns.updateColumnHeaders(['student'])
-        @reloadStudentData()
-      )
+      @saveSettings({ showInactive, showConcluded }, @updateStudentHeadersAndReloadData)
 
     getEnrollmentFilters: () =>
       @gridDisplaySettings.showEnrollments
