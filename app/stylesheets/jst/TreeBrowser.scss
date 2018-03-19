@@ -55,5 +55,5 @@
   i[class*=icon-], i[class^=icon-] { color: $ic-font-color-dark }
 
   .icon-mini-arrow-right { transition: transform 0.2s }
-  .expanded .icon-mini-arrow-right { transform: rotate(90deg) }
+  .expanded .icon-mini-arrow-right:before { transform: rotate(90deg) }
 }

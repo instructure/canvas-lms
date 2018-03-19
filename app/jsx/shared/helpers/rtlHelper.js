@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 - present Instructure, Inc.
+ * Copyright (C) 2018 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,19 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isRTL} from 'jsx/shared/helpers/rtlHelper'
 
-export default {
-  allDayDefault: false,
-  fixedWeekCount: false,
-  timezone: window.ENV.TIMEZONE,
-  // We do our own caching with our EventDataSource, so there's no need for
-  // fullcalendar to also cache.
-  lazyFetching: false,
-  dragRevertDuration: 0,
-  isRTL: isRTL(),
+/**
+ * @param {Element} element, will use the <html> element by default
+ * @returns {Booean}
+ */
+export function isRTL(element) {
+  return getDirection(element) === 'rtl'
+}
 
-  // localization config
-  // note: timeFormat && columnFormat change based on lang
-  lang: window.ENV.FULLCALENDAR_LOCALE
+/**
+ * Return the direction ('ltr' or 'rtl') of an element
+ * @param {Element} element, will use the <html> element by default
+ * @returns {String} 'ltr' or 'rtl' (or `undefined` if no DOM is present)
+ */
+export function getDirection(element = document.documentElement){
+  return window.getComputedStyle(element, null).direction
 }

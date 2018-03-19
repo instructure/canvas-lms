@@ -15,17 +15,16 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import {isRTL} from 'jsx/shared/helpers/rtlHelper'
+
 const loadedStylesheets = {}
 
 const brandableCss = {
-  isRTL () {
-    return document.documentElement.getAttribute('dir') === 'rtl'
-  },
 
   getCssVariant () {
     const variant = window.ENV.use_responsive_layout ? 'responsive_layout' : 'new_styles'
     const contrast = window.ENV.use_high_contrast ? 'high_contrast' : 'normal_contrast'
-    const rtl = brandableCss.isRTL() ? '_rtl' : ''
+    const rtl = isRTL() ? '_rtl' : ''
     return `${variant}_${contrast}${rtl}`
   },
 

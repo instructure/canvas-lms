@@ -148,10 +148,8 @@
   top: 0;
   left: 100%;
   margin-top: -6px;
-  margin-left: -1px;
-  -webkit-border-radius: 0 6px 6px 6px;
-     -moz-border-radius: 0 6px 6px 6px;
-          border-radius: 0 6px 6px 6px;
+  margin-#{direction(left)}: -1px;
+  border-radius: direction-corners(0 6px 6px 6px);
 }
 .dropdown-submenu a:focus + .dropdown-menu, /* INSTRUCTURE */
 .dropdown-submenu:hover > .dropdown-menu {

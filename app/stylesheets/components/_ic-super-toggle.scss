@@ -189,7 +189,7 @@ See Forms section.
 
 @include super-toggle-state ('checked') {
   .ic-Super-toggle__switch::after { // handle
-    transform: translate3d(100%,0,0);
+    transform: direction-if(rtl, translate3d(-100%,0,0), translate3d(100%,0,0));
   }
 }
 

@@ -136,6 +136,7 @@ $ic-tooltip-arrow-size: 0.375rem;
 
     .ic-icon-svg--navtoggle {
       transition: all 0.4s;
+      transform: direction-if(rtl, rotate3d(0, 1, 0, -180deg));
     }
   }
 
@@ -353,7 +354,7 @@ body.primary-nav-expanded {
   .ic-app-header__menu-list-link {
     &.ic-app-header__menu-list-link--nav-toggle {
       .ic-icon-svg--navtoggle {
-        transform: rotate3d(0, 1, 0, -180deg);
+        transform: direction-if(rtl, none, rotate3d(0, 1, 0, -180deg));
       }
     }
 

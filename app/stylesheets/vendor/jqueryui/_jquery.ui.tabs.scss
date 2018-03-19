@@ -18,14 +18,14 @@
     background: transparent;
     border-width: 0 0 1px 0;
     box-shadow: none; //override .ui-widget-header
-    li { 
-      list-style: none; 
-      float: left; 
-      position: relative; 
-      top: 1px; 
-      margin: 0 .2em 1px 0; 
-      border-bottom: 0 !important; 
-      padding: 0; 
+    li {
+      list-style: none;
+      float: direction(left);
+      position: relative;
+      top: 1px;
+      margin: 0 .2em 1px 0;
+      border-bottom: 0 !important;
+      padding: 0;
       white-space: nowrap;
       a { 
         float: left; 

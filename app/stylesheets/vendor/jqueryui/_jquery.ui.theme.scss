@@ -135,6 +135,23 @@
 .ui-icon-circle-arrow-n { background-position: -160px -192px; }
 .ui-icon-grip-diagonal-se { background-position: -80px -224px; }
 
+// flip all the arrows around in RTL
+@if $direction == 'rtl' {
+  .ui-icon-carat-1-e,
+  .ui-icon-triangle-1-ne,
+  .ui-icon-triangle-1-e,
+  .ui-icon-triangle-1-se,
+  .ui-icon-triangle-1-sw,
+  .ui-icon-triangle-1-w,
+  .ui-icon-triangle-1-nw,
+  .ui-icon-triangle-2-n-s,
+  .ui-icon-triangle-2-e-w,
+  .ui-icon-arrowrefresh-1-w,
+  .ui-icon-circle-triangle-e,
+  .ui-icon-circle-triangle-w, {
+    transform: scale(-1, 1);
+  }
+}
 .ui-icon-radio-off { background: none !important; }
 .ui-icon-radio-on {
   background: url(/images/icon-checkmark.svg) 0 50% no-repeat !important;

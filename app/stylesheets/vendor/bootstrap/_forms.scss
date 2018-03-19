@@ -449,7 +449,7 @@ This is the standard form actions button bar at the bottom of every content form
     margin-bottom: 0; // prevent bottom margin from screwing up alignment in stacked forms
     *margin-left: 0;
     vertical-align: top;
-    @include border-radius(0 $inputBorderRadius $inputBorderRadius 0);
+    border-radius: direction-corners(0 $inputBorderRadius $inputBorderRadius 0);
     // Make input on top when focused so blue border and shadow always show
     &:focus {
       z-index: 2;
@@ -484,10 +484,10 @@ This is the standard form actions button bar at the bottom of every content form
   .btn {
     margin-right: -1px;
   }
-  .add-on:first-child,
-  .btn:first-child {
+  .add-on:#{direction-if(rtl, last, first)}-child,
+  .btn:#{direction-if(rtl, last, first)}-child {
     // FYI, `.btn:first-child` accounts for a button group that's prepended
-    @include border-radius($inputBorderRadius 0 0 $inputBorderRadius);
+    border-radius: $inputBorderRadius 0 0 $inputBorderRadius;
   }
 }
 
@@ -495,9 +495,9 @@ This is the standard form actions button bar at the bottom of every content form
   input,
   select,
   .uneditable-input {
-    @include border-radius($inputBorderRadius 0 0 $inputBorderRadius);
+    border-radius: $inputBorderRadius 0 0 $inputBorderRadius;
     + .btn-group .btn {
-      @include border-radius(0 $inputBorderRadius $inputBorderRadius 0);
+      border-radius: 0 $inputBorderRadius $inputBorderRadius 0;
     }
   }
   .add-on,
@@ -505,9 +505,9 @@ This is the standard form actions button bar at the bottom of every content form
   .btn-group {
     margin-left: -1px;
   }
-  .add-on:last-child,
-  .btn:last-child {
-    @include border-radius(0 $inputBorderRadius $inputBorderRadius 0);
+  .add-on:#{direction-if(rtl, first, last)}-child,
+  .btn:#{direction-if(rtl, first, last)}-child {
+    border-radius: 0 $inputBorderRadius $inputBorderRadius 0;
   }
 }
 
@@ -516,22 +516,22 @@ This is the standard form actions button bar at the bottom of every content form
   input,
   select,
   .uneditable-input {
-    @include border-radius(0);
+    border-radius: 0;
     + .btn-group .btn {
-      @include border-radius(0 $inputBorderRadius $inputBorderRadius 0);
+      border-radius: 0 $inputBorderRadius $inputBorderRadius 0;
     }
   }
-  .add-on:first-child,
-  .btn:first-child {
+  .add-on:#{direction-if(rtl, last, first)}-child,
+  .btn:#{direction-if(rtl, last, first)}-child {
     margin-right: -1px;
-    @include border-radius($inputBorderRadius 0 0 $inputBorderRadius);
+    border-radius: $inputBorderRadius 0 0 $inputBorderRadius;
   }
-  .add-on:last-child,
-  .btn:last-child {
+  .add-on:#{direction-if(rtl, first, last)}-child,
+  .btn:#{direction-if(rtl, first, last)}-child {
     margin-left: -1px;
-    @include border-radius(0 $inputBorderRadius $inputBorderRadius 0);
+    border-radius: 0 $inputBorderRadius $inputBorderRadius 0;
   }
-  .btn-group:first-child {
+  .btn-group:#{direction-if(rtl, last, first)}-child {
     margin-left: 0;
   }
 }
@@ -658,15 +658,7 @@ legend + .control-group {
   }
   // Move over all input controls and content
   .controls {
-    // Super jank IE7 fix to ensure the inputs in .input-append and input-prepend
-    // don't inherit the margin of the parent, in this case .controls
-    *display: inline-block;
-    *padding-left: 20px;
-    margin-left: $horizontalComponentOffset;
-    *margin-left: 0;
-    &:first-child {
-      *padding-left: $horizontalComponentOffset;
-    }
+    margin-#{direction(left)}: $horizontalComponentOffset;
   }
   // Remove bottom margin on block level help text since that's accounted for on .control-group
   .help-block {
