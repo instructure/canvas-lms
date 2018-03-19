@@ -19,23 +19,23 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AssessmentRequest do
+  before :once do
+    course_with_teacher(active_all: true)
+    @submission_student = student_in_course(active_all: true, course: @course).user
+    @review_student = student_in_course(active_all: true, course: @course).user
+    @assignment = @course.assignments.create!
+    submission = @assignment.find_or_create_submission(@user)
+    @request = AssessmentRequest.create!(user: @submission_student, asset: submission, assessor_asset: @review_student, assessor: @review_student)
+  end
+
   describe "workflow" do
-    let_once(:request) do
-      user_factory
-      course_factory
-      assignment = @course.assignments.create!
-      submission = assignment.find_or_create_submission(@user)
-
-      AssessmentRequest.create!(user: @user, asset: submission, assessor_asset: @user, assessor: @user)
-    end
-
     it "defaults to assigned" do
-      expect(request).to be_assigned
+      expect(@request).to be_assigned
     end
 
     it "can be completed" do
-      request.complete!
-      expect(request).to be_completed
+      @request.complete!
+      expect(@request).to be_completed
     end
   end
 
@@ -45,41 +45,37 @@ describe AssessmentRequest do
     let(:notification)      { Notification.create!(:name => notification_name, :category => 'Invitation') }
 
     it "should send submission reminders" do
-      course_with_student(:active_all => true)
       @student.communication_channels.create!(:path => 'test@example.com').confirm!
       NotificationPolicy.create!(:notification => notification,
-        :communication_channel => @user.communication_channel, :frequency => 'immediately')
+        :communication_channel => @student.communication_channel, :frequency => 'immediately')
 
-      assignment = @course.assignments.create!
-      submission = assignment.find_or_create_submission(@student)
       rubric_model
       @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
-      assignment.update_attribute(:title, 'new assmt title')
+      @assignment.update_attribute(:title, 'new assmt title')
 
-      request = AssessmentRequest.new(:user => @user, :asset => submission, :assessor_asset => @student, :assessor => @user, :rubric_association => @association)
-      request.send_reminder!
+      @request.rubric_association = @association
+      @request.save!
+      @request.send_reminder!
 
-      expect(request.messages_sent.keys).to include(notification_name)
-      message = request.messages_sent[notification_name].first
-      expect(message.body).to include(assignment.title)
+      expect(@request.messages_sent.keys).to include(notification_name)
+      message = @request.messages_sent[notification_name].first
+      expect(message.body).to include(@assignment.title)
     end
   end
 
   describe 'policies' do
 
     before :once do
-      assignment_model
-      @teacher = user_factory(active_all: true)
-      @course.enroll_teacher(@teacher).accept
-      @student = user_factory(active_all: true)
-      @course.enroll_student(@student).accept
       rubric_model
       @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
       @assignment.update_attribute(:anonymous_peer_reviews, true)
       @reviewed = @student
-      @reviewer = student_in_course(:active_all => true).user
+      @reviewer = student_in_course(active_all: true, course: @course).user
       @assessment_request = @assignment.assign_peer_review(@reviewer, @reviewed)
+      @assessment_request.rubric_association = @association
+      @assessment_request.save!
     end
+
     it "should prevent reviewer from seeing reviewed name" do
       expect(@assessment_request.grants_right?(@reviewer, :read_assessment_user)).to be_falsey
     end
@@ -93,4 +89,25 @@ describe AssessmentRequest do
     end
   end
 
+  describe '#delete_ignores' do
+    before :once do
+      @ignore = Ignore.create!(asset: @request, user: @student, purpose: 'reviewing')
+    end
+
+    it 'should delete ignores if the request is completed' do
+      @request.complete!
+      expect {@ignore.reload}.to raise_error ActiveRecord::RecordNotFound
+    end
+
+    it 'should delete ignores if the request is deleted' do
+      @request.destroy!
+      expect {@ignore.reload}.to raise_error ActiveRecord::RecordNotFound
+    end
+
+    it 'should not delete ignores if the request is updated, but not completed or deleted' do
+      @request.assessor = @teacher
+      @request.save!
+      expect(@ignore.reload).to eq @ignore
+    end
+  end
 end

@@ -326,6 +326,7 @@ class Submission < ActiveRecord::Base
   after_save :update_quiz_submission
   after_save :update_participation
   after_save :update_line_item_result
+  after_save :delete_ignores
 
   def autograded?
     # AutoGrader == (quiz_id * -1)
@@ -2222,6 +2223,17 @@ class Submission < ActiveRecord::Base
   def update_line_item_result
     return if lti_result.nil?
     lti_result.update(result_score: score) if saved_change_to_score?
+  end
+
+  def delete_ignores
+    if !submission_type.nil? || excused
+      Ignore.where(asset_type: 'Assignment', asset_id: assignment_id, user_id: user_id, purpose: 'submitting').delete_all
+
+      unless Submission.where(assignment_id: assignment_id).where(Submission.needs_grading_conditions).exists?
+        Ignore.where(asset_type: 'Assignment', asset_id: assignment_id, purpose: 'grading', permanent: false).delete_all
+      end
+    end
+    true
   end
 
   def point_data?

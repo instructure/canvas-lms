@@ -907,6 +907,7 @@ class Assignment < ActiveRecord::Base
     state :deleted
   end
 
+  alias destroy_permanently! destroy
   def destroy
     self.workflow_state = 'deleted'
     ContentTag.delete_for(self)
@@ -916,7 +917,6 @@ class Assignment < ActiveRecord::Base
     each_submission_type { |submission| submission.destroy if submission && !submission.deleted? }
     refresh_course_content_participation_counts
   end
-  alias destroy_permanently! destroy
 
   def refresh_course_content_participation_counts
     progress = self.context.progresses.build(tag: 'refresh_content_participation_counts')

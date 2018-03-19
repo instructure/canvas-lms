@@ -4605,6 +4605,56 @@ describe Submission do
     end
   end
 
+  describe '#delete_ignores' do
+    context 'for submission ignores' do
+      before :once do
+        @submission = @assignment.submissions.find_by!(user_id: @student)
+        @ignore = Ignore.create!(asset: @assignment, user: @student, purpose: 'submitting')
+      end
+
+      it 'should delete submission ignores when asset is submitted' do
+        @assignment.submit_homework(@student, {submission_type: 'online_text_entry', body: 'Hi'})
+        expect {@ignore.reload}.to raise_error ActiveRecord::RecordNotFound
+      end
+
+      it 'should not delete submission ignores when asset is not submitted' do
+        @submission.student_entered_score = 5
+        @submission.save!
+        expect(@ignore.reload).to eq @ignore
+      end
+
+      it 'should delete submission ignores when asset is excused' do
+        @submission.excused = true
+        @submission.save!
+        expect {@ignore.reload}.to raise_error ActiveRecord::RecordNotFound
+      end
+    end
+
+    context 'for grading ignores' do
+      before :once do
+        @student1 = @student
+        @student2 = student_in_course(course: @course, active_all: true).user
+        @sub1 = @assignment.submit_homework(@student1, {submission_type: 'online_text_entry', body: 'Hi'})
+        @sub2 = @assignment.submit_homework(@student2, {submission_type: 'online_text_entry', body: 'Hi'})
+        @ignore = Ignore.create!(asset: @assignment, user: @teacher, purpose: 'grading')
+      end
+
+      it 'should delete grading ignores if every submission is graded or excused' do
+        @sub1.score = 5
+        @sub1.save!
+        @sub2.excused = true
+        @sub2.save!
+        expect {@ignore.reload}.to raise_error ActiveRecord::RecordNotFound
+      end
+
+      it 'should not delete grading ignores if some submissions are ungraded' do
+        @sub1.score = 5
+        @sub1.save!
+        expect(@ignore.reload).to eq @ignore
+      end
+    end
+  end
+
   def submission_spec_model(opts={})
     opts = @valid_attributes.merge(opts)
     assignment = opts.delete(:assignment) || Assignment.find(opts.delete(:assignment_id))
