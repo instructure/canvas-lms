@@ -157,7 +157,7 @@ class UsersController < ApplicationController
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
     :user_dashboard, :toggle_recent_activity_dashboard, :toggle_hide_dashcard_color_overlays,
     :masquerade, :external_tool, :dashboard_sidebar, :settings, :activity_stream,
-    :activity_stream_summary]
+    :activity_stream_summary, :pandata_token]
   before_action :require_registered_user, :only => [:delete_user_service,
     :create_user_service]
   before_action :reject_student_view_student, :only => [:delete_user_service,
@@ -2211,6 +2211,50 @@ class UsersController < ApplicationController
       end
     end
     render :json => {:invited_users => invited_users, :errored_users => errored_users}
+  end
+
+  # @API Get a Pandata jwt token and its expiration date
+  #
+  # Returns a jwt token that can be used to send events to Pandata
+  #
+  # @argument app_key [String]
+  #   The pandata appKey for this mobile app
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/users/<user_id>/pandata_token \
+  #          -X POST \
+  #          -H 'Authorization: Bearer <token>'
+  #          -F 'app_key=MOBILE_APPS_KEY' \
+  #
+  # @example_response
+  #   {
+  #     "token": "wek23klsdnsoieioeoi3of9deeo8r8eo8fdn",
+  #     "expires_at": 1521667783000,
+  #   }
+  def pandata_token
+    user = api_find(User, params[:id])
+    settings = Canvas::DynamicSettings.find(service: 'pandata')
+
+    if params[:app_key] == settings["ios-pandata-key"]
+      key = settings["ios-pandata-key"]
+      sekrit = settings["ios-pandata-secret"]
+    elsif params[:app_key] == settings["android-pandata-key"]
+      key = settings["android-pandata-key"]
+      sekrit = settings["android-pandata-secret"]
+    else
+      return render(json: { :message => "Invalid app key" }, status: :bad_request)
+    end
+
+    expires_at = Time.zone.now + 1.day.to_i
+    body = {
+      iss: key,
+      exp: expires_at.to_i,
+      aud: 'PANDATA',
+      sub: user.global_id
+    }
+
+    token = Canvas::Security.create_jwt(body, expires_at, sekrit)
+    render json: {token: token, expires_at: expires_at.to_f * 1000}
   end
 
   protected

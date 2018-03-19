@@ -33,6 +33,11 @@ development:
       app-host: "http://api.instfs.docker"
       # this is just "super-sekret-value", base64-encoded:
       secret: "c3VwZXItc2VrcmV0LXZhbHVlCg=="
+    pandata:
+      ios-pandata-key: IOS_pandata_key
+      ios-pandata-secret: teamrocketblastoffatthespeedoflight
+      android-pandata-key: ANDROID_pandata_key
+      android-pandata-secret: surrendernoworpreparetofight
 
   private:
     canvas:

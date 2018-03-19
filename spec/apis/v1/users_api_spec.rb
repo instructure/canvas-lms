@@ -2009,4 +2009,37 @@ describe "Users API", type: :request do
       expect(json.map {|i| i["id"]}).not_to be_include a.id
     end
   end
+
+  describe 'POST pandata_token' do
+    let(:fake_secrets){
+      {
+        "ios-pandata-key" => "IOS_pandata_key",
+        "ios-pandata-secret" => "teamrocketblastoffatthespeedoflight",
+        "android-pandata-key" => "ANDROID_pandata_key",
+        "android-pandata-secret" => "surrendernoworpreparetofight"
+      }
+    }
+
+    before do
+      allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
+      allow(Canvas::DynamicSettings).to receive(:find).with(service: 'pandata').and_return(fake_secrets)
+    end
+
+    it 'should return token and expiration' do
+      json = api_call(:post, "/api/v1/users/#{@user.id}/pandata_token",
+          { controller: 'users', action: 'pandata_token', format:'json', id: @user.to_param },
+          { app_key: 'IOS_pandata_key'}
+      )
+      expect(json['token']).to be_present
+      expect(json['expires_at']).to be_present
+    end
+
+    it 'should return a bad request for incorrect app keys' do
+      json = raw_api_call(:post, "/api/v1/users/#{@user.id}/pandata_token",
+          { controller: 'users', action: 'pandata_token', format:'json', id: @user.to_param },
+          { app_key: 'IOS_not_right'}
+      )
+      assert_status(400)
+    end
+  end
 end
