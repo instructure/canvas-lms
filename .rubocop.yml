@@ -126,6 +126,8 @@ Style/StderrPuts:
   Enabled: false
 Style/DateTime:
   Enabled: false
+Style/SymbolArray:
+  Enabled: false
 # We may want to enable this when we start working toward Ruby 3
 Style/FrozenStringLiteralComment:
   Enabled: false
