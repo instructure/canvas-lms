@@ -101,7 +101,7 @@
   .nav-collapse .dropdown-menu {
     position: static;
     top: auto;
-    left: auto;
+    #{direction(left)}: auto;
     float: none;
     display: none;
     max-width: none;
@@ -147,7 +147,7 @@
   // Pull right (secondary) nav content
   .navbar .nav-collapse .nav.pull-right {
     float: none;
-    margin-left: 0;
+    margin-#{direction(left)}: 0;
   }
   // Hide everything in the navbar save .brand and toggle button */
   .nav-collapse {

@@ -52,7 +52,7 @@
   flex: 1;
   min-width: 1px;
   box-sizing: border-box;
-  padding-right: $ic-sp * 2;
+  padding-#{direction(right)}: $ic-sp * 2;
 }
 
 .StudentContextTray-Header__Actions {
@@ -94,11 +94,11 @@
   padding: 0 $ic-sp / 2;
 
   &:first-of-type {
-    padding-left: 0;
+    padding-#{direction(left)}: 0;
   }
 
   &:last-of-type {
-    padding-right: 0;
+    padding-#{direction(right)}: 0;
   }
   .StudentContextTray-QuickLinks__Link-text {
     display: inline-block;

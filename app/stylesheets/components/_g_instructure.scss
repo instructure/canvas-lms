@@ -29,7 +29,7 @@
   display: none;
   position: fixed;
   top: 10px;
-  left: 50px;
+  #{direction(left)}: 50px;
   z-index: 9999;
   background-color: #fff;
   border: 2px solid #888;
@@ -44,7 +44,7 @@
 #fixed_bottom, #flash_message_holder {
   position: fixed;
   z-index: 100000;
-  left: 0;
+  #{direction(left)}: 0;
   width: 100%;
 }
 
@@ -97,7 +97,7 @@
     }
     .close_link {
       position: absolute;
-      right: 10px;
+      #{direction(right)}: 10px;
       top: 50%;
       width: 20px;
       height: 20px;
@@ -109,7 +109,7 @@
     i {
       display: inline-block;
       vertical-align: middle;
-      margin-right: 0;
+      margin-#{direction(right)}: 0;
       width: 20px;
       height: 20px;
       background-image: url(/images/check_16.png);
@@ -145,7 +145,7 @@
     margin-bottom: 1em;
   }
   table:not([cellpadding]) {
-    margin-left: 5px;
+    margin-#{direction(left)}: 5px;
     td {
       padding: 2px;
     }
@@ -191,7 +191,7 @@
   padding: 5px 10px;
   position: absolute;
   top: 5px;
-  left: 0px;
+  #{direction(left)}: 0px;
   background-color: #fe8;
   border: 2px solid #FBAD00;
   border-radius: 5px;
@@ -219,7 +219,7 @@
   ul.item_list {
     margin-top: 0;
     list-style-type: none;
-    margin-left: 15px;
+    margin-#{direction(left)}: 15px;
     &.limit_height {
       max-height: 150px;
       overflow: auto;
@@ -285,7 +285,7 @@
 
     .event-details,
     .todo-details {
-      padding-right: $ic-sp;
+      padding-#{direction(right)}: $ic-sp;
       flex: 1;
       min-width: 1px;
       overflow: hidden;
@@ -295,7 +295,7 @@
         content: "";
         position: absolute;
         top: 0;
-        right: 0;
+        #{direction(right)}: 0;
         height: 100%;
         width: $ic-sp;
         background: linear-gradient(
@@ -306,7 +306,7 @@
 
     .todo-details {
       // gets more padding/width to accommodate close X button
-      padding-right: $ic-sp * 2.5;
+      padding-#{direction(right)}: $ic-sp * 2.5;
       &:after {
         width: $ic-sp * 2.5;
         background: linear-gradient(
@@ -356,7 +356,7 @@
 table.summary {
   width: auto;
   th, caption {
-    text-align: left;
+    text-align: direction(left);
   }
   th, td, caption {
     padding: $ic-sp/2;
@@ -407,7 +407,7 @@ table.formtable td {
     margin: 0 0 0 10px;
   }
   .info {
-    clear: left;
+    clear: direction(left);
     font-size: 0.8em;
     margin: 0 0 5px 10px;
     .links {
@@ -453,7 +453,7 @@ span.hint {
 .formError {
   color: $ic-color-danger;
   font-size: 0.8em;
-  padding-left: 15px;
+  padding-#{direction(left)}: 15px;
 }
 
 .nobr {
@@ -464,10 +464,10 @@ span.hint {
   font-size: 0.8em;
   .name {
     font-weight: bold;
-    margin-left: 10px;
+    margin-#{direction(left)}: 10px;
   }
   .date {
-    margin-left: 5px;
+    margin-#{direction(left)}: 5px;
   }
   .message {
     font-size: 1.5em;
@@ -486,7 +486,7 @@ body .disabled_link {
 .error_box {
   position: absolute;
   top: -1000px;
-  left: -100px;
+  #{direction(left)}: -100px;
   z-index: 11;
   max-width: 200px;
   min-width: 100px;
@@ -502,13 +502,13 @@ body .disabled_link {
   .error_bottom {
     position: absolute;
     bottom: 0;
-    left: 4px;
+    #{direction(left)}: 4px;
   }
 }
 
 .datetime_suggest {
   font-size: 0.8em;
-  padding-left: 10px;
+  padding-#{direction(left)}: 10px;
   color: $ic-dim-helper-text;
 }
 
@@ -529,13 +529,13 @@ body .disabled_link {
 
 ul.notification_list {
   line-height: 1.7em;
-  padding-left: 10px;
+  padding-#{direction(left)}: 10px;
   margin-bottom: 20px;
 }
 
 ul.group_list {
   line-height: 1.7em;
-  padding-left: 10px;
+  padding-#{direction(left)}: 10px;
   margin-bottom: 20px;
 }
 
@@ -565,7 +565,7 @@ $wizard-bg-color: $ic-color-dark;
   z-index: 111;
   position: fixed;
   bottom: 0;
-  left: 0;
+  #{direction(left)}: 0;
   width: 100%;
   display: none;
   h3, .h3 {
@@ -586,16 +586,16 @@ $wizard-bg-color: $ic-color-dark;
     @include clearfix;
     box-shadow: 0 0 10px #333;
     .links {
-      float: right;
+      float: direction(right);
     }
     .wizard_options {
-      float: left;
+      float: direction(left);
       width: 40%;
-      padding-right: 20px;
+      padding-#{direction(right)}: 20px;
       position: relative;
     }
     .wizard_details {
-      float: left;
+      float: direction(left);
       width: 43%;
       display: none;
       border: 1px solid #aaa;
@@ -616,7 +616,7 @@ $wizard-bg-color: $ic-color-dark;
     .wizard_options_list {
       list-style-type: none;
       margin: 0 10px 0 0;
-      padding-left: 5px;
+      padding-#{direction(left)}: 5px;
       li {
         line-height: 1.8em;
       }
@@ -801,7 +801,7 @@ $wizard-bg-color: $ic-color-dark;
           &.selected {
             background: rgba($ic-color-light, 0.1);
             a.header {
-              border-left-color: var(--ic-brand-primary);
+              border-#{direction(left)}-color: var(--ic-brand-primary);
             }
           }
           &.completed {
@@ -820,11 +820,11 @@ $wizard-bg-color: $ic-color-dark;
             background: url("/images/wizard-todo-unchecked.svg") no-repeat $ic-sp 50%;
             background-size: 16px 16px;
             line-height: 1.2;
-            border-left: ($ic-sp / 3) solid transparent;
+            border-#{direction(left)}: ($ic-sp / 3) solid transparent;
             @include breakpoint(desktop) {
               background-position: ($ic-sp * 2) 50%;
               background-size: ($ic-sp * 2) ($ic-sp * 2);
-              padding-left: $ic-sp * 5;
+              padding-#{direction(left)}: $ic-sp * 5;
             }
           }
         }
@@ -928,7 +928,7 @@ $wizard-bg-color: $ic-color-dark;
     margin: 0;
     > .tag {
       display: block;
-      float: left;
+      float: direction(left);
       border: 1px solid #ccc;
       border-radius: 3px;
       background-color: #cdf;
@@ -947,7 +947,7 @@ $wizard-bg-color: $ic-color-dark;
 
 .hidden-readable {
   position: absolute;
-  left: -100000px;
+  #{direction(left)}: -100000px;
   top: auto;
   width: 1px;
   height: 1px;
@@ -973,7 +973,7 @@ $wizard-bg-color: $ic-color-dark;
         font-size: 1.2em;
         color: #248;
         font-family: courier, monospace;
-        text-align: right;
+        text-align: direction(right);
       }
     }
   }
@@ -1010,30 +1010,30 @@ $wizard-bg-color: $ic-color-dark;
       _height: 25px;
       color: #666;
       .header_title {
-        float: left;
+        float: direction(left);
       }
       .header_icon {
-        float: left;
+        float: direction(left);
         padding-top: 5px;
         &.announcement_header_icon {
           display: none;
         }
       }
       .title {
-        margin-left: 10px;
+        margin-#{direction(left)}: 10px;
         font-size: 1em;
         font-weight: bold;
         // :color #444
 
       }
       .sub_title {
-        margin-left: 30px;
+        margin-#{direction(left)}: 30px;
         line-height: 0.8em;
       }
       .context_code {
         font-size: 0.8em;
-        padding-right: 5px;
-        padding-left: 0;
+        padding-#{direction(right)}: 5px;
+        padding-#{direction(left)}: 0;
       }
       .context_name {
         font-size: 0.8em;
@@ -1043,8 +1043,8 @@ $wizard-bg-color: $ic-color-dark;
       }
       .points_possible {
         font-size: 0.8em;
-        padding-right: 5px;
-        padding-left: 0;
+        padding-#{direction(right)}: 5px;
+        padding-#{direction(left)}: 0;
       }
       .podcast {
         display: none;
@@ -1054,29 +1054,29 @@ $wizard-bg-color: $ic-color-dark;
         font-size: 0.8em;
       }
       .post_date {
-        float: right;
-        padding-right: 10px;
+        float: direction(right);
+        padding-#{direction(right)}: 10px;
         font-size: 0.8em;
         padding-top: 0.2em;
         .new-and-total-badge {
-          float: right;
+          float: direction(right);
         }
       }
       .under_links {
-        float: right;
-        clear: right;
-        padding-right: 10px;
+        float: direction(right);
+        clear: direction(right);
+        padding-#{direction(right)}: 10px;
         font-size: 0.8em;
         a {
           color: inherit;
         }
       }
       .link_box {
-        float: right;
+        float: direction(right);
         width: 60px;
-        text-align: right;
+        text-align: direction(right);
         min-height: 10px;
-        margin-right: 5px;
+        margin-#{direction(right)}: 5px;
         a {
           opacity: 0;
           &:hover, &:focus {
@@ -1089,8 +1089,8 @@ $wizard-bg-color: $ic-color-dark;
       padding: 5px 5px 1px 50px;
       color: #444;
       .links {
-        text-align: right;
-        margin-right: 2.5em;
+        text-align: direction(right);
+        margin-#{direction(right)}: 2.5em;
         display: block;
         font-size: 0.8em;
         color: #888;
@@ -1108,13 +1108,13 @@ $wizard-bg-color: $ic-color-dark;
         padding-top: 5px;
       }
       .status {
-        text-align: right;
+        text-align: direction(right);
         font-size: 0.8em;
       }
       .original_post_date {
-        text-align: right;
+        text-align: direction(right);
         font-size: 0.8em;
-        padding-right: 44px;
+        padding-#{direction(right)}: 44px;
         color: #888;
       }
       .statistics {
@@ -1177,7 +1177,7 @@ $wizard-bg-color: $ic-color-dark;
     background: #ffb;
     .header {
       .links {
-        float: right;
+        float: direction(right);
         font-size: 0.8em;
       }
     }
@@ -1191,20 +1191,20 @@ $wizard-bg-color: $ic-color-dark;
     .header {
       .podcast {
         display: block;
-        float: right;
+        float: direction(right);
         opacity: 0.7;
       }
     }
   }
   a.disable_item_link {
     visibility: hidden;
-    float: right;
-    margin-right: 6px;
+    float: direction(right);
+    margin-#{direction(right)}: 6px;
   }
   // use less padding on ones that are a boostrap .alert
   //(like enrollment invitation and account notifications)
   &.alert div.content {
-    padding-left: 35px;
+    padding-#{direction(left)}: 35px;
   }
 }
 
@@ -1271,8 +1271,8 @@ $wizard-bg-color: $ic-color-dark;
       padding: 0;
     }
     .score {
-      float: right;
-      padding-right: 10px;
+      float: direction(right);
+      padding-#{direction(right)}: 10px;
     }
   }
 }
@@ -1291,11 +1291,11 @@ $wizard-bg-color: $ic-color-dark;
       border-width: 0px;
       color: #999;
       .link_box {
-        float: right;
+        float: direction(right);
         width: 60px;
-        text-align: right;
+        text-align: direction(right);
         min-height: 10px;
-        margin-right: 5px;
+        margin-#{direction(right)}: 5px;
         opacity: 0.5;
         a {
           visibility: hidden;
@@ -1308,15 +1308,15 @@ $wizard-bg-color: $ic-color-dark;
         }
       }
       .header_title {
-        float: left;
+        float: direction(left);
       }
       .user_name {
-        padding-left: 5px;
+        padding-#{direction(left)}: 5px;
         white-space: nowrap;
       }
       .post_date {
-        float: right;
-        padding-right: 10px;
+        float: direction(right);
+        padding-#{direction(right)}: 10px;
         font-size: 0.9em;
         padding-top: 0.2em;
       }
@@ -1330,8 +1330,8 @@ $wizard-bg-color: $ic-color-dark;
       .less_important {
         color: #888;
         display: block;
-        text-align: right;
-        padding-right: 20px;
+        text-align: direction(right);
+        padding-#{direction(right)}: 20px;
       }
       a.textarea {
         display: block;
@@ -1364,7 +1364,7 @@ $wizard-bg-color: $ic-color-dark;
       }
     }
     &.footer {
-      float: right;
+      float: direction(right);
     }
   }
   &.toggled_communication_sub_message {
@@ -1377,7 +1377,7 @@ $wizard-bg-color: $ic-color-dark;
         display: inline;
         color: inherit;
         padding: 0;
-        margin-right: 15px;
+        margin-#{direction(right)}: 15px;
         border-width: 0;
         &:hover,
         &:focus {
@@ -1459,7 +1459,7 @@ html > body .new_activity_message form textarea {
 
 .notification_list {
   li a {
-    padding-left: 20px;
+    padding-#{direction(left)}: 20px;
     background-image: url(/images/other_icon.png);
     background-repeat: no-repeat;
     background-position: left center;
@@ -1488,12 +1488,12 @@ html > body .new_activity_message form textarea {
 }
 
 .module_legend {
-  float: right;
-  clear: right;
+  float: direction(right);
+  clear: direction(right);
   border: 1px solid #ccc;
   min-width: 200px;
   margin-bottom: 5px;
-  margin-left: 10px;
+  margin-#{direction(left)}: 10px;
   &.module_legend_locked {
     .title {
       display: none;
@@ -1532,7 +1532,7 @@ html > body .new_activity_message form textarea {
     }
   }
   .footer {
-    text-align: right;
+    text-align: direction(right);
     font-size: 0.8em;
   }
   .context_module_item {
@@ -1575,9 +1575,9 @@ body > #ui-datepicker-div {
       }
     }
     .ui-icon {
-      float: left;
+      float: direction(left);
       margin-top: 0.2em;
-      margin-right: 2px;
+      margin-#{direction(right)}: 2px;
     }
   }
 }
@@ -1594,9 +1594,9 @@ body > #ui-datepicker-div {
 
 #sequence_details {
   .sequence_list {
-    margin-left: 10px;
+    margin-#{direction(left)}: 10px;
     li {
-      padding-left: 20px;
+      padding-#{direction(left)}: 20px;
       background: url(/images/ball.png) no-repeat center left;
       &.prev, &.next {
         font-size: 0.9em;
@@ -1642,14 +1642,14 @@ body.padless-content .ic-Layout-contentMain,
     }
   }
   .next {
-    float: right;
+    float: direction(right);
   }
   .prev {
-    float: left;
+    float: direction(left);
   }
   .all {
-    clear: right;
-    float: right;
+    clear: direction(right);
+    float: direction(right);
   }
 }
 
@@ -1674,7 +1674,7 @@ body.padless-content .ic-Layout-contentMain,
       }
       &.locked_requirement {
         .description {
-          padding-left: $ic-sp*2;
+          padding-#{direction(left)}: $ic-sp*2;
         }
         a {
           color: $ic-color-medium;
@@ -1685,7 +1685,7 @@ body.padless-content .ic-Layout-contentMain,
       cursor: pointer;
       h3 {
         display: inline-block;
-        padding-left: $ic-sp;
+        padding-#{direction(left)}: $ic-sp;
       }
       ul {
         display: none;
@@ -1703,12 +1703,12 @@ form.user_content_post_form {
 }
 
 #change_calendar_version_link_holder {
-  float: right !important;
+  float: direction(right) !important;
   background: none !important;
 }
 
 #change_calendar_version_link_holder a, .dashboard-toggle a {
-  margin-right: 10px;
+  margin-#{direction(right)}: 10px;
   padding: 1px 10px;
   border-radius: 3px;
   @include vertical-gradient(#0abdff, #008fd6);
@@ -1751,7 +1751,7 @@ form.user_content_post_form {
   >*:not(.ic-alert-masquerade-student-view) {
     i {
       vertical-align: middle;
-      margin-right: 10px;
+      margin-#{direction(right)}: 10px;
     }
     b {
       line-height: 28px;
@@ -1786,16 +1786,16 @@ form.user_content_post_form {
 
 .nav-badge {
   @include ic-badge-maker;
-  float: right;
+  float: direction(right);
 }
 
 .unread-grade {
-  float: left;
+  float: direction(left);
   display: inline-block;
   line-height: 8px;
   width: 8px;
   margin-top: 6px;
-  margin-left: -16px;
+  margin-#{direction(left)}: -16px;
   background-color: #06a9ee;
   border-radius: 4px;
 }

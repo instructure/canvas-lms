@@ -45,7 +45,7 @@ div.math-dialog > span {
   // it and the buttonpane
   margin-bottom: -5px;
   min-height: 247px;
-  margin-left: 5px;
+  margin-#{direction(left)}: 5px;
   width: 96%;
 }
 
@@ -90,8 +90,8 @@ div.math-dialog > span {
 }
 
 .math-toggle {
-  text-align: right;
-  padding-right: 10px;
+  text-align: direction(right);
+  padding-#{direction(right)}: 10px;
 }
 
 #mathquill-view, #mathjax-view {

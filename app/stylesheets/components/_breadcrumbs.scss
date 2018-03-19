@@ -37,7 +37,7 @@
       // it can do the ellipsis thing. But if we use block or inline-block we get
       // white space issues, hence the float.
       > a .ellipsis {
-        float: right;
+        float: direction(right);
         line-height: inherit;
         // firefox has a bug so it can't do it like the rest of the browsers:
         // https://bugzilla.mozilla.org/show_bug.cgi?id=488725

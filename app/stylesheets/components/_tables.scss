@@ -268,7 +268,7 @@ $sp-table: $ic-sp + 2;
   th, td {
     padding: $sp-table $sp-table/2;
     line-height: 1.3;
-    text-align: left;
+    text-align: direction(left);
     vertical-align: middle;
     border-bottom-style: solid;
     border-bottom-width: 1px;
@@ -301,7 +301,7 @@ $sp-table: $ic-sp + 2;
     // If you need to add admin links to the far-right cell, enclose them in .ic-Table--actions
     .ic-Table__actions {
       position: relative;
-      text-align: right;
+      text-align: direction(right);
     }
   }
 

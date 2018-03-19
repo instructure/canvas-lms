@@ -197,7 +197,7 @@ $ic-Expand-link-size: $ic-sp*4;
     height: $ic-Expand-link-size;
     line-height: 1;
     position: absolute;
-    top: 0; right: 0;
+    top: 0; #{direction(right)}: 0;
     text-align: center;
     &:before {
       top: $ic-sp/2;
@@ -227,7 +227,7 @@ $ic-Expand-link-size: $ic-sp*4;
     }
 
     .ic-Expand-link__layout { padding: 0 0 0 $ic-Expand-link-size; }
-    .ic-Expand-link__icon { right: auto; left: 0; }
+    .ic-Expand-link__icon { #{direction(right)}: auto; #{direction(left)}: 0; }
 
     &.ic-Expand-link--active {
       .ic-Expand-link__trigger { @include ic-Expand-link-active-state; }

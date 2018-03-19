@@ -43,8 +43,8 @@
 }
 
 .header .links {
-  padding-left: $ic-sp;
-  float: right;
+  padding-#{direction(left)}: $ic-sp;
+  float: direction(right);
 }
 
 .header.header_hover {
@@ -62,8 +62,8 @@
 ul.sub_accounts {
   list-style-type: none;
   margin: 10px;
-  padding-left: 20px;
-  margin-right: 0;
+  padding-#{direction(left)}: 20px;
+  margin-#{direction(right)}: 0;
 }
 
 ul.sub_accounts .account {

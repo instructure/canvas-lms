@@ -37,7 +37,7 @@
   }
   td {
     &.icon_react a {
-      margin-right: 5px;
+      margin-#{direction(right)}: 5px;
       margin-bottom: 3px;
     }
     span.name {
@@ -59,9 +59,9 @@
       height: $ic-sp * 3;
       border: 1px solid $ic-border-color;
       padding: 2px;
-      margin-right: $ic-sp / 2;
+      margin-#{direction(right)}: $ic-sp / 2;
       vertical-align: middle;
-      float: left;
+      float: direction(left);
     }
     .details {
       max-width: 200px;

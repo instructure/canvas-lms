@@ -38,18 +38,18 @@
 }
 
 .pill > li {
-  float: left;
+  float: direction(left);
   padding: 0 10px;
-  border-right: solid 1px rgba(0, 0, 0, 0.25);
+  border-#{direction(right)}: solid 1px rgba(0, 0, 0, 0.25);
   @include fontSize($ic-font-size--xsmall);
 
   &:first-child {
-    padding-left: 10px;
+    padding-#{direction(left)}: 10px;
     border-radius: 1em 0 0 1em
   }
   &:last-child {
-    padding-right: 10px;
-    border-right: none;
+    padding-#{direction(right)}: 10px;
+    border-#{direction(right)}: none;
     border-radius: 0 1em 1em 0
   }
 }

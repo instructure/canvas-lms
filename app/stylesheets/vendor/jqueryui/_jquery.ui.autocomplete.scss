@@ -27,14 +27,14 @@
   padding: 2px;
   margin: 0;
   display:block;
-  float: left;
+  float: direction(left);
   .ui-menu { margin-top: -3px; }
   .ui-menu-item {
     margin:0;
     padding: 0;
     zoom: 1;
-    float: left;
-    clear: left;
+    float: direction(left);
+    clear: direction(left);
     width: 100%;
 
     a {

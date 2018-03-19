@@ -49,18 +49,18 @@
     width: 10px;
     height: 10px;
     position: absolute;
-    left: 3px;
+    #{direction(left)}: 3px;
     top: 22px;
     padding: 0;
   }
   .accessibly-hidden {
     position: absolute;
-    left: -9999px;
+    #{direction(left)}: -9999px;
   }
   .unread {
     width: 10px;
     height: 10px;
-    margin-left: -15px;
+    margin-#{direction(left)}: -15px;
     background-color: var(--ic-brand-primary);
     border-radius: 5px;
   }
@@ -85,7 +85,7 @@
     }
     .toggle-details {
       text-indent: 0;
-      text-align: right;
+      text-align: direction(right);
     }
   }
 }
@@ -100,7 +100,7 @@ $ignore-col-width: 50px;
 
 .toggle-details {
   display: block;
-  text-align: right;
+  text-align: direction(right);
   text-indent: 0;
   &:hover {
     text-decoration: none;
@@ -109,7 +109,7 @@ $ignore-col-width: 50px;
 
 .details_container {
   display: none;
-  margin-left: 62px;
+  margin-#{direction(left)}: 62px;
 }
 
 .stream-details {

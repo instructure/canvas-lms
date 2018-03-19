@@ -31,19 +31,19 @@ thead th {
   margin-bottom: 0;
   thead {
     tr:first-child th:first-child {
-      border-top-left-radius: 0 !important;
+      border-top-#{direction(left)}-radius: 0 !important;
       min-width: 175px;
     }
     tr:first-child th:last-child {
-      border-top-right-radius: 0 !important;
+      border-top-#{direction(right)}-radius: 0 !important;
     }
   }
   tbody {
     tr:last-child th {
-      border-bottom-left-radius: 0 !important;
+      border-bottom-#{direction(left)}-radius: 0 !important;
     }
     tr:last-child td:last-child {
-      border-bottom-right-radius: 0 !important;
+      border-bottom-#{direction(right)}-radius: 0 !important;
     }
   }
 }
@@ -52,10 +52,10 @@ thead th {
   border-radius: 4px 4px 0 0;
   thead {
     tr:first-child th:first-child {
-      border-top-left-radius: 4px !important;
+      border-top-#{direction(left)}-radius: 4px !important;
     }
     tr:first-child th:last-child {
-      border-top-right-radius: 4px !important;
+      border-top-#{direction(right)}-radius: 4px !important;
     }
   }
   .channel-name, .channel-addr {
@@ -68,10 +68,10 @@ thead th {
   border-radius: 0 0 4px 4px;
   tbody {
     tr:last-child th {
-      border-bottom-left-radius: 4px !important;
+      border-bottom-#{direction(left)}-radius: 4px !important;
     }
     tr:last-child td:last-child {
-      border-bottom-right-radius: 4px !important;
+      border-bottom-#{direction(right)}-radius: 4px !important;
     }
   }
 }
@@ -92,7 +92,7 @@ thead th {
 
 @media screen and (max-width: 1300px) {
   .notification-table-wrapper {
-    margin-right: 40px;
+    margin-#{direction(right)}: 40px;
   }
 }
 
@@ -157,7 +157,7 @@ thead th {
     }
   }
   .user-preference {
-    margin-left: 1.1em;
+    margin-#{direction(left)}: 1.1em;
     label {
       display: block;
       @include fontSize(13px);
@@ -169,7 +169,7 @@ h2, .h2 {
   position: relative;
   #notifications_save_status {
     position: absolute;
-    right: 0;
+    #{direction(right)}: 0;
     top: 0;
     width: 40px;
     height: 40px;
@@ -179,5 +179,5 @@ h2, .h2 {
 .weekly_notification_range {
   color: gray;
   font-style: italic;
-  padding-left: 1em;
+  padding-#{direction(left)}: 1em;
 }

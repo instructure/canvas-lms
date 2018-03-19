@@ -59,12 +59,12 @@ table.roles_table.ic-Table td.permissionButtonView {
     }
 
   .dropdown-menu {
-    text-align: left;
+    text-align: direction(left);
 
     input[type=radio] {
       /* Display none breaks ie so we position it off the page */
       position: absolute;
-      left: -9999px;
+      #{direction(left)}: -9999px;
     }
 
     label{
@@ -73,8 +73,8 @@ table.roles_table.ic-Table td.permissionButtonView {
     }
 
     span.text{
-      float: right;
-      text-align: left !important;
+      float: direction(right);
+      text-align: direction(left) !important;
       width: 110px;
 
       &:last{

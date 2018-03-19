@@ -55,7 +55,7 @@ The Icon-Text Combo is a tiny component for when you want to use an avatar or ic
   @include overwrite-default-icon-size(18px);
   // We don't know if it will be an icon or avatar (or something else) next to the text, hence the *
   > * + .ic-image-text-combo__text {
-    margin-left: $ic-sp;
+    margin-#{direction(left)}: $ic-sp;
   }
 }
 

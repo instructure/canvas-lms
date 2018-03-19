@@ -25,7 +25,7 @@
   background: url(/images/ajax-loader-linear.gif);
   content: '';
   display: inline-block;
-  margin-left: 7px;
+  margin-#{direction(left)}: 7px;
 }
 
 .loading.center {

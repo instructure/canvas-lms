@@ -18,7 +18,7 @@
 
 .post-to-sis-status {
   transition: none;
-  margin-right: $ic-sp;
+  margin-#{direction(right)}: $ic-sp;
   cursor: pointer;
 
   input {

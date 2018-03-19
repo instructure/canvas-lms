@@ -20,8 +20,8 @@
 
 /* Helper classes */
 .align-center { text-align: center; }
-.align-right  { text-align: right; }
-.padding-r    { padding-right: 16px; }
+.align-right  { text-align: direction(right); }
+.padding-r    { padding-#{direction(right)}: 16px; }
 .table        { display: table; }
 .table-row    { display: table-row; }
 .table-cell   { display: table-cell; }
@@ -56,9 +56,9 @@ header:not(.ic-app-header) {
 }
 
 .ig-row-label {
-  margin-right: $ic-sp;
+  margin-#{direction(right)}: $ic-sp;
   @include breakpoint(desktop) {
-    margin-right: $ic-sp*1.5;
+    margin-#{direction(right)}: $ic-sp*1.5;
   }
 }
 
@@ -67,12 +67,12 @@ header:not(.ic-app-header) {
 }
 
 .ig-list .ig-row {
-  padding-left: $ic-sp;
-  padding-right: $ic-sp;
+  padding-#{direction(left)}: $ic-sp;
+  padding-#{direction(right)}: $ic-sp;
 }
 
 .ig-info {
-  margin-left: 0;
+  margin-#{direction(left)}: 0;
 }
 
 .ig-title {

@@ -1356,10 +1356,10 @@ select.ic-Input:not(*:root) {
       .ic-Checkbox-group {
         flex: 1;
         margin: 0 $ic-sp/2;
-        &:first-child { margin-left: 0; }
-        &:last-child { margin-right: 0; }
+        &:first-child { margin-#{direction(left)}: 0; }
+        &:last-child { margin-#{direction(right)}: 0; }
 
-        .ic-Form-message { margin-left: 0; }
+        .ic-Form-message { margin-#{direction(left)}: 0; }
       }
 
     }
@@ -1377,7 +1377,7 @@ select.ic-Input:not(*:root) {
           > .ic-Label {
             margin-bottom: 0;
             flex: 0 0 $ic-horizontal-form-offset;
-            padding-right: $ic-sp*2;
+            padding-#{direction(right)}: $ic-sp*2;
           }
 
           > .ic-Input,
@@ -1387,16 +1387,16 @@ select.ic-Input:not(*:root) {
 
           > .ic-Form-message {
             display: block;
-            margin-left: 0;
+            margin-#{direction(left)}: 0;
             width: 100%;
             .ic-Form-message__Layout {
-              margin-left: $ic-horizontal-form-offset + $ic-sp;
+              margin-#{direction(left)}: $ic-horizontal-form-offset + $ic-sp;
               display: inline-flex;
             }
           }
 
           > .ic-Form-help-text {
-            padding-left: $ic-horizontal-form-offset;
+            padding-#{direction(left)}: $ic-horizontal-form-offset;
           }
         }
 
@@ -1411,12 +1411,12 @@ select.ic-Input:not(*:root) {
 
       > .ic-Fieldset--radio-checkbox {
         position: relative;
-        padding-left: $ic-horizontal-form-offset;
+        padding-#{direction(left)}: $ic-horizontal-form-offset;
         min-height: 30px;
 
         > .ic-Legend {
           position: absolute;
-          top: 5px; left: 0;
+          top: 5px; #{direction(left)}: 0;
           width: $ic-horizontal-form-offset - ($ic-sp * 2);
           margin-bottom: 0;
         }
@@ -1434,12 +1434,12 @@ select.ic-Input:not(*:root) {
 
       > .ic-Form-control:not(.ic-Form-control--checkbox):not(.ic-Form-control--radio) {
         .ic-Form-help-text {
-          padding-left: $ic-horizontal-form-offset + $ic-sp*2;
+          padding-#{direction(left)}: $ic-horizontal-form-offset + $ic-sp*2;
         }
       }
 
       > .ic-Fieldset--radio-checkbox {
-        padding-left: $ic-horizontal-form-offset + $ic-sp*2;
+        padding-#{direction(left)}: $ic-horizontal-form-offset + $ic-sp*2;
 
         .ic-Legend {
           width: $ic-horizontal-form-offset;
@@ -1456,7 +1456,7 @@ select.ic-Input:not(*:root) {
     background: $color;
     &:before {
       background: darken($color, 5%);
-      border-right: 1px solid darken($color, 12%);
+      border-#{direction(right)}: 1px solid darken($color, 12%);
     }
     &:after { border-bottom-color: darken($color, 5%); }
   }
@@ -1464,7 +1464,7 @@ select.ic-Input:not(*:root) {
 
 .ic-Form-message {
   display: inline-block;
-  margin-left: $ic-sp;
+  margin-#{direction(left)}: $ic-sp;
   position: relative;
   z-index: 1;
   transition: all 0.2s $ic-transition;
@@ -1477,11 +1477,11 @@ select.ic-Input:not(*:root) {
 // Make error message styles work with ic-Super-toggle
 .ic-Form-group:not(.ic-Form-group--horizontal) [class^="ic-Super-toggle--"] + .ic-Form-message {
   display: block;
-  margin-left: 0;
+  margin-#{direction(left)}: 0;
   .ic-Form-message__Layout { display: inline-flex; }
 }
 
-.ic-Input-group + .ic-Form-message { margin-left: 0; }
+.ic-Input-group + .ic-Form-message { margin-#{direction(left)}: 0; }
 
 .ic-Form-message__Layout {
   position: relative;
@@ -1499,12 +1499,12 @@ select.ic-Input:not(*:root) {
     width: 32px;
     height: 100%;
     position: absolute;
-    left: 0; top: 0;
+    #{direction(left)}: 0; top: 0;
     box-sizing: border-box;
   }
 
   &:after {
-    bottom: 100%; left: 16px;
+    bottom: 100%; #{direction(left)}: 16px;
     border: solid transparent;
     content: "";
     height: 0; width: 0;
@@ -1512,7 +1512,7 @@ select.ic-Input:not(*:root) {
     pointer-events: none;
     border-color: rgba(white, 0);
     border-width: $ic-sp/2;
-    margin-left: -($ic-sp/2);
+    margin-#{direction(left)}: -($ic-sp/2);
     box-sizing: border-box;
   }
 
@@ -1530,7 +1530,7 @@ select.ic-Input:not(*:root) {
     width: 32px; height: auto;
     flex: 0 0 32px;
     line-height: 1;
-    margin-right: $ic-sp - 4;
+    margin-#{direction(right)}: $ic-sp - 4;
     box-sizing: border-box;
     display: flex;
     justify-content: center;
@@ -1560,7 +1560,7 @@ form.ic-Form-group { margin: 0; }
     .ic-Form-message__Layout:after { display: none; }
 
     &.ic-Form-control--checkbox,
-    .ic-Radio { padding-right: $ic-sp*1.5; }
+    .ic-Radio { padding-#{direction(right)}: $ic-sp*1.5; }
   }
 
   &.ic-Form-control--has-error {
@@ -1594,8 +1594,8 @@ form.ic-Form-group { margin: 0; }
     > .ic-Input-group {
       margin: 0 $ic-sp/3;
       flex: 1;
-      &:first-child { margin-left: 0; }
-      &:last-child { margin-right: 0; }
+      &:first-child { margin-#{direction(left)}: 0; }
+      &:last-child { margin-#{direction(right)}: 0; }
     }
   }
 }
@@ -1615,7 +1615,7 @@ form.ic-Form-group { margin: 0; }
   margin-top: $ic-sp;
   border: 1px solid $ic-border-light;
   padding: $ic-sp;
-  text-align: right;
+  text-align: direction(right);
   background: darken($ic-color-light, 3%);
   white-space: nowrap;
 }
@@ -1667,7 +1667,7 @@ form.ic-Form-group { margin: 0; }
     margin: 0;
     position: relative;
     z-index: 1;
-    padding: $ic-sp/3 0 $ic-sp/3 $ic-radio-checkbox-left-offset;
+    padding: direction-sides($ic-sp/3 0 $ic-sp/3 $ic-radio-checkbox-left-offset);
     font-weight: normal;
     display: inline-block;
 
@@ -1679,18 +1679,18 @@ form.ic-Form-group { margin: 0; }
       width: 16px; height: 16px;
       border: 1px solid $ic-Input-border;
       position: absolute;
-      top: 5px; left: 0;
+      top: 5px; #{direction(left)}: 0;
       background: $ic-color-light;
     }
 
   }
 
-  ~ .ic-Form-message { margin-left: $ic-radio-checkbox-left-offset; }
+  ~ .ic-Form-message { margin-#{direction(left)}: $ic-radio-checkbox-left-offset; }
 
   input[type="radio"] {
     opacity: 0;
     position: absolute;
-    top: 0; left: 0;
+    top: 0; #{direction(left)}: 0;
 
     // overwrite Bootstrap
     ~ .ic-Label { vertical-align: baseline; }
@@ -1784,7 +1784,7 @@ form.ic-Form-group { margin: 0; }
       display: flex;
       flex-wrap: wrap;
       .ic-Form-control.ic-Form-control--checkbox {
-        margin-right: $ic-sp*1.5;
+        margin-#{direction(right)}: $ic-sp*1.5;
       }
       .ic-Form-message { display: block; }
     }
@@ -1806,7 +1806,7 @@ form.ic-Form-group { margin: 0; }
     margin-bottom: 0;
     position: relative;
     z-index: 1;
-    padding: $ic-sp/3 0 $ic-sp/3 $ic-radio-checkbox-left-offset;
+    padding: direction-sides($ic-sp/3 0 $ic-sp/3 $ic-radio-checkbox-left-offset);
     font-weight: normal;
     display: inline-block;
 
@@ -1815,7 +1815,7 @@ form.ic-Form-group { margin: 0; }
       transition: border-color 0.2s ease-out, outline-offset 0.2s ease-out, outline-color 0.2s ease-out;
       box-sizing: border-box;
       position: absolute;
-      top: 5px; left: 0;
+      top: 5px; #{direction(left)}: 0;
       width: 16px; height: 16px;
       border-radius: $baseBorderRadius;
       background: url("/images/forms/ic-checkbox-bg.svg") no-repeat center bottom $ic-color-light;
@@ -1827,7 +1827,7 @@ form.ic-Form-group { margin: 0; }
   }
 
   .ic-Form-message {
-    margin-left: $ic-radio-checkbox-left-offset;
+    margin-#{direction(left)}: $ic-radio-checkbox-left-offset;
     vertical-align: middle;
   }
 
@@ -1835,7 +1835,7 @@ form.ic-Form-group { margin: 0; }
     margin: 0;
     opacity: 0;
     position: absolute;
-    top: 0; left: 0;
+    top: 0; #{direction(left)}: 0;
 
     &:not([disabled]):hover {
       ~ .ic-Label:before { border-color: var(--ic-brand-primary); }
@@ -1890,27 +1890,27 @@ form.ic-Form-group { margin: 0; }
     flex: 1;
 
     &:not(:first-child) {
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
+      border-top-#{direction(left)}-radius: 0;
+      border-bottom-#{direction(left)}-radius: 0;
     }
     &:not(:last-child) {
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
+      border-top-#{direction(right)}-radius: 0;
+      border-bottom-#{direction(right)}-radius: 0;
     }
   }
 
   .Button {
 
     &:first-child {
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-      &:not(.Button--primary):not(.Button--secondary):not(.Button--success):not(.Button--warning):not(.Button--danger) { border-right: none; }
+      border-top-#{direction(right)}-radius: 0;
+      border-bottom-#{direction(right)}-radius: 0;
+      &:not(.Button--primary):not(.Button--secondary):not(.Button--success):not(.Button--warning):not(.Button--danger) { border-#{direction(right)}: none; }
     }
 
     &:last-child {
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
-      &:not(.Button--primary):not(.Button--secondary):not(.Button--success):not(.Button--warning):not(.Button--danger) { border-left: none; }
+      border-top-#{direction(left)}-radius: 0;
+      border-bottom-#{direction(left)}-radius: 0;
+      &:not(.Button--primary):not(.Button--secondary):not(.Button--success):not(.Button--warning):not(.Button--danger) { border-#{direction(left)}: none; }
     }
   }
 
@@ -1924,14 +1924,14 @@ form.ic-Form-group { margin: 0; }
     padding: $ic-sp/2 ($ic-sp - 4);
 
     &:first-child {
-      border-right: none;
-      border-top-left-radius: $baseBorderRadius;
-      border-bottom-left-radius: $baseBorderRadius;
+      border-#{direction(right)}: none;
+      border-top-#{direction(left)}-radius: $baseBorderRadius;
+      border-bottom-#{direction(left)}-radius: $baseBorderRadius;
     }
     &:last-child {
-      border-left: none;
-      border-top-right-radius: $baseBorderRadius;
-      border-bottom-right-radius: $baseBorderRadius;
+      border-#{direction(left)}: none;
+      border-top-#{direction(right)}-radius: $baseBorderRadius;
+      border-bottom-#{direction(right)}-radius: $baseBorderRadius;
     }
   }
 
@@ -1968,17 +1968,17 @@ form.ic-Form-group { margin: 0; }
     .ic-Action-header__Secondary {
       flex: 1;
       box-sizing: border-box;
-      text-align: right;
+      text-align: direction(right);
       &--auto {
         flex: 0 0 auto;
       }
       > .Button,
       > .btn,
-      > .ui-button { margin-left: $ic-sp/4; }
+      > .ui-button { margin-#{direction(left)}: $ic-sp/4; }
     }
 
     .ic-Action-header__Primary + .ic-Action-header__Secondary {
-      padding-left: $ic-sp*2;
+      padding-#{direction(left)}: $ic-sp*2;
     }
   }
 }
@@ -2001,8 +2001,8 @@ form.ic-Form-group { margin: 0; }
     @include breakpoint(desktop) {
       margin: 0 $ic-sp/3;
       flex: 1;
-      &:first-child { margin-left: 0; }
-      &:last-of-type { margin-right: 0; }
+      &:first-child { margin-#{direction(left)}: 0; }
+      &:last-of-type { margin-#{direction(right)}: 0; }
     }
   }
 
@@ -2019,7 +2019,7 @@ form.ic-Form-group { margin: 0; }
 
 .ic-Form-action-box__Actions {
   box-sizing: border-box;
-  padding-left: $ic-sp*4;
+  padding-#{direction(left)}: $ic-sp*4;
 }
 
 .ic-Form-help-text {

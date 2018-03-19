@@ -20,12 +20,12 @@
 
 .Reminder__course-setup {
   .Reminder__course-setup-title {
-    text-align: left;
+    text-align: direction(left);
     border-bottom-style: none;
     margin-bottom: 0;
   }
   .Reminder__course-setup-subttitle {
-    float: right;
+    float: direction(right);
     @include fontSize(11px);
     padding-top: .1563rem;
     text-transform: capitalize;

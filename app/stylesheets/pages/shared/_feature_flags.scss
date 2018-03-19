@@ -67,12 +67,12 @@ $left-offset:  16px;
   @include fontSize(16px);
   font-weight: bold;
   line-height: 24px;
-  padding-left: $left-offset;
+  padding-#{direction(left)}: $left-offset;
 }
 
 .feature-title {
   font-weight: bold;
-  margin-right: 8px;
+  margin-#{direction(right)}: 8px;
 }
 
 .feature-release, .feature-release-notes-link {
@@ -92,13 +92,13 @@ $left-offset:  16px;
 }
 
 .feature-details p {
-  padding-left: 24px;
+  padding-#{direction(left)}: 24px;
 }
 
 .feature-detail-links {
   bottom: 0;
   position: absolute;
-  right: 0;
+  #{direction(right)}: 0;
 }
 // this snippet styles the feature flag description so it allows
 // it to be underlined / highlighted
@@ -118,10 +118,10 @@ $switch-text: rgba($ic-color-light, 0.8);
     background-color: $switch-background-disabled;
   }
   &.ff-left {
-    border-radius: 20px 0 0 20px;
+    border-radius: direction-corners(20px 0 0 20px);
   }
   &.ff-right{
-    border-radius: 0 20px 20px 0;
+    border-radius: direction-corners(0 20px 20px 0);
   }
 }
 

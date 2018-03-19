@@ -28,7 +28,7 @@
     text-align: center;
 }
 .create-collaborations-dropdown {
-    margin-left: 20px;
+    margin-#{direction(left)}: 20px;
 }
 .CollaborationsApp .LoadMore-button{
   text-align: center;

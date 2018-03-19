@@ -31,7 +31,7 @@
   .email {
     font-size: 0.8em;
     color: #888;
-    padding-left: 10px;
+    padding-#{direction(left)}: 10px;
   }
   .type {
     color: #888;

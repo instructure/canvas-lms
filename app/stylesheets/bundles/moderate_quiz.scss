@@ -21,7 +21,7 @@
 }
 
 .outstanding_link {
-  float: right;
+  float: direction(right);
 }
 
 #students {
@@ -35,7 +35,7 @@
       display:none {}
     }
     position: relative;
-    left: -2px;
+    #{direction(left)}: -2px;
     top: -2px;
   }
   th {
@@ -45,7 +45,7 @@
     text-align: center;
   }
   th.name, td.name {
-    text-align: left;
+    text-align: direction(left);
   }
   th.unlocked_col, td.unlocked_col {
     padding: 8px 2px;
@@ -69,7 +69,7 @@
     &.extendable {
       .extend_time_link {
         display: inline;
-        padding-left: 5px;
+        padding-#{direction(left)}: 5px;
       }
     }
   }
@@ -86,10 +86,10 @@
     line-height: 1em;
   }
   .field {
-    float: left;
+    float: direction(left);
     margin-bottom: 13px;
     label {
-      float: left;
+      float: direction(left);
       width: 260px;
       font-size: 115%;
       .note {
@@ -101,24 +101,24 @@
       }
     }
     .input {
-      float: right;
+      float: direction(right);
       width: 160px;
       margin-top: 6px;
       input[type="text"] {
-        float: left;
+        float: direction(left);
         width: 50px;
       }
       .units {
         line-height: 30px;
-        margin-left: 8px;
+        margin-#{direction(left)}: 8px;
         font-size: 90%;
       }
     }
   }
   .manually_unlock, .one_time_results {
     input {
-      float: left;
-      margin-right: 10px;
+      float: direction(left);
+      margin-#{direction(right)}: 10px;
     }
     label {
       width: 400px;
@@ -132,13 +132,13 @@
   }
   dt {
     width: 75px;
-    float: left;
+    float: direction(left);
     font-weight: bold;
-    text-align: right;
+    text-align: direction(right);
   }
   dd {
     width: 330px;
-    float: left;
+    float: direction(left);
   }
   p {
     margin-bottom: 1.5em;

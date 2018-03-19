@@ -32,11 +32,11 @@
   display: block;
 }
 .edit_term_buttons {
-  text-align: right;
+  text-align: direction(right);
 }
 #terms .term td.header {
   font-size: 1.2em;
-  padding-right: 20px;
+  padding-#{direction(right)}: 20px;
 }
 .term .permissions {
   font-size: 0.8em;
@@ -53,7 +53,7 @@
   padding: 2px 0;
 }
 #terms td.links {
-  padding-left: 5px;
+  padding-#{direction(left)}: 5px;
 }
 #terms form.enrollment_term_form {
   width: 80%;

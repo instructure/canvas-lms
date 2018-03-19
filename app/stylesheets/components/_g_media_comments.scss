@@ -32,7 +32,7 @@
 }
 
 #media_record_option_holder, #video_record_holder_holder, #audio_record_holder_holder {
-  float: left;
+  float: direction(left);
 }
 
 #media_record_option_holder .record_option.selected_option {
@@ -99,7 +99,7 @@ div#audio_upload, div#video_upload {
 
 #media_upload_file_size {
   font-size: 0.8em;
-  padding-left: 20px;
+  padding-#{direction(left)}: 20px;
 }
 
 #media_upload_progress {
@@ -131,12 +131,12 @@ div#audio_upload, div#video_upload {
 .volume_meter {
   width: 20px;
   height: 240px;
-  float: right;
+  float: direction(right);
   border: 0px solid #888;
-  border-left-width: 0;
+  border-#{direction(left)}-width: 0;
   position: absolute;
   top: 0;
-  left: 400px;
+  #{direction(left)}: 400px;
   z-index: 9999;
 }
 

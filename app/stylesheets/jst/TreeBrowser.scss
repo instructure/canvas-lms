@@ -23,7 +23,7 @@
   &, ul {
     @include reset-list;
   }
-  ul { margin-left: 8px; }
+  ul { margin-#{direction(left)}: 8px; }
   li a {
     padding-bottom: 2px;
     display: flex;
@@ -40,7 +40,7 @@
     display: inline-block;
     width: 42px;
     height: 42px;
-    padding-right: 6px;
+    padding-#{direction(right)}: 6px;
     .preview-thumbnail {
       max-width: 100%;
       max-height: 100%;
@@ -48,7 +48,7 @@
   }
   .icon-folder:before, .icon-folder-locked:before {
     @include fontSize(11px);
-    padding-right: $ic-sp/2;
+    padding-#{direction(right)}: $ic-sp/2;
     vertical-align: middle;
   }
 

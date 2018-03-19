@@ -25,7 +25,7 @@ $usage-rights-alert-text: $ic-color-light;
 
 .UsageRightsDialog__warning {
   color: $usage-rights-alert-text;
-  margin-right: 10px;
+  margin-#{direction(right)}: 10px;
 }
 
 .UsageRightsDialog__andMore {
@@ -38,14 +38,14 @@ $usage-rights-alert-text: $ic-color-light;
 }
 
 .UsageRightsDialog__tooltip {
-  text-align: left !important; /* Important so it overides the default stuff */
+  text-align: direction(left) !important; /* Important so it overides the default stuff */
 }
 
 .UsageRightsDialog__folderBulletList {
   /* list-style-image: url(/images/mimeClassIcons/folder.svg)
       would be better than this stuff, but sizing is hard with it. */
   list-style: none;
-  margin-left: 0;
+  margin-#{direction(left)}: 0;
   li:before {
     content:'';
     display:inline-block;

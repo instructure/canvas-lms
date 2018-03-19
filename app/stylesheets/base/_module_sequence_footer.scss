@@ -48,8 +48,8 @@ $bar-height: 64px;
   animation: module-sequence-footer-animation 0.5s ease-out;
 }
 
-.module-sequence-footer-button--next { float: right; }
-.module-sequence-footer-button--previous { float: left; }
+.module-sequence-footer-button--next { float: direction(right); }
+.module-sequence-footer-button--previous { float: direction(left); }
 
 @media print {
   .module-sequence-padding, .module-sequence-footer {

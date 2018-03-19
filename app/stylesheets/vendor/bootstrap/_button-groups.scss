@@ -14,7 +14,7 @@
 
 // Space out series of button groups
 .btn-group + .btn-group {
-  margin-left: 5px;
+  margin-#{direction(left)}: 5px;
 }
 
 // Optional: Group multiple button groups together for a toolbar
@@ -25,7 +25,7 @@
   .btn + .btn,
   .btn-group + .btn,
   .btn + .btn-group {
-    margin-left: 5px;
+    margin-#{direction(left)}: 5px;
   }
 }
 
@@ -35,7 +35,7 @@
   border-radius: 0;
 }
 .btn-group > .btn + .btn {
-  margin-left: -1px;
+  margin-#{direction(left)}: -1px;
 }
 .btn-group > .btn,
 .btn-group > .dropdown-menu {
@@ -159,7 +159,7 @@
 // Reposition the caret
 .btn .caret {
   margin-top: 8px;
-  margin-left: 0;
+  margin-#{direction(left)}: 0;
 }
 // Carets in other button sizes
 .btn-mini .caret,

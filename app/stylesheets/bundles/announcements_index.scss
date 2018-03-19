@@ -22,6 +22,6 @@
 
 #delete_announcements, #lock_announcements {
   svg {
-    margin-right: 0 !important;
+    margin-#{direction(right)}: 0 !important;
   }
 }

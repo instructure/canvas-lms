@@ -46,7 +46,7 @@
   }
 
   .header-table-right {
-    text-align: right;
+    text-align: direction(right);
     width: 60%;
   }
 }
@@ -78,7 +78,7 @@
 .navigation_title, .appointment_group_title {
   display: inline;
   line-height: 32px;
-  padding-left: 5px;
+  padding-#{direction(left)}: 5px;
   white-space: nowrap;
   @include fontSize($ic-font-size--medium);
 }
@@ -87,9 +87,9 @@
   background-image: url("/images/ajax-loader-black-on-white-static.gif");
   background-position: 50% 50%;
   display: block;
-  float: right;
+  float: direction(right);
   height: 16px;
-  margin-left: 3px;
+  margin-#{direction(left)}: 3px;
   position: relative;
   top: 8px;
   width: 16px;
@@ -100,13 +100,13 @@
 
 #create_new_event_link {
   color: #444444;
-  margin-left: 5px;
+  margin-#{direction(left)}: 5px;
 }
 
 .whats-new {
   @include fontSize(11px);
   line-height: 32px;
-  margin-right: 0px;
+  margin-#{direction(right)}: 0px;
 }
 
 .counter-badge {

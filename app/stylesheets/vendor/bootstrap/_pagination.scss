@@ -11,7 +11,7 @@
   // Allow for text-based alignment
   display: inline-block;
   // Reset default ul styles
-  margin-left: 0;
+  margin-#{direction(left)}: 0;
   margin-bottom: 0;
   // Visuals
   @include border-radius($baseBorderRadius);
@@ -22,13 +22,13 @@
 }
 .pagination ul > li > a,
 .pagination ul > li > span {
-  float: left; // Collapse white-space
+  float: direction(left); // Collapse white-space
   padding: 4px 12px;
   line-height: $baseLineHeight;
   text-decoration: none;
   background-color: $paginationBackground;
   border: 1px solid $paginationBorder;
-  border-left-width: 0;
+  border-#{direction(left)}-width: 0;
 }
 .pagination ul > li > a:hover,
 .pagination ul > .active > a,
@@ -49,7 +49,7 @@
 }
 .pagination ul > li:first-child > a,
 .pagination ul > li:first-child > span {
-  border-left-width: 1px;
+  border-#{direction(left)}-width: 1px;
   @include border-left-radius($baseBorderRadius);
 }
 .pagination ul > li:last-child > a,
@@ -65,7 +65,7 @@
   text-align: center;
 }
 .pagination-right {
-  text-align: right;
+  text-align: direction(right);
 }
 
 

@@ -19,17 +19,17 @@
 @import 'components/ic-unread-badge';
 
 .ic-item-row__select-col + .ic-item-row__author-col {
-  margin-left: 11px;
+  margin-#{direction(left)}: 11px;
 }
 
 .ic-item-row__icon-col-student{
   display: flex;
   align-items: center;
-  margin-left: 11px;
+  margin-#{direction(left)}: 11px;
 }
 
 .ic-item-row__icon-col-teacher{
-  margin-right: -11px;
+  margin-#{direction(right)}: -11px;
 }
 
 .ic-item-row {
@@ -57,7 +57,7 @@
   margin: 0 22px;
 
   &:first-child {
-    margin-left: 0;
+    margin-#{direction(left)}: 0;
   }
 
   & > .ic-item-row__content-link {
@@ -101,7 +101,7 @@
   max-width: 230px;
   display: flex;
   flex-direction: column;
-  text-align: right;
+  text-align: direction(right);
 
   .ic-item-row__meta-actions {
     height: 23px;
@@ -153,8 +153,8 @@
     .ic-item-row__master-course-lock {
       &:focus { @include ic-focus-variant; }
       vertical-align: text-bottom;
-      margin-left: 10px;
-      margin-right: 2px;
+      margin-#{direction(left)}: 10px;
+      margin-#{direction(right)}: 2px;
     }
   }
 

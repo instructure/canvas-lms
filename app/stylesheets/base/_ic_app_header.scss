@@ -38,16 +38,16 @@ $ic-subnav-tray-bgd: black;
 $ic-tooltip-arrow-size: 0.375rem;
 
 .tray-with-space-for-global-nav {
-  margin-left: $ic-header-primary-width - 30;
+  margin-#{direction(left)}: $ic-header-primary-width - 30;
   body.primary-nav-expanded & {
-    margin-left: $ic-header-primary-width;
+    margin-#{direction(left)}: $ic-header-primary-width;
   }
 }
 
 .ic-app-header {
   box-sizing: border-box;
   position: fixed;
-  top: 0; left: 0;
+  top: 0; #{direction(left)}: 0;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -64,7 +64,7 @@ $ic-tooltip-arrow-size: 0.375rem;
 .ic-app-header__secondary-navigation {
   box-sizing: border-box;
   position: absolute;
-  left: 0;
+  #{direction(left)}: 0;
   bottom: 0;
   z-index: 1;
   width: 100%;
@@ -244,7 +244,7 @@ button.ic-app-header__menu-list-link {
   box-sizing: border-box;
   background-color: var(--ic-brand-global-nav-ic-icon-svg-fill--active);
   position: absolute;
-  left: 100%;
+  #{direction(left)}: 100%;
   top: 50%;
   padding: 0 $ic-sp;
   line-height: 1.8rem;
@@ -264,7 +264,7 @@ button.ic-app-header__menu-list-link {
   }
 
   &::after {
-    right: 100%;
+    #{direction(right)}: 100%;
     top: 50%;
     border: solid transparent;
     content: "";
@@ -273,7 +273,7 @@ button.ic-app-header__menu-list-link {
     position: absolute;
     pointer-events: none;
     border-color: transparent;
-    border-right-color: var(--ic-brand-global-nav-ic-icon-svg-fill--active);
+    border-#{direction(right)}-color: var(--ic-brand-global-nav-ic-icon-svg-fill--active);
     border-width: $ic-tooltip-arrow-size;
     margin-top: -($ic-tooltip-arrow-size);
   }
@@ -283,7 +283,7 @@ button.ic-app-header__menu-list-link {
   @include ic-badge-maker;
   transition: all 0.3s ease-out;
   position: absolute;
-  top: -0.5em; right: 0;
+  top: -0.5em; #{direction(right)}: 0;
   background: var(--ic-brand-global-nav-menu-item__badge-bgd);
   color: var(--ic-brand-global-nav-menu-item__badge-text);
 }
@@ -333,7 +333,7 @@ body.primary-nav-expanded {
 
   .ic-app-header__secondary-navigation {
     position: static;
-    left: auto;
+    #{direction(left)}: auto;
     bottom: auto;
     z-index: auto;
     width: auto;
@@ -368,7 +368,7 @@ body.primary-nav-expanded {
   .menu-item__text {
     transition: none;
     position: static;
-    left: auto;
+    #{direction(left)}: auto;
     top: auto;
     transform: none;
     opacity: 1;

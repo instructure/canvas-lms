@@ -24,20 +24,20 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
   /*== Icons ==*/
   .move_icon, .group_move_icon { cursor: move }
   .move_icon, .group_move_icon, .links a {
-    left: -10000px;
+    #{direction(left)}: -10000px;
     position: relative;
 
     // the focus class exists to help with testing (i.e. add 'focus' class
     // before clicking in selenium).
     &:focus, &.focus {
-      left: auto;
+      #{direction(left)}: auto;
       text-decoration: none;
     }
   }
 
   .group_assignment .content:hover, .header_content:hover {
     .move_icon, .group_move_icon, .links a {
-      left: auto;
+      #{direction(left)}: auto;
       text-decoration: none;
 
       opacity: 0.5;
@@ -84,7 +84,7 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
 
     /*== Table cells ==*/
     &.move {
-      padding-left: 12px;
+      padding-#{direction(left)}: 12px;
       width: 20px;
     }
     &.assignment_title {
@@ -96,7 +96,7 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
       width: 25%;
     }
     &.links {
-      padding-right: 12px;
+      padding-#{direction(right)}: 12px;
       width: 40px;
     }
   }
@@ -115,8 +115,8 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
       display: inline-block;
     }
 
-    .cell.first { padding-left:  6px; }
-    .cell.last  { padding-right: 6px; }
+    .cell.first { padding-#{direction(left)}:  6px; }
+    .cell.last  { padding-#{direction(right)}: 6px; }
 
     .no_points                    { display: none; }
     .points_uneditable .points    { display: none; }
@@ -144,7 +144,7 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
     }
     .details {
       display: block;
-      margin-left: 60px;
+      margin-#{direction(left)}: 60px;
       font-size: 0.8em;
       margin-bottom: 5px;
     }
@@ -181,12 +181,12 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
       }
     }
     div.data {
-      float: left;
+      float: direction(left);
       border: 0px;
       padding: 2px 5px 2px 5px;
       &.assignment_title {
         width: 40%;
-        margin-left: 30px;
+        margin-#{direction(left)}: 30px;
         .title {
           font-size: 1.3em;
           font-weight: bold;
@@ -241,7 +241,7 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
         width: auto;
         border-bottom: 1px solid #999999;
         background-color: #dddddd;
-        padding-left: 25px;
+        padding-#{direction(left)}: 25px;
         color: #666666;
         margin-bottom: 0px;
         border-top-right-radius: 3px;
@@ -286,17 +286,17 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
         }
       }
       div.data {
-        float: left;
+        float: direction(left);
         border: 0px;
         padding: 2px 5px 2px 5px;
         &.assignment_title {
           width: 40%;
           font-weight: bold;
-          margin-left: 30px;
+          margin-#{direction(left)}: 30px;
           .context_name {
             font-weight: normal;
             font-size: 0.7em;
-            padding-left: 10px;
+            padding-#{direction(left)}: 10px;
             color: #888888;
           }
         }
@@ -309,13 +309,13 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
           font-size: 0.8em;
         }
         &.buttons {
-          float: right;
+          float: direction(right);
         }
         &.links {
           display: none;
         }
         &.name {
-          margin-right: 10px;
+          margin-#{direction(right)}: 10px;
           font-weight: bold;
           width: 200px;
         }
@@ -362,7 +362,7 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
     display: block;
     margin-top: 3px;
     color: $ic-font-color-dark;
-    padding-left: 5px;
+    padding-#{direction(left)}: 5px;
   }
 }
 
@@ -372,20 +372,20 @@ table.full_assignment_table {
 
 #submit_from_external_tool_form {
   #external_tool_submission_details {
-    padding-left: 10px;
+    padding-#{direction(left)}: 10px;
     &.not_selected {
       color: #777766;
       font-style: italic;
     }
     &.file_submission {
       font-weight: bold;
-      padding-left: 28px;
+      padding-#{direction(left)}: 28px;
       background: url(/images/file.png) no-repeat 10px center;
       @include fontSize($ic-font-size--medium);
     }
     &.url_submission {
       font-weight: bold;
-      padding-left: 28px;
+      padding-#{direction(left)}: 28px;
       background: url(/images/link.png) no-repeat 10px center;
       @include fontSize($ic-font-size--medium);
     }
@@ -397,7 +397,7 @@ table.full_assignment_table {
   }
   .tools {
     list-style-type: none;
-    margin-right: 20px;
+    margin-#{direction(right)}: 20px;
     .tool {
       display: block;
       padding: 2px 5px;
@@ -422,7 +422,7 @@ table.full_assignment_table {
 }
 
 input[type="checkbox"].post_to_sis_checkbox {
-  margin-left: 20px;
+  margin-#{direction(left)}: 20px;
 }
 
 .dl-horizontal.vdd_tooltip_content {
@@ -434,10 +434,10 @@ input[type="checkbox"].post_to_sis_checkbox {
     margin-bottom: 5px;
   }
   dd {
-    margin-left: 125px;
+    margin-#{direction(left)}: 125px;
     width: 115px;
     line-height: 12px;
-    text-align: left;
+    text-align: direction(left);
   }
 }
 

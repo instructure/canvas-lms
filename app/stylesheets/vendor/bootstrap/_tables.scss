@@ -13,7 +13,7 @@
   td {
     padding: 8px;
     line-height: $baseLineHeight;
-    text-align: left;
+    text-align: direction(left);
     vertical-align: top;
     border-top: 1px solid $tableBorder;
   }
@@ -59,11 +59,11 @@
   border: 1px solid $tableBorder;
   border-collapse: separate; // Done so we can round those corners!
   *border-collapse: collapse; // IE7 can't round corners anyway
-  border-left: 0;
+  border-#{direction(left)}: 0;
   @include border-radius($baseBorderRadius);
   th,
   td {
-    border-left: 1px solid $tableBorder;
+    border-#{direction(left)}: 1px solid $tableBorder;
   }
   // Prevent a double border
   caption + thead tr:first-child th,
@@ -155,7 +155,7 @@ table th[class*="span"],
 .row-fluid table th[class*="span"] {
   display: table-cell;
   float: none; // undo default grid column styles
-  margin-left: 0; // undo default grid column styles
+  margin-#{direction(left)}: 0; // undo default grid column styles
 }
 
 // Change the column widths to account for td/th padding

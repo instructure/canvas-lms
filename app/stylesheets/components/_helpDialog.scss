@@ -62,7 +62,7 @@
     padding: 10px 10px 6px;
     width: 380px;
     position: absolute;
-    left: 400px;
+    #{direction(left)}: 400px;
     top: 0;
   }
   textarea {
@@ -84,7 +84,7 @@
     }
     .ui-icon {
       position: absolute;
-      left: 10px;
+      #{direction(left)}: 10px;
       top: 10px;
     }
   }
@@ -92,14 +92,14 @@
 
 .ui-dialog-header-backlink {
   display: block;
-  float: left;
+  float: direction(left);
   overflow: hidden;
   text-indent: -999px;
   width: 16px;
   height: 16px;
-  margin-left: -4px;
+  margin-#{direction(left)}: -4px;
   margin-top: 2px;
-  margin-right: 10px;
+  margin-#{direction(right)}: 10px;
   background: url(/images/jqueryui/icon_sprite.png) no-repeat left -32px;
   &:hover {
     background-position: left -48px;

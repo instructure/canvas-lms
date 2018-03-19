@@ -21,14 +21,14 @@
 .accessibility-warning {
   @include accessibility-prompt;
   position: absolute;
-  left: -10000px;
+  #{direction(left)}: -10000px;
   top: auto;
   width: 1px;
   height: 1px;
   overflow: hidden;
   @include fontSize(12px);
   &:focus{
-    left: 0;
+    #{direction(left)}: 0;
     top: 36px;
     width: auto;
     height: auto;
@@ -99,7 +99,7 @@
 
   @include breakpoint(desktop) {
     margin-bottom: 0;
-    margin-right: $ic-sp * 2;
+    margin-#{direction(right)}: $ic-sp * 2;
   }
 }
 

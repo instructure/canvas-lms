@@ -33,7 +33,7 @@
 // Place the caret
 .dropdown .caret {
   margin-top: 8px;
-  margin-left: 2px;
+  margin-#{direction(left)}: 2px;
 }
 
 // The dropdown menu (ul)
@@ -41,10 +41,10 @@
 .dropdown-menu {
   position: absolute;
   top: 100%;
-  left: 0;
+  #{direction(left)}: 0;
   z-index: $zindexDropdown;
   display: none; // none by default, but block on "open" of the menu
-  float: left;
+  float: direction(left);
   min-width: 160px;
   padding: 5px 0;
   margin: 2px 0 0; // override default ul
@@ -62,8 +62,8 @@
 
   // Aligns the dropdown menu to right
   &.pull-right {
-    right: 0;
-    left: auto;
+    #{direction(right)}: 0;
+    #{direction(left)}: auto;
   }
 
   // Dividers (basically an hr) within the dropdown
@@ -133,8 +133,8 @@
 // Right aligned dropdowns
 // ---------------------------
 .pull-right > .dropdown-menu {
-  right: 0;
-  left: auto;
+  #{direction(right)}: 0;
+  #{direction(left)}: auto;
 }
 
 
@@ -146,7 +146,7 @@
 // Default dropdowns
 .dropdown-submenu > .dropdown-menu {
   top: 0;
-  left: 100%;
+  #{direction(left)}: 100%;
   margin-top: -6px;
   margin-#{direction(left)}: -1px;
   border-radius: direction-corners(0 6px 6px 6px);
@@ -161,18 +161,18 @@
 .dropdown-submenu > a:after {
   display: block;
   content: " ";
-  float: right;
+  float: direction(right);
   width: 0;
   height: 0;
   border-color: transparent;
   border-style: solid;
   border-width: 5px 0 5px 5px;
-  border-left-color: darken($dropdownBackground, 20%);
+  border-#{direction(left)}-color: darken($dropdownBackground, 20%);
   margin-top: 5px;
-  margin-right: -10px;
+  margin-#{direction(right)}: -10px;
 }
 .dropdown-submenu:hover > a:after {
-  border-left-color: $dropdownLinkColorHover;
+  border-#{direction(left)}-color: $dropdownLinkColorHover;
 }
 
 // Left aligned submenus
@@ -183,10 +183,8 @@
 
   // Positioning the submenu
   > .dropdown-menu {
-    left: -100%;
-    margin-left: 10px;
-    -webkit-border-radius: 6px 0 6px 6px;
-       -moz-border-radius: 6px 0 6px 6px;
-            border-radius: 6px 0 6px 6px;
+    #{direction(left)}: -100%;
+    margin-#{direction(left)}: 10px;
+    border-radius: direction-corers(6px 0 6px 6px);
   }
 }

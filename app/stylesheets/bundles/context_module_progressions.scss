@@ -35,8 +35,8 @@
           padding: $ic-sp;
         }
         .status {
-          padding-right: 16px;
-          text-align: right;
+          padding-#{direction(right)}: 16px;
+          text-align: direction(right);
           .subtitle {
             color: $ic-hint-text;
             @include fontSize(12px);
@@ -83,7 +83,7 @@
       margin: 0;
     }
     a {
-      float: right;
+      float: direction(right);
     }
   }
   .header, li {
@@ -91,7 +91,7 @@
   }
   .collectionViewItems {
     list-style-type: none;
-    margin-left: 0;
+    margin-#{direction(left)}: 0;
     overflow-y: auto;
     .student {
       cursor: pointer;
@@ -108,7 +108,7 @@
         font-weight: bold;
         background-color: $btnBackground;
         border-bottom: solid 1px $ic-border-light;
-        margin-left: -1px;
+        margin-#{direction(left)}: -1px;
         a { color: var(--ic-link-color); }
       }
     }
@@ -126,8 +126,8 @@
 .module-progress-view__modules {
   flex: 1;
   box-sizing: border-box;
-  padding-right: $ic-sp;
-  @include breakpoint(desktop) { padding-right: $ic-sp*2; }
+  padding-#{direction(right)}: $ic-sp;
+  @include breakpoint(desktop) { padding-#{direction(right)}: $ic-sp*2; }
 }
 
 .module-progress-view__students {

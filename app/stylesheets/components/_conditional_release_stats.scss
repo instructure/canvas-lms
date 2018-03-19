@@ -30,13 +30,13 @@
 
   .crs-breakdown-graph__loading {
     p {
-      float: left;
+      float: direction(left);
       padding-top: 8px;
-      padding-left: 10px;
+      padding-#{direction(left)}: 10px;
     }
 
     > div {
-      float: left;
+      float: direction(left);
     }
   }
 }
@@ -48,7 +48,7 @@
 .crs-breakdown-details__closeButton {
   position: absolute;
   top: 1rem;
-  right: 1rem;
+  #{direction(right)}: 1rem;
   z-index: 11;
   color: $ic-color-medium;
 }
@@ -68,8 +68,8 @@
 }
 
 .crs-breakdown-details__header-text {
-  margin-left: 20px;
-  margin-right: 10px;
+  margin-#{direction(left)}: 20px;
+  margin-#{direction(right)}: 10px;
 }
 
 .crs-bar__horizontal-outside {
@@ -105,7 +105,7 @@
   justify-content: space-between;
   font-size: 14px;
   color: $ic-color-dark;
-  margin-left: 4px;
+  margin-#{direction(left)}: 4px;
   margin-bottom: 15px;
 }
 
@@ -172,7 +172,7 @@
   width: 35px;
   height: 35px;
   border-radius: 50%;
-  margin-right: 10px;
+  margin-#{direction(right)}: 10px;
 }
 
 .crs-student__trend-icon {
@@ -180,7 +180,7 @@
   height: 30px;
   font-size: 18px;
   font-weight: bold;
-  float: right;
+  float: direction(right);
 
   &.crs-student__trend-icon__positive {
     color: $ic-color-success;
@@ -215,13 +215,13 @@
   width: 365px;
   height: 100%;
   position: fixed;
-  right: 0px;
+  #{direction(right)}: 0px;
   top: 0px;
   transition: all .5s;
   background: $ic-color-light;
 
   &.crs-student-details__hidden {
-    right: -365px;
+    #{direction(right)}: -365px;
     opacity: 0;
     visibility: hidden;
   }
@@ -314,8 +314,8 @@ i.crs-student-details__assignment-icon {
   line-height: 32px;
   border-radius: 50%;
   color: $ic-color-light;
-  float: left;
-  margin-left: 5px;
+  float: direction(left);
+  margin-#{direction(left)}: 5px;
 
   &:before {
     font-size: 14px;
@@ -350,7 +350,7 @@ i.crs-icon-discussion {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-right: 10px;
+  margin-#{direction(right)}: 10px;
   font-weight: bold;
 }
 
@@ -362,5 +362,5 @@ i.crs-icon-discussion {
 }
 
 .crs-icon-email {
-  padding-right: 5px;
+  padding-#{direction(right)}: 5px;
 }

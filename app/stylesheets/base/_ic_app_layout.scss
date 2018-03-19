@@ -29,7 +29,7 @@
 }
 @mixin shared-secondary {
   width: $ic-right-side-width;
-  padding-left: $ic-sp*2;
+  padding-#{direction(left)}: $ic-sp*2;
 }
 
 $ic-left-side-width: $ic-sp*15;
@@ -138,12 +138,12 @@ body:not(.course-menu-expanded) {
   display: flex;
   a {
     color: $ic-font-color--subdued;
-    margin-right: $ic-sp;
+    margin-#{direction(right)}: $ic-sp;
     @include fontSize($ic-font-size--xsmall);
   }
   @include breakpoint(desktop) {
     justify-content: flex-end;
-    a { margin-right: 0; margin-left: $ic-sp; }
+    a { margin-#{direction(right)}: 0; margin-#{direction(left)}: $ic-sp; }
   }
 }
 
@@ -168,11 +168,11 @@ body:not(.course-menu-expanded) {
   }
 
   body:not(.no-headers) & {
-    margin-left: $ic-header-primary-width - 30;
+    margin-#{direction(left)}: $ic-header-primary-width - 30;
   }
 
   body:not(.no-headers).primary-nav-expanded & {
-    margin-left: $ic-header-primary-width;
+    margin-#{direction(left)}: $ic-header-primary-width;
   }
 
   body.embedded & {
@@ -192,10 +192,10 @@ body:not(.course-menu-expanded) {
   }
 
   body.course-menu-expanded:not(.ic-no-flex-layout):not(.embedded):not(.is-inside-submission-frame) & {
-    margin-left: $ic-left-side-width;
+    margin-#{direction(left)}: $ic-left-side-width;
 
     .ic-Layout-watermark {
-      left: -$ic-left-side-width;
+      #{direction(left)}: -$ic-left-side-width;
     }
   }
 
@@ -223,7 +223,7 @@ body:not(.course-menu-expanded) {
 
 .ic-Layout-watermark {
   position: absolute;
-  left: 0;
+  #{direction(left)}: 0;
   bottom: 0;
   z-index: -1;
   width: 100%;
@@ -231,7 +231,7 @@ body:not(.course-menu-expanded) {
   opacity: var(--ic-brand-watermark-opacity);
   background-image: var(--ic-brand-watermark);
   background-repeat: no-repeat;
-  background-position: left bottom;
+  background-position: direction(left) bottom;
 }
 
 .ic-app-course-menu {
@@ -240,9 +240,9 @@ body:not(.course-menu-expanded) {
   transform: translate3d(0,0,0);
   box-sizing: border-box;
   position: absolute;
-  top: 0; right: 100%;
+  top: 0; #{direction(right)}: 100%;
   width: $ic-left-side-width;
-  padding: $ic-sp*2 $ic-sp $ic-sp $ic-sp*2;
+  padding: direction-sides($ic-sp*2 $ic-sp $ic-sp $ic-sp*2);
   opacity: 0;
   body.course-menu-expanded & {
     opacity: 1;
@@ -250,7 +250,7 @@ body:not(.course-menu-expanded) {
   }
   // account for the course term showing in the left-hand sub-nav
   #section-tabs-header-subtitle {
-    padding: 0 0 $ic-sp $ic-sp;
+    padding: direction-sides(0 0 $ic-sp $ic-sp);
   }
 }
 
@@ -264,11 +264,11 @@ body:not(.course-menu-expanded) {
 }
 
 .ic-app-course-nav-toggle {
-  margin-right: $ic-sp;
+  margin-#{direction(right)}: $ic-sp;
   padding: 0;
   width: $ic-sp*3; height: ($ic-sp*3) - ($ic-sp/2);
   @include overwrite-default-icon-size(1.5rem);
-  i[class*=icon-], i[class^=icon-] { margin-right: 0; }
+  i[class*=icon-], i[class^=icon-] { margin-#{direction(right)}: 0; }
 }
 
 .ic-app-crumbs {

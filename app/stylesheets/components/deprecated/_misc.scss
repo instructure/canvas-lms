@@ -52,7 +52,7 @@
 // CLOSE ICONS
 // -----------
 a.x-close-link {
-  float: right;
+  float: direction(right);
   color: black !important;
   @include fontSize(20px);
   font-weight: bold;

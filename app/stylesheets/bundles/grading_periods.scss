@@ -20,10 +20,10 @@
 
 #grading-periods-tab {
   #disable-feature-message {
-    float: right;
+    float: direction(right);
   }
   #admin-periods-message {
-    float: left;
+    float: direction(left);
   }
 }
 #grading_periods {
@@ -67,5 +67,5 @@
 
 .GradingPeriod__Actions {
   flex: 0 0;
-  margin-right: 12px;
+  margin-#{direction(right)}: 12px;
 }

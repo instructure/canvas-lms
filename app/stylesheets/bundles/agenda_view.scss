@@ -66,7 +66,7 @@
   .agenda-date {
     @include fontSize(14px);
     margin: 0;
-    padding-left: $ic-sp - 2;
+    padding-#{direction(left)}: $ic-sp - 2;
   }
 }
 .agenda-event__list {
@@ -90,7 +90,7 @@
 .agenda-event__item-container .agenda-event__icon {
   background: none;
   flex: 0 0 2rem;
-  padding-left: $ic-sp/4;
+  padding-#{direction(left)}: $ic-sp/4;
 
   &:hover, &:focus {
     background: none;
@@ -125,7 +125,7 @@ span.agendaView--no-assignments {
 }
 
 .agenda-actions {
-  margin-left: 10%;
+  margin-#{direction(left)}: 10%;
   .agenda-load-btn {
     margin-bottom: 20px;
   }
@@ -134,7 +134,7 @@ span.agendaView--no-assignments {
 #calendar_header {
   .navigation_buttons {
     bottom: 0;
-    margin-left: 6px;
+    margin-#{direction(left)}: 6px;
     .ui-button {
       padding: 8px;
       i:before {
@@ -149,13 +149,13 @@ span.agendaView--no-assignments {
 
   .navigation_title, .appointment_group_title {
     vertical-align: middle;
-    padding-left: $ic-sp/4;
+    padding-#{direction(left)}: $ic-sp/4;
   }
 
   #refresh_calendar_link {
     display: none;
     float: none;
-    margin-right: 8px;
+    margin-#{direction(right)}: 8px;
     &.loading {
       display: inline-block;
       cursor: default;
@@ -186,7 +186,7 @@ span.agendaView--no-assignments {
     .fc-widget-header, .fc-axis {
       box-sizing: border-box;
       background: none;
-      border-left: none;
+      border-#{direction(left)}: none;
       color: $ic-font-color--subdued;
     }
 
@@ -209,7 +209,7 @@ span.agendaView--no-assignments {
 
     .fc-widget-header {
       border-top: none;
-      border-right: none;
+      border-#{direction(right)}: none;
       text-transform: uppercase;
 
       .fc-axis {
@@ -223,7 +223,7 @@ span.agendaView--no-assignments {
     }
     // this is to hide the border-right that is being added inline within the all-day row
     .fc-day-grid .fc-row {
-      border-right-color: $ic-color-light;
+      border-#{direction(right)}-color: $ic-color-light;
     }
     .fc-time-grid  .fc-today {
       background-color: transparent;
@@ -238,7 +238,7 @@ span.agendaView--no-assignments {
     .calendar-nowline {
       background-color: #FACE90;
       position: absolute;
-      right: 0;
+      #{direction(right)}: 0;
       height: 2px;
     }
   }
@@ -273,7 +273,7 @@ span.agendaView--no-assignments {
     line-height: 1.3;
     padding: $ic-sp/4;
     i {
-      margin-right: 2px;
+      margin-#{direction(right)}: 2px;
     }
   }
 
@@ -286,7 +286,7 @@ span.agendaView--no-assignments {
     background-image: url("/images/ajax-loader-black-on-white.gif");
     background-position: 50% 50%;
     height: 16px;
-    margin-left: 3px;
+    margin-#{direction(left)}: 3px;
     position: relative;
     top: 8px;
     width: 16px;
@@ -319,7 +319,7 @@ span.agendaView--no-assignments {
   }
   .context-list-toggle-box {
     border-radius: 2px;
-    margin-left: 0;
+    margin-#{direction(left)}: 0;
   }
   label {
     display: inline;

@@ -65,15 +65,15 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
     margin: 0;
   }
   & .ui-button {
-    margin-right: -1px; // this is to override jquery negative margin that doesn't allow for full keyboard focus ring
+    margin-#{direction(right)}: -1px; // this is to override jquery negative margin that doesn't allow for full keyboard focus ring
   }
   & .ui-button:first-child {
-    border-top-left-radius: $borderRadius;
-    border-bottom-left-radius: $borderRadius;
+    border-top-#{direction(left)}-radius: $borderRadius;
+    border-bottom-#{direction(left)}-radius: $borderRadius;
   }
   & .ui-button:last-child {
-    border-top-right-radius: $borderRadius;
-    border-bottom-right-radius: $borderRadius;
+    border-top-#{direction(right)}-radius: $borderRadius;
+    border-bottom-#{direction(right)}-radius: $borderRadius;
   }
 }
 
@@ -92,7 +92,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   @include fontSize($ic-font-size--xsmall);
   font-style: italic;
   white-space: nowrap;
-  padding-left: $ic-sp;
+  padding-#{direction(left)}: $ic-sp;
 }
 
 .ef-header__secondary {
@@ -100,7 +100,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   align-items: center;
   @include breakpoint(desktop) {
     flex: 1;
-    margin-left: $ic-sp;
+    margin-#{direction(left)}: $ic-sp;
   }
 }
 
@@ -108,7 +108,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   flex: 1;
   display: flex;
   justify-content: flex-end;
-  > * { margin-left: $ic-sp/3; }
+  > * { margin-#{direction(left)}: $ic-sp/3; }
 }
 
 .ef-main{
@@ -120,7 +120,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
     flex-direction: column;
     flex: 1 1 0%;
     padding: 0px;
-    border-right: 1px solid $ic-border-light;
+    border-#{direction(right)}: 1px solid $ic-border-light;
     overflow-x: auto;
 
     .tree {
@@ -169,7 +169,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
       height: 30px;
       @include fontSize($ic-font-size--medium);
       border-top: 1px solid $ic-border-color;
-      padding-left: 20px;
+      padding-#{direction(left)}: 20px;
     }
   }
 }
@@ -219,7 +219,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
       // adds blue border
       content: '';
       position: absolute;
-      left: 0;
+      #{direction(left)}: 0;
       top:0;
       width: 4px;
       height: 100%;
@@ -237,14 +237,14 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 
   .btn-link {
     border-width: 0;
-    padding-right: 15px;
+    padding-#{direction(right)}: 15px;
     &.restricted { color: $ic-color-alert; }
     &.hiddenState { color: $ic-color-alert; }
   }
 }
 
 .ef-big-icon-container {
-  margin-right: $ic-sp/2;
+  margin-#{direction(right)}: $ic-sp/2;
   flex: 0 0 $ef-thumbnail-size;
 }
 
@@ -268,7 +268,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   display: flex;
   align-items: center;
   overflow: hidden;
-  padding-right: $ic-sp/2;
+  padding-#{direction(right)}: $ic-sp/2;
   box-sizing: border-box;
   a {
     @if $use_high_contrast { @extend .ef-plain-link; }
@@ -326,7 +326,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 
 /* used to make sure the icons align nicely */
 .ef-usage-rights-col-offset {
-  margin-left: 5px;
+  margin-#{direction(left)}: 5px;
 }
 
 .ef-links-col{
@@ -365,9 +365,9 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 }
 
 .file-rename-form__form-label {
-  float: left;
+  float: direction(left);
   margin-top: 5px;
-  padding-right: 5px;
+  padding-#{direction(right)}: 5px;
 }
 
 .current_uploads {
@@ -378,17 +378,17 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 
 .ef-breadcrumb-popover {
   display: block;
-  left: -9999px;
+  #{direction(left)}: -9999px;
   top: 15px;
   opacity: 0;
   transition: opacity .2s;
   width: auto;
   &.open {
-    left: -23px;
+    #{direction(left)}: -23px;
     opacity: 1;
   }
   &.popover > .arrow {
-    left: 53px;
+    #{direction(left)}: 53px;
   }
 
   ul {
@@ -415,7 +415,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 
 .form-controls {
   .btn {
-    margin: 0 0 0 5px;
+    margin: direction-sides(0 0 0 5px);
   }
 }
 
@@ -439,7 +439,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 // the lock
 .ef-main {
   .lock-icon {  // align it with the adjacent buttons
-    margin-right: $ic-sp/2;
+    margin-#{direction(right)}: $ic-sp/2;
     padding-top: $ic-sp/2;
     &.lock-icon button.unlocked {
       color:  $ic-color-icon-disabled;

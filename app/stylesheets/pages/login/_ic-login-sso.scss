@@ -80,10 +80,10 @@
   transition: all 0.5s;
 }
 .ic-Login__icon-sso {
-  padding-right: $ic-sp;
+  padding-#{direction(right)}: $ic-sp;
 }
 .ic-Login__icon-sso--icon-only {
-  padding-right: 0;
+  padding-#{direction(right)}: 0;
 }
 .ic-Login__sso-button__title {
   color: var(--ic-brand-Login-footer-link-color);

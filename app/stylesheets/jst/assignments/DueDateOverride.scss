@@ -27,7 +27,7 @@ $assign-border-color: #ccc;
 #edit_assignment_wrapper .overrides-column-right.overrideFormFlex {
 
   select, .subtitle {
-    margin-left: 0;
+    margin-#{direction(left)}: 0;
   }
   label:not(.ic-Label) {
     padding: 0;
@@ -38,7 +38,7 @@ $assign-border-color: #ccc;
 
 .quiz-overrides-column-right{
   display: inline-block;
-  margin-left: 20px;
+  margin-#{direction(left)}: 20px;
   margin-top: -15px;
 }
 
@@ -72,7 +72,7 @@ $assign-border-color: #ccc;
 }
 
 .DueDateRow__RemoveRow {
-  text-align: right;
+  text-align: direction(right);
   margin: 0;
   padding: 0;
   > .Button.Button--link {
@@ -99,10 +99,10 @@ $assign-border-color: #ccc;
 .Available-from-to {
   display: flex;
   .from {
-    margin-right: 3px;
+    margin-#{direction(right)}: 3px;
   }
   .to {
-    margin-left: 3px;
+    margin-#{direction(left)}: 3px;
   }
   .Available-from-to__prompt {
     text-align: center;
