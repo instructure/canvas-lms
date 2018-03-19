@@ -129,7 +129,7 @@
 <% end %>
 
 <div id="file_content_header">
-  <div style="float: left;" id="file_display_name"><%= @attachment ? @attachment.display_name : @tag.title %>
+  <div class="pull-left" id="file_display_name"><%= @attachment ? @attachment.display_name : @tag.title %>
   </div>
   <div style="float: right; padding-top:0.5em;">
     <a href="#" id="frameless_link"><%= t 'links.exit_frame', "Lose the Frames"%></a>
