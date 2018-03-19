@@ -23,7 +23,10 @@ export default class SubmissionDetailsDialog {
     this.student = student
     this.options = options
     const speedGraderUrl = this.options.speed_grader_enabled
-      ? `${this.options.context_url}/gradebook/speed_grader?assignment_id=${this.assignment.id}#%7B%22student_id%22%3A${this.student.id}%7D`
+      ? encodeURI(
+          `${this.options.context_url}/gradebook/speed_grader?` +
+          `assignment_id=${this.assignment.id}#{"student_id":"${this.student.id}"}`
+        )
       : null
 
     this.url = this.options.change_grade_url.replace(':assignment', this.assignment.id).replace(':submission', this.student.id)

@@ -47,7 +47,7 @@ const fakeStudents = [
         provisional_grade_id: 10,
         grade_matches_current_submission: true,
         speedgrader_url:
-          'http://localhost:3000/courses/1/gradebook/speed_grader?assignment_id=1#%7B%22student_id%22:3,%22provisional_grade_id%22:10%7D'
+          encodeURI('http://localhost:3000/courses/1/gradebook/speed_grader?assignment_id=1#{"student_id":"3","provisional_grade_id":10}')
       },
       {
         grade: '10',
@@ -58,7 +58,7 @@ const fakeStudents = [
         provisional_grade_id: 10,
         grade_matches_current_submission: true,
         speedgrader_url:
-          'http://localhost:3000/courses/1/gradebook/speed_grader?assignment_id=1#%7B%22student_id%22:3,%22provisional_grade_id%22:10%7D'
+          encodeURI('http://localhost:3000/courses/1/gradebook/speed_grader?assignment_id=1#{"student_id":"3","provisional_grade_id":10}')
       },
       {
         grade: '1',
@@ -69,7 +69,7 @@ const fakeStudents = [
         provisional_grade_id: 10,
         grade_matches_current_submission: true,
         speedgrader_url:
-          'http://localhost:3000/courses/1/gradebook/speed_grader?assignment_id=1#%7B%22student_id%22:3,%22provisional_grade_id%22:10%7D'
+          encodeURI('http://localhost:3000/courses/1/gradebook/speed_grader?assignment_id=1#{"student_id":"3","provisional_grade_id":10}')
       }
     ]
   },
@@ -90,7 +90,7 @@ const fakeStudents = [
         provisional_grade_id: 11,
         grade_matches_current_submission: true,
         speedgrader_url:
-          'http://localhost:3000/courses/1/gradebook/speed_grader?assignment_id=1#%7B%22student_id%22:4,%22provisional_grade_id%22:11%7D'
+          encodeURI('http://localhost:3000/courses/1/gradebook/speed_grader?assignment_id=1#{"student_id":"4","provisional_grade_id":11}')
       },
       {
         grade: '6',
@@ -101,7 +101,7 @@ const fakeStudents = [
         provisional_grade_id: 13,
         grade_matches_current_submission: true,
         speedgrader_url:
-          'http://localhost:3000/courses/1/gradebook/speed_grader?assignment_id=1#%7B%22student_id%22:4,%22provisional_grade_id%22:13%7D'
+          encodeURI('http://localhost:3000/courses/1/gradebook/speed_grader?assignment_id=1#{"student_id":"4","provisional_grade_id":13}')
       },
       {
         grade: '6',
@@ -112,7 +112,7 @@ const fakeStudents = [
         provisional_grade_id: 13,
         grade_matches_current_submission: true,
         speedgrader_url:
-          'http://localhost:3000/courses/1/gradebook/speed_grader?assignment_id=1#%7B%22student_id%22:4,%22provisional_grade_id%22:13%7D'
+          encodeURI('http://localhost:3000/courses/1/gradebook/speed_grader?assignment_id=1#{"student_id":"4","provisional_grade_id":13}')
       }
     ]
   }

@@ -194,7 +194,7 @@ QUnit.module('SubmissionTray', function (hooks) {
   });
 
   test('shows SpeedGrader link if enabled', function () {
-    const speedGraderUrl = '/courses/1/gradebook/speed_grader?assignment_id=30#%7B%22student_id%22%3A27%7D';
+    const speedGraderUrl = encodeURI('/courses/1/gradebook/speed_grader?assignment_id=30#{"student_id":"27"}');
     mountComponent();
     const speedGraderLink = document.querySelector('.SubmissionTray__Container a[href*="speed_grader"]').getAttribute('href');
     strictEqual(speedGraderLink, speedGraderUrl);

@@ -69,6 +69,16 @@ test('speed_grader_enabled as false does not set speedgrader url', function() {
   equal(dialog.dialog.find('.more-details-link').length, 0)
 })
 
+test('speedgrader url quotes the student id', function() {
+  // Supply a value for context_url so we have a well-formed speedGraderUrl
+  this.options.context_url = 'http://localhost';
+  const submissionDetailsDialog = new SubmissionDetailsDialog(this.assignment, this.user, this.options);
+
+  const urlObject = new URL(submissionDetailsDialog.submission.speedGraderUrl);
+  strictEqual(decodeURI(urlObject.hash), '#{"student_id":"1"}');
+  submissionDetailsDialog.dialog.dialog('destroy');
+})
+
 test('lateness correctly passes through to the template', function() {
   this.assignment = new Assignment({
     id: 1,
