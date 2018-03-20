@@ -768,13 +768,10 @@ class Attachment < ActiveRecord::Base
     instfs_hosted? || !!(authenticated_s3_url rescue false)
   end
 
-  def authenticated_url(**options)
+  def public_url(**options)
     if instfs_hosted?
-      InstFS.authenticated_url(self, options)
+      InstFS.authenticated_url(self, options.merge(user: nil))
     else
-      # attachment_fu doesn't like the extra option when building s3 urls
-      options.delete(:user)
-      options.delete(:acting_as)
       should_download = options.delete(:download)
       disposition = should_download ? "attachment" : "inline"
       options[:response_content_disposition] = "#{disposition}; #{disposition_filename}"
@@ -782,24 +779,12 @@ class Attachment < ActiveRecord::Base
     end
   end
 
-  def download_url_for_user(user, acting_as, ttl = url_ttl)
-    authenticated_url(user: user, acting_as: acting_as, expires_in: ttl, download: true)
-  end
-
-  def inline_url_for_user(user, acting_as, ttl = url_ttl)
-    authenticated_url(user: user, acting_as: acting_as, expires_in: ttl, download: false)
-  end
-
-  def public_url(**options)
-    authenticated_url(options.merge(user: nil))
-  end
-
   def public_inline_url(ttl = url_ttl)
-    authenticated_url(user: nil, expires_in: ttl, download: false)
+    public_url(expires_in: ttl, download: false)
   end
 
   def public_download_url(ttl = url_ttl)
-    authenticated_url(user: nil, expires_in: ttl, download: true)
+    public_url(expires_in: ttl, download: true)
   end
 
   def url_ttl
@@ -904,13 +889,14 @@ class Attachment < ActiveRecord::Base
 
   # you should be able to pass an optional width, height, and page_number/video_seconds to this method for media objects
   # you should be able to pass an optional size (e.g. '64x64') to this method for other thumbnailable content types
+  #
+  # direct use of this method is deprecated. use the controller's
+  # `file_authenticator.thumbnail_url(attachment)` instead.
   def thumbnail_url(options={})
     return nil if Attachment.skip_thumbnails
 
     geometry = options[:size]
-    if instfs_hosted? && thumbnailable?
-      InstFS.authenticated_thumbnail_url(self, geometry: geometry)
-    elsif self.thumbnail || geometry.present?
+    if self.thumbnail || geometry.present?
       to_use = thumbnail_for_size(geometry) || self.thumbnail
       to_use.cached_s3_url
     elsif self.media_object && self.media_object.media_id

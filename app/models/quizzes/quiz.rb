@@ -302,11 +302,21 @@ class Quizzes::Quiz < ActiveRecord::Base
     write_attribute(:assignment_id, val)
   end
 
+  def lock_at=(val)
+    val = val.in_time_zone.end_of_day if val.is_a?(Date)
+    if val.is_a?(String)
+      super(Time.zone.parse(val))
+      self.lock_at = CanvasTime.fancy_midnight(self.lock_at) unless val =~ /:/
+    else
+      super(val)
+    end
+  end
+
   def due_at=(val)
     val = val.in_time_zone.end_of_day if val.is_a?(Date)
     if val.is_a?(String)
       super(Time.zone.parse(val))
-      infer_times unless val.match(/:/)
+      infer_times unless val =~ /:/
     else
       super(val)
     end

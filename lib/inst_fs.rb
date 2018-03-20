@@ -21,10 +21,10 @@ module InstFS
       Canvas::Plugin.find('inst_fs').enabled?
     end
 
-    def login_pixel(user, session, domain_root_account)
+    def login_pixel(user, session, oauth_host)
       if !session[:shown_instfs_pixel] && user && enabled?
         session[:shown_instfs_pixel] = true
-        pixel_url = login_pixel_url(token: session_jwt(user, domain_root_account.domain))
+        pixel_url = login_pixel_url(token: session_jwt(user, oauth_host))
         %Q(<img src="#{pixel_url}" alt="" role="presentation" />).html_safe
       end
     end
@@ -66,10 +66,10 @@ module InstFS
       Base64.decode64(setting("secret"))
     end
 
-    def upload_preflight_json(context:, user:, acting_as:, folder:, filename:, content_type:, quota_exempt:, on_duplicate:, capture_url:, domain_root_account:, target_url: nil, progress_json: nil)
+    def upload_preflight_json(context:, user:, acting_as:, folder:, filename:, content_type:, quota_exempt:, on_duplicate:, capture_url:, target_url: nil, progress_json: nil)
       raise ArgumentError unless !!target_url == !!progress_json # these params must both be present or both absent
 
-      token = upload_jwt(user, acting_as, capture_url, domain_root_account.domain,
+      token = upload_jwt(user, acting_as, capture_url,
         context_type: context.class.to_s,
         context_id: context.global_id.to_s,
         user_id: acting_as.global_id.to_s,
@@ -150,7 +150,7 @@ module InstFS
         iat: Time.now.utc.to_i,
         user_id: options[:user]&.global_id&.to_s,
         resource: attachment.instfs_uuid,
-        host: Attachment.current_root_account.domain
+        host: options[:oauth_host]
       }
       if options[:acting_as] && options[:acting_as] != options[:user]
         claims[:acting_as_user_id] = options[:acting_as].global_id.to_s
@@ -158,14 +158,13 @@ module InstFS
       Canvas::Security.create_jwt(claims, expires_in.from_now, self.jwt_secret)
     end
 
-    def upload_jwt(user, acting_as, capture_url, host, capture_params)
+    def upload_jwt(user, acting_as, capture_url, capture_params)
       expires_in = Setting.get('instfs.upload_jwt.expiration_minutes', '10').to_i.minutes
       claims = {
         iat: Time.now.utc.to_i,
         user_id: user.global_id.to_s,
         resource: upload_url,
         capture_url: capture_url,
-        host: host,
         capture_params: capture_params
       }
       unless acting_as == user

@@ -70,14 +70,15 @@ module Api::V1::Attachment
     downloadable = !attachment.locked_for?(user, check_policies: true)
 
     if downloadable
-      thumbnail_url = attachment.thumbnail_url
+      # using the multi-parameter form because not every class that mixes in
+      # this api helper also mixes in ApplicationHelper (I'm looking at you,
+      # DiscussionTopic::MaterializedView), and in those cases we need to
+      # include the url_options
+      if attachment.thumbnailable?
+        thumbnail_url = thumbnail_image_url(attachment, attachment.uuid, url_options)
+      end
       if options[:thumbnail_url]
-        # not the same as thumbnail_url above because:
-        # * that one's going to be a direct (and possibly signed) s3, inst-fs,
-        #   etc. link for immediate use.
-        # * this one's a more compact canvas link to be stored for later use;
-        #   it will resolve to the former when accessed
-        url = thumbnail_image_url(attachment)
+        url = thumbnail_url
       else
         h = { :download => '1', :download_frd => '1' }
         h.merge!(:verifier => attachment.uuid) unless options[:omit_verifier_in_app] && (respond_to?(:in_app?, true) && in_app? || @authenticated_with_jwt)
@@ -228,7 +229,6 @@ module Api::V1::Attachment
         context: context,
         user: logged_in_user,
         acting_as: @current_user,
-        domain_root_account: @domain_root_account,
         folder: folder,
         filename: infer_upload_filename(params),
         content_type: infer_upload_content_type(params),

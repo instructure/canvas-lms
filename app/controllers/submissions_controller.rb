@@ -684,7 +684,7 @@ class SubmissionsController < ApplicationController
             })
           end
         else
-          inline_url = attachment.inline_url_for_user(logged_in_user, @current_user)
+          inline_url = authenticated_inline_url(attachment)
           format.html { redirect_to inline_url }
           format.zip { redirect_to inline_url }
         end

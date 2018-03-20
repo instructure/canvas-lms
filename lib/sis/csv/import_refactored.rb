@@ -91,6 +91,7 @@ module SIS
               @tmp_dirs << tmp_dir
               CanvasUnzip::extract_archive(file, tmp_dir)
               Dir[File.join(tmp_dir, "**/**")].each do |fn|
+                next if File.directory?(fn) || !!(fn =~ IGNORE_FILES)
                 file_name = fn[tmp_dir.size+1 .. -1]
                 att = create_batch_attachment(File.join(tmp_dir, file_name))
                 process_file(tmp_dir, file_name, att)
