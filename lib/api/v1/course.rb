@@ -93,7 +93,7 @@ module Api::V1::Course
       hash['total_students'] = course.student_count || course.student_enrollments.not_fake.distinct.count(:user_id) if includes.include?('total_students')
       hash['passback_status'] = post_grades_status_json(course) if includes.include?('passback_status')
       hash['is_favorite'] = course.favorite_for_user?(user) if includes.include?('favorites')
-      hash['teachers'] = course.teachers.map { |teacher| user_display_json(teacher) } if includes.include?('teachers')
+      hash['teachers'] = course.teachers.distinct.map { |teacher| user_display_json(teacher) } if includes.include?('teachers')
       hash['tabs'] = tabs_available_json(course, user, session, ['external']) if includes.include?('tabs')
       hash['locale'] = course.locale unless course.locale.nil?
       hash['subaccount_name'] = course.account.name if includes.include?('subaccount')
