@@ -322,7 +322,7 @@ class Assignment
     private
 
     def anonymous_moderated_marking?
-      @course.root_account.feature_enabled?(:anonymous_moderated_marking)
+      @course.root_account.feature_enabled?(:anonymous_moderated_marking) && @assignment.anonymous_grading?
     end
   end
 end

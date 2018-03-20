@@ -254,6 +254,7 @@ describe Assignment::SpeedGrader do
     it "creates a non-annotatable DocViewer session for Discussion attachments" do
       course = student_in_course(active_all: true).course
       assignment = assignment_model(course: course)
+      assignment.anonymous_grading = true
       topic = course.discussion_topics.create!(assignment: assignment)
       attachment = attachment_model(
         context: @student,
@@ -882,7 +883,7 @@ describe Assignment::SpeedGrader do
     let_once(:student_2) { user_with_pseudonym(active_all: true, username: "student2@example.com") }
     let_once(:test_student) { course.student_view_student }
 
-    let_once(:assignment) { course.assignments.create!(title: "Example Assignment", submission_types: ['online_upload']) }
+    let_once(:assignment) { course.assignments.create!(title: "Example Assignment", submission_types: ['online_upload'], anonymous_grading: true) }
     let_once(:rubric_association) do
       rubric = rubric_model
       rubric.associate_with(assignment, course, purpose: "grading", use_for_grading: true)
