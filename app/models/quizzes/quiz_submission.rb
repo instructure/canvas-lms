@@ -59,7 +59,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   after_update :grade_submission!, if: :just_completed?
 
   def just_completed?
-    submission_id? && workflow_state_changed? && completed?
+    submission_id? && saved_change_to_workflow_state? && completed?
   end
 
   def grade_submission!

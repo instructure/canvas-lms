@@ -37,7 +37,7 @@ class User < ActiveRecord::Base
 
   before_save :infer_defaults
   after_create :set_default_feature_flags
-  after_update :clear_cached_short_name, if: -> (user) {user.short_name_changed? || (user.read_attribute(:short_name).nil? && user.name_changed?)}
+  after_update :clear_cached_short_name, if: -> (user) {user.saved_change_to_short_name? || (user.read_attribute(:short_name).nil? && user.saved_change_to_name?)}
 
   serialize :preferences
   include TimeZoneHelper
@@ -366,7 +366,7 @@ class User < ActiveRecord::Base
   end
 
   def update_account_associations_if_necessary
-    update_account_associations if !self.class.skip_updating_account_associations? && self.workflow_state_changed? && self.id_was
+    update_account_associations if !self.class.skip_updating_account_associations? && self.saved_change_to_workflow_state? && self.id_before_last_save
   end
 
   def update_account_associations(opts = nil)

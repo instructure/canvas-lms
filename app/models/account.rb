@@ -111,7 +111,7 @@ class Account < ActiveRecord::Base
   after_save :invalidate_caches_if_changed
   after_update :clear_special_account_cache_if_special
 
-  after_update :clear_cached_short_name, :if => :name_changed?
+  after_update :clear_cached_short_name, :if => :saved_change_to_name?
 
   after_create :create_default_objects
 
@@ -396,7 +396,7 @@ class Account < ActiveRecord::Base
   end
 
   def update_account_associations_if_changed
-    send_later_if_production(:update_account_associations) if self.parent_account_id_changed? || self.root_account_id_changed?
+    send_later_if_production(:update_account_associations) if self.saved_change_to_parent_account_id? || self.saved_change_to_root_account_id?
   end
 
   def equella_settings
@@ -569,7 +569,7 @@ class Account < ActiveRecord::Base
 
   def invalidate_caches_if_changed
     @invalidations ||= []
-    if self.parent_account_id_changed?
+    if self.saved_change_to_parent_account_id?
       @invalidations += Account.inheritable_settings # invalidate all of them
     elsif @old_settings
       Account.inheritable_settings.each do |key|

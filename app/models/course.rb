@@ -209,7 +209,7 @@ class Course < ActiveRecord::Base
   after_save :set_self_enrollment_code
   after_commit :update_cached_due_dates
 
-  after_update :clear_cached_short_name, :if => :course_code_changed?
+  after_update :clear_cached_short_name, :if => :saved_change_to_course_code?
 
   before_update :handle_syllabus_changes_for_master_migration
 
@@ -282,15 +282,15 @@ class Course < ActiveRecord::Base
   end
 
   def update_account_associations_if_changed
-    if (self.root_account_id_changed? || self.account_id_changed?) && !self.class.skip_updating_account_associations?
+    if (self.saved_change_to_root_account_id? || self.saved_change_to_account_id?) && !self.class.skip_updating_account_associations?
       send_now_or_later_if_production(new_record? ? :now : :later, :update_account_associations)
     end
   end
 
   def update_enrollment_states_if_necessary
-    if (changes.keys & %w{restrict_enrollments_to_course_dates account_id enrollment_term_id}).any? ||
-        (self.restrict_enrollments_to_course_dates? && (changes.keys & %w{start_at conclude_at}).any?) ||
-        (self.workflow_state_changed? && (completed? || self.workflow_state_was == 'completed'))
+    if (saved_changes.keys & %w{restrict_enrollments_to_course_dates account_id enrollment_term_id}).any? ||
+        (self.restrict_enrollments_to_course_dates? && (saved_changes.keys & %w{start_at conclude_at}).any?) ||
+        (self.saved_change_to_workflow_state? && (completed? || self.workflow_state_before_last_save == 'completed'))
         # a lot of things can change the date logic here :/
 
       EnrollmentState.send_later_if_production(:invalidate_states_for_course_or_section, self) if self.enrollments.exists?
@@ -704,7 +704,7 @@ class Course < ActiveRecord::Base
     p.whenever { |record|
       record.root_account &&
       ((record.just_created && record.name != Course.default_name) ||
-       (record.name_was == Course.default_name &&
+       (record.name_before_last_save == Course.default_name &&
          record.name != Course.default_name)
       )
     }
@@ -3023,7 +3023,7 @@ class Course < ActiveRecord::Base
 
   def touch_students_if_necessary
     # to update the cached current enrollments
-    if workflow_state_changed? && (workflow_state == 'available' || workflow_state_was == 'available')
+    if saved_change_to_workflow_state? && (workflow_state == 'available' || workflow_state_before_last_save == 'available')
       touch_students_later if self.students.exists?
     end
   end

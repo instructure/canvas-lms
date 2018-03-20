@@ -65,7 +65,7 @@ class AssessmentQuestion < ActiveRecord::Base
     # this has to be in an after_save, because translate_links may create attachments
     # with this question as the context, and if this question does not exist yet,
     # creating that attachment will fail.
-    translate_links if self.question_data_changed? && !@skip_translate_links
+    translate_links if self.saved_change_to_question_data? && !@skip_translate_links
   end
 
   def self.translate_links(ids)

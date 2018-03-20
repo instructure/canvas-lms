@@ -36,7 +36,7 @@ class LiveEventsObserver < ActiveRecord::Observer
 
   NOP_UPDATE_FIELDS = [ "updated_at", "sis_batch_id" ].freeze
   def after_update(obj)
-    changes = obj.changes
+    changes = obj.saved_changes
     return nil if changes.except(*NOP_UPDATE_FIELDS).empty?
 
     obj.class.connection.after_transaction_commit do

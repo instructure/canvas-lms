@@ -31,6 +31,7 @@ describe BroadcastPolicy::InstanceMethods do
     def attribute_changed?(method)
       changed_attributes.key?(method)
     end
+    alias saved_change_to_attribute? attribute_changed?
 
     def new_record?
       false
@@ -38,11 +39,16 @@ describe BroadcastPolicy::InstanceMethods do
 
     def method_missing(method, *)
       case method.to_s
+      when /^saved_change_to.+\?\z/
+        method = method.to_s.sub(/^saved_change_to/, "").to_sym
+        method = method.to_s.sub(/\?\z/, "").to_sym
+        attribute_changed? method
       when /_changed\?\z/
         method = method.to_s.sub(/_changed\?\z/, "").to_sym
         attribute_changed? method
-      when /_was\z/
+      when /_was\z/, /_before_last_save\z/
         method = method.to_s.sub(/_was\z/, "").to_sym
+        method = method.to_s.sub(/_before_last_save\z/, "").to_sym
         attribute_changed?(method) ? changed_attributes[method] : attributes[method]
       else
         attributes[method]

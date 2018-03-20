@@ -146,7 +146,7 @@ class Enrollment < ActiveRecord::Base
 
   # see .active_student_conditions
   def active_student?(was = false)
-    suffix = was ? "_was" : ""
+    suffix = was ? "_before_last_save" : ""
 
     %w[StudentEnrollment StudentViewEnrollment].include?(send("type#{suffix}")) &&
       send("workflow_state#{suffix}") == "active"
@@ -191,7 +191,7 @@ class Enrollment < ActiveRecord::Base
       record.course &&
       record.user.registered? &&
       !record.observer? &&
-      ((record.invited? && (record.just_created || record.workflow_state_changed?)) || @re_send_confirmation)
+      ((record.invited? && (record.just_created || record.saved_change_to_workflow_state?)) || @re_send_confirmation)
     }
 
     p.dispatch :enrollment_registration
@@ -200,7 +200,7 @@ class Enrollment < ActiveRecord::Base
       !record.self_enrolled &&
       record.course &&
       !record.user.registered? &&
-      ((record.invited? && (record.just_created || record.workflow_state_changed?)) || @re_send_confirmation)
+      ((record.invited? && (record.just_created || record.saved_change_to_workflow_state?)) || @re_send_confirmation)
     }
 
     p.dispatch :enrollment_notification
@@ -224,7 +224,7 @@ class Enrollment < ActiveRecord::Base
 
   def dispatch_invitations_later
     # if in an invited state but not frd "invited?" because of future date restrictions, send it later
-    if (self.just_created || self.workflow_state_changed? || @re_send_confirmation) && self.workflow_state == 'invited' && self.inactive? && self.available_at &&
+    if (self.just_created || self.saved_change_to_workflow_state? || @re_send_confirmation) && self.workflow_state == 'invited' && self.inactive? && self.available_at &&
         !self.self_enrolled && !(self.observer? && self.user.registered?)
       # this won't work if they invite them and then change the course/term/section dates _afterwards_ so hopefully people don't do that
       self.send_later_enqueue_args(:re_send_confirmation_if_invited!, {:run_at => self.available_at, :singleton => "send_enrollment_invitations_#{global_id}"})
@@ -337,12 +337,12 @@ class Enrollment < ActiveRecord::Base
   end
 
   def should_update_user_account_association?
-    self.new_record? || self.course_id_changed? || self.course_section_id_changed? || self.root_account_id_changed?
+    self.new_record? || self.saved_change_to_course_id? || self.saved_change_to_course_section_id? || self.saved_change_to_root_account_id?
   end
 
   def update_user_account_associations_if_necessary
     return if self.fake_student?
-    if id_was.nil? || being_restored?
+    if id_before_last_save.nil? || being_restored?
       return if %w{creation_pending deleted}.include?(self.user.workflow_state)
       associations = User.calculate_account_associations_from_accounts([self.course.account_id, self.course_section.course.account_id, self.course_section.nonxlist_course.try(:account_id)].compact.uniq)
       self.user.update_account_associations(:incremental => true, :precalculated_associations => associations)
@@ -414,7 +414,7 @@ class Enrollment < ActiveRecord::Base
     observers.each do |observer|
       if enrollment = active_linked_enrollment_for(observer)
         enrollment.update_from(self)
-      elsif self.workflow_state_changed? && self.workflow_state_was == 'inactive'
+      elsif self.saved_change_to_workflow_state? && self.workflow_state_before_last_save == 'inactive'
         create_linked_enrollment_for(observer)
       end
     end
@@ -435,7 +435,7 @@ class Enrollment < ActiveRecord::Base
     observer.observer_enrollments.where(
       :associated_user_id => user_id,
       :course_id => course_id,
-      :course_section_id => course_section_id_was || course_section_id).
+      :course_section_id => course_section_id_before_last_save || course_section_id).
         shard(Shard.shard_for(course_id)).first
   end
 
@@ -443,7 +443,7 @@ class Enrollment < ActiveRecord::Base
     enrollment = linked_enrollment_for(observer)
     # we don't want to "undelete" observer enrollments that have been
     # explicitly deleted
-    return nil if enrollment && enrollment.deleted? && workflow_state_was != 'deleted'
+    return nil if enrollment && enrollment.deleted? && workflow_state_before_last_save != 'deleted'
     enrollment
   end
 
@@ -452,7 +452,7 @@ class Enrollment < ActiveRecord::Base
   # This split allows us to suspend this callback and affect the update_cached_due_dates callback since after_commit
   # callbacks aren't being suspended properly.  We suspend this callback during some bulk operations.
   def set_update_cached_due_dates
-    @update_cached_due_dates = workflow_state_changed? && (student? || fake_student?) && course
+    @update_cached_due_dates = saved_change_to_workflow_state? && (student? || fake_student?) && course
   end
 
   def update_cached_due_dates
@@ -479,7 +479,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def clear_email_caches
-    if self.workflow_state_changed? && (self.workflow_state_was == 'invited' || self.workflow_state == 'invited')
+    if self.saved_change_to_workflow_state? && (self.workflow_state_before_last_save == 'invited' || self.workflow_state == 'invited')
       if Enrollment.cross_shard_invitations?
         Shard.birth.activate do
           self.user.communication_channels.email.unretired.each { |cc| Rails.cache.delete([cc.path, 'all_invited_enrollments2'].cache_key)}
@@ -491,7 +491,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def cancel_future_appointments
-    if workflow_state_changed? && %w{completed deleted}.include?(workflow_state)
+    if saved_change_to_workflow_state? && %w{completed deleted}.include?(workflow_state)
       unless self.course.current_enrollments.where(:user_id => self.user_id).exists? # ignore if they have another still valid enrollment
         course.appointment_participants.active.current.for_context_codes(user.asset_string).update_all(:workflow_state => 'deleted')
       end
@@ -650,13 +650,13 @@ class Enrollment < ActiveRecord::Base
   end
 
   def reset_notifications_cache
-    if self.workflow_state_changed?
+    if self.saved_change_to_workflow_state?
       StreamItemCache.invalidate_recent_stream_items(self.user_id, "Course", self.course_id)
     end
   end
 
   def add_to_favorites_later
-    if self.workflow_state_changed? && self.workflow_state == 'active'
+    if self.saved_change_to_workflow_state? && self.workflow_state == 'active'
       self.class.connection.after_transaction_commit do
         self.send_later_if_production_enqueue_args(:add_to_favorites, :priority => Delayed::LOW_PRIORITY)
       end
@@ -728,7 +728,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def recalculate_enrollment_state
-    if (self.changes.keys & %w{workflow_state start_at end_at}).any?
+    if (self.saved_changes.keys & %w{workflow_state start_at end_at}).any?
       @enrollment_dates = nil
       self.enrollment_state.state_is_current = false
       self.enrollment_state.is_direct_recalculation = true
@@ -738,7 +738,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def state_based_on_date
-    RequestCache.cache('enrollment_state_based_on_date', self, self.workflow_state, self.changed?) do
+    RequestCache.cache('enrollment_state_based_on_date', self, self.workflow_state, self.saved_changes?) do
       if %w{invited active completed}.include?(self.workflow_state)
         self.enrollment_state.get_effective_state
       else
@@ -1369,7 +1369,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def need_to_copy_scores?
-    return false unless id_changed? || being_restored?
+    return false unless saved_change_to_id? || being_restored?
     student_or_fake_student? && other_enrollment_of_same_type.present?
   end
 
@@ -1429,18 +1429,18 @@ class Enrollment < ActiveRecord::Base
   end
 
   def being_restored?(to_state: workflow_state)
-    workflow_state_changed? && workflow_state_was == 'deleted' && workflow_state == to_state
+    saved_change_to_workflow_state? && workflow_state_before_last_save == 'deleted' && workflow_state == to_state
   end
 
   def being_reactivated?
-    workflow_state_changed? && workflow_state != 'deleted' && workflow_state_was == 'inactive'
+    saved_change_to_workflow_state? && workflow_state != 'deleted' && workflow_state_before_last_save == 'inactive'
   end
 
   def being_uncompleted?
-    workflow_state_changed? && workflow_state != 'deleted' && workflow_state_was == 'completed'
+    saved_change_to_workflow_state? && workflow_state != 'deleted' && workflow_state_before_last_save == 'completed'
   end
 
   def being_deleted?
-    workflow_state == 'deleted' && workflow_state_was != 'deleted'
+    workflow_state == 'deleted' && workflow_state_before_last_save != 'deleted'
   end
 end

@@ -428,8 +428,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def touch_assignment_group
-    if assignment_group_id_changed? && assignment_group_id_was.present?
-      AssignmentGroup.where(id: assignment_group_id_was).update_all(updated_at: Time.zone.now.utc)
+    if saved_change_to_assignment_group_id? && assignment_group_id_before_last_save.present?
+      AssignmentGroup.where(id: assignment_group_id_before_last_save).update_all(updated_at: Time.zone.now.utc)
     end
     AssignmentGroup.where(:id => self.assignment_group_id).update_all(:updated_at => Time.zone.now.utc) if self.assignment_group_id
     true
@@ -457,7 +457,7 @@ class Assignment < ActiveRecord::Base
 
   def needs_to_update_submissions?
     !new_record? &&
-      (points_possible_changed? || grading_type_changed? || grading_standard_id_changed?) &&
+      (saved_change_to_points_possible? || saved_change_to_grading_type? || saved_change_to_grading_standard_id?) &&
       !submissions.graded.empty?
   end
   private :needs_to_update_submissions?
@@ -476,19 +476,19 @@ class Assignment < ActiveRecord::Base
 
   def needs_to_recompute_grade?
     !new_record? && (
-      points_possible_changed? ||
-      muted_changed? ||
-      workflow_state_changed? ||
-      assignment_group_id_changed? ||
-      only_visible_to_overrides_changed? ||
-      omit_from_final_grade_changed?
+      saved_change_to_points_possible? ||
+      saved_change_to_muted? ||
+      saved_change_to_workflow_state? ||
+      saved_change_to_assignment_group_id? ||
+      saved_change_to_only_visible_to_overrides? ||
+      saved_change_to_omit_from_final_grade?
     )
   end
   private :needs_to_recompute_grade?
 
   def update_grades_if_details_changed
     if needs_to_recompute_grade?
-      Rails.logger.debug "GRADES: recalculating because assignment #{global_id} changed. (#{changes.inspect})"
+      Rails.logger.debug "GRADES: recalculating because assignment #{global_id} changed. (#{saved_changes.inspect})"
       self.class.connection.after_transaction_commit { self.context.recompute_student_scores }
     end
     true
@@ -496,9 +496,9 @@ class Assignment < ActiveRecord::Base
   private :update_grades_if_details_changed
 
   def update_grading_period_grades
-    return true unless due_at_changed? && !id_changed? && context.grading_periods?
+    return true unless saved_change_to_due_at? && !saved_change_to_id? && context.grading_periods?
 
-    grading_period_was = GradingPeriod.for_date_in_course(date: due_at_was, course: context)
+    grading_period_was = GradingPeriod.for_date_in_course(date: due_at_before_last_save, course: context)
     grading_period = GradingPeriod.for_date_in_course(date: due_at, course: context)
     return true if grading_period_was&.id == grading_period&.id
 
@@ -671,7 +671,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def delete_empty_abandoned_children
-    if submission_types_changed?
+    if saved_change_to_submission_types?
       each_submission_type do |submittable, type|
         unless self.submission_types == type.to_s
           submittable.unlink!(:assignment) if submittable
@@ -681,7 +681,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_submissions_later
-    send_later_if_production(:update_submissions) if points_possible_changed?
+    send_later_if_production(:update_submissions) if saved_change_to_points_possible?
   end
 
   attr_accessor :updated_submissions # for testing
@@ -772,7 +772,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def touch_submissions_if_muted_changed
-    if muted_changed?
+    if saved_change_to_muted?
       self.class.connection.after_transaction_commit do
         # this is necessary to generate new permissions cache keys for students
         submissions.touch_all
@@ -2419,18 +2419,18 @@ class Assignment < ActiveRecord::Base
   def update_cached_due_dates
     return unless update_cached_due_dates?
 
-    relevant_changes = changes.slice(:due_at, :workflow_state, :only_visible_to_overrides).inspect
+    relevant_changes = saved_changes.slice(:due_at, :workflow_state, :only_visible_to_overrides).inspect
     Rails.logger.debug "GRADES: recalculating because scope changed for Assignment #{global_id}: #{relevant_changes}"
     DueDateCacher.recompute(self, update_grades: true)
   end
 
   def update_cached_due_dates?
-    due_at_changed? || workflow_state_changed? || only_visible_to_overrides_changed?
+    saved_change_to_due_at? || saved_change_to_workflow_state? || saved_change_to_only_visible_to_overrides?
   end
 
   def apply_late_policy
     return if update_cached_due_dates? # DueDateCacher already re-applies late policy so we shouldn't
-    return unless grading_type_changed?
+    return unless saved_change_to_grading_type?
 
     LatePolicyApplicator.for_assignment(self)
   end

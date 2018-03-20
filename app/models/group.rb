@@ -71,7 +71,7 @@ class Group < ActiveRecord::Base
 
   after_create :refresh_group_discussion_topics
 
-  after_update :clear_cached_short_name, :if => :name_changed?
+  after_update :clear_cached_short_name, :if => :saved_change_to_name?
 
   delegate :time_zone, :to => :context
 

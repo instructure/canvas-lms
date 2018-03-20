@@ -109,7 +109,7 @@ describe Assignment do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
         allow(assignment).to receive(:update_cached_due_dates?).and_return(false)
-        allow(assignment).to receive(:grading_type_changed?).and_return(true)
+        allow(assignment).to receive(:saved_change_to_grading_type?).and_return(true)
         expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment)
 
         assignment.save!
@@ -119,7 +119,7 @@ describe Assignment do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
         allow(assignment).to receive(:update_cached_due_dates?).and_return(true)
-        allow(assignment).to receive(:grading_type_changed?).and_return(true)
+        allow(assignment).to receive(:saved_change_to_grading_type?).and_return(true)
         expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment).once
 
         assignment.save!
@@ -129,7 +129,7 @@ describe Assignment do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
         allow(assignment).to receive(:update_cached_due_dates?).and_return(false)
-        allow(assignment).to receive(:grading_type_changed?).and_return(false)
+        allow(assignment).to receive(:saved_change_to_grading_type?).and_return(false)
         expect(LatePolicyApplicator).not_to receive(:for_assignment).with(assignment)
 
         assignment.save!
@@ -139,7 +139,7 @@ describe Assignment do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
         allow(assignment).to receive(:update_cached_due_dates?).and_return(true)
-        allow(assignment).to receive(:grading_type_changed?).and_return(false)
+        allow(assignment).to receive(:saved_change_to_grading_type?).and_return(false)
         expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment).once
 
         assignment.save!
