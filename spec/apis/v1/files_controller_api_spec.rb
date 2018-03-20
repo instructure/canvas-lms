@@ -47,6 +47,61 @@ describe "Files API", type: :request do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
   end
 
+  describe 'create file' do
+    def call_course_create_file
+      api_call(:post, "/api/v1/courses/#{@course.id}/files", {
+        controller: 'courses',
+        action: 'create_file',
+        course_id: @course.id,
+        format: 'json',
+        name: 'test_file.png',
+        size: '12345',
+        content_type: 'image/png',
+        success_include: ['avatar'],
+        no_redirect: 'true'
+      })
+    end
+
+    it 'includes success_include param in file create url' do
+      local_storage!
+      json = call_course_create_file
+      query = Rack::Utils.parse_nested_query(URI(json['upload_url']).query)
+      expect(query['success_include']).to include('avatar')
+    end
+
+    it 'includes include param in create success url' do
+      s3_storage!
+      json = call_course_create_file
+      query = Rack::Utils.parse_nested_query(URI(json['upload_params']['success_url']).query)
+      expect(query['include']).to include('avatar')
+    end
+
+    it 'includes include capture param in inst_fs token' do
+      secret = 'secret'
+      allow(InstFS).to receive(:enabled?).and_return true
+      allow(InstFS).to receive(:jwt_secret).and_return(secret)
+      json = call_course_create_file
+      query = Rack::Utils.parse_nested_query(URI(json['upload_url']).query)
+      payload = Canvas::Security.decode_jwt(query['token'], [secret])
+      expect(payload['capture_params']['include']).to include('avatar')
+    end
+  end
+
+  describe 'api_create' do
+    it 'includes success_include as include when redirecting' do
+      local_storage!
+      a = attachment_model(workflow_state: :unattached)
+      params = a.ajax_upload_params(@pseudonym, '/url', '/s3')[:upload_params]
+      raw_api_call(:post, "/files_api", params.merge({
+        controller: 'files',
+        action: 'api_create',
+        success_include: ['avatar'],
+      }))
+      query = Rack::Utils.parse_nested_query(URI(response.headers['Location']).query)
+      expect(query['include']).to include('avatar')
+    end
+  end
+
   describe "api_create_success" do
     before :once do
       @attachment = Attachment.new

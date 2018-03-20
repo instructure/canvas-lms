@@ -747,7 +747,8 @@ class FilesController < ApplicationController
           size: params[:attachment][:size],
           parent_folder_id: params[:attachment][:folder_id],
           on_duplicate: params[:attachment][:on_duplicate],
-          no_redirect: params[:no_redirect]
+          no_redirect: params[:no_redirect],
+          success_include: params[:success_include]
         })
     end
   end
@@ -763,7 +764,11 @@ class FilesController < ApplicationController
     @attachment.uploaded_data = params[:file] || params[:attachment] && params[:attachment][:uploaded_data]
     if @attachment.save
       # for consistency with the s3 upload client flow, we redirect to the success url here to finish up
-      redirect_to api_v1_files_create_success_url(@attachment, :uuid => @attachment.uuid, :on_duplicate => params[:on_duplicate], :quota_exemption => params[:quota_exemption])
+      redirect_to api_v1_files_create_success_url(@attachment,
+        uuid: @attachment.uuid,
+        on_duplicate: params[:on_duplicate],
+        quota_exemption: params[:quota_exemption],
+        include: params[:success_include])
     else
       head :bad_request
     end

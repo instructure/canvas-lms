@@ -236,7 +236,8 @@ module Api::V1::Attachment
         quota_exempt: !opts[:check_quota],
         capture_url: api_v1_files_capture_url,
         target_url: params[:url],
-        progress_json: progress_json
+        progress_json: progress_json,
+        include_param: params[:success_include]
       )
     else
       @attachment = Attachment.new
@@ -273,12 +274,14 @@ module Api::V1::Attachment
           @current_pseudonym,
           api_v1_files_create_url(
             on_duplicate: on_duplicate,
-            quota_exemption: quota_exemption),
+            quota_exemption: quota_exemption,
+            success_include: params[:success_include]),
           api_v1_files_create_success_url(
             @attachment,
             uuid: @attachment.uuid,
             on_duplicate: on_duplicate,
-            quota_exemption: quota_exemption),
+            quota_exemption: quota_exemption,
+            include: params[:success_include]),
           ssl: request.ssl?,
           file_param: opts[:file_param],
           no_redirect: params[:no_redirect])
