@@ -82,6 +82,8 @@ class Assignment < ActiveRecord::Base
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :inverse_of => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :group_category_changes_ok?
+  validate :anonymous_grading_changes_ok?
+  validate :no_anonymous_group_assignments
   validate :due_date_ok?, :unless => :active_assignment_overrides?
   validate :assignment_overrides_due_date_ok?
   validate :discussion_group_ok?
@@ -213,13 +215,36 @@ class Assignment < ActiveRecord::Base
   end
 
   def group_category_changes_ok?
-    return if new_record?
-    return unless has_submitted_submissions?
-    if group_category_id_changed?
-      errors.add :group_category_id, I18n.t("group_category_locked",
-                                            "The group category can't be changed because students have already submitted on this assignment")
+    return unless group_category_id_changed?
+
+    if has_submitted_submissions?
+      errors.add :group_category_id,
+        I18n.t("The group category can't be changed because students have already submitted on this assignment")
+    end
+
+    if anonymous_grading? && !anonymous_grading_changed?
+      errors.add :group_category_id, I18n.t("Anonymously graded assignments can't be group assignments")
     end
   end
+  private :group_category_changes_ok?
+
+  def anonymous_grading_changes_ok?
+    return unless anonymous_grading_changed?
+
+    if group_category.present? && !group_category_id_changed?
+      errors.add :anonymous_grading, I18n.t("Group assignments can't be anonymously graded")
+    end
+  end
+  private :anonymous_grading_changes_ok?
+
+  def no_anonymous_group_assignments
+    return unless group_category_id_changed? && anonymous_grading_changed?
+
+    if group_category.present? && anonymous_grading?
+      errors.add :base, I18n.t("Can't enable anonymous grading and group assignments together")
+    end
+  end
+  private :no_anonymous_group_assignments
 
   def due_date_required?
     AssignmentUtil.due_date_required?(self)

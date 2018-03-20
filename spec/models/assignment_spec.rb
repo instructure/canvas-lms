@@ -4543,7 +4543,6 @@ describe Assignment do
         assignment.valid?
         expect(assignment.errors.keys.include?(:points_possible)).to be_falsey
       end
-
     end
   end
 
@@ -4766,6 +4765,91 @@ describe Assignment do
       a2 = assignment(@group_category)
       a2.group_category.destroy
       expect(a2.group_category_deleted_with_submissions?).to eq false
+    end
+
+    context 'when anonymous grading is enabled from before' do
+      before :each do
+        a1.group_category = nil
+        a1.anonymous_grading = true
+        a1.save!
+
+        a1.group_category = @group_category
+      end
+
+      it 'invalidates the record' do
+        expect(a1).not_to be_valid
+      end
+
+      it 'adds a validation error on the group category field' do
+        a1.valid?
+
+        expected_validation_error = "Anonymously graded assignments can't be group assignments"
+        expect(a1.errors[:group_category_id]).to eq([expected_validation_error])
+      end
+    end
+  end
+
+  describe 'anonymous grading validation' do
+    before :once do
+      @group_category = @course.group_categories.create! name: "groups"
+      @groups = Array.new(2) do |i|
+        @group_category.groups.create! name: "group #{i}", context: @course
+      end
+
+      @assignment = @course.assignments.build(name: "Assignment")
+      @assignment.save!
+    end
+
+    context 'when group_category is enabled from before' do
+      before :each do
+        @assignment.group_category = @group_category
+        @assignment.save!
+
+        @assignment.anonymous_grading = true
+      end
+
+      it 'invalidates the record' do
+        expect(@assignment).not_to be_valid
+      end
+
+      it 'adds a validation error on the anonymous grading field' do
+        @assignment.valid?
+
+        expected_validation_error = "Group assignments can't be anonymously graded"
+        expect(@assignment.errors[:anonymous_grading]).to eq([expected_validation_error])
+      end
+    end
+  end
+
+  describe 'group category and anonymous grading co-validation' do
+    before :once do
+      @group_category = @course.group_categories.create! name: "groups"
+      @groups = Array.new(2) do |i|
+        @group_category.groups.create! name: "group #{i}", context: @course
+      end
+
+      @assignment = @course.assignments.build(name: "Assignment")
+      @assignment.save!
+
+      @assignment.group_category = @group_category
+      @assignment.anonymous_grading = true
+    end
+
+    it 'invalidates the record' do
+      expect(@assignment).not_to be_valid
+    end
+
+    it 'adds a validation error on the base record' do
+      @assignment.valid?
+
+      expected_validation_error = "Can't enable anonymous grading and group assignments together"
+      expect(@assignment.errors[:base]).to eq([expected_validation_error])
+    end
+
+    it 'does not add a validation error on the anonymous grading field' do
+      @assignment.valid?
+
+      expect(@assignment.errors[:anonymous_grading]).to be_empty
     end
   end
 

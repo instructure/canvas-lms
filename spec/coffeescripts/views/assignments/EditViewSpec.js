@@ -150,6 +150,16 @@ test('does not allow group assignment for large rosters', function() {
   equal(view.$('#group_category_selector').length, 0)
 })
 
+test('does not allow group assignment for anonymously graded assignments', () => {
+  ENV.ANONYMOUS_GRADING_ENABLED = true
+  const view = editView({anonymous_grading: true})
+  view.$el.appendTo($('#fixtures'))
+  view.afterRender() // call this because it's called before everything is rendered in the specs
+  const hasGroupCategoryCheckbox = view.$el.find('input#has_group_category')
+
+  strictEqual(hasGroupCategoryCheckbox.prop('disabled'), true)
+})
+
 test('does not allow peer review for large rosters', function() {
   ENV.IS_LARGE_ROSTER = true
   const view = this.editView()
@@ -946,6 +956,19 @@ QUnit.module('EditView: anonymous grading', (hooks) => {
     const view = editView()
     strictEqual(view.toJSON().anonymousGradingEnabled, true)
     strictEqual(view.$el.find('input#assignment_anonymous_grading').length, 1)
+  })
+
+  test('is disabled when group assignment is enabled', () => {
+    ENV.ANONYMOUS_GRADING_ENABLED = true
+    ENV.GROUP_CATEGORIES = [
+      {id: '1', name: 'Group Category #1'}
+    ]
+    const view = editView({group_category_id: '1'})
+    view.$el.appendTo($('#fixtures'))
+    view.afterRender() // call this because it's called before everything is rendered in the specs
+    const anonymousGradingCheckbox = view.$el.find('input#assignment_anonymous_grading')
+
+    strictEqual(anonymousGradingCheckbox.prop('disabled'), true)
   })
 })
 
