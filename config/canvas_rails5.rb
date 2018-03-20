@@ -20,9 +20,9 @@
 # or setting `private/canvas/rails5.1` to `true` in a locally accessible consul
 if !defined?(CANVAS_RAILS5_0)
   if ENV['CANVAS_RAILS5_1']
-    CANVAS_RAILS5_0 = ENV['CANVAS_RAILS5_1'] != '1'
-  elsif File.exist?(File.expand_path("../RAILS5_1", __FILE__))
-    CANVAS_RAILS5_0 = false
+    CANVAS_RAILS5_0 = ENV['CANVAS_RAILS5_1'] == '0'
+  elsif File.exist?(File.expand_path("../RAILS5_0", __FILE__))
+    CANVAS_RAILS5_0 = true
   else
     begin
       # have to do the consul communication without any gems, because
@@ -46,9 +46,9 @@ if !defined?(CANVAS_RAILS5_0)
         result = nil unless result.is_a?(Net::HTTPSuccess)
         break if result
       end
-      CANVAS_RAILS5_0 = !(result && Base64.decode64(JSON.load(result.body).first['Value']) == 'true')
+      CANVAS_RAILS5_0 = (result || false) && Base64.decode64(JSON.load(result.body).first['Value']) == 'false'
     rescue
-      CANVAS_RAILS5_0 = true
+      CANVAS_RAILS5_0 = false
     end
   end
 end
