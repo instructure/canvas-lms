@@ -691,9 +691,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     # first we update the version we've been modifying, so that all versions are current.
     update_submission_version(version, [:submission_data, :score, :fudge_points, :workflow_state])
 
-    if version.model.attempt == self.attempt && completed_before_changes
-      self.without_versioning(&:save)
-    else
+    if version.model.attempt != self.attempt || !completed_before_changes
       self.reload
 
       # score_to_keep should work regardless of the current model workflow_state and score
@@ -710,11 +708,14 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
         s.grade_matches_current_submission = true
         s.body = "user: #{self.user_id}, quiz: #{self.quiz_id}, score: #{self.kept_score}, time: #{Time.now}"
         s.saved_by = :quiz_submission
-        s.save!
       end
-
-      self.without_versioning(&:save)
     end
+
+    # submission has to be saved with versioning
+    # to help Auditors::GradeChange record grade_before correctly
+    self.submission.with_versioning(explicit: true, &:save) if self.submission.present?
+    self.without_versioning(&:save)
+
     self.reload
     grader = Quizzes::SubmissionGrader.new(self)
     if grader.outcomes_require_update(self, original_score)
