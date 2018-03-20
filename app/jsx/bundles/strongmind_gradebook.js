@@ -1,2 +1,2 @@
-import '../strongmind_gradebook/main.03b2a855.js'
-import '../strongmind_gradebook/main.51c2dbf2.css'
+import '../strongmind_gradebook/main.cc24b001.js'
+import '../strongmind_gradebook/main.f2ab554b.css'
