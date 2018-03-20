@@ -61,17 +61,6 @@ GreatExpectations.install!
 
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
 
-if CANVAS_RAILS5_0
-  module EnforceKwargTestFormat
-    def non_kwarg_request_warning
-      raise "Please use keyword arguments in your calls in controller/integration specs. e.g. `get :show, params: {id: 1}`"
-    end
-  end
-  [ActionDispatch::Integration::Session, ActionController::TestCase::Behavior].each do |mod|
-    mod.prepend(EnforceKwargTestFormat)
-  end
-end
-
 # this makes sure that a broken transaction becomes functional again
 # by the time we hit rescue_action_in_public, so that the error report
 # can be recorded

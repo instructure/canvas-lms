@@ -90,8 +90,7 @@ module PostgreSQLAdapterExtensions
   # postgres doesn't support limit on text columns, but it does on varchars. assuming we don't exceed
   # the varchar limit, change the type. otherwise drop the limit. not a big deal since we already
   # have max length validations in the models.
-  def type_to_sql(type, *args)
-    limit = CANVAS_RAILS5_0 ? args.shift : args.first[:limit]
+  def type_to_sql(type, limit: nil, **)
     if type == :text && limit
       if limit <= 10485760
         type = :string
@@ -99,7 +98,7 @@ module PostgreSQLAdapterExtensions
         limit = nil
       end
     end
-    CANVAS_RAILS5_0 ? super(type, limit, *args) : super(type, args.first.merge(:limit => limit))
+    super
   end
 
   def func(name, *args)

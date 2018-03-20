@@ -105,36 +105,3 @@ end
 ActionController::ParameterMissing.class_eval do
   def skip_error_report?; true; end
 end
-
-if CANVAS_RAILS5_0
-  module RaiseOnDeprecateHashMethods
-    def raise_deprecation_error(method)
-      raise "The method '#{method}' is going away for `params` in Rails 5.1 because ActionController::Parameters will no longer inherit from Hash - Use #to_unsafe_h if needed"
-    end
-
-    def method_missing(method_sym, *args, &block)
-      if @parameters.respond_to?(method_sym)
-        raise_deprecation_error(method_sym)
-      else
-        super
-      end
-    end
-
-    def ==(other)
-      if !other.respond_to?(:permitted?) && other.is_a?(Hash)
-        raise_deprecation_error("==")
-      else
-        super
-      end
-    end
-
-    def to_hash
-      if !self.class.raise_on_unfiltered_parameters
-        raise_deprecation_error("to_hash")
-      else
-        super
-      end
-    end
-  end
-  ActionController::Parameters.prepend(RaiseOnDeprecateHashMethods)
-end

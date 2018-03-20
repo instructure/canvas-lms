@@ -1373,13 +1373,10 @@ ActiveRecord::Associations::CollectionAssociation.class_eval do
 end
 
 module UnscopeCallbacks
-  method = CANVAS_RAILS5_0 ? "__run_callbacks__" : "run_callbacks"
-  module_eval <<-RUBY, __FILE__, __LINE__ + 1
-    def #{method}(*args)
-      scope = self.class.all.klass.unscoped
-      scope.scoping { super }
-    end
-  RUBY
+  def run_callbacks(*args)
+    scope = self.class.all.klass.unscoped
+    scope.scoping { super }
+  end
 end
 ActiveRecord::Base.send(:include, UnscopeCallbacks)
 
@@ -1437,8 +1434,7 @@ module SkipTouchCallbacks
   end
 
   module BelongsTo
-    def touch_record(o, *args)
-      name = CANVAS_RAILS5_0 ? args[1] : args[2]
+    def touch_record(o, _changes, _foreign_key, name, *)
       return if o.class.touch_callbacks_skipped?(name)
       super
     end
@@ -1471,7 +1467,7 @@ module DupArraysInMutationTracker
     change
   end
 end
-ActiveRecord::AttributeMutationTracker.prepend(DupArraysInMutationTracker) unless CANVAS_RAILS5_0
+ActiveRecord::AttributeMutationTracker.prepend(DupArraysInMutationTracker)
 
 module IgnoreOutOfSequenceMigrationDates
   def current_migration_number(dirname)

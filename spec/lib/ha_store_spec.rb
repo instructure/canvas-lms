@@ -87,7 +87,7 @@ describe ActiveSupport::Cache::HaStore do
 
   describe "#delete" do
     it "triggers a consul event when configured" do
-      # will get called twice; once with rails51: prefix, once without
+      # will get called twice; once with rails52: prefix, once without
       expect(Imperium::Events.default_client).to receive(:fire).with("invalidate", match(/mykey$/), anything).twice
       store.delete('mykey')
     end
