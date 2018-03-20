@@ -131,13 +131,7 @@ class Pseudonym < ActiveRecord::Base
     @send_confirmation = false
   end
 
-  scope :by_unique_id, lambda { |unique_id|
-    where("#{to_lower_column(:unique_id)}=#{to_lower_column('?')}", unique_id.to_s)
-  }
-
-  def self.to_lower_column(column)
-    "LOWER(#{column})"
-  end
+  scope :by_unique_id, lambda {|unique_id| where("LOWER(unique_id)=LOWER(?)", unique_id.to_s)}
 
   def self.custom_find_by_unique_id(unique_id)
     return unless unique_id

@@ -129,7 +129,7 @@ module SIS
                 next
               end
               if pseudo_by_login && (pseudo != pseudo_by_login && status_is_active ||
-                !ActiveRecord::Base.connection.select_value("SELECT 1 FROM #{Pseudonym.quoted_table_name} WHERE #{Pseudonym.to_lower_column(Pseudonym.connection.quote(pseudo.unique_id))}=#{Pseudonym.to_lower_column(Pseudonym.connection.quote(user_row.login_id))} LIMIT 1"))
+                !Pseudonym.where("LOWER(?)=LOWER(?)", pseudo.unique_id, user_row.login_id).exists?)
                 id_message = pseudo_by_login.sis_user_id ? 'SIS ID' : 'Canvas ID'
                 user_id = pseudo_by_login.sis_user_id || pseudo_by_login.user_id
                 @messages << I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping", user_id: "#{id_message} #{user_id.to_s}", other_user_id: user_row.user_id)
