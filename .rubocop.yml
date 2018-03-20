@@ -155,6 +155,8 @@ Gemspec/RequiredRubyVersion:
   Enabled: false
 
 # Rails style changes
+Migration/ModelBehavior:
+  Enabled: false
 Rails:
   Enabled: true
 Rails/TimeZone:
