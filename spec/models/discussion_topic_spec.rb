@@ -24,6 +24,27 @@ describe DiscussionTopic do
     student_in_course(:active_all => true)
   end
 
+  def create_enrolled_user(course, section, opts)
+    opts.reverse_merge!(:active_all => true, :section => section, :enrollment_state => 'active')
+    user = user_factory(opts)
+    user.save!
+    course.enroll_user(user, type=opts[:enrollment_type], opts)
+    return user
+  end
+
+  def add_section_to_topic(topic, section, opts = {})
+    opts.reverse_merge!({
+      :workflow_state => "active"
+    })
+    topic.is_section_specific = true
+    topic.discussion_topic_section_visibilities <<
+      DiscussionTopicSectionVisibility.new(
+        :discussion_topic => topic,
+        :course_section => section,
+        :workflow_state => opts[:workflow_state]
+      )
+  end
+
   describe '#grading_standard_or_default' do
     context 'when the DiscussionTopic belongs to a Course' do
       before(:once) do
@@ -324,6 +345,7 @@ describe DiscussionTopic do
       expect(@topic.visible_for?(@student)).to be_truthy
     end
 
+
     it "should be visible to all teachers in the course" do
       @topic.update_attribute(:delayed_post_at, Time.now + 1.day)
       new_teacher = user_factory
@@ -428,6 +450,22 @@ describe DiscussionTopic do
           expect(@topic.context).to eq(@course)
           expect(@topic.active_participants_with_visibility.include?(@student1)).to be_truthy
           expect(@topic.active_participants_with_visibility.include?(@student2)).to be_truthy
+        end
+
+        it "should filter out-of-section students" do
+          @course.root_account.enable_feature!(:section_specific_discussions)
+          topic = @course.discussion_topics.create(
+            :title => "section specific topic", :title => "foo", :message => "bar", :user => @teacher)
+          section1 = @course.course_sections.create!
+          section2 = @course.course_sections.create!
+          student1 = create_enrolled_user(@course, section1, :name => 'student 1', :enrollment_type => 'StudentEnrollment')
+          student2 = create_enrolled_user(@course, section2, :name => 'student 2', :enrollment_type => 'StudentEnrollment')
+          add_section_to_topic(topic, section2)
+          topic.save!
+          topic.publish!
+          expect(topic.active_participants_with_visibility.include?(student1)).to be_falsey
+          expect(topic.active_participants_with_visibility.include?(student2)).to be_truthy
+          expect(topic.active_participants_with_visibility.include?(@teacher)).to be_truthy
         end
 
         it "should work when ungraded and context is a group" do
@@ -1992,22 +2030,9 @@ describe DiscussionTopic do
       announcement
     end
 
-    def add_section_to_topic(topic, section, opts = {})
-      opts.reverse_merge!({
-        :workflow_state => "active"
-      })
-      topic.discussion_topic_section_visibilities <<
-        DiscussionTopicSectionVisibility.new(
-          :discussion_topic => topic,
-          :course_section => section,
-          :workflow_state => opts[:workflow_state]
-        )
-    end
-
     it "only section specific topics can have sections" do
       @course.root_account.enable_feature!(:section_specific_announcements)
       announcement = basic_announcement_model(course: @course)
-      announcement.is_section_specific = true
       add_section_to_topic(announcement, @section)
       expect(announcement.valid?).to eq true
       announcement.is_section_specific = false
@@ -2031,7 +2056,6 @@ describe DiscussionTopic do
       student_in_course(active_all: true)
       @group.add_user(@student)
       announcement = basic_announcement_model(course: @group)
-      announcement.is_section_specific = true
       add_section_to_topic(announcement, @section)
       expect(announcement.valid?).to eq false
       errors = announcement.errors[:is_section_specific]
@@ -2044,7 +2068,6 @@ describe DiscussionTopic do
       @course.root_account.disable_feature!(:section_specific_discussions)
       topic = DiscussionTopic.create!(:title => "some title", :context => @course,
         :user => @teacher)
-      topic.is_section_specific = true
       add_section_to_topic(topic, @section)
       expect(topic.valid?).to eq false
       errors = topic.errors[:is_section_specific]
@@ -2055,14 +2078,12 @@ describe DiscussionTopic do
       @course.root_account.enable_feature!(:section_specific_discussions)
       topic = DiscussionTopic.create!(:title => "some title", :context => @course,
         :user => @teacher)
-      topic.is_section_specific = true
       add_section_to_topic(topic, @section)
       expect(topic.valid?).to eq true
     end
 
     it "does not allow announcements to be section-specific if the feature is disabled" do
       @course.root_account.disable_feature!(:section_specific_announcements)
-      @announcement.is_section_specific = true
       add_section_to_topic(@announcement, @section)
       expect(@announcement.valid?).to eq false
       errors = @announcement.errors[:is_section_specific]
@@ -2071,7 +2092,6 @@ describe DiscussionTopic do
 
     it "allows announcements to be section-specific if the feature is enabled" do
       @course.root_account.enable_feature!(:section_specific_announcements)
-      @announcement.is_section_specific = true
       add_section_to_topic(@announcement, @section)
       expect(@announcement.valid?).to eq true
     end
@@ -2079,7 +2099,6 @@ describe DiscussionTopic do
     it "does not allow graded discussions to be section-specific" do
       group_discussion_assignment
       @course.root_account.enable_feature!(:section_specific_discussions)
-      @topic.is_section_specific = true
       add_section_to_topic(@topic, @section)
       expect(@topic.valid?).to eq false
     end
@@ -2087,7 +2106,6 @@ describe DiscussionTopic do
     it "does not allow course grouped discussions to be section-specific" do
       group_discussion_topic_model
       @course.root_account.enable_feature!(:section_specific_discussions)
-      @group_topic.is_section_specific = true
       add_section_to_topic(@group_topic, @section)
       expect(@group_topic.valid?).to eq false
     end
@@ -2096,7 +2114,6 @@ describe DiscussionTopic do
       course = course_with_two_sections
       announcement = basic_announcement_model(
         :course => course,
-        :is_section_specific => true
       )
       add_section_to_topic(announcement, course.course_sections.first)
       add_section_to_topic(announcement, course.course_sections.second)
@@ -2138,7 +2155,6 @@ describe DiscussionTopic do
       course = course_with_two_sections
       announcement = basic_announcement_model(
         :course => course,
-        :is_section_specific => true
       )
       add_section_to_topic(announcement, course.course_sections.first)
       announcement.save!
@@ -2150,7 +2166,6 @@ describe DiscussionTopic do
       course = course_with_two_sections
       announcement = basic_announcement_model(
         :course => course,
-        :is_section_specific => true
       )
       add_section_to_topic(announcement, course.course_sections.second)
       announcement.save!
@@ -2171,7 +2186,6 @@ describe DiscussionTopic do
       course = course_with_two_sections
       announcement = basic_announcement_model(
         :course => course,
-        :is_section_specific => true
       )
       add_section_to_topic(announcement, course.course_sections.first)
       add_section_to_topic(announcement, course.course_sections.second)
@@ -2431,13 +2445,6 @@ describe DiscussionTopic do
   end
 
   describe "users with permissions" do
-    def create_enrolled_user(course, section, opts)
-      opts.reverse_merge!(:active_all => true, :section_id => section.id)
-      user = user_factory(opts)
-      create_enrollment(course, user, opts)
-      return user
-    end
-
     before :once do
       @course = course_factory(:active_all => true)
       @course.root_account.enable_feature!(:section_specific_announcements)
@@ -2446,8 +2453,8 @@ describe DiscussionTopic do
       @section2 = @course.course_sections.create!
       @limited_teacher = create_enrolled_user(@course, @section1, :name => 'limited teacher',
         :enrollment_type => 'TeacherEnrollment', :limit_privileges_to_course_section => true)
-      @student1 = create_enrolled_user(@course, @section1, :name => 'student 1')
-      @student2 = create_enrolled_user(@course, @section2, :name => 'student 2')
+      @student1 = create_enrolled_user(@course, @section1, :name => 'student 1', :enrollment_type => 'StudentEnrollment')
+      @student2 = create_enrolled_user(@course, @section2, :name => 'student 2', :enrollment_type => 'StudentEnrollment')
       @all_users = [@teacher, @limited_teacher, @student1, @student2]
     end
 
@@ -2461,13 +2468,7 @@ describe DiscussionTopic do
     it "specific topic limits properly" do
       topic = DiscussionTopic.new(:title => 'foo', :message => 'bar',
         :context => @course, :user => @teacher)
-      topic.is_section_specific = true
-      topic.discussion_topic_section_visibilities <<
-        DiscussionTopicSectionVisibility.new(
-          :discussion_topic => topic,
-          :course_section => @section2,
-          :workflow_state => 'active'
-        )
+      add_section_to_topic(topic, @section2)
       topic.save!
       users = topic.users_with_permissions(@all_users)
       expect(users.map(&:id).to_set).to eq([@teacher.id, @student2.id].to_set)
