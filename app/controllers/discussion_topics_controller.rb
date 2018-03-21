@@ -435,135 +435,136 @@ class DiscussionTopicsController < ApplicationController
       return redirect_to edit_course_discussion_topic_url(@context.context_id, @topic.root_topic_id)
     end
 
-    if authorized_action(@topic, @current_user, (@topic.new_record? ? :create : :update))
-      can_set_group_category = @context.respond_to?(:group_categories) && @context.grants_right?(@current_user, session, :manage) # i.e. not a student
-      hash =  {
-        URL_ROOT: named_context_url(@context, :api_v1_context_discussion_topics_url),
-        PERMISSIONS: {
-          CAN_CREATE_ASSIGNMENT: @context.respond_to?(:assignments) && @context.assignments.temp_record.grants_right?(@current_user, session, :create),
-          CAN_ATTACH: @topic.grants_right?(@current_user, session, :attach),
-          CAN_MODERATE: user_can_moderate,
-          CAN_SET_GROUP: can_set_group_category
-        }
+    return unless authorized_action(@topic, @current_user, (@topic.new_record? ? :create : :update))
+    return render_unauthorized_action unless @topic.visible_for?(@current_user)
+
+    can_set_group_category = @context.respond_to?(:group_categories) && @context.grants_right?(@current_user, session, :manage) # i.e. not a student
+    hash =  {
+      URL_ROOT: named_context_url(@context, :api_v1_context_discussion_topics_url),
+      PERMISSIONS: {
+        CAN_CREATE_ASSIGNMENT: @context.respond_to?(:assignments) && @context.assignments.temp_record.grants_right?(@current_user, session, :create),
+        CAN_ATTACH: @topic.grants_right?(@current_user, session, :attach),
+        CAN_MODERATE: user_can_moderate,
+        CAN_SET_GROUP: can_set_group_category
       }
+    }
 
-      unless @topic.new_record?
-        add_discussion_or_announcement_crumb
-        add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
-        add_crumb t :edit_crumb, "Edit"
-        hash[:ATTRIBUTES] = discussion_topic_api_json(@topic, @context, @current_user, session, override_dates: false)
-      end
-      (hash[:ATTRIBUTES] ||= {})[:is_announcement] = @topic.is_announcement
-      hash[:ATTRIBUTES][:can_group] = @topic.can_group?
-      handle_assignment_edit_params(hash[:ATTRIBUTES])
-
-      categories = []
-      if can_set_group_category
-        categories = @context.group_categories
-        # if discussion has entries and is attached to a deleted group category,
-        # add that category to the ENV list so it will be shown on the edit page.
-        if @topic.group_category_deleted_with_entries?
-          categories << @topic.group_category
-        end
-      end
-
-      if @topic.assignment.present?
-        hash[:ATTRIBUTES][:assignment][:assignment_overrides] =
-          (assignment_overrides_json(
-            @topic.assignment.overrides_for(@current_user, ensure_set_not_empty: true)
-            ))
-        hash[:ATTRIBUTES][:assignment][:has_student_submissions] = @topic.assignment.has_student_submissions?
-      end
-
-      section_visibilities =
-        if @context.respond_to?(:course_section_visibility)
-          @context.course_section_visibility(@current_user)
-        else
-          :none
-        end
-
-      sections =
-        if section_visibilities == :none
-          []
-        elsif section_visibilities == :all
-          @context.course_sections.active.to_a
-        else
-          @context.course_sections.select{ |s| s.active? && section_visibilities.include?(s.id) }
-        end
-
-      js_hash = {
-        CONTEXT_ACTION_SOURCE: :discussion_topic,
-        CONTEXT_ID: @context.id,
-        DISCUSSION_TOPIC: hash,
-        GROUP_CATEGORIES: categories.
-           reject(&:student_organized?).
-           map { |category| { id: category.id, name: category.name } },
-        HAS_GRADING_PERIODS: @context.grading_periods?,
-        SECTION_LIST: sections.map { |section| { id: section.id, name: section.name } },
-        ANNOUNCEMENTS_LOCKED: announcements_locked?
-      }
-
-      post_to_sis = Assignment.sis_grade_export_enabled?(@context)
-      js_hash[:POST_TO_SIS] = post_to_sis
-      if post_to_sis && @topic.new_record?
-        js_hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value]
-      end
-      if @context.root_account.feature_enabled?(:student_planner)
-        js_hash[:STUDENT_PLANNER_ENABLED] = @context.grants_any_right?(@current_user, session, :manage)
-      end
-
-      if @context.account.feature_enabled?(:section_specific_announcements) &&
-          @topic.is_section_specific && @context.is_a?(Course)
-
-        selected_section_ids = @topic.discussion_topic_section_visibilities.pluck(:course_section_id)
-        js_hash['SELECTED_SECTION_LIST'] = sections.select{|s| selected_section_ids.include?(s.id)}.map do |section|
-          {
-            id: section.id,
-            name: section.name
-          }
-        end
-      end
-      js_hash[:SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED] = @context.account.
-        feature_enabled?(:section_specific_announcements)
-
-
-      js_hash[:SECTION_SPECIFIC_DISCUSSIONS_ENABLED] = @context.account.feature_enabled?(:section_specific_discussions)
-
-      js_hash[:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.name_length_required_for_account?(@context)
-      js_hash[:MAX_NAME_LENGTH] = AssignmentUtil.assignment_max_name_length(@context)
-      js_hash[:DUE_DATE_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.due_date_required_for_account?(@context)
-      js_hash[:SIS_NAME] = AssignmentUtil.post_to_sis_friendly_name(@context)
-
-      if @context.is_a?(Course)
-        js_hash['SECTION_LIST'] = sections.map do |section|
-          {
-            id: section.id,
-            name: section.name,
-            start_at: section.start_at,
-            end_at: section.end_at,
-            override_course_and_term_dates: section.restrict_enrollments_to_section_dates
-          }
-        end
-        js_hash['VALID_DATE_RANGE'] = CourseDateRange.new(@context)
-      end
-      js_hash[:CANCEL_TO] = cancel_redirect_url
-      append_sis_data(js_hash)
-
-      if @context.grading_periods?
-        gp_context = @context.is_a?(Group) ? @context.context : @context
-        js_hash[:active_grading_periods] = GradingPeriod.json_for(gp_context, @current_user)
-      end
-      if context.is_a?(Course)
-        js_hash[:allow_self_signup] = true  # for group creation
-        js_hash[:group_user_type] = 'student'
-      end
-      js_env(js_hash)
-
-      set_master_course_js_env_data(@topic, @context)
-      conditional_release_js_env(@topic.assignment)
-
-      render :edit
+    unless @topic.new_record?
+      add_discussion_or_announcement_crumb
+      add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
+      add_crumb t :edit_crumb, "Edit"
+      hash[:ATTRIBUTES] = discussion_topic_api_json(@topic, @context, @current_user, session, override_dates: false)
     end
+    (hash[:ATTRIBUTES] ||= {})[:is_announcement] = @topic.is_announcement
+    hash[:ATTRIBUTES][:can_group] = @topic.can_group?
+    handle_assignment_edit_params(hash[:ATTRIBUTES])
+
+    categories = []
+    if can_set_group_category
+      categories = @context.group_categories
+      # if discussion has entries and is attached to a deleted group category,
+      # add that category to the ENV list so it will be shown on the edit page.
+      if @topic.group_category_deleted_with_entries?
+        categories << @topic.group_category
+      end
+    end
+
+    if @topic.assignment.present?
+      hash[:ATTRIBUTES][:assignment][:assignment_overrides] =
+        (assignment_overrides_json(
+          @topic.assignment.overrides_for(@current_user, ensure_set_not_empty: true)
+          ))
+      hash[:ATTRIBUTES][:assignment][:has_student_submissions] = @topic.assignment.has_student_submissions?
+    end
+
+    section_visibilities =
+      if @context.respond_to?(:course_section_visibility)
+        @context.course_section_visibility(@current_user)
+      else
+        :none
+      end
+
+    sections =
+      if section_visibilities == :none
+        []
+      elsif section_visibilities == :all
+        @context.course_sections.active.to_a
+      else
+        @context.course_sections.select{ |s| s.active? && section_visibilities.include?(s.id) }
+      end
+
+    js_hash = {
+      CONTEXT_ACTION_SOURCE: :discussion_topic,
+      CONTEXT_ID: @context.id,
+      DISCUSSION_TOPIC: hash,
+      GROUP_CATEGORIES: categories.
+         reject(&:student_organized?).
+         map { |category| { id: category.id, name: category.name } },
+      HAS_GRADING_PERIODS: @context.grading_periods?,
+      SECTION_LIST: sections.map { |section| { id: section.id, name: section.name } },
+      ANNOUNCEMENTS_LOCKED: announcements_locked?
+    }
+
+    post_to_sis = Assignment.sis_grade_export_enabled?(@context)
+    js_hash[:POST_TO_SIS] = post_to_sis
+    if post_to_sis && @topic.new_record?
+      js_hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value]
+    end
+    if @context.root_account.feature_enabled?(:student_planner)
+      js_hash[:STUDENT_PLANNER_ENABLED] = @context.grants_any_right?(@current_user, session, :manage)
+    end
+
+    if @context.account.feature_enabled?(:section_specific_announcements) &&
+        @topic.is_section_specific && @context.is_a?(Course)
+
+      selected_section_ids = @topic.discussion_topic_section_visibilities.pluck(:course_section_id)
+      js_hash['SELECTED_SECTION_LIST'] = sections.select{|s| selected_section_ids.include?(s.id)}.map do |section|
+        {
+          id: section.id,
+          name: section.name
+        }
+      end
+    end
+    js_hash[:SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED] = @context.account.
+      feature_enabled?(:section_specific_announcements)
+
+
+    js_hash[:SECTION_SPECIFIC_DISCUSSIONS_ENABLED] = @context.account.feature_enabled?(:section_specific_discussions)
+
+    js_hash[:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.name_length_required_for_account?(@context)
+    js_hash[:MAX_NAME_LENGTH] = AssignmentUtil.assignment_max_name_length(@context)
+    js_hash[:DUE_DATE_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.due_date_required_for_account?(@context)
+    js_hash[:SIS_NAME] = AssignmentUtil.post_to_sis_friendly_name(@context)
+
+    if @context.is_a?(Course)
+      js_hash['SECTION_LIST'] = sections.map do |section|
+        {
+          id: section.id,
+          name: section.name,
+          start_at: section.start_at,
+          end_at: section.end_at,
+          override_course_and_term_dates: section.restrict_enrollments_to_section_dates
+        }
+      end
+      js_hash['VALID_DATE_RANGE'] = CourseDateRange.new(@context)
+    end
+    js_hash[:CANCEL_TO] = cancel_redirect_url
+    append_sis_data(js_hash)
+
+    if @context.grading_periods?
+      gp_context = @context.is_a?(Group) ? @context.context : @context
+      js_hash[:active_grading_periods] = GradingPeriod.json_for(gp_context, @current_user)
+    end
+    if context.is_a?(Course)
+      js_hash[:allow_self_signup] = true  # for group creation
+      js_hash[:group_user_type] = 'student'
+    end
+    js_env(js_hash)
+
+    set_master_course_js_env_data(@topic, @context)
+    conditional_release_js_env(@topic.assignment)
+
+    render :edit
   end
 
   def show
@@ -584,7 +585,7 @@ class DiscussionTopicsController < ApplicationController
       return
     end
 
-    unless @topic.grants_right?(@current_user, session, :read)
+    unless @topic.grants_right?(@current_user, session, :read) && @topic.visible_for?(@current_user)
       return render_unauthorized_action unless @current_user
       respond_to do |format|
         if @topic.is_announcement
@@ -1048,7 +1049,7 @@ class DiscussionTopicsController < ApplicationController
     unless invalid_sections.empty?
       @errors[:specific_sections] = t(
         :error_section_permission,
-        'You do not have permissions to create discussion for section(s) %{section_ids}',
+        'You do not have permissions to modify discussion for section(s) %{section_ids}',
         section_ids: invalid_sections.join(", ")
       )
     end
@@ -1078,6 +1079,7 @@ class DiscussionTopicsController < ApplicationController
     else
       @topic = @context.send(model_type).active.find(params[:id] || params[:topic_id])
       prior_version = DiscussionTopic.find(@topic.id)
+      verify_specific_section_visibilities # Make sure user actually has perms to modify this
     end
 
     # It's possible customers already are using this API and haven't updated to
