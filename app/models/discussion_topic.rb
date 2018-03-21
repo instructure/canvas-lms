@@ -1271,6 +1271,16 @@ class DiscussionTopic < ActiveRecord::Base
 
       next false unless (is_announcement ? context.grants_right?(user, :read_announcements) : context.grants_right?(user, :read_forum))
 
+      # Don't have visibilites for any of the specific sections in a section specific topic
+      if context.is_a?(Course) && self.try(:is_section_specific)
+        section_visibilities = context.course_section_visibility(user)
+        next false if section_visibilities == :none
+        if section_visibilities != :all
+          course_specific_sections = self.course_sections.pluck(:id)
+          next false if (section_visibilities & course_specific_sections).empty?
+        end
+      end
+
       # user is an admin in the context (teacher/ta/designer) OR
       # user is an account admin with appropriate permission
       next true if context.grants_any_right?(user, :manage, :read_course_content)
@@ -1286,11 +1296,6 @@ class DiscussionTopic < ActiveRecord::Base
       elsif is_announcement && unlock_at = available_from_for(user)
       # unlock date exists and has passed
         next unlock_at < Time.now.utc
-      # check section specific stuff
-      elsif self.try(:is_section_specific)
-        sections = user.enrollments.active.
-          where(course_section_id: self.discussion_topic_section_visibilities.select(:course_section_id))
-        next sections.any?
       # everything else
       else
         next true
