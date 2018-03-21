@@ -20,14 +20,17 @@ module Alerts
     def self.process
       Account.root_accounts.active.find_each do |account|
         next unless account.settings[:enable_alerts]
-        self.send_later_if_production_enqueue_args(:evaluate_for_root_account, { :priority => Delayed::LOW_PRIORITY }, account)
+        account.all_courses.active.find_ids_in_batches do |batch|
+          self.send_later_if_production_enqueue_args(:evaluate_courses,
+                                                     {n_strand: ['delayed_alert_sender_evaluate_courses', account.global_id],
+                                                      priority: Delayed::LOW_PRIORITY}, batch)
+        end
       end
     end
 
-    def self.evaluate_for_root_account(account)
-      return unless account.settings[:enable_alerts]
+    def self.evaluate_courses(course_ids)
       alerts_cache = {}
-      account.associated_courses.where(:workflow_state => 'available').find_each do |course|
+      Course.where(id: course_ids).find_each do |course|
         alerts_cache[course.account_id] ||= course.account.account_chain.map { |a| a.alerts.to_a }.flatten
         self.evaluate_for_course(course, alerts_cache[course.account_id])
       end
