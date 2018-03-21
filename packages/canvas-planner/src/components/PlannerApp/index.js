@@ -29,7 +29,7 @@ import LoadingFutureIndicator from '../LoadingFutureIndicator';
 import LoadingPastIndicator from '../LoadingPastIndicator';
 import PlannerEmptyState from '../PlannerEmptyState';
 import formatMessage from '../../format-message';
-import {loadFutureItems, scrollIntoPast, loadPastUntilNewActivity, scrollToNewActivity, togglePlannerItemCompletion, updateTodo} from '../../actions';
+import {loadFutureItems, loadPastButtonClicked, loadPastUntilNewActivity, scrollToNewActivity, togglePlannerItemCompletion, updateTodo} from '../../actions';
 import {getFirstLoadedMoment} from '../../utilities/dateUtils';
 import {notifier} from '../../dynamic-ui';
 
@@ -48,7 +48,7 @@ export class PlannerApp extends Component {
     loadingFuture: bool,
     allFutureItemsLoaded: bool,
     firstNewActivityDate: momentObj,
-    scrollIntoPast: func,
+    loadPastButtonClicked: func,
     loadPastUntilNewActivity: func,
     scrollToNewActivity: func,
     loadFutureItems: func,
@@ -148,7 +148,7 @@ export class PlannerApp extends Component {
     return (
       <ShowOnFocusButton
         buttonProps={{
-          onClick: this.props.scrollIntoPast
+          onClick: this.props.loadPastButtonClicked
         }}
         >
           {formatMessage('Load prior dates')}
@@ -221,5 +221,5 @@ const mapStateToProps = (state) => {
   };
 };
 
-const mapDispatchToProps = {loadFutureItems, scrollIntoPast, loadPastUntilNewActivity, scrollToNewActivity, togglePlannerItemCompletion, updateTodo};
+const mapDispatchToProps = {loadFutureItems, loadPastButtonClicked, loadPastUntilNewActivity, scrollToNewActivity, togglePlannerItemCompletion, updateTodo};
 export default notifier(connect(mapStateToProps, mapDispatchToProps)(PlannerApp));

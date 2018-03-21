@@ -17,7 +17,7 @@
  */
 
 import {
-  // MaintainScrollPosition,
+  MaintainScrollPosition,
   ScrollToNewActivity,
   ScrollToLastLoadedNewActivity,
 
@@ -44,13 +44,17 @@ export class AnimationCollection {
       ],
       animation: ScrollToLastLoadedNewActivity
     },
+    {
+      expected: [
+        'SCROLL_INTO_PAST',
+        'START_LOADING_PAST_SAGA',
+        'GOT_DAYS_SUCCESS',
+      ],
+      animation: MaintainScrollPosition,
+    },
+
 
     // animations for the future. no, the format doesn't match.
-
-    // [['SCROLL_INTO_PAST', // a new action to distinguish scrolling from "load more" button clicks
-    //   'START_LOADING_PAST_SAGA',
-    //   'GOT_DAYS_SUCCESS',
-    // ], MaintainScrollPosition],
 
     // [['LOAD_FUTURE_ITEMS',
     //   'GOT_DAYS_SUCCESS',

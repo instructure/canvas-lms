@@ -214,17 +214,10 @@ describe('action handling', () => {
 });
 
 describe('getting past items', () => {
-  it('maintains the scroll position when loading past items', () => {
+  it('records the fixed element on preTrigger', () => {
     const {manager, animator} = createManagerWithMocks();
-    manager.handleAction(gettingPastItems({seekingNewActivity: false}));
-    manager.handleAction(gotItemsSuccess(
-      [{uniqueId: 'day-1-group-1-item-0'}, {uniqueId: 'day-1-group-0-item-0'}],
-    ));
-    registerStandardDays(manager);
     manager.preTriggerUpdates('fixed-element', 'app');
     expect(animator.recordFixedElement).toHaveBeenCalledWith('fixed-element');
-    manager.triggerUpdates();
-    expect(animator.maintainViewportPosition).toHaveBeenCalled();
   });
 });
 

@@ -200,12 +200,6 @@ export class DynamicUiManager {
     if (handler) handler(action);
   }
 
-  handleGettingPastItems = (action) => {
-    if (!action.payload.seekingNewActivity) {
-      this.animationPlan.noScroll = true;
-    }
-  }
-
   handleGotDaysSuccess = (action) => {
     const newDays = action.payload.internalDays;
     const newItems = daysToItems(newDays);
