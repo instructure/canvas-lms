@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class AddRedirectUrisToDeveloperKeys < ActiveRecord::Migration[4.2]
-  tag :predeploy
+  tag :postdeploy
 
   def change
     add_column :developer_keys, :redirect_uris, :string, array: true, default: [], null: false
