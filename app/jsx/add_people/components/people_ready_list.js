@@ -60,7 +60,7 @@ import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReade
             <tbody>
               {this.props.nameList.map((n, i) => (
                 <tr key={`${n.address}_${i}`}>
-                  <td>{n.user_name}</td>
+                  <th scope="row">{n.user_name}</th>
                   <td>{n.email}</td>
                   <td>{n.login_id || ''}</td>
                   {this.props.canReadSIS ? <td>{n.sis_user_id || ''}</td> : null}
