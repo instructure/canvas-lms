@@ -80,7 +80,8 @@ export default class SubmissionTray extends React.Component {
       name: string.isRequired,
       htmlUrl: string.isRequired,
       muted: bool.isRequired,
-      published: bool.isRequired
+      published: bool.isRequired,
+      anonymousGrading: bool.isRequired
     }).isRequired,
     contentRef: func,
     currentUserId: string.isRequired,
@@ -209,7 +210,11 @@ export default class SubmissionTray extends React.Component {
     const { name, avatarUrl } = this.props.student;
     const assignmentParam = `assignment_id=${this.props.submission.assignmentId}`;
     const studentParam = `#{"student_id":"${this.props.student.id}"}`;
-    const speedGraderUrl = encodeURI(`/courses/${this.props.courseId}/gradebook/speed_grader?${assignmentParam}${studentParam}`);
+    const speedGraderUrlParams = this.props.assignment.anonymousGrading
+      ? assignmentParam
+      : `${assignmentParam}${studentParam}`
+    const speedGraderUrl = encodeURI(`/courses/${this.props.courseId}/gradebook/speed_grader?${speedGraderUrlParams}`)
+
     const submissionCommentsProps = {
       submissionComments: this.props.submissionComments,
       submissionCommentsLoaded: this.props.submissionCommentsLoaded,

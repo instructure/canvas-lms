@@ -59,6 +59,15 @@ test('speed_grader_enabled sets speedgrader url', function() {
   equal(dialog.dialog.find('.more-details-link').length, 1)
 })
 
+test('speed_grader_enabled omits student_id from speedgrader url for anonymously graded assignments', function() {
+  this.assignment.anonymous_grading = true
+  this.options.context_url = 'http://some-fake-url'
+  const dialog = new SubmissionDetailsDialog(this.assignment, this.user, this.options)
+
+  const urlObject = new URL(dialog.submission.speedGraderUrl)
+  strictEqual(urlObject.hash, '')
+})
+
 test('speed_grader_enabled as false does not set speedgrader url', function() {
   const dialog = new SubmissionDetailsDialog(this.assignment, this.user, {
     speed_grader_enabled: false,

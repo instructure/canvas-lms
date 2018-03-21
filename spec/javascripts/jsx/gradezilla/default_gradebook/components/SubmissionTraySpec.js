@@ -200,6 +200,13 @@ QUnit.module('SubmissionTray', function (hooks) {
     strictEqual(speedGraderLink, speedGraderUrl);
   });
 
+  test('omits student_id from SpeedGrader link if enabled and assignment is anonymously graded', function() {
+    const speedGraderUrl = '/courses/1/gradebook/speed_grader?assignment_id=30';
+    mountComponent({assignment: {anonymousGrading: true}});
+    const speedGraderLink = document.querySelector('.SubmissionTray__Container a[href*="speed_grader"]').getAttribute('href');
+    strictEqual(speedGraderLink, speedGraderUrl);
+  });
+
   test('does not show SpeedGrader link if disabled', function () {
     mountComponent({speedGraderEnabled: false});
     const speedGraderLink = document.querySelector('.SubmissionTray__Container a[href*="speed_grader"]');
