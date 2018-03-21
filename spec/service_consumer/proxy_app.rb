@@ -15,23 +15,43 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# ENV["RAILS_ENV"] = 'test'
-
 class ProxyApp
-  def initialize
+  def initialize(api_token=nil)
+    @full_token = api_token if api_token
     require ::File.expand_path('../../../config/environment', __FILE__)
-    @real_provider_app = Rails.application
+    @real_provider_app = CanvasRails::Application
   end
 
   def call(env)
-    # modify request (env) here
-    # See http://www.rubydoc.info/github/rack/rack/file/SPEC for contents of the ENV
-    # create a User
-    AccountUser.create!(account: Account.default, user: User.create!)
-    # create token
-    full_token = Account.default.users.first.access_tokens.create!.full_token
     env["HTTP_AUTHORIZATION"] = "Bearer #{full_token}" if env.include?("HTTP_AUTHORIZATION")
     response = @real_provider_app.call(env)
     response
+  end
+
+  def full_token
+    @full_token ||= create_user_account_pseudo_token
+  end
+
+  def create_user_account_pseudo_token(user_id=nil, account=Account.default, password="password1", purpose="purpose")
+    AccountUser.create!(account: account, user: user_create_or_find(user_id))
+    pseudonym_create
+    # create token
+    @user.access_tokens.create!(purpose: purpose).full_token
+  end
+
+  def user_create_or_find(user_id=nil)
+    @user ||= user_id.nil? ? User.create! : User.find(user_id)
+  end
+
+  def account(account_id=nil)
+    @account ||= account_id ? Account.find(account_id) : Account.default
+  end
+
+  def pseudonym_create(unique_user="admin", password="password")
+    @psuedonym ||= Pseudonym.create!(user: @user,
+        account: account,
+        unique_id: unique_user + @user.id.to_s,
+        password: password,
+        password_confirmation: password)
   end
 end
