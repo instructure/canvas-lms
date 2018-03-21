@@ -78,6 +78,8 @@ module SIS
         group = @root_account.all_groups.where(sis_source_id: group_id).take
         unless group
           raise ImportError, "No name given for group #{group_id}." if name.blank?
+          # closed and completed are no longer valid states. Leaving these for
+          # backwards compatibility. It is not longer a documented status
           raise ImportError, "Improper status \"#{status}\" for group #{group_id}." unless status =~ /\A(available|closed|completed|deleted)/i
         end
 
@@ -86,7 +88,7 @@ module SIS
         # group_category's context, so assign context
         if group_category
           context = group_category.context
-          group ? group.group_category = group_category : group = group_category.groups.new
+          group ? group.group_category = group_category : group = group_category.groups.new(name: name, sis_source_id: group_id)
         end
         # no account_id, course_id, or group_category, assign context to root_account
         context ||= @root_account
@@ -102,19 +104,7 @@ module SIS
         group.name = name if name.present? && !group.stuck_sis_fields.include?(:name)
         group.context = context
         group.sis_batch_id = @batch.id if @batch
-
-        # closed and completed are no longer valid states. Leaving these for
-        # backwards compatibility. It is not longer a documented status
-        case status
-        when /available/i
-          group.workflow_state = 'available'
-        when /closed/i
-          group.workflow_state = 'available'
-        when /completed/i
-          group.workflow_state = 'available'
-        when /deleted/i
-          group.workflow_state = 'deleted'
-        end
+        group.workflow_state = status == 'deleted' ? 'deleted' : 'available'
 
         if group.save
           @success_count += 1

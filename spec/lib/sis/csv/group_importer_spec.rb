@@ -98,7 +98,7 @@ describe SIS::CSV::GroupImporter do
     expect(groups.map(&:account)).to eq [@account, sub]
   end
 
-  it "should use group_category_id" do
+  it "should use group_category_id and set sis_id" do
     sub = @account.sub_accounts.create!(name: 'sub')
     sub.update_attribute('sis_source_id', 'A002')
     process_csv_data_cleanly(
@@ -109,7 +109,9 @@ describe SIS::CSV::GroupImporter do
       "group_id,account_id,name,status,group_category_id",
       "G001,,Group 1,available,Gc001",
       "G002,,Group 2,available,Gc002")
-    groups = Group.order(:id).to_a
+    group1 = Group.where(sis_source_id: 'G001').take
+    group2 = Group.where(sis_source_id: 'G002').take
+    groups = [group1, group2]
     expect(groups.map(&:account)).to eq [@account, sub]
     expect(groups.map(&:group_category)).to eq GroupCategory.order(:id).to_a
   end
