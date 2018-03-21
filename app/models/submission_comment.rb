@@ -263,7 +263,7 @@ class SubmissionComment < ActiveRecord::Base
 
   def update_participation
     # id_changed? because new_record? is false in after_save callbacks
-    if id_changed? || (hidden_changed? && !hidden?)
+    if saved_change_to_id? || (saved_change_to_hidden? && !hidden?)
       return if submission.user_id == author_id
       return if submission.assignment.deleted? || submission.assignment.muted?
       return if provisional_grade_id.present?

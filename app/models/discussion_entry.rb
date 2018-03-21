@@ -181,7 +181,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def update_discussion
-    if %w(workflow_state message attachment_id editor_id).any? { |a| self.changed.include?(a) }
+    if %w(workflow_state message attachment_id editor_id).any? { |a| self.saved_change_to_attribute?(a) }
       dt = self.discussion_topic
       loop do
         dt.touch

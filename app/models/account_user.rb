@@ -55,7 +55,7 @@ class AccountUser < ActiveRecord::Base
   end
 
   def update_account_associations_if_changed
-    being_deleted = self.workflow_state == 'deleted' && self.workflow_state_was != 'deleted'
+    being_deleted = self.workflow_state == 'deleted' && self.workflow_state_before_last_save != 'deleted'
     if (self.saved_change_to_account_id? || self.saved_change_to_user_id?) || being_deleted
       if self.new_record?
         return if %w{creation_pending deleted}.include?(self.user.workflow_state)

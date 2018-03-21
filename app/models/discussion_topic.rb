@@ -202,7 +202,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def update_materialized_view_if_changed
-    if self.sort_by_rating_changed?
+    if self.saved_change_to_sort_by_rating?
       update_materialized_view
     end
   end
@@ -220,7 +220,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def update_subtopics
-    if !self.deleted? && (self.has_group_category? || !!self.group_category_id_was)
+    if !self.deleted? && (self.has_group_category? || !!self.group_category_id_before_last_save)
       send_later_if_production :refresh_subtopics
     end
   end
@@ -277,7 +277,7 @@ class DiscussionTopic < ActiveRecord::Base
       self.sync_assignment
       self.assignment.workflow_state = "published" if is_announcement && deleted_assignment
       self.assignment.description = self.message
-      if group_category_id_changed?
+      if saved_change_to_group_category_id?
         self.assignment.validate_assignment_overrides(force_override_destroy: true)
       end
       self.assignment.save
@@ -287,7 +287,7 @@ class DiscussionTopic < ActiveRecord::Base
     # ungraded to graded, or from one assignment to another; we ignore the
     # transition from graded to ungraded) we acknowledge that the users that
     # have posted have contributed to the topic
-    if self.assignment_id && self.assignment_id_changed?
+    if self.assignment_id && self.saved_change_to_assignment_id?
       recalculate_context_module_actions!
     end
   end
@@ -871,7 +871,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   on_update_send_to_streams do
     check_state = !is_announcement ? 'unpublished' : 'post_delayed'
-    became_active = workflow_state_was == check_state && workflow_state == 'active'
+    became_active = workflow_state_before_last_save == check_state && workflow_state == 'active'
     if should_send_to_stream && (@content_changed || became_active)
       self.active_participants_with_visibility
     end

@@ -1684,7 +1684,7 @@ class Submission < ActiveRecord::Base
   end
 
   def assignment_graded_in_the_last_hour?
-    graded_at_was && graded_at_was > 1.hour.ago
+    graded_at_before_last_save && graded_at_before_last_save > 1.hour.ago
   end
 
   def teacher
@@ -2210,7 +2210,7 @@ class Submission < ActiveRecord::Base
 
     return unless self.context.grants_right?(self.user, :participate_as_student)
 
-    if score_changed? || grade_changed? || excused_changed?
+    if saved_change_to_score? || saved_change_to_grade? || saved_change_to_excused?
       ContentParticipation.create_or_update({
         :content => self,
         :user => self.user,
@@ -2221,7 +2221,7 @@ class Submission < ActiveRecord::Base
 
   def update_line_item_result
     return if lti_result.nil?
-    lti_result.update(result_score: score) if score_changed?
+    lti_result.update(result_score: score) if saved_change_to_score?
   end
 
   def point_data?

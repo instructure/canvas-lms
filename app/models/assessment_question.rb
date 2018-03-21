@@ -183,8 +183,6 @@ class AssessmentQuestion < ActiveRecord::Base
       # we may be modifying this data (translate_links), and only want to work on a copy
       data = data.try(:dup)
     end
-    # force AR to think this attribute has changed
-    self.question_data_will_change!
     write_attribute(:question_data, data.to_hash.with_indifferent_access)
   end
 
