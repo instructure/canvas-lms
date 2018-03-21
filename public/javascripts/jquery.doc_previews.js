@@ -110,7 +110,7 @@ import './jquery.loadingImg'
           src: opts.canvadoc_session_url,
           width: opts.width,
           allowfullscreen: '1',
-          css: {border: 0, overflow: 'auto', height: '99%', 'min-height': '400px'},
+          css: {border: 0, overflow: 'auto', height: '99%', 'min-height': '800px'},
           id: opts.id
         });
         iframe.appendTo(canvadocWrapper)
