@@ -135,7 +135,7 @@ export default class CoursesListRow extends React.Component {
 
     return (
       <tr>
-        <td>
+        <th scope="row">
         {isPublished && (
           <Tooltip tip={I18n.t('Published')}>
             <span className="published-status published">
@@ -143,7 +143,7 @@ export default class CoursesListRow extends React.Component {
             </span>
           </Tooltip>
         )}
-        </td>
+        </th>
         <td>
           <a href={url}>
             {name}

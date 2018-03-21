@@ -33,7 +33,7 @@ export default function CoursesList(props) {
     <Table margin="small 0" caption={<ScreenReaderContent>{I18n.t('Courses')}</ScreenReaderContent>}>
       <thead>
         <tr>
-          <th width="1">
+          <th width="1" scope="col">
             <ScreenReaderContent>{I18n.t('Published')}</ScreenReaderContent>
           </th>
           <th>
@@ -46,7 +46,7 @@ export default function CoursesList(props) {
             />
           </th>
           {showSISIds && (
-            <th style={{whiteSpace: 'nowrap'}}>
+            <th style={{whiteSpace: 'nowrap'}} scope="col">
               <CoursesListHeader
                 {...props}
                 id="sis_course_id"
@@ -56,7 +56,7 @@ export default function CoursesList(props) {
               />
             </th>
           )}
-          <th>
+          <th scope="col">
             <CoursesListHeader
               {...props}
               id="term"
@@ -65,7 +65,7 @@ export default function CoursesList(props) {
               tipAsc={I18n.t('Click to sort by term descending')}
             />
           </th>
-          <th>
+          <th scope="col">
             <CoursesListHeader
               {...props}
               id="teacher"
@@ -74,7 +74,7 @@ export default function CoursesList(props) {
               tipAsc={I18n.t('Click to sort by teacher descending')}
             />
           </th>
-          <th>
+          <th scope="col">
             <CoursesListHeader
               {...props}
               id="subaccount"
@@ -83,10 +83,10 @@ export default function CoursesList(props) {
               tipAsc={I18n.t('Click to sort by sub-account descending')}
             />
           </th>
-          <th width="1">
+          <th width="1" scope="col">
             {I18n.t('Students')}
           </th>
-          <th width="1">
+          <th width="1" scope="col">
             <ScreenReaderContent>{I18n.t('Course option links')}</ScreenReaderContent>
           </th>
         </tr>
