@@ -39,7 +39,7 @@ export default function UsersList (props) {
       : 'asc'
 
     return (
-      <th>
+      <th scope="col">
         <ApplyTheme theme={{[Link.theme]: {fontWeight: 'bold'}}}>
           <Tooltip
             as={Link}
@@ -87,7 +87,7 @@ export default function UsersList (props) {
             tipDesc={I18n.t('Click to sort by last login ascending')}
             tipAsc={I18n.t('Click to sort by last login descending')}
           />
-          <th width="1">
+          <th width="1" scope="col">
             <ScreenReaderContent>{I18n.t('User option links')}</ScreenReaderContent>
           </th>
         </tr>

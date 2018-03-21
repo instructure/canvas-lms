@@ -31,14 +31,14 @@ import UserLink from './UserLink'
 export default function UsersListRow({accountId, user, permissions, handlers}) {
   return (
     <tr>
-      <td>
+      <th scope="row">
         <UserLink
           href={`/accounts/${accountId}/users/${user.id}`}
           name={user.name}
           avatar_url={user.avatar_url}
           size="x-small"
         />
-      </td>
+      </th>
       <td>{user.email}</td>
       <td>{user.sis_user_id}</td>
       <td><FriendlyDatetime dateTime={user.last_login} /></td>
