@@ -235,6 +235,20 @@ describe DiscussionTopicsController do
       assert_unauthorized
     end
 
+    it "should return unauthorized if a user does not have visibilities" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      user_session(@teacher)
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept!
+      Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
+      ann = @course.announcements.create!(message: "testing", is_section_specific: true, course_sections: [section2])
+      ann.save!
+      get :show, params: {course_id: @course.id, id: ann.id}
+      get :edit, params: {course_id: @course.id, id: ann.id}
+      expect(response.status).to equal(401)
+    end
+
     it "js_env TOTAL_USER_COUNT and IS_ANNOUNCEMENT are set correctly for section specific announcements" do
       @course.root_account.enable_feature!(:section_specific_announcements)
       user_session(@teacher)
@@ -775,6 +789,19 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env]["SECTION_LIST"].length).to eq(3)
     end
 
+    it "returns unauthorized for a user that does not have visibilites to view thiss" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      user_session(@teacher)
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept!
+      Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
+      ann = @course.announcements.create!(message: "testing", is_section_specific: true, course_sections: [section2])
+      ann.save!
+      get :edit, params: {course_id: @course.id, id: ann.id}
+      assert_unauthorized
+    end
+
     it "js_env SELECTED_SECTION_LIST is set correctly for section specific announcements" do
       @course.root_account.enable_feature!(:section_specific_announcements)
       user_session(@teacher)
@@ -1275,6 +1302,25 @@ describe DiscussionTopicsController do
       expect(response).to have_http_status 422
       expect(DiscussionTopic.count).to eq 2
       expect(DiscussionTopicSectionVisibility.count).to eq 0
+    end
+
+    it "does not allow updating a section specific announcement you do not have visibilities for" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      user_session(@teacher)
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept!
+      Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
+      ann = @course.announcements.create!(message: "testing", is_section_specific: true, course_sections: [section2])
+      ann.save!
+
+      put('update', params: {
+        course_id: @course.id,
+        topic_id: ann.id,
+        specific_sections: section1.id,
+        title: 'Updated Topic',
+      })
+      expect(response).to have_http_status 400
     end
 
     it "should not clear lock_at if locked is not changed" do
