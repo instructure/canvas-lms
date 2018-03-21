@@ -2374,6 +2374,7 @@ class ApplicationController < ActionController::Base
         can_read_course_list: can_read_course_list,
         can_read_roster: can_read_roster,
         can_create_courses: @account.grants_right?(@current_user, session, :manage_courses),
+        can_create_enrollments: @account.grants_any_right?(@current_user, session, :manage_students, :manage_admin_users),
         can_create_users: @account.root_account.grants_right?(@current_user, session, :manage_user_logins),
         analytics: @account.service_enabled?(:analytics),
         can_masquerade: @account.grants_right?(@current_user, session, :become_user),
