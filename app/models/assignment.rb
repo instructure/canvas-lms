@@ -156,6 +156,8 @@ class Assignment < ActiveRecord::Base
   # ignores, moderated_grading_selections, teacher_enrollment
   # TODO: Try to get more of that stuff duplicated
   def duplicate(opts = {})
+    raise "This assignment can't be duplicated" unless can_duplicate?
+
     # Don't clone a new record
     return self if self.new_record?
 
@@ -212,6 +214,12 @@ class Assignment < ActiveRecord::Base
     result.external_tool_tag = self.external_tool_tag&.dup
 
     result
+  end
+
+  def can_duplicate?
+    return false if quiz?
+    return false if external_tool_tag.present? && !quiz_lti?
+    true
   end
 
   def group_category_changes_ok?
@@ -343,6 +351,7 @@ class Assignment < ActiveRecord::Base
     grading_standard_id
     anonymous_instructor_annotations
     anonymous_grading
+    workflow_state
   ).freeze
 
   def external_tool?
@@ -890,19 +899,24 @@ class Assignment < ActiveRecord::Base
     state :unpublished do
       event :publish, :transitions_to => :published
     end
+    state :duplicating do
+      event :finish_duplicating, :transitions_to => :unpublished
+      event :fail_to_duplicate, :transitions_to => :failed_to_duplicate
+    end
+    state :failed_to_duplicate
     state :deleted
   end
 
-  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     ContentTag.delete_for(self)
-    self.rubric_association.destroy if self.rubric_association
+    self.rubric_association.destroy if self.rubric_association.present?
     self.save!
 
     each_submission_type { |submission| submission.destroy if submission && !submission.deleted? }
     refresh_course_content_participation_counts
   end
+  alias destroy_permanently! destroy
 
   def refresh_course_content_participation_counts
     progress = self.context.progresses.build(tag: 'refresh_content_participation_counts')

@@ -690,11 +690,11 @@ test('renders due date column in appropriate time zone', function() {
   )
 })
 
-test('can duplicate when assignment is simple', () => {
+test('can duplicate when assignment can be duplicated', () => {
   const model = buildAssignment({
     id: 1,
     title: 'Foo',
-    is_quiz_assignment: false
+    can_duplicate: true
   })
   const view = createView(model, {
     userIsAdmin: true,
@@ -710,7 +710,7 @@ test('cannot duplicate when user is not admin', () => {
   const model = buildAssignment({
     id: 1,
     title: 'Foo',
-    is_quiz_assignment: false
+    can_duplicate: true
   })
   const view = createView(model, {
     userIsAdmin: false,
@@ -722,52 +722,26 @@ test('cannot duplicate when user is not admin', () => {
   equal(view.$('.duplicate_assignment').length, 0)
 })
 
-test('cannot duplicate when assignment is quiz', () => {
+test('displays duplicating message when assignment is duplicating', function() {
   const model = buildAssignment({
-    id: 1,
-    title: 'Foo',
-    is_quiz_assignment: true
+    id: 2,
+    title: 'Foo Copy',
+    original_assignment_name: 'Foo',
+    workflow_state: 'duplicating'
   })
-  const view = createView(model, {
-    userIsAdmin: true,
-    canManage: true,
-    duplicateEnabled: true
-  })
-  const json = view.toJSON()
-  notOk(json.canDuplicate)
-  equal(view.$('.duplicate_assignment').length, 0)
+  const view = createView(model)
+  ok(view.$el.text().includes('Making a copy of "Foo"'))
 })
 
-test('can duplicate when assignment is discussion topic', () => {
+test('displays failed to duplicate message when assignment failed to duplicate', function() {
   const model = buildAssignment({
-    id: 1,
-    title: 'Foo',
-    submission_types: ['discussion_topic']
+    id: 2,
+    title: 'Foo Copy',
+    original_assignment_name: 'Foo',
+    workflow_state: 'failed_to_duplicate'
   })
-  const view = createView(model, {
-    userIsAdmin: true,
-    canManage: true,
-    duplicateEnabled: true
-  })
-  const json = view.toJSON()
-  ok(json.canDuplicate)
-  equal(view.$('.duplicate_assignment').length, 1)
-})
-
-test('can duplicate when assignment is wiki page', () => {
-  const model = buildAssignment({
-    id: 1,
-    title: 'Foo',
-    submission_types: ['wiki_page']
-  })
-  const view = createView(model, {
-    userIsAdmin: true,
-    canManage: true,
-    duplicateEnabled: true
-  })
-  const json = view.toJSON()
-  ok(json.canDuplicate)
-  equal(view.$('.duplicate_assignment').length, 1)
+  const view = createView(model)
+  ok(view.$el.text().includes('Something went wrong with making a copy of "Foo"'))
 })
 
 test('can move when userIsAdmin is true', function() {

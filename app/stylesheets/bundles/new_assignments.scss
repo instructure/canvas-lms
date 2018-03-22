@@ -19,6 +19,7 @@
 @import "base/environment";
 @import "pages/shared/move_dialog";
 @import "base/mixins/misc";
+@import "components/spinner";
 
 .drag_and_drop_warning {
   @include accessibility-prompt($is-link: false);
@@ -247,5 +248,13 @@ form[data-view='edit-assignment'] {
 
   input[name='points_possible'][readonly] {
     margin-top: -3px;
+  }
+}
+
+.duplicate-failed-actions {
+  margin: 0.5rem 0 0 0;
+
+  form {
+    margin: 0;
   }
 }

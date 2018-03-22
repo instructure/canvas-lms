@@ -378,54 +378,108 @@ describe Assignment do
     end
   end
 
-  it "duplicate assignment" do
-    assignment = wiki_page_assignment_model({ :title => "Wiki Assignment" })
-    rubric = @course.rubrics.create! { |r| r.user = @teacher }
-    rubric_association_params = HashWithIndifferentAccess.new({
-       hide_score_total: "0",
-       purpose: "grading",
-       skip_updating_points_possible: false,
-       update_if_existing: true,
-       use_for_grading: "1",
-       association_object: assignment
-     })
+  describe "#duplicate" do
+    it "duplicates the assignment" do
+      assignment = wiki_page_assignment_model({ :title => "Wiki Assignment" })
+      rubric = @course.rubrics.create! { |r| r.user = @teacher }
+      rubric_association_params = HashWithIndifferentAccess.new({
+        hide_score_total: "0",
+        purpose: "grading",
+        skip_updating_points_possible: false,
+        update_if_existing: true,
+        use_for_grading: "1",
+        association_object: assignment
+      })
 
-    rubric_assoc = RubricAssociation.generate(@teacher, rubric, @course, rubric_association_params)
-    assignment.rubric_association = rubric_assoc
-    assignment.attachments.push(Attachment.new)
-    assignment.submissions.push(Submission.new)
-    assignment.ignores.push(Ignore.new)
-    assignment.turnitin_asset_string
-    new_assignment = assignment.duplicate
-    expect(new_assignment.id).to be_nil
-    expect(new_assignment.new_record?).to be true
-    expect(new_assignment.attachments.length).to be(0)
-    expect(new_assignment.submissions.length).to be(0)
-    expect(new_assignment.ignores.length).to be(0)
-    expect(new_assignment.rubric_association).not_to be_nil
-    expect(new_assignment.title).to eq "Wiki Assignment Copy"
-    expect(new_assignment.wiki_page.title).to eq "Wiki Assignment Copy"
-    expect(new_assignment.duplicate_of).to eq assignment
-    new_assignment.save!
-    new_assignment2 = assignment.duplicate
-    expect(new_assignment2.title).to eq "Wiki Assignment Copy 2"
-    new_assignment2.save!
-    expect(assignment.duplicates).to match_array [new_assignment, new_assignment2]
-    # Go back to the first new assignment to test something just ending in
-    # "Copy"
-    new_assignment3 = new_assignment.duplicate
-    expect(new_assignment3.title).to eq "Wiki Assignment Copy 3"
+      rubric_assoc = RubricAssociation.generate(@teacher, rubric, @course, rubric_association_params)
+      assignment.rubric_association = rubric_assoc
+      assignment.attachments.push(Attachment.new)
+      assignment.submissions.push(Submission.new)
+      assignment.ignores.push(Ignore.new)
+      assignment.turnitin_asset_string
+      new_assignment = assignment.duplicate
+      expect(new_assignment.id).to be_nil
+      expect(new_assignment.new_record?).to be true
+      expect(new_assignment.attachments.length).to be(0)
+      expect(new_assignment.submissions.length).to be(0)
+      expect(new_assignment.ignores.length).to be(0)
+      expect(new_assignment.rubric_association).not_to be_nil
+      expect(new_assignment.title).to eq "Wiki Assignment Copy"
+      expect(new_assignment.wiki_page.title).to eq "Wiki Assignment Copy"
+      expect(new_assignment.duplicate_of).to eq assignment
+      new_assignment.save!
+      new_assignment2 = assignment.duplicate
+      expect(new_assignment2.title).to eq "Wiki Assignment Copy 2"
+      new_assignment2.save!
+      expect(assignment.duplicates).to match_array [new_assignment, new_assignment2]
+      # Go back to the first new assignment to test something just ending in
+      # "Copy"
+      new_assignment3 = new_assignment.duplicate
+      expect(new_assignment3.title).to eq "Wiki Assignment Copy 3"
+    end
+
+    context "with an assignment that can't be duplicated" do
+      let(:assignment) { @course.assignments.create!(assignment_valid_attributes) }
+
+      before { allow(assignment).to receive(:can_duplicate?).and_return(false) }
+
+      it "raises an exception" do
+        expect { assignment.duplicate }.to raise_error(RuntimeError)
+      end
+    end
+
+    context "with an assignment that uses an external tool" do
+      let_once(:assignment) do
+        @course.assignments.create!(
+          submission_types: 'external_tool',
+          external_tool_tag_attributes: { url: 'http://example.com/launch' },
+          **assignment_valid_attributes
+        )
+      end
+
+      before { allow(assignment).to receive(:can_duplicate?).and_return(true) }
+
+      it "duplicates the assignment's external_tool_tag" do
+        new_assignment = assignment.duplicate
+        new_assignment.save!
+        expect(new_assignment.external_tool_tag).to be_present
+        expect(new_assignment.external_tool_tag.content).to eq(assignment.external_tool_tag.content)
+      end
+    end
   end
 
-  it "duplicates an assignment's external_tool_tag" do
-    assignment = @course.assignments.create!(
-      submission_types: 'external_tool',
-      external_tool_tag_attributes: { url: 'http://example.com/launch' },
-      **assignment_valid_attributes
-    )
-    new_assignment = assignment.duplicate
-    expect(new_assignment.external_tool_tag).to be_present
-    expect(new_assignment.external_tool_tag.content).to eq(assignment.external_tool_tag.content)
+  describe "#can_duplicate?" do
+    subject { assignment.can_duplicate? }
+
+    let(:assignment) { @course.assignments.create!(assignment_valid_attributes) }
+
+    context "with a regular assignment" do
+      it { is_expected.to be true }
+    end
+
+    context "with a quiz" do
+      before { allow(assignment).to receive(:quiz?).and_return(true) }
+
+      it { is_expected.to be false }
+    end
+
+    context "with an assignment that uses an external tool" do
+      let_once(:assignment) do
+        @course.assignments.create!(
+          submission_types: 'external_tool',
+          external_tool_tag_attributes: { url: 'http://example.com/launch' },
+          **assignment_valid_attributes
+        )
+      end
+
+      it { is_expected.to be false }
+
+      context "quiz_lti" do
+        before { allow(assignment).to receive(:quiz_lti?).and_return(true) }
+
+        it { is_expected.to be true }
+      end
+    end
   end
 
   describe "#representatives" do
