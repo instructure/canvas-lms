@@ -641,7 +641,8 @@ class DiscussionTopicsController < ApplicationController
                 @context.account.feature_enabled?(:section_specific_announcements) &&
                 @topic.is_section_specific
               user_counts = Enrollment.where(:course_section_id => @topic.course_sections,
-                                             course_id: @context).active.group(:course_section_id).count
+                                             course_id: @context).not_fake.active_or_pending_by_date_ignoring_access.
+                                             group(:course_section_id).count
               section_data = @topic.course_sections.map do |cs|
                 cs.attributes.slice(*%w{id name}).merge(:user_count => user_counts[cs.id] || 0)
               end
@@ -715,7 +716,8 @@ class DiscussionTopicsController < ApplicationController
 
             js_hash = {:DISCUSSION => env_hash}
             if @context.account.feature_enabled?(:section_specific_announcements) && @context.is_a?(Course)
-              js_hash[:TOTAL_USER_COUNT] = @topic.context.enrollments.active.count
+              js_hash[:TOTAL_USER_COUNT] = @topic.context.enrollments.not_fake.
+                active_or_pending_by_date_ignoring_access.count
             end
             js_hash[:COURSE_ID] = @context.id if @context.is_a?(Course)
             js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic

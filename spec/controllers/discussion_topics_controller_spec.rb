@@ -256,6 +256,21 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:DISCUSSION][:TOPIC][:COURSE_SECTIONS].first["name"]).to eq(section1.name)
     end
 
+    it "js_env COURSE_SECTIONS should have correct count" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      user_session(@teacher)
+      section1 = @course.course_sections.create!(name: "Section 1")
+
+      student1, student2 = create_users(2, return_type: :record)
+      student_in_section(section1, user: student1)
+      student_in_section(section1, user: student2)
+      ann = @course.announcements.create!(message: "testing", is_section_specific: true, course_sections: [section1])
+      ann.save!
+      student1.enrollments.first.conclude
+      get 'show', params: {:course_id => @course.id, :id => ann}
+      expect(assigns[:js_env][:DISCUSSION][:TOPIC][:COURSE_SECTIONS].first[:user_count]).to eq(1)
+    end
+
     it "should not work for announcements in a public course" do
       @course.update_attribute(:is_public, true)
       @announcement = @course.announcements.create!(
