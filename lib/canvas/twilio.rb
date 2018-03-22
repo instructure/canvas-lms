@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # Utilities to send text messages via Twilio.
+require 'twilio-ruby'
+
 module Canvas::Twilio
   DEFAULT_COUNTRY = 'US'
 
