@@ -68,8 +68,8 @@ gem 'highline', '1.7.10', require: false
 gem 'httparty', '0.15.6'
 gem 'i18n', '0.9.3'
 gem 'i18nliner', '0.0.14'
-  gem 'ruby2ruby', '2.4.0', require: false
-  gem 'ruby_parser', '3.10.1', require: false
+  gem 'ruby2ruby', '2.4.1', require: false
+  gem 'ruby_parser', '3.11.0', require: false
 gem 'icalendar', '1.5.4', require: false
 gem 'ims-lti', '2.2.3', require: 'ims'
 gem 'simple_oauth', '0.3.1', require: false
