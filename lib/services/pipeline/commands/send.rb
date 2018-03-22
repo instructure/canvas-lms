@@ -6,13 +6,15 @@ module Services
         MESSAGE_NAME = 'enrollment_changed'
 
         def initialize(enrollment:)
-          @host           = ENV['PIPELINE_ENDPOINT']
-          @username       = ENV['PIPELINE_USER_NAME']
-          @password       = ENV['PIPELINE_PASSWORD']
-          @account_admin  = get_account_admin
-          @enrollment     = enrollment
-          @payload        = {}
-          @api_instance   = PipelinePublisher::MessagesApi.new
+          @host              = ENV['PIPELINE_ENDPOINT']
+          @username          = ENV['PIPELINE_USER_NAME']
+          @password          = ENV['PIPELINE_PASSWORD']
+          @account_admin     = get_account_admin
+          @enrollment        = enrollment
+          @payload           = {}
+          @publisher         = PipelinePublisher
+          @api_instance      = publisher::MessagesApi.new
+          @pipeline_user_api = Services::Pipeline::UserAPI
         end
 
         def call
@@ -27,7 +29,7 @@ module Services
         private
 
         attr_reader :payload, :message, :enrollment, :user_name, :password,
-          :account_admin, :api_instance, :payload, :api_json
+          :account_admin, :api_instance, :payload, :api_json, :publisher
 
         def post
           api_instance.messages_post(message)
@@ -40,11 +42,15 @@ module Services
         end
 
         def get_api_json
-          @api_json = Services::Pipeline::UserAPI.new.enrollment_json(enrollment, account_admin, {})
+          @api_json = pipeline_user_api.new.enrollment_json(
+            enrollment,
+            account_admin,
+            {}
+          )
         end
 
         def build_pipeline_message
-          @message = PipelinePublisher::Message.new(
+          @message = publisher::Message.new(
             noun:         MESSAGE_NAME,
             meta:         {},
             identifiers:  { id: enrollment.id },
