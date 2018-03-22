@@ -113,8 +113,9 @@ class Feature
         display_name: -> { I18n.t('SIS Import Refactor')},
         description: -> { I18n.t('Update how we process SIS imports') },
         applies_to: 'RootAccount',
-        state: 'hidden'
-      },
+        state: 'hidden_in_prod',
+        beta: true
+  },
     'section_specific_announcements' =>
     {
       display_name: -> { I18n.t('Section Specific Announcements') },
