@@ -16,40 +16,43 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% @presenter.peer_reviews_for(@current_user).each do |peer_review| %>
-  <div class="discussion-section discussion-assignment-section peer-review-alert <%= peer_review.assigned? ? "alert" : "alert-info" %>">
-    <div class="row-fluid">
-      <% if peer_review.completed? %>
+
+<% if @assignment.peer_reviews? %>
+  <% @presenter.peer_reviews_for(@current_user).each do |peer_review| %>
+    <div class="discussion-section discussion-assignment-section peer-review-alert <%= peer_review.assigned? ? "alert" : "alert-info" %>">
+      <div class="row-fluid">
+        <% if peer_review.completed? %>
+          <div class="span9">
+            <p class="peer-review-title">
+              <i class="icon-peer-review"></i>
+              <strong>
+                <%= t('You have completed a peer review for %{person}. Thank you', {:person => peer_review.user.name}) %>
+              </strong>
+            </p>
+          </div>
+        <% else %>
         <div class="span9">
           <p class="peer-review-title">
             <i class="icon-peer-review"></i>
             <strong>
-              <%= t('You have completed a peer review for %{person}. Thank you', {:person => peer_review.user.name}) %>
+              <%= t('peer_review_alert',
+              'You have been assigned a peer review for %{person}',
+              {:person => peer_review.user.name}) %>
+              <%= link_to t("Review Now"), course_assignment_submission_path(@assignment.context_id, @assignment.id, peer_review.user_id) %>
             </strong>
           </p>
         </div>
-      <% else %>
-      <div class="span9">
-        <p class="peer-review-title">
-          <i class="icon-peer-review"></i>
-          <strong>
-            <%= t('peer_review_alert',
-            'You have been assigned a peer review for %{person}',
-            {:person => peer_review.user.name}) %>
-            <%= link_to t("Review Now"), course_assignment_submission_path(@assignment.context_id, @assignment.id, peer_review.user_id) %>
-          </strong>
-        </p>
-      </div>
 
-      <div class="span3 right-align">
-        <div class="discussion-pubdate">
-          <b <%= context_sensitive_datetime_title(@assignment.peer_reviews_due_at, @assignment.context) %> >
-            <%= t(:due_date, 'due %{date}', :date => OverrideListPresenter.new.formatted_date_string(:peer_reviews_due_at,@assignment)) %>
-          </b>
+        <div class="span3 right-align">
+          <div class="discussion-pubdate">
+            <b <%= context_sensitive_datetime_title(@assignment.peer_reviews_due_at, @assignment.context) %> >
+              <%= t(:due_date, 'due %{date}', :date => OverrideListPresenter.new.formatted_date_string(:peer_reviews_due_at,@assignment)) %>
+            </b>
+          </div>
         </div>
+        <% end %>
       </div>
-      <% end %>
     </div>
-  </div>
 
+  <% end %>
 <% end %>

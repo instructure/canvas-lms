@@ -200,6 +200,22 @@ describe "discussions" do
         expect(f(".peer-review-alert.alert")).to include_text("You have been assigned a peer review for student1")
         expect(f(".peer-review-alert.alert-info")).to include_text("You have completed a peer review for student2")
       end
+
+      it "should not show peer review information if peer reviews are turned off" do
+        assignment.update_attribute(:peer_reviews, true)
+        other_student1 = student_in_course(course: course, name: 'student1', active_all: true).user
+        assignment_topic.reply_from(:user => other_student1, :text => "reply")
+        other_student2 = student_in_course(course: course, name: 'student2', active_all: true).user
+        assignment_topic.reply_from(:user => other_student2, :text => "reply")
+        assignment.assign_peer_review(student, other_student1)
+        assignment.assign_peer_review(student, other_student2).complete!
+        assignment.peer_reviews = false
+        assignment.save!
+
+        get "/courses/#{course.id}/discussion_topics/#{assignment_topic.id}"
+
+        expect(f("body")).not_to contain_css(".peer-review-alert.alert")
+      end
     end
 
     context "as a teacher" do
