@@ -266,6 +266,33 @@ describe 'Submissions API', type: :request do
       expect(json.size).to eq 0
     end
 
+    it 'returns submissions based on graded_since' do
+      assignment = Assignment.create!(course: @course)
+      assignment.grade_student(@student1, grade: '10', grader: @teacher)
+
+      json = api_call(:get,
+                      "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
+                      {controller: 'submissions_api', action: 'for_students',
+                       format: 'json', section_id: 'sis_section_id:my-section-sis-id'},
+                      graded_since: 1.day.ago.iso8601,
+                      student_ids: 'all')
+      expect(json.size).to eq 1
+    end
+
+    it 'does not returns submissions based on graded_since' do
+      assignment = Assignment.create!(course: @course)
+      assignment.grade_student(@student1, grade: '10', grader: @teacher)
+      Submission.where(user_id: @student1, assignment_id: assignment).update_all(graded_at: 2.days.ago)
+
+      json = api_call(:get,
+                      "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
+                      {controller: 'submissions_api', action: 'for_students',
+                       format: 'json', section_id: 'sis_section_id:my-section-sis-id'},
+                      graded_since: 1.day.ago.iso8601,
+                      student_ids: 'all')
+      expect(json.size).to eq 0
+    end
+
     it 'should scope call to enrollment_state with post_to_sis' do
       @a1.post_to_sis = true
       @a1.save!
