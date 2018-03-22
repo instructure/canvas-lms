@@ -64,6 +64,7 @@ module SIS
 
         state = status.downcase.strip
         raise ImportError, "Invalid status #{status} for admin" unless %w(active deleted).include? state
+        return if @batch.skip_deletes? && state == 'deleted'
 
         get_account(account_id)
         raise ImportError, "Invalid account_id given for admin" unless @account

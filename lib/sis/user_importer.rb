@@ -69,6 +69,7 @@ module SIS
         raise ImportError, "No user_id given for a user" if user.user_id.blank?
         raise ImportError, "No login_id given for user #{user.user_id}" if user.login_id.blank?
         raise ImportError, "Improper status for user #{user.user_id}" unless user.status =~ /\A(active|deleted)/i
+        return if @batch.skip_deletes? && user.status =~ /deleted/i
 
         @batched_users << user
         process_batch if @batched_users.size >= Setting.get("sis_user_batch_size", "100").to_i

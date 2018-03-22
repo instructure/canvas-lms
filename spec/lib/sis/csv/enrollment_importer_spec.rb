@@ -704,7 +704,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(SisPseudonym).to receive(:for).with(user, @account, type: :implicit, require_sis: false).and_return(user.pseudonyms.first)
 
     warnings = []
-    work = SIS::EnrollmentImporter::Work.new(nil, @account, Rails.logger, warnings)
+    work = SIS::EnrollmentImporter::Work.new(@account.sis_batches.create!, @account, Rails.logger, warnings)
     expect(work).to receive(:root_account_from_id).with('account2').once.and_return(account2)
     expect(SIS::EnrollmentImporter::Work).to receive(:new).with(any_args).and_return(work)
 
@@ -762,7 +762,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(SisPseudonym).to receive(:for).with(user, @account, type: :implicit, require_sis: false).never
 
     warnings = []
-    work = SIS::EnrollmentImporter::Work.new(nil, @account, Rails.logger, warnings)
+    work = SIS::EnrollmentImporter::Work.new(@account.sis_batches.create!, @account, Rails.logger, warnings)
     expect(work).to receive(:root_account_from_id).with('account2').once.and_return(nil)
     expect(SIS::EnrollmentImporter::Work).to receive(:new).with(any_args).and_return(work)
     # the enrollments

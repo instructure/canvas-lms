@@ -250,6 +250,11 @@ class SisBatch < ActiveRecord::Base
     "sis_batch:account:#{Shard.birth.activate { account.id }}"
   end
 
+  def skip_deletes?
+    self.options ||= {}
+    !!self.options[:skip_deletes]
+  end
+
   def self.process_all_for_account(account)
     if use_parallel_importers?(account)
       if account.sis_batches.importing.exists?
@@ -564,6 +569,7 @@ class SisBatch < ActiveRecord::Base
       "diffing_data_set_identifier" => self.diffing_data_set_identifier,
       "diffed_against_import_id" => self.options[:diffed_against_sis_batch_id],
       "diffing_drop_status" => self.options[:diffing_drop_status],
+      "skip_deletes" => self.options[:skip_deletes],
       "change_threshold" => self.change_threshold,
     }
     data["processing_errors"] = self.processing_errors if self.processing_errors.present?

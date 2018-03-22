@@ -53,6 +53,7 @@ module SIS
         @logger.debug("Processing Account #{[account_id, parent_account_id, status, name].inspect}")
 
         raise ImportError, "No account_id given for an account" if account_id.blank?
+        return if @batch.skip_deletes? && status =~ /deleted/i
 
         parent = nil
         if !parent_account_id.blank?

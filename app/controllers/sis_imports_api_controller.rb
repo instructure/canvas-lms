@@ -210,6 +210,11 @@
 #           "example": "false",
 #           "type": "boolean"
 #         },
+#         "skip_deletes": {
+#           "description": "When set the import will skip any deletes.",
+#           "example": "false",
+#           "type": "boolean"
+#         },
 #         "override_sis_stickiness": {
 #           "description": "Whether UI changes were overridden.",
 #           "example": "false",
@@ -335,6 +340,10 @@ class SisImportsApiController < ApplicationController
   #
   # @argument multi_term_batch_mode [Boolean]
   #   Runs batch mode against all terms in terms file. Requires change_threshold.
+  #
+  # @argument skip_deletes [Boolean]
+  #   When set the import will skip any deletes. This does not account for
+  #   objects that are deleted during the batch mode cleanup process.
   #
   # @argument override_sis_stickiness [Boolean]
   #   Many fields on records in Canvas can be marked "sticky," which means that
@@ -463,6 +472,8 @@ class SisImportsApiController < ApplicationController
           batch.enable_diffing(params[:diffing_data_set_identifier],
                                remaster: value_to_boolean(params[:diffing_remaster_data_set]))
         end
+
+        batch.options[:skip_deletes] = value_to_boolean(params[:skip_deletes])
 
         if value_to_boolean(params[:override_sis_stickiness])
           batch.options[:override_sis_stickiness] = true

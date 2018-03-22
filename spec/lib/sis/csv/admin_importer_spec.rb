@@ -87,7 +87,7 @@ describe SIS::CSV::AdminImporter do
 
     before_count = @account.account_users.active.count
 
-    work = SIS::AdminImporter::Work.new(nil, @account, Rails.logger)
+    work = SIS::AdminImporter::Work.new(@account.sis_batches.create!, @account, Rails.logger)
     expect(work).to receive(:root_account_from_id).with('account2').once.and_return(account2)
     expect(SIS::AdminImporter::Work).to receive(:new).with(any_args).and_return(work)
 

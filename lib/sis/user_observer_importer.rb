@@ -63,6 +63,7 @@ module SIS
         raise ImportError, "No user_id given for a user observer" if student_id.blank?
         raise ImportError, "Can't observe yourself user #{student_id}" if student_id == observer_id
         raise ImportError, "Improper status \"#{status}\" for a user_observer" unless status =~ /\A(active|deleted)\z/i
+        return if @batch.skip_deletes? && status =~ /deleted/i
 
         o_pseudo = @root_account.pseudonyms.active.where(sis_user_id: observer_id).take
         raise ImportError, "An observer referenced a non-existent user #{observer_id}" unless o_pseudo

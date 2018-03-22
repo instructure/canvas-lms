@@ -102,6 +102,7 @@ module SIS
         raise ImportError, "No course_id or section_id given for an enrollment" unless enrollment.valid_context?
         raise ImportError, "No user_id given for an enrollment" unless enrollment.valid_user?
         raise ImportError, "Improper status \"#{enrollment.status}\" for an enrollment" unless enrollment.valid_status?
+        return if @batch.skip_deletes? && enrollment.status =~ /deleted/i
 
         @enrollment_batch << enrollment
         process_batch if @enrollment_batch.size >= Setting.get("sis_enrollment_batch_size", "100").to_i # no idea if this is a good number
