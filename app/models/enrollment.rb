@@ -80,7 +80,7 @@ class Enrollment < ActiveRecord::Base
   after_destroy :update_assignment_overrides_if_needed
 
   def send_to_pipeline
-    command = Services::Pipeline::Commands::Send.new(enrollment: self)
+    Services::Pipeline::Commands::Send.new(enrollment: self).call
   end
 
   attr_accessor :already_enrolled, :need_touch_user, :skip_touch_user

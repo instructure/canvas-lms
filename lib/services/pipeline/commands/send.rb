@@ -2,7 +2,9 @@ module Services
   module Pipeline
     module Commands
       class Send
+
         MESSAGE_NAME = 'enrollment_changed'
+
         def initialize(enrollment:)
           @host           = ENV['PIPELINE_ENDPOINT']
           @username       = ENV['PIPELINE_USER_NAME']
@@ -20,6 +22,7 @@ module Services
           post
           self
         end
+        handle_asynchronously :call
 
         private
 
