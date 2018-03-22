@@ -25,6 +25,6 @@ group :development do
   # The ruby debug gems conflict with the IDE-based debugger gem.
   # Set this option in your dev environment to disable.
   unless ENV['DISABLE_RUBY_DEBUGGING']
-    gem 'byebug', '10.0.0', platform: :mri
+    gem 'byebug', '10.0.1', platform: :mri
   end
 end
