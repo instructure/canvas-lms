@@ -714,7 +714,9 @@ class Attachment < ActiveRecord::Base
         copy_access_attributes!(atts)
         atts.each do |a|
           # update content tags to refer to the new file
-          ContentTag.where(:content_id => a, :content_type => 'Attachment').update_all(content_id: self.id)
+          if ContentTag.where(:content_id => a, :content_type => 'Attachment').update_all(content_id: self.id, updated_at: Time.now.utc) > 0
+            ContextModule.where(:id => ContentTag.where(:content_id => self.id, :content_type => 'Attachment').select(:context_module_id)).touch_all
+          end
           # update replacement pointers pointing at the overwritten file
           context.attachments.where(:replacement_attachment_id => a).update_all(replacement_attachment_id: self.id)
           # delete the overwritten file (unless the caller is queueing them up)

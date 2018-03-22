@@ -1549,6 +1549,32 @@ describe MasterCourses::MasterMigration do
       expect(@topic_copy.message).to include("/courses/#{@copy_to.id}/files/#{@att_copy.id}/download?wrap=1")
     end
 
+    it "should replace module item contents when file is replaced" do
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+
+      @att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
+      @mod = @copy_from.context_modules.create!
+      @tag = @mod.add_item(:id => @att.id, :type => 'attachment')
+
+      run_master_migration
+
+      @att_copy = @copy_to.attachments.where(:migration_id => mig_id(@att)).first
+      @tag_copy = @copy_to.context_module_tags.where(:migration_id => mig_id(@tag)).first
+      expect(@tag_copy.content).to eq @att_copy
+
+      Timecop.freeze(1.minute.from_now) do
+        @new_att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
+        @new_att.handle_duplicates(:overwrite)
+      end
+      expect(@tag.reload.content).to eq @new_att
+
+      run_master_migration
+
+      @new_att_copy = @copy_to.attachments.where(:migration_id => mig_id(@new_att)).first
+      expect(@tag_copy.reload.content).to eq @new_att_copy
+    end
+
     it "should export account-level linked outcomes in a selective migration" do
       Timecop.freeze(1.minute.ago) do
         @acc_outcome = @copy_from.account.created_learning_outcomes.create!(:short_description => "womp")
