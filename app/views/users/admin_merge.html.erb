@@ -88,7 +88,10 @@
         <tr>
           <td style="vertical-align: top; padding: 10px 30px 10px;">
             <h2><%= t('titles.find_user', 'Find a User') %></h2>
-            <% accounts = @current_user.associated_accounts.sort_by(&:name).uniq.select { |a| a.grants_any_right?(@current_user, session, :manage_user_logins, :read_roster) } %>
+
+            <% accounts = @current_user.associated_accounts.shard(Shard.current).to_a
+               accounts << @domain_root_account if @domain_root_account && !accounts.include?(@domain_root_account)
+               accounts = accounts.sort_by(&:name).uniq.select { |a| a.grants_any_right?(@current_user, session, :manage_user_logins, :read_roster) } %>
             <% if accounts.empty? %>
               <%= t('no_permission', "You don't have permission to search any accounts") %>
             <% else %>
