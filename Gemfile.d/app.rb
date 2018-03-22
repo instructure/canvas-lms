@@ -90,7 +90,7 @@ gem 'oauth', '0.5.4', require: false
 gem 'parallel', '1.12.1', require: false
   gem 'ruby-progressbar', '1.9.0', require: false # used to show progress of S3Uploader
 gem 'retriable', '1.4.1'
-gem 'rake', '12.3.0'
+gem 'rake', '12.3.1'
 gem 'ratom-nokogiri', '0.10.6', require: false
 gem 'rdiscount', '1.6.8', require: false
 gem 'ritex', '1.0.1', require: false
