@@ -96,7 +96,7 @@ gem 'rdiscount', '1.6.8', require: false
 gem 'ritex', '1.0.1', require: false
 
 gem 'rotp', '3.3.0', require: false
-gem 'net-ldap', '0.16.0', require: false
+gem 'net-ldap', '0.16.1', require: false
 gem 'ruby-duration', '3.2.3', require: false
 gem 'ruby-saml-mod', '0.3.7'
 gem 'saml2', '2.1.0'
