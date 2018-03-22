@@ -657,14 +657,14 @@ enrollments.csv
 <td>date</td>
 <td></td>
 <td>✓</td>
-<td>The enrollment start date. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
+<td>The enrollment start date. For start_date to take effect the end_date also needs to be populated. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
 </tr>
 <tr>
 <td>end_date</td>
 <td>date</td>
 <td></td>
 <td>✓</td>
-<td>The enrollment end date The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
+<td>The enrollment end date. For end_date to take effect the start_date also needs to be populated. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
 </tr>
 <tr>
 <td>user_id</td>
