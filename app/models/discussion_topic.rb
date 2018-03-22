@@ -1130,12 +1130,29 @@ class DiscussionTopic < ActiveRecord::Base
 
   def users_with_permissions(users)
     permission = self.is_announcement ? :read_announcements : :read_forum
-    if self.course.is_a?(Course)
-      self.course.filter_users_by_permission(users, permission)
-    else
-      # sucks to be an account-level group
-      users.select{|u| self.is_announcement ? self.context.grants_right?(u, :read_announcements) : self.context.grants_right?(u, :read_forum)}
+    course = self.course
+    if !(course.is_a?(Course))
+      return users.select do |u|
+        self.is_announcement ? self.context.grants_right?(u, :read_announcements) : self.context.grants_right?(u, :read_forum)
+      end
     end
+
+    readers = self.course.filter_users_by_permission(users, permission)
+    return readers unless self.is_section_specific
+
+    # this is now a section-specific topic in a course context
+    discussion_section_ids =
+      self.discussion_topic_section_visibilities.active.pluck(:course_section_id)
+    users_in_sections = Enrollment.select(:user_id).active.
+      where(:course_id => course.id, :course_section_id => discussion_section_ids).
+      map(&:user_id).to_set
+    # Instructors don't need to have explicit enrollments in a section if they're not
+    # limited to only see their section.
+    unlocked_teachers = Enrollment.select(:user_id).active.
+      instructor.where(:course_id => course.id, :limit_privileges_to_course_section => false).
+      map(&:user_id).to_set
+    permitted_users = users_in_sections.union(unlocked_teachers)
+    return readers.select { |u| permitted_users.include?(u.id) }
   end
 
   def course

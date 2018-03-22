@@ -2347,4 +2347,48 @@ describe DiscussionTopic do
       expect(new_topic.user_id).to eq @student.id
     end
   end
+
+  describe "users with permissions" do
+    def create_enrolled_user(course, section, opts)
+      opts.reverse_merge!(:active_all => true, :section_id => section.id)
+      user = user_factory(opts)
+      create_enrollment(course, user, opts)
+      return user
+    end
+
+    before :once do
+      @course = course_factory(:active_all => true)
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      @course.root_account.enable_feature!(:section_specific_discussions)
+      @section1 = @course.course_sections.create!
+      @section2 = @course.course_sections.create!
+      @limited_teacher = create_enrolled_user(@course, @section1, :name => 'limited teacher',
+        :enrollment_type => 'TeacherEnrollment', :limit_privileges_to_course_section => true)
+      @student1 = create_enrolled_user(@course, @section1, :name => 'student 1')
+      @student2 = create_enrolled_user(@course, @section2, :name => 'student 2')
+      @all_users = [@teacher, @limited_teacher, @student1, @student2]
+    end
+
+    it "non-specific-topic is visible to everyone" do
+      topic = @course.discussion_topics.create!(:title => 'foo', :message => 'bar',
+        :workflow_state => 'published')
+      users = topic.users_with_permissions(@all_users)
+      expect(users.map(&:id).to_set).to eq(@all_users.map(&:id).to_set)
+    end
+
+    it "specific topic limits properly" do
+      topic = DiscussionTopic.new(:title => 'foo', :message => 'bar',
+        :context => @course, :user => @teacher)
+      topic.is_section_specific = true
+      topic.discussion_topic_section_visibilities <<
+        DiscussionTopicSectionVisibility.new(
+          :discussion_topic => topic,
+          :course_section => @section2,
+          :workflow_state => 'active'
+        )
+      topic.save!
+      users = topic.users_with_permissions(@all_users)
+      expect(users.map(&:id).to_set).to eq([@teacher.id, @student2.id].to_set)
+    end
+  end
 end

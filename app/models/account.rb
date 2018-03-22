@@ -1351,24 +1351,20 @@ class Account < ActiveRecord::Base
   end
 
   def closest_turnitin_pledge
-    account_with_pledge = account_chain.find { |a| a.turnitin_pledge.present? }
-    account_with_pledge&.turnitin_pledge || t('This assignment submission is my own, original work')
+    closest_account_value(:turnitin_pledge, t('This assignment submission is my own, original work'))
   end
 
   def closest_turnitin_comments
-    if self.turnitin_comments && !self.turnitin_comments.empty?
-      self.turnitin_comments
-    else
-      self.parent_account.try(:closest_turnitin_comments)
-    end
+    closest_account_value(:turnitin_comments)
   end
 
   def closest_turnitin_originality
-    if self.turnitin_originality && !self.turnitin_originality.empty?
-      self.turnitin_originality
-    else
-      self.parent_account.try(:turnitin_originality)
-    end
+    closest_account_value(:turnitin_originality, 'immediate')
+  end
+
+  def closest_account_value(value, default = '')
+    account_with_value = account_chain.find { |a| a.send(value.to_sym).present? }
+    account_with_value&.send(value.to_sym) || default
   end
 
   def self_enrollment_allowed?(course)
