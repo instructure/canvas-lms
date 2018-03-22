@@ -21,6 +21,8 @@ else
   gem 'rails', '5.1.3'
 end
 
+gem 'pipeline_publisher_ruby', :git => 'git@github.com:StrongMind/pipeline-publisher-ruby.git'
+
 gem 'rack', '2.0.3'
 gem 'oauth2', '1.2.0', require: false
 
