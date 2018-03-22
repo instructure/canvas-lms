@@ -17,7 +17,7 @@
 
 require 'spec_helper'
 
-describe MasterCourses::FolderLockingHelper do
+describe MasterCourses::FolderHelper do
   it "should be able to fetch a list of folder ids with restricted files (even recursively via sub-folders)" do
     @copy_from = course_factory
     @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
@@ -43,7 +43,7 @@ describe MasterCourses::FolderLockingHelper do
     unlocked_att = attachment_model(context: @copy_to, folder: unlocked_child_folder,
       filename: 'unlockedfile.txt', migration_id: unlocked_master_tag.migration_id)
 
-    expect(MasterCourses::FolderLockingHelper.locked_folder_ids_for_course(@copy_to)).
+    expect(MasterCourses::FolderHelper.locked_folder_ids_for_course(@copy_to)).
       to match_array([child_root, locked_parent_folder, locked_child_folder].map(&:id))
   end
 end

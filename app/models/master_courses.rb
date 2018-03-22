@@ -26,6 +26,8 @@ module MasterCourses
     ContextExternalTool ContextModule ContentTag LearningOutcome LearningOutcomeGroup Quizzes::Quiz Rubric WikiPage
   }.freeze
 
+  CONTENT_TYPES_FOR_UNSYNCED_CHANGES = (ALLOWED_CONTENT_TYPES - ['ContentTag'] + ['Folder']).freeze
+
   MIGRATION_ID_PREFIX = "mastercourse_".freeze
 
   LOCK_TYPES = [:content, :settings, :points, :due_dates, :availability_dates, :state].freeze

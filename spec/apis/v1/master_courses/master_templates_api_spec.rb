@@ -500,6 +500,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         @page = @master.wiki_pages.create! :title => 'Old News'
         @ann = @master.announcements.create! :title => 'Boring', :message => 'Yawn'
         @file = attachment_model(:context => @master, :display_name => 'Some File')
+        @folder = @master.folders.create!(:name => 'Blargh')
         @template.content_tag_for(@file).update_attribute(:restrictions, {:content => true})
         run_master_migration
       end
@@ -508,6 +509,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     it 'detects creates, updates, and deletes since the last sync' do
       @ann.destroy
       @file.update_attribute(:display_name, 'Renamed')
+      @folder.update_attribute(:name, 'Blergh')
       @new_page = @master.wiki_pages.create! :title => 'New News'
 
       json = api_call_as_user(@admin, :get, "/api/v1/courses/#{@master.id}/blueprint_templates/default/unsynced_changes",
@@ -519,7 +521,9 @@ describe MasterCourses::MasterTemplatesController, type: :request do
        {"asset_id"=>@file.id,"asset_type"=>"attachment","asset_name"=>"Renamed","change_type"=>"updated",
         "html_url"=>"http://www.example.com/courses/#{@master.id}/files/#{@file.id}","locked"=>true},
        {"asset_id"=>@new_page.id,"asset_type"=>"wiki_page","asset_name"=>"New News","change_type"=>"created",
-        "html_url"=>"http://www.example.com/courses/#{@master.id}/pages/new-news","locked"=>false}
+        "html_url"=>"http://www.example.com/courses/#{@master.id}/pages/new-news","locked"=>false},
+       {"asset_id"=>@folder.id,"asset_type"=>"folder","asset_name"=>"Blergh","change_type"=>"updated",
+        "html_url"=>"http://www.example.com/courses/#{@master.id}/folders/#{@folder.id}","locked"=>false},
       ])
     end
 

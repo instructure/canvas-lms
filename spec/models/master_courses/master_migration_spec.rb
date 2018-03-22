@@ -1109,7 +1109,7 @@ describe MasterCourses::MasterMigration do
       @sub = @template.add_child_course!(@copy_to)
 
       enable_cache do
-        expect(MasterCourses::FolderLockingHelper.locked_folder_ids_for_course(@copy_to)).to be_empty
+        expect(MasterCourses::FolderHelper.locked_folder_ids_for_course(@copy_to)).to be_empty
 
         master_parent_folder = Folder.root_folders(@copy_from).first.sub_folders.create!(:name => "parent", :context => @copy_from)
         master_sub_folder = master_parent_folder.sub_folders.create!(:name => "child", :context => @copy_from)
@@ -1123,8 +1123,29 @@ describe MasterCourses::MasterMigration do
         child_parent_folder = child_sub_folder.parent_folder
         expected_ids = [child_sub_folder, child_parent_folder, Folder.root_folders(@copy_to).first].map(&:id)
         expect(Folder.connection).to receive(:select_values).never # should have already been cached in migration
-        expect(MasterCourses::FolderLockingHelper.locked_folder_ids_for_course(@copy_to)).to match_array(expected_ids)
+        expect(MasterCourses::FolderHelper.locked_folder_ids_for_course(@copy_to)).to match_array(expected_ids)
       end
+    end
+
+    it "propagates folder name changes" do
+      master_parent_folder = nil
+      att_tag = nil
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+
+      Timecop.travel(10.minutes.ago) do
+        master_parent_folder = Folder.root_folders(@copy_from).first.sub_folders.create!(:name => "parent", :context => @copy_from)
+        master_sub_folder = master_parent_folder.sub_folders.create!(:name => "child", :context => @copy_from)
+        att = Attachment.create!(:filename => 'file.txt', :uploaded_data => StringIO.new('1'), :folder => master_sub_folder, :context => @copy_from)
+        att_tag = @template.create_content_tag_for!(att)
+        run_master_migration
+      end
+
+      master_parent_folder.update_attribute(:name, "parent RENAMED")
+      run_master_migration
+
+      copied_att = @copy_to.attachments.where(:migration_id => att_tag.migration_id).first
+      expect(copied_att.full_path).to eq "course files/parent RENAMED/child/file.txt"
     end
 
     it "should baleet assignment overrides when an admin pulls a bait-n-switch with date restrictions" do

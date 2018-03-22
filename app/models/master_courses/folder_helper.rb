@@ -15,9 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class MasterCourses::FolderLockingHelper
-  # couldn't think of an ideal place to put this
-
+class MasterCourses::FolderHelper
   def self.cache_key(child_course)
     ["locked_folder_ids_for_master_courses", Shard.global_id_for(child_course)].cache_key
   end
@@ -56,6 +54,20 @@ class MasterCourses::FolderLockingHelper
         else
           []
         end
+      end
+    end
+  end
+
+  def self.update_folder_names(child_course, content_export)
+    cutoff_time = content_export.master_migration&.master_template&.last_export_completed_at
+    return unless cutoff_time
+
+    updated_folders = content_export.context.folders.where('updated_at>?', cutoff_time)
+    updated_folders.each do |source_folder|
+      dest_folder = child_course.folders.active.where(cloned_item_id: source_folder.cloned_item_id).take
+      if dest_folder && dest_folder.name != source_folder.name
+        dest_folder.name = source_folder.name
+        dest_folder.save!
       end
     end
   end
