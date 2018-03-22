@@ -1375,6 +1375,23 @@ describe ExternalToolsController do
       expect(tool_settings['custom_canvas_user_id']).to eq @user.id.to_s
     end
 
+    it "strips query param from launch_url before signing, attaches to post body, and removes query params in url for launch" do
+      @tool = new_valid_tool(@course, { url: 'http://www.example.com/basic_lti?tripping', post_only: true })
+      user_session(@user)
+
+      get :generate_sessionless_launch, params: {:course_id => @course.id, id: @tool.id}
+
+      expect(response).to be_success
+
+      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
+      redis_key = "#{@course.class.name}:#{ExternalToolsController::REDIS_PREFIX}#{verifier}"
+      launch_settings = JSON.parse(Canvas.redis.get(redis_key))
+
+      expect(launch_settings['launch_url']).to eq 'http://www.example.com/basic_lti'
+      expect(launch_settings['tool_settings']).to have_key 'tripping'
+    end
+
     it "generates a sessionless launch for an external tool assignment" do
       tool = new_valid_tool(@course)
       user_session(@user)
@@ -1449,6 +1466,34 @@ describe ExternalToolsController do
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
 
       expect(launch_settings['tool_settings']['resource_link_id']). to eq opaque_id(@tg)
+    end
+
+    it 'makes the module item available for variable expansions' do
+      user_session(@user)
+      @tool = new_valid_tool(@course)
+      @tool.settings[:custom_fields] = {'standard' => '$Canvas.moduleItem.id'}
+      @tool.save!
+      @cm = ContextModule.create(context: @course)
+      @tg = ContentTag.create(context: @course,
+        context_module: @cm,
+        content_type: 'ContextExternalTool',
+        content: @tool,
+        url: @tool.url)
+      @cm.content_tags << @tg
+      @cm.save!
+      @course.save!
+
+      get :generate_sessionless_launch,
+        params: {course_id: @course.id,
+        launch_type: 'module_item',
+        module_item_id: @tg.id,
+        content_type: 'ContextExternalTool'}
+
+      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
+      redis_key = "#{@course.class.name}:#{ExternalToolsController::REDIS_PREFIX}#{verifier}"
+      launch_settings = JSON.parse(Canvas.redis.get(redis_key))
+      expect(launch_settings.dig('tool_settings', 'custom_standard')).to eq @tg.id.to_s
     end
   end
 

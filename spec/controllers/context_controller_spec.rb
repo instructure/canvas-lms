@@ -358,14 +358,13 @@ describe ContextController do
     end
 
     it 'allows undeleting wiki pages' do
-      # wiki pages are special because they have to go through context.wiki
       user_session(@teacher)
-      page = @course.wiki_pages.create(:title => "some page")
-      page.workflow_state = 'deleted'
-      page.save!
+      page = @course.wiki_pages.create!(:title => "some page")
+      page.destroy
 
       post :undelete_item, params: {course_id: @course.id, asset_string: page.asset_string}
       expect(page.reload).not_to be_deleted
+      expect(page.current_version).not_to be_nil
     end
 
     it 'allows undeleting attachments' do
@@ -405,7 +404,7 @@ describe ContextController do
       get :roster_user_usage, params: {course_id: @course.id, user_id: @student.id}, format: :json
 
       expect(response).to be_success
-      expect(JSON.parse(response.body.gsub("while(1);", "")).length).to eq 1
+      expect(json_parse(response.body).length).to eq 1
     end
   end
 end

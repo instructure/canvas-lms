@@ -1,3 +1,21 @@
+#
+# Copyright (C) 2018 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 module Types
   AssignmentType = GraphQL::ObjectType.define do
     name "Assignment"
@@ -64,6 +82,10 @@ module Types
       end
     end
 
+    field :gradingType, AssignmentGradingType, resolve: ->(assignment, _, _) {
+      GRADING_TYPES[assignment.grading_type]
+    }
+
     field :submissionTypes, types[!AssignmentSubmissionType],
       resolve: ->(assignment, _, _) {
         # there's some weird data in the db so we'll just ignore anything that
@@ -101,17 +123,22 @@ module Types
 
     connection :submissionsConnection, SubmissionType.connection_type do
       description "submissions for this assignment"
-      resolve ->(assignment, _, ctx) {
+      argument :filter, SubmissionFilterInputType
+
+      resolve ->(assignment, args, ctx) {
         current_user = ctx[:current_user]
         session = ctx[:session]
         course = assignment.course
 
+        submissions = assignment.submissions.where(
+          workflow_state: (args[:filter] || {})[:states] || DEFAULT_SUBMISSION_STATES
+        )
+
         if course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)
-          # a user can see all submissions
-          assignment.submissions.where.not(workflow_state: "unsubmitted")
+          submissions
         elsif course.grants_right?(current_user, session, :read_grades)
           # a user can see their own submission
-          assignment.submissions.where(user_id: current_user.id).where.not(workflow_state: "unsubmitted")
+          submissions.where(user_id: current_user.id)
         end
       }
     end
@@ -140,11 +167,20 @@ module Types
     wiki_page
   ].to_set
 
+  GRADING_TYPES = Hash[
+    Assignment::ALLOWED_GRADING_TYPES.zip(Assignment::ALLOWED_GRADING_TYPES)
+  ]
+
   AssignmentSubmissionType = GraphQL::EnumType.define do
     name "SubmissionType"
     description "Types of submissions an assignment accepts"
     SUBMISSION_TYPES.each { |submission_type|
       value(submission_type)
     }
+  end
+
+  AssignmentGradingType = GraphQL::EnumType.define do
+    name "GradingType"
+    Assignment::ALLOWED_GRADING_TYPES.each { |type| value(type) }
   end
 end

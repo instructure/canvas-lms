@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
-import i18n from 'i18n!react_collaborations'
+import I18n from 'i18n!react_collaborations'
   class DeleteConfirmation extends React.Component {
     componentDidMount () {
       ReactDOM.findDOMNode(this).focus()
@@ -29,16 +29,16 @@ import i18n from 'i18n!react_collaborations'
       return (
         <div className='DeleteConfirmation' tabIndex='0'>
           <p className='DeleteConfirmation-message'>
-            {i18n.t('Remove "%{collaborationTitle}"?', {
+            {I18n.t('Remove "%{collaborationTitle}"?', {
               collaborationTitle: this.props.collaboration.title
             })}
           </p>
           <div className='DeleteConfirmation-actions'>
             <button className='Button Button--danger' onClick={this.props.onDelete}>
-              {i18n.t('Yes, remove')}
+              {I18n.t('Yes, remove')}
             </button>
             <button className='Button' onClick={this.props.onCancel}>
-              {i18n.t('Cancel')}
+              {I18n.t('Cancel')}
             </button>
           </div>
         </div>

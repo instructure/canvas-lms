@@ -45,12 +45,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!ajaxflashalert'
-import Alert from 'instructure-ui/lib/components/Alert'
-import Button from 'instructure-ui/lib/components/Button'
-import Typography from 'instructure-ui/lib/components/Typography'
-import PresentationContent from 'instructure-ui/lib/components/PresentationContent'
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
-import Transition from 'instructure-ui/lib/components/Transition'
+import Alert from '@instructure/ui-core/lib/components/Alert'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Text from '@instructure/ui-core/lib/components/Text'
+import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import Transition from '@instructure/ui-core/lib/components/Transition'
 
 const messageHolderId = 'flashalert_message_holder' // specs fail if I reuse jquery's elements
 const screenreaderMessageHolderId = 'flashalert_screenreader_holder'
@@ -138,11 +138,11 @@ export default class FlashAlert extends React.Component {
   renderDetailMessage () {
     const {a, b} = this.findDetailMessage()
     return (
-      <Typography as="p" fontStyle="italic">
-        <Typography>{a}</Typography>
+      <Text as="p" fontStyle="italic">
+        <Text>{a}</Text>
         {b ? <br /> : null}
-        {b ? <Typography>{b}</Typography> : null}
-      </Typography>
+        {b ? <Text>{b}</Text> : null}
+      </Text>
     )
   }
 

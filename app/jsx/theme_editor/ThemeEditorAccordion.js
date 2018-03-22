@@ -18,15 +18,15 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!theme_editor'
+import I18n from 'i18nObj'
+import $ from 'jquery'
+import 'jqueryui/accordion'
+import Text from '@instructure/ui-core/lib/components/Text'
 import ThemeEditorColorRow from './ThemeEditorColorRow'
 import ThemeEditorImageRow from './ThemeEditorImageRow'
+import ThemeEditorVariableGroup from './ThemeEditorVariableGroup'
 import RangeInput from './RangeInput'
 import customTypes from './PropTypes'
-import ThemeEditorVariableGroup from './ThemeEditorVariableGroup'
-
-import Heading from '@instructure/ui-core/lib/components/Heading'
-import Text from '@instructure/ui-core/lib/components/Text'
 
 const activeIndexKey = 'Theme__editor-accordion-index'
 
@@ -36,7 +36,9 @@ export default class ThemeEditorAccordion extends React.Component {
     brandConfigVariables: PropTypes.object.isRequired,
     changedValues: PropTypes.object.isRequired,
     changeSomething: PropTypes.func.isRequired,
-    getDisplayValue: PropTypes.func.isRequired
+    getDisplayValue: PropTypes.func.isRequired,
+    themeState: PropTypes.object,
+    handleThemeStateChange: PropTypes.func
   }
 
   state = {
@@ -65,6 +67,8 @@ export default class ThemeEditorAccordion extends React.Component {
       userInput: this.props.changedValues[varDef.variable_name],
       onChange: this.props.changeSomething.bind(null, varDef.variable_name),
       placeholder: this.props.getDisplayValue(varDef.variable_name),
+      themeState: this.props.themeState,
+      handleThemeStateChange: this.props.handleThemeStateChange,
       varDef
     }
 
@@ -84,7 +88,10 @@ export default class ThemeEditorAccordion extends React.Component {
             step={0.1}
             defaultValue={defaultValue ? parseFloat(defaultValue) : 0.5}
             name={`brand_config[variables][${varDef.variable_name}]`}
+            variableKey={varDef.variable_name}
             onChange={value => props.onChange(value)}
+            themeState={props.themeState}
+            handleThemeStateChange={props.handleThemeStateChange}
             formatValue={value => I18n.toPercentage(value * 100, {precision: 0})}
           />
         )

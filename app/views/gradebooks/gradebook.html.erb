@@ -115,7 +115,7 @@
           <ul style="display: none;" id="csv_export_options" class="export_dropdown ui-kyle-menu">
             <li class="generate_new_csv"><a href="#"><%=t('CSV File') %></a></li>
             <% if @last_exported_gradebook_csv.present? %>
-              <li><a href="<%= @last_exported_gradebook_csv.attachment.download_url_for_user(@current_user) %>" class="open_in_a_new_tab">
+              <li><a href="<%= authenticated_download_url(@last_exported_gradebook_csv.attachment) %>" class="open_in_a_new_tab">
                 <%= t('Previous CSV File (%{time})', time: datetime_string(@last_exported_gradebook_csv.attachment.updated_at)) %>
               </a></li>
             <% else %>

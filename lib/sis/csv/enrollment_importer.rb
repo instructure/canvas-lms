@@ -22,7 +22,7 @@ module SIS
 
       def self.enrollment_csv?(row)
         (row.include?('section_id') || row.include?('course_id')) &&
-            (row.include?('user_id') || row.include?('user_integration_id'))
+          (row.include?('user_id') || row.include?('user_integration_id'))
       end
 
       def self.identifying_fields
@@ -31,25 +31,24 @@ module SIS
 
       # expected columns
       # course_id,user_id,role,section_id,status
-      def process(csv)
+      def process(csv, index=nil, count=nil)
         messages = []
-        @sis.counts[:enrollments] += SIS::EnrollmentImporter.new(@root_account, importer_opts).process(messages, @sis.updates_every) do |importer|
-          csv_rows(csv) do |row|
+        count = SIS::EnrollmentImporter.new(@root_account, importer_opts).process(messages) do |importer|
+          csv_rows(csv, index, count) do |row|
             update_progress
-
             begin
-              importer.add_enrollment(create_enrollment(row, messages))
+              importer.add_enrollment(create_enrollment(row, messages, csv: csv))
             rescue ImportError => e
-              messages << "#{e}"
-              next
+              messages << SisBatch.build_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
             end
           end
         end
-        messages.each { |message| add_warning(csv, message) }
+        SisBatch.bulk_insert_sis_errors(messages)
+        count
       end
 
       private
-      def create_enrollment(row, messages)
+      def create_enrollment(row, messages, csv: nil)
         enrollment = SIS::Models::Enrollment.new(
           course_id: row['course_id'],
           section_id: row['section_id'],
@@ -60,14 +59,17 @@ module SIS
           associated_user_id: row['associated_user_id'],
           root_account_id: row['root_account'],
           role_id: row['role_id'],
-          limit_section_privileges: row['limit_section_privileges']
+          limit_section_privileges: row['limit_section_privileges'],
+          lineno: row['lineno'],
+          csv: csv
         )
 
         begin
-          enrollment.start_date = DateTime.parse(row['start_date']) unless row['start_date'].blank?
-          enrollment.end_date = DateTime.parse(row['end_date']) unless row['end_date'].blank?
+          enrollment.start_date = DateTime.parse(row['start_date']) if row['start_date'].present?
+          enrollment.end_date = DateTime.parse(row['end_date']) if row['end_date'].present?
         rescue ArgumentError
-          messages << "Bad date format for user #{row['user_id']} in #{row['course_id'].blank? ? 'section' : 'course'} #{row['course_id'].blank? ? row['section_id'] : row['course_id']}"
+          message = "Bad date format for user #{row['user_id']} in #{row['course_id'].blank? ? 'section' : 'course'} #{row['course_id'].presence || row['section_id']}"
+          messages << SisBatch.build_error(csv, message, sis_batch: @batch, row: enrollment.lineno, row_info: row)
         end
 
         enrollment

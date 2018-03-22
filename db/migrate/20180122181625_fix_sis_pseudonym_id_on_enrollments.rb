@@ -20,7 +20,6 @@ class FixSisPseudonymIdOnEnrollments < ActiveRecord::Migration[5.0]
 
   def change
     remove_column :enrollments, :pseudonym_id if column_exists?(:enrollments, :pseudonym_id)
-    add_foreign_key :enrollments, :pseudonyms, column: :sis_pseudonym_id
     add_index :enrollments, :sis_pseudonym_id
   end
 end

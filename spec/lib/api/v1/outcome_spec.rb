@@ -75,6 +75,9 @@ RSpec.describe "Api::V1::Outcome" do
           expect(outcome['description']).to eq(outcome_params[:description])
           expect(outcome['vendor_guid']).to eq(outcome_params[:vendor_guid])
           expect(outcome['assessed']).to eq(LearningOutcome.find(outcome['id']).assessed? ? true : false)
+          expect(outcome['has_updateable_rubrics']).to eq(
+            LearningOutcome.find(outcome['id']).updateable_rubrics?
+          )
         end
       end
 

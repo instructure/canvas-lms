@@ -29,24 +29,24 @@ describe LocaleSelection do
 
   context 'accept-language' do
     it "should ignore malformed accept-language headers" do
-      expect(ls.infer_browser_locale("en not valid", ['en'])).to be_nil
+      expect(ls.infer_browser_locale("en not valid", 'en' => nil)).to be_nil
     end
 
     it "should match valid locale ranges" do
-      expect(ls.infer_browser_locale("en", ['en'])).to eql('en')
+      expect(ls.infer_browser_locale("en", 'en' => nil)).to eql('en')
     end
 
     it "should not match invalid locale ranges" do
-      expect(ls.infer_browser_locale("it", ['en'])).to be_nil
+      expect(ls.infer_browser_locale("it", 'en' => nil)).to be_nil
     end
 
     it "should do case-insensitive matching" do
-      expect(ls.infer_browser_locale("en-us", ['en-US'])).to eql('en-US')
+      expect(ls.infer_browser_locale("en-us", 'en-US' => nil)).to eql('en-US')
     end
 
     # see rfc2616 ... en means any en(-.*)? is acceptable
     it "should do range prefix-matching" do
-      expect(ls.infer_browser_locale("en", ['en-US'])).to eql('en-US')
+      expect(ls.infer_browser_locale("en", 'en-US' => nil)).to eql('en-US')
     end
 
     # while tag prefix-matching might be desirable (sometimes), it should not
@@ -57,33 +57,37 @@ describe LocaleSelection do
     #   available. A user agent might suggest in such a case to add "en" to
     #   get the best matching behavior.
     it "should not do tag prefix-matching" do
-      expect(ls.infer_browser_locale("en-US", ['en'])).to be_nil
+      expect(ls.infer_browser_locale("en-US", 'en' => nil)).to be_nil
     end
 
     it "should assign quality values based on the best match" do
-      expect(ls.infer_browser_locale("en-US, es;q=0.9, en;q=0.8", ['en-US', 'es'])).to eql('en-US')
+      expect(ls.infer_browser_locale("en-US, es;q=0.9, en;q=0.8", 'en-US' => nil, 'es' => nil)).to eql('en-US')
 
       # no tag prefix-matching
-      expect(ls.infer_browser_locale("en-US, es;q=0.9, en;q=0.8", ['en', 'es'])).to eql('es')
+      expect(ls.infer_browser_locale("en-US, es;q=0.9, en;q=0.8", 'en' => nil, 'es' => nil)).to eql('es')
 
       # order doesn't matter
-      expect(ls.infer_browser_locale("es;q=0.9, en", ['en', 'es'])).to eql('en')
+      expect(ls.infer_browser_locale("es;q=0.9, en", 'en' => nil, 'es' => nil)).to eql('en')
 
       # although the en range matches the en-US tag, the en-US range is
       # a better (read: longer) match. so the es tag ends up with a higher
       # quality value than en-US tag
-      expect(ls.infer_browser_locale("en, es;q=0.9, en-US;q=0.8", ['en-US', 'es'])).to eql('es')
+      expect(ls.infer_browser_locale("en, es;q=0.9, en-US;q=0.8", 'en-US' => nil, 'es' => nil)).to eql('es')
     end
 
     it "should understand wildcards" do
-      expect(ls.infer_browser_locale("*, pt;q=0.8", ['ru', 'pt'])).to eql('ru')
-      expect(ls.infer_browser_locale("*, pt;q=0.8, ru;q=0.7", ['ru', 'pt'])).to eql('pt')
+      expect(ls.infer_browser_locale("*, pt;q=0.8", 'ru' => nil, 'pt' => nil)).to eql('ru')
+      expect(ls.infer_browser_locale("*, pt;q=0.8, ru;q=0.7", 'ru' => nil, 'pt' => nil)).to eql('pt')
       # the pt range is explicitly rejected, so we don't get a locale
-      expect(ls.infer_browser_locale("pt-BR, *;q=0.9, pt;q=0", ['pt'])).to be_nil
+      expect(ls.infer_browser_locale("pt-BR, *;q=0.9, pt;q=0", 'pt' => nil)).to be_nil
       # no pt variants supported, so we get the first alternative
-      expect(ls.infer_browser_locale("pt-BR, pt;q=0.9, *;q=0.8", ['es', 'fr'])).to eql('es')
+      expect(ls.infer_browser_locale("pt-BR, pt;q=0.9, *;q=0.8", 'es' => nil, 'fr' => nil)).to eql('es')
       # equal matches sort by position before alphabetical
-      expect(ls.infer_browser_locale("en, *", ['ar', 'en'])).to eql('en')
+      expect(ls.infer_browser_locale("en, *", 'ar' => nil, 'en' => nil)).to eql('en')
+    end
+
+    it "handles aliases" do
+      expect(ls.infer_browser_locale("zh-TW, *", 'zh-TW' => 'zh-Hant', 'zh-Hant' => nil, 'en' => nil)).to  eql('zh-Hant')
     end
   end
 

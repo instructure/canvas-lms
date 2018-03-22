@@ -37,33 +37,33 @@ describe "assignments" do
       to include_text('Points possible must be 0 or more for selected grading type')
   end
 
-  context "with points" do
+  context 'with points' do
     before(:each) do
       course_with_teacher_logged_in
     end
 
-    it "should validate points for percentage grading (!= '')", priority: "2", test_id: 209980 do
+    it 'should validate points for percentage grading (!= '')', priority: '2', test_id: 209980 do
       point_validation do
         click_option('#assignment_grading_type', 'Percentage')
         replace_content f('#assignment_points_possible'), ''
       end
     end
 
-    it "should validate points for percentage grading (digits only)", priority: "2", test_id: 209984 do
+    it 'should validate points for percentage grading (digits only)', priority: '2', test_id: 209984 do
       point_validation do
         click_option('#assignment_grading_type', 'Percentage')
         replace_content f('#assignment_points_possible'), 'taco'
       end
     end
 
-    it "should validate points for letter grading (!= '')", priority: "2", test_id:209985 do
+    it 'should validate points for letter grading (!= '')', priority: '2', test_id:209985 do
       point_validation do
         click_option('#assignment_grading_type', 'Letter Grade')
         replace_content f('#assignment_points_possible'), ''
       end
     end
 
-    it "should validate points for letter grading (digits only)", priority: "2", test_id: 209986 do
+    it 'should validate points for letter grading (digits only)', priority: '2', test_id: 209986 do
       point_validation do
         click_option('#assignment_grading_type', 'Letter Grade')
         replace_content f('#assignment_points_possible'), 'taco'
@@ -71,15 +71,15 @@ describe "assignments" do
     end
   end
 
-  context "with assignment creation" do
+  context 'with assignment creation' do
     before(:each) do
       course_with_teacher_logged_in
       @assignment_title = 'grading options assignment'
       manually_create_assignment(@assignment_title)
     end
 
-    %w(points percent pass_fail letter_grade).each do |grading_option|
-      it "can create an assignment with #{grading_option} grading option", priority: "2", test_id: 209976 do
+    %w(points percent pass_fail letter_grade gpa_scale).each do |grading_option|
+      it "can create an assignment with #{grading_option} grading option", priority: '2', test_id: 209976 do
         click_option('#assignment_grading_type', grading_option, :value)
         replace_content(f('#assignment_points_possible'), '5')
         click_option('#assignment_submission_type', 'No Submission')
@@ -89,15 +89,9 @@ describe "assignments" do
         expect(Assignment.find_by(title: @assignment_title).grading_type).to eq grading_option
       end
     end
-
-    it "cannot create a GPA Scale assignment", priority: "1", test_id: 3431683 do
-      manually_create_assignment('A New Assignment')
-      wait_for_ajaximations
-      expect(f('#assignment_grading_type')).not_to contain_css('option[value="gpa_scale"]')
-    end
   end
 
-  context "with GPA Scale Assignments" do
+  context 'with GPA Scale Assignments' do
     before(:each) do
       course_with_teacher_logged_in
     end
@@ -113,29 +107,29 @@ describe "assignments" do
       )
     end
 
-    it "validates points for GPA scale grading (!= '')", priority: "2", test_id: 209988 do
+    it 'validates points for GPA scale grading (!= '')', priority: '2', test_id: 209988 do
       point_validation(assignment) do
         click_option('#assignment_grading_type', 'GPA Scale')
         replace_content f('#assignment_points_possible'), ''
       end
     end
 
-    it "validates points for GPA scale grading (digits only)", priority: "2", test_id: 209980 do
+    it 'validates points for GPA scale grading (digits only)', priority: '2', test_id: 209980 do
       point_validation(assignment) do
         click_option('#assignment_grading_type', 'GPA Scale')
         replace_content f('#assignment_points_possible'), 'taco'
       end
     end
 
-    it "shows 'GPA Scale' option if the assignment's type is GPA Scale", priority: "1", test_id: 3431684 do
+    it "shows 'GPA Scale' option if the assignment's type is GPA Scale", priority: '1', test_id: 3431684 do
       get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
       expect(f('#assignment_grading_type')).to contain_css('option[value="gpa_scale"]')
     end
 
-    it "does not show 'GPA Scale' option if the assignment's type is not GPA Scale", priority: "2", test_id: 3431685 do
+    it "shows 'GPA Scale' option if the assignment's type is not GPA Scale", priority: '2', test_id: 3431685 do
       assignment.update!(grading_type: 'points')
       get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
-      expect(f('#assignment_grading_type')).not_to contain_css('option[value="gpa_scale"]')
+      expect(f('#assignment_grading_type')).to contain_css('option[value="gpa_scale"]')
     end
   end
 end

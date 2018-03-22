@@ -21,10 +21,10 @@
 .bcs__trigger {
   position: fixed;
   top: 0;
-  right: 0;
+  #{direction(right)}: 0;
   z-index: 10;
   padding: 10px 3px;
-  border-bottom-left-radius: 5px;
+  border-bottom-#{direction(left)}-radius: 5px;
   background-color: $electric;
   box-shadow: -1px 1px 2px 0 rgba(0,0,0,.2);
 
@@ -33,7 +33,7 @@
     display: block;
     position: fixed;
     top: 58px;
-    right: 0;
+    #{direction(right)}: 0;
     bottom: 0;
     width: 8px;
     background-color: $electric;
@@ -60,7 +60,7 @@
 
   & > * {
     display: inline-block;
-    margin-left: 1em;
+    margin-#{direction(left)}: 1em;
   }
 }
 
@@ -79,21 +79,21 @@
 
       .bcs__history-item__content-grid {
         > span > span > span:first-child {
-          padding-left: 0,
+          padding-#{direction(left)}: 0,
         }
       }
     }
 
     .bcs__history-item__content-grid {
-      left: 0;
+      #{direction(left)}: 0;
 
       > span > span > span:first-child {
-        padding-left: 30px,
+        padding-#{direction(left)}: 30px,
       }
     }
 
     .bcs__history-item__lock-icon {
-      left: 0;
+      #{direction(left)}: 0;
     }
   }
 
@@ -132,8 +132,8 @@
 .bcs__history-item__content-grid {
   position: absolute;
   top: 0;
-  right: 0;
-  left: 50px;
+  #{direction(right)}: 0;
+  #{direction(left)}: 50px;
 }
 
 .bcs__history-item__change-exceps {
@@ -157,7 +157,7 @@
 .bcs__history-item__lock-icon {
   position: absolute;
   top: -5px;
-  left: 10px;
+  #{direction(left)}: 10px;
 }
 
 @keyframes spinning {
@@ -193,7 +193,7 @@
   }
 
   .bcs__row-right-content {
-    float: right;
+    float: direction(right);
     line-height: 2.5em;
     vertical-align: middle;
   }
@@ -208,12 +208,12 @@
 }
 
 .bcs__close-wrapper {
-  float: left;
+  float: direction(left);
 
   button {
     position: relative;
     top: -0.25em;
-    left: 0.5em;
+    #{direction(left)}: 0.5em;
   }
 }
 
@@ -269,7 +269,7 @@
 
   &> div > div {
     // overwrite instui padding to match design
-    padding-left: 0 !important;
+    padding-#{direction(left)}: 0 !important;
   }
 }
 
@@ -314,7 +314,7 @@
     margin: 0 10px;
 
     label > span > span:last-child {
-      margin-left: 22px;
+      margin-#{direction(left)}: 22px;
     }
   }
 
@@ -327,7 +327,7 @@
     .bca-table__body {
       tr {
         // overwrite instui borders to match design
-        border-left: none !important;
+        border-#{direction(left)}: none !important;
 
         td:first-child {
           // overwrite instui borders to match design
@@ -348,7 +348,7 @@
 }
 
 .bca-associations-table {
-  padding-left: 10px;
+  padding-#{direction(left)}: 10px;
   margin-bottom: 40px;
   position: relative;
   min-height: 75px;
@@ -359,7 +359,7 @@
     }
   }
   .bca-associations__x-col {
-    text-align: right;
+    text-align: direction(right);
   }
 }
 
@@ -395,9 +395,9 @@
 }
 
 .bcs__history-notification__add-message {
-  margin-left: 1em;
+  margin-#{direction(left)}: 1em;
   label {
-    margin-right: .5em;
+    margin-#{direction(right)}: .5em;
   }
 }
 
@@ -407,7 +407,7 @@
 
 .bcc__master-child-stack {
   position: relative;
-  padding-right: 2em;
+  padding-#{direction(right)}: 2em;
 
   &:before {
       content: '';
@@ -417,7 +417,7 @@
       position: absolute;
       top: 10px;
       bottom: 100px;
-      left: 50%;
+      #{direction(left)}: 50%;
   }
 }
 
@@ -450,7 +450,7 @@
 }
 
 .bpc__lock-no__toggle {
-  padding-right: 12px;
+  padding-#{direction(right)}: 12px;
   position: relative;
   top: 2px;
   font-size: 1.25em;
@@ -458,7 +458,7 @@
   .bpc__lock-no__toggle-icon  {
     position: relative;
     top: 4px;
-    margin-right: 6px
+    margin-#{direction(right)}: 6px
   }
 }
 
@@ -474,7 +474,7 @@
         width: 66%;
       }
       td:last-child {
-        text-align: right;
+        text-align: direction(right);
       }
       .bcs__unsynced-item__name {
         display: flex;

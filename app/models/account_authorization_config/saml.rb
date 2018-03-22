@@ -45,7 +45,8 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
       :parent_registration,
       :jit_provisioning,
       :metadata,
-      :metadata_uri
+      :metadata_uri,
+      :sig_alg
     ].freeze
   end
 
@@ -62,6 +63,10 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
 
   before_validation :set_saml_defaults
   before_validation :download_metadata
+  after_initialize do |ap|
+    # default to the most secure signature we support, but only for new objects
+    ap.sig_alg ||= 'RSA-SHA256' if ap.new_record?
+  end
 
   def auth_provider_filter
     [nil, self]
@@ -138,6 +143,26 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     settings['signing_certificates'] ||= []
   end
 
+  def sig_alg
+    settings['sig_alg'].presence
+  end
+
+  def sig_alg=(value)
+    value = value.presence
+    value = SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA1 if value&.downcase == 'rsa-sha1'
+    value = SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA256 if value&.downcase == 'rsa-sha256'
+    # support using 'false' to disable
+    value = nil if ::Canvas::Plugin.value_to_boolean(value, ignore_unrecognized: true) == false
+
+    unless [nil,
+            SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA1,
+            SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA256].include?(value)
+      errors.add("Unsupported signing algorithm #{value}")
+      return
+    end
+    settings['sig_alg'] = value
+  end
+
   def populate_from_metadata(entity)
     idps = entity.identity_providers
     raise "Must provide exactly one IDPSSODescriptor; found #{idps.length}" unless idps.length == 1
@@ -148,6 +173,16 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     self.certificate_fingerprint = (idp.signing_keys.first || idp.keys.first).try(:fingerprint)
     self.identifier_format = (idp.name_id_formats & Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS).first
     self.settings[:signing_certificates] = idp.signing_keys.map(&:x509)
+    case idp.want_authn_requests_signed?
+    when true
+      # use ||= to not overwrite a specific algorithm that has otherwise been
+      # chosen
+      self.sig_alg ||= 'RSA-SHA1'
+    when false
+      self.sig_alg = nil
+    # else nil
+    # don't change the user settings
+    end
   end
 
   def populate_from_metadata_xml(xml)
@@ -208,7 +243,7 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   end
 
   def self.sp_metadata(entity_id, hosts)
-    app_config = ConfigFile.load('saml') || {}
+    app_config = config
 
     entity = SAML2::Entity.new
     entity.entity_id = entity_id
@@ -246,38 +281,28 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   end
 
   def generate_authn_request_redirect(host: nil, parent_registration: false)
-    if account.settings[:use_legacy_saml_authn_request]
-      settings = saml_settings(host)
-      request = Onelogin::Saml::AuthRequest.new(settings)
-      forward_url = request.generate_request
-      if debugging? && !debug_get(:request_id)
-        debug_set(:request_id, request.id)
-        debug_set(:to_idp_url, forward_url)
-        debug_set(:to_idp_xml, request.request_xml)
-        debug_set(:debugging, "Forwarding user to IdP for authentication")
-      end
-      forward_url << '&ForceAuthn=true' if parent_registration
-    else
-      sp_metadata = self.class.sp_metadata_for_account(account, host).service_providers.first
-      authn_request = SAML2::AuthnRequest.initiate(SAML2::NameID.new(entity_id),
-                                                   idp_metadata.identity_providers.first,
-                                                   service_provider: sp_metadata)
-      authn_request.name_id_policy.format = identifier_format if identifier_format.present?
-      if requested_authn_context.present?
-        authn_request.requested_authn_context = SAML2::RequestedAuthnContext.new
-        authn_request.requested_authn_context.class_ref = requested_authn_context
-        authn_request.requested_authn_context.comparison = :exact
-      end
-      authn_request.force_authn = true if parent_registration
-      forward_url = SAML2::Bindings::HTTPRedirect.encode(authn_request)
-
-      if debugging? && !debug_get(:request_id)
-        debug_set(:request_id, authn_request.id)
-        debug_set(:to_idp_url, forward_url)
-        debug_set(:to_idp_xml, authn_request.to_s)
-        debug_set(:debugging, "Forwarding user to IdP for authentication")
-      end
+    sp_metadata = self.class.sp_metadata_for_account(account, host).service_providers.first
+    authn_request = SAML2::AuthnRequest.initiate(SAML2::NameID.new(entity_id),
+                                                 idp_metadata.identity_providers.first,
+                                                 service_provider: sp_metadata)
+    authn_request.name_id_policy.format = identifier_format if identifier_format.present?
+    if requested_authn_context.present?
+      authn_request.requested_authn_context = SAML2::RequestedAuthnContext.new
+      authn_request.requested_authn_context.class_ref = requested_authn_context
+      authn_request.requested_authn_context.comparison = :exact
     end
+    authn_request.force_authn = true if parent_registration
+    private_key = self.class.private_key
+    private_key = nil if sig_alg.nil?
+    forward_url = SAML2::Bindings::HTTPRedirect.encode(authn_request, private_key: private_key, sig_alg: sig_alg)
+
+    if debugging? && !debug_get(:request_id)
+      debug_set(:request_id, authn_request.id)
+      debug_set(:to_idp_url, forward_url)
+      debug_set(:to_idp_xml, authn_request.to_s)
+      debug_set(:debugging, "Forwarding user to IdP for authentication")
+    end
+
     forward_url
   end
 
@@ -304,6 +329,14 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     ConfigFile.load('saml') || {}
   end
 
+  def self.private_key
+    unless instance_variable_defined?(:@key)
+      private_key_data = private_keys.first&.last
+      @key = OpenSSL::PKey::RSA.new(private_key_data) if private_key_data
+    end
+    @key
+  end
+
   def self.private_keys
     return [] unless (encryption = config[:encryption])
     ([encryption[:private_key]] + Array(encryption[:additional_private_keys])).map do |key|
@@ -311,6 +344,10 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
       next unless path
       [path, File.read(path)]
     end.compact.to_h
+  end
+
+  ::Canvas::Reloader.on_reload do
+    remove_instance_variable(:@key) if instance_variable_defined?(:@key)
   end
 
   def self.onelogin_saml_settings_for_account(account, current_host=nil)
@@ -407,9 +444,11 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     )
 
     # sign the response
-    private_key_data = AccountAuthorizationConfig::SAML.private_keys.first&.last
-    private_key = OpenSSL::PKey::RSA.new(private_key_data) if private_key_data
-    result = SAML2::Bindings::HTTPRedirect.encode(logout_request, private_key: private_key)
+    private_key = AccountAuthorizationConfig::SAML.private_key
+    private_key = nil if sig_alg.nil?
+    result = SAML2::Bindings::HTTPRedirect.encode(logout_request,
+                                                  private_key: private_key,
+                                                  sig_alg: sig_alg)
 
     if debugging? && debug_get(:logged_in_user_id) == current_user.id
       debug_set(:logout_request_id, logout_request.id)

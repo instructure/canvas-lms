@@ -57,7 +57,7 @@ $new-total-border-radius: 3px;
     padding: 0 $new-total-padding;
     font-weight: bold;
     @include fontSize(11px);
-    float: left;
+    float: direction(left);
     color: white;
   }
   .new-items {

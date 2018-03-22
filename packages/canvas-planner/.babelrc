@@ -1,0 +1,12 @@
+{
+  "presets": [["./babel-preset"]],
+  "env": {
+    "test": {
+      "presets": [["./babel-preset"]]
+    }
+  },
+  "plugins": [
+    "inline-react-svg",
+    "transform-regenerator",
+  ]
+}

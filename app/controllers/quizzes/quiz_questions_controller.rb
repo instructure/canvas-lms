@@ -17,7 +17,6 @@
 #
 
 # @API Quiz Questions
-# @beta
 #
 # @model QuizQuestion
 #   {
@@ -191,7 +190,6 @@ class Quizzes::QuizQuestionsController < ApplicationController
   before_action :require_question, :only => [:show]
 
   # @API List questions in a quiz or a submission
-  # @beta
   #
   # Returns the paginated list of QuizQuestions in this quiz.
   #
@@ -218,7 +216,6 @@ class Quizzes::QuizQuestionsController < ApplicationController
   end
 
   # @API Get a single quiz question
-  # @beta
   #
   # Returns the quiz question with the given id
   #
@@ -238,7 +235,6 @@ class Quizzes::QuizQuestionsController < ApplicationController
   end
 
   # @API Create a single quiz question
-  # @beta
   #
   # Create a new quiz question for this quiz
   #
@@ -308,7 +304,6 @@ class Quizzes::QuizQuestionsController < ApplicationController
   protected :add_questions
 
   # @API Update an existing quiz question
-  # @beta
   #
   # Updates an existing quiz question for this quiz
   #
@@ -376,7 +371,6 @@ class Quizzes::QuizQuestionsController < ApplicationController
   end
 
   # @API Delete a quiz question
-  # @beta
   #
   # @argument quiz_id [Required, Integer]
   #   The associated quiz's unique identifier

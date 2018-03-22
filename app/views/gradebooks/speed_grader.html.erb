@@ -51,11 +51,15 @@
             <%= @assignment.muted? ? t("Unmute Assignment") : t("Mute Assignment") %>
           </span>
         </button>
-        <button id="keyboard-shortcut-info-icon" class="Button Button--icon-action gradebookActions__Button" type="button" title="<%= t('Keyboard Shortcuts') %>">
-          <i class="icon-keyboard-shortcuts" aria-hidden="true"></i>
-          <span class="screenreader-only" aria-hidden="true"><%= t('Keyboard Shortcuts') %></span>
-        </button>
-        <% if help_link %>
+
+        <% unless @anonymous_moderated_marking_enabled %>
+          <button id="keyboard-shortcut-info-icon" class="Button Button--icon-action gradebookActions__Button" type="button" title="<%= t('Keyboard Shortcuts') %>">
+            <i class="icon-keyboard-shortcuts" aria-hidden="true"></i>
+            <span class="screenreader-only" aria-hidden="true"><%= t('Keyboard Shortcuts') %></span>
+          </button>
+        <% end %>
+
+        <% if help_link && !@anonymous_moderated_marking_enabled %>
           <%= link_to help_link_url,
                 class: help_link_classes(["Button Button--icon-action gradebookActions__Button exclude_external_icon"]),
                 title: help_link_name,
@@ -64,10 +68,15 @@
             <span class="screenreader-only" aria-hidden="true"><%= help_link_name %></span>
           <% end %>
         <% end %>
-        <button id="settings_link" class="Button Button--icon-action gradebookActions__Button" type="button" title="<%= t('Settings') %>">
-          <i class="icon-settings" aria-hidden="true"></i>
-          <span class="screenreader-only" aria-hidden="true"><%= t('Speedgrader Settings') %></span>
-        </button>
+
+        <% if @anonymous_moderated_marking_enabled %>
+          <span id="speedgrader-settings"></span>
+        <% else %>
+          <button id="settings_link" class="Button Button--icon-action gradebookActions__Button" type="button" title="<%= t('Settings') %>">
+            <i class="icon-settings" aria-hidden="true"></i>
+            <span class="screenreader-only" aria-hidden="true"><%= t('SpeedGrader Settings') %></span>
+          </button>
+        <% end %>
       </div>
       <div class="assignmentDetails">
         <a id="assignment_url" href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>">
@@ -325,9 +334,24 @@
                 <div class="media_recording"></div>
               </div>
               <% if @assignment.has_group_category? %>
-                <div id="group_comment_wrapper" class="ic-Form-control ic-Form-control--checkbox">
-                  <input type="checkbox" name="group_comment" id="submission_group_comment" class="ic_Input"/>
-                  <label for="submission_group_comment" class="ic-Label"><%= t('labels.group_comment', "Send Comment to the Whole Group") %></label>
+                <div id="group_comment_wrapper">
+                  <% if @assignment.grade_as_group? %>
+                    <%= t('All comments are sent to the whole group') %>
+                    <input type="checkbox" name="submission[group_comment]" id="submission_group_comment" style="display:none" checked />
+                  <% else %>
+                    <fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
+                      <div class="ic-Form-control ic-Form-control--radio">
+                        <div class="ic-Radio">
+                          <input type="radio" name="submission[group_comment]" id="not_submission_group_comment" checked />
+                          <label for="not_submission_group_comment" class="ic-Label"><%= t('Send comment to this student only') %></label>
+                        </div>
+                        <div class="ic-Radio">
+                          <input type="radio" name="submission[group_comment]" id="submission_group_comment" />
+                          <label for="submission_group_comment" class="ic-Label"><%= t('Send comment to the whole group') %></label>
+                        </div>
+                      </div>
+                    </fieldset>
+                  <% end %>
                 </div>
               <% end %>
 

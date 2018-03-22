@@ -23,7 +23,7 @@
   table-layout: fixed;
   margin-bottom: 10px;
   thead th, td {
-    text-align: left;
+    text-align: direction(left);
     @include fontSize(14px);
   }
   tr.date {
@@ -37,7 +37,7 @@
       white-space: nowrap;
     }
     td.details {
-      padding-right: 0;
+      padding-#{direction(right)}: 0;
       td {
         border: none;
         background-color: transparent;
@@ -48,8 +48,8 @@
 
       td.dates {
         white-space: nowrap;
-        padding-right: 7px;
-        text-align: right;
+        padding-#{direction(right)}: 7px;
+        text-align: direction(right);
       }
 
       td.not_last {
@@ -82,7 +82,7 @@
 }
 .name {
   > i {
-    padding-right: $ic-sp/2;
+    padding-#{direction(right)}: $ic-sp/2;
   }
 }
 #toggle_special_dates_in_syllabus {
@@ -92,7 +92,7 @@
   &.shown span.show {
     display: none;
   }
-  float: right;
+  float: direction(right);
 }
 
 #syllabus_links {

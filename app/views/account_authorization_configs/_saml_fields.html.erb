@@ -64,4 +64,27 @@ TEXT
                {},
                class: 'ic-Input', id: "requested_authn_context_#{presenter.id_suffix(aac)}") %>
 </div>
+<fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
+  <legend class="ic-Legend">
+    <%= t('Message Signing') %>
+  </legend>
+  <div class="ic-Form-control ic-Form-control--radio">
+    <p><%= t('The algorithm to use for signing AuthnRequest, LogoutRequest, and LogoutResponse messages sent to the IdP.') %></p>
+    <div class="ic-Radio">
+      <%= f.radio_button :sig_alg, false, id: "no_sig_alg_#{presenter.id_suffix(aac)}", checked: aac.sig_alg.nil? %>
+      <%= f.label :sig_alg, t('Not Signed'), for: "no_sig_alg_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
+    </div>
+    <div class="ic-Radio">
+      <%= f.radio_button :sig_alg, SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA1, id: "rsa_sha1_#{presenter.id_suffix(aac)}", checked: aac.sig_alg == SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA1 %>
+      <%= f.label :sig_alg, t('RSA-SHA1'), for: "rsa_sha1_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
+    </div>
+    <div class="ic-Radio">
+      <%= f.radio_button :sig_alg, SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA256, id: "rsa_sha256_#{presenter.id_suffix(aac)}", checked: aac.sig_alg == SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA256 %>
+      <%= f.label :sig_alg, t('RSA-SHA256'), for: "rsa_sha256_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
+    </div>
+  </div>
+</fieldset>
+<div class="ic-Form-control">
+
+</div>
 <%= render partial: 'jit_provisioning_field', locals: { aac: aac, presenter: presenter, f: f } %>

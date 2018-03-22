@@ -207,8 +207,8 @@ I18n.send(:extend, Module.new {
   # Returns nothing.
   def set_locale_with_localizer
     if localizer
-      self.locale = localizer.call
-      self.localizer = nil
+      local_localizer, self.localizer = localizer, nil
+      self.locale = local_localizer.call
     end
   end
 
@@ -236,6 +236,10 @@ I18n.send(:extend, Module.new {
 
   def fullcalendar_locale
     backend.send(:lookup, locale.to_s, "fullcalendar_locale") || locale.to_s.downcase
+  end
+
+  def rtl?
+    backend.send(:lookup, locale.to_s, "rtl")
   end
 
   def moment_locale

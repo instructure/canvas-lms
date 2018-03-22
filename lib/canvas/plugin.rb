@@ -184,12 +184,13 @@ module Canvas
       @registered_plugins[id.to_s] || raise(NoPluginError)
     end
 
-    def self.value_to_boolean(value)
+    def self.value_to_boolean(value, ignore_unrecognized: false)
       if value.is_a?(String) || value.is_a?(Symbol)
         return true if ["yes", "y", "true", "t", "on", "1"].include?(value.to_s.downcase)
         return false if ["no", "n", "false", "f", "off", "0"].include?(value.to_s.downcase)
       end
       return value if [true, false].include?(value)
+      return nil if ignore_unrecognized
       return value.to_i != 0
     end
   end

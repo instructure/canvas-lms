@@ -37,12 +37,11 @@ describe SIS::CSV::EnrollmentImporter do
     )
     expect(Enrollment.count).to eq before_count
 
-    expect(importer.errors).to eq []
-    warnings = importer.warnings.map { |r| r.last }
+    errors = importer.errors.map { |r| r.last }
     # since accounts can define course roles, the "cheater" row can't be
     # rejected immediately on parse like the others; that's why the warning
     # comes out of order with the source data
-    expect(warnings).to eq ["No course_id or section_id given for an enrollment",
+    expect(errors).to eq ["No course_id or section_id given for an enrollment",
                       "No user_id given for an enrollment",
                       "Improper status \"semi-active\" for an enrollment",
                       "Improper role \"cheater\" for an enrollment",
@@ -68,33 +67,32 @@ describe SIS::CSV::EnrollmentImporter do
       "NONEXISTENT,U001,student,1B,active",
       "C001,U001,student,NONEXISTENT,active",
       "C002,U001,student,1B,active")
-    warnings = importer.warnings.map(&:last)
-    expect(warnings).to eq ["An enrollment referenced a non-existent course NONEXISTENT",
+    errors = importer.errors.map(&:last)
+    expect(errors).to eq ["An enrollment referenced a non-existent course NONEXISTENT",
                             "An enrollment referenced a non-existent section NONEXISTENT",
                             "An enrollment listed a section (1B) and a course (C002) that are unrelated for user (U001)"]
-    expect(importer.errors).to eq []
   end
 
   it "should not fail for really long course names" do
     #create course, users, and sections
     process_csv_data_cleanly(
-        "course_id,short_name,long_name,account_id,term_id,status",
-        "test_1,TC 101,Test Course 101,,,active"
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
     )
     process_csv_data_cleanly(
-        "user_id,login_id,first_name,last_name,email,status",
-        "user_1,user1,User,Uno,user@example.com,active"
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,active"
     )
     name = '0123456789' * 25
     process_csv_data_cleanly(
-        "section_id,course_id,name,status,start_date,end_date",
-        "S001,test_1,#{name},active,,"
+      "section_id,course_id,name,status,start_date,end_date",
+      "S001,test_1,#{name},active,,"
     )
     # the enrollments
-    process_csv_data_cleanly(
-        "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
-        "test_1,user_1,teacher,S001,active,,,"
-    )
+    expect {process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
+      "test_1,user_1,teacher,S001,active,,,"
+    )}.not_to raise_error
   end
 
   it "should enroll users" do
@@ -103,7 +101,7 @@ describe SIS::CSV::EnrollmentImporter do
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"
     )
-    batch = process_csv_data(
+    importer = process_csv_data(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user@example.com,active",
       "user_2,user2,User,Dos,user2@example.com,active",
@@ -113,16 +111,16 @@ describe SIS::CSV::EnrollmentImporter do
       "user_7,user7,User,Siete,user7@example.com,active",
       ",,,,,"
     )
-    expect(batch.errors).to eq []
-    expect(batch.warnings).to eq []
+    expect(importer.errors).to eq []
     # should skip empty lines without error or warning
-    expect(batch.counts[:users]).to eq 6
+    expect(importer.batch.reload.data[:counts][:users]).to eq 6
 
     process_csv_data_cleanly(
       "section_id,course_id,name,status,start_date,end_date",
       "S001,test_1,Sec1,active,,"
     )
     # the enrollments
+    expect_any_instance_of(Enrollment).to receive(:add_to_favorites).once
     process_csv_data_cleanly(
       "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
       "test_1,user_1,teacher,,active,,,",
@@ -538,20 +536,22 @@ describe SIS::CSV::EnrollmentImporter do
     expect(e.completed_at).to be_present
   end
 
-  it "should only queue up one DueDateCacher job per course" do
-    course_model(:account => @account, :sis_source_id => 'C001').assignments.create!
-    course_model(:account => @account, :sis_source_id => 'C002').assignments.create!
-    @course.assignments.create!
-    user_with_managed_pseudonym(:account => @account, :sis_user_id => 'U001')
-    user_with_managed_pseudonym(:account => @account, :sis_user_id => 'U002')
+  it 'should only queue up one DueDateCacher job per course' do
+    course1 = course_model(account: @account, sis_source_id: 'C001')
+    course2 = course_model(account: @account, sis_source_id: 'C002')
+    user1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
+    user2 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U002')
+    course1.enroll_user(user2)
     expect(DueDateCacher).to receive(:recompute).never
-    expect(DueDateCacher).to receive(:recompute_course).twice
+    # there are no assignments so this will just return, but we just want to see
+    # that it gets called correctly and for the users that wre imported
+    expect(DueDateCacher).to receive(:recompute_users_for_course).with([user1.id], course1.id)
+    expect(DueDateCacher).to receive(:recompute_users_for_course).with([user1.id, user2.id], course2.id)
     process_csv_data_cleanly(
-        "course_id,user_id,role,status",
-        "C001,U001,student,active",
-        "C001,U002,student,active",
-        "C002,U001,student,active",
-        "C002,U002,student,active",
+      'course_id,user_id,role,status',
+      'C001,U001,student,active',
+      'C002,U001,student,active',
+      'C002,U002,student,active'
     )
   end
 
@@ -582,7 +582,7 @@ describe SIS::CSV::EnrollmentImporter do
             "TehCourse,user1,cheater,,active,"
         )
         expect(@user1.enrollments.size).to eq 0
-        expect(importer.warnings.map(&:last)).to eq ["Improper role \"cheater\" for an enrollment"]
+        expect(importer.errors.map(&:last)).to eq ["Improper role \"cheater\" for an enrollment"]
       end
 
       it "should not enroll with a nonexistent role" do
@@ -591,7 +591,7 @@ describe SIS::CSV::EnrollmentImporter do
             "TehCourse,user1,basketweaver,,active,"
         )
         expect(@user1.enrollments.size).to eq 0
-        expect(importer.warnings.map(&:last)).to eq ["Improper role \"basketweaver\" for an enrollment"]
+        expect(importer.errors.map(&:last)).to eq ["Improper role \"basketweaver\" for an enrollment"]
       end
 
       it "should create multiple enrollments with different roles having the same base type" do
@@ -653,7 +653,7 @@ describe SIS::CSV::EnrollmentImporter do
         )
         expect(@user1.enrollments.size).to eq 0
         expect(@user2.enrollments.map{|e|[e.type, e.role.name]}).to eq [['StudentEnrollment', 'StudentEnrollment']]
-        expect(importer.warnings.map(&:last)).to eq ["Improper role \"instruc-TOR\" for an enrollment"]
+        expect(importer.errors.map(&:last)).to eq ["Improper role \"instruc-TOR\" for an enrollment"]
       end
 
       it "should enroll with a custom role that overrides an inactive inherited role" do
@@ -681,7 +681,7 @@ describe SIS::CSV::EnrollmentImporter do
             "TehCourse,user1,Pixel Pusher,,active,",
             "OtherCourse,user2,Pixel Pusher,,active,"
         )
-        expect(importer.warnings.map(&:last)).to eq ["Improper role \"Pixel Pusher\" for an enrollment"]
+        expect(importer.errors.map(&:last)).to eq ["Improper role \"Pixel Pusher\" for an enrollment"]
         expect(@user1.enrollments.size).to eq 0
         expect(@user2.enrollments.map{|e|[e.type, e.role.name]}).to eq [['DesignerEnrollment', 'Pixel Pusher']]
       end
@@ -704,7 +704,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(SisPseudonym).to receive(:for).with(user, @account, type: :implicit, require_sis: false).and_return(user.pseudonyms.first)
 
     warnings = []
-    work = SIS::EnrollmentImporter::Work.new(nil, @account, Rails.logger, 1000, warnings)
+    work = SIS::EnrollmentImporter::Work.new(nil, @account, Rails.logger, warnings)
     expect(work).to receive(:root_account_from_id).with('account2').once.and_return(account2)
     expect(SIS::EnrollmentImporter::Work).to receive(:new).with(any_args).and_return(work)
 
@@ -733,15 +733,15 @@ describe SIS::CSV::EnrollmentImporter do
     expect(SisPseudonym).to receive(:for).with(user, @account, type: :implicit, require_sis: false).once.and_return(nil)
 
     warnings = []
-    work = SIS::EnrollmentImporter::Work.new(nil, @account, Rails.logger, 1000, warnings)
+    work = SIS::EnrollmentImporter::Work.new(@account.sis_batches.create!, @account, Rails.logger, warnings)
     expect(work).to receive(:root_account_from_id).with('account2').once.and_return(account2)
     expect(SIS::EnrollmentImporter::Work).to receive(:new).with(any_args).and_return(work)
     # the enrollments
-    importer = process_csv_data(
+    process_csv_data(
         "course_id,root_account,user_id,role,status",
         "test_1,account2,user_1,teacher,active",
     )
-    expect(warnings).to eq ["User account2:user_1 does not have a usable login for this account"]
+    expect(warnings.first.message).to eq "User account2:user_1 does not have a usable login for this account"
     course = @account.courses.where(sis_source_id: 'test_1').first
     expect(course.teachers.to_a).to be_empty
   end
@@ -762,7 +762,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(SisPseudonym).to receive(:for).with(user, @account, type: :implicit, require_sis: false).never
 
     warnings = []
-    work = SIS::EnrollmentImporter::Work.new(nil, @account, Rails.logger, 1000, warnings)
+    work = SIS::EnrollmentImporter::Work.new(nil, @account, Rails.logger, warnings)
     expect(work).to receive(:root_account_from_id).with('account2').once.and_return(nil)
     expect(SIS::EnrollmentImporter::Work).to receive(:new).with(any_args).and_return(work)
     # the enrollments
@@ -789,7 +789,7 @@ describe SIS::CSV::EnrollmentImporter do
     student = Pseudonym.where(:unique_id => "user1").first.user
 
     observer = user_with_pseudonym(:account => @account)
-    student.observers << observer
+    student.linked_observers << observer
 
     process_csv_data_cleanly(
         "course_id,user_id,role,section_id,status,associated_user_id",
@@ -850,8 +850,8 @@ describe SIS::CSV::EnrollmentImporter do
         "course_id,user_id,role,section_id,status,associated_user_id",
         "test_1,student_user,student,,active,",
     )
-    warnings = importer.warnings.map { |r| r.last }
-    expect(warnings).to eq ["Attempted enrolling of deleted user student_user in course test_1"]
+    errors = importer.errors.map { |r| r.last }
+    expect(errors).to eq ["Attempted enrolling of deleted user student_user in course test_1"]
 
     student = Pseudonym.where(:sis_user_id => "student_user").first.user
     expect(student.enrollments.count).to eq 1
@@ -875,8 +875,8 @@ describe SIS::CSV::EnrollmentImporter do
       "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
       "test_1,user_1,teacher,S001,active,,,",
     )
-    warnings = importer.warnings.map { |r| r.last }
-    expect(warnings.first).to include("not a valid section")
+    errors = importer.errors.map { |r| r.last }
+    expect(errors.first).to include("not a valid section")
   end
 
   it "should still work when creating a completed enrollment" do
@@ -933,9 +933,8 @@ describe SIS::CSV::EnrollmentImporter do
                  "c1,u0,student,s1,active",
                  "c1,u1,student,s2,active",
     )
-    warnings = importer.warnings.map { |r| r.last }
-    expect(warnings.first).to include("non-existent section")
-    expect(importer.errors).to be_empty
+    errors = importer.errors.map { |r| r.last }
+    expect(errors.first).to include("non-existent section")
   end
 
   it "associates to the correct accounts and doesn't die for invalid rows" do
@@ -984,9 +983,8 @@ describe SIS::CSV::EnrollmentImporter do
       "c3,s3,v1,student,active", # invalid course_id
       "c2,s2,v1,student,active",
     )
-    expect(importer.errors).to eq []
-    warnings = importer.warnings.map &:last
-    expect(warnings).to eq ["An enrollment referenced a non-existent course c3"]
+    errors = importer.errors.map &:last
+    expect(errors).to eq ["An enrollment referenced a non-existent course c3"]
     a1 = @account.sub_accounts.find_by(sis_source_id: 'a1')
     a2 = @account.sub_accounts.find_by(sis_source_id: 'a2')
     u1 = @account.pseudonyms.active.find_by(sis_user_id: 'u1').user

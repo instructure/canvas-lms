@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
 import InputMixin from 'jsx/external_apps/mixins/InputMixin'

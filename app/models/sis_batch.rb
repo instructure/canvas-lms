@@ -26,11 +26,11 @@ class SisBatch < ActiveRecord::Base
   belongs_to :attachment
   belongs_to :errors_attachment, class_name: 'Attachment'
   has_many :sis_batch_error_files
+  has_many :parallel_importers, inverse_of: :sis_batch
+  has_many :sis_batch_errors, inverse_of: :sis_batch, autosave: false
   belongs_to :generated_diff, class_name: 'Attachment'
   belongs_to :batch_mode_term, class_name: 'EnrollmentTerm'
   belongs_to :user
-
-  before_save :limit_size_of_messages
 
   validates_presence_of :account_id, :workflow_state
   validates_length_of :diffing_data_set_identifier, maximum: 128
@@ -84,6 +84,42 @@ class SisBatch < ActiveRecord::Base
     Attachment.skip_3rd_party_submits(false)
   end
 
+  def self.add_error(csv, message, sis_batch:, row: nil, failure: false, backtrace: nil, row_info: nil)
+    error = build_error(csv, message, row: row, failure: failure, backtrace: backtrace, row_info: row_info, sis_batch: sis_batch)
+    error.save!
+  end
+
+  def self.build_error(csv, message, sis_batch:, row: nil, failure: false, backtrace: nil, row_info: nil)
+    file = csv ? csv[:file] : nil
+    sis_batch.sis_batch_errors.build(root_account: sis_batch.account,
+                                     file: file,
+                                     message: message,
+                                     failure: failure,
+                                     backtrace: backtrace,
+                                     row_info: row_info,
+                                     row: row,
+                                     created_at: Time.zone.now)
+  end
+
+  def self.bulk_insert_sis_errors(errors)
+    errors.each_slice(1000) do |batch|
+      errors_hash = batch.map do |error|
+        {
+          root_account_id: error.root_account_id,
+          created_at: error.created_at,
+          sis_batch_id: error.sis_batch_id,
+          failure: error.failure,
+          file: error.file,
+          message: error.message,
+          backtrace: error.backtrace,
+          row: error.row,
+          row_info: error.row_info
+        }
+      end
+      SisBatchError.bulk_insert(errors_hash)
+    end
+  end
+
   workflow do
     state :initializing
     state :created
@@ -111,21 +147,19 @@ class SisBatch < ActiveRecord::Base
 
   class Aborted < RuntimeError; end
 
-  def add_errors(messages)
-    self.processing_errors = (self.processing_errors || []) + messages
-  end
+  def self.queue_job_for_account(account, run_at=nil)
+    job_args = {:priority => Delayed::LOW_PRIORITY, :max_attempts => 1}
 
-  def add_warnings(messages)
-    self.processing_warnings = (self.processing_warnings || []) + messages
-  end
+    key = use_parallel_importers?(account) ? :strand : :singleton
+    job_args[key] = strand_for_account(account)
 
-  def self.queue_job_for_account(account)
-    process_delay = Setting.get('sis_batch_process_start_delay', '0').to_f
-    job_args = {:singleton => "sis_batch:account:#{Shard.birth.activate { account.id }}",
-                :priority => Delayed::LOW_PRIORITY,
-                :max_attempts => 1}
-    if process_delay > 0
-      job_args[:run_at] = process_delay.seconds.from_now
+    if run_at
+      job_args[:run_at] = run_at
+    else
+      process_delay = Setting.get('sis_batch_process_start_delay', '0').to_f
+      if process_delay > 0
+        job_args[:run_at] = process_delay.seconds.from_now
+      end
     end
 
     work = SisBatch::Work.new(SisBatch, :process_all_for_account, [account])
@@ -190,8 +224,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   def batch_aborted(message)
-    add_errors([[message]])
-    self.save!
+    SisBatch.add_error(nil, message, sis_batch: self)
     raise SisBatch::Aborted
   end
 
@@ -209,17 +242,37 @@ class SisBatch < ActiveRecord::Base
   scope :not_completed, -> { where(workflow_state: %w[initializing created importing cleanup_batch]) }
   scope :succeeded, -> { where(:workflow_state => %w[imported imported_with_messages]) }
 
+  def self.use_parallel_importers?(account)
+    account.feature_enabled?(:sis_imports_refactor)
+  end
+
+  def self.strand_for_account(account)
+    "sis_batch:account:#{Shard.birth.activate { account.id }}"
+  end
+
   def self.process_all_for_account(account)
-    start_time = Time.now
-    loop do
-      batches = account.sis_batches.needs_processing.limit(50).order(:created_at).to_a
-      break if batches.empty?
-      batches.each do |batch|
-        batch.process_without_send_later
-        if Time.now - start_time > Setting.get('max_time_per_sis_batch', 60).to_i
-          # requeue the job to continue processing more batches
-          queue_job_for_account(account)
-          return
+    if use_parallel_importers?(account)
+      if account.sis_batches.importing.exists?
+        delay = Setting.get('sis_batch_recheck_delay', 5.minutes).to_i
+        queue_job_for_account(account, delay.seconds.from_now) # requeue another job to check a little later
+      else
+        batch_to_run = account.sis_batches.needs_processing.order(:created_at).first
+        if batch_to_run
+          batch_to_run.process_without_send_later
+        end
+      end
+    else
+      start_time = Time.now
+      loop do
+        batches = account.sis_batches.needs_processing.limit(50).order(:created_at).to_a
+        break if batches.empty?
+        batches.each do |batch|
+          batch.process_without_send_later
+          if Time.now - start_time > Setting.get('max_time_per_sis_batch', 60).to_i
+            # requeue the job to continue processing more batches
+            queue_job_for_account(account)
+            return
+          end
         end
       end
     end
@@ -245,8 +298,15 @@ class SisBatch < ActiveRecord::Base
     download_zip
     generate_diff
 
-    importer = SIS::CSV::Import.process(self.account, :files => [@data_file.path], :batch => self, :override_sis_stickiness => options[:override_sis_stickiness], :add_sis_stickiness => options[:add_sis_stickiness], :clear_sis_stickiness => options[:clear_sis_stickiness])
-    finish importer.finished
+    use_parallel = self.class.use_parallel_importers?(self.account)
+    import_class = use_parallel ? SIS::CSV::ImportRefactored : SIS::CSV::Import
+    importer = import_class.process(self.account,
+                                        files: [@data_file.path],
+                                        batch: self,
+                                        override_sis_stickiness: options[:override_sis_stickiness],
+                                        add_sis_stickiness: options[:add_sis_stickiness],
+                                        clear_sis_stickiness: options[:clear_sis_stickiness])
+    finish importer.finished unless use_parallel
   end
 
   def generate_diff
@@ -289,21 +349,30 @@ class SisBatch < ActiveRecord::Base
     @data_file = nil
     return self if workflow_state == 'aborted'
     remove_previous_imports if self.batch_mode? && import_finished
-    compile_all_errors
+    import_finished = !self.sis_batch_errors.failed.exists? if import_finished
     finalize_workflow_state(import_finished)
+    write_errors_to_file
+    populate_old_warnings_and_errors
     self.progress = 100
     self.ended_at = Time.now.utc
     self.save!
+
+    if self.class.use_parallel_importers?(account)
+      # set waiting jobs as available - or queue another job if there are none
+      if Delayed::Job.where(:strand => self.class.strand_for_account(account), :locked_by => nil).update_all(:run_at => Time.now.utc) == 0
+        self.class.queue_job_for_account(account)
+      end
+    end
   end
 
   def finalize_workflow_state(import_finished)
     if import_finished
       return if workflow_state == 'aborted'
       self.workflow_state = :imported
-      self.workflow_state = :imported_with_messages if messages?
+      self.workflow_state = :imported_with_messages if self.sis_batch_errors.exists?
     else
       self.workflow_state = :failed
-      self.workflow_state = :failed_with_messages if messages?
+      self.workflow_state = :failed_with_messages if self.sis_batch_errors.exists?
     end
   end
 
@@ -333,9 +402,9 @@ class SisBatch < ActiveRecord::Base
     end
   end
 
-  def remove_non_batch_courses(courses, total_rows)
+  def remove_non_batch_courses(courses, total_rows, current_row)
     # delete courses that weren't in this batch, in the selected term
-    current_row = 0
+    current_row ||= 0
     courses.find_each do |course|
       course.clear_sis_stickiness(:workflow_state)
       course.skip_broadcasts = true
@@ -366,7 +435,7 @@ class SisBatch < ActiveRecord::Base
 
   def remove_non_batch_sections(sections, total_rows, current_row)
     section_count = 0
-    current_row = 0 unless current_row
+    current_row ||= 0
     # delete sections who weren't in this batch, whose course was in the selected term
     sections.find_each do |section|
       section.destroy
@@ -393,15 +462,24 @@ class SisBatch < ActiveRecord::Base
 
   def remove_non_batch_enrollments(enrollments, total_rows, current_row)
     enrollment_count = 0
-    current_row = 0 unless current_row
+    current_row ||= 0
     # delete enrollments for courses that weren't in this batch, in the selected term
-    enrollments.find_each do |enrollment|
-      enrollment.destroy
-      enrollment_count += 1
-      current_row += 1
+    enrollments.find_in_batches do |batch|
+      if account.feature_enabled?(:sis_imports_refactor)
+        count = Enrollment::BatchStateUpdater.destroy_batch(batch)
+        enrollment_count += count
+        current_row += count
+      else
+        batch.each do |enrollment|
+          enrollment.destroy
+          enrollment_count += 1
+          current_row += 1
+        end
+      end
       self.fast_update_progress(current_row.to_f/total_rows * 100)
     end
     self.data[:counts][:batch_enrollments_deleted] = enrollment_count
+    current_row
   end
 
   def remove_previous_imports
@@ -419,9 +497,9 @@ class SisBatch < ActiveRecord::Base
       enrollments = non_batch_enrollments_scope
 
       count = detect_changes(count, courses, enrollments, sections)
-      row = remove_non_batch_courses(courses, count) if courses
+      row = remove_non_batch_enrollments(enrollments, count, row) if enrollments
       row = remove_non_batch_sections(sections, count, row) if sections
-      remove_non_batch_enrollments(enrollments, count, row) if enrollments
+      remove_non_batch_courses(courses, count, row) if courses
     rescue SisBatch::Aborted
       return self.reload
     end
@@ -469,12 +547,12 @@ class SisBatch < ActiveRecord::Base
   def as_json(options={})
     self.options ||= {} # set this to empty hash if it does not exist so options[:stuff] doesn't blow up
     data = {
+      "id" => self.id,
       "created_at" => self.created_at,
       "started_at" => self.started_at,
       "ended_at" => self.ended_at,
       "updated_at" => self.updated_at,
       "progress" => self.progress,
-      "id" => self.id,
       "workflow_state" => self.workflow_state,
       "data" => self.data,
       "batch_mode" => self.batch_mode,
@@ -493,33 +571,36 @@ class SisBatch < ActiveRecord::Base
     data
   end
 
-  def self.max_messages
-    Setting.get('sis_batch_max_messages', '50').to_i
-  end
-
-  private
-
-  def messages?
-    self.errors_attachment_id?
-  end
-
-  def compile_all_errors
-    write_warnings_and_errors_to_file
-    all_errors = Set.new
-    return unless self.sis_batch_error_files.exists?
-    self.sis_batch_error_files.each do |errors|
-      CSV.foreach(errors.attachment.open) do |row|
-        next if row.first.start_with?('There were ')
-        all_errors << row
-      end
+  def populate_old_warnings_and_errors
+    fail_count = self.sis_batch_errors.failed.count
+    warning_count = self.sis_batch_errors.warnings.count
+    self.processing_errors = self.sis_batch_errors.failed.limit(24).pluck(:file, :message)
+    self.processing_warnings = self.sis_batch_errors.warnings.limit(24).pluck(:file, :message)
+    if fail_count > 24
+      self.processing_errors << ["and #{fail_count - 24} more errors that were not included",
+                                 "Download the error file to see all errors."]
     end
-    write_all_errors(all_errors)
+    if warning_count > 24
+      self.processing_warnings << ["and #{warning_count - 24} more warnings that were not included",
+                                   "Download the error file to see all warnings."]
+    end
+    self.data ||= {}
+    self.data[:counts] ||= {}
+    self.data[:counts][:error_count] = fail_count
+    self.data[:counts][:warning_count] = warning_count
   end
 
-  def write_all_errors(errors)
+  def write_errors_to_file
+    return unless self.sis_batch_errors.exists?
     file = temp_error_file_path
     CSV.open(file, "w") do |csv|
-      errors.to_a.each do |row|
+      csv << %w(sis_import_id file message row)
+      self.sis_batch_errors.find_each do |error|
+        row = []
+        row << error.sis_batch_id
+        row << error.file
+        row << error.message
+        row << error.row
         csv << row
       end
     end
@@ -530,68 +611,10 @@ class SisBatch < ActiveRecord::Base
     )
   end
 
-  def cleanup_error_files_when_finished
-    return unless self.errors_attachment_id?
-    cleanup_error_files
-  end
-
-  def cleanup_error_files
-    Attachment.connection.after_transaction_commit do
-      atts = Attachment.where(id: self.sis_batch_error_files.select(:attachment_id)).order(:id).to_a
-      atts.each do |a|
-        a.reload
-        a.make_childless
-        a.destroy_content unless a.root_attachment_id?
-      end
-      self.sis_batch_error_files.scope.delete_all
-      Attachment.where(id: atts).delete_all
-    end
-  rescue => e
-    # just in case
-    Canvas::Errors.capture(e, {type: :sis_import, during_tests: false})
-  end
-
-  def write_warnings_and_errors_to_file
-    error_count = processing_errors&.size || 0
-    warning_count = processing_warnings&.size || 0
-    return unless error_count > 0 || warning_count > 0
-    file = temp_error_file_path
-    CSV.open(file, "w") do |csv|
-      processing_warnings.each {|row| csv << row}
-      processing_errors.each {|row| csv << row}
-    end
-    self.sis_batch_error_files.create(
-      attachment: SisBatch.create_data_attachment(
-        self,
-        Rack::Test::UploadedFile.new(file, 'csv', true),
-        "errors_and_warnings.csv"
-      )
-    )
-  end
-
   def temp_error_file_path
     temp = Tempfile.open([self.global_id.to_s + '_processing_warnings_and_errors' + Time.zone.now.to_s, '.csv'])
     file = temp.path
     temp.close!
     file
   end
-
-  def limit_size_of_messages
-    max_messages = SisBatch.max_messages
-    %w[processing_warnings processing_errors].each do |field|
-      write_warnings_and_errors_to_file unless messages?
-      next unless self.send("#{field}_changed?") && (self.send(field).try(:size) || 0) > max_messages
-      limit_message = case field
-                      when "processing_warnings"
-                        t 'errors.too_many_warnings', "There were %{count} more warnings",
-                          count: (processing_warnings.size - max_messages + 1)
-                      when "processing_errors"
-                        t 'errors.too_many_errors', "There were %{count} more errors",
-                          count: (processing_errors.size - max_messages + 1)
-                      end
-      self.send("#{field}=", self.send(field)[0, max_messages-1] + [['', limit_message]])
-    end
-    true
-  end
-
 end

@@ -18,9 +18,9 @@
 
 import { Grid } from 'vendor/slickgrid';
 import 'jqueryui/sortable';
-import CellEditorFactory from '../../../gradezilla/default_gradebook/slick-grid/CellEditorFactory';
-import CellFormatterFactory from '../../../gradezilla/default_gradebook/slick-grid/CellFormatterFactory';
-import ColumnHeaderRenderer from '../../../gradezilla/default_gradebook/slick-grid/ColumnHeaderRenderer';
+import CellEditorFactory from './editors/CellEditorFactory'
+import CellFormatterFactory from './formatters/CellFormatterFactory'
+import ColumnHeaderRenderer from './headers/ColumnHeaderRenderer'
 import Columns from './Columns';
 import Events from './Events';
 import GridSupport from './GridSupport';

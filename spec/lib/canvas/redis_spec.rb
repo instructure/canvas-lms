@@ -20,6 +20,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 if Canvas.redis_enabled?
 describe "Canvas::Redis" do
+  it "doesn't marshall" do
+    Canvas.redis.set('test', 1)
+    expect(Canvas.redis.get('test')).to eq '1'
+  end
+
   describe "locking" do
     it "should succeed if the lock isn't taken" do
       expect(Canvas::Redis.lock('test1')).to eq true

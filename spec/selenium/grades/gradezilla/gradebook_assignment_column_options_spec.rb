@@ -95,7 +95,7 @@ describe "Gradezilla - Assignment Column Options" do
       Gradezilla.click_assignment_popover_enter_grade_as(@assignment.id, 'Percentage')
       Gradezilla::Cells.edit_grade(@course.students[1], @assignment, 8)
 
-      expect { Gradezilla::Cells.get_grade(@course.students[1], @assignment) }.to become '80%'
+      expect { Gradezilla::Cells.get_grade(@course.students[1], @assignment) }.to become '8%'
     end
 
     it "active grading scheme displays a check", priority: "2", test_id: 3415924 do
@@ -127,7 +127,7 @@ describe "Gradezilla - Assignment Column Options" do
       # excuse the student by entering 'EX' in the cell
       Gradezilla::Cells.edit_grade(@course.students[2],@assignment, 'EX')
 
-      expect(Gradezilla::Cells.get_grade(@course.students[2], @assignment)).to eq 'Excused'
+      expect { Gradezilla::Cells.get_grade(@course.students[2], @assignment) }.to become 'Excused'
     end
   end
 end

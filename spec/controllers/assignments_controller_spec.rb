@@ -421,8 +421,9 @@ describe AssignmentsController do
     it "should not show locked external tool assignments" do
       user_session(@student)
 
-      @assignment.lock_at = Time.now - 1.week
-      @assignment.unlock_at = Time.now + 1.week
+      @assignment.lock_at = 1.week.ago
+      @assignment.due_at = 10.days.ago
+      @assignment.unlock_at = 2.weeks.ago
       @assignment.submission_types = 'external_tool'
       @assignment.save
       # This is usually a ContentExternalTool, but it only needs to
@@ -818,6 +819,27 @@ describe AssignmentsController do
         user_session(@teacher)
         get 'edit', params: {:course_id => @course.id, :id => @assignment.id}
         expect(assigns[:js_env][:dummy]).to be nil
+      end
+    end
+
+    describe 'js_env ANONYMOUS_GRADING_ENABLED' do
+      before(:each) do
+        @course.account.enable_feature!(:anonymous_moderated_marking)
+        user_session(@teacher)
+      end
+
+      it 'is false when the anonymous marking flag is not enabled' do
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+
+        expect(assigns[:js_env][:ANONYMOUS_GRADING_ENABLED]).to be false
+      end
+
+      it 'is true when the anonymous marking flag is enabled' do
+        @course.enable_feature!(:anonymous_marking)
+
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+
+        expect(assigns[:js_env][:ANONYMOUS_GRADING_ENABLED]).to be true
       end
     end
   end

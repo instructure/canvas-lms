@@ -48,6 +48,16 @@ export default class ChildContent extends Component {
     this.props.realRef(this)
   }
 
+  componentDidUpdate (prevProps /* , prevState */) {
+    // it's awkward to reach outside the component to give the Modal's trigger
+    // focus when it closes but the way our opening is decoupled from the button
+    // through 'router' makes that impossible
+    if (prevProps.isChangeLogOpen && !this.props.isChangeLogOpen ) {
+      const infoButton = document.querySelector('.blueprint_information_button')
+      if (infoButton) infoButton.focus()
+    }
+  }
+
   clearRoutes = () => {
     this.props.routeTo('#!/')
   }

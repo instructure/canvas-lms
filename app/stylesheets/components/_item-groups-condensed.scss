@@ -263,7 +263,7 @@
   padding: 9px;
 
   .ig-header {
-    padding-left: 0px;
+    padding-#{direction(left)}: 0px;
   }
 
   .ig-row {

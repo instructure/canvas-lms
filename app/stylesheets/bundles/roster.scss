@@ -48,7 +48,7 @@
 }
 
 .user-list__item-details {
-  margin-left: 10px;
+  margin-#{direction(left)}: 10px;
 }
 
 .token_input {
@@ -61,7 +61,7 @@
   padding: 0;
   li {
     @include name_bubbles;
-    clear: left;
+    clear: direction(left);
     margin-top: $ic-sp/2;
   }
 }

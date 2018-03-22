@@ -128,6 +128,12 @@ describe ApplicationController do
       expect { controller.js_env(:REAL_SLIM_SHADY => 'poser') }.to raise_error("js_env key REAL_SLIM_SHADY is already taken")
     end
 
+    it "should overwrite a key if told explicitly to do so" do
+      controller.js_env :REAL_SLIM_SHADY => 'please stand up'
+      controller.js_env({:REAL_SLIM_SHADY => 'poser'}, true)
+      expect(controller.js_env[:REAL_SLIM_SHADY]).to eq 'poser'
+    end
+
     it 'gets appropriate settings from the root account' do
       root_account = double(global_id: 1, feature_enabled?: false, open_registration?: true, settings: {})
       allow(HostUrl).to receive_messages(file_host: 'files.example.com')
@@ -1076,11 +1082,12 @@ describe CoursesController do
   describe "set_js_wiki_data" do
     before :each do
       course_with_teacher_logged_in :active_all => true
+      @course.wiki_pages.create!(:title => 'blah').set_as_front_page!
+      @course.reload
       @course.default_view = "wiki"
       @course.show_announcements_on_home_page = true
       @course.home_page_announcement_limit = 5
       @course.save!
-      @course.wiki_pages.create!(:title => 'blah').set_as_front_page!
     end
 
     it "should populate js_env with course_home setting" do
@@ -1148,6 +1155,114 @@ describe CoursesController do
       expect(data['is_master_course_child_content']).to be_truthy
       expect(data['restricted_by_master_course']).to be_truthy
       expect(data['master_course_restrictions']).to eq({:content => true})
+    end
+  end
+
+  context 'validate_scopes' do
+    let(:account_with_feature_enabled) do
+      account = double()
+      allow(account).to receive(:feature_enabled?).with(:api_token_scoping).and_return(true)
+      account
+    end
+
+    let(:account_with_feature_disabled) do
+      account = double()
+      allow(account).to receive(:feature_enabled?).with(:api_token_scoping).and_return(false)
+      account
+    end
+
+    context 'api_token_scoping feature enabled' do
+      before do
+        controller.instance_variable_set(:@domain_root_account, account_with_feature_enabled)
+      end
+
+      it 'does not affect session based api requests' do
+        allow(controller).to receive(:request).and_return(double({
+          params: {}
+        }))
+        expect(controller.send(:validate_scopes)).to be_nil
+      end
+
+      it 'does not affect api requests that use an access token with an unscoped developer key' do
+        user = user_model
+        developer_key = DeveloperKey.create!
+        token = AccessToken.create!(user: user, developer_key: developer_key)
+        controller.instance_variable_set(:@access_token, token)
+        allow(controller).to receive(:request).and_return(double({
+          params: {},
+          method: 'GET'
+        }))
+        expect(controller.send(:validate_scopes)).to be_nil
+      end
+
+      it 'raises AccessTokenScopeError if scopes do not match' do
+        user = user_model
+        developer_key = DeveloperKey.create!(require_scopes: true)
+        token = AccessToken.create!(user: user, developer_key: developer_key)
+        controller.instance_variable_set(:@access_token, token)
+        allow(controller).to receive(:request).and_return(double({
+          params: {},
+          method: 'GET'
+        }))
+        expect { controller.send(:validate_scopes) }.to raise_error(AuthenticationMethods::AccessTokenScopeError)
+      end
+
+      it 'allows adequately scoped requests through' do
+        user = user_model
+        developer_key = DeveloperKey.create!(require_scopes: true)
+        token = AccessToken.create!(user: user, developer_key: developer_key, scopes: ['url:GET|/api/v1/accounts'])
+        controller.instance_variable_set(:@access_token, token)
+        allow(controller).to receive(:request).and_return(double({
+          params: {},
+          method: 'GET',
+          path: '/api/v1/accounts'
+        }))
+        expect(controller.send(:validate_scopes)).to be_nil
+      end
+
+      it 'allows HEAD requests' do
+        user = user_model
+        developer_key = DeveloperKey.create!(require_scopes: true)
+        token = AccessToken.create!(user: user, developer_key: developer_key, scopes: ['url:GET|/api/v1/accounts'])
+        controller.instance_variable_set(:@access_token, token)
+        allow(controller).to receive(:request).and_return(double({
+          params: {},
+          method: 'HEAD',
+          path: '/api/v1/accounts'
+        }))
+        expect(controller.send(:validate_scopes)).to be_nil
+      end
+
+      it 'strips includes for adequately scoped requests' do
+        user = user_model
+        developer_key = DeveloperKey.create!(require_scopes: true)
+        token = AccessToken.create!(user: user, developer_key: developer_key, scopes: ['url:GET|/api/v1/accounts'])
+        controller.instance_variable_set(:@access_token, token)
+        allow(controller).to receive(:request).and_return(double({
+          method: 'GET',
+          path: '/api/v1/accounts'
+        }))
+        params = double()
+        expect(params).to receive(:delete).with(:include)
+        expect(params).to receive(:delete).with(:includes)
+        allow(controller).to receive(:params).and_return(params)
+        controller.send(:validate_scopes)
+      end
+    end
+
+    context 'api_token_scoping feature disabled' do
+      before do
+        controller.instance_variable_set(:@domain_root_account, account_with_feature_disabled)
+      end
+
+      after do
+        controller.instance_variable_set(:@domain_root_account, nil)
+      end
+
+      it "does nothing" do
+        expect(controller).not_to receive(:api_request?)
+        controller.send(:validate_scopes)
+      end
     end
   end
 end

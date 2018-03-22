@@ -32,8 +32,7 @@ module BlankSlateProtection
         $stderr.puts "about performance, use `:once`. `:all` hooks are dangerous because"
         $stderr.puts "they can leave around garbage that affects later specs"
       else
-        $stderr.puts "\e[31mError: Don't create records outside the rspec lifecycle!"
-        $stderr.puts "See: " + location + "\e[0m"
+        $stderr.puts "\e[31mError: Don't create records outside the rspec lifecycle! See: " + location + "\e[0m"
         $stderr.puts
         $stderr.puts "\e[33mTIP:\e[0m move this into a `before`, `let` or `it`. Otherwise it will exist"
         $stderr.puts "before *any* specs start, and possibly be deleted/modified before the"

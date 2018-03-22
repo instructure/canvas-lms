@@ -17,7 +17,6 @@
 #
 
 # @API Grading Periods
-# @beta
 # Manage grading periods
 #
 # @model GradingPeriod
@@ -57,6 +56,11 @@
 #           "description": "A weight value that contributes to the overall weight of a grading period set which is used to calculate how much assignments in this period contribute to the total grade",
 #           "type": "integer",
 #           "example": "33.33"
+#         },
+#         "is_closed": {
+#           "description": "If true, the grading period's close_date has passed.",
+#           "example": true,
+#           "type": "boolean"
 #         }
 #       }
 #    }
@@ -66,7 +70,6 @@ class GradingPeriodsController < ApplicationController
   before_action :get_context
 
   # @API List grading periods
-  # @beta
   #
   # Returns the paginated list of grading periods for the current course.
   #
@@ -96,7 +99,6 @@ class GradingPeriodsController < ApplicationController
   end
 
   # @API Get a single grading period
-  # @beta
   #
   # Returns the grading period with the given id
   #
@@ -114,7 +116,6 @@ class GradingPeriodsController < ApplicationController
   end
 
   # @API Update a single grading period
-  # @beta
   #
   # Update an existing grading period.
   #
@@ -148,7 +149,6 @@ class GradingPeriodsController < ApplicationController
   end
 
   # @API Delete a grading period
-  # @beta
   #
   # <b>204 No Content</b> response code is returned if the deletion was
   # successful.

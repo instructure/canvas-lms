@@ -40,4 +40,9 @@ module CustomDateHelpers
   def calendar_time_string(time)
     time_string(time).sub(/m\z/, "").strip
   end
+
+  def format_time_for_datepicker(time)
+    date = format_date_for_view(time.to_date, :medium)
+    "#{date}#{time_string(time)}"
+  end
 end

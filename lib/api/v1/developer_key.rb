@@ -39,7 +39,9 @@ module Api::V1::DeveloperKey
         hash['last_used_at'] = key.last_used_at
         hash['vendor_code'] = key.vendor_code
       end
+
       hash['account_name'] = key.account_name
+      hash['visible'] = key.visible
       hash['id'] = key.global_id
     end
   end

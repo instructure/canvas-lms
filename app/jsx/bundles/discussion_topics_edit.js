@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import $ from 'jquery'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import 'grading_standards'
 import DiscussionTopic from 'compiled/models/DiscussionTopic'
 import Announcement from 'compiled/models/Announcement'
 import DueDateList from 'compiled/models/DueDateList'
@@ -25,10 +28,7 @@ import AssignmentGroupCollection from 'compiled/collections/AssignmentGroupColle
 import SectionCollection from 'compiled/collections/SectionCollection'
 import splitAssetString from 'compiled/str/splitAssetString'
 import LockManager from '../blueprint_courses/apps/LockManager'
-import React from 'react'
-import ReactDOM from 'react-dom'
 import SectionsAutocomplete from '../shared/SectionsAutocomplete'
-import 'grading_standards'
 
 const lockManager = new LockManager()
 lockManager.init({ itemType: 'discussion_topic', page: 'edit' })
@@ -40,10 +40,46 @@ const model = new (isAnnouncement ? Announcement : DiscussionTopic)(ENV.DISCUSSI
 model.urlRoot = ENV.DISCUSSION_TOPIC.URL_ROOT
 const assignment = model.get('assignment')
 
+const announcementsLocked = ENV.ANNOUNCEMENTS_LOCKED
 const sectionList = new SectionCollection(ENV.SECTION_LIST)
 const dueDateList = new DueDateList(assignment.get('assignment_overrides'), sectionList, assignment)
 
 const [contextType] = splitAssetString(ENV.context_asset_string)
+
+function renderSectionsAutocomplete (view) {
+  if (sectionSpecificEnabled()) {
+    const container = document.querySelector('#sections_autocomplete_root')
+    if (container) {
+      const gcs = view.groupCategorySelector
+      const isGradedDiscussion = view.gradedChecked()
+      const isGroupDiscussion = (gcs !== undefined) ? gcs.groupDiscussionChecked() : false
+      const enableDiscussionOptions = () => {
+        view.enableGradedCheckBox()
+        if (gcs !== undefined) {
+          view.groupCategorySelector.enableGroupDiscussionCheckbox()
+        }
+      }
+      const disableDiscussionOptions = () => {
+        view.disableGradedCheckBox()
+        if (gcs !== undefined) {
+          view.groupCategorySelector.disableGroupDiscussionCheckbox()
+        }
+      }
+
+      ReactDOM.render(
+        <SectionsAutocomplete
+          selectedSections={ENV.SELECTED_SECTION_LIST}
+          disabled={isGradedDiscussion || isGroupDiscussion}
+          disableDiscussionOptions={disableDiscussionOptions}
+          enableDiscussionOptions={enableDiscussionOptions}
+          sections={ENV.SECTION_LIST}
+        />
+        , container
+      )
+    }
+  }
+}
+
 const view = new EditView({
   model,
   permissions: ENV.DISCUSSION_TOPIC.PERMISSIONS,
@@ -56,8 +92,19 @@ const view = new EditView({
       availabilityDatesReadonly: !!lockedItems.availability_dates
     })
   },
-  lockedItems: model.id ? lockedItems : {}  // if no id, creating a new discussion
+  lockedItems: model.id ? lockedItems : {},  // if no id, creating a new discussion
+  announcementsLocked
 })
+view.setRenderSectionsAutocomplete(() => renderSectionsAutocomplete(view))
+
+function sectionSpecificEnabled() {
+  if (!ENV.context_asset_string.startsWith("course")) {
+    return false
+  }
+
+  const isAnnouncement = ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement
+  return isAnnouncement ? ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED : ENV.SECTION_SPECIFIC_DISCUSSIONS_ENABLED
+}
 
 if ((contextType === 'courses') && !isAnnouncement && ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT) {
   const agc = new AssignmentGroupCollection();
@@ -65,20 +112,16 @@ if ((contextType === 'courses') && !isAnnouncement && ENV.DISCUSSION_TOPIC.PERMI
   agc.contextAssetString = ENV.context_asset_string;
   view.assignmentGroupCollection = agc;
 }
+
+
 $(() => {
   view.render().$el.appendTo('#content')
   document.querySelector('#discussion-title').focus()
-  const container = document.querySelector('#sections_autocomplete_root')
-  const sectionSpecificAnnouncement = ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement
-                                        && ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED
-                                        && ENV.context_asset_string.startsWith("course")
-  if (container && sectionSpecificAnnouncement) {
-    ReactDOM.render(
-      <SectionsAutocomplete
-        selectedSections={ENV.SELECTED_SECTION_LIST}
-        sections={ENV.SECTION_LIST}/>
-      , container)
-  }
+
+  // This needs to be run in the next tick, so that the backbone views are all
+  // properly created/rendered thus can be used to checked if this is a graded
+  // or group discussions.
+  setTimeout(() => renderSectionsAutocomplete(view))
 })
 
 export default view

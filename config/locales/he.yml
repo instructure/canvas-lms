@@ -1139,6 +1139,7 @@ he:
       tab_quotas: מכסות
       tab_reports: דוחות
       tab_settings: הגדרות
+      transifex_message: "הצטרפו ל{קהילת מתרגמי קנבס] (%{transifex_url})"
       turnitin_comments_help: "הערות אלו תוצגנה לתלמידים כאשר הם מגישים משימה באמצעות Turnitin"
       turnitin_pledge_help: "תלמידים צריכים לסמן תיבה המאשרת כי הם מסכימים עם הצהרה זו"
       turnitin_settings_title: "הגדרות Turnitin"

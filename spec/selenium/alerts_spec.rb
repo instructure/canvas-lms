@@ -161,6 +161,7 @@ describe "Alerts" do
 
   context "recipients" do
     it "should hide the add link when all recipients are added" do
+      skip_if_chrome('fragile in chrome')
       get "/accounts/#{@context.id}/settings"
 
       find('#tab-alerts-link').click
@@ -174,7 +175,8 @@ describe "Alerts" do
       alert.find_all('.add_recipients_line select option').each do
         link.click
       end
-      expect(find('.alert.new .add_recipient_link')).not_to be_displayed
+      wait_for_ajaximations
+      expect(f('.add_recipients_line')).not_to contain_link('Recipient')
     end
 
     it "should not show the add link when all recipients are already there" do

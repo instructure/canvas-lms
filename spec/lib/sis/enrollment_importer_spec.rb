@@ -40,15 +40,15 @@ module SIS
       let(:messages) { [] }
 
       before do
-        EnrollmentImporter.new(Account.default, {}).process(messages, 2) do |importer|
+        EnrollmentImporter.new(Account.default, {batch: Account.default.sis_batches.create!}).process(messages) do |importer|
           importer.add_enrollment(enrollment)
         end
       end
 
-      it { expect(messages.first).to include("User not found for enrollment") }
-      it { expect(messages.first).to include("User ID: #{user_id}") }
-      it { expect(messages.first).to include("Course ID: #{course_id}") }
-      it { expect(messages.first).to include("Section ID: #{section_id}") }
+      it { expect(messages.first.message).to include("User not found for enrollment") }
+      it { expect(messages.first.message).to include("User ID: #{user_id}") }
+      it { expect(messages.first.message).to include("Course ID: #{course_id}") }
+      it { expect(messages.first.message).to include("Section ID: #{section_id}") }
     end
 
     context 'with a valid user ID but invalid course and section IDs' do
@@ -60,7 +60,7 @@ module SIS
         @pseudonym.sis_user_id = @student.id
         @pseudonym.save!
         Account.default.pseudonyms << @pseudonym
-        EnrollmentImporter.new(Account.default, {}).process(@messages, 2) do |importer|
+        EnrollmentImporter.new(Account.default, {batch: Account.default.sis_batches.create!}).process(@messages) do |importer|
           an_enrollment = SIS::Models::Enrollment.new(
             course_id: 1,
             section_id: 2,
@@ -75,19 +75,19 @@ module SIS
       end
 
       it 'alerts user of nonexistent course/section for user enrollment' do
-        expect(@messages.last).to include("Neither course nor section existed for user enrollment ")
+        expect(@messages.last.message).to include("Neither course nor section existed for user enrollment ")
       end
 
       it 'provides a course ID for the offending row' do
-        expect(@messages.last).to include('Course ID: 1,')
+        expect(@messages.last.message).to include('Course ID: 1,')
       end
 
       it 'provides a section ID for the offending row' do
-        expect(@messages.last).to include('Section ID: 2,')
+        expect(@messages.last.message).to include('Section ID: 2,')
       end
 
       it 'provides a user ID for the offending row' do
-        expect(@messages.last).to include("User ID: #{@student.pseudonyms.last.user_id}")
+        expect(@messages.last.message).to include("User ID: #{@student.pseudonyms.last.user_id}")
       end
     end
 

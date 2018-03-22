@@ -603,7 +603,8 @@ class Gradezilla
       assignment_header_menu_element(assignment_id).click
     end
 
-    def click_assignment_header_menu_element(menuitem)
+    def click_assignment_header_menu_element(assignment_id, menuitem)
+      assignment_header_menu_element(assignment_id).click
       menu_item_id = ""
 
       if menuitem =~ /(message(\-?\s?student)?)/i
@@ -616,6 +617,7 @@ class Gradezilla
         menu_item_id = 'assignment-muter'
       elsif menuitem =~ /(download(\-?\s?submission)?)/i
         menu_item_id = 'download-submissions'
+
       end
       assignment_header_menu_item_element(menu_item_id).click
     end
@@ -660,8 +662,7 @@ class Gradezilla
 
     # assignment mute toggle
     def toggle_assignment_muting(assignment_id)
-      click_assignment_header_menu(assignment_id)
-      click_assignment_header_menu_element('mute')
+      click_assignment_header_menu_element(assignment_id, 'mute')
       dialog_save_mute_setting.click
       wait_for_ajaximations
     end

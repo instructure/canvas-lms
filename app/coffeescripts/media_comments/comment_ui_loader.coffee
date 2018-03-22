@@ -17,9 +17,8 @@
 
 define [
   'jquery',
-  'i18n!media_comments'
   'jst/MediaComments'
-], ($, I18n, mediaCommentsTemplate) ->
+], ($, mediaCommentsTemplate) ->
 
   ###
   # Loads html partial for display within the uploader

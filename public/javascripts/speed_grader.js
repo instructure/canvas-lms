@@ -22,13 +22,13 @@ import ReactDOM from 'react-dom';
 import Alert from '@instructure/ui-core/lib/components/Alert';
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
 import TextArea from '@instructure/ui-core/lib/components/TextArea';
-import MGP from 'jsx/speed_grader/gradingPeriod';
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper';
 import quizzesNextSpeedGrading from 'jsx/grading/quizzesNextSpeedGrading';
 import StatusPill from 'jsx/grading/StatusPill';
 import JQuerySelectorCache from 'jsx/shared/helpers/JQuerySelectorCache';
 import numberHelper from 'jsx/shared/helpers/numberHelper';
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
+import SpeedGraderSettingsMenu from 'jsx/speed_grader/SpeedGraderSettingsMenu'
 import studentViewedAtTemplate from 'jst/speed_grader/student_viewed_at';
 import submissionsDropdownTemplate from 'jst/speed_grader/submissions_dropdown';
 import speechRecognitionTemplate from 'jst/speed_grader/speech_recognition';
@@ -124,7 +124,6 @@ let $submission_late_notice
 let $submission_not_newest_notice
 let $enrollment_inactive_notice
 let $enrollment_concluded_notice
-let $closed_gp_notice
 let $submission_files_container
 let $submission_files_list
 let $submission_attachment_viewed_at
@@ -425,20 +424,26 @@ function setupHeader () {
     addEvents () {
       this.elements.nav.click($.proxy(this.toAssignment, this));
       this.elements.mute.link.click($.proxy(this.onMuteClick, this));
-      this.elements.settings.form.submit(this.submitSettingsForm.bind(this));
-      this.elements.settings.link.click(this.showSettingsModal.bind(this));
+
+      if (!ENV.anonymous_moderated_marking_enabled) {
+        this.elements.settings.form.submit(this.submitSettingsForm.bind(this));
+        this.elements.settings.link.click(this.showSettingsModal.bind(this));
+      }
       this.elements.keyinfo.icon.click(this.keyboardShortcutInfoModal.bind(this));
     },
     createModals () {
-      this.elements.settings.form.dialog({
-        autoOpen: false,
-        modal: true,
-        resizable: false,
-        width: 400
-      }).fixDialogButtons();
-      // FF hack - when reloading the page, firefox seems to "remember" the disabled state of this
-      // button. So here we'll manually re-enable it.
-      this.elements.settings.form.find(".submit_button").removeAttr('disabled')
+      if (!ENV.anonymous_moderated_marking_enabled) {
+        this.elements.settings.form.dialog({
+          autoOpen: false,
+          modal: true,
+          resizable: false,
+          width: 400
+        }).fixDialogButtons();
+        // FF hack - when reloading the page, firefox seems to "remember" the disabled state of this
+        // button. So here we'll manually re-enable it.
+        this.elements.settings.form.find(".submit_button").removeAttr('disabled')
+      }
+
       this.elements.mute.modal.dialog({
         autoOpen: false,
         buttons: [{
@@ -881,12 +886,7 @@ function initKeyCodes () {
 function initGroupAssignmentMode() {
   if (jsonData.GROUP_GRADING_MODE) {
     gradeeLabel = groupLabel;
-    disableGroupCommentCheckbox();
   }
-}
-
-function disableGroupCommentCheckbox() {
-  $("#submission_group_comment").prop({checked: true, disabled: true});
 }
 
 function refreshGrades (cb) {
@@ -963,8 +963,9 @@ function unexcuseSubmission (grade, submission, assignment) {
 function rubricAssessmentToPopulate () {
   const assessment = getSelectedAssessment();
   const userIsNotAssessor = !!assessment && assessment.assessor_id !== ENV.current_user_id;
+  const userCanAssess = isAssessmentEditableByMe(assessment);
 
-  if (userIsNotAssessor) {
+  if (userIsNotAssessor && !userCanAssess) {
     return { ...assessment, data: [] };
   }
 
@@ -1278,7 +1279,7 @@ EG = {
       $full_width_container.removeClass("with_enrollment_notice");
       $enrollment_inactive_notice.hide();
       $enrollment_concluded_notice.hide();
-      $closed_gp_notice.hide();
+      selectors.get('#closed_gp_notice').hide()
 
       EG.setGradeReadOnly(true); // disabling now will keep it from getting undisabled unintentionally by disableWhileLoading
       if (ENV.grading_role == 'moderator' && this.currentStudent.submission_state == 'not_graded') {
@@ -1829,16 +1830,18 @@ EG = {
     );
 
     var isConcluded = EG.isStudentConcluded(this.currentStudent.id);
-    var isClosedForStudent = MGP.assignmentClosedForStudent(this.currentStudent, jsonData);
     $enrollment_concluded_notice.showIf(isConcluded);
-    $closed_gp_notice.showIf(isClosedForStudent);
+
+    const gradingPeriod = jsonData.gradingPeriods[(submissionHolder || {}).grading_period_id]
+    const isClosedForSubmission = !!gradingPeriod && gradingPeriod.is_closed
+    selectors.get('#closed_gp_notice').showIf(isClosedForSubmission)
     SpeedgraderHelpers.setRightBarDisabled(isConcluded);
     EG.setGradeReadOnly((typeof submissionHolder != "undefined" &&
                          submissionHolder.submission_type === "online_quiz") ||
                         isConcluded ||
-                        (isClosedForStudent && !isAdmin));
+                        (isClosedForSubmission && !isAdmin));
 
-    if (isConcluded || isClosedForStudent) {
+    if (isConcluded || isClosedForSubmission) {
       $full_width_container.addClass("with_enrollment_notice");
     }
   },
@@ -2408,9 +2411,6 @@ EG = {
     EG.showDiscussion();
     renderCommentTextArea();
     $add_a_comment.find(":input").prop("disabled", false);
-    if (jsonData.GROUP_GRADING_MODE) {
-      disableGroupCommentCheckbox();
-    }
 
     if (draftComment) {
       // Show a different message when auto-saving a draft comment
@@ -2746,11 +2746,6 @@ EG = {
   }
 };
 
-function getAssignmentOverrides() {
-  return $.getJSON("/api/v1/courses/" + ENV.course_id +
-                   "/assignments/" + ENV.assignment_id + "/overrides");
-}
-
 function getGradingPeriods() {
   var dfd = $.Deferred();
   // treating failure as a success here since grading periods 404 when not
@@ -2765,13 +2760,9 @@ function getGradingPeriods() {
   return dfd;
 }
 
-function gotData(assignmentOverridesResponse, gradingPeriods, speedGraderJsonResponse) {
+function gotData(gradingPeriods, speedGraderJsonResponse) {
   var speedGraderJSON = speedGraderJsonResponse[0];
-  var assignmentOverrides = assignmentOverridesResponse[0];
-
-  speedGraderJSON.gradingPeriods = gradingPeriods;
-  speedGraderJSON.assignmentOverrides = assignmentOverrides;
-
+  speedGraderJSON.gradingPeriods = _.indexBy(gradingPeriods, 'id')
   window.jsonData = speedGraderJSON;
   EG.jsonReady();
 }
@@ -2808,7 +2799,6 @@ function setupSelectors() {
   $avatar_image = $('#avatar_image')
   $average_score = $('#average_score')
   $average_score_wrapper = $('#average-score-wrapper')
-  $closed_gp_notice = $('#closed_gp_notice')
   $comment_attachment_blank = $('#comment_attachment_blank').removeAttr('id').detach()
   $comment_attachment_input_blank = $('#comment_attachment_input_blank').detach()
   $comment_blank = $('#comment_blank').removeAttr('id').detach()
@@ -2876,8 +2866,22 @@ function setupSelectors() {
   header = setupHeader()
 }
 
+function renderSettingsMenu () {
+  const props =  {
+    showModerationMenuItem: ENV.grading_role === 'moderator',
+    showHelpMenuItem: ENV.show_help_menu_item
+  }
+
+  const settingsMenu = <SpeedGraderSettingsMenu {...props} />
+  ReactDOM.render(settingsMenu, document.getElementById('speedgrader-settings'))
+}
+
 export default {
   setup () {
+    if (ENV.anonymous_moderated_marking_enabled) {
+      renderSettingsMenu()
+    }
+
     setupSelectors()
 
     function registerQuizzesNext (overriddenShowSubmission) {
@@ -2890,7 +2894,7 @@ export default {
     const speedGraderJSONUrl = `${window.location.pathname}.json${window.location.search}`;
     const speedGraderJsonDfd = $.ajaxJSON(speedGraderJSONUrl, 'GET', null, null, speedGraderJSONErrorFn);
 
-    $.when(getAssignmentOverrides(), getGradingPeriods(), speedGraderJsonDfd).then(gotData);
+    $.when(getGradingPeriods(), speedGraderJsonDfd).then(gotData);
 
     //run the stuff that just attaches event handlers and dom stuff, but does not need the jsonData
     $(document).ready(function() {

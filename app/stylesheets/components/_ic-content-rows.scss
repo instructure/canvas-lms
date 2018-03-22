@@ -16,10 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- @import "components/ic-unread-badge";
+@import 'components/ic-unread-badge';
 
 .ic-item-row__select-col + .ic-item-row__author-col {
-  margin-left: 11px;
+  margin-#{direction(left)}: 11px;
+}
+
+.ic-item-row__icon-col-student{
+  display: flex;
+  align-items: center;
+  margin-#{direction(left)}: 11px;
+}
+
+.ic-item-row__icon-col-teacher{
+  margin-#{direction(right)}: -11px;
 }
 
 .ic-item-row {
@@ -29,16 +39,13 @@
   justify-content: space-between;
   align-items: center;
   position: relative;
+}
 
-  &.ic-item-row__unread:before {
-    content: '';
-    display: block;
-    position: absolute;
-    left: -25px;
-    width: 12px;
-    height: 12px;
-    background: $electric;
-    border-radius: 50%;
+.ic-item-row__content-link {
+  display: block;
+  @include ic-focus-base;
+  &:focus {
+    @include ic-focus-variant;
   }
 }
 
@@ -48,14 +55,14 @@
   min-width: 0;
   flex-grow: 1;
   margin: 0 22px;
-  overflow: hidden;
 
   &:first-child {
-    margin-left: 0;
+    margin-#{direction(left)}: 0;
   }
 
   & > .ic-item-row__content-link {
-    &, &:link {
+    &,
+    &:link {
       color: inherit;
     }
     &:hover {
@@ -63,17 +70,24 @@
     }
   }
 
+  .ic-item-row__content-link-container {
+    width: auto;
+  }
+
   h3 {
     font-weight: 600;
     font-size: 1rem;
     margin-bottom: 4px;
+    overflow: hidden;
   }
 
   p {
     margin: 0;
   }
 
-  p, h4, .ic-announcement-row__content {
+  p,
+  h4,
+  .ic-announcement-row__content {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -87,10 +101,10 @@
   max-width: 230px;
   display: flex;
   flex-direction: column;
-  text-align: right;
+  text-align: direction(right);
 
   .ic-item-row__meta-actions {
-    height: 20px;
+    height: 23px;
   }
 
   .ic-item-row__meta-content {
@@ -104,6 +118,30 @@
   }
 }
 
+.icon-blueprint {
+  padding: 8px 8px 0px 8px;
+  margin-bottom: 18px;
+}
+
+.icon-blueprint-lock {
+  padding: 8px 8px 0px 8px;
+  margin-bottom: 18px;
+}
+
+.ic-discussion-row {
+  .ic-item-row__meta-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    .ic-item-row__master-course-lock {
+      &:focus { @include ic-focus-variant; }
+      margin-left: 2px;
+      margin-right: 2px;
+    }
+  }
+}
+
 .ic-announcement-row {
   .ic-announcement-row__content {
     p:not(:first-of-type) {
@@ -112,13 +150,11 @@
   }
 
   .ic-item-row__meta-actions {
-    .ic-unread-badge {
-      transform: translateY(-2px);
-    }
-
     .ic-item-row__master-course-lock {
+      &:focus { @include ic-focus-variant; }
       vertical-align: text-bottom;
-      margin-left: 10px;
+      margin-#{direction(left)}: 10px;
+      margin-#{direction(right)}: 2px;
     }
   }
 
@@ -128,4 +164,10 @@
       font-size: 1.2rem;
     }
   }
+}
+
+.ic-item-row__manage-menu {
+  display: inline-block;
+  margin: 0 -10px;
+  transform: translateY(-5px);
 }

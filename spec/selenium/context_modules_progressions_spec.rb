@@ -97,7 +97,7 @@ describe "context modules" do
       expect(f("#progression_student_#{@students[3].id}_module_#{@module2.id} .status").text).to include("Locked")
     end
 
-    it "should show progression to individual students" do
+    it "should show progression to individual students", priority: "1", test_id: 251029 do
       user_session(@students[1])
       get "/courses/#{@course.id}/modules/progressions"
       expect(f("#progression_students")).not_to be_displayed

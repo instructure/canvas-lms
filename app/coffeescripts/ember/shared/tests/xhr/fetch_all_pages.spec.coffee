@@ -34,6 +34,10 @@ define [
       #  in every setup.
       Ember.testing = false
       fixtures.create()
+      @server = sinon.createFakeServer()
+
+    teardown: ->
+      @server.restore()
 
   test 'passes records through by default', (assert) ->
     start = assert.async()

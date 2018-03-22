@@ -134,6 +134,15 @@ a[class^=icon-] {
     font-style: normal !important;
   }
 
+  // flip all the arrows around in RTL
+  @if $direction == 'rtl' {
+    &[class*=right],
+    &[class*=left] {
+      &:before {
+        transform: scale(-1, 1);
+      }
+    }
+  }
 }
 
 i[class*=icon-], i[class^=icon-] {
@@ -162,7 +171,7 @@ i[class*=icon-], i[class^=icon-] {
 // things look nicer
 a[class*=icon-], a[class^=icon-] {
   &:before {
-    margin-right: 4px;
+    margin-#{direction(right)}: 4px;
     vertical-align: text-bottom;
   }
 }

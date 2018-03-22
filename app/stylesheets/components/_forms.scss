@@ -115,7 +115,7 @@ input + .hint-text {
     margin: 0;
     background-color: lighten($ic-color-neutral, 5%);
     border-top: 1px solid $ic-border-light;
-    text-align: right;
+    text-align: direction(right);
     position: absolute;
     left: 0px;
     right: 0px;

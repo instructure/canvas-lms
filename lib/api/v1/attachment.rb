@@ -19,6 +19,7 @@
 module Api::V1::Attachment
   include Api::V1::Json
   include Api::V1::Locked
+  include Api::V1::Progress
   include Api::V1::User
   include Api::V1::UsageRights
 
@@ -38,6 +39,7 @@ module Api::V1::Attachment
   def attachment_json(attachment, user, url_options = {}, options = {})
     hash = {
       'id' => attachment.id,
+      'uuid' => attachment.uuid,
       'folder_id' => attachment.folder_id,
       'display_name' => attachment.display_name,
       'filename' => attachment.filename,
@@ -68,14 +70,15 @@ module Api::V1::Attachment
     downloadable = !attachment.locked_for?(user, check_policies: true)
 
     if downloadable
-      thumbnail_url = attachment.thumbnail_url
+      # using the multi-parameter form because not every class that mixes in
+      # this api helper also mixes in ApplicationHelper (I'm looking at you,
+      # DiscussionTopic::MaterializedView), and in those cases we need to
+      # include the url_options
+      if attachment.thumbnailable?
+        thumbnail_url = thumbnail_image_url(attachment, attachment.uuid, url_options)
+      end
       if options[:thumbnail_url]
-        # not the same as thumbnail_url above because:
-        # * that one's going to be a direct (and possibly signed) s3, inst-fs,
-        #   etc. link for immediate use.
-        # * this one's a more compact canvas link to be stored for later use;
-        #   it will resolve to the former when accessed
-        url = thumbnail_image_url(attachment)
+        url = thumbnail_url
       else
         h = { :download => '1', :download_frd => '1' }
         h.merge!(:verifier => attachment.uuid) unless options[:omit_verifier_in_app] && (respond_to?(:in_app?, true) && in_app? || @authenticated_with_jwt)
@@ -130,7 +133,7 @@ module Api::V1::Attachment
     if includes.include? "context_asset_string"
       hash['context_asset_string'] = attachment.context.try(:asset_string)
     end
-    if includes.include? 'avatar' && respond_to?(:avatar_json)
+    if includes.include?('avatar') && respond_to?(:avatar_json)
       hash['avatar'] = avatar_json(user, attachment, type: 'attachment')
     end
 
@@ -153,7 +156,7 @@ module Api::V1::Attachment
     if !context.respond_to?(:folders)
       nil
     elsif params[:parent_folder_id]
-      context.folders.find(params[:parent_folder_id])
+      context.folders.active.where(id: params[:parent_folder_id]).first
     elsif params[:parent_folder_path].is_a?(String)
       Folder.assert_path(params[:parent_folder_path], context)
     end
@@ -212,31 +215,29 @@ module Api::V1::Attachment
     return if folder && !authorized_action(folder, @current_user, :manage_contents)
 
     # no permission check required to use the preferred folder
-    folder ||= opts[:folder]
 
+    folder ||= opts[:folder]
     if InstFS.enabled?
-      if params[:url]
-        # TODO: CNVS-39171
-        # * asynchronously tell inst-fs to fetch and store the file, then
-        #   ping api_v1_files_capture_url on success or failure
-        # * return a Progress from this method
-        # * update client and docs to recognize the Progress
-        # * augment api_capture to update the appropriate progress when it creates the file
-        # * allow api_capture to receive an error and fail the appropriate
-        #   Progress instead of creating a file
-        raise NotImplementedError
-      else
-        json = InstFS.upload_preflight_json(
-          context: context,
-          user: @current_user,
-          folder: folder,
-          filename: infer_upload_filename(params),
-          content_type: infer_upload_content_type(params),
-          on_duplicate: infer_on_duplicate(params),
-          quota_exempt: !opts[:check_quota],
-          capture_url: api_v1_files_capture_url
-        )
+      progress_json = if params[:url]
+        progress = ::Progress.new(context: @current_user, tag: :upload_via_url)
+        progress.start
+        progress.save!
+        progress_json(progress, @current_user, session)
       end
+
+      json = InstFS.upload_preflight_json(
+        context: context,
+        user: logged_in_user,
+        acting_as: @current_user,
+        folder: folder,
+        filename: infer_upload_filename(params),
+        content_type: infer_upload_content_type(params),
+        on_duplicate: infer_on_duplicate(params),
+        quota_exempt: !opts[:check_quota],
+        capture_url: api_v1_files_capture_url,
+        target_url: params[:url],
+        progress_json: progress_json
+      )
     else
       @attachment = Attachment.new
       @attachment.shard = context.shard
@@ -247,7 +248,7 @@ module Api::V1::Attachment
       @attachment.folder = folder
       @attachment.set_publish_state_for_usage_rights
       @attachment.file_state = 'deleted'
-      @attachment.workflow_state = 'unattached'
+      @attachment.workflow_state = opts[:temporary] ? 'unattached_temporary' : 'unattached'
       @attachment.modified_at = Time.now.utc
       @attachment.save!
 

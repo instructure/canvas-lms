@@ -37,11 +37,11 @@ $discussion-dark-text: $ic-color-dark;
 }
 
 .right-align {
-  text-align: right;
+  text-align: direction(right);
 }
 
 .pull-right {
-  float: right;
+  float: direction(right);
 }
 
 .show-if-collapsed {
@@ -66,10 +66,10 @@ $discussion-dark-text: $ic-color-dark;
     background: $ic-color-light;
     border: 1px solid $ic-border-light;
     padding: 0;
-    margin: $ic-sp 0 $ic-sp*2 $ic-sp*2;
+    margin: direction-sides($ic-sp 0 $ic-sp*2 $ic-sp*2);
 
     &.collapsed, .entry {
-      margin: 16px 0 16px 18px;
+      margin: direction-sides(16px 0 16px 18px);
     }
 
     .deleted-discussion-entry {
@@ -126,14 +126,14 @@ $discussion-dark-text: $ic-color-dark;
   background: white;
   padding: 6px;
   .al-trigger {
-    margin-left: 10px;
-    margin-right: 0px;
+    margin-#{direction(left)}: 10px;
+    margin-#{direction(right)}: 0px;
     margin-top: 0px;
   }
 }
 
 .new-and-total-badge {
-  float: right;
+  float: direction(right);
 }
 
 .discussion-section {
@@ -146,7 +146,7 @@ $discussion-dark-text: $ic-color-dark;
     margin: 0;
     a {
       display: inline-block;
-      margin-left: 3px
+      margin-#{direction(left)}: 3px
     }
   }
   .icon-peer-review {
@@ -171,7 +171,7 @@ $discussion-dark-text: $ic-color-dark;
 
 .toggle-wrapper {
   margin: 0 11px;
-  text-align: right;
+  text-align: direction(right);
 }
 
 .due_date_wrapper {
@@ -240,7 +240,7 @@ $discussion-dark-text: $ic-color-dark;
   height: 10px;
   padding: 12px;
   display: block;
-  left: -($ic-sp*3);
+  #{direction(left)}: -($ic-sp*3);
 }
 
 .discussion-read-state {
@@ -258,7 +258,7 @@ $discussion-dark-text: $ic-color-dark;
 }
 
 .discussion-read-state-btn {
-  left: -32px;
+  #{direction(left)}: -32px;
 }
 
 .discussion-reply-action, .discussion-rate-action {
@@ -273,7 +273,7 @@ $discussion-dark-text: $ic-color-dark;
 }
 
 .discussion-rate-action {
-  margin-left: 12px;
+  margin-#{direction(left)}: 12px;
 }
 
 .discussion-rate-action--checked {
@@ -315,8 +315,8 @@ $discussion-dark-text: $ic-color-dark;
 
 .entry-content {
   .avatar {
-    float: left;
-    margin: 3px 8px 0 0;
+    float: direction(left);
+    margin: direction-sides(3px 8px 0 0);
   }
 }
 
@@ -368,7 +368,7 @@ $discussion-dark-text: $ic-color-dark;
   padding: 0;
   margin: 0;
   li {
-    padding: 0 0 0 20px;
+    padding: direction-sides(0 0 0 20px);
     margin: 0;
     background: transparent url(/images/messages/attach-gray.png) left center no-repeat;
   }
@@ -386,11 +386,11 @@ $discussion-dark-text: $ic-color-dark;
 }
 
 .discussion-reply-attachments-container {
-  float: left;
+  float: direction(left);
 }
 
 .discussion-reply-buttons {
-  float: right;
+  float: direction(right);
 }
 
 .message-notification, .notification {
@@ -421,13 +421,13 @@ $discussion-dark-text: $ic-color-dark;
   font-weight: bold;
   @include clearfix;
   a {
-    float: left;
+    float: direction(left);
     text-transform: uppercase;
     &:after {
       content: "";
       display: inline-block;
       position: relative;
-      left: 4px;
+      #{direction(left)}: 4px;
       top: 2px;
       bottom: 2px;
       height: 0px;
@@ -440,7 +440,7 @@ $discussion-dark-text: $ic-color-dark;
   }
   .new-and-total-badge {
     margin-top: 0;
-    float: right;
+    float: direction(right);
   }
 }
 
@@ -458,7 +458,7 @@ $discussion-dark-text: $ic-color-dark;
   @include fontSize(12px);
 
   .new-and-total-badge {
-    float: left;
+    float: direction(left);
     margin: 0;
   }
 }
@@ -479,7 +479,7 @@ $discussion-dark-text: $ic-color-dark;
 }
 
 .discussion_subentries {
-  padding: $ic-sp 0 $ic-sp $ic-sp;
+  padding: direction-sides($ic-sp 0 $ic-sp $ic-sp);
 }
 
 .discussion-page-nav {
@@ -488,7 +488,7 @@ $discussion-dark-text: $ic-color-dark;
     margin: 0;
     padding-bottom: 20px;
     list-style: none;
-    text-align: right;
+    text-align: direction(right);
     height: 1em;
   }
   li {
@@ -496,11 +496,11 @@ $discussion-dark-text: $ic-color-dark;
   }
   .item {
     display: block;
-    padding: 4px 12px 4px 8px;
-    border-right: 1px solid $border;
+    padding: direction-sides(4px 12px 4px 8px);
+    border-#{direction(right)}: 1px solid $border;
   }
   li:last-child .item {
-    border-right: none;
+    border-#{direction(right)}: none;
   }
 }
 
@@ -538,7 +538,7 @@ $discussion-dark-text: $ic-color-dark;
 }
 
 .add-side-comment-wrap {
-  padding: 10px 10px 10px 41px;
+  padding: direction-sides(10px 10px 10px 41px);
   border-top: solid 1px #e4e5e7;
 }
 
@@ -574,7 +574,7 @@ $discussion-dark-text: $ic-color-dark;
     content: "";
     position: absolute;
     top: 2px;
-    left: 50%;
+    #{direction(left)}: 50%;
     height: 0px;
     width: 0px;
     border-style: solid;
@@ -646,12 +646,12 @@ $discussion-dark-text: $ic-color-dark;
     + .discussion-entry-reply-area { margin-top: -1px; }
   }
   .admin-links {
-    text-align: left;
+    text-align: direction(left);
     float: none;
     display: inline;
   }
   .al-trigger {
-    margin-left: 4px;
+    margin-#{direction(left)}: 4px;
   }
   .headerBar {
     min-height: 53px;
@@ -673,8 +673,8 @@ $discussion-dark-text: $ic-color-dark;
     border-color: $ic-border-light;
     background: $lightBackground;
     min-height: 53px;
-    margin-left: $ic-header-primary-width + ($ic-sp*2);
-    margin-right: $ic-sp*2;
+    margin-#{direction(left)}: $ic-header-primary-width + ($ic-sp*2);
+    margin-#{direction(right)}: $ic-sp*2;
     box-shadow: 0 2px 3px rgba(black, 0.1);
   }
   [disabled] {
@@ -688,7 +688,7 @@ $discussion-dark-text: $ic-color-dark;
   width: 100%;
   th {
     font-weight: bold;
-    text-align: left;
+    text-align: direction(left);
   }
 }
 

@@ -20,6 +20,7 @@ module Api::V1::SisImport
   include Api::V1::Json
   include Api::V1::Attachment
   include Api::V1::User
+  include Api::V1::SisImportError
 
   def sis_imports_json(batches, user, session)
     batches.map do |f|
@@ -27,7 +28,7 @@ module Api::V1::SisImport
     end
   end
 
-  def sis_import_json(batch, user, session)
+  def sis_import_json(batch, user, session, includes: [])
     json = api_json(batch, user, session)
     if batch.errors_attachment_id
       # skip permission checks since the context is a sis_import it will fail permission checks
@@ -44,4 +45,3 @@ module Api::V1::SisImport
     json
   end
 end
-

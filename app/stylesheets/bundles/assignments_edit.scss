@@ -54,7 +54,7 @@
 /* for labels */
 div.form-column-left {
   width: 145px;
-  text-align: right;
+  text-align: direction(right);
   margin-top: 20px;
   display: inline-block;
   vertical-align: top;
@@ -70,7 +70,7 @@ div.form-column-left {
 #discussion_point_change_warning {
   margin-top: 15px;
   margin-bottom: 0px;
-  margin-left: 180px;
+  margin-#{direction(left)}: 180px;
   display: inline-block;
   display: none;
 }
@@ -88,7 +88,7 @@ div.form-column-right, div.overrides-column-right {
     padding: 15px 0px;
     margin-top: 20px;
     select, .subtitle {
-      margin-left: 15px;
+      margin-#{direction(left)}: 15px;
     }
   }
 
@@ -103,7 +103,7 @@ div.form-column-right, div.overrides-column-right {
 
   label:not(.ic-Label), label.date_field {
     margin: 0px;
-    padding: 10px 0px 10px 40px;
+    padding: direction-sides(10px 0px 10px 40px);
   }
 
   .subtitle {
@@ -116,28 +116,28 @@ div.form-column-right, div.overrides-column-right {
   /* nested form els within a group */
   .nested {
     label.checkbox, label.radio {
-      padding-left: 60px;
+      padding-#{direction(left)}: 60px;
     }
     select, a, .explanation {
-      margin-left: 40px;
+      margin-#{direction(left)}: 40px;
     }
     input[type=text] {
-      margin-left: 60px;
+      margin-#{direction(left)}: 60px;
     }
     button.Button {
-      margin: 7px 0px 0px 40px;
+      margin: direction-sides(7px 0px 0px 40px);
     }
     .nest {
-      padding-left: 20px;
+      padding-#{direction(left)}: 20px;
     }
   }
 }
 
 #similarity_detection_tools .form-column-right {
   #report_visibility_picker_label {
-    padding: 0px 0px 10px 17px !important;
+    padding: direction-sides(0px 0px 10px 17px) !important;
   }
-  padding-left: 4px;
+  padding-#{direction(left)}: 4px;
   iframe.tool_launch {
     margin: 15px 0px 0px 0px;
     width: 100%;

@@ -23,7 +23,7 @@ class ActiveRecord::Base
   public :write_attribute
 
   class << self
-    delegate :distinct_on, :find_ids_in_batches, to: :all
+    delegate :distinct_on, :find_ids_in_batches, :explain, to: :all
 
     def find_ids_in_ranges(opts={}, &block)
       opts.reverse_merge!(:loose => true)
@@ -402,6 +402,8 @@ class ActiveRecord::Base
         # The collation level of 3 is the default, but is explicitly specified here and means that
         # case, accents and base characters are all taken into account when creating a collation key
         # for a string - more at https://pgxn.org/dist/pg_collkey/0.5.1/
+        # if you change these arguments, you need to rebuild all db indexes that use them,
+        # and you should also match the settings with Canvas::ICU::Collator and natcompare.js
         "#{schema}.collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 3, true)"
       else
         "CAST(LOWER(replace(#{col}, '\\', '\\\\')) AS bytea)"
@@ -643,11 +645,20 @@ end
 
 module UsefulFindInBatches
   def find_in_batches(options = {}, &block)
-    # already in a transaction (or transactions don't matter); cursor is fine
-    if can_use_cursor? && !options[:start]
+    # prefer copy unless we're in a transaction (which would be bad,
+    # because we might open a separate connection in the block, and not
+    # see the contents of our current transaction)
+    if connection.open_transactions == 0 && !options[:start] && eager_load_values.empty?
+      self.activate { |r| r.find_in_batches_with_copy(options, &block) }
+    elsif should_use_cursor? && !options[:start] && eager_load_values.empty?
       self.activate { |r| r.find_in_batches_with_cursor(options, &block) }
     elsif find_in_batches_needs_temp_table?
-      raise ArgumentError.new("GROUP and ORDER are incompatible with :start, as is an explicit select without the primary key") if options[:start]
+      if options[:start]
+        raise ArgumentError.new("GROUP and ORDER are incompatible with :start, as is an explicit select without the primary key")
+      end
+      unless eager_load_values.empty?
+        raise ArgumentError.new("GROUP and ORDER are incompatible with `eager_load`, as is an explicit select without the primary key")
+      end
       self.activate { |r| r.find_in_batches_with_temp_table(options, &block) }
     else
       super
@@ -658,12 +669,7 @@ ActiveRecord::Relation.prepend(UsefulFindInBatches)
 
 module LockForNoKeyUpdate
   def lock(lock_type = true)
-    if lock_type == :no_key_update
-      postgres_9_3_or_above = connection.adapter_name == 'PostgreSQL' &&
-        connection.send(:postgresql_version) >= 90300
-      lock_type = true
-      lock_type = 'FOR NO KEY UPDATE' if postgres_9_3_or_above
-    end
+    lock_type = 'FOR NO KEY UPDATE' if lock_type == :no_key_update
     super(lock_type)
   end
 end
@@ -701,12 +707,8 @@ ActiveRecord::Relation.class_eval do
   end
   private :find_in_batches_needs_temp_table?
 
-  def can_use_cursor?
-    (connection.adapter_name == 'PostgreSQL' &&
-      (Shackles.environment == :slave ||
-        connection.readonly? ||
-        (!Rails.env.test? && connection.open_transactions > 0) ||
-        in_transaction_in_test?))
+  def should_use_cursor?
+    (Shackles.environment == :slave || connection.readonly?)
   end
 
   def find_in_batches_with_cursor(options = {})
@@ -734,8 +736,83 @@ ActiveRecord::Relation.class_eval do
     end
   end
 
+  def find_in_batches_with_copy(options = {})
+    # implement the start option as an offset
+    return offset(options[:start]).find_in_batches_with_copy(options.merge(start: 0)) if options[:start].to_i != 0
+
+    limited_query = limit(0).to_sql
+    full_query = "COPY (#{to_sql}) TO STDOUT"
+    conn = connection
+    full_query = conn.annotate_sql(full_query) if defined?(Marginalia)
+    pool = conn.pool
+    # remove the connection from the pool so that any queries executed
+    # while we're running this will get a new connection
+    pool.remove(conn)
+
+
+    # make sure to log _something_, even if the dbtime is totally off
+    conn.send(:log, full_query, "#{klass.name} Load") do
+      # set up all our metadata based on a dummy query (COPY doesn't return any metadata)
+      result = conn.raw_connection.exec(limited_query)
+      type_map = conn.raw_connection.type_map_for_results.build_column_map(result)
+      deco = PG::TextDecoder::CopyRow.new(type_map: type_map)
+      # see PostgreSQLAdapter#exec_query
+      types = {}
+      fields = result.fields
+      fields.each_with_index do |fname, i|
+        ftype = result.ftype i
+        fmod  = result.fmod i
+        types[fname] = conn.send(:get_oid_type, ftype, fmod, fname)
+      end
+
+      column_types = types.dup
+      columns_hash.each_key { |k| column_types.delete k }
+
+      includes = includes_values + preload_values
+
+      rows = []
+      batch_size = options[:batch_size] || 1000
+
+      conn.raw_connection.copy_data(full_query, deco) do
+        while (row = conn.raw_connection.get_copy_data)
+          rows << row
+          if rows.size == batch_size
+            batch = ActiveRecord::Result.new(fields, rows, types).map { |record| instantiate(record, column_types) }
+            ActiveRecord::Associations::Preloader.new.preload(batch, includes) if includes
+            yield batch
+            rows = []
+          end
+        end
+      end
+      # return the connection now, in case there was only 1 batch, we can avoid a separate connection if the block needs it
+      pool.synchronize do
+        pool.send(:adopt_connection, conn)
+        pool.checkin(conn)
+      end
+      pool = nil
+
+      unless rows.empty?
+        batch = ActiveRecord::Result.new(fields, rows, types).map { |record| instantiate(record, column_types) }
+        ActiveRecord::Associations::Preloader.new.preload(batch, includes) if includes
+        yield batch
+      end
+    end
+    nil
+  ensure
+    if pool
+      # put the connection back in the pool for reuse
+      pool.synchronize do
+        pool.send(:adopt_connection, conn)
+        pool.checkin(conn)
+      end
+    end
+  end
+
   def find_in_batches_with_temp_table(options = {})
-    can_do_it = Rails.env.production? || ActiveRecord::Base.in_migration || ActiveRecord::Base.in_transaction_in_test?
+    can_do_it = Rails.env.production? ||
+      ActiveRecord::Base.in_migration ||
+      (!Rails.env.test? && connection.open_transactions > 0) ||
+      ActiveRecord::Base.in_transaction_in_test?
     raise "find_in_batches_with_temp_table probably won't work outside a migration
            and outside a transaction. Unfortunately, it's impossible to automatically
            determine a better way to do it that will work correctly. You can try
@@ -1241,10 +1318,9 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     case self.adapter_name
     when 'PostgreSQL'
       foreign_key_name = foreign_key_name(from_table, options)
-      query = supports_delayed_constraint_validation? ? 'convalidated' : 'conname'
       schema = @config[:use_qualified_names] ? quote(shard.name) : 'current_schema()'
-      value = select_value("SELECT #{query} FROM pg_constraint INNER JOIN pg_namespace ON pg_namespace.oid=connamespace WHERE conname='#{foreign_key_name}' AND nspname=#{schema}")
-      if supports_delayed_constraint_validation? && value == 'f'
+      value = select_value("SELECT convalidated FROM pg_constraint INNER JOIN pg_namespace ON pg_namespace.oid=connamespace WHERE conname='#{foreign_key_name}' AND nspname=#{schema}")
+      if value == 'f'
         execute("ALTER TABLE #{quote_table_name(from_table)} DROP CONSTRAINT #{quote_table_name(foreign_key_name)}")
       elsif value
         return
@@ -1258,12 +1334,33 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     end
   end
 
-  def remove_foreign_key_if_exists(table, options = {})
-    begin
-      remove_foreign_key(table, options)
-    rescue ActiveRecord::StatementInvalid => e
-      raise unless e.message =~ /PG(?:::)?Error: ERROR:.+does not exist/
+  def find_foreign_key(from_table, to_table, column: nil)
+    column ||= "#{to_table.to_s.singularize}_id"
+    foreign_keys(from_table).find do |key|
+      key.to_table == to_table.to_s && key.column == column.to_s
+    end&.name
+  end
+
+  def alter_constraint(table, constraint, new_name: nil, deferrable: nil)
+    raise ArgumentError, "must specify deferrable or a new name" if new_name.nil? && deferrable.nil?
+
+    # can't rename and alter options in the same statement, so do the rename first
+    if new_name && new_name != constraint
+      execute("ALTER TABLE #{quote_table_name(table)}
+               RENAME CONSTRAINT #{quote_column_name(constraint)} TO #{quote_column_name(new_name)}")
+      constraint = new_name
     end
+
+    unless deferrable.nil?
+      options = deferrable ? "DEFERRABLE" : "NOT DEFERRABLE"
+      execute("ALTER TABLE #{quote_table_name(table)}
+               ALTER CONSTRAINT #{quote_column_name(constraint)} #{options}")
+    end
+  end
+
+  def remove_foreign_key_if_exists(table, options = {})
+    return unless foreign_key_exists?(table, options)
+    remove_foreign_key(table, options)
   end
 end
 
@@ -1276,13 +1373,10 @@ ActiveRecord::Associations::CollectionAssociation.class_eval do
 end
 
 module UnscopeCallbacks
-  method = CANVAS_RAILS5_0 ? "__run_callbacks__" : "run_callbacks"
-  module_eval <<-RUBY, __FILE__, __LINE__ + 1
-    def #{method}(*args)
-      scope = self.class.all.klass.unscoped
-      scope.scoping { super }
-    end
-  RUBY
+  def run_callbacks(*args)
+    scope = self.class.all.klass.unscoped
+    scope.scoping { super }
+  end
 end
 ActiveRecord::Base.send(:include, UnscopeCallbacks)
 
@@ -1340,8 +1434,7 @@ module SkipTouchCallbacks
   end
 
   module BelongsTo
-    def touch_record(o, *args)
-      name = CANVAS_RAILS5_0 ? args[1] : args[2]
+    def touch_record(o, _changes, _foreign_key, name, *)
       return if o.class.touch_callbacks_skipped?(name)
       super
     end
@@ -1374,7 +1467,7 @@ module DupArraysInMutationTracker
     change
   end
 end
-ActiveRecord::AttributeMutationTracker.prepend(DupArraysInMutationTracker) unless CANVAS_RAILS5_0
+ActiveRecord::AttributeMutationTracker.prepend(DupArraysInMutationTracker)
 
 module IgnoreOutOfSequenceMigrationDates
   def current_migration_number(dirname)
@@ -1392,3 +1485,38 @@ Autoextend.hook(:"ActiveRecord::Generators::MigrationGenerator",
                 singleton: true,
                 method: :prepend,
                 optional: true)
+
+module ExplainAnalyze
+  def exec_explain(queries, analyze: false) # :nodoc:
+    str = queries.map do |sql, binds|
+      msg = "EXPLAIN #{"ANALYZE " if analyze}for: #{sql}"
+      unless binds.empty?
+        msg << " "
+        msg << binds.map { |attr| render_bind(attr) }.inspect
+      end
+      msg << "\n"
+      msg << connection.explain(sql, binds, analyze: analyze)
+    end.join("\n")
+
+    # Overriding inspect to be more human readable, especially in the console.
+    def str.inspect
+      self
+    end
+
+    str
+  end
+
+  def explain(analyze: false)
+    #TODO: Fix for binds.
+    exec_explain(collecting_queries_for_explain do
+      if block_given?
+        yield
+      else
+        # fold in switchman's override
+        self.activate { |relation| relation.send(:exec_queries) }
+      end
+    end, analyze: analyze)
+  end
+end
+ActiveRecord::Relation.prepend(ExplainAnalyze)
+

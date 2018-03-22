@@ -38,6 +38,11 @@ module CC
       ) do |mods_node|
         @course.context_modules.not_deleted.each do |cm|
 
+          # context modules are in order and a pre-req can only reference
+          # a previous module, so just adding as we go is okay
+          mod_migration_id = create_key(cm)
+          module_id_map[cm.id] = mod_migration_id
+
           unless export_object?(cm)
             # if the whole module isn't selected, check to see if a specific item is selected, and make sure that item gets exported
             cm.content_tags.not_deleted.each do |ct|
@@ -49,11 +54,6 @@ module CC
           end
 
           add_exported_asset(cm)
-
-          mod_migration_id = create_key(cm)
-          # context modules are in order and a pre-req can only reference
-          # a previous module, so just adding as we go is okay
-          module_id_map[cm.id] = mod_migration_id
 
           mods_node.module(:identifier=>mod_migration_id) do |m_node|
             m_node.title cm.name

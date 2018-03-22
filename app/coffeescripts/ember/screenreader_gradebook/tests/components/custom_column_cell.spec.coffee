@@ -41,6 +41,8 @@ define [
         @column = Ember.Object.create
           id: '22'
           title: 'Notes'
+          read_only: false
+          is_loading: false
         @student = Ember.Object.create
           id: '45'
         @dataForStudent = [
@@ -68,6 +70,21 @@ define [
 
   test "saveUrl", ->
     equal @component.get('saveURL'), '/api/v1/custom_gradebook_columns/22/45'
+
+  test "disabled is true when column isLoading", ->
+    @component.column.set('isLoading', true)
+    @component.column.set('read_only', false)
+    equal @component.get('disabled'), true
+
+  test "disabled is true when column is read_only", ->
+    @component.column.set('isLoading', false)
+    @component.column.set('read_only', true)
+    equal @component.get('disabled'), true
+
+  test "disabled is false when column is not loading and not read_only", ->
+    @component.column.set('isLoading', false)
+    @component.column.set('read_only', false)
+    equal @component.get('disabled'), false
 
   test "focusOut", (assert) ->
     assert.expect(1)

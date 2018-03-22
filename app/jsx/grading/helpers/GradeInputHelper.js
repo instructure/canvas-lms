@@ -21,7 +21,6 @@ import {gradeToScore, scoreToGrade} from '../../gradebook/GradingSchemeHelper'
 import numberHelper from '../../shared/helpers/numberHelper'
 
 const MAX_PRECISION = 15 // the maximum precision of a score persisted to the database
-const UNGRADED = Object.freeze({enteredAs: null, excused: false, grade: null, score: null})
 
 function precisionOf(value) {
   const parts = value.toString().split('.')
@@ -30,6 +29,16 @@ function precisionOf(value) {
 
 function roundScore(score, precision = MAX_PRECISION) {
   return round(score, precision)
+}
+
+function invalid(value) {
+  return {
+    enteredAs: null,
+    excused: false,
+    grade: value,
+    score: null,
+    valid: false
+  }
 }
 
 function parseAsGradingScheme(value, options) {
@@ -42,19 +51,17 @@ function parseAsGradingScheme(value, options) {
     return null
   }
 
-  const percent = options.pointsPossible ? percentage : 0
-
   return {
     enteredAs: 'gradingScheme',
-    percent,
-    points: options.pointsPossible ? percentage / options.pointsPossible : 0,
+    percent: options.pointsPossible ? percentage : 0,
+    points: options.pointsPossible ? percentage / 100 * options.pointsPossible : 0,
     schemeKey: scoreToGrade(percentage, options.gradingScheme)
   }
 }
 
 function parseAsPercent(value, options) {
   const percentage = numberHelper.parse(value.replace(/[%％﹪٪]/, ''))
-  if (Number.isNaN(percentage)) {
+  if (isNaN(percentage)) {
     return null
   }
 
@@ -63,7 +70,7 @@ function parseAsPercent(value, options) {
 
   if (!options.pointsPossible) {
     points = numberHelper.parse(value)
-    if (Number.isNaN(points)) {
+    if (isNaN(points)) {
       percent = 0
       points = 0
     }
@@ -79,7 +86,7 @@ function parseAsPercent(value, options) {
 
 function parseAsPoints(value, options) {
   const points = numberHelper.parse(value)
-  if (Number.isNaN(points)) {
+  if (isNaN(points)) {
     return null
   }
 
@@ -104,11 +111,12 @@ function parseForGradingScheme(value, options) {
       enteredAs: result.enteredAs,
       excused: false,
       grade: result.schemeKey,
-      score: result.points
+      score: result.points,
+      valid: true
     }
   }
 
-  return UNGRADED
+  return invalid(value)
 }
 
 function parseForPercent(value, options) {
@@ -119,11 +127,12 @@ function parseForPercent(value, options) {
       enteredAs: result.enteredAs,
       excused: false,
       grade: `${result.percent}%`,
-      score: result.points
+      score: result.points,
+      valid: true
     }
   }
 
-  return UNGRADED
+  return invalid(value)
 }
 
 function parseForPoints(value, options) {
@@ -137,43 +146,42 @@ function parseForPoints(value, options) {
       enteredAs: result.enteredAs,
       excused: false,
       grade: `${result.points}`,
-      score: result.points
+      score: result.points,
+      valid: true
     }
   }
 
-  return UNGRADED
+  return invalid(value)
 }
 
 function parseForPassFail(value, options) {
   const cleanValue = value.toLowerCase()
-  const result = {...UNGRADED}
+  const result = {enteredAs: 'passFail', excused: false, grade: cleanValue, valid: true}
 
   if (cleanValue === 'complete') {
-    result.grade = 'complete'
     result.score = options.pointsPossible || 0
-    result.enteredAs = 'passFail'
   } else if (cleanValue === 'incomplete') {
-    result.grade = 'incomplete'
     result.score = 0
-    result.enteredAs = 'passFail'
+  } else {
+    return invalid(value)
   }
 
   return result
 }
 
 export function isExcused(grade) {
-  return `${grade}`.trim() === 'EX'
+  return `${grade}`.trim().toLowerCase() === 'ex'
 }
 
 export function parseTextValue(value, options) {
-  const trimmedValue = `${value}`.trim()
+  const trimmedValue = value != null ? `${value}`.trim() : ''
 
   if (trimmedValue === '') {
-    return UNGRADED
+    return {enteredAs: null, excused: false, grade: null, score: null, valid: true}
   }
 
   if (isExcused(trimmedValue)) {
-    return {enteredAs: 'excused', excused: true, grade: null, score: null}
+    return {enteredAs: 'excused', excused: true, grade: null, score: null, valid: true}
   }
 
   switch (options.enterGradesAs) {
@@ -190,4 +198,32 @@ export function parseTextValue(value, options) {
       return parseForPoints(trimmedValue, options)
     }
   }
+}
+
+export function hasGradeChanged(submission, gradeInfo, options) {
+  if (!gradeInfo.valid) {
+    // the given submission is always assumed to be valid
+    return true
+  }
+
+  if (gradeInfo.excused !== submission.excused) {
+    return true
+  }
+
+  if (gradeInfo.enteredAs === 'gradingScheme') {
+    /*
+     * When the value given is a grading scheme key, it must be compared to
+     * the grade on the submission instead of the score. This avoids updating
+     * the grade when the stored score and interpreted score differ and the
+     * input value was not changed.
+     *
+     * To avoid updating the grade in cases where the stored grade is of a
+     * different type but otherwise equivalent, get the grading data for the
+     * stored grade and compare it to the grading data from the input.
+     */
+    const submissionGradeInfo = parseTextValue(submission.enteredGrade, options)
+    return submissionGradeInfo.grade !== gradeInfo.grade
+  }
+
+  return submission.enteredScore !== gradeInfo.score
 }

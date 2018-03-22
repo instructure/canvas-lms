@@ -1,0 +1,45 @@
+.root {
+  font-family: var(--fontFamily);
+  color: var(--color);
+  box-sizing: border-box;
+  padding: var(--padding);
+  border-bottom: var(--borderWidth) solid var(--borderColor);
+}
+
+.showLabel {
+  margin-left: var(--gutterWidth);
+}
+
+.contentPrimary {
+  margin-bottom: var(--bottomMarginPhoneUp);
+  margin-left: calc(var(--gutterWidth) - var(--buttonPadding)); /* account for the padding inside the button */
+  box-sizing: border-box;
+  min-width: 1px;
+}
+
+.contentSecondary {
+  margin-left: var(--gutterWidth);
+  box-sizing: border-box;
+  min-width: 1px;
+}
+
+[data-media-medium] {
+  &.root {
+    display: flex;
+    align-items: center;
+  }
+
+  .contentPrimary {
+    margin-bottom: 0;
+    flex: 1;
+  }
+
+  .contentSecondary {
+    margin-left: 1rem;
+  }
+}
+
+[data-media-x-large] {
+  &.root {
+  }
+}

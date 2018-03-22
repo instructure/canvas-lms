@@ -59,7 +59,13 @@
 <% css_bundle :profile_edit %>
 
 <% if service_enabled?(:avatars) %>
-  <%= avatar(@user, url: '#', edit: true, class: "profile_pic_link #{@user.avatar_state}", title: t('titles.click_to_change_profile_pic', "Click to change profile pic")) %>
+  <% if @user_data[:can_edit_avatar] %>
+    <%= avatar(@user, url: '#', edit: true, class: "profile_pic_link #{@user.avatar_state}",
+        title: t('titles.click_to_change_profile_pic', "Click to change profile pic"),
+        sr_content: t('Click to change profile picture for %{display_name}', :display_name => @user.short_name)) %>
+  <% else %>
+    <%= avatar(@user, url: nil, edit: false) %>
+  <% end %>
 <% end %>
 <h1 style="padding-top: 0.3em;"><%= t("%{user}'s Settings", :user => @user.short_name) %></h1>
 <div class="clear"></div>

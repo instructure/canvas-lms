@@ -187,19 +187,10 @@ module AccountReports
       param = {}
 
       if start_at
-        param[:start_at] = start_at
-        start = " AND aua.updated_at > :start_at"
+        data = data.where("enrollments.last_activity_at < ? OR enrollments.last_activity_at IS NULL", start_at)
       else
-        start = ""
+        data = data.where("enrollments.last_activity_at IS NULL")
       end
-
-      data = data.
-        where("NOT EXISTS (SELECT user_id, context_id
-                           FROM #{AssetUserAccess.quoted_table_name} aua
-                           WHERE aua.user_id = enrollments.user_id
-                             AND aua.context_id = enrollments.course_id
-                             AND aua.context_type = 'Course'
-                           #{start})", param)
 
       data = data.where(:enrollments => {:course_id => course}) if course
       data = add_term_scope(data, 'c')

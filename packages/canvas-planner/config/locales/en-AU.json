@@ -1,0 +1,206 @@
+{
+  "add_to_do_7def3c37": {
+    "message": "Add To Do"
+  },
+  "all_items_loaded_aa256183": {
+    "message": "All items loaded"
+  },
+  "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
+    "message": "Are you sure you want to delete this planner item?"
+  },
+  "assignmenttype_title_is_complete_813e54f8": {
+    "message": "{ assignmentType } { title } is complete"
+  },
+  "assignmenttype_title_is_incomplete_a1d5fac0": {
+    "message": "{ assignmentType } { title } is incomplete"
+  },
+  "beginning_of_your_to_do_history_61ef2dce": {
+    "message": "Beginning of Your To-Do History"
+  },
+  "canvas_planner_98ed106": {
+    "message": "Canvas Planner"
+  },
+  "close_d634289d": {
+    "message": "Close"
+  },
+  "close_opportunities_popover_f4e50551": {
+    "message": "Close opportunities popover"
+  },
+  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+    "message": "{ count, plural,\n     =0 {# opportunities}\n    one {# opportunity}\n  other {# opportunities}\n}"
+  },
+  "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
+    "message": "{ count, plural,\n    one {Show # completed item}\n  other {Show # completed items}\n}"
+  },
+  "course_8a63b4a3": {
+    "message": "Course"
+  },
+  "course_to_do_bcbbab54": {
+    "message": "{ course } TO DO"
+  },
+  "date_at_time_dbdb1b99": {
+    "message": "{ date } at { time }"
+  },
+  "date_ee500367": {
+    "message": "Date"
+  },
+  "date_is_required_8660ec22": {
+    "message": "Date is required"
+  },
+  "delete_a6efa79d": {
+    "message": "Delete"
+  },
+  "details_98a31b68": {
+    "message": "Details"
+  },
+  "dismiss_opportunityname_5995176f": {
+    "message": "Dismiss { opportunityName }"
+  },
+  "due_5d7267be": {
+    "message": "Due:"
+  },
+  "due_date_8ce289b6": {
+    "message": "DUE: { date }"
+  },
+  "edit_title_72e5a21e": {
+    "message": "Edit { title }"
+  },
+  "error_loading_more_items_3f109d9f": {
+    "message": "Error loading more items"
+  },
+  "error_loading_past_items_2881dbb1": {
+    "message": "Error loading past items"
+  },
+  "excused_cf8792eb": {
+    "message": "Excused"
+  },
+  "failed_to_delete_to_do_64edff49": {
+    "message": "Failed to delete to do"
+  },
+  "failed_to_get_new_activity_17e7ec7c": {
+    "message": "Failed to get new activity"
+  },
+  "failed_to_load_opportunities_52ab6404": {
+    "message": "Failed to load opportunities"
+  },
+  "failed_to_save_to_do_ddc7503b": {
+    "message": "Failed to save to do"
+  },
+  "feedback_6dcc1991": {
+    "message": "Feedback"
+  },
+  "go_to_dashboard_card_view_10398ef6": {
+    "message": "Go to Dashboard Card View"
+  },
+  "graded_25cd3fcd": {
+    "message": "Marked"
+  },
+  "late_2be42b88": {
+    "message": "Late"
+  },
+  "load_more_a36f9cf9": {
+    "message": "Load more"
+  },
+  "load_prior_dates_f2b0f6f0": {
+    "message": "Load prior dates"
+  },
+  "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
+    "message": "Loaded { count, plural,\n     =0{# items}\n    one {# item}\n  other {# items}\n}"
+  },
+  "loading_25990131": {
+    "message": "Loading..."
+  },
+  "loading_past_items_ca499e75": {
+    "message": "Loading past items"
+  },
+  "loading_planner_items_947a813d": {
+    "message": "Loading planner items"
+  },
+  "looks_like_there_isn_t_anything_here_d9bcef49": {
+    "message": "Looks like there isn''t anything here"
+  },
+  "missing_1a256b3b": {
+    "message": "Missing"
+  },
+  "missing_items_for_5ef30cea": {
+    "message": "Missing items for "
+  },
+  "new_activity_8b84847d": {
+    "message": "New Activity"
+  },
+  "new_activity_for_ac84f6e6": {
+    "message": "New activity for "
+  },
+  "next_month_749b1778": {
+    "message": "Next Month"
+  },
+  "no_due_dates_assigned_e8f5bac8": {
+    "message": "No Due Dates Assigned"
+  },
+  "no_to_do_s_for_this_day_yet_90c5873d": {
+    "message": "No \"To-Do''s\" for this day yet."
+  },
+  "nothing_new_needs_attention_3ac548d4": {
+    "message": "Nothing new needs attention."
+  },
+  "optional_add_course_ef0d70fc": {
+    "message": "Optional: Add Course"
+  },
+  "points_bceb5005": {
+    "message": "points"
+  },
+  "points_points_63e59cce": {
+    "message": "{ points } points"
+  },
+  "previous_month_bb1e3c84": {
+    "message": "Previous Month"
+  },
+  "pts_699bd9aa": {
+    "message": "pts"
+  },
+  "replies_4a8577c8": {
+    "message": "Replies"
+  },
+  "save_11a80ec3": {
+    "message": "Save"
+  },
+  "submitted_318fad53": {
+    "message": "Submitted"
+  },
+  "task_16b0ef38": {
+    "message": "Task"
+  },
+  "title_ee03d132": {
+    "message": "Title"
+  },
+  "title_is_required_6ddcab69": {
+    "message": "title is required"
+  },
+  "to_do_1d554f36": {
+    "message": "To Do"
+  },
+  "today_76e10f9c": {
+    "message": "Today"
+  },
+  "today_at_date_8ac30d6": {
+    "message": "Today at { date }"
+  },
+  "tomorrow_9a6c9a00": {
+    "message": "Tomorrow"
+  },
+  "tomorrow_at_date_b53f2cf1": {
+    "message": "Tomorrow at { date }"
+  },
+  "unable_to_mark_as_complete_8141856d": {
+    "message": "Unable to mark as complete."
+  },
+  "yesterday_at_date_1aa6d18e": {
+    "message": "Yesterday at { date }"
+  },
+  "yesterday_c6bd6abf": {
+    "message": "Yesterday"
+  },
+  "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
+    "message": "You''ve scrolled back to your very first To-Do!"
+  }
+}

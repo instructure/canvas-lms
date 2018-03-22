@@ -216,6 +216,18 @@ describe CoursesController do
         expect(assigns[:future_enrollments]).to be_empty
       end
 
+      it "should not include hard-inactive enrollments even in the future" do
+        course1 = Account.default.courses.create!(start_at: 1.month.from_now, restrict_enrollments_to_course_dates: true)
+        course1.offer!
+        enrollment = course_with_student course: course1, user: @student, active_all: true
+        enrollment.deactivate
+
+        user_session(@student)
+        get 'index'
+        expect(response).to be_success
+        expect(assigns[:future_enrollments]).to be_empty
+      end
+
       it "should not include 'invited' enrollments whose term is past" do
         @student = user_factory
 
@@ -261,7 +273,7 @@ describe CoursesController do
         expect(assigns[:future_enrollments]).to be_empty
 
         observer = user_with_pseudonym(active_all: true)
-        o = @student.user_observers.build; o.observer = observer; o.save!
+        o = @student.as_student_observation_links.build; o.observer = observer; o.save!
         user_session(observer)
         get 'index'
         expect(response).to be_success
@@ -395,7 +407,7 @@ describe CoursesController do
         expect(assigns[:future_enrollments].map(&:course_id)).to eq [course1.id, course2.id]
 
         observer = user_with_pseudonym(active_all: true)
-        o = @student.user_observers.build; o.observer = observer; o.save!
+        o = @student.as_student_observation_links.build; o.observer = observer; o.save!
         user_session(observer)
         get 'index'
         expect(response).to be_success
@@ -429,7 +441,7 @@ describe CoursesController do
         expect(assigns[:future_enrollments]).to eq [enrollment1]
 
         observer = user_with_pseudonym(active_all: true)
-        o = @student.user_observers.build; o.observer = observer; o.save!
+        o = @student.as_student_observation_links.build; o.observer = observer; o.save!
         user_session(observer)
         get 'index'
         expect(response).to be_success
@@ -886,9 +898,10 @@ describe CoursesController do
       end
 
       it "should work for wiki view with draft state enabled" do
+        @course1.wiki_pages.create!(:title => 'blah').set_as_front_page!
+        @course1.reload
         @course1.default_view = "wiki"
         @course1.save!
-        @course1.wiki_pages.create!(:title => 'blah').set_as_front_page!
         get 'show', params: {:id => @course1.id}
         expect(controller.js_env[:WIKI_RIGHTS].symbolize_keys).to eql({:read => true})
         expect(controller.js_env[:PAGE_RIGHTS].symbolize_keys).to eql({:read => true})
@@ -896,11 +909,12 @@ describe CoursesController do
       end
 
       it "should work for wiki view with home page announcements enabled" do
+        @course1.wiki_pages.create!(:title => 'blah').set_as_front_page!
+        @course1.reload
         @course1.default_view = "wiki"
         @course1.show_announcements_on_home_page = true
         @course1.home_page_announcement_limit = 3
         @course1.save!
-        @course1.wiki_pages.create!(:title => 'blah').set_as_front_page!
         get 'show', params: {:id => @course1.id}
         expect(controller.js_env[:COURSE_HOME]).to be_truthy
         expect(controller.js_env[:SHOW_ANNOUNCEMENTS]).to be_truthy
@@ -908,12 +922,13 @@ describe CoursesController do
       end
 
       it "should not show announcements for public users" do
+        @course1.wiki_pages.create!(:title => 'blah').set_as_front_page!
+        @course1.reload
         @course1.default_view = "wiki"
         @course1.show_announcements_on_home_page = true
         @course1.home_page_announcement_limit = 3
         @course1.is_public = true
         @course1.save!
-        @course1.wiki_pages.create!(:title => 'blah').set_as_front_page!
         remove_user_session
         get 'show', params: {:id => @course1.id}
         expect(response).to be_success

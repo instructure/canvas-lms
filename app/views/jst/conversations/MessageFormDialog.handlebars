@@ -35,7 +35,15 @@
           </label>
         </div>
         <div class='message-header-input'>
-          <div id='compose-message-course-group-filter'></div>
+          <select id="compose-message-course" name="course"
+                  data-track-category="Compose Course"
+                  data-track-action="Edit"
+                  data-track-label="Course"
+                  class="message_course"
+                  required="true"
+                  value="{{course}}">
+            <option>{{#t "labels.select_course"}}Select a course{{/t}}</option>
+          </select>
           <span class="message_course_ro">{{#if course}}{{course}}{{else}}{{#t "no_course"}}No course{{/t}}{{/if}}</span>
           <input type="hidden" name="context_code" />
         </div>

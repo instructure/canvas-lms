@@ -1399,7 +1399,27 @@ describe Quizzes::Quiz do
       @quiz.workflow_state = 'unpublished'
       expect(@quiz).not_to be_active
     end
+  end
 
+  describe "#update_cached_due_dates?" do
+    before :each do
+      @quiz = @course.quizzes.create!(title: 'Test Quiz')
+    end
+
+    it 'returns true when the quiz due_at is changed' do
+      expect { @quiz.due_at = 1.day.from_now }.to change { @quiz.update_cached_due_dates? }.
+        from(false).to(true)
+    end
+
+    it 'returns true when the quiz workflow_state is changed' do
+      expect { @quiz.workflow_state = 'deleted' }.to change { @quiz.update_cached_due_dates? }.
+        from(false).to(true)
+    end
+
+    it 'returns true when the quiz only_visible_to_overrides_changed is changed' do
+      expect { @quiz.only_visible_to_overrides = true }.
+        to change { @quiz.update_cached_due_dates? }.from(false).to(true)
+    end
   end
 
   describe "#published?" do
@@ -1462,15 +1482,20 @@ describe Quizzes::Quiz do
       regrade = Quizzes::QuizRegrade.create!(quiz: quiz, quiz_version: quiz.version_number, user: @teacher)
       regrade.quiz_question_regrades.create!(
         quiz_question_id: q.id,
-        regrade_option: 'current_correct_only')
-      expect(Quizzes::QuizRegrader::Regrader).to receive(:send_later).once.
-        with(:regrade!, quiz: quiz, version_number: quiz.version_number)
+        regrade_option: 'current_correct_only'
+      )
+      expect(Quizzes::QuizRegrader::Regrader).to receive(:send_later_enqueue_args).once.
+        with(
+          :regrade!,
+          { strand: "quiz:#{quiz.global_id}:regrading"},
+          quiz: quiz, version_number: quiz.version_number
+        )
       quiz.save!
     end
 
     it "does not queue a job to regrade when no current question regrades" do
       course_with_teacher(course: @course, active_all: true)
-      expect(Quizzes::QuizRegrader::Regrader).to receive(:send_later).never
+      expect(Quizzes::QuizRegrader::Regrader).to receive(:send_later_enqueue_args).never
       quiz = @course.quizzes.create!
       quiz.save!
     end
@@ -2324,6 +2349,115 @@ describe Quizzes::Quiz do
 
     it "should exclude quizzes that don't meet either criterion" do
       expect(@course.quizzes.due_between_with_overrides(1.hour.ago, 1.hour.from_now)).not_to include (@quiz)
+    end
+  end
+
+  context "with_user_due_date" do
+    before :once do
+      course_with_student(active_all: true)
+      @quiz = @course.quizzes.create!(title: 'Ungraded Quiz with Overrides', quiz_type: 'practice_quiz')
+    end
+
+    it 'should return correct due date when there are no overrides' do
+      @quiz.due_at = 1.day.from_now
+      @quiz.save!
+      expect(@course.quizzes.ungraded_with_user_due_date(@student).find(@quiz)[:user_due_date]).to eq @quiz.due_at
+    end
+
+    it 'should return correct due date when user does not have an override' do
+      @quiz.due_at = 1.day.from_now
+      @quiz.save!
+      section = @course.course_sections.create!
+      override = @quiz.assignment_overrides.build
+      override.due_at = 2.days.from_now
+      override.due_at_overridden = true
+      override.title = 'section override'
+      override.set = section
+      override.save!
+      expect(@course.quizzes.ungraded_with_user_due_date(@student).find(@quiz)[:user_due_date]).to eq @quiz.due_at
+    end
+
+    it 'should return correct due date when user has an override and there is an everyone else date' do
+      @quiz.due_at = 1.day.from_now
+      @quiz.save!
+      section = @course.course_sections.create!
+      student_in_section(section, user: @student)
+      override = @quiz.assignment_overrides.build
+      override.due_at = 2.days.from_now
+      override.due_at_overridden = true
+      override.title = 'section override'
+      override.set = section
+      override.save!
+      expect(@course.quizzes.ungraded_with_user_due_date(@student).find(@quiz)[:user_due_date]).to eq override.due_at
+    end
+
+    it 'should return correct due date when user has an override and there is not an everyone else date' do
+      @quiz.due_at = 1.day.from_now
+      @quiz.only_visible_to_overrides = true
+      @quiz.save!
+      section = @course.course_sections.create!
+      student_in_section(section, user: @student)
+      override = @quiz.assignment_overrides.build
+      override.due_at = 2.days.from_now
+      override.due_at_overridden = true
+      override.title = 'section override'
+      override.set = section
+      override.save!
+      expect(@course.quizzes.ungraded_with_user_due_date(@student).find(@quiz)[:user_due_date]).to eq override.due_at
+    end
+
+    it 'should return nil due date when an override has a nil due date that overrides the everyone else date' do
+      @quiz.due_at = 1.day.from_now
+      @quiz.save!
+      section = @course.course_sections.create!
+      student_in_section(section, user: @student)
+      override = @quiz.assignment_overrides.build
+      override.due_at = nil
+      override.due_at_overridden = true
+      override.title = 'section override'
+      override.set = section
+      override.save!
+      expect(@course.quizzes.ungraded_with_user_due_date(@student).find(@quiz)[:user_due_date]).to eq nil
+    end
+
+    it 'should return nil due date when an override has a nil due date and another override has a due date' do
+      @quiz.due_at = 1.day.from_now
+      @quiz.save!
+      section = @course.course_sections.create!
+      student_in_section(section, user: @student)
+      override1 = @quiz.assignment_overrides.build
+      override1.due_at = 2.days.from_now
+      override1.due_at_overridden = true
+      override1.title = 'section override'
+      override1.set = section
+      override1.save!
+      override2 = @quiz.assignment_overrides.build
+      override2.due_at = nil
+      override2.due_at_overridden = true
+      override2.title = 'adhoc override'
+      override2.set_type = 'ADHOC'
+      AssignmentOverrideStudent.create!(user: @student, assignment_override: override2)
+      expect(@course.quizzes.ungraded_with_user_due_date(@student).find(@quiz)[:user_due_date]).to eq nil
+    end
+
+    it 'should return latest due date when user has two (or more) overridden due dates' do
+      @quiz.due_at = 1.day.from_now
+      @quiz.save!
+      section = @course.course_sections.create!
+      student_in_section(section, user: @student)
+      override1 = @quiz.assignment_overrides.build
+      override1.due_at = 2.days.from_now
+      override1.due_at_overridden = true
+      override1.title = 'section override'
+      override1.set = section
+      override1.save!
+      override2 = @quiz.assignment_overrides.build
+      override2.due_at = 3.days.from_now
+      override2.due_at_overridden = true
+      override2.title = 'adhoc override'
+      override2.set_type = 'ADHOC'
+      AssignmentOverrideStudent.create!(user: @student, assignment_override: override2)
+      expect(@course.quizzes.ungraded_with_user_due_date(@student).find(@quiz)[:user_due_date]).to eq override2.due_at
     end
   end
 

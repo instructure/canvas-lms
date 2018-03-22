@@ -242,35 +242,15 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def recompute_scores
-    dates_or_workflow_state_changed = time_boundaries_changed? || workflow_state_changed?
+    dates_or_workflow_state_changed = time_boundaries_changed? || saved_change_to_workflow_state?
 
     if course_group?
-      recompute_scores_for_course(grading_period_group.course, dates_or_workflow_state_changed)
+      course = grading_period_group.course
+      course.recompute_student_scores(update_all_grading_period_scores: dates_or_workflow_state_changed)
+      DueDateCacher.recompute_course(course) if dates_or_workflow_state_changed
     else
-      self.send_later_if_production(:recompute_scores_for_each_course, dates_or_workflow_state_changed)
+      grading_period_group.recompute_scores_for_each_term(dates_or_workflow_state_changed)
     end
-  end
-
-  def recompute_scores_for_each_course(dates_or_workflow_state_changed)
-    if grading_period_group.deleted?
-      # when the group is deleted, it disassociates all enrollment terms, so we have to use the workaround
-      # to find affected courses
-      courses = Course.active.joins(:submissions).where("submissions.grading_period_id = ?", id).distinct
-    else
-      courses = Course.active.joins(:enrollment_term).where(
-        "enrollment_terms.grading_period_group_id = ?",
-        grading_period_group_id
-      )
-    end
-
-    courses.find_each { |course| recompute_scores_for_course(course, dates_or_workflow_state_changed) }
-  end
-
-  def recompute_scores_for_course(course, dates_or_workflow_state_changed)
-    # we don't need to recompute scores for each grading period if only weight has changed
-    course.recompute_student_scores(update_all_grading_period_scores: dates_or_workflow_state_changed)
-    # DueDateCacher handles updating the cached grading_period_id on submissions
-    DueDateCacher.recompute_course(course) if dates_or_workflow_state_changed
   end
 
   def weight_actually_changed?
@@ -278,10 +258,10 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def time_boundaries_changed?
-    start_date_changed? || end_date_changed?
+    saved_change_to_start_date? || saved_change_to_end_date?
   end
 
   def dates_or_weight_or_workflow_state_changed?
-    time_boundaries_changed? || weight_actually_changed? || workflow_state_changed?
+    time_boundaries_changed? || weight_actually_changed? || saved_change_to_workflow_state?
   end
 end

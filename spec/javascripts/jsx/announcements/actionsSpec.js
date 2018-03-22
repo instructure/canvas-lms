@@ -96,14 +96,15 @@ test('searchAnnouncements calls actions.getAnnouncements when filter updates', (
   getAnnouncementsSpy.restore()
 })
 
-test('lockAnnouncements dispatches LOCK_ANNOUNCEMENTS_START', () => {
+test('toggleAnnouncementsLock dispatches LOCK_ANNOUNCEMENTS_START', () => {
   const state = { announcements: { pages: { 1: { items: [] } }, currentPage: 1 } }
   const dispatchSpy = sinon.spy()
-  actions.lockAnnouncements()(dispatchSpy, () => state)
+  actions.toggleAnnouncementsLock()(dispatchSpy, () => state)
   deepEqual(dispatchSpy.firstCall.args, [{ type: 'LOCK_ANNOUNCEMENTS_START' }])
 })
 
-test('lockAnnouncements calls apiClient.lockAnnouncements with selected announcements and locked: true if any selected announcements are unlocked', () => {
+test(`toggleSelectedAnnouncementsLock calls apiClient.lockAnnouncements with selected announcements
+      and locked: true if any selected announcements are unlocked`, () => {
   const state = {
     selectedAnnouncements: [1, 2, 3],
     announcements: {
@@ -128,11 +129,41 @@ test('lockAnnouncements calls apiClient.lockAnnouncements with selected announce
   }
   const dispatchSpy = sinon.spy()
   mockSuccess('lockAnnouncements', { successes: [], failures: [] })
-  actions.lockAnnouncements()(dispatchSpy, () => state)
+  actions.toggleSelectedAnnouncementsLock()(dispatchSpy, () => state)
   deepEqual(apiClient.lockAnnouncements.firstCall.args, [state, state.selectedAnnouncements, true])
 })
 
-test('lockAnnouncements calls apiClient.lockAnnouncements with selected announcements and locked: false if all selected announcements are locked', () => {
+test('toggleAnnouncementsLock calls apiClient.lockAnnouncements with passed in announcements and lock status', () => {
+  const announcements = ['2', '3']
+  const state = {
+    announcements: {
+      currentPage: 1,
+      pages: {
+        1: {
+          items: [{
+            id: 1,
+            locked: true,
+          },
+          {
+            id: 2,
+            locked: true,
+          },
+          {
+            id: 3,
+            locked: false,
+          }],
+        },
+      },
+    },
+  }
+  const dispatchSpy = sinon.spy()
+  mockSuccess('lockAnnouncements', { successes: [], failures: [] })
+  actions.toggleAnnouncementsLock(announcements, true)(dispatchSpy, () => state)
+  deepEqual(apiClient.lockAnnouncements.firstCall.args, [state, announcements, true])
+})
+
+test(`toggleSelectedAnnouncementsLock calls apiClient.lockAnnouncements with selected announcements
+      and locked: false if all the announcements are locked`, () => {
   const state = {
     selectedAnnouncements: [1, 2, 3],
     announcements: {
@@ -157,17 +188,17 @@ test('lockAnnouncements calls apiClient.lockAnnouncements with selected announce
   }
   const dispatchSpy = sinon.spy()
   mockSuccess('lockAnnouncements', { successes: [], failures: [] })
-  actions.lockAnnouncements()(dispatchSpy, () => state)
+  actions.toggleSelectedAnnouncementsLock()(dispatchSpy, () => state)
   deepEqual(apiClient.lockAnnouncements.firstCall.args, [state, state.selectedAnnouncements, true])
 })
 
-test('lockAnnouncements dispatches LOCK_ANNOUNCEMENTS_FAIL if promise fails', (assert) => {
+test('toggleAnnouncementsLock dispatches LOCK_ANNOUNCEMENTS_FAIL if promise fails', (assert) => {
   const done = assert.async()
   const state = { announcements: { pages: { 1: { items: [] } }, currentPage: 1 } }
   const dispatchSpy = sinon.spy()
 
   mockFail('lockAnnouncements', { err: 'something bad happened' })
-  actions.lockAnnouncements()(dispatchSpy, () => state)
+  actions.toggleAnnouncementsLock()(dispatchSpy, () => state)
 
   setTimeout(() => {
     equal(dispatchSpy.secondCall.args[0].type, 'LOCK_ANNOUNCEMENTS_FAIL')
@@ -175,13 +206,13 @@ test('lockAnnouncements dispatches LOCK_ANNOUNCEMENTS_FAIL if promise fails', (a
   })
 })
 
-test('lockAnnouncements dispatches LOCK_ANNOUNCEMENTS_SUCCESS if promise succeeeds and successes is at least 1', (assert) => {
+test('toggleAnnouncementsLock dispatches LOCK_ANNOUNCEMENTS_SUCCESS if promise succeeeds and successes is at least 1', (assert) => {
   const done = assert.async()
   const state = { announcements: { pages: { 1: { items: [{ id: 1 }] } }, currentPage: 1 }, selectedAnnouncements: [] }
   const dispatchSpy = sinon.spy()
 
   mockSuccess('lockAnnouncements', { successes: [{ data: 1 }], failures: [] })
-  actions.lockAnnouncements()(dispatchSpy, () => state)
+  actions.toggleAnnouncementsLock()(dispatchSpy, () => state)
 
   setTimeout(() => {
     equal(dispatchSpy.secondCall.args[0].type, 'LOCK_ANNOUNCEMENTS_SUCCESS')
@@ -189,13 +220,13 @@ test('lockAnnouncements dispatches LOCK_ANNOUNCEMENTS_SUCCESS if promise succeee
   })
 })
 
-test('lockAnnouncements dispatches LOCK_ANNOUNCEMENTS_FAIL if promise succeeeds but successes is less than 1 and failures is at least 1', (assert) => {
+test('toggleAnnouncementsLock dispatches LOCK_ANNOUNCEMENTS_FAIL if promise succeeeds, successes is 0, and failures is > 0', (assert) => {
   const done = assert.async()
   const state = { announcements: { pages: { 1: { items: [{ id: 1 }] } }, currentPage: 1 }, selectedAnnouncements: [] }
   const dispatchSpy = sinon.spy()
 
   mockSuccess('lockAnnouncements', { successes: [], failures: [{ data: 1, err: 'something bad happened' }] })
-  actions.lockAnnouncements()(dispatchSpy, () => state)
+  actions.toggleAnnouncementsLock()(dispatchSpy, () => state)
 
   setTimeout(() => {
     equal(dispatchSpy.secondCall.args[0].type, 'LOCK_ANNOUNCEMENTS_FAIL')
@@ -210,11 +241,19 @@ test('deleteAnnouncements dispatches DELETE_ANNOUNCEMENTS_START', () => {
   deepEqual(dispatchSpy.firstCall.args, [{ type: 'DELETE_ANNOUNCEMENTS_START' }])
 })
 
-test('deleteAnnouncements calls apiClient.deleteAnnouncements with state selectedAnnouncements', () => {
+test('deleteAnnouncements calls apiClient.deleteAnnouncements with passed in announcements', () => {
+  const announcements = [1, 2, 3]
+  const dispatchSpy = sinon.spy()
+  mockSuccess('deleteAnnouncements', { successes: [], failures: [] })
+  actions.deleteAnnouncements(announcements)(dispatchSpy, () => {})
+  deepEqual(apiClient.deleteAnnouncements.firstCall.args[1], announcements)
+})
+
+test('deleteSelectedAnnouncements calls apiClient.deleteAnnouncements with state selectedAnnouncements', () => {
   const state = { selectedAnnouncements: [1, 2, 3, 5, 8] }
   const dispatchSpy = sinon.spy()
   mockSuccess('deleteAnnouncements', { successes: [], failures: [] })
-  actions.deleteAnnouncements()(dispatchSpy, () => state)
+  actions.deleteSelectedAnnouncements()(dispatchSpy, () => state)
   deepEqual(apiClient.deleteAnnouncements.firstCall.args[1], state.selectedAnnouncements)
 })
 

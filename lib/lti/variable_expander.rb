@@ -556,7 +556,8 @@ module Lti
     #   ```
     register_expansion 'Canvas.membership.roles', [],
                        -> { lti_helper.current_canvas_roles },
-                       ROLES_GUARD
+                       ROLES_GUARD,
+                       default_name: 'canvas_membership_roles'
 
     # This is a list of IMS LIS roles should have a different key
     # @example
@@ -722,6 +723,17 @@ module Lti
                        -> { @current_user.prefers_high_contrast? ? 'true' : 'false' },
                        USER_GUARD
 
+    # returns the Canvas ids of all active groups in the current course.
+    # @example
+    #   ```
+    #   23,24,...
+    #   ```
+    register_expansion 'com.instructure.Course.groupIds', [],
+                       -> { @context.groups.active.pluck(:id).join(',') },
+                       COURSE_GUARD,
+                       default_name: 'com_instructure_course_groupids'
+
+
     # returns the context ids for the groups the user belongs to in the course.
     # @example
     #   ```
@@ -745,6 +757,13 @@ module Lti
                        default_name: 'roles'
 
     # Returns list of [LIS role full URNs](https://www.imsglobal.org/specs/ltiv1p0/implementation-guide#toc-16).
+    # Note that this will include all roles the user has.
+    # There are 3 different levels of roles defined: Context, Institution, System.
+    # Context role urns start with "urn:lti:ims" and include roles for the context where the launch occurred.
+    # Institution role urns start with "urn:lti:instrole" and include roles the user has in the institution. This
+    # will include roles they have in other courses or at the account level. Note that there is not a TA role at the
+    # Institution level. Instead Users with a TA enrollment will have an institution role of Instructor.
+    # System role urns start with "urn:lti:sysrole" and include roles for the entire system.
     # @duplicates ext_roles which is sent by default
     # @example
     #   ```
@@ -947,6 +966,32 @@ module Lti
                        -> { @assignment.id },
                        ASSIGNMENT_GUARD
 
+    # Returns the Canvas id of the group the current user is in if launching
+    # from a group assignment.
+    #
+    # @example
+    #   ```
+    #   481
+    #   ```
+    register_expansion 'com.instructure.Group.id', [],
+                       -> { (@assignment.group_category&.groups & @current_user.groups).first&.id },
+                       USER_GUARD,
+                       ASSIGNMENT_GUARD,
+                       default_name: 'vnd_canvas_group_id'
+
+    # Returns the name of the group the current user is in if launching
+    # from a group assignment.
+    #
+    # @example
+    #   ```
+    #   Group One
+    #   ```
+    register_expansion 'com.instructure.Group.name', [],
+                       -> { (@assignment.group_category&.groups & @current_user.groups).first&.name },
+                       USER_GUARD,
+                       ASSIGNMENT_GUARD,
+                       default_name: 'vnd_canvas_group_name'
+
     # Returns the title of the assignment that was launched.
     #
     # @example
@@ -1090,7 +1135,7 @@ module Lti
     #   ```
     register_expansion 'vnd.Canvas.submission.url', [],
                         -> do
-                          SubmissionsApiController::SERVICE_DEFINITIONS.find do |s|
+                          Lti::SubmissionsApiController::SERVICE_DEFINITIONS.find do |s|
                             s[:id] == 'vnd.Canvas.submission'
                           end[:endpoint]
                         end,
@@ -1104,7 +1149,7 @@ module Lti
     #   ```
     register_expansion 'vnd.Canvas.submission.history.url', [],
                         -> do
-                          SubmissionsApiController::SERVICE_DEFINITIONS.find do |s|
+                          Lti::SubmissionsApiController::SERVICE_DEFINITIONS.find do |s|
                             s[:id] == 'vnd.Canvas.submission.history'
                           end[:endpoint]
                         end,

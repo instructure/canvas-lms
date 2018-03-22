@@ -28,7 +28,7 @@
 
 
 .bcs_sub-menu-item {
-    margin-left: 2.5em;
+    margin-#{direction(left)}: 2.5em;
     margin-bottom: .75em;
     max-width: 500px;
     white-space: normal;
@@ -71,10 +71,10 @@
 .bcs_check_box-group {
   margin-top: .75em;
   margin-bottom: .75em;
-  margin-left: 2.5em;
+  margin-#{direction(left)}: 2.5em;
 }
 
 .bcs_radio_input-group {
-  margin-left: 2em;
+  margin-#{direction(left)}: 2em;
   padding-bottom: .75em;
 }

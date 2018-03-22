@@ -22,11 +22,12 @@ module Selinimum
     class << self
       def change_list(sha)
         sha = recent_shas[1] if ignore_intermediate_commits?
-        `git diff --name-only #{Shellwords.escape(sha)}`.split(/\n/)
+        # all changes except deletions
+        `git diff --diff-filter=d --name-only #{Shellwords.escape(sha)}`.split(/\n/)
       end
 
       def recent_shas
-        `git log --oneline --first-parent --pretty=format:'%H'|head -n 100`.split(/\n/)
+        `git log --oneline --first-parent --pretty=format:'%H'|head -n 150`.split(/\n/)
       end
 
       def head

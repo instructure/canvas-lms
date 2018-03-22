@@ -58,10 +58,13 @@ describe AvatarHelper do
     end
 
     describe ".avatar" do
-      let_once(:user) {user_model}
+      let_once(:user) {user_model(short_name: 'Greta')}
 
-      it "leaves off the href if url is nil" do
-        expect(avatar(user, url: nil)).not_to match(/href/)
+      it "leaves off the href and creates a span if url is nil" do
+        html = avatar(user, url: nil)
+        expect(html).not_to match(/<a/)
+        expect(html).to match(/<span/)
+        expect(html).not_to match(/href/)
       end
 
       it "sets the href to the given url" do
@@ -79,6 +82,16 @@ describe AvatarHelper do
 
       it "falls back to a blank avatar when the user is nil" do
         expect(avatar(nil)).to match("/images/messages/avatar-50.png")
+      end
+
+      it 'includes screenreader content if supplied' do
+        text = avatar(user, sr_content: 'boogaloo')
+        expect(text).to include("<span class=\"screenreader-only\">boogaloo</span>")
+      end
+
+      it 'defaults the screenreader content to just the display name if sr_content is not supplied' do
+        text = avatar(user)
+        expect(text).to include("<span class=\"screenreader-only\">Greta</span>")
       end
     end
 

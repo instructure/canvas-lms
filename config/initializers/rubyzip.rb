@@ -23,6 +23,7 @@
 require 'zip'
 
 Zip.write_zip64_support = true
+Zip.unicode_names = true
 
 module ZipEncodingFix
   def fix_name_encoding
@@ -30,14 +31,24 @@ module ZipEncodingFix
     @name.force_encoding('ASCII-8BIT') unless @name.valid_encoding?
   end
 
+  # see https://github.com/rubyzip/rubyzip/issues/324
+  # there's a test for this case, see
+  # spec/lib/canvas/migration_spec.rb:85, ie
+  # "should deal with backslashes path separators in migrations"
+  def fix_name_backslashes
+    @name.tr!('\\', '/')
+  end
+
   def read_c_dir_entry(io)
     retval = super
+    fix_name_backslashes
     fix_name_encoding
     retval
   end
 
   def read_local_entry(io)
     retval = super
+    # fix_name_backslashes # regression was only in read_c_dir_entry
     fix_name_encoding
     retval
   end

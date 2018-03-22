@@ -42,7 +42,8 @@ describe SIS::UserImporter do
       user3 = SIS::Models::User.new(user_id: 'U003', login_id: 'user3', status: 'active',
                                     full_name: 'User Three', email: 'user3@example.com')
 
-      SIS::UserImporter.new(@account, {}).process(2, messages) do |importer|
+      Setting.set("sis_user_batch_size", "2")
+      SIS::UserImporter.new(@account, {}).process(messages) do |importer|
         importer.add_user(user1)
         importer.add_user(user2)
         importer.add_user(user3)
@@ -61,11 +62,11 @@ describe SIS::UserImporter do
       Setting.set('sis_transaction_seconds', '1')
       user1 = SIS::Models::User.new(user_id: @user_id, login_id: @login_id, status: 'active',
                                     full_name: 'User One', email: 'user1@example.com')
-      SIS::UserImporter.new(@account, {}).process(2, messages) do |importer|
+      SIS::UserImporter.new(@account, {batch: @account.sis_batches.create!}).process(messages) do |importer|
         importer.add_user(user1)
       end
 
-      @message = messages.first
+      @message = messages.first.message
     end
 
     it 'must include the login_id' do
@@ -84,7 +85,7 @@ describe SIS::UserImporter do
   it 'should handle user_ids as integers just in case' do
     user1 = SIS::Models::User.new(user_id: 12345, login_id: 'user1', status: 'active',
                                   full_name: 'User One', email: 'user1@example.com')
-    SIS::UserImporter.new(account_model, {}).process(2, []) do |importer|
+    SIS::UserImporter.new(account_model, {}).process([]) do |importer|
       importer.add_user(user1)
     end
     expect(Pseudonym.last.sis_user_id).to eq '12345'

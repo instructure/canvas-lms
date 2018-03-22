@@ -318,7 +318,6 @@ class SisApiController < ApplicationController
   }.freeze
 
   # @API Retrieve assignments enabled for grade export to SIS
-  # @beta
   #
   # Retrieve a list of published assignments flagged as "post_to_sis".
   # See the Assignments API for more details on assignments.

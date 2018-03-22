@@ -145,6 +145,17 @@ describe "download submissions link" do
     expect(doc.at_css('#download_submission_button')).to be_nil
   end
 
+  it "should not show download submissions button with no submissions from active students" do
+    @submission = @assignment.submissions.find_by!(user: @student)
+    @submission.update(submission_type: 'online_url')
+    @student.enrollments.each(&:conclude)
+
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+    expect(response).to be_success
+    doc = Nokogiri::XML(response.body)
+    expect(doc.at_css('#download_submission_button')).to be_nil
+  end
+
   it "should show download submissions button with submission not graded" do
     @submission = @assignment.submissions.find_by!(user: @student)
     @submission.update(submission_type: 'online_url')

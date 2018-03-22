@@ -16,157 +16,269 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { mount } from 'enzyme';
-import SubmissionTrayRadioInput from 'jsx/gradezilla/default_gradebook/components/SubmissionTrayRadioInput';
-import NumberInput from '@instructure/ui-core/lib/components/NumberInput';
+import React from 'react'
+import { mount } from 'enzyme'
+import SubmissionTrayRadioInput from 'jsx/gradezilla/default_gradebook/components/SubmissionTrayRadioInput'
+import NumberInput from '@instructure/ui-core/lib/components/NumberInput'
 
-QUnit.module('SubmissionTrayRadioInput', {
-  mountComponent (customProps) {
-    const props = {
-      checked: false,
-      color: '#FEF7E5',
-      disabled: false,
-      latePolicy: { lateSubmissionInterval: 'day' },
-      locale: 'en',
-      onChange () {},
-      onNumberInputBlur () {},
-      submission: { secondsLate: 0 },
-      text: 'Missing',
-      value: 'missing',
-      ...customProps
-    };
-    return mount(<SubmissionTrayRadioInput {...props} />);
-  },
+let wrapper
+let updateSubmission
 
-  numberInputContainer () {
-    return this.wrapper.find('.NumberInput__Container');
-  },
-
-  numberInput () {
-    return this.numberInputContainer().find(NumberInput);
-  },
-
-  numberInputDescription () {
-    return this.numberInputContainer().find('span[role="presentation"]').node.textContent;
-  },
-
-  numberInputLabel () {
-    return this.numberInputContainer().find('label').node.textContent;
-  },
-
-  radioInput () {
-    return this.wrapper.find('input[type="radio"]');
-  },
-
-  teardown () {
-    this.wrapper.unmount();
+function mountComponent (customProps) {
+  const props = {
+    checked: false,
+    color: '#FEF7E5',
+    disabled: false,
+    latePolicy: { lateSubmissionInterval: 'day' },
+    locale: 'en',
+    onChange () {},
+    submission: { secondsLate: 0 },
+    text: 'Missing',
+    updateSubmission () {},
+    value: 'missing',
+    ...customProps
   }
-});
+  return mount(<SubmissionTrayRadioInput {...props} />)
+}
 
-test('does not render a NumberInput when value is not "late"', function () {
-  this.wrapper = this.mountComponent();
-  strictEqual(this.wrapper.find(NumberInput).length, 0);
-});
+function numberInputContainer () {
+  return wrapper.find('.NumberInput__Container')
+}
 
-test('renders with a NumberInput when value is "late" and checked is true', function () {
-  this.wrapper = this.mountComponent({ value: 'late', checked: true });
-  strictEqual(this.numberInput().length, 1);
-});
+function numberInput () {
+  return numberInputContainer().find('input')
+}
 
-test('renders without a NumberInput when value is "late" and checked is false', function () {
-  this.wrapper = this.mountComponent({ value: 'late' });
-  strictEqual(this.numberInput().length, 0);
-});
+function numberInputDescription () {
+  return numberInputContainer().find('span[role="presentation"]').node.textContent
+}
 
-test('renders with the NumberInput enabled when disabled is false', function () {
-  this.wrapper = this.mountComponent({ value: 'late', checked: true });
-  strictEqual(this.numberInput().props().disabled, false);
-});
+function numberInputLabel () {
+  return numberInputContainer().find('label').node.textContent
+}
 
-test('renders with the NumberInput disabled when disabled is true', function () {
-  this.wrapper = this.mountComponent({ value: 'late', checked: true, disabled: true });
-  strictEqual(this.numberInput().props().disabled, true);
-});
+function radioInput () {
+  return wrapper.find('input[type="radio"]')
+}
 
-test('renders with the radio option enabled when disabled is false', function () {
-  this.wrapper = this.mountComponent({ disabled: false });
-  strictEqual(this.wrapper.find('RadioInput').props().disabled, false);
-});
+function radioInputContainer () {
+  return wrapper.find('.SubmissionTray__RadioInput')
+}
 
-test('renders with the radio option disabled when disabled is true', function () {
-  this.wrapper = this.mountComponent({ disabled: true });
-  strictEqual(this.wrapper.find('RadioInput').props().disabled, true);
-});
+QUnit.module('SubmissionTrayRadioInput', function (hooks) {
+  hooks.beforeEach(() => {
+    updateSubmission = sinon.stub()
+  })
 
-test('renders with the radio option selected when checked is true', function () {
-  this.wrapper = this.mountComponent({ checked: true });
-  strictEqual(this.radioInput().node.checked, true);
-});
+  hooks.afterEach(() => {
+    wrapper.unmount()
+  })
 
-test('renders with the radio option deselected when checked is false', function () {
-  this.wrapper = this.mountComponent();
-  strictEqual(this.radioInput().node.checked, false);
-});
+  test('renders a radio option with a name of "SubmissionTrayRadioInput"', function () {
+    wrapper = mountComponent()
+    strictEqual(radioInput().node.name, 'SubmissionTrayRadioInput')
+  })
 
-test('calls onChange when the radio option is selected', function () {
-  const onChange = this.stub();
-  this.wrapper = this.mountComponent({ onChange });
-  this.radioInput().simulate('change', { target: { checked: true } });
-  strictEqual(onChange.callCount, 1);
-});
+  test('renders with a background color specified by the "color" prop', function () {
+    wrapper = mountComponent({ color: 'green' })
+    const { style } = radioInputContainer().node
+    strictEqual(style.getPropertyValue('background-color'), 'green')
+  })
 
-test('the text next to the NumberInput reads "Day(s)" if the late policy interval is "day"', function () {
-  this.wrapper = this.mountComponent({ value: 'late', checked: true });
-  strictEqual(this.numberInputDescription(), 'Day(s)');
-});
+  test('renders with a "transparent" background color if a color is not specified', function () {
+    wrapper = mountComponent({ color: undefined })
+    const { style } = radioInputContainer().node
+    strictEqual(style.getPropertyValue('background-color'), 'transparent')
+  })
 
-test('the text next to the NumberInput reads "Day(s)" if the late policy interval is "day"', function () {
-  this.wrapper = this.mountComponent({ value: 'late', checked: true, latePolicy: { lateSubmissionInterval: 'hour' } });
-  strictEqual(this.numberInputDescription(), 'Hour(s)');
-});
+  test('renders with the radio option enabled when disabled is false', function () {
+    wrapper = mountComponent({ disabled: false })
+    strictEqual(wrapper.find('RadioInput').props().disabled, false)
+  })
 
-test('the label for the NumberInput reads "Days late" if the late policy interval is "day"', function () {
-  this.wrapper = this.mountComponent({ value: 'late', checked: true });
-  strictEqual(this.numberInputLabel(), 'Days late');
-});
+  test('renders with the radio option disabled when disabled is true', function () {
+    wrapper = mountComponent({ disabled: true })
+    strictEqual(wrapper.find('RadioInput').props().disabled, true)
+  })
 
-test('the label for the NumberInput reads "Hours late" if the late policy interval is "hour"', function () {
-  this.wrapper = this.mountComponent({ value: 'late', checked: true, latePolicy: { lateSubmissionInterval: 'hour' } });
-  strictEqual(this.numberInputLabel(), 'Hours late');
-});
+  test('renders with the radio option selected when checked is true', function () {
+    wrapper = mountComponent({ checked: true })
+    strictEqual(radioInput().node.checked, true)
+  })
 
-test('the default value for the NumberInput is converted to days if the late policy interval is "day"', function () {
-  // two days in seconds
-  const secondsLate = 172800;
-  this.wrapper = this.mountComponent({
-    value: 'late',
-    checked: true,
-    submission: { latePolicyStatus: 'late', secondsLate }
-  });
-  strictEqual(this.numberInput().props().defaultValue, '2');
-});
+  test('renders with the radio option deselected when checked is false', function () {
+    wrapper = mountComponent()
+    strictEqual(radioInput().node.checked, false)
+  })
 
-test('the default value for the NumberInput is converted to hours if the late policy interval is "hour"', function () {
-  // two days in seconds
-  const secondsLate = 172800;
-  this.wrapper = this.mountComponent({
-    value: 'late',
-    checked: true,
-    latePolicy: { lateSubmissionInterval: 'hour' },
-    submission: { latePolicyStatus: 'late', secondsLate }
-  });
-  strictEqual(this.numberInput().props().defaultValue, '48');
-});
+  test('calls onChange when the radio option is selected', function () {
+    const onChange = sinon.stub()
+    wrapper = mountComponent({ onChange })
+    radioInput().simulate('change', { target: { checked: true } })
+    strictEqual(onChange.callCount, 1)
+  })
 
-test('the default value for the NumberInput is rounded to two digits after the decimal point', function () {
-  // two days and four minutes in seconds
-  const secondsLate = 173040;
-  this.wrapper = this.mountComponent({
-    value: 'late',
-    checked: true,
-    latePolicy: { lateSubmissionInterval: 'hour' },
-    submission: { latePolicyStatus: 'late', secondsLate }
-  });
-  strictEqual(this.numberInput().props().defaultValue, '48.07');
-});
+  QUnit.module('NumberInput', function () {
+    test('does not render a NumberInput when value is not "late"', function () {
+      wrapper = mountComponent()
+      strictEqual(wrapper.find(NumberInput).length, 0)
+    })
+
+    test('renders with a NumberInput when value is "late" and checked is true', function () {
+      wrapper = mountComponent({ value: 'late', checked: true })
+      strictEqual(numberInput().length, 1)
+    })
+
+    test('renders without a NumberInput when value is "late" and checked is false', function () {
+      wrapper = mountComponent({ value: 'late' })
+      strictEqual(numberInput().length, 0)
+    })
+
+    test('renders with the NumberInput enabled when disabled is false', function () {
+      wrapper = mountComponent({ value: 'late', checked: true })
+      strictEqual(numberInput().props().disabled, false)
+    })
+
+    test('renders with the NumberInput disabled when disabled is true', function () {
+      wrapper = mountComponent({ value: 'late', checked: true, disabled: true })
+      strictEqual(numberInput().props().disabled, true)
+    })
+
+    test('the text next to the input reads "Day(s)" if the late policy interval is "day"', function () {
+      wrapper = mountComponent({ value: 'late', checked: true })
+      strictEqual(numberInputDescription(), 'Day(s)')
+    })
+
+    test('the text next to the input reads "Hour(s)" if the late policy interval is "day"', function () {
+      wrapper = mountComponent({ value: 'late', checked: true, latePolicy: { lateSubmissionInterval: 'hour' } })
+      strictEqual(numberInputDescription(), 'Hour(s)')
+    })
+
+    test('the label for the input reads "Days late" if the late policy interval is "day"', function () {
+      wrapper = mountComponent({ value: 'late', checked: true })
+      strictEqual(numberInputLabel(), 'Days late')
+    })
+
+    test('the label for the input reads "Hours late" if the late policy interval is "hour"', function () {
+      wrapper = mountComponent({ value: 'late', checked: true, latePolicy: { lateSubmissionInterval: 'hour' } })
+      strictEqual(numberInputLabel(), 'Hours late')
+    })
+
+    test('the default value for the input is converted to days if the late policy interval is "day"', function () {
+      // two days in seconds
+      const secondsLate = 172800
+      wrapper = mountComponent({
+        value: 'late',
+        checked: true,
+        submission: { latePolicyStatus: 'late', secondsLate }
+      })
+      strictEqual(numberInput().props().defaultValue, '2')
+    })
+
+    test('the default value for the input is converted to hours if the late policy interval is "hour"', function () {
+      // two days in seconds
+      const secondsLate = 172800
+      wrapper = mountComponent({
+        value: 'late',
+        checked: true,
+        latePolicy: { lateSubmissionInterval: 'hour' },
+        submission: { latePolicyStatus: 'late', secondsLate }
+      })
+      strictEqual(numberInput().props().defaultValue, '48')
+    })
+
+    test('the default value for the input is rounded to two digits after the decimal point', function () {
+      // two days and four minutes in seconds
+      const secondsLate = 173040
+      wrapper = mountComponent({
+        value: 'late',
+        checked: true,
+        latePolicy: { lateSubmissionInterval: 'hour' },
+        submission: { latePolicyStatus: 'late', secondsLate }
+      })
+      strictEqual(numberInput().props().defaultValue, '48.07')
+    })
+
+    QUnit.module('on blur', function () {
+      test('does not call updateSubmission if the input value is an empty string', function () {
+        wrapper = mountComponent({ value: 'late', checked: true, updateSubmission })
+        const input = numberInput()
+        input.simulate('change', { target: { value: '' } })
+        input.simulate('blur')
+        strictEqual(updateSubmission.callCount, 0)
+      })
+
+      test('does not call updateSubmission if the input value cannot be parsed as a number', function () {
+        wrapper = mountComponent({ value: 'late', checked: true, updateSubmission })
+        const input = numberInput()
+        input.simulate('change', { target: { value: 'foo' } })
+        input.simulate('blur')
+        strictEqual(updateSubmission.callCount, 0)
+      })
+
+      test('does not call updateSubmission if the input value matches the current value', function () {
+        wrapper = mountComponent({ value: 'late', checked: true, updateSubmission })
+        const input = numberInput()
+        input.simulate('change', { target: { value: '0' } })
+        input.simulate('blur')
+        strictEqual(updateSubmission.callCount, 0)
+      })
+
+      test('does not call updateSubmission if the parsed value (2 decimals) matches the current value', function () {
+        wrapper = mountComponent({ value: 'late', checked: true, updateSubmission })
+        const input = numberInput()
+        input.simulate('change', { target: { value: '0.004' } })
+        input.simulate('blur')
+        strictEqual(updateSubmission.callCount, 0)
+      })
+
+      test('calls updateSubmission if the parsed value (2 decimals) differs from the current value', function () {
+        wrapper = mountComponent({ value: 'late', checked: true, updateSubmission })
+        const input = numberInput()
+        input.simulate('change', { target: { value: '2' } })
+        input.simulate('blur')
+        strictEqual(updateSubmission.callCount, 1)
+      })
+
+      test('calls updateSubmission with latePolicyStatus set to "late"', function () {
+        wrapper = mountComponent({ value: 'late', checked: true, updateSubmission })
+        const input = numberInput()
+        input.simulate('change', { target: { value: '2' } })
+        input.simulate('blur')
+        strictEqual(updateSubmission.getCall(0).args[0].latePolicyStatus, 'late')
+      })
+
+      test('interval is hour: calls updateSubmission with the input converted to seconds', function () {
+        wrapper = mountComponent({
+          checked: true,
+          latePolicy: { lateSubmissionInterval: 'hour' }, updateSubmission,
+          value: 'late'
+        })
+
+        const input = numberInput()
+        input.simulate('change', { target: { value: '2' } })
+        input.simulate('blur')
+        const expectedSeconds = 2 * 3600
+        strictEqual(updateSubmission.getCall(0).args[0].secondsLateOverride, expectedSeconds)
+      })
+
+      test('interval is day: calls updateSubmission with the input converted to seconds', function () {
+        wrapper = mountComponent({ value: 'late', checked: true, updateSubmission })
+        const input = numberInput()
+        input.simulate('change', { target: { value: '2' } })
+        input.simulate('blur')
+        const expectedSeconds = 2 * 86400
+        strictEqual(updateSubmission.getCall(0).args[0].secondsLateOverride, expectedSeconds)
+      })
+
+      test('truncates the remainder if one exists', function () {
+        wrapper = mountComponent({ value: 'late', checked: true, updateSubmission })
+        const input = numberInput()
+        input.simulate('change', { target: { value: '2.3737' } })
+        input.simulate('blur')
+        const expectedSeconds = Math.trunc(2.3737 * 86400)
+        strictEqual(updateSubmission.getCall(0).args[0].secondsLateOverride, expectedSeconds)
+      })
+    })
+  })
+})

@@ -93,6 +93,10 @@ module LoginAndSessionMethods
     wait_for_ajaximations
   end
 
+  def leave_student_view
+    expect_new_page_load { f('.leave_student_view').click }
+  end
+
   def fill_in_login_form(username, password)
     user_element = f('#pseudonym_session_unique_id')
     user_element.send_keys(username)
@@ -122,13 +126,14 @@ module LoginAndSessionMethods
 
   def displayed_username
     f('[aria-label="Global Navigation"] a[href="/profile"]').click
-    f('#global_nav_profile_display_name').text
+    f('[aria-label="Global navigation tray"] h1').text
   end
 
 
   def expect_logout_link_present
     logout_element = begin
       f('[aria-label="Global Navigation"] a[href="/profile"]').click
+      wait_for_animations
       fj('form[action="/logout"] button:contains("Logout")')
     end
     expect(logout_element).to be_present

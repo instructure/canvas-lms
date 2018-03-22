@@ -8,7 +8,7 @@ FROM instructure/ruby-passenger:2.4
 ENV APP_HOME /usr/src/app/
 ENV RAILS_ENV "production"
 ENV NGINX_MAX_UPLOAD_SIZE 10g
-ENV YARN_VERSION 1.3.2-1
+ENV YARN_VERSION 1.5.1-1
 
 # Work around github.com/zertosh/v8-compile-cache/issues/2
 # This can be removed once yarn pushes a release including the fixed version
@@ -40,7 +40,6 @@ RUN curl -sL https://deb.nodesource.com/setup_8.x | bash - \
 RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="-i /var/lib/gems/$RUBY_MAJOR.0"; fi \
   && gem uninstall --all --ignore-dependencies --force $BUNDLER_INSTALL bundler \
   && gem install bundler --no-document -v 1.15.2 \
-  && gem update --system --no-document \
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
 
 # We will need sfnt2woff in order to build fonts
@@ -58,10 +57,11 @@ COPY Gemfile      ${APP_HOME}
 COPY Gemfile.d    ${APP_HOME}Gemfile.d
 COPY config       ${APP_HOME}config
 COPY gems         ${APP_HOME}gems
+COPY packages     ${APP_HOME}packages
 COPY script       ${APP_HOME}script
 COPY package.json ${APP_HOME}
 COPY yarn.lock    ${APP_HOME}
-RUN find gems -type d ! -user docker -print0 | xargs -0 chown -h docker:docker
+RUN find gems packages -type d ! -user docker -print0 | xargs -0 chown -h docker:docker
 
 # Install deps as docker to avoid sadness w/ npm lifecycle hooks
 USER docker
@@ -72,7 +72,11 @@ USER root
 COPY . $APP_HOME
 RUN mkdir -p .yardoc \
              app/stylesheets/brandable_css_brands \
+             app/views/info \
+             client_apps/canvas_quizzes/dist \
              client_apps/canvas_quizzes/node_modules \
+             client_apps/canvas_quizzes/tmp \
+             config/locales/generated \
              gems/canvas_i18nliner/node_modules \
              gems/selinimum/node_modules \
              log \
@@ -81,6 +85,7 @@ RUN mkdir -p .yardoc \
              public/doc/api \
              public/javascripts/client_apps \
              public/javascripts/compiled \
+             public/javascripts/translations \
              tmp \
              /home/docker/.bundler/ \
              /home/docker/.cache/yarn \

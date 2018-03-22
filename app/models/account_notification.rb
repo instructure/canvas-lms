@@ -39,8 +39,9 @@ class AccountNotification < ActiveRecord::Base
     if root_account.site_admin?
       current = self.for_account(root_account)
     else
-      all_account_ids = user.enrollments.active.shard(user).
-        joins(:course).where(courses: {workflow_state: 'available'}).
+      course_ids = user.enrollments.active.shard(user).distinct.pluck(:course_id) # fetch sharded course ids
+      # and then fetch account_ids separately - using pluck on a joined column doesn't give relative ids
+      all_account_ids = Course.where(:id => course_ids, :workflow_state => 'available').
         distinct.pluck(:account_id, :root_account_id).flatten.uniq
       all_account_ids += user.account_users.active.shard(user).
         joins(:account).where(accounts: {workflow_state: 'active'}).

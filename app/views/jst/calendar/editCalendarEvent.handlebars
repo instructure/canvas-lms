@@ -20,7 +20,7 @@
               {{datepickerScreenreaderPrompt 'date'}}
             </label>
             <input id="calendar_event_date" type="text"
-              value="{{fcMomentToDateString date "medium_with_weekday"}}"
+              value="{{fcMomentToDateString date "default"}}"
               name="date" style="width: 100px;" class="date_field"
               aria-labelledby='calendar_event_date_accessible_label'
               data-tooltip title="{{accessibleDateFormat 'date'}}"/>
@@ -30,7 +30,7 @@
       <tr>
         <td style="vertical-align: top;"><label for="calendar_event_start_time">{{#t "from"}}From:{{/t}}</label></td>
         <td>
-          <div style="float: left;">
+          <div style="display: inline-block;">
             <div class='date_field_container'>
               <label class='screenreader-only' id='calendar_event_start_time_accessible_label'>
                 {{#t}}Event Start Time{{/t}}
@@ -43,8 +43,8 @@
                 data-tooltip title="{{accessibleDateFormat 'time'}}"/>
             </div>
           </div>
-          <div style="float: left; margin: 5px"><label for="calendar_event_end_time">{{#t "timespan_separator"}} to {{/t}}</label></div>
-          <div style="float: left;">
+          <div style="display: inline-block; margin: 5px"><label for="calendar_event_end_time">{{#t "timespan_separator"}} to {{/t}}</label></div>
+          <div style="display: inline-block;">
             <div class='date_field_container'>
               <label class='screenreader-only' id='calendar_event_end_time_accessible_label'>
                 {{#t}}Event End Time{{/t}}

@@ -1,0 +1,206 @@
+{
+  "add_to_do_7def3c37": {
+    "message": "添加到待办事项"
+  },
+  "all_items_loaded_aa256183": {
+    "message": "已加载所有项目"
+  },
+  "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
+    "message": "是否确定要删除此规划者项目？"
+  },
+  "assignmenttype_title_is_complete_813e54f8": {
+    "message": "{ assignmentType } { title } 已完成"
+  },
+  "assignmenttype_title_is_incomplete_a1d5fac0": {
+    "message": "{ assignmentType } { title } 未完成"
+  },
+  "beginning_of_your_to_do_history_61ef2dce": {
+    "message": "您的待办事项历史记录的开始"
+  },
+  "canvas_planner_98ed106": {
+    "message": "Canvas 计划程序"
+  },
+  "close_d634289d": {
+    "message": "关闭"
+  },
+  "close_opportunities_popover_f4e50551": {
+    "message": "关闭机会弹出窗"
+  },
+  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+    "message": "{ count, plural,\n     =0 {# 机会}\n    one {# 机会}\n  other {# 机会}\n}"
+  },
+  "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
+    "message": "{ count, plural,\n    one {显示 # 个已完成项目}\n  other {显示 # 个已完成项目}\n}"
+  },
+  "course_8a63b4a3": {
+    "message": "课程"
+  },
+  "course_to_do_bcbbab54": {
+    "message": "{ course } 待办事项"
+  },
+  "date_at_time_dbdb1b99": {
+    "message": "{ date } 时间{ time }"
+  },
+  "date_ee500367": {
+    "message": "日期"
+  },
+  "date_is_required_8660ec22": {
+    "message": "日期必填"
+  },
+  "delete_a6efa79d": {
+    "message": "删除"
+  },
+  "details_98a31b68": {
+    "message": "详情"
+  },
+  "dismiss_opportunityname_5995176f": {
+    "message": "撤销{ opportunityName }"
+  },
+  "due_5d7267be": {
+    "message": "到期："
+  },
+  "due_date_8ce289b6": {
+    "message": "到期：{ date }"
+  },
+  "edit_title_72e5a21e": {
+    "message": "编辑{ title }"
+  },
+  "error_loading_more_items_3f109d9f": {
+    "message": "加载更多项目时出错"
+  },
+  "error_loading_past_items_2881dbb1": {
+    "message": "加载过去的项目时出错"
+  },
+  "excused_cf8792eb": {
+    "message": "已请假"
+  },
+  "failed_to_delete_to_do_64edff49": {
+    "message": "删除待办事项出错"
+  },
+  "failed_to_get_new_activity_17e7ec7c": {
+    "message": "获取新活动失败"
+  },
+  "failed_to_load_opportunities_52ab6404": {
+    "message": "加载机遇失败"
+  },
+  "failed_to_save_to_do_ddc7503b": {
+    "message": "保存待办事项出错"
+  },
+  "feedback_6dcc1991": {
+    "message": "反馈"
+  },
+  "go_to_dashboard_card_view_10398ef6": {
+    "message": "转到仪表板卡视图"
+  },
+  "graded_25cd3fcd": {
+    "message": "已评分"
+  },
+  "late_2be42b88": {
+    "message": "延迟"
+  },
+  "load_more_a36f9cf9": {
+    "message": "加载更多"
+  },
+  "load_prior_dates_f2b0f6f0": {
+    "message": "加载以前的日期"
+  },
+  "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
+    "message": "已加载 { count, plural,\n     =0{# 个项目 }\n    one {# 个项目 }\n  other {# 个项目}\n}"
+  },
+  "loading_25990131": {
+    "message": "加载中……"
+  },
+  "loading_past_items_ca499e75": {
+    "message": "正在加载过去的项目"
+  },
+  "loading_planner_items_947a813d": {
+    "message": "加载计划程序项目"
+  },
+  "looks_like_there_isn_t_anything_here_d9bcef49": {
+    "message": "此处似乎没有任何内容"
+  },
+  "missing_1a256b3b": {
+    "message": "缺失"
+  },
+  "missing_items_for_5ef30cea": {
+    "message": "缺少项目"
+  },
+  "new_activity_8b84847d": {
+    "message": "新活动"
+  },
+  "new_activity_for_ac84f6e6": {
+    "message": "新活动"
+  },
+  "next_month_749b1778": {
+    "message": "下个月"
+  },
+  "no_due_dates_assigned_e8f5bac8": {
+    "message": "未指定截止日期"
+  },
+  "no_to_do_s_for_this_day_yet_90c5873d": {
+    "message": "当天没有“待办事项”。"
+  },
+  "nothing_new_needs_attention_3ac548d4": {
+    "message": "没有任何新内容需要注意。"
+  },
+  "optional_add_course_ef0d70fc": {
+    "message": "可选：添加课程"
+  },
+  "points_bceb5005": {
+    "message": "分值"
+  },
+  "points_points_63e59cce": {
+    "message": "{ points } 分值"
+  },
+  "previous_month_bb1e3c84": {
+    "message": "上个月"
+  },
+  "pts_699bd9aa": {
+    "message": "得分"
+  },
+  "replies_4a8577c8": {
+    "message": "回复"
+  },
+  "save_11a80ec3": {
+    "message": "保存"
+  },
+  "submitted_318fad53": {
+    "message": "已提交"
+  },
+  "task_16b0ef38": {
+    "message": "任务"
+  },
+  "title_ee03d132": {
+    "message": "名称"
+  },
+  "title_is_required_6ddcab69": {
+    "message": "名称必填"
+  },
+  "to_do_1d554f36": {
+    "message": "待办事项"
+  },
+  "today_76e10f9c": {
+    "message": "今天"
+  },
+  "today_at_date_8ac30d6": {
+    "message": "今天{ date }"
+  },
+  "tomorrow_9a6c9a00": {
+    "message": "明天"
+  },
+  "tomorrow_at_date_b53f2cf1": {
+    "message": "明天{ date }"
+  },
+  "unable_to_mark_as_complete_8141856d": {
+    "message": "无法标记为完成"
+  },
+  "yesterday_at_date_1aa6d18e": {
+    "message": "昨天{ date }"
+  },
+  "yesterday_c6bd6abf": {
+    "message": "昨天"
+  },
+  "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
+    "message": "您已经往回滚动到第一个待办事项！"
+  }
+}

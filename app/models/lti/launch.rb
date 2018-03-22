@@ -17,7 +17,7 @@
 
 module Lti
   class Launch
-    FRAME_ALLOWANCES = ['geolocation', 'microphone', 'camera', 'midi', 'encrypted-media'].freeze
+    FRAME_ALLOWANCES = ['geolocation *', 'microphone *', 'camera *', 'midi *', 'encrypted-media *'].freeze
 
     attr_writer :analytics_id, :analytics_message_type
     attr_accessor :link_text, :resource_url, :params, :launch_type, :tool_dimensions, :base_string
@@ -32,22 +32,20 @@ module Lti
     end
 
     def resource_url
-      begin
-        url = URI(@resource_url)
+      url = URI(@resource_url)
 
-        if ['http', 'https'].include?(url.scheme)
-          @post_only ? @resource_url.split('?').first : @resource_url
-        else
-          'about:blank'
-        end
-      rescue
+      if ['http', 'https'].include?(url.scheme)
+        @post_only ? @resource_url.split('?').first : @resource_url
+      else
         'about:blank'
       end
+    rescue
+      'about:blank'
     end
 
     def resource_path
       url = URI.parse(resource_url)
-      url.path.blank? ? '/' : url.path
+      url.path.presence || '/'
     end
 
     def analytics_id

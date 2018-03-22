@@ -42,7 +42,7 @@
       </tr>
     </table>
   <% elsif question_type.entry_type == "matching" %>
-    <div style="float: left; width: 40%; margin-top: 10px;">
+    <div class="pull-left" style="width: 40%; margin-top: 10px;">
       <% if answer %>
         <label for="question_<%= hash_get(question, :id) %>_answer_<%= hash_get(answer, :id) %>" aria-label="<%= answer_label %>"><%= (hash_get(answer, :left_html) || hash_get(answer, :html)).present? ? (hash_get(answer, :left_html) || hash_get(answer, :html)).html_safe : (hash_get(answer, :left) || hash_get(answer, :text)) %></label>
         <% if !user_answer %>
@@ -52,7 +52,7 @@
         <% end %>
       <% end %>
     </div>
-    <div style="float: left; width: 40%; margin-top: 10px;">
+    <div class="pull-left" style="width: 40%; margin-top: 10px;">
       <% if user_answer %>
         <% if hash_get(user_answer, "answer_#{hash_get(answer, :id)}").to_i == hash_get(answer, :match_id).to_i %>
           <%= (hash_get(answer, :right) || (hash_get(question, :matches, []).find{|a| hash_get(a, :match_id).to_i == hash_get(answer, :match_id).to_i}[:text] rescue '')) %>

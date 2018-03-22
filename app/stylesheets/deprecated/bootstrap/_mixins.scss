@@ -109,16 +109,16 @@
 
 // Border Radius
 @mixin border-radius($radius) {
-  border-radius: $radius;
+  border-radius: direction-corners($radius);
 }
 // Single Side Border Radius
 @mixin border-right-radius($radius) {
-  border-top-right-radius: $radius;
-  border-bottom-right-radius: $radius;
+  border-top-#{direction(right)}-radius: $radius;
+  border-bottom-#{direction(right)}-radius: $radius;
 }
 @mixin border-left-radius($radius) {
-  border-top-left-radius: $radius;
-  border-bottom-left-radius: $radius;
+  border-top-#{direction(left)}-radius: $radius;
+  border-bottom-#{direction(left)}-radius: $radius;
 }
 
 // Drop shadows
@@ -196,20 +196,20 @@
 @mixin tableColumns($columnSpan: 1) {
   float: none; // undo default grid column styles
   width: (($gridColumnWidth) * $columnSpan) + ($gridGutterWidth * ($columnSpan - 1)) - 16; // 16 is total padding on left and right of table cells
-  margin-left: 0; // undo default grid column styles
+  margin-#{direction(left)}: 0; // undo default grid column styles
 }
 
 // The Grid
 @mixin grid-core($gridColumnWidth, $gridGutterWidth) {
   .row {
-    margin-left: $gridGutterWidth * -1;
+    margin-#{direction(left)}: $gridGutterWidth * -1;
     @include clearfix();
   }
 
   [class*="span"] {
-    float: left;
+    float: direction(left);
     min-height: 1px; // prevent collapsing columns
-    margin-left: $gridGutterWidth;
+    margin-#{direction(left)}: $gridGutterWidth;
   }
 
   // Set the container width
@@ -241,7 +241,7 @@
 }
 
 @mixin grid-core-offset($columns, $gridColumnWidth, $gridGutterWidth) {
-  margin-left: ($gridColumnWidth * $columns) + ($gridGutterWidth * ($columns + 1));
+  margin-#{direction(left)}: ($gridColumnWidth * $columns) + ($gridGutterWidth * ($columns + 1));
 }
 
 
@@ -255,16 +255,16 @@
       width: 100%;
       min-height: $inputHeight;
       @include box-sizing(border-box);
-      float: left;
-      margin-left: $fluidGridGutterWidth;
+      float: direction(left);
+      margin-#{direction(left)}: $fluidGridGutterWidth;
     }
     [class*="span"]:first-child {
-      margin-left: 0;
+      margin-#{direction(left)}: 0;
     }
 
     // Space grid-sized controls properly if multiple per line
     .controls-row [class*="span"] + [class*="span"] {
-      margin-left: $fluidGridGutterWidth;
+      margin-#{direction(left)}: $fluidGridGutterWidth;
     }
 
     // generate .spanX and .offsetX
@@ -293,11 +293,11 @@
 }
 
 @mixin grid-fluid-offset($columns, $fluidGridColumnWidth, $fluidGridGutterWidth) {
-  margin-left: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) + ($fluidGridGutterWidth * 2);
+  margin-#{direction(left)}: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) + ($fluidGridGutterWidth * 2);
 }
 
 @mixin grid-fluid-offset-first-child($columns, $fluidGridColumnWidth, $fluidGridGutterWidth) {
-  margin-left: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) + ($fluidGridGutterWidth);
+  margin-#{direction(left)}: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) + ($fluidGridGutterWidth);
 }
 
 
@@ -306,12 +306,12 @@
   input,
   textarea,
   .uneditable-input {
-    margin-left: 0; // override margin-left from core grid system
+    margin-#{direction(left)}: 0; // override margin-left from core grid system
   }
 
   // Space grid-sized controls properly if multiple per line
   .controls-row [class*="span"] + [class*="span"] {
-    margin-left: $gridGutterWidth;
+    margin-#{direction(left)}: $gridGutterWidth;
   }
 
   // generate .spanX

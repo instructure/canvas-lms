@@ -24,7 +24,6 @@ import Container from '@instructure/ui-core/lib/components/Container'
 import types from './PropTypes'
 import ThemeEditorAccordion from './ThemeEditorAccordion'
 import ThemeEditorFileUpload from './ThemeEditorFileUpload'
-import ThemeEditor from './ThemeEditor'
 
 export default function ThemeEditorSidebar(props) {
   if (props.allowGlobalIncludes) {
@@ -37,6 +36,8 @@ export default function ThemeEditorSidebar(props) {
             getDisplayValue={props.getDisplayValue}
             changedValues={props.changedValues}
             changeSomething={props.changeSomething}
+            themeState={props.themeState}
+            handleThemeStateChange={props.handleThemeStateChange}
           />
         </TabPanel>
         <TabPanel title={I18n.t('Upload')} padding="0">
@@ -78,6 +79,8 @@ export default function ThemeEditorSidebar(props) {
                 currentValue={props.brandConfig.css_overrides}
                 userInput={props.changedValues.css_overrides}
                 onChange={props.changeSomething.bind(null, 'css_overrides')}
+                themeState={props.themeState}
+                handleThemeStateChange={props.handleThemeStateChange}
               />
 
               <ThemeEditorFileUpload
@@ -87,6 +90,8 @@ export default function ThemeEditorSidebar(props) {
                 currentValue={props.brandConfig.js_overrides}
                 userInput={props.changedValues.js_overrides}
                 onChange={props.changeSomething.bind(null, 'js_overrides')}
+                themeState={props.themeState}
+                handleThemeStateChange={props.handleThemeStateChange}
               />
             </div>
           </div>
@@ -105,6 +110,8 @@ export default function ThemeEditorSidebar(props) {
                 currentValue={props.brandConfig.mobile_css_overrides}
                 userInput={props.changedValues.mobile_css_overrides}
                 onChange={props.changeSomething.bind(null, 'mobile_css_overrides')}
+                themeState={props.themeState}
+                handleThemeStateChange={props.handleThemeStateChange}
               />
 
               <ThemeEditorFileUpload
@@ -114,6 +121,8 @@ export default function ThemeEditorSidebar(props) {
                 currentValue={props.brandConfig.mobile_js_overrides}
                 userInput={props.changedValues.mobile_js_overrides}
                 onChange={props.changeSomething.bind(null, 'mobile_js_overrides')}
+                themeState={props.themeState}
+                handleThemeStateChange={props.handleThemeStateChange}
               />
             </div>
           </div>
@@ -129,6 +138,8 @@ export default function ThemeEditorSidebar(props) {
         getDisplayValue={props.getDisplayValue}
         changedValues={props.changedValues}
         changeSomething={props.changeSomething}
+        themeState={props.themeState}
+        handleThemeStateChange={props.handleThemeStateChange}
       />
     </Container>
   )
@@ -140,7 +151,9 @@ ThemeEditorSidebar.propTypes = {
   variableSchema: types.variableSchema.isRequired,
   getDisplayValue: func.isRequired,
   changeSomething: func.isRequired,
-  changedValues: object
+  changedValues: object,
+  themeState: object.isRequired,
+  handleThemeStateChange: func.isRequired
 }
 
 ThemeEditorSidebar.defaultProps = {

@@ -151,6 +151,7 @@ class UsersController < ApplicationController
   include SectionTabHelper
   include I18nUtilities
   include CustomColorHelper
+  include DashboardHelper
 
   before_action :require_user, :only => [:grades, :merge, :kaltura_session,
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
@@ -201,10 +202,17 @@ class UsersController < ApplicationController
 
     grading_period_id = generate_grading_period_id(params[:grading_period_id])
     opts = { grading_period_id: grading_period_id } if grading_period_id
-    render json: {
+
+    grade_data = {
       grade: enrollment.computed_current_score(opts),
       hide_final_grades: enrollment.course.hide_final_grades?
     }
+
+    if enrollment.course.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
+      grade_data[:unposted_grade] = enrollment.unposted_current_score(opts)
+    end
+
+    render json: grade_data
   end
 
   def oauth
@@ -490,23 +498,13 @@ class UsersController < ApplicationController
           sortable_name: @user.sortable_name,
           email: @user.email,
           pseudonyms: @user.all_active_pseudonyms.map do |pseudonym|
-            { login_id: pseudonym.login,
+            { login_id: pseudonym.unique_id,
               sis_id: pseudonym.sis_user_id,
               integration_id: pseudonym.integration_id }
           end
         }
       }
       render :html => '<div id="application"></div><div id="act_as_modal"></div>'.html_safe, :layout => 'layouts/bare'
-    end
-  end
-
-  helper_method :show_planner?
-  def show_planner?
-    return false unless @current_user && @current_user.preferences
-    if @current_user.preferences[:dashboard_view]
-      @current_user.preferences[:dashboard_view] == 'planner'
-    else
-      false
     end
   end
 
@@ -533,13 +531,14 @@ class UsersController < ApplicationController
     js_env({
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
       :PREFERENCES => {
-        :recent_activity_dashboard => @current_user.preferences[:dashboard_view] == 'activity' || @current_user.preferences[:recent_activity_dashboard],
+        :recent_activity_dashboard => show_recent_activity?,
         :hide_dashcard_color_overlays => @current_user.preferences[:hide_dashcard_color_overlays],
         :custom_colors => @current_user.custom_colors,
         :show_planner => show_planner?
       },
       :STUDENT_PLANNER_ENABLED => planner_enabled?,
-      :STUDENT_PLANNER_COURSES => planner_enabled? && map_courses_for_menu(@current_user.courses_with_primary_enrollment, :include_section_tabs => true)
+      :STUDENT_PLANNER_COURSES => planner_enabled? && map_courses_for_menu(@current_user.courses_with_primary_enrollment, :include_section_tabs => true),
+      :STUDENT_PLANNER_GROUPS => planner_enabled? && map_groups_for_planner(@current_user.current_groups.where(context_type: 'Account'))
     })
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
@@ -845,11 +844,13 @@ class UsersController < ApplicationController
 
     grading_scope = @current_user.assignments_needing_grading(scope_only: true).
       reorder(:due_at, :id)
-    submitting_scope = @current_user.assignments_needing_submitting(
+    submitting_scope = @current_user.
+      assignments_needing_submitting(
         include_ungraded: true,
         limit: ToDoListPresenter::ASSIGNMENT_LIMIT,
-        scope_only: true ).
-      where('assignments.due_at > ?', Time.zone.now).
+        scope_only: true
+      ).
+      where('assignments.due_at IS NULL OR assignments.due_at > ?', Time.zone.now).
       reorder(:due_at, :id)
 
     grading_collection = BookmarkedCollection.wrap(bookmark, grading_scope)
@@ -867,10 +868,12 @@ class UsersController < ApplicationController
 
     if Array(params[:include]).include? 'ungraded_quizzes'
       quizzes_bookmark = BookmarkedCollection::SimpleBookmarker.new(Quizzes::Quiz, :due_at, :id)
-      quizzes_scope = @current_user.ungraded_quizzes(
+      quizzes_scope = @current_user.
+        ungraded_quizzes(
           :needing_submitting => true,
-          :scope_only => true).
-        where('quizzes.due_at >= ?', Time.zone.now).
+          :scope_only => true
+        ).
+        where('quizzes.due_at IS NULL OR quizzes.due_at >= ?', Time.zone.now).
         reorder(:due_at, :id)
       quizzes_collection = BookmarkedCollection.wrap(quizzes_bookmark, quizzes_scope)
       quizzes_collection = BookmarkedCollection.transform(quizzes_collection) do |a|
@@ -886,6 +889,22 @@ class UsersController < ApplicationController
     render :json => todos
   end
 
+  # @API List counts for todo items
+  # Counts of different todo items such as the number of assignments needing grading as well as the number of assignments needing submitting.
+  #
+  # @argument include[] [String, "ungraded_quizzes"]
+  #   "ungraded_quizzes":: Optionally include ungraded quizzes (such as practice quizzes and surveys) in the list.
+  #                        These will be returned under a +quiz+ key instead of an +assignment+ key in response elements.
+  #
+  # There is a limit to the number of todo items this endpoint will count.
+  # It will only look at the first 100 todo items for the user. If the user has more than 100 todo items this count may not be reliable.
+  # The largest reliable number for both counts is 100.
+  #
+  # @example_response
+  #   {
+  #     needs_grading_count: 32,
+  #     assignments_needing_submitting: 10
+  #   }
   def todo_item_count
     return render_unauthorized_action unless @current_user
     limit = ToDoListPresenter::ASSIGNMENT_LIMIT
@@ -1213,7 +1232,7 @@ class UsersController < ApplicationController
   # @returns User
   def api_show
     @user = api_find(User, params[:id])
-    if @user.grants_any_right?(@current_user, session, :manage, :manage_user_details)
+    if @user.grants_right?(@current_user, session, :api_show_user)
       render :json => user_json(@user, @current_user, session, %w{locale avatar_url permissions}, @current_user.pseudonym.account)
     else
       render_unauthorized_action
@@ -1627,7 +1646,9 @@ class UsersController < ApplicationController
     end
   end
 
-  # @API Get dashboard postions
+  # @API Get dashboard positions
+  # @beta
+  #
   # Returns all dashboard positions that have been saved for a user.
   #
   # @example_request
@@ -1651,6 +1672,8 @@ class UsersController < ApplicationController
   end
 
   # @API Update dashboard positions
+  # @beta
+  #
   # Updates the dashboard positions for a user for a given context.  This allows
   # positions for the dashboard cards and elsewhere to be customized on a per
   # user basis.
@@ -1759,11 +1782,6 @@ class UsersController < ApplicationController
     @user = api_request? ?
       api_find(User, params[:id]) :
       params[:id] ? api_find(User, params[:id]) : @current_user
-
-    if params[:default_pseudonym_id] && authorized_action(@user, @current_user, :manage)
-      @default_pseudonym = @user.pseudonyms.find(params[:default_pseudonym_id])
-      @default_pseudonym.move_to_top
-    end
 
     update_email = @user.grants_right?(@current_user, :manage_user_details) && user_params[:email]
     managed_attributes = []
@@ -2524,8 +2542,8 @@ class UsersController < ApplicationController
         @pseudonym.send(:skip_session_maintenance=, true)
       end
       @user.save!
-      if @observee && !@user.user_observees.where(user_id: @observee).exists?
-        UserObserver.create_or_restore(observee: @observee, observer: @user)
+      if @observee && !@user.as_observer_observation_links.where(user_id: @observee).exists?
+        UserObservationLink.create_or_restore(student: @observee, observer: @user)
       end
 
       if notify_policy.is_self_registration?

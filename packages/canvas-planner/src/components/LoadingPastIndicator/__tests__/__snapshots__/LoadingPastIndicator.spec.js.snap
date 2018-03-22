@@ -1,0 +1,122 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`prioritizes loading complete over currently loading 1`] = `
+<div>
+  <Container
+    as="div"
+    display={null}
+    padding="small"
+    textAlign="center"
+  >
+    <Container
+      display="block"
+      margin="small"
+    >
+      <TV
+        aria-hidden="true"
+        role="img"
+      />
+    </Container>
+    <Text
+      as="div"
+      letterSpacing="normal"
+      size="large"
+    >
+      Beginning of Your To-Do History
+    </Text>
+    <Text
+      as="div"
+      letterSpacing="normal"
+      size="medium"
+    >
+      You've scrolled back to your very first To-Do!
+    </Text>
+  </Container>
+</div>
+`;
+
+exports[`renders TV when all past items loaded 1`] = `
+<div>
+  <Container
+    as="div"
+    display={null}
+    padding="small"
+    textAlign="center"
+  >
+    <Container
+      display="block"
+      margin="small"
+    >
+      <TV
+        aria-hidden="true"
+        role="img"
+      />
+    </Container>
+    <Text
+      as="div"
+      letterSpacing="normal"
+      size="large"
+    >
+      Beginning of Your To-Do History
+    </Text>
+    <Text
+      as="div"
+      letterSpacing="normal"
+      size="medium"
+    >
+      You've scrolled back to your very first To-Do!
+    </Text>
+  </Container>
+</div>
+`;
+
+exports[`renders spinner while loading 1`] = `
+<div>
+  <Container
+    as="div"
+    display={null}
+    padding="small"
+    textAlign="center"
+  >
+    <Container
+      display="inline"
+    >
+      <Spinner
+        margin="0 x-small 0 0"
+        size="small"
+        title="Loading past items"
+        variant="default"
+      />
+    </Container>
+    <Text
+      as="span"
+      color="secondary"
+      letterSpacing="normal"
+      size="small"
+    >
+      Loading past items
+    </Text>
+  </Container>
+</div>
+`;
+
+exports[`renders very little 1`] = `<div />`;
+
+exports[`shows an Alert when there's a query error 1`] = `
+<div>
+  <div
+    style={
+      Object {
+        "margin": "0 auto",
+        "width": "50%",
+      }
+    }
+  >
+    <ErrorAlert
+      error="uh oh"
+    >
+      Error loading past items
+    </ErrorAlert>
+  </div>
+</div>
+`;

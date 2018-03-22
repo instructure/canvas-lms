@@ -199,6 +199,45 @@ test('creates get action creator from thunk that selects the page if select is t
   })
 })
 
+test('can get all pagination results under a single set of dispatches', (assert) => {
+  const done = assert.async()
+  const mockStore = createMockStore({
+    things: {
+      currentPage: 1,
+      pages: { 1: { item: [], loadState: LoadStates.NOT_LOADED } }
+    },
+  })
+  const dispatchSpy = sinon.spy(mockStore, 'dispatch')
+
+  const mockResult = {
+    data: ['item1'],
+    headers: {
+      link: '<http://canvas.example.com/api/v1/someendpoint&page=5&per_page=50>; rel="last"'
+    }
+  }
+  const thunk = () => new Promise((resolve, _reject) => resolve(mockResult))
+  const { actionCreators } = createPaginationActions('things', thunk, { headThunk: thunk, fetchAll: true })
+  actionCreators.getThings()(mockStore.dispatch, mockStore.getState)
+  setTimeout(() => {
+    equal(dispatchSpy.callCount, 2)
+    deepEqual(dispatchSpy.firstCall.args, [{ type: 'GET_THINGS_START', payload: { page: 1 } }])
+
+    // Should have item1 5 times, as the link header indicated there were 5
+    // pages that needed to be gathered
+    const expectedResults = {
+      type: 'GET_THINGS_SUCCESS',
+      payload: {
+        data: [ "item1", "item1", "item1", "item1", "item1" ],
+        lastPage: 1,
+        page: 1
+      }
+    }
+    deepEqual(dispatchSpy.secondCall.args, [expectedResults])
+    dispatchSpy.restore()
+    done()
+  }, 750)
+})
+
 QUnit.module('createPaginatedReducer')
 
 test('sets current page on SELECT_PAGE', () => {

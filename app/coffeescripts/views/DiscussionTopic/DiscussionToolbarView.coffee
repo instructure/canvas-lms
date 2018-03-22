@@ -16,11 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'i18n!discussions'
   'Backbone'
   'underscore'
   'jqueryui/button'
-], (I18n, {View}, _) ->
+], ({View}, _) ->
 
   ##
   # requires a MaterializedDiscussionTopic model

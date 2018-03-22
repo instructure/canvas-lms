@@ -61,17 +61,6 @@ GreatExpectations.install!
 
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
 
-if CANVAS_RAILS5_0
-  module EnforceKwargTestFormat
-    def non_kwarg_request_warning
-      raise "Please use keyword arguments in your calls in controller/integration specs. e.g. `get :show, params: {id: 1}`"
-    end
-  end
-  [ActionDispatch::Integration::Session, ActionController::TestCase::Behavior].each do |mod|
-    mod.prepend(EnforceKwargTestFormat)
-  end
-end
-
 # this makes sure that a broken transaction becomes functional again
 # by the time we hit rescue_action_in_public, so that the error report
 # can be recorded
@@ -236,6 +225,7 @@ if defined?(Spec::DSL::Main)
 end
 
 RSpec::Matchers.define_negated_matcher :not_eq, :eq
+RSpec::Matchers.define_negated_matcher :not_have_key, :have_key
 
 RSpec::Matchers.define :encompass do |expected|
   match do |actual|
@@ -318,6 +308,7 @@ RSpec.configure do |config|
 
   config.include Helpers
   config.include Factories
+  config.include RequestHelper, type: :request
   config.include Onceler::BasicHelpers
   config.project_source_dirs << "gems" # so that failures here are reported properly
 
@@ -343,7 +334,7 @@ RSpec.configure do |config|
     RoleOverride.clear_cached_contexts
     Delayed::Job.redis.flushdb if Delayed::Job == Delayed::Backend::Redis::Job
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
-    Attachment.domain_namespace = nil
+    Attachment.current_root_account = nil
     Canvas::DynamicSettings.reset_cache!
     ActiveRecord::Migration.verbose = false
     RequestStore.clear!
@@ -530,18 +521,27 @@ RSpec.configure do |config|
     dir
   end
 
-  def process_csv_data(*lines)
-    opts = lines.extract_options!
-    opts.reverse_merge!(allow_printing: false)
-    account = opts[:account] || @account || account_model
-
+  def generate_csv_file(lines)
     tmp = Tempfile.new("sis_rspec")
     path = "#{tmp.path}.csv"
     tmp.close!
     File.open(path, "w+") { |f| f.puts lines.flatten.join "\n" }
+    path
+  end
+
+  def process_csv_data(*lines)
+    opts = lines.extract_options!
+    opts.reverse_merge!(allow_printing: false)
+    account = opts[:account] || @account || account_model
+    opts[:batch] ||= account.sis_batches.create!
+
+    path = generate_csv_file(lines)
     opts[:files] = [path]
 
-    importer = SIS::CSV::Import.process(account, opts)
+    use_parallel = SisBatch.use_parallel_importers?(account)
+    import_class = use_parallel ? SIS::CSV::ImportRefactored : SIS::CSV::Import
+    importer = import_class.process(account, opts)
+    run_jobs
 
     File.unlink path
 
@@ -551,7 +551,7 @@ RSpec.configure do |config|
   def process_csv_data_cleanly(*lines_or_opts)
     importer = process_csv_data(*lines_or_opts)
     raise "csv errors: #{importer.errors.inspect}" if importer.errors.present?
-    raise "csv warning: #{importer.warnings.inspect}" if importer.warnings.present?
+    importer
   end
 
   def enable_cache(new_cache=:memory_store)

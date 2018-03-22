@@ -59,9 +59,9 @@ define([
   test("sets form values from 'period' props", function() {
     let form = this.renderComponent();
     equal(form.refs.title.value, 'Q1');
-    equal(form.refs.startDate.refs.dateInput.value, 'Nov 1, 2015 at 12pm');
-    equal(form.refs.endDate.refs.dateInput.value, 'Dec 31, 2015 at 12pm');
-    equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7, 2016 at 12pm');
+    equal(form.refs.startDate.refs.dateInput.value, 'Nov 1, 2015 12pm');
+    equal(form.refs.endDate.refs.dateInput.value, 'Dec 31, 2015 12pm');
+    equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7, 2016 12pm');
     equal(form.weightInput.value, '30');
   });
 
@@ -90,40 +90,40 @@ define([
     let incompletePeriod = _.extend({}, examplePeriod, { closeDate: null });
     let form = this.renderComponent({period: incompletePeriod});
     let endDateInput = ReactDOM.findDOMNode(form.refs.endDate.refs.dateInput);
-    endDateInput.value = 'Dec 31, 2015 at 12pm';
+    endDateInput.value = 'Dec 31, 2015 12pm';
     endDateInput.dispatchEvent(new Event("change"));
-    equal(form.refs.endDate.refs.dateInput.value, 'Dec 31, 2015 at 12pm');
-    equal(form.refs.closeDate.refs.dateInput.value, 'Dec 31, 2015 at 12pm');
+    equal(form.refs.endDate.refs.dateInput.value, 'Dec 31, 2015 12pm');
+    equal(form.refs.closeDate.refs.dateInput.value, 'Dec 31, 2015 12pm');
   });
 
   test("auto-updates 'closeDate' when set equal to 'endDate' and 'endDate' changes", function() {
     let consistentPeriod = _.extend({}, examplePeriod, { closeDate: examplePeriod.endDate });
     let form = this.renderComponent({period: consistentPeriod});
     let endDateInput = ReactDOM.findDOMNode(form.refs.endDate.refs.dateInput);
-    endDateInput.value = 'Dec 30, 2015 at 12pm';
+    endDateInput.value = 'Dec 30, 2015 12pm';
     endDateInput.dispatchEvent(new Event("change"));
-    equal(form.refs.endDate.refs.dateInput.value, 'Dec 30, 2015 at 12pm');
-    equal(form.refs.closeDate.refs.dateInput.value, 'Dec 30, 2015 at 12pm');
+    equal(form.refs.endDate.refs.dateInput.value, 'Dec 30, 2015 12pm');
+    equal(form.refs.closeDate.refs.dateInput.value, 'Dec 30, 2015 12pm');
   });
 
   test("preserves 'closeDate' when not set equal to 'endDate' and 'endDate' changes", function() {
     let form = this.renderComponent();
     let endDateInput = ReactDOM.findDOMNode(form.refs.endDate.refs.dateInput);
-    endDateInput.value = 'Dec 30, 2015 at 12pm';
+    endDateInput.value = 'Dec 30, 2015 12pm';
     endDateInput.dispatchEvent(new Event("change"));
-    equal(form.refs.endDate.refs.dateInput.value, 'Dec 30, 2015 at 12pm');
-    equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7, 2016 at 12pm');
+    equal(form.refs.endDate.refs.dateInput.value, 'Dec 30, 2015 12pm');
+    equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7, 2016 12pm');
   });
 
   test("preserves 'closeDate' when already set and 'endDate' changes to match, then changes again", function() {
     let form = this.renderComponent();
     let endDateInput = ReactDOM.findDOMNode(form.refs.endDate.refs.dateInput);
-    endDateInput.value = 'Jan 7 at 12pm';
+    endDateInput.value = 'Jan 7 12pm';
     endDateInput.dispatchEvent(new Event("change"));
-    endDateInput.value = 'Dec 30, 2015 at 12pm';
+    endDateInput.value = 'Dec 30, 2015 12pm';
     endDateInput.dispatchEvent(new Event("change"));
-    equal(form.refs.endDate.refs.dateInput.value, 'Dec 30, 2015 at 12pm');
-    equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7, 2016 at 12pm');
+    equal(form.refs.endDate.refs.dateInput.value, 'Dec 30, 2015 12pm');
+    equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7, 2016 12pm');
   });
 
   test("auto-updates 'closeDate' when cleared and 'endDate' changes", function() {
@@ -132,10 +132,10 @@ define([
     closeDateInput.value = '';
     closeDateInput.dispatchEvent(new Event("change"));
     let endDateInput = ReactDOM.findDOMNode(form.refs.endDate.refs.dateInput);
-    endDateInput.value = 'Jan 7 at 12pm';
+    endDateInput.value = 'Jan 7 12pm';
     endDateInput.dispatchEvent(new Event("change"));
-    equal(form.refs.endDate.refs.dateInput.value, 'Jan 7 at 12pm');
-    equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7 at 12pm');
+    equal(form.refs.endDate.refs.dateInput.value, 'Jan 7 12pm');
+    equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7 12pm');
   });
 
   test("given a different content timezone, local and server time are shown", function() {

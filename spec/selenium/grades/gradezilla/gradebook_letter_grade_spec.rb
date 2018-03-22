@@ -18,16 +18,15 @@
 require_relative '../../helpers/gradezilla_common'
 require_relative '../pages/gradezilla_page'
 require_relative '../pages/gradezilla_cells_page'
+require_relative '../setup/assignment_grade_type_setup'
 
 describe "Gradezilla" do
   include_context "in-process server selenium tests"
-  include GradezillaCommon
+  include AssignmentGradeTypeSetup
 
   describe 'letter grade assignment grading' do
     before :once do
-      init_course_with_students 1
-      @assignment = @course.assignments.create!(grading_type: 'letter_grade', points_possible: 10)
-      @assignment.grade_student(@students[0], grade: 'B', grader: @teacher)
+      entering_grades_setup('letter_grade','B')
     end
 
     before :each do
@@ -36,16 +35,14 @@ describe "Gradezilla" do
     end
 
     it 'is maintained in editable mode', priority: "1", test_id: 3438379 do
-      skip('This is skeleton code that acts as AC for GRADE-61 which is WIP')
-      Gradezilla::Cells.grading_cell(@students[0], @assignment).click
-      expect(Gradezilla::Cells.grade_cell_input(@students[0], @assignment)).to eq('B')
+      Gradezilla::Cells.select_scheme_grade(@students[0], @assignment, 'C')
+      expect(Gradezilla::Cells.get_grade(@students[0], @assignment)).to eq('C')
     end
 
     it 'is maintained on page refresh post grade update', priority: "1", test_id: 3438380 do
-      skip('This is skeleton code that acts as AC for GRADE-61 which is WIP')
-      Gradezilla::Cells.edit_grade(@students[0], @assignment, 'A')
+      Gradezilla::Cells.select_scheme_grade(@students[0], @assignment, 'A-')
       refresh_page
-      expect(Gradezilla::Cells.get_grade(@students[0], @assignment)).to eq('A')
+      expect(Gradezilla::Cells.get_grade(@students[0], @assignment)).to eq('A-')
     end
   end
 end

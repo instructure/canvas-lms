@@ -2,30 +2,42 @@
 
   {{#unless skipToolbar}}
   <div class="toolbar outcomes-toolbar">
-    <a href="#" class="go_back ui-button ui-widget ui-state-default ui-corner-all" role="button" style="display:none">
-      {{#t "links.back"}}Back{{/t}}
-    </a>
+    <button class="go_back ui-button ui-widget ui-state-default ui-corner-all" style="display:none">
+      {{#t}}Back{{/t}}
+    </button>
 
     {{#if canManageOutcomes}}
-    <a href="#" class="add_outcome_link ui-button ui-widget ui-state-default ui-corner-all" role="button">
+    <button class="add_outcome_link ui-button ui-widget ui-state-default ui-corner-all">
       <i class="icon-plus"></i>
-      <span class="ui-button-text" aria-hidden="true">{{#t "links.new_outcome"}}Outcome{{/t}}</span>
+      <span class="ui-button-text" aria-hidden="true">{{#t}}Outcome{{/t}}</span>
       <span class="screenreader-only">{{#t}}Add a New Outcome{{/t}}</span>
-    </a>
-    <a href="#" class="add_outcome_group ui-button ui-widget ui-state-default ui-corner-all" role="button">
+    </button>
+    <button class="add_outcome_group ui-button ui-widget ui-state-default ui-corner-all">
       <i class="icon-plus"></i>
-      <span class="ui-button-text" aria-hidden="true">{{#t "links.new_group"}}Group{{/t}}</span>
+      <span class="ui-button-text" aria-hidden="true">{{#t}}Group{{/t}}</span>
       <span class="screenreader-only">{{#t}}Add a New Outcome Group{{/t}}</span>
-    </a>
-    <a href="#" class="find_outcome ui-button ui-widget ui-state-default ui-corner-all" role="button">
+    </button>
+    <button class="import_outcomes ui-button ui-widget ui-state-default ui-corner-all">
+      <i class="icon-upload"></i>
+      <span class="ui-button-text" aria-hidden="true">{{#t}}Import{{/t}}</span>
+      <span class="screenreader-only">{{#t}}Import a set of Outcomes{{/t}}</span>
+    </button>
+    <button class="find_outcome ui-button ui-widget ui-state-default ui-corner-all">
       <i class="icon-search"></i>
-      <span class="ui-button-text" aria-hidden="true">{{#t "links.find"}}Find{{/t}}</span>
+      <span class="ui-button-text" aria-hidden="true">{{#t}}Find{{/t}}</span>
       <span class="screenreader-only">{{#t}}Find an Outcome{{/t}}</span>
-    </a>
+    </button>
     {{/if}}
-    <span id="popoverMenu" class="popover-menu"></span>
+    {{#if canManageRubrics }}
+      <a href="{{contextUrlRoot}}/rubrics" class="manage_rubrics ui-button ui-widget ui-state-default ui-corner-all" role="button">
+        <i class="icon-rubric"></i>
+        <span class="ui-button-text">{{#t}}Manage Rubrics{{/t}}</span>
+      </a>
+    {{/if}}
   </div>
   {{/unless}}
+
+
 
   <div class="outcomes-main">
     <div class="outcomes-sidebar">

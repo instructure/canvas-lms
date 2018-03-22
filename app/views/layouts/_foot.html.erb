@@ -1,3 +1,5 @@
+<%= InstFS.login_pixel(logged_in_user, session, request.host_with_port) %>
+
 <script>
   INST = <%= raw(inst_env.to_json) %>;
   ENV = <%= raw StringifyIds.recursively_stringify_ids(js_env.clone).to_json %>;

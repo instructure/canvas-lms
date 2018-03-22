@@ -32,7 +32,7 @@
 }
 
 .RestrictedDialogForm__form .form-controls .btn:first-of-type{
-  margin-right: 10px;
+  margin-#{direction(right)}: 10px;
 }
 
 .context_modules2 {
@@ -155,11 +155,11 @@
     }
 
     td:first-of-type, th:first-of-type {
-      text-align: left;
+      text-align: direction(left);
     }
 
     td:last-of-type, th:last-of-type {
-      text-align: right;
+      text-align: direction(right);
     }
 
     td {
@@ -170,7 +170,7 @@
       text-align: inherit;
 
       &.align-right {
-        text-align: right;
+        text-align: direction(right);
       }
       &.long {
         width: auto;
@@ -184,7 +184,7 @@
       }
 
       &.no-right-padding {
-        padding-right: 0;
+        padding-#{direction(right)}: 0;
       }
     }
   }
@@ -203,20 +203,20 @@
     display: inherit;
   }
   .item-group-condensed .ig-title {
-    left: 20px;
+    #{direction(left)}: 20px;
   }
 
   .indent-1 {
-    margin-left: 18px;
+    margin-#{direction(left)}: 18px;
   }
   .indent-2 {
-    margin-left: 36px;
+    margin-#{direction(left)}: 36px;
   }
   .indent-3 {
-    margin-left: 54px;
+    margin-#{direction(left)}: 54px;
   }
   .indent-4 {
-    margin-left: 72px;
+    margin-#{direction(left)}: 72px;
   }
 
   /*

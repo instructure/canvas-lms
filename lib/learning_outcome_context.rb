@@ -23,6 +23,8 @@ module LearningOutcomeContext
       klass.has_many :created_learning_outcomes, :class_name => 'LearningOutcome', :as => :context, :inverse_of => :context
       klass.has_many :learning_outcome_groups, :as => :context, :inverse_of => :context
       klass.send :include, InstanceMethods
+
+      klass.after_save :update_root_outcome_group_name, if: -> { saved_change_to_name? }
     end
   end
 
@@ -73,5 +75,12 @@ module LearningOutcomeContext
       LearningOutcomeGroup.find_or_create_root(self, force)
     end
 
+    def update_root_outcome_group_name
+      root = root_outcome_group(false)
+      return unless root
+      self.class.connection.after_transaction_commit do
+        root.update! title: self.name
+      end
+    end
   end
 end

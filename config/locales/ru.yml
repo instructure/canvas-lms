@@ -94,6 +94,7 @@ ru:
         partner_id: "Идентификатор партнера"
         partner_key: "Ключ партнера"
   accept_2fdd362e: Принять
+  acceptable_use_policy_29a28124: "Приемлемая политика использования"
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "допустимые форматы: hex, rgba, rgb, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "Допустимые форматы: svg, png, jpg, gif"
   accepted_user_role_type_course_course_2ce91589: "Принято: %{user}, %{role_type}, курс, %{course}"
@@ -798,6 +799,11 @@ ru:
           description: 
             text: "Этот отчет отображает результаты итоговой оценки студента для всех студентов в данном периоде. В полученном файле .csv на каждую регистрацию будет приходиться одна строка, а также будут показаны текущая и итоговая оценка, отображенные в табеле успеваемости курса."
     group_type: группа
+    ilumno: 
+      grade_export: 
+        course_date_picker_parameter: 
+          Optional: Опционально
+          settings: "настройки:"
     include_deleted_parameter: 
       account_reports: 
         default: 
@@ -1492,12 +1498,14 @@ ru:
   add_a_new_course_4a041207: "Добавить новый курс"
   add_a_new_outcome_cbdbe96c: "Добавить новый результат"
   add_a_new_outcome_group_e3fab2fc: "Добавить группу нового результата"
+  add_a_new_user_9d041d3b: "Добавить нового пользователя"
   add_a_new_user_c440d053: "Добавить нового пользователя"
   add_a_reviewer_for_the_selected_students_1c7b5d6f: "Добавить рецензента для выбранных студентов"
   add_account_admins_99c03c9e: "Добавить администраторов учетной записи"
   add_alert_b2729c99: "Добавить предупреждение"
   add_an_assignment_fb73942e: "Добавить задание"
   add_an_identity_provider_to_this_account_c2644478: "Добавить провайдера идентификации к этой учетной записи:"
+  add_announcement_165c3b05: "Добавить объявление"
   add_another_assignment_fc5c908f: "Добавить другое задание"
   add_app_baf540f: "Добавить приложение"
   add_assignment_to_name_caf173b0: "Добавить задание для %{name}"
@@ -1515,6 +1523,8 @@ ru:
   add_custom_link_22059c0: "Добавить пользовательскую ссылку"
   add_email_address_aef3b61: "Добавить адрес электронной почты"
   add_existing_content_7e36da66: "Добавить имеющееся содержимое"
+  add_external_feed_6d437a28: "Добавить внешний канал"
+  add_feed_49ed1cb2: "Добавить канал"
   add_files_to_the_course_da6ffd32: "Добавить файлы к курсу"
   add_folder_ba50d107: "Добавить папку"
   add_grading_period_6f774dc3: "Добавить Оценочный период"
@@ -1563,6 +1573,7 @@ ru:
   add_users_to_name_b8109bbb: "Добавить пользователей к %{name}"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Добавить задания. Вы можете просто создать длинный список либо разбить их на группы. Вы можете даже указать весовые критерии каждой группы заданий."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Добавьте ID произвольного поля в своей копии Zendesk для каждого из следующих полей (поля, которые не имеют идентификаторов, не будут введены):"
+  adding_rss_feed_f1202567: "Добавить канал RSS"
   additional_comments_9aed10bb: "Дополнительные комментарии"
   additional_occurrence_s_7b5b0173: "дополнительное(-ые) событие(-я)"
   additional_outcomes_options_6df428f1: "Дополнительные варианты отображения результатов"
@@ -1643,6 +1654,8 @@ ru:
   all_assignments_b79a4d6a: "Все задания"
   all_changes_were_saved_f6f3ddcc: "Все изменения были сохранены"
   all_close_dates_must_be_on_or_after_the_end_date_b898d85d: "Все даты закрытия должны наступать не ранее конечной даты"
+  all_comments_are_sent_to_the_whole_group_284591e7: "Все комментарии отправлены всей группе"
+  all_comments_are_sent_to_the_whole_group_778126f3: "Все комментарии отправлены всей группе."
   all_configured_apps_a14eef0a: "Все настроенные приложения"
   all_courses_a7dbb853: "Все курсы"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Все поля с датами должны присутствовать и быть правильно отформатированными"
@@ -1668,6 +1681,7 @@ ru:
   all_weights_must_be_greater_than_or_equal_to_0_cc2dcdf1: "Все весовые коэффициенты должны быть не меньше 0"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Разрешить модератору рассмотреть несколько независимых оценок для выбранных документов"
   allow_bulk_grade_export_to_sis_e11a6e66: "Разрешить массовый экспорт оценок в SIS"
+  allow_comments_a1f45d8: "Разрешить комментарии"
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: "Разрешить загрузку материалов курса и их просмотр в автономном режиме"
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Разрешить определение изображений курса для каждого курса и использование на картах приборной панели."
   allow_course_images_to_be_assigned_to_a_course_and_adb906f4: "Разрешить определение изображений курса для каждого курса и использование на картах приборной панели."
@@ -1679,19 +1693,23 @@ ru:
   allow_opt_out_of_inbox: "Разрешить пользователям отказаться от ящика входящих сообщений разговоров. Это приведет к тому, что все сообщения и уведомления разговора будут отправляться на основной электронный адрес пользователя в виде уведомлений ASAP, а также к скрытию значка непрочитанных сообщений в ящике входящих сообщений разговора и скрытию предпочтительных настроек уведомлений разговора."
   allow_passive_acceptance_of_terms_of_service_63ef5994: "Разрешить пассивное принятие Условий предоставления услуг"
   allow_reorder_dashboard_cards_78215947: "Разрешить перегруппировку карточек инструментальной панели"
+  allow_replies_for_title_cfe7af6c: "Разрешить ответы для %{title}"
   allow_students_to_download_course_content_and_view_810e66ec: "Разрешить учащимся загружать содержимое курса и просматривать его в оффлайне"
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Разрешить студентам видеть, кто подписался на временные интервалы."
   allow_students_to_see_who_was_signed_up_for_time_s_160ba252: "Разрешить учащимся видеть, кто записался на временные интервалы"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Разрешить возможность отправки уведомлений через нашу очередь диспетчера"
   allow_the_ability_to_send_notifications_through_ou_fdaace5a: "Разрешить возможность отправлять уведомления через нашу диспетчерскую очередь "
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Разрешить этому инструменту доступ к IMS Names и службе присвоения ролей Role Provisioning"
+  allow_users_to_comment_45b8f753: "Разрешить пользователям комментирование"
   allowed_attempts_4e229caa: "Разрешенные попытки"
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Позволяет создавать объявления для конкретного раздела"
+  allows_creating_discussions_for_a_specific_section_6bf44036: "Разрешить создавать дискуссии по отдельным разделам"
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Разрешить учителям отмечать данные оценок для массового экспорта в интеграции SIS."
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Позволяет копировать модули в Canvas"
   allows_the_duplicating_of_objects_in_canvas_c86f3665: "Разрешает дублирование объектов в Canvas"
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Позволяет планировать календарь повторяющихся событий"
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Позволяет пользователям с международными телефонными номерами получать текстовые сообщения от Canvas."
+  alumno_88c80e37: Alumno
   always_3a59e701: Всегда
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "Всегда загружать RCE и Боковую панель из обширной коллекции контент-услуг Canvas"
   an_api_key_is_required_to_use_academic_benchmarks_26011dd6: "Для использования Academic Benchmarks требуется ключ API"
@@ -1718,16 +1736,20 @@ ru:
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Возникла ошибка при установке права на использование для %{filename}"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "При попытке связаться с Turnitin произошла ошибка."
   an_error_occurred_while_checking_the_migration_sta_d17035b1: "Произошла ошибка во время проверки статуса миграции"
+  an_error_occurred_while_deleting_announcements_ab1ff3f6: "Произошла ошибка при удалении аннотаций."
   an_error_occurred_while_loading_associations_9699b3ee: "Произошла ошибка при загрузке ассоциаций"
   an_error_occurred_while_loading_changes_9851b56f: "Произошла ошибка при загрузке изменений"
   an_error_occurred_while_loading_courses_11d4571e: "Произошла ошибка при загрузке курсов"
   an_error_occurred_while_loading_late_policies_c415f676: "Произошла ошибка при загрузке политик опозданий"
+  an_error_occurred_while_locking_announcements_8115ccd7: "Произошла ошибка при блокировании объявлений."
   an_error_occurred_while_migrating_405ac0b5: "При переносе данных произошла ошибка."
   an_error_occurred_while_saving_associations_bd66f3f4: "Произошла ошибка при сохранении ассоциаций"
   an_error_occurred_while_starting_migration_8e6015e2: "Произошла ошибка при запуске миграции"
+  an_error_occurred_while_updating_announcements_loc_5a1c5dcf: "Произошла ошибка при обновлении статуса блокировки объявлений."
   an_error_occurred_while_updating_late_policies_a95b707f: "Произошла ошибка при обновлении политик опозданий"
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: "Возникла ошибка при удалении группы назначенных встреч"
   an_error_ocurred_while_loading_announcements_32af2ce4: "При загрузке объявлений произошла ошибка"
+  an_error_ocurred_while_loading_discussions_51876507: "Произошла ошибка при загрузке обсуждений"
   an_error_ocurred_while_loading_sync_history_ad9dc6df: "Произошла ошибка при загрузки истории синхронизации"
   an_error_ocurred_while_loading_unsynced_changes_aed0d04d: "Произошла ошибка при загрузке несинхронизированных изменений"
   an_error_ocurred_while_saving_the_appointment_grou_e19452cd: "Возникла ошибка при сохранении группы назначенных встреч"
@@ -1775,6 +1797,7 @@ ru:
   announcement_creation_failed_f7d227f5: "Ошибка создания объявления"
   announcement_ends_at_4ccc2a7e: "Объявление заканчивается в"
   announcement_fb4cb645: Объявление
+  announcement_filter_d35318a7: "Фильтр объявлений"
   announcement_not_found_d6d124c3: "Объявление не найдено"
   announcement_starts_at_2e987a38: "Объявление начинается в"
   announcement_successfully_created_731a707f: "Объявление успешно создано"
@@ -1819,9 +1842,12 @@ ru:
     podcast_feed_description_group: "Все медиафайлы, связанные или встроенные в объявления в этой группе \"%{group}\", будут отображаться в этом канале."
     podcast_feed_name: "%{course} Канал подкастов объявлений"
   announcements_a4b8ed4a: Объявления
+  announcements_deleted_successfully_7d77e9e1: "Объявления успешно удалены"
   announcements_list_c75fc413: "Список объявлений"
   announcements_loaded_e9335d5f: "Объявления загружены!"
+  announcements_locked_successfully_43d58107: "Объявления успешно заблокированы"
   announcements_tutorial_tray_994287d6: "Лоток справки по объявлениям"
+  announcements_unlocked_successfully_1432da9d: "Объявления успешно разблокированы"
   anonymize_all_annotations_made_by_instructors_on_s_4f2b70a5: "Удалить персональные данные всех аннотаций, выполненных инструкторами в отправке для этого задания в SpeedGrader"
   anonymous_e1b8ad27: Анонимно
   anonymous_grading_ccb5045c: "Анонимное оценивание"
@@ -1928,6 +1954,7 @@ ru:
     update: Обновить
   archive_3f794d7e: Архив
   archive_selected_d64506ca: "Архив выбран"
+  archived_de543437: "Помещено в архив"
   are_you_sure_26795d3c: "Вы уверены?"
   are_you_sure_you_want_to_archive_your_copies_of_th_7d219afe: 
     few: "Вы действительно хотите архивировать свои копии этих дискуссий?"
@@ -1950,6 +1977,8 @@ ru:
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "Вы уверены, что хотите удалить этот набор периодов выставления оценок?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Вы уверены, что хотите удалить этот период выставления оценок?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Вы уверены, что хотите удалить эту схему оценок?"
+  are_you_sure_you_want_to_delete_this_rubric_any_co_29d7ac76: "Действительно хотите удалить эту рубрику? Любой курс, в настоящее время ассоциированные с этой рубрикой, все еще будет иметь доступ к ней, но новые курсы не смогут использовать ее."
+  are_you_sure_you_want_to_delete_this_rubric_this_a_d4ff43c7: "Действительно хотите удалить эту рубрику? Это действие приведет к удалению этой ассоциации с рубрикой изо всех заданий в текущем курсе и удалению всех существующих ассоциированных заданий."
   are_you_sure_you_want_to_delete_this_to_do_item_497016ea: "Вы уверены, что хотите удалить этот элемент задач?"
   are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
     few: "Вы действительно хотите удалить свою копию этих дискуссий? Это действие невозможно отменить."
@@ -1987,13 +2016,18 @@ ru:
   ask_your_instructor_a_question_a61ca5e9: "Задайте вопрос вашему преподавателю"
   assess_and_survey_your_students_ce8172a9: "Оцените и опросите ваших учащихся"
   assessment_by_name_7b879a2c: "Проверено %{name}"
+  assessment_id_9a1476be: "идентификатор проверки знаний"
   assessment_not_yet_completed_e800a0a7: "Задание еще не завершено"
   assessment_question: 
     default_question_name: Вопрос
+  assessment_question_6ad1766d: "вопрос проверки знаний"
   assessment_question_bank: 
     default_imported_title: "Импортированные вопросы"
     default_title: "Нет имени - %{course}"
     default_unfiled_title: "Неотвеченные вопросы"
+  assessment_question_id_4eacadb3: "идентификатор вопроса проверки знаний"
+  assessment_title_7ab69b66: "заголовок проверки знаний"
+  assessment_type_81a73b9c: "тип проверки знаний"
   assign_eedf72bb: Назначить
   assign_reviews_on_date_7e48ec50: "Назначить рассмотрение на дату"
   assign_to_c46e21: "Назначить для"
@@ -2091,6 +2125,7 @@ ru:
   assignment_groups_bc9cc3c9: "Группы заданий"
   assignment_groups_weight_2f1a5a7c: "Весовой коэффициент группы заданий"
   assignment_has_a_locked_date_due_date_cannot_be_se_2e2e3389: "Задание имеет фиксированную дату. Дата выполнения не может быть задана за пределами фиксированного интервала дат."
+  assignment_id_96baa1b7: "идентификатор задания"
   assignment_id_b040cee0: "Идентификатор задания"
   assignment_menu_91fe3716: "Меню заданий"
   assignment_muted_4cb590a4: "Звук задания выключен"
@@ -2121,6 +2156,8 @@ ru:
   assignment_preview_3833e819: "%{assignment} предпросмотр"
   assignment_selection_6bff05c4: "Выбор заданий"
   assignment_title_82b4422e: "Заголовок задания:"
+  assignment_title_8a707dd2: "заголовок задания"
+  assignment_url_37c849c6: "url-адрес задания"
   assignment_was_deleted_8320d26d: "Задание было удалено"
   assignment_weights_d4bcf9ab: "Вес заданий"
   assignments: 
@@ -2787,6 +2824,7 @@ ru:
     upload_error_too_many_redirects: "Слишком много перенаправлений"
     upload_error_unexpected: "Произошла неизвестная ошибка при загрузке с %{url}"
   attachment_deffe5a9: Вложение
+  attempt_3dd42b18: попытка
   attendance: 
     options: 
       clear_attendance_marks: "Снять метки посещения"
@@ -3471,6 +3509,7 @@ ru:
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Невозможно изменить новую дату истечения срока выполнения на дату в закрытом периоде оценки успеваемости"
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Невозможно изменить дату истечения срока выполнения на дату в закрытом периоде оценки успеваемости"
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "Невозможно изменить дату истечения срока выполнения, наступающую в закрытом периоде оценки успеваемости"
+  cannot_create_an_appointment_group_for_a_concluded_f4da02e3: "не удается создать группу должностей для выведенного курса"
   cannot_delete_a_file_that_has_been_submitted_as_pa_fda24c4: "Не удается удалить файл, который был подан в качестве части задания"
   cannot_delete_an_override_with_a_due_date_within_a_fa94ca3b: "Невозможно удалить новую дату истечения срока выполнения в закрытом периоде оценки успеваемости"
   cannot_grade_at_this_time_489744b0: "Оценка в настоящее время невозможна"
@@ -3508,6 +3547,7 @@ ru:
   canvas_cartridge_file_description: "Пакет экспорта курса Canvas"
   canvas_cartridge_name: "Импортер Canvas Cartridge"
   canvas_cloud_information_fdd404f2: "Облако данных Canvas"
+  canvas_course_id_db4de2b8: canvas_course_id
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "Сслки на приборную панель Canvas переведут вас в каталог приборной панели"
   canvas_default_7f81a6b8: "Стандартная настройка Canvas"
   canvas_demo_7a005cf3: "Демонстрация Canvas"
@@ -3517,6 +3557,7 @@ ru:
   canvas_error_report_ff678539: "Отчет об ошибках Canvas"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_introduction_video_2d81f3ad: "Ознакомительное видео Canvas "
+  canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas не сконфигурировано для получения данных входа в систему из %{issuer}."
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "Резервные коды многофакторной проверки подлинности Canvas"
   canvas_observer_id_59db0918: canvas_observer_id
   canvas_parent_description: "Эта настройка определяет, могут ли родители подключаются к студентам в вашем учебном заведении с использованием мобильного приложения Canvas для родителей."
@@ -3573,6 +3614,8 @@ ru:
   chart_of_the_student_s_grades_on_each_assignment_a1fb1908: "Диаграмма оценок студента по каждому заданию"
   chat_2153c6b7: Чат
   check_back_in_a_little_while_17756399: "Проверьте еще раз через некоторое время."
+  check_back_later_c4234dbc: "Проверьте еще раз позднее"
+  check_this_box_to_add_posts_with_specific_phrase_i_d473aeeb: "Установите флажок в этом окне для добавления постов со специфической фразой в заголовок с помощью расположенного ниже текстового поля"
   check_to_add_a_user_for_loginid_6cd25597: "Проверьте, чтобы добавить пользователя для %{loginid}"
   check_to_select_all_98e484f1: "Поставьте галочку, чтобы выбрать все"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Проверьте, чтобы пропустить добавление пользователя для %{loginid}"
@@ -3625,6 +3668,7 @@ ru:
   click_to_order_by_sis_id_ascending_692d35a7: "Щелкните для расположения по идентификатору SIS в восходящем порядке"
   click_to_publish_ad27be9d: "Щелкните, чтобы опубликовать."
   click_to_report_profile_picture_370f9625: "Нажмите, чтобы сообщить о фотографии профиля"
+  click_to_report_profile_picture_for_display_name_9ffbcc86: "Щелкнуть для сообщения об изображении профиля для %{display_name}"
   click_to_select_bd3b3a0d: "нажмите для выбора"
   click_to_select_user_name_41746803: "Нажмите, чтобы выбрать пользователя %{name}"
   click_to_set_this_answer_as_correct_1326e3fd: "Щелкните, чтобы установить этот ответ как правильный"
@@ -3982,6 +4026,8 @@ ru:
   configure_tool_app_3b1bb50b: "Сконфигурировать приложение %{tool}?"
   configure_toolname_app_651371be: "Настроить приложение %{toolName}"
   confirm_contact_method_29d6fe4b: "Подтвердите метод контакта"
+  confirm_delete_6febeafb: "Подтвердить удаление"
+  confirm_delete_announcements_3d83b69a: "Подтвердить удаление объявлений"
   confirm_deletion_b2efe7d4: "Подтвердить удаление"
   confirm_dialog: 
     cancel: Отменить
@@ -4831,6 +4877,7 @@ ru:
   couldn_t_generate_diff_message_a0528b20: "Не удалось сгенерировать разницу: %{message}"
   couldn_t_update_standards_for_authority_auth_81206187: "Не удалось обновить стандарты для полномочий %{auth}"
   count_alignments_7d98ee41: "*%{count}* Выравнивание"
+  count_announcements_found_b7b055b3: "%{count} объявления найдено."
   count_apps_found_f4d86860: "%{count} найдены приложения"
   count_assignments_found_17520826: 
     one: "Найдено 1 задание."
@@ -4909,6 +4956,10 @@ ru:
     many: "%{count} баллов"
     one: "1 балл"
     other: "%{count} баллов"
+  count_posts_added_fa55ce4: 
+    one: "%{count} пост добавлен"
+    other: "%{count} посты добавлены"
+    zero: "%{count} посты добавлены"
   count_pushed_changes_6fe7fba: "%{count} введенные изменения"
   count_quizzes_found_e5e29bb4: 
     one: "Найден 1 тест."
@@ -4925,6 +4976,11 @@ ru:
     many: "%{count} результатов отображено"
     one: "1 результат отображено"
     other: "%{count} результатов отображено"
+  count_sections_466dcd5c: 
+    few: "%{count} Разделы"
+    many: "%{count} Разделы"
+    one: "1 раздел"
+    other: "%{count} Разделы"
   count_sets_of_grading_periods_found_c8857ae9: 
     one: "Найден 1 набор периодов оценивания."
     other: "Найден %{count} набор периодов оценивания."
@@ -5103,6 +5159,7 @@ ru:
   course_id_8bd2a21c: "Идентификатор курса"
   course_id_a7c924d5: "идентификатор курса"
   course_id_b0bc82d4: "Идентификатор курса"
+  course_id_f8640bb8: course_id
   course_image_for_course_cfbb08df: "Изображение курса для %{course}"
   course_image_settings_eba3ec55: "Настройки изображения курса"
   course_implemented_apps_fa658f5a: "Реализованные приложения курса"
@@ -5185,6 +5242,7 @@ ru:
       workflow_state: "Состояние рабочего процесса"
   course_members_are_free_to_join_9b2603d4: "Члены курса могут вступать свободно"
   course_modules_795cb95e: "Модули курса"
+  course_name_45175338: "название курса"
   course_name_63b973d1: "Название курса"
   course_name_is_required_90919349: "Необходимо указать название курса"
   course_name_successfully_added_48116a50: "%{course_name} успешно добавлен!"
@@ -5256,6 +5314,7 @@ ru:
   course_setup_wizard_is_showing_a7c087c1: "Отображается мастер установки курса."
   course_sis_7ae8f649: "sis курса"
   course_sis_df8b379: "Sis курса"
+  course_sis_id_bbed1a60: "идентификатор sis курса"
   course_sis_id_sis_id_or_canvas_id_4d323f5c: "SIS ID (SIS_ID:####) курса ИЛИ Canvas ID: (###)"
   course_starts_at_3a01f9da: "Курс начинается в"
   course_statistics: 
@@ -5715,6 +5774,7 @@ ru:
         drop_course: "Переместить этот курс"
         join_course: "Присоединиться к этому курсу"
         new_announcement: "Новое объявление"
+        student_view: "Вид с позиции студента"
         view_course_stream: "Просмотреть поток курса"
       re_sending: "Повторная отправка..."
       send_done: "Готово. Сообщение может занять несколько минут."
@@ -5803,8 +5863,10 @@ ru:
   create_a_new_user_for_address_7487e9c9: "Создать нового пользователя для \"%{address}\""
   create_account_263ec6: "Создать учетную запись"
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "Создайте онлайновые контрольные работы и опросы как с оценкой, так и без оценки и осуществляйте их администрирование"
+  create_announcements_above_1c36202b: "Создать объявления выше"
   create_as_many_discussion_topics_as_needed_as_assi_45ec1df: "Создавайте столько тем для обсуждений, сколько необходимо, в качестве заданий для выставления оценок или форума для обмена идеями и информацией."
   create_as_many_discussion_topics_as_needed_as_assi_f1221307: "Создавайте столько дискуссий, сколько необходимо, в качестве заданий на оценку или в качестве форума для обмена идеями и информацией."
+  create_assessments_with_quizzes_next_and_migrate_e_eaaee5e6: "Создать объявления с тестированиями. Далее и выполнить миграцию существующих тестирований Canvas."
   create_assignment_68532ceb: "Создать задание"
   create_assignments_on_the_assignments_page_organiz_8838b18a: "Создать задания на странице Заданий. Разбейте задания, например, на следующие группы: «Домашняя работа», «Классная работа», «Эссе», «Дискуссии» и «Контрольные работы». Группам заданий могут быть присвоены весовые коэффициенты."
   create_assignments_on_the_assignments_page_organiz_90c78fdc: "Создавайте задания на странице Заданий. Объединяйте задания в группы, например, Домашняя работа, Классная работа, Эссе, Дискуссии и Контрольные работы. Группам заданий могут быть присвоены весовые коэффициенты."
@@ -5960,6 +6022,7 @@ ru:
   current_theme_62e5e8cf: "Текущая тема"
   current_total_67bf5f72: "Текущий общий балл:"
   currently_assigned_to_tokenname_click_to_remove_5a853a84: "В настоящее время закреплено за %{tokenName}, нажмите, чтобы удалить"
+  curso_f0ee9b5: Curso
   curve_grades_b7a75443: "Кривая оценок"
   curve_grades_dialog: 
     average_score: "Средний балл"
@@ -6240,6 +6303,7 @@ ru:
   delete_current_module_item_21fefc54: "Удалить текущий модуль/элемент"
   delete_custom_help_link_814f0509: "Удалить пользовательскую ссылку помощи "
   delete_entry_title_5e59727b: "Удалить запись %{title}"
+  delete_feedname_1ac9a4a4: "Удалить %{feedName}"
   delete_grading_period_dba36e59: "Удалить период выставления оценок"
   delete_grading_period_set_b35358dd: "Удалить набор периода выставления оценок"
   delete_grading_scheme_6b308832: "Удалить схему оценок"
@@ -6254,6 +6318,7 @@ ru:
   delete_rubric_9b66412d: "Удалить рубрику"
   delete_section_name_a48d9d79: "Удалить раздел «%{name}»"
   delete_selected_a023ccf8: "Выбранная дата"
+  delete_selected_announcements_69e23710: "Удалить выбранные объявления"
   delete_survey_56fddbbd: "Удалить опрос"
   delete_term_name_f707abc9: "Удалить семестр %{name}"
   delete_theme_bdb70d25: "Удалить тему"
@@ -6381,6 +6446,7 @@ ru:
     save_key: "Сохранить ключ"
     tool_id: "Идентификатор инструмента:"
     vendor_code: "Код поставщика (LTI 2):"
+  developer_key_management_5a5866bd: "Управление ключами программиста"
   developer_keys: 
     button: 
       saving: "Сохранение ключа..."
@@ -6421,8 +6487,12 @@ ru:
   disabling_f594bda: "Выполняется отключение..."
   disabling_post_to_sis_is_not_available_for_non_pub_ee031373: "Отключение «Публикация в SIS» недоступна для неопубликованных курсов"
   disabling_sync_to_name_failed_e7521ebb: "Не удалось отключить синхронизацию с %{name}"
+  disallow_comments_6d04b47a: "Запретить комментарии"
+  disallow_replies_for_title_ca3806b2: "Запретить ответы для %{title}"
+  disccussions_515a3a99: Дискуссии
   discovery_url_3dce06d9: "URL обнаружения"
   discussion_6719c51d: Обсуждение
+  discussion_assignments_cannot_be_section_specific_93d63843: "Задания по дискуссиям не могут относиться к конкретному разделу"
   discussion_entries: 
     created_entry_notice: "Запись успешно создана."
     deleted_entry_notice: "Эта запись удалена"
@@ -6761,6 +6831,7 @@ ru:
     unsubscribed_hint: "Вы не подписаны на данную тему. Щелкните, чтобы подписаться"
   discussions_a5f96392: Дискуссии
   discussions_tutorial_tray_4ef79bcc: "Лоток справки по дискуссиям"
+  discussions_with_groups_cannot_be_section_specific_1146d29: "Задания в группах не могут относиться к конкретному разделу"
   dismiss_dacdb625: Отклонить
   dismiss_this_5c74dddc: Отбросить
   display_all_text_links_in_canvas_as_underlined_tex_e698e714: "Показать все текстовые ссылки в Canvas, как *подчеркнутый текст*."
@@ -6780,6 +6851,8 @@ ru:
   district_id_6f408184: "Районный ID"
   divide_into_equal_slots_of_input_value_minutes_fca83452: "Разделить на равные интервалы по %{input_value} минут. "
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "Разделить на равные интервалы в %{num_minutes} минут. *Перейти*"
+  divide_into_equal_slots_value_is_in_minutes_13fe14d2: "Разделить на равные промежутки (значение в минутах)"
+  divide_into_equal_time_slots_in_minutes_234312fa: "Разделить на равные отрезки времени (в минутах"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Не учитывать это задание при подсчете итоговой оценки"
   do_nothing_9672b478: "Ничего не делать"
   domain_3b54c511: Домен
@@ -6813,6 +6886,7 @@ ru:
   drag_to_rearrange_sections_637efee3: "Перетащите для изменения порядка разделов"
   drag_up_or_down_to_reorder_382126ff: "Перетащите вверх или вниз, чтобы изменить порядок следования"
   drop_image_62a2a071: "Перетащите изображение"
+  dropdown_changed_state_to_expanded_517689c2: "раскрывающийся список изменил состояние на %{expanded}."
   dropdown_option_1_e6ff2fc: "Выпадающий вариант 1"
   dropdown_option_2_9766a346: "Выпадающий вариант 2"
   dropped_38031953: Отклонен
@@ -6959,6 +7033,7 @@ ru:
   edit_toolname_app_23cfbb8: "Редактировать приложение %{toolName}"
   edit_user_c46cf103: "Редактировать данные пользователя"
   edit_user_details_4d7b63ff: "Редактировать информацию о пользователе"
+  edit_user_details_9af7819b: "Редактировать сведения о пользователе"
   edit_your_catalog_account_cce59310: "Редактируйте аккаунт вашего каталога"
   edited_date_b0455372: "(Отредактировано) %{date}"
   editing_permissions_for_name_3503e235: "Редактирование разрешений для: %{name}"
@@ -7049,6 +7124,7 @@ ru:
   enable_feature_title_987d8e9a: "Включить функцию: %{title}"
   enable_gradebook_list_students_by_sortable_name: "Список студентов по сортируемым именам в табеле успеваемости. По умолчанию, сортируемое имя идет в порядке \"Фамилия, Имя\" и может быть изменено в настройках."
   enable_gradezilla_name_is_only_a_placeholder_as_it_34afd9f1: "Активировать Gradezilla (название является условным, поскольку в будущем заменит табель успеваемости)."
+  enable_gravatar_8a865b41: "Включить Gravatar"
   enable_multiple_grading_periods: |-
       Множественные Периоды Оценивания позволяют учителям и администраторам создавать периоды оценивания с установленными
       контрольными датами. Задания могут быть отфильтрованы по этим периодам оценивания в журнале успеваемости.
@@ -7072,6 +7148,9 @@ ru:
   end_date_cannot_be_before_start_date_eb62ed6d: "Дата окончания не может быть раньше даты начала"
   end_date_cdd7a7b6: "Дата окончания:"
   end_date_e0093ed7: "Дата окончания"
+  end_date_from_cdd9d90: "Дата окончания от:"
+  end_date_to_8b17929d: "Дата окончания до:"
+  end_dates_249d8dbb: "Даты окончания:"
   end_dates_cannot_be_before_start_dates_d6018daf: "Даты окончания не могут предшествовать датам начала"
   end_time_250391e8: "Время окончания"
   end_tutorial_7fb16b6f: "Выйти из справки"
@@ -7123,11 +7202,13 @@ ru:
   enrollment_term_7bfe840: "Условие регистрации"
   enrollments_e250c9c3: Регистрации
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Введите hexcode здесь, чтобы использовать собственный цвет."
+  enter_a_valid_date_46d77547: "Введите правильную дату"
   enter_a_what_if_score_668c91a3: "Введите оценку «что, если»."
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "Введите \"{{ACCOUNT_DOMAIN}}\", чтобы подставить домен корневой учетной записи пользователя"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "Введите \"{{CANVAS_USER_ID}}\", чтобы заменить уникальный идентификатор пользователя Canvas"
   enter_grades_as_e113e606: "Ввести оценки как"
   enter_or_find_an_external_tool_url_6aebbd0d: "Ввести или найти URL внешнего инструмента"
+  enter_specific_phrase_9b686755: "Введите специфическую фразу"
   enter_the_access_token_for_your_organization_from__cc77493d: "Введите маркер доступа для вашей организации от *eduappcenter.com*. После применения на странице Внешние Приложения будут перечислены только те приложения, которые ваша организация одобрила в EduAppCenter. Узнайте, как **генерировать маркер доступа**."
   enter_the_email_addresses_of_the_users_you_would_l_17cef6a0: "Введите через запятую адреса электронной почты пользователей, которых вы хотите добавить"
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: "Введите адреса электронной почты пользователей, которых вы хотите добавить, разделив их запятыми или разрывами строки"
@@ -7411,8 +7492,10 @@ ru:
   error_duplicating_module_4b023042: "Ошибка при копировании модуля"
   error_exporting_gradebook_msg_6ea31e2f: "При экспорте журнала успеваемости возникла ошибка: %{msg}"
   error_in_mastery_paths_range_index_7d17ddac: "%{error} в диапазоне путей усвоения %{index}"
+  error_loading_courses_27d6cd3f: "Ошибка загрузки курсов"
   error_loading_grade_history_try_again_36465d2c: "Ошибка при загрузке истории выставления оценок. Повторить попытку?"
   error_loading_gradebook_history_try_again_19032437: "Ошибка при загрузке истории журнала оценок. Повторить попытку?"
+  error_loading_groups_2a3dd72d: "Ошибка загрузки групп"
   error_message_2b9d12ee: "Ошибка: %{message}"
   error_rendering_duplicated_module_db821097: "Ошибка при передаче скопированного модуля"
   error_retrieving_assignment_configuration_tools_f7d75303: "Возникла ошибка при считывании настроек инструментов конфигурирования заданий"
@@ -7546,6 +7629,8 @@ ru:
   external_feed: 
     original_article: "Исходная статья"
     short_feed_title: "%{short_url} канал"
+  external_feed_deleted_successfully_33209dbc: "Внешний источник успешно удален"
+  external_feed_successfully_added_e0ce0784: "Внешний источник успешно добавлен"
   external_feed_was_added_d6d16a0: "Внешние каналы были добавлены"
   external_feed_was_deleted_403465fd: "Внешние каналы были удалены"
   external_feeds: 
@@ -7693,13 +7778,18 @@ ru:
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Не удалось загрузить разделы курса. Перезагрузите страницу, чтобы попытаться еще раз."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Не удалось загрузить компонент истории синхронизации. Подключение в вашей сети в порядке?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Не удалось загрузить компонент несинхронизированных изменений. Подключение в вашей сети в порядке?"
+  failed_to_add_new_feed_ee1c5ea: "Не удалось добавить новый источник"
+  failed_to_change_last_attended_date_1e340ba6: "Не удалось изменить дату последнего посещения"
   failed_to_create_webhook_b766cf5c: "Не удалось создать вебхук."
   failed_to_create_zip_file_1a943d06: "Не удалось создать файл zip"
+  failed_to_delete_external_feed_36f19d70: "Не удалось удалить внешний источник"
   failed_to_export_some_tool_settings_c992fc56: "Не удалось экспортировать некоторые настройки инструментов"
   failed_to_import_media_objects_4c1fcb4f: "Не удалось импортировать мультимедийные объекты"
+  failed_to_load_external_feeds_7ac8411d: "Не удалось загрузить внешние источники"
   failed_to_log_in_7ceec561: "Не удалось войти в систему"
   failed_to_move_items_e043da6: "Не удалось отправить элементы"
   failed_to_publish_draft_comment_853761e9: "Не удалось опубликовать проект комментария"
+  failed_to_save_dashboard_selection_32e71c72: "Не удалось сохранить выбор панели управления"
   failed_to_save_please_try_again_later_bb7070fb: "Не удалось сохранить, пожалуйста, повторите попытку позже"
   failed_to_submit_draft_comment_1de83451: "Не удалось отправить проект комментария"
   fair_38e62237: Справедливый
@@ -7755,7 +7845,9 @@ ru:
   features_2581da: Функции
   federated_attributes_5cbe6441: "Федеративные Атрибуты"
   federated_attributes_are_information_sent_from_you_2116fb61: "Федеративные атрибуты - это информация, посланная от провайдера аутентификации, которая может использоваться для автоматического обновления соответствующей информации для пользователей Canvas каждый раз, когда они входят в систему."
+  feed_url_8a433438: "Url-адрес источника"
   feed_url_is_required_253fda4e: "Требуется фид URL"
+  feeds_9f1c5c76: Источники
   field_name_31fff38e: "Имя поля"
   file_a_ticket_for_a_personal_response_from_our_sup_1e1ffaff: "Заполните заявку на персональный ответ от нашей службы поддержки."
   file_already_exists_bdc61895: "файл уже существует"
@@ -7874,6 +7966,10 @@ ru:
   filter_by_ip_address_40965f66: "Фильтр по IP адресу"
   filter_by_name_34cbe139: "Сортировать по имени"
   filter_by_student_name_or_secondary_id_83dc524f: "Фильтр по имени студента или вторичному идентификатору"
+  filter_by_term_cfe778b2: "Фильтровать по сроку"
+  filter_by_user_type_dbbd3e3d: "Фильтровать по типу пользователя"
+  filter_conversations_by_course_or_group_38d0a55e: "Фильтровать дискуссии по курсу или группе"
+  filter_conversations_by_type_1ce8c064: "Фильтровать дискуссии по типу"
   filter_discussions_by_assignments_757924ed: "включить фильтр обсуждений по заданиям"
   filter_discussions_by_unread_6c48322: "включить фильтр обсуждений по непрочитанным"
   filter_e3398407: Фильтр
@@ -7965,7 +8061,9 @@ ru:
   from_date_must_be_before_to_date_79f00046: "Дата 'С' должна быть раньше даты 'До'"
   from_fdd4956d: От
   from_from_to_to_e31f6422: "С %{from} по %{to}"
+  from_gravatar_58372d5a: "Из Gravatar"
   front_page_must_be_set_first_4dbbfdbe: "Вначале должна быть установлена титульная страница"
+  full_article_9296bb6f: "Статья целиком"
   full_name_14c958f7: "Фамилия и имя полностью:"
   full_name_23fdfb6d: "Полное имя"
   full_name_83cf5453: "Полное имя"
@@ -8841,6 +8939,8 @@ ru:
       create_category_success: "Категория была успешно создана."
       delete_category_success: "Категория успешно удалена"
       update_category_success: "Категория успешно обновлена."
+  group_categories_7a569a4d: "Категории групп"
+  group_categories_csv_21eb0566: "CSV категорий групп"
   group_category: 
     cant_restrict_self_signup: "Невозможно ограничить самостоятельную регистрацию до тех пор, пока в категории существует группа, составленная из различных разделов"
     empty_course_or_account_id: "Должна иметься учетная запись или идентификатор курса"
@@ -8864,9 +8964,11 @@ ru:
   group_group_name_is_for_a_different_section_4d84d256: "Группа %{group_name} предназначена для другого раздела"
   group_group_name_is_full_297880d6: "Группа %{group_name} набрана"
   group_group_name_is_joined_by_invitation_only_4ac2a9e5: "К группе %{group_name} можно присоединиться только по приглашению"
+  group_group_name_is_not_available_at_this_time_971001c1: "Группа %{group_name} недоступна в настоящее время"
   group_is_for_a_different_section_6a843a4d: "Группа предназначена для другого раздела"
   group_is_full_56849d78: "Группа набрана"
   group_is_joined_by_invitation_only_d00f5a63: "К группе можно присоединиться только по приглашению"
+  group_is_not_available_at_this_time_d99f0eab: "Группа недоступна в настоящее время"
   group_leader_user_name_6f24bebb: "лидер группы %{user_name}"
   group_limit_87ae4421: group_limit
   group_members_ae5489ed: "участники группы"
@@ -9408,6 +9510,8 @@ ru:
     text_entry_submission: "Отправка текстовой записи"
   id_ac7afadf: id
   id_already_in_use_for_this_account_and_authenticat_dc3a7d65: "ID уже используется для этой учетной записи и проверки подлинности провайдера"
+  id_del_alumno_bc4bcf8a: "ID del Alumno"
+  id_del_curso_4ef15337: "ID del Curso"
   id_id_4e148481: "ID: %{id}"
   idp_entity_id_25c51837: "Идентификатор объекта IdP"
   idp_metadata_uri_dae5314a: "URL метаданных IdP"
@@ -9773,6 +9877,7 @@ ru:
   kind_7f0a88c4: Тип
   labels: 
     lock_module_until: "Заблокировать до"
+  last_day_attended_b72d623c: "День последнего посещения"
   last_download_33ea9bf4: "Последняя загрузка:"
   last_e159dbd: Последняя
   last_enrollment_activity_10fe15ba: "Последняя активность по зачислению"
@@ -9847,6 +9952,14 @@ ru:
   learning_outcome: 
     no_comment: "Нет комментария"
     no_description: "Нет описания"
+  learning_outcome_friendly_name_bde2c4fb: "понятное имя результата обучения"
+  learning_outcome_id_88ff198c: "идентификатор результата обучения"
+  learning_outcome_mastered_7b30ef43: "достигнутый результат обучения"
+  learning_outcome_mastery_score_c96330b8: "оценка уровня по результату обучения"
+  learning_outcome_name_9cb475e6: "название результата обучения"
+  learning_outcome_points_possible_628a9d55: "допустимые баллы по результату обучения"
+  learning_outcome_rating_8143e88c: "оценка результата обучения"
+  learning_outcome_rating_points_c453bb8a: "оценочные баллы результата обучения"
   leave_5e852989: Покинуть
   leave_a_comment_7991725b: "Оставить комментарий"
   leave_group_group_name_6847c632: "Покинуть группу %{group_name}"
@@ -9984,6 +10097,7 @@ ru:
   link_number_1_9f169e48: "Ссылка номер 1"
   link_number_2_61fcff2: "Ссылка номер 2"
   link_number_3_7118ff64: "Ссылка номер 3"
+  link_only_995966e: "Только ссылка"
   link_selection_1486c5d0: "Выбор ссылки"
   link_text_d2c702f9: "Ссылка на текст"
   link_title_189888b7: "Заголовок ссылки"
@@ -10029,11 +10143,15 @@ ru:
     other: "Загрузка курсов завершена: %{count} найдено курсов"
   loading_courses_started_6e6d742c: "Загрузка курсов началась"
   loading_data_ecd89ba: "Загрузка данных..."
+  loading_discussions_8ed5fcd7: "Загрузка дискуссий"
   loading_graders_f6a76142: "Загрузка оценщиков"
+  loading_last_attended_date_5a42463: "Загрузка даты последнего посещения"
   loading_mastery_paths_c558a766: "Загрузка Пути усвоения..."
   loading_more_grade_history_results_b235de5: "Загрузка дополнительных результатов истории выставления оценок."
   loading_more_gradebook_history_results_810f6d2e: "Загрузка большего числа результатов истории журнала оценок."
   loading_more_results_def6df65: "Загрузка большего количества результатов..."
+  loading_more_sub_accounts_d0a30903: "Загрузка дополнительных субучетных записей..."
+  loading_more_terms_4053e31f: "Загрузка дополнительных условий..."
   loading_results_769c8819: "Загрузка результатов"
   loading_results_spinner_73ef739c: "Счетчик загрузки результатов"
   loading_students_30b71301: "Загрузка студентов"
@@ -10051,11 +10169,13 @@ ru:
   lock_date_cannot_be_before_due_date_ac30f54: "Дата блокировки не может быть раньше даты выполнения"
   lock_icon_a9916601: "заблокировать иконку"
   lock_questions_after_answering_5aecef9d: "Блокировать вопросы после ответов"
+  lock_selected_announcements_33740f80: "Заблокировать выбранные объявления"
   lock_this_setting_for_sub_accounts_2ae5af17: "Зафиксируйте этот параметр для субаккаунтов"
   locked_762f138b: Заблокировано
   locked_796957c7: "Заблокировано:"
   locked_click_to_unlock_50747e11: "Заблокировано. Нажмите, чтобы разблокировать."
   locked_content_f4ef2968: "Заблокированный контент"
+  locked_image_24f37a16: "Заблокированное изображение"
   locked_object_configuration_d1fb1b82: "Заблокированная конфигурация объекта:"
   locked_objects_by_type_ff376c6c: "Заблокированные объекты по типу"
   locked_objects_cannot_be_edited_in_associated_cour_1af858c8: "Редактирование заблокированных объектов в связанных  курсах невозможно."
@@ -10166,6 +10286,7 @@ ru:
   login_button_text_c958250f: "Текст кнопки для входа"
   login_footer_link_badb3898: "Ссылка нижнего колонтитула страницы логина"
   login_footer_link_hover_1b474e6c: "Наведение курсора на ссылку нижнего колонтитула страницы логина"
+  login_handle_is_required_90ab7fe0: "%{login_handle} необходимо"
   login_id_12109693: "Имя пользователя"
   login_id_bc943b97: "ИД входа в систему:"
   login_info_d1d9f11e: "Информация для входа в систему"
@@ -10234,6 +10355,7 @@ ru:
   manage_item_name_6118d4b0: "Управлять %{item_name}"
   manage_module_name_dfe16816: "Управлять %{module_name}"
   manage_name_7f55f792: "Управлять %{name}"
+  manage_options_for_name_83278ad0: "Управлять опциями для %{name}"
   manage_profile_pictures_40c958ce: "Управление изображениями профиля"
   manage_rubrics_5d274f6a: "Управление рубриками"
   manage_snapshots_1dc4b79d: "Управление снэпшотами"
@@ -12379,6 +12501,7 @@ ru:
   more_courses_5ebbe998: "Другие курсы"
   more_info_at_course_name_56dc8c10: "Дополнительные сведения доступны в %{course_name}"
   more_information_3dfb76b5: "Дополнительная информация"
+  more_people_options_730e9686: "Дополнительные опции по людям"
   more_results_were_added_at_the_bottom_of_the_page_dc323877: "Дополнительные результаты были добавлены в нижней части страницы."
   more_than_999_submissions_need_grading_bc087dd0: "Более 999 студенческих работ требуют оценки"
   more_than_9_submissions_need_grading_30157d49: "Более 9 студенческих работ требуют оценки"
@@ -12440,6 +12563,7 @@ ru:
   move_to_front_bf6f0194: "Перейти к началу"
   move_to_the_beginning_636b342c: "Перейти в начало"
   move_to_the_end_bc05abf6: "Перейти в конец"
+  move_to_using_instui_for_several_components_and_im_21898396: "Перейти к использованию InstUI для нескольких компонентов и внедрения системы хранения"
   moving_a4d552df: Перемещение...
   multi_factor_authentication_backup_codes_4d781044: "Резервные коды многофакторной авторизации"
   multi_factor_authentication_configured_865b1bde: "Многофакторная аутентификация настроена"
@@ -12527,6 +12651,8 @@ ru:
   name_is_unlocked_click_to_lock_b8b9a2c8: "%{name} разблокировано. Нажмите, чтобы заблокировать."
   name_only_5f56718e: "Только имя"
   name_options_bc5c95ce: "%{name} Опции"
+  name_unposted_current_score_e98e95fd: "%{name} неопубликованная текущая оценка"
+  name_unposted_final_score_124708d2: "%{name} неопубликованная финальная оценка"
   nav_avatar_border_3246beb1: "Граница аватара нав."
   nav_background_fd299145: "Фон нав."
   nav_badge_3c67de17: "Ярлык нав."
@@ -12561,6 +12687,7 @@ ru:
   new_criterion_canceled_d8c2a655: "Новый критерий отменен"
   new_event_for_course_name_2ba1f734: "Новое событие для %{course_name}"
   new_export_3ab758: "Новый экспорт"
+  new_features_for_developer_key_management_994090dc: "Новые функции для управления ключами программиста"
   new_file_135ae520: "[ Новый файл ]"
   new_file_added_for_name_a5ec3156: "Новый файл добавлен для %{name}"
   new_goodies_coming_soon_15d4f7fa: "Новые опции на подходе!"
@@ -12610,6 +12737,7 @@ ru:
   nickname_1e6da3ad: Ник
   nickname_7df95b09: "Ник:"
   no_74e9b590: нет
+  no_announcements_280df147: "Нет объявлений"
   no_assignment_name_adbb215b: "Отсутствует имя задания"
   no_assignments_with_that_name_found_1d7be1: "Задания с таким именем не найдены"
   no_associated_terms_13bacefc: "Нет связанных файлов"
@@ -12673,6 +12801,7 @@ ru:
   norway_47_bc598662: "Норвегия (+47)"
   norway_c11471b3: Норвегия
   not_a_number: "должно быть положительным числом"
+  not_a_valid_date_d3ac20ba: "Не является действительной датой"
   not_all_sections_will_be_assigned_this_item_4e2b8eaa: "Этот элемент будет назначен не для всех разделов."
   not_anonymously_graded_87574f91: "Анонимно оценки не выставляются"
   not_available_487d3648: Недоступно
@@ -13092,7 +13221,10 @@ ru:
   only_after_their_last_attempt_3593d101: "Только после последней попытки"
   only_announcements_can_be_section_specific_1ff992a: "Только объявления могут относиться к конкретному разделу"
   only_available_to_students_with_link_not_visible_i_b21ec391: "Доступно только для студентов, пришедших по ссылке.Не отображается в файлах студента. "
+  only_course_announcements_and_discussions_can_be_s_924d4386: "Только объявления о курсах и дискуссии могут относиться к конкретному разделу"
+  only_course_announcements_can_be_section_specific_eabcd6e0: "Только объявления о курсах могут относиться к конкретному разделу"
   only_once_after_each_attempt_cc842738: "Только один раз после каждой попытки"
+  only_show_announcement_on_current_account_domain_fc341eea: "Показывать только объявления на текущем домене учетной записи"
   only_teachers_can_see_this_course_until_it_is_publ_6fac97a7: "Пока курс не опубликован, его могут просматривать только преподаватели"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} вовремя, %{late} с опозданием, %{missing} отсутствует"
   oops_there_was_a_problem_loading_content_locks_4ab29a2a: "К сожалению, при загрузке данных о блокировке содержимого возникла проблема."
@@ -13152,6 +13284,7 @@ ru:
   out_of_points_possible_8ab14f7: "из %{points_possible}"
   out_of_pointspossible_3fb5ee20: "Из %{pointsPossible}"
   outcome_da397d20: Результат
+  outcome_export_89229eb4: "Экспорт результатов"
   outcome_group_39fae76f: "Группа результатов"
   outcome_groups: 
     invalid_file: "Неверный файл группы результатов"
@@ -13162,6 +13295,7 @@ ru:
   outcome_results: 
     outcomes_filename: Результаты
   outcome_results_title: "Результаты успеваемости"
+  outcome_score_141cf00a: "оценка результата"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Результат: %{title} имеет статус %{statusTooltip}"
   outcomes: 
     account_standards: "Стандарты учетной записи"
@@ -14337,7 +14471,7 @@ ru:
       required: Требуется
       sequence: "Нельзя включать последовательности символов больше %{max} букв (например abcdef)"
       sis_taken: "Идентификатор SIS уже используется"
-      taken: "Электронный адрес уже используется"
+      taken: "Уже используется"
       too_long: "Не может превышать %{max}символов"
       too_short: "Должно быть не менее %{min} символов"
   pseudonym_sessions: 
@@ -16051,6 +16185,7 @@ ru:
   rename_this_section_bcbb6741: "Переименовать этот раздел"
   replace_e61834a7: Заменить
   replaces_the_current_folder_tree_with_a_new_access_6f9d15c2: "Заменяет текущее дерево папок на новое доступное и более многофункциональное дерево папок."
+  reply_389d6fb9: Ответить
   reply_from_name: "%{name} через уведомления Canvas"
   reply_to_comment_72d96728: "Ответить в комментарии"
   reply_to_current_message_55391f5b: "Ответить на текущее сообщение"
@@ -16512,6 +16647,8 @@ ru:
     student_groups: "Группы студентов"
   search_23a88d5c: Поиск…
   search_280d00bd: Поиск
+  search_announcements_by_title_407a998e: "Поиск объявлений по заголовку"
+  search_by_99d1ba5f: "Поиск по"
   search_by_c559efd: "Поиск по"
   search_by_title_short_name_or_sis_id_fe84aa12: "Поиск по заголовку, краткому названию или идентификатору SIS"
   search_by_user_dd3ad189: "Поиск по пользователям"
@@ -16571,11 +16708,15 @@ ru:
   section_id_6f73f3d5: "идентификатор раздела"
   section_id_b5aad4a7: "Идентификатор раздела"
   section_name_b6d82574: "Название раздела"
+  section_name_edb51b2: "название раздела"
   section_section_names_98f172e6: "Раздел: %{section_names}"
   section_sis_2a80d2fa: "Sis раздела"
   section_sis_94511bcd: "sis раздела"
+  section_sis_id_6f989834: "идентификатор sis раздела"
+  section_specific_announcements_are_disabled_80c53340: "Относящиеся к конкретным разделам объявления отключены"
   section_specific_announcements_e0d355d9: "Специальные объявления раздела"
   section_specific_discussions_are_disabled_9e3fd431: "Относящиеся к конкретным разделам обсуждения отключены"
+  section_specific_discussions_d6a3addf: "Относящиеся к конкретным разделам обсуждения"
   section_specific_topics_must_have_sections_11868960: "Относящиеся к конкретным разделам темы должны содержать разделы"
   section_starts_at_65eaed1: "Раздел начинается на"
   sections: 
@@ -16682,7 +16823,10 @@ ru:
   select_course_5cf89177: "Выбрать курс"
   select_course_a_selection_is_required_before_recip_f622d9df: "Выберите курс: выбор необходимо совершить до того, как станет доступно поле получателей"
   select_course_color_cad8e62b: "Выбрать Цвет курса"
+  select_course_or_group_ddb2185d: "Выбрать курс или группу"
+  select_courses_or_groups_1a8b8f66: "Выбрать курсы или группы"
   select_d70f31da: Выбрать
+  select_embedded_content_type_966f048a: "Выберите тип интегрированного контента"
   select_for_list_of_users_who_responded_791ce930: "Выбрать для списка пользователей, которые ответили."
   select_image_e1696a4d: "Выбрать изображение"
   select_indentation_d056bab8: "Выбрать отступ"
@@ -16761,6 +16905,9 @@ ru:
   send_a_message_to_the_teacher_1ae115b6: "Отправить сообщение учителю"
   send_a_message_to_this_student_ec46b8dd: "Отправить сообщение этому учащемуся"
   send_authorization_url_in_lti2_registration_287fcb33: "Отправить URL авторизации при регистрации LTI2"
+  send_comment_to_instructor_only_4295a109: "Отправить комментарий только инструктору"
+  send_comment_to_the_whole_group_8d41e63a: "Отправить комментарий всей группе"
+  send_comment_to_this_student_only_e3d9ca1: "Отправить комментарий только этому студенту"
   send_custom_fields_uncheck_unless_using_canvas_zen_67e83666: "Отправить Пользовательские поля (снимите флажокесли не используется Canvas Zendesk)"
   send_e3bd0ed0: Отправить
   send_message_6ccc90e8: "Отправить сообщение"
@@ -16775,6 +16922,7 @@ ru:
   sending_message_8ac5bc90: "Отправка сообщения..."
   sending_message_failed_please_try_again_b53cc904: "Ошибка отправки сообщения, повторите попытку"
   sends_international_text_messages_from_a_phone_num_10afbad6: "Посылает международные текстовые сообщения с номера телефона, в стране получателя, если это возможно."
+  sent_fe0a1eb4: Отправлено
   sequence_footer: 
     next_module: "Следующий модуль:"
     next_module_desc: "Следующий модуль: *модуль*"
@@ -16798,6 +16946,7 @@ ru:
   set_email_address_as_default_954d284: "Установить адрес электронной почты по умолчанию"
   set_email_as_default_5b4a28e: "Установить, как email по умолчанию"
   set_group_weights_fd41c1f: "Установить оценки группы"
+  set_last_attended_date_8fb30092: "Задать дату последнего посещения"
   set_name_d14182d7: "Установить имя..."
   set_name_f83b658: "Установить имя"
   set_of_grading_periods_545b37e9: "Набор Оценочных периодов"
@@ -17602,6 +17751,8 @@ ru:
       unrecorgnized_type: "Нераспознанный тип импорта"
     instructure_csv: "Форматированный Instructure CSV или архив файлов CSV"
     upload_filename: "sis_upload_%{id}.zip"
+  sis_del_alumno_716babc5: "SIS del Alumno"
+  sis_del_curso_bf9d61ae: "SIS del Curso"
   sis_errors_attachment__id_9a8f2921: "sis_errors_attachment_%{id}"
   sis_export_title: "Экспорт SIS"
   sis_friendly_name_52b5683d: "Понятное название SIS"
@@ -17621,13 +17772,17 @@ ru:
       imported_items: "Импортированные элементы"
     import_counts: 
       accounts: "Учетные записи: %{account_count}"
+      admins: "Админы: %{admin_count}"
+      change_sis_ids: "Изменить идентификаторы SIS: %{change_sis_ids_count}"
       courses: "Курсы: %{course_count}"
       crosslists: "Перекрестные списки: %{crosslist_count}"
       enrollments: "Регистрации: %{enrollment_count}"
+      group_categories: "Категории групп: %{group_categories_count}"
       group_enrollments: "Регистрации группы: %{group_enrollments_count}"
       groups: "Группы: %{group_count}"
       sections: "Разделы: %{section_count}"
       terms: "Периоды: %{term_count}"
+      user_observers: "Оценщики пользователя: %{user_observers_count}"
       users: "Пользователи: %{user_count}"
     messages: 
       import_complete_success: "Импорт завершен, все записи были успешно импортированы."
@@ -17702,6 +17857,7 @@ ru:
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "Некоторые отправленные работы не могут быть оценены; изменения оценок этих работ не были учтены."
   someone: Кто-либо
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: "Что-то сломалось, но пока что я могу обойтись без помощи"
+  something_went_wrong_creating_course_please_try_ag_5198931d: "Что-то пошло не так при создании курса. Попробуйте еще раз."
   something_went_wrong_inactivating_the_user_please__ea7d0001: "Что-то пошло не так при дезактивации пользователя. Пожалуйста, повторите попытку позже."
   something_went_wrong_please_try_again_6d337b6c: "Что-то пошло не так, повторите попытку."
   something_went_wrong_please_try_refreshing_the_pag_4e14a67: "Возникла проблема. Попробуйте перезагрузить страницу. Если проблема не устранена, причиной этого может быть слишком большое число записей в \"%{assignmentTitle}\" для загрузки SpeedGrader."
@@ -17779,6 +17935,7 @@ ru:
     student_hidden_name: "Студент %{position}"
   sso_settings_ebf98263: "Настройки SSO"
   star_conversation_2e2ba614: "Отметить разговор звездочкой"
+  starred_5a9efa8a: "Отмечено звездочкой"
   starred_no_subject_click_to_unstar_3191d64: "Со звездой \"(Без темы)\", Нажмите, чтобы снять звезду."
   starred_no_subject_click_to_unstar_bff04bce: "Со звездой \"(Без темы)\", Нажмите, чтобы снять звезду."
   starred_subject_click_to_unstar_6aafcddc: "Со звездой \"%{subject}\", Нажмите, чтобы снять звезду."
@@ -17786,7 +17943,10 @@ ru:
   start_date_e937be8a: "Дата начала"
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
   start_date_field_for_styleguide_8a8ab1d6: "Поле Дата Начала для styleguide"
+  start_date_from_20503757: "Дата начала от:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} в %{end_time}"
+  start_date_to_1e6e6bbe: "Дата начала до:"
+  start_dates_8f1c22a8: "Даты начала:"
   start_from_a_template_380d4e8: "Начать с шаблона..."
   start_from_a_template_theme_6c6e3dab: "Начните с темы шаблона:"
   start_from_a_theme_template_475c3d26: "Начать с шаблона темы"
@@ -17861,6 +18021,7 @@ ru:
   student_planner_date_4cc73abb: "Дата планировщика студента:"
   student_sis_6721040e: "Sis учащегося"
   student_sis_d9f0cd39: "sis студента"
+  student_sis_id_abe6b292: "идентификатор sis студента"
   student_summary: 
     student_summary_table_ascending: "Таблица сводных данных студентов, сортированная по возрастанию по %{sortText}"
     student_summary_table_descending: "	Таблица сводных данных студентов, сортированная по убыванию по %{sortText}"
@@ -17957,6 +18118,7 @@ ru:
   submission_comment: 
     unknown_author: Кто-либо
   submission_comments_4fa03a17: "Комментарии отправки"
+  submission_date_a7920dac: "дата отправки"
   submission_detail: 
     go_to_submission_url: "Перейти к URL-адресу отправки"
     no_submission: "Нет отправки"
@@ -17980,6 +18142,7 @@ ru:
     view_rubric_assessment_in_the_speedgrader: "Просмотр оценки рубрики в SpeedGrader"
   submission_in_another_grading_period_e754b329: "Предоставление материалов в другом оценочном периоде"
   submission_options_5184a65b: "Опции представления"
+  submission_score_b7a291e8: "оценка отправки"
   submission_status_3079e730: "Статус отправки"
   submission_tray_429ac3df: "Лоток отправки"
   submissions: 
@@ -18202,6 +18365,7 @@ ru:
     tab_location_error: "Неверное расположение вкладки"
     tab_unmanagable_error: "%{css_class} не подлежит управлению"
   taiwan_886_9a5b6bbf: "Тайвань (+886)"
+  take_a_picture_d582acf1: "Использовать изображение"
   take_a_snapshot_now_5b622d85: "Сделать снэпшот"
   take_the_quiz_87214d7e: "Принять контрольную работу"
   take_the_quiz_again_8ea51a6c: "Снова принять контрольную работу"
@@ -18375,6 +18539,7 @@ ru:
   theme_52404e51: Тема
   theme_editor_b7b00f6b: "Редактор тем"
   theme_editor_changes_have_been_cancelled_2af5cc5f: "Изменения редактора тем были отменены."
+  theme_editor_refactor_f8d8bdfa: "Переработка кода редактора тем"
   theme_name_68f46e09: "Название темы"
   themes_89bfe9c4: Темы
   there_are_count_associations_906edb03: 
@@ -18433,6 +18598,8 @@ ru:
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "При обработке вашего запроса произошла ошибка; пожалуйста, попробуйте другой поиск"
   there_was_an_unexpected_problem_with_the_sync_be079a67: "Неожиданная проблема во время синхронизации"
   there_was_an_unknown_error_registering_the_tool_b9a29954: "Неизвестная ошибка во время регистрации инструмента"
+  there_were_a_total_of_count_errors_db1d89de: "Произошло всего %{count} ошибки (ошибок)."
+  there_were_a_total_of_count_warnings_6405df1e: "Было всего %{count} предупреждения (предупреждений)."
   there_were_errors_with_the_form_errors_ab5b559a: "Ошибки в форме: %{errors}"
   there_were_several_possible_matches_with_the_impor_ad58bcd0: "Возникло несколько возможных совпадений с импортом. Пожалуйста, изучите представленную ниже информацию и примите необходимые меры."
   these_backup_codes_can_be_used_if_your_multi_facto_ca30a3df: "Эти резервные коды могут быть использованы, если ваше устройство многофакторной авторизации недоступно. Распечатайте и храните их в надежном месте аналогичное вашему кошельку."
@@ -18479,6 +18646,7 @@ ru:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Эта папка в данный момент заблокирована и недоступна для просмотра."
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "Эта оценка отличается от оценки, которую видит студент, потому что некоторые задания были заброкированы"
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Это изображение появляется на странице в качестве фонового водяного знака. Допустимые форматы: png, svg, gif, jpeg"
+  this_is_a_blueprint_course_5e7b47fe: "Это шаблонный курс"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Это список надежных URL-адресов, перечисленных через запятую. Если URL-адрес находится в списке надежных, при входе с него в систему Canvas будет пропускаться использование маркера CSRF."
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "Это завершенный курс, поэтому доступна только завершенная регистрация."
   this_is_a_feature_to_allow_product_design_to_remov_e92ea1c3: "Это функция, позволяющая дизайну продукта удалять все разнообразные изменения размеров шрифта, обусловленные применением."
@@ -18520,6 +18688,7 @@ ru:
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Данная контрольная работа не опубликована* Только учителя могут просматривать эту контрольную работу до публикации."
   this_quiz_needs_review_50e014e: "Требуется проверка этой контрольной работы"
   this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: "Этот рекордер использует Flash. В результате, вы можете оказаться легче сделать запись на локальном компьютере, а затем воспользоваться вкладкой загрузки медиа, чтобы загрузить ее."
+  this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "В этом отчете представлены результаты обучения, существующие в этой учетной записи. Результирующий файл csv будет иметь один столбец на результат, и в нем будут отображаться данные всех ассоциированных атрибутов для каждого результата."
   this_report_shows_all_the_courses_for_a_given_term_3cdc11e5: "Данный отчет показывает все курсы данного семестра. Полученный файл .csv будет содержать по одной строке на каждый курс и будет отображать идентификатор курса, sis идентификатор курса, краткое название курса, название курса, id аккаунта, sis id аккаунта, имя аккаунта, используемое хранилище в МБ. Используемое хранилище отражает все файлы, которые идут против квоты курсов. Сумма всех файлов в процессе является суммой всех файлов, которые находятся в процессе, независимо от влияния на квоты курсов."
   this_report_shows_all_the_courses_for_a_given_term_9102a3d7: "Данный отчет показывает все курсы данного семестра. Полученный файл .csv будет содержать по одной строке на каждый курс и будет отображать идентификатор курса, sis идентификатор курса, краткое название курса, название курса, id аккаунта, sis id аккаунта, имя аккаунта, используемое хранилище в МБ."
   this_report_shows_grading_period_grades_and_overal_a86346a: "Этот отчет показывает оценки периода оценивания (и общие оценки по курсу) для каждого студента, зачисленного в той или иной срок. В полученном файле CSV будет по одной строке для каждого зачисления."
@@ -18804,6 +18973,7 @@ ru:
       
       Если провайдер может настроить действующий обратный вызов или перенаправление URI, используйте %{callback_url}.
   to_date_can_t_come_before_from_date_cf9e18aa: "Параметр «До» не может быть раньше параметра «С»"
+  to_date_cannot_come_before_from_date_3eeb2633: "Дата «До» не может быть раньше даты «С»"
   to_do_1d554f36: Задачи
   to_do_5526f10a: "Задачи:"
   to_do_items_loading_d1cdfcd5: "Для выполнения загрузки позиций"
@@ -18857,6 +19027,7 @@ ru:
   tree_browser: 
     folder_tree_instructions: "Для перемещения по дереву используйте клавиши со стрелками. Нажмите правую кнопку для развертывания папок, левую для сворачивания и ввод для выбора выбранного элемента."
   trinidad_and_tobago_1_fc2d8d1c: "Тринидад и Тобаго (+1)"
+  truncated_56b1a661: Усеченное
   turning_off_this_tutorial_will_remove_the_tutorial_dfd81b3a: "При отключении этой справки лоток справки будет удален с экрана для всех ваших курсов. Ее можно будет снова включить в разделе Функциональных опций в меню Пользовательских настроек."
   turnitin: 
     error_1007: "Загружаемый файл слишком велик."
@@ -18951,6 +19122,8 @@ ru:
   unnamed_account_id_e688ad87: "Безымянный аккаунт (%{id})"
   unpin_a318452a: "Отменить привязку"
   unposted_8d9932ec: Неопубликовано
+  unposted_current_score_c1dd3879: "неопубликованная текущая оценка"
+  unposted_final_score_c19c35b3: "неопубликованная финальная оценка"
   unprocessable_entity: "Объект, который невозможно обработать"
   unprocessable_entity_message: "Недействительное id для подписанного собрания"
   unpublish_9f2d730b: "Отменить публикацию"
@@ -19005,6 +19178,7 @@ ru:
   upload_8b403d05: Загрузить
   upload_a_css_file_ec22214b: "Загрузить файл CSS..."
   upload_a_js_file_c89d795: "Загрузить файл JS..."
+  upload_a_picture_9f5f6e3c: "Загрузить изображение"
   upload_button: 
     upload: Загрузить
   upload_course_files_syllabi_readings_or_other_docu_21f8725f: |-
@@ -19251,6 +19425,8 @@ ru:
   usercount_users_found_8c07f1f2: "Найдено %{userCount} пользователей."
   username_47bb5bbe: "Имя пользователя"
   username_could_not_be_found_6c3e8383: "Невозможно найти имя пользователя"
+  username_saved_successfully_9303974f: "*%{userName}* успешно сохранена!"
+  username_saved_successfully_they_should_receive_an_877e31e: "*%{userName}* успешно сохранена! Они должны получить подтверждение по электронной почте в ближайшее время."
   users: 
     admin_merge: 
       buttons: 
@@ -19578,13 +19754,13 @@ ru:
   warning_icon_f64936d7: "иконка предупреждения"
   warnings: 
     test_install: 
-      periodic_message: "Эта версия Canvas предназначена только для тестирования, и будет периодически перезапускаться."
+      periodic_message: "Установка Canvas выполняется только в целях тестирования и будет периодически сбрасываться."
       title: "Тестовая версия Canvas"
       weekly_message: 
-        few: "Эта версия Canvas предназначена только для тестирования, и будет перезапускаться каждые %{count} недели."
-        many: "Эта версия Canvas предназначена только для тестирования, и будет перезапускаться каждые %{count} недель."
-        one: "Эта версия Canvas предназначена только для тестирования, и будет перезапускаться каждую неделю"
-        other: "Эта версия Canvas предназначена только для тестирования, и будет перезапускаться каждые %{count} недель."
+        few: "Установка Canvas выполняется только в целях тестирования и будет сбрасываться каждые %{count} недели."
+        many: "Установка Canvas выполняется только в целях тестирования и будет сбрасываться каждые %{count} недели."
+        one: "Установка Canvas выполняется только в целях тестирования и будет сбрасываться каждую неделю."
+        other: "Установка Canvas выполняется только в целях тестирования и будет сбрасываться каждые %{count} недели."
   watermark_c93fae0d: "Водяной знак"
   watermark_opacity_ce3d3097: "Непрозрачность водяного знака"
   watermarks_other_images_e970fc6a: "Водяные знаки и другие изображения"
@@ -19824,6 +20000,11 @@ ru:
   yes_dde87d5: Да
   yes_install_tool_f51b3278: "Да, установить инструмент"
   yo_e4ee15a4: Yo
+  you_are_about_to_delete_count_announcements_are_yo_96a2b383: 
+    few: "Вы собираетесь удалить %{count} объявлений. Вы уверены?"
+    many: "Вы собираетесь удалить %{count} объявлений. Вы уверены?"
+    one: "Вы собираетесь удалить 1 объявление. Вы уверены?"
+    other: "Вы собираетесь удалить %{count} объявлений. Вы уверены?"
   you_are_about_to_lose_any_changes_that_you_have_no_6759802f: |-
       Несохраненные изменения в учетной записи будут потеряны.
       
@@ -19880,6 +20061,7 @@ ru:
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Можно обновить некоторую информацию об этом пользователе, но он сможет изменить это."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Вы можете использовать один файл 16x16, 32x32, 48x48 с расширением .ico."
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "Вы можете просматривать свои оценки только в режиме «что, если», чтобы понимать, как на них будут влиять предстоящие или повторно сданные задания. Вы можете проверять оценки за задание, которое уже включает оценку или пока не было оценено."
+  you_cannot_assign_sections_to_a_group_discussion_t_fec73e05: "Вы не можете присвоить разделы к теме дискуссии группы"
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Вы не можете назначить для группы вне набора заданий группы."
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Вы не можете редактировать темы в этом суб-аккаунте."
   you_cannot_remove_this_enrollment_c87be1cb: "Вы не можете удалить эту регистрацию."
@@ -19887,6 +20069,7 @@ ru:
   you_cannot_set_a_grouped_discussion_as_a_student_a20f363: "Являясь студентом, вы не можете начать групповое обсуждение."
   you_cannot_use_a_number_greater_than_the_number_of_af33e220: "Вы не можете использовать число, превышающее количество заданий"
   you_created_an_announcement_in_course_c49e3d70: "Вы создали объявление в %{course}"
+  you_do_not_have_access_to_the_requested_announceme_a774d80a: "У вас нет доступа к запрошенному объявлению."
   you_do_not_have_access_to_the_requested_discussion_90d8ec99: "У вас нет доступа к запрошенному обсуждению."
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: "У вас нет доступа к запрошенному контрольному опросу"
   you_do_not_have_access_to_the_requested_resource_316ce49a: "У вас нет доступа к запрошенному ресурсу."
@@ -19919,6 +20102,7 @@ ru:
   you_must_allow_at_least_one_group_to_attend_68531eab: "Вы должны разрешить посещение хотя бы одной группы"
   you_must_enter_a_date_f8eabfb1: "Необходимо указать дату"
   you_must_have_a_student_or_section_selected_a99e45df: "Вы должны выбрать студента или раздел"
+  you_must_input_a_section_b8d370fe: "Вы должны ввести раздел"
   you_must_log_in_to_view_replies_9ccd4da0: "Вы должны войти в систему для просмотра ответов"
   you_must_provide_a_value_or_unselect_the_option_3b28b754: "Необходимо задать значение или отменить выбор опции."
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Вы должны выбрать курс, прежде чем копировать из него содержимое"

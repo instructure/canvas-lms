@@ -43,7 +43,7 @@
 >
   <div class="screenreader-only"><h2><%= t 'rubric', "Rubric" %></h2></div>
   <div class="rubric_title">
-    <div style="float: right; <%= hidden unless editable && edit_view %>" class="links displaying">
+    <div style="<%= hidden unless editable && edit_view %>" class="links displaying pull-right">
       <% hash = rubric_association ? {:rubric_association_id => rubric_association.id} : {} %>
       <a
         href="<%= context_url(context, :context_rubric_url, rubric ? rubric.id : "{{ id }}", hash) %>"
@@ -149,7 +149,7 @@
   <%= render :partial => "shared/rubric_criterion", :object => nil %>
   <tr class="summary">
     <td colspan="4">
-      <div style="float: right;" class="total_points_holder" style="<%= hidden if rubric_association && rubric_association.hide_score_total %>">
+      <div class="total_points_holder" style="float: right; <%= hidden if rubric_association && rubric_association.hide_score_total %>">
         <span><%= before_label :total_points, "Total Points" %>
           <% ot(:out_of, "%{points} *out of %{total}*", :points => capture { %>
             <span class="rubric_total">
@@ -164,7 +164,7 @@
             %>
         </span>
       </div>
-      <div style="float: left;" class="editing">
+      <div class="editing pull-left">
         <span id="add_criterion_holder" class="criterion_link"></span>
       </div>
       <div class="clear"></div>

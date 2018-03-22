@@ -1,0 +1,8 @@
+canvas_id,vendor_guid,object_type,title,description,display_name,calculation_method,calculation_int,workflow_state,parent_guids,ratings,,,,,,,
+,a,group,A,AAA,display,,,active,,,,,,,,,
+,b,group,B,BBB,names,,,active,a,,,,,,,,
+,c,outcome,C,CCC,here,,,active,a b,3,Betterest,2,Better,1,Good,,
+,d,outcome,D,DDD,here,highest,,active,a,2,Good,1,,,,,
+,e,outcome,E,EEE,here,latest,,active,a,2,Good,1,,,,,
+,f,outcome,F,FFF,here,decaying_average,40,active,b,2,Good,1,,,,,
+,g,outcome,G,GGG,here,n_mastery,3,active,b,1,,,,,,,

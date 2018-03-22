@@ -554,7 +554,7 @@ module AccountReports
     def groups
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['group_id', 'group_category_id', 'account_id', 'name', 'status']
+        headers = ['group_id', 'group_category_id', 'account_id', 'course_id', 'name', 'status']
       else
         headers = []
         headers << I18n.t('#account_reports.report_header_canvas_group_id', 'canvas_group_id')
@@ -563,8 +563,10 @@ module AccountReports
         headers << I18n.t('group_category_id')
         headers << I18n.t('#account_reports.report_header_canvas_account_id', 'canvas_account_id')
         headers << I18n.t('#account_reports.report_header_account_id', 'account_id')
-        headers << I18n.t('#account_reports.report_header_name', 'name')
-        headers << I18n.t('#account_reports.report_header_status', 'status')
+        headers << I18n.t('canvas_course_id')
+        headers << I18n.t('course_id')
+        headers << I18n.t('name')
+        headers << I18n.t('status')
         headers << I18n.t('created_by_sis')
         headers << I18n.t('context_id')
         headers << I18n.t('context_type')
@@ -573,8 +575,11 @@ module AccountReports
       end
 
       groups = root_account.all_groups.
-        select("groups.*, accounts.sis_source_id AS account_sis_id, group_categories.sis_source_id AS gc_sis_id").
+        select("groups.*, accounts.sis_source_id AS account_sis_id,
+                courses.sis_source_id AS course_sis_id,
+                group_categories.sis_source_id AS gc_sis_id").
         joins("INNER JOIN #{Account.quoted_table_name} ON accounts.id = groups.account_id
+               LEFT JOIN #{Course.quoted_table_name} ON courses.id = groups.context_id AND context_type='Course'
                LEFT JOIN #{GroupCategory.quoted_table_name} ON groups.group_category_id=group_categories.id")
 
       groups = groups.where.not(groups: {sis_source_id: nil}) if @sis_format
@@ -587,7 +592,6 @@ module AccountReports
       end
 
       if account != root_account
-        groups = groups.joins("LEFT JOIN #{Course.quoted_table_name} ON groups.context_type = 'Course' AND groups.context_id = courses.id")
         groups.where!("(groups.context_type = 'Account'
                          AND (accounts.id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
                            OR accounts.id = :account_id))
@@ -603,8 +607,10 @@ module AccountReports
           row << g.sis_source_id
           row << g.group_category_id unless @sis_format
           row << g.gc_sis_id
-          row << g.account_id unless @sis_format
-          row << g.account_sis_id
+          row << (g.context_type == 'Account' ? g.context_id : nil) unless @sis_format
+          row << (g.context_type == 'Account' ? g.account_sis_id : nil)
+          row << (g.context_type == 'Course' ? g.context_id : nil) unless @sis_format
+          row << (g.context_type == 'Course' ? g.course_sis_id : nil)
           row << g.name
           row << g.workflow_state
           row << g.sis_batch_id? unless @sis_format
@@ -620,7 +626,7 @@ module AccountReports
     def group_categories
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['group_category_id', 'account_id', 'category_name', 'status']
+        headers = ['group_category_id', 'account_id', 'course_id', 'category_name', 'status']
       else
         headers = []
         headers << I18n.t('canvas_group_category_id')
@@ -633,7 +639,6 @@ module AccountReports
         headers << I18n.t('group_limit')
         headers << I18n.t('auto_leader')
         headers << I18n.t('status')
-
       end
 
       root_account.shard.activate do
@@ -649,12 +654,14 @@ module AccountReports
         else
           group_categories = root_account.all_group_categories.
             joins("LEFT JOIN #{Account.quoted_table_name} a ON a.id = group_categories.context_id
-                   AND group_categories.context_type = 'Account'")
+                     AND group_categories.context_type = 'Account'
+                   LEFT JOIN #{Course.quoted_table_name} c ON c.id = group_categories.context_id
+                     AND group_categories.context_type = 'Course'")
         end
         group_categories.where!('group_categories.deleted_at IS NULL') unless @include_deleted
         if @sis_format
           group_categories = group_categories.
-            select("group_categories.*, a.sis_source_id AS account_sis_id").
+            select("group_categories.*, a.sis_source_id AS account_sis_id, c.sis_source_id AS course_sis_id").
             where.not(sis_batch_id: nil)
         end
 
@@ -663,7 +670,8 @@ module AccountReports
             row = []
             row << g.id unless @sis_format
             row << g.sis_source_id
-            row << g.account_sis_id if @sis_format
+            row << ((g.context_type == 'Account') ? g.account_sis_id : nil) if @sis_format
+            row << ((g.context_type == 'Course') ? g.course_sis_id : nil) if @sis_format
             row << g.context_id unless @sis_format
             row << g.context_type unless @sis_format
             row << g.name
@@ -822,7 +830,7 @@ module AccountReports
                 p2.user_id AS observer_id,
                 user_observers.workflow_state AS ob_state,
                 user_observers.sis_batch_id AS o_batch_id").
-        joins("INNER JOIN #{UserObserver.quoted_table_name} ON pseudonyms.user_id=user_observers.user_id
+        joins("INNER JOIN #{UserObservationLink.quoted_table_name} ON pseudonyms.user_id=user_observers.user_id
                INNER JOIN #{Pseudonym.quoted_table_name} AS p2 ON p2.user_id=user_observers.observer_id").
         where("p2.account_id=pseudonyms.account_id")
 

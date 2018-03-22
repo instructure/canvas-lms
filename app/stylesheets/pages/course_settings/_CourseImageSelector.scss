@@ -43,7 +43,7 @@
 .CourseImageSelector__Button {
   position: absolute;
   top: 6px;
-  right: 6px;
+  #{direction(right)}: 6px;
 }
 
 .CourseImagePicker {

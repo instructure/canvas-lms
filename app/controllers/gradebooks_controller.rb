@@ -102,16 +102,13 @@ class GradebooksController < ApplicationController
 
     ags_json = light_weight_ags_json(@presenter.groups, {student: @presenter.student})
 
-    grading_scheme = @context.grading_standard.try(:data) ||
-                     GradingStandard.default_grading_standard
-
     js_env(
       submissions: submissions_json,
       assignment_groups: ags_json,
       assignment_sort_options: @presenter.sort_options,
       group_weighting_scheme: @context.group_weighting_scheme,
       show_total_grade_as_points: @context.show_total_grade_as_points?,
-      grading_scheme: grading_scheme,
+      grading_scheme: @context.grading_standard_or_default.data,
       current_grading_period_id: @current_grading_period_id,
       current_assignment_sort_order: @presenter.assignment_order,
       grading_period_set: grading_period_group_json,
@@ -298,6 +295,7 @@ class GradebooksController < ApplicationController
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(teacher_notes: true).first
     ag_includes = [:assignments, :assignment_visibility]
     last_exported_attachment = @last_exported_gradebook_csv.try(:attachment)
+    grading_standard = @context.grading_standard_or_default
     {
       STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards),
       GRADEBOOK_OPTIONS: {
@@ -342,11 +340,8 @@ class GradebooksController < ApplicationController
         context_code: @context.asset_string,
         context_sis_id: @context.sis_source_id,
         group_weighting_scheme: @context.group_weighting_scheme,
-        grading_standard: (
-          @context.grading_standard_enabled? &&
-          (@context.grading_standard.try(:data) || GradingStandard.default_grading_standard)
-        ),
-        default_grading_standard: GradingStandard.default_grading_standard,
+        grading_standard: @context.grading_standard_enabled? && grading_standard.data,
+        default_grading_standard: grading_standard.data,
         course_is_concluded: @context.completed?,
         course_name: @context.name,
         gradebook_is_editable: @gradebook_is_editable,
@@ -376,7 +371,7 @@ class GradebooksController < ApplicationController
         ),
         export_gradebook_csv_url: course_gradebook_csv_url,
         gradebook_csv_progress: @last_exported_gradebook_csv.try(:progress),
-        attachment_url: last_exported_attachment && last_exported_attachment.download_url_for_user(@current_user),
+        attachment_url: authenticated_download_url(last_exported_attachment),
         attachment: last_exported_attachment,
         sis_app_url: Setting.get('sis_app_url', nil),
         sis_app_token: Setting.get('sis_app_token', nil),
@@ -414,14 +409,16 @@ class GradebooksController < ApplicationController
   end
 
   def history
-    if authorized_action(@context, @current_user, :manage_grades)
+    if authorized_action(@context, @current_user, %i[manage_grades view_all_grades])
       crumbs.delete_if { |crumb| crumb[0] == "Grades" }
       add_crumb(t("Gradebook History"),
                 context_url(@context, controller: :gradebooks, action: :history))
       @page_title = t("Gradebook History")
       @body_classes << "full-width padless-content"
       js_bundle :gradebook_history
-      js_env({})
+      js_env(
+        COURSE_IS_CONCLUDED: @context.is_a?(Course) && @context.completed?
+      )
 
       render html: "", layout: true
     end
@@ -456,7 +453,7 @@ class GradebooksController < ApplicationController
 
         submission = submission.permit(:grade, :score, :excuse, :excused,
           :graded_anonymously, :provisional, :final,
-          :comment, :media_comment_id).to_unsafe_h
+          :comment, :media_comment_id, :group_comment).to_unsafe_h
 
         submission[:grader] = @current_user
         submission.delete(:provisional) unless @assignment.moderated_grading?
@@ -597,6 +594,7 @@ class GradebooksController < ApplicationController
       format.html do
         @headers = false
         @outer_frame = true
+        @anonymous_moderated_marking_enabled = @context.root_account.feature_enabled?(:anonymous_moderated_marking)
         log_asset_access([ "speed_grader", @context ], "grades", "other")
         env = {
           CONTEXT_ACTION_SOURCE: :speed_grader,
@@ -607,10 +605,12 @@ class GradebooksController < ApplicationController
           lti_retrieve_url: retrieve_course_external_tools_url(
             @context.id, assignment_id: @assignment.id, display: 'borderless'
           ),
+          anonymous_moderated_marking_enabled: @anonymous_moderated_marking_enabled,
           course_id: @context.id,
           assignment_id: @assignment.id,
           assignment_title: @assignment.title,
-          can_comment_on_submission: @can_comment_on_submission
+          can_comment_on_submission: @can_comment_on_submission,
+          show_help_menu_item: show_help_link?
         }
         if [:moderator, :provisional_grader].include?(grading_role)
           env[:provisional_status_url] = api_v1_course_assignment_provisional_status_path(@context.id, @assignment.id)
@@ -958,10 +958,13 @@ class GradebooksController < ApplicationController
     courses << @context if courses.empty?
 
     courses.map do |course|
+      grading_period_set_id = GradingPeriodGroup.for_course(course)&.id
+
       {
         id: course.id,
         nickname: course.nickname_for(@current_user),
-        url: context_url(course, :context_grades_url)
+        url: context_url(course, :context_grades_url),
+        grading_period_set_id: grading_period_set_id.try(:to_s)
       }
     end.as_json
   end

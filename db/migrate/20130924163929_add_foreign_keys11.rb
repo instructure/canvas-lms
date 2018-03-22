@@ -16,7 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class AddForeignKeys11 < ActiveRecord::Migration[4.2]
-  tag :postdeploy
+  # this used to be post deploy, but now we need to modify a constraint in a
+  # predeploy so a new database will have the contrainte before it is attempted
+  # to be modified.
+  tag :predeploy
   disable_ddl_transaction!
 
   def self.up

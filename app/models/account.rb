@@ -20,6 +20,7 @@ require 'atom'
 
 class Account < ActiveRecord::Base
   include Context
+  include OutcomeImportContext
 
   INSTANCE_GUID_SUFFIX = 'canvas-lms'
 
@@ -35,7 +36,7 @@ class Account < ActiveRecord::Base
   has_many :group_categories, -> { where(deleted_at: nil) }, as: :context, inverse_of: :context
   has_many :all_group_categories, :class_name => 'GroupCategory', foreign_key: 'root_account_id', inverse_of: :root_account
   has_many :groups, :as => :context, :inverse_of => :context
-  has_many :all_groups, :class_name => 'Group', :foreign_key => 'root_account_id'
+  has_many :all_groups, class_name: 'Group', foreign_key: 'root_account_id', inverse_of: :root_account
   has_many :all_group_memberships, source: 'group_memberships', through: :all_groups
   has_many :enrollment_terms, :foreign_key => 'root_account_id'
   has_many :active_enrollment_terms, -> { where("enrollment_terms.workflow_state<>'deleted'") }, class_name: 'EnrollmentTerm', foreign_key: 'root_account_id'
@@ -60,6 +61,7 @@ class Account < ActiveRecord::Base
   has_many :folders, -> { order('folders.name') }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :active_folders, -> { where("folder.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context, inverse_of: :context
   has_many :developer_keys
+  has_many :developer_key_account_bindings, inverse_of: :account
   has_many :authentication_providers,
            -> { order(:position) },
            extend: AccountAuthorizationConfig::FindWithType,
@@ -73,6 +75,7 @@ class Account < ActiveRecord::Base
   has_many :all_roles, :class_name => 'Role', :foreign_key => 'root_account_id'
   has_many :progresses, :as => :context, :inverse_of => :context
   has_many :content_migrations, :as => :context, :inverse_of => :context
+  has_many :sis_batch_errors, foreign_key: :root_account_id, inverse_of: :root_account
 
   def inherited_assessment_question_banks(include_self = false, *additional_contexts)
     sql = []
@@ -108,7 +111,7 @@ class Account < ActiveRecord::Base
   after_save :invalidate_caches_if_changed
   after_update :clear_special_account_cache_if_special
 
-  after_update :clear_cached_short_name, :if => :name_changed?
+  after_update :clear_cached_short_name, :if => :saved_change_to_name?
 
   after_create :create_default_objects
 
@@ -229,6 +232,8 @@ class Account < ActiveRecord::Base
 
   add_setting :strict_sis_check, :boolean => true, :root_only => true, :default => false
   add_setting :lock_all_announcements, default: false, boolean: true, inheritable: true
+
+  add_setting :enable_gravatar, :boolean => true, :root_only => true, :default => true
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
@@ -391,7 +396,7 @@ class Account < ActiveRecord::Base
   end
 
   def update_account_associations_if_changed
-    send_later_if_production(:update_account_associations) if self.parent_account_id_changed? || self.root_account_id_changed?
+    send_later_if_production(:update_account_associations) if self.saved_change_to_parent_account_id? || self.saved_change_to_root_account_id?
   end
 
   def equella_settings
@@ -564,7 +569,7 @@ class Account < ActiveRecord::Base
 
   def invalidate_caches_if_changed
     @invalidations ||= []
-    if self.parent_account_id_changed?
+    if self.saved_change_to_parent_account_id?
       @invalidations += Account.inheritable_settings # invalidate all of them
     elsif @old_settings
       Account.inheritable_settings.each do |key|
@@ -1022,7 +1027,10 @@ class Account < ActiveRecord::Base
     end
 
     given { |user| !self.account_users_for(user).empty? }
-    can :read and can :read_as_admin and can :manage and can :update and can :delete and can :read_outcomes
+    can :read and can :read_as_admin and can :manage and can :update and can :delete and can :read_outcomes and can :read_terms
+
+    given { |user| self.root_account? && self.all_account_users_for(user).any? }
+    can :read_terms
 
     given { |user|
       result = false
@@ -1345,24 +1353,20 @@ class Account < ActiveRecord::Base
   end
 
   def closest_turnitin_pledge
-    account_with_pledge = account_chain.find { |a| a.turnitin_pledge.present? }
-    account_with_pledge&.turnitin_pledge || t('This assignment submission is my own, original work')
+    closest_account_value(:turnitin_pledge, t('This assignment submission is my own, original work'))
   end
 
   def closest_turnitin_comments
-    if self.turnitin_comments && !self.turnitin_comments.empty?
-      self.turnitin_comments
-    else
-      self.parent_account.try(:closest_turnitin_comments)
-    end
+    closest_account_value(:turnitin_comments)
   end
 
   def closest_turnitin_originality
-    if self.turnitin_originality && !self.turnitin_originality.empty?
-      self.turnitin_originality
-    else
-      self.parent_account.try(:turnitin_originality)
-    end
+    closest_account_value(:turnitin_originality, 'immediate')
+  end
+
+  def closest_account_value(value, default = '')
+    account_with_value = account_chain.find { |a| a.send(value.to_sym).present? }
+    account_with_value&.send(value.to_sym) || default
   end
 
   def self_enrollment_allowed?(course)
@@ -1439,7 +1443,13 @@ class Account < ActiveRecord::Base
     end
 
     tabs << { :id => TAB_BRAND_CONFIGS, :label => t('#account.tab_brand_configs', "Themes"), :css_class => 'brand_configs', :href => :account_brand_configs_path } if manage_settings && branding_allowed?
-    tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :account_developer_keys_path, account_id: root_account.id } if root_account? && self.grants_right?(user, :manage_developer_keys)
+
+    if self.root_account.feature_enabled?(:developer_key_management)
+      tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :account_developer_keys_path, account_id: self.id } if self.grants_right?(user, :manage_developer_keys)
+    else
+      tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :account_developer_keys_path, account_id: root_account.id } if root_account? && self.grants_right?(user, :manage_developer_keys)
+    end
+
 
     tabs += external_tool_tabs(opts)
     tabs += Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::ACCOUNT_NAVIGATION], opts)

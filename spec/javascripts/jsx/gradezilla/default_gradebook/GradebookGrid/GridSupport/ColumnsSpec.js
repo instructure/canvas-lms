@@ -19,7 +19,7 @@
 import $ from 'jquery';
 import { Editors, Grid } from 'vendor/slickgrid';
 import GridSupport from 'jsx/gradezilla/default_gradebook/GradebookGrid/GridSupport';
-import SlickGridSpecHelper from '../../slick-grid/SlickGridSpecHelper';
+import SlickGridSpecHelper from './SlickGridSpecHelper'
 
 function createColumns () {
   return [1, 2, 3, 4].map(id => (
@@ -180,6 +180,55 @@ QUnit.module('GridSupport Columns', (suiteHooks) => {
       gridSupport.columns.updateColumnHeaders(['column3']);
       const instance = columnHeaderRenderer.renderColumnHeader.lastCall.args[2];
       equal(instance, gridSupport);
+    });
+  });
+
+  QUnit.module('#scrollToStart', () => {
+    test('calls scrollCellIntoView', () => {
+      createAndInitialize();
+      const scrollCellIntoViewSpy = sinon.spy(gridSupport.grid, 'scrollCellIntoView')
+      gridSupport.columns.scrollToStart()
+      strictEqual(scrollCellIntoViewSpy.callCount, 1)
+    });
+
+    test('scrolls to the first column', () => {
+      createAndInitialize();
+      const scrollCellIntoViewSpy = sinon.spy(gridSupport.grid, 'scrollCellIntoView')
+      gridSupport.columns.scrollToStart()
+      strictEqual(scrollCellIntoViewSpy.firstCall.args[1], 0)
+    });
+
+    test('scrolls with the same visible row', () => {
+      createAndInitialize();
+      const scrollCellIntoViewSpy = sinon.spy(gridSupport.grid, 'scrollCellIntoView')
+      const { top } = gridSupport.grid.getViewport()
+      gridSupport.columns.scrollToStart()
+      strictEqual(scrollCellIntoViewSpy.firstCall.args[0], top)
+    });
+  });
+
+  QUnit.module('#scrollToEnd', () => {
+    test('calls scrollCellIntoView', () => {
+      createAndInitialize();
+      const scrollCellIntoViewSpy = sinon.spy(gridSupport.grid, 'scrollCellIntoView')
+      gridSupport.columns.scrollToEnd()
+      strictEqual(scrollCellIntoViewSpy.callCount, 1)
+    });
+
+    test('scrolls to the last column', () => {
+      createAndInitialize();
+      const scrollCellIntoViewSpy = sinon.spy(gridSupport.grid, 'scrollCellIntoView')
+      const lastColumn = gridSupport.grid.getColumns().length - 1
+      gridSupport.columns.scrollToEnd()
+      strictEqual(scrollCellIntoViewSpy.firstCall.args[1], lastColumn)
+    });
+
+    test('scrolls with the same visible row', () => {
+      createAndInitialize();
+      const scrollCellIntoViewSpy = sinon.spy(gridSupport.grid, 'scrollCellIntoView')
+      const { top } = gridSupport.grid.getViewport()
+      gridSupport.columns.scrollToEnd()
+      strictEqual(scrollCellIntoViewSpy.firstCall.args[0], top)
     });
   });
 

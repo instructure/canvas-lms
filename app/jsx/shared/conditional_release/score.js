@@ -77,7 +77,7 @@ const percentToPoints = (score, assignment) => {
   if (score === 0) { return '0' }
   const percent = numberHelper.parse(score)
   const pointsPossible = Number(assignment.points_possible) || 100
-  return Math.ceil(percent * pointsPossible)
+  return parseFloat((percent * pointsPossible).toFixed(2))
 }
 
 const percentToLetterGrade = (score, assignment) => {

@@ -38,5 +38,5 @@
 }
 
 .terms-of-service__link {
-  padding-left: 4px;
+  padding-#{direction(left)}: 4px;
 }

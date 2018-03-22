@@ -276,7 +276,7 @@ describe UsersController do
           expect(response).to be_success
           new_pseudo = Pseudonym.where(unique_id: 'jane@example.com').first
           new_user = new_pseudo.user
-          expect(new_user.observed_users).to eq [@user]
+          expect(new_user.linked_students).to eq [@user]
           oe = new_user.observer_enrollments.first
           expect(oe.course).to eq @course
           expect(oe.associated_user).to eq @user
@@ -484,7 +484,7 @@ describe UsersController do
         u = User.where(name: 'Jacob Fugal').first
         expect(u).to be_pre_registered
         expect(response).to be_success
-        expect(u.observed_users).to include(@user)
+        expect(u.linked_students).to include(@user)
       end
     end
 
@@ -691,11 +691,92 @@ describe UsersController do
       end
     end
 
+    context "with unposted assignments" do
+      before(:each) do
+        unposted_assignment = assignment_model(
+          course: test_course, due_at: Time.zone.now,
+          points_possible: 90, muted: true
+        )
+        unposted_assignment.grade_student(student, grade: '100%', grader: @teacher)
+
+        user_session(@teacher)
+      end
+
+      let(:response) do
+        get('grades_for_student', params: {enrollment_id: student_enrollment.id})
+      end
+
+      let(:parsed_response) do
+        json_parse(response.body)
+      end
+
+      context "when the requester can manage grades" do
+        before(:each) do
+          test_course.root_account.role_overrides.create!(
+            permission: 'view_all_grades', role: teacher_role, enabled: false
+          )
+          RoleOverride.create!(
+            permission: 'manage_grades', role: teacher_role, enabled: true
+          )
+        end
+
+        it "allows access" do
+          expect(response).to be_ok
+        end
+
+        it "returns the grade" do
+          expect(parsed_response['grade']).to eq 94.55
+        end
+
+        it "returns the unposted_grade" do
+          expect(parsed_response['unposted_grade']).to eq 97
+        end
+      end
+
+      context "when the requester can view all grades" do
+        before(:each) do
+          test_course.root_account.role_overrides.create!(
+            permission: 'view_all_grades', role: teacher_role, enabled: true
+          )
+          test_course.root_account.role_overrides.create!(
+            permission: 'manage_grades', role: teacher_role, enabled: false
+          )
+        end
+
+        it "allows access" do
+          expect(response).to be_ok
+        end
+
+        it "returns the grade" do
+          expect(parsed_response['grade']).to eq 94.55
+        end
+
+        it "returns the unposted_grade" do
+          expect(parsed_response['unposted_grade']).to eq 97
+        end
+      end
+
+      context "when the requester does not have permissions to see unposted grades" do
+        before(:each) do
+          test_course.root_account.role_overrides.create!(
+            permission: 'view_all_grades', role: teacher_role, enabled: false
+          )
+          test_course.root_account.role_overrides.create!(
+            permission: 'manage_grades', role: teacher_role, enabled: false
+          )
+        end
+
+        it "returns unauthorized" do
+          expect(response).to have_http_status(401)
+        end
+      end
+    end
+
     context "as an observer" do
       let(:observer) { user_with_pseudonym(active_all: true) }
 
       it "returns the grade and the total for a student, filtered by grading period" do
-        student.observers << observer
+        student.linked_observers << observer
         user_session(observer)
         get('grades_for_student', params: {enrollment_id: student_enrollment.id,
           grading_period_id: grading_period.id})
@@ -717,7 +798,7 @@ describe UsersController do
 
       it "does not filter the grades by a grading period if " \
       "'All Grading Periods' is selected" do
-        student.observers << observer
+        student.linked_observers << observer
         all_grading_periods_id = 0
         user_session(observer)
         get('grades_for_student', params: {grading_period_id: all_grading_periods_id,
@@ -769,8 +850,8 @@ describe UsersController do
           observer = user_with_pseudonym(active_all: true)
           course_with_user('StudentEnrollment', course: test_course, user: student1, active_all: true)
           course_with_user('StudentEnrollment', course: test_course, user: student2, active_all: true)
-          student1.observers << observer
-          student2.observers << observer
+          student1.linked_observers << observer
+          student2.linked_observers << observer
           observer
         end
 
@@ -1253,7 +1334,7 @@ describe UsersController do
       user2 = user_with_pseudonym(name: "user2", short_name: "u2")
       user2.pseudonym.sis_user_id = "user2_sisid1"
       user2.pseudonym.integration_id = "user2_intid1"
-      user2.pseudonym.login = "user2_login1@foo.com"
+      user2.pseudonym.unique_id = "user2_login1@foo.com"
       user2.pseudonym.save!
       user2
     end
@@ -1274,7 +1355,7 @@ describe UsersController do
         sortable_name: user2.sortable_name,
         email: user2.email,
         pseudonyms: [
-          { login_id: user2.pseudonym.login,
+          { login_id: user2.pseudonym.unique_id,
             sis_id: user2.pseudonym.sis_user_id,
             integration_id: user2.pseudonym.integration_id }
         ]
@@ -1554,6 +1635,24 @@ describe UsersController do
         @current_user = @user
         get 'user_dashboard'
         expect(assigns[:js_env][:STUDENT_PLANNER_ENABLED]).to be_truthy
+      end
+
+      it "sets ENV.STUDENT_PLANNER_COURSES" do
+        course_with_student_logged_in(active_all: true)
+        @current_user = @user
+        get 'user_dashboard'
+        courses = assigns[:js_env][:STUDENT_PLANNER_COURSES]
+        expect(courses.map {|c| c[:id]}).to eq [@course.id]
+      end
+
+      it "sets ENV.STUDENT_PLANNER_GROUPS" do
+        course_with_student_logged_in(active_all: true)
+        @current_user = @user
+        group = @account.groups.create! :name => 'Account group'
+        group.add_user(@current_user, 'accepted', true)
+        get 'user_dashboard'
+        groups = assigns[:js_env][:STUDENT_PLANNER_GROUPS]
+        expect(groups.map {|g| g[:id]}).to eq [group.id]
       end
 
     end

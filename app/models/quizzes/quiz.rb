@@ -302,14 +302,28 @@ class Quizzes::Quiz < ActiveRecord::Base
     write_attribute(:assignment_id, val)
   end
 
+  def lock_at=(val)
+    val = val.in_time_zone.end_of_day if val.is_a?(Date)
+    if val.is_a?(String)
+      super(Time.zone.parse(val))
+      self.lock_at = CanvasTime.fancy_midnight(self.lock_at) unless val =~ /:/
+    else
+      super(val)
+    end
+  end
+
   def due_at=(val)
     val = val.in_time_zone.end_of_day if val.is_a?(Date)
     if val.is_a?(String)
       super(Time.zone.parse(val))
-      infer_times unless val.match(/:/)
+      infer_times unless val =~ /:/
     else
       super(val)
     end
+  end
+
+  def update_cached_due_dates?
+    due_at_changed? || workflow_state_changed? || only_visible_to_overrides_changed?
   end
 
   def assignment?
@@ -1076,6 +1090,46 @@ class Quizzes::Quiz < ActiveRecord::Base
           assignment_overrides.due_at BETWEEN ? AND ?', start, ending, start, ending)
   }
 
+  scope :ungraded_with_user_due_date, -> (user) do
+    from("(WITH overrides AS (
+          SELECT DISTINCT ON (o.quiz_id, o.user_id) *
+          FROM (
+            SELECT ao.quiz_id, aos.user_id, ao.due_at, ao.due_at_overridden, 1 AS priority, ao.id AS override_id
+            FROM #{AssignmentOverride.quoted_table_name} ao
+            INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} aos ON ao.id = aos.assignment_override_id AND ao.set_type = 'ADHOC'
+            WHERE aos.user_id = #{User.connection.quote(user)}
+              AND ao.workflow_state = 'active'
+              AND aos.workflow_state <> 'deleted'
+            UNION
+            SELECT ao.quiz_id, e.user_id, ao.due_at, ao.due_at_overridden, 1 AS priority, ao.id AS override_id
+            FROM #{AssignmentOverride.quoted_table_name} ao
+            INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_section_id = ao.set_id AND ao.set_type = 'CourseSection'
+            WHERE e.user_id = #{User.connection.quote(user)}
+              AND e.workflow_state NOT IN ('rejected', 'deleted')
+              AND ao.workflow_state = 'active'
+            UNION
+            SELECT q.id, e.user_id, q.due_at, FALSE as due_at_overridden, 2 AS priority, NULL as override_id
+            FROM #{Quizzes::Quiz.quoted_table_name} q
+            INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_id = q.context_id
+            WHERE e.workflow_state NOT IN ('rejected', 'deleted')
+              AND e.type in ('StudentEnrollment', 'StudentViewEnrollment')
+              AND e.user_id = #{User.connection.quote(user)}
+              AND q.assignment_id IS NULL
+              AND NOT q.only_visible_to_overrides
+          ) o
+          ORDER BY o.user_id ASC, o.quiz_id ASC, priority ASC, o.due_at_overridden DESC, o.due_at DESC NULLS FIRST
+        )
+        SELECT CASE WHEN overrides.due_at_overridden THEN overrides.due_at ELSE q.due_at END as user_due_date, q.*
+        FROM #{Quizzes::Quiz.quoted_table_name} q
+        INNER JOIN overrides ON overrides.quiz_id = q.id) as quizzes").
+      not_for_assignment
+  end
+
+  scope :ungraded_due_between_for_user, -> (start, ending, user) do
+    ungraded_with_user_due_date(user).
+      where(user_due_date: start..ending)
+  end
+
   # Return quizzes (up to limit) that do not have any submissions
   scope :need_submitting_info, lambda { |user_id, limit|
     where("(SELECT COUNT(id) FROM #{Quizzes::QuizSubmission.quoted_table_name}
@@ -1270,7 +1324,11 @@ class Quizzes::Quiz < ActiveRecord::Base
         version_number: self.version_number
       }
       if current_quiz_question_regrades.present?
-        Quizzes::QuizRegrader::Regrader.send_later(:regrade!, options)
+        Quizzes::QuizRegrader::Regrader.send_later_enqueue_args(
+          :regrade!,
+          { strand: "quiz:#{self.global_id}:regrading"},
+          options
+        )
       end
     end
     true

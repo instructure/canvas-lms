@@ -55,7 +55,7 @@ propTypes.courseInfo = shape({
   sis_course_id: string,
 })
 
-propTypes.lockableAttribute = oneOf(['points', 'content', 'due_dates', 'availability_dates', 'settings'])
+propTypes.lockableAttribute = oneOf(['points', 'content', 'due_dates', 'availability_dates', 'settings', 'deleted'])
 propTypes.lockableAttributeList = arrayOf(propTypes.lockableAttribute)
 
 propTypes.migrationException = shape({

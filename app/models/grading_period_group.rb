@@ -21,14 +21,14 @@ class GradingPeriodGroup < ActiveRecord::Base
 
   belongs_to :root_account, inverse_of: :grading_period_groups, foreign_key: :account_id, class_name: "Account"
   belongs_to :course
-  has_many :grading_periods, dependent: :destroy
+  has_many :grading_periods
   has_many :enrollment_terms, inverse_of: :grading_period_group
 
   validate :associated_with_course_or_root_account, if: :active?
 
   after_save :recompute_course_scores, if: :weighted_actually_changed?
-  after_save :recache_grading_period, if: :course_id_changed?
-  after_destroy :dissociate_enrollment_terms
+  after_save :recache_grading_period, if: :saved_change_to_course_id?
+  after_destroy :cleanup_associations_and_recompute_scores_later
 
   set_policy do
     given do |user|
@@ -68,12 +68,23 @@ class GradingPeriodGroup < ActiveRecord::Base
     account_group.nil? || account_group.deleted? ? nil : account_group
   end
 
+  def recompute_scores_for_each_term(update_all_grading_period_scores, term_ids: nil)
+    terms = term_ids ? EnrollmentTerm.where(id: term_ids) : enrollment_terms.active
+
+    terms.find_each do |term|
+      term.recompute_course_scores_later(
+        update_all_grading_period_scores: update_all_grading_period_scores,
+        strand_identifier: "GradingPeriodGroup:#{global_id}"
+      )
+    end
+  end
+
   private
 
   def recompute_course_scores
     return course.recompute_student_scores(update_all_grading_period_scores: false) if course_id.present?
 
-    enrollment_terms.each { |term| term.recompute_course_scores(update_all_grading_period_scores: false) }
+    recompute_scores_for_each_term(false)
   end
 
   handle_asynchronously_if_production(
@@ -82,12 +93,12 @@ class GradingPeriodGroup < ActiveRecord::Base
   )
 
   def weighted_actually_changed?
-    !self.new_record? && weighted_changed?
+    !self.new_record? && saved_change_to_weighted?
   end
 
   def recache_grading_period
     DueDateCacher.recompute_course(course) if course
-    DueDateCacher.recompute_course(course_id_was) if course_id_was
+    DueDateCacher.recompute_course(course_id_before_last_save) if course_id_before_last_save
   end
 
   def associated_with_course_or_root_account
@@ -106,7 +117,39 @@ class GradingPeriodGroup < ActiveRecord::Base
     end
   end
 
-  def dissociate_enrollment_terms
-    enrollment_terms.update_all(grading_period_group_id: nil)
+  def cleanup_associations_and_recompute_scores_later
+    root_account_id = course_id ? course.root_account.global_id : root_account.global_id
+    send_later_if_production_enqueue_args(
+      :cleanup_associations_and_recompute_scores,
+      {
+        strand: "GradingPeriodGroup#cleanup_associations_and_recompute_scores:Account#{root_account_id}",
+        max_attempts: 1,
+        priority: Delayed::LOW_PRIORITY
+      }
+    )
+  end
+
+  def cleanup_associations_and_recompute_scores
+    periods_to_destroy = grading_periods.active
+    update_in_batches(periods_to_destroy, workflow_state: :deleted)
+
+    scores_to_destroy = Score.active.where(grading_period_id: periods_to_destroy)
+    update_in_batches(scores_to_destroy, workflow_state: :deleted)
+
+    # Legacy Grading Period support. Grading Periods can no longer have a course_id.
+    if course_id.present?
+      course.recompute_student_scores(update_all_grading_period_scores: true, run_immediately: true)
+      DueDateCacher.recompute_course(course, run_immediately: true)
+    else
+      term_ids = enrollment_terms.pluck(:id)
+      update_in_batches(enrollment_terms, grading_period_group_id: nil)
+      recompute_scores_for_each_term(true, term_ids: term_ids)
+    end
+  end
+
+  def update_in_batches(scope, updates)
+    scope.find_ids_in_ranges(batch_size: 1000) do |min_id, max_id|
+      scope.where(id: min_id..max_id).update_all(updates.reverse_merge({ updated_at: Time.zone.now }))
+    end
   end
 end

@@ -37,7 +37,7 @@
       // it can do the ellipsis thing. But if we use block or inline-block we get
       // white space issues, hence the float.
       > a .ellipsis {
-        float: right;
+        float: direction(right);
         line-height: inherit;
         // firefox has a bug so it can't do it like the rest of the browsers:
         // https://bugzilla.mozilla.org/show_bug.cgi?id=488725
@@ -58,6 +58,7 @@
           display: inline-block;
           margin: 0 ($ic-sp - 3);
           background: url("/images/breadcrumb-arrow-light.svg") no-repeat 50% 50%;
+          transform: direction-if(rtl, scale(-1, 1)); //flip the image in rtl
           background-size: 5px 9px;
         }
         &:last-of-type a {

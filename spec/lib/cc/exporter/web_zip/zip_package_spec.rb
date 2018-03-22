@@ -829,6 +829,14 @@ describe "ZipPackage" do
           }]
       end
 
+      it "should not export quizzes when locked by date" do
+        quiz = @course.quizzes.create!(title: 'Quiz 1', description: "stuff",
+          workflow_state: "available", unlock_at: 3.days.from_now)
+        @module.content_tags.create!(content: quiz, context: @course, indent: 0)
+        course_data = create_zip_package.parse_course_data
+        expect(course_data[:quizzes]).to be_empty
+      end
+
       it "should export linked file items in sub-folders" do
         folder = @course.folders.create!(name: 'folder#1', parent_folder: Folder.root_folders(@course).first)
         file = add_file(fixture_file_upload('files/cn_image.jpg', 'image/jpg'), @course, "cn_image.jpg", folder)

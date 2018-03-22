@@ -19,6 +19,56 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe DeveloperKey do
+  let(:account) { Account.create! }
+
+  let(:developer_key_saved) do
+    DeveloperKey.create(
+      name:         'test',
+      email:        'test@test.com',
+      redirect_uri: 'http://test.com',
+      account_id:    account.id
+    )
+  end
+
+  # Tests that use this key will run faster because they don't need to
+  # save an account and a developer_key to the db
+  let(:developer_key_not_saved) do
+    DeveloperKey.new(
+      name:         'test',
+      email:        'test@test.com',
+      redirect_uri: 'http://test.com',
+    )
+  end
+
+  describe "sets a default value" do
+    it "when visible is not specified" do
+      expect(developer_key_not_saved.valid?).to eq(true)
+      expect(developer_key_not_saved.visible).to eq(false)
+    end
+
+    it "is false for site admin generated keys" do
+      key = DeveloperKey.create!(
+        name:         'test',
+        email:        'test@test.com',
+        redirect_uri: 'http://test.com',
+        account_id:   nil
+      )
+
+      expect(key.visible).to eq(false)
+    end
+
+    it "is true for non site admin generated keys" do
+      key = DeveloperKey.create!(
+        name:         'test',
+        email:        'test@test.com',
+        redirect_uri: 'http://test.com',
+        account_id:   account.id
+      )
+
+      expect(key.visible).to eq(true)
+    end
+  end
+
   describe "default" do
     context "sharding" do
       specs_require_sharding
@@ -30,8 +80,7 @@ describe DeveloperKey do
       end
 
       it 'sets new developer keys to auto expire tokens' do
-        key = DeveloperKey.create!(:redirect_uri => "http://example.com/a/b")
-        expect(key.auto_expire_tokens).to be_truthy
+        expect(developer_key_saved.auto_expire_tokens).to be_truthy
       end
 
       it 'uses integer special keys properly because the query does not like strings' do
@@ -40,91 +89,88 @@ describe DeveloperKey do
         # different finder because of the transactions-in-test issue. this confirms that setting
         # a key id does not translate it to a string and therefore can be used with 'where(id: key_id)'
         # safely
-        key = DeveloperKey.create!
-        Setting.set('rspec_developer_key_id', key.id)
+
+        Setting.set('rspec_developer_key_id', developer_key_saved.id)
         key_id = Setting.get('rspec_developer_key_id', nil)
-        expect(DeveloperKey.where(id: key_id).first).to eq key
+        expect(DeveloperKey.where(id: key_id).first).to eq(developer_key_saved)
       end
     end
   end
 
   it "allows non-http redirect URIs" do
-    key = DeveloperKey.new
-    key.redirect_uri = 'tealpass://somewhere.edu/authentication'
-    key.redirect_uris = ['tealpass://somewhere.edu/authentication']
-    expect(key).to be_valid
+    developer_key_not_saved.redirect_uri = 'tealpass://somewhere.edu/authentication'
+    developer_key_not_saved.redirect_uris = ['tealpass://somewhere.edu/authentication']
+    expect(developer_key_not_saved).to be_valid
   end
 
   it "returns the correct count of access_tokens" do
-    key = DeveloperKey.create!(
-      :name => 'test',
-      :email => 'test@test.com',
-      :redirect_uri => 'http://test.com'
-    )
+    expect(developer_key_saved.access_token_count).to eq 0
 
-    expect(key.access_token_count).to eq 0
+    AccessToken.create!(:user => user_model, :developer_key => developer_key_saved)
+    AccessToken.create!(:user => user_model, :developer_key => developer_key_saved)
+    AccessToken.create!(:user => user_model, :developer_key => developer_key_saved)
 
-    AccessToken.create!(:user => user_model, :developer_key => key)
-    AccessToken.create!(:user => user_model, :developer_key => key)
-    AccessToken.create!(:user => user_model, :developer_key => key)
-
-    expect(key.access_token_count).to eq 3
+    expect(developer_key_saved.access_token_count).to eq 3
   end
 
   it "returns the last_used_at value for a key" do
-    key = DeveloperKey.create!(
-      :name => 'test',
-      :email => 'test@test.com',
-      :redirect_uri => 'http://test.com'
-    )
-
-    expect(key.last_used_at).to be_nil
-    at = AccessToken.create!(:user => user_model, :developer_key => key)
+    expect(developer_key_saved.last_used_at).to be_nil
+    at = AccessToken.create!(:user => user_model, :developer_key => developer_key_saved)
     at.used!
-    expect(key.last_used_at).not_to be_nil
+    expect(developer_key_saved.last_used_at).not_to be_nil
   end
-
 
   describe "#redirect_domain_matches?" do
     it "should match domains exactly, and sub-domains" do
-      key = DeveloperKey.create!(:redirect_uri => "http://example.com/a/b")
-      expect(key.redirect_domain_matches?("http://example.com/a/b")).to be_truthy
+      developer_key_not_saved.redirect_uri = "http://example.com/a/b"
+
+      expect(developer_key_not_saved.redirect_domain_matches?("http://example.com/a/b")).to be_truthy
+
       # other paths on the same domain are ok
-      expect(key.redirect_domain_matches?("http://example.com/other")).to be_truthy
+      expect(developer_key_not_saved.redirect_domain_matches?("http://example.com/other")).to be_truthy
+
       # completely separate domain
-      expect(key.redirect_domain_matches?("http://example2.com/a/b")).to be_falsey
+      expect(developer_key_not_saved.redirect_domain_matches?("http://example2.com/a/b")).to be_falsey
+
       # not a sub-domain
-      expect(key.redirect_domain_matches?("http://wwwexample.com/a/b")).to be_falsey
-      expect(key.redirect_domain_matches?("http://example.com.evil/a/b")).to be_falsey
-      expect(key.redirect_domain_matches?("http://www.example.com.evil/a/b")).to be_falsey
+      expect(developer_key_not_saved.redirect_domain_matches?("http://wwwexample.com/a/b")).to be_falsey
+      expect(developer_key_not_saved.redirect_domain_matches?("http://example.com.evil/a/b")).to be_falsey
+      expect(developer_key_not_saved.redirect_domain_matches?("http://www.example.com.evil/a/b")).to be_falsey
+
       # sub-domains are ok
-      expect(key.redirect_domain_matches?("http://www.example.com/a/b")).to be_truthy
-      expect(key.redirect_domain_matches?("http://a.b.example.com/a/b")).to be_truthy
-      expect(key.redirect_domain_matches?("http://a.b.example.com/other")).to be_truthy
+      expect(developer_key_not_saved.redirect_domain_matches?("http://www.example.com/a/b")).to be_truthy
+      expect(developer_key_not_saved.redirect_domain_matches?("http://a.b.example.com/a/b")).to be_truthy
+      expect(developer_key_not_saved.redirect_domain_matches?("http://a.b.example.com/other")).to be_truthy
     end
 
     it "does not allow subdomains when it matches in redirect_uris" do
-      key = DeveloperKey.create!(redirect_uris: "http://example.com/a/b")
-      expect(key.redirect_domain_matches?("http://example.com/a/b")).to eq true
+      developer_key_not_saved.redirect_uris << "http://example.com/a/b"
+
+      expect(developer_key_not_saved.redirect_domain_matches?("http://example.com/a/b")).to eq true
+
       # other paths on the same domain are NOT ok
-      expect(key.redirect_domain_matches?("http://example.com/other")).to eq false
+      expect(developer_key_not_saved.redirect_domain_matches?("http://example.com/other")).to eq false
       # sub-domains are not ok either
-      expect(key.redirect_domain_matches?("http://www.example.com/a/b")).to eq false
-      expect(key.redirect_domain_matches?("http://a.b.example.com/a/b")).to eq false
-      expect(key.redirect_domain_matches?("http://a.b.example.com/other")).to eq false
+      expect(developer_key_not_saved.redirect_domain_matches?("http://www.example.com/a/b")).to eq false
+      expect(developer_key_not_saved.redirect_domain_matches?("http://a.b.example.com/a/b")).to eq false
+      expect(developer_key_not_saved.redirect_domain_matches?("http://a.b.example.com/other")).to eq false
     end
   end
 
   context "Account scoped keys" do
-
     shared_examples "authorized_for_account?" do
 
-      it "should allow allow access to its own account" do
+      it "should allow access to its own account" do
         expect(@key.authorized_for_account?(Account.find(@account.id))).to be true
       end
 
-      it "shouldn't allow allow access to a foreign account" do
+      it "shouldn't allow access to a foreign account" do
         expect(@key.authorized_for_account?(@not_sub_account)).to be false
+      end
+
+      it "allows access if the account is in its account chain" do
+        sub_account = Account.create!(parent_account: @account)
+        expect(@key.authorized_for_account?(sub_account)).to be true
       end
     end
 

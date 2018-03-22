@@ -18,14 +18,14 @@
 
 module Factories
   def outcome_model(opts={})
-    @context ||= opts.delete(:context) || course_model(:reusable => true)
-    outcome_context = opts.delete(:outcome_context) || @context
-    @outcome_group ||= @context.root_outcome_group
+    context = opts.delete(:context) || @context || course_model(:reusable => true)
+    outcome_context = opts.delete(:outcome_context) || context
+    outcome_group = opts.delete(:outcome_group) || context.root_outcome_group
     @outcome = outcome_context.created_learning_outcomes.build(valid_outcome_attributes.merge(opts))
     @outcome.rubric_criterion = valid_outcome_data
     @outcome.save!
-    @outcome_group.add_outcome(@outcome)
-    @outcome_group.save!
+    outcome_group.add_outcome(@outcome)
+    outcome_group.save!
     @outcome
   end
 
@@ -50,7 +50,7 @@ module Factories
     context = opts[:context] || @context
     @parent_outcome_group =
       if opts[:outcome_group_id]
-        LearningOutcomeGroup.for_context(context).active.find(opts[:outcome_group_id])
+        LearningOutcomeGroup.for_context(context).active.find(opts.delete(:outcome_group_id))
       else
         context.root_outcome_group
       end
@@ -69,13 +69,11 @@ module Factories
   def outcome_with_rubric(opts={})
     course = opts[:course] || @course
     @outcome_group ||= course.root_outcome_group
-    @outcome = opts[:outcome] || begin
-      (opts[:outcome_context] || course).created_learning_outcomes.create!(
-        :description => '<p>This is <b>awesome</b>.</p>',
-        :short_description => 'new outcome',
-        :calculation_method => 'highest'
-      )
-    end
+    @outcome = opts[:outcome] || outcome_model(context: course,
+                                               outcome_context: opts[:outcome_context] || course,
+                                               title: 'new outcome',
+                                               description: '<p>This is <b>awesome</b>.</p>',
+                                               calculation_method: 'highest')
     [opts[:outcome_context], @course].compact.uniq.each do |context|
       root = context.root_outcome_group
       root.add_outcome(@outcome)

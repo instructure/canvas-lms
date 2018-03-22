@@ -18,8 +18,8 @@
 
 <% content_for :page_title do %><%= t :title, "Developer Keys" %><% end %>
 
-<% js_bundle :developer_keys %>
 <% css_bundle :developer_keys %>
+<% js_bundle(:developer_keys) %>
 
 <div class="ic-Action-header">
   <div class="ic-Action-header__Primary">
@@ -37,6 +37,7 @@
     </button>
   </div>
 </div>
+
 <table id="keys" class="ic-Table">
   <thead>
     <tr>
@@ -55,5 +56,7 @@
   <button class='btn show_all' type="button"><%= t :show_all, "Show All %{count} Keys", :count => @keys.total_entries %></button>
   <img src="/images/ajax-loader-medium-444.gif" class="loader">
 </div>
+
+
 <div id='edit_dialog' title='<%= t :key_settings, "Key Settings" %>'>
 </div>

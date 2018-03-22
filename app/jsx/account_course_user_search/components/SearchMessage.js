@@ -58,6 +58,7 @@ export default function SearchMessage({ collection, setPage, noneFoundMessage })
               key={pageNumber}
               onClick={() => setPage(pageNumber)}
               current={pageNumber === Number(collection.links.current.page)}
+              title={I18n.t('page %{pageNumber}', {pageNumber})}
             >
               {I18n.n(pageNumber)}
             </PaginationButton>

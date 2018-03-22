@@ -31,13 +31,13 @@
     box-sizing: border-box;
     overflow: auto;
     .manage_rubrics {
-      float: right;
+      float: direction(right);
     }
     .popover-menu {
-      float: right;
+      float: direction(right);
     }
     .search {
-      float: right;
+      float: direction(right);
     }
     .ui-button {
       i {
@@ -57,7 +57,7 @@
     }
   }
   .outcomes-sidebar {
-    float: left;
+    float: direction(left);
     height: 610px;
     width: 201px;
     background-color: $ic-color-light;
@@ -72,7 +72,7 @@
   }
   .outcomes-content {
     height: 625px;
-    border-left: 1px solid $borderColor;
+    border-#{direction(left)}: 1px solid $borderColor;
     overflow-x: auto;
     overflow-y: auto;
     position: relative;
@@ -81,7 +81,7 @@
     background-color: $ic-color-light;
     .learning_outcome {
       label.span3 {
-        margin-left: 0px;
+        margin-#{direction(left)}: 0px;
       }
     }
     .wrapper {
@@ -105,8 +105,12 @@
     .outcome_information_link i {
       margin-bottom: -3px;
     }
+    .outcome-assessed-info-banner {
+      margin-top: -$ic-sp;
+      margin-bottom: $ic-sp;
+    }
     .move_button, .edit_button, .delete_button {
-      margin-left: 1em;
+      margin-#{direction(left)}: 1em;
       margin-bottom: 1em;
     }
     dl.dl-horizontal {
@@ -114,7 +118,7 @@
         width: 140px;
       }
       dd {
-        margin-left: 158px;
+        margin-#{direction(left)}: 158px;
       }
     }
   }
@@ -123,8 +127,8 @@
 ul.outcome-level {
   padding: 0;
   margin: 0;
-  border-right: 1px solid #ddd;
-  float: left;
+  border-#{direction(right)}: 1px solid #ddd;
+  float: direction(left);
   height: 625px;
   width: 200px;
   overflow-x: hidden;
@@ -168,7 +172,7 @@ ul.outcome-level {
           // adds blue border
           content: '';
           position: absolute;
-          left: 0;
+          #{direction(left)}: 0;
           top:0;
           width: 4px;
           height: 100%;
@@ -190,8 +194,14 @@ ul.outcome-level {
         background-color: $ic-bg-light-primary;
       }
     }
-    a.loading-more {
+    span.loading-more {
       background-color: darken($lightBackground, 3%);
+      text-decoration: none;
+      display: block;
+      white-space: nowrap;
+
+      padding: $ic-sp/2 $ic-sp;
+      color: $ic-font-color--subdued;
     }
     &[aria-grabbed=true] a, &[aria-grabbed=true] i {
       opacity: 0.75;
@@ -248,15 +258,15 @@ table.criterion .edit {
     margin-bottom: 8px;
   }
   .buttons button {
-    margin-left: 4px;
+    margin-#{direction(left)}: 4px;
   }
   .buttons .button-container {
-    float: right;
+    float: direction(right);
   }
 }
 
 .edit_rating {
-  float: right;
+  float: direction(right);
 }
 
 .outcome_rating_description {
@@ -266,7 +276,7 @@ table.criterion .edit {
 table.criterion .insert {
   position: absolute;
   top: -40px;
-  right: -30px;
+  #{direction(right)}: -30px;
   cursor: pointer;
   a {
     @if $use_high_contrast {
@@ -310,7 +320,7 @@ table.criterion .insert {
 }
 
 .outcomes-edit-row {
-  text-align: left;
+  text-align: direction(left);
 }
 
 .no-outcomes-warning {
@@ -325,7 +335,7 @@ table.criterion .insert {
   font-style: italic;
 }
 #alignments {
-  margin-left: 0;
+  margin-#{direction(left)}: 0;
 }
 #alignments .alignment {
   list-style: none;
@@ -345,7 +355,7 @@ table.criterion .insert {
   flex: 1;
 }
 #outcome_results_list {
-  margin-left: 0;
+  margin-#{direction(left)}: 0;
 }
 #outcome_results_list .outcome_result {
   list-style: none;

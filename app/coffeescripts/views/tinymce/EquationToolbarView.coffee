@@ -16,13 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'i18n!editor'
   'jquery'
   'Backbone'
   'jst/tinymce/EquationToolbarView'
   'mathml'
   'mathquill'
-], (I18n, $, Backbone, template, mathml) ->
+], ($, Backbone, template, mathml) ->
 
   class EquationToolbarView extends Backbone.View
 

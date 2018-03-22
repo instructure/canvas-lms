@@ -38,7 +38,7 @@ module LocaleSelection
       -> { context.default_locale(true) if context.try(:is_a?, Account) },
       -> { root_account.try(:default_locale) },
       -> {
-        if accept_language && locale = infer_browser_locale(accept_language, I18n.available_locales)
+        if accept_language && locale = infer_browser_locale(accept_language, LocaleSelection.locales_with_aliases)
           user.update_attribute(:browser_locale, locale) if user && user.browser_locale != locale
           locale
         end
@@ -60,9 +60,9 @@ module LocaleSelection
   SEPARATOR = /\s*,\s*/
   ACCEPT_LANGUAGE = /\A#{LANGUAGE_RANGE}(#{SEPARATOR}#{LANGUAGE_RANGE})*\z/
 
-  def infer_browser_locale(accept_language, supported_locales)
+  def infer_browser_locale(accept_language, locales_with_aliases)
     return nil unless accept_language =~ ACCEPT_LANGUAGE
-    supported_locales = supported_locales.map(&:to_s)
+    supported_locales = locales_with_aliases.keys
 
     ranges = accept_language.downcase.split(SEPARATOR).map{ |range|
       quality = (range =~ QUALITY_VALUE) ? $1.to_f : 1
@@ -96,7 +96,11 @@ module LocaleSelection
     #     and canvas is localized in 'en-US', 'en-GB-oy' and 'en-CA-eh'
     #   then i should get 'en-US'
 
-    best_locales.first && best_locales.first.first
+    result = best_locales.first&.first
+
+    # translate back to an actual locale, if it happened to be an alias
+    result = locales_with_aliases[result] if locales_with_aliases[result]
+    result
   end
 
   # gives you a hash of localized locales, e.g. {"en" => "English", "es" => "Español" }
@@ -122,5 +126,17 @@ module LocaleSelection
   def crowdsourced_locales
     @crowdsourced_locales ||= I18n.available_locales.select{ |locale| I18n.send(:t, :crowdsourced, :locale => locale) == true }
   end
-end
 
+  def self.locales_with_aliases
+    @locales_with_aliases ||= begin
+      locales = I18n.available_locales.map { |l| [l.to_s, nil] }.to_h
+      locales.keys.each do |locale|
+        aliases = Array.wrap(I18n.send(:t, :aliases, locale: locale, default: nil))
+        aliases.each do |a|
+          locales[a] = locale
+        end
+      end
+      locales
+    end
+  end
+end

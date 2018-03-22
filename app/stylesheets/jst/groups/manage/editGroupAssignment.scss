@@ -33,19 +33,19 @@
 
 .group-category-edit {
   .auto-group-leader-controls-radio {
-    margin-left: 25px;
+    margin-#{direction(left)}: 25px;
   }
 }
 
 .group-category-create {
   .auto-group-leader-controls-radio {
-    margin-left: 200px;
+    margin-#{direction(left)}: 200px;
   }
 }
 
 .group-category-create {
   .group-by-section-controls {
-    margin-left: 200px;
+    margin-#{direction(left)}: 200px;
     margin-bottom: 10px;
   }
 }

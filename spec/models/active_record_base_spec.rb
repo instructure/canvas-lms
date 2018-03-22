@@ -469,7 +469,7 @@ describe ActiveRecord::Base do
     it "should fail with dot in nested column name" do
       expect {
         User.where(:name => { "users.id" => @user }).first
-      }.to raise_error(CANVAS_RAILS5_0 ? ActiveRecord::StatementInvalid : TypeError)
+      }.to raise_error(TypeError)
     end
 
     it "should not fail with a dot in column name only" do

@@ -107,17 +107,17 @@ Combines with `.border` and `.border-trbl`
 
 .border-tbl {
   border-width: 1px;
-  border-right: none;
+  border-#{direction(right)}: none;
 }
 
 .border-bl {
   border-bottom-size: 1px;
-  border-left-size: 1px;
+  border-#{direction(left)}-size: 1px;
 }
 
 .border-tl {
   border-top-width: 1px;
-  border-left-width: 1px;
+  border-#{direction(left)}-width: 1px;
 }
 .border-b {
   border-bottom-width: 1px;
@@ -128,21 +128,21 @@ Combines with `.border` and `.border-trbl`
 }
 
 .border-r {
-  border-right-width: 1px;
+  border-#{direction(right)}-width: 1px;
 }
 
 .border-round-b {
-  border-bottom-left-radius: $borderRadius;
-  border-bottom-right-radius: $borderRadius;
+  border-bottom-#{direction(left)}-radius: $borderRadius;
+  border-bottom-#{direction(right)}-radius: $borderRadius;
 }
 
 .border-round-t {
-  border-top-left-radius: $borderRadius;
-  border-top-right-radius: $borderRadius;
+  border-top-#{direction(left)}-radius: $borderRadius;
+  border-top-#{direction(right)}-radius: $borderRadius;
 }
 
 .border-round-tl {
-  border-top-left-radius: $borderRadius;
+  border-top-#{direction(left)}-radius: $borderRadius;
 }
 
 .border-round {

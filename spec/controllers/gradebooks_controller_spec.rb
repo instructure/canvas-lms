@@ -727,6 +727,20 @@ describe GradebooksController do
         user_session(@teacher)
       end
 
+      describe "default_grading_standard" do
+        it "uses the course's grading standard" do
+          grading_standard = grading_standard_for(@course)
+          @course.update!(default_grading_standard: grading_standard)
+          get :show, params: { course_id: @course.id }
+          expect(gradebook_options.fetch(:default_grading_standard)).to eq grading_standard.data
+        end
+
+        it "uses the Canvas default grading standard if the course does not have one" do
+          get :show, params: { course_id: @course.id }
+          expect(gradebook_options.fetch(:default_grading_standard)).to eq GradingStandard.default_grading_standard
+        end
+      end
+
       it "includes colors if New Gradebook is enabled" do
         @course.enable_feature!(:new_gradebook)
         get :show, params: {course_id: @course.id}
@@ -1132,6 +1146,30 @@ describe GradebooksController do
       # tell it to use gradebook 2
       get 'change_gradebook_version', params: {:course_id => @course.id, :version => 2}
       expect(response).to redirect_to(:action => 'show')
+    end
+  end
+
+  describe "GET 'history'" do
+    it "grants authorization to teachers in active courses" do
+      user_session(@teacher)
+
+      get 'history', params: { course_id: @course.id }
+      expect(response).to be_ok
+    end
+
+    it "grants authorization to teachers in concluded courses" do
+      @course.complete!
+      user_session(@teacher)
+
+      get 'history', params: { course_id: @course.id }
+      expect(response).to be_ok
+    end
+
+    it "returns unauthorized for students" do
+      user_session(@student)
+
+      get 'history', params: { course_id: @course.id }
+      assert_unauthorized
     end
   end
 

@@ -37,6 +37,17 @@ import TimeZoneSelect from './TimeZoneSelect'
 
 const trim = (str = '') => str.trim()
 
+const initialState = {
+  open: false,
+  data: {
+    user: {},
+    pseudonym: {
+      send_confirmation: true
+    }
+  },
+  errors: {}
+}
+
 export default class CreateOrUpdateUserModal extends React.Component {
   static propTypes = {
     // whatever you pass as the child, when clicked, will open the dialog
@@ -62,16 +73,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
     showSIS: window.ENV.SHOW_SIS_ID_IN_NEW_USER_FORM
   }
 
-  state = {
-    open: false,
-    data: {
-      user: {},
-      pseudonym: {
-        send_confirmation: true
-      }
-    },
-    errors: {}
-  }
+  state = {...initialState}
 
   componentWillMount() {
     if (this.props.createOrUpdate === 'update') {
@@ -125,7 +127,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
         : I18n.t('*%{userName}* saved successfully!', {userName, wrapper})
       )
 
-      this.close()
+      this.setState({...initialState})
       if (this.props.afterSave) this.props.afterSave(response)
     }, ({response}) => {
       const errors = registrationErrors(response.data.errors)
@@ -217,7 +219,11 @@ export default class CreateOrUpdateUserModal extends React.Component {
                   key={name}
                   label={label}
                   value={get(this.state.data, name)}
-                  onChange={e => this.onChange(name, e.target.value)}
+                  checked={get(this.state.data, name)}
+                  onChange={e => this.onChange(name, e.target.type === 'checkbox'
+                    ? e.target.checked
+                    : e.target.value
+                  )}
                   required={!!required}
                   layout="inline"
                   messages={(this.state.errors[name] || [])

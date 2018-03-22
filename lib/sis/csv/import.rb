@@ -24,7 +24,7 @@ module SIS
   module CSV
     class Import
 
-      attr_accessor :root_account, :batch, :errors, :warnings, :finished, :counts, :updates_every,
+      attr_accessor :root_account, :batch, :finished, :counts, :updates_every,
         :override_sis_stickiness, :add_sis_stickiness, :clear_sis_stickiness
 
       IGNORE_FILES = /__macosx|desktop d[bf]|\A\..*/i
@@ -65,9 +65,6 @@ module SIS
         @progress_multiplier = opts[:progress_multiplier] || 1
         @progress_offset = opts[:progress_offset] || 0
 
-        @errors = []
-        @warnings = []
-
         @pending = false
         @finished = false
 
@@ -91,6 +88,10 @@ module SIS
         importer
       end
 
+      def use_parallel_imports?
+        false
+      end
+
       def prepare
         @tmp_dirs = []
         @files.each do |file|
@@ -100,10 +101,15 @@ module SIS
               @tmp_dirs << tmp_dir
               CanvasUnzip::extract_archive(file, tmp_dir)
               Dir[File.join(tmp_dir, "**/**")].each do |fn|
-                process_file(tmp_dir, fn[tmp_dir.size+1 .. -1])
+                next if File.directory?(fn) || !!(fn =~ IGNORE_FILES)
+                file_name = fn[tmp_dir.size+1 .. -1]
+                att = create_batch_attachment(File.join(tmp_dir, file_name))
+                process_file(tmp_dir, file_name, att)
               end
             elsif File.extname(file).downcase == '.csv'
-              process_file(File.dirname(file), File.basename(file))
+              att = @batch.attachment
+              att ||= create_batch_attachment file
+              process_file(File.dirname(file), File.basename(file), att)
             end
           end
         end
@@ -120,13 +126,19 @@ module SIS
               @total_rows += rows
               false
             rescue ::CSV::MalformedCSVError
-              add_error(csv, I18n.t("Malformed CSV"))
+              SisBatch.add_error(csv, I18n.t("Malformed CSV"), sis_batch: @batch,failure: true)
               true
             end
           end
         end
 
         @csvs
+      end
+
+      def create_batch_attachment(path)
+        return if File.stat(path).size == 0
+        data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+        SisBatch.create_data_attachment(@batch, data, File.basename(path))
       end
 
       def process
@@ -171,7 +183,7 @@ module SIS
         else
           IMPORTERS.each do |importer|
             importerObject = SIS::CSV.const_get(importer.to_s.camelcase + 'Importer').new(self)
-            @csvs[importer].each { |csv| importerObject.process(csv) }
+            @csvs[importer].each { |csv| @counts[importer.to_s.pluralize.to_sym] += importerObject.process(csv) }
           end
           @finished = true
         end
@@ -188,9 +200,9 @@ module SIS
           })[:error_report]
           error_message = I18n.t("Error while importing CSV. Please contact support."\
                                  " (Error report %{number})", number: err_id.to_s)
-          add_error(nil, error_message)
+          SisBatch.add_error(nil, error_message, sis_batch: @batch,failure: true)
         else
-          add_error(nil, "#{e.message}\n#{e.backtrace.join "\n"}")
+          SisBatch.add_error(nil, e.to_s, sis_batch: @batch,backtrace: e.backtrace, failure: true)
           raise e
         end
       ensure
@@ -200,14 +212,7 @@ module SIS
 
         if @batch && @parallelism == 1
           @batch.data[:counts] = @counts
-          @batch.processing_errors = @errors
-          @batch.processing_warnings = @warnings
           @batch.save
-        end
-
-        if @allow_printing and !@errors.empty? and !@batch
-          # If there's no batch, then we must be working via the console and we should just error out
-          @errors.each { |w| puts w.join ": " }
         end
       end
 
@@ -215,12 +220,10 @@ module SIS
         @logger ||= Rails.logger
       end
 
-      def add_error(csv, message)
-        @errors << [ csv ? csv[:file] : "", message ]
-      end
-
-      def add_warning(csv, message)
-        @warnings << [ csv ? csv[:file] : "", message ]
+      def errors
+        errors = @root_account.sis_batch_errors
+        errors = errors.where(sis_batch: @batch) if @batch
+        errors.order(:id).pluck(:file, :message)
       end
 
       def calculate_progress
@@ -272,7 +275,7 @@ module SIS
             file = csv[:attachment].open
             csv[:fullpath] = file.path
           end
-          importerObject.process(csv)
+          @counts[importer.to_s.pluralize.to_sym] += importerObject.process(csv)
           run_next_importer(IMPORTERS[IMPORTERS.index(importer) + 1]) if complete_importer(importer)
         rescue => e
           return @batch if @batch.workflow_state == 'aborted'
@@ -285,11 +288,7 @@ module SIS
           })[:error_report]
           error_message = I18n.t("Error while importing CSV. Please contact support. "\
                                  "(Error report %{number})", number: err_id.to_s)
-          add_error(nil, error_message)
-          @batch.processing_errors ||= []
-          @batch.processing_warnings ||= []
-          @batch.processing_errors.concat(@errors)
-          @batch.processing_warnings.concat(@warnings)
+          SisBatch.add_error(nil, error_message, sis_batch: @batch,failure: true, backtrace: e)
           @batch.workflow_state = :failed_with_messages
           @batch.save!
         ensure
@@ -328,13 +327,9 @@ module SIS
           @current_row += @batch.data[:current_row] if @batch.data[:current_row]
           @batch.data[:current_row] = @current_row
           @batch.progress = (((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100
-          @batch.processing_errors ||= []
-          @batch.processing_warnings ||= []
-          @batch.processing_errors.concat(@errors)
-          @batch.processing_warnings.concat(@warnings)
           @current_row = 0
           @batch.save
-          return @batch.data[:importers][importer] == 0
+          @batch.data[:importers][importer] == 0
         end
       end
 
@@ -349,6 +344,7 @@ module SIS
         # throttling can be set on individual SisBatch instances, and also
         # site-wide in the Setting table.
         @batch.reload(:select => 'data') # update to catch changes to pause vars
+        @batch.data ||= {}
         @pause_every = (@batch.data[:pause_every] || Setting.get('sis_batch_pause_every', 100)).to_i
         @pause_duration = (@batch.data[:pause_duration] || Setting.get('sis_batch_pause_duration', 0)).to_f
       end
@@ -409,11 +405,11 @@ module SIS
         @csvs[importer] = new_csvs
       end
 
-      def process_file(base, file)
-        csv = { :base => base, :file => file, :fullpath => File.join(base, file) }
+      def process_file(base, file, att)
+        csv = {base: base, file: file, fullpath: File.join(base, file), attachment: att}
         if File.file?(csv[:fullpath]) && File.extname(csv[:fullpath]).downcase == '.csv'
           unless valid_utf8?(csv[:fullpath])
-            add_error(csv, I18n.t("Invalid UTF-8"))
+            SisBatch.add_error(csv, I18n.t("Invalid UTF-8"), sis_batch: @batch,failure: true)
             return
           end
           begin
@@ -428,14 +424,14 @@ module SIS
                   false
                 end
               end
-              add_error(csv, I18n.t("Couldn't find Canvas CSV import headers")) if importer.nil?
+              SisBatch.add_error(csv, I18n.t("Couldn't find Canvas CSV import headers"), sis_batch: @batch,failure: true) if importer.nil?
               break
             end
           rescue ::CSV::MalformedCSVError
-            add_error(csv, "Malformed CSV")
+            SisBatch.add_error(csv, "Malformed CSV", sis_batch: @batch,failure: true)
           end
         elsif !File.directory?(csv[:fullpath]) && !(csv[:fullpath] =~ IGNORE_FILES)
-          add_warning(csv, I18n.t("Skipping unknown file type"))
+          SisBatch.add_error(csv, I18n.t("Skipping unknown file type"), sis_batch: @batch)
         end
       end
 

@@ -106,6 +106,14 @@
 #           "description": "the number of enrollments that were removed because they were not included in the batch for batch_mode imports. Only included if enrollments were deleted",
 #           "example": 150,
 #           "type": "integer"
+#         },
+#         "error_count": {
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "warning_count": {
+#           "example": 0,
+#           "type": "integer"
 #         }
 #       }
 #     }
@@ -136,7 +144,7 @@
 #           "type": "datetime"
 #         },
 #         "workflow_state": {
-#           "description": "The current state of the SIS import. - 'created': The SIS import has been created.\n - 'importing': The SIS import is currently processing.\n - 'cleanup_batch': The SIS import is currently cleaning up courses, sections, and enrollments not included in the batch for batch_mode imports.\n - 'imported': The SIS import has completed successfully.\n - 'imported_with_messages': The SIS import completed with errors or warnings.\n - 'failed_with_messages': The SIS import failed with errors.\n - 'failed': The SIS import failed.",
+#           "description": "The current state of the SIS import.\n - 'created': The SIS import has been created.\n - 'importing': The SIS import is currently processing.\n - 'cleanup_batch': The SIS import is currently cleaning up courses, sections, and enrollments not included in the batch for batch_mode imports.\n - 'imported': The SIS import has completed successfully.\n - 'imported_with_messages': The SIS import completed with errors or warnings.\n - 'aborted': The SIS import was aborted.\n - 'failed_with_messages': The SIS import failed with errors.\n - 'failed': The SIS import failed.",
 #           "example": "imported",
 #           "type": "string",
 #           "allowableValues": {
@@ -165,6 +173,10 @@
 #           "description": "The errors_attachment api object of the SIS import. Only available if there are errors or warning and import has completed.",
 #           "$ref": "File"
 #         },
+#         "user": {
+#           "description": "The user that initiated the sis_batch. See the Users API for details.",
+#           "$ref": "User"
+#         },
 #         "processing_warnings": {
 #           "description": "Only imports that are complete will get this data. An array of CSV_file/warning_message pairs.",
 #           "example": [["students.csv","user John Doe has already claimed john_doe's requested login information, skipping"]],
@@ -173,10 +185,6 @@
 #             "type": "array",
 #             "items": {"type": "string"}
 #           }
-#         },
-#         "user": {
-#           "description": "The user that initiated the sis_batch. See the Users API for details.",
-#           "$ref": "User"
 #         },
 #         "processing_errors": {
 #           "description": "An array of CSV_file/error_message pairs.",
@@ -493,7 +501,7 @@ class SisImportsApiController < ApplicationController
   def show
     if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
       @batch = @account.sis_batches.find(params[:id])
-      render json: sis_import_json(@batch, @current_user, session)
+      render json: sis_import_json(@batch, @current_user, session, includes: ['errors'])
     end
   end
 
@@ -512,7 +520,7 @@ class SisImportsApiController < ApplicationController
         @batch = @account.sis_batches.not_completed.lock.find(params[:id])
         @batch.abort_batch
       end
-      render json: sis_import_json(@batch.reload, @current_user, session)
+      render json: sis_import_json(@batch.reload, @current_user, session, includes: ['errors'])
     end
   end
 

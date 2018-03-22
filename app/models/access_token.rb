@@ -16,6 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class AccessToken < ActiveRecord::Base
+  include Workflow
+
+  workflow do
+    state :active
+    state :deleted
+  end
+
   attr_reader :full_token
   attr_reader :plaintext_refresh_token
   belongs_to :developer_key, counter_cache: :access_token_count
@@ -25,7 +32,7 @@ class AccessToken < ActiveRecord::Base
   serialize :scopes, Array
   validate :must_only_include_valid_scopes
 
-  has_many :notification_endpoints, dependent: :destroy
+  has_many :notification_endpoints, -> { where(:workflow_state => "active") }, dependent: :destroy
 
   before_validation -> { self.developer_key ||= DeveloperKey.default }
 
@@ -34,20 +41,31 @@ class AccessToken < ActiveRecord::Base
   # on the scope defined in the auth process (scope has not
   # yet been implemented)
 
-  scope :active, -> { where("expires_at IS NULL OR expires_at>?", DateTime.now.utc) }
+  scope :active, -> { not_deleted.where("expires_at IS NULL OR expires_at>?", DateTime.now.utc) }
+  scope :not_deleted, -> { where(:workflow_state => "active") }
 
   TOKEN_SIZE = 64
-  OAUTH2_SCOPE_NAMESPACE = '/auth/'
-  ALLOWED_SCOPES = ["#{OAUTH2_SCOPE_NAMESPACE}userinfo"]
+  OAUTH2_SCOPE_NAMESPACE = '/auth/'.freeze
+  ALLOWED_SCOPES = [
+    "#{OAUTH2_SCOPE_NAMESPACE}userinfo",
+    *TokenScopes::SCOPES # this will need to change once we start capturing scopes on developer keys
+  ].freeze
 
   before_create :generate_token
   before_create :generate_refresh_token
+
+  alias_method :destroy_permanently!, :destroy
+  def destroy
+    return true if deleted?
+    self.workflow_state = 'deleted'
+    run_callbacks(:destroy) { save! }
+  end
 
   def self.authenticate(token_string, token_key = :crypted_token)
     # hash the user supplied token with all of our known keys
     # attempt to find a token that matches one of the hashes
     hashed_tokens = all_hashed_tokens(token_string)
-    token = self.where(token_key => hashed_tokens).first
+    token = self.not_deleted.where(token_key => hashed_tokens).first
     if token && token.send(token_key) != hashed_tokens.first
       # we found the token but, its hashed using an old key. save the updated hash
       token.send("#{token_key}=", hashed_tokens.first)
@@ -188,7 +206,20 @@ class AccessToken < ActiveRecord::Base
     end
   end
 
-  #Scoped token convenience method
+  def url_scopes_for_method(method)
+    re = /^url:#{method}\|/
+    scopes.select { |scope| re =~ scope }.map do |scope|
+      path = scope.split('|').last
+      # build up the scope matching regexp from the route path
+      path = path.gsub(/:[^\/\)]+/, '[^/]+') # handle dynamic segments /courses/:course_id -> /courses/[^/]+
+      path = path.gsub(/\*[^\/\)]+/, '.+') # handle glob segments /files/*path -> /files/.+
+      path = path.gsub(/\(/, '(?:').gsub(/\)/, '|)') # handle optional segments /files(/[^/]+) -> /files(?:/[^/]+|)
+      path = "#{path}(?:\.[^/]+|)" # handle format segments /files(.:format) -> /files(\.[^/]+|)
+      Regexp.new("^#{path}$")
+    end
+  end
+
+  # Scoped token convenience method
   def scoped_to?(req_scopes)
     self.class.scopes_match?(scopes, req_scopes)
   end
@@ -211,6 +242,10 @@ class AccessToken < ActiveRecord::Base
   # The hint is only returned in visible_token, if protected_token is false.
   def self.serialization_excludes
     [:crypted_token, :token_hint, :crypted_refresh_token]
+  end
+
+  def dev_key_account_id
+    cached_developer_key.account_id
   end
 
   private

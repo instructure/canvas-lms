@@ -252,6 +252,7 @@ class SubmissionsController < ApplicationController
       :media_comment_type, :media_comment_id, :eula_agreement_timestamp,
       :attachment_ids => []
     )
+    submission_params[:group_comment] = value_to_boolean(submission_params[:group_comment])
     submission_params[:attachments] = self.class.copy_attachments_to_submissions_folder(@context, params[:submission][:attachments].compact.uniq)
 
     begin
@@ -666,10 +667,7 @@ class SubmissionsController < ApplicationController
 
     respond_to do |format|
       if attachment.zipped?
-        if Attachment.s3_storage?
-          format.html { redirect_to attachment.inline_url_for_user(@current_user) }
-          format.zip { redirect_to attachment.inline_url_for_user(@current_user) }
-        else
+        if attachment.stored_locally?
           cancel_cache_buster
 
           format.html do
@@ -685,6 +683,10 @@ class SubmissionsController < ApplicationController
               :disposition => 'inline'
             })
           end
+        else
+          inline_url = authenticated_inline_url(attachment)
+          format.html { redirect_to inline_url }
+          format.zip { redirect_to inline_url }
         end
         format.json { render :json => attachment.as_json(:methods => :readable_size) }
       else

@@ -118,7 +118,7 @@ class SearchFormComponent extends Component {
   }
 
   setSelectedFrom = (_, from, _rawValue, rawConversionFailed) => {
-    const startOfFrom = from ? moment(from).startOf('day').format() : '';
+    const startOfFrom = from ? moment(from).startOf('day').toISOString() : '';
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,
@@ -128,7 +128,7 @@ class SearchFormComponent extends Component {
   }
 
   setSelectedTo = (_, to, _rawValue, rawConversionFailed) => {
-    const endOfTo = to ? moment(to).endOf('day').format() : '';
+    const endOfTo = to ? moment(to).endOf('day').toISOString() : '';
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,

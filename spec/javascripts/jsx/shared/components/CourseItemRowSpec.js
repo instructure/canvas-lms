@@ -18,14 +18,16 @@
 
 import React from 'react'
 import { mount } from 'enzyme'
-import _ from 'lodash'
+import merge from 'lodash/merge'
 import CourseItemRow from 'jsx/shared/components/CourseItemRow'
 import AnnouncementModel from 'compiled/models/Announcement'
+import IconAssignmentLine from 'instructure-icons/lib/Line/IconAssignmentLine'
 
 QUnit.module('CourseItemRow component')
 
-const makeProps = (props = {}) => _.merge({
-  children: <p>Hello World</p>,
+const makeProps = (props = {}) => merge({
+  title: <p>Hello World</p>,
+  body: <p>Hello World</p>,
   actionsContent: null,
   metaContent: null,
   author: {
@@ -36,7 +38,6 @@ const makeProps = (props = {}) => _.merge({
   },
   className: '',
   id: '5',
-  title: 'Hello World',
   itemUrl: '',
   selectable: false,
   defaultSelected: false,
@@ -51,9 +52,34 @@ test('renders the CourseItemRow component', () => {
 })
 
 test('renders children inside content column', () => {
-  const tree = mount(<CourseItemRow {...makeProps()}><span className="find-me" /></CourseItemRow>)
-  const node = tree.find('.ic-item-row__content-col .find-me')
-  ok(node.exists())
+  // lodash merge is broken, have to do it this way for whatever reason
+  const props = makeProps({})
+  props.title = <span className="find-me" />
+  props.body = <span className="find-me2" />
+  props.sectionToolTip = <span className="find-me3" />
+  props.replyButton = <span className="find-me4" />
+
+  const tree = mount(<CourseItemRow { ...props } />)
+  ok(tree.find('.ic-item-row__content-col .find-me').exists())
+  ok(tree.find('.ic-item-row__content-col .find-me2').exists())
+  ok(tree.find('.ic-item-row__content-col .find-me3').exists())
+  ok(tree.find('.ic-item-row__content-col .find-me4').exists())
+})
+
+test('renders clickable children inside content link', () => {
+  // lodash merge is broken, have to do it this way for whatever reason
+  const itemUrl = "/foo"
+  const props = makeProps(makeProps({ itemUrl }))
+  props.title = <span className="find-me" />
+  props.body = <span className="find-me2" />
+  props.sectionToolTip = <span className="find-me3" />
+  props.replyButton = <span className="find-me4" />
+
+  const tree = mount(<CourseItemRow { ...props } />)
+  ok(tree.find('.ic-item-row__content-col .ic-item-row__content-link .find-me').exists())
+  ok(tree.find('.ic-item-row__content-col .ic-item-row__content-link .find-me2').exists())
+  ok(!tree.find('.ic-item-row__content-col .ic-item-row__content-link .find-me3').exists())
+  ok(tree.find('.ic-item-row__content-col .ic-item-row__content-link .find-me4').exists())
 })
 
 test('renders actions inside actions wrapper', () => {
@@ -73,6 +99,18 @@ test('renders metaContent inside meta content wrapper', () => {
 test('renders a checkbox if selectable: true', () => {
   const tree = mount(<CourseItemRow {...makeProps({ selectable: true })} />)
   const node = tree.find('Checkbox')
+  ok(node.exists())
+})
+
+test('renders a drag handle if draggable: true', () => {
+  const tree = mount(<CourseItemRow {...makeProps({ draggable: true, connectDragSource: (component) => component})} />)
+  const node = tree.find('IconDragHandleLine')
+  ok(node.exists())
+})
+
+test('renders inputted icon', () => {
+  const tree = mount(<CourseItemRow {...makeProps({ icon: <IconAssignmentLine /> })} />)
+  const node = tree.find('IconAssignmentLine')
   ok(node.exists())
 })
 
@@ -96,8 +134,8 @@ test('renders no avatar if showAvatar: false', () => {
 
 test('renders unread indicator if isRead: false', () => {
   const tree = mount(<CourseItemRow {...makeProps({ isRead: false })} />)
-  const rowNode = tree.find('.ic-item-row')
-  ok(rowNode.hasClass('ic-item-row__unread'))
+  const rowNode = tree.find('Badge')
+  ok(rowNode.exists())
 
   const srNode = tree.find('.ic-item-row__content-col ScreenReaderContent')
   ok(srNode.exists())
@@ -179,4 +217,28 @@ test('calls onSelectChanged when checkbox is toggled', () => {
   const instance = tree.instance()
   instance.onSelectChanged({ target: { checked: true } })
   ok(onSelectedChanged.calledWithMatch({ id: '5', selected: true }))
+})
+
+test('renders no manage menu when showManageMenu is false', () => {
+  const tree = mount(<CourseItemRow {...makeProps({ showManageMenu: false })} />)
+  const menu = tree.find('.ic-item-row__manage-menu')
+  notOk(menu.exists())
+})
+
+test('renders no manage menu when showManageMenu is true but manageMenuOptions is empty', () => {
+  const tree = mount(<CourseItemRow {...makeProps({ showManageMenu: true })} />)
+  const menu = tree.find('.ic-item-row__manage-menu')
+  notOk(menu.exists())
+})
+
+test('renders manage menu when showManageMenu is true and manageMenuOptions is not empty', () => {
+  const tree = mount(<CourseItemRow {...makeProps({ showManageMenu: true, manageMenuOptions: ['one', 'two'] })} />)
+  const menu = tree.find('.ic-item-row__manage-menu')
+  ok(menu.exists())
+})
+
+test('does not render a clickable div if the body is empty', () => {
+  const tree = mount(<CourseItemRow {...makeProps({ body: null })} />)
+  const contentLinks = tree.find('.ic-item-row__content-link')
+  strictEqual(contentLinks.length, 1)
 })

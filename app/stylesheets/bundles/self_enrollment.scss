@@ -40,7 +40,7 @@ body.embedded {
     margin: 0 -1em !important;
     background-color: $ic-bg-light-neutral;
     border-top: 1px solid $ic-border-light;
-    text-align: right;
+    text-align: direction(right);
     .footer-info {
       //position: absolute;
       //left: 1em;
@@ -67,5 +67,5 @@ body.embedded {
 // and is right-text-aligned
 .ic-Self-enrollment-footer__Primary {
   flex: 1;
-  text-align: right;
+  text-align: direction(right);
 }

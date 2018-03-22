@@ -10,14 +10,6 @@ describe TatlTael::Linters::Simple::PublicJsSpecsLinter do
                    Consts::PUBLIC_JS_SPEC_PATH
 
   context "in excluded public sub dirs" do
-    context "bower" do
-      include_examples "does not comment",
-                       [{path: Consts::PUBLIC_BOWER_JS_PATH, status: "added"}]
-    end
-    context "mediaelement" do
-      include_examples "does not comment",
-                       [{path: Consts::PUBLIC_ME_JS_PATH, status: "added"}]
-    end
     context "vendor" do
       include_examples "does not comment",
                        [{path: Consts::PUBLIC_VENDOR_JS_PATH, status: "added"}]

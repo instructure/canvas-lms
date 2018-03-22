@@ -30,8 +30,9 @@ development:
         app-host: "rce.docker"
     # another service
     inst-fs:
-      app-host: "http://inst-fs.docker"
-      secret: "super-sekret-value"
+      app-host: "http://api.instfs.docker"
+      # this is just "super-sekret-value", base64-encoded:
+      secret: "c3VwZXItc2VrcmV0LXZhbHVlCg=="
 
   private:
     canvas:

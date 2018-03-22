@@ -101,7 +101,7 @@ The access token is not sent with this request.
 Example Response:
 
     HTTP/1.1 301 Moved Permanently
-    Location: https://<canvas>/api/v1/s3_success/1234?uuid=ABCDE
+    Location: https://<canvas>/api/v1/files/1234/create_success?uuid=ABCDE
 
 IMPORTANT:  The request is signed, and will be denied if any parameters
 from the `upload_params` response are added, removed or modified.  The

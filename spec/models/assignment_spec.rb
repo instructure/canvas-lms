@@ -109,7 +109,7 @@ describe Assignment do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
         allow(assignment).to receive(:update_cached_due_dates?).and_return(false)
-        allow(assignment).to receive(:grading_type_changed?).and_return(true)
+        allow(assignment).to receive(:saved_change_to_grading_type?).and_return(true)
         expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment)
 
         assignment.save!
@@ -119,7 +119,7 @@ describe Assignment do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
         allow(assignment).to receive(:update_cached_due_dates?).and_return(true)
-        allow(assignment).to receive(:grading_type_changed?).and_return(true)
+        allow(assignment).to receive(:saved_change_to_grading_type?).and_return(true)
         expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment).once
 
         assignment.save!
@@ -129,7 +129,7 @@ describe Assignment do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
         allow(assignment).to receive(:update_cached_due_dates?).and_return(false)
-        allow(assignment).to receive(:grading_type_changed?).and_return(false)
+        allow(assignment).to receive(:saved_change_to_grading_type?).and_return(false)
         expect(LatePolicyApplicator).not_to receive(:for_assignment).with(assignment)
 
         assignment.save!
@@ -139,7 +139,7 @@ describe Assignment do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
         allow(assignment).to receive(:update_cached_due_dates?).and_return(true)
-        allow(assignment).to receive(:grading_type_changed?).and_return(false)
+        allow(assignment).to receive(:saved_change_to_grading_type?).and_return(false)
         expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment).once
 
         assignment.save!
@@ -405,14 +405,27 @@ describe Assignment do
     expect(new_assignment.rubric_association).not_to be_nil
     expect(new_assignment.title).to eq "Wiki Assignment Copy"
     expect(new_assignment.wiki_page.title).to eq "Wiki Assignment Copy"
+    expect(new_assignment.duplicate_of).to eq assignment
     new_assignment.save!
     new_assignment2 = assignment.duplicate
     expect(new_assignment2.title).to eq "Wiki Assignment Copy 2"
     new_assignment2.save!
+    expect(assignment.duplicates).to match_array [new_assignment, new_assignment2]
     # Go back to the first new assignment to test something just ending in
     # "Copy"
     new_assignment3 = new_assignment.duplicate
     expect(new_assignment3.title).to eq "Wiki Assignment Copy 3"
+  end
+
+  it "duplicates an assignment's external_tool_tag" do
+    assignment = @course.assignments.create!(
+      submission_types: 'external_tool',
+      external_tool_tag_attributes: { url: 'http://example.com/launch' },
+      **assignment_valid_attributes
+    )
+    new_assignment = assignment.duplicate
+    expect(new_assignment.external_tool_tag).to be_present
+    expect(new_assignment.external_tool_tag.content).to eq(assignment.external_tool_tag.content)
   end
 
   describe "#representatives" do
@@ -1204,6 +1217,19 @@ describe Assignment do
       it "uses the canvas default" do
         expect(@assignment.grading_standard_or_default.title).to eql "Default Grading Scheme"
       end
+    end
+
+    it "converts using numbers sensitive to floating point errors" do
+      @assignment.grading_type = "letter_grade"
+      @assignment.points_possible = 100
+      gs = @assignment.context.grading_standards.build({title: "Numerical"})
+      gs.data = {"A" => 0.29, "F" => 0.00}
+      gs.assignments << @assignment
+      gs.save!
+      @assignment.save!
+
+      # 0.29 * 100 = 28.999999999999996 in ruby, which matches F instead of A
+      expect(@assignment.score_to_grade(29)).to eq("A")
     end
 
     it "should preserve gpa scale grades with zero points possible" do
@@ -3670,10 +3696,11 @@ describe Assignment do
     end
     it "should include assignments where unlock_at is in the past and lock_at is future" do
       @quiz.unlock_at = 1.day.ago
+      @quiz.due_at = 1.hour.ago
       @quiz.lock_at = 1.day.from_now
       @quiz.save!
       list = Assignment.not_locked.to_a
-      expect(list.size).to eql 1
+      expect(list.size).to be 1
       expect(list.first.title).to eql 'Test Assignment'
     end
     it "should not include assignments where unlock_at is in future" do
@@ -3993,24 +4020,24 @@ describe Assignment do
 
     it "triggers when assignment is created" do
       new_assignment = @course.assignments.build
-      expect(DueDateCacher).to receive(:recompute).with(new_assignment)
+      expect(DueDateCacher).to receive(:recompute).with(new_assignment, hash_including(update_grades: true))
       new_assignment.save
     end
 
     it "triggers when due_at changes" do
-      expect(DueDateCacher).to receive(:recompute).with(@assignment)
+      expect(DueDateCacher).to receive(:recompute).with(@assignment, hash_including(update_grades: true))
       @assignment.due_at = 1.week.from_now
       @assignment.save
     end
 
     it "triggers when due_at changes to nil" do
-      expect(DueDateCacher).to receive(:recompute).with(@assignment)
+      expect(DueDateCacher).to receive(:recompute).with(@assignment, hash_including(update_grades: true))
       @assignment.due_at = nil
       @assignment.save
     end
 
     it "triggers when assignment deleted" do
-      expect(DueDateCacher).to receive(:recompute).with(@assignment)
+      expect(DueDateCacher).to receive(:recompute).with(@assignment, hash_including(update_grades: true))
       @assignment.destroy
     end
 
@@ -4463,7 +4490,7 @@ describe Assignment do
         it { is_expected.not_to be_in_closed_grading_period }
       end
 
-      context 'when there are at least one submission in a closed grading peiod' do
+      context 'when there are at least one submission in a closed grading period' do
         before { assignment.update!(due_at: 3.months.ago) }
 
         it { is_expected.to be_in_closed_grading_period }
@@ -4865,6 +4892,32 @@ describe Assignment do
     end
   end
 
+  describe '.suspend_due_date_caching' do
+    it 'suspends the update_cached_due_dates after_save callback on Assignment' do
+      Assignment.suspend_due_date_caching do
+        expect(Assignment.send(:suspended_callback?, :update_cached_due_dates, :save, :after)).to be true
+      end
+    end
+
+    it 'suspends the update_cached_due_dates after_commit callback on AssignmentOverride' do
+      Assignment.suspend_due_date_caching do
+        expect(AssignmentOverride.send(:suspended_callback?, :update_cached_due_dates, :commit, :after)).to be true
+      end
+    end
+
+    it 'suspends the update_cached_due_dates after_create callback on AssignmentOverrideStudent' do
+      Assignment.suspend_due_date_caching do
+        expect(AssignmentOverrideStudent.send(:suspended_callback?, :update_cached_due_dates, :create, :after)).to be true
+      end
+    end
+
+    it 'suspends the update_cached_due_dates after_destroy callback on AssignmentOverrideStudent' do
+      Assignment.suspend_due_date_caching do
+        expect(AssignmentOverrideStudent.send(:suspended_callback?, :update_cached_due_dates, :destroy, :after)).to be true
+      end
+    end
+  end
+
   describe '.with_student_submission_count' do
     specs_require_sharding
 
@@ -4876,6 +4929,35 @@ describe Assignment do
         sql = @course.assignments.with_student_submission_count.to_sql
         expect(sql).to be_include(Shard.default.name)
         expect(sql).not_to be_include(@shard1.name)
+      end
+    end
+  end
+
+  describe '#lti_resource_link_id' do
+    subject { assignment.lti_resource_link_id }
+
+    context 'without external tool tag' do
+      let(:assignment) do
+        @course.assignments.create!(assignment_valid_attributes)
+      end
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'with external tool tag' do
+      let(:assignment) do
+        @course.assignments.create!(submission_types: 'external_tool',
+                                    external_tool_tag_attributes: { url: 'http://example.com/launch' },
+                                    **assignment_valid_attributes)
+      end
+
+      it 'calls ContextExternalTool.opaque_identifier_for with the external tool tag and assignment shard' do
+        lti_resource_link_id = SecureRandom.hex
+        expect(ContextExternalTool).to receive(:opaque_identifier_for).with(
+          assignment.external_tool_tag,
+          assignment.shard
+        ).and_return(lti_resource_link_id)
+        expect(assignment.lti_resource_link_id).to eq(lti_resource_link_id)
       end
     end
   end

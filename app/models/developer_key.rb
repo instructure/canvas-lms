@@ -26,12 +26,15 @@ class DeveloperKey < ActiveRecord::Base
   belongs_to :account
 
   has_many :page_views
-  has_many :access_tokens
+  has_many :access_tokens, -> { where(:workflow_state => "active") }
+  has_many :developer_key_account_bindings, inverse_of: :developer_key
 
   has_one :tool_consumer_profile, :class_name => 'Lti::ToolConsumerProfile'
+  serialize :scopes, Array
 
   before_create :generate_api_key
   before_create :set_auto_expire_tokens
+  before_create :set_visible
   before_save :nullify_empty_icon_url
   before_save :protect_default_key
   after_save :clear_cache
@@ -40,6 +43,7 @@ class DeveloperKey < ActiveRecord::Base
   validate :validate_redirect_uris
 
   scope :nondeleted, -> { where("workflow_state<>'deleted'") }
+  scope :visible, -> { where(visible: true) }
 
   workflow do
     state :active do
@@ -97,9 +101,15 @@ class DeveloperKey < ActiveRecord::Base
     get_special_key("User-Generated")
   end
 
+  def set_visible
+    self.visible = !site_admin?
+    true
+  end
+
   def authorized_for_account?(target_account)
     return true unless account_id
-    target_account.id == account_id
+    return true if target_account.id == account_id
+    target_account.account_chain_ids.include?(account_id)
   end
 
   def account_name
@@ -178,5 +188,11 @@ class DeveloperKey < ActiveRecord::Base
       @sns = Aws::SNS::Client.new(settings) if settings
     end
     @sns
+  end
+
+  private
+
+  def site_admin?
+    self.account_id.nil?
   end
 end

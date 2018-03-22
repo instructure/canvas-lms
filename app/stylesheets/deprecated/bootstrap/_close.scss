@@ -4,7 +4,7 @@
 
 
 .close {
-  float: right;
+  float: direction(right);
   @include fontSize(20px);
   font-weight: bold;
   line-height: $baseLineHeight;

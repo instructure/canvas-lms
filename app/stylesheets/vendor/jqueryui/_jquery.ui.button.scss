@@ -27,18 +27,18 @@ We use jQuery UI button set
 */
 
 .ui-buttonset {
-  margin-right: 7px;
+  margin-#{direction(right)}: 7px;
   .ui-button {
-    margin-left: 0;
-    margin-right: -5px;
+    margin-#{direction(left)}: 0;
+    margin-#{direction(right)}: -5px;
     border-radius: 0;
     &.ui-corner-right {
-      border-top-right-radius: $baseBorderRadius;
-      border-bottom-right-radius: $baseBorderRadius;
+      border-top-#{direction(right)}-radius: $baseBorderRadius;
+      border-bottom-#{direction(right)}-radius: $baseBorderRadius;
     }
     &.ui-corner-left {
-      border-top-left-radius: $baseBorderRadius;
-      border-bottom-left-radius: $baseBorderRadius;
+      border-top-#{direction(left)}-radius: $baseBorderRadius;
+      border-bottom-#{direction(left)}-radius: $baseBorderRadius;
     }
   }
   input[type=checkbox] + label.ui-button, input[type=radio] + label.ui-button { vertical-align: middle; }

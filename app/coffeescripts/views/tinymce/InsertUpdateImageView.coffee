@@ -145,6 +145,7 @@ define [
       if @$("[name='image[data-decorative]']").is(':checked')
         res['alt'] = ''
         res['data-decorative'] = true
+      res['data-mce-src'] = res.src
       res
 
     onFileLinkClick: (event) ->

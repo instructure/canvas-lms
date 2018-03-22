@@ -39,7 +39,7 @@ export class ToDoSidebar extends Component {
     items: arrayOf(object).isRequired,
     loading: bool,
     courses: arrayOf(object).isRequired,
-    timeZone: string.isRequired
+    timeZone: string
   };
 
   static defaultProps = {
@@ -50,14 +50,34 @@ export class ToDoSidebar extends Component {
   constructor () {
     super()
     this.state = { showTodos: false }
+    this.dismissedItemIndex = null;
+    this.titleFocus = null;
   }
 
   componentDidMount () {
     this.props.loadInitialItems(moment.tz(this.props.timeZone).startOf('day'));
   }
 
+  componentDidUpdate () {
+    if (this.dismissedItemIndex != null) {
+      const previousIndex = this.dismissedItemIndex - 1
+      this.dismissedItemIndex = null
+      if (previousIndex >= 0) {
+        this.todoItemComponents[previousIndex].focus()
+      } else {
+        this.titleFocus.focus();
+      }
+    }
+  }
+
   showMoreTodos = () => {
     this.setState({showTodos: true});
+  }
+
+  handleDismissClick (itemIndex, itemType, itemId) {
+    this.dismissedItemIndex = itemIndex
+    this.props.completeItem(itemType, itemId)
+      .catch(() => {this.dismissedItemIndex = null})
   }
 
   renderShowMoreTodos (items) {
@@ -67,6 +87,7 @@ export class ToDoSidebar extends Component {
         <ButtonLink onClick={this.showMoreTodos}>{I18n.t("%{number} More...", {number})}</ButtonLink>
       );
     }
+    return null;
   }
 
   render () {
@@ -86,14 +107,18 @@ export class ToDoSidebar extends Component {
     const filteredTodos = this.props.items.filter(completedFilter)
     const visibleTodos = this.state.showTodos ? filteredTodos : filteredTodos.slice(0, 5);
 
+    this.todoItemComponents = [];
     return (
       <div>
-        <Heading level="h2" border="bottom">{I18n.t('To Do')}</Heading>
+        <h2 className="todo-list-header">
+          <span tabIndex="-1" ref={elt => {this.titleFocus = elt}}>{I18n.t('To Do')}</span>
+        </h2>
         <List variant="unstyled">
           {
-            visibleTodos.map(item => (
+            visibleTodos.map((item, itemIndex) => (
               <ListItem key={`${item.plannable_type}_${item.plannable_id}`}>
                 <ToDoItem
+                  ref={component => {this.todoItemComponents[itemIndex] = component}}
                   itemId={item.plannable_id}
                   title={item.plannable.name || item.plannable.title}
                   href={item.html_url}
@@ -102,7 +127,7 @@ export class ToDoSidebar extends Component {
                   courseId={item.course_id || item.plannable.course_id}
                   dueAt={item.plannable_date}
                   points={item.plannable.points_possible}
-                  handleDismissClick={this.props.completeItem}
+                  handleDismissClick={(...args) => this.handleDismissClick(itemIndex, ...args)}
                 />
               </ListItem>
             ))

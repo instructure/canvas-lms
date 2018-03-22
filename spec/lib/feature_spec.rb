@@ -261,7 +261,7 @@ describe "new_gradebook" do
     expect(transitions).to include({ "on" => LOCKED })
   end
 
-  context "backwards compatibility" do
+  describe "coursel-level backwards compatibility" do
     let(:student) { student_in_course(course: course).user }
     let!(:assignment) { course.assignments.create!(title: 'assignment', points_possible: 10) }
     let(:submission) { assignment.submissions.find_by(user: student) }
@@ -323,6 +323,57 @@ describe "new_gradebook" do
 
       ngb_trans_proc.call(admin, course, nil, transitions)
       expect(transitions).to include({ "on" => UNLOCKED, "off" => UNLOCKED })
+    end
+  end
+
+  describe 'account-level backwards compatibility' do
+    let(:sub_account) do
+      first_level = account_model(parent_account: root_account)
+      account_model(parent_account: first_level)
+    end
+
+    let(:course_at_sub_account) { course_factory(account: sub_account, active_all: true) }
+
+    context 'when no course or sub-account has the flag enabled' do
+      it 'allows disabling the flag' do
+        expect(transitions['off']['locked']).to be_falsey
+      end
+
+      it 'adds no warnings' do
+        expect(transitions['off']['warning']).to be_blank
+      end
+    end
+
+    context 'when any course has the flag enabled' do
+      before do
+        course_at_sub_account.enable_feature!(:new_gradebook)
+
+        ngb_trans_proc.call(admin, root_account, nil, transitions)
+      end
+
+      it 'blocks disabling the flag' do
+        expect(transitions['off']['locked']).to be(true)
+      end
+
+      it 'adds a warning' do
+        expect(transitions['off']['warning']).to be_present
+      end
+    end
+
+    context 'when any sub-account has the flag enabled' do
+      before do
+        sub_account.enable_feature!(:new_gradebook)
+
+        ngb_trans_proc.call(admin, root_account, nil, transitions)
+      end
+
+      it 'blocks disabling the flag' do
+        expect(transitions['off']['locked']).to be(true)
+      end
+
+      it 'adds a warning' do
+        expect(transitions['off']['warning']).to be_present
+      end
     end
   end
 end

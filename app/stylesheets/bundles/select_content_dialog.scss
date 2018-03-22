@@ -48,7 +48,7 @@
         }
         &.resource_selection {
           .name {
-            margin-right: 20px;
+            margin-#{direction(right)}: 20px;
             background: url(/images/find.png) no-repeat right center;
           }
         }

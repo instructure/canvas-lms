@@ -130,7 +130,10 @@ class SectionsController < ApplicationController
   #   The name of the section
   #
   # @argument course_section[sis_section_id] [String]
-  #   The sis ID of the section
+  #   The sis ID of the section. Must have manage_sis permission to set. This is ignored if caller does not have permission to set.
+  #
+  # @argument course_section[integration_id] [String]
+  #   The integration_id of the section. Must have manage_sis permission to set. This is ignored if caller does not have permission to set.
   #
   # @argument course_section[start_at] [DateTime]
   #   Section start date in ISO8601 format, e.g. 2011-01-01T01:00Z
@@ -148,6 +151,7 @@ class SectionsController < ApplicationController
   def create
     if authorized_action(@context.course_sections.temp_record, @current_user, :create)
       sis_section_id = params[:course_section].try(:delete, :sis_section_id)
+      integration_id = params[:course_section].try(:delete, :integration_id)
       can_manage_sis = api_request? && sis_section_id.present? &&
         @context.root_account.grants_right?(@current_user, session, :manage_sis)
 
@@ -156,7 +160,10 @@ class SectionsController < ApplicationController
         @section.workflow_state = 'active' if @section
       end
       @section ||= @context.course_sections.build(course_section_params)
-      @section.sis_source_id = sis_section_id if can_manage_sis
+      if can_manage_sis
+        @section.sis_source_id = sis_section_id.presence
+        @section.integration_id = integration_id.presence
+      end
 
       respond_to do |format|
         if @section.save

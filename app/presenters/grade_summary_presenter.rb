@@ -259,8 +259,9 @@ class GradeSummaryPresenter
   def courses_with_grades
     @courses_with_grades ||= begin
       student.shard.activate do
-        if student_is_user?
-          Course.where(id: student.participating_student_current_and_concluded_course_ids).to_a
+        course_list = if student_is_user?
+          Course.preload(:enrollment_term, :grading_period_groups).
+            where(id: student.participating_student_current_and_concluded_course_ids).to_a
         elsif user_an_observer_of_student?
           observed_courses = []
           Shard.partition_by_shard(student.participating_student_current_and_concluded_course_ids) do |course_ids|
@@ -269,12 +270,15 @@ class GradeSummaryPresenter
               where(course_id: course_ids, user_id: @current_user, associated_user_id: student).
               pluck(:course_id)
             next unless observed_course_ids.any?
-            observed_courses += Course.where(id: observed_course_ids).to_a
+            observed_courses += Course.preload(:enrollment_term, :grading_period_groups).
+              where(id: observed_course_ids).to_a
           end
           observed_courses
         else
           []
         end
+
+        course_list.select { |c| c.grants_right?(student, :read) }
       end
     end
   end

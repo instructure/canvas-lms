@@ -201,7 +201,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     end
   rescue ActiveRecord::RecordNotUnique
     uncached do
-      pseudonyms.active.by_unique_id(unique_id).first!
+      pseudonyms.active.by_unique_id(unique_id).take!
     end
   end
 
@@ -232,7 +232,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
         end.compact
         roles_to_add = roles - existing_account_users.map(&:role)
         account_users_to_delete = existing_account_users.select { |au| au.active? && !roles.include?(au.role) }
-        account_users_to_activate = existing_account_users.select { |au| au.deleted? && roles.include?(au.role) } 
+        account_users_to_activate = existing_account_users.select { |au| au.deleted? && roles.include?(au.role) }
         roles_to_add.each do |role|
           account.account_users.create!(user: user, role: role)
         end

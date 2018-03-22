@@ -209,6 +209,15 @@ import './vendor/jquery.scrollTo'
     $(".turnitin_account_settings").change(function() {
       $(".confirm_turnitin_settings_link").text(I18n.t('links.turnitin.confirm_settings', "confirm Turnitin settings"));
     });
+
+    $("input[name='account[services][avatars]']").change(function() {
+      if(this.checked) {
+        $("#account_settings_gravatar_checkbox").show();
+      } else {
+        $("#account_settings_gravatar_checkbox").hide();
+      }
+    }).change();
+
     $(".confirm_turnitin_settings_link").click(function(event) {
       event.preventDefault();
       var $link = $(this);

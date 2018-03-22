@@ -17,12 +17,25 @@
 %>
 
 <% if @assignment.has_group_category? && can_do(@assignment.submissions.build(:user => @current_user), @current_user, :make_group_comment) %>
-<tr>
-  <td colspan="2">
-    <label>
-      <input type="checkbox" name="submission[group_comment]" />
-      <%= t('labels.group_comment', 'Send Comment to the Whole Group') %>
-    </label>
-  </td>
-</tr>
+  <% if @assignment.grade_as_group? %>
+    <tr><td colspan="2">
+      <%= t("All comments are sent to the whole group.") %>
+      <input type="hidden" name="submission[group_comment]" value="1" />
+    </td></tr>
+  <% else %>
+    <tr><td colspan="2">
+      <fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
+        <div class="ic-Form-control ic-Form-control--radio">
+          <div class="ic-Radio">
+            <input type="radio" name="submission[group_comment]" id="not_submission_group_comment" value="0" checked />
+            <label for="not_submission_group_comment" class="ic-Label"><%= t("Send comment to instructor only") %></label>
+          </div>
+          <div class="ic-Radio">
+            <input type="radio" name="submission[group_comment]" id="submission_group_comment" value="1" />
+            <label for="submission_group_comment" class="ic-Label"><%= t("Send comment to the whole group") %></label>
+          </div>
+        </div>
+      </fieldset>
+    </td></tr>
+  <% end %>
 <% end %>

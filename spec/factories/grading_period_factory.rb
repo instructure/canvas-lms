@@ -21,17 +21,27 @@
 # the grading_periods both have a weight of 1
 module Factories
   def grading_periods(options = {})
+    now = Time.zone.now
     course = options[:context] || @course || course_factory()
     count = options[:count] || 2
 
+    default_weights = [1] * count
+    weights = options[:weights] || default_weights
+    weights = default_weights if weights.blank? || (weights.size != count)
+
+    default_start_dates = Array.new(count) { |n| now + n.months }
+    start_dates = options[:start_dates] || default_start_dates
+    start_dates = default_start_dates if start_dates.blank? || (start_dates.size != count)
+
+    period_duration = options[:duration] || 1.month
+
     grading_period_group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(course)
-    now = Time.zone.now
     count.times.map do |n|
       grading_period_group.grading_periods.create!(
         title:      "Period #{n}",
-        start_date: (n).months.since(now),
-        end_date:   (n+1).months.since(now),
-        weight:     1
+        start_date: start_dates[n],
+        end_date:   start_dates[n] + period_duration,
+        weight:     weights[n]
       )
     end
   end

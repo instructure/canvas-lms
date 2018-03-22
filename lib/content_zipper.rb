@@ -338,16 +338,15 @@ class ContentZipper
 
   def complete_attachment!(zip_attachment, zip_name)
     if zipped_successfully?
-      @logger.debug("data zipped! uploading to s3...")
+      @logger.debug("data zipped! uploading to external store...")
       uploaded_data = Rack::Test::UploadedFile.new(zip_name, 'application/zip')
-      zip_attachment.uploaded_data = uploaded_data
+      Attachments::Storage.store_for_attachment(zip_attachment, uploaded_data)
       zip_attachment.workflow_state = 'zipped'
       zip_attachment.file_state = 'available'
-      zip_attachment.save!
     else
       zip_attachment.workflow_state = 'errored'
-      zip_attachment.save!
     end
+    zip_attachment.save!
   end
 
   private
@@ -462,7 +461,7 @@ class ContentZipper
   end
 
   def sanitize_file_name(filename)
-    filename.gsub(/[^\w]/, '').downcase
+    filename.gsub(/[^[[:word:]]]/, '').downcase
   end
 
   def sanitize_user_name(user_name)

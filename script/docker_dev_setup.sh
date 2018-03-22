@@ -239,7 +239,7 @@ permissions so we can run migrations."
     docker-compose run --rm web bundle exec rake db:migrate
   else
     message 'Database does not exist. Running initial setup...'
-    docker-compose run --rm web bundle exec rake db:create db:initial_setup
+    docker-compose run --rm web bundle exec rake db:create db:migrate db:initial_setup
   fi
 
   message 'Setting up the test database...'

@@ -224,19 +224,33 @@ class DiscussionTopicsApiController < ApplicationController
     # Require topic hook forbids duplicating of child, nonexistent, and deleted topics
     # The only extra check we need is to prevent duplicating announcements.
     if @topic.is_announcement
-      return render json: { error: 'announcements cannot be duplicated' }, status: :bad_request
+      return render json: { error: t('announcements cannot be duplicated') }, status: :bad_request
     end
 
     new_topic = @topic.duplicate({ :user => @current_user })
+    if @topic.pinned
+      new_topic.position = @topic.context.discussion_topics.maximum(:position) + 1
+    end
     if new_topic.save!
-      result = discussion_topic_api_json(new_topic, @context, @current_user, session)
+      result = discussion_topic_api_json(new_topic, @context, @current_user, session,
+        :include_sections => true)
+      # If pinned, make the new topic show up just below the old one
+      if new_topic.pinned
+        new_topic.insert_at(@topic.position + 1)
+        # Pass the new positions to the backend so the frontend can stay consistent
+        # with the backend.  Rails doesn't like topic.context.discussion_topics.select(...).
+        # We only care about the id and position here, so don't pull everything else up
+        positions_array = DiscussionTopic.select(:id, :position).where(:context => @context).
+          active.where(:pinned => true).map { |t| [t.id, t.position] }
+        result[:new_positions] = positions_array.to_h
+      end
       if new_topic.assignment
         new_topic.assignment.insert_at(@topic.assignment.position + 1)
         result[:set_assignment] = true
       end
       render :json => result
     else
-      render json: { error: 'unable to save new discussion topic' }, status: :bad_request
+      render json: { error: t('unable to save new discussion topic') }, status: :bad_request
     end
   end
 

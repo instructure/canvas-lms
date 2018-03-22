@@ -26,6 +26,16 @@
 #       "id": "CustomColumn",
 #       "description": "",
 #       "properties": {
+#         "id": {
+#           "description": "The ID of the custom gradebook column",
+#           "example": 2,
+#           "type": "integer"
+#         },
+#         "teacher_notes": {
+#           "description": "When true, this column's visibility will be toggled in the Gradebook when a user selects to show or hide notes",
+#           "example": false,
+#           "type": "boolean"
+#         },
 #         "title": {
 #           "description": "header text",
 #           "example": "Stuff",
@@ -39,6 +49,11 @@
 #         "hidden": {
 #           "description": "won't be displayed if hidden is true",
 #           "example": false,
+#           "type": "boolean"
+#         },
+#         "read_only": {
+#           "description": "won't be editable in the gradebook UI",
+#           "example": true,
 #           "type": "boolean"
 #         }
 #       }
@@ -84,6 +99,8 @@ class CustomGradebookColumnsApiController < ApplicationController
   # @argument column[teacher_notes] [Boolean]
   #   Set this if the column is created by a teacher.  The gradebook only
   #   supports one teacher_notes column.
+  # @argument column[read_only] [Boolean]
+  #   Set this to prevent the column from being editable in the gradebook ui
   #
   # @returns CustomColumn
   def create
@@ -141,6 +158,6 @@ class CustomGradebookColumnsApiController < ApplicationController
   end
 
   def column_params
-    params.require(:column).permit(:title, :position, :teacher_notes, :hidden)
+    params.require(:column).permit(:title, :position, :teacher_notes, :hidden, :read_only)
   end
 end

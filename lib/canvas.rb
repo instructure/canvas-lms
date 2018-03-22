@@ -34,7 +34,15 @@ module Canvas
 
   def self.redis
     raise "Redis is not enabled for this install" unless Canvas.redis_enabled?
-    return Rails.cache.data if redis_config == 'cache_store'
+    if redis_config == 'cache_store'
+      raw_redis = Rails.cache.data
+      wrapped_redis = raw_redis.instance_variable_get(:@wrapped_redis)
+      unless wrapped_redis
+        wrapped_redis = RedisWrapper.new(raw_redis)
+        raw_redis.instance_variable_set(:@wrapped_redis, wrapped_redis)
+      end
+      return wrapped_redis
+    end
     @redis ||= begin
       Bundler.require 'redis'
       Canvas::Redis.patch
@@ -51,10 +59,19 @@ module Canvas
     @redis_enabled ||= redis_config.present?
   end
 
+  # technically this is jsut disconnect_redis, because new connections are created lazily,
+  # but I didn't want to rename it when there are several uses of it
   def self.reconnect_redis
-    if Rails.cache && Rails.cache.respond_to?(:reconnect)
+    if Rails.cache &&
+      defined?(ActiveSupport::Cache::RedisStore) &&
+      Rails.cache.is_a?(ActiveSupport::Cache::RedisStore)
       Canvas::Redis.handle_redis_failure(nil, "none") do
-        Rails.cache.reconnect
+        store = Rails.cache.data
+        if store.respond_to?(:nodes)
+          store.nodes.each(&:disconnect!)
+        else
+          store.disconnect!
+        end
       end
     end
 
@@ -98,7 +115,7 @@ module Canvas
         servers = config.delete('servers')
         if servers
           servers = servers.map { |s| Canvas::RedisConfig.url_to_redis_options(s).merge(config_options) }
-          ActiveSupport::Cache.lookup_store(:redis_store, servers, config)
+          ActiveSupport::Cache.lookup_store(:redis_store, servers, config.symbolize_keys)
         end
       end
     when 'memory_store'

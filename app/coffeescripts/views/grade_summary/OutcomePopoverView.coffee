@@ -16,13 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'i18n!outcomes'
   'underscore'
   'Backbone'
   '../../util/Popover'
   './OutcomeLineGraphView'
   'jst/outcomes/outcomePopover'
-], (I18n, _, Backbone, Popover, OutcomeLineGraphView, template) ->
+], (_, Backbone, Popover, OutcomeLineGraphView, template) ->
   class OutcomePopoverView extends Backbone.View
     TIMEOUT_LENGTH: 50
 

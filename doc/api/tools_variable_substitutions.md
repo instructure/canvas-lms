@@ -512,7 +512,7 @@ active
 returns the current course membership roles.
 
 **Availability**: *when launched from a course or an account*  
-
+**Launch Parameter**: *canvas_membership_roles*  
 
 ```
 StudentEnrollment
@@ -661,6 +661,15 @@ Returns the users preference for high contrast colors (an accessibility feature)
 ```
 false
 ```
+## com.instructure.Course.groupIds
+returns the Canvas ids of all active groups in the current course.
+
+**Availability**: *when launched in a course*  
+**Launch Parameter**: *com_instructure_course_groupids*  
+
+```
+23,24,...
+```
 ## Canvas.group.contextIds
 returns the context ids for the groups the user belongs to in the course.
 
@@ -681,6 +690,13 @@ http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator
 ```
 ## Canvas.xuser.allRoles [duplicates ext_roles which is sent by default]
 Returns list of [LIS role full URNs](https://www.imsglobal.org/specs/ltiv1p0/implementation-guide#toc-16).
+Note that this will include all roles the user has.
+There are 3 different levels of roles defined: Context, Institution, System.
+Context role urns start with "urn:lti:ims" and include roles for the context where the launch occurred.
+Institution role urns start with "urn:lti:instrole" and include roles the user has in the institution. This
+will include roles they have in other courses or at the account level. Note that there is not a TA role at the
+Institution level. Instead Users with a TA enrollment will have an institution role of Instructor.
+System role urns start with "urn:lti:sysrole" and include roles for the entire system.
 
 **Availability**: *always*  
 
@@ -860,6 +876,26 @@ Returns the assignment_id of the assignment that was launched.
 
 ```
 1234
+```
+## com.instructure.Group.id
+Returns the Canvas id of the group the current user is in if launching
+from a group assignment.
+
+**Availability**: *when launched by a logged in user and when launched as an assignment*  
+**Launch Parameter**: *vnd_canvas_group_id*  
+
+```
+481
+```
+## com.instructure.Group.name
+Returns the name of the group the current user is in if launching
+from a group assignment.
+
+**Availability**: *when launched by a logged in user and when launched as an assignment*  
+**Launch Parameter**: *vnd_canvas_group_name*  
+
+```
+Group One
 ```
 ## Canvas.assignment.title
 Returns the title of the assignment that was launched.

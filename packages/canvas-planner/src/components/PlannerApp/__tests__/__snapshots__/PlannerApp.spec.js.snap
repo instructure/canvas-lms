@@ -1,0 +1,262 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders base component using dayKeys 1`] = `
+<div
+  className="PlannerApp"
+>
+  <ShowOnFocusButton
+    buttonProps={
+      Object {
+        "onClick": undefined,
+      }
+    }
+    buttonRef={[Function]}
+  >
+    Load prior dates
+  </ShowOnFocusButton>
+  <LoadingPastIndicator
+    allPastItemsLoaded={false}
+    loadingPast={false}
+  />
+  <Animatable(Day)
+    animatableIndex={0}
+    day="2017-04-24"
+    itemsForDay={
+      Array [
+        Object {
+          "dateBucketMoment": "2017-04-23T15:00:00.000Z",
+        },
+      ]
+    }
+    timeZone="UTC"
+  />
+  <Animatable(Day)
+    animatableIndex={1}
+    day="2017-04-25"
+    itemsForDay={
+      Array [
+        Object {
+          "dateBucketMoment": "2017-04-24T15:00:00.000Z",
+        },
+      ]
+    }
+    timeZone="UTC"
+  />
+  <Animatable(Day)
+    animatableIndex={2}
+    day="2017-04-26"
+    itemsForDay={
+      Array [
+        Object {
+          "dateBucketMoment": "2017-04-25T15:00:00.000Z",
+        },
+      ]
+    }
+    timeZone="UTC"
+  />
+  <LoadingFutureIndicator
+    allFutureItemsLoaded={false}
+    loadingFuture={false}
+    onLoadMore={[Function]}
+    plannerActive={[Function]}
+  />
+  <div
+    id="planner-app-fixed-element"
+  />
+</div>
+`;
+
+exports[`renders empty component with no assignments 1`] = `
+<div>
+  <div>
+    <ShowOnFocusButton
+      buttonProps={
+        Object {
+          "onClick": undefined,
+        }
+      }
+      buttonRef={[Function]}
+    >
+      Load prior dates
+    </ShowOnFocusButton>
+    <PlannerEmptyState
+      changeToDashboardCardView={[Function]}
+    />
+  </div>
+</div>
+`;
+
+exports[`shows new activity button when new activity is indicated 1`] = `
+<div
+  className="PlannerApp"
+>
+  <StickyButton
+    buttonRef={[Function]}
+    direction="up"
+    offset="0px"
+    onClick={[Function]}
+  >
+    New Activity
+  </StickyButton>
+  <ShowOnFocusButton
+    buttonProps={
+      Object {
+        "onClick": undefined,
+      }
+    }
+    buttonRef={[Function]}
+  >
+    Load prior dates
+  </ShowOnFocusButton>
+  <LoadingPastIndicator
+    allPastItemsLoaded={false}
+    loadingPast={false}
+  />
+  <Animatable(Day)
+    animatableIndex={0}
+    day="2017-04-24"
+    itemsForDay={
+      Array [
+        Object {
+          "dateBucketMoment": "2017-04-23T15:00:00.000Z",
+        },
+      ]
+    }
+    timeZone="UTC"
+  />
+  <Animatable(Day)
+    animatableIndex={1}
+    day="2017-04-25"
+    itemsForDay={
+      Array [
+        Object {
+          "dateBucketMoment": "2017-04-24T15:00:00.000Z",
+        },
+      ]
+    }
+    timeZone="UTC"
+  />
+  <Animatable(Day)
+    animatableIndex={2}
+    day="2017-04-26"
+    itemsForDay={
+      Array [
+        Object {
+          "dateBucketMoment": "2017-04-25T15:00:00.000Z",
+        },
+      ]
+    }
+    timeZone="UTC"
+  />
+  <LoadingFutureIndicator
+    allFutureItemsLoaded={false}
+    loadingFuture={false}
+    onLoadMore={[Function]}
+    plannerActive={[Function]}
+  />
+  <div
+    id="planner-app-fixed-element"
+  />
+</div>
+`;
+
+exports[`shows only the loading component when the isLoading prop is true 1`] = `
+<div
+  className="PlannerApp"
+>
+  <ShowOnFocusButton
+    buttonProps={
+      Object {
+        "onClick": undefined,
+      }
+    }
+    buttonRef={[Function]}
+  >
+    Load prior dates
+  </ShowOnFocusButton>
+  <LoadingPastIndicator
+    allPastItemsLoaded={false}
+    loadingPast={false}
+  />
+  <Container
+    display="block"
+    padding="xx-large medium"
+    textAlign="center"
+  >
+    <Spinner
+      size="medium"
+      title="Loading planner items"
+      variant="default"
+    />
+  </Container>
+  <div
+    id="planner-app-fixed-element"
+  />
+</div>
+`;
+
+exports[`shows the loading past indicator when loadingPast prop is true 1`] = `
+<div
+  className="PlannerApp"
+>
+  <ShowOnFocusButton
+    buttonProps={
+      Object {
+        "onClick": undefined,
+      }
+    }
+    buttonRef={[Function]}
+  >
+    Load prior dates
+  </ShowOnFocusButton>
+  <LoadingPastIndicator
+    allPastItemsLoaded={false}
+    loadingPast={true}
+  />
+  <Animatable(Day)
+    animatableIndex={0}
+    day="2017-04-24"
+    itemsForDay={
+      Array [
+        Object {
+          "dateBucketMoment": "2017-04-23T15:00:00.000Z",
+        },
+      ]
+    }
+    timeZone="UTC"
+  />
+  <Animatable(Day)
+    animatableIndex={1}
+    day="2017-04-25"
+    itemsForDay={
+      Array [
+        Object {
+          "dateBucketMoment": "2017-04-24T15:00:00.000Z",
+        },
+      ]
+    }
+    timeZone="UTC"
+  />
+  <Animatable(Day)
+    animatableIndex={2}
+    day="2017-04-26"
+    itemsForDay={
+      Array [
+        Object {
+          "dateBucketMoment": "2017-04-25T15:00:00.000Z",
+        },
+      ]
+    }
+    timeZone="UTC"
+  />
+  <LoadingFutureIndicator
+    allFutureItemsLoaded={false}
+    loadingFuture={false}
+    onLoadMore={[Function]}
+    plannerActive={[Function]}
+  />
+  <div
+    id="planner-app-fixed-element"
+  />
+</div>
+`;

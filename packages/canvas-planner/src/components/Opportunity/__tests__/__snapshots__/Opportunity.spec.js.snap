@@ -1,0 +1,133 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders the base component correctly 1`] = `
+<div>
+  <div>
+    <div>
+      course about stuff
+    </div>
+    <div>
+      <Link
+        as="button"
+        ellipsis={false}
+        href="http://www.non_default_url.com"
+        linkRef={[Function]}
+        variant="default"
+      >
+        this is a description about the opportunity
+      </Link>
+    </div>
+  </div>
+  <div>
+    <div>
+      <Pill
+        text="Missing"
+        variant="danger"
+      />
+      <div>
+        <span>
+          Due:
+        </span>
+         
+        March 9, 2017 at 1:40 PM
+      </div>
+    </div>
+    <div>
+      <ScreenReaderContent
+        as="span"
+      >
+        20 points
+      </ScreenReaderContent>
+      <PresentationContent
+        as="span"
+      >
+        <span>
+          20
+        </span>
+        points
+      </PresentationContent>
+    </div>
+  </div>
+  <div>
+    <Button
+      as="button"
+      buttonRef={[Function]}
+      fluidWidth={false}
+      margin="0"
+      onClick={[Function]}
+      size="small"
+      type="button"
+      variant="icon"
+    >
+      <IconXLine
+        title="Dismiss this is a description about the opportunity"
+      />
+    </Button>
+  </div>
+</div>
+`;
+
+exports[`renders the base component correctly without points 1`] = `
+<div>
+  <div>
+    <div>
+      course about stuff
+    </div>
+    <div>
+      <Link
+        as="button"
+        ellipsis={false}
+        href="http://www.non_default_url.com"
+        linkRef={[Function]}
+        variant="default"
+      >
+        this is a description about the opportunity
+      </Link>
+    </div>
+  </div>
+  <div>
+    <div>
+      <Pill
+        text="Missing"
+        variant="danger"
+      />
+      <div>
+        <span>
+          Due:
+        </span>
+         
+        March 9, 2017 at 1:40 PM
+      </div>
+    </div>
+    <div>
+      <ScreenReaderContent
+        as="span"
+      >
+        null points
+      </ScreenReaderContent>
+      <PresentationContent
+        as="span"
+      >
+        <span />
+        points
+      </PresentationContent>
+    </div>
+  </div>
+  <div>
+    <Button
+      as="button"
+      buttonRef={[Function]}
+      fluidWidth={false}
+      margin="0"
+      onClick={[Function]}
+      size="small"
+      type="button"
+      variant="icon"
+    >
+      <IconXLine
+        title="Dismiss this is a description about the opportunity"
+      />
+    </Button>
+  </div>
+</div>
+`;

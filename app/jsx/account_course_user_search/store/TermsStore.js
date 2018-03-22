@@ -31,7 +31,9 @@ export const propType = shape({
   data: arrayOf(
     shape({
       id: string.isRequired,
-      name: string.isRequired
+      name: string.isRequired,
+      end_at: string,
+      start_at: string
     })
   ),
   loading: bool

@@ -43,7 +43,6 @@ describe "graphql student context cards" do
       @section = @course.default_section
       add_enrollment('active', @section)
       grade_assignment(@course, @student, @teacher)
-      Account.default.enable_feature!(:graphql)
       Account.default.enable_feature!(:student_context_cards)
     end
 
@@ -84,7 +83,6 @@ describe "graphql student context cards" do
       @section = @course.default_section
       add_enrollment('active', @section)
       grade_assignment(@course, @student, @admin)
-      Account.default.enable_feature!(:graphql)
       Account.default.enable_feature!(:student_context_cards)
     end
 
@@ -135,47 +133,6 @@ describe "graphql student context cards" do
       wait_for_ajaximations
       expect(f(".StudentContextTray-Header__Name h2 a")).to include_text("User")
       cool_link =f(".StudentContextTray-QuickLinks a")
-      expect(cool_link["href"]).to include("/courses/#{@course.id}/grades/#{@student.id}")
-    end
-  end
-
-  context 'with graphql disabled as an admin' do
-    before :each do
-      course_with_admin_logged_in
-      @section = @course.default_section
-      add_enrollment('active', @section)
-      grade_assignment(@course, @student, @admin)
-      Account.default.disable_feature!(:graphql)
-      Account.default.enable_feature!(:student_context_cards)
-    end
-
-    it "should should pull student context card data from graphql on people page", priority: "2", test_id: 3308083 do
-      get "/courses/#{@course.id}/users"
-      wait_for_ajaximations
-      f("a[data-student_id='#{@student.id}']").click
-      wait_for_ajaximations
-      expect(f(".StudentContextTray-Header__Name h2 a")).to include_text("User")
-      cool_link = f(".StudentContextTray-Header__Name h2 a")
-      expect(cool_link["href"]).to include("/courses/#{@course.id}/users/#{@student.id}")
-    end
-
-    it "should link to student submissions page", priority: "2", test_id: 3431682 do
-      get "/courses/#{@course.id}/users"
-      wait_for_ajaximations
-      f("a[data-student_id='#{@student.id}']").click
-      wait_for_ajaximations
-      expect(f(".StudentContextTray-Header__Name h2 a")).to include_text("User")
-      cool_link = f(".StudentContextTray-Progress__Bar a")
-      expect(cool_link["href"]).to include("/courses/#{@course.id}/assignments/#{@ass.id}/submissions/#{@student.id}")
-    end
-
-    it "should link to grades page", priority: "2", test_id: 3431710 do
-      get "/courses/#{@course.id}/users"
-      wait_for_ajaximations
-      f("a[data-student_id='#{@student.id}']").click
-      wait_for_ajaximations
-      expect(f(".StudentContextTray-Header__Name h2 a")).to include_text("User")
-      cool_link = f(".StudentContextTray-QuickLinks a")
       expect(cool_link["href"]).to include("/courses/#{@course.id}/grades/#{@student.id}")
     end
   end

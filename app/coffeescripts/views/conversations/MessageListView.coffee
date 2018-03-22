@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'i18n!messages'
+  'i18nObj'
   '../PaginatedCollectionView'
   '../conversations/MessageView'
   'jst/conversations/messageList'

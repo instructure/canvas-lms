@@ -41,7 +41,7 @@ class DiscussionTopicSectionVisibility < ActiveRecord::Base
   end
 
   def discussion_topic_is_section_specific
-    return true if self.discussion_topic.is_section_specific
+    return true if self.deleted? || self.discussion_topic.is_section_specific
     self.errors.add(:discussion_topic_id, t("Cannot add section to a non-section-specific discussion"))
   end
 

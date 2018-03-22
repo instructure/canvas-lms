@@ -48,10 +48,12 @@
       <%= f.radio_button :auth_over_tls, 'simple_tls', id: "simple_tls_#{presenter.id_suffix(aac)}", checked: aac.auth_over_tls == 'simple_tls' %>
       <%= f.label :auth_over_tls, t('Simple TLS'), for: "simple_tls_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
     </div>
-    <div class="ic-Radio">
-      <%= f.radio_button :auth_over_tls, false, id: "no_tls_#{presenter.id_suffix(aac)}", checked: !aac.auth_over_tls %>
-      <%= f.label :auth_over_tls, t('No TLS'), for: "no_tls_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
-    </div>
+    <% if aac && !aac.auth_over_tls %>
+      <div class="ic-Radio">
+        <%= f.radio_button :auth_over_tls, false, id: "no_tls_#{presenter.id_suffix(aac)}", checked: !aac.auth_over_tls %>
+        <%= f.label :auth_over_tls, t('No TLS'), for: "no_tls_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
+      </div>
+    <% end %>
   </div>
 </fieldset>
 <div class="ic-Form-control">

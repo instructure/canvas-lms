@@ -121,7 +121,7 @@ describe UserSearch do
               ObserverEnrollment.create!(:user => ta, :course => course, :workflow_state => 'active')
               ta2 = User.create!(:name => 'Tyler Observer 2')
               ObserverEnrollment.create!(:user => ta2, :course => course, :workflow_state => 'active')
-              student.observers << ta2
+              student.linked_observers << ta2
             end
 
             it { is_expected.not_to include('Tyler Observer 2') }
@@ -173,6 +173,14 @@ describe UserSearch do
             expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq [user]
           end
 
+          it 'will match against an sis id and regular id' do
+            user2 = User.create(name: 'user two')
+            pseudonym.sis_user_id = user2.id.to_s
+            pseudonym.save!
+            course.enroll_user(user2)
+            expect(UserSearch.for_user_in_context(user2.id.to_s, course, user)).to eq [user, user2]
+          end
+
           it 'will match against a login id' do
             expect(UserSearch.for_user_in_context("UNIQUE_ID", course, user)).to eq [user]
           end
@@ -189,7 +197,8 @@ describe UserSearch do
         end
 
         describe 'searching on emails' do
-          let(:cc) { user.communication_channels.create!(path: 'the.giver@example.com') }
+          let(:user1) {user_with_pseudonym(user: user)}
+          let(:cc) {user1.communication_channels.create!(path: 'the.giver@example.com')}
 
           before do
             cc.confirm!
@@ -215,8 +224,8 @@ describe UserSearch do
             expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
           end
 
-          it 'matches unconfirmed channels', priority: 1, test_id: 3010726 do 
-            cc2 = user.communication_channels.create!(path: 'unconfirmed@example.com')
+          it 'matches unconfirmed channels', priority: 1, test_id: 3010726 do
+            user.communication_channels.create!(path: 'unconfirmed@example.com')
             expect(UserSearch.for_user_in_context("unconfirmed", course, user)).to eq [user]
           end
         end

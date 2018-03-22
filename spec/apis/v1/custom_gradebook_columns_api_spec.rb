@@ -97,7 +97,7 @@ describe CustomGradebookColumnsApiController, type: :request do
         "/api/v1/courses/#{@course.id}/custom_gradebook_columns",
         {course_id: @course.to_param, action: "create",
          controller: "custom_gradebook_columns_api", format: "json"},
-        "column[title]" => "Blah blah blah", "column[position]" => 1
+        "column[title]" => "Blah blah blah", "column[position]" => 1, "column[read_only]" => true
       expect(response).to be_success
       expect(CustomGradebookColumn.find(json["id"])).not_to be_nil
     end
@@ -122,9 +122,10 @@ describe CustomGradebookColumnsApiController, type: :request do
         "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}",
         {course_id: @course.to_param, id: @col.to_param, action: "update",
          controller: "custom_gradebook_columns_api", format: "json"},
-        "column[title]" => "Bar"
+        "column[title]" => "Bar", "column[read_only]" => true
       expect(response).to be_success
       expect(json["title"]).to eq "Bar"
+      expect(json["read_only"]).to eq(true)
       expect(@col.reload.title).to eq "Bar"
     end
   end

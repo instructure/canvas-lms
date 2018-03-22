@@ -28,7 +28,102 @@ describe GradingPeriodGroup do
   # it { is_expected.to validate_presence_of(:title) }
   it { is_expected.to belong_to(:course) }
   it { is_expected.to have_many(:enrollment_terms).inverse_of(:grading_period_group) }
-  it { is_expected.to have_many(:grading_periods).dependent(:destroy) }
+  it { is_expected.to have_many(:grading_periods) }
+
+  describe '#recompute_scores_for_each_term' do
+    def course_with_grades(account, term, due_date, student, delete_term: false)
+      course = account.courses.create!(enrollment_term: term)
+      teacher = User.create!
+      course.enroll_teacher(teacher, active_all: true)
+      course.enroll_student(student, active_all: true)
+      assignment = course.assignments.create!(due_at: due_date, points_possible: 10)
+      assignment.grade_student(student, grader: teacher, grade: 8)
+      if delete_term
+        course.destroy!
+        term.destroy!
+      end
+      course
+    end
+
+    before(:once) do
+      now = Time.zone.now
+      @student = User.create!
+      @group = account.grading_period_groups.create!(weighted: true)
+      @period = @group.grading_periods.create!(
+        title: 'Active Grading Period With No Weight',
+        start_date: 2.months.ago(now),
+        end_date: 2.months.from_now(now),
+        weight: 0.0
+      )
+      first_term = account.enrollment_terms.create!(grading_period_group: @group)
+      @first_course = course_with_grades(account, first_term, now, @student)
+
+      second_term = account.enrollment_terms.create!(grading_period_group: @group)
+      @second_course = course_with_grades(account, second_term, now, @student)
+
+      deleted_term = account.enrollment_terms.create!(grading_period_group: @group)
+      @course_for_deleted_term = course_with_grades(account, deleted_term, now, @student, delete_term: true)
+    end
+
+    it 'computes scores for active terms' do
+      # update_columns to avoid a grade recalculation
+      # rubocop:disable Rails/SkipsModelValidations
+      @group.update_columns(weighted: false)
+      # rubocop:enable Rails/SkipsModelValidations
+      expect { @group.recompute_scores_for_each_term(true) }.to change {
+        [@first_course, @second_course].map do |course|
+          Enrollment.find_by(course: course, user: @student).computed_current_score
+        end
+      }.from([0.0, 0.0]).to([80.0, 80.0])
+    end
+
+    it 'does not computes scores for inactive terms' do
+      # update_columns to avoid a grade recalculation
+      # rubocop:disable Rails/SkipsModelValidations
+      @group.update_columns(weighted: false)
+      # rubocop:enable Rails/SkipsModelValidations
+      expect { @group.recompute_scores_for_each_term(true) }.not_to change {
+        Enrollment.find_by(course: @course_for_deleted_term, user: @student).computed_current_score
+      }
+    end
+
+    it 'can be passed enrollment term IDs on which to operate' do
+      # update_columns to avoid a grade recalculation
+      # rubocop:disable Rails/SkipsModelValidations
+      @group.update_columns(weighted: false)
+      # rubocop:enable Rails/SkipsModelValidations
+      ids = [@second_course.enrollment_term_id]
+      expect { @group.recompute_scores_for_each_term(true, term_ids: ids) }.to change {
+        [@first_course, @second_course].map do |course|
+          Enrollment.find_by(course: course, user: @student).computed_current_score
+        end
+      }.from([0.0, 0.0]).to([0.0, 80.0])
+    end
+
+    it 'recomputes grading period scores if passed `true`' do
+      assignment = @first_course.assignments.first
+      # update_columns to avoid a grade recalculation
+      # rubocop:disable Rails/SkipsModelValidations
+      assignment.update_columns(points_possible: 20)
+      # rubocop:enable Rails/SkipsModelValidations
+      expect { @group.recompute_scores_for_each_term(true) }.to change {
+        enrollment = Enrollment.find_by(course: @first_course, user: @student)
+        enrollment.computed_current_score(grading_period_id: @period)
+      }.from(80.0).to(40.0)
+    end
+
+    it 'does not recompute grading period scores if passed `false`' do
+      assignment = @first_course.assignments.first
+      # update_columns to avoid a grade recalculation
+      # rubocop:disable Rails/SkipsModelValidations
+      assignment.update_columns(points_possible: 20)
+      # rubocop:enable Rails/SkipsModelValidations
+      expect { @group.recompute_scores_for_each_term(false) }.not_to change {
+        enrollment = Enrollment.find_by(course: @first_course, user: @student)
+        enrollment.computed_current_score(grading_period_id: @period)
+      }
+    end
+  end
 
   describe ".for" do
     context "when given a root account" do

@@ -17,7 +17,7 @@
  */
 
 .tinymce-keyboard-shortcuts-toggle {
-  margin-right: 12px;
+  margin-#{direction(right)}: 12px;
 }
 
 // The dialog

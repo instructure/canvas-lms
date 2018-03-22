@@ -18,7 +18,7 @@
 
 .admins_list {
   list-style-type: none;
-  padding-left: 10px;
+  padding-#{direction(left)}: 10px;
 }
 
 .admins_list li {
@@ -34,25 +34,25 @@
 
 .admins_list .user_name {
   font-weight: bold;
-  float: left;
+  float: direction(left);
 }
 
 .admins_list .email {
-  clear: left;
+  clear: direction(left);
   display: block;
   font-size: 0.8em;
-  padding-left: 10px;
+  padding-#{direction(left)}: 10px;
 }
 
 .admins_list .membership_type {
-  clear: left;
+  clear: direction(left);
   display: block;
   font-size: 0.8em;
-  padding-left: 10px;
+  padding-#{direction(left)}: 10px;
 }
 
 .admins_list .remove_account_user_link {
-  float: right;
+  float: direction(right);
   opacity: 0.5;
 }
 
@@ -84,7 +84,7 @@
   padding-top: $ic-sp;
 
   .delete {
-    float: right;
+    float: direction(right);
   }
 }
 
@@ -95,7 +95,7 @@
 .announcement-details-post-info__datetime {
   flex: 1;
   box-sizing: border-box;
-  padding-right: $ic-sp;
+  padding-#{direction(right)}: $ic-sp;
   font-weight: bold;
 }
 
@@ -115,11 +115,11 @@
 }
 
 #self_registration_type_radios {
-  margin-left: 1.5em;
+  margin-#{direction(left)}: 1.5em;
 }
 
 .sis-name {
-  margin-left: 50px;
+  margin-#{direction(left)}: 50px;
 }
 
 .small-input{
@@ -183,7 +183,7 @@
   }
   .alert {
     padding-top: 0;
-    margin-left: -5px;
+    margin-#{direction(left)}: -5px;
   }
 }
 #global_includes_warning_message_wrapper:not(.alert) #global_includes_warning_message {
@@ -201,7 +201,7 @@
 }
 
 .account_settings td.sub_checkbox {
-  padding-left: 20px;
+  padding-#{direction(left)}: 20px;
   padding-top: 0px;
 }
 
@@ -215,4 +215,8 @@ textarea#account_notification_message, .edit_notification_form textarea {
 
 .HelpMenuOptions__ButtonIcon {
   vertical-align: middle;
+}
+
+#account_settings_gravatar_checkbox {
+  margin-#{direction(left)}: 12px;
 }

@@ -24,23 +24,61 @@ import ConversationStatusFilter from 'jsx/shared/components/ConversationStatusFi
 QUnit.module('ConversationStatusFilter component')
 
 const makeProps = (props = {}) => _.merge({
-  filters: [
-    { value: 'inbox', label: 'Inbox' },
-    { value: 'unread', label: 'Unread' },
-    { value: 'sent', label: 'Sent' }
-  ],
-  defaultFilter: 'inbox',
-  initialFilter: null,
-  onChange: () => {}
+  router: {
+    on: () => {},
+    off: () => {},
+    header: {changeTypeFilter: (_newState) => {}}
+  },
+  defaultFilter: 'foo',
+  initialFilter: 'foo',
+  filters: {
+    foo: 'foo',
+    bar: 'bar',
+    baz: 'baz'
+  }
 }, props)
 
 test('default initial selected option', () => {
   const wrapper1 = shallow(<ConversationStatusFilter {...makeProps()} />)
-  strictEqual(wrapper1.state().selected, 'inbox')
+  strictEqual(wrapper1.state().selected, 'foo')
 
-  const wrapper2 = shallow(<ConversationStatusFilter {...makeProps({ initialFilter: 'unread' })} />)
-  strictEqual(wrapper2.state().selected, 'unread')
+  const wrapper2 = shallow(<ConversationStatusFilter {...makeProps({ initialFilter: 'bar' })} />)
+  strictEqual(wrapper2.state().selected, 'bar')
+})
 
-  const wrapper3 = shallow(<ConversationStatusFilter {...makeProps({ initialFilter: 'invalid' })} />)
-  strictEqual(wrapper3.state().selected, 'inbox')
+test('getUrlFilter accepts valid filters', () => {
+  const wrapper = shallow(<ConversationStatusFilter {...makeProps()} />)
+  strictEqual(wrapper.instance().getUrlFilter("type=foo"), 'foo')
+  strictEqual(wrapper.instance().getUrlFilter("type=bar"), 'bar')
+  strictEqual(wrapper.instance().getUrlFilter("type=baz"), 'baz')
+  strictEqual(wrapper.instance().getUrlFilter("jar=jar&type=foo"), 'foo')
+  strictEqual(wrapper.instance().getUrlFilter("jar=jar&type=bar"), 'bar')
+  strictEqual(wrapper.instance().getUrlFilter("jar=jar&type=baz"), 'baz')
+})
+
+test('getUrlFilter uses defaults when invalid', () => {
+  const wrapper1 = shallow(<ConversationStatusFilter {...makeProps()} />)
+  strictEqual(wrapper1.instance().getUrlFilter("type=NOT_A_VALID_FILTER"), 'foo')
+  strictEqual(wrapper1.instance().getUrlFilter("jar=jar&type=NOT_A_VALID_FILTER"), 'foo')
+  strictEqual(wrapper1.instance().getUrlFilter(""), 'foo')
+  strictEqual(wrapper1.instance().getUrlFilter("jar=jar"), 'foo')
+
+  const wrapper2 = shallow(<ConversationStatusFilter {...makeProps({ defaultFilter: 'bar' })} />)
+  strictEqual(wrapper2.instance().getUrlFilter("type=NOT_A_VALID_FILTER"), 'bar')
+  strictEqual(wrapper2.instance().getUrlFilter("jar=jar&type=NOT_A_VALID_FILTER"), 'bar')
+  strictEqual(wrapper2.instance().getUrlFilter(""), 'bar')
+  strictEqual(wrapper2.instance().getUrlFilter("jar=jar"), 'bar')
+})
+
+test('updateBackboneState only allows valid filters', () => {
+  const wrapper = shallow(<ConversationStatusFilter {...makeProps()} />)
+
+  wrapper.instance().updateBackboneState("foo")
+  strictEqual(wrapper.state().selected, 'foo')
+
+  wrapper.instance().updateBackboneState("bar")
+  strictEqual(wrapper.state().selected, 'bar')
+
+  wrapper.instance().updateBackboneState("NOT_A_VALID_FILTER")
+  strictEqual(wrapper.state().selected, 'foo')
 })

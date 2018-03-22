@@ -54,7 +54,20 @@ class Oauth2ProviderController < ApplicationController
     end
 
     if @current_pseudonym && !params[:force_login]
-      redirect_to Canvas::Oauth::Provider.confirmation_redirect(self, provider, @current_user)
+      if @current_user != logged_in_user && !provider.authorized_token?(logged_in_user)
+        flash[:error] = t(
+          "%{application} can only be authorized for the currently logged-in user (%{real_user}), and cannot be done while acting as another user (%{target_user}).",
+          application: provider.app_name,
+          real_user: logged_in_user.name,
+          target_user: @current_user.name
+        )
+        redirect_to login_url(
+          params.permit(:canvas_login, :authentication_provider, pseudonym_session: :unique_id).
+          merge(force_login: 1)
+        )
+      else
+        redirect_to Canvas::Oauth::Provider.confirmation_redirect(self, provider, logged_in_user)
+      end
     else
       params["pseudonym_session"] = {"unique_id" => params[:unique_id]} if params.key?(:unique_id)
       redirect_to login_url(params.permit(:canvas_login, :force_login,

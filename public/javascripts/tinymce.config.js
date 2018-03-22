@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {getDirection} from 'jsx/shared/helpers/rtlHelper'
+
 export default class EditorConfig {
   /**
    * Create an editor config instance, with some internal state passed in
@@ -66,6 +68,7 @@ export default class EditorConfig {
       theme: 'modern',
       skin: false,
       plugins: 'autolink,media,paste,table,textcolor,link,directionality,lists,a11y_checker,wordcount',
+      directionality: getDirection(),
       external_plugins: {
         instructure_image: '/javascripts/tinymce_plugins/instructure_image/plugin.js',
         instructure_links: '/javascripts/tinymce_plugins/instructure_links/plugin.js',

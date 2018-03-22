@@ -16,7 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'i18n!groups'
   'jquery'
   'underscore'
   'Backbone'
@@ -27,7 +26,7 @@ define [
   'jst/groups/manage/groupCategories'
   'jst/groups/manage/groupCategoryTab'
   'jqueryui/tabs'
-], (I18n, $, _, {View}, CollectionView, GroupCategoryView, GroupCategoryCreateView, GroupCategory, groupCategoriesTemplate, tabTemplate) ->
+], ($, _, {View}, CollectionView, GroupCategoryView, GroupCategoryCreateView, GroupCategory, groupCategoriesTemplate, tabTemplate) ->
 
   class GroupCategoriesView extends CollectionView
 

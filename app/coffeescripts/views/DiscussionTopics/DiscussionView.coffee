@@ -166,7 +166,8 @@ define [
 
     onDuplicate: (e) =>
       e.preventDefault()
-      @model.duplicate(ENV.COURSE_ID, @insertDuplicatedDiscussion)
+      assets = ENV.context_asset_string.split("_")
+      @model.duplicate(assets[0], assets[1], @insertDuplicatedDiscussion)
 
     # Public: Delete the model and update the server.
     #

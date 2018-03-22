@@ -83,7 +83,7 @@
               </div>
             </a>
           </li>
-          <% if @current_user && @current_user.current_groups_in_region? %>
+          <% if @current_user && @current_user.current_active_groups? %>
             <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/groups') %>">
               <a id="global_nav_groups_link" href="/groups" class="ic-app-header__menu-list-link">
                 <div class="menu-item-icon-container" aria-hidden="true">
@@ -142,14 +142,14 @@
             <button
               id="primaryNavToggle"
               class="ic-app-header__menu-list-link ic-app-header__menu-list-link--nav-toggle"
-              aria-label="
-                <% if @current_user.try(:collapse_global_nav?) %><%= t('Expand global navigation') %>
+              aria-label="<% if @current_user.try(:collapse_global_nav?) %><%= t('Expand global navigation') %>
                 <% else %><%= t('Minimize global navigation') %><% end %>"
-              title="
-                <% if @current_user.try(:collapse_global_nav?) %><%= t('Expand global navigation') %>
+              title="<% if @current_user.try(:collapse_global_nav?) %><%= t('Expand global navigation') %>
                 <% else %><%= t('Minimize global navigation') %><% end %>"
             >
-              <%= svg_icon :navtoggle %>
+              <div class="menu-item-icon-container" aria-hidden="true">
+                <%= svg_icon :navtoggle %>
+              </div>
             </button>
           </li>
         </ul>

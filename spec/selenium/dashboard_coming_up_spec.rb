@@ -47,8 +47,12 @@ describe "dashboard" do
 
       due_date = Time.now.utc + 2.days
       names = ['locked discussion assignment', 'locked quiz']
-      @course.assignments.create(:name => names[0], :submission_types => 'discussion', :due_at => due_date, :lock_at => Time.now, :unlock_at => due_date)
-      q = @course.quizzes.create!(:title => names[1], :due_at => due_date, :lock_at => Time.now, :unlock_at => due_date)
+      @course.assignments.create(name: names[0],
+                                 submission_types: 'discussion',
+                                 due_at: due_date,
+                                 lock_at: 1.week.from_now,
+                                 unlock_at: due_date)
+      q = @course.quizzes.create!(title: names[1], due_at: due_date, lock_at: 1.week.from_now, unlock_at: due_date)
       q.workflow_state = 'available'
       q.save
       q.reload

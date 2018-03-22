@@ -34,7 +34,7 @@
       margin: 5px 0px;
     }
     .bar-left {
-      left: 0;
+      #{direction(left)}: 0;
       border-width: 2px 0 2px 2px;
     }
     .none-left, .none-right {

@@ -59,6 +59,10 @@ class ExternalFeed < ActiveRecord::Base
     where("external_feeds.consecutive_failures<5 AND external_feeds.refresh_at<?", start).order(:refresh_at)
   }
 
+  def inactive?
+    !self.context || self.context.root_account.deleted? || self.context.inactive?
+  end
+
   def add_rss_entries(rss)
     items = rss.items.map{|item| add_entry(item, rss, :rss) }.compact
     self.context.add_aggregate_entries(items, self) if self.context && self.context.respond_to?(:add_aggregate_entries)

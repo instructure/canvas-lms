@@ -1,3 +1,21 @@
+#
+# Copyright (C) 2012 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "users" do
@@ -223,6 +241,10 @@ describe "users" do
     end
 
     it "should require terms if configured to do so" do
+      if terms = Account.default.terms_of_service
+        terms.update(passive: false)
+      end
+
       get "/register"
 
       %w{teacher student parent}.each do |type|
@@ -238,6 +260,10 @@ describe "users" do
     end
 
     it "should register a student with a join code" do
+      if terms = Account.default.terms_of_service
+        terms.update(passive: false)
+      end
+
       Account.default.allow_self_enrollment!
       course_factory(active_all: true)
       @course.update_attribute(:self_enrollment, true)
@@ -260,6 +286,10 @@ describe "users" do
     end
 
     it "should register a teacher" do
+      if terms = Account.default.terms_of_service
+        terms.update(passive: false)
+      end
+
       get '/register'
       f('#signup_teacher').click
 
@@ -284,11 +314,15 @@ describe "users" do
       # close the "check your email to confirm your account" dialog
       f('.ui-dialog-titlebar-close').click
       expect(displayed_username).to eq('teacher!')
-      expect_logout_link_present
+      expect(fj('form[action="/logout"] button:contains("Logout")')).to be_present
       expect(User.last.initial_enrollment_type).to eq 'teacher'
     end
 
     it "should register an observer" do
+      if terms = Account.default.terms_of_service
+        terms.update(passive: false)
+      end
+
       user_with_pseudonym(:active_all => true, :password => 'lolwut12')
 
       get '/register'

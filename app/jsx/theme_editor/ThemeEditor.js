@@ -20,16 +20,32 @@ import I18n from 'i18n!theme_editor'
 import React from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
-import _ from 'underscore'
+import _ from 'lodash'
 import preventDefault from 'compiled/fn/preventDefault'
 import Progress from 'compiled/models/Progress'
 import customTypes from './PropTypes'
 import submitHtmlForm from './submitHtmlForm'
 import SaveThemeButton from './SaveThemeButton'
+import ThemeEditorAccordion from './ThemeEditorAccordion'
+import ThemeEditorFileUpload from './ThemeEditorFileUpload'
 import ThemeEditorModal from './ThemeEditorModal'
 import ThemeEditorSidebar from './ThemeEditorSidebar'
 
 /* eslint no-alert:0 */
+const TABS = [
+  {
+    id: 'te-editor',
+    label: I18n.t('Edit'),
+    value: 'edit',
+    selected: true
+  },
+  {
+    id: 'te-upload',
+    label: I18n.t('Upload'),
+    value: 'upload',
+    selected: false
+  }
+]
 
 function findVarDef(variableSchema, variableName) {
   for (let i = 0; i < variableSchema.length; i++) {
@@ -63,13 +79,31 @@ export default class ThemeEditor extends React.Component {
     useHighContrast: PropTypes.bool
   }
 
-  state = {
-    changedValues: {},
-    showProgressModal: false,
-    progress: 0,
-    sharedBrandConfigBeingEdited: readSharedBrandConfigBeingEditedFromStorage(),
-    showSubAccountProgress: false,
-    activeSubAccountProgresses: []
+  constructor(props) {
+    super()
+    const {variableSchema, brandConfig} = props
+    const theme = _.flatMap(variableSchema, s => s.variables).reduce(
+      (acc, next) => ({
+        ...acc,
+        ...{[next.variable_name]: next.default}
+      }),
+      {}
+    )
+
+    this.originalThemeProperties = {...theme, ...brandConfig.variables}
+
+    this.state = {
+      themeStore: {
+        properties: {...this.originalThemeProperties},
+        files: []
+      },
+      changedValues: {},
+      showProgressModal: false,
+      progress: 0,
+      sharedBrandConfigBeingEdited: readSharedBrandConfigBeingEditedFromStorage(),
+      showSubAccountProgress: false,
+      activeSubAccountProgresses: []
+    }
   }
 
   onProgress = data => {
@@ -124,8 +158,41 @@ export default class ThemeEditor extends React.Component {
     return val
   }
 
+  handleThemeStateChange = (key, value, opts = {}) => {
+    let {files, properties} = this.state.themeStore
+    if (value instanceof File) {
+      const fileStorageObject = {
+        variable_name: key,
+        value
+      }
+      if (opts.customFileUpload) {
+        fileStorageObject.customFileUpload = true
+      }
+      files.push(fileStorageObject)
+    } else {
+      properties = {
+        ...properties,
+        ...{[key]: value}
+      }
+    }
+
+    if (opts.resetValue) {
+      properties = {
+        ...properties,
+        ...{[key]: this.originalThemeProperties[key]}
+      }
+      files = files.filter(x => x.variable_name !== key)
+    }
+    this.setState({
+      themeStore: {
+        properties,
+        files
+      }
+    })
+  }
+
   somethingHasChanged = () =>
-    _.any(
+    _.some(
       this.state.changedValues,
       (change, key) =>
         // null means revert an unsaved change (should revert to saved brand config or fallback to default and not flag as a change)
@@ -172,6 +239,39 @@ export default class ThemeEditor extends React.Component {
     )
   }
 
+  /**
+   * Takes the themeStore state object and appends it to a FormData object
+   * in preparation for sending to the server.
+   *
+   * @returns FormData
+   * @memberof ThemeEditor
+   */
+  processThemeStoreForSubmit() {
+    const processedData = new FormData()
+    const {properties, files} = this.state.themeStore
+    Object.keys(properties).forEach(k => {
+      const defaultVal = this.getSchemaDefault(k)
+      if (properties[k] !== defaultVal && properties[k] && properties[k][0] !== '$') {
+        processedData.append(`brand_config[variables][${k}]`, properties[k])
+      } else {
+        processedData.append(`brand_config[variables][${k}]`, '')
+      }
+    })
+    files.forEach(f => {
+      const keyName = f.customFileUpload
+        ? f.variable_name
+        : `brand_config[variables][${f.variable_name}]`
+      processedData.append(keyName, f.value)
+    });
+    // We need to make sure that these are present with the upload
+    ['js_overrides', 'css_overrides', 'mobile_js_overrides', 'mobile_css_overrides'].forEach(name => {
+      if (!processedData.has(name)) {
+        processedData.append(name, this.props.brandConfig[name] || '');
+      }
+    })
+    return processedData
+  }
+
   handleFormSubmit = () => {
     let newMd5
 
@@ -180,7 +280,7 @@ export default class ThemeEditor extends React.Component {
     $.ajax({
       url: `/accounts/${this.props.accountID}/brand_configs`,
       type: 'POST',
-      data: new FormData(this.themeEditorForm),
+      data: this.processThemeStoreForSubmit(),
       processData: false,
       contentType: false,
       dataType: 'json'
@@ -216,7 +316,7 @@ export default class ThemeEditor extends React.Component {
     $.ajax({
       url: `/accounts/${this.props.accountID}/brand_configs/save_to_account`,
       type: 'POST',
-      data: new FormData(this.themeEditorForm),
+      data: this.processThemeStoreForSubmit(),
       processData: false,
       contentType: false,
       dataType: 'json'
@@ -249,6 +349,35 @@ export default class ThemeEditor extends React.Component {
   closeSubAccountProgressModal = () => {
     this.setState({showSubAccountProgress: false})
   }
+
+  renderTabInputs = () =>
+    this.props.allowGlobalIncludes
+      ? TABS.map(tab => (
+          <input
+            type="radio"
+            id={tab.id}
+            key={tab.id}
+            name="te-action"
+            defaultValue={tab.value}
+            className="Theme__editor-tabs_input"
+            defaultChecked={tab.selected}
+          />
+        ))
+      : null
+
+  renderTabLabels = () =>
+    this.props.allowGlobalIncludes
+      ? TABS.map(tab => (
+          <label
+            htmlFor={tab.id}
+            key={`${tab.id}-tab`}
+            className="Theme__editor-tabs_item"
+            id={`${tab.id}-tab`}
+          >
+            {tab.label}
+          </label>
+        ))
+      : null
 
   renderHeader(tooltipForWhyApplyIsDisabled) {
     return (
@@ -338,7 +467,7 @@ export default class ThemeEditor extends React.Component {
           </div>
         )}
         <form
-          ref={component => (this.themeEditorForm = component)}
+          ref={c => (this.ThemeEditorForm = c)}
           onSubmit={preventDefault(this.handleFormSubmit)}
           encType="multipart/form-data"
           acceptCharset="UTF-8"
@@ -355,6 +484,8 @@ export default class ThemeEditor extends React.Component {
           >
             <div className="Theme__editor">
               <ThemeEditorSidebar
+                themeStore={this.state.themeStore}
+                handleThemeStateChange={this.handleThemeStateChange}
                 allowGlobalIncludes={this.props.allowGlobalIncludes}
                 brandConfig={this.props.brandConfig}
                 variableSchema={this.props.variableSchema}
@@ -363,6 +494,7 @@ export default class ThemeEditor extends React.Component {
                 changedValues={this.state.changedValues}
               />
             </div>
+
             <div className="Theme__preview">
               {this.somethingHasChanged() ? (
                 <div className="Theme__preview-overlay">

@@ -20,8 +20,10 @@ import I18n from 'i18n!announcements_on_home_page'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import axios from 'axios'
-import AnnouncementList from '../announcements/components/OldAnnouncementList'
 import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import Container from '@instructure/ui-core/lib/components/Container'
+import AnnouncementRow from '../shared/components/AnnouncementRow'
 
 if (ENV.SHOW_ANNOUNCEMENTS) {
   const container = document.querySelector('#announcements_on_home_page')
@@ -29,24 +31,24 @@ if (ENV.SHOW_ANNOUNCEMENTS) {
 
   const url = '/api/v1/announcements'
 
-  const presentAnnouncement = a => ({
-    id: a.id,
-    title: a.title,
-    message: a.message,
-    posted_at: a.delayed_post_at || a.posted_at,
-    url: a.url
-  })
-
   const params = {
-    'context_codes[]': `course_${ENV.ANNOUNCEMENT_COURSE_ID}`,
+    'context_codes': [`course_${ENV.COURSE.id}`],
     per_page: (ENV.ANNOUNCEMENT_LIMIT || 3),
     page: '1',
     start_date: '1900-01-01',
     end_date: new Date().toISOString(),
-    active_only: true
+    active_only: true,
+    'include': ['sections', 'sections_user_count'],
   }
 
   axios.get(url, { params }).then(response => {
-    ReactDOM.render(<AnnouncementList announcements={response.data.map(presentAnnouncement)} />, container)
+    ReactDOM.render(
+      <Container display="block" margin="0 0 medium">
+        <Heading level="h3" margin="0 0 small">{I18n.t('Recent Announcements')}</Heading>
+        {response.data.map(announcement => (
+          <AnnouncementRow key={announcement.id} announcement={announcement} />
+        ))}
+      </Container>,
+    container)
   })
 }

@@ -34,10 +34,10 @@
     vertical-align: middle;
   }
   .prev_month_link {
-    float: left;
+    float: direction(left);
   }
   .next_month_link {
-    float: right;
+    float: direction(right);
   }
 }
 

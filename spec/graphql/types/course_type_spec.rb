@@ -1,3 +1,21 @@
+#
+# Copyright (C) 2017 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
 
@@ -116,18 +134,35 @@ describe Types::CourseType do
         ]
       end
     end
+
+    context "filtering" do
+      it "allows filtering submissions by their state" do
+        expect(
+          course_type.submissionsConnection(
+            current_user: @teacher,
+            args: {
+              studentIds: [@student1.id.to_s],
+              filter: {states: %[unsubmitted]}
+            }
+          )
+        ).to eq [ ]
+      end
+    end
   end
 
   describe "usersConnection" do
     before(:once) do
       @student1 = @student
       @student2 = student_in_course(active_all: true).user
+      @inactive_user = student_in_course.tap { |enrollment|
+        enrollment.update_attribute :workflow_state, 'inactive'
+      }.user
     end
 
     it "returns all visible users" do
       expect(
         course_type.usersConnection(current_user: @teacher)
-      ).to eq [@teacher, @student1, @student2]
+      ).to eq [@teacher, @student1, @student2, @inactive_user]
     end
 
     it "returns only the specified users" do

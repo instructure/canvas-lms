@@ -17,7 +17,7 @@
 %>
 
 <div class="rubric_dialog" id="rubric_dialog" style="display: none;">
-  <h2 style="float: left;"><%= t 'titles.find_a_rubric', "Find a Rubric" %></h2>
+  <h2 class="pull-left"><%= t 'titles.find_a_rubric', "Find a Rubric" %></h2>
   <a style="float: right;" href="<%= context_url(@context, :context_rubrics_url) %>"><%= t 'links.manage_rubrics', "Manage Rubrics" %></a>
   <a href="<%= context_url(@context, :context_grading_rubrics_url) %>" class="grading_rubrics_url" style="display: none;">&nbsp;</a>
   <div class="clear"></div>
@@ -59,7 +59,7 @@
             <div style="margin-bottom: 10px;" class="rubrics_dialog_rubric_brief side_tabs_content_with_room_for_button">
               <span class="id" style="display: none;">&nbsp;</span>
               <div>
-                <div style="float: left;">
+                <div class="pull-left">
                   <a href="#" class="select_rubric_link"><b class="title">&nbsp;</b></a>
                   <span class="display_name" style="padding-left: 10px; font-size: 0.8em; color: #888;">
                     &nbsp;

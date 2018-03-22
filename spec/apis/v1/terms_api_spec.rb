@@ -153,10 +153,11 @@ describe TermsApiController, type: :request do
         expect_terms_index_401
       end
 
-      it "should require root domain auth" do
+      it "should allow sub-account admins to view" do
         subaccount = @account.sub_accounts.create!(name: 'subaccount')
         account_admin_user(account: subaccount)
-        expect_terms_index_401
+        res = get_terms.map{ |t| t['name'] }
+        expect(res).to match_array([@term1.name, @term2.name])
       end
 
       it "should require context to be root_account and error nicely" do

@@ -89,8 +89,9 @@ module Canvas::Migration::ExternalContent
     end
 
     def get_migration_id_from_canvas_id(obj_class, canvas_id)
-      if content_export && content_export.for_master_migration?
-        content_export.create_key("#{obj_class.reflection_type_name}_#{Shard.global_id_for(canvas_id)}")
+      if content_export&.for_master_migration?
+        obj = obj_class.find(canvas_id)
+        content_export.create_key(obj)
       else
         CC::CCHelper.create_key("#{obj_class.reflection_type_name}_#{canvas_id}")
       end

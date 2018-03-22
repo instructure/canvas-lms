@@ -40,7 +40,7 @@
     }
     .links {
       display: none;
-      float: right;
+      float: direction(right);
     }
     &.folder {
       background-image: url(/images/folder_big.png);
@@ -128,7 +128,7 @@
       display: block;
       color: #444;
       ul {
-        margin-left: 10px;
+        margin-#{direction(left)}: 10px;
       }
       .folder_name {
         padding: 5px 5px 5px 30px;
@@ -190,7 +190,7 @@
       font-weight: bold;
     }
     .cancel_upload_link {
-      float: right;
+      float: direction(right);
     }
     .progress_bar {
       height: 10px;

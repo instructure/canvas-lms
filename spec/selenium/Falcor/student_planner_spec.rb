@@ -52,6 +52,25 @@ describe "student planner" do
     validate_link_to_url(announcement, 'discussion_topics')
   end
 
+  it "shows course images when the feature is enabled", priority: "1", test_id: 3306206 do
+    Account.default.enable_feature!(:course_card_images)
+    @course_root = Folder.root_folders(@course).first
+    @course_attachment = @course_root.attachments.create!(:context => @course,
+                                                          :uploaded_data => jpeg_data_frd, :filename => 'course.jpg',
+                                                          :display_name => 'course.jpg')
+    @course.image_id = @course_attachment.id
+    @course.save!
+    @course.announcements.create!(title: 'Hi there!', message: 'Announcement time!')
+    go_to_list_view
+    validate_object_displayed('Announcement')
+    elem = f("a[href='/courses/#{@course.id}']")
+    url = driver.current_url
+    # validate the background image url
+    expect(elem[:style]).
+      to include("#{url}courses/#{@course.id}/files/#{@course_attachment.id}/download?verifier=#{@course_attachment.uuid}")
+
+  end
+
   context "assignments" do
     before :once do
       @assignment = @course.assignments.create({
@@ -68,7 +87,7 @@ describe "student planner" do
     end
 
     it "enables the checkbox when an assignment is completed", priority: "1", test_id: 3306201 do
-      @assignment.submit_homework(@student1, submission_type: "online_text_entry", 
+      @assignment.submit_homework(@student1, submission_type: "online_text_entry",
                                   body: "Assignment submitted")
       go_to_list_view
       expect(f('.PlannerApp')).to contain_jqcss('span:contains("Show 1 completed item")')
@@ -94,6 +113,21 @@ describe "student planner" do
       @assignment.update_submission(@student1, {comment: 'Good', author: @teacher})
       go_to_list_view
       validate_pill('Feedback')
+    end
+
+    it "ensures time zone changes update the planner items", priority: "1", test_id: 3306207 do
+      go_to_list_view
+      time = calendar_time_string(@assignment.due_at).chop
+      expect(fxpath("//div[@class='PlannerApp']//span[text()[contains(.,'DUE: #{time}')]]")).
+        to be_displayed
+      @student1.time_zone = 'Asia/Tokyo'
+      @student1.save!
+      refresh_page
+
+      # the users time zone is not converted to UTC and to balance it we subtract 6 hours from the due time
+      time = calendar_time_string(@assignment.due_at+9.hours).chop
+      expect(fxpath("//div[@class='PlannerApp']//span[text()[contains(.,'DUE: #{time}')]]")).
+        to be_displayed
     end
 
     it "shows missing tag for an assignment with missing submissions", priority: "1", test_id: 3263153 do
@@ -151,7 +185,7 @@ describe "student planner" do
       expect(f('.PlannerApp')).to contain_link(past_discussion.title.to_s)
     end
   end
-  
+
   it "shows and navigates to ungraded discussions with todo dates from student planner", priority:"1", test_id: 3259305 do
     discussion = @course.discussion_topics.create!(user: @teacher, title: 'somebody topic title',
                                                    message: 'somebody topic message',
@@ -219,7 +253,7 @@ describe "student planner" do
     it "adds text to the details field", priority: "1", test_id: 3263161 do
       go_to_list_view
       todo_modal_button.click
-      todo_details.send_keys("https://imgs.xkcd.com/comics/code_quality_3.png")
+      todo_details.send_keys("https://imgs.xkcd.com/comics/code_quality_3.png\n")
       expect(todo_details[:value]).to include("https://imgs.xkcd.com/comics/code_quality_3.png")
     end
 
@@ -279,8 +313,7 @@ describe "student planner" do
       # gives the To Do a new name and saves it
       modal = todo_sidebar_modal("Title Text")
       element = f('input', modal)
-      element.send_keys(8.chr * 10)
-      element.send_keys("New Text")
+      replace_content(element, "New Text")
       todo_save_button.click
 
       # verifies that the edited To Do is showing up
@@ -288,6 +321,35 @@ describe "student planner" do
       expect(todo_item).to include_text("To Do")
       expect(todo_item).to include_text("New Text")
       expect(todo_item).not_to include_text("Title Text")
+    end
+
+    it "edits a completed To Do", priority: "1" do
+      @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Title Text")
+      go_to_list_view
+
+      # complete it
+      f('label[for*=Checkbox]').click
+      expect(f('input[type=checkbox]:checked')).to be_displayed
+
+      # Opens the To Do edit sidebar
+      todo_item = todo_info_holder
+      expect(todo_item).to include_text("To Do")
+      expect(todo_item).to include_text("Title Text")
+      fj("a:contains('Title Text')", todo_item).click
+
+      # gives the To Do a new name and saves it
+      modal = todo_sidebar_modal("Title Text")
+      element = f('input', modal)
+      replace_content(element, "New Text")
+      todo_save_button.click
+
+      # verifies that the edited To Do is showing up
+      todo_item = todo_info_holder
+      expect(todo_item).to include_text("To Do")
+      expect(todo_item).to include_text("New Text")
+
+      # and that it is still complete
+      expect(f('input[type=checkbox]:checked')).to be_displayed
     end
 
     it "deletes a To Do", priority: "1", test_id: 3281715 do
@@ -352,6 +414,24 @@ describe "student planner" do
       todo_modal_button.click
       element = fj("select:contains('Optional: Add Course')")
       expect(fj("option:contains('Unnamed Course')", element)).to be
+    end
+
+    it "ensures time zones with offsets higher than UTC update the planner items" do
+      planner_note = @student1.planner_notes.create!(todo_date: (Time.zone.now + 1.day).beginning_of_day,
+                                                     title: "Title Text")
+      go_to_list_view
+      # Opens the To Do edit sidebar
+      expect(f('.PlannerApp')).to contain_link(planner_note.title)
+      fln(planner_note.title).click
+      @modal = todo_sidebar_modal(planner_note.title)
+      expect(ff('input', @modal)[1][:value]).to eq format_date_for_view(planner_note.todo_date, :long)
+      @student1.time_zone = 'Minsk'
+      @student1.save!
+      refresh_page
+      expect(f('.PlannerApp')).to contain_link(planner_note.title)
+      fln(planner_note.title).click
+      @modal = todo_sidebar_modal(planner_note.title)
+      expect(ff('input', @modal)[1][:value]).to eq format_date_for_view(planner_note.todo_date, :long)
     end
   end
 

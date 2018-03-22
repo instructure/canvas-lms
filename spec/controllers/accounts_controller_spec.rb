@@ -703,6 +703,18 @@ describe AccountsController do
       expect(assigns[:last_reports].first.last).to eq report
     end
 
+    it "puts up-to-date help link stuff in the env" do
+      account_with_admin_logged_in
+      @account.settings[:help_link_name] = 'Clippy'
+      @account.settings[:help_link_icon] = 'paperclip'
+      @account.save!
+      allow_any_instance_of(ApplicationHelper).to receive(:help_link_name).and_return('old_cached_nonsense')
+      allow_any_instance_of(ApplicationHelper).to receive(:help_link_icon).and_return('old_cached_nonsense')
+      get 'settings', params: {account_id: @account}
+      expect(assigns[:js_env][:help_link_name]).to eq 'Clippy'
+      expect(assigns[:js_env][:help_link_icon]).to eq 'paperclip'
+    end
+
     context "sharding" do
       specs_require_sharding
 

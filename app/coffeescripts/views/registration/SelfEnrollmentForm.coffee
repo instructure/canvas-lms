@@ -20,11 +20,10 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'i18n!registration'
   '../../registration/registrationErrors'
   'jquery.instructure_forms'
   'jquery.ajaxJSON'
-], ($, _, Backbone, I18n, registrationErrors) ->
+], ($, _, Backbone, registrationErrors) ->
 
   class SelfEnrollmentForm extends Backbone.View
     events:

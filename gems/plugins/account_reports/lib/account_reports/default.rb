@@ -30,6 +30,10 @@ module AccountReports
       OutcomeReports.new(account_report).outcome_results
     end
 
+    def self.outcome_export_csv(account_report)
+      OutcomeExport.new(account_report).outcome_export
+    end
+
     def self.grade_export_csv(account_report)
       GradeReports.new(account_report).grade_export
     end

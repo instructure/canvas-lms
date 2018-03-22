@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import uniq from 'lodash/uniq'
+import without from 'lodash/without'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import { actionTypes } from './actions'
@@ -68,11 +70,15 @@ function reduceAnnouncements (announcements, action) {
 }
 
 export default combineReducers({
-  courseId: identity(null),
+  contextType: identity(null),
+  contextId: identity(null),
   feedId: identity(null),
   permissions: identity({}),
   masterCourseData: identity(null),
   atomFeedUrl: identity(null),
+  isToggleLocking: handleActions({
+    [actionTypes.SET_ANNOUNCEMENTS_IS_LOCKING] : (state, action) => action.payload
+  }, false),
   announcements: (state, action) => {
     const paginatedState = reduceAnnouncementsPagination(state, action)
     const newState = reduceAnnouncements(paginatedState, action)
@@ -104,12 +110,9 @@ export default combineReducers({
   selectedAnnouncements: handleActions({
     [actionTypes.SET_ANNOUNCEMENT_SELECTION]: (state, action) => {
       if (action.payload.selected) {
-        // use of Set ensures we don't have duplicates
-        return Array.from(new Set([...state, action.payload.id]))
+        return uniq([...state, action.payload.id])
       } else {
-        const set = new Set(state)
-        set.delete(action.payload.id)
-        return Array.from(set)
+        return without(state, action.payload.id)
       }
     },
     [actionTypes.CLEAR_ANNOUNCEMENT_SELECTIONS]: () => [],
@@ -175,4 +178,5 @@ export default combineReducers({
     }, false)
   }),
   notifications: reduceNotifications,
+  announcementsLocked: identity(false)
 })

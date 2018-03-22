@@ -16,7 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # @API Blueprint Courses
-# @beta
 # Configure blueprint courses
 #
 # @model BlueprintTemplate
@@ -433,7 +432,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     max_records = Setting.get('master_courses_history_count', '150').to_i
     items = []
     Shackles.activate(:slave) do
-    (MasterCourses::ALLOWED_CONTENT_TYPES - ['AssignmentGroup', 'ContentTag']).each do |klass|
+    (MasterCourses::ALLOWED_CONTENT_TYPES - ['ContentTag']).each do |klass|
       item_scope = case klass
       when 'Attachment'
         @course.attachments
@@ -674,6 +673,10 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   end
 
   def change_classes(klass, columns)
+    # if we skipped it because it's deleted, there's no sense
+    # in going on and seeing if they also edited it first
+    return ['deleted'] if columns.include?("manually_deleted")
+    
     classes = []
     columns.each do |col|
       klass.restricted_column_settings.each do |k, v|

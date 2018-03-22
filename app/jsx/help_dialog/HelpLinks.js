@@ -17,81 +17,69 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
+import {bool, arrayOf, shape, string, func} from 'prop-types'
 import I18n from 'i18n!help_dialog'
+import Link from '@instructure/ui-core/lib/components/Link'
+import List, {ListItem} from '@instructure/ui-core/lib/components/List'
 import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import Text from '@instructure/ui-core/lib/components/Text'
 
-  const HelpLinks = React.createClass({
-    propTypes: {
-      links: PropTypes.array,
-      hasLoaded: PropTypes.bool,
-      onClick: PropTypes.func
-    },
-    getDefaultProps() {
-      return {
-        hasLoaded: false,
-        links: [],
-        onClick: function (url) {}
-      };
-    },
-    handleLinkClick (e) {
-      const url = e.target.getAttribute('href');
-      if (url === '#create_ticket' || url === '#teacher_feedback') {
-        e.preventDefault();
-        this.props.onClick(url);
-      }
-    },
-    render () {
-      const links = this.props.links.map((link, index) => {
-        return (
-          <li className="ic-NavMenu-list-item" key={`link${index}`}>
-            <a
+export default function HelpLinks({links, hasLoaded, onClick}) {
+  return (
+    <List variant="unstyled" margin="small 0" itemSpacing="small">
+      {hasLoaded ? (
+        links.map((link, index) => (
+          <ListItem key={`link-${index}`}>
+            <Link
               href={link.url}
               target="_blank"
               rel="noopener"
-              onClick={this.handleLinkClick}
-              className="ic-NavMenu-list-item__link"
+              onClick={event => {
+                if (link.url === '#create_ticket' || link.url === '#teacher_feedback') {
+                  event.preventDefault()
+                  onClick(link.url)
+                }
+              }}
             >
               {link.text}
-            </a>
-            {
-              link.subtext ? (
-                <div
-                  className="ic-NavMenu-list-item__helper-text is-help-link">
-                  {link.subtext}
-                </div>
-              ) : null
-            }
-          </li>
-        );
-      });
+            </Link>
+            {link.subtext && (
+              <Text as="div" size="small" weight="light">{link.subtext}</Text>
+            )}
+          </ListItem>
+        )).concat(
+          // if the current user is an admin, show the settings link to
+          // customize this menu
+          window.ENV.current_user_roles && window.ENV.current_user_roles.includes('root_admin') && ([
+            <ListItem key="hr"><hr /></ListItem>,
+            <ListItem key="customize">
+              <Link href="/accounts/self/settings" >
+                {I18n.t('Customize this menu')}
+              </Link>
+            </ListItem>
+          ])
+        ).filter(Boolean)
+      ) : (
+        <ListItem>
+          <Spinner size="small" title={I18n.t('Loading')} />
+        </ListItem>
+      )}
+    </List>
+  )
+}
 
-      // if the current user is an admin, show the settings link to
-      // customize this menu
-      if (window.ENV.current_user_roles && window.ENV.current_user_roles.indexOf("root_admin") > -1) {
-        links.push(
-          <li key="admin" className="ic-NavMenu-list-item ic-NavMenu-list-item--feature-item">
-            <a
-              href="/accounts/self/settings"
-              className="ic-NavMenu-list-item__link">
-              {I18n.t('Customize this menu')}
-            </a>
-          </li>
-        );
-      }
+HelpLinks.propTypes = {
+  links: arrayOf(shape({
+    url: string.isRequired,
+    text: string.isRequired,
+    subtext: string
+  })).isRequired,
+  hasLoaded: bool,
+  onClick: func
+}
 
-      return (
-        <ul className="ic-NavMenu__link-list">
-          {this.props.hasLoaded ?
-            links
-            :
-            <li className="ic-NavMenu-list-item ic-NavMenu-list-item--loading-message">
-              <Spinner size="small" title={I18n.t('Loading')} />
-            </li>
-          }
-        </ul>
-      );
-    }
-  });
-
-export default HelpLinks
+HelpLinks.defaultProps = {
+  hasLoaded: false,
+  links: [],
+  onClick: () => {}
+}

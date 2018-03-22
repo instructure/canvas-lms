@@ -32,7 +32,7 @@
       background: transparent url(/images/warning_36.png) 0 4px no-repeat;
       position: absolute;
       top: 6px;
-      left: 22px;
+      #{direction(left)}: 22px;
       width: 42px;
       height: 42px;
     }

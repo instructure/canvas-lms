@@ -46,7 +46,7 @@ describe "new account course search" do
     expect(f("#left-side #section-tabs")).not_to include_text("Courses")
   end
 
-  it "should hide courses without enrollments if checked" do
+  it "should hide courses without enrollments if checked", test_id: 3454769, priority: 1 do
     empty_course = course_factory(:account => @account, :course_name => "no enrollments")
     not_empty_course = course_factory(:account => @account, :course_name => "yess enrollments", :active_all => true)
     student_in_course(:course => not_empty_course, :active_all => true)
@@ -58,7 +58,7 @@ describe "new account course search" do
     expect(rows[0]).to include_text(empty_course.name)
     expect(rows[1]).to include_text(not_empty_course.name)
 
-    fj('label:contains("Hide courses without enrollments")').click
+    fj('label:contains("Hide courses without students")').click
     wait_for_loading_to_disappear
 
     rows = get_rows
@@ -67,7 +67,7 @@ describe "new account course search" do
     expect(rows[0]).not_to include_text(empty_course.name)
   end
 
-  it "should paginate" do
+  it "should paginate", test_id: 3454771, priority: 1 do
     16.times { |i| @account.courses.create!(:name => "course #{i + 1}") }
 
     get "/accounts/#{@account.id}"
@@ -86,7 +86,7 @@ describe "new account course search" do
     expect(f("#content")).not_to contain_css('button[title="Next Page"]')
   end
 
-  it "should search by term" do
+  it "should search by term", test_id: 3454772, priority: 1 do
     term = @account.enrollment_terms.create!(:name => "some term")
     term_course = course_factory(:account => @account, :course_name => "term course_factory")
     term_course.enrollment_term = term
@@ -158,7 +158,8 @@ describe "new account course search" do
 
     get "/accounts/#{@account.id}"
 
-    get_rows.first.find('[name="IconPlusLine"]').click
+    el = get_rows.first.find('[name="IconPlusLine"]')
+    move_to_click_element(el)
 
     dialog = fj('#add_people_modal:visible')
     expect(dialog).to be_displayed
@@ -174,12 +175,13 @@ describe "new account course search" do
     # when the "+ users" is clicked and not as part of the page load
     sections = ('A'..'Z').map { |i| course.course_sections.create!(:name => "Test Section #{i}") }
 
-    get_rows.first.find('[name="IconPlusLine"]').click
+    el = get_rows.first.find('[name="IconPlusLine"]')
+    move_to_click_element(el)
     section_options = ffj('#add_people_modal:visible #peoplesearch_select_section option')
     expect(section_options.map(&:text)).to eq(sections.map(&:name))
   end
 
-  it "should create a new course from the 'Add a New Course' dialog" do
+  it "should create a new course from the 'Add a New Course' dialog", test_id: 3454775, priority: 1 do
     @account.enrollment_terms.create!(:name => "Test Enrollment Term")
     subaccount = @account.sub_accounts.create!(name: "Test Sub Account")
 
@@ -210,7 +212,8 @@ describe "new account course search" do
     named_course = course_factory(:account => @account, :course_name => "course factory with name")
 
     get "/accounts/#{@account.id}"
-    get_rows.first.find('[name="IconPlusLine"]').click
+    el = get_rows.first.find('[name="IconPlusLine"]')
+    move_to_click_element(el)
     expect(f('#add_people_modal h2')).to include_text(named_course.name)
   end
 end

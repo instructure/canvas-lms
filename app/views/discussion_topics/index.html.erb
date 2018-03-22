@@ -24,6 +24,11 @@
   feed_code = @context_enrollment.try(:feed_code) || (@context.available? && @context.feed_code)
   content_for :auto_discovery, auto_discovery_link_tag(:atom, feeds_forum_format_path(@context.feed_code, :atom), {:title => t(:course_discussions_atom_feed_title, "Course Discussions Atom Feed")})
 
-  js_bundle :discussion_topics_index
-  css_bundle :discussions_list
+  if @context.account.feature_enabled?(:section_specific_discussions)
+    js_bundle :discussion_topics_index_v2
+    css_bundle :discussions_index
+  else
+    js_bundle :discussion_topics_index
+    css_bundle :discussions_list
+  end
 %>

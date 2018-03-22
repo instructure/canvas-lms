@@ -16,12 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'i18n!outcomes'
   'underscore'
   'Backbone'
   './ProgressBarView'
   'jst/grade_summary/alignment'
-], (I18n, _, Backbone, ProgressBarView, template) ->
+], (_, Backbone, ProgressBarView, template) ->
   class AlignmentView extends Backbone.View
     tagName: 'li'
     className: 'alignment'

@@ -221,12 +221,12 @@ textarea {
 .radio,
 .checkbox {
   min-height: $baseLineHeight; // clear the floating input if there is no label text
-  padding-left: 20px;
+  padding-#{direction(left)}: 20px;
 }
 .radio input[type="radio"],
 .checkbox input[type="checkbox"] {
-  float: left;
-  margin-left: -20px;
+  float: direction(left);
+  margin-#{direction(left)}: -20px;
 }
 
 // Move the options list down to align with labels
@@ -246,7 +246,7 @@ textarea {
 }
 .radio.inline + .radio.inline,
 .checkbox.inline + .checkbox.inline {
-  margin-left: 10px; // space out consecutive inline controls
+  margin-#{direction(left)}: 10px; // space out consecutive inline controls
 }
 
 
@@ -273,7 +273,7 @@ textarea[class*="span"],
 .row-fluid textarea[class*="span"],
 .row-fluid .uneditable-input[class*="span"] {
   float: none;
-  margin-left: 0;
+  margin-#{direction(left)}: 0;
 }
 // Ensure input-prepend/append never wraps
 .input-append input[class*="span"],
@@ -306,7 +306,7 @@ textarea[class*="span"],
 .controls-row [class*="span"],
 // Redeclare the fluid grid collapse since we undo the float for inputs
 .row-fluid .controls-row [class*="span"] {
-  float: left;
+  float: direction(left);
 }
 // Explicity set top padding on all checkboxes/radios, not just first-child
 .controls-row .checkbox[class*="span"],
@@ -419,7 +419,7 @@ This is the standard form actions button bar at the bottom of every content form
 .help-inline {
   display: inline-block;
   vertical-align: middle;
-  padding-left: 5px;
+  padding-#{direction(left)}: 5px;
 }
 
 
@@ -449,7 +449,7 @@ This is the standard form actions button bar at the bottom of every content form
     margin-bottom: 0; // prevent bottom margin from screwing up alignment in stacked forms
     *margin-left: 0;
     vertical-align: top;
-    @include border-radius(0 $inputBorderRadius $inputBorderRadius 0);
+    border-radius: direction-corners(0 $inputBorderRadius $inputBorderRadius 0);
     // Make input on top when focused so blue border and shadow always show
     &:focus {
       z-index: 2;
@@ -482,12 +482,12 @@ This is the standard form actions button bar at the bottom of every content form
 .input-prepend {
   .add-on,
   .btn {
-    margin-right: -1px;
+    margin-#{direction(right)}: -1px;
   }
-  .add-on:first-child,
-  .btn:first-child {
+  .add-on:#{direction-if(rtl, last, first)}-child,
+  .btn:#{direction-if(rtl, last, first)}-child {
     // FYI, `.btn:first-child` accounts for a button group that's prepended
-    @include border-radius($inputBorderRadius 0 0 $inputBorderRadius);
+    border-radius: $inputBorderRadius 0 0 $inputBorderRadius;
   }
 }
 
@@ -495,19 +495,19 @@ This is the standard form actions button bar at the bottom of every content form
   input,
   select,
   .uneditable-input {
-    @include border-radius($inputBorderRadius 0 0 $inputBorderRadius);
+    border-radius: $inputBorderRadius 0 0 $inputBorderRadius;
     + .btn-group .btn {
-      @include border-radius(0 $inputBorderRadius $inputBorderRadius 0);
+      border-radius: 0 $inputBorderRadius $inputBorderRadius 0;
     }
   }
   .add-on,
   .btn,
   .btn-group {
-    margin-left: -1px;
+    margin-#{direction(left)}: -1px;
   }
-  .add-on:last-child,
-  .btn:last-child {
-    @include border-radius(0 $inputBorderRadius $inputBorderRadius 0);
+  .add-on:#{direction-if(rtl, first, last)}-child,
+  .btn:#{direction-if(rtl, first, last)}-child {
+    border-radius: 0 $inputBorderRadius $inputBorderRadius 0;
   }
 }
 
@@ -516,22 +516,22 @@ This is the standard form actions button bar at the bottom of every content form
   input,
   select,
   .uneditable-input {
-    @include border-radius(0);
+    border-radius: 0;
     + .btn-group .btn {
-      @include border-radius(0 $inputBorderRadius $inputBorderRadius 0);
+      border-radius: 0 $inputBorderRadius $inputBorderRadius 0;
     }
   }
-  .add-on:first-child,
-  .btn:first-child {
+  .add-on:#{direction-if(rtl, last, first)}-child,
+  .btn:#{direction-if(rtl, last, first)}-child {
     margin-right: -1px;
-    @include border-radius($inputBorderRadius 0 0 $inputBorderRadius);
+    border-radius: $inputBorderRadius 0 0 $inputBorderRadius;
   }
-  .add-on:last-child,
-  .btn:last-child {
+  .add-on:#{direction-if(rtl, first, last)}-child,
+  .btn:#{direction-if(rtl, first, last)}-child {
     margin-left: -1px;
-    @include border-radius(0 $inputBorderRadius $inputBorderRadius 0);
+    border-radius: 0 $inputBorderRadius $inputBorderRadius 0;
   }
-  .btn-group:first-child {
+  .btn-group:#{direction-if(rtl, last, first)}-child {
     margin-left: 0;
   }
 }
@@ -614,7 +614,7 @@ input.search-query {
 .form-search .checkbox,
 .form-inline .radio,
 .form-inline .checkbox {
-  padding-left: 0;
+  padding-#{direction(left)}: 0;
   margin-bottom: 0;
   vertical-align: middle;
 }
@@ -623,9 +623,9 @@ input.search-query {
 .form-search .checkbox input[type="checkbox"],
 .form-inline .radio input[type="radio"],
 .form-inline .checkbox input[type="checkbox"] {
-  float: left;
-  margin-right: 3px;
-  margin-left: 0;
+  float: direction(left);
+  margin-#{direction(right)}: 3px;
+  margin-#{direction(left)}: 0;
 }
 
 
@@ -651,22 +651,14 @@ legend + .control-group {
   }
   // Float the labels left
   .control-label {
-    float: left;
+    float: direction(left);
     width: $horizontalComponentOffset - 20;
     padding-top: 5px;
-    text-align: right;
+    text-align: #{direction(right)};
   }
   // Move over all input controls and content
   .controls {
-    // Super jank IE7 fix to ensure the inputs in .input-append and input-prepend
-    // don't inherit the margin of the parent, in this case .controls
-    *display: inline-block;
-    *padding-left: 20px;
-    margin-left: $horizontalComponentOffset;
-    *margin-left: 0;
-    &:first-child {
-      *padding-left: $horizontalComponentOffset;
-    }
+    margin-#{direction(left)}: $horizontalComponentOffset;
   }
   // Remove bottom margin on block level help text since that's accounted for on .control-group
   .help-block {
@@ -682,6 +674,6 @@ legend + .control-group {
   }
   // Move over buttons in .form-actions to align with .controls
   .form-actions {
-    padding-left: $horizontalComponentOffset;
+    padding-#{direction(left)}: $horizontalComponentOffset;
   }
 }

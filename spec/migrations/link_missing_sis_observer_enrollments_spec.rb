@@ -24,7 +24,7 @@ describe 'DataFixup::LinkMissingSisObserverEnrollments' do
     course_with_student(:active_all => true)
 
     observer = user_with_pseudonym
-    @student.observers << observer
+    @student.linked_observers << observer
 
     @student.student_enrollments.first.update_attribute(:sis_batch_id, batch.id)
 

@@ -70,10 +70,10 @@ html {
   font-size: 100%;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
-  font-family: $ic-font-family-fallback;
-  &.lato-font-loaded {
-    font-family: $ic-font-family;
+  &.lato-font-not-loaded-yet {
+    font-family: $ic-font-family-fallback;
   }
+  font-family: $ic-font-family;
 }
 
 body {
@@ -223,7 +223,7 @@ a {
 // Unordered and Ordered lists
 ul, ol {
   padding: 0;
-  margin: 0 0 6px 25px;
+  margin: direction-sides(0 0 6px 25px);
 }
 ul ul,
 ul ol,
@@ -233,7 +233,7 @@ ol ul {
 }
 ul.unstyled,
 ol.unstyled {
-  margin-left: 0;
+  margin-#{direction(left)}: 0;
   list-style: none;
 }
 
@@ -249,22 +249,22 @@ dt {
   font-weight: bold;
 }
 dd {
-  margin-left: 10px;
+  margin-#{direction(left)}: 10px;
 }
 // Horizontal layout (like forms)
 .dl-horizontal {
   @include clearfix(); // Ensure dl clears floats if empty dd elements present
   dt {
-    float: left;
+    float: direction(left);
     width: $horizontalComponentOffset - 20;
-    clear: left;
-    text-align: right;
+    clear: direction(left);
+    text-align: direction(right);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
   dd {
-    margin-left: $horizontalComponentOffset;
+    margin-#{direction(left)}: $horizontalComponentOffset;
   }
 }
 
@@ -326,7 +326,7 @@ select.un-bootrstrapify {
 }
 
 .form-actions {
-  text-align: right;
+  text-align: direction(right);
   padding: 10px 10px 11px;
 
   // when .form-actions is in a modal box, make it look different per Kyle mockup
@@ -465,7 +465,7 @@ abbr.initialism {
 blockquote {
   padding: 0 0 0 15px;
   margin: 0 0 20px;
-  border-left: 5px solid $ic-border-color;
+  border-#{direction(left)}: 5px solid $ic-border-color;
   p {
     margin-bottom: 0;
     @include fontSize(16px);
@@ -483,14 +483,14 @@ blockquote {
 
   // Float right with text-align: right
   &.pull-right {
-    float: right;
-    padding-right: 15px;
-    padding-left: 0;
-    border-right: 5px solid $ic-border-color;
-    border-left: 0;
+    float: direction(right);
+    padding-#{direction(right)}: 15px;
+    padding-#{direction(left)}: 0;
+    border-#{direction(right)}: 5px solid $ic-border-color;
+    border-#{direction(left)}: 0;
     p,
     small {
-      text-align: right;
+      text-align: direction(right);
     }
     small {
       &:before {
@@ -550,7 +550,7 @@ Here's an accessible way to do it for popovers without a header.
   max-width: 236px;
   width: 236px;
   color: $gray;
-  text-align: left;
+  text-align: direction(left);
   text-decoration: none;
   background-color: $popoverBackground;
   opacity: 1;
@@ -575,21 +575,21 @@ $popoverArrowDistanceFromCorner: $popoverArrowOuterWidth;
     height:0;
     content: "";
     top: -$popoverArrowOuterWidth * 2;
-    left: $popoverArrowDistanceFromCorner;
+    #{direction(left)}: $popoverArrowDistanceFromCorner;
   }
   &:after {
     border-bottom-color: $popoverTitleBackground;
     border-width: $popoverArrowWidth;
     top: -$popoverArrowWidth * 2;
-    left: $popoverArrowDistanceFromCorner + 1;
+    #{direction(left)}: $popoverArrowDistanceFromCorner + 1;
   }
   &.right:before {
-    left: auto;
-    right: $popoverArrowDistanceFromCorner;
+    #{direction(left)}: auto;
+    #{direction(right)}: $popoverArrowDistanceFromCorner;
   }
   &.right:after {
-    left: auto;
-    right: $popoverArrowDistanceFromCorner + 1;
+    #{direction(left)}: auto;
+    #{direction(right)}: $popoverArrowDistanceFromCorner + 1;
   }
   &.bottom:before {
     border-color: $popoverArrowOuterColor transparent transparent transparent;
@@ -604,12 +604,12 @@ $popoverArrowDistanceFromCorner: $popoverArrowOuterWidth;
   &.center:before {
     left: 50%;
     margin-left: -$popoverArrowOuterWidth;
-    right: auto;
+    #{direction(right)}: auto;
   }
   &.center:after {
     left: 50%;
     margin-left: -$popoverArrowWidth;
-    right: auto;
+    #{direction(right)}: auto;
   }
   &.middle:before {
     top: 50%;
@@ -625,26 +625,26 @@ $popoverArrowDistanceFromCorner: $popoverArrowOuterWidth;
     top: 50%;
     margin-top: -$popoverArrowOuterWidth;
     bottom: auto;
-    left: -$popoverArrowOuterWidth * 2;
-    right: auto;
+    #{direction(left)}: -$popoverArrowOuterWidth * 2;
+    #{direction(right)}: auto;
     border-color: transparent $popoverArrowOuterColor transparent transparent;
   }
   &.horizontal:after {
     top: 50%;
     margin-top: -$popoverArrowWidth;
     bottom: auto;
-    left: -$popoverArrowWidth * 2;
-    right: auto;
+    #{direction(left)}: -$popoverArrowWidth * 2;
+    #{direction(right)}: auto;
     border-color: transparent $popoverArrowColor transparent transparent;
   }
   &.right.horizontal:before {
-    left: auto;
-    right: -$popoverArrowOuterWidth * 2;
+    #{direction(left)}: auto;
+    #{direction(right)}: -$popoverArrowOuterWidth * 2;
     border-color: transparent transparent transparent $popoverArrowOuterColor;
   }
   &.right.horizontal:after {
-    left: auto;
-    right: -$popoverArrowWidth * 2;
+    #{direction(left)}: auto;
+    #{direction(right)}: -$popoverArrowWidth * 2;
     border-color: transparent transparent transparent $popoverArrowColor;
   }
   &.bottom.horizontal:before {

@@ -112,7 +112,7 @@ define([
     const component = renderComponent(defaultProps())
 
     const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-bar__info')
-    equal(renderedList[0].textContent, '11 pts+ to 15 pts', 'renders upper scores')
+    equal(renderedList[0].textContent, '10.5 pts+ to 15 pts', 'renders upper scores')
   })
 
   test('renders enrolled correctly', () => {

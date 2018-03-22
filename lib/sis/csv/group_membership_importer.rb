@@ -29,19 +29,18 @@ module SIS
 
       # expected columns
       # group_id,user_id,status
-      def process(csv)
-        @sis.counts[:group_memberships] += SIS::GroupMembershipImporter.new(@root_account, importer_opts).process do |importer|
-          csv_rows(csv) do |row|
+      def process(csv, index=nil, count=nil)
+        count = SIS::GroupMembershipImporter.new(@root_account, importer_opts).process do |importer|
+          csv_rows(csv, index, count) do |row|
             update_progress
-
             begin
               importer.add_group_membership(row['user_id'], row['group_id'], row['status'])
             rescue ImportError => e
-              add_warning(csv, "#{e}")
+              SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
             end
           end
         end
-
+        count
       end
     end
   end

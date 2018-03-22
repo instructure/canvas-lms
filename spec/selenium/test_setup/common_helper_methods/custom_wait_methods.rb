@@ -91,6 +91,22 @@ module CustomWaitMethods
     wait_for_animations
   end
 
+  def wait_for_stale_element(selector, jquery_selector: false)
+    stale_element = true
+    while stale_element == true
+      begin
+        wait_for_dom_ready
+        if jquery_selector
+          fj(selector)
+        else
+          f(selector)
+        end
+      rescue Selenium::WebDriver::Error::NoSuchElementError
+        stale_element = false
+      end
+    end
+  end
+
   def pause_ajax
     SeleniumDriverSetup.request_mutex.synchronize { yield }
   end

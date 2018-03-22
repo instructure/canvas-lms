@@ -32,7 +32,7 @@ fieldset {
     font-weight: bold;
     border: none;
     width: auto;
-    margin-left: 20px;
+    margin-#{direction(left)}: 20px;
     font-size: 1.2em;
     margin-bottom: 0;
   }
@@ -43,7 +43,7 @@ table.details {
     padding: 1px 5px;
   }
   th {
-    text-align: left;
+    text-align: direction(left);
   }
 }
 

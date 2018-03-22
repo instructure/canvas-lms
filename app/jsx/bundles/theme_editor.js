@@ -16,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'formdata-polyfill'; // Need to support FormData.has for IE
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ThemeEditor from '../theme_editor/ThemeEditor'
 
-  // framebust out so we don't ever get theme editor inside theme editor
+// framebust out so we don't ever get theme editor inside theme editor
 if (window.top.location !== self.location) {
   window.top.location = self.location.href
 }

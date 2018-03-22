@@ -60,6 +60,12 @@ define [
       dir = $(e.target).data 'view'
       @selectDir dir
 
+    resetSidebar: () =>
+      _.each @directories, (d) -> d.remove()
+      @directories = []
+      @cachedDirectories = {}
+      @addDirFor @rootOutcomeGroup
+
     # Adds a directory view for an outcome group.
     # Returns the directory view.
     addDirFor: (outcomeGroup) ->

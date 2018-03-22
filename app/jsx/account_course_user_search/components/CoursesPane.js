@@ -20,6 +20,7 @@ import React from 'react'
 import {shape, arrayOf, string, func} from 'prop-types'
 import {debounce} from 'underscore'
 import I18n from 'i18n!account_course_user_search'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import CoursesStore from '../store/CoursesStore'
 import TermsStore from '../store/TermsStore'
 import AccountsTreeStore from '../store/AccountsTreeStore'
@@ -33,7 +34,6 @@ const stores = [CoursesStore, TermsStore, AccountsTreeStore]
 const defaultFilters = {
   enrollment_term_id: '',
   search_term: '',
-  with_students: false,
   sort: 'sis_course_id',
   order: 'asc',
   search_by: 'course',
@@ -150,6 +150,10 @@ class CoursesPane extends React.Component {
 
     return (
       <div>
+        <ScreenReaderContent>
+          <h1>{I18n.t('Courses')}</h1>
+        </ScreenReaderContent>
+
         <CoursesToolbar
           onUpdateFilters={this.onUpdateFilters}
           onApplyFilters={this.onApplyFilters}

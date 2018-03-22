@@ -149,7 +149,6 @@ describe AssignmentOverrideStudent do
   describe "clean_up_for_assignment" do
     it "if callbacks aren't run clean_up_for_assignment should delete invalid overrides" do
       adhoc_override_with_student
-      #no callbacks
       Score.where(enrollment_id: @user.enrollments).each(&:destroy_permanently!)
       @user.enrollments.each(&:destroy_permanently!)
 

@@ -31,7 +31,7 @@ $subtleBorderColor: #e5e5e5;
   }
 
   .ui-dialog-buttonset.attachments {
-    float: left;
+    float: direction(left);
 
     .ui-button {
       padding: 4px 5px;
@@ -53,7 +53,7 @@ $subtleBorderColor: #e5e5e5;
 
   .ui-dialog-buttonpane {
     box-shadow: none;
-    padding-left: 1em;
+    padding-#{direction(left)}: 1em;
     margin-top: 0;
   }
 
@@ -76,7 +76,7 @@ $subtleBorderColor: #e5e5e5;
   }
 
   .form-horizontal .controls {
-    margin-left: 100px;
+    margin-#{direction(left)}: 100px;
   }
 
   #compose-message-subject {
@@ -147,7 +147,7 @@ $subtleBorderColor: #e5e5e5;
 
   .attachment .remove_link {
     position: relative;
-    left: -9999px;
+    #{direction(left)}: -9999px;
     z-index: 1;
     text-decoration: none;
   }
@@ -163,7 +163,7 @@ $subtleBorderColor: #e5e5e5;
   }
 
   .attachment:hover .remove_link, .attachment:focus .remove_link, .remove_link:focus {
-    left: 0;
+    #{direction(left)}: 0;
   }
 
   .attachment-icon {
@@ -242,10 +242,10 @@ $subtleBorderColor: #e5e5e5;
     border-radius: 4px;
     a.browser {
       top: 4px;
-      right: 5px;
+      #{direction(right)}: 5px;
     }
     &.browsable > div {
-      padding-right: 25px;
+      padding-#{direction(right)}: 25px;
     }
     &.active {
       border-color: rgba(82, 168, 236, 0.8);
@@ -265,7 +265,7 @@ $subtleBorderColor: #e5e5e5;
       display: table-cell;
       box-sizing: border-box;
       padding: 10px 15px 10px 5px;
-      text-align: right;
+      text-align: direction(right);
       width: 1px;
       white-space: nowrap;
 
@@ -278,14 +278,16 @@ $subtleBorderColor: #e5e5e5;
       display: table-cell;
       vertical-align: middle;
 
+      #bulk_message:focus {
+        outline: 0;
+        outline-width: 2px !important;
+        @include ic-focus-base;
+        @include ic-focus-variant;
+      }
+
       input {
         box-sizing: border-box;
         height: auto;
-
-        &:focus {
-          outline: none;
-          box-shadow: 0 0 0 1px var(--ic-link-color);
-        }
       }
       input[type="text"] {
         margin: 0;
@@ -300,7 +302,7 @@ $subtleBorderColor: #e5e5e5;
     > li {
       border-top: 1px solid $subtleBorderColor;
       padding: 14px;
-      clear: right;
+      clear: direction(right);
     }
 
     .context-date, .context-body {
@@ -308,7 +310,7 @@ $subtleBorderColor: #e5e5e5;
     }
 
     .context-date {
-      margin-right: 4px;
+      margin-#{direction(right)}: 4px;
     }
 
     .context-body {
@@ -326,15 +328,15 @@ $subtleBorderColor: #e5e5e5;
 
 }
 
-::-webkit-input-placeholder { 
+::-webkit-input-placeholder {
     color: #666;
     opacity: 1;
 }
-::-moz-placeholder { 
+::-moz-placeholder {
     color: #666;
     opacity: 1;
 }
-:-ms-input-placeholder { 
+:-ms-input-placeholder {
     color: #666;
     opacity: 1;
 }

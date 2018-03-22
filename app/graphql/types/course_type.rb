@@ -1,3 +1,21 @@
+#
+# Copyright (C) 2018 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 module Types
   CourseType = GraphQL::ObjectType.define do
     name "Course"
@@ -41,9 +59,8 @@ module Types
       resolve ->(course, args, ctx) {
         if course.grants_any_right?(ctx[:current_user], ctx[:session],
             :read_roster, :view_all_grades, :manage_grades)
-          scope = UserSearch.scope_for(course, ctx[:current_user], {})
+          scope = UserSearch.scope_for(course, ctx[:current_user], include_inactive_enrollments: true)
           scope = scope.where(users: {id: args[:userIds]}) if args[:userIds].present?
-
           scope
         else
           nil
@@ -63,6 +80,7 @@ module Types
       argument :studentIds, !types[!types.ID], "Only return submissions for the given students.",
         prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User")
       argument :orderBy, types[SubmissionOrderInputType]
+      argument :filter, SubmissionFilterInputType
 
       resolve ->(course, args, ctx) {
         current_user = ctx[:current_user]
@@ -81,8 +99,9 @@ module Types
 
         submissions = Submission.active.joins(:assignment).where(
           user_id: allowed_user_ids,
-          assignment_id: course.assignments.published
-        ).where.not(workflow_state: "unsubmitted")
+          assignment_id: course.assignments.published,
+          workflow_state: (args[:filter] || {})[:states] || DEFAULT_SUBMISSION_STATES
+        )
 
         (args[:orderBy] || []).each { |order|
           submissions = submissions.order("#{order[:field]} #{order[:direction]}")

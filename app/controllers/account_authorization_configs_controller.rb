@@ -99,6 +99,11 @@
 #           "example": "nameid",
 #           "type": "string"
 #         },
+#         "sig_alg": {
+#           "description": "Valid for SAML providers.",
+#           "example": "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
+#           "type": "string"
+#         },
 #         "jit_provisioning": {
 #           "description": "Just In Time provisioning. Valid for all providers except Canvas (which has the similar in concept self_registration setting).",
 #           "type": "boolean"
@@ -378,7 +383,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   # - auth_over_tls [Optional]
   #
-  #   Whether to use TLS. Can be '', 'simple_tls', or 'start_tls'. For backwards
+  #   Whether to use TLS. Can be 'simple_tls', or 'start_tls'. For backwards
   #   compatibility, booleans are also accepted, with true meaning simple_tls.
   #   If not provided, it will default to start_tls.
   #
@@ -558,6 +563,16 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   #   The SAML AuthnContext
   #
+  # - sig_alg [Optional]
+  #
+  #   If set, +AuthnRequest+, +LogoutRequest+, and +LogoutResponse+ messages
+  #   are signed with the corresponding algorithm. Supported algorithms are:
+  #
+  #   - {http://www.w3.org/2000/09/xmldsig#rsa-sha1}
+  #   - {http://www.w3.org/2001/04/xmldsig-more#rsa-sha256}
+  #
+  #   RSA-SHA1 and RSA-SHA256 are acceptable aliases.
+  #
   # - federated_attributes [Optional]
   #
   #   See FederatedAttributesConfig. Any value is allowed for the provider attribute names.
@@ -700,7 +715,7 @@ class AccountAuthorizationConfigsController < ApplicationController
           flash[:error] = aac.errors.full_messages
           redirect_to(account_authentication_providers_path(@account))
         end
-        format.json { raise ActiveRecord::RecordInvalid.new(account_config) }
+        format.json { raise ActiveRecord::RecordInvalid.new(aac) }
       end
       return
     end

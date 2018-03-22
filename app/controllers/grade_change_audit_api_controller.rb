@@ -263,7 +263,7 @@ class GradeChangeAuditApiController < AuditorApiController
   end
 
   def course_authorized?(course)
-    course.grants_right?(@current_user, session, :manage_grades)
+    course.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
   end
 
   def render_events(events, route, course: nil)

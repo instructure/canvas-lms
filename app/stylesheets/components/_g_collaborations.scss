@@ -26,11 +26,11 @@ $highlight-blue: #00b5fe;
   margin-bottom: 14px;
 
   h1, .h1 {
-    float: left;
+    float: direction(left);
     margin: 0;
   }
   .add_collaboration_link {
-    float: right;
+    float: direction(right);
   }
 }
 
@@ -46,7 +46,7 @@ $highlight-blue: #00b5fe;
 
   .collaboration-header {
     h2, .h2 {
-      float: left;
+      float: direction(left);
       font-family: arial, sans-serif;
       font-size: 1.2em;
       line-height: inherit;
@@ -55,7 +55,7 @@ $highlight-blue: #00b5fe;
     }
 
     .links {
-      float: right;
+      float: direction(right);
       line-height: 0.8em;
     }
   }
@@ -91,7 +91,7 @@ $highlight-blue: #00b5fe;
 
 .collaborator-picker {
   .list-wrapper {
-    float: left;
+    float: direction(left);
     height: 300px;
     overflow-y: scroll;
     width: 50%;
@@ -103,7 +103,7 @@ $highlight-blue: #00b5fe;
     .icon-end, .icon-add {
       display: none;
       position: absolute;
-      right: 5px;
+      #{direction(right)}: 5px;
       top: 4px;
     }
 
@@ -131,7 +131,7 @@ $highlight-blue: #00b5fe;
 
   .filters {
     display: inline-block;
-    padding-right: 5px;
+    padding-#{direction(right)}: 5px;
   }
 
   .radio-group-outline {

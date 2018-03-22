@@ -18,10 +18,9 @@
 define [
   'Backbone'
   'underscore'
-  'i18n!overrides'
   '../models/AssignmentOverride'
   '../models/Section'
-], ({Model}, _, I18n, AssignmentOverride, Section) ->
+], ({Model}, _, AssignmentOverride, Section) ->
 
   class DueDateList
 

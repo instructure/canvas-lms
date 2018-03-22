@@ -96,14 +96,14 @@ li[id$=service_google_docs] {
   }
 
   .service a {
-    text-align: left;
+    text-align: direction(left);
   }
 }
 
 .profile_pic_link {
   position: relative;
-  float: left;
-  margin-right: 5px;
+  float: direction(left);
+  margin-#{direction(right)}: 5px;
 
   .icon-edit {
     background: rgba(0, 0, 0, .75);
@@ -111,7 +111,7 @@ li[id$=service_google_docs] {
     color: #fff;
     padding: 2px;
     position: absolute;
-    right: 0;
+    #{direction(right)}: 0;
     visibility: hidden;
   }
 
@@ -124,7 +124,7 @@ li[id$=service_google_docs] {
   .img {
     cursor: pointer;
     display: inline-block;
-    float: left;
+    float: direction(left);
     margin: 2px;
     overflow: hidden;
     padding: 4px;

@@ -30,7 +30,7 @@
 .ag-header-controls {
   position: absolute;
   top: 0;
-  right: 0;
+  #{direction(right)}: 0;
 }
 
 .loadingIndicator {
@@ -38,7 +38,7 @@
 }
 
 .group_select {
-  margin-left: 20px;
+  margin-#{direction(left)}: 20px;
 }
 
 #ag_weights_wrapper {
@@ -52,7 +52,7 @@
     padding: 10px 0px;
   }
   td.right-align {
-    text-align: right;
+    text-align: direction(right);
   }
   tfoot td {
     font-weight: bold;
@@ -137,7 +137,7 @@
 .show-by-label {
   // to match what we add to non-wrapped labels in bootstrap overrides
   vertical-align: -4px;
-  margin-right: 5px;
+  margin-#{direction(right)}: 5px;
 }
 
 .sortable-handle, .draggable-handle {
@@ -200,7 +200,7 @@
 }
 
 .row-fluid span.grade-display {
-  margin-left: 9%;
+  margin-#{direction(left)}: 9%;
 }
 
 .accessible-toggler {
@@ -222,9 +222,9 @@
 
 .new_quiz_lti_wrapper {
   display: inline-block;
-  margin-right: 6px;
-  padding-right: 10px;
-  border-right: 1px solid $ic-color-medium-lighter;
+  margin-#{direction(right)}: 6px;
+  padding-#{direction(right)}: 10px;
+  border-#{direction(right)}: 1px solid $ic-color-medium-lighter;
 }
 
 /* support for master class locked input fields */

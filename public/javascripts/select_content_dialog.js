@@ -24,7 +24,7 @@ import ReactDOM from 'react-dom'
 import FileSelectBox from 'jsx/context_modules/FileSelectBox'
 import _ from 'underscore'
 import htmlEscape from 'str/htmlEscape'
-import uploadFile from 'jsx/shared/upload_file'
+import { uploadFile } from 'jsx/shared/upload_file'
 import iframeAllowances from 'jsx/external_apps/lib/iframeAllowances'
 import './jquery.instructure_date_and_time' /* datetime_field */
 import './jquery.ajaxJSON'
@@ -402,8 +402,8 @@ import './jquery.templateData'
                 on_duplicate: 'rename',
                 no_redirect: true
               };
-              uploadFile(url, data, file).then(function(response) {
-                callback(response.data)
+              uploadFile(url, data, file).then(function(attachment) {
+                callback(attachment)
               }).catch(function(response) {
                 $("#select_context_content_dialog").loadingImage('remove');
                 $("#select_context_content_dialog").errorBox(I18n.t('errors.failed_to_create_item', 'Failed to Create new Item'));

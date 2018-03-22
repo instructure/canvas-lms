@@ -50,7 +50,7 @@
         @include firefox-white-space-bug-fix-gradient($gradient-color);
         content: "";
         position: absolute;
-        right: 0; top: 0;
+        #{direction(right)}: 0; top: 0;
         height: $baseLineHeight; width: $ic-sp*2.5;
         z-index: 1;
       }

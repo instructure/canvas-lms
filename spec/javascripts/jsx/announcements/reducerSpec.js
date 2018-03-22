@@ -188,11 +188,18 @@ test('SET_ANNOUNCEMENT_SELECTION with selected: false should should do nothing i
   deepEqual(newState.selectedAnnouncements, [2, 3])
 })
 
-test('CLEAR_ANNOUNCEMENT_SELECTIONS should reset selectedAnnouncements', () => {
-  const newState = reduce(actions.clearAnnouncementSelections(), {
+test('ANNOUNCEMENT_SELECTION_CHANGE_START with selected: false should should do nothing if id not in selectedAnnouncements', () => {
+  const newState = reduce(actions.announcementSelectionChangeStart({ selected: false, id: 5 }), {
     selectedAnnouncements: [2, 3],
   })
-  deepEqual(newState.selectedAnnouncements, [])
+  deepEqual(newState.selectedAnnouncements, [2, 3])
+})
+
+test('SET_ANNOUNCEMENTS_IS_LOCKING should properly set when changed to true', () => {
+  const newState = reduce(actions.setAnnouncementsIsLocking(true), {
+    isToggleLocking: false,
+  })
+  deepEqual(newState.isToggleLocking, true)
 })
 
 test('DELETE_ANNOUNCEMENTS_SUCCESS should reset selectedAnnouncements', () => {

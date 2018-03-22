@@ -58,10 +58,11 @@ describe 'Student reports' do
       :active_all => true, :account => @account, :name => 'Rick Astley',
       :sortable_name => 'Astley, Rick', :username => 'rick@roll.com',
       :sis_user_id => 'user_sis_id_03')
-    @e1 = @course1.enroll_user(@user1, 'StudentEnrollment', {enrollment_state: 'active'})
-    @e2 = @course2.enroll_user(@user2, 'StudentEnrollment', {enrollment_state: 'active'})
-    @e3 = @course2.enroll_user(@user1, 'StudentEnrollment', {enrollment_state: 'active'})
-    @e4 = @course1.enroll_user(@user2, 'StudentEnrollment', {enrollment_state: 'active'})
+
+    enrollment_params = {enrollment_state: 'active', type: 'StudentEnrollment'}
+    @e_u1_c1, @e_u2_c1 = Enrollment.find(create_enrollments(@course1, [@user1, @user2], enrollment_params))
+    @e_u1_c2, @e_u2_c2 = Enrollment.find(create_enrollments(@course2, [@user1, @user2], enrollment_params))
+
     @section1 = @course1.course_sections.first
     @section2 = @course2.course_sections.first
     @section3 = @course3.course_sections.first
@@ -93,10 +94,10 @@ describe 'Student reports' do
     end
 
     it 'should find users that with no submissions after a date in all states' do
-      Enrollment.where(id: @e1).update_all(workflow_state: 'completed')
-      Enrollment.where(id: @e2).update_all(workflow_state: 'deleted')
-      Enrollment.where(id: @e3).update_all(workflow_state: 'invited')
-      Enrollment.where(id: @e4).update_all(workflow_state: 'rejected')
+      Enrollment.where(id: @e_u1_c1).update_all(workflow_state: 'completed')
+      Enrollment.where(id: @e_u2_c2).update_all(workflow_state: 'deleted')
+      Enrollment.where(id: @e_u1_c2).update_all(workflow_state: 'invited')
+      Enrollment.where(id: @e_u2_c1).update_all(workflow_state: 'rejected')
       parameters = {}
       parameters['start_at'] = @start_at2
       parameters['include_enrollment_state'] = true
@@ -125,9 +126,9 @@ describe 'Student reports' do
     end
 
     it 'should filter on enrollment states' do
-      Enrollment.where(id: @e1).update_all(workflow_state: 'completed')
-      Enrollment.where(id: @e2).update_all(workflow_state: 'deleted')
-      Enrollment.where(id: @e3).update_all(workflow_state: 'invited')
+      Enrollment.where(id: @e_u1_c1).update_all(workflow_state: 'completed')
+      Enrollment.where(id: @e_u2_c2).update_all(workflow_state: 'deleted')
+      Enrollment.where(id: @e_u1_c2).update_all(workflow_state: 'invited')
       parameters = {}
       parameters['start_at'] = @start_at2
       parameters['include_enrollment_state'] = true
@@ -147,9 +148,9 @@ describe 'Student reports' do
     end
 
     it 'should filter on enrollment state' do
-      Enrollment.where(id: @e1).update_all(workflow_state: 'completed')
-      Enrollment.where(id: @e2).update_all(workflow_state: 'deleted')
-      Enrollment.where(id: @e3).update_all(workflow_state: 'invited')
+      Enrollment.where(id: @e_u1_c1).update_all(workflow_state: 'completed')
+      Enrollment.where(id: @e_u2_c2).update_all(workflow_state: 'deleted')
+      Enrollment.where(id: @e_u1_c2).update_all(workflow_state: 'invited')
       parameters = {}
       parameters['start_at'] = @start_at2
       parameters['include_enrollment_state'] = true
@@ -267,122 +268,104 @@ describe 'Student reports' do
     before(:once) do
       @type = 'zero_activity_csv'
 
-      @course1.enroll_user(@user3, 'StudentEnrollment', {:enrollment_state => 'active'})
+      @course1.enroll_user(@user3, 'StudentEnrollment', {enrollment_state: 'active'})
       @course3.enroll_user(@user3, 'StudentEnrollment', {:enrollment_state => 'active'})
 
-      @asset1 = factory_with_protected_attributes(
-        AssetUserAccess, :user => @user1, :context => @course1,
-        :asset_code => @assignment1.asset_string
-      )
-      @asset2 = factory_with_protected_attributes(
-        AssetUserAccess, :user => @user2, :context => @course2,
-        :asset_code => @assignment2.asset_string
-      )
-      @asset3 = factory_with_protected_attributes(
-        AssetUserAccess, :user => @user3, :context => @course3,
-        :asset_code => @assignment3.asset_string
-      )
-      @asset4 = factory_with_protected_attributes(
-        AssetUserAccess, :user => @user3, :context => @course3,
-        :asset_code => @assignment4.asset_string
-      )
+      @user4 = user_with_managed_pseudonym(name: 'User 4', account: @account, sis_user_id: 'user_sis_id_04')
+      @user5 = user_with_managed_pseudonym(name: 'User 5', account: @account, sis_user_id: 'user_sis_id_05')
+      @course4 = course_factory(course_name: 'Course 4', account: @account, active_course: true)
+      @section4 = @course4.default_section
+      create_enrollments(@course4, [@user4, @user5], {enrollment_state: 'active', type: 'StudentEnrollment'})
+
+      [[@user1, @course1], [@user2, @course2], [@user3, @course3], [@user5, @course4]].each do |user, course|
+        user.enrollments.where(course_id: course).update_all(last_activity_at: Time.now.utc)
+      end
+
+      @term1 = EnrollmentTerm.create(:name => 'Fall')
+      @term1.root_account = @account
+      @term1.sis_source_id = 'fall12'
+      @term1.save!
+
+      @course4.enrollment_term = @term1
+      @course4.save
     end
 
     it 'should run the zero activity report for course' do
       param = {}
       param['course'] = @course1.id
       parsed = read_report(@type, {params: param, order: 1})
-      expect(parsed.length).to eq 2
-      expect(parsed[0]).to eq [@user2.id.to_s, 'user_sis_id_02',
-                           'Bolton, Michael', @section1.id.to_s,
-                           @section1.sis_source_id, @section1.name,
-                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
-      expect(parsed[1]).to eq [@user3.id.to_s, 'user_sis_id_03',
-                           @user3.sortable_name, @section1.id.to_s,
-                           @section1.sis_source_id, @section1.name,
-                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
+      expect(parsed).to eq_stringified_array [
+        [@user2.id, 'user_sis_id_02', 'Bolton, Michael', @section1.id, @section1.sis_source_id,
+         @section1.name, @course1.id, 'SIS_COURSE_ID_1', 'English 101'],
+        [@user3.id, 'user_sis_id_03', @user3.sortable_name, @section1.id, @section1.sis_source_id,
+         @section1.name, @course1.id, 'SIS_COURSE_ID_1', 'English 101']
+      ]
     end
 
     it 'should run the zero activity report for term' do
-      @term1 = EnrollmentTerm.create(:name => 'Fall')
-      @term1.root_account = @account
-      @term1.sis_source_id = 'fall12'
-      @term1.save!
       @course1.enrollment_term = @term1
       @course1.save
       param = {}
       param['enrollment_term'] = 'sis_term_id:fall12'
       parsed = read_report(@type, {params: param, order: 1})
-      expect(parsed.length).to eq 2
-      expect(parsed[0]).to eq [@user2.id.to_s, 'user_sis_id_02',
-                           'Bolton, Michael', @section1.id.to_s,
-                           @section1.sis_source_id, @section1.name,
-                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
-      expect(parsed[1]).to eq [@user3.id.to_s, 'user_sis_id_03',
-                           @user3.sortable_name, @section1.id.to_s,
-                           @section1.sis_source_id, @section1.name,
-                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
+      expect(parsed).to eq_stringified_array [
+        [@user2.id, 'user_sis_id_02', 'Bolton, Michael', @section1.id, @section1.sis_source_id,
+         @section1.name, @course1.id, 'SIS_COURSE_ID_1', 'English 101'],
+        [@user3.id, 'user_sis_id_03', @user3.sortable_name, @section1.id, @section1.sis_source_id,
+         @section1.name, @course1.id, 'SIS_COURSE_ID_1', 'English 101'],
+        [@user4.id, 'user_sis_id_04', '4, User', @section4.id, nil,
+         @section4.name, @course4.id, nil, 'Course 4']
+      ]
     end
 
     it 'should run the zero activity report with no params' do
       report = run_report
-      expect(report.parameters["extra_text"]).to eq  "Term: All Terms;"
+      expect(report.parameters["extra_text"]).to eq "Term: All Terms;"
       parsed = parse_report(report, {order: 1})
 
-      expect(parsed.length).to eq 3
-
-      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01',
-                           @user1.sortable_name, @section2.id.to_s,
-                           @section2.sis_source_id, @section2.name,
-                           @course2.id.to_s, nil, 'Math 101']
-      expect(parsed[1]).to eq [@user2.id.to_s, 'user_sis_id_02',
-                           'Bolton, Michael', @section1.id.to_s,
-                           @section1.sis_source_id, @section1.name,
-                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
-      expect(parsed[2]).to eq [@user3.id.to_s, 'user_sis_id_03',
-                           @user3.sortable_name, @section1.id.to_s,
-                           @section1.sis_source_id, @section1.name,
-                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
+      expect(parsed).to eq_stringified_array [
+        [@user1.id, 'user_sis_id_01', @user1.sortable_name, @section2.id, @section2.sis_source_id,
+         @section2.name, @course2.id, nil, 'Math 101'],
+        [@user2.id, 'user_sis_id_02', 'Bolton, Michael', @section1.id, @section1.sis_source_id,
+         @section1.name, @course1.id, 'SIS_COURSE_ID_1', 'English 101'],
+        [@user3.id, 'user_sis_id_03', @user3.sortable_name, @section1.id, @section1.sis_source_id,
+         @section1.name, @course1.id, 'SIS_COURSE_ID_1', 'English 101'],
+        [@user4.id, 'user_sis_id_04', '4, User', @course4.default_section.id, nil,
+         @course4.default_section.name, @course4.id, nil, 'Course 4']
+      ]
     end
 
     it 'should run zero activity report on a sub account' do
-      sub_account = Account.create(:parent_account => @account,:name => 'Math')
+      sub_account = Account.create(parent_account: @account, name: 'Math')
       @course2.account = sub_account
       @course2.save!
 
       parsed = read_report(@type, {account: sub_account})
-      expect(parsed.length).to eq 1
-      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01',
-                           @user1.sortable_name, @section2.id.to_s,
-                           @section2.sis_source_id, @section2.name,
-                           @course2.id.to_s, nil, 'Math 101']
+      expect(parsed).to eq_stringified_array [
+        [@user1.id, 'user_sis_id_01', @user1.sortable_name, @section2.id, @section2.sis_source_id,
+         @section2.name, @course2.id, nil, 'Math 101']
+      ]
     end
 
     it 'should ignore everything before the start date' do
-      AssetUserAccess.where(:id => @asset1).
-        update_all(:updated_at => 6.days.ago)
+      @user1.enrollments.where(course_id: @course1).update_all(last_activity_at: 6.days.ago)
       parameter = {}
       parameter['start_at'] = 3.days.ago
       report = run_report(@type, {params: parameter})
-      expect(report.parameters["extra_text"].include? "Start At:").to eq true
+      expect(report.parameters["extra_text"].include?("Start At:")).to eq true
       parsed = parse_report(report, {order: [1,5]})
-      expect(parsed.length).to eq 4
-      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01',
-                           @user1.sortable_name, @section1.id.to_s,
-                           @section1.sis_source_id, @section1.name,
-                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
-      expect(parsed[1]).to eq [@user1.id.to_s, 'user_sis_id_01',
-                           @user1.sortable_name, @section2.id.to_s,
-                           @section2.sis_source_id, @section2.name,
-                           @course2.id.to_s, nil, 'Math 101']
-      expect(parsed[2]).to eq [@user2.id.to_s, 'user_sis_id_02',
-                           'Bolton, Michael', @section1.id.to_s,
-                           @section1.sis_source_id, @section1.name,
-                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
-      expect(parsed[3]).to eq [@user3.id.to_s, 'user_sis_id_03',
-                           @user3.sortable_name, @section1.id.to_s,
-                           @section1.sis_source_id, @section1.name,
-                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
+      expect(parsed).to eq_stringified_array [
+        [@user1.id, 'user_sis_id_01', @user1.sortable_name, @section1.id, @section1.sis_source_id,
+         @section1.name, @course1.id, 'SIS_COURSE_ID_1', 'English 101'],
+        [@user1.id, 'user_sis_id_01', @user1.sortable_name, @section2.id, @section2.sis_source_id,
+         @section2.name, @course2.id, nil, 'Math 101'],
+        [@user2.id, 'user_sis_id_02', 'Bolton, Michael', @section1.id, @section1.sis_source_id,
+         @section1.name, @course1.id, 'SIS_COURSE_ID_1', 'English 101'],
+        [@user3.id, 'user_sis_id_03', @user3.sortable_name, @section1.id, @section1.sis_source_id,
+         @section1.name, @course1.id, 'SIS_COURSE_ID_1', 'English 101'],
+        [@user4.id, 'user_sis_id_04', '4, User', @course4.default_section.id, nil,
+         'Course 4', @course4.id, nil, 'Course 4']
+      ]
     end
   end
 
@@ -407,14 +390,15 @@ describe 'Student reports' do
 
     it 'should run the last user access report' do
       parsed = read_report(@type, {order: 1})
-      expect(parsed.length).to eq 3
-      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip]
-      expect(parsed[1]).to eq [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip]
-      expect(parsed[2]).to eq [@user3.id.to_s, 'user_sis_id_03', 'Astley, Rick', @last_login_time2.iso8601, @p3.current_login_ip]
+      expect(parsed).to eq_stringified_array [
+        [@user1.id, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip],
+        [@user2.id, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip],
+        [@user3.id, 'user_sis_id_03', 'Astley, Rick', @last_login_time2.iso8601, @p3.current_login_ip]
+      ]
     end
 
     it 'should run the last user access report for a term' do
-      @term1 = EnrollmentTerm.create(:name => 'Fall')
+      @term1 = EnrollmentTerm.create(name: 'Fall')
       @term1.root_account = @account
       @term1.save!
       @course1.enrollment_term = @term1
@@ -422,18 +406,20 @@ describe 'Student reports' do
       param = {}
       param['enrollment_term'] = @term1.id
       parsed = read_report(@type, {params: param, order: 1})
-      expect(parsed.length).to eq 2
-      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip]
-      expect(parsed[1]).to eq [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip]
+      expect(parsed).to eq_stringified_array [
+        [@user1.id, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip],
+        [@user2.id, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip]
+      ]
     end
 
     it 'should run the last user access report for a course' do
       param = {}
       param['course'] = @course.id
       parsed = read_report(@type, {params: param, order: 1})
-      expect(parsed.length).to eq 2
-      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip]
-      expect(parsed[1]).to eq [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip]
+      expect(parsed).to eq_stringified_array [
+        [@user1.id, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip],
+        [@user2.id, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip]
+      ]
     end
 
     it 'should not include a user multiple times for multiple enrollments' do
@@ -447,11 +433,10 @@ describe 'Student reports' do
       param['enrollment_term'] = term1.id
 
       parsed = read_report(@type, {params: param, order: 1})
-      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.',
-                           @last_login_time2.iso8601, @p1.current_login_ip]
-      expect(parsed[1]).to eq [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael',
-                           @last_login_time.iso8601, @p2.current_login_ip]
-      expect(parsed.length).to eq 2
+      expect(parsed).to eq_stringified_array [
+        [@user1.id, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip],
+        [@user2.id, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip]
+      ]
     end
 
     it 'should include each pseudonym for users' do
@@ -473,13 +458,11 @@ describe 'Student reports' do
       report = run_report(@type, {params: param})
       expect(report.parameters["extra_text"]).to eq "Term: Fall;"
       parsed = parse_report(report, {order: 1})
-      expect(parsed[0]).to eq [@user1.id.to_s, 'secondSIS', 'Clair, John St.',
-                               @last_login_time.iso8601, p1b.current_login_ip]
-      expect(parsed[1]).to eq [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.',
-                               @last_login_time2.iso8601, @p1.current_login_ip]
-      expect(parsed[2]).to eq [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael',
-                               @last_login_time.iso8601, @p2.current_login_ip]
-      expect(parsed.length).to eq 3
+      expect(parsed).to eq_stringified_array [
+        [@user1.id, 'secondSIS', 'Clair, John St.', @last_login_time.iso8601, p1b.current_login_ip],
+        [@user1.id, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip],
+        [@user2.id, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip]
+      ]
     end
 
     it 'should not include a user with a deleted enrollment' do
@@ -488,11 +471,10 @@ describe 'Student reports' do
       param['course'] = @course2.id
       param['include_deleted'] = false
       parsed = read_report(@type, {params: param, order: 1})
-      expect(parsed.length).to eq 2
-      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.',
-                               @last_login_time2.iso8601, @p1.current_login_ip]
-      expect(parsed[1]).to eq [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael',
-                               @last_login_time.iso8601, @p2.current_login_ip]
+      expect(parsed).to eq_stringified_array [
+        [@user1.id, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip],
+        [@user2.id, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip]
+      ]
     end
 
     it 'should include a user with a deleted enrollment' do
@@ -501,13 +483,11 @@ describe 'Student reports' do
       param['course'] = @course2.id
       param['include_deleted'] = true
       parsed = read_report(@type, {params: param, order: 1})
-      expect(parsed.length).to eq 3
-      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.',
-                               @last_login_time2.iso8601, @p1.current_login_ip]
-      expect(parsed[1]).to eq [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael',
-                               @last_login_time.iso8601, @p2.current_login_ip]
-      expect(parsed[2]).to eq [@user3.id.to_s, 'user_sis_id_03', 'Astley, Rick',
-                               @last_login_time2.iso8601, @p3.current_login_ip]
+      expect(parsed).to eq_stringified_array [
+        [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip],
+        [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip],
+        [@user3.id.to_s, 'user_sis_id_03', 'Astley, Rick', @last_login_time2.iso8601, @p3.current_login_ip]
+      ]
     end
   end
 
@@ -517,51 +497,51 @@ describe 'Student reports' do
       @later_activity = 1.week.ago
       @earlier_activity = 8.days.ago
       # user 1
-      @e1.last_activity_at = @later_activity
-      @e3.last_activity_at = @earlier_activity
+      @e_u1_c1.last_activity_at = @later_activity
+      @e_u1_c2.last_activity_at = @earlier_activity
       # user 2
-      @e2.last_activity_at = @later_activity
-      @e4.last_activity_at = @earlier_activity
-      [@e1,@e2,@e3,@e4].each(&:save!)
+      @e_u2_c2.last_activity_at = @later_activity
+      @e_u2_c1.last_activity_at = @earlier_activity
+      [@e_u1_c1, @e_u2_c2, @e_u1_c2, @e_u2_c1].each(&:save!)
     end
 
     it 'should show the lastest activity for each user' do
       report = run_report(@type)
       parsed = parse_report(report, {order: 1})
 
-      expect(parsed[0]).to eq [@user2.id.to_s, 'Bolton, Michael', @later_activity.iso8601]
-      expect(parsed[1]).to eq [@user1.id.to_s,'Clair, John St.', @later_activity.iso8601]
-      expect(parsed.length).to eq 2
+      expect(parsed).to eq_stringified_array [
+        [@user2.id.to_s, 'Bolton, Michael', @later_activity.iso8601],
+        [@user1.id.to_s,'Clair, John St.', @later_activity.iso8601]
+      ]
     end
 
     it 'does not include a user who has no enrollment activity' do
-      @e1.last_activity_at = nil
-      @e3.last_activity_at = nil
-      @e1.save!
-      @e3.save!
+      @e_u1_c1.last_activity_at = nil
+      @e_u1_c2.last_activity_at = nil
+      @e_u1_c1.save!
+      @e_u1_c2.save!
 
       report = run_report(@type)
       parsed = parse_report(report, { order: 1 })
 
-      expect(parsed[0]).to eq [@user2.id.to_s, 'Bolton, Michael', @later_activity.iso8601]
-      expect(parsed.length).to eq 1
+      expect(parsed).to eq_stringified_array [[@user2.id.to_s, 'Bolton, Michael', @later_activity.iso8601]]
     end
 
     it 'should scope by course if param given' do
-      # course1 is e1 and e4
       parameters = {}
       parameters['course'] = @course1.id
       report = run_report(@type, {params: parameters})
       parsed = parse_report(report, {order: 1})
 
       # Bolton will show earlier time if restricted to course 1
-      expect(parsed[1]).to eq [@user1.id.to_s,'Clair, John St.', @later_activity.iso8601]
-      expect(parsed[0]).to eq [@user2.id.to_s, 'Bolton, Michael', @earlier_activity.iso8601]
-      expect(parsed.length).to eq 2
+      expect(parsed).to eq_stringified_array [
+        [@user2.id.to_s, 'Bolton, Michael', @earlier_activity.iso8601],
+        [@user1.id.to_s,'Clair, John St.', @later_activity.iso8601]
+      ]
     end
 
     it 'should scope by term if param given' do
-      @term1 = @account.enrollment_terms.create(:name => 'Fall')
+      @term1 = @account.enrollment_terms.create(name: 'Fall')
       @term1.save!
       @course1.enrollment_term = @term1
       @course1.save
@@ -572,23 +552,24 @@ describe 'Student reports' do
       parsed = parse_report(report, {order: 1})
 
       # Bolton will show earlier time if restricted to course 1 (via term restriction)
-      expect(parsed[1]).to eq [@user1.id.to_s,'Clair, John St.', @later_activity.iso8601]
-      expect(parsed[0]).to eq [@user2.id.to_s, 'Bolton, Michael', @earlier_activity.iso8601]
-      expect(parsed.length).to eq 2
+      expect(parsed).to eq_stringified_array [
+        [@user2.id.to_s, 'Bolton, Michael', @earlier_activity.iso8601],
+        [@user1.id.to_s,'Clair, John St.', @later_activity.iso8601]
+      ]
     end
 
     it 'should show data for users in other accounts with enrollments on this account' do
       @different_account = Account.create(name: 'New Account', default_time_zone: 'UTC')
 
-      @course3 = course_factory(:course_name => 'English 101', :account => @account, :active_course => true)
+      @course3 = course_factory(course_name: 'English 101', account: @account, active_course: true)
       @course3.save!
       @course3.offer
 
       @different_account_user = user_with_managed_pseudonym(
-        :active_all => true, :account => @different_account, :name => 'Diego Renault',
-        :sortable_name => 'Renault, Diego', :username => 'diegor@diff_account.com')
+        active_all: true, account: @different_account, name: 'Diego Renault',
+        sortable_name: 'Renault, Diego', username: 'diegor@diff_account.com')
 
-      e3 = @course3.enroll_user(@different_account_user, 'StudentEnrollment', {:enrollment_state => 'active'})
+      e3 = @course3.enroll_user(@different_account_user, 'StudentEnrollment', {enrollment_state: 'active'})
       @very_recent_acivity = 1.minute.ago
       e3.last_activity_at = @very_recent_acivity
       e3.save!
@@ -596,10 +577,11 @@ describe 'Student reports' do
       report = run_report(@type, account: @account)
       parsed = parse_report(report, {order: 1})
 
-      expect(parsed[0]).to eq [@user2.id.to_s, 'Bolton, Michael', @later_activity.iso8601]
-      expect(parsed[1]).to eq [@user1.id.to_s,'Clair, John St.', @later_activity.iso8601]
-      expect(parsed[2]).to eq [@different_account_user.id.to_s,'Renault, Diego', @very_recent_acivity.iso8601]
-      expect(parsed.length).to eq 3
+      expect(parsed).to eq_stringified_array [
+        [@user2.id.to_s, 'Bolton, Michael', @later_activity.iso8601],
+        [@user1.id.to_s,'Clair, John St.', @later_activity.iso8601],
+        [@different_account_user.id.to_s,'Renault, Diego', @very_recent_acivity.iso8601]
+      ]
     end
   end
 
@@ -607,59 +589,37 @@ describe 'Student reports' do
     before(:once) do
       @type = 'user_access_tokens_csv'
       @at1 = AccessToken.create!(
-        :user => @user1,
-        :developer_key => DeveloperKey.default,
-        :expires_at => 2.hours.ago
+        user: @user1,
+        developer_key: DeveloperKey.default,
+        expires_at: 2.hours.ago
       )
       @user1.destroy
 
       @at2 = AccessToken.create!(
-        :user => @user2,
-        :developer_key => DeveloperKey.default,
-        :expires_at => 2.hours.from_now
+        user: @user2,
+        developer_key: DeveloperKey.default,
+        expires_at: 2.hours.from_now
       )
 
       @at2.update_attribute(:last_used_at, 2.hours.ago)
 
       @at3 = AccessToken.create!(
-        :user => @user3,
-        :developer_key => DeveloperKey.default,
-        :expires_at => nil
+        user: @user3,
+        developer_key: DeveloperKey.default,
+        expires_at: nil
       )
     end
 
     it 'should run and include deleted users' do
       parsed = read_report(@type, {params: {"include_deleted" => true}, order: 1})
-      expect(parsed.length).to eq 3
-      expect(parsed[0]).to eq([
-        @user3.id.to_s,
-        "Astley, Rick",
-        @at3.token_hint.gsub(/.+~/, ''),
-        'never',
-        'never',
-        DeveloperKey.default.id.to_s,
-        "User-Generated"
-      ])
-
-      expect(parsed[1]).to eq([
-        @user2.id.to_s,
-        "Bolton, Michael",
-        @at2.token_hint.gsub(/.+~/, ''),
-        @at2.expires_at.iso8601,
-        @at2.last_used_at.iso8601,
-        DeveloperKey.default.id.to_s,
-        "User-Generated"
-      ])
-
-      expect(parsed[2]).to eq([
-        @user1.id.to_s,
-        "Clair, John St.",
-        @at1.token_hint.gsub(/.+~/, ''),
-        @at1.expires_at.iso8601,
-        'never',
-        DeveloperKey.default.id.to_s,
-        "User-Generated"
-      ])
+      expect(parsed).to eq_stringified_array [
+        [@user3.id, "Astley, Rick", @at3.token_hint.gsub(/.+~/, ''), 'never',
+         'never', DeveloperKey.default.id, "User-Generated"],
+        [@user2.id, "Bolton, Michael", @at2.token_hint.gsub(/.+~/, ''), @at2.expires_at.iso8601,
+         @at2.last_used_at.iso8601, DeveloperKey.default.id, "User-Generated"],
+        [@user1.id, "Clair, John St.", @at1.token_hint.gsub(/.+~/, ''), @at1.expires_at.iso8601,
+         'never', DeveloperKey.default.id, "User-Generated"]
+      ]
     end
 
     it 'should run and exclude deleted users' do

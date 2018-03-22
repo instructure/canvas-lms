@@ -20,8 +20,6 @@ import tz from 'timezone'
 import React from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
-import I18n from 'i18n!external_tools'
-import _ from 'underscore'
 import GradingPeriodTemplate from '../grading/gradingPeriodTemplate'
 import DateHelper from '../shared/helpers/dateHelper'
   var Types = PropTypes;

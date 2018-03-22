@@ -79,7 +79,7 @@ describe "Canvas Cartridge importing" do
 
     @migration.migration_ids_to_import = {
       :copy => {
-        'assignments' => {42 => true},
+        'assignments' => {42 => true, CC::CCHelper.create_key(a) => true},
         'assignment_groups' => {
           CC::CCHelper.create_key(ag1) => true,
           CC::CCHelper.create_key(ag2) => true,
@@ -113,8 +113,8 @@ describe "Canvas Cartridge importing" do
     #import assignment
     hash = {:migration_id=>CC::CCHelper.create_key(a),
             :title=>a.title,
-            :assignment_group_migration_id=>CC::CCHelper.create_key(ag2)}
-    Importers::AssignmentImporter.import_from_migration(hash, @copy_to, @migration)
+            :assignment_group_migration_id=>CC::CCHelper.create_key(ag2)}.with_indifferent_access
+    Importers::AssignmentImporter.process_migration({'assignments' => [hash]}, @migration)
 
     ag2_2.reload
     expect(ag2_2.assignments.count).to eq 1

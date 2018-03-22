@@ -200,6 +200,20 @@ table.sis_csv th {
   background-color: #DDD;
 }
 
+table.outcomes_csv {
+  border: 2px solid gray;
+  border-collapse: collapse;
+}
+table.outcomes_csv th, table.outcomes_csv td {
+  padding: 4px;
+  border: 1px inset gray;
+  border-spacing: 1px;
+}
+table.outcomes_csv th {
+  color: #333;
+  background-color: #DDD;
+}
+
 table.tool {
   border: 1px solid gray;
   border-collapse: collapse;

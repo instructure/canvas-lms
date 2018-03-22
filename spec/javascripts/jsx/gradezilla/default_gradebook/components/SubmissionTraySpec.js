@@ -106,7 +106,8 @@ QUnit.module('SubmissionTray', function (hooks) {
       submissionComments: [],
       isInOtherGradingPeriod: false,
       isInClosedGradingPeriod: false,
-      isInNoGradingPeriod: false
+      isInNoGradingPeriod: false,
+      isNotCountedForScore: false
     };
     wrapper = mount(<SubmissionTray {...defaultProps} {...props} />);
     clock.tick(50); // wait for Tray to transition open
@@ -193,7 +194,7 @@ QUnit.module('SubmissionTray', function (hooks) {
   });
 
   test('shows SpeedGrader link if enabled', function () {
-    const speedGraderUrl = '/courses/1/gradebook/speed_grader?assignment_id=30#%7B%22student_id%22%3A27%7D';
+    const speedGraderUrl = encodeURI('/courses/1/gradebook/speed_grader?assignment_id=30#{"student_id":"27"}');
     mountComponent();
     const speedGraderLink = document.querySelector('.SubmissionTray__Container a[href*="speed_grader"]').getAttribute('href');
     strictEqual(speedGraderLink, speedGraderUrl);
@@ -552,6 +553,22 @@ QUnit.module('SubmissionTray', function (hooks) {
       const gradingScheme = [['A', 0.90], ['B+', 0.85], ['B', 0.80], ['B-', 0.75], ['C+', 0.70]];
       mountComponent({ gradingScheme });
       deepEqual(wrapContent().find('GradeInput').prop('gradingScheme'), gradingScheme);
+    });
+
+    test('passes along isNotCountedForScore prop to SubmissionStatus', function () {
+      mountComponent()
+      const isNotCountedForScore = wrapContent().find('SubmissionStatus').at(0).prop('isNotCountedForScore')
+      deepEqual(isNotCountedForScore, wrapper.prop('isNotCountedForScore'))
+    });
+
+    test('receives the "pendingGradeInfo" given to the Tray', function() {
+      const pendingGradeInfo = {
+        excused: false,
+        grade: '10',
+        valid: true
+      };
+      mountComponent({ pendingGradeInfo });
+      equal(wrapContent().find('GradeInput').prop('pendingGradeInfo'), pendingGradeInfo);
     });
   });
 

@@ -164,7 +164,7 @@ describe RoleOverridesController do
   end
 
   describe "check_account_permission" do
-    let(:json) { JSON.parse(response.body.gsub("while(1)\;", "")) }
+    let(:json) { json_parse(response.body) }
 
     describe "manage_catalog permission" do
       context "when catalog is enabled" do

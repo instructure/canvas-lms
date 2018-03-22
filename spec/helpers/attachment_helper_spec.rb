@@ -44,4 +44,13 @@ describe AttachmentHelper do
     expect(attrs).to match /#{@current_user.id}/
     expect(attrs).to match /#{@att.id}/
   end
+
+  describe "set_cache_header" do
+    it "should not allow caching of instfs redirects" do
+      allow(@att).to receive(:instfs_hosted?).and_return(true)
+      expect(self).to receive(:cancel_cache_buster).never
+      set_cache_header(@att, false)
+      expect(response.headers).not_to have_key('Cache-Control')
+    end
+  end
 end

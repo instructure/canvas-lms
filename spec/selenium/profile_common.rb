@@ -26,7 +26,7 @@ shared_examples 'profile_settings_page' do |context|
   include SharedExamplesCommon
 
   it 'should give option to change profile pic', priority: "2", test_id: pick_test_id(context, student: 68936, teacher: 352617, admin: 352618) do
-    enable_avatars
+    enable_avatars(false)
     get "/profile/settings"
     driver.mouse.move_to f('.avatar.profile_pic_link.none')
     wait_for_ajaximations
@@ -44,7 +44,7 @@ shared_examples 'profile_user_about_page' do |context|
   include SharedExamplesCommon
 
   it 'should give option to change profile pic', priority: "2", test_id: pick_test_id(context, student: 358573, teacher: 358574, admin: 358575) do
-    enable_avatars
+    enable_avatars(false)
     get "/about/#{@user.id}"
 
     driver.mouse.move_to f('.avatar.profile-link')
@@ -60,7 +60,7 @@ shared_examples 'user settings page change pic window' do |context|
   include SharedExamplesCommon
 
   it 'should allow user to click to change profile pic', priority: "1", test_id: pick_test_id(context, student: 68938, teacher: 368784, admin: 368785) do
-    enable_avatars
+    enable_avatars(true)
     get '/profile/settings'
 
     f('.avatar.profile_pic_link.none').click
@@ -87,11 +87,34 @@ shared_examples 'user settings page change pic window' do |context|
   end
 end
 
+shared_examples 'with gravatar settings' do |context|
+  include SharedExamplesCommon
+
+  it 'should not allow user to see gravatar when disabled', priority: "1", test_id: pick_test_id(context, student: 68938, teacher: 368784, admin: 368785) do
+    enable_avatars(false)
+    get '/profile/settings'
+
+    f('.avatar.profile_pic_link.none').click
+    wait_for_ajaximations
+    expect(fj('.nav.nav-pills li')).not_to include_text("From Gravatar")
+  end
+
+  it 'should allow user to see gravatar when enabled', priority: "1", test_id: pick_test_id(context, student: 68938, teacher: 368784, admin: 368785) do
+    enable_avatars(true)
+    get '/profile/settings'
+
+    f('.avatar.profile_pic_link.none').click
+    wait_for_ajaximations
+
+    expect(fj('.nav.nav-pills li :contains("From Gravatar")')).to include_text('From Gravatar')
+  end
+end
+
 shared_examples 'user settings change pic cancel' do |context|
   include SharedExamplesCommon
 
   it 'closes window when cancel button is pressed', priority: "1", test_id: pick_test_id(context, student: 68939, teacher: 372132, admin: 372133) do
-    enable_avatars
+    enable_avatars(false)
     get '/profile/settings'
 
     f('.avatar.profile_pic_link.none').click
@@ -109,12 +132,12 @@ end
 # Helper Methods
 # ======================================================================================================================
 shared_context 'profile common' do
-  def enable_avatars
+  def enable_avatars(withGravatar)
     a = Account.default.reload
     a.enable_service('avatars')
     a.settings[:enable_profiles] = true
+    a.settings[:enable_gravatar] = withGravatar
     a.save!
     a
   end
 end
-

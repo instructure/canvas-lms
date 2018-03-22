@@ -31,6 +31,7 @@ import './jquery.instructure_date_and_time' /* date_field, time_field, datetime_
 import './jquery.instructure_misc_helpers' /* /\$\.uniq/ */
 import 'compiled/jquery.rails_flash_notifications'
 import './vendor/jquery.scrollTo'
+import { uploadFile as rawUploadFile } from 'jsx/shared/upload_file'
 
   // Intercepts the default form submission process.  Uses the form tag's
   // current action and method attributes to know where to submit to.
@@ -296,44 +297,20 @@ import './vendor/jquery.scrollTo'
         $.ajaxJSON(options.url, options.method, data, options.success, options.error);
       }
     };
+    const uploadUrl = options.uploadDataUrl || "/files/pending";
     var uploadFile = function(parameters, file) {
-      $.ajaxJSON(options.uploadDataUrl || "/files/pending", 'POST', parameters, function(data) {
-        try {
-        var old_name = $(file).attr('name');
-        var onError = function(error) {
-          $(file).attr('name', old_name);
-          (options.upload_error || options.error).call($this, error);
-        };
-        var onUpload = function(data) {
-          $(file).attr('name', old_name);
+      // we want the s3 success url in the preflight response, not embedded in
+      // the upload_url. the latter doesn't work with the new ajax mechanism
+      parameters.no_redirect = true;
+      file = file.files[0]
+      rawUploadFile(uploadUrl, parameters, file)
+        .then((data) => {
           attachments.push(data);
           next.call($this);
-        };
-        if(data && data.upload_url) {
-          var post_params = data.upload_params;
-          $(file).attr('name', data.file_param);
-          $.ajaxJSONFiles(data.upload_url, 'POST', post_params, $(file), function(data) {
-            if (post_params.success_url) {
-              // s3 upload, need to ping success_url to finalize and get back
-              // attachment information
-              $.ajaxJSON(post_params.success_url, 'GET', {}, onUpload, onError);
-            } else if (data.location) {
-              // inst-fs upload, need to request attachment information from
-              // location
-              $.ajaxJSON(data.location, 'GET', {}, onUpload, onError);
-            } else {
-              // local-storage upload, this _is_ the attachment information
-              onUpload(data)
-            }
-          }, onError, {onlyGivenParameters: true });
-        } else {
-          onError(data);
-        }
-        } finally {}
-
-      }, function() {
-        return (options.upload_error || options.error).apply(this, arguments);
-      });
+        })
+        .catch((error) => {
+          (options.upload_error || options.error).call($this, error);
+        });
     };
     var next = function() {
       var item = list.shift();
@@ -341,12 +318,14 @@ import './vendor/jquery.scrollTo'
         var attrs = $.extend({
           'name': item.name,
           'on_duplicate': 'rename',
+          'no_redirect': true,
           'attachment[folder_id]': options.folder_id,
           'attachment[intent]': options.intent,
           'attachment[asset_string]': options.asset_string,
           'attachment[filename]': item.name,
+          'attachment[size]': item.size,
           'attachment[context_code]': options.context_code,
-          'attachment[duplicate_handling]': 'rename'
+          'attachment[on_duplicate]': 'rename'
         }, options.formDataTarget == 'uploadDataUrl' ? options.formData : {});
         if (item.files.length === 1) {
           attrs['attachment[content_type]'] = item.files[0].type;
@@ -1160,8 +1139,6 @@ import './vendor/jquery.scrollTo'
       var field = $form.find('[name="'+name+'"]');
       if (!field.length) {return;}
       field.attr({'aria-required': 'true'});
-      // TODO: enable this, maybe when Safari supports it
-      // field.attr({required: true});
       field.each(function() {
         if (!this.id) {return;}
         var label = $('label[for="'+this.id+'"]');

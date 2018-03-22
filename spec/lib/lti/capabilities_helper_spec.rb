@@ -101,7 +101,11 @@ module Lti
          com.instructure.Assignment.lti.id
          com.instructure.PostMessageToken
          com.instructure.Editor.contents
-         com.instructure.Editor.selection)
+         com.instructure.Editor.selection
+         com.instructure.Group.id
+         com.instructure.Group.name
+         Canvas.membership.roles
+         com.instructure.Course.groupIds)
     }
 
     describe '#supported_capabilities' do

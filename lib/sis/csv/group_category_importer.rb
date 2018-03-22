@@ -31,17 +31,18 @@ module SIS
       # expected columns
       # group_category_id, account_id, name, status
       def process(csv)
-        @sis.counts[:group_categories] += SIS::GroupCategoryImporter.new(@root_account, importer_opts).process do |importer|
+        count = SIS::GroupCategoryImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv) do |row|
             update_progress
-
             begin
-              importer.add_group_category(row['group_category_id'], row['account_id'], row['category_name'], row['status'])
+              importer.add_group_category(row['group_category_id'], row['account_id'],
+                                          row['course_id'], row['category_name'], row['status'])
             rescue ImportError => e
-              add_warning(csv, "#{e}")
+              SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
             end
           end
         end
+        count
       end
     end
   end

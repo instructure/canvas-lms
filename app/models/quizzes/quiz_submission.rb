@@ -59,7 +59,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   after_update :grade_submission!, if: :just_completed?
 
   def just_completed?
-    submission_id? && workflow_state_changed? && completed?
+    submission_id? && saved_change_to_workflow_state? && completed?
   end
 
   def grade_submission!
@@ -764,14 +764,14 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     # submissions, not quiz submissions.  The necessary delegations
     # are at the bottom of this class.
     p.dispatch :submission_graded
-    p.to { user }
+    p.to { ([user] + User.observing_students_in_course(user, self.context)).uniq(&:id) }
     p.whenever { |q_sub|
       BroadcastPolicies::QuizSubmissionPolicy.new(q_sub).
         should_dispatch_submission_graded?
     }
 
     p.dispatch :submission_grade_changed
-    p.to { user }
+    p.to { ([user] + User.observing_students_in_course(user, self.context)).uniq(&:id) }
     p.whenever { |q_sub|
       BroadcastPolicies::QuizSubmissionPolicy.new(q_sub).
         should_dispatch_submission_grade_changed?

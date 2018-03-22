@@ -19,7 +19,7 @@
 #auth-config-right-side {
   a {
     img {
-      margin-right: 5px;
+      margin-#{direction(right)}: 5px;
     }
   }
 }
@@ -35,7 +35,7 @@
   }
   pre {
     margin: auto;
-    margin-left: 10px;
+    margin-#{direction(left)}: 10px;
     font-family: monospace;
   }
   h3{

@@ -16,163 +16,157 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import customTypes from './PropTypes'
 import I18n from 'i18n!theme_editor'
 import rgb2hex from 'compiled/util/rgb2hex'
 import classnames from 'classnames'
 
-export default React.createClass({
+export default class ThemeEditorColorRow extends Component {
+  static propTypes = {
+    varDef: customTypes.color,
+    onChange: PropTypes.func.isRequired,
+    userInput: customTypes.userVariableInput,
+    placeholder: PropTypes.string.isRequired,
+    themeState: PropTypes.object,
+    handleThemeStateChange: PropTypes.func
+  }
 
-    displayName: 'ThemeEditorColorRow',
+  static defaultProps = {
+    userInput: {},
+    themeState: {},
+    handleThemeStateChange() {}
+  }
 
-    propTypes: {
-      varDef: customTypes.color,
-      onChange: PropTypes.func.isRequired,
-      userInput: customTypes.userVariableInput,
-      placeholder: PropTypes.string.isRequired
-    },
+  state = {}
 
-    getDefaultProps(){
-      return ({
-        userInput: {}
-      })
-    },
+  showWarning = () => this.props.userInput.invalid && this.inputNotFocused()
 
-    getInitialState(){
-      return {};
-    },
-
-    showWarning(){
-      return this.props.userInput.invalid && this.inputNotFocused()
-    },
-
-    warningLabel(){
-      if (this.showWarning()) {
-        return(
-          <span role="alert">
-            <div className="ic-Form-message ic-Form-message--error" tabIndex="0">
-              <div className="ic-Form-message__Layout">
-                <i className="icon-warning" role="presentation"></i>
-                {I18n.t("'%{chosenColor}' is not a valid color.", {chosenColor: this.props.userInput.val})}
-              </div>
-            </div>
-          </span>
-        )
-      } else {
-        // must return empty alert span so screenreaders
-        // read the error when it is inserted
-        return <span role="alert" />
-      }
-    },
-
-    changedColor(value) {
-      // fail fast for no value
-      if (!value) return null
-
-      // set and read color values from a dom node to get only valid values
-      const tempNode = document.createElement('span')
-      tempNode.style.backgroundColor = value
-      const color = tempNode.style.backgroundColor
-      
-      // reject invalid values
-      if (!color) return null
-      
-      // FF returns 'transparent' for invalid colors, but we allow intentionally setting a value to 'transparent'
-      if (color === 'transparent' && value !== 'transparent') return null
-
-      return color
-    },
-
-    hexVal(colorString) {
-      var rgbVal = this.changedColor(colorString);
-      // rgb2hex will fail if rgbVal is null or undefined
-      return rgbVal ? (rgb2hex(rgbVal) || rgbVal) : '';
-    },
-
-    invalidHexString(colorString) {
-      return colorString.match(/#/) ?
-        !colorString.match(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/) :
-        false
-    },
-
-    inputChange(value) {
-      var invalidColor = !!value && (!this.changedColor(value) || this.invalidHexString(value));
-      this.props.onChange(value, invalidColor);
-    },
-
-    inputNotFocused() {
-      return this.refs.textInput && this.refs.textInput.getDOMNode() != document.activeElement
-    },
-
-    updateIfMounted() {
-      if (this.isMounted()) {
-        this.forceUpdate()
-      }
-    },
-
-    textColorInput(){
-      var inputClasses = classnames({
-        'Theme__editor-color-block_input-text': true,
-        'Theme__editor-color-block_input': true,
-        'Theme__editor-color-block_input--has-error': this.props.userInput.invalid
-      });
-      
-      var colorVal = this.props.userInput.val != null ? this.props.userInput.val : this.props.currentValue
-
-      // 1st input is hidden and posts a valid hex value
-      // 2nd input handles display, input events, and validation
-      const hexValue = this.hexVal(colorVal)
-      return(
-        <span>
-          <input
-              type="hidden"
-              name={'brand_config[variables]['+ this.props.varDef.variable_name +']'}
-              value={hexValue} />
-          <input
-              ref="textInput"
-              type="text"
-              id={'brand_config[variables]['+ this.props.varDef.variable_name +']'}
-              className={inputClasses}
-              placeholder={this.props.placeholder}
-              value={colorVal}
-              aria-invalid={this.showWarning()}
-              onChange={event => this.inputChange(event.target.value) }
-              onBlur={this.updateIfMounted} />
-        </span>
-      );
-    },
-
-    render() {
-      var colorInputValue = (this.props.placeholder !== "none") ? this.props.placeholder : null;
+  warningLabel = () => {
+    if (this.showWarning()) {
       return (
-        <section className="Theme__editor-accordion_element Theme__editor-color ic-Form-control">
-          <div className="Theme__editor-form--color">
-            <label
-              htmlFor={'brand_config[variables]['+ this.props.varDef.variable_name +']'}
-              className="Theme__editor-color_title"
-            >
-              {this.props.varDef.human_name}
-            </label>
-            <div className="Theme__editor-color-block">
-              {this.textColorInput()}
-              {this.warningLabel()}
-              <label className="Theme__editor-color-label Theme__editor-color-block_label-sample" style={{backgroundColor: this.props.placeholder}}
-                /* this <label> and <input type=color> are here so if you click the 'sample',
-                it will pop up a color picker on browsers that support it */
-              >
-                <input
-                  className="Theme__editor-color-block_input-sample Theme__editor-color-block_input"
-                  type="color"
-                  ref="colorpicker"
-                  value={colorInputValue}
-                  role="presentation-only"
-                  onChange={event => this.inputChange(event.target.value) } />
-              </label>
+        <span role="alert">
+          <div className="ic-Form-message ic-Form-message--error" tabIndex="0">
+            <div className="ic-Form-message__Layout">
+              <i className="icon-warning" role="presentation" />
+              {I18n.t("'%{chosenColor}' is not a valid color.", {
+                chosenColor: this.props.userInput.val
+              })}
             </div>
           </div>
-        </section>
+        </span>
       )
+    } else {
+      // must return empty alert span so screenreaders
+      // read the error when it is inserted
+      return <span role="alert" />
     }
-  })
+  }
+
+  changedColor(value) {
+    // fail fast for no value
+    if (!value) return null
+
+    // set and read color values from a dom node to get only valid values
+    const tempNode = document.createElement('span')
+    tempNode.style.backgroundColor = value
+    const color = tempNode.style.backgroundColor
+
+    // reject invalid values
+    if (!color) return null
+
+    // FF returns 'transparent' for invalid colors, but we allow intentionally setting a value to 'transparent'
+    if (color === 'transparent' && value !== 'transparent') return null
+
+    return color
+  }
+
+  hexVal = colorString => {
+    const rgbVal = this.changedColor(colorString)
+    // rgb2hex will fail if rgbVal is null or undefined
+    return rgbVal ? rgb2hex(rgbVal) || rgbVal : ''
+  }
+
+  invalidHexString(colorString) {
+    return colorString.match(/#/) ? !colorString.match(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/) : false
+  }
+
+  inputChange = value => {
+    const invalidColor = !!value && (!this.changedColor(value) || this.invalidHexString(value))
+    this.props.onChange(value, invalidColor)
+    if (!invalidColor) {
+      this.props.handleThemeStateChange(this.props.varDef.variable_name, value)
+    }
+  }
+
+  inputNotFocused = () => this.textInput && this.textInput !== document.activeElement
+
+  updateIfMounted = () => {
+    this.forceUpdate()
+  }
+
+  textColorInput = () => {
+    const inputClasses = classnames({
+      'Theme__editor-color-block_input-text': true,
+      'Theme__editor-color-block_input': true,
+      'Theme__editor-color-block_input--has-error': this.props.userInput.invalid
+    })
+
+    const colorVal =
+      this.props.userInput.val != null ? this.props.userInput.val : this.props.currentValue
+
+    // 2nd input handles display, input events, and validation
+    const hexValue = this.hexVal(colorVal)
+    return (
+      <span>
+        <input
+          ref={c => (this.textInput = c)}
+          type="text"
+          id={`brand_config[variables][${this.props.varDef.variable_name}]`}
+          className={inputClasses}
+          placeholder={this.props.placeholder}
+          value={this.props.themeState[this.props.varDef.variable_name]}
+          aria-invalid={this.showWarning()}
+          onChange={event => this.inputChange(event.target.value)}
+          onBlur={this.updateIfMounted}
+        />
+      </span>
+    )
+  }
+
+  render() {
+    const colorInputValue = this.props.placeholder !== 'none' ? this.props.placeholder : null
+    return (
+      <section className="Theme__editor-accordion_element Theme__editor-color ic-Form-control">
+        <div className="Theme__editor-form--color">
+          <label
+            htmlFor={`brand_config[variables][${this.props.varDef.variable_name}]`}
+            className="Theme__editor-color_title"
+          >
+            {this.props.varDef.human_name}
+          </label>
+          <div className="Theme__editor-color-block">
+            {this.textColorInput()}
+            {this.warningLabel()}
+            <label
+              className="Theme__editor-color-label Theme__editor-color-block_label-sample"
+              style={{backgroundColor: this.props.placeholder}}
+              /* this <label> and <input type=color> are here so if you click the 'sample',
+              it will pop up a color picker on browsers that support it */
+            >
+              <input
+                className="Theme__editor-color-block_input-sample Theme__editor-color-block_input"
+                type="color"
+                ref="colorpicker"
+                value={colorInputValue}
+                role="presentation-only"
+                onChange={event => this.inputChange(event.target.value)}
+              />
+            </label>
+          </div>
+        </div>
+      </section>
+    )
+  }
+}

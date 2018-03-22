@@ -10,12 +10,6 @@
   <%= (date_string(force_zone(m.send_at), :no_words) rescue t("#date.days.today_lower", "today")) %>
 <% end %>
 
-<% define_content :footer_link do %>
-  <a href="<%= content(:link) %>">
-    <%= t 'click_to_preferences', "Click here to edit your notification preferences" %>
-  </a>
-<% end %>
-
 <% m = (delayed_messages || []).find{|m| m.frequency == Notification::FREQ_WEEKLY} || delayed_messages.first %>
 <% if !m || m.frequency == Notification::FREQ_DAILY %>
   <p><%= t :daily_body, "You're signed up to receive a daily report of some notifications from your Canvas account.  Below is the report for %{date}:",

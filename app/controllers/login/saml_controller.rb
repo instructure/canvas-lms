@@ -52,24 +52,19 @@ class Login::SamlController < ApplicationController
     response = Onelogin::Saml::Response.new(params[:SAMLResponse])
 
     @aac = @domain_root_account.authentication_providers.active.
-        where(auth_type: 'saml').
-        where(idp_entity_id: response.issuer).
-        first
+      where(auth_type: 'saml').
+      where(idp_entity_id: response.issuer).
+      first
     if @aac.nil?
       logger.error "Attempted SAML login for #{response.issuer} on account without that IdP"
-      if @domain_root_account.settings[:allow_mismatched_entity_id] &&
-        @domain_root_account.authentication_providers.active.where(auth_type: 'saml').count == 1
-        @aac = @domain_root_account.authentication_providers.active.where(auth_type: 'saml').first
+      flash[:delegated_message] = if @domain_root_account.auth_discovery_url
+        t("Canvas did not recognize your identity provider")
+      elsif response.issuer
+        t("Canvas is not configured to receive logins from %{issuer}.", issuer: response.issuer)
       else
-        if @domain_root_account.auth_discovery_url
-          flash[:delegated_message] = t("Canvas did not recognize your identity provider")
-        elsif response.issuer
-          flash[:delegated_message] = t("Canvas is not configured to receive logins from %{issuer}.", issuer: response.issuer)
-        else
-          flash[:delegated_message] = t("The institution you logged in from is not configured on this account.")
-        end
-        return redirect_to login_url
+        t("The institution you logged in from is not configured on this account.")
       end
+      return redirect_to login_url
     end
 
     settings = aac.saml_settings(request.host_with_port)
@@ -311,7 +306,14 @@ class Login::SamlController < ApplicationController
 
       logout_current_user
 
-      return redirect_to(SAML2::Bindings::HTTPRedirect.encode(logout_response, relay_state: relay_state))
+      private_key = AccountAuthorizationConfig::SAML.private_key
+      private_key = nil if aac.sig_alg.nil?
+      forward_url = SAML2::Bindings::HTTPRedirect.encode(logout_response,
+                                                         relay_state: relay_state,
+                                                         private_key: private_key,
+                                                         sig_alg: aac.sig_alg)
+
+      return redirect_to(forward_url)
     else
       error = "Unexpected SAML message: #{message.class}"
       Canvas::Errors.capture_exception(:saml, error)
@@ -351,8 +353,8 @@ class Login::SamlController < ApplicationController
   def complete_observee_addition(registration_data)
     observee_unique_id = registration_data[:observee][:unique_id]
     observee = @domain_root_account.pseudonyms.by_unique_id(observee_unique_id).first.user
-    unless @current_user.user_observees.where(user_id: observee).exists?
-      UserObserver.create_or_restore(observe: observee, observer: @current_user)
+    unless @current_user.as_observer_observation_links.where(user_id: observee).exists?
+      UserObservationLink.create_or_restore(student: observee, observer: @current_user)
       @current_user.touch
     end
   end
@@ -389,7 +391,7 @@ class Login::SamlController < ApplicationController
 
     # set the new user (observer) to observe the target user (observee)
     observee = @domain_root_account.pseudonyms.active.by_unique_id(observee_unique_id).first.user
-    UserObserver.create_or_restore(observee: observee, observer: user)
+    UserObservationLink.create_or_restore(student: observee, observer: user)
 
     notify_policy = Users::CreationNotifyPolicy.new(false, unique_id: observer_unique_id)
     notify_policy.dispatch!(user, pseudonym, cc)

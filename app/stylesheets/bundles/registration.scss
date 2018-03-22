@@ -36,6 +36,13 @@ a {
   position: relative;
 }
 
+#terms_of_service_link {
+  button {
+    margin-top: -3px !important;
+    color: #999 !important;
+  }
+}
+
 #registration_header {
   background: #fff;
   height: 122px;
@@ -53,7 +60,7 @@ a {
   #registration_login {
     color: #30536e;
     position: absolute;
-    right: 73px;
+    #{direction(right)}: 73px;
     top: 55px;
     padding: 0 22px 0 0;
     border: 5px solid transparent;
@@ -113,7 +120,7 @@ a {
   color: #999;
   @include fontSize(11px);
   a {
-    margin-left: 5px;
+    margin-#{direction(left)}: 5px;
     color: #999;
     &:hover, &:active {
       color: #2ca4e9;
@@ -122,11 +129,11 @@ a {
 }
 
 .left {
-  float: left;
+  float: direction(left);
 }
 
 .right {
-  float: right;
+  float: direction(right);
 }
 
 #signup_teacher, #signup_student {
@@ -146,11 +153,11 @@ a {
     background-position: 5px -60px;
     outline: none;
   }
-  left: 67px;
+  #{direction(left)}: 67px;
 }
 
 #signup_student {
-  right: 67px;
+  #{direction(right)}: 67px;
   background-position: 5px -125px;
   &:hover, &:focus {
     background-position: 5px -190px;
@@ -160,7 +167,7 @@ a {
 
 #login_form {
   position: absolute;
-  right: 0;
+  #{direction(right)}: 0;
   top: 95px;
   background: #fff;
   border: 1px solid #bbb;
@@ -199,11 +206,11 @@ a {
     width: 16px;
     position: absolute;
     top: -10px;
-    left: 50%;
-    margin-left: -11px;
+    #{direction(left)}: 50%;
+    margin-#{direction(left)}: -11px;
     transform: rotate(45deg);
     border: 1px solid #bbb;
-    border-right: none;
+    border-#{direction(right)}: none;
     border-bottom: none;
     background: $white;
   }

@@ -16,11 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'i18n!outcomes'
   'underscore'
   'Backbone'
   'jst/grade_summary/progress_bar'
-], (I18n, _, Backbone, template) ->
+], (_, Backbone, template) ->
   class ProgressBarView extends Backbone.View
     className: 'bar'
     template: template

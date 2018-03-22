@@ -66,8 +66,10 @@ module DifferentiableAssignment
 
   # can filter scope of Assignments, DiscussionTopics, Quizzes, or ContentTags
   def self.scope_filter(scope, user, context, opts={})
-    self.filter(scope, user, context, opts) do |scope, user_ids|
-      scope.visible_to_students_in_course_with_da(user_ids, context.id)
+    context.shard.activate do
+      self.filter(scope, user, context, opts) do |scope, user_ids|
+        scope.visible_to_students_in_course_with_da(user_ids, context.id)
+      end
     end
   end
 

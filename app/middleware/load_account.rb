@@ -51,6 +51,6 @@ class LoadAccount
   protected
 
   def configure_for_root_account(domain_root_account)
-    Attachment.domain_namespace = domain_root_account
+    Attachment.current_root_account = domain_root_account
   end
 end

@@ -41,7 +41,7 @@ describe "i18n js" do
 
   context "locales" do
     it "should pull in core translations for all locales" do
-      skip("Rails 5.0 specific") unless CANVAS_RAILS5_0
+      skip("Rails 5.1 specific") unless CANVAS_RAILS5_1
       skip('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
       skip('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
       core_keys = I18nTasks::Utils::CORE_KEYS

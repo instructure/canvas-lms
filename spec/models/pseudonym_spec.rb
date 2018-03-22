@@ -238,21 +238,6 @@ describe Pseudonym do
       pseudonym_model
     end
 
-    it "should offer login as the unique id" do
-      expect(@pseudonym.login).to eql(@pseudonym.unique_id)
-    end
-
-    it "should be able to set the login" do
-      @pseudonym.login = 'another'
-      expect(@pseudonym.login).to eql('another')
-      expect(@pseudonym.unique_id).to eql('another')
-    end
-
-    it "should know if the login changed" do
-      @pseudonym.login = 'another'
-      expect(@pseudonym.login_changed?).to be_truthy
-    end
-
     it "should offer the user code as the user's uuid" do
       expect(@pseudonym.user).to eql(@user)
       expect(@pseudonym.user_code).to eql(@user.uuid)

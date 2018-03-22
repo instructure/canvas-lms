@@ -389,6 +389,18 @@ describe "Module Items API", type: :request do
         expect(tag.content_type).to eq 'Assignment'
         expect(tag.content_id).to eq assignment.id
         expect(tag.indent).to eq new_indent
+        expect(tag).to be_published
+      end
+
+      it "creates an unpublished tag for an unpublished item" do
+        assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"],
+                                                 :workflow_state => 'unpublished')
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                        {:controller => "context_module_items_api", :action => "create", :format => "json",
+                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}"},
+                        {:module_item => {:type => 'Assignment', :content_id => assignment.id}})
+        tag = @module1.content_tags.where(id: json['id']).first
+        expect(tag).to be_unpublished
       end
 
       it "should create with page_url for wiki page items" do

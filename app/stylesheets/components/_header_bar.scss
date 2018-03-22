@@ -144,7 +144,7 @@
     width: 1071px;
     background-color: white;
     box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.5);
-    margin-left: -12px;
+    margin-#{direction(left)}: -12px;
     padding: 15px;
     z-index: 100;
   }
@@ -154,8 +154,8 @@
     top: 0;
     left: 0;
     right: 0;
-    margin-left: $left_side_width + 1;
-    margin-right: $right_side_width + 1;
+    margin-#{direction(left)}: $left_side_width + 1;
+    margin-#{direction(right)}: $right_side_width + 1;
     z-index: 3;
     background: white;
     height: 33px;
@@ -165,10 +165,10 @@
   }
   // helpers for alignment, use .row-fluid and .span classes to align where possible instead of these
   .header-bar-right {
-    float: right;
+    float: direction(right);
   }
   .header-bar-left {
-    float: left;
+    float: direction(left);
   }
   &.no-line {
     border: none;
@@ -177,10 +177,10 @@
 
 // classes for grouping buttons on the right
 .header-group-left{
-  margin-right: 10px;
+  margin-#{direction(right)}: 10px;
 }
 .header-group-left, .header-group-right{
-  float: left;
+  float: direction(left);
 }
 
 #searchTerm {

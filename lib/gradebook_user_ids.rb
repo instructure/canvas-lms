@@ -59,7 +59,7 @@ class GradebookUserIds
     students.
       joins("LEFT JOIN #{Submission.quoted_table_name} ON submissions.user_id=users.id AND
              submissions.workflow_state<>'deleted' AND
-             submissions.assignment_id=#{Submission.sanitize(assignment_id)}").
+             submissions.assignment_id=#{Submission.connection.quote(assignment_id)}").
       order("#{Enrollment.table_name}.type = 'StudentViewEnrollment'").
       order("#{Submission.table_name}.score #{sort_direction} NULLS LAST").
       order("#{Submission.table_name}.id IS NULL").
@@ -146,9 +146,9 @@ class GradebookUserIds
 
   def sort_by_scores(type = :total_grade, id = nil)
     score_scope = if type == :assignment_group
-      "scores.assignment_group_id=#{Score.sanitize(id)}"
+      "scores.assignment_group_id=#{Score.connection.quote(id)}"
     elsif type == :grading_period
-      "scores.grading_period_id=#{Score.sanitize(id)}"
+      "scores.grading_period_id=#{Score.connection.quote(id)}"
     else
       "scores.course_score IS TRUE"
     end

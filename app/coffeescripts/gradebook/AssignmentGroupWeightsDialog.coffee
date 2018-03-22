@@ -17,7 +17,7 @@
 
 define [
   '../util/round'
-  'i18n!assignments'
+  'i18nObj'
   'jquery'
   'jst/AssignmentGroupWeightsDialog'
   'jsx/shared/helpers/numberHelper'

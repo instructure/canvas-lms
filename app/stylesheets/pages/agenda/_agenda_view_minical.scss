@@ -37,9 +37,21 @@ $mini-cal-highlight-border: #fa0;
     align-items: center; // allow divs to center align vertically
     justify-content: space-around; // allows the divs to space evenly, regardless of content
     // Set order of divs
-    .fc-left {order: 1;}
+    .fc-left {
+      @include ic-focus-base;
+      &:focus-within {
+        @include ic-focus-variant;
+      }
+      order: 1;
+    }
     .fc-center {order: 2;}
-    .fc-right {order: 3;}
+    .fc-right {
+      @include ic-focus-base;
+      &:focus-within {
+        @include ic-focus-variant;
+      }
+      order: 3;
+    }
     .fc-clear {display: none;} // old way of clearing, don't need div for flexbox (it'll also break it)
     h2, .h2 {
       color: #666;

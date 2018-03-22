@@ -1,0 +1,4 @@
+canvas_id,vendor_guid,object_type,title,description,display_name,calculation_method,calculation_int,workflow_state,parent_guids,ratings,,,,,,,
+,始計,group,始計,孫子曰：兵者，國之大事，死生之地，存亡之道，不可不察也。,testing,,,active,,,,,,,,,
+,作戰,group,作戰,故經之以五事，校之以計，而索其情，一曰道，二曰天，三曰地，四曰將，五曰法。,123,,,active,始計,,,,,,,,
+,軍爭,outcome,軍爭,道者，令民與上同意也，可與之死，可與之生，而不畏危。天者，陰陽，寒暑，時制也。地者，遠近，險易，廣狹，死生也。將者，智，信，仁，勇，嚴也。法者，曲制，官道，主用也。凡此五者，將莫不聞，知之者勝，不知者不勝。,456,decaying_average,40,active,始計 作戰,3,地形,2,九地,1,火攻,,

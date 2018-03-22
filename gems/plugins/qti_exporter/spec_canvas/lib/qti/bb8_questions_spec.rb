@@ -489,7 +489,6 @@ module BB8Expected
                                 [{:end=>4.0,
                                   :numerical_answer_type=>"range_answer",
                                   :start=>4.0,
-                                  :exact=>4.0,
                                   :comments=>"",
                                   :weight=>100}],
                         :question_text=>"What is 10 - 6?<br>",

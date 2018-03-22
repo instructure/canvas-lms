@@ -19,13 +19,14 @@
 define([
   'lodash',
   'jquery',
+  'react',
   'i18n!gradebook',
   'helpers/fakeENV',
   '../gradebook/GradeCalculatorSpecHelper',
   'jsx/shared/helpers/numberHelper',
   'jsx/gradebook/CourseGradeCalculator',
   'jsx/grading/GradeSummary'
-], (_, $, I18n, fakeENV, GradeCalculatorSpecHelper, numberHelper, CourseGradeCalculator, GradeSummary) => {
+], (_, $, React, I18n, fakeENV, GradeCalculatorSpecHelper, numberHelper, CourseGradeCalculator, GradeSummary) => {
   const $fixtures = $('#fixtures');
 
   let exampleGrades;
@@ -694,28 +695,6 @@ define([
     equal($('#show_all_details_button').text(), 'Show All Details');
   });
 
-  QUnit.module('GradeSummary.getSelectedGradingPeriodId', {
-    setup () {
-      setPageHtmlFixture();
-      this.$select = document.querySelector('.grading_periods_selector');
-    }
-  });
-
-  test('returns the value of the selected grading period', function () {
-    this.$select.value = '701';
-    equal(GradeSummary.getSelectedGradingPeriodId(), '701');
-  });
-
-  test('returns null when "All Grading Periods" is selected', function () {
-    this.$select.value = '0';
-    deepEqual(GradeSummary.getSelectedGradingPeriodId(), null);
-  });
-
-  test('returns null when the grading periods selector is not present in the DOM', function () {
-    this.$select.parentNode.removeChild(this.$select);
-    deepEqual(GradeSummary.getSelectedGradingPeriodId(), null);
-  });
-
   QUnit.module('GradeSummary.onEditWhatIfScore', {
     setup () {
       fullPageSetup();
@@ -1097,27 +1076,25 @@ define([
   });
 
   test('returns an empty string if grading periods are weighted and "All Grading Periods" is selected', function () {
-    sinon.stub(GradeSummary, 'getSelectedGradingPeriodId').returns(null);
     ENV.grading_period_set = {
       id: '1501',
       grading_periods: [{ id: '701', weight: 50 }, { id: '702', weight: 50 }],
       weighted: true
-    };
-    const text = GradeSummary.finalGradePointsPossibleText('equal', '50.00 / 100.00');
-    strictEqual(text, '');
-    GradeSummary.getSelectedGradingPeriodId.restore();
+    }
+    ENV.current_grading_period_id = '0'
+    const text = GradeSummary.finalGradePointsPossibleText('equal', '50.00 / 100.00')
+    strictEqual(text, '')
   });
 
   test('returns the score with points possible if grading periods are weighted and a period is selected', function () {
-    sinon.stub(GradeSummary, 'getSelectedGradingPeriodId').returns('701');
     ENV.grading_period_set = {
       id: '1501',
       grading_periods: [{ id: '701', weight: 50 }, { id: '702', weight: 50 }],
       weighted: true
-    };
-    const text = GradeSummary.finalGradePointsPossibleText('equal', '50.00 / 100.00');
-    strictEqual(text, '50.00 / 100.00');
-    GradeSummary.getSelectedGradingPeriodId.restore();
+    }
+    ENV.current_grading_period_id = '701'
+    const text = GradeSummary.finalGradePointsPossibleText('equal', '50.00 / 100.00')
+    strictEqual(text, '50.00 / 100.00')
   });
 
   test('returns the score with points possible if grading periods are not weighted', function () {
@@ -1130,4 +1107,174 @@ define([
     const text = GradeSummary.finalGradePointsPossibleText('equal', '50.00 / 100.00');
     strictEqual(text, '50.00 / 100.00');
   });
+
+  QUnit.module('GradeSummary', () => {
+    QUnit.module('.getSelectedGradingPeriodId', (hooks) => {
+      hooks.beforeEach(() => {
+        fakeENV.setup()
+      })
+
+      hooks.afterEach(() => {
+        fakeENV.teardown()
+      })
+
+      test('returns the id of the current grading period', () => {
+        ENV.current_grading_period_id = '701'
+
+        strictEqual(GradeSummary.getSelectedGradingPeriodId(), '701')
+      })
+
+      test('returns null when the current grading period is "All Grading Periods"', () => {
+        ENV.current_grading_period_id = '0'
+
+        strictEqual(GradeSummary.getSelectedGradingPeriodId(), null)
+      })
+
+      test('returns null when there is no current grading period', () => {
+        strictEqual(GradeSummary.getSelectedGradingPeriodId(), null)
+      })
+    });
+
+    QUnit.module('#renderSelectMenuGroup', hooks => {
+      const props = {
+        assignmentSortOptions: [],
+        courses: [],
+        currentUserID: '42',
+        displayPageContent() {},
+        goToURL() {},
+        gradingPeriods: [],
+        saveAssignmentOrder() {},
+        selectedAssignmentSortOrder: '1',
+        selectedCourseID: '2',
+        selectedGradingPeriodID: '3',
+        selectedStudentID: '4',
+        students: []
+      }
+
+      hooks.beforeEach(() => {
+        sinon.stub(GradeSummary, 'getSelectMenuGroupProps').returns(props)
+        fakeENV.setup({context_asset_string: 'course_42', current_user: {}})
+      })
+
+      hooks.afterEach(() => {
+        fakeENV.teardown()
+        GradeSummary.getSelectMenuGroupProps.restore()
+      })
+
+      test('calls getSelectMenuGroupProps', () => {
+        $('#fixtures').html('<div id="GradeSummarySelectMenuGroup"></div>')
+        GradeSummary.renderSelectMenuGroup()
+
+        strictEqual(GradeSummary.getSelectMenuGroupProps.callCount, 1)
+      })
+    })
+
+    QUnit.module('#getSelectMenuGroupProps', hooks => {
+      hooks.beforeEach(() => {
+        fakeENV.setup({
+          context_asset_string: 'course_42',
+          current_user: {},
+          courses_with_grades: []
+        })
+      })
+
+      hooks.afterEach(() => {
+        fakeENV.teardown()
+      })
+
+      test('sets assignmentSortOptions to the assignment_sort_options environment variable', () => {
+        ENV.assignment_sort_options = [
+          ['Assignment Group', 'assignment_group'],
+          ['Due Date', 'due_at'],
+          ['Title', 'title']
+        ]
+
+        deepEqual(
+          GradeSummary.getSelectMenuGroupProps().assignmentSortOptions,
+          ENV.assignment_sort_options
+        )
+      })
+
+      test('sets courses to camelized version of courses_with_grades', () => {
+        ENV.courses_with_grades = [
+          {grading_period_set: null, id: '15', nickname: 'Course #1', url: '/courses/15/grades'},
+          {grading_period_set: 3, id: '42', nickname: 'Course #2', url: '/courses/42/grades'}
+        ]
+
+        const expectedCourses = [
+          {gradingPeriodSet: null, id: '15', nickname: 'Course #1', url: '/courses/15/grades'},
+          {gradingPeriodSet: 3, id: '42', nickname: 'Course #2', url: '/courses/42/grades'}
+        ]
+
+        deepEqual(GradeSummary.getSelectMenuGroupProps().courses, expectedCourses)
+      })
+
+      test('sets currentUserID to the current user id as set in the environment', () => {
+        ENV.current_user = {id: 42}
+
+        strictEqual(GradeSummary.getSelectMenuGroupProps().currentUserID, 42)
+      })
+
+      test('sets gradingPeriods to the grading period data passed in the environment', () => {
+        ENV.grading_periods = [
+          {
+            id: '6',
+            close_date: '2017-09-01T05:59:59Z',
+            end_date: '2017-09-01T05:59:59Z',
+            is_closed: true,
+            is_last: false,
+            permissions: {
+              create: false,
+              delete: false,
+              read: true,
+              update: false
+            },
+            start_date: '2017-08-01T06:00:00Z',
+            title: 'Summer 2017',
+            weight: 10
+          }
+        ]
+
+        deepEqual(GradeSummary.getSelectMenuGroupProps().gradingPeriods, ENV.grading_periods)
+      })
+
+      test('sets gradingPeriods to an empty array if there is no grading period data in the environment', () => {
+        deepEqual(GradeSummary.getSelectMenuGroupProps().gradingPeriods, [])
+      })
+
+      test('sets selectedAssignmentSortOrder to the current_assignment_sort_order environment variable', () => {
+        ENV.current_assignment_sort_order = 'due_at'
+
+        strictEqual(
+          GradeSummary.getSelectMenuGroupProps().selectedAssignmentSortOrder,
+          ENV.current_assignment_sort_order
+        )
+      })
+
+      test('sets selectedCourseID to the context id', () => {
+        strictEqual(GradeSummary.getSelectMenuGroupProps().selectedCourseID, '42')
+      })
+
+      test('sets selectedGradingPeriodID to the current_grading_period_id environment variable', () => {
+        ENV.current_grading_period_id = '3'
+
+        strictEqual(
+          GradeSummary.getSelectMenuGroupProps().selectedGradingPeriodID,
+          ENV.current_grading_period_id
+        )
+      })
+
+      test('sets selectedStudentID to the student_id environment variable', () => {
+        ENV.student_id = '66'
+
+        strictEqual(GradeSummary.getSelectMenuGroupProps().selectedStudentID, ENV.student_id)
+      })
+
+      test('sets students to the students environment variable', () => {
+        ENV.students = [{id: 42, name: 'Abel'}, {id: 43, name: 'Baker'}]
+
+        deepEqual(GradeSummary.getSelectMenuGroupProps().students, ENV.students)
+      })
+    })
+  })
 });

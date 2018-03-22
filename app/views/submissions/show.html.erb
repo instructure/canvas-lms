@@ -228,6 +228,7 @@
         partial: 'shared/rubric',
         object: @assignment.rubric,
         locals: {
+          rubric_association: @assignment.rubric_association,
           assessing: @submission.grants_right?(@current_user, :grade) || currently_peer_reviewing
         }}) %>
     <% end %>
@@ -326,22 +327,42 @@
           </div>
           <div style="padding: 10px; <%= hidden unless can_do(@submission, @current_user, :comment) %>" id="add_comment_form">
             <strong><%= before_label('add_a_comment', 'Add a Comment') %></strong>
-            <span><br/><%= t('teachers_notified_of_comments', 'Teachers and submitter will be notified of all comments.') %></span>
             <textarea class="ic-Input grading_comment"></textarea>
             <div class="comment_attachments">
             </div>
             <div class="clearfix" style="text-align: right;">
               <% if feature_enabled?(:kaltura) %>
-                <a href="#" style="float: left;" class="media_comment_link media-comment"><%= t('media_comment', 'Media Comment') %></a>
+                <a href="#" class="media_comment_link media-comment pull-left"><%= t('media_comment', 'Media Comment') %></a>
               <% end %>
               <a href="#" style="float: right;" class="attach_comment_file_link"><%= t('attach_file', 'Attach File') %></a>
               <div class="clear"></div>
             </div>
             <% if @assignment.has_group_category? && can_do(@submission, @current_user, :make_group_comment) %>
-              <label class="checkbox" for="submission_group_comment">
-                <input type="checkbox" name="group_comment" id="submission_group_comment"/>
-                <%= t('sent_to_whole_group', 'Send Comment to the Whole Group') %>
-              </label>
+              <% if @assignment.grade_as_group? %>
+                <span><%= t("All comments are sent to the whole group.") %></span>
+                <input type="checkbox" name="submission[group_comment]" id="submission_group_comment" style="display:none" checked />
+              <% else %>
+                <fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
+                  <div class="ic-Form-control ic-Form-control--radio">
+                    <div class="ic-Radio">
+                      <input type="radio" name="submission[group_comment]" id="not_submission_group_comment" value="0" checked />
+                      <label class="ic-Label" for="not_submission_group_comment">
+                        <% if can_do(@submission, @current_user, :grade) %>
+                          <%= t('Send comment to this student only') %>
+                        <% else %>
+                          <%= t('Send comment to instructor only') %>
+                        <% end %>
+                      </label>
+                    </div>
+                    <div class="ic-Radio">
+                      <input type="radio" name="submission[group_comment]" id="submission_group_comment" value="1" />
+                      <label class="ic-Label" for="submission_group_comment">
+                        <%= t('sent_to_whole_group', 'Send comment to the whole group') %>
+                      </label>
+                    </div>
+                  </div>
+                </fieldset>
+              <% end %>
             <% end %>
             <div class="button-container">
               <button type="button" class="Button Button--primary save_comment_button"><%= t('buttons.save', 'Save') %></button>

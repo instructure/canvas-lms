@@ -319,7 +319,7 @@ interface, this is called the SIS ID.</td>
 <td>parent_account_id</td>
 <td>text</td>
 <td>✓</td>
-<td></td>
+<td>✓</td>
 <td>The account identifier of the parent account.
 If this is blank the parent account will be the root account. Note that even if
 all values are blank, the column must be included to differentiate the file
@@ -653,6 +653,20 @@ enrollments.csv
 <td>The domain of the account to search for the user.</td>
 </tr>
 <tr>
+<td>start_date</td>
+<td>date</td>
+<td></td>
+<td>✓</td>
+<td>The enrollment start date. For start_date to take effect the end_date also needs to be populated. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
+</tr>
+<tr>
+<td>end_date</td>
+<td>date</td>
+<td></td>
+<td>✓</td>
+<td>The enrollment end date. For end_date to take effect the start_date also needs to be populated. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
+</tr>
+<tr>
 <td>user_id</td>
 <td>text</td>
 <td>✓&#42;</td>
@@ -758,8 +772,16 @@ This identifier must not change for the group category, and must be globally uni
 <td>text</td>
 <td></td>
 <td></td>
-<td>The account identifier from accounts.csv, if none is specified the group
-will be attached to the root account.</td>
+<td>The account identifier from accounts.csv, if no account or course is
+specified the group will be attached to the root account.</td>
+</tr>
+<tr>
+<td>course_id</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>The course identifier from courses.csv, if no course or account is specified
+the group will be attached to the root account.</td>
 </tr>
 <tr>
 <td>category_name</td>
@@ -779,10 +801,10 @@ will be attached to the root account.</td>
 
 Sample:
 
-<pre>group_category_id,account_id,category_name,status
-GC08,A001,First Group Category,active
-GC07,,GC7,active
-GC10,,GC10,deleted
+<pre>group_category_id,account_id,course_id,category_name,status
+GC08,A001,,First Group Category,active
+GC07,,,GC7,active
+GC10,,,GC10,deleted
 </pre>
 
 groups.csv
@@ -810,7 +832,8 @@ This identifier must not change for the group, and must be globally unique.</td>
 <td></td>
 <td></td>
 <td>The group category identifier from group_categories.csv, if none is
-specified the group will be put in the default group category for the account.
+specified the group will be put in the default group category for the account
+or course or root_account if there is no course_id or account_id.
 </td>
 </tr>
 <tr>
@@ -819,6 +842,14 @@ specified the group will be put in the default group category for the account.
 <td></td>
 <td></td>
 <td>The account identifier from accounts.csv, if none is specified the group will be attached to
+the root account.</td>
+</tr>
+<tr>
+<td>course_id</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>The course identifier from courses.csv, if none is specified the group will be attached to
 the root account.</td>
 </tr>
 <tr>
@@ -1087,7 +1118,8 @@ object type and the root_account.</td>
 <td>text</td>
 <td>✓&#42;</td>
 <td></td>
-<td>The current integration_id of the object that should be changed.</td>
+<td>The current integration_id of the object that should be changed. This
+column is not supported for group categories.</td>
 </tr>
 <tr>
 <td>new_integration_id</td>
@@ -1095,15 +1127,16 @@ object type and the root_account.</td>
 <td>✓&#42;</td>
 <td></td>
 <td>The desired integration_id of the object. This id must be currently unique
-to the object type and the root_account. Can pass "&lt;delete>" to
-remove the integration_id from the object.</td>
+to the object type and the root_account. This column is not supported for group
+categories. Can pass "&lt;delete>" to remove the integration_id from the
+object.</td>
 </tr>
 <tr>
 <td>type</td>
 <td>text</td>
 <td>✓</td>
 <td></td>
-<td>account, term, course, section, group, user, user_integration_id</td>
+<td>account, term, course, section, group, group_category, user</td>
 </tr>
 </table>
 

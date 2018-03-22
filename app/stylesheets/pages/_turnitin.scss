@@ -43,31 +43,31 @@ $turnitin_gray: #808080;
   border-width: 4px;
   border-color: transparent;
   border-style: solid;
-  left: -8px;
+  #{direction(left)}: -8px;
   margin-top: -4px;
   &.none_score {
-    border-right-color: $turnitin_blue;
+    border-#{direction(right)}-color: $turnitin_blue;
   }
   &.acceptable_score {
-    border-right-color: $turnitin_green;
+    border-#{direction(right)}-color: $turnitin_green;
   }
   &.warning_score {
-    border-right-color: $turnitin_yellow;
+    border-#{direction(right)}-color: $turnitin_yellow;
   }
   &.problem_score {
-    border-right-color: $turnitin_orange;
+    border-#{direction(right)}-color: $turnitin_orange;
   }
   &.failure_score {
-    border-right-color: $turnitin_red;
+    border-#{direction(right)}-color: $turnitin_red;
   }
   &.submission_error, &.submission_pending {
-    border-right-color: $turnitin_gray;
+    border-#{direction(right)}-color: $turnitin_gray;
   }
 }
 
 .turnitin_score_container {
   position: relative;
-  margin-left: 10px;
+  margin-#{direction(left)}: 10px;
 }
 
 .turnitin_similarity_score,
@@ -102,15 +102,20 @@ $turnitin_gray: #808080;
   &.submission_error, &.submission_pending {
     background-color: $turnitin_gray;
   }
+  &.pending_score {
+    background-image: url(/images/turnitin_submission_pending.png);
+    width: 10px;
+    height: 10px;
+  }
 }
 
 .turnitin_score_container {
   position: relative;
-  margin-left: 10px;
+  margin-#{direction(left)}: 10px;
 }
 
 .turnitin_resubmit_container {
-  text-align: right;
+  text-align: direction(right);
 }
 
 .turnitin-comments {

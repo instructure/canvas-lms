@@ -93,38 +93,19 @@ export default class Navigation {
 
   handleHeaderKeyDown (event, location) {
     if (isTab(event)) {
-      const columns = this.grid.getColumns();
-      const lastCell = columns.length - 1;
-
-      if (location.cell === lastCell) {
-        // Tab into the body: Activate the first cell of the first row.
-        this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 0 });
-      } else {
-        // Tab within the header: Activate the next cell.
-        this.gridSupport.state.setActiveLocation('header', { cell: location.cell + 1 });
-      }
-
+      // Tab out of the grid: Activate the "after grid" region.
+      this.gridSupport.state.setActiveLocation('afterGrid');
       this.trigger('onNavigateNext', event);
 
-      // prevent both SlickGrid and default browser behavior
-      event.preventDefault();
+      // prevent SlickGrid behavior, but allow default browser behavior
     }
 
     if (isShiftTab(event)) {
-      if (location.cell === 0) {
-        // Shift+Tab back out of the header: Activate "before grid" region.
-        this.gridSupport.state.setActiveLocation('beforeGrid');
-        this.trigger('onNavigatePrev', event);
+      // Shift+Tab out of the grid: Activate the "before grid" region.
+      this.gridSupport.state.setActiveLocation('beforeGrid');
+      this.trigger('onNavigatePrev', event);
 
-        // prevent SlickGrid behavior, but allow default browser behavior
-      } else {
-        // Shift+Tab back within the header: Activate the previous cell.
-        this.gridSupport.state.setActiveLocation('header', { cell: location.cell - 1 });
-        this.trigger('onNavigatePrev', event);
-
-        // prevent both SlickGrid and default browser behavior
-        event.preventDefault();
-      }
+      // prevent SlickGrid behavior, but allow default browser behavior
     }
 
     if (isLeftArrow(event)) {
@@ -170,35 +151,20 @@ export default class Navigation {
 
   handleBodyKeyDown (event, location) {
     if (isShiftTab(event)) {
-      if (location.row === 0 && location.cell === 0) {
-        // Shift+Tab back out of the body: Activate the last header cell.
-        const lastCell = this.grid.getColumns().length - 1;
-        this.gridSupport.state.setActiveLocation('header', { cell: lastCell });
-        this.trigger('onNavigatePrev', event);
+      // Shift+Tab out of the grid: Activate the "before grid" region.
+      this.gridSupport.state.setActiveLocation('beforeGrid');
+      this.trigger('onNavigatePrev', event);
 
-        // prevent both SlickGrid and default browser behavior
-        event.preventDefault();
-        skipSlickGridDefaults(event);
-      }
-
-      // Shift+Tab within the body: Activate the previous cell.
-      // * this is handled by SlickGrid
+      // prevent SlickGrid behavior, but allow default browser behavior
+      skipSlickGridDefaults(event);
     }
 
     if (isTab(event)) {
-      const lastRow = this.grid.getDataLength() - 1;
-      const lastCell = this.grid.getColumns().length - 1;
+      // Tab out of the grid: Activate the "after grid" region.
+      this.gridSupport.state.setActiveLocation('afterGrid');
 
-      if (location.row === lastRow && location.cell === lastCell) {
-        // Tab out of the body: Activate the "after grid" region.
-        this.gridSupport.state.setActiveLocation('afterGrid');
-
-        // prevent SlickGrid behavior, but allow default browser behavior
-        skipSlickGridDefaults(event);
-      }
-
-      // Tab within the body: Activate the next cell.
-      // * this is handled by SlickGrid
+      // prevent SlickGrid behavior, but allow default browser behavior
+      skipSlickGridDefaults(event);
     }
 
     if (isLeftArrow(event)) {
@@ -237,7 +203,7 @@ export default class Navigation {
   handleBeforeGridKeyDown (event, _location) {
     if (isTab(event)) {
       // Tab into the header: Activate the first cell.
-      this.gridSupport.state.setActiveLocation('header', { cell: 0 });
+      this.gridSupport.state.restorePreviousLocation();
       this.trigger('onNavigateNext', event);
 
       // prevent both SlickGrid and default browser behavior
@@ -250,11 +216,8 @@ export default class Navigation {
 
   handleAfterGridKeyDown (event, _location) {
     if (isShiftTab(event)) {
-      // Shift+Tab back into the body: Activate the last cell.
-      const lastRow = this.grid.getDataLength() - 1;
-      const lastCell = this.grid.getColumns().length - 1;
-
-      this.gridSupport.state.setActiveLocation('body', { row: lastRow, cell: lastCell });
+      // Shift+Tab back into the body: Activate the first cell.
+      this.gridSupport.state.restorePreviousLocation();
       this.trigger('onNavigatePrev', event);
 
       // prevent both SlickGrid and default browser behavior

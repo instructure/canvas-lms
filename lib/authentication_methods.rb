@@ -35,6 +35,9 @@ module AuthenticationMethods
   class AccessTokenError < Exception
   end
 
+  class AccessTokenScopeError < StandardError
+  end
+
   class LoggedOutError < Exception
   end
 
@@ -82,6 +85,22 @@ module AuthenticationMethods
     end
   end
 
+  def validate_scopes
+    if @access_token && @domain_root_account.feature_enabled?(:api_token_scoping)
+      developer_key = @access_token.developer_key
+      request_method = request.method.casecmp('HEAD') == 0 ? 'GET' : request.method.upcase
+
+      if developer_key.try(:require_scopes)
+        if @access_token.url_scopes_for_method(request_method).any? { |scope| scope =~ request.path }
+          params.delete :include
+          params.delete :includes
+        else
+          raise AccessTokenScopeError
+        end
+      end
+    end
+  end
+
   def load_pseudonym_from_access_token
     return unless api_request? ||
       (params[:controller] == 'oauth2_provider' && params[:action] == 'destroy') ||
@@ -95,9 +114,8 @@ module AuthenticationMethods
         raise AccessTokenError
       end
 
-      if !@access_token.authorized_for_account?(@domain_root_account)
-        raise AccessTokenError
-      end
+      account = access_token_account(@domain_root_account, @access_token)
+      raise AccessTokenError unless @access_token.authorized_for_account?(account)
 
       @current_user = @access_token.user
       @current_pseudonym = SisPseudonym.for(@current_user, @domain_root_account, type: :implicit, require_sis: false)
@@ -105,10 +123,22 @@ module AuthenticationMethods
       unless @current_user && @current_pseudonym
         raise AccessTokenError
       end
+
+      validate_scopes
       @access_token.used!
 
       RequestContextGenerator.add_meta_header('at', @access_token.global_id)
       RequestContextGenerator.add_meta_header('dk', @access_token.global_developer_key_id) if @access_token.developer_key_id
+    end
+  end
+
+  def access_token_account(domain_root_account, access_token)
+    dev_key_account_id = access_token.dev_key_account_id
+    if dev_key_account_id.blank? || domain_root_account.id == dev_key_account_id
+      domain_root_account
+    else
+      get_context
+      (@context && Context.get_account(@context)) || domain_root_account
     end
   end
 

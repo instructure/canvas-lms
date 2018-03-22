@@ -72,15 +72,17 @@ class DiscussionTopic < ActiveRecord::Base
   has_many :course_sections, :through => :discussion_topic_section_visibilities, :dependent => :destroy
   belongs_to :user
 
+  validates_associated :discussion_topic_section_visibilities
   validates_presence_of :context_id, :context_type
   validates_inclusion_of :discussion_type, :in => DiscussionTypes::TYPES
   validates_length_of :message, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validate :validate_draft_state_change, :if => :workflow_state_changed?
   validate :section_specific_topics_must_have_sections
-  validate :only_announcements_can_be_section_specific
   validate :feature_must_be_enabled_for_section_specific
   validate :only_course_topics_can_be_section_specific
+  validate :assignments_cannot_be_section_specific
+  validate :course_group_discussion_cannot_be_section_specific
 
   sanitize_field :message, CanvasSanitize::SANITIZE
   copy_authorized_links(:message) { [self.context, nil] }
@@ -98,8 +100,6 @@ class DiscussionTopic < ActiveRecord::Base
   after_create :create_participant
   after_create :create_materialized_view
 
-  # TODO: Consider merging the following two validations into one to save a
-  # db query
   def section_specific_topics_must_have_sections
     if !self.deleted? && self.is_section_specific && self.discussion_topic_section_visibilities.none?(&:active?)
       self.errors.add(:is_section_specific, t("Section specific topics must have sections"))
@@ -108,9 +108,13 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  def only_announcements_can_be_section_specific
-    if self.is_section_specific && !self.is_announcement
-      self.errors.add(:is_section_specific, t("Only announcements can be section-specific"))
+  def feature_must_be_enabled_for_section_specific
+    return true unless self.is_section_specific
+
+    if self.is_announcement && !self.context.root_account.feature_enabled?(:section_specific_announcements)
+      self.errors.add(:is_section_specific, t("Section-specific announcements are disabled"))
+    elsif !self.is_announcement && !self.context.root_account.feature_enabled?(:section_specific_discussions)
+      self.errors.add(:is_section_specific, t("Section-specific discussions are disabled"))
     else
       true
     end
@@ -118,20 +122,26 @@ class DiscussionTopic < ActiveRecord::Base
 
   def only_course_topics_can_be_section_specific
     if self.is_section_specific && !(self.context.is_a? Course)
-      self.errors.add(:is_section_specific, t("Only course announcements can be section-specific"))
+      self.errors.add(:is_section_specific, t("Only course announcements and discussions can be section-specific"))
     else
       true
     end
   end
 
-  def feature_must_be_enabled_for_section_specific
-    return true unless self.is_section_specific
-    # We don't allow group discussions to be section-specific, so it's ok to require
-    # that context be a course here.
-    feature_enabled = (self.context.is_a? Course) &&
-      self.context.root_account&.feature_enabled?(:section_specific_announcements)
-    return true if feature_enabled
-    self.errors.add(:is_section_specific, t("Section-specific discussions are disabled"))
+  def assignments_cannot_be_section_specific
+    if self.is_section_specific && self.assignment
+      self.errors.add(:is_section_specific, t("Discussion assignments cannot be section-specific"))
+    else
+      true
+    end
+  end
+
+  def course_group_discussion_cannot_be_section_specific
+    if self.is_section_specific && self.has_group_category?
+      self.errors.add(:is_section_specific, t("Discussions with groups cannot be section-specific"))
+    else
+      true
+    end
   end
 
   def threaded=(v)
@@ -329,9 +339,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def get_potentially_conflicting_titles(title_base)
-    result = DiscussionTopic.active.where(context_id: self.context_id)
-      .starting_with_title(title_base).pluck("title").to_set
-    result
+    DiscussionTopic.active.where(context_type: self.context_type, context_id: self.context_id).
+      starting_with_title(title_base).pluck("title").to_set
   end
 
   # This is a guess of what to copy over.
@@ -358,7 +367,8 @@ class DiscussionTopic < ActiveRecord::Base
       :allow_rating => self.allow_rating,
       :only_graders_can_rate => self.only_graders_can_rate,
       :sort_by_rating => self.sort_by_rating,
-      :todo_date => self.todo_date
+      :todo_date => self.todo_date,
+      :is_section_specific => self.is_section_specific
     })
   end
 
@@ -377,12 +387,33 @@ class DiscussionTopic < ActiveRecord::Base
       opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"), self.title)
     result = self.duplicate_base_model(copy_title, opts_with_default)
 
+    # Start with a position guaranteed to not conflict with existing ones.
+    # Clients are encouraged to set the correct position later on and do
+    # an insert_at upon save.
+
+    if self.pinned
+      result.position = self.context.discussion_topics.active.where(:pinned => true).maximum(:position) + 1
+    end
+
     if self.assignment && opts_with_default[:duplicate_assignment]
       result.assignment = self.assignment.duplicate({
         :duplicate_discussion_topic => false,
         :copy_title => result.title
       })
     end
+
+    result.discussion_topic_section_visibilities = []
+    if self.is_section_specific
+      original_visibilities = self.discussion_topic_section_visibilities.active
+      original_visibilities.each do |visibility|
+        new_visibility = DiscussionTopicSectionVisibility.new(
+          :discussion_topic => result,
+          :course_section => visibility.course_section
+        )
+        result.discussion_topic_section_visibilities << new_visibility
+      end
+    end
+
     # For some reason, the relation doesn't take care of this for us. Don't understand why.
     # Without this line, *two* discussion topic duplicates appear when a save is performed.
     result.assignment&.discussion_topic = result
@@ -1095,10 +1126,33 @@ class DiscussionTopic < ActiveRecord::Base
 
   def set_assignment=(val); end
 
+  # From the given list of users, return those that are permitted to see the section
+  # of the topic.  If the topic is not section specific this just returns the
+  # original list.
+  def users_with_section_visibility(users)
+    return users unless self.is_section_specific? && self.context.is_a?(Course)
+    non_nil_users = users.compact
+    section_ids = DiscussionTopicSectionVisibility.active.where(:discussion_topic_id => self.id).
+      pluck(:course_section_id)
+    user_ids = non_nil_users.map(&:id)
+    # Context is known to be a course here
+    users_in_sections = Enrollment.select(:user_id).active.where(:course_id => self.context_id,
+      :course_section_id => section_ids, :user_id => user_ids).map(&:user_id).to_set
+    unlocked_teachers = Enrollment.select(:user_id).active.instructor.
+      where(:course_id => self.context_id, :limit_privileges_to_course_section => false,
+        :user_id => user_ids).
+      map(&:user_id).to_set
+    permitted_user_ids = users_in_sections.union(unlocked_teachers)
+    return non_nil_users.select { |u| permitted_user_ids.include?(u.id) }
+  end
+
   def participants(include_observers=false)
-    participants = [ self.user ]
-    participants += context.participants(include_observers: include_observers, by_date: true)
-    participants.compact.uniq
+    participants = context.participants(include_observers: include_observers, by_date: true)
+    participants_in_section = self.users_with_section_visibility(participants.compact)
+    if self.user && !participants_in_section.map(&:id).to_set.include?(self.user.id)
+      participants_in_section += [ self.user ]
+    end
+    return participants_in_section
   end
 
   def active_participants(include_observers=false)
@@ -1120,12 +1174,15 @@ class DiscussionTopic < ActiveRecord::Base
 
   def users_with_permissions(users)
     permission = self.is_announcement ? :read_announcements : :read_forum
-    if self.course.is_a?(Course)
-      self.course.filter_users_by_permission(users, permission)
-    else
-      # sucks to be an account-level group
-      users.select{|u| self.is_announcement ? self.context.grants_right?(u, :read_announcements) : self.context.grants_right?(u, :read_forum)}
+    course = self.course
+    if !(course.is_a?(Course))
+      return users.select do |u|
+        self.is_announcement ? self.context.grants_right?(u, :read_announcements) : self.context.grants_right?(u, :read_forum)
+      end
     end
+
+    readers = self.course.filter_users_by_permission(users, permission)
+    return self.users_with_section_visibility(readers)
   end
 
   def course
@@ -1214,6 +1271,16 @@ class DiscussionTopic < ActiveRecord::Base
 
       next false unless (is_announcement ? context.grants_right?(user, :read_announcements) : context.grants_right?(user, :read_forum))
 
+      # Don't have visibilites for any of the specific sections in a section specific topic
+      if context.is_a?(Course) && self.try(:is_section_specific)
+        section_visibilities = context.course_section_visibility(user)
+        next false if section_visibilities == :none
+        if section_visibilities != :all
+          course_specific_sections = self.course_sections.pluck(:id)
+          next false if (section_visibilities & course_specific_sections).empty?
+        end
+      end
+
       # user is an admin in the context (teacher/ta/designer) OR
       # user is an account admin with appropriate permission
       next true if context.grants_any_right?(user, :manage, :read_course_content)
@@ -1229,11 +1296,6 @@ class DiscussionTopic < ActiveRecord::Base
       elsif is_announcement && unlock_at = available_from_for(user)
       # unlock date exists and has passed
         next unlock_at < Time.now.utc
-      # check section specific stuff
-      elsif self.try(:is_section_specific)
-        sections = user.enrollments.active.
-          where(course_section_id: self.discussion_topic_section_visibilities.select(:course_section_id))
-        next sections.any?
       # everything else
       else
         next true
@@ -1425,5 +1487,15 @@ class DiscussionTopic < ActiveRecord::Base
   # synchronously create/update the materialized view
   def create_materialized_view
     DiscussionTopic::MaterializedView.for(self).update_materialized_view_without_send_later(xlog_location: self.class.current_xlog_location)
+  end
+
+  def grading_standard_or_default
+    grading_standard_context = assignment || context
+
+    if grading_standard_context.present?
+      grading_standard_context.grading_standard_or_default
+    else
+      GradingStandard.default_instance
+    end
   end
 end

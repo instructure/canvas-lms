@@ -96,12 +96,12 @@ $te-footer-height: 72px;
   width: calc(100% - #{$te-width});
   z-index: 8000;
   position: absolute;
-  left: $te-width; top: 0;
+  #{direction(left)}: $te-width; top: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   .Theme__layout--is-active-theme & {
-    top: 4px; left: $te-width + 4;
+    top: 4px; #{direction(left)}: $te-width + 4;
     height: calc(100% - #{$te-footer-height + 4});
     width: calc(100% - #{$te-width + 8});
   }
@@ -109,7 +109,7 @@ $te-footer-height: 72px;
 }
 
 .Theme__preview-button-text {
-  padding-left: $ic-sp;
+  padding-#{direction(left)}: $ic-sp;
 }
 
 .Theme__preview iframe {
@@ -124,7 +124,7 @@ $te-footer-height: 72px;
 
 .Theme__header {
   position: fixed;
-  left: 0; bottom: 0;
+  #{direction(left)}: 0; bottom: 0;
   width: 100%;
   background: $te-bgd-dark;
   color: $ic-color-light;
@@ -185,7 +185,7 @@ $te-footer-height: 72px;
   .Theme__editor-tabs_input {
     opacity: 0;
     position: absolute;
-    top: 0; left: 0;
+    top: 0; #{direction(left)}: 0;
   }
 
   #te-editor:checked ~ .Theme__editor-tab-label-layout #te-editor-tab,
@@ -232,6 +232,7 @@ $te-footer-height: 72px;
 .Theme__editor-upload-overrides {
   background-color: $te-content-bgd;
   color: $ic-font-color-dark;
+  width: 300px;
 
   .Theme__editor-upload-overrides_header {
     padding: 10px;
@@ -263,7 +264,7 @@ $te-footer-height: 72px;
 
   input[type="file"] {
     position: absolute;
-    top: 0; left: -9999px;
+    top: 0; #{direction(left)}: -9999px;
     opacity: 0;
   }
 }
@@ -295,7 +296,7 @@ $te-footer-height: 72px;
 
 
 .ThemeEditorFileUpload__view-file {
-  float: right;
+  float: direction(right);
   font-weight: normal;
 }
 
@@ -486,8 +487,8 @@ $te-footer-height: 72px;
   .ic-Form-message.ic-Form-message--error{
     position: absolute;
     top: 40px;
-    right: 40px;
-    left: auto;
+    #{direction(right)}: 40px;
+    #{direction(left)}: auto;
     height: auto; width: auto;
     .ic-Form-message__Layout {
       flex-direction: row;
@@ -499,8 +500,8 @@ $te-footer-height: 72px;
         flex: 0 0 150px;
       }
       &:after {
-        right: 16px;
-        left: auto;
+        #{direction(right)}: 16px;
+        #{direction(left)}: auto;
       }
     }
   }
@@ -587,7 +588,7 @@ $te-footer-height: 72px;
     }
     .Theme__editor-input_upload {
       position: absolute;
-      top: 0; left: -9999px;
+      top: 0; #{direction(left)}: -9999px;
       opacity: 0;
 
       &:focus + .Theme__editor-button_upload {
@@ -620,7 +621,7 @@ $te-footer-height: 72px;
 
 .Theme-editor-progress-list-item__title {
   flex: 0 0 36%;
-  padding-right: $ic-sp*2;
+  padding-#{direction(right)}: $ic-sp*2;
   font-size: $baseFontSize;
   font-weight: bold;
 }

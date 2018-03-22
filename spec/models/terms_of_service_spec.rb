@@ -44,6 +44,11 @@ describe TermsOfService do
     expect(tos.passive).to eq true
   end
 
+  it "creates a Terms of Service defaulting sets correct options" do
+    ac2 = account_model
+    expect(TermsOfService.type_dropdown_options_for_account(ac2)[0][1]).to eq "default"
+  end
+
   describe "#ensure_terms_for_account" do
     before :each do
       TermsOfService.skip_automatic_terms_creation = false

@@ -60,6 +60,7 @@ describe "conversations new" do
     end
 
     it "should check the Journal messages for correct time and sender", priority: "1", test_id: 75701 do
+      skip_if_chrome('fragile in chrome')
       user_session(@teacher)
       conversations
       compose course: @course, subject: 'Christmas', to: [@s1], body: 'The Fat Man cometh.', journal: true, send: true
@@ -72,6 +73,7 @@ describe "conversations new" do
     end
 
     it "should allow an admin to delete a Journal message", priority: "1", test_id: 75703 do
+      skip_if_chrome('fragile in chrome')
       skip_if_safari(:alert)
       user_session(@teacher)
       conversations
@@ -116,6 +118,7 @@ describe "conversations new" do
     end
 
     it "should be allowed on new private conversations with students", priority: "1", test_id: 207094 do
+      skip_if_chrome('fragile in chrome')
       compose course: @course, to: [@s1, @s2], body: 'hallo!', send: false
       checkbox = f('.user_note')
       expect(checkbox).to be_displayed
@@ -128,6 +131,7 @@ describe "conversations new" do
     end
 
     it "should be allowed with student groups", priority: "1", test_id: 207093 do
+      skip_if_chrome('fragile in chrome')
       compose course: @course, to: [@group], body: 'hallo!', send: false
       checkbox = f('.user_note')
       expect(checkbox).to be_displayed
@@ -138,6 +142,7 @@ describe "conversations new" do
     end
 
     it "should not be allowed if disabled", priority: "1", test_id: 207092 do
+      skip_if_chrome('fragile in chrome')
       @course.account.update_attribute(:enable_user_notes, false)
       conversations
       compose course: @course, to: [@s1], body: 'hallo!', send: false
@@ -145,6 +150,7 @@ describe "conversations new" do
     end
 
     it "should not be allowed for students", priority: "1", test_id: 138686 do
+      skip_if_chrome('fragile in chrome')
       user_session(@s1)
       conversations
       compose course: @course, to: [@s2], body: 'hallo!', send: false
@@ -152,6 +158,7 @@ describe "conversations new" do
     end
 
     it "should not be allowed with non-student recipient", priority: "1", test_id: 138687 do
+      skip_if_chrome('fragile in chrome')
       compose course: @course, to: [@teacher], body: 'hallo!', send: false
       expect(f('.user_note')).not_to be_displayed
     end
@@ -201,6 +208,7 @@ describe "conversations new" do
     end
 
     it "should send a message with faculty journal checked", priority: "1", test_id: 75433 do
+      skip_if_chrome('fragile in chrome')
       conversations
       # First verify teacher can send a message with faculty journal entry checked to one student
       compose course: @course, to: [@s1], body: 'hallo!', journal: true, send: true

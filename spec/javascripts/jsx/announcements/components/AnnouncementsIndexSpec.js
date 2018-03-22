@@ -27,6 +27,7 @@ import sampleData from '../sampleData'
 const makeProps = (props = {}) => _.merge({
   announcements: [],
   announcementsPage: 1,
+  isCourseContext: true,
   isLoadingAnnouncements: false,
   hasLoadedAnnouncements: false,
   announcementsLastPage: 5,
@@ -37,13 +38,16 @@ const makeProps = (props = {}) => _.merge({
   },
   getAnnouncements () {},
   setAnnouncementSelection () {},
+  deleteAnnouncements () {},
+  toggleAnnouncementsLock () {},
 }, props)
 
 // necessary to mock this because we have a child Container/"Smart" component
 // that need to pull their props from the store state
 const store = {
   getState: () => ({
-    courseId: '5',
+    contextType: 'course',
+    contextId: '1',
     permissions: {
       create: true,
       manage_content: true,
@@ -110,7 +114,7 @@ test('clicking announcement checkbox triggers setAnnouncementSelection with corr
   const selectSpy = sinon.spy()
   const props = {
     announcements: sampleData.announcements,
-    setAnnouncementSelection: selectSpy,
+    announcementSelectionChangeStart: selectSpy,
     hasLoadedAnnouncements: true,
     permissions: {
       moderate: true,
@@ -128,4 +132,63 @@ test('clicking announcement checkbox triggers setAnnouncementSelection with corr
     deepEqual(selectSpy.firstCall.args, [{ selected: true, id: sampleData.announcements[0].id }])
     done()
   })
+})
+
+test('onManageAnnouncement shows delete modal when called with delete action', (assert) => {
+  const done = assert.async()
+  const props = {
+    announcements: sampleData.announcements,
+    hasLoadedAnnouncements: true,
+    permissions: {
+      moderate: true,
+    },
+  }
+
+  function indexRef (c) {
+    if (c) {
+      c.onManageAnnouncement(null, { action: 'delete' })
+
+      setTimeout(() => {
+        ok(c.deleteModal)
+        c.deleteModal.hide()
+        done()
+      })
+    }
+  }
+
+  mount(
+    <Provider store={store}>
+      <AnnouncementsIndex {...makeProps(props)} ref={indexRef} />
+    </Provider>
+  )
+})
+
+test('onManageAnnouncement calls toggleAnnouncementsLock when called with lock action', (assert) => {
+  const done = assert.async()
+  const lockSpy = sinon.spy()
+  const props = {
+    announcements: sampleData.announcements,
+    hasLoadedAnnouncements: true,
+    permissions: {
+      moderate: true,
+    },
+    toggleAnnouncementsLock: lockSpy,
+  }
+
+  function indexRef (c) {
+    if (c) {
+      c.onManageAnnouncement(null, { action: 'lock' })
+
+      setTimeout(() => {
+        equal(lockSpy.callCount, 1)
+        done()
+      })
+    }
+  }
+
+  mount(
+    <Provider store={store}>
+      <AnnouncementsIndex {...makeProps(props)} ref={indexRef} />
+    </Provider>
+  )
 })

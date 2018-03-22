@@ -21,22 +21,22 @@
 }
 
 ul.instTree {
-  padding-left: 0;
+  padding-#{direction(left)}: 0;
   width: 100%;
   margin: 0;
   overflow: hidden;
   list-style: none;
   ul {
-    padding-left: 0;
-    margin-left: 0;
+    padding-#{direction(left)}: 0;
+    margin-#{direction(left)}: 0;
   }
   li {
     list-style: none;
     min-height: 20px;
-    padding-left: 35px;
+    padding-#{direction(left)}: 35px;
     position: relative;
     border-radius: 3px;
-    background: 13px top no-repeat;
+    background: direction(left) 13px top no-repeat;
     background-size: 16px 16px;
     &.separator {
       min-height: 2px;
@@ -65,7 +65,7 @@ ul.instTree {
       ul {
         display: none;
         position: relative;
-        left: -13px;
+        #{direction(left)}: -13px;
       }
       &.open > ul {
         display: block;
@@ -84,8 +84,11 @@ ul.instTree {
         height: 15px;
         cursor: pointer;
         position: absolute;
-        left: -4px;
+        #{direction(left)}: -4px;
         top: 0;
+        @if $direction == 'rtl' {
+          transform: scale(-1, 1);
+        }
         &.plus {
           background: url("/images/inst_tree/plus.gif") 5px 50% no-repeat;
         }
@@ -99,7 +102,7 @@ ul.instTree {
     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
     font-size: 1em;
     position: absolute;
-    left: 30px;
+    #{direction(left)}: 30px;
     top: 0;
   }
 }

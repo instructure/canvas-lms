@@ -75,7 +75,6 @@ define [
 
       if @outcomeGroup
         @$el.disableWhileLoading(dfd = @groups.fetch())
-        dfd.done(@focusFirstOutcome)
 
       @loadDfd.done(@selectFirstOutcome) if opts.selectFirstItem
 
@@ -154,20 +153,13 @@ define [
       if (@views().length > 0)
         @views()[0].makeFocusable()
 
-    focusFirstOutcome: =>
-      $li = @$el.find('[tabindex=0]')
-      if $li.length > 0
-        $li.focus()
-      else
-        @$el.prev().find('[tabindex=0]').focus()
-
     selectFirstOutcome: =>
       $('ul.outcome-level li:first').click()
 
     # Overriding
     paginationLoaderTemplate: ->
-      "<li><a href='#' class='loading-more'>
-        #{htmlEscape I18n.t("loading_more_results", "Loading more results")}</a></li>"
+      "<li><span class='loading-more'>
+        #{htmlEscape I18n.t("Loading more results")}</span></li>"
 
     # Overriding to insert into the ul.
     showPaginationLoader: ->

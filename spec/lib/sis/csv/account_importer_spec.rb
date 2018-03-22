@@ -23,34 +23,25 @@ describe SIS::CSV::AccountImporter do
   before { account_model }
 
   it 'should skip bad content' do
-    before_count = Account.count
+    before_count = Account.where.not(:sis_source_id => nil).count
     importer = process_csv_data(
       "account_id,parent_account_id,name,status",
       "A001,,Humanities,active",
-      ",,Humanities 3,active")
-
-    errors = importer.errors.map { |r| r.last }
-    warnings = importer.warnings.map { |r| r.last }
-    expect(warnings).to eq ["No account_id given for an account"]
-    expect(errors).to eq []
-
-    importer = process_csv_data(
-      "account_id,parent_account_id,name,status",
+      ",,Humanities 3,active",
       "A002,A000,English,active",
       "A003,,English,inactive",
       "A004,,,active")
-    expect(Account.count).to eq before_count + 1
+    expect(Account.where.not(:sis_source_id => nil).count).to eq before_count + 1
 
     errors = importer.errors.map { |r| r.last }
-    warnings = importer.warnings.map { |r| r.last }
-    expect(errors).to eq []
-    expect(warnings).to eq ["Parent account didn't exist for A002",
-                        "Improper status \"inactive\" for account A003, skipping",
-                        "No name given for account A004, skipping"]
+    expect(errors).to match_array ["No account_id given for an account",
+                                   "Parent account didn't exist for A002",
+                                   "Improper status \"inactive\" for account A003, skipping",
+                                   "No name given for account A004, skipping"]
   end
 
   it 'should create accounts' do
-    before_count = Account.count
+    before_count = Account.where.not(:sis_source_id => nil).count
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
       "A001,,Humanities,active",
@@ -58,7 +49,7 @@ describe SIS::CSV::AccountImporter do
       "A003,A002,English Literature,active",
       "A004,,Awesomeness,active"
     )
-    expect(Account.count).to eq before_count + 4
+    expect(Account.where.not(:sis_source_id => nil).count).to eq before_count + 4
 
     a1 = @account.sub_accounts.where(sis_source_id: 'A001').first
     expect(a1).not_to be_nil
@@ -80,7 +71,7 @@ describe SIS::CSV::AccountImporter do
   end
 
   it 'should update the hierarchies of existing accounts' do
-    before_count = Account.count
+    before_count = Account.where.not(:sis_source_id => nil).count
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
       "A001,,Humanities,active",
@@ -88,7 +79,7 @@ describe SIS::CSV::AccountImporter do
       "A003,,English Literature,active",
       "A004,,Awesomeness,active"
     )
-    expect(Account.count).to eq before_count + 4
+    expect(Account.where.not(:sis_source_id => nil).count).to eq before_count + 4
 
     ['A001', 'A002', 'A003', 'A004'].each do |id|
       expect(Account.where(sis_source_id: id).first.parent_account).to eq @account
@@ -102,7 +93,7 @@ describe SIS::CSV::AccountImporter do
       "A003,A002,,",
       "A004,A002,,"
     )
-    expect(Account.count).to eq before_count + 4
+    expect(Account.where.not(:sis_source_id => nil).count).to eq before_count + 4
 
     a1 = Account.where(sis_source_id: 'A001').first
     a2 = Account.where(sis_source_id: 'A002').first
@@ -116,6 +107,19 @@ describe SIS::CSV::AccountImporter do
     expect(Account.where(sis_source_id: 'A002').first.workflow_state).to eq "deleted"
     expect(Account.where(sis_source_id: 'A003').first.name).to eq "English Literature"
 
+  end
+
+  it 'should not allow deleting accounts with content' do
+    process_csv_data_cleanly(
+      "account_id,parent_account_id,name,status",
+      "A001,,Humanities,active",
+      "A002,A001,Sub Humanities,active")
+    importer = process_csv_data(
+      "account_id,parent_account_id,name,status",
+      "A001,,Humanities,deleted")
+
+    errors = importer.errors.map { |r| r.last }
+    expect(errors).to eq ["Cannot delete the sub_account with ID: A001 because it has active sub accounts."]
   end
 
   it 'should support sticky fields' do
@@ -167,12 +171,12 @@ describe SIS::CSV::AccountImporter do
   end
 
   it 'should match headers case-insensitively' do
-    before_count = Account.count
+    before_count = Account.where.not(:sis_source_id => nil).count
     process_csv_data_cleanly(
       "Account_ID,Parent_Account_ID,Name,Status",
       "A001,,Humanities,active"
     )
-    expect(Account.count).to eq before_count + 1
+    expect(Account.where.not(:sis_source_id => nil).count).to eq before_count + 1
 
     a1 = @account.sub_accounts.where(sis_source_id: 'A001').first
     expect(a1).not_to be_nil
@@ -192,9 +196,7 @@ describe SIS::CSV::AccountImporter do
       "A001,A002,Humanities,active"
     )
     errors = importer.errors.map { |r| r.last }
-    warnings = importer.warnings.map { |r| r.last }
-    expect(errors).to eq []
-    expect(warnings).to eq ["Setting account A001's parent to A002 would create a loop"]
+    expect(errors).to eq ["Setting account A001's parent to A002 would create a loop"]
   end
 
   it 'should update batch id on unchanging accounts' do

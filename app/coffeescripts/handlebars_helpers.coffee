@@ -595,6 +595,11 @@ define [
 
     nf:(number, {hash: {format}}) ->
       numberFormat[format](number)
+
+    # Public: look up an element of a hash or array
+    #
+    lookup: (obj, key) ->
+      obj && obj[key]
   }
 
   return Handlebars

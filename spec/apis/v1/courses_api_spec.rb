@@ -135,6 +135,24 @@ describe Api::V1::Course do
       expect(json['total_students']).to eq 1
     end
 
+    it "counts students with multiple enrollments once in 'total students'" do
+      section = @course2.course_sections.create! name: 'other section'
+      @course2.enroll_student @student, section: section, allow_multiple_enrollments: true
+      expect(@course2.student_enrollments.count).to eq 2
+
+      json = @test_api.course_json(@course2, @me, {}, ['total_students'], [])
+      expect(json).to include('total_students')
+      expect(json['total_students']).to eq 1
+    end
+
+    it "excludes the student view student in 'total students'" do
+      @course2.student_view_student
+      json = @test_api.course_json(@course2, @me, {}, ['total_students'], [])
+
+      expect(json).to include('total_students')
+      expect(json['total_students']).to eq 1
+    end
+
     it "includes the course nickname if one is set" do
       @me.course_nicknames[@course1.id] = 'nickname'
       json = @test_api.course_json(@course1, @me, {}, [], [])
@@ -142,17 +160,20 @@ describe Api::V1::Course do
       expect(json['original_name']).to eq @course1.name
     end
 
-    context "total_scores" do
-      before do
-        @enrollment.scores.create!(current_score: 95.0, final_score: 85.0)
+    describe "total_scores" do
+      before(:each) do
+        @enrollment.scores.create!(
+          current_score: 95.0, final_score: 85.0,
+          unposted_current_score: 94.0, unposted_final_score: 84.0
+        )
         @course.grading_standard_enabled = true
         @course.save!
       end
 
       let(:json) { @test_api.course_json(@course1, @me, {}, ['total_scores'], [@enrollment]) }
 
-      it "should include computed scores" do
-        expect(json['enrollments']).to eq [{
+      let(:expected_result_without_unposted) do
+        {
           "type" => "student",
           "role" => student_role.name,
           "role_id" => student_role.id,
@@ -162,7 +183,137 @@ describe Api::V1::Course do
           "computed_final_score" => 85.0,
           "computed_current_grade" => "A",
           "computed_final_grade" => "B"
-        }]
+        }
+      end
+
+      let(:expected_result_with_unposted) do
+        expected_result_without_unposted.merge({
+          "unposted_current_score" => 94.0,
+          "unposted_final_score" => 84.0,
+          "unposted_current_grade" => "A",
+          "unposted_final_grade" => "B"
+        })
+      end
+
+      it "should include computed scores" do
+        expect(json['enrollments']).to eq [expected_result_with_unposted]
+      end
+
+      it "should include unposted scores if user has :manage_grades" do
+        @course.root_account.role_overrides.create!(permission: 'view_all_grades', role: teacher_role, enabled: false)
+        @course.root_account.role_overrides.create!(permission: 'manage_grades', role: teacher_role, enabled: true)
+
+        expect(json['enrollments']).to eq [expected_result_with_unposted]
+      end
+
+      it "should include unposted scores if user has :view_all_grades" do
+        @course.root_account.role_overrides.create!(permission: 'view_all_grades', role: teacher_role, enabled: true)
+        @course.root_account.role_overrides.create!(permission: 'manage_grades', role: teacher_role, enabled: false)
+
+        expect(json['enrollments']).to eq [expected_result_with_unposted]
+      end
+
+      it "should not include unposted scores if user does not have permission" do
+        @course.root_account.role_overrides.create!(permission: 'view_all_grades', role: teacher_role, enabled: false)
+        @course.root_account.role_overrides.create!(permission: 'manage_grades', role: teacher_role, enabled: false)
+
+        expect(json['enrollments']).to eq [expected_result_without_unposted]
+      end
+    end
+
+    describe "current_grading_period_scores" do
+      before(:each) do
+        @course.grading_standard_enabled = true
+        create_grading_periods_for(@course, grading_periods: [:current, :future])
+
+        current_assignment = @course.assignments.create!(
+          title: "Current",
+          due_at: 2.days.ago,
+          points_possible: 10
+        )
+        current_assignment.grade_student(@student, grader: @teacher, score: 2)
+        unposted_current_assignment = @course.assignments.create!(
+          title: "Current",
+          due_at: 2.days.ago,
+          points_possible: 10,
+          muted: true
+        )
+        unposted_current_assignment.grade_student(@student, grader: @teacher, score: 9)
+
+        future_assignment = @course.assignments.create!(
+          title: "Future",
+          due_at: 4.months.from_now,
+          points_possible: 10,
+        )
+        future_assignment.grade_student(@student, grader: @teacher, score: 7)
+
+        @course.save!
+        @me = @teacher
+      end
+
+      let(:json) do
+        @test_api.course_json(@course, @me, {}, ['total_scores', 'current_grading_period_scores'], [@enrollment])
+      end
+
+      let(:student_enrollment) { json['enrollments'].first }
+
+      let(:expected_fields_without_unposted) do
+        {
+          "type" => "student",
+          "role" => student_role.name,
+          "role_id" => student_role.id,
+          "user_id" => @student.id,
+          "enrollment_state" => "active",
+          "computed_current_score" => 45.0,
+          "computed_final_score" => 30.0,
+          "computed_current_grade" => "F",
+          "computed_final_grade" => "F",
+          "current_period_computed_current_score" => 20.0,
+          "current_period_computed_final_score" => 10.0,
+          "current_period_computed_current_grade" => "F",
+          "current_period_computed_final_grade" => "F"
+        }
+      end
+
+      let(:unposted_fields) do
+        {
+          "unposted_current_score" => 60.0,
+          "unposted_final_score" => 60.0,
+          "unposted_current_grade" => "F",
+          "unposted_final_grade" => "F",
+          "current_period_unposted_current_score" => 55.0,
+          "current_period_unposted_final_score" => 55.0,
+          "current_period_unposted_current_grade" => "F",
+          "current_period_unposted_final_grade" => "F"
+        }
+      end
+
+      let(:expected_fields_with_unposted) { expected_fields_without_unposted.merge(unposted_fields) }
+
+      it "should always include computed scores" do
+        expect(student_enrollment).to include(expected_fields_without_unposted)
+      end
+
+      it "should include unposted scores if user has :manage_grades" do
+        @course.root_account.role_overrides.create!(permission: 'view_all_grades', role: teacher_role, enabled: false)
+        @course.root_account.role_overrides.create!(permission: 'manage_grades', role: teacher_role, enabled: true)
+
+        expect(student_enrollment).to include(expected_fields_with_unposted)
+      end
+
+      it "should include unposted scores if user has :view_all_grades" do
+        @course.root_account.role_overrides.create!(permission: 'view_all_grades', role: teacher_role, enabled: true)
+        @course.root_account.role_overrides.create!(permission: 'manage_grades', role: teacher_role, enabled: false)
+
+        expect(student_enrollment).to include(expected_fields_with_unposted)
+      end
+
+      it "should not include unposted scores if user does not have permission" do
+        @me = @student
+
+        enrollment = student_enrollment
+        expect(enrollment).to include(expected_fields_without_unposted)
+        expect(enrollment).not_to include(unposted_fields)
       end
     end
 
@@ -262,7 +413,7 @@ describe CoursesController, type: :request do
     course_with_student(:user => @user, :active_all => true)
     @course2 = @course
     @course2.update_attribute(:sis_source_id, 'TEST-SIS-ONE.2011')
-    @course2.update_attribute(:default_view, 'wiki')
+    @course2.update_attributes(:default_view => 'assignments')
     @user.pseudonym.update_attribute(:sis_user_id, 'user1')
   end
 
@@ -385,6 +536,7 @@ describe CoursesController, type: :request do
 
         it "returns 200 success" do
           api_call(:put, @path, @params, { :event => 'undelete', :course_ids => [@course.id] })
+          expect(response).to be_success
         end
       end
 
@@ -441,7 +593,7 @@ describe CoursesController, type: :request do
     end
     it "should return a course list for an observed students" do
       parent = User.create
-      parent.user_observees.create! do |uo|
+      parent.as_observer_observation_links.create! do |uo|
         uo.user_id = @me.id
       end
       json = api_call_as_user(parent,:get,"/api/v1/users/#{@me.id}/courses",
@@ -454,7 +606,7 @@ describe CoursesController, type: :request do
     it "should fail if trying to view courses for student that is not observee" do
       # test to make sure it doesn't crash if user has not observees
       parent = User.create
-      expect(parent.user_observees).to eq []
+      expect(parent.as_observer_observation_links).to eq []
 
       api_call_as_user(parent,:get,"/api/v1/users/#{@me.id}/courses",
                       { :user_id => @me.id, :controller => 'courses', :action => 'user_index',
@@ -466,7 +618,7 @@ describe CoursesController, type: :request do
       @shard2.activate do
         a = Account.create
         parent = user_with_pseudonym(name: 'Zombo', username: 'nobody2@example.com', account: a)
-        parent.user_observees.create! do |uo|
+        parent.as_observer_observation_links.create! do |uo|
           uo.user_id = @me.id
         end
         parent.save!
@@ -853,7 +1005,7 @@ describe CoursesController, type: :request do
         'hide_final_grades' => false,
         'apply_assignment_group_weights' => true,
         'restrict_enrollments_to_course_dates' => true,
-        'default_view' => 'new default view',
+        'default_view' => 'syllabus',
         'course_format' => 'on_campus',
         'time_zone' => 'Pacific/Honolulu'
       }, 'offer' => true }
@@ -897,9 +1049,27 @@ describe CoursesController, type: :request do
         expect(@course.restrict_enrollments_to_course_dates).to be_truthy
         expect(@course.workflow_state).to eq 'available'
         expect(@course.apply_group_weights?).to eq true
-        expect(@course.default_view).to eq 'new default view'
+        expect(@course.default_view).to eq 'syllabus'
         expect(@course.course_format).to eq 'on_campus'
         expect(@course.time_zone.tzinfo.name).to eq 'Pacific/Honolulu'
+      end
+
+      it "should not be able to update default_view to arbitrary values" do
+        json = api_call(:put, @path, @params, {'course' => {'default_view' => 'somethingsilly'}}, {}, {:expected_status => 400})
+        expect(json["errors"]["default_view"].first['message']).to eq "Home page is not valid"
+      end
+
+      it "should not be able to update default_view to 'wiki' without a front page" do
+        expect(@course.wiki.front_page).to be_nil
+        json = api_call(:put, @path, @params, {'course' => {'default_view' => 'wiki'}}, {}, {:expected_status => 400})
+        expect(json["errors"]["default_view"].first['message']).to eq "A Front Page is required"
+      end
+
+      it "should be able to update default_view to 'wiki' with a front page" do
+        wp = @course.wiki_pages.create!(:title => "something")
+        wp.set_as_front_page!
+        json = api_call(:put, @path, @params, {'course' => {'default_view' => 'wiki'}}, {}, {:expected_status => 200})
+        expect(@course.reload.default_view).to eq 'wiki'
       end
 
       it "should not change dates that aren't given" do
@@ -1678,7 +1848,7 @@ describe CoursesController, type: :request do
     context "include total scores" do
       before(:once) do
         student_enrollment = @course2.all_student_enrollments.first
-        student_enrollment.scores.create!(current_score: 80, final_score: 70)
+        student_enrollment.scores.create!(current_score: 80, final_score: 70, unposted_current_score: 10)
       end
 
       it "includes scores in course list if requested" do
@@ -1688,6 +1858,16 @@ describe CoursesController, type: :request do
           'computed_current_score' => 80,
           'computed_final_score' => 70,
           'computed_final_grade' => @course2.score_to_grade(70)
+        )
+      end
+
+      it "does not include unposted scores for a self-viewing user" do
+        json_response = courses_api_index_call
+        expect(enrollment(json_response)).not_to include(
+          'unposted_current_score',
+          'unposted_current_grade',
+          'unposted_final_score',
+          'unposted_final_grade'
         )
       end
 
@@ -1731,6 +1911,13 @@ describe CoursesController, type: :request do
         expect(enrollment_json).to include(*grading_period_keys)
         current_grading_period_title = 'Course Period 2: current period'
         expect(enrollment_json['current_grading_period_title']).to eq(current_grading_period_title)
+      end
+
+      it "ignores soft-deleted grading periods when determining the current grading period" do
+        GradingPeriod.current_period_for(@course2).destroy
+        json_response = courses_api_index_call(includes: ['total_scores', 'current_grading_period_scores'])
+        current_period_id = enrollment(json_response)['current_grading_period_id']
+        expect(current_period_id).to be_nil
       end
 
       it "does not include current grading period scores if 'total_scores' are " \
@@ -2394,55 +2581,63 @@ describe CoursesController, type: :request do
     end
 
     describe "/users" do
-
-      it "returns an empty array for a page past the end" do
-        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json?page=5",
+      let(:api_url) {"/api/v1/courses/#{@course1.id}/users.json"}
+      let(:api_route) do
+        {
           controller: 'courses',
           action: 'users',
           course_id: @course1.id.to_s,
-          page: '5',
-          format: 'json')
+          format: 'json'
+        }
+      end
+
+      it "returns an empty array for a page past the end" do
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json?page=5",
+                        controller: 'courses',
+                        action: 'users',
+                        course_id: @course1.id.to_s,
+                        page: '5',
+                        format: 'json')
         expect(json).to eq []
       end
 
       it "returns a 404 for an otherwise invalid page" do
         raw_api_call(:get, "/api/v1/courses/#{@course1.id}/users.json?page=invalid",
-          controller: 'courses',
-          action: 'users',
-          course_id: @course1.id.to_s,
-          page: 'invalid',
-          format: 'json')
+                     controller: 'courses',
+                     action: 'users',
+                     course_id: @course1.id.to_s,
+                     page: 'invalid',
+                     format: 'json')
         assert_status(404)
       end
 
       it "returns a list of users" do
-        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
-                        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' })
+        json = api_call(:get, api_url, api_route)
         expected_users = @course1.users.to_a.uniq - [@test_student]
-        expect(json.sort_by{|x| x["id"]}).to eq api_json_response(expected_users,
-                                                              :only => user_api_fields).sort_by{|x| x["id"]}
+        expect(json.sort_by {|x| x["id"]}).to eq api_json_response(expected_users,
+                                                                   only: user_api_fields).sort_by {|x| x["id"]}
       end
 
       it "returns a list of users filtered by id if user_ids is given" do
         expected_users = [@student1, @student2]
-        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json", {
-          :controller => 'courses',
-          :action => 'users',
-          :course_id => @course1.id.to_s,
-          :user_ids => expected_users.map(&:id),
-          :format => 'json'
+        json = api_call(:get, api_url, {
+          controller: 'courses',
+          action: 'users',
+          course_id: @course1.id.to_s,
+          user_ids: expected_users.map(&:id),
+          format: 'json'
         })
-        expect(json.sort_by{|x| x["id"]}).to eq api_json_response(
-          expected_users,
-          :only => user_api_fields
-        ).sort_by{|x| x["id"]}
+        expect(json.sort_by {|x| x["id"]}).to eq api_json_response(
+                                                   expected_users,
+                                                   only: user_api_fields
+                                                 ).sort_by {|x| x["id"]}
       end
 
       it "excludes the test student by default" do
         @course1.student_view_student
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
-                        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' })
-        expect(json.map{ |s| s["name"] }).not_to include("Test Student")
+                        {controller: 'courses', action: 'users', course_id: @course1.id.to_s, format: 'json'})
+        expect(json.map {|s| s["name"]}).not_to include("Test Student")
       end
 
       context "inactive enrollments" do
@@ -2454,20 +2649,26 @@ describe CoursesController, type: :request do
         end
 
         it "excludes users with inactive enrollments for students" do
-          student_in_course(:course => @course1, :active_all => true, :user => user_with_pseudonym)
-          json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
-            { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' })
+          student_in_course(course: @course1, active_all: true, user: user_with_pseudonym)
+          json = api_call(:get, api_url, api_route)
           expect(json.map{ |s| s["id"] }).not_to include(@inactive_user.id)
         end
 
         it "includes users with inactive enrollments for teachers" do
           @user = @course1.teachers.first
-          json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
-            { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' }, :include => ['enrollments'])
+          json = api_call(:get, api_url, api_route, include: ['enrollments'], include_inactive: true)
           expect(json.map{ |s| s["id"] }).to include(@inactive_user.id)
           user_json = json.detect{ |s| s["id"] == @inactive_user.id}
           expect(user_json['enrollments'].map{|e| e['id']}).to eq [@inactive_enroll.id]
           expect(user_json['enrollments'].first['enrollment_state']).to eq 'inactive'
+        end
+
+        it 'does not include inactive enrollments by default' do
+          @admin = account_admin_user(user: user_with_pseudonym, account: @course.account, active_all: true)
+          json = api_call(:get, api_url, api_route)
+          expect(json.count).to eq 5
+          json = api_call(:get, api_url, api_route, include_inactive: true)
+          expect(json.count).to eq 6
         end
       end
 
@@ -2864,6 +3065,16 @@ describe CoursesController, type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course1.id}/users/sis_user_id:#{pseudonym.sis_user_id}.json",
         { controller: 'courses', action: 'user', course_id: @course1.id.to_s, id: "sis_user_id:#{pseudonym.sis_user_id}", :format => 'json' })
       expect(response.code).to eq '200'
+    end
+
+    it "shouldn't show other course enrollments to other students" do
+      @me = @student
+      student2 = student_in_course(course: @course1, name: "student").user
+      @course2.enroll_student(student2)
+      json = api_call(:get, "/api/v1/courses/#{@course1.id}/users/#{student2.id}.json?include[]=enrollments",
+        { controller: 'courses', action: 'user', course_id: @course1.id.to_s, id: student2.id.to_s, include: ['enrollments'], :format => 'json' })
+      course_ids = json["enrollments"].map{|e| e["course_id"]}
+      expect(course_ids).to eq [@course1.id]
     end
   end
 
@@ -3498,7 +3709,8 @@ describe ContentImportsController, type: :request do
     # check queued state
     json = api_call(:get, "/api/v1/courses/#{@course.id}/link_validation",
       { :controller => 'courses', :action => 'link_validation', :format => 'json', :course_id => @course.id.to_param })
-    expect(json).to eq({'state' => 'queued'})
+    expect(json['workflow_state']).to eq('queued')
+    expect(json).not_to have_key('results')
 
     allow_any_instance_of(CourseLinkValidator).to receive(:check_course)
     allow_any_instance_of(CourseLinkValidator).to receive(:issues).and_return(['mock_issue'])
@@ -3507,8 +3719,8 @@ describe ContentImportsController, type: :request do
     # check results
     json = api_call(:get, "/api/v1/courses/#{@course.id}/link_validation",
                     { :controller => 'courses', :action => 'link_validation', :format => 'json', :course_id => @course.id.to_param })
-    expect(json['state']).to eq('completed')
-    expect(json['issues']).to eq(['mock_issue'])
+    expect(json['workflow_state']).to eq('completed')
+    expect(json['results']['issues']).to eq(['mock_issue'])
   end
 end
 
@@ -3611,8 +3823,10 @@ describe CoursesController, type: :request do
 
     before(:once) do
       student.scores.create!(grading_period_id: grading_period.id,
-                             current_score: 100, final_score: 50)
-      student.scores.create!(current_score: 80, final_score: 74)
+                             current_score: 100, final_score: 50,
+                             unposted_current_score: 70, unposted_final_score: 60)
+      student.scores.create!(current_score: 80, final_score: 74,
+                             unposted_current_score: 75, unposted_final_score: 86)
     end
 
     context "users endpoint with mgp" do
@@ -3634,6 +3848,8 @@ describe CoursesController, type: :request do
         expect(grades).to include({
           "current_score" => 80.0,
           "final_score" => 74.0,
+          "unposted_current_score" => 75.0,
+          "unposted_final_score" => 86.0
         })
       end
 
@@ -3647,6 +3863,8 @@ describe CoursesController, type: :request do
         expect(grades).to include({
           "current_score" => 100.0,
           "final_score" => 50.0,
+          "unposted_current_score" => 70.0,
+          "unposted_final_score" => 60.0,
           "grading_period_id" => grading_period.id
         })
       end
@@ -3674,6 +3892,8 @@ describe CoursesController, type: :request do
         expect(grades).to include({
           "current_score" => 80.0,
           "final_score" => 74.0,
+          "unposted_current_score" => 75.0,
+          "unposted_final_score" => 86.0
         })
       end
 
@@ -3687,6 +3907,8 @@ describe CoursesController, type: :request do
         expect(grades).to include({
           "current_score" => 100.0,
           "final_score" => 50.0,
+          "unposted_current_score" => 70.0,
+          "unposted_final_score" => 60.0,
           "grading_period_id" => grading_period.id
         })
       end

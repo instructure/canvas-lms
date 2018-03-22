@@ -56,7 +56,8 @@ class Submission < ActiveRecord::Base
   attr_readonly :assignment_id
   attr_accessor :visible_to_user,
                 :skip_grade_calc
-  attr_writer :versioned_originality_reports
+  attr_writer :versioned_originality_reports,
+              :text_entry_originality_reports
 
   belongs_to :attachment # this refers to the screenshot of the submission if it is a url submission
   belongs_to :assignment
@@ -81,6 +82,7 @@ class Submission < ActiveRecord::Base
   has_many :provisional_grades, class_name: 'ModeratedGrading::ProvisionalGrade'
   has_many :originality_reports
   has_one :rubric_assessment, -> { where(assessment_type: 'grading') }, as: :artifact, inverse_of: :artifact
+  has_one :lti_result, inverse_of: :submission, class_name: 'Lti::Result', dependent: :destroy
 
   # we no longer link submission comments and conversations, but we haven't fixed up existing
   # linked conversations so this relation might be useful
@@ -129,9 +131,8 @@ class Submission < ActiveRecord::Base
     limit(limit)
   }
 
-  scope :for_course, lambda { |course|
-    where(assignment_id: course.assignments.except(:order))
-  }
+  scope :for_course, -> (course) { where(assignment: course.assignments.except(:order)) }
+  scope :for_assignment, -> (assignment) { where(assignment: assignment) }
 
   scope :missing, -> do
     joins(:assignment).
@@ -204,6 +205,8 @@ class Submission < ActiveRecord::Base
     ")
   end
 
+  scope :anonymized, -> { where.not(anonymous_id: nil) }
+
   workflow do
     state :submitted do
       event :grade_it, :transitions_to => :graded
@@ -214,6 +217,33 @@ class Submission < ActiveRecord::Base
     state :deleted
   end
   alias needs_review? pending_review?
+
+  def self.anonymous_ids_for(assignment)
+    anonymized.for_assignment(assignment).pluck(:anonymous_id)
+  end
+
+  # Returns a unique short id to be used for anonymous_id. If the
+  # generated short id is already in use, loop until an available
+  # one is generated. `anonymous_ids` are unique per assignment.
+  # This method will throw a unique constraint error from the
+  # database if it has used all unique ids.
+  # An optional argument of existing_anonymous_ids can be supplied
+  # to customize the handling of existing anonymous_ids. E.g. bulk
+  # generation of anonymous ids where you wouldn't want to
+  # continuously query the database
+  def self.generate_unique_anonymous_id(assignment:, existing_anonymous_ids: anonymous_ids_for(assignment))
+    loop do
+      short_id = Submission.generate_short_id
+      break short_id unless existing_anonymous_ids.include?(short_id)
+    end
+  end
+
+  # base58 to avoid literal problems with prefixed 0 (i.e. when 0x123
+  # is interpreted as a hex value `0x123 == 291`), and similar looking
+  # characters: 0/O, I/l
+  def self.generate_short_id
+    SecureRandom.base58(5)
+  end
 
   # see #needs_grading?
   # When changing these conditions, update index_submissions_needs_grading to
@@ -234,7 +264,7 @@ class Submission < ActiveRecord::Base
 
   # see .needs_grading_conditions
   def needs_grading?(was = false)
-    suffix = was ? "_was" : ""
+    suffix = was ? "_before_last_save" : ""
 
     !send("submission_type#{suffix}").nil? &&
     (send("workflow_state#{suffix}") == 'pending_review' ||
@@ -272,6 +302,11 @@ class Submission < ActiveRecord::Base
                 :assignment_changed_not_sub,
                 :grading_error_message,
                 :grade_change_event_author_id
+
+  # Because set_anonymous_id makes database calls, delay it until just before
+  # validation. Otherwise if we place it in any earlier (e.g.
+  # before/after_initialize), every Submission.new will make database calls.
+  before_validation :set_anonymous_id, if: :new_record?
   before_save :apply_late_policy, if: :late_policy_relevant_changes?
   before_save :update_if_pending
   before_save :validate_single_submission, :infer_values
@@ -290,6 +325,7 @@ class Submission < ActiveRecord::Base
   after_save :check_for_media_object
   after_save :update_quiz_submission
   after_save :update_participation
+  after_save :update_line_item_result
 
   def autograded?
     # AutoGrader == (quiz_id * -1)
@@ -487,12 +523,12 @@ class Submission < ActiveRecord::Base
   end
 
   def update_final_score
-    if score_changed? || excused_changed? ||
-        (workflow_state_was == "pending_review" && workflow_state == "graded")
+    if saved_change_to_score? || saved_change_to_excused? ||
+        (workflow_state_before_last_save == "pending_review" && workflow_state == "graded")
       if skip_grade_calc
-        Rails.logger.info "GRADES: NOT recomputing scores for submission #{global_id} because skip_grade_calc was set"
+        Rails.logger.debug "GRADES: NOT recomputing scores for submission #{global_id} because skip_grade_calc was set"
       else
-        Rails.logger.info "GRADES: submission #{global_id} score changed. recomputing grade for course #{context.global_id} user #{user_id}."
+        Rails.logger.debug "GRADES: submission #{global_id} score changed. recomputing grade for course #{context.global_id} user #{user_id}."
         self.class.connection.after_transaction_commit do
           Enrollment.recompute_final_score_in_singleton(
             self.user_id,
@@ -648,11 +684,17 @@ class Submission < ActiveRecord::Base
   end
 
   def text_entry_originality_reports
-    originality_reports.where(attachment: nil)
+    @text_entry_originality_reports ||= begin
+      if self.association(:originality_reports).loaded?
+        originality_reports.select { |o| o.attachment_id.blank? }
+      else
+        originality_reports.where(attachment_id: nil)
+      end
+    end
   end
 
   def originality_reports_for_display
-    (OriginalityReport.where(attachment_id: attachment_ids_for_version) + text_entry_originality_reports).uniq
+    (versioned_originality_reports + text_entry_originality_reports).uniq
   end
 
   def turnitin_assets
@@ -671,20 +713,15 @@ class Submission < ActiveRecord::Base
       originality_reports.where(attachment_id: nil).first&.report_launch_path
     elsif self.grants_right?(user, :view_turnitin_report)
       requested_attachment = all_versioned_attachments.find_by_asset_string(asset_string)
-      report = assignment_group_originality_reports.find_by(attachment: requested_attachment)
+      scope = association(:originality_reports).loaded? ? versioned_originality_reports : originality_reports
+      report = scope.find_by(attachment: requested_attachment)
       report&.report_launch_path
     end
   end
 
   def has_originality_report?
     versioned_originality_reports.present? ||
-    text_entry_originality_reports.present? ||
-    assignment_group_originality_reports.present?
-  end
-
-  def assignment_group_originality_reports
-    submission_ids = assignment.submissions.where(group_id: group_id).active.pluck(:id)
-    OriginalityReport.where(submission_id: submission_ids)
+    text_entry_originality_reports.present?
   end
 
   def all_versioned_attachments
@@ -1163,7 +1200,7 @@ class Submission < ActiveRecord::Base
   private :attachment_fake_belongs_to_group
 
   def submit_attachments_to_canvadocs
-    if attachment_ids_changed? && submission_type != 'discussion_topic'
+    if saved_change_to_attachment_ids? && submission_type != 'discussion_topic'
       attachments.preload(:crocodoc_document, :canvadoc).each do |a|
         # associate previewable-document and submission for permission checks
         if a.canvadocable? && Canvadocs.annotations_supported?
@@ -1330,11 +1367,16 @@ class Submission < ActiveRecord::Base
   def apply_late_policy(late_policy=nil, incoming_assignment=nil)
     return if points_deducted_changed? || grading_period&.closed?
     incoming_assignment ||= assignment
-    return unless late_policy_status_manually_applied? || incoming_assignment.expects_submission?
+    return unless late_policy_status_manually_applied? || incoming_assignment.expects_submission? || submitted_to_lti_assignment?(incoming_assignment)
     late_policy ||= incoming_assignment.course.late_policy
     return score_missing(late_policy, incoming_assignment.points_possible, incoming_assignment.grading_type) if missing?
     score_late_or_none(late_policy, incoming_assignment.points_possible, incoming_assignment.grading_type)
   end
+
+  def submitted_to_lti_assignment?(assignment_submitted_to)
+    submitted_at.present? && assignment_submitted_to.external_tool?
+  end
+  private :submitted_to_lti_assignment?
 
   def score_missing(late_policy, points_possible, grading_type)
     if self.points_deducted.present?
@@ -1470,7 +1512,11 @@ class Submission < ActiveRecord::Base
     @versioned_originality_reports ||= begin
       attachment_ids = attachment_ids_for_version
       return [] if attachment_ids.empty?
-      OriginalityReport.where(submission_id: id, attachment_id: attachment_ids)
+      if self.association(:originality_reports).loaded?
+        originality_reports.select { |o| attachment_ids.include?(o.attachment_id) }
+      else
+        originality_reports.where(attachment_id: attachment_ids)
+      end
     end
   end
 
@@ -1532,7 +1578,7 @@ class Submission < ActiveRecord::Base
     attachment_ids_by_submission_and_index = group_attachment_ids_by_submission_and_index(submissions)
     bulk_attachment_ids = attachment_ids_by_submission_and_index.values.flatten
 
-    reports_by_assignment_id = if bulk_attachment_ids.empty?
+    reports_by_attachment_id = if bulk_attachment_ids.empty?
       {}
     else
       OriginalityReport.where(
@@ -1542,7 +1588,19 @@ class Submission < ActiveRecord::Base
 
     submissions.each_with_index do |s, index|
       s.versioned_originality_reports =
-        reports_by_assignment_id.values_at(*attachment_ids_by_submission_and_index[[s, index]]).flatten.compact
+        reports_by_attachment_id.values_at(*attachment_ids_by_submission_and_index[[s, index]]).flatten.compact
+    end
+  end
+
+  def self.bulk_load_text_entry_originality_reports(submissions)
+    submissions = Array(submissions)
+    submission_ids = submissions.map(&:id)
+
+    reports_by_submission =
+      OriginalityReport.where(submission_id: submission_ids, attachment_id: nil).group_by(&:submission_id)
+
+    submissions.each do |s|
+      s.text_entry_originality_reports = reports_by_submission[s.id] || []
     end
   end
 
@@ -1553,7 +1611,6 @@ class Submission < ActiveRecord::Base
     attachment_ids_by_submission =
       Hash[submissions.map { |s| [s, s.attachment_associations.map(&:attachment_id)] }]
     bulk_attachment_ids = attachment_ids_by_submission.values.flatten.uniq
-
     if bulk_attachment_ids.empty?
       attachments_by_id = {}
     else
@@ -1674,8 +1731,8 @@ class Submission < ActiveRecord::Base
   private :validate_single_submission
 
   def grade_change_audit(force_audit = self.assignment_changed_not_sub)
-    newly_graded = self.workflow_state_changed? && self.workflow_state == 'graded'
-    grade_changed = (self.changed & %w(grade score excused)).present?
+    newly_graded = self.saved_change_to_workflow_state? && self.workflow_state == 'graded'
+    grade_changed = (self.saved_changes.keys & %w(grade score excused)).present?
     return true unless newly_graded || grade_changed || force_audit
 
     if grade_change_event_author_id.present?
@@ -1845,7 +1902,7 @@ class Submission < ActiveRecord::Base
 
   def add_comment(opts={})
     opts = opts.symbolize_keys
-    opts[:author] ||= opts[:commenter] || opts[:author] || opts[:user] || self.user
+    opts[:author] ||= opts[:commenter] || opts[:author] || opts[:user] || self.user unless opts[:skip_author]
     opts[:comment] = opts[:comment].try(:strip) || ""
     opts[:attachments] ||= opts[:comment_attachments]
     opts[:draft] = !!opts[:draft_comment]
@@ -2162,6 +2219,11 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def update_line_item_result
+    return if lti_result.nil?
+    lti_result.update(result_score: score) if score_changed?
+  end
+
   def point_data?
     !!(self.score || self.grade)
   end
@@ -2338,7 +2400,7 @@ class Submission < ActiveRecord::Base
     end
   ensure
     user_ids = graded_user_ids.to_a
-    Rails.logger.info "GRADES: recomputing scores in course #{context.id} for users #{user_ids} because of bulk submission update"
+    Rails.logger.debug "GRADES: recomputing scores in course #{context.id} for users #{user_ids} because of bulk submission update"
     context.recompute_student_scores(user_ids)
   end
 
@@ -2372,4 +2434,9 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  private
+
+  def set_anonymous_id
+    self.anonymous_id = Submission.generate_unique_anonymous_id(assignment: anonymous_id)
+  end
 end

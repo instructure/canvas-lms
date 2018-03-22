@@ -97,7 +97,7 @@ describe 'Grade Detail Tray:' do
 
     it 'late submission has late-by days/hours', test_id: 3337209, priority: '1' do
       late_by_days_value = (@course.students.first.submissions.find_by(assignment_id:@a1.id).
-                              seconds_late/86400.to_f).round(2)
+        seconds_late/86400.to_f).round(2)
 
       expect(Gradezilla::GradeDetailTray.fetch_late_by_value.to_f).to eq late_by_days_value
     end

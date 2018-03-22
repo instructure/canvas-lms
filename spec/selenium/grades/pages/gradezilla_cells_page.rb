@@ -35,25 +35,48 @@ class Gradezilla
         f(grading_cell_selector(student, assignment))
       end
 
-      def get_grade(student, assignment)
-        grading_cell(student, assignment).text
+      def grading_cell_input(student, assignment)
+        f("#{grading_cell_selector(student, assignment)} input[type='text']")
       end
 
-      def grade_cell_input(student, assignment)
-        cell_selector = grading_cell_selector(student, assignment)
-        f(cell_selector).click
-        f("#{cell_selector} .grade")
+      def grading_cell_menu_button(student, assignment, menu_selector:)
+        f("#{grading_cell_selector(student, assignment)} .Grid__AssignmentRowCell__#{menu_selector}Menu button")
+      end
+
+      def get_grade(student, assignment)
+        grading_cell(student, assignment).text
       end
 
       def edit_grade(student, assignment, grade)
         cell_selector = grading_cell_selector(student, assignment)
         f(cell_selector).click
 
-        grade_input = f("#{cell_selector} .grade")
+        grade_input = grading_cell_input(student, assignment)
         set_value(grade_input, grade)
 
         grade_input.send_keys(:return)
-        wait_for_ajax_requests
+      end
+
+      def select_scheme_grade(student, assignment, grade)
+        select_grade_from_menu(student, assignment, grade, 'GradingScheme')
+      end
+
+      def select_complete_incomplete_grade(student, assignment, grade)
+        select_grade_from_menu(student, assignment, grade, 'CompleteIncomplete')
+      end
+
+      def select_grade_from_menu(student, assignment, grade, menu_selector)
+        grading_cell(student, assignment).click
+
+        button = grading_cell_menu_button(student, assignment, menu_selector: menu_selector)
+        button.click
+
+        grade_item = ff("ul[aria-labelledby='#{button.attribute('id')}'] li").detect do |element|
+          element.text.chomp == grade # find exact grade match "B+" != "B"
+        end
+        grade_item.click
+
+        button.send_keys(:down) # commit the grade change
       end
 
       def send_keyboard_shortcut(student, assignment, key)
@@ -66,7 +89,8 @@ class Gradezilla
       def open_tray(student, assignment)
         cell = grading_cell(student, assignment)
         cell.click
-        fj('button:contains("Open submission tray")', cell).click
+        driver.action.send_keys(:escape).perform
+        driver.action.send_keys('c').perform
         wait_for_ajaximations
       end
 

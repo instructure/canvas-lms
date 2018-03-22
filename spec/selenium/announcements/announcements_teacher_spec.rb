@@ -33,11 +33,11 @@ describe "announcements" do
       user_session(@teacher)
     end
 
-    it "should allow saving of section announcement" do
+    it "should allow saving of section announcement", test_id:3469728, priority: "1" do
       @course.root_account.enable_feature!(:section_specific_announcements)
       @course.course_sections.create!(name: "Section 1")
       @course.course_sections.create!(name: "Section 2")
-      AnnouncementNewEdit.visit(@course)
+      AnnouncementNewEdit.visit_new(@course)
       AnnouncementNewEdit.select_a_section("Section")
       AnnouncementNewEdit.add_message("Announcement Body")
       AnnouncementNewEdit.add_title("Announcement Title")
@@ -46,15 +46,27 @@ describe "announcements" do
                                             individual_announcement_url(Announcement.last))
     end
 
-    it "should not allow empty sections" do
+    it "should not allow empty sections", test_id:3469730, priority: "1" do
       @course.root_account.enable_feature!(:section_specific_announcements)
       @course.course_sections.create!(name: "Section 1")
       @course.course_sections.create!(name: "Section 2")
-      AnnouncementNewEdit.visit(@course)
+      AnnouncementNewEdit.visit_new(@course)
       AnnouncementNewEdit.select_a_section("")
       AnnouncementNewEdit.add_message("Announcement Body")
       AnnouncementNewEdit.add_title("Announcement Title")
       expect(AnnouncementNewEdit.section_error).to include("A section is required")
+    end
+
+    it "should not show the allow comments checkbox if globally disabled" do
+      @course.lock_all_announcements = true
+      @course.save!
+      AnnouncementNewEdit.visit_new(@course)
+      expect { f("#allow_user_comments") }.to raise_error(Selenium::WebDriver::Error::NoSuchElementError)
+    end
+
+    it "should show the comments checkbox if not globally disabled" do
+      AnnouncementNewEdit.visit_new(@course)
+      expect { f("#allow_user_comments") }.not_to raise_error
     end
 
     context "section specific announcements" do
@@ -366,9 +378,10 @@ describe "announcements" do
       # Create reply as a student
       enter_student_view
       reply_to_announcement(@announcement.id, student_entry)
-      expect_logout_link_present.click
+      leave_student_view
 
-      #As a teacher, verify that you can see the student's reply even though you have not responded
+      # As a teacher, verify that you can see the student's reply even though
+      # you have not responded
       get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
       expect(ff('.discussion_entry .message')[1]).to include_text(student_entry)
     end

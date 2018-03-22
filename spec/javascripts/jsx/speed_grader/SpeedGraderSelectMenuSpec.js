@@ -22,7 +22,7 @@ import SpeedGraderSelectMenu from 'speed_grader_select_menu';
 
 /*
  * There are also specs in
- * spec/coffeescripts/speed_grader/SpeedGraderSelectMenuSpec.coffee
+ * spec/coffeescripts/speed_grader/SpeedGraderSelectMenuSpec.js
  * but those haven't been rewritten/translated from coffeescript
  */
 

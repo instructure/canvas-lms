@@ -553,7 +553,7 @@ class ContentMigration < ActiveRecord::Base
   alias_method :import_content_without_send_later, :import_content
 
   def master_migration
-    @master_migration ||= MasterCourses::MasterMigration.find(self.migration_settings[:master_migration_id])
+    @master_migration ||= self.shard.activate { MasterCourses::MasterMigration.find(self.migration_settings[:master_migration_id]) }
   end
 
   def update_master_migration(state)
@@ -562,7 +562,7 @@ class ContentMigration < ActiveRecord::Base
 
   def master_course_subscription
     return unless self.for_master_course_import?
-    @master_course_subscription ||= MasterCourses::ChildSubscription.find(self.child_subscription_id)
+    @master_course_subscription ||= self.shard.activate { MasterCourses::ChildSubscription.find(self.child_subscription_id) }
   end
 
   def prepare_data(data)
@@ -607,7 +607,12 @@ class ContentMigration < ActiveRecord::Base
       end
       item_scope.each do |content|
         child_tag = master_course_subscription.content_tag_for(content)
-        if child_tag.downstream_changes.any?
+        skip_item = child_tag.downstream_changes.any? && !content.editing_restricted?(:any)
+        if content.is_a?(AssignmentGroup) && !skip_item && content.assignments.active.exists?
+          skip_item = true # don't delete an assignment group if an assignment is left (either they added one or changed one so it was skipped)
+        end
+
+        if skip_item
           Rails.logger.debug("skipping deletion sync for #{content.asset_string} due to downstream changes #{child_tag.downstream_changes}")
           add_skipped_item(child_tag)
         else
@@ -894,7 +899,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def check_for_blocked_migration
-    if self.workflow_state_changed? && %w(pre_process_error exported imported failed).include?(workflow_state)
+    if self.saved_change_to_workflow_state? && %w(pre_process_error exported imported failed).include?(workflow_state)
       if self.context && (next_cm = self.context.content_migrations.where(:workflow_state => 'queued').order(:id).first)
         job_id = next_cm.job_progress.try(:delayed_job_id)
         if job_id && (job = Delayed::Job.where(:id => job_id, :locked_at => nil).first)

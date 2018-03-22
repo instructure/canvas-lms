@@ -541,6 +541,10 @@ module CustomSeleniumActions
     driver.action.move_to(el).click.perform
   end
 
+  def move_to_click_element(element)
+    driver.action.move_to(element).click.perform
+  end
+
   def scroll_to(element)
     element_location = "#{element.location['y']}"
     driver.execute_script('window.scrollTo(0, ' + element_location + ');')
@@ -555,7 +559,7 @@ module CustomSeleniumActions
   end
 
   def dismiss_flash_messages_if_present
-    unless (find_all_with_jquery(flash_message_selector).length) > 0
+    unless (find_all_with_jquery(flash_message_selector).length) == 0
       find_all_with_jquery(flash_message_selector).each(&:click)
     end
   end

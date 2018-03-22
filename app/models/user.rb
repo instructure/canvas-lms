@@ -31,12 +31,13 @@ class User < ActiveRecord::Base
 
   include Context
   include ModelCache
+  include UserLearningObjectScopes
 
   attr_accessor :previous_id, :menu_data, :gradebook_importer_submissions, :prior_enrollment
 
   before_save :infer_defaults
   after_create :set_default_feature_flags
-  after_update :clear_cached_short_name, if: -> (user) {user.short_name_changed? || (user.read_attribute(:short_name).nil? && user.name_changed?)}
+  after_update :clear_cached_short_name, if: -> (user) {user.saved_change_to_short_name? || (user.read_attribute(:short_name).nil? && user.saved_change_to_name?)}
 
   serialize :preferences
   include TimeZoneHelper
@@ -58,14 +59,15 @@ class User < ActiveRecord::Base
   has_many :not_removed_enrollments, -> { where.not(workflow_state: ['rejected', 'deleted', 'inactive']) }, class_name: 'Enrollment', multishard: true
   has_many :observer_enrollments
   has_many :observee_enrollments, :foreign_key => :associated_user_id, :class_name => 'ObserverEnrollment'
-  has_many :user_observers, dependent: :destroy, inverse_of: :user
-  has_many :observers, -> { where("user_observers.workflow_state <> 'deleted'") }, :through => :user_observers, :class_name => 'User'
-  has_many :user_observees,
-           class_name: 'UserObserver',
-           foreign_key: :observer_id,
-           dependent: :destroy,
-           inverse_of: :observer
-  has_many :observed_users, :through => :user_observees, :source => :user
+
+  has_many :as_student_observation_links, -> { where.not(:workflow_state => 'deleted') }, class_name: 'UserObservationLink',
+    foreign_key: :user_id, dependent: :destroy, inverse_of: :student
+  has_many :as_observer_observation_links, -> { where.not(:workflow_state => 'deleted') }, class_name: 'UserObservationLink',
+    foreign_key: :observer_id, dependent: :destroy, inverse_of: :observer
+
+  has_many :linked_observers, :through => :as_student_observation_links, :source => :observer, :class_name => 'User'
+  has_many :linked_students, :through => :as_observer_observation_links, :source => :student, :class_name => 'User'
+
   has_many :all_courses, :source => :course, :through => :enrollments
   has_many :all_courses_for_active_enrollments, -> { Enrollment.active }, :source => :course, :through => :enrollments
   has_many :group_memberships, -> { preload(:group) }, dependent: :destroy
@@ -78,9 +80,10 @@ class User < ActiveRecord::Base
   has_many :associated_accounts, -> { order("user_account_associations.depth") }, source: :account, through: :user_account_associations
   has_many :associated_root_accounts, -> { order("user_account_associations.depth").where(accounts: { parent_account_id: nil }) }, source: :account, through: :user_account_associations
   has_many :developer_keys
-  has_many :access_tokens, -> { preload(:developer_key) }
+  has_many :access_tokens, -> { where(:workflow_state => "active").preload(:developer_key) }
   has_many :notification_endpoints, :through => :access_tokens
   has_many :context_external_tools, -> { order(:name) }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :lti_results, inverse_of: :user, class_name: 'Lti::Result'
 
   has_many :student_enrollments
   has_many :ta_enrollments
@@ -192,7 +195,6 @@ class User < ActiveRecord::Base
     self.from("(#{scopes.join("\nUNION\n")}) users")
   }
   scope :active, -> { where("users.workflow_state<>'deleted'") }
-  scope :active_user_observers, -> { where.not(user_observers: {workflow_state: 'deleted'}) }
 
   scope :has_current_student_enrollments, -> do
     where("EXISTS (?)",
@@ -364,7 +366,7 @@ class User < ActiveRecord::Base
   end
 
   def update_account_associations_if_necessary
-    update_account_associations if !self.class.skip_updating_account_associations? && self.workflow_state_changed? && self.id_was
+    update_account_associations if !self.class.skip_updating_account_associations? && self.saved_change_to_workflow_state? && self.id_before_last_save
   end
 
   def update_account_associations(opts = nil)
@@ -635,10 +637,6 @@ class User < ActiveRecord::Base
     self.name <=> other.name
   end
 
-  def default_pseudonym_id
-    self.pseudonyms.active.first.id
-  end
-
   def available?
     true
   end
@@ -888,8 +886,8 @@ class User < ActiveRecord::Base
       if root_account == :all
         # make sure to hit all shards
         enrollment_scope = self.enrollments.shard(self)
-        user_observer_scope = self.user_observers.shard(self)
-        user_observee_scope = self.user_observees.shard(self)
+        user_observer_scope = self.as_student_observation_links.shard(self)
+        user_observee_scope = self.as_observer_observation_links.shard(self)
         pseudonym_scope = self.pseudonyms.active.shard(self)
         account_users = self.account_users.active.shard(self)
         has_other_root_accounts = false
@@ -900,8 +898,8 @@ class User < ActiveRecord::Base
         # student view user won't be cross shard, so that will still be the
         # right shard
         enrollment_scope = fake_student? ? self.enrollments : root_account.enrollments.where(user_id: self)
-        user_observer_scope = self.user_observers.shard(self)
-        user_observee_scope = self.user_observees.shard(self)
+        user_observer_scope = self.as_student_observation_links.shard(self)
+        user_observee_scope = self.as_observer_observation_links.shard(self)
         pseudonym_scope = root_account.pseudonyms.active.where(user_id: self)
 
         account_users = root_account.account_users.where(user_id: self).to_a +
@@ -1019,7 +1017,7 @@ class User < ActiveRecord::Base
     given { |user| user == self }
     can :read and can :read_grades and can :read_profile and can :read_as_admin and can :manage and
       can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and
-      can :update_avatar and can :manage_feature_flags
+      can :update_avatar and can :manage_feature_flags and can :api_show_user
 
     given { |user| user == self && user.user_can_edit_name? }
     can :rename
@@ -1043,14 +1041,13 @@ class User < ActiveRecord::Base
     can :view_statistics
 
     given {|user| self.check_accounts_right?(user, :manage_students) }
-    can :manage_user_details and can :update_avatar and can :remove_avatar and can :rename and can :read_profile and
-      can :view_statistics and can :read and can :read_reports and can :manage_feature_flags and can :read_grades
+    can :read_profile and can :view_statistics and can :read_reports and can :read_grades
 
     given {|user| self.check_accounts_right?(user, :manage_user_logins) }
     can :read and can :read_reports
 
     given {|user| self.check_accounts_right?(user, :read_roster) }
-    can :read_full_profile
+    can :read_full_profile and can :api_show_user
 
     given {|user| self.check_accounts_right?(user, :view_all_grades) }
     can :read_grades
@@ -1058,7 +1055,8 @@ class User < ActiveRecord::Base
     given do |user|
       self.check_accounts_right?(user, :manage_user_logins) && self.adminable_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) }
     end
-    can :manage_user_details and can :rename and can :read_profile
+    can :manage_user_details and can :rename and can :read_profile and can :update_avatar and can :remove_avatar and
+      can :manage_feature_flags and can :api_show_user
 
     given{ |user| self.pseudonyms.shard(self).any?{ |p| p.grants_right?(user, :update) } }
     can :merge
@@ -1081,7 +1079,7 @@ class User < ActiveRecord::Base
     end
     can :reset_mfa
 
-    given { |user| user && user.user_observees.active.where(user_id: self.id).exists? }
+    given { |user| user && user.as_observer_observation_links.where(user_id: self.id).exists? }
     can :read and can :read_as_parent
   end
 
@@ -1433,290 +1431,6 @@ class User < ActiveRecord::Base
 
   def use_new_conversations?
     true
-  end
-
-  def ignore_item!(asset, purpose, permanent = false)
-    begin
-      # more likely this doesn't exist, so try the create first
-      asset.ignores.create!(:user => self, :purpose => purpose, :permanent => permanent)
-    rescue ActiveRecord::RecordNotUnique
-      asset.shard.activate do
-        ignore = asset.ignores.where(user_id: self, purpose: purpose).first
-        ignore.permanent = permanent
-        ignore.save!
-      end
-    end
-    self.touch
-  end
-
-  def assignments_visible_in_course(course)
-    return course.active_assignments if course.grants_any_right?(self, :read_as_admin, :manage_grades, :manage_assignments)
-    published_visible_assignments = course.active_assignments.published
-    published_visible_assignments = DifferentiableAssignment.scope_filter(published_visible_assignments,self,course, is_teacher: false)
-    published_visible_assignments
-  end
-
-  def assignments_needing(purpose, participation_type, expires_in, opts={})
-    original_shard = Shard.current
-    shard.activate do
-      course_ids = course_ids_for_todo_lists(participation_type, opts)
-      opts = {limit: 15}.merge(opts.slice(:due_after, :due_before, :limit, :include_ungraded, :ungraded_quizzes, :include_ignored,
-        :include_locked, :include_concluded, :scope_only, :only_favorites, :needing_submitting))
-
-      if opts[:scope_only]
-        Shard.partition_by_shard(course_ids) do |shard_course_ids|
-          next unless Shard.current == original_shard
-          return yield(*arguments_for_assignments_needing(purpose, shard_course_ids, opts))
-        end
-        return Assignment.none # fallback
-      else
-        course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join('/'))
-        Rails.cache.fetch([self, "assignments_needing_#{purpose}", course_ids_cache_key, opts].cache_key, :expires_in => expires_in) do
-          result = Shackles.activate(:slave) do
-            Shard.partition_by_shard(course_ids) do |shard_course_ids|
-              yield(*arguments_for_assignments_needing(purpose, shard_course_ids, opts))
-            end
-          end
-          result = result[0...opts[:limit]] if opts[:limit]
-          result
-        end
-      end
-    end
-  end
-
-  def course_ids_for_todo_lists(participation_type, opts)
-    shard.activate do
-      course_ids = Shackles.activate(:slave) do
-        if opts[:include_concluded]
-          participated_course_ids
-        else
-          case participation_type
-          when :student
-            participating_student_course_ids
-          when :instructor
-            participating_instructor_course_ids
-          end
-        end
-      end
-
-      if opts[:only_favorites]
-        course_ids = course_ids & favorite_context_ids("Course")
-      end
-
-      if opts[:contexts]
-        course_ids = Array(opts[:contexts]).map(&:id) & course_ids
-      end
-      course_ids
-    end
-  end
-
-  def arguments_for_assignments_needing(purpose, shard_course_ids, opts)
-    scope = nil
-    if opts[:ungraded_quizzes]
-      scope = Quizzes::Quiz.where(context_type: 'Course', context_id: shard_course_ids).
-        not_for_assignment
-      scope = scope.not_ignored_by(self, purpose) unless opts[:include_ignored]
-    else
-      scope = Assignment.for_course(shard_course_ids)
-      scope = scope.not_ignored_by(self, purpose) unless opts[:include_ignored]
-    end
-    [scope, opts.merge(:shard_course_ids => shard_course_ids)]
-  end
-
-  def assignments_needing_submitting(opts={})
-    assignments_needing('submitting', :student, 15.minutes, opts) do |assignment_scope, options|
-      due_after = options[:due_after] || 4.weeks.ago
-      due_before = options[:due_before] || 1.week.from_now
-
-      assignments = assignment_scope.
-        filter_by_visibilities_in_given_courses(id, options[:shard_course_ids]).
-        published.
-        due_between_with_overrides(due_after, due_before).
-        need_submitting_info(id, options[:limit])
-      assignments = assignments.expecting_submission unless options[:include_ungraded]
-      assignments = assignments.not_locked unless options[:include_locked]
-      if options[:scope_only]
-        assignments.for_course(options[:shard_course_ids])
-      else
-        select_available_assignments(assignments, options).reject { |a| a.due_at && a.due_at < Time.now && !a.expects_submission? }
-      end
-    end
-  end
-
-  def ungraded_quizzes(opts={})
-    assignments_needing('submitting', :student, 15.minutes, opts.merge(:ungraded_quizzes => true)) do |quiz_scope, options|
-      due_after = options[:due_after] || Time.now
-      due_before = options[:due_before] || 1.week.from_now
-
-      quizzes = quiz_scope.
-                  visible_to_students_in_course_with_da(self.id, options[:shard_course_ids])
-      quizzes = quizzes.not_locked unless opts[:include_locked]
-      quizzes = quizzes.
-                  available.
-                  due_between_with_overrides(due_after, due_before).
-                  preload(:context)
-      quizzes = quizzes.need_submitting_info(id, options[:limit]) if options[:needing_submitting]
-      if options[:scope_only]
-        quizzes.for_course(options[:shard_course_ids])
-      else
-        select_available_assignments(quizzes, options)
-      end
-    end
-  end
-
-  def assignments_needing_grading(opts={})
-    # not really any harm in extending the expires_in since we touch the user anyway when grades change
-    assignments_needing('grading', :instructor, 120.minutes, opts) do |assignment_scope, opts|
-      as = assignment_scope.active.
-        expecting_submission.
-        need_grading_info
-      ActiveRecord::Associations::Preloader.new.preload(as, :context)
-      if opts[:scope_only]
-        as # This needs the below `select` somehow to work
-      else
-        as.lazy.select{|a| Assignments::NeedsGradingCountQuery.new(a, self).count != 0 }.take(opts[:limit]).to_a
-      end
-    end
-  end
-
-  def submitted_assignments(opts={})
-    assignments_needing('submitted', :student, 120.minutes, opts) do |assignment_scope, options|
-      due_after = options[:due_after] || 2.weeks.ago
-      due_before = options[:due_before] || 2.weeks.from_now
-
-      as = assignment_scope.active
-      as = as.expecting_submission unless options[:include_ungraded]
-      as = as.not_locked unless options[:include_locked]
-      as = as.filter_by_visibilities_in_given_courses(id, options[:shard_course_ids]).
-            published.
-            due_between_with_overrides(due_after, due_before).
-            having_submissions_for_user(id).
-            group('submissions.id')
-      options[:scope_only] ? as : select_available_assignments(as, options)
-    end
-  end
-
-  def assignments_needing_moderation(opts={})
-    assignments_needing('moderation', :instructor, 120.minutes, opts) do |assignment_scope, options|
-      scope = assignment_scope.active.
-        expecting_submission.
-        where(:moderated_grading => true).
-        where("assignments.grades_published_at IS NULL").
-        where(:id => ModeratedGrading::ProvisionalGrade.joins(:submission).where("submissions.assignment_id=assignments.id").
-          where(Submission.needs_grading_conditions).distinct.select(:assignment_id)).
-        preload(:context)
-      if options[:scope_only]
-        scope # Also need to check the rights like below
-      else
-        scope.lazy.select{|a| a.context.grants_right?(self, :moderate_grades)}.take(options[:limit]).to_a
-      end
-    end
-  end
-
-  def submissions_needing_peer_review(opts={})
-    course_ids = Shackles.activate(:slave) do
-      if opts[:contexts]
-        (Array(opts[:contexts]).map(&:id) &
-        participating_student_course_ids)
-      else
-        participating_student_course_ids
-      end
-    end
-    opts = {limit: 15}.merge(opts.slice(:limit))
-
-    shard.activate do
-      Rails.cache.fetch([self, 'submissions_needing_peer_review', course_ids, opts].cache_key, expires_in: 15.minutes) do
-        Shackles.activate(:slave) do
-          limit = opts[:limit]
-
-          result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
-            shard_course_context_codes = shard_course_ids.map { |course_id| "course_#{course_id}"}
-            AssessmentRequest.where(assessor_id: id).incomplete.
-              not_ignored_by(self, 'reviewing').
-              for_context_codes(shard_course_context_codes).
-              preload({submission: :assignment}) # avoid n+1 query on grants_right? check below
-          end
-
-          # only include assessment requests user has permission to perform.
-          # This has 2 parts
-          # 1. the reviewer must have permission to read the submission, and
-          # 2. the submission must still be part of the assignment, which will
-          #    be false if the submitter is no longer assigned the assigment
-          result = result.select do |request|
-            request.submission.grants_right?(self, :read) &&
-            request.submission.assignment.submissions.include?(request.submission)
-          end
-          # outer limit, since there could be limit * n_shards results
-          result = result[0...limit] if limit
-          result
-        end
-      end
-    end
-  end
-
-  def needing_viewing(object_type, participation_type, expires_in, opts={})
-    original_shard = Shard.current
-    shard.activate do
-      course_ids = course_ids_for_todo_lists(participation_type, opts)
-
-      if opts[:scope_only]
-        Shard.partition_by_shard(course_ids) do |shard_course_ids|
-          next unless Shard.current == original_shard # only provide scope on current shard
-          return yield(*arguments_for_needing_viewing(object_type, shard_course_ids, opts))
-        end
-        return object_type.constantize.none
-      else
-        course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join(','))
-        cache_key = [self, "#{object_type.underscore}_needing_viewing", course_ids_cache_key, opts].cache_key
-        Rails.cache.fetch(cache_key, :expires_in => expires_in) do
-          result = Shackles.activate(:slave) do
-            Shard.partition_by_shard(course_ids) do |shard_course_ids|
-              yield(*arguments_for_needing_viewing(object_type, shard_course_ids, opts))
-            end
-          end
-          result = result[0...opts[:limit]] if opts[:limit]
-          result
-        end
-      end
-    end
-  end
-
-  def arguments_for_needing_viewing(object_type, shard_course_ids, opts)
-    scope = object_type.constantize.for_courses_and_groups(shard_course_ids, cached_current_group_memberships.map(&:group_id))
-    scope = scope.not_ignored_by(self, 'viewing') unless opts[:include_ignored]
-    scope = scope.todo_date_between(opts[:due_after], opts[:due_before])
-    [scope, opts.merge(:shard_course_ids => shard_course_ids)]
-  end
-
-  def discussion_topics_needing_viewing(opts={})
-    needing_viewing('DiscussionTopic', :student, 120.minutes, opts) do |topics_context, options|
-      topics_context.active.published
-    end
-  end
-
-  def wiki_pages_needing_viewing(opts={})
-    needing_viewing('WikiPage', :student, 120.minutes, opts) do |wiki_pages_context, options|
-      wiki_pages_context.available_to_planner.visible_to_user(self)
-    end
-  end
-
-  def submission_statuses(opts = {})
-    Rails.cache.fetch(['assignment_submission_statuses', self, opts].cache_key, :expires_in => 120.minutes) do
-        opts[:due_after] ||= 2.weeks.ago
-
-        {
-          submitted: Set.new(submitted_assignments(opts).pluck(:id)),
-          excused: Set.new(Submission.active.with_assignment.where(excused: true, user_id: self).pluck(:assignment_id)),
-          graded: Set.new(Submission.active.with_assignment.where(user_id: self).where("submissions.excused = true OR (submissions.score IS NOT NULL AND submissions.workflow_state = 'graded')").pluck(:assignment_id)),
-          late: Set.new(Submission.active.with_assignment.late.where(user_id: self).pluck(:assignment_id)),
-          missing: Set.new(Submission.active.with_assignment.missing.where(user_id: self).pluck(:assignment_id)),
-          needs_grading: Set.new(Submission.active.with_assignment.needs_grading.where(user_id: self).pluck(:assignment_id)),
-          # distinguishes between assignment being graded and having feedback comments, but cannot discern new feedback and new grades if there is already feedback.
-          # that's OK for now, since the "New" was removed from the "New Grades" and "New Feedback" pills in the UI to simply indicate if there is _any_ feedback or grade.
-          has_feedback: Set.new((self.recent_feedback(start_at: opts[:due_after]).select { |feedback| feedback[:submission_comments_count].to_i > 0 }).pluck(:assignment_id)),
-          new_activity: Set.new(Submission.active.with_assignment.unread_for(self).pluck(:assignment_id))
-        }.with_indifferent_access
-    end
   end
 
   def generate_access_verifier(ts)
@@ -2485,8 +2199,10 @@ class User < ActiveRecord::Base
     return user_roles(root_account, true) if exclude_deleted_accounts
 
     return @roles if @roles
-    @roles = Rails.cache.fetch(['user_roles_for_root_account3', self, root_account].cache_key) do
-      user_roles(root_account)
+    root_account.shard.activate do
+      @roles = Rails.cache.fetch(['user_roles_for_root_account3', self, root_account].cache_key) do
+        user_roles(root_account)
+      end
     end
   end
 
@@ -2941,9 +2657,9 @@ class User < ActiveRecord::Base
     !!@all_active_pseudonyms
   end
 
-  def current_groups_in_region?
-    return true if self.current_groups.exists?
-    return true if self.current_groups.shard(self.in_region_associated_shards).exists?
+  def current_active_groups?
+    return true if self.current_groups.preload(:context).any?(&:context_available?)
+    return true if self.current_groups.shard(self.in_region_associated_shards).preload(:context).any?(&:context_available?)
     false
   end
 

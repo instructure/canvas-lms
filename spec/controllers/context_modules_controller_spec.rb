@@ -538,14 +538,14 @@ describe ContextModulesController do
     it "should show unpublished modules for teachers" do
       user_session(@teacher)
       get 'item_details', params: {:course_id => @course.id, :module_item_id => @topicTag.id, :id => "discussion_topic_#{@topic.id}"}
-      json = JSON.parse response.body.gsub("while(1);",'')
+      json = json_parse(response.body)
       expect(json["next_module"]["context_module"]["id"]).to eq @m2.id
     end
 
     it "should skip unpublished modules for students" do
       user_session(@student)
       get 'item_details', params: {:course_id => @course.id, :module_item_id => @topicTag.id, :id => "discussion_topic_#{@topic.id}"}
-      json = JSON.parse response.body.gsub("while(1);",'')
+      json = json_parse(response.body)
       expect(json["next_module"]["context_module"]["id"]).to eq @m3.id
     end
 
@@ -557,7 +557,7 @@ describe ContextModulesController do
       quiz_tag = @m2.add_item :type => 'quiz', :id => quiz.id
 
       get 'item_details', params: {:course_id => @course.id, :module_item_id => quiz_tag.id, :id => "quizzes:quiz_#{quiz.id}"}
-      json = JSON.parse response.body.gsub("while(1);",'')
+      json = json_parse(response.body)
       expect(json['current_item']['content_tag']['content_type']).to eq 'Quizzes::Quiz'
     end
   end
@@ -573,7 +573,7 @@ describe ContextModulesController do
 
       it "returns 'locked' progressions for modules locked by date" do
         get 'progressions', params: {:course_id => @course.id}, :format => 'json'
-        json = JSON.parse response.body.gsub("while(1);",'')
+        json = json_parse(response.body)
         expect(json).to match_array(
                 [{"context_module_progression"=>
                    {"context_module_id"=>@mod1.id,
@@ -606,14 +606,14 @@ describe ContextModulesController do
     it "should return all student progressions to teacher" do
       user_session(@teacher)
       get 'progressions', params: {:course_id => @course.id}, :format => "json"
-      json = JSON.parse response.body.gsub("while(1);",'')
+      json = json_parse(response.body)
       expect(json.length).to eq 1
     end
 
     it "should return a single student progression" do
       user_session(@student)
       get 'progressions', params: {:course_id => @course.id}, :format => "json"
-      json = JSON.parse response.body.gsub("while(1);",'')
+      json = json_parse(response.body)
       expect(json.length).to eq 1
     end
 
@@ -626,14 +626,14 @@ describe ContextModulesController do
       it "should return a single student progression" do
         user_session(@student)
         get 'progressions', params: {:course_id => @course.id}, :format => "json"
-        json = JSON.parse response.body.gsub("while(1);",'')
+        json = json_parse(response.body)
         expect(json.length).to eq 1
       end
 
       it "should not return any student progressions to teacher" do
         user_session(@teacher)
         get 'progressions', params: {:course_id => @course.id}, :format => "json"
-        json = JSON.parse response.body.gsub("while(1);",'')
+        json = json_parse(response.body)
         expect(json.length).to eq 0
       end
     end
@@ -652,7 +652,7 @@ describe ContextModulesController do
         @assign.points_possible = 456
         @assign.save!
         get 'content_tag_assignment_data', params: {course_id: @course.id}, format: 'json'
-        json = JSON.parse response.body.gsub("while(1);",'')
+        json = json_parse(response.body)
         expect(json[@tag.id.to_s]["points_possible"].to_i).to eql 456
       end
     end
@@ -674,7 +674,7 @@ describe ContextModulesController do
       expect(AssignmentOverrideApplicator).to receive(:overrides_for_assignment_and_user).never
 
       get 'content_tag_assignment_data', params: {course_id: @course.id}, format: 'json' # precache
-      json = JSON.parse response.body.gsub("while(1);",'')
+      json = json_parse(response.body)
       expect(json[@tag.id.to_s]["vdd_tooltip"]).to be_nil
       expect(json[@tag.id.to_s]["has_many_overrides"]).to be_truthy
     end
@@ -696,7 +696,7 @@ describe ContextModulesController do
       end
 
       get 'content_tag_assignment_data', params: {course_id: @course.id}, format: 'json' # precache
-      json = JSON.parse response.body.gsub("while(1);",'')
+      json = json_parse(response.body)
       expect(json[@tag.id.to_s]["vdd_tooltip"]).to be_nil
       expect(json[@tag.id.to_s]["has_many_overrides"]).to be_truthy
     end
@@ -709,12 +709,12 @@ describe ContextModulesController do
 
       enable_cache do
         get 'content_tag_assignment_data', params: {course_id: @course.id}, format: 'json' # precache
-        json = JSON.parse response.body.gsub("while(1);",'')
+        json = json_parse(response.body)
         expect(json[@tag.id.to_s]["past_due"]).to be_nil
 
         Timecop.freeze(2.weeks.from_now) do
           get 'content_tag_assignment_data', params: {course_id: @course.id}, format: 'json'
-          json = JSON.parse response.body.gsub("while(1);",'')
+          json = json_parse(response.body)
           expect(json[@tag.id.to_s]["past_due"]).to be_truthy
         end
       end
@@ -734,7 +734,7 @@ describe ContextModulesController do
       override.save!
 
       get 'content_tag_assignment_data', params: {course_id: @course.id}, format: 'json' # precache
-      json = JSON.parse response.body.gsub("while(1);",'')
+      json = json_parse(response.body)
       expect(json[@tag.id.to_s]["vdd_tooltip"]["due_dates"].count).to eq 2
     end
 
@@ -753,7 +753,7 @@ describe ContextModulesController do
       end
 
       get 'content_tag_assignment_data', params: {course_id: @course.id}, format: 'json' # precache
-      json = JSON.parse response.body.gsub("while(1);",'')
+      json = json_parse(response.body)
       expect(json[@tag.id.to_s]["vdd_tooltip"]).to be_nil
       expect(json[@tag.id.to_s]["has_many_overrides"]).to be_truthy
     end
@@ -766,7 +766,7 @@ describe ContextModulesController do
       @tag = @mod.add_item(type: 'quiz', id: @quiz.id)
 
       get 'content_tag_assignment_data', params: {course_id: @course.id}, format: 'json'
-      json = JSON.parse response.body.gsub("while(1);",'')
+      json = json_parse(response.body)
       expect(json[@tag.id.to_s]["past_due"]).to be_present
     end
 
@@ -780,7 +780,7 @@ describe ContextModulesController do
       @quiz.generate_submission(@student).complete!
 
       get 'content_tag_assignment_data', params: {course_id: @course.id}, format: 'json' # precache
-      json = JSON.parse response.body.gsub("while(1);",'')
+      json = json_parse(response.body)
       expect(json[@tag.id.to_s]["past_due"]).to be_blank
     end
   end

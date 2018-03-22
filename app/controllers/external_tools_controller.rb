@@ -248,11 +248,11 @@ class ExternalToolsController < ApplicationController
 
     launch_settings = JSON.parse(launch_settings)
 
-    @lti_launch = launch_settings['tool_settings']['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
+    @lti_launch = Lti::Launch.new
     @lti_launch.params = launch_settings['tool_settings']
     @lti_launch.resource_url = launch_settings['launch_url']
     @lti_launch.link_text =  launch_settings['tool_name']
-    @lti_launch.analytics_id =  launch_settings['analytics_id']
+    @lti_launch.analytics_id = launch_settings['analytics_id']
 
     render Lti::AppUtil.display_template('borderless')
   end
@@ -334,7 +334,16 @@ class ExternalToolsController < ApplicationController
   #        "migration_selection": null,
   #        "resource_selection": null,
   #        "tool_configuration": null,
-  #        "user_navigation": null,
+  #        "user_navigation": {
+  #             "canvas_icon_class": "icon-lti",
+  #             "icon_url": "...",
+  #             "text": "...",
+  #             "url": "...",
+  #             "default": "disabled",
+  #             "enabled": "true",
+  #             "visibility": "public",
+  #             "windowTarget": "_blank"
+  #        },
   #        "selection_width": 500,
   #        "selection_height": 500,
   #        "icon_url": "...",
@@ -633,6 +642,10 @@ class ExternalToolsController < ApplicationController
   #
   # @argument user_navigation[text] [String]
   #   The text that will show on the left-tab in the user navigation
+  #
+  # @argument user_navigation[visibility] [String, "admins"|"members"|"public"]
+  #   Who will see the navigation tab. "admins" for admins, "public" or
+  #   "members" for everyone
   #
   # @argument course_home_sub_navigation[url] [String]
   #   The url of the external tool for right-side course home navigation menu
@@ -1011,21 +1024,22 @@ class ExternalToolsController < ApplicationController
     tool_id = params[:id]
     launch_url = params[:url] || launch_url
     launch_type = params[:launch_type]
+    module_item = options[:module_item]
 
-    unless tool_id || launch_url || options[:module_item]
+    unless tool_id || launch_url || module_item
       @context.errors.add(:id, 'A tool id, tool url, or module item id must be provided')
       @context.errors.add(:url, 'A tool id, tool url, or module item id must be provided')
       @context.errors.add(:module_item_id, 'A tool id, tool url, or module item id must be provided')
       return render :json => @context.errors, :status => :bad_request
     end
 
-    if launch_url && options[:module_item].blank?
+    if launch_url && module_item.blank?
       @tool = ContextExternalTool.find_external_tool(launch_url, @context, tool_id)
-    elsif options[:module_item]
+    elsif module_item
       @tool = ContextExternalTool.find_external_tool(
-        options[:module_item].url,
+        module_item.url,
         @context,
-        options[:module_item].content_id
+        module_item.content_id
       )
     else
       return unless find_tool(tool_id, launch_type)
@@ -1044,7 +1058,7 @@ class ExternalToolsController < ApplicationController
 
     case launch_type
     when 'module_item'
-      opts[:link_code] = @tool.opaque_identifier_for(options[:module_item])
+      opts[:link_code] = @tool.opaque_identifier_for(module_item)
     when 'assessment'
       opts[:link_code] = @tool.opaque_identifier_for(options[:assignment].external_tool_tag)
     end
@@ -1055,36 +1069,36 @@ class ExternalToolsController < ApplicationController
       @context
     ).prepare_tool_launch(
       url_for(@context),
-      variable_expander(assignment: options[:assignment]),
+      variable_expander(assignment: options[:assignment], content_tag: module_item),
       opts
     )
 
     launch_settings = {
-      'launch_url' => adapter.launch_url,
+      'launch_url' => adapter.launch_url(post_only: @tool.settings['post_only']),
       'tool_name' => @tool.name,
       'analytics_id' => @tool.tool_id
     }
 
-    if options[:assignment]
-      launch_settings['tool_settings'] = adapter.generate_post_payload_for_assignment(
-        options[:assignment],
-        lti_grade_passback_api_url(@tool),
-        blti_legacy_grade_passback_api_url(@tool),
-        lti_turnitin_outcomes_placement_url(@tool.id)
-      )
-    else
-      launch_settings['tool_settings'] = adapter.generate_post_payload
-    end
+    launch_settings['tool_settings'] = if options[:assignment]
+                                        adapter.generate_post_payload_for_assignment(
+                                          options[:assignment],
+                                          lti_grade_passback_api_url(@tool),
+                                          blti_legacy_grade_passback_api_url(@tool),
+                                          lti_turnitin_outcomes_placement_url(@tool.id)
+                                        )
+                                       else
+                                         adapter.generate_post_payload
+                                       end
 
     # store the launch settings and return to the user
     verifier = SecureRandom.hex(64)
     Canvas.redis.setex("#{@context.class.name}:#{REDIS_PREFIX}#{verifier}", 5.minutes, launch_settings.to_json)
 
-    if @context.is_a?(Account)
-      uri = URI(account_external_tools_sessionless_launch_url(@context))
-    else
-      uri = URI(course_external_tools_sessionless_launch_url(@context))
-    end
+    uri = if @context.is_a?(Account)
+            URI(account_external_tools_sessionless_launch_url(@context))
+          else
+            URI(course_external_tools_sessionless_launch_url(@context))
+          end
     uri.query = {:verifier => verifier}.to_query
 
     render :json => {:id => @tool.id, :name => @tool.name, :url => uri.to_s}

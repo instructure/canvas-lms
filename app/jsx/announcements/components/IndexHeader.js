@@ -18,10 +18,9 @@
 
 import I18n from 'i18n!announcements_v2'
 import React, { Component } from 'react'
-import { string, func, bool } from 'prop-types'
+import { string, func, bool, number } from 'prop-types'
 import { connect } from 'react-redux'
 import { debounce } from 'lodash'
-
 import { bindActionCreators } from 'redux'
 
 import Button from '@instructure/ui-core/lib/components/Button'
@@ -34,34 +33,45 @@ import PresentationContent from '@instructure/ui-core/lib/components/Presentatio
 import IconPlus from 'instructure-icons/lib/Line/IconPlusLine'
 import IconSearchLine from 'instructure-icons/lib/Line/IconSearchLine'
 import IconTrash from 'instructure-icons/lib/Line/IconTrashLine'
-import IconReply from 'instructure-icons/lib/Line/IconReplyLine'
+import IconUnlock from 'instructure-icons/lib/Line/IconUnlockLine'
+import IconLock from 'instructure-icons/lib/Line/IconLockLine'
 
 import select from '../../shared/select'
-import ExternalFeedsTray from './ExternalFeedsTray'
 import propTypes from '../propTypes'
 import actions from '../actions'
+import ExternalFeedsTray from './ExternalFeedsTray'
+import {showConfirmDelete} from './ConfirmDeleteModal'
 
-export const SEARCH_TIME_DELAY = 300
+// Delay the search so as not to overzealously read out the number
+// of search results to the user
+export const SEARCH_TIME_DELAY = 750
 const filters = {
   all: I18n.t('All'),
   unread: I18n.t('Unread')
 }
 export default class IndexHeader extends Component {
   static propTypes = {
-    courseId: string.isRequired,
+    contextType: string.isRequired,
+    contextId: string.isRequired,
     isBusy: bool,
-    hasSelectedAnnouncements: bool,
+    selectedCount: number,
+    isToggleLocking: bool.isRequired,
     permissions: propTypes.permissions.isRequired,
     atomFeedUrl: string,
     searchAnnouncements: func.isRequired,
-    lockAnnouncements: func.isRequired,
-    deleteAnnouncements: func.isRequired,
+    toggleSelectedAnnouncementsLock: func.isRequired,
+    deleteSelectedAnnouncements: func.isRequired,
+    applicationElement: func,
+    searchInputRef: func,
+    announcementsLocked: bool.isRequired,
   }
 
   static defaultProps = {
     isBusy: false,
     atomFeedUrl: null,
-    hasSelectedAnnouncements: false,
+    selectedCount: 0,
+    applicationElement: () => document.getElementById('application'),
+    searchInputRef: null,
   }
 
   onSearch = debounce(() => {
@@ -71,6 +81,28 @@ export default class IndexHeader extends Component {
     leading: false,
     trailing: true,
   })
+
+  onDelete = () => {
+    showConfirmDelete({
+      modalRef: (modal) => { this.deleteModal = modal },
+      applicationElement: this.props.applicationElement,
+      selectedCount: this.props.selectedCount,
+      onConfirm: () => this.props.deleteSelectedAnnouncements(),
+      onHide: () => {
+        const { deleteBtn, searchInput } = this
+        if (deleteBtn && deleteBtn._button && !deleteBtn._button.disabled) {
+          deleteBtn.focus()
+        } else if (searchInput) {
+          searchInput.focus()
+        }
+      },
+    })
+  }
+
+  searchInputRef = (input) => {
+    this.searchInput = input
+    if (this.props.searchInputRef) this.props.searchInputRef(input)
+  }
 
   render () {
     return (
@@ -91,35 +123,54 @@ export default class IndexHeader extends Component {
               </GridCol>
               <GridCol width={4}>
                 <TextInput
-                  disabled={this.props.isBusy}
                   label={<ScreenReaderContent>{I18n.t('Search announcements by title')}</ScreenReaderContent>}
                   placeholder={I18n.t('Search')}
                   icon={() => <IconSearchLine />}
-                  ref={(c) => { this.searchInput = c }}
+                  ref={this.searchInputRef}
                   onChange={this.onSearch}
                   name="announcements_search"
                 />
               </GridCol>
               <GridCol width={6} textAlign="end">
+                {
+                  this.props.permissions.manage_content &&
+                  !this.props.announcementsLocked &&
+                  (this.props.isToggleLocking ? (
+                    <Button
+                      disabled={this.props.isBusy || this.props.selectedCount === 0}
+                      size="medium"
+                      margin="0 small 0 0"
+                      id="lock_announcements"
+                      onClick={this.props.toggleSelectedAnnouncementsLock}
+                    >
+                      <IconLock />
+                      <ScreenReaderContent>{I18n.t('Lock Selected Announcements')}</ScreenReaderContent>
+                    </Button>
+                  ) : (
+                    <Button
+                      disabled={this.props.isBusy || this.props.selectedCount === 0}
+                      size="medium"
+                      margin="0 small 0 0"
+                      id="lock_announcements"
+                      onClick={this.props.toggleSelectedAnnouncementsLock}
+                    >
+                      <IconUnlock />
+                      <ScreenReaderContent>{I18n.t('Unlock Selected Announcements')}</ScreenReaderContent>
+                    </Button>
+                  ))
+                }
                 {this.props.permissions.manage_content &&
                   <Button
-                    disabled={this.props.isBusy || !this.props.hasSelectedAnnouncements}
-                    size="medium"
-                    margin="0 small 0 0"
-                    id="lock_announcements"
-                    onClick={this.props.lockAnnouncements}
-                  ><IconReply title={I18n.t('Lock Selected Announcements')} /></Button>}
-                {this.props.permissions.manage_content &&
-                  <Button
-                    disabled={this.props.isBusy || !this.props.hasSelectedAnnouncements}
+                    disabled={this.props.isBusy || this.props.selectedCount === 0}
                     size="medium"
                     margin="0 small 0 0"
                     id="delete_announcements"
-                    onClick={this.props.deleteAnnouncements}
-                  ><IconTrash title={I18n.t('Delete Selected Announcements')} /></Button>}
+                    onClick={this.onDelete}
+                    ref={(c) => { this.deleteBtn = c }}
+                  ><IconTrash /><ScreenReaderContent>{I18n.t('Delete Selected Announcements')}</ScreenReaderContent></Button>}
                 {this.props.permissions.create &&
                   <Button
-                    href={`/courses/${this.props.courseId}/discussion_topics/new?is_announcement=true`}
+                    href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new?is_announcement=true`}
                     variant="primary"
                     id="add_announcement"
                   ><IconPlus />
@@ -139,8 +190,9 @@ export default class IndexHeader extends Component {
 
 const connectState = state => Object.assign({
   isBusy: state.isLockingAnnouncements || state.isDeletingAnnouncements,
-  hasSelectedAnnouncements: state.selectedAnnouncements.length > 0,
-}, select(state, ['courseId', 'permissions', 'atomFeedUrl']))
-const selectedActions = ['searchAnnouncements', 'lockAnnouncements', 'deleteAnnouncements']
+  selectedCount: state.selectedAnnouncements.length,
+  isToggleLocking: state.isToggleLocking,
+}, select(state, ['contextType', 'contextId', 'permissions', 'atomFeedUrl', 'announcementsLocked']))
+const selectedActions = ['searchAnnouncements', 'toggleSelectedAnnouncementsLock', 'deleteSelectedAnnouncements']
 const connectActions = dispatch => bindActionCreators(select(actions, selectedActions), dispatch)
 export const ConnectedIndexHeader = connect(connectState, connectActions)(IndexHeader)

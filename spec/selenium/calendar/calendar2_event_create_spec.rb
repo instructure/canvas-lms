@@ -74,6 +74,29 @@ describe "calendar2" do
         expect(CalendarEvent.last.location_address).to eq location_address
       end
 
+      it 'should cosistently format date <input> value to what datepicker would set it as, even in langs that have funky formatting' do
+        skip('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
+        skip('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
+        @user.locale = 'fr'
+        @user.save!
+
+        get "/calendar2#view_name=month&view_start=2018-02-01"
+        f('.fc-day[data-date="2018-03-02"]').click
+
+        # verify it shows up right from the start
+        expect(f('.ui-dialog #calendar_event_date').attribute(:value)).to eq('02/03/2018')
+        expect(fj('.date_field_container:has(#calendar_event_date) .datetime_suggest').text).to eq 'ven. 2 Mar 2018'
+
+        # verify it shows up right when set from the datepicker
+        f('#calendar_event_date + .ui-datepicker-trigger').click
+        fj('.ui-datepicker-current-day a:contains(2)').click()
+        expect(f('.ui-dialog #calendar_event_date').attribute(:value)).to eq('ven 2 Mars 2018')
+        expect(fj('.date_field_container:has(#calendar_event_date) .datetime_suggest').text).to eq 'ven. 2 Mar 2018'
+
+        f('#edit_calendar_event_form button[type="submit"]').click
+        expect(CalendarEvent.last.start_at).to eq Time.utc(2018, 3, 2)
+      end
+
       it "should go to calendar event modal when a syllabus link is clicked", priority: "1", test_id: 186581 do
         event_title = "Test Event"
         make_event(title: event_title, context: @course)
@@ -91,8 +114,8 @@ describe "calendar2" do
         group(:context => @course)
 
         get "/groups/#{@group.id}"
-        expect_new_page_load { f('.event-list-view-calendar').click }
-        event_name = 'some name'
+        get "/calendar?include_contexts=group_#{@group.id}"
+        event_name = 'Test Event'
         create_calendar_event(event_name, false, false, false)
 
         event = @group.calendar_events.last

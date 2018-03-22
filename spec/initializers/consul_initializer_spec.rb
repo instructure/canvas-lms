@@ -52,35 +52,6 @@ describe ConsulInitializer do
     end
   end
 
-  describe ".fallback to" do
-    let(:fallback_data) do
-      {
-        'rich-content-service' => {
-          'app-host' => 'rce.docker',
-          'cdn-host' => 'rce.docker'
-        },
-        'canvas' => {
-          'encryption-secret' => 'asdf',
-          'signing-secret' => 'fdas'
-        }
-      }
-    end
-
-    it "provides fallback data to DynamicSettings" do
-      ConsulInitializer.fallback_to(fallback_data)
-      s_secret = Canvas::DynamicSettings.
-        fallback_data['canvas']['signing-secret']
-      expect(s_secret).to eq('fdas')
-    end
-
-    it "puts the data in with indifferent access" do
-      ConsulInitializer.fallback_to(fallback_data)
-      e_secret = Canvas::DynamicSettings.
-        fallback_data[:canvas]["encryption-secret".to_sym]
-      expect(e_secret).to eq('asdf')
-    end
-  end
-
   describe "just from loading" do
     it "clears the DynamicSettings cache on reload" do
       Canvas::DynamicSettings.reset_cache!

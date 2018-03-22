@@ -20,7 +20,7 @@
   margin: 0;
 }
 .form-inline input, .form-inline button {
-  margin-left: 0.5em;
+  margin-#{direction(left)}: 0.5em;
 }
 #course_summaries {
   margin: 0;
@@ -53,5 +53,5 @@ p {
 .course_enrollment_link {
   position: absolute;
   bottom: 3px;
-  right: 3px;
+  #{direction(right)}: 3px;
 }

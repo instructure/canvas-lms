@@ -18,12 +18,12 @@
 
 import React from 'react'
 import { mount } from 'enzyme'
-import _ from 'lodash'
+import merge from 'lodash/merge'
 import AnnouncementRow from 'jsx/shared/components/AnnouncementRow'
 
 QUnit.module('AnnouncementRow component')
 
-const makeProps = (props = {}) => _.merge({
+const makeProps = (props = {}) => merge({
   announcement: {
     id: '1',
     position: 1,
@@ -93,10 +93,16 @@ test('renders "Posted on" date label if announcement is not delayed', () => {
   ok(node.text().includes('Posted on'))
 })
 
-test('renders the SectionsTooltip component', () => {
+test('renders the SectionsTooltip component if canHaveSections: true', () => {
   const announcement = { user_count: 200 }
-  const tree = mount(<AnnouncementRow {...makeProps({ announcement })} />)
+  const tree = mount(<AnnouncementRow {...makeProps({ announcement, canHaveSections: true })} />)
   equal(tree.find('SectionsTooltip Text').text(), 'All Sections')
+})
+
+test('does not render the SectionsTooltip component if canHaveSections: false', () => {
+  const announcement = { user_count: 200, canHaveSections: false }
+  const tree = mount(<AnnouncementRow {...makeProps({ announcement })} />)
+  notOk(tree.find('SectionsTooltip').exists())
 })
 
 test('renders the SectionsTooltip component with sections', () => {
@@ -104,8 +110,8 @@ test('renders the SectionsTooltip component with sections', () => {
     { "id": 6, "course_id": 1, "name": "section 4", "user_count": 2 },
     { "id": 5, "course_id": 1, "name": "section 2", "user_count": 1 }
   ]}
-  const tree = mount(<AnnouncementRow {...makeProps({ announcement })} />)
-  equal(tree.find('SectionsTooltip Text').text(), '2 Sections')
+  const tree = mount(<AnnouncementRow {...makeProps({ announcement, canHaveSections: true })} />)
+  equal(tree.find('SectionsTooltip Text').text(), '2 Sectionssection 4section 2')
 })
 
 test('does not render master course lock icon if masterCourseData is not provided', (assert) => {
@@ -152,4 +158,29 @@ test('removes non-text content from announcement message', () => {
   equal(node.childNodes[0].nodeType, 3) // nodeType === 3 is text node type
   ok(node.textContent.includes('Hello World!'))
   ok(node.textContent.includes('foo bar'))
+})
+
+test('does not render manage menu if canManage is false', () => {
+  const tree = mount(<AnnouncementRow {...makeProps({ canManage: false })} />)
+  const menu = tree.find('.ic-item-row__manage-menu')
+  notOk(menu.exists())
+})
+
+test('renders manage menu if canManage is true', () => {
+  const tree = mount(<AnnouncementRow {...makeProps({ canManage: true })} />)
+  const menu = tree.find('.ic-item-row__manage-menu')
+  ok(menu.exists())
+})
+
+test('does not render Allow Comments menu item if announcements are globally locked', () => {
+  const tree = mount(<AnnouncementRow {...makeProps({ canManage: true, announcementsLocked: true })} />)
+
+  // If we click the menu, it does not actually pop up the new menu in this tree,
+  // it pops it up in another tree in the dom which afaict can't be tested here.
+  // This is a way to get around that.
+  const courseItemRow = tree.find("CourseItemRow")
+  ok(courseItemRow.exists())
+  const menuItems = courseItemRow.props().manageMenuOptions
+  strictEqual(menuItems.length, 1)
+  strictEqual(menuItems[0].key, 'delete')
 })

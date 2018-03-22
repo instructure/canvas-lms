@@ -83,6 +83,11 @@ module.exports = {
   }, bundleEntries, momentLocaleBundles),
 
   output: {
+    // NOTE: hashSalt was added when HashedModuleIdsPlugin was installed, since
+    // chunkhashes are insensitive to moduleid changes. It should be changed again
+    // if this plugin is reconfigured or removed, or if there is another reason to
+    // prevent previously cached assets from being mixed with those from the new build
+    hashSalt: '2018-01-29',
     path: path.join(__dirname, '../public', webpackPublicPath),
 
     // Add /* filename */ comments to generated require()s in the output.
@@ -107,7 +112,6 @@ module.exports = {
       // don't let people import these top-level modules, because then you
       // get :allthethings: ... you need to import particular components
       'instructure-icons$': 'invalid',
-      'instructure-ui$': 'invalid',
 
       backbone: 'Backbone',
       timezone$: 'timezone_core',
@@ -167,10 +171,11 @@ module.exports = {
           path.resolve(__dirname, '../app/jsx'),
           path.resolve(__dirname, '../app/coffeescripts'),
           path.resolve(__dirname, '../spec/javascripts/jsx'),
+          path.resolve(__dirname, '../spec/coffeescripts'),
           /gems\/plugins\/.*\/app\/jsx\//
         ],
         exclude: [
-          path.resolve(__dirname, '../public/javascripts/vendor/mediaelement-and-player.js'), // remove when we use npm version
+          path.resolve(__dirname, '../public/javascripts/translations'),
           /bower\//,
         ],
         loaders: happify('babel', [
@@ -218,12 +223,12 @@ module.exports = {
         loader: 'json-loader'
       },
       {
-        test: /vendor\/md5/,
-        loader: 'exports-loader?CryptoJS'
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
       },
       {
-        test: /\.css$/,
-        loader: 'style-loader!css-loader'
+        test: /\.(png|svg|gif)$/,
+        loader: 'file-loader'
       }
     ]
   },
@@ -272,6 +277,9 @@ module.exports = {
     // be removed when that issue is fixed
     new webpack.IgnorePlugin(/\.flow$/),
 
+    new webpack.HashedModuleIdsPlugin({
+      hashDigestLength: 10
+    })
   ]
   .concat(process.env.SELINIMUM_RUN || process.env.SELINIMUM_CAPTURE ? [
 
@@ -283,7 +291,7 @@ module.exports = {
 
     // don't include any of the moment locales in the common bundle (otherwise it is huge!)
     // we load them explicitly onto the page in include_js_bundles from rails.
-    new webpack.IgnorePlugin(/^\.\/locale$/, /^moment$/),
+    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
 
     // outputs a json file so Rails knows which hash fingerprints to add to each script url
     new ManifestPlugin({fileName: 'webpack-manifest.json'}),

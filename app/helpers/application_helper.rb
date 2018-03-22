@@ -244,10 +244,14 @@ module ApplicationHelper
     Rails.env.test? && ENV.fetch("DISABLE_CSS_TRANSITIONS", "1") == "1"
   end
 
+  def use_rtl?
+    @current_user.try(:feature_enabled?, :force_rtl) || (@domain_root_account.try(:feature_enabled?, :allow_rtl) && I18n.rtl?)
+  end
+
   def css_variant(opts = {})
     variant = use_responsive_layout? ? 'responsive_layout' : 'new_styles'
     use_high_contrast = @current_user && @current_user.prefers_high_contrast? || opts[:force_high_contrast]
-    variant + (use_high_contrast ? '_high_contrast' : '_normal_contrast')
+    variant + (use_high_contrast ? '_high_contrast' : '_normal_contrast') + (use_rtl? ? '_rtl' : '')
   end
 
   def css_url_for(bundle_name, plugin=false, opts = {})
@@ -552,6 +556,21 @@ module ApplicationHelper
 
     if @domain_root_account.feature_enabled?(:dashcard_reordering)
       mapped = mapped.sort_by {|h| h[:position] || ::CanvasSort::Last}
+    end
+
+    mapped
+  end
+
+  # return enough group data for the planner to display items associated with
+  # account-level groups
+  def map_groups_for_planner(groups)
+    mapped = groups.select {|g| g.context_type == "Account"}.map do |g|
+      {
+        id: g.id,
+        assetString: "group_#{g.id}",
+        name: g.name,
+        url: "/groups/#{g.id}"
+      }
     end
 
     mapped
@@ -891,10 +910,26 @@ module ApplicationHelper
     @domain_root_account&.feature_enabled?(:student_planner) && @current_user.has_student_enrollment?
   end
 
-  def thumbnail_image_url(attachment)
+  def file_authenticator
+    FileAuthenticator.new(logged_in_user, @current_user, request.host_with_port)
+  end
+
+  def authenticated_download_url(attachment)
+    file_authenticator.download_url(attachment)
+  end
+
+  def authenticated_inline_url(attachment)
+    file_authenticator.inline_url(attachment)
+  end
+
+  def authenticated_thumbnail_url(attachment, options={})
+    file_authenticator.thumbnail_url(attachment, options)
+  end
+
+  def thumbnail_image_url(attachment, uuid=nil, url_options={})
     # this thumbnail url is a route that redirects to local/s3 appropriately.
     # deferred redirect through route because it may be saved for later use
     # after a direct link to attachment.thumbnail_url would have expired
-    super(attachment, attachment.uuid)
+    super(attachment, uuid || attachment.uuid, url_options)
   end
 end

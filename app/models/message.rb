@@ -564,13 +564,19 @@ class Message < ActiveRecord::Base
   #
   # Returns nothing
   def enqueue_to_sqs
-    notification_targets.each do |target|
-      Services::NotificationService.process(
-        global_id,
-        notification_message,
-        path_type,
-        target
-      )
+    targets = notification_targets
+    if targets.empty?
+      self.transmission_errors = "No notification targets specified"
+      self.set_transmission_error
+    else
+      targets.each do |target|
+        Services::NotificationService.process(
+          global_id,
+          notification_message,
+          path_type,
+          target
+        )
+      end
       complete_dispatch
     end
   rescue Aws::SQS::Errors::ServiceError => e

@@ -112,33 +112,45 @@ describe UserMerge do
       expect(user1.submissions.map(&:id)).to be_include(s3.id)
     end
 
-    it "should overwrite submission objects that do not contain actual student submissions (e.g. what_if grades)" do
+    it "should not move or delete submission when both users have submissions" do
       a1 = assignment_model
       s1 = a1.find_or_create_submission(user1)
+      s1.submission_type = "online_quiz"
+      s1.save!
       s2 = a1.find_or_create_submission(user2)
       s2.submission_type = "online_quiz"
       s2.save!
 
-      UserMerge.from(user2).into(user1)
+      UserMerge.from(user1).into(user2)
+
+      expect(user1.reload.submissions).to eq [s1.reload]
+      expect(user2.reload.submissions).to eq [s2.reload]
+    end
+
+    it "should prioritize grades over submissions" do
+      a1 = assignment_model(course: course1)
+      course1.enroll_user(user1)
+      s1 = a1.grade_student(user1, grade: "10", grader: @teacher).first
+      s2 = a1.find_or_create_submission(user2)
+      s2.submission_type = "online_quiz"
+      s2.save!
+
+      UserMerge.from(user1).into(user2)
 
       expect(user1.reload.submissions).to eq [s2.reload]
-      expect(user2.reload.submissions).to eq []
+      expect(user2.reload.submissions).to eq [s1.reload]
+    end
 
-      user1.destroy
-      user2.destroy
-
-      user1 = user_model
-      user2 = user_model
+    it "should move and swap submission when one user has a submission" do
       a2 = assignment_model
       s3 = a2.find_or_create_submission(user1)
       s3.submission_type = "online_quiz"
       s3.save!
       s4 = a2.find_or_create_submission(user2)
+      UserMerge.from(user1).into(user2)
 
-      UserMerge.from(user2).into(user1)
-
-      expect(user1.reload.submissions).to eq [s3.reload]
-      expect(user2.reload.submissions).to eq [s4.reload]
+      expect(user1.reload.submissions).to eq [s4.reload]
+      expect(user2.reload.submissions).to eq [s3.reload]
     end
 
     it "should move quiz submissions to the new user (but only if they don't already exist)" do
@@ -164,11 +176,11 @@ describe UserMerge do
       user1.reload
 
       expect(user2.quiz_submissions.length).to be(1)
-      expect(user2.quiz_submissions.first.id).to be(qs2.id)
-      expect(qs2.reload.submission_id).to be_nil
+      expect(user2.quiz_submissions.first.id).to be(qs1.id)
+      expect(qs2.reload.submission_id).to eq sub.id
 
       expect(user1.quiz_submissions.length).to be(2)
-      expect(user1.quiz_submissions.map(&:id)).to be_include(qs1.id)
+      expect(user1.quiz_submissions.map(&:id)).to be_include(qs2.id)
       expect(user1.quiz_submissions.map(&:id)).to be_include(qs3.id)
     end
 
@@ -367,8 +379,8 @@ describe UserMerge do
 
       observer1 = user_with_pseudonym
       observer2 = user_with_pseudonym
-      user1.observers << observer1 << observer2
-      user2.observers << observer2
+      user1.linked_observers << observer1 << observer2
+      user2.linked_observers << observer2
       expect(ObserverEnrollment.count).to eql 3
       Enrollment.where(user_id: observer2, associated_user_id: user1).update_all(workflow_state: 'completed')
 
@@ -384,30 +396,30 @@ describe UserMerge do
     it "should move and uniquify observers" do
       observer1 = user_model
       observer2 = user_model
-      user1.observers << observer1 << observer2
-      user2.observers << observer2
+      user1.linked_observers << observer1 << observer2
+      user2.linked_observers << observer2
 
       UserMerge.from(user1).into(user2)
       data = UserMergeData.where(user_id: user2).first
-      expect(data.user_merge_data_records.where(context_type: 'UserObserver').count).to eq 2
+      expect(data.user_merge_data_records.where(context_type: 'UserObservationLink').count).to eq 2
       user1.reload
-      expect(user1.observers.active_user_observers).to be_empty
-      expect(user1.user_observers.first.workflow_state).to eq 'deleted'
+      expect(user1.linked_observers).to be_empty
+      expect(UserObservationLink.where(:student => user1).first.workflow_state).to eq 'deleted'
       user2.reload
-      expect(user2.observers.sort_by(&:id)).to eql [observer1, observer2]
+      expect(user2.linked_observers.sort_by(&:id)).to eql [observer1, observer2]
     end
 
     it "should move and uniquify observed users" do
       student1 = user_model
       student2 = user_model
-      user1.observed_users << student1 << student2
-      user2.observed_users << student2
+      user1.linked_students << student1 << student2
+      user2.linked_students << student2
 
       UserMerge.from(user1).into(user2)
       user1.reload
-      expect(user1.observed_users.active_user_observers).to be_empty
+      expect(user1.linked_students).to be_empty
       user2.reload
-      expect(user2.observed_users.sort_by(&:id)).to eql [student1, student2]
+      expect(user2.linked_students.sort_by(&:id)).to eql [student1, student2]
     end
 
     it "should move conversations to the new user" do

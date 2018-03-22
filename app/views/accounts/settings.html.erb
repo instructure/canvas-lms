@@ -109,11 +109,6 @@
                              [[no_language, nil]] + available_locales.invert.sort_by { |desc, _| Canvas::ICU.collation_key(desc) },
                              {:selected => @context.default_locale}, {:class => 'locale'} %>
                 <%= render :partial => 'shared/locale_warning' %>
-                <p class="unbreakable"><%= mt :transifex_message, <<-TEXT, :transifex_url => "https://www.transifex.com/instructure/canvas-crowdsource/"
-Join the [Canvas Translation Community](%{transifex_url})
-TEXT
-                %>
-                </p>
                 <p style="font-size: 0.9em;"><%= t(:default_language_description, "This will override any browser/OS language settings. Preferred languages can still be set at the course/user level.") %></p>
               </td>
             </tr>
@@ -297,10 +292,13 @@ TEXT
           <% js_env(:TERMS_OF_SERVICE_CUSTOM_CONTENT => @account.terms_of_service_content&.content) %>
           <% js_bundle :terms_of_service_modal%>
           <fieldset>
-            <legend><%= t("Terms of Service") %></legend>
+            <legend><%= t("Acceptable Use Policy") %></legend>
             <%= f.fields_for :terms_of_service do |tos| %>
               <%= tos.label :terms_type, t("License Type") %>
-              <%= tos.select :terms_type, options_for_select(TermsOfService.type_dropdown_options, @account.terms_of_service.terms_type) %>
+              <% if TermsOfService.type_dropdown_options_for_account(@account)[0][1] == "built_in:default" %>
+                <label> (<%= t("Old Policy") %>)</label>
+              <% end %>
+              <%= tos.select :terms_type, options_for_select(TermsOfService.type_dropdown_options_for_account(@account), @account.terms_of_service.terms_type) %>
               <br>
               <%= tos.check_box :passive, :checked => @account.terms_of_service.passive %>
               <%= tos.label :passive, t("Allow passive acceptance of Terms of Service")%>
@@ -478,6 +476,7 @@ TEXT
                 <%= settings.check_box :author_email_in_notifications, :checked => @account.author_email_in_notifications? %>
                 <%= settings.label     :author_email_in_notifications, :en => "Show the email address of sender for user interaction Notifications" %>
               </div>
+
             <% end %>
             <% unless @account.site_admin? %>
               <div>
@@ -492,12 +491,20 @@ TEXT
               </div>
             <% end %>
           <% end %>
+
           <%= f.fields_for :services do |services| %>
             <% Account.services_exposed_to_ui_hash(:setting, @current_user, @account).sort_by { |k,h| Canvas::ICU.collation_key(h[:name]) }.each do |key, service| %>
               <div>
                 <%= services.check_box key, :checked => @account.service_enabled?(key) %>
                 <%= services.label key, service[:name] + " " %>
               </div>
+              <% if key == :avatars %>
+                <div id="account_settings_gravatar_checkbox">
+                  <%= hidden_field_tag "account[settings][enable_gravatar]", "0", id: "hidden_account_settings_enable_gravatar" %>
+                  <%= check_box_tag "account[settings][enable_gravatar]", "1", @account.enable_gravatar? %>
+                  <%= label_tag "account[settings][enable_gravatar]", t("Enable Gravatar") %>
+                </div>
+              <% end %>
             <% end %>
           <% end %>
         </fieldset>
@@ -544,6 +551,12 @@ TEXT
                     <%= t(:turnitin_pledge_help, "students must check a box acknowledging that they agree with this pledge") %>
                   </span>
                   <%= f.text_area :turnitin_pledge, :style => "width: 90%; height: 50px;" %>
+                </td>
+              </tr>
+              <tr>
+                <td><label for="account_turnitin_originality"><%= I18n.t('Students can see originality score') %></label></td>
+                <td>
+                  <%= f.select :turnitin_originality, options_for_select(turnitin_originality_options, @account.turnitin_originality)%>
                 </td>
               </tr>
             </table>

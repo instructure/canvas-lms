@@ -107,8 +107,10 @@ class GroupCategory < ActiveRecord::Base
       role_category_for_context('communities', context)
     end
 
-    def uncategorized
-      GroupCategory.new(name: name_for_role('uncategorized'), role: 'uncategorized')
+    def uncategorized(context: nil)
+      gc = GroupCategory.new(name: name_for_role('uncategorized'), role: 'uncategorized', context: context)
+      gc.set_root_account_id
+      gc
     end
 
     protected
@@ -369,7 +371,8 @@ class GroupCategory < ActiveRecord::Base
     end
     Group.where(id: groups).touch_all
     if context_type == 'Course'
-      DueDateCacher.recompute_course(context_id, Assignment.where(context_type: context_type, context_id: context_id, group_category_id: self).pluck(:id))
+      opts = { assignments: Assignment.where(context_type: context_type, context_id: context_id, group_category_id: self).pluck(:id) }
+      DueDateCacher.recompute_course(context_id, opts)
     end
   end
 
@@ -521,7 +524,7 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def update_groups_max_membership
-    if group_limit_changed?
+    if saved_change_to_group_limit?
       groups.update_all(:max_membership => group_limit)
     end
   end

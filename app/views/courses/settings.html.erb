@@ -154,11 +154,11 @@
             <% end %>
           <% end %>
         </td>
-      <% if @context.sis_source_id && can_do(@context, @current_user, :read_sis) || can_do(@context, @current_user, :manage_sis) %>
+      <% if @context.sis_source_id && can_do(@context, @current_user, :read_sis) || can_do(@context.root_account, @current_user, :manage_sis) %>
         </tr><tr>
           <td class="form-label"><%= f.blabel :sis_source_id, :en => "SIS ID" %></td>
           <td>
-            <% if can_manage && can_do(@context, @current_user, :manage_sis) %>
+            <% if can_manage && can_do(@context.root_account, @current_user, :manage_sis) %>
               <%= f.text_field :sis_source_id, :style => "width: 202px;", :title => t('sis_source_id', "SIS ID"), :value => @context.sis_source_id %>
             <% else %>
               <span id="course_sis_source_id">
@@ -271,11 +271,6 @@
                            [[no_language, nil]] + available_locales.invert.sort_by { |desc, _| Canvas::ICU.collation_key(desc) },
                            {:selected => @context.locale}, {:class => 'locale'} %>
               <%= render :partial => 'shared/locale_warning' %>
-              <p> <%= mt :transifex_message, <<-TEXT, :transifex_url => "https://www.transifex.com/instructure/canvas-crowdsource/"
-  Join the [Canvas Translation Community](%{transifex_url})
-  TEXT
-              %>
-              </p>
             </div>
             <div class="aside palign">
               <%= t('language_overrides_preferences', "This will override any user/system language preferences. This is only recommended for foreign language courses") %>

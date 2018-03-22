@@ -54,7 +54,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def invalidate_course_cache
-    if self.workflow_state_changed?
+    if self.saved_change_to_workflow_state?
       Rails.cache.delete(self.class.course_cache_key(self.course))
     end
   end
@@ -75,7 +75,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
         end
       end
     else
-      if self.default_restrictions_changed?
+      if self.saved_change_to_default_restrictions?
         count = self.master_content_tags.where(:use_default_restrictions => true).
           update_all(:restrictions => self.default_restrictions)
         if count > 0 && self.default_restrictions.any?{|setting, locked| locked && !self.default_restrictions_was[setting]} # tightened restrictions

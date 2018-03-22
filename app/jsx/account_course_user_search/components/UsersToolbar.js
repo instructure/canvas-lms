@@ -83,8 +83,8 @@ export default function UsersToolbar(props) {
           )}{' '}
           <PopoverMenu
             trigger={
-              <Button>
-                <IconMoreLine title={I18n.t('More People Options')} />
+              <Button theme={{iconPlusTextMargin: '0'}}>
+                <IconMoreLine margin="0" title={I18n.t('More People Options')} />
               </Button>
             }
           >

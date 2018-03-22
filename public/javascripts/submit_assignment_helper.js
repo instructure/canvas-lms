@@ -33,8 +33,11 @@ var invalidToolReturn = function(message) {
     return false;
 };
 
-export function recordEulaAgreement (input, checked) {
-  input.value = checked ? new Date().getTime() : '';
+export function recordEulaAgreement (querySelector, checked) {
+  const inputs = document.querySelectorAll(querySelector)
+  for (let i = 0; i < inputs.length; ++i) {
+    inputs[i].value = checked ? new Date().getTime() : ''
+  }
 }
 
 export function submitContentItem (contentItem) {

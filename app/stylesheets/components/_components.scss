@@ -109,7 +109,7 @@
   .image-block-content {
     flex: 1;
     min-width: 1px;
-    padding-left: $ic-sp;
+    padding-#{direction(left)}: $ic-sp;
     box-sizing: border-box;
   }
 }

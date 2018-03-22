@@ -144,6 +144,7 @@ module Quizzes
     end
 
     def description
+      return '' if hide_locked_description?
       if @serializer_options[:description_formatter]
         @serializer_options[:description_formatter].call(quiz.description)
       else
@@ -317,6 +318,18 @@ module Quizzes
 
     def show_speedgrader?
       quiz.assignment.present? && quiz.published? && context.allows_speed_grader?
+    end
+
+    def quiz_locked_for_user?
+      quiz.locked_for? current_user
+    end
+
+    def user_is_student?
+      context.user_is_student? current_user
+    end
+
+    def hide_locked_description?
+      quiz_locked_for_user? && user_is_student?
     end
 
     def due_dates

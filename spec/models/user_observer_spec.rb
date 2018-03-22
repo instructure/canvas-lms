@@ -18,20 +18,25 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
-describe UserObserver do
+describe UserObservationLink do
   let_once(:student) { user_factory }
 
+  it 'should fail when there is not observer or observee' do
+    expect { UserObservationLink.create_or_restore(student: nil, observer: student) }.
+      to raise_error(ArgumentError, 'student and observer are required')
+  end
+
   it "should not allow a user to observe oneself" do
-    expect { student.observers << student }.to raise_error(ActiveRecord::RecordInvalid)
+    expect { student.linked_observers << student }.to raise_error(ActiveRecord::RecordInvalid)
   end
 
   it 'should restore deleted observees instead of creating a new one' do
     observer = user_with_pseudonym
-    student.observers << observer
-    observee = observer.user_observees.first
+    student.linked_observers << observer
+    observee = observer.as_observer_observation_links.first
     observee.destroy
 
-    re_observee = UserObserver.create_or_restore(observer: observer, observee: student)
+    re_observee = UserObservationLink.create_or_restore(observer: observer, student: student)
     expect(observee.id).to eq re_observee.id
     expect(re_observee.workflow_state).to eq 'active'
   end
@@ -41,18 +46,18 @@ describe UserObserver do
     student_enroll = student_in_course(:user => student)
 
     observer = user_with_pseudonym
-    student.observers << observer
+    student.linked_observers << observer
     observer_enroll = observer.observer_enrollments.first
     observer_enroll.destroy
 
-    UserObserver.create_or_restore(observer: observer, observee: student)
+    UserObservationLink.create_or_restore(observer: observer, student: student)
     expect(observer_enroll.reload).to_not be_deleted
   end
 
   it 'should create an observees when one does not exist' do
     observer = user_with_pseudonym
-    re_observee = UserObserver.create_or_restore(observer: observer, observee: student)
-    expect(re_observee).to eq student.user_observers.first
+    re_observee = UserObservationLink.create_or_restore(observer: observer, student: student)
+    expect(re_observee).to eq student.as_student_observation_links.first
   end
 
   it "should enroll the observer in all pending/active courses and restore them after destroy" do
@@ -65,7 +70,7 @@ describe UserObserver do
     e3.complete!
 
     observer = user_with_pseudonym
-    student.observers << observer
+    student.linked_observers << observer
 
     enrollments = observer.observer_enrollments.order(:course_id)
     expect(enrollments.size).to eql 2
@@ -78,9 +83,24 @@ describe UserObserver do
     p = observer.pseudonyms.first
     p.workflow_state = 'active'
     p.save!
-    UserObserver.create_or_restore(observer: observer, observee: student)
+    UserObservationLink.create_or_restore(observer: observer, student: student)
     observer.reload
     expect(enrollments.reload.map(&:workflow_state)).to eql ["active", "active"]
+  end
+
+  it "should be able to preload observers" do
+    c1 = course_factory(active_all: true)
+    e1 = student_in_course(:course => c1, :user => student)
+
+    observer = user_with_pseudonym
+    student.linked_observers << observer
+
+    preloaded_student = User.where(:id => student).preload(:linked_observers).first
+    expect(preloaded_student.association(:linked_observers).loaded?).to be_truthy
+    expect(preloaded_student.linked_observers).to eq [observer]
+
+    UserObservationLink.where(:user_id => student).update_all(:workflow_state => "deleted")
+    expect(User.where(:id => student).preload(:linked_observers).first.linked_observers).to eq []
   end
 
   it "should enroll the observer in courses when the student is inactive" do
@@ -89,7 +109,7 @@ describe UserObserver do
     enroll.deactivate
 
     observer = user_with_pseudonym
-    student.observers << observer
+    student.linked_observers << observer
 
     o_enroll = observer.observer_enrollments.first
     expect(o_enroll).to be_inactive
@@ -105,13 +125,13 @@ describe UserObserver do
     c1 = course_factory(active_all: true)
 
     observer = user_with_pseudonym
-    student.observers << observer
+    student.linked_observers << observer
 
-    uo = student.user_observers.first
+    uo = student.as_student_observation_links.first
     uo.destroy!
 
     student.reload
-    expect(student.observers).to be_empty
+    expect(student.linked_observers).to be_empty
 
     enroll = student_in_course(:course => c1, :user => student)
 
@@ -134,7 +154,7 @@ describe UserObserver do
     observer = user_with_pseudonym(account: a2)
     allow(@pseudonym).to receive(:works_for_account?).and_return(false)
     allow(@pseudonym).to receive(:works_for_account?).with(a2, true).and_return(true)
-    student.observers << observer
+    student.linked_observers << observer
 
     enrollments = observer.observer_enrollments
     expect(enrollments.size).to eql 1
@@ -147,7 +167,7 @@ describe UserObserver do
       @course = course_factory active_all: true
       @student_enrollment = student_in_course(course: @course, user: student, active_all: true)
       @observer = user_with_pseudonym
-      student.observers << @observer
+      student.linked_observers << @observer
       @observer_enrollment = @observer.enrollments.where(type: 'ObserverEnrollment', course_id: @course, associated_user_id: student).first
     end
 
@@ -176,7 +196,7 @@ describe UserObserver do
       parent = nil
       @shard2.activate do
         parent = user_with_pseudonym(account: course.account, active_all: true)
-        UserObserver.create_or_restore(observer: parent, observee: student)
+        UserObservationLink.create_or_restore(observer: parent, student: student)
       end
       expect(parent.enrollments.shard(parent).first.course).to eq course
     end

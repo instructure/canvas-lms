@@ -54,8 +54,8 @@
   }
   .links {
     white-space: nowrap;
-    text-align: right;
+    text-align: direction(right);
     font-size: 0.8em;
-    padding-left: 30px;
+    padding-#{direction(left)}: 30px;
   }
 }

@@ -18,7 +18,7 @@
 
 <% page_comment ||= nil; comment = page_comment || nil; read_only ||= false %>
 <div class="comment" id="comment_<%= comment ? comment.id : "{{ blank }}" %>" style="<%= hidden unless comment %> border: 0px solid #aaa; margin-bottom: 10px;">
-  <div style="float: left;" class="user_name"><%= comment.user_name rescue nbsp %></div>
+  <div class="user_name pull-left"><%= comment.user_name rescue nbsp %></div>
   <div style="float: right;">
     <span class="created_at" style="color: #888; font-size: 0.8em;"><%= datetime_string(comment.created_at) rescue nbsp %></span>
     <% if !read_only && can_do(@portfolio, @current_user, :update) %>

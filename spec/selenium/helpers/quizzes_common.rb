@@ -22,8 +22,8 @@ module QuizzesCommon
     @quiz = quiz_model
     @quiz.generate_quiz_data
     @quiz.due_at = opts.fetch(:due_at, default_time_for_due_date(Time.zone.now))
-    @quiz.lock_at = opts.fetch(:lock_at, default_time_for_lock_date(Time.zone.now.advance(days:4)))
-    @quiz.unlock_at = opts.fetch(:unlock_at, default_time_for_unlock_date(Time.zone.now.advance(days:-2)))
+    @quiz.lock_at = opts.fetch(:lock_at, default_time_for_lock_date(4.days.from_now))
+    @quiz.unlock_at = opts.fetch(:unlock_at, default_time_for_unlock_date(1.week.ago))
     @quiz.save!
     @quiz
   end
@@ -270,6 +270,7 @@ module QuizzesCommon
 
   def click_questions_tab
     wait_for_ajaximations
+    dismiss_flash_messages_if_present
     f("a[href='#questions_tab']").click
   end
 

@@ -239,32 +239,12 @@ module ActiveRecord
     describe "lock_with_exclusive_smarts" do
       let(:scope){ User.active }
 
-      context "with postgres 90300" do
-        before do
-          allow(scope.connection).to receive(:postgresql_version).and_return(90300)
-        end
-
-        it "uses FOR UPDATE on a normal exclusive lock" do
-          expect(scope.lock(true).lock_value).to eq true
-        end
-
-        it "substitutes 'FOR NO KEY UPDATE' if specified" do
-          expect(scope.lock(:no_key_update).lock_value).to eq "FOR NO KEY UPDATE"
-        end
+      it "uses FOR UPDATE on a normal exclusive lock" do
+        expect(scope.lock(true).lock_value).to eq true
       end
 
-      context "with postgres 90299" do
-        before do
-          allow(scope.connection).to receive(:postgresql_version).and_return(90299)
-        end
-
-        it "uses FOR UPDATE on a normal exclusive lock" do
-          expect(scope.lock(true).lock_value).to eq true
-        end
-
-        it "ignores 'FOR NO KEY UPDATE' if specified" do
-          expect(scope.lock(:no_key_update).lock_value).to eq true
-        end
+      it "substitutes 'FOR NO KEY UPDATE' if specified" do
+        expect(scope.lock(:no_key_update).lock_value).to eq "FOR NO KEY UPDATE"
       end
     end
 
@@ -296,6 +276,52 @@ module ActiveRecord
       context "through a relation" do
         include_examples "query creation"
         let(:base) { Account.create.users }
+      end
+    end
+  end
+
+  describe 'ConnectionAdapters' do
+    describe 'SchemaStatements' do
+
+      it 'should find the name of a foreign key on the default column' do
+        fk_name = ActiveRecord::Migration.find_foreign_key(:enrollments, :users)
+        expect(fk_name).to eq('fk_rails_e860e0e46b')
+      end
+
+      it 'should find the name of a foreign key on a specific column' do
+        fk_name = ActiveRecord::Migration.find_foreign_key(:accounts, :outcome_imports,
+                                                           column: 'latest_outcome_import_id')
+        expect(fk_name).to eq('fk_rails_3f0c8923c0')
+      end
+
+      it 'should not find a foreign key if there is not one' do
+        fk_name = ActiveRecord::Migration.find_foreign_key(:users, :courses)
+        other_fk_name = ActiveRecord::Migration.find_foreign_key(:users, :users)
+        expect(fk_name).to be_nil
+        expect(other_fk_name).to be_nil
+      end
+
+      it 'should not find a foreign key on a column that is not one' do
+        fk_name = ActiveRecord::Migration.find_foreign_key(:users, :pseudonyms, column: 'time_zone')
+        expect(fk_name).to be_nil
+      end
+
+      it 'should not crash on a non-existant column' do
+        fk_name = ActiveRecord::Migration.find_foreign_key(:users, :pseudonyms, column: 'notacolumn')
+        expect(fk_name).to be_nil
+      end
+
+      it 'should not crash on a non-existant table' do
+        fk_name = ActiveRecord::Migration.find_foreign_key(:notatable, :users)
+        other_fk_name = ActiveRecord::Migration.find_foreign_key(:users, :notatable)
+        expect(fk_name).to be_nil
+        expect(fk_name).to be_nil
+      end
+
+      it 'actually renames foreign keys' do
+        old_name = User.connection.find_foreign_key(:user_services, :users)
+        User.connection.alter_constraint(:user_services, old_name, new_name: 'test')
+        expect(User.connection.find_foreign_key(:user_services, :users)).to eq 'test'
       end
     end
   end

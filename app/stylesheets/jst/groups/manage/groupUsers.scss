@@ -37,7 +37,7 @@
   }
   .al-trigger {
     padding: 0;
-    text-align:right;
+    text-align: direction(right);
   }
 }
 
@@ -45,21 +45,21 @@
 .assign-to-group {
   position: absolute;
   top: 0px;
-  right: 3px;
+  #{direction(right)}: 3px;
   top: 1px;
   i:before {
     color: $ic-icon-link-color;
     font-size: 0.8em;
   }
   .icon-mini-arrow-down{
-    text-align:left;
+    text-align: direction(left);
   }
 }
 
 .assign-to-group {
   position: absolute;
   top: 1px;
-  right: 8px;
+  #{direction(right)}: 8px;
 }
 
 .group .group-users {
@@ -86,23 +86,23 @@
 }
 
 .group .group-user {
-  float: left;
+  float: direction(left);
   width: 31%;
-  margin: 0 2% 3px 0;
+  margin: direction-sides(0 2% 3px 0);
   box-sizing: border-box;
 
   .group-category-contents-condensed & {
     width: 23.5%;
-    margin: 0 1% 3px 0;
+    margin: direction-sides(0 1% 3px 0);
   }
 
   .group-user-name {
-    margin-right: 0;
+    margin-#{direction(right)}: 0;
   }
 
   .group-leader {
     position: absolute;
-    right: 36px;
+    #{direction(right)}: 36px;
     top: 7px;
   }
 }
@@ -111,7 +111,7 @@
   max-width: 80%;
   overflow: hidden;
   white-space: nowrap;
-  margin-right: 10px;
+  margin-#{direction(right)}: 10px;
   font-weight: bold;
   color: #777;
 }

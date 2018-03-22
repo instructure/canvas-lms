@@ -117,17 +117,18 @@ QUnit.module('GridSupport Navigation', (suiteHooks) => {
     $fixtures.remove();
   });
 
-  QUnit.module('Tab into the header', (hooks) => {
+  QUnit.module('Tab into the grid', (hooks) => {
     hooks.beforeEach(() => {
       gridSupport.state.setActiveLocation('beforeGrid');
       $activeElement = gridSupport.helper.getBeforeGridNode();
     });
 
-    test('activates the first header cell', () => {
+    test('activates the first cell of the header', () => {
       simulateKeyDown('Tab');
       const activeLocation = gridSupport.state.getActiveLocation();
       equal(activeLocation.region, 'header');
       strictEqual(activeLocation.cell, 0);
+      strictEqual(typeof activeLocation.row, 'undefined');
     });
 
     test('triggers onNavigateNext', () => {
@@ -199,76 +200,18 @@ QUnit.module('GridSupport Navigation', (suiteHooks) => {
     });
   });
 
-  QUnit.module('Tab between two header cells', (hooks) => {
-    hooks.beforeEach(() => {
-      gridSupport.state.setActiveLocation('header', { cell: 0 });
-      $activeElement = gridSupport.helper.getBeforeGridNode();
-    });
-
-    test('activates the next header cell', () => {
-      simulateKeyDown('Tab');
-      const activeLocation = gridSupport.state.getActiveLocation();
-      equal(activeLocation.region, 'header');
-      strictEqual(activeLocation.cell, 1);
-    });
-
-    test('triggers onNavigateNext', () => {
-      const handler = sinon.spy();
-      gridSupport.events.onNavigateNext.subscribe(handler);
-      simulateKeyDown('Tab');
-      strictEqual(handler.callCount, 1);
-    });
-
-    test('includes the event when triggering onNavigateNext', () => {
-      let capturedEvent;
-      gridSupport.events.onNavigateNext.subscribe((event, _activeLocation) => { capturedEvent = event });
-      simulateKeyDown('Tab');
-      equal(capturedEvent, triggeredEvent);
-    });
-
-    test('includes the active location when triggering onNavigateNext', () => {
-      let location;
-      gridSupport.events.onNavigateNext.subscribe((_event, activeLocation) => { location = activeLocation });
-      simulateKeyDown('Tab');
-      equal(location.region, 'header');
-      equal(location.cell, 1);
-      equal(typeof location.row, 'undefined');
-    });
-
-    test('prevents SlickGrid default behavior', () => {
-      simulateKeyDown('Tab');
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true);
-    });
-
-    test('does not stop propagation of the event', () => {
-      simulateKeyDown('Tab');
-      equal(bubbledEvent, triggeredEvent);
-    });
-
-    test('prevents the default behavior of the event', () => {
-      simulateKeyDown('Tab');
-      strictEqual(defaultPrevented, true);
-    });
-
-    test('activates the next header cell when handling keydown on a header child element', () => {
-      simulateKeyDown('Tab', document.querySelectorAll('.slick-column-name')[2]);
-      const activeLocation = gridSupport.state.getActiveLocation();
-      equal(activeLocation.region, 'header');
-      strictEqual(activeLocation.cell, 3);
-    });
-  });
-
-  QUnit.module('Tab from frozen header cell to scrollable header cell', (hooks) => {
+  QUnit.module('Tab on a header cell', (hooks) => {
     hooks.beforeEach(() => {
       gridSupport.state.setActiveLocation('header', { cell: 1 });
       $activeElement = gridSupport.helper.getBeforeGridNode();
     });
 
-    test('activates the next header cell', () => {
+    test('sets the active location to the afterGrid region', () => {
       simulateKeyDown('Tab');
       const activeLocation = gridSupport.state.getActiveLocation();
-      equal(activeLocation.region, 'header');
-      strictEqual(activeLocation.cell, 2);
+      equal(activeLocation.region, 'afterGrid');
+      equal(typeof activeLocation.cell, 'undefined');
+      equal(typeof activeLocation.row, 'undefined');
     });
 
     test('triggers onNavigateNext', () => {
@@ -289,8 +232,8 @@ QUnit.module('GridSupport Navigation', (suiteHooks) => {
       let location;
       gridSupport.events.onNavigateNext.subscribe((_event, activeLocation) => { location = activeLocation });
       simulateKeyDown('Tab');
-      equal(location.region, 'header');
-      equal(location.cell, 2);
+      equal(location.region, 'afterGrid');
+      equal(typeof location.cell, 'undefined');
       equal(typeof location.row, 'undefined');
     });
 
@@ -306,185 +249,31 @@ QUnit.module('GridSupport Navigation', (suiteHooks) => {
 
     test('prevents the default behavior of the event', () => {
       simulateKeyDown('Tab');
-      strictEqual(defaultPrevented, true);
-    });
-  });
-
-  QUnit.module('Tab from last header cell to first body cell', (hooks) => {
-    hooks.beforeEach(() => {
-      gridSupport.state.setActiveLocation('header', { cell: 3 });
-      $activeElement = gridSupport.helper.getBeforeGridNode();
+      strictEqual(defaultPrevented, false);
     });
 
-    test('activates the first cell of the first body row', () => {
-      simulateKeyDown('Tab');
+    test('activates the afterGrid region when handling keydown on a header child element', () => {
+      simulateKeyDown('Tab', document.querySelectorAll('.slick-column-name')[2]);
       const activeLocation = gridSupport.state.getActiveLocation();
-      equal(activeLocation.region, 'body');
-      strictEqual(activeLocation.cell, 0);
-      strictEqual(activeLocation.row, 0);
+      equal(activeLocation.region, 'afterGrid');
+      equal(typeof activeLocation.cell, 'undefined');
+      equal(typeof activeLocation.row, 'undefined');
     });
 
-    test('triggers onNavigateNext', () => {
-      const handler = sinon.spy();
-      gridSupport.events.onNavigateNext.subscribe(handler);
+    test('activates the previously-active location when followed by Shift+Tab', () => {
       simulateKeyDown('Tab');
-      strictEqual(handler.callCount, 1);
-    });
+      $activeElement = gridSupport.helper.getAfterGridNode();
+      simulateKeyDown('ShiftTab');
 
-    test('includes the event when triggering onNavigateNext', () => {
-      let capturedEvent;
-      gridSupport.events.onNavigateNext.subscribe((event, _activeLocation) => { capturedEvent = event });
-      simulateKeyDown('Tab');
-      equal(capturedEvent, triggeredEvent);
-    });
-
-    test('includes the active location when triggering onNavigateNext', () => {
-      let location;
-      gridSupport.events.onNavigateNext.subscribe((_event, activeLocation) => { location = activeLocation });
-      simulateKeyDown('Tab');
-      equal(location.region, 'body');
-      equal(location.cell, 0);
-      equal(location.row, 0);
-    });
-
-    test('activates the first cell within the grid', () => {
-      simulateKeyDown('Tab');
-      const activeCell = grid.getActiveCell();
-      deepEqual(activeCell, { row: 0, cell: 0 });
-    });
-
-    test('creates an editor for the cell', () => {
-      simulateKeyDown('Tab');
-      ok(grid.getCellEditor(), 'an editor exists for the active cell');
-    });
-
-    test('prevents SlickGrid default behavior', () => {
-      simulateKeyDown('Tab');
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true);
-    });
-
-    test('does not stop propagation of the event', () => {
-      simulateKeyDown('Tab');
-      equal(bubbledEvent, triggeredEvent);
-    });
-
-    test('prevents the default behavior of the event', () => {
-      simulateKeyDown('Tab');
-      strictEqual(defaultPrevented, true);
-    });
-  });
-
-  QUnit.module('Tab between two body cells', (hooks) => {
-    hooks.beforeEach(() => {
-      gridSupport.state.setActiveLocation('body', { row: 0, cell: 0 });
-      $activeElement = gridSupport.state.getActiveNode();
-    });
-
-    test('activates the next cell of the body row', () => {
-      simulateKeyDown('Tab');
       const activeLocation = gridSupport.state.getActiveLocation();
-      equal(activeLocation.region, 'body');
+      equal(activeLocation.region, 'header');
       strictEqual(activeLocation.cell, 1);
-      strictEqual(activeLocation.row, 0);
-    });
-
-    test('activates the cell within the grid', () => {
-      simulateKeyDown('Tab');
-      const activeCell = grid.getActiveCell();
-      deepEqual(activeCell, { row: 0, cell: 1 });
-    });
-
-    test('creates an editor for the cell', () => {
-      simulateKeyDown('Tab');
-      ok(grid.getCellEditor(), 'an editor exists for the active cell');
-    });
-
-    test('does not prevent SlickGrid default behavior', () => {
-      simulateKeyDown('Tab');
-      equal(typeof triggeredEvent.skipSlickGridDefaults, 'undefined');
-    });
-
-    test('stops propagation of the event', () => {
-      simulateKeyDown('Tab');
-      equal(typeof bubbledEvent, 'undefined');
     });
   });
 
-  QUnit.module('Tab from frozen body cell to scrollable body cell', (hooks) => {
+  QUnit.module('Tab on a body cell', (hooks) => {
     hooks.beforeEach(() => {
       gridSupport.state.setActiveLocation('body', { row: 0, cell: 1 });
-      $activeElement = gridSupport.state.getActiveNode();
-    });
-
-    test('activates the next cell of the body row', () => {
-      simulateKeyDown('Tab');
-      const activeLocation = gridSupport.state.getActiveLocation();
-      equal(activeLocation.region, 'body');
-      strictEqual(activeLocation.cell, 2);
-      strictEqual(activeLocation.row, 0);
-    });
-
-    test('activates the cell within the grid', () => {
-      simulateKeyDown('Tab');
-      const activeCell = grid.getActiveCell();
-      deepEqual(activeCell, { row: 0, cell: 2 });
-    });
-
-    test('creates an editor for the cell', () => {
-      simulateKeyDown('Tab');
-      ok(grid.getCellEditor(), 'an editor exists for the active cell');
-    });
-
-    test('does not prevent SlickGrid default behavior', () => {
-      simulateKeyDown('Tab');
-      equal(typeof triggeredEvent.skipSlickGridDefaults, 'undefined');
-    });
-
-    test('stops propagation of the event', () => {
-      simulateKeyDown('Tab');
-      equal(typeof bubbledEvent, 'undefined');
-    });
-  });
-
-  QUnit.module('Tab from last row cell to first cell of next row', (hooks) => {
-    hooks.beforeEach(() => {
-      gridSupport.state.setActiveLocation('body', { row: 0, cell: 3 });
-      $activeElement = gridSupport.state.getActiveNode();
-    });
-
-    test('activates the first cell of the next body row', () => {
-      simulateKeyDown('Tab');
-      const activeLocation = gridSupport.state.getActiveLocation();
-      equal(activeLocation.region, 'body');
-      strictEqual(activeLocation.cell, 0);
-      strictEqual(activeLocation.row, 1);
-    });
-
-    test('activates the cell within the grid', () => {
-      simulateKeyDown('Tab');
-      const activeCell = grid.getActiveCell();
-      deepEqual(activeCell, { row: 1, cell: 0 });
-    });
-
-    test('creates an editor for the cell', () => {
-      simulateKeyDown('Tab');
-      ok(grid.getCellEditor(), 'an editor exists for the active cell');
-    });
-
-    test('does not prevent SlickGrid default behavior', () => {
-      simulateKeyDown('Tab');
-      equal(typeof triggeredEvent.skipSlickGridDefaults, 'undefined');
-    });
-
-    test('stops propagation of the event', () => {
-      simulateKeyDown('Tab');
-      equal(typeof bubbledEvent, 'undefined');
-    });
-  });
-
-  QUnit.module('Tab into the afterGrid region', (hooks) => {
-    hooks.beforeEach(() => {
-      gridSupport.state.setActiveLocation('body', { row: 1, cell: 3 });
       $activeElement = gridSupport.state.getActiveNode();
     });
 
@@ -509,6 +298,17 @@ QUnit.module('GridSupport Navigation', (suiteHooks) => {
     test('does not prevent the default behavior of the event', () => {
       simulateKeyDown('Tab');
       strictEqual(defaultPrevented, false);
+    });
+
+    test('activates the previously-active location when followed by Shift+Tab', () => {
+      simulateKeyDown('Tab');
+      $activeElement = gridSupport.helper.getAfterGridNode();
+      simulateKeyDown('ShiftTab');
+
+      const activeLocation = gridSupport.state.getActiveLocation();
+      equal(activeLocation.region, 'body');
+      strictEqual(activeLocation.row, 0);
+      strictEqual(activeLocation.cell, 1);
     });
   });
 
@@ -617,9 +417,9 @@ QUnit.module('GridSupport Navigation', (suiteHooks) => {
     });
   });
 
-  QUnit.module('Shift+Tab back out of the header', (hooks) => {
+  QUnit.module('Shift+Tab on a header cell', (hooks) => {
     hooks.beforeEach(() => {
-      gridSupport.state.setActiveLocation('header', { cell: 0 });
+      gridSupport.state.setActiveLocation('header', { row: 0, cell: 1 });
       $activeElement = gridSupport.helper.getBeforeGridNode();
     });
 
@@ -668,123 +468,28 @@ QUnit.module('GridSupport Navigation', (suiteHooks) => {
       simulateKeyDown('ShiftTab');
       strictEqual(defaultPrevented, false);
     });
-  });
 
-  QUnit.module('Shift+Tab between two header cells', (hooks) => {
-    hooks.beforeEach(() => {
-      gridSupport.state.setActiveLocation('header', { cell: 1 });
-      $activeElement = gridSupport.helper.getBeforeGridNode();
-    });
-
-    test('activates the previous header cell', () => {
-      simulateKeyDown('ShiftTab');
-      const activeLocation = gridSupport.state.getActiveLocation();
-      equal(activeLocation.region, 'header');
-      strictEqual(activeLocation.cell, 0);
-    });
-
-    test('triggers onNavigatePrev', () => {
-      const handler = sinon.spy();
-      gridSupport.events.onNavigatePrev.subscribe(handler);
-      simulateKeyDown('ShiftTab');
-      strictEqual(handler.callCount, 1);
-    });
-
-    test('includes the event when triggering onNavigatePrev', () => {
-      let capturedEvent;
-      gridSupport.events.onNavigatePrev.subscribe((event, _activeLocation) => { capturedEvent = event });
-      simulateKeyDown('ShiftTab');
-      equal(capturedEvent, triggeredEvent);
-    });
-
-    test('includes the active location when triggering onNavigatePrev', () => {
-      let location;
-      gridSupport.events.onNavigatePrev.subscribe((_event, activeLocation) => { location = activeLocation });
-      simulateKeyDown('ShiftTab');
-      equal(location.region, 'header');
-      equal(location.cell, 0);
-      equal(typeof location.row, 'undefined');
-    });
-
-    test('prevents SlickGrid default behavior', () => {
-      simulateKeyDown('ShiftTab');
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true);
-    });
-
-    test('does not stop propagation of the event', () => {
-      simulateKeyDown('ShiftTab');
-      equal(bubbledEvent, triggeredEvent);
-    });
-
-    test('prevents the default behavior of the event', () => {
-      simulateKeyDown('ShiftTab');
-      strictEqual(defaultPrevented, true);
-    });
-  });
-
-  QUnit.module('Shift+Tab from scrollable header cell to frozen header cell', (hooks) => {
-    hooks.beforeEach(() => {
-      gridSupport.state.setActiveLocation('header', { cell: 2 });
-      $activeElement = gridSupport.helper.getBeforeGridNode();
-    });
-
-    test('activates the previous header cell', () => {
+    test('activates the previously-active location when followed by Tab', () => {
+      simulateKeyDown('Tab');
+      $activeElement = gridSupport.helper.getAfterGridNode();
       simulateKeyDown('ShiftTab');
       const activeLocation = gridSupport.state.getActiveLocation();
       equal(activeLocation.region, 'header');
       strictEqual(activeLocation.cell, 1);
     });
-
-    test('triggers onNavigatePrev', () => {
-      const handler = sinon.spy();
-      gridSupport.events.onNavigatePrev.subscribe(handler);
-      simulateKeyDown('ShiftTab');
-      strictEqual(handler.callCount, 1);
-    });
-
-    test('includes the event when triggering onNavigatePrev', () => {
-      let capturedEvent;
-      gridSupport.events.onNavigatePrev.subscribe((event, _activeLocation) => { capturedEvent = event });
-      simulateKeyDown('ShiftTab');
-      equal(capturedEvent, triggeredEvent);
-    });
-
-    test('includes the active location when triggering onNavigatePrev', () => {
-      let location;
-      gridSupport.events.onNavigatePrev.subscribe((_event, activeLocation) => { location = activeLocation });
-      simulateKeyDown('ShiftTab');
-      equal(location.region, 'header');
-      equal(location.cell, 1);
-      equal(typeof location.row, 'undefined');
-    });
-
-    test('prevents SlickGrid default behavior', () => {
-      simulateKeyDown('ShiftTab');
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true);
-    });
-
-    test('does not stop propagation of the event', () => {
-      simulateKeyDown('ShiftTab');
-      equal(bubbledEvent, triggeredEvent);
-    });
-
-    test('prevents the default behavior of the event', () => {
-      simulateKeyDown('ShiftTab');
-      strictEqual(defaultPrevented, true);
-    });
   });
 
-  QUnit.module('Shift+Tab from first body cell to last header cell', (hooks) => {
+  QUnit.module('Shift+Tab on a body cell', (hooks) => {
     hooks.beforeEach(() => {
-      gridSupport.state.setActiveLocation('body', { row: 0, cell: 0 });
+      gridSupport.state.setActiveLocation('body', { row: 1, cell: 1 });
       $activeElement = gridSupport.state.getActiveNode();
     });
 
-    test('activates the last header cell', () => {
+    test('activates the beforeGrid region', () => {
       simulateKeyDown('ShiftTab');
       const activeLocation = gridSupport.state.getActiveLocation();
-      equal(activeLocation.region, 'header');
-      strictEqual(activeLocation.cell, 3);
+      equal(activeLocation.region, 'beforeGrid');
+      equal(typeof activeLocation.cell, 'undefined');
       equal(typeof activeLocation.row, 'undefined');
     });
 
@@ -806,8 +511,8 @@ QUnit.module('GridSupport Navigation', (suiteHooks) => {
       let location;
       gridSupport.events.onNavigatePrev.subscribe((_event, activeLocation) => { location = activeLocation });
       simulateKeyDown('ShiftTab');
-      equal(location.region, 'header');
-      strictEqual(location.cell, 3);
+      equal(location.region, 'beforeGrid');
+      equal(typeof location.cell, 'undefined');
       equal(typeof location.row, 'undefined');
     });
 
@@ -823,130 +528,33 @@ QUnit.module('GridSupport Navigation', (suiteHooks) => {
 
     test('prevents the default behavior of the event', () => {
       simulateKeyDown('ShiftTab');
-      strictEqual(defaultPrevented, true);
-    });
-  });
-
-  QUnit.module('Shift+Tab between two body cells', (hooks) => {
-    hooks.beforeEach(() => {
-      gridSupport.state.setActiveLocation('body', { row: 0, cell: 1 });
-      $activeElement = gridSupport.state.getActiveNode();
+      strictEqual(defaultPrevented, false);
     });
 
-    test('activates the previous body cell', () => {
+    test('activates the previously-active location when followed by Tab', () => {
+      simulateKeyDown('Tab');
+      $activeElement = gridSupport.helper.getAfterGridNode();
       simulateKeyDown('ShiftTab');
+
       const activeLocation = gridSupport.state.getActiveLocation();
       equal(activeLocation.region, 'body');
-      strictEqual(activeLocation.cell, 0);
-      strictEqual(activeLocation.row, 0);
-    });
-
-    test('activates the cell within the grid', () => {
-      simulateKeyDown('ShiftTab');
-      const activeCell = grid.getActiveCell();
-      deepEqual(activeCell, { row: 0, cell: 0 });
-    });
-
-    test('creates an editor for the cell', () => {
-      simulateKeyDown('ShiftTab');
-      ok(grid.getCellEditor(), 'an editor exists for the active cell');
-    });
-
-    test('does not prevent SlickGrid default behavior', () => {
-      simulateKeyDown('ShiftTab');
-      equal(typeof triggeredEvent.skipSlickGridDefaults, 'undefined');
-    });
-
-    test('stops propagation of the event', () => {
-      simulateKeyDown('ShiftTab');
-      equal(typeof bubbledEvent, 'undefined');
-    });
-  });
-
-  QUnit.module('Shift+Tab from scrollable body cell to frozen body cell', (hooks) => {
-    hooks.beforeEach(() => {
-      gridSupport.state.setActiveLocation('body', { row: 0, cell: 2 });
-      $activeElement = gridSupport.state.getActiveNode();
-    });
-
-    test('activates the next cell of the body row', () => {
-      simulateKeyDown('ShiftTab');
-      const activeLocation = gridSupport.state.getActiveLocation();
-      equal(activeLocation.region, 'body');
+      strictEqual(activeLocation.row, 1);
       strictEqual(activeLocation.cell, 1);
-      strictEqual(activeLocation.row, 0);
-    });
-
-    test('activates the cell within the grid', () => {
-      simulateKeyDown('ShiftTab');
-      const activeCell = grid.getActiveCell();
-      deepEqual(activeCell, { row: 0, cell: 1 });
-    });
-
-    test('creates an editor for the cell', () => {
-      simulateKeyDown('ShiftTab');
-      ok(grid.getCellEditor(), 'an editor exists for the active cell');
-    });
-
-    test('does not prevent SlickGrid default behavior', () => {
-      simulateKeyDown('ShiftTab');
-      equal(typeof triggeredEvent.skipSlickGridDefaults, 'undefined');
-    });
-
-    test('stops propagation of the event', () => {
-      simulateKeyDown('ShiftTab');
-      equal(typeof bubbledEvent, 'undefined');
     });
   });
 
-  QUnit.module('Shift+Tab from first row cell to last cell of previous row', (hooks) => {
-    hooks.beforeEach(() => {
-      gridSupport.state.setActiveLocation('body', { row: 1, cell: 0 });
-      $activeElement = gridSupport.state.getActiveNode();
-    });
-
-    test('activates the first cell of the next body row', () => {
-      simulateKeyDown('ShiftTab');
-      const activeLocation = gridSupport.state.getActiveLocation();
-      equal(activeLocation.region, 'body');
-      strictEqual(activeLocation.cell, 3);
-      strictEqual(activeLocation.row, 0);
-    });
-
-    test('activates the cell within the grid', () => {
-      simulateKeyDown('ShiftTab');
-      const activeCell = grid.getActiveCell();
-      deepEqual(activeCell, { row: 0, cell: 3 });
-    });
-
-    test('creates an editor for the cell', () => {
-      simulateKeyDown('ShiftTab');
-      ok(grid.getCellEditor(), 'an editor exists for the active cell');
-    });
-
-    test('does not prevent SlickGrid default behavior', () => {
-      simulateKeyDown('ShiftTab');
-      equal(typeof triggeredEvent.skipSlickGridDefaults, 'undefined');
-    });
-
-    test('stops propagation of the event', () => {
-      simulateKeyDown('ShiftTab');
-      equal(typeof bubbledEvent, 'undefined');
-    });
-  });
-
-  QUnit.module('Shift+Tab back into the body', (hooks) => {
+  QUnit.module('Shift+Tab back into the grid', (hooks) => {
     hooks.beforeEach(() => {
       gridSupport.state.setActiveLocation('afterGrid');
       $activeElement = gridSupport.helper.getAfterGridNode();
     });
 
-    test('sets the active location to the last cell of the last row', () => {
+    test('sets the active location to the first column of the header by default', () => {
       simulateKeyDown('ShiftTab');
       const activeLocation = gridSupport.state.getActiveLocation();
-      equal(activeLocation.region, 'body');
-      strictEqual(activeLocation.cell, 3);
-      strictEqual(activeLocation.row, 1);
+      equal(activeLocation.region, 'header');
+      strictEqual(activeLocation.cell, 0);
+      strictEqual(typeof activeLocation.row, 'undefined');
     });
 
     test('triggers onNavigatePrev', () => {
@@ -967,20 +575,9 @@ QUnit.module('GridSupport Navigation', (suiteHooks) => {
       let location;
       gridSupport.events.onNavigatePrev.subscribe((_event, activeLocation) => { location = activeLocation });
       simulateKeyDown('ShiftTab');
-      equal(location.region, 'body');
-      strictEqual(location.cell, 3);
-      strictEqual(location.row, 1);
-    });
-
-    test('activates the cell within the grid', () => {
-      simulateKeyDown('ShiftTab');
-      const activeCell = grid.getActiveCell();
-      deepEqual(activeCell, { row: 1, cell: 3 });
-    });
-
-    test('creates an editor for the cell', () => {
-      simulateKeyDown('ShiftTab');
-      ok(grid.getCellEditor(), 'an editor exists for the active cell');
+      equal(location.region, 'header');
+      strictEqual(location.cell, 0);
+      strictEqual(typeof location.row, 'undefined');
     });
 
     test('prevents SlickGrid default behavior', () => {

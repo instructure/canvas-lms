@@ -33,7 +33,7 @@
 <div class="prerequisites">
   <% if context_module %>
     <% prerequisites.each do |pre| %>
-      <div class="prerequisite_criterion <%= pre[:type] %>_criterion" style="float: left;">
+      <div class="prerequisite_criterion <%= pre[:type] %>_criterion pull-left">
         <span class="id" style="display: none;"><%= pre[:id] %></span>
         <span class="type" style="display: none;"><%= pre[:type] %></span>
         <span class="name" style="display: none;"><%= pre[:name] %></span>

@@ -19,8 +19,9 @@ define [
   'underscore'
   'jquery'
   'Backbone'
+  'jsx/shared/upload_file'
   'jquery.instructure_forms'
-], (_,$, Backbone) ->
+], (_,$, Backbone, uploader) ->
   class ContentMigration extends Backbone.Model
     urlRoot: => "/api/v1/courses/#{@get('course_id')}/content_migrations"
     @dynamicDefaults = {}
@@ -66,44 +67,44 @@ define [
           models = collection.map (model) -> model
           _.each models, (model) -> collection.remove model
 
-    # Handles two cases. Migration with and without a file. 
-    # When saving we extract the fileElement (input type="file" dom node) 
-    # so we can then pass it into our custom "multipart" upload function. 
+    # Handles two cases. Migration with a file and without a file.
     #
-    # Steps: 
-    #   * Get file element
-    #   * Save the migration model which should start the process but does
-    #     not up upload the file at this point
-    #   * Create a temp backbone model that uses the url recieved back from
-    #     the first migration save. This is the url used to save the actual 
-    #     migration file. 
-    #   * Save the temp backbone model which will upload the file to amazon
-    #     and return a 302 from which we can start processing the migration
-    #     file. 
+    # The presence of a file in the migration is indicated by a
+    # `pre_attachment` field on the model. This field will contain a
+    # `fileElement` (a DOM node for an <input type="file">). A migration
+    # without a file (e.g. a course copy) is executed as a normal save.
     #
-    #  @returns deffered object
+    # A migration with a file (e.g. an import) is executed in multiple stages.
+    # We first set aside the fileElement and save the remainder of the
+    # migration. In addition to creating the migration on the server, this acts
+    # as the preflight for the upload of the migration's file, with the
+    # preflight results being stored back into the model's `pre_attachment`. We
+    # then complete the upload as for any other file upload. Once completed, we
+    # reload the model to set the polling url, then resolve the deferred.
+    #
+    #  @returns deferred object
     #  @api public backbone override
 
     save: =>
       return super unless @get('pre_attachment') # No attachment, regular save
+
       dObject = $.Deferred()
+      resolve = =>
+        # sets the poll url
+        this.fetch success: =>
+          dObject.resolve()
+      reject = (message) => dObject.rejectWith(this, message)
 
       fileElement = @get('pre_attachment').fileElement
       delete @get('pre_attachment').fileElement
+      file = fileElement.files[0]
 
       super _.omit(arguments[0], 'file'),
-        error: (xhr) => dObject.rejectWith(this, xhr.responseText)
-        success: (model, xhr, options) => 
-          tempModel = new Backbone.Model(@get('pre_attachment').upload_params)
-          tempModel.url = => @get('pre_attachment').upload_url
-          tempModel.set('attachment', fileElement)
-
-          tempModel.save null,
-            multipart: fileElement 
-            success: (model, xhr) => 
-              return dObject.rejectWith(this, xhr.message) if xhr.message
-              this.fetch success: => dObject.resolve() # sets the poll url
-            error: (message) => dObject.rejectWith(this, message)
+        error: (xhr) => reject(xhr.responseText)
+        success: (model, xhr, options) =>
+          uploader.completeUpload(@get('pre_attachment'), file, ignoreResult: true)
+            .catch(reject)
+            .then(resolve)
 
       dObject
 

@@ -28,6 +28,8 @@ const PASS_FAIL = 'pass_fail';
 const PASS_GRADES = ['complete', 'pass'];
 const FAIL_GRADES = ['incomplete', 'fail'];
 
+const UNGRADED = '–'
+
 function isPassFail (grade, gradeType) {
   if (gradeType) {
     return gradeType === PASS_FAIL;
@@ -102,6 +104,18 @@ function formatCompleteIncompleteGrade (score, grade, options) {
     passed = PASS_GRADES.includes(grade);
   }
   return passed ? I18n.t('Complete') : I18n.t('Incomplete');
+}
+
+function formatGradeInfo(gradeInfo, options = {}) {
+  if (gradeInfo.excused) {
+    return excused()
+  }
+
+  if (gradeInfo.grade == null) {
+    return options.defaultValue != null ? options.defaultValue : UNGRADED
+  }
+
+  return gradeInfo.grade
 }
 
 const GradeFormatHelper = {
@@ -192,6 +206,7 @@ const GradeFormatHelper = {
 
   excused,
   isExcused,
+  formatGradeInfo,
 
   formatSubmissionGrade (submission, options = { version: 'final' }) {
     if (submission.excused) {
@@ -202,7 +217,7 @@ const GradeFormatHelper = {
     const grade = options.version === 'entered' ? submission.enteredGrade : submission.grade;
 
     if (score == null) {
-      return options.formatType === 'passFail' ? I18n.t('ungraded') : '–';
+      return options.defaultValue != null ? options.defaultValue : UNGRADED
     }
 
     switch (options.formatType) {
@@ -215,7 +230,6 @@ const GradeFormatHelper = {
       default:
         return formatPointsGrade(score);
     }
-
   }
 };
 

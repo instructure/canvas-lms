@@ -172,7 +172,9 @@ module Canvas::LiveEvents
       lock_at: assignment.lock_at,
       updated_at: assignment.updated_at,
       points_possible: assignment.points_possible,
-      lti_assignment_id: assignment.lti_context_id
+      lti_assignment_id: assignment.lti_context_id,
+      lti_resource_link_id: assignment.lti_resource_link_id,
+      lti_resource_link_id_duplicated_from: assignment.duplicate_of&.lti_resource_link_id
     }
   end
 
@@ -435,6 +437,10 @@ module Canvas::LiveEvents
 
   def self.course_section_updated(section)
     post_event_stringified('course_section_updated', get_course_section_data(section))
+  end
+
+  def self.quizzes_next_quiz_duplicated(payload)
+    post_event_stringified('quizzes_next_quiz_duplicated', payload)
   end
 
   def self.get_course_section_data(section)

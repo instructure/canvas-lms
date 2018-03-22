@@ -19,7 +19,7 @@
 /config/*.yml
 /config/environments/*-local.rb
 /config/locales/generated/
-/config/RAILS5_1
+/config/RAILS5_2
 /coverage/
 /coverage-js/
 /db/schema.rb
@@ -27,7 +27,7 @@
 /db/*sql
 /exports/
 Gemfile.lock
-Gemfile.lock.51
+Gemfile.lock.52
 /log/
 mkmf.log
 /node_modules
@@ -59,3 +59,11 @@ yarn-error.log
 
 # user docker compose overrides
 docker-compose.local.*
+
+# sub-packages
+/packages/*/node_modules
+/packages/*/copy-of-what-gets-published-to-npm-registry
+/packages/canvas-planner/lib
+/packages/canvas-planner/es
+/packages/canvas-planner/coverage/
+/packages/canvas-planner/.babel-cache

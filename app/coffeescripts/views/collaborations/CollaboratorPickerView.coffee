@@ -17,13 +17,12 @@
 #
 
 define [
-  'i18n!collaborations'
   'jquery'
   'Backbone'
   './ListView'
   './MemberListView'
   'jst/collaborations/CollaboratorPicker'
-], (I18n, $, {View}, ListView, MemberListView, widgetTemplate) ->
+], ($, {View}, ListView, MemberListView, widgetTemplate) ->
 
   class CollaboratorPickerView extends View
     template: widgetTemplate

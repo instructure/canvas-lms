@@ -883,6 +883,7 @@ describe ConversationsController, type: :request do
                     'content-type' => 'image/png',
                     'display_name' => 'test my file? hai!&.png',
                     'id' => attachment.id,
+                    'uuid' => attachment.uuid,
                     'folder_id' => attachment.folder_id,
                     'size' => attachment.size,
                     'unlock_at' => nil,
@@ -894,7 +895,7 @@ describe ConversationsController, type: :request do
                     'created_at' => attachment.created_at.as_json,
                     'updated_at' => attachment.updated_at.as_json,
                     'modified_at' => attachment.modified_at.as_json,
-                    'thumbnail_url' => attachment.thumbnail_url,
+                    'thumbnail_url' => thumbnail_image_url(attachment, attachment.uuid, host: 'www.example.com'),
                     'mime_class' => attachment.mime_class,
                     'media_entry_id' => attachment.media_entry_id }], "participating_user_ids" => [@me.id, @bob.id].sort
                   }
@@ -1105,6 +1106,7 @@ describe ConversationsController, type: :request do
                 "content-type" => "unknown/unknown",
                 "display_name" => "test.txt",
                 "id" => attachment.id,
+                "uuid" => attachment.uuid,
                 "folder_id" => attachment.folder_id,
                 "size" => attachment.size,
                 'unlock_at' => nil,
@@ -1115,7 +1117,7 @@ describe ConversationsController, type: :request do
                 'hidden_for_user' => false,
                 'created_at' => attachment.created_at.as_json,
                 'updated_at' => attachment.updated_at.as_json,
-                'thumbnail_url' => attachment.thumbnail_url,
+                'thumbnail_url' => nil,
                 'modified_at' => attachment.modified_at.as_json,
                 'mime_class' => attachment.mime_class,
                 'media_entry_id' => attachment.media_entry_id

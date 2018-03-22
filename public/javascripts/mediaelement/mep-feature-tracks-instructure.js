@@ -3,12 +3,15 @@
 //
 // to see the diff, run:
 //
-// upstream_url='https://raw.githubusercontent.com/instructure/mediaelement/1a177ed2cc3d51689a210d5c034c88112d5a2e42/src/js/mep-feature-tracks.js'
+// upstream_url='https://raw.githubusercontent.com/instructure/mediaelement/e4e415b5093855eddbf310d07ddb3a12e81ae1d4/src/js/mep-feature-tracks.js'
 // diff -bu \
 //   <(curl -s "${upstream_url}") \
 //   public/javascripts/mediaelement/mep-feature-tracks-instructure.js
 //
-/*global mejs, MediaElementPlayer*/
+
+import I18n from 'i18n!mepfeaturetracksinstructure'
+import htmlEscape from 'str/htmlEscape'
+
 (function($) {
 
   // add extra default options
@@ -16,7 +19,7 @@
     // this will automatically turn on a <track>
     startLanguage: '',
 
-    tracksText: mejs.i18n.t('Captions/Subtitles'),
+    tracksText: '',
 
     // By default, no WAI-ARIA live region - don't make a
     // screen reader speak captions over an audio track.
@@ -53,6 +56,7 @@
       var t = this,
         attr = t.options.tracksAriaLive ?
           'role="log" aria-live="assertive" aria-atomic="false"' : '',
+        tracksTitle = t.options.tracksText ? t.options.tracksText : I18n.t('Captions/Subtitles'),
         i,
         kind;
 
@@ -72,12 +76,12 @@
       player.captionsText = player.captions.find('.mejs-captions-text');
       player.captionsButton =
           $('<div class="mejs-button mejs-captions-button">'+
-            '<button type="button" aria-controls="' + t.id + '" title="' + t.options.tracksText + '" aria-label="' + t.options.tracksText + '"></button>'+
+            '<button type="button" aria-controls="' + t.id + '" title="' + tracksTitle + '" aria-label="' + tracksTitle + '"></button>'+
             '<div class="mejs-captions-selector mejs-offscreen" role="menu" aria-expanded="false" aria-hidden="true">'+
               '<ul>'+
                 '<li>'+
-                  '<input type="radio" name="' + player.id + '_captions" id="' + player.id + '_captions_none" value="none" checked="checked" role="menuitemradio" aria-selected="true" aria-label="' + mejs.i18n.t('None') + '" tabindex=-1 />' +
-                  '<label for="' + player.id + '_captions_none" aria-hidden="true" class="mejs-selected">' + mejs.i18n.t('None') +'</label>'+
+                  '<input type="radio" name="' + player.id + '_captions" id="' + player.id + '_captions_none" value="none" checked="checked" role="menuitemradio" aria-selected="true" aria-label="' + mejs.i18n.t('mejs.none') + '" tabindex="-1" />' +
+                  '<label for="' + player.id + '_captions_none" aria-hidden="true">' + mejs.i18n.t('mejs.none') +'</label>'+
                 '</li>'  +
               '</ul>'+
             '</div>'+
@@ -103,7 +107,7 @@
           player.setTrack(lang);
         });
       } else {
-        // hover or keyboard focus
+        // hover
         var hoverTimeout;
         player.captionsButton.hover(function() {
           clearTimeout(hoverTimeout);
@@ -114,8 +118,8 @@
           }, t.options.menuTimeoutMouseLeave);
         })
 
-        // keyboard menu activation
-        .on('keydown', function (e) {
+        // handle clicks to the language radio buttons
+        .on('keydown', function(e) {
           if(e.target.tagName.toLowerCase() === 'a') {
             // bypass for upload/delete links
             return true;
@@ -129,12 +133,12 @@
                 player.showCaptionsSelector();
               }
               $(this).find('.mejs-captions-selector')
-                .find('input[type=radio]:checked').first().focus();
+                .find('input[type=radio]:checked').first().focus()
               break;
             case 13: // enter
               player.showCaptionsSelector();
               $(this).find('.mejs-captions-selector')
-                .find('input[type=radio]:checked').first().focus();
+                .find('input[type=radio]:checked').first().focus()
               break;
             case 27: // esc
               player.hideCaptionsSelector();
@@ -159,18 +163,12 @@
         }, 100))
 
         // handle clicks to the language radio buttons
-        .on('click','input[type=radio]',function() {
+        .on('click', 'input[type=radio]', function() {
           lang = this.value;
           player.setTrack(lang);
-          var selector = $(this).closest('.mejs-captions-selector');
-          $(this).attr('aria-selected', true).attr('checked', 'checked');
-          selector.find('input[type=radio]').not(this).attr('aria-selected', 'false').removeAttr('checked');
-          selector.find('.mejs-selected').removeClass('mejs-selected')
-          selector.find('input[type="radio"]:checked').next().addClass('mejs-selected');
         })
 
-        // Handle click so that screen readers can toggle the menu
-        .on('click', 'button', function (e) {
+        .on('click', 'button', function() {
           if ($(this).siblings('.mejs-captions-selector').hasClass('mejs-offscreen')) {
             player.showCaptionsSelector();
             $(this).siblings('.mejs-captions-selector').find('input[type=radio]:checked').first().focus();
@@ -302,6 +300,8 @@
       var t = this,
         i;
 
+      $(this).attr('aria-selected', true).attr('checked', 'checked');
+      $(this).closest('.mejs-captions-selector').find('input[type=radio]').not(this).attr('aria-selected', 'false').removeAttr('checked');
       if (lang == 'none') {
         t.selectedTrack = null;
         t.captionsButton.removeClass('mejs-captions-enabled');
@@ -350,38 +350,39 @@
 
         };
 
+      if (track.src !== undefined || track.src !== "") {
+        $.ajax({
+          url: track.src,
+          dataType: "text",
+          success: function(d) {
 
-      $.ajax({
-        url: track.src,
-        dataType: "text",
-        success: function(d) {
+            // parse the loaded file
+            if (typeof d == "string" && (/<tt\s+xml/ig).exec(d)) {
+              track.entries = mejs.TrackFormatParser.dfxp.parse(d);
+            } else {
+              track.entries = mejs.TrackFormatParser.webvtt.parse(d);
+            }
 
-          // parse the loaded file
-          if (typeof d == "string" && (/<tt\s+xml/ig).exec(d)) {
-            track.entries = mejs.TrackFormatParser.dfxp.parse(d);
-          } else {
-            track.entries = mejs.TrackFormatParser.webvtt.parse(d);
+            after();
+
+            if (track.kind == 'chapters') {
+              t.media.addEventListener('play', function() {
+                if (t.media.duration > 0) {
+                  t.displayChapters(track);
+                }
+              }, false);
+            }
+
+            if (track.kind == 'slides') {
+              t.setupSlides(track);
+            }
+          },
+          error: function() {
+            t.removeTrackButton(track.srclang);
+            t.loadNextTrack();
           }
-
-          after();
-
-          if (track.kind == 'chapters') {
-            t.media.addEventListener('play', function() {
-              if (t.media.duration > 0) {
-                t.displayChapters(track);
-              }
-            }, false);
-          }
-
-          if (track.kind == 'slides') {
-            t.setupSlides(track);
-          }
-        },
-        error: function() {
-          t.removeTrackButton(track.srclang);
-          t.loadNextTrack();
-        }
-      });
+        });
+      }
     },
 
     enableTrackButton: function(lang, label) {
@@ -393,10 +394,10 @@
 
       t.captionsButton
         .find('input[value=' + lang + ']')
-          .prop('disabled',false)
+          .prop('disabled', false)
           .attr('aria-label', label)
         .siblings('label')
-          .html( label )
+          .html( label );
 
       // auto select
       if (t.options.startLanguage == lang) {
@@ -440,7 +441,7 @@
       // INSTRUCTURE added code
       var deleteButtonHtml = '';
       if (t.options.can_add_captions) {
-        deleteButtonHtml = '<a href="#" role="button" data-remove="li" data-confirm="Are you sure you want to delete this track?" data-url="' + src + '" tabindex="-1" aria-label="Delete track"><span aria-hidden="true">×<span></a>';
+        deleteButtonHtml = '<a href="#" role="button" data-remove="li" data-confirm="' + htmlEscape(I18n.t('Are you sure you want to delete this track?')) + '" data-url="' + src + '" tabindex="-1" aria-label="' + htmlEscape(I18n.t('Delete track')) + '"><span aria-hidden="true">×<span></a>';
       }
 
       t.captionsButton.find('ul').append(
@@ -490,350 +491,391 @@
       }
     },
 
-    displayCaptions: function() {
+		displayCaptions: function() {
 
-      if (typeof this.tracks == 'undefined')
-        return;
+			if (typeof this.tracks == 'undefined')
+				return;
 
-      var
-        t = this,
-        i,
-        track = t.selectedTrack;
+			var
+				t = this,
+				track = t.selectedTrack,
+				i,
+				sanitize = function (html) {
+					parser = new DOMParser();
+					doc = parser.parseFromString(html, "text/html");
 
-      if (track !== null && track.isLoaded) {
-        for (i=0; i<track.entries.times.length; i++) {
-          if (t.media.currentTime >= track.entries.times[i].start && t.media.currentTime <= track.entries.times[i].stop) {
-            // Set the line before the timecode as a class so the cue can be targeted if needed
-            t.captionsText.text(track.entries.text[i]).attr('class', 'mejs-captions-text ' + (track.entries.times[i].identifier || ''));
-            t.captions.show().height(0);
-            return; // exit out if one is visible;
-          }
-        }
-        t.captions.hide();
-      } else {
-        t.captions.hide();
-      }
-    },
+					// Remove all nodes except those that are whitelisted
+					var elementWhitelist = [
+						'i', 'b', 'u', 'v', 'c',
+						'ruby', 'rt', 'lang', 'link'
+					];
+					var elements = Array.from(doc.body.children || []);
+					while (elements.length) {
+						var node = elements.shift();
+						if (elementWhitelist.includes(node.tagName.toLowerCase())) {
+							elements = elements.concat(Array.from(node.children || []));
+						} else {
+							node.parentNode.removeChild(node);
+						}
+					}
 
-    setupSlides: function(track) {
-      var t = this;
+					// Loop the elements and remove anything that contains value="javascript:" or an `on*` attribute
+					// (`onerror`, `onclick`, etc.)
+					var allElements = doc.body.getElementsByTagName('*');
+					for (var i = 0, n = allElements.length; i < n; i++) {
+						var
+							attributesObj = allElements[i].attributes,
+							attributes = Array.prototype.slice.call(attributesObj)
+						;
 
-      t.slides = track;
-      t.slides.entries.imgs = [t.slides.entries.text.length];
-      t.showSlide(0);
+						for (var j = 0, total = attributes.length; j < total; j++) {
+							if (attributes[j].name.startsWith('on') || attributes[j].value.startsWith('javascript')) {
+								allElements[i].parentNode.removeChild(allElements[i]);
+							} else if (attributes[j].name === 'style') {
+								allElements[i].removeAttribute(attributes[j].name);
+							}
+						}
 
-    },
+					}
 
-    showSlide: function(index) {
-      if (typeof this.tracks == 'undefined' || typeof this.slidesContainer == 'undefined') {
-        return;
-      }
+					return doc.body.innerHTML;
+				};
 
-      var t = this,
-        url = t.slides.entries.text[index],
-        img = t.slides.entries.imgs[index];
+			if (track !== null && track.isLoaded) {
+				for (i=0; i<track.entries.times.length; i++) {
+					if (t.media.currentTime >= track.entries.times[i].start && t.media.currentTime <= track.entries.times[i].stop) {
+						// Set the line before the timecode as a class so the cue can be targeted if needed
+						t.captionsText.html(sanitize(track.entries.text[i])).attr('class', 'mejs-captions-text ' + (track.entries.times[i].identifier || ''));
+						t.captions.show().height(0);
+						return; // exit out if one is visible;
+					}
+				}
+				t.captions.hide();
+			} else {
+				t.captions.hide();
+			}
+		},
 
-      if (typeof img == 'undefined' || typeof img.fadeIn == 'undefined') {
+		setupSlides: function(track) {
+			var t = this;
 
-        t.slides.entries.imgs[index] = img = $('<img src="' + url + '">')
-            .on('load', function() {
-              img.appendTo(t.slidesContainer)
-                .hide()
-                .fadeIn()
-                .siblings(':visible')
-                  .fadeOut();
+			t.slides = track;
+			t.slides.entries.imgs = [t.slides.entries.text.length];
+			t.showSlide(0);
 
-            });
+		},
 
-      } else {
+		showSlide: function(index) {
+			if (typeof this.tracks == 'undefined' || typeof this.slidesContainer == 'undefined') {
+				return;
+			}
 
-        if (!img.is(':visible') && !img.is(':animated')) {
+			var t = this,
+				url = t.slides.entries.text[index],
+				img = t.slides.entries.imgs[index];
 
-          //console.log('showing existing slide');
+			if (typeof img == 'undefined' || typeof img.fadeIn == 'undefined') {
 
-          img.fadeIn()
-            .siblings(':visible')
-              .fadeOut();
-        }
-      }
+				t.slides.entries.imgs[index] = img = $('<img src="' + url + '">')
+						.on('load', function() {
+							img.appendTo(t.slidesContainer)
+								.hide()
+								.fadeIn()
+								.siblings(':visible')
+									.fadeOut();
 
-    },
+						});
 
-    displaySlides: function() {
+			} else {
 
-      if (typeof this.slides == 'undefined')
-        return;
+				if (!img.is(':visible') && !img.is(':animated')) {
 
-      var
-        t = this,
-        slides = t.slides,
-        i;
+					//console.log('showing existing slide');
 
-      for (i=0; i<slides.entries.times.length; i++) {
-        if (t.media.currentTime >= slides.entries.times[i].start && t.media.currentTime <= slides.entries.times[i].stop){
+					img.fadeIn()
+						.siblings(':visible')
+							.fadeOut();
+				}
+			}
 
-          t.showSlide(i);
+		},
 
-          return; // exit out if one is visible;
-        }
-      }
-    },
+		displaySlides: function() {
 
-    displayChapters: function() {
-      var
-        t = this,
-        i;
+			if (typeof this.slides == 'undefined')
+				return;
 
-      for (i=0; i<t.tracks.length; i++) {
-        if (t.tracks[i].kind == 'chapters' && t.tracks[i].isLoaded) {
-          t.drawChapters(t.tracks[i]);
-          t.hasChapters = true;
-          break;
-        }
-      }
-    },
+			var
+				t = this,
+				slides = t.slides,
+				i;
 
-    drawChapters: function(chapters) {
-      var
-        t = this,
-        i,
-        dur,
-        //width,
-        //left,
-        percent = 0,
-        usedPercent = 0;
+			for (i=0; i<slides.entries.times.length; i++) {
+				if (t.media.currentTime >= slides.entries.times[i].start && t.media.currentTime <= slides.entries.times[i].stop){
 
-      t.chapters.empty();
+					t.showSlide(i);
 
-      for (i=0; i<chapters.entries.times.length; i++) {
-        dur = chapters.entries.times[i].stop - chapters.entries.times[i].start;
-        percent = Math.floor(dur / t.media.duration * 100);
-        if (percent + usedPercent > 100 || // too large
-          i == chapters.entries.times.length-1 && percent + usedPercent < 100) // not going to fill it in
-          {
-          percent = 100 - usedPercent;
-        }
-        //width = Math.floor(t.width * dur / t.media.duration);
-        //left = Math.floor(t.width * chapters.entries.times[i].start / t.media.duration);
-        //if (left + width > t.width) {
-        //  width = t.width - left;
-        //}
+					return; // exit out if one is visible;
+				}
+			}
+		},
 
-        t.chapters.append( $(
-          '<div class="mejs-chapter" rel="' + chapters.entries.times[i].start + '" style="left: ' + usedPercent.toString() + '%;width: ' + percent.toString() + '%;">' +
-            '<div class="mejs-chapter-block' + ((i==chapters.entries.times.length-1) ? ' mejs-chapter-block-last' : '') + '">' +
-              '<span class="ch-title">' + chapters.entries.text[i] + '</span>' +
-              '<span class="ch-time">' + mejs.Utility.secondsToTimeCode(chapters.entries.times[i].start, t.options) + '&ndash;' + mejs.Utility.secondsToTimeCode(chapters.entries.times[i].stop, t.options) + '</span>' +
-            '</div>' +
-          '</div>'));
-        usedPercent += percent;
-      }
+		displayChapters: function() {
+			var
+				t = this,
+				i;
 
-      t.chapters.find('div.mejs-chapter').click(function() {
-        t.media.setCurrentTime( parseFloat( $(this).attr('rel') ) );
-        if (t.media.paused) {
-          t.media.play();
-        }
-      });
+			for (i=0; i<t.tracks.length; i++) {
+				if (t.tracks[i].kind == 'chapters' && t.tracks[i].isLoaded) {
+					t.drawChapters(t.tracks[i]);
+					t.hasChapters = true;
+					break;
+				}
+			}
+		},
 
-      t.chapters.show();
-    }
-  });
+		drawChapters: function(chapters) {
+			var
+				t = this,
+				i,
+				dur,
+				//width,
+				//left,
+				percent = 0,
+				usedPercent = 0;
 
+			t.chapters.empty();
 
+			for (i=0; i<chapters.entries.times.length; i++) {
+				dur = chapters.entries.times[i].stop - chapters.entries.times[i].start;
+				percent = Math.floor(dur / t.media.duration * 100);
+				if (percent + usedPercent > 100 || // too large
+					i == chapters.entries.times.length-1 && percent + usedPercent < 100) // not going to fill it in
+					{
+					percent = 100 - usedPercent;
+				}
+				//width = Math.floor(t.width * dur / t.media.duration);
+				//left = Math.floor(t.width * chapters.entries.times[i].start / t.media.duration);
+				//if (left + width > t.width) {
+				//	width = t.width - left;
+				//}
 
-  mejs.language = {
-    codes:  {
-      af:'Afrikaans',
-      sq:'Albanian',
-      ar:'Arabic',
-      be:'Belarusian',
-      bg:'Bulgarian',
-      ca:'Catalan',
-      zh:'Chinese',
-      'zh-cn':'Chinese Simplified',
-      'zh-tw':'Chinese Traditional',
-      hr:'Croatian',
-      cs:'Czech',
-      da:'Danish',
-      nl:'Dutch',
-      en:'English',
-      et:'Estonian',
-      fl:'Filipino',
-      fi:'Finnish',
-      fr:'French',
-      gl:'Galician',
-      de:'German',
-      el:'Greek',
-      ht:'Haitian Creole',
-      iw:'Hebrew',
-      hi:'Hindi',
-      hu:'Hungarian',
-      is:'Icelandic',
-      id:'Indonesian',
-      ga:'Irish',
-      it:'Italian',
-      ja:'Japanese',
-      ko:'Korean',
-      lv:'Latvian',
-      lt:'Lithuanian',
-      mk:'Macedonian',
-      ms:'Malay',
-      mt:'Maltese',
-      no:'Norwegian',
-      fa:'Persian',
-      pl:'Polish',
-      pt:'Portuguese',
-      // 'pt-pt':'Portuguese (Portugal)',
-      ro:'Romanian',
-      ru:'Russian',
-      sr:'Serbian',
-      sk:'Slovak',
-      sl:'Slovenian',
-      es:'Spanish',
-      sw:'Swahili',
-      sv:'Swedish',
-      tl:'Tagalog',
-      th:'Thai',
-      tr:'Turkish',
-      uk:'Ukrainian',
-      vi:'Vietnamese',
-      cy:'Welsh',
-      yi:'Yiddish'
-    }
-  };
+				t.chapters.append( $(
+					'<div class="mejs-chapter" rel="' + chapters.entries.times[i].start + '" style="left: ' + usedPercent.toString() + '%;width: ' + percent.toString() + '%;">' +
+						'<div class="mejs-chapter-block' + ((i==chapters.entries.times.length-1) ? ' mejs-chapter-block-last' : '') + '">' +
+							'<span class="ch-title">' + chapters.entries.text[i] + '</span>' +
+							'<span class="ch-time">' + mejs.Utility.secondsToTimeCode(chapters.entries.times[i].start, t.options) + '&ndash;' + mejs.Utility.secondsToTimeCode(chapters.entries.times[i].stop, t.options) + '</span>' +
+						'</div>' +
+					'</div>'));
+				usedPercent += percent;
+			}
 
-  /*
-  Parses WebVTT format which should be formatted as
-  ================================
-  WEBVTT
-  1
-  00:00:01,1 --> 00:00:05,000
-  A line of text
-  2
-  00:01:15,1 --> 00:02:05,000
-  A second line of text
-  ===============================
-  Adapted from: http://www.delphiki.com/html5/playr
-  */
-  mejs.TrackFormatParser = {
-    webvtt: {
-      pattern_timecode: /^((?:[0-9]{1,2}:)?[0-9]{2}:[0-9]{2}([,.][0-9]{1,3})?) --\> ((?:[0-9]{1,2}:)?[0-9]{2}:[0-9]{2}([,.][0-9]{3})?)(.*)$/,
+			t.chapters.find('div.mejs-chapter').click(function() {
+				t.media.setCurrentTime( parseFloat( $(this).attr('rel') ) );
+				if (t.media.paused) {
+					t.media.play();
+				}
+			});
 
-      parse: function(trackText) {
-        var
-          i = 0,
-          lines = mejs.TrackFormatParser.split2(trackText, /\r?\n/),
-          entries = {text:[], times:[]},
-          timecode,
-          text,
-          identifier;
-        for(; i<lines.length; i++) {
-          timecode = this.pattern_timecode.exec(lines[i]);
-
-          if (timecode && i<lines.length) {
-            if ((i - 1) >= 0 && lines[i - 1] !== '') {
-              identifier = lines[i - 1];
-            }
-            i++;
-            // grab all the (possibly multi-line) text that follows
-            text = lines[i];
-            i++;
-            while(lines[i] !== '' && i<lines.length){
-              text = text + '\n' + lines[i];
-              i++;
-            }
-            text = $.trim(text).replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig, "<a href='$1' target='_blank'>$1</a>");
-            // Text is in a different array so I can use .join
-            entries.text.push(text);
-            entries.times.push(
-            {
-              identifier: identifier,
-              start: (mejs.Utility.convertSMPTEtoSeconds(timecode[1]) === 0) ? 0.200 : mejs.Utility.convertSMPTEtoSeconds(timecode[1]),
-              stop: mejs.Utility.convertSMPTEtoSeconds(timecode[3]),
-              settings: timecode[5]
-            });
-          }
-          identifier = '';
-        }
-        return entries;
-      }
-    },
-    // Thanks to Justin Capella: https://github.com/johndyer/mediaelement/pull/420
-    dfxp: {
-      parse: function(trackText) {
-        trackText = $(trackText).filter("tt");
-        var
-          i = 0,
-          container = trackText.children("div").eq(0),
-          lines = container.find("p"),
-          styleNode = trackText.find("#" + container.attr("style")),
-          styles,
-          text,
-          entries = {text:[], times:[]};
+			t.chapters.show();
+		}
+	});
 
 
-        if (styleNode.length) {
-          var attributes = styleNode.removeAttr("id").get(0).attributes;
-          if (attributes.length) {
-            styles = {};
-            for (i = 0; i < attributes.length; i++) {
-              styles[attributes[i].name.split(":")[1]] = attributes[i].value;
-            }
-          }
-        }
 
-        for(i = 0; i<lines.length; i++) {
-          var style;
-          var _temp_times = {
-            start: null,
-            stop: null,
-            style: null
-          };
-          if (lines.eq(i).attr("begin")) _temp_times.start = mejs.Utility.convertSMPTEtoSeconds(lines.eq(i).attr("begin"));
-          if (!_temp_times.start && lines.eq(i-1).attr("end")) _temp_times.start = mejs.Utility.convertSMPTEtoSeconds(lines.eq(i-1).attr("end"));
-          if (lines.eq(i).attr("end")) _temp_times.stop = mejs.Utility.convertSMPTEtoSeconds(lines.eq(i).attr("end"));
-          if (!_temp_times.stop && lines.eq(i+1).attr("begin")) _temp_times.stop = mejs.Utility.convertSMPTEtoSeconds(lines.eq(i+1).attr("begin"));
-          if (styles) {
-            style = "";
-            for (var _style in styles) {
-              style += _style + ":" + styles[_style] + ";";
-            }
-          }
-          if (style) _temp_times.style = style;
-          if (_temp_times.start === 0) _temp_times.start = 0.200;
-          entries.times.push(_temp_times);
-          text = $.trim(lines.eq(i).html()).replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig, "<a href='$1' target='_blank'>$1</a>");
-          entries.text.push(text);
-        }
-        return entries;
-      }
-    },
-    split2: function (text, regex) {
-      // normal version for compliant browsers
-      // see below for IE fix
-      return text.split(regex);
-    }
-  };
+	mejs.language = {
+		codes:  {
+			af:'Afrikaans',
+			sq:'Albanian',
+			ar:'Arabic',
+			be:'Belarusian',
+			bg:'Bulgarian',
+			ca:'Catalan',
+			zh:'Chinese',
+			'zh-cn':'Chinese Simplified',
+			'zh-tw':'Chinese Traditional',
+			hr:'Croatian',
+			cs:'Czech',
+			da:'Danish',
+			nl:'Dutch',
+			en:'English',
+			et:'Estonian',
+			fl:'Filipino',
+			fi:'Finnish',
+			fr:'French',
+			gl:'Galician',
+			de:'German',
+			el:'Greek',
+			ht:'Haitian Creole',
+			iw:'Hebrew',
+			hi:'Hindi',
+			hu:'Hungarian',
+			is:'Icelandic',
+			id:'Indonesian',
+			ga:'Irish',
+			it:'Italian',
+			ja:'Japanese',
+			ko:'Korean',
+			lv:'Latvian',
+			lt:'Lithuanian',
+			mk:'Macedonian',
+			ms:'Malay',
+			mt:'Maltese',
+			no:'Norwegian',
+			fa:'Persian',
+			pl:'Polish',
+			pt:'Portuguese',
+			// 'pt-pt':'Portuguese (Portugal)',
+			ro:'Romanian',
+			ru:'Russian',
+			sr:'Serbian',
+			sk:'Slovak',
+			sl:'Slovenian',
+			es:'Spanish',
+			sw:'Swahili',
+			sv:'Swedish',
+			tl:'Tagalog',
+			th:'Thai',
+			tr:'Turkish',
+			uk:'Ukrainian',
+			vi:'Vietnamese',
+			cy:'Welsh',
+			yi:'Yiddish'
+		}
+	};
 
-  // test for browsers with bad String.split method.
-  if ('x\n\ny'.split(/\n/gi).length != 3) {
-    // add super slow IE8 and below version
-    mejs.TrackFormatParser.split2 = function(text, regex) {
-      var
-        parts = [],
-        chunk = '',
-        i;
+	/*
+	Parses WebVTT format which should be formatted as
+	================================
+	WEBVTT
+	1
+	00:00:01,1 --> 00:00:05,000
+	A line of text
+	2
+	00:01:15,1 --> 00:02:05,000
+	A second line of text
+	===============================
+	Adapted from: http://www.delphiki.com/html5/playr
+	*/
+	mejs.TrackFormatParser = {
+		webvtt: {
+			pattern_timecode: /^((?:[0-9]{1,2}:)?[0-9]{2}:[0-9]{2}([,.][0-9]{1,3})?) --\> ((?:[0-9]{1,2}:)?[0-9]{2}:[0-9]{2}([,.][0-9]{3})?)(.*)$/,
 
-      for (i=0; i<text.length; i++) {
-        chunk += text.substring(i,i+1);
-        if (regex.test(chunk)) {
-          parts.push(chunk.replace(regex, ''));
-          chunk = '';
-        }
-      }
-      parts.push(chunk);
-      return parts;
-    };
-  }
+			parse: function(trackText) {
+				var
+					i = 0,
+					lines = mejs.TrackFormatParser.split2(trackText, /\r?\n/),
+					entries = {text:[], times:[]},
+					timecode,
+					text,
+					identifier;
+				for(; i<lines.length; i++) {
+					timecode = this.pattern_timecode.exec(lines[i]);
+
+					if (timecode && i<lines.length) {
+						if ((i - 1) >= 0 && lines[i - 1] !== '') {
+							identifier = lines[i - 1];
+						}
+						i++;
+						// grab all the (possibly multi-line) text that follows
+						text = lines[i];
+						i++;
+						while(lines[i] !== '' && i<lines.length){
+							text = text + '\n' + lines[i];
+							i++;
+						}
+						text = $.trim(text).replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig, "<a href='$1' target='_blank'>$1</a>");
+						// Text is in a different array so I can use .join
+						entries.text.push(text);
+						entries.times.push(
+						{
+							identifier: identifier,
+							start: (mejs.Utility.convertSMPTEtoSeconds(timecode[1]) === 0) ? 0.200 : mejs.Utility.convertSMPTEtoSeconds(timecode[1]),
+							stop: mejs.Utility.convertSMPTEtoSeconds(timecode[3]),
+							settings: timecode[5]
+						});
+					}
+					identifier = '';
+				}
+				return entries;
+			}
+		},
+		// Thanks to Justin Capella: https://github.com/johndyer/mediaelement/pull/420
+		dfxp: {
+			parse: function(trackText) {
+				trackText = $(trackText).filter("tt");
+				var
+					i = 0,
+					container = trackText.children("div").eq(0),
+					lines = container.find("p"),
+					styleNode = trackText.find("#" + container.attr("style")),
+					styles,
+					text,
+					entries = {text:[], times:[]};
+
+
+				if (styleNode.length) {
+					var attributes = styleNode.removeAttr("id").get(0).attributes;
+					if (attributes.length) {
+						styles = {};
+						for (i = 0; i < attributes.length; i++) {
+							styles[attributes[i].name.split(":")[1]] = attributes[i].value;
+						}
+					}
+				}
+
+				for(i = 0; i<lines.length; i++) {
+					var style;
+					var _temp_times = {
+						start: null,
+						stop: null,
+						style: null
+					};
+					if (lines.eq(i).attr("begin")) _temp_times.start = mejs.Utility.convertSMPTEtoSeconds(lines.eq(i).attr("begin"));
+					if (!_temp_times.start && lines.eq(i-1).attr("end")) _temp_times.start = mejs.Utility.convertSMPTEtoSeconds(lines.eq(i-1).attr("end"));
+					if (lines.eq(i).attr("end")) _temp_times.stop = mejs.Utility.convertSMPTEtoSeconds(lines.eq(i).attr("end"));
+					if (!_temp_times.stop && lines.eq(i+1).attr("begin")) _temp_times.stop = mejs.Utility.convertSMPTEtoSeconds(lines.eq(i+1).attr("begin"));
+					if (styles) {
+						style = "";
+						for (var _style in styles) {
+							style += _style + ":" + styles[_style] + ";";
+						}
+					}
+					if (style) _temp_times.style = style;
+					if (_temp_times.start === 0) _temp_times.start = 0.200;
+					entries.times.push(_temp_times);
+					text = $.trim(lines.eq(i).html()).replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig, "<a href='$1' target='_blank'>$1</a>");
+					entries.text.push(text);
+				}
+				return entries;
+			}
+		},
+		split2: function (text, regex) {
+			// normal version for compliant browsers
+			// see below for IE fix
+			return text.split(regex);
+		}
+	};
+
+	// test for browsers with bad String.split method.
+	if ('x\n\ny'.split(/\n/gi).length != 3) {
+		// add super slow IE8 and below version
+		mejs.TrackFormatParser.split2 = function(text, regex) {
+			var
+				parts = [],
+				chunk = '',
+				i;
+
+			for (i=0; i<text.length; i++) {
+				chunk += text.substring(i,i+1);
+				if (regex.test(chunk)) {
+					parts.push(chunk.replace(regex, ''));
+					chunk = '';
+				}
+			}
+			parts.push(chunk);
+			return parts;
+		};
+	}
+
 })(mejs.$);
