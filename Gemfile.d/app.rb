@@ -62,7 +62,7 @@ gem 'inst-jobs', '0.14.2'
     gem 'et-orbi', '1.0.8', require: false
 gem 'inst-jobs-autoscaling', '1.0.2'
   gem 'aws-sdk-autoscaling', '1.5.0', require: false
-gem 'ffi', '1.9.18', require: false
+gem 'ffi', '1.9.23', require: false
 gem 'hashery', '2.1.2', require: false
 gem 'highline', '1.7.10', require: false
 gem 'httparty', '0.15.6'
