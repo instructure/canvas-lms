@@ -22,21 +22,34 @@ describe Attachments::Storage do
     @attachment = attachment_model
     @uuid = "1234-abcd"
     allow(InstFS).to receive(:direct_upload).and_return(@uuid)
+    allow(InstFS).to receive(:enabled?).and_return(true)
     @file = File.open("public/images/a.png")
   end
 
   describe "store_for_attachment" do
     it "calls instfs direct upload if inst-fs is enabled" do
-      allow(InstFS).to receive(:enabled?).and_return(true)
       expect(InstFS).to receive(:direct_upload)
-      Attachments::Storage.store_for_attachment(@attachment, File.open("public/images/a.png"))
+      Attachments::Storage.store_for_attachment(@attachment, @file)
       expect(@attachment.instfs_uuid).to eq(@uuid)
     end
 
     it "calls attachment_fu methods if inst-fs is not enabled" do
       allow(InstFS).to receive(:enabled?).and_return(false)
       expect(@attachment).to receive(:uploaded_data=)
-      Attachments::Storage.store_for_attachment(@attachment, File.open("public/images/a.png"))
+      Attachments::Storage.store_for_attachment(@attachment, @file)
+    end
+
+    describe "value setting" do
+      it "keeps data size if already set" do
+        Attachments::Storage.store_for_attachment(@attachment, @file)
+        expect(@attachment.size).to eq(100)
+      end
+
+      it "sets data size if not already set" do
+        @attachment.size = nil
+        Attachments::Storage.store_for_attachment(@attachment, @file)
+        expect(@attachment.size).to eq(@file.size)
+      end
     end
   end
 

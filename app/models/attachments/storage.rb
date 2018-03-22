@@ -24,8 +24,11 @@ class Attachments::Storage
         file_name: attachment.display_name
       )
       attachment.instfs_uuid = instfs_uuid
-      attachment.filename = detect_filename(data)
-      attachment.content_type = detect_mimetype(data)
+
+      # populate attachment fields if they were not already set
+      attachment.size ||= data.size
+      attachment.filename ||= detect_filename(data)
+      attachment.content_type ||= detect_mimetype(data)
     else
       attachment.uploaded_data = data
     end
@@ -37,7 +40,7 @@ class Attachments::Storage
       data.original_filename
     elsif data.respond_to?(:filename)
       data.filename
-    else
+    elsif data.class == File
       File.basename(data)
     end
   end
