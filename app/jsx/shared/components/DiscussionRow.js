@@ -340,6 +340,7 @@ export default class DiscussionRow extends Component {
                 }
                 itemUrl={this.props.discussion.html_url}
                 onSelectedChanged={this.props.onSelectedChanged}
+                peerReview={this.props.discussion.assignment ? this.props.discussion.assignment.peer_reviews : false}
                 showManageMenu={this.props.canManage}
                 onManageMenuSelect={this.onManageDiscussion}
                 clearFocusDirectives={this.props.cleanDiscussionFocus}

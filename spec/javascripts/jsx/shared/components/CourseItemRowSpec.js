@@ -174,6 +174,14 @@ test('renders master course lock icon if isMasterCourse', () => {
   ok(tree.instance().masterCourseLock)
 })
 
+test('renders peer review icon if peer review', () => {
+  const props = makeProps()
+  props.peerReview = true
+  const tree = mount(<CourseItemRow {...props} />)
+  const peerReviewComponent = tree.find('.ic-item-row__peer_review')
+  ok(peerReviewComponent.exists())
+})
+
 test('renders master course lock icon if isChildCourse', () => {
   const props = makeProps()
   props.masterCourse = {

@@ -33,6 +33,7 @@ import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
 import IconMore from 'instructure-icons/lib/Line/IconMoreLine'
 
 import IconDragHandleLine from 'instructure-icons/lib/Line/IconDragHandleLine'
+import IconPeerReviewLine from 'instructure-icons/lib/Line/IconPeerReviewLine'
 import LockIconView from 'compiled/views/LockIconView'
 import { author as authorShape } from '../proptypes/user'
 import masterCourseDataShape from '../proptypes/masterCourseData'
@@ -60,6 +61,7 @@ export default class CourseItemRow extends Component {
     isRead: bool,
     showAvatar: bool,
     onSelectedChanged: func,
+    peerReview: bool,
     icon: node,
     showManageMenu: bool,
     manageMenuOptions: arrayOf(node),
@@ -88,6 +90,7 @@ export default class CourseItemRow extends Component {
     itemUrl: null,
     selectable: false,
     draggable: false,
+    peerReview: false,
     defaultSelected: false,
     isRead: true,
     icon: null,
@@ -117,6 +120,10 @@ export default class CourseItemRow extends Component {
     this.onFocusManage(nextProps)
   }
 
+  componentWillUnmount () {
+    this.unmountMasterCourseLock()
+  }
+
   onFocusManage(props) {
     if (props.focusOn) {
       switch (props.focusOn) {
@@ -131,10 +138,6 @@ export default class CourseItemRow extends Component {
       }
       this.props.clearFocusDirectives()
     }
-  }
-
-  componentWillUnmount () {
-    this.unmountMasterCourseLock()
   }
 
   onSelectChanged = (e) => {
@@ -226,6 +229,14 @@ export default class CourseItemRow extends Component {
         </div>
         <div className="ic-item-row__meta-col">
           <div className="ic-item-row__meta-actions">
+            { this.props.peerReview ? (
+              <span className="ic-item-row__peer_review">
+                <Text color="success" size="medium">
+                  <IconPeerReviewLine />
+                </Text>
+              </span>
+              ) : null
+            }
             {this.props.actionsContent}
             <span ref={this.initializeMasterCourseIcon} className="ic-item-row__master-course-lock" />
             {this.props.showManageMenu && this.props.manageMenuOptions.length > 0 &&

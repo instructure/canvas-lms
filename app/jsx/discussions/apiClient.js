@@ -23,6 +23,7 @@ function discussionQueryString(contextType, page) {
   const params = [
     { per_page: 40 },
     { plain_messages: true },
+    { include_assignment: true },
     { exclude_assignment_descriptions: true },
     { exclude_context_module_locked_topics: true },
     { page },

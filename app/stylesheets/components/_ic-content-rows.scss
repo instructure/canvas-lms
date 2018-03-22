@@ -49,6 +49,10 @@
   }
 }
 
+.ic-item-row__peer_review {
+  margin-top: -4px;
+}
+
 .ic-item-row__content-col {
   // necessary because min-width: auto by default
   // without this, the text force-expands the width of the container instead of being truncated
