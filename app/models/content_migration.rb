@@ -899,7 +899,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def check_for_blocked_migration
-    if self.workflow_state_changed? && %w(pre_process_error exported imported failed).include?(workflow_state)
+    if self.saved_change_to_workflow_state? && %w(pre_process_error exported imported failed).include?(workflow_state)
       if self.context && (next_cm = self.context.content_migrations.where(:workflow_state => 'queued').order(:id).first)
         job_id = next_cm.job_progress.try(:delayed_job_id)
         if job_id && (job = Delayed::Job.where(:id => job_id, :locked_at => nil).first)
