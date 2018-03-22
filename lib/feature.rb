@@ -413,14 +413,14 @@ END
       beta: true
     },
     'bulk_sis_grade_export' =>
-      {
-        display_name: -> { I18n.t('Allow Bulk Grade Export to SIS') },
-        description:  -> { I18n.t('Allows teachers to mark grade data to be exported in bulk to SIS integrations.') },
-        applies_to: 'RootAccount',
-        state: 'hidden',
-        root_opt_in: true,
-        beta: true
-      },
+    {
+      display_name: -> { I18n.t('Allow Bulk Grade Export to SIS') },
+      description:  -> { I18n.t('Allows teachers to mark grade data to be exported in bulk to SIS integrations.') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      root_opt_in: true,
+      beta: true
+    },
     'notification_service' =>
     {
       display_name: -> { I18n.t('Use remote service for notifications') },
@@ -642,13 +642,13 @@ END
       end
     },
     'developer_key_management' =>
-      {
-        display_name: -> { I18n.t('Developer Key management')},
-        description: -> { I18n.t('New Features for Developer Key management') },
-        applies_to: 'RootAccount',
-        state: 'hidden',
-        development: true
-      },
+    {
+      display_name: -> { I18n.t('Developer Key management')},
+      description: -> { I18n.t('New Features for Developer Key management') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      development: true
+    },
     'developer_key_management_ui_rewrite' =>
       {
         display_name: -> { I18n.t('Developer Key management UI Rewrite')},
