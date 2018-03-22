@@ -15,46 +15,74 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import Velocity from 'velocity-animate';
 
-export function animateSlideDown (elt) {
-  Velocity(elt, 'slideDown');
+function isScrollPositionAtTop (wind) {
+  return wind.pageYOffset === 0;
 }
 
-function handleScrollUpAttempt (cb, e) {
+function isScrollPositionAtBottom (wind) {
+  const doc = wind.document.documentElement;
+  const docBottom = doc.getBoundingClientRect().bottom;
+  const clientHeight = doc.clientHeight;
+
+  return docBottom <= clientHeight;
+}
+
+function isScrollUpKey (key) {
+  return key === 'PageUp' || key === 'ArrowUp' || key === 'Up';
+}
+
+function isScrollDownKey(key) {
+  return key === 'PageDown' || key === 'ArrowDown' || key === 'Down';
+}
+
+function isWheelUpEvent (e) {
+  return e.deltaY < 0;
+}
+
+function isWheelDownEvent (e) {
+  return e.deltaY > 0;
+}
+
+function handleScrollAttempt (cb, e) {
   e.preventDefault();
   cb();
 }
 
-function handleWindowWheel (cb, wind, e) {
-  if (wind.pageYOffset === 0 && e.deltaY < 0) {
-    handleScrollUpAttempt(cb, e);
+function handleWindowWheel (pastCb, futureCb, wind, e) {
+  if (isScrollPositionAtTop(wind) && isWheelUpEvent(e)) {
+    handleScrollAttempt(pastCb, e);
+  } else if (isScrollPositionAtBottom(wind) && isWheelDownEvent(e)) {
+    handleScrollAttempt(futureCb, e);
   }
 }
 
-function handleWindowScrollKey (cb, wind, e) {
-  if (wind.pageYOffset === 0 &&
-      (e.key === 'PageUp' || e.key === 'ArrowUp' || e.key === 'Up')) {
-    handleScrollUpAttempt(cb, e);
+function handleWindowScrollKey (pastCb, futureCb, wind, e) {
+  if (isScrollPositionAtTop(wind) && isScrollUpKey(e.key)) {
+    handleScrollAttempt(pastCb, e);
+  } else if (isScrollPositionAtBottom(wind) && isScrollDownKey(e.key)) {
+    handleScrollAttempt(futureCb, e);
   }
 }
 
 // User drags a finger down the screen to scroll up.
 // When she gets to the top, and keeps on pulling down, call the callback
+// and vice versa
 let ongoingTouch = null;
 function handleTouchStart (e) {
   if (ongoingTouch === null) {
     ongoingTouch = e.changedTouches[0];
   }
 }
-function handleWindowTouchMove (cb, wind, e) {
-  if (wind.pageYOffset === 0 && ongoingTouch) {
-    const thisTouch = e.changedTouches[ongoingTouch.identifier];
-    if (thisTouch) {
-      if (thisTouch.screenY - ongoingTouch.screenY > 3) {
-        cb();
-      }
-    }
+
+function handleWindowTouchMove (pastCb, futureCb, wind, e) {
+  if (!ongoingTouch) return;
+  const thisTouch = e.changedTouches[ongoingTouch.identifier];
+  if (!thisTouch) return;
+  if (isScrollPositionAtTop(wind) && thisTouch.screenY - ongoingTouch.screenY > 3) {
+    pastCb();
+  } else if (isScrollPositionAtBottom(wind) && thisTouch.screenY - ongoingTouch.screenY < -3) {
+    futureCb();
   }
 }
 function handleTouchEnd (e) {
@@ -88,16 +116,21 @@ class ScrollHandler {
   }
 }
 
-export function registerScrollEvents (scrollIntoPastCb, scrollCb, wind = window) {
-  const boundWindowWheel = handleWindowWheel.bind(undefined, scrollIntoPastCb, wind);
+export function registerScrollEvents ({
+  scrollIntoPast: scrollIntoPastCb,
+  scrollIntoFuture: scrollIntoFutureCb,
+  scrollPositionChange: scrollCb,
+  window: wind}) {
+  wind = wind ||  window;
+  const boundWindowWheel = handleWindowWheel.bind(undefined, scrollIntoPastCb, scrollIntoFutureCb, wind);
   wind.addEventListener('wheel', boundWindowWheel);
 
-  const boundScrollKey = handleWindowScrollKey.bind(undefined, scrollIntoPastCb, wind);
+  const boundScrollKey = handleWindowScrollKey.bind(undefined, scrollIntoPastCb, scrollIntoFutureCb, wind);
   wind.addEventListener('keydown', boundScrollKey);
 
   wind.addEventListener('touchstart', handleTouchStart);
   wind.addEventListener('touchend', handleTouchEnd);
-  const boundTouchMove = handleWindowTouchMove.bind(undefined, scrollIntoPastCb, wind);
+  const boundTouchMove = handleWindowTouchMove.bind(undefined, scrollIntoPastCb, scrollIntoFutureCb, wind);
   wind.addEventListener('touchmove', boundTouchMove);
 
   new ScrollHandler(scrollCb, wind);

@@ -18,93 +18,258 @@
 import {registerScrollEvents} from '../scrollUtils';
 
 function createMockWindow (opts) {
+  const callbacks = {};
   return {
-    addEventListener: jest.fn(),
+    addEventListener: jest.fn((event, callback) => callbacks[event] = callback),
     pageYOffset: 0,
     setTimeout: jest.fn(),
+    document: {
+      documentElement: {
+        clientHeight: 42,
+        getBoundingClientRect: () => ({bottom: 42}),
+      },
+    },
+    callbacks,
     ...opts,
   };
 }
 
+function mockRegister () {
+  const wind = createMockWindow();
+  const pastCb = jest.fn();
+  const futureCb = jest.fn();
+  const scrollPositionChange = jest.fn();
+  const callbacks = {};
+
+  registerScrollEvents({
+    window: wind,
+    scrollIntoPast: pastCb,
+    scrollIntoFuture: futureCb,
+    scrollPositionChange,
+    callbacks,
+  });
+  return {wind, pastCb, futureCb, scrollPositionChange};
+}
+
 it('registers proper events', () => {
-  const mockWindow = createMockWindow();
-  registerScrollEvents(jest.fn, jest.fn(), mockWindow);
-  expect(mockWindow.addEventListener.mock.calls[0][0]).toBe('wheel');
-  expect(mockWindow.addEventListener.mock.calls[1][0]).toBe('keydown');
+  const {wind} = mockRegister();
+  expect(wind.addEventListener).toHaveBeenCalledWith('wheel', expect.anything());
+  expect(wind.addEventListener).toHaveBeenCalledWith('keydown', expect.anything());
+  expect(wind.addEventListener).toHaveBeenCalledWith('touchstart', expect.anything());
+  expect(wind.addEventListener).toHaveBeenCalledWith('touchmove', expect.anything());
+  expect(wind.addEventListener).toHaveBeenCalledWith('touchend', expect.anything());
 });
 
 describe('wheel events', () => {
-  it('invokes the callback and preventDefault when a wheel event happens at the top of the page', () => {
-    const mockWindow = createMockWindow();
-    const mockCb = jest.fn();
-    const mockPreventDefault = jest.fn();
-    registerScrollEvents(mockCb, jest.fn(), mockWindow);
-    const wheelHandler = mockWindow.addEventListener.mock.calls[0][1];
-    wheelHandler({deltaY: -42, preventDefault: mockPreventDefault});
-    expect(mockPreventDefault).toHaveBeenCalled();
-    expect(mockCb).toHaveBeenCalled();
+  describe('scrolling into the past', () => {
+    it('invokes the callback and preventDefault when a wheel event happens at the top of the page', () => {
+      const {wind, pastCb} = mockRegister();
+      const mockPreventDefault = jest.fn();
+      const wheelHandler = wind.callbacks.wheel;
+      wheelHandler({deltaY: -42, preventDefault: mockPreventDefault});
+      expect(mockPreventDefault).toHaveBeenCalled();
+      expect(pastCb).toHaveBeenCalled();
+    });
+
+    it('does not invoke the callback when the window is not scrolled to the top', () => {
+      const {wind, pastCb} = mockRegister();
+      wind.pageYOffset = 42;
+      const mockPreventDefault = jest.fn();
+      const wheelHandler = wind.callbacks.wheel;
+      wheelHandler({deltaY: -42, preventDefault: mockPreventDefault});
+      expect(mockPreventDefault).not.toHaveBeenCalled();
+      expect(pastCb).not.toHaveBeenCalled();
+    });
   });
 
-  it('does not invoke the callback when the window is not scrolled to the top', () => {
-    const mockWindow = createMockWindow({ pageYOffset: 42 });
-    const mockCb = jest.fn();
-    const mockPreventDefault = jest.fn();
-    registerScrollEvents(mockCb, jest.fn(), mockWindow);
-    const wheelHandler = mockWindow.addEventListener.mock.calls[0][1];
-    wheelHandler({deltaY: -42, preventDefault: mockPreventDefault});
-    expect(mockPreventDefault).not.toHaveBeenCalled();
-    expect(mockCb).not.toHaveBeenCalled();
+  describe('scrolling into the future', () => {
+    it('invokes the callback and preventDefault when a wheel event happens at the bottom of the page', () => {
+      const {wind, futureCb} = mockRegister();
+      const mockPreventDefault = jest.fn();
+      const wheelHandler = wind.callbacks.wheel;
+      wheelHandler({deltaY: 42, preventDefault: mockPreventDefault});
+      expect(mockPreventDefault).toHaveBeenCalled();
+      expect(futureCb).toHaveBeenCalled();
+    });
+
+    it('invokes the callback and preventDefault when the document is shorter than the window', () => {
+      const {wind, futureCb} = mockRegister();
+      wind.document.documentElement.getBoundingClientRect = () => ({bottom: 15});
+      const mockPreventDefault = jest.fn();
+      const wheelHandler = wind.callbacks.wheel;
+      wheelHandler({deltaY: 42, preventDefault: mockPreventDefault});
+      expect(mockPreventDefault).toHaveBeenCalled();
+      expect(futureCb).toHaveBeenCalled();
+    });
+
+    it('does not invoke the callback when the window is not scrolled to the bottom', () => {
+      const {wind, futureCb} = mockRegister();
+      wind.document.documentElement.getBoundingClientRect = () => ({bottom: 100});
+      const mockPreventDefault = jest.fn();
+      const wheelHandler = wind.callbacks.wheel;
+      wheelHandler({deltaY: 42, preventDefault: mockPreventDefault});
+      expect(mockPreventDefault).not.toHaveBeenCalled();
+      expect(futureCb).not.toHaveBeenCalled();
+    });
+  });
+});
+
+describe('touch events', () => {
+  let mockWindow = null;
+  afterEach(() => {
+    // need to reset global touch state after each test
+    mockWindow.callbacks.touchend({});
+  });
+
+  describe('scrolling into the past', () => {
+    it('invokes the callback and preventDefault when touch events happen at the top of the page', () => {
+      const {wind, pastCb} = mockRegister();
+      mockWindow = wind;
+      const {touchstart, touchmove} = wind.callbacks;
+      touchstart({changedTouches: [{screenY: 10, identifier: 'touchid'}]});
+      touchmove({changedTouches: {touchid: {screenY: 14}}});
+      expect(pastCb).toHaveBeenCalled();
+    });
+
+    it('does not invoke the callback when the window is not scrolled to the top', () => {
+      const {wind, pastCb} = mockRegister();
+      mockWindow = wind;
+      wind.pageYOffset = 42;
+      const {touchstart, touchmove} = wind.callbacks;
+      touchstart({changedTouches: [{screenY: 10, identifier: 'touchid'}]});
+      touchmove({changedTouches: {touchid: {screenY: 14}}});
+      expect(pastCb).not.toHaveBeenCalled();
+    });
+
+    it('does not invoke the callback when the scroll is not large enough', () => {
+      const {wind, pastCb} = mockRegister();
+      mockWindow = wind;
+      wind.pageYOffset = 42;
+      const {touchstart, touchmove} = wind.callbacks;
+      touchstart({changedTouches: [{screenY: 10, identifier: 'touchid'}]});
+      touchmove({changedTouches: {touchid: {screenY: 13}}});
+      expect(pastCb).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('scrolling into the future', () => {
+    it('invokes the callback and preventDefault when touch events happen at the bottom of the page', () => {
+      const {wind, futureCb} = mockRegister();
+      mockWindow = wind;
+      const {touchstart, touchmove} = wind.callbacks;
+      touchstart({changedTouches: [{screenY: 10, identifier: 'touchid'}]});
+      touchmove({changedTouches: {touchid: {screenY: 6}}});
+      expect(futureCb).toHaveBeenCalled();
+    });
+
+    it('does not invoke the callback when the window is not scrolled to the bottom', () => {
+      const {wind, futureCb} = mockRegister();
+      mockWindow = wind;
+      const {touchstart, touchmove} = wind.callbacks;
+      wind.document.documentElement.getBoundingClientRect = () => ({bottom: 84});
+      touchstart({changedTouches: [{screenY: 10, identifier: 'touchid'}]});
+      touchmove({changedTouches: {touchid: {screenY: 6}}});
+      expect(futureCb).not.toHaveBeenCalled();
+    });
+
+    it('does not invoke the callback when the scroll is not large enough', () => {
+      const {wind, futureCb} = mockRegister();
+      mockWindow = wind;
+      const {touchstart, touchmove} = wind.callbacks;
+      touchstart({changedTouches: [{screenY: 10, identifier: 'touchid'}]});
+      touchmove({changedTouches: {touchid: {screenY: 7}}});
+      expect(futureCb).not.toHaveBeenCalled();
+    });
   });
 });
 
 describe('key events', () => {
-  it('invokes the callback and preventDefault when a wheel event happens at the top of the page', () => {
-    const mockWindow = createMockWindow();
-    const mockCb = jest.fn();
-    const mockPreventDefault = jest.fn();
-    registerScrollEvents(mockCb, jest.fn(), mockWindow);
-    const keyHandler = mockWindow.addEventListener.mock.calls[1][1];
-    keyHandler({key: 'ArrowUp', preventDefault: mockPreventDefault});
-    expect(mockPreventDefault).toHaveBeenCalled();
-    expect(mockCb).toHaveBeenCalled();
+  describe('scrolling into the past', () => {
+    it('invokes the callback and preventDefault when a key event happens at the top of the page', () => {
+      const {wind, pastCb} = mockRegister();
+      const mockPreventDefault = jest.fn();
+      const keyHandler = wind.callbacks.keydown;
+      keyHandler({key: 'ArrowUp', preventDefault: mockPreventDefault});
+      expect(mockPreventDefault).toHaveBeenCalled();
+      expect(pastCb).toHaveBeenCalled();
+    });
+
+    it('does not invoke the past callback or preventDefault on other keys', () => {
+      const {wind, pastCb} = mockRegister();
+      const mockPreventDefault = jest.fn();
+      const keyHandler = wind.callbacks.keydown;
+      keyHandler({key: 'Home', preventDefault: mockPreventDefault});
+      expect(mockPreventDefault).not.toHaveBeenCalled();
+      expect(pastCb).not.toHaveBeenCalled();
+    });
+
+    it('does not invoke the past callback if window is not at the top', () => {
+      const {wind, pastCb} = mockRegister();
+      wind.pageYOffset = 42;
+      const mockPreventDefault = jest.fn();
+      const keyHandler = wind.callbacks.keydown;
+      keyHandler({key: 'ArrowUp', preventDefault: mockPreventDefault});
+      expect(mockPreventDefault).not.toHaveBeenCalled();
+      expect(pastCb).not.toHaveBeenCalled();
+    });
   });
 
-  it('does not invoke the callback or preventDefault on other keys', () => {
-    const mockWindow = createMockWindow();
-    const mockCb = jest.fn();
-    const mockPreventDefault = jest.fn();
-    registerScrollEvents(mockCb, jest.fn(), mockWindow);
-    const keyHandler = mockWindow.addEventListener.mock.calls[1][1];
-    keyHandler({key: 'Home', preventDefault: mockPreventDefault});
-    expect(mockPreventDefault).not.toHaveBeenCalled();
-    expect(mockCb).not.toHaveBeenCalled();
-  });
+  describe('scrolling into the future', () => {
+    it('invokes the future callback and preventDefault when a key event happens at the bottom of the page', () => {
+      const {wind, futureCb} = mockRegister();
+      const mockPreventDefault = jest.fn();
+      const keyHandler = wind.callbacks.keydown;
+      keyHandler({key: 'ArrowDown', preventDefault: mockPreventDefault});
+      expect(mockPreventDefault).toHaveBeenCalled();
+      expect(futureCb).toHaveBeenCalled();
+    });
 
-  it('does not invoke the callback if window is not at the top', () => {
-    const mockWindow = createMockWindow({ pageYOffset: 42 });
-    const mockCb = jest.fn();
-    const mockPreventDefault = jest.fn();
-    registerScrollEvents(mockCb, jest.fn(), mockWindow);
-    const keyHandler = mockWindow.addEventListener.mock.calls[1][1];
-    keyHandler({key: 'ArrowUp', preventDefault: mockPreventDefault});
-    expect(mockPreventDefault).not.toHaveBeenCalled();
-    expect(mockCb).not.toHaveBeenCalled();
+    it('invokes the future callback and preventDefault when a key event happens when the document is shorter than the window', () => {
+      const {wind, futureCb} = mockRegister();
+      wind.document.documentElement.getBoundingClientRect = () => ({bottom: 24});
+      const mockPreventDefault = jest.fn();
+      const keyHandler = wind.callbacks.keydown;
+      keyHandler({key: 'ArrowDown', preventDefault: mockPreventDefault});
+      expect(mockPreventDefault).toHaveBeenCalled();
+      expect(futureCb).toHaveBeenCalled();
+    });
+
+    it('does not invoke the future callback or preventDefault on other keys', () => {
+      const {wind, futureCb} = mockRegister();
+      const mockPreventDefault = jest.fn();
+      const keyHandler = wind.callbacks.keydown;
+      keyHandler({key: 'End', preventDefault: mockPreventDefault});
+      expect(mockPreventDefault).not.toHaveBeenCalled();
+      expect(futureCb).not.toHaveBeenCalled();
+    });
+
+    it('does not invoke the callback if window is not at the bottom', () => {
+      const {wind, futureCb} = mockRegister();
+      wind.document.documentElement.getBoundingClientRect = () => ({bottom: 100});
+      const mockPreventDefault = jest.fn();
+      const keyHandler = wind.callbacks.keydown;
+      keyHandler({key: 'ArrowDown', preventDefault: mockPreventDefault});
+      expect(mockPreventDefault).not.toHaveBeenCalled();
+      expect(futureCb).not.toHaveBeenCalled();
+    });
   });
 });
 
 describe('scroll events', () => {
   it('throttles the callback', () => {
     const mockWindow = createMockWindow();
-    mockWindow.addEventListener = (event, cb) => {
-      if (event === 'scroll') { mockWindow.registeredScrollHandler = cb; }
-    };
     const mockScrollCb = jest.fn();
-    registerScrollEvents(jest.fn(), mockScrollCb, mockWindow);
+    registerScrollEvents({
+      window: mockWindow,
+      scrollIntoPast: jest.fn(),
+      scrollIntoFuture: jest.fn(),
+      scrollPositionChange: mockScrollCb
+    });
 
     mockWindow.pageYOffset = 42;
-    mockWindow.registeredScrollHandler();
+    mockWindow.callbacks.scroll();
     mockWindow.pageYOffset = 84;
-    mockWindow.registeredScrollHandler();
+    mockWindow.callbacks.scroll();
 
     const setTimeoutMock = mockWindow.setTimeout;
     expect(setTimeoutMock).toHaveBeenCalledTimes(1);

@@ -16,17 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
 import changeCase from 'change-case';
 import {AnimatableRegistry} from './animatable-registry';
 import {Animator} from './animator';
 import {AnimationCollection} from './animation-collection';
-import {isNewActivityItem} from '../utilities/statusUtils';
 import {daysToItems} from '../utilities/daysUtils';
 import {srAlert} from '../utilities/alertUtils';
 import formatMessage from '../format-message';
 import {setNaiAboveScreen} from '../actions';
-import {loadPastUntilNewActivity} from '../actions/loading-actions';
 
 export function specialFallbackFocusId (type) {
   return `~~~${type}-fallback-focus~~~`;

@@ -59,7 +59,6 @@
     "react-dom": "^0.14.7 || ^15",
     "react-moment-proptypes": "^1.4.0",
     "react-redux": "^5.0.3",
-    "react-waypoint": "^7.0.3",
     "redux": "^3.5.2",
     "redux-actions": "^2.0.1",
     "redux-logger": "^3.0.1",

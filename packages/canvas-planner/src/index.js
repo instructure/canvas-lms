@@ -27,7 +27,7 @@ import PlannerHeader from './components/PlannerHeader';
 import ApplyTheme from '@instructure/ui-core/lib/components/ApplyTheme';
 import i18n from './i18n';
 import configureStore from './store/configureStore';
-import { initialOptions, getPlannerItems, scrollIntoPast } from './actions';
+import { initialOptions, getPlannerItems, scrollIntoPast, loadFutureItems } from './actions';
 import { registerScrollEvents } from './utilities/scrollUtils';
 import { initialize as initializeAlerts } from './utilities/alertUtils';
 import moment from 'moment-timezone';
@@ -56,6 +56,13 @@ function handleScrollIntoPastAttempt () {
   }
 }
 
+function handleScrollIntoFutureAttempt () {
+  if (!plannerActive()) return;
+  if (!store.getState().loading.loadingPast && !store.getState().loading.loadingFuture && !store.getState().loading.allFutureItemsLoaded) {
+    store.dispatch(loadFutureItems());
+  }
+}
+
 export function render (element, options) {
   // Using this pattern because default params don't merge objects
   const opts = { ...defaultOptions, ...options };
@@ -63,7 +70,11 @@ export function render (element, options) {
   moment.locale(opts.locale);
   moment.tz.setDefault(opts.timeZone);
   dynamicUiManager.setStickyOffset(opts.stickyOffset);
-  registerScrollEvents(handleScrollIntoPastAttempt, pos => dynamicUiManager.handleScrollPositionChange(pos));
+  registerScrollEvents({
+    scrollIntoPast: handleScrollIntoPastAttempt,
+    scrollIntoFuture: handleScrollIntoFutureAttempt,
+    scrollPositionChange: pos => dynamicUiManager.handleScrollPositionChange(pos),
+  });
   if (!opts.flashAlertFunctions) {
     throw new Error('You must provide callbacks to handle flash messages');
   }

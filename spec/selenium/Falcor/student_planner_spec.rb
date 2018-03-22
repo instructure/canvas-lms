@@ -500,6 +500,7 @@ describe "student planner" do
       go_to_list_view
       current_items = items_displayed.count
       driver.execute_script("window.scrollTo(0,  document.documentElement.scrollHeight);")
+      f('body').send_keys(:arrow_down)
       wait_for_spinner
       expect(items_displayed.count).to be > current_items
     end
