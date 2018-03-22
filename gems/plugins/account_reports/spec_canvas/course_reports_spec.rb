@@ -187,6 +187,11 @@ describe "Course Account Reports" do
       expect(parsed.length).to eq 0
     end
 
+    it "should set run_at" do
+      report = run_report(@type)
+      expect(report.start_at).not_to be_nil
+    end
+
     it "should run unused courses report with a term" do
       @term1 = @account.enrollment_terms.create(:name => 'Fall')
       @assignment.destroy
