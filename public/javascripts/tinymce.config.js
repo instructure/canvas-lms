@@ -67,8 +67,8 @@ export default class EditorConfig {
       toolbar: this.toolbar(),
       theme: 'modern',
       skin: false,
+      plugins: 'autolink,media,paste,table,textcolor,link,directionality,lists,a11y_checker,wordcount',
       directionality: getDirection(),
-      plugins: 'autolink,media,paste,table,textcolor,link,directionality,lists,a11y_checker',
       external_plugins: {
         instructure_image: '/javascripts/tinymce_plugins/instructure_image/plugin.js',
         instructure_links: '/javascripts/tinymce_plugins/instructure_links/plugin.js',

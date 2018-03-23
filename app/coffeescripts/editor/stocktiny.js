@@ -25,6 +25,7 @@ import 'tinymce/plugins/textcolor/plugin'
 import 'tinymce/plugins/link/plugin'
 import 'tinymce/plugins/directionality/plugin'
 import 'tinymce/plugins/lists/plugin'
+import 'tinymce/plugins/wordcount/plugin'
 
 // prevent tiny from loading any CSS assets
 tinymce.DOM.loadCSS = function () {}
