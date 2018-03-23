@@ -325,4 +325,15 @@ describe SIS::CSV::Import do
     importer = process_csv_data(files: File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/sis/mac_sis_batch.zip'))
     expect(importer.errors).to eq []
   end
+
+  describe "parallel imports" do
+    it 'should retry an importer once' do
+      @account.enable_feature!(:sis_imports_refactor)
+      expect_any_instance_of(Attachment).to receive(:open).twice
+      process_csv_data(
+        "term_id,name,status,start_date,end_date",
+        "T001,Winter13,active,,"
+      )
+    end
+  end
 end
