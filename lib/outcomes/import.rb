@@ -131,7 +131,8 @@ module Outcomes
       model.display_name = outcome[:display_name] || ''
       model.calculation_method = outcome[:calculation_method]
       model.calculation_int = outcome[:calculation_int]
-      model.workflow_state ||= 'active' # let removing the outcome_links content tags delete the underlying outcome
+      # let removing the outcome_links content tags delete the underlying outcome
+      model.workflow_state = 'active' if outcome[:workflow_state] == 'active'
 
       prior_rubric = model.rubric_criterion || {}
       changed = ->(k) { outcome[k].present? && outcome[k] != prior_rubric[k] }
@@ -232,13 +233,23 @@ module Outcomes
 
     def update_outcome_parents(outcome, parents)
       existing_links = ContentTag.learning_outcome_links.where(context: context, content: outcome)
-      existing_parent_ids = existing_links.map(&:associated_asset_id)
-      updated_parent_ids = parents.map(&:id)
-      new_parents = parents.reject { |p| existing_parent_ids.include?(p.id) }
-      old_links = existing_links.reject { |l| updated_parent_ids.include?(l.associated_asset_id) }
 
+      next_parent_ids = parents.map(&:id)
+      resurrect = existing_links.
+        where(associated_asset_id: next_parent_ids).
+        where(associated_asset_type: 'LearningOutcomeGroup').
+        where(workflow_state: 'deleted')
+      resurrect.update_all(workflow_state: 'active')
+
+      kill = existing_links.
+        where.not(associated_asset_id: next_parent_ids).
+        where(associated_asset_type: 'LearningOutcomeGroup').
+        where(workflow_state: 'active')
+      kill.destroy_all
+
+      existing_parent_ids = existing_links.pluck(:associated_asset_id)
+      new_parents = parents.reject { |p| existing_parent_ids.include?(p.id) }
       new_parents.each { |p| p.add_outcome(outcome) }
-      old_links.each(&:destroy)
     end
 
     def outcome_import_id

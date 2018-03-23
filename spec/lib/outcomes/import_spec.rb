@@ -25,6 +25,12 @@ RSpec.describe Outcomes::Import do
       @context = context
     end
 
+    def new_import
+      @outcome_import_id = nil
+      next_import_id = outcome_import_id
+      LearningOutcomeGroup.update_all(outcome_import_id: next_import_id)
+    end
+
     attr_reader :context
   end
 
@@ -261,6 +267,18 @@ RSpec.describe Outcomes::Import do
         expect(context.root_outcome_group.child_outcome_links.active).to be_empty
         expect(parent1.child_outcome_links.active.map(&:content)).to include existing_outcome
         expect(parent2.child_outcome_links.active.map(&:content)).to include existing_outcome
+      end
+
+      it 'reassigns parent when resurrected' do
+        with_parents = outcome_attributes.merge(parent_guids: 'parent1 parent2')
+        importer.import_outcome(**with_parents)
+        importer.new_import
+        importer.import_outcome(**with_parents, workflow_state: 'deleted')
+        importer.new_import
+        importer.import_outcome(**with_parents)
+        expect(parent1.child_outcome_links.active.map(&:content)).to include existing_outcome
+        expect(parent2.child_outcome_links.active.map(&:content)).to include existing_outcome
+        expect(existing_outcome.reload.workflow_state).to eq('active')
       end
 
       it 'assigns to root outcome group if no parent specified' do
