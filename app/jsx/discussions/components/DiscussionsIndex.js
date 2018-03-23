@@ -154,6 +154,7 @@ export default class DiscussionsIndex extends Component {
               permissions={this.props.permissions}
               masterCourseData={this.props.masterCourseData}
               roles={this.props.roles}
+              deleteDiscussion={this.openDeleteDiscussionsModal}
             />
           </div>
         ) : null}
@@ -168,6 +169,7 @@ export default class DiscussionsIndex extends Component {
             updateDiscussion={this.props.updateDiscussion}
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
             roles={this.props.roles}
+            deleteDiscussion={this.openDeleteDiscussionsModal}
             renderContainerBackground={() =>
               pinnedDiscussionBackground({
                 permissions: this.props.permissions
@@ -186,6 +188,7 @@ export default class DiscussionsIndex extends Component {
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
             updateDiscussion={this.props.updateDiscussion}
             roles={this.props.roles}
+            deleteDiscussion={this.openDeleteDiscussionsModal}
             renderContainerBackground={() =>
               closedDiscussionBackground({
                 permissions: this.props.permissions
@@ -193,6 +196,12 @@ export default class DiscussionsIndex extends Component {
             }
           />
         </div>
+        {this.state.showDelete && (<DiscussionsDeleteModal
+          onSubmit={this.state.deleteFunction}
+          defaultOpen
+          selectedCount={1}
+          applicationElement={() => document.getElementById('application')}
+        />)}
       </Container>
     )
   }

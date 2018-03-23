@@ -26,7 +26,7 @@ const defaultProps = () => ({
   closeForComments: () => {},
   permissions: {create: false, manage_content: false, moderate: false},
   togglePin: () => {},
-  discussions: [{id: 1, filtered: false}],
+  discussions: [{id: 1, filtered: false, permissions: {delete: true}}],
   discussionsPage: 1,
   isLoadingDiscussions: false,
   hasLoadedDiscussions: false,
@@ -73,7 +73,7 @@ test('renders a draggable discussion row when user has moderate permissions', ()
 
 test('renders discussion row when discussion is not filtered', () => {
   const props = defaultProps()
-  props.discussions = [{id: 1, filtered: false}]
+  props.discussions = [{id: 1, filtered: false, permissions: {delete: true}}]
   const tree = shallow(<DiscussionContainer {...props} />)
   const node = tree.find('DiscussionRow')
   ok(node.exists())

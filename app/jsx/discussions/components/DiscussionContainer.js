@@ -136,7 +136,13 @@ export default class DiscussionsContainer extends Component {
         ? <DraggableDiscussionRow
             key={discussion.id}
             discussion={discussion}
-            canManage={this.props.permissions.manage_content}
+            displayManageMenu={discussion.permissions.delete}
+            displayPinMenuItem={this.props.permissions.moderate}
+            displayDuplicateMenuItem={this.props.permissions.manage_content}
+            displayLockMenuItem={discussion.can_lock}
+            displayDeleteMenuItem={
+              !(discussion.is_master_course_child_content && discussion.restricted_by_master_course)
+            }
             canPublish={this.props.permissions.publish}
             masterCourseData={this.props.masterCourseData}
             onToggleSubscribe={this.props.toggleSubscribe}
@@ -151,7 +157,13 @@ export default class DiscussionsContainer extends Component {
         : <DiscussionRow
             key={discussion.id}
             discussion={discussion}
-            canManage={this.props.permissions.manage_content}
+            displayManageMenu={discussion.permissions.delete}
+            displayPinMenuItem={this.props.permissions.moderate}
+            displayDuplicateMenuItem={this.props.permissions.manage_content}
+            displayLockMenuItem={discussion.can_lock}
+            displayDeleteMenuItem={
+              !(discussion.is_master_course_child_content && discussion.restricted_by_master_course)
+            }
             canPublish={this.props.permissions.publish}
             masterCourseData={this.props.masterCourseData}
             onToggleSubscribe={this.props.toggleSubscribe}

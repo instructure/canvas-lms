@@ -189,7 +189,7 @@ actions.deleteDiscussion = function(discussion) {
       })
       .catch(err => {
         $.screenReaderFlashMessage(I18n.t('Failed to delete discussion %{title}', { title: discussion.title }))
-        dispatch(actions.deleteDiscussionFails({
+        dispatch(actions.deleteDiscussionFail({
           message: I18n.t('Failed to delete discussion %{title}', { title: discussion.title }),
           discussion,
           err

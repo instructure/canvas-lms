@@ -171,36 +171,63 @@ test('removes non-text content from discussion message', () => {
   ok(node.textContent.includes('foo bar'))
 })
 
-test('renders manage menu if permitted', () => {
-  const tree = mount(<DiscussionRow {...makeProps({ canManage: true })} />)
-  const manageMenuNode = tree.find('PopoverMenu')
-  ok(manageMenuNode.exists())
-  const courseItemRow = tree.find('CourseItemRow')
-  ok(courseItemRow.exists())
-  ok(courseItemRow.props().manageMenuOptions.length > 0)
-  const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
-  ok(allKeys.includes('duplicate'))
-  ok(allKeys.includes('togglepinned'))
-  ok(allKeys.includes('togglelocked'))
-  ok(allKeys.includes('delete'))
+test('does not render manage menu if not permitted', () => {
+  const tree = mount(<DiscussionRow {...makeProps({ displayManageMenu: false })} />)
+  const node = tree.find('PopoverMenu')
+  notOk(node.exists())
 })
 
 test('renders move-to in manage menu if permitted', () => {
   const tree = mount(<DiscussionRow {...makeProps({
-    canManage: true,
+    displayManageMenu: true,
     onMoveDiscussion: ()=>{}
    })} />)
-  const manageMenuNode = tree.find('PopoverMenu')
-  ok(manageMenuNode.exists())
   const courseItemRow = tree.find('CourseItemRow')
-  ok(courseItemRow.exists())
-  ok(courseItemRow.props().manageMenuOptions.length > 0)
   const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
-  ok(allKeys.includes('move'))
+  equal(allKeys.length, 1)
+  equal(allKeys[0], 'move')
 })
 
-test('does not render manage menu if not permitted', () => {
-  const tree = mount(<DiscussionRow {...makeProps({ canManage: false })} />)
-  const node = tree.find('PopoverMenu')
-  notOk(node.exists())
+test('renders pin item in manage menu if permitted', () => {
+  const tree = mount(<DiscussionRow {...makeProps({
+    displayManageMenu: true,
+    displayPinMenuItem: true
+   })} />)
+  const courseItemRow = tree.find('CourseItemRow')
+  const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
+  equal(allKeys.length, 1)
+  equal(allKeys[0], 'togglepinned')
+})
+
+test('renders duplicate item in manage menu if permitted', () => {
+  const tree = mount(<DiscussionRow {...makeProps({
+    displayManageMenu: true,
+    displayDuplicateMenuItem: true
+   })} />)
+  const courseItemRow = tree.find('CourseItemRow')
+  const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
+  equal(allKeys.length, 1)
+  equal(allKeys[0], 'duplicate')
+})
+
+test('renders delete item in manage menu if permitted', () => {
+  const tree = mount(<DiscussionRow {...makeProps({
+    displayManageMenu: true,
+    displayDeleteMenuItem: true
+   })} />)
+  const courseItemRow = tree.find('CourseItemRow')
+  const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
+  equal(allKeys.length, 1)
+  equal(allKeys[0], 'delete')
+})
+
+test('renders lock item in manage menu if permitted', () => {
+  const tree = mount(<DiscussionRow {...makeProps({
+    displayManageMenu: true,
+    displayLockMenuItem: true
+   })} />)
+  const courseItemRow = tree.find('CourseItemRow')
+  const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
+  equal(allKeys.length, 1)
+  equal(allKeys[0], 'togglelocked')
 })
