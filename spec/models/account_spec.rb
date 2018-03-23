@@ -617,6 +617,7 @@ describe Account do
   it "does not allow create_courses even to admins on site admin and children" do
     a = Account.site_admin
     a.settings = { :no_enrollments_can_create_courses => true }
+    a.save!
     manual = a.manually_created_courses_account
     user_factory
 
