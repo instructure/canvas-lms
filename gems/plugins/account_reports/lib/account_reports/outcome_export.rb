@@ -146,16 +146,22 @@ module AccountReports
     end
 
     def export_outcomes(csv)
+      I18n.locale = account.default_locale if account.default_locale.present?
       outcome_scope.find_each do |row|
         outcome = row.attributes.dup
         outcome['object_type'] = 'outcome'
         outcome_data = YAML.safe_load(outcome['data'])
         outcome['mastery_points'] = outcome_data.dig(:rubric_criterion, :mastery_points)
+        outcome['mastery_points'] = I18n.n(outcome['mastery_points']) if outcome['mastery_points']
 
         csv_row = OUTCOME_EXPORT_SCALAR_HEADERS.map { |h| outcome[h] }
         ratings = outcome_data.dig(:rubric_criterion, :ratings)
         if ratings.present?
-          csv_row += ratings.flat_map { |r| r.values_at(:points, :description) }
+          csv_row += ratings.flat_map do |r|
+            r.values_at(:points, :description).tap do |p|
+              p[0] = I18n.n(p[0]) if p[0]
+            end
+          end
         end
         csv << csv_row
       end
