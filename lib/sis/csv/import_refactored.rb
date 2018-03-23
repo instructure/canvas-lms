@@ -213,10 +213,14 @@ module SIS
           update_progress # just update progress on completetion - the parallel jobs should be short enough
           parallel_importer.complete(:rows_processed => count)
         rescue => e
+          if parallel_importer.workflow_state == 'running'
+            parallel_importer.write_attribute(:workflow_state, 'retry')
+            run_parallel_importer(parallel_importer)
+          end
           parallel_importer.fail
           fail_with_error!(e)
         ensure
-          file.close if file
+          file&.close
           if is_last_parallel_importer_of_type?(parallel_importer)
             queue_next_importer_set unless %w{aborted failed failed_with_messages}.include?(@batch.workflow_state)
           end
@@ -265,7 +269,7 @@ module SIS
 
       def is_last_parallel_importer_of_type?(parallel_importer)
         importer_type = parallel_importer.importer_type.to_sym
-        return false if @batch.parallel_importers.where(:importer_type => importer_type, :workflow_state => %w{queued running}).exists?
+        return false if @batch.parallel_importers.where(:importer_type => importer_type, :workflow_state => %w{queued running retry}).exists?
 
         SisBatch.transaction do
           @batch.reload(:lock => true)
