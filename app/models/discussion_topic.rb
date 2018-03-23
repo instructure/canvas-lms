@@ -1456,6 +1456,6 @@ class DiscussionTopic < ActiveRecord::Base
 
   # synchronously create/update the materialized view
   def create_materialized_view
-    DiscussionTopic::MaterializedView.for(self).update_materialized_view_without_send_later(xlog_location: self.class.current_xlog_location)
+    DiscussionTopic::MaterializedView.for(self).update_materialized_view_without_send_later(use_master: true)
   end
 end

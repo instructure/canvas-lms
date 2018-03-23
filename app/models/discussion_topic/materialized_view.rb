@@ -101,11 +101,11 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
     end
   end
 
-  def update_materialized_view(xlog_location: nil)
-    self.class.wait_for_replication(start: xlog_location)
+  def update_materialized_view(xlog_location: nil, use_master: false)
+    self.class.wait_for_replication(start: xlog_location) unless use_master
     self.generation_started_at = Time.zone.now
     view_json, user_ids, entry_lookup =
-      self.build_materialized_view
+      self.build_materialized_view(use_master: use_master)
     self.json_structure = view_json
     self.participants_array = user_ids
     self.entry_ids_array = entry_lookup
@@ -115,11 +115,11 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
   handle_asynchronously :update_materialized_view,
     :singleton => proc { |o| "materialized_discussion:#{ Shard.birth.activate { o.discussion_topic_id } }" }
 
-  def build_materialized_view
+  def build_materialized_view(use_master: false)
     entry_lookup = {}
     view = []
     user_ids = Set.new
-    Shackles.activate(:slave) do
+    Shackles.activate(use_master ? :master : :slave) do
       all_entries.find_each do |entry|
         json = discussion_entry_api_json([entry], discussion_topic.context, nil, nil, []).first
         entry_lookup[entry.id] = json
