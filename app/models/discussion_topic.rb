@@ -1134,14 +1134,13 @@ class DiscussionTopic < ActiveRecord::Base
     non_nil_users = users.compact
     section_ids = DiscussionTopicSectionVisibility.active.where(:discussion_topic_id => self.id).
       pluck(:course_section_id)
-    user_ids = non_nil_users.map(&:id)
+    user_ids = non_nil_users.pluck(:id)
     # Context is known to be a course here
-    users_in_sections = Enrollment.select(:user_id).active.where(:course_id => self.context_id,
-      :course_section_id => section_ids, :user_id => user_ids).map(&:user_id).to_set
-    unlocked_teachers = Enrollment.select(:user_id).active.instructor.
-      where(:course_id => self.context_id, :limit_privileges_to_course_section => false,
-        :user_id => user_ids).
-      map(&:user_id).to_set
+    users_in_sections = self.context.enrollments.active.
+      where(:user_id => user_ids, :course_section_id => section_ids).pluck(:user_id).to_set
+    unlocked_teachers = self.context.enrollments.active.instructor.
+      where(:limit_privileges_to_course_section => false, :user_id => user_ids).
+      pluck(:user_id).to_set
     permitted_user_ids = users_in_sections.union(unlocked_teachers)
     return non_nil_users.select { |u| permitted_user_ids.include?(u.id) }
   end
