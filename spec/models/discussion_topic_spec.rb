@@ -478,7 +478,7 @@ describe DiscussionTopic do
         it "should filter out-of-section students" do
           @course.root_account.enable_feature!(:section_specific_discussions)
           topic = @course.discussion_topics.create(
-            :title => "section specific topic", :title => "foo", :message => "bar", :user => @teacher)
+            :title => "foo", :message => "bar", :user => @teacher)
           section1 = @course.course_sections.create!
           section2 = @course.course_sections.create!
           student1 = create_enrolled_user(@course, section1, :name => 'student 1', :enrollment_type => 'StudentEnrollment')

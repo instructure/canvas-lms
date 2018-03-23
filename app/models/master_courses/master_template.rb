@@ -68,7 +68,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
             update_all(:restrictions => new_type_restrictions)
           next unless count > 0
 
-          old_type_restrictions = self.default_restrictions_by_type_was[type] || {}
+          old_type_restrictions = self.default_restrictions_by_type_before_last_save[type] || {}
           if new_type_restrictions.any?{|setting, locked| locked && !old_type_restrictions[setting]} # tightened restrictions
             self.touch_all_content_for_tags(type)
           end
@@ -78,7 +78,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
       if self.saved_change_to_default_restrictions?
         count = self.master_content_tags.where(:use_default_restrictions => true).
           update_all(:restrictions => self.default_restrictions)
-        if count > 0 && self.default_restrictions.any?{|setting, locked| locked && !self.default_restrictions_was[setting]} # tightened restrictions
+        if count > 0 && self.default_restrictions.any?{|setting, locked| locked && !self.default_restrictions_before_last_save[setting]} # tightened restrictions
           self.touch_all_content_for_tags
         end
       end

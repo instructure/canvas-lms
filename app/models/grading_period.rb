@@ -254,7 +254,7 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def weight_actually_changed?
-    grading_period_group.weighted && weight_changed?
+    grading_period_group.weighted && saved_change_to_weight?
   end
 
   def time_boundaries_changed?

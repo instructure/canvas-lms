@@ -22,7 +22,7 @@ class OriginalityReport < ActiveRecord::Base
   belongs_to :attachment
   belongs_to :originality_report_attachment, class_name: "Attachment"
 
-  has_one :lti_link, class_name: Lti::Link, as: :linkable, inverse_of: :linkable, dependent: :destroy
+  has_one :lti_link, class_name: 'Lti::Link', as: :linkable, inverse_of: :linkable, dependent: :destroy
   accepts_nested_attributes_for :lti_link, allow_destroy: true
 
   validates :submission, presence: true
