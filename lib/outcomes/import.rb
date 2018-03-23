@@ -142,7 +142,7 @@ module Outcomes
       if model.context == context
         model.outcome_import_id = outcome_import_id
         model.save!
-      elsif model.changed?
+      elsif model.has_changes_to_save?
         raise InvalidDataError, I18n.t(
           'Cannot modify outcome from another context: %{changes}; outcome must be modified in %{context}',
           changes: model.changes.keys.inspect,
