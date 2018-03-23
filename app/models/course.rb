@@ -202,11 +202,11 @@ class Course < ActiveRecord::Base
   before_validation :assert_defaults
   before_save :update_enrollments_later
   before_save :update_show_total_grade_as_on_weighting_scheme_change
+  before_save :set_self_enrollment_code
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
   after_save :update_enrollment_states_if_necessary
   after_save :touch_students_if_necessary
-  after_save :set_self_enrollment_code
   after_commit :update_cached_due_dates
 
   after_update :clear_cached_short_name, :if => :saved_change_to_course_code?
@@ -1023,11 +1023,13 @@ class Course < ActiveRecord::Base
     # shard, and not all courses will have enrollment codes, so that may not be
     # necessary)
     code = nil
-    self.class.unique_constraint_retry(10) do
+    10.times do
       code = code_length.times.map{
         alphanums[(rand * alphanums.size).to_i, 1]
       }.join
-      update_attribute :self_enrollment_code, code
+      next if Course.where(self_enrollment_code: code).exists?
+      self.self_enrollment_code = code
+      break
     end
     code
   end

@@ -103,7 +103,11 @@ module Submittable
 
   def update_assignment
     if self.deleted?
-      self.assignment.destroy if self.for_assignment? && !self.assignment.deleted?
+      if self.for_assignment? && !self.assignment.deleted?
+        self.class.connection.after_transaction_commit do
+          self.assignment.destroy
+        end
+      end
     else
       if !self.assignment_id && @old_assignment_id
         self.context_module_tags.each(&:confirm_valid_module_requirements)

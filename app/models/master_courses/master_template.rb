@@ -61,7 +61,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   def sync_default_restrictions
     if self.use_default_restrictions_by_type
-      if self.use_default_restrictions_by_type_changed? || self.default_restrictions_by_type_changed?
+      if self.saved_change_to_use_default_restrictions_by_type? || self.saved_change_to_default_restrictions_by_type?
         MasterCourses::RESTRICTED_OBJECT_TYPES.each do |type|
           new_type_restrictions = self.default_restrictions_by_type[type] || {}
           count = self.master_content_tags.where(:use_default_restrictions => true, :content_type => type).

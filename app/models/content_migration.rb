@@ -890,10 +890,10 @@ class ContentMigration < ActiveRecord::Base
 
   def handle_import_in_progress_notice
     return unless context.is_a?(Course) && is_set?(migration_settings[:import_in_progress_notice])
-    if (new_record? || (workflow_state_changed? && %w{created queued}.include?(workflow_state_was))) &&
+    if (just_created || (saved_change_to_workflow_state? && %w{created queued}.include?(workflow_state_before_last_save))) &&
         %w(pre_processing pre_processed exporting importing).include?(workflow_state)
       context.add_content_notice(:import_in_progress, 4.hours)
-    elsif workflow_state_changed? && %w(pre_process_error exported imported failed).include?(workflow_state)
+    elsif saved_change_to_workflow_state? && %w(pre_process_error exported imported failed).include?(workflow_state)
       context.remove_content_notice(:import_in_progress)
     end
   end
