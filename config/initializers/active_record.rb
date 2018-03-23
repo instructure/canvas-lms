@@ -1520,3 +1520,18 @@ module ExplainAnalyze
 end
 ActiveRecord::Relation.prepend(ExplainAnalyze)
 
+if CANVAS_RAILS5_1
+  ActiveRecord::AttributeMethods::Dirty.module_eval do
+    def emit_warning_if_needed(method_name, new_method_name)
+      unless mutation_tracker.equal?(mutations_from_database)
+        raise <<-EOW.squish
+                The behavior of `#{method_name}` inside of after callbacks will
+                be changing in the next version of Rails. The new return value will reflect the
+                behavior of calling the method after `save` returned (e.g. the opposite of what
+                it returns now). To maintain the current behavior, use `#{new_method_name}`
+                instead.
+        EOW
+      end
+    end
+  end
+end
