@@ -129,6 +129,17 @@ describe ContentMigrationsController, type: :request do
       json = api_call(:get, @migration_url, @params)
       expect(json[0]['attachment']).to be_nil
     end
+
+    it "should not return a blank page when master_course_import migrations exist" do
+      template = MasterCourses::MasterTemplate.set_as_master_course(Course.create!)
+      sub = template.add_child_course!(@course)
+      mm = @course.content_migrations.create migration_type: 'master_course_import', child_subscription_id: sub.id
+      mm.migration_settings[:hide_from_index] = true
+      mm.save!
+      json = api_call(:get, @migration_url + "?per_page=1", @params.merge(per_page: '1'))
+      expect(json.length).to eq 1
+      expect(json.first['id']).to eq @migration.id
+    end
   end
 
   describe 'show' do
