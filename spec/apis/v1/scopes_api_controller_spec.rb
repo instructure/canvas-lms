@@ -32,6 +32,7 @@ describe ScopesApiController, type: :request do
       end
 
       it "returns expected scopes" do
+        allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
         allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management).and_return(true)
         allow_any_instance_of(Account).to receive(:feature_allowed?).and_return(false)
         allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management).and_return(true)

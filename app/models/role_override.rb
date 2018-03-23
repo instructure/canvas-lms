@@ -818,6 +818,18 @@ class RoleOverride < ActiveRecord::Base
         :label => -> { t('LTI add and edit') },
         :true_for => %w(TeacherEnrollment TaEnrollment DesignerEnrollment AccountAdmin),
         :available_to => %w(TeacherEnrollment TaEnrollment DesignerEnrollment AccountAdmin AccountMembership)
+      },
+      :select_final_grade => {
+        :label => -> { t('Select final grade for moderation') },
+        :true_for => %w(TeacherEnrollment TaEnrollment AccountAdmin),
+        :available_to => %w(TeacherEnrollment TaEnrollment AccountAdmin AccountMembership),
+        :account_allows => lambda {|a| a.feature_enabled?(:anonymous_moderated_marking)}
+      },
+      :view_audit_trail => {
+        :label => -> { t('View audit trail') },
+        :true_for => %w(TeacherEnrollment AccountAdmin),
+        :available_to => %w(TeacherEnrollment AccountAdmin AccountMembership),
+        :account_allows => lambda {|a| a.feature_enabled?(:anonymous_moderated_marking)}
       }
     })
 

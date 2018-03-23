@@ -177,6 +177,7 @@ describe "accounts/settings.html.erb" do
         before do
           allow(@account).to receive(:feature_enabled?).with(:new_sis_integrations).and_return(false)
           allow(@account).to receive(:grants_right?).with(current_user, :manage_account_memberships).and_return(true)
+          allow(@account).to receive(:feature_enabled?).with(:anonymous_moderated_marking).and_return(false)
           allow(@account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(true)
         end
 
@@ -205,6 +206,7 @@ describe "accounts/settings.html.erb" do
 
         before do
           allow(@account).to receive(:feature_enabled?).with(:new_sis_integrations).and_return(true)
+          allow(@account).to receive(:feature_enabled?).with(:anonymous_moderated_marking).and_return(false)
           allow(@account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(true)
         end
 
@@ -233,6 +235,7 @@ describe "accounts/settings.html.erb" do
           context "for root account" do
             before do
               allow(@account).to receive(:sis_syncing).and_return({value: true, locked: true})
+              allow(@account).to receive(:feature_enabled?).with(:anonymous_moderated_marking).and_return(false)
               allow(@account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(true)
               do_render(current_user)
             end
@@ -251,6 +254,7 @@ describe "accounts/settings.html.erb" do
             context "locked" do
               before do
                 @account.enable_feature!(:post_grades)
+                allow(@account).to receive(:feature_enabled?).with(:anonymous_moderated_marking).and_return(false)
                 allow(@account).to receive(:sis_syncing).and_return({value: true, locked: true, inherited: true })
                 do_render(current_user, @account)
               end
@@ -267,6 +271,7 @@ describe "accounts/settings.html.erb" do
             context "not locked" do
               before do
                 allow(@account).to receive(:sis_syncing).and_return({value: true, locked: false, inherited: true })
+                allow(@account).to receive(:feature_enabled?).with(:anonymous_moderated_marking).and_return(false)
                 allow(@account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(true)
                 do_render(current_user)
               end
