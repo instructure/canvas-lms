@@ -33,7 +33,7 @@ module Services
 
         def configure
           publisher.configure do |config|
-            config.host = host
+            config.host     = host
             config.username = username
             config.password = password
           end
@@ -60,7 +60,7 @@ module Services
         def build_pipeline_message
           @message = publisher::Message.new(
             noun:         MESSAGE_NAME,
-            meta:         {},
+            meta:         {source: SOURCE},
             identifiers:  { id: enrollment.id },
             data:         payload
           )
