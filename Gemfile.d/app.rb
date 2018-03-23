@@ -66,7 +66,11 @@ gem 'ffi', '1.9.23', require: false
 gem 'hashery', '2.1.2', require: false
 gem 'highline', '1.7.10', require: false
 gem 'httparty', '0.16.1'
-gem 'i18n', '0.9.3'
+if CANVAS_RAILS5_1
+  gem 'i18n', '0.9.5'
+else
+  gem 'i18n', '1.0.0'
+end
 gem 'i18nliner', '0.0.14'
   gem 'ruby2ruby', '2.4.1', require: false
   gem 'ruby_parser', '3.11.0', require: false
