@@ -147,9 +147,9 @@
         <%= print_messages(@last_batch) %>
         <%= print_counts @last_batch %>
       <% elsif @last_batch.workflow_state == 'failed' %>
-        <%= t(:import_failed_message, "There was an error importing your SIS data. No records were imported.") %>
+        <%= t(:import_failed_message, "There was an error importing your SIS data.") %>
       <% elsif @last_batch.workflow_state == 'failed_with_messages' %>
-        <%= t(:imported_with_messages_message, "The SIS data was imported but with these messages:") %>
+        <%= t(:import_failed_with_messages_message, "The import failed with these messages:") %>
         <% if @last_batch.errors_attachment_id %>
           <p><%= t('Download the complete list of errors and warnings here.') %>
             <%= link_to "<i class='icon-download'></i>".html_safe,
@@ -160,7 +160,6 @@
                         'aria-label' => t('Download errors_attchment'),
                         'title' => t('Download errors_attchment') %></p>
         <% end %>
-        <%= t(:import_failed_with_messages_message, "No SIS records were imported. The import failed with these messages:") %>
         <%= print_messages(@last_batch) %>
       <% elsif @last_batch.workflow_state == 'aborted' %>
         <%= t('The previous SIS batch was aborted') %>

@@ -353,7 +353,7 @@ class SisBatch < ActiveRecord::Base
     finalize_workflow_state(import_finished)
     write_errors_to_file
     populate_old_warnings_and_errors
-    self.progress = 100
+    self.progress = 100 if import_finished
     self.ended_at = Time.now.utc
     self.save!
 

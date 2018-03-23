@@ -136,7 +136,7 @@ describe "sis imports ui" do
     submit_form('#sis_importer')
     expect(f('.progress_bar_holder .progress_message')).to be_displayed
     SisBatch.last.process_without_send_later
-    expect(f(".sis_messages .sis_error_message")).to include_text "No SIS records were imported. The import failed with these messages:"
+    expect(f(".sis_messages .sis_error_message")).to include_text "The import failed with these messages:"
     expect(SisBatch.last.batch_mode).to eq true
     expect(SisBatch.last.options).to eq({:override_sis_stickiness => true,
                                      :add_sis_stickiness => true})
@@ -146,7 +146,7 @@ describe "sis imports ui" do
     submit_form('#sis_importer')
     expect(f('.progress_bar_holder .progress_message')).to be_displayed
     SisBatch.last.process_without_send_later
-    expect(f(".sis_messages .sis_error_message")).to include_text "No SIS records were imported. The import failed with these messages:"
+    expect(f(".sis_messages .sis_error_message")).to include_text "The import failed with these messages:"
     expect(!!SisBatch.last.batch_mode).to be_falsey
     expect(SisBatch.last.options).to eq({:override_sis_stickiness => true})
   end

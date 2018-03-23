@@ -240,6 +240,7 @@ module SIS
                                  "(Error report %{number})", number: err_id.to_s)
         SisBatch.add_error(nil, error_message, sis_batch: @batch, failure: true, backtrace: e.backtrace)
         @batch.workflow_state = :failed_with_messages
+        @batch.finish(false)
         @batch.save!
       end
 
