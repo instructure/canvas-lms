@@ -18,8 +18,8 @@ module Services
         end
 
         def call
+          configure
           get_api_json
-          build_payload
           build_pipeline_message
           post
           self
@@ -29,7 +29,15 @@ module Services
         private
 
         attr_reader :payload, :message, :enrollment, :user_name, :password,
-          :account_admin, :api_instance, :payload, :api_json, :publisher
+          :account_admin, :api_instance, :payload, :publisher
+
+        def configure
+          publisher.configure do |config|
+            config.host = host
+            config.username = username
+            config.password = password
+          end
+        end
 
         def post
           api_instance.messages_post(message)
@@ -42,7 +50,7 @@ module Services
         end
 
         def get_api_json
-          @api_json = pipeline_user_api.new.enrollment_json(
+          @payload = pipeline_user_api.new.enrollment_json(
             enrollment,
             account_admin,
             {}
@@ -56,13 +64,6 @@ module Services
             identifiers:  { id: enrollment.id },
             data:         payload
           )
-        end
-
-        def build_payload
-          enrollment.changes.each do |field, attribute_changes|
-            next unless api_json.keys.include?(field)
-            payload[field] = attribute_changes[1]
-          end
         end
       end
     end
