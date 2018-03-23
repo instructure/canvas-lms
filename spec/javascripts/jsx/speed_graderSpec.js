@@ -1306,7 +1306,10 @@ QUnit.module('SpeedGrader', function() {
     hooks.beforeEach(function() {
       fakeENV.setup({
         anonymous_moderated_marking_enabled: false,
+        assignment_id: '17',
+        course_id: '29',
         grading_role: 'moderator',
+        help_url: 'example.com/support',
         show_help_menu_item: false
       })
 

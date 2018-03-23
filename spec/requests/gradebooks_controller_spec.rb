@@ -94,6 +94,12 @@ describe GradebooksController, type: :request do
           expect(js_env.fetch('show_help_menu_item')).to be true
         end
       end
+
+      it 'includes the "Help" URL' do
+        get speed_grader_course_gradebook_path(course_id: @course.id), params: { assignment_id: @assignment.id }
+        js_env = js_env_from_response(response)
+        expect(js_env).to have_key 'help_url'
+      end
     end
   end
 

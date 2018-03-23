@@ -610,7 +610,8 @@ class GradebooksController < ApplicationController
           assignment_id: @assignment.id,
           assignment_title: @assignment.title,
           can_comment_on_submission: @can_comment_on_submission,
-          show_help_menu_item: show_help_link?
+          show_help_menu_item: show_help_link?,
+          help_url: help_link_url
         }
         if [:moderator, :provisional_grader].include?(grading_role)
           env[:provisional_status_url] = api_v1_course_assignment_provisional_status_path(@context.id, @assignment.id)
