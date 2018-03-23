@@ -2,8 +2,8 @@ module Services
   module Pipeline
     module Commands
       class Send
-
-        MESSAGE_NAME = 'enrollment_changed'
+        MESSAGE_NAME = 'enrollment'
+        SOURCE = 'canvas'
 
         def initialize(enrollment:)
           @host              = ENV['PIPELINE_ENDPOINT']
