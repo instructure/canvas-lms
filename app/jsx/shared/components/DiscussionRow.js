@@ -35,13 +35,13 @@ import IconAssignmentLine from 'instructure-icons/lib/Line/IconAssignmentLine'
 import IconRssLine from 'instructure-icons/lib/Line/IconRssLine'
 import IconRssSolid from 'instructure-icons/lib/Solid/IconRssSolid'
 import IconPublishSolid from 'instructure-icons/lib/Solid/IconPublishSolid'
-import IconPublishLine from 'instructure-icons/lib/Line/IconPublishLine'
 import IconCopySolid from 'instructure-icons/lib/Solid/IconCopySolid'
 import IconUpdownLine from 'instructure-icons/lib/Line/IconUpdownLine'
 import IconTrashSolid from 'instructure-icons/lib/Solid/IconTrashSolid'
 import IconPinSolid from 'instructure-icons/lib/Solid/IconPinSolid'
 import IconPinLine from 'instructure-icons/lib/Line/IconPinLine'
 import IconReply from 'instructure-icons/lib/Line/IconReplyLine'
+import IconUnpublishedLine from 'instructure-icons/lib/Line/IconUnpublishedLine'
 
 import DiscussionModel from 'compiled/models/DiscussionTopic'
 import compose from '../helpers/compose'
@@ -188,8 +188,16 @@ export default class DiscussionRow extends Component {
   subscribeButton = () => (
     <ToggleIcon
       toggled={this.props.discussion.subscribed}
-      OnIcon={<IconRssSolid title={I18n.t('Unsubscribe from %{title}', { title: this.props.discussion.title })} />}
-      OffIcon={<IconRssLine title={I18n.t('Subscribe to %{title}', { title: this.props.discussion.title })} />}
+      OnIcon={
+        <Text color="brand">
+          <IconRssSolid title={I18n.t('Unsubscribe from %{title}', { title: this.props.discussion.title })} />
+        </Text>
+      }
+      OffIcon={
+        <Text color="brand">
+          <IconRssLine title={I18n.t('Subscribe to %{title}', { title: this.props.discussion.title })} />
+        </Text>
+      }
       onToggleOn={() => this.props.onToggleSubscribe(this.props.discussion)}
       onToggleOff={() => this.props.onToggleSubscribe(this.props.discussion)}
       disabled={this.props.discussion.subscription_hold !== undefined}
@@ -201,8 +209,16 @@ export default class DiscussionRow extends Component {
     this.props.canPublish
     ? (<ToggleIcon
          toggled={this.props.discussion.published}
-         OnIcon={<IconPublishSolid title={I18n.t('Publish %{title}', { title: this.props.discussion.title })} />}
-         OffIcon={<IconPublishLine title={I18n.t('Unpublish %{title}', { title: this.props.discussion.title })} />}
+         OnIcon={
+           <Text color="success">
+             <IconPublishSolid title={I18n.t('Publish %{title}', { title: this.props.discussion.title })} />
+           </Text>
+         }
+         OffIcon={
+           <Text color="secondary">
+             <IconUnpublishedLine title={I18n.t('Unpublish %{title}', { title: this.props.discussion.title })} />
+           </Text>
+         }
          onToggleOn={() => this.props.updateDiscussion(this.props.discussion, {published: true}, {})}
          onToggleOff={() => this.props.updateDiscussion(this.props.discussion, {published: false}, {})}
          className="publish-button"
@@ -224,6 +240,25 @@ export default class DiscussionRow extends Component {
         </span>
       )
     }
+  }
+
+  renderIcon = () => {
+    if(this.props.discussion.assignment) {
+      if(this.props.discussion.published) {
+        return (
+          <Text color="success" size="large">
+            <IconAssignmentLine />
+          </Text>
+        )
+      } else {
+        return (
+          <Text color="secondary" size="large">
+            <IconAssignmentLine />
+          </Text>
+        )
+      }
+    }
+    return null
   }
 
   renderMenuList = () => {
@@ -323,11 +358,7 @@ export default class DiscussionRow extends Component {
                 draggable={this.props.draggable}
                 connectDragSource={this.props.connectDragSource}
                 connectDropTarget={this.props.connectDropTarget}
-                icon={
-                  <Text color={this.props.draggable ? "success" : "secondary"} size="large">
-                    <IconAssignmentLine />
-                  </Text>
-                }
+                icon={this.renderIcon() }
                 isRead
                 author={this.props.discussion.author}
                 title={this.props.discussion.title}

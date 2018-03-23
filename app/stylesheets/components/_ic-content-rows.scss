@@ -50,7 +50,8 @@
 }
 
 .ic-item-row__peer_review {
-  margin-top: -4px;
+  margin-#{direction(right)}: 2px;
+  margin-bottom: -4px;
 }
 
 .ic-item-row__content-col {
@@ -123,13 +124,13 @@
 }
 
 .icon-blueprint {
-  padding: 8px 8px 0px 8px;
-  margin-bottom: 18px;
+  margin-bottom: 3px;
+  padding: direction-sides(8px 8px 7px 8px);
 }
 
 .icon-blueprint-lock {
-  padding: 8px 8px 0px 8px;
-  margin-bottom: 18px;
+  margin-bottom: 3px;
+  padding: direction-sides(8px 8px 7px 8px);
 }
 
 .ic-discussion-row {
@@ -172,6 +173,6 @@
 
 .ic-item-row__manage-menu {
   display: inline-block;
-  margin: 0 -10px;
+  margin: direction-sides(0 -8px -8px -10px);
   transform: translateY(-5px);
 }
