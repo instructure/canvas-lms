@@ -133,7 +133,7 @@ class GradebookExporter
       end
       csv << row
 
-      group_filler_length = groups.size * (include_points? ? 6 : 2)
+      group_filler_length = groups.size * column_count_per_group
 
       # Possible muted row
       if assignments.any?(&:muted)
@@ -317,4 +317,9 @@ class GradebookExporter
   def include_points?
     !@course.apply_group_weights?
   end
+
+  def column_count_per_group
+    include_points? ? 6 : 4
+  end
+  private :column_count_per_group
 end

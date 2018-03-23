@@ -318,6 +318,35 @@ describe GradebookExporter do
     end
   end
 
+  context "with weighted assignment groups" do
+    before(:once) do
+      student_in_course active_all: true
+      @course.update_attributes(group_weighting_scheme: 'percent')
+
+      first_group = @course.assignment_groups.create!(name: "First Group", group_weight: 0.5)
+      @course.assignment_groups.create!(name: "Second Group", group_weight: 0.5)
+
+      @assignment = @course.assignments.create!(title: 'Assignment 1', points_possible: 10,
+                                                grading_type: 'gpa_scale', assignment_group: first_group)
+      @assignment.grade_student(@student, grade: 8, grader: @teacher)
+    end
+
+    it "emits rows of equal length when no assignments are muted" do
+      csv = GradebookExporter.new(@course, @teacher, {}).to_csv
+      rows = CSV.parse(csv)
+
+      expect(rows.group_by(&:size).count).to be 1
+    end
+
+    it "emits rows of equal length when an assignment is muted" do
+      @assignment.mute!
+      csv = GradebookExporter.new(@course, @teacher, {}).to_csv
+      rows = CSV.parse(csv)
+
+      expect(rows.group_by(&:size).count).to be 1
+    end
+  end
+
   describe "#show_overall_totals" do
     let(:enrollment) { @student.enrollments.find_by(course: @course) }
 
