@@ -1108,9 +1108,8 @@ class DiscussionTopicsController < ApplicationController
 
     prefer_assignment_availability_dates(discussion_topic_hash)
 
-    unless process_future_date_parameters(discussion_topic_hash)
-      process_lock_parameters(discussion_topic_hash)
-    end
+    process_future_date_parameters(discussion_topic_hash)
+    process_lock_parameters(discussion_topic_hash)
 
     process_published_parameters(discussion_topic_hash)
     if is_new && @topic.published? && params[:assignment]
@@ -1212,23 +1211,22 @@ class DiscussionTopicsController < ApplicationController
       else
         @topic.unlock(without_save: true)
       end
-      true
-    else
-      false
     end
   end
 
   def process_lock_parameters(discussion_topic_hash)
     # Handle locking/unlocking (overrides workflow state if provided). It appears that the locked param as a hash
     # is from old code and is not being used. Verification requested.
-    if params.has_key?(:locked) && !params[:locked].is_a?(Hash)
-      should_lock = value_to_boolean(params[:locked])
-      if should_lock != @topic.locked?
-        if should_lock
-          @topic.lock(without_save: true)
-        else
-          discussion_topic_hash[:lock_at] = nil
-          @topic.unlock(without_save: true)
+    if !(@topic.lock_at_changed?)
+      if params.has_key?(:locked) && !params[:locked].is_a?(Hash)
+        should_lock = value_to_boolean(params[:locked])
+        if should_lock != @topic.locked?
+          if should_lock
+            @topic.lock(without_save: true)
+          else
+            discussion_topic_hash[:lock_at] = nil
+            @topic.unlock(without_save: true)
+          end
         end
       end
     end

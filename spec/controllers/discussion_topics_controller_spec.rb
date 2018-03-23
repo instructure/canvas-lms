@@ -1321,8 +1321,44 @@ describe DiscussionTopicsController do
           title: 'Updated Topic',
           lock_at: @topic.lock_at, delayed_post_at: @topic.delayed_post_at,
           locked: false})
+      expect(response).to have_http_status 200
       expect(@topic.reload).not_to be_locked
       expect(@topic.lock_at).not_to be_nil
+    end
+
+    it "should be able to turn off locked and delayed_post_at date in same request" do
+      @topic.delayed_post_at = '2013-01-02T00:00:00UTC'
+      @topic.locked = true
+      @topic.save!
+      put('update', params: {course_id: @course.id, topic_id: @topic.id,
+          title: 'Updated Topic',
+          locked: false,
+          delayed_post_at: nil})
+      expect(response).to have_http_status 200
+      expect(assigns[:topic].title).to eq 'Updated Topic'
+      expect(assigns[:topic].locked).to eq false
+      expect(assigns[:topic].delayed_post_at).to be_nil
+      expect(@topic.reload).not_to be_locked
+      expect(@topic.delayed_post_at).to be_nil
+    end
+
+    it "should be able to turn on locked and delayed_post_at date in same request" do
+      @topic.delayed_post_at = nil
+      @topic.locked = false
+      @topic.save!
+      delayed_post_time = Time.new(2018, 04, 15)
+      put('update', params: {course_id: @course.id, topic_id: @topic.id,
+          title: 'Updated Topic',
+          locked: true,
+          delayed_post_at: delayed_post_time.to_s})
+      expect(response).to have_http_status 200
+      expect(assigns[:topic].title).to eq 'Updated Topic'
+      expect(assigns[:topic].locked).to eq true
+      expect(assigns[:topic].delayed_post_at.year).to eq 2018
+      expect(assigns[:topic].delayed_post_at.month).to eq 4
+      expect(@topic.reload).to be_locked
+      expect(@topic.delayed_post_at.year).to eq 2018
+      expect(@topic.delayed_post_at.month).to eq 4
     end
 
     it "should not change the editor if only pinned was changed" do
