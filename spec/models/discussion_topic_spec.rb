@@ -270,11 +270,35 @@ describe DiscussionTopic do
       expect(@topic.visible_for?(@student)).to be_truthy
     end
 
-    it "should be visible to all teachers in the course" do
+    it "should be visible to teachers not locked to a section in the course" do
       @topic.update_attribute(:delayed_post_at, Time.now + 1.day)
       new_teacher = user_factory
       @course.enroll_teacher(new_teacher).accept!
       expect(@topic.visible_for?(new_teacher)).to be_truthy
+    end
+
+    it "should not be visible to teachers locked to a different section in a course" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      new_teacher = user_factory
+      @course.enroll_teacher(new_teacher, section: section1, allow_multiple_enrollments: true).accept!
+      Enrollment.limit_privileges_to_course_section!(@course, new_teacher, true)
+      ann = @course.announcements.create!(message: "testing", is_section_specific: true, course_sections: [section2])
+      ann.save!
+      expect(ann.visible_for?(new_teacher)).not_to be_truthy
+    end
+
+    it "should be visible to teachers locked to the same section in a course" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      new_teacher = user_factory
+      @course.enroll_teacher(new_teacher, section: section1, allow_multiple_enrollments: true).accept!
+      Enrollment.limit_privileges_to_course_section!(@course, new_teacher, true)
+      ann = @course.announcements.create!(message: "testing", is_section_specific: true, course_sections: [section1])
+      ann.save!
+      expect(ann.visible_for?(new_teacher)).to be_truthy
     end
 
     it "unpublished topics should not be visible to custom account admins by default" do

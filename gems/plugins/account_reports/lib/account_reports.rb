@@ -49,8 +49,7 @@ module AccountReports
   end
 
   def self.generate_report(account_report)
-    account_report.update_attribute(:workflow_state, 'running')
-    account_report.start_at ||= Time.now
+    account_report.update_attributes(workflow_state: 'running', start_at: Time.zone.now)
     begin
       REPORTS[account_report.report_type][:proc].call(account_report)
     rescue => e

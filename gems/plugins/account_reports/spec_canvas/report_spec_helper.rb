@@ -34,7 +34,9 @@ module ReportSpecHelper
                                        :report_type => type)
     account_report.parameters = parameters
     account_report.save
-    AccountReports.available_reports[type].proc.call(account_report)
+    if AccountReport.available_reports[type]
+      AccountReports.generate_report(account_report)
+    end
     account_report
   end
 
