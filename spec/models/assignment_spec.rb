@@ -23,6 +23,10 @@ require_relative '../lti2_spec_helper'
 describe Assignment do
   include_context 'lti2_spec_helper'
 
+  describe 'relationships' do
+    it { is_expected.to have_one(:score_statistic).dependent(:destroy) }
+  end
+
   before :once do
     course_with_teacher(active_all: true)
     @initial_student = student_in_course(active_all: true, user_name: 'a student').user

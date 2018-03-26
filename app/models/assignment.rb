@@ -80,6 +80,8 @@ class Assignment < ActiveRecord::Base
   has_many :line_items, inverse_of: :assignment, class_name: 'Lti::LineItem', dependent: :destroy
 
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :inverse_of => :context, :dependent => :destroy
+  has_one :score_statistic, dependent: :destroy
+
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :group_category_changes_ok?
   validate :anonymous_grading_changes_ok?

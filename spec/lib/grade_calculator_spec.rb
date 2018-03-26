@@ -973,6 +973,24 @@ describe GradeCalculator do
             expect(overall_course_score.unposted_final_points).to eq(468.70)
           end
         end
+
+        it 'updates score statistics for all assignments' do
+          assignment_count = @course.assignments.size
+          calculator = GradeCalculator.new(@student.id, @course)
+          ScoreStatistic.where(assignment: @course.assignments).destroy_all
+
+          expect { calculator.compute_and_save_scores }.to change {
+            ScoreStatistic.where(assignment: @course.assignments).size
+          }.from(0).to(assignment_count)
+        end
+
+        it 'does not update score statistics when calculating scores for muted assignments' do
+          calculator = GradeCalculator.new(@student.id, @course, ignore_muted: false)
+
+          expect { calculator.compute_and_save_scores }.not_to change {
+            ScoreStatistic.where(assignment: @course.assignments)
+          }
+        end
       end
 
       describe 'assignment group scores' do
@@ -1119,6 +1137,16 @@ describe GradeCalculator do
           not_to (change { @student.enrollments.first.scores.where.not(grading_period_id: nil).map(&:updated_at) })
       end
 
+      it 'updates score statistics for all assignments' do
+        assignment_count = @course.assignments.size
+        calculator = GradeCalculator.new(@student.id, @course)
+        ScoreStatistic.where(assignment: @course.assignments).destroy_all
+
+        expect { calculator.compute_and_save_scores }.to change {
+          ScoreStatistic.where(assignment: @course.assignments).size
+        }.from(0).to(assignment_count)
+      end
+
       context 'when a grading period is provided' do
         it 'updates the grading period score' do
           GradeCalculator.new(@student.id, @course, grading_period: @first_period).compute_and_save_scores
@@ -1128,6 +1156,17 @@ describe GradeCalculator do
         it 'updates the overall course score' do
           GradeCalculator.new(@student.id, @course, grading_period: @first_period).compute_and_save_scores
           expect(overall_course_score.current_score).to eq(91.37)
+        end
+
+        it 'does not update score statistics if the course score is not updated' do
+          unmuted_assignment_count = @course.assignments.where(muted: false).size
+          calculator_options = { grading_period: @first_period, update_course_score: false }
+          calculator = GradeCalculator.new(@student.id, @course, calculator_options)
+          ScoreStatistic.where(assignment: @course.assignments).destroy_all
+
+          expect { calculator.compute_and_save_scores }.not_to change {
+            ScoreStatistic.where(assignment: @course.assignments).size
+          }.from(0)
         end
 
         it 'does not update scores for other grading periods' do
