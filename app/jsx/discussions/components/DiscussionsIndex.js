@@ -55,6 +55,7 @@ export default class DiscussionsIndex extends Component {
     contextId: string.isRequired,
     contextType: string.isRequired,
     deleteDiscussion: func.isRequired,
+    discussionTopicMenuTools: arrayOf(propTypes.discussionTopicMenuTools),
     duplicateDiscussion: func.isRequired,
     getDiscussions: func.isRequired,
     handleDrop: func,
@@ -70,9 +71,11 @@ export default class DiscussionsIndex extends Component {
   }
 
   static defaultProps = {
+    discussionTopicMenuTools: [],
     pinnedDiscussions: [],
     unpinnedDiscussions: [],
     closedForCommentsDiscussions: [],
+    masterCourseData: {},
     handleDrop: undefined,
   }
 
@@ -151,6 +154,7 @@ export default class DiscussionsIndex extends Component {
             <DiscussionsContainer
               title={I18n.t('Pinned Discussions')}
               discussions={this.props.pinnedDiscussions}
+              discussionTopicMenuTools={this.props.discussionTopicMenuTools}
               permissions={this.props.permissions}
               masterCourseData={this.props.masterCourseData}
               roles={this.props.roles}
@@ -163,6 +167,7 @@ export default class DiscussionsIndex extends Component {
             title={I18n.t('Discussions')}
             discussions={this.props.unpinnedDiscussions}
             permissions={this.props.permissions}
+            discussionTopicMenuTools={this.props.discussionTopicMenuTools}
             masterCourseData={this.props.masterCourseData}
             toggleSubscribe={this.props.toggleSubscriptionState}
             duplicateDiscussion={this.props.duplicateDiscussion}
@@ -182,6 +187,7 @@ export default class DiscussionsIndex extends Component {
             title={I18n.t('Closed for Comments')}
             discussions={this.props.closedForCommentsDiscussions}
             permissions={this.props.permissions}
+            discussionTopicMenuTools={this.props.discussionTopicMenuTools}
             masterCourseData={this.props.masterCourseData}
             toggleSubscribe={this.props.toggleSubscriptionState}
             duplicateDiscussion={this.props.duplicateDiscussion}
@@ -218,6 +224,7 @@ export default class DiscussionsIndex extends Component {
             deleteDiscussion={this.openDeleteDiscussionsModal}
             toggleSubscribe={this.props.toggleSubscriptionState}
             updateDiscussion={this.props.updateDiscussion}
+            discussionTopicMenuTools={this.props.discussionTopicMenuTools}
             handleDrop={this.props.handleDrop}
             duplicateDiscussion={this.props.duplicateDiscussion}
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
@@ -238,6 +245,7 @@ export default class DiscussionsIndex extends Component {
             deleteDiscussion={this.openDeleteDiscussionsModal}
             permissions={this.props.permissions}
             masterCourseData={this.props.masterCourseData}
+            discussionTopicMenuTools={this.props.discussionTopicMenuTools}
             toggleSubscribe={this.props.toggleSubscriptionState}
             updateDiscussion={this.props.updateDiscussion}
             handleDrop={this.props.handleDrop}
@@ -264,6 +272,7 @@ export default class DiscussionsIndex extends Component {
             masterCourseData={this.props.masterCourseData}
             toggleSubscribe={this.props.toggleSubscriptionState}
             updateDiscussion={this.props.updateDiscussion}
+            discussionTopicMenuTools={this.props.discussionTopicMenuTools}
             handleDrop={this.props.handleDrop}
             duplicateDiscussion={this.props.duplicateDiscussion}
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
@@ -307,16 +316,17 @@ const connectState = state =>
     },
     selectPaginationState(state, 'discussions'),
     select(state, [
-      'permissions',
-      'contextType',
-      'contextId',
-      'roles',
-      'masterCourseData',
-      'pinnedDiscussions',
       'closedForCommentsDiscussions',
-      'unpinnedDiscussions',
       'contextId',
-      'contextType'
+      'contextId',
+      'contextType',
+      'contextType',
+      'discussionTopicMenuTools',
+      'masterCourseData',
+      'permissions',
+      'pinnedDiscussions',
+      'roles',
+      'unpinnedDiscussions',
     ])
   )
 const connectActions = dispatch =>

@@ -39,6 +39,7 @@ export default combineReducers({
   courseSettings: courseSettingsReducer,
   currentUserId: identity(null),
   discussions: createPaginatedReducer('discussions'),
+  discussionTopicMenuTools: identity([]),
   isSavingSettings: isSavingSettingsReducer,
   isSettingsModalOpen: isSettingsModalOpenReducer,
   masterCourseData: identity(null),

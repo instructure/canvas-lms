@@ -244,3 +244,41 @@ test('renders mastery paths menu item if permitted', () => {
   equal(allKeys.length, 1)
   equal(allKeys[0], 'masterypaths')
 })
+
+test('renders ltiTool menu if there are some', () => {
+  const tree=mount(<DiscussionRow {...makeProps({
+    discussionTopicMenuTools:[{
+      base_url: "test.com",
+      canvas_icon_class: "icon-lti",
+      icon_url: "iconUrltest.com",
+      title: "discussion_topic_menu Text",
+    }]
+  })} />)
+  const courseItemRow = tree.find('CourseItemRow')
+  const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
+  equal(allKeys.length, 1)
+  equal(allKeys[0], 'test.com')
+})
+
+test('renders multiple ltiTool menu if there are multiple', () => {
+  const tree=mount(<DiscussionRow {...makeProps({
+    discussionTopicMenuTools:[
+      {
+        base_url: "test.com",
+        canvas_icon_class: "icon-lti",
+        icon_url: "iconUrltest.com",
+        title: "discussion_topic_menu Text",
+      },
+      {
+        base_url: "test2.com",
+        canvas_icon_class: "icon-lti",
+        icon_url: "iconUrltest2.com",
+        title: "discussion_topic_menu otherText",
+      }
+    ]
+  })} />)
+  const courseItemRow = tree.find('CourseItemRow')
+  const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
+  equal(allKeys.length, 2)
+  equal(allKeys[1], 'test2.com')
+})

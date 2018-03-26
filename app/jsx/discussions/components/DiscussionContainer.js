@@ -58,6 +58,7 @@ export default class DiscussionsContainer extends Component {
     masterCourseData: masterCourseDataShape,
     title: string.isRequired,
     toggleSubscribe: func.isRequired,
+    discussionTopicMenuTools: arrayOf(propTypes.discussionTopicMenuTools),
     updateDiscussion: func.isRequired,
     handleDrop: func, // eslint-disable-line
     duplicateDiscussion: func.isRequired,
@@ -78,6 +79,7 @@ export default class DiscussionsContainer extends Component {
     closedState: undefined,
     roles: ['user', 'student'],
     onMoveDiscussion: null,
+    discussionTopicMenuTools: [],
     deleteDiscussion: null,
     handleDrop: undefined,
   }
@@ -149,6 +151,7 @@ export default class DiscussionsContainer extends Component {
             masterCourseData={this.props.masterCourseData}
             onToggleSubscribe={this.props.toggleSubscribe}
             duplicateDiscussion={this.props.duplicateDiscussion}
+            discussionTopicMenuTools={this.props.discussionTopicMenuTools}
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
             updateDiscussion={this.props.updateDiscussion}
             onMoveDiscussion={this.props.onMoveDiscussion}
@@ -169,6 +172,7 @@ export default class DiscussionsContainer extends Component {
             displayMasteryPathsMenuItem={cyoe.isCyoeAble}
             canPublish={this.props.permissions.publish}
             masterCourseData={this.props.masterCourseData}
+            discussionTopicMenuTools={this.props.discussionTopicMenuTools}
             onToggleSubscribe={this.props.toggleSubscribe}
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
             duplicateDiscussion={this.props.duplicateDiscussion}

@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!discussion_row'
 import React, { Component } from 'react'
-import { func, bool } from 'prop-types'
+import { func, bool, arrayOf } from 'prop-types'
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
 
@@ -42,6 +42,7 @@ import IconPinSolid from 'instructure-icons/lib/Solid/IconPinSolid'
 import IconPinLine from 'instructure-icons/lib/Line/IconPinLine'
 import IconReply from 'instructure-icons/lib/Line/IconReplyLine'
 import IconUnpublishedLine from 'instructure-icons/lib/Line/IconUnpublishedLine'
+import IconLtiLine from 'instructure-icons/lib/Line/IconLtiLine'
 
 import DiscussionModel from 'compiled/models/DiscussionTopic'
 import compose from '../helpers/compose'
@@ -50,6 +51,7 @@ import CourseItemRow from './CourseItemRow'
 import UnreadBadge from './UnreadBadge'
 
 import ToggleIcon from './ToggleIcon'
+import propTypes from '../../discussions/propTypes'
 import discussionShape from '../proptypes/discussion'
 import masterCourseDataShape from '../proptypes/masterCourseData'
 
@@ -68,13 +70,13 @@ function makeTimestamp ({ delayed_post_at, posted_at }) {
   }
   : { title: I18n.t('Posted on:'), date: posted_at }
 }
-const discussionTarget = {
+const dragTarget = {
   beginDrag (props) {
     return props.discussion
   },
 }
 
-const otherTarget = {
+const dropTarget = {
   hover(props, monitor, component) {
     const dragIndex = monitor.getItem().sortableId
     const hoverIndex = props.discussion.sortableId
@@ -104,35 +106,37 @@ const otherTarget = {
 
 export default class DiscussionRow extends Component {
   static propTypes = {
-    discussion: discussionShape.isRequired,
-    masterCourseData: masterCourseDataShape,
-    rowRef: func,
-    moveCard: func, // eslint-disable-line
-    deleteDiscussion: func.isRequired,
-    onSelectedChanged: func,
-    connectDragSource: func,
+    canPublish: bool.isRequired,
+    cleanDiscussionFocus: func.isRequired,
     connectDragPreview: func,
+    connectDragSource: func,
     connectDropTarget: func,
-    isDragging: bool,
-    draggable: bool,
-    onToggleSubscribe: func.isRequired,
-    displayManageMenu: bool.isRequired,
-    displayPinMenuItem: bool.isRequired,
-    displayDuplicateMenuItem: bool.isRequired,
+    deleteDiscussion: func.isRequired,
+    discussion: discussionShape.isRequired,
+    discussionTopicMenuTools: arrayOf(propTypes.discussionTopicMenuTools),
     displayDeleteMenuItem: bool.isRequired,
+    displayDuplicateMenuItem: bool.isRequired,
     displayLockMenuItem: bool.isRequired,
     displayMasteryPathsMenuItem: bool.isRequired,
+    displayManageMenu: bool.isRequired,
+    displayPinMenuItem: bool.isRequired,
+    draggable: bool,
     duplicateDiscussion: func.isRequired,
-    cleanDiscussionFocus: func.isRequired,
-    updateDiscussion: func.isRequired,
-    canPublish: bool.isRequired,
+    isDragging: bool,
+    masterCourseData: masterCourseDataShape,
+    moveCard: func, // eslint-disable-line
     onMoveDiscussion: func,
+    onSelectedChanged: func,
+    onToggleSubscribe: func.isRequired,
+    rowRef: func,
+    updateDiscussion: func.isRequired,
   }
 
   static defaultProps = {
     connectDragPreview (component) {return component},
     connectDragSource (component) {return component},
     connectDropTarget (component) {return component},
+    discussionTopicMenuTools: [],
     draggable: false,
     isDragging: false,
     masterCourseData: null,
@@ -142,7 +146,7 @@ export default class DiscussionRow extends Component {
     rowRef () {},
   }
 
-  onManageDiscussion = (e, { action, id }) => {
+  onManageDiscussion = (e, { action, id, menuTool }) => {
     switch (action) {
      case 'duplicate':
        this.props.duplicateDiscussion(id)
@@ -167,6 +171,9 @@ export default class DiscussionRow extends Component {
        window.location =
          `discussion_topics/${this.props.discussion.id}/edit?return_to=${returnTo}#mastery-paths-editor`
        break
+     case 'ltiMenuTool':
+        window.location = `${menuTool.base_url}&discussion_topics[]=${id}`
+        break
      default:
        throw new Error(I18n.t('Unknown manage discussion action encountered'))
     }
@@ -253,6 +260,19 @@ export default class DiscussionRow extends Component {
     }
   }
 
+  createMenuItem = (itemKey, visibleItemLabel, screenReaderContent) => (
+      <MenuItem
+        key={itemKey}
+        value={{ action: itemKey, id: this.props.discussion.id }}
+        id={`${itemKey}-discussion-menu-option`}
+      >
+        {visibleItemLabel}
+        <ScreenReaderContent>
+          {screenReaderContent}
+        </ScreenReaderContent>
+      </MenuItem>
+  )
+
   renderIcon = () => {
     if(this.props.discussion.assignment) {
       if(this.props.discussion.published) {
@@ -272,19 +292,15 @@ export default class DiscussionRow extends Component {
     return null
   }
 
-  createMenuItem = (itemKey, visibleItemLabel, screenReaderContent) => (
-      <MenuItem
-        key={itemKey}
-        value={{ action: itemKey, id: this.props.discussion.id }}
-        id={`${itemKey}-discussion-menu-option`}
-      >
-        {visibleItemLabel}
-        <ScreenReaderContent>
-          {screenReaderContent}
-        </ScreenReaderContent>
-      </MenuItem>
-  )
-
+  renderMenuToolIcon (menuTool) {
+    if (menuTool.canvas_icon_class){
+      return <span><i className={menuTool.canvas_icon_class}/>&nbsp;&nbsp;{menuTool.title}</span>
+    } else if (menuTool.icon_url) {
+      return <span><img className="icon" alt="" src={menuTool.icon_url} />&nbsp;&nbsp;{menuTool.title}</span>
+    } else {
+      return <span><IconLtiLine />&nbsp;&nbsp;{menuTool.title}</span>
+    }
+  }
 
   renderMenuList = () => {
     const discussionTitle = this.props.discussion.title
@@ -336,6 +352,23 @@ export default class DiscussionRow extends Component {
         ( <span aria-hidden='true'>{ I18n.t('Mastery Paths') }</span> ),
         I18n.t('Edit Mastery Paths for %{title}', { title: discussionTitle })
       ))
+    }
+
+    if(this.props.discussionTopicMenuTools.length > 0) {
+      this.props.discussionTopicMenuTools.forEach((menuTool) =>  {
+        menuList.push(
+          <MenuItem
+            key={menuTool.base_url}
+            value={{ action: 'ltiMenuTool', id: this.props.discussion.id, title: this.props.discussion.title, menuTool }}
+            id="menuTool-discussion-menu-option"
+          >
+            <span aria-hidden='true'>
+              {this.renderMenuToolIcon(menuTool)}
+            </span>
+            <ScreenReaderContent>{ menuTool.title }</ScreenReaderContent>
+          </MenuItem>
+        )
+      })
     }
 
     if (this.props.displayDeleteMenuItem) {
@@ -428,10 +461,10 @@ export default class DiscussionRow extends Component {
 
   /* eslint-disable new-cap */
 export const DraggableDiscussionRow = compose(
-    DropTarget('Discussion', otherTarget, connect => ({
+    DropTarget('Discussion', dropTarget, connect => ({
       connectDropTarget: connect.dropTarget()
     })),
-    DragSource('Discussion', discussionTarget, (connect, monitor) => ({
+    DragSource('Discussion', dragTarget, (connect, monitor) => ({
       connectDragSource: connect.dragSource(),
       isDragging: monitor.isDragging(),
       connectDragPreview: connect.dragPreview(),
