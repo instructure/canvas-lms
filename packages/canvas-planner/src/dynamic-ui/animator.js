@@ -32,6 +32,11 @@ export class Animator {
   fixedElement = null;
   fixedElementsInitialPositionInViewport = null;
 
+  // Get the window registered with this animator. Mostly for testing.
+  getWindow () {
+    return this.window;
+  }
+
   focusElement (elt) {
     // focusing an element causes it to scroll into view, so do the focus first so it doesn't
     // override maintaining the viewport position.
@@ -82,6 +87,15 @@ export class Animator {
 
   isAboveScreen (elt, offset) {
     return elt.getBoundingClientRect().top < offset;
+  }
+
+  documentIsTallerThanScreen () {
+    // clientHeight is rounded to an integer, while the rect is a more precise
+    // float. Add some padding so we err on the side of loading too much.
+    // Also, Canvas's footer makes the document always at least as tall as
+    // the viewport.
+    const doc = this.window.document.documentElement;
+    return doc.getBoundingClientRect().height > doc.clientHeight + 2;
   }
 
   runAnimationQueue = () => {

@@ -19,3 +19,4 @@
 export * from './scroll-to-last-loaded-new-activity';
 export * from './scroll-to-new-activity';
 export * from './maintain-scroll-position';
+export * from './continue-initial-load';

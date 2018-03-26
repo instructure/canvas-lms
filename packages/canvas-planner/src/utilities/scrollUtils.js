@@ -24,8 +24,14 @@ function isScrollPositionAtBottom (wind) {
   const doc = wind.document.documentElement;
   const docBottom = doc.getBoundingClientRect().bottom;
   const clientHeight = doc.clientHeight;
+  // clientHeight is rounded to an integer, while the rect is a more precise
+  // float. This means sometimes bottom is greater than the clientHeight
+  // because clientHeight has been rounded off. Also, there appears to be
+  // a bug with chrome when zoomed out and this will be off by more than
+  // half a pixel. So to fix this, we'll pad the clientHeight just a little
+  // so things will work when we're near the bottom.
 
-  return docBottom <= clientHeight;
+  return docBottom <= clientHeight + 2;
 }
 
 function isScrollUpKey (key) {

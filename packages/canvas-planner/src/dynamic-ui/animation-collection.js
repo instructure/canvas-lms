@@ -20,6 +20,7 @@ import {
   MaintainScrollPosition,
   ScrollToNewActivity,
   ScrollToLastLoadedNewActivity,
+  ContinueInitialLoad,
 
   // ResetFocus,
   // FocusSavedItem,
@@ -31,6 +32,14 @@ import {
 
 export class AnimationCollection {
   static actionsToAnimations = [
+    {
+      expected: [
+        'CONTINUE_LOADING_INITIAL_ITEMS',
+        'START_LOADING_FUTURE_SAGA',
+        'GOT_DAYS_SUCCESS',
+      ],
+      animation: ContinueInitialLoad,
+    },
     {
       expected: [
         'SCROLL_TO_NEW_ACTIVITY',

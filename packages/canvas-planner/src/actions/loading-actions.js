@@ -25,6 +25,7 @@ import { itemsToDays } from '../utilities/daysUtils';
 
 export const {
   startLoadingItems,
+  continueLoadingInitialItems,
   foundFirstNewActivityDate,
   gettingFutureItems,
   allFutureItemsLoaded,
@@ -35,6 +36,7 @@ export const {
   startLoadingPastUntilNewActivitySaga,
 } = createActions(
   'START_LOADING_ITEMS',
+  'CONTINUE_LOADING_INITIAL_ITEMS',
   'FOUND_FIRST_NEW_ACTIVITY_DATE',
   'GETTING_FUTURE_ITEMS',
   'ALL_FUTURE_ITEMS_LOADED',
@@ -86,6 +88,7 @@ export function getFirstNewActivityDate (fromMoment) {
 export function getPlannerItems (fromMoment) {
   return (dispatch, getState) => {
     dispatch(startLoadingItems());
+    dispatch(continueLoadingInitialItems()); // a start counts as a continue for the ContinueInitialLoad animation
     dispatch(getFirstNewActivityDate(fromMoment));
     dispatch(startLoadingFutureSaga());
   };
