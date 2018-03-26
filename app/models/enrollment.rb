@@ -1343,9 +1343,10 @@ class Enrollment < ActiveRecord::Base
     if being_deleted? && !enrollments_exist_for_user_in_course?
       return unless (assignment_ids = assignment_scope.pluck(:id)).any?
 
-      override_scope
-        .where(assignment_id: assignment_ids)
-        .find_each(&:destroy)
+      # this is handled in after_commit :update_cached_due_dates
+      AssignmentOverrideStudent.suspend_callbacks(:update_cached_due_dates) do
+        override_scope.where(assignment_id: assignment_ids).find_each(&:destroy)
+      end
     end
   end
 

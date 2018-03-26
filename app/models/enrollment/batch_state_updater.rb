@@ -139,10 +139,13 @@ class Enrollment::BatchStateUpdater
     courses.each do |c|
       assignment_ids = Assignment.where(context_id: c, context_type: 'Course').pluck(:id)
       next unless assignment_ids
-      AssignmentOverrideStudent.
-        where(user_id: user_ids, assignment_id: assignment_ids).
-        where.not(user_id: c.enrollments.where(user_id: user_ids).
-        where.not(id: batch).select(:user_id)).each(&:destroy)
+      # this is handled in :update_cached_due_dates
+      AssignmentOverrideStudent.suspend_callbacks(:update_cached_due_dates) do
+        AssignmentOverrideStudent.
+          where(user_id: user_ids, assignment_id: assignment_ids).
+          where.not(user_id: c.enrollments.where(user_id: user_ids).
+          where.not(id: batch).select(:user_id)).each(&:destroy)
+      end
     end
   end
 

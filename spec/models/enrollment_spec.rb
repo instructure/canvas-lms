@@ -2605,6 +2605,14 @@ describe Enrollment do
         @course.enroll_student(user_factory)
       end
     end
+
+    it 'triggers once for enrollment.destroy' do
+      override = assignment_override_model(assignment: @assignments.first)
+      override.assignment_override_students.create(user: @student)
+      expect(DueDateCacher).to receive(:recompute_users_for_course).once
+      expect(DueDateCacher).to receive(:recompute).never
+      @enrollment.destroy
+    end
   end
 
   describe "#student_with_conditions?" do
