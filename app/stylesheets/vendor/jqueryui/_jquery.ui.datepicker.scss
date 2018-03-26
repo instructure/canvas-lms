@@ -72,7 +72,7 @@
   .ui-datepicker-time {
     @extend .ui-dialog-buttonpane;
     padding: 5px 6px;
-    text-align: right;
+    text-align: direction(right);
 
     input, select { padding: 2px; margin-bottom: 0; }
     .ui-datepicker-ok { margin-left: 6px; }
