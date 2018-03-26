@@ -29,7 +29,7 @@ import DiscussionRow, { DraggableDiscussionRow } from '../../shared/components/D
 import { discussionList } from '../../shared/proptypes/discussion'
 import masterCourseDataShape from '../../shared/proptypes/masterCourseData'
 import propTypes from '../propTypes'
-
+import CyoeHelper from '../../shared/conditional_release/CyoeHelper'
 
 // Handle drag and drop on a discussion. The props passed in tell us how we
 // should update the discussion if something is dragged into this container
@@ -132,6 +132,7 @@ export default class DiscussionsContainer extends Component {
   renderDiscussions () {
     return this.state.discussions.reduce((accumlator, discussion) => {
       if (discussion.filtered) { return accumlator }
+      const cyoe = CyoeHelper.getItemData(discussion.assignment_id)
       const row = this.props.permissions.moderate
         ? <DraggableDiscussionRow
             key={discussion.id}
@@ -143,6 +144,7 @@ export default class DiscussionsContainer extends Component {
             displayDeleteMenuItem={
               !(discussion.is_master_course_child_content && discussion.restricted_by_master_course)
             }
+            displayMasteryPathsMenuItem={cyoe.isCyoeAble}
             canPublish={this.props.permissions.publish}
             masterCourseData={this.props.masterCourseData}
             onToggleSubscribe={this.props.toggleSubscribe}
@@ -164,6 +166,7 @@ export default class DiscussionsContainer extends Component {
             displayDeleteMenuItem={
               !(discussion.is_master_course_child_content && discussion.restricted_by_master_course)
             }
+            displayMasteryPathsMenuItem={cyoe.isCyoeAble}
             canPublish={this.props.permissions.publish}
             masterCourseData={this.props.masterCourseData}
             onToggleSubscribe={this.props.toggleSubscribe}

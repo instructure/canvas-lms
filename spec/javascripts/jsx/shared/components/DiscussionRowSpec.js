@@ -185,7 +185,7 @@ test('renders move-to in manage menu if permitted', () => {
   const courseItemRow = tree.find('CourseItemRow')
   const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
   equal(allKeys.length, 1)
-  equal(allKeys[0], 'move')
+  equal(allKeys[0], 'moveTo')
 })
 
 test('renders pin item in manage menu if permitted', () => {
@@ -230,4 +230,17 @@ test('renders lock item in manage menu if permitted', () => {
   const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
   equal(allKeys.length, 1)
   equal(allKeys[0], 'togglelocked')
+})
+
+test('renders mastery paths menu item if permitted', () => {
+  const tree=mount(<DiscussionRow {...makeProps({
+    discussion: {
+      assignment_id: 2
+    },
+    displayMasteryPathsMenuItem: true
+  })} />)
+  const courseItemRow = tree.find('CourseItemRow')
+  const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
+  equal(allKeys.length, 1)
+  equal(allKeys[0], 'masterypaths')
 })

@@ -121,6 +121,7 @@ export default class DiscussionRow extends Component {
     displayDuplicateMenuItem: bool.isRequired,
     displayDeleteMenuItem: bool.isRequired,
     displayLockMenuItem: bool.isRequired,
+    displayMasteryPathsMenuItem: bool.isRequired,
     duplicateDiscussion: func.isRequired,
     cleanDiscussionFocus: func.isRequired,
     updateDiscussion: func.isRequired,
@@ -159,6 +160,12 @@ export default class DiscussionRow extends Component {
      case 'togglelocked':
        this.props.updateDiscussion(this.props.discussion, { locked: !this.props.discussion.locked },
          this.makePinSuccessFailMessages(this.props.discussion), 'manageMenu')
+       break
+     case 'masterypaths':
+       // This is terrible
+       const returnTo = encodeURIComponent(window.location.pathname)
+       window.location =
+         `discussion_topics/${this.props.discussion.id}/edit?return_to=${returnTo}#mastery-paths-editor`
        break
      default:
        throw new Error(I18n.t('Unknown manage discussion action encountered'))
@@ -265,92 +272,80 @@ export default class DiscussionRow extends Component {
     return null
   }
 
+  createMenuItem = (itemKey, visibleItemLabel, screenReaderContent) => (
+      <MenuItem
+        key={itemKey}
+        value={{ action: itemKey, id: this.props.discussion.id }}
+        id={`${itemKey}-discussion-menu-option`}
+      >
+        {visibleItemLabel}
+        <ScreenReaderContent>
+          {screenReaderContent}
+        </ScreenReaderContent>
+      </MenuItem>
+  )
+
+
   renderMenuList = () => {
+    const discussionTitle = this.props.discussion.title
     const menuList = []
-    if (this.props.displayDuplicateMenuItem) {
-      menuList.push(
-        <MenuItem
-          key="duplicate"
-          value={{ action: 'duplicate', id: this.props.discussion.id }}
-          id="duplicate-discussion-menu-option"
-        >
-          <span aria-hidden='true'>
-            <IconCopySolid />&nbsp;&nbsp;{I18n.t('Duplicate')}
-          </span>
-          <ScreenReaderContent>
-            { I18n.t('Duplicate discussion %{title}', { title: this.props.discussion.title }) }
-          </ScreenReaderContent>
-        </MenuItem>
-      )
+    if (this.props.displayLockMenuItem) {
+      const menuLabel = this.props.discussion.locked ? I18n.t('Open for comments')
+        : I18n.t('Close for comments')
+      const screenReaderContent = this.props.discussion.locked
+        ? I18n.t('Open discussion %{title} for comments', { title: discussionTitle })
+        : I18n.t('Close discussion %{title} for comments', { title: discussionTitle })
+      menuList.push(this.createMenuItem(
+        'togglelocked',
+        ( <span aria-hidden='true'> <IconReply />&nbsp;&nbsp;{menuLabel} </span> ),
+        screenReaderContent
+      ))
     }
 
     if (this.props.displayPinMenuItem) {
-      menuList.push(
-        <MenuItem
-          key="togglepinned"
-          value={{ action: 'togglepinned', id: this.props.discussion.id }}
-          id="togglepinned-discussion-menu-option"
-        >
-          {this.pinMenuItemDisplay()}
-          <ScreenReaderContent>
-          { this.props.discussion.pinned
-            ? I18n.t('Unpin discussion %{title}', { title: this.props.discussion.title })
-            : I18n.t('Pin discussion %{title}', { title: this.props.discussion.title })}
-          </ScreenReaderContent>
-        </MenuItem>
-      )
-    }
-
-    if (this.props.displayDeleteMenuItem) {
-      menuList.push(
-        <MenuItem
-          key="delete"
-          value={{ action: 'delete', id: this.props.discussion.id }}
-          id="delete-discussion-menu-option"
-        >
-          <span aria-hidden='true'>
-            <IconTrashSolid />&nbsp;&nbsp;{I18n.t('Delete')}
-          </span>
-          <ScreenReaderContent> { I18n.t('Delete discussion %{title}', { title: this.props.discussion.title }) } </ScreenReaderContent>
-        </MenuItem>
-      )
-    }
-
-    if (this.props.displayLockMenuItem) {
-      menuList.push(
-        <MenuItem
-          key="togglelocked"
-          value={{ action: 'togglelocked', id: this.props.discussion.id }}
-          id="togglelocked-discussion-menu-option"
-        >
-          <span aria-hidden='true'>
-            <IconReply />&nbsp;&nbsp;{ this.props.discussion.locked
-              ? I18n.t('Open for comments')
-              : I18n.t('Close for comments') }
-          </span>
-          <ScreenReaderContent>
-          { this.props.discussion.locked
-            ? I18n.t('Open discussion %{title} for comments', { title: this.props.discussion.title })
-            : I18n.t('Close discussion %{title} for comments', { title: this.props.discussion.title })}
-          </ScreenReaderContent>
-        </MenuItem>
-      )
+      const screenReaderContent = this.props.discussion.pinned
+        ? I18n.t('Unpin discussion %{title}', { title: discussionTitle })
+        : I18n.t('Pin discussion %{title}', { title: discussionTitle })
+      menuList.push(this.createMenuItem(
+        'togglepinned',
+        this.pinMenuItemDisplay(),
+        screenReaderContent
+      ))
     }
 
     if (this.props.onMoveDiscussion) {
-      menuList.push(
-        <MenuItem
-          key="move"
-          value={{ action: 'moveTo', id: this.props.discussion.id, title: this.props.discussion.title }}
-          id="move-discussion-menu-option"
-        >
-          <span aria-hidden='true'>
-            <IconUpdownLine />&nbsp;&nbsp;{I18n.t('Move To')}
-          </span>
-          <ScreenReaderContent> { I18n.t('Move discussion %{title}', { title: this.props.discussion.title }) } </ScreenReaderContent>
-        </MenuItem>
-      )
+      menuList.push(this.createMenuItem(
+        'moveTo',
+        ( <span aria-hidden='true'><IconUpdownLine />&nbsp;&nbsp;{I18n.t('Move To')}</span> ),
+        I18n.t('Move discussion %{title}', { title: discussionTitle })
+      ))
     }
+
+    if (this.props.displayDuplicateMenuItem) {
+      menuList.push(this.createMenuItem(
+        'duplicate',
+        ( <span aria-hidden='true'><IconCopySolid />&nbsp;&nbsp;{I18n.t('Duplicate')}</span> ),
+        I18n.t('Duplicate discussion %{title}', { title: discussionTitle })
+      ))
+    }
+
+    // This returns an empty struct if assignment_id is falsey
+    if (this.props.displayMasteryPathsMenuItem) {
+      menuList.push(this.createMenuItem(
+        'masterypaths',
+        ( <span aria-hidden='true'>{ I18n.t('Mastery Paths') }</span> ),
+        I18n.t('Edit Mastery Paths for %{title}', { title: discussionTitle })
+      ))
+    }
+
+    if (this.props.displayDeleteMenuItem) {
+      menuList.push(this.createMenuItem(
+        'delete',
+        ( <span aria-hidden='true'><IconTrashSolid />&nbsp;&nbsp;{I18n.t('Delete')}</span> ),
+        I18n.t('Delete discussion %{title}', { title: discussionTitle })
+      ))
+    }
+
     return menuList
   }
 
