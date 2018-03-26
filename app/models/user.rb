@@ -2646,8 +2646,8 @@ class User < ActiveRecord::Base
 
   def adminable_accounts
     @adminable_accounts ||= shard.activate do
-      Rails.cache.fetch(['adminable_accounts', self, ApplicationController.region].cache_key) do
-        adminable_accounts_scope.to_a
+      Rails.cache.fetch(['adminable_accounts_1', self, ApplicationController.region].cache_key) do
+        adminable_accounts_scope.order(Account.best_unicode_collation_key('name'), :id).to_a
       end
     end
   end
