@@ -166,7 +166,7 @@ class User < ActiveRecord::Base
     PageView.for_user(self, options)
   end
 
-  scope :of_account, lambda { |account| where("EXISTS (?)", account.user_account_associations.where("user_account_associations.user_id=users.id")).shard(account.shard) }
+  scope :of_account, lambda { |account| joins(:user_account_associations).where(:user_account_associations => {:account_id => account}).shard(account.shard) }
   scope :recently_logged_in, -> {
     eager_load(:pseudonyms).
         where("pseudonyms.current_login_at>?", 1.month.ago).
