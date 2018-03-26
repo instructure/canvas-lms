@@ -35,6 +35,7 @@ define [
         when 'loading'
           @$el.empty()
         else # show
-          @$el.html outcomeGroupTemplate _.extend data, readOnly: @readOnly()
+          canManage = !@readOnly() && @model.get 'can_edit'
+          @$el.html outcomeGroupTemplate _.extend data, canManage: canManage
       @$('input:first').focus()
       this

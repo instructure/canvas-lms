@@ -28,7 +28,7 @@ const createView = function(opts) {
   return view.render()
 }
 
-QUnit.module('OutcomeGroupView', {
+QUnit.module('OutcomeGroupView as a teacher', {
   setup() {
     fixtures.setup()
     fakeENV.setup()
@@ -37,7 +37,9 @@ QUnit.module('OutcomeGroupView', {
       context_type: 'Course',
       url: 'www.example.com',
       context_id: 1,
-      parent_outcome_group: {subgroups_url: 'www.example.com'}
+      parent_outcome_group: {subgroups_url: 'www.example.com'},
+      description: 'blah',
+      can_edit: true
     })
   },
   teardown() {
@@ -63,5 +65,54 @@ test('validates title is present', function() {
   view.$('#outcome_group_title').val('')
   ok(!view.isValid())
   ok(view.errors.title)
+  view.remove()
+})
+
+test('move, edit, and delete buttons appear', function() {
+  const view = createView({
+    state: 'show',
+    model: this.outcomeGroup
+  })
+  ok(view.$('.move_group_button').is(':visible'))
+  view.remove()
+})
+
+test('move, edit, and delete buttons do not appear when read only', function() {
+  const view = createView({
+    state: 'show',
+    model: this.outcomeGroup,
+    readOnly: true
+  })
+  ok(!view.$('.move_group_button').is(':visible'))
+  view.remove()
+})
+
+
+QUnit.module('OutcomeGroupView as a student', {
+  setup() {
+    fixtures.setup()
+    fakeENV.setup()
+    ENV.PERMISSIONS = {manage_outcomes: false}
+    this.outcomeGroup = new OutcomeGroup({
+      context_type: 'Course',
+      url: 'www.example.com',
+      context_id: 1,
+      parent_outcome_group: {subgroups_url: 'www.example.com'},
+      description: 'blah',
+      can_edit: false
+    })
+  },
+  teardown() {
+    fixtures.teardown()
+    fakeENV.teardown()
+  }
+})
+
+test('move, edit, and delete buttons do not appear', function() {
+  const view = createView({
+    state: 'show',
+    model: this.outcomeGroup
+  })
+  ok(!view.$('.move_group_button').is(':visible'))
   view.remove()
 })
