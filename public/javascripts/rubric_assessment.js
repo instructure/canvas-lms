@@ -95,22 +95,7 @@ window.rubricAssessment = {
           $criterion.find(".rating.selected").removeClass('selected');
           if (val || val === 0) {
             $criterion.find(".criterion_description").addClass('completed');
-            $criterion.find(".rating").each(function() {
-              const rating_val = numberHelper.parse($(this).find(".points").text());
-              const use_range = $criterion.find('.criterion_use_range').attr('checked')
-              if (rating_val === val) {
-                $(this).addClass('selected');
-              } else if (use_range) {
-                const $nextRating = $(this).next('.rating')
-                let min_value = 0;
-                if ($nextRating.find(".points").text()) {
-                  min_value = numberHelper.parse($nextRating.find('.points').text());
-                }
-                if ((rating_val > val) && (min_value < val)){
-                  $(this).addClass('selected');
-                }
-              }
-            });
+            rubricAssessment.highlightCriterionScore($criterion, val)
           } else {
             $criterion.find(".criterion_description").removeClass('completed');
           }
@@ -167,6 +152,25 @@ window.rubricAssessment = {
     });
 
     setInterval(rubricAssessment.sizeRatings, 2500);
+  },
+
+  highlightCriterionScore: function($criterion, val){
+    $criterion.find(".rating").each(function() {
+      const rating_val = numberHelper.parse($(this).find(".points").text());
+      const use_range = $criterion.find('.criterion_use_range').attr('checked')
+      if (rating_val === val) {
+        $(this).addClass('selected');
+      } else if (use_range) {
+        const $nextRating = $(this).next('.rating')
+        let min_value = 0;
+        if ($nextRating.find(".points").text()) {
+          min_value = numberHelper.parse($nextRating.find('.points').text());
+        }
+        if ((rating_val > val) && (min_value < val)){
+          $(this).addClass('selected');
+        }
+      }
+    });
   },
 
   sizeRatings: function() {
@@ -261,6 +265,7 @@ window.rubricAssessment = {
     if(data) {
       var assessment = data;
       var total = 0;
+      var $criterion = null;
       for(var idx in assessment.data) {
         var rating = assessment.data[idx];
         var comments = rating.comments_enabled ? rating.comments : rating.description;
@@ -269,7 +274,7 @@ window.rubricAssessment = {
         } else {
           var comments_html = htmlEscape(comments);
         }
-        var $criterion = $rubric.find("#criterion_" + rating.criterion_id);
+        $criterion = $rubric.find("#criterion_" + rating.criterion_id);
         if(!rating.id) {
           $criterion.find(".rating").each(function() {
             var rating_val = parseFloat($(this).find(".points").text(), 10);
@@ -301,6 +306,7 @@ window.rubricAssessment = {
         }
       }
       total = window.rubricAssessment.roundAndFormat(total);
+      if ($criterion) rubricAssessment.highlightCriterionScore($criterion, total);
       $rubric.find(".rubric_total").text(total);
     }
   },
