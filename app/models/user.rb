@@ -2044,7 +2044,7 @@ class User < ActiveRecord::Base
 
         Shackles.activate(:slave) do
           submissions = []
-          submissions += self.submissions.where("submissions.submitted_at > ? OR submissions.created_at > ?", opts[:start_at], opts[:start_at]).
+          submissions += self.submissions.where("GREATEST(submissions.submitted_at, submissions.created_at) > ?", opts[:start_at]).
             for_context_codes(context_codes).eager_load(:assignment).
             where("submissions.score IS NOT NULL AND assignments.workflow_state=? AND assignments.muted=?", 'published', false).
             order('submissions.created_at DESC').
