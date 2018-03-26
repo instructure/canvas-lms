@@ -29,7 +29,7 @@ import Text from '@instructure/ui-core/lib/components/Text'
 export default function CoursesTray({courses, hasLoaded}) {
   return (
     <Container as="div" padding="medium">
-      <Heading level="h3" as="h1">{I18n.t('Courses')}</Heading>
+      <Heading level="h3" as="h2">{I18n.t('Courses')}</Heading>
       <hr />
       <List variant="unstyled" margin="small 0" itemSpacing="small">
         {hasLoaded ? (

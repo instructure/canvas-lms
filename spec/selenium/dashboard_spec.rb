@@ -266,7 +266,7 @@ describe "dashboard" do
       it "should display course name in course menu", priority: "1", test_id: 215586 do
         f('#global_nav_courses_link').click
         expect(driver.current_url).not_to match(/\/courses$/)
-        expect(fj("[aria-label='Global navigation tray'] h1:contains('Courses')")).to be_displayed
+        expect(fj("[aria-label='Global navigation tray'] h2:contains('Courses')")).to be_displayed
         wait_for_ajax_requests
         expect(fj("[aria-label='Global navigation tray'] a:contains('#{@course.name}')")).to be_displayed
       end
@@ -282,7 +282,7 @@ describe "dashboard" do
         get "/"
 
         f('#global_nav_groups_link').click
-        expect(fj("[aria-label='Global navigation tray'] h1:contains('Groups')")).to be_displayed
+        expect(fj("[aria-label='Global navigation tray'] h2:contains('Groups')")).to be_displayed
         wait_for_ajax_requests
 
         list = fj("[aria-label='Global navigation tray']")
@@ -380,7 +380,7 @@ describe "dashboard" do
       get "/"
 
       f('#global_nav_courses_link').click
-      expect(fj("[aria-label='Global navigation tray'] h1:contains('Courses')")).to be_displayed
+      expect(fj("[aria-label='Global navigation tray'] h2:contains('Courses')")).to be_displayed
       expect(f("[aria-label='Global navigation tray']")).not_to include_text(c1.name)
     end
 
