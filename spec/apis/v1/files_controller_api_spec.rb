@@ -97,8 +97,7 @@ describe "Files API", type: :request do
         action: 'api_create',
         success_include: ['avatar'],
       }))
-      query = Rack::Utils.parse_nested_query(URI(response.headers['Location']).query)
-      expect(query['include']).to include('avatar')
+      expect(redirect_params['include']).to include('avatar')
     end
   end
 
@@ -125,9 +124,18 @@ describe "Files API", type: :request do
       @attachment.save!
     end
 
-    def call_create_success
-      api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
-               {:controller => "files", :action => "api_create_success", :format => "json", :id => @attachment.to_param, :uuid => @attachment.uuid})
+    def call_create_success(params = {})
+      api_call(
+        :post,
+        "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
+        params.merge({
+          controller: "files",
+          action: "api_create_success",
+          format: "json",
+          id: @attachment.to_param,
+          uuid: @attachment.uuid
+        })
+      )
     end
 
     it "should set the attachment to available (local storage)" do
@@ -253,6 +261,24 @@ describe "Files API", type: :request do
       assert_status(400)
     end
 
+    it "includes canvadoc preview url if requested and available" do
+      allow(Canvadocs).to receive(:enabled?).and_return(true)
+      allow(Canvadoc).to receive(:mime_types).and_return([@attachment.content_type])
+      local_storage!
+      upload_data
+      json = call_create_success(include: ['preview_url'])
+      expect(json['preview_url']).to include('/api/v1/canvadoc_session')
+    end
+
+    it "includes nil preview url if requested and not available" do
+      allow(Canvadocs).to receive(:enabled?).and_return(false)
+      allow(Canvadoc).to receive(:mime_types).and_return([])
+      local_storage!
+      upload_data
+      json = call_create_success(include: ['preview_url'])
+      expect(json['preview_url']).to be_nil
+    end
+
     context "upload success context callback" do
       before do
         allow_any_instance_of(Course).to receive(:file_upload_success_callback)
@@ -370,6 +396,20 @@ describe "Files API", type: :request do
       expect(attachment.display_name).to eq params[:name]
       expect(existing).to be_deleted
       expect(existing.replacement_attachment).to eq attachment
+    end
+
+    it "redirect has preview_url include if requested" do
+      raw_api_call(
+        :post,
+        "/api/v1/files/capture?#{base_params.to_query}",
+        base_params.merge(
+          controller: "files",
+          action: "api_capture",
+          format: "json",
+          include: ["preview_url"]
+        )
+      )
+      expect(redirect_params['include']).to include('preview_url')
     end
   end
 

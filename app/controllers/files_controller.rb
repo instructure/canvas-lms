@@ -846,8 +846,14 @@ class FilesController < ApplicationController
       progress.complete!
     end
 
-    url_params = {}
-    url_params[:include] = 'enhanced_preview_url' if @context.is_a?(User) || @context.is_a?(Course)
+    url_params = { include: [] }
+    includes = Array(params[:include])
+    if includes.include?('preview_url')
+      url_params[:include] << 'preview_url'
+    # only use implicit enhanced_preview_url if there is no explicit preview_url
+    elsif @context.is_a?(User) || @context.is_a?(Course)
+      url_params[:include] << 'enhanced_preview_url'
+    end
     render json: {}, status: :created, location: api_v1_attachment_url(@attachment, url_params)
   end
 
@@ -878,11 +884,16 @@ class FilesController < ApplicationController
       include: []
     }
 
-    if Array(params[:include]).include?('avatar')
+    includes = Array(params[:include])
+
+    if includes.include?('avatar')
       json_params[:include] << 'avatar'
     end
 
-    if @attachment.context.is_a?(User) || @attachment.context.is_a?(Course) || @attachment.context.is_a?(Group)
+    if includes.include?('preview_url')
+      json_params[:include] << 'preview_url'
+    # only use implicit enhanced_preview_url if there is no explicit preview_url
+    elsif @attachment.context.is_a?(User) || @attachment.context.is_a?(Course) || @attachment.context.is_a?(Group)
       json_params[:include] << 'enhanced_preview_url'
     end
 
