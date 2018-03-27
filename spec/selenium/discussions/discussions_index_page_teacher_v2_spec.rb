@@ -209,7 +209,6 @@ describe "discussions index" do
     end
 
     it 'pill on announcement displays correct number of unread replies' do
-      skip('Add with COMMS-693')
       login_and_visit_course(@teacher, @course)
       expect(DiscussionsIndex.discussion_unread_pill(discussion1_title)).to eq "2"
     end

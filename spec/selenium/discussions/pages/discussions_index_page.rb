@@ -86,7 +86,7 @@ class DiscussionsIndex
     end
 
     def discussion_unread_pill(title)
-      f('.ic-unread-badge__unread-count', discussion(title))
+      f('.ic-unread-badge__unread-count', discussion(title)).text
     end
 
     def discussion_unread_number(title)
