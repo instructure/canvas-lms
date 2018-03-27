@@ -378,7 +378,7 @@ test('UPDATE_DISCUSSIONS_SEARCH should set the filter flag on discussions', () =
 test('DELETE_DISCUSSION_SUCCESS should delete correct discussion', () => {
   const newState = reduce(actions.deleteDiscussionSuccess({ discussion: { title: "venk", id: 5, pinned: true, locked: false } }), {
     pinnedDiscussions: [
-      { title: "landon", id: 1, pinned: true, locked: false },
+      { title: "landon", id: 1, pinned: true, locked: false, permissions: { delete: true } },
       { title: "venk", id: 5, pinned: true, locked: false },
       { title: "steven", id: 2, pinned: true, locked: false },
       { title: "aaron", id: 10, pinned: true, locked: false }
@@ -387,7 +387,7 @@ test('DELETE_DISCUSSION_SUCCESS should delete correct discussion', () => {
     closedDiscussions: [],
   })
   deepEqual(newState.pinnedDiscussions, [
-    { title: "landon", id: 1, pinned: true, sortableId: 0, locked: false, focusOn: "manageMenu" },
+    { title: "landon", id: 1, pinned: true, sortableId: 0, locked: false, permissions: { delete: true }, focusOn: "manageMenu" },
     { title: "steven", id: 2, pinned: true, sortableId: 1, locked: false },
     { title: "aaron", id: 10, pinned: true, sortableId: 2, locked: false }
   ])
@@ -406,7 +406,7 @@ test('DELETE_DISCUSSION_SUCCESS should delete last discussion', () => {
 })
 
 test('DELETE_DISCUSSION_SUCCESS should not delete discussions not specified', () => {
-  const newState = reduce(actions.deleteDiscussionSuccess({ discussion: { title: "venk", id: 5, pinned: true, locked: false } }), {
+  const newState = reduce(actions.deleteDiscussionSuccess({ discussion: { title: "venk", id: 50, pinned: true, locked: false } }), {
     pinnedDiscussions: [
       { title: "landon", id: 1, pinned: true, locked: false },
       { title: "venk", id: 5, pinned: true, locked: false },
@@ -428,6 +428,54 @@ test('DELETE_DISCUSSION_SUCCESS should not delete discussions not specified', ()
     { title: "me-aaron", id: 10, pinned: true, locked: false }
   ])
 })
+
+test('DELETE_DISCUSSION_SUCCESS should focus correctly with students with mixed permissions', () => {
+  const newState = reduce(
+    actions.deleteDiscussionSuccess({
+      discussion: {title: 'tiny-venk-bloo', id: 55, pinned: false, locked: false}
+    }),
+    {
+      pinnedDiscussions: [
+        {title: 'landon', id: 1, pinned: true, locked: false},
+        {title: 'venk', id: 5, pinned: true, locked: false},
+        {title: 'steven', id: 2, pinned: true, locked: false},
+        {title: 'aaron', id: 10, pinned: true, locked: false}
+      ],
+      unpinnedDiscussions: [
+        {
+          title: 'landon-boss-bler',
+          id: 73,
+          pinned: false,
+          locked: false,
+          permissions: {delete: false}
+        },
+        {title: 'tiny-venk-bloo', id: 55, pinned: false, locked: false},
+        {title: 'silly-steven-bleh', id: 15, pinned: false, locked: false},
+        {title: 'me-aaron-blah', id: 33, pinned: false, locked: false}
+      ],
+      closedForCommentsDiscussions: [
+        {title: 'landon-boss', id: 30, pinned: false, locked: false},
+        {title: 'tiny-venk', id: 42, pinned: false, locked: false},
+        {title: 'silly-steven', id: 23, pinned: false, locked: false},
+        {title: 'me-aaron', id: 10, pinned: false, locked: false}
+      ]
+    }
+  )
+  deepEqual(newState.unpinnedDiscussions, [
+    {
+      title: 'landon-boss-bler',
+      id: 73,
+      pinned: false,
+      locked: false,
+      permissions: {delete: false},
+      focusOn: 'title'
+    },
+    {title: 'silly-steven-bleh', id: 15, pinned: false, locked: false},
+    {title: 'me-aaron-blah', id: 33, pinned: false, locked: false}
+  ])
+})
+
+
 test('DRAG_AND_DROP should add sortableId to pinned discussion and sort correctly', () => {
   const initialState = {
     pinnedDiscussions: [

@@ -36,7 +36,10 @@ const deleteReducerMap = {
     } else {
       const newFocusIndex = oldIndex - 1;
       if(newState[newFocusIndex]) {
-        newState[newFocusIndex] = { ...newState[newFocusIndex], focusOn: "manageMenu" }
+        newState[newFocusIndex] = {
+          ...newState[newFocusIndex],
+          focusOn: newState[newFocusIndex].permissions.delete ? 'manageMenu' : 'title'
+        }
         newState.splice(oldIndex, 1)
         return setSortableId(newState)
       } else { // There is no discussions left
