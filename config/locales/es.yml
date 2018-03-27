@@ -1981,7 +1981,7 @@ es:
   arrange_columns_by_assignment_group_33acdf03: "Arreglar columnas por grupo de trabajo"
   arrange_columns_by_assignment_group_59bbddd0: "Arreglar columnas por grupo de tarea"
   arrange_columns_by_due_date_888f2551: "Arreglar las columnas por hora límite de entrega"
-  arrange_columns_by_due_date_f74f9e2d: "Arreglar las columnas por hora límite de entrega"
+  arrange_columns_by_due_date_f74f9e2d: "Arreglar las columnas por fecha límite de entrega"
   arrange_columns_by_points_48da9ba3: "Disponer columnas por puntos"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Al escribir en este campo, la lista de grupos se filtrará automáticamente para incluir solo aquellos cuyo nombre coincida con su entrada."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Al escribir en este campo, la lista de resultados se actualizará automáticamente."
@@ -2021,7 +2021,7 @@ es:
     gpa_scale_explainer: "¿Qué es la calificación de escala GPA?"
     group_assignment_must_have_group_set: "Seleccione un grupo para esta tarea"
     labels: 
-      due: "Hora límite"
+      due: "Fecha límite"
     name_is_required: "Es obligatorio escribir un nombre"
     name_too_long: "El nombre es demasiado largo"
     points_possible_number: "Puntos posibles debe ser un número"
@@ -2112,7 +2112,7 @@ es:
   assignment_name_course_name_is_now_due_55613e9b: "%{assignment_name}, %{course_name}, se debe entregar ahora"
   assignment_name_course_name_no_longer_has_a_due_da_a37b6a7c: "%{assignment_name}, %{course_name}, ya no tiene una fecha límite de entrega"
   assignment_name_course_name_override_is_now_due_ed5ce1e: "%{assignment_name}, %{course_name} (%{override}) se debe entregar ahora"
-  assignment_name_course_name_override_no_longer_has_5a94da2b: "%{assignment_name}, %{course_name} (%{override}) ya no tiene una hora límite de entrega"
+  assignment_name_course_name_override_no_longer_has_5a94da2b: "%{assignment_name}, %{course_name} (%{override}) ya no tiene una fecha límite de entrega"
   assignment_name_grade_history_b506426c: "historial de calificación de %{assignment_name}"
   assignment_name_z_a_34f92f4b: "Nombre de la tarea - Z-A"
   assignment_options_1e5b7074: "Opciones de tarea"
@@ -2214,7 +2214,7 @@ es:
       delete_assignment: "¿Está seguro de que desea borrar esta tarea?"
     create_assignment: 
       assignment: Tarea
-      assignment_due_at: "Hora límite:"
+      assignment_due_at: "Fecha límite:"
       assignment_name: "Nombre:"
       assignment_points: "Puntos:"
       assignment_type: "Tipo:"
@@ -2245,8 +2245,8 @@ es:
       available: Disponible
       multiple_dates: "Varias fechas"
     date_due_column_view: 
-      due: "Hora límite"
-      due_date: "Hora límite"
+      due: "Fecha límite"
+      due_date: "Fecha límite"
       multiple_dates: "Varias fechas"
     delete_group: 
       cancel: Cancelar
@@ -2516,8 +2516,8 @@ es:
       date_time_by: "%{date} hasta %{time}"
       defaults: 
         no_content: "Sin contenido"
-      due: "Hora límite"
-      due_at: "Hora límite"
+      due: "Fecha límite"
+      due_at: "Fecha límite"
       for: Para
       links: 
         add_rubric: Rúbrica
@@ -2881,13 +2881,13 @@ es:
   blocked_by_running_migration_d8a57cb7: "Bloqueado por la migración en marcha"
   blue_daf8fea9: Azul
   blueprint_5cca2ef: Proyecto
-  blueprint_course_associations_72c9609: "Asociaciones del curso de proyectos"
-  blueprint_course_e16ed131: "Curso de heliografía"
-  blueprint_course_information_term_course_10d5cf30: "Información del curso de proyectos: %{term} - %{course}"
+  blueprint_course_associations_72c9609: "Asociaciones del curso plantilla"
+  blueprint_course_e16ed131: "Curso plantilla"
+  blueprint_course_information_term_course_10d5cf30: "Información del curso plantilla: %{term} - %{course}"
   blueprint_course_sync_finished_80cd9509: "La sincronización del curso de proyectos ha terminado"
   blueprint_course_sync_in_progress_a1e2622b: "La sincronización del curso de proyectos está en proceso"
-  blueprint_courses_9dd321b8: "Cursos de heliografía"
-  blueprint_courses_create_edit_associate_delete_bf41988e: "Cursos de heliografía (crear/editar/asociar/eliminar)"
+  blueprint_courses_9dd321b8: "Cursos plantilla"
+  blueprint_courses_create_edit_associate_delete_bf41988e: "Cursos plantilla (crear/editar/asociar/eliminar)"
   blueprint_information_95dcef55: "Información del plano"
   blueprint_settings_233e909a: "Configuración del proyecto"
   body_9f663faf: Cuerpo
@@ -3138,7 +3138,7 @@ es:
     sample_final_answer: "Este valor es un ejemplo de una respuesta final para este tipo de pregunta"
   calendar: 
     agenda_view: 
-      due: "Hora límite"
+      due: "Fecha límite"
       loading: Cargando
       no_events: "*Sin eventos después de esta fecha*."
       starts_at: "Comienza el:"
@@ -3221,7 +3221,7 @@ es:
       users: usuarios.
     edit_assignment: 
       calendar: "Calendario:"
-      due: "Hora límite:"
+      due: "Fecha límite:"
       group: "Grupo:"
       links: 
         more_options: "Más opciones"
@@ -3229,7 +3229,7 @@ es:
       title: "Título:"
     edit_assignment_override: 
       calendar: "Calendario:"
-      due: "Hora límite:"
+      due: "Fecha límite:"
       links: 
         more_options: "Más opciones"
     edit_calendar_event: 
@@ -3473,7 +3473,7 @@ es:
   cannot_delete_a_file_that_has_been_submitted_as_pa_fda24c4: "No se puede eliminar un archivo que se ha presentado como parte de una tarea"
   cannot_delete_an_override_with_a_due_date_within_a_fa94ca3b: "No se puede eliminar una anulación con una fecha debida dentro de un período de calificación cerrado"
   cannot_grade_at_this_time_489744b0: "No se puede calificar en este momento"
-  cannot_have_a_blueprint_course_with_students_248e3e76: "No puede tener un curso de proyectos con los alumnos"
+  cannot_have_a_blueprint_course_with_students_248e3e76: "No puede tener un curso plantilla con los alumnos"
   cannot_restrict_by_section_unless_groups_are_empty_662d3144: "No se puede restringir por sección a menos que los grupos estén vacíos y no tengan limitación de tamaño"
   cannot_set_only_visible_to_overrides_when_due_in_a_fac518ce: "No se puede establecer solo visible a las anulaciones cuando están vencidas en un período de calificación cerrado"
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "No se puede establecer una anulación de fecha debida a una fecha dentro de un período de calificación cerrado"
@@ -4189,7 +4189,7 @@ es:
         add_day_sub_title: "Agregar día de sustitución"
         beginning_change_to: "cambiar a"
         beginning_date: "Fecha de inicio"
-        checkbox_label: "Ajustar eventos y horas límites"
+        checkbox_label: "Ajustar eventos y fechas límites"
         date_adjustment: "Ajuste de datos"
         ending_change_to: "cambiar a"
         ending_date: "Fecha de finalización"
@@ -5078,7 +5078,7 @@ es:
   course_image_for_course_cfbb08df: "Imagen del curso de %{course}"
   course_image_settings_eba3ec55: "Configuraciones de la imagen del curso"
   course_implemented_apps_fa658f5a: "Aplicaciones Implementadas en el curso"
-  course_is_already_associated_with_a_blueprint_4d9407cb: "El curso ya está asociado con un proyecto"
+  course_is_already_associated_with_a_blueprint_4d9407cb: "El curso ya está asociado con una plantilla "
   course_list: 
     favorited_tooltip: "Haga clic para eliminar del menú de cursos."
     nonfavorited_tooltip: "Haga clic para agregar al menú de cursos."
@@ -5545,7 +5545,7 @@ es:
         allow_student_forum_attachments: "Permitir que los alumnos adjunten archivos a los foros"
         allow_student_organized_groups: "Permitir que los alumnos organicen sus propios grupos"
         blueprint: "Habilitar curso como Curso de proyectos"
-        blueprint_course: "Curso de heliografía"
+        blueprint_course: "Curso plantilla "
         conclude_at: Finaliza
         course_code: "Código del curso"
         course_description: Descripción
@@ -6400,8 +6400,8 @@ es:
   discussion_topics: 
     assignment_details: 
       available_from: "Disponible desde"
-      due: "Hora límite"
-      due_date: "hora límite %{date}"
+      due: "Fecha límite"
+      due_date: "fecha límite %{date}"
       for: Para
       graded_discussion_and_points: 
         one: "Este es un foro con calificación: *vale 1 punto*"
@@ -6536,7 +6536,7 @@ es:
       first_page: Primera
       last_page: Última
     peer_reviews: 
-      due_date: "hora límite %{date}"
+      due_date: "fecha límite %{date}"
       peer_review_alert: "Se le ha asignado una revisión entre pares para %{person}"
     points_possible_number: "Puntos posibles debe ser un número"
     published_button: 
@@ -6756,16 +6756,16 @@ es:
   dropdown_option_2_9766a346: "Opción de desplegable 2"
   dropped_38031953: Cancelado
   dropped_for_grading_purposes_46256461: "Eliminado por motivos de calificación"
-  due_a73610f6: "Hora límite"
-  due_assignment_due_date_time_5acdf3cf: "Hora límite: %{assignment_due_date_time}"
-  due_assignment_due_date_time_607f2e1d: "hora límite: %{assignment_due_date_time}"
+  due_a73610f6: "Fecha límite"
+  due_assignment_due_date_time_5acdf3cf: "Fecha límite: %{assignment_due_date_time}"
+  due_assignment_due_date_time_607f2e1d: "fecha límite: %{assignment_due_date_time}"
   due_at: "no se puede dejar en blanco cuando se selecciona la opción Publicar en SIS"
   due_at_5d7d2fa: "Vence el:"
   due_at_5e18eeac: "Vence el:"
   due_at_time_fa41cf6c: "Se vence a las: %{time}"
-  due_by_c263dc10: "hora límite:"
+  due_by_c263dc10: "fecha límite:"
   due_date_5d0a953c: "Fecha de entrega:"
-  due_date_6a281fe3: "Hora límite: %{date}"
+  due_date_6a281fe3: "Fecha límite: %{date}"
   due_date_822625d8: "Fecha límite"
   due_date_cannot_be_after_course_end_fd128a14: "La fecha límite no puede ser posterior a la fecha de finalización del curso"
   due_date_cannot_be_after_lock_date_675b30aa: "La fecha de entrega no puede ser después de la fecha de bloqueo"
@@ -6788,17 +6788,17 @@ es:
     no_due_date: "fecha límite: No hay fecha límite"
   due_dates_520a6c08: "Fechas de entrega"
   due_dates_changed_exceptions_ddb028: "Excepciones de modificación en las fechas de caducidad:"
-  due_datetime_f5a81b81: "Hora límite: %{dateTime}"
+  due_datetime_f5a81b81: "Fecha límite: %{dateTime}"
   due_dueat_39d7d6c2: "Se vence %{dueAt}"
-  due_dueat_ef67f6f4: "Hora límite: %{dueAt}"
+  due_dueat_ef67f6f4: "Fecha límite: %{dueAt}"
   due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: "Límite - Formato como DD-MM-YYYY hh:mm"
-  due_multiple_dates_cc0ee3f5: "Hora límite: varias fechas"
-  due_multiple_dates_ea8a95e1: "hora límite: varias fechas"
-  due_multiple_due_dates_d1b141b: "Hora límite: múltiples fechas límite"
-  due_no_due_date_2b226d2c: "Hora límite: no hay fecha límite"
-  due_no_due_date_3c1d1651: "hora límite: no hay fecha límite"
-  due_on_date_5ffb2182: "Hora límite de entrega el"
-  due_time_9acd6b69: "Hora límite %{time}"
+  due_multiple_dates_cc0ee3f5: "Fecha límite: varias fechas"
+  due_multiple_dates_ea8a95e1: "fecha límite: varias fechas"
+  due_multiple_due_dates_d1b141b: "Fecha límite: múltiples fechas límite"
+  due_no_due_date_2b226d2c: "Fecha límite: no hay fecha límite"
+  due_no_due_date_3c1d1651: "fecha límite: no hay fecha límite"
+  due_on_date_5ffb2182: "Fecha límite de entrega el"
+  due_time_9acd6b69: "Fecha límite %{time}"
   duplicate_31cec192: Duplicado
   duplicate_assignment_name_3ca7d753: "Tarea duplicada %{name}"
   duplicate_discussion_title_43b39959: "Duplicar debate %{title}"
@@ -6980,7 +6980,7 @@ es:
   ember_modules_description: "Módulos reescritos en Ember. Utiliza la API de arrastrar y soltar nativa para permitir arrastrar desde ubicaciones externas."
   empty_stub_for_testing_only_37aad38: "Vaciar archivo stub (solo para diagnóstico)"
   enable_6f5d1328: Habilitar
-  enable_course_as_a_blueprint_course_8515ffd5: "Habilitar curso como curso de proyectos"
+  enable_course_as_a_blueprint_course_8515ffd5: "Habilitar curso como Curso plantilla"
   enable_dashboard_images_for_courses_5af458b0: "Habilitar Imágenes del tablero de control para cursos"
   enable_feature_title_987d8e9a: "Habilitar función: %{title}"
   enable_gradebook_list_students_by_sortable_name: "Permite hacer una lista de los alumnos por orden alfabético en el libro de calificaciones. El orden predeterminado de los nombres es \"Apellido, Nombre\", aunque esta opción puede cambiarse en la configuración."
@@ -6992,7 +6992,7 @@ es:
   enable_or_condition_for_modules_a16f02d8: "Habilitar \"O\" Condiciones para Módulos"
   enable_reregistration_for_lti_2_b2a10444: "Habilitar el proceso de registro nuevamente para LTI 2"
   enable_student_context_card_links_eba2f2c5: "Permitir vínculos de tarjeta de contexto de alumno"
-  enable_the_creation_of_blueprint_courses_79f91c30: "Habilitar la creación de cursos de heliografía"
+  enable_the_creation_of_blueprint_courses_79f91c30: "Habilitar la creación de Cursos plantilla "
   enable_the_creation_of_master_courses_8205b155: "Habilitar la creación de cursos principales"
   enable_the_plagiarism_detection_platform_7c3b6195: "Activar la plataforma de detección de plagio"
   enabled_and_locked_49ff3de4: "Activado y bloqueado"
@@ -8346,7 +8346,7 @@ es:
       headers: 
         anonymous: "Calificado anónimamente"
         details: Detalles
-        due: "Hora límite"
+        due: "Fecha límite"
         grades: "Calificaciones para %{student}"
         name: Nombre
         out_of: De
@@ -10693,12 +10693,12 @@ es:
         no_due_date: "No Hay Fecha Límite"
       summary: 
         assignment_due_date_changed: "La fecha límite de la tarea ha cambiado: %{assignment_name}, %{course_name}"
-        due_at: "Hora límite: %{assignment_due_date_time}"
-        no_due_date: "hora límite: no hay fecha límite"
+        due_at: "Fecha límite: %{assignment_due_date_time}"
+        no_due_date: "fecha límite: no hay fecha límite"
       twitter: 
         assignment_change: "Alerta de Canvas-Cambio de fecha: %{assignment_name}, %{course_name}"
-        due_at: "Hora límite: %{assignment_due_date_time}"
-        no_due_date: "hora límite: no hay fecha límite"
+        due_at: "Fecha límite: %{assignment_due_date_time}"
+        no_due_date: "fecha límite: no hay fecha límite"
     assignment_due_date_override_changed: 
       email: 
         assignment_due_date_changed: "Cambio en la fecha límite de la tarea: %{assignment_name}, %{course_name} (%{override})"
@@ -10717,12 +10717,12 @@ es:
         no_due_date: "Sin fecha de vencimiento"
       summary: 
         assignment_due_date_changed: "Cambio en la fecha límite de la tarea: %{assignment_name}, %{course_name} (%{override})"
-        due_at: "hora límite: %{assignment_due_date_time}"
-        no_due_date: "hora límite: no hay fecha límite"
+        due_at: "fecha límite: %{assignment_due_date_time}"
+        no_due_date: "fecha límite: no hay fecha límite"
       twitter: 
         assignment_change: "Alerta de Canvas-Cambio de fecha: %{assignment_name}, %{course_name} (%{override})"
-        due_at: "hora límite: %{assignment_due_date_time}"
-        no_due_date: "hora límite: no hay fecha límite"
+        due_at: "fecha límite: %{assignment_due_date_time}"
+        no_due_date: "fecha límite: no hay fecha límite"
     assignment_graded: 
       email: 
         assignment_graded: "Tarea calificada: %{assignment_name}, %{course_name}"
@@ -10822,38 +10822,38 @@ es:
     assignment_unpublished_module: "Esta tarea es parte de un módulo sin publicar y aún no está disponible."
     blueprint_content_added: 
       email: 
-        body: "Los cambios del curso de proyectos se han sincronizado en %{name}."
+        body: "Los cambios del curso plantilla se han sincronizado en %{name}."
         details_link: "Ver cambios: %{link}"
         html: 
-          body: "Los cambios del curso de proyectos se han sincronizado en %{name}."
+          body: "Los cambios del curso plantilla se han sincronizado en %{name}."
           details_link: "Ver cambios"
           subject: "Sincronización de proyectos: %{name}"
         subject: "Sincronización de proyectos: %{name}"
       sms: 
-        body: "Cambios del curso de proyectos sincronizados en %{name}."
+        body: "Cambios del curso plantilla sincronizados en %{name}."
         link_message: "Más información en %{url}"
       summary: 
         body: "Sincronización de proyectos: Cambios sincronizados en %{name}."
         subject: "Sincronización de proyectos: %{name}"
       twitter: 
-        tweet: "Alerta de Canvas: los cambios en el curso de proyectos se sincronizaron en %{name}"
+        tweet: "Alerta de Canvas: los cambios en el curso plantilla se sincronizaron en %{name}"
     blueprint_sync_complete: 
       email: 
-        body: "Su curso de proyectos, %{name}, ha sincronizado cambios en todos los cursos asociados."
+        body: "Su curso plantilla, %{name}, ha sincronizado cambios en todos los cursos asociados."
         details_link: "Más información: %{link}"
         html: 
-          body: "Su curso de proyectos, %{name}, ha sincronizado cambios en todos los cursos asociados."
+          body: "Su curso plantilla, %{name}, ha sincronizado cambios en todos los cursos asociados."
           details_link: "Más información"
           subject: "Sincronización de proyectos finalizada: %{name}"
         subject: "Sincronización de proyectos finalizada: %{name}"
       sms: 
-        body: "Cambios del curso de proyectos sincronizados desde %{name}."
+        body: "Cambios del curso plantilla sincronizados desde %{name}."
         link_message: "Más información en %{url}"
       summary: 
         body: "Sincronización de proyectos: Cambios sincronizados desde %{name}."
         subject: "Sincronización de proyectos finalizada: %{name}"
       twitter: 
-        tweet: "Alerta de Canvas: los cambios en el curso de proyectos se sincronizaron desde %{name}."
+        tweet: "Alerta de Canvas: los cambios en el curso plantilla se sincronizaron desde %{name}."
     collaboration_invitation: 
       email: 
         body: |
@@ -12634,7 +12634,7 @@ es:
     blueprint_description: |-
         *Solo instructor y administrador:*
         
-        El contenido ha sido sincronizado desde un curso de proyectos a cursos asociados
+        El contenido ha sido sincronizado desde un curso plantilla a cursos asociados
     blueprint_display: "Sincronización de proyectos"
     calendar_description: "Elementos nuevos y modificados de su calendario de curso"
     calendar_display: Calendario
@@ -15233,7 +15233,7 @@ es:
       notices: 
         cant_view_submission_while_muted: "No puede ver el historial de la evaluación mientras esté bloqueada."
         has_submissions_already: "Recuerde, algunos alumnos ya han realizado o han comenzado a realizar esta evaluación"
-        less_than_allotted_time: "Como empezó esta evaluación cerca de la hora límite, no contará con todo el tiempo para terminarla."
+        less_than_allotted_time: "Como empezó esta evaluación cerca de la fecha límite, no contará con todo el tiempo para terminarla."
         no_submission_for_user: "No hay presentaciones disponibles para ese usuario"
         quiz_updated: "Evaluación actualizada correctamente"
         quizzes_published: 
@@ -15286,7 +15286,7 @@ es:
       quiz_details: 
         allowed_attempts: "Intentos permitidos"
         headers: 
-          due: "Hora límite"
+          due: "Fecha límite"
           points: Puntos
           questions: Preguntas
           time_limit: "Tiempo límite"
@@ -15329,7 +15329,7 @@ es:
         available_from: "Disponible desde"
         cant_go_back: "Bloquear preguntas después de responderlas"
         code: "Código de acceso"
-        due: "Hora límite"
+        due: "Fecha límite"
         filter: "Filtro IP"
         for: Para
         group: "Grupo de tareas"
@@ -17345,7 +17345,7 @@ es:
   show_navigation_menu_34e7f441: "Mostrar menú de navegación"
   show_notes_column_22d2b6c1: "Mostrar la columna de notas"
   show_one_question_at_a_time_271e346d: "Mostrar una pregunta a la vez"
-  show_only_blueprint_courses_9fb37b41: "Mostrar únicamente los cursos de heliografía"
+  show_only_blueprint_courses_9fb37b41: "Mostrar únicamente los cursos plantilla "
   show_originality_report_to_students_be22f5ee: "Mostrar informe de originalidad a los alumnos"
   show_question_details_b059df00: "Mostrar los detalles de la pregunta"
   show_recent_activity_stream_2be4abc1: "Mostrar flujo de actividad reciente"
@@ -18243,7 +18243,7 @@ es:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Esta carpeta está bloqueada actualmente y no se puede ver."
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "Esta calificación difiere de la calificación de la vista del alumno porque algunas tareas están silenciadas"
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Esta imagen aparece como una filigrana de fondo a su página. Formatos aceptados: png, svg, gif, jpeg"
-  this_is_a_blueprint_course_5e7b47fe: "Este es un curso de proyectos"
+  this_is_a_blueprint_course_5e7b47fe: "Este es un curso plantilla"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Esta es una lista separada por comas de URL de confianza. Confiar en cualquier URL de confianza de las que aparecen en esta lista hará que se derive el autentificador CSRF cuando inicien sesión en Canvas."
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "Este curso ha concluido, por lo que solo están disponibles matrículas concluidas."
   this_is_a_feature_to_allow_product_design_to_remov_e92ea1c3: "Es una función para permitir que el diseño de productos elimine todas las diferentes cancelaciones de tamaño de fuente en toda la aplicación."
