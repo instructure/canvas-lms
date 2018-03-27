@@ -61,6 +61,11 @@ class BzController < ApplicationController
       obj.save
     end
 
+    # enable the display now too
+    course = Course.find(params[:import][:course_id])
+    course.enable_my_info = true
+    course.save
+
     flash[:message] = 'Data saved!'
     redirect_to cohort_info_upload_path(course_id: params[:import][:course_id])
   end
