@@ -790,6 +790,57 @@ describe "Users API", type: :request do
         })
       end
 
+      it "accepts a valid destination param" do
+        json = api_call(:post, "/api/v1/accounts/#{@site_admin.account.id}/users",
+                        { :controller => 'users', :action => 'create', :format => 'json', :account_id => @site_admin.account.id.to_s },
+                        {
+                          user: {
+                            name: "Test User",
+                          },
+                          pseudonym: {
+                            unique_id: "test@example.com",
+                            password: "password123",
+                          },
+                          destination: 'http://www.example.com/courses/1'
+                        }
+        )
+        expect(json['destination']).to start_with('http://www.example.com/courses/1?session_token=')
+      end
+
+      it "ignores a destination with a mismatched host" do
+        json = api_call(:post, "/api/v1/accounts/#{@site_admin.account.id}/users",
+                        { :controller => 'users', :action => 'create', :format => 'json', :account_id => @site_admin.account.id.to_s },
+                        {
+                          user: {
+                            name: "Test User",
+                          },
+                          pseudonym: {
+                            unique_id: "test@example.com",
+                            password: "password123",
+                          },
+                          destination: 'http://hacker.com/courses/1'
+                        }
+        )
+        expect(json['destination']).to be_nil
+      end
+
+      it "ignores a destination with an unrecognized path" do
+        json = api_call(:post, "/api/v1/accounts/#{@site_admin.account.id}/users",
+                        { :controller => 'users', :action => 'create', :format => 'json', :account_id => @site_admin.account.id.to_s },
+                        {
+                          user: {
+                            name: "Test User",
+                          },
+                          pseudonym: {
+                            unique_id: "test@example.com",
+                            password: "password123",
+                          },
+                          destination: 'http://www.example.com/hacker/1'
+                        }
+        )
+        expect(json['destination']).to be_nil
+      end
+
       context "sis reactivation" do
         it "should allow reactivating deleting users using sis_user_id" do
           other_user = user_with_pseudonym(:active_all => true)

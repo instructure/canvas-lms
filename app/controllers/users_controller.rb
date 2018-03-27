@@ -1387,6 +1387,15 @@ class UsersController < ApplicationController
   # @argument enable_sis_reactivation [Boolean]
   #   When true, will first try to re-activate a deleted user with matching sis_user_id if possible.
   #
+  # @argument destination [URL]
+  #
+  #   If you're setting the password for the newly created user, you can provide this param
+  #   with a valid URL pointing into this Canvas installation, and the response will include
+  #   a destination field that's a URL that you can redirect a browser to and have the newly
+  #   created user automatically logged in. The URL is only valid for a short time, and must
+  #   match the domain this request is directed to, and be for a well-formed path that Canvas
+  #   can recognize.
+  #
   # @returns User
   def create
     create_user
@@ -2545,6 +2554,7 @@ class UsersController < ApplicationController
       pseudonym_params.delete(:password)
       pseudonym_params.delete(:password_confirmation)
     end
+    password_provided = @pseudonym.new_record? && pseudonym_params.key?(:password)
     if params[:pseudonym][:authentication_provider_id]
       @pseudonym.authentication_provider = @context.
           authentication_providers.active.
@@ -2589,7 +2599,24 @@ class UsersController < ApplicationController
 
       data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :message_sent => message_sent, :course => @user.self_enrollment_course }
       if api_request?
-        render(:json => user_json(@user, @current_user, session, includes))
+        result = user_json(@user, @current_user, session, includes)
+        # if they passed a destination, and it matches the current canvas installation,
+        # add a session_token to it for the newly created user and return it
+        if params[:destination] && password_provided &&
+          (_routes.recognize_path(params[:destination]) rescue false) &&
+          (uri = URI.parse(params[:destination]) rescue nil) &&
+          uri.host == request.host &&
+          uri.port == request.port
+
+          # add session_token to the query
+          qs = URI.decode_www_form(uri.query || '')
+          qs.delete_if { |(k, _v)| k == 'session_token' }
+          qs << ['session_token', SessionToken.new(@pseudonym.id, current_user_id: @user.id)]
+          uri.query = URI.encode_www_form(qs)
+
+          result['destination'] = uri.to_s
+        end
+        render(:json => result)
       else
         render(:json => data)
       end
