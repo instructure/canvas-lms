@@ -59,4 +59,5 @@ group :test do
   gem 'hashdiff', '0.3.7'
   gem 'luminosity_contrast', '0.2.1'
   gem 'pact'
+  gem 'database_cleaner', '~> 1.5', '>= 1.5.3'
 end

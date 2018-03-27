@@ -23,16 +23,17 @@ class ProxyApp
   end
 
   def call(env)
+    puts ENV["course_id"]
     env["HTTP_AUTHORIZATION"] = "Bearer #{full_token}" if env.include?("HTTP_AUTHORIZATION")
     response = @real_provider_app.call(env)
     response
   end
 
   def full_token
-    @full_token ||= create_user_account_pseudo_token
+    @full_token ||= create_user_account_pseudo_token(User.last.id)
   end
 
-  def create_user_account_pseudo_token(user_id=nil, account=Account.default, password="password1", purpose="purpose")
+  def create_user_account_pseudo_token(user_id=nil, account=Account.default, _password="password1", purpose="purpose")
     AccountUser.create!(account: account, user: user_create_or_find(user_id))
     pseudonym_create
     # create token
@@ -49,9 +50,9 @@ class ProxyApp
 
   def pseudonym_create(unique_user="admin", password="password")
     @psuedonym ||= Pseudonym.create!(user: @user,
-        account: account,
-        unique_id: unique_user + @user.id.to_s,
-        password: password,
-        password_confirmation: password)
+                                     account: account,
+                                     unique_id: unique_user + @user.id.to_s,
+                                     password: password,
+                                     password_confirmation: password)
   end
 end
