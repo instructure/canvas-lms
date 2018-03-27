@@ -79,7 +79,8 @@ class Course < ActiveRecord::Base
                   :public_syllabus,
                   :course_format,
                   :time_zone,
-                  :organize_epub_by_content_type
+                  :organize_epub_by_content_type,
+                  :enable_my_info
 
   time_zone_attribute :time_zone
   def time_zone

@@ -13,13 +13,13 @@
       <li class="user_name"><%= link_to @current_user.short_name, user_profile_path(@current_user) %></li>
     <% end %>
     <% unless @current_user.fake_student? %>
-      <!-- Hide for now so we can push other stuff and finish testing this. -->
-      <!--
-      <li class="first cohort"><a href="/bz/my_cohort<%= (@context.nil? || !@context.is_a?(Course)) ? '' : "?course_id=#{@context.id}" %>">My Cohort</li>
+      <% if @context && @context.is_a?(Course) && @context.enable_my_info %>
+        <li class="first cohort"><a href="/bz/my_cohort<%= (@context.nil? || !@context.is_a?(Course)) ? '' : "?course_id=#{@context.id}" %>">My Cohort</li>
 
-      <li class="inbox">
-      -->
-      <li class="first inbox">
+        <li class="inbox">
+      <% else %>
+        <li class="first inbox">
+      <% end %>
         <a href="<%= conversations_path %>">
           <span><%= t 'links.inbox', "Inbox" %></span>
           <% unless @current_user.disabled_inbox? %>

@@ -334,6 +334,16 @@
           </div>
         </td>
       </tr><tr>
+      </tr><tr>
+        <td class="form-label">Cohort Info</td>
+        <td colspan="3">
+          <div>
+            <%= f.check_box :enable_my_info %>
+            <%= f.label :enable_my_info, "Enable My Cohort Info page" %>
+          </div>
+        </td>
+      </tr><tr>
+
         <td class="form-label"><label for="course_public_description"><%= before_label('course_description', %{Description}) %></label></td>
         <td colspan="3">
           <%= f.text_area :public_description, :style => "height: 100px;", :disabled => !can_manage %>
