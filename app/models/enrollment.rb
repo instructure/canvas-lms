@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 require 'atom'
 
 class Enrollment < ActiveRecord::Base
@@ -80,7 +79,14 @@ class Enrollment < ActiveRecord::Base
   after_destroy :update_assignment_overrides_if_needed
 
   def send_to_pipeline
-    Services::Pipeline::Commands::Send.new(enrollment: self).call
+    account_admin = Account.default.account_users.find do |account_user|
+      account_user.role.name == 'AccountAdmin'
+    end
+
+    PipelineService::Commands::Send.new(
+      enrollment: self,
+      user: account_admin.user
+    ).call
   end
 
   attr_accessor :already_enrolled, :need_touch_user, :skip_touch_user

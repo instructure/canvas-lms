@@ -21,8 +21,6 @@ else
   gem 'rails', '5.1.3'
 end
 
-gem 'pipeline_publisher_ruby', :git => 'git@github.com:StrongMind/pipeline-publisher-ruby.git'
-
 gem 'rack', '2.0.3'
 gem 'oauth2', '1.2.0', require: false
 
@@ -162,3 +160,7 @@ gem 'twitter', path: 'gems/twitter'
 gem 'vericite_api', '1.5.1'
 gem 'utf8_cleaner', path: 'gems/utf8_cleaner'
 gem 'workflow', path: 'gems/workflow'
+
+# StrongMind
+gem 'canvas_shim', :git => 'git@github.com:StrongMind/canvas_shim.git'
+gem 'pipeline_publisher_ruby', :git => 'git@github.com:StrongMind/pipeline-publisher-ruby.git'
