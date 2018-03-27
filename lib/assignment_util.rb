@@ -21,6 +21,10 @@ module AssignmentUtil
   end
 
   def self.in_date_range?(date, start_date, end_date)
+    # due dates are considered equal if they're the same up to the minute
+    date = Assignment.due_date_compare_value date
+    start_date = Assignment.due_date_compare_value start_date
+    end_date = Assignment.due_date_compare_value end_date
     date >= start_date && date <= end_date
   end
 
