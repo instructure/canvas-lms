@@ -7,9 +7,9 @@
     "yarn": "1.5.1"
   },
   "dependencies": {
-    "@instructure/ui-core": "^4.7.2",
-    "@instructure/ui-themeable": "^4.7.2",
-    "@instructure/ui-themes": "^4.7.2",
+    "@instructure/ui-core": "^4.8.0",
+    "@instructure/ui-themeable": "^4.8.0",
+    "@instructure/ui-themes": "^4.8.0",
     "axios": "^0.16.0",
     "backbone": "1.1.1",
     "brandable_css": "0.1.0",
