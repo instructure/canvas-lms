@@ -68,7 +68,7 @@ export default class CourseItemRow extends Component {
     onManageMenuSelect: func,
     sectionToolTip: node,
     replyButton: node,
-    focusOn: oneOf(['title', 'manageMenu']),
+    focusOn: oneOf(['title', 'manageMenu', 'toggleButton']),
     clearFocusDirectives: func, // Required if focusOn is provided
     hasReadBadge: bool,
   }
@@ -132,6 +132,8 @@ export default class CourseItemRow extends Component {
           break;
         case 'manageMenu':
           this._manageMenu.focus()
+          break;
+        case 'toggleButton':
           break;
         default:
           throw new Error(I18n.t('Illegal element focus request'))
