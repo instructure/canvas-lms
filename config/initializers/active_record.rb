@@ -37,10 +37,30 @@ class ActiveRecord::Base
     # unless specifically requested
     def in_transaction_in_test?
       return false unless Rails.env.test?
-      transaction_method = ActiveRecord::ConnectionAdapters::DatabaseStatements.instance_method(:transaction).source_location.first
-      transaction_regex = /\A#{Regexp.escape(transaction_method)}:\d+:in `transaction'\z/.freeze
-      # transactions due to spec fixtures are _not_in the callstack, so we only need to find 1
-      !!caller.find { |s| s =~ transaction_regex && !s.include?('spec_helper.rb') }
+      stacktrace = caller
+
+      transaction_index, wrap_index, after_index = [
+        ActiveRecord::ConnectionAdapters::DatabaseStatements.instance_method(:transaction),
+        defined?(SpecTransactionWrapper) && SpecTransactionWrapper.method(:wrap_block_in_transaction),
+        AfterTransactionCommit::Transaction.instance_method(:commit_records)
+      ].map do |method|
+        if method
+          regex = /\A#{Regexp.escape(method.source_location.first)}:\d+:in `#{Regexp.escape(method.name)}'\z/.freeze
+          stacktrace.index{|s| s =~ regex}
+        end
+      end
+
+      if transaction_index
+        # we wrap a transaction around controller actions, so try to see if this call came from that
+        if wrap_index && (transaction_index..wrap_index).all?{|i| stacktrace[i].match?(/transaction|mon_synchronize/)}
+          false
+        else
+          # check if this is being run through an after_transaction_commit since the last transaction
+          !(after_index && after_index < transaction_index)
+        end
+      else
+        false
+      end
     end
 
     def default_scope(*)
@@ -599,7 +619,9 @@ class ActiveRecord::Base
   def self.current_xlog_location
     Shard.current(shard_category).database_server.unshackle do
       Shackles.activate(:master) do
-        if connection.send(:postgresql_version) >= 100000
+        if Rails.env.test? ? self.in_transaction_in_test? : connection.open_transactions > 0
+          raise "don't run current_xlog_location in a transaction"
+        elsif connection.send(:postgresql_version) >= 100000
           connection.select_value("SELECT pg_current_wal_lsn()")
         else
           connection.select_value("SELECT pg_current_xlog_location()")

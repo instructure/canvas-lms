@@ -331,7 +331,9 @@ class DiscussionTopic < ActiveRecord::Base
 
   def update_materialized_view
     # kick off building of the view
-    DiscussionTopic::MaterializedView.for(self).update_materialized_view(xlog_location: self.class.current_xlog_location)
+    self.class.connection.after_transaction_commit do
+      DiscussionTopic::MaterializedView.for(self).update_materialized_view(xlog_location: self.class.current_xlog_location)
+    end
   end
 
   def group_category_deleted_with_entries?
