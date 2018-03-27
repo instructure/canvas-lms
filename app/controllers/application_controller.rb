@@ -116,7 +116,7 @@ class ApplicationController < ActionController::Base
   #       ENV.FOO_BAR #> [1,2,3]
   #
   def js_env(hash = {}, overwrite = false)
-    return {} unless request.format.html? || @include_js_env
+    return {} unless request.format.html? || request.format == "*/*" || @include_js_env
     # set some defaults
     unless @js_env
       editor_css = [
