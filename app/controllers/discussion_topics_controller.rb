@@ -249,17 +249,18 @@ class DiscussionTopicsController < ApplicationController
   #
   # Returns the paginated list of discussion topics for this course or group.
   #
-  # @argument include[] [String, "all_dates", "sections", "sections_user_count"]
+  # @argument include[] [String, "all_dates", "sections", "sections_user_count", "overrides"]
   #   If "all_dates" is passed, all dates associated with graded discussions'
   #   assignments will be included.
   #   if "sections" is passed, includes the course sections that are associated
-  #   with the topic, if the topic is specific to sertain sections of the course.
+  #   with the topic, if the topic is specific to certain sections of the course.
   #   If "sections_user_count" is passed, then:
   #     (a) If sections were asked for *and* the topic is specific to certain
-  #         course sections sections, includes the number of users in each
+  #         course sections, includes the number of users in each
   #         section. (as part of the section json asked for above)
   #     (b) Else, includes at the root level the total number of users in the
   #         topic's context (group or course) that the topic applies to.
+  #   If "overrides" is passed, the overrides for the assignment will be included
   #
   # @argument order_by [String, "position"|"recent_activity"|"title"]
   #   Determines the order of the discussion topic list. Defaults to "position".
@@ -402,6 +403,7 @@ class DiscussionTopicsController < ApplicationController
           include_all_dates: include_params.include?('all_dates'),
           :include_sections => include_params.include?('sections'),
           :include_sections_user_count => include_params.include?('sections_user_count'),
+          :include_overrides => include_params.include?('overrides'),
           master_course_status: mc_status,
           root_topic_fields: root_topic_fields)
       end

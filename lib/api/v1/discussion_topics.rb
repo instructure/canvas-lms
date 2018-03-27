@@ -94,7 +94,8 @@ module Api::V1::DiscussionTopics
       include_all_dates: false,
       override_dates: true,
       include_root_topic_data: false,
-      root_topic_fields: []
+      root_topic_fields: [],
+      include_overrides: false,
     )
 
     opts[:user_can_moderate] = context.grants_right?(user, session, :moderate_forum) if opts[:user_can_moderate].nil?
@@ -111,7 +112,7 @@ module Api::V1::DiscussionTopics
       json[:assignment] = assignment_json(topic.assignment, user, session,
         include_discussion_topic: false, override_dates: opts[:override_dates],
         include_all_dates: opts[:include_all_dates],
-        exclude_response_fields: excludes)
+        exclude_response_fields: excludes, include_overrides: opts[:include_overrides])
     end
 
     if opts[:include_sections_user_count] && !topic.is_section_specific
@@ -137,6 +138,7 @@ module Api::V1::DiscussionTopics
         json[field_name] ||= root_topics[topic.root_topic_id][field_name] if root_topics[topic.root_topic_id]
       end
     end
+
     json
   end
 
