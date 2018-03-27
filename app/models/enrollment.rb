@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 require 'atom'
 
 class Enrollment < ActiveRecord::Base
@@ -65,6 +64,7 @@ class Enrollment < ActiveRecord::Base
   before_validation :infer_privileges
   after_create :create_linked_enrollments
   after_create :create_enrollment_state
+  after_save :send_to_pipeline
   after_save :copy_scores_from_existing_enrollment, if: :need_to_copy_scores?
   after_save :clear_email_caches
   after_save :cancel_future_appointments
@@ -77,6 +77,17 @@ class Enrollment < ActiveRecord::Base
   after_save :recalculate_enrollment_state
   after_save :add_to_favorites_later
   after_destroy :update_assignment_overrides_if_needed
+
+  def send_to_pipeline
+    account_admin = Account.default.account_users.find do |account_user|
+      account_user.role.name == 'AccountAdmin'
+    end
+
+    PipelineService::Commands::Send.new(
+      enrollment: self,
+      user: account_admin.user
+    ).call
+  end
 
   attr_accessor :already_enrolled, :need_touch_user, :skip_touch_user
   scope :current, -> { joins(:course).where(QueryBuilder.new(:active).conditions).readonly(false) }

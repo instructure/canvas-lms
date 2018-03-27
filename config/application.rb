@@ -46,6 +46,7 @@ module CanvasRails
     config.action_dispatch.default_headers['X-UA-Compatible'] = "IE=Edge,chrome=1"
     config.action_dispatch.default_headers.delete('X-Frame-Options')
     config.action_controller.forgery_protection_origin_check = true
+    config.autoload_paths << File.expand_path("app/services", __dir__)
     ActiveSupport.to_time_preserves_timezone = true
 
     config.app_generators do |c|
