@@ -34,6 +34,10 @@ class BzController < ApplicationController
     file.each_with_index do |row, index|
       next if index == 0 # skip the header row
 
+      next if row[0].blank?
+
+      row = row.map(&:strip)
+
       existing = CohortInfo.where(:course_id => params[:import][:course_id], :section_name => row[0])
       obj = nil
       if existing.any?
@@ -43,7 +47,7 @@ class BzController < ApplicationController
       end
 
       obj.course_id = params[:import][:course_id]
-      obj.section_name = row[0].strip
+      obj.section_name = row[0]
       obj.lc_name = row[1]
       obj.lc_email = row[2]
       obj.lc_phone = row[3]
@@ -57,10 +61,48 @@ class BzController < ApplicationController
       obj.save
     end
 
+    # enable the display now too
+    course = Course.find(params[:import][:course_id])
+    course.enable_my_info = true
+    course.save
+
     flash[:message] = 'Data saved!'
     redirect_to cohort_info_upload_path(course_id: params[:import][:course_id])
   end
 
+  def cohort_info_download
+    course_id = params[:course_id]
+
+    course = Course.find(course_id)
+    sections = {}
+    course.course_sections.each do |s|
+      sections[s.name] = false
+    end
+
+    csv = CSV.generate do |csv|
+      csv << ["Section Name", "LC Name", "LC Email", "LC Phone", "TA Name", "TA Email", "TA Phone", "TA Office Hours/Location", "LL Times", "LL Location"]
+
+      CohortInfo.where(:course_id => course_id).each do |ci|
+        sections[ci.section_name] = true
+        csv << [ci.section_name, ci.lc_name, ci.lc_email, ci.lc_phone, ci.ta_name, ci.ta_email, ci.ta_phone, ci.ta_office, ci.ll_times, ci.ll_location]
+      end
+
+      sections.each do |name, done|
+        if !done
+          lc = course.course_sections.where(:name => name).first.tas.first
+          if lc.nil?
+            csv << [name]
+          else
+            csv << [name, lc.name, lc.email]
+          end
+        end
+      end
+    end
+
+    respond_to do |format|
+      format.csv { render text: csv }
+    end
+  end
 
 
   def get_assignment_info(assignment_id)

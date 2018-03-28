@@ -17,6 +17,7 @@ CanvasRails::Application.routes.draw do
   post 'bz/user_retained_data' => 'bz#set_user_retained_data'
 
   get 'bz/cohort_info_upload' => 'bz#cohort_info_upload', as: :cohort_info_upload
+  get 'bz/cohort_info_download' => 'bz#cohort_info_download', as: :cohort_info_download
   get 'bz/my_cohort' => 'bz#my_cohort'
   post 'bz/cohort_info_upload' => 'bz#do_cohort_info_upload'
 
