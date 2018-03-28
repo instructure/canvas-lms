@@ -121,12 +121,28 @@ module AccountReports
       end
     end
     if filename
-      attachment = account_report.account.attachments.create!(
-        :uploaded_data => Rack::Test::UploadedFile.new(filepath, filetype, true),
-        :display_name => filename,
-        :filename => filename,
-        :user => account_report.user
-      )
+      data = Rack::Test::UploadedFile.new(filepath, filetype, true)
+      # have to branch here because calling the uploaded_data= method on attachment
+      # (done in the Attachments::Storage method) triggers an attachment_fu save
+      # callback which is handled differently than creating the attachment using
+      # the create! uploaded_data method, and assigns a different filename
+      # which report_attachment tests for :/
+
+      if InstFS.enabled?
+        attachment = account_report.account.attachments.new
+        Attachments::Storage.store_for_attachment(attachment, data)
+        attachment.display_name = filename
+        attachment.filename = filename
+        attachment.user = account_report.user
+        attachment.save!
+      else
+        attachment = account_report.account.attachments.create!(
+          :uploaded_data => data,
+          :display_name => filename,
+          :filename => filename,
+          :user => account_report.user
+        )
+      end
     end
     attachment
   end
