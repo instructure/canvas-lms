@@ -1470,22 +1470,6 @@ describe UsersController do
     end
   end
 
-  describe '#toggle_recent_activity_dashboard' do
-    it 'updates user preference based on value provided' do
-      course_factory
-      user_factory(active_all: true)
-      user_session(@user)
-
-      expect(@user.preferences[:recent_activity_dashboard]).to be_falsy
-
-      post :toggle_recent_activity_dashboard
-
-      expect(@user.reload.preferences[:recent_activity_dashboard]).to be_truthy
-      expect(response).to be_success
-      expect(JSON.parse(response.body)).to be_empty
-    end
-  end
-
   describe '#toggle_hide_dashcard_color_overlays' do
     it 'updates user preference based on value provided' do
       course_factory

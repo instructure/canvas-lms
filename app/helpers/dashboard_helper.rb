@@ -24,6 +24,18 @@ module DashboardHelper
     dashboard_view
   end
 
+  def show_cards?
+    user_dashboard_view == 'cards'
+  end
+
+  def show_planner?
+    user_dashboard_view == 'planner'
+  end
+
+  def show_recent_activity?
+    user_dashboard_view == 'activity'
+  end
+
   def show_welcome_message?
     @current_user.present? && !@current_user.has_active_enrollment?
   end

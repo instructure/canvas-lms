@@ -155,7 +155,7 @@ class UsersController < ApplicationController
 
   before_action :require_user, :only => [:grades, :merge, :kaltura_session,
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
-    :user_dashboard, :toggle_recent_activity_dashboard, :toggle_hide_dashcard_color_overlays,
+    :user_dashboard, :toggle_hide_dashcard_color_overlays,
     :masquerade, :external_tool, :dashboard_sidebar, :settings, :activity_stream,
     :activity_stream_summary, :pandata_token]
   before_action :require_registered_user, :only => [:delete_user_service,
@@ -586,15 +586,6 @@ class UsersController < ApplicationController
     end
 
     render :layout => false
-  end
-
-  # This should be considered as deprecated in favor of the dashboard_view endpoint
-  # instead. DON'T USE THIS AGAIN
-  def toggle_recent_activity_dashboard
-    @current_user.preferences[:recent_activity_dashboard] =
-      !@current_user.preferences[:recent_activity_dashboard]
-    @current_user.save!
-    render json: {}
   end
 
   def toggle_hide_dashcard_color_overlays
