@@ -425,7 +425,7 @@ describe "discussions" do
         it "should show student view posts to teacher and other students", priority: "2", test_id: 344546 do
           fake_student = course.student_view_student
           entry = topic.reply_from(:user => fake_student, :text => 'i am a figment of your imagination')
-          topic.create_materialized_view
+          topic.update_materialized_view
 
           get url
           wait_for_ajaximations

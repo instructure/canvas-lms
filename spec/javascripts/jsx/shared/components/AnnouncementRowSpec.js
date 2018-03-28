@@ -79,11 +79,12 @@ test('renders UnreadBadge if announcement has replies == 0', () => {
   notOk(node.exists())
 })
 
-test('renders "Delayed until" date label if announcement is delayed', () => {
-  const announcement = { delayed_post_at: (new Date).toString() }
+test('renders "Delayed" date label if announcement is delayed', () => {
+  const delayedDate = (new Date).toString()
+  const announcement = { delayed_post_at: delayedDate }
   const tree = mount(<AnnouncementRow {...makeProps({ announcement })} />)
-  const node = tree.find('.ic-item-row__meta-content-heading')
-  ok(node.text().includes('Delayed until'))
+  const node = tree.find('.ic-item-row__meta-content-timestamp')
+  ok(node.exists())
 })
 
 test('renders "Posted on" date label if announcement is not delayed', () => {

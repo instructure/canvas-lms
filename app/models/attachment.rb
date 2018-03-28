@@ -861,13 +861,8 @@ class Attachment < ActiveRecord::Base
   # passed block; this is a helper function for #open
   # (you should call #open instead of this)
   private def streaming_download(dest=nil, &block)
-    uri = URI(public_url)
-    Net::HTTP.start(uri.host, uri.port) do |http|
-      request = Net::HTTP::Get.new uri
-
-      http.request(request) do |response|
-        response.read_body(dest, &block)
-      end
+    CanvasHttp.get(public_url) do |response|
+      response.read_body(dest, &block)
     end
   end
 
