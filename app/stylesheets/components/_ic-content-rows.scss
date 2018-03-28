@@ -97,6 +97,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  .ic-discussion-row__content {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .ic-item-row__meta-col {
@@ -147,6 +152,13 @@
   }
 }
 
+.ic-discussion-row {
+  .ic-discussion-row__content {
+    p:not(:first-of-type) {
+      display: none;
+    }
+  }
+}
 .ic-announcement-row {
   .ic-announcement-row__content {
     p:not(:first-of-type) {
