@@ -31,6 +31,7 @@ import PeerReviewsSelector from 'compiled/views/assignments/PeerReviewsSelector'
 import fakeENV from 'helpers/fakeENV'
 import userSettings from 'compiled/userSettings'
 import assertions from 'helpers/assertions'
+import tinymce from 'compiled/editor/stocktiny'
 import 'helpers/jquery.simulate'
 
 const s_params = 'some super secure params'
@@ -104,11 +105,15 @@ QUnit.module('EditView', {
       VALID_DATE_RANGE: {},
       COURSE_ID: 1
     })
+    // Sometimes TinyMCE has stuff on the dom that causes issues, likely from things that
+    // don't clean up properly, we make sure that these run in a clean tiny state each time
+    tinymce.remove()
     this.server = sinon.fakeServer.create()
   },
   teardown() {
     this.server.restore()
     fakeENV.teardown()
+    tinymce.remove() // Make sure we clean stuff up
     $('.ui-dialog').remove()
     $('ul[id^=ui-id-]').remove()
     $('.form-dialog').remove()
