@@ -171,7 +171,7 @@ describe('api actions', () => {
     it('dispatches GETTING_FUTURE_ITEMS and starts the saga', () => {
       const mockDispatch = jest.fn();
       Actions.loadFutureItems()(mockDispatch, getBasicState);
-      expect(mockDispatch).toHaveBeenCalledWith(Actions.gettingFutureItems());
+      expect(mockDispatch).toHaveBeenCalledWith(Actions.gettingFutureItems({loadMoreButtonClicked: false}));
       expect(mockDispatch).toHaveBeenCalledWith(Actions.startLoadingFutureSaga());
     });
 

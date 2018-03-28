@@ -21,6 +21,7 @@ import {
   ScrollToNewActivity,
   ScrollToLastLoadedNewActivity,
   ContinueInitialLoad,
+  FocusPriorItemOnLoadMore,
 
   // ResetFocus,
   // FocusSavedItem,
@@ -61,13 +62,16 @@ export class AnimationCollection {
       ],
       animation: MaintainScrollPosition,
     },
+    {
+      expected: [
+        'GETTING_FUTURE_ITEMS', // checks if the load more button was initiator of this action
+        'GOT_DAYS_SUCCESS',
+      ],
+      animation: FocusPriorItemOnLoadMore,
+    }
 
 
     // animations for the future. no, the format doesn't match.
-
-    // [['LOAD_FUTURE_ITEMS',
-    //   'GOT_DAYS_SUCCESS',
-    // ], SetFocusToPriorLoadedItem],
 
     // [['OPEN_EDITING_PLANNER_ITEM',
     //   'CANCEL_EDITING_PLANNER_ITEM',

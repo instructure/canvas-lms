@@ -36,6 +36,7 @@ export function mockRegistry () {
   return {
     getLastComponent: jest.fn(),
     getAllNewActivityIndicatorsSorted: jest.fn(),
+    getAllItemsSorted: jest.fn(),
   };
 }
 

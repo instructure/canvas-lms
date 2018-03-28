@@ -94,10 +94,10 @@ export function getPlannerItems (fromMoment) {
   };
 }
 
-export function loadFutureItems () {
+export function loadFutureItems (opts = {loadMoreButtonClicked: false}) {
   return (dispatch, getState) => {
     if (getState().loading.allFutureItemsLoaded) return;
-    dispatch(gettingFutureItems());
+    dispatch(gettingFutureItems(opts));
     dispatch(startLoadingFutureSaga());
   };
 }
