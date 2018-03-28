@@ -157,6 +157,24 @@ This text has a http://www.google.com link in it...
     expect(@item.stream_item_instances.first.read?).to be_truthy
   end
 
+  it "should mark last_comment_at on the submission" do
+    prepare_test_submission
+    student_comment = @submission.add_comment(:author => @submission.user, :comment => "some comment")
+    expect(@submission.reload.last_comment_at).to be_nil
+
+    draft_comment = @submission.add_comment(:author => @teacher, :comment => "some comment", :draft_comment => true)
+    expect(@submission.reload.last_comment_at).to be_nil
+
+    frd_comment = @submission.add_comment(:author => @teacher, :comment => "some comment")
+    expect(@submission.reload.last_comment_at.to_i).to eq frd_comment.created_at.to_i
+
+    draft_comment.update_attributes(:draft => false, :created_at => 2.days.from_now) # should re-run after update
+    expect(@submission.reload.last_comment_at.to_i).to eq draft_comment.created_at.to_i
+
+    draft_comment.destroy # should re-run after destroy
+    expect(@submission.reload.last_comment_at.to_i).to eq frd_comment.created_at.to_i
+  end
+
   it "should not create a stream item for a provisional comment" do
     prepare_test_submission
     expect {
