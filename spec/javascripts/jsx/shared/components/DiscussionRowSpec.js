@@ -131,6 +131,27 @@ test('renders the SectionsTooltip component with sections', () => {
   equal(tree.find('SectionsTooltip Text').text(), '2 Sectionssection 4section 2')
 })
 
+test('does not renders the SectionsTooltip component on a graded discussion', () => {
+  const discussion = { user_count: 200, assignment: true }
+  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const node = tree.find('SectionsTooltip')
+  notOk(node.exists())
+})
+
+test('does not renders the SectionsTooltip component on a group discussion', () => {
+  const discussion = { user_count: 200, group_category_id: 13 }
+  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const node = tree.find('SectionsTooltip')
+  notOk(node.exists())
+})
+
+test('does not renders the SectionsTooltip component within a group context', () => {
+  const discussion = { user_count: 200 }
+  const tree = mount(<DiscussionRow {...makeProps({ discussion, contextType: "group" })} />)
+  const node = tree.find('SectionsTooltip')
+  notOk(node.exists())
+})
+
 test('does not render master course lock icon if masterCourseData is not provided', (assert) => {
   const done = assert.async()
   const masterCourseData = null

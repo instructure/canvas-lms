@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!discussion_row'
 import React, { Component } from 'react'
-import { func, bool, arrayOf } from 'prop-types'
+import { func, bool, string, arrayOf } from 'prop-types'
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
 
@@ -111,6 +111,7 @@ export default class DiscussionRow extends Component {
     connectDragPreview: func,
     connectDragSource: func,
     connectDropTarget: func,
+    contextType: string.isRequired,
     deleteDiscussion: func.isRequired,
     discussion: discussionShape.isRequired,
     discussionTopicMenuTools: arrayOf(propTypes.discussionTopicMenuTools),
@@ -383,6 +384,20 @@ export default class DiscussionRow extends Component {
     return menuList
   }
 
+  renderSectionsTooltip = () => {
+    if (this.props.contextType === "group" || this.props.discussion.assignment ||
+        this.props.discussion.group_category_id) {
+      return null
+    }
+
+    return (
+      <SectionsTooltip
+        totalUserCount={this.props.discussion.user_count}
+        sections={this.props.discussion.sections}
+      />
+    )
+  }
+
   render () {
     // necessary because discussions return html from RCE
     const contentWrapper = document.createElement('span')
@@ -416,12 +431,7 @@ export default class DiscussionRow extends Component {
                 author={this.props.discussion.author}
                 title={this.props.discussion.title}
                 body={textContent ? <div className="ic-discussion-row__content">{textContent}</div> : null}
-                sectionToolTip={
-                  <SectionsTooltip
-                    totalUserCount={this.props.discussion.user_count}
-                    sections={this.props.discussion.sections}
-                  />
-                }
+                sectionToolTip={this.renderSectionsTooltip()}
                 itemUrl={this.props.discussion.html_url}
                 onSelectedChanged={this.props.onSelectedChanged}
                 peerReview={this.props.discussion.assignment ? this.props.discussion.assignment.peer_reviews : false}

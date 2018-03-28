@@ -689,7 +689,9 @@ class DiscussionTopicsController < ApplicationController
               :THREADED => @topic.threaded?,
               :ALLOW_RATING => @topic.allow_rating,
               :SORT_BY_RATING => @topic.sort_by_rating,
-              :TODO_DATE => @topic.todo_date
+              :TODO_DATE => @topic.todo_date,
+              :IS_ASSIGNMENT => @topic.assignment_id?,
+              :IS_GROUP => @topic.group_category_id?
             }
             if params[:hide_student_names]
               env_hash[:HIDE_STUDENT_NAMES] = true

@@ -158,6 +158,7 @@ export default class DiscussionsIndex extends Component {
               permissions={this.props.permissions}
               masterCourseData={this.props.masterCourseData}
               roles={this.props.roles}
+              contextType={this.props.contextType}
               deleteDiscussion={this.openDeleteDiscussionsModal}
             />
           </div>
@@ -174,6 +175,7 @@ export default class DiscussionsIndex extends Component {
             updateDiscussion={this.props.updateDiscussion}
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
             roles={this.props.roles}
+            contextType={this.props.contextType}
             deleteDiscussion={this.openDeleteDiscussionsModal}
             renderContainerBackground={() =>
               pinnedDiscussionBackground({
@@ -194,6 +196,7 @@ export default class DiscussionsIndex extends Component {
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
             updateDiscussion={this.props.updateDiscussion}
             roles={this.props.roles}
+            contextType={this.props.contextType}
             deleteDiscussion={this.openDeleteDiscussionsModal}
             renderContainerBackground={() =>
               closedDiscussionBackground({
@@ -230,6 +233,7 @@ export default class DiscussionsIndex extends Component {
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
             onMoveDiscussion={this.renderMoveDiscussionTray}
             roles={this.props.roles}
+            contextType={this.props.contextType}
             pinned
             renderContainerBackground={() =>
               pinnedDiscussionBackground({
@@ -254,6 +258,7 @@ export default class DiscussionsIndex extends Component {
             pinned={false}
             closedState={false}
             roles={this.props.roles}
+            contextType={this.props.contextType}
             renderContainerBackground={() =>
               unpinnedDiscussionsBackground({
                 permissions: this.props.permissions,
@@ -277,6 +282,7 @@ export default class DiscussionsIndex extends Component {
             duplicateDiscussion={this.props.duplicateDiscussion}
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
             roles={this.props.roles}
+            contextType={this.props.contextType}
             pinned={false}
             closedState
             renderContainerBackground={() =>

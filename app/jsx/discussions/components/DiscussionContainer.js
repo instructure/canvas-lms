@@ -70,6 +70,7 @@ export default class DiscussionsContainer extends Component {
     renderContainerBackground: func.isRequired,
     onMoveDiscussion: func,
     deleteDiscussion: func,
+    contextType: string.isRequired,
   }
 
   static defaultProps = {
@@ -156,6 +157,7 @@ export default class DiscussionsContainer extends Component {
             updateDiscussion={this.props.updateDiscussion}
             onMoveDiscussion={this.props.onMoveDiscussion}
             deleteDiscussion={this.props.deleteDiscussion}
+            contextType={this.props.contextType}
             moveCard={this.moveCard}
             draggable
           />
@@ -179,6 +181,7 @@ export default class DiscussionsContainer extends Component {
             updateDiscussion={this.props.updateDiscussion}
             onMoveDiscussion={this.props.onMoveDiscussion}
             deleteDiscussion={this.props.deleteDiscussion}
+            contextType={this.props.contextType}
             draggable={false}
           />
       accumlator.push(row)
