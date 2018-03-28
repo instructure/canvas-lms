@@ -17,6 +17,7 @@
  */
 import moment from 'moment-timezone';
 import _ from 'lodash';
+import { makeEndOfDayIfMidnight } from './dateUtils';
 
 const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
   let { plannable, plannable_type, planner_override } = apiResponse;
@@ -87,11 +88,7 @@ export function transformApiToInternalItem (apiResponse, courses, groups, timeZo
   const details = getItemDetailsFromPlannable(apiResponse, timeZone);
 
   // Standardize 00:00:00 date to 11:59PM on the current day to make due date less confusing
-  let plannableDate = apiResponse.plannable_date;
-  let currentDay = moment(plannableDate);
-  if (isMidnight(currentDay, timeZone)) {
-    plannableDate = currentDay.endOf('day').toISOString();
-  }
+  const plannableDate = makeEndOfDayIfMidnight(apiResponse.plannable_date, timeZone);
 
   if ((!contextInfo.context) && apiResponse.plannable_type === 'planner_note' && (details.course_id)) {
     const course = courses.find(c => c.id === details.course_id);
@@ -129,7 +126,7 @@ export function transformPlannerNoteApiToInternalItem (plannerItemApiResponse, c
   return {
     id: plannerNote.id,
     uniqueId: `planner_note-${plannerNote.id}`,
-    dateBucketMoment: moment.tz(plannerNote.todo_date, timeZone).startOf('day'),
+    dateBucketMoment: moment.tz(plannerNote.todo_date, timeZone),
     type: 'To Do',
     status: false,
     course_id: plannerNote.course_id,
@@ -201,11 +198,4 @@ function getGroupContext(apiResponse, group) {
     color: group.color,
     url: group.url
   };
-}
-
-function isMidnight(currentDay, timeZone) {
-  // in languages like Arabic, moment.format returns strings in the native characters
-  // so this doesn't work
-  //currentDay.tz(timeZone).format('HH:mm:ss') === '00:00:00'
-  return currentDay.hours() === currentDay.minutes() === currentDay.seconds() === 0;
 }

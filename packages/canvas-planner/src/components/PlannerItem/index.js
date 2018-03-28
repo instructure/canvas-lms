@@ -125,8 +125,7 @@ export class PlannerItem extends Component {
   }
 
   renderDateField = () => {
-    if (this.props.date &&
-        this.props.associated_item !== "To Do") {
+    if (this.props.date) {
 
       if (this.props.associated_item === "Announcement") {
         return this.props.date.format("LT");

@@ -410,7 +410,6 @@ describe "student planner" do
     end
 
     it "adds date and time to a to-do item", priority: "1", test_id: 3482559 do
-      skip("unskip with ADMIN-297")
       go_to_list_view
       todo_modal_button.click
       modal = todo_sidebar_modal

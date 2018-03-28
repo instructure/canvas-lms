@@ -12,7 +12,7 @@
     "@instructure/ui-core": "^4.8.0",
     "@instructure/ui-menu": "^5.0.1",
     "@instructure/ui-overlays": "^5.0.1",
-    "@instructure/ui-themeable": "^4.8.0",
+    "@instructure/ui-themeable": "^5.4.0",
     "@instructure/ui-themes": "^5.0.1",
     "apollo-boost": "^0.1.4",
     "axios": "^0.16.0",
@@ -193,6 +193,7 @@
     "upgrade-and-dedupe": "rm -rf yarn.lock node_modules && yes 1 | yarn install --flat --production && git checkout package.json && yarn install && git add yarn.lock && git commit -m 'update npm deps'"
   },
   "resolutions": {
-    "jquery": "https://github.com/ryankshaw/jquery.git#a755a3e9c99d5a70d8ea570836f94ae1ba56046d"
+    "jquery": "https://github.com/ryankshaw/jquery.git#a755a3e9c99d5a70d8ea570836f94ae1ba56046d",
+    "moment": "2.10.6"
   }
 }
