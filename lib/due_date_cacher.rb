@@ -211,11 +211,12 @@ class DueDateCacher
           "count(nullif(workflow_state in ('completed'), false)) as prior_count",
           "count(nullif(workflow_state in ('rejected', 'deleted'), false)) as deleted_count"
         ).
-          where(course_id: @course, type: ['StudentEnrollment', 'StudentViewEnrollment'])
+          where(course_id: @course, type: ['StudentEnrollment', 'StudentViewEnrollment']).
+          group(:user_id)
 
         scope = scope.where(user_id: @user_ids) if @user_ids.present?
 
-        scope.group(:user_id).find_each do |record|
+        scope.find_each do |record|
           if record.accepted_count == 0 && record.deleted_count > 0
             counts.deleted_student_ids << record.user_id
           elsif record.accepted_count == 0 && record.prior_count > 0
