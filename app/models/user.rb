@@ -1801,17 +1801,13 @@ class User < ActiveRecord::Base
             limit(opts[:limit]).to_a
 
           subs_with_comment_scope = Submission.active.where(user_id: self).for_context_codes(context_codes).
-            joins(:submission_comments, :assignment).
+            joins(:assignment).
             where(assignments: {muted: false, workflow_state: 'published'}).
-            where('submission_comments.created_at>?', opts[:start_at]).
-            where.not(:submission_comments => {:author_id => self, :draft => true}).
-            distinct_on("submissions.id").
-            order("submissions.id, submission_comments.created_at DESC"). # get the last created comment
-            select("submissions.*, submission_comments.created_at AS last_updated_at_from_db")
+            where('last_comment_at > ?', opts[:start_at])
           # have to order by last_updated_at_from_db in another query because of distinct_on in the first one
-          submissions += Submission.from(subs_with_comment_scope).limit(opts[:limit]).order("last_updated_at_from_db").select("*").to_a
+          submissions += Submission.from(subs_with_comment_scope).limit(opts[:limit]).order("last_comment_at").select("*").to_a
 
-          submissions = submissions.sort_by{|t| t['last_updated_at_from_db'] || t.created_at}.reverse
+          submissions = submissions.sort_by{|t| t.last_comment_at || t.created_at}.reverse
           submissions = submissions.uniq
           submissions.first(opts[:limit])
 
