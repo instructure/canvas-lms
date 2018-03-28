@@ -32,8 +32,8 @@ import { MenuItem } from '@instructure/ui-core/lib/components/Menu'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import IconTimer from 'instructure-icons/lib/Line/IconTimerLine'
 import IconAssignmentLine from 'instructure-icons/lib/Line/IconAssignmentLine'
-import IconRssLine from 'instructure-icons/lib/Line/IconRssLine'
-import IconRssSolid from 'instructure-icons/lib/Solid/IconRssSolid'
+import IconBookmarkSolid from 'instructure-icons/lib/Solid/IconBookmarkSolid'
+import IconBookmarkLine from 'instructure-icons/lib/Line/IconBookmarkLine'
 import IconPublishSolid from 'instructure-icons/lib/Solid/IconPublishSolid'
 import IconCopySolid from 'instructure-icons/lib/Solid/IconCopySolid'
 import IconUpdownLine from 'instructure-icons/lib/Line/IconUpdownLine'
@@ -207,13 +207,13 @@ export default class DiscussionRow extends Component {
     <ToggleIcon
       toggled={this.props.discussion.subscribed}
       OnIcon={
-        <Text color="brand">
-          <IconRssSolid title={I18n.t('Unsubscribe from %{title}', { title: this.props.discussion.title })} />
+        <Text color="success">
+          <IconBookmarkSolid title={I18n.t('Unsubscribe from %{title}', { title: this.props.discussion.title })} />
         </Text>
       }
       OffIcon={
         <Text color="brand">
-          <IconRssLine title={I18n.t('Subscribe to %{title}', { title: this.props.discussion.title })} />
+          <IconBookmarkLine title={I18n.t('Subscribe to %{title}', { title: this.props.discussion.title })} />
         </Text>
       }
       onToggleOn={() => this.props.onToggleSubscribe(this.props.discussion)}
@@ -449,7 +449,7 @@ export default class DiscussionRow extends Component {
                     </Text>
                   </div>
                 }
-                actionsContent={[this.readCount(), this.subscribeButton(), this.publishButton()]}
+                actionsContent={[this.readCount(), this.publishButton(), this.subscribeButton()]}
               />
             </GridCol>
           </GridRow>
