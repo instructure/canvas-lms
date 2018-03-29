@@ -1331,6 +1331,7 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/courses', action: :courses_api, as: 'account_courses'
       get 'accounts/:account_id/sub_accounts', action: :sub_accounts, as: 'sub_accounts'
       get 'accounts/:account_id/courses/:id', controller: :courses, action: :show, as: 'account_course_show'
+      get 'accounts/:account_id/permissions', action: :permissions
       delete 'accounts/:account_id/users/:user_id', action: :remove_user
     end
 
