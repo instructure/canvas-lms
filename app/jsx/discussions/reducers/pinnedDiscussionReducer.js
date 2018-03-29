@@ -63,10 +63,9 @@ const reducerMap = {
     }, [])
     return setSortableId(orderBy(pinnedDiscussions, ['position'], ['asc']))
   },
-  [actionTypes.UPDATE_DISCUSSION_START]: (state, action) =>
-    copyAndUpdateDiscussionState(state, action.payload.discussion),
-  [actionTypes.UPDATE_DISCUSSION_FAIL]: (state, action) =>
-    copyAndUpdateDiscussionState(state, action.payload.discussion),
+  [actionTypes.UPDATE_DISCUSSION_SUCCESS]: (state, action) => (
+    copyAndUpdateDiscussionState(state, action.payload.discussion)
+  ),
   [actionTypes.DRAG_AND_DROP_START]: (state, action) => {
     const updatedState = copyAndUpdateDiscussionState(state, action.payload.discussion)
     return orderPinnedDiscussions(updatedState, action.payload.order)

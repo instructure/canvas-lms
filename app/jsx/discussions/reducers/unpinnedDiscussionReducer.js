@@ -50,10 +50,7 @@ const reducerMap = {
     }, [])
     return orderBy(unpinnedDiscussions, ((d) => new Date(d.last_reply_at)), ['desc'])
   },
-  [actionTypes.UPDATE_DISCUSSION_START]: (state, action) => (
-    copyAndUpdateDiscussionState(state, action.payload.discussion)
-  ),
-  [actionTypes.UPDATE_DISCUSSION_FAIL]: (state, action) => (
+  [actionTypes.UPDATE_DISCUSSION_SUCCESS]: (state, action) => (
     copyAndUpdateDiscussionState(state, action.payload.discussion)
   ),
   [actionTypes.DRAG_AND_DROP_START]: (state, action) => (

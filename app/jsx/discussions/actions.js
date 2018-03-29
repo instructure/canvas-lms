@@ -81,33 +81,36 @@ function copyAndUpdateDiscussion(discussion, updatedFields, focusOn) {
   return discussionCopy
 }
 
-const defaultFailMessage = I18n.t('Updating discussion failed')
-
-// We are assuming success here (mostly for the sake of drag and drop, where
-// it would look really awkward to drop it, have it snap back to the original
-// position, and then snap to the new position shortly after).
-// focusOn must be one of 'title' or 'manageMenu' (or can be left unspecified)
-// If set to a value, it will cause focus to end up on the title or manage menu
-// of the updated discussion.
-
-// TODO change this to the onSuccess paradigm. Much easier
 actions.updateDiscussion = function(discussion, updatedFields, { successMessage, failMessage }, focusOn) {
   return (dispatch, getState) => {
-    const discussionCopy = copyAndUpdateDiscussion(discussion, updatedFields, focusOn)
-    dispatch(actions.updateDiscussionStart({discussion: discussionCopy}))
-
+    dispatch(actions.updateDiscussionStart())
     apiClient.updateDiscussion(getState(), discussion, updatedFields)
-      .then(_ => {
-        dispatch(actions.updateDiscussionSuccess())
+      .then(res => {
+        const newDiscussion = res.data
+
+        // Students lose the manage menu if they close a discussion that they
+        // created. This can ruin the focus, and we need to correct it here
+        // if so. The check is here, not in the caller of the updateDiscussion,
+        // because we don't know if the menu disappears until we get the result
+        // back from this call. This is terrible.
+        if (focusOn) {
+          if (focusOn === "manageMenu") {
+            const realFocus = newDiscussion.permissions.delete ? "manageMenu" : "title"
+            newDiscussion.focusOn = realFocus
+          } else {
+            newDiscussion.focusOn = focusOn
+          }
+        }
+
+        dispatch(actions.updateDiscussionSuccess({discussion: newDiscussion}))
         if (successMessage) {
           $.screenReaderFlashMessage(successMessage)
         }
       })
       .catch(err => {
-        $.screenReaderFlashMessage(failMessage || defaultFailMessage)
+        $.screenReaderFlashMessage(failMessage || I18n.t('Updating discussion failed'))
         dispatch(actions.updateDiscussionFail({
-          message: failMessage || defaultFailMessage,
-          discussion,
+          message: failMessage || I18n.t('Updating discussion failed'),
           err
         }))
       })

@@ -69,8 +69,8 @@ test('GET_DISCUSSIONS_SUCCESS properly sorts discussions', () => {
   deepEqual(newState.closedForCommentsDiscussions.map(d => d.id), [6, 5])
 })
 
-test('UPDATE_DISCUSSION_START should not update pinned discussion', () => {
-  const newState = reduce(actions.updateDiscussionStart({discussion: {id: 1, pinned: true, locked: false}}), {
+test('UPDATE_DISCUSSION_SUCCESS should not update pinned discussion', () => {
+  const newState = reduce(actions.updateDiscussionSuccess({discussion: {id: 1, pinned: true, locked: false}}), {
     pinnedDiscussions: [{ id: 1, pinned: false, locked: false }]
   })
   deepEqual(newState.closedForCommentsDiscussions, [])
@@ -78,17 +78,8 @@ test('UPDATE_DISCUSSION_START should not update pinned discussion', () => {
   deepEqual(newState.pinnedDiscussions, [{ id: 1, pinned: true, locked: false }])
 })
 
-test('UPDATE_DISCUSSION_FAIL should update pinned discussion', () => {
-  const newState = reduce(actions.updateDiscussionFail({discussion: {id: 1, pinned: true, locked: false}}), {
-    pinnedDiscussions: [{ id: 1, pinned: false, locked: false }]
-  })
-  deepEqual(newState.closedForCommentsDiscussions, [])
-  deepEqual(newState.unpinnedDiscussions, [])
-  deepEqual(newState.pinnedDiscussions, [{ id: 1, pinned: true, locked: false }])
-})
-
-test('UPDATE_DISCUSSION_START should not update unpinned discussion', () => {
-  const newState = reduce(actions.updateDiscussionStart({discussion: {id: 1, pinned: false, locked: false}}), {
+test('UPDATE_DISCUSSION_SUCCESS should not update unpinned discussion', () => {
+  const newState = reduce(actions.updateDiscussionSuccess({discussion: {id: 1, pinned: false, locked: false}}), {
     pinnedDiscussions: [{ id: 1, pinned: true, locked: false }]
   })
   deepEqual(newState.closedForCommentsDiscussions, [])
@@ -96,26 +87,8 @@ test('UPDATE_DISCUSSION_START should not update unpinned discussion', () => {
   deepEqual(newState.pinnedDiscussions, [])
 })
 
-test('UPDATE_DISCUSSION_FAIL should update unpinned discussion', () => {
-  const newState = reduce(actions.updateDiscussionFail({discussion: {id: 1, pinned: false, locked: false}}), {
-    pinnedDiscussions: [{ id: 1, pinned: true, locked: false }]
-  })
-  deepEqual(newState.closedForCommentsDiscussions, [])
-  deepEqual(newState.unpinnedDiscussions, [{ id: 1, pinned: false, locked: false }])
-  deepEqual(newState.pinnedDiscussions, [])
-})
-
-test('UPDATE_DISCUSSION_START should not update closedForComments discussion', () => {
-  const newState = reduce(actions.updateDiscussionStart({discussion: {id: 1, pinned: false, locked: true}}), {
-    pinnedDiscussions: [{ id: 1, pinned: true, locked: true }]
-  })
-  deepEqual(newState.closedForCommentsDiscussions, [{ id: 1, pinned: false, locked: true }])
-  deepEqual(newState.unpinnedDiscussions, [])
-  deepEqual(newState.pinnedDiscussions, [])
-})
-
-test('UPDATE_DISCUSSION_FAIL should update closedForComments discussion', () => {
-  const newState = reduce(actions.updateDiscussionFail({discussion: {id: 1, pinned: false, locked: true}}), {
+test('UPDATE_DISCUSSION_SUCCESS should not update closedForComments discussion', () => {
+  const newState = reduce(actions.updateDiscussionSuccess({discussion: {id: 1, pinned: false, locked: true}}), {
     pinnedDiscussions: [{ id: 1, pinned: true, locked: true }]
   })
   deepEqual(newState.closedForCommentsDiscussions, [{ id: 1, pinned: false, locked: true }])

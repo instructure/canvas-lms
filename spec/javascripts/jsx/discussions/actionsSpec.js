@@ -42,25 +42,30 @@ QUnit.module('Discussions redux actions', {
   }
 })
 
-test('updateDiscussion dispatches UPDATE_DISCUSSION_START', () => {
-  mockSuccess('updateDiscussion', {})
+test('updateDiscussion dispatches UPDATE_DISCUSSION_SUCCESS', (assert) => {
+  const done = assert.async()
+  mockSuccess('updateDiscussion', { data: { locked: false, pinned: true } })
   const state = { discussions: { pages: { 1: { items: [] } }, currentPage: 1 } }
   const discussion = { pinned: false, locked: false }
   const updateFields = { pinned: true }
   const dispatchSpy = sinon.spy()
   actions.updateDiscussion(discussion, updateFields, {})(dispatchSpy, () => state)
-  const expected = [
-    {
-      payload: {
-        discussion: {
-          locked: false,
-          pinned: true
+
+  setTimeout(() => {
+    const expected = [
+      {
+        payload: {
+          discussion: {
+            locked: false,
+            pinned: true
+          },
         },
-      },
-      type: "UPDATE_DISCUSSION_START"
-    }
-  ]
-  deepEqual(dispatchSpy.firstCall.args, expected)
+        type: "UPDATE_DISCUSSION_SUCCESS"
+      }
+    ]
+    deepEqual(dispatchSpy.secondCall.args, expected)
+    done()
+  })
 })
 
 test('updateDiscussion calls apiClient.updateDiscussion', () => {
@@ -89,12 +94,8 @@ test('updateDiscussion dispatches UPDATE_DISCUSSION_FAIL if promise fails', (ass
     const expected = [
       {
         payload: {
-          discussion: {
-            locked: false,
-            pinned: true
-          },
-        err: "something bad happened",
-        message: "Updating discussion failed"
+          err: "something bad happened",
+          message: "Updating discussion failed"
         },
         type: "UPDATE_DISCUSSION_FAIL"
       }
@@ -161,7 +162,7 @@ test('updateDiscussion calls screenReaderFlash if unsuccessful with custom flash
   })
 })
 
-test('updateDiscussion throws exception if updating a field that does not exist on the discussion', (assert) => {
+test('handleDrop throws exception if updating a field that does not exist on the discussion', (assert) => {
   const state = { discussions: { pages: { 1: { items: [] } }, currentPage: 1 } }
   const discussion = { pinned: true, locked: false}
   const updateFields = {foobar: true}
@@ -169,7 +170,7 @@ test('updateDiscussion throws exception if updating a field that does not exist 
 
   assert.throws(
     function() {
-      actions.updateDiscussion(discussion, updateFields, {})(dispatchSpy, () => state)
+      actions.handleDrop(discussion, updateFields, {})(dispatchSpy, () => state)
     },
     "field foobar does not exist in the discussion"
   )
