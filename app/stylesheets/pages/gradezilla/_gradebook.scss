@@ -1005,3 +1005,8 @@ $gradebook_checkbox_size: 16px;
   text-align: center;
   padding: 0.7rem;
 }
+
+// Specific width to ensure the text of the dialog doesn't wrap by default
+#anonymous-speed-grader-alert-container {
+  min-width: 35rem;
+}
