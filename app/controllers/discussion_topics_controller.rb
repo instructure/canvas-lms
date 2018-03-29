@@ -504,7 +504,8 @@ class DiscussionTopicsController < ApplicationController
          map { |category| { id: category.id, name: category.name } },
       HAS_GRADING_PERIODS: @context.grading_periods?,
       SECTION_LIST: sections.map { |section| { id: section.id, name: section.name } },
-      ANNOUNCEMENTS_LOCKED: announcements_locked?
+      ANNOUNCEMENTS_LOCKED: announcements_locked?,
+      CREATE_ANNOUNCEMENTS_UNLOCKED: @current_user.create_announcements_unlocked?
     }
 
     post_to_sis = Assignment.sis_grade_export_enabled?(@context)
@@ -1072,6 +1073,7 @@ class DiscussionTopicsController < ApplicationController
       prior_version = @topic.dup
       if model_type == :announcements && @context.is_a?(Course)
         @topic.locked = true
+        save_lock_preferences
       end
     else
       @topic = @context.send(model_type).active.find(params[:id] || params[:topic_id])
@@ -1214,6 +1216,14 @@ class DiscussionTopicsController < ApplicationController
         @topic.unlock(without_save: true)
       end
     end
+  end
+
+  def save_lock_preferences
+    return if @current_user.nil?
+    return if !params.key?(:locked) || params[:locked].is_a?(Hash)
+    should_lock = value_to_boolean(params[:locked])
+    @current_user.create_announcements_unlocked(!should_lock)
+    @current_user.save
   end
 
   def process_lock_parameters(discussion_topic_hash)

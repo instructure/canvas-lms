@@ -1441,6 +1441,14 @@ class User < ActiveRecord::Base
     !!preferences[:disable_inbox]
   end
 
+  def create_announcements_unlocked?
+    preferences.fetch(:create_announcements_unlocked, false)
+  end
+
+  def create_announcements_unlocked(bool)
+    preferences[:create_announcements_unlocked] = bool
+  end
+
   def use_new_conversations?
     true
   end

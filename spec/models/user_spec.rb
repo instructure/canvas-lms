@@ -2300,6 +2300,13 @@ describe User do
     end
   end
 
+  describe "create_announcements_unlocked" do
+    it "defaults to false if preference not set"  do
+      user = User.create!
+      expect(user.create_announcements_unlocked?).to be_falsey
+    end
+  end
+
   describe "things excluded from json serialization" do
     it "excludes collkey" do
       # Ruby 1.9 does not like html that includes the collkey, so
