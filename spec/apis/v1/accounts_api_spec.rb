@@ -1086,6 +1086,21 @@ describe "Accounts API", type: :request do
     end
   end
 
+  context "permissions" do
+    it "returns permissions" do
+      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/permissions?permissions[]=become_user&permissions[]=manage_blarghs",
+                      :controller => 'accounts', :action => 'permissions', :account_id => @a1.to_param,
+                      :format => 'json', :permissions => %w(become_user manage_blarghs))
+      expect(json).to eq({"become_user"=>true, "manage_blarghs"=>false})
+    end
+
+    it "requires :read permission on the account" do
+      api_call(:get, "/api/v1/accounts/#{@a3.id}/permissions?permissions[]=become_user",
+               { :controller => 'accounts', :action => 'permissions', :account_id => @a3.to_param, :format => 'json',
+                 :permissions => %w(become_user) }, {}, {}, { :expected_status => 401 })
+    end
+  end
+
   context "account api extension" do
     module MockPlugin
       def self.extend_account_json(hash, account, user, session, includes)

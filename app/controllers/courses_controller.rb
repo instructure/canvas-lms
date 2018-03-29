@@ -2672,10 +2672,12 @@ class CoursesController < ApplicationController
   end
 
   # @API Permissions
-  # Returns permission information for provided course & current_user
+  # Returns permission information for the calling user in the given course.
+  # See also {api:AccountsController#permissions the Account counterpart}.
   #
   # @argument permissions[] [String]
-  #   List of permissions to check against authenticated user
+  #   List of permissions to check against the authenticated user.
+  #   Permission names are documented in the {api:RoleOverridesController#add_role Create a role} endpoint.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/permissions \
