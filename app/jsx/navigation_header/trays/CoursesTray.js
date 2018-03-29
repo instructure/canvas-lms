@@ -30,7 +30,7 @@ export default function CoursesTray({courses, hasLoaded}) {
   return (
     <Container as="div" padding="medium">
       <Heading level="h3" as="h2">{I18n.t('Courses')}</Heading>
-      <hr />
+      <hr role="presentation"/>
       <List variant="unstyled" margin="small 0" itemSpacing="small">
         {hasLoaded ? (
           courses.map(course =>
@@ -41,7 +41,7 @@ export default function CoursesTray({courses, hasLoaded}) {
               }
             </ListItem>
           ).concat([
-            <ListItem key="hr"><hr /></ListItem>,
+            <ListItem key="hr"><hr role="presentation"/></ListItem>,
             <ListItem key="all">
               <Link href="/courses">{I18n.t('All Courses')}</Link>
             </ListItem>

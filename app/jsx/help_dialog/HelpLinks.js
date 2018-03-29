@@ -51,7 +51,7 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
           // if the current user is an admin, show the settings link to
           // customize this menu
           window.ENV.current_user_roles && window.ENV.current_user_roles.includes('root_admin') && ([
-            <ListItem key="hr"><hr /></ListItem>,
+            <ListItem key="hr"><hr role="presentation"/></ListItem>,
             <ListItem key="customize">
               <Link href="/accounts/self/settings" >
                 {I18n.t('Customize this menu')}
