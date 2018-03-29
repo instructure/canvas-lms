@@ -14537,7 +14537,7 @@ nl:
         cancel: Annuleren
         move_copy_question: "Vraag verplaatsen/kopiëren"
       buttons: 
-        add_a_question: "Een opmerking toevoegen"
+        add_a_question: "Een vraag toevoegen"
         already_bookmarked: "Is al opgenomen in jouw bladwijzer"
         bookmark: "Plaats een bladwijzer bij deze toetsbank"
         delete: "Toetsbank verwijderen"
