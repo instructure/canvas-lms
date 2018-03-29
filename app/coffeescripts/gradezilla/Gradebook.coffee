@@ -2746,6 +2746,7 @@ define [
           type: 'error'
         })
         @addPendingGradeInfo(submission, gradeInfo)
+        @updateRowCellsForStudentIds([submission.userId])
         @renderSubmissionTray() if @getSubmissionTrayState().open
 
     updateSubmissionAndRenderSubmissionTray: (data) =>
