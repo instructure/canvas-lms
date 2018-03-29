@@ -26,7 +26,7 @@ import HomeworkSubmissionLtiContainer from 'compiled/external_tools/HomeworkSubm
 import RCEKeyboardShortcuts from 'compiled/views/editor/KeyboardShortcuts' /* TinyMCE Keyboard Shortcuts for a11y */
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 import { uploadFile } from 'jsx/shared/upload_file'
-import {submitContentItem, recordEulaAgreement} from './submit_assignment_helper'
+import {submitContentItem, recordEulaAgreement, verifyPledgeIsChecked} from './submit_assignment_helper'
 import 'compiled/jquery.rails_flash_notifications'
 import './jquery.ajaxJSON'
 import './jquery.inst_tree'
@@ -130,17 +130,16 @@ import 'jqueryui/tabs'
         uploadFileFromUrl();
         return;
       }
-      if($turnitin.length > 0 && !$turnitin.attr('checked')) {
-        alert(I18n.t('messages.agree_to_pledge', "You must agree to the submission pledge before you can submit this assignment."));
-        event.preventDefault();
-        event.stopPropagation();
+
+      if (!verifyPledgeIsChecked($turnitin)) {
+        event.preventDefault()
+        event.stopPropagation()
         return false;
       }
 
-      if($vericite.length > 0 && !$vericite.attr('checked')) {
-        alert(I18n.t('messages.agree_to_pledge', "You must agree to the submission pledge before you can submit this assignment."));
-        event.preventDefault();
-        event.stopPropagation();
+      if (!verifyPledgeIsChecked($vericite)) {
+        event.preventDefault()
+        event.stopPropagation()
         return false;
       }
 

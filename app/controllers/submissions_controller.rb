@@ -364,6 +364,8 @@ class SubmissionsController < ApplicationController
       return false
     end
 
+    always_permitted = always_permitted_create_params
+
     # Make sure that the submitted parameters match what we expect
     submission_params = (['submission_type'] + API_SUBMISSION_TYPES[submission_type]).sort
     params[:submission].slice!(*submission_params)
@@ -379,6 +381,8 @@ class SubmissionsController < ApplicationController
     if params[:submission].has_key?(:body)
       params[:submission][:body] = process_incoming_html_content(params[:submission][:body])
     end
+
+    params[:submission].merge!(always_permitted)
     return true
   end
   private :process_api_submission_params
@@ -565,6 +569,11 @@ class SubmissionsController < ApplicationController
     end
   end
   private :resubmit_to_plagiarism
+
+  def always_permitted_create_params
+    always_permitted_params = [:eula_agreement_timestamp].freeze
+    params.require(:submission).permit(always_permitted_params)
+  end
 
   def update
     @assignment = @context.assignments.active.find(params[:assignment_id])

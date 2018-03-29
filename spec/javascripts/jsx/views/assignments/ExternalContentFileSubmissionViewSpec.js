@@ -68,3 +68,24 @@ test("hits the group url", () => {
   view.uploadFileFromUrl({}, model)
   ok(spy.calledWith('/api/v1/groups/2/files'))
 })
+
+test("sends the eula agreement timestamp to the submission endpoint", () => {
+  const timestamp = 1522419910
+  const timestampNode = document.createElement('input')
+  const ajaxSpy = sinon.spy()
+  const submission = new Map()
+  const attachment = {
+    id: 23
+  }
+
+  timestampNode.id = 'eula_agreement_timestamp'
+  timestampNode.value = timestamp
+  document.querySelector('#fixtures').appendChild(timestampNode)
+
+  $.ajaxJSON = ajaxSpy
+  submission.set('comment', 'a comment')
+
+  view.assignmentSubmission = submission
+  view.submitAssignment(attachment)
+  equal(ajaxSpy.args[0][2].submission.eula_agreement_timestamp, timestamp)
+})

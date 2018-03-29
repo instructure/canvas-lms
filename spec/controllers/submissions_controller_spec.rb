@@ -222,6 +222,25 @@ describe SubmissionsController do
       expect(assigns[:submission].url).to eq 'http://www.google.com'
     end
 
+    it 'accepts eula agreement timestamp when api submission' do
+      timestamp = Time.zone.now.to_i.to_s
+      course_with_student_logged_in(:active_all => true)
+      attachment = attachment_model(context: @student)
+      @assignment = @course.assignments.create!(:title => 'some assignment', :submission_types => 'online_upload')
+      request.path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions"
+      params = {
+        course_id: @course.id,
+        assignment_id: @assignment.id,
+        submission: {
+          submission_type: 'online_upload',
+          file_ids: [attachment.id],
+          eula_agreement_timestamp: timestamp
+        }
+      }
+      post 'create', params: params
+      expect(assigns[:submission].turnitin_data[:eula_agreement_timestamp]).to eq timestamp
+    end
+
     it "should redirect to the assignment when locked in submit-at-deadline situation" do
       enable_cache do
         now = Time.now.utc

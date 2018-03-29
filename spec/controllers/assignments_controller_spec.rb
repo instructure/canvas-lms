@@ -759,8 +759,18 @@ describe AssignmentsController do
     context 'plagiarism detection platform' do
       include_context 'lti2_spec_helper'
 
-      it "bootstraps the correct message_handler id for LTI 2 tools to js_env" do
-        user_session(@teacher)
+      let(:service_offered) do
+        [
+          {
+            "endpoint" => "http://originality.docker/eula",
+            "action" => ["GET"],
+            "@id" => "http://originality.docker/lti/v2/services#vnd.Canvas.Eula",
+            "@type" => "RestService"
+          }
+        ]
+      end
+
+      before do
         allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:create_subscription).and_return true
         allow(Lti::ToolProxy).to receive(:find_active_proxies_for_context).with(@course) { Lti::ToolProxy.where(id: tool_proxy.id) }
         tool_proxy.resources << resource_handler
@@ -772,9 +782,21 @@ describe AssignmentsController do
           tool_type: 'Lti::MessageHandler',
           tool_id: message_handler.id
         )
+      end
 
+      it "bootstraps the correct message_handler id for LTI 2 tools to js_env" do
+        user_session(@teacher)
         get 'edit', params: {:course_id => @course.id, :id => @assignment.id}
         expect(assigns[:js_env][:SELECTED_CONFIG_TOOL_ID]).to eq message_handler.id
+      end
+
+      it "bootstraps the correct EULA link for the associated LTI 2 tool" do
+        tool_proxy.raw_data['tool_profile']['service_offered'] = service_offered
+        tool_proxy.save!
+
+        user_session(@student)
+        get 'show', params: {:course_id => @course.id, :id => @assignment.id}
+        expect(assigns[:js_env][:EULA_URL]).to eq service_offered[0]['endpoint']
       end
     end
 
