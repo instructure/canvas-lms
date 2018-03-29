@@ -75,6 +75,7 @@ describe EnrollmentsApiController, type: :request do
           'updated_at'                         => new_enrollment.updated_at.xmlschema,
           'created_at'                         => new_enrollment.created_at.xmlschema,
           'last_activity_at'                   => nil,
+          'last_attended_at'                   => nil,
           'total_activity_time'                => 0,
           'sis_account_id'                     => @course.account.sis_source_id,
           'sis_course_id'                      => @course.sis_source_id,
@@ -588,6 +589,7 @@ describe EnrollmentsApiController, type: :request do
           'updated_at'                         => new_enrollment.updated_at.xmlschema,
           'created_at'                         => new_enrollment.created_at.xmlschema,
           'last_activity_at'                   => nil,
+          'last_attended_at'                   => nil,
           'total_activity_time'                => 0,
           'sis_account_id'                     => @course.account.sis_source_id,
           'sis_course_id'                      => @course.sis_source_id,
@@ -926,6 +928,7 @@ describe EnrollmentsApiController, type: :request do
             'start_at'                           => nil,
             'end_at'                             => nil,
             'last_activity_at'                   => nil,
+            'last_attended_at'                   => nil,
             'total_activity_time'                => 0
         })
       end
@@ -985,6 +988,7 @@ describe EnrollmentsApiController, type: :request do
             'start_at'  => nil,
             'end_at'  => nil,
             'last_activity_at' => nil,
+            'last_attended_at' => nil,
             'total_activity_time' => 0
           }
         }
@@ -1195,6 +1199,7 @@ describe EnrollmentsApiController, type: :request do
             'start_at'           => nil,
             'end_at'             => nil,
             'last_activity_at'   => e.last_activity_at.xmlschema,
+            'last_attended_at'   => nil,
             'total_activity_time' => e.total_activity_time
           }
         }
@@ -1391,6 +1396,7 @@ describe EnrollmentsApiController, type: :request do
             'start_at' => nil,
             'end_at' => nil,
             'last_activity_at' => nil,
+            'last_attended_at' => nil,
             'total_activity_time' => 0,
             'user' => {
               'name' => e.user.name,
@@ -1443,6 +1449,7 @@ describe EnrollmentsApiController, type: :request do
             'start_at'                           => nil,
             'end_at'                             => nil,
             'last_activity_at'                   => nil,
+            'last_attended_at'                   => nil,
             'total_activity_time'                => 0
         })
       end
@@ -1489,6 +1496,7 @@ describe EnrollmentsApiController, type: :request do
             'start_at'           => nil,
             'end_at'             => nil,
             'last_activity_at'   => nil,
+            'last_attended_at'   => nil,
             'total_activity_time' => 0
           }
         }
@@ -1604,6 +1612,7 @@ describe EnrollmentsApiController, type: :request do
             'start_at' => nil,
             'end_at' => nil,
             'last_activity_at' => nil,
+            'last_attended_at' => nil,
             'total_activity_time' => 0,
             'course_integration_id' => nil,
             'sis_account_id' => nil,
@@ -1761,6 +1770,7 @@ describe EnrollmentsApiController, type: :request do
             'start_at' => nil,
             'end_at' => nil,
             'last_activity_at' => nil,
+            'last_attended_at' => nil,
             'total_activity_time' => 0
           }
           h['grades'] = {
@@ -1866,6 +1876,7 @@ describe EnrollmentsApiController, type: :request do
             'start_at'                           => nil,
             'end_at'                             => nil,
             'last_activity_at'                   => nil,
+            'last_attended_at'                   => nil,
             'total_activity_time'                => 0,
             'course_integration_id' => nil,
             'sis_account_id' => nil,
@@ -1928,6 +1939,7 @@ describe EnrollmentsApiController, type: :request do
             'start_at'                           => nil,
             'end_at'                             => nil,
             'last_activity_at'                   => nil,
+            'last_attended_at'                   => nil,
             'total_activity_time'                => 0,
             'course_integration_id' => nil,
             'sis_account_id' => nil,
@@ -2091,6 +2103,7 @@ describe EnrollmentsApiController, type: :request do
             'start_at'   => nil,
             'end_at'     => nil,
             'last_activity_at' => nil,
+            'last_attended_at' => nil,
             'total_activity_time' => 0,
             'user' => {
               'name' => e.user.name,
@@ -2129,6 +2142,7 @@ describe EnrollmentsApiController, type: :request do
             'start_at'   => nil,
             'end_at'     => nil,
             'last_activity_at' => nil,
+            'last_attended_at' => nil,
             'total_activity_time' => 0,
             'user' => {
               'name' => e.user.name,
@@ -2302,4 +2316,3 @@ describe EnrollmentsApiController, type: :request do
     end
   end
 end
-
