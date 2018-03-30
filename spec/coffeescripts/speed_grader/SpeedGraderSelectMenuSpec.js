@@ -103,7 +103,8 @@ test('A key press event on the select menu causes the change function to call', 
       className: {
         raw: 'not_graded',
         formatted: 'not graded'
-      }
+      },
+      anonymizableId: 'id'
     }
   ]
   let fired = false
@@ -138,18 +139,21 @@ QUnit.module('SpeedGraderSelectMenu - rendered select control', {
             id: 'section_all',
             data: {'section-id': 'all'},
             name: 'Show all sections',
-            className: {raw: 'section_all'}
+            className: {raw: 'section_all'},
+            anonymizableId: 'id'
           },
           {
             id: 'section_1',
             data: {'section-id': '1'},
             name: 'Change section to Section 1',
-            className: {raw: 'section_1'}
+            className: {raw: 'section_1'},
+            anonymizableId: 'id'
           }
-        ]
+        ],
+        anonymizableId: 'id'
       },
-      {id: '3', name: 'Student 2', className: {raw: 'graded', formatted: 'graded'}},
-      {id: '1', name: 'Student 1', className: {raw: 'not_graded', formatted: 'not graded'}}
+      {id: '3', name: 'Student 2', className: {raw: 'graded', formatted: 'graded'}, anonymizableId: 'id'},
+      {id: '1', name: 'Student 1', className: {raw: 'not_graded', formatted: 'not graded'}, anonymizableId: 'id'}
     ]
     this.selectMenu = new SpeedgraderSelectMenu(this.optionsArray)
     this.selectMenu.appendTo('#test_area')

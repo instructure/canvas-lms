@@ -16,19 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import SpeedgraderHelpers from 'speed_grader_helpers'
+import fakeENV from 'helpers/fakeENV'
+import SpeedgraderHelpers, {
+  isAnonymousModeratedMarkingEnabled,
+  setupIsAnonymous,
+  setupAnonymizableId
+} from 'speed_grader_helpers'
 
 QUnit.module('SpeedGrader', {
   setup() {
     const fixtures = document.getElementById('fixtures')
-    fixtures.innerHTML = `\
-<a id="assignment_submission_default_url" href="http://www.default.com"></a>
-<a id="assignment_submission_originality_report_url" href="http://www.report.com"></a>\
-`
+    fixtures.innerHTML = `
+      <a id="assignment_submission_default_url" href="http://www.default.com"></a>
+      <a id="assignment_submission_originality_report_url" href="http://www.report.com"></a>
+      `
   },
   teardown() {
     fixtures.innerHTML = ''
   }
+})
+
+test('isAnonymousModeratedMarkingEnabled is available on main object', () => {
+  strictEqual(SpeedgraderHelpers.isAnonymousModeratedMarkingEnabled, isAnonymousModeratedMarkingEnabled)
+})
+
+test('setupIsAnonymous is available on main object', () => {
+  strictEqual(SpeedgraderHelpers.setupIsAnonymous, setupIsAnonymous)
+})
+
+test('setupAnonymizableId is available on main object', () => {
+  strictEqual(SpeedgraderHelpers.setupAnonymizableId, setupAnonymizableId)
 })
 
 test('populateTurnitin sets correct URL for OriginalityReports', () => {
@@ -422,4 +439,70 @@ test('Posts to the resubmit URL', () => {
   SpeedgraderHelpers.plagiarismResubmitHandler(event, 'http://www.test.com')
   ok($.ajaxJSON.called)
   $.ajaxJSON = previousAjaxJson
+})
+
+QUnit.module('SpeedgraderHelpers.isAnonymousModeratedMarking', suiteHooks => {
+  suiteHooks.afterEach(() => {
+    fakeENV.teardown()
+  })
+
+  test('returns false when not set', () => {
+    delete ENV.anonymous_moderated_marking_enabled
+    strictEqual(isAnonymousModeratedMarkingEnabled(), false)
+  })
+
+  test('returns false when disabled', () => {
+    fakeENV.setup({anonymous_moderated_marking_enabled: false})
+    strictEqual(isAnonymousModeratedMarkingEnabled(), false)
+  })
+
+  test('returns true when enabled', () => {
+    fakeENV.setup({anonymous_moderated_marking_enabled: true})
+    strictEqual(isAnonymousModeratedMarkingEnabled(), true)
+  })
+})
+
+QUnit.module('SpeedgraderHelpers.setupIsAnonymous', suiteHooks => {
+  suiteHooks.afterEach(() => {
+    fakeENV.teardown()
+  })
+
+  test('returns true when assignment is anonymously graded and Anonymous Moderated Marking is enabled', () => {
+    fakeENV.setup({anonymous_moderated_marking_enabled: true})
+    strictEqual(setupIsAnonymous({anonymous_grading: true}), true)
+  })
+
+  test('returns false when assignment is not anonymously graded and Anonymous Moderated Marking is enabled', () => {
+    fakeENV.setup({anonymous_moderated_marking_enabled: true})
+    strictEqual(setupIsAnonymous({anonymous_grading: false}), false)
+  })
+
+  test('returns false when assignment is anonymously graded and Anonymous Moderated Marking is disabled', () => {
+    fakeENV.setup({anonymous_moderated_marking_enabled: false})
+    strictEqual(setupIsAnonymous({anonymous_grading: true}), false)
+  })
+
+  test('returns false when assignment is not anonymously graded and Anonymous Moderated Marking is unset', () => {
+    delete ENV.anonymous_moderated_marking_enabled
+    strictEqual(setupIsAnonymous({anonymous_grading: false}), false)
+  })
+
+  test('returns false when assignment is anonymously graded and Anonymous Moderated Marking is unset', () => {
+    delete ENV.anonymous_moderated_marking_enabled
+    strictEqual(setupIsAnonymous({anonymous_grading: true}), false)
+  })
+})
+
+QUnit.module('SpeedgraderHelpers.setupAnonymizableId', suiteHooks => {
+  suiteHooks.afterEach(() => {
+    fakeENV.teardown()
+  })
+
+  test('returns anonymizable_id when anonymous', () => {
+    strictEqual(setupAnonymizableId(true), 'anonymous_id')
+  })
+
+  test('returns id when anonymous', () => {
+    strictEqual(setupAnonymizableId(false), 'id')
+  })
 })
