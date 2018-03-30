@@ -1744,6 +1744,12 @@ class Attachment < ActiveRecord::Base
 
       self.file_state = 'available'
       self.save!
+
+      if opts[:progress]
+        # the UI only needs the id from here
+        opts[:progress].set_results({ id: self.id })
+      end
+
       handle_duplicates(duplicate_handling || 'overwrite')
     rescue Exception, Timeout::Error => e
       self.file_state = 'errored'
@@ -1765,6 +1771,12 @@ class Attachment < ActiveRecord::Base
       else
         self.upload_error_message = t :upload_error_unexpected, "An unknown error occurred downloading from %{url}", :url => url
       end
+
+      if opts[:progress]
+        opts[:progress].message = self.upload_error_message
+        opts[:progress].fail!
+      end
+
       self.save!
     end
   end
