@@ -237,6 +237,7 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
          idp.single_logout_services << SAML2::Endpoint.new(log_out_url,
                                                            SAML2::Bindings::HTTPRedirect::URN)
        end
+       idp.fingerprints = (certificate_fingerprint || '').split.presence
        entity.roles << idp
        entity
     end
@@ -275,6 +276,7 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
         sp.keys << SAML2::Key.new(cert, SAML2::Key::Type::SIGNING)
       end
     end
+    sp.private_keys = private_keys.values.map { |key| OpenSSL::PKey::RSA.new(key) }
 
     entity.roles << sp
     entity
@@ -325,6 +327,10 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     entity
   end
 
+  def sp_metadata(current_host = nil)
+    self.class.sp_metadata_for_account(account, current_host)
+  end
+
   def self.config
     ConfigFile.load('saml') || {}
   end
@@ -338,7 +344,7 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   end
 
   def self.private_keys
-    return [] unless (encryption = config[:encryption])
+    return {} unless (encryption = config[:encryption])
     ([encryption[:private_key]] + Array(encryption[:additional_private_keys])).map do |key|
       path = resolve_saml_key_path(key)
       next unless path
