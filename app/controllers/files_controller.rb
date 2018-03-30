@@ -843,7 +843,7 @@ class FilesController < ApplicationController
     if params[:progress_id]
       progress = Progress.find(params[:progress_id])
 
-      json = attachment_json(@attachment, @current_user)
+      json = { "id" => @attachment.id }
       progress.set_results(json)
       progress.complete!
     end

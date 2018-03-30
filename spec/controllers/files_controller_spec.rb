@@ -1311,6 +1311,7 @@ describe FilesController do
 
       progress.reload
       expect(progress).to be_completed
+      expect(progress.results["id"]).to_not be_nil
     end
   end
 
