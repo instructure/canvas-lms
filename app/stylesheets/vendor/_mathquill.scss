@@ -53,8 +53,8 @@
 }
 
 .mathquill-editable .cursor {
-  border-left: 1px solid black;
-  margin-right: -1px;
+  border-#{direction(left)}: 1px solid black;
+  margin-#{direction(right)}: -1px;
   position: relative;
   z-index: 1;
 }
@@ -258,8 +258,8 @@
   vertical-align: -.4em;
 }
 .mathquill-rendered-math sup.nthroot {
-  margin-right: -.6em;
-  margin-left: .2em;
+  margin-#{direction(right)}: -.6em;
+  margin-#{direction(left)}: .2em;
   min-width: .5em;
 }
 .mathquill-rendered-math sup.limit, .mathquill-rendered-math sub.limit,
@@ -277,7 +277,7 @@
   padding: 0 .2em;
 }
 .mathquill-rendered-math .unary-operator {
-  padding-left: .2em;
+  padding-#{direction(left)}: .2em;
 }
 .mathquill-rendered-math sup .binary-operator,
 .mathquill-rendered-math sub .binary-operator {
@@ -285,7 +285,7 @@
 }
 .mathquill-rendered-math sup .unary-operator,
 .mathquill-rendered-math sub .unary-operator {
-  padding-left: .1em;
+  padding-#{direction(left)}: .1em;
 }
 
 .mathquill-rendered-math .fraction {
@@ -310,7 +310,7 @@
 }
 .mathquill-rendered-math .denominator {
   border-top: 1px solid;
-  float: right; /* take out of normal flow to manipulate baseline */
+  float: direction(right); /* take out of normal flow to manipulate baseline */
   width: 100%;
 }
 
@@ -329,9 +329,9 @@
   color: inherit;
   font-family: "Courier New", monospace;
   border: 1px solid gray;
-  padding-right: 1px;
-  margin-right: 1px;
-  margin-left: 2px;
+  padding-#{direction(right)}: 1px;
+  margin-#{direction(right)}: 1px;
+  margin-#{direction(left)}: 2px;
 }
 .mathquill-rendered-math .latex-command-input.empty {
   background: transparent;
@@ -351,9 +351,9 @@
 .mathquill-rendered-math .sqrt-stem {
   border-top: 1px solid;
   margin-top: 1px;
-  padding-left: .15em;
-  padding-right: .2em;
-  margin-right: .1em;
+  padding-#{direction(left)}: .15em;
+  padding-#{direction(right)}: .2em;
+  margin-#{direction(right)}: .1em;
 }
 
 .mathquill-rendered-math .paren {
@@ -376,7 +376,7 @@
 }
 
 .mathquill-rendered-math .non-italicized-function {
-  padding-right: .2em;
+  padding-#{direction(right)}: .2em;
 }
 
 /*.mathquill-rendered-math .not {
@@ -422,7 +422,7 @@
   border-top-right-radius: 4px;
   border-top-left-radius: 4px;
   margin: 0 4px 0 0;
-  float: left;
+  float: direction(left);
   top: 1px;
   height: 2em;
   overflow: hidden;
@@ -458,7 +458,7 @@
   margin: 0 -100% 0 0;
   width: 100%;
   visibility: hidden;
-  float: left;
+  float: direction(left);
 }
 .mathquill-tab-pane-selected {
   visibility: visible;
@@ -474,7 +474,7 @@
 .mathquill-tab-pane li {
   overflow: hidden;
   display: block;
-  float: left;
+  float: direction(left);
   height: 1.5em;
   margin: 0 -4px 3px;
   padding: 4px 6px 0;

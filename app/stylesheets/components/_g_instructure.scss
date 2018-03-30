@@ -330,7 +330,7 @@
   .events_list {
     margin-bottom: $ic-sp * 1.5;
     .event-list-view-calendar {
-      float: right;
+      float: direction(right);
       @include fontSize(12px);
       font-weight: normal;
       &[class*=icon-]:before, &[class^=icon-]:before {

@@ -62,7 +62,7 @@
       width: 0;
       height: 10px;
       margin: 5px 0;
-      right: 0;
+      #{direction(right)}: 0;
       border-width: 2px 2px 2px 0;
     }
   }

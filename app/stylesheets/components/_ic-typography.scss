@@ -602,13 +602,13 @@ $popoverArrowDistanceFromCorner: $popoverArrowOuterWidth;
     bottom: -$popoverArrowWidth * 2;
   }
   &.center:before {
-    left: 50%;
-    margin-left: -$popoverArrowOuterWidth;
+    #{direction(left)}: 50%;
+    margin-#{direction(left)}: -$popoverArrowOuterWidth;
     #{direction(right)}: auto;
   }
   &.center:after {
-    left: 50%;
-    margin-left: -$popoverArrowWidth;
+    #{direction(left)}: 50%;
+    margin-#{direction(left)}: -$popoverArrowWidth;
     #{direction(right)}: auto;
   }
   &.middle:before {
