@@ -25,7 +25,7 @@ QUnit.module('SpeedgraderLinkView', {
   setup() {
     this.model = new Assignment({published: false})
     $('#fixtures').html(`\
-<a href="#" id="assignment-speedgrader-link" class="hidden"></a>\
+<ul><li id="assignment-speedgrader-link" class="hidden"></li></ul>\
 `)
     this.view = new SpeedgraderLinkView({
       model: this.model,
