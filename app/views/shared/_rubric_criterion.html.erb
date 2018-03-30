@@ -77,7 +77,7 @@
   <td style="padding: 0;">
     <% if !edit_view && criterion && rubric && rubric.free_form_criterion_comments %>
       <div class="custom_ratings_entry assessing">
-        <div style="margin-left: 5px; margin-top: 2px; <%= hidden unless rubric_association && rubric_association.summary_data && rubric_association.summary_data[:saved_comments] && rubric_association.summary_data[:saved_comments][criterion.id.to_s] %>" class="saved_custom_rating_holder">
+        <div style="margin-<%= direction('left') %>: 5px; margin-top: 2px; <%= hidden unless rubric_association && rubric_association.summary_data && rubric_association.summary_data[:saved_comments] && rubric_association.summary_data[:saved_comments][criterion.id.to_s] %>" class="saved_custom_rating_holder">
           <select class="saved_custom_rating">
             <option value=""><%= t "[ Select ]" %></option>
             <% (rubric_association.summary_data[:saved_comments][criterion.id.to_s] || [] rescue []).each do |comment| %>

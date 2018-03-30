@@ -215,7 +215,7 @@
     <% } %>
     <span class="min_score_box" style="display: none;" tabindex="0">
       <label class="screenreader-only" for="criterion_min_score"><%= t('Minimum Score') %></label>
-      <input id="criterion_min_score" type="text" class="min_score" style="width: 30px; margin-right: 5px;"/>
+      <input id="criterion_min_score" type="text" class="min_score" style="width: 30px; margin-<%= direction('right') %>: 5px;"/>
       <span class="points_possible_parent"><%= t 'assignment_points_possible', '/ %{points_possible}', :points_possible => '<span class="points_possible">&nbsp;</span>'.html_safe %></span>
     </pan>
   </div>

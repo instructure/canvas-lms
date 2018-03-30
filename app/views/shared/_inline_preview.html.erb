@@ -51,7 +51,7 @@
   display: none;
 }
 #file_content .context_module .header  {
-  margin-left: 5px;
+  margin-<%= direction('left') %>: 5px;
 }
 #file_content .context_module {
   margin-bottom: 0;
@@ -74,7 +74,7 @@
   overflow: auto;
   width: 250px;
   position: relative;
-  border-right: 1px solid #aaa;
+  border-<%= direction('right') %>: 1px solid #aaa;
 }
 #modules .context_module_item .move_item_link {
   display: none;
@@ -91,7 +91,7 @@
   white-space: inherit;
 }
 #modules .context_module_item .module_item_icons {
-  padding-left: 20px;
+  padding-<%= direction('left') %>: 20px;
 }
 #modules .context_module {
   border: 0
@@ -131,7 +131,7 @@
 <div id="file_content_header">
   <div class="pull-left" id="file_display_name"><%= @attachment ? @attachment.display_name : @tag.title %>
   </div>
-  <div style="float: right; padding-top:0.5em;">
+  <div style="float: <%= direction('right') %>; padding-top:0.5em;">
     <a href="#" id="frameless_link"><%= t 'links.exit_frame', "Lose the Frames"%></a>
   </div>
   <div id="current_item_id" style="display: none;"><%= @tag.try(:id) %></div>
@@ -149,7 +149,7 @@
     <td style="<%= hidden unless @module %>" class="modules_holder">
       <div id="modules">
         <%= render :partial => "context_modules/context_module", :object => @module %>
-        <div style="float: right; margin-top: 5px;">
+        <div style="float: <%= direction('right') %>; margin-top: 5px;">
           <a href="#" class="hide_sidebar_link no-hover" title="<%= t 'links.hide_sidebar', "Hide Sidebar" %>"><%= image_tag "delete_circle.png", :alt => t('Hide Sidebar') %></a>
         </div>
       </div>

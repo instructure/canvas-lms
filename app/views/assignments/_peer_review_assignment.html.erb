@@ -31,7 +31,7 @@
     </a>
   </span>
   <span class="user_id" style="display: none;"><%= request.try_rescue(:asset).try_rescue(:user_id) || nbsp %></span>
-  <div style="float: right;" class="review_links">
+  <div style="float: <%= direction('right') %>;" class="review_links">
     <% user = request.try_rescue(:assessor).try_rescue(:name)
        user ||= t 'titles.user_default', "User"
        reminder = t 'titles.remind_reviewer', "Remind %{user} about Assessment", :user => user

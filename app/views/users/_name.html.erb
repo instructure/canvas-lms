@@ -65,7 +65,7 @@
       <% unless @read_only %>
       <%# order important: the can_do(...) check filters out contexts that don't respond to root_account (e.g. User) %>
         <% first = true %>
-        <td class="links" colspan="2" style="text-align: right; font-size: 0.8em; padding-top: 10px;">
+        <td class="links" colspan="2" style="text-align: <%= direction('right') %>; font-size: 0.8em; padding-top: 10px;">
           <% if @user.grants_right?(@current_user, :rename) %>
             <% first = false %>
             <a href="#" class="edit_user_link"><%= t('edit', 'Edit') %></a>

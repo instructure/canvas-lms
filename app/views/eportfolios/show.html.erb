@@ -93,7 +93,7 @@
     or just jump straight to the portfolio.
     DETAILS
   %></p>
-  <ul class="unstyled_list" style="padding-left: 20px; margin-bottom: 20px; line-height: 1.8em; font-size: 1.2em;">
+  <ul class="unstyled_list" style="padding-<%= direction('left') %>: 20px; margin-bottom: 20px; line-height: 1.8em; font-size: 1.2em;">
     <li><a href="#" class="wizard_popup_link icon-question"><%= t('links.wizard', "Getting Started Wizard") %></a></li>
     <li><a href="?view=preview" class="icon-arrow-right"><%= t('links.portfolio', "Go to the Actual ePortfolio") %></a></li>
   </ul>
@@ -138,15 +138,15 @@
           class="submission_info">
           <%= submission.assignment.title %>, <%= submission.assignment.context.name %>
         </a>
-        <div style="float: right; font-size: 0.8em; color: #aaa; margin-right: 20px; margin-top: 0.5em;">
+        <div style="float: <%= direction('right') %>; font-size: 0.8em; color: #aaa; margin-<%= direction('right') %>: 20px; margin-top: 0.5em;">
           <%= datetime_string(submission.submitted_at || submission.updated_at) %>
           &nbsp;<a href="<%= context_url(submission.assignment.context, :context_assignment_submission_url, submission.assignment_id, @portfolio.user.id) %>" target="_blank" class="no-hover view_submission_url"><%= image_tag "popout.png", :alt => t('titles.view_submission', "View the Submission") %></a>
         </div>
         <span class="text" style="font-size: 1.2em;">
           <span class="text assignment_title"><%= submission.assignment.title %></span>
-          <span style="font-size: 0.8em; padding-left: 5px;" class="text context_name"><%= submission.assignment.context.name %></span>
+          <span style="font-size: 0.8em; padding-<%= direction('left') %>: 5px;" class="text context_name"><%= submission.assignment.context.name %></span>
         </span>
-        <div style="font-size: 0.8em; color #aaa; margin-left: 20px;">
+        <div style="font-size: 0.8em; color #aaa; margin-<%= direction('left') %>: 20px;">
           <%= t(:attachment_count, { :one => "1 Attachment", :other => "%{count} Attachments" },
                 :count => submission.attachments.length) unless submission.attachments.empty? %></div>
         <span class="submission_id" style="display: none;"><%= submission.id %></span>
@@ -206,9 +206,9 @@
         <td><%= before_label(:page_name, "Page Name") %></td>
         <td><input type="text" name="eportfolio_entry[name]" style="width: 100px;"/></td>
       </tr><tr>
-        <td colspan="2" style="padding-left: 20px; font-size: 0.8em; padding-top: 10px;">
+        <td colspan="2" style="padding-<%= direction('left') %>: 20px; font-size: 0.8em; padding-top: 10px;">
           <%= t(:current_pages, "Current Pages") %>
-          <ul id="page_select_list" class="unstyled_list" style="padding-left: 20px; margin-top: 5px;">
+          <ul id="page_select_list" class="unstyled_list" style="padding-<%= direction('left') %>: 20px; margin-top: 5px;">
             <li class="page_select" id="page_select_blank" style="display: none;">
             </li>
           </ul>
@@ -226,7 +226,7 @@
   </form>
 <% else %>
   <% if can_do(@portfolio, @current_user, :manage) %>
-  <div style="float: right; display: none;"><a href="#" class="edit_content_link icon-edit"><%= edit_link_text %></a></div>
+  <div style="float: <%= direction('right') %>; display: none;"><a href="#" class="edit_content_link icon-edit"><%= edit_link_text %></a></div>
   <% end %>
   <h2 id="eportfolio_entry_<%= @page.id %>"><span class="name"><%= @page.name %></span></h2>
   <%= form_for @page, :url => eportfolio_entry_url(@portfolio, @page), :html => {:id => "edit_page_form" } do |f| %>
@@ -242,7 +242,7 @@
   <div class="form_content">
     <%= f.check_box :allow_comments, :class => "allow_comments" %>
     <%= f.label :allow_comments, t('labels.allow_comments', "Allow Comments on this Page") %>
-    <div style="margin-left: 40px;" class="show_comments_box <%= "disabled" unless @page.allow_comments %>">
+    <div style="margin-<%= direction('left') %>: 40px;" class="show_comments_box <%= "disabled" unless @page.allow_comments %>">
       <%= f.check_box :show_comments, :class => "show_comments" %>
       <%= f.label :show_comments, t('labels.show_comments', "Make Comments Public") %>
     </div>
@@ -260,7 +260,7 @@
   <table class="formtable" style="width: 100%; display: none;">
     <tr>
       <td colspan="2">
-        <div style="text-align: right; margin-right: 5%; font-size: 0.8em;">
+        <div style="text-align: <%= direction('right') %>; margin-<%= direction('right') %>: 5%; font-size: 0.8em;">
           <a href="#" class="switch_views_link"><%= t '#editor.switch_editor_html', "HTML Editor" %></a>
           <a href="#" class="switch_views_link" style="display:none;"><%= t '#editor.switch_editor_rich_text', "Rich Content Editor" %></a>
         </div>
@@ -274,11 +274,11 @@
   <% if can_do(@portfolio, @current_user, :manage) %>
   <div id="edit_content_templates" style="display: none;">
     <div class="edit_rich_text_content form_content" style="display: none;">
-      <textarea class="edit_section" id="edit_section_blank" style="width: 95%; margin-left: auto; margin-right: auto; height: 200px;"></textarea>
+      <textarea class="edit_section" id="edit_section_blank" style="width: 95%; margin-<%= direction('left') %>: auto; margin-<%= direction('right') %>: auto; height: 200px;"></textarea>
     </div>
     <div class="edit_html_content form_content" style="display: none;">
       <%= before_label(:html_content, "Copy and paste your HTML code into the box below") %><br/>
-      <textarea class="edit_section" id="edit_html_section_blank" style="width: 95%; margin-left: auto; margin-right: auto; height: 150px;"></textarea>
+      <textarea class="edit_section" id="edit_html_section_blank" style="width: 95%; margin-<%= direction('left') %>: auto; margin-<%= direction('right') %>: auto; height: 150px;"></textarea>
     </div>
     <div class="edit_submission_content form_content" style="display: none;">
       <%= before_label(:choose_submission, "Select an assignment submission to embed in this page") %><br/>
@@ -299,8 +299,8 @@
                 <%=t "click to select" %>
               </span>
             </span>
-            <div style="float: right; font-size: 0.8em; color: #aaa; margin-right: 20px; margin-top: 0.5em;"><%= datetime_string(submission.submitted_at || submission.updated_at) %></div>
-            <div style="font-size: 0.8em; color #aaa; margin-left: 20px;">
+            <div style="float: <%= direction('right') %>; font-size: 0.8em; color: #aaa; margin-<%= direction('right') %>: 20px; margin-top: 0.5em;"><%= datetime_string(submission.submitted_at || submission.updated_at) %></div>
+            <div style="font-size: 0.8em; color #aaa; margin-<%= direction('left') %>: 20px;">
               <%= t(:attachment_count, { :one => "1 Attachment", :other => "%{count} Attachments" },
                     :count => submission.attachments.length) unless submission.attachments.empty? %></div>
             <div class="clear"></div>
@@ -317,17 +317,17 @@
       </div>
     </div>
     <div class="edit_attachment_content form_content" style="display: none;">
-      <div style="width: 400px; margin: 0 auto; text-align: left;">
+      <div style="width: 400px; margin: 0 auto; text-align: <%= direction('left') %>;">
         <%= before_label(:file_select, "Select a file to include on this page") %><br/>
-        <div class="file_list" style="margin-left: 50px; max-height: 200px; overflow: auto;">
+        <div class="file_list" style="margin-<%= direction('left') %>: 50px; max-height: 200px; overflow: auto;">
           <b><%= t(:no_files, "No Files Uploaded") if @portfolio.user.attachments.active.empty? %></b>
           <% unless @portfolio.user.attachments.active.empty? %>
             <%= render :partial => "files/nested_content", :object => (@folders.select{|f| !f.parent_folder_id}), :locals => {:folders => @folders} %>
           <% end %>
         </div><br/>
         <%= before_label(:file_upload, "Or upload a new file") %><br/>
-        <%= file_field :attachment, :uploaded_data, :class => "file_upload", :style => "padding-left: 50px;" %>
-        <div style="font-size: 0.8em; margin-left: 20px;">
+        <%= file_field :attachment, :uploaded_data, :class => "file_upload", :style => "padding-#{ direction('left') }: 50px;" %>
+        <div style="font-size: 0.8em; margin-<%= direction('left') %>: 20px;">
           <%= t("%{file_size_limit} user file quota applies",
                 file_size_limit: number_to_human_size(@current_user.quota)) %>
         </div>
@@ -347,7 +347,7 @@
     </div>
     <%= form_for :attachment, :url => context_url(@portfolio.user, :controller => :files, :action => :create, :format => "text"), :html => {:id => "upload_file_form"} do |f| %>
     <% end %>
-    <iframe class="submission_preview" style="border: 1px solid #aaa; width: 95%; height: 300px; display: block; margin-left: auto; margin-right: auto;" src="about:blank" title="<%= t("Preview") %>">
+    <iframe class="submission_preview" style="border: 1px solid #aaa; width: 95%; height: 300px; display: block; margin-<%= direction('left') %>: auto; margin-<%= direction('right') %>: auto;" src="about:blank" title="<%= t("Preview") %>">
     </iframe>
   </div>
   <div style="display: none;">
@@ -419,7 +419,7 @@
 </div>
 <% end %>
 <% if @owner_view %>
-  <div style="text-align: left; font-size: 1.2em; margin: 30px 10px 0;">
+  <div style="text-align: <%= direction('left') %>; font-size: 1.2em; margin: 30px 10px 0;">
     <a href="<%= eportfolio_export_portfolio_path(@portfolio.id) %>" class="download_eportfolio_link icon-zipped"><%= t('links.download_eportfolio', "Download the contents of this ePortfolio as a zip file") %></a>
     <div style="display: none; font-size: 1.2em;" id="downloading_eportfolio_message">
       <span class="message">
@@ -430,10 +430,10 @@
       </div>
     </div>
   </div>
-  <div style="text-align: left; font-size: 1.2em; margin: 30px 10px 0;">
+  <div style="text-align: <%= direction('left') %>; font-size: 1.2em; margin: 30px 10px 0;">
     <a href="<%= eportfolio_url(@portfolio.id) %>" class="delete_eportfolio_link icon-trash"><%= t('links.delete', "Delete this ePortfolio") %></a>
   </div>
-  <%= form_tag eportfolio_url(@portfolio.id), {:method => :delete, :id => "delete_eportfolio_form", :style => "margin-top: 20px; margin-left: 20px; display: none;"} do %>
+  <%= form_tag eportfolio_url(@portfolio.id), {:method => :delete, :id => "delete_eportfolio_form", :style => "margin-top: 20px; margin-#{direction('left')}: 20px; display: none;"} do %>
     <%= t(:delete_confirm, {
         :one => "You currently have 1 page in this ePortfolio. Are you sure you want to delete the entire ePortfolio?",
         :other => "You currently have %{count} pages in this ePortfolio. Are you sure you want to delete the entire ePortfolio?"

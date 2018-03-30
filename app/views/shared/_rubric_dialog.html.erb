@@ -18,7 +18,7 @@
 
 <div class="rubric_dialog" id="rubric_dialog" style="display: none;">
   <h2 class="pull-left"><%= t 'titles.find_a_rubric', "Find a Rubric" %></h2>
-  <a style="float: right;" href="<%= context_url(@context, :context_rubrics_url) %>"><%= t 'links.manage_rubrics', "Manage Rubrics" %></a>
+  <a style="float: <%= direction('right') %>;" href="<%= context_url(@context, :context_rubrics_url) %>"><%= t 'links.manage_rubrics', "Manage Rubrics" %></a>
   <a href="<%= context_url(@context, :context_grading_rubrics_url) %>" class="grading_rubrics_url" style="display: none;">&nbsp;</a>
   <div class="clear"></div>
   <div class="loading_message" style="margin: 10px; text-align: center;">
@@ -61,13 +61,13 @@
               <div>
                 <div class="pull-left">
                   <a href="#" class="select_rubric_link"><b class="title">&nbsp;</b></a>
-                  <span class="display_name" style="padding-left: 10px; font-size: 0.8em; color: #888;">
+                  <span class="display_name" style="padding-<%= direction('left') %>: 10px; font-size: 0.8em; color: #888;">
                     &nbsp;
                   </span>
                 </div>
                 <div class="clear"></div>
               </div>
-              <div style="margin-left: 5px;" class="details">
+              <div style="margin-<%= direction('left') %>: 5px;" class="details">
                 <%= render :partial => "shared/rubric_summary", :object => nil, :locals => {:brief => true} %>
               </div>
               <div class="clear"></div>
@@ -78,7 +78,7 @@
       </td>
     </tr>
   </table>
-  <div style="margin-top: 5px; text-align: right; display: none;"><a href="#" class="cancel_find_rubric_link"><%= t '#buttons.cancel', "Cancel" %></a></div>
+  <div style="margin-top: 5px; text-align: <%= direction('right') %>; display: none;"><a href="#" class="cancel_find_rubric_link"><%= t '#buttons.cancel', "Cancel" %></a></div>
   <div style="display: none;">
     <a href="<%= context_url(@context, :context_assignment_url, assignment.id) %>" style="display: none;" class="update_rubric_url">&nbsp;</a>
     <a href="<%= context_url(@context, :context_rubric_associations_url) %>" class="select_rubric_url">&nbsp;</a>

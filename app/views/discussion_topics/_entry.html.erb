@@ -50,7 +50,7 @@
     <% else %>
       <div class="header_title">
         <% if out_of_context %>
-          <span style="font-size: 0.8em; padding-left: 20px;">from
+          <span style="font-size: 0.8em; padding-<%= direction('left') %>: 20px;">from
             <% if assignment_visible_to_user %>
               <a href="<%= context_url(entry_context, :context_discussion_topic_url, (entry ? entry.discussion_topic_id : '{{ topic_id }}'), headless_param) %>" style="font-size: 1.2em; font-weight: bold;"><%= entry.discussion_topic.title %></a>
             <% else %>
@@ -82,7 +82,7 @@
   </div>
   <div class="content">
     <% unless hide_student_names %>
-      <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar((entry.try_rescue(:user_id)), context_code: entry_context.asset_string) %></div>
+      <div style="float: <%= direction('left') %>; margin: 0 5px 0 -10px;"><%= avatar((entry.try_rescue(:user_id)), context_code: entry_context.asset_string) %></div>
     <% end %>
     <div class="course_id" style="display: none;"><%= entry_context.id if entry_context && entry_context.is_a?(Course) %></div>
     <div class="message user_content"><%= user_content(entry.try_rescue(:message)) || nbsp %></div>

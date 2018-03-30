@@ -72,7 +72,7 @@
                 <%= mt(:override_sis_stickiness_instructions,
                        "By default, UI changes have priority over SIS import changes; for a number of fields, the SIS import will not change that field's data if an admin has changed that field through the UI. If you select this option, this SIS import will override UI changes.  \nSee the documentation for details.") %>
               </p>
-              <div id="add_sis_stickiness_container" style="padding-left: 20px;">
+              <div id="add_sis_stickiness_container" style="padding-<%= direction('left') %>: 20px;">
                 <input type="checkbox" name="add_sis_stickiness" value="1" id="add_sis_stickiness"/>
                 <label for="add_sis_stickiness"><%= t(:add_sis_stickiness_label, "Process as UI changes") %></label>
                 <p class='instruction'>
@@ -80,7 +80,7 @@
                          "With this option selected, changes made through this SIS import will be processed as if they are UI changes, preventing subsequent non-overriding SIS imports from changing the fields changed here.") %>
                 </p>
               </div>
-              <div id="clear_sis_stickiness_container" style="padding-left: 20px;">
+              <div id="clear_sis_stickiness_container" style="padding-<%= direction('left') %>: 20px;">
                 <input type="checkbox" name="clear_sis_stickiness" value="1" id="clear_sis_stickiness"/>
                 <label for="clear_sis_stickiness"><%= t(:clear_sis_stickiness_label, "Clear UI-changed state") %></label>
                 <p class='instruction'>

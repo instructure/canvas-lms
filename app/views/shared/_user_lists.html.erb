@@ -44,7 +44,7 @@
       <div id="user_list_duplicates_found" class="ui-widget">
         <div class="ui-state-highlight ui-corner-all">
           <p>
-            <span style="float: left; margin-right: 0 0.3em;" class="ui-icon ui-icon-info"></span>
+            <span style="float: <%= direction('left') %>; margin-<%= direction('right') %>: 0 0.3em;" class="ui-icon ui-icon-info"></span>
             <strong><%= before_label :notice, "Notice" %></strong>
             <span class="message_content"></span>
           </p>
@@ -52,14 +52,14 @@
       </div>
       <div id="user_list_no_valid_users" class="ui-widget">
         <div class="ui-state-highlight ui-corner-all">
-          <p><span style="float: left; margin-right: 0 0.3em;" class="ui-icon ui-icon-info"></span>
+          <p><span style="float: <%= direction('left') %>; margin-<%= direction('right') %>: 0 0.3em;" class="ui-icon ui-icon-info"></span>
           <%= t :no_valid_users, "*Sorry,* it does not seem as if there were any valid email addresses or login IDs typed in, please go back and try again.", :wrapper => "<strong>\\1</strong>" %></p>
         </div>
       </div>
       <div id="user_list_with_errors" class="ui-widget">
         <div class="ui-state-highlight ui-corner-all">
           <p>
-            <span style="float: left; margin-right: 0 0.3em;" class="ui-icon ui-icon-alert"></span>
+            <span style="float: <%= direction('left') %>; margin-<%= direction('right') %>: 0 0.3em;" class="ui-icon ui-icon-alert"></span>
             <strong><%= before_label :alert, "Alert" %></strong>
             <span class="message_content"></span>
           </p>

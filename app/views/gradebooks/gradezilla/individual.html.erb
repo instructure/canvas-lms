@@ -21,7 +21,7 @@
   js_bundle :screenreader_gradebook
 %>
 <% content_for :page_title, t("Gradebook: Individual View") %>
-<div style="float: right;">
+<div style="float: <%= direction('right') %>;">
   <span data-component="GradebookSelector" data-variant="IndividualGradebook"></span>
 </div>
 <div style="display:none;">

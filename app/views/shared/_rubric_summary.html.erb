@@ -48,7 +48,7 @@
     <%= render :partial => "shared/rubric_summary_criterion", :locals => {:assessing => assessing, :brief => brief} %>
   <% end %>
   <tr class="summary" style="<%= hidden if rubric_association && rubric_association.hide_score_total %>">
-    <td colspan="2" style="padding-right: 10px; text-align: right;">
+    <td colspan="2" style="padding-<%= direction('right') %>: 10px; text-align: <%= direction('right') %>;">
       <%= before_label :total_points, "Total Points" %>
       <%= t "*%{points}* out of **%{total}**",
             points: (assessing ? "0" : (I18n.n(rubric.points_possible) rescue 5)),

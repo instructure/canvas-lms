@@ -68,7 +68,7 @@
     <% end %>
   </div>
   <% unless content_is_locked %>
-    <div style="float: right;" class="links">
+    <div style="float: <%= direction('right') %>;" class="links">
       <span class="local_group_links">
         <% collapse_title = t('titles.collapse_group', "Collapse Group") %>
         <% expand_title = t('titles.expand_group', "Expand Group") %>

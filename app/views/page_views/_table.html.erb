@@ -25,7 +25,7 @@
         <th><%= t('headers.participated', "Participated") %></th>
         <th><%= t('headers.time', "Time") %></th>
         <th>
-          <div style="float:right; margin-right: 4px">
+          <div style="float:<%= direction('right') %>; margin-<%= direction('right') %>: 4px">
             <%= link_to("csv", user_page_views_path(@user, :format => :csv), :class => 'icon-ms-excel') %>
           </div>
           <%= t('headers.user_agent', "User Agent") %>

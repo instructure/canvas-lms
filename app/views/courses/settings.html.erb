@@ -307,7 +307,7 @@
         <td id="course_grading_scheme">
           <%= f.check_box :grading_standard_enabled, :class => "grading_standard_checkbox", :disabled => !can_manage %>
           <%= f.label :grading_standard_enabled, :en => "Enable course grading scheme" %>
-          <div class="grading_standard_link" style="margin-left: 20px;">
+          <div class="grading_standard_link" style="margin-<%= direction('left') %>: 20px;">
             <a href="#" class="edit_letter_grades_link"><%= @context.grading_standard_enabled? ? t('view_grading_scheme', "view grading scheme") : t('set_grading_scheme', "set grading scheme") %></a>
           </div>
         </td>
@@ -422,8 +422,8 @@
               %>
             <% end %>
           </span>
-          <a href="#" role="button" class="course_form course_form_more_options_link" style="padding-left: 20px;"><%= t('links.more_options', %{more options}) %></a>
-          <div class="course_form_more_options" style="display: none; padding-left: 20px;">
+          <a href="#" role="button" class="course_form course_form_more_options_link" style="padding-<%= direction('left') %>: 20px;"><%= t('links.more_options', %{more options}) %></a>
+          <div class="course_form_more_options" style="display: none; padding-<%= direction('left') %>: 20px;">
             <% if @context.self_enrollment_allowed? %>
               <%= f.check_box :self_enrollment, :class => 'self_enrollment_checkbox', :disabled => !can_manage %>
               <label for="course_self_enrollment">
@@ -463,7 +463,7 @@
             <label for="course_default_wiki_editing_roles">
               <%= t(%{can create, rename, and edit course pages by default}) %>
             </label><br/>
-            <div class="changed_default_wiki_editing_roles" style="display: none; padding-left: 20px; font-size: 0.8em;">
+            <div class="changed_default_wiki_editing_roles" style="display: none; padding-<%= direction('left') %>: 20px; font-size: 0.8em;">
               <input type="checkbox" name="update_default_pages" id="update_default_pages"/>
               <label for="update_default_pages"><%= t 'wiki_editing_roles_change_existing', %{Change pages currently editable by "%{current_setting}" to "%{new_setting}".}, :current_setting => content_tag('span', @context.readable_default_wiki_editing_roles), :new_setting => content_tag('span', nbsp, :class => 'default_wiki_editing_roles_change') %></label>
             </div>

@@ -172,7 +172,7 @@
                       <%= f.radio_button('do_lock_at', false, :checked => true) %>
                       <%= f.label('do_lock_at_false', :no_time_limit, :en => 'No time limit') %>
                     </label>
-                    <label id="how_long_to_unlock_wrapper" style="float: left; margin-left: 30px;" for="until">
+                    <label id="how_long_to_unlock_wrapper" style="float: <%= direction('left') %>; margin-<%= direction('left') %>: 30px;" for="until">
                       <%= f.radio_button('do_lock_at', true, checked: false) %>
                       <%= f.label('do_lock_at', :available_until, en: 'Until', value: true) %>
                       <label class="screenreader-only" id="quiz_lock_at_label">
@@ -219,7 +219,7 @@
                   <span id="quiz_details_text">
                     <%= @quiz.survey? ? t('links.show_student_survey_results', "Show Student Survey Results") : t('links.show_student_quiz_results', "Show Student Quiz Results") %>
                   </span>
-                  <div style="font-size: 0.8em; padding-left: 20px;">(<%= t(:students_submitted_so_far, {:one => "1 student submitted so far", :other => "%{count} students submitted so far"}, :count => @submitted_student_count) %>)</div>
+                  <div style="font-size: 0.8em; padding-<%= direction('left') %>: 20px;">(<%= t(:students_submitted_so_far, {:one => "1 student submitted so far", :other => "%{count} students submitted so far"}, :count => @submitted_student_count) %>)</div>
                 </a>
               </li>
             <% end %>

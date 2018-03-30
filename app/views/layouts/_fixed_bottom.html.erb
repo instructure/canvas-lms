@@ -22,7 +22,7 @@
       <div id="element_toggler_<%= index %>" class="element_toggler fixed_warning" role="button" aria-controls="element_toggler_<%= index %>" tabindex="0">
         <i class=<%= "icon-#{warning[:icon]}" %>></i>
         <b><%= warning[:title] %></b>
-        <div style="float: right;"><%= warning[:message] %></div>
+        <div style="float: <%= direction('right') %>;"><%= warning[:message] %></div>
       </div>
     <% end %>
   <% end %>

@@ -19,7 +19,7 @@
 <% eportfolio ||= nil %>
 <li id="portfolio_<%= eportfolio ? eportfolio.id : "blank" %>" style="<%= hidden unless eportfolio %> display: block; margin-bottom: 20px;">
   <a href="<%= eportfolio_path(eportfolio ? eportfolio.id : "{{ id }}") %>" class="icon-folder" style="font-size: 1.2em;"><span class="name"><%= eportfolio.name rescue nbsp %></span></a>
-  <div style="padding-left: 30px;">
+  <div style="padding-<%= direction('left') %>: 30px;">
     <%= t(:entry_count, { :one => "*1* page", :other => "*%{count}* pages" },
           :count => (eportfolio.eportfolio_entries.length rescue 0),
           :wrapper => '<span class="entry_count">\1</span>') %>

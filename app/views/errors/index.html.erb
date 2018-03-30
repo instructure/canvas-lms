@@ -81,7 +81,7 @@
         <br><%= before_label k.to_s %> <%= v %>
       <% end %>
       <br />
-      <pre style="font-size: 0.8em; margin-left: 20px; <%= "max-height: 150px;" if @reports.length > 1 %> overflow: auto;">
+      <pre style="font-size: 0.8em; margin-<%= direction('left') %>: 20px; <%= "max-height: 150px;" if @reports.length > 1 %> overflow: auto;">
         <%= report.data.try(:[], "exception_message") %><br />
         <%= report.backtrace %>
       </pre>

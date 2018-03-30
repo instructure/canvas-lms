@@ -62,7 +62,7 @@
         <i class="icon-add"></i><span class="screenreader-only"><%= new_question_title %></span>
         <%= new_question_title %>
       </a>
-      <a href="#" class="add_question_group_link btn" style="margin-left: 20px; margin-right: 20px;">
+      <a href="#" class="add_question_group_link btn" style="margin-<%= direction('left') %>: 20px; margin-<%= direction('right') %>: 20px;">
         <i class="icon-add"></i><span class="screenreader-only"><%= new_question_group_title %></span>
         <%= new_question_group_title %>
       </a>

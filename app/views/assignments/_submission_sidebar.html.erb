@@ -133,7 +133,7 @@
                 </div>
               <% end %>
             </div>
-            <div class="signature" style="font-size: 0.8em; text-align: right; color: #888;">
+            <div class="signature" style="font-size: 0.8em; text-align: <%= direction('right') %>; color: #888;">
               <%= t :comment_signature, "%{author}, %{created_at}", {
                 :author => comment_author_name_for(comment),
                 :created_at => datetime_string(comment.created_at)

@@ -47,7 +47,7 @@
   text-align: center;
 }
 #outcomes th.outcome {
-  text-align: left;
+  text-align: <%= direction('left') %>;
 }
 #outcomes td {
   padding: 2px 5px;
@@ -55,7 +55,7 @@
   border-bottom: 1px dotted #ccc;
 }
 #outcomes .short_description {
-  text-align: left;
+  text-align: <%= direction('left') %>;
   min-width: 150px;
 }
 #outcomes .attempts .sub_attempt {
@@ -74,7 +74,7 @@
   background-color: #fee;
 }
 #outcomes td#outcome_results {
-  text-align: left;
+  text-align: <%= direction('left') %>;
 }
 </style>
 <% end %>

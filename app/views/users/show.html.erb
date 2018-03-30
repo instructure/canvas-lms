@@ -34,7 +34,7 @@
 <div>
   <h1 class="screenreader-only"><%= t(:page_header_title, "User Profile") %></h1>
   <% if @context_account.is_a?(Account) && @context_account.has_outcomes? %>
-    <div style="float: right;">
+    <div style="float: <%= direction('right') %>;">
       <div>
         <a href="<%= context_url(@context_account, :context_user_outcomes_results_url, @user.id) %>" class=""><%= t('see_outcomes', 'See Outcome Results for %{user}', :user => @user.short_name) %></a>
       </div>
@@ -47,8 +47,8 @@
     margin-bottom: 2em;
   }
   #user-info-fieldsets table th{
-    text-align: left;
-    padding-right: 2em;
+    text-align: <%= direction('left') %>;
+    padding-<%= direction('right') %>: 2em;
   }
   ul.context_list .subtitle {
     line-height: 1.0em;
@@ -68,7 +68,7 @@
     <div id="courses_list" style="<%= hidden if @enrollments.empty? %>">
       <h3><%= t('courses', 'Courses') %> <%= count_if_any(@enrollments.count) %></h3>
       <div class="courses" style="font-size: 1.2em">
-        <ul class="unstyled_list context_list" style="margin-left: 5px; font-size: 0.9em; margin-bottom: 10px; max-height: 200px; overflow: auto;">
+        <ul class="unstyled_list context_list" style="margin-<%= direction('left') %>: 5px; font-size: 0.9em; margin-bottom: 10px; max-height: 200px; overflow: auto;">
           <% @enrollments.each do |enrollment| %>
             <% num_enrollments += 1 %>
             <%= render :partial => "enrollment", :object => enrollment %>
@@ -79,7 +79,7 @@
     <% if @user.adminable_accounts && !@user.adminable_accounts.empty? %>
       <h3><%= t('accounts', 'Accounts') %> <%= count_if_any(@user.adminable_accounts.count) %></h3>
       <div class="accounts" style="font-size: 1.2em">
-        <ul class="unstyled_list context_list" style="margin-left: 5px; font-size: 0.9em; margin-bottom: 10px; max-height: 200px; overflow: auto;">
+        <ul class="unstyled_list context_list" style="margin-<%= direction('left') %>: 5px; font-size: 0.9em; margin-bottom: 10px; max-height: 200px; overflow: auto;">
           <% @user.adminable_accounts.each do |account| %>
             <% num_enrollments += 1 %>
             <li>
@@ -95,7 +95,7 @@
     <% if !@group_memberships.empty? %>
       <h3><%= t('groups', 'Groups') %> <%= count_if_any(@group_memberships.count) %></h3>
       <div class="groups" style="font-size: 1.2em">
-        <ul class="unstyled_list context_list" style="margin-left: 5px; font-size: 0.9em; max-width: 800px; margin-bottom: 10px; max-height: 200px; overflow: auto;">
+        <ul class="unstyled_list context_list" style="margin-<%= direction('left') %>: 5px; font-size: 0.9em; max-width: 800px; margin-bottom: 10px; max-height: 200px; overflow: auto;">
           <% @group_memberships.each do |membership| %>
             <% num_enrollments += 1 %>
             <li>
