@@ -45,6 +45,11 @@ describe 'Developer Keys' do
       )
     end
 
+    def click_inherited_tab
+      fj("span:contains('Inherited'):last").click
+      wait_for_ajaximations
+    end
+
     it "allows creation through 'add developer key button'", test_id: 344077 do
       get "/accounts/#{Account.default.id}/developer_keys"
 
@@ -126,10 +131,8 @@ describe 'Developer Keys' do
     it "allows for pagination", test_id: 344532 do
       11.times { |i| Account.default.developer_keys.create!(name: "tool #{i}") }
       get "/accounts/#{Account.default.id}/developer_keys"
-      expect(f("#loading")).not_to have_class('loading')
       expect(ff("#reactContent tbody tr")).to have_size(10)
-      find_button("Show All 11 Keys").click
-      expect(f("#loading")).not_to have_class('loading')
+      find_button("Show All Keys").click
       expect(ff("#reactContent tbody tr")).to have_size(11)
     end
 
@@ -150,17 +153,18 @@ describe 'Developer Keys' do
     end
 
     context "Account Binding" do
-      it "creates an account binding with default workflow_state 'allow'", test_id: 3482823 do
+      it "creates an account binding with default workflow_state 'off'", test_id: 3482823 do
         site_admin_developer_key
-        expect(DeveloperKeyAccountBinding.last.workflow_state).to eq 'allow'
+        expect(DeveloperKeyAccountBinding.last.workflow_state).to eq 'off'
         expect(DeveloperKeyAccountBinding.last.account_id).to eq Account.site_admin.id
       end
 
-      it "site admin dev key is visible and set to 'allow' in root account", test_id: 3482823 do
+      it "site admin dev key is visible and set to 'off' in root account", test_id: 3482823 do
         site_admin_developer_key.update(visible: true)
         get "/accounts/#{Account.default.id}/developer_keys"
-        expect(fj("span:contains('Allow'):last").text).to eq 'ALLOW'
-        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'allow'
+        click_inherited_tab
+        expect(fj("input[type='radio']:checked").attribute('value')).to eq 'off'
+        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'off'
       end
 
       it "root account inherits 'on' binding workflow state from site admin key", test_id: 3482823 do
@@ -169,6 +173,7 @@ describe 'Developer Keys' do
         get "/accounts/#{Account.site_admin.id}/developer_keys"
         fj("span:contains('On'):last").click
         get "/accounts/#{Account.default.id}/developer_keys"
+        click_inherited_tab
         expect(fj("fieldset:last").attribute('aria-disabled')).to eq 'true'
         expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'on'
       end
@@ -179,20 +184,24 @@ describe 'Developer Keys' do
         get "/accounts/#{Account.site_admin.id}/developer_keys"
         fj("span:contains('Off'):last").click
         get "/accounts/#{Account.default.id}/developer_keys"
+        click_inherited_tab
         expect(fj("fieldset:last").attribute('aria-disabled')).to eq 'true'
         expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'off'
       end
 
       it "root account keeps self binding workflow state if site admin key state is 'allow'", test_id: 3482823 do
         site_admin_logged_in
-        site_admin_developer_key.update(visible: true)
+        site_admin_developer_key.update!(visible: true)
+        site_admin_developer_key.developer_key_account_bindings.first.update!(workflow_state: 'allow')
         get "/accounts/#{Account.default.id}/developer_keys"
+        click_inherited_tab
         fj("span:contains('On'):last").click
         get "/accounts/#{Account.site_admin.id}/developer_keys"
         fj("span:contains('Off'):last").click
         expect(DeveloperKeyAccountBinding.where(account_id: Account.site_admin.id).first.workflow_state).to eq 'off'
         fj("span:contains('Allow'):last").click
         get "/accounts/#{Account.default.id}/developer_keys"
+        click_inherited_tab
         expect(DeveloperKeyAccountBinding.where(account_id: Account.default.id).first.workflow_state).to eq 'on'
         expect(fj("fieldset:last")).not_to have_attribute('aria-disabled')
       end

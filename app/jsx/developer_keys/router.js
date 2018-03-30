@@ -38,7 +38,6 @@ function renderShowDeveloperKeys (ctx) {
         applicationState={state}
         actions={actions}
         store={store}
-        env={ENV}
         ctx={ctx}
       />,
       document.getElementById('reactContent'));

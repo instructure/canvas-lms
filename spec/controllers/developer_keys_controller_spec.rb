@@ -19,82 +19,140 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe DeveloperKeysController do
+  let(:site_admin_key) do
+    DeveloperKey.create!(
+      name: 'Site Admin Key',
+      visible: false
+    )
+  end
+  let(:root_account_key) do
+    DeveloperKey.create!(
+      name: 'Root Account Key',
+      account: test_domain_root_account,
+      visible: true
+    )
+  end
+  let(:test_domain_root_account) { Account.create! }
+
   context "Site admin" do
     before :once do
       account_admin_user(:account => Account.site_admin)
     end
 
     describe "GET 'index'" do
-      it 'should require authorization' do
-        get 'index', params: {account_id: Account.site_admin.id}
-        expect(response).to be_redirect
-      end
-
-      it 'should return the list of developer keys' do
-        user_session(@admin)
-        dk = DeveloperKey.create!
-        get 'index', params: {account_id: Account.site_admin.id}
-        expect(response).to be_success
-        expect(assigns[:keys]).to be_include(dk)
-      end
-
-      describe "js bundles" do
-        render_views
-
-        it 'includes developer_keys_react' do
-          allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(true)
-          user_session(@admin)
+      context 'with no session' do
+        it 'should require authorization' do
           get 'index', params: {account_id: Account.site_admin.id}
-          expect(response).to render_template(:index_react)
-          expect(response).to be_success
-        end
-
-        it 'includes developer_keys' do
-          user_session(@admin)
-          get 'index', params: {account_id: Account.site_admin.id}
-          expect(response).to render_template(:index)
-          expect(response).to be_success
+          expect(response).to be_redirect
         end
       end
 
-      it 'should not include deleted keys' do
-        user_session(@admin)
-        dk = DeveloperKey.create!
-        dk.destroy
-        get 'index', params: {account_id: Account.site_admin.id}
-        expect(response).to be_success
-        expect(assigns[:keys]).to_not be_include(dk)
-      end
+      context 'with a session' do
+        before do
+          user_session(@admin)
+        end
 
-      it 'should include inactive keys' do
-        user_session(@admin)
-        dk = DeveloperKey.create!
-        dk.deactivate!
-        get 'index', params: {account_id: Account.site_admin.id}
-        expect(response).to be_success
-        expect(assigns[:keys]).to be_include(dk)
-      end
+        it 'should return the list of developer keys' do
+          dk = DeveloperKey.create!
+          get 'index', params: {account_id: Account.site_admin.id}
+          expect(response).to be_success
+          expect(assigns[:keys]).to be_include(dk)
+        end
 
-      it "should include the key's 'vendor_code'" do
-        user_session(@admin)
-        DeveloperKey.create!(vendor_code: 'test_vendor_code')
-        get 'index', params: {account_id: Account.site_admin.id}
-        expect(assigns[:keys].first.vendor_code).to eq 'test_vendor_code'
-      end
+        describe "js bundles" do
+          render_views
 
-      it "should include the key's 'visibility'" do
-        user_session(@admin)
-        key = DeveloperKey.create!
-        get 'index', params: {account_id: Account.site_admin.id}, format: :json
-        developer_key = json_parse(response.body).first
-        expect(developer_key['visible']).to eq(key.visible)
-      end
+          it 'includes developer_keys_react' do
+            allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(true)
+            get 'index', params: {account_id: Account.site_admin.id}
+            expect(response).to render_template(:index_react)
+            expect(response).to be_success
+          end
 
-      it 'includes non-visible keys created in site admin' do
-        user_session(@admin)
-        site_admin_key = DeveloperKey.create!(name: 'Site Admin Key', visible: false)
-        get 'index', params: {account_id: 'site_admin'}
-        expect(assigns[:keys]).to eq [site_admin_key]
+          it 'includes developer_keys' do
+            get 'index', params: {account_id: Account.site_admin.id}
+            expect(response).to render_template(:index)
+            expect(response).to be_success
+          end
+        end
+
+        it 'should not include deleted keys' do
+          dk = DeveloperKey.create!
+          dk.destroy
+          get 'index', params: {account_id: Account.site_admin.id}
+          expect(response).to be_success
+          expect(assigns[:keys]).not_to be_include(dk)
+        end
+
+        it 'should include inactive keys' do
+          dk = DeveloperKey.create!
+          dk.deactivate!
+          get 'index', params: {account_id: Account.site_admin.id}
+          expect(response).to be_success
+          expect(assigns[:keys]).to be_include(dk)
+        end
+
+        it "should include the key's 'vendor_code'" do
+          DeveloperKey.create!(vendor_code: 'test_vendor_code')
+          get 'index', params: {account_id: Account.site_admin.id}
+          expect(assigns[:keys].first.vendor_code).to eq 'test_vendor_code'
+        end
+
+        it "should include the key's 'visibility'" do
+          key = DeveloperKey.create!
+          get 'index', params: {account_id: Account.site_admin.id}, format: :json
+          developer_key = json_parse(response.body).first
+          expect(developer_key['visible']).to eq(key.visible)
+        end
+
+        it 'includes non-visible keys created in site admin' do
+          site_admin_key = DeveloperKey.create!(name: 'Site Admin Key', visible: false)
+          get 'index', params: {account_id: 'site_admin'}
+          expect(assigns[:keys]).to eq [site_admin_key]
+        end
+
+        context 'with inherited param' do
+          before do
+            site_admin_key
+            root_account_key
+            allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(true)
+            allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
+          end
+
+          context 'on site_admin account' do
+            it 'returns empty array' do
+              get 'index', params: {inherited: true, account_id: 'site_admin', format: 'json'}
+              developer_keys = json_parse(response.body)
+              expect(developer_keys.size).to eq 0
+            end
+          end
+
+          context 'on root account' do
+            context 'with site_admin key visible' do
+              before do
+                dev_key = DeveloperKey.create!(name: 'Site Admin Key 2')
+                dev_key.update!(visible: true)
+              end
+
+              it 'returns only the keys from site_admin' do
+                get 'index', params: {inherited: true, account_id: test_domain_root_account.id, format: 'json'}
+                developer_keys = json_parse(response.body)
+                expect(developer_keys.size).to eq 1
+                expect(developer_keys.first['name']).to eq 'Site Admin Key 2'
+              end
+            end
+
+            context 'with site_admin key not visible' do
+              it 'returns empty array' do
+                get 'index', params: {inherited: true, account_id: test_domain_root_account.id, format: 'json'}
+                developer_keys = json_parse(response.body)
+                expect(developer_keys.size).to eq 0
+              end
+            end
+          end
+
+          context 'on sub account'
+        end
       end
     end
 
@@ -149,7 +207,6 @@ describe DeveloperKeysController do
   end
 
   context "Account admin (not site admin)" do
-    let(:test_domain_root_account) { Account.create! }
     let(:test_domain_root_account_admin) { account_admin_user(account: test_domain_root_account) }
     let(:sub_account) { test_domain_root_account.sub_accounts.create!(parent_account: test_domain_root_account, root_account: test_domain_root_account) }
 
@@ -159,21 +216,6 @@ describe DeveloperKeysController do
     end
 
     describe '#index' do
-      let(:site_admin_key) do
-        DeveloperKey.create!(
-          name: 'Site Admin Key',
-          visible: false
-        )
-      end
-
-      let(:root_account_key) do
-        DeveloperKey.create!(
-          name: 'Root Account Key',
-          account: test_domain_root_account,
-          visible: true
-        )
-      end
-
       before do
         site_admin_key
         root_account_key
@@ -194,16 +236,61 @@ describe DeveloperKeysController do
         expect(assigns[:keys]).to match_array [root_account_key]
       end
 
-      it 'does include visible keys from site admin' do
+      it 'does not include visible keys from site admin' do
         site_admin_key.update!(visible: true)
         get 'index', params: {account_id: test_domain_root_account.id}
-        expect(assigns[:keys]).to match_array [site_admin_key, root_account_key]
+        expect(assigns[:keys]).to match_array [root_account_key]
       end
 
       it 'includes non-visible keys created in the current context' do
         root_account_key.update!(visible: false)
         get 'index', params: {account_id: test_domain_root_account.id}
         expect(assigns[:keys]).to match_array [root_account_key]
+      end
+
+      context 'with "inherited" parameter' do
+        it 'does not include account developer keys' do
+          root_account_key
+          get 'index', params: {account_id: test_domain_root_account.id, inherited: true}
+          expect(assigns[:keys]).to be_blank
+        end
+      end
+
+      context 'with sharding' do
+        specs_require_sharding
+
+        let(:root_account_admin) { root_account_shard.activate { account_admin_user(account: root_account) } }
+        let(:site_admin_shard) { Account.site_admin.shard }
+        let(:site_admin_key) do
+          site_admin_shard.activate do
+            key = DeveloperKey.create!
+            key.update!(visible: true)
+            key
+          end
+        end
+        let(:root_account_shard) { Shard.create! }
+        let(:root_account) { root_account_shard.activate { account_model } }
+        let(:root_account_key) { root_account_shard.activate { DeveloperKey.create!(account: root_account) } }
+
+        before do
+          site_admin_key
+          root_account_key
+
+          allow(controller).to receive(:account_context) do
+            controller.send(:require_account_context)
+            controller.send(:context)
+          end
+        end
+
+        it 'includes visible site admin keys from the site admin shard' do
+          user_session(root_account_admin)
+
+          root_account_shard.activate do
+            get 'index', params: {account_id: root_account.id, inherited: true}
+          end
+
+          expect(assigns[:keys]).to match_array [site_admin_key]
+        end
       end
     end
 

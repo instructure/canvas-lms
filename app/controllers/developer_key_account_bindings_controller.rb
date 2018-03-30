@@ -61,7 +61,7 @@ class DeveloperKeyAccountBindingsController < ApplicationController
   #
   # @argument workflow_state [String]
   #   The workflow state for the binding. Must be one of "on", "off", or "allow".
-  #   Defaults to "allow".
+  #   Defaults to "off".
   #
   # @returns DeveloperKeyAccountBinding
   def create_or_update

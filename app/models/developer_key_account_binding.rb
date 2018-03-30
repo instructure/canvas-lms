@@ -17,7 +17,8 @@
 #
 
 class DeveloperKeyAccountBinding < ApplicationRecord
-  DEFAULT_STATE = 'allow'.freeze
+  DEFAULT_STATE = 'off'.freeze
+  ALLOW_STATE = 'allow'.freeze
 
   belongs_to :account
   belongs_to :developer_key
@@ -40,7 +41,7 @@ class DeveloperKeyAccountBinding < ApplicationRecord
   # account 4 is "on."
   #
   # find_in_account_priority([1, 2, 3, 4], developer_key.id) would return the binding for
-  # account 3.
+  # account 3. Account 4 is not returned because it is after account 3 in the parameters.
   #
   # find_in_account_priority([1, 2, 3, 4], developer_key.id, false) would return the binding for
   # account 2.
@@ -55,7 +56,7 @@ class DeveloperKeyAccountBinding < ApplicationRecord
       WHERE
           b."developer_key_id" = #{developer_key_id}
       AND
-          b."workflow_state" <> '#{explicitly_set.present? ? DEFAULT_STATE : "NULL"}'
+          b."workflow_state" <> '#{explicitly_set.present? ? ALLOW_STATE : "NULL"}'
       ORDER BY i.ord ASC LIMIT 1
     SQL
     self.find_by(id: binding_id)

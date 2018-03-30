@@ -103,7 +103,7 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def set_visible
-    self.visible = !site_admin?
+    self.visible = !site_admin? # ask Karl if this should honor the visible set on object intialization
     true
   end
 

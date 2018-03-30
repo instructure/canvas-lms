@@ -69,12 +69,12 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
         )
       end
 
-      it 'defaults to "allow"' do
+      it 'defaults to "off"' do
         binding = DeveloperKeyAccountBinding.create!(
           account: account,
           developer_key: developer_key
         )
-        expect(binding.workflow_state).to eq 'allow'
+        expect(binding.workflow_state).to eq 'off'
       end
     end
   end
@@ -83,8 +83,16 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
     let(:root_account) { account_model }
     let(:sub_account) { account_model(parent_account: root_account) }
     let(:site_admin_key) { DeveloperKey.create!(account: nil) }
-    let(:root_account_binding) { site_admin_key.developer_key_account_bindings.create!(account: root_account) }
-    let(:sub_account_binding) { site_admin_key.developer_key_account_bindings.create!(account: sub_account) }
+    let(:root_account_binding) do
+      site_admin_key.developer_key_account_bindings.create!(
+        account: root_account, workflow_state: DeveloperKeyAccountBinding::ALLOW_STATE
+      )
+    end
+    let(:sub_account_binding) do
+      site_admin_key.developer_key_account_bindings.create!(
+        account: sub_account, workflow_state: DeveloperKeyAccountBinding::ALLOW_STATE
+      )
+    end
     let(:account_ids) { [sub_account.global_id, root_account.global_id, Account.site_admin.global_id] }
 
     before do

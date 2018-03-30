@@ -19,6 +19,7 @@
 import FormFieldGroup from '@instructure/ui-core/lib/components/FormFieldGroup'
 import Grid, {GridCol, GridRow} from '@instructure/ui-core/lib/components/Grid'
 import I18n from 'i18n!react_developer_keys'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import TextArea from '@instructure/ui-core/lib/components/TextArea'
 import TextInput from '@instructure/ui-core/lib/components/TextInput'
 import React from 'react'
@@ -35,7 +36,11 @@ export default class DeveloperKeyFormFields extends React.Component {
 
   developerKeySettings() {
     return (
-      <FormFieldGroup rowSpacing="small" vAlign="middle">
+      <FormFieldGroup
+        rowSpacing="small"
+        vAlign="middle"
+        description={<ScreenReaderContent>{I18n.t('Developer Key Settings')}</ScreenReaderContent>}
+      >
         <TextInput
           label={I18n.t('Key Name:')}
           name="developer_key[name]"
