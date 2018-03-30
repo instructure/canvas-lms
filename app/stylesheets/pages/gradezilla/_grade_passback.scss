@@ -20,7 +20,7 @@
 .error-circle{
     position: absolute;
     z-index: 10;
-    margin-left: -15px;
+    margin-#{direction(left)}: -15px;
     margin-top: 11px;
 
     border-radius: 50%;
@@ -35,7 +35,7 @@
 .success-mark {
     color: #33802a;
     position: absolute;
-    margin-left: -35px;
+    margin-#{direction(left)}: -35px;
     margin-top: 7px;
 }
 
@@ -53,26 +53,26 @@
 .btn-ignore {
     color: #c5c5c5;
     position: absolute;
-    margin-left: 208px;
+    margin-#{direction(left)}: 208px;
     margin-top: -38px;
 }
 
 .name-span3{
-  margin-left: 5px;
+  margin-#{direction(left)}: 5px;
 }
 
 .date-span2{
-  margin-left: 5px;
+  margin-#{direction(left)}: 5px;
 }
 
 /* Provide enough extra space on bottom of row for hints and datefields */
 .correction-row {
-    margin-left: 14px;
+    margin-#{direction(left)}: 14px;
     margin-bottom: 10px;
 }
 
 .title-row {
-    margin-left: 14px;
+    margin-#{direction(left)}: 14px;
 }
 
 /* Used as the header 'lead' text on each dialog page */
@@ -112,5 +112,5 @@ input + .hint-text {
 
 .assignment_correction_ignore{
   top: 38px;
-  right: -83px;
+  #{direction(right)}: -83px;
 }

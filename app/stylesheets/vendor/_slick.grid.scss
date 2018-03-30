@@ -16,10 +16,10 @@
 }
 
 .grid-header .h {
-	float: left;
+	float: direction(left);
 	
 	border: 1px solid transparent;
-	border-right-color: gray;
+	border-#{direction(right)}-color: gray;
 	border-bottom-color: silver;
 	background: #e0e0e0;
 	height: 19px;
@@ -32,7 +32,7 @@
 	z-index: 1;
 	padding: 2px;
 	padding-top: 1px;
-	padding-left: 1px;
+	padding-#{direction(left)}: 1px;
 	font-weight: bold;
 }
 
@@ -72,11 +72,11 @@
 }
 
 .grid-canvas .r .c {
-	float: left;
+	float: direction(left);
 	
 	border: 1px solid transparent;
-	border-right-color: silver;
-	border-right-style: dotted;
+	border-#{direction(right)}-color: silver;
+	border-#{direction(right)}-style: dotted;
 	border-bottom-color: silver;
 	
 	height: 19px;
@@ -89,7 +89,7 @@
 	z-index: 1;
 	padding: 2px;
 	padding-top: 1px;
-	padding-left: 1px;
+	padding-#{direction(left)}: 1px;
 	position: relative;
 }
 
@@ -117,20 +117,20 @@
 /* Individual cell styles */
 .grid-canvas .r .c.task-name {
 	font-weight: bold;
-	text-align: right;
+	text-align: direction(right);
 }
 
 
 .grid-canvas .r .c.task-percent {
-	text-align: right;
+	text-align: direction(right);
 }
 
 
 .grid-canvas .r .c.cell-move-handle {
 	font-weight: bold;
-	text-align: right;
-	border-right-style: solid;
-	border-right-color: gray;
+	text-align: direction(right);
+	border-#{direction(right)}-style: solid;
+	border-#{direction(right)}-color: gray;
 
 	background: #efefef;
 	cursor: move;
@@ -145,7 +145,7 @@
 }
 
 .grid-canvas .r .cell-actions {
-	text-align: left;
+	text-align: direction(left);
 }
 
 
@@ -179,7 +179,7 @@
 	outline: 0px; 
 	padding: 0px;
 	padding-top: 3px;
-	float: left;
+	float: direction(left);
 }
 
 .grid-canvas .r .c .editor-percentcomplete-picker {
@@ -190,16 +190,16 @@
     background: url("images/pencil.gif") no-repeat center center;	
 	overflow: visible;
 	z-index: 1000;
-	float: right;
+	float: direction(right);
 }
 	
 .grid-canvas .r .c .editor-percentcomplete-helper {
     border: 1px solid gray;
     position: absolute;
     top: -2px;
-    left: -9px;
+    #{direction(left)}: -9px;
     background: url("images/editor-helper-bg.gif") no-repeat top left;
-    padding-left: 9px;
+    padding-#{direction(left)}: 9px;
     border: 0px;
     width: 120px;
     height: 140px;
@@ -216,11 +216,11 @@
 	width:100%;
 	height:98px;
 	border:1px solid gray;
-	border-left:0px;	
+	border-#{direction(left)}:0px;	
 }
 
 .grid-canvas .r .c .editor-percentcomplete-buttons {
-	float: right;	
+	float: direction(right);	
 }
 
 .grid-canvas .r .c .editor-percentcomplete-buttons button {
@@ -229,7 +229,7 @@
 
 
 .grid-canvas .r .c .editor-percentcomplete-slider {
-	float: left;	
+	float: direction(left);	
 }
 
 .grid-canvas .r .c .editor-percentcomplete-picker:hover .editor-percentcomplete-helper {
@@ -274,12 +274,12 @@
 
 .grid-canvas .r .c .grade-helper-wrapper{
   position:absolute;
-  right:-10px;
+  #{direction(right)}:-10px;
   top:0;
 }
 .grid-canvas .r .c .grade-helper-wrapper .grade-helper-inner{
   position: absolute; 
-  left: 10px; 
+  #{direction(left)}: 10px; 
   top: -2px;
   
   font-size:10px;
