@@ -231,12 +231,12 @@ export default class DiscussionRow extends Component {
          toggled={this.props.discussion.published}
          OnIcon={
            <Text color="success">
-             <IconPublishSolid title={I18n.t('Publish %{title}', { title: this.props.discussion.title })} />
+             <IconPublishSolid title={I18n.t('Unpublish %{title}', { title: this.props.discussion.title })} />
            </Text>
          }
          OffIcon={
            <Text color="secondary">
-             <IconUnpublishedLine title={I18n.t('Unpublish %{title}', { title: this.props.discussion.title })} />
+             <IconUnpublishedLine title={I18n.t('Publish %{title}', { title: this.props.discussion.title })} />
            </Text>
          }
          onToggleOn={() => this.props.updateDiscussion(this.props.discussion, {published: true}, {})}
