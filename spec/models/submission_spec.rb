@@ -886,6 +886,14 @@ describe Submission do
       end
     end
 
+    it "sets the workflow state to 'graded' when submission is missing" do
+      Timecop.freeze(1.day.from_now(@date)) do
+        submission.score = nil
+        submission.apply_late_policy(@late_policy, @assignment)
+        expect(submission.workflow_state).to eq "graded"
+      end
+    end
+
     it "does not change the score of a missing submission if it already has one" do
       Timecop.freeze(1.day.from_now(@date)) do
         @assignment.grade_student(@student, grade: 1000, grader: @teacher)
