@@ -18,53 +18,47 @@
 
 import I18n from 'i18n!calendar'
 import $ from 'jquery'
+import tz from 'timezone'
 import htmlEscape from 'str/htmlEscape'
-import fcUtil from '../util/fcUtil'
-import commonEventFactory from '../calendar/commonEventFactory'
-import ValidatedFormView from '../views/ValidatedFormView'
 import editPlannerNoteTemplate from 'jst/calendar/editPlannerNote'
-import wrapper from 'jst/EmptyDialogFormWrapper'
 import datePickerFormat from 'jsx/shared/helpers/datePickerFormat'
-import {extend} from '../legacyCoffeesScriptHelpers'
 import 'jquery.instructure_date_and_time'
 import 'jquery.instructure_forms'
 import 'jquery.instructure_misc_helpers'
 import 'vendor/date'
+import fcUtil from '../util/fcUtil'
+import commonEventFactory from '../calendar/commonEventFactory'
+import ValidatedFormView from '../views/ValidatedFormView'
 import '../calendar/fcMomentHandlebarsHelpers'
 
-extend(EditPlannerNoteDetails, ValidatedFormView)
+export default class EditPlannerNoteDetails extends ValidatedFormView {
 
-export default function EditPlannerNoteDetails() {
-  this.onSaveFail = this.onSaveFail.bind(this)
-  this.onSaveSuccess = this.onSaveSuccess.bind(this)
-  this.getFormData = this.getFormData.bind(this)
-  this.setupTimeAndDatePickers = this.setupTimeAndDatePickers.bind(this)
-  this.contextChange = this.contextChange.bind(this)
-  this.setContext = this.setContext.bind(this)
-  this.activate = this.activate.bind(this)
-  this.submitNote = this.submitNote.bind(this)
-  return EditPlannerNoteDetails.__super__.constructor.apply(this, arguments)
-}
-
-Object.assign(EditPlannerNoteDetails.prototype, {
-  events: {
+  events = {
     ...EditPlannerNoteDetails.prototype.events,
-    'click .save_note': 'submitNote',
     'change .context_id': 'contextChange'
-  },
-  template: editPlannerNoteTemplate,
-  wrapper,
+  }
+  template = editPlannerNoteTemplate
 
-  initialize(selector, event, contextChangeCB, closeCB) {
+  constructor(selector, event, contextChangeCB, closeCB) {
+    super({
+      title: event.title,
+      contexts: event.possibleContexts(),
+      date: event.startDate(),
+      details: htmlEscape(event.description)
+    })
+
+    this.onSaveFail = this.onSaveFail.bind(this)
+    this.onSaveSuccess = this.onSaveSuccess.bind(this)
+    this.getFormData = this.getFormData.bind(this)
+    this.setupTimeAndDatePickers = this.setupTimeAndDatePickers.bind(this)
+    this.contextChange = this.contextChange.bind(this)
+    this.setContext = this.setContext.bind(this)
+    this.activate = this.activate.bind(this)
+
     this.event = event
     this.contextChangeCB = contextChangeCB
     this.closeCB = closeCB
-    EditPlannerNoteDetails.__super__.initialize.call(this, {
-      title: this.event.title,
-      contexts: this.event.possibleContexts(),
-      date: this.event.startDate(),
-      details: htmlEscape(this.event.description)
-    })
+
     this.currentContextInfo = null
 
     $(selector).append(this.render().el)
@@ -82,9 +76,9 @@ Object.assign(EditPlannerNoteDetails.prototype, {
     }
 
     this.model = this.event
-  },
+  }
 
-  submitNote(e) {
+  submit(e) {
     const data = this.getFormData()
     if (this.event.isNewEvent()) {
       data.contextInfo = this.event.contextInfo
@@ -94,30 +88,30 @@ Object.assign(EditPlannerNoteDetails.prototype, {
       this.event.can_change_context &&
       data.context_code !== this.event.object.context_code
     ) {
-      // need to update @event so it is cached in the right calendar (aka context_code)
+      // need to update this.event so it is cached in the right calendar (aka context_code)
       this.event.old_context_code = this.event.object.context_code
       this.event.removeClass(`group_${this.event.old_context_code}`)
       this.event.object.context_code = data.context_code
       this.event.contextInfo = this.contextInfoForCode(data.context_code)
     }
 
-    return this.submit(e)
-  },
+    return super.submit(e)
+  }
 
   contextInfoForCode(code) {
     return this.event.possibleContexts().find(context => context.asset_string === code) || null
-  },
+  }
 
   activate() {
     return this.$el.find('select.context_id').change()
-  },
+  }
 
   setContext(newContext) {
     this.$el
       .find('select.context_id')
       .val(newContext)
       .triggerHandler('change', false)
-  },
+  }
 
   contextChange(jsEvent, propagate) {
     const context = $(jsEvent.target).val()
@@ -128,9 +122,9 @@ Object.assign(EditPlannerNoteDetails.prototype, {
     }
 
     if (propagate !== false) {
-      return this.contextChangeCB(context)
+      this.contextChangeCB(context)
     }
-  },
+  }
 
   // TODO: when we can create planner notes from the calendar
   // # Update the edit and more option urls
@@ -144,45 +138,47 @@ Object.assign(EditPlannerNoteDetails.prototype, {
   setupTimeAndDatePickers() {
     // select the appropriate fields
     const $date = this.$el.find('.date_field')
-    // $start = @$el.find(".time_field.start_time")
-    // $end = @$el.find(".time_field.end_time")
+    const $time = this.$el.find(".time_field.note_time")
 
     // set them up as appropriate variants of datetime_field
     $date.datetime_field({
       datepicker: {
-        dateFormat: datePickerFormat(
-          this.event.allDay
-            ? I18n.t('#date.formats.medium_with_weekday')
-            : I18n.t('#date.formats.full_with_weekday')
-        )
-      }
+        dateFormat: datePickerFormat(I18n.t('#date.formats.medium_with_weekday'))
+      },
+      dateOnly: true
     })
-    // $start.time_field()
-    // $end.time_field()
+    $time.time_field()
 
     // fill initial values of each field according to @event
-    const start = fcUtil.unwrap(this.event.startDate())
-    // end = fcUtil.unwrap(@event.endDate())
-
-    return $date.data('instance', start)
-  },
-  // $start.data('instance').setTime(if @event.allDay then null else start)
-  // $end.data('instance').setTime(if @event.allDay then null else end)
-  //
-  // # couple start and end times so that end time will never precede start
-  // coupleTimeFields($start, $end, $date)
+    const due = fcUtil.unwrap(this.event.startDate())
+    $date.data('instance').setDate(due)
+    $time.data('instance').setTime(this.event.isNewEvent() ? null : due)
+  }
 
   getFormData() {
-    const data = EditPlannerNoteDetails.__super__.getFormData.apply(this, arguments)
+    const data = super.getFormData()
 
     const params = {
       title: data.title,
-      todo_date: data.date ? data.date.toISOString() : '',
+      todo_date: data.date,
       details: data.details,
       id: this.event.object.id,
       type: 'planner_note',
       context_code: data.context_code
     }
+    // check if input box was cleared for explicitly undated
+    if (params.todo_date) {
+      const { time } = data
+      let due_at = params.todo_date.toString('yyyy-MM-dd')
+      if (time) {
+        due_at += time.toString(' HH:mm')
+      } else {
+        due_at += ' 23:59'
+      }
+
+      params.todo_date = tz.parse(due_at)
+    }
+
     if (data.context_code.match(/^course_/)) {
       // is in a course's calendar
       params.context_type = 'Course'
@@ -196,34 +192,34 @@ Object.assign(EditPlannerNoteDetails.prototype, {
     }
 
     return params
-  },
+  }
 
   onSaveSuccess() {
     return this.closeCB()
-  },
+  }
 
   onSaveFail(xhr) {
     this.disableWhileLoadingOpts = {}
     return EditPlannerNoteDetails.__super__.onSaveFail.call(this, xhr)
-  },
+  }
 
   validateBeforeSave(data, errors) {
-    errors = this._validateTitle(data, errors)
-    errors = this._validateDate(data, errors)
+    errors = this._validateTitle(data, errors)  // eslint-disable-line no-param-reassign
+    errors = this._validateDate(data, errors)   // eslint-disable-line no-param-reassign
     return errors
-  },
+  }
 
   _validateTitle(data, errors) {
     if (!data.title || $.trim(data.title.toString()).length === 0) {
-      errors.title = [{message: I18n.t('Title is required!')}]
-    }
-    return errors
-  },
-
-  _validateDate(data, errors) {
-    if (!data.todo_date || $.trim(data.todo_date.toString()).length === 0) {
-      errors.date = [{message: I18n.t('Date is required!')}]
+      errors.title = [{message: I18n.t('Title is required!')}]  // eslint-disable-line no-param-reassign
     }
     return errors
   }
-})
+
+  _validateDate(data, errors) {
+    if (!data.todo_date || $.trim(data.todo_date.toString()).length === 0) {
+      errors.date = [{message: I18n.t('Date is required!')}]  // eslint-disable-line no-param-reassign
+    }
+    return errors
+  }
+}

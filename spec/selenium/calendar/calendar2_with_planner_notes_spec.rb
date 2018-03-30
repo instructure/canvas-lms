@@ -57,7 +57,7 @@ describe "calendar2" do
       replace_content(f('#planner_note_date'), 0.days.from_now.to_date.iso8601)
       replace_content(f('#planner_note_title'), title)
       f('button.save_note').click
-      wait_for_ajaximations
+      wait_for_ajax_requests
       note = f('a.fc-event')
       expect(note.attribute('class')).to include("group_user_#{@student1.id}") # the user calendar
       expect(note).to include_text('Student 1')
@@ -115,7 +115,7 @@ describe "calendar2" do
     it "should move a course calendar todo to the student calendar" do
       @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Course To Do", course_id: @course.id)
       get '/calendar2'
-
+      wait_for_ajax_requests
       f('a.fc-event').click # click the note
       f('button.edit_event_link').click # the Edit button
       click_option('#planner_note_context', @student1.name)

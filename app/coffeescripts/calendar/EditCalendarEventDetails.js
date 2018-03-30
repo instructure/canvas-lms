@@ -20,15 +20,15 @@ import I18n from 'i18n!calendar'
 import $ from 'jquery'
 import _ from 'underscore'
 import tz from 'timezone'
-import fcUtil from '../util/fcUtil'
-import commonEventFactory from '../calendar/commonEventFactory'
 import editCalendarEventTemplate from 'jst/calendar/editCalendarEvent'
-import coupleTimeFields from '../util/coupleTimeFields'
 import datePickerFormat from 'jsx/shared/helpers/datePickerFormat'
 import 'jquery.instructure_date_and_time'
 import 'jquery.instructure_forms'
 import 'jquery.instructure_misc_helpers'
 import 'vendor/date'
+import commonEventFactory from '../calendar/commonEventFactory'
+import coupleTimeFields from '../util/coupleTimeFields'
+import fcUtil from '../util/fcUtil'
 import '../calendar/fcMomentHandlebarsHelpers'
 
 export default class EditCalendarEventDetails {
@@ -175,10 +175,10 @@ export default class EditCalendarEventDetails {
     } else {
       moreOptionsHref = `${this.event.fullDetailsURL()}/edit`
     }
-    return this.$form.find('.more_options_link').attr('href', moreOptionsHref)
+    this.$form.find('.more_options_link').attr('href', moreOptionsHref)
   }
 
-  duplicateCheckboxChanged = (jsEvent, propagate) =>
+  duplicateCheckboxChanged = (jsEvent, _propagate) =>
     this.enableDuplicateFields(jsEvent.target.checked)
 
   enableDuplicateFields = shouldEnable => {

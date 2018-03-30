@@ -42,19 +42,20 @@ Object.assign(PlannerNote.prototype, {
   // if we get here via a request for the list of notes (see EventDataSource), some of the
   // fields are already filled in, but if we get here because we just edited a planner_note
   // they are not.
+  /* eslint-disable no-param-reassign */
   copyDataFromObject(data) {
     data.type = 'planner_note'
     data.description = data.details
     data.planner_note_id = data.id
     data.start_at = data.todo_date
     data.end_at = null
-    data.all_day = true
-    data.url = `${location.origin}${plannerNotesAPI}/${data.planner_note_id}`
+    data.all_day = false
+    data.url = `${window.location.origin}${plannerNotesAPI}/${data.planner_note_id}`
     data.context_code = data.course_id ? `course_${data.course_id}` : `user_${data.user_id}`
     data.all_context_codes = data.context_code
 
     if (data.calendar_event) data = data.calendar_event
-    this.object = this.calendarEvent = data
+    this.object = this.calendarEvent = data // eslint-disable-line no-multi-assign
     if (data.id) this.id = `planner_note_${data.id}`
     this.title = data.title || 'Untitled'
     this.start = this.parseStartDate()
@@ -81,7 +82,7 @@ Object.assign(PlannerNote.prototype, {
   },
 
   displayTimeString() {
-    return this.formatTime(this.startDate(), true)
+    return this.formatTime(this.startDate())
   },
 
   readableType() {

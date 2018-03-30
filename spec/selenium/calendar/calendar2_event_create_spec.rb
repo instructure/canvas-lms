@@ -242,7 +242,7 @@ describe "calendar2" do
         f('.fc-content .fc-title').click
         event_content = fj('.event-details-content:visible')
         expect(event_content.find_element(:css, '.event-details-timestring').text).
-          to eq format_date_for_view(Time.zone.now, :short)
+          to eq format_time_for_view(Time.zone.now, :short)
         expect(event_content).to contain_link('Student 1')
       end
     end
@@ -263,7 +263,7 @@ describe "calendar2" do
         f('.fc-content .fc-title').click
         event_content = fj('.event-details-content:visible')
         expect(event_content.find_element(:css, '.event-details-timestring').text).
-          to eq format_date_for_view(Time.zone.now, :short)
+          to eq format_time_for_view(Time.zone.now, :short)
         expect(event_content).to contain_link('Course 1')
       end
     end
@@ -313,21 +313,21 @@ describe "calendar2" do
         f('.fc-content .fc-title').click
         f('.edit_event_link').click
         replace_content(f('input[name=title]'), 'new to-do edited')
-        date = format_date_for_view(Time.zone.now, :short).split(" ")
-        day = if date[1] == '15'
-                date[0] + ' 20'
-              else
-                date[0] + ' 15'
-              end
-        replace_content(f('input[name=date]'), day)
+        datetime = Time.zone.now
+        datetime = if datetime.to_date().mday() == '15'
+                      datetime.change({day: 20})
+                   else
+                      datetime.change({day: 15})
+                   end
+        replace_content(f('input[name=date]'), format_date_for_view(datetime, :short))
         f('.validated-form-view').submit
         refresh_page
         f('.fc-content .fc-title').click
         event_content = fj('.event-details-content:visible')
         expect(event_content.find_element(:css, '.event-details-timestring').text).
-          to eq format_date_for_view(day)
+          to eq format_time_for_view(datetime, :short)
         @to_do.reload
-        expect(format_date_for_view(@to_do.todo_date, :short)).to eq(day)
+        expect(format_time_for_view(@to_do.todo_date, :short)).to eq(format_time_for_view(datetime, :short))
       end
     end
   end

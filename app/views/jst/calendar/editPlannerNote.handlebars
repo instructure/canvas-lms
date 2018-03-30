@@ -16,7 +16,7 @@
         <td>
           <div class='date_field_container'>
             <label class='screenreader-only' id='planner_note_date_accessible_label'>
-              {{#t}}Event Date:{{/t}}
+              {{#t}}To Do Date:{{/t}}
               {{datepickerScreenreaderPrompt 'date'}}
             </label>
             <input id="planner_note_date" type="text"
@@ -24,6 +24,24 @@
               name="date" style="width: 100px;" class="date_field"
               aria-labelledby='planner_note_date_accessible_label'
               data-tooltip title="{{accessibleDateFormat 'date'}}"/>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;"><label for="planner_note_time">{{#t "time"}}Time:{{/t}}</label></td>
+        <td>
+          <div style="display: inline-block;">
+            <div class='date_field_container'>
+              <label class='screenreader-only' id='planner_note_time_accessible_label'>
+                {{#t}}To Do Time{{/t}}
+                {{datepickerScreenreaderPrompt 'time'}}
+              </label>
+              <input id="planner_note_time" type="text"
+                name="time" style="width: 60px;"
+                class="time_field note_time"
+                aria-labelledby='planner_note_time_accessible_label'
+                data-tooltip title="{{accessibleDateFormat 'time'}}"/>
+            </div>
           </div>
         </td>
       </tr>
