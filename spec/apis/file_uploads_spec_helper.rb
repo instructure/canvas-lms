@@ -184,24 +184,26 @@ shared_examples_for "file uploads api" do
     local_storage!
     # step 1, preflight
     json = preflight({ :name => filename, :size => 20, :url => "http://www.example.com/images/delete.png" })
+    progress_url = json['progress']['url']
+    progress_id = json['progress']['id']
     attachment = Attachment.order(:id).last
     expect(attachment.file_state).to eq 'deleted'
-    status_url = json['status_url']
-    expect(status_url).to eq "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
+    expect(progress_url).to be_present
 
     # step 2, download
-    json = api_call(:get, status_url, {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
-    expect(json['upload_status']).to eq 'pending'
+    json = api_call(:get, progress_url, {:id => progress_id, :controller => 'progress', :action => 'show', :format => 'json'})
+    expect(json['workflow_state']).to eq 'queued'
 
     expect(CanvasHttp).to receive(:get).with("http://www.example.com/images/delete.png").and_yield(FakeHttpResponse.new(200, "asdf"))
     run_download_job
 
-    json = api_call(:get, status_url, {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
+    json = api_call(:get, progress_url, {:id => progress_id, :controller => 'progress', :action => 'show', :format => 'json'})
 
-    expect(json).to eq({
-      'upload_status' => 'ready',
-      'attachment' => attachment_json(attachment.reload, no_doc_preview: true),
-    })
+    expect(json['workflow_state']).to eq('completed')
+    expect(json['results']).to be_present
+    expect(json['results']['id']).to eq(attachment.id)
+
+    attachment.reload
     expect(attachment.file_state).to eq 'available'
     expect(attachment.size).to eq 4
     expect(attachment.user.id).to eq @user.id
@@ -213,13 +215,15 @@ shared_examples_for "file uploads api" do
     local_storage!
     # step 1, preflight
     json = preflight({ :name => filename, :size => 20, :url => '#@$YA#Y#AGWREG' })
+    progress_url = json['progress']['url']
+    progress_id = json['progress']['id']
     attachment = Attachment.order(:id).last
-    expect(json['status_url']).to eq "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
+    expect(progress_url).to be_present
 
     # step 2, download
     run_download_job
-    json = api_call(:get, json['status_url'], {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
-    expect(json['upload_status']).to eq 'errored'
+    json = api_call(:get, progress_url, {:id => progress_id, :controller => 'progress', :action => 'show', :format => 'json'})
+    expect(json['workflow_state']).to eq 'failed'
     expect(json['message']).to eq "Could not parse the URL: \#@$YA#Y#AGWREG"
     expect(attachment.reload.file_state).to eq 'errored'
   end
@@ -230,13 +234,15 @@ shared_examples_for "file uploads api" do
     local_storage!
     # step 1, preflight
     json = preflight({ :name => filename, :size => 20, :url => '/images/delete.png' })
+    progress_url = json['progress']['url']
+    progress_id = json['progress']['id']
     attachment = Attachment.order(:id).last
-    expect(json['status_url']).to eq "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
+    expect(progress_url).to be_present
 
     # step 2, download
     run_download_job
-    json = api_call(:get, json['status_url'], {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
-    expect(json['upload_status']).to eq 'errored'
+    json = api_call(:get, progress_url, {:id => progress_id, :controller => 'progress', :action => 'show', :format => 'json'})
+    expect(json['workflow_state']).to eq 'failed'
     expect(json['message']).to eq "No host provided for the URL: /images/delete.png"
     expect(attachment.reload.file_state).to eq 'errored'
   end
@@ -249,13 +255,15 @@ shared_examples_for "file uploads api" do
     # step 1, preflight
     expect(CanvasHttp).to receive(:get).with(url).and_yield(FakeHttpResponse.new(404))
     json = preflight({ :name => filename, :size => 20, :url => url })
+    progress_url = json['progress']['url']
+    progress_id = json['progress']['id']
     attachment = Attachment.order(:id).last
-    expect(json['status_url']).to eq "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
+    expect(progress_url).to be_present
 
     # step 2, download
     run_download_job
-    json = api_call(:get, json['status_url'], {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
-    expect(json['upload_status']).to eq 'errored'
+    json = api_call(:get, progress_url, {:id => progress_id, :controller => 'progress', :action => 'show', :format => 'json'})
+    expect(json['workflow_state']).to eq 'failed'
     expect(json['message']).to eq  "Invalid response code, expected 200 got 404"
     expect(attachment.reload.file_state).to eq 'errored'
   end
@@ -268,13 +276,15 @@ shared_examples_for "file uploads api" do
     # step 1, preflight
     expect(CanvasHttp).to receive(:get).with(url).and_raise(Timeout::Error)
     json = preflight({ :name => filename, :size => 20, :url => url })
+    progress_url = json['progress']['url']
+    progress_id = json['progress']['id']
     attachment = Attachment.order(:id).last
-    expect(json['status_url']).to eq "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
+    expect(progress_url).to be_present
 
     # step 2, download
     run_download_job
-    json = api_call(:get, json['status_url'], {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
-    expect(json['upload_status']).to eq 'errored'
+    json = api_call(:get, progress_url, {:id => progress_id, :controller => 'progress', :action => 'show', :format => 'json'})
+    expect(json['workflow_state']).to eq 'failed'
     expect(json['message']).to eq "The request timed out: http://www.example.com/images/delete.png"
     expect(attachment.reload.file_state).to eq 'errored'
   end
@@ -287,14 +297,16 @@ shared_examples_for "file uploads api" do
     # step 1, preflight
     expect(CanvasHttp).to receive(:get).with(url).and_raise(CanvasHttp::TooManyRedirectsError)
     json = preflight({ :name => filename, :size => 20, :url => url })
+    progress_url = json['progress']['url']
+    progress_id = json['progress']['id']
     attachment = Attachment.order(:id).last
     expect(attachment.workflow_state).to eq 'unattached'
-    expect(json['status_url']).to eq "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
+    expect(progress_url).to be_present
 
     # step 2, download
     run_download_job
-    json = api_call(:get, json['status_url'], {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
-    expect(json['upload_status']).to eq 'errored'
+    json = api_call(:get, progress_url, {:id => progress_id, :controller => 'progress', :action => 'show', :format => 'json'})
+    expect(json['workflow_state']).to eq 'failed'
     expect(json['message']).to eq "Too many redirects"
     expect(attachment.reload.file_state).to eq 'errored'
   end
@@ -507,13 +519,14 @@ shared_examples_for "file uploads api with quotas" do
     @context.write_attribute(:storage_quota, 1.megabyte)
     @context.save!
     json = preflight({ :name => "test.txt", :url => "http://www.example.com/test" })
-    status_url = json['status_url']
+    progress_url = json['progress']['url']
+    progress_id = json['progress']['id']
     attachment = Attachment.order(:id).last
     expect(CanvasHttp).to receive(:get).with("http://www.example.com/test").and_yield(FakeHttpResponse.new(200, (" " * 2.megabytes)))
     run_jobs
 
-    json = api_call(:get, status_url, {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
-    expect(json['upload_status']).to eq 'errored'
+    json = api_call(:get, progress_url, {:id => progress_id, :controller => 'progress', :action => 'show', :format => 'json'})
+    expect(json['workflow_state']).to eq 'failed'
     expect(json['message']).to eq "file size exceeds quota limits: #{ActiveSupport::NumberHelper.number_to_delimited(2.megabytes)} bytes"
     expect(attachment.file_state).to eq 'deleted'
   end
