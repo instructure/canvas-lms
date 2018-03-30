@@ -2680,11 +2680,11 @@ class Assignment < ActiveRecord::Base
 
   def validate_overrides_for_sis(overrides)
     unless AssignmentUtil.sis_integration_settings_enabled?(context) && AssignmentUtil.due_date_required_for_account?(context)
-      @skip_due_date_validation = true
+      @skip_sis_due_date_validation = true
       return
     end
     raise ActiveRecord::RecordInvalid unless assignment_overrides_due_date_ok?(overrides)
-    @skip_due_date_validation = true
+    @skip_sis_due_date_validation = true
   end
 
   def lti_resource_link_id
@@ -2695,13 +2695,19 @@ class Assignment < ActiveRecord::Base
   private
 
   def due_date_ok?
-    unless AssignmentUtil.due_date_ok?(self)
+    if unlock_at && lock_at && due_at
+      unless AssignmentUtil.in_date_range?(due_at, unlock_at, lock_at)
+        errors.add(:due_at, I18n.t("must be between availability dates"))
+        return false
+      end
+    end
+    unless @skip_sis_due_date_validation || AssignmentUtil.due_date_ok?(self)
       errors.add(:due_at, I18n.t("due_at", "cannot be blank when Post to Sis is checked"))
     end
   end
 
   def assignment_overrides_due_date_ok?(overrides={})
-    return true if @skip_due_date_validation
+    return true if @skip_sis_due_date_validation
 
     if AssignmentUtil.due_date_required?(self)
       overrides = gather_override_data(overrides)
@@ -2720,7 +2726,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def active_assignment_overrides?
-    @skip_due_date_validation || self.assignment_overrides.length > 0
+    self.assignment_overrides.exists?
   end
 
   def assignment_name_length_ok?
