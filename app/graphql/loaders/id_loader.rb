@@ -21,14 +21,16 @@ class Loaders::IDLoader < GraphQL::Batch::Loader
     @scope = scope
   end
 
-  def load(key)
-    # since we might load an id that is a number or a string, we need to coerce
-    # here to keep things consistent
-    super(key.to_s)
+  def load(id)
+    super(Shard.global_id_for(id))
   end
 
   def perform(ids)
-    @scope.where(id: ids).each { |o| fulfill(o.id.to_s, o) }
+    Shard.partition_by_shard(ids) { |sharded_ids|
+      @scope.where(id: sharded_ids).each { |o|
+        fulfill(o.global_id, o)
+      }
+    }
     ids.each { |id| fulfill(id, nil) unless fulfilled?(id) }
   end
 end
