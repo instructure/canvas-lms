@@ -34,22 +34,20 @@ outcomes.csv
 <th>Description</th>
 </tr>
 <tr>
-<td>canvas_id</td>
-<td>integer</td>
-<td></td>
-<td>For internal Canvas use only. This field must be blank for new
-learning outcomes and learning outcome groups. If this field is populated
-(i.e. because the user is editing a CSV that has been exported), the user
-must not change any of the populated canvas_id values.</td>
-</tr>
-<tr>
 <td>vendor_guid</td>
 <td>text</td>
 <td>✓</td>
 <td>A value that uniquely identifies this learning outcome or learning outcome group.
 For learning outcome groups, this value can be referenced by other learning outcomes or
 learning outcome groups in the parent_guids field below, to indicate that this group
-contains an outcome or group. This value cannot contain spaces.</td>
+contains an outcome or group. This value cannot contain spaces.
+<br />
+If outcomes have been exported from an account with no vendor_guid values set,
+canvas will auto-assign vendor_guid values from internal identifiers. We
+recommend that you *do not* change these values once they have been assigned.
+If you want to set your own vendor_guid values, you should do that using the
+Canvas API prior to exporting outcomes from an account.
+</td>
 </tr>
 <tr>
 <td>object_type</td>
@@ -132,8 +130,8 @@ These columns must be blank for learning outcome groups. See sample below.</td>
 Sample:
 
 <pre>
-canvas_id,vendor_guid,object_type,title,description,display_name,calculation_method,calculation_int,workflow_state,parent_guids,ratings,,,,,,,
-,a,group,Parent group,parent group description,G-1,,,active,,,,,,,,,
-,b,group,Child group,child group description,G-1.1,,,active,a,,,,,,,,
-,c,outcome,Learning Standard,outcome description,LS-100,decaying_average,40,active,a b,3,Excellent,2,Better,1,Good,,
+vendor_guid,object_type,title,description,display_name,calculation_method,calculation_int,workflow_state,parent_guids,ratings,,,,,,,
+a,group,Parent group,parent group description,G-1,,,active,,,,,,,,,
+b,group,Child group,child group description,G-1.1,,,active,a,,,,,,,,
+c,outcome,Learning Standard,outcome description,LS-100,decaying_average,40,active,a b,3,Excellent,2,Better,1,Good,,
 </pre>

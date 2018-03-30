@@ -163,9 +163,11 @@ module Outcomes
     private
 
     def find_prior_outcome(outcome)
-      if outcome[:canvas_id].present?
+      match = /canvas_outcome:(\d+)/.match(outcome[:vendor_guid])
+      if match
+        canvas_id = match[1]
         begin
-          LearningOutcome.find(outcome[:canvas_id])
+          LearningOutcome.find(canvas_id)
         rescue ActiveRecord::RecordNotFound
           raise InvalidDataError, I18n.t(
             'Outcome with canvas id "%{id}" not found',
@@ -180,21 +182,29 @@ module Outcomes
     end
 
     def find_prior_group(group)
-      if group[:canvas_id].present?
+      lookup = {
+        vendor_guid: group[:vendor_guid],
+        context: context
+      }
+
+      prior = LearningOutcomeGroup.find_by(**lookup)
+      return prior if prior
+
+      match = /canvas_outcome_group:(\d+)/.match(group[:vendor_guid])
+      if match
+        canvas_id = match[1]
         begin
-          LearningOutcomeGroup.find(group[:canvas_id])
+          by_id = LearningOutcomeGroup.find(canvas_id)
+          return by_id if by_id.context == context
         rescue ActiveRecord::RecordNotFound
           raise InvalidDataError, I18n.t(
             'Outcome group with canvas id %{id} not found',
             id: group[:canvas_id]
           )
         end
-      else
-        LearningOutcomeGroup.find_or_initialize_by(
-          vendor_guid: group[:vendor_guid],
-          context: context
-        )
       end
+
+      LearningOutcomeGroup.new(**lookup)
     end
 
     def create_rubric(ratings, mastery_points)

@@ -25,10 +25,13 @@ RSpec.describe Outcomes::Import do
       @context = context
     end
 
+    def current_import_id
+      outcome_import_id
+    end
+
     def new_import
       @outcome_import_id = nil
-      next_import_id = outcome_import_id
-      LearningOutcomeGroup.update_all(outcome_import_id: next_import_id)
+      outcome_import_id
     end
 
     attr_reader :context
@@ -83,25 +86,43 @@ RSpec.describe Outcomes::Import do
   describe '#import_group' do
     let_once(:existing_group) { outcome_group_model(context: context, vendor_guid: group_vendor_guid) }
 
-    context 'with canvas_id' do
+    context 'with magic vendor_guid' do
+      let(:magic_guid) do
+        "canvas_outcome_group:#{existing_group.id}"
+      end
+
       it 'fails if group not present with that id' do
-        missing_id = existing_group.destroy_permanently!.id
+        existing_group.destroy_permanently!.id
         expect do
-          importer.import_group(canvas_id: missing_id, **group_attributes)
+          importer.import_group(**group_attributes, vendor_guid: magic_guid)
         end.to raise_error(TestImporter::InvalidDataError, /not found/)
       end
 
-      it 'fails if matching group not in correct context' do
+      it '"imports" group if matching group not in correct context' do
         existing_group.update! context: other_context
-        expect do
-          importer.import_group(canvas_id: existing_group.id, **group_attributes)
-        end.to raise_error(TestImporter::InvalidDataError, /incorrect context/)
+        importer.import_group(**group_attributes, vendor_guid: magic_guid)
+        imported = LearningOutcomeGroup.where(context: context, vendor_guid: magic_guid)
+        expect(imported.length).to eq(1)
+        expect(imported.first.id).not_to eq(existing_group.id)
       end
 
-      it 'updates vendor_guid if group in correct context' do
-        existing_group.update! vendor_guid: 'gonna get changed'
-        importer.import_group(canvas_id: existing_group.id, **group_attributes)
-        expect(existing_group.reload.vendor_guid).to eq group_vendor_guid
+      it 'updates "imported" group on further imports instead of re-importing' do
+        existing_group.update! context: other_context
+        importer.import_group(**group_attributes, vendor_guid: magic_guid)
+        importer.new_import
+        importer.import_group(
+          **group_attributes,
+          description: 'more updates',
+          vendor_guid: magic_guid
+        )
+        imported = LearningOutcomeGroup.where(context: context, vendor_guid: magic_guid)
+        expect(imported.length).to eq(1)
+        expect(imported.first.description).to eq('more updates')
+      end
+
+      it 'updates description of group in correct context' do
+        importer.import_group(**group_attributes, vendor_guid: magic_guid, description: 'update!')
+        expect(existing_group.reload.description).to eq 'update!'
       end
     end
 
@@ -190,24 +211,32 @@ RSpec.describe Outcomes::Import do
       outcome_model(context: context, vendor_guid: outcome_vendor_guid)
     end
 
-    context 'with canvas_id' do
+    context 'with magic vendor_guid' do
+      let(:magic_guid) do
+        "canvas_outcome:#{existing_outcome.id}"
+      end
+
       it 'fails if outcome not present with that id' do
-        missing_id = existing_outcome.destroy_permanently!.id
+        existing_outcome.destroy_permanently!.id
         expect do
-          importer.import_outcome(**outcome_attributes, canvas_id: missing_id)
+          importer.import_outcome(**outcome_attributes, vendor_guid: magic_guid)
         end.to raise_error(TestImporter::InvalidDataError, /with canvas id/)
       end
 
       it 'fails if matching outcome not in visible context' do
         existing_outcome.update! context: other_context
         expect do
-          importer.import_outcome(**outcome_attributes, canvas_id: existing_outcome.id)
+          importer.import_outcome(**outcome_attributes, vendor_guid: magic_guid)
         end.to raise_error(TestImporter::InvalidDataError, /not in visible context/)
       end
 
-      it 'updates vendor_guid if group in current context' do
-        importer.import_outcome(**outcome_attributes)
-        expect(existing_outcome.reload.vendor_guid).to eq outcome_vendor_guid
+      it 'updates description if outcome in current context' do
+        importer.import_outcome(
+          **outcome_attributes,
+          vendor_guid: magic_guid,
+          description: 'changed!'
+        )
+        expect(existing_outcome.reload.description).to eq 'changed!'
       end
     end
 
@@ -273,8 +302,10 @@ RSpec.describe Outcomes::Import do
         with_parents = outcome_attributes.merge(parent_guids: 'parent1 parent2')
         importer.import_outcome(**with_parents)
         importer.new_import
+        LearningOutcomeGroup.update_all(outcome_import_id: importer.current_import_id)
         importer.import_outcome(**with_parents, workflow_state: 'deleted')
         importer.new_import
+        LearningOutcomeGroup.update_all(outcome_import_id: importer.current_import_id)
         importer.import_outcome(**with_parents)
         expect(parent1.child_outcome_links.active.map(&:content)).to include existing_outcome
         expect(parent2.child_outcome_links.active.map(&:content)).to include existing_outcome
