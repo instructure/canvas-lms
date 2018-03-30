@@ -17,6 +17,8 @@
  */
 
 import GridHelper from './GridHelper';
+import {isRTL} from '../../../../shared/helpers/rtlHelper';
+
 
 function isLeftArrow (event) {
   return event.which === 37;
@@ -25,6 +27,10 @@ function isLeftArrow (event) {
 function isRightArrow (event) {
   return event.which === 39;
 }
+
+// RTL aware methods that "flip" left and right so arrows do the right thing in RTL
+const isNextArrow = (event) => (isRTL(event.target) ? isLeftArrow : isRightArrow)(event)
+const isPrevArrow = (event) => (isRTL(event.target) ? isRightArrow : isLeftArrow)(event)
 
 function isUpArrow (event) {
   return event.which === 38;
@@ -108,7 +114,7 @@ export default class Navigation {
       // prevent SlickGrid behavior, but allow default browser behavior
     }
 
-    if (isLeftArrow(event)) {
+    if (isPrevArrow(event)) {
       if (location.cell !== 0) {
         // Left Arrow within the header: Activate the previous cell.
         this.gridSupport.state.setActiveLocation('header', { cell: location.cell - 1 });
@@ -119,7 +125,7 @@ export default class Navigation {
       }
     }
 
-    if (isRightArrow(event)) {
+    if (isNextArrow(event)) {
       const columns = this.grid.getColumns();
       const lastCell = columns.length - 1;
 
@@ -167,7 +173,7 @@ export default class Navigation {
       skipSlickGridDefaults(event);
     }
 
-    if (isLeftArrow(event)) {
+    if (isPrevArrow(event)) {
       if (location.cell === 0) {
         // Left Arrow in first cell of a row: Commit any edits
         // * this preserves focus for cells without an editor

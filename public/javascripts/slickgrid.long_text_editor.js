@@ -133,10 +133,12 @@ function LongTextEditor (args) {
     $wrapper.show();
   };
 
-  this.position = function (position) {
-    $wrapper
-        .css('top', position.top - 5)
-        .css('left', position.left - 5)
+  this.position = function () {
+    $wrapper.position({
+      my: 'center top',
+      at: 'center top',
+      of: args.container
+    })
   };
 
   this.destroy = function () {

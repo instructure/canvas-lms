@@ -287,8 +287,8 @@ $page-dark: #ebeff2;
       color: $font-color;
     }
 
-    &.r1 {
-      border-left: 1px solid $border-light;
+    &.f1 {
+      border-#{direction(left)}: 1px solid $border-light;
     }
   }
 

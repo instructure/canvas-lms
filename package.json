@@ -44,6 +44,7 @@
     "md5": "^2.2.1",
     "mediaelement": "https://github.com/instructure/mediaelement.git#master",
     "moment": "~2.10.6",
+    "normalize-scroll-left": "^0.1.2",
     "page": "visionmedia/page.js#1.6.4",
     "parse-decimal-number": "1.0.0",
     "prop-types": "^15",

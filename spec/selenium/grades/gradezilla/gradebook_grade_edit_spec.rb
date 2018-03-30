@@ -49,7 +49,7 @@ describe "Gradezilla editing grades" do
     q.reload
 
     Gradezilla.visit(@course)
-    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l4', points.to_s)
+    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .b4', points.to_s)
 
     get "/courses/#{@course.id}/quizzes/#{q.id}/history?quiz_submission_id=#{qs.id}"
     expect(f('.score_value')).to include_text points.to_s
@@ -68,10 +68,10 @@ describe "Gradezilla editing grades" do
     Gradezilla.visit(@course)
 
     # editing grade for first row, first cell
-    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l1', 0)
+    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .b1', 0)
 
     # editing grade for second row, first cell
-    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .l1', 0)
+    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .b1', 0)
 
     # refresh page and make sure the grade sticks
     Gradezilla.visit(@course)
@@ -83,9 +83,9 @@ describe "Gradezilla editing grades" do
     assignment_model(course: @course, grading_type: 'letter_grade', points_possible: nil, title: 'no-points')
     Gradezilla.visit(@course)
 
-    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l4', 'A-')
+    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .b4', 'A-')
 
-    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l4')).to include_text('A-')
+    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .b4')).to include_text('A-')
     expect(@assignment.submissions.where('grade is not null').count).to eq 1
 
     sub = @assignment.submissions.where('grade is not null').first
@@ -127,7 +127,7 @@ describe "Gradezilla editing grades" do
     driver.action.send_keys(:tab).perform
     driver.action.send_keys(:tab).perform
 
-    next_cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l3')
+    next_cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .b3')
     expect(next_cell).not_to have_class('editable')
   end
 
