@@ -165,7 +165,7 @@ export default class DiscussionRow extends Component {
        break
      case 'togglelocked':
        this.props.updateDiscussion(this.props.discussion, { locked: !this.props.discussion.locked },
-         this.makePinSuccessFailMessages(this.props.discussion), 'manageMenu')
+         this.makeLockedSuccessFailMessages(this.props.discussion), 'manageMenu')
        break
      case 'masterypaths':
        // This is terrible
@@ -188,6 +188,16 @@ export default class DiscussionRow extends Component {
     const failMessage = this.props.discussion.pinned ?
       I18n.t('Unpin of discussion %{title} failed', { title: this.props.discussion.title }) :
       I18n.t('Pin of discussion %{title} failed', { title: this.props.discussion.title })
+    return { successMessage, failMessage }
+  }
+
+  makeLockedSuccessFailMessages = () => {
+    const successMessage = this.props.discussion.locked ?
+      I18n.t('Unlock discussion %{title} succeeded', { title: this.props.discussion.title }) :
+      I18n.t('Lock discussion %{title} succeeded', { title: this.props.discussion.title })
+    const failMessage = this.props.discussion.locked ?
+      I18n.t('Unlock discussion %{title} failed', { title: this.props.discussion.title }) :
+      I18n.t('Lock discussion %{title} failed', { title: this.props.discussion.title })
     return { successMessage, failMessage }
   }
 

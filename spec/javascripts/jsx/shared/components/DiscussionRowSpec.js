@@ -60,6 +60,22 @@ test('renders UnreadBadge if discussion has replies > 0', () => {
   ok(node.exists())
 })
 
+test('renders Correct Screenreader message for locked discussions', () => {
+  const discussion = { locked: false, title: "blerp"}
+  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const instance = tree.instance() // Unintuitive but remember this is the message it will do not what it actually is
+  equal(instance.makeLockedSuccessFailMessages().successMessage, "Lock discussion blerp succeeded")
+  equal(instance.makeLockedSuccessFailMessages().failMessage, "Lock discussion blerp failed")
+})
+
+test('renders Correct Screenreader message for unlocked discussions', () => {
+  const discussion = { locked: true, title: "blerp"}
+  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const instance = tree.instance() // Unintuitive but remember this is the message it will do not what it actually is
+  equal(instance.makeLockedSuccessFailMessages().successMessage, "Unlock discussion blerp succeeded")
+  equal(instance.makeLockedSuccessFailMessages().failMessage, "Unlock discussion blerp failed")
+})
+
 test('does not render UnreadBadge if discussion has replies == 0', () => {
   const discussion = { discussion_subentry_count: 0 }
   const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
