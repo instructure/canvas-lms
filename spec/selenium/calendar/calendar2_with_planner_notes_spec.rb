@@ -49,6 +49,7 @@ describe "calendar2" do
       expect(note).to contain_css('i.icon-note-light')
     end
     it "should create a new student calendar todo" do
+      skip('Flaky, see ADMIN-916')
       title = "new todo title"
       get '/calendar2'
       wait_for_ajax_requests
