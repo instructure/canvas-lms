@@ -33,11 +33,12 @@ module ReportSpecHelper
                                        :account => account,
                                        :report_type => type)
     account_report.parameters = parameters
-    account_report.save
+    account_report.save!
     if AccountReport.available_reports[type]
       AccountReports.generate_report(account_report)
     end
-    account_report
+    run_jobs
+    account_report.reload
   end
 
   def parse_report(report, options = {})
