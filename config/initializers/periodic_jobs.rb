@@ -192,6 +192,10 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(SisBatchError, :cleanup_old_errors)
   end
 
+  Delayed::Periodic.cron 'AccountReport.delete_old_rows_and_runners', '*/15 * * * *', priority: Delayed::LOW_PRIORITY do
+    with_each_shard_by_database(AccountReport, :delete_old_rows_and_runners)
+  end
+
   Delayed::Periodic.cron 'EnrollmentState.recalculate_expired_states', '*/5 * * * *', priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(EnrollmentState, :recalculate_expired_states)
   end
