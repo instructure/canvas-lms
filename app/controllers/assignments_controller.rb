@@ -215,7 +215,7 @@ class AssignmentsController < ApplicationController
 
   def downloadable_submissions?(current_user, context, assignment)
     types = ["online_upload", "online_url", "online_text_entry"]
-    return unless (assignment.submission_types.split(",") & types).any?
+    return unless (assignment.submission_types.split(",") & types).any? && current_user
 
     student_ids =
       if assignment.grade_as_group?
