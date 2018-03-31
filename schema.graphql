@@ -611,6 +611,15 @@ type Submission implements Node, Timestamped {
   assignment: Assignment
   createdAt: Time
 
+  # how many points are being deducted due to late policy
+  deductedPoints: Float
+
+  # the submission grade *before* late policy deductions were applied
+  enteredGrade: String
+
+  # the submission score *before* late policy deductions were applied
+  enteredScore: Float
+
   # excused assignments are ignored when calculating grades
   excused: Boolean
   grade: String

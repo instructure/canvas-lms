@@ -839,7 +839,6 @@ CanvasRails::Application.routes.draw do
   get 'files' => 'files#index'
   get "files/folder#{full_path_glob}", controller: 'files', action: 'react_files', format: false
   get "files/search", controller: 'files', action: 'react_files', format: false
-  get 'files/s3_success/:id' => 'files#s3_success', as: :s3_success
   get 'files/:id/public_url' => 'files#public_url', as: :public_url
   post 'files/pending' => 'files#create_pending', as: :file_create_pending
   resources :assignments, only: :index do
@@ -1237,6 +1236,13 @@ CanvasRails::Application.routes.draw do
     scope(controller: :sis_import_errors_api) do
       get 'accounts/:account_id/sis_imports/:id/errors', action: :index, as: :sis_batch_import_errors
       get 'accounts/:account_id/sis_import_errors', action: :index, as: :account_sis_import_errors
+    end
+
+    scope(controller: :outcome_imports_api) do
+      %w(account course).each do |context|
+        post "#{context}s/:#{context}_id/outcome_imports", action: :create
+        get "#{context}s/:#{context}_id/outcome_imports/:id", action: :show
+      end
     end
 
     scope(controller: :users) do
@@ -2120,6 +2126,12 @@ CanvasRails::Application.routes.draw do
     # Scores Service
     scope(controller: 'lti/ims/scores') do
       post "courses/:course_id/line_items/:line_item_id/scores", action: :create, as: :lti_result_create
+    end
+
+    # Result Service
+    scope(controller: 'lti/ims/results') do
+      get "courses/:course_id/line_items/:line_item_id/results/:id", action: :show, as: :lti_result_show
+      get "courses/:course_id/line_items/:line_item_id/results", action: :index
     end
   end
 

@@ -17,7 +17,6 @@
 #
 
 # @API Gradebook History
-# @beta
 #
 # API for accessing the versioned history of student submissions along with their
 # grade changes, organized by the date of the submission.

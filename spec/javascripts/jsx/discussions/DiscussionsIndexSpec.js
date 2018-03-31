@@ -17,23 +17,72 @@
  */
 
 import React from 'react'
+import { Provider } from 'react-redux'
 import { mount, shallow } from 'enzyme'
 
 import DiscussionsIndex from 'jsx/discussions/components/DiscussionsIndex'
 
 const defaultProps = () => ({
+
+  closeForComments: () => {},
+  permissions: {create: false, manage_content: false, moderate: false},
+  togglePin: () => {},
   discussions: [],
   discussionsPage: 1,
   isLoadingDiscussions: false,
   hasLoadedDiscussions: false,
   getDiscussions: () => {},
+  roles: ["student", "user"],
 })
+
+// necessary to mock this because we have a child Container/"Smart" component
+// that need to pull their props from the store state
+const store = {
+  getState: () => ({
+
+    closedForCommentsDiscussions: [],
+    courseSettings: {collapse_global_nav: false, manual_mark_as_read: false},
+    currentUserId: 1,
+    discussions: [],
+    isSavingSettings: false,
+    isSettingsModalOpen: false,
+    pinnedDiscussions: [],
+    roles: ['user', 'teacher'],
+    unpinnedDiscussions: [],
+    userSettings: {collapse_global_nav: false, manual_mark_as_read: false},
+    contextType: 'course',
+    contextId: '1',
+    permissions: {
+      create: true,
+      manage_content: true,
+      moderate: true,
+    },
+  }),
+  // we only need to define these functions so that we match the react-redux contextTypes
+  // shape for a store otherwise react-redux thinks our store is invalid
+  dispatch() {},
+  subscribe() {},
+}
 
 QUnit.module('DiscussionsIndex component')
 
 test('renders the component', () => {
-  const tree = mount(<DiscussionsIndex {...defaultProps()} />)
+  const tree = mount(
+    <Provider store={store}>
+      <DiscussionsIndex {...defaultProps()} />
+    </Provider>
+  )
   const node = tree.find('DiscussionsIndex')
+  ok(node.exists())
+})
+
+test('renders the IndexHeaderComponent component', () => {
+  const tree = mount(
+    <Provider store={store}>
+      <DiscussionsIndex {...defaultProps()} />
+    </Provider>
+  )
+  const node = tree.find('IndexHeader')
   ok(node.exists())
 })
 
@@ -48,6 +97,43 @@ test('displays spinner when loading discussions', () => {
 test('calls getDiscussions if hasLoadedDiscussions is false', () => {
   const props = defaultProps()
   props.getDiscussions = sinon.spy()
-  mount(<DiscussionsIndex {...props} />)
+  mount(
+    <Provider store={store}>
+      <DiscussionsIndex {...props} />
+    </Provider>
+  )
   equal(props.getDiscussions.callCount, 1)
+})
+
+test('only renders pinned discussions in studentView if there are pinned discussions', () => {
+  const props = defaultProps()
+  props.pinnedDiscussions = [{id: '1'}]
+  props.closedForCommentsDiscussions = []
+  const tree = shallow(<DiscussionsIndex {...props} />)
+  const node = tree.find('DiscussionsContainer')
+  equal(node.length, 3)
+})
+
+test('does not renders pinned discussions in studentView if there are no pinned discussions', () => {
+  const props = defaultProps()
+  props.closedForCommentsDiscussions = []
+  const tree = shallow(<DiscussionsIndex {...props} />)
+  const node = tree.find('DiscussionsContainer')
+  equal(node.length, 2)
+})
+
+test('does not render droppable container when student', () => {
+  const props = defaultProps()
+  const tree = shallow(<DiscussionsIndex {...props} />)
+  const node = tree.find('DroppableDiscussionsContainer')
+  equal(node.length, 0)
+})
+
+test('renders three containers for teachers', () => {
+  const props = defaultProps()
+  props.permissions.moderate = true
+  const tree = shallow(<DiscussionsIndex {...props} />)
+  equal(tree.find('.closed-for-comments-discussions-v2__wrapper').length, 1)
+  equal(tree.find('.unpinned-discussions-v2__wrapper').length, 1)
+  equal(tree.find('.pinned-discussions-v2__wrapper').length, 1)
 })

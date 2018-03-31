@@ -16,7 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # @API JWTs
-# @beta
 # Short term tokens useful for talking to other services in the Canvas Ecosystem.
 # Note: JWTs have no value or use directly against the Canvas API, and expire
 # after one hour

@@ -26,7 +26,7 @@ module SIS
       i = Work.new(@batch, @root_account, @logger, messages)
 
       Enrollment.skip_touch_callbacks(:course) do
-        Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
+        Enrollment.suspend_callbacks(:set_update_cached_due_dates, :add_to_favorites_later) do
           User.skip_updating_account_associations do
             Enrollment.process_as_sis(@sis_options) do
               yield i
@@ -47,8 +47,8 @@ module SIS
         Course.where(id: batch).touch_all
       end
       i.courses_to_recache_due_dates.to_a.in_groups_of(1000, false) do |batch|
-        batch.each do |course_id|
-          DueDateCacher.recompute_course(course_id)
+        batch.each do |course_id, user_ids|
+          DueDateCacher.recompute_users_for_course(user_ids.uniq, course_id)
         end
       end
       # We batch these up at the end because normally a user would get several enrollments, and there's no reason
@@ -59,6 +59,12 @@ module SIS
         User.where(id: batch).touch_all
         User.where(id: UserObserver.where(user_id: batch).select(:observer_id)).touch_all
       end
+      i.enrollments_to_add_to_favorites.map(&:id).compact.each_slice(1000) do |sliced_ids|
+        Enrollment.send_later_enqueue_args(:batch_add_to_favorites,
+          {:priority => Delayed::LOW_PRIORITY, :strand => "batch_add_to_favorites_#{@root_account.global_id}"},
+          sliced_ids)
+      end
+
       @logger.debug("Enrollments with batch operations took #{Time.now - start} seconds")
       return i.success_count
     end
@@ -67,7 +73,8 @@ module SIS
     class Work
       attr_accessor :enrollments_to_update_sis_batch_ids, :courses_to_touch_ids,
           :incrementally_update_account_associations_user_ids, :update_account_association_user_ids,
-          :account_chain_cache, :users_to_touch_ids, :success_count, :courses_to_recache_due_dates
+          :account_chain_cache, :users_to_touch_ids, :success_count, :courses_to_recache_due_dates,
+          :enrollments_to_add_to_favorites
 
       def initialize(batch, root_account, logger, messages)
         @batch = batch
@@ -79,7 +86,8 @@ module SIS
         @incrementally_update_account_associations_user_ids = Set.new
         @users_to_touch_ids = Set.new
         @courses_to_touch_ids = Set.new
-        @courses_to_recache_due_dates = Set.new
+        @courses_to_recache_due_dates = {}
+        @enrollments_to_add_to_favorites = []
         @enrollments_to_update_sis_batch_ids = []
         @account_chain_cache = {}
         @course = @section = nil
@@ -285,7 +293,13 @@ module SIS
             enrollment.sis_pseudonym_id = pseudo.id
             if enrollment.changed?
               @users_to_touch_ids.add(user.id)
-              courses_to_recache_due_dates << enrollment.course_id if enrollment.workflow_state_changed?
+              if enrollment.workflow_state_changed?
+                courses_to_recache_due_dates[enrollment.course_id] ||=[]
+                courses_to_recache_due_dates[enrollment.course_id] << enrollment.user_id
+                if enrollment.workflow_state == 'active'
+                  enrollments_to_add_to_favorites << enrollment
+                end
+              end
               enrollment.sis_batch_id = enrollment_info.sis_batch_id if enrollment_info.sis_batch_id
               enrollment.sis_batch_id = @batch.id if @batch
               enrollment.skip_touch_user = true

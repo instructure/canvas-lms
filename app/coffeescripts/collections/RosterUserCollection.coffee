@@ -35,5 +35,5 @@ define [
     @optionProperty 'sections'
 
     url: ->
-      "/api/v1/courses/#{@options.course_id}/users"
+      "/api/v1/courses/#{@options.course_id}/users?include_inactive=true"
 

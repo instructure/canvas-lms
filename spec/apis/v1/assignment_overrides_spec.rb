@@ -812,7 +812,7 @@ describe AssignmentOverridesController, type: :request do
         @override.assignment_override_students.create!(user: remove_override_student)
         @override.reload
 
-        expect(DueDateCacher).to receive(:recompute).with(@assignment)
+        expect(DueDateCacher).to receive(:recompute).with(@assignment, hash_including(update_grades: false))
         api_update_override(@course, @assignment, @override,
           :assignment_override => { :student_ids => [always_override_student.id] })
 

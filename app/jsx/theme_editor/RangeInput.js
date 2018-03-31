@@ -16,81 +16,83 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
 
-  var RangeInput = React.createClass({
-    propTypes: {
-      min:           PropTypes.number.isRequired,
-      max:           PropTypes.number.isRequired,
-      defaultValue:  PropTypes.number.isRequired,
-      labelText:     PropTypes.string.isRequired,
-      name:          PropTypes.string.isRequired,
-      step:          PropTypes.number,
-      formatValue:   PropTypes.func,
-      onChange:      PropTypes.func
-    },
+export default class RangeInput extends Component {
+  static propTypes = {
+    min: PropTypes.number.isRequired,
+    max: PropTypes.number.isRequired,
+    defaultValue: PropTypes.number.isRequired,
+    labelText: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    step: PropTypes.number,
+    formatValue: PropTypes.func,
+    onChange: PropTypes.func,
+    themeState: PropTypes.object,
+    handleThemeStateChange: PropTypes.func,
+    variableKey: PropTypes.string.isRequired
+  }
 
-    getDefaultProps: function() {
-      return {
-        step: 1,
-        onChange: function(){},
-        formatValue: val => val
-      };
-    },
+  static defaultProps = {
+    step: 1,
+    onChange() {},
+    formatValue: val => val,
+    themeState: {},
+    handleThemeStateChange() {}
+  }
 
-    getInitialState: function() {
-      return { value: this.props.defaultValue };
-    },
+  state = {
+    value: this.props.defaultValue
+  }
 
-    /* workaround for https://github.com/facebook/react/issues/554 */
-    componentDidMount: function() {
-      // https://connect.microsoft.com/IE/Feedback/Details/856998
-      $(this.refs.rangeInput.getDOMNode()).on('input change', this.handleChange);
-    },
+  /* TODO: Remove this workaround when we upgrade to 15.6.x or later */
+  /* workaround for https://github.com/facebook/react/issues/554 */
+  componentDidMount() {
+    // https://connect.microsoft.com/IE/Feedback/Details/856998
+    $(this.rangeInput).on('input change', this.handleChange)
+  }
 
-    componentWillUnmount: function() {
-      $(this.refs.rangeInput.getDOMNode()).off('input change', this.handleChange);
-    },
-    /* end workaround */
+  componentWillUnmount() {
+    $(this.rangeInput).off('input change', this.handleChange)
+  }
+  /* end workaround */
 
-    handleChange: function(event) {
-      this.setState({ value: event.target.value });
-      this.props.onChange(event.target.value);
-    },
+  handleChange = event => {
+    this.setState({value: event.target.value})
+    this.props.onChange(event.target.value)
+    this.props.handleThemeStateChange(this.props.variableKey, event.target.value)
+  }
 
-    render: function() {
-      var {
-        labelText,
-        formatValue,
-        onChange,
-        value,
-        ...props
-      } = this.props;
+  render() {
+    var {labelText, formatValue, onChange, value, ...props} = this.props
 
-      return (
-        <label className="RangeInput">
-          <div className="RangeInput__label">
-            {labelText}
-          </div>
-          <div className="RangeInput__control">
-            <input  className="RangeInput__input"
-                    ref="rangeInput"
-                    type="range"
-                    role="slider"
-                    aria-valuenow={this.props.defaultValue}
-                    aria-valuemin={this.props.min}
-                    aria-valuemax={this.props.max}
-                    aria-valuetext={formatValue(this.state.value)}
-                    onChange={function() {}}
-                    {...props} />
-            <output htmlFor={this.props.name} className="RangeInput__value">
-              { formatValue(this.state.value) }
-            </output>
-          </div>
-        </label>
-      );
-    }
-  });
-export default RangeInput
+    return (
+      <label className="RangeInput">
+        <div className="RangeInput__label">{labelText}</div>
+        <div className="RangeInput__control">
+          <input
+            className="RangeInput__input"
+            ref={c => (this.rangeInput = c)}
+            type="range"
+            role="slider"
+            aria-valuenow={this.props.defaultValue}
+            aria-valuemin={this.props.min}
+            aria-valuemax={this.props.max}
+            aria-valuetext={formatValue(this.state.value)}
+            onChange={() => {}}
+            {...props}
+          />
+          <output
+            ref={c => (this.outputElement = c)}
+            htmlFor={this.props.name}
+            className="RangeInput__value"
+          >
+            {formatValue(this.state.value)}
+          </output>
+        </div>
+      </label>
+    )
+  }
+}

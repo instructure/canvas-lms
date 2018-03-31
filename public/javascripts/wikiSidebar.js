@@ -124,7 +124,7 @@ import 'jqueryui/tabs'
           $file
             .addClass('kalturable')
             .attr('data-media-entry-id', file.media_entry_id)
-            .addClass(file.content_type && file.content_type.match(/video/) ? 'video_playback' : 'audio_playback');
+            .addClass(file['content-type'] && file['content-type'].match(/video/) ? 'video_playback' : 'audio_playback');
         }
         file.name = displayName;
         $file.fillTemplateData({
@@ -141,7 +141,7 @@ import 'jqueryui/tabs'
           fileCallback($file);
         }
       }
-      if(newUpload && (attachment.mime_class == 'image' || attachment.content_type.match(/^image/)) &&
+      if(newUpload && (attachment.mime_class == 'image' || attachment['content-type'].match(/^image/)) &&
         $image_list.hasClass('initialized')) {
         var url = $.replaceTags($("#editor_tabs_4 .file_url").attr('href'), 'id', attachment.id);
         var $img = $editor_tabs.find("#wiki_sidebar_image_uploads .img_link").clone();
@@ -602,12 +602,12 @@ import 'jqueryui/tabs'
           $sidebar_upload_image_form.find(".uploading").slideDown();
           $sidebar_upload_image_form.attr('action', $sidebar_upload_image_form.find(".json_upload_url").attr('href'));
         },
-        success: function(data) {
+        success: function(attachment) {
 
           $sidebar_upload_image_form.slideUp(function() {
             $sidebar_upload_image_form.find(".uploading").hide();
           });
-          wikiSidebar.fileAdded(data.attachment, function() {
+          wikiSidebar.fileAdded(attachment, function() {
             wikiSidebar.imageSelected($(this).find(".img"));
           });
         },
@@ -634,13 +634,13 @@ import 'jqueryui/tabs'
           $sidebar_upload_file_form.attr('action', $sidebar_upload_file_form.find(".json_upload_url").attr('href'));
           $(this).find("button").attr('disabled', true).text(I18n.t('buttons.uploading', "Uploading..."));
         },
-        success: function(data) {
+        success: function(attachment) {
           $(this).find("button").attr('disabled', false).text("Upload");
           $sidebar_upload_file_form.slideUp(function() {
             $sidebar_upload_file_form.find(".uploading").hide();
           });
-          UsageRights.setFileUsageRights(data.attachment);
-          wikiSidebar.fileAdded(data.attachment, true, function(node) {
+          UsageRights.setFileUsageRights(attachment);
+          wikiSidebar.fileAdded(attachment, true, function(node) {
             wikiSidebar.fileSelected(node);
           });
         },

@@ -18,8 +18,17 @@
 
 <%
   content_for :page_title, @tag.title
-  add_crumb @tag.context_module.name, context_url(@context, :context_context_modules_url)
+
+  # modules are a bit different, and it's not possible to get the URL to a specific
+  # module using context_url, so we get the URL to a course's modules, and append
+  # the id of the module we're interested in.
+  # if you change this, see also application_controller#content_tag_redirect where
+  # it calls add_crumb
+  cu = context_url(@context, :context_context_modules_url)
+  cu = "#{cu}/#{@tag.context_module.id}"
+  add_crumb @tag.context_module.name, cu
   add_crumb @tag.title
+
   js_bundle :file_inline
   js_bundle 'module_sequence_footer'
 %>

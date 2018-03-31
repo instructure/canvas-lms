@@ -99,7 +99,7 @@ define [
       for fieldName, field of errors
         $input = field.element || @findField(fieldName, useGlobalSelector)
         html = field.message || (htmlEscape(@translations?[message] or message) for {message} in field).join('</p><p>')
-        $input.errorBox($.raw("#{html}"))?.css("z-index", "1020")?.attr('role', 'alert')
+        $input.errorBox($.raw("#{html}"))?.css("z-index", "1100")?.attr('role', 'alert')
         @attachErrorDescription($input, html)
         field.$input = $input
         field.$errorBox = $input.data 'associated_error_box'

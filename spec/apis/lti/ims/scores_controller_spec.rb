@@ -18,7 +18,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require_dependency "lti/ims/scores_controller"
 
-# rubocop:disable Metrics/ModuleLength
 module Lti::Ims
   RSpec.describe ScoresController, type: :request do
     let_once(:line_item) { line_item_model with_resource_link: true }
@@ -197,8 +196,25 @@ module Lti::Ims
             expect(response).to have_http_status :unprocessable_entity
           end
         end
+
+        context 'when user_id not found in course' do
+          let(:user) { student_in_course(course: course_model, active_all: true).user }
+
+          it 'returns an error unprocessable_entity' do
+            post url, params: create_params
+            expect(response).to have_http_status :unprocessable_entity
+          end
+        end
+
+        context 'when user_id is not a student in course' do
+          let(:user) { ta_in_course(course: course, active_all: true).user }
+
+          it 'returns an error unprocessable_entity' do
+            post url, params: create_params
+            expect(response).to have_http_status :unprocessable_entity
+          end
+        end
       end
     end
   end
 end
-# rubocop:enable Metrics/ModuleLength

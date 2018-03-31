@@ -889,6 +889,22 @@ class UsersController < ApplicationController
     render :json => todos
   end
 
+  # @API List counts for todo items
+  # Counts of different todo items such as the number of assignments needing grading as well as the number of assignments needing submitting.
+  #
+  # @argument include[] [String, "ungraded_quizzes"]
+  #   "ungraded_quizzes":: Optionally include ungraded quizzes (such as practice quizzes and surveys) in the list.
+  #                        These will be returned under a +quiz+ key instead of an +assignment+ key in response elements.
+  #
+  # There is a limit to the number of todo items this endpoint will count.
+  # It will only look at the first 100 todo items for the user. If the user has more than 100 todo items this count may not be reliable.
+  # The largest reliable number for both counts is 100.
+  #
+  # @example_response
+  #   {
+  #     needs_grading_count: 32,
+  #     assignments_needing_submitting: 10
+  #   }
   def todo_item_count
     return render_unauthorized_action unless @current_user
     limit = ToDoListPresenter::ASSIGNMENT_LIMIT

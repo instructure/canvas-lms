@@ -484,6 +484,7 @@ module Api
     # otherwise let HostUrl figure out what host is appropriate
     if self.respond_to?(:request)
       host, protocol = get_host_and_protocol_from_request
+      target_shard = Shard.current
     elsif self.respond_to?(:use_placeholder_host?) && use_placeholder_host?
       host = PLACEHOLDER_HOST
       protocol = PLACEHOLDER_PROTOCOL
@@ -505,7 +506,11 @@ module Api
     end
     html = rewriter.translate_content(html)
 
-    url_helper = Html::UrlProxy.new(self, context, host, protocol)
+    url_helper = Html::UrlProxy.new(self,
+                                    context,
+                                    host,
+                                    protocol,
+                                    target_shard: target_shard)
     account = Context.get_account(context) || @domain_root_account
     include_mobile = !(respond_to?(:in_app?, true) && in_app?)
     Html::Content.rewrite_outgoing(html, account, url_helper, include_mobile: include_mobile)

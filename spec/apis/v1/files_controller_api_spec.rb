@@ -82,6 +82,7 @@ describe "Files API", type: :request do
       @attachment.reload
       expect(json).to eq({
         'id' => @attachment.id,
+        'uuid' => @attachment.uuid,
         'folder_id' => @attachment.folder_id,
         'url' => file_download_url(@attachment, :verifier => @attachment.uuid, :download => '1', :download_frd => '1'),
         'content-type' => 'text/plain',
@@ -100,7 +101,9 @@ describe "Files API", type: :request do
         'thumbnail_url' => nil,
         'modified_at' => @attachment.modified_at.as_json,
         'mime_class' => @attachment.mime_class,
-        'media_entry_id' => @attachment.media_entry_id
+        'media_entry_id' => @attachment.media_entry_id,
+        'canvadoc_session_url' => nil,
+        'crocodoc_session_url' => nil
       })
       expect(@attachment.file_state).to eq 'available'
     end
@@ -117,6 +120,7 @@ describe "Files API", type: :request do
       @attachment.reload
       expect(json).to eq({
         'id' => @attachment.id,
+        'uuid' => @attachment.uuid,
         'folder_id' => @attachment.folder_id,
         'url' => file_download_url(@attachment, :verifier => @attachment.uuid, :download => '1', :download_frd => '1'),
         'content-type' => 'text/plain',
@@ -135,7 +139,9 @@ describe "Files API", type: :request do
         'thumbnail_url' => nil,
         'modified_at' => @attachment.modified_at.as_json,
         'mime_class' => @attachment.mime_class,
-        'media_entry_id' => @attachment.media_entry_id
+        'media_entry_id' => @attachment.media_entry_id,
+        'canvadoc_session_url' => nil,
+        'crocodoc_session_url' => nil
       })
       expect(@attachment.reload.file_state).to eq 'available'
     end
@@ -708,6 +714,7 @@ describe "Files API", type: :request do
       json = api_call(:get, @file_path, @file_path_options, {})
       expect(json).to eq({
               'id' => @att.id,
+              'uuid' => @att.uuid,
               'folder_id' => @att.folder_id,
               'url' => file_download_url(@att, :verifier => @att.uuid, :download => '1', :download_frd => '1'),
               'content-type' => "image/png",
@@ -722,7 +729,7 @@ describe "Files API", type: :request do
               'hidden_for_user' => false,
               'created_at' => @att.created_at.as_json,
               'updated_at' => @att.updated_at.as_json,
-              'thumbnail_url' => @att.thumbnail_url,
+              'thumbnail_url' => thumbnail_image_url(@att, @att.uuid, host: 'www.example.com'),
               'modified_at' => @att.modified_at.as_json,
               'mime_class' => @att.mime_class,
               'media_entry_id' => @att.media_entry_id

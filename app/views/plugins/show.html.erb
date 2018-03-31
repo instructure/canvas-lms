@@ -34,9 +34,25 @@
       <%= f.label :disabled, :en => "Disable this Plugin" %>
     </div>
     <% partial = render :partial => @plugin.settings_partial, :locals => {:settings => (@plugin_setting.settings || {}).merge(params[:settings]&.to_unsafe_h || {})} %>
-    <%= f.error_messages if !@error_messages_handled %>
+
+    <% if @plugin_setting.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= t({
+          one: "1 error prohibited this plugin from being saved:",
+          other: "%{count} errors prohibited this plugin from being saved:" },
+          count: @plugin_setting.errors.count
+        ) %></h2>
+
+        <ul>
+        <% @plugin_setting.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+
     <div class="box tabular plugin_settings">
-        <%= partial %>
+      <%= partial %>
     </div>
     <div class='button-container'>
       <button type="submit" class="btn save_button"><%= t '#buttons.apply', "Apply" %></button>

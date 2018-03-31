@@ -25,8 +25,6 @@ describe GraphQLController do
   end
 
   context "graphiql" do
-    before { Account.default.enable_feature!("graphql") }
-
     it "requires a user" do
       get :graphiql
       expect(response.location).to match /\/login$/
@@ -56,11 +54,22 @@ describe GraphQLController do
   end
 
   context "graphql" do
-    before { Account.default.enable_feature!("graphql") }
-
     it "works" do
       post :execute, params: {query: "{}"}
       expect(JSON.parse(response.body)["errors"]).not_to be_blank
+    end
+
+    context "data dog metrics" do
+      it "reports data dog metrics if requested" do
+        expect_any_instance_of(Tracers::DatadogTracer).to receive :trace
+        request.headers["GraphQL-Metrics"] = "true"
+        post :execute, params: {query: '{legacyNode(User, 1) { id }'}
+      end
+
+      it "doesn't report normally" do
+        expect_any_instance_of(Tracers::DatadogTracer).not_to receive :trace
+        post :execute, params: {query: '{legacyNode(User, 1) { id }'}
+      end
     end
   end
 end

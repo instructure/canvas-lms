@@ -39,14 +39,12 @@ class Gradezilla
         f("#{grading_cell_selector(student, assignment)} input[type='text']")
       end
 
-      def get_grade(student, assignment)
-        grading_cell(student, assignment).text
+      def grading_cell_menu_button(student, assignment, menu_selector:)
+        f("#{grading_cell_selector(student, assignment)} .Grid__AssignmentRowCell__#{menu_selector}Menu button")
       end
 
-      def grade_cell_input(student, assignment)
-        cell_selector = grading_cell_selector(student, assignment)
-        f(cell_selector).click
-        f("#{cell_selector} .grade")
+      def get_grade(student, assignment)
+        grading_cell(student, assignment).text
       end
 
       def edit_grade(student, assignment, grade)
@@ -57,6 +55,28 @@ class Gradezilla
         set_value(grade_input, grade)
 
         grade_input.send_keys(:return)
+      end
+
+      def select_scheme_grade(student, assignment, grade)
+        select_grade_from_menu(student, assignment, grade, 'GradingScheme')
+      end
+
+      def select_complete_incomplete_grade(student, assignment, grade)
+        select_grade_from_menu(student, assignment, grade, 'CompleteIncomplete')
+      end
+
+      def select_grade_from_menu(student, assignment, grade, menu_selector)
+        grading_cell(student, assignment).click
+
+        button = grading_cell_menu_button(student, assignment, menu_selector: menu_selector)
+        button.click
+
+        grade_item = ff("ul[aria-labelledby='#{button.attribute('id')}'] li").detect do |element|
+          element.text.chomp == grade # find exact grade match "B+" != "B"
+        end
+        grade_item.click
+
+        button.send_keys(:down) # commit the grade change
       end
 
       def send_keyboard_shortcut(student, assignment, key)

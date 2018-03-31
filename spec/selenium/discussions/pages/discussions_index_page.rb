@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+require_relative '../../common'
 
 class DiscussionsIndex
   class << self
@@ -58,9 +59,17 @@ class DiscussionsIndex
       f('#confirm_delete_discussion')
     end
 
+    def discussion_css(title)
+      "a:contains(#{title})"
+    end
+
+    def discussion_group(group_name)
+      fj("div:contains('#{group_name}')")
+    end
+
     # ---------------------- Discussion ----------------------
     def discussion(title)
-      fj(".ic-discussion-row:contains('#{title}')")
+      fj(discussion_title_css(title))
     end
 
     def discussion_title_css(title)
@@ -84,9 +93,21 @@ class DiscussionsIndex
       discussion_unread_pill(title).text
     end
 
+    def publish_button(title)
+      f('.publish-button', discussion(title))
+    end
+
+    def subscribe_button(title)
+      f('.subscribe-button', discussion(title))
+    end
+
     # ---------------------- Discussion Menu ----------------------
     def discussion_menu(title)
       f('.ic-item-row__manage-menu button', discussion(title))
+    end
+
+    def discussion_settings_button
+      f('#discussion_settings')
     end
 
     def delete_menu_option
@@ -94,15 +115,23 @@ class DiscussionsIndex
     end
 
     def pin_menu_option
-      f('#pin-discussion-menu-option')
+      f('#togglepinned-discussion-menu-option')
     end
 
     def close_for_comment_menu_option
-      f('#lock-discussion-menu-option')
+      f('#togglelocked-discussion-menu-option')
     end
 
     def duplicate_menu_option
-      f('#copy-discussion-menu-option')
+      f('#duplicate-discussion-menu-option')
+    end
+
+    def create_discussions_checkbox
+      fj("label:contains('Create discussion')")
+    end
+
+    def discussion_settings_submit_button
+      f('#submit_discussion_settings')
     end
 
     # ---------------------- Actions ----------------------
@@ -132,7 +161,7 @@ class DiscussionsIndex
       close_for_comment_menu_option.click
     end
 
-    def click_duplicatate_menu_option(title)
+    def click_duplicate_menu_option(title)
       discussion_menu(title).click
       duplicate_menu_option.click
     end
@@ -145,8 +174,29 @@ class DiscussionsIndex
       discussion_title(title).click
     end
 
+    def click_discussion_settings_button
+      discussion_settings_button.click
+      wait_for_ajax_requests
+    end
+
+    def click_create_discussions_checkbox
+      create_discussions_checkbox.click
+    end
+
+    def submit_discussion_settings
+      discussion_settings_submit_button.click
+    end
+
     def click_add_discussion
        add_discussion_button.click
+    end
+
+    def click_publish_button(title)
+      publish_button(title).click
+    end
+
+    def click_subscribe_button(title)
+      subscribe_button(title).click
     end
   end
 end

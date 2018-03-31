@@ -36,21 +36,25 @@ import CourseItemRow from './CourseItemRow'
 import UnreadBadge from './UnreadBadge'
 import announcementShape from '../proptypes/announcement'
 import masterCourseDataShape from '../proptypes/masterCourseData'
+import { isPassedDelayedPostAt } from '../../announcements/utils'
 
-function makeTimestamp ({ delayed_post_at, posted_at }) {
-  return delayed_post_at
-  ? {
-      title: (
-        <span>
-          <Container margin="0 x-small">
-            <Text color="secondary"><IconTimer /></Text>
-          </Container>
-          {I18n.t('Delayed until:')}
-        </span>
-      ),
-      date: delayed_post_at
-  }
-  : { title: I18n.t('Posted on:'), date: posted_at }
+function makeTimestamp({delayed_post_at}) {
+  return (delayed_post_at
+    && !isPassedDelayedPostAt({ currentDate: null, delayedDate: delayed_post_at}))
+    ? {
+        title: (
+          <span>
+            <Container margin="0 x-small">
+              <Text color="secondary">
+                <IconTimer />
+              </Text>
+            </Container>
+            {I18n.t('Delayed until:')}
+          </span>
+        ),
+        date: delayed_post_at
+      }
+    : {title: I18n.t('Posted on:'), date: delayed_post_at}
 }
 
 export default function AnnouncementRow (
@@ -91,7 +95,9 @@ export default function AnnouncementRow (
       value={{ action: 'delete', id: announcement.id }}
       id="delete-announcement-menu-option"
     >
-      <IconTrash />&nbsp;&nbsp;{I18n.t('Delete')}
+      <span aria-hidden='true'>
+        <IconTrash />&nbsp;&nbsp;{I18n.t('Delete')}
+      </span>
       <ScreenReaderContent>{I18n.t('Delete announcement %{title}', { title: announcement.title })}</ScreenReaderContent>
     </MenuItem>,
   ]
@@ -102,7 +108,9 @@ export default function AnnouncementRow (
         value={{ action: 'lock', id: announcement.id, lock: !announcement.locked }}
         id="lock-announcement-menu-option"
       >
-        <IconReply />&nbsp;&nbsp;{announcement.locked ? I18n.t('Allow Comments') : I18n.t('Disallow Comments')}
+        <span aria-hidden='true'>
+          <IconReply />&nbsp;&nbsp;{announcement.locked ? I18n.t('Allow Comments') : I18n.t('Disallow Comments')}
+        </span>
         <ScreenReaderContent>
         { announcement.locked
           ? I18n.t('Allow replies for %{title}', { title: announcement.title })
@@ -120,7 +128,7 @@ export default function AnnouncementRow (
   return (
     <CourseItemRow
       title={announcement.title}
-      body={<div className="ic-announcement-row__content">{textContent}</div>}
+      body={textContent ? <div className="ic-announcement-row__content">{textContent}</div> : null}
       sectionToolTip={sectionsToolTip}
       replyButton={replyButton}
       ref={rowRef}
@@ -148,7 +156,11 @@ export default function AnnouncementRow (
           <span className="ic-item-row__meta-content-heading">
             <Text size="small" as="p">{timestamp.title}</Text>
           </span>
-          <Text color="secondary" size="small" as="p">{$.datetimeString(timestamp.date, {format: 'medium'})}</Text>
+          <span className="ic-item-row__meta-content-timestamp">
+            <Text color="secondary" size="small" as="p">
+              {$.datetimeString(timestamp.date, {format: 'medium'})}
+            </Text>
+          </span>
         </div>
       }
       actionsContent={readCount}

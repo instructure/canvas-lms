@@ -33,6 +33,7 @@ class StickyButton extends Component {
     direction: oneOf(['none', 'up', 'down']),
     zIndex: number,
     offset: string,
+    buttonRef: func,
   };
 
   static defaultProps = {
@@ -104,6 +105,7 @@ class StickyButton extends Component {
         className={classnames(classes)}
         style={style}
         aria-disabled={(disabled) ? 'true' : null}
+        ref={this.props.buttonRef}
       >
         <span className={styles.layout}>
           {children}

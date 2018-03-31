@@ -50,6 +50,7 @@ define [
     @optionProperty 'parentModel'
     @optionProperty 'nested'
     @optionProperty 'preventNotGraded'
+    @optionProperty 'lockedItems'
 
     handleGradingTypeChange: (ev) =>
       gradingType = @$gradingType.val()
@@ -80,6 +81,14 @@ define [
         close: -> $(ev.target).focus()
       ).fixDialogButtons()
 
+    gradingTypeMap: () ->
+      percent:      I18n.t 'grading_type_options.percent', 'Percentage'
+      pass_fail:    I18n.t 'grading_type_options.pass_fail', 'Complete/Incomplete'
+      points:       I18n.t 'grading_type_options.points', 'Points'
+      letter_grade: I18n.t 'grading_type_options.letter_grade', 'Letter Grade'
+      gpa_scale:    I18n.t 'grading_type_options.gpa_scale', 'GPA Scale'
+      not_graded:   I18n.t 'grading_type_options.not_graded', 'Not Graded'
+
     toJSON: =>
       gradingType: @parentModel.gradingType()
       isNotGraded: @parentModel.isNotGraded()
@@ -87,7 +96,8 @@ define [
       gpaScaleQuestionLabel: I18n.t('gpa_scale_explainer', "What is GPA Scale Grading?")
       isGpaScaled: @parentModel.isGpaScaled()
       gradingStandardId: @parentModel.gradingStandardId()
-      frozenAttributes: @parentModel.frozenAttributes()
       nested: @nested
-      preventNotGraded: @preventNotGraded
-      inClosedGradingPeriod: @parentModel.inClosedGradingPeriod
+      preventNotGraded: @preventNotGraded || (@lockedItems?.points && !@parentModel.isNotGraded())
+      freezeGradingType: _.include(@parentModel.frozenAttributes(), 'grading_type') ||
+                         @parentModel.inClosedGradingPeriod() || (@lockedItems?.points && @parentModel.isNotGraded())
+      gradingTypeMap: @gradingTypeMap()

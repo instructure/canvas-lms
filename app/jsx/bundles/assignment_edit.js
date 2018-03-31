@@ -32,6 +32,7 @@ import LockManager from '../blueprint_courses/apps/LockManager'
 
 const lockManager = new LockManager()
 lockManager.init({ itemType: 'assignment', page: 'edit' })
+const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
 
 ENV.ASSIGNMENT.assignment_overrides = ENV.ASSIGNMENT_OVERRIDES
 
@@ -49,7 +50,8 @@ const assignmentGroupSelector = new AssignmentGroupSelector({
 })
 const gradingTypeSelector = new GradingTypeSelector({
   parentModel: assignment,
-  preventNotGraded: assignment.submissionTypesFrozen()
+  preventNotGraded: assignment.submissionTypesFrozen(),
+  lockedItems
 })
 const groupCategorySelector = new GroupCategorySelector({
   parentModel: assignment,
@@ -61,8 +63,6 @@ const peerReviewsSelector = new PeerReviewsSelector({
 })
 
 const headerEl = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED ? '#edit_assignment_header-cr' : '#edit_assignment_header'
-
-const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
 
 const editView = new EditView({
   el: '#edit_assignment_form',

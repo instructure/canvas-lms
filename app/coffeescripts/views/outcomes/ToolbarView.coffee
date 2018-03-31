@@ -17,13 +17,12 @@
 #
 
 define [
-  'i18n!outcomes'
   'jquery'
   'underscore'
   'Backbone'
   '../../models/Outcome'
   '../../models/OutcomeGroup'
-], (I18n, $, _, Backbone, Outcome, OutcomeGroup) ->
+], ($, _, Backbone, Outcome, OutcomeGroup) ->
 
   # Manage the toolbar buttons.
   class ToolbarView extends Backbone.View
@@ -32,6 +31,7 @@ define [
       'click .go_back': 'goBack'
       'click .add_outcome_link': 'addOutcome'
       'click .add_outcome_group': 'addGroup'
+      'click .import_outcomes': 'importOutcomes'
       'click .find_outcome': 'findDialog'
 
     goBack: (e) =>
@@ -52,6 +52,22 @@ define [
     findDialog: (e) =>
       e.preventDefault()
       @trigger 'find'
+
+    importOutcomes: (e) =>
+      e.preventDefault()
+      @trigger 'import'
+
+    disable: () =>
+      @$el.find('button').each((i, button) =>
+        $(button).attr('disabled', 'disabled')
+        $(button).attr('aria-disabled', 'true')
+      )
+
+    enable: () =>
+      @$el.find('button').each((i, button) =>
+        $(button).removeAttr('disabled')
+        $(button).removeAttr('aria-disabled')
+      )
 
     resetBackButton: (model, directories) =>
       return unless ENV.PERMISSIONS.manage_outcomes

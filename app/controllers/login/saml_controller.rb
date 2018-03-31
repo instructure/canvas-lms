@@ -359,7 +359,7 @@ class Login::SamlController < ApplicationController
     observee_unique_id = registration_data[:observee][:unique_id]
     observee = @domain_root_account.pseudonyms.by_unique_id(observee_unique_id).first.user
     unless @current_user.user_observees.where(user_id: observee).exists?
-      UserObserver.create_or_restore(observe: observee, observer: @current_user)
+      UserObserver.create_or_restore(observee: observee, observer: @current_user)
       @current_user.touch
     end
   end

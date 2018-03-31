@@ -30,7 +30,7 @@ describe 'Submissions API', type: :request do
 
   def submit_homework(assignment, student, opts = {:body => "test!"})
     @submit_homework_time ||= Time.zone.at(0)
-    @submit_homework_time += 1.hour
+    @submit_homework_time += 1.hour # each submission in a test is separated by an hour
     sub = assignment.find_or_create_submission(student)
     if sub.versions.size == 1
       Version.where(:id => sub.versions.first).update_all(:created_at => @submit_homework_time)
@@ -238,11 +238,22 @@ describe 'Submissions API', type: :request do
     end
 
     it 'returns submissions based on submitted_since' do
+      assignment = Assignment.create!(course: @course)
+      @submit_homework_time = 12.hours.ago
+      submit_homework(assignment, @student1)
       json = api_call(:get,
                       "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
                       {controller: 'submissions_api', action: 'for_students',
                        format: 'json', section_id: 'sis_section_id:my-section-sis-id'},
                       submitted_since: 1.day.ago.iso8601,
+                      student_ids: 'all')
+      expect(json.size).to eq 2
+
+      json = api_call(:get,
+                      "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
+                      {controller: 'submissions_api', action: 'for_students',
+                       format: 'json', section_id: 'sis_section_id:my-section-sis-id'},
+                      submitted_since: 6.hours.ago.iso8601,
                       student_ids: 'all')
       expect(json.size).to eq 1
 
@@ -1055,6 +1066,7 @@ describe 'Submissions API', type: :request do
              "filename" => "unknown.loser",
              "display_name" => "unknown.loser",
              "id" => sub1.attachments.first.id,
+             "uuid" => sub1.attachments.first.uuid,
              "folder_id" => sub1.attachments.first.folder_id,
              "size" => sub1.attachments.first.size,
              'unlock_at' => nil,
@@ -1069,7 +1081,7 @@ describe 'Submissions API', type: :request do
              'modified_at' => sub1.attachments.first.modified_at.as_json,
              'mime_class' => sub1.attachments.first.mime_class,
              'media_entry_id' => sub1.attachments.first.media_entry_id,
-             'thumbnail_url' => sub1.attachments.first.thumbnail_url },
+             'thumbnail_url' => nil },
          ],
         "submission_history"=>
          [{"id"=>sub1.id,
@@ -1148,6 +1160,7 @@ describe 'Submissions API', type: :request do
                 "filename" => "unknown.loser",
                 "display_name" => "unknown.loser",
                 "id" => sub1.attachments.first.id,
+                "uuid" => sub1.attachments.first.uuid,
                 "folder_id" => sub1.attachments.first.folder_id,
                 "size" => sub1.attachments.first.size,
                 'unlock_at' => nil,
@@ -1162,7 +1175,7 @@ describe 'Submissions API', type: :request do
                 'modified_at' => sub1.attachments.first.modified_at.as_json,
                 'mime_class' => sub1.attachments.first.mime_class,
                 'media_entry_id' => sub1.attachments.first.media_entry_id,
-                'thumbnail_url' => sub1.attachments.first.thumbnail_url },
+                'thumbnail_url' => nil },
             ],
            "body"=>"test!",
            "submitted_at"=>"1970-01-01T03:00:00Z",
@@ -1257,6 +1270,7 @@ describe 'Submissions API', type: :request do
                "filename" => "snapshot.png",
                "url" => "http://www.example.com/files/#{sub2a1.id}/download?download_frd=1&verifier=#{sub2a1.uuid}",
                "id" => sub2a1.id,
+               "uuid" => sub2a1.uuid,
                "folder_id" => sub2a1.folder_id,
                "size" => sub2a1.size,
                'unlock_at' => nil,
@@ -1268,7 +1282,7 @@ describe 'Submissions API', type: :request do
                'created_at' => sub2a1.created_at.as_json,
                'updated_at' => sub2a1.updated_at.as_json,
                'preview_url' => nil,
-               'thumbnail_url' => sub2a1.thumbnail_url,
+               'thumbnail_url' => thumbnail_image_url(sub2a1, sub2a1.uuid, host: 'www.example.com'),
                'modified_at' => sub2a1.modified_at.as_json,
                'mime_class' => sub2a1.mime_class,
                'media_entry_id' => sub2a1.media_entry_id
@@ -1292,6 +1306,7 @@ describe 'Submissions API', type: :request do
            "filename" => "snapshot.png",
            "url" => "http://www.example.com/files/#{sub2a1.id}/download?download_frd=1&verifier=#{sub2a1.uuid}",
            "id" => sub2a1.id,
+           "uuid" => sub2a1.uuid,
            "folder_id" => sub2a1.folder_id,
            "size" => sub2a1.size,
            'unlock_at' => nil,
@@ -1303,7 +1318,7 @@ describe 'Submissions API', type: :request do
            'created_at' => sub2a1.created_at.as_json,
            'updated_at' => sub2a1.updated_at.as_json,
            'preview_url' => nil,
-           'thumbnail_url' => sub2a1.thumbnail_url,
+           'thumbnail_url' => thumbnail_image_url(sub2a1, sub2a1.uuid, host: 'www.example.com'),
            'modified_at' => sub2a1.modified_at.as_json,
            'mime_class' => sub2a1.mime_class,
            'media_entry_id' => sub2a1.media_entry_id

@@ -347,7 +347,7 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   end
 
   ::Canvas::Reloader.on_reload do
-    remove_instance_variable(:@key)
+    remove_instance_variable(:@key) if instance_variable_defined?(:@key)
   end
 
   def self.onelogin_saml_settings_for_account(account, current_host=nil)

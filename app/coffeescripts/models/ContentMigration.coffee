@@ -102,9 +102,9 @@ define [
       super _.omit(arguments[0], 'file'),
         error: (xhr) => reject(xhr.responseText)
         success: (model, xhr, options) =>
-          uploader.completeUpload(@get('pre_attachment'), file, ignoreResult: true).
-            catch(reject).
-            then(resolve)
+          uploader.completeUpload(@get('pre_attachment'), file, ignoreResult: true)
+            .catch(reject)
+            .then(resolve)
 
       dObject
 

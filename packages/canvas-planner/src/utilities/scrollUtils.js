@@ -61,7 +61,34 @@ function handleTouchEnd (e) {
   ongoingTouch = null;
 }
 
-export function registerScrollEvents (scrollIntoPastCb, wind = window) {
+class ScrollHandler {
+  mostRecentScrollPosition = 0;
+  callbackThrottle = false;
+
+  constructor (scrollCb, wind) {
+    this.scrollCb = scrollCb;
+    this.wind = wind;
+    wind.addEventListener('scroll', this.handleScrollEvent);
+  }
+
+  throttledScrollEvent = () => {
+    try {
+      this.scrollCb(this.mostRecentScrollPosition);
+    } finally {
+      this.callbackThrottle = false;
+    }
+  }
+
+  handleScrollEvent = () => {
+    this.mostRecentScrollPosition = this.wind.pageYOffset;
+    if (!this.callbackThrottle) {
+      this.callbackThrottle = true;
+      this.wind.setTimeout(this.throttledScrollEvent, 0);
+    }
+  }
+}
+
+export function registerScrollEvents (scrollIntoPastCb, scrollCb, wind = window) {
   const boundWindowWheel = handleWindowWheel.bind(undefined, scrollIntoPastCb, wind);
   wind.addEventListener('wheel', boundWindowWheel);
 
@@ -72,4 +99,6 @@ export function registerScrollEvents (scrollIntoPastCb, wind = window) {
   wind.addEventListener('touchend', handleTouchEnd);
   const boundTouchMove = handleWindowTouchMove.bind(undefined, scrollIntoPastCb, wind);
   wind.addEventListener('touchmove', boundTouchMove);
+
+  new ScrollHandler(scrollCb, wind);
 }

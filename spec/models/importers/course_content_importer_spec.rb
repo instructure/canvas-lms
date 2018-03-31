@@ -260,6 +260,17 @@ describe Course do
       ann = @course.announcements.first
       expect(ann).to_not be_locked
     end
+
+    it "runs DueDateCacher only twice" do
+      due_date_cacher = instance_double(DueDateCacher)
+      allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
+
+      # Once for course creation and once after the full import has completed
+      expect(due_date_cacher).to receive(:recompute).twice
+
+      params = {:copy => {"everything" => true}}
+      setup_import(@course, 'assessments.json', params)
+    end
   end
 
   describe "shift_date_options" do

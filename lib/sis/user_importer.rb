@@ -198,6 +198,7 @@ module SIS
               id_message = pseudo_by_integration.sis_user_id ? 'SIS ID' : 'Canvas ID'
               user_id = pseudo_by_integration.sis_user_id || pseudo_by_integration.user_id
               @messages << I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s requested integration_id, skipping", user_id: "#{id_message} #{user_id.to_s}", other_user_id: user_row.user_id)
+              next
             end
             pseudo.integration_id = user_row.integration_id if user_row.integration_id.present?
             pseudo.account = @root_account
@@ -243,8 +244,14 @@ module SIS
                   end
                 end
               end
+            rescue ImportError
+              # we have already added the message to the user in add_user_warning.
+              next
             rescue => e
-              Canvas::Errors.capture_exception(:sis_import, e)
+              # something broke
+              error = Canvas::Errors.capture_exception(:sis_import, e)
+              er = error[:error_report]
+              add_user_warning("Something broke with this user. Contact Support with ErrorReport id: #{er}", user_row.user_id, user_row.login_id)
               next
             end
 
@@ -280,6 +287,7 @@ module SIS
               cc.user_id = user.id
               cc.pseudonym_id = pseudo.id
               cc.path = user_row.email
+              cc.bounce_count = 0 if cc.path_changed?
               cc.workflow_state = status_is_active ? 'active' : 'retired'
               newly_active = cc.path_changed? || (cc.active? && cc.workflow_state_changed?)
               if cc.changed?
@@ -316,6 +324,7 @@ module SIS
               end
             elsif user_row.email.present? && EmailAddressValidator.valid?(user_row.email) == false
               @messages << "The email address associated with user '#{user_row.user_id}' is invalid (email: '#{user_row.email}')"
+              next
             end
 
             if pseudo.changed?

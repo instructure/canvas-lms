@@ -19,7 +19,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Container from '@instructure/ui-core/lib/components/Container';
 import Spinner from '@instructure/ui-core/lib/components/Spinner';
-import { arrayOf, oneOfType, bool, object, string, number, func } from 'prop-types';
+import { arrayOf, oneOfType, shape, bool, object, string, number, func } from 'prop-types';
 import { momentObj } from 'react-moment-proptypes';
 import Day from '../Day';
 import ShowOnFocusButton from '../ShowOnFocusButton';
@@ -28,7 +28,7 @@ import LoadingFutureIndicator from '../LoadingFutureIndicator';
 import LoadingPastIndicator from '../LoadingPastIndicator';
 import PlannerEmptyState from '../PlannerEmptyState';
 import formatMessage from '../../format-message';
-import {loadFutureItems, scrollIntoPast, loadPastUntilNewActivity, togglePlannerItemCompletion, updateTodo} from '../../actions';
+import {loadFutureItems, scrollIntoPast, loadPastUntilNewActivity, scrollToNewActivity, togglePlannerItemCompletion, updateTodo} from '../../actions';
 import {getFirstLoadedMoment} from '../../utilities/dateUtils';
 import {notifier} from '../../dynamic-ui';
 
@@ -49,6 +49,7 @@ export class PlannerApp extends Component {
     firstNewActivityDate: momentObj,
     scrollIntoPast: func,
     loadPastUntilNewActivity: func,
+    scrollToNewActivity: func,
     loadFutureItems: func,
     stickyOffset: number, // in pixels
     stickyZIndex: number,
@@ -58,6 +59,9 @@ export class PlannerApp extends Component {
     triggerDynamicUiUpdates: func,
     preTriggerDynamicUiUpdates: func,
     plannerActive: func,
+    ui: shape({
+      naiAboveScreen: bool,
+    }),
   };
 
   static defaultProps = {
@@ -65,11 +69,11 @@ export class PlannerApp extends Component {
     stickyOffset: 0,
     triggerDynamicUiUpdates: () => {},
     preTriggerDynamicUiUpdates: () => {},
-    plannerActive: () => {return false}
+    plannerActive: () => {return false;}
   };
 
   componentWillUpdate () {
-    this.props.preTriggerDynamicUiUpdates(this.fixedElement);
+    this.props.preTriggerDynamicUiUpdates(this.fixedElement, 'app');
   }
 
   componentDidUpdate () {
@@ -81,7 +85,9 @@ export class PlannerApp extends Component {
   }
 
   handleNewActivityClick = () => {
-    this.props.loadPastUntilNewActivity();
+    let additionalOffset = 0;
+    if (this.newActivityButtonRef) additionalOffset = this.newActivityButtonRef.getBoundingClientRect().height;
+    this.props.scrollToNewActivity({additionalOffset});
   }
 
   renderLoading () {
@@ -102,7 +108,8 @@ export class PlannerApp extends Component {
     if (!this.props.firstNewActivityDate) return;
 
     const firstLoadedMoment = getFirstLoadedMoment(this.props.days, this.props.timeZone);
-    if (firstLoadedMoment.isSame(this.props.firstNewActivityDate) || firstLoadedMoment.isBefore(this.props.firstNewActivityDate)) return;
+    const firstNewActivityLoaded = firstLoadedMoment.isSame(this.props.firstNewActivityDate) || firstLoadedMoment.isBefore(this.props.firstNewActivityDate);
+    if (firstNewActivityLoaded && !this.props.ui.naiAboveScreen) return;
 
     return (
       <StickyButton
@@ -110,6 +117,7 @@ export class PlannerApp extends Component {
         onClick={this.handleNewActivityClick}
         offset={this.props.stickyOffset + 'px'}
         zIndex={this.props.stickyZIndex}
+        buttonRef={ref => this.newActivityButtonRef = ref}
       >
         {formatMessage("New Activity")}
       </StickyButton>
@@ -205,8 +213,9 @@ const mapStateToProps = (state) => {
     loadingError: state.loading.loadingError,
     firstNewActivityDate: state.firstNewActivityDate,
     timeZone: state.timeZone,
+    ui: state.ui,
   };
 };
 
-const mapDispatchToProps = {loadFutureItems, scrollIntoPast, loadPastUntilNewActivity, togglePlannerItemCompletion, updateTodo};
+const mapDispatchToProps = {loadFutureItems, scrollIntoPast, loadPastUntilNewActivity, scrollToNewActivity, togglePlannerItemCompletion, updateTodo};
 export default notifier(connect(mapStateToProps, mapDispatchToProps)(PlannerApp));

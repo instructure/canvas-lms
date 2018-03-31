@@ -1399,7 +1399,27 @@ describe Quizzes::Quiz do
       @quiz.workflow_state = 'unpublished'
       expect(@quiz).not_to be_active
     end
+  end
 
+  describe "#update_cached_due_dates?" do
+    before :each do
+      @quiz = @course.quizzes.create!(title: 'Test Quiz')
+    end
+
+    it 'returns true when the quiz due_at is changed' do
+      expect { @quiz.due_at = 1.day.from_now }.to change { @quiz.update_cached_due_dates? }.
+        from(false).to(true)
+    end
+
+    it 'returns true when the quiz workflow_state is changed' do
+      expect { @quiz.workflow_state = 'deleted' }.to change { @quiz.update_cached_due_dates? }.
+        from(false).to(true)
+    end
+
+    it 'returns true when the quiz only_visible_to_overrides_changed is changed' do
+      expect { @quiz.only_visible_to_overrides = true }.
+        to change { @quiz.update_cached_due_dates? }.from(false).to(true)
+    end
   end
 
   describe "#published?" do

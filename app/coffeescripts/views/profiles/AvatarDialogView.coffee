@@ -135,11 +135,13 @@ define [
           @enableSelectButton()
 
     preflightRequest: =>
+      # not using uploader.uploadFile because need to have completeUpload also
+      # wait on @getImage in imageUpdateAvatar
       $.post('/files/pending', {
         name: 'profile.jpg'
         format: 'text'
         no_redirect: true
-        'attachment[duplicate_handling]': 'overwrite'
+        'attachment[on_duplicate]': 'overwrite'
         'attachment[folder_id]': ENV.folder_id
         'attachment[filename]': 'profile.jpg'
         'attachment[context_code]': 'user_'+ENV.current_user_id

@@ -23,6 +23,7 @@ import courses from './courses-reducer';
 import groups from './groups-reducer';
 import opportunities from './opportunities-reducer';
 import todo from './todo-reducer';
+import ui from './ui-reducer';
 
 const locale = handleAction('INITIAL_OPTIONS', (state, action) => {
   return action.payload.locale;
@@ -46,4 +47,5 @@ export default combineReducers({
   firstNewActivityDate,
   opportunities,
   todo,
+  ui,
 });

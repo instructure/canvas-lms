@@ -27,11 +27,12 @@ module Api::V1::AccountReport
   end
 
   def account_report_json(report, user, session)
-    json = api_json(report, user, session,
-                    :only => %w(id progress parameters current_line)
-    )
+    json = api_json(report, user, session, only: %w(id progress parameters current_line))
     json[:status] = report.workflow_state
     json[:report] = report.report_type
+    json[:created_at] = report.created_at&.iso8601
+    json[:started_at] = report.start_at&.iso8601
+    json[:ended_at] = report.end_at&.iso8601
     json[:file_url] = (report.attachment.nil? ? nil : account_file_download_url(report.account_id, report.attachment_id))
     if report.attachment
       json[:attachment] = attachment_json(report.attachment, user)

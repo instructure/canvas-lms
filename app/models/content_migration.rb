@@ -607,7 +607,12 @@ class ContentMigration < ActiveRecord::Base
       end
       item_scope.each do |content|
         child_tag = master_course_subscription.content_tag_for(content)
-        if child_tag.downstream_changes.any?
+        skip_item = child_tag.downstream_changes.any? && !content.editing_restricted?(:any)
+        if content.is_a?(AssignmentGroup) && !skip_item && content.assignments.active.exists?
+          skip_item = true # don't delete an assignment group if an assignment is left (either they added one or changed one so it was skipped)
+        end
+
+        if skip_item
           Rails.logger.debug("skipping deletion sync for #{content.asset_string} due to downstream changes #{child_tag.downstream_changes}")
           add_skipped_item(child_tag)
         else

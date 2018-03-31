@@ -20,6 +20,7 @@ import Backbone from 'Backbone'
 import ExternalContentFileSubmissionView from 'compiled/views/assignments/ExternalContentFileSubmissionView'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
+import * as uploader from 'jsx/shared/upload_file'
 
 const contentItem = {
   '@type': 'FileItem',
@@ -55,7 +56,7 @@ QUnit.module('ExternalContentFileSubmissionView#uploadFileFromUrl', {
 })
 
 test("hits the course url", () => {
-  const spy = sandbox.spy($, 'ajaxJSON')
+  const spy = sandbox.spy(uploader, 'uploadFile')
   view.uploadFileFromUrl({}, model)
   ok(spy.calledWith('/api/v1/courses/42/assignments/24/submissions/5/files'))
 })
@@ -63,7 +64,7 @@ test("hits the course url", () => {
 test("hits the group url", () => {
   window.ENV.SUBMIT_ASSIGNMENT.GROUP_ID_FOR_USER = 2
 
-  const spy = sandbox.spy($, 'ajaxJSON')
+  const spy = sandbox.spy(uploader, 'uploadFile')
   view.uploadFileFromUrl({}, model)
   ok(spy.calledWith('/api/v1/groups/2/files'))
 })

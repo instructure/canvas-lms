@@ -19,12 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import GraphQLStudentContextTray from '../context_cards/GraphQLStudentContextTray'
-import RestStudentContextTray from '../context_cards/RestStudentContextTray'
-
-const StudentContextTray = ENV.GRAPHQL_ENABLED
-  ? GraphQLStudentContextTray
-  : RestStudentContextTray;
+import StudentContextTray from '../context_cards/GraphQLStudentContextTray'
 
   const handleClickEvent = (event) => {
     const studentId = $(event.target).attr('data-student_id');

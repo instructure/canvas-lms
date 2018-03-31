@@ -35,17 +35,16 @@ describe "Gradezilla" do
       Gradezilla.visit(@course)
     end
 
-    it 'is maintained in editable mode', priority: "1", test_id: 3426618 do
-      skip('This is skeleton code that acts as AC for GRADE-76 which is WIP')
+    it 'is maintained in editable mode', priority: '1', test_id: 3426618 do
       Gradezilla::Cells.grading_cell(@students[0], @assignment).click
-      expect(Gradezilla::Cells.grade_cell_input(@students[0], @assignment)).to include_text('Complete')
+      title = f("#{Gradezilla::Cells.grading_cell_selector(@students[0], @assignment)} title")
+      expect(title.attribute(:innerHTML)).to eq 'Complete'
     end
 
-    it 'is maintained on page refresh post grade update', priority: "1", test_id: 3435317 do
-      skip('This is skeleton code that acts as AC for GRADE-76 which is WIP')
-      Gradezilla::Cells.edit_grade(@students[0], @assignment, "fail")
+    it 'is maintained on page refresh post grade update', priority: '1', test_id: 3435317 do
+      Gradezilla::Cells.select_complete_incomplete_grade(@students[0], @assignment, 'Incomplete')
       refresh_page
-      expect(Gradezilla::Cells.get_grade(@students[0], @assignment)).to include_text('Incomplete')
+      expect(Gradezilla::Cells.get_grade(@students[0], @assignment)).to eq 'Incomplete'
     end
   end
 end

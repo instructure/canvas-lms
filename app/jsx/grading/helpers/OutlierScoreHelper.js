@@ -24,7 +24,7 @@ import GRADEBOOK_TRANSLATIONS from 'compiled/gradebook/GradebookTranslations'
     return score < 0;
   };
 
-  const isTooManyPoints = function(score, pointsPossible) {
+  const isUnusuallyHigh = function(score, pointsPossible) {
     if (pointsPossible === 0 || pointsPossible == null) { return false; }
     const outlierBoundary = pointsPossible * MULTIPLIER;
     return score >= outlierBoundary;
@@ -38,13 +38,13 @@ import GRADEBOOK_TRANSLATIONS from 'compiled/gradebook/GradebookTranslations'
 
     hasWarning() {
       // mutually exclusive
-      return isNegativePoints(this.score) || isTooManyPoints(this.score, this.pointsPossible);
+      return isNegativePoints(this.score) || isUnusuallyHigh(this.score, this.pointsPossible);
     }
 
     warningMessage() {
       if (isNegativePoints(this.score)) {
         return GRADEBOOK_TRANSLATIONS.submission_negative_points_warning;
-      } else if (isTooManyPoints(this.score, this.pointsPossible)) {
+      } else if (isUnusuallyHigh(this.score, this.pointsPossible)) {
         return GRADEBOOK_TRANSLATIONS.submission_too_many_points_warning;
       } else {
         return null;
@@ -52,4 +52,4 @@ import GRADEBOOK_TRANSLATIONS from 'compiled/gradebook/GradebookTranslations'
     }
   };
 
-export default OutlierScoreHelper
+export { OutlierScoreHelper as default, isUnusuallyHigh }

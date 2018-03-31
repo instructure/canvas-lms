@@ -8,7 +8,7 @@ FROM instructure/ruby-passenger:2.4
 ENV APP_HOME /usr/src/app/
 ENV RAILS_ENV "production"
 ENV NGINX_MAX_UPLOAD_SIZE 10g
-ENV YARN_VERSION 1.3.2-1
+ENV YARN_VERSION 1.5.1-1
 
 # Work around github.com/zertosh/v8-compile-cache/issues/2
 # This can be removed once yarn pushes a release including the fixed version
@@ -72,7 +72,11 @@ USER root
 COPY . $APP_HOME
 RUN mkdir -p .yardoc \
              app/stylesheets/brandable_css_brands \
+             app/views/info \
+             client_apps/canvas_quizzes/dist \
              client_apps/canvas_quizzes/node_modules \
+             client_apps/canvas_quizzes/tmp \
+             config/locales/generated \
              gems/canvas_i18nliner/node_modules \
              gems/selinimum/node_modules \
              log \
@@ -81,6 +85,7 @@ RUN mkdir -p .yardoc \
              public/doc/api \
              public/javascripts/client_apps \
              public/javascripts/compiled \
+             public/javascripts/translations \
              tmp \
              /home/docker/.bundler/ \
              /home/docker/.cache/yarn \

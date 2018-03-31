@@ -45,7 +45,11 @@ describe "Enrollment::BatchStateUpdater" do
       expect(@user.associated_accounts).to eq [Account.default]
       Enrollment::BatchStateUpdater.mark_enrollments_as_deleted([@enrollment.id, @enrollment2.id])
       Enrollment::BatchStateUpdater.touch_and_update_associations([@user.id])
-      expect(@user.associated_accounts(true)).to eq []
+      if CANVAS_RAILS5_0
+        expect(@user.associated_accounts(true)).to eq []
+      else
+        expect(@user.associated_accounts.reload).to eq []
+      end
     end
   end
 
@@ -126,6 +130,7 @@ describe "Enrollment::BatchStateUpdater" do
       add_to_favorites_later
       assign_uuid
       audit_groups_for_deleted_enrollments
+      after_save_collection_association
       autosave_associated_records_for_associated_user
       autosave_associated_records_for_course
       autosave_associated_records_for_course_section

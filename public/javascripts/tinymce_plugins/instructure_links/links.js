@@ -321,6 +321,8 @@ import YouTubeApi from './youtube_api'
       $box.find(".disable_inline_content").attr('checked', $a.hasClass('inline_disabled')).triggerHandler('change');
       $box.find(".auto_show_inline_content").attr('checked', $a.hasClass('auto_open')).triggerHandler('change');
       $box.find(".insert_button").text("Update Link");
+    } else {
+      $box.find(".prompt").val('').change();
     }
     $box.dialog({
       width: 425,

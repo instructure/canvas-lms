@@ -69,6 +69,68 @@ QUnit.module('GradeInput', suiteHooks => {
     equal(label.text(), 'Grade')
   })
 
+  test('sets the input value to the grade of the pending grade info, when present', () => {
+    props.pendingGradeInfo = {excused: false, grade: 'invalid', valid: false}
+    mountComponent()
+    strictEqual(getTextInputValue(), 'invalid')
+  })
+
+  test('clears the grade input when the pending grade is cleared', () => {
+    props.pendingGradeInfo = {excused: false, grade: null, valid: true}
+    mountComponent()
+    strictEqual(getTextInputValue(), '')
+  })
+
+  test('displays "Excused" when the pending grade is "Excused"', () => {
+    props.pendingGradeInfo = {excused: true, grade: null, valid: true}
+    mountComponent()
+    strictEqual(getTextInputValue(), 'Excused')
+  })
+
+  QUnit.module('when the "enter grades as" setting is "passFail"', contextHooks => {
+    const getInputValue = () =>
+      wrapper.find('.Grid__AssignmentRowCell__CompleteIncompleteValue').node.textContent
+
+    contextHooks.beforeEach(() => {
+      props.enterGradesAs = 'passFail'
+      props.submission.enteredGrade = 'complete'
+      props.submission.enteredScore = 10
+    })
+
+    test('renders a button trigger for the menu', () => {
+      mountComponent()
+      const button = wrapper.find('.Grid__AssignmentRowCell__CompleteIncompleteMenu button')
+      strictEqual(button.length, 1)
+    })
+
+    test('sets the input value to "–" when the submission is not graded and not excused', () => {
+      props.submission.enteredGrade = null
+      props.submission.enteredScore = null
+      mountComponent()
+      strictEqual(getInputValue(), '–')
+    })
+
+    test('sets the input value to "Excused" when the submission is excused', () => {
+      props.submission.enteredGrade = null
+      props.submission.enteredScore = null
+      props.submission.excused = true
+      mountComponent()
+      strictEqual(getInputValue(), 'Excused')
+    })
+
+    test('sets the value to "Complete" when the submission is complete', () => {
+      mountComponent()
+      strictEqual(getInputValue(), 'Complete')
+    })
+
+    test('sets the value to "Incomplete" when the submission is inccomplete', () => {
+      props.submission.enteredGrade = 'incomplete'
+      props.submission.enteredScore = 0
+      mountComponent()
+      strictEqual(getInputValue(), 'Incomplete')
+    })
+  })
+
   QUnit.module('when the "enter grades as" setting is "points"', contextHooks => {
     contextHooks.beforeEach(() => {
       props.enterGradesAs = 'points'
@@ -180,37 +242,6 @@ QUnit.module('GradeInput', suiteHooks => {
     })
   })
 
-  QUnit.module('when the "enter grades as" setting is "gradingScheme"', contextHooks => {
-    contextHooks.beforeEach(() => {
-      props.enterGradesAs = 'gradingScheme'
-      props.submission.enteredGrade = '7.8'
-      props.submission.enteredScore = 7.8
-    })
-
-    test('adds the GradingSchemeInput-suffix class to the container', () => {
-      mountComponent()
-      strictEqual(wrapper.hasClass('Grid__AssignmentRowCell__GradingSchemeInput'), true)
-    })
-
-    test('renders a text input', () => {
-      mountComponent()
-      const input = wrapper.find('input[type="text"]')
-      strictEqual(input.length, 1)
-    })
-
-    test('optionally disables the input', () => {
-      props.disabled = true
-      mountComponent()
-      const input = wrapper.find('input[type="text"]')
-      strictEqual(input.prop('disabled'), true)
-    })
-
-    test('sets as the input value the grade corresponding to the entered score', () => {
-      mountComponent()
-      equal(getTextInputValue(), 'C')
-    })
-  })
-
   QUnit.module('#componentWillReceiveProps()', () => {
     test('sets the input value to the entered score of the updated submission', () => {
       mountComponent()
@@ -237,50 +268,157 @@ QUnit.module('GradeInput', suiteHooks => {
     })
   })
 
-  QUnit.module('#focus()', () => {
-    test('sets focus on the input', () => {
-      mountComponent()
-      wrapper.instance().focus()
-      strictEqual(document.activeElement, wrapper.find('input[type="text"]').get(0))
-    })
-
-    test('selects the content of the input', () => {
-      props.submission = {...props.submission, enteredScore: 8.13, enteredGrade: '8.13'}
-      mountComponent()
-      wrapper.instance().focus()
-      strictEqual(document.getSelection().toString(), '8.13')
-    })
-  })
-
-  QUnit.module('#gradingData', () => {
-    function getGradingData() {
-      return wrapper.instance().gradingData
+  QUnit.module('#gradeInfo', () => {
+    function getGradeInfo() {
+      return wrapper.instance().gradeInfo
     }
+
+    QUnit.module('when the submission is ungraded', hooks => {
+      hooks.beforeEach(() => {
+        mountComponent()
+      })
+
+      test('sets grade to null', () => {
+        strictEqual(getGradeInfo().grade, null)
+      })
+
+      test('sets score to null', () => {
+        strictEqual(getGradeInfo().score, null)
+      })
+
+      test('sets enteredAs to null', () => {
+        equal(getGradeInfo().enteredAs, null)
+      })
+
+      test('sets excused to false', () => {
+        strictEqual(getGradeInfo().excused, false)
+      })
+    })
+
+    QUnit.module('when "enterGradesAs" is "points" and the submission is graded', hooks => {
+      hooks.beforeEach(() => {
+        props.enterGradesAs = 'points'
+        props.submission = {...props.submission, enteredGrade: '7.6', enteredScore: 7.6}
+        mountComponent()
+      })
+
+      test('sets grade to the points form of the entered grade', () => {
+        equal(getGradeInfo().grade, '7.6')
+      })
+
+      test('sets score to the score form of the entered grade', () => {
+        strictEqual(getGradeInfo().score, 7.6)
+      })
+
+      test('sets enteredAs to "points"', () => {
+        equal(getGradeInfo().enteredAs, 'points')
+      })
+
+      test('sets excused to false', () => {
+        strictEqual(getGradeInfo().excused, false)
+      })
+    })
+
+    QUnit.module('when "enterGradesAs" is "percent" and the submission is graded', hooks => {
+      hooks.beforeEach(() => {
+        props.enterGradesAs = 'percent'
+        props.submission = {...props.submission, enteredGrade: '76%', enteredScore: 7.6}
+        mountComponent()
+      })
+
+      test('sets grade to the percent form of the entered grade', () => {
+        equal(getGradeInfo().grade, '76%')
+      })
+
+      test('sets score to the score form of the entered grade', () => {
+        strictEqual(getGradeInfo().score, 7.6)
+      })
+
+      test('sets enteredAs to "percent"', () => {
+        equal(getGradeInfo().enteredAs, 'percent')
+      })
+
+      test('sets excused to false', () => {
+        strictEqual(getGradeInfo().excused, false)
+      })
+    })
+
+    QUnit.module('when the submission is excused', hooks => {
+      hooks.beforeEach(() => {
+        props.submission = {...props.submission, excused: true}
+        mountComponent()
+      })
+
+      test('sets grade to null', () => {
+        strictEqual(getGradeInfo().grade, null)
+      })
+
+      test('sets score to null', () => {
+        strictEqual(getGradeInfo().score, null)
+      })
+
+      test('sets enteredAs to "excused"', () => {
+        equal(getGradeInfo().enteredAs, 'excused')
+      })
+
+      test('sets excused to true', () => {
+        strictEqual(getGradeInfo().excused, true)
+      })
+    })
+
+    QUnit.module('when the submission has a pending grade', hooks => {
+      hooks.beforeEach(() => {
+        props.pendingGradeInfo = {
+          enteredAs: 'points',
+          excused: false,
+          grade: 'B',
+          score: 8.6,
+          valid: true
+        }
+        mountComponent()
+      })
+
+      test('sets grade to the grade of the pending grade', () => {
+        equal(getGradeInfo().grade, 'B')
+      })
+
+      test('sets score to the score of the pending grade', () => {
+        strictEqual(getGradeInfo().score, 8.6)
+      })
+
+      test('sets enteredAs to the value of the pending grade', () => {
+        equal(getGradeInfo().enteredAs, 'points')
+      })
+
+      test('sets excused to false', () => {
+        strictEqual(getGradeInfo().excused, false)
+      })
+    })
 
     test('trims whitespace from changed input values', () => {
       mountComponent()
       wrapper.find('input').simulate('change', {target: {value: ' 8.9 '}})
-      strictEqual(getGradingData().grade, '8.9')
+      strictEqual(getGradeInfo().grade, '8.9')
     })
 
     test('is excused when the input changes to "EX"', () => {
       mountComponent()
       wrapper.find('input').simulate('change', {target: {value: 'EX'}})
-      strictEqual(getGradingData().excused, true)
+      strictEqual(getGradeInfo().excused, true)
     })
 
     test('clears the grade when the input is cleared', () => {
       mountComponent()
       wrapper.find('input').simulate('change', {target: {value: '8.9'}})
       wrapper.find('input').simulate('change', {target: {value: ''}})
-      strictEqual(getGradingData().grade, null)
+      strictEqual(getGradeInfo().grade, null)
     })
 
     test('clears the score when the input is cleared', () => {
       mountComponent()
       wrapper.find('input').simulate('change', {target: {value: '8.9'}})
       wrapper.find('input').simulate('change', {target: {value: ''}})
-      strictEqual(getGradingData().score, null)
+      strictEqual(getGradeInfo().score, null)
     })
 
     QUnit.module('when "enterGradesAs" is "points"', contextHooks => {
@@ -295,15 +433,15 @@ QUnit.module('GradeInput', suiteHooks => {
         })
 
         test('sets grade to the entered grade', () => {
-          strictEqual(getGradingData().grade, '8.9')
+          strictEqual(getGradeInfo().grade, '8.9')
         })
 
         test('sets score to the score form of the entered grade', () => {
-          strictEqual(getGradingData().score, 8.9)
+          strictEqual(getGradeInfo().score, 8.9)
         })
 
         test('sets enteredAs to "points"', () => {
-          strictEqual(getGradingData().enteredAs, 'points')
+          strictEqual(getGradeInfo().enteredAs, 'points')
         })
       })
 
@@ -313,15 +451,15 @@ QUnit.module('GradeInput', suiteHooks => {
         })
 
         test('sets grade to the points form of the entered grade', () => {
-          strictEqual(getGradingData().grade, '8.9')
+          strictEqual(getGradeInfo().grade, '8.9')
         })
 
         test('sets score to the score form of the entered grade', () => {
-          strictEqual(getGradingData().score, 8.9)
+          strictEqual(getGradeInfo().score, 8.9)
         })
 
         test('sets enteredAs to "percent"', () => {
-          strictEqual(getGradingData().enteredAs, 'percent')
+          strictEqual(getGradeInfo().enteredAs, 'percent')
         })
       })
 
@@ -331,15 +469,15 @@ QUnit.module('GradeInput', suiteHooks => {
         })
 
         test('sets grade to the points form of the entered grade', () => {
-          strictEqual(getGradingData().grade, '8.9')
+          strictEqual(getGradeInfo().grade, '8.9')
         })
 
         test('sets score to the score form of the entered grade', () => {
-          strictEqual(getGradingData().score, 8.9)
+          strictEqual(getGradeInfo().score, 8.9)
         })
 
         test('sets enteredAs to "gradingScheme"', () => {
-          strictEqual(getGradingData().enteredAs, 'gradingScheme')
+          strictEqual(getGradeInfo().enteredAs, 'gradingScheme')
         })
       })
     })
@@ -356,15 +494,15 @@ QUnit.module('GradeInput', suiteHooks => {
         })
 
         test('sets grade to the percent form of the entered grade', () => {
-          strictEqual(getGradingData().grade, '8.9%')
+          strictEqual(getGradeInfo().grade, '8.9%')
         })
 
         test('sets score to the score form of the entered grade', () => {
-          strictEqual(getGradingData().score, 0.89)
+          strictEqual(getGradeInfo().score, 0.89)
         })
 
         test('sets enteredAs to "percent"', () => {
-          strictEqual(getGradingData().enteredAs, 'percent')
+          strictEqual(getGradeInfo().enteredAs, 'percent')
         })
       })
 
@@ -374,15 +512,15 @@ QUnit.module('GradeInput', suiteHooks => {
         })
 
         test('sets grade to the entered grade', () => {
-          strictEqual(getGradingData().grade, '89%')
+          strictEqual(getGradeInfo().grade, '89%')
         })
 
         test('sets score to the score form of the entered grade', () => {
-          strictEqual(getGradingData().score, 8.9)
+          strictEqual(getGradeInfo().score, 8.9)
         })
 
         test('sets enteredAs to "percent"', () => {
-          strictEqual(getGradingData().enteredAs, 'percent')
+          strictEqual(getGradeInfo().enteredAs, 'percent')
         })
       })
 
@@ -392,78 +530,40 @@ QUnit.module('GradeInput', suiteHooks => {
         })
 
         test('sets grade to the percent form of the entered grade', () => {
-          strictEqual(getGradingData().grade, '89%')
+          strictEqual(getGradeInfo().grade, '89%')
         })
 
         test('sets score to the score form of the entered grade', () => {
-          strictEqual(getGradingData().score, 8.9)
+          strictEqual(getGradeInfo().score, 8.9)
         })
 
         test('sets enteredAs to "gradingScheme"', () => {
-          strictEqual(getGradingData().enteredAs, 'gradingScheme')
+          strictEqual(getGradeInfo().enteredAs, 'gradingScheme')
         })
       })
     })
+  })
 
-    QUnit.module('when "enterGradesAs" is "gradingScheme"', contextHooks => {
-      contextHooks.beforeEach(() => {
-        props.enterGradesAs = 'gradingScheme'
-        mountComponent()
-      })
+  QUnit.module('#focus()', () => {
+    test('sets focus on the input', () => {
+      mountComponent()
+      wrapper.instance().focus()
+      strictEqual(document.activeElement, wrapper.find('input[type="text"]').get(0))
+    })
 
-      QUnit.module('when a point value is entered', hooks => {
-        hooks.beforeEach(() => {
-          wrapper.find('input').simulate('change', {target: {value: '8.9'}})
-        })
+    test('selects the content of the input', () => {
+      props.submission = {...props.submission, enteredScore: 8.13, enteredGrade: '8.13'}
+      mountComponent()
+      wrapper.instance().focus()
+      strictEqual(document.getSelection().toString(), '8.13')
+    })
+  })
 
-        test('sets grade to the percent form of the entered grade', () => {
-          strictEqual(getGradingData().grade, 'B')
-        })
-
-        test('sets score to the score form of the entered grade', () => {
-          strictEqual(getGradingData().score, 8.9)
-        })
-
-        test('sets enteredAs to "points"', () => {
-          strictEqual(getGradingData().enteredAs, 'points')
-        })
-      })
-
-      QUnit.module('when a percent value is entered', hooks => {
-        hooks.beforeEach(() => {
-          wrapper.find('input').simulate('change', {target: {value: '89%'}})
-        })
-
-        test('sets grade to the entered grade', () => {
-          strictEqual(getGradingData().grade, 'B')
-        })
-
-        test('sets score to the score form of the entered grade', () => {
-          strictEqual(getGradingData().score, 8.9)
-        })
-
-        test('sets enteredAs to "percent"', () => {
-          strictEqual(getGradingData().enteredAs, 'percent')
-        })
-      })
-
-      QUnit.module('when a grading scheme value is entered', hooks => {
-        hooks.beforeEach(() => {
-          wrapper.find('input').simulate('change', {target: {value: 'B'}})
-        })
-
-        test('sets grade to the percent form of the entered grade', () => {
-          strictEqual(getGradingData().grade, 'B')
-        })
-
-        test('sets score to the score form of the entered grade', () => {
-          strictEqual(getGradingData().score, 8.9)
-        })
-
-        test('sets enteredAs to "gradingScheme"', () => {
-          strictEqual(getGradingData().enteredAs, 'gradingScheme')
-        })
-      })
+  QUnit.module('#handleKeyDown()', () => {
+    test('always returns undefined', () => {
+      mountComponent()
+      const result = wrapper.instance().handleKeyDown({shiftKey: false, which: 9})
+      equal(typeof result, 'undefined')
     })
   })
 
@@ -471,6 +571,53 @@ QUnit.module('GradeInput', suiteHooks => {
     function hasGradeChanged() {
       return wrapper.instance().hasGradeChanged()
     }
+
+    test('returns true when an invalid grade is entered', () => {
+      mountComponent()
+      wrapper.find('input').simulate('change', {target: {value: 'invalid'}})
+      strictEqual(hasGradeChanged(), true)
+    })
+
+    test('returns false when an invalid grade is entered without change', () => {
+      props.pendingGradeInfo = {excused: false, grade: 'invalid', valid: false}
+      mountComponent()
+      wrapper.find('input').simulate('change', {target: {value: 'invalid'}})
+      strictEqual(hasGradeChanged(), false)
+    })
+
+    test('ignores whitespace when comparing an invalid grade', () => {
+      props.pendingGradeInfo = {excused: false, grade: 'invalid', valid: false}
+      mountComponent()
+      wrapper.find('input').simulate('change', {target: {value: '  invalid  '}})
+      strictEqual(hasGradeChanged(), false)
+    })
+
+    test('returns true when an invalid grade is changed to a different invalid grade', () => {
+      mountComponent()
+      wrapper.find('input').simulate('change', {target: {value: 'also invalid'}})
+      strictEqual(hasGradeChanged(), true)
+    })
+
+    test('returns true when an invalid grade is cleared', () => {
+      props.pendingGradeInfo = {excused: false, grade: 'invalid', valid: false}
+      mountComponent()
+      wrapper.find('input').simulate('change', {target: {value: ''}})
+      strictEqual(hasGradeChanged(), true)
+    })
+
+    test('returns false when a valid grade is pending', () => {
+      props.pendingGradeInfo = {excused: false, grade: '8.9', valid: true}
+      mountComponent()
+      // with valid pending grades, the input is disabled
+      // changing grades is not allowed at this time
+      wrapper.find('input').simulate('change', {target: {value: 'invalid'}})
+      strictEqual(hasGradeChanged(), false)
+    })
+
+    test('returns false when a null grade is unchanged', () => {
+      mountComponent()
+      strictEqual(hasGradeChanged(), false)
+    })
 
     QUnit.module('when the "enter grades as" setting is "points"', () => {
       test('returns true when the grade has changed', () => {
@@ -532,6 +679,13 @@ QUnit.module('GradeInput', suiteHooks => {
         mountComponent()
         wrapper.find('input').simulate('change', {target: {value: '7.6'}})
         strictEqual(hasGradeChanged(), false)
+      })
+
+      test('returns true when an invalid grade is corrected', () => {
+        props.pendingGradeInfo = {excused: false, grade: 'invalid', valid: false}
+        mountComponent()
+        wrapper.find('input').simulate('change', {target: {value: '8.9'}})
+        strictEqual(hasGradeChanged(), true)
       })
     })
 
@@ -600,79 +754,12 @@ QUnit.module('GradeInput', suiteHooks => {
         wrapper.find('input').simulate('change', {target: {value: '76%'}})
         strictEqual(hasGradeChanged(), false)
       })
-    })
 
-    QUnit.module('when the "enter grades as" setting is "gradingScheme"', contextHooks => {
-      contextHooks.beforeEach(() => {
-        props.enterGradesAs = 'gradingScheme'
-      })
-
-      test('returns true when the grade has changed', () => {
-        props.submission = {...props.submission, enteredGrade: 'C', enteredScore: 7.6}
+      test('returns true when an invalid grade is corrected', () => {
+        props.pendingGradeInfo = {excused: false, grade: 'invalid', valid: false}
         mountComponent()
-        wrapper.find('input').simulate('change', {target: {value: 'B'}})
+        wrapper.find('input').simulate('change', {target: {value: '89%'}})
         strictEqual(hasGradeChanged(), true)
-      })
-
-      test('returns true when the submission becomes excused', () => {
-        props.submission = {...props.submission, enteredGrade: 'C', enteredScore: 7.6}
-        mountComponent()
-        wrapper.find('input').simulate('change', {target: {value: 'EX'}})
-        strictEqual(hasGradeChanged(), true)
-      })
-
-      test('returns false when the grade has not changed', () => {
-        mountComponent()
-        strictEqual(hasGradeChanged(), false)
-      })
-
-      test('returns false when the grade has not changed to a different grading scheme key', () => {
-        props.submission = {...props.submission, enteredGrade: 'C', enteredScore: 7.6}
-        mountComponent()
-        wrapper.find('input').simulate('change', {target: {value: 'C'}})
-        strictEqual(hasGradeChanged(), false)
-      })
-
-      test('returns false when the grade has changed to the same value in "points"', () => {
-        props.submission = {...props.submission, enteredGrade: 'C', enteredScore: 7.6}
-        mountComponent()
-        wrapper.find('input').simulate('change', {target: {value: '7.6'}})
-        strictEqual(hasGradeChanged(), false)
-      })
-
-      test('returns false when the grade has changed to the same value in "percent"', () => {
-        props.submission = {...props.submission, enteredGrade: 'C', enteredScore: 7.6}
-        mountComponent()
-        wrapper.find('input').simulate('change', {target: {value: '76%'}})
-        strictEqual(hasGradeChanged(), false)
-      })
-
-      test('returns true when the grade has changed to a different value in "points"', () => {
-        props.submission = {...props.submission, enteredGrade: 'C', enteredScore: 7.6}
-        mountComponent()
-        wrapper.find('input').simulate('change', {target: {value: '7.8'}})
-        strictEqual(hasGradeChanged(), true)
-      })
-
-      test('returns true when the grade has changed to a different value in "percent"', () => {
-        props.submission = {...props.submission, enteredGrade: 'C', enteredScore: 7.6}
-        mountComponent()
-        wrapper.find('input').simulate('change', {target: {value: '78%'}})
-        strictEqual(hasGradeChanged(), true)
-      })
-
-      test('returns false when the grade is stored as the same value in "points"', () => {
-        props.submission = {...props.submission, enteredGrade: '7.6', enteredScore: 7.6}
-        mountComponent()
-        wrapper.find('input').simulate('change', {target: {value: 'C'}})
-        strictEqual(hasGradeChanged(), false)
-      })
-
-      test('returns false when the grade is stored as the same value in "percent"', () => {
-        props.submission = {...props.submission, enteredGrade: '76%', enteredScore: 7.6}
-        mountComponent()
-        wrapper.find('input').simulate('change', {target: {value: 'C'}})
-        strictEqual(hasGradeChanged(), false)
       })
     })
 
@@ -716,22 +803,6 @@ QUnit.module('GradeInput', suiteHooks => {
       mountComponent()
       wrapper.find('input').simulate('change', {target: {value: '7.600'}})
       strictEqual(hasGradeChanged(), false)
-    })
-  })
-
-  QUnit.module('#isFocused()', () => {
-    test('returns true when the input has focus', () => {
-      mountComponent()
-      wrapper
-        .find('input[type="text"]')
-        .get(0)
-        .focus()
-      strictEqual(wrapper.instance().isFocused(), true)
-    })
-
-    test('returns false when the input does not have focus', () => {
-      mountComponent()
-      strictEqual(wrapper.instance().isFocused(), false)
     })
   })
 })

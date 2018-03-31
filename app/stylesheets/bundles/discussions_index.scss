@@ -24,5 +24,75 @@
   box-shadow: -1px -1px $ic-border-color, inset -1px -1px $ic-border-color;
   padding-right: 10px;
   padding-left: 10px;
-  border-radius: 3px;
+}
+
+.pinned-discussions-v2__wrapper {
+  padding: 10px;
+  border: 1px solid $ic-border-color;
+  border-bottom: 0px;
+  background-color: #f9f9f9;
+}
+// We had to create our own overlay because instui
+// Currently doesn't support overlays in a portal
+.discussion-settings-v2-spinner-container {
+  z-index: 9999;
+  position: absolute;
+  background: rgba(255, 255, 255, 0.65098);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  @include ic-focus-base;
+  &:focus {
+    @include ic-focus-variant;
+  }
+}
+
+// This is because we got to define the container for our
+// custom overlay.  Without specificying a height the spinner
+// doesn't know how to center in the container
+.discussion-settings-v2-modal-body-container {
+  position: relative;
+  height: 300px;
+}
+
+.closed-for-comments-discussions-v2__wrapper {
+  padding: 10px;
+  border: 1px solid $ic-border-color;
+  background-color: #f9f9f9;
+}
+
+.unpinned-discussions-v2__wrapper{
+  padding: 10px;
+  border: 1px solid $ic-border-color;
+  border-bottom: 0px;
+  background-color: #f9f9f9;
+}
+
+.recent-activity-text-container {
+  float: right;
+}
+
+.discussions-v2__container-image {
+  padding: 12px;
+  margin: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: $ic-color-light;
+  border: 1px dashed #ccc;
+}
+
+.discussions-v2__placeholder {
+  padding: 12px;
+  margin: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: $ic-color-light;
+  border: 1px dashed #ccc;
+}
+.ic-discussion-row {
+  background-color: $ic-color-light;
 }

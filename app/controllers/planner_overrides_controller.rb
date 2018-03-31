@@ -173,14 +173,22 @@ class PlannerOverridesController < ApplicationController
   # ]
   def items_index
     ensure_valid_planner_params or return
-
-    items_json = Rails.cache.fetch(['planner_items', @current_user, page, params[:filter], default_opts].cache_key, expires_in: 120.minutes) do
-      items = params[:filter] == 'new_activity' ? unread_items : planner_items
-      items = Api.paginate(items, self, api_v1_planner_items_url)
-      planner_items_json(items, @current_user, session, {start_at: start_date, due_after: start_date, due_before: end_date})
+    # fetch a meta key so we can invalidate just this info and not the whole of the user's cache
+    planner_overrides_meta_key = Rails.cache.fetch(planner_meta_cache_key, expires_in: 120.minutes) do
+      SecureRandom.uuid
     end
 
-    render json: items_json
+    items_response = Rails.cache.fetch(['planner_items', planner_overrides_meta_key, page, params[:filter], default_opts].cache_key, expires_in: 120.minutes) do
+      items = params[:filter] == 'new_activity' ? unread_items : planner_items
+      items = Api.paginate(items, self, api_v1_planner_items_url)
+      {
+        json: planner_items_json(items, @current_user, session, {start_at: start_date, due_after: start_date, due_before: end_date}),
+        link: response.headers["Link"].to_s,
+      }
+    end
+
+    response.headers["Link"] = items_response[:link]
+    render json: items_response[:json]
   end
 
   # @API List planner overrides
@@ -228,6 +236,7 @@ class PlannerOverridesController < ApplicationController
     planner_override.dismissed = value_to_boolean(params[:dismissed])
 
     if planner_override.save
+      Rails.cache.delete(planner_meta_cache_key)
       render json: planner_override_json(planner_override, @current_user, session), status: :ok
     else
       render json: planner_override.errors, status: :bad_request
@@ -264,6 +273,7 @@ class PlannerOverridesController < ApplicationController
       user: @current_user, dismissed: value_to_boolean(params[:dismissed]))
 
     if planner_override.save
+      Rails.cache.delete(planner_meta_cache_key)
       render json: planner_override_json(planner_override, @current_user, session), status: :created
     else
       render json: planner_override.errors, status: :bad_request
@@ -280,6 +290,7 @@ class PlannerOverridesController < ApplicationController
     planner_override = PlannerOverride.find(params[:id])
 
     if planner_override.destroy
+      Rails.cache.delete(planner_meta_cache_key)
       render json: planner_override_json(planner_override, @current_user, session), status: :ok
     else
       render json: planner_override.errors, status: :bad_request
@@ -290,9 +301,10 @@ class PlannerOverridesController < ApplicationController
 
   def planner_items
     collections = [*assignment_collections,
-                    planner_note_collection,
-                    page_collection,
-                    ungraded_discussion_collection]
+                   ungraded_quiz_collection,
+                   planner_note_collection,
+                   page_collection,
+                   ungraded_discussion_collection]
     BookmarkedCollection.merge(*collections)
   end
 
@@ -310,28 +322,30 @@ class PlannerOverridesController < ApplicationController
     #
     # grading = @current_user.assignments_needing_grading(default_opts) if @domain_root_account.grants_right?(@current_user, :manage_grades)
     # moderation = @current_user.assignments_needing_moderation(default_opts)
-    submitting = @current_user.assignments_needing_submitting(default_opts).
-      preload(:quiz, :discussion_topic)
-    ungraded_quiz = @current_user.ungraded_quizzes(default_opts)
-    submitted = @current_user.submitted_assignments(default_opts).preload(:quiz, :discussion_topic)
-    scopes = {submitted: submitted, ungraded_quiz: ungraded_quiz,
-              submitting: submitting}
+    viewing = @current_user.assignments_for_student('viewing', default_opts).preload(:quiz, :discussion_topic)
+    scopes = {viewing: viewing}
     # TODO: Add when ready (see above comment)
     # scopes[:grading] = grading if grading
     # scopes[:moderation] = moderation if moderation
     collections = []
     scopes.each do |scope_name, scope|
       next unless scope
-      base_model = scope_name == :ungraded_quiz ? Quizzes::Quiz : Assignment
-      collections << item_collection(scope_name.to_s, scope, base_model, [:due_at, :created_at], :id)
+      collections << item_collection(scope_name.to_s,
+        scope,
+        Assignment, [:due_at, :created_at], :id)
     end
     collections
   end
 
+  def ungraded_quiz_collection
+    item_collection('ungraded_quizzes',
+                    @current_user.ungraded_quizzes(default_opts),
+                    Quizzes::Quiz, [:due_at, :created_at], :id)
+  end
+
   def unread_discussion_topic_collection
     item_collection('unread_discussion_topics',
-                    @current_user.discussion_topics_needing_viewing(scope_only: true, include_ignored: true,
-                      due_before: end_date, due_after: start_date).
+                    @current_user.discussion_topics_needing_viewing(default_opts).
                       unread_for(@current_user),
                     DiscussionTopic, [:todo_date, :posted_at, :delayed_post_at, :created_at], :id)
   end
@@ -387,8 +401,8 @@ class PlannerOverridesController < ApplicationController
     # Since a range is needed, set values that weren't passed to a date
     # in the far past/future as to get all values before or after whichever
     # date was passed
-    @start_date = formatted_planner_date('start_date', @start_date, 10.years.ago)
-    @end_date   = formatted_planner_date('end_date', @end_date, 10.years.from_now)
+    @start_date = formatted_planner_date('start_date', @start_date, 10.years.ago.beginning_of_day)
+    @end_date   = formatted_planner_date('end_date', @end_date, 10.years.from_now.beginning_of_day)
   end
 
   def set_params

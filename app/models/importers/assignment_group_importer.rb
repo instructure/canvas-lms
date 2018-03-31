@@ -66,8 +66,8 @@ module Importers
       item.position = hash[:position].to_i if hash[:position] && hash[:position].to_i > 0
       item.group_weight = hash[:group_weight] if hash[:group_weight]
 
+      rules = ""
       if hash[:rules] && hash[:rules].length > 0
-        rules = ""
         hash[:rules].each do |rule|
           if rule[:drop_type] == "drop_lowest" || rule[:drop_type] == "drop_highest"
             rules += "#{rule[:drop_type]}:#{rule[:drop_count]}\n"
@@ -77,8 +77,11 @@ module Importers
             end
           end
         end
-        item.rules = rules unless rules == ''
       end
+      if rules.blank? && context.respond_to?(:assignment_group_no_drop_assignments)
+        context.assignment_group_no_drop_assignments&.delete_if{|k, v| v == item} # don't set never_drop rules if there are no drop rules
+      end
+      item.rules = rules.presence
 
       item.save!
       item

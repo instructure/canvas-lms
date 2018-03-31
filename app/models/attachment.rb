@@ -53,6 +53,7 @@ class Attachment < ActiveRecord::Base
        :content_export, :content_migration, :course, :eportfolio, :epub_export,
        :gradebook_upload, :group, :submission, :purgatory,
        { context_folder: 'Folder', context_sis_batch: 'SisBatch',
+         context_outcome_import: 'OutcomeImport',
          context_user: 'User', quiz: 'Quizzes::Quiz',
          quiz_statistics: 'Quizzes::QuizStatistics',
          quiz_submission: 'Quizzes::QuizSubmission' }]
@@ -484,7 +485,7 @@ class Attachment < ActiveRecord::Base
       # I've added the root_account_id accessor above, but I didn't verify there
       # isn't any code still accessing the namespace for the account id directly.
       ns = root_attachment.try(:namespace) if root_attachment_id
-      ns ||= Attachment.domain_namespace
+      ns ||= Attachment.current_namespace
       ns ||= self.context.root_account.file_namespace rescue nil
       ns ||= self.context.account.file_namespace rescue nil
       if Rails.env.development? && Attachment.local_storage?
@@ -767,12 +768,10 @@ class Attachment < ActiveRecord::Base
     instfs_hosted? || !!(authenticated_s3_url rescue false)
   end
 
-  def authenticated_url(**options)
+  def public_url(**options)
     if instfs_hosted?
-      InstFS.authenticated_url(self, options)
+      InstFS.authenticated_url(self, options.merge(user: nil))
     else
-      # attachment_fu doesn't like the extra option when building s3 urls
-      options.delete(:user)
       should_download = options.delete(:download)
       disposition = should_download ? "attachment" : "inline"
       options[:response_content_disposition] = "#{disposition}; #{disposition_filename}"
@@ -780,28 +779,12 @@ class Attachment < ActiveRecord::Base
     end
   end
 
-  def authenticated_url_for_user(user, **options)
-    authenticated_url(options.merge(user: user))
-  end
-
-  def download_url_for_user(user, ttl = url_ttl)
-    authenticated_url_for_user(user, expires_in: ttl, download: true)
-  end
-
-  def inline_url_for_user(user, ttl = url_ttl)
-    authenticated_url_for_user(user, expires_in: ttl, download: false)
-  end
-
-  def public_url(**options)
-    authenticated_url_for_user(nil, options)
-  end
-
   def public_inline_url(ttl = url_ttl)
-    inline_url_for_user(nil, ttl)
+    public_url(expires_in: ttl, download: false)
   end
 
   def public_download_url(ttl = url_ttl)
-    download_url_for_user(nil, ttl)
+    public_url(expires_in: ttl, download: true)
   end
 
   def url_ttl
@@ -861,7 +844,38 @@ class Attachment < ActiveRecord::Base
   # path will be used instead of the default system temporary path. It'll be
   # created if necessary.
   def open(opts = {}, &block)
-    store.open(opts, &block)
+    if instfs_hosted?
+      if block_given?
+        streaming_download(&block)
+      else
+        create_tempfile(opts) do |tempfile|
+          streaming_download(tempfile)
+        end
+      end
+    else
+      store.open(opts, &block)
+    end
+  end
+
+  # GETs this attachment's public_url and streams the response to the
+  # passed block; this is a helper function for #open
+  # (you should call #open instead of this)
+  private def streaming_download(dest=nil, &block)
+    CanvasHttp.get(public_url) do |response|
+      response.read_body(dest, &block)
+    end
+  end
+
+  def create_tempfile(opts)
+    if opts[:temp_folder].present? && !File.exist?(opts[:temp_folder])
+      FileUtils.mkdir_p(opts[:temp_folder])
+    end
+    tempfile = Tempfile.new(["attachment_#{id}", extension],
+                            opts[:temp_folder].presence || Dir.tmpdir)
+    tempfile.binmode
+    yield tempfile
+    tempfile.rewind
+    tempfile
   end
 
   def has_thumbnail?
@@ -870,13 +884,14 @@ class Attachment < ActiveRecord::Base
 
   # you should be able to pass an optional width, height, and page_number/video_seconds to this method for media objects
   # you should be able to pass an optional size (e.g. '64x64') to this method for other thumbnailable content types
+  #
+  # direct use of this method is deprecated. use the controller's
+  # `file_authenticator.thumbnail_url(attachment)` instead.
   def thumbnail_url(options={})
     return nil if Attachment.skip_thumbnails
 
     geometry = options[:size]
-    if instfs_hosted? && thumbnailable?
-      InstFS.authenticated_thumbnail_url(self, geometry: geometry)
-    elsif self.thumbnail || geometry.present?
+    if self.thumbnail || geometry.present?
       to_use = thumbnail_for_size(geometry) || self.thumbnail
       to_use.cached_s3_url
     elsif self.media_object && self.media_object.media_id
@@ -1623,13 +1638,22 @@ class Attachment < ActiveRecord::Base
     file
   end
 
-  def self.domain_namespace=(val)
-    @domain_namespace = val
+  def self.current_root_account=(account)
+    # TODO rename to @current_root_account
+    @domain_namespace = account
   end
 
-  def self.domain_namespace
+  def self.current_root_account
+    @domain_namespace
+  end
+
+  def self.current_namespace
     @domain_namespace.respond_to?(:file_namespace) ? @domain_namespace.file_namespace : @domain_namespace
   end
+
+  # deprecated
+  def self.domain_namespace=(val); self.current_root_account = val; end
+  def self.domain_namespace; self.current_namespace; end
 
   def self.serialization_methods; [:mime_class, :currently_locked, :crocodoc_available?]; end
   cattr_accessor :skip_thumbnails
@@ -1707,6 +1731,12 @@ class Attachment < ActiveRecord::Base
 
       self.file_state = 'available'
       self.save!
+
+      if opts[:progress]
+        # the UI only needs the id from here
+        opts[:progress].set_results({ id: self.id })
+      end
+
       handle_duplicates(duplicate_handling || 'overwrite')
     rescue Exception, Timeout::Error => e
       self.file_state = 'errored'
@@ -1728,6 +1758,12 @@ class Attachment < ActiveRecord::Base
       else
         self.upload_error_message = t :upload_error_unexpected, "An unknown error occurred downloading from %{url}", :url => url
       end
+
+      if opts[:progress]
+        opts[:progress].message = self.upload_error_message
+        opts[:progress].fail!
+      end
+
       self.save!
     end
   end

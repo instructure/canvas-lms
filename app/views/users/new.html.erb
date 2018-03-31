@@ -17,41 +17,45 @@
 %>
 
 <%
-  js_bundle :registration
+  js_bundle :terms_of_service_modal, :registration
   css_bundle :registration
   content_for :page_title, t('create_a_canvas_account', "Create a Canvas Account")
   content_for :head, include_common_stylesheets
+  js_env(:TERMS_OF_SERVICE_CUSTOM_CONTENT => @domain_root_account.terms_of_service.terms_of_service_content&.content)
 %>
 
-<div id="registration_header">
-  <div class="registration-content">
-    <h1><a href="http://www.instructure.com">Instructure</a></h1>
-    <a id="registration_login" href="/login">Login</a>
-  </div>
-</div>
 
-<div id="registration_content">
-  <div class="registration-content">
-    <h2 id="registration_video"><a href="http://vimeo.com/35336470" title="Play the Canvas introduction video">Watch a Video</a></h2>
-    <div id="registration_options">
-      <h2>Sign up now, it's free!</h2>
-      <% if (url = @domain_root_account.settings[:fft_registration_url]) %>
-        <a id="signup_teacher" href=<%= url %> title="Teacher Signup">I'm a Teacher</a>
-      <% else %>
-        <a href="#" id="signup_teacher" class="signup_link" data-template="teacherDialog" title="Teacher Signup">I'm a Teacher</a>
-      <% end %>
-      <a href="#" id="signup_student" class="signup_link" data-template="studentDialog" title="Student Signup">I'm a Student</a>
-      <%= link_to_parent_signup(@domain_root_account.parent_auth_type) %>
+<div id="main">
+  <div id="registration_header">
+    <div class="registration-content">
+      <h1><a href="http://www.instructure.com">Instructure</a></h1>
+      <a id="registration_login" href="/login">Login</a>
     </div>
   </div>
-</div>
 
-<div id="registration_footer">
-  <div class="registration-content">
-    <div class="left">&copy; <%= Time.now.year %> <a href="http://www.instructure.com">Instructure</a></div>
-    <div class="right">
-      <%= link_to t(:terms_of_use, 'Terms of Use'), terms_of_use_url %>
-      <%= link_to t(:privacy_policy, 'Privacy Policy'), privacy_policy_url %>
+  <div id="registration_content">
+    <div class="registration-content">
+      <h2 id="registration_video"><a href="http://vimeo.com/35336470" title="Play the Canvas introduction video">Watch a Video</a></h2>
+      <div id="registration_options">
+        <h2>Sign up now, it's free!</h2>
+        <% if (url = @domain_root_account.settings[:fft_registration_url]) %>
+          <a id="signup_teacher" href=<%= url %> title="Teacher Signup">I'm a Teacher</a>
+        <% else %>
+          <a href="#" id="signup_teacher" class="signup_link" data-template="teacherDialog" title="Teacher Signup">I'm a Teacher</a>
+        <% end %>
+        <a href="#" id="signup_student" class="signup_link" data-template="studentDialog" title="Student Signup">I'm a Student</a>
+        <%= link_to_parent_signup(@domain_root_account.parent_auth_type) %>
+      </div>
+    </div>
+  </div>
+
+  <div id="registration_footer">
+    <div class="registration-content">
+      <div class="left">&copy; <%= Time.now.year %> <a href="http://www.instructure.com">Instructure</a></div>
+      <div class="right">
+        <a href="#" class="terms_of_service_link" id="terms_of_service_link"></a>
+        <%= link_to t(:privacy_policy, 'Privacy Policy'), privacy_policy_url %>
+      </div>
     </div>
   </div>
 </div>

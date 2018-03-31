@@ -83,7 +83,10 @@ const { string, func, bool, instanceOf, oneOfType } = PropTypes;
     // ---------------
 
     formattedDate() {
-      return $.datetimeString(this.props.dateValue)
+      // make this match the format used by the datepicker
+      const dateStr = $.dateString(this.props.dateValue)
+      const timeStr = $.timeString(this.props.dateValue)
+      return `${dateStr} ${timeStr}`
     },
 
     wrapperClassName() {

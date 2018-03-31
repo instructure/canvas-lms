@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import i18n from 'i18n!react_collaborations'
+import I18n from 'i18n!react_collaborations'
   class LoadMore extends React.Component {
 
     static propTypes = {
@@ -51,7 +51,7 @@ import i18n from 'i18n!react_collaborations'
           {this.props.hasMore && !this.props.isLoading &&
             <div className='LoadMore-button'>
               <button className='Button--link' onClick={this.props.loadMore}>
-                {i18n.t('Load more results')}
+                {I18n.t('Load more results')}
               </button>
             </div>
           }

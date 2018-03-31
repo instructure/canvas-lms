@@ -228,12 +228,12 @@ describe UsersController, type: :request do
   it "doesn't include ungraded quizzes if not assigned to user" do
     survey = @student_course.quizzes.create!(quiz_type: 'survey', due_at: 1.day.from_now, only_visible_to_overrides: true)
     survey.publish!
-    override = survey.assignment_overrides.create!(:set => @course.default_section)
+    survey.assignment_overrides.create!(:set => @course.default_section)
 
     survey2 = @student_course.quizzes.create!(quiz_type: 'survey', due_at: 1.day.from_now, only_visible_to_overrides: true)
     survey2.publish!
     section = @course.course_sections.create!
-    override = survey.assignment_overrides.create!(:set => section)
+    survey2.assignment_overrides.create!(:set => section)
 
     json = api_call :get, "/api/v1/users/self/todo?include[]=ungraded_quizzes", :controller => "users",
       :action => "todo_items", :format => "json", :include => %w(ungraded_quizzes)

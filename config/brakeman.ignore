@@ -95,8 +95,28 @@
         "user_input": "Course.best_unicode_collation_key(\"courses.name\")",
         "confidence": "High",
         "note": "No user input is passed in to via opts['order'] in this function (see accounts_controller:sort_order)"
+      },
+      {
+        "warning_type": "Remote Code Execution",
+        "warning_code": 24,
+        "fingerprint": "b5ba030e599093d2a5047494736d8a61807935ee92704d7f289da07646c862e4",
+        "check_name": "UnsafeReflection",
+        "message": "Unsafe reflection method const_get called with parameter value",
+        "file": "app/controllers/files_controller.rb",
+        "line": 810,
+        "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
+        "code": "Object.const_get(params[:context_type])",
+        "render_path": null,
+        "location": {
+          "type": "method",
+          "class": "FilesController",
+          "method": "api_capture"
+        },
+        "user_input": "params[:context_type]",
+        "confidence": "High",
+        "note": "Value is whitelisted"
       }
     ],
-    "updated": "2017-12-19 10:36:25 -0700",
-    "brakeman_version": "4.1.0"
+    "updated": "2018-03-09 20:57:06 +0000",
+    "brakeman_version": "4.2.0"
 }

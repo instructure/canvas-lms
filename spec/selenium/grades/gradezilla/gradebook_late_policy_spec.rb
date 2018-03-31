@@ -128,7 +128,7 @@ describe 'Late Policies:' do
     end
 
     it 'missing policy adjusts pass/fail assignment', test_id: 3354099, priority: '1' do
-      expect(Gradezilla::Cells.get_grade(@student, @a5)).to eq "fail"
+      expect(Gradezilla::Cells.get_grade(@student, @a5)).to eq "Incomplete"
     end
 
     it 'late & missing policy wont affect no-submission assignment', test_id: 3354106, priority: '2' do

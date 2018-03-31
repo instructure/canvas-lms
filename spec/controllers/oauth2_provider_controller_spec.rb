@@ -143,6 +143,36 @@ describe Oauth2ProviderController do
         expect(response.location).to match(/https:\/\/example.com/)
       end
 
+      context 'masquerading' do
+        before :once do
+          @real_user = @user
+          @target_user = user_with_pseudonym(active_all: true, name: "Target")
+          Account.default.account_users.create!(user: @real_user)
+        end
+
+        before :each do
+          session[:become_user_id] = @target_user.id
+        end
+
+        it 'should generate a code for the real user if the developer key is trusted' do
+          key.trusted = true
+          key.save!
+          expect(Canvas::Oauth::Token).to receive(:generate_code_for).with(@real_user.global_id, anything, anything)
+          get :auth, params: {client_id: key.id,
+              redirect_uri: 'https://example.com',
+              response_type: 'code',
+              scope: '/auth/userinfo'}
+        end
+
+        it 'should redirect to login_url with error flash when developer key is not trusted' do
+          get :auth, params: {client_id: key.id,
+              redirect_uri: 'https://example.com',
+              response_type: 'code',
+              scope: '/auth/userinfo'}
+          expect(flash[:error]).to match(/can only be authorized for the currently logged-in user/)
+          expect(response).to redirect_to(login_url(force_login: 1))
+        end
+      end
     end
   end
 
@@ -222,7 +252,7 @@ describe Oauth2ProviderController do
       allow(Canvas).to receive_messages(:redis => redis)
       post :token, params: {:client_id => key.id, :client_secret => key.api_key, :code => valid_code, :replace_tokens => '1'}
       expect(response).to be_success
-      expect(AccessToken.exists?(old_token.id)).to be(false)
+      expect(AccessToken.not_deleted.exists?(old_token.id)).to be(false)
     end
 
     it 'does not delete existing tokens without replace_tokens' do
@@ -230,7 +260,7 @@ describe Oauth2ProviderController do
       allow(Canvas).to receive_messages(:redis => redis)
       post :token, params: {:client_id => key.id, :client_secret => key.api_key, :code => valid_code}
       expect(response).to be_success
-      expect(AccessToken.exists?(old_token.id)).to be(true)
+      expect(AccessToken.not_deleted.exists?(old_token.id)).to be(true)
     end
 
     context 'grant_type refresh_token' do

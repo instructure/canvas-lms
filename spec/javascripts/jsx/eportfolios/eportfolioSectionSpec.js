@@ -16,43 +16,40 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jquery',
-  'eportfolios/eportfolio_section',
-  'helpers/fixtures'
-], ($, {fetchContent}, fixtures) => {
-  var $section = null
+import $ from 'jquery';
+import { fetchContent } from 'eportfolios/eportfolio_section';
+import fixtures from 'helpers/fixtures';
 
-  QUnit.module("EportfolioSection -> fetchContent", {
-    setup() {
-      fixtures.setup()
-      $section = fixtures.create(
-        "<div id='eportfolio_section'>"     +
-        "  <div class='section_content'>"   +
-        "    <p>Some Editor Content</p>"    +
-        "  </div>"                          +
-        "  <textarea class='edit_section'>" +
-        "    Some HTML Content"             +
-        "  </textarea>"                     +
-        "</div>"
-      )
-    },
+var $section = null
 
-    teardown() {
-      fixtures.teardown()
-    }
-  });
+QUnit.module("EportfolioSection -> fetchContent", {
+  setup() {
+    fixtures.setup()
+    $section = fixtures.create(
+      "<div id='eportfolio_section'>"     +
+      "  <div class='section_content'>"   +
+      "    <p>Some Editor Content</p>"    +
+      "  </div>"                          +
+      "  <textarea class='edit_section'>" +
+      "    Some HTML Content"             +
+      "  </textarea>"                     +
+      "</div>"
+    )
+  },
 
-  test('grabs section content for rich_text type', ()=>{
-    var content = fetchContent($section, 'rich_text', 'section1')
-    equal(content['section1[section_type]'], 'rich_text')
-    equal(content['section1[content]'].trim(), '<p>Some Editor Content</p>')
-  })
-
-  test("uses edit field value for html type", ()=>{
-    var content = fetchContent($section, 'html', 'section1')
-    equal(content['section1[section_type]'], 'html')
-    equal(content['section1[content]'].trim(), 'Some HTML Content')
-  })
-
+  teardown() {
+    fixtures.teardown()
+  }
 });
+
+test('grabs section content for rich_text type', ()=>{
+  var content = fetchContent($section, 'rich_text', 'section1')
+  equal(content['section1[section_type]'], 'rich_text')
+  equal(content['section1[content]'].trim(), '<p>Some Editor Content</p>')
+})
+
+test("uses edit field value for html type", ()=>{
+  var content = fetchContent($section, 'html', 'section1')
+  equal(content['section1[section_type]'], 'html')
+  equal(content['section1[content]'].trim(), 'Some HTML Content')
+})

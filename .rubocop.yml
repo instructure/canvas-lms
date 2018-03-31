@@ -61,6 +61,8 @@ Layout/TrailingBlankLines:
 Layout/TrailingWhitespace:
   Enabled: false
 
+Style/FormatStringToken:
+  Enabled: false
 Style/StringLiterals:
   Enabled: false
 Style/SignalException:

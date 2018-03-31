@@ -723,6 +723,17 @@ module Lti
                        -> { @current_user.prefers_high_contrast? ? 'true' : 'false' },
                        USER_GUARD
 
+    # returns the Canvas ids of all active groups in the current course.
+    # @example
+    #   ```
+    #   23,24,...
+    #   ```
+    register_expansion 'com.instructure.Course.groupIds', [],
+                       -> { @context.groups.active.pluck(:id).join(',') },
+                       COURSE_GUARD,
+                       default_name: 'com_instructure_course_groupids'
+
+
     # returns the context ids for the groups the user belongs to in the course.
     # @example
     #   ```
@@ -746,8 +757,13 @@ module Lti
                        default_name: 'roles'
 
     # Returns list of [LIS role full URNs](https://www.imsglobal.org/specs/ltiv1p0/implementation-guide#toc-16).
-    # Note that this will include all roles the user has across the entire root account. Roles will not
-    # be scoped to the context of the LTI launch.
+    # Note that this will include all roles the user has.
+    # There are 3 different levels of roles defined: Context, Institution, System.
+    # Context role urns start with "urn:lti:ims" and include roles for the context where the launch occurred.
+    # Institution role urns start with "urn:lti:instrole" and include roles the user has in the institution. This
+    # will include roles they have in other courses or at the account level. Note that there is not a TA role at the
+    # Institution level. Instead Users with a TA enrollment will have an institution role of Instructor.
+    # System role urns start with "urn:lti:sysrole" and include roles for the entire system.
     # @duplicates ext_roles which is sent by default
     # @example
     #   ```

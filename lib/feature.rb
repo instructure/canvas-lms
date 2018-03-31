@@ -256,6 +256,21 @@ END
           end
         elsif context.is_a?(Account)
           transitions['on']['locked'] = true if transitions&.dig('on')
+
+          new_gradebook_feature_flag = FeatureFlag.where(feature: :new_gradebook, state: :on)
+          all_active_sub_account_ids = Account.sub_account_ids_recursive(context.id)
+          relevant_accounts = Account.joins(:feature_flags).where(id: [context.id].concat(all_active_sub_account_ids))
+          relevant_courses = Course.joins(:feature_flags).where(account_id: all_active_sub_account_ids)
+
+          accounts_with_feature = relevant_accounts.merge(new_gradebook_feature_flag)
+          courses_with_feature = relevant_courses.merge(new_gradebook_feature_flag)
+
+          if accounts_with_feature.exists? || courses_with_feature.exists?
+            transitions['off'] ||= {}
+            transitions['off']['locked'] = true
+            transitions['off']['warning'] =
+              I18n.t("This feature can't be disabled because there is at least one sub-account or course with this feature enabled.")
+          end
         end
       end
     },
@@ -576,14 +591,6 @@ END
       beta: true,
       development: false
     },
-    'graphql' =>
-    {
-      display_name: -> { I18n.t("GraphQL API") },
-      description: -> { I18n.t("EXPERIMENTAL GraphQL API.") },
-      applies_to: "RootAccount",
-      state: "on",
-      beta: true,
-    },
     'rubric_criterion_range' =>
     {
       display_name: -> { I18n.t('Rubric Criterion Range') },
@@ -625,7 +632,22 @@ END
         applies_to: 'RootAccount',
         state: 'hidden',
         development: true
-      }
+      },
+    'developer_key_management_ui_rewrite' =>
+      {
+        display_name: -> { I18n.t('Developer Key management UI Rewrite')},
+        description: -> { I18n.t('React UI rewrite Developer Key management') },
+        applies_to: 'RootAccount',
+        state: 'hidden',
+        development: true
+      },
+    'common_cartridge_page_conversion' => {
+      display_name: -> { I18n.t('Common Cartridge HTML File to Page Conversion') },
+      description: -> { I18n.t('If enabled, Common Cartridge importers will convert HTML files into Pages') },
+      applies_to: 'Course',
+      state: 'hidden',
+      beta: true
+    }
   )
 
   def self.definitions

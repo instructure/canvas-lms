@@ -248,11 +248,11 @@ class ExternalToolsController < ApplicationController
 
     launch_settings = JSON.parse(launch_settings)
 
-    @lti_launch = launch_settings['tool_settings']['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
+    @lti_launch = Lti::Launch.new
     @lti_launch.params = launch_settings['tool_settings']
     @lti_launch.resource_url = launch_settings['launch_url']
     @lti_launch.link_text =  launch_settings['tool_name']
-    @lti_launch.analytics_id =  launch_settings['analytics_id']
+    @lti_launch.analytics_id = launch_settings['analytics_id']
 
     render Lti::AppUtil.display_template('borderless')
   end
@@ -1074,31 +1074,31 @@ class ExternalToolsController < ApplicationController
     )
 
     launch_settings = {
-      'launch_url' => adapter.launch_url,
+      'launch_url' => adapter.launch_url(post_only: @tool.settings['post_only']),
       'tool_name' => @tool.name,
       'analytics_id' => @tool.tool_id
     }
 
-    if options[:assignment]
-      launch_settings['tool_settings'] = adapter.generate_post_payload_for_assignment(
-        options[:assignment],
-        lti_grade_passback_api_url(@tool),
-        blti_legacy_grade_passback_api_url(@tool),
-        lti_turnitin_outcomes_placement_url(@tool.id)
-      )
-    else
-      launch_settings['tool_settings'] = adapter.generate_post_payload
-    end
+    launch_settings['tool_settings'] = if options[:assignment]
+                                        adapter.generate_post_payload_for_assignment(
+                                          options[:assignment],
+                                          lti_grade_passback_api_url(@tool),
+                                          blti_legacy_grade_passback_api_url(@tool),
+                                          lti_turnitin_outcomes_placement_url(@tool.id)
+                                        )
+                                       else
+                                         adapter.generate_post_payload
+                                       end
 
     # store the launch settings and return to the user
     verifier = SecureRandom.hex(64)
     Canvas.redis.setex("#{@context.class.name}:#{REDIS_PREFIX}#{verifier}", 5.minutes, launch_settings.to_json)
 
-    if @context.is_a?(Account)
-      uri = URI(account_external_tools_sessionless_launch_url(@context))
-    else
-      uri = URI(course_external_tools_sessionless_launch_url(@context))
-    end
+    uri = if @context.is_a?(Account)
+            URI(account_external_tools_sessionless_launch_url(@context))
+          else
+            URI(course_external_tools_sessionless_launch_url(@context))
+          end
     uri.query = {:verifier => verifier}.to_query
 
     render :json => {:id => @tool.id, :name => @tool.name, :url => uri.to_s}

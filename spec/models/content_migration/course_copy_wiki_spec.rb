@@ -188,9 +188,9 @@ describe ContentMigration do
       end
 
       it "should set default view to modules if wiki front page is missing" do
+        @copy_from.wiki.set_front_page_url!('haha not here')
         @copy_from.default_view = 'wiki'
         @copy_from.save!
-        @copy_from.wiki.set_front_page_url!('haha not here')
 
         run_course_copy
 

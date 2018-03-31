@@ -218,7 +218,7 @@ describe "AuthenticationProviders API", type: :request do
       @ldap_hash['id'] = aac.id
       @ldap_hash['auth_port'] = nil
       @ldap_hash['auth_base'] = nil
-      @ldap_hash['auth_over_tls'] = nil
+      @ldap_hash['auth_over_tls'] = 'start_tls'
       @ldap_hash['identifier_format'] = nil
       @ldap_hash['position'] = 1
       expect(json).to eq @ldap_hash
@@ -261,6 +261,14 @@ describe "AuthenticationProviders API", type: :request do
 
       aac.reload
       expect(aac.idp_entity_id).to eq 'hahahaha'
+    end
+
+
+    it "should return error when it fails to update" do
+      aac = @account.authentication_providers.create!(@saml_hash)
+      @saml_hash['metadata_uri'] = 'hahahaha_super_invalid'
+      json = call_update(aac.id, @saml_hash, 422)
+      expect(json['errors'].first['field']).to eq 'metadata_uri'
     end
 
     it "updates federated attributes" do

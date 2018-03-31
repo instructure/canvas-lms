@@ -18,7 +18,6 @@
 
 module LiveAssessments
   # @API LiveAssessments
-  # @beta
   # Manage live assessment results
   #
   # @model Result
@@ -79,7 +78,6 @@ module LiveAssessments
     before_action :require_assessment
 
     # @API Create live assessment results
-    # @beta
     #
     # Creates live assessment results and adds them to a live assessment
     #
@@ -135,7 +133,6 @@ module LiveAssessments
     end
 
     # @API List live assessment results
-    # @beta
     #
     # Returns a paginated list of live assessment results
     #

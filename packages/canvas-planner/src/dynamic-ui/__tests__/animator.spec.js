@@ -130,3 +130,17 @@ it('does focus action before other operations', () => {
   mocks.window.queue[1]();
   expect(mocks.velocity).toHaveBeenCalledWith(elt, 'scroll', expect.anything());
 });
+
+it('determines when an element is on or below the screen', () => {
+  const {animator} = makeAnimator();
+  const elt = mockElement();
+  elt.getBoundingClientRect.mockReturnValue({top: 42});
+  expect(animator.isAboveScreen(elt, 42)).toBe(false);
+});
+
+it('determines when an element is above the screen', () => {
+  const {animator} = makeAnimator();
+  const elt = mockElement();
+  elt.getBoundingClientRect.mockReturnValue({top: 41});
+  expect(animator.isAboveScreen(elt, 42)).toBe(true);
+});

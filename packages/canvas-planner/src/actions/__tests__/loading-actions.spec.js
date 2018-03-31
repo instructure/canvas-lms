@@ -39,7 +39,6 @@ const getBasicState = () => ({
     ['2017-05-24', [{id: '42', dateBucketMoment: moment.tz('2017-05-24', 'UTC')}]],
   ],
   loading: {
-    somePastItemsLoaded: false,
     futureNextUrl: null,
     pastNextUrl: null,
   },
@@ -72,7 +71,7 @@ describe('api actions', () => {
       });
       return moxiosWait(request => {
         expect(request.config.url).toBe('/api/v1/planner/items');
-        expect(request.config.params.start_date).toBe(fromMoment.format());
+        expect(request.config.params.start_date).toBe(fromMoment.toISOString());
       });
     });
 
@@ -93,7 +92,7 @@ describe('api actions', () => {
       });
       return moxiosWait(request => {
         expect(request.config.url).toBe('/api/v1/planner/items');
-        expect(request.config.params.end_date).toBe(fromMoment.format());
+        expect(request.config.params.end_date).toBe(fromMoment.toISOString());
         expect(request.config.params.order).toBe('desc');
       });
     });
@@ -145,7 +144,7 @@ describe('api actions', () => {
       Actions.getFirstNewActivityDate(mockMoment)(mockDispatch, getBasicState);
       return moxiosWait(request => {
         expect(request.config.params.filter).toBe('new_activity');
-        expect(request.config.params.start_date).toBe(mockMoment.subtract(6, 'months').format());
+        expect(request.config.params.start_date).toBe(mockMoment.subtract(6, 'months').toISOString());
         expect(request.config.params.order).toBe('asc');
       });
     });
@@ -208,7 +207,6 @@ describe('api actions', () => {
       Actions.loadPastUntilNewActivity()(mockDispatch, (getBasicState));
       expect(mockDispatch).toHaveBeenCalledWith(Actions.gettingPastItems({
         seekingNewActivity: true,
-        somePastItemsLoaded: false,
       }));
       expect(mockDispatch).toHaveBeenCalledWith(Actions.startLoadingPastUntilNewActivitySaga());
     });

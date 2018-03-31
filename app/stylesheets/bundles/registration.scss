@@ -36,6 +36,13 @@ a {
   position: relative;
 }
 
+#terms_of_service_link {
+  button {
+    margin-top: -3px !important;
+    color: #999 !important;
+  }
+}
+
 #registration_header {
   background: #fff;
   height: 122px;

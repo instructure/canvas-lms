@@ -71,39 +71,6 @@ describe "discussions" do
         expect(DiscussionTopic.last.podcast_enabled).to be_truthy
       end
 
-      context "group discussion" do
-        it "should not allow specific selections and group discussions at the same time" do
-          course.account.set_feature_flag! :section_specific_discussions, 'on'
-          assignment_group
-          group_category
-          get url
-
-          group_checkbox = f('input[type=checkbox][name="has_group_category"]')
-          section_specific_entry = f('input[id^="Autocomplete"]')
-
-          expect(section_specific_entry.enabled?).to be true
-          expect(group_checkbox.enabled?).to be true
-
-          group_checkbox.click
-          expect(section_specific_entry.enabled?).to be false
-          expect(group_checkbox.enabled?).to be true
-
-          group_checkbox.click
-          expect(section_specific_entry.enabled?).to be true
-          expect(group_checkbox.enabled?).to be true
-
-          section_specific_entry.click
-          f('[id^="Autocomplete_Options"]').click
-          expect(section_specific_entry.enabled?).to be true
-          expect(group_checkbox.enabled?).to be false
-
-          section_specific_entry.click
-          f('[id^="Autocomplete_Options"]').click
-          expect(section_specific_entry.enabled?).to be true
-          expect(group_checkbox.enabled?).to be true
-        end
-      end
-
       it "should not display the section specific announcer if the FF is disabled" do
         get url
         graded_checkbox = f('input[type=checkbox][name="assignment[set_assignment]"]')
@@ -167,36 +134,6 @@ describe "discussions" do
           errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
           visBoxes, hidBoxes = errorBoxes.partition { |eb| eb.displayed? }
           expect(visBoxes.first.text).to eq "Please create a group set"
-        end
-
-        it "should not allow specific selections and the graded assignments at the same time" do
-          course.account.set_feature_flag! :section_specific_discussions, 'on'
-          assignment_group
-          get url
-
-          graded_checkbox = f('input[type=checkbox][name="assignment[set_assignment]"]')
-          section_specific_entry = f('input[id^="Autocomplete"]')
-
-          expect(section_specific_entry.enabled?).to be true
-          expect(graded_checkbox.enabled?).to be true
-
-          graded_checkbox.click
-          expect(section_specific_entry.enabled?).to be false
-          expect(graded_checkbox.enabled?).to be true
-
-          graded_checkbox.click
-          expect(section_specific_entry.enabled?).to be true
-          expect(graded_checkbox.enabled?).to be true
-
-          section_specific_entry.click()
-          f('[id^="Autocomplete_Options"]').click()
-          expect(section_specific_entry.enabled?).to be true
-          expect(graded_checkbox.enabled?).to be false
-
-          section_specific_entry.click()
-          f('[id^="Autocomplete_Options"]').click()
-          expect(section_specific_entry.enabled?).to be true
-          expect(graded_checkbox.enabled?).to be true
         end
       end
 

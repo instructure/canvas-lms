@@ -229,7 +229,8 @@ class DiscussionTopicsApiController < ApplicationController
 
     new_topic = @topic.duplicate({ :user => @current_user })
     if new_topic.save!
-      result = discussion_topic_api_json(new_topic, @context, @current_user, session)
+      result = discussion_topic_api_json(new_topic, @context, @current_user, session,
+        :include_sections => true)
       if new_topic.assignment
         new_topic.assignment.insert_at(@topic.assignment.position + 1)
         result[:set_assignment] = true

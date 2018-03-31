@@ -91,6 +91,7 @@ exports[`shows new activity button when new activity is indicated 1`] = `
   className="PlannerApp"
 >
   <StickyButton
+    buttonRef={[Function]}
     direction="up"
     offset="0px"
     onClick={[Function]}

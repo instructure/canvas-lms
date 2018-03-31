@@ -261,13 +261,12 @@ describe "Gradezilla editing grades" do
     end
 
     it 'indicates an error without posting the grade', priority: "1", test_id: 3455458 do
-      skip('This is skeleton code that acts as AC for GRADE-684 which is WIP')
-      Gradezilla::Cells.edit_grade(@students[0], @assignment, 'A')
+      Gradezilla::Cells.edit_grade(@students[0], @assignment, 'invalid')
       current_cell = Gradezilla::Cells.grading_cell(@students[0], @assignment)
-      expect(current_cell).to have_css(".Grid__AssignmentRowCell__Indicator .invalid-grade")
+      expect(current_cell).to contain_css(".Grid__AssignmentRowCell__InvalidGrade")
       refresh_page
       current_score = Gradezilla::Cells.get_grade(@students[0], @assignment)
-      expect(current_score).to eq(10)
+      expect(current_score).to eq('10')
     end
   end
 

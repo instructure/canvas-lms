@@ -17,7 +17,6 @@
 #
 
 # @API Rubrics
-# @beta
 #
 # API for accessing rubric information.
 #

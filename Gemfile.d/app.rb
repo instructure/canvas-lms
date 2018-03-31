@@ -18,7 +18,7 @@
 if CANVAS_RAILS5_0
   gem 'rails', '5.0.4'
 else
-  gem 'rails', '5.1.4'
+  gem 'rails', '5.1.5'
 end
 
 gem 'rack', '2.0.3'
@@ -38,8 +38,7 @@ gem 'active_model_serializers',   '0.9.0alpha1',
 gem 'authlogic', '3.6.1'
   gem 'scrypt', '3.0.5'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
-gem 'dynamic_form', '1.1.4', require: false
-gem 'switchman', '1.11.5'
+gem 'switchman', '1.11.7'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
@@ -164,3 +163,4 @@ gem 'twitter', path: 'gems/twitter'
 gem 'vericite_api', '1.5.3'
 gem 'utf8_cleaner', path: 'gems/utf8_cleaner'
 gem 'workflow', path: 'gems/workflow'
+gem 'dogstatsd-ruby', '3.3.0'

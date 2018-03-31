@@ -23,7 +23,7 @@ define([
   'react-addons-test-utils',
   'jsx/files/Breadcrumbs',
   'compiled/models/Folder',
-  '../../../../coffeescripts/helpers/fakeENV.coffee',
+  '../../../../coffeescripts/helpers/fakeENV',
   'compiled/react_files/modules/filesEnv',
 ], ($, React, ReactDOM, TestUtils, Breadcrumbs, Folder, fakeENV, filesEnv) => {
 

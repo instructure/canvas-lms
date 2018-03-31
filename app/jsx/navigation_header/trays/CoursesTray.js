@@ -18,69 +18,58 @@
 
 import I18n from 'i18n!new_nav'
 import React from 'react'
-import PropTypes from 'prop-types'
-import SVGWrapper from '../../shared/SVGWrapper'
-import Spinner from 'instructure-ui/lib/components/Spinner'
+import {bool, arrayOf, shape, string} from 'prop-types'
+import Container from '@instructure/ui-core/lib/components/Container'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import Link from '@instructure/ui-core/lib/components/Link'
+import List, {ListItem} from '@instructure/ui-core/lib/components/List'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import Text from '@instructure/ui-core/lib/components/Text'
 
-  var CoursesTray = React.createClass({
-    propTypes: {
-      courses: PropTypes.array.isRequired,
-      closeTray: PropTypes.func.isRequired,
-      hasLoaded: PropTypes.bool.isRequired
-    },
-
-    getDefaultProps() {
-      return {
-        courses: []
-      };
-    },
-
-    renderCourses() {
-      if (!this.props.hasLoaded) {
-        return (
-          <li className="ic-NavMenu-list-item ic-NavMenu-list-item--loading-message">
+export default function CoursesTray({courses, hasLoaded}) {
+  return (
+    <Container as="div" padding="medium">
+      <Heading level="h3" as="h1">{I18n.t('Courses')}</Heading>
+      <hr />
+      <List variant="unstyled" margin="small 0" itemSpacing="small">
+        {hasLoaded ? (
+          courses.map(course =>
+            <ListItem key={course.id}>
+              <Link href={`/courses/${course.id}`}>{course.name}</Link>
+              {course.enrollment_term_id > 1 &&
+                <Text as="div" size="x-small" weight="light">{course.term.name}</Text>
+              }
+            </ListItem>
+          ).concat([
+            <ListItem key="hr"><hr /></ListItem>,
+            <ListItem key="all">
+              <Link href="/courses">{I18n.t('All Courses')}</Link>
+            </ListItem>
+          ])
+        ) : (
+          <ListItem>
             <Spinner size="small" title={I18n.t('Loading')} />
-          </li>
-        );
-      }
-      var courses = this.props.courses.map((course) => {
-        return (
-          <li key={course.id} className='ic-NavMenu-list-item'>
-            <a href={`/courses/${course.id}`} className='ic-NavMenu-list-item__link'>{course.name}</a>
-            { course.enrollment_term_id > 1 ? ( <div className='ic-NavMenu-list-item__helper-text'>{course.term.name}</div> ) : null }
-          </li>
-        );
-      });
-      courses.push(
-        <li key='allCourseLink' className='ic-NavMenu-list-item ic-NavMenu-list-item--feature-item'>
-          <a href='/courses' className='ic-NavMenu-list-item__link'>{I18n.t('All Courses')}</a>
-        </li>
-      );
-      return courses;
-    },
+          </ListItem>
+        )}
+      </List>
+      <br />
+      <Text>
+        {I18n.t(
+          'Welcome to your courses! To customize the list of courses,  click on the "All Courses" link and star the courses to display.'
+        )}
+      </Text>
+    </Container>
+  )
+}
 
-    render() {
-      return (
-        <div className="ic-NavMenu__layout">
-          <div className="ic-NavMenu__primary-content">
-            <div className="ic-NavMenu__header">
-              <h1 className="ic-NavMenu__headline">{I18n.t('Courses')}</h1>
-              <button className="Button Button--icon-action ic-NavMenu__closeButton" type="button" onClick={this.props.closeTray}>
-                <i className="icon-x"></i>
-                <span className="screenreader-only">{I18n.t('Close')}</span>
-              </button>
-            </div>
-            <ul className="ic-NavMenu__link-list">
-              {this.renderCourses()}
-            </ul>
-          </div>
-          <div className="ic-NavMenu__secondary-content">
-              {I18n.t('Welcome to your courses! To customize the list of courses, ' +
-                      'click on the "All Courses" link and star the courses to display.')}
-          </div>
-        </div>
-      );
-    }
-  });
+CoursesTray.propTypes = {
+  courses: arrayOf(shape({
+    id: string.isRequired,
+    name: string.isRequired
+  })).isRequired,
+  hasLoaded: bool.isRequired
+}
 
-export default CoursesTray
+CoursesTray.defaultProps = {
+  courses: []
+}

@@ -27,6 +27,8 @@ import instructionsTemplate from 'jst/outcomes/mainInstructions'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import OutcomesActionsPopoverMenu from '../outcomes/OutcomesActionsPopoverMenu'
+import {showImportOutcomesModal} from '../outcomes/ImportOutcomesModal'
+import {showOutcomesImporter, showOutcomesImporterIfInProgress} from '../outcomes/OutcomesImporter'
 
 const renderInstructions = ENV.PERMISSIONS.manage_outcomes
 
@@ -37,13 +39,17 @@ $el.html(browserTemplate({
   contextUrlRoot: ENV.CONTEXT_URL_ROOT
 }))
 
-ReactDOM.render(
-  <OutcomesActionsPopoverMenu
-    contextUrlRoot={ENV.CONTEXT_URL_ROOT}
-    permissions={ENV.PERMISSIONS}
-  />,
-  $el.find('#popoverMenu')[0]
-)
+// The below functionality and its accompanying DOM element (popover-menu)
+// have been disabled since the feature has been shelved for now. However,
+// it's still on the roadmap eventually.
+
+// ReactDOM.render(
+//   <OutcomesActionsPopoverMenu
+//     contextUrlRoot={ENV.CONTEXT_URL_ROOT}
+//     permissions={ENV.PERMISSIONS}
+//   />,
+//   $el.find('#popoverMenu')[0]
+// )
 
 export const toolbar = new ToolbarView({el: $el.find('.toolbar')})
 
@@ -60,11 +66,39 @@ export const content = new ContentView({
   renderInstructions
 })
 
+// events for Outcome sync
+const disableOutcomeViews = () => {
+  sidebar.$sidebar.hide()
+  toolbar.disable()
+}
+
+const resetOutcomeViews = () => {
+  toolbar.enable()
+  sidebar.resetSidebar()
+  content.resetContent()
+  sidebar.$sidebar.show()
+}
+
 // toolbar events
 toolbar.on('goBack', sidebar.goBack)
 toolbar.on('add', sidebar.addAndSelect)
 toolbar.on('add', content.add)
 toolbar.on('find', () => sidebar.findDialog(FindDialog))
+toolbar.on('import', () => showImportOutcomesModal({toolbar}))
+toolbar.on('start_sync', (file) => showOutcomesImporter({
+  file,
+  disableOutcomeViews,
+  resetOutcomeViews,
+  mount: content.$el[0],
+  contextUrlRoot: ENV.CONTEXT_URL_ROOT
+}))
+
+showOutcomesImporterIfInProgress({
+  disableOutcomeViews,
+  resetOutcomeViews,
+  mount: content.$el[0],
+  contextUrlRoot: ENV.CONTEXT_URL_ROOT
+}, ENV.current_user.id)
 
 // sidebar events
 sidebar.on('select', model => content.show(model))

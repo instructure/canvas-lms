@@ -81,7 +81,7 @@ describe TokensController do
         expect(token.user_id).to eq @user.id
         delete 'destroy', params: {:id => token.id}
         expect(response).to be_success
-        expect(assigns[:token]).to be_frozen
+        expect(assigns[:token]).to be_deleted
       end
 
       it "should not allow deleting an access token while masquerading" do

@@ -30,25 +30,19 @@ module Factories
   private
 
   def lti_result_line_item(li_result_overrides, course)
-    li_result_overrides.fetch(
-      :line_item,
+    li_result_overrides[:line_item] ||
       line_item_model(
-        assignment: li_result_overrides.fetch(
-          :assignment,
+        assignment: li_result_overrides[:assignment] ||
           assignment_model(
             course: course,
             points_possible: li_result_overrides.fetch(:result_maximum, 10)
           )
-        )
       )
-    )
   end
 
   def line_item_user(li_result_overrides, course)
-    li_result_overrides.fetch(
-      :user,
+    li_result_overrides[:user] ||
       create_users_in_course(course, 1, return_type: :record).first
-    )
   end
 
   def lti_result_submission(li_result_overrides, user, li)
@@ -71,7 +65,8 @@ module Factories
       result_score: li_result_overrides[:result_score],
       result_maximum: li_result_overrides[:result_maximum],
       updated_at: li_result_overrides.fetch(:updated_at, time),
-      created_at: time
+      created_at: time,
+      comment: li_result_overrides[:comment]
     }
   end
 end

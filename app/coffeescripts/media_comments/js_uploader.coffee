@@ -17,7 +17,6 @@
 
 define [
   'jquery',
-  'i18n!media_comments',
   '../media_comments/dialog_manager',
   '../media_comments/comment_ui_loader',
   'bower/k5uploader/k5uploader',
@@ -25,7 +24,6 @@ define [
   '../media_comments/kaltura_session_loader',
   '../media_comments/file_input_manager'
 ], ($,
-    I18n,
     DialogManager,
     CommentUiLoader,
     K5Uploader,

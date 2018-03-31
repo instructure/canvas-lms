@@ -1040,6 +1040,7 @@ class SubmissionsApiController < ApplicationController
       ungraded = @context.submissions.
         needs_grading.having_submission.
         where(user_id: student_ids, assignment_id: @assignment, excused: [nil, false]).
+        except(:order).
         count
       not_submitted = student_ids.count - graded - ungraded
 

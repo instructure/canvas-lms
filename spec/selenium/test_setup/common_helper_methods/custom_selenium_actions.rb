@@ -559,7 +559,7 @@ module CustomSeleniumActions
   end
 
   def dismiss_flash_messages_if_present
-    unless (find_all_with_jquery(flash_message_selector).length) > 0
+    unless (find_all_with_jquery(flash_message_selector).length) == 0
       find_all_with_jquery(flash_message_selector).each(&:click)
     end
   end

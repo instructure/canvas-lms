@@ -1696,6 +1696,54 @@ describe AssignmentsApiController, type: :request do
       expect(response.code).to eql '400'
     end
 
+    it "calls DueDateCacher only once" do
+      student_in_course(:course => @course, :active_enrollment => true)
+
+      @adhoc_due_at = 5.days.from_now
+      @section_due_at = 7.days.from_now
+
+      @user = @teacher
+
+      assignment_params = {
+        :assignment => {
+          'name' => 'some assignment',
+          'assignment_overrides' => {
+            '0' => {
+              'student_ids' => [@student.id],
+              'due_at' => @adhoc_due_at.iso8601
+            },
+            '1' => {
+              'course_section_id' => @course.default_section.id,
+              'due_at' => @section_due_at.iso8601
+            },
+            '2' => {
+              'title' => 'Helpful Tag',
+              'noop_id' => 999
+            }
+          }
+        }
+      }
+
+      controller_params = {
+        :controller => 'assignments_api',
+        :action => 'create',
+        :format => 'json',
+        :course_id => @course.id.to_s
+      }
+
+      due_date_cacher = instance_double(DueDateCacher)
+      allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
+
+      expect(due_date_cacher).to receive(:recompute).once
+
+      @json = api_call(
+        :post,
+        "/api/v1/courses/#{@course.id}/assignments.json",
+        controller_params,
+        assignment_params
+      )
+    end
+
     it "allows creating an assignment with overrides via the API" do
       student_in_course(:course => @course, :active_enrollment => true)
 
@@ -2648,6 +2696,68 @@ describe AssignmentsApiController, type: :request do
             }
           })
           @assignment.reload
+        end
+
+        let(:update_assignment_only) do
+          api_update_assignment_call(@course,@assignment,{
+            'name' => 'Assignment With Overrides',
+            'due_at' => 1.week.from_now.iso8601,
+            'assignment_overrides' => {
+              '0' => {
+                'student_ids' => [@student.id],
+                'title' => 'adhoc override',
+                'due_at' => @adhoc_due_at.iso8601
+              },
+              '1' => {
+                'course_section_id' => @course.default_section.id,
+                'due_at' => @section_due_at.iso8601
+              },
+              '2' => {
+                'title' => 'Group override',
+                'set_id' => @group_category.id,
+                'group_id' => @group.id,
+                'due_at' => @group_due_at.iso8601
+              },
+              '3' => {
+                'title' => 'Helpful Tag',
+                'noop_id' => 999
+              }
+            }
+          })
+          @assignment.reload
+        end
+
+        describe "DueDateCacher" do
+          it "is called only once when there are changes to overrides" do
+            due_date_cacher = instance_double(DueDateCacher)
+            allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
+
+            expect(due_date_cacher).to receive(:recompute).once
+
+            update_assignment
+          end
+
+          it "is not called when there are no changes to overrides or assignment" do
+            update_assignment
+
+            due_date_cacher = instance_double(DueDateCacher)
+            allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
+
+            expect(due_date_cacher).to receive(:recompute).never
+
+            update_assignment
+          end
+
+          it "is called only once when there are changes to the assignment but not to the overrides" do
+            update_assignment
+
+            due_date_cacher = instance_double(DueDateCacher)
+            allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
+
+            expect(due_date_cacher).to receive(:recompute).once
+
+            update_assignment_only
+          end
         end
 
         it "updates any ADHOC overrides" do

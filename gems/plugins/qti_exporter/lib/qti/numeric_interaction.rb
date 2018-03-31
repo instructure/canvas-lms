@@ -34,17 +34,20 @@ class NumericInteraction < AssessmentItemConverter
   end
 
   def get_answer_values
-    answer = {:weight=>100,:comments=>"",:id=>unique_local_id,:numerical_answer_type=>"range_answer"}
+    answer = {:weight=>100,:comments=>"",:id=>unique_local_id}
     if gte = @doc.at_css('responseCondition gte baseValue')
       answer[:start] = gte.text.to_f
     end
     if lte = @doc.at_css('responseCondition lte baseValue')
       answer[:end] = lte.text.to_f
     end
-    if equal = @doc.at_css('responseCondition equal baseValue')
+
+    if (answer[:start] && answer[:end])
+      answer[:numerical_answer_type] = "range_answer"
+      @question[:answers] << answer
+    elsif equal = @doc.at_css('responseCondition equal baseValue')
       answer[:exact] = equal.text.to_f
-    end
-    if (answer[:start] && answer[:end]) || answer[:exact]
+      answer[:numerical_answer_type] = "exact_answer"
       @question[:answers] << answer
     end
   end

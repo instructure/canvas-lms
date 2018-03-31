@@ -82,6 +82,11 @@
 #           "example": "17 courses processed",
 #           "type": "string"
 #         },
+#         "results": {
+#           "description": "optional results of the job. omitted when job is still pending",
+#           "example": { "id": "123" },
+#           "type": "object"
+#         },
 #         "url": {
 #           "description": "url where a progress update can be retrieved",
 #           "example": "https://canvas.example.edu/api/v1/progress/1",

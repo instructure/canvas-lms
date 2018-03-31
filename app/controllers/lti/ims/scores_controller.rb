@@ -217,9 +217,7 @@ module Lti::Ims
     end
 
     def result_url
-      # TODO: ResultUrl service needs to be merged for this to work
-      # line_item_result_show_url(course_id: context.id, line_item_id: line_item.id, id: result.id)
-      "#{request.protocol}#{request.host}/courses/#{context.id}/line_items/#{line_item.id}/results/#{result.id}"
+      lti_result_show_url(course_id: context.id, line_item_id: line_item.id, id: result.id)
     end
   end
 end

@@ -45,7 +45,7 @@ export const {
   'START_LOADING_PAST_UNTIL_NEW_ACTIVITY_SAGA',
 );
 
-export const gettingPastItems = createAction('GETTING_PAST_ITEMS', (opts = {seekingNewActivity: false, somePastItemsLoaded: false}) => {
+export const gettingPastItems = createAction('GETTING_PAST_ITEMS', (opts = {seekingNewActivity: false}) => {
   return opts;
 });
 
@@ -71,7 +71,7 @@ export function getFirstNewActivityDate (fromMoment) {
   return (dispatch, getState) => {
     fromMoment = fromMoment.clone().subtract(6, 'months');
     return axios.get('api/v1/planner/items', { params: {
-      start_date: fromMoment.format(),
+      start_date: fromMoment.toISOString(),
       filter: 'new_activity',
       order: 'asc'
     }}).then(response => {
@@ -104,7 +104,6 @@ export function scrollIntoPast () {
     if (getState().loading.allPastItemsLoaded) return;
     dispatch(gettingPastItems({
       seekingNewActivity: false,
-      somePastItemsLoaded: getState().loading.somePastItemsLoaded
     }));
     dispatch(startLoadingPastSaga());
   };
@@ -113,9 +112,9 @@ export function scrollIntoPast () {
 export const loadPastUntilNewActivity = () => (dispatch, getState) => {
   dispatch(gettingPastItems({
     seekingNewActivity: true,
-    somePastItemsLoaded: getState().loading.somePastItemsLoaded
   }));
   dispatch(startLoadingPastUntilNewActivitySaga());
+  return 'loadPastUntilNewActivity';
 };
 
 export function sendFetchRequest (loadingOptions) {
@@ -137,7 +136,7 @@ function fetchParams (loadingOptions) {
     return [nextPageUrl, {}];
   } else {
     const params = {
-      [timeParam]: loadingOptions.fromMoment.format()
+      [timeParam]: loadingOptions.fromMoment.toISOString()
     };
     if (loadingOptions.intoThePast) {
       params.order = 'desc';

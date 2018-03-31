@@ -534,11 +534,13 @@ describe "courses" do
     html = "<p>#{text}</p>"
     @course.announcements.create!(:title => "something", :message => html)
 
+    @course.wiki_pages.create!(:title => 'blah').set_as_front_page!
+
+    @course.reload
     @course.default_view = "wiki"
     @course.show_announcements_on_home_page = true
     @course.home_page_announcement_limit = 5
     @course.save!
-    @course.wiki_pages.create!(:title => 'blah').set_as_front_page!
 
     get "/courses/#{@course.id}"
 

@@ -49,6 +49,7 @@ class GradingStandard < ActiveRecord::Base
   serialize :data
 
   before_save :update_usage_count
+  attr_accessor :default_standard
 
   workflow do
     state :active
@@ -217,8 +218,13 @@ class GradingStandard < ActiveRecord::Base
   def self.default_instance
     gs = GradingStandard.new()
     gs.data = default_grading_scheme
-    gs.title = "Default Grading Scheme"
+    gs.title = 'Default Grading Scheme'
+    gs.default_standard = true
     gs
+  end
+
+  def default_standard?
+    !!default_standard
   end
 
   def self.default_grading_scheme

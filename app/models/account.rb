@@ -20,6 +20,7 @@ require 'atom'
 
 class Account < ActiveRecord::Base
   include Context
+  include OutcomeImportContext
 
   INSTANCE_GUID_SUFFIX = 'canvas-lms'
 

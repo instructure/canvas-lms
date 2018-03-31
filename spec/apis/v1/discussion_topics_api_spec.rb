@@ -383,6 +383,7 @@ describe DiscussionTopicsController, type: :request do
                           "filename" => "content.txt",
                           "display_name" => "content.txt",
                           "id" => @attachment.id,
+                          "uuid" => @attachment.uuid,
                           "folder_id" => @attachment.folder_id,
                           "size" => @attachment.size,
                           'unlock_at' => nil,
@@ -394,7 +395,7 @@ describe DiscussionTopicsController, type: :request do
                           'created_at' => @attachment.created_at.as_json,
                           'updated_at' => @attachment.updated_at.as_json,
                           'modified_at' => @attachment.modified_at.as_json,
-                          'thumbnail_url' => @attachment.thumbnail_url,
+                          'thumbnail_url' => nil,
                           'mime_class' => @attachment.mime_class,
                           'media_entry_id' => @attachment.media_entry_id
                          }],
@@ -1370,6 +1371,7 @@ describe DiscussionTopicsController, type: :request do
           "filename" => "content.txt",
           "display_name" => "content.txt",
           "id" => attachment.id,
+          "uuid" => attachment.uuid,
           "folder_id" => attachment.folder_id,
           "size" => attachment.size,
           'unlock_at' => nil,
@@ -1380,7 +1382,7 @@ describe DiscussionTopicsController, type: :request do
           'hidden_for_user' => false,
           'created_at' => attachment.created_at.as_json,
           'updated_at' => attachment.updated_at.as_json,
-          'thumbnail_url' => attachment.thumbnail_url,
+          'thumbnail_url' => nil,
           'modified_at' => attachment.modified_at.as_json,
           'mime_class' => attachment.mime_class,
           'media_entry_id' => attachment.media_entry_id
@@ -2446,6 +2448,7 @@ describe DiscussionTopicsController, type: :request do
         "filename" => "unknown.loser",
         "display_name" => "unknown.loser",
         "id" => @attachment.id,
+        "uuid" => @attachment.uuid,
         "folder_id" => @attachment.folder_id,
         "size" => 100,
         'unlock_at' => nil,
@@ -2456,7 +2459,7 @@ describe DiscussionTopicsController, type: :request do
         'hidden_for_user' => false,
         'created_at' => @attachment.created_at.as_json,
         'updated_at' => @attachment.updated_at.as_json,
-        'thumbnail_url' => @attachment.thumbnail_url,
+        'thumbnail_url' => nil,
         'modified_at' => @attachment.modified_at.as_json,
         'mime_class' => @attachment.mime_class,
         'media_entry_id' => @attachment.media_entry_id
@@ -2804,6 +2807,33 @@ describe DiscussionTopicsController, type: :request do
         {},
         {},
         :expected_status => 200)
+    end
+
+    it "duplicate carries sections over" do
+      @user = @teacher
+      @course.root_account.enable_feature!(:section_specific_discussions)
+      discussion_topic_model(:context => @course, :title => "Section Specific Topic", :user => @teacher)
+      section1 = @course.course_sections.create!
+      @course.course_sections.create! # just to make sure we only copy the right one
+      @topic.is_section_specific = true
+      @topic.discussion_topic_section_visibilities << DiscussionTopicSectionVisibility.new(
+        :discussion_topic => @topic,
+        :course_section => section1,
+        :workflow_state => "active"
+      )
+      @topic.save!
+      json = api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/duplicate",
+        { :controller => "discussion_topics_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.to_param,
+          :topic_id => @topic.to_param },
+        {},
+        {},
+        :expected_status => 200)
+      expect(json["title"]).to eq "Section Specific Topic Copy"
+      expect(json["sections"].length).to eq 1
+      expect(json["sections"][0]["id"]).to eq section1.id
     end
   end
 

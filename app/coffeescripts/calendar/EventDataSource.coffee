@@ -382,11 +382,28 @@ define [
         donecb list
 
       eventDataSources = [
-        [ '/api/v1/calendar_events', params ]
+        [ '/api/v1/calendar_events', @indexParams(params) ]
         [ '/api/v1/calendar_events', @assignmentParams(params) ]
       ]
       eventDataSources.push([ '/api/v1/planner_notes', params ]) if ENV.STUDENT_PLANNER_ENABLED
       @startFetch eventDataSources, dataCB, doneCB, options
+
+    # rewrite `context_codes[]=appointment_group_X&context_codes[]=appointment_group_Y`
+    # as `appointment_group_ids=X,Y` to reduce Link header size in the HTTP response
+    # (which Apache limits to 8K)
+    indexParams: (params) ->
+      ag_ids = []
+      context_codes = []
+      params.context_codes.forEach (context_code) ->
+        match = context_code.match /^appointment_group_(\d+)$/
+        if match && match.length == 2
+          ag_ids.push match[1]
+        else
+          context_codes.push context_code
+      p = $.extend({}, params, {context_codes: context_codes})
+      if ag_ids.length > 0
+        p.appointment_group_ids = ag_ids.join(',')
+      p
 
     assignmentParams: (params) ->
       p = $.extend({type: 'assignment'}, params)

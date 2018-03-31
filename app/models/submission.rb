@@ -1545,7 +1545,7 @@ class Submission < ActiveRecord::Base
     attachment_ids_by_submission_and_index = group_attachment_ids_by_submission_and_index(submissions)
     bulk_attachment_ids = attachment_ids_by_submission_and_index.values.flatten
 
-    reports_by_assignment_id = if bulk_attachment_ids.empty?
+    reports_by_attachment_id = if bulk_attachment_ids.empty?
       {}
     else
       OriginalityReport.where(
@@ -1555,7 +1555,7 @@ class Submission < ActiveRecord::Base
 
     submissions.each_with_index do |s, index|
       s.versioned_originality_reports =
-        reports_by_assignment_id.values_at(*attachment_ids_by_submission_and_index[[s, index]]).flatten.compact
+        reports_by_attachment_id.values_at(*attachment_ids_by_submission_and_index[[s, index]]).flatten.compact
     end
   end
 

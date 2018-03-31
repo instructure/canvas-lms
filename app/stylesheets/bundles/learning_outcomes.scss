@@ -105,6 +105,10 @@
     .outcome_information_link i {
       margin-bottom: -3px;
     }
+    .outcome-assessed-info-banner {
+      margin-top: -$ic-sp;
+      margin-bottom: $ic-sp;
+    }
     .move_button, .edit_button, .delete_button {
       margin-left: 1em;
       margin-bottom: 1em;

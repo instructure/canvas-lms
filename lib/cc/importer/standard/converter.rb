@@ -35,11 +35,13 @@ module CC::Importer::Standard
     # settings will use these keys: :course_name, :base_download_dir
     def initialize(settings)
       super(settings, "cc")
+
       @course = @course
       @is_canvas_cartridge = nil
       @resources = {}
       @file_path_migration_id = {}
       @resource_nodes_for_flat_manifest = {}
+      @convert_html_to_pages = self.content_migration&.context&.feature_enabled?(:common_cartridge_page_conversion)
     end
 
     # exports the package into the intermediary json

@@ -19,7 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe DeveloperKeysController do
-
   context "Site admin" do
     before :once do
       account_admin_user(:account => Account.site_admin)
@@ -37,6 +36,25 @@ describe DeveloperKeysController do
         get 'index', params: {account_id: Account.site_admin.id}
         expect(response).to be_success
         expect(assigns[:keys]).to be_include(dk)
+      end
+
+      describe "js bundles" do
+        render_views
+
+        it 'includes developer_keys_react' do
+          allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(true)
+          user_session(@admin)
+          get 'index', params: {account_id: Account.site_admin.id}
+          expect(response).to render_template(:index_react)
+          expect(response).to be_success
+        end
+
+        it 'includes developer_keys' do
+          user_session(@admin)
+          get 'index', params: {account_id: Account.site_admin.id}
+          expect(response).to render_template(:index)
+          expect(response).to be_success
+        end
       end
 
       it 'should not include deleted keys' do
@@ -114,31 +132,29 @@ describe DeveloperKeysController do
   end
 
   context "Account admin (not site admin)" do
-    before :once do
-      @test_domain_root_account = Account.create!
-      @test_domain_root_account_admin= account_admin_user(account: @test_domain_root_account)
-      @sub_account = @test_domain_root_account.sub_accounts.create!(parent_account: @test_domain_root_account, root_account: @test_domain_root_account)
-    end
+    let(:test_domain_root_account) { Account.create! }
+    let(:test_domain_root_account_admin) { account_admin_user(account: test_domain_root_account) }
+    let(:sub_account) { test_domain_root_account.sub_accounts.create!(parent_account: test_domain_root_account, root_account: test_domain_root_account) }
 
     before :each do
-      user_session(@test_domain_root_account_admin)
-      allow(LoadAccount).to receive(:default_domain_root_account).and_return(@test_domain_root_account)
+      user_session(test_domain_root_account_admin)
+      allow(LoadAccount).to receive(:default_domain_root_account).and_return(test_domain_root_account)
     end
 
     it 'Should be allowed to access their dev keys' do
-      get 'index', params: {account_id: @test_domain_root_account.id}
+      get 'index', params: {account_id: test_domain_root_account.id}
       expect(response).to be_success
     end
 
     it "An account admin shouldn't be able to access site admin dev keys" do
-      user_session(@test_domain_root_account_admin)
+      user_session(test_domain_root_account_admin)
       get 'index', params: {account_id: Account.site_admin.id}
       expect(response).to be_redirect
       expect(flash[:error]).to eq "You don't have permission to access that page"
     end
 
     it "An account admin shouldn't be able to access site admin dev keys explicitly" do
-      user_session(@test_domain_root_account_admin)
+      user_session(test_domain_root_account_admin)
       get 'index', params: {account_id: Account.site_admin.id}
       expect(response).to be_redirect
       expect(flash[:error]).to eq "You don't have permission to access that page"
@@ -146,7 +162,7 @@ describe DeveloperKeysController do
 
     describe "Should be able to create developer key" do
       before :each do
-        post "create", params: {account_id: @test_domain_root_account.id, developer_key: {
+        post "create", params: {account_id: test_domain_root_account.id, developer_key: {
                        redirect_uri: "http://example.com/sdf"
                      }}
       end
@@ -156,12 +172,12 @@ describe DeveloperKeysController do
       end
 
       it 'should be dev keys plus 1 key' do
-        expect(@test_domain_root_account.developer_keys.all.count).to be 1
+        expect(test_domain_root_account.developer_keys.all.count).to be 1
       end
     end
 
     it 'should be allowed update a dev key' do
-      dk = @test_domain_root_account.developer_keys.create!(redirect_uri: 'http://asd.com/')
+      dk = test_domain_root_account.developer_keys.create!(redirect_uri: 'http://asd.com/')
       put 'update', params: {id: dk.id, developer_key: {
           redirect_uri: "http://example.com/sdf"
         }}
@@ -172,13 +188,13 @@ describe DeveloperKeysController do
     end
 
     it "Shouldn't be allowed access dev keys for a sub account" do
-      get 'index', params: {account_id: @sub_account.id}
+      get 'index', params: {account_id: sub_account.id}
       expect(response).to be_redirect
       expect(flash[:error]).to eq "You don't have permission to access that page"
     end
 
     it "Shouldn't be allowed to create dev keys for a sub account" do
-      post 'create', params: {account_id: @sub_account.id}
+      post 'create', params: {account_id: sub_account.id}
       expect(response).to be_redirect
       expect(flash[:error]).to eq "You don't have permission to access that page"
     end
@@ -203,14 +219,14 @@ describe DeveloperKeysController do
 
       it "Shouldn't be allowed to update dev keys for a foreign account" do
         dk = @other_root_account.developer_keys.create!
-        post 'update', params: {id: dk.id, account_id: @test_domain_root_account_admin.id, developer_key: { event: :deactivate }}
+        post 'update', params: {id: dk.id, account_id: test_domain_root_account_admin.id, developer_key: { event: :deactivate }}
         expect(response).to be_redirect
         expect(flash[:error]).to eq "You don't have permission to access that page"
       end
 
       it "Shouldn't be allowed to update global dev keys" do
         dk = DeveloperKey.create!
-        post 'update', params: {id: dk.id, account_id: @test_domain_root_account_admin.id, developer_key: { event: :deactivate }}
+        post 'update', params: {id: dk.id, account_id: test_domain_root_account_admin.id, developer_key: { event: :deactivate }}
         expect(response).to be_redirect
         expect(flash[:error]).to eq "You don't have permission to access that page"
       end

@@ -35,12 +35,9 @@ module Exporters
     end
 
     def build_assignment_payload
-      external_tool_tag = @assignment.external_tool_tag
       {
         assignment: {
-          resource_link_id: ContextExternalTool.opaque_identifier_for(
-            external_tool_tag, @assignment.shard
-          ),
+          resource_link_id: @assignment.lti_resource_link_id,
           title: @quiz.title,
           context_title: @quiz.context.name,
           course_uuid: @course.uuid

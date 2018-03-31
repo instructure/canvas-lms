@@ -135,6 +135,24 @@ describe Api::V1::Course do
       expect(json['total_students']).to eq 1
     end
 
+    it "counts students with multiple enrollments once in 'total students'" do
+      section = @course2.course_sections.create! name: 'other section'
+      @course2.enroll_student @student, section: section, allow_multiple_enrollments: true
+      expect(@course2.student_enrollments.count).to eq 2
+
+      json = @test_api.course_json(@course2, @me, {}, ['total_students'], [])
+      expect(json).to include('total_students')
+      expect(json['total_students']).to eq 1
+    end
+
+    it "excludes the student view student in 'total students'" do
+      @course2.student_view_student
+      json = @test_api.course_json(@course2, @me, {}, ['total_students'], [])
+
+      expect(json).to include('total_students')
+      expect(json['total_students']).to eq 1
+    end
+
     it "includes the course nickname if one is set" do
       @me.course_nicknames[@course1.id] = 'nickname'
       json = @test_api.course_json(@course1, @me, {}, [], [])
@@ -395,7 +413,7 @@ describe CoursesController, type: :request do
     course_with_student(:user => @user, :active_all => true)
     @course2 = @course
     @course2.update_attribute(:sis_source_id, 'TEST-SIS-ONE.2011')
-    @course2.update_attribute(:default_view, 'wiki')
+    @course2.update_attributes(:default_view => 'assignments')
     @user.pseudonym.update_attribute(:sis_user_id, 'user1')
   end
 
@@ -518,6 +536,7 @@ describe CoursesController, type: :request do
 
         it "returns 200 success" do
           api_call(:put, @path, @params, { :event => 'undelete', :course_ids => [@course.id] })
+          expect(response).to be_success
         end
       end
 
@@ -986,7 +1005,7 @@ describe CoursesController, type: :request do
         'hide_final_grades' => false,
         'apply_assignment_group_weights' => true,
         'restrict_enrollments_to_course_dates' => true,
-        'default_view' => 'new default view',
+        'default_view' => 'syllabus',
         'course_format' => 'on_campus',
         'time_zone' => 'Pacific/Honolulu'
       }, 'offer' => true }
@@ -1030,9 +1049,27 @@ describe CoursesController, type: :request do
         expect(@course.restrict_enrollments_to_course_dates).to be_truthy
         expect(@course.workflow_state).to eq 'available'
         expect(@course.apply_group_weights?).to eq true
-        expect(@course.default_view).to eq 'new default view'
+        expect(@course.default_view).to eq 'syllabus'
         expect(@course.course_format).to eq 'on_campus'
         expect(@course.time_zone.tzinfo.name).to eq 'Pacific/Honolulu'
+      end
+
+      it "should not be able to update default_view to arbitrary values" do
+        json = api_call(:put, @path, @params, {'course' => {'default_view' => 'somethingsilly'}}, {}, {:expected_status => 400})
+        expect(json["errors"]["default_view"].first['message']).to eq "Home page is not valid"
+      end
+
+      it "should not be able to update default_view to 'wiki' without a front page" do
+        expect(@course.wiki.front_page).to be_nil
+        json = api_call(:put, @path, @params, {'course' => {'default_view' => 'wiki'}}, {}, {:expected_status => 400})
+        expect(json["errors"]["default_view"].first['message']).to eq "A Front Page is required"
+      end
+
+      it "should be able to update default_view to 'wiki' with a front page" do
+        wp = @course.wiki_pages.create!(:title => "something")
+        wp.set_as_front_page!
+        json = api_call(:put, @path, @params, {'course' => {'default_view' => 'wiki'}}, {}, {:expected_status => 200})
+        expect(@course.reload.default_view).to eq 'wiki'
       end
 
       it "should not change dates that aren't given" do
@@ -2544,55 +2581,63 @@ describe CoursesController, type: :request do
     end
 
     describe "/users" do
-
-      it "returns an empty array for a page past the end" do
-        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json?page=5",
+      let(:api_url) {"/api/v1/courses/#{@course1.id}/users.json"}
+      let(:api_route) do
+        {
           controller: 'courses',
           action: 'users',
           course_id: @course1.id.to_s,
-          page: '5',
-          format: 'json')
+          format: 'json'
+        }
+      end
+
+      it "returns an empty array for a page past the end" do
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json?page=5",
+                        controller: 'courses',
+                        action: 'users',
+                        course_id: @course1.id.to_s,
+                        page: '5',
+                        format: 'json')
         expect(json).to eq []
       end
 
       it "returns a 404 for an otherwise invalid page" do
         raw_api_call(:get, "/api/v1/courses/#{@course1.id}/users.json?page=invalid",
-          controller: 'courses',
-          action: 'users',
-          course_id: @course1.id.to_s,
-          page: 'invalid',
-          format: 'json')
+                     controller: 'courses',
+                     action: 'users',
+                     course_id: @course1.id.to_s,
+                     page: 'invalid',
+                     format: 'json')
         assert_status(404)
       end
 
       it "returns a list of users" do
-        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
-                        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' })
+        json = api_call(:get, api_url, api_route)
         expected_users = @course1.users.to_a.uniq - [@test_student]
-        expect(json.sort_by{|x| x["id"]}).to eq api_json_response(expected_users,
-                                                              :only => user_api_fields).sort_by{|x| x["id"]}
+        expect(json.sort_by {|x| x["id"]}).to eq api_json_response(expected_users,
+                                                                   only: user_api_fields).sort_by {|x| x["id"]}
       end
 
       it "returns a list of users filtered by id if user_ids is given" do
         expected_users = [@student1, @student2]
-        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json", {
-          :controller => 'courses',
-          :action => 'users',
-          :course_id => @course1.id.to_s,
-          :user_ids => expected_users.map(&:id),
-          :format => 'json'
+        json = api_call(:get, api_url, {
+          controller: 'courses',
+          action: 'users',
+          course_id: @course1.id.to_s,
+          user_ids: expected_users.map(&:id),
+          format: 'json'
         })
-        expect(json.sort_by{|x| x["id"]}).to eq api_json_response(
-          expected_users,
-          :only => user_api_fields
-        ).sort_by{|x| x["id"]}
+        expect(json.sort_by {|x| x["id"]}).to eq api_json_response(
+                                                   expected_users,
+                                                   only: user_api_fields
+                                                 ).sort_by {|x| x["id"]}
       end
 
       it "excludes the test student by default" do
         @course1.student_view_student
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
-                        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' })
-        expect(json.map{ |s| s["name"] }).not_to include("Test Student")
+                        {controller: 'courses', action: 'users', course_id: @course1.id.to_s, format: 'json'})
+        expect(json.map {|s| s["name"]}).not_to include("Test Student")
       end
 
       context "inactive enrollments" do
@@ -2604,20 +2649,26 @@ describe CoursesController, type: :request do
         end
 
         it "excludes users with inactive enrollments for students" do
-          student_in_course(:course => @course1, :active_all => true, :user => user_with_pseudonym)
-          json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
-            { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' })
+          student_in_course(course: @course1, active_all: true, user: user_with_pseudonym)
+          json = api_call(:get, api_url, api_route)
           expect(json.map{ |s| s["id"] }).not_to include(@inactive_user.id)
         end
 
         it "includes users with inactive enrollments for teachers" do
           @user = @course1.teachers.first
-          json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
-            { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' }, :include => ['enrollments'])
+          json = api_call(:get, api_url, api_route, include: ['enrollments'], include_inactive: true)
           expect(json.map{ |s| s["id"] }).to include(@inactive_user.id)
           user_json = json.detect{ |s| s["id"] == @inactive_user.id}
           expect(user_json['enrollments'].map{|e| e['id']}).to eq [@inactive_enroll.id]
           expect(user_json['enrollments'].first['enrollment_state']).to eq 'inactive'
+        end
+
+        it 'does not include inactive enrollments by default' do
+          @admin = account_admin_user(user: user_with_pseudonym, account: @course.account, active_all: true)
+          json = api_call(:get, api_url, api_route)
+          expect(json.count).to eq 5
+          json = api_call(:get, api_url, api_route, include_inactive: true)
+          expect(json.count).to eq 6
         end
       end
 
@@ -3658,7 +3709,8 @@ describe ContentImportsController, type: :request do
     # check queued state
     json = api_call(:get, "/api/v1/courses/#{@course.id}/link_validation",
       { :controller => 'courses', :action => 'link_validation', :format => 'json', :course_id => @course.id.to_param })
-    expect(json).to eq({'state' => 'queued'})
+    expect(json['workflow_state']).to eq('queued')
+    expect(json).not_to have_key('results')
 
     allow_any_instance_of(CourseLinkValidator).to receive(:check_course)
     allow_any_instance_of(CourseLinkValidator).to receive(:issues).and_return(['mock_issue'])
@@ -3667,8 +3719,8 @@ describe ContentImportsController, type: :request do
     # check results
     json = api_call(:get, "/api/v1/courses/#{@course.id}/link_validation",
                     { :controller => 'courses', :action => 'link_validation', :format => 'json', :course_id => @course.id.to_param })
-    expect(json['state']).to eq('completed')
-    expect(json['issues']).to eq(['mock_issue'])
+    expect(json['workflow_state']).to eq('completed')
+    expect(json['results']['issues']).to eq(['mock_issue'])
   end
 end
 

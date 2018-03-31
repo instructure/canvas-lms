@@ -29,8 +29,20 @@
   partial = is_recent_feedback ? 'courses/recent_feedback' : 'courses/recent_event'
   contexts_to_link_to ||= nil
 %>
-<div class="events_list <%= is_recent_feedback ? 'recent_feedback' : 'coming_up' %>">
-  <h2><% unless is_recent_feedback %><a class='event-list-view-calendar icon-calendar-day standalone-icon' href='<%= calendar_url_for(contexts_to_link_to) %>'><%= t 'links.view_calendar', "View Calendar" %></a><% end %> <%= title %></h2>
+<div class="events_list
+  <%= is_recent_feedback ? 'recent_feedback' : 'coming_up' %>"
+>
+  <h2>
+  <% unless is_recent_feedback %>
+    <a
+      class='event-list-view-calendar icon-calendar-day standalone-icon'
+      href='<%= calendar_url_for(contexts_to_link_to) %>'
+    >
+      <%= t 'links.view_calendar', "View Calendar" %>
+    </a>
+  <% end %>
+    <%= title %>
+  </h2>
   <ul class="right-side-list events">
   <% if !event_list || event_list.empty? %>
     <li>

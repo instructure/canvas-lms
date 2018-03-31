@@ -64,8 +64,8 @@ export const loadInitialItems = currentMoment => (
     const firstMomentDate = currentMoment.clone().subtract(2, 'weeks');
     const lastMomentDate = currentMoment.clone().add(2, 'weeks');
     axios.get('/api/v1/planner/items', { params: {
-      start_date: firstMomentDate.format(),
-      end_date: lastMomentDate.format(),
+      start_date: firstMomentDate.toISOString(),
+      end_date: lastMomentDate.toISOString(),
       order: 'asc'
     }}).then((response) => {
       const linkHeader = parseLinkHeader(response.headers.link)
@@ -92,12 +92,12 @@ export const completeItem = (itemType, itemId) => (
       const plannerOverride = itemToUpdate.planner_override;
       plannerOverride.marked_complete = true;
 
-      axios.put(`/api/v1/planner/overrides/${plannerOverride.id}`, {
+      return axios.put(`/api/v1/planner/overrides/${plannerOverride.id}`, {
         ...plannerOverride
       }).then(response => dispatch(itemSaved(response.data)))
         .catch(response => dispatch(itemSavingFailed(response)));
     } else {
-      axios.post('/api/v1/planner/overrides', {
+      return axios.post('/api/v1/planner/overrides', {
         marked_complete: true,
         plannable_type: itemToUpdate.plannable_type,
         plannable_id: itemToUpdate.plannable_id

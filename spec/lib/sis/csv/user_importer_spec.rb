@@ -618,13 +618,16 @@ describe SIS::CSV::UserImporter do
     expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.sortable_name).to eq "Two, User"
   end
 
-  it "should allow a user to update emails specifically" do
+  it "should allow a user to update emails and bounce count specifically" do
     enable_cache do
       Timecop.travel(1.minute.ago) do
         process_csv_data_cleanly(
           "user_id,login_id,first_name,last_name,email,status",
           "user_1,user1,User,Uno,user1@example.com,active"
         )
+        @cc = Pseudonym.where(account_id: @account, sis_user_id: "user_1").take.communication_channels.take
+        @cc.bounce_count = 3
+        @cc.save!
         expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.email).to eq "user1@example.com"
       end
 
@@ -632,6 +635,7 @@ describe SIS::CSV::UserImporter do
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user2@example.com,active"
       )
+      expect(@cc.reload.bounce_count).to eq 0
       expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.email).to eq "user2@example.com"
     end
   end
@@ -861,6 +865,15 @@ describe SIS::CSV::UserImporter do
     expect(importer.errors.map{|x| x[1]}).to eq ["An existing Canvas user with the SIS ID user_1 has already claimed user_2's user_id requested login information, skipping"]
     expect(Pseudonym.by_unique_id('user1').first).not_to be_nil
     expect(Pseudonym.by_unique_id('user2').first).to be_nil
+  end
+
+  it "should not throw an error to sentry for all errors" do
+    importer = process_csv_data(
+      "user_id,login_id,full_name,email,status",
+      "u,'long_string_for_user_login_should_throw_an_error_and_be_caught_and_be_returned_to_import_and_not_sent_to_sentry',U U,u@example.com,active"
+    )
+    expect(Canvas::Errors).to receive(:capture_exception).never
+    expect(importer.errors.map{|x| x[1]}).to eq ["Could not save the user with user_id: 'u'. Unknown reason: unique_id is too long (maximum is 100 characters)"]
   end
 
   it "should not confirm an email communication channel that has an invalid email" do

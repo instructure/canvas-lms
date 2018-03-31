@@ -16,13 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'i18n!assignments'
   'Backbone'
   'jst/assignments/DateAvailableColumnView'
   'jquery'
   'underscore'
   '../../behaviors/tooltip'
-], (I18n, Backbone, template, $, _) ->
+], (Backbone, template, $, _) ->
 
   class DateAvailableColumnView extends Backbone.View
     template: template

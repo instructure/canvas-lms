@@ -57,6 +57,10 @@ class TermsOfService < ActiveRecord::Base
     DEFAULT_OPTIONS
   end
 
+  def self.type_dropdown_options_for_account(_account = nil)
+    self.type_dropdown_options
+  end
+
   def self.type_dropdown_options
     [
       [t('Default'), "default"],

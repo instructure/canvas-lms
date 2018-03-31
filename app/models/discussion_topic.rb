@@ -339,9 +339,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def get_potentially_conflicting_titles(title_base)
-    result = DiscussionTopic.active.where(context_id: self.context_id)
-      .starting_with_title(title_base).pluck("title").to_set
-    result
+    DiscussionTopic.active.where(context_type: self.context_type, context_id: self.context_id).
+      starting_with_title(title_base).pluck("title").to_set
   end
 
   # This is a guess of what to copy over.
@@ -368,7 +367,8 @@ class DiscussionTopic < ActiveRecord::Base
       :allow_rating => self.allow_rating,
       :only_graders_can_rate => self.only_graders_can_rate,
       :sort_by_rating => self.sort_by_rating,
-      :todo_date => self.todo_date
+      :todo_date => self.todo_date,
+      :is_section_specific => self.is_section_specific
     })
   end
 
@@ -393,6 +393,19 @@ class DiscussionTopic < ActiveRecord::Base
         :copy_title => result.title
       })
     end
+
+    result.discussion_topic_section_visibilities = []
+    if self.is_section_specific
+      original_visibilities = self.discussion_topic_section_visibilities.active
+      original_visibilities.each do |visibility|
+        new_visibility = DiscussionTopicSectionVisibility.new(
+          :discussion_topic => result,
+          :course_section => visibility.course_section
+        )
+        result.discussion_topic_section_visibilities << new_visibility
+      end
+    end
+
     # For some reason, the relation doesn't take care of this for us. Don't understand why.
     # Without this line, *two* discussion topic duplicates appear when a save is performed.
     result.assignment&.discussion_topic = result
@@ -1105,10 +1118,33 @@ class DiscussionTopic < ActiveRecord::Base
 
   def set_assignment=(val); end
 
+  # From the given list of users, return those that are permitted to see the section
+  # of the topic.  If the topic is not section specific this just returns the
+  # original list.
+  def users_with_section_visibility(users)
+    return users unless self.is_section_specific? && self.context.is_a?(Course)
+    non_nil_users = users.compact
+    section_ids = DiscussionTopicSectionVisibility.active.where(:discussion_topic_id => self.id).
+      pluck(:course_section_id)
+    user_ids = non_nil_users.map(&:id)
+    # Context is known to be a course here
+    users_in_sections = Enrollment.select(:user_id).active.where(:course_id => self.context_id,
+      :course_section_id => section_ids, :user_id => user_ids).map(&:user_id).to_set
+    unlocked_teachers = Enrollment.select(:user_id).active.instructor.
+      where(:course_id => self.context_id, :limit_privileges_to_course_section => false,
+        :user_id => user_ids).
+      map(&:user_id).to_set
+    permitted_user_ids = users_in_sections.union(unlocked_teachers)
+    return non_nil_users.select { |u| permitted_user_ids.include?(u.id) }
+  end
+
   def participants(include_observers=false)
-    participants = [ self.user ]
-    participants += context.participants(include_observers: include_observers, by_date: true)
-    participants.compact.uniq
+    participants = context.participants(include_observers: include_observers, by_date: true)
+    participants_in_section = self.users_with_section_visibility(participants.compact)
+    if self.user && !participants_in_section.map(&:id).to_set.include?(self.user.id)
+      participants_in_section += [ self.user ]
+    end
+    return participants_in_section
   end
 
   def active_participants(include_observers=false)
@@ -1138,21 +1174,7 @@ class DiscussionTopic < ActiveRecord::Base
     end
 
     readers = self.course.filter_users_by_permission(users, permission)
-    return readers unless self.is_section_specific
-
-    # this is now a section-specific topic in a course context
-    discussion_section_ids =
-      self.discussion_topic_section_visibilities.active.pluck(:course_section_id)
-    users_in_sections = Enrollment.select(:user_id).active.
-      where(:course_id => course.id, :course_section_id => discussion_section_ids).
-      map(&:user_id).to_set
-    # Instructors don't need to have explicit enrollments in a section if they're not
-    # limited to only see their section.
-    unlocked_teachers = Enrollment.select(:user_id).active.
-      instructor.where(:course_id => course.id, :limit_privileges_to_course_section => false).
-      map(&:user_id).to_set
-    permitted_users = users_in_sections.union(unlocked_teachers)
-    return readers.select { |u| permitted_users.include?(u.id) }
+    return self.users_with_section_visibility(readers)
   end
 
   def course
@@ -1456,6 +1478,16 @@ class DiscussionTopic < ActiveRecord::Base
 
   # synchronously create/update the materialized view
   def create_materialized_view
-    DiscussionTopic::MaterializedView.for(self).update_materialized_view_without_send_later(xlog_location: self.class.current_xlog_location)
+    DiscussionTopic::MaterializedView.for(self).update_materialized_view_without_send_later(use_master: true)
+  end
+
+  def grading_standard_or_default
+    grading_standard_context = assignment || context
+
+    if grading_standard_context.present?
+      grading_standard_context.grading_standard_or_default
+    else
+      GradingStandard.default_instance
+    end
   end
 end

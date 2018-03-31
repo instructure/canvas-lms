@@ -26,13 +26,17 @@ module DrDiff
     attr_reader :campsite
     private :campsite
 
+    attr_reader :base_dir
+    private :base_dir
+
     # all levels: %w(error warn info)
     SEVERE_LEVELS = %w(error warn).freeze
 
-    def initialize(git: nil, git_dir: nil, sha: nil, campsite: true)
+    def initialize(git: nil, git_dir: nil, sha: nil, campsite: true, base_dir: nil)
       @git_dir = git_dir
       @git = git || GitProxy.new(git_dir: git_dir, sha: sha)
       @campsite = campsite
+      @base_dir = base_dir || ""
     end
 
     extend Forwardable
@@ -41,9 +45,8 @@ module DrDiff
     def files(regex = /./)
       all_files = git.files.split("\n")
 
-      if git_dir
-        all_files = all_files.map { |file_path| git_dir + file_path }
-      end
+      dir = git_dir || base_dir
+      all_files = all_files.map { |file_path| dir + file_path }
 
       all_files.select do |file_path|
         file_path =~ regex && File.exist?(file_path)

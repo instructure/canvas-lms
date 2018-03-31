@@ -90,7 +90,7 @@ module Api::V1::Course
       hash['course_progress'] = CourseProgress.new(course, subject_user).to_json if includes.include?('course_progress')
       hash['apply_assignment_group_weights'] = course.apply_group_weights?
       hash['sections'] = section_enrollments_json(enrollments) if includes.include?('sections')
-      hash['total_students'] = course.student_count || course.students.count if includes.include?('total_students')
+      hash['total_students'] = course.student_count || course.student_enrollments.not_fake.distinct.count(:user_id) if includes.include?('total_students')
       hash['passback_status'] = post_grades_status_json(course) if includes.include?('passback_status')
       hash['is_favorite'] = course.favorite_for_user?(user) if includes.include?('favorites')
       hash['teachers'] = course.teachers.map { |teacher| user_display_json(teacher) } if includes.include?('teachers')

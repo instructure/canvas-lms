@@ -79,8 +79,8 @@ module DiscussionHelpers
   end
 
   class << self
-    def create_discussion_topic(course, user, title, message, assignment = nil)
-      course.discussion_topics.create!(
+    def create_discussion_topic(context, user, title, message, assignment = nil)
+      context.discussion_topics.create!(
         user: user,
         title: title,
         message: message,

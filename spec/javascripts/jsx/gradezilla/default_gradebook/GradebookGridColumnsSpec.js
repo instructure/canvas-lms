@@ -18,19 +18,18 @@
 
 import $ from 'jquery';
 import fakeENV from 'helpers/fakeENV';
+import DataLoader from 'jsx/gradezilla/DataLoader'
 import {
   createGradebook,
   setFixtureHtml
-} from '../../gradezilla/default_gradebook/GradebookSpecHelper';
-import SlickGridSpecHelper from '../../gradezilla/default_gradebook/slick-grid/SlickGridSpecHelper';
-import DataLoader from 'jsx/gradezilla/DataLoader';
+} from '../../gradezilla/default_gradebook/GradebookSpecHelper'
+import SlickGridSpecHelper from '../../gradezilla/default_gradebook/GradebookGrid/GridSupport/SlickGridSpecHelper'
 
 QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
   let $fixture;
   let gridSpecHelper;
   let gradebook;
   let dataLoader;
-  let server;
 
   let assignmentGroups;
   let assignments;
@@ -112,6 +111,9 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
 
   function createGradebookAndAddData (options) {
     gradebook = createGradebook(options);
+    sinon.stub(gradebook, 'saveSettings').callsFake((settings, onSuccess = () => {}) => {
+      onSuccess(settings)
+    })
     gradebook.initialize();
     addGridData();
   }
@@ -124,7 +126,6 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
     fakeENV.setup({
       current_user_id: '1101'
     });
-    server = sinon.fakeServer.create();
 
     dataLoader = {
       gotAssignmentGroups: $.Deferred(),
@@ -148,7 +149,6 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
     gradebook.destroy();
     DataLoader.loadGradebookData.restore();
     DataLoader.getDataForColumn.restore();
-    server.restore();
     fakeENV.teardown();
     $fixture.remove();
   });
@@ -433,6 +433,9 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
           ]
         }
       });
+      sinon.stub(gradebook, 'saveSettings').callsFake((settings, onSuccess = () => {}) => {
+        onSuccess(settings)
+      })
     });
 
     test('excludes assignment group columns when setting is disabled', function () {
@@ -472,11 +475,13 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
             { id: '1401', title: 'Grading Period 1' },
             { id: '1402', title: 'Grading Period 2' }
           ]
+        },
+        settings: {
+          selected_view_options_filters: ['assignmentGroups', 'modules', 'gradingPeriods', 'sections']
         }
       });
       gridSpecHelper = new SlickGridSpecHelper(gradebook.gradebookGrid);
       gradebook.getAssignment('2302').published = false;
-      sinon.stub(gradebook, 'saveSettings');
     });
 
     test('removes unpublished assignment columns when filtered', function () {

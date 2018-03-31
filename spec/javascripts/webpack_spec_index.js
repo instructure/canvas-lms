@@ -45,6 +45,7 @@ if (process.env.JSPEC_PATH) {
     // run specs for ember screenreader gradebook
     requireAll(require.context('../../app/coffeescripts', !!'includeSubdirectories', /\.spec.coffee$/))
 
+    requireAll(require.context('../coffeescripts', !!'includeSubdirectories', /Spec.js$/))
     requireAll(require.context('../coffeescripts', !!'includeSubdirectories', /Spec.coffee$/))
   }
 

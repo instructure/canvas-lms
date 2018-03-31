@@ -352,9 +352,9 @@ class Enrollment < ActiveRecord::Base
   end
   protected :update_user_account_associations_if_necessary
 
-  def other_section_enrollment_count
-    # The number of other active sessions that the user is enrolled in.
-    self.course.student_enrollments.active.for_user(self.user).where("id != ?", self.id).count
+  def other_section_enrollment_exists?
+    # If other active sessions that the user is enrolled in exist.
+    self.course.student_enrollments.active.for_user(self.user).where.not(id: self.id).exists?
   end
 
   def audit_groups_for_deleted_enrollments
@@ -374,13 +374,13 @@ class Enrollment < ActiveRecord::Base
 
       # check group deletion criteria if either enrollment is not a deletion
       # or it may be a deletion/unenrollment from a section but not from the course as a whole (still enrolled in another section)
-      if self.workflow_state != 'deleted' || other_section_enrollment_count > 0
+      if self.workflow_state != 'deleted' || other_section_enrollment_exists?
         # don't bother unless the group's category has section restrictions
         next unless group.group_category && group.group_category.restricted_self_signup?
 
         # skip if the user is the only user in the group. there's no one to have
         # a conflicting section.
-        next if group.users.count == 1
+        next unless group.users.where.not(id: self.user_id).exists?
 
         # check if the group has the section the user is abandoning as a common
         # section (from CourseSection#common_to_users? view, the enrollment is
@@ -661,6 +661,10 @@ class Enrollment < ActiveRecord::Base
         self.send_later_if_production_enqueue_args(:add_to_favorites, :priority => Delayed::LOW_PRIORITY)
       end
     end
+  end
+
+  def self.batch_add_to_favorites(enrollment_ids)
+    Enrollment.where(:id => enrollment_ids).each(&:add_to_favorites)
   end
 
   def add_to_favorites

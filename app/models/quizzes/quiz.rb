@@ -322,6 +322,10 @@ class Quizzes::Quiz < ActiveRecord::Base
     end
   end
 
+  def update_cached_due_dates?
+    due_at_changed? || workflow_state_changed? || only_visible_to_overrides_changed?
+  end
+
   def assignment?
     self.quiz_type == 'assignment'
   end

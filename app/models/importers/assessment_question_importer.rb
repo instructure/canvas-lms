@@ -56,6 +56,19 @@ module Importers
       bank_map = migration.context.assessment_question_banks.reload.index_by(&:migration_id)
       bank_map[CC::CCHelper.create_key(default_title, 'assessment_question_bank')] = default_bank if default_bank
 
+      if migration.for_master_course_import? && data['assessment_question_banks']
+        data['assessment_question_banks'].each do |aqb_hash|
+          mig_id = aqb_hash["migration_id"]
+          bank = bank_map[mig_id]
+          next unless bank # only include pre-existing banks
+          bank.mark_as_importing!(migration)
+          next if bank.edit_types_locked_for_overwrite_on_import.include?(:content)
+
+          aq_ids = questions.select{|aq| aq["question_bank_migration_id"] == mig_id}.map{|aq| aq["assessment_question_id"]}.compact
+          bank.assessment_questions.active.where.not(:migration_id => aq_ids).update_all(:workflow_state => 'deleted')
+        end
+      end
+
       questions.each do |question|
         question_data[:aq_data][question['migration_id']] = question
 

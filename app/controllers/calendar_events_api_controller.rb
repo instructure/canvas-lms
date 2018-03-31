@@ -406,6 +406,8 @@ class CalendarEventsApiController < ApplicationController
   #   Time zone of the user editing the event. Allowed time zones are
   #   {http://www.iana.org/time-zones IANA time zones} or friendlier
   #   {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
+  # @argument calendar_event[all_day] [Boolean]
+  #   When true event is considered to span the whole day and times are ignored.
   # @argument calendar_event[child_event_data][X][start_at] [DateTime]
   #   Section-level start time(s) if this is a course event. X can be any
   #   identifier, provided that it is consistent across the start_at, end_at
@@ -575,6 +577,8 @@ class CalendarEventsApiController < ApplicationController
   #   Time zone of the user editing the event. Allowed time zones are
   #   {http://www.iana.org/time-zones IANA time zones} or friendlier
   #   {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
+  # @argument calendar_event[all_day] [Boolean]
+  #   When true event is considered to span the whole day and times are ignored.
   # @argument calendar_event[child_event_data][X][start_at] [DateTime]
   #   Section-level start time(s) if this is a course event. X can be any
   #   identifier, provided that it is consistent across the start_at, end_at
@@ -785,7 +789,6 @@ class CalendarEventsApiController < ApplicationController
   end
 
   # @API Set a course timetable
-  # @beta
   #
   # Creates and updates "timetable" events for a course.
   # Can automaticaly generate a series of calendar events based on simple schedules
@@ -865,7 +868,6 @@ class CalendarEventsApiController < ApplicationController
   end
 
   # @API Get course timetable
-  # @beta
   #
   # Returns the last timetable set by the
   # {api:CalendarEventsApiController#set_course_timetable Set a course timetable} endpoint
@@ -879,7 +881,6 @@ class CalendarEventsApiController < ApplicationController
   end
 
   # @API Create or update events directly for a course timetable
-  # @beta
   #
   # Creates and updates "timetable" events for a course or course section.
   # Similar to {api:CalendarEventsApiController#set_course_timetable setting a course timetable},
@@ -1300,6 +1301,10 @@ class CalendarEventsApiController < ApplicationController
     ag_count = (params[:context_codes] || []).count { |code| code =~ /\Aappointment_group_/ }
     context_limit = @domain_root_account.settings[:calendar_contexts_limit] || 10
     codes = (params[:context_codes] || [user.asset_string])[0, context_limit + ag_count]
+    # also accept a more compact comma-separated list of appointment group ids
+    if params[:appointment_group_ids].present? && params[:appointment_group_ids].is_a?(String)
+      codes += params[:appointment_group_ids].split(',').map { |id| "appointment_group_#{id}" }
+    end
     get_options(codes, user)
 
     # if specific context codes were requested, ensure the user can access them

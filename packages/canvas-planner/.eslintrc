@@ -1,4 +1,5 @@
 {
+  "root": true,
   "extends": ["react-app", "plugin:react/recommended"],
   "plugins": [
     "react",

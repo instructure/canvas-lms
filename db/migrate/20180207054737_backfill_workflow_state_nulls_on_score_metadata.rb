@@ -20,16 +20,6 @@ class BackfillWorkflowStateNullsOnScoreMetadata < ActiveRecord::Migration[5.0]
   disable_ddl_transaction!
 
   def up
-    DataFixup::BackfillNulls.send_later_if_production_enqueue_args(
-      :run,
-      {
-        priority: Delayed::LOW_PRIORITY,
-        max_attempts: 1,
-        n_strand: 'data_fixup_backfill_nulls_score_metadata_workflow_state'
-      },
-      ScoreMetadata,
-      :workflow_state,
-      default_value: :active
-    )
+    DataFixup::BackfillNulls.run ScoreMetadata, :workflow_state, default_value: :active
   end
 end

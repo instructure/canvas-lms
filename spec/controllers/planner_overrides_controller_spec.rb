@@ -19,6 +19,8 @@
 require_relative '../sharding_spec_helper'
 
 describe PlannerOverridesController do
+  include PlannerHelper
+
   before :once do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
@@ -63,6 +65,26 @@ describe PlannerOverridesController do
         it "returns http success" do
           get :items_index
           expect(response).to have_http_status(:success)
+        end
+
+        it "checks the planner cache" do
+          @current_user = @student
+          found_planner_meta_request = false
+          found_planner_items_request = false
+          allow(Rails.cache).to receive(:fetch) do |cache_key, &block|
+            if cache_key == planner_meta_cache_key
+              found_planner_meta_request = true
+              'meta-cache-key'
+            elsif cache_key.include?('meta-cache-key')
+              found_planner_items_request = true
+              block.call
+            else
+              block.call
+            end
+          end
+          get :items_index
+          expect(found_planner_meta_request).to be true
+          expect(found_planner_items_request).to be true
         end
 
         it "should show wiki pages with todo dates" do
@@ -367,6 +389,14 @@ describe PlannerOverridesController do
             end
           end
 
+          it "should include link headers in cached response" do
+            enable_cache
+            next_link = test_page
+            expect(next_link).not_to be_nil
+            next_link = test_page
+            expect(next_link).not_to be_nil
+          end
+
         end
 
 
@@ -560,6 +590,12 @@ describe PlannerOverridesController do
           expect(@planner_override.reload.marked_complete).to be_truthy
           expect(@planner_override.dismissed).to be_truthy
         end
+
+        it "invalidates the planner cache" do
+          @current_user = @student
+          expect(Rails.cache).to receive(:delete).with(planner_meta_cache_key)
+          put :update, params: {id: @planner_override.id, marked_complete: true, dismissed: true}
+        end
       end
 
       describe "POST #create" do
@@ -567,6 +603,12 @@ describe PlannerOverridesController do
           post :create, params: {plannable_type: "assignment", plannable_id: @assignment2.id, marked_complete: true}
           expect(response).to have_http_status(:created)
           expect(PlannerOverride.where(user_id: @student.id).count).to be 2
+        end
+
+        it "invalidates the planner cache" do
+          @current_user = @student
+          expect(Rails.cache).to receive(:delete).with(planner_meta_cache_key)
+          post :create, params: {plannable_type: "assignment", plannable_id: @assignment2.id, marked_complete: true}
         end
 
         it "should save announcement overrides with a plannable_type of discussion_topic" do
@@ -582,6 +624,12 @@ describe PlannerOverridesController do
           delete :destroy, params: {id: @planner_override.id}
           expect(response).to have_http_status(:success)
           expect(@planner_override.reload).to be_deleted
+        end
+
+        it "invalidates the planner cache" do
+          @current_user = @student
+          expect(Rails.cache).to receive(:delete).with(planner_meta_cache_key)
+          delete :destroy, params: {id: @planner_override.id}
         end
       end
     end

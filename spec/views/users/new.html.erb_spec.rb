@@ -23,6 +23,10 @@ describe "/users/new" do
   it "should render" do
     course_with_student
     view_context
+    terms_of_service_content = TermsOfServiceContent.create!(content: "default content")
+    terms_of_service = TermsOfService.create!(terms_type: "default",
+                                               terms_of_service_content: terms_of_service_content,
+                                               account: @course.account)
     assign(:user, User.new)
     assign(:pseudonym, Pseudonym.new)
 

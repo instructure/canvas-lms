@@ -111,6 +111,11 @@
 #           "description": "whether this outcome has been used to assess a student",
 #           "example": true,
 #           "type": "boolean"
+#         },
+#         "has_updateable_rubrics": {
+#           "description": "whether updates to this outcome will propagate to unassessed rubrics that have imported it",
+#           "example": true,
+#           "type": "boolean"
 #         }
 #       }
 #     }

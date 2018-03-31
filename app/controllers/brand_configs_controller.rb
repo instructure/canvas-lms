@@ -55,7 +55,8 @@ class BrandConfigsController < ApplicationController
            hasUnsavedChanges: session.key?(:brand_config_md5),
            variableSchema: default_schema,
            allowGlobalIncludes: @account.allow_global_includes?,
-           account_id: @account.id
+           account_id: @account.id,
+           REFACTOR_ENABLED: @account.feature_enabled?(:theme_editor_refactor)
     render html: '', layout: 'layouts/bare'
   end
 

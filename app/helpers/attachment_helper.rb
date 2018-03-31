@@ -72,9 +72,9 @@ module AttachmentHelper
       send_file_headers!( :length=> attachment.s3object.content_length, :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type_with_encoding)
       render body: attachment.s3object.get.body.read
     elsif inline
-      redirect_to attachment.inline_url_for_user(@current_user)
+      redirect_to authenticated_inline_url(attachment)
     else
-      redirect_to attachment.download_url_for_user(@current_user)
+      redirect_to authenticated_download_url(attachment)
     end
   end
 
@@ -90,7 +90,15 @@ module AttachmentHelper
   end
 
   def set_cache_header(attachment, inline)
-    unless attachment.content_type.match(/\Atext/) || attachment.extension == '.html' || attachment.extension == '.htm'
+    # TODO [RECNVS-73]
+    # instfs JWTs cannot be shared across users, so we cannot cache them across
+    # users. while most browsers will only service one user and caching
+    # independent of user would not be detrimental, we cannot guarantee that.
+    # so we can't let the browser cache the instfs redirect. we should still
+    # investigate opportunities to reuse JWTs when the same user requests the
+    # same file within a reasonable window of time, so that the URL redirected
+    # too can still take advantage of browser caching.
+    unless attachment.instfs_hosted? || attachment.content_type.match(/\Atext/) || attachment.extension == '.html' || attachment.extension == '.htm'
       cancel_cache_buster
       #set cache to expire whenever the s3 url does (or one day if local or inline proxy), max-age take seconds, and Expires takes a date
       ttl = attachment.stored_locally? || (inline && attachment.can_be_proxied?) ? attachment.url_ttl : 1.day

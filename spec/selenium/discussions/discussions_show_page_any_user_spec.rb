@@ -54,7 +54,7 @@ describe "discussions" do
 
           reply_count = 2
           reply_count.times { topic.discussion_entries.create!(:message => 'Lorem ipsum dolor sit amet', :user => student) }
-          topic.create_materialized_view
+          topic.update_materialized_view
 
           # make sure everything looks unread
           get url
@@ -77,7 +77,7 @@ describe "discussions" do
           f('.discussion-read-state-btn').click
           wait_for_ajaximations
           topic.discussion_entries.create!(:message => 'new lorem ipsum', :user => student)
-          topic.create_materialized_view
+          topic.update_materialized_view
 
           get url
           expect(ff(".discussion_entry.unread")).to have_size(2)
@@ -93,7 +93,7 @@ describe "discussions" do
             entry = topic.reply_from(:user => student, :text => "entry #{n}")
             entry.reply_from(:user => student, :text => "sub reply #{n}")
           end
-          topic.create_materialized_view
+          topic.update_materialized_view
 
           # so auto mark as read won't mess up this test
           somebody.preferences[:manual_mark_as_read] = true
@@ -113,7 +113,7 @@ describe "discussions" do
 
         it "should manually mark reply as read", priority: "1", test_id: 150483 do
           topic.discussion_entries.create!(message: 'Lorem ipsum dolor sit amet', user: student)
-          topic.create_materialized_view
+          topic.update_materialized_view
           get url
           expect(f('.new-and-total-badge .new-items').text).to eq('1')
           f('.discussion-read-state').click
@@ -126,7 +126,7 @@ describe "discussions" do
       context "topic subscription" do
         it "should load with the correct status represented", priority: "2", test_id: 345028 do
           topic.subscribe(somebody)
-          topic.create_materialized_view
+          topic.update_materialized_view
 
           get url
           expect(f('.topic-unsubscribe-button')).to be_displayed
@@ -142,7 +142,7 @@ describe "discussions" do
 
         it "should unsubscribe from topic", priority: "1", test_id: 345482 do
           topic.subscribe(somebody)
-          topic.create_materialized_view
+          topic.update_materialized_view
 
           get url
           f('.topic-unsubscribe-button').click
@@ -153,7 +153,7 @@ describe "discussions" do
 
         it "should subscribe to topic", priority: "1", test_id: 150474 do
           topic.unsubscribe(somebody)
-          topic.create_materialized_view
+          topic.update_materialized_view
 
           get url
           f('.topic-subscribe-button').click
@@ -178,7 +178,7 @@ describe "discussions" do
         before :each do
           @entry1 = topic.discussion_entries.create!(message: 'Lorem ipsum dolor sit amet', user: somebody)
           @entry2 = topic.discussion_entries.create!(message: 'Reply by teacher', user: teacher)
-          topic.create_materialized_view
+          topic.update_materialized_view
           get url
         end
 
@@ -303,7 +303,7 @@ describe "discussions" do
               :user => somebody, :message => 'i haz attachments', :discussion_topic => topic, :attachment => attachment)
           replies << reply
         end
-        topic.create_materialized_view
+        topic.update_materialized_view
         get url
         wait_for_ajaximations
         expect(ffj('.comment_attachments').count).to eq 10
