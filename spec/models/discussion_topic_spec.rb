@@ -1429,6 +1429,14 @@ describe DiscussionTopic do
       expect(@student.submissions.first.submission_type).to eq 'discussion_topic'
     end
 
+    it 'should use fancy midnight' do
+      @topic.lock_at = Time.zone.parse('Sat, 31 Mar 2018')
+      @topic.save!
+      expect(@topic.lock_at.hour).to eq 23
+      expect(@topic.lock_at.min).to eq 59
+      expect(@topic.lock_at.sec).to eq 59
+    end
+
     it "should create submissions for existing entries in group topics when setting the assignment (even if locked)" do
       group_category = @course.group_categories.create!(:name => "category")
       @group1 = @course.groups.create!(:name => "group 1", :group_category => group_category)

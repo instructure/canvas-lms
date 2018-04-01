@@ -170,8 +170,9 @@ class DiscussionTopic < ActiveRecord::Base
     @content_changed = self.message_changed? || self.title_changed?
     default_submission_values
     if self.has_group_category?
-      self.subtopics_refreshed_at ||= Time.parse("Jan 1 2000")
+      self.subtopics_refreshed_at ||= Time.zone.parse("Jan 1 2000")
     end
+    self.lock_at = CanvasTime.fancy_midnight(self.lock_at)
 
     [
       :could_be_locked, :podcast_enabled, :podcast_has_student_posts,

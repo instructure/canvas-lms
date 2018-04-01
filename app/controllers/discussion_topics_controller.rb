@@ -1205,8 +1205,11 @@ class DiscussionTopicsController < ApplicationController
   def process_future_date_parameters(discussion_topic_hash)
     # Set the delayed_post_at and lock_at if provided. This will be used to determine if the values have changed
     # in order to know if we should rely on this data to update the workflow state
-    @topic.delayed_post_at = discussion_topic_hash[:delayed_post_at] if params.has_key? :delayed_post_at
-    @topic.lock_at = discussion_topic_hash[:lock_at] if params.has_key? :lock_at
+    @topic.delayed_post_at = discussion_topic_hash[:delayed_post_at] if params.key? :delayed_post_at
+    if discussion_topic_hash[:lock_at].present? && @topic&.lock_at&.to_i == Time.zone.parse(discussion_topic_hash[:lock_at]).to_i
+      params.delete(:lock_at)
+    end
+    @topic.lock_at = discussion_topic_hash[:lock_at] if params.key? :lock_at
 
     if @topic.delayed_post_at_changed? || @topic.lock_at_changed?
       @topic.workflow_state = @topic.should_not_post_yet ? 'post_delayed' : 'active'
