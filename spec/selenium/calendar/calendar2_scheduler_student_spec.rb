@@ -318,7 +318,8 @@ describe "scheduler" do
       create_appointment_group(
         max_appointments_per_participant: 1,
         new_appointments: [
-          [ 1.hour.ago, 30.minutes.ago ]
+          # this can fail if run in the first 2 seconds of the month.
+          [ 2.seconds.ago, 1.second.ago ]
         ]
       )
       AppointmentGroup.last.appointments.first.reserve_for(@student, @teacher)
