@@ -72,6 +72,9 @@ beforeAll(() => {
 afterAll(() => {
   resetWindow();
 });
+afterEach(() => {
+  jest.restoreAllMocks();
+});
 
 
 it('renders large', () => {

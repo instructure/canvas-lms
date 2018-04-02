@@ -265,7 +265,7 @@ export class Grouping extends Component {
 
   render () {
     return (
-      <div className={classnames(styles.root, styles[this.getLayout()])}>
+      <div className={classnames(styles.root, styles[this.getLayout()], 'planner-grouping')} >
         {this.renderNotificationBadge()}
         {this.renderGroupLink()}
         <ol className={styles.items} style={{ borderColor: this.props.color }}>

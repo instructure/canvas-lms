@@ -324,7 +324,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
 </div>
 `;
 
-exports[`PlannerApp renders base component using dayKeys 1`] = `
+exports[`PlannerApp renders base component 1`] = `
 <div
   className="PlannerApp large"
 >

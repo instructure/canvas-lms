@@ -42,7 +42,7 @@ afterAll (() => {
 });
 
 describe('PlannerApp', () => {
-  it('renders base component using dayKeys', () => {
+  it('renders base component', () => {
     const wrapper = shallow(
       <PlannerApp {...getDefaultValues()} />
     );

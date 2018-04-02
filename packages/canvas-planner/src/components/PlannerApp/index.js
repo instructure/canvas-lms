@@ -38,6 +38,8 @@ import {getFirstLoadedMoment} from '../../utilities/dateUtils';
 import {notifier} from '../../dynamic-ui';
 import {daysToDaysHash} from '../../utilities/daysUtils';
 import {formatDayKey} from '../../utilities/dateUtils';
+import {Animator} from '../../dynamic-ui/animator';
+import responsiviser from '../responsiviser';
 
 export class PlannerApp extends Component {
   static propTypes = {
@@ -83,23 +85,35 @@ export class PlannerApp extends Component {
     appRef: () => {},
   };
 
-  componentWillMount () {
-    this.props.appRef(this);
+  constructor (props) {
+    super(props);
+    this.animator = null;
+    this._plannerElem = null;
+    this.fixedResponsiveMemo = null;
   }
 
-  componentWillUpdate () {
+  componentWillMount () {
+    this.props.appRef(this);
+    window.addEventListener('resize', this.onResize, false);
+  }
+
+   componentWillUpdate () {
     this.props.preTriggerDynamicUiUpdates();
   }
 
-  componentDidUpdate () {
+  componentDidUpdate (prevProps) {
     const additionalOffset = this.newActivityButtonRef ?
       this.newActivityButtonRef.getBoundingClientRect().height :
       0;
     this.props.triggerDynamicUiUpdates(additionalOffset);
+    if (this.props.responsiveSize !== prevProps.responsiveSize) {
+      this.afterLayoutChange();
+    }
   }
 
   componentWillUnmount () {
     this.props.appRef(null);
+    window.removeEventListenet('resize', this.onResize, false);
   }
 
   fixedElementForItemScrolling () { return this.fixedElement; }
@@ -110,6 +124,41 @@ export class PlannerApp extends Component {
 
   handleNewActivityClick = () => {
     this.props.scrollToNewActivity();
+  }
+
+  // when the planner changes layout, its contents move and the user gets lost.
+  // let's help with that.
+
+  // First, when the user starts to resize the window, call beforeLayoutChange
+    resizeTimer = 0;
+  onResize = (event) => {
+    if (this.resizeTimer === 0) {
+      this.resizeTimer = window.setTimeout(() => {this.resizeTimer = 0;}, 1000);
+      this.beforeLayoutChange();
+    }
+  }
+
+  // before we tell the responsive elements the size has changed, find the first
+  // visible day or grouping and remember its position.
+  beforeLayoutChange () {
+    function findFirstVisible(selector) {
+      const list = plannerTop.querySelectorAll(selector);
+      const elem = Array.prototype.find.call(list, el => el.getBoundingClientRect().top > 0);
+      return elem;
+    }
+    const plannerTop = this._plannerElem || document;
+    const fixedResponsiveElem = findFirstVisible('.planner-day, .planner-grouping, .planner-empty-days');
+    if (fixedResponsiveElem) {
+      if (!this.animator) this.animator = new Animator();
+      this.fixedResponsiveMemo = this.animator.elementPositionMemo(fixedResponsiveElem);
+    }
+  }
+  // after the re-layout, put the cached element back to where it was
+  afterLayoutChange = () => {
+    if (this.fixedResponsiveMemo) {
+      this.animator.maintainViewportPositionFromMemo(this.fixedResponsiveMemo.element, this.fixedResponsiveMemo);
+      this.fixedResponsiveMemo = null;
+    }
   }
 
   renderLoading () {
@@ -344,7 +393,7 @@ export class PlannerApp extends Component {
       </div>;
     }
 
-    return <div className={classes}>
+    return <div className={classes} ref={el => this._plannerElem = el}>
       {this.renderNewActivity()}
       {this.renderLoadPastButton()}
       {this.renderLoadingPast()}
@@ -381,5 +430,6 @@ const mapStateToProps = (state) => {
   };
 };
 
+const ResponsivePlannerApp = responsiviser()(PlannerApp);
 const mapDispatchToProps = {loadFutureItems, loadPastButtonClicked, loadPastUntilNewActivity, scrollToNewActivity, togglePlannerItemCompletion, updateTodo};
-export default notifier(connect(mapStateToProps, mapDispatchToProps)(PlannerApp));
+export default notifier(connect(mapStateToProps, mapDispatchToProps)(ResponsivePlannerApp));

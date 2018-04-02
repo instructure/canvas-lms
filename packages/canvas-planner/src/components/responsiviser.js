@@ -135,7 +135,7 @@ function responsiviser () {
     return ResponsiveComponent;
   };
 }
-responsiviser.mqwatcher = new MediaQueryWatcher();  // this one and only one for now
+responsiviser.mqwatcher = new MediaQueryWatcher();  // create the one and only one (for now)
 
 
 export default responsiviser;

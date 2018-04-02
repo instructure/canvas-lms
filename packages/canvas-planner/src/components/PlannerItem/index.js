@@ -266,7 +266,7 @@ export class PlannerItem extends Component {
       formatMessage('{assignmentType} {title} is incomplete',
         { assignmentType: assignmentType, title: this.props.title });
     return (
-      <div className={classnames(styles.root, styles[this.getLayout()])} ref={this.registerRootDivRef}>
+      <div className={classnames(styles.root, styles[this.getLayout()], 'planner-item')} ref={this.registerRootDivRef}>
         <NotificationBadge>{this.renderNotificationBadge()}</NotificationBadge>
         <div className={styles.completed}>
           <Checkbox
