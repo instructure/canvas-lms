@@ -49,7 +49,6 @@ describe "outcomes" do
       end
 
       it "should edit a learning outcome and delete a rating", priority: "1", test_id: 250535 do
-        skip('Flaky, see OUT-2102')
         should_edit_a_learning_outcome_and_delete_a_rating
       end
 
@@ -131,7 +130,6 @@ describe "outcomes" do
         end
 
         it "should create an outcome group (nested)", priority: "1", test_id: 250237 do
-          skip('Flaky, see OUT-2101')
           should_create_an_outcome_group_nested
         end
 

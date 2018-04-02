@@ -219,11 +219,14 @@ module OutcomeCommon
     ## when
     # edit title
     replace_content f('.outcomes-content input[name=title]'), edited_title
+    wait_for_animations
     # delete a rating
     f('.edit_rating').click
+    wait_for_animations
     f('.delete_rating_link').click
     # edit a rating
     f('.edit_rating').click
+    wait_for_animations
     replace_content f('input[name="ratings[0][points]"]'), '1'
     replace_content f('input[name="mastery_points"]'), '1'
     # submit
@@ -344,6 +347,7 @@ module OutcomeCommon
     f('.add_outcome_group').click
     group_title = 'my group'
     replace_content f('.outcomes-content input[name=title]'), group_title
+    wait_for_animations
     # submit
     f(".submit_button").click
     wait_for_ajaximations
@@ -353,6 +357,7 @@ module OutcomeCommon
     f('.add_outcome_group').click
     nested_group_title = 'my nested group'
     replace_content f('.outcomes-content input[name=title]'), nested_group_title
+    wait_for_animations
     # submit
     f(".submit_button").click
     wait_for_ajaximations
@@ -391,6 +396,7 @@ module OutcomeCommon
     expect(f('.outcomes-content input[name=title]')).to be_displayed
 
     replace_content f('.outcomes-content input[name=title]'), edited_title
+    wait_for_animations
     f('.submit_button').click
     wait_for_ajaximations
 
