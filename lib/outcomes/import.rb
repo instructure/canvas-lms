@@ -22,7 +22,7 @@ module Outcomes
     class InvalidDataError < RuntimeError; end
 
     OBJECT_ONLY_FIELDS = %i[calculation_method calculation_int ratings].freeze
-    VALID_WORKFLOWS = ['', 'active', 'deleted'].freeze
+    VALID_WORKFLOWS = [nil, '', 'active', 'deleted'].freeze
 
     def check_object(object)
       %i[vendor_guid title].each do |field|
@@ -95,7 +95,7 @@ module Outcomes
       model.vendor_guid = group[:vendor_guid]
       model.title = group[:title]
       model.description = group[:description] || ''
-      model.workflow_state = group[:workflow_state] || 'active'
+      model.workflow_state = group[:workflow_state].presence || 'active'
       model.learning_outcome_group = parent
       model.outcome_import_id = outcome_import_id
       model.save!
