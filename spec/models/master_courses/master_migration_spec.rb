@@ -1549,6 +1549,21 @@ describe MasterCourses::MasterMigration do
       expect(mod2_to.reload.prerequisites).to be_empty
     end
 
+    it "should copy the lack of a module unlock date" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      mod = @copy_from.context_modules.create!(:name => 'm', :unlock_at => 3.days.from_now)
+      run_master_migration
+      mod_to = @copy_to.context_modules.where(:migration_id => mig_id(mod)).first
+
+      Timecop.freeze(1.minute.from_now) do
+        mod.update_attribute(:unlock_at, nil)
+      end
+      run_master_migration
+      expect(mod_to.reload.unlock_at).to be_nil
+    end
+
     it "should work with links to files copied in previous sync" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
