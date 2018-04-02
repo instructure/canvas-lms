@@ -103,12 +103,13 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def set_visible
-    self.visible = !site_admin? # ask Karl if this should honor the visible set on object intialization
+    self.visible = !site_admin?
     true
   end
 
   def authorized_for_account?(target_account)
-    return true unless account_id
+    return false unless binding_on_in_account?(target_account)
+    return true if account_id.blank?
     return true if target_account.id == account_id
     target_account.account_chain_ids.include?(account_id)
   end
@@ -208,6 +209,16 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   private
+
+  def binding_on_in_account?(target_account)
+    do_binding_check = Account.site_admin.feature_allowed?(:developer_key_management_ui_rewrite)
+    unless target_account.site_admin?
+      do_binding_check &&= target_account.feature_enabled?(:developer_key_management_ui_rewrite)
+    end
+
+    return true unless do_binding_check
+    account_binding_for(target_account)&.workflow_state == DeveloperKeyAccountBinding::ON_STATE
+  end
 
   def create_default_account_binding
     owner_account = account || Account.site_admin

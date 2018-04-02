@@ -22,7 +22,6 @@ class DeveloperKeyAccountBinding < ApplicationRecord
   OFF_STATE = 'off'.freeze
   DEFAULT_STATE = OFF_STATE
 
-
   belongs_to :account
   belongs_to :developer_key
 

@@ -21,6 +21,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 describe ScopesApiController, type: :request do
   describe "index" do
     before :each do
+      allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
+      allow_any_instance_of(Account).to receive(:feature_allowed?).and_return(false)
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:api_token_scoping).and_return(true)
       allow_any_instance_of(Account).to receive(:feature_allowed?).with(:api_token_scoping).and_return(true)
     end
