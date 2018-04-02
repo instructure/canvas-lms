@@ -306,6 +306,13 @@ describe AssignmentsController do
       assert_status(404)
     end
 
+    it "doesn't fail on a public course with a nil user" do
+      course = course_factory(:active_all => true, :is_public => true)
+      assignment = assignment_model(:course => course, :submission_types => "online_url")
+      get 'show', params: {:course_id => course.id, :id => assignment.id}
+      assert_status(200)
+    end
+
     it "should return unauthorized if not enrolled" do
       get 'show', params: {:course_id => @course.id, :id => @assignment.id}
       assert_unauthorized

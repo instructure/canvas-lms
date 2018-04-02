@@ -193,6 +193,11 @@
 #             "example": "2012-04-18T23:08:51Z",
 #             "type": "datetime"
 #           },
+#           "last_attended_at": {
+#             "description": "The last attended date of the user for the enrollment in a course, in ISO8601 format.",
+#             "example": "2012-04-18T23:08:51Z",
+#             "type": "datetime"
+#           },
 #           "total_activity_time": {
 #             "description": "The total activity time of the user for the enrollment, in seconds.",
 #             "example": 260,
