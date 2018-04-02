@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+
+# yarn caches file: dependencies. to ensure yarn copies the fresh package, this
+# script deletes the existing copied package and its cache. this is should be
+# run in the canvas preinstall script.
+
+script/remove-packages-from-yarn-integriry
+
+for name in $(cd packages; ls -1 */package.json | xargs dirname); do
+  echo -n "Clearning cache for packages/$name... "
+  node_modules_dir="node_modules/$name"
+  rm -rf $node_modules_dir
+  cache_dirs=`yarn cache dir`/npm-${name}*
+  rm -rf $cache_dirs
+  echo "Done"
+done

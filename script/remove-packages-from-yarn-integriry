@@ -1,0 +1,38 @@
+#!/usr/bin/env node
+// vi: set ft=javascript
+"use strict";
+
+const path = require("path");
+const fs = require("fs");
+const util = require("util");
+
+const YARN_INTEGRITY_PATH = path.join(__dirname, "..", "node_modules", ".yarn-integrity");
+
+const readFile = util.promisify(fs.readFile);
+const writeFile = util.promisify(fs.writeFile);
+
+async function main() {
+  const json = await readFile(YARN_INTEGRITY_PATH);
+  const data = JSON.parse(json);
+
+  data.topLevelPatterns = data.topLevelPatterns.filter(pattern => {
+    if (/@file:/.test(pattern)) {
+      delete data.lockfileEntries[pattern];
+      return false;
+    }
+    return true;
+  });
+
+  const newJson = JSON.stringify(data, null, 2);
+  await writeFile(YARN_INTEGRITY_PATH, newJson);
+}
+
+main().catch(err => {
+  if (err.code === "ENOENT") {
+    // no yarn integrity file yet
+    process.exit(0)
+  }
+  console.error(err.stack);
+  process.exit(1);
+});
+

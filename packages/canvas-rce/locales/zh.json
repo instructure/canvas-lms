@@ -1,0 +1,248 @@
+{
+  "group_navigation_99f191a": {
+    "message": "小组导航"
+  },
+  "cc_attribution_share_alike_669e7f16": {
+    "message": "CC 署名、相同方式共享"
+  },
+  "link_to_url_52dd935c": {
+    "message": "URL 链接"
+  },
+  "quizzes_7e598f57": {
+    "message": "测验"
+  },
+  "cc_attribution_non_commercial_no_derivatives_9fe74c00": {
+    "message": "CC 署名、非商业、禁止改写"
+  },
+  "c_2001_acme_inc_283f7f80": {
+    "message": "(c) 2001 Acme Inc."
+  },
+  "upload_a_new_file_96e6d4ff": {
+    "message": "上传新文件"
+  },
+  "file_upload_form_4aaad554": {
+    "message": "文件上传窗体"
+  },
+  "folder_705fd2d7": {
+    "message": "文件夹"
+  },
+  "insert_equella_links_49a8dacd": {
+    "message": "插入 Equella 链接"
+  },
+  "assignment_list_a833f59d": {
+    "message": "作业列表"
+  },
+  "alternative_text_a834dcad": {
+    "message": "替代文本："
+  },
+  "discussions_a5f96392": {
+    "message": "讨论"
+  },
+  "cc_attribution_no_derivatives_b006744f": {
+    "message": "CC 署名、禁止改写"
+  },
+  "usage_right_ff96f3e2": {
+    "message": "使用权限："
+  },
+  "click_to_embed_image_33107dd8": {
+    "message": "单击以嵌入图片"
+  },
+  "i_hold_the_copyright_71ee91b1": {
+    "message": "我持有版权"
+  },
+  "files_c300e900": {
+    "message": "文件"
+  },
+  "cancel_image_upload_2c771950": {
+    "message": "取消图片上传"
+  },
+  "people_b4ebb13c": {
+    "message": "人员"
+  },
+  "check_if_the_image_is_decorative_283649b7": {
+    "message": "检查图片是否为装饰图片"
+  },
+  "loading_25990131": {
+    "message": "加载中……"
+  },
+  "announcements_a4b8ed4a": {
+    "message": "公告"
+  },
+  "select_a_file_53ba40ac": {
+    "message": "选择一个文件"
+  },
+  "formatting_press_down_to_select_df728c30": {
+    "message": "格式，按下即可选择"
+  },
+  "background_color_press_down_to_select_ef99fdac": {
+    "message": "背景颜色，按下即可选择"
+  },
+  "files_index_af7c662b": {
+    "message": "文件索引"
+  },
+  "cancel_file_upload_9903e7b9": {
+    "message": "取消文件上传"
+  },
+  "the_material_is_subject_to_fair_use_exception_41bc6a4b": {
+    "message": "材料受公正使用例外的约束"
+  },
+  "enter_the_alternative_text_for_this_image_88047c47": {
+    "message": "为此图片输入替代文本"
+  },
+  "link_to_other_content_in_the_group_3fe25379": {
+    "message": "链接至小组中的其它内容。"
+  },
+  "discussions_index_6c36ced": {
+    "message": "讨论索引"
+  },
+  "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
+    "message": "单击任何文件以插入该文件的下载链接。"
+  },
+  "copyright_holder_66ee111": {
+    "message": "版权持有者："
+  },
+  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
+    "message": "富文本区域。按 ALT+F8 获取帮助"
+  },
+  "enter_search_terms_e397b1f0": {
+    "message": "搜索搜索条件"
+  },
+  "pages_e5414c2c": {
+    "message": "页面"
+  },
+  "cc_attribution_f6de631f": {
+    "message": "CC 署名"
+  },
+  "insert_link_6dc23cae": {
+    "message": "插入链接"
+  },
+  "collaborations_5c56c15f": {
+    "message": "协作"
+  },
+  "what_would_you_like_to_call_the_new_page_d7e4488a": {
+    "message": "您想要新页面叫什么名字?"
+  },
+  "click_any_image_to_embed_the_image_in_the_page_2cdd1136": {
+    "message": "单击任何图片以在该页面中嵌入图片。"
+  },
+  "search_flickr_6884b518": {
+    "message": "搜索 Flickr"
+  },
+  "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
+    "message": "单击任何页面以插入指向该页面的链接。"
+  },
+  "click_to_insert_a_link_into_the_editor_c19613aa": {
+    "message": "单击以插入指向编辑器的链接。"
+  },
+  "decorative_image_fde98579": {
+    "message": "装饰图片"
+  },
+  "click_to_insert_a_link_to_this_item_39794098": {
+    "message": "单击以插入指向该项目的链接。"
+  },
+  "load_more_results_460f49a9": {
+    "message": "加载更多结果"
+  },
+  "link_7262adec": {
+    "message": "链接"
+  },
+  "grades_a61eba0a": {
+    "message": "评分"
+  },
+  "links_14b70841": {
+    "message": "链接"
+  },
+  "loading_failed_b3524381": {
+    "message": "加载失败……"
+  },
+  "click_to_embed_imagename_c41ea8df": {
+    "message": "单击以嵌入{ imageName }"
+  },
+  "close_flickr_form_b32e600a": {
+    "message": "关闭 Flickr 窗体"
+  },
+  "course_syllabus_5de1b0af": {
+    "message": "课程大纲"
+  },
+  "upload_8b403d05": {
+    "message": "上传"
+  },
+  "modules_c4325335": {
+    "message": "单元"
+  },
+  "no_results_940393cf": {
+    "message": "无结果。"
+  },
+  "announcement_list_da155734": {
+    "message": "公告列表"
+  },
+  "link_to_a_new_page_6c4ad034": {
+    "message": "链接至新页面"
+  },
+  "insert_math_equation_57c6e767": {
+    "message": "插入数学公式"
+  },
+  "i_have_obtained_permission_to_use_this_file_6386f087": {
+    "message": "我已获得使用此文件的权限。"
+  },
+  "cc_attribution_non_commercial_share_alike_c7edb1e5": {
+    "message": "CC 署名、非商业、相同方式共享"
+  },
+  "wiki_home_9cd54d0": {
+    "message": "维基主页"
+  },
+  "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+    "message": "如果您现在不选择使用权限，该文件在上传后不会被发布。"
+  },
+  "upload_a_new_image_890df275": {
+    "message": "上传新图片"
+  },
+  "search_280d00bd": {
+    "message": "搜索"
+  },
+  "assignments_1e02582c": {
+    "message": "作业"
+  },
+  "cc_attribution_non_commercial_39e0d30d": {
+    "message": "CC 署名、非商业"
+  },
+  "quizzes_list_d812caa6": {
+    "message": "测验列表"
+  },
+  "image_upload_form_7b74079a": {
+    "message": "图片上传窗体"
+  },
+  "the_material_is_licensed_under_creative_commons_3242cb5e": {
+    "message": "材料已根据 Creative Commons 许可"
+  },
+  "images_7ce26570": {
+    "message": "图像"
+  },
+  "link_to_other_content_in_the_course_879163b5": {
+    "message": "链接至课程中的其它内容。"
+  },
+  "font_size_press_down_to_select_6c25dc2d": {
+    "message": "字体大小，按下即可选择"
+  },
+  "select_a_folder_to_upload_your_file_into_b82d12b": {
+    "message": "选择您的文件要上传至其中的文件夹"
+  },
+  "course_navigation_dd035109": {
+    "message": "课程导航"
+  },
+  "choose_usage_rights_33683854": {
+    "message": "选择使用权限..."
+  },
+  "text_color_press_down_to_select_8f5ad9b5": {
+    "message": "文本颜色，按下即可选择"
+  },
+  "embed_image_1080badc": {
+    "message": "嵌入图片"
+  },
+  "creative_commons_license_725584ae": {
+    "message": "Creative Commons 许可证："
+  },
+  "the_material_is_in_the_public_domain_279c39a3": {
+    "message": "材料在公开域中"
+  }
+}

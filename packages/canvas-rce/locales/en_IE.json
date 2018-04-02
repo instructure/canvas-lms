@@ -1,0 +1,248 @@
+{
+  "group_navigation_99f191a": {
+    "message": "Group navigation"
+  },
+  "cc_attribution_share_alike_669e7f16": {
+    "message": "CC attribution share alike"
+  },
+  "link_to_url_52dd935c": {
+    "message": "Link to URL"
+  },
+  "quizzes_7e598f57": {
+    "message": "Surveys"
+  },
+  "cc_attribution_non_commercial_no_derivatives_9fe74c00": {
+    "message": "CC attribution non-commercial no derivatives"
+  },
+  "c_2001_acme_inc_283f7f80": {
+    "message": "(c) 2001 Acme Inc."
+  },
+  "upload_a_new_file_96e6d4ff": {
+    "message": "Upload a new file"
+  },
+  "file_upload_form_4aaad554": {
+    "message": "File upload form"
+  },
+  "folder_705fd2d7": {
+    "message": "Folder"
+  },
+  "insert_equella_links_49a8dacd": {
+    "message": "Insert Equella links"
+  },
+  "assignment_list_a833f59d": {
+    "message": "Task list"
+  },
+  "alternative_text_a834dcad": {
+    "message": "Alternative text:"
+  },
+  "discussions_a5f96392": {
+    "message": "Discussions"
+  },
+  "cc_attribution_no_derivatives_b006744f": {
+    "message": "CC attribution no derivatives"
+  },
+  "usage_right_ff96f3e2": {
+    "message": "Usage right:"
+  },
+  "click_to_embed_image_33107dd8": {
+    "message": "Click to embed image"
+  },
+  "i_hold_the_copyright_71ee91b1": {
+    "message": "I hold the copyright"
+  },
+  "files_c300e900": {
+    "message": "Files"
+  },
+  "cancel_image_upload_2c771950": {
+    "message": "Cancel image upload"
+  },
+  "people_b4ebb13c": {
+    "message": "People"
+  },
+  "check_if_the_image_is_decorative_283649b7": {
+    "message": "Check if the image is decorative"
+  },
+  "loading_25990131": {
+    "message": "Loading..."
+  },
+  "announcements_a4b8ed4a": {
+    "message": "Announcements"
+  },
+  "select_a_file_53ba40ac": {
+    "message": "Select a file"
+  },
+  "formatting_press_down_to_select_df728c30": {
+    "message": "Formatting. Press down to select"
+  },
+  "background_color_press_down_to_select_ef99fdac": {
+    "message": "Background colour. Press down to select"
+  },
+  "files_index_af7c662b": {
+    "message": "Files index"
+  },
+  "cancel_file_upload_9903e7b9": {
+    "message": "Cancel file upload"
+  },
+  "the_material_is_subject_to_fair_use_exception_41bc6a4b": {
+    "message": "The material is subject to fair use exception"
+  },
+  "enter_the_alternative_text_for_this_image_88047c47": {
+    "message": "Enter the alternative text for this image"
+  },
+  "link_to_other_content_in_the_group_3fe25379": {
+    "message": "Link to other content in the group."
+  },
+  "discussions_index_6c36ced": {
+    "message": "Discussions index"
+  },
+  "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
+    "message": "Click any file to insert a download link for that file."
+  },
+  "copyright_holder_66ee111": {
+    "message": "Copyright holder:"
+  },
+  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
+    "message": "Rich Text Area. Press ALT+F8 for help"
+  },
+  "enter_search_terms_e397b1f0": {
+    "message": "enter search terms"
+  },
+  "pages_e5414c2c": {
+    "message": "Pages"
+  },
+  "cc_attribution_f6de631f": {
+    "message": "CC attribution"
+  },
+  "insert_link_6dc23cae": {
+    "message": "Insert link"
+  },
+  "collaborations_5c56c15f": {
+    "message": "Collaborations"
+  },
+  "what_would_you_like_to_call_the_new_page_d7e4488a": {
+    "message": "What would you like to call the new page?"
+  },
+  "click_any_image_to_embed_the_image_in_the_page_2cdd1136": {
+    "message": "Click any image to embed the image in the page."
+  },
+  "search_flickr_6884b518": {
+    "message": "Search Flickr"
+  },
+  "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
+    "message": "Click any page to insert a link to that page."
+  },
+  "click_to_insert_a_link_into_the_editor_c19613aa": {
+    "message": "Click to insert a link into the editor."
+  },
+  "decorative_image_fde98579": {
+    "message": "Decorative image"
+  },
+  "click_to_insert_a_link_to_this_item_39794098": {
+    "message": "Click to insert a link to this item."
+  },
+  "load_more_results_460f49a9": {
+    "message": "Load more results"
+  },
+  "link_7262adec": {
+    "message": "Link"
+  },
+  "grades_a61eba0a": {
+    "message": "Grades"
+  },
+  "links_14b70841": {
+    "message": "Links"
+  },
+  "loading_failed_b3524381": {
+    "message": "Loading failed..."
+  },
+  "click_to_embed_imagename_c41ea8df": {
+    "message": "Click to embed { imageName }"
+  },
+  "close_flickr_form_b32e600a": {
+    "message": "Close Flickr form"
+  },
+  "course_syllabus_5de1b0af": {
+    "message": "Programme syllabus"
+  },
+  "upload_8b403d05": {
+    "message": "Upload"
+  },
+  "modules_c4325335": {
+    "message": "Modules"
+  },
+  "no_results_940393cf": {
+    "message": "No results."
+  },
+  "announcement_list_da155734": {
+    "message": "Announcement List"
+  },
+  "link_to_a_new_page_6c4ad034": {
+    "message": "Link to a new page"
+  },
+  "insert_math_equation_57c6e767": {
+    "message": "Insert Math Equation"
+  },
+  "i_have_obtained_permission_to_use_this_file_6386f087": {
+    "message": "I have obtained permission to use this file."
+  },
+  "cc_attribution_non_commercial_share_alike_c7edb1e5": {
+    "message": "CC attribution non-commercial share alike"
+  },
+  "wiki_home_9cd54d0": {
+    "message": "Wiki Home"
+  },
+  "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+    "message": "If you do not select usage rights now, this file will be unpublished after it''s uploaded."
+  },
+  "upload_a_new_image_890df275": {
+    "message": "Upload a new image"
+  },
+  "search_280d00bd": {
+    "message": "Search"
+  },
+  "assignments_1e02582c": {
+    "message": "Tasks"
+  },
+  "cc_attribution_non_commercial_39e0d30d": {
+    "message": "CC attribution non-commercial"
+  },
+  "quizzes_list_d812caa6": {
+    "message": "Surveys List"
+  },
+  "image_upload_form_7b74079a": {
+    "message": "Image upload form"
+  },
+  "the_material_is_licensed_under_creative_commons_3242cb5e": {
+    "message": "The material is licensed under Creative Commons"
+  },
+  "images_7ce26570": {
+    "message": "Images"
+  },
+  "link_to_other_content_in_the_course_879163b5": {
+    "message": "Link to other content in the programme."
+  },
+  "font_size_press_down_to_select_6c25dc2d": {
+    "message": "Font size. Press down to select"
+  },
+  "select_a_folder_to_upload_your_file_into_b82d12b": {
+    "message": "Select a folder to upload your file into"
+  },
+  "course_navigation_dd035109": {
+    "message": "Programme navigation"
+  },
+  "choose_usage_rights_33683854": {
+    "message": "Choose usage rights..."
+  },
+  "text_color_press_down_to_select_8f5ad9b5": {
+    "message": "Text colour. Press down to select"
+  },
+  "embed_image_1080badc": {
+    "message": "Embed image"
+  },
+  "creative_commons_license_725584ae": {
+    "message": "Creative Commons Licence:"
+  },
+  "the_material_is_in_the_public_domain_279c39a3": {
+    "message": "The material is in the public domain"
+  }
+}

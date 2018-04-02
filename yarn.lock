@@ -2498,20 +2498,17 @@ caniuse-lite@^1.0.30000792, caniuse-lite@^1.0.30000805, caniuse-lite@^1.0.300008
     redux-thunk "^2.2.0"
     velocity-animate "^1.5.0"
 
-canvas-rce@3.1.0-hotfix.0:
-  version "3.1.0-hotfix.0"
-  resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-3.1.0-hotfix.0.tgz#4a7d96042148cb851dec6495565540b112456a5b"
+"canvas-rce@file:./packages/canvas-rce/canvas":
+  version "3.1.1"
   dependencies:
     "@instructure/ui-core" "^4.1.0"
     "@instructure/ui-themes" "^4.1.0"
     aphrodite "^1.1.0"
     bloody-offset "0.0.0"
-    escape-html "1.0.3"
     format-message "^5.1.0"
     format-message-generate-id "^5.1.0"
     instructure-icons "3 || 4"
     isomorphic-fetch "2.2.1"
-    load-css "0.1.0"
     react "^0.14.8 || ^15.0.0"
     react-dom "^0.14.8 || ^15.0.0"
     react-redux "~4.4.5"
@@ -3990,7 +3987,7 @@ es6-weak-map@^2.0.1, es6-weak-map@^2.0.2:
     es6-iterator "^2.0.1"
     es6-symbol "^3.1.1"
 
-escape-html@1.0.3, escape-html@~1.0.3:
+escape-html@~1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/escape-html/-/escape-html-1.0.3.tgz#0258eae4d3d0c0974de1c169188ef0051d1d1988"
 
@@ -7106,10 +7103,6 @@ liftoff@^2.1.0:
     object.map "^1.0.0"
     rechoir "^0.6.2"
     resolve "^1.1.7"
-
-load-css@0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/load-css/-/load-css-0.1.0.tgz#82b8e7329ed1779bedb55ea172ed81625243e774"
 
 load-json-file@^1.0.0:
   version "1.1.0"
