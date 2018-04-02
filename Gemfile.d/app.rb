@@ -111,7 +111,7 @@ gem 'safe_yaml', '1.0.4', require: false
 gem 'sanitize', '2.1.0', require: false
 gem 'shackles', '1.4.0'
 
-gem 'useragent', '0.16.8', require: false
+gem 'useragent', '0.16.10', require: false
 
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'hey', '1.3.1', require: false
