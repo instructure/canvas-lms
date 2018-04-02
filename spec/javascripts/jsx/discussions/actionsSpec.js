@@ -611,3 +611,111 @@ test('searchDiscussions announces number of results found to screenreader', (ass
     done()
   })
 })
+
+test('deleteDiscussion dispatches DELETE_DISCUSSION_SUCCESS on success', (assert) => {
+  const done = assert.async()
+  mockSuccess('deleteDiscussion', {})
+  const state = { pinnedDiscussions: [{id: 1}] }
+  const discussion = { id: 1 }
+  const dispatchSpy = sinon.spy()
+  actions.deleteDiscussion(discussion)(dispatchSpy, () => state)
+
+  setTimeout(() => {
+    const expected = [
+      {
+        payload: {
+          discussion: { id: 1 }
+        },
+        type: "DELETE_DISCUSSION_SUCCESS"
+      }
+    ]
+    deepEqual(dispatchSpy.thirdCall.args, expected)
+    done()
+  })
+})
+
+test('deleteDiscussion dispatches DELETE_FOCUS_PENDING on success', (assert) => {
+  const done = assert.async()
+  mockSuccess('deleteDiscussion', {})
+  const state = { pinnedDiscussions: [{id: 1}] }
+  const discussion = { id: 1 }
+  const dispatchSpy = sinon.spy()
+  actions.deleteDiscussion(discussion)(dispatchSpy, () => state)
+
+  setTimeout(() => {
+    const expected = [
+      {
+        type: "DELETE_FOCUS_PENDING"
+      }
+    ]
+    deepEqual(dispatchSpy.secondCall.args, expected)
+    done()
+  })
+})
+
+test('deleteDiscussion dispatches DELETE_DISCUSSION_FAIL on failure', (assert) => {
+  const done = assert.async()
+  mockFail('deleteDiscussion', 'test_error')
+  const state = { pinnedDiscussions: [{id: 1, title: 'foo'}] }
+  const discussion = { id: 1, title: 'foo' }
+  const dispatchSpy = sinon.spy()
+  actions.deleteDiscussion(discussion)(dispatchSpy, () => state)
+
+  setTimeout(() => {
+    const expected = [
+      {
+        payload: {
+          message: 'Failed to delete discussion foo',
+          discussion: { id: 1, title: 'foo' },
+          err: 'test_error'
+        },
+        type: "DELETE_DISCUSSION_FAIL"
+      }
+    ]
+    deepEqual(dispatchSpy.secondCall.args, expected)
+    done()
+  })
+})
+
+test('deleteDiscussion calls screenReaderFlash on success', (assert) => {
+  const done = assert.async()
+  const flashStub = sinon.spy($, 'screenReaderFlashMessage')
+  mockSuccess('deleteDiscussion', {})
+  const state = { pinnedDiscussions: [{id: 1, title: 'foo'}] }
+  const discussion = { id: 1, title: 'foo' }
+  const dispatchSpy = sinon.spy()
+  actions.deleteDiscussion(discussion)(dispatchSpy, () => state)
+
+  setTimeout(() => {
+    deepEqual(flashStub.firstCall.args, ["Successfully deleted discussion foo"])
+    flashStub.restore()
+    done()
+  })
+})
+
+test('deleteDiscussion calls screenReaderFlash on failure', (assert) => {
+  const done = assert.async()
+  const flashStub = sinon.spy($, 'screenReaderFlashMessage')
+  mockFail('deleteDiscussion', 'test_error')
+  const state = { pinnedDiscussions: [{id: 1, title: 'foo'}] }
+  const discussion = { id: 1, title: 'foo' }
+  const dispatchSpy = sinon.spy()
+  actions.deleteDiscussion(discussion)(dispatchSpy, () => state)
+
+  setTimeout(() => {
+    deepEqual(flashStub.firstCall.args, ["Failed to delete discussion foo"])
+    flashStub.restore()
+    done()
+  })
+})
+
+test('deleteFocusDone dispatches DELETE_FOCUS_CLEANUP', (assert) => {
+  const done = assert.async()
+  const dispatchSpy = sinon.spy()
+  actions.deleteFocusDone()(dispatchSpy, () => {})
+  setTimeout(() => {
+    const expected = [{ type: "DELETE_FOCUS_CLEANUP" }]
+    deepEqual(dispatchSpy.firstCall.args, expected)
+    done()
+  })
+})

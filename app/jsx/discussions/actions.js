@@ -59,6 +59,8 @@ const types = [
   'DELETE_DISCUSSION_START',
   'DELETE_DISCUSSION_SUCCESS',
   'DELETE_DISCUSSION_FAIL',
+  'DELETE_FOCUS_PENDING',
+  'DELETE_FOCUS_CLEANUP',
   'CLEAN_DISCUSSION_FOCUS'
 ]
 
@@ -187,6 +189,7 @@ actions.deleteDiscussion = function(discussion) {
     dispatch(actions.deleteDiscussionStart())
     apiClient.deleteDiscussion(getState(), {discussion: discussionCopy})
       .then(_ => {
+        dispatch(actions.deleteFocusPending())
         dispatch(actions.deleteDiscussionSuccess({discussion: discussionCopy}))
         $.screenReaderFlashMessage(I18n.t('Successfully deleted discussion %{title}', { title: discussion.title }))
       })
@@ -199,6 +202,10 @@ actions.deleteDiscussion = function(discussion) {
         }))
       })
   }
+}
+
+actions.deleteFocusDone = function() {
+  return (dispatch) => dispatch(actions.deleteFocusCleanup())
 }
 
 

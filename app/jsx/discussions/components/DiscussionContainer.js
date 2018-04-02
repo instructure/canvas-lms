@@ -63,7 +63,9 @@ export default class DiscussionsContainer extends Component {
     handleDrop: func, // eslint-disable-line
     duplicateDiscussion: func.isRequired,
     cleanDiscussionFocus: func.isRequired,
+    deleteFocusDone: func.isRequired,
     pinned: bool,
+    deleteFocusPending: bool.isRequired, // eslint-disable-line
     closedState: bool, // eslint-disable-line
     connectDropTarget: func,
     roles: arrayOf(string), // eslint-disable-line
@@ -94,27 +96,28 @@ export default class DiscussionsContainer extends Component {
   }
 
   componentWillReceiveProps(props) {
-    if((this.props.discussions.length >= 1
-      && props.discussions.length === 0)
-      || (props.discussions[0]
-      && props.discussions[0].focusOn === "toggleButton")) {
-      if(this.toggleBtn) {
-        setTimeout(() => {
-          this.toggleBtn.focus()
-          this.props.cleanDiscussionFocus()
-        });
-      }
-    }
-
-    if(this.props.discussions !== props.discussions) {
-      this.setState({
-        discussions: props.discussions,
-      })
-    }
+    if(this.props.discussions === props.discussions) { return }
+    this.setState({ discussions: props.discussions })
+    this.handleDeleteFocus(props)
   }
 
   wrapperToggleRef = (c) => {
     this.toggleBtn = c && c.querySelector('button')
+  }
+
+  handleDeleteFocus(newProps) {
+    // Set the focus to the container toggle button if we are deleting an element,
+    // and the new discussions list is empty or explictly said to set focus to
+    // that toggle button.
+    if (!this.toggleBtn) { return }
+    if (!newProps.deleteFocusPending) { return }
+    if (this.props.discussions.length === 0) { return }
+
+    if (newProps.discussions.length === 0 || newProps.discussions[0].focusOn === "toggleButton") {
+      this.toggleBtn.focus()
+      this.props.cleanDiscussionFocus()
+      this.props.deleteFocusDone()
+    }
   }
 
   moveCard(dragIndex, hoverIndex) {

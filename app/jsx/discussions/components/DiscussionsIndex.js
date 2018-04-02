@@ -51,6 +51,8 @@ export default class DiscussionsIndex extends Component {
   static propTypes = {
     arrangePinnedDiscussions: func.isRequired,
     cleanDiscussionFocus: func.isRequired,
+    deleteFocusDone: func.isRequired,
+    deleteFocusPending: bool.isRequired,
     closedForCommentsDiscussions: discussionList,
     contextId: string.isRequired,
     contextType: string.isRequired,
@@ -92,10 +94,9 @@ export default class DiscussionsIndex extends Component {
 
   onDeleteConfirm = (discussion, isConfirm) => {
     if(isConfirm) {
-      this.setState({showDelete: false, deleteFunction: () => {}}, this.props.deleteDiscussion(discussion))
-    } else {
-      this.setState({showDelete: false, deleteFunction: () => {}})
+      this.props.deleteDiscussion(discussion)
     }
+    this.setState({showDelete: false, deleteFunction: () => {}})
   }
 
   selectPage(page) {
@@ -174,6 +175,8 @@ export default class DiscussionsIndex extends Component {
             duplicateDiscussion={this.props.duplicateDiscussion}
             updateDiscussion={this.props.updateDiscussion}
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
+            deleteFocusPending={this.props.deleteFocusPending}
+            deleteFocusDone={this.props.deleteFocusDone}
             roles={this.props.roles}
             contextType={this.props.contextType}
             deleteDiscussion={this.openDeleteDiscussionsModal}
@@ -194,6 +197,8 @@ export default class DiscussionsIndex extends Component {
             toggleSubscribe={this.props.toggleSubscriptionState}
             duplicateDiscussion={this.props.duplicateDiscussion}
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
+            deleteFocusPending={this.props.deleteFocusPending}
+            deleteFocusDone={this.props.deleteFocusDone}
             updateDiscussion={this.props.updateDiscussion}
             roles={this.props.roles}
             contextType={this.props.contextType}
@@ -231,6 +236,8 @@ export default class DiscussionsIndex extends Component {
             handleDrop={this.props.handleDrop}
             duplicateDiscussion={this.props.duplicateDiscussion}
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
+            deleteFocusPending={this.props.deleteFocusPending}
+            deleteFocusDone={this.props.deleteFocusDone}
             onMoveDiscussion={this.renderMoveDiscussionTray}
             roles={this.props.roles}
             contextType={this.props.contextType}
@@ -255,6 +262,8 @@ export default class DiscussionsIndex extends Component {
             handleDrop={this.props.handleDrop}
             duplicateDiscussion={this.props.duplicateDiscussion}
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
+            deleteFocusPending={this.props.deleteFocusPending}
+            deleteFocusDone={this.props.deleteFocusDone}
             pinned={false}
             closedState={false}
             roles={this.props.roles}
@@ -281,6 +290,8 @@ export default class DiscussionsIndex extends Component {
             handleDrop={this.props.handleDrop}
             duplicateDiscussion={this.props.duplicateDiscussion}
             cleanDiscussionFocus={this.props.cleanDiscussionFocus}
+            deleteFocusPending={this.props.deleteFocusPending}
+            deleteFocusDone={this.props.deleteFocusDone}
             roles={this.props.roles}
             contextType={this.props.contextType}
             pinned={false}
@@ -327,6 +338,7 @@ const connectState = state =>
       'contextId',
       'contextType',
       'contextType',
+      'deleteFocusPending',
       'discussionTopicMenuTools',
       'masterCourseData',
       'permissions',
@@ -344,6 +356,7 @@ const connectActions = dispatch =>
       'handleDrop',
       'duplicateDiscussion',
       'cleanDiscussionFocus',
+      'deleteFocusDone',
       'arrangePinnedDiscussions',
       'deleteDiscussion'
     ]),

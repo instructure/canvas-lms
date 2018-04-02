@@ -357,7 +357,7 @@ test('DELETE_DISCUSSION_SUCCESS should delete correct discussion', () => {
       { title: "aaron", id: 10, pinned: true, locked: false }
     ],
     unpinnedDiscussions: [],
-    closedDiscussions: [],
+    closedForCommentsDiscussions: [],
   })
   deepEqual(newState.pinnedDiscussions, [
     { title: "landon", id: 1, pinned: true, sortableId: 0, locked: false, permissions: { delete: true }, focusOn: "manageMenu" },
@@ -372,7 +372,7 @@ test('DELETE_DISCUSSION_SUCCESS should delete last discussion', () => {
       { title: "venk", id: 5, pinned: true, locked: false },
     ],
     unpinnedDiscussions: [],
-    closedDiscussions: [],
+    closedForCommentsDiscussions: [],
   })
   deepEqual(newState.pinnedDiscussions, [
   ])
@@ -537,4 +537,18 @@ test('DRAG_AND_DROP should remove sortableId to unpinned discussion', () => {
     deepEqual(newState.unpinnedDiscussions.map(d => d.sortableId), [undefined, undefined])
     deepEqual(newState.closedForCommentsDiscussions, [])
   })
+})
+
+test('DELETE_FOCUS_PENDING sets deleteFocusPending to true', () => {
+  const initialState = { deleteFocusPending: false }
+  const dispatchData = {}
+  const newState = reduce(actions.deleteFocusPending(dispatchData), initialState)
+  deepEqual(newState.deleteFocusPending, true)
+})
+
+test('DELETE_FOCUS_CLEANUP sets deleteFocusPending to false', () => {
+  const initialState = { deleteFocusPending: true }
+  const dispatchData = {}
+  const newState = reduce(actions.deleteFocusCleanup(dispatchData), initialState)
+  deepEqual(newState.deleteFocusPending, false)
 })

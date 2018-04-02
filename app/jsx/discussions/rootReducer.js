@@ -22,6 +22,7 @@ import { createPaginatedReducer } from '../shared/reduxPagination'
 import pinnedDiscussionReducer from './reducers/pinnedDiscussionReducer'
 import unpinnedDiscussionReducer from './reducers/unpinnedDiscussionReducer'
 import closedForCommentsDiscussionReducer from './reducers/closedForCommentsDiscussionReducer'
+import deleteFocusReducer from './reducers/deleteFocusReducer'
 import userSettingsReducer from './reducers/userSettingsReducer'
 import courseSettingsReducer from './reducers/courseSettingsReducer'
 import isSavingSettingsReducer from './reducers/isSavingSettingsReducer'
@@ -38,6 +39,7 @@ export default combineReducers({
   contextType: identity(null),
   courseSettings: courseSettingsReducer,
   currentUserId: identity(null),
+  deleteFocusPending: deleteFocusReducer,
   discussions: createPaginatedReducer('discussions'),
   discussionTopicMenuTools: identity([]),
   isSavingSettings: isSavingSettingsReducer,
