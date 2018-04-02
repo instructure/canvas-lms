@@ -143,6 +143,11 @@ module PlannerPageObject
     f('.ic-dashboard-app')
   end
 
+  def time_input
+    modal = todo_sidebar_modal
+    ff('input', modal)[2]
+  end
+
   def todo_save_button
     fj("button:contains('Save')")
   end

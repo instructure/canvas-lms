@@ -388,6 +388,24 @@ describe "student planner" do
       expect(format_date_for_view(@student_to_do.todo_date, :long)).to eq(day)
     end
 
+    it "adds date and time to a to-do item", priority: "1", test_id: 222222 do
+      skip('unskip with ADMIN-298')
+      go_to_list_view
+      todo_modal_button.click
+      modal = todo_sidebar_modal
+      element = ff('input', modal)[1]
+      element.click
+      fj("button:contains('15')").click
+
+      time_element = time_input
+      time_element.click
+      time_element.send_keys('9:00 am')
+      todo_save_button.click
+      time = calendar_time_string(PlannerNote.last.todo_time).chop
+      expect(fxpath("//div[contains(@class, 'PlannerApp')]//span[contains(text(),'DUE: #{time}')]")).
+        to be_displayed
+    end
+
     it "updates the sidebar when clicking on mutiple to-do items", priority: "1", test_id: 3426619 do
       student_to_do2 = @student1.planner_notes.create!(todo_date: Time.zone.now + 5.minutes,
                                                        title: "Student to do 2")
