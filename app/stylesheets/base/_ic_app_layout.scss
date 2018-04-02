@@ -158,7 +158,7 @@ body:not(.course-menu-expanded) {
   body:not(.full-width):not(.outcomes) & {
     // We want to add a max size to most pages in canvas
     // unless it's a full-width app
-    max-width: 1366px;
+    max-width: 100%;
   }
 
   body:not(.ic-no-flex-layout):not(.embedded) & {
