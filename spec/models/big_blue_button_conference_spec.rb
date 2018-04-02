@@ -30,11 +30,13 @@ describe BigBlueButtonConference do
           :secret_dec => "secret",
         })
       ])
+      @course = course_factory
       user_with_communication_channel
+      @course.enroll_teacher(@user).accept
       @conference = BigBlueButtonConference.create!(
         :title => "my conference",
         :user => @user,
-        :context => course_factory
+        :context => @course
       )
     end
 
@@ -80,6 +82,10 @@ describe BigBlueButtonConference do
       @conference.initiate_conference
       expect(@conference).to be_active
       expect(@conference.craft_url(@user)).to match(/\Ahttps:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
+    end
+
+    it "should have a well formed user string as for recording_user_ready" do
+      expect(@conference.recording_ready_user).to eq "#{@user['name']} <#{@user.email}>"
     end
 
     it "return nil if a request times out" do
