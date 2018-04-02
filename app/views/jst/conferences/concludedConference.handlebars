@@ -65,10 +65,14 @@
             <div class="ig-row__layout">
               <div class="ig-info">
                 <div class="ig-details">
-                  <a href="{{playback_url}}" target="_blank" class="ig-title"
-                    style="line-height: inherit;" data-id="{{recording_id}}" data-format="presentation">
-                    {{title}}
+                  <span>{{title}}</span>
+                  &nbsp;&nbsp;&nbsp;
+                  {{#each playback_formats}}
+                  <a href="{{url}}" target="_blank" class="ig-title"
+                    style="line-height: inherit;" data-id="{{../recording_id}}" data-format="presentation">
+                    {{#t "type"}}{{type}}{{/t}}
                   </a>
+                  {{/each}}
                   {{dateString created_at}}
                   &nbsp;&#124;&nbsp;
                   {{durationToString duration_minutes}}
