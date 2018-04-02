@@ -34,6 +34,7 @@ export function mockComponent(name) {
 
 export function mockRegistry () {
   return {
+    getComponent: jest.fn(),
     getLastComponent: jest.fn(),
     getAllNewActivityIndicatorsSorted: jest.fn(),
     getAllItemsSorted: jest.fn(),
@@ -66,6 +67,7 @@ export function mockManager () {
     getRegistry () { return this.registry; },
     getAnimator () { return this.animator; },
     getStore () { return this.store; },
+    getStickyOffset () { return 34; },
     totalOffset () { return 42; },
   };
 }

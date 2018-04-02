@@ -31,7 +31,7 @@ import { initialOptions, getPlannerItems, scrollIntoPast, loadFutureItems } from
 import { registerScrollEvents } from './utilities/scrollUtils';
 import { initialize as initializeAlerts } from './utilities/alertUtils';
 import moment from 'moment-timezone';
-import {DynamicUiManager, DynamicUiProvider} from './dynamic-ui';
+import {DynamicUiManager, DynamicUiProvider, specialFallbackFocusId} from './dynamic-ui';
 
 const defaultOptions = {
   locale: 'en',
@@ -63,6 +63,13 @@ function handleScrollIntoFutureAttempt () {
   }
 }
 
+function externalFocusableWrapper (externalFallbackFocusable) {
+  return {
+    getFocusable () { return externalFallbackFocusable; },
+    getScrollable () { return externalFallbackFocusable; },
+  };
+}
+
 export function render (element, options) {
   // Using this pattern because default params don't merge objects
   const opts = { ...defaultOptions, ...options };
@@ -70,6 +77,9 @@ export function render (element, options) {
   moment.locale(opts.locale);
   moment.tz.setDefault(opts.timeZone);
   dynamicUiManager.setStickyOffset(opts.stickyOffset);
+  dynamicUiManager.registerAnimatable(
+    'item', externalFocusableWrapper(options.externalFallbackFocusable), -1, [specialFallbackFocusId('item')]
+  );
   registerScrollEvents({
     scrollIntoPast: handleScrollIntoPastAttempt,
     scrollIntoFuture: handleScrollIntoFutureAttempt,
@@ -126,7 +136,7 @@ function applyTheme (el, theme) {
   ): el;
 }
 
-export default function loadPlannerDashboard ({changeToCardView, getActiveApp, flashError, flashMessage, srFlashMessage, env}) {
+export default function loadPlannerDashboard ({changeToCardView, getActiveApp, flashError, flashMessage, srFlashMessage, externalFallbackFocusable, env}) {
   const element = document.getElementById('dashboard-planner');
   const headerElement = document.getElementById('dashboard-planner-header');
   const stickyElement = document.getElementById('dashboard_header_container');
@@ -151,6 +161,7 @@ export default function loadPlannerDashboard ({changeToCardView, getActiveApp, f
       visualSuccessCallback: flashMessage,
       srAlertCallback: srFlashMessage
     },
+    externalFallbackFocusable,
     locale: env.LOCALE,
     timeZone: env.TIMEZONE,
     currentUser: {

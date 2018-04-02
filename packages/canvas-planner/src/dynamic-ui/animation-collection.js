@@ -22,7 +22,7 @@ import {
   ScrollToLastLoadedNewActivity,
   ContinueInitialLoad,
   FocusPriorItemOnLoadMore,
-
+  FocusPriorItemOnDelete,
   // ResetFocus,
   // FocusSavedItem,
   // SetFocusToPriorLoadedItem,
@@ -68,6 +68,12 @@ export class AnimationCollection {
         'GOT_DAYS_SUCCESS',
       ],
       animation: FocusPriorItemOnLoadMore,
+    },
+    {
+      expected: [
+        'DELETED_PLANNER_ITEM',
+      ],
+      animation: FocusPriorItemOnDelete,
     }
 
 

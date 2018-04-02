@@ -118,8 +118,9 @@ export default class Animation {
   registry () { return this.manager().getRegistry(); }
   animator () { return this.manager().getAnimator(); }
   store () { return this.manager().getStore(); }
-  window() { return this.animator().getWindow(); }
-
+  window () { return this.animator().getWindow(); }
+  stickyOffset () { return this.manager().getStickyOffset(); }
+  totalOffset () { return this.manager().totalOffset(); }
   //------------------------------------------------------------------
   // Implementation methods: do not use or override the methods below
   //------------------------------------------------------------------

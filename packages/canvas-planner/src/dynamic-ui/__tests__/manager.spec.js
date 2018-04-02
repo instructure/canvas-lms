@@ -272,41 +272,6 @@ describe('manipulating items', () => {
     expect(animator.maintainViewportPosition).toHaveBeenCalled();
     expect(animator.scrollTo).toHaveBeenCalledWith('scrollable-day-0-group-0-item-0', 42);
   });
-
-  describe('deleting an item', () => {
-    it('sets focus to the previous item if there is one', () => {
-      const {manager, animator} = createManagerWithMocks();
-      // when deleting, we need to assume the item has already been registered.
-      registerStandardDays(manager);
-      manager.handleOpenEditingPlannerItem();
-      manager.handleDeletedPlannerItem({payload: {uniqueId: 'day-1-group-1-item-2'}});
-      manager.preTriggerUpdates('fixed-element', 'app');
-      manager.triggerUpdates();
-      expect(animator.focusElement).toHaveBeenCalledWith('focusable-day-1-group-1-item-1');
-    });
-
-    it('sets focus to the fallback if there is no previous item', () => {
-      const {manager, animator} = createManagerWithMocks();
-      registerStandardDays(manager);
-      const fakeFallback = {getFocusable: () => 'fallback', getScrollable: () => 'scroll'};
-      manager.registerAnimatable('item', fakeFallback, -1, ['~~~item-fallback-focus~~~']);
-      manager.handleOpenEditingPlannerItem();
-      manager.handleDeletedPlannerItem({payload: {uniqueId: 'day-0-group-0-item-0'}});
-      manager.preTriggerUpdates('fixed-element', 'app');
-      manager.triggerUpdates();
-      expect(animator.focusElement).toHaveBeenCalledWith('fallback');
-    });
-
-    it('gives up setting item focus if deleting the first item and there is no fallback', () => {
-      const {manager, animator} = createManagerWithMocks();
-      registerStandardDays(manager);
-      manager.handleOpenEditingPlannerItem();
-      manager.handleDeletedPlannerItem({payload: {uniqueId: 'day-0-group-0-item-0'}});
-      manager.preTriggerUpdates('fixed-element', 'app');
-      manager.triggerUpdates();
-      expect(animator.focusElement).not.toHaveBeenCalled();
-    });
-  });
 });
 
 describe('deleting an opportunity', () => {
