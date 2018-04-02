@@ -20,7 +20,7 @@
   position: absolute;
   z-index: 2000;
   overflow: hidden;
-  margin-left: -12px;
+  margin-#{direction(left)}: -12px;
   padding: 0 12px 12px;
   display: block;
   > div {
@@ -35,7 +35,7 @@
       position: relative;
       // each menu level (contains two uls)
       > div {
-        float: left;
+        float: direction(left);
         width: 390px;
       }
     }

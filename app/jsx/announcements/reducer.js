@@ -76,6 +76,9 @@ export default combineReducers({
   permissions: identity({}),
   masterCourseData: identity(null),
   atomFeedUrl: identity(null),
+  isToggleLocking: handleActions({
+    [actionTypes.SET_ANNOUNCEMENTS_IS_LOCKING] : (state, action) => action.payload
+  }, false),
   announcements: (state, action) => {
     const paginatedState = reduceAnnouncementsPagination(state, action)
     const newState = reduceAnnouncements(paginatedState, action)

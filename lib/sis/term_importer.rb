@@ -45,6 +45,7 @@ module SIS
 
         raise ImportError, "No term_id given for a term" if term_id.blank?
         raise ImportError, "Improper status \"#{status}\" for term #{term_id}" unless status =~ /\Aactive|\Adeleted/i
+        return if @batch.skip_deletes? && status =~ /deleted/i
 
         term = @root_account.enrollment_terms.where(sis_source_id: term_id).first_or_initialize
         term.sis_batch_id = @batch.id if @batch

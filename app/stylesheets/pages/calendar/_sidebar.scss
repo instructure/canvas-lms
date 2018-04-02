@@ -57,7 +57,7 @@
   }
   .spin_holder {
     display: none;
-    float: left;
+    float: direction(left);
     width: 22px;
     height: 20px;
     position: relative;
@@ -110,7 +110,7 @@
     width: 11px;
     height: 11px;
     margin: 5px 11px 0 15px;
-    float: left;
+    float: direction(left);
     border: 1px solid;
   }
   .not-checked {
@@ -122,9 +122,9 @@
   }
   .context-list-add {
     position: absolute;
-    right: 5px;
+    #{direction(right)}: 5px;
   }
   .ContextList__MoreBtn {
-    float: right;
+    float: direction(right);
   }
 }

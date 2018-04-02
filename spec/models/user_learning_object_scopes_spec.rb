@@ -90,7 +90,7 @@ describe UserLearningObjectScopes do
       student_in_section(section, user: student)
       @assignment.only_visible_to_overrides = true
       @assignment.publish
-      @quiz.due_at = 2.days.from_now
+      @quiz.due_at = opts[:due_at] || 2.days.from_now
       @quiz.save!
       if opts[:override]
         create_section_override_for_assignment(@assignment, {course_section: section})
@@ -111,6 +111,7 @@ describe UserLearningObjectScopes do
       @quiz.lock_at = nil
       @quiz.due_at = 2.days.from_now
       @quiz.save!
+      DueDateCacher.recompute(@quiz.assignment)
 
       expect(@student.assignments_for_student('submitting', contexts: [@course]).count).to eq 1
     end
@@ -136,12 +137,14 @@ describe UserLearningObjectScopes do
         override.due_at = 1.week.from_now - 1.day
         override.due_at_overridden = true
         override.save!
+        DueDateCacher.recompute(@quiz.assignment)
         expect(@student.assignments_for_student('submitting', contexts: [@course])).
           to include @quiz.assignment
       end
 
       it "should include assignments with no locks" do
         @quiz.save!
+        DueDateCacher.recompute(@quiz.assignment)
         list = @student.assignments_for_student('submitting', context: [@course])
         expect(list.size).to be 1
         expect(list.first.title).to eq 'Test Assignment'
@@ -150,6 +153,7 @@ describe UserLearningObjectScopes do
       it "should include assignments with unlock_at in the past" do
         @quiz.unlock_at = 1.hour.ago
         @quiz.save!
+        DueDateCacher.recompute(@quiz.assignment)
         list = @student.assignments_for_student('submitting', context: [@course])
         expect(list.size).to be 1
         expect(list.first.title).to eq 'Test Assignment'
@@ -158,6 +162,7 @@ describe UserLearningObjectScopes do
       it "should include assignments with lock_at in the future" do
         @quiz.lock_at = 1.hour.from_now
         @quiz.save!
+        DueDateCacher.recompute(@quiz.assignment)
         list = @student.assignments_for_student('submitting', context: [@course])
         expect(list.size).to be 1
         expect(list.first.title).to eq 'Test Assignment'
@@ -166,12 +171,14 @@ describe UserLearningObjectScopes do
       it "should not include assignments where unlock_at is in future" do
         @quiz.unlock_at = 1.hour.from_now
         @quiz.save!
+        DueDateCacher.recompute(@quiz.assignment)
         expect(@student.assignments_for_student('submitting', contexts: [@course]).count).to eq 0
       end
 
       it "should not include assignments where lock_at is in past" do
         @quiz.lock_at = 1.hour.ago
         @quiz.save!
+        DueDateCacher.recompute(@quiz.assignment)
         expect(@student.assignments_for_student('submitting', contexts: [@course]).count).to eq 0
       end
 
@@ -179,6 +186,7 @@ describe UserLearningObjectScopes do
         it "should include assignments where unlock_at is in future" do
           @quiz.unlock_at = 1.hour.from_now
           @quiz.save!
+          DueDateCacher.recompute(@quiz.assignment)
           list = @student.assignments_for_student('submitting', include_locked: true, contexts: [@course])
           expect(list.count).to eq 1
         end
@@ -186,6 +194,7 @@ describe UserLearningObjectScopes do
         it "should include assignments where lock_at is in past" do
           @quiz.lock_at = 1.hour.ago
           @quiz.save!
+          DueDateCacher.recompute(@quiz.assignment)
           list = @student.assignments_for_student('submitting', include_locked: true, contexts: [@course])
           expect(list.count).to eq 1
         end
@@ -195,6 +204,7 @@ describe UserLearningObjectScopes do
     context "ungraded assignments" do
       before :once do
         @assignment = @course.assignments.create! title: 'blah!', due_at: 1.day.from_now, submission_types: 'not_graded'
+        DueDateCacher.recompute(@assignment)
       end
 
       it "excludes ungraded assignments by default" do
@@ -208,13 +218,58 @@ describe UserLearningObjectScopes do
 
     context "differentiated_assignments" do
       it "should not return the assignments without an override for the student" do
-        assignment = create_assignment_with_override
+        assignment = create_assignment_with_override(due_at: 2.days.from_now)
+        DueDateCacher.recompute(assignment)
         expect(@student.assignments_for_student('submitting', contexts: Course.all)).not_to include(assignment)
       end
 
       it "should return the assignments with an override" do
-        assignment = create_assignment_with_override(override: true)
+        assignment = create_assignment_with_override(override: true, due_at: 2.days.from_now)
+        DueDateCacher.recompute(assignment)
         expect(@student.assignments_for_student('submitting', contexts: Course.all)).to include(assignment)
+      end
+
+      it "should return assignments with due dates in the 'due_after' 'due_before' window for the student" do
+        # if this spec fails due to new logic, please consider updating ungraded quizzes due date logic
+        # and verifying the differentiated assignments spec for ungraded quizzes in this file
+        assignment = create_assignment_with_override(override: true, due_at: 2.days.from_now)
+        ad_hoc = create_adhoc_override_for_assignment(assignment, @student)
+        ad_hoc.due_at = 2.weeks.from_now
+        ad_hoc.due_at_overridden = true
+        ad_hoc.save!
+        DueDateCacher.recompute(assignment)
+        assigns1 = @student.assignments_for_student('submitting', {due_after: 1.week.from_now, due_before: 3.weeks.from_now})
+        assigns2 = @student.assignments_for_student('submitting', {due_after: Time.zone.now, due_before: 1.week.from_now})
+        expect(assigns1).to include(assignment)
+        expect(assigns2).not_to include(assignment)
+      end
+
+      it "should return assignments with overrides where the due date is not overridden for the student" do
+        # if this spec fails due to new logic, please consider updating ungraded quizzes due date logic
+        # and verifying the differentiated assignments spec for ungraded quizzes in this file
+        assignment = create_assignment_with_override(override: true, due_at: 2.days.from_now)
+        ad_hoc = create_adhoc_override_for_assignment(assignment, @student)
+        ad_hoc.lock_at = 2.weeks.from_now
+        ad_hoc.lock_at_overridden = true
+        ad_hoc.save!
+        DueDateCacher.recompute(assignment)
+        assigns1 = @student.assignments_for_student('submitting', {due_after: 1.week.from_now, due_before: 3.weeks.from_now})
+        assigns2 = @student.assignments_for_student('submitting', {due_after: Time.zone.now, due_before: 1.week.from_now})
+        expect(assigns1).not_to include(assignment)
+        expect(assigns2).to include(assignment)
+      end
+
+      it "should not return assignments where the override removes the user's due date" do
+        # if this spec fails due to new logic, please consider updating ungraded quizzes due date logic
+        # and verifying the differentiated assignments spec for ungraded quizzes in this file
+        assignment = create_assignment_with_override(override: true, due_at: 2.days.from_now)
+        ad_hoc = create_adhoc_override_for_assignment(assignment, @student)
+        ad_hoc.due_at = nil
+        ad_hoc.due_at_overridden = true
+        ad_hoc.save!
+        DueDateCacher.recompute(assignment)
+        assignments = @student.assignments_for_student('submitting', {due_after: 4.weeks.ago, due_before: 4.weeks.from_now})
+        expect(assignments).not_to include(assignment)
       end
     end
 
@@ -229,6 +284,8 @@ describe UserLearningObjectScopes do
         @c2 = @e2.course
         @q2 = assignment_quiz([], :course => @c2, :user => @user)
         @e2.conclude
+        DueDateCacher.recompute(@q1.assignment)
+        DueDateCacher.recompute(@q2.assignment)
       end
 
       it "should not include assignments from concluded enrollments by default" do
@@ -237,6 +294,7 @@ describe UserLearningObjectScopes do
 
       it "should include assignments from concluded enrollments if requested" do
         assignments = @u.assignments_for_student('submitting', include_concluded: true)
+
         expect(assignments.count).to eq 2
         expect(assignments.map(&:id).sort).to eq [@q1.assignment.id, @q2.assignment.id].sort
       end
@@ -249,6 +307,7 @@ describe UserLearningObjectScopes do
         @quiz.lock_at = nil
         @quiz.due_at = 3.days.from_now
         @quiz.save!
+        DueDateCacher.recompute(@quiz.assignment)
         Timecop.travel(2.days) do
           EnrollmentState.recalculate_expired_states # runs periodically in background
           expect(@student.assignments_for_student('submitting', contexts: [@course]).count).to eq 0
@@ -267,6 +326,8 @@ describe UserLearningObjectScopes do
         @c2 = course_with_student(:active_all => true, :user => @u).course
         @u.favorites.where(:context_type => "Course", :context_id => @c2).first.destroy
         @q2 = assignment_quiz([], :course => @c2, :user => @user)
+        DueDateCacher.recompute(@q1.assignment)
+        DueDateCacher.recompute(@q2.assignment)
       end
 
       it "should include assignments from all courses by default" do
@@ -285,7 +346,8 @@ describe UserLearningObjectScopes do
 
       it "includes assignments from other shards" do
         student = @shard1.activate { user_factory }
-        assignment = create_assignment_with_override(student: student, override: true)
+        assignment = create_assignment_with_override(student: student, override: true, due_at: 2.days.from_now)
+        DueDateCacher.recompute(assignment)
         expect(student.assignments_needing_submitting).to eq [assignment]
       end
     end
@@ -297,6 +359,7 @@ describe UserLearningObjectScopes do
       @quiz.lock_at = nil
       @quiz.due_at = 2.days.from_now
       @quiz.save!
+      DueDateCacher.recompute(@quiz.assignment)
       assignments = @student.assignments_for_student('submitting', contexts: [@course])
       expect(assignments[0]).to have_attribute :only_visible_to_overrides
     end
@@ -309,17 +372,20 @@ describe UserLearningObjectScopes do
 
     it "excludes assignments with due dates in the past" do
       past_assignment = @course.assignments.create! title: 'blah!', due_at: 1.day.ago, submission_types: 'not_graded'
+      DueDateCacher.recompute(past_assignment)
       expect(@student.assignments_needing_submitting).not_to include past_assignment
     end
 
     it "excludes assignments that aren't expecting a submission" do
       assignment = @course.assignments.create! title: 'no submission', due_at: 1.day.from_now, submission_types: 'none'
+      DueDateCacher.recompute(assignment)
       expect(@student.assignments_needing_submitting).not_to include assignment
     end
 
     it "excludes assignments that have an existing submission" do
       assignment = @course.assignments.create! title: 'submitted', due_at: 1.day.from_now, submission_types: 'online_url'
       submission_model(assignment: assignment, user: @student, submission_type: 'online_url', url: 'www.hi.com')
+      DueDateCacher.recompute(assignment)
       expect(@student.assignments_needing_submitting).not_to include assignment
     end
   end
@@ -331,6 +397,7 @@ describe UserLearningObjectScopes do
 
     it "excludes assignments that don't have a submission" do
       assignment = @course.assignments.create! title: 'submitted', due_at: 1.day.from_now, submission_types: 'online_url'
+      DueDateCacher.recompute(assignment)
       expect(@student.submitted_assignments).not_to include assignment
     end
   end
@@ -382,8 +449,60 @@ describe UserLearningObjectScopes do
       expect(@student.ungraded_quizzes(needing_submitting: true)).not_to include @quiz
     end
 
-    it "filters by due date" do
-      expect(@student.ungraded_quizzes(due_after: 2.days.from_now, needing_submitting: true)).not_to include @quiz
+    context "differentiated_assignments" do
+
+      def create_ungraded_quiz_with_override(opts={})
+        student = opts[:student] || @student
+        @course.enrollments.where(user_id: student).destroy_all # student removed from default section
+        section = @course.course_sections.create!
+        student_in_section(section, user: student)
+        @quiz = @course.quizzes.create!(quiz_type: 'practice_quiz', title: 'practice quiz')
+        @quiz.due_at = 1.day.from_now
+        @quiz.only_visible_to_overrides = true
+        @quiz.publish!
+        if opts[:override]
+          create_section_override_for_assignment(@quiz, {course_section: section})
+        end
+        @quiz
+      end
+
+      it "filters by due date" do
+        expect(@student.ungraded_quizzes(due_after: 2.days.from_now, needing_submitting: true)).not_to include @quiz
+      end
+
+      it "should return ungraded quizzes with due dates in the 'due_after' 'due_before' window for the student" do
+        quiz = create_ungraded_quiz_with_override(override: true)
+        ad_hoc = create_adhoc_override_for_assignment(quiz, @student)
+        ad_hoc.due_at = 2.weeks.from_now
+        ad_hoc.due_at_overridden = true
+        ad_hoc.save!
+        quizzes1 = @student.ungraded_quizzes({due_after: 1.week.from_now, due_before: 3.weeks.from_now})
+        quizzes2 = @student.ungraded_quizzes({due_after: Time.zone.now, due_before: 1.week.from_now})
+        expect(quizzes1).to include(quiz)
+        expect(quizzes2).not_to include(quiz)
+      end
+
+      it "should return ungraded quizzes with overrides where the due date is not overridden for the student" do
+        quiz = create_ungraded_quiz_with_override(override: true)
+        ad_hoc = create_adhoc_override_for_assignment(quiz, @student)
+        ad_hoc.lock_at = 2.weeks.from_now
+        ad_hoc.lock_at_overridden = true
+        ad_hoc.save!
+        quizzes1 = @student.ungraded_quizzes({due_after: 1.week.from_now, due_before: 3.weeks.from_now})
+        quizzes2 = @student.ungraded_quizzes({due_after: Time.zone.now, due_before: 1.week.from_now})
+        expect(quizzes1).not_to include(quiz)
+        expect(quizzes2).to include(quiz)
+      end
+
+      it "should not return ungraded quizzes where an applicable due date is nil" do
+        quiz = create_ungraded_quiz_with_override(override: true)
+        ad_hoc = create_adhoc_override_for_assignment(quiz, @student)
+        ad_hoc.due_at = nil
+        ad_hoc.due_at_overridden = true
+        ad_hoc.save!
+        quizzes = @student.ungraded_quizzes({due_after: 4.weeks.ago, due_before: 4.weeks.from_now})
+        expect(quizzes).not_to include(quiz)
+      end
     end
 
     context "sharding" do

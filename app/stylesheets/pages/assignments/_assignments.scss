@@ -18,7 +18,7 @@
 
 .lock_date {
   color: #444;
-  padding-left: 20px;
+  padding-#{direction(left)}: 20px;
   font-weight: bold;
 }
 
@@ -73,7 +73,7 @@
     width: 95%;
   }
   .js-exclude-small-matches-options {
-    margin-left: 21px;
+    margin-#{direction(left)}: 21px;
     input[type="radio"] {
       margin-top: 13px;
     }
@@ -110,8 +110,8 @@
   }
   .assignment-buttons {
     @include breakpoint(desktop) {
-      padding-left: $ic-sp * 1.5;
-      text-align: right;
+      padding-#{direction(left)}: $ic-sp * 1.5;
+      text-align: direction(right);
       .Button,
       .btn,
       .ui-button {
@@ -136,10 +136,10 @@
     }
     .title {
       font-weight: bold;
-      padding-right: 0.5em;
+      padding-#{direction(right)}: 0.5em;
     }
     .value {
-      padding-right: 2.5em;
+      padding-#{direction(right)}: 2.5em;
     }
   }
   .form-horizontal.display-only .control-group {
@@ -151,7 +151,6 @@
   .description.teacher-version {
     padding: 15px;
     overflow-y: auto;
-    height: 200px;
     border: 1px solid #AAA;
     border-radius: 4px;
     resize: vertical;
@@ -202,7 +201,7 @@
       margin-top: 2px;
     }
     .content {
-      padding-left: 5px;
+      padding-#{direction(left)}: 5px;
       h4 {
         @include fontSize(11px);
         font-weight: bold;
@@ -223,11 +222,11 @@
         max-height: 300px;
         overflow: auto;
         .comment {
-          margin-left: 10px;
+          margin-#{direction(left)}: 10px;
           .signature {
             color: #888888;
             font-size: 0.8em;
-            text-align: right;
+            text-align: direction(right);
           }
         }
       }

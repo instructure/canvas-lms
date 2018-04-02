@@ -43,14 +43,6 @@ module SIS
         @sis.logger || Rails.logger
       end
 
-      def add_error(csv, message)
-        @sis.add_error(csv, message, failure: true)
-      end
-
-      def add_warning(csv, message)
-        @sis.add_warning(csv, message)
-      end
-
       def update_progress
         @sis.update_progress unless @sis.use_parallel_imports?
       end
@@ -59,14 +51,21 @@ module SIS
       # passed. It will return if the current row is bigger than the index+count
       def csv_rows(csv, index=nil, count=nil)
         # csv foreach does not track the line number, and we want increase the
-        # counter first thing beacuse we skip if the line number is out of the
+        # counter first thing because we skip if the line number is out of the
         # range. We have to start at -1 to have a 0 index work.
         lineno = -1
         ::CSV.foreach(csv[:fullpath], PARSE_ARGS) do |row|
           lineno += 1
           next if index && lineno < index
-          return if index && lineno >= index + count
+          break if index && lineno >= index + count
           next if row.to_hash.values.all?(&:nil?)
+          # this does not really need index to be present, but we only trust the
+          # lineno on the refactored importer for parallel imports.
+          #
+          # we have to add two because we need to account for the header row and
+          # our sis_errors are documented as a one based index including the
+          # header row.
+          row['lineno'] = index ? lineno + 2 : nil
           yield row
         end
       end

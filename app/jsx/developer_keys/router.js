@@ -34,7 +34,13 @@ function renderShowDeveloperKeys (ctx) {
   const view = () => {
     const state = store.getState();
     ReactDOM.render(
-      <DeveloperKeysApp applicationState={state} actions={actions} store={store} env={ENV} />,
+      <DeveloperKeysApp
+        applicationState={state}
+        actions={actions}
+        store={store}
+        env={ENV}
+        ctx={ctx}
+      />,
       document.getElementById('reactContent'));
   };
   // returns A function that unsubscribes the change listener.

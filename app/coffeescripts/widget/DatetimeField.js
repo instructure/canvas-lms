@@ -20,6 +20,8 @@ import $ from 'jquery'
 import {debounce} from 'underscore'
 import tz from 'timezone'
 import datePickerFormat from 'jsx/shared/helpers/datePickerFormat'
+import {isRTL} from 'jsx/shared/helpers/rtlHelper'
+
 import moment from 'moment'
 import 'jquery.instructure_date_and_time'
 import '../jquery.rails_flash_notifications'
@@ -316,6 +318,7 @@ export default class DatetimeField {
       disableButton: false,
 
       // localization values understood by $.datepicker
+      isRTL: isRTL(),
       prevText: I18n.t('prevText', 'Prev'), // title text for previous month icon
       nextText: I18n.t('nextText', 'Next'), // title text for next month icon
       monthNames: I18n.lookup('date.month_names').slice(1), // names of months

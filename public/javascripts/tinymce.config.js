@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {getDirection} from 'jsx/shared/helpers/rtlHelper'
+
 export default class EditorConfig {
   /**
    * Create an editor config instance, with some internal state passed in
@@ -65,7 +67,8 @@ export default class EditorConfig {
       toolbar: this.toolbar(),
       theme: 'modern',
       skin: false,
-      plugins: 'autolink,media,paste,table,textcolor,link,directionality,lists,a11y_checker',
+      directionality: getDirection(),
+      plugins: 'autolink,media,paste,table,textcolor,link,directionality,lists,a11y_checker,wordcount',
       external_plugins: {
         instructure_image: '/javascripts/tinymce_plugins/instructure_image/plugin.js',
         instructure_links: '/javascripts/tinymce_plugins/instructure_links/plugin.js',
@@ -80,6 +83,7 @@ export default class EditorConfig {
       // we add the menubar for a11y purposes but then
       // hide it with js for non screenreader users
       menubar: true,
+      branding: false,
       remove_script_host: true,
       resize: true,
       block_formats: 'Paragraph=p;Header 2=h2;Header 3=h3;Header 4=h4;Preformatted=pre',

@@ -34,13 +34,13 @@ ul.item_list {
       color: $ic-font-color--subdued;
       margin-top: -5px;
       margin-bottom: 0.5em;
-      margin-left: 5px;
+      margin-#{direction(left)}: 5px;
     }
   }
 }
 
 table.numbers_table {
-  margin-left: 20px;
+  margin-#{direction(left)}: 20px;
   margin-bottom: 20px;
   font-size: 1.2em;
   border-collapse: collapse;
@@ -48,12 +48,12 @@ table.numbers_table {
     padding-bottom: 2px;
     padding-top: 2px;
     border-bottom: 1px dotted #ccc;
-    padding-left: 5px;
+    padding-#{direction(left)}: 5px;
     font-size: 0.8em;
   }
   td {
-    padding-left: 20px;
-    padding-right: 5px;
+    padding-#{direction(left)}: 20px;
+    padding-#{direction(right)}: 5px;
     padding-bottom: 2px;
     padding-top: 2px;
     border-bottom: 1px dotted #ccc;
@@ -66,14 +66,14 @@ table.numbers_table {
   th {
     border-bottom: 1px dotted #ccc;
     padding: 2px 10px;
-    text-align: left;
+    text-align: direction(left);
   }
   td {
     border-bottom: 1px dotted #ccc;
     padding: 2px 10px;
   }
   td.indent {
-    padding-left: 25px;
+    padding-#{direction(left)}: 25px;
     font-size: 0.8em;
   }
   .small {

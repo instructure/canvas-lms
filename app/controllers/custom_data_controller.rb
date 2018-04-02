@@ -23,7 +23,6 @@ class CustomDataController < ApplicationController
   before_action :require_custom_data, :except => :set_data
 
   # @API Store custom data
-  # @beta
   # Store arbitrary user data as JSON.
   #
   # Arbitrary JSON data can be stored for a User.
@@ -222,7 +221,6 @@ class CustomDataController < ApplicationController
   end
 
   # @API Load custom data
-  # @beta
   # Load custom user data.
   #
   # Arbitrary JSON data can be stored for a User.  This API call
@@ -261,7 +259,6 @@ class CustomDataController < ApplicationController
   end
 
   # @API Delete custom data
-  # @beta
   # Delete custom user data.
   #
   # Arbitrary JSON data can be stored for a User.  This API call

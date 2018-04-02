@@ -4,6 +4,7 @@ ar:
   bigeasy_locale: ar_SA
   moment_locale: ar-sa
   dow_offset: 6
+  rtl: true
 da:
   locales:
     da: Dansk
@@ -40,6 +41,7 @@ fa:
   bigeasy_locale: fa_IR
   crowdsourced: true
   dow_offset: 6
+  rtl: true
 fr:
   locales:
     fr: Français
@@ -54,6 +56,7 @@ he:
   locales:
     he: עברית
   bigeasy_locale: he_IL
+  rtl: true
   crowdsourced: true
 ht:
   locales:

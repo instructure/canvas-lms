@@ -46,9 +46,34 @@ describe GradingStandard do
   end
 
   describe 'validations' do
-    it 'does not throw an error if `data` is not supplied' do
-      standard = GradingStandard.new()
-      expect { standard.valid? }.not_to raise_error
+    it { is_expected.to validate_presence_of(:context_type) }
+    it { is_expected.to validate_presence_of(:context_id) }
+    it { is_expected.to validate_presence_of(:data) }
+
+    describe 'grading standard data' do
+      let(:standard) { GradingStandard.new(context: @course) }
+
+      it 'does not throw an error if `data` is not supplied' do
+        expect { standard.valid? }.not_to raise_error
+      end
+
+      it 'is invalid when there is no bucket with a floor value of 0.0' do
+        standard.data = [['A', 0.9], ['B', 0.8], ['C', 0.7]]
+
+        expect(standard).not_to be_valid
+      end
+
+      it 'is valid when there is a bucket with a floor value of 0.0' do
+        standard.data = [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.0]]
+
+        expect(standard).to be_valid
+      end
+
+      it 'is valid even if the buckets are out of order' do
+        standard.data = [['B', 0.8], ['A', 0.9], ['D', 0.0], ['C', 0.7]]
+
+        expect(standard).to be_valid
+      end
     end
   end
 

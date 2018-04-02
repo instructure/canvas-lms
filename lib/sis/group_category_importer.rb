@@ -44,6 +44,8 @@ module SIS
         raise ImportError, "No name given for group category #{sis_id}" if category_name.blank?
         raise ImportError, "No status given for group category #{sis_id}" if status.blank?
         raise ImportError, "Improper status \"#{status}\" for group category #{sis_id}, skipping" unless status =~ /\A(active|deleted)/i
+        return if @batch.skip_deletes? && status =~ /deleted/i
+
         if course_id && account_id
           raise ImportError, "Only one context is allowed and both course_id and account_id where provided for group category #{sis_id}."
         end

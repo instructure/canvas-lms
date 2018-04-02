@@ -132,10 +132,11 @@ class OutcomeImport < ApplicationRecord
         else
           job_failed!
         end
-      rescue
-        add_error(1, I18n.t('An unexpected error has occurred'))
+      rescue => e
+        report = ErrorReport.log_exception('outcomes_import', e)
+        # no I18n on error report id
+        add_error(1, I18n.t('An unexpected error has occurred: see error report %{id}', id: report.id.to_s))
         job_failed!
-        raise
       ensure
         file.close
         notify_user

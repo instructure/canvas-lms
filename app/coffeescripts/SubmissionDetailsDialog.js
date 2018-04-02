@@ -23,7 +23,7 @@ export default class SubmissionDetailsDialog {
     this.student = student
     this.options = options
     const speedGraderUrl = this.options.speed_grader_enabled
-      ? `${this.options.context_url}/gradebook/speed_grader?assignment_id=${this.assignment.id}#%7B%22student_id%22%3A${this.student.id}%7D`
+      ? this.buildSpeedGraderUrl()
       : null
 
     this.url = this.options.change_grade_url.replace(':assignment', this.assignment.id).replace(':submission', this.student.id)
@@ -97,6 +97,14 @@ export default class SubmissionDetailsDialog {
     const url = `${this.url}&include[]=submission_history&include[]=submission_comments&include[]=rubric_assessment`
     const deferred = $.ajaxJSON(url, 'GET', {}, this.update)
     this.dialog.find('.submission_details_comments').disableWhileLoading(deferred)
+  }
+
+  buildSpeedGraderUrl = () => {
+    const assignmentParam = `assignment_id=${this.assignment.id}`
+    const speedGraderUrlParams = this.assignment.anonymous_grading
+      ? assignmentParam
+      : `${assignmentParam}#{"student_id":"${this.student.id}"}`
+    return encodeURI(`${this.options.context_url}/gradebook/speed_grader?${speedGraderUrlParams}`)
   }
 
   open = () => {

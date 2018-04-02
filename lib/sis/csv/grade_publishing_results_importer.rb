@@ -33,7 +33,7 @@ module SIS
             begin
               importer.add_grade_publishing_result(row['enrollment_id'], row['grade_publishing_status'], row['message'])
             rescue ImportError => e
-              add_warning(csv, "#{e}")
+              SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
             end
           end
         end

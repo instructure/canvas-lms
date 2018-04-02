@@ -48,16 +48,16 @@ $crumb_border_radius: 5px;
     padding: 0;
     list-style: none;
     position: relative;
-    float: left;
-    padding-right: 2px;
+    float: direction(left);
+    padding-#{direction(right)}: 2px;
     height: 40px;
-    margin-left: 11px;
-    padding-left: 20px;
-    padding-right: 10px;
+    margin-#{direction(left)}: 11px;
+    padding-#{direction(left)}: 20px;
+    padding-#{direction(right)}: 10px;
     &.first {
-      border-top-left-radius: $crumb_border_radius;
-      border-bottom-left-radius: $crumb_border_radius;
-      margin-left: 0;
+      border-top-#{direction(left)}-radius: $crumb_border_radius;
+      border-bottom-#{direction(left)}-radius: $crumb_border_radius;
+      margin-#{direction(left)}: 0;
     }
   }
   .chevron-outer,
@@ -71,8 +71,8 @@ $crumb_border_radius: 5px;
   .chevron-outer {
     border-bottom: 21px dotted transparent;
     border-top: 21px dotted transparent;
-    border-left: 14px solid #fff;
-    right: -14px;
+    border-#{direction(left)}: 14px solid #fff;
+    #{direction(right)}: -14px;
     top: auto;
     bottom: 50%;
     margin-bottom: -20px;
@@ -80,17 +80,17 @@ $crumb_border_radius: 5px;
   .chevron-inner {
     border-bottom: 18px dotted transparent;
     border-top: 18px dotted transparent;
-    border-left: 11px solid #fff;
-    right: auto;
-    left: -14px;
+    border-#{direction(left)}: 11px solid #fff;
+    #{direction(right)}: auto;
+    #{direction(left)}: -14px;
     bottom: -18px;
-    border-left-color: #f2f2f2;
+    border-#{direction(left)}-color: #f2f2f2;
   }
   .active {
     font-weight: bold;
     background-color: #E3E3E3;
     .chevron-inner {
-      border-left-color: #E3E3E3;
+      border-#{direction(left)}-color: #E3E3E3;
     }
   }
   .before-active {
@@ -102,7 +102,7 @@ $crumb_border_radius: 5px;
     }
   }
   #hide-scratch {
-    float: right;
-    margin-right: 1em;
+    float: direction(right);
+    margin-#{direction(right)}: 1em;
   }
 }

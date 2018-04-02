@@ -60,7 +60,7 @@
 
     .slick-cell {
       line-height: 25px;
-      padding-left: 5px;
+      padding-#{direction(left)}: 5px;
     }
   }
 

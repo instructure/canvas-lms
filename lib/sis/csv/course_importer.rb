@@ -31,29 +31,32 @@ module SIS
       # expected columns
       # course_id,short_name,long_name,account_id,term_id,status
       def process(csv, index=nil, count=nil)
-        course_ids = {}
         messages = []
-        count =  SIS::CourseImporter.new(@root_account, importer_opts).process(messages) do |importer|
+        count = SIS::CourseImporter.new(@root_account, importer_opts).process(messages) do |importer|
           update_progress
           csv_rows(csv, index, count) do |row|
             start_date = nil
             end_date = nil
             begin
-              start_date = DateTime.parse(row['start_date']) unless row['start_date'].blank?
-              end_date = DateTime.parse(row['end_date']) unless row['end_date'].blank?
+              start_date = DateTime.parse(row['start_date']) if row['start_date'].present?
+              end_date = DateTime.parse(row['end_date']) if row['end_date'].present?
             rescue
-              messages << "Bad date format for course #{row['course_id']}"
+              messages << SisBatch.build_error(csv, "Bad date format for course #{row['course_id']}", sis_batch: @batch, row: row['lineno'], row_info: row)
             end
-            course_format = row.has_key?('course_format') && (row['course_format'] || 'not_set')
+            course_format = row.key?('course_format') && (row['course_format'] || 'not_set')
             begin
               importer.add_course(row['course_id'], row['term_id'], row['account_id'], row['fallback_account_id'], row['status'], start_date, end_date,
-                row['abstract_course_id'], row['short_name'], row['long_name'], row['integration_id'], course_format, row['blueprint_course_id'])
+                                  row['abstract_course_id'], row['short_name'], row['long_name'], row['integration_id'], course_format, row['blueprint_course_id'])
             rescue ImportError => e
-              messages << "#{e}"
+              messages << SisBatch.build_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
             end
           end
         end
-        messages.each { |message| add_warning(csv, message) }
+        errors = []
+        messages.each do |message|
+          errors << ((message.is_a? SisBatchError) ? message : SisBatch.build_error(csv, message, sis_batch: @batch))
+        end
+        SisBatch.bulk_insert_sis_errors(errors)
         count
       end
     end

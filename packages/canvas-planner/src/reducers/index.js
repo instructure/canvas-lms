@@ -33,6 +33,10 @@ const timeZone = handleAction('INITIAL_OPTIONS', (state, action) => {
   return action.payload.timeZone;
 }, 'UTC');
 
+const currentUser = handleAction('INITIAL_OPTIONS', (state, action) => {
+  return action.payload.currentUser;
+}, {});
+
 const firstNewActivityDate = handleAction('FOUND_FIRST_NEW_ACTIVITY_DATE', (state, action) => {
   return action.payload.clone();
 }, null);
@@ -42,6 +46,7 @@ export default combineReducers({
   groups,
   locale,
   timeZone,
+  currentUser,
   days,
   loading,
   firstNewActivityDate,

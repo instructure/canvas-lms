@@ -37,7 +37,7 @@
 }
 
 .Collaboration-author {
-  margin-right: 10px;
+  margin-#{direction(right)}: 10px;
 }
 
 .Collaboration-actions {

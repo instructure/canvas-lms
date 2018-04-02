@@ -114,7 +114,7 @@ test('clicking announcement checkbox triggers setAnnouncementSelection with corr
   const selectSpy = sinon.spy()
   const props = {
     announcements: sampleData.announcements,
-    setAnnouncementSelection: selectSpy,
+    announcementSelectionChangeStart: selectSpy,
     hasLoadedAnnouncements: true,
     permissions: {
       moderate: true,

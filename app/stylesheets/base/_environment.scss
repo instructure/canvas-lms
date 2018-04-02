@@ -25,6 +25,10 @@
 
 // Mixins
 //==================
+
+// provides RTL support: see https://www.npmjs.com/package/sass-direction for docs
+@import "../../../node_modules/sass-direction/_direction.scss";
+
 @import "base/ic_mixins";
 @import "base/mixins/compile_mixins";
 @import "base/mixins/typography";

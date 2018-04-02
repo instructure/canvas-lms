@@ -60,18 +60,6 @@ describe "announcements" do
       stub_rcs_config
     end
 
-    it "should allow a group member to create an announcement", priority: "1", test_id: 220378 do
-      gc = group_category
-      group = gc.groups.create!(:context => @course)
-      group.add_user(@student, 'accepted')
-
-      get "/groups/#{group.id}/announcements"
-      expect {
-        create_announcement_option(nil)
-        expect_new_page_load { submit_form('.form-actions') }
-      }.to change(Announcement, :count).by 1
-    end
-
     it "allows rating when enabled", priority: "1", test_id: 603587 do
       announcement = @course.announcements.create!(title: 'stuff', message: 'things', allow_rating: true)
       announcement.discussion_entries.create!(message: 'reply')

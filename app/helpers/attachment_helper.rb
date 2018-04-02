@@ -100,8 +100,8 @@ module AttachmentHelper
     # too can still take advantage of browser caching.
     unless attachment.instfs_hosted? || attachment.content_type.match(/\Atext/) || attachment.extension == '.html' || attachment.extension == '.htm'
       cancel_cache_buster
-      #set cache to expire whenever the s3 url does (or one day if local or inline proxy), max-age take seconds, and Expires takes a date
-      ttl = attachment.stored_locally? || (inline && attachment.can_be_proxied?) ? attachment.url_ttl : 1.day
+      # set cache to expire whenever the s3 url does (or one day if local or inline proxy), max-age take seconds, and Expires takes a date
+      ttl = attachment.stored_locally? || (inline && attachment.can_be_proxied?) ? 1.day : attachment.url_ttl
       response.headers["Cache-Control"] = "private, max-age=#{ttl.seconds.to_s}"
       response.headers["Expires"] = ttl.from_now.httpdate
     end

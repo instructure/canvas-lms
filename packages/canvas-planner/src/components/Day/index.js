@@ -22,6 +22,7 @@ import Heading from '@instructure/ui-core/lib/components/Heading';
 import Text from '@instructure/ui-core/lib/components/Text';
 import Container from '@instructure/ui-core/lib/components/Container';
 import { shape, string, number, arrayOf, func, bool } from 'prop-types';
+import { userShape, itemShape } from '../plannerPropTypes';
 import styles from './styles.css';
 import theme from './theme.js';
 import { getFriendlyDate, getFullDate, isToday } from '../../utilities/dateUtils';
@@ -33,11 +34,7 @@ import { animatable } from '../../dynamic-ui';
 export class Day extends Component {
   static propTypes = {
     day: string.isRequired,
-    itemsForDay: arrayOf(shape({
-      context: shape({
-        inform_students_of_overdue_submissions: bool
-      })
-    })),
+    itemsForDay: arrayOf(shape(itemShape)),
     animatableIndex: number,
     timeZone: string.isRequired,
     toggleCompletion: func,
@@ -45,7 +42,8 @@ export class Day extends Component {
     alwaysRender: bool,
     registerAnimatable: func,
     deregisterAnimatable: func,
-  }
+    currentUser: shape(userShape),
+  };
 
   constructor (props) {
     super(props);
@@ -140,6 +138,7 @@ export class Day extends Component {
                       titleColor: courseInfo.color || null
                     }}
                     toggleCompletion={this.props.toggleCompletion}
+                    currentUser={this.props.currentUser}
                   />
                 );
               })

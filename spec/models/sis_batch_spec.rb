@@ -486,6 +486,44 @@ s2,test_1,section2,active},
       expect(@course.reload).to be_deleted
     end
 
+    it "should skip deletes if skip_deletes is set" do
+      process_csv_data(
+        [
+          %{user_id,login_id,status
+          user_1,user_1,active},
+          %{course_id,short_name,long_name,term_id,status
+          course_1,course_1,course_1,term_1,active},
+          %{section_id,course_id,name,status
+          section_1,course_1,section_1,active},
+          %{section_id,user_id,role,status
+          section_1,user_1,student,active}
+        ])
+      batch = create_csv_data(
+        [
+          %{user_id,login_id,status
+          user_1,user_1,deleted},
+          %{course_id,short_name,long_name,term_id,status
+          course_1,course_1,course_1,term_1,deleted},
+          %{section_id,course_id,name,status
+          section_1,course_1,section_1,deleted},
+          %{section_id,user_id,role,status
+          section_1,user_1,student,deleted}
+        ]) do |batch|
+        batch.options = {}
+        batch.batch_mode = true
+        batch.options[:skip_deletes] = true
+        batch.save!
+        batch.process_without_send_later
+        run_jobs
+      end
+      expect(batch.reload.workflow_state).to eq 'imported'
+      p = Pseudonym.where(sis_user_id: 'user_1').take
+      expect(p.workflow_state).to eq 'active'
+      expect(Course.where(sis_source_id: 'course_1').take.workflow_state).to eq 'claimed'
+      expect(CourseSection.where(sis_source_id: 'section_1').take.workflow_state).to eq 'active'
+      expect(Enrollment.where(user: p.user).take.workflow_state).to eq 'active'
+    end
+
     it "should treat crosslisted sections as belonging to their original course" do
       @term1 = @account.enrollment_terms.first
       @term2 = @account.enrollment_terms.create!(:name => 'term2')
@@ -756,6 +794,27 @@ test_1,u1,student,active}
         expect(@e1.reload).to be_active
         expect(@e2.reload).to be_active
         expect(batch.sis_batch_errors.first.message).to eq "1 enrollments would be deleted and exceeds the set threshold of 20%"
+      end
+
+      it 'should not delete batch mode if skip_deletes is set' do
+        batch = create_csv_data(
+          [
+            %{course_id,short_name,long_name,account_id,term_id,status
+test_1,TC 101,Test Course 101,,term1,active},
+            %{course_id,user_id,role,status,section_id
+test_1,u1,student,active}
+          ]) do |batch|
+          batch.options = {}
+          batch.batch_mode = true
+          batch.options[:skip_deletes] = true
+          batch.save!
+          batch.process_without_send_later
+          run_jobs
+        end
+
+        expect(batch.workflow_state).to eq 'imported'
+        expect(@e1.reload).to be_active
+        expect(@e2.reload).to be_active
       end
 
       it 'should delete batch mode below threshold' do

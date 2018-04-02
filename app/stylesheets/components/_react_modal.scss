@@ -182,7 +182,7 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
       * { margin: 0; }
     }
 
-    .ReactModal__Header-Actions { text-align: right; }
+    .ReactModal__Header-Actions { text-align: direction(right); }
 
     .ReactModal__Body {
       padding: $ic-sp;
@@ -228,8 +228,8 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
         justify-content: flex-end;
       }
       .Button, .btn {
-        margin-left: $ic-sp/3;
-        &:first-of-type { margin-left: 0; }
+        margin-#{direction(left)}: $ic-sp/3;
+        &:first-of-type { margin-#{direction(left)}: 0; }
       }
     }
 

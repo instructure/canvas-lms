@@ -18,11 +18,12 @@
 
 import classNames from 'classnames'
 import $ from 'jquery'
+import 'jquery.instructure_date_and_time'
 import 'jqueryui/dialog'
 import I18n from 'i18n!react_developer_keys'
 import React from 'react'
 import PropTypes from 'prop-types'
-import buildForm from './lib/buildForm'
+import DeveloperKeyStateControl from './DeveloperKeyStateControl'
 
 
 class DeveloperKey extends React.Component {
@@ -33,6 +34,8 @@ class DeveloperKey extends React.Component {
     this.editLinkHandler = this.editLinkHandler.bind(this);
     this.deleteLinkHandler = this.deleteLinkHandler.bind(this);
     this.focusDeleteLink = this.focusDeleteLink.bind(this);
+    this.makeVisibleLinkHandler = this.makeVisibleLinkHandler.bind(this);
+    this.makeInvisibleLinkHandler = this.makeInvisibleLinkHandler.bind(this);
   }
 
   activateLinkHandler (event)
@@ -55,6 +58,26 @@ class DeveloperKey extends React.Component {
     )
   }
 
+  makeVisibleLinkHandler (event)
+  {
+    event.preventDefault()
+    this.props.store.dispatch(
+      this.props.actions.makeVisibleDeveloperKey(
+        this.props.developerKey
+      )
+    )
+  }
+
+  makeInvisibleLinkHandler (event)
+  {
+    event.preventDefault()
+    this.props.store.dispatch(
+      this.props.actions.makeInvisibleDeveloperKey(
+        this.props.developerKey
+      )
+    )
+  }
+
   deleteLinkHandler (event)
   {
     event.preventDefault()
@@ -71,12 +94,14 @@ class DeveloperKey extends React.Component {
   editLinkHandler (event)
   {
     event.preventDefault()
-    const form = buildForm(this.props.developerKey)
-
-    $('#edit_dialog')
-      .empty()
-      .append(form)
-      .dialog('open')
+    this.props.store.dispatch(
+      this.props.actions.setEditingDeveloperKey(
+        this.props.developerKey
+      )
+    )
+    this.props.store.dispatch(
+      this.props.actions.developerKeysModalOpen()
+    )
   }
 
   developerName (developerKey) {
@@ -91,62 +116,85 @@ class DeveloperKey extends React.Component {
     return developerKey.workflow_state !== "inactive"
   }
 
-  inactive (developerKey) {
-    return this.isActive(developerKey) ? null : (<div><i>{I18n.t("inactive")}</i></div>)
-  }
-
   focusDeleteLink() {
     this.deleteLink.focus();
   }
 
+  getLinkHelper(options) {
+    const iconClassName = `icon-${options.iconType} standalone-icon`
+    return (
+      <a href="#"
+        role={options.role}
+        aria-checked={options.ariaChecked} aria-label={options.ariaLabel}
+        className={options.className} title={options.title}
+        ref={options.refLink}
+        onClick={options.onClick}>
+          <i className={iconClassName} />
+      </a>)
+  }
+
+  getEditLink(developerName) {
+    return this.getLinkHelper({
+      ariaChecked: null,
+      ariaLabel: I18n.t("Edit key %{developerName}", {developerName}),
+      className: "edit_link",
+      title: I18n.t("Edit this key"),
+      onClick: this.editLinkHandler,
+      iconType: "edit"
+    })
+  }
+
+  refDeleteLink = (link) => { this.deleteLink = link; }
+
+  getDeleteLink(developerName) {
+    return this.getLinkHelper({
+      ariaChecked: null,
+      ariaLabel: I18n.t("Delete key %{developerName}", {developerName}),
+      className: "delete_link",
+      title: I18n.t("Delete this key"),
+      onClick: this.deleteLinkHandler,
+      iconType: "trash",
+      refLink: this.refDeleteLink
+    })
+  }
+
+  getMakeVisibleLink() {
+    const label = I18n.t("Make key visible")
+    return this.getLinkHelper({
+      role: "checkbox",
+      ariaChecked: false,
+      ariaLabel: label,
+      className: "deactivate_link",
+      title: label,
+      onClick: this.makeVisibleLinkHandler,
+      iconType: "off",
+    })
+  }
+
+  getMakeInvisibleLink() {
+    const label = I18n.t("Make key invisible")
+    return this.getLinkHelper({
+      role: "checkbox",
+      ariaChecked: true,
+      ariaLabel: label,
+      className: "deactivate_link",
+      title: label,
+      onClick: this.makeInvisibleLinkHandler,
+      iconType: "eye",
+    })
+  }
+
   links (developerKey) {
     const developerNameCached = this.developerName(developerKey)
-
-    const localizedActivateLabel = I18n.t("Activate key %{developerName}", {developerName: developerNameCached})
-
-    const activateLink = (
-      <a href="#" role="checkbox"
-        aria-checked="false" aria-label={localizedActivateLabel}
-        className="deactivate_link" title={I18n.t("Activate this key")}
-        onClick={this.activateLinkHandler}>
-          <i className="icon-unlock standalone-icon" />
-      </a>)
-
-    const localizedDeactivateLabel = I18n.t("Deactivate key %{developerName}", {developerName: developerNameCached})
-
-    const deactivateLink = (
-      <a href="#" role="checkbox"
-        aria-checked="true" aria-label={localizedDeactivateLabel}
-        className="deactivate_link" title={I18n.t("Deactivate this key")}
-        onClick={this.deactivateLinkHandler}>
-          <i className="icon-lock standalone-icon" />
-      </a>)
-
-    const localizedEditLabel = I18n.t("Edit key %{developerName}", {developerName: developerNameCached})
-
-    const editLink = (
-      <a href="#" className="edit_link"
-        aria-label={localizedEditLabel}
-        title={I18n.t("Edit this key")}
-        onClick={this.editLinkHandler}>
-          <i className="icon-edit standalone-icon" />
-      </a>)
-
-    const localizedDeleteLabel = I18n.t("Delete key %{developerName}", {developerName: developerNameCached})
-
-    const deleteLink = (
-      <a href="#" className="delete_link"
-        aria-label={localizedDeleteLabel}
-        title={I18n.t("Delete this key")}
-        ref={(link) => { this.deleteLink = link; }}
-        onClick={this.deleteLinkHandler}>
-          <i className="icon-trash standalone-icon" />
-      </a>)
+    const editLink = this.getEditLink(developerNameCached)
+    const deleteLink = this.getDeleteLink(developerNameCached)
+    const makeVisibleLink = this.getMakeVisibleLink()
+    const makeInvisibleLink = this.getMakeInvisibleLink()
 
     return (
       <div>
         {editLink}
-        {this.isActive(developerKey) ? deactivateLink : activateLink}
+        {developerKey.visible ? makeInvisibleLink : makeVisibleLink}
         {deleteLink}
       </div>
     )
@@ -185,11 +233,6 @@ class DeveloperKey extends React.Component {
     return `${lastUsed} ${lastUsedDate}`
   }
 
-  notes (developerKey) {
-    if (!developerKey.notes) { return null }
-    return (<div>{developerKey.notes}</div>)
-  }
-
   render () {
     const { developerKey } = this.props;
 
@@ -198,7 +241,6 @@ class DeveloperKey extends React.Component {
         <td className="name">
           {this.makeImage(developerKey)}
           {this.developerName(developerKey)}
-          {this.inactive(developerKey)}
         </td>
 
         <td>
@@ -235,11 +277,14 @@ class DeveloperKey extends React.Component {
             {this.lastUsed(developerKey)}
           </div>
         </td>
-
-        <td className="notes">
-          {this.notes(developerKey)}
+        <td>
+          <DeveloperKeyStateControl
+            developerKey={developerKey}
+            store={this.props.store}
+            actions={this.props.actions}
+            ctx={this.props.ctx}
+          />
         </td>
-
         <td className="icon_react">
           {this.links(developerKey)}
         </td>
@@ -253,14 +298,23 @@ DeveloperKey.propTypes = {
     dispatch: PropTypes.func.isRequired,
   }).isRequired,
   actions: PropTypes.shape({
+    makeVisibleDeveloperKey: PropTypes.func.isRequired,
+    makeInvisibleDeveloperKey: PropTypes.func.isRequired,
     activateDeveloperKey: PropTypes.func.isRequired,
     deactivateDeveloperKey: PropTypes.func.isRequired,
     deleteDeveloperKey: PropTypes.func.isRequired,
+    setEditingDeveloperKey: PropTypes.func.isRequired,
+    developerKeysModalOpen: PropTypes.func.isRequired
   }).isRequired,
   developerKey: PropTypes.shape({
     id: PropTypes.string.isRequired,
     api_key: PropTypes.string.isRequired,
     created_at: PropTypes.string.isRequired
+  }).isRequired,
+  ctx: PropTypes.shape({
+    params: PropTypes.shape({
+      contextId: PropTypes.string.isRequired
+    })
   }).isRequired
 };
 

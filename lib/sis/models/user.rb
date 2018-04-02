@@ -20,14 +20,14 @@ module SIS
     class User
       attr_accessor :user_id, :login_id, :status, :first_name, :last_name,
                     :email, :password, :ssha_password, :integration_id,
-                    :short_name, :full_name, :sortable_name,
+                    :short_name, :full_name, :sortable_name, :lineno, :csv,
                     :authentication_provider_id, :sis_batch_id
 
       def initialize(user_id:, login_id:, status:, first_name: nil, last_name: nil,
                      email: nil, password: nil, ssha_password: nil,
                      integration_id: nil, short_name: nil, full_name: nil,
                      sortable_name: nil, authentication_provider_id: nil,
-                     sis_batch_id: nil)
+                     sis_batch_id: nil, lineno: nil, csv: nil)
         self.user_id = user_id
         self.login_id = login_id
         self.status = status
@@ -41,6 +41,8 @@ module SIS
         self.full_name = full_name
         self.sortable_name = sortable_name
         self.authentication_provider_id = authentication_provider_id
+        self.lineno = lineno
+        self.csv = csv
         self.sis_batch_id = sis_batch_id
       end
 

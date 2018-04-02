@@ -95,10 +95,10 @@ class Pseudonym < ActiveRecord::Base
 
   def update_account_associations_if_account_changed
     return unless self.user && !User.skip_updating_account_associations?
-    if self.id_was.nil?
+    if self.id_before_last_save.nil?
       return if %w{creation_pending deleted}.include?(self.user.workflow_state)
       self.user.update_account_associations(:incremental => true, :precalculated_associations => {self.account_id => 0})
-    elsif self.account_id_changed?
+    elsif self.saved_change_to_account_id?
       self.user.update_account_associations_later
     end
   end
@@ -131,23 +131,19 @@ class Pseudonym < ActiveRecord::Base
     @send_confirmation = false
   end
 
-  scope :by_unique_id, lambda { |unique_id|
-    where("#{to_lower_column(:unique_id)}=#{to_lower_column('?')}", unique_id.to_s)
-  }
-
-  def self.to_lower_column(column)
-    "LOWER(#{column})"
-  end
+  scope :by_unique_id, lambda {|unique_id| where("LOWER(unique_id)=LOWER(?)", unique_id.to_s)}
 
   def self.custom_find_by_unique_id(unique_id)
     return unless unique_id
     active.by_unique_id(unique_id).where("authentication_provider_id IS NULL OR EXISTS (?)",
-      AccountAuthorizationConfig.active.where(auth_type: ['canvas', 'ldap']).where("authentication_provider_id=account_authorization_configs.id")).first
+      AccountAuthorizationConfig.active.where(auth_type: ['canvas', 'ldap']).
+        where("authentication_provider_id=account_authorization_configs.id")).first
   end
 
   def self.for_auth_configuration(unique_id, aac)
     auth_id = aac.try(:auth_provider_filter)
-    active.by_unique_id(unique_id).where(authentication_provider_id: auth_id).first
+    active.by_unique_id(unique_id).where(authentication_provider_id: auth_id).
+      order("authentication_provider_id NULLS LAST").take
   end
 
   def set_password_changed
@@ -223,8 +219,8 @@ class Pseudonym < ActiveRecord::Base
     unless self.deleted?
       self.shard.activate do
         existing_pseudo = Pseudonym.active.by_unique_id(self.unique_id).where(:account_id => self.account_id,
-          :authentication_provider_id => self.authentication_provider_id).first
-        if existing_pseudo && existing_pseudo.id != self.id
+          :authentication_provider_id => self.authentication_provider_id).where.not(id: self).exists?
+        if existing_pseudo
           self.errors.add(:unique_id, :taken,
             message: t("ID already in use for this account and authentication provider"))
           throw :abort

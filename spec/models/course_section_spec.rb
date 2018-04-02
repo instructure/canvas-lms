@@ -374,7 +374,6 @@ describe CourseSection, "moving to new course" do
       course = course_factory({ :course_name => "Course 1", :active_all => true })
       section = course.course_sections.create!
       course.save!
-      course.root_account.enable_feature!(:section_specific_announcements)
       announcement1 = Announcement.create!(
         :title => "some topic",
         :message => "I announce that i am lying",

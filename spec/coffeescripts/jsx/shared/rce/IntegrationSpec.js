@@ -36,7 +36,14 @@ QUnit.module('Rce Abstraction - integration', {
       props: {},
       renderIntoDiv: (renderingTarget, propsForRCE, renderCallback) => {
         $(renderingTarget).append(`<div id='fake-editor'>${propsForRCE.toString()}</div>`)
-        return renderCallback()
+        const fakeEditor = {
+          mceInstance () {
+            return {
+              on () { }
+            }
+          }
+        }
+        return renderCallback(fakeEditor)
       }
     }
     return this.stub(RCELoader, 'loadRCE').callsFake(callback => callback(this.fakeRceModule))

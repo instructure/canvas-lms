@@ -168,7 +168,7 @@
                 <%= form_for @quiz, as: :quiz, method: :put, :url => context_url(@context, :context_quiz_url, @quiz.id), :html => { :id => 'quiz_unlock_form' } do |f| %>
                   <%= hidden_field_tag 'quiz[locked]', false %>
                   <div id="unlock_for_how_long_dialog" title="<%= t('titles.unlock_for_how_long', "How long would you like to unlock the quiz for?") %>" style="display:none;">
-                    <label style="float: left;" for="no_time_limit">
+                    <label class="pull-left" for="no_time_limit">
                       <%= f.radio_button('do_lock_at', false, :checked => true) %>
                       <%= f.label('do_lock_at_false', :no_time_limit, :en => 'No time limit') %>
                     </label>

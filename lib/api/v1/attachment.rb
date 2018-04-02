@@ -254,18 +254,18 @@ module Api::V1::Attachment
 
       on_duplicate = infer_on_duplicate(params)
       if params[:url]
-        @attachment.send_later_enqueue_args(:clone_url,
-          {
-            priority: Delayed::LOW_PRIORITY,
-            max_attempts: 1,
-            n_strand: 'file_download'
-          },
-          params[:url], on_duplicate, opts[:check_quota])
-        json = {
-          id: @attachment.id,
-          upload_status: 'pending',
-          status_url: api_v1_file_status_url(@attachment, @attachment.uuid)
-        }
+        progress = ::Progress.new(context: @current_user, tag: :upload_via_url)
+        progress.reset!
+        progress.process_job(
+          @attachment,
+          :clone_url,
+          { n_strand: 'file_download', preserve_method_args: true },
+          params[:url],
+          on_duplicate,
+          opts[:check_quota],
+          { progress: progress }
+        )
+        json = { progress: progress_json(progress, @current_user, session) }
       else
         on_duplicate = nil if on_duplicate == 'overwrite'
         quota_exemption = @attachment.quota_exemption_key if !opts[:check_quota]

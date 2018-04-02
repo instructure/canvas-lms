@@ -25,7 +25,8 @@ export default function generator ({ borders, colors, media, spacing, typography
 
     groupColor: colors.brand,
 
-    borderTopWidthTabletUp: borders.widthSmall,
+    borderTopWidth: borders.widthSmall,
+    borderTopWidthTablet: borders.widthMedium,
 
     heroMinHeight: '7rem',
     heroWidth: '12rem',
@@ -37,6 +38,7 @@ export default function generator ({ borders, colors, media, spacing, typography
     overlayOpacity: 0.75,
 
     titleFontSize: typography.fontSizeXSmall,
+    titleFontSizeTablet: '0.875rem',
     titleFontWeight: typography.fontWeightBold,
     titleLetterSpacing: '0.0625rem',
     titleBackground: colors.white,
@@ -46,10 +48,6 @@ export default function generator ({ borders, colors, media, spacing, typography
     titleTextDecoration: 'none',
     titleTextDecorationHover: 'underline',
     titleColor: colors.brand,
-    activityIndicatorPadding: spacing.small,
-    activityIndicatorWidth: spacing.small,
-    activityIndicatorBorderSize: '1rem',
-    activityIndicatorBackground: colors.white,
     ...media
   };
 }

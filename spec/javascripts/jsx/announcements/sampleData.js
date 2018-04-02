@@ -35,6 +35,9 @@ const data = {
     locked: false,
     user_count: 2,
     html_url: 'http://example.org/announcement/5',
+    permissions: {
+      delete: true
+    }
   }],
 }
 

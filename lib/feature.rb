@@ -113,24 +113,9 @@ class Feature
         display_name: -> { I18n.t('SIS Import Refactor')},
         description: -> { I18n.t('Update how we process SIS imports') },
         applies_to: 'RootAccount',
-        state: 'hidden'
-      },
-    'theme_editor_refactor' =>
-    {
-      display_name: -> { I18n.t('Theme Editor Refactor')},
-      description: -> { I18n.t('Move to using InstUI for several components and implementing a store system') },
-      applies_to: 'Account',
-      state: 'hidden',
-      development: true
-    },
-    'section_specific_announcements' =>
-    {
-      display_name: -> { I18n.t('Section Specific Announcements') },
-      description: -> { I18n.t('Allows creating announcements for a specific section') },
-      applies_to: 'Account',
-      state: 'allowed',
-      root_opt_in: false
-    },
+        state: 'hidden_in_prod',
+        beta: true
+  },
     'section_specific_discussions' =>
     {
       display_name: -> { I18n.t('Section Specific Discussions') },
@@ -219,6 +204,14 @@ END
       applies_to: 'Course',
       state: 'allowed',
       root_opt_in: false
+    },
+    'outcome_extra_credit' =>
+    {
+      display_name: -> { I18n.t('Allow Outcome Extra Credit') },
+      description:  -> { I18n.t('If enabled, allows more than the maximum possible score on an Outcome to be given on a rubric.')},
+      applies_to: 'Course',
+      state: 'allowed',
+      root_opt_in: true
     },
     'post_grades' =>
     {
@@ -413,14 +406,14 @@ END
       beta: true
     },
     'bulk_sis_grade_export' =>
-      {
-        display_name: -> { I18n.t('Allow Bulk Grade Export to SIS') },
-        description:  -> { I18n.t('Allows teachers to mark grade data to be exported in bulk to SIS integrations.') },
-        applies_to: 'RootAccount',
-        state: 'hidden',
-        root_opt_in: true,
-        beta: true
-      },
+    {
+      display_name: -> { I18n.t('Allow Bulk Grade Export to SIS') },
+      description:  -> { I18n.t('Allows teachers to mark grade data to be exported in bulk to SIS integrations.') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      root_opt_in: true,
+      beta: true
+    },
     'notification_service' =>
     {
       display_name: -> { I18n.t('Use remote service for notifications') },
@@ -477,6 +470,22 @@ END
       state: 'hidden',
       development: true,
       root_opt_in: false
+    },
+    'allow_rtl' =>
+    {
+      display_name: -> { I18n.t('Allow RTL users to see RTL interface') },
+      description: -> { I18n.t('This feature flag is something an account can turn on if they want to allow the users of their account that speak languages that are normally written in Right to Left (eg: Arabic, Hebrew, Farsi) to see the RTL layout while we are working on it. once the feature is "ready" this feature flag will go away and anyone that speaks one of those languages will always see the RTL interface.') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      development: true,
+    },
+    'force_rtl' =>
+    {
+      display_name: -> { I18n.t('Turn on RTL Even For Non-RTL Languages') },
+      description: -> { I18n.t('This is just a dev-only feature you can turn on to get a preview of how pages would look in a RTL environment, without having to change your language to one that is normally RTL ') },
+      applies_to: 'User',
+      state: 'hidden',
+      development: true,
     },
     'anonymous_grading' => {
       display_name: -> { I18n.t('Anonymous Grading') },
@@ -626,13 +635,13 @@ END
       end
     },
     'developer_key_management' =>
-      {
-        display_name: -> { I18n.t('Developer Key management')},
-        description: -> { I18n.t('New Features for Developer Key management') },
-        applies_to: 'RootAccount',
-        state: 'hidden',
-        development: true
-      },
+    {
+      display_name: -> { I18n.t('Developer Key management')},
+      description: -> { I18n.t('New Features for Developer Key management') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      development: true
+    },
     'developer_key_management_ui_rewrite' =>
       {
         display_name: -> { I18n.t('Developer Key management UI Rewrite')},
@@ -647,6 +656,13 @@ END
       applies_to: 'Course',
       state: 'hidden',
       beta: true
+    },
+    'api_token_scoping' => {
+      display_name: -> { I18n.t('API Token Scoping')},
+      description: -> { I18n.t('If enabled, scopes will be validated on API requests if the developer key being used requires scopes.') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      development: true
     }
   )
 

@@ -21,9 +21,9 @@
 .submission_details {
   .bold { font-weight: bold; }
   .error { color: $ic-color-danger; }
-  td { padding-left: 1em; }
+  td { padding-#{direction(left)}: 1em; }
   th { font-weight: normal; }
-  td, th { text-align: right; }
+  td, th { text-align: direction(right); }
 }
 
 .submission-details-header {
@@ -47,12 +47,12 @@
     margin-bottom: 0;
     flex: 1;
     min-width: 1px;
-    padding-right: $ic-sp;
+    padding-#{direction(right)}: $ic-sp;
   }
 }
 .submission-details-header__rubric {
   @include breakpoint(tablet) {
-    text-align: right;
+    text-align: direction(right);
   }
 
   &.submission-details-header__rubric--can-grade {
@@ -63,7 +63,7 @@
   margin-top: $ic-sp / 3;
 }
 .submission-details-header__time {
-  margin-right: $ic-sp / 4;
+  margin-#{direction(right)}: $ic-sp / 4;
   &.late {
     color: $ic-color-danger;
     font-weight: bold;
@@ -93,7 +93,7 @@
     height: 300px;
     overflow: auto;
     background-color: $ic-bg-light-neutral;
-    @include breakpoint(desktop) { border-left: 1px solid $ic-border-light; }
+    @include breakpoint(desktop) { border-#{direction(left)}: 1px solid $ic-border-light; }
   }
 }
 
@@ -109,10 +109,10 @@
 .file-upload-submission-info {
   @include fontSize(13px);
   box-sizing: border-box;
-  padding-right: $ic-sp;
+  padding-#{direction(right)}: $ic-sp;
   > a {
     @include fontSize(13px); // need to overwrite default tiny-text style here
-    margin-right: $ic-sp/2;
+    margin-#{direction(right)}: $ic-sp/2;
     font-weight: bold;
   }
   flex: 1;
@@ -128,9 +128,9 @@
 .file-upload-submission-attachment {
   @include fontSize(13px);
   flex: 0 0 auto;
-  text-align: right;
+  text-align: direction(right);
   box-sizing: border-box;
-  padding-left: $ic-sp;
+  padding-#{direction(left)}: $ic-sp;
 }
 
 .file-upload-submission-turnitin {

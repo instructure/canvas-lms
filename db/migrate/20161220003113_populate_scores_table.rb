@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class PopulateScoresTable < ActiveRecord::Migration[4.2]
-  tag :predeploy
+  tag :postdeploy
 
   def up
     DataFixup::PopulateScoresTable.run

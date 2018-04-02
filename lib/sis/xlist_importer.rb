@@ -56,6 +56,7 @@ module SIS
         raise ImportError, "No xlist_course_id given for a cross-listing" if xlist_course_id.blank?
         raise ImportError, "No section_id given for a cross-listing" if section_id.blank?
         raise ImportError, "Improper status \"#{status}\" for a cross-listing" unless status =~ /\A(active|deleted)\z/i
+        return if @batch.skip_deletes? && status =~ /deleted/i
 
         section = @root_account.course_sections.where(sis_source_id: section_id).take
         raise ImportError, "A cross-listing referenced a non-existent section #{section_id}" unless section

@@ -26,15 +26,15 @@ module ActiveSupport::Cache
   module RailsCacheShim
     def normalize_key(key, options)
       result = super
-      if options && options.has_key?(:use_new_rails) ? options[:use_new_rails] : !CANVAS_RAILS5_0
-        result = "rails51:#{result}"
+      if options && options.has_key?(:use_new_rails) ? options[:use_new_rails] : !CANVAS_RAILS5_1
+        result = "rails52:#{result}"
       end
       result
     end
 
     def delete(key, options = nil)
-      r1 = super(key, (options || {}).merge(use_new_rails: !CANVAS_RAILS5_0)) # prefer rails 3 if on rails 3 and vis versa
-      r2 = super(key, (options || {}).merge(use_new_rails: CANVAS_RAILS5_0))
+      r1 = super(key, (options || {}).merge(use_new_rails: !CANVAS_RAILS5_1)) # prefer rails 3 if on rails 3 and vis versa
+      r2 = super(key, (options || {}).merge(use_new_rails: CANVAS_RAILS5_1))
       r1 || r2
     end
   end
@@ -78,10 +78,6 @@ module IgnoreMonkeyPatchesInDeprecations
   end
 end
 ActiveSupport::Deprecation.prepend(IgnoreMonkeyPatchesInDeprecations)
-unless CANVAS_RAILS5_0
-  ::Rails.logger.warn("Temporarily silencing deprecations because there are a lot - especially here https://github.com/rails/rails/blob/5-1-stable/activerecord/lib/active_record/attribute_methods/dirty.rb#L250-L256")
-  ActiveSupport::Deprecation.silenced = true
-end
 
 module RaiseErrorOnDurationCoercion
   def coerce(other)

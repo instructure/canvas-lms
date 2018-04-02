@@ -76,7 +76,7 @@
 
 .ic-Sortable-item__Text {
   flex: 1;
-  padding-right: $ic-sp*2;
+  padding-#{direction(right)}: $ic-sp*2;
   line-height: $ic-label-line-height;
   user-select: none;
 }
@@ -88,7 +88,7 @@
 
 .ic-Sortable-sort-controls {
   @include overwrite-default-icon-size(1.25rem);
-  margin-right: $ic-sp;
+  margin-#{direction(right)}: $ic-sp;
 }
 
 .ic-Sortable-sort-controls__button {

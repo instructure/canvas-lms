@@ -594,6 +594,7 @@ class GradebooksController < ApplicationController
       format.html do
         @headers = false
         @outer_frame = true
+        @anonymous_moderated_marking_enabled = @context.root_account.feature_enabled?(:anonymous_moderated_marking)
         log_asset_access([ "speed_grader", @context ], "grades", "other")
         env = {
           CONTEXT_ACTION_SOURCE: :speed_grader,
@@ -604,10 +605,12 @@ class GradebooksController < ApplicationController
           lti_retrieve_url: retrieve_course_external_tools_url(
             @context.id, assignment_id: @assignment.id, display: 'borderless'
           ),
+          anonymous_moderated_marking_enabled: @anonymous_moderated_marking_enabled,
           course_id: @context.id,
           assignment_id: @assignment.id,
           assignment_title: @assignment.title,
-          can_comment_on_submission: @can_comment_on_submission
+          can_comment_on_submission: @can_comment_on_submission,
+          show_help_menu_item: show_help_link?
         }
         if [:moderator, :provisional_grader].include?(grading_role)
           env[:provisional_status_url] = api_v1_course_assignment_provisional_status_path(@context.id, @assignment.id)

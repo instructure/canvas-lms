@@ -105,7 +105,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   end
 
   def update_alignments
-    return unless workflow_state_changed? && deleted?
+    return unless saved_change_to_workflow_state? && deleted?
     LearningOutcome.update_alignments(self, context, [])
   end
 

@@ -21,10 +21,10 @@
 .course_details {
   border-collapse: collapse;
   min-width: 400px;
-  margin-left: 20px;
+  margin-#{direction(left)}: 20px;
   border-spacing: 0;
   th {
-    text-align: left;
+    text-align: direction(left);
   }
   td {
     border-bottom: 1px solid #ccc;

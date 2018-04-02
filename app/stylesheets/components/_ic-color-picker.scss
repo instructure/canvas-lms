@@ -62,7 +62,7 @@
 
 .ColorPicker__Container.with-arrow{
   &:after, &:before {
-    right: 100%; top: $ic-sp*2;
+    #{direction(right)}: 100%; top: $ic-sp*2;
     border: solid transparent;
     content: "";
     height: 0; width: 0;
@@ -71,13 +71,13 @@
   }
   &:after {
     border-color: rgba(255,255,255,0);
-    border-right-color: $ic-color-light;
+    border-#{direction(right)}-color: $ic-color-light;
     border-width: $ic-sp - 1;
     margin-top: -($ic-sp - 1);
   }
   &:before {
     border-color: rgba(215, 215, 215, 0);
-    border-right-color: darken($ic-border-light, 4%);
+    border-#{direction(right)}-color: darken($ic-border-light, 4%);
     border-width: $ic-sp;
     margin-top: -($ic-sp);
   }
@@ -86,15 +86,15 @@
 .right > .ColorPicker__Container {
   transform: translate3d(20%,0,0);
   &:after, &:before {
-    right: auto; left: 100%;
+    #{direction(right)}: auto; #{direction(left)}: 100%;
   }
   &:after {
-    border-right-color: rgba(255,255,255,0);
-    border-left-color: $ic-color-light;
+    border-#{direction(right)}-color: rgba(255,255,255,0);
+    border-#{direction(left)}-color: $ic-color-light;
   }
   &:before {
-    border-right-color: rgba(255,255,255,0);
-    border-left-color: darken($ic-border-light, 4%);
+    border-#{direction(right)}-color: rgba(255,255,255,0);
+    border-#{direction(left)}-color: darken($ic-border-light, 4%);
   }
 }
 
@@ -162,14 +162,14 @@
   // Note that this declaration will have to be changed if
   // the total # colors is changed from the current 15
   &:nth-child(5n) {
-    margin-right: 0;
+    margin-#{direction(right)}: 0;
   }
 }
 
 .ColorPicker__ColorBlock-line {
   position: absolute;
   top: 0;
-  left: 0;
+  #{direction(left)}: 0;
   width: 100%;
   height: 100%;
   stroke: red;
@@ -207,7 +207,7 @@
   border-color: $ic-border-color;
   border-radius: $baseBorderRadius;
   border-width: 1px;
-  margin-right: 2px;
+  margin-#{direction(right)}: 2px;
   &:focus {
     outline: none;
   }
@@ -223,7 +223,7 @@
   justify-content: flex-end;
   body.chrome & {
     // fixes weird Chrome bug, where left border of first button gets cut off
-    .Button:first-of-type { margin-left: 1px; }
+    .Button:first-of-type { margin-#{direction(left)}: 1px; }
   }
 
 }

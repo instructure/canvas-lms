@@ -17,7 +17,6 @@
 #
 
 # @API Quiz Question Groups
-# @beta
 #
 # API for accessing information on quiz question groups
 #
@@ -77,7 +76,6 @@ class Quizzes::QuizGroupsController < ApplicationController
   before_action :require_context, :require_quiz
 
   # @API Get a single quiz group
-  # @beta
   #
   # Returns details of the quiz group with the given id.
   #
@@ -90,7 +88,6 @@ class Quizzes::QuizGroupsController < ApplicationController
   end
 
   # @API Create a question group
-  # @beta
   #
   # Create a new question group for this quiz
   #
@@ -132,7 +129,6 @@ class Quizzes::QuizGroupsController < ApplicationController
   end
 
   # @API Update a question group
-  # @beta
   #
   # Update a question group
   #
@@ -164,7 +160,6 @@ class Quizzes::QuizGroupsController < ApplicationController
   end
 
   # @API Delete a question group
-  # @beta
   #
   # Delete a question group
   #
@@ -179,7 +174,6 @@ class Quizzes::QuizGroupsController < ApplicationController
   end
 
   # @API Reorder question groups
-  # @beta
   #
   # Change the order of the quiz questions within the group
   #

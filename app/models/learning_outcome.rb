@@ -342,10 +342,10 @@ class LearningOutcome < ActiveRecord::Base
 
   def propagate_changes_to_rubrics
     # exclude new outcomes
-    return if self.id_changed?
-    return if !self.data_changed? &&
-      !self.short_description_changed? &&
-      !self.description_changed?
+    return if self.saved_change_to_id?
+    return if !self.saved_change_to_data? &&
+      !self.saved_change_to_short_description? &&
+      !self.saved_change_to_description?
 
     self.send_later_if_production(:update_associated_rubrics)
   end

@@ -89,7 +89,8 @@ module CC::Importer::Standard
       zip_file = File.join(@base_export_dir, 'all_files.zip')
       make_export_dir
 
-      Zip::File.open(zip_file, 'w') do |zipfile|
+      return if file_map.empty?
+      Zip::File.open(zip_file, Zip::File::CREATE) do |zipfile|
         file_map.each_value do |val|
           next if zipfile.entries.include?(val[:path_name])
 

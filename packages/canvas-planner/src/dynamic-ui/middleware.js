@@ -20,8 +20,12 @@ export function createDynamicUiMiddleware (uiManager) {
   return store => {
     uiManager.setStore(store);
     return next => action => {
+      const beforeState = store.getState();
       uiManager.handleAction(action);
-      return next(action);
+      const result = next(action);
+      const afterState = store.getState();
+      if (beforeState === afterState) uiManager.uiStateUnchanged(action);
+      return result;
     };
   };
 }

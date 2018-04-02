@@ -33,18 +33,8 @@ development:
       app-host: "http://api.instfs.docker"
       # this is just "super-sekret-value", base64-encoded:
       secret: "c3VwZXItc2VrcmV0LXZhbHVlCg=="
-
-  private:
-    canvas:
-      ha_cache.yml: |
-        cache_store: ha_store
-        servers:
-         - redis://redis/2
-        # keep stale data for up to 1 week in the cache
-        race_condition_ttl: 604800
-        # how long it might take to recompute a cache value
-        # before the lock times out and another process is
-        # allowed to write it
-        lock_timeout: 5
-        # how long before a cache entry is considered stale
-        expires_in: 300
+    pandata:
+      ios-pandata-key: IOS_pandata_key
+      ios-pandata-secret: teamrocketblastoffatthespeedoflight
+      android-pandata-key: ANDROID_pandata_key
+      android-pandata-secret: surrendernoworpreparetofight

@@ -45,7 +45,7 @@
     width: 35%;
   }
   .course-list-no-left-border {
-    border-left: 0;
+    border-#{direction(left)}: 0;
   }
   .course-list-table-row:hover {
     background-color: $lightBackground;
@@ -69,6 +69,6 @@
 .course-color-block:before {
   content:'\25A0';
   @include fontSize(21px);
-  padding-right: $ic-sp/2;
+  padding-#{direction(right)}: $ic-sp/2;
   vertical-align: baseline;
 }

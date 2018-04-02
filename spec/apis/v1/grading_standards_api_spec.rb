@@ -110,32 +110,41 @@ describe GradingStandardsApiController, type: :request do
     end
 
     describe 'grading standards creation' do
+      let(:grading_scheme_entry) do
+        [
+          {"name"=>"A", "value"=>"90"},
+          {"name"=>"B", "value"=>"80"},
+          {"name"=>"C", "value"=>"70"},
+          {"name"=>"D", "value"=>"0"},
+        ]
+      end
+
       it "creates account level grading standards" do
-        post_params = {"title"=>"account grading standard", "grading_scheme_entry"=>[{"name"=>"A", "value"=>"90"}, {"name"=>"B", "value"=>"80"}, {"name"=>"C", "value"=>"70"}]}
+        post_params = {"title"=>"account grading standard", "grading_scheme_entry"=>grading_scheme_entry}
         json = api_call(:post, account_resources_path, account_create_params, post_params)
-        grading_standard = GradingStandard.find(json['id'])
         expect(json['title']).to eq 'account grading standard'
         expect(json['context_id']).to eq account.id
         expect(json['context_type']).to eq 'Account'
         data = json['grading_scheme']
-        expect(data.count).to eq 3
+        expect(data.count).to eq 4
         expect(data[0]).to eq({'name'=>'A', 'value'=>0.9})
         expect(data[1]).to eq({'name'=>'B', 'value'=>0.8})
         expect(data[2]).to eq({'name'=>'C', 'value'=>0.7})
+        expect(data[3]).to eq({'name'=>'D', 'value'=>0.0})
       end
 
       it "creates course level grading standards" do
-        post_params = {"title"=>"course grading standard", "grading_scheme_entry"=>[{"name"=>"A", "value"=>"90"}, {"name"=>"B", "value"=>"80"}, {"name"=>"C", "value"=>"70"}]}
+        post_params = {"title"=>"course grading standard", "grading_scheme_entry"=>grading_scheme_entry}
         json = api_call(:post, course_resources_path, course_create_params, post_params)
-        grading_standard = GradingStandard.find(json['id'])
         expect(json['title']).to eq 'course grading standard'
         expect(json['context_id']).to eq course.id
         expect(json['context_type']).to eq 'Course'
         data = json['grading_scheme']
-        expect(data.count).to eq 3
+        expect(data.count).to eq 4
         expect(data[0]).to eq({'name'=>'A', 'value'=>0.9})
         expect(data[1]).to eq({'name'=>'B', 'value'=>0.8})
         expect(data[2]).to eq({'name'=>'C', 'value'=>0.7})
+        expect(data[3]).to eq({'name'=>'D', 'value'=>0.0})
       end
 
       it "returns error if no grading scheme provided" do
@@ -144,21 +153,86 @@ describe GradingStandardsApiController, type: :request do
         expect(json).to eq({"errors"=>{"data"=>[{"attribute"=>"data", "type"=>"blank", "message"=>"blank"}]}})
       end
 
-      it "returns error if grading scheme contains negative values" do
-        post_params = {"title"=>"course grading standard", "grading_scheme_entry"=>[{"name"=>"A", "value"=>"-90"}, {"name"=>"B", "value"=>"80"}, {"name"=>"C", "value"=>"70"}]}
+      it "returns error if grading scheme does not contain a grade for 0%" do
+        grading_standard_without_zero = [
+          { "name" => "A", "value" => "90" },
+          { "name" => "B", "value" => "80" },
+          { "name" => "C", "value" => "70" },
+        ]
+        post_params = {"title"=>"course grading standard", "grading_scheme_entry"=> grading_standard_without_zero }
         json = api_call(:post, account_resources_path, account_create_params, post_params, {}, {expected_status: 400})
-        expect(json).to eq({"errors"=>{"data"=>[{"attribute"=>"data", "type"=>"grading scheme values cannot be negative", "message"=>"grading scheme values cannot be negative"}]}})
+        expected_json = {
+          "errors" => {
+            "data" => [
+              {
+                "attribute" => "data",
+                "type" => "grading schemes must have 0% for the lowest grade",
+                "message" => "grading schemes must have 0% for the lowest grade"
+              }
+            ]
+          }
+        }
+        expect(json).to eq(expected_json)
+      end
+
+      it "returns error if grading scheme contains negative values" do
+        negative_grading_standard = [
+          { "name" => "A", "value" => "-90" },
+          { "name" => "B", "value" => "80" },
+          { "name" => "C", "value" => "70" },
+          { "name" => "D", "value" => "0" }
+        ]
+        post_params = {"title"=>"course grading standard", "grading_scheme_entry"=> negative_grading_standard }
+        json = api_call(:post, account_resources_path, account_create_params, post_params, {}, {expected_status: 400})
+        expected_json = {
+          "errors" => {
+            "data" => [
+              {
+                "attribute" => "data",
+                "type" => "grading scheme values cannot be negative",
+                "message" => "grading scheme values cannot be negative"
+              }
+            ]
+          }
+        }
+        expect(json).to eq(expected_json)
       end
 
       it "returns error if grading scheme contains duplicate values" do
-        post_params = {"title"=>"course grading standard", "grading_scheme_entry"=>[{"name"=>"A", "value"=>"90"}, {"name"=>"B", "value"=>"80"}, {"name"=>"C", "value"=>"90"}]}
+        duplicate_grading_standard = [
+          { "name" => "A", "value" => "90" },
+          { "name" => "B", "value" => "80" },
+          { "name" => "C", "value" => "90" },
+          { "name" => "D", "value" => "0" }
+        ]
+        post_params = {"title"=>"course grading standard", "grading_scheme_entry"=> duplicate_grading_standard }
         json = api_call(:post, account_resources_path, account_create_params, post_params, {}, {expected_status: 400})
-        expect(json).to eq({"errors"=>{"data"=>[{"attribute"=>"data", "type"=>"grading scheme cannot contain duplicate values", "message"=>"grading scheme cannot contain duplicate values"}]}})
+        expected_json = {
+          "errors" => {
+            "data" => [
+              {
+                "attribute" => "data",
+                "type" => "grading scheme cannot contain duplicate values",
+                "message" => "grading scheme cannot contain duplicate values"
+              }
+            ]
+          }
+        }
+        expect(json).to eq(expected_json)
       end
     end
   end
 
   context "teacher" do
+    let(:grading_scheme_entry) do
+      [
+        {"name"=>"A", "value"=>"90"},
+        {"name"=>"B", "value"=>"80"},
+        {"name"=>"C", "value"=>"70"},
+        {"name"=>"D", "value"=>"0"},
+      ]
+    end
+
     before(:each) do
       user_factory
       enrollment = course.enroll_teacher(@user)
@@ -167,12 +241,12 @@ describe GradingStandardsApiController, type: :request do
 
     describe "grading standard creation" do
       it "returns unauthorized for account grading standards" do
-        post_params = {"title"=>"account grading standard", "grading_scheme_entry"=>[{"name"=>"A", "value"=>"90"}, {"name"=>"B", "value"=>"80"}, {"name"=>"C", "value"=>"70"}]}
+        post_params = {"title"=>"account grading standard", "grading_scheme_entry"=>grading_scheme_entry}
         api_call(:post, account_resources_path, account_create_params, post_params, {}, {:expected_status => 401})
       end
 
       it "returns ok for course grading standards" do
-        post_params = {"title"=>"course grading standard", "grading_scheme_entry"=>[{"name"=>"A", "value"=>"90"}, {"name"=>"B", "value"=>"80"}, {"name"=>"C", "value"=>"70"}]}
+        post_params = {"title"=>"course grading standard", "grading_scheme_entry"=>grading_scheme_entry}
         api_call(:post, course_resources_path, course_create_params, post_params, {}, {:expected_status => 200})
       end
     end

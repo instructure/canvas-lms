@@ -37,7 +37,7 @@
   pointer-events: none;
 }
 .UploadDropZone__instructions__close {
-  float: right;
+  float: direction(right);
   color: $ic-color-neutral;
   font-size: -1.8em;
   pointer: cursor;

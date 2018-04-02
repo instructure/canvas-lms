@@ -37,7 +37,7 @@ class Quizzes::QuizRegradeRun < ActiveRecord::Base
   end
 
   def send_messages?
-    old, new = changes['finished_at']
+    old, new = saved_changes['finished_at']
     !!(new && old.nil?) && Quizzes::QuizRegradeRun.where(quiz_regrade_id: quiz_regrade).count == 1
   end
 

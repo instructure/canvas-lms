@@ -62,7 +62,7 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
 .ic-ThemeCard-thumbnail__primary-content {
   box-sizing: border-box;
   flex: 0.66;
-  padding-right: $ic-sp*2;
+  padding-#{direction(right)}: $ic-sp*2;
 }
 
 .ic-ThemeCard-thumbnail__secondary-content {
@@ -73,7 +73,7 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
 .ic-ThemeCard-thumbnail__nav {
   height: 100%; width: $ic-sp*3;
   position: absolute;
-  top: 0; left: 0;
+  top: 0; #{direction(left)}: 0;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -122,7 +122,7 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
     height: 3px; width: 34%;
     background: $ic-color-light;
     position: absolute;
-    bottom: 0; right: 0;
+    bottom: 0; #{direction(right)}: 0;
   }
 }
 
@@ -145,10 +145,10 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
 
 .ic-ThemeCard-fake-progressbar__inner {
   position: absolute;
-  top: 0; left: 0;
+  top: 0; #{direction(left)}: 0;
   width: 66%; height: 100%;
-  border-top-left-radius: $baseBorderRadius - 1;
-  border-bottom-left-radius: $baseBorderRadius - 1;
+  border-top-#{direction(left)}-radius: $baseBorderRadius - 1;
+  border-bottom-#{direction(left)}-radius: $baseBorderRadius - 1;
 }
 
 .ic-ThemeCard-fake-radio {
@@ -160,7 +160,7 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
     content: "";
     box-sizing: border-box;
     position: absolute;
-    right: 0; top: 50%;
+    #{direction(right)}: 0; top: 50%;
     margin-top: -1px;
     height: 2px; width: calc(100% - 24px);
     background: $ic-border-light;
@@ -183,7 +183,7 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
     content: "";
     box-sizing: border-box;
     position: absolute;
-    right: 0; top: 50%;
+    #{direction(right)}: 0; top: 50%;
     margin-top: -1px;
     height: 2px; width: calc(100% - 24px);
     background: $ic-border-light;
@@ -199,14 +199,14 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
   > i[class^=icon-] {
     color: $ic-color-light;
     position: absolute;
-    top: 2px; left: 3px;
+    top: 2px; #{direction(left)}: 3px;
     line-height: 8px;
   }
 }
 
 .ic-ThemeCard-name-button {
   box-sizing: border-box;
-  text-align: left;
+  text-align: direction(left);
   background: transparent;
   border: none;
   color: var(--ic-link-color);
@@ -238,14 +238,14 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
 .ic-ThemeCard-main__name {
   box-sizing: border-box;
   flex: 1;
-  padding-right: $ic-sp*1.5;
+  padding-#{direction(right)}: $ic-sp*1.5;
   min-width: 1px;
 }
 
 .ic-ThemeCard-main__actions {
   box-sizing: border-box;
   min-width: 1px;
-  padding-right: 4px;
+  padding-#{direction(right)}: 4px;
 }
 
 .ic-ThemeCard-status {
@@ -260,7 +260,7 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
 .ic-ThemeCard-overlay {
   transition: all 0.2s ease-out;
   position: absolute;
-  top: 0; left: 0;
+  top: 0; #{direction(left)}: 0;
   z-index: 1;
   height: 100%; width: 100%;
   display: flex;

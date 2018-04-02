@@ -26,7 +26,7 @@ group :test do
   gem 'simplecov', '0.15.1', require: false
     gem 'docile', '1.1.5', require: false
   gem 'simplecov-rcov', '0.2.3', require: false
-  gem 'puma', '3.11.2'
+  gem 'puma', '3.11.3'
 
   gem 'rspec', '3.7.0'
   gem 'rspec_around_all', '0.2.0'
@@ -43,7 +43,7 @@ group :test do
 
   # Keep this gem synced with docker-compose/seleniumff/Dockerfile
   gem 'selenium-webdriver', '2.53.4'
-    gem 'childprocess', '0.8.0', require: false
+    gem 'childprocess', '0.9.0', require: false
     gem 'websocket', '1.2.5', require: false
   gem 'chromedriver-helper', require: false
   gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'

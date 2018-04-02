@@ -343,13 +343,13 @@ input[type="button"] {
   }
 
   i[class*=icon-], i[class^=icon-] {
-    margin-right: 3px;
+    margin-#{direction(right)}: 3px;
   }
 }
 
 .Button--link--has-divider {
   display: block;
-  text-align: left;
+  text-align: direction(left);
   border-bottom: 1px solid $ic-border-color;
   color: $ic-color-dark;
   padding: $ic-sp;
@@ -420,7 +420,7 @@ input[type="button"] {
     background-size: auto 80%;
   }
   @include beta-tag;
-  padding-right: 20px;
+  padding-#{direction(right)}: 20px;
 
   // Prevent the beta background image from disappearing on hover
   &:hover {

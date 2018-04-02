@@ -56,7 +56,7 @@ $gradebook_header_height: 3.5em;
   }
 
   #combo_box_container {
-    text-align: left;
+    text-align: direction(left);
     background: transparent;
     select {
       width: 230px;
@@ -77,7 +77,7 @@ $gradebook_header_height: 3.5em;
   flex-wrap: nowrap;
   flex-shrink: 2;
   min-width: 0;
-  padding-right: $ic-sp;
+  padding-#{direction(right)}: $ic-sp;
   overflow: hidden;
 }
 // little trick to make the icon-font and the icon svg match in size
@@ -87,13 +87,13 @@ $icon-size: 1.4rem;
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
-  margin-right: $ic-sp;
+  margin-#{direction(right)}: $ic-sp;
   flex-shrink: 0;
 
   // sizes the icon font
   .gradebookActions__Button {
     @include overwrite-default-icon-size($icon-size);
-    margin-right: $ic-sp/3;
+    margin-#{direction(right)}: $ic-sp/3;
     color: var(--ic-brand-global-nav-ic-icon-svg-fill);
   }
 
@@ -109,9 +109,9 @@ $icon-size: 1.4rem;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  padding-left: 20px;
-  border-left: 1px dotted var(--ic-brand-global-nav-menu-item__text-color);
-  text-align: left;
+  padding-#{direction(left)}: 20px;
+  border-#{direction(left)}: 1px dotted var(--ic-brand-global-nav-menu-item__text-color);
+  text-align: direction(left);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -142,15 +142,15 @@ $icon-size: 1.4rem;
   flex-wrap: nowrap;
   flex-shrink: 0;
   min-width: 0;
-  padding-left: $ic-sp;
+  padding-#{direction(left)}: $ic-sp;
 }
 .statsMetric {
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
   align-self: flex-end;
-  padding-right: $ic-sp;
-  border-right: 1px dotted var(--ic-brand-global-nav-menu-item__text-color);
+  padding-#{direction(right)}: $ic-sp;
+  border-#{direction(right)}: 1px dotted var(--ic-brand-global-nav-menu-item__text-color);
 }
 .statsMetric__Item {
   display: flex;
@@ -158,9 +158,9 @@ $icon-size: 1.4rem;
   justify-content: center;
   white-space: nowrap;
   text-align: center;
-  margin-right: $ic-sp*2;
+  margin-#{direction(right)}: $ic-sp*2;
   &:last-of-type {
-    margin-right: $ic-sp;
+    margin-#{direction(right)}: $ic-sp;
   }
 }
 .statsMetric__Item-value {
@@ -175,7 +175,7 @@ $icon-size: 1.4rem;
   align-items: center;
   justify-content: flex-end;
   flex-wrap: nowrap;
-  margin-left: $ic-sp;
+  margin-#{direction(left)}: $ic-sp;
 }
 .gradebookMoveToNext {
   padding: 0 $ic-sp;
@@ -188,13 +188,13 @@ $icon-size: 1.4rem;
   max-width: 30px;
   border-radius: 30px; //match size of avatar width
   overflow: hidden;
-  margin-right: $ic-sp;
+  margin-#{direction(right)}: $ic-sp;
 }
 #eg-canvas-logo {
   background: url(/images/canvas/header_canvas_logo.png) no-repeat;
   position: absolute;
   top: 7px;
-  right: 7px;
+  #{direction(right)}: 7px;
   height: 26px;
   width: 135px;
   display: block;
@@ -231,9 +231,9 @@ $icon-size: 1.4rem;
 .full_width {
   #left_side {
     width: 100%;
-    margin-left: -8px;
+    margin-#{direction(left)}: -8px;
     #left_side_inner {
-      margin-left: 8px;
+      margin-#{direction(left)}: 8px;
     }
   }
   #right_side {
@@ -252,9 +252,9 @@ $icon-size: 1.4rem;
 .media_comments_visible {
   #left_side {
     width: 100%;
-    margin-left: -330px;
+    margin-#{direction(left)}: -330px;
     #left_side_inner {
-      margin-left: 330px;
+      margin-#{direction(left)}: 330px;
     }
   }
   #right_side {
@@ -279,7 +279,7 @@ $icon-size: 1.4rem;
     align-items: center;
 
     #new_mark_container {
-      padding-left: 5px;
+      padding-#{direction(left)}: 5px;
     }
   }
 }
@@ -298,7 +298,7 @@ $icon-size: 1.4rem;
       &.ui-state-active {
         background: $ic-bg-light-neutral;
         button {
-          float: right;
+          float: direction(right);
           margin: 6px 14px;
           display: inline-block;
         }
@@ -312,7 +312,7 @@ $icon-size: 1.4rem;
       &.selected .selected_icon {
         display: inline-block;
         color: var(--ic-brand-primary);
-        padding-right: 6px;
+        padding-#{direction(right)}: 6px;
       }
       a {
         padding: 14px 12px;
@@ -342,8 +342,8 @@ $icon-size: 1.4rem;
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 0;
-  right: 25%;
+  #{direction(left)}: 0;
+  #{direction(right)}: 25%;
   #submissions_container, #left_side_inner, iframe, #doc_preview_holder, #iframe_holder, #resize_overlay {
     height: 100%;
     width: 100%;
@@ -370,11 +370,11 @@ $icon-size: 1.4rem;
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 0;
+  #{direction(left)}: 0;
   background: #bbb url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%;
   cursor: pointer;
   width: 7px;
-  border-right: 1px solid #838383;
+  border-#{direction(right)}: 1px solid #838383;
   z-index: 2;
   &.highlight {
     background-color: #FBEC88;
@@ -390,7 +390,7 @@ $icon-size: 1.4rem;
   position: absolute;
   top: 0;
   bottom: 0;
-  right: 0;
+  #{direction(right)}: 0;
   @include fontSize(14px);
 
   #rubric_summary_container {
@@ -415,7 +415,7 @@ $icon-size: 1.4rem;
     }
     span.draft-marker {
       color: $red;
-      padding-right: 0.5em;
+      padding-#{direction(right)}: 0.5em;
       flex: none;
     }
     div.comment_flex {
@@ -428,12 +428,12 @@ $icon-size: 1.4rem;
     }
     .comment_citation {
       @include fontSize(12px);
-      text-align: right;
+      text-align: direction(right);
     }
     .delete_comment_link, .submit_comment_button {
       flex: none;
       height: 24px;
-      margin-left: 0.5em;
+      margin-#{direction(left)}: 0.5em;
       @if $use_high_contrast {
         color: lighten($ic-color-dark, 12%);
       }
@@ -476,15 +476,15 @@ $icon-size: 1.4rem;
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 8px;
-  right: 0;
+  #{direction(left)}: 8px;
+  #{direction(right)}: 0;
 }
 
 #rubric_full {
   #rubric_full_resizer #rubric_full_resizer_handle {
     position: absolute;
     top: 50%;
-    left: 0px;
+    #{direction(left)}: 0px;
     background: transparent url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%;
     cursor: pointer;
     height: 20px;
@@ -507,7 +507,7 @@ $icon-size: 1.4rem;
       height: 24px;
       max-width: 24px;
       flex-shrink: 5;
-      margin-right: 12px;
+      margin-#{direction(right)}: 12px;
     }
   }
 }
@@ -544,19 +544,19 @@ $icon-size: 1.4rem;
     .prompt {
       font-weight: bold;
       line-height: 24px;
-      padding-right: 4px;
-      float: left;
+      padding-#{direction(right)}: 4px;
+      float: direction(left);
     }
     button {
-      float: left;
-      margin-right: 5px;
+      float: direction(left);
+      margin-#{direction(right)}: 5px;
     }
   }
   #comment_attachments {
     padding: $ic-sp/2 0;
     display: block;
     a {
-      float: right;
+      float: direction(right);
     }
   }
 }
@@ -595,7 +595,7 @@ body .ui-selectmenu-dropdown {
     border: none;
     position: absolute;
     top: -1px;
-    right: -1px;
+    #{direction(right)}: -1px;
     margin: 0;
   }
 }
@@ -644,15 +644,15 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 .ui-selectmenu-item-icon {
   top: 6px !important;
   margin-top: 0 !important;
-  left: -3px;
+  #{direction(left)}: -3px;
 }
 
 .ui-selectmenu-item-icon.speedgrader-selectmenu-icon {
   position: absolute;
-  left: 0px;
+  #{direction(left)}: 0px;
   .ui-selectmenu-status & {
     top: (-0.5px) !important;
-    left: 4px;
+    #{direction(left)}: 4px;
   }
   .not_graded & {
     font-size: 1.7em;
@@ -697,7 +697,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 }
 
 .speedgrader-selectmenu-icon + .ui-selectmenu-item-header {
-  margin-left: 5px;
+  margin-#{direction(left)}: 5px;
 }
 
 .turnitin_info {
@@ -758,9 +758,9 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
       position: relative;
       padding: $ic-sp/2 0;
       .turnitin_score_container {
-        float: left;
-        margin-right: $ic-sp;
-        margin-left: 0;
+        float: direction(left);
+        margin-#{direction(right)}: $ic-sp;
+        margin-#{direction(left)}: 0;
       }
       .turnitin_score_container_caret {
         display: none;
@@ -781,12 +781,12 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
         height: 16px;
         position: absolute;
         top: 3px;
-        right: 1px;
+        #{direction(right)}: 1px;
         overflow: hidden;
       }
       .display_name {
         display: block;
-        margin-right: 28px;
+        margin-#{direction(right)}: 28px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -808,8 +808,8 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   #section-menu-link {
     display: block;
     height: 19px;
-    margin-left: 8px;
-    padding-left: 29px;
+    margin-#{direction(left)}: 8px;
+    padding-#{direction(left)}: 29px;
     background: url("/images/arrow_left.png") no-repeat center left;
     overflow: hidden;
     white-space: nowrap;
@@ -823,7 +823,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   ul {
     position: absolute;
     top:0;
-    left: -200px;
+    #{direction(left)}: -200px;
     width: 200px;
     background-color: $ic-color-light;
     padding: 0;
@@ -855,8 +855,8 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 
 .speedgrader_alert {
   position: absolute;
-  left: 50%;
-  margin-left: -150px;
+  #{direction(left)}: 50%;
+  margin-#{direction(left)}: -150px;
   width: 300px;
   text-align: center;
 }
@@ -912,14 +912,14 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
     display: none;
   }
   .deduction-box-labels {
-    margin-right: .5em;
+    margin-#{direction(right)}: .5em;
   }
   .deduction-box-values {
     flex: 1
   }
   .error {
     color: $ic-color-danger;
-    margin-right: 1em;
+    margin-#{direction(right)}: 1em;
   }
   .bold {
     font-weight: bold;

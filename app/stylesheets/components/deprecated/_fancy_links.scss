@@ -18,21 +18,21 @@
 
 @mixin icon_link {
   background-repeat: no-repeat;
-  background-position: left center;
+  background-position: direction(left) center;
   line-height: 20px;
   // give it a 1px top and bottom padding so that the bg-images dont get chopped off, and give it a 20px left to make room for bg-icon
-  padding: 1px 0 1px 26px;
+  padding: direction-sides(1px 0 1px 26px);
   display: inline-block;
 }
 
 a.external_link {
-  padding-right: 15px;
+  padding-#{direction(right)}: 15px;
   background: no-repeat right center;
   background-image: url(/images/popout.png);
 }
 
 a.equella_content_link {
-  padding-left: 17px;
+  padding-#{direction(left)}: 17px;
   background: no-repeat left center;
   background-image: url(/images/equella_icon.png);
 }
@@ -44,7 +44,7 @@ a.add {
 
 a.add-small {
   @include icon_link;
-  padding-left: 15px;
+  padding-#{direction(left)}: 15px;
   background-image: url(/images/add-small.png);
 }
 
@@ -273,7 +273,7 @@ a.icon-grading {
     background-image: url(/images/icon-checkmark-plus-success.svg);
   }
   background-repeat: no-repeat;
-  background-position: left center;
+  background-position: direction(left) center;
   background-size: 18px;
 }
 
@@ -289,7 +289,7 @@ a.admin {
 
 @mixin attachment_link {
   background-repeat: no-repeat;
-  background-position: left center;
+  background-position: direction(left) center;
   @include fontSize(12px);
   padding: 1px 0 2px 20px;
 }
@@ -364,7 +364,7 @@ a.no-underline, a.no-underline:hover, a.no-underline:focus {
 .atr-reply, .atr-edit, .atr-delete {
   text-indent: -119988px;
   overflow: hidden;
-  text-align: left;
+  text-align: direction(left);
   background-repeat: no-repeat;
   background-position: 50% 50%;
   width: 16px;

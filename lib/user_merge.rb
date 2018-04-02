@@ -299,20 +299,20 @@ class UserMerge
   def move_observees(target_user, user_merge_data)
     # record all the records before destroying them
     # pass the from_user since user_id will be the observer
-    user_merge_data.add_more_data(from_user.user_observees, user: from_user)
-    user_merge_data.add_more_data(from_user.user_observers)
+    user_merge_data.add_more_data(from_user.as_observer_observation_links, user: from_user)
+    user_merge_data.add_more_data(from_user.as_student_observation_links)
     # delete duplicate or invalid observers/observees, move the rest
-    from_user.user_observees.where(user_id: target_user.user_observees.map(&:user_id)).destroy_all
-    from_user.user_observees.where(user_id: target_user).destroy_all
-    user_merge_data.add_more_data(target_user.user_observees.where(user_id: from_user), user: target_user)
-    target_user.user_observees.where(user_id: from_user).destroy_all
-    from_user.user_observees.active.update_all(observer_id: target_user.id)
-    xor_observer_ids = UserObserver.where(user_id: [from_user, target_user]).distinct.pluck(:observer_id)
-    from_user.user_observers.where(observer_id: target_user.user_observers.map(&:observer_id)).destroy_all
-    from_user.user_observers.active.update_all(user_id: target_user.id)
+    from_user.as_observer_observation_links.where(user_id: target_user.as_observer_observation_links.map(&:user_id)).destroy_all
+    from_user.as_observer_observation_links.where(user_id: target_user).destroy_all
+    user_merge_data.add_more_data(target_user.as_observer_observation_links.where(user_id: from_user), user: target_user)
+    target_user.as_observer_observation_links.where(user_id: from_user).destroy_all
+    from_user.as_observer_observation_links.update_all(observer_id: target_user.id)
+    xor_observer_ids = UserObservationLink.where(student: [from_user, target_user]).distinct.pluck(:observer_id)
+    from_user.as_student_observation_links.where(observer_id: target_user.as_student_observation_links.map(&:observer_id)).destroy_all
+    from_user.as_student_observation_links.update_all(user_id: target_user.id)
     # for any observers not already watching both users, make sure they have
     # any missing observer enrollments added
-    target_user.user_observers.where(observer_id: xor_observer_ids).each(&:create_linked_enrollments)
+    target_user.as_student_observation_links.where(observer_id: xor_observer_ids).each(&:create_linked_enrollments)
   end
 
   def destroy_conflicting_module_progressions(from_user, target_user)

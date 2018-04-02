@@ -2959,4 +2959,36 @@ describe User do
       expect(User.from_tokens(broken_tokens)).to be_empty
     end
   end
+
+  describe '#dashboard_view' do
+    before(:each) do
+      course_factory
+      user_factory(active_all: true)
+      user_session(@user)
+    end
+
+    it "defaults to 'cards' if not set at the user or account level" do
+      @user.dashboard_view = nil
+      @user.save!
+      @user.account.default_dashboard_view = nil
+      @user.account.save!
+      expect(@user.dashboard_view).to eql('cards')
+    end
+
+    it "defaults to account setting if user's isn't set" do
+      @user.dashboard_view = nil
+      @user.save!
+      @user.account.default_dashboard_view = 'activity'
+      @user.account.save!
+      expect(@user.dashboard_view).to eql('activity')
+    end
+
+    it "uses the user's setting as precedence" do
+      @user.dashboard_view = 'cards'
+      @user.save!
+      @user.account.default_dashboard_view = 'activity'
+      @user.account.save!
+      expect(@user.dashboard_view).to eql('cards')
+    end
+  end
 end

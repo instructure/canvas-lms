@@ -23,7 +23,7 @@ const discussion = shape({
   position: number,
   published: bool.isRequired,
   title: string.isRequired,
-  message: string.isRequired,
+  message: string,
   posted_at: string.isRequired,
   author: author.isRequired,
   read_state: oneOf(['read', 'unread']).isRequired,

@@ -47,7 +47,7 @@ export default function ProfileTray({
           inline={false}
           margin="auto"
         />
-        <Heading level="h3" as="h1">{userDisplayName}</Heading>
+        <Heading level="h3" as="h2">{userDisplayName}</Heading>
         <form action="/logout" method="post">
           <input name="utf8" value="✓" type="hidden" />
           <input name="_method" value="delete" type="hidden" />

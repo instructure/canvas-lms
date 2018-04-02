@@ -369,6 +369,13 @@ class StreamItem < ActiveRecord::Base
       User.where(:id => user_ids.to_a).touch_all
     end
 
+    Shackles.activate(:deploy) do
+      Shard.current.database_server.unshackle do
+        StreamItem.connection.execute("VACUUM ANALYZE #{StreamItem.quoted_table_name}")
+        StreamItemInstance.connection.execute("VACUUM ANALYZE #{StreamItemInstance.quoted_table_name}")
+      end
+    end
+
     count
   end
 

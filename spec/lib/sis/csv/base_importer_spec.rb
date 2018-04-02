@@ -24,29 +24,30 @@ describe SIS::CSV::CSVBaseImporter do
     sis = double
     allow(sis).to receive(:batch).and_return nil
     allow(sis).to receive(:root_account).and_return nil
-    path = generate_csv_file(['h,h,h',
-                              '0,0,0',
-                              '1,1,1',
-                              '2,2,2',
-                              '3,3,3',
-                              '4,4,4',
-                              '5,5,5',
-                              '6,6,6',
-                              '7,7,7',
-                              '8,8,8',
-                              '9,9,9'])
+    # we also add row numbers on a 1 based index including header row.
+    path = generate_csv_file(['h,h,h', # 1
+                              '0,0,0', # 2
+                              '1,1,1', # 3
+                              '2,2,2', # 4
+                              '3,3,3', # 5
+                              '4,4,4', # 6
+                              '5,5,5', # 7
+                              '6,6,6', # 8
+                              '7,7,7', # 9
+                              '8,8,8', # 10
+                              '9,9,9']) # 11
     csv = {}
     csv[:fullpath] = path
-    rows, rows2, rows3 = [],[],[]
+    rows, rows2, rows3 = [], [], []
     importer = SIS::CSV::CSVBaseImporter.new(sis)
     importer.csv_rows(csv, 0, 3) {|row| rows << row}
     importer.csv_rows(csv, 3, 6) {|row| rows2 << row}
     importer.csv_rows(csv, 9, 6) {|row| rows3 << row}
-    expect(rows.first.fields).to eq (['0','0','0'])
-    expect(rows.last.fields).to eq (['2','2','2'])
-    expect(rows2.first.fields).to eq (['3','3','3'])
-    expect(rows2.last.fields).to eq (['8','8','8'])
-    expect(rows3.first.fields).to eq (['9','9','9'])
+    expect(rows.first.fields).to eq ['0', '0', '0', 2]
+    expect(rows.last.fields).to eq ['2', '2', '2', 4]
+    expect(rows2.first.fields).to eq ['3', '3', '3', 5]
+    expect(rows2.last.fields).to eq ['8', '8', '8', 10]
+    expect(rows3.first.fields).to eq ['9', '9', '9', 11]
     expect(rows3.count).to eq 1
   end
 end

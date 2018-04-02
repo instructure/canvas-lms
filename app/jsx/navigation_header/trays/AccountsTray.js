@@ -28,7 +28,7 @@ import Spinner from '@instructure/ui-core/lib/components/Spinner'
 export default function AccountsTray({accounts, hasLoaded}) {
   return (
     <Container as="div" padding="medium">
-      <Heading level="h3" as="h1">{I18n.t('Admin')}</Heading>
+      <Heading level="h3" as="h2">{I18n.t('Admin')}</Heading>
       <hr />
       <List variant="unstyled" margin="small 0" itemSpacing="small">
         {hasLoaded ? (

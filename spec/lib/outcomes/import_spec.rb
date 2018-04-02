@@ -25,6 +25,12 @@ RSpec.describe Outcomes::Import do
       @context = context
     end
 
+    def new_import
+      @outcome_import_id = nil
+      next_import_id = outcome_import_id
+      LearningOutcomeGroup.update_all(outcome_import_id: next_import_id)
+    end
+
     attr_reader :context
   end
 
@@ -123,6 +129,13 @@ RSpec.describe Outcomes::Import do
     it 'updates attributes' do
       importer.import_group(group_attributes)
       expect(existing_group.reload).to have_attributes group_attributes
+    end
+
+    it 'fails if outcome group has already appeared in import' do
+      importer.import_group(group_attributes)
+      expect do
+        importer.import_group(group_attributes)
+      end.to raise_error TestImporter::InvalidDataError, /already appeared/
     end
 
     context 'with parents' do
@@ -235,6 +248,13 @@ RSpec.describe Outcomes::Import do
       expect(existing_outcome.reload).to have_attributes outcome_attributes
     end
 
+    it 'fails if outcome has already appeared in import' do
+      importer.import_outcome(outcome_attributes)
+      expect do
+        importer.import_outcome(outcome_attributes)
+      end.to raise_error TestImporter::InvalidDataError, /already appeared/
+    end
+
     context 'with parents' do
       before do
         [parent1, parent2].each do |p|
@@ -247,6 +267,18 @@ RSpec.describe Outcomes::Import do
         expect(context.root_outcome_group.child_outcome_links.active).to be_empty
         expect(parent1.child_outcome_links.active.map(&:content)).to include existing_outcome
         expect(parent2.child_outcome_links.active.map(&:content)).to include existing_outcome
+      end
+
+      it 'reassigns parent when resurrected' do
+        with_parents = outcome_attributes.merge(parent_guids: 'parent1 parent2')
+        importer.import_outcome(**with_parents)
+        importer.new_import
+        importer.import_outcome(**with_parents, workflow_state: 'deleted')
+        importer.new_import
+        importer.import_outcome(**with_parents)
+        expect(parent1.child_outcome_links.active.map(&:content)).to include existing_outcome
+        expect(parent2.child_outcome_links.active.map(&:content)).to include existing_outcome
+        expect(existing_outcome.reload.workflow_state).to eq('active')
       end
 
       it 'assigns to root outcome group if no parent specified' do
@@ -275,8 +307,9 @@ RSpec.describe Outcomes::Import do
       end
 
       context 'with outcomes from other contexts' do
+        let(:parent_context) { account_model }
+
         before do
-          parent_context = account_model
           context.update! parent_account: parent_context
           existing_outcome.update! context: parent_context
         end
@@ -284,13 +317,29 @@ RSpec.describe Outcomes::Import do
         it 'does not assign parents when attributes are changed' do
           expect do
             importer.import_outcome(**outcome_attributes, parent_guids: 'parent1')
-          end.to raise_error(TestImporter::InvalidDataError, /Cannot modify fields/)
+          end.to raise_error(TestImporter::InvalidDataError, /Cannot modify outcome from another context/)
         end
 
         it 'assigns parents for outcome in another context if attributes unchanged' do
           existing_outcome.update! outcome_attributes
           importer.import_outcome(**outcome_attributes, parent_guids: 'parent1')
           expect(parent1.child_outcome_links.map(&:content)).to include existing_outcome
+        end
+
+        context 'with global context' do
+          let(:parent_context) { nil }
+
+          it 'does not assign parents when attributes are changed' do
+            expect do
+              importer.import_outcome(**outcome_attributes, parent_guids: 'parent1')
+            end.to raise_error(TestImporter::InvalidDataError, /Cannot modify .* the global context/)
+          end
+
+          it 'assigns parents if attributes are unchanged' do
+            existing_outcome.update! outcome_attributes
+            importer.import_outcome(**outcome_attributes, parent_guids: 'parent1')
+            expect(parent1.child_outcome_links.map(&:content)).to include existing_outcome
+          end
         end
       end
     end

@@ -28,19 +28,19 @@
   overflow: hidden;
   position: relative;
   .centered-block-wrap {
-    clear: left;
+    clear: direction(left);
     margin: 0;
     padding: 0;
     position: relative;
-    left: 50%;
+    #{direction(left)}: 50%;
     text-align: center;
     .centered-block-inner {
       display: block;
       margin: 0;
       padding: 0;
       position: relative;
-      right: 50%;
-      text-align: left;
+      #{direction(right)}: 50%;
+      text-align: direction(left);
     }
   }
 }

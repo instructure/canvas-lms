@@ -116,7 +116,7 @@ class EpubExport < ActiveRecord::Base
     content_export.export
     true
   end
-  handle_asynchronously :export, priority: Delayed::LOW_PRIORITY, max_attempts: 1
+  handle_asynchronously :export, priority: Delayed::LOW_PRIORITY, max_attempts: 1, on_permanent_failure: :mark_as_failed
 
   def mark_exported
     if content_export.failed?
@@ -134,14 +134,18 @@ class EpubExport < ActiveRecord::Base
     update_attribute(:workflow_state, 'generating')
     convert_to_epub
   end
-  handle_asynchronously :generate, priority: Delayed::LOW_PRIORITY, max_attempts: 1
+  handle_asynchronously :generate, priority: Delayed::LOW_PRIORITY, max_attempts: 1, on_permanent_failure: :mark_as_failed
 
   def mark_as_generated
     job_progress.complete! if job_progress.running?
     update_attribute(:workflow_state, 'generated')
   end
 
-  def mark_as_failed
+  def mark_as_failed(error=nil)
+    if error
+      out = Canvas::Errors.capture_exception(:course_export, error)
+      ::Rails.logger.debug("Created ErrorReport #{out[:error_report]}")
+    end
     job_progress.try :fail!
     update_attribute(:workflow_state, 'failed')
   end
@@ -157,7 +161,7 @@ class EpubExport < ActiveRecord::Base
       file_paths = super
       I18n.locale = :en
     rescue => e
-      mark_as_failed
+      mark_as_failed(e)
       raise e
     end
 

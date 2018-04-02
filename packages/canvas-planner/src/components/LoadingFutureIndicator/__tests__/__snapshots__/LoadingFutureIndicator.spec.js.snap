@@ -22,15 +22,6 @@ exports[`renders all future items loaded regardless of other props 1`] = `
 
 exports[`renders load more by default 1`] = `
 <div>
-  <Waypoint
-    bottomOffset="0px"
-    fireOnRapidScroll={true}
-    horizontal={false}
-    onEnter={[Function]}
-    onLeave={[Function]}
-    onPositionChange={[Function]}
-    topOffset="0px"
-  />
   <Container
     as="div"
     display={null}
@@ -89,15 +80,6 @@ exports[`renders loading when indicated 1`] = `
 
 exports[`shows an Alert when there's a query error 1`] = `
 <div>
-  <Waypoint
-    bottomOffset="0px"
-    fireOnRapidScroll={true}
-    horizontal={false}
-    onEnter={[Function]}
-    onLeave={[Function]}
-    onPositionChange={[Function]}
-    topOffset="0px"
-  />
   <Container
     as="div"
     display={null}

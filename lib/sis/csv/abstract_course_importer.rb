@@ -33,7 +33,7 @@ module SIS
             begin
               importer.add_abstract_course(row['abstract_course_id'], row['short_name'], row['long_name'], row['status'], row['term_id'], row['account_id'], row['fallback_account_id'])
             rescue ImportError => e
-              add_warning(csv, "#{e}")
+              SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
             end
           end
         end

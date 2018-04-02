@@ -238,6 +238,10 @@ I18n.send(:extend, Module.new {
     backend.send(:lookup, locale.to_s, "fullcalendar_locale") || locale.to_s.downcase
   end
 
+  def rtl?
+    backend.send(:lookup, locale.to_s, "rtl")
+  end
+
   def moment_locale
     backend.send(:lookup, locale.to_s, "moment_locale") || locale.to_s.downcase
   end

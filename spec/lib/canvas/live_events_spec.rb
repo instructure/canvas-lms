@@ -655,4 +655,19 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.logged_in(session, @user, @pseudonym)
     end
   end
+
+  describe '.quizzes_next_quiz_duplicated' do
+    it 'should trigger a quiz duplicated live event' do
+      event_payload = {
+        original_course_id: '1234',
+        new_course_id: '5678',
+        original_resource_link_id: 'abc123',
+        new_resource_link_id: 'def456'
+      }
+
+      expect_event('quizzes_next_quiz_duplicated', event_payload).once
+
+      Canvas::LiveEvents.quizzes_next_quiz_duplicated(event_payload)
+    end
+  end
 end

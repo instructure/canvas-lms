@@ -37,7 +37,7 @@ module InstFS
     end
 
     def authenticated_url(attachment, options={})
-      query_params = { token: access_jwt(attachment, options) }
+      query_params = { token: access_jwt(access_path(attachment, attachment.filename), options) }
       query_params[:download] = 1 if options[:download]
       access_url(attachment, query_params)
     end
@@ -48,7 +48,7 @@ module InstFS
     end
 
     def authenticated_thumbnail_url(attachment, options={})
-      query_params = { token: access_jwt(attachment, options) }
+      query_params = { token: access_jwt(thumbnail_path(attachment), options) }
       query_params[:geometry] = options[:geometry] if options[:geometry]
       thumbnail_url(attachment, query_params)
     end
@@ -95,7 +95,7 @@ module InstFS
       }
     end
 
-    def direct_upload(host:, file_name:, file_object:)
+    def direct_upload(file_name:, file_object:)
       # example of a call to direct_upload:
       # > res = InstFS.direct_upload(
       # >   host: "canvas.docker",
@@ -103,13 +103,20 @@ module InstFS
       # >   file_object: File.open("public/images/a.png")
       # > )
 
-      token = direct_upload_jwt(host)
+      token = direct_upload_jwt
       url = "#{app_host}/files?token=#{token}"
 
       data = {}
       data[file_name] = file_object
 
-      CanvasHttp.post(url, form_data: data, multipart:true)
+      response = CanvasHttp.post(url, form_data: data, multipart:true)
+      if response.class == Net::HTTPCreated
+        json_response = JSON.parse(response.body)
+        return json_response["uuid"] if json_response.key?("uuid")
+
+        raise InstFS::DirectUploadError, "upload succeeded, but response did not containe a \"uuid\" key"
+      end
+      raise InstFS::DirectUploadError, "received code \"#{response.code}\" from service"
     end
 
     private
@@ -131,11 +138,11 @@ module InstFS
     end
 
     def access_url(attachment, query_params)
-      service_url("/files/#{attachment.instfs_uuid}/#{attachment.filename}", query_params)
+      service_url(access_path(attachment, attachment.filename), query_params)
     end
 
     def thumbnail_url(attachment, query_params)
-      service_url("/thumbnails/#{attachment.instfs_uuid}", query_params)
+      service_url(thumbnail_path(attachment), query_params)
     end
 
     def upload_url(token=nil)
@@ -143,13 +150,25 @@ module InstFS
       service_url("/files", query_string)
     end
 
-    def access_jwt(attachment, options={})
+    def access_path(attachment, custom_name)
+      res = "/files/#{attachment.instfs_uuid}"
+      if custom_name
+        res += "/#{custom_name}"
+      end
+      res
+    end
+
+    def thumbnail_path(attachment)
+      "/thumbnails/#{attachment.instfs_uuid}"
+    end
+
+    def access_jwt(resource, options={})
       expires_in = Setting.get('instfs.access_jwt.expiration_hours', '24').to_i.hours
       expires_in = options[:expires_in] || expires_in
       claims = {
         iat: Time.now.utc.to_i,
         user_id: options[:user]&.global_id&.to_s,
-        resource: attachment.instfs_uuid,
+        resource: resource,
         host: options[:oauth_host]
       }
       if options[:acting_as] && options[:acting_as] != options[:user]
@@ -163,7 +182,7 @@ module InstFS
       claims = {
         iat: Time.now.utc.to_i,
         user_id: user.global_id.to_s,
-        resource: upload_url,
+        resource: "/files",
         capture_url: capture_url,
         capture_params: capture_params
       }
@@ -173,12 +192,12 @@ module InstFS
       Canvas::Security.create_jwt(claims, expires_in.from_now, self.jwt_secret)
     end
 
-    def direct_upload_jwt(host)
+    def direct_upload_jwt
       expires_in = Setting.get('instfs.upload_jwt.expiration_minutes', '10').to_i.minutes
       Canvas::Security.create_jwt({
         iat: Time.now.utc.to_i,
         user_id: nil,
-        host: host,
+        host: "canvas",
         resource: "/files",
       }, expires_in.from_now, self.jwt_secret)
     end
@@ -206,8 +225,10 @@ module InstFS
       expires_in = Setting.get('instfs.logout_jwt.expiration_minutes', '5').to_i.minutes
       Canvas::Security.create_jwt({
         iat: Time.now.utc.to_i,
-        resource: '/resources'
+        resource: '/references'
       }, expires_in.from_now, self.jwt_secret)
     end
   end
+
+  class DirectUploadError < StandardError; end
 end

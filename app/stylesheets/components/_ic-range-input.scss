@@ -157,17 +157,17 @@
     border-radius: 3px;
     background: $range-input-value-bg-color;
     padding: 5px 10px;
-    margin-left: 7px;
+    margin-#{direction(left)}: 7px;
 
     &:after {
       content: "";
       position: absolute;
       top: 8px;
-      left: -6px;
+      #{direction(left)}: -6px;
       width: 0;
       height: 0;
       border-top: 7px solid transparent;
-      border-right: 7px solid $range-input-value-bg-color;
+      border-#{direction(right)}: 7px solid $range-input-value-bg-color;
       border-bottom: 7px solid transparent;
     }
   }

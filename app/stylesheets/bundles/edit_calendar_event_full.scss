@@ -31,7 +31,7 @@
       vertical-align: top;
       padding: 0 5px 0 0;
       &:first-child {
-        padding-left: 0px;
+        padding-#{direction(left)}: 0px;
       }
       label.row_header {
         padding-top: 10px;
@@ -41,7 +41,7 @@
       margin-bottom: 0px;
     }
     span {
-      float: left;
+      float: direction(left);
       padding: 0 5px;
       min-height: 40px;
     }
@@ -78,46 +78,46 @@
   }
 }
 .duplicate_div{
-  float: left;
+  float: direction(left);
   display: inline-block;
   margin: 0 5px;
   line-height: 38px;
   width: 35px;
-  text-align: right;
+  text-align: direction(right);
 }
 .duplicate_td{
   vertical-align: top;
-  padding-left: 20px;
+  padding-#{direction(left)}: 20px;
   min-width: 300px;
 }
 #duplicate_interval{
   width: 50px;
-  float: left;
+  float: direction(left);
   display: inline-block;
   margin: 0 5px;
 }
 .duplicate_for_div{
-  float: left;
+  float: direction(left);
   display: inline-block;
   margin: 0 5px;
   line-height: 38px;
   width: 35px;
-  text-align: right;
+  text-align: direction(right);
 }
 #duplicate_count{
   width: 50px;
-  float: left;
+  float: direction(left);
   display: inline-block;
   margin: 0 5px;
 }
 .occurences_div{
-  float: left;
+  float: direction(left);
   display: inline-block;
   margin: 0 5px;
   line-height: 38px;
 }
 .duplicate_tooltip_td{
   vertical-align: top;
-  padding-left: 20px;
+  padding-#{direction(left)}: 20px;
   width: 35px;
 }

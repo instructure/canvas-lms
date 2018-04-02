@@ -48,21 +48,21 @@ class ContextModule < ActiveRecord::Base
     return if self.new_record?
 
     if self.context.available? && self.active?
-      if self.workflow_state_changed? && self.workflow_state_was == "unpublished"
+      if self.saved_change_to_workflow_state? && self.workflow_state_before_last_save == "unpublished"
         # should trigger when publishing a prerequisite for an already active module
         @relock_warning = true if self.context.context_modules.active.any?{|mod| self.is_prerequisite_for?(mod)}
       end
-      if self.completion_requirements_changed?
+      if self.saved_change_to_completion_requirements?
         # removing a requirement shouldn't trigger
-        @relock_warning = true if (self.completion_requirements.to_a - self.completion_requirements_was.to_a).present?
+        @relock_warning = true if (self.completion_requirements.to_a - self.completion_requirements_before_last_save.to_a).present?
       end
-      if self.prerequisites_changed?
+      if self.saved_change_to_prerequisites?
         # ditto with removing a prerequisite
-        @relock_warning = true if (self.prerequisites.to_a - self.prerequisites_was.to_a).present?
+        @relock_warning = true if (self.prerequisites.to_a - self.prerequisites_before_last_save.to_a).present?
       end
-      if self.unlock_at_changed?
+      if self.saved_change_to_unlock_at?
         # adding a unlock_at date should trigger
-        @relock_warning = true if self.unlock_at.present? && self.unlock_at_was.blank?
+        @relock_warning = true if self.unlock_at.present? && self.unlock_at_before_last_save.blank?
       end
     end
   end

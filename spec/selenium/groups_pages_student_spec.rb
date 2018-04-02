@@ -19,6 +19,7 @@ require_relative 'common'
 require_relative 'announcements/announcement_index_page'
 require_relative 'announcements/announcement_new_edit_page'
 require_relative 'helpers/announcements_common'
+require_relative 'helpers/legacy_announcements_common'
 require_relative 'helpers/conferences_common'
 require_relative 'helpers/course_common'
 require_relative 'helpers/discussions_common'
@@ -123,74 +124,8 @@ describe "groups" do
       end
     end
 
-    #-------------------------------------------------------------------------------------------------------------------
-    describe "announcements page" do
-      it_behaves_like 'announcements_page', :student
-
-      it "should allow group members to delete their own announcements", priority: "1", test_id: 326521 do
-        create_group_announcement_manually("Announcement by #{@students.first.name}",'yo ho, yo ho')
-        expect(ff('.discussion-topic').size).to eq 1
-        delete_via_gear_menu
-        expect(f("#content")).not_to contain_css('.discussion-topic')
-      end
-
-      it "should allow any group member to create an announcement", priority: "1", test_id: 273607 do
-
-        # Checks that initial user can create an announcement
-        create_group_announcement_manually("Announcement by #{@user.name}",'sup')
-
-        # Log in as a new student to verify the last group was created and that they can also create a group
-        user_session(@students.first)
-        expect(ff('.discussion-topic').size).to eq 1
-        create_group_announcement_manually("Announcement by #{@students.first.name}",'yo')
-        expect(ff('.discussion-topic').size).to eq 2
-      end
-
-      it "should allow group members to edit their own announcements", priority: "1", test_id: 312867 do
-        create_group_announcement_manually("Announcement by #{@students.first.name}",'The Force Awakens')
-        expect(ff('.discussion-topic').size).to eq 1
-        f('.discussion-title').click
-        f('.edit-btn').click
-        expect(driver.title).to eq 'Edit Announcement'
-        type_in_tiny('textarea[name=message]','Rey is Yodas daughter')
-        f('.btn-primary').click
-        wait_for_ajaximations
-        get announcements_page
-        expect(ff('.discussion-topic').size).to eq 1
-        expect(f('.discussion-summary')).to include_text('Rey is Yodas daughter')
-      end
-
-      it "should not allow group members to edit someone else's announcement", priority: "1", test_id: 327111 do
-        create_group_announcement_manually("Announcement by #{@user.name}",'sup')
-        user_session(@students.first)
-        get announcements_page
-        expect(ff('.discussion-topic').size).to eq 1
-        f('.discussion-title').click
-        expect(f("#content")).not_to contain_css('.edit-btn')
-      end
-
-      it "should allow all group members to see announcements", priority: "1", test_id: 273613 do
-        @announcement = @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @teacher)
-        # Verifying with a few different group members should be enough to ensure all group members can see it
-        verify_member_sees_announcement
-
-        user_session(@students.first)
-        verify_member_sees_announcement
-      end
-
-      it "should only allow group members to access announcements", priority: "1", test_id: 315329 do
-        get announcements_page
-        expect(fj('.btn-primary:contains("Announcement")')).to be_displayed
-        verify_no_course_user_access(announcements_page)
-      end
-    end
-
     describe "announcements page v2" do
       it_behaves_like 'announcements_page_v2', :student
-
-      before :once do
-        @course.root_account.enable_feature!(:section_specific_announcements)
-      end
 
       it "should allow group members to delete their own announcements" do
         announcement = @testgroup.first.announcements.create!(

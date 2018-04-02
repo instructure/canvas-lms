@@ -502,7 +502,7 @@ describe CommunicationChannelsController do
         user_with_pseudonym(:username => 'jt+1@instructure.com', :active_all => 1)
         @logged_user = @user
 
-        @not_logged_user.observers << @logged_user
+        @not_logged_user.linked_observers << @logged_user
 
         user_session(@logged_user, @pseudonym)
 
@@ -516,7 +516,7 @@ describe CommunicationChannelsController do
         user_with_pseudonym(:username => 'jt+1@instructure.com', :active_all => 1)
         @logged_user = @user
 
-        @logged_user.observers << @not_logged_user
+        @logged_user.linked_observers << @not_logged_user
 
         user_session(@logged_user, @pseudonym)
 

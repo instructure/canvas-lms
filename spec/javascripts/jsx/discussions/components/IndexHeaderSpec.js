@@ -45,6 +45,20 @@ test('renders the component', () => {
   ok(node.exists())
 })
 
+test('renders the search input', () => {
+  const props = makeProps()
+  const tree = mount( <IndexHeader {...props} />)
+  const select = tree.find('TextInput')
+  ok(select.exists())
+})
+
+test('renders the filter input', () => {
+  const props = makeProps()
+  const tree = mount( <IndexHeader {...props} />)
+  const filter = tree.find('Select')
+  ok(filter.exists())
+})
+
 test('renders create discussion button if we have create permissions', () => {
   const tree = mount(
     <IndexHeader {...makeProps({ permissions: { create: true } })} />
@@ -69,3 +83,36 @@ test('renders discussionSettings', () => {
   ok(node.exists())
 })
 
+test('calls onFilterChange when entering a search term', (assert) => {
+  const done = assert.async()
+  const props = makeProps()
+  const searchSpy = sinon.spy()
+  props.searchDiscussions = searchSpy
+
+  const tree = mount( <IndexHeader {...props} />)
+  const select = tree.find('TextInput')
+  const input = select.find('input')
+  input.simulate('change', { target: { value: 'foobar' } })
+
+  setTimeout(() => {
+    ok(searchSpy.calledOnce)
+    done()
+  }, 750) // Need the longer timout here cause of debounce
+})
+
+test('calls onFilterChange when selecting a new filter', (assert) => {
+  const done = assert.async()
+  const props = makeProps()
+  const filterSpy = sinon.spy()
+  props.searchDiscussions = filterSpy
+
+  const tree = mount( <IndexHeader {...props} />)
+  const instuiSelect = tree.find('Select')
+  const rawSelect = instuiSelect.find('select')
+  rawSelect.simulate('change', { target: { value: 'unread' } })
+
+  setTimeout(() => {
+    ok(filterSpy.calledOnce)
+    done()
+  }, 750) // Need the longer timout here cause of debounce
+})

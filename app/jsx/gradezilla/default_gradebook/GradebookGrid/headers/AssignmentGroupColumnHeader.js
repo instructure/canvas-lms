@@ -98,7 +98,11 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader {
     const classes = `Gradebook__ColumnHeaderAction ${this.state.menuShown ? 'menuShown' : ''}`;
 
     return (
-      <div className="Gradebook__ColumnHeaderContent">
+      <div
+        className={`Gradebook__ColumnHeaderContent ${this.state.hasFocus ? 'focused' : ''}`}
+        onBlur={this.handleBlur}
+        onFocus={this.handleFocus}
+      >
         <div style={{ flex: 1, minWidth: '1px' }}>
           <Grid colSpacing="none" hAlign="space-between" vAlign="middle">
             <GridRow>

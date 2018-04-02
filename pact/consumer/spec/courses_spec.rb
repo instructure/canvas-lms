@@ -47,9 +47,9 @@ describe 'Courses', :pact => true do
           body: Pact.each_like(
             "id":9,"name":"Course1A","account_id":3,
             "uuid":"9TzDqnM8dX56QI1YvlA2wKUHB4HtEZkV4i7VIJt0",
-            "start_at":"2018-02-20T20:53:48Z","grading_standard_id":nil,
+            "start_at":"2018-02-20T20:53:48Z",
             "is_public":false,"course_code":"Course1A","default_view":"assignments",
-            "root_account_id":1,"enrollment_term_id":1,"end_at":nil,
+            "root_account_id":1,"enrollment_term_id":1,
             "public_syllabus":false,"public_syllabus_to_auth":false,
             "storage_quota_mb":500,"is_public_to_auth_users":false,
             "apply_assignment_group_weights":false,

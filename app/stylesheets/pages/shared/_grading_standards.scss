@@ -41,7 +41,7 @@
   }
   &.react_grading_standards {
     .cancel_button {
-      margin-right: 6px;
+      margin-#{direction(right)}: 6px;
     }
   }
 }
@@ -76,7 +76,7 @@
       display: table-row;
     }
     .standard_title div {
-      float: left;
+      float: direction(left);
     }
   }
   &.react_grading_standard {
@@ -87,8 +87,8 @@
       width: 175px;
     }
     .name_header {
-      text-align: left;
-      padding-right: 10px;
+      text-align: direction(left);
+      padding-#{direction(right)}: 10px;
       width: 24%;
     }
     .insert_row_container {
@@ -96,18 +96,18 @@
       width: 4%;
     }
     .links {
-      float: right;
+      float: direction(right);
     }
     .disabled-buttons {
-      float: right;
+      float: direction(right);
       opacity: 0.5;
     }
     .cannot-manage-notification {
       font-weight: normal;
-      margin-left: 4px;
+      margin-#{direction(left)}: 4px;
     }
     .icon-edit {
-      margin-right: 5px;
+      margin-#{direction(right)}: 5px;
     }
     .form-actions {
       background-color: transparent;
@@ -117,8 +117,8 @@
     .range_container {
       width: 72%;
       .range_label {
-        float: left;
-        margin-left: 10px;
+        float: direction(left);
+        margin-#{direction(left)}: 10px;
       }
     }
     table {
@@ -150,13 +150,13 @@
       width: 37px;
     }
     .last_row_cell {
-      padding-left: 15px;
+      padding-#{direction(left)}: 15px;
     }
     .row_cell {
       padding: 2px 2px;
       width: 24%;
       .range_to {
-        padding-right: 5px;
+        padding-#{direction(right)}: 5px;
       }
     }
     &.border_below {

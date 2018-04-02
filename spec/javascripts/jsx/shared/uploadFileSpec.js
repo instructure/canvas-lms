@@ -401,3 +401,33 @@ test('completeUpload waits on progress after upload POST if given both a progres
     deepEqual(data, results, 'returned data is from the Progress polling');
   });
 });
+
+test('uploadFile differentiates network failures during preflight', () => {
+  const fakeAjaxLib = { post: sinon.stub() };
+  fakeAjaxLib.post.rejects({ message: 'Network Error' }); // preflight attempt
+  return uploadFile('http://preflightUrl', {}, sinon.stub(), fakeAjaxLib)
+    .then(() => ok(false, 'preflight should fail'))
+    .catch(({ message }) => ok(message.match(/failed to initiate the upload/), 'correct error message'));
+});
+
+test('uploadFile differentiates network failures during POST to upload_url', () => {
+  const fakeAjaxLib = { post: sinon.stub() };
+  fakeAjaxLib.post.onCall(0).resolves({ data: { upload_url: 'http://uploadUrl' } }); // preflight
+  fakeAjaxLib.post.onCall(1).rejects({ message: 'Network Error' }); // upload attempt
+  return uploadFile('http://preflightUrl', {}, sinon.stub(), fakeAjaxLib)
+    .then(() => ok(false, 'upload should fail'))
+    .catch(({ message }) => ok(message.match(/service may be down/), 'correct error message'));
+});
+
+test('uploadFile differentiates network failures after upload', () => {
+  const fakeAjaxLib = { post: sinon.stub(), get: sinon.stub() };
+  fakeAjaxLib.post.onCall(0).resolves({ data: {
+    upload_url: 'http://uploadUrl',
+    success_url: 'http://successUrl'
+  }}); // preflight
+  fakeAjaxLib.post.onCall(1).resolves({ data: {} }); // upload
+  fakeAjaxLib.get.rejects({ message: 'Network Error' }); // success url attempt
+  return uploadFile('http://preflightUrl', {}, sinon.stub(), fakeAjaxLib)
+    .then(() => ok(false, 'finalization should fail'))
+    .catch(({ message }) => ok(message.match(/failed to complete the upload/), 'correct error message'));
+});

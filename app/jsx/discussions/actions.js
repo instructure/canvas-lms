@@ -31,6 +31,10 @@ const discussionActions = createPaginationActions('discussions', apiClient.getDi
 
 const types = [
   ...discussionActions.actionTypes,
+  'DRAG_AND_DROP_START',
+  'DRAG_AND_DROP_SUCCESS',
+  'DRAG_AND_DROP_FAIL',
+  'UPDATE_DISCUSSIONS_SEARCH',
   'TOGGLE_MODAL_OPEN',
   'TOGGLE_SUBSCRIBE_START',
   'ARRANGE_PINNED_DISCUSSIONS',
@@ -52,6 +56,9 @@ const types = [
   'DUPLICATE_DISCUSSION_START',
   'DUPLICATE_DISCUSSION_SUCCESS',
   'DUPLICATE_DISCUSSION_FAIL',
+  'DELETE_DISCUSSION_START',
+  'DELETE_DISCUSSION_SUCCESS',
+  'DELETE_DISCUSSION_FAIL',
   'CLEAN_DISCUSSION_FOCUS'
 ]
 
@@ -82,6 +89,8 @@ const defaultFailMessage = I18n.t('Updating discussion failed')
 // focusOn must be one of 'title' or 'manageMenu' (or can be left unspecified)
 // If set to a value, it will cause focus to end up on the title or manage menu
 // of the updated discussion.
+
+// TODO change this to the onSuccess paradigm. Much easier
 actions.updateDiscussion = function(discussion, updatedFields, { successMessage, failMessage }, focusOn) {
   return (dispatch, getState) => {
     const discussionCopy = copyAndUpdateDiscussion(discussion, updatedFields, focusOn)
@@ -104,6 +113,91 @@ actions.updateDiscussion = function(discussion, updatedFields, { successMessage,
       })
   }
 }
+
+
+// We need to assume success here, so that when we drag and drop something
+// it does not snap back to its current location and then move to the
+// correct location after the API call succeeds. This is a bit more complex
+// as we could be making two API calls here as well (pinning a discussion
+// and setting the order of the pin). Start by updating the store with
+// this information, then rollback based on if either of the API calls
+// failed.
+actions.handleDrop = function(discussion, updatedFields, order) {
+  return (dispatch, getState) => {
+    const originalOrder = order ? getState().pinnedDiscussions.map(d => d.id) : undefined
+    const discussionCopy = copyAndUpdateDiscussion(discussion, updatedFields)
+    dispatch(actions.dragAndDropStart({discussion: discussionCopy, order}))
+    apiClient.updateDiscussion(getState(), discussion, updatedFields)
+      .then(() => {
+        // Only need to make this API call if reordering the pinned discussions
+        const promise = (discussionCopy.pinned && order !== undefined)
+          ? apiClient.reorderPinnedDiscussions(getState(), order)
+          : new Promise(resolve => resolve())
+
+        promise
+          .then(() => {
+            dispatch(actions.dragAndDropSuccess())
+          })
+          .catch(err => {
+            // container state has already been updated, so we are only reverting
+            // the pinned order here. By default, if this is a discussion that
+            // that just got moved to the pinned container, we will move it to
+            // the bottom of the pinned discussions on error
+            if (discussionCopy.pinned) { originalOrder.push(discussionCopy.id) }
+            dispatch(actions.dragAndDropFail({
+              message: I18n.t('Failed to update discussion'),
+              discussion: discussionCopy,
+              order: originalOrder,
+              err,
+            }))
+          })
+      })
+      .catch(err => {
+        // reset order and discussion back to original state
+        dispatch(actions.dragAndDropFail({
+          message: I18n.t('Failed to update discussion'),
+          discussion,
+          order: originalOrder,
+          err,
+        }))
+      })
+  }
+}
+
+
+actions.searchDiscussions = function searchDiscussions ({ searchTerm, filter }) {
+  return (dispatch, getState) => {
+    dispatch(actions.updateDiscussionsSearch({ searchTerm, filter }))
+    const state = getState()
+    const pinned = state.pinnedDiscussions
+    const unpinned = state.unpinnedDiscussions
+    const closed = state.closedForCommentsDiscussions
+    const allDiscussions = pinned.concat(unpinned).concat(closed)
+    const numDisplayed = allDiscussions.filter(d => !d.filtered).length
+    $.screenReaderFlashMessageExclusive(I18n.t('%{count} discussions found.', { count: numDisplayed }))
+  }
+}
+
+actions.deleteDiscussion = function(discussion) {
+  return (dispatch, getState) => {
+    const discussionCopy = copyAndUpdateDiscussion(discussion, {})
+    dispatch(actions.deleteDiscussionStart())
+    apiClient.deleteDiscussion(getState(), {discussion: discussionCopy})
+      .then(_ => {
+        dispatch(actions.deleteDiscussionSuccess({discussion: discussionCopy}))
+        $.screenReaderFlashMessage(I18n.t('Successfully deleted discussion %{title}', { title: discussion.title }))
+      })
+      .catch(err => {
+        $.screenReaderFlashMessage(I18n.t('Failed to delete discussion %{title}', { title: discussion.title }))
+        dispatch(actions.deleteDiscussionFail({
+          message: I18n.t('Failed to delete discussion %{title}', { title: discussion.title }),
+          discussion,
+          err
+        }))
+      })
+  }
+}
+
 
 actions.fetchUserSettings = function() {
   return (dispatch, getState) => {

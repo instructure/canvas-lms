@@ -42,7 +42,7 @@
     color: $ic-font-color-dark;
   }
   .links {
-    float: right;
+    float: direction(right);
     opacity: 0.5;
     color: $ic-font-color-dark;
     &:hover {
@@ -50,15 +50,15 @@
     }
   }
   .repetition_group {
-    margin-left: 40px;
+    margin-#{direction(left)}: 40px;
     color: $ic-font-color-dark;
     font-weight: normal;
   }
   li {
     width: 400px;
-    clear: right;
+    clear: direction(right);
     .delete_item_link {
-      float: right
+      float: direction(right)
     }
   }
   .add_criteria_line select, .add_recipients_line select, .repetition_group input[type="text"] {

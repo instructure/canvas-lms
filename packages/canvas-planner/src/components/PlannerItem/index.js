@@ -17,23 +17,25 @@
  */
 import React, { Component } from 'react';
 import themeable from '@instructure/ui-themeable/lib';
-import containerQuery from '@instructure/ui-utils/lib/react/containerQuery';
 import Text from '@instructure/ui-core/lib/components/Text';
 import Checkbox from '@instructure/ui-core/lib/components/Checkbox';
 import Link from '@instructure/ui-core/lib/components/Link';
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
 import Pill from '@instructure/ui-core/lib/components/Pill';
+import Avatar from '@instructure/ui-core/lib/components/Avatar';
 import Assignment from 'instructure-icons/lib/Line/IconAssignmentLine';
 import Quiz from 'instructure-icons/lib/Line/IconQuizLine';
 import Announcement from 'instructure-icons/lib/Line/IconAnnouncementLine';
 import Discussion from 'instructure-icons/lib/Line/IconDiscussionLine';
-import Note from 'instructure-icons/lib/Line/IconNoteLightLine';
 import Calendar from 'instructure-icons/lib/Line/IconCalendarMonthLine';
 import Page from 'instructure-icons/lib/Line/IconMsWordLine';
+import NotificationBadge, { MissingIndicator, NewActivityIndicator } from '../NotificationBadge';
 import BadgeList from '../BadgeList';
 import styles from './styles.css';
 import theme from './theme.js';
 import { arrayOf, bool, number, string, func, shape, object } from 'prop-types';
+import { badgeShape, userShape, statusShape } from '../plannerPropTypes';
+import { showPillForOverdueStatus } from '../../utilities/statusUtils';
 import { momentObj } from 'react-moment-proptypes';
 import formatMessage from '../../format-message';
 import {animatable} from '../../dynamic-ui';
@@ -56,13 +58,14 @@ export class PlannerItem extends Component {
     html_url: string,
     toggleCompletion: func,
     updateTodo: func.isRequired,
-    badges: arrayOf(shape({
-      text: string,
-      variant: string
-    })),
+    badges: arrayOf(shape(badgeShape)),
     registerAnimatable: func,
     deregisterAnimatable: func,
     toggleAPIPending: bool,
+    status: statusShape,
+    newActivity: bool,
+    showNotificationBadge: bool,
+    currentUser: shape(userShape),
   };
 
   static defaultProps = {
@@ -126,6 +129,8 @@ export class PlannerItem extends Component {
   }
 
   renderIcon = () => {
+    const currentUser = this.props.currentUser || {};
+
     switch(this.props.associated_item) {
         case "Assignment":
           return <Assignment />;
@@ -140,7 +145,7 @@ export class PlannerItem extends Component {
         case "Page":
           return <Page />;
         default:
-          return <Note />;
+          return <Avatar name={currentUser.displayName || '?'} src={currentUser.avatarUrl} size="small" />;
     }
   }
 
@@ -219,17 +224,43 @@ export class PlannerItem extends Component {
     );
   }
 
+  renderNotificationBadge () {
+    if (!this.props.showNotificationBadge) {
+      return null;
+    }
+
+    const newItem = this.props.newActivity;
+    let missing = false;
+    if (showPillForOverdueStatus('missing', {status: this.props.status, context: this.props.context})) {
+      missing = true;
+    }
+
+    if (newItem || missing) {
+      const IndicatorComponent = newItem ? NewActivityIndicator : MissingIndicator;
+      return (
+        <div className={styles.activityIndicator}>
+          <IndicatorComponent
+          title={this.props.title}
+          itemIds={[this.props.uniqueId]}
+          animatableIndex={this.props.animatableIndex} />
+        </div>
+      );
+    } else {
+      return null;
+    }
+  }
 
   render () {
-    let assignmentType = this.props.associated_item ?
+    const assignmentType = this.props.associated_item ?
       this.props.associated_item : formatMessage('Task');
-    let checkboxLabel = this.state.completed ?
+    const checkboxLabel = this.state.completed ?
       formatMessage('{assignmentType} {title} is complete',
         { assignmentType: assignmentType, title: this.props.title }) :
       formatMessage('{assignmentType} {title} is incomplete',
         { assignmentType: assignmentType, title: this.props.title });
     return (
       <div className={styles.root} ref={this.registerRootDivRef}>
+        <NotificationBadge>{this.renderNotificationBadge()}</NotificationBadge>
         <div className={styles.completed}>
           <Checkbox
             ref={this.registerFocusElementRef}
@@ -240,7 +271,7 @@ export class PlannerItem extends Component {
           />
         </div>
         <div
-          className={styles.icon}
+          className={assignmentType === 'To Do' ? styles.avatar : styles.icon}
           style={{ color: this.props.color }}
           aria-hidden="true"
         >
@@ -255,11 +286,4 @@ export class PlannerItem extends Component {
   }
 }
 
-export default animatable(themeable(theme, styles)(
-  // we can update this to be whatever works for this component and its content
-  containerQuery({
-    'media-x-large': { minWidth: '68rem' },
-    'media-large': { minWidth: '58rem' },
-    'media-medium': { minWidth: '48rem' }
-  })(PlannerItem))
-);
+export default animatable(themeable(theme, styles)(PlannerItem));

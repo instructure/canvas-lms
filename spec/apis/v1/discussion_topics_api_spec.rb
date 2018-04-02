@@ -556,7 +556,6 @@ describe DiscussionTopicsController, type: :request do
       describe "section specific announcements" do
         before(:once) do
           course_with_teacher(active_course: true)
-          @course.account.set_feature_flag! :section_specific_announcements, 'on'
           @section = @course.course_sections.create!(name: 'test section')
 
           @announcement = @course.announcements.create!(:user => @teacher, message: 'hello my favorite section!')
@@ -711,6 +710,76 @@ describe DiscussionTopicsController, type: :request do
         expect(audio_tag["controls"]).to eq "controls"
         expect(audio_tag["src"]).to eq "http://www.example.com/courses/#{@course.id}/media_download?entryId=m-QgvagKCQATEtJAAMKdZV_g&media_type=audio&redirect=1"
         expect(message.css("p").inner_text).to eq "this is a media comment"
+      end
+
+      it "should include all_dates if they are asked for" do
+        due_date = 3.days.from_now
+        @assignment = @topic.context.assignments.build
+        @assignment.due_at = due_date
+        @topic.assignment = @assignment
+        @topic.save!
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+        {:controller => 'discussion_topics_api', :action => 'show', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s}, {include: ['all_dates']})
+
+        expect(json['assignment']['all_dates']).not_to be_nil
+      end
+
+      it "should include overrides if they are asked for" do
+        @assignment = @topic.context.assignments.build
+        override = @assignment.assignment_overrides.build
+        override.set = @section
+        override.title = "extension"
+        override.due_at = 2.days.from_now
+        override.due_at_overridden = true
+        override.save!
+        @topic.assignment = @assignment
+        @topic.save!
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+        {:controller => 'discussion_topics_api', :action => 'show', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s}, {include: ['overrides']})
+
+        expect(json['assignment']['overrides']).not_to be_nil
+      end
+
+      it "should include sections if the discussion is section specific and they are asked for" do
+        @course.root_account.enable_feature!(:section_specific_discussions)
+        section = @course.course_sections.create!
+        @topic.is_section_specific = true
+        @topic.discussion_topic_section_visibilities << DiscussionTopicSectionVisibility.new(
+          :discussion_topic => @topic,
+          :course_section => section,
+          :workflow_state => "active"
+        )
+        @topic.save!
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+        {:controller => 'discussion_topics_api', :action => 'show', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s}, { include: ['sections']})
+
+        expect(json['is_section_specific']).to be(true)
+        expect(json['sections'][0]['id']).to be(section.id)
+      end
+
+      it "should include section user accounts if they are asked for" do
+        @course.root_account.enable_feature!(:section_specific_discussions)
+        section = @course.course_sections.create!
+        @topic.is_section_specific = true
+        @topic.discussion_topic_section_visibilities << DiscussionTopicSectionVisibility.new(
+          :discussion_topic => @topic,
+          :course_section => section,
+          :workflow_state => "active"
+        )
+        @topic.save!
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+        {:controller => 'discussion_topics_api', :action => 'show', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s},
+         { include: ['sections', 'sections_user_count']})
+
+        expect(json['sections'][0]['user_count']).not_to be_nil
       end
     end
 
@@ -2834,6 +2903,35 @@ describe DiscussionTopicsController, type: :request do
       expect(json["title"]).to eq "Section Specific Topic Copy"
       expect(json["sections"].length).to eq 1
       expect(json["sections"][0]["id"]).to eq section1.id
+    end
+
+    it "duplicate updates positions" do
+      @user = @teacher
+      topic1 = DiscussionTopic.create!(:context => @course, :pinned => true, :position => 20,
+        :title => "Foo", :message => "bar")
+      topic2 = DiscussionTopic.create!(:context => @course, :pinned => true, :position => 21,
+        :title => "Bar", :message => "baz")
+      json = api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{topic1.id}/duplicate",
+        { :controller => "discussion_topics_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.to_param,
+          :topic_id => topic1.to_param },
+        {},
+        {},
+        :expected_status => 200)
+      # The new topic should have position 21, and topic2 should be bumped
+      # up to 22
+      new_positions = json["new_positions"]
+      topic1.reload
+      expect(new_positions[topic1.id.to_s]).to eq 20
+      expect(topic1.position).to eq 20
+      new_topic = DiscussionTopic.last
+      expect(new_positions[new_topic.id.to_s]).to eq 21
+      expect(new_topic.position).to eq 21
+      topic2.reload
+      expect(new_positions[topic2.id.to_s]).to eq 22
+      expect(topic2.position).to eq 22
     end
   end
 

@@ -23,7 +23,7 @@
 }
 
 .communication_message {
-  margin-left: 0px;
+  margin-#{direction(left)}: 0px;
   margin-bottom: 1em;
   padding-bottom: 1em;
   border-bottom: 1px solid $ic-border-color;
@@ -33,7 +33,7 @@
   }
 
   .header {
-    margin-left: 0px;
+    margin-#{direction(left)}: 0px;
 
     padding: 25px;
     line-height: 20px;
@@ -44,15 +44,15 @@
       line-height: 1.8em;
 
       .title {
-        margin-left: 0px;
-        padding-left: 0px;
+        margin-#{direction(left)}: 0px;
+        padding-#{direction(left)}: 0px;
         padding-bottom: 5px;
         @include fontSize(16px);
         color: $ic-font-color-dark;
         font-weight: normal;
       }
       .sub_title {
-        margin-left: 0px;
+        margin-#{direction(left)}: 0px;
         padding: 0 0 5px 0;
         color: $ic-font-color--subdued;
         font-style: italic;

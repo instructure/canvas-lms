@@ -109,6 +109,19 @@ describe SIS::CSV::AccountImporter do
 
   end
 
+  it 'should not allow deleting accounts with content' do
+    process_csv_data_cleanly(
+      "account_id,parent_account_id,name,status",
+      "A001,,Humanities,active",
+      "A002,A001,Sub Humanities,active")
+    importer = process_csv_data(
+      "account_id,parent_account_id,name,status",
+      "A001,,Humanities,deleted")
+
+    errors = importer.errors.map { |r| r.last }
+    expect(errors).to eq ["Cannot delete the sub_account with ID: A001 because it has active sub accounts."]
+  end
+
   it 'should support sticky fields' do
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",

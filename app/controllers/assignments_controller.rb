@@ -215,7 +215,7 @@ class AssignmentsController < ApplicationController
 
   def downloadable_submissions?(current_user, context, assignment)
     types = ["online_upload", "online_url", "online_text_entry"]
-    return unless (assignment.submission_types.split(",") & types).any?
+    return unless (assignment.submission_types.split(",") & types).any? && current_user
 
     student_ids =
       if assignment.grade_as_group?
@@ -524,6 +524,9 @@ class AssignmentsController < ApplicationController
       if @context.grading_periods?
         hash[:active_grading_periods] = GradingPeriod.json_for(@context, @current_user)
       end
+
+      hash[:ANONYMOUS_GRADING_ENABLED] = @context.feature_enabled?(:anonymous_marking)
+
       append_sis_data(hash)
       if context.is_a?(Course)
         hash[:allow_self_signup] = true  # for group creation

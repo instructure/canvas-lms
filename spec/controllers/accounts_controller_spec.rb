@@ -528,6 +528,22 @@ describe AccountsController do
       expect(@account.allowed_services).to match(%r{\+test3})
     end
 
+    it "should update 'default_dashboard_view'" do
+      account_with_admin_logged_in
+      @account = @account.sub_accounts.create!
+      expect(@account.default_dashboard_view).to be_nil
+
+      post 'update', params: { id: @account.id,
+                               account: {
+                                  settings: {
+                                    default_dashboard_view: "cards"
+                                  }
+                                }
+                             }
+      @account.reload
+      expect(@account.default_dashboard_view).to eq "cards"
+    end
+
     describe "quotas" do
       before :once do
         @account = Account.create!

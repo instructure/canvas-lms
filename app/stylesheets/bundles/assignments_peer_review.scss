@@ -34,12 +34,12 @@
   visibility: visible;
 }
 .student_reviews .person_gray {
-  padding-left: 20px;
+  padding-#{direction(left)}: 20px;
   background: url(/images/grading_icon_gray.png) no-repeat left center;
   color: #888;
 }
 .student_reviews .person {
-  padding-left: 20px;
+  padding-#{direction(left)}: 20px;
   background: url(/images/grading_icon.png) no-repeat left center;
 }
 

@@ -53,7 +53,7 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def publish_other_comments_in_this_group
-    return unless draft_changed?
+    return unless saved_change_to_draft?
     update_other_comments_in_this_group do |comment|
       comment.update_attributes(draft: draft)
     end
@@ -88,7 +88,7 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def check_for_media_object
-    if self.media_comment? && self.media_comment_id_changed?
+    if self.media_comment? && self.saved_change_to_media_comment_id?
       MediaObject.ensure_media_object(self.media_comment_id, {
         :user => self.author,
         :context => self.author,
@@ -131,7 +131,7 @@ class SubmissionComment < ActiveRecord::Base
     p.whenever {|record|
       # allows broadcasting when this record is initially saved (assuming draft == false) and also when it gets updated
       # from draft to final
-      (!record.draft? && (record.just_created || record.draft_changed?)) &&
+      (!record.draft? && (record.just_created || record.saved_change_to_draft?)) &&
       record.provisional_grade_id.nil? &&
       record.submission.assignment &&
       record.submission.assignment.context.available? &&
@@ -143,7 +143,7 @@ class SubmissionComment < ActiveRecord::Base
     p.dispatch :submission_comment_for_teacher
     p.to { submission.assignment.context.instructors_in_charge_of(author_id) - [author] }
     p.whenever {|record|
-      (!record.draft? && (record.just_created || record.draft_changed?)) &&
+      (!record.draft? && (record.just_created || record.saved_change_to_draft?)) &&
       record.provisional_grade_id.nil? &&
       record.submission.user_id == record.author_id
     }
@@ -263,7 +263,7 @@ class SubmissionComment < ActiveRecord::Base
 
   def update_participation
     # id_changed? because new_record? is false in after_save callbacks
-    if id_changed? || (hidden_changed? && !hidden?)
+    if saved_change_to_id? || (saved_change_to_hidden? && !hidden?)
       return if submission.user_id == author_id
       return if submission.assignment.deleted? || submission.assignment.muted?
       return if provisional_grade_id.present?

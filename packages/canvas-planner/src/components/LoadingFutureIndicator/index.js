@@ -22,7 +22,6 @@ import Container from '@instructure/ui-core/lib/components/Container';
 import Spinner from '@instructure/ui-core/lib/components/Spinner';
 import Text from '@instructure/ui-core/lib/components/Text';
 import ErrorAlert from '../ErrorAlert';
-import Waypoint from 'react-waypoint';
 import formatMessage from '../../format-message';
 
 export default class LoadingFutureIndicator extends Component {
@@ -44,12 +43,6 @@ export default class LoadingFutureIndicator extends Component {
 
   handleLoadMoreButton = () => {
     this.props.onLoadMore({});
-  }
-
-  handleWaypoint = () => {
-    if (!this.props.loadingError && this.props.plannerActive()) {
-      this.props.onLoadMore();
-    }
   }
 
   renderLoadMore () {
@@ -93,15 +86,8 @@ export default class LoadingFutureIndicator extends Component {
     }
   }
 
-  renderWaypoint () {
-    if (!this.props.loadingFuture && !this.props.allFutureItemsLoaded){
-      return <Waypoint onEnter={this.handleWaypoint} />;
-    }
-  }
-
   render () {
     return <div>
-      {this.renderWaypoint()}
       <Container as="div" padding="x-large" textAlign="center">
         {this.renderError()}
         {this.renderLoadMore()}

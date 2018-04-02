@@ -67,6 +67,8 @@ define [
       'click .icon-lock': 'onUnlockAssignment'
       'click .icon-unlock': 'onLockAssignment'
       'click .move_assignment': 'onMove'
+      'click .duplicate-failed-retry': 'onDuplicateFailedRetry'
+      'click .duplicate-failed-cancel': 'onDuplicateFailedCancel'
 
     messages:
       confirm: I18n.t('Are you sure you want to delete this assignment?')
@@ -256,6 +258,20 @@ define [
       e.preventDefault()
       @model.duplicate(@addAssignmentToList)
 
+    onDuplicateFailedRetry: (e) =>
+      e.preventDefault()
+      originalAssignment = @model.collection.get(@model.originalAssignmentID())
+      $button = $(e.target)
+      $button.prop('disabled', true)
+      originalAssignment.duplicate((response) =>
+        @addAssignmentToList(response)
+        @delete(silent: true)
+      ).always -> $button.prop('disabled', false)
+
+    onDuplicateFailedCancel: (e) =>
+      e.preventDefault()
+      @delete(silent: true)
+
     onDelete: (e) =>
       e.preventDefault()
       return unless @canDelete()
@@ -274,20 +290,18 @@ define [
     onLockAssignment: (e) =>
       e.preventDefault()
 
-    delete: ->
-      @model.destroy success: =>
-        $.screenReaderFlashMessage(I18n.t('Assignment was deleted'))
+    delete: (opts = { silent: false }) ->
+      callbacks = {}
+      unless opts.silent
+        callbacks.success = -> $.screenReaderFlashMessage(I18n.t('Assignment was deleted'))
+      @model.destroy(callbacks)
       @$el.remove()
 
     canDelete: ->
       (@userIsAdmin or @model.canDelete()) && !@model.isRestrictedByMasterCourse()
 
-    isDuplicableAssignment: ->
-      !@model.is_quiz_assignment() && !@model.isQuiz()
-
     canDuplicate: ->
-      # For now, forbid duplicating quizzes. We will implement that later.
-      (@userIsAdmin || @canManage()) && @isDuplicableAssignment()
+      (@userIsAdmin || @canManage()) && @model.canDuplicate()
 
     canMove: ->
       @userIsAdmin or (@canManage() and @model.canMove())

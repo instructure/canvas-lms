@@ -2,16 +2,23 @@
 
 exports[`renders as a div with a Checkbox and a string of text indicating count 1`] = `
 <div>
+  <NotificationBadge />
   <div>
-    <Checkbox
-      defaultChecked={true}
-      disabled={false}
-      inline={true}
-      label="Show 3 completed items"
+    <Button
+      as="button"
+      buttonRef={[Function]}
+      fluidWidth={false}
+      margin="0"
       onClick={[Function]}
       size="medium"
-      variant="simple"
-    />
+      type="button"
+      variant="link"
+    >
+      <IconArrowOpenRightSolid />
+      <span>
+        Show 3 completed items
+      </span>
+    </Button>
   </div>
   <div />
 </div>

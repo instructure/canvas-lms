@@ -109,7 +109,7 @@ describe Assignment do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
         allow(assignment).to receive(:update_cached_due_dates?).and_return(false)
-        allow(assignment).to receive(:grading_type_changed?).and_return(true)
+        allow(assignment).to receive(:saved_change_to_grading_type?).and_return(true)
         expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment)
 
         assignment.save!
@@ -119,7 +119,7 @@ describe Assignment do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
         allow(assignment).to receive(:update_cached_due_dates?).and_return(true)
-        allow(assignment).to receive(:grading_type_changed?).and_return(true)
+        allow(assignment).to receive(:saved_change_to_grading_type?).and_return(true)
         expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment).once
 
         assignment.save!
@@ -129,7 +129,7 @@ describe Assignment do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
         allow(assignment).to receive(:update_cached_due_dates?).and_return(false)
-        allow(assignment).to receive(:grading_type_changed?).and_return(false)
+        allow(assignment).to receive(:saved_change_to_grading_type?).and_return(false)
         expect(LatePolicyApplicator).not_to receive(:for_assignment).with(assignment)
 
         assignment.save!
@@ -139,7 +139,7 @@ describe Assignment do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
         allow(assignment).to receive(:update_cached_due_dates?).and_return(true)
-        allow(assignment).to receive(:grading_type_changed?).and_return(false)
+        allow(assignment).to receive(:saved_change_to_grading_type?).and_return(false)
         expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment).once
 
         assignment.save!
@@ -378,54 +378,108 @@ describe Assignment do
     end
   end
 
-  it "duplicate assignment" do
-    assignment = wiki_page_assignment_model({ :title => "Wiki Assignment" })
-    rubric = @course.rubrics.create! { |r| r.user = @teacher }
-    rubric_association_params = HashWithIndifferentAccess.new({
-       hide_score_total: "0",
-       purpose: "grading",
-       skip_updating_points_possible: false,
-       update_if_existing: true,
-       use_for_grading: "1",
-       association_object: assignment
-     })
+  describe "#duplicate" do
+    it "duplicates the assignment" do
+      assignment = wiki_page_assignment_model({ :title => "Wiki Assignment" })
+      rubric = @course.rubrics.create! { |r| r.user = @teacher }
+      rubric_association_params = HashWithIndifferentAccess.new({
+        hide_score_total: "0",
+        purpose: "grading",
+        skip_updating_points_possible: false,
+        update_if_existing: true,
+        use_for_grading: "1",
+        association_object: assignment
+      })
 
-    rubric_assoc = RubricAssociation.generate(@teacher, rubric, @course, rubric_association_params)
-    assignment.rubric_association = rubric_assoc
-    assignment.attachments.push(Attachment.new)
-    assignment.submissions.push(Submission.new)
-    assignment.ignores.push(Ignore.new)
-    assignment.turnitin_asset_string
-    new_assignment = assignment.duplicate
-    expect(new_assignment.id).to be_nil
-    expect(new_assignment.new_record?).to be true
-    expect(new_assignment.attachments.length).to be(0)
-    expect(new_assignment.submissions.length).to be(0)
-    expect(new_assignment.ignores.length).to be(0)
-    expect(new_assignment.rubric_association).not_to be_nil
-    expect(new_assignment.title).to eq "Wiki Assignment Copy"
-    expect(new_assignment.wiki_page.title).to eq "Wiki Assignment Copy"
-    expect(new_assignment.duplicate_of).to eq assignment
-    new_assignment.save!
-    new_assignment2 = assignment.duplicate
-    expect(new_assignment2.title).to eq "Wiki Assignment Copy 2"
-    new_assignment2.save!
-    expect(assignment.duplicates).to match_array [new_assignment, new_assignment2]
-    # Go back to the first new assignment to test something just ending in
-    # "Copy"
-    new_assignment3 = new_assignment.duplicate
-    expect(new_assignment3.title).to eq "Wiki Assignment Copy 3"
+      rubric_assoc = RubricAssociation.generate(@teacher, rubric, @course, rubric_association_params)
+      assignment.rubric_association = rubric_assoc
+      assignment.attachments.push(Attachment.new)
+      assignment.submissions.push(Submission.new)
+      assignment.ignores.push(Ignore.new)
+      assignment.turnitin_asset_string
+      new_assignment = assignment.duplicate
+      expect(new_assignment.id).to be_nil
+      expect(new_assignment.new_record?).to be true
+      expect(new_assignment.attachments.length).to be(0)
+      expect(new_assignment.submissions.length).to be(0)
+      expect(new_assignment.ignores.length).to be(0)
+      expect(new_assignment.rubric_association).not_to be_nil
+      expect(new_assignment.title).to eq "Wiki Assignment Copy"
+      expect(new_assignment.wiki_page.title).to eq "Wiki Assignment Copy"
+      expect(new_assignment.duplicate_of).to eq assignment
+      new_assignment.save!
+      new_assignment2 = assignment.duplicate
+      expect(new_assignment2.title).to eq "Wiki Assignment Copy 2"
+      new_assignment2.save!
+      expect(assignment.duplicates).to match_array [new_assignment, new_assignment2]
+      # Go back to the first new assignment to test something just ending in
+      # "Copy"
+      new_assignment3 = new_assignment.duplicate
+      expect(new_assignment3.title).to eq "Wiki Assignment Copy 3"
+    end
+
+    context "with an assignment that can't be duplicated" do
+      let(:assignment) { @course.assignments.create!(assignment_valid_attributes) }
+
+      before { allow(assignment).to receive(:can_duplicate?).and_return(false) }
+
+      it "raises an exception" do
+        expect { assignment.duplicate }.to raise_error(RuntimeError)
+      end
+    end
+
+    context "with an assignment that uses an external tool" do
+      let_once(:assignment) do
+        @course.assignments.create!(
+          submission_types: 'external_tool',
+          external_tool_tag_attributes: { url: 'http://example.com/launch' },
+          **assignment_valid_attributes
+        )
+      end
+
+      before { allow(assignment).to receive(:can_duplicate?).and_return(true) }
+
+      it "duplicates the assignment's external_tool_tag" do
+        new_assignment = assignment.duplicate
+        new_assignment.save!
+        expect(new_assignment.external_tool_tag).to be_present
+        expect(new_assignment.external_tool_tag.content).to eq(assignment.external_tool_tag.content)
+      end
+    end
   end
 
-  it "duplicates an assignment's external_tool_tag" do
-    assignment = @course.assignments.create!(
-      submission_types: 'external_tool',
-      external_tool_tag_attributes: { url: 'http://example.com/launch' },
-      **assignment_valid_attributes
-    )
-    new_assignment = assignment.duplicate
-    expect(new_assignment.external_tool_tag).to be_present
-    expect(new_assignment.external_tool_tag.content).to eq(assignment.external_tool_tag.content)
+  describe "#can_duplicate?" do
+    subject { assignment.can_duplicate? }
+
+    let(:assignment) { @course.assignments.create!(assignment_valid_attributes) }
+
+    context "with a regular assignment" do
+      it { is_expected.to be true }
+    end
+
+    context "with a quiz" do
+      before { allow(assignment).to receive(:quiz?).and_return(true) }
+
+      it { is_expected.to be false }
+    end
+
+    context "with an assignment that uses an external tool" do
+      let_once(:assignment) do
+        @course.assignments.create!(
+          submission_types: 'external_tool',
+          external_tool_tag_attributes: { url: 'http://example.com/launch' },
+          **assignment_valid_attributes
+        )
+      end
+
+      it { is_expected.to be false }
+
+      context "quiz_lti" do
+        before { allow(assignment).to receive(:quiz_lti?).and_return(true) }
+
+        it { is_expected.to be true }
+      end
+    end
   end
 
   describe "#representatives" do
@@ -1196,11 +1250,11 @@ describe Assignment do
       before do
         @gs1 = @course.grading_standards.create! standard_data: {
           a: {name: "OK", value: 100},
-          b: {name: "Bad", value: 80},
+          b: {name: "Bad", value: 0},
         }
         @gs2 = @course.grading_standards.create! standard_data: {
           a: {name: "🚀", value: 100},
-          b: {name: "🚽", value: 80},
+          b: {name: "🚽", value: 0},
         }
       end
 
@@ -1217,6 +1271,19 @@ describe Assignment do
       it "uses the canvas default" do
         expect(@assignment.grading_standard_or_default.title).to eql "Default Grading Scheme"
       end
+    end
+
+    it "converts using numbers sensitive to floating point errors" do
+      @assignment.grading_type = "letter_grade"
+      @assignment.points_possible = 100
+      gs = @assignment.context.grading_standards.build({title: "Numerical"})
+      gs.data = {"A" => 0.29, "F" => 0.00}
+      gs.assignments << @assignment
+      gs.save!
+      @assignment.save!
+
+      # 0.29 * 100 = 28.999999999999996 in ruby, which matches F instead of A
+      expect(@assignment.score_to_grade(29)).to eq("A")
     end
 
     it "should preserve gpa scale grades with zero points possible" do
@@ -4530,7 +4597,6 @@ describe Assignment do
         assignment.valid?
         expect(assignment.errors.keys.include?(:points_possible)).to be_falsey
       end
-
     end
   end
 
@@ -4753,6 +4819,91 @@ describe Assignment do
       a2 = assignment(@group_category)
       a2.group_category.destroy
       expect(a2.group_category_deleted_with_submissions?).to eq false
+    end
+
+    context 'when anonymous grading is enabled from before' do
+      before :each do
+        a1.group_category = nil
+        a1.anonymous_grading = true
+        a1.save!
+
+        a1.group_category = @group_category
+      end
+
+      it 'invalidates the record' do
+        expect(a1).not_to be_valid
+      end
+
+      it 'adds a validation error on the group category field' do
+        a1.valid?
+
+        expected_validation_error = "Anonymously graded assignments can't be group assignments"
+        expect(a1.errors[:group_category_id]).to eq([expected_validation_error])
+      end
+    end
+  end
+
+  describe 'anonymous grading validation' do
+    before :once do
+      @group_category = @course.group_categories.create! name: "groups"
+      @groups = Array.new(2) do |i|
+        @group_category.groups.create! name: "group #{i}", context: @course
+      end
+
+      @assignment = @course.assignments.build(name: "Assignment")
+      @assignment.save!
+    end
+
+    context 'when group_category is enabled from before' do
+      before :each do
+        @assignment.group_category = @group_category
+        @assignment.save!
+
+        @assignment.anonymous_grading = true
+      end
+
+      it 'invalidates the record' do
+        expect(@assignment).not_to be_valid
+      end
+
+      it 'adds a validation error on the anonymous grading field' do
+        @assignment.valid?
+
+        expected_validation_error = "Group assignments can't be anonymously graded"
+        expect(@assignment.errors[:anonymous_grading]).to eq([expected_validation_error])
+      end
+    end
+  end
+
+  describe 'group category and anonymous grading co-validation' do
+    before :once do
+      @group_category = @course.group_categories.create! name: "groups"
+      @groups = Array.new(2) do |i|
+        @group_category.groups.create! name: "group #{i}", context: @course
+      end
+
+      @assignment = @course.assignments.build(name: "Assignment")
+      @assignment.save!
+
+      @assignment.group_category = @group_category
+      @assignment.anonymous_grading = true
+    end
+
+    it 'invalidates the record' do
+      expect(@assignment).not_to be_valid
+    end
+
+    it 'adds a validation error on the base record' do
+      @assignment.valid?
+
+      expected_validation_error = "Can't enable anonymous grading and group assignments together"
+      expect(@assignment.errors[:base]).to eq([expected_validation_error])
+    end
+
+    it 'does not add a validation error on the anonymous grading field' do
+      @assignment.valid?
+
+      expect(@assignment.errors[:anonymous_grading]).to be_empty
     end
   end
 

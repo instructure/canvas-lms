@@ -58,7 +58,8 @@ const types = [
   'LOCK_ANNOUNCEMENTS_FAIL',
   'DELETE_ANNOUNCEMENTS_START',
   'DELETE_ANNOUNCEMENTS_SUCCESS',
-  'DELETE_ANNOUNCEMENTS_FAIL'
+  'DELETE_ANNOUNCEMENTS_FAIL',
+  'SET_ANNOUNCEMENTS_IS_LOCKING'
 ]
 
 const actions = Object.assign(
@@ -142,6 +143,23 @@ actions.toggleAnnouncementsLock = (announcements, isLocking = true) => (dispatch
     })
 }
 
+actions.announcementSelectionChangeStart = ({ selected , id }) => (dispatch, getState) => {
+  dispatch(actions.setAnnouncementSelection({ selected , id }))
+  const state = getState()
+  const { announcements } = state
+  const { items } = announcements.pages[announcements.currentPage]
+
+  const selectedItems = items.filter(item =>
+    state.selectedAnnouncements.includes(item.id))
+
+  // if all the selected items are locked, we want to unlock
+  // if any of the selected items are unlocked, we lock everything
+  const hasUnlockedItems = selectedItems
+    .reduce((hasAnyUnlocked, item) => hasAnyUnlocked || !item.locked, false)
+
+  dispatch(actions.setAnnouncementsIsLocking(hasUnlockedItems))
+}
+
 actions.toggleSelectedAnnouncementsLock = () => (dispatch, getState) => {
   const state = getState()
   const { announcements } = state
@@ -156,6 +174,7 @@ actions.toggleSelectedAnnouncementsLock = () => (dispatch, getState) => {
     .reduce((hasAnyUnlocked, item) => hasAnyUnlocked || !item.locked, false)
 
   actions.toggleAnnouncementsLock(state.selectedAnnouncements, hasUnlockedItems)(dispatch, getState)
+  dispatch(actions.setAnnouncementsIsLocking(!hasUnlockedItems)) // isLocking
 }
 
 actions.deleteAnnouncements = (announcements) => (dispatch, getState) => {

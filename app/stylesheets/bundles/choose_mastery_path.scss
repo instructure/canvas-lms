@@ -89,7 +89,7 @@
 }
 
 .cmp-button {
-  float: right;
+  float: direction(right);
   margin-top: -10px;
 
   &.cmp-button__selected,

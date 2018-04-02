@@ -38,10 +38,10 @@
 }
 
 .profile-avatar-wrapper {
-  margin-right: 20px !important;
+  margin-#{direction(right)}: 20px !important;
 
   a {
-    float: left;
+    float: direction(left);
     position: relative;
   }
 
@@ -56,7 +56,7 @@
     height: 30px;
     padding: 4px;
     position: absolute;
-    right: 2px;
+    #{direction(right)}: 2px;
     visibility: hidden;
     width: 30px;
 
@@ -139,7 +139,7 @@
   list-style: none;
   line-height: 2.0;
   & a {
-    padding-left: $ic-sp/2;
+    padding-#{direction(left)}: $ic-sp/2;
   }
 }
 .profileHeader {
@@ -147,7 +147,7 @@
   line-height: 1.25;
 }
 .stats {
-  text-align: left;
+  text-align: direction(left);
   width: 100%;
   tr {
     border-bottom: 1px solid #dfdfdf;
@@ -156,7 +156,7 @@
     border-bottom: 1px solid $borderColor;
   }
   td {
-    text-align: right;
+    text-align: direction(right);
     color: var(--ic-link-color);
     font-weight: bold;
   }
@@ -172,8 +172,8 @@
   margin: 0;
   padding: 0;
   li {
-    float: left;
-    margin-right: 10px;
+    float: direction(left);
+    margin-#{direction(right)}: 10px;
     text-align: center;
     .social {
       width: 30px;
@@ -250,5 +250,5 @@
 
 .ic-Profile-layout__Secondary {
   flex: 1;
-  text-align: right;
+  text-align: direction(right);
 }

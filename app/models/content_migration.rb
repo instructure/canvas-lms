@@ -504,7 +504,8 @@ class ContentMigration < ActiveRecord::Base
           end
         end
         self.context.copy_attachments_from_course(source_export.context, :content_export => source_export, :content_migration => self)
-        MasterCourses::FolderLockingHelper.recalculate_locked_folders(self.context)
+        MasterCourses::FolderHelper.recalculate_locked_folders(self.context)
+        MasterCourses::FolderHelper.update_folder_names(self.context, source_export)
 
         data = JSON.parse(self.exported_attachment.open, :max_nesting => 50)
         data = prepare_data(data)
@@ -890,16 +891,16 @@ class ContentMigration < ActiveRecord::Base
 
   def handle_import_in_progress_notice
     return unless context.is_a?(Course) && is_set?(migration_settings[:import_in_progress_notice])
-    if (new_record? || (workflow_state_changed? && %w{created queued}.include?(workflow_state_was))) &&
+    if (just_created || (saved_change_to_workflow_state? && %w{created queued}.include?(workflow_state_before_last_save))) &&
         %w(pre_processing pre_processed exporting importing).include?(workflow_state)
       context.add_content_notice(:import_in_progress, 4.hours)
-    elsif workflow_state_changed? && %w(pre_process_error exported imported failed).include?(workflow_state)
+    elsif saved_change_to_workflow_state? && %w(pre_process_error exported imported failed).include?(workflow_state)
       context.remove_content_notice(:import_in_progress)
     end
   end
 
   def check_for_blocked_migration
-    if self.workflow_state_changed? && %w(pre_process_error exported imported failed).include?(workflow_state)
+    if self.saved_change_to_workflow_state? && %w(pre_process_error exported imported failed).include?(workflow_state)
       if self.context && (next_cm = self.context.content_migrations.where(:workflow_state => 'queued').order(:id).first)
         job_id = next_cm.job_progress.try(:delayed_job_id)
         if job_id && (job = Delayed::Job.where(:id => job_id, :locked_at => nil).first)

@@ -50,7 +50,7 @@ export default class AnnouncementsIndex extends Component {
     hasLoadedAnnouncements: bool.isRequired,
     isCourseContext: bool.isRequired,
     getAnnouncements: func.isRequired,
-    setAnnouncementSelection: func.isRequired,
+    announcementSelectionChangeStart: func.isRequired,
     permissions: propTypes.permissions.isRequired,
     masterCourseData: masterCourseDataShape,
     deleteAnnouncements: func.isRequired,
@@ -135,9 +135,9 @@ export default class AnnouncementsIndex extends Component {
             <AnnouncementRow
               key={announcement.id}
               announcement={announcement}
-              canManage={this.props.permissions.manage_content}
+              canManage={announcement.permissions.delete}
               masterCourseData={this.props.masterCourseData}
-              onSelectedChanged={this.props.setAnnouncementSelection}
+              onSelectedChanged={this.props.announcementSelectionChangeStart}
               onManageMenuSelect={this.onManageAnnouncement}
               canHaveSections={this.props.isCourseContext}
               announcementsLocked={this.props.announcementsLocked}
@@ -204,7 +204,7 @@ const connectState = state =>
   )
 const connectActions = dispatch =>
   bindActionCreators(select(actions,
-    ['getAnnouncements', 'setAnnouncementSelection', 'deleteAnnouncements', 'toggleAnnouncementsLock']
+    ['getAnnouncements', 'announcementSelectionChangeStart', 'deleteAnnouncements', 'toggleAnnouncementsLock']
   ), dispatch)
 
 export const ConnectedAnnouncementsIndex = connect(connectState, connectActions)(AnnouncementsIndex)

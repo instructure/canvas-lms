@@ -96,13 +96,13 @@ a {
       font-size: 1.2em;
       position: absolute;
       top: 2px;
-      left: 25px;
+      #{direction(left)}: 25px;
     }
     .section:hover .links {
       display: block;
       position: absolute;
       top: 2px;
-      right: 2px;
+      #{direction(right)}: 2px;
     }
     .section .section_content {
       display: none;
@@ -111,7 +111,7 @@ a {
       display: block;
       position: absolute;
       top: 2px;
-      left: 2px;
+      #{direction(left)}: 2px;
       background-color: #fff;
       padding: 2px;
       cursor: move;
@@ -158,7 +158,7 @@ a {
         border-width: 0;
         background-color: transparent;
         padding: 0;
-        text-align: left;
+        text-align: direction(left);
       }
       .section:hover .move_link, .section:hover .links, .section_type_name {
         display: none;
@@ -172,12 +172,12 @@ a {
 }
 
 .submission_list, .submission_list.instTree {
-  padding-left: 0px;
+  padding-#{direction(left)}: 0px;
   max-height: 150px;
   overflow: auto;
   width: auto;
   margin: 5px 50px;
-  text-align: left;
+  text-align: direction(left);
 }
 
 .submission_list .already_used {
@@ -208,7 +208,7 @@ ul.submission_list.instTree li.submission.leaf {
       }
     }
     .file_list {
-      text-align: left;
+      text-align: direction(left);
     }
     .file_list .instTree .leaf.active {
       background-color: #ddd;
@@ -233,14 +233,14 @@ ul.submission_list.instTree li.submission.leaf {
     position: relative;
     .links {
       position: absolute;
-      right: 0;
+      #{direction(right)}: 0;
       bottom: 2px;
       font-size: 0.6em;
       font-weight: normal;
     }
   }
   #page_list {
-    padding-left: 0;
+    padding-#{direction(left)}: 0;
     margin-top: 5px;
     list-style-type: none;
     .page {
@@ -259,7 +259,7 @@ ul.submission_list.instTree li.submission.leaf {
     &.editing {
       .page .page_settings_menu {
         display: inline;
-        float: right;
+        float: direction(right);
         font-weight: normal;
       }
       .page_url {
@@ -326,7 +326,7 @@ ul.submission_list.instTree li.submission.leaf {
     .section_url {
       position: relative;
       background-color: $bodyBackground;
-      margin-right: -1px;
+      margin-#{direction(right)}: -1px;
       position: relative;
       padding: 7px 0 7px 23px;
       // color: #2C4C5E
@@ -363,8 +363,8 @@ ul.submission_list.instTree li.submission.leaf {
 
 #section_list {
   .section_settings_menu {
-    float: right;
-    padding-right: 5px;
+    float: direction(right);
+    padding-#{direction(right)}: 5px;
     display: none;
   }
   &.editing {
@@ -383,7 +383,7 @@ ul.submission_list.instTree li.submission.leaf {
     }
     .section_settings_menu {
       display: inline;
-      margin-left: 3px;
+      margin-#{direction(left)}: 3px;
       cursor: pointer;
     }
     li.section .name {

@@ -21,7 +21,7 @@ define [
   '../../util/Popover'
   '../../models/grade_summary/Outcome'
   'd3'
-  'i18n!outcomes'
+  'i18nObj'
   'jst/outcomes/outcomePopover'
 ], (_, {View}, Popover, Outcome, d3, I18n, popover_template) ->
 

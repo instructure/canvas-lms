@@ -69,7 +69,7 @@ class CourseSection < ActiveRecord::Base
   end
 
   def delete_enrollments_later_if_deleted
-    send_later_if_production(:delete_enrollments_if_deleted) if workflow_state == 'deleted' && workflow_state_changed?
+    send_later_if_production(:delete_enrollments_if_deleted) if workflow_state == 'deleted' && saved_change_to_workflow_state?
   end
 
   def delete_enrollments_if_deleted
@@ -162,9 +162,9 @@ class CourseSection < ActiveRecord::Base
   end
 
   def update_account_associations_if_changed
-    if (self.course_id_changed? || self.nonxlist_course_id_changed?) && !Course.skip_updating_account_associations?
+    if (self.saved_change_to_course_id? || self.saved_change_to_nonxlist_course_id?) && !Course.skip_updating_account_associations?
       Course.send_later_if_production(:update_account_associations,
-                                      [self.course_id, self.course_id_was, self.nonxlist_course_id, self.nonxlist_course_id_was].compact.uniq)
+                                      [self.course_id, self.course_id_before_last_save, self.nonxlist_course_id, self.nonxlist_course_id_before_last_save].compact.uniq)
     end
   end
 
@@ -312,7 +312,7 @@ class CourseSection < ActiveRecord::Base
   end
 
   def update_enrollment_states_if_necessary
-    if self.restrict_enrollments_to_section_dates_changed? || (self.restrict_enrollments_to_section_dates? && (changes.keys & %w{start_at end_at}).any?)
+    if self.saved_change_to_restrict_enrollments_to_section_dates? || (self.restrict_enrollments_to_section_dates? && (saved_changes.keys & %w{start_at end_at}).any?)
       EnrollmentState.send_later_if_production(:invalidate_states_for_course_or_section, self)
     end
   end

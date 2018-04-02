@@ -18,7 +18,42 @@
 
 import axios from 'axios'
 import qs from 'qs'
+import I18n from 'i18n!upload_file'
 import resolveProgress from './resolve_progress'
+
+// error interpretations. specifically avoid reporting an unhelpful "Network
+// Error". TODO: more introspection of the errors for more detailed/specific
+// error messages.
+function preflightFailed(err) {
+  if (err.message === 'Network Error') {
+    const wrapped = new Error(I18n.t("Canvas failed to initiate the upload."));
+    wrapped.originalError = err;
+    return Promise.reject(wrapped);
+  }
+  return Promise.reject(err)
+}
+
+function fileUploadFailed(err) {
+  if (err.message === 'Network Error') {
+    // something broke in the attempt to upload the file before the storage
+    // service could give a proper response. most likely is that an
+    // authentication failure broke the OPTIONS pre-request, causing a CORS
+    // fault
+    const wrapped = new Error(I18n.t("Unable to transmit file to the storage service. The service may be down or you may need to re-login to Canvas."));
+    wrapped.originalError = err;
+    return Promise.reject(wrapped);
+  }
+  return Promise.reject(err)
+}
+
+function postUploadFailed(err) {
+  if (err.message === 'Network Error') {
+    const wrapped = new Error(I18n.t("Canvas failed to complete the upload."));
+    wrapped.originalError = err;
+    return Promise.reject(wrapped);
+  }
+  return Promise.reject(err)
+}
 
 /*
  * preflightUrl: usually something like
@@ -49,6 +84,7 @@ export function uploadFile(preflightUrl, preflightData, file, ajaxLib = axios) {
   }
 
   return ajaxLib.post(preflightUrl, preflightData)
+    .catch(preflightFailed)
     .then((response) => exports.completeUpload(response.data, file, { ajaxLib }));
 }
 
@@ -86,7 +122,7 @@ export function completeUpload(preflightResponse, file, options={}) {
 
   if (!upload_url) {
     // cloning a url and don't need to repost elsewhere, just wait on progress
-    return resolveProgress(progress, { ajaxLib });
+    return resolveProgress(progress, { ajaxLib }).catch(postUploadFailed);
   }
 
   let { file_param, upload_params, success_url } = preflightResponse;
@@ -110,11 +146,11 @@ export function completeUpload(preflightResponse, file, options={}) {
   });
 
   // finalize upload
-  return upload.then((response) => {
+  return upload.catch(fileUploadFailed).then((response) => {
     if (progress) {
       // cloning a url, wait on the progress object to complete, the return its
       // results as the data
-      return resolveProgress(progress, { ajaxLib });
+      return resolveProgress(progress, { ajaxLib }).catch(postUploadFailed);
     }
     let location, query = {};
     if (success_url) {
@@ -141,7 +177,7 @@ export function completeUpload(preflightResponse, file, options={}) {
           location = `${location}?${query}`;
         }
       }
-      return ajaxLib.get(location).then(({ data }) => data);
+      return ajaxLib.get(location).then(({ data }) => data).catch(postUploadFailed);
     } else {
       // local-storage upload, this _is_ the attachment information
       return response.data;

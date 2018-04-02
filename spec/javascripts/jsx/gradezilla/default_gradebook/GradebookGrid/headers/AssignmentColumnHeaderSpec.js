@@ -1008,3 +1008,22 @@ test('#focusAtEnd sets focus on the options menu trigger', function () {
   this.wrapper.node.focusAtEnd();
   equal(document.activeElement, this.wrapper.node.optionsMenuTrigger);
 });
+
+test('applies the "focused" class when the assignment title has focus', function() {
+  const link = this.wrapper.find('.assignment-name a')
+  link.get(0).focus()
+  ok(this.wrapper.hasClass('focused'))
+})
+
+test('applies the "focused" class when the options menu has focus', function() {
+  const button = this.wrapper.find('.Gradebook__ColumnHeaderAction button')
+  button.get(0).focus()
+  ok(this.wrapper.hasClass('focused'))
+})
+
+test('removes the "focused" class when the header blurs', function() {
+  const link = this.wrapper.find('.assignment-name a')
+  link.get(0).focus()
+  link.get(0).blur()
+  notOk(this.wrapper.hasClass('focused'))
+})

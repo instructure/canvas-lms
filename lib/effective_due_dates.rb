@@ -23,6 +23,11 @@ class EffectiveDueDates
   # assignment id's, or a relation, but they MUST be from the same course.
   # Also cross-shard id's won't work.
 
+  # This class does NOT find the effective due dates for ungraded quizzes
+  # which can still have due date overrides.  If the logic in this file
+  # needs to be changed, please consider updating the logic in the
+  # "ungraded_with_user_due_date" quiz scope
+
   def initialize(context, *assignment_collection)
     raise "Context must be a course" unless context.is_a?(Course)
     raise "Context must have an id" unless context.id

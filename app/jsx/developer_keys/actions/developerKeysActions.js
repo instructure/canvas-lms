@@ -50,6 +50,24 @@ actions.deactivateDeveloperKeySuccessful = (payload) => ({ type: actions.DEACTIV
 actions.DEACTIVATE_DEVELOPER_KEY_FAILED = 'DEACTIVATE_DEVELOPER_KEY_FAILED';
 actions.deactivateDeveloperKeyFailed = (error) => ({ type: actions.DEACTIVATE_DEVELOPER_KEY_FAILED, error: true, payload: error });
 
+actions.MAKE_VISIBLE_DEVELOPER_KEY_START = 'MAKE_VISIBLE_DEVELOPER_KEY_START';
+actions.makeVisibleDeveloperKeyStart = () => ({ type: actions.MAKE_VISIBLE_DEVELOPER_KEY_START });
+
+actions.MAKE_VISIBLE_DEVELOPER_KEY_SUCCESSFUL = 'MAKE_VISIBLE_DEVELOPER_KEY_SUCCESSFUL';
+actions.makeVisibleDeveloperKeySuccessful = () => ({ type: actions.MAKE_VISIBLE_DEVELOPER_KEY_SUCCESSFUL });
+
+actions.MAKE_VISIBLE_DEVELOPER_KEY_FAILED = 'MAKE_VISIBLE_DEVELOPER_KEY_FAILED';
+actions.makeVisibleDeveloperKeyFailed = (error) => ({ type: actions.MAKE_VISIBLE_DEVELOPER_KEY_FAILED, error: true, payload: error });
+
+actions.MAKE_INVISIBLE_DEVELOPER_KEY_START = 'MAKE_INVISIBLE_DEVELOPER_KEY_START';
+actions.makeInvisibleDeveloperKeyStart = () => ({ type: actions.MAKE_INVISIBLE_DEVELOPER_KEY_START });
+
+actions.MAKE_INVISIBLE_DEVELOPER_KEY_SUCCESSFUL = 'MAKE_INVISIBLE_DEVELOPER_KEY_SUCCESSFUL';
+actions.makeInvisibleDeveloperKeySuccessful = () => ({ type: actions.MAKE_INVISIBLE_DEVELOPER_KEY_SUCCESSFUL });
+
+actions.MAKE_INVISIBLE_DEVELOPER_KEY_FAILED = 'MAKE_INVISIBLE_DEVELOPER_KEY_FAILED';
+actions.makeInvisibleDeveloperKeyFailed = (error) => ({ type: actions.MAKE_INVISIBLE_DEVELOPER_KEY_FAILED, error: true, payload: error });
+
 actions.DELETE_DEVELOPER_KEY_START = 'DELETE_DEVELOPER_KEY_START';
 actions.deleteDeveloperKeyStart = (payload) => ({ type: actions.DELETE_DEVELOPER_KEY_START, payload });
 
@@ -67,6 +85,75 @@ actions.activateDeveloperKeySuccessful = (payload) => ({ type: actions.ACTIVATE_
 
 actions.ACTIVATE_DEVELOPER_KEY_FAILED = 'ACTIVATE_DEVELOPER_KEY_FAILED';
 actions.activateDeveloperKeyFailed = (error) => ({ type: actions.ACTIVATE_DEVELOPER_KEY_FAILED, error: true, payload: error });
+
+actions.CREATE_OR_EDIT_DEVELOPER_KEY_START = 'CREATE_OR_EDIT_DEVELOPER_KEY_START';
+actions.createOrEditDeveloperKeyStart = () => ({ type: actions.CREATE_OR_EDIT_DEVELOPER_KEY_START })
+
+actions.CREATE_OR_EDIT_DEVELOPER_KEY_SUCCESSFUL = 'CREATE_OR_EDIT_DEVELOPER_KEY_SUCCESSFUL';
+actions.createOrEditDeveloperKeySuccessful = () => ({ type: actions.CREATE_OR_EDIT_DEVELOPER_KEY_SUCCESSFUL })
+
+actions.CREATE_OR_EDIT_DEVELOPER_KEY_FAILED = 'CREATE_OR_EDIT_DEVELOPER_KEY_FAILED';
+actions.createOrEditDeveloperKeyFailed = () => ({ type: actions.CREATE_OR_EDIT_DEVELOPER_KEY_FAILED })
+
+actions.SET_EDITING_DEVELOPER_KEY = 'SET_EDITING_DEVELOPER_KEY';
+actions.setEditingDeveloperKey = (payload) => ({type: actions.SET_EDITING_DEVELOPER_KEY, payload})
+
+actions.DEVELOPER_KEYS_MODAL_OPEN = 'DEVELOPER_KEYS_MODAL_OPEN';
+actions.developerKeysModalOpen = () => ({type: actions.DEVELOPER_KEYS_MODAL_OPEN})
+
+actions.DEVELOPER_KEYS_MODAL_CLOSE = 'DEVELOPER_KEYS_MODAL_CLOSE';
+actions.developerKeysModalClose = () => ({type: actions.DEVELOPER_KEYS_MODAL_CLOSE})
+
+actions.SET_BINDING_WORKFLOW_STATE_START = 'SET_BINDING_WORKFLOW_STATE_START';
+actions.setBindingWorkflowStateStart = () => ({ type: actions.SET_BINDING_WORKFLOW_STATE_START });
+
+actions.SET_BINDING_WORKFLOW_STATE_SUCCESSFUL = 'SET_BINDING_WORKFLOW_STATE_SUCCESSFUL';
+actions.setBindingWorkflowStateSuccessful = () => ({ type: actions.SET_BINDING_WORKFLOW_STATE_SUCCESSFUL });
+
+actions.SET_BINDING_WORKFLOW_STATE_FAILED = 'SET_BINDING_WORKFLOW_STATE_FAILED';
+actions.setBindingWorkflowStateFailed = () => ({ type: actions.SET_BINDING_WORKFLOW_STATE_FAILED });
+
+actions.setBindingWorkflowState = (developerKeyId, accountId, workflowState) => (dispatch) => {
+  dispatch(actions.setBindingWorkflowStateStart())
+  const url = `/api/v1/accounts/${accountId}/developer_keys/${developerKeyId}/developer_key_account_bindings`
+
+  axios.post(url, {
+    developer_key_account_binding: {
+      workflow_state: workflowState
+    }
+  })
+  .then(() => {
+    dispatch(actions.setBindingWorkflowStateSuccessful())
+  })
+  .catch((error) => {
+    dispatch(actions.setBindingWorkflowStateFailed())
+    $.flashError(error.message)
+  })
+}
+
+actions.createOrEditDeveloperKey = (formData, url, method) => (dispatch) => {
+  dispatch(actions.createOrEditDeveloperKeyStart())
+
+  axios({
+    method,
+    url,
+    data: formData,
+    config: { headers: {'Content-Type': 'multipart/form-data' }}
+  }).then((response) => {
+    if (method === 'post') {
+      dispatch(actions.listDeveloperKeysPrepend(response.data))
+    } else {
+      dispatch(actions.listDeveloperKeysReplace(response.data))
+    }
+    dispatch(actions.createOrEditDeveloperKeySuccessful())
+    dispatch(actions.developerKeysModalClose())
+  }).catch(error => {
+    $.flashError(error.message)
+    dispatch(actions.createOrEditDeveloperKeyFailed())
+  }).finally(() => {
+    dispatch(actions.setEditingDeveloperKey())
+  })
+}
 
 actions.getDeveloperKeys = (url, newSearch) => (dispatch, _getState) => {
   dispatch(actions.listDeveloperKeysStart(newSearch));
@@ -132,6 +219,38 @@ actions.activateDeveloperKey = (developerKey) => (dispatch, _getState) => {
     .catch((err) => dispatch(actions.activateDeveloperKeyFailed(err)));
 };
 
+actions.makeInvisibleDeveloperKey = (developerKey) => (dispatch, _getState) => {
+  dispatch(actions.makeInvisibleDeveloperKeyStart());
+
+  const url = `/api/v1/developer_keys/${developerKey.id}`
+  axios.put(url,
+      {
+        developer_key: {visible: false}
+      }
+    )
+    .then((response) => {
+      dispatch(actions.listDeveloperKeysReplace(response.data))
+      dispatch(actions.makeInvisibleDeveloperKeySuccessful())
+    })
+    .catch((err) => dispatch(actions.makeInvisibleDeveloperKeyFailed(err)));
+};
+
+actions.makeVisibleDeveloperKey = (developerKey) => (dispatch, _getState) => {
+  dispatch(actions.makeVisibleDeveloperKeyStart());
+
+  const url = `/api/v1/developer_keys/${developerKey.id}`
+  axios.put(url,
+      {
+        developer_key: {visible: true}
+      }
+    )
+    .then((response) => {
+      dispatch(actions.listDeveloperKeysReplace(response.data))
+      dispatch(actions.makeVisibleDeveloperKeySuccessful())
+    })
+    .catch((err) => dispatch(actions.makeVisibleDeveloperKeyFailed(err)));
+};
+
 actions.deleteDeveloperKey = (developerKey) => (dispatch, _getState) => {
   dispatch(actions.deleteDeveloperKeyStart());
 
@@ -145,4 +264,3 @@ actions.deleteDeveloperKey = (developerKey) => (dispatch, _getState) => {
 };
 
 export default actions
-

@@ -35,7 +35,9 @@ class DiscussionsIndex
     end
 
     def individual_discussion_url(discussion)
-      "/discussion_topics/#{discussion.id}"
+      context_type = discussion.context.is_a?(Course) ? "courses" : "groups"
+      context_id = discussion.context.id
+      "/#{context_type}/#{context_id}/discussion_topics/#{discussion.id}"
     end
 
     # ---------------------- Controls ----------------------
@@ -63,6 +65,10 @@ class DiscussionsIndex
       "a:contains(#{title})"
     end
 
+    def discussions_list
+      ff('.ic-item-row')
+    end
+
     def discussion_group(group_name)
       fj("div:contains('#{group_name}')")
     end
@@ -86,7 +92,7 @@ class DiscussionsIndex
     end
 
     def discussion_unread_pill(title)
-      f('.ic-unread-badge__unread-count', discussion(title))
+      f('.ic-unread-badge__unread-count', discussion(title)).text
     end
 
     def discussion_unread_number(title)
@@ -114,8 +120,16 @@ class DiscussionsIndex
       f('#delete-discussion-menu-option')
     end
 
+    def confirm_delete_modal_button
+      f('#confirm_delete_discussions')
+    end
+
     def pin_menu_option
       f('#togglepinned-discussion-menu-option')
+    end
+
+    def summary_content
+      f('.ic-announcement-row__content')
     end
 
     def close_for_comment_menu_option
@@ -149,6 +163,10 @@ class DiscussionsIndex
     def click_delete_menu_option(title)
       discussion_menu(title).click
       delete_menu_option.click
+    end
+
+    def click_delete_modal_confirm
+      confirm_delete_modal_button.click
     end
 
     def click_pin_menu_option(title)

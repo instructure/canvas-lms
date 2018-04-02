@@ -77,11 +77,11 @@
     .dragging_message {
       position: absolute;
       top: 5px;
-      left: 5px;
+      #{direction(left)}: 5px;
       display: block;
       font-size: 1.4em;
       font-weight: bold;
-      padding-left: 20px;
+      padding-#{direction(left)}: 20px;
       background: transparent url(/images/page_white_get.png) no-repeat left center;
     }
   }
@@ -95,7 +95,7 @@
   .remaining {
     font-size: 0.8em;
     color: #888;
-    margin-left: 7px;
+    margin-#{direction(left)}: 7px;
     margin-top: -5px;
   }
 }
@@ -107,7 +107,7 @@
     border: 1px solid #ccc;
     margin: 3px;
     padding: 3px;
-    float: left;
+    float: direction(left);
     .img_holder {
       min-height: 50px;
     }
@@ -133,11 +133,11 @@
     .dragging_message {
       position: absolute;
       top: 5px;
-      left: 5px;
+      #{direction(left)}: 5px;
       display: block;
       font-size: 1.4em;
       font-weight: bold;
-      padding-left: 20px;
+      padding-#{direction(left)}: 20px;
       background: transparent url(/images/page_white_get.png) no-repeat left center;
     }
   }
@@ -171,14 +171,14 @@
       img {
         position: absolute;
         top: 3px;
-        left: 3px;
+        #{direction(left)}: 3px;
         width: 24px;
         height: 24px;
       }
       i {
         position: absolute;
         top: 7px;
-        left: 7px;
+        #{direction(left)}: 7px;
         width: 16px;
         height: 16px;
       }

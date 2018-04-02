@@ -37,13 +37,13 @@ import select from '../../shared/select'
 import propTypes from '../propTypes'
 import actions from '../actions'
 
-// Delay the search so as not to overzealously read out the number
-// of search results to the user
-export const SEARCH_TIME_DELAY = 750
 const filters = {
   all: I18n.t('All'),
   unread: I18n.t('Unread')
 }
+
+const SEARCH_DELAY = 350
+
 export default class IndexHeader extends Component {
   static propTypes = {
     contextId: string.isRequired,
@@ -55,14 +55,18 @@ export default class IndexHeader extends Component {
     isSettingsModalOpen: bool.isRequired,
     permissions: propTypes.permissions.isRequired,
     saveSettings: func.isRequired,
-    searchInputRef: func,
+    searchDiscussions: func.isRequired,
     toggleModalOpen: func.isRequired,
     userSettings: propTypes.userSettings.isRequired,
   }
 
   static defaultProps = {
-    searchInputRef: null,
     courseSettings: {},
+  }
+
+  state = {
+    searchTerm: "",
+    filter: 'all',
   }
 
   componentDidMount() {
@@ -72,15 +76,21 @@ export default class IndexHeader extends Component {
     }
   }
 
-  onSearch = debounce(() => {}, SEARCH_TIME_DELAY, {
-    leading: false,
-    trailing: true,
-  })
-
-  searchInputRef = (input) => {
-    this.searchInput = input
-    if (this.props.searchInputRef) this.props.searchInputRef(input)
+  onSearchStringChange = (e) => {
+    this.setState({searchTerm: e.target.value}, this.filterDiscussions)
   }
+
+  onFilterChange = (e) => {
+    this.setState({filter: e.target.value}, this.filterDiscussions)
+  }
+
+  // This is needed to make the search results do not keep cutting each
+  // other off when typing fasting and using a screen reader
+  filterDiscussions = debounce(
+    () => this.props.searchDiscussions(this.state),
+    SEARCH_DELAY,
+    {leading: false, trailing: true}
+  )
 
   render () {
     return (
@@ -91,19 +101,20 @@ export default class IndexHeader extends Component {
               <GridCol width={2}>
                 <Select
                   name="filter-dropdown"
+                  onChange={this.onFilterChange}
                   size="medium"
                   label={<ScreenReaderContent>{I18n.t('Discussion Filter')}</ScreenReaderContent>}>
                   {
                     Object.keys(filters).map((filter) => (<option key={filter} value={filter}>{filters[filter]}</option>))
-                  } </Select>
+                  }
+                </Select>
               </GridCol>
               <GridCol width={4}>
                 <TextInput
                   label={<ScreenReaderContent>{I18n.t('Search discussion by title')}</ScreenReaderContent>}
                   placeholder={I18n.t('Search')}
                   icon={() => <IconSearchLine />}
-                  ref={this.searchInputRef}
-                  onChange={this.onSearch}
+                  onChange={this.onSearchStringChange}
                   name="discussion_search"
                 />
               </GridCol>
@@ -148,6 +159,6 @@ const connectState = state => Object.assign({
   'isSavingSettings',
   'isSettingsModalOpen',
 ]))
-const selectedActions = ['fetchUserSettings', 'fetchCourseSettings', 'saveSettings', 'toggleModalOpen']
+const selectedActions = ['fetchUserSettings', 'searchDiscussions', 'fetchCourseSettings', 'saveSettings', 'toggleModalOpen']
 const connectActions = dispatch => bindActionCreators(select(actions, selectedActions), dispatch)
 export const ConnectedIndexHeader = connect(connectState, connectActions)(IndexHeader)

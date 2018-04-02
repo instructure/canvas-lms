@@ -18,11 +18,11 @@
 # You can enable the Rails 5.1 support by either defining a
 # CANVAS_RAILS5_1=1 env var, creating an empty RAILS5_1 file in the canvas config dir,
 # or setting `private/canvas/rails5.1` to `true` in a locally accessible consul
-if !defined?(CANVAS_RAILS5_0)
-  if ENV['CANVAS_RAILS5_1']
-    CANVAS_RAILS5_0 = ENV['CANVAS_RAILS5_1'] == '0'
-  elsif File.exist?(File.expand_path("../RAILS5_0", __FILE__))
-    CANVAS_RAILS5_0 = true
+unless defined?(CANVAS_RAILS5_1)
+  if ENV['CANVAS_RAILS5_2']
+    CANVAS_RAILS5_1 = ENV['CANVAS_RAILS5_2'] == '0'
+  elsif File.exist?(File.expand_path("../RAILS5_2", __FILE__))
+    CANVAS_RAILS5_1 = false
   else
     begin
       # have to do the consul communication without any gems, because
@@ -35,9 +35,9 @@ if !defined?(CANVAS_RAILS5_0)
       environment = YAML.load(File.read(File.expand_path("../consul.yml", __FILE__))).dig(ENV['RAILS_ENV'] || 'development', 'environment')
 
       keys = [
-        ["private/canvas", environment, $canvas_cluster, "rails5.1"].compact.join("/"),
-        ["private/canvas", environment, "rails5.1"].compact.join("/"),
-        ["global/private/canvas", environment, "rails5.1"].compact.join("/")
+        ["private/canvas", environment, $canvas_cluster, "rails5.2"].compact.join("/"),
+        ["private/canvas", environment, "rails5.2"].compact.join("/"),
+        ["global/private/canvas", environment, "rails5.2"].compact.join("/")
       ].uniq
 
       result = nil
@@ -46,9 +46,9 @@ if !defined?(CANVAS_RAILS5_0)
         result = nil unless result.is_a?(Net::HTTPSuccess)
         break if result
       end
-      CANVAS_RAILS5_0 = (result || false) && Base64.decode64(JSON.load(result.body).first['Value']) == 'false'
+      CANVAS_RAILS5_1 = !(result && Base64.decode64(JSON.load(result.body).first['Value']) == 'false')
     rescue
-      CANVAS_RAILS5_0 = false
+      CANVAS_RAILS5_1 = true
     end
   end
 end

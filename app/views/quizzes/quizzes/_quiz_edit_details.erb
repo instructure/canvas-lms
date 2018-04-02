@@ -42,7 +42,7 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
           <input type="hidden" name="description" value="<%=@quiz.description%>"/>
         <% else %>
           <%= before_label(:quiz_instructions, "Quiz Instructions") %>
-          <div style="float: right; font-size: 0.8em; cursor: pointer;">
+          <div class="pull-right" style="font-size: 0.8em; cursor: pointer;">
             <a href="#" class="toggle_description_views_link"><%= t "HTML Editor" %></a>
             <a href="#" class="toggle_description_views_link" style="display:none;"><%= t "Rich Content Editor" %></a>
           </div>

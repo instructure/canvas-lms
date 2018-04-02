@@ -20,201 +20,304 @@ import $ from 'jquery'
 import ComboBox from 'compiled/widget/ComboBox'
 import simulateClick from 'helpers/simulateClick'
 
-QUnit.module('ComboBox', {
-  teardown() {
-    // remove a combobox if one was created
-    if (this.combobox != null) {
-      this.combobox.$el.remove()
-    }
-  }
-})
+/* eslint-disable qunit/no-identical-names */
 
-function confirmSelected(combobox, item) {
-  equal(combobox.$menu.val(), combobox._value(item))
-}
+QUnit.module('ComboBox', suiteHooks => {
+  let combobox
+  let items
+  let options
 
-test('constructor: dom setup', function() {
-  const items = [
-    {label: 'label1', value: 'value1'},
-    {label: 'label2', value: 'value2'},
-    {label: 'label3', value: 'value3'}
-  ]
-  this.combobox = new ComboBox(items)
-
-  // should have the infrastructure in place
-  ok(this.combobox.$el.hasClass('ui-combobox'))
-  ok(this.combobox.$prev.hasClass('ui-combobox-prev'))
-  ok(this.combobox.$next.hasClass('ui-combobox-next'))
-  ok(this.combobox.$menu[0].tagName, 'SELECT')
-
-  // should have the options (both flavors) set up according to items
-  const options = $('option', this.combobox.$menu)
-
-  equal(options.length, 3)
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i]
-    equal(options.eq(i).prop('value'), item.value)
-    equal(options.eq(i).text(), item.label)
-  }
-
-  // should have the first item selected
-  confirmSelected(this.combobox, items[0])
-})
-
-test('constructor: value', function() {
-  const items = [
-    {label: 'label1', id: 'id1'},
-    {label: 'label2', id: 'id2'},
-    {label: 'label3', id: 'id3'}
-  ]
-  const valueFunc = item => item.id
-  this.combobox = new ComboBox(items, {value: valueFunc})
-
-  const options = $('option', this.combobox.$menu)
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i]
-    equal(options.eq(i).prop('value'), valueFunc(item))
-  }
-})
-
-test('constructor: label', function() {
-  const items = [
-    {name: 'name1', value: 'value1'},
-    {name: 'name2', value: 'value2'},
-    {name: 'name3', value: 'value3'}
-  ]
-  const labelFunc = item => item.name
-  this.combobox = new ComboBox(items, {label: labelFunc})
-
-  const options = $('option', this.combobox.$menu)
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i]
-    equal(options.eq(i).text(), labelFunc(item))
-  }
-})
-
-test('constructor: selected', function() {
-  const items = [
-    {label: 'label1', value: 'value1'},
-    {label: 'label2', value: 'value2'},
-    {label: 'label3', value: 'value3'}
-  ]
-  const selectedItem = items[2]
-  this.combobox = new ComboBox(items, {selected: selectedItem.value})
-
-  // should have the specified item selected
-  confirmSelected(this.combobox, selectedItem)
-})
-
-test('constructor: value and selected', function() {
-  const items = [
-    {label: 'label1', id: 'id1'},
-    {label: 'label2', id: 'id2'},
-    {label: 'label3', id: 'id3'}
-  ]
-  const selectedItem = items[2]
-  const valueFunc = item => item.id
-  this.combobox = new ComboBox(items, {
-    value: valueFunc,
-    selected: valueFunc(selectedItem)
+  suiteHooks.beforeEach(() => {
+    items = [
+      {label: 'Label 1', value: 'value1'},
+      {label: 'Label 2', value: 'value2'},
+      {label: 'Label 3', value: 'value3'}
+    ]
+    options = {}
   })
 
-  // should have the specified item selected
-  confirmSelected(this.combobox, selectedItem)
-})
+  suiteHooks.afterEach(() => {
+    if (combobox != null) {
+      combobox.$el.remove()
+    }
+  })
 
-test('select', function() {
-  const items = [
-    {label: 'label1', value: 'value1'},
-    {label: 'label2', value: 'value2'},
-    {label: 'label3', value: 'value3'}
-  ]
-  this.combobox = new ComboBox(items)
-  const spy = this.spy()
-  this.combobox.on('change', spy)
+  function createComboBox() {
+    combobox = new ComboBox(items, options)
+  }
 
-  // calling select should change selection and trigger callback with new
-  // selected item
-  this.combobox.select(items[2].value)
-  confirmSelected(this.combobox, items[2])
-  // for some reason spy.withArgs(items[2]).calledOnce doesn't work
-  ok(spy.calledOnce)
-  equal(spy.getCall(0).args[0], items[2])
+  function getOptionValues() {
+    const $options = $('option', combobox.$menu)
+    return [].map.call($options, option => $(option).prop('value'))
+  }
 
-  // calling with the current selection should not trigger callback
-  spy.reset()
-  this.combobox.select(items[2].value)
-  ok(!spy.called)
-})
+  function getOptionLabels() {
+    const $options = $('option', combobox.$menu)
+    return [].map.call($options, $.text)
+  }
 
-test('prev button', function() {
-  const items = [
-    {label: 'label1', value: 'value1'},
-    {label: 'label2', value: 'value2'},
-    {label: 'label3', value: 'value3'}
-  ]
-  this.combobox = new ComboBox(items, {selected: items[1].value})
-  const spy = this.spy()
-  this.combobox.on('change', spy)
+  QUnit.module('when initialized', () => {
+    test('adds the "ui-combobox" class to the combobox element', () => {
+      createComboBox()
+      ok(combobox.$el.hasClass('ui-combobox'))
+    })
 
-  // clicking prev button selects previous element
-  simulateClick(this.combobox.$prev[0])
-  confirmSelected(this.combobox, items[0])
-  ok(spy.calledOnce)
-  equal(spy.getCall(0).args[0], items[0])
+    test('adds the "ui-combobox-prev" class to the "previous" button', () => {
+      createComboBox()
+      ok(combobox.$prev.hasClass('ui-combobox-prev'))
+    })
 
-  // clicking from the front wraps around
-  spy.reset()
-  simulateClick(this.combobox.$prev[0])
-  confirmSelected(this.combobox, items[2])
-  ok(spy.calledOnce)
-  equal(spy.getCall(0).args[0], items[2])
-})
+    test('adds the "ui-combobox-next" class to the "next" button', () => {
+      createComboBox()
+      ok(combobox.$next.hasClass('ui-combobox-next'))
+    })
 
-test('prev button: one item', function() {
-  const items = [{label: 'label1', value: 'value1'}]
-  this.combobox = new ComboBox(items)
-  const spy = this.spy()
-  this.combobox.on('change', spy)
+    test('stores a reference to the select element', () => {
+      createComboBox()
+      equal(combobox.$menu[0].tagName, 'SELECT')
+    })
 
-  // clicking prev button does nothing
-  simulateClick(this.combobox.$prev[0])
-  confirmSelected(this.combobox, items[0])
-  ok(!spy.called)
-})
+    test('includes each of the given options', () => {
+      createComboBox()
+      equal($('option', combobox.$menu).length, 3)
+    })
 
-test('next button', function() {
-  const items = [
-    {label: 'label1', value: 'value1'},
-    {label: 'label2', value: 'value2'},
-    {label: 'label3', value: 'value3'}
-  ]
-  this.combobox = new ComboBox(items, {selected: items[1].value})
-  const spy = this.spy()
-  this.combobox.on('change', spy)
+    test('uses the given option labels', () => {
+      createComboBox()
+      deepEqual(getOptionLabels(), ['Label 1', 'Label 2', 'Label 3'])
+    })
 
-  // clicking prev button selects previous element
-  simulateClick(this.combobox.$next[0])
-  confirmSelected(this.combobox, items[2])
-  ok(spy.calledOnce)
-  equal(spy.getCall(0).args[0], items[2])
+    test('uses the given option values', () => {
+      createComboBox()
+      deepEqual(getOptionValues(), ['value1', 'value2', 'value3'])
+    })
 
-  // clicking from the front wraps around
-  spy.reset()
-  simulateClick(this.combobox.$next[0])
-  confirmSelected(this.combobox, items[0])
-  ok(spy.calledOnce)
-  equal(spy.getCall(0).args[0], items[0])
-})
+    test('selects the first option by default', () => {
+      createComboBox()
+      equal(combobox.$menu.val(), 'value1')
+    })
 
-test('next button: one item', function() {
-  const items = [{label: 'label1', value: 'value1'}]
-  this.combobox = new ComboBox(items)
-  const spy = this.spy()
-  this.combobox.on('change', spy)
+    test('uses the given label function to set the option labels', () => {
+      options.label = item => item.label.toUpperCase()
+      createComboBox()
+      deepEqual(getOptionLabels(), ['LABEL 1', 'LABEL 2', 'LABEL 3'])
+    })
 
-  // clicking prev button does nothing
-  simulateClick(this.combobox.$next[0])
-  confirmSelected(this.combobox, items[0])
-  ok(!spy.called)
+    test('uses the given value function to set the option values', () => {
+      options.value = item => item.value.toUpperCase()
+      createComboBox()
+      deepEqual(getOptionValues(), ['VALUE1', 'VALUE2', 'VALUE3'])
+    })
+
+    test('selects the given selected value', () => {
+      options.selected = 'value2'
+      createComboBox()
+      equal(combobox.$menu.val(), 'value2')
+    })
+
+    test('matches the selected value using the given value function', () => {
+      options.selected = 'VALUE2'
+      options.value = item => item.value.toUpperCase()
+      createComboBox()
+      equal(combobox.$menu.val(), 'VALUE2')
+    })
+  })
+
+  QUnit.module('#select()', () => {
+    test('selects the given value', () => {
+      createComboBox()
+      combobox.select('value2')
+      equal(combobox.$menu.val(), 'value2')
+    })
+
+    test('triggers the "change" event', () => {
+      createComboBox()
+      const spy = sinon.spy()
+      combobox.on('change', spy)
+      combobox.select('value2')
+      equal(spy.callCount, 1)
+    })
+
+    test('sends the selected item to the "change" event', () => {
+      createComboBox()
+      let selectedValue
+      combobox.on('change', value => {
+        selectedValue = value
+      })
+      combobox.select('value2')
+      equal(selectedValue, items[1])
+    })
+
+    test('does not trigger the "change" event for the currently-selected option', () => {
+      createComboBox()
+      const spy = sinon.spy()
+      combobox.on('change', spy)
+      combobox.select('value1')
+      equal(spy.callCount, 0)
+    })
+  })
+
+  QUnit.module('clicking the "Previous" button', () => {
+    QUnit.module('with an intermediate option selected', hooks => {
+      hooks.beforeEach(() => {
+        options.selected = 'value2'
+      })
+
+      test('selects the previous option', () => {
+        createComboBox()
+        simulateClick(combobox.$prev[0])
+        equal(combobox.$menu.val(), 'value1')
+      })
+
+      test('triggers the "change" event', () => {
+        createComboBox()
+        const spy = sinon.spy()
+        combobox.on('change', spy)
+        simulateClick(combobox.$prev[0])
+        equal(spy.callCount, 1)
+      })
+
+      test('sends the selected item to the "change" event', () => {
+        createComboBox()
+        let selectedValue
+        combobox.on('change', value => {
+          selectedValue = value
+        })
+        simulateClick(combobox.$prev[0])
+        equal(selectedValue, items[0])
+      })
+    })
+
+    QUnit.module('with the first option selected', hooks => {
+      hooks.beforeEach(() => {
+        options.selected = 'value1'
+      })
+
+      test('selects the last value', () => {
+        createComboBox()
+        simulateClick(combobox.$prev[0])
+        equal(combobox.$menu.val(), 'value3')
+      })
+
+      test('triggers the "change" event', () => {
+        createComboBox()
+        const spy = sinon.spy()
+        combobox.on('change', spy)
+        simulateClick(combobox.$prev[0])
+        equal(spy.callCount, 1)
+      })
+
+      test('sends the selected item to the "change" event', () => {
+        createComboBox()
+        let selectedValue
+        combobox.on('change', value => {
+          selectedValue = value
+        })
+        simulateClick(combobox.$prev[0])
+        equal(selectedValue, items[2])
+      })
+    })
+
+    QUnit.module('with only one option', hooks => {
+      hooks.beforeEach(() => {
+        items = [items[0]]
+      })
+
+      test('does not change the selected value', () => {
+        createComboBox()
+        simulateClick(combobox.$prev[0])
+        equal(combobox.$menu.val(), 'value1')
+      })
+
+      test('does not trigger the "change" event', () => {
+        createComboBox()
+        const spy = sinon.spy()
+        combobox.on('change', spy)
+        simulateClick(combobox.$prev[0])
+        equal(spy.callCount, 0)
+      })
+    })
+  })
+
+  QUnit.module('clicking the "Next" button', () => {
+    QUnit.module('with an intermediate option selected', hooks => {
+      hooks.beforeEach(() => {
+        options.selected = 'value2'
+      })
+
+      test('selects the next option', () => {
+        createComboBox()
+        simulateClick(combobox.$next[0])
+        equal(combobox.$menu.val(), 'value3')
+      })
+
+      test('triggers the "change" event', () => {
+        createComboBox()
+        const spy = sinon.spy()
+        combobox.on('change', spy)
+        simulateClick(combobox.$next[0])
+        equal(spy.callCount, 1)
+      })
+
+      test('sends the selected item to the "change" event', () => {
+        createComboBox()
+        let selectedValue
+        combobox.on('change', value => {
+          selectedValue = value
+        })
+        simulateClick(combobox.$next[0])
+        equal(selectedValue, items[2])
+      })
+    })
+
+    QUnit.module('with the last option selected', hooks => {
+      hooks.beforeEach(() => {
+        options.selected = 'value3'
+      })
+
+      test('selects the first value', () => {
+        createComboBox()
+        simulateClick(combobox.$next[0])
+        equal(combobox.$menu.val(), 'value1')
+      })
+
+      test('triggers the "change" event', () => {
+        createComboBox()
+        const spy = sinon.spy()
+        combobox.on('change', spy)
+        simulateClick(combobox.$next[0])
+        equal(spy.callCount, 1)
+      })
+
+      test('sends the selected item to the "change" event', () => {
+        createComboBox()
+        let selectedValue
+        combobox.on('change', value => {
+          selectedValue = value
+        })
+        simulateClick(combobox.$next[0])
+        equal(selectedValue, items[0])
+      })
+    })
+
+    QUnit.module('with only one option', hooks => {
+      hooks.beforeEach(() => {
+        items = [items[0]]
+      })
+
+      test('does not change the selected value', () => {
+        createComboBox()
+        simulateClick(combobox.$prev[0])
+        equal(combobox.$menu.val(), 'value1')
+      })
+
+      test('does not trigger the "change" event', () => {
+        createComboBox()
+        const spy = sinon.spy()
+        combobox.on('change', spy)
+        simulateClick(combobox.$prev[0])
+        equal(spy.callCount, 0)
+      })
+    })
+  })
 })

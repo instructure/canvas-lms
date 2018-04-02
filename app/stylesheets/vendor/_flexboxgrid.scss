@@ -198,7 +198,7 @@ $c-grid-columns: 12;
     .off-#{$size}-#{$i} {
       @extend %base-#{$size};
       @if $i != $c-grid-columns {
-        margin-left: $width;
+        margin-#{direction(left)}: $width;
       }
     }
   }

@@ -25,6 +25,7 @@ const app = createDiscussionsIndex(root, {
   permissions: ENV.permissions,
   roles: ENV.current_user_roles,
   masterCourseData: ENV.BLUEPRINT_COURSES_DATA,
+  discussionTopicMenuTools: ENV.discussion_topic_menu_tools,
   contextCodes: [ENV.context_asset_string],
   currentUserId: ENV.current_user.id,
   contextType,

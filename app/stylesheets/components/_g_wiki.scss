@@ -53,7 +53,7 @@ $revision-button-color: $ic-color-dark;
   top: 0px;
   left: 0px;
   right: 0px;
-  margin-left: 1px;
+  margin-#{direction(left)}: 1px;
   background: white;
   height: 33px;
   max-width: $max_main_width;
@@ -61,11 +61,11 @@ $revision-button-color: $ic-color-dark;
 }
 
 .pages.with-left-side .sticky-toolbar .sticky {
-  margin-left: $left_side_width + 1px;
+  margin-#{direction(left)}: $left_side_width + 1px;
 }
 
 .pages.with-right-side .sticky-toolbar .sticky {
-  margin-right: $right_side_width + 1px;
+  margin-#{direction(right)}: $right_side_width + 1px;
 }
 
 .delete_criterion_link {
@@ -89,7 +89,7 @@ $revision-button-color: $ic-color-dark;
 .pages {
   .header-bar-outer-container {
     min-height: 64px;
-    clear: right;
+    clear: direction(right);
     .header-bar-container {
       min-width: $min_main_width - 2px;
       min-height: 64px;
@@ -111,7 +111,7 @@ $revision-button-color: $ic-color-dark;
         }
       }
       .header-right-flex {
-        padding-left: $ic-sp;
+        padding-#{direction(left)}: $ic-sp;
       }
       .flex-container {
         display: flex;
@@ -145,11 +145,11 @@ $revision-button-color: $ic-color-dark;
     .edit-label {
       padding-top: 5px;
       width: 75px;
-      float: left;
-      text-align: right;
+      float: direction(left);
+      text-align: direction(right);
     }
     .edit-controls {
-      margin-left: 85px;
+      margin-#{direction(left)}: 85px;
     }
     .edit-control-text {
       width: 270px;
@@ -162,10 +162,10 @@ $revision-button-color: $ic-color-dark;
       border-spacing: 0;
       td, th {
         &:first-child {
-          padding-left: 12px;
+          padding-#{direction(left)}: 12px;
         }
         &:last-child {
-          padding-right: 12px;
+          padding-#{direction(right)}: 12px;
         }
       }
 
@@ -197,10 +197,10 @@ $revision-button-color: $ic-color-dark;
           color: inherit;
         }
         td:first-child {
-          border-left: $pages-border;
+          border-#{direction(left)}: $pages-border;
         }
         td:last-child {
-          border-right: $pages-border;
+          border-#{direction(right)}: $pages-border;
         }
       }
       tr:first-child {
@@ -208,10 +208,10 @@ $revision-button-color: $ic-color-dark;
           border-top: $pages-border;
         }
         td:first-child {
-          border-top-left-radius: $border-radius;
+          border-top-#{direction(left)}-radius: $border-radius;
         }
         td:last-child {
-          border-top-right-radius: $border-radius;
+          border-top-#{direction(right)}-radius: $border-radius;
         }
       }
       tr:last-child {
@@ -219,10 +219,10 @@ $revision-button-color: $ic-color-dark;
           border-bottom: $pages-border;
         }
         td:first-child {
-          border-bottom-left-radius: $border-radius;
+          border-bottom-#{direction(left)}-radius: $border-radius;
         }
         td:last-child {
-          border-bottom-right-radius: $border-radius;
+          border-bottom-#{direction(right)}-radius: $border-radius;
         }
       }
       td {
@@ -266,8 +266,8 @@ $revision-button-color: $ic-color-dark;
       &.loading-more {
         border: $pages-dashed-border;
         border-top-width: 0;
-        border-bottom-left-radius: $border-radius;
-        border-bottom-right-radius: $border-radius;
+        border-bottom-#{direction(left)}-radius: $border-radius;
+        border-bottom-#{direction(right)}-radius: $border-radius;
         margin-top: 1px;
         padding: 4px 12px;
         background: #f4f6f8;
@@ -335,13 +335,13 @@ $revision-button-color: $ic-color-dark;
     overflow-x: auto;
     box-sizing: border-box;
     padding: 0 $ic-sp;
-    @include breakpoint(desktop) { padding: 0 $ic-sp*2 0 $ic-sp; }
+    @include breakpoint(desktop) { padding: direction-sides(0 $ic-sp*2 0 $ic-sp); }
   }
   .floating_links {
-    margin-right: 15px;
+    margin-#{direction(right)}: 15px;
   }
   .public-license {
-    margin-left: 15px;
+    margin-#{direction(left)}: 15px;
     margin-bottom: 15px;
   }
 }
@@ -360,7 +360,7 @@ $revision-button-color: $ic-color-dark;
 
 .pages.edit {
   .form-actions {
-    padding-left: 1em;
+    padding-#{direction(left)}: 1em;
   }
   .edit-form {
     margin: 0;
@@ -403,7 +403,7 @@ $revision-button-color: $ic-color-dark;
   }
   .show-content {
     @include breakpoint(desktop) {
-      margin-right: $revision-sidebar-width;
+      margin-#{direction(right)}: $revision-sidebar-width;
     }
   }
   .show-revisions {
@@ -412,7 +412,7 @@ $revision-button-color: $ic-color-dark;
       border-bottom: none;
       position: absolute;
       top: 0;
-      right: 0;
+      #{direction(right)}: 0;
       width: $revision-sidebar-width;
       aside {
         width: $revision-sidebar-width;
@@ -432,7 +432,7 @@ $revision-button-color: $ic-color-dark;
       position: absolute;
       top: 3px;
       bottom: 3px;
-      right: 3px;
+      #{direction(right)}: 3px;
       width: 42px;
       text-align: center;
       color: dimgrey;
@@ -443,7 +443,7 @@ $revision-button-color: $ic-color-dark;
         position: absolute;
         top: 50%;
         margin-top: -8px;
-        right: 13px;
+        #{direction(right)}: 13px;
       }
     }
     ul.revisions-list {
@@ -458,7 +458,7 @@ $revision-button-color: $ic-color-dark;
     height: 34px;
     transition: height 400ms;
 
-    border-left: 2px solid transparent;
+    border-#{direction(left)}: 2px solid transparent;
 
     &.selected, &.latest {
       height: 56px;
@@ -477,7 +477,7 @@ $revision-button-color: $ic-color-dark;
       }
     }
     &:not(.selected):hover {
-      border-left-color: var(--ic-link-color);
+      border-#{direction(left)}-color: var(--ic-link-color);
       .revision-content {
         cursor: pointer;
       }
@@ -493,7 +493,7 @@ $revision-button-color: $ic-color-dark;
       cursor: pointer;
     }
     &.selected {
-      border-left-color: var(--ic-link-color);
+      border-#{direction(left)}-color: var(--ic-link-color);
       background: $ic-bg-light-primary;
     }
   }
@@ -514,12 +514,12 @@ $revision-button-color: $ic-color-dark;
     }
     .prev-button {
       position: absolute;
-      left: 0;
+      #{direction(left)}: 0;
       top: 0
     }
     .next-button {
       position: absolute;
-      right: 0;
+      #{direction(right)}: 0;
       top: 0;
     }
   }
@@ -534,7 +534,7 @@ $revision-button-color: $ic-color-dark;
       display: none;
     }
     .show-content {
-      margin-right: 0;
+      margin-#{direction(right)}: 0;
     }
   }
 }
@@ -548,7 +548,7 @@ $revision-button-color: $ic-color-dark;
   border-width: 0 0 1px 0;
   font-size: 0.8em;
   margin-bottom: 10px;
-  margin-right: 2px;
+  margin-#{direction(right)}: 2px;
   h3, .h3 {
     margin: 0px 20px 10px;
     font-size: 1.5em;
@@ -557,7 +557,7 @@ $revision-button-color: $ic-color-dark;
 }
 
 #page_history {
-  float: right;
+  float: direction(right);
 }
 
 // this is to fix a bug that was reported that if you shrink your browser window width to something small

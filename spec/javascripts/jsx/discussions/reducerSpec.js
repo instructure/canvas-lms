@@ -23,6 +23,24 @@ QUnit.module('Discussions reducer')
 
 const reduce = (action, state = {}) => reducer(state, action)
 
+
+test('GET_DISCUSSIONS_SUCCESS sets sortableId for drag and drop', () => {
+  const dispatchData = {
+    data: [
+      {id: 1, pinned: true, position: 2},
+      {id: 2, pinned: true, position: 1},
+    ]
+  }
+
+  const newState = reduce(actions.getDiscussionsSuccess(dispatchData), {
+    pinnedDiscussions: [],
+    unpinnedDiscussions: [],
+    closedForCommentsDiscussions: [],
+  })
+
+  deepEqual(newState.pinnedDiscussions.map(d => d.sortableId), [0, 1])
+})
+
 test('GET_DISCUSSIONS_SUCCESS properly sorts discussions', () => {
   const dispatchData = {
     data: [
@@ -214,12 +232,12 @@ test('SAVING_SETTINGS_FAIL should toggle isSavingSettings', () => {
   deepEqual(newState.isSavingSettings, false)
 })
 
-test('GET_COURSE_SETTINGS_SUCCESS should return paylod', () => {
+test('GET_COURSE_SETTINGS_SUCCESS should return payload', () => {
   const newState = reduce(actions.getCourseSettingsSuccess({courseSettings: "blah"}))
   deepEqual(newState.courseSettings, {courseSettings: "blah"})
 })
 
-test('SAVING_SETTINGS_SUCCESS should return paylod if returned', () => {
+test('SAVING_SETTINGS_SUCCESS should return payload if returned', () => {
   const newState = reduce(actions.savingSettingsSuccess({courseSettings: "blah", userSettings: 'blee'}))
   deepEqual(newState.courseSettings, "blah")
 })
@@ -229,15 +247,16 @@ test('SAVING_SETTINGS_SUCCESS should return old state if nothing is returned', (
   deepEqual(newState.courseSettings, "blah")
 })
 
-test('GET_COURSE_SETTINGS_SUCCESS should return paylod for user settings', () => {
+test('GET_COURSE_SETTINGS_SUCCESS should return payload for user settings', () => {
   const newState = reduce(actions.getUserSettingsSuccess({userSettings: "blah"}))
   deepEqual(newState.userSettings, {userSettings: "blah"})
 })
 
-test('SAVING_SETTINGS_SUCCESS should return paylod for user settings', () => {
+test('SAVING_SETTINGS_SUCCESS should return payload for user settings', () => {
   const newState = reduce(actions.savingSettingsSuccess({courseSettings: "blah", userSettings: 'blee'}))
   deepEqual(newState.userSettings, "blee")
 })
+
 test('ARRANGE_PINNED_DISCUSSIONS should update unpinned discussion', () => {
   const newState = reduce(actions.arrangePinnedDiscussions({ order: [10, 5, 2, 1] }), {
     pinnedDiscussions: [
@@ -248,9 +267,301 @@ test('ARRANGE_PINNED_DISCUSSIONS should update unpinned discussion', () => {
     ]
   })
   deepEqual(newState.pinnedDiscussions, [
-    { title: "aaron", id: 10, pinned: true, locked: false },
-    { title: "venk", id: 5, pinned: true, locked: false },
-    { title: "steven", id: 2, pinned: true, locked: false },
-    { title: "landon", id: 1, pinned: true, locked: false }
+    { title: "aaron", id: 10, pinned: true, locked: false, sortableId: 0},
+    { title: "venk", id: 5, pinned: true, locked: false, sortableId: 1 },
+    { title: "steven", id: 2, pinned: true, locked: false, sortableId: 2 },
+    { title: "landon", id: 1, pinned: true, locked: false, sortableId: 3 }
   ])
+})
+
+test('DUPLICATE_DISCUSSIONS_SUCCESS should update pinned discussion positions', () => {
+  const originalState = {
+    pinnedDiscussions: [
+      { title: "landon", id: 2, position: 20, pinned: true, locked: false },
+      { title: "steven", id: 3, position: 21, pinned: true, locked: false },
+      { title: "aaron", id: 4, position: 22, pinned: true, locked: false }
+    ],
+    closedForCommentsDiscussions: [],
+    unpinnedDiscussions: []
+  }
+  const payload = {
+    originalId: 3,
+    newDiscussion: {
+      id: 5,
+      title: "steven Copy",
+      position: 22,
+      pinned: true,
+      locked: false,
+      new_positions: { 2: 20, 3: 21, 5: 22, 4: 23 }
+    }
+  }
+
+  const newState = reduce(actions.duplicateDiscussionSuccess(payload), originalState)
+  const expectedPinnedDiscussions = [
+    { title: "landon", id: 2, position: 20, sortableId: 0, pinned: true, locked: false },
+    { title: "steven", id: 3, position: 21, pinned: true, sortableId: 1, locked: false },
+    { title: "steven Copy", id: 5, position: 22, pinned: true, sortableId: 2, locked: false, focusOn: 'title'},
+    { title: "aaron", id: 4, position: 23, pinned: true, sortableId: 3, locked: false },
+  ]
+  deepEqual(newState.pinnedDiscussions, expectedPinnedDiscussions)
+  deepEqual(newState.closedForCommentsDiscussions, [])
+  deepEqual(newState.unpinnedDiscussions, [])
+
+})
+
+test('DUPLICATE_DISCUSSIONS_SUCCESS should work properly for unpinned discussions', () => {
+  const originalState = {
+    pinnedDiscussions: [],
+    closedForCommentsDiscussions: [],
+    unpinnedDiscussions: [
+      { title: "landon", id: 2, pinned: false, locked: false },
+      { title: "steven", id: 5,  pinned: false, locked: false },
+      { title: "aaron", id: 1, pinned: false, locked: false }
+    ],
+  }
+  const payload = {
+    originalId: 5,
+    newDiscussion: {
+      id: 6,
+      title: "steven Copy",
+      pinned: false,
+      locked: false,
+    }
+  }
+
+  const newState = reduce(actions.duplicateDiscussionSuccess(payload), originalState)
+  const expectedUnpinnedDiscussions = [
+    { title: "landon", id: 2, pinned: false, locked: false },
+    { title: "steven", id: 5, pinned: false, locked: false },
+    { title: "steven Copy", id: 6, pinned: false, locked: false, focusOn: 'title'},
+    { title: "aaron", id: 1, pinned: false, locked: false },
+  ]
+  deepEqual(newState.unpinnedDiscussions, expectedUnpinnedDiscussions)
+  deepEqual(newState.pinnedDiscussions, [])
+  deepEqual(newState.closedForCommentsDiscussions, [])
+})
+
+test('UPDATE_DISCUSSIONS_SEARCH should set the filter flag on discussions', () => {
+  const initialState = {
+    pinnedDiscussions: [
+      {title: 'foo', pinned: true, locked: false, filtered: false, read_state: 'read',   unread_count: 1},
+      {title: 'foo', pinned: true, locked: false, filtered: false, read_state: 'read',   unread_count: 0},
+      {title: 'foo', pinned: true, locked: true,  filtered: false, read_state: 'unread', unread_count: 0},
+      {title: 'bar', pinned: true, locked: true,  filtered: false, read_state: 'unread', unread_count: 1},
+    ],
+    unpinnedDiscussions: [
+      {title: 'foo', pinned: false, locked: false, filtered: false, read_state: 'read',   unread_count: 1},
+      {title: 'foo', pinned: false, locked: false, filtered: false, read_state: 'read',   unread_count: 0},
+      {title: 'foo', pinned: true, locked: true,  filtered: false, read_state: 'unread', unread_count: 0},
+      {title: 'bar', pinned: false, locked: false, filtered: false, read_state: 'unread', unread_count: 1},
+    ],
+    closedForCommentsDiscussions: [
+      {title: 'foo', pinned: false, locked: true, filtered: false, read_state: 'read',   unread_count: 1},
+      {title: 'foo', pinned: false, locked: true, filtered: false, read_state: 'read',   unread_count: 0},
+      {title: 'foo', pinned: true, locked: true,  filtered: false, read_state: 'unread', unread_count: 0},
+      {title: 'bar', pinned: false, locked: true, filtered: false, read_state: 'unread', unread_count: 1},
+    ]
+  }
+
+  const dispatchData = {
+    searchTerm: 'foo',
+    filter: 'unread',
+  }
+
+  const newState = reduce(actions.updateDiscussionsSearch(dispatchData), initialState)
+
+  deepEqual(newState.pinnedDiscussions.map(d => d.filtered), [false, true, false, true])
+  deepEqual(newState.unpinnedDiscussions.map(d => d.filtered), [false, true, false, true])
+  deepEqual(newState.closedForCommentsDiscussions.map(d => d.filtered), [false, true, false, true])
+})
+
+test('DELETE_DISCUSSION_SUCCESS should delete correct discussion', () => {
+  const newState = reduce(actions.deleteDiscussionSuccess({ discussion: { title: "venk", id: 5, pinned: true, locked: false } }), {
+    pinnedDiscussions: [
+      { title: "landon", id: 1, pinned: true, locked: false, permissions: { delete: true } },
+      { title: "venk", id: 5, pinned: true, locked: false },
+      { title: "steven", id: 2, pinned: true, locked: false },
+      { title: "aaron", id: 10, pinned: true, locked: false }
+    ],
+    unpinnedDiscussions: [],
+    closedDiscussions: [],
+  })
+  deepEqual(newState.pinnedDiscussions, [
+    { title: "landon", id: 1, pinned: true, sortableId: 0, locked: false, permissions: { delete: true }, focusOn: "manageMenu" },
+    { title: "steven", id: 2, pinned: true, sortableId: 1, locked: false },
+    { title: "aaron", id: 10, pinned: true, sortableId: 2, locked: false }
+  ])
+})
+
+test('DELETE_DISCUSSION_SUCCESS should delete last discussion', () => {
+  const newState = reduce(actions.deleteDiscussionSuccess({ discussion: { title: "venk", id: 5, pinned: true, locked: false } }), {
+    pinnedDiscussions: [
+      { title: "venk", id: 5, pinned: true, locked: false },
+    ],
+    unpinnedDiscussions: [],
+    closedDiscussions: [],
+  })
+  deepEqual(newState.pinnedDiscussions, [
+  ])
+})
+
+test('DELETE_DISCUSSION_SUCCESS should not delete discussions not specified', () => {
+  const newState = reduce(actions.deleteDiscussionSuccess({ discussion: { title: "venk", id: 50, pinned: true, locked: false } }), {
+    pinnedDiscussions: [
+      { title: "landon", id: 1, pinned: true, locked: false },
+      { title: "venk", id: 5, pinned: true, locked: false },
+      { title: "steven", id: 2, pinned: true, locked: false },
+      { title: "aaron", id: 10, pinned: true, locked: false }
+    ],
+    unpinnedDiscussions: [],
+    closedForCommentsDiscussions: [
+      { title: "landon-boss", id: 30, pinned: true, locked: false },
+      { title: "tiny-venk", id: 42, pinned: true, locked: false },
+      { title: "silly-steven", id: 23, pinned: true, locked: false },
+      { title: "me-aaron", id: 10, pinned: true, locked: false }
+    ],
+  })
+  deepEqual(newState.closedForCommentsDiscussions, [
+    { title: "landon-boss", id: 30, pinned: true, locked: false },
+    { title: "tiny-venk", id: 42, pinned: true, locked: false },
+    { title: "silly-steven", id: 23, pinned: true, locked: false },
+    { title: "me-aaron", id: 10, pinned: true, locked: false }
+  ])
+})
+
+test('DELETE_DISCUSSION_SUCCESS should focus correctly with students with mixed permissions', () => {
+  const newState = reduce(
+    actions.deleteDiscussionSuccess({
+      discussion: {title: 'tiny-venk-bloo', id: 55, pinned: false, locked: false}
+    }),
+    {
+      pinnedDiscussions: [
+        {title: 'landon', id: 1, pinned: true, locked: false},
+        {title: 'venk', id: 5, pinned: true, locked: false},
+        {title: 'steven', id: 2, pinned: true, locked: false},
+        {title: 'aaron', id: 10, pinned: true, locked: false}
+      ],
+      unpinnedDiscussions: [
+        {
+          title: 'landon-boss-bler',
+          id: 73,
+          pinned: false,
+          locked: false,
+          permissions: {delete: false}
+        },
+        {title: 'tiny-venk-bloo', id: 55, pinned: false, locked: false},
+        {title: 'silly-steven-bleh', id: 15, pinned: false, locked: false},
+        {title: 'me-aaron-blah', id: 33, pinned: false, locked: false}
+      ],
+      closedForCommentsDiscussions: [
+        {title: 'landon-boss', id: 30, pinned: false, locked: false},
+        {title: 'tiny-venk', id: 42, pinned: false, locked: false},
+        {title: 'silly-steven', id: 23, pinned: false, locked: false},
+        {title: 'me-aaron', id: 10, pinned: false, locked: false}
+      ]
+    }
+  )
+  deepEqual(newState.unpinnedDiscussions, [
+    {
+      title: 'landon-boss-bler',
+      id: 73,
+      pinned: false,
+      locked: false,
+      permissions: {delete: false},
+      focusOn: 'title'
+    },
+    {title: 'silly-steven-bleh', id: 15, pinned: false, locked: false},
+    {title: 'me-aaron-blah', id: 33, pinned: false, locked: false}
+  ])
+})
+
+
+test('DRAG_AND_DROP should add sortableId to pinned discussion and sort correctly', () => {
+  const initialState = {
+    pinnedDiscussions: [
+      {id: 1, pinned: true, sortableId: 0},
+      {id: 2, pinned: true, sortableId: 1},
+    ],
+    unpinnedDiscussions: [
+      {id: 3, pinned: false},
+    ],
+    closedForCommentsDiscussions: []
+  }
+
+  const dispatchData = {
+    order: [3, 2, 1],
+    discussion: {id: 3, pinned: true}
+  }
+
+  // start and failure should do the same thing here
+  const states = [
+    reduce(actions.dragAndDropStart(dispatchData), initialState),
+    reduce(actions.dragAndDropFail(dispatchData), initialState)
+  ]
+  states.forEach(newState => {
+    deepEqual(newState.pinnedDiscussions.map(d => d.sortableId), [0, 1, 2])
+    deepEqual(newState.pinnedDiscussions.map(d => d.id), [3, 2, 1])
+    deepEqual(newState.unpinnedDiscussions, [])
+    deepEqual(newState.closedForCommentsDiscussions, [])
+  })
+})
+
+test('DRAG_AND_DROP should put pinned discussion without ordering at the bottom', () => {
+  const initialState = {
+    pinnedDiscussions: [
+      {id: 1, pinned: true, sortableId: 0},
+      {id: 2, pinned: true, sortableId: 1},
+    ],
+    unpinnedDiscussions: [
+      {id: 3, pinned: false},
+    ],
+    closedForCommentsDiscussions: []
+  }
+
+  const dispatchData = {
+    order: undefined,
+    discussion: {id: 3, pinned: true}
+  }
+
+  // start and failure should do the same thing here
+  const states = [
+    reduce(actions.dragAndDropStart(dispatchData), initialState),
+    reduce(actions.dragAndDropFail(dispatchData), initialState)
+  ]
+  states.forEach(newState => {
+    deepEqual(newState.pinnedDiscussions.map(d => d.sortableId), [0, 1, 2])
+    deepEqual(newState.pinnedDiscussions.map(d => d.id), [1, 2, 3])
+    deepEqual(newState.unpinnedDiscussions, [])
+    deepEqual(newState.closedForCommentsDiscussions, [])
+  })
+})
+
+test('DRAG_AND_DROP should remove sortableId to unpinned discussion', () => {
+  const initialState = {
+    pinnedDiscussions: [
+      {id: 1, pinned: true, sortableId: 0},
+      {id: 2, pinned: true, sortableId: 1},
+    ],
+    unpinnedDiscussions: [
+      {id: 3, pinned: false},
+    ],
+    closedForCommentsDiscussions: []
+  }
+
+  const dispatchData = {
+    order: undefined,
+    discussion: {id: 2, pinned: false}
+  }
+
+  // start and failure should do the same thing here
+  const states = [
+    reduce(actions.dragAndDropStart(dispatchData), initialState),
+    reduce(actions.dragAndDropFail(dispatchData), initialState)
+  ]
+  states.forEach(newState => {
+    deepEqual(newState.pinnedDiscussions.map(d => d.id), [1])
+    deepEqual(newState.unpinnedDiscussions.map(d => d.id), [2, 3])
+    deepEqual(newState.unpinnedDiscussions.map(d => d.sortableId), [undefined, undefined])
+    deepEqual(newState.closedForCommentsDiscussions, [])
+  })
 })

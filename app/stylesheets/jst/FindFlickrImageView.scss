@@ -23,11 +23,11 @@
     padding: 0;
     max-height: 200px;
     overflow: auto;
-    margin-left: 0px;
+    margin-#{direction(left)}: 0px;
     margin-top: 10px;
     li {
       margin-bottom: 10px;
-      margin-left: 10px;
+      margin-#{direction(left)}: 10px;
       a.active { background-color: darken($activeBG, 25%); }
     }
   }
@@ -38,7 +38,7 @@
     max-height: 130px;
     li {
       margin-bottom: 10px;
-      margin-left: 10px;
+      margin-#{direction(left)}: 10px;
     }
     img { 
       width: 40px;

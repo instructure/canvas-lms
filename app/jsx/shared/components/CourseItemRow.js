@@ -23,6 +23,7 @@ import cx from 'classnames'
 
 import Heading from '@instructure/ui-core/lib/components/Heading'
 import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
+import Container from '@instructure/ui-core/lib/components/Container'
 import Avatar from '@instructure/ui-core/lib/components/Avatar'
 import Badge from '@instructure/ui-core/lib/components/Badge'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
@@ -32,13 +33,14 @@ import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
 import IconMore from 'instructure-icons/lib/Line/IconMoreLine'
 
 import IconDragHandleLine from 'instructure-icons/lib/Line/IconDragHandleLine'
+import IconPeerReviewLine from 'instructure-icons/lib/Line/IconPeerReviewLine'
 import LockIconView from 'compiled/views/LockIconView'
 import { author as authorShape } from '../proptypes/user'
 import masterCourseDataShape from '../proptypes/masterCourseData'
 
 export default class CourseItemRow extends Component {
   static propTypes = {
-    actionsContent: node,
+    actionsContent: arrayOf(node),
     metaContent: node,
     masterCourse: shape({
       courseData: masterCourseDataShape,
@@ -47,7 +49,9 @@ export default class CourseItemRow extends Component {
     author: authorShape,
     title: string.isRequired,
     body: node,
+    isDragging: bool,
     connectDragSource: func,
+    connectDropTarget: func,
     id: string,
     className: string,
     itemUrl: string,
@@ -57,14 +61,16 @@ export default class CourseItemRow extends Component {
     isRead: bool,
     showAvatar: bool,
     onSelectedChanged: func,
+    peerReview: bool,
     icon: node,
     showManageMenu: bool,
     manageMenuOptions: arrayOf(node),
     onManageMenuSelect: func,
     sectionToolTip: node,
     replyButton: node,
-    focusOn: oneOf(['title', 'manageMenu']),
+    focusOn: oneOf(['title', 'manageMenu', 'toggleButton']),
     clearFocusDirectives: func, // Required if focusOn is provided
+    hasReadBadge: bool,
   }
 
   static defaultProps = {
@@ -80,14 +86,17 @@ export default class CourseItemRow extends Component {
     },
     id: null,
     className: '',
+    isDragging: false,
     itemUrl: null,
     selectable: false,
     draggable: false,
+    peerReview: false,
     defaultSelected: false,
     isRead: true,
     icon: null,
     showAvatar: false,
-    connectDragSource: null,
+    connectDragSource: (component) => component,
+    connectDropTarget: (component) => component,
     onSelectedChanged () {},
     showManageMenu: false,
     manageMenuOptions: [],
@@ -95,25 +104,36 @@ export default class CourseItemRow extends Component {
     sectionToolTip: null,
     replyButton: null,
     focusOn: null,
-    clearFocusDirectives: () => {}
+    clearFocusDirectives: () => {},
+    hasReadBadge: false
   }
 
   state = {
     isSelected: this.props.defaultSelected,
   }
 
+  componentDidMount () {
+    this.onFocusManage(this.props)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.onFocusManage(nextProps)
+  }
+
   componentWillUnmount () {
     this.unmountMasterCourseLock()
   }
 
-  componentDidMount () {
-    if (this.props.focusOn) {
-      switch (this.props.focusOn) {
+  onFocusManage(props) {
+    if (props.focusOn) {
+      switch (props.focusOn) {
         case 'title':
           this._titleElement.focus()
           break;
         case 'manageMenu':
           this._manageMenu.focus()
+          break;
+        case 'toggleButton':
           break;
         default:
           throw new Error(I18n.t('Illegal element focus request'))
@@ -165,27 +185,29 @@ export default class CourseItemRow extends Component {
   }
 
   render () {
-    const classes = cx('ic-item-row', {
-      'ic-item-row__unread': !this.props.isRead,
-    })
+    const classes = cx('ic-item-row')
     return (
-      <div className={`${classes} ${this.props.className}`}>
+      this.props.connectDropTarget(this.props.connectDragSource(
+      <div style={{ opacity: (this.props.isDragging) ? 0 : 1 }} className={`${classes} ${this.props.className}`}>
         {(this.props.draggable && this.props.connectDragSource && <div className="ic-item-row__drag-col">
-          {this.props.connectDragSource(
-            <span>
-              <Text color="secondary" size="large">
-                <IconDragHandleLine />
-              </Text>
-            </span>, {dropEffect: 'copy'})
-          }
+          <span>
+            <Text color="secondary" size="large">
+              <IconDragHandleLine />
+            </Text>
+          </span>
         </div>)}
-        {(this.props.icon &&
-        <div className={this.props.draggable ? "ic-item-row__icon-col-teacher" : "ic-item-row__icon-col-student"}>
-          {!this.props.isRead ?
-            <Badge margin="0 small 0 0 " standalone type="notification" />
-          : null}
-          {this.props.icon}
-        </div>)}
+        {
+          !this.props.isRead ? (
+            <Container display="block" margin="0 medium 0 0">
+              <Badge margin="0 0 0 0" standalone type="notification" />
+            </Container>
+          ) : this.props.hasReadBadge ? (
+            <Container display="block" margin="0 small 0 0">
+              <Container display="block" margin="0 medium 0 0" />
+            </Container>
+          ) : null
+        }
+        {this.props.icon}
         {(this.props.selectable && <div className="ic-item-row__select-col">
           <Checkbox
             defaultChecked={this.props.defaultSelected}
@@ -209,6 +231,14 @@ export default class CourseItemRow extends Component {
         </div>
         <div className="ic-item-row__meta-col">
           <div className="ic-item-row__meta-actions">
+            { this.props.peerReview ? (
+              <span className="ic-item-row__peer_review">
+                <Text color="success" size="medium">
+                  <IconPeerReviewLine />
+                </Text>
+              </span>
+              ) : null
+            }
             {this.props.actionsContent}
             <span ref={this.initializeMasterCourseIcon} className="ic-item-row__master-course-lock" />
             {this.props.showManageMenu && this.props.manageMenuOptions.length > 0 &&
@@ -228,7 +258,7 @@ export default class CourseItemRow extends Component {
             {this.props.metaContent}
           </div>
         </div>
-      </div>
+      </div>, {dropEffect: 'copy'}))
     )
   }
 }

@@ -170,7 +170,7 @@ class WebConference < ActiveRecord::Base
     p.dispatch :web_conference_recording_ready
     p.to { user }
     p.whenever do
-      recording_ready? && recording_ready_changed?
+      recording_ready? && saved_change_to_recording_ready?
     end
   end
 

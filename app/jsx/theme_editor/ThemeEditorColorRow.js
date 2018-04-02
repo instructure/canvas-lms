@@ -30,15 +30,13 @@ export default class ThemeEditorColorRow extends Component {
     userInput: customTypes.userVariableInput,
     placeholder: PropTypes.string.isRequired,
     themeState: PropTypes.object,
-    handleThemeStateChange: PropTypes.func,
-    refactorEnabled: PropTypes.bool
+    handleThemeStateChange: PropTypes.func
   }
 
   static defaultProps = {
     userInput: {},
     themeState: {},
-    handleThemeStateChange() {},
-    refactorEnabled: false
+    handleThemeStateChange() {}
   }
 
   state = {}
@@ -122,13 +120,6 @@ export default class ThemeEditorColorRow extends Component {
     const hexValue = this.hexVal(colorVal)
     return (
       <span>
-        {!this.props.refactorEnabled && (
-          <input
-            type="hidden"
-            name={`brand_config[variables][${this.props.varDef.variable_name}]`}
-            value={hexValue}
-          />
-        )}
         <input
           ref={c => (this.textInput = c)}
           type="text"

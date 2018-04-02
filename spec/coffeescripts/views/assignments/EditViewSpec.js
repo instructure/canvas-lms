@@ -31,6 +31,7 @@ import PeerReviewsSelector from 'compiled/views/assignments/PeerReviewsSelector'
 import fakeENV from 'helpers/fakeENV'
 import userSettings from 'compiled/userSettings'
 import assertions from 'helpers/assertions'
+import tinymce from 'compiled/editor/stocktiny'
 import 'helpers/jquery.simulate'
 
 const s_params = 'some super secure params'
@@ -104,11 +105,15 @@ QUnit.module('EditView', {
       VALID_DATE_RANGE: {},
       COURSE_ID: 1
     })
+    // Sometimes TinyMCE has stuff on the dom that causes issues, likely from things that
+    // don't clean up properly, we make sure that these run in a clean tiny state each time
+    tinymce.remove()
     this.server = sinon.fakeServer.create()
   },
   teardown() {
     this.server.restore()
     fakeENV.teardown()
+    tinymce.remove() // Make sure we clean stuff up
     $('.ui-dialog').remove()
     $('ul[id^=ui-id-]').remove()
     $('.form-dialog').remove()
@@ -148,6 +153,16 @@ test('does not allow group assignment for large rosters', function() {
   ENV.IS_LARGE_ROSTER = true
   const view = this.editView()
   equal(view.$('#group_category_selector').length, 0)
+})
+
+test('does not allow group assignment for anonymously graded assignments', () => {
+  ENV.ANONYMOUS_GRADING_ENABLED = true
+  const view = editView({anonymous_grading: true})
+  view.$el.appendTo($('#fixtures'))
+  view.afterRender() // call this because it's called before everything is rendered in the specs
+  const hasGroupCategoryCheckbox = view.$el.find('input#has_group_category')
+
+  strictEqual(hasGroupCategoryCheckbox.prop('disabled'), true)
 })
 
 test('does not allow peer review for large rosters', function() {
@@ -915,3 +930,50 @@ test('when environment is set to true, enables editing the property', function()
   strictEqual(view.toJSON().anonymousInstructorAnnotationsEnabled, true)
   strictEqual(view.$el.find('input#assignment_anonymous_instructor_annotations').length, 1)
 })
+
+QUnit.module('EditView: anonymous grading', (hooks) => {
+  let server;
+  hooks.beforeEach(() => {
+    fakeENV.setup()
+    server = sinon.fakeServer.create()
+  });
+
+  hooks.afterEach(() => {
+    server.restore()
+    fakeENV.teardown()
+  });
+
+  test('does not show the checkbox when environment is not set', () => {
+    const view = editView()
+    strictEqual(view.toJSON().anonymousGradingEnabled, false)
+    strictEqual(view.$el.find('input#assignment_anonymous_grading').length, 0)
+  })
+
+  test('does not show the checkbox when environment set to false', () => {
+    ENV.ANONYMOUS_GRADING_ENABLED = false
+    const view = editView()
+    strictEqual(view.toJSON().anonymousGradingEnabled, false)
+    strictEqual(view.$el.find('input#assignment_anonymous_grading').length, 0)
+  })
+
+  test('shows the checkbox when environment is set to true', () => {
+    ENV.ANONYMOUS_GRADING_ENABLED = true
+    const view = editView()
+    strictEqual(view.toJSON().anonymousGradingEnabled, true)
+    strictEqual(view.$el.find('input#assignment_anonymous_grading').length, 1)
+  })
+
+  test('is disabled when group assignment is enabled', () => {
+    ENV.ANONYMOUS_GRADING_ENABLED = true
+    ENV.GROUP_CATEGORIES = [
+      {id: '1', name: 'Group Category #1'}
+    ]
+    const view = editView({group_category_id: '1'})
+    view.$el.appendTo($('#fixtures'))
+    view.afterRender() // call this because it's called before everything is rendered in the specs
+    const anonymousGradingCheckbox = view.$el.find('input#assignment_anonymous_grading')
+
+    strictEqual(anonymousGradingCheckbox.prop('disabled'), true)
+  })
+})
+

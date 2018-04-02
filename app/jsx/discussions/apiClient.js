@@ -23,6 +23,7 @@ function discussionQueryString(contextType, page) {
   const params = [
     { per_page: 40 },
     { plain_messages: true },
+    { include_assignment: true },
     { exclude_assignment_descriptions: true },
     { exclude_context_module_locked_topics: true },
     { page },
@@ -51,6 +52,11 @@ export function updateDiscussion ({ contextType, contextId }, discussion, update
   return axios.put(url, updatedFields)
 }
 
+export function deleteDiscussion ({ contextType, contextId }, { discussion }) {
+  const url = `/api/v1/${contextType}s/${contextId}/discussion_topics/${discussion.id}`
+  return axios.delete(url)
+}
+
 export function subscribeToTopic ({ contextType, contextId }, { id }) {
   return axios.put(`/api/v1/${contextType}s/${contextId}/discussion_topics/${id}/subscribed`)
 }
@@ -77,4 +83,10 @@ export function saveUserSettings ({currentUserId}, settings) {
 
 export function duplicateDiscussion ({ contextType, contextId }, discussionId) {
   return axios.post(`/api/v1/${contextType}s/${contextId}/discussion_topics/${discussionId}/duplicate`)
+}
+
+export function reorderPinnedDiscussions ({ contextType, contextId }, order) {
+  const postData = { order: order.join(',') }
+  const url = `/api/v1/${contextType}s/${contextId}/discussion_topics/reorder`
+  return axios.post(url, postData)
 }

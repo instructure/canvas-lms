@@ -22,7 +22,7 @@
 }
 #move_question_dialog .question_text {
   font-size: 0.8em;
-  margin-left: 20px;
+  margin-#{direction(left)}: 20px;
 }
 #move_question_dialog ul.questions {
   margin: 5px 20px;
@@ -31,7 +31,7 @@
   max-height: 200px;
 }
 #move_question_dialog ul.questions .list_question .list_question_text {
-  padding-left: 30px;
+  padding-#{direction(left)}: 30px;
   color: $ic-font-color--subdued;
   font-size: 0.8em;
   max-height: 1.7em;
@@ -47,22 +47,22 @@
 }
 #move_question_dialog li.bank {
   margin-bottom: 5px;
-  padding-left: 2px;
+  padding-#{direction(left)}: 2px;
 }
 #move_question_dialog li.bank .bank_label {
-  float: left;
+  float: direction(left);
 }
 #move_question_dialog li.bank .bank_radio {
-  float: left;
+  float: direction(left);
 }
 #move_question_dialog li.bank .bank_label .bank_name {
   display: block;
-  margin-left: $ic-sp/2;
+  margin-#{direction(left)}: $ic-sp/2;
 }
 #move_question_dialog li.bank .bank_label .context_name {
   font-size: 0.8em;
   display: block;
-  padding-left: 10px;
+  padding-#{direction(left)}: 10px;
   color: $ic-hint-text;
 }
 #questions.uneditable .question_holder .display_question .move {
@@ -72,9 +72,9 @@
   display: none;
 }
 .bottom_links {
-  text-align: right;
-  margin-right: 10px;
-  clear: left;
+  text-align: direction(right);
+  margin-#{direction(right)}: 10px;
+  clear: direction(left);
 }
 #questions.uneditable .question_holder .display_question .bottom_links {
   display: none;
@@ -82,6 +82,6 @@
 
 .move_question_dialog_actions {
   margin-top: $ic-sp;
-  text-align: right;
+  text-align: direction(right);
   padding-bottom: $ic-sp/2;
 }

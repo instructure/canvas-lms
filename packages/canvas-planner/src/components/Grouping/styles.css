@@ -7,6 +7,7 @@
   color: var(--groupColor);
   line-height: var(--lineHeight);
   position: relative;
+  display: flex;
 }
 
 .title {
@@ -44,10 +45,11 @@
 
 .hero {
   position: relative;
+  display: flex;
+  flex: 0 0 var(--heroWidth);
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
-  display: flex;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
@@ -55,13 +57,18 @@
   padding: var(--heroPadding);
   text-decoration: none;
 
-  /* this can become min-height once we drop IE11 support */
-
-  height: var(--heroMinHeight);
+  /* handle long words that break layout */
+  min-width: 1px;
 
   .groupingName {
     text-decoration: var(--heroLinkTextDecoration);
   }
+}
+
+.hero,
+.overlay {
+  border-bottom-left-radius: var(--heroBorderRadius);
+  border-top-left-radius: var(--heroBorderRadius);
 }
 
 .heroHover {
@@ -89,71 +96,36 @@
   }
 }
 
+/* the <ol> */
 .items {
+  flex: 1;
   list-style-type: none;
   margin: 0;
   padding: 0;
+  border-top: var(--borderTopWidth) solid;
   border-color: var(--groupColor);
   color: var(--groupColor);
 }
 
-.activityIndicator.hasBadge {
-  background: var(--activityIndicatorBackground);
-  width: var(--activityIndicatorBorderSize);
-  height: var(--activityIndicatorBorderSize);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  top: -0.25rem;
-  right: -0.25rem;
-  z-index: 1;
-  border-radius: 100%;
-}
-
-[data-media-medium] {
+.medium {
   &.root {
-    display: flex;
+    display: block;
   }
-
+  .hero, .overlay {
+    border-radius: 0;
+    background-color: transparent;
+  }
   .hero {
-    flex: 0 0 var(--heroWidth);
-    height: auto;
-
-    /* handle long words that break layout */
-    min-width: 1px;
+    display: block;
+    flex: none;
+    min-height: unset;
+    line-height: 2rem;
   }
-
-  .hero,
-  .overlay {
-    border-bottom-left-radius: var(--heroBorderRadius);
-    border-top-left-radius: var(--heroBorderRadius);
+  .title {
+    font-size: var(--titleFontSizeTablet);
+    padding-left: 0;
   }
-
   .items {
-    flex: 1;
-    border-top: var(--borderTopWidthTabletUp) solid;
-  }
-
-  .activityIndicator {
-    width: var(--activityIndicatorWidth);
-    padding: var(--activityIndicatorPadding);
-
-    &.hasBadge {
-      background: transparent;
-      width: auto;
-      height: auto;
-      position: static;
-      top: auto;
-      right: auto;
-      z-index: auto;
-      border-radius: 0;
-    }
-  }
-}
-
-[data-media-x-large] {
-  .hero {
-    flex: 0 0 var(--heroWidthLarge);
+    border-top-width: var(--borderTopWidthTablet);
   }
 }

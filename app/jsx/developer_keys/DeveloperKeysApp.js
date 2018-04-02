@@ -17,12 +17,14 @@
  */
 
 import Button from '@instructure/ui-core/lib/components/Button'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import Spinner from '@instructure/ui-core/lib/components/Spinner'
 import I18n from 'i18n!react_developer_keys'
 import React from 'react'
 import PropTypes from 'prop-types'
 import DeveloperKeysTable from './DeveloperKeysTable'
 import DeveloperKey from './DeveloperKey'
+import DeveloperKeyModal from './DeveloperKeyModal'
 
 class DeveloperKeysApp extends React.Component {
   constructor (props) {
@@ -41,7 +43,49 @@ class DeveloperKeysApp extends React.Component {
         ref={(table) => { this.DeveloperKeysTable = table; }}
         store={this.props.store}
         actions={this.props.actions}
-        developerKeysList={this.props.applicationState.listDeveloperKeys.list} /> )
+        developerKeysList={this.props.applicationState.listDeveloperKeys.list}
+        ctx={this.props.ctx}
+      />
+    )
+  }
+
+  addKeyButton () {
+    const createKeyLabel = I18n.t('Developer Key')
+
+    return (
+      <div className="ic-Action-header">
+        <div className="ic-Action-header__Primary">
+          <h2 className="ic-Action-header__Heading">{I18n.t('Developer Keys')}</h2>
+        </div>
+        <div className="ic-Action-header__Secondary">
+          <Button
+            variant="primary"
+            onClick={this.showCreateDeveloperKey}
+            >
+            <ScreenReaderContent>{I18n.t('Create a developer key')}</ScreenReaderContent>
+            <span aria-hidden="true">
+              <i className="icon-plus" />
+              { ` ${createKeyLabel}` }
+            </span>
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  developerKeyModal () {
+    return (
+      <DeveloperKeyModal
+        store={this.props.store}
+        actions={this.props.actions}
+        createOrEditDeveloperKeyState={this.props.applicationState.createOrEditDeveloperKey}
+        ctx={this.props.ctx}
+      />
+    )
+  }
+
+  showCreateDeveloperKey = () => {
+    this.props.store.dispatch(this.props.actions.developerKeysModalOpen())
   }
 
   nextPage () {
@@ -74,6 +118,8 @@ class DeveloperKeysApp extends React.Component {
     const { list } = this.props.applicationState.listDeveloperKeys;
     return (
       <div>
+        {this.addKeyButton()}
+        {this.developerKeyModal()}
         {this.showKeys(list)}
         <div id="loading">
           {this.getSpinner()}
@@ -92,16 +138,23 @@ DeveloperKeysApp.propTypes = {
     dispatch: PropTypes.func.isRequired,
   }).isRequired,
   actions: PropTypes.shape({
+    developerKeysModalOpen: PropTypes.func.isRequired,
     getRemainingDeveloperKeys: PropTypes.func.isRequired,
+    setEditingDeveloperKey: PropTypes.func.isRequired
   }).isRequired,
   applicationState: PropTypes.shape({
+    createOrEditDeveloperKey: PropTypes.shape({
+      developerKeyCreateOrEditFailed: PropTypes.bool.isRequired,
+      developerKeyCreateOrEditSuccessful: PropTypes.bool.isRequired,
+    }),
     listDeveloperKeys: PropTypes.shape({
       nextPage: PropTypes.string,
       listDeveloperKeysPending: PropTypes.bool.isRequired,
       listDeveloperKeysSuccessful: PropTypes.bool.isRequired,
       list: PropTypes.arrayOf(DeveloperKey.propTypes.developerKey).isRequired,
     }).isRequired
-  }).isRequired
+  }).isRequired,
+  ctx: DeveloperKeyModal.propTypes.ctx
 };
 
 export default DeveloperKeysApp

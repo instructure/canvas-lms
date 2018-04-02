@@ -19,9 +19,9 @@
 module SIS
   class AdminImporter < BaseImporter
 
-    def process(messages)
+    def process
       start = Time.zone.now
-      importer = Work.new(@batch, @root_account, @logger, messages)
+      importer = Work.new(@batch, @root_account, @logger)
 
       AccountUser.skip_touch_callbacks(:user) do
         User.skip_updating_account_associations do
@@ -44,12 +44,11 @@ module SIS
                     :account_users_to_update_associations,
                     :account_users_to_set_batch_id
 
-      def initialize(batch, root_account, logger, messages)
+      def initialize(batch, root_account, logger)
         @batch = batch
         @root_account = root_account
         @account = root_account
         @logger = logger
-        @messages = messages
         @success_count = 0
         @account_users_to_update_associations = Set.new
         @account_users_to_set_batch_id = Set.new
@@ -65,6 +64,7 @@ module SIS
 
         state = status.downcase.strip
         raise ImportError, "Invalid status #{status} for admin" unless %w(active deleted).include? state
+        return if @batch.skip_deletes? && state == 'deleted'
 
         get_account(account_id)
         raise ImportError, "Invalid account_id given for admin" unless @account

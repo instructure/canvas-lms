@@ -146,7 +146,7 @@ class Rubric < ActiveRecord::Base
   end
 
   def alignments_need_update?
-    data_changed? || workflow_state_changed?
+    saved_change_to_data? || saved_change_to_workflow_state?
   end
 
   def data_outcome_ids

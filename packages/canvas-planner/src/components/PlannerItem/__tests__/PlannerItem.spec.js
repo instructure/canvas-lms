@@ -35,7 +35,8 @@ function defaultProps (option = {}) {
       points: option.points,
       html_url: option.html_url,
       toggleCompletion: () => {},
-      updateTodo: () => {}
+      updateTodo: () => {},
+      currentUser: {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here'},
   };
 }
 
@@ -49,7 +50,8 @@ function noteProps (option) {
       completed: !!option.completed,
       title: option.title || "A note about note taking",
       toggleCompletion: () => {},
-      updateTodo: () => {}
+      updateTodo: () => {},
+      currentUser: {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here'},
   };
 }
 
@@ -74,7 +76,8 @@ function groupProps (option) {
     "html_url": "/groups/9/pages/this-is-an-account-level-group-page",
     "badges": [],
     toggleCompletion: () => {},
-    updateTodo: () => {}
+    updateTodo: () => {},
+    currentUser: {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here'},
   };
 }
 
@@ -547,4 +550,14 @@ it('registers itself as animatable', () => {
 
   wrapper.unmount();
   expect(fakeDeregister).toHaveBeenCalledWith('item', instance, ['second']);
+});
+
+it('renders a NewActivityIndicator when asked to', () => {
+  const props = defaultProps({points: 35, date: DEFAULT_DATE});
+  props.newActivity = true;
+  props.showNotificationBadge = true;
+  const wrapper = shallow(
+    <PlannerItem {...props} />
+  );
+  expect(wrapper.find('Animatable(NewActivityIndicator)')).toHaveLength(1);
 });

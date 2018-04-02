@@ -22,10 +22,10 @@
   width: 230px;
   background-color: $lightBackground;
   margin-bottom: 2px;
-  margin-right: 12px;
+  margin-#{direction(right)}: 12px;
 }
 
 .EnrollmentTerms__list {
-  margin-left: 24px;
+  margin-#{direction(left)}: 24px;
   @include fontSize($ic-font-size--xsmall);
 }

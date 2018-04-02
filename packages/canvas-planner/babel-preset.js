@@ -20,7 +20,7 @@ if (env === 'test') {
   module.exports = {
     // eslint-disable-next-line import/no-extraneous-dependencies
     presets: [[ require('@instructure/ui-presets/babel'), {
-      themeable: process.env.BABEL_ENV === 'production',
+      themeable: true,
       coverage: false,
       esModules: Boolean(process.env.ES_MODULES)
     }]]

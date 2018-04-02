@@ -17,7 +17,6 @@
 #
 
 # @API Course Quiz Extensions
-# @beta
 #
 # API for setting extensions on student quiz submissions at the course level
 #
@@ -62,7 +61,6 @@ class Quizzes::CourseQuizExtensionsController < ApplicationController
   before_action :require_user, :require_context
 
   # @API Set extensions for student quiz submissions
-  # @beta
   #
   # @argument user_id [Required, Integer]
   #   The ID of the user we want to add quiz extensions for.

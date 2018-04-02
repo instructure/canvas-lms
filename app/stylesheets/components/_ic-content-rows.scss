@@ -19,17 +19,17 @@
 @import 'components/ic-unread-badge';
 
 .ic-item-row__select-col + .ic-item-row__author-col {
-  margin-left: 11px;
+  margin-#{direction(left)}: 11px;
 }
 
 .ic-item-row__icon-col-student{
   display: flex;
   align-items: center;
-  margin-left: 11px;
+  margin-#{direction(left)}: 11px;
 }
 
 .ic-item-row__icon-col-teacher{
-  margin-right: -11px;
+  margin-#{direction(right)}: -11px;
 }
 
 .ic-item-row {
@@ -39,17 +39,6 @@
   justify-content: space-between;
   align-items: center;
   position: relative;
-
-  &.ic-item-row__unread:before {
-    content: '';
-    display: block;
-    position: absolute;
-    left: -25px;
-    width: 12px;
-    height: 12px;
-    background: $electric;
-    border-radius: 50%;
-  }
 }
 
 .ic-item-row__content-link {
@@ -60,6 +49,11 @@
   }
 }
 
+.ic-item-row__peer_review {
+  margin-#{direction(right)}: 2px;
+  margin-bottom: -4px;
+}
+
 .ic-item-row__content-col {
   // necessary because min-width: auto by default
   // without this, the text force-expands the width of the container instead of being truncated
@@ -68,7 +62,7 @@
   margin: 0 22px;
 
   &:first-child {
-    margin-left: 0;
+    margin-#{direction(left)}: 0;
   }
 
   & > .ic-item-row__content-link {
@@ -103,6 +97,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  .ic-discussion-row__content {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .ic-item-row__meta-col {
@@ -112,7 +111,7 @@
   max-width: 230px;
   display: flex;
   flex-direction: column;
-  text-align: right;
+  text-align: direction(right);
 
   .ic-item-row__meta-actions {
     height: 23px;
@@ -129,6 +128,37 @@
   }
 }
 
+.icon-blueprint {
+  margin-bottom: 3px;
+  padding: direction-sides(8px 8px 7px 8px);
+}
+
+.icon-blueprint-lock {
+  margin-bottom: 3px;
+  padding: direction-sides(8px 8px 7px 8px);
+}
+
+.ic-discussion-row {
+  .ic-item-row__meta-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    .ic-item-row__master-course-lock {
+      &:focus { @include ic-focus-variant; }
+      margin-left: 2px;
+      margin-right: 2px;
+    }
+  }
+}
+
+.ic-discussion-row {
+  .ic-discussion-row__content {
+    p:not(:first-of-type) {
+      display: none;
+    }
+  }
+}
 .ic-announcement-row {
   .ic-announcement-row__content {
     p:not(:first-of-type) {
@@ -138,8 +168,10 @@
 
   .ic-item-row__meta-actions {
     .ic-item-row__master-course-lock {
+      &:focus { @include ic-focus-variant; }
       vertical-align: text-bottom;
-      margin-left: 10px;
+      margin-#{direction(left)}: 10px;
+      margin-#{direction(right)}: 2px;
     }
   }
 
@@ -153,6 +185,6 @@
 
 .ic-item-row__manage-menu {
   display: inline-block;
-  margin: 0 -10px;
+  margin: direction-sides(0 -8px -8px -10px);
   transform: translateY(-5px);
 }

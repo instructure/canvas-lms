@@ -24,7 +24,7 @@ module LearningOutcomeContext
       klass.has_many :learning_outcome_groups, :as => :context, :inverse_of => :context
       klass.send :include, InstanceMethods
 
-      klass.after_save :update_root_outcome_group_name, if: -> { try(:name_changed?) }
+      klass.after_save :update_root_outcome_group_name, if: -> { saved_change_to_name? }
     end
   end
 

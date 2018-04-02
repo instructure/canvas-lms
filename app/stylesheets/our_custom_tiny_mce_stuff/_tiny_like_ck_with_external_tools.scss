@@ -21,6 +21,12 @@ $menu-item-text-hover-focus-color: $ic-font-color-dark;
 $menu-item-text-disabled-color: $ic-font-color-dark;
 $menu-item-keyboard-shortcut-color: $ic-font-color-dark;
 
+[dir=rtl] {
+  .mce-container, .mce-container *, .mce-widget, .mce-widget *, .mce-reset {
+    text-align: right;
+  }
+}
+
 // puts the blue glow around each little color sqare in the tinyMCE text/bg color picker
 .mce-container .mce-grid td.mce-grid-cell div:focus{
   outline: thin dotted #333;

@@ -109,11 +109,6 @@
                              [[no_language, nil]] + available_locales.invert.sort_by { |desc, _| Canvas::ICU.collation_key(desc) },
                              {:selected => @context.default_locale}, {:class => 'locale'} %>
                 <%= render :partial => 'shared/locale_warning' %>
-                <p class="unbreakable"><%= mt :transifex_message, <<-TEXT, :transifex_url => "https://www.transifex.com/instructure/canvas-crowdsource/"
-Join the [Canvas Translation Community](%{transifex_url})
-TEXT
-                %>
-                </p>
                 <p style="font-size: 0.9em;"><%= t(:default_language_description, "This will override any browser/OS language settings. Preferred languages can still be set at the course/user level.") %></p>
               </td>
             </tr>
@@ -175,6 +170,15 @@ TEXT
                       <p style="font-size: 0.9em;"><%= t("This is a comma separated list of URL's to trust.  Trusting any URL's in this list will bypass the CSRF token when logging in to Canvas.") %></p>
                     </td>
                   </tr>
+
+                  <% if can_do(@context, @current_user, :manage_account_settings) %>
+                    <tr>
+                      <td><%= settings.blabel :default_dashboard_view, t("Default View for Dashboard") %></td>
+                      <td>
+                        <%= settings.select :default_dashboard_view, options_for_select(dashboard_view_options(@account), @account.default_dashboard_view) %>
+                      </td>
+                    </tr>
+                  <% end %>
 
                   <tr>
                     <td colspan="2"><%= settings.check_box :prevent_course_renaming_by_teachers, :checked => @account.settings[:prevent_course_renaming_by_teachers] %>

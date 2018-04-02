@@ -401,7 +401,6 @@ define [
     sectionsAreRequired: ->
       if !ENV.context_asset_string.startsWith("course")
         return false
-
       isAnnouncement = ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement
       announcementsFlag = ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED
       discussionsFlag = ENV.SECTION_SPECIFIC_DISCUSSIONS_ENABLED

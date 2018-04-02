@@ -17,7 +17,6 @@
 #
 
 # @API Quiz Submissions
-# @beta
 #
 # API for accessing quiz submissions
 #
@@ -151,7 +150,6 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   before_action :validate_ldb_status!, :only => [ :create, :complete ]
 
   # @API Get all quiz submissions.
-  # @beta
   #
   # Get a list of all submissions for this quiz. Users who can view or manage
   # grades for a course will have submissions from multiple users returned. A
@@ -201,7 +199,6 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   end
 
   # @API Get the quiz submission.
-  # @beta
   #
   # Get the submission for this quiz for the current user.
   #
@@ -224,7 +221,6 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   end
 
   # @API Get a single quiz submission.
-  # @beta
   #
   # Get a single quiz submission.
   #
@@ -248,7 +244,6 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   end
 
   # @API Create the quiz submission (start a quiz-taking session)
-  # @beta
   #
   # Start taking a Quiz by creating a QuizSubmission which you can use to answer
   # questions and submit your answers.
@@ -289,7 +284,6 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   end
 
   # @API Update student question scores and comments.
-  # @beta
   #
   # Update the amount of points a student has scored for questions they've
   # answered, provide comments for the student about their answer(s), or simply
@@ -360,7 +354,6 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   end
 
   # @API Complete the quiz submission (turn it in).
-  # @beta
   #
   # Complete the quiz submission by marking it as complete and grading it. When
   # the quiz submission has been marked as complete, no further modifications
@@ -402,7 +395,6 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   end
 
   # @API Get current quiz submission times.
-  # @beta
   #
   # Get the current timing data for the quiz attempt, both the end_at timestamp
   # and the time_left parameter.

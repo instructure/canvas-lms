@@ -72,7 +72,7 @@
   .ui-datepicker-time {
     @extend .ui-dialog-buttonpane;
     padding: 5px 6px;
-    text-align: right;
+    text-align: direction(right);
 
     input, select { padding: 2px; margin-bottom: 0; }
     .ui-datepicker-ok { margin-left: 6px; }
@@ -108,7 +108,7 @@
 
 .ui-datepicker .ui-datepicker-header .ui-datepicker-prev {
   .ui-icon { display: none; }
-  background: url("/images/icon-arrow-left.svg") 50% 50% no-repeat;
+  background: url("/images/icon-arrow-#{direction(left)}.svg") 50% 50% no-repeat;
   background-size: 12px;
 }
 
@@ -128,10 +128,10 @@
   }
 
   .ui-datepicker-prev { 
-    background-image: url("/images/icon-arrow-left.svg"); 
+    background-image: url("/images/icon-arrow-#{direction(left)}.svg");
   }
   .ui-datepicker-next { 
-    background-image: url("/images/icon-arrow-right.svg"); 
+    background-image: url("/images/icon-arrow-#{direction(right)}.svg");
   }
 
 }

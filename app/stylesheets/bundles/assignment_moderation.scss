@@ -21,7 +21,7 @@
 .grade-moderation-table {
   tr {
     vertical-align: middle;
-    text-align: left;
+    text-align: direction(left);
   }
 
   .ModeratedColumnHeader {
@@ -48,7 +48,7 @@
     }
 
     span {
-      margin-left: 10px;
+      margin-#{direction(left)}: 10px;
     }
   }
 
@@ -76,15 +76,15 @@
     width: 200px;
 
     span {
-      margin-left: 10px;
+      margin-#{direction(left)}: 10px;
     }
 
-    margin-right: 40px;
+    margin-#{direction(right)}: 40px;
   }
 
   .ColumnHeader__Selector {
     padding-bottom: 5px;
-    text-align: right;
+    text-align: direction(right);
     width: 1px;
   }
 
@@ -120,7 +120,7 @@
   }
 
   .ModeratedAssignmentList__Selector {
-    text-align: right;
+    text-align: direction(right);
   }
 
   .AssignmentList {
@@ -138,7 +138,7 @@
 
   .AssignmentList__StudentInfo {
     width: 200px;
-    margin-right: 40px;
+    margin-#{direction(right)}: 40px;
   }
 
   .AssignmentList__StudentInfo input[type='checkbox'] {
@@ -160,7 +160,7 @@
   }
 
   .AssignmentList__Selector {
-    text-align: right;
+    text-align: direction(right);
   }
 }
 

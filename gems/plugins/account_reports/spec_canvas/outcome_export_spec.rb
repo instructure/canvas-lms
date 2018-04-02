@@ -300,6 +300,20 @@ describe "Outcome Reports" do
           expect(report[0][RATING_INDEX + 13]).to be_nil
         end
       end
+
+      context 'in a different locale' do
+        before do
+          account.update(default_locale: :sv)
+        end
+
+        it 'formats mastery points' do
+          expect(report[0]['mastery_points']).to eq '3,0'
+        end
+
+        it 'formats rating points' do
+          expect(report[0][RATING_INDEX]).to eq '3,0'
+        end
+      end
     end
   end
 end

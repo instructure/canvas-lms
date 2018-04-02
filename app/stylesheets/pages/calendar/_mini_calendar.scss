@@ -67,10 +67,10 @@ $kyle-blue: #0081e3;
     @include fontSize(10px);
     line-height: 20px;
     &.fc-first {
-      border-left: 1px solid #bbbbbb;
+      border-#{direction(left)}: 1px solid #bbbbbb;
     }
     &.fc-last {
-      border-right: 1px solid #bbbbbb;
+      border-#{direction(right)}: 1px solid #bbbbbb;
     }
   }
   .fc-toolbar .fc-button .fc-icon:after {
@@ -92,7 +92,7 @@ $kyle-blue: #0081e3;
       display: block;
       position: absolute;
       bottom: -1px;
-      right: -1px;
+      #{direction(right)}: -1px;
       border-color: transparent $kyle-blue $kyle-blue transparent;
       border-style: solid;
       border-width: 5px;

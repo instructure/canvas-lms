@@ -22,6 +22,7 @@ module LocaleSelection
     root_account = options[:root_account]
     accept_language = options[:accept_language]
     session_locale = options[:session_locale]
+    ignore_browser_locale = options[:ignore_browser_locale]
 
     # groups cheat and set the context to be the group after get_context runs
     # but before set_locale runs, but we want to do locale lookup based on the
@@ -43,7 +44,7 @@ module LocaleSelection
           locale
         end
          },
-      -> { user.try(:browser_locale) },
+      -> { !ignore_browser_locale && user.try(:browser_locale) },
       -> { I18n.default_locale.to_s }
           ]
 

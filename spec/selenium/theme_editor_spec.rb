@@ -182,4 +182,22 @@ describe 'Theme Editor' do
     # expect all 15 text fields to have working validation
     expect(all_warning_messages.length).to eq 15
   end
+
+  it 'should allow fields to be changed after colors are unlinked', priority: 3, test_id: 3470985 do
+    bc = BrandConfig.create(variables: {
+                              'ic-brand-primary' => '#999',
+                              'ic-brand-button--primary-bgd' => '#888'
+                            })
+    Account.default.brand_config = bc
+    Account.default.save!
+    open_theme_editor(Account.default.id)
+    ff('.Theme__editor-color-block_input-text')[1].send_keys('#000') # main text color
+    expect_new_page_load do
+      preview_your_changes
+      run_jobs
+    end
+    color_labels = ff('.Theme__editor-color-label')
+    expect(color_labels[0].attribute('style')).to include('background-color: rgb(153, 153, 153)')
+    expect(color_labels[1].attribute('style')).to include('background-color: rgb(0, 0, 0)')
+  end
 end

@@ -33,7 +33,7 @@
 
     .conditional_options_count {
       background: #1897D8;
-      float: right;
+      float: direction(right);
       padding: 2px 15px;
       border-radius: 12px;
       font-size: 11px;
@@ -146,7 +146,7 @@
     .publish-icon {
       display: flex;
       align-items: center;
-      padding-left: 10px;
+      padding-#{direction(left)}: 10px;
       padding-top: 12px;
     }
   }
@@ -184,7 +184,7 @@
 
 .context_module_item .completion_requirement {
   font-size: inherit;
-  padding-left: 0;
+  padding-#{direction(left)}: 0;
   margin-top: auto;
   color: inherit;
 }
@@ -197,7 +197,7 @@
   /* shared with assignments, dry it up */
   color: #b4b7ba;
   margin: 0 4px 0 -15px;
-  padding: 0 0px 0 10px !important;
+  padding: direction-sides(0 0px 0 10px )!important;
 }
 
 .sortable-handle,
@@ -217,13 +217,13 @@
 }
 
 input.move-module-label-spacer {
-  margin-right: 10px;
+  margin-#{direction(right)}: 10px;
 }
 
 .move-module-or {
   display: inline-block;
   width: 60px;
-  margin-left: 20px;
+  margin-#{direction(left)}: 20px;
 
 }
 
@@ -241,20 +241,20 @@ input.move-module-label-spacer {
 
 .prereq-req-item {
   flex: 1 1 1;
-  padding-right: 5px;
+  padding-#{direction(right)}: 5px;
   .option {
     display: block;
   }
 }
 
 .points_possible {
-  padding-right: 5px;
+  padding-#{direction(right)}: 5px;
 }
 
 .prereq-req-item-delete {
   padding-top: calc((38px - 20px) / 2 );
   position: absolute;
-  right: 5px;
+  #{direction(right)}: 5px;
 }
 
 .add-item {
@@ -289,7 +289,7 @@ input.move-module-label-spacer {
 }
 .for-nvda {
   position:absolute;
-  left:-10000px;
+  #{direction(left)}:-10000px;
   top:auto;
   width:1px;
   height:1px;
@@ -297,7 +297,7 @@ input.move-module-label-spacer {
 }
 
 .require-sequential {
-  margin-left: 20px;
+  margin-#{direction(left)}: 20px;
 }
 
 .header-bar__module-layout {

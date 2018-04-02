@@ -161,6 +161,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
     end
 
     it "should be able to upload a file when nothing has been loaded" do
+      skip_if_chrome('fragile in chrome')
       wiki_page_tools_file_tree_setup
       expect(f("form.edit-form .edit-content")).to be_displayed
 

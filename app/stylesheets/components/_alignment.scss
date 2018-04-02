@@ -17,10 +17,10 @@
  */
 
 .align-right, .text-right {
-  text-align: right;
+  text-align: direction(right);
 }
 .text-left {
-  text-align: left;
+  text-align: direction(left);
 }
 .text-center {
   text-align: center;

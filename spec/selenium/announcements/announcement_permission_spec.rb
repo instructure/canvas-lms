@@ -19,6 +19,7 @@
 require_relative '../common'
 require_relative '../announcements/announcement_helpers'
 require_relative '../discussions/discussion_helpers'
+require_relative '../discussions/pages/discussions_index_page'
 require_relative '../helpers/shared_examples_common'
 
 describe 'announcement permissions' do
@@ -44,7 +45,6 @@ describe 'announcement permissions' do
       new_announcement(@course)
     end
 
-
     shared_examples 'allow announcement view with discussions disallowed' do |context|
       before :each do
         enable_view_announcements(@course, context_role)
@@ -56,7 +56,7 @@ describe 'announcement permissions' do
 
       it "allows viewing announcements with discussions disallowed", priority: pick_priority(context, student: "1", observer: "1", teacher: "2", ta: "2", designer: "2"), test_id: pick_test_id(context, student: "779908", teacher: "779909", ta: "779910", observer: "779911", designer: "779912") do
         get announcements_page
-        expect(fj(announcement_message)).to be_displayed
+        expect(DiscussionsIndex.summary_content).to be_displayed
       end
     end
 

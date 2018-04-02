@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
+
 define(['rubric_assessment', 'i18n!rubric_assessment'], (rubric_assessment, I18n) => {
   QUnit.module('RubricAssessment#roundAndFormat');
 
@@ -36,4 +38,30 @@ define(['rubric_assessment', 'i18n!rubric_assessment'], (rubric_assessment, I18n
     strictEqual(rubric_assessment.roundAndFormat(undefined), '');
     strictEqual(rubric_assessment.roundAndFormat(''), '');
   });
+
+  test('properly adds the "selected" class to a rating when score is equal', function () {
+    const $criterion = $(
+      "<span>" +
+        "<span class='rating'><span class='points'>5</span></span>" +
+        "<span class='rating'><span class='points'>3</span></span>" +
+        "<span class='rating'><span class='points'>0</span></span>" +
+      "</span>"
+    );
+    rubric_assessment.highlightCriterionScore($criterion, 3);
+    strictEqual($criterion.find('.selected').find('.points').text(), "3");
+  })
+
+  test('properly adds the "selected" class to proper rating when score is in range', function () {
+    const $criterion = $(
+      "<span>" +
+        "<input type='checkbox' class='criterion_use_range' checked>" +
+        "<span class='rating'><span class='points'>5</span></span>" +
+        "<span class='rating'><span class='points'>3</span></span>" +
+        "<span class='rating'><span class='points'>0</span></span>" +
+      "</span>"
+    );
+    rubric_assessment.highlightCriterionScore($criterion, 4);
+    strictEqual($criterion.find('.selected').length, 1);
+    strictEqual($criterion.find('.selected').find('.points').text(), "5");
+  })
 });

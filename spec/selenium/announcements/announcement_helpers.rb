@@ -51,4 +51,3 @@ module AnnouncementHelpers
     fj(announcement_title).click()
   end
 end
-

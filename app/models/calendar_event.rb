@@ -276,8 +276,8 @@ class CalendarEvent < ActiveRecord::Base
   ]
 
   def sync_child_events
-    locked_changes = LOCKED_ATTRIBUTES.select { |attr| send("#{attr}_changed?") }
-    cascaded_changes = CASCADED_ATTRIBUTES.select { |attr| send("#{attr}_changed?") }
+    locked_changes = LOCKED_ATTRIBUTES.select { |attr| saved_change_to_attribute?(attr) }
+    cascaded_changes = CASCADED_ATTRIBUTES.select { |attr| saved_change_to_attribute?(attr) }
     child_events.are_locked.update_all Hash[locked_changes.map{ |attr| [attr, send(attr)] }] if locked_changes.present?
     child_events.are_unlocked.update_all Hash[cascaded_changes.map{ |attr| [attr, send(attr)] }] if cascaded_changes.present?
   end
@@ -286,7 +286,7 @@ class CalendarEvent < ActiveRecord::Base
   def sync_parent_event
     return unless parent_event
     return if appointment_group
-    return unless start_at_changed? || end_at_changed? || workflow_state_changed?
+    return unless saved_change_to_start_at? || saved_change_to_end_at? || saved_change_to_workflow_state?
     return if @skip_sync_parent_event
     parent_event.cache_child_event_ranges! unless workflow_state == 'deleted'
   end
@@ -375,7 +375,7 @@ class CalendarEvent < ActiveRecord::Base
     whenever {
       appointment_group && parent_event &&
       deleted? &&
-      workflow_state_changed? &&
+      saved_change_to_workflow_state? &&
       @updating_user &&
       context == appointment_group.participant_for(@updating_user)
     }
@@ -397,7 +397,7 @@ class CalendarEvent < ActiveRecord::Base
     whenever {
       appointment_group && parent_event &&
       deleted? &&
-      workflow_state_changed?
+      saved_change_to_workflow_state?
     }
     data { {
       :updating_user_name => @updating_user.name,

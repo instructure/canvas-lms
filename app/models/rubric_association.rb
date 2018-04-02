@@ -226,6 +226,15 @@ class RubricAssociation < ActiveRecord::Base
     self.association_object.is_a?(Assignment) && self.purpose == "grading" && assessment_type == "grading"
   end
 
+  def assessment_points(criterion, data)
+    if criterion.learning_outcome_id && !self.context.feature_enabled?(:outcome_extra_credit)
+      [criterion.points, data[:points].to_f].min
+    else
+      data[:points].to_f
+    end
+  end
+  protected :assessment_points
+
   def assess(opts={})
     # TODO: what if this is for a group assignment?  Seems like it should
     # give all students for the group assignment the same rubric assessment
@@ -265,7 +274,7 @@ class RubricAssociation < ActiveRecord::Base
       if data
         replace_ratings = true
         has_score = (data[:points]).present?
-        rating[:points] = data[:points].to_f if has_score
+        rating[:points] = assessment_points(criterion, data) if has_score
         rating[:criterion_id] = criterion.id
         rating[:learning_outcome_id] = criterion.learning_outcome_id
         if criterion.ignore_for_scoring

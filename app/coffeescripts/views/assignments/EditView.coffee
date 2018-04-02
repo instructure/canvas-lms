@@ -89,6 +89,7 @@ define [
     MODERATED_GRADING_BOX = '#assignment_moderated_grading'
     CONDITIONAL_RELEASE_TARGET = '#conditional_release_target'
     SIMILARITY_DETECTION_TOOLS = '#similarity_detection_tools'
+    ANONYMOUS_GRADING_BOX = '#assignment_anonymous_grading'
 
     els: _.extend({}, @::els, do ->
       els = {}
@@ -119,6 +120,7 @@ define [
       els["#{CONDITIONAL_RELEASE_TARGET}"] = '$conditionalReleaseTarget'
       els["#{SIMILARITY_DETECTION_TOOLS}"] = '$similarityDetectionTools'
       els["#{SECURE_PARAMS}"] = '$secureParams'
+      els["#{ANONYMOUS_GRADING_BOX}"] = '$anonymousGradingBox'
       els
     )
 
@@ -138,6 +140,7 @@ define [
       events["change #{PEER_REVIEWS_BOX}"] = 'handleModeratedGradingChange'
       events["change #{MODERATED_GRADING_BOX}"] = 'handleModeratedGradingChange'
       events["change #{GROUP_CATEGORY_BOX}"] = 'handleGroupCategoryChange'
+      events["change #{ANONYMOUS_GRADING_BOX}"] = 'handleAnonymousGradingChange'
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
         events["change"] = 'onChange'
       events
@@ -203,8 +206,44 @@ define [
 
     handleGroupCategoryChange: ->
       isGrouped = @$groupCategoryBox.prop('checked')
+      isAnonymous = @$anonymousGradingBox.prop('checked')
+
+      if isAnonymous
+        @resetHasGroupCategory()
+      else
+        @updateHasGroupCategory(isGrouped)
+
       @$intraGroupPeerReviews.toggleAccessibly(isGrouped)
       @handleModeratedGradingChange()
+
+    handleAnonymousGradingChange: ->
+      isGrouped = @$groupCategoryBox.prop('checked')
+      isAnonymous = @$anonymousGradingBox.prop('checked')
+
+      if isGrouped
+        @resetAnonymousGrading()
+      else
+        @updateAnonymousGrading(isAnonymous)
+
+    resetHasGroupCategory: =>
+      @$groupCategoryBox.prop('checked', false)
+
+    updateHasGroupCategory: (setting) =>
+      if setting
+        @disableCheckbox(@$anonymousGradingBox, I18n.t('Anonymous grading cannot be enabled for group assignments'))
+      else
+        @enableCheckbox(@$anonymousGradingBox)
+
+    resetAnonymousGrading: =>
+      @$anonymousGradingBox.prop('checked', false)
+
+    updateAnonymousGrading: (setting) =>
+      if setting
+        @disableCheckbox(@$groupCategoryBox, I18n.t('Group assignments cannot be enabled for anonymously graded assignments'))
+      else
+        @enableCheckbox(@$groupCategoryBox)
+
+      @assignment.anonymousGrading(setting)
 
     handleModeratedGradingChange: =>
       if !ENV?.HAS_GRADED_SUBMISSIONS
@@ -302,6 +341,7 @@ define [
       @$peerReviewsBox = $("#{PEER_REVIEWS_BOX}")
       @$intraGroupPeerReviews = $("#{INTRA_GROUP_PEER_REVIEWS}")
       @$groupCategoryBox = $("#{GROUP_CATEGORY_BOX}")
+      @$anonymousGradingBox = $("#{ANONYMOUS_GRADING_BOX}")
 
       @similarityDetectionTools = SimilarityDetectionTools.attach(
             @$similarityDetectionTools.get(0),
@@ -316,6 +356,8 @@ define [
       @handleModeratedGradingChange()
       @handleOnlineSubmissionTypeChange()
       @handleSubmissionTypeChange()
+      @handleGroupCategoryChange()
+      @handleAnonymousGradingChange()
 
       if ENV?.HAS_GRADED_SUBMISSIONS
         @disableCheckbox(@$moderatedGradingBox, I18n.t("Moderated grading setting cannot be changed if graded submissions exist"))
@@ -340,6 +382,7 @@ define [
         conditionalReleaseServiceEnabled: ENV?.CONDITIONAL_RELEASE_SERVICE_ENABLED or false
         lockedItems: @lockedItems
         anonymousInstructorAnnotationsEnabled: ENV?.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED or false
+        anonymousGradingEnabled: ENV?.ANONYMOUS_GRADING_ENABLED or false
 
 
     _attachEditorToDescription: =>

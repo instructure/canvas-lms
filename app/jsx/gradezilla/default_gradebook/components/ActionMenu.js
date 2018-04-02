@@ -80,10 +80,6 @@ const { arrayOf, bool, func, object, shape, string } = PropTypes;
       })
     };
 
-    static downloadableLink (url) {
-      return `${url}&download_frd=1`;
-    }
-
     static gotoUrl (url) {
       window.location.href = url;
     }
@@ -136,7 +132,7 @@ const { arrayOf, bool, func, object, shape, string } = PropTypes;
 
         const previousExport = {
           label: `${I18n.t('New Export')} (${DateHelper.formatDatetimeForDisplay(updatedAt)})`,
-          attachmentUrl: ActionMenu.downloadableLink(attachmentUrl)
+          attachmentUrl
         };
 
         this.setState({ previousExport });
@@ -188,7 +184,7 @@ const { arrayOf, bool, func, object, shape, string } = PropTypes;
 
       return {
         label: `${I18n.t('Previous Export')} (${DateHelper.formatDatetimeForDisplay(updatedAt)})`,
-        attachmentUrl: ActionMenu.downloadableLink(attachment.downloadUrl)
+        attachmentUrl: attachment.downloadUrl
       };
     }
 

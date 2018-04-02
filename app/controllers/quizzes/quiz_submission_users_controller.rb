@@ -17,7 +17,6 @@
 #
 module Quizzes
   # @API Quiz Submission User List
-  # @beta
   #
   # List of users who have or haven't submitted for a quiz.
   #
@@ -114,7 +113,6 @@ module Quizzes
     end
 
     # @API Send a message to unsubmitted or submitted users for the quiz
-    # @beta
     #
     # @argument conversations [QuizUserConversation] - Body and recipients to send the message to.
     #

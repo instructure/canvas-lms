@@ -117,7 +117,7 @@ describe 'dashcards' do
       expect(f('a.announcements .unread_count').text).to include('1')
       # The notifications should go away after visiting the show page of announcements
       expect_new_page_load{f('a.announcements').click}
-      expect_new_page_load{fln('New Announcement').click}
+      expect_new_page_load{f('.ic-announcement-row h3').click}
       get '/'
       expect(f("#content")).not_to contain_css('a.announcements .unread_count')
     end

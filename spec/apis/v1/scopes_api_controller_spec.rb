@@ -20,6 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe ScopesApiController, type: :request do
   describe "index" do
+    before :each do
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:api_token_scoping)
+    end
+
     context "with admin" do
       before :once do
         @account = account_model
@@ -28,6 +32,7 @@ describe ScopesApiController, type: :request do
       end
 
       it "returns expected scopes" do
+        allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
         allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management).and_return(true)
         allow_any_instance_of(Account).to receive(:feature_allowed?).and_return(false)
         allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management).and_return(true)

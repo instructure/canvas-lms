@@ -72,13 +72,13 @@
       border-bottom: none;
     }
     .middle {
-      padding-left: 69px;
+      padding-#{direction(left)}: 69px;
     }
     .avatar {
-      float: left;
+      float: direction(left);
     }
     time {
-      float: right;
+      float: direction(right);
       color: #777;
       @include fontSize(11px);
     }
@@ -108,13 +108,13 @@
     display: block;
   }
   #group-comment-container {
-    float: left;
+    float: direction(left);
     label {
       display: inline;
       font-weight: normal;
     }
   }
   .btn {
-    float: right;
+    float: direction(right);
   }
 }

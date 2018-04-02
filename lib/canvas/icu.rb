@@ -117,16 +117,19 @@ module Canvas::ICU
       end
     end
 
-    def self.collator
+    def self.collator(locale = I18n.locale)
       @collations ||= {}
-      @collations[I18n.locale] ||= begin
-        collator = ICU::Collation::Collator.new(I18n.locale.to_s)
+      @collations[locale] ||= begin
+        collator = ICU::Collation::Collator.new(locale.to_s)
 
         # Reference documentation (some option names differ in ruby-space)for these options is at
         # http://userguide.icu-project.org/collation/customization#TOC-Default-Options
-        collator.normalization_mode = true
+        # if you change these settings, also match the settings in best_unicode_collation_key
+        # and natcompare.js
+        collator.normalization_mode = false # default; other languages override as appropriate
         collator.numeric_collation = true
-        collator.strength = :tertiary
+        collator.strength = :tertiary # default
+        collator.alternate_handling = :non_ignorable # default
         collator
       end
     end

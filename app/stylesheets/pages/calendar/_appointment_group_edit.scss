@@ -37,7 +37,7 @@
 }
 
 .sectionItem {
-  padding-left: 20px;
+  padding-#{direction(left)}: 20px;
 }
 
 .AppointmentGroupList__List {
@@ -52,7 +52,7 @@
 .AppointmentGroupList__MessageButton {
   margin-top: 10px;
   width: 100%;
-  margin-left: 30px;
+  margin-#{direction(left)}: 30px;
 }
 
 .AppointmentGroupList__Icon--reserved {
@@ -87,7 +87,7 @@
 }
 
 .TimeBlockSelectorColumn {
-  margin-right: $ic-sp;
+  margin-#{direction(right)}: $ic-sp;
 }
 
 .TimeBlockSelectorRow__Date,  // will remove once inputs are switched over to use instui
@@ -104,7 +104,7 @@
     box-shadow: 0 0 1px $ic-color-dark;
     background: $ic-color-medium-light;
     padding: 2px 10px;
-    margin-right: 5px;
+    margin-#{direction(right)}: 5px;
     border-radius: 12px;
     display: inline-block;
     font-size: 0.9em;

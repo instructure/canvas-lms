@@ -31,8 +31,6 @@ describe DiscussionTopicSectionVisibility do
     @section2 = @course2.course_sections.create!
     @course1.save!
     @course2.save!
-    @course1.root_account.enable_feature!(:section_specific_announcements)
-    @course2.root_account.enable_feature!(:section_specific_announcements)
     @announcement = Announcement.create!(
       :title => "some topic",
       :message => "I announce that i am lying",
@@ -43,7 +41,6 @@ describe DiscussionTopicSectionVisibility do
   end
 
   it 'forbid non-section-specific topics from having sections' do
-    @course1.root_account.enable_feature!(:section_specific_announcements)
     @announcement.is_section_specific = false
     @announcement.discussion_topic_section_visibilities <<
       DiscussionTopicSectionVisibility.new(
@@ -56,7 +53,6 @@ describe DiscussionTopicSectionVisibility do
   end
 
   it 'forbid sections with wrong context' do
-    @course1.root_account.enable_feature!(:section_specific_announcements)
     @announcement.is_section_specific = true
     @announcement.discussion_topic_section_visibilities <<
       DiscussionTopicSectionVisibility.new(
@@ -69,7 +65,6 @@ describe DiscussionTopicSectionVisibility do
   end
 
   it 'valid entry' do
-    @course1.root_account.enable_feature!(:section_specific_announcements)
     @announcement.is_section_specific = true
     @announcement.discussion_topic_section_visibilities <<
       DiscussionTopicSectionVisibility.new(

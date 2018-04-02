@@ -1671,7 +1671,7 @@ describe EnrollmentsApiController, type: :request do
           @course.enroll_student(@student, enrollment_state: 'active')
         end
         @observer = user_factory(active_all: true, active_state: 'active')
-        @observer.user_observees.create do |uo|
+        @observer.as_observer_observation_links.create do |uo|
           uo.user_id = @student.id
         end
         @user = @observer

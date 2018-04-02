@@ -1028,6 +1028,19 @@ describe "Accounts API", type: :request do
         { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param,
           :format => 'json', :search_term => search_term })
       expect(response).to eq 400
+
+      # search on something that's a course name but looks like an id also
+      one_more = create_courses(
+        [{name: @courses[0].id.to_s, course_code: "name_looks_like_id"}],
+        account: @a1, account_associations: true, return_type: :record
+      )
+      @courses.push(*one_more)
+      search_term = @courses.last.name
+      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?search_term=#{search_term}",
+        { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param,
+          :format => 'json', :search_term => search_term })
+      expect(json.length).to be 2
+      expect(json.map{ |c| [c['id'], c['name']] }).to match_array([[@courses.first.id, @courses.first.name], [@courses.last.id, @courses.last.name]])
     end
 
     context "blueprint courses" do

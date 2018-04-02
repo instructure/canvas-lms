@@ -37,7 +37,7 @@ module SIS
             begin
               i.process_user_observer(row['observer_id'], row['student_id'], row['status'])
             rescue ImportError => e
-              add_warning(csv, "#{e}")
+              SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
             end
           end
         end

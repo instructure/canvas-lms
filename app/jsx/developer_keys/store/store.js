@@ -22,6 +22,9 @@ import listDeveloperKeysReducer from '../reducers/listDeveloperKeysReducer'
 import deactivateDeveloperKeyReducer from '../reducers/deactivateDeveloperKeyReducer'
 import activateDeveloperKeyReducer from '../reducers/activateDeveloperKeyReducer'
 import deleteDeveloperKeyReducer from '../reducers/deleteDeveloperKeyReducer'
+import createOrEditDeveloperKeyReducer from '../reducers/createOrEditDeveloperKeyReducer'
+import makeVisibleDeveloperKeyReducer from '../reducers/makeVisibleDeveloperKeyReducer'
+import makeInvisibleDeveloperKeyReducer from '../reducers/makeInvisibleDeveloperKeyReducer'
 
 const createStoreWithMiddleware = applyMiddleware(
   ReduxThunk
@@ -32,6 +35,9 @@ const developerKeysReducer = combineReducers({
   deactivateDeveloperKey: deactivateDeveloperKeyReducer,
   activateDeveloperKey: activateDeveloperKeyReducer,
   deleteDeveloperKey: deleteDeveloperKeyReducer,
+  createOrEditDeveloperKey: createOrEditDeveloperKeyReducer,
+  makeVisibleDeveloperKey: makeVisibleDeveloperKeyReducer,
+  makeInvisibleDeveloperKey: makeInvisibleDeveloperKeyReducer
 });
 
 export default createStoreWithMiddleware(developerKeysReducer)
