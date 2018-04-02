@@ -91,11 +91,11 @@ it('renders to do items correctly', () => {
 it('does not render completed items by default', () => {
   const props = getDefaultProps();
   props.items[0].completed = true;
-  const wrapper = shallow(
+  const wrapper = mount(
     <Grouping {...props} />
   );
 
-  expect(wrapper.find('Animatable(PlannerItem)')).toHaveLength(1);
+  expect(wrapper.find('Animatable(ResponsivePlannerItem)')).toHaveLength(1);
 });
 
 it('renders a CompletedItemsFacade when completed items are present by default', () => {
@@ -118,7 +118,7 @@ it('renders completed items when the facade is clicked', () => {
   );
 
   wrapper.instance().handleFacadeClick();
-  expect(wrapper.find('Animatable(PlannerItem)')).toHaveLength(2);
+  expect(wrapper.find('Animatable(ResponsivePlannerItem)')).toHaveLength(2);
 });
 
 it('renders completed items when they have the show property', () => {
@@ -130,7 +130,7 @@ it('renders completed items when they have the show property', () => {
     <Grouping {...props} />
   );
 
-  expect(wrapper.find('Animatable(PlannerItem)')).toHaveLength(2);
+  expect(wrapper.find('Animatable(ResponsivePlannerItem)')).toHaveLength(2);
 });
 
 it('does not render a CompletedItemsFacade when showCompletedItems state is true', () => {

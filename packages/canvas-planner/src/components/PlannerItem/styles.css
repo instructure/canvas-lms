@@ -112,3 +112,12 @@
   text-align: end;
   min-width: 1px;
 }
+
+.medium {
+  .title {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding-right: 0.5rem;
+  }
+}

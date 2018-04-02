@@ -41,6 +41,7 @@
   "license": "AGPL-3.0",
   "dependencies": {
     "@instructure/ui-core": "^4.8.0",
+    "@instructure/ui-toggle-details": "^5.0.0",
     "axios": "^0.16.0",
     "babel-plugin-inline-react-svg": "^0.4.0",
     "change-case": "^3.0.1",

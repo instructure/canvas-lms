@@ -17,9 +17,8 @@
  */
 import React, { Component } from 'react';
 import themeable from '@instructure/ui-themeable/lib';
-import Button from '@instructure/ui-core/lib/components/Button';
+import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails';
 import Pill from '@instructure/ui-core/lib/components/Pill';
-import IconArrowOpenRight from 'instructure-icons/lib/Solid/IconArrowOpenRightSolid';
 import BadgeList from '../BadgeList';
 import NotificationBadge, { MissingIndicator, NewActivityIndicator} from '../NotificationBadge';
 import { func, number, string, arrayOf, shape, oneOf } from 'prop-types';
@@ -100,27 +99,27 @@ export class CompletedItemsFacade extends Component {
     );
   }
   render () {
+    const theme = this.theme ? {
+      textColor: this.theme.labelColor,
+      iconColor: this.theme.labelColor,
+      iconMargin: this.theme.gutterWidth,
+    } : null;
     return (
       <div className={styles.root} ref={elt => this.rootDiv = elt}>
         <NotificationBadge>{this.renderNotificationBadge()}</NotificationBadge>
         <div className={styles.contentPrimary}>
-          <Button
-            variant="link"
+          <ToggleDetails
             ref={ref => this.buttonRef = ref}
-            onClick={this.props.onClick}
-          >
-            <IconArrowOpenRight/>
-            <span className={styles.showLabel}>
-              {
-                formatMessage(`{
+            onToggle={this.props.onClick}
+            summary={formatMessage(`{
                   count, plural,
                   one {Show # completed item}
                   other {Show # completed items}
-                }`, { count: this.props.itemCount })
-              }
-            </span>
-          </Button>
-
+                }`, { count: this.props.itemCount })}
+            theme={theme}
+          >
+            ToggleDetails requires a child
+          </ToggleDetails>
         </div>
         <div className={styles.contentSecondary}>
           {this.renderBadges()}

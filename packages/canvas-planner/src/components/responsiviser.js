@@ -26,7 +26,7 @@ class MediaQueryWatcher {
   // initialize the mediaQueryList with our media-query of interest
   setup () {
     if (!window.matchMedia) return; // or unit tests fail
-    this.mediaQueryList = window.matchMedia('(max-width: 50em)'); // hard-code for now
+    this.mediaQueryList = window.matchMedia('(max-width: 56em)'); // ==896px. hard-code query for now
     this.size = this.mediaQueryList.matches ? 'medium' : 'large';
 
     // some browsers support mediaQueryList.onchange. Use it if we can
@@ -106,7 +106,6 @@ function responsiviser () {
         ...ComposedComponent.propTypes
       }
       static defaultProps = ComposedComponent.defaultProps ? {...ComposedComponent.defaultProps} : null;
-      static displayName = `Responsive${ComposedComponent.displayName}`;
       static name() {
         return `Responsive${ComposedComponent.displayName}`;
       }
@@ -132,6 +131,7 @@ function responsiviser () {
         return <ComposedComponent {...this.props} responsiveSize={this.state.size} />;
       }
     }
+    ResponsiveComponent.displayName = ResponsiveComponent.name();
     return ResponsiveComponent;
   };
 }
