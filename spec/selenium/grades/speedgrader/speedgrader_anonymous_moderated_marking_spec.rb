@@ -25,6 +25,7 @@ describe "SpeedGrader with Anonymous Moderated Marking enabled" do
 
   before(:each) do
     Account.default.enable_feature!(:anonymous_moderated_marking)
+    Account.default.enable_feature!(:anonymous_marking)
     course_with_teacher_logged_in
     outcome_with_rubric
     @assignment = @course.assignments.create(
