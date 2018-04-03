@@ -20,4 +20,4 @@ services:
       - yarn-cache:/home/docker/.cache/yarn
     environment:
       NODE_ENV: CI
-    command: yarn run test-watch-headless
+    command: yarn run test:karma:watch:headless
