@@ -59,6 +59,7 @@ describe "account admin outcomes" do
       end
 
       it "should edit a learning outcome and delete a rating", priority: "1", test_id: 250231 do
+        skip('Flaky, see OUT-2102')
         should_edit_a_learning_outcome_and_delete_a_rating
       end
 
@@ -83,6 +84,7 @@ describe "account admin outcomes" do
       end
 
       it "should create an outcome group (nested)", priority: "2", test_id: 250237 do
+        skip('Flaky, see OUT-2102')
         should_create_an_outcome_group_nested
       end
 

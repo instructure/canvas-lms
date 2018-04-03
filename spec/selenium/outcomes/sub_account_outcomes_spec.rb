@@ -43,6 +43,7 @@ describe "sub account outcomes" do
         end
 
         it "should edit a learning outcome and delete a rating", priority: "2", test_id: 263681 do
+          skip('Flaky, see OUT-2102')
           should_edit_a_learning_outcome_and_delete_a_rating
         end
 
