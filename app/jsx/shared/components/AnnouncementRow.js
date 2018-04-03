@@ -40,7 +40,7 @@ import announcementShape from '../proptypes/announcement'
 import masterCourseDataShape from '../proptypes/masterCourseData'
 import { isPassedDelayedPostAt } from '../../announcements/utils'
 
-function makeTimestamp({delayed_post_at}) {
+function makeTimestamp({delayed_post_at, posted_at}) {
   return (delayed_post_at
     && !isPassedDelayedPostAt({ currentDate: null, delayedDate: delayed_post_at}))
     ? {
@@ -56,7 +56,7 @@ function makeTimestamp({delayed_post_at}) {
         ),
         date: delayed_post_at
       }
-    : {title: I18n.t('Posted on:'), date: delayed_post_at}
+    : {title: I18n.t('Posted on:'), date: delayed_post_at || posted_at}
 }
 
 export default function AnnouncementRow({
