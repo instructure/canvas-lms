@@ -143,6 +143,7 @@ module CanvasSanitize #:nodoc:
           'colgroup' => ['span', 'width'].freeze,
           'img' => ['align', 'alt', 'height', 'src', 'width'].freeze,
           'iframe' => ['src', 'width', 'height', 'name', 'align', 'frameborder', 'scrolling',
+                       'allow', # TODO: remove explicit allow with domain whitelist account setting
                        'sandbox', 'allowfullscreen','webkitallowfullscreen','mozallowfullscreen'].freeze,
           'ol' => ['start', 'type'].freeze,
           'q' => ['cite'].freeze,
