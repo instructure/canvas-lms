@@ -133,6 +133,18 @@ describe "ZipPackage" do
       expect(zip_package.parse_module_data.length).to eq 1
     end
 
+    it "does not include unpublished prerequisites" do
+      module2 = @course.context_modules.create(name: 'second_module')
+      module2.prerequisites = "module_#{@module.id}"
+      module2.save!
+      @module.unpublish
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      data = zip_package.parse_module_data
+      expect(data.length).to eq 1
+      expect(data[0][:id]).to eq module2.id
+      expect(data[0][:prereqs]).to eq []
+    end
+
     it "should parse module completion requirements settings" do
       assign = @course.assignments.create!(title: 'Assignment 1')
       assign_item = @module.content_tags.create!(content: assign, context: @course)
