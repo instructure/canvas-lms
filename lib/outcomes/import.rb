@@ -182,19 +182,18 @@ module Outcomes
           )
         end
       else
-        LearningOutcome.find_or_initialize_by(
-          vendor_guid: outcome[:vendor_guid]
-        )
+        vendor_guid = outcome[:vendor_guid]
+        prior = LearningOutcome.find_by(vendor_clause(vendor_guid))
+        return prior if prior
+        LearningOutcome.new(vendor_guid: vendor_guid)
       end
     end
 
     def find_prior_group(group)
-      lookup = {
-        vendor_guid: group[:vendor_guid],
-        context: context
-      }
+      vendor_guid = group[:vendor_guid]
+      clause = vendor_clause(group[:vendor_guid])
 
-      prior = LearningOutcomeGroup.find_by(**lookup)
+      prior = LearningOutcomeGroup.where(clause).find_by(context: context)
       return prior if prior
 
       match = /canvas_outcome_group:(\d+)/.match(group[:vendor_guid])
@@ -211,7 +210,7 @@ module Outcomes
         end
       end
 
-      LearningOutcomeGroup.new(**lookup)
+      LearningOutcomeGroup.new(vendor_guid: vendor_guid, context: context)
     end
 
     def create_rubric(ratings, mastery_points)

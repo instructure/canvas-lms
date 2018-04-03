@@ -139,6 +139,14 @@ RSpec.describe Outcomes::Import do
         expect(new_group.title).to eq "i'm a group"
       end
 
+      it 'uses the right vendor_guid clause' do
+        different_guid = group_attributes.merge(vendor_guid: 'vg2')
+        allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return true
+        existing_group.update! vendor_guid: different_guid[:vendor_guid]
+        importer.import_group(different_guid)
+        expect(existing_group.reload.title).to eq "i'm a group"
+      end
+
       it 'creates new group if matching group not in correct context' do
         existing_group.update! context: other_context
         importer.import_group(group_attributes)
@@ -275,6 +283,14 @@ RSpec.describe Outcomes::Import do
 
       it 'updates if outcome in current context' do
         importer.import_outcome(**outcome_attributes)
+        expect(existing_outcome.reload.title).to eq "i'm an outcome"
+      end
+
+      it 'uses the right vendor_guid clause' do
+        different_guid = outcome_attributes.merge(vendor_guid: 'vg2')
+        allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return true
+        existing_outcome.update! vendor_guid: different_guid[:vendor_guid]
+        importer.import_outcome(different_guid)
         expect(existing_outcome.reload.title).to eq "i'm an outcome"
       end
 
