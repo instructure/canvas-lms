@@ -476,7 +476,7 @@ END
       display_name: -> { I18n.t('Allow RTL users to see RTL interface') },
       description: -> { I18n.t('This feature flag is something an account can turn on if they want to allow the users of their account that speak languages that are normally written in Right to Left (eg: Arabic, Hebrew, Farsi) to see the RTL layout while we are working on it. once the feature is "ready" this feature flag will go away and anyone that speaks one of those languages will always see the RTL interface.') },
       applies_to: 'RootAccount',
-      state: 'hidden',
+      state: 'available',
       development: true,
     },
     'force_rtl' =>
