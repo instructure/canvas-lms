@@ -95,6 +95,7 @@ exports[`shows new activity button when new activity is indicated 1`] = `
   <StickyButton
     buttonRef={[Function]}
     direction="up"
+    hidden={true}
     offset="0px"
     onClick={[Function]}
   >

@@ -119,6 +119,7 @@ export class PlannerApp extends Component {
     return (
       <StickyButton
         direction="up"
+        hidden={true}
         onClick={this.handleNewActivityClick}
         offset={this.props.stickyOffset + 'px'}
         zIndex={this.props.stickyZIndex}
