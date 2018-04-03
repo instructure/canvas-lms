@@ -87,8 +87,10 @@ export class Day extends Component {
   }
 
   render () {
+    const thisIsToday = isToday(this.props.day);
+
     return (
-      <div className={classnames(styles.root, 'planner-day')}  >
+      <div className={classnames(styles.root, 'planner-day', {'planner-today': thisIsToday})} >
           <Heading
             border={(this.hasItems()) ? 'none' : 'bottom'}
           >
@@ -96,7 +98,7 @@ export class Day extends Component {
               as="div"
               transform="uppercase"
               lineHeight="condensed"
-              size={isToday(this.props.day) ? 'large' : 'medium'}
+              size={thisIsToday ? 'large' : 'medium'}
             >
               {this.friendlyName}
             </Text>

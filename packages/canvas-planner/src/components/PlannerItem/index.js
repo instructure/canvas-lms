@@ -69,11 +69,13 @@ export class PlannerItem extends Component {
     showNotificationBadge: bool,
     currentUser: shape(userShape),
     responsiveSize: sizeShape,
+    allDay: bool,
   };
 
   static defaultProps = {
     badges: [],
     responsiveSize: 'large',
+    allDay: false,
   };
 
   constructor (props) {
@@ -245,15 +247,17 @@ export class PlannerItem extends Component {
     if (newItem || missing) {
       const IndicatorComponent = newItem ? NewActivityIndicator : MissingIndicator;
       return (
-        <div className={styles.activityIndicator}>
-          <IndicatorComponent
-          title={this.props.title}
-          itemIds={[this.props.uniqueId]}
-          animatableIndex={this.props.animatableIndex} />
-        </div>
+        <NotificationBadge>
+          <div className={styles.activityIndicator}>
+            <IndicatorComponent
+            title={this.props.title}
+            itemIds={[this.props.uniqueId]}
+            animatableIndex={this.props.animatableIndex} />
+          </div>
+        </NotificationBadge>
       );
     } else {
-      return null;
+      return <NotificationBadge/>;
     }
   }
 
@@ -267,7 +271,7 @@ export class PlannerItem extends Component {
         { assignmentType: assignmentType, title: this.props.title });
     return (
       <div className={classnames(styles.root, styles[this.getLayout()], 'planner-item')} ref={this.registerRootDivRef}>
-        <NotificationBadge>{this.renderNotificationBadge()}</NotificationBadge>
+        {this.renderNotificationBadge()}
         <div className={styles.completed}>
           <Checkbox
             ref={this.registerFocusElementRef}

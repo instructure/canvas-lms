@@ -31,7 +31,10 @@ import Tray from '@instructure/ui-core/lib/components/Tray';
 import Badge from '@instructure/ui-core/lib/components/Badge';
 import Opportunities from '../Opportunities';
 import GradesDisplay from '../GradesDisplay';
-import {addDay, savePlannerItem, deletePlannerItem, cancelEditingPlannerItem, openEditingPlannerItem, getNextOpportunities, getInitialOpportunities, dismissOpportunity, clearUpdateTodo, startLoadingGradesSaga} from '../../actions';
+import {
+  addDay, savePlannerItem, deletePlannerItem, cancelEditingPlannerItem, openEditingPlannerItem, getNextOpportunities,
+  getInitialOpportunities, dismissOpportunity, clearUpdateTodo, startLoadingGradesSaga, scrollToToday
+} from '../../actions';
 
 import { courseShape, opportunityShape } from '../plannerPropTypes';
 import styles from './styles.css';
@@ -50,6 +53,7 @@ export class PlannerHeader extends Component {
     openEditingPlannerItem: PropTypes.func,
     triggerDynamicUiUpdates: PropTypes.func,
     preTriggerDynamicUiUpdates: PropTypes.func,
+    scrollToToday: PropTypes.func,
     locale: PropTypes.string.isRequired,
     timeZone: PropTypes.string.isRequired,
     opportunities: PropTypes.shape(opportunityShape).isRequired,
@@ -180,6 +184,12 @@ export class PlannerHeader extends Component {
     });
   }
 
+  handleTodayClick = () => {
+    if (this.props.scrollToToday) {
+      this.props.scrollToToday();
+    }
+  }
+
   _doToggleOpportunitiesDropdown (openOrClosed) {
     this.setState({opportunitiesOpen: !!openOrClosed}, () => {
       this.toggleAriaHiddenStuff(this.state.opportunitiesOpen);
@@ -239,6 +249,13 @@ export class PlannerHeader extends Component {
 
     return (
       <div className={styles.root}>
+        <Button
+          variant="light"
+          margin="0 medium 0 0"
+          onClick={this.handleTodayClick}
+        >
+          {formatMessage("Today")}
+        </Button>
         <Button
           variant="icon"
           margin="0 medium 0 0"
@@ -334,6 +351,9 @@ export const ThemedPlannerHeader = themeable(theme, styles)(PlannerHeader);
 export const NotifierPlannerHeader = notifier(ThemedPlannerHeader);
 
 const mapStateToProps = ({opportunities, loading, courses, todo}) => ({opportunities, loading, courses, todo});
-const mapDispatchToProps = {addDay, savePlannerItem, deletePlannerItem, cancelEditingPlannerItem, openEditingPlannerItem, getInitialOpportunities, getNextOpportunities, dismissOpportunity, clearUpdateTodo, startLoadingGradesSaga};
+const mapDispatchToProps = {
+  addDay, savePlannerItem, deletePlannerItem, cancelEditingPlannerItem, openEditingPlannerItem,
+  getInitialOpportunities, getNextOpportunities, dismissOpportunity, clearUpdateTodo, startLoadingGradesSaga, scrollToToday
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(NotifierPlannerHeader);

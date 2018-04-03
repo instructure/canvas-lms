@@ -24,7 +24,7 @@ import themeable from '@instructure/ui-themeable/lib';
 import Heading from '@instructure/ui-core/lib/components/Heading';
 import Text from '@instructure/ui-core/lib/components/Text';
 import Container from '@instructure/ui-core/lib/components/Container';
-import { string, number, func } from 'prop-types';
+import { string } from 'prop-types';
 import styles from './styles.css';
 import theme from './theme.js';
 import { getShortDate } from '../../utilities/dateUtils';

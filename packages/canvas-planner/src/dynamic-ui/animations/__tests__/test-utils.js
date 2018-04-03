@@ -18,10 +18,10 @@
 
 import {DynamicUiManager} from '../../manager';
 
-export function mockRegistryEntry (ids, name) {
+export function mockRegistryEntry (ids, name, date) {
   return {
     componentIds: ids,
-    component: mockComponent(name),
+    component: mockComponent(name, date),
   };
 }
 
@@ -39,10 +39,11 @@ export function mockDocument () {
   };
 }
 
-export function mockComponent(name) {
+export function mockComponent(name, date) {
   return {
     getFocusable: jest.fn(() => `${name}-focusable`),
     getScrollable: jest.fn(() => `${name}-scrollable`),
+    props: {date},
   };
 }
 

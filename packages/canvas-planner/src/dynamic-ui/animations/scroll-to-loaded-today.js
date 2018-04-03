@@ -1,4 +1,4 @@
-/*
+  /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
  * This file is part of Canvas.
@@ -16,13 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './scroll-to-last-loaded-new-activity';
-export * from './scroll-to-new-activity';
-export * from './maintain-scroll-position-when-scrolling-into-the-past';
-export * from './continue-initial-load';
-export * from './focus-item-on-save';
-export * from './focus-prior-item-on-load-more';
-export * from './focus-prior-item-on-delete';
-export * from './scroll-to-today';
-export * from './scroll-to-loaded-today';
-export * from './return-focus-on-cancel-editing';
+import Animation from '../animation';
+import { scrollAndFocusTodayItem } from './scroll-to-today';
+
+export class ScrollToLoadedToday extends Animation {
+  uiDidUpdate () {
+    const t = this.document().querySelector('.planner-today');
+    if (t) {
+      scrollAndFocusTodayItem(this.manager(), t);
+    } else {
+      this.animator().scrollToTop();
+    }
+  }
+}

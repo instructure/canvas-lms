@@ -44,6 +44,14 @@ export function isInFuture (date, today = moment()) {
   return momentizedDate.isAfter(today, 'day');
 }
 
+export function isTodayOrBefore (date, today = moment()) {
+  const momentizedDate = new moment(date);
+  return momentizedDate.isBefore(today, 'day') || momentizedDate.isSame(today, 'day');
+  // moment.isSameOrBefore isn't available until moment 2.11, but until we get off
+  // all of ui-core, it ends up pulling in an earlier version.
+  //return momentizedDate.isSameOrBefore(today, 'day');
+}
+
 /**
 * Given a date (in any format that moment will digest)
 * it will return a string indicating Today, Tomorrow, Yesterday

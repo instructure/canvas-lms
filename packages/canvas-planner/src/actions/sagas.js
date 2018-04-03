@@ -27,7 +27,7 @@ import {
 } from './loading-actions';
 
 import {
-  mergeFutureItems, mergePastItems, mergePastItemsForNewActivity
+  mergeFutureItems, mergePastItems, mergePastItemsForNewActivity, mergePastItemsForToday
 } from './saga-actions';
 
 
@@ -42,6 +42,7 @@ function* watchForSagas () {
   yield takeEvery('START_LOADING_FUTURE_SAGA', loadFutureSaga);
   yield takeEvery('START_LOADING_PAST_UNTIL_NEW_ACTIVITY_SAGA', loadPastUntilNewActivitySaga);
   yield takeEvery('START_LOADING_GRADES_SAGA', loadGradesSaga);
+  yield takeEvery('START_LOADING_PAST_UNTIL_TODAY_SAGA', loadPastUntilTodaySaga);
 }
 
 // fromMomentFunction: function
@@ -114,6 +115,10 @@ export function* loadGradesSaga () {
     yield put(gotGradesError(loadingError));
     throw loadingError;
   }
+}
+
+export function* loadPastUntilTodaySaga () {
+  yield* loadingLoop(fromMomentPast, mergePastItemsForToday, {intoThePast: true});
 }
 
 function fromMomentPast (state) {

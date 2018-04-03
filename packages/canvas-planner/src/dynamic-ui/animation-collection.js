@@ -27,6 +27,8 @@ import {
   ReturnFocusOnCancelEditing,
   // SetDismissedOpportunityFocus,
 
+  ScrollToToday,
+  ScrollToLoadedToday
 } from './animations';
 
 export class AnimationCollection {
@@ -85,12 +87,26 @@ export class AnimationCollection {
         'DELETED_PLANNER_ITEM',
       ],
       animation: FocusPriorItemOnDelete,
-    }
+    },
 
 
     // animations for the future. no, the format doesn't match.
     // [['DISMISSED_OPPORTUNITY',
     // ], SetDismissedOpportunityFocus],
+
+    {
+      expected: [
+        'SCROLL_TO_TODAY',
+      ],
+      animation: ScrollToToday,
+    },
+    {
+      expected: [
+        'START_LOADING_PAST_UNTIL_TODAY_SAGA',
+        'GOT_DAYS_SUCCESS',
+      ],
+      animation: ScrollToLoadedToday
+    }
   ]
 
   constructor (manager, actionsToAnimations) {

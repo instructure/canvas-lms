@@ -66,12 +66,15 @@ export class Animator {
     }, 'push');
   }
 
-  scrollTo (elt, offset) {
+  scrollTo (elt, offset, onComplete) {
     this.queueAnimation(() => {
       const viewportHeight = this.window.innerHeight;
       const rect = elt.getBoundingClientRect();
       if (rect.top < offset || rect.bottom > viewportHeight) {
-        this.velocity(elt, 'scroll', {offset: -offset, duration: 1000, easing: 'ease-in-out'});
+        this.velocity(elt, 'scroll', {offset: -offset, duration: 1000, easing: 'ease-in-out', complete: onComplete});
+      } else {
+        // even though we didn't need to run the animation, execute the onComplete callback
+        onComplete && onComplete();
       }
     });
   }
