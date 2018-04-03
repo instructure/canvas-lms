@@ -19,7 +19,8 @@
 import I18n from 'i18n!roster'
 import React from 'react'
 import {bool, func, shape, arrayOf, oneOfType} from 'prop-types'
-import Modal, {ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-core/lib/components/Modal'
+import Modal, {ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
+import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
 import Heading from '@instructure/ui-core/lib/components/Heading'
 import Button from '@instructure/ui-core/lib/components/Button'
 import Spinner from '@instructure/ui-core/lib/components/Spinner'
@@ -305,19 +306,25 @@ export default class AddPeople extends React.Component {
 
     return (
       <Modal
-        closeButtonLabel={cancelLabel}
         id="add_people_modal"
         open={this.props.isOpen}
         label={modalTitle}
-        applicationElement={() => document.getElementById('application')}
         onDismiss={this.close}
         ref={node => { this.node = node }}
-        shouldCloseOnOverlayClick={false}
+        shouldCloseOnDocumentClick={false}
         size="medium"
         tabIndex="-1"
-        closeButtonRef={ c => { this.modalCloseBtn = c }}
       >
         <ModalHeader>
+          <CloseButton
+            buttonRef={c => { this.modalCloseBtn = c }}
+            placement="end"
+            offset="medium"
+            variant="icon"
+            onClick={this.close}
+          >
+            {cancelLabel}
+          </CloseButton>
           <Heading tabIndex="-1">{modalTitle}</Heading>
         </ModalHeader>
         <ModalBody>

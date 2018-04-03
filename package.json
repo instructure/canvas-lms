@@ -8,8 +8,10 @@
   },
   "dependencies": {
     "@instructure/ui-alerts": "^5.0.1",
+    "@instructure/ui-buttons": "^5.0.1",
     "@instructure/ui-core": "^4.8.0",
     "@instructure/ui-menu": "^5.0.1",
+    "@instructure/ui-overlays": "^5.0.1",
     "@instructure/ui-themeable": "^4.8.0",
     "@instructure/ui-themes": "^4.8.0",
     "apollo-boost": "^0.1.4",
