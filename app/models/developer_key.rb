@@ -195,14 +195,12 @@ class DeveloperKey < ActiveRecord::Base
     # If no account was specified return nil to prevent unneeded searching
     return if binding_account.blank?
 
-    # If not site admin we need to look up the account chain
-    accounts = if binding_account.site_admin?
-      [binding_account.id]
-    else
-      Account.account_chain_ids(binding_account).push(Account.site_admin.id).reverse
-    end
-
     # First check for explicitly set bindings starting with site admin and working down
+    binding = DeveloperKeyAccountBinding.find_site_admin_cached(self)
+    return binding if binding.present?
+
+    # Search for bindings in the account chain starting with the highest account
+    accounts = Account.account_chain_ids(binding_account).reverse
     binding = DeveloperKeyAccountBinding.find_in_account_priority(accounts, self.id)
 
     # If no explicity set bindings were found check for 'allow' bindings
@@ -213,9 +211,7 @@ class DeveloperKey < ActiveRecord::Base
 
   def create_default_account_binding
     owner_account = account || Account.site_admin
-    developer_key_account_bindings.create!(
-      account: owner_account
-    )
+    owner_account.developer_key_account_bindings.create!(developer_key: self)
   end
 
   def site_admin?

@@ -303,7 +303,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
         sub_account.update!(parent_account: account_model)
         user_session(sub_account_admin)
         post :create_or_update, params: sub_account_params
-        expect(response).to be_unauthorized
+        expect(response).to be_not_found
       end
 
       it_behaves_like 'the developer key update endpoint' do

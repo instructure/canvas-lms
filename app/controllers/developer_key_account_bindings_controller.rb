@@ -129,11 +129,15 @@ class DeveloperKeyAccountBindingsController < ApplicationController
     end
   end
 
+  def developer_key
+    @_developer_key ||= DeveloperKey.find_cached(params[:developer_key_id])
+  end
+
   def create_params
     workflow_state_param.merge(
       {
         account: account,
-        developer_key_id: params[:developer_key_id]
+        developer_key: developer_key
       }
     )
   end
@@ -147,14 +151,18 @@ class DeveloperKeyAccountBindingsController < ApplicationController
   def developer_key_in_account
     # Get all account ids in the account chain
     account_chain_ids = Account.account_chain_ids(account)
+    requested_key_id = params[:developer_key_id]
 
-    # Site admin developer keys have an account_id set to nil.
-    # We still want to include them in our developer key query.
-    account_chain_ids.push(nil)
+    # Check if requested key is active in the account chain
+    valid_key_ids = DeveloperKey.nondeleted.where(account_id: account_chain_ids).map(&:global_id)
+    found = valid_key_ids.map(&:to_s).include?(requested_key_id)
+    return if found
 
-    valid_key_ids = DeveloperKey.nondeleted.where(account_id: account_chain_ids).pluck(:id)
-    requested_key_id = Shard.local_id_for(params[:developer_key_id]).first
-    head :unauthorized unless valid_key_ids.include?(requested_key_id)
+    # Check if requested key is active on site admin
+    requested_key = DeveloperKey.find_cached(requested_key_id.to_i)
+    found ||= requested_key.present? && requested_key.account.blank? && requested_key.active?
+
+    raise ActiveRecord::RecordNotFound unless found
   end
 
   def require_manage_developer_keys

@@ -166,9 +166,49 @@ describe DeveloperKey do
           expect(binding.account).to eq Account.site_admin
         end
 
-        it 'finds the site admin binding when requesting root account' do
+        it 'finds the root account binding when requesting root account' do
           binding = root_account_key.account_binding_for(root_account)
+          expect(binding.account).to eq root_account
+        end
+      end
+    end
+
+    context 'sharding' do
+      specs_require_sharding
+
+      let(:root_account_shard) { Shard.create! }
+      let(:root_account) { root_account_shard.activate { account_model } }
+      let(:sa_developer_key) { Account.site_admin.shard.activate { DeveloperKey.create!(name: 'SA Key') } }
+      let(:root_account_binding) do
+        root_account_shard.activate do
+          DeveloperKeyAccountBinding.create!(
+            account_id: root_account.id,
+            developer_key_id: sa_developer_key.global_id
+          )
+        end
+      end
+      let(:sa_account_binding) { sa_developer_key.developer_key_account_bindings.find_by(account: Account.site_admin) }
+
+      context 'when developer key binding is on the site admin shard' do
+        it 'finds the site admin binding if it is set to "on"' do
+          root_account_binding.update!(workflow_state: 'on')
+          sa_account_binding.update!(workflow_state: 'off')
+          binding = root_account_shard.activate { sa_developer_key.account_binding_for(root_account) }
           expect(binding.account).to eq Account.site_admin
+        end
+
+        it 'finds the site admin binding if it is set to "off"' do
+          root_account_binding.update!(workflow_state: 'off')
+          sa_account_binding.update!(workflow_state: 'on')
+          binding = root_account_shard.activate { sa_developer_key.account_binding_for(root_account) }
+          expect(binding.account).to eq Account.site_admin
+        end
+
+        it 'finds the root account binding if site admin binding is set to "allow"' do
+          root_account_binding.update!(workflow_state: 'on')
+          sa_account_binding.update!(workflow_state: 'allow')
+          binding = root_account_shard.activate { sa_developer_key.account_binding_for(root_account) }
+          expect(binding.account).to eq root_account
         end
       end
     end
