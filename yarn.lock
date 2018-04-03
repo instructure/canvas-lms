@@ -167,6 +167,30 @@
     numeral "^2.0.6"
     prop-types "^15.5.10"
 
+"@instructure/ui-elements@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-elements/-/ui-elements-5.0.1.tgz#0fa667314fa9ed81dd785d37fca9f7148a7652b0"
+  dependencies:
+    "@instructure/ui-a11y" "^5.0.1"
+    "@instructure/ui-container" "^5.0.1"
+    "@instructure/ui-icons" "^5.0.1"
+    "@instructure/ui-layout" "^5.0.1"
+    "@instructure/ui-motion" "^5.0.1"
+    "@instructure/ui-themeable" "^5.0.1"
+    "@instructure/ui-utils" "^5.0.1"
+    classnames "^2.2.5"
+    prop-types "^15.5.10"
+
+"@instructure/ui-i18n@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-i18n/-/ui-i18n-5.0.1.tgz#3b6dc729af9771d26f66cc0b00b43f2da5f448cb"
+  dependencies:
+    "@instructure/ui-utils" "^5.0.1"
+    decimal.js "^9.0.1"
+    moment "^2.10.6"
+    moment-timezone "^0.5.14"
+    prop-types "^15.5.10"
+
 "@instructure/ui-icons@^5.0.1":
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/@instructure/ui-icons/-/ui-icons-5.0.1.tgz#63f029d0338743156f9761b096871446c081d79a"
@@ -174,11 +198,65 @@
     "@instructure/ui-svg-images" "^5.0.1"
     prop-types "^15.5.10"
 
+"@instructure/ui-layout@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-layout/-/ui-layout-5.0.1.tgz#8012d874313e392c07d737c98dae5af05116e8b0"
+  dependencies:
+    "@instructure/ui-a11y" "^5.0.1"
+    "@instructure/ui-container" "^5.0.1"
+    "@instructure/ui-motion" "^5.0.1"
+    "@instructure/ui-portal" "^5.0.1"
+    "@instructure/ui-themeable" "^5.0.1"
+    "@instructure/ui-utils" "^5.0.1"
+    classnames "^2.2.5"
+    prop-types "^15.5.10"
+
+"@instructure/ui-menu@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-menu/-/ui-menu-5.0.1.tgz#3ad99918348636493885ca7c8dc2336cdb766fc6"
+  dependencies:
+    "@instructure/ui-a11y" "^5.0.1"
+    "@instructure/ui-elements" "^5.0.1"
+    "@instructure/ui-icons" "^5.0.1"
+    "@instructure/ui-layout" "^5.0.1"
+    "@instructure/ui-overlays" "^5.0.1"
+    "@instructure/ui-themeable" "^5.0.1"
+    "@instructure/ui-utils" "^5.0.1"
+    classnames "^2.2.5"
+    keycode "^2.1.8"
+    prop-types "^15.5.10"
+
 "@instructure/ui-motion@^5.0.1":
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/@instructure/ui-motion/-/ui-motion-5.0.1.tgz#9adba0002fa28d2c7663c4d32baa5011d27dd57c"
   dependencies:
     "@instructure/ui-themeable" "^5.0.1"
+    "@instructure/ui-utils" "^5.0.1"
+    prop-types "^15.5.10"
+
+"@instructure/ui-overlays@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-overlays/-/ui-overlays-5.0.1.tgz#b50f4762d9aed33ecaad8081ed657c3d990c3e55"
+  dependencies:
+    "@instructure/ui-a11y" "^5.0.1"
+    "@instructure/ui-buttons" "^5.0.1"
+    "@instructure/ui-container" "^5.0.1"
+    "@instructure/ui-elements" "^5.0.1"
+    "@instructure/ui-i18n" "^5.0.1"
+    "@instructure/ui-layout" "^5.0.1"
+    "@instructure/ui-motion" "^5.0.1"
+    "@instructure/ui-portal" "^5.0.1"
+    "@instructure/ui-themeable" "^5.0.1"
+    "@instructure/ui-utils" "^5.0.1"
+    classnames "^2.2.5"
+    keycode "^2.1.8"
+    no-scroll "^2.1.0"
+    prop-types "^15.5.10"
+
+"@instructure/ui-portal@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-portal/-/ui-portal-5.0.1.tgz#b1badd9d2b1bd9978c42cf57f14c36fe557fc181"
+  dependencies:
     "@instructure/ui-utils" "^5.0.1"
     prop-types "^15.5.10"
 
