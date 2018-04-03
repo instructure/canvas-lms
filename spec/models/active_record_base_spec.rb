@@ -179,44 +179,6 @@ describe ActiveRecord::Base do
     end
   end
 
-  describe "#remove_dropped_columns" do
-    before do
-      @orig_dropped = ActiveRecord::Base::DROPPED_COLUMNS
-    end
-
-    after do
-      ActiveRecord::Base.send(:remove_const, :DROPPED_COLUMNS)
-      ActiveRecord::Base::DROPPED_COLUMNS = @orig_dropped
-      User.reset_column_information
-    end
-
-    it "should mask columns marked as dropped from column info methods" do
-      expect(User.columns.any? { |c| c.name == 'name' }).to be_truthy
-      expect(User.column_names).to be_include('name')
-      u = User.create!(:name => 'my name')
-      # if we ever actually drop the name column, this spec will fail on the line
-      # above, so it's all good
-      ActiveRecord::Base.send(:remove_const, :DROPPED_COLUMNS)
-      ActiveRecord::Base::DROPPED_COLUMNS = { 'users' => %w(name) }
-      User.reset_column_information
-      expect(User.columns.any? { |c| c.name == 'name' }).to be_falsey
-      expect(User.column_names).not_to be_include('name')
-
-      # load from the db should hide the attribute
-      u = User.find(u.id)
-      expect(u.attributes.keys.include?('name')).to be_falsey
-    end
-
-    it "should only drop columns from the specific table specified" do
-      ActiveRecord::Base.send(:remove_const, :DROPPED_COLUMNS)
-      ActiveRecord::Base::DROPPED_COLUMNS = { 'users' => %w(name) }
-      User.reset_column_information
-      Group.reset_column_information
-      expect(User.columns.any? { |c| c.name == 'name' }).to be_falsey
-      expect(Group.columns.any? { |c| c.name == 'name' }).to be_truthy
-    end
-  end
-
   context "rank helpers" do
     it "should generate appropriate rank sql" do
       expect(ActiveRecord::Base.rank_sql(['a', ['b', 'c'], ['d']], 'foo')).
