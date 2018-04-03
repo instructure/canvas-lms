@@ -46,6 +46,9 @@ module EportfolioPage
       add_crumb(@category.name, eportfolio_named_category_path(@portfolio.id, @category.slug)) if @category.slug.present?
       add_crumb(@page.name, eportfolio_named_category_entry_path(@portfolio.id, @category.slug, @page.slug)) if @category.slug.present? && @page.slug.present?
     end
+    if @current_user
+      js_env :folder_id => Folder.unfiled_folder(@current_user).id,
+             :context_code => @current_user.asset_string
+    end
   end
-
 end

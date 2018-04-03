@@ -345,7 +345,7 @@
       <%= image_tag "ajax-loader-bar.gif", :alt => '' %><br/>
       <%= before_label(:uploading_file, "Uploading") %><span class="file_name">&nbsp;</span>...
     </div>
-    <%= form_for :attachment, :url => context_url(@portfolio.user, :controller => :files, :action => :create, :format => "text"), :html => {:id => "upload_file_form"} do |f| %>
+    <%= form_for :attachment, :url => '#', :html => {:id => "upload_file_form"} do |f| %>
     <% end %>
     <iframe class="submission_preview" style="border: 1px solid #aaa; width: 95%; height: 300px; display: block; margin-<%= direction('left') %>: auto; margin-<%= direction('right') %>: auto;" src="about:blank" title="<%= t("Preview") %>">
     </iframe>

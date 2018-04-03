@@ -269,4 +269,12 @@ describe "eportfolios file upload" do
     get "/eportfolios/#{@eportfolio.id}/#{ec.slug}"
     test_file_upload
   end
+
+  it "should upload a file to an eportfolio page" do
+    ec = @eportfolio.eportfolio_categories.create! name: 'Der Section'
+    ep = ec.eportfolio_entries.create! eportfolio: @eportfolio, name: 'Das Page'
+    create_session(@student.pseudonym)
+    get "/eportfolios/#{@eportfolio.id}/#{ec.slug}/#{ep.slug}"
+    test_file_upload
+  end
 end
