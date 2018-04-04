@@ -95,14 +95,22 @@ class Feature
   #     # queue a delayed_job to perform any nontrivial processing
   #     after_state_change_proc:  ->(user, context, old_state, new_state) { ... }
   #   }
+  VALID_STATES = %w(on allowed hidden hidden_in_prod).freeze
+  VALID_APPLIES_TO = %w(Course Account RootAccount User).freeze
 
   def self.register(feature_hash)
     @features ||= {}
     feature_hash.each do |feature_name, attrs|
+      validate_attrs(attrs)
       next if attrs[:development] && production_environment?
       feature = feature_name.to_s
       @features[feature] = Feature.new({feature: feature}.merge(attrs))
     end
+  end
+
+  def self.validate_attrs(attrs)
+    raise 'invalid state' unless VALID_STATES.include? attrs[:state]
+    raise 'invalid applies_to' unless VALID_APPLIES_TO.include? attrs[:applies_to]
   end
 
   # TODO: register built-in features here
