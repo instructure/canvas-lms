@@ -24,8 +24,7 @@ describe PluginSetting do
   end
 
   it "should encrypt/decrypt transparently" do
-    s = PluginSetting.new(:name => "plugin_setting_test", :settings => {:bar => "qwerty", :foo => "asdf"})
-    expect(s.save).to be_truthy
+    s = PluginSetting.create!(:name => "plugin_setting_test", :settings => {:bar => "qwerty", :foo => "asdf"})
     s.reload
     expect(s.valid_settings?).to be_truthy
     expect(s.settings.keys.sort_by(&:to_s)).to eql([:bar, :foo, :foo_dec, :foo_enc, :foo_salt])
@@ -35,9 +34,6 @@ describe PluginSetting do
 
   it "should not be valid if there are decrypt errors" do
     s = PluginSetting.new(:name => "plugin_setting_test", :settings => {:bar => "qwerty", :foo_enc => "invalid", :foo_salt => "invalid"})
-    expect(s.send(:save_without_callbacks)).to be_truthy
-
-    s.reload
     expect(s.valid_settings?).to be_falsey
     expect(s.settings).to eql({:bar => "qwerty", :foo_enc => "invalid", :foo_salt => "invalid", :foo => PluginSetting::DUMMY_STRING})
   end
@@ -49,16 +45,14 @@ describe PluginSetting do
   end
 
   it "should return updated content if created" do
-    s = PluginSetting.new(:name => "plugin_setting_test", :settings => {:bar => "qwerty"})
-    expect(s.send(:save_without_callbacks)).to be_truthy
+    s = PluginSetting.create!(:name => "plugin_setting_test", :settings => {:bar => "qwerty"})
     settings = PluginSetting.settings_for_plugin("plugin_setting_test")
     expect(settings).not_to be_nil
     expect(settings[:bar]).to eq "qwerty"
   end
 
   it "should return default content if the setting is disabled" do
-    s = PluginSetting.new(:name => "plugin_setting_test", :settings => {:bar => "qwerty"})
-    expect(s.send(:save_without_callbacks)).to be_truthy
+    s = PluginSetting.create!(:name => "plugin_setting_test", :settings => {:bar => "qwerty"})
     settings = PluginSetting.settings_for_plugin("plugin_setting_test")
     expect(settings).not_to be_nil
     expect(settings[:bar]).to eq "qwerty"
@@ -71,8 +65,7 @@ describe PluginSetting do
 
   it "should immediately uncache on save" do
     enable_cache do
-      s = PluginSetting.new(:name => "plugin_setting_test", :settings => {:bar => "qwerty"})
-      s.save!
+      s = PluginSetting.create!(:name => "plugin_setting_test", :settings => {:bar => "qwerty"})
       # cache it
       settings = PluginSetting.settings_for_plugin("plugin_setting_test")
       expect(settings).to eq({:bar => "qwerty"})
@@ -88,8 +81,7 @@ describe PluginSetting do
     RequestCache.enable do
       enable_cache do
         name = "plugin_setting_test"
-        ps = PluginSetting.new(:name => name, :settings => {:bar => "qwerty"})
-        s.save!
+        ps = PluginSetting.create!(:name => name, :settings => {:bar => "qwerty"})
         expect(MultiCache).to receive(:fetch).once.and_return(s)
         PluginSetting.cached_plugin_setting(name) # sets the cache
         PluginSetting.cached_plugin_setting(name) # 2nd lookup

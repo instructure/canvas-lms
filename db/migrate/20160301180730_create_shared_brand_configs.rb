@@ -39,9 +39,11 @@ class CreateSharedBrandConfigs < ActiveRecord::Migration[4.2]
   def down
     # restore the globally shared ones (like "K12 Theme") back
     SharedBrandConfig.where(account_id: nil).find_each do |shared_brand_config|
-      shared_brand_config.brand_config.name = shared_brand_config.name
-      shared_brand_config.brand_config.share = true
-      shared_brand_config.brand_config.save_without_callbacks
+      # skips callbacks
+      shared_brand_config.brand_config.update_columns(
+        name: shared_brand_config.name,
+        share: true
+      )
     end
     drop_table :shared_brand_configs
   end

@@ -501,24 +501,6 @@ describe ContentTag do
     expect(@module.reload.updated_at.to_i).to eq yesterday.to_i
   end
 
-  describe '.content_type' do
-    it 'returns the correct representation of a quiz' do
-      content_tag = ContentTag.create! content: quiz_model, context: course_model
-      expect(content_tag.content_type).to eq 'Quizzes::Quiz'
-
-      content_tag.content_type = 'Quiz'
-      content_tag.send(:save_without_callbacks)
-
-      expect(ContentTag.find(content_tag.id).content_type).to eq 'Quizzes::Quiz'
-    end
-
-    it 'returns the content type attribute if not a quiz' do
-      content_tag = ContentTag.create! content: assignment_model, context: course_model
-
-      expect(content_tag.content_type).to eq 'Assignment'
-    end
-  end
-
   describe "visible_to_students_in_course_with_da" do
     before do
       course_with_student(active_all: true)

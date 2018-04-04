@@ -51,7 +51,7 @@ describe AssignmentsApiController, type: :request do
                                        user,
                                        score: '99',
                                        grade: '99',
-                                       grader: @teacher,
+                                       grader_id: @teacher.id,
                                        submitted_at: now,
                                        grade_matches_current_submission: true
     return assignment,submission
