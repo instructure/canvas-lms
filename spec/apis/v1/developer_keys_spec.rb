@@ -56,6 +56,19 @@ describe DeveloperKeysController, type: :request do
       confirm_valid_key_in_json(json, key)
     end
 
+    it 'not query for bindings' do
+      admin_session
+      key = DeveloperKey.create!
+      expect_any_instance_of(DeveloperKey).not_to receive(:account_binding_for)
+      api_call(:get, "/api/v1/accounts/#{sa_id}/developer_keys.json", {
+        controller: 'developer_keys',
+        action: 'index',
+        format: 'json',
+        account_id: sa_id.to_s
+      })
+
+    end
+
     describe 'developer key account bindings' do
       it 'does not include binding data' do
         user_session(account_admin_user(account: Account.site_admin))

@@ -29,7 +29,7 @@ module Api::V1::DeveloperKey
 
   def developer_key_json(key, user, session, context, show_bindings=false)
     context ||= Account.site_admin
-    account_binding = key.account_binding_for(context)
+    account_binding = key.account_binding_for(context) if show_bindings.present?
 
     api_json(key, user, session, :only => DEVELOPER_KEY_JSON_ATTRS).tap do |hash|
       if context.grants_right?(user, session, :manage_developer_keys) || user.try(:id) == key.user_id
