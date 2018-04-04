@@ -136,6 +136,12 @@ module Api::V1::Attachment
     if includes.include?('avatar') && respond_to?(:avatar_json)
       hash['avatar'] = avatar_json(user, attachment, type: 'attachment')
     end
+    if includes.include? 'instfs_uuid'
+      # This option has been included to facilitate inst-fs end-to-end tests,
+      # and is not documented as a publicly available api option.
+      # It may be removed at any time.
+      hash['instfs_uuid'] = attachment.instfs_uuid
+    end
 
     if options[:master_course_status]
       hash.merge!(attachment.master_course_api_restriction_data(options[:master_course_status]))

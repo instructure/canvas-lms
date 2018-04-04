@@ -605,6 +605,11 @@ describe "Files API", type: :request do
       ]
     end
 
+    it "includes an instfs_uuid if ?include[]-ed" do
+      json = api_call(:get, @files_path, @files_path_options.merge(include: ['instfs_uuid']))
+      expect(json[0].key? "instfs_uuid").to be true
+    end
+
   end
 
   describe "#index for courses" do
