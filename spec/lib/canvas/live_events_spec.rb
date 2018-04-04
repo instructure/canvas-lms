@@ -22,7 +22,52 @@ describe Canvas::LiveEvents do
   # The only methods tested in here are ones that have any sort of logic happening.
 
   def expect_event(event_name, event_body, event_context = nil)
-    expect(LiveEvents).to receive(:post_event).with(event_name, event_body, anything, event_context)
+    expect(LiveEvents).to receive(:post_event).with(
+      event_name: event_name,
+      payload: event_body,
+      time: anything,
+      context: event_context
+    )
+  end
+
+  context 'when using a custom stream client' do
+
+    class FakeSettings
+      def call
+        {
+          'kinesis_stream_name' => 'fake_stream',
+          'aws_region' => 'us-east-1'
+        }
+      end
+    end
+
+    class FakeStreamClient
+      attr_accessor :data
+
+      def put_record(stream_name:, data:, partition_key:) # rubocop:disable Lint/UnusedMethodArgument
+        @data = JSON.parse(data)
+      end
+
+      def body
+        @data['body']
+      end
+    end
+
+    it 'sends the event message with the injected client' do
+      fake_client = FakeStreamClient.new
+      LiveEvents.stream_client = fake_client
+      LiveEvents.set_context(nil)
+      LiveEvents.settings = FakeSettings.new
+      course = course_model
+      amended_context = described_class.amended_context(course)
+      event_name = 'a_fake_event'
+      payload = { fake: 'yes' }
+
+      described_class.post_event_stringified(event_name, payload, amended_context)
+      run_jobs
+
+      expect(fake_client.body).to eq({ 'fake' => 'yes' })
+    end
   end
 
   describe '.amended_context' do
@@ -104,7 +149,6 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.group_category_updated(group_category)
     end
   end
-
 
   describe ".group_updated" do
     it "should include the context" do

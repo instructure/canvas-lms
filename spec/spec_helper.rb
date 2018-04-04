@@ -298,6 +298,7 @@ RSpec.configure do |config|
   config.raise_errors_for_deprecations!
   config.color = true
   config.order = :random
+  config.filter_run_excluding :pact
 
   config.include Helpers
   config.include Factories

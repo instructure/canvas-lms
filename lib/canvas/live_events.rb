@@ -19,7 +19,12 @@ module Canvas::LiveEvents
   def self.post_event_stringified(event_name, payload, context = nil)
     StringifyIds.recursively_stringify_ids(payload)
     StringifyIds.recursively_stringify_ids(context)
-    LiveEvents.post_event(event_name, payload, Time.zone.now, context)
+    LiveEvents.post_event(
+      event_name: event_name,
+      payload: payload,
+      time: Time.zone.now,
+      context: context
+    )
   end
 
   def self.amended_context(canvas_context)
