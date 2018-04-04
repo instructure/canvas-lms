@@ -30,6 +30,7 @@ type Assignment implements Node, Timestamped {
   gradingType: GradingType
   htmlUrl: URL
   id: ID!
+  lockAt: DateTime
   muted: Boolean
   name: String
   needsGradingCount: Int
@@ -62,6 +63,7 @@ type Assignment implements Node, Timestamped {
     # Returns the last _n_ elements from the list.
     last: Int
   ): SubmissionConnection
+  unlockAt: DateTime
   updatedAt: DateTime
 }
 

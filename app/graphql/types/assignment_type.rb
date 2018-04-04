@@ -39,6 +39,8 @@ module Types
     field :dueAt, DateTimeType,
       "when this assignment is due",
       property: :due_at
+    field :lockAt, DateTimeType, property: :lock_at
+    field :unlockAt, DateTimeType, property: :unlock_at
 
     field :muted, types.Boolean, property: :muted?
 

@@ -58,6 +58,9 @@ describe Types::AssignmentType do
     expect(assignment_type.state).to eq assignment.workflow_state
     expect(assignment_type.onlyVisibleToOverrides).to eq assignment.only_visible_to_overrides
     expect(assignment_type.assignmentGroup).to eq assignment.assignment_group
+    expect(assignment_type.dueAt).to eq assignment.due_at
+    expect(assignment_type.lockAt).to eq assignment.lock_at
+    expect(assignment_type.unlockAt).to eq assignment.unlock_at
     expect(assignment_type.muted).to eq assignment.muted?
   end
 
