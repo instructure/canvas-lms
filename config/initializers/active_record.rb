@@ -1268,6 +1268,13 @@ end
 class ActiveRecord::MigrationProxy
   delegate :connection, :tags, :cassandra_cluster, to: :migration
 
+  def initialize(*)
+    super
+    if version&.to_s&.length == 14 && version.to_s > Time.now.utc.strftime("%Y%m%d%H%M%S")
+      raise "please don't create migrations with a version number in the future: #{name} #{version}"
+    end
+  end
+
   def runnable?
     !migration.respond_to?(:runnable?) || migration.runnable?
   end
