@@ -23,7 +23,6 @@ class ProxyApp
   end
 
   def call(env)
-    puts ENV["course_id"]
     env["HTTP_AUTHORIZATION"] = "Bearer #{full_token}" if env.include?("HTTP_AUTHORIZATION")
     response = @real_provider_app.call(env)
     response
