@@ -6,8 +6,8 @@ module DataFixup::PopulateLastCommentAtOnSubmissions
          (SELECT MAX(submission_comments.created_at) FROM #{SubmissionComment.quoted_table_name}
           WHERE submission_comments.submission_id=submissions.id AND
           submission_comments.author_id <> submissions.user_id AND
-          submission_comments.draft <> 't'
-          submission_comments.provisional_grade_id IS NULL})")
+          submission_comments.draft <> 't' AND
+          submission_comments.provisional_grade_id IS NULL)")
     end
   end
 end
