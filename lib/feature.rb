@@ -491,6 +491,13 @@ END
       state: 'hidden',
       development: true,
     },
+    'include_byte_order_mark_in_gradebook_exports' =>
+    {
+      display_name: -> { I18n.t('Include Byte-Order Mark in Gradebook Exports') },
+      description: -> { I18n.t('Optionally include a byte-order mark in Gradebook exports so they can be imported into Excel for users in some locales.') },
+      applies_to: 'User',
+      state: 'allowed'
+    },
     'anonymous_grading' => {
       display_name: -> { I18n.t('Anonymous Grading') },
       description: -> { I18n.t("Anonymous grading forces student names to be hidden in SpeedGrader™") },
