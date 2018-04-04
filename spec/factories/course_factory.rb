@@ -17,26 +17,25 @@
 #
 
 module Factories
-  def course_factory_v2(opts={})
+  def course_factory(opts={})
     account = opts[:account] || Account.default
     account.shard.activate do
-      course = Course.create!(:sis_source_id => opts[:sis_source_id], :name => opts[:course_name], :account => account, :is_public => !!opts[:is_public])
-      course.offer! if opts[:active_course] || opts[:active_all]
-      teacher = nil
+      @course = Course.create!(:sis_source_id => opts[:sis_source_id], :name => opts[:course_name], :account => account, :is_public => !!opts[:is_public])
+      @course.offer! if opts[:active_course] || opts[:active_all]
       if opts[:active_all]
         u = User.create!
         u.register!
         if u.feature_enabled?(:new_user_tutorial_on_off) && !opts[:new_user]
           u.disable_feature!(:new_user_tutorial_on_off)
         end
-        e = course.enroll_teacher(u)
+        e = @course.enroll_teacher(u)
         e.workflow_state = 'active'
         e.save!
-        teacher = u
+        @teacher = u
       end
-      create_grading_periods_for(course, opts) if opts[:grading_periods]
-      [course, teacher]
+      create_grading_periods_for(@course, opts) if opts[:grading_periods]
     end
+    @course
   end
 
   def course_model(opts={})
