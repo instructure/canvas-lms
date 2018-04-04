@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-Types::TimeType = GraphQL::ScalarType.define do
-  name "Time"
+Types::DateTimeType = GraphQL::ScalarType.define do
+  name "DateTime"
   description "an ISO8601 formatted time string"
 
   coerce_input ->(time_str, _) { time_str }

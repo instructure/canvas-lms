@@ -21,7 +21,7 @@ type Assignment implements Node, Timestamped {
     last: Int
   ): AssignmentOverrideConnection
   course: Course
-  createdAt: Time
+  createdAt: DateTime
   description: String
   discussion: Discussion
 
@@ -62,7 +62,7 @@ type Assignment implements Node, Timestamped {
     # Returns the last _n_ elements from the list.
     last: Int
   ): SubmissionConnection
-  updatedAt: Time
+  updatedAt: DateTime
 }
 
 # The connection type for Assignment.
@@ -105,14 +105,14 @@ type AssignmentGroup implements Node, Timestamped {
     # Returns the last _n_ elements from the list.
     last: Int
   ): AssignmentConnection
-  createdAt: Time
+  createdAt: DateTime
   groupWeight: Float
   id: ID!
   name: String
   position: Int
   rules: AssignmentGroupRules
   state: AssignmentGroupState!
-  updatedAt: Time
+  updatedAt: DateTime
 }
 
 # The connection type for AssignmentGroup.
@@ -158,15 +158,15 @@ type AssignmentOverride implements Timestamped {
   _id: ID!
   allDay: Boolean
   assignment: Assignment
-  createdAt: Time
-  dueAt: Time
-  lockAt: Time
+  createdAt: DateTime
+  dueAt: DateTime
+  lockAt: DateTime
 
   # This object specifies what students this override applies to
   set: AssignmentOverrideSet
   title: String
-  unlockAt: Time
-  updatedAt: Time
+  unlockAt: DateTime
+  updatedAt: DateTime
 }
 
 # The connection type for AssignmentOverride.
@@ -230,7 +230,7 @@ type Course implements Node, Timestamped {
 
   # course short name
   courseCode: String
-  createdAt: Time
+  createdAt: DateTime
   gradingPeriodsConnection(
     # Returns the elements in the list that come after the specified global ID.
     after: String
@@ -296,7 +296,7 @@ type Course implements Node, Timestamped {
     # Only return submissions for the given students.
     studentIds: [ID!]!
   ): SubmissionConnection
-  updatedAt: Time
+  updatedAt: DateTime
   usersConnection(
     # Returns the elements in the list that come after the specified global ID.
     after: String
@@ -332,19 +332,22 @@ enum CourseWorkflowState {
   deleted
 }
 
+# an ISO8601 formatted time string
+scalar DateTime
+
 type Discussion implements Node, Timestamped {
   # legacy canvas id
   _id: ID!
-  createdAt: Time
+  createdAt: DateTime
   id: ID!
-  updatedAt: Time
+  updatedAt: DateTime
 }
 
 type Enrollment implements Node, Timestamped {
   # legacy canvas id
   _id: ID!
   course: Course
-  createdAt: Time
+  createdAt: DateTime
   grades(
     # The grading period to return grades for. If not specified, will use the
     # current grading period (or the course grade for courses that don't use
@@ -352,11 +355,11 @@ type Enrollment implements Node, Timestamped {
     gradingPeriodId: ID
   ): Grades
   id: ID!
-  lastActivityAt: Time
+  lastActivityAt: DateTime
   section: Section
   state: EnrollmentWorkflowState!
   type: EnrollmentType!
-  updatedAt: Time
+  updatedAt: DateTime
   user: User
 }
 
@@ -395,13 +398,13 @@ type GradingPeriod implements Node, Timestamped {
   _id: ID!
 
   #     assignments can only be graded before the grading period closes
-  closeDate: Time
-  createdAt: Time
-  endDate: Time
+  closeDate: DateTime
+  createdAt: DateTime
+  endDate: DateTime
   id: ID!
-  startDate: Time
+  startDate: DateTime
   title: String
-  updatedAt: Time
+  updatedAt: DateTime
 
   #     used to calculate how much the assignments in this grading period
   #     contribute to the overall grade
@@ -438,7 +441,7 @@ enum GradingType {
 type Group implements Timestamped {
   # legacy canvas id
   _id: ID!
-  createdAt: Time
+  createdAt: DateTime
   membersConnection(
     # Returns the elements in the list that come after the specified global ID.
     after: String
@@ -453,7 +456,7 @@ type Group implements Timestamped {
     last: Int
   ): GroupMembershipConnection
   name: String
-  updatedAt: Time
+  updatedAt: DateTime
 }
 
 # The connection type for Group.
@@ -477,9 +480,9 @@ type GroupEdge {
 type GroupMembership implements Timestamped {
   # legacy canvas id
   _id: ID!
-  createdAt: Time
+  createdAt: DateTime
   state: GroupMembershipState!
-  updatedAt: Time
+  updatedAt: DateTime
   user: User
 }
 
@@ -576,18 +579,18 @@ type Query {
 type Quiz implements Node, Timestamped {
   # legacy canvas id
   _id: ID!
-  createdAt: Time
+  createdAt: DateTime
   id: ID!
-  updatedAt: Time
+  updatedAt: DateTime
 }
 
 type Section implements Node, Timestamped {
   # legacy canvas id
   _id: ID!
-  createdAt: Time
+  createdAt: DateTime
   id: ID!
   name: String!
-  updatedAt: Time
+  updatedAt: DateTime
 }
 
 # The connection type for Section.
@@ -617,7 +620,7 @@ type StudentSummaryAnalytics {
 
 type Submission implements Node, Timestamped {
   assignment: Assignment
-  createdAt: Time
+  createdAt: DateTime
 
   # how many points are being deducted due to late policy
   deductedPoints: Float
@@ -631,14 +634,14 @@ type Submission implements Node, Timestamped {
   # excused assignments are ignored when calculating grades
   excused: Boolean
   grade: String
-  gradedAt: Time
+  gradedAt: DateTime
   gradingStatus: String
   id: ID!
   score: Float
   state: SubmissionState
   submissionStatus: String
-  submittedAt: Time
-  updatedAt: Time
+  submittedAt: DateTime
+  updatedAt: DateTime
   user: User
 }
 
@@ -706,13 +709,10 @@ type TardinessBreakdown {
   total: Int
 }
 
-# an ISO8601 formatted time string
-scalar Time
-
 # Contains timestamp metadata
 interface Timestamped {
-  createdAt: Time
-  updatedAt: Time
+  createdAt: DateTime
+  updatedAt: DateTime
 }
 
 scalar URL
@@ -721,7 +721,7 @@ type User implements Node, Timestamped {
   # legacy canvas id
   _id: ID!
   avatarUrl: URL
-  createdAt: Time
+  createdAt: DateTime
   email: String
   enrollments(
     # only return enrollments for this course
@@ -739,7 +739,7 @@ type User implements Node, Timestamped {
     # returns summary analytics for this course
     courseId: ID!
   ): StudentSummaryAnalytics
-  updatedAt: Time
+  updatedAt: DateTime
 }
 
 # The connection type for User.
