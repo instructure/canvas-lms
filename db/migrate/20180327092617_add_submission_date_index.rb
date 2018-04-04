@@ -20,7 +20,7 @@ class AddSubmissionDateIndex < ActiveRecord::Migration[5.1]
   disable_ddl_transaction!
 
   def change
-    return if ActiveRecord::SchemaMigration.where(version: '20180501192614').exists?
+    return if index_exists? {name: 'index_submissions_on_user_and_greatest_dates'}
     add_index :submissions, "user_id, GREATEST(submitted_at, created_at)", name: "index_submissions_on_user_and_greatest_dates", algorithm: :concurrently
   end
 end
