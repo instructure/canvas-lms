@@ -18,9 +18,10 @@
 import $ from 'jquery'
 import I18n from 'i18n!broken_images'
 
-export default function attachErrorHandler(imgElement) {
+export function attachErrorHandler(imgElement) {
   $(imgElement).on('error', e => {
-    $.get(e.currentTarget.src)
+    if (e.currentTarget.src) {
+      $.get(e.currentTarget.src)
       .fail(response => {
         if (response.status === 403) {
           // Replace the image with a lock image
@@ -35,13 +36,19 @@ export default function attachErrorHandler(imgElement) {
           $(e.currentTarget).addClass('broken-image')
         }
       })
+    } else {
+      // Add the broken-image class (if there is no source)
+      $(e.currentTarget).addClass('broken-image')
+    }
   })
+}
+
+export function getImagesAndAttach () {
+  $('img[src!=""]')
+    .toArray()
+    .forEach(attachErrorHandler)
 }
 
 // this behavior will set up all broken images on the page with an error handler that
 // can apply the broken-image class if there is an error loading the image.
-$(document).ready(() =>
-  $('img')
-    .toArray()
-    .forEach(attachErrorHandler)
-)
+$(document).ready(() => getImagesAndAttach())
