@@ -40,6 +40,8 @@ module Types
       "when this assignment is due",
       property: :due_at
 
+    field :muted, types.Boolean, property: :muted?
+
     field :state, !AssignmentState, property: :workflow_state
 
     field :assignmentGroup, AssignmentGroupType, resolve: ->(assignment, _, _) {

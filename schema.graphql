@@ -30,6 +30,7 @@ type Assignment implements Node, Timestamped {
   gradingType: GradingType
   htmlUrl: URL
   id: ID!
+  muted: Boolean
   name: String
   needsGradingCount: Int
 
