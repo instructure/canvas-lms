@@ -1508,6 +1508,17 @@ Autoextend.hook(:"ActiveRecord::Generators::MigrationGenerator",
                 method: :prepend,
                 optional: true)
 
+module AlwaysUseMigrationDates
+  def next_migration_number(number)
+    if ActiveRecord::Base.timestamped_migrations
+      Time.now.utc.strftime("%Y%m%d%H%M%S")
+    else
+      SchemaMigration.normalize_migration_number(number)
+    end
+  end
+end
+ActiveRecord::Migration.prepend(AlwaysUseMigrationDates)
+
 module ExplainAnalyze
   def exec_explain(queries, analyze: false) # :nodoc:
     str = queries.map do |sql, binds|
