@@ -26,7 +26,7 @@ type Assignment implements Node, Timestamped {
   discussion: Discussion
 
   # when this assignment is due
-  dueAt: String
+  dueAt: DateTime
   gradingType: GradingType
   htmlUrl: URL
   id: ID!
