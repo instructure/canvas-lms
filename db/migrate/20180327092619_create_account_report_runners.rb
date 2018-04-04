@@ -16,20 +16,20 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CreateAccountReportRows < ActiveRecord::Migration[5.1]
+class CreateAccountReportRunners < ActiveRecord::Migration[5.1]
   tag :predeploy
 
   def change
-    create_table :account_report_rows do |t|
+    return if ActiveRecord::SchemaMigration.where(version: '20180501192615').exists?
+    create_table :account_report_runners do |t|
       t.integer :account_report_id, null: false, limit: 8
-      t.integer :account_report_runner_id, null: false, limit: 8
-      t.integer :row_number
-      t.string :row, array: true, default: []
-      t.datetime :created_at, null: false
+      t.string :workflow_state, null: false, default: 'created', limit: 255
+      t.string :batch_items, array: true, default: []
+      t.timestamps
+      t.datetime :started_at
+      t.datetime :ended_at
     end
-    add_foreign_key :account_report_rows, :account_reports
-    add_foreign_key :account_report_rows, :account_report_runners
-    add_index :account_report_rows, :account_report_id
-    add_index :account_report_rows, :account_report_runner_id
+    add_foreign_key :account_report_runners, :account_reports
+    add_index :account_report_runners, :account_report_id
   end
 end
