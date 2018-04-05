@@ -495,6 +495,11 @@ test('re-renders the filters after updating submissions load state', function ()
   this.loaderPromises.gotSubmissions.resolve();
 });
 
+test('sets assignmentGroupsLoaded to false', function () {
+  const gradebook = this.createInitializedGradebook()
+  strictEqual(gradebook.contentLoadStates.assignmentGroupsLoaded, false)
+})
+
 QUnit.module('Gradebook#reloadStudentData', {
   setup () {
     this.gradingPeriodSet = {
@@ -6328,9 +6333,17 @@ QUnit.module('Gradebook', () => {
       strictEqual(gradebook.getFilterColumnsBySetting('assignmentGroupId'), '2')
     })
 
-    test('deletes the assignment group filter setting when the filter is hidden', () => {
+    test('deletes the assignment group filter setting when the filter is hidden ' +
+      'and assignment groups have loaded', () => {
+      gradebook.setAssignmentGroupsLoaded(true)
       gradebook.updateFilterSettings(currentFilters.filter(type => type !== 'assignmentGroups'))
       strictEqual(gradebook.getFilterColumnsBySetting('assignmentGroupId'), null)
+    })
+
+    test('does not delete the assignment group filter setting when the filter is ' +
+      'hidden and assignment groups have not loaded', () => {
+      gradebook.updateFilterSettings(currentFilters.filter(type => type !== 'assignmentGroups'))
+      strictEqual(gradebook.getFilterColumnsBySetting('assignmentGroupId'), '2')
     })
 
     test('getFilterColumnsBySetting returns the grading period filter setting', () => {
@@ -6346,9 +6359,15 @@ QUnit.module('Gradebook', () => {
       strictEqual(gradebook.getFilterColumnsBySetting('contextModuleId'), '2')
     })
 
-    test('deletes the modules filter setting when the filter is hidden', () => {
+    test('deletes the modules filter setting when the filter is hidden and modules have loaded', () => {
+      gradebook.contentLoadStates.contextModulesLoaded = true
       gradebook.updateFilterSettings(currentFilters.filter(type => type !== 'modules'))
       strictEqual(gradebook.getFilterColumnsBySetting('contextModuleId'), null)
+    })
+
+    test('does not delete the modules filter setting when the filter is hidden and modules have not loaded', () => {
+      gradebook.updateFilterSettings(currentFilters.filter(type => type !== 'modules'))
+      strictEqual(gradebook.getFilterColumnsBySetting('contextModuleId'), '2')
     })
 
     test('getFilterColumnsBySetting returns the sections filter setting', () => {
@@ -8962,5 +8981,43 @@ QUnit.module('Gradebook#updateStudentHeadersAndReloadData', (hooks) => {
     const updateColumnHeaders = sinon.stub(gradebook.gradebookGrid.gridSupport.columns, 'updateColumnHeaders')
     gradebook.updateStudentHeadersAndReloadData()
     sinon.assert.callOrder(updateColumnHeaders, gradebook.reloadStudentData)
+  })
+})
+
+QUnit.module('Gradebook#gotAllAssignmentGroups', (hooks) => {
+  let gradebook
+
+  hooks.beforeEach(() => {
+    gradebook = createGradebook()
+  })
+
+  test('sets the "assignment groups loaded" state', () => {
+    sinon.stub(gradebook, 'setAssignmentGroupsLoaded')
+    gradebook.gotAllAssignmentGroups([])
+    strictEqual(gradebook.setAssignmentGroupsLoaded.callCount, 1)
+  })
+
+  test('sets the "assignment groups loaded" state to true', () => {
+    sinon.stub(gradebook, 'setAssignmentGroupsLoaded')
+    gradebook.gotAllAssignmentGroups([])
+    strictEqual(gradebook.setAssignmentGroupsLoaded.getCall(0).args[0], true)
+  })
+})
+
+QUnit.module('Gradebook#setAssignmentGroupsLoaded', (hooks) => {
+  let gradebook
+
+  hooks.beforeEach(() => {
+    gradebook = createGradebook()
+  })
+
+  test('sets contentLoadStates.assignmentGroupsLoaded to true when passed true', () => {
+    gradebook.setAssignmentGroupsLoaded(true)
+    strictEqual(gradebook.contentLoadStates.assignmentGroupsLoaded, true)
+  })
+
+  test('sets contentLoadStates.assignmentGroupsLoaded to false when passed false', () => {
+    gradebook.setAssignmentGroupsLoaded(false)
+    strictEqual(gradebook.contentLoadStates.assignmentGroupsLoaded, false)
   })
 })

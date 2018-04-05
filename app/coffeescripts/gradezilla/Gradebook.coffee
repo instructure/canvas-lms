@@ -367,6 +367,7 @@ define [
           @saveColumnWidthPreference(column.id, column.width)
 
     initialize: ->
+      @setAssignmentGroupsLoaded(false)
       @setStudentsLoaded(false)
       @setSubmissionsLoaded(false)
 
@@ -559,6 +560,7 @@ define [
       @invalidateRowsForStudentIds(_.uniq(studentIds))
 
     gotAllAssignmentGroups: (assignmentGroups) =>
+      @setAssignmentGroupsLoaded(true)
       # purposely passing the @options and assignmentGroups by reference so it can update
       # an assigmentGroup's .group_weight and @options.group_weighting_scheme
       for group in assignmentGroups
@@ -1350,10 +1352,13 @@ define [
       renderComponent(ActionMenu, mountPoint, props)
 
     renderFilters: =>
+      # Sections and grading periods are passed into the constructor, and therefore are always
+      # available, whereas assignment groups and context modules are fetched via the DataLoader,
+      # so we need to wait until they are loaded to set their filter visibility.
       @updateSectionFilterVisibility()
-      @updateAssignmentGroupFilterVisibility()
+      @updateAssignmentGroupFilterVisibility() if @contentLoadStates.assignmentGroupsLoaded
       @updateGradingPeriodFilterVisibility()
-      @updateModulesFilterVisibility()
+      @updateModulesFilterVisibility() if @contentLoadStates.contextModulesLoaded
       @renderSearchFilter()
 
     renderGridColor: =>
@@ -2334,6 +2339,9 @@ define [
 
     setAssignmentsLoaded: (loaded) =>
       @contentLoadStates.assignmentsLoaded = loaded
+
+    setAssignmentGroupsLoaded: (loaded) =>
+      @contentLoadStates.assignmentGroupsLoaded = loaded
 
     setStudentsLoaded: (loaded) =>
       @contentLoadStates.studentsLoaded = loaded
