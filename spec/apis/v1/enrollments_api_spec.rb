@@ -795,6 +795,16 @@ describe EnrollmentsApiController, type: :request do
           expect(response).to be_ok
         end
 
+        it "filters to terms for users" do
+          term = EnrollmentTerm.create!(name: 'fall', root_account_id: @course.root_account_id)
+          course = Course.create!(enrollment_term_id: term.id, root_account_id: @course.root_account_id, workflow_state: 'available')
+          e = course.enroll_user(@student)
+          @user_params[:enrollment_term_id] = term.id
+          json = api_call(:get, @user_path, @user_params)
+          expect(json.length).to eq(1)
+          expect(json.first['id']).to eq e.id
+        end
+
         it "returns an error if the user is not in the grading period" do
           course = Course.create!
           grading_period_group = group_helper.legacy_create_for_course(course)
