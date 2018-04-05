@@ -85,15 +85,15 @@ const karmaConfig = {
 if (process.env.COVERAGE) {
   karmaConfig.reporters.push('coverage-istanbul')
   karmaConfig.coverageIstanbulReporter = {
-    reports: ['html'],
-    dir: 'coverage-js/',
+    reports: ['html', 'json'],
+    dir: 'coverage-karma/',
     fixWebpackSourcePaths: true
   }
   karmaConfig.webpack.module.rules.unshift({
     test: /\.(js|coffee)$/,
     use: {
       loader: 'istanbul-instrumenter-loader',
-      options: { esModules: true }
+      options: { esModules: true, produceSourceMap: true }
     },
     enforce: 'post',
     exclude: /(node_modules|spec|public\/javascripts\/(bower|client_apps|translations|vendor|custom_moment_locales|custom_timezone_locales))/,

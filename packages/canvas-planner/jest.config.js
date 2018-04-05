@@ -35,7 +35,8 @@ module.exports = {
   testRegex: "/__tests__/.*\\.(test|spec)\\.js$",
   coverageReporters: [
     'html',
-    'text'
+    'text',
+    'json'
   ],
   collectCoverageFrom: [
     'src/**/*.js'
