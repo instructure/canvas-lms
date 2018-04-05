@@ -214,23 +214,21 @@ module OutcomeCommon
 
     fj('.outcomes-sidebar .outcome-level:first li').click
     wait_for_ajaximations
-    driver.execute_script("$('.edit_button').click()")
+    f('.edit_button').click
+    wait_for_ajaximations
 
     ## when
     # edit title
     replace_content f('.outcomes-content input[name=title]'), edited_title
-    wait_for_animations
     # delete a rating
     f('.edit_rating').click
-    wait_for_animations
     f('.delete_rating_link').click
     # edit a rating
     f('.edit_rating').click
-    wait_for_animations
     replace_content f('input[name="ratings[0][points]"]'), '1'
     replace_content f('input[name="mastery_points"]'), '1'
     # submit
-    driver.execute_script "$('.submit_button').click()"
+    f('.submit_button').click
     wait_for_ajaximations
 
     ## expect
