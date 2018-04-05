@@ -116,14 +116,18 @@ class Feature
   # TODO: register built-in features here
   # (plugins may register additional features during application initialization)
   register(
-    'sis_imports_refactor' =>
+    'refactor_of_sis_imports' =>
       {
-        display_name: -> { I18n.t('SIS Import Refactor')},
-        description: -> { I18n.t('Update how we process SIS imports') },
+        display_name: -> {I18n.t('SIS Import Refactor')},
+        description: -> {I18n.t(<<END
+The engine that processes SIS imports has been refactored to better handle the
+stability of large SIS imports. The functionality of SIS imports has not changed.
+END
+        )},
         applies_to: 'RootAccount',
-        state: 'hidden_in_prod',
+        state: 'allowed',
         beta: true
-  },
+      },
     'section_specific_discussions' =>
     {
       display_name: -> { I18n.t('Section Specific Discussions') },

@@ -243,7 +243,7 @@ class SisBatch < ActiveRecord::Base
   scope :succeeded, -> { where(:workflow_state => %w[imported imported_with_messages]) }
 
   def self.use_parallel_importers?(account)
-    account.feature_enabled?(:sis_imports_refactor)
+    account.feature_enabled?(:refactor_of_sis_imports)
   end
 
   def self.strand_for_account(account)
@@ -470,7 +470,7 @@ class SisBatch < ActiveRecord::Base
     current_row ||= 0
     # delete enrollments for courses that weren't in this batch, in the selected term
     enrollments.find_in_batches do |batch|
-      if account.feature_enabled?(:sis_imports_refactor)
+      if account.feature_enabled?(:refactor_of_sis_imports)
         count = Enrollment::BatchStateUpdater.destroy_batch(batch)
         enrollment_count += count
         current_row += count
