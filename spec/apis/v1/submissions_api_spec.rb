@@ -4486,11 +4486,11 @@ describe 'Submissions API', type: :request do
       @student3 = student_in_course(:active_all => true).user
       course_with_user('StudentViewEnrollment', :active_all => true)
 
-      section = @course.course_sections.build(:name => 'Another Section')
-      section.save
-      section.enroll_user(@student1, 'StudentEnrollment', 'active')
-      section.enroll_user(@student2, 'StudentEnrollment', 'active')
-      section.enroll_user(@student3, 'StudentEnrollment', 'active')
+      @section = @course.course_sections.build(:name => 'Another Section')
+      @section.save
+      @section.enroll_user(@student1, 'StudentEnrollment', 'active')
+      @section.enroll_user(@student2, 'StudentEnrollment', 'active')
+      @section.enroll_user(@student3, 'StudentEnrollment', 'active')
 
       @assignment = @course.assignments.create(points_possible: 100)
       @assignment.submit_homework @student1, :body => 'EHLO'
@@ -4593,6 +4593,24 @@ describe 'Submissions API', type: :request do
       response = api_call_as_user(@teacher, :get, @path, @params)
       assert_status(404)
       expect(response['errors'][0]['message']).to eq 'The specified resource does not exist.'
+    end
+
+    it 'doesnt show submissions from various inactive types of enrollments' do
+      inactive = ['deleted', 'rejected', 'inactive', 'invited']
+
+      @student4 = student_in_course(:active_all => true).user
+      enrollment = @section.enroll_user(@student4, 'StudentEnrollment', 'active')
+      @assignment.submit_homework @student4, :body => 'EHLO'
+
+      inactive.each do |state|
+        enrollment.workflow_state = state
+        enrollment.save!
+
+        json = api_call_as_user(@teacher, :get, @path, @params)
+        expect(json['graded']).to eq 1
+        expect(json['ungraded']).to eq 1
+        expect(json['not_submitted']).to eq 1
+      end
     end
   end
 end
