@@ -815,6 +815,32 @@ describe DiscussionTopicsController, type: :request do
         expect(@topic.require_initial_post?).to eq true
       end
 
+      it "should return section count if section specific" do
+        post_at = 1.month.from_now
+        lock_at = 2.months.from_now
+        @course.root_account.enable_feature!(:section_specific_discussions)
+        discussion_topic_model(:context => @course, :title => "Section Specific Topic", :user => @teacher)
+        section1 = @course.course_sections.create!
+        @course.course_sections.create! # just to make sure we only copy the right one
+        @topic.is_section_specific = true
+        @topic.discussion_topic_section_visibilities << DiscussionTopicSectionVisibility.new(
+          :discussion_topic => @topic,
+          :course_section => section1,
+          :workflow_state => "active"
+        )
+        @topic.save!
+        api_response = api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                 {:title => "test title",
+                  :message => "test <b>message</b>",
+                  :discussion_type => "threaded",
+                  :delayed_post_at => post_at.as_json,
+                  :lock_at => lock_at.as_json,
+                  :podcast_has_student_posts => '1',
+                  :require_initial_post => '1'})
+        expect(api_response["sections"].count).to eq 1
+      end
+
       it "should not unlock topic if lock_at changes but is still in the past" do
         lock_at = 1.month.ago
         new_lock_at = 1.week.ago

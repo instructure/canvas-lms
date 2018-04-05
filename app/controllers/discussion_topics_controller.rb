@@ -1154,7 +1154,15 @@ class DiscussionTopicsController < ApplicationController
         @topic = DiscussionTopic.find(@topic.id)
         @topic.broadcast_notifications(prior_version)
 
-        render :json => discussion_topic_api_json(@topic, @context, @current_user, session)
+        if @context.is_a?(Course)
+          render :json => discussion_topic_api_json(@topic,
+                                                    @context,
+                                                    @current_user,
+                                                    session,
+                                                    {include_sections: true, include_sections_user_count: true})
+        else
+          render :json => discussion_topic_api_json(@topic, @context, @current_user, session)
+        end
       else
         errors = @topic.errors.as_json[:errors]
         errors.merge!(@topic.root_topic.errors.as_json[:errors]) if @topic.root_topic
