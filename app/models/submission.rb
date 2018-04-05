@@ -226,6 +226,10 @@ class Submission < ActiveRecord::Base
     conditions
   end
 
+  def pipeline_serializer
+    PipelineService::Serializers::Submission
+  end
+
   # see .needs_grading_conditions
   def needs_grading?(was = false)
     suffix = was ? "_was" : ""
@@ -279,6 +283,7 @@ class Submission < ActiveRecord::Base
   after_save :check_for_media_object
   after_save :update_quiz_submission
   after_save :update_participation
+  after_save -> { PipelineService.publish self }
 
   def autograded?
     # AutoGrader == (quiz_id * -1)
