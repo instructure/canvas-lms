@@ -1091,14 +1091,15 @@ describe DiscussionTopicsController do
       specify { expect(topic.threaded).to be_falsey }
     end
 
+    # TODO: fix this terribleness
     describe 'section specific discussions' do
       before(:each) do
         @course.root_account.enable_feature!(:section_specific_discussions)
         user_session(@teacher)
         @section1 = @course.course_sections.create!(name: "Section 1")
         @section2 = @course.course_sections.create!(name: "Section 2")
-        @section3 = @course.course_sections.create!(name: "Section 1")
-        @section4 = @course.course_sections.create!(name: "Section 2")
+        @section3 = @course.course_sections.create!(name: "Section 3")
+        @section4 = @course.course_sections.create!(name: "Section 4")
         @course.enroll_teacher(@teacher, section: @section1, allow_multiple_enrollments: true).accept!
         @course.enroll_teacher(@teacher, section: @section2, allow_multiple_enrollments: true).accept!
         Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
@@ -1111,6 +1112,47 @@ describe DiscussionTopicsController do
         expect(response).to have_http_status :success
         expect(DiscussionTopic.last.course_sections.first).to eq @section1
         expect(DiscussionTopicSectionVisibility.count).to eq 1
+      end
+
+      it 'section-specific-teachers can create course-wide discussions' do
+        old_count = DiscussionTopic.count
+        post 'create',
+          params: topic_params(@course, {is_announcement: true}),
+          :format => :json
+        expect(response).to have_http_status :success
+        expect(DiscussionTopic.count).to eq old_count + 1
+        expect(DiscussionTopic.last.is_section_specific).to be_falsey
+      end
+
+      it 'section-specfic-teachers cannot create wrong-section discussions' do
+        old_count = DiscussionTopic.count
+        post 'create',
+          params: topic_params(@course, {is_announcement: true, specific_sections: @section3.id.to_s}),
+          :format => :json
+        expect(response).to have_http_status 400
+        expect(DiscussionTopic.count).to eq old_count
+      end
+
+      it 'admins can see section-specific discussions' do
+        admin = account_admin_user(account: @course.root_account, role: admin_role, active_user: true)
+        user_session(admin)
+        topic = @course.discussion_topics.create!
+        topic.is_section_specific = true
+        topic.course_sections << @section1
+        topic.save!
+        get 'index', params: { :course_id => @course.id }, :format => :json
+        expect(response).to be_success
+        expect(assigns[:topics].length).to eq(1)
+      end
+
+      it 'admins can create section-specific discussions' do
+        admin = account_admin_user(account: @course.root_account, role: admin_role, active_user: true)
+        user_session(admin)
+        post 'create',
+          params: topic_params(@course, {is_announcement: true, specific_sections: @section1.id.to_s}),
+          :format => :json
+        expect(response).to have_http_status :success
+        expect(DiscussionTopic.last.course_sections.first).to eq @section1
       end
 
       it 'creates a discussion with sections' do
@@ -1384,6 +1426,22 @@ describe DiscussionTopicsController do
         title: 'Updated Topic',
       })
       expect(response).to have_http_status 400
+    end
+
+    it "Allows an admin to update a section-specific discussion" do
+      account = @course.root_account
+      account.enable_feature!(:section_specific_discussions)
+      section = @course.course_sections.create!(name: "Section")
+      admin = account_admin_user(account: account, role: admin_role, active_user: true)
+      user_session(admin)
+      topic = @course.discussion_topics.create!(title: "foo", message: "bar", user: @teacher)
+      put('update', params: {
+        course_id: @course.id,
+        topic_id: topic.id,
+        specific_sections: section.id,
+        title: "foobers"
+      })
+      expect(response).to have_http_status 200
     end
 
     it "should not clear lock_at if locked is not changed" do

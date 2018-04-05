@@ -393,6 +393,19 @@ describe DiscussionTopic do
       expect(@topic.visible_for?(admin)).to be_truthy
     end
 
+    it "section-specific-topics should be visible to account admins" do
+      account = @course.root_account
+      account.enable_feature!(:section_specific_discussions)
+      section = @course.course_sections.create!(name: "Section of topic")
+      add_section_to_topic(@topic, section)
+      @topic.save!
+      nobody_role = custom_account_role('NobodyAdmin', account: account)
+      account_with_role_changes(account: account, role: nobody_role,
+        role_changes: { read_course_content: true, read_forum: true })
+      admin = account_admin_user(account: account, role: nobody_role, active_user: true)
+      expect(@topic.visible_for?(admin)).to be_truthy
+    end
+
     context "participants with teachers and tas" do
       before(:once) do
         group_course = course_factory(active_course: true)

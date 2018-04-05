@@ -1160,6 +1160,43 @@ describe Course do
     c.save!
     expect { Marshal.dump(c) }.not_to raise_error
   end
+
+  describe "course_section_visibility" do
+    before :once do
+      @course = Account.default.courses.create!
+      @section1 = @course.course_sections.create!(:name => "Section 1")
+      @section2 = @course.course_sections.create!(:name => "Section 2")
+    end
+
+    it "returns all for admins" do
+      admin = account_admin_user(account: @course.root_account, role: admin_role, active_user: true)
+      expect(@course.course_section_visibility(admin)).to eq :all
+    end
+
+    it "returns correct sections for students" do
+      student = User.create!(:name => "Student")
+      @course.enroll_student(student, :section => @section1)
+      expect(@course.course_section_visibility(student)).to eq [@section1.id]
+    end
+
+    it "correctly limits visibilities for a limited teacher" do
+      limited_teacher = User.create(:name => "Limited Teacher")
+      @course.enroll_teacher(limited_teacher, :limit_privileges_to_course_section => true,
+        :section => @section2)
+      expect(@course.course_section_visibility(limited_teacher)).to eq [@section2.id]
+    end
+
+    it "unlimited teachers can see everything" do
+      unlimited_teacher = User.create(:name => "Unlimited Teacher")
+      @course.enroll_teacher(unlimited_teacher, :section => @section2)
+      expect(@course.course_section_visibility(unlimited_teacher)).to eq :all
+    end
+
+    it "returns none for a nobody" do
+      worthless_loser = User.create(:name => "Worthless Loser")
+      expect(@course.course_section_visibility(worthless_loser)).to eq []
+    end
+  end
 end
 
 
