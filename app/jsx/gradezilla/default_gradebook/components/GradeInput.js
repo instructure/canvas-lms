@@ -51,6 +51,14 @@ function normalizeSubmissionGrade (props) {
 }
 
 function hasGradeChanged (props, state) {
+  if (props.pendingGradeInfo) {
+    if (props.pendingGradeInfo.valid) {
+      return false
+    }
+
+    return state.grade !== props.pendingGradeInfo.grade
+  }
+
   const normalizedEnteredGrade = normalizeSubmissionGrade(props);
   return (normalizedEnteredGrade !== state.grade) && (props.submission.enteredGrade !== state.grade)
 }

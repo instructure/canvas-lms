@@ -8266,17 +8266,29 @@ QUnit.module('Gradebook', () => {
         }
         gradebook.addPendingGradeInfo(submission, invalidGradeInfo)
         Object.assign(gradeInfo, {enteredAs: 'points', grade: 'B', score: 9})
-        // return to ensure that any changes cause the hook to wait for the
-        // potential promise from the api
-        return gradebook.gradeSubmission(submission, gradeInfo)
       })
 
       test('removes an existing pending grade info for the submission', () => {
+        gradebook.gradeSubmission(submission, gradeInfo)
         strictEqual(gradebook.getPendingGradeInfo(submission), null)
       })
 
       test('does not update the grade via the api', () => {
+        gradebook.gradeSubmission(submission, gradeInfo)
         strictEqual(gradebook.apiUpdateSubmission.callCount, 0)
+      })
+
+      test('updates cells in the student row', () => {
+        sinon.stub(gradebook, 'updateRowCellsForStudentIds')
+        gradebook.gradeSubmission(submission, gradeInfo)
+        strictEqual(gradebook.updateRowCellsForStudentIds.callCount, 1)
+      })
+
+      test('uses the id of the student when updating the row cells', () => {
+        sinon.stub(gradebook, 'updateRowCellsForStudentIds')
+        gradebook.gradeSubmission(submission, gradeInfo)
+        const [userIds] = gradebook.updateRowCellsForStudentIds.lastCall.args
+        deepEqual(userIds, ['1101'])
       })
 
       test('re-renders the submission tray if it is open', function () {

@@ -240,6 +240,24 @@ QUnit.module('GradeInput', suiteHooks => {
       strictEqual(props.onSubmissionUpdate.callCount, 0)
     })
 
+    test('calls the onSubmissionUpdate prop when an invalid grade is changed back to the saved score', () => {
+      props.pendingGradeInfo = {grade: 'invalid', valid: false, excused: false}
+      props.onSubmissionUpdate = sinon.spy()
+      mountComponent()
+      wrapper.find('input').simulate('change', {target: {value: '7.8'}})
+      wrapper.find('input').simulate('blur')
+      strictEqual(props.onSubmissionUpdate.callCount, 1)
+    })
+
+    test('does not call the onSubmissionUpdate prop when a pending grade is present', () => {
+      props.pendingGradeInfo = {grade: '10', valid: true, excused: false}
+      props.onSubmissionUpdate = sinon.spy()
+      mountComponent()
+      wrapper.find('input').simulate('change', {target: {value: '7.8'}})
+      wrapper.find('input').simulate('blur')
+      strictEqual(props.onSubmissionUpdate.callCount, 0)
+    })
+
     test('does not call the onSubmissionUpdate prop when the value has not changed from a null value', () => {
       props.submission.enteredGrade = null
       props.onSubmissionUpdate = sinon.spy()

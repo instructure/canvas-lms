@@ -2762,6 +2762,7 @@ define [
             )
         else
           @removePendingGradeInfo(submission)
+          @updateRowCellsForStudentIds([submission.userId])
           @renderSubmissionTray() if @getSubmissionTrayState().open
       else
         FlashAlert.showFlashAlert({
