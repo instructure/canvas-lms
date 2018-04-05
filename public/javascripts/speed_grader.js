@@ -770,11 +770,12 @@ function initRubricStuff(){
   });
 
   selectors.get('#rubric_assessments_select').change(() => {
+    const editingData = rubricAssessment.assessmentData($("#rubric_full"))
     var selectedAssessment = getSelectedAssessment();
     rubricAssessment.populateRubricSummary(
       $("#rubric_summary_holder .rubric_summary"),
       selectedAssessment,
-      isAssessmentEditableByMe(selectedAssessment)
+      editingData
     );
   });
 

@@ -44,7 +44,7 @@
           <i class="learning_outcome_flag icon-outcomes" aria-hidden="true"></i>
           <span class="screenreader-only"><%= t("This criterion is linked to a Learning Outcome") %></span>
         </span>
-        <span class="description criterion_description_value"><%= description %></span>
+        <span class="description description_title"><%= description %></span>
         <span class="learning_outcome_id" style="display: none;"><%= criterion.try(:learning_outcome_id) %></span>
         <span class="criterion_id" style="display: none;"><%= criterion.try(:id) %></span>
         <% if !learning_outcome_criterion && !assessing %>
