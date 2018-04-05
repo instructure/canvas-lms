@@ -1132,6 +1132,14 @@ class DiscussionTopicsController < ApplicationController
       DiscussionTopic.transaction do
         if !@topic.is_section_specific
           @topic.course_sections = []
+        else
+          # HACK: For some reason apply_assignment_parameters saves the submittable
+          # so we can't run it until everything is already good.  But if the topic
+          # is section specific stuff isn't good until we clear out the assignment,
+          # so do that here.  This is terrible.
+          if params[:assignment] && !value_to_boolean(params[:assignment][:set_assignment])
+            @topic.assignment = nil
+          end
         end
         @topic.update_attributes(discussion_topic_hash)
         @topic.root_topic.try(:save)

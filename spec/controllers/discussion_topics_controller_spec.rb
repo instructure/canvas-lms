@@ -1444,6 +1444,24 @@ describe DiscussionTopicsController do
       expect(response).to have_http_status 200
     end
 
+    it "can turn graded topic into ungraded section-specific topic in one edit" do
+      user_session(@teacher)
+      @course.root_account.enable_feature!(:section_specific_discussions)
+      assign = @course.assignments.create!(title: 'Graded Topic 1', submission_types: 'discussion_topic')
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      topic = assign.discussion_topic
+      put('update', params: {
+        course_id: @course.id,
+        topic_id: topic.id,
+        assignment: { set_assignment: "0" },
+        specific_sections: section1.id
+      })
+      expect(response).to have_http_status 200
+      topic.reload
+      expect(topic.assignment).to be_nil
+    end
+
     it "should not clear lock_at if locked is not changed" do
       put('update', params: {course_id: @course.id, topic_id: @topic.id,
           title: 'Updated Topic',
