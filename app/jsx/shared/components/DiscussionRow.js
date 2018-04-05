@@ -55,22 +55,8 @@ import ToggleIcon from './ToggleIcon'
 import propTypes from '../../discussions/propTypes'
 import discussionShape from '../proptypes/discussion'
 import masterCourseDataShape from '../proptypes/masterCourseData'
+import { makeTimestamp } from '../date-utils'
 
-function makeTimestamp ({ delayed_post_at, posted_at }) {
-  return delayed_post_at
-  ? {
-      title: (
-        <span>
-          <Container margin="0 x-small">
-            <Text color="secondary"><IconTimer /></Text>
-          </Container>
-          {I18n.t('Delayed until:')}
-        </span>
-      ),
-      date: delayed_post_at
-  }
-  : { title: I18n.t('Posted on:'), date: posted_at }
-}
 const dragTarget = {
   beginDrag (props) {
     return props.discussion
@@ -415,6 +401,9 @@ export default class DiscussionRow extends Component {
     const contentWrapper = document.createElement('span')
     contentWrapper.innerHTML = this.props.discussion.message
     const textContent = contentWrapper.textContent.trim()
+    const delayedLabel = I18n.t('Delayed until:');
+    const postedAtLabel = I18n.t('Posted on:');
+
     return this.props.connectDragPreview (
       <div>
         <Grid startAt="medium" vAlign="middle" colSpacing="none">
@@ -465,10 +454,20 @@ export default class DiscussionRow extends Component {
                 metaContent={
                   <div>
                     <span className="ic-item-row__meta-content-heading">
-                      <Text size="small" as="p">{makeTimestamp(this.props.discussion).title}</Text>
+                      <Text size="small" as="p">{
+                        makeTimestamp(this.props.discussion,
+                          delayedLabel,
+                          postedAtLabel
+                        ).title
+                      }</Text>
                     </span>
                     <Text color="secondary" size="small" as="p">
-                      {$.datetimeString(makeTimestamp(this.props.discussion).date, {format: 'medium'})}
+                      {$.datetimeString(
+                        makeTimestamp(this.props.discussion,
+                          delayedLabel,
+                          postedAtLabel
+                        ).date, {format: 'medium'}
+                      )}
                     </Text>
                   </div>
                 }

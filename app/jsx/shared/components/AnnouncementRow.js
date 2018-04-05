@@ -38,26 +38,7 @@ import CourseItemRow from './CourseItemRow'
 import UnreadBadge from './UnreadBadge'
 import announcementShape from '../proptypes/announcement'
 import masterCourseDataShape from '../proptypes/masterCourseData'
-import { isPassedDelayedPostAt } from '../../announcements/utils'
-
-function makeTimestamp({delayed_post_at, posted_at}) {
-  return (delayed_post_at
-    && !isPassedDelayedPostAt({ currentDate: null, delayedDate: delayed_post_at}))
-    ? {
-        title: (
-          <span>
-            <Container margin="0 x-small">
-              <Text color="secondary">
-                <IconTimer />
-              </Text>
-            </Container>
-            {I18n.t('Delayed until:')}
-          </span>
-        ),
-        date: delayed_post_at
-      }
-    : {title: I18n.t('Posted on:'), date: delayed_post_at || posted_at}
-}
+import { makeTimestamp } from '../date-utils'
 
 export default function AnnouncementRow({
   announcement,
@@ -69,7 +50,7 @@ export default function AnnouncementRow({
   canHaveSections,
   announcementsLocked
 }) {
-  const timestamp = makeTimestamp(announcement)
+  const timestamp = makeTimestamp(announcement, I18n.t('Delayed until:'), I18n.t('Posted on:'))
   const readCount =
     announcement.discussion_subentry_count > 0 ? (
       <UnreadBadge
