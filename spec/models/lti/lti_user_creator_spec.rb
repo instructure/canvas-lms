@@ -101,7 +101,7 @@ describe Lti::LtiUserCreator do
         observer_in_course(course: canvas_course, user: canvas_user2, associated_user: canvas_user)
 
         lti_user = course_observer_creator.convert
-        expect(lti_user.current_observee_ids).to match_array ['blah']
+        expect(lti_user.current_observee_ids).to match_array [canvas_user.lti_context_id]
       end
 
       describe "#current_enrollments" do

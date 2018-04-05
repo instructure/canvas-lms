@@ -370,7 +370,10 @@ describe Canvas::LiveEvents do
   context 'submissions' do
     let(:submission) do
       course_with_student_submissions
-      @course.assignments.first.submissions.first
+      @student.update(lti_context_id: SecureRandom.uuid)
+      s = @course.assignments.first.submissions.first
+      s.update(lti_user_id: @student.lti_context_id)
+      s
     end
 
     let(:group) do

@@ -37,7 +37,7 @@ describe "User Profile API", type: :request do
     @admin_lti_user_id = Lti::Asset.opaque_identifier_for(@admin)
     course_with_student(:user => user_with_pseudonym(:name => 'Student', :username => 'pvuser@example.com'))
     @student.pseudonym.update_attribute(:sis_user_id, 'sis-user-id')
-    @student_lti_user_id = Lti::Asset.opaque_identifier_for(@student)
+    Lti::Asset.opaque_identifier_for(@student)
     @user = @admin
     Account.default.tap { |a| a.enable_service(:avatars) }.save
     user_with_pseudonym(:user => @user)
@@ -114,7 +114,7 @@ describe "User Profile API", type: :request do
       'login_id' => 'pvuser@example.com',
       'avatar_url' => @student.gravatar_url(50, nil, request),
       'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
-      'lti_user_id' => @student_lti_user_id,
+      'lti_user_id' => @student.lti_context_id,
       'title' => nil,
       'bio' => nil,
       'time_zone' => 'Etc/UTC',
@@ -136,7 +136,7 @@ describe "User Profile API", type: :request do
       'login_id' => 'pvuser@example.com',
       'avatar_url' => @student.gravatar_url(50, nil, request),
       'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
-      'lti_user_id' => @student_lti_user_id,
+      'lti_user_id' => @student.lti_context_id,
       'title' => nil,
       'bio' => nil,
       'time_zone' => 'Etc/UTC',
