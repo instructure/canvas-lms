@@ -136,7 +136,7 @@ describe SIS::CSV::GroupCategoryImporter do
   end
 
   it "should not fail on refactored importer" do
-    @account.enable_feature!(:sis_imports_refactor)
+    @account.enable_feature!(:refactor_of_sis_imports)
     importer = process_csv_data_cleanly(
       "group_category_id,account_id,category_name,status",
       "Gc002,A001,Group Cat 2,deleted")

@@ -77,7 +77,7 @@ describe SisBatch do
   end
 
   it 'should make parallel importers' do
-    @account.enable_feature!(:sis_imports_refactor)
+    @account.enable_feature!(:refactor_of_sis_imports)
     batch = process_csv_data([%{user_id,login_id,status
                                 user_1,user_1,active},
                               %{course_id,short_name,long_name,term_id,status
@@ -102,7 +102,7 @@ describe SisBatch do
   describe "parallel imports" do
     it "should do cool stuff" do
       PluginSetting.create!(:name => 'sis_import', :settings => {:minimum_rows_for_parallel => 2})
-      @account.enable_feature!(:sis_imports_refactor)
+      @account.enable_feature!(:refactor_of_sis_imports)
       batch = process_csv_data([
         %{user_id,login_id,status
           user_1,user_1,active
@@ -559,14 +559,14 @@ s2,test_1,section2,active},
   context 'sis_import_feature on' do
     include_examples 'sis_import_feature'
     before do
-      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:sis_imports_refactor).and_return(true)
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:refactor_of_sis_imports).and_return(true)
     end
   end
 
   context 'sis_import_feature off' do
     include_examples 'sis_import_feature'
     before do
-      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:sis_imports_refactor).and_return(false)
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:refactor_of_sis_imports).and_return(false)
     end
   end
 
