@@ -229,7 +229,8 @@ describe "calendar2" do
 
     context "student to-do event" do
       before :once do
-        @student_to_do = @student1.planner_notes.create!(todo_date: Time.zone.now, title: "Student to do")
+        @todo_date = Time.zone.now
+        @student_to_do = @student1.planner_notes.create!(todo_date: @todo_date, title: "Student to do")
       end
 
       it "shows student to-do events in the calendar", priority: "1", test_id: 3357313 do
@@ -242,14 +243,15 @@ describe "calendar2" do
         f('.fc-content .fc-title').click
         event_content = fj('.event-details-content:visible')
         expect(event_content.find_element(:css, '.event-details-timestring').text).
-          to eq format_time_for_view(Time.zone.now, :short)
+          to eq format_time_for_view(@todo_date, :short)
         expect(event_content).to contain_link('Student 1')
       end
     end
 
     context "course to-do event" do
       before :once do
-        @course_to_do = @student1.planner_notes.create!(todo_date: Time.zone.now, title: "Course to do",
+        @todo_date = Time.zone.now
+        @course_to_do = @student1.planner_notes.create!(todo_date: @todo_date, title: "Course to do",
                                                         course_id: @course.id)
       end
 
@@ -263,14 +265,15 @@ describe "calendar2" do
         f('.fc-content .fc-title').click
         event_content = fj('.event-details-content:visible')
         expect(event_content.find_element(:css, '.event-details-timestring').text).
-          to eq format_time_for_view(Time.zone.now, :short)
+          to eq format_time_for_view(@todo_date, :short)
         expect(event_content).to contain_link('Course 1')
       end
     end
 
     context "edit to-do event" do
       before :once do
-        @to_do = @student1.planner_notes.create!(todo_date: Time.zone.now, title: "A new to do")
+        @todo_date = Time.zone.now
+        @to_do = @student1.planner_notes.create!(todo_date: @todo_date, title: "A new to do")
       end
 
       it "respects the calendars checkboxes" do
@@ -313,7 +316,7 @@ describe "calendar2" do
         f('.fc-content .fc-title').click
         f('.edit_event_link').click
         replace_content(f('input[name=title]'), 'new to-do edited')
-        datetime = Time.zone.now
+        datetime = @todo_date
         datetime = if datetime.to_date().mday() == '15'
                       datetime.change({day: 20})
                    else
