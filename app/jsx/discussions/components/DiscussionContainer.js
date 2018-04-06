@@ -53,26 +53,26 @@ const discussionTarget = {
 
 export default class DiscussionsContainer extends Component {
   static propTypes = {
-    discussions: discussionList.isRequired,
-    permissions: propTypes.permissions.isRequired,
-    masterCourseData: masterCourseDataShape,
-    title: string.isRequired,
-    toggleSubscribe: func.isRequired,
-    discussionTopicMenuTools: arrayOf(propTypes.discussionTopicMenuTools),
-    updateDiscussion: func.isRequired,
-    handleDrop: func, // eslint-disable-line
-    duplicateDiscussion: func.isRequired,
     cleanDiscussionFocus: func.isRequired,
-    deleteFocusDone: func.isRequired,
-    pinned: bool,
-    deleteFocusPending: bool.isRequired, // eslint-disable-line
     closedState: bool, // eslint-disable-line
     connectDropTarget: func,
-    roles: arrayOf(string), // eslint-disable-line
-    renderContainerBackground: func.isRequired,
-    onMoveDiscussion: func,
-    deleteDiscussion: func,
     contextType: string.isRequired,
+    deleteDiscussion: func,
+    deleteFocusDone: func.isRequired,
+    deleteFocusPending: bool.isRequired, // eslint-disable-line
+    discussionTopicMenuTools: arrayOf(propTypes.discussionTopicMenuTools),
+    discussions: discussionList.isRequired,
+    duplicateDiscussion: func.isRequired,
+    handleDrop: func, // eslint-disable-line
+    masterCourseData: masterCourseDataShape,
+    onMoveDiscussion: func,
+    permissions: propTypes.permissions.isRequired,
+    pinned: bool,
+    renderContainerBackground: func.isRequired,
+    roles: arrayOf(string), // eslint-disable-line
+    title: string.isRequired,
+    toggleSubscribe: func.isRequired,
+    updateDiscussion: func.isRequired,
   }
 
   static defaultProps = {
@@ -92,17 +92,22 @@ export default class DiscussionsContainer extends Component {
     this.moveCard = this.moveCard.bind(this)
     this.state = {
       discussions: props.discussions,
+      expanded: true,
     }
   }
 
   componentWillReceiveProps(props) {
     if(this.props.discussions === props.discussions) { return }
-    this.setState({ discussions: props.discussions })
+    this.setState({ discussions: props.discussions, expanded: true })
     this.handleDeleteFocus(props)
   }
 
   wrapperToggleRef = (c) => {
     this.toggleBtn = c && c.querySelector('button')
+  }
+
+  toggleExpanded = () => {
+    this.setState({expanded: !this.state.expanded})
   }
 
   handleDeleteFocus(newProps) {
@@ -209,7 +214,8 @@ export default class DiscussionsContainer extends Component {
         </span> : null }
         <span ref={this.wrapperToggleRef}>
           <ToggleDetails
-            defaultExpanded
+            expanded={this.state.expanded}
+            onToggle={this.toggleExpanded}
             summary={<Text weight="bold">{this.props.title}</Text>}
           >
               {
