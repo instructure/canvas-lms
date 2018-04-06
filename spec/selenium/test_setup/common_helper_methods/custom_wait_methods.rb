@@ -62,9 +62,6 @@ module CustomWaitMethods
         });
       }
     JS
-    if result == -2
-      raise "Timed out waiting for ajax requests to finish. (This might mean there was a js error in an ajax callback.)"
-    end
     result
   end
 

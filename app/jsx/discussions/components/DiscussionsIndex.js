@@ -108,19 +108,15 @@ export default class DiscussionsIndex extends Component {
     this.setState({showDelete: true, deleteFunction})
   }
 
-  renderSpinner(condition, title) {
-    if (condition) {
-      return (
-        <div style={{textAlign: 'center'}}>
-          <Spinner size="small" title={title} />
-          <Text size="small" as="p">
-            {title}
-          </Text>
-        </div>
-      )
-    } else {
-      return null
-    }
+  renderSpinner(title) {
+    return (
+      <div className="discussions-v2__spinnerWrapper">
+        <Spinner size="large" title={title} />
+        <Text size="small" as="p">
+          {title}
+        </Text>
+      </div>
+    )
   }
 
   renderMoveDiscussionTray = item => {
@@ -319,8 +315,10 @@ export default class DiscussionsIndex extends Component {
           <Heading level="h1">{I18n.t('Discussions')}</Heading>
         </ScreenReaderContent>
         <ConnectedIndexHeader />
-        {this.renderSpinner(this.props.isLoadingDiscussions, I18n.t('Loading Discussions'))}
-        {this.props.permissions.moderate ? this.renderTeacherView() : this.renderStudentView()}
+        {this.props.isLoadingDiscussions ?
+            this.renderSpinner(I18n.t('Loading Discussions')) :
+            this.props.permissions.moderate ? this.renderTeacherView() : this.renderStudentView()
+        }
       </div>
     )
   }
