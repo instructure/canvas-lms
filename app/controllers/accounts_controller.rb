@@ -462,7 +462,7 @@ class AccountsController < ApplicationController
     ActiveRecord::Associations::Preloader.new.preload(@courses, [:teachers]) if includes.include?("teachers")
 
     if includes.include?("total_students")
-      student_counts = StudentEnrollment.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')").
+      student_counts = StudentEnrollment.not_fake.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')").
         where(:course_id => @courses).group(:course_id).distinct.count(:user_id)
       @courses.each {|c| c.student_count = student_counts[c.id] || 0 }
     end

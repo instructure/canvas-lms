@@ -662,6 +662,16 @@ describe "Accounts API", type: :request do
       expect(json[0].has_key?("storage_quota_used_mb")).to be_truthy
     end
 
+    it "should don't include fake students" do
+      @c1 = course_model(:name => 'c1', :account => @a1, :root_account => @a1)
+      @c1.student_view_student
+      @a1.account_users.create!(user: @user)
+      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?include[]=total_students",
+        { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param,
+          :format => 'json', :include => ['total_students'] }, {})
+      expect(json[0]["total_students"]).to eq 0
+    end
+
     it "should include enrollment term information for each course" do
       @c1 = course_model(:name => 'c1', :account => @a1, :root_account => @a1)
       @a1.account_users.create!(user: @user)
