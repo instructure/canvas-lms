@@ -43,6 +43,7 @@ export function mockRegistry () {
 
 export function mockAnimator () {
   return {
+    getWindow: jest.fn(() => window),
     focusElement: jest.fn(),
     maintainViewportPosition: jest.fn(),
     scrollTo: jest.fn(),

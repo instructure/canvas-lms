@@ -133,7 +133,7 @@ exports[`renders the base component correctly with two buttons and a tray 1`] = 
     shadow={true}
     shouldCloseOnDocumentClick={false}
     shouldContainFocus={true}
-    shouldReturnFocus={true}
+    shouldReturnFocus={false}
     size="small"
   >
     <UpdateItemTray

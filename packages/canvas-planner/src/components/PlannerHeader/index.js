@@ -268,6 +268,7 @@ export class PlannerHeader extends Component {
           label={this.getTrayLabel()}
           placement="end"
           shouldContainFocus={true}
+          shouldReturnFocus={false}
           applicationElement={() => document.getElementById('application') }
           onExited={this.noteBtnOnClose}
           onDismiss={this.handleCancelPlannerItem}
