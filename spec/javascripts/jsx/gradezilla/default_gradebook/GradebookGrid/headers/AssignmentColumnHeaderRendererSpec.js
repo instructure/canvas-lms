@@ -172,6 +172,18 @@ QUnit.module('AssignmentColumnHeaderRenderer', function (suiteHooks) {
       equal(component.props.downloadSubmissionsAction, gradebook.getDownloadSubmissionsAction.returnValues[0]);
     });
 
+    test('includes the assignment anonymous grading status when true', function () {
+      assignment.anonymous_grading = true;
+      render();
+      strictEqual(component.props.assignment.anonymousGrading, true);
+    });
+
+    test('includes the assignment anonymous grading status when false', function () {
+      assignment.anonymous_grading = false;
+      render();
+      strictEqual(component.props.assignment.anonymousGrading, false);
+    });
+
     test('shows the "enter grades as" setting for a "points" assignment', function () {
       assignment.grading_type = 'points';
       render();

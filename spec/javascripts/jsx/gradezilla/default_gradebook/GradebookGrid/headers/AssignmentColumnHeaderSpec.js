@@ -737,6 +737,21 @@ QUnit.module('AssignmentColumnHeader: non-standard assignment', function (hooks)
     strictEqual(secondaryDetail.text(), 'Unpublished');
   });
 
+  test('renders an unpublished status when the assignment is unpublished and anonymously graded', function () {
+    props.assignment.published = false;
+    props.assignment.anonymousGrading = true;
+    wrapper = mountComponent(props);
+    const secondaryDetail = wrapper.find('.Gradebook__ColumnHeaderDetail--secondary');
+    strictEqual(secondaryDetail.text(), 'Unpublished');
+  });
+
+  test('renders an anonymous status when the assignment is anonymously graded', function() {
+    props.assignment.anonymousGrading = true;
+    wrapper = mountComponent(props);
+    const secondaryDetail = wrapper.find('.Gradebook__ColumnHeaderDetail--secondary');
+    strictEqual(secondaryDetail.text(), 'Anonymous');
+  });
+
   test('does not render points possible when the assignment is unpublished', function () {
     props.assignment.published = false;
     wrapper = mountComponent(props);
