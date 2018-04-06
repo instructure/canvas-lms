@@ -208,7 +208,7 @@ RSpec.describe Outcomes::Import do
 
   describe '#import_outcome' do
     let_once(:existing_outcome) do
-      outcome_model(context: context, vendor_guid: outcome_vendor_guid)
+      outcome_model(context: context, vendor_guid: outcome_vendor_guid, display_name: '')
     end
 
     context 'with magic vendor_guid' do
@@ -237,6 +237,31 @@ RSpec.describe Outcomes::Import do
           description: 'changed!'
         )
         expect(existing_outcome.reload.description).to eq 'changed!'
+      end
+
+      context 'importing outcome into visible context' do
+        let(:importer) { TestImporter.new(course) }
+
+        it 'fails updating non-vendor guid attributes' do
+          expect do
+            importer.import_outcome(
+              **outcome_attributes,
+              vendor_guid: magic_guid
+            )
+          end.to raise_error(TestImporter::InvalidDataError, /Cannot modify outcome from another context/)
+        end
+
+        it 'allows magic guid to reference but not update outcome' do
+          existing_outcome.update! vendor_guid: nil
+          expect do
+            importer.import_outcome(
+              **existing_outcome.slice(:title, :description, :display_name,
+                :workflow_state, :calculation_method, :calculation_int).symbolize_keys,
+              vendor_guid: magic_guid
+            )
+            existing_outcome.reload
+          end.not_to change(existing_outcome, :vendor_guid)
+        end
       end
     end
 

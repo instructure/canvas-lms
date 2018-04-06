@@ -142,7 +142,7 @@ module Outcomes
       if model.context == context
         model.outcome_import_id = outcome_import_id
         model.save!
-      elsif model.has_changes_to_save?
+      elsif non_vendor_guid_changes?(model)
         raise InvalidDataError, I18n.t(
           'Cannot modify outcome from another context: %{changes}; outcome must be modified in %{context}',
           changes: model.changes.keys.inspect,
@@ -161,6 +161,13 @@ module Outcomes
     end
 
     private
+
+    def non_vendor_guid_changes?(model)
+      model.has_changes_to_save? && !(model.changes_to_save.length == 1 &&
+        model.changes_to_save.key?(
+          AcademicBenchmark.use_new_guid_columns? ? 'vendor_guid_2' : 'vendor_guid'
+        ))
+    end
 
     def find_prior_outcome(outcome)
       match = /canvas_outcome:(\d+)/.match(outcome[:vendor_guid])
