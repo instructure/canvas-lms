@@ -136,7 +136,7 @@ describe "Gradezilla - Assignment Column" do
       # enable anonymous flags at account level
       Account.default.enable_feature!(:anonymous_moderated_marking)
       Account.default.enable_feature!(:anonymous_marking)
-      
+
       # re-use the course and student setup from the describe block up-above
       # update assignment to be an anonymous assignment
       @assignment.update_attributes(title: "Anon Assignment", anonymous_grading: true)
@@ -151,7 +151,7 @@ describe "Gradezilla - Assignment Column" do
     end
 
     it "speedgrader link on tray displays warning", priority: "1", test_id: 3481216 do
-      skip('This is skeleton code that acts as AC for GRADE-1015 which is WIP')
+      skip('This is skeleton code that acts as AC for GRADE-1050 which is WIP')
       Gradezilla::Cells.open_tray(@course.students.first, @assignment)
       Gradezilla::GradeDetailTray.speedgrader_link.click
 
