@@ -60,7 +60,6 @@ SafeYAML::OPTIONS.merge!(
         !ruby/hash:ActionController::Parameters
         !ruby/object:Class
         !ruby/object:OpenStruct
-        !ruby/object:Scribd::Document
         !ruby/object:Mime::Type
         !ruby/object:Mime::NullType
         !ruby/object:URI::HTTP

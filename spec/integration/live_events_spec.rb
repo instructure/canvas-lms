@@ -72,7 +72,7 @@ describe LiveEvents do
 
     context 'Files' do
       def course_file
-        data = fixture_file_upload('scribd_docs/doc.doc', 'application/msword', true)
+        data = fixture_file_upload('docs/doc.doc', 'application/msword', true)
         factory_with_protected_attributes(@course.attachments, :uploaded_data => data)
       end
 

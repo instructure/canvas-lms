@@ -42,7 +42,7 @@ describe FilesController do
   end
 
   def io
-    fixture_file_upload('scribd_docs/doc.doc', 'application/msword', true)
+    fixture_file_upload('docs/doc.doc', 'application/msword', true)
   end
 
   def course_file

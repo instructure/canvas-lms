@@ -1643,7 +1643,7 @@ describe DiscussionTopicsController, type: :request do
     end
 
     it "should allow including attachments on top-level entries" do
-      data = fixture_file_upload("scribd_docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
         {:controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
@@ -1656,7 +1656,7 @@ describe DiscussionTopicsController, type: :request do
 
     it "should include attachments on replies to top-level entries" do
       top_entry = create_entry(@topic, :message => 'top-level message')
-      data = fixture_file_upload("scribd_docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{top_entry.id}/replies.json",
         {:controller => 'discussion_topics_api', :action => 'add_reply', :format => 'json',
@@ -1668,7 +1668,7 @@ describe DiscussionTopicsController, type: :request do
     end
 
     it "handles duplicate files when attaching" do
-      data = fixture_file_upload("scribd_docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
       attachment_model :context => @user, :uploaded_data => data, :folder => Folder.unfiled_folder(@user)
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",

@@ -494,7 +494,7 @@ RSpec.configure do |config|
   end
 
   def default_uploaded_data
-    fixture_file_upload('scribd_docs/doc.doc', 'application/msword', true)
+    fixture_file_upload('docs/doc.doc', 'application/msword', true)
   end
 
   def factory_with_protected_attributes(ar_klass, attrs, do_save = true)
@@ -791,7 +791,7 @@ RSpec.configure do |config|
   end
 
   def dummy_io
-    fixture_file_upload('scribd_docs/doc.doc', 'application/msword', true)
+    fixture_file_upload('docs/doc.doc', 'application/msword', true)
   end
 
   def consider_all_requests_local(value)

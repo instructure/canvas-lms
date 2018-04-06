@@ -1542,7 +1542,7 @@ describe DiscussionTopicsController do
     end
 
     it "attaches a file and handles duplicates" do
-      data = fixture_file_upload("scribd_docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
       attachment_model :context => @course, :uploaded_data => data, :folder => Folder.unfiled_folder(@course)
       put 'update', params: {course_id: @course.id, topic_id: @topic.id, attachment: data}, format: 'json'
       expect(response).to be_success

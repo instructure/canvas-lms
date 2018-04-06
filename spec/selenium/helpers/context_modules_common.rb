@@ -19,7 +19,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 module ContextModulesCommon
   def io
-    fixture_file_upload('scribd_docs/txt.txt', 'text/plain', true)
+    fixture_file_upload('docs/txt.txt', 'text/plain', true)
   end
 
 

@@ -3718,7 +3718,6 @@ describe 'Submissions API', type: :request do
         @context = @course
         @student2 = @student
         @user = @student1
-        @always_scribd = true
       end
 
       include_examples "file uploads api"
