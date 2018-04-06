@@ -27,10 +27,12 @@ class OpenidController < ApplicationController
 
   # We tell osqa whom to attempt authentication has via a cross-domain script tag.
   # This is those contents - just the url to pre-fill.
+  #
+  # This is also used by the join server to merge logins for NLU students on Braven Champions.
   def url_script
     # Referrer check just to keep other sites from linking this in and getting our
     # user id too.
-    if request.referrer.nil? || URI(request.referrer).host == URI(BeyondZConfiguration.help_url).host
+    if request.referrer.nil? || URI(request.referrer).host == URI(BeyondZConfiguration.help_url).host || URI(request.referrer).host == URI(BeyondZConfiguration.join_url).host
       if user_signed_in?
         code = "var bz_current_user_openid_url = #{url_for_user.to_json};"
       else
