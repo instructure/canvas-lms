@@ -672,7 +672,6 @@ class CoursesController < ApplicationController
   # @argument course[default_view]  [String, "feed"|"wiki"|"modules"|"syllabus"|"assignments"]
   #   The type of page that users will see when they first visit the course
   #   * 'feed' Recent Activity Dashboard
-  #   * 'wiki' Wiki Front Page
   #   * 'modules' Course Modules/Sections Page
   #   * 'assignments' Course Assignments List
   #   * 'syllabus' Course Syllabus Page
