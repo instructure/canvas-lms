@@ -25,10 +25,24 @@ export function mockRegistryEntry (ids, name) {
   };
 }
 
+export function mockApp () {
+  return {
+    fixedElementForItemScrolling: jest.fn(),
+  };
+}
+
+export function mockDocument () {
+  return {
+    activeElement: 'active-element',
+    querySelector: jest.fn(),
+    body: {},
+  };
+}
+
 export function mockComponent(name) {
   return {
-    getFocusable () { return `${name}-focusable`; },
-    getScrollable () { return `${name}-scrollable`; },
+    getFocusable: jest.fn(() => `${name}-focusable`),
+    getScrollable: jest.fn(() => `${name}-scrollable`),
   };
 }
 
@@ -45,7 +59,8 @@ export function mockAnimator () {
   return {
     getWindow: jest.fn(() => window),
     focusElement: jest.fn(),
-    maintainViewportPosition: jest.fn(),
+    elementPositionMemo: jest.fn(),
+    maintainViewportPositionFromMemo: jest.fn(),
     scrollTo: jest.fn(),
     scrollToTop: jest.fn(),
     isAboveScreen: jest.fn(),
@@ -64,10 +79,14 @@ export function mockManager () {
     registry: mockRegistry(),
     animator: mockAnimator(),
     store: mockStore(),
+    app: mockApp(),
+    document: mockDocument(),
 
     getRegistry () { return this.registry; },
     getAnimator () { return this.animator; },
     getStore () { return this.store; },
+    getApp () { return this.app; },
+    getDocument () { return this.document; },
     getStickyOffset () { return 34; },
     totalOffset () { return 42; },
   };

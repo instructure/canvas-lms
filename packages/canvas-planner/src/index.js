@@ -97,6 +97,7 @@ export function render (element, options) {
     <DynamicUiProvider manager={dynamicUiManager} >
       <Provider store={store}>
         <PlannerApp
+          appRef={app => dynamicUiManager.setApp(app)}
           stickyOffset={opts.stickyOffset}
           stickyZIndex={opts.stickyZIndex}
           changeToDashboardCardView={opts.changeToDashboardCardView}

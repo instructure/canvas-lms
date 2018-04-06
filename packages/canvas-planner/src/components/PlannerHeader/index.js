@@ -105,7 +105,7 @@ export class PlannerHeader extends Component {
   }
 
   componentWillUpdate () {
-    this.props.preTriggerDynamicUiUpdates(document.getElementById('planner-app-fixed-element'), 'header');
+    this.props.preTriggerDynamicUiUpdates();
   }
 
   componentDidUpdate () {
@@ -136,10 +136,8 @@ export class PlannerHeader extends Component {
   handleCancelPlannerItem = () => {
     this.toggleUpdateItemTray();
     // let the dynamic ui manager manage focus on cancel.
-    // Don't scroll if it was the add button because it's in the sticky header.
-    const canceledNewItem = !this.props.todo.updateTodoItem;
     if (this.props.cancelEditingPlannerItem) {
-      this.props.cancelEditingPlannerItem({noScroll: canceledNewItem});
+      this.props.cancelEditingPlannerItem();
     }
   }
 

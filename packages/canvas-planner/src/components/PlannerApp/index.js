@@ -66,6 +66,7 @@ export class PlannerApp extends Component {
     }),
     currentUser: shape(userShape),
     size: sizeShape,
+    appRef: func,
   };
   static defaultProps = {
     isLoading: false,
@@ -74,10 +75,15 @@ export class PlannerApp extends Component {
     preTriggerDynamicUiUpdates: () => {},
     plannerActive: () => {return false;},
     size: 'large',
+    appRef: () => {},
   };
 
+  componentWillMount () {
+    this.props.appRef(this);
+  }
+
   componentWillUpdate () {
-    this.props.preTriggerDynamicUiUpdates(this.fixedElement, 'app');
+    this.props.preTriggerDynamicUiUpdates();
   }
 
   componentDidUpdate () {
@@ -86,6 +92,12 @@ export class PlannerApp extends Component {
       0;
     this.props.triggerDynamicUiUpdates(additionalOffset);
   }
+
+  componentWillUnmount () {
+    this.props.appRef(null);
+  }
+
+  fixedElementForItemScrolling () { return this.fixedElement; }
 
   fixedElementRef = (elt) => {
     this.fixedElement = elt;
@@ -182,8 +194,8 @@ export class PlannerApp extends Component {
       {this.renderLoadPastButton()}
       {this.renderLoadingPast()}
       {children}
-      {this.renderLoadMore()}
       <div id="planner-app-fixed-element" ref={this.fixedElementRef} />
+      {this.renderLoadMore()}
     </div>;
   }
 

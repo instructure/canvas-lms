@@ -44,24 +44,24 @@ export class Animator {
     else this.queueAnimation(() => elt.focus(), 'unshift');
   }
 
-  recordFixedElement (elt) {
-    if (elt) {
-      this.fixedElement = elt;
-      this.fixedElementsInitialPositionInViewport = elt.getBoundingClientRect().top;
-    }
+  elementPositionMemo (elt) {
+    return {
+      element: elt,
+      rect: elt.getBoundingClientRect(),
+    };
   }
 
   // Based on this formula:
   // element's position in the viewport + the window's scroll position === the element's position in the document
   // so if we want the scroll position that will maintain the element in it's current viewport position,
   // window scroll position = element's current document position - element's initial viewport position
-  maintainViewportPosition () {
-    if (this.fixedElement == null) return;
+  maintainViewportPositionFromMemo (elt, memo) {
     this.queueAnimation(() => {
-      const fixedElementsNewPositionInViewport = this.fixedElement.getBoundingClientRect().top;
+      const fixedElementsInitialPositionInViewport = memo.rect.top;
+      const fixedElementsNewPositionInViewport = elt.getBoundingClientRect().top;
       const documentPositionInViewport = this.document.documentElement.getBoundingClientRect().top;
       const fixedElementsPositionInDocument = fixedElementsNewPositionInViewport - documentPositionInViewport;
-      const newWindowScrollPosition = fixedElementsPositionInDocument - this.fixedElementsInitialPositionInViewport;
+      const newWindowScrollPosition = fixedElementsPositionInDocument - fixedElementsInitialPositionInViewport;
       this.window.scroll(0, newWindowScrollPosition);
     }, 'push');
   }

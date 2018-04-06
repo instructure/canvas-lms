@@ -54,14 +54,14 @@ exports[`renders base component using dayKeys 1`] = `
     }
     timeZone="UTC"
   />
+  <div
+    id="planner-app-fixed-element"
+  />
   <LoadingFutureIndicator
     allFutureItemsLoaded={false}
     loadingFuture={false}
     onLoadMore={[Function]}
     plannerActive={[Function]}
-  />
-  <div
-    id="planner-app-fixed-element"
   />
 </div>
 `;
@@ -182,14 +182,14 @@ exports[`shows new activity button when new activity is indicated 1`] = `
     }
     timeZone="UTC"
   />
+  <div
+    id="planner-app-fixed-element"
+  />
   <LoadingFutureIndicator
     allFutureItemsLoaded={false}
     loadingFuture={false}
     onLoadMore={[Function]}
     plannerActive={[Function]}
-  />
-  <div
-    id="planner-app-fixed-element"
   />
 </div>
 `;

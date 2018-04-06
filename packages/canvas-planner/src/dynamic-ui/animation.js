@@ -56,9 +56,22 @@ export default class Animation {
   // be cleared.
   uiDidUpdate () {}
 
+  // Override this to enable calling `this.maintainViewportPositionOfFixedElement`
+  fixedElement () { return null; }
+
   //------------------------------------
   // Interface methods: Do not override
   //------------------------------------
+
+  // Convenience method for using the animator's maintainViewportPositionFromMemo
+  // method. Implement fixedElement to use this.
+  maintainViewportPositionOfFixedElement () {
+    const fixedElement = this.fixedElement();
+    if (fixedElement && this.fixedElementPositionMemo) {
+      this.animator().maintainViewportPositionFromMemo(fixedElement, this.fixedElementPositionMemo);
+      this.fixedElementPositionMemo = null;
+    }
+  }
 
   // Used by the manager to feed actions to the animations
   acceptAction (action) {
@@ -81,6 +94,10 @@ export default class Animation {
   invokeUiWillUpdate () {
     if (this.executing) return;
     this.executing = true;
+
+    const fixedElement = this.fixedElement();
+    if (fixedElement) this.fixedElementPositionMemo = this.animator().elementPositionMemo(fixedElement);
+
     this.uiWillUpdate();
     this.executing = false;
   }
@@ -111,6 +128,7 @@ export default class Animation {
   // remove all accepted actions
   reset () {
     this.acceptedActions = {};
+    this.fixedElementPositionMemo = null;
   }
 
   // access to all the different objects an animation could need.
@@ -118,6 +136,8 @@ export default class Animation {
   registry () { return this.manager().getRegistry(); }
   animator () { return this.manager().getAnimator(); }
   store () { return this.manager().getStore(); }
+  app () { return this.manager().getApp(); }
+  document () { return this.manager().getDocument(); }
   window () { return this.animator().getWindow(); }
   stickyOffset () { return this.manager().getStickyOffset(); }
   totalOffset () { return this.manager().totalOffset(); }

@@ -17,18 +17,16 @@
  */
 
 import {
-  MaintainScrollPosition,
+  MaintainScrollPositionWhenScrollingIntoThePast,
   ScrollToNewActivity,
   ScrollToLastLoadedNewActivity,
   ContinueInitialLoad,
+  FocusItemOnSave,
   FocusPriorItemOnLoadMore,
   FocusPriorItemOnDelete,
-  // ResetFocus,
-  // FocusSavedItem,
-  // SetFocusToPriorLoadedItem,
-
-  // SetDeletedItemFocus,
+  ReturnFocusOnCancelEditing,
   // SetDismissedOpportunityFocus,
+
 } from './animations';
 
 export class AnimationCollection {
@@ -60,7 +58,7 @@ export class AnimationCollection {
         'START_LOADING_PAST_SAGA',
         'GOT_DAYS_SUCCESS',
       ],
-      animation: MaintainScrollPosition,
+      animation: MaintainScrollPositionWhenScrollingIntoThePast,
     },
     {
       expected: [
@@ -71,6 +69,19 @@ export class AnimationCollection {
     },
     {
       expected: [
+        'SAVED_PLANNER_ITEM',
+      ],
+      animation: FocusItemOnSave,
+    },
+    {
+      expected: [
+        'OPEN_EDITING_PLANNER_ITEM',
+        'CANCEL_EDITING_PLANNER_ITEM',
+      ],
+      animation: ReturnFocusOnCancelEditing,
+    },
+    {
+      expected: [
         'DELETED_PLANNER_ITEM',
       ],
       animation: FocusPriorItemOnDelete,
@@ -78,19 +89,6 @@ export class AnimationCollection {
 
 
     // animations for the future. no, the format doesn't match.
-
-    // [['OPEN_EDITING_PLANNER_ITEM',
-    //   'CANCEL_EDITING_PLANNER_ITEM',
-    // ], ResetFocus],
-
-    // [['OPEN_EDITING_PLANNER_ITEM',
-    //   'SAVED_PLANNER_ITEM',
-    // ], FocusSavedItem],
-
-    // [['OPEN_EDITING_PLANNER_ITEM',
-    //   'DELETED_PLANNER_ITEM',
-    // ], SetDeletedItemFocus],
-
     // [['DISMISSED_OPPORTUNITY',
     // ], SetDismissedOpportunityFocus],
   ]

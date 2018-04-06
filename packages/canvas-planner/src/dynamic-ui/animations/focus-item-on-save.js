@@ -16,11 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './scroll-to-last-loaded-new-activity';
-export * from './scroll-to-new-activity';
-export * from './maintain-scroll-position-when-scrolling-into-the-past';
-export * from './continue-initial-load';
-export * from './focus-item-on-save';
-export * from './focus-prior-item-on-load-more';
-export * from './focus-prior-item-on-delete';
-export * from './return-focus-on-cancel-editing';
+import Animation from '../animation';
+
+export class FocusItemOnSave extends Animation {
+  fixedElement () {
+    return this.app().fixedElementForItemScrolling();
+  }
+
+  uiDidUpdate () {
+    const action = this.acceptedAction('SAVED_PLANNER_ITEM');
+    const savedItemUniqueId = action.payload.item.uniqueId;
+    const itemComponentToFocus = this.registry().getComponent('item', savedItemUniqueId);
+    if (itemComponentToFocus == null) return;
+    this.maintainViewportPositionOfFixedElement();
+    this.animator().focusElement(itemComponentToFocus.component.getFocusable('update'));
+    this.animator().scrollTo(itemComponentToFocus.component.getScrollable(), this.stickyOffset());
+
+  }
+}

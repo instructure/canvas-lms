@@ -18,8 +18,9 @@
 
 import Animation from '../animation';
 
-export class MaintainScrollPosition extends Animation {
+export class MaintainScrollPositionWhenScrollingIntoThePast extends Animation {
+  fixedElement () { return this.app().fixedElementForItemScrolling(); }
   uiDidUpdate () {
-    this.animator().maintainViewportPosition();
+    this.maintainViewportPositionOfFixedElement();
   }
 }
