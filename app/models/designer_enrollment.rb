@@ -20,4 +20,9 @@ class DesignerEnrollment < Enrollment
   def designer?
     true
   end
+
+  def pipeline_serializer
+    PipelineService::Serializers::Enrollment
+  end
+
 end
