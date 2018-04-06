@@ -39,15 +39,11 @@ define [
     )
 
     @optionProperty 'viewToggle'
-    @optionProperty 'userIsAdmin'
     @optionProperty 'sisName'
 
     initialize: ->
       @viewToggle = false
       super
-
-    canDisableSync: ->
-      @userIsAdmin
 
     openDisableSync: ->
       if @viewToggle
@@ -63,21 +59,17 @@ define [
 
     submit: (event) ->
       event?.preventDefault()
-      if @canDisableSync()
-        success_message = I18n.t('Sync to %{name} successfully disabled', name: @sisName)
-        error_message = I18n.t('Disabling Sync to %{name} failed', name: @sisName)
-        $.ajaxJSON '/api/sis/courses/' +
-                   @model.id +
-                   '/disable_post_to_sis', 'PUT',
-                   grading_period_id: @currentGradingPeriod(),
-                   ((data) ->
-                     $.flashMessage success_message
-                   ), ->
-                     $.flashError error_message
-
-        setTimeout(window.location.reload(true))
-      else
-        $.flashWarning I18n.t("You are not authorized to disable the Sync to %{name} option.", name: @sisName)
+      success_message = I18n.t('Sync to %{name} successfully disabled', name: @sisName)
+      error_message = I18n.t('Disabling Sync to %{name} failed', name: @sisName)
+      $.ajaxJSON '/api/sis/courses/' +
+                 @model.id +
+                 '/disable_post_to_sis', 'PUT',
+                 grading_period_id: @currentGradingPeriod(),
+                 ((data) ->
+                   $.flashMessage success_message
+                   setTimeout(window.location.reload(true))
+                 ), ->
+                   $.flashError error_message
 
     cancel: ->
       @close()
@@ -85,6 +77,5 @@ define [
     toJSON: ->
       data = super
       data.course
-      data.canDisableSync = @canDisableSync()
       data.sisName = @sisName
       data

@@ -54,18 +54,6 @@ QUnit.module('AssignmentSyncSettingsView', {
   }
 })
 
-test('canDisableSync is true if userIsAdmin is true', () => {
-  const view = createView({userIsAdmin: true})
-  equal(view.canDisableSync(), true)
-  return view.remove()
-})
-
-test('canDisableSync is false if userIsAdmin is false', () => {
-  const view = createView({userIsAdmin: false})
-  equal(view.canDisableSync(), false)
-  return view.remove()
-})
-
 test('openDisableSync sets viewToggle to true', () => {
   const view = createView()
   view.openDisableSync()
@@ -77,23 +65,5 @@ test('currentGradingPeriod returns "" if a grading period is not selected', () =
   const view = createView()
   const grading_period_id = view.currentGradingPeriod()
   equal(grading_period_id, '')
-  return view.remove()
-})
-
-test('disables the Save and Cancel buttons', () => {
-  const view = createView()
-  ok(view.$('#cancel-assignment-settings').hasClass('disabled'))
-  ok(view.$('#update-assignment-settings').hasClass('disabled'))
-  return view.remove()
-})
-
-test('disables the Save and Cancel button handlers', function() {
-  const view = createView()
-  this.spy(view, 'saveFormData')
-  this.spy(view, 'cancel')
-  view.$('#cancel-assignment-settings').click()
-  view.$('#update-assignment-settings').click()
-  notOk(view.saveFormData.called)
-  notOk(view.cancel.called)
   return view.remove()
 })

@@ -77,7 +77,6 @@ if (ENV.PERMISSIONS.manage_assignments) {
   assignmentSyncSettingsView = new AssignmentSyncSettingsView({
     collection: assignmentGroups,
     model: course,
-    userIsAdmin,
     sisName: ENV.SIS_NAME
   })
 
