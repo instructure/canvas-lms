@@ -97,6 +97,60 @@ describe Course do
     end
   end
 
+  describe '#moderators' do
+    before(:once) do
+      @course = Course.create!
+      @course.root_account.enable_feature!(:anonymous_moderated_marking)
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher)
+      @ta = User.create!
+      @course.enroll_ta(@ta)
+    end
+
+    it 'returns an empty list if the root account has Anonymous Moderated Marking disabled' do
+      @course.root_account.disable_feature!(:anonymous_moderated_marking)
+      expect(@course.moderators).to be_empty
+    end
+
+    it 'includes active teachers' do
+      expect(@course.moderators).to include @teacher
+    end
+
+    it 'includes active TAs' do
+      expect(@course.moderators).to include @ta
+    end
+
+    it 'excludes active teachers if teachers have "Select Final Grade" priveleges revoked' do
+      @course.root_account.role_overrides.create!(permission: 'select_final_grade', role: teacher_role, enabled: false)
+      expect(@course.moderators).not_to include @teacher
+    end
+
+    it 'excludes active TAs if TAs have "Select Final Grade" priveleges revoked' do
+      @course.root_account.role_overrides.create!(permission: 'select_final_grade', role: ta_role, enabled: false)
+      expect(@course.moderators).not_to include @ta
+    end
+
+    it 'excludes inactive teachers' do
+      @course.enrollments.find_by!(user_id: @teacher).deactivate
+      expect(@course.moderators).not_to include @teacher
+    end
+
+    it 'excludes concluded teachers' do
+      @course.enrollments.find_by!(user_id: @teacher).conclude
+      expect(@course.moderators).not_to include @teacher
+    end
+
+    it 'excludes inactive TAs' do
+      @course.enrollments.find_by!(user_id: @ta).deactivate
+      expect(@course.moderators).not_to include @ta
+    end
+
+    it 'excludes concluded TAs' do
+      @course.enrollments.find_by!(user_id: @ta).conclude
+      expect(@course.moderators).not_to include @ta
+    end
+  end
+
   describe "#recompute_student_scores" do
     it "should use all student ids except concluded and deleted if none are passed" do
       @course.save!

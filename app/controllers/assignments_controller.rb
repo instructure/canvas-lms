@@ -478,12 +478,14 @@ class AssignmentsController < ApplicationController
 
       post_to_sis = Assignment.sis_grade_export_enabled?(@context)
       hash = {
+        ANONYMOUS_MODERATED_MARKING_ENABLED: @context.root_account.feature_enabled?(:anonymous_moderated_marking),
         ASSIGNMENT_GROUPS: json_for_assignment_groups,
         ASSIGNMENT_INDEX_URL: polymorphic_url([@context, :assignments]),
         ASSIGNMENT_OVERRIDES: assignment_overrides_json(
           @assignment.overrides_for(@current_user, ensure_set_not_empty: true),
           @current_user
         ),
+        AVAILABLE_MODERATORS: @assignment.available_moderators.map { |user| { name: user.name, id: user.id } },
         COURSE_ID: @context.id,
         GROUP_CATEGORIES: group_categories,
         HAS_GRADED_SUBMISSIONS: @assignment.graded_submissions_exist?,

@@ -815,6 +815,32 @@ describe AssignmentsController do
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
 
+    describe 'js_env ANONYMOUS_MODERATED_MARKING_ENABLED' do
+      before(:each) do
+        user_session(@teacher)
+      end
+
+      it 'is true when the root account has Anonymous Moderated Marking enabled' do
+        @course.root_account.enable_feature!(:anonymous_moderated_marking)
+        get :edit, params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:ANONYMOUS_MODERATED_MARKING_ENABLED]).to be true
+      end
+
+      it 'is false when the root account does not have Anonymous Moderated Marking enabled' do
+        get :edit, params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:ANONYMOUS_MODERATED_MARKING_ENABLED]).to be false
+      end
+    end
+
+    it 'js_env AVAILABLE_MODERATORS includes the name and id for each available moderator' do
+      user_session(@teacher)
+      @course.root_account.enable_feature!(:anonymous_moderated_marking)
+      @assignment.update!(grader_count: 2, moderated_grading: true)
+      get :edit, params: { course_id: @course.id, id: @assignment.id }
+      expected_moderators = @course.instructors.map { |user| { name: user.name, id: user.id } }
+      expect(assigns[:js_env][:AVAILABLE_MODERATORS]).to match_array expected_moderators
+    end
+
     describe 'js_env ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED' do
       before(:each) do
         user_session(@teacher)

@@ -5290,6 +5290,46 @@ describe Assignment do
     end
   end
 
+  describe '.remove_user_as_final_grader' do
+    it 'calls .remove_user_as_final_grader_immediately in a delayed job' do
+      expect(Assignment).to receive(:send_later_if_production_enqueue_args).
+        with(:remove_user_as_final_grader_immediately, any_args)
+      Assignment.remove_user_as_final_grader(@teacher.id, @course.id)
+    end
+
+    it 'runs the job in a strand, stranded by the root account ID' do
+      delayed_job_args = {
+        strand: "Assignment.remove_user_as_final_grader:#{@course.root_account.global_id}",
+        max_attempts: 1,
+        priority: Delayed::LOW_PRIORITY
+      }
+
+      expect(Assignment).to receive(:send_later_if_production_enqueue_args).
+        with(:remove_user_as_final_grader_immediately, delayed_job_args, any_args)
+      Assignment.remove_user_as_final_grader(@teacher.id, @course.id)
+    end
+  end
+
+  describe '.remove_user_as_final_grader_immediately' do
+    it 'removes the user as final grader in all assignments in the given course' do
+      2.times { @course.assignments.create!(moderated_grading: true, final_grader: @teacher) }
+      another_teacher = User.create!
+      @course.enroll_teacher(another_teacher, active_all: true)
+      @course.assignments.create!(moderated_grading: true, final_grader: another_teacher)
+      expect { Assignment.remove_user_as_final_grader_immediately(@teacher.id, @course.id) }.to change {
+        @course.assignments.order(:created_at).pluck(:final_grader_id)
+      }.from([@teacher.id, @teacher.id, another_teacher.id]).to([nil, nil, another_teacher.id])
+    end
+
+    it 'includes soft-deleted assignments when removing the user as final grader' do
+      assignment = @course.assignments.create!(moderated_grading: true, final_grader: @teacher)
+      assignment.destroy
+      expect { Assignment.remove_user_as_final_grader_immediately(@teacher.id, @course.id) }.to change {
+        assignment.reload.final_grader_id
+      }.from(@teacher.id).to(nil)
+    end
+  end
+
   describe '.suspend_due_date_caching' do
     it 'suspends the update_cached_due_dates after_save callback on Assignment' do
       Assignment.suspend_due_date_caching do
@@ -5360,6 +5400,62 @@ describe Assignment do
     end
   end
 
+  describe '#available_moderators' do
+    before(:once) do
+      @course = Course.create!
+      @course.root_account.enable_feature!(:anonymous_moderated_marking)
+      @first_teacher = User.create!
+      @second_teacher = User.create!
+      [@first_teacher, @second_teacher].each { |user| @course.enroll_teacher(user, enrollment_state: 'active') }
+      @first_ta = User.create!
+      @second_ta = User.create
+      [@first_ta, @second_ta].each { |user| @course.enroll_ta(user, enrollment_state: 'active') }
+      @assignment = @course.assignments.create!(moderated_grading: true, final_grader: @first_teacher)
+    end
+
+    it 'returns a list of active, available moderators in the course' do
+      expected_moderator_ids = [@first_teacher, @second_teacher, @first_ta, @second_ta].map(&:id)
+      expect(@assignment.available_moderators.map(&:id)).to match_array expected_moderator_ids
+    end
+
+    it 'excludes deactivated moderators in the course (see exception below)' do
+      @course.enrollments.find_by(user: @second_teacher).deactivate
+      expected_moderator_ids = [@first_teacher, @first_ta, @second_ta].map(&:id)
+      expect(@assignment.available_moderators.map(&:id)).to match_array expected_moderator_ids
+    end
+
+    it 'excludes concluded moderators in the course (see exception below)' do
+      @course.enrollments.find_by(user: @second_teacher).conclude
+      expected_moderator_ids = [@first_teacher, @first_ta, @second_ta].map(&:id)
+      expect(@assignment.available_moderators.map(&:id)).to match_array expected_moderator_ids
+    end
+
+    it 'excludes TAs if they do not have "Select Final Grade" permissions' do
+      @course.root_account.role_overrides.create!(permission: 'select_final_grade', role: ta_role, enabled: false)
+      expected_moderator_ids = [@first_teacher, @second_teacher].map(&:id)
+      expect(@assignment.available_moderators.map(&:id)).to match_array expected_moderator_ids
+    end
+
+    it 'excludes teachers if they do not have "Select Final Grade" permissions' do
+      @assignment.update!(final_grader: @first_ta)
+      @course.root_account.role_overrides.create!(permission: 'select_final_grade', role: teacher_role, enabled: false)
+      expected_moderator_ids = [@first_ta, @second_ta].map(&:id)
+      expect(@assignment.available_moderators.map(&:id)).to match_array expected_moderator_ids
+    end
+
+    it 'includes an inactive user in the list if that user was picked as the final grader before being deactivated' do
+      @course.enrollments.find_by(user: @first_teacher).deactivate
+      expected_moderator_ids = [@first_teacher, @second_teacher, @first_ta, @second_ta].map(&:id)
+      expect(@assignment.available_moderators.map(&:id)).to match_array expected_moderator_ids
+    end
+
+    it 'includes a concluded user in the list if that user was picked as the final grader before being concluded' do
+      @course.enrollments.find_by(user: @first_teacher).conclude
+      expected_moderator_ids = [@first_teacher, @second_teacher, @first_ta, @second_ta].map(&:id)
+      expect(@assignment.available_moderators.map(&:id)).to match_array expected_moderator_ids
+    end
+  end
+
   describe 'Anonymous Moderated Marking setting validation' do
     before(:once) do
       @course.account.enable_feature!(:anonymous_moderated_marking)
@@ -5382,12 +5478,20 @@ describe Assignment do
 
     describe 'Moderated Grading validation' do
       context 'when moderated_grading is not enabled' do
-        subject { @course.assignments.build }
+        subject(:assignment) { @course.assignments.build }
 
         it { is_expected.to validate_absence_of(:grader_comments_visible_to_graders) }
         it { is_expected.to validate_absence_of(:grader_section) }
         it { is_expected.to validate_absence_of(:final_grader) }
         it { is_expected.to validate_absence_of(:grader_names_visible_to_final_grader) }
+
+        it 'before validation, sets final_grader_id to nil if it is present' do
+          teacher = User.create!
+          @course.enroll_teacher(teacher, active_all: true)
+          assignment.final_grader_id = teacher.id
+          assignment.validate
+          expect(assignment.final_grader_id).to be_nil
+        end
       end
 
       context 'when moderated_grading is enabled' do
@@ -5469,12 +5573,16 @@ describe Assignment do
             expect(errors[:final_grader]).to eq ['Final grader must be an instructor in this course']
           end
 
-          it 'does not allow a non-active final grader' do
+          it 'does not allow changing final grader to an inactive user' do
             @section1_ta.enrollments.first.deactivate
             @assignment.final_grader = @section1_ta
-            @assignment.valid?
+            expect(@assignment).to be_invalid
+          end
 
-            expect(errors[:final_grader]).to eq ['Final grader must be an instructor in this course']
+          it 'allows a non-active final grader if the final grader was set when the user was active' do
+            @assignment.update!(final_grader: @section1_ta)
+            @section1_ta.enrollments.first.deactivate
+            expect(@assignment).to be_valid
           end
 
           it 'does not allow a final grader not in the course' do

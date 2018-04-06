@@ -845,8 +845,8 @@ class RoleOverride < ActiveRecord::Base
       },
       :select_final_grade => {
         :label => -> { t('Select final grade for moderation') },
-        :true_for => %w(TeacherEnrollment TaEnrollment AccountAdmin),
-        :available_to => %w(TeacherEnrollment TaEnrollment AccountAdmin AccountMembership),
+        :true_for => %w(TeacherEnrollment TaEnrollment),
+        :available_to => %w(TeacherEnrollment TaEnrollment),
         :account_allows => lambda {|a| a.feature_enabled?(:anonymous_moderated_marking)}
       },
       :view_audit_trail => {

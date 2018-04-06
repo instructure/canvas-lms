@@ -516,12 +516,12 @@ describe RoleOverride do
     describe 'select_final_grade' do
       let(:permission) { RoleOverride.permissions[:select_final_grade] }
 
-      it 'is enabled by default for teachers, TAs and admins' do
-        expect(permission[:true_for]).to match_array %w(TeacherEnrollment TaEnrollment AccountAdmin)
+      it 'is enabled by default for teachers and TAs' do
+        expect(permission[:true_for]).to match_array %w(TeacherEnrollment TaEnrollment)
       end
 
-      it 'is available to teachers, TAs, admins and account memberships' do
-        expect(permission[:available_to]).to match_array %w(TeacherEnrollment TaEnrollment AccountAdmin AccountMembership)
+      it 'is available to teachers and TAs' do
+        expect(permission[:available_to]).to match_array %w(TeacherEnrollment TaEnrollment)
       end
 
       it 'is allowed when Anonymous Moderated Marking is enabled for the account' do

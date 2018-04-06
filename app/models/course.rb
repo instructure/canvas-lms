@@ -3147,6 +3147,13 @@ class Course < ActiveRecord::Base
     default_grading_standard || GradingStandard.default_instance
   end
 
+  def moderators
+    return [] unless root_account.feature_enabled?(:anonymous_moderated_marking)
+
+    active_instructors = users.merge(Enrollment.active_or_pending.of_instructor_type)
+    active_instructors.select { |user| grants_right?(user, :select_final_grade) }
+  end
+
   private
 
   def effective_due_dates

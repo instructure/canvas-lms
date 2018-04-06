@@ -139,6 +139,7 @@ class Assignment < ActiveRecord::Base
   }
   before_validation do |assignment|
     assignment.points_possible = nil unless assignment.graded?
+    assignment.final_grader_id = nil unless assignment.moderated_grading?
     assignment.lti_context_id ||= SecureRandom.uuid
     if assignment.external_tool? && assignment.external_tool_tag
       assignment.external_tool_tag.context = assignment
@@ -702,6 +703,28 @@ class Assignment < ActiveRecord::Base
     else
       # no due at = all_day and all_day_date are irrelevant
       return false, nil
+    end
+  end
+
+  def self.remove_user_as_final_grader(user_id, course_id)
+    strand_identifier = Course.find(course_id).root_account.global_id
+    send_later_if_production_enqueue_args(
+      :remove_user_as_final_grader_immediately,
+      {
+        strand: "Assignment.remove_user_as_final_grader:#{strand_identifier}",
+        max_attempts: 1,
+        priority: Delayed::LOW_PRIORITY,
+      },
+      user_id,
+      course_id
+    )
+  end
+
+  def self.remove_user_as_final_grader_immediately(user_id, course_id)
+    Assignment.where(context_id: course_id, context_type: 'Course', final_grader_id: user_id).find_each do |assignment|
+      # going this route instead of doing an update_all so that we create a new
+      # assignment version when this update happens
+      assignment.update!(final_grader_id: nil)
     end
   end
 
@@ -2735,6 +2758,22 @@ class Assignment < ActiveRecord::Base
     ContextExternalTool.opaque_identifier_for(external_tool_tag, shard)
   end
 
+  def available_moderators
+    moderators = course.moderators
+    return moderators if final_grader_id.blank?
+
+    # This captures scenarios where a user is selected as the final grader
+    # for an assignment, and then afterwards they are deactivated or concluded,
+    # or their 'Select Final Grade' permission is revoked. In these cases, we
+    # still want to keep that user as the moderator for the assignment (even
+    # though that user will not be included in the course.moderators list)
+    # because a workflow state (excluding a change to 'deleted') or permission
+    # change should have no bearing on their moderator status (this is a
+    # product decision).
+    moderators << final_grader if moderators.exclude?(final_grader)
+    moderators
+  end
+
   private
 
   def due_date_ok?
@@ -2794,9 +2833,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def final_grader_ok?
-    # TODO: once we can set a final grader via the UI, remove this early return
-    # and require a non-null final grader.
-    return if final_grader.blank?
+    return unless final_grader_id_changed?
+    return if final_grader_id.blank?
 
     if grader_section_id && grader_section.instructor_enrollments.where(user_id: final_grader_id, workflow_state: 'active').empty?
       errors.add(:final_grader, 'Final grader must be enrolled in selected section')
