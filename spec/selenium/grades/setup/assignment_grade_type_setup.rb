@@ -20,7 +20,7 @@ require_relative '../../helpers/gradezilla_common'
 module AssignmentGradeTypeSetup
   include GradezillaCommon
 
-  def entering_grades_setup(grading_type, grade)
+  def assignments_with_grades_setup(grading_type, grade)
     init_course_with_students 1
     @assignment = @course.assignments.create!(grading_type: grading_type, points_possible: 10)
     @assignment.grade_student(@students[0], grade: grade, grader: @teacher)

@@ -26,7 +26,7 @@ describe "Gradezilla" do
 
   describe 'complete/incomplete assignment grading' do
     before :once do
-      entering_grades_setup('pass_fail','pass')
+      assignments_with_grades_setup('pass_fail', 'pass')
     end
 
     before :each do
