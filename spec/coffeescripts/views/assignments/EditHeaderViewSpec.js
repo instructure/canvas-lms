@@ -28,7 +28,7 @@ const defaultAssignmentOpts = {
   name: 'Test Assignment',
   assignment_overrides: []
 }
-const editHeaderView = function(assignmentOptions = {}, viewOptions = {}) {
+const editHeaderView = function(assignmentOptions = {}, viewOptions = {}, beforeRender) {
   Object.assign(assignmentOptions, defaultAssignmentOpts)
   const assignment = new Assignment(assignmentOptions)
   const app = new EditHeaderView({
@@ -36,6 +36,7 @@ const editHeaderView = function(assignmentOptions = {}, viewOptions = {}) {
     views: {edit_assignment_form: new Backbone.View({template: editViewTemplate})},
     userIsAdmin: viewOptions.userIsAdmin
   })
+  if (beforeRender) beforeRender(app)
   return app.render()
 }
 
@@ -59,6 +60,25 @@ test('should be accessible', assert => {
 test('renders', () => {
   const view = editHeaderView()
   ok(view.$('.header-bar-right').length > 0, 'header bar is rendered')
+})
+
+test('renders the moderated grading form field group if Anonymous Moderated Marking is enabled', () => {
+  ENV.ANONYMOUS_MODERATED_MARKING_ENABLED = true
+  function beforeRender(editView) {
+    sinon.stub(editView.model, 'renderModeratedGradingFormFieldGroup')
+  }
+  const view = editHeaderView({}, {}, beforeRender)
+  strictEqual(view.model.renderModeratedGradingFormFieldGroup.callCount, 1)
+  view.model.renderModeratedGradingFormFieldGroup.restore()
+})
+
+test('does not render the moderated grading form field group if Anonymous Moderated Marking is disabled', () => {
+  function beforeRender(editView) {
+    sinon.stub(editView.model, 'renderModeratedGradingFormFieldGroup')
+  }
+  const view = editHeaderView({}, {}, beforeRender)
+  strictEqual(view.model.renderModeratedGradingFormFieldGroup.callCount, 0)
+  view.model.renderModeratedGradingFormFieldGroup.restore()
 })
 
 test('delete works for an un-saved assignment', function() {

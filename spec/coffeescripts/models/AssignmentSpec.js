@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import React from 'react'
 import Assignment from 'compiled/models/Assignment'
 import Submission from 'compiled/models/Submission'
 import DateGroup from 'compiled/models/DateGroup'
@@ -158,6 +159,23 @@ test("when value 'assignment', sets record value to 'none'", () => {
   assignment.assignmentType('assignment')
   equal(assignment.assignmentType(), 'assignment')
   deepEqual(assignment.get('submission_types'), ['none'])
+})
+
+QUnit.module('Assignment#moderatedGrading', () => {
+  test('returns false if the moderated_grading attribute is undefined', () => {
+    const assignment = new Assignment()
+    strictEqual(assignment.moderatedGrading(), false)
+  })
+
+  test('returns false if the moderated_grading attribute is set to false', () => {
+    const assignment = new Assignment({ moderated_grading: false })
+    strictEqual(assignment.moderatedGrading(), false)
+  })
+
+  test('returns true if the moderated_grading attribute is set to true', () => {
+    const assignment = new Assignment({ moderated_grading: true })
+    strictEqual(assignment.moderatedGrading(), true)
+  })
 })
 
 QUnit.module('Assignment#assignmentType as a getter')
@@ -1142,4 +1160,55 @@ test('stops polling when the assignment has finished duplicating', function () {
   ok(this.assignment.fetch.calledOnce)
   this.clock.tick(3000)
   ok(this.assignment.fetch.calledOnce)
+})
+
+QUnit.module('Assignment#renderModeratedGradingFormFieldGroup', (hooks) => {
+  const fixtures = document.getElementById('fixtures')
+  const availableModerators = [{ name: 'John Doe', id: '21' }, { name: 'Jane Doe', id: '89' }]
+  const mountPointID = 'ModeratedGradingFormFieldGroup'
+
+  hooks.beforeEach(() => {
+    fakeENV.setup({ ANONYMOUS_MODERATED_MARKING_ENABLED: false, AVAILABLE_MODERATORS: availableModerators })
+    fixtures.innerHTML = `<span data-component="${mountPointID}"></span>`
+  })
+
+  hooks.afterEach(() => {
+    fixtures.innerHTML = ''
+  })
+
+  test('renders the moderated grading form field group', () => {
+    const assignment = new Assignment()
+    assignment.renderModeratedGradingFormFieldGroup()
+    strictEqual(document.getElementsByClassName('ModeratedGrading__Container').length, 1)
+  })
+
+  test('passes the final_grader_id as a prop to the component', () => {
+    const assignment = new Assignment()
+    assignment.set('final_grader_id', '293')
+    sinon.spy(React, 'createElement')
+    assignment.renderModeratedGradingFormFieldGroup()
+    const [,props] = React.createElement.getCall(0).args
+    strictEqual(props.finalGraderID, '293')
+    React.createElement.restore()
+  })
+
+  test('passes moderated_grading as a prop to the component', () => {
+    const assignment = new Assignment()
+    assignment.set('moderated_grading', true)
+    sinon.spy(React, 'createElement')
+    assignment.renderModeratedGradingFormFieldGroup()
+    const [,props] = React.createElement.getCall(0).args
+    strictEqual(props.moderatedGradingEnabled, true)
+    React.createElement.restore()
+  })
+
+  test('passes available moderators in the ENV as a prop to the component', () => {
+    const assignment = new Assignment()
+    assignment.set('moderated_grading', true)
+    sinon.spy(React, 'createElement')
+    assignment.renderModeratedGradingFormFieldGroup()
+    const [,props] = React.createElement.getCall(0).args
+    strictEqual(props.availableModerators, availableModerators)
+    React.createElement.restore()
+  })
 })

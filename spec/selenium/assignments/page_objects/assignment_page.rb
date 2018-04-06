@@ -32,7 +32,7 @@ class AssignmentPage
     end
 
     def select_grader_dropdown
-      f("select[name='grader-dropdown']")
+      f("select[name='final_grader_id']")
     end
 
     def moderate_checkbox

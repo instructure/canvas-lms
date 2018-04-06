@@ -19,6 +19,8 @@ define [
   'jquery'
   'underscore'
   'Backbone'
+  'react'
+  'react-dom'
   '../backbone-ext/DefaultUrlMixin'
   '../models/TurnitinSettings'
   '../models/VeriCiteSettings'
@@ -27,11 +29,13 @@ define [
   '../collections/DateGroupCollection'
   'i18n!assignments'
   'jsx/grading/helpers/GradingPeriodsHelper'
+  'jsx/assignments/ModeratedGradingFormFieldGroup.js'
   'timezone'
   'jsx/shared/helpers/numberHelper'
   '../util/PandaPubPoller'
-], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, VeriCiteSettings, DateGroup, AssignmentOverrideCollection,
-    DateGroupCollection, I18n, GradingPeriodsHelper, tz, numberHelper, PandaPubPoller) ->
+], ($, _, {Model}, React, ReactDOM, DefaultUrlMixin, TurnitinSettings, VeriCiteSettings, DateGroup,
+    AssignmentOverrideCollection, DateGroupCollection, I18n, GradingPeriodsHelper, ModeratedGradingFormFieldGroup,
+    tz, numberHelper, PandaPubPoller) ->
 
   isAdmin = () ->
     _.contains(ENV.current_user_roles, 'admin')
@@ -197,9 +201,9 @@ define [
       return @get 'post_to_sis' unless arguments.length > 0
       @set 'post_to_sis', postToSisBoolean
 
-    moderatedGrading: (moderatedGradingBoolean) =>
-      return @get 'moderated_grading' unless arguments.length > 0
-      @set 'moderated_grading', moderatedGradingBoolean
+    moderatedGrading: (enabled) =>
+      return @get('moderated_grading') or false unless arguments.length > 0
+      @set('moderated_grading', enabled)
 
     anonymousInstructorAnnotations: (anonymousInstructorAnnotationsBoolean) =>
       return @get 'anonymous_instructor_annotations' unless arguments.length > 0
@@ -565,3 +569,13 @@ define [
 
     isRestrictedByMasterCourse: ->
       @get('is_master_course_child_content') && @get('restricted_by_master_course')
+
+    renderModeratedGradingFormFieldGroup: ->
+      props =
+        finalGraderID: @get('final_grader_id')
+        moderatedGradingEnabled: @moderatedGrading()
+        availableModerators: ENV.AVAILABLE_MODERATORS
+
+      formFieldGroup = React.createElement(ModeratedGradingFormFieldGroup, props)
+      mountPoint = document.querySelector("[data-component='ModeratedGradingFormFieldGroup']")
+      ReactDOM.render(formFieldGroup, mountPoint)

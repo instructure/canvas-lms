@@ -63,6 +63,7 @@ describe "moderated grading assignments" do
       # turn on the moderation flag
       Account.default.enable_feature!(:anonymous_moderated_marking)
       Account.default.enable_feature!(:anonymous_marking)
+      Account.default.enable_feature!(:moderated_grading)
       @moderated_assignment = @course.assignments.create!(
         title: 'Moderated Assignment',
         submission_types: 'online_text_entry',
@@ -85,7 +86,6 @@ describe "moderated grading assignments" do
     end
 
     it "should allow user to select final moderator", priority: "1", test_id: 3482530 do
-      skip('This is skeleton code that acts as AC for GRADE-973 which is WIP')
       AssignmentPage.select_moderate_checkbox
       AssignmentPage.select_grader_dropdown.click
       expect(AssignmentPage.select_grader_dropdown).to include_text(@teacher_two.name)
