@@ -211,6 +211,7 @@ module CC
           node.rubric_external_identifier assignment.rubric.id
         end
         node.rubric_use_for_grading assoc.use_for_grading
+        node.rubric_hide_points !!assoc.hide_points
         node.rubric_hide_score_total !!assoc.hide_score_total
         if assoc.summary_data && assoc.summary_data[:saved_comments]
           node.saved_rubric_comments do |sc_node|
