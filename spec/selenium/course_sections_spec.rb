@@ -97,6 +97,35 @@ describe "course sections" do
     expect(@section.end_at).to eq(Date.new(2015, 3, 4))
   end
 
+  context "account admin" do
+    before do
+      Account.default.role_overrides.create! role: Role.get_built_in_role('AccountAdmin'), permission: 'manage_sis', enabled: true
+      @subaccount = Account.default.sub_accounts.create! name: 'sub'
+      course_factory account: @subaccount
+      @section = @course.course_sections.create! name: 'sec'
+    end
+
+    it "lets a root account admin modify the sis ID" do
+      account_admin_user account: Account.default
+      user_session @admin
+      get "/courses/#{@course.id}/sections/#{@section.id}"
+
+      f('.edit_section_link').click
+      edit_form = f('#edit_section_form')
+      expect(edit_form).to contain_css('input#course_section_sis_source_id')
+    end
+
+    it "does not let a subaccount admin modify the sis ID" do
+      account_admin_user account: @subaccount
+      user_session @admin
+      get "/courses/#{@course.id}/sections/#{@section.id}"
+
+      f('.edit_section_link').click
+      edit_form = f('#edit_section_form')
+      expect(edit_form).not_to contain_css('input#course_section_sis_source_id')
+    end
+  end
+
   context "student tray" do
 
     before(:each) do

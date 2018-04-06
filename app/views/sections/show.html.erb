@@ -127,12 +127,12 @@ h3 .tally {
     <td><%= f.blabel :name, :en => "Section Name" %></td>
     <td><%= f.text_field :name %></td>
   </tr>
-  <% if @section.sis_source_id && can_do(@context, @current_user, :read_sis) || can_do(@context, @current_user, :manage_sis) %>
+  <% if @section.sis_source_id && can_do(@context, @current_user, :read_sis) || can_do(@context.root_account, @current_user, :manage_sis) %>
     <tr>
       <td><%= f.blabel :sis_source_id, :en => "SIS ID" %></td>
       <td>
         <span class="course_form">
-          <% if can_do(@context, @current_user, :manage_sis) %>
+          <% if can_do(@context.root_account, @current_user, :manage_sis) %>
             <%= f.text_field :sis_source_id, :style => "width: 50px;", :title => "SIS ID", :value => @section.sis_source_id %>
           <% else %>
             <%= @section.sis_source_id %>
