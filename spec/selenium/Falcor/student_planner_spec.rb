@@ -369,6 +369,20 @@ describe "student planner" do
       expect(fj("h2:contains('No Due Dates Assigned')")).to be_displayed
     end
 
+    it "groups the to-do item with other course items", priority: "1", test_id: 3482560 do
+      skip('unskip with ADMIN-917')
+      @assignment = @course.assignments.create({
+                                                 name: 'Assignment 1',
+                                                 due_at: Time.zone.now + 1.day,
+                                                 submission_types: 'online_text_entry'
+                                               })
+      @student1.planner_notes.create!(todo_date: Time.zone.now + 1.day, title: "Title Text", course_id: @course.id)
+      go_to_list_view
+      course_group = f('ol', f('.PlannerApp'))
+      group_items = ff('li', course_group)
+      expect(group_items.count).to eq(2)
+    end
+
     it "allows date of a to-do item to be edited", priority: "1", test_id: 3402913 do
       view_todo_item
       element = ff('input', @modal)[1]
@@ -388,7 +402,7 @@ describe "student planner" do
       expect(format_date_for_view(@student_to_do.todo_date, :long)).to eq(day)
     end
 
-    it "adds date and time to a to-do item", priority: "1", test_id: 222222 do
+    it "adds date and time to a to-do item", priority: "1", test_id: 3482559 do
       skip('unskip with ADMIN-298')
       go_to_list_view
       todo_modal_button.click
