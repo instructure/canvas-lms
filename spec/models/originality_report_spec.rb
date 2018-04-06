@@ -285,6 +285,32 @@ describe OriginalityReport do
       end.not_to change(OriginalityReport, :count)
     end
 
+    context 'with sharding' do
+      specs_require_sharding
+
+      let(:new_shard) { Shard.create! }
+      let(:new_shard_attachment) { new_shard.activate { attachment_model } }
+      let(:submission) { submission_model }
+
+      it 'allows cross-shard attachment associations' do
+        report = OriginalityReport.create!(
+          submission: submission,
+          originality_score: 50,
+          attachment: new_shard_attachment
+        )
+        expect(report.attachment).to eq new_shard_attachment
+      end
+
+      it 'allows cross-shard report attachment associations' do
+        report = OriginalityReport.create!(
+          submission: submission,
+          originality_score: 50,
+          originality_report_attachment: new_shard_attachment
+        )
+        expect(report.originality_report_attachment).to eq new_shard_attachment
+      end
+    end
+
     context 'when lti link is present' do
       let!(:link) do
         Lti::Link.create!(
