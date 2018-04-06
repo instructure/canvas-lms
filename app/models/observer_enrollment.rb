@@ -21,6 +21,10 @@ class ObserverEnrollment < Enrollment
     true
   end
 
+  def pipeline_serializer
+    PipelineService::Serializers::Enrollment
+  end
+
   def self.observed_enrollments_for_courses(contexts, user)
     contexts = Array(contexts)
     observed_students = []

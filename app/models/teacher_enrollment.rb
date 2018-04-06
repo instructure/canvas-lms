@@ -20,4 +20,8 @@ class TeacherEnrollment < Enrollment
   def teacher?
     true
   end
+
+  def pipeline_serializer
+    PipelineService::Serializers::Enrollment
+  end
 end
