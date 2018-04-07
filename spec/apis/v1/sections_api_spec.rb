@@ -385,6 +385,15 @@ describe SectionsController, type: :request do
         expect(section.sis_batch_id).to eq nil
       end
 
+      it "should set the integration_id by itself" do
+        section_params = {name: 'Name', integration_id: 'int1'}
+        json = api_call(:post, @path_prefix, @path_params, {course_section: section_params})
+        @course.reload
+        section = @course.active_course_sections.find(json['id'].to_i)
+        expect(section.name).to eq 'Name'
+        expect(section.integration_id).to eq 'int1'
+      end
+
       it "should allow reactivating deleting sections using sis_section_id" do
         old_section = @course.course_sections.create!
         old_section.sis_source_id = 'fail'
