@@ -152,10 +152,9 @@ class SectionsController < ApplicationController
     if authorized_action(@context.course_sections.temp_record, @current_user, :create)
       sis_section_id = params[:course_section].try(:delete, :sis_section_id)
       integration_id = params[:course_section].try(:delete, :integration_id)
-      can_manage_sis = api_request? && sis_section_id.present? &&
-        @context.root_account.grants_right?(@current_user, session, :manage_sis)
+      can_manage_sis = api_request? && @context.root_account.grants_right?(@current_user, session, :manage_sis)
 
-      if can_manage_sis && value_to_boolean(params[:enable_sis_reactivation])
+      if can_manage_sis && sis_section_id.present? && value_to_boolean(params[:enable_sis_reactivation])
         @section = @context.course_sections.where(:sis_source_id => sis_section_id, :workflow_state => 'deleted').first
         @section.workflow_state = 'active' if @section
       end
