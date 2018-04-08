@@ -36,9 +36,7 @@ describe SIS::CSV::GradePublishingResultsImporter do
   end
 
   it 'should properly update the db' do
-    course_with_student
-    @course.account = @account
-    @course.save!
+    course_with_student(account: @account)
 
     @enrollment.grade_publishing_status = 'publishing'
     @enrollment.save!
@@ -52,9 +50,7 @@ describe SIS::CSV::GradePublishingResultsImporter do
   end
 
   it 'should properly pass in messages' do
-    course_with_student
-    @course.account = @account
-    @course.save!
+    course_with_student(account: @account)
 
     @enrollment.grade_publishing_status = 'publishing'
     @enrollment.save!
