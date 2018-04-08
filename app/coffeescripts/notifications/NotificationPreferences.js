@@ -76,8 +76,7 @@ export default class NotificationPreferences {
         email: I18n.t('communication.email.display', 'Email Address'),
         sms: I18n.t('communication.sms.display', 'Cell Number'),
         push: I18n.t('communication.push.display', 'Push Notification'),
-        twitter: I18n.t('communication.twitter.display', 'Twitter'),
-        yo: I18n.t('communication.yo.display', 'Yo')
+        twitter: I18n.t('communication.twitter.display', 'Twitter')
       }[c.type]
     })
     // Setup the mappings

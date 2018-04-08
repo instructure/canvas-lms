@@ -1,5 +1,5 @@
-<%
-# Copyright (C) 2014 - present Instructure, Inc.
+#
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,21 +14,12 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-%>
+#
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
-  <table style="width: 500px;" class="formtable">
-    <tr>
-      <td colspan="2"><%= mt(:description, <<-TEXT, :yo_url => 'http://dev.justyo.co')
-You will need an [api token from Yo](%{yo_url}).
-TEXT
-      %></td>
-    </tr>
-    <tr>
-      <td><%= f.blabel :api_token, :en => "Api token" %></td>
-      <td>
-        <%= f.text_field :api_token %>
-      </td>
-    </tr>
-  </table>
-<% end %>
+class DeleteYoCommunicationChannels < ActiveRecord::Migration[5.1]
+  tag :postdeploy
+
+  def up
+    CommunicationChannel.where(path_type: 'yo').delete_all
+  end
+end

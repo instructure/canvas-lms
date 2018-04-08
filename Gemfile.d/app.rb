@@ -114,7 +114,6 @@ gem 'shackles', '1.4.0'
 gem 'useragent', '0.16.10', require: false
 
 gem 'crocodoc-ruby', '0.0.1', require: false
-gem 'hey', '1.3.1', require: false
 gem 'sentry-raven', '2.7.2', require: false
 gem 'canvas_statsd', '2.0.4'
   gem 'statsd-ruby', '1.4.0', require: false

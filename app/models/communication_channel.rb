@@ -51,7 +51,6 @@ class CommunicationChannel < ActiveRecord::Base
   TYPE_SMS      = 'sms'
   TYPE_TWITTER  = 'twitter'
   TYPE_PUSH     = 'push'
-  TYPE_YO       = 'yo'
 
   RETIRE_THRESHOLD = 1
 
@@ -254,16 +253,12 @@ class CommunicationChannel < ActiveRecord::Base
       Pseudonym.where(:sis_communication_channel_id => self).exists?
   end
 
-  # Return the 'path' for simple communication channel types like email and sms. For
-  # Yo and Twitter, return the user's configured user_name for the service.
+  # Return the 'path' for simple communication channel types like email and sms.
+  # For Twitter, return the user's configured user_name for the service.
   def path_description
     if self.path_type == TYPE_TWITTER
       res = self.user.user_services.for_service(TYPE_TWITTER).first.service_user_name rescue nil
       res ||= t :default_twitter_handle, 'Twitter Handle'
-      res
-    elsif self.path_type == TYPE_YO
-      res = self.user.user_services.for_service(TYPE_YO).first.service_user_name rescue nil
-      res ||= t :default_yo_name, 'Yo Name'
       res
     elsif self.path_type == TYPE_PUSH
       t 'For All Devices'
@@ -372,7 +367,6 @@ class CommunicationChannel < ActiveRecord::Base
     rank_order = [TYPE_EMAIL, TYPE_SMS, TYPE_PUSH]
     # Add twitter and yo (in that order) if the user's account is setup for them.
     rank_order << TYPE_TWITTER if twitter_service
-    rank_order << TYPE_YO unless user.user_services.for_service(CommunicationChannel::TYPE_YO).empty?
     self.unretired.where('communication_channels.path_type IN (?)', rank_order).
       order("#{self.rank_sql(rank_order, 'communication_channels.path_type')} ASC, communication_channels.position asc").to_a
   end
@@ -443,7 +437,7 @@ class CommunicationChannel < ActiveRecord::Base
 
   # This is setup as a default in the database, but this overcomes misspellings.
   def assert_path_type
-    valid_types = [TYPE_EMAIL, TYPE_SMS, TYPE_TWITTER, TYPE_PUSH, TYPE_YO]
+    valid_types = [TYPE_EMAIL, TYPE_SMS, TYPE_TWITTER, TYPE_PUSH]
     self.path_type = TYPE_EMAIL unless valid_types.include?(path_type)
     true
   end

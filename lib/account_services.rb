@@ -51,12 +51,6 @@ module AccountServices
             :expose_to_ui => :service,
             :expose_to_ui_proc => proc { !!Twitter::Connection.config }
         },
-        :yo => {
-            :name => I18n.t("Yo"),
-            :description => "",
-            :expose_to_ui => :service,
-            :expose_to_ui_proc => proc { !!Canvas::Plugin.find(:yo).try(:enabled?) }
-        },
         :delicious => {
             :name => I18n.t("Delicious"),
             :description => "",

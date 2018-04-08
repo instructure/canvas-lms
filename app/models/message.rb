@@ -16,8 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'hey'
-
 class Message < ActiveRecord::Base
   # Included modules
   include Rails.application.routes.url_helpers
@@ -827,21 +825,6 @@ class Message < ActiveRecord::Base
     msg_id = AssetSignature.generate(self)
     Twitter::Messenger.new(self, twitter_service, host, msg_id).deliver
     complete_dispatch
-  end
-
-  # Internal: Deliver the message through Yo.
-  #
-  # Returns nothing.
-  def deliver_via_yo
-    plugin = Canvas::Plugin.find(:yo)
-    if plugin && plugin.enabled? && plugin.setting(:api_token)
-      service = self.user.user_services.where(service: 'yo').first
-      Hey.api_token ||= plugin.setting(:api_token)
-      Hey::Yo.user(service.service_user_id, link: self.url)
-      complete_dispatch
-    else
-      cancel
-    end
   end
 
   # Internal: Send the message through SMS. This currently sends it via Twilio if the recipient is a E.164 phone
