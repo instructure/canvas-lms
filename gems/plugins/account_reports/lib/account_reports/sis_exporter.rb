@@ -529,28 +529,6 @@ module AccountReports
       headers
     end
 
-    def loaded_pseudonym(pseudonyms, u, include_deleted: false, enrollment: nil)
-      context = enrollment || root_account
-      user_pseudonyms = pseudonyms[u.id] || []
-      u.instance_variable_set(include_deleted ? :@all_pseudonyms : :@all_active_pseudonyms, user_pseudonyms)
-      SisPseudonym.for(u, context, {type: :trusted, require_sis: false, include_deleted: include_deleted})
-    end
-
-    def load_cross_shard_logins(users, include_deleted: false)
-      shards = root_account.trusted_account_ids.map {|id| Shard.shard_for(id)}
-      shards << root_account.shard
-      User.preload_shard_associations(users)
-      shards = shards & users.map(&:associated_shards).flatten
-      pseudonyms = Pseudonym.shard(shards.uniq).where(user_id: users)
-      pseudonyms = pseudonyms.active unless include_deleted
-      pseudonyms.each do |p|
-        p.account = root_account if p.account_id == root_account.id
-      end
-      preloads = Account.reflections['role_links'] ? { account: :role_links } : :account
-      ActiveRecord::Associations::Preloader.new.preload(pseudonyms, preloads)
-      pseudonyms.group_by(&:user_id)
-    end
-
     def groups
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
