@@ -101,7 +101,7 @@ describe SisBatch do
 
   describe "parallel imports" do
     it "should do cool stuff" do
-      PluginSetting.create!(:name => 'sis_import', :settings => {:minimum_rows_for_parallel => 2})
+      PluginSetting.create!(name: 'sis_import', settings: {parallelism: '12'})
       @account.enable_feature!(:refactor_of_sis_imports)
       batch = process_csv_data([
         %{user_id,login_id,status
@@ -114,13 +114,20 @@ describe SisBatch do
           course_3,course_3,course_3,term_1,active
           course_4,course_4,course_4,term_1,active}
       ])
+      expect(Setting.get("sis_parallel_import/#{@account.global_id}_num_strands", "1")).to eq '12'
       expect(batch.reload).to be_imported
-      expect(batch.parallel_importers.group(:importer_type).count).to eq({"course" => 2, "user" => 2})
+      expect(batch.parallel_importers.group(:importer_type).count).to eq({"course" => 1, "user" => 1})
       expect(batch.parallel_importers.order(:id).pluck(:importer_type, :rows_processed)).to eq [
-        ['course', 2], ['course', 2], ['user', 2], ['user', 1]
+        ['course', 4], ['user', 3]
       ]
       expect(Pseudonym.where(:sis_user_id => %w{user_1 user_2 user_3}).count).to eq 3
       expect(Course.where(:sis_source_id => %w{course_1 course_2 course_3 course_4}).count).to eq 4
+    end
+
+    it 'should set rows_for_parallel' do
+      expect(SisBatch.rows_for_parallel(10)).to eq 25
+      expect(SisBatch.rows_for_parallel(4_001)).to eq 41
+      expect(SisBatch.rows_for_parallel(400_000)).to eq 1_000
     end
   end
 
