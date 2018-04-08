@@ -120,6 +120,13 @@ class SisBatch < ActiveRecord::Base
     end
   end
 
+  def self.rows_for_parallel(rows)
+    # Try to have 100 jobs but don't have a job that processes less than 25
+    # rows but also not more than 1000 rows.
+    # Progress is calculated on the number of jobs remaining.
+    [[(rows/100.to_f).ceil, 25].max, 1000].min
+  end
+
   workflow do
     state :initializing
     state :created
