@@ -97,7 +97,7 @@ Object.assign(CommonEvent.prototype, {
   },
 
   addClass(newClass) {
-    this.className = [...new Set([...this.className, newClass])]
+    this.className.push(newClass)
   },
 
   removeClass(rmClass) {
