@@ -97,6 +97,7 @@ describe "announcements" do
     end
 
     it "should create a delayed announcement", priority: "1", test_id: 150531 do
+      skip("Skipping flaky test, see COMMS-1051")
       get course_announcements_path(@course)
       create_announcement_option('input[type=checkbox][name=delay_posting]')
       f('.ui-datepicker-trigger').click
@@ -107,6 +108,7 @@ describe "announcements" do
     end
 
     it "allows creating a delayed announcement with an attachment", priority: "1", test_id: 220369 do
+      skip("Skipping flaky test, see COMMS-1051")
       get course_announcements_path(@course)
       create_announcement_option('input[type=checkbox][name=delay_posting]')
       f('.ui-datepicker-trigger').click
