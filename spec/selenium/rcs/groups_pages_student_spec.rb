@@ -72,6 +72,7 @@ describe "groups" do
       end
 
       it "should allow all group members to see announcements", priority: "1", test_id: 273613 do
+        skip("Skipping flaky test, see COMMS-1051")
         @announcement = @testgroup.first.announcements.create!(
           title: 'Group Announcement',
           message: 'Group',
