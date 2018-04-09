@@ -51,7 +51,7 @@ describe "submissions" do
       type_in_tiny("#submission_body", 'text')
       f('button[type="submit"]').click
 
-      expect(f("#sidebar_content")).to include_text("Turned In!")
+      expect(f("#sidebar_content")).to include_text("Submitted!")
       expect(f("#content")).not_to contain_css(".error_text")
     end
 
@@ -74,7 +74,7 @@ describe "submissions" do
       # when
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       # expect
-      expect(f('#sidebar_content .details')).to include_text "Not Turned In!"
+      expect(f('#sidebar_content .details')).to include_text "Not Submitted!"
       expect(f('.submit_assignment_link')).to include_text "Submit Assignment"
     end
 

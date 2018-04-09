@@ -34,10 +34,10 @@
     <div class="header">
       <% if @current_user_submission.has_submission? %>
         <i class="icon-check" aria-hidden="true"></i>
-        <%= t 'titles.submission_turned_in', "Turned In!" %>
+        <%= t 'titles.submission_turned_in', "Submitted!" %>
       <% else %>
         <i class="icon-x" aria-hidden="true"></i>
-        <%= t 'titles.submission_not_turned_in', "Not Turned In!" %>
+        <%= t 'titles.submission_not_turned_in', "Not Submitted!" %>
       <% end %>
     </div>
   <% end %>
