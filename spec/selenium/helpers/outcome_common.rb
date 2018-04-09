@@ -129,6 +129,7 @@ module OutcomeCommon
     ## when
     # create outcome
     f('.add_outcome_link').click
+    wait_for_tiny(f('.outcomes-content textarea[name=description]'))
     outcome_name = 'first new outcome'
     outcome_description = 'new learning outcome'
     replace_content f('.outcomes-content input[name=title]'), outcome_name
@@ -171,6 +172,7 @@ module OutcomeCommon
     ## when
     # create group
     f('.add_outcome_group').click
+    wait_for_tiny(f('.outcomes-content textarea[name=description]'))
     group_title = 'my group'
     replace_content f('.outcomes-content input[name=title]'), group_title
     # submit
@@ -216,6 +218,7 @@ module OutcomeCommon
     wait_for_ajaximations
     f('.edit_button').click
     wait_for_ajaximations
+    wait_for_tiny(f('.outcomes-content textarea[name=description]'))
 
     ## when
     # edit title
@@ -271,6 +274,7 @@ module OutcomeCommon
   def should_validate_decaying_average_range
     get outcome_url
     f('.add_outcome_link').click
+    wait_for_tiny(f('.outcomes-content textarea[name=description]'))
     below_range = 0
     above_range = 100
     replace_content(f('.outcomes-content input[name=title]'), 'Decaying Average')
@@ -294,6 +298,7 @@ module OutcomeCommon
   def should_validate_n_mastery_range
     get outcome_url
     f('.add_outcome_link').click
+    wait_for_tiny(f('.outcomes-content textarea[name=description]'))
     below_range = 0
     above_range = 6
     replace_content(f('.outcomes-content input[name=title]'), 'n Number of Times')
@@ -320,6 +325,7 @@ module OutcomeCommon
     ## when
     # create group
     f('.add_outcome_group').click
+    wait_for_tiny(f('.outcomes-content textarea[name=description]'))
     group_title = 'my group'
     replace_content f('.outcomes-content input[name=title]'), group_title
     # submit
@@ -343,6 +349,7 @@ module OutcomeCommon
     ## when
     # create group
     f('.add_outcome_group').click
+    wait_for_tiny(f('.outcomes-content textarea[name=description]'))
     group_title = 'my group'
     replace_content f('.outcomes-content input[name=title]'), group_title
     wait_for_animations
@@ -353,6 +360,7 @@ module OutcomeCommon
 
     # create nested group
     f('.add_outcome_group').click
+    wait_for_tiny(f('.outcomes-content textarea[name=description]'))
     nested_group_title = 'my nested group'
     replace_content f('.outcomes-content input[name=title]'), nested_group_title
     wait_for_animations
@@ -387,10 +395,10 @@ module OutcomeCommon
     outcome_group_model
     get outcome_url
 
-
     fj('.outcomes-sidebar .outcome-level:first li.outcome-group').click
 
     f('.edit_button').click
+    wait_for_tiny(f('.outcomes-content textarea[name=description]'))
     expect(f('.outcomes-content input[name=title]')).to be_displayed
 
     replace_content f('.outcomes-content input[name=title]'), edited_title
