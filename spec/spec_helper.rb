@@ -383,6 +383,11 @@ RSpec.configure do |config|
     end
 
     Timecop.safe_mode = true
+
+    # cache brand variables because if we try to look them up inside a Timecop
+    # block, we will conflict our active record patch to prevent future
+    # migrations.
+    BrandableCSS.default_variables_md5
   end
 
   config.before do
