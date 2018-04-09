@@ -20,7 +20,7 @@ require_relative '../../helpers/gradebook_common'
 
 describe GradeSummaryPresenter do
   include_context 'in-process server selenium tests'
-  include_context 'reusable_course'
+  include_context 'reusable_gradebook_course'
 
   describe 'deleted submissions', priority: "2" do
     it 'should navigate to grade summary page' do

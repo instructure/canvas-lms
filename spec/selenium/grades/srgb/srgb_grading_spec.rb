@@ -21,7 +21,7 @@ require_relative '../setup/gradebook_setup'
 
 describe 'Screenreader Gradebook grading' do
   include_context 'in-process server selenium tests'
-  include_context 'reusable_course'
+  include_context 'reusable_gradebook_course'
   include GradebookCommon
   include GradebookSetup
 

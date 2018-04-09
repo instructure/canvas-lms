@@ -22,7 +22,7 @@ require_relative '../pages/grading_curve_page'
 
 describe "Screenreader Gradebook" do
   include_context 'in-process server selenium tests'
-  include_context 'reusable_course'
+  include_context 'reusable_gradebook_course'
   include GradebookCommon
 
   let(:default_gradebook) { "/courses/#{@course.id}/gradebook/change_gradebook_version?version=2" }
