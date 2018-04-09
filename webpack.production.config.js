@@ -1,14 +1,19 @@
 process.env.NODE_ENV = 'production'
 
 const productionWebpackConfig = require('./frontend_build/baseWebpackConfig')
-const ParallelUglifyPlugin = require('webpack-parallel-uglify-plugin')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 if (!process.env.JS_BUILD_NO_UGLIFY) {
   productionWebpackConfig.plugins.push(
-    new ParallelUglifyPlugin({
+    new UglifyJsPlugin({
       sourceMap: true,
-      uglifyJS: {
-        ie8: false
+      parallel: true,
+      uglifyOptions: {
+        ecma: 5,
+        output: {
+          comments: false,
+        },
+        safari10: true,
       }
     })
   )

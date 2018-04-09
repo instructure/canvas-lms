@@ -157,7 +157,7 @@
     "webpack": "^3",
     "webpack-cleanup-plugin": "^0.5",
     "webpack-manifest-plugin": "^1",
-    "webpack-parallel-uglify-plugin": "^1",
+    "uglifyjs-webpack-plugin": "^1.2",
     "xsslint": "0.1.4",
     "yaml-loader": "^0.5"
   },
