@@ -42,7 +42,7 @@ describe Message do
     end
 
     it 'should sanitize html' do
-      expect_any_instance_of(Message).to receive(:load_html_template).and_return <<-ZOMGXSS
+      expect_any_instance_of(Message).to receive(:load_html_template).and_return [<<-ZOMGXSS, 'template.html.erb']
         <b>Your content</b>: <%= "<script>alert()</script>" %>
       ZOMGXSS
       user         = user_factory(active_all: true)
