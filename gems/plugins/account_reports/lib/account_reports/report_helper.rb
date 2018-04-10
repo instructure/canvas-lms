@@ -294,6 +294,8 @@ module AccountReports::ReportHelper
         write_report headers do |csv|
           @account_report.account_report_rows.order(:account_report_runner_id, :row_number).find_each {|record| csv << record.row}
         end
+        # total lines was used to track progress but was not accurate.
+        @account_report.update_attributes(total_lines: @account_report.current_line)
         @account_report.delete_account_report_rows
       end
     end
@@ -327,7 +329,11 @@ module AccountReports::ReportHelper
     updates = {}
     updates[:current_line] = current_line if account_report.current_line < current_line
     updates[:progress] = progress if account_report.progress < progress
-    Shackles.activate(:master) {account_report.update_attributes(updates)} unless updates.empty?
+    unless updates.empty?
+      Shackles.activate(:master) do
+        AccountReport.where(id: account_report).where("progress <?", progress).update_all(updates)
+      end
+    end
   end
 
   def last_account_report_runner?(account_report)
