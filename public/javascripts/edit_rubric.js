@@ -19,6 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import RubricAddCriterionPopover from 'jsx/rubrics/RubricAddCriterionPopover'
+import RubricManagement from 'jsx/rubrics/RubricManagement'
 import I18n from 'i18n!edit_rubric'
 import changePointsPossibleToMatchRubricDialog from 'jst/changePointsPossibleToMatchRubricDialog'
 import $ from 'jquery'
@@ -1200,5 +1201,13 @@ import 'compiled/jquery/fixDialogButtons'
     setInterval(rubricEditing.sizeRatings, 10000);
     $.publish('edit_rubric/initted')
   };
+
+  if (document.getElementById("rubric_management") && ENV.NON_SCORING_RUBRICS && ENV.PERMISSIONS.manage_outcomes) {
+    $('h1').hide()
+    ReactDOM.render(
+      <RubricManagement />,
+      document.getElementById("rubric_management")
+    );
+  }
 
 export default rubricEditing;

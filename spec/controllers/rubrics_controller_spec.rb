@@ -38,6 +38,17 @@ describe RubricsController do
         get 'index', params: {:user_id => @user.id}
         expect(response).to be_success
       end
+
+      it "should include managed_outcomes permission" do
+        get 'index', params: {:course_id => @course.id}
+        expect(assigns[:js_env][:PERMISSIONS][:manage_outcomes]).to eq true
+      end
+
+      it "should return non_scoring_rubrics if enabled" do
+        @course.root_account.enable_feature! :non_scoring_rubrics
+        get 'index', params: {:course_id => @course.id}
+        expect(assigns[:js_env][:NON_SCORING_RUBRICS]).to eq true
+      end
     end
   end
 

@@ -29,7 +29,7 @@ import CourseNicknameEdit from './CourseNicknameEdit'
 import classnames from 'classnames'
 import 'compiled/jquery.rails_flash_notifications'
 
-  var PREDEFINED_COLORS = [
+  export const PREDEFINED_COLORS = [
     {hexcode: '#EF4437', name: I18n.t('Red')},
     {hexcode: '#E71F63', name: I18n.t('Pink')},
     {hexcode: '#8F3E97', name: I18n.t('Purple')},
@@ -259,7 +259,8 @@ import 'compiled/jquery.rails_flash_notifications'
         this.setState({ saveInProgress: true }, () => {
           // this is pretty hacky, however until ColorPicker is extracted into an instructure-ui
           // component this is the simplest way to avoid extracting Course Color specific code
-          if (this.props.parentComponent === 'StatusColorListItem') {
+          if (this.props.parentComponent === 'StatusColorListItem' ||
+              this.props.parentComponent === 'ProficiencyRating') {
             this.props.setStatusColor(this.state.currentColor, handleSuccess, handleFailure);
           } else {
             // both API calls update the same User model and thus need to be performed serially
