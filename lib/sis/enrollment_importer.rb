@@ -321,7 +321,7 @@ module SIS
                   @messages << msg
                   @retry = false
                 else
-                  @enrollment_batch.unshift(enrollment)
+                  @enrollment_batch.unshift(enrollment_info)
                   @retry = true
                 end
                 next
