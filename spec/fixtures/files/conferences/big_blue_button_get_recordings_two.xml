@@ -22,17 +22,27 @@
       </metadata>
       <playback>
         <format>
+          <type>statistics</type>
+          <url>https://bbb.blah.com/instructure/0858103f804f6e06b6de665dab79584b22c7cf91-1511807048982/statistics/</url>
+          <length/>
+        </format>
+        <format>
           <type>presentation</type>
-          <url>http://bbb.blah.com/mock/playback/0858103f804f6e06b6de665dab79584b22c7cf91-1511807048982</url>
-          <processingTime>9590</processingTime>
+          <url>https://bbb.blah.com/instructure/0858103f804f6e06b6de665dab79584b22c7cf91-1511807048982/presentation/</url>
+          <processingTime>9922</processingTime>
           <length>0</length>
           <preview>
             <images>
-              <image alt="Welcome to" height="136" width="176">http://bbb.blah.com/mock/playback/0858103f804f6e06b6de665dab79584b22c7cf91-1511807048982/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1511807049008/thumbnails/thumb-1.png</image>
-              <image alt="(this slide left blank for use as a whiteboard)" height="136" width="176">http://bbb.blah.com/mock/playback/0858103f804f6e06b6de665dab79584b22c7cf91-1511807048982/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1511807049008/thumbnails/thumb-2.png</image>
-              <image alt="(this slide left blank for use as a whiteboard)" height="136" width="176">http://bbb.blah.com/mock/playback/0858103f804f6e06b6de665dab79584b22c7cf91-1511807048982/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1511807049008/thumbnails/thumb-3.png</image>
+              <image alt="Welcome to" height="136" width="176">https://bbb.blah.com/instructure/0858103f804f6e06b6de665dab79584b22c7cf91-1511807048982/presentation/thumbnails/thumb-1.png</image>
+              <image alt="(this slide left blank for use as a whiteboard)" height="136" width="176">https://bbb.blah.com/instructure/0858103f804f6e06b6de665dab79584b22c7cf91-1511807048982/presentation/thumbnails/thumb-2.png</image>
+              <image alt="(this slide left blank for use as a whiteboard)" height="136" width="176">https://bbb.blah.com/instructure/0858103f804f6e06b6de665dab79584b22c7cf91-1511807048982/presentation/thumbnails/thumb-3.png</image>
             </images>
           </preview>
+        </format>
+        <format>
+          <type>video</type>
+          <url>https://bbb.blah.com/instructure/0858103f804f6e06b6de665dab79584b22c7cf91-1511807048982/capture/</url>
+          <length>0</length>
         </format>
       </playback>
     </recording>
@@ -56,17 +66,27 @@
       </metadata>
       <playback>
         <format>
+          <type>statistics</type>
+          <url>https://bbb.blah.com/instructure/0858103f804f6e06b6de665dab79584b22c7cf91-1511809970509/statistics/</url>
+          <length/>
+        </format>
+        <format>
           <type>presentation</type>
-          <url>http://bbb.blah.com/mock/playback/0858103f804f6e06b6de665dab79584b22c7cf91-1511809970509</url>
-          <processingTime>35788</processingTime>
-          <length>26</length>
+          <url>https://bbb.blah.com/instructure/0858103f804f6e06b6de665dab79584b22c7cf91-1511809970509/presentation/</url>
+          <processingTime>9922</processingTime>
+          <length>0</length>
           <preview>
             <images>
-              <image alt="Welcome to" height="136" width="176">http://bbb.blah.com/mock/playback/0858103f804f6e06b6de665dab79584b22c7cf91-1511809970509/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1511809970514/thumbnails/thumb-1.png</image>
-              <image alt="(this slide left blank for use as a whiteboard)" height="136" width="176">http://bbb.blah.com/mock/playback/0858103f804f6e06b6de665dab79584b22c7cf91-1511809970509/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1511809970514/thumbnails/thumb-2.png</image>
-              <image alt="(this slide left blank for use as a whiteboard)" height="136" width="176">http://bbb.blah.com/mock/playback/0858103f804f6e06b6de665dab79584b22c7cf91-1511809970509/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1511809970514/thumbnails/thumb-3.png</image>
+              <image alt="Welcome to" height="136" width="176">https://bbb.blah.com/instructure/0858103f804f6e06b6de665dab79584b22c7cf91-1511809970509/presentation/thumbnails/thumb-1.png</image>
+              <image alt="(this slide left blank for use as a whiteboard)" height="136" width="176">https://bbb.blah.com/instructure/0858103f804f6e06b6de665dab79584b22c7cf91-1511809970509/presentation/thumbnails/thumb-2.png</image>
+              <image alt="(this slide left blank for use as a whiteboard)" height="136" width="176">https://bbb.blah.com/instructure/0858103f804f6e06b6de665dab79584b22c7cf91-1511809970509/presentation/thumbnails/thumb-3.png</image>
             </images>
           </preview>
+        </format>
+        <format>
+          <type>video</type>
+          <url>https://bbb.blah.com/instructure/0858103f804f6e06b6de665dab79584b22c7cf91-1511809970509/capture/</url>
+          <length>0</length>
         </format>
       </playback>
     </recording>

@@ -131,20 +131,18 @@ define [
 
     deleteRecording: (e) ->
       e.preventDefault()
-      $deleteButton = $(e.currentTarget).parent('div.ig-button')
-      if !confirm I18n.t("Are you sure you want to delete this recording?")
-        $deleteButton.focus()
-        return
-      $.ajaxJSON($deleteButton.data('url') + "/recording", "DELETE", {
-          recording_id: $deleteButton.data("id"),
-        }
-      ).done( (data, status) =>
-        if data.deleted
-          return @removeRecordingRow($deleteButton)
-        $.flashError(I18n.t("Sorry, the action performed on this recording failed. Try again later"))
-      ).fail( (xhr, status) =>
-        $.flashError(I18n.t("Sorry, the action performed on this recording failed. Try again later"))
-      )
+      if confirm I18n.t("Are you sure you want to delete this recording?")
+        $button = $(e.currentTarget).parents('div.ig-button')
+        $.ajaxJSON($button.data('url') + "/recording", "DELETE", {
+            recording_id: $button.data("id"),
+          }
+        ).done( (data, status) =>
+          if data.deleted
+            return @removeRecordingRow($button)
+          $.flashError(I18n.t("Sorry, the action performed on this recording failed. Try again later"))
+        ).fail( (xhr, status) =>
+          $.flashError(I18n.t("Sorry, the action performed on this recording failed. Try again later"))
+        )
 
     removeRecordingRow: ($button) =>
       $row = $('.ig-row[data-id="' + $button.data("id") + '"]')
