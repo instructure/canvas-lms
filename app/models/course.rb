@@ -55,7 +55,7 @@ class Course < ActiveRecord::Base
 
   has_many :course_sections
   has_many :active_course_sections, -> { where(workflow_state: 'active') }, class_name: 'CourseSection'
-  has_many :enrollments, -> { where("enrollments.workflow_state<>'deleted'") }, dependent: :destroy, inverse_of: :course
+  has_many :enrollments, -> { where("enrollments.workflow_state<>'deleted'") }, inverse_of: :course
 
   has_many :all_enrollments, :class_name => 'Enrollment'
   has_many :current_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')").preload(:user) }, class_name: 'Enrollment'
