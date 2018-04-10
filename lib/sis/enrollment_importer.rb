@@ -329,7 +329,7 @@ module SIS
                   @messages << SisBatch.build_error(enrollment_info.csv, msg, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info)
                   @retry = false
                 else
-                  @enrollment_batch.unshift(enrollment)
+                  @enrollment_batch.unshift(enrollment_info)
                   @retry = true
                 end
                 next
