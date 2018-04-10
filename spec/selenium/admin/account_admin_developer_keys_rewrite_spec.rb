@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,7 +17,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
-describe 'developer keys' do
+describe 'Developer Keys' do
   include_context 'in-process server selenium tests'
 
   describe 'with developer key management UI rewrite feature flag' do
@@ -27,10 +27,19 @@ describe 'developer keys' do
       Account.default.enable_feature!(:developer_key_management_ui_rewrite)
     end
 
-    let(:developer_key) do
+    let(:root_developer_key) do
       Account.default.developer_keys.create!(
         name: 'Cool Tool',
         email: 'admin@example.com',
+        redirect_uris: ['http://example.com'],
+        icon_url: '/images/delete.png'
+      )
+    end
+
+    let(:site_admin_developer_key) do
+      DeveloperKey.create!(
+        name: 'Site Admin Dev Key',
+        email: 'siteadmin@example.com',
         redirect_uris: ['http://example.com'],
         icon_url: '/images/delete.png'
       )
@@ -56,7 +65,7 @@ describe 'developer keys' do
     end
 
     it "allows update through 'edit this key button'", test_id: 344078 do
-      developer_key
+      root_developer_key
       get "/accounts/#{Account.default.id}/developer_keys"
       f("#reactContent tbody tr.key .edit_link").click
       replace_content(f("input[name='developer_key[name]']"), "Cooler Tool")
@@ -75,7 +84,7 @@ describe 'developer keys' do
     end
 
     it 'allows editing of legacy redirect URI', test_id: 3469351 do
-      dk = developer_key
+      dk = root_developer_key
       dk.update_attribute(:redirect_uri, "http://a/")
       get "/accounts/#{Account.default.id}/developer_keys"
       f("#reactContent tbody tr.key .edit_link").click
@@ -96,7 +105,7 @@ describe 'developer keys' do
 
     it "allows deletion through 'delete this key button'", test_id: 344079 do
       skip_if_safari(:alert)
-      developer_key
+      root_developer_key
       get "/accounts/#{Account.default.id}/developer_keys"
       f("#reactContent tbody tr.key .edit_link").click
       f("input[name='developer_key[icon_url]']").clear
@@ -122,6 +131,98 @@ describe 'developer keys' do
       find_button("Show All 11 Keys").click
       expect(f("#loading")).not_to have_class('loading')
       expect(ff("#reactContent tbody tr")).to have_size(11)
+    end
+
+    it "renders the key not visible", test_id: 3485785 do
+      root_developer_key
+      get "/accounts/#{Account.default.id}/developer_keys"
+      f("#keys tbody tr.key .icon-eye").click
+      expect(f("#keys tbody")).to contain_css(".icon-off")
+      expect(root_developer_key.reload.visible).to eq false
+    end
+
+    it "renders the key visible", test_id: 3485785 do
+      root_developer_key.update(visible: false)
+      get "/accounts/#{Account.default.id}/developer_keys"
+      f("#keys tbody tr.key .icon-off").click
+      expect(f("#keys tbody")).not_to contain_css(".icon-off")
+      expect(root_developer_key.reload.visible).to eq true
+    end
+
+    context "Account Binding" do
+      it "creates an account binding with default workflow_state 'allow'", test_id: 3482823 do
+        site_admin_developer_key
+        expect(DeveloperKeyAccountBinding.last.workflow_state).to eq 'allow'
+        expect(DeveloperKeyAccountBinding.last.account_id).to eq Account.site_admin.id
+      end
+
+      it "site admin dev key is visible and set to 'allow' in root account", test_id: 3482823 do
+        site_admin_developer_key.update(visible: true)
+        get "/accounts/#{Account.default.id}/developer_keys"
+        expect(fj("span:contains('Allow'):last").text).to eq 'ALLOW'
+        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'allow'
+      end
+
+      it "root account inherits 'on' binding workflow state from site admin key", test_id: 3482823 do
+        site_admin_logged_in
+        site_admin_developer_key.update(visible: true)
+        get "/accounts/#{Account.site_admin.id}/developer_keys"
+        fj("span:contains('On'):last").click
+        get "/accounts/#{Account.default.id}/developer_keys"
+        expect(fj("fieldset:last").attribute('aria-disabled')).to eq 'true'
+        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'on'
+      end
+
+      it "root account inherits 'off' binding workflow state from site admin key", test_id: 3482823 do
+        site_admin_logged_in
+        site_admin_developer_key.update(visible: true)
+        get "/accounts/#{Account.site_admin.id}/developer_keys"
+        fj("span:contains('Off'):last").click
+        get "/accounts/#{Account.default.id}/developer_keys"
+        expect(fj("fieldset:last").attribute('aria-disabled')).to eq 'true'
+        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'off'
+      end
+
+      it "root account keeps self binding workflow state if site admin key state is 'allow'", test_id: 3482823 do
+        site_admin_logged_in
+        site_admin_developer_key.update(visible: true)
+        get "/accounts/#{Account.default.id}/developer_keys"
+        fj("span:contains('On'):last").click
+        get "/accounts/#{Account.site_admin.id}/developer_keys"
+        fj("span:contains('Off'):last").click
+        expect(DeveloperKeyAccountBinding.where(account_id: Account.site_admin.id).first.workflow_state).to eq 'off'
+        fj("span:contains('Allow'):last").click
+        get "/accounts/#{Account.default.id}/developer_keys"
+        expect(DeveloperKeyAccountBinding.where(account_id: Account.default.id).first.workflow_state).to eq 'on'
+        expect(fj("fieldset:last")).not_to have_attribute('aria-disabled')
+      end
+
+      it "allows for root account dev key status 'allow'", test_id: 3482823 do
+        root_developer_key
+        DeveloperKeyAccountBinding.last.update(workflow_state: 'off')
+        get "/accounts/#{Account.default.id}/developer_keys"
+        fj("span:contains('Allow'):last").click
+        keep_trying_until { expect(current_active_element.attribute('value')).to eq 'allow' }
+        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'allow'
+      end
+
+      it "allows for root account dev key status 'on'", test_id: 3482823 do
+        root_developer_key
+        get "/accounts/#{Account.default.id}/developer_keys"
+        fj("span:contains('On'):last").click
+        keep_trying_until { expect(current_active_element.attribute('value')).to eq 'on' }
+        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'on'
+      end
+
+      it "allows for root account dev key status 'off'", test_id: 3482823 do
+        root_developer_key
+        DeveloperKeyAccountBinding.last.update(workflow_state: 'on')
+        get "/accounts/#{Account.default.id}/developer_keys"
+        fj("span:contains('Off'):last").click
+        keep_trying_until { expect(current_active_element.attribute('value')).to eq 'off' }
+        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'off'
+      end
+
     end
   end
 
