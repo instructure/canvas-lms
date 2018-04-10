@@ -49,7 +49,7 @@ describe DataFixup::PopulateRootAccountIdOnUserObservers do
     pseudonym(@observer, :account => new_account)
     UserObservationLink.create!(:student => @student, :observer => @observer, :root_account => new_account)
     described_class.run
-    ra_ids = UserObservationLink.where(:student => @student, :observer => @observer).pluck(:root_account_id)
+    ra_ids = UserObservationLink.active.where(:student => @student, :observer => @observer).pluck(:root_account_id)
     expect(ra_ids).to match_array([Account.default.id, new_account.id])
   end
 
