@@ -43,7 +43,8 @@ const conferenceView = function(conferenceOpts = {}) {
       read: true,
       resume: false,
       update: true,
-      edit: true
+      edit: true,
+      manage_recordings: true
     }
   })
   const app = new ConferenceView({model: conference})
@@ -101,28 +102,41 @@ test('deleteRecordings calls screenreader', function() {
     200,
     {'Content-Type': 'application/json'},
     JSON.stringify({
-      deleted: 'true',
+      deleted: true,
     })
   ])
-  this.spy($, 'screenReaderFlashMessage')
   const big_blue_button_conference = {
     id: 1,
     recordings: [
       {
-        duration_minutes: 0,
-        ended_at: 1518554650000,
-        playback_url: "www.blah.com",
         recording_id: "954cc3",
-        title: "Conference"
+        title: "Conference",
+        duration_minutes: 0,
+        playback_url: null,
+        playback_formats: [
+          {
+            type: "statistics",
+            url: "www.blah.com",
+            length: null
+          },
+          {
+            type: "presentation",
+            url: "www.blah.com",
+            length: 0
+          }
+        ],
+        created_at: 1518554650000,
       }
     ],
     user_settings: {
       record: true
     }
   }
-  conferenceView(big_blue_button_conference)
+  this.spy($, 'screenReaderFlashMessage')
+  const view = conferenceView(big_blue_button_conference)
   $('div.ig-button[data-id="954cc3"]').children('a').trigger($.Event( "click" ))
   server.respond()
   equal($.screenReaderFlashMessage.callCount, 1)
   server.restore()
+  ok(view)
 })
