@@ -19,6 +19,7 @@
 import { combineReducers } from 'redux'
 import { reduceNotifications } from '../shared/reduxNotifications'
 import { createPaginatedReducer } from '../shared/reduxPagination'
+import allDiscussionsReducer from './reducers/allDiscussionsReducer'
 import pinnedDiscussionReducer from './reducers/pinnedDiscussionReducer'
 import unpinnedDiscussionReducer from './reducers/unpinnedDiscussionReducer'
 import closedForCommentsDiscussionReducer from './reducers/closedForCommentsDiscussionReducer'
@@ -33,7 +34,8 @@ const identity = (defaultState = null) => (
 )
 
 export default combineReducers({
-  closedForCommentsDiscussions: closedForCommentsDiscussionReducer,
+  allDiscussions: allDiscussionsReducer,
+  closedForCommentsDiscussionIds: closedForCommentsDiscussionReducer,
   contextCodes: identity([]),
   contextId: identity(null),
   contextType: identity(null),
@@ -47,8 +49,8 @@ export default combineReducers({
   masterCourseData: identity(null),
   notifications: reduceNotifications,
   permissions: identity({}),
-  pinnedDiscussions: pinnedDiscussionReducer,
+  pinnedDiscussionIds: pinnedDiscussionReducer,
   roles: identity({}),
-  unpinnedDiscussions: unpinnedDiscussionReducer,
+  unpinnedDiscussionIds: unpinnedDiscussionReducer,
   userSettings: userSettingsReducer,
 })

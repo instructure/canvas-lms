@@ -19,7 +19,7 @@
 import React from 'react'
 import { mount } from 'enzyme'
 import _ from 'lodash'
-import DiscussionRow from 'jsx/discussions/components/DiscussionRow'
+import { DiscussionRow } from 'jsx/discussions/components/DiscussionRow'
 
 QUnit.module('DiscussionRow component')
 

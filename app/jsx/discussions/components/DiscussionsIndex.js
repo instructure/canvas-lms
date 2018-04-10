@@ -29,8 +29,10 @@ import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReade
 import Spinner from '@instructure/ui-core/lib/components/Spinner'
 import Heading from '@instructure/ui-core/lib/components/Heading'
 import Text from '@instructure/ui-core/lib/components/Text'
-import masterCourseDataShape from '../../shared/proptypes/masterCourseData'
-import DiscussionsContainer, {DroppableDiscussionsContainer} from './DiscussionContainer'
+import {
+  ConnectedDiscussionsContainer,
+  DroppableConnectedDiscussionsContainer
+} from './DiscussionContainer'
 import {
   pinnedDiscussionBackground,
   unpinnedDiscussionsBackground,
@@ -50,35 +52,16 @@ import {reorderDiscussionsURL} from '../utils'
 export default class DiscussionsIndex extends Component {
   static propTypes = {
     arrangePinnedDiscussions: func.isRequired,
-    cleanDiscussionFocus: func.isRequired,
-    deleteFocusDone: func.isRequired,
-    deleteFocusPending: bool.isRequired,
-    closedForCommentsDiscussions: discussionList,
+    closedForCommentsDiscussions: discussionList.isRequired,
     contextId: string.isRequired,
     contextType: string.isRequired,
     deleteDiscussion: func.isRequired,
-    discussionTopicMenuTools: arrayOf(propTypes.discussionTopicMenuTools),
-    duplicateDiscussion: func.isRequired,
     getDiscussions: func.isRequired,
-    handleDrop: func,
     hasLoadedDiscussions: bool.isRequired,
     isLoadingDiscussions: bool.isRequired,
-    masterCourseData: masterCourseDataShape,
     permissions: propTypes.permissions.isRequired,
-    pinnedDiscussions: discussionList,
-    roles: arrayOf(string).isRequired,
-    toggleSubscriptionState: func.isRequired,
-    unpinnedDiscussions: discussionList,
-    updateDiscussion: func.isRequired,
-  }
-
-  static defaultProps = {
-    discussionTopicMenuTools: [],
-    pinnedDiscussions: [],
-    unpinnedDiscussions: [],
-    closedForCommentsDiscussions: [],
-    masterCourseData: {},
-    handleDrop: undefined,
+    pinnedDiscussions: discussionList.isRequired,
+    unpinnedDiscussions: discussionList.isRequired,
   }
 
   state = {
@@ -92,6 +75,10 @@ export default class DiscussionsIndex extends Component {
     }
   }
 
+  // TODO make if the modal is shown or not based on a flag in the redux store
+  //      instead of the state here, so that children (namely DiscussionRow)
+  //      can interact with this from the connected store instaed of passing
+  //      it down as a nested prop through multiple components
   onDeleteConfirm = (discussion, isConfirm) => {
     if(isConfirm) {
       this.props.deleteDiscussion(discussion)
@@ -148,33 +135,17 @@ export default class DiscussionsIndex extends Component {
       <Container margin="medium">
         {this.props.pinnedDiscussions.length ? (
           <div className="pinned-discussions-v2__wrapper">
-            <DiscussionsContainer
+            <ConnectedDiscussionsContainer
               title={I18n.t('Pinned Discussions')}
               discussions={this.props.pinnedDiscussions}
-              discussionTopicMenuTools={this.props.discussionTopicMenuTools}
-              permissions={this.props.permissions}
-              masterCourseData={this.props.masterCourseData}
-              roles={this.props.roles}
-              contextType={this.props.contextType}
               deleteDiscussion={this.openDeleteDiscussionsModal}
             />
           </div>
         ) : null}
         <div className="unpinned-discussions-v2__wrapper">
-          <DiscussionsContainer
+          <ConnectedDiscussionsContainer
             title={I18n.t('Discussions')}
             discussions={this.props.unpinnedDiscussions}
-            permissions={this.props.permissions}
-            discussionTopicMenuTools={this.props.discussionTopicMenuTools}
-            masterCourseData={this.props.masterCourseData}
-            toggleSubscribe={this.props.toggleSubscriptionState}
-            duplicateDiscussion={this.props.duplicateDiscussion}
-            updateDiscussion={this.props.updateDiscussion}
-            cleanDiscussionFocus={this.props.cleanDiscussionFocus}
-            deleteFocusPending={this.props.deleteFocusPending}
-            deleteFocusDone={this.props.deleteFocusDone}
-            roles={this.props.roles}
-            contextType={this.props.contextType}
             deleteDiscussion={this.openDeleteDiscussionsModal}
             renderContainerBackground={() =>
               pinnedDiscussionBackground({
@@ -184,20 +155,9 @@ export default class DiscussionsIndex extends Component {
           />
         </div>
         <div className="closed-for-comments-discussions-v2__wrapper">
-          <DiscussionsContainer
+          <ConnectedDiscussionsContainer
             title={I18n.t('Closed for Comments')}
             discussions={this.props.closedForCommentsDiscussions}
-            permissions={this.props.permissions}
-            discussionTopicMenuTools={this.props.discussionTopicMenuTools}
-            masterCourseData={this.props.masterCourseData}
-            toggleSubscribe={this.props.toggleSubscriptionState}
-            duplicateDiscussion={this.props.duplicateDiscussion}
-            cleanDiscussionFocus={this.props.cleanDiscussionFocus}
-            deleteFocusPending={this.props.deleteFocusPending}
-            deleteFocusDone={this.props.deleteFocusDone}
-            updateDiscussion={this.props.updateDiscussion}
-            roles={this.props.roles}
-            contextType={this.props.contextType}
             deleteDiscussion={this.openDeleteDiscussionsModal}
             renderContainerBackground={() =>
               closedDiscussionBackground({
@@ -220,23 +180,11 @@ export default class DiscussionsIndex extends Component {
     return (
       <Container margin="medium">
         <div className="pinned-discussions-v2__wrapper">
-          <DroppableDiscussionsContainer
+          <DroppableConnectedDiscussionsContainer
             title={I18n.t('Pinned Discussions')}
             discussions={this.props.pinnedDiscussions}
-            permissions={this.props.permissions}
-            masterCourseData={this.props.masterCourseData}
             deleteDiscussion={this.openDeleteDiscussionsModal}
-            toggleSubscribe={this.props.toggleSubscriptionState}
-            updateDiscussion={this.props.updateDiscussion}
-            discussionTopicMenuTools={this.props.discussionTopicMenuTools}
-            handleDrop={this.props.handleDrop}
-            duplicateDiscussion={this.props.duplicateDiscussion}
-            cleanDiscussionFocus={this.props.cleanDiscussionFocus}
-            deleteFocusPending={this.props.deleteFocusPending}
-            deleteFocusDone={this.props.deleteFocusDone}
             onMoveDiscussion={this.renderMoveDiscussionTray}
-            roles={this.props.roles}
-            contextType={this.props.contextType}
             pinned
             renderContainerBackground={() =>
               pinnedDiscussionBackground({
@@ -246,24 +194,12 @@ export default class DiscussionsIndex extends Component {
           />
         </div>
         <div className="unpinned-discussions-v2__wrapper">
-          <DroppableDiscussionsContainer
+          <DroppableConnectedDiscussionsContainer
             title={I18n.t('Discussions')}
             discussions={this.props.unpinnedDiscussions}
             deleteDiscussion={this.openDeleteDiscussionsModal}
-            permissions={this.props.permissions}
-            masterCourseData={this.props.masterCourseData}
-            discussionTopicMenuTools={this.props.discussionTopicMenuTools}
-            toggleSubscribe={this.props.toggleSubscriptionState}
-            updateDiscussion={this.props.updateDiscussion}
-            handleDrop={this.props.handleDrop}
-            duplicateDiscussion={this.props.duplicateDiscussion}
-            cleanDiscussionFocus={this.props.cleanDiscussionFocus}
-            deleteFocusPending={this.props.deleteFocusPending}
-            deleteFocusDone={this.props.deleteFocusDone}
             pinned={false}
             closedState={false}
-            roles={this.props.roles}
-            contextType={this.props.contextType}
             renderContainerBackground={() =>
               unpinnedDiscussionsBackground({
                 permissions: this.props.permissions,
@@ -274,22 +210,10 @@ export default class DiscussionsIndex extends Component {
           />
         </div>
         <div className="closed-for-comments-discussions-v2__wrapper">
-          <DroppableDiscussionsContainer
+          <DroppableConnectedDiscussionsContainer
             title={I18n.t('Closed for Comments')}
             discussions={this.props.closedForCommentsDiscussions}
-            permissions={this.props.permissions}
             deleteDiscussion={this.openDeleteDiscussionsModal}
-            masterCourseData={this.props.masterCourseData}
-            toggleSubscribe={this.props.toggleSubscriptionState}
-            updateDiscussion={this.props.updateDiscussion}
-            discussionTopicMenuTools={this.props.discussionTopicMenuTools}
-            handleDrop={this.props.handleDrop}
-            duplicateDiscussion={this.props.duplicateDiscussion}
-            cleanDiscussionFocus={this.props.cleanDiscussionFocus}
-            deleteFocusPending={this.props.deleteFocusPending}
-            deleteFocusDone={this.props.deleteFocusDone}
-            roles={this.props.roles}
-            contextType={this.props.contextType}
             pinned={false}
             closedState
             renderContainerBackground={() =>
@@ -324,39 +248,29 @@ export default class DiscussionsIndex extends Component {
   }
 }
 
-const connectState = state =>
-  Object.assign(
-    {
-      // other props here
-    },
-    selectPaginationState(state, 'discussions'),
-    select(state, [
-      'closedForCommentsDiscussions',
-      'contextId',
-      'contextId',
-      'contextType',
-      'contextType',
-      'deleteFocusPending',
-      'discussionTopicMenuTools',
-      'masterCourseData',
-      'permissions',
-      'pinnedDiscussions',
-      'roles',
-      'unpinnedDiscussions',
-    ])
-  )
+
+const connectState = (state, ownProps) => {
+  const fromPagination = selectPaginationState(state, 'discussions')
+  const { allDiscussions, closedForCommentsDiscussionIds, pinnedDiscussionIds,
+          unpinnedDiscussionIds } = state
+
+  const fromState = {
+    closedForCommentsDiscussions: closedForCommentsDiscussionIds.map(id => allDiscussions[id]),
+    contextId: state.contextId,
+    contextType: state.contextType,
+    permissions: state.permissions,
+    pinnedDiscussions: pinnedDiscussionIds.map(id => allDiscussions[id]),
+    unpinnedDiscussions: unpinnedDiscussionIds.map(id => allDiscussions[id]),
+  }
+  return Object.assign({}, ownProps, fromPagination, fromState)
+}
 const connectActions = dispatch =>
   bindActionCreators(
     select(actions, [
-      'getDiscussions',
-      'toggleSubscriptionState',
-      'updateDiscussion',
-      'handleDrop',
-      'duplicateDiscussion',
-      'cleanDiscussionFocus',
-      'deleteFocusDone',
       'arrangePinnedDiscussions',
-      'deleteDiscussion'
+      'deleteDiscussion',
+      'deleteFocusDone',
+      'getDiscussions',
     ]),
     dispatch
   )

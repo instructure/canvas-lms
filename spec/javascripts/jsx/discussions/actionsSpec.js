@@ -163,7 +163,15 @@ test('updateDiscussion calls screenReaderFlash if unsuccessful with custom flash
 })
 
 test('handleDrop throws exception if updating a field that does not exist on the discussion', (assert) => {
-  const state = { discussions: { pages: { 1: { items: [] } }, currentPage: 1 } }
+  const state = {
+    allDiscussions: {
+      1: {id: 1, pinned: false},
+      2: {id: 2, pinned: true},
+    },
+    pinnedDiscussionIds: [2],
+    unpinnedDiscussionIds: [1],
+    closedForCommentsDiscussions: [],
+  }
   const discussion = { pinned: true, locked: false}
   const updateFields = {foobar: true}
   const dispatchSpy = sinon.spy()
@@ -182,8 +190,12 @@ test('handleDrop dispatches DRAG_AND_DROP_START', (assert) => {
   mockSuccess('reorderPinnedDiscussions', {})
   const dispatchSpy = sinon.spy()
   const state = {
-    pinnedDiscussions: [{id: 2, pinned: true}],
-    unpinnedDiscussions: [{id: 1, pinned: false}],
+    allDiscussions: {
+      1: {id: 1, pinned: false},
+      2: {id: 2, pinned: true},
+    },
+    pinnedDiscussionIds: [2],
+    unpinnedDiscussionIds: [1],
     closedForCommentsDiscussions: [],
   }
   actions.handleDrop({id: 1, pinned: false}, {pinned: true}, [1, 2])(dispatchSpy, () => state)
@@ -207,8 +219,12 @@ test('handleDrop dispatches DRAG_AND_DROP_SUCCESS if no api calls fail', (assert
   const done = assert.async()
   const dispatchSpy = sinon.spy()
   const state = {
-    pinnedDiscussions: [{id: 2, pinned: true}],
-    unpinnedDiscussions: [{id: 1, pinned: false}],
+    allDiscussions: {
+      1: {id: 1, pinned: false},
+      2: {id: 2, pinned: true},
+    },
+    pinnedDiscussionIds: [2],
+    unpinnedDiscussionIds: [1],
     closedForCommentsDiscussions: [],
   }
   mockSuccess('updateDiscussion', {})
@@ -225,8 +241,12 @@ test('handleDrop dispatches DRAG_AND_DROP_FAIL if updateDiscussion api call fail
   const done = assert.async()
   const dispatchSpy = sinon.spy()
   const state = {
-    pinnedDiscussions: [{id: 2, pinned: true}],
-    unpinnedDiscussions: [{id: 1, pinned: false}],
+    allDiscussions: {
+      1: {id: 1, pinned: false},
+      2: {id: 2, pinned: true},
+    },
+    pinnedDiscussionIds: [2],
+    unpinnedDiscussionIds: [1],
     closedForCommentsDiscussions: [],
   }
   mockFail('updateDiscussion', {})
@@ -254,8 +274,12 @@ test('handleDrop dispatches DRAG_AND_DROP_FAIL if reorderPinnedDiscussions api c
   const done = assert.async()
   const dispatchSpy = sinon.spy()
   const state = {
-    pinnedDiscussions: [{id: 2, pinned: true}],
-    unpinnedDiscussions: [{id: 1, pinned: false}],
+    allDiscussions: {
+      1: {id: 1, pinned: false},
+      2: {id: 2, pinned: true},
+    },
+    pinnedDiscussionIds: [2],
+    unpinnedDiscussionIds: [1],
     closedForCommentsDiscussions: [],
   }
   mockSuccess('updateDiscussion', {})
@@ -284,8 +308,12 @@ test('handleDrop calls reorderPinnedDiscussions if pinned and order present', (a
   const done = assert.async()
   const dispatchSpy = sinon.spy()
   const state = {
-    pinnedDiscussions: [{id: 2, pinned: true}],
-    unpinnedDiscussions: [{id: 1, pinned: false}],
+    allDiscussions: {
+      1: {id: 1, pinned: false},
+      2: {id: 2, pinned: true},
+    },
+    pinnedDiscussionIds: [2],
+    unpinnedDiscussionIds: [1],
     closedForCommentsDiscussions: [],
   }
   mockSuccess('updateDiscussion', {})
@@ -302,8 +330,12 @@ test('handleDrop does not call reorderPinnedDiscussions if discussion is not pin
   const done = assert.async()
   const dispatchSpy = sinon.spy()
   const state = {
-    pinnedDiscussions: [{id: 2, pinned: true}],
-    unpinnedDiscussions: [{id: 1, pinned: false}],
+    allDiscussions: {
+      1: {id: 1, pinned: false},
+      2: {id: 2, pinned: true},
+    },
+    pinnedDiscussionIds: [2],
+    unpinnedDiscussionIds: [1],
     closedForCommentsDiscussions: [],
   }
   mockSuccess('updateDiscussion', {})
@@ -320,8 +352,12 @@ test('handleDrop does not call reorderPinnedDiscussions if ordering not present'
   const done = assert.async()
   const dispatchSpy = sinon.spy()
   const state = {
-    pinnedDiscussions: [{id: 2, pinned: true}],
-    unpinnedDiscussions: [{id: 1, pinned: false}],
+    allDiscussions: {
+      1: {id: 1, pinned: false},
+      2: {id: 2, pinned: true},
+    },
+    pinnedDiscussionIds: [2],
+    unpinnedDiscussionIds: [1],
     closedForCommentsDiscussions: [],
   }
   mockSuccess('updateDiscussion', {})
@@ -550,7 +586,7 @@ test('dispatches duplicateDiscussionSuccess if api call succeeds', (assert) => {
   actions.duplicateDiscussion(1)(dispatchSpy, getState)
   setTimeout(() => {
     const expectedArgs = [{
-      payload: { originalId: 1, newDiscussion: { id: 3 }},
+      payload: { originalId: 1, newDiscussion: { id: 3, focusOn: "title" }},
       type: "DUPLICATE_DISCUSSION_SUCCESS"
     }]
     deepEqual(dispatchSpy.secondCall.args, expectedArgs)
@@ -577,9 +613,10 @@ test('dispatches duplicateDiscussionFail if api call fails', (assert) => {
 test('searchDiscussions dispatches UPDATE_DISCUSSIONS_SEARCH', () => {
   const dispatchSpy = sinon.spy()
   const state = {
-    pinnedDiscussions: [],
-    unpinnedDiscussions: [],
-    closedForCommentsDiscussions: [],
+    allDiscussions: {},
+    pinnedDiscussionIds: [],
+    unpinnedDiscussionIds: [],
+    closedForCommentsDiscussionIds: [],
   }
   actions.searchDiscussions({ searchTerm: 'foobar', filter: 'unread' })(dispatchSpy, () => state)
   const expected = [
@@ -599,9 +636,17 @@ test('searchDiscussions announces number of results found to screenreader', (ass
   const dispatchSpy = sinon.spy()
   const flashStub = sinon.spy($, 'screenReaderFlashMessageExclusive')
   const state = {
-    pinnedDiscussions: [{filtered: true}, {filtered: false}],
-    unpinnedDiscussions: [{filtered: true}, {filtered: false}],
-    closedForCommentsDiscussions: [{filtered: true}, {filtered: false}],
+    allDiscussions: {
+      1: {id: 1, filtered: true},
+      2: {id: 2, filtered: false},
+      3: {id: 3, filtered: true},
+      4: {id: 4, filtered: false},
+      5: {id: 5, filtered: true},
+      6: {id: 6, filtered: false},
+    },
+    pinnedDiscussions: [1, 2],
+    unpinnedDiscussions: [3, 4],
+    closedForCommentsDiscussions: [5, 6],
   }
   actions.searchDiscussions({ searchTerm: 'foobar', filter: 'unread' })(dispatchSpy, () => state)
 
@@ -615,7 +660,12 @@ test('searchDiscussions announces number of results found to screenreader', (ass
 test('deleteDiscussion dispatches DELETE_DISCUSSION_SUCCESS on success', (assert) => {
   const done = assert.async()
   mockSuccess('deleteDiscussion', {})
-  const state = { pinnedDiscussions: [{id: 1}] }
+  const state = {
+    allDiscussions: {1: {id: 1}},
+    pinnedDiscussionIds: [1],
+    unpinnedDiscussionIds: [],
+    closedForCommentsDiscussionIds: [],
+  }
   const discussion = { id: 1 }
   const dispatchSpy = sinon.spy()
   actions.deleteDiscussion(discussion)(dispatchSpy, () => state)
@@ -624,7 +674,11 @@ test('deleteDiscussion dispatches DELETE_DISCUSSION_SUCCESS on success', (assert
     const expected = [
       {
         payload: {
-          discussion: { id: 1 }
+          discussion: { id: 1 },
+          nextFocusDiscussion: {
+            focusId: undefined,
+            focusOn: undefined,
+          },
         },
         type: "DELETE_DISCUSSION_SUCCESS"
       }
@@ -637,7 +691,12 @@ test('deleteDiscussion dispatches DELETE_DISCUSSION_SUCCESS on success', (assert
 test('deleteDiscussion dispatches DELETE_FOCUS_PENDING on success', (assert) => {
   const done = assert.async()
   mockSuccess('deleteDiscussion', {})
-  const state = { pinnedDiscussions: [{id: 1}] }
+  const state = {
+    allDiscussions: {1: {id: 1}},
+    pinnedDiscussionIds: [1],
+    unpinnedDiscussionIds: [],
+    closedForCommentsDiscussionIds: [],
+  }
   const discussion = { id: 1 }
   const dispatchSpy = sinon.spy()
   actions.deleteDiscussion(discussion)(dispatchSpy, () => state)
@@ -656,7 +715,12 @@ test('deleteDiscussion dispatches DELETE_FOCUS_PENDING on success', (assert) => 
 test('deleteDiscussion dispatches DELETE_DISCUSSION_FAIL on failure', (assert) => {
   const done = assert.async()
   mockFail('deleteDiscussion', 'test_error')
-  const state = { pinnedDiscussions: [{id: 1, title: 'foo'}] }
+  const state = {
+    allDiscussions: {1: {id: 1}},
+    pinnedDiscussionIds: [1],
+    unpinnedDiscussionIds: [],
+    closedForCommentsDiscussionIds: [],
+  }
   const discussion = { id: 1, title: 'foo' }
   const dispatchSpy = sinon.spy()
   actions.deleteDiscussion(discussion)(dispatchSpy, () => state)
@@ -681,7 +745,12 @@ test('deleteDiscussion calls screenReaderFlash on success', (assert) => {
   const done = assert.async()
   const flashStub = sinon.spy($, 'screenReaderFlashMessage')
   mockSuccess('deleteDiscussion', {})
-  const state = { pinnedDiscussions: [{id: 1, title: 'foo'}] }
+  const state = {
+    allDiscussions: {1: {id: 1}},
+    pinnedDiscussionIds: [1],
+    unpinnedDiscussionIds: [],
+    closedForCommentsDiscussionIds: [],
+  }
   const discussion = { id: 1, title: 'foo' }
   const dispatchSpy = sinon.spy()
   actions.deleteDiscussion(discussion)(dispatchSpy, () => state)
@@ -697,7 +766,12 @@ test('deleteDiscussion calls screenReaderFlash on failure', (assert) => {
   const done = assert.async()
   const flashStub = sinon.spy($, 'screenReaderFlashMessage')
   mockFail('deleteDiscussion', 'test_error')
-  const state = { pinnedDiscussions: [{id: 1, title: 'foo'}] }
+  const state = {
+    allDiscussions: {1: {id: 1}},
+    pinnedDiscussionIds: [1],
+    unpinnedDiscussionIds: [],
+    closedForCommentsDiscussionIds: [],
+  }
   const discussion = { id: 1, title: 'foo' }
   const dispatchSpy = sinon.spy()
   actions.deleteDiscussion(discussion)(dispatchSpy, () => state)
@@ -705,6 +779,139 @@ test('deleteDiscussion calls screenReaderFlash on failure', (assert) => {
   setTimeout(() => {
     deepEqual(flashStub.firstCall.args, ["Failed to delete discussion foo"])
     flashStub.restore()
+    done()
+  })
+})
+
+test('deleteDiscussion does not set focusOn if collection is empty after delete', (assert) => {
+  const done = assert.async()
+  mockSuccess('deleteDiscussion', {})
+  const state = {
+    allDiscussions: {1: {id: 1}},
+    pinnedDiscussionIds: [1],
+    unpinnedDiscussionIds: [],
+    closedForCommentsDiscussionIds: [],
+  }
+  const discussion = { id: 1 }
+  const dispatchSpy = sinon.spy()
+  actions.deleteDiscussion(discussion)(dispatchSpy, () => state)
+
+  setTimeout(() => {
+    const expected = [
+      {
+        payload: {
+          discussion: { id: 1 },
+          nextFocusDiscussion: {
+            focusId: undefined,
+            focusOn: undefined,
+          },
+        },
+        type: "DELETE_DISCUSSION_SUCCESS"
+      }
+    ]
+    deepEqual(dispatchSpy.thirdCall.args, expected)
+    done()
+  })
+})
+
+test('deleteDiscussion sets focusOn to toggleButton if deleting first item in collection', (assert) => {
+  const done = assert.async()
+  mockSuccess('deleteDiscussion', {})
+  const state = {
+    allDiscussions: {
+      1: {id: 1},
+      2: {id: 2},
+    },
+    pinnedDiscussionIds: [1, 2],
+    unpinnedDiscussionIds: [],
+    closedForCommentsDiscussionIds: [],
+  }
+  const discussion = { id: 1 }
+  const dispatchSpy = sinon.spy()
+  actions.deleteDiscussion(discussion)(dispatchSpy, () => state)
+
+  setTimeout(() => {
+    const expected = [
+      {
+        payload: {
+          discussion: { id: 1 },
+          nextFocusDiscussion: {
+            focusId: 2,
+            focusOn: 'toggleButton',
+          },
+        },
+        type: "DELETE_DISCUSSION_SUCCESS"
+      }
+    ]
+    deepEqual(dispatchSpy.thirdCall.args, expected)
+    done()
+  })
+})
+
+test('deleteDiscussion sets focusOn to manageMenu if user has delete perms', (assert) => {
+  const done = assert.async()
+  mockSuccess('deleteDiscussion', {})
+  const state = {
+    allDiscussions: {
+      1: {id: 1, permissions: {delete: true}},
+      2: {id: 2, permissions: {delete: true}},
+    },
+    pinnedDiscussionIds: [1, 2],
+    unpinnedDiscussionIds: [],
+    closedForCommentsDiscussionIds: [],
+  }
+  const discussion = { id: 2 }
+  const dispatchSpy = sinon.spy()
+  actions.deleteDiscussion(discussion)(dispatchSpy, () => state)
+
+  setTimeout(() => {
+    const expected = [
+      {
+        payload: {
+          discussion: { id: 2 },
+          nextFocusDiscussion: {
+            focusId: 1,
+            focusOn: 'manageMenu',
+          },
+        },
+        type: "DELETE_DISCUSSION_SUCCESS"
+      }
+    ]
+    deepEqual(dispatchSpy.thirdCall.args, expected)
+    done()
+  })
+})
+
+test('deleteDiscussion sets focusOn to title if user does not have delete perms', (assert) => {
+  const done = assert.async()
+  mockSuccess('deleteDiscussion', {})
+  const state = {
+    allDiscussions: {
+      1: {id: 1, permissions: {delete: false}},
+      2: {id: 2, permissions: {delete: false}},
+    },
+    pinnedDiscussionIds: [1, 2],
+    unpinnedDiscussionIds: [],
+    closedForCommentsDiscussionIds: [],
+  }
+  const discussion = { id: 2 }
+  const dispatchSpy = sinon.spy()
+  actions.deleteDiscussion(discussion)(dispatchSpy, () => state)
+
+  setTimeout(() => {
+    const expected = [
+      {
+        payload: {
+          discussion: { id: 2 },
+          nextFocusDiscussion: {
+            focusId: 1,
+            focusOn: 'title',
+          },
+        },
+        type: "DELETE_DISCUSSION_SUCCESS"
+      }
+    ]
+    deepEqual(dispatchSpy.thirdCall.args, expected)
     done()
   })
 })

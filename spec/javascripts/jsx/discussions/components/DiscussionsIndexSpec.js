@@ -23,40 +23,45 @@ import { mount, shallow } from 'enzyme'
 import DiscussionsIndex from 'jsx/discussions/components/DiscussionsIndex'
 
 const defaultProps = () => ({
-
   closeForComments: () => {},
-  permissions: {create: false, manage_content: false, moderate: false},
-  togglePin: () => {},
+  closedForCommentsDiscussions: [],
+  closedForCommentsDiscussionIds: [],
   discussions: [],
   discussionsPage: 1,
-  isLoadingDiscussions: false,
-  hasLoadedDiscussions: false,
   getDiscussions: () => {},
+  hasLoadedDiscussions: false,
+  isLoadingDiscussions: false,
+  permissions: {create: false, manage_content: false, moderate: false},
+  pinnedDiscussions: [],
+  pinnedDiscussionIds: [],
   roles: ["student", "user"],
+  togglePin: () => {},
+  unpinnedDiscussions: [],
+  unpinnedDiscussionIds: [],
 })
 
 // necessary to mock this because we have a child Container/"Smart" component
 // that need to pull their props from the store state
 const store = {
   getState: () => ({
-
-    closedForCommentsDiscussions: [],
+    allDiscussions: {},
+    closedForCommentsDiscussionIds: [],
+    contextId: '1',
+    contextType: 'course',
     courseSettings: {collapse_global_nav: false, manual_mark_as_read: false},
     currentUserId: 1,
     discussions: [],
     isSavingSettings: false,
     isSettingsModalOpen: false,
-    pinnedDiscussions: [],
-    roles: ['user', 'teacher'],
-    unpinnedDiscussions: [],
-    userSettings: {collapse_global_nav: false, manual_mark_as_read: false},
-    contextType: 'course',
-    contextId: '1',
     permissions: {
       create: true,
       manage_content: true,
       moderate: true,
     },
+    pinnedDiscussionIds: [],
+    roles: ['user', 'teacher'],
+    unpinnedDiscussionIds: [],
+    userSettings: {collapse_global_nav: false, manual_mark_as_read: false},
   }),
   // we only need to define these functions so that we match the react-redux contextTypes
   // shape for a store otherwise react-redux thinks our store is invalid
@@ -110,7 +115,7 @@ test('only renders pinned discussions in studentView if there are pinned discuss
   props.pinnedDiscussions = [{id: '1'}]
   props.closedForCommentsDiscussions = []
   const tree = shallow(<DiscussionsIndex {...props} />)
-  const node = tree.find('DiscussionsContainer')
+  const node = tree.find('Connect(DiscussionsContainer)')
   equal(node.length, 3)
 })
 
@@ -118,14 +123,14 @@ test('does not renders pinned discussions in studentView if there are no pinned 
   const props = defaultProps()
   props.closedForCommentsDiscussions = []
   const tree = shallow(<DiscussionsIndex {...props} />)
-  const node = tree.find('DiscussionsContainer')
+  const node = tree.find('Connect(DiscussionsContainer)')
   equal(node.length, 2)
 })
 
 test('does not render droppable container when student', () => {
   const props = defaultProps()
   const tree = shallow(<DiscussionsIndex {...props} />)
-  const node = tree.find('DroppableDiscussionsContainer')
+  const node = tree.find('Connect(DroppableDiscussionsContainer)')
   equal(node.length, 0)
 })
 

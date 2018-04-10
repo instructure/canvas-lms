@@ -17,44 +17,49 @@
  */
 
 import I18n from 'i18n!discussion_row'
+
 import React, { Component } from 'react'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import { DragSource, DropTarget } from 'react-dnd';
+import { findDOMNode } from 'react-dom'
 import { func, bool, string, arrayOf } from 'prop-types'
+
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
 
-import { DragSource, DropTarget } from 'react-dnd';
-import { findDOMNode } from 'react-dom'
-import Container from '@instructure/ui-core/lib/components/Container'
 import Badge from '@instructure/ui-core/lib/components/Badge'
-import Text from '@instructure/ui-core/lib/components/Text'
+import Container from '@instructure/ui-core/lib/components/Container'
 import Grid, { GridCol, GridRow} from '@instructure/ui-core/lib/components/Grid'
-import { MenuItem } from '@instructure/ui-core/lib/components/Menu'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
-import IconTimer from 'instructure-icons/lib/Line/IconTimerLine'
 import IconAssignmentLine from 'instructure-icons/lib/Line/IconAssignmentLine'
-import IconBookmarkSolid from 'instructure-icons/lib/Solid/IconBookmarkSolid'
 import IconBookmarkLine from 'instructure-icons/lib/Line/IconBookmarkLine'
-import IconPublishSolid from 'instructure-icons/lib/Solid/IconPublishSolid'
+import IconBookmarkSolid from 'instructure-icons/lib/Solid/IconBookmarkSolid'
 import IconCopySolid from 'instructure-icons/lib/Solid/IconCopySolid'
-import IconUpdownLine from 'instructure-icons/lib/Line/IconUpdownLine'
-import IconTrashSolid from 'instructure-icons/lib/Solid/IconTrashSolid'
-import IconPinSolid from 'instructure-icons/lib/Solid/IconPinSolid'
-import IconPinLine from 'instructure-icons/lib/Line/IconPinLine'
 import IconLock from 'instructure-icons/lib/Line/IconLockLine'
+import IconLtiLine from 'instructure-icons/lib/Line/IconLtiLine'
+import IconPinLine from 'instructure-icons/lib/Line/IconPinLine'
+import IconPinSolid from 'instructure-icons/lib/Solid/IconPinSolid'
+import IconPublishSolid from 'instructure-icons/lib/Solid/IconPublishSolid'
+import IconTrashSolid from 'instructure-icons/lib/Solid/IconTrashSolid'
 import IconUnlock from 'instructure-icons/lib/Line/IconUnlockLine'
 import IconUnpublishedLine from 'instructure-icons/lib/Line/IconUnpublishedLine'
-import IconLtiLine from 'instructure-icons/lib/Line/IconLtiLine'
+import IconUpdownLine from 'instructure-icons/lib/Line/IconUpdownLine'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import Text from '@instructure/ui-core/lib/components/Text'
+import { MenuItem } from '@instructure/ui-core/lib/components/Menu'
 
 import DiscussionModel from 'compiled/models/DiscussionTopic'
+import actions from '../actions'
 import compose from '../../shared/helpers/compose'
-import SectionsTooltip from '../../shared/SectionsTooltip'
 import CourseItemRow from '../../shared/components/CourseItemRow'
-import UnreadBadge from '../../shared/components/UnreadBadge'
-
-import ToggleIcon from '../../shared/components/ToggleIcon'
-import propTypes from '../propTypes'
+import CyoeHelper from '../../shared/conditional_release/CyoeHelper'
 import discussionShape from '../../shared/proptypes/discussion'
 import masterCourseDataShape from '../../shared/proptypes/masterCourseData'
+import propTypes from '../propTypes'
+import SectionsTooltip from '../../shared/SectionsTooltip'
+import select from '../../shared/select'
+import ToggleIcon from '../../shared/components/ToggleIcon'
+import UnreadBadge from '../../shared/components/UnreadBadge'
 import { makeTimestamp } from '../../shared/date-utils'
 
 const dragTarget = {
@@ -65,8 +70,8 @@ const dragTarget = {
 
 const dropTarget = {
   hover(props, monitor, component) {
-    const dragIndex = monitor.getItem().sortableId
-    const hoverIndex = props.discussion.sortableId
+    const dragIndex = props.getDiscussionPosition(monitor.getItem())
+    const hoverIndex = props.getDiscussionPosition(props.discussion)
     if (dragIndex === undefined || hoverIndex === undefined) {
       return
     }
@@ -77,6 +82,7 @@ const dropTarget = {
     const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
     const clientOffset = monitor.getClientOffset()
     const hoverClientY = clientOffset.y - hoverBoundingRect.top
+
     // Only perform the move when the mouse has crossed half of the items height
     // When dragging downwards, only move when the cursor is below 50%
     // When dragging upwards, only move when the cursor is above 50%
@@ -87,11 +93,10 @@ const dropTarget = {
       return
     }
     props.moveCard(dragIndex, hoverIndex)
-    monitor.getItem().sortableId = hoverIndex // eslint-disable-line
   },
 }
 
-export default class DiscussionRow extends Component {
+export class DiscussionRow extends Component {
   static propTypes = {
     canPublish: bool.isRequired,
     cleanDiscussionFocus: func.isRequired,
@@ -115,7 +120,7 @@ export default class DiscussionRow extends Component {
     moveCard: func, // eslint-disable-line
     onMoveDiscussion: func,
     onSelectedChanged: func,
-    onToggleSubscribe: func.isRequired,
+    toggleSubscriptionState: func.isRequired,
     rowRef: func,
     updateDiscussion: func.isRequired,
   }
@@ -215,8 +220,8 @@ export default class DiscussionRow extends Component {
           <IconBookmarkLine title={I18n.t('Subscribe to %{title}', { title: this.props.discussion.title })} />
         </Text>
       }
-      onToggleOn={() => this.props.onToggleSubscribe(this.props.discussion)}
-      onToggleOff={() => this.props.onToggleSubscribe(this.props.discussion)}
+      onToggleOn={() => this.props.toggleSubscriptionState(this.props.discussion)}
+      onToggleOff={() => this.props.toggleSubscriptionState(this.props.discussion)}
       disabled={this.props.discussion.subscription_hold !== undefined}
       className="subscribe-button"
     />
@@ -481,14 +486,44 @@ export default class DiscussionRow extends Component {
   }
 }
 
-  /* eslint-disable new-cap */
+const mapDispatch = (dispatch) => {
+  const actionKeys = [
+    'cleanDiscussionFocus',
+    'duplicateDiscussion',
+    'toggleSubscriptionState',
+    'updateDiscussion',
+  ]
+  return bindActionCreators(select(actions, actionKeys), dispatch)
+}
+
+const mapState = (state, ownProps) => {
+  const { discussion } = ownProps
+  const cyoe = CyoeHelper.getItemData(discussion.assignment_id)
+  const propsFromState = {
+    canPublish: state.permissions.publish,
+    contextType: state.contextType,
+    discussionTopicMenuTools: state.discussionTopicMenuTools,
+    displayDeleteMenuItem: !(discussion.is_master_course_child_content && discussion.restricted_by_master_course),
+    displayDuplicateMenuItem: state.permissions.manage_content,
+    displayLockMenuItem: discussion.can_lock,
+    displayMasteryPathsMenuItem: cyoe.isCyoeAble,
+    displayManageMenu: discussion.permissions.delete,
+    displayPinMenuItem: state.permissions.moderate,
+    masterCourseData: state.masterCourseData,
+  }
+  return Object.assign({}, ownProps, propsFromState)
+}
+
+/* eslint-disable new-cap */
 export const DraggableDiscussionRow = compose(
-    DropTarget('Discussion', dropTarget, connect => ({
-      connectDropTarget: connect.dropTarget()
+    DropTarget('Discussion', dropTarget, dConnect => ({
+      connectDropTarget: dConnect.dropTarget()
     })),
-    DragSource('Discussion', dragTarget, (connect, monitor) => ({
-      connectDragSource: connect.dragSource(),
+    DragSource('Discussion', dragTarget, (dConnect, monitor) => ({
+      connectDragSource: dConnect.dragSource(),
       isDragging: monitor.isDragging(),
-      connectDragPreview: connect.dragPreview(),
+      connectDragPreview: dConnect.dragPreview(),
     }))
   )(DiscussionRow)
+export const ConnectedDiscussionRow = connect(mapState, mapDispatch)(DiscussionRow)
+export const ConnectedDraggableDiscussionRow = connect(mapState, mapDispatch)(DraggableDiscussionRow)

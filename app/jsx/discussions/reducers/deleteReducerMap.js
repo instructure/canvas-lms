@@ -16,37 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import { actionTypes } from '../actions'
-import { setSortableId } from '../utils'
 
 const deleteReducerMap = {
-  [actionTypes.DELETE_DISCUSSION_SUCCESS]: (state, action) => {
-    const oldIndex = state.findIndex((disc) => (
-      disc.id === action.payload.discussion.id
-    ))
-    const newState= state.slice()
-    if (oldIndex < 0) {
-      return newState
-    }
-    if(oldIndex === 0) {
-      newState.splice(oldIndex, 1)
-      if(newState.length) {
-        newState[0] = { ...newState[0], focusOn: "toggleButton" }
-      }
-      return setSortableId(newState)
-    } else {
-      const newFocusIndex = oldIndex - 1;
-      if(newState[newFocusIndex]) {
-        newState[newFocusIndex] = {
-          ...newState[newFocusIndex],
-          focusOn: newState[newFocusIndex].permissions.delete ? 'manageMenu' : 'title'
-        }
-        newState.splice(oldIndex, 1)
-        return setSortableId(newState)
-      } else { // There is no discussions left
-        return []
-      }
-    }
-  }
+  [actionTypes.DELETE_DISCUSSION_SUCCESS]: (state, action) => (
+    state.filter((id) => id !== action.payload.discussion.id)
+  )
 }
 
 export default deleteReducerMap

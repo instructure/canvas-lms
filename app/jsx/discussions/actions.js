@@ -129,7 +129,7 @@ actions.updateDiscussion = function(discussion, updatedFields, { successMessage,
 // failed.
 actions.handleDrop = function(discussion, updatedFields, order) {
   return (dispatch, getState) => {
-    const originalOrder = order ? getState().pinnedDiscussions.map(d => d.id) : undefined
+    const originalOrder = order ? getState().pinnedDiscussionIds.slice() : undefined
     const discussionCopy = copyAndUpdateDiscussion(discussion, updatedFields)
     dispatch(actions.dragAndDropStart({discussion: discussionCopy, order}))
     apiClient.updateDiscussion(getState(), discussion, updatedFields)
@@ -173,24 +173,79 @@ actions.handleDrop = function(discussion, updatedFields, order) {
 actions.searchDiscussions = function searchDiscussions ({ searchTerm, filter }) {
   return (dispatch, getState) => {
     dispatch(actions.updateDiscussionsSearch({ searchTerm, filter }))
-    const state = getState()
-    const pinned = state.pinnedDiscussions
-    const unpinned = state.unpinnedDiscussions
-    const closed = state.closedForCommentsDiscussions
-    const allDiscussions = pinned.concat(unpinned).concat(closed)
-    const numDisplayed = allDiscussions.filter(d => !d.filtered).length
+    const { allDiscussions } = getState()
+    const unfiltered = Object.keys(allDiscussions).filter((id) => {
+      const discussion = allDiscussions[id]
+      return !discussion.filtered
+    })
+    const numDisplayed = unfiltered.length
     $.screenReaderFlashMessageExclusive(I18n.t('%{count} discussions found.', { count: numDisplayed }))
+  }
+}
+
+
+function nextFocusableDiscussion(state, discussionId) {
+  const { allDiscussions } = state
+  const pinned = state.pinnedDiscussionIds
+  const unpinned = state.unpinnedDiscussionIds
+  const closed = state.closedForCommentsDiscussionIds
+
+  // Find which category has the requested discussion
+  let container = null
+  let index = null
+  const pinnedIndex = pinned.indexOf(discussionId)
+  const unpinnedIndex = unpinned.indexOf(discussionId)
+  const closedIndex = closed.indexOf(discussionId)
+  if (pinnedIndex !== -1) {
+    container = pinned
+    index = pinnedIndex
+  } else if (unpinnedIndex !== -1) {
+    container = unpinned
+    index = unpinnedIndex
+  } else if (closedIndex !== -1) {
+    container = closed
+    index = closedIndex
+  } else {
+    throw new Error("discussionId does not exist in any container")
+  }
+
+  // 0 is a special case, where we have to go back out to the toggle button
+  // (as there are no previous discussions we can put focus on). Also note
+  // that it is possible for this to return nothing, ie if there is only a
+  // single element in a container. The same logic that handles if element 0
+  // requests you put focus back on the toggle button will also handle if
+  // there aren't any elements left in this container, and push the focus back
+  // to the containers toggle button as well.
+  let focusId, focusOn
+  if(index === 0) {
+    const nextDiscussion = allDiscussions[container[index + 1]]
+    if (nextDiscussion) {
+      focusId = nextDiscussion.id
+      focusOn = "toggleButton"
+    }
+  } else {
+    const prevDiscussion = allDiscussions[container[index - 1]]
+    if (prevDiscussion) {
+      focusId = prevDiscussion.id
+      focusOn = prevDiscussion.permissions.delete ? 'manageMenu' : 'title'
+    }
+  }
+
+  return {
+    focusOn,
+    focusId
   }
 }
 
 actions.deleteDiscussion = function(discussion) {
   return (dispatch, getState) => {
-    const discussionCopy = copyAndUpdateDiscussion(discussion, {})
+    const state = getState()
     dispatch(actions.deleteDiscussionStart())
-    apiClient.deleteDiscussion(getState(), {discussion: discussionCopy})
+    apiClient.deleteDiscussion(state, {discussion})
       .then(_ => {
+        const nextFocusDiscussion = nextFocusableDiscussion(state, discussion.id)
         dispatch(actions.deleteFocusPending())
-        dispatch(actions.deleteDiscussionSuccess({discussion: discussionCopy}))
+        dispatch(actions.deleteDiscussionSuccess({discussion, nextFocusDiscussion}))
         $.screenReaderFlashMessage(I18n.t('Successfully deleted discussion %{title}', { title: discussion.title }))
       })
       .catch(err => {
@@ -273,9 +328,14 @@ actions.duplicateDiscussion = function(discussionId) {
     // This is a no-op, just here to maintain a pattern
     dispatch(actions.duplicateDiscussionStart())
     apiClient.duplicateDiscussion(getState(), discussionId).then(response => {
-      const successMessage = I18n.t('Duplication of %{title} succeeded', { title: response.data.title })
+      const newDiscussion = response.data
+      newDiscussion.focusOn = 'title'
+      const successMessage = I18n.t('Duplication of %{title} succeeded', { title: newDiscussion.title })
       $.screenReaderFlashMessageExclusive(successMessage)
-      dispatch(actions.duplicateDiscussionSuccess({ newDiscussion: response.data, originalId: discussionId }))
+      dispatch(actions.duplicateDiscussionSuccess({
+        newDiscussion,
+        originalId: discussionId
+      }))
     }).catch(err => {
       const failMessage = I18n.t('Duplication failed')
       $.screenReaderFlashMessageExclusive(failMessage)

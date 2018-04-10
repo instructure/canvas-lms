@@ -19,13 +19,12 @@
 import React from 'react'
 import { mount, shallow } from 'enzyme'
 
-import DiscussionContainer from 'jsx/discussions/components/DiscussionContainer'
+import { DiscussionsContainer, mapState } from 'jsx/discussions/components/DiscussionContainer'
 
 const defaultProps = () => ({
   title: "discussions",
   closeForComments: () => {},
   permissions: {create: false, manage_content: false, moderate: false},
-  togglePin: () => {},
   discussions: [{id: 1, filtered: false, permissions: {delete: true}}],
   discussionsPage: 1,
   isLoadingDiscussions: false,
@@ -35,10 +34,10 @@ const defaultProps = () => ({
   renderContainerBackground: () => {},
 })
 
-QUnit.module('DiscussionContainer component')
+QUnit.module('DiscussionsContainer component')
 
 test('renders the component', () => {
-  const tree = mount(<DiscussionContainer {...defaultProps()} />)
+  const tree = shallow(<DiscussionsContainer {...defaultProps()} />)
   const node = tree.find('.discussions-container__wrapper')
   ok(node.exists())
 })
@@ -51,50 +50,46 @@ test('renders passed in component when renderContainerBackground is present', ()
       <p>testing</p>
     </div>
   )
-  const tree = shallow(<DiscussionContainer {...props} />)
+  const tree = shallow(<DiscussionsContainer {...props} />)
   const node = tree.find('.discussions-v2__test-image')
   ok(node.exists())
 })
 
 test('renders regular discussion row when user does not have moderate permissions', () => {
   const props = defaultProps()
-  const tree = shallow(<DiscussionContainer {...props} />)
-  const node = tree.find('DiscussionRow')
+  const tree = shallow(<DiscussionsContainer {...props} />)
+  const node = tree.find('Connect(DiscussionRow)')
   ok(node.exists())
 })
 
 test('renders a draggable discussion row when user has moderate permissions', () => {
   const props = defaultProps()
   props.permissions.moderate = true
-  const tree = shallow(<DiscussionContainer {...props} />)
-  const node = tree.find('DropTarget(DragSource(DiscussionRow))')
+  const tree = shallow(<DiscussionsContainer {...props} />)
+  const node = tree.find('Connect(DropTarget(DragSource(DiscussionRow)))')
   ok(node.exists())
 })
 
-test('renders discussion row when discussion is not filtered', () => {
-  const props = defaultProps()
-  props.discussions = [{id: 1, filtered: false, permissions: {delete: true}}]
-  const tree = shallow(<DiscussionContainer {...props} />)
-  const node = tree.find('DiscussionRow')
-  ok(node.exists())
+test('connected mapStateToProps filters out filtered discussions', () => {
+  const state = {}
+  const ownProps = {
+    discussions: [
+      {id: 1, filtered: true},
+      {id: 2, filtered: false}
+    ],
+  }
+  const connectedProps = mapState(state, ownProps)
+  deepEqual(connectedProps.discussions, [{id: 2, filtered: false}])
 })
 
-test('does not render a discussion row when discussion is filtered', () => {
-  const props = defaultProps()
-  props.discussions = [{id: 1, filtered: true}]
-  const tree = shallow(<DiscussionContainer {...props} />)
-  const node = tree.find('DiscussionRow')
-  ok(!node.exists())
-})
-
-test('renders background image if all discussions are filtered', () => {
+test('renders background image no discussions are present', () => {
   const props = defaultProps()
   const renderBackgroundSpy = sinon.spy()
-  props.discussions = [{id: 1, filtered: true}]
+  props.discussions = []
   props.renderContainerBackground = renderBackgroundSpy
 
-  const tree = mount(<DiscussionContainer {...props} />)
-  const node = tree.find('DiscussionRow')
+  const tree = mount(<DiscussionsContainer {...props} />)
+  const node = tree.find('Connect(DiscussionRow)')
   ok(renderBackgroundSpy.calledOnce)
   ok(!node.exists())
 })

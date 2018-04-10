@@ -19,36 +19,38 @@ import orderBy from 'lodash/orderBy'
 
 import { handleActions } from 'redux-actions'
 import { actionTypes } from '../actions'
-import subscriptionReducerMap from './subscriptionReducerMap'
 import duplicationReducerMap from './duplicationReducerMap'
-import cleanDiscussionFocusReducerMap from './cleanDiscussionFocusReducerMap'
-import searchReducerMap from './searchReducerMap'
 import deleteReducerMap from './deleteReducerMap'
 
 function copyAndUpdateDiscussionState(oldState, updatedDiscussion) {
   const newState = oldState.slice()
-  const discussionIndex = newState.map(d => d.id).indexOf(updatedDiscussion.id)
+  const discussionIndex = newState.indexOf(updatedDiscussion.id)
 
   if ((updatedDiscussion.pinned || updatedDiscussion.locked) && discussionIndex !== -1) {
     newState.splice(discussionIndex, 1)
   } else if (!updatedDiscussion.pinned && !updatedDiscussion.locked && discussionIndex === -1) {
-    newState.unshift(updatedDiscussion)
+    newState.unshift(updatedDiscussion.id)
   } else if (!updatedDiscussion.pinned && !updatedDiscussion.locked && discussionIndex !== -1) {
-    newState[discussionIndex] = updatedDiscussion
+    newState[discussionIndex] = updatedDiscussion.id
   }
   return newState
 }
 
+function getUnpinnedDiscussions(allDiscussions) {
+  return allDiscussions.reduce((acc, discussion) => {
+    if (!discussion.pinned && !discussion.locked) {
+      acc.push(discussion)
+    }
+    return acc
+  }, [])
+}
+
 const reducerMap = {
   [actionTypes.GET_DISCUSSIONS_SUCCESS]: (state, action) => {
-    const discussions = action.payload.data || []
-    const unpinnedDiscussions = discussions.reduce((accumlator, discussion) => {
-      if (!discussion.pinned && !discussion.locked) {
-        accumlator.push({ ...discussion, filtered: false })
-      }
-      return accumlator
-    }, [])
-    return orderBy(unpinnedDiscussions, ((d) => new Date(d.last_reply_at)), ['desc'])
+    const allDiscussions = action.payload.data
+    const unpinnedDiscussions = getUnpinnedDiscussions(allDiscussions)
+    const sorted = orderBy(unpinnedDiscussions, ((d) => new Date(d.last_reply_at)), ['desc'])
+    return sorted.map(d => d.id)
   },
   [actionTypes.UPDATE_DISCUSSION_SUCCESS]: (state, action) => (
     copyAndUpdateDiscussionState(state, action.payload.discussion)
@@ -61,8 +63,7 @@ const reducerMap = {
   ),
 }
 
-Object.assign(reducerMap, subscriptionReducerMap, duplicationReducerMap,
-              cleanDiscussionFocusReducerMap, searchReducerMap, deleteReducerMap)
+Object.assign(reducerMap, duplicationReducerMap, deleteReducerMap)
 
 const unpinnedDiscussionReducer = handleActions(reducerMap, [])
 export default unpinnedDiscussionReducer
