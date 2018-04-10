@@ -204,7 +204,7 @@ describe Outcomes::CsvImporter do
       uuid = SecureRandom.uuid
       import_fake_csv([
         headers + ['mastery_points', 'ratings'],
-        outcome_row(vendor_guid: uuid) + ['3.14', '5.34', 'awesome', '1.2', 'adequate']
+        outcome_row(vendor_guid: uuid) + ['3.14', '5.34', 'awesome', '1.2', 'adequate', '0', 'nonexistant']
       ])
 
       outcome = LearningOutcome.find_by(vendor_guid: uuid)
