@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,11 +14,21 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-class MoveScribdDocsToRootAttachments < ActiveRecord::Migration[4.2]
+class DropScribdMimeType < ActiveRecord::Migration[5.1]
   tag :postdeploy
 
-  def self.up
-    DataFixup::MoveScribdDocsToRootAttachments.send_later_if_production_enqueue_args(:run, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1)
+  def up
+    drop_table :scribd_mime_types
+  end
+
+  def down
+    create_table "scribd_mime_types" do |t|
+      t.string :extension, limit: 255
+      t.string :name, limit: 255
+      t.timestamps
+    end
+    add_index :scribd_mime_types, :extension, name: 'index_scribd_mime_types_on_extension'
   end
 end
