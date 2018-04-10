@@ -32,7 +32,7 @@ class OpenidController < ApplicationController
   def url_script
     # Referrer check just to keep other sites from linking this in and getting our
     # user id too.
-    if request.referrer.nil? || URI(request.referrer).host == URI(BeyondZConfiguration.help_url).host || URI(request.referrer).host == URI(BeyondZConfiguration.join_url).host
+    if request.referrer.nil? || (BeyondZConfiguration.help_url.nil? || URI(request.referrer).host == URI(BeyondZConfiguration.help_url).host) || URI(request.referrer).host == URI(BeyondZConfiguration.join_url).host
       if user_signed_in?
         code = "var bz_current_user_openid_url = #{url_for_user.to_json};"
       else
@@ -185,7 +185,7 @@ EOS
   end
 
   def approved(trust_root)
-    URI(trust_root).host == URI(BeyondZConfiguration.help_url).host || URI(trust_root).host == URI(BeyondZConfiguration.join_url).host
+    (BeyondZConfiguration.help_url.nil? || URI(trust_root).host == URI(BeyondZConfiguration.help_url).host) || URI(trust_root).host == URI(BeyondZConfiguration.join_url).host
   end
 
   def is_authorized(identity_url, trust_root)
