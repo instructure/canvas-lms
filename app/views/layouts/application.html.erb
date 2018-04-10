@@ -120,7 +120,7 @@
           <% end %>
       <% end %>
       
-      <% if @current_user && @current_user.pseudonym.unique_id != 'public'  %>
+      <% if @current_user %>
           <div class="sm-menu-item dropdown">
             <a id="sm-profile-dropdown" href="/profile" type="button" aria-haspopup="true" data-toggle="dropdown" data-id="profile-dropdown" aria-owns="sm-profile-dropdown" aria-labelledby="type-filter-description" aria-expanded="false">
               <div class="sm-menu-item-icon-container" aria-hidden="true">
@@ -171,9 +171,6 @@
               </li>
             </ul>
           </div>
-        <% elsif @current_user && @current_user.pseudonym.unique_id == 'public' %>
-	   <div class="sm-menu-item">
-           </div>
         <% else %>
           <div class="sm-menu-item">
             <a id="global_nav_login_link" href="/login" class="ic-app-header__menu-list-link">
