@@ -1,0 +1,51 @@
+<table>
+<% @response_object["audit_trace"].each do |thing| %>
+  <tr>
+    <td><a href="#<%= thing["field_name"] %>"><%= thing["field_name"] %></a></td>
+    <td><%= thing["field_value"] %></td>
+    <td><%= thing["field_timing"] %></td>
+    <td><%= thing["points_amount"] %></td>
+    <td><%= thing["points_possible"] %></td>
+    <td><%= thing["points_reason_english"] %></td>
+  </tr>
+<% end %>
+</table>
+<!-- reasons:
+  wrong, already_awarded, N/A, past_due (last few for 0), not_answered, participation, mastery (these for points).
+  May be preceded with partial_credit:
+-->
+
+  <%= @document.to_s.html_safe %>
+
+
+<script>
+  var all = document.querySelectorAll("[data-bz-grade-info]");
+  for(var i = 0; i < all.length; i++) {
+    var e = all[i];
+
+    var info = JSON.parse(e.getAttribute("data-bz-grade-info"));
+
+    var div = document.createElement("div");
+    div.textContent =
+      info["points_amount"] + "/" + info["points_possible"] + " points\n" +
+      (info["points_given"] ? "awarded for: " : "missed because: ") + "\n" +
+      info["points_reason_english"];
+    div.style.position = "relative";
+    div.style.left = "-200px";
+    div.style.width = "200px";
+    div.style.padding = "0.25em";
+    div.style.boxSizing = "border-box";
+    div.style.whiteSpace = "pre-line";
+
+    div.style.border = "solid 2px black";
+
+    div.id = info["field_name"];
+
+    if(info["points_given"])
+      div.style.borderColor = info["points_possible"] == info["points_amount"] ? "green" : "yellow";
+    else
+      div.style.borderColor = "red";
+
+    e.parentNode.insertBefore(div, e);
+  }
+</script>

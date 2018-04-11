@@ -7,6 +7,8 @@ require 'google/api_client/auth/storages/file_store'
 
 require 'csv'
 
+require 'bz_grading'
+
 class BzController < ApplicationController
 
   # magic field dump uses an access token instead
@@ -162,6 +164,27 @@ class BzController < ApplicationController
     assignment_info[:sections_points_available] = sections_points_available
 
     assignment_info
+  end
+
+  def grade_details
+    user = params[:user_id].nil? @current_user : User.find(params[:user_id])
+    if user.id != @current_user.id && @current_user.id != 1
+      raise "permission denied"
+    end
+    module_item_id = params[:module_item_id]
+
+    bzg = BZGrading.new
+
+    @response_object = bzg.calculate_user_module_score(module_item_id, user)
+    i = 0
+    @document = nil
+    bzg.module_unique_magic_fields(module_item_id) do |umf|
+      if i == 0
+        @document = umf.document
+      end
+      umf["data-bz-grade-info"] = @response_object["audit_trace"][i].to_json
+      i += 1
+    end
   end
 
   def grades_download
