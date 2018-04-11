@@ -13,6 +13,10 @@ class BzController < ApplicationController
   before_filter :require_user, :except => [:magic_field_dump]
   skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user, :user_retained_data_batch]
 
+  def champion_connect_redirect
+    redirect_to BeyondZConfiguration.join_url + "connect"
+  end
+
   def cohort_info_upload
     @course_id = params[:course_id]
     # view render
