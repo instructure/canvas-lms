@@ -555,6 +555,18 @@ describe SIS::CSV::EnrollmentImporter do
     )
   end
 
+  it 'should only queue up one recache_grade_distribution job per course' do
+    Course.create!(account: @account, sis_source_id: 'C001', workflow_state: 'available')
+    user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
+    user_with_managed_pseudonym(account: @account, sis_user_id: 'U002')
+    expect_any_instance_of(CachedGradeDistribution).to receive(:recalculate!).once
+    process_csv_data_cleanly(
+      'course_id,user_id,role,status',
+      'C001,U001,student,active',
+      'C001,U002,student,active',
+    )
+  end
+
   describe "custom roles" do
     context "in an account" do
       before do
