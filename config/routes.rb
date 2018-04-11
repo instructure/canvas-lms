@@ -31,6 +31,8 @@ CanvasRails::Application.routes.draw do
 
   get 'bz/user_linkedin_url' => 'bz#user_linkedin_url'
 
+  get 'bz/grade_details' => 'bz#grade_details'
+
   get 'bz/grades_download' => 'bz#grades_download', defaults: { format: 'csv' }
 
   get 'bz/linked_in_auth' => 'bz#linked_in_auth'
