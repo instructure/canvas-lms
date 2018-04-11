@@ -26,7 +26,7 @@ module SIS
       i = Work.new(@batch, @root_account, @logger, messages)
 
       Enrollment.skip_touch_callbacks(:course) do
-        Enrollment.suspend_callbacks(:set_update_cached_due_dates, :add_to_favorites_later) do
+        Enrollment.suspend_callbacks(:set_update_cached_due_dates, :add_to_favorites_later, :recache_course_grade_distribution) do
           User.skip_updating_account_associations do
             Enrollment.process_as_sis(@sis_options) do
               yield i
@@ -44,7 +44,9 @@ module SIS
       # We batch these up at the end because we don't want to keep touching the same course over and over,
       # and to avoid hitting other callbacks for the course (especially broadcast_policy)
       i.courses_to_touch_ids.to_a.in_groups_of(1000, false) do |batch|
-        Course.where(id: batch).touch_all
+        courses = Course.where(id: batch)
+        courses.touch_all
+        courses.each(&:recache_grade_distribution)
       end
       i.courses_to_recache_due_dates.to_a.in_groups_of(1000, false) do |batch|
         batch.each do |course_id, user_ids|
