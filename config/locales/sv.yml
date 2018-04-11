@@ -122,7 +122,7 @@ sv:
     tab_courses: Kurser
     tab_developer_keys: Utvecklarnycklar
     tab_faculty_journal: Fakultetsjournal
-    tab_grading_standards: Omdömesschema
+    tab_grading_standards: Bedömning
     tab_jobs: Jobb
     tab_outcomes: Lärandemål
     tab_permissions: Behörigheter
@@ -641,7 +641,7 @@ sv:
           filter_online: 
             check_box: "Endast online klasser"
     confirm_delete_user: 
-      confirm_delete: "Är du säker på att du vill radera den här användaren från kontot %{account}? Användarens data kommer att tas bort (inklusive omdöme) från alla kurser och grupper. Denna val kan inte ångras."
+      confirm_delete: "Är du säker på att du vill radera den här användaren från kontot %{account}? Användarens data kommer att tas bort (inklusive omdöme) från alla kurser och grupper. Detta val kan inte ångras."
       delete_button: "Radera %{user}"
       page_title: "Bekräfta radering"
       title: "Bekräfta radering %{user} från %{account}"
