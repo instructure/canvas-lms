@@ -1749,6 +1749,11 @@ describe CoursesController, type: :request do
     expect(course2_section_json.first['end_at']).to eq section.end_at
   end
 
+  it 'includes account_name if requested' do
+    json = api_call(:get, "/api/v1/courses.json", {controller: 'courses', action: 'index', format: 'json'}, {include: ['account_name']})
+    expect(json.first['account_name']).to eq 'Default Account'
+  end
+
   it "should include term name in course list if requested" do
     [@course1.enrollment_term, @course2.enrollment_term].each do |term|
       term.start_at = 1.day.ago

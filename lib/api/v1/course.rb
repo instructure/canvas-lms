@@ -96,6 +96,8 @@ module Api::V1::Course
       hash['teachers'] = course.teachers.distinct.map { |teacher| user_display_json(teacher) } if includes.include?('teachers')
       hash['tabs'] = tabs_available_json(course, user, session, ['external']) if includes.include?('tabs')
       hash['locale'] = course.locale unless course.locale.nil?
+      hash['account_name'] = course.account.name if includes.include?('account_name')
+      # undocumented, but leaving for backwards compatibility.
       hash['subaccount_name'] = course.account.name if includes.include?('subaccount')
       add_helper_dependant_entries(hash, course, builder)
       apply_nickname(hash, course, user) if user
