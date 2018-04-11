@@ -45,6 +45,9 @@ CanvasRails::Application.routes.draw do
 
   get '/nlu', to: redirect('/login/cas/6') # a convenience path for the separate sso people
 
+  # Send them back to Braven Champions if they go to the wrong domain
+  get '/connect', to: redirect(BeyondZConfiguration.join_url + "connect")
+
   # IMPORTANT: there are more custom routes below, search for 'bz'
   # end
   resources :epub_exports, only: [:index]
