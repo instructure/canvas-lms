@@ -32,8 +32,13 @@ class BeyondZConfiguration
     return self.production? || email.include?('@bebraven.org') || email.include?('@arsdnet.net')
   end
 
-  # Returns the URL of teh Braven Help site.  e.g. https://help.bebraven.org
+  # Returns the URL of the Braven Help site.  e.g. https://help.bebraven.org
   def self.help_url
     @config[:help_url]
+  end
+
+  # Returns the URL of the join server. Necessary for shared login on Champions page.  e.g. https://join.bebraven.org
+  def self.join_url
+    @config[:base_url]
   end
 end
