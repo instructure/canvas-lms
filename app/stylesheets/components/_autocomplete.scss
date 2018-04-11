@@ -176,7 +176,7 @@ ul[class*=ac-] {
   margin: direction-sides(2px 4px 2px 0);
   // Please don't remove overflow. It fixes a weird webkit bug.
   overflow: hidden;
-  padding: 0 18px 0 8px;
+  padding: direction-sides(0 18px 0 8px);
   position: relative;
   vertical-align: middle;
 

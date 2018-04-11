@@ -196,7 +196,7 @@
 .draggable-handle {
   /* shared with assignments, dry it up */
   color: #b4b7ba;
-  margin: 0 4px 0 -15px;
+  margin: direction-sides(0 4px 0 -15px);
   padding: direction-sides(0 0px 0 10px )!important;
 }
 

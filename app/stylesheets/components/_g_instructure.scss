@@ -495,7 +495,7 @@ body .disabled_link {
 .error_box {
   position: absolute;
   top: -1000px;
-  #{direction(left)}: -100px;
+  left: -100px;
   z-index: 11;
   max-width: 200px;
   min-width: 100px;
@@ -511,7 +511,7 @@ body .disabled_link {
   .error_bottom {
     position: absolute;
     bottom: 0;
-    #{direction(left)}: 4px;
+    left: 4px;
   }
 }
 

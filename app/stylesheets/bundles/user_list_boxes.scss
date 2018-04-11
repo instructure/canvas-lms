@@ -68,6 +68,7 @@
         position: absolute;
         margin: -4px;
         width: 33px;
+        #{direction(right)}: 4px;
       }
       &.existing-user::before {
         background-image: url(/images/circle-check.png);

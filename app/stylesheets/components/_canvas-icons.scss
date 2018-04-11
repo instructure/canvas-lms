@@ -136,8 +136,8 @@ a[class^=icon-] {
 
   // flip all the arrows around in RTL
   @if $direction == 'rtl' {
-    &[class*=right],
-    &[class*=left] {
+    &[class*=-right],
+    &[class*=-left] {
       &:before {
         transform: scale(-1, 1);
       }
