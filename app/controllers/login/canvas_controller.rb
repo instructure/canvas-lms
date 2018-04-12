@@ -47,10 +47,7 @@ class Login::CanvasController < ApplicationController
     end
 
     # reset the session id cookie to prevent session fixation.
-
-    if !params[:pseudonym_session][:unique_id] == 'public'
-        reset_session_for_login
-    end
+    # reset_session_for_login
 
     if params[:pseudonym_session].blank? || params[:pseudonym_session][:password].blank?
       return unsuccessful_login(t("No password was given"))
