@@ -92,9 +92,6 @@ class EportfoliosController < ApplicationController
 
         # otherwise, if  I can otherwise view the user, link directly to them
         @owner_url ||= user_url(@portfolio.user) if @portfolio.user.grants_right?(@current_user, :view_statistics)
-
-        js_env :folder_id => Folder.unfiled_folder(@current_user).id,
-               :context_code => @current_user.asset_string
       end
     end
   end

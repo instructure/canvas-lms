@@ -40,7 +40,8 @@ import IconUpdownLine from 'instructure-icons/lib/Line/IconUpdownLine'
 import IconTrashSolid from 'instructure-icons/lib/Solid/IconTrashSolid'
 import IconPinSolid from 'instructure-icons/lib/Solid/IconPinSolid'
 import IconPinLine from 'instructure-icons/lib/Line/IconPinLine'
-import IconReply from 'instructure-icons/lib/Line/IconReplyLine'
+import IconLock from 'instructure-icons/lib/Line/IconLockLine'
+import IconUnlock from 'instructure-icons/lib/Line/IconUnlockLine'
 import IconUnpublishedLine from 'instructure-icons/lib/Line/IconUnpublishedLine'
 import IconLtiLine from 'instructure-icons/lib/Line/IconLtiLine'
 
@@ -313,9 +314,10 @@ export default class DiscussionRow extends Component {
       const screenReaderContent = this.props.discussion.locked
         ? I18n.t('Open discussion %{title} for comments', { title: discussionTitle })
         : I18n.t('Close discussion %{title} for comments', { title: discussionTitle })
+      const icon = this.props.discussion.locked ? ( <IconUnlock /> ) : ( <IconLock /> )
       menuList.push(this.createMenuItem(
         'togglelocked',
-        ( <span aria-hidden='true'> <IconReply />&nbsp;&nbsp;{menuLabel} </span> ),
+        ( <span aria-hidden='true'> {icon}&nbsp;&nbsp;{menuLabel} </span> ),
         screenReaderContent
       ))
     }

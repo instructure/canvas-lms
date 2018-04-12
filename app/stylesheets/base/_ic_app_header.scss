@@ -299,7 +299,7 @@ button.ic-app-header__menu-list-link {
   background-image: var(--ic-brand-header-image);
   background-position: 50%;
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: contain;
   transition: transform 0.3s;
   height: 75px;
 

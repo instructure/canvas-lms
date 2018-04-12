@@ -1837,22 +1837,22 @@ class Assignment < ActiveRecord::Base
   def representatives(user, includes: [:inactive])
     return visible_students_for_speed_grader(user, includes: includes) unless grade_as_group?
 
-    submissions = self.submissions.preload(:user).to_a
-    users_with_submissions = submissions.select(&:has_submission?).map(&:user)
-    users_with_turnitin_data = if turnitin_enabled?
-                                 submissions.reject { |s| s.turnitin_data.blank? }.map(&:user)
+    submissions = self.submissions.to_a
+    user_ids_with_submissions = submissions.select(&:has_submission?).map(&:user_id).to_set
+    user_ids_with_turnitin_data = if turnitin_enabled?
+                                 submissions.reject { |s| s.turnitin_data.blank? }.map(&:user_id).to_set
                                else
                                  []
                                end
-    users_with_vericite_data = if vericite_enabled?
+    user_ids_with_vericite_data = if vericite_enabled?
                                  submissions.
                                    reject {|s| s.turnitin_data.blank?}.
-                                   map(&:user)
+                                   map(&:user_id).to_set
                                else
                                  []
                                end
     # this only includes users with a submission who are unexcused
-    users_who_arent_excused = submissions.reject(&:excused?).map(&:user)
+    user_ids_who_arent_excused = submissions.reject(&:excused?).map(&:user_id).to_set
 
     enrollment_state =
       Hash[self.context.all_accepted_student_enrollments.pluck(:user_id, :workflow_state)]
@@ -1861,17 +1861,18 @@ class Assignment < ActiveRecord::Base
     enrollment_priority = { 'active' => 1, 'inactive' => 2 }
     enrollment_priority.default = 100
 
+    visible_student_ids = visible_students_for_speed_grader(user, includes: includes).map(&:id).to_set
+
     reps_and_others = groups_and_ungrouped(user, includes: includes).map do |group_name, group_info|
       group_students = group_info[:users]
-      visible_group_students =
-        group_students & visible_students_for_speed_grader(user, includes: includes)
+      visible_group_students = group_students.select{|u| visible_student_ids.include?(u.id)}
 
-      candidate_students = visible_group_students & users_who_arent_excused
+      candidate_students = visible_group_students.select{|u| user_ids_who_arent_excused.include?(u.id)}
       candidate_students = visible_group_students if candidate_students.empty?
       candidate_students.sort_by! { |s| enrollment_priority[enrollment_state[s.id]] }
 
-      representative   = (candidate_students & (users_with_turnitin_data || users_with_vericite_data)).first
-      representative ||= (candidate_students & users_with_submissions).first
+      representative   = candidate_students.detect{|u| user_ids_with_turnitin_data.include?(u.id) || user_ids_with_vericite_data.include?(u.id)}
+      representative ||= candidate_students.detect{|u| user_ids_with_submissions.include?(u.id)}
       representative ||= candidate_students.first
       others = visible_group_students - [representative]
       next unless representative

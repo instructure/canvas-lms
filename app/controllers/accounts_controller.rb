@@ -197,6 +197,30 @@ class AccountsController < ApplicationController
     end
   end
 
+  # @API Permissions
+  # Returns permission information for the calling user and the given account.
+  # You may use `self` as the account id to check permissions against the domain root account.
+  # The caller must have an account role or admin (teacher/TA/designer) enrollment in a course
+  # in the account. See also {api:CoursesController#permissions the Course counterpart}.
+  #
+  # @argument permissions[] [String]
+  #   List of permissions to check against the authenticated user.
+  #   Permission names are documented in the {api:RoleOverridesController#add_role Create a role} endpoint.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/accounts/self/permissions \
+  #       -H 'Authorization: Bearer <token>' \
+  #       -d 'permissions[]=manage_account_memberships' \
+  #       -d 'permissions[]=become_user'
+  #
+  # @example_response
+  #   {'manage_account_memberships': 'false', 'become_user': 'true'}
+  def permissions
+    return unless authorized_action(@account, @current_user, :read)
+    permissions = Array(params[:permissions]).map(&:to_sym)
+    render json: @account.rights_status(@current_user, session, *permissions)
+  end
+
   # @API Get the sub-accounts of an account
   #
   # List accounts that are sub-accounts of the given account.

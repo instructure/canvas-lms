@@ -230,7 +230,7 @@ end
 describe "eportfolios file upload" do
   include_context "in-process server selenium tests"
 
-  before do
+  before :once do
     @password = "asdfasdf"
     @student = user_with_pseudonym :active_user => true,
                                    :username => "student@example.com",
@@ -242,11 +242,8 @@ describe "eportfolios file upload" do
     eportfolio_model({:user => @user, :name => "student content"})
   end
 
-  it "should upload a file" do
-    create_session(@student.pseudonym)
-    get "/eportfolios/#{@eportfolio.id}"
+  def test_file_upload
     _filename, fullpath, _data = get_file("testfile5.zip")
-    expect_new_page_load { f(".icon-arrow-right").click }
     f("#right-side .edit_content_link").click
     wait_for_ajaximations
     f('.add_file_link').click
@@ -258,7 +255,26 @@ describe "eportfolios file upload" do
     download = fj("a.eportfolio_download:visible")
     expect(download).to be_displayed
     expect(download).to have_attribute("href", /files/)
-    # cannot test downloading the file, will check in the future
-    # check_file(download)
+  end
+
+  it "should upload a file to the main page" do
+    create_session(@student.pseudonym)
+    get "/eportfolios/#{@eportfolio.id}?view=preview"
+    test_file_upload
+  end
+
+  it "should upload a file to an eportfolio section" do
+    ec = @eportfolio.eportfolio_categories.create! name: 'Something'
+    create_session(@student.pseudonym)
+    get "/eportfolios/#{@eportfolio.id}/#{ec.slug}"
+    test_file_upload
+  end
+
+  it "should upload a file to an eportfolio page" do
+    ec = @eportfolio.eportfolio_categories.create! name: 'Der Section'
+    ep = ec.eportfolio_entries.create! eportfolio: @eportfolio, name: 'Das Page'
+    create_session(@student.pseudonym)
+    get "/eportfolios/#{@eportfolio.id}/#{ec.slug}/#{ep.slug}"
+    test_file_upload
   end
 end

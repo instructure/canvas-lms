@@ -116,11 +116,11 @@ export default {
       'aria-selected': this.props.isSelected,
       draggable: !this.state.editing,
       ref: 'FolderChild',
-      onDragStart: () => {
+      onDragStart: (event) => {
         if (!this.props.isSelected) {
           this.props.toggleSelected()
         }
-        return this.props.dndOptions.onItemDragStart(...arguments)
+        return this.props.dndOptions.onItemDragStart(event)
       }
     }
 
