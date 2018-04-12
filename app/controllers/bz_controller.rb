@@ -167,7 +167,7 @@ class BzController < ApplicationController
   end
 
   def grade_details
-    user = params[:user_id].nil? @current_user : User.find(params[:user_id])
+    user = params[:user_id].nil? ? @current_user : User.find(params[:user_id])
     if user.id != @current_user.id && @current_user.id != 1
       raise "permission denied"
     end
