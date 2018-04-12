@@ -301,4 +301,61 @@ describe LiveEventsObserver do
       course.root_account.save!
     end
   end
+
+  describe "modules" do
+    it "posts create events" do
+      expect(Canvas::LiveEvents).to receive(:module_created).with(anything)
+      Account.default.courses.create!.context_modules.create!
+    end
+
+    it "posts update events" do
+      context_module = Account.default.courses.create!.context_modules.create!
+      expect(Canvas::LiveEvents).to receive(:module_updated).with(context_module)
+      context_module.update_attribute(:position, 10)
+    end
+  end
+
+  describe "context events" do
+    let(:course) { Account.default.courses.create! }
+
+    context "the tag_type is context_module" do
+      it "posts create events" do
+        expect(Canvas::LiveEvents).to receive(:module_item_created).with(anything)
+        context_module = course.context_modules.create!
+        ContentTag.create!(
+          title: "content",
+          context: course,
+          tag_type: "context_module",
+          context_module: context_module
+        )
+      end
+
+      it "posts update events" do
+        context_module = course.context_modules.create!
+        content_tag = ContentTag.create!(
+          title: "content",
+          context: course,
+          tag_type: "context_module",
+          context_module: context_module
+        )
+        expect(Canvas::LiveEvents).to receive(:module_item_updated).with(content_tag)
+        content_tag.update_attribute(:position, 11)
+      end
+    end
+
+    context "the tag_type is not context_module" do
+      it "does nothing" do
+        expect(Canvas::LiveEvents).not_to receive(:module_item_created)
+        expect(Canvas::LiveEvents).not_to receive(:module_item_updated)
+        context_module = course.context_modules.create!
+        content_tag = ContentTag.create!(
+          title: "content",
+          context: course,
+          tag_type: "learning_outcome",
+          context_module: context_module
+        )
+        content_tag.update_attribute(:position, 11)
+      end
+    end
+  end
 end
