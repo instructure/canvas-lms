@@ -24,7 +24,30 @@ module AccountReports
   # This hash is modified below and should not be frozen.
   REPORTS = {}
 
-  Report = Struct.new(:title, :description_partial, :parameters_partial, :parameters, :module, :proc, :parallel_proc) do
+  Report = Struct.new(:type, :title, :description_partial, :parameters_partial, :parameters, :module, :proc, :parallel_proc) do
+    def module_name
+      if self[:module].include?("::")
+        self[:module]
+      else
+        "AccountReports::#{self[:module]}"
+      end
+    end
+
+    def proc
+      unless self[:proc]
+        self.proc = module_name.constantize.method(type)
+      end
+      self[:proc]
+    end
+
+    def parallel_proc
+      unless instance_variable_defined?(:@parallel_proc)
+        @parallel_proc = self[:parallel_proc] ||
+          module_name.constantize.public_methods.include?(:"parallel_#{type}") &&
+          module_name.constantize.method(:"parallel_#{type}")
+      end
+      @parallel_proc
+    end
 
     def title
       title = self[:title]
@@ -36,12 +59,8 @@ module AccountReports
   def self.configure_account_report(module_name, reports)
     reports.each do |report_type, details|
       details[:module] ||= module_name
-      module_name = "AccountReports::#{module_name}" unless module_name.include?("::")
-      details[:proc] ||= module_name.constantize.method(report_type)
-      if module_name.constantize.public_methods.include?(:"parallel_#{report_type}")
-        details[:parallel_proc] ||= module_name.constantize.method(:"parallel_#{report_type}")
-      end
-      report = Report.new(details[:title],
+      report = Report.new(report_type,
+                          details[:title],
                           details[:description_partial],
                           details[:parameters_partial],
                           details[:parameters],
@@ -62,7 +81,7 @@ module AccountReports
   def self.generate_report(account_report)
     account_report.update_attributes(workflow_state: 'running', start_at: Time.zone.now)
     begin
-      REPORTS[account_report.report_type][:proc].call(account_report)
+      REPORTS[account_report.report_type].proc.call(account_report)
     rescue => e
       account_report.logger.error e
       @er = ErrorReport.log_exception(nil, e, :user => account_report.user)

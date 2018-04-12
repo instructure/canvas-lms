@@ -306,7 +306,7 @@ module AccountReports::ReportHelper
         return
       end
       report_runner.start
-      Shackles.activate(:slave) {AccountReports::REPORTS[@account_report.report_type][:parallel_proc].call(@account_report, report_runner)}
+      Shackles.activate(:slave) {AccountReports::REPORTS[@account_report.report_type].parallel_proc.call(@account_report, report_runner)}
       update_parallel_progress(account_report: @account_report,report_runner: report_runner)
     rescue => e
       report_runner.fail
