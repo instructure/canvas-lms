@@ -325,11 +325,11 @@ class AccountsController < ApplicationController
   # @argument search_term [String]
   #   The partial course name, code, or full ID to match and return in the results list. Must be at least 3 characters.
   #
-  # @argument include[] [String, "syllabus_body"|"term"|"course_progress"|"storage_quota_used_mb"|"total_students"|"teachers"]
+  # @argument include[] [String, "syllabus_body"|"term"|"course_progress"|"storage_quota_used_mb"|"total_students"|"teachers"|"account_name"]
   #   - All explanations can be seen in the {api:CoursesController#index Course API index documentation}
   #   - "sections", "needs_grading_count" and "total_scores" are not valid options at the account level
   #
-  # @argument sort [String, "course_name"|"sis_course_id"|"teacher"|"subaccount"]
+  # @argument sort [String, "course_name"|"sis_course_id"|"teacher"|"account_name"]
   #   The column to sort results by.
   #
   # @argument order [String, "asc"|"desc"]
@@ -366,7 +366,8 @@ class AccountsController < ApplicationController
                 AND #{Enrollment.quoted_table_name}.type = 'TeacherEnrollment'
                 AND #{Enrollment.quoted_table_name}.course_id = #{Course.quoted_table_name}.id
                 ORDER BY #{sortable_name_col} LIMIT 1)"
-            elsif params[:sort] == 'subaccount'
+            # leaving subaccount as an option for backwards compatibility
+            elsif params[:sort] == 'subaccount' || params[:sort] == 'account_name'
               "(SELECT #{name_col} FROM #{Account.quoted_table_name}
                 WHERE #{Account.quoted_table_name}.id
                 = #{Course.quoted_table_name}.account_id)"
