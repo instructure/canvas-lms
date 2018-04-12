@@ -562,7 +562,7 @@ class AssignmentsController < ApplicationController
   protected
 
   def tool_eula_url
-    @assignment.tool_settings_tool.try(:tool_proxy)&.find_service(Assignment::Lti::EULA_SERVICE, 'GET')&.endpoint
+    @assignment.tool_settings_tool.try(:tool_proxy)&.find_service(Assignment::LTI_EULA_SERVICE, 'GET')&.endpoint
   end
 
   def strong_assignment_params
