@@ -76,8 +76,6 @@ class EportfolioCategoriesController < ApplicationController
         @page = @category.eportfolio_entries.first
         @page ||= @portfolio.eportfolio_entries.create(:eportfolio_category => @category, :allow_comments => true, :show_comments => true, :name => t(:default_name, "New Page")) if @portfolio.grants_right?(@current_user, session, :update)
         raise ActiveRecord::RecordNotFound if !@page
-        js_env :folder_id => Folder.unfiled_folder(@current_user).id,
-               :context_code => @current_user.asset_string
         eportfolio_page_attributes
         render "eportfolios/show"
       end

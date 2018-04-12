@@ -64,7 +64,7 @@ class DueDateCacher
     user_ids = Array(user_ids)
     course = Course.find(course) unless course.is_a?(Course)
     if assignments.nil?
-      inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Users:#{course.global_id}:#{user_ids.join(':')}"
+      inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Users:#{course.global_id}:#{Digest::MD5.hexdigest(user_ids.sort.join(':'))}"
     end
     assignments ||= Assignment.active.where(context: course).pluck(:id)
     return if assignments.empty?

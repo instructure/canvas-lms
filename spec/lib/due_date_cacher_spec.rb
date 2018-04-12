@@ -188,7 +188,7 @@ describe DueDateCacher do
     it "queues a delayed job in a singleton if given no assignments and no singleton option" do
       expect(DueDateCacher).to receive(:new).and_return(instance)
       expect(instance).to receive(:send_later_if_production_enqueue_args).
-        with(:recompute, singleton: "cached_due_date:calculator:Users:#{@course.global_id}:#{student_1.id}")
+        with(:recompute, singleton: "cached_due_date:calculator:Users:#{@course.global_id}:#{Digest::MD5.hexdigest(student_1.id.to_s)}")
       DueDateCacher.recompute_users_for_course(student_1.id, @course)
     end
 
