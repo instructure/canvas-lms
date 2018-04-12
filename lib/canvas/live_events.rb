@@ -469,4 +469,37 @@ module Canvas::LiveEvents
       integration_id: section.integration_id
     }
   end
+
+  def self.module_created(context_module)
+    post_event_stringified('module_created', get_context_module_data(context_module))
+  end
+
+  def self.module_updated(context_module)
+    post_event_stringified('module_updated', get_context_module_data(context_module))
+  end
+
+  def self.get_context_module_data(context_module)
+    {
+      module_id: context_module.id,
+      name: context_module.name,
+      position: context_module.position,
+      workflow_state: context_module.workflow_state,
+    }
+  end
+
+  def self.module_item_created(context_module_item)
+    post_event_stringified('module_item_created', get_context_module_item_data(context_module_item))
+  end
+
+  def self.module_item_updated(context_module_item)
+    post_event_stringified('module_item_updated', get_context_module_item_data(context_module_item))
+  end
+
+  def self.get_context_module_item_data(context_module_item)
+    {
+      module_item_id: context_module_item.id,
+      position: context_module_item.position,
+      workflow_state: context_module_item.workflow_state
+    }
+  end
 end

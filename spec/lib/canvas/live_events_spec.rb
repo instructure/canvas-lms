@@ -717,4 +717,86 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.quizzes_next_quiz_duplicated(event_payload)
     end
   end
+
+  describe '.module_created' do
+    it 'should trigger a context module created live event' do
+      course_with_student_submissions
+      context_module = ContextModule.create!(context: @course)
+
+      expected_event_body = {
+        module_id: context_module.id.to_s,
+        name: context_module.name,
+        position: context_module.position,
+        workflow_state: context_module.workflow_state,
+      }
+
+      expect_event('module_created', expected_event_body).once
+
+      Canvas::LiveEvents.module_created(context_module)
+    end
+  end
+
+  describe '.module_updated' do
+    it 'should trigger a context module updated live event' do
+      course_with_student_submissions
+      context_module = ContextModule.create!(context: @course)
+
+      expected_event_body = {
+        module_id: context_module.id.to_s,
+        name: context_module.name,
+        position: context_module.position,
+        workflow_state: context_module.workflow_state,
+      }
+
+      expect_event('module_updated', expected_event_body).once
+
+      Canvas::LiveEvents.module_updated(context_module)
+    end
+  end
+
+  describe '.module_item_created' do
+    it 'should trigger a context module item created live event' do
+      course_with_student_submissions
+      context_module = ContextModule.create!(context: @course)
+      content_tag = ContentTag.create!(
+        title: "content",
+        context: @course,
+        context_module: context_module,
+        content: @course.assignments.first
+      )
+
+      expected_event_body = {
+        module_item_id: content_tag.id.to_s,
+        position: content_tag.position,
+        workflow_state: content_tag.workflow_state
+      }
+
+      expect_event('module_item_created', expected_event_body).once
+
+      Canvas::LiveEvents.module_item_created(content_tag)
+    end
+  end
+
+  describe '.module_item_updated' do
+    it 'should trigger a context module updated live event' do
+      course_with_student_submissions
+      context_module = ContextModule.create!(context: @course)
+      content_tag = ContentTag.create!(
+        title: "content",
+        context: @course,
+        context_module: context_module,
+        content: @course.assignments.first
+      )
+
+      expected_event_body = {
+        module_item_id: content_tag.id.to_s,
+        position: content_tag.position,
+        workflow_state: content_tag.workflow_state
+      }
+
+      expect_event('module_item_updated', expected_event_body).once
+
+      Canvas::LiveEvents.module_item_updated(content_tag)
+    end
+  end
 end
