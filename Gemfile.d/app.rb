@@ -71,7 +71,7 @@ if CANVAS_RAILS5_1
 else
   gem 'i18n', '1.0.0'
 end
-gem 'i18nliner', '0.0.14'
+gem 'i18nliner', '0.1.0'
   gem 'ruby2ruby', '2.4.1', require: false
   gem 'ruby_parser', '3.11.0', require: false
 gem 'icalendar', '1.5.4', require: false
