@@ -2998,4 +2998,40 @@ describe User do
       expect(@user.dashboard_view).to eql('cards')
     end
   end
+
+  describe "user_can_edit_name?" do
+    before(:once) do
+      user_with_pseudonym
+      @pseudonym.account.settings[:users_can_edit_name] = false
+      @pseudonym.account.save!
+    end
+
+    it "does not allow editing user name by default" do
+      expect(@user.user_can_edit_name?).to eq false
+    end
+
+    it "allows editing user name if the pseudonym allows this" do
+      @pseudonym.account.settings[:users_can_edit_name] = true
+      @pseudonym.account.save!
+      expect(@user.user_can_edit_name?).to eq true
+    end
+
+    describe "multiple pseudonyms" do
+      before(:once) do
+        @other_account = Account.create :name => 'Other Account'
+        @other_account.settings[:users_can_edit_name] = true
+        @other_account.save!
+        user_with_pseudonym(:user => @user, :account => @other_account)
+      end
+
+      it "allows editing if one pseudonym's account allows this" do
+        expect(@user.user_can_edit_name?).to eq true
+      end
+
+      it "doesn't allow editing if only a deleted pseudonym's account allows this" do
+        @user.pseudonyms.where(account_id: @other_account).first.destroy
+        expect(@user.user_can_edit_name?).to eq false
+      end
+    end
+  end
 end
