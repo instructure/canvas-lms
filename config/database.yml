@@ -11,7 +11,7 @@ development:
   pool: <%= ENV["DB_POOL"] || 5 %>
   use_qualified_names: true
   schema_search_path: "courseware,public"
-  
+
 production:
   adapter: postgresql
   host: <%= ENV['DB_HOST'] %>
@@ -25,7 +25,7 @@ production:
   pool: <%= ENV["DB_POOL"] || 5 %>
   use_qualified_names: true
   schema_search_path: "courseware,public"
-  
+
 courseware:
   adapter: postgresql
   host: <%= ENV['DB_HOST'] %>
@@ -39,3 +39,15 @@ courseware:
   pool: <%= ENV["DB_POOL"] || 5 %>
   use_qualified_names: true
   schema_search_path: "courseware,public"
+
+test:
+  adapter: postgresql
+  encoding: utf8
+  database: canvas_test
+  host: localhost
+  host: <%= ENV['DB_HOST'] %>
+  port: <%= ENV['DB_PORT'] %>
+  username: <%= ENV['DB_USER'] %>
+  database: <%= ENV['DB_NAME'] %>
+  password: <%= ENV['DB_PASS'] %>
+  timeout: 5000
