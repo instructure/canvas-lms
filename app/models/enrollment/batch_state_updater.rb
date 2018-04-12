@@ -61,6 +61,7 @@ class Enrollment::BatchStateUpdater
       reset_notifications_cache(user_course_tuples)
       update_assignment_overrides(batch, courses, user_ids)
       needs_grading_count_updated(courses)
+      recache_all_course_grade_distribution(courses)
       update_cached_due_dates(students, root_account)
       batch.count
     end
@@ -152,6 +153,12 @@ class Enrollment::BatchStateUpdater
   def self.needs_grading_count_updated(courses)
     courses.each do |c|
       c.assignments.touch_all
+    end
+  end
+
+  def self.recache_all_course_grade_distribution(courses)
+    courses.each do |c|
+      c.recache_grade_distribution
     end
   end
 
