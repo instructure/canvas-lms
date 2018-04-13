@@ -80,4 +80,6 @@ environment_configuration(defined?(config) && config) do |config|
 
   # eval <env>-local.rb if it exists
   Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }
+
+  config.logger = Logger.new(STDOUT)
 end
