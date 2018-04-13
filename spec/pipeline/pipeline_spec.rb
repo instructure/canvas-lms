@@ -11,7 +11,12 @@ describe 'pipeline service' do
 
   context "Missing configuration" do
     before do
+      @original_pipeline_user = ENV['PIPELINE_USER_NAME']
       ENV['PIPELINE_USER_NAME'] = nil
+    end
+
+    after do
+      ENV['PIPELINE_USER_NAME'] = @original_pipeline_user
     end
 
     it 'wont raise an error through the api cus its queued' do
@@ -27,7 +32,7 @@ describe 'pipeline service' do
 
   context "Submission" do
     let(:context) { double('context') }
-    let(:assignment) { double('assignment', context: context, submission_types:        []) }
+    let(:assignment) { double('assignment', context: context, submission_types: []) }
     let(:user) { double('user') }
 
     let(:submission) do
@@ -44,13 +49,17 @@ describe 'pipeline service' do
         originality_data:        [],
         vericite_data:           {},
         versioned_attachments:   [],
-        attachment:              nil
-
+        attachment:              nil,
+        submission_type:         '',
+        id: 1
       )
     end
 
     before do
-      Api.instance_variable_set('@current_user', user)
+      ENV['PIPELINE_ENDPOINT'] = 'https://example.com'
+      ENV['PIPELINE_USER_NAME'] = 'example_user'
+      ENV['PIPELINE_PASSWORD'] = 'example_password'
+      ENV['CANVAS_DOMAIN'] = 'someschool.com'
     end
 
     it do
