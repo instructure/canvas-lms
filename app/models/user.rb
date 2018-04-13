@@ -159,6 +159,17 @@ class User < ActiveRecord::Base
     PageView.for_user(self, options)
   end
 
+  def industry_interests
+    industries = []
+    ['dyc-industry-1', 'dyc-industry-2', 'dyc-industry-freeform-other'].each do |name|
+      res = RetainedData.where(:user_id => self.id, :name => name)
+      if res.any? && !res.first.value.blank?
+        industries << res.first.value
+      end
+    end
+    industries
+  end
+
   scope :of_account, lambda { |account| where("EXISTS (?)", account.user_account_associations.where("user_account_associations.user_id=users.id")).shard(account.shard) }
   scope :recently_logged_in, -> {
     eager_load(:pseudonyms).
