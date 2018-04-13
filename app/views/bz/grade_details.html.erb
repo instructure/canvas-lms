@@ -19,6 +19,10 @@
 
 
 <script>
+  function prettyRound(n) {
+    return Math.round(n * 100) / 100;
+  }
+
   var all = document.querySelectorAll("[data-bz-grade-info]");
   for(var i = 0; i < all.length; i++) {
     var e = all[i];
@@ -27,7 +31,7 @@
 
     var div = document.createElement("div");
     div.textContent =
-      info["points_amount"] + "/" + info["points_possible"] + " points\n" +
+      prettyRound(info["points_amount"]) + "/" + prettyRound(info["points_possible"]) + " points\n" +
       (info["points_given"] ? "awarded for: " : "missed because: ") + "\n" +
       info["points_reason_english"];
     div.style.position = "relative";
