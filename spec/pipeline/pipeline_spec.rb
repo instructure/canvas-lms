@@ -32,7 +32,7 @@ describe 'pipeline service' do
 
   context "Submission" do
     let(:context) { double('context') }
-    let(:assignment) { double('assignment', context: context, submission_types:        []) }
+    let(:assignment) { double('assignment', context: context, submission_types: []) }
     let(:user) { double('user') }
 
     let(:submission) do
