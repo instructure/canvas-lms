@@ -77,6 +77,7 @@ class Account < ActiveRecord::Base
   has_many :progresses, :as => :context, :inverse_of => :context
   has_many :content_migrations, :as => :context, :inverse_of => :context
   has_many :sis_batch_errors, foreign_key: :root_account_id, inverse_of: :root_account
+  has_one :outcome_proficiency, dependent: :destroy
 
   def inherited_assessment_question_banks(include_self = false, *additional_contexts)
     sql, conds = [], []
@@ -154,6 +155,10 @@ class Account < ActiveRecord::Base
     end
     result = nil unless I18n.locale_available?(result)
     result
+  end
+
+  def resolved_outcome_proficiency
+    outcome_proficiency || parent_account&.resolved_outcome_proficiency
   end
 
   include ::Account::Settings

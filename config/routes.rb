@@ -1264,6 +1264,11 @@ CanvasRails::Application.routes.draw do
       end
     end
 
+    scope(controller: :outcome_proficiency_api) do
+      post "accounts/:account_id/outcome_proficiency", action: :create
+      get "accounts/:account_id/outcome_proficiency", action: :show
+    end
+
     scope(controller: :users) do
       get 'users/self/activity_stream', action: :activity_stream, as: 'user_activity_stream'
       get 'users/activity_stream', action: :activity_stream # deprecated

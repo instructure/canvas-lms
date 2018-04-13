@@ -23,6 +23,14 @@ describe Account do
 
   describe 'relationships' do
     it { is_expected.to have_many(:feature_flags) }
+    it { is_expected.to have_one(:outcome_proficiency).dependent(:destroy) }
+  end
+
+  it 'retrieves parent account\'s outcome proficiency' do
+    root_account = Account.create!
+    proficiency = outcome_proficiency_model(root_account)
+    subaccount = root_account.sub_accounts.create!
+    expect(subaccount.resolved_outcome_proficiency).to eq proficiency
   end
 
   it "should provide a list of courses" do
