@@ -65,11 +65,8 @@ export default class EditorConfig {
       toolbar: this.toolbar(),
       theme: 'modern',
       skin: false,
-      plugins: 'autolink,media,paste,table,textcolor,link,directionality,lists',
+      plugins: 'paste,table,textcolor,directionality,lists',
       external_plugins: {
-        instructure_image: '/javascripts/tinymce_plugins/instructure_image/plugin.js',
-        instructure_links: '/javascripts/tinymce_plugins/instructure_links/plugin.js',
-        instructure_embed: '/javascripts/tinymce_plugins/instructure_embed/plugin.js',
         instructure_equation: '/javascripts/tinymce_plugins/instructure_equation/plugin.js',
         instructure_equella: '/javascripts/tinymce_plugins/instructure_equella/plugin.js',
         instructure_external_tools: '/javascripts/tinymce_plugins/instructure_external_tools/plugin.js',
