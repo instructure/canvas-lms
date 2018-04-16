@@ -216,6 +216,23 @@ test('handleThemeStateChange resets to default when opts.resetValue is set', () 
   })
 })
 
+test('handleThemeStateChange sets values to original default values when opts.useDefault is set', () => {
+  const wrapper = shallow(<ThemeEditor {...testProps} />)
+  wrapper.instance().handleThemeStateChange('ic-brand-favicon', '/path/to/some/image.ico')
+
+  wrapper.instance().handleThemeStateChange('ic-brand-favicon', null, {resetValue: true, useDefault: true})
+  deepEqual(wrapper.state('themeStore'), {
+    properties: {
+      'ic-brand-primary': 'green',
+      'ic-brand-font-color-dark': '#2D3B45',
+      'ic-brand-global-nav-bgd': '#394B58',
+      'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
+      'ic-brand-favicon': '/images/favicon.ico'
+    },
+    files: []
+  })
+})
+
 test('handleThemeStateChange removes files from the store when opts.resetValue is set', () => {
   const wrapper = shallow(<ThemeEditor {...testProps} />)
   const key = 'ic-brand-favicon'
@@ -235,6 +252,7 @@ test('handleThemeStateChange removes files from the store when opts.resetValue i
   })
 })
 
+
 test('processThemeStoreForSubmit puts the themeStore into a FormData and returns it', () => {
   const wrapper = shallow(<ThemeEditor {...testProps} />)
   const fileValue = new File(['foo'], 'foo.png')
@@ -245,7 +263,7 @@ test('processThemeStoreForSubmit puts the themeStore into a FormData and returns
   const formObj = fromPairs(Array.from(formData.entries()))
   deepEqual(formObj, {
     'brand_config[variables][ic-brand-font-color-dark]': 'black',
-    'brand_config[variables][ic-brand-global-nav-bgd]': '',
+    'brand_config[variables][ic-brand-global-nav-bgd]': '#394B58',
     'brand_config[variables][ic-brand-global-nav-ic-icon-svg-fill]': '#efefef',
     'brand_config[variables][ic-brand-primary]': 'green',
     'brand_config[variables][ic-brand-favicon]': fileValue,
@@ -264,11 +282,11 @@ test('processThemeStoreForSubmit sets the correct keys for custom uploads', () =
   const formData = wrapper.instance().processThemeStoreForSubmit()
   const formObj = fromPairs(Array.from(formData.entries()))
   deepEqual(formObj, {
-    'brand_config[variables][ic-brand-font-color-dark]': '',
-    'brand_config[variables][ic-brand-global-nav-bgd]': '',
+    'brand_config[variables][ic-brand-font-color-dark]': '#2D3B45',
+    'brand_config[variables][ic-brand-global-nav-bgd]': '#394B58',
     'brand_config[variables][ic-brand-global-nav-ic-icon-svg-fill]': '#efefef',
     'brand_config[variables][ic-brand-primary]': 'green',
-    'brand_config[variables][ic-brand-favicon]': '',
+    'brand_config[variables][ic-brand-favicon]': '/images/favicon.ico',
     'js_overrides': '',
     'mobile_css_overrides': '',
     'mobile_js_overrides': '',
@@ -285,11 +303,11 @@ test('processThemeStoreForSubmit sets the correct keys for custom uploads that a
   const formData = wrapper.instance().processThemeStoreForSubmit()
   const formObj = fromPairs(Array.from(formData.entries()))
   deepEqual(formObj, {
-    'brand_config[variables][ic-brand-font-color-dark]': '',
-    'brand_config[variables][ic-brand-global-nav-bgd]': '',
+    'brand_config[variables][ic-brand-font-color-dark]': '#2D3B45',
+    'brand_config[variables][ic-brand-global-nav-bgd]': '#394B58',
     'brand_config[variables][ic-brand-global-nav-ic-icon-svg-fill]': '#efefef',
     'brand_config[variables][ic-brand-primary]': 'green',
-    'brand_config[variables][ic-brand-favicon]': '',
+    'brand_config[variables][ic-brand-favicon]': '/images/favicon.ico',
     'js_overrides': '/some/path/to/a/file',
     'mobile_css_overrides': '',
     'mobile_js_overrides': '',
