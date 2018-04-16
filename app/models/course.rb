@@ -2354,7 +2354,10 @@ class Course < ActiveRecord::Base
     visibilities = section_visibilities_for(user, opts)
     visibility = enrollment_visibility_level_for(user, visibilities)
     if [:full, :limited, :restricted, :sections].include?(visibility)
-      if visibility == :sections || visibilities.all?{ |v| ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment'].include? v[:type] }
+      enrollment_types = ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment']
+      if [:restricted, :sections].include?(visibility) || (
+          visibilities.any? && visibilities.all? { |v| enrollment_types.include? v[:type] }
+        )
         visibilities.map{ |s| s[:course_section_id] }
       else
         :all

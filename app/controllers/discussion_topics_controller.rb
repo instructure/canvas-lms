@@ -1030,8 +1030,7 @@ class DiscussionTopicsController < ApplicationController
   end
 
   def verify_specific_section_visibilities
-    return unless @topic.is_section_specific
-    return unless @context.is_a? Course
+    return unless @topic.is_section_specific && @context.is_a?(Course)
     visibilities = @context.course_section_visibility(@current_user)
 
     invalid_sections =
