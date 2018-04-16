@@ -53,7 +53,7 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
           window.ENV.current_user_roles && window.ENV.current_user_roles.includes('root_admin') && ([
             <ListItem key="hr"><hr role="presentation"/></ListItem>,
             <ListItem key="customize">
-              <Link href="/accounts/self/settings" >
+              <Link href="/accounts/self/settings#custom_help_link_settings" >
                 {I18n.t('Customize this menu')}
               </Link>
             </ListItem>
