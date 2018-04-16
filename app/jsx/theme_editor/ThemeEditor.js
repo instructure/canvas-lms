@@ -183,6 +183,11 @@ export default class ThemeEditor extends React.Component {
       }
       files = files.filter(x => x.variable_name !== key)
     }
+
+    if (opts.useDefault) {
+      properties[key] = this.getSchemaDefault(key)
+    }
+
     this.setState({
       themeStore: {
         properties,
@@ -254,7 +259,7 @@ export default class ThemeEditor extends React.Component {
       if (properties[k] !== defaultVal && properties[k] && properties[k][0] !== '$') {
         processedData.append(`brand_config[variables][${k}]`, properties[k])
       } else {
-        processedData.append(`brand_config[variables][${k}]`, '')
+        processedData.append(`brand_config[variables][${k}]`, defaultVal)
       }
     })
     files.forEach(f => {
