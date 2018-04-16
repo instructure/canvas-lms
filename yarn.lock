@@ -2320,9 +2320,9 @@ caniuse-lite@^1.0.30000792, caniuse-lite@^1.0.30000805, caniuse-lite@^1.0.300008
     redux-thunk "^2.2.0"
     velocity-animate "^1.5.0"
 
-canvas-rce@3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-3.1.0.tgz#f8439a431a1c53dd47bb0cc1b92d1a8b74583f3b"
+canvas-rce@3.1.0-hotfix.0:
+  version "3.1.0-hotfix.0"
+  resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-3.1.0-hotfix.0.tgz#4a7d96042148cb851dec6495565540b112456a5b"
   dependencies:
     "@instructure/ui-core" "^4.1.0"
     "@instructure/ui-themes" "^4.1.0"
