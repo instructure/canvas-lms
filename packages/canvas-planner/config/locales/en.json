@@ -95,6 +95,9 @@
   "graded_25cd3fcd": {
     "message": "Graded"
   },
+  "items_completed_items_plural_1_item_other_items_717d579f": {
+    "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
+  },
   "late_2be42b88": {
     "message": "Late"
   },
@@ -122,14 +125,14 @@
   "missing_1a256b3b": {
     "message": "Missing"
   },
-  "missing_items_for_5ef30cea": {
-    "message": "Missing items for "
+  "missing_items_for_title_516511f8": {
+    "message": "Missing items for { title }"
   },
   "new_activity_8b84847d": {
     "message": "New Activity"
   },
-  "new_activity_for_ac84f6e6": {
-    "message": "New activity for "
+  "new_activity_for_title_14c9c3af": {
+    "message": "New activity for { title }"
   },
   "next_month_749b1778": {
     "message": "Next Month"
