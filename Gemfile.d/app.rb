@@ -18,7 +18,7 @@
 if CANVAS_RAILS5_1
   gem 'rails', '5.1.5'
 else
-  gem 'rails', '5.2.0.rc2'
+  gem 'rails', '5.2.0'
 end
 
 gem 'rack', '2.0.4'
@@ -32,13 +32,13 @@ gem 'rails-observers', '0.1.5'
 gem 'builder', '3.2.3'
 gem 'tzinfo', '1.2.5'
 
-gem 'encrypted_cookie_store-instructure', '1.2.7', require: 'encrypted_cookie_store'
+gem 'encrypted_cookie_store-instructure', '1.2.8', require: 'encrypted_cookie_store'
 gem 'active_model_serializers',   '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
-gem 'authlogic', '3.6.1'
+gem 'authlogic', '4.0.1'
   gem 'scrypt', '3.0.5'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
-gem 'switchman', '1.11.7'
+gem 'switchman', '1.12.2'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
@@ -110,7 +110,7 @@ gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.2.1', require: 'zip'
 gem 'safe_yaml', '1.0.4', require: false
 gem 'sanitize', '2.1.0', require: false
-gem 'shackles', '1.4.0'
+gem 'shackles', '1.4.1'
 
 gem 'useragent', '0.16.10', require: false
 
@@ -118,7 +118,7 @@ gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'sentry-raven', '2.7.2', require: false
 gem 'canvas_statsd', '2.0.4'
   gem 'statsd-ruby', '1.4.0', require: false
-  gem 'aroi', '0.0.5', require: false
+  gem 'aroi', '0.0.6', require: false
 gem 'gepub', '0.7.0beta4'
 gem 'imperium', '0.3.0', require: false
 gem 'academic_benchmarks', '0.0.10', require: false

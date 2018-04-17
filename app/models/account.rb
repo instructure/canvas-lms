@@ -487,7 +487,7 @@ class Account < ActiveRecord::Base
   end
 
   def fast_course_base(opts = {})
-    opts[:order] ||= "#{Course.best_unicode_collation_key("courses.name")} ASC"
+    opts[:order] ||= Course.best_unicode_collation_key("courses.name").asc
     columns = "courses.id, courses.name, courses.workflow_state, courses.course_code, courses.sis_source_id, courses.enrollment_term_id"
     associated_courses = self.associated_courses(
       :include_crosslisted_courses => opts[:include_crosslisted_courses]

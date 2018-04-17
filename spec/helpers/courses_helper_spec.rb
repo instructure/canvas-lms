@@ -143,14 +143,14 @@ describe CoursesHelper do
     end
 
     it "should return the score if graded" do
-      submission = Submission.new(:grade => 1.33333333, :workflow_state => 'graded')
-      submission.create_assignment(:points_possible => 5, :grading_type => 'points')
+      assignment = Assignment.new(:points_possible => 5, :grading_type => 'points')
+      submission = Submission.new(:grade => 1.33333333, :workflow_state => 'graded', :assignment => assignment)
       expect(readable_grade(submission)).to eq '1.33 out of 5'
     end
 
     it "should not raise an error when passing a numeric type but grading_type is not 'points'" do
-      submission = Submission.new(grade: 1.33333333, workflow_state: 'graded')
-      submission.create_assignment(points_possible: 5, grading_type: 'percent')
+      assignment = Assignment.new(points_possible: 5, grading_type: 'percent')
+      submission = Submission.new(grade: 1.33333333, workflow_state: 'graded', assignment: assignment)
       expect(readable_grade(submission)).to eq '1.33333%'
     end
   end

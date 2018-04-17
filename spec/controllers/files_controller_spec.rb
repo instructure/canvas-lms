@@ -341,10 +341,10 @@ describe FilesController do
 
     it "should set cache headers for non text files" do
       get 'show', params: {:course_id => @course.id, :id => @file.id, :download => 1, :verifier => @file.uuid, :download_frd => 1}
-      expect(response.header["Cache-Control"]).to include "private, max-age"
+      expect(response.header["Cache-Control"]).to include "private"
+      expect(response.header["Cache-Control"]).to include "max-age=#{1.day.seconds}"
       expect(response.header["Cache-Control"]).not_to include "no-cache"
       expect(response.header["Cache-Control"]).not_to include "no-store"
-      expect(response.header["Cache-Control"]).not_to include "max-age=0"
       expect(response.header["Cache-Control"]).not_to include "must-revalidate"
       expect(response.header).to include("Expires")
       expect(response.header).not_to include("Pragma")
@@ -354,11 +354,9 @@ describe FilesController do
       @file.content_type = "text/html"
       @file.save
       get 'show', params: {:course_id => @course.id, :id => @file.id, :download => 1, :verifier => @file.uuid, :download_frd => 1}
-      expect(response.header["Cache-Control"]).not_to include "private, max-age"
+      expect(response.header["Cache-Control"]).not_to include "private"
       expect(response.header["Cache-Control"]).to include "no-cache"
       expect(response.header["Cache-Control"]).to include "no-store"
-      expect(response.header["Cache-Control"]).to include "max-age=0"
-      expect(response.header["Cache-Control"]).to include "must-revalidate"
       expect(response.header).not_to include("Expires")
       expect(response.header).to include("Pragma")
     end

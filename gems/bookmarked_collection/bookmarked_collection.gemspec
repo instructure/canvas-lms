@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "folio-pagination", "~> 0.0.12"
   spec.add_dependency "will_paginate", "~> 3.0"
-  spec.add_dependency "rails", ">= 3.2", "< 5.2"
+  spec.add_dependency "rails", ">= 3.2"
 
   spec.add_dependency "paginated_collection"
   spec.add_dependency "json_token"

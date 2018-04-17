@@ -115,7 +115,7 @@ class SisPseudonym
                  relation.where.not(sis_user_id: nil)
                else
                  # false sorts before true
-                 relation.order("sis_user_id IS NULL")
+                 relation.order(Arel.sql("sis_user_id IS NULL"))
                end
     relation.primary_shard.activate do
       relation = relation.order(Pseudonym.best_unicode_collation_key(:unique_id))

@@ -1873,7 +1873,7 @@ class Course < ActiveRecord::Base
         # order by course_section_id<>section.id so that if there *is* an existing enrollment for this section, we get it (false orders before true)
         e = self.all_enrollments.
           where(user_id: user, type: type, role_id: role.id, associated_user_id: associated_user_id).
-          order("course_section_id<>#{section.id}").
+          order(Arel.sql("course_section_id<>#{section.id}")).
           first
       end
       if e && (!e.active? || opts[:force_update])

@@ -260,6 +260,7 @@ module AssignmentOverrideApplicator
     [:id, :updated_at, :created_at].each { |attr|
       clone[attr] = assignment.send(attr)
     }
+    clone.clear_changes_information
     self.copy_preloaded_associations_to_clone(assignment, clone)
     yield(clone) if block_given?
 

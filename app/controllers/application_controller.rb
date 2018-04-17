@@ -801,7 +801,7 @@ class ApplicationController < ActionController::Base
           courses = Course.
             shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current).
             joins(enrollments: :enrollment_state).
-            merge(enrollment_scope).
+            merge(enrollment_scope.except(:joins)).
             where(id: course_ids)
         end
         if include_groups
@@ -812,7 +812,7 @@ class ApplicationController < ActionController::Base
         courses = Course.
           shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current).
           joins(enrollments: :enrollment_state).
-          merge(enrollment_scope)
+          merge(enrollment_scope.except(:joins))
       end
 
       groups = []
@@ -1096,7 +1096,7 @@ class ApplicationController < ActionController::Base
 
   def set_no_cache_headers
     response.headers["Pragma"] = "no-cache"
-    response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
+    response.headers["Cache-Control"] = "no-cache, no-store"
   end
 
   def clear_cached_contexts

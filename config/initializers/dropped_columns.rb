@@ -155,15 +155,19 @@ ActiveRecord::Base::DROPPED_COLUMNS = {
   }.freeze
 
 module DroppedColumns
-  def columns
-    @columns_with_dropped ||= super.reject { |c|
-      (ActiveRecord::Base::DROPPED_COLUMNS[self.table_name] || []).include?(c.name)
+  def columns_hash
+    @columns_hash_with_dropped ||= super.reject { |k, c|
+      (ActiveRecord::Base::DROPPED_COLUMNS[self.table_name] || []).include?(k)
     }
   end
 
   def reset_column_information
-    @columns_with_dropped = nil
+    @columns_hash_with_dropped = nil
     super
+  end
+
+  def define_attribute(name, *args)
+    super unless (ActiveRecord::Base::DROPPED_COLUMNS[self.table_name] || []).include?(name)
   end
 
   def instantiate(attributes, *args)

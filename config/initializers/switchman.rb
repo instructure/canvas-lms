@@ -144,7 +144,7 @@ Rails.application.config.after_initialize do
 
     scope :in_current_region, -> do
       @current_region_scope ||=
-        if !default.is_a?(self)
+        if !default.is_a?(Switchman::Shard)
           # sharding isn't set up? maybe we're in tests, or a somehow degraded environment
           # either way there's only one shard, and we always want to see it
           [default]

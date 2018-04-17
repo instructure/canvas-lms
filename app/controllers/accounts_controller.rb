@@ -155,7 +155,7 @@ class AccountsController < ApplicationController
     if @current_user
       account_ids = Rails.cache.fetch(['admin_enrollment_course_account_ids', @current_user].cache_key) do
         Account.joins(:courses => :enrollments).merge(
-          @current_user.enrollments.admin.shard(@current_user).except(:select)
+          @current_user.enrollments.admin.shard(@current_user).except(:select, :joins)
         ).select("accounts.id").distinct.pluck(:id).map{|id| Shard.global_id_for(id)}
       end
       course_accounts = BookmarkedCollection.wrap(Account::Bookmarker, Account.where(:id => account_ids))

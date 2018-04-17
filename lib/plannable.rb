@@ -149,7 +149,7 @@ module Plannable
     end
 
     def order_by
-      @order_by ||= @columns.map { |col| column_order(col) }.join(', ')
+      @order_by ||= Arel.sql(@columns.map { |col| column_order(col) }.join(', '))
     end
 
     def column_order(col_name)

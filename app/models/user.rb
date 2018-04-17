@@ -1608,7 +1608,7 @@ class User < ActiveRecord::Base
           end
 
           scope.select("courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment_type, enrollments.role_id AS primary_enrollment_role_id, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state, enrollments.created_at AS primary_enrollment_date").
-              order("courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}").
+              order(Arel.sql("courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}")).
               distinct_on(:id).shard(shards).to_a
         end
         result.dup

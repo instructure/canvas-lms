@@ -18,5 +18,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "byebug"
   spec.add_development_dependency "minitest"
   spec.add_development_dependency "rake"
-  spec.add_development_dependency "activesupport", "< 5.2"
+  spec.add_development_dependency "activesupport"
 end
