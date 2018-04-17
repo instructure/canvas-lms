@@ -73,43 +73,46 @@ export default function AnnouncementRow({
     </Container>
   )
 
-  const MenuList = [
-    <MenuItem
-      key="delete"
-      value={{action: 'delete', id: announcement.id}}
-      id="delete-announcement-menu-option"
-    >
-      <span aria-hidden="true">
-        <IconTrash />&nbsp;&nbsp;{I18n.t('Delete')}
-      </span>
-      <ScreenReaderContent>
-        {I18n.t('Delete announcement %{title}', {title: announcement.title})}
-      </ScreenReaderContent>
-    </MenuItem>
-  ]
-  if (!announcementsLocked) {
-    MenuList.push(
+  const renderMenuList = () => {
+    const menuList = [
       <MenuItem
-        key="lock"
-        value={{action: 'lock', id: announcement.id, lock: !announcement.locked}}
-        id="lock-announcement-menu-option"
+        key="delete"
+        value={{action: 'delete', id: announcement.id}}
+        id="delete-announcement-menu-option"
       >
-        {announcement.locked ? (
-          <span aria-hidden="true">
-            <IconUnlock />&nbsp;&nbsp;{I18n.t('Allow Comments')}
-          </span>
-        ) : (
-          <span aria-hidden="true">
-            <IconLock />&nbsp;&nbsp;{I18n.t('Disallow Comments')}
-          </span>
-        )}
+        <span aria-hidden="true">
+          <IconTrash />&nbsp;&nbsp;{I18n.t('Delete')}
+        </span>
         <ScreenReaderContent>
-          {announcement.locked
-            ? I18n.t('Allow replies for %{title}', {title: announcement.title})
-            : I18n.t('Disallow replies for %{title}', {title: announcement.title})}
+          {I18n.t('Delete announcement %{title}', {title: announcement.title})}
         </ScreenReaderContent>
       </MenuItem>
-    )
+    ]
+    if (!announcementsLocked) {
+      menuList.push(
+        <MenuItem
+          key="lock"
+          value={{action: 'lock', id: announcement.id, lock: !announcement.locked}}
+          id="lock-announcement-menu-option"
+        >
+          {announcement.locked ? (
+            <span aria-hidden="true">
+              <IconUnlock />&nbsp;&nbsp;{I18n.t('Allow Comments')}
+            </span>
+          ) : (
+            <span aria-hidden="true">
+              <IconLock />&nbsp;&nbsp;{I18n.t('Disallow Comments')}
+            </span>
+          )}
+          <ScreenReaderContent>
+            {announcement.locked
+              ? I18n.t('Allow replies for %{title}', {title: announcement.title})
+              : I18n.t('Disallow replies for %{title}', {title: announcement.title})}
+          </ScreenReaderContent>
+        </MenuItem>
+      )
+    }
+    return menuList
   }
 
   // necessary because announcements return html from RCE
@@ -160,7 +163,7 @@ export default function AnnouncementRow({
       actionsContent={readCount}
       showManageMenu={canManage}
       onManageMenuSelect={onManageMenuSelect}
-      manageMenuOptions={(canManage && MenuList) || null}
+      manageMenuOptions={renderMenuList}
       hasReadBadge
     />
   )

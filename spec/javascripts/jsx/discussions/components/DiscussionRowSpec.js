@@ -19,7 +19,7 @@
 import React from 'react'
 import { mount } from 'enzyme'
 import _ from 'lodash'
-import DiscussionRow from 'jsx/shared/components/DiscussionRow'
+import DiscussionRow from 'jsx/discussions/components/DiscussionRow'
 
 QUnit.module('DiscussionRow component')
 
@@ -214,13 +214,43 @@ test('does not render manage menu if not permitted', () => {
   notOk(node.exists())
 })
 
+test('does not insert the manage menu list if we have not clicked it yet', () => {
+  const tree = mount(<DiscussionRow {...makeProps({
+    displayManageMenu: true,
+    onMoveDiscussion: ()=>{}
+  })} />)
+  // We still should show the menu thingy itself
+  const menuNode = tree.find('PopoverMenu')
+  ok(menuNode.exists())
+  // We have to search the whole document because the items in instui
+  // popover menu are appended to the end of the document rather than
+  // within the popover menu or even the discussion row
+  const menuItemNode = document.querySelector('#moveTo-discussion-menu-option')
+  equal(menuItemNode, null)
+})
+
+test('manage menu items do appear upon click', () => {
+  const tree = mount(<DiscussionRow {...makeProps({
+    displayManageMenu: true,
+    onMoveDiscussion: ()=>{}
+  })} />)
+  const menuNode = tree.find('PopoverMenu')
+  ok(menuNode.exists())
+  menuNode.find('button').simulate('click')
+  // We have to search the whole document because the items in instui
+  // popover menu are appended to the end of the document rather than
+  // within the popover menu or even the discussion row
+  const menuItemNode = document.querySelector('#moveTo-discussion-menu-option')
+  ok(menuItemNode.textContent.includes('Move To'))
+})
+
 test('renders move-to in manage menu if permitted', () => {
   const tree = mount(<DiscussionRow {...makeProps({
     displayManageMenu: true,
     onMoveDiscussion: ()=>{}
    })} />)
   const courseItemRow = tree.find('CourseItemRow')
-  const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
+  const allKeys = courseItemRow.props().manageMenuOptions().map((option) => option.key)
   equal(allKeys.length, 1)
   equal(allKeys[0], 'moveTo')
 })
@@ -231,7 +261,7 @@ test('renders pin item in manage menu if permitted', () => {
     displayPinMenuItem: true
    })} />)
   const courseItemRow = tree.find('CourseItemRow')
-  const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
+  const allKeys = courseItemRow.props().manageMenuOptions().map((option) => option.key)
   equal(allKeys.length, 1)
   equal(allKeys[0], 'togglepinned')
 })
@@ -242,7 +272,7 @@ test('renders duplicate item in manage menu if permitted', () => {
     displayDuplicateMenuItem: true
    })} />)
   const courseItemRow = tree.find('CourseItemRow')
-  const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
+  const allKeys = courseItemRow.props().manageMenuOptions().map((option) => option.key)
   equal(allKeys.length, 1)
   equal(allKeys[0], 'duplicate')
 })
@@ -253,7 +283,7 @@ test('renders delete item in manage menu if permitted', () => {
     displayDeleteMenuItem: true
    })} />)
   const courseItemRow = tree.find('CourseItemRow')
-  const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
+  const allKeys = courseItemRow.props().manageMenuOptions().map((option) => option.key)
   equal(allKeys.length, 1)
   equal(allKeys[0], 'delete')
 })
@@ -264,7 +294,7 @@ test('renders lock item in manage menu if permitted', () => {
     displayLockMenuItem: true
    })} />)
   const courseItemRow = tree.find('CourseItemRow')
-  const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
+  const allKeys = courseItemRow.props().manageMenuOptions().map((option) => option.key)
   equal(allKeys.length, 1)
   equal(allKeys[0], 'togglelocked')
 })
@@ -277,7 +307,7 @@ test('renders mastery paths menu item if permitted', () => {
     displayMasteryPathsMenuItem: true
   })} />)
   const courseItemRow = tree.find('CourseItemRow')
-  const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
+  const allKeys = courseItemRow.props().manageMenuOptions().map((option) => option.key)
   equal(allKeys.length, 1)
   equal(allKeys[0], 'masterypaths')
 })
@@ -292,7 +322,7 @@ test('renders ltiTool menu if there are some', () => {
     }]
   })} />)
   const courseItemRow = tree.find('CourseItemRow')
-  const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
+  const allKeys = courseItemRow.props().manageMenuOptions().map((option) => option.key)
   equal(allKeys.length, 1)
   equal(allKeys[0], 'test.com')
 })
@@ -315,7 +345,7 @@ test('renders multiple ltiTool menu if there are multiple', () => {
     ]
   })} />)
   const courseItemRow = tree.find('CourseItemRow')
-  const allKeys = courseItemRow.props().manageMenuOptions.map((option) => option.key)
+  const allKeys = courseItemRow.props().manageMenuOptions().map((option) => option.key)
   equal(allKeys.length, 2)
   equal(allKeys[1], 'test2.com')
 })

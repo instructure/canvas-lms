@@ -25,7 +25,7 @@ import ToggleDetails from '@instructure/ui-core/lib/components/ToggleDetails'
 import Text from '@instructure/ui-core/lib/components/Text'
 import update from 'immutability-helper'
 
-import DiscussionRow, { DraggableDiscussionRow } from '../../shared/components/DiscussionRow'
+import DiscussionRow, { DraggableDiscussionRow } from './DiscussionRow'
 import { discussionList } from '../../shared/proptypes/discussion'
 import masterCourseDataShape from '../../shared/proptypes/masterCourseData'
 import propTypes from '../propTypes'

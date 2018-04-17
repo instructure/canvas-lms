@@ -46,16 +46,16 @@ import IconUnpublishedLine from 'instructure-icons/lib/Line/IconUnpublishedLine'
 import IconLtiLine from 'instructure-icons/lib/Line/IconLtiLine'
 
 import DiscussionModel from 'compiled/models/DiscussionTopic'
-import compose from '../helpers/compose'
-import SectionsTooltip from '../SectionsTooltip'
-import CourseItemRow from './CourseItemRow'
-import UnreadBadge from './UnreadBadge'
+import compose from '../../shared/helpers/compose'
+import SectionsTooltip from '../../shared/SectionsTooltip'
+import CourseItemRow from '../../shared/components/CourseItemRow'
+import UnreadBadge from '../../shared/components/UnreadBadge'
 
-import ToggleIcon from './ToggleIcon'
-import propTypes from '../../discussions/propTypes'
-import discussionShape from '../proptypes/discussion'
-import masterCourseDataShape from '../proptypes/masterCourseData'
-import { makeTimestamp } from '../date-utils'
+import ToggleIcon from '../../shared/components/ToggleIcon'
+import propTypes from '../propTypes'
+import discussionShape from '../../shared/proptypes/discussion'
+import masterCourseDataShape from '../../shared/proptypes/masterCourseData'
+import { makeTimestamp } from '../../shared/date-utils'
 
 const dragTarget = {
   beginDrag (props) {
@@ -439,7 +439,7 @@ export default class DiscussionRow extends Component {
                 showManageMenu={this.props.displayManageMenu}
                 onManageMenuSelect={this.onManageDiscussion}
                 clearFocusDirectives={this.props.cleanDiscussionFocus}
-                manageMenuOptions={this.renderMenuList()}
+                manageMenuOptions={this.renderMenuList}
                 masterCourse={{
                   courseData: this.props.masterCourseData || {},
                   getLockOptions: () => ({
