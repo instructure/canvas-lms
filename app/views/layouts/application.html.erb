@@ -77,8 +77,8 @@
   load_blueprint_courses_ui
 -%>
 <%= render :partial => "layouts/head" %>
-<body 
-  class="<%= (@body_classes).uniq.join(" ") %>" 
+<body
+  class="<%= (@body_classes).uniq.join(" ") %>"
   <% if @distraction_free %> style="display:none;" <% end %>
 >
 <%if @real_current_user && @real_current_user != @current_user %>
@@ -119,8 +119,8 @@
             <div class="TutorialToggleHolder"></div>
           <% end %>
       <% end %>
-      
-      <% if @current_user %>
+
+      <% if @current_user && @current_user.pseudonym.unique_id != 'public'  %>
           <div class="sm-menu-item dropdown">
             <a id="sm-profile-dropdown" href="/profile" type="button" aria-haspopup="true" data-toggle="dropdown" data-id="profile-dropdown" aria-owns="sm-profile-dropdown" aria-labelledby="type-filter-description" aria-expanded="false">
               <div class="sm-menu-item-icon-container" aria-hidden="true">
@@ -171,6 +171,9 @@
               </li>
             </ul>
           </div>
+    <% elsif @current_user && @current_user.pseudonym.unique_id == 'teastudent' || 'TEAstudent' %>
+              <div class="sm-menu-item">
+              </div>
         <% else %>
           <div class="sm-menu-item">
             <a id="global_nav_login_link" href="/login" class="ic-app-header__menu-list-link">
@@ -185,7 +188,7 @@
       <% if @display_header_image %>
       <div class="sm-course-header-image" style="background-image: url('<%= @image %>')">
       <% end %>
-      
+
       <% if @show_left_side %>
         <div id="left-side"
           class="ic-app-course-menu sm-course-menu <% if !@no_left_side_list_view %>list-view<% end %>"
@@ -234,7 +237,7 @@
       <% if @display_header_image %>
       </div>
       <% end %>
-      
+
       <div id="not_right_side" class="ic-app-main-content">
         <div id="content-wrapper" class="ic-Layout-contentWrapper">
             <%= render :partial => 'shared/content_notices' if @show_left_side && @context && @context.respond_to?(:content_notices) %>
@@ -328,7 +331,7 @@
         course_id:       '<%= @context.id if @context%>',
         is_student:      '<%= @is_student %>',
         full_path:       '<%= request.try(:fullpath)%>',
-        rails_env:       '<%= Rails.env %>'  
+        rails_env:       '<%= Rails.env %>'
       },
       account: {
         id:           '',
