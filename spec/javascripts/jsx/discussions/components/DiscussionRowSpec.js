@@ -31,6 +31,7 @@ const makeProps = (props = {}) => _.merge({
     title: 'Hello World',
     message: 'Foo bar bar baz boop beep bop Foo',
     posted_at: 'January 10, 2019 at 10:00 AM',
+    can_unpublish: true,
     author: {
       id: '5',
       display_name: 'John Smith',
@@ -109,6 +110,20 @@ test('renders the subscription ToggleIcon', () => {
   const node = tree.find('ToggleIcon')
   ok(node.exists())
   strictEqual(node.length, 1)
+})
+
+test('disables publish button when can_unpublish is false', () => {
+  const discussion = { can_unpublish: false }
+  const tree = mount(<DiscussionRow {...makeProps({canPublish: true, discussion})} />)
+  const node = tree.find('ToggleIcon .publish-button')
+  strictEqual(node.props().children.props.disabled, true)
+})
+
+test('allows to publish even if you cannot unpublish', () => {
+  const discussion = { can_unpublish: false, published: false }
+  const tree = mount(<DiscussionRow {...makeProps({canPublish: true, discussion})} />)
+  const node = tree.find('ToggleIcon .publish-button')
+  strictEqual(node.props().children.props.disabled, false)
 })
 
 test('renders the publish ToggleIcon', () => {

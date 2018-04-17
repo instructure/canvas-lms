@@ -231,6 +231,7 @@ export class DiscussionRow extends Component {
     this.props.canPublish
     ? (<ToggleIcon
          toggled={this.props.discussion.published}
+         disabled={!this.props.discussion.can_unpublish && this.props.discussion.published}
          OnIcon={
            <Text color="success">
              <IconPublishSolid title={I18n.t('Unpublish %{title}', { title: this.props.discussion.title })} />
