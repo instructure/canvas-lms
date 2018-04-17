@@ -839,9 +839,7 @@ class UsersController < ApplicationController
       assignments_needing_submitting(
         include_ungraded: true,
         limit: ToDoListPresenter::ASSIGNMENT_LIMIT,
-        scope_only: true
-      ).
-      where('assignments.due_at IS NULL OR assignments.due_at > ?', Time.zone.now).
+        scope_only: true).
       reorder(:due_at, :id)
 
     grading_collection = BookmarkedCollection.wrap(bookmark, grading_scope)
@@ -864,7 +862,6 @@ class UsersController < ApplicationController
           :needing_submitting => true,
           :scope_only => true
         ).
-        where('quizzes.due_at IS NULL OR quizzes.due_at >= ?', Time.zone.now).
         reorder(:due_at, :id)
       quizzes_collection = BookmarkedCollection.wrap(quizzes_bookmark, quizzes_scope)
       quizzes_collection = BookmarkedCollection.transform(quizzes_collection) do |a|

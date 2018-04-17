@@ -248,6 +248,21 @@ describe UsersController, type: :request do
     expect(response).to be_success
   end
 
+  it "doesnt include anything over 4 weeks old" do
+    @student_course.assignments.create! due_at: 5.weeks.ago, workflow_state: 'published', submission_types: 'not_graded'
+    past_survey = @student_course.quizzes.create!(quiz_type: 'survey', due_at: 5.weeks.ago)
+    past_survey.publish!
+
+    json = api_call :get, "/api/v1/users/self/todo?include[]=ungraded_quizzes", :controller => "users",
+      :action => "todo_items", :format => "json", :include => %w(ungraded_quizzes)
+    expect(json.map { |el| el['quiz'] && el['quiz']['id'] }.compact).to eql([])
+
+    json = api_call :get, "/api/v1/courses/#{@student_course.id}/todo?include[]=ungraded_quizzes",
+      :controller => "courses", :action => "todo_items",
+      :format => "json", :course_id => @student_course.to_param, :include => %w(ungraded_quizzes)
+    expect(json.map { |el| el['quiz'] && el['quiz']['id'] }.compact).to eql([])
+  end
+
   context 'when the assignment is differentiated/ has overrides' do
     before :each do
       @course = course_factory(active_all: true)
@@ -256,7 +271,7 @@ describe UsersController, type: :request do
       @user = user_factory(active_all: true)
       @course.enroll_student(@user, { :section => @section }).accept!
 
-      ao = differentiated_assignment(:context => @course, :course_section => @section, :due_at => nil)
+      ao = differentiated_assignment(:context => @course, :course_section => @section, :due_at => nil, :submission_types => 'online_text_entry')
       ao.due_at = 1.day.from_now
       ao.due_at_overridden = true
       ao.save!

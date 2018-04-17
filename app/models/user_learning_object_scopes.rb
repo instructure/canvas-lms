@@ -112,6 +112,7 @@ module UserLearningObjectScopes
     objects_needing('Assignment', purpose, :student, cache_timeout, opts) do |assignment_scope, options|
       assignments = assignment_scope.due_between_for_user(options[:due_after], options[:due_before], self)
       assignments = assignments.need_submitting_info(id, options[:limit]) if purpose == 'submitting'
+      assignments = assignments.submittable.or(assignments.where('due_at > ?', Time.zone.now)) if purpose == 'submitting'
       assignments = assignments.having_submissions_for_user(id) if purpose == 'submitted'
       assignments = assignments.not_locked unless options[:include_locked]
       assignments
@@ -124,9 +125,7 @@ module UserLearningObjectScopes
     opts[:cache_timeout] = 15.minutes
     assignments = assignments_for_student('submitting', opts)
     return assignments if opts[:scope_only]
-    select_available_assignments(assignments, opts).reject do |a|
-      a.due_at && a.due_at < Time.zone.now && !a.expects_submission?
-    end
+    select_available_assignments(assignments, opts)
   end
 
   def submitted_assignments(opts={})
