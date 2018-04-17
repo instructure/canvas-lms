@@ -346,6 +346,10 @@ class DiscussionTopicsController < ApplicationController
       end
     end
 
+    if params[:only_announcements] && !@context.grants_any_right?(@current_user, :manage, :read_course_content)
+      scope = scope.active.where('delayed_post_at IS NULL OR delayed_post_at<?', Time.now.utc)
+    end
+
     @topics = Api.paginate(scope, self, topic_pagination_url)
 
     if params[:exclude_context_module_locked_topics]

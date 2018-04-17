@@ -554,6 +554,7 @@ describe DiscussionTopicsController, type: :request do
         end
       end
 
+
       describe "section specific announcements" do
         before(:once) do
           course_with_teacher(active_course: true)
@@ -568,6 +569,27 @@ describe DiscussionTopicsController, type: :request do
           @course.enroll_student(@student1, :enrollment_state => 'active')
           @course.enroll_student(@student2, :enrollment_state => 'active')
           student_in_section(@section, user: @student1)
+        end
+
+        it "should render correct page count for users even with delayed posted date" do
+          @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>", :delayed_post_at => 2.days.from_now)
+          @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
+          [@topic2, @topic3].each do |topic|
+            topic.type = 'Announcement'
+            topic.save!
+          end
+
+          api_call_as_user(@student1,
+            :get, "/api/v1/courses/#{@course.id}/discussion_topics?only_announcements=1&per_page=2",
+            {
+              controller: "discussion_topics",
+              action: "index",
+              format: "json",
+              course_id: @course.id.to_s,
+              only_announcements: 1,
+              per_page: 2,
+            })
+          expect(!response.headers['Link'].split(',').last.include?("&page=2&")).to eq(true)
         end
 
         it "teacher should be able to see section specific announcements" do
