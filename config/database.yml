@@ -48,6 +48,5 @@ test:
   host: <%= ENV['DB_HOST'] %>
   port: <%= ENV['DB_PORT'] %>
   username: <%= ENV['DB_USER'] %>
-  database: <%= ENV['DB_NAME'] %>
   password: <%= ENV['DB_PASS'] %>
   timeout: 5000
