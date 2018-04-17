@@ -79,7 +79,7 @@ export function transformApiToInternalItem (apiResponse, courses, groups, timeZo
   const contextId = apiResponse[`${context_type.toLowerCase()}_id`];
   if (context_type === 'Course') {
     const course = courses.find(c => c.id === contextId);
-    contextInfo.context = getCourseContext(apiResponse, course);
+    contextInfo.context = getCourseContext(course);
   } else if (context_type === 'Group') {
     const group = groups.find(g => g.id === contextId) || {name: "Unknown Group", color: "#666666", url: undefined};
     contextInfo.context = getGroupContext(apiResponse, group);
@@ -87,7 +87,7 @@ export function transformApiToInternalItem (apiResponse, courses, groups, timeZo
   const details = getItemDetailsFromPlannable(apiResponse, timeZone);
 
   // Standardize 00:00:00 date to 11:59PM on the current day to make due date less confusing
-  let plannableDate = apiResponse.plannable_date
+  let plannableDate = apiResponse.plannable_date;
   let currentDay = moment(plannableDate);
   if (isMidnight(currentDay, timeZone)) {
     plannableDate = currentDay.endOf('day').toISOString();
@@ -95,19 +95,7 @@ export function transformApiToInternalItem (apiResponse, courses, groups, timeZo
 
   if ((!contextInfo.context) && apiResponse.plannable_type === 'planner_note' && (details.course_id)) {
     const course = courses.find(c => c.id === details.course_id);
-    // shouldn't happen, but if the course data is missing, skip it.
-    // this has the effect of the planner note showing up as a vanilla todo not associated with a course
-    if (course) {
-      contextInfo.context = {
-        type: 'Planner Note',
-        id: details.course_id,
-        title: course.shortName,
-        image_url: course.image,
-        inform_students_of_overdue_submissions: course.informStudentsOfOverdueSubmissions,
-        color: course.color,
-        url: course.href
-      };
-    }
+    contextInfo.context = getCourseContext(course);
   }
 
   if (details.unread_count) {
@@ -136,17 +124,7 @@ export function transformPlannerNoteApiToInternalItem (plannerItemApiResponse, c
   let context = {};
   if (plannerNote.course_id) {
     const course = courses.find(c => c.id === plannerNote.course_id);
-    if (course) {
-      context = {
-        type: 'Planner Note',
-        id: plannerNote.course_id,
-        title: course.shortName,
-        image_url: course.image,
-        inform_students_of_overdue_submissions: course.informStudentsOfOverdueSubmissions,
-        color: course.color,
-        url: course.href
-      };
-    }
+    context = getCourseContext(course);
   }
   return {
     id: plannerNote.id,
@@ -197,10 +175,12 @@ export function transformInternalToApiOverride (internalItem, userId) {
   };
 }
 
-function getCourseContext(apiResponse, course) {
+function getCourseContext(course) {
+  // shouldn't happen, but if the course data is missing, skip it.
+  // this has the effect of a planner note showing up as a vanilla todo not associated with a course
   if (!course) return undefined;
   return {
-    type: apiResponse.context_type,
+    type: 'Course',
     id: course.id,
     title: course.shortName,
     image_url: course.image,

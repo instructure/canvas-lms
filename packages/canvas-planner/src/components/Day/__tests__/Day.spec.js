@@ -17,7 +17,7 @@
  */
 import React from 'react';
 import { shallow, mount } from 'enzyme';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import {Day} from '../index';
 
 it('renders the base component with required props', () => {

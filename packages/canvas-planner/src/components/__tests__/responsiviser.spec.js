@@ -84,7 +84,6 @@ it('renders large', () => {
 });
 
 it('renders medium', () => {
-  debugger;
   const ResponsiveComponent = responsiviser()(SomeComponent);
   const wrapper = mount(<ResponsiveComponent/>);
   expect(wrapper).toMatchSnapshot();   // large

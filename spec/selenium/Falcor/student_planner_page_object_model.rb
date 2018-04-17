@@ -143,6 +143,11 @@ module PlannerPageObject
     f('.ic-dashboard-app')
   end
 
+  def title_input(title = nil)
+    modal = todo_sidebar_modal(title)
+    ff('input', modal)[0]
+  end
+
   def time_input
     modal = todo_sidebar_modal
     ff('input', modal)[2]

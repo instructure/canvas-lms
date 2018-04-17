@@ -27,7 +27,7 @@ import PropTypes from 'prop-types';
 import TextInput from '@instructure/ui-core/lib/components/TextInput';
 import Select from '@instructure/ui-core/lib/components/Select';
 import TextArea from '@instructure/ui-core/lib/components/TextArea';
-import DateInput from '@instructure/ui-core/lib/components/DateInput';
+import DateInput from '@instructure/ui-forms/lib/components/DateInput';
 import moment from 'moment-timezone';
 
 import { courseShape } from '../plannerPropTypes';

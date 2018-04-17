@@ -17,7 +17,7 @@
  */
 import { createActions } from 'redux-actions';
 import axios from 'axios';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import configureAxios from '../utilities/configureAxios';
 import { alert } from '../utilities/alertUtils';
 import formatMessage from '../format-message';
