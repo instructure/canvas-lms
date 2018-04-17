@@ -94,3 +94,13 @@ it('shows new activity button when there is new activity, but no current items',
     />);
   expect(wrapper.find('StickyButton')).toHaveLength(1);
 });
+
+it('shows load prior items button when there is more to load', () => {
+  const wrapper = shallow(<PlannerApp {...getDefaultValues()} />);
+  expect(wrapper.find('ShowOnFocusButton')).toHaveLength(1);
+});
+
+it('does not show load prior items button when all past items are loaded', () => {
+  const wrapper = shallow(<PlannerApp {...getDefaultValues()} allPastItemsLoaded />);
+  expect(wrapper.find('ShowOnFocusButton')).toHaveLength(0);
+});

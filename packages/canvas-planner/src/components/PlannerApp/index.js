@@ -148,6 +148,7 @@ export class PlannerApp extends Component {
   }
 
   renderLoadPastButton () {
+    if (this.props.allPastItemsLoaded) return;
     return (
       <ShowOnFocusButton
         buttonProps={{
