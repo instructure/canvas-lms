@@ -15,7 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../common')
+require_relative '../common'
+require_relative './new_user_search_page'
 
 describe "new account user search" do
   include_context "in-process server selenium tests"
@@ -134,16 +135,6 @@ describe "new account user search" do
     expect(new_pseudonym.user.name).to eq name
   end
 
-  it "should bring up user page when clicking name", priority: "1", test_id: 3399648 do
-    page_user = user_with_pseudonym(:account => @account, :name => "User Page")
-    get "/accounts/#{@account.id}/users"
-
-    fj("[data-automation='users list'] tr a:contains('#{page_user.name}')").click
-
-    wait_for_ajax_requests
-    expect(f("#content h2")).to include_text page_user.name
-  end
-
   it "should paginate" do
     ('A'..'Z').each do |letter|
       user_with_pseudonym(:account => @account, :name => "Test User #{letter}")
@@ -243,4 +234,16 @@ describe "new account user search" do
     expect(fj('label:contains("Full Name") input').attribute('value')).to eq("Edit User")
   end
 
+  # This describe block will be removed once all tests are converted
+  describe 'Page Object Converted Tests' do
+    before do
+      @user.update_attribute(:name, "Test User")
+      NewUserSearchPage.visit(@account)
+    end
+
+    it "should bring up user page when clicking name", priority: "1", test_id: 3399648 do
+      NewUserSearchPage.click_user_link(@user.name)
+      expect(f("#content h2")).to include_text @user.name
+    end
+  end
 end
