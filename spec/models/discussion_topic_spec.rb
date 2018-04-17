@@ -1957,6 +1957,24 @@ describe DiscussionTopic do
       expect(ann.reload).to be_active
     end
 
+    it "should restore an announcement to active state with sections" do
+      section = @course.course_sections.create!
+      @course.save!
+      announcement = Announcement.create!(
+        :title => "some topic",
+        :message => "I announce that i am lying",
+        :user => @teacher,
+        :context => @course,
+        :workflow_state => "published"
+      )
+      add_section_to_topic(announcement, section)
+      announcement.save!
+      announcement.destroy
+
+      announcement.restore
+      expect(announcement.reload).to be_active
+    end
+
     it "should restore a topic with submissions to active state" do
       discussion_topic_model(:context => @course)
       @topic.reply_from(user: @student, text: "huttah!")

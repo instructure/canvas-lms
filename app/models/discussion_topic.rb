@@ -952,6 +952,12 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def restore(from=nil)
+    if self.is_section_specific?
+      DiscussionTopicSectionVisibility.where(discussion_topic_id: self.id).to_a.uniq(&:course_section_id).each do |dtsv|
+        dtsv.workflow_state = 'active'
+        dtsv.save
+      end
+    end
     self.workflow_state = can_unpublish? ? 'unpublished' : 'active'
     self.save
 
