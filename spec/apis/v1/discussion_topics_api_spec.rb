@@ -400,6 +400,7 @@ describe DiscussionTopicsController, type: :request do
                           'media_entry_id' => @attachment.media_entry_id
                          }],
        "topic_children" => [@sub.id],
+       "group_topic_children" => [{"id" => @sub.id, "group_id" => @sub.context_id}],
        "discussion_type" => 'side_comment',
        "locked" => false,
        "can_lock" => true,
@@ -1459,6 +1460,7 @@ describe DiscussionTopicsController, type: :request do
       "posted_at" => gtopic.posted_at.as_json,
       "root_topic_id" => nil,
       "topic_children" => [],
+      "group_topic_children" => [],
       "discussion_type" => 'side_comment',
       "permissions" => {"delete" => true, "attach" => true, "update" => true, "reply" => true},
       "locked" => false,

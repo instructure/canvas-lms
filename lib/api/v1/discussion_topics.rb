@@ -164,6 +164,7 @@ module Api::V1::DiscussionTopics
       user_can_see_posts: topic.user_can_see_posts?(user), podcast_url: url,
       read_state: topic.read_state(user), unread_count: topic.unread_count(user),
       subscribed: topic.subscribed?(user), topic_children: topic.child_topics.pluck(:id),
+      group_topic_children: topic.child_topics.pluck(:id, :context_id).map{|id, group_id| {id: id, group_id: group_id}},
       attachments: attachments, published: topic.published?,
       can_unpublish: opts[:user_can_moderate] ? topic.can_unpublish?(opts) : false,
       locked: topic.locked?, can_lock: topic.can_lock?, comments_disabled: topic.comments_disabled?,
