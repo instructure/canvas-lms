@@ -196,6 +196,11 @@ export class DynamicUiManager {
     if (handler) handler(action);
   }
 
+  alertLoading = () => { srAlert(formatMessage('loading')); }
+  handleStartLoadingItems = this.alertLoading
+  handleGettingFutureItems = this.alertLoading
+  handleGettingPastItems = this.alertLoading
+
   handleGotDaysSuccess = (action) => {
     const newDays = action.payload.internalDays;
     const newItems = daysToItems(newDays);

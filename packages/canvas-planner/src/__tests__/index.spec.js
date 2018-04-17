@@ -17,11 +17,17 @@
  */
 import { render, renderHeader } from '../index';
 import moxios from 'moxios';
+import { initialize as alertInitialize } from '../utilities/alertUtils';
 
 describe('with mock api', () => {
   beforeEach(() => {
     document.body.innerHTML = '<div id="container"></div>';
     moxios.install();
+    alertInitialize({
+      visualSuccessCallback: jest.fn(),
+      visualErrorCallback: jest.fn(),
+      srAlertCallback: jest.fn(),
+    });
   });
 
   afterEach(() => {
