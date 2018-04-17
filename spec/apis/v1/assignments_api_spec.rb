@@ -3729,6 +3729,7 @@ describe AssignmentsApiController, type: :request do
           'pinned' => !!@topic.pinned,
           'position' => @topic.position,
           'topic_children' => [],
+          'group_topic_children' => [],
           'locked' => false,
           'can_lock' => true,
           'comments_disabled' => false,
