@@ -25,7 +25,7 @@ describe 'pipeline service' do
 
     it 'calling it directly will raise an error since its not queued' do
       expect { PipelineService::Commands::Send.new(object: @enrollment).call }.to raise_error(
-        ArgumentError, 'Missing environment variables for the pipeline client'
+        RuntimeError, 'Missing config'
       )
     end
   end
@@ -61,9 +61,12 @@ describe 'pipeline service' do
       ENV['PIPELINE_PASSWORD'] = 'example_password'
       ENV['CANVAS_DOMAIN'] = 'someschool.com'
     end
+    let(:endpoint_instance) { double('endpoint instance', call: nil) }
+    let(:endpoint) { double('endpoint class', new: endpoint_instance) }
 
     it do
-      PipelineService::Commands::Send.new(object: submission).call
+      expect(endpoint_instance).to receive(:call)
+      PipelineService::Commands::Send.new(object: submission, endpoint: endpoint).call
     end
 
   end
