@@ -571,21 +571,6 @@ END
       root_opt_in: true,
       touch_context: true
     },
-    'new_annotations' =>
-    {
-      display_name: -> { I18n.t('New Annotations') },
-      description: -> { I18n.t('Use the new document annotation tool') },
-      applies_to: 'Account',
-      state: 'hidden',
-      beta: true,
-      root_opt_in: true,
-      custom_transition_proc: ->(_, _, from_state, transitions) do
-        if from_state == 'on'
-          transitions['off'] = { 'locked' => true, 'message' => I18n.t('This feature cannot be disabled once it has been turned on.') }
-          transitions['allowed'] = { 'locked' => true, 'message' => I18n.t('This feature cannot be disabled once it has been turned on.') }
-        end
-      end
-    },
     'master_courses' =>
     {
       display_name: -> { I18n.t('Blueprint Courses') }, # this won't be confusing at all
