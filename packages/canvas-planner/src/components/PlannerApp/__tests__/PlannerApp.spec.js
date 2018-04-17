@@ -68,6 +68,18 @@ it('shows the loading past indicator when loadingPast prop is true', () => {
   expect(wrapper).toMatchSnapshot();
 });
 
+it('renders loading past spinner when loading past and there are no future items', () => {
+  const wrapper = shallow(
+    <PlannerApp
+      days={[]}
+      timeZone="UTC"
+      changeToDashboardCardView={() => {}}
+      firstNewActivityDate={moment().add(-1, 'days')}
+      loadingPast
+    />);
+    expect(wrapper).toMatchSnapshot();
+});
+
 it('notifies the UI to perform dynamic updates', () => {
   const mockUpdate = jest.fn();
   const wrapper = shallow(<PlannerApp

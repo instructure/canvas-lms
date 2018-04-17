@@ -138,7 +138,7 @@ export class PlannerApp extends Component {
   }
 
   renderLoadMore () {
-    if (this.props.isLoading) return;
+    if (this.props.isLoading || this.props.loadingPast) return;
     return <LoadingFutureIndicator
       loadingFuture={this.props.loadingFuture}
       allFutureItemsLoaded={this.props.allFutureItemsLoaded}
@@ -162,18 +162,17 @@ export class PlannerApp extends Component {
 
   renderNoAssignments() {
     return (
-      <div>
-        {this.renderLoadPastButton()}
-        <PlannerEmptyState changeToDashboardCardView={this.props.changeToDashboardCardView}/>
-      </div>
+      <PlannerEmptyState changeToDashboardCardView={this.props.changeToDashboardCardView}/>
     );
   }
 
   renderBody (children, classes) {
 
-    if (children.length === 0) {
+    const loading = this.props.loadingPast || this.props.loadingFuture || this.props.isLoading;
+    if (children.length === 0 && !loading) {
       return <div className={classes}>
         {this.renderNewActivity()}
+        {this.renderLoadPastButton()}
         {this.renderNoAssignments()}
       </div>;
     }
