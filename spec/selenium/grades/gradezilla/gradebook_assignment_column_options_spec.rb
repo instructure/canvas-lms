@@ -146,8 +146,7 @@ describe "Gradezilla - Assignment Column" do
     end
 
     it "assignment header cell contains ANONYMOUS label" do
-      skip('This is skeleton code that acts as AC for GRADE-1015 which is WIP')
-      expect(Gradezilla.select_assignment_header_secondary_label('Anon Assignment').text).to include_text('ANONYMOUS')
+      expect(Gradezilla.select_assignment_header_secondary_label('Anon Assignment').text).to eq 'ANONYMOUS'
     end
 
     it "speedgrader link on tray displays warning", priority: "1", test_id: 3481216 do
