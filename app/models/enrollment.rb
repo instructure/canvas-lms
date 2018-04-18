@@ -456,7 +456,10 @@ class Enrollment < ActiveRecord::Base
   end
 
   def update_cached_due_dates
-    DueDateCacher.recompute_users_for_course(user_id, course) if @update_cached_due_dates
+    if @update_cached_due_dates
+      update_grades = being_restored?(to_state: 'active') || being_restored?(to_state: 'inactive')
+      DueDateCacher.recompute_users_for_course(user_id, course, nil, update_grades: update_grades)
+    end
   end
 
   def update_from(other, skip_broadcasts=false)
@@ -831,7 +834,6 @@ class Enrollment < ActiveRecord::Base
     self.workflow_state = 'active'
     self.completed_at = nil
     self.save
-    Score.where(enrollment_id: self, workflow_state: :deleted).find_each(&:undestroy)
     true
   end
 
