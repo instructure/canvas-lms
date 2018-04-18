@@ -29,14 +29,17 @@ describe "In speedgrader" do
 
   context "as a teacher in course with unlimited sections " do
     before(:each) do
-      @teacher_enrollment = course_with_teacher(:course => @course, :active_all => true)
-      user_logged_in(:user => @teacher)
-      @assignment = @course.assignments.create(:name => 'assignment with rubric', :points_possible => 10)
+      @teacher_enrollment = course_with_teacher(course: @course, active_all: true)
+      user_logged_in(user: @teacher)
+      @assignment = @course.assignments.create(name: 'assignment with rubric', points_possible: 10)
 
       @section = @course.course_sections.create!
-      student_in_course(:active_all => true); @student1 = @student
-      student_in_course(:active_all => true); @student2 = @student
-      @enrollment.course_section = @section; @enrollment.save
+      student_in_course(active_all: true)
+      @student1 = @student
+      student_in_course(active_all: true)
+      @student2 = @student
+      @enrollment.course_section = @section
+      @enrollment.save
     end
 
     it "switching between a section and all sections doesn’t cause errors", priority: "2" do
