@@ -50,7 +50,7 @@ module SIS
       end
       i.courses_to_recache_due_dates.to_a.in_groups_of(1000, false) do |batch|
         batch.each do |course_id, user_ids|
-          DueDateCacher.recompute_users_for_course(user_ids.uniq, course_id)
+          DueDateCacher.recompute_users_for_course(user_ids.uniq, course_id, nil, update_grades: true)
         end
       end
       # We batch these up at the end because normally a user would get several enrollments, and there's no reason
@@ -304,8 +304,10 @@ module SIS
             if enrollment.changed?
               @users_to_touch_ids.add(user.id)
               if enrollment.workflow_state_changed?
-                courses_to_recache_due_dates[enrollment.course_id] ||=[]
-                courses_to_recache_due_dates[enrollment.course_id] << enrollment.user_id
+                if enrollment_needs_due_date_recaching?(enrollment)
+                  courses_to_recache_due_dates[enrollment.course_id] ||=[]
+                  courses_to_recache_due_dates[enrollment.course_id] << enrollment.user_id
+                end
                 if enrollment.workflow_state == 'active'
                   enrollments_to_add_to_favorites << enrollment
                 end
@@ -361,6 +363,15 @@ module SIS
                       ))
         end
         @incrementally_update_account_associations_user_ids = Set.new
+      end
+
+      private
+
+      def enrollment_needs_due_date_recaching?(enrollment)
+        unless %w(active inactive).include? enrollment.workflow_state_before_last_save
+          return %w(active inactive).include? enrollment.workflow_state
+        end
+        false
       end
     end
 

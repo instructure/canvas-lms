@@ -545,8 +545,9 @@ describe SIS::CSV::EnrollmentImporter do
     expect(DueDateCacher).to receive(:recompute).never
     # there are no assignments so this will just return, but we just want to see
     # that it gets called correctly and for the users that wre imported
-    expect(DueDateCacher).to receive(:recompute_users_for_course).with([user1.id], course1.id)
-    expect(DueDateCacher).to receive(:recompute_users_for_course).with([user1.id, user2.id], course2.id)
+    expect(DueDateCacher).to receive(:recompute_users_for_course).with([user1.id], course1.id, nil, update_grades: true)
+    expect(DueDateCacher).to receive(:recompute_users_for_course).
+      with([user1.id, user2.id], course2.id, nil, update_grades: true)
     process_csv_data_cleanly(
       'course_id,user_id,role,status',
       'C001,U001,student,active',
