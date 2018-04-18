@@ -176,10 +176,16 @@ require 'atom'
 #           "type": "string"
 #         },
 #         "topic_children": {
-#           "description": "An array of topic_ids for the group discussions the user is a part of.",
+#           "description": "DEPRECATED An array of topic_ids for the group discussions the user is a part of.",
 #           "example": [5, 7, 10],
 #           "type": "array",
 #           "items": { "type": "integer"}
+#         },
+#         "group_topic_children": {
+#           "description": "An array of group discussions the user is a part of. Fields include: id, group_id",
+#           "example": [{"id": 5, "group_id": 1}, {"id": 7, "group_id": 5}, {"id": 10, "group_id": 4}],
+#           "type": "array",
+#           "items": { "type": "object"}
 #         },
 #         "root_topic_id": {
 #           "description": "If the topic is for grading and a group assignment this will point to the original topic in the course.",
