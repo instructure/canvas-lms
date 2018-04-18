@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/mixins/typography";
+@import 'base/environment';
 
 // these are the things that show up when you try to import names w/emails into your course
 #user_list_boxes {
