@@ -60,7 +60,10 @@ describe ContentMigration do
 
       page1_to = @copy_to.wiki_pages.where(migration_id: mig_id(page1)).first
       page2_to = @copy_to.wiki_pages.where(migration_id: mig_id(page2)).first
-      expect(page2_to.body).to eq body % [@copy_to.id, page1_to.url]
+
+      new_body = body % [@copy_to.id, page1_to.url]
+      expect(page2_to.body).to eq new_body
+      expect(page2_to.versions.first.model.body).to eq new_body
     end
 
     it "should find and fix wiki links by title or id" do
