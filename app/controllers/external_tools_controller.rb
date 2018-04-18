@@ -634,6 +634,10 @@ class ExternalToolsController < ApplicationController
   # @argument account_navigation[selection_height] [String]
   #   The height of the dialog the tool is launched in
   #
+  # @argument account_navigation[display_type] [String]
+  #   The layout type to use when launching the tool. Must be
+  #   "full_width", "borderless", or "default"
+  #
   # @argument user_navigation[url] [String]
   #   The url of the external tool for user navigation
   #
@@ -677,6 +681,10 @@ class ExternalToolsController < ApplicationController
   # @argument course_navigation[default] [Boolean]
   #   Whether the navigation option will show in the course by default or
   #   whether the teacher will have to explicitly enable it
+  #
+  # @argument course_navigation[display_type] [String]
+  #   The layout type to use when launching the tool. Must be
+  #   "full_width", "borderless", or "default"
   #
   # @argument editor_button[url] [String]
   #   The url of the external tool
