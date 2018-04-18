@@ -719,9 +719,9 @@ class EnrollmentsApiController < ApplicationController
   #     -H 'Authorization: Bearer <token>'
   #
   # @example_response
-  # {
-  #   "success": true
-  # }
+  #   {
+  #     "success": true
+  #   }
   def accept
     @enrollment = @context.enrollments.find(params[:id])
     return render_unauthorized_action unless @current_user && @enrollment.user == @current_user
@@ -746,9 +746,9 @@ class EnrollmentsApiController < ApplicationController
   #     -H 'Authorization: Bearer <token>'
   #
   # @example_response
-  # {
-  #   "success": true
-  # }
+  #   {
+  #     "success": true
+  #   }
   def reject
     @enrollment = @context.enrollments.find(params[:id])
     return render_unauthorized_action unless @current_user && @enrollment.user == @current_user
