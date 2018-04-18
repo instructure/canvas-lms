@@ -126,7 +126,7 @@ class DeveloperKeyAccountBindingsController < ApplicationController
   def create_params
     workflow_state_param.merge(
       {
-        account_id: params[:account_id],
+        account: account,
         developer_key_id: params[:developer_key_id]
       }
     )
