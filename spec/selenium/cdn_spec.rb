@@ -40,7 +40,8 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
         sample_bundles = {
           'bundles/common' => false,
           'plugins/analytics/analytics' => false, # to test that it works with plugins
-          'jst/tinymce/EquationEditorView' => true # to test that it works with handlebars-loaded css
+          'jst/tinymce/EquationEditorView' => false, # to test that it works with handlebars-loaded css
+          'jst/tinymce/InsertUpdateImageView' => true
         }
         sample_bundles.each do |bundle_name, includes_no_variables|
           fingerprints = BrandableCSS.variants.map do |variant|
