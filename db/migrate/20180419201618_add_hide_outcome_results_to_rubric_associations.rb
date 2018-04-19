@@ -16,17 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class BackfillHidePointsSetting < ActiveRecord::Migration[5.1]
-  tag :postdeploy
+class AddHideOutcomeResultsToRubricAssociations < ActiveRecord::Migration[5.1]
+  tag :predeploy
 
-  def up
-    DataFixup::BackfillNulls.send_later_if_production_enqueue_args(
-      :run,
-      {priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups'},
-      RubricAssociation,
-      {
-        hide_points: false
-      }
-    )
+  def change
+    add_column :rubric_associations, :hide_outcome_results, :boolean
+    change_column_default(:rubric_associations, :hide_outcome_results, false)
   end
 end

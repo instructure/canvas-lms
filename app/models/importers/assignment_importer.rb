@@ -211,6 +211,7 @@ module Importers
         assoc.use_for_grading = !!hash[:rubric_use_for_grading] if hash.key?(:rubric_use_for_grading)
         assoc.hide_score_total = !!hash[:rubric_hide_score_total] if hash.key?(:rubric_hide_score_total)
         assoc.hide_points = !!hash[:rubric_hide_points] if hash.key?(:rubric_hide_points)
+        assoc.hide_outcome_results = !!hash[:rubric_hide_outcome_results] if hash.key?(:rubric_hide_outcome_results)
         if hash[:saved_rubric_comments]
           assoc.summary_data ||= {}
           assoc.summary_data[:saved_comments] ||= {}
