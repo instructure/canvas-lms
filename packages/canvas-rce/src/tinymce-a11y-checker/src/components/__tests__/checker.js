@@ -63,6 +63,27 @@ describe("check", () => {
     expect(error.rule.test).toHaveBeenCalledWith(error.node, conf)
   })
 
+  test("handles async tests", async () => {
+    const asyncTestRule = {
+      test: async () => {
+        return Promise.resolve(false)
+      },
+      data: elem => {},
+      form: () => [],
+      update: (elem, data) => {},
+      message: () => "Async works!",
+      why: () => "Because async",
+      link: "http://isAsync"
+    }
+
+    component = shallow(
+      <Checker getBody={() => node} additionalRules={[asyncTestRule]} />
+    )
+    instance = component.instance()
+    await promisify(instance.check.bind(instance))()
+    expect(instance.state.errors.length).toBe(4)
+  })
+
   test("calls beforeCheck when provided it as a config option", async () => {
     const testCallback = jest.fn()
     const beforeCheck = (ed, done) => {
