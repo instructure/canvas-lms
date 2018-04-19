@@ -151,28 +151,30 @@ describe "announcements" do
       end
     end
 
-    it "should create a delayed announcement", priority: "1", test_id: 150531 do
-      skip("Skipping flaky test, see COMMS-1051")
-      get course_announcements_path(@course)
-      create_announcement_option('input[type=checkbox][name=delay_posting]')
+    it "should create a delayed announcement with an attachment", priority: "1", test_id: 150531 do
+      AnnouncementNewEdit.visit_new(@course)
+      f('input[type=checkbox][name=delay_posting]').click
+      replace_content(f('input[name=title]'), "First Announcement")
+      type_in_tiny('textarea[name=message]', 'Hi, this is my first announcement')
       f('.ui-datepicker-trigger').click
       datepicker_next
       f('.ui-datepicker-time .ui-datepicker-ok').click
-      expect_new_page_load { submit_form('.form-actions') }
-      expect(f('.discussion-fyi')).to include_text('The content of this announcement will not be visible to users until')
-    end
-
-    it "allows creating a delayed announcement with an attachment", priority: "1", test_id: 220369 do
-      skip("Skipping flaky test, see COMMS-1051")
-      get course_announcements_path(@course)
-      create_announcement_option('input[type=checkbox][name=delay_posting]')
-      f('.ui-datepicker-trigger').click
-      datepicker_next
-      f('.ui-datepicker-time .ui-datepicker-ok').click
-      name, path, data = get_file('testfile1.txt')
+      _, path = get_file('testfile1.txt')
       f('#discussion_attachment_uploaded_data').send_keys(path)
       expect_new_page_load { submit_form('.form-actions') }
-      expect(f('.discussion-fyi')).to include_text('The content of this announcement will not be visible to users until')
+      expect(Announcement.last.title).to eq("First Announcement")
+      # the delayed post at should be far enough in the future to make this
+      # not flaky
+      expect(Announcement.last.delayed_post_at > Time.zone.now).to eq true
+    end
+
+    it "displayed delayed post note on page of delayed announcement" do
+      a = @course.announcements.create!(:title => "Announcement", :message => "foobers",
+        :delayed_post_at => 1.week.from_now)
+      get AnnouncementNewEdit.full_individual_announcement_url(@course, a)
+      expect(f('.discussion-fyi')).to include_text(
+        'The content of this announcement will not be visible to users until'
+      )
     end
 
     it "allows delay post date edit with disabled comments", priority: "2", test_id: 3035859 do
