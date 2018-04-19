@@ -596,9 +596,12 @@ describe UsersController do
         u = User.create! { |u| u.workflow_state = 'registered' }
         u.communication_channels.create!(:path => 'jacob@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
         u.pseudonyms.create!(:unique_id => 'jon@instructure.com')
-        expect_any_instance_of(CommunicationChannel).to receive(:send_merge_notification!)
+        notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
+
         post 'create', params: {:account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :send_confirmation => '0' }, :user => { :name => 'Jacob Fugal' }}, format: 'json'
         expect(response).to be_success
+        p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
+        expect(Message.where(:communication_channel_id => p.user.email_channel, :notification_id => notification).first).to be_present
       end
 
       it "should not notify the user if the merge opportunity can't log in'" do
