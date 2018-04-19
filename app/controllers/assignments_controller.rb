@@ -491,6 +491,7 @@ class AssignmentsController < ApplicationController
         HAS_GRADED_SUBMISSIONS: @assignment.graded_submissions_exist?,
         KALTURA_ENABLED: !!feature_enabled?(:kaltura),
         HAS_GRADING_PERIODS: @context.grading_periods?,
+        MODERATED_GRADING_MAX_GRADER_COUNT: @assignment.moderated_grading_max_grader_count,
         PLAGIARISM_DETECTION_PLATFORM: Lti::ToolProxy.capability_enabled_in_context?(
           @assignment.course,
           Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2

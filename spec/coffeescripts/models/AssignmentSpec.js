@@ -1168,7 +1168,12 @@ QUnit.module('Assignment#renderModeratedGradingFormFieldGroup', (hooks) => {
   const mountPointID = 'ModeratedGradingFormFieldGroup'
 
   hooks.beforeEach(() => {
-    fakeENV.setup({ ANONYMOUS_MODERATED_MARKING_ENABLED: false, AVAILABLE_MODERATORS: availableModerators })
+    fakeENV.setup({
+      ANONYMOUS_MODERATED_MARKING_ENABLED: false,
+      AVAILABLE_MODERATORS: availableModerators,
+      LOCALE: 'en',
+      MODERATED_GRADING_MAX_GRADER_COUNT: 7
+    })
     fixtures.innerHTML = `<span data-component="${mountPointID}"></span>`
   })
 
@@ -1209,6 +1214,34 @@ QUnit.module('Assignment#renderModeratedGradingFormFieldGroup', (hooks) => {
     assignment.renderModeratedGradingFormFieldGroup()
     const [,props] = React.createElement.getCall(0).args
     strictEqual(props.availableModerators, availableModerators)
+    React.createElement.restore()
+  })
+
+  test('passes max grader count in the ENV as a prop to the component', () => {
+    const assignment = new Assignment()
+    sinon.spy(React, 'createElement')
+    assignment.renderModeratedGradingFormFieldGroup()
+    const [,props] = React.createElement.getCall(0).args
+    strictEqual(props.maxGraderCount, ENV.MODERATED_GRADING_MAX_GRADER_COUNT)
+    React.createElement.restore()
+  })
+
+  test('passes locale in the ENV as a prop to the component', () => {
+    const assignment = new Assignment()
+    sinon.spy(React, 'createElement')
+    assignment.renderModeratedGradingFormFieldGroup()
+    const [,props] = React.createElement.getCall(0).args
+    strictEqual(props.locale, ENV.LOCALE)
+    React.createElement.restore()
+  })
+
+  test('passes current grader count as a prop to the component', () => {
+    const assignment = new Assignment()
+    assignment.set('grader_count', 4)
+    sinon.spy(React, 'createElement')
+    assignment.renderModeratedGradingFormFieldGroup()
+    const [,props] = React.createElement.getCall(0).args
+    strictEqual(props.currentGraderCount, 4)
     React.createElement.restore()
   })
 })

@@ -82,6 +82,7 @@ class AssignmentPage
     end
 
     def add_number_of_graders(number)
+      grader_count_input.clear
       grader_count_input.send_keys(number)
       driver.action.send_keys(:enter).perform
     end

@@ -38,9 +38,9 @@ describe 'Moderated Marking' do
     # create moderated assignment
     @moderated_assignment = @moderated_course.assignments.create!(
       title: 'Moderated Assignment1',
+      grader_count: 2,
       grading_type: 'points',
       points_possible: 15,
-      grader_count: 2,
       submission_types: 'online_upload',
       moderated_grading: true
     )

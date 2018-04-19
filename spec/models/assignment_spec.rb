@@ -5452,7 +5452,11 @@ describe Assignment do
       @first_ta = User.create!
       @second_ta = User.create
       [@first_ta, @second_ta].each { |user| @course.enroll_ta(user, enrollment_state: 'active') }
-      @assignment = @course.assignments.create!(moderated_grading: true, final_grader: @first_teacher)
+      @assignment = @course.assignments.create!(
+        final_grader: @first_teacher,
+        grader_count: 2,
+        moderated_grading: true
+      )
     end
 
     it 'returns a list of active, available moderators in the course' do
@@ -5498,6 +5502,32 @@ describe Assignment do
     end
   end
 
+  describe '#moderated_grading_max_grader_count' do
+    before(:once) do
+      course = Course.create!
+      teacher = User.create!
+      second_teacher = User.create!
+      course.enroll_teacher(teacher, enrollment_state: 'active')
+      @second_teacher_enrollment = course.enroll_teacher(second_teacher, enrollment_state: 'active')
+      ta = User.create!
+      course.enroll_ta(ta, enrollment_state: 'active')
+      @assignment = course.assignments.create!(
+        final_grader: teacher,
+        grader_count: 2,
+        moderated_grading: true
+      )
+    end
+
+    it 'returns the number of active instructors minus one' do
+      expect(@assignment.moderated_grading_max_grader_count).to eq 2
+    end
+
+    it 'returns the current grader_count if it is greater than the number of active instructors minus one' do
+      @second_teacher_enrollment.deactivate
+      expect(@assignment.moderated_grading_max_grader_count).to eq 2
+    end
+  end
+
   describe 'Anonymous Moderated Marking setting validation' do
     before(:once) do
       @course.account.enable_feature!(:anonymous_moderated_marking)
@@ -5533,6 +5563,14 @@ describe Assignment do
           assignment.final_grader_id = teacher.id
           assignment.validate
           expect(assignment.final_grader_id).to be_nil
+        end
+
+        it 'before validation, sets grader_count to nil if it is present' do
+          teacher = User.create!
+          @course.enroll_teacher(teacher, active_all: true)
+          assignment.grader_count = 2
+          assignment.validate
+          expect(assignment.grader_count).to be_nil
         end
       end
 

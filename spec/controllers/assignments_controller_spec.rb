@@ -841,6 +841,12 @@ describe AssignmentsController do
       expect(assigns[:js_env][:AVAILABLE_MODERATORS]).to match_array expected_moderators
     end
 
+    it 'js_env MODERATED_GRADING_MAX_GRADER_COUNT is the max grader count for the assignment' do
+      user_session(@teacher)
+      get :edit, params: { course_id: @course.id, id: @assignment.id }
+      expect(assigns[:js_env][:MODERATED_GRADING_MAX_GRADER_COUNT]).to eq @assignment.moderated_grading_max_grader_count
+    end
+
     describe 'js_env ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED' do
       before(:each) do
         user_session(@teacher)

@@ -2527,7 +2527,7 @@ describe AssignmentsApiController, type: :request do
         end
 
         it 'allows updating final_grader_id for a participating instructor with "Select Final Grade" permissions' do
-          assignment = @course.assignments.create!(name: 'Some Assignment', moderated_grading: true)
+          assignment = @course.assignments.create!(name: 'Some Assignment', moderated_grading: true, grader_count: 2)
           api_call(
             :put,
             "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
@@ -2544,7 +2544,7 @@ describe AssignmentsApiController, type: :request do
         end
 
         it 'does not allow updating final_grader_id if the user does not have "Select Final Grade" permissions' do
-          assignment = @course.assignments.create!(name: 'Some Assignment', moderated_grading: true)
+          assignment = @course.assignments.create!(name: 'Some Assignment', moderated_grading: true, grader_count: 2)
           @course.root_account.role_overrides.create!(
             permission: 'select_final_grade',
             role: teacher_role,
@@ -2567,7 +2567,7 @@ describe AssignmentsApiController, type: :request do
         end
 
         it 'does not allow updating final_grader_id if the user is not active in the course' do
-          assignment = @course.assignments.create!(name: 'Some Assignment', moderated_grading: true)
+          assignment = @course.assignments.create!(name: 'Some Assignment', moderated_grading: true, grader_count: 2)
           deactivated_teacher = User.create!
           deactivated_teacher = @course.enroll_teacher(deactivated_teacher, enrollment_state: 'inactive')
           api_call(
@@ -2588,7 +2588,7 @@ describe AssignmentsApiController, type: :request do
 
         it 'does not allow updating final_grader_id if the course has no user with the supplied ID' do
           user_not_enrolled_in_course = User.create!
-          assignment = @course.assignments.create!(name: 'Some Assignment', moderated_grading: true)
+          assignment = @course.assignments.create!(name: 'Some Assignment', moderated_grading: true, grader_count: 2)
           api_call(
             :put,
             "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
@@ -2606,7 +2606,12 @@ describe AssignmentsApiController, type: :request do
         end
 
         it 'skips final_grader_id validation if the field has not changed' do
-          assignment = @course.assignments.create!(name: 'Some Assignment', moderated_grading: true, final_grader: @teacher)
+          assignment = @course.assignments.create!(
+            final_grader: @teacher,
+            grader_count: 2,
+            moderated_grading: true,
+            name: 'Some Assignment'
+          )
           @course.root_account.role_overrides.create!(
             permission: 'select_final_grade',
             role: teacher_role,
@@ -2646,6 +2651,24 @@ describe AssignmentsApiController, type: :request do
           expect(json_parse(response.body)['final_grader_id']).to be_nil
         end
       end
+    end
+
+    it 'allows updating grader_count' do
+      course_with_teacher(active_all: true)
+      assignment = @course.assignments.create!(name: 'Some Assignment', moderated_grading: true)
+      api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+        {
+          controller: 'assignments_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id,
+          id: assignment.to_param
+        },
+        { assignment: { grader_count: 4 } },
+      )
+      expect(json_parse(response.body)['grader_count']).to eq 4
     end
 
     it "should not allow updating an assignment title to longer than 255 characters" do

@@ -245,6 +245,10 @@ class Course < ActiveRecord::Base
 
   has_a_broadcast_policy
 
+  # A hard limit on the number of graders (excluding the moderator) a moderated
+  # assignment can have.
+  MODERATED_GRADING_GRADER_LIMIT = 10.freeze
+
   def [](attr)
     attr.to_s == 'asset_string' ? self.asset_string : super
   end
@@ -3154,6 +3158,17 @@ class Course < ActiveRecord::Base
 
     active_instructors = users.merge(Enrollment.active_or_pending.of_instructor_type)
     active_instructors.select { |user| grants_right?(user, :select_final_grade) }
+  end
+
+  def moderated_grading_max_grader_count
+    count = participating_instructors.distinct.count
+    # A moderated assignment must have at least 1 (non-moderator) grader.
+    return 1 if count < 2
+    # grader count cannot exceed the hard limit
+    return MODERATED_GRADING_GRADER_LIMIT if count > MODERATED_GRADING_GRADER_LIMIT + 1
+    # for any given assignment: 1 assigned moderator + N max graders = all participating instructors
+    # so N max graders = all participating instructors - 1 assigned moderator
+    count - 1
   end
 
   private

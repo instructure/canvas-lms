@@ -36,6 +36,7 @@ module Api::V1::Assignment
       updated_at
       due_at
       final_grader_id
+      grader_count
       lock_at
       unlock_at
       assignment_group_id
@@ -382,6 +383,7 @@ module Api::V1::Assignment
     description
     position
     points_possible
+    grader_count
     grading_type
     allowed_extensions
     due_at

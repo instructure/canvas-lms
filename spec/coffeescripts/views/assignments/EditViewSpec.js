@@ -166,6 +166,23 @@ test('validates presence of a final grader if anonymous moderated marking is ena
   view.validateFinalGrader.restore()
 })
 
+test('does not validate grader count if anonymous moderated marking is disabled', function() {
+  const view = this.editView()
+  sinon.spy(view, 'validateGraderCount')
+  view.validateBeforeSave({}, [])
+  strictEqual(view.validateGraderCount.callCount, 0)
+  view.validateGraderCount.restore()
+})
+
+test('validates grader count if anonymous moderated marking is enabled', function() {
+  ENV.ANONYMOUS_MODERATED_MARKING_ENABLED = true
+  const view = this.editView()
+  sinon.spy(view, 'validateGraderCount')
+  view.validateBeforeSave({}, [])
+  strictEqual(view.validateGraderCount.callCount, 1)
+  view.validateGraderCount.restore()
+})
+
 test('does not allow group assignment for large rosters', function() {
   ENV.IS_LARGE_ROSTER = true
   const view = this.editView()
@@ -1059,5 +1076,49 @@ QUnit.module('EditView#validateFinalGrader', (hooks) => {
   test('returns an error if moderated grading is turned on and there is no final grader', () => {
     const errors = view.validateFinalGrader({ moderated_grading: 'on', final_grader_id: '' })
     deepEqual(Object.keys(errors), ['final_grader_id'])
+  })
+})
+
+QUnit.module('EditView#validateGraderCount', (hooks) => {
+  const fixtures = document.getElementById('fixtures')
+  let server
+  let view
+
+  hooks.beforeEach(() => {
+    fixtures.innerHTML = '<span id="editor_tabs"></span>'
+    fakeENV.setup({ COURSE_ID: 1 })
+    server = sinon.fakeServer.create()
+    view = editView()
+  })
+
+  hooks.afterEach(() => {
+    server.restore()
+    fakeENV.teardown()
+    fixtures.innerHTML = ''
+  })
+
+  test('returns no errors if moderated grading is turned off', () => {
+    const errors = view.validateGraderCount({ moderated_grading: 'off' })
+    strictEqual(Object.keys(errors).length, 0)
+  })
+
+  test('returns no errors if moderated grading is turned on and grader count is in an acceptable range', () => {
+    const errors = view.validateGraderCount({ moderated_grading: 'on', grader_count: '6' })
+    strictEqual(Object.keys(errors).length, 0)
+  })
+
+  test('returns no errors if moderated grading is turned on and grader count is greater than max grader count', () => {
+    const errors = view.validateGraderCount({ moderated_grading: 'on', grader_count: '8' })
+    strictEqual(Object.keys(errors).length, 0)
+  })
+
+  test('returns an error if moderated grading is turned on and grader count is empty', () => {
+    const errors = view.validateGraderCount({ moderated_grading: 'on', grader_count: '' })
+    deepEqual(Object.keys(errors), ['grader_count'])
+  })
+
+  test('returns an error if moderated grading is turned on and grader count is 0', () => {
+    const errors = view.validateGraderCount({ moderated_grading: 'on', grader_count: '0' })
+    deepEqual(Object.keys(errors), ['grader_count'])
   })
 })

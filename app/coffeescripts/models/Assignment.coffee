@@ -572,9 +572,12 @@ define [
 
     renderModeratedGradingFormFieldGroup: ->
       props =
+        currentGraderCount: @get('grader_count')
         finalGraderID: @get('final_grader_id')
         moderatedGradingEnabled: @moderatedGrading()
         availableModerators: ENV.AVAILABLE_MODERATORS
+        maxGraderCount: ENV.MODERATED_GRADING_MAX_GRADER_COUNT
+        locale: ENV.LOCALE
 
       formFieldGroup = React.createElement(ModeratedGradingFormFieldGroup, props)
       mountPoint = document.querySelector("[data-component='ModeratedGradingFormFieldGroup']")

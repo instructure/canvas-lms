@@ -521,7 +521,9 @@ define [
       errors = @_validateSubmissionTypes data, errors
       errors = @_validateAllowedExtensions data, errors
       errors = @assignmentGroupSelector.validateBeforeSave(data, errors)
-      errors = Object.assign(errors, @validateFinalGrader(data)) if ENV?.ANONYMOUS_MODERATED_MARKING_ENABLED
+      if ENV.ANONYMOUS_MODERATED_MARKING_ENABLED
+        Object.assign(errors, @validateFinalGrader(data))
+        Object.assign(errors, @validateGraderCount(data))
       unless ENV?.IS_LARGE_ROSTER
         errors = @groupCategorySelector.validateBeforeSave(data, errors)
       errors = @_validatePointsPossible(data, errors)
@@ -540,6 +542,17 @@ define [
       errors = {}
       if data.moderated_grading == 'on' and !data.final_grader_id
         errors.final_grader_id = [{ message: I18n.t('Grader is required') }]
+
+      errors
+
+    validateGraderCount: (data) =>
+      errors = {}
+      return errors unless data.moderated_grading == 'on'
+
+      if !data.grader_count
+        errors.grader_count = [{ message: I18n.t('Grader count is required') }]
+      else if data.grader_count == '0'
+        errors.grader_count = [{ message: I18n.t('Grader count cannot be 0') }]
 
       errors
 

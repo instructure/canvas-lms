@@ -16,21 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {arrayOf, bool, shape, string} from 'prop-types'
+import {arrayOf, bool, number, shape, string} from 'prop-types'
 import React from 'react'
 import I18n from 'i18n!assignments'
 import FinalGraderSelectMenu from './FinalGraderSelectMenu'
+import GraderCountNumberInput from './GraderCountNumberInput'
 import ModeratedGradingCheckbox from './ModeratedGradingCheckbox'
 import {direction} from '../shared/helpers/rtlHelper'
 
 export default class ModeratedGradingFormFieldGroup extends React.Component {
   static propTypes = {
     availableModerators: arrayOf(shape({name: string.isRequired, id: string.isRequired})).isRequired,
+    currentGraderCount: number,
     finalGraderID: string,
+    locale: string.isRequired,
+    maxGraderCount: number.isRequired,
     moderatedGradingEnabled: bool.isRequired
   }
 
   static defaultProps = {
+    currentGraderCount: null,
     finalGraderID: null
   }
 
@@ -59,6 +64,12 @@ export default class ModeratedGradingFormFieldGroup extends React.Component {
 
             {this.state.moderatedGradingChecked && (
               <div className="ModeratedGrading__Content">
+                <GraderCountNumberInput
+                  currentGraderCount={this.props.currentGraderCount}
+                  maxGraderCount={this.props.maxGraderCount}
+                  locale={this.props.locale}
+                />
+
                 <FinalGraderSelectMenu
                   availableModerators={this.props.availableModerators}
                   finalGraderID={this.props.finalGraderID}

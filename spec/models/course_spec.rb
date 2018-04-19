@@ -97,6 +97,60 @@ describe Course do
     end
   end
 
+  describe "#moderated_grading_max_grader_count" do
+    before(:once) do
+      @course = Course.create!
+    end
+
+    it 'returns 1 if the course has no instructors' do
+      expect(@course.moderated_grading_max_grader_count).to eq 1
+    end
+
+    it 'returns 1 if the course has one instructor' do
+      teacher = User.create!
+      @course.enroll_teacher(teacher)
+      expect(@course.moderated_grading_max_grader_count).to eq 1
+    end
+
+    it 'returns 10 if the course has more than 11 instructors' do
+      create_users_in_course(@course, 6, enrollment_type: 'TeacherEnrollment')
+      create_users_in_course(@course, 6, enrollment_type: 'TaEnrollment')
+      expect(@course.moderated_grading_max_grader_count).to eq 10
+    end
+
+    it 'returns N-1 if the course has between 1 < N < 12 instructors' do
+      create_users_in_course(@course, 2, enrollment_type: 'TeacherEnrollment')
+      @course.enroll_ta(User.create!, enrollment_state: 'active')
+      expect { @course.enroll_ta(User.create!, enrollment_state: 'active') }.to change {
+        @course.moderated_grading_max_grader_count
+      }.from(2).to(3)
+    end
+
+    it 'ignores deactivated instructors' do
+      create_users_in_course(@course, 2, enrollment_type: 'TeacherEnrollment')
+      @course.enroll_ta(User.create!, enrollment_state: 'active').deactivate
+      expect(@course.moderated_grading_max_grader_count).to eq 1
+    end
+
+    it 'ignores concluded instructors' do
+      create_users_in_course(@course, 2, enrollment_type: 'TeacherEnrollment')
+      @course.enroll_ta(User.create!, enrollment_state: 'active').conclude
+      expect(@course.moderated_grading_max_grader_count).to eq 1
+    end
+
+    it 'ignores deleted instructors' do
+      create_users_in_course(@course, 2, enrollment_type: 'TeacherEnrollment')
+      @course.enroll_ta(User.create!, enrollment_state: 'active').destroy
+      expect(@course.moderated_grading_max_grader_count).to eq 1
+    end
+
+    it 'ignores non-instructors' do
+      create_users_in_course(@course, 2, enrollment_type: 'TeacherEnrollment')
+      @course.enroll_student(User.create!, enrollment_state: 'active')
+      expect(@course.moderated_grading_max_grader_count).to eq 1
+    end
+  end
+
   describe '#moderators' do
     before(:once) do
       @course = Course.create!

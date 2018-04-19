@@ -94,11 +94,11 @@ describe "moderated grading assignments" do
 
     it "should allow user to input number of graders", priority: "1", test_id: 3490818 do
       # default value for the input is 2, or if the class has <= 2 active instructors the default is 1
-      skip('refs: GRADE-974, unskip when merging to master')
       AssignmentPage.select_moderate_checkbox
       AssignmentPage.add_number_of_graders(2)
-
-      expect(@moderated_assignment.grader_count).to eq 2
+      AssignmentPage.select_grader_from_dropdown(@teacher.name)
+      expect_new_page_load { AssignmentPage.assignment_save_button.click }
+      expect(@moderated_assignment.reload.grader_count).to eq 2
     end
   end
 

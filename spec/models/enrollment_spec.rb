@@ -206,8 +206,8 @@ describe Enrollment do
         @another_teacher = User.create!
         @course.enroll_teacher(@teacher, enrollment_state: 'active', allow_multiple_enrollments: true)
         @course.enroll_teacher(@another_teacher, enrollment_state: 'active', allow_multiple_enrollments: true)
-        2.times { @course.assignments.create!(moderated_grading: true, final_grader: @teacher) }
-        @course.assignments.create!(moderated_grading: true, final_grader: @another_teacher)
+        2.times { @course.assignments.create!(moderated_grading: true, final_grader: @teacher, grader_count: 2) }
+        @course.assignments.create!(moderated_grading: true, final_grader: @another_teacher, grader_count: 2)
       end
 
       it 'removes the user as final grader from all course assignments if Anonymous Moderated Marking is enabled' do

@@ -99,14 +99,6 @@ class Assignment < ActiveRecord::Base
   validate :assignment_name_length_ok?
   validates :lti_context_id, presence: true, uniqueness: true
 
-  # TODO: remove this once the field is editable via the UI. Right now there's
-  # no user-facing way to set the grader count to a valid value.
-  before_validation(on: :create) do
-    if moderated_grading? && anonymous_moderated_marking? && grader_count.zero?
-      self.grader_count = 2
-    end
-  end
-
   before_create do
     self.muted = true if moderated_grading? && anonymous_moderated_marking?
   end
@@ -141,7 +133,7 @@ class Assignment < ActiveRecord::Base
   }
   before_validation do |assignment|
     assignment.points_possible = nil unless assignment.graded?
-    assignment.final_grader_id = nil unless assignment.moderated_grading?
+    clear_moderated_grading_attributes(assignment) unless assignment.moderated_grading?
     assignment.lti_context_id ||= SecureRandom.uuid
     if assignment.external_tool? && assignment.external_tool_tag
       assignment.external_tool_tag.context = assignment
@@ -2784,6 +2776,13 @@ class Assignment < ActiveRecord::Base
     moderators
   end
 
+  def moderated_grading_max_grader_count
+    max_course_count = course.moderated_grading_max_grader_count
+    return max_course_count if grader_count.blank?
+
+    [grader_count, max_course_count].max
+  end
+
   private
 
   def due_date_ok?
@@ -2855,5 +2854,10 @@ class Assignment < ActiveRecord::Base
 
   def anonymous_moderated_marking?
     course.root_account.feature_enabled?(:anonymous_moderated_marking)
+  end
+
+  def clear_moderated_grading_attributes(assignment)
+    assignment.final_grader_id = nil
+    assignment.grader_count = nil
   end
 end

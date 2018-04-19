@@ -28,6 +28,8 @@ QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
     props = {
       availableModerators: [{name: 'John Doe', id: '923'}, {name: 'Jane Doe', id: '492'}],
       finalGraderID: undefined,
+      locale: 'en',
+      maxGraderCount: 10,
       moderatedGradingEnabled: true
     }
   })
@@ -69,6 +71,18 @@ QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
   test('shows the moderated grading content when passed moderatedGradingEnabled: true', () => {
     mountComponent()
     strictEqual(content().length, 1)
+  })
+
+  test('includes a final grader select menu in the moderated grading content', () => {
+    mountComponent()
+    const selectMenu = content().find('select[name="final_grader_id"]')
+    strictEqual(selectMenu.length, 1)
+  })
+
+  test('includes a grader count input in the moderated grading content', () => {
+    mountComponent()
+    const graderCountInput = content().find('input[name="grader_count"]')
+    strictEqual(graderCountInput.length, 1)
   })
 
   test('hides the moderated grading content when the checkbox is unchecked', () => {
