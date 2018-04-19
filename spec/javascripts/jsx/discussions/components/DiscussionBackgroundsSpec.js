@@ -64,9 +64,9 @@ test('renders correct student view for the pinnedDiscussionBackground ', () => {
   equal(node.length, '1')
 })
 
-test('renders correct student view fo the unpinnedDiscussionsBackground decorative component', () => {
+test('renders correct student view for the unpinnedDiscussionsBackground decorative component', () => {
   const props = defaultProps()
-  props.permissions.manage_content = false
+  props.permissions.create = false
   const tree = shallow(unpinnedDiscussionsBackground(props))
   const node = tree.find('Link')
   equal(node.length, '0')

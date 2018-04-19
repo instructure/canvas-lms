@@ -139,6 +139,11 @@ export default class DiscussionsIndex extends Component {
               title={I18n.t('Pinned Discussions')}
               discussions={this.props.pinnedDiscussions}
               deleteDiscussion={this.openDeleteDiscussionsModal}
+              renderContainerBackground={() =>
+                pinnedDiscussionBackground({
+                  permissions: this.props.permissions
+                })
+              }
             />
           </div>
         ) : null}
@@ -148,8 +153,10 @@ export default class DiscussionsIndex extends Component {
             discussions={this.props.unpinnedDiscussions}
             deleteDiscussion={this.openDeleteDiscussionsModal}
             renderContainerBackground={() =>
-              pinnedDiscussionBackground({
-                permissions: this.props.permissions
+              unpinnedDiscussionsBackground({
+                permissions: this.props.permissions,
+                contextID: this.props.contextId,
+                contextType: this.props.contextType
               })
             }
           />
