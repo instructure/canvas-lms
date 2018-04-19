@@ -96,30 +96,6 @@ describe "announcements" do
       end
     end
 
-    it "should create a delayed announcement", priority: "1", test_id: 150531 do
-      skip("Skipping flaky test, see COMMS-1051")
-      get course_announcements_path(@course)
-      create_announcement_option('input[type=checkbox][name=delay_posting]')
-      f('.ui-datepicker-trigger').click
-      datepicker_next
-      f('.ui-datepicker-time .ui-datepicker-ok').click
-      expect_new_page_load { submit_form('.form-actions') }
-      expect(f('.discussion-fyi')).to include_text('The content of this announcement will not be visible to users until')
-    end
-
-    it "allows creating a delayed announcement with an attachment", priority: "1", test_id: 220369 do
-      skip("Skipping flaky test, see COMMS-1051")
-      get course_announcements_path(@course)
-      create_announcement_option('input[type=checkbox][name=delay_posting]')
-      f('.ui-datepicker-trigger').click
-      datepicker_next
-      f('.ui-datepicker-time .ui-datepicker-ok').click
-      name, path, data = get_file('testfile1.txt')
-      f('#discussion_attachment_uploaded_data').send_keys(path)
-      expect_new_page_load { submit_form('.form-actions') }
-      expect(f('.discussion-fyi')).to include_text('The content of this announcement will not be visible to users until')
-    end
-
     it "should remove delayed_post_at when unchecking delay_posting", priority: "1", test_id: 220371 do # no
       topic = @course.announcements.create!(:title => @topic_title, :user => @user, :delayed_post_at => 10.days.ago, :message => "message")
       get "/courses/#{@course.id}/announcements/#{topic.id}"
