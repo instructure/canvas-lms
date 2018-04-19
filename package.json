@@ -174,7 +174,7 @@
     "test:karma:watch": "karma start",
     "test:karma:watch:headless": "karma start --browsers ChromeHeadlessNoSandbox",
     "test:packages": "script/local-yarn test",
-    "preinstall": "script/local-yarn install",
+    "preinstall": "script/local-yarn install && script/local-yarn build",
     "build": "yarn run build:css && yarn run build:js",
     "build:watch": "concurrently \"yarn build:css:watch\" \"yarn build:js:watch\"",
     "build:css": "brandable_css",
