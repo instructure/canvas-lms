@@ -4345,6 +4345,32 @@ describe AssignmentsApiController, type: :request do
         expect(@assignment).to be_anonymous_grading
       end
     end
+
+    context "with the duplicated_successfully parameter" do
+      subject { @assignment }
+
+      let(:params) do
+        ActionController::Parameters.new(duplicated_successfully: duplicated_successfully)
+      end
+
+      before do
+        allow(@assignment).to receive(:finish_duplicating)
+        allow(@assignment).to receive(:fail_to_duplicate)
+        update_from_params(@assignment, params, @teacher)
+      end
+
+      context "when duplicated_successfully is true" do
+        let(:duplicated_successfully) { true }
+
+        it { is_expected.to have_received(:finish_duplicating) }
+      end
+
+      context "when duplicated_successfully is false" do
+        let(:duplicated_successfully) { false }
+
+        it { is_expected.to have_received(:fail_to_duplicate) }
+      end
+    end
   end
 
   context "as an observer viewing assignments" do

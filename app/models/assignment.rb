@@ -211,7 +211,7 @@ class Assignment < ActiveRecord::Base
       result.send(:"#{attr}=", nil)
     end
     result.peer_review_count = 0
-    result.workflow_state = "unpublished"
+    result.workflow_state = external_tool_tag.present? ? 'duplicating' : 'unpublished'
     # Default to the last position of all active assignments in the group.  Clients can still
     # override later.  Just helps to avoid duplicate positions.
     result.position = Assignment.active.where(assignment_group: assignment_group).maximum(:position) + 1

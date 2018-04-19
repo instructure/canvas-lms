@@ -464,6 +464,10 @@ describe Assignment do
         expect(new_assignment.external_tool_tag).to be_present
         expect(new_assignment.external_tool_tag.content).to eq(assignment.external_tool_tag.content)
       end
+
+      it "sets the assignment's state to 'duplicating'" do
+        expect(assignment.duplicate.workflow_state).to eq('duplicating')
+      end
     end
   end
 

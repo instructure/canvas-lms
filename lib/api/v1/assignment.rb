@@ -666,6 +666,14 @@ module Api::V1::Assignment
       assignment.anonymous_grading = value_to_boolean(assignment_params['anonymous_grading'])
     end
 
+    if assignment_params.key?('duplicated_successfully')
+      if value_to_boolean(assignment_params[:duplicated_successfully])
+        assignment.finish_duplicating
+      else
+        assignment.fail_to_duplicate
+      end
+    end
+
     apply_report_visibility_options!(assignment_params, assignment)
 
     assignment.updating_user = user
