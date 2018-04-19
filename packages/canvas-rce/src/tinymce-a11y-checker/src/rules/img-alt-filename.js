@@ -1,6 +1,8 @@
 import formatMessage from "../format-message"
 import { filename } from "../utils/strings"
 
+import axios from "axios"
+
 export default {
   test: elem => {
     if (elem.tagName !== "IMG") {
@@ -10,7 +12,24 @@ export default {
     if (alt == null || alt === "") {
       return true
     }
-    return filename(alt) !== filename(elem.src)
+    return axios.get(elem.src).catch(e => {
+      if (
+        e.response &&
+        (e.response.status === 301 || e.response.status === 302)
+      ) {
+        const { location } = e.response.headers
+        const contentDisposition = e.response.headers["content-disposition"]
+        const matches = []
+        if (location) {
+          matches.push(filename(alt) !== filename(location))
+        }
+        if (contentDisposition) {
+          matches.push(filename(alt) !== filename(contentDisposition))
+        }
+        return matches.some(x => x)
+      }
+      return filename(alt) !== filename(elem.src)
+    })
   },
 
   data: elem => {

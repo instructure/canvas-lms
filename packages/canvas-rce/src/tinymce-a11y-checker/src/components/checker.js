@@ -55,6 +55,10 @@ export default class Checker extends React.Component {
     this.handleClose = this.handleClose.bind(this)
   }
 
+  static defaultProps = {
+    additionalRules: []
+  }
+
   static get displayName() {
     return "Checker"
   }
@@ -104,13 +108,18 @@ export default class Checker extends React.Component {
       dom.walk(
         node,
         child => {
-          for (let rule of rules) {
-            if (
-              !child.hasAttribute("data-ignore-a11y-check") &&
-              !rule.test(child, this.state.config)
-            ) {
-              errors.push({ node: child, rule })
+          const composedRules = rules.concat(this.props.additionalRules)
+          for (let rule of composedRules) {
+            if (child.hasAttribute("data-ignore-a11y-check")) {
+              continue
             }
+            const promise = Promise.resolve(
+              rule.test(child, this.state.config)
+            ).then(result => {
+              if (!result) {
+                errors.push({ node: child, rule })
+              }
+            })
           }
         },
         () => {
