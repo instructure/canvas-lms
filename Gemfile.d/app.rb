@@ -164,3 +164,4 @@ gem 'workflow', path: 'gems/workflow'
 # StrongMind
 gem 'canvas_shim', :path => 'vendor/canvas_shim'
 gem 'pipeline_publisher_ruby', :path => 'vendor/pipeline-publisher-ruby'
+gem 'airbrake', '~> 7.2'
