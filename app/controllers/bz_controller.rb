@@ -167,13 +167,19 @@ class BzController < ApplicationController
   end
 
   def grade_details
+    @is_staff = @current_user.id == 1
+
     user = params[:user_id].nil? ? @current_user : User.find(params[:user_id])
-    if user.id != @current_user.id && @current_user.id != 1
+    if user.id != @current_user.id && !@is_staff
       raise "permission denied"
     end
     module_item_id = params[:module_item_id]
+    @module_item_id = module_item_id
+    @user_id = user.id
 
     bzg = BZGrading.new
+
+    @course = bzg.get_context_module(module_item_id).course
 
     @response_object = bzg.calculate_user_module_score(module_item_id, user)
     i = 0

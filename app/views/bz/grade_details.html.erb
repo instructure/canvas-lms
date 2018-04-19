@@ -1,4 +1,28 @@
+<% if @is_staff %>
+
+<form method="GET">
+  <input type="hidden" name="module_item_id" value="<%= @module_item_id %>" />
+  <select name="user_id">
+<%
+  @course.students.active.each do |student|
+  %>
+    <option value="<%=student.id%>" <%= (student.id == @user_id) ? "selected" : "" %>><%=student.name%></option>
+  <%
+  end
+%>
+  </select>
+  <input type="submit" value="View" />
+</form>
+
 <table>
+  <tr>
+    <th>Field Name</th>
+    <th>Provided Answer</th>
+    <th>When Answered</th>
+    <th>Points Awarded</th>
+    <th>Points Possible</th>
+    <th>Explanation</th>
+  </tr>
 <% @response_object["audit_trace"].each do |thing| %>
   <tr>
     <td><a href="#<%= thing["field_name"] %>"><%= thing["field_name"] %></a></td>
@@ -15,6 +39,8 @@
   May be preceded with partial_credit:
 -->
 
+<% end %>
+
   <%= @document.to_s.html_safe %>
 
 
@@ -30,25 +56,18 @@
     var info = JSON.parse(e.getAttribute("data-bz-grade-info"));
 
     var div = document.createElement("div");
-    div.textContent =
-      prettyRound(info["points_amount"]) + "/" + prettyRound(info["points_possible"]) + " points\n" +
+    div.className = "grade-explained";
+    div.innerHTML =
+      "<span class=\"score\">" + prettyRound(info["points_amount"]) + "/" + prettyRound(info["points_possible"]) + " points</span>\n" +
       (info["points_given"] ? "awarded for: " : "missed because: ") + "\n" +
-      info["points_reason_english"];
-    div.style.position = "relative";
-    div.style.left = "-200px";
-    div.style.width = "200px";
-    div.style.padding = "0.25em";
-    div.style.boxSizing = "border-box";
-    div.style.whiteSpace = "pre-line";
-
-    div.style.border = "solid 2px black";
+      "<span class=\"score-reason\">" + info["points_reason_english"] + "</span>";
 
     div.id = info["field_name"];
 
     if(info["points_given"])
-      div.style.borderColor = info["points_possible"] == info["points_amount"] ? "green" : "yellow";
+      div.className += info["points_possible"] == info["points_amount"] ? " correct" : " partial";
     else
-      div.style.borderColor = "red";
+      div.className += " incorrect";
 
     e.parentNode.insertBefore(div, e);
   }
