@@ -78,7 +78,7 @@ module ErrorContext
 
     def error_template
       @error_template ||= begin
-        ActionView::Template::Handlers::Erubi.new(File.read(error_template_path))
+        ActionView::Template::Handlers::ERB::Erubi.new(File.read(error_template_path))
       end
     end
   end
