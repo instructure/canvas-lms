@@ -26,7 +26,7 @@ class ErrorReport < ActiveRecord::Base
   serialize :data, Hash
 
   before_save :guess_email
-  after_save :notify_airbrake
+  before_save :notify_airbrake
 
   def notify_airbrake
     Airbrake.notify(
