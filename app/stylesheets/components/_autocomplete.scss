@@ -144,6 +144,7 @@ ul[class*=ac-] {
   position: absolute;
   #{direction(right)}: 4px;
   top: 5px;
+  z-index: 10;
 
   i:before {
     color: #999;
@@ -179,6 +180,9 @@ ul[class*=ac-] {
   padding: direction-sides(0 18px 0 8px);
   position: relative;
   vertical-align: middle;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 85%;
 
   &:hover {
     background: #bccef4;
