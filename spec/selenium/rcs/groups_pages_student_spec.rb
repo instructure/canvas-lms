@@ -25,6 +25,7 @@ require_relative '../helpers/groups_common'
 require_relative '../helpers/groups_shared_examples'
 require_relative '../helpers/wiki_and_tiny_common'
 require_relative '../discussions/pages/discussions_index_page'
+require_relative '../announcements/announcement_index_page'
 
 describe "groups" do
   include_context "in-process server selenium tests"
@@ -72,16 +73,15 @@ describe "groups" do
       end
 
       it "should allow all group members to see announcements", priority: "1", test_id: 273613 do
-        skip("Skipping flaky test, see COMMS-1051")
         @announcement = @testgroup.first.announcements.create!(
           title: 'Group Announcement',
           message: 'Group',
-          user: @teacher)
-        # Verifying with a few different group members should be enough to ensure all group members can see it
-        verify_member_sees_announcement
-
-        user_session(@students.first)
-        verify_member_sees_announcement
+          user: @teacher
+        )
+        AnnouncementIndex.visit_groups_index(@testgroup.first)
+        expect(ff('.ic-announcement-row').size).to eq 1
+        expect_new_page_load { ff('.ic-announcement-row')[0].click }
+        expect(f('.discussion-title')).to include_text(@announcement.title)
       end
     end
 
