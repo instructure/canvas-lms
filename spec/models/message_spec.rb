@@ -478,6 +478,24 @@ describe Message do
           message = message_model(:context => assign, notification: notification, user: user)
           expect(message.from_name).to eq 'nickname'
         end
+
+        it 'uses a course appointment group if exists' do
+          @account = Account.create!
+          @account.settings[:allow_invitation_previews] = false
+          @account.save!
+          course_with_student(:account => @account, :active_all => true, :name => 'Unnamed Course')
+          cat = @course.group_categories.create(:name => 'teh category')
+          ag = appointment_group_model(:contexts => [@course], :sub_context => cat)
+          assign = assignment_model
+          @course.offer!
+          user = user_model(preferences: { course_nicknames: { assign.context.id => 'test_course' }})
+          user.register!
+          enroll = @course.enroll_user(user)
+          enroll.accept!
+          notification = Notification.create(:name => 'Assignment Group Published')
+          message = message_model(:context => ag, notification: notification, user: user)
+          expect(message.from_name).to eq "Unnamed Course"
+        end
       end
     end
 
