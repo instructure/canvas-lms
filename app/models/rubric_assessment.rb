@@ -103,7 +103,11 @@ class RubricAssessment < ActiveRecord::Base
     # title
     result.title = "#{user.name}, #{rubric_association.title}"
 
-    result.assessed_at = Time.now
+    # non-scoring rubrics
+    result.hide_points = self.hide_points
+    result.hidden = self.rubric_association.hide_outcome_results
+
+    result.assessed_at = Time.zone.now
     result.save_to_version(result.attempt)
     result
   end
