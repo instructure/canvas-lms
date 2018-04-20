@@ -30,9 +30,9 @@ class ErrorReport < ActiveRecord::Base
 
   def notify_airbrake
     Airbrake.notify(
-      "#{error.category}: #{error.message}",
-      backtrace: error.backtrace,
-      data: error.data.merge(canvas_domain: ENV['CANVAS_DOMAIN'])
+      "#{category}: #{message}",
+      backtrace: backtrace,
+      data: data.merge(canvas_domain: ENV['CANVAS_DOMAIN'])
     )
   end
 
