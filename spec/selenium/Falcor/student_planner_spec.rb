@@ -52,6 +52,16 @@ describe "student planner" do
     validate_link_to_url(announcement, 'discussion_topics')
   end
 
+  it "shows and navigates to the events page", priority: "1", test_id: 3488530 do
+    skip('Unskip with ADMIN-278')
+    event = CalendarEvent.new(title: "New event")
+    event.context = @course
+    event.save!
+    go_to_list_view
+    validate_object_displayed('Calendar Event')
+    validate_link_to_url(event, 'calendar_events')
+  end
+
   it "shows course images when the feature is enabled", priority: "1", test_id: 3306206 do
     Account.default.enable_feature!(:course_card_images)
     @course_root = Folder.root_folders(@course).first
