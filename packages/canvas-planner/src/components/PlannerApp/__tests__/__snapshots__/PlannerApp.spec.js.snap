@@ -1,6 +1,84 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`renders base component using dayKeys 1`] = `
+exports[`PlannerApp empty day calculation always renders yesterday, today and tomorrow 1`] = `
+<div
+  className="PlannerApp large"
+>
+  <ShowOnFocusButton
+    buttonProps={
+      Object {
+        "onClick": undefined,
+      }
+    }
+    buttonRef={[Function]}
+  >
+    Load prior dates
+  </ShowOnFocusButton>
+  <LoadingPastIndicator
+    allPastItemsLoaded={false}
+    loadingPast={false}
+  />
+  <Animatable(Day)
+    animatableIndex={0}
+    day="2017-04-19"
+    itemsForDay={
+      Array [
+        Object {
+          "dateBucketMoment": "2017-04-18T15:00:00.000Z",
+        },
+      ]
+    }
+    timeZone="Asia/Tokyo"
+  />
+  <Animatable(Day)
+    animatableIndex={1}
+    day="2017-04-22"
+    itemsForDay={Array []}
+    timeZone="Asia/Tokyo"
+  />
+  <Animatable(Day)
+    animatableIndex={2}
+    day="2017-04-23"
+    itemsForDay={Array []}
+    timeZone="Asia/Tokyo"
+  />
+  <Animatable(Day)
+    animatableIndex={3}
+    day="2017-04-24"
+    itemsForDay={Array []}
+    timeZone="Asia/Tokyo"
+  />
+  <EmptyDays
+    animatableIndex={4}
+    day="2017-04-25"
+    endday="2017-04-28"
+    timeZone="Asia/Tokyo"
+  />
+  <Animatable(Day)
+    animatableIndex={5}
+    day="2017-04-29"
+    itemsForDay={
+      Array [
+        Object {
+          "dateBucketMoment": "2017-04-28T15:00:00.000Z",
+        },
+      ]
+    }
+    timeZone="Asia/Tokyo"
+  />
+  <div
+    id="planner-app-fixed-element"
+  />
+  <LoadingFutureIndicator
+    allFutureItemsLoaded={false}
+    loadingFuture={false}
+    onLoadMore={[Function]}
+    plannerActive={[Function]}
+  />
+</div>
+`;
+
+exports[`PlannerApp empty day calculation merges 3 consecutive empty days in the future 1`] = `
 <div
   className="PlannerApp large"
 >
@@ -34,7 +112,7 @@ exports[`renders base component using dayKeys 1`] = `
         },
       ]
     }
-    timeZone="UTC"
+    timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
     animatableIndex={1}
@@ -46,19 +124,25 @@ exports[`renders base component using dayKeys 1`] = `
         },
       ]
     }
-    timeZone="UTC"
+    timeZone="Asia/Tokyo"
   />
-  <Animatable(Day)
+  <EmptyDays
     animatableIndex={2}
     day="2017-04-26"
+    endday="2017-04-28"
+    timeZone="Asia/Tokyo"
+  />
+  <Animatable(Day)
+    animatableIndex={3}
+    day="2017-04-29"
     itemsForDay={
       Array [
         Object {
-          "dateBucketMoment": "2017-04-25T15:00:00.000Z",
+          "dateBucketMoment": "2017-04-28T15:00:00.000Z",
         },
       ]
     }
-    timeZone="UTC"
+    timeZone="Asia/Tokyo"
   />
   <div
     id="planner-app-fixed-element"
@@ -72,7 +156,223 @@ exports[`renders base component using dayKeys 1`] = `
 </div>
 `;
 
-exports[`renders empty component with no assignments 1`] = `
+exports[`PlannerApp empty day calculation only renders days with items in the past 1`] = `
+<div
+  className="PlannerApp large"
+>
+  <ShowOnFocusButton
+    buttonProps={
+      Object {
+        "onClick": undefined,
+      }
+    }
+    buttonRef={[Function]}
+  >
+    Load prior dates
+  </ShowOnFocusButton>
+  <LoadingPastIndicator
+    allPastItemsLoaded={false}
+    loadingPast={false}
+  />
+  <Animatable(Day)
+    animatableIndex={0}
+    day="2017-04-18"
+    itemsForDay={
+      Array [
+        Object {
+          "dateBucketMoment": "2017-04-17T15:00:00.000Z",
+        },
+      ]
+    }
+    timeZone="Asia/Tokyo"
+  />
+  <Animatable(Day)
+    animatableIndex={1}
+    day="2017-04-20"
+    itemsForDay={
+      Array [
+        Object {
+          "dateBucketMoment": "2017-04-19T15:00:00.000Z",
+        },
+      ]
+    }
+    timeZone="Asia/Tokyo"
+  />
+  <Animatable(Day)
+    animatableIndex={2}
+    day="2017-04-22"
+    itemsForDay={Array []}
+    timeZone="Asia/Tokyo"
+  />
+  <Animatable(Day)
+    animatableIndex={3}
+    day="2017-04-23"
+    itemsForDay={Array []}
+    timeZone="Asia/Tokyo"
+  />
+  <Animatable(Day)
+    animatableIndex={4}
+    day="2017-04-24"
+    itemsForDay={Array []}
+    timeZone="Asia/Tokyo"
+  />
+  <div
+    id="planner-app-fixed-element"
+  />
+  <LoadingFutureIndicator
+    allFutureItemsLoaded={false}
+    loadingFuture={false}
+    onLoadMore={[Function]}
+    plannerActive={[Function]}
+  />
+</div>
+`;
+
+exports[`PlannerApp empty day calculation renders 2 consecutive empty days in the future as empty days 1`] = `
+<div
+  className="PlannerApp large"
+>
+  <ShowOnFocusButton
+    buttonProps={
+      Object {
+        "onClick": undefined,
+      }
+    }
+    buttonRef={[Function]}
+  >
+    Load prior dates
+  </ShowOnFocusButton>
+  <LoadingPastIndicator
+    allPastItemsLoaded={false}
+    loadingPast={false}
+  />
+  <Animatable(Day)
+    animatableIndex={0}
+    day="2017-04-24"
+    itemsForDay={
+      Array [
+        Object {
+          "dateBucketMoment": "2017-04-23T15:00:00.000Z",
+        },
+      ]
+    }
+    timeZone="Asia/Tokyo"
+  />
+  <Animatable(Day)
+    animatableIndex={1}
+    day="2017-04-25"
+    itemsForDay={
+      Array [
+        Object {
+          "dateBucketMoment": "2017-04-24T15:00:00.000Z",
+        },
+      ]
+    }
+    timeZone="Asia/Tokyo"
+  />
+  <Animatable(Day)
+    animatableIndex={2}
+    day="2017-04-26"
+    itemsForDay={Array []}
+    timeZone="Asia/Tokyo"
+  />
+  <Animatable(Day)
+    animatableIndex={3}
+    day="2017-04-27"
+    itemsForDay={Array []}
+    timeZone="Asia/Tokyo"
+  />
+  <Animatable(Day)
+    animatableIndex={4}
+    day="2017-04-28"
+    itemsForDay={
+      Array [
+        Object {
+          "dateBucketMoment": "2017-04-27T15:00:00.000Z",
+        },
+      ]
+    }
+    timeZone="Asia/Tokyo"
+  />
+  <div
+    id="planner-app-fixed-element"
+  />
+  <LoadingFutureIndicator
+    allFutureItemsLoaded={false}
+    loadingFuture={false}
+    onLoadMore={[Function]}
+    plannerActive={[Function]}
+  />
+</div>
+`;
+
+exports[`PlannerApp renders base component using dayKeys 1`] = `
+<div
+  className="PlannerApp large"
+>
+  <ShowOnFocusButton
+    buttonProps={
+      Object {
+        "onClick": undefined,
+      }
+    }
+    buttonRef={[Function]}
+  >
+    Load prior dates
+  </ShowOnFocusButton>
+  <LoadingPastIndicator
+    allPastItemsLoaded={false}
+    loadingPast={false}
+  />
+  <Animatable(Day)
+    animatableIndex={0}
+    day="2017-04-24"
+    itemsForDay={
+      Array [
+        Object {
+          "dateBucketMoment": "2017-04-23T15:00:00.000Z",
+        },
+      ]
+    }
+    timeZone="Asia/Tokyo"
+  />
+  <Animatable(Day)
+    animatableIndex={1}
+    day="2017-04-25"
+    itemsForDay={
+      Array [
+        Object {
+          "dateBucketMoment": "2017-04-24T15:00:00.000Z",
+        },
+      ]
+    }
+    timeZone="Asia/Tokyo"
+  />
+  <Animatable(Day)
+    animatableIndex={2}
+    day="2017-04-26"
+    itemsForDay={
+      Array [
+        Object {
+          "dateBucketMoment": "2017-04-25T15:00:00.000Z",
+        },
+      ]
+    }
+    timeZone="Asia/Tokyo"
+  />
+  <div
+    id="planner-app-fixed-element"
+  />
+  <LoadingFutureIndicator
+    allFutureItemsLoaded={false}
+    loadingFuture={false}
+    onLoadMore={[Function]}
+    plannerActive={[Function]}
+  />
+</div>
+`;
+
+exports[`PlannerApp renders empty component with no assignments 1`] = `
 <div
   className="PlannerApp large"
 >
@@ -98,7 +398,7 @@ exports[`renders empty component with no assignments 1`] = `
 </div>
 `;
 
-exports[`renders loading past spinner when loading past and there are no future items 1`] = `
+exports[`PlannerApp renders loading past spinner when loading past and there are no future items 1`] = `
 <div
   className="PlannerApp large"
 >
@@ -137,7 +437,7 @@ exports[`renders loading past spinner when loading past and there are no future 
 </div>
 `;
 
-exports[`shows new activity button when new activity is indicated 1`] = `
+exports[`PlannerApp shows new activity button when new activity is indicated 1`] = `
 <div
   className="PlannerApp large"
 >
@@ -180,7 +480,7 @@ exports[`shows new activity button when new activity is indicated 1`] = `
         },
       ]
     }
-    timeZone="UTC"
+    timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
     animatableIndex={1}
@@ -192,7 +492,7 @@ exports[`shows new activity button when new activity is indicated 1`] = `
         },
       ]
     }
-    timeZone="UTC"
+    timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
     animatableIndex={2}
@@ -204,7 +504,7 @@ exports[`shows new activity button when new activity is indicated 1`] = `
         },
       ]
     }
-    timeZone="UTC"
+    timeZone="Asia/Tokyo"
   />
   <div
     id="planner-app-fixed-element"
@@ -218,7 +518,7 @@ exports[`shows new activity button when new activity is indicated 1`] = `
 </div>
 `;
 
-exports[`shows only the loading component when the isLoading prop is true 1`] = `
+exports[`PlannerApp shows only the loading component when the isLoading prop is true 1`] = `
 <div
   className="PlannerApp large"
 >
@@ -259,7 +559,7 @@ exports[`shows only the loading component when the isLoading prop is true 1`] = 
 </div>
 `;
 
-exports[`shows the loading past indicator when loadingPast prop is true 1`] = `
+exports[`PlannerApp shows the loading past indicator when loadingPast prop is true 1`] = `
 <div
   className="PlannerApp large"
 >
@@ -293,7 +593,7 @@ exports[`shows the loading past indicator when loadingPast prop is true 1`] = `
         },
       ]
     }
-    timeZone="UTC"
+    timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
     animatableIndex={1}
@@ -305,7 +605,7 @@ exports[`shows the loading past indicator when loadingPast prop is true 1`] = `
         },
       ]
     }
-    timeZone="UTC"
+    timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
     animatableIndex={2}
@@ -317,7 +617,7 @@ exports[`shows the loading past indicator when loadingPast prop is true 1`] = `
         },
       ]
     }
-    timeZone="UTC"
+    timeZone="Asia/Tokyo"
   />
   <div
     id="planner-app-fixed-element"

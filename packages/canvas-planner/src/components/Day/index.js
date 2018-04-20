@@ -21,7 +21,7 @@ import themeable from '@instructure/ui-themeable/lib';
 import Heading from '@instructure/ui-core/lib/components/Heading';
 import Text from '@instructure/ui-core/lib/components/Text';
 import Container from '@instructure/ui-core/lib/components/Container';
-import { shape, string, number, arrayOf, func, bool } from 'prop-types';
+import { shape, string, number, arrayOf, func } from 'prop-types';
 import { userShape, itemShape } from '../plannerPropTypes';
 import styles from './styles.css';
 import theme from './theme.js';
@@ -39,7 +39,6 @@ export class Day extends Component {
     timeZone: string.isRequired,
     toggleCompletion: func,
     updateTodo: func,
-    alwaysRender: bool,
     registerAnimatable: func,
     deregisterAnimatable: func,
     currentUser: shape(userShape),
@@ -85,19 +84,7 @@ export class Day extends Component {
     return !!Object.keys(this.state.groupedItems).length;
   }
 
-  shouldRender () {
-    if (this.props.alwaysRender) return true;
-    const myDate = moment.tz(this.props.day, this.props.timeZone);
-    const today = moment.tz(this.props.timeZone);
-    const future = today.clone().add(2, 'weeks');
-    const past = today.clone().subtract(2, 'weeks');
-    if (myDate.isBetween(past, future, 'days')) return true;
-    return this.hasItems();
-  }
-
   render () {
-    if (!this.shouldRender()) return null;
-
     return (
       <div className={styles.root} >
           <Heading

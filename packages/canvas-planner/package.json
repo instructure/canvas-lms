@@ -98,6 +98,7 @@
     "jest": "^22",
     "json-server": "^0.9.6",
     "lint-staged": "^3.4.0",
+    "mockdate": "^2.0.2",
     "moxios": "^0.4.0",
     "npm-run-all": "^4",
     "webpack": "^3"

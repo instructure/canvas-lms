@@ -73,6 +73,10 @@ export function getFullDate (date) {
   }
 }
 
+export function getShortDate (date) {
+  return moment(date).format('MMMM D');
+}
+
 export function getFullDateAndTime (date) {
   const { today, yesterday, tomorrow } = getTodaysDetails();
   const momentizedDate = new moment(date);
@@ -124,7 +128,7 @@ export function isMidnight(datetime, timeZone) {
 // timeZone: user's timeZone
 // returns: moment of the result
 export function makeEndOfDayIfMidnight(datetime, timeZone) {
-  if (typeof(datetime) === 'string') datetime = moment(datetime);
+  datetime = moment(datetime);
   if (isMidnight(datetime, timeZone)) {
     return moment(datetime).tz(timeZone).endOf('day');
   }

@@ -86,17 +86,17 @@ it('sets only opportunities fields on ALL_OPPORTUNITIES_LOADED', () => {
   });
 });
 
-it('purges complete days from partial days on GOT_DAYS_SUCCES', () => {
+it('purges complete days from partial days on GOT_DAYS_SUCCESS', () => {
   const state = initialState({
-    partialFutureDays: [['2017-12-18', []], ['2017-12-19', []]],
-    partialPastDays: [['2017-12-17', []], ['2017-12-16', []]],
+    partialFutureDays: [['2017-12-18', []], ['2017-12-19', []], ['2017-12-20', [{id:1}]]],
+    partialPastDays: [['2017-12-17', []], ['2017-12-16', []], ['2017-12-15', [{id:2}]]],
   });
   const newState = loadingReducer(state, Actions.gotDaysSuccess([
     ['2017-12-18', []], ['2017-12-17', []]
   ]));
   expect(newState).toMatchObject({
-    partialFutureDays: [['2017-12-19', []]],
-    partialPastDays: [['2017-12-16', []]],
+    partialFutureDays: [['2017-12-20', [{id:1}]]],
+    partialPastDays: [['2017-12-15', [{id:2}]]],
   });
 });
 
