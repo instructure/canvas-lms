@@ -21,7 +21,11 @@ import ReactDOM from 'react-dom'
 import TestUtils from 'react-addons-test-utils'
 import DeveloperKeysApp from 'jsx/developer_keys/DeveloperKeysApp';
 
-QUnit.module('DevelopersKeyApp');
+QUnit.module('DevelopersKeyApp',  {
+  teardown() {
+    document.getElementById('fixtures').innerHTML = ''
+  }
+});
 
 function developerKeyRows(componentNode, index) {
   const panel = componentNode.querySelectorAll("div[role='tabpanel']")[index]

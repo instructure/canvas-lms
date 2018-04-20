@@ -89,7 +89,11 @@ function updateDefaultProps (updates = {}) {
   return props
 }
 
-QUnit.module('DeveloperKey');
+QUnit.module('DeveloperKey', {
+  teardown() {
+    document.getElementById('fixtures').innerHTML = ''
+  }
+});
 test('includes developerName', () => {
   testWrapperOk(defaultProps, "Atomic fireball")
 });

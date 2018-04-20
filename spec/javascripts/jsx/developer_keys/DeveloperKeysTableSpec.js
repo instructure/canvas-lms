@@ -21,7 +21,11 @@ import ReactDOM from 'react-dom'
 import TestUtils from 'react-addons-test-utils'
 import DeveloperKeysTable from 'jsx/developer_keys/DeveloperKeysTable'
 
-QUnit.module('DeveloperKeysTable')
+QUnit.module('DeveloperKeysTable',  {
+  teardown() {
+    document.getElementById('fixtures').innerHTML = ''
+  }
+})
 
 function devKeyList(numKeys = 10) {
   return [...Array(numKeys).keys()].map(n => ({id: `${n}`, api_key: "abc12345678", created_at: "2012-06-07T20:36:50Z"}))
