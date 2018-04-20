@@ -57,7 +57,7 @@
             </div>
             <div class="ic-Form-control ic-Form-control--login">
               <%= f.label :password, :en => "Password", :class => "ic-Label" %>
-              <%= f.password_field :password, :class => "ic-Input text" %>
+              <%= f.password_field :password, :class => "ic-Input text", :role => "textbox" %>
             </div>
             <div class="ic-Login__actions">
               <div class="ic-Login__actions-timeout">
@@ -111,7 +111,7 @@
           <%= help_link %>
           <%= render :partial => 'shared/footer_links' %>
         </div>
-        <a href="http://www.instructure.com" class="ic-Login-footer__logo-link">
+        <a href="http://www.instructure.com" class="ic-Login-footer__logo-link" aria-label="By Instructure">
           <%= render "login/canvas/instructure_logo.svg" %>
         </a>
     </footer>
