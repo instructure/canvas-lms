@@ -79,12 +79,12 @@
 #       }
 #     }
 #
-
 class PlannerOverridesController < ApplicationController
   include Api::V1::PlannerOverride
   include PlannerHelper
 
   before_action :require_user
+  before_action :require_planner_enabled
 
   # @API List planner overrides
   # @beta
@@ -182,11 +182,5 @@ class PlannerOverridesController < ApplicationController
     else
       render json: planner_override.errors, status: :bad_request
     end
-  end
-
-  private
-
-  def require_user
-    render_unauthorized_action if !@current_user || !@domain_root_account.feature_enabled?(:student_planner)
   end
 end
