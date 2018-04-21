@@ -103,7 +103,7 @@
              rating.edge = (idx == 0 || idx == ratings.length - 1);
              next_rating = ratings[idx+1] if idx != ratings.length - 1;
              rating_min = (next_rating ? next_rating.points : 0);
-             selected = assessment_rating ? (n(assessment_rating[:points]) > n(rating_min) && n(assessment_rating[:points]) <= n(rating.points)) : false
+             selected = assessment_rating && assessment_rating[:points] ? (n(assessment_rating[:points]) > n(rating_min) && n(assessment_rating[:points]) <= n(rating.points)) : false
              use_range = (criterion.try(:criterion_use_range) && rating_min.try(:to_f) != rating.points.try(:to_f) && range_rating_enabled);
           %>
           <td id="rating_<%= rating.id %>"
