@@ -42,12 +42,17 @@ module SIS
       end
 
       def add_group(group_id, group_category_id, account_id, course_id, name, status)
+        @logger.debug("Processing Group #{[group_id, group_category_id, account_id, course_id, name, status].inspect}")
         raise ImportError, "No group_id given for a group." unless group_id
+        raise ImportError, "No name given for group #{group_id}." if name.blank?
+        # closed and completed are no longer valid states. Leaving these for
+        # backwards compatibility. It is not longer a documented status
+        raise ImportError, "Improper status \"#{status}\" for group #{group_id}." unless status =~ /\A(available|closed|completed|deleted)/i
+        return if @batch.skip_deletes? && status =~ /deleted/i
+
         if course_id && account_id
           raise ImportError, "Only one context is allowed and both course_id and account_id where provided for group #{group_id}."
         end
-
-        @logger.debug("Processing Group #{[group_id, group_category_id, account_id, course_id, name, status].inspect}")
 
         context = nil
         if account_id
@@ -76,12 +81,6 @@ module SIS
         end
 
         group = @root_account.all_groups.where(sis_source_id: group_id).take
-        unless group
-          raise ImportError, "No name given for group #{group_id}." if name.blank?
-          # closed and completed are no longer valid states. Leaving these for
-          # backwards compatibility. It is not longer a documented status
-          raise ImportError, "Improper status \"#{status}\" for group #{group_id}." unless status =~ /\A(available|closed|completed|deleted)/i
-        end
 
         # if the group_category exists it is in the correct context or the
         # context is blank, but it should be consistent with the

@@ -465,6 +465,9 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     it "should delete a table from toolbar", priority: "1", test_id: 588945 do
       table = "<table><tbody><tr><td></td><td></td></tr><tr><td></td><td></td></tr></tbody></table>"
       wysiwyg_state_setup(table, html: true)
+      in_frame wiki_page_body_ifr_id do
+        f('.mce-item-table tr td').click
+      end
       f('.mce-i-table').click
       driver.find_element(:xpath, "//span[text()[contains(.,'Delete table')]]").click
       in_frame wiki_page_body_ifr_id do

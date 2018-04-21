@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@import 'base/environment';
+
 #license_help_dialog {
   #licence-help-options {
     th {
@@ -45,7 +47,7 @@
     margin-top: 10px;
   }
   .license {
-    float: left;
+    float: direction(left);
     display: none;
     font-size: 1.2em;
     font-weight: bold;
@@ -57,8 +59,8 @@
     }
   }
   .select {
-    float: left;
-    margin-right: 10px;
+    float: direction(left);
+    margin-#{direction(right)}: 10px;
   }
   #option-explanations td {
     font-size: 0.8em;

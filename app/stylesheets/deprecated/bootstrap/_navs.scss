@@ -12,7 +12,7 @@
 // ----------
 
 .nav {
-  margin-left: 0;
+  margin-#{direction(left)}: 0;
   margin-bottom: $baseLineHeight;
   list-style: none;
 }
@@ -28,7 +28,7 @@
 
 // Redeclare pull classes because of specifity
 .nav > .pull-right {
-  float: right;
+  float: direction(right);
 }
 
 
@@ -40,12 +40,12 @@
   @include clearfix();
 }
 .nav-pills > li {
-  float: left;
+  float: direction(left);
 }
 .nav-pills > li > a {
-  padding-right: 12px;
-  padding-left: 12px;
-  margin-right: 2px;
+  padding-#{direction(right)}: 12px;
+  padding-#{direction(left)}: 12px;
+  margin-#{direction(right)}: 2px;
   line-height: 14px; // keeps the overall height an even number
 }
 

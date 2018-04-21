@@ -400,13 +400,13 @@ describe NotificationMessageCreator do
       messages.each {|m| expect(m.subject).to eql("This is 5!")}
     end
 
-    it "should respect browser locales" do
+    it "should disrespect browser locales" do
       I18n.backend.stub(piglatin: {messages: {test_name: {email: {subject: "Isthay isay ivefay!"}}}}) do
         I18n.config.available_locales_set.merge([:piglatin, 'piglatin'])
         @user.browser_locale = 'piglatin'
         @user.save(validate: false) # the validation was declared before :piglatin was added, so we skip it
         messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-        messages.each {|m| expect(m.subject).to eql("Isthay isay ivefay!")}
+        messages.each {|m| expect(m.subject).to eql("This is 5!")}
         expect(I18n.locale).to eql(:en)
       end
     end

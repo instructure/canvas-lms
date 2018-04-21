@@ -24,7 +24,7 @@
 }
 
 .toggle-group > i {
-  padding-right: 0.5em;
+  padding-#{direction(right)}: 0.5em;
   &:before {
     font-size: 1.25em;
   }
@@ -58,12 +58,12 @@
   }
 
   .group-actions {
-    text-align: right;
+    text-align: direction(right);
     > a {
-      margin-left: 5%;
+      margin-#{direction(left)}: 5%;
     }
     > * {
-      text-align: left;
+      text-align: direction(left);
     }
   }
 

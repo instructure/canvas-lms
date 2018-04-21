@@ -21,7 +21,7 @@
 
 // print button for grades summary page
 .print-grades {
-  float: right;
+  float: direction(right);
   @media print {
     display: none;
   }
@@ -36,8 +36,8 @@
 
   .course_selector,
   .assignment_order {
-    float: left;
-    margin-right: $ic-sp;
+    float: direction(left);
+    margin-#{direction(right)}: $ic-sp;
   }
 }
 // styles for grade summary tables
@@ -59,7 +59,7 @@
     font-size: $ic-font-size - 2;
     font-weight: bold;
     border-bottom: 2px solid black;
-    padding-left: 0;
+    padding-#{direction(left)}: 0;
   }
 }
 
@@ -74,16 +74,16 @@
 
 #grades_summary tr.comments td {
   border-width: 0;
-  padding-left: 30px;
+  padding-#{direction(left)}: 30px;
   @media print {
-    padding-left: 0;
+    padding-#{direction(left)}: 0;
     font-style: italic;
   }
 }
 
 #grades_summary tr.rubric_assessments > td {
   border-width: 0;
-  padding-left: 30px;
+  padding-#{direction(left)}: 30px;
   table.rubric {
     margin-top: 0;
     margin-bottom: 20px;
@@ -109,8 +109,8 @@
     &::after {
       content: '\00d7';
       position: absolute;
-      right: 0;
-      padding-left: $ic-sp;
+      #{direction(right)}: 0;
+      padding-#{direction(left)}: $ic-sp;
     }
   }
 }
@@ -134,8 +134,8 @@
 }
 
 #grades_summary td.details {
-  text-align: right;
-  padding-left: 0;
+  text-align: direction(right);
+  padding-#{direction(left)}: 0;
   white-space: nowrap;
   min-width: 80px;  // equals 4 x 20 pixel icons
 
@@ -176,7 +176,7 @@
 
 #grades_summary tr.assignment_graded {
   .unread-grade {
-    margin-left: -24px;
+    margin-#{direction(left)}: -24px;
   }
 }
 
@@ -216,7 +216,7 @@
 .revert_score_link {
   position: absolute;
   top: 0px;
-  left: -5px;
+  #{direction(left)}: -5px;
   display: none;
   &:hover, &:focus {
     opacity: 0.7;
@@ -255,9 +255,9 @@
   }
   .tooltip_text {
     background-color: $ic-color-dark;
-    background-position: left bottom;
+    background-position: direction(left) bottom;
     color: $ic-color-light;
-    left: 0px;
+    #{direction(left)}: 0px;
     max-width: 250px;
     padding: 2px 7px 2px;
     white-space: nowrap;
@@ -268,8 +268,8 @@
     }
   }
   .right {
-    right: 0px;
-    background-position: right bottom;
+    #{direction(right)}: 0px;
+    background-position: direction(right) bottom;
   }
 }
 
@@ -293,19 +293,19 @@
   }
 
   td {
-    padding-left: 1em;
+    padding-#{direction(left)}: 1em;
   }
 }
 
 a.screenreader-toggle {
   font-weight: normal;
-  padding-right: 5px;
+  padding-#{direction(right)}: 5px;
 }
 
 .grade-summary-graph-component {
   position: absolute;
   top: 0;
-  left: 0;
+  #{direction(left)}: 0;
   width: 0;
   overflow: hidden;
   border-style: solid;
@@ -322,12 +322,12 @@ div.rubric-toggle {
 }
 
 .outcome-toggles {
-  float: right;
+  float: direction(right);
   position: absolute;
-  right: 1em;
+  #{direction(right)}: 1em;
   margin-top: -2.3em;
   .btn {
-    margin-left: 0.5em;
+    margin-#{direction(left)}: 0.5em;
   }
   a[class*=icon-]:before, a[class^=icon-]:before {
     margin: 0;
@@ -352,8 +352,8 @@ $outcome-border: 1px solid #BCC2CA;
   }
   h3 {
     font-size: 1.2em;
-    margin-left: 1em;
-    float: left;
+    margin-#{direction(left)}: 1em;
+    float: direction(left);
   }
   .group-description {
     cursor: pointer;
@@ -375,7 +375,7 @@ $outcome-border: 1px solid #BCC2CA;
       line-height: 40px;
     }
     .group-status {
-      float: right;
+      float: direction(right);
       top: 8px;
       @include fontSize(30px);
       position: relative;
@@ -417,15 +417,15 @@ $outcome-border: 1px solid #BCC2CA;
     background-color: #f7f7f7;
   }
   ul {
-    margin-left: 0;
+    margin-#{direction(left)}: 0;
     list-style-type: none;
   }
   li {
     list-style-type: none;
     overflow: hidden;
     .outcome-icon {
-      float: left;
-      margin-right: 15px;
+      float: direction(left);
+      margin-#{direction(right)}: 15px;
     }
   }
   li.group {
@@ -449,7 +449,7 @@ $outcome-border: 1px solid #BCC2CA;
     border-top: $outcome-border;
     display: none;
     .outcome-properties {
-      float: left;
+      float: direction(left);
       width: 70%;
     }
     .description {
@@ -472,8 +472,8 @@ $outcome-border: 1px solid #BCC2CA;
       }
     }
     .alignment-info {
-      float: right;
-      text-align: right;
+      float: direction(right);
+      text-align: direction(right);
       width: 200px;
       padding-top: 10px;
       i {
@@ -559,7 +559,7 @@ $outcome-border: 1px solid #BCC2CA;
   .score {
     color: #959595;
     @include fontSize(18px);
-    float: left;
+    float: direction(left);
     strong {
       color: #2a333b;
     }
@@ -569,18 +569,18 @@ $outcome-border: 1px solid #BCC2CA;
 .outcome-modal {
   padding: 7px 0;
   .title {
-    float: left;
+    float: direction(left);
     font-weight: bold;
   }
   .outcome-bar-wrapper {
-    float: right;
+    float: direction(right);
     .score {
-      text-align: right;
-      margin-right: 5px;
+      text-align: direction(right);
+      margin-#{direction(right)}: 5px;
       letter-spacing: 1px;
     }
     .bar {
-      float: left;
+      float: direction(left);
       width: 170px;
       top: 6px;
     }

@@ -38,6 +38,7 @@ describe "sub account outcomes" do
         end
 
         it "should create a learning outcome (nested)", priority: "2", test_id: 263680 do
+          skip('Flaky, see OUT-2102')
           should_create_a_learning_outcome_nested
         end
 
@@ -65,6 +66,7 @@ describe "sub account outcomes" do
         end
 
         it "should create an outcome group (nested)", priority: "1", test_id: 250521 do
+          skip('Flaky, see OUT-2103')
           should_create_an_outcome_group_nested
         end
 

@@ -81,6 +81,21 @@ describe DeveloperKeysController do
         get 'index', params: {account_id: Account.site_admin.id}
         expect(assigns[:keys].first.vendor_code).to eq 'test_vendor_code'
       end
+
+      it "should include the key's 'visibility'" do
+        user_session(@admin)
+        key = DeveloperKey.create!
+        get 'index', params: {account_id: Account.site_admin.id}, format: :json
+        developer_key = json_parse(response.body).first
+        expect(developer_key['visible']).to eq(key.visible)
+      end
+
+      it 'includes non-visible keys created in site admin' do
+        user_session(@admin)
+        site_admin_key = DeveloperKey.create!(name: 'Site Admin Key', visible: false)
+        get 'index', params: {account_id: 'site_admin'}
+        expect(assigns[:keys]).to eq [site_admin_key]
+      end
     end
 
     describe "POST 'create'" do
@@ -90,7 +105,9 @@ describe DeveloperKeysController do
         post "create", params: {account_id: Account.site_admin.id, developer_key: {
                        redirect_uri: "http://example.com/sdf"
                      }}
+
         expect(response).to be_success
+
         json_data = JSON.parse(response.body)
 
         key = DeveloperKey.find(json_data['id'])
@@ -139,6 +156,55 @@ describe DeveloperKeysController do
     before :each do
       user_session(test_domain_root_account_admin)
       allow(LoadAccount).to receive(:default_domain_root_account).and_return(test_domain_root_account)
+    end
+
+    describe '#index' do
+      let(:site_admin_key) do
+        DeveloperKey.create!(
+          name: 'Site Admin Key',
+          visible: false
+        )
+      end
+
+      let(:root_account_key) do
+        DeveloperKey.create!(
+          name: 'Root Account Key',
+          account: test_domain_root_account,
+          visible: true
+        )
+      end
+
+      before do
+        site_admin_key
+        root_account_key
+
+        allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(true)
+        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
+      end
+
+      it 'does not inherit site admin keys if feature flag is off' do
+        allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(false)
+        site_admin_key.update!(visible: true)
+        get 'index', params: {account_id: test_domain_root_account.id}
+        expect(assigns[:keys]).to match_array [root_account_key]
+      end
+
+      it 'does not include non-visible keys from site admin' do
+        get 'index', params: {account_id: test_domain_root_account.id}
+        expect(assigns[:keys]).to match_array [root_account_key]
+      end
+
+      it 'does include visible keys from site admin' do
+        site_admin_key.update!(visible: true)
+        get 'index', params: {account_id: test_domain_root_account.id}
+        expect(assigns[:keys]).to match_array [site_admin_key, root_account_key]
+      end
+
+      it 'includes non-visible keys created in the current context' do
+        root_account_key.update!(visible: false)
+        get 'index', params: {account_id: test_domain_root_account.id}
+        expect(assigns[:keys]).to match_array [root_account_key]
+      end
     end
 
     it 'Should be allowed to access their dev keys' do
@@ -238,7 +304,6 @@ describe DeveloperKeysController do
         expect(response).to be_redirect
         expect(flash[:error]).to eq "You don't have permission to access that page"
       end
-
     end
   end
 end

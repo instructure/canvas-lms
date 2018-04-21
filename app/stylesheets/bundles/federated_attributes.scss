@@ -31,5 +31,5 @@
   max-width: 200px;
 }
 .add_federated_attribute_button {
-  margin-left: $ic-sp/2;
+  margin-#{direction(left)}: $ic-sp/2;
 }

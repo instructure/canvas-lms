@@ -100,7 +100,7 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
 }
 
 .admin-links {
-  float: right;
+  float: direction(right);
 }
 
 .al-dropdown__container {
@@ -123,7 +123,7 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
   position: absolute;
   padding: 8px 0;
   border-color: $ic-border-light;
-  text-align: left;
+  text-align: direction(left);
 
   * { box-sizing: border-box; }
 
@@ -144,7 +144,7 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
       padding: $ic-sp/2 $ic-sp;
 
       & i[class*=icon-]:before,
-      & i[class^=icon-]:before { margin-right: 8px; }
+      & i[class^=icon-]:before { margin-#{direction(right)}: 8px; }
     }
 
     a.disabled.ui-state-focus {

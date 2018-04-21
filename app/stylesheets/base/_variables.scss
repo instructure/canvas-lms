@@ -166,13 +166,14 @@ $h3-font-size:  19px;
 //============================
 // Layout Functional Variables
 //============================
-$ic-body-background-color:      lighten($ic-color-neutral, 4);
-$ic-content-background-color:   $ic-color-light;
-$ic-content-padding:            15px;
-$ic-header-background:          #34444f;
-$ic-header-primary-width:       84px;
-$ic-header-primary-expanded-width: $ic-sp*15;
-$ic-right-side-width: $ic-sp*24;
+$ic-body-background-color:          lighten($ic-color-neutral, 4);
+$ic-content-background-color:       $ic-color-light;
+$ic-content-padding:                15px;
+$ic-header-background:              #34444f;
+$ic-header-primary-width:           84px;
+$ic-header-primary-expanded-width:  $ic-sp*15;
+$ic-right-side-width:               $ic-sp*24;
+$ic-breadcrumbs-height:             4.5rem;
 
 //============================
 // List Functional Variables

@@ -36,13 +36,32 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # Returns data on an individual discussion topic. See the List action for the response formatting.
   #
+  # @argument include[] [String, "all_dates", "sections", "sections_user_count", "overrides"]
+  #   If "all_dates" is passed, all dates associated with graded discussions'
+  #   assignments will be included.
+  #   if "sections" is passed, includes the course sections that are associated
+  #   with the topic, if the topic is specific to certain sections of the course.
+  #   If "sections_user_count" is passed, then:
+  #     (a) If sections were asked for *and* the topic is specific to certain
+  #         course sections, includes the number of users in each
+  #         section. (as part of the section json asked for above)
+  #     (b) Else, includes at the root level the total number of users in the
+  #         topic's context (group or course) that the topic applies to.
+  #   If "overrides" is passed, the overrides for the assignment will be included
+  #
   # @example_request
   #
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \
   #         -H 'Authorization: Bearer <token>'
   def show
+    include_params = Array(params[:include])
     render(json: discussion_topics_api_json([@topic], @context,
-                                            @current_user, session).first)
+                                            @current_user, session,
+                                            include_all_dates: include_params.include?('all_dates'),
+                                            :include_sections => include_params.include?('sections'),
+                                            :include_sections_user_count => include_params.include?('sections_user_count'),
+                                            :include_overrides => include_params.include?('overrides'),
+                                           ).first)
   end
 
   # @API Get the full topic
@@ -224,20 +243,33 @@ class DiscussionTopicsApiController < ApplicationController
     # Require topic hook forbids duplicating of child, nonexistent, and deleted topics
     # The only extra check we need is to prevent duplicating announcements.
     if @topic.is_announcement
-      return render json: { error: 'announcements cannot be duplicated' }, status: :bad_request
+      return render json: { error: t('announcements cannot be duplicated') }, status: :bad_request
     end
 
     new_topic = @topic.duplicate({ :user => @current_user })
+    if @topic.pinned
+      new_topic.position = @topic.context.discussion_topics.maximum(:position) + 1
+    end
     if new_topic.save!
       result = discussion_topic_api_json(new_topic, @context, @current_user, session,
         :include_sections => true)
+      # If pinned, make the new topic show up just below the old one
+      if new_topic.pinned
+        new_topic.insert_at(@topic.position + 1)
+        # Pass the new positions to the backend so the frontend can stay consistent
+        # with the backend.  Rails doesn't like topic.context.discussion_topics.select(...).
+        # We only care about the id and position here, so don't pull everything else up
+        positions_array = DiscussionTopic.select(:id, :position).where(:context => @context).
+          active.where(:pinned => true).map { |t| [t.id, t.position] }
+        result[:new_positions] = positions_array.to_h
+      end
       if new_topic.assignment
         new_topic.assignment.insert_at(@topic.assignment.position + 1)
         result[:set_assignment] = true
       end
       render :json => result
     else
-      render json: { error: 'unable to save new discussion topic' }, status: :bad_request
+      render json: { error: t('unable to save new discussion topic') }, status: :bad_request
     end
   end
 

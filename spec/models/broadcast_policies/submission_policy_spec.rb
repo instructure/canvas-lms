@@ -61,8 +61,8 @@ module BroadcastPolicies
         allow(s).to receive(:quiz_submission).and_return(nil)
         allow(s).to receive(:user).and_return(user)
         allow(s).to receive(:context).and_return(course)
-        allow(s).to receive(:submitted_at_was).and_return(nil)
-        allow(s).to receive(:submitted_at_changed?).and_return(false)
+        allow(s).to receive(:submitted_at_before_last_save).and_return(nil)
+        allow(s).to receive(:saved_change_to_submitted?).and_return(false)
         allow(s).to receive(:changed_state_to).with(:submitted).and_return true
       end
     end
@@ -112,8 +112,8 @@ module BroadcastPolicies
 
     describe '#should_dispatch_assignment_resubmitted' do
       before do
-        allow(submission).to receive(:submitted_at_was).and_return(1.day.ago)
-        allow(submission).to receive(:submitted_at_changed?).and_return(true)
+        allow(submission).to receive(:submitted_at_before_last_save).and_return(1.day.ago)
+        allow(submission).to receive(:saved_change_to_submitted_at?).and_return(true)
       end
 
       def wont_send_when

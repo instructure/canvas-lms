@@ -143,7 +143,8 @@ class ContentMigrationsController < ApplicationController
 
     Folder.root_folders(@context) # ensure course root folder exists so file imports can run
 
-    @migrations = Api.paginate(@context.content_migrations.order("id DESC"), self, api_v1_course_content_migration_list_url(@context))
+    scope = @context.content_migrations.where(child_subscription_id: nil).order('id DESC')
+    @migrations = Api.paginate(scope, self, api_v1_course_content_migration_list_url(@context))
     @migrations.each{|mig| mig.check_for_pre_processing_timeout }
     content_migration_json_hash = content_migrations_json(@migrations, @current_user, session)
 

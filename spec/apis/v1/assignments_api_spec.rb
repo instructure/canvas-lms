@@ -1057,7 +1057,7 @@ describe AssignmentsApiController, type: :request do
     it "returns assignments for authorized observer" do
       course_with_student_submissions(:active_all => true)
       parent = User.create
-      parent.user_observees.create! do |uo|
+      parent.as_observer_observation_links.create! do |uo|
         uo.user_id = @student.id
       end
       parent.save!
@@ -3713,6 +3713,7 @@ describe AssignmentsApiController, type: :request do
           'pinned' => !!@topic.pinned,
           'position' => @topic.position,
           'topic_children' => [],
+          'group_topic_children' => [],
           'locked' => false,
           'can_lock' => true,
           'comments_disabled' => false,
@@ -4200,6 +4201,16 @@ describe AssignmentsApiController, type: :request do
         expect(result.has_key?('turnitin_enabled')).to eq false
       end
     end
+
+    it "contains true for anonymous_grading when the assignment has anonymous grading enabled" do
+      @assignment.anonymous_grading = true
+      expect(result['anonymous_grading']).to be true
+    end
+
+    it "contains false for anonymous_grading when the assignment has anonymous grading disabled" do
+      @assignment.anonymous_grading = false
+      expect(result['anonymous_grading']).to be false
+    end
   end
 
   context "update_from_params" do
@@ -4283,6 +4294,40 @@ describe AssignmentsApiController, type: :request do
       params = ActionController::Parameters.new({"muted" => "false"})
       update_from_params(@assignment, params, @teacher)
       expect(comment.reload.hidden?).to eql false
+    end
+
+    it "does not update anonymous grading if the anonymous marking feature flag is not set" do
+      params = ActionController::Parameters.new({"anonymous_grading" => "true"})
+      update_from_params(@assignment, params, @teacher)
+      expect(@assignment.anonymous_grading).to be_falsey
+    end
+
+    context "when the anonymous marking feature flag is set" do
+      before(:once) do
+        @course.account.enable_feature!(:anonymous_moderated_marking)
+        @course.enable_feature!(:anonymous_marking)
+      end
+
+      it "enables anonymous grading if anonymous_grading is true" do
+        params = ActionController::Parameters.new({"anonymous_grading" => "true"})
+        update_from_params(@assignment, params, @teacher)
+        expect(@assignment).to be_anonymous_grading
+      end
+
+      it "disables anonymous grading if anonymous_grading is false" do
+        params = ActionController::Parameters.new({"anonymous_grading" => "false"})
+        update_from_params(@assignment, params, @teacher)
+        expect(@assignment).not_to be_anonymous_grading
+      end
+
+      it "does not update anonymous grading status if anonymous_grading is not present" do
+        @assignment.anonymous_grading = true
+
+        params = ActionController::Parameters.new({})
+        update_from_params(@assignment, params, @teacher)
+
+        expect(@assignment).to be_anonymous_grading
+      end
     end
   end
 

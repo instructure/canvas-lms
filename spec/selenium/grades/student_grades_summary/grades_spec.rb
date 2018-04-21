@@ -210,13 +210,16 @@ describe "grades" do
     it "should display rubric on assignment", priority: "1", test_id: 229661 do
       get "/courses/#{@course.id}/grades"
 
-      #click rubric
+      # click rubric
       f("#submission_#{@first_assignment.id} .toggle_rubric_assessments_link").click
       wait_for_ajaximations
       expect(fj('.rubric_assessments:visible .rubric_title')).to include_text(@rubric.title)
       expect(fj('.rubric_assessments:visible .rubric_total')).to include_text('2')
 
-      #check rubric comment
+      # check if proper rating is highlighted for a score of 2 on scale of 10|5|0
+      expect(fj('.rubric_assessments:visible .selected')).to include_text('5')
+
+      # check rubric comment
       expect(fj('.assessment-comments:visible div').text).to eq 'cool, yo'
     end
 

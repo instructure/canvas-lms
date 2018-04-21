@@ -77,13 +77,14 @@ export default class OutcomesImporter extends Component {
   }
 
   beginUpload () {
-    const {disableOutcomeViews, contextUrlRoot, file, importId} = this.props
+    const {disableOutcomeViews, resetOutcomeViews, contextUrlRoot, file, importId} = this.props
     disableOutcomeViews()
     if (file !== null) {
       apiClient.createImport(contextUrlRoot, file).
         then((resp) => this.pollImportStatus(resp.data.id)).
         catch(() => {
           showFlashAlert({type: 'error', message: I18n.t('There was an error uploading your file. Please try again.')})
+          resetOutcomeViews()
         })
     } else if (importId !== null) {
       this.pollImportStatus(importId)

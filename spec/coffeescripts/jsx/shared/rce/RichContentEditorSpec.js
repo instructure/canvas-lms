@@ -122,14 +122,10 @@ test('calls editorBox and set_code when feature flag off', function(assert) {
   sinon.stub(this.$target, 'editorBox')
   this.$target.editorBox.onCall(0).returns(this.$target)
   return RichContentEditor.loadNewEditor(this.$target, {defaultContent: 'content'}, () => {
-    try {
-      ok(this.$target.editorBox.calledTwice, 'called twice')
-      ok(this.$target.editorBox.firstCall.calledWith(), 'first called with nothing')
-      ok(this.$target.editorBox.secondCall.calledWith('set_code', 'content'))
-      done()
-    } catch (err) {
-      done(err)
-    }
+    ok(this.$target.editorBox.calledTwice, 'called twice')
+    ok(this.$target.editorBox.firstCall.calledWith(), 'first called with nothing')
+    ok(this.$target.editorBox.secondCall.calledWith('set_code', 'content'))
+    done()
   })
 })
 
@@ -143,13 +139,9 @@ test('with focus:true calls focus on RceCommandShim after load', function(assert
   ENV.RICH_CONTENT_SERVICE_ENABLED = false
   sinon.stub(RceCommandShim, 'focus')
   return RichContentEditor.loadNewEditor(this.$target, {focus: true}, () => {
-    try {
-      ok(RceCommandShim.focus.calledWith(this.$target))
-      RceCommandShim.focus.restore()
-      done()
-    } catch (err) {
-      done(err)
-    }
+    ok(RceCommandShim.focus.calledWith(this.$target))
+    RceCommandShim.focus.restore()
+    done()
   })
 })
 
@@ -159,12 +151,8 @@ test('with focus:true tries to show sidebar', function(assert) {
   ENV.RICH_CONTENT_SERVICE_ENABLED = false
   RichContentEditor.initSidebar()
   return RichContentEditor.loadNewEditor(this.$target, {focus: true}, () => {
-    try {
-      ok(Sidebar.show.called)
-      done()
-    } catch (err) {
-      done(err)
-    }
+    ok(Sidebar.show.called)
+    done()
   })
 })
 

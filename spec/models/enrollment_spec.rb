@@ -868,7 +868,7 @@ describe Enrollment do
       course_with_teacher(:active_all => true)
       student = user_with_pseudonym
       observer = user_with_pseudonym
-      observer.observed_users << student
+      observer.linked_students << student
 
       @course.enroll_student(student, :no_notify => true)
       expect(student.messages).to be_empty
@@ -888,7 +888,7 @@ describe Enrollment do
       course_with_teacher
       student = user_with_pseudonym
       observer = user_with_pseudonym
-      observer.observed_users << student
+      observer.linked_students << student
 
       @course.enroll_student(student)
       expect(observer.messages).to be_empty
@@ -952,7 +952,7 @@ describe Enrollment do
     student = user_with_pseudonym
     observer = user_with_pseudonym
     old_time = observer.updated_at
-    observer.observed_users << student
+    observer.linked_students << student
     @course.enrollments.create(user: student, skip_touch_user: true, type: 'StudentEnrollment')
     expect(observer.reload.updated_at).to eq old_time
   end
@@ -2427,7 +2427,7 @@ describe Enrollment do
     before :once do
       @student = user_factory(active_all: true)
       @parent = user_with_pseudonym(:active_all => true)
-      @student.observers << @parent
+      @student.linked_observers << @parent
     end
 
     it 'should get new observer enrollments when an observed user gets a new enrollment' do
@@ -2604,6 +2604,14 @@ describe Enrollment do
       Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
         @course.enroll_student(user_factory)
       end
+    end
+
+    it 'triggers once for enrollment.destroy' do
+      override = assignment_override_model(assignment: @assignments.first)
+      override.assignment_override_students.create(user: @student)
+      expect(DueDateCacher).to receive(:recompute_users_for_course).once
+      expect(DueDateCacher).to receive(:recompute).never
+      @enrollment.destroy
     end
   end
 

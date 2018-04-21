@@ -240,30 +240,59 @@ test('processThemeStoreForSubmit puts the themeStore into a FormData and returns
   const fileValue = new File(['foo'], 'foo.png')
   wrapper.instance().handleThemeStateChange('ic-brand-favicon', fileValue)
   wrapper.instance().handleThemeStateChange('ic-brand-font-color-dark', 'black')
+  wrapper.instance().changeSomething('ic-brand-font-color-dark', 'black', false)
   const formData = wrapper.instance().processThemeStoreForSubmit()
   const formObj = fromPairs(Array.from(formData.entries()))
   deepEqual(formObj, {
     'brand_config[variables][ic-brand-font-color-dark]': 'black',
-    'brand_config[variables][ic-brand-global-nav-bgd]': '#394B58',
+    'brand_config[variables][ic-brand-global-nav-bgd]': '',
     'brand_config[variables][ic-brand-global-nav-ic-icon-svg-fill]': '#efefef',
     'brand_config[variables][ic-brand-primary]': 'green',
-    'brand_config[variables][ic-brand-favicon]': fileValue
+    'brand_config[variables][ic-brand-favicon]': fileValue,
+    'css_overrides': '',
+    'js_overrides': '',
+    'mobile_css_overrides': '',
+    'mobile_js_overrides': ''
   })
 })
 
 test('processThemeStoreForSubmit sets the correct keys for custom uploads', () => {
   const wrapper = shallow(<ThemeEditor {...testProps} />)
-  const key = 'custom_css'
+  const key = 'css_overrides'
   const value = new File(['foo'], 'foo.png')
   wrapper.instance().handleThemeStateChange(key, value, {customFileUpload: true})
   const formData = wrapper.instance().processThemeStoreForSubmit()
   const formObj = fromPairs(Array.from(formData.entries()))
   deepEqual(formObj, {
-    'brand_config[variables][ic-brand-font-color-dark]': '#2D3B45',
-    'brand_config[variables][ic-brand-global-nav-bgd]': '#394B58',
+    'brand_config[variables][ic-brand-font-color-dark]': '',
+    'brand_config[variables][ic-brand-global-nav-bgd]': '',
     'brand_config[variables][ic-brand-global-nav-ic-icon-svg-fill]': '#efefef',
     'brand_config[variables][ic-brand-primary]': 'green',
-    'brand_config[variables][ic-brand-favicon]': '/images/favicon.ico',
+    'brand_config[variables][ic-brand-favicon]': '',
+    'js_overrides': '',
+    'mobile_css_overrides': '',
+    'mobile_js_overrides': '',
+    [key]: value
+  })
+});
+
+test('processThemeStoreForSubmit sets the correct keys for custom uploads that already have values', () => {
+  testProps.brandConfig.js_overrides = '/some/path/to/a/file'
+  const wrapper = shallow(<ThemeEditor {...testProps} />)
+  const key = 'css_overrides'
+  const value = new File(['foo'], 'foo.png')
+  wrapper.instance().handleThemeStateChange(key, value, {customFileUpload: true})
+  const formData = wrapper.instance().processThemeStoreForSubmit()
+  const formObj = fromPairs(Array.from(formData.entries()))
+  deepEqual(formObj, {
+    'brand_config[variables][ic-brand-font-color-dark]': '',
+    'brand_config[variables][ic-brand-global-nav-bgd]': '',
+    'brand_config[variables][ic-brand-global-nav-ic-icon-svg-fill]': '#efefef',
+    'brand_config[variables][ic-brand-primary]': 'green',
+    'brand_config[variables][ic-brand-favicon]': '',
+    'js_overrides': '/some/path/to/a/file',
+    'mobile_css_overrides': '',
+    'mobile_js_overrides': '',
     [key]: value
   })
 })

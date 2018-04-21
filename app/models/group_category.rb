@@ -524,7 +524,7 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def update_groups_max_membership
-    if group_limit_changed?
+    if saved_change_to_group_limit?
       groups.update_all(:max_membership => group_limit)
     end
   end

@@ -67,8 +67,11 @@ module SIS
         @finished = false
 
         settings = PluginSetting.settings_for_plugin('sis_import')
-        @minimum_rows_for_parallel = settings[:minimum_rows_for_parallel].to_i
-        @minimum_rows_for_parallel = 1000 if @minimum_rows_for_parallel < 1
+        parallel = Setting.get("sis_parallel_import/#{@root_account.global_id}_num_strands", "1")
+        if settings.dig(:parallelism).to_i > 1 && settings[:parallelism] != parallel
+          Setting.set("sis_parallel_import/#{@root_account.global_id}_num_strands", settings[:parallelism])
+        end
+        @rows_for_parallel = nil
         update_pause_vars
       end
 
@@ -105,31 +108,47 @@ module SIS
         end
         @files = nil
         @parallel_importers = {}
+        # first run is just to get the total number of lines to determine how
+        # many jobs to create
+        number_of_rows(create_importers: false)
+        @rows_for_parallel = SisBatch.rows_for_parallel(@total_rows)
+        # second run actually creates the jobs now that we have @total_rows and
+        # @rows_for_parallel
+        number_of_rows(create_importers: true)
 
+        @csvs
+      end
+
+      def number_of_rows(create_importers:)
         IMPORTERS.each do |importer|
           @csvs[importer].reject! do |csv|
             begin
-              rows = 0
-              ::CSV.open(csv[:fullpath], "rb", CSVBaseImporter::PARSE_ARGS) do |faster_csv|
-                while faster_csv.shift
-                  if rows % @minimum_rows_for_parallel == 0
-                    @parallel_importers[importer] ||= []
-                    @parallel_importers[importer] << create_parallel_importer(csv, importer, rows)
-                  end
-                  rows += 1
-                end
+              rows = count_rows(csv, importer, create_importers: create_importers)
+              unless create_importers
+                @rows[importer] += rows
+                @total_rows += rows
               end
-              @rows[importer] += rows
-              @total_rows += rows
               false
             rescue ::CSV::MalformedCSVError
-              add_error(csv, I18n.t("Malformed CSV"), failure: true)
+              SisBatch.add_error(csv, I18n.t("Malformed CSV"), sis_batch: @batch, failure: true)
               true
             end
           end
         end
+      end
 
-        @csvs
+      def count_rows(csv, importer, create_importers:)
+        rows = 0
+        ::CSV.open(csv[:fullpath], "rb", CSVBaseImporter::PARSE_ARGS) do |faster_csv|
+          while faster_csv.shift
+            if create_importers && rows % @rows_for_parallel == 0
+              @parallel_importers[importer] ||= []
+              @parallel_importers[importer] << create_parallel_importer(csv, importer, rows)
+            end
+            rows += 1
+          end
+        end
+        rows
       end
 
       def create_parallel_importer(csv, importer, rows)
@@ -137,7 +156,7 @@ module SIS
                                           importer_type: importer.to_s,
                                           attachment: csv[:attachment],
                                           index: rows,
-                                          batch_size: @minimum_rows_for_parallel)
+                                          batch_size: @rows_for_parallel)
       end
 
       def create_batch_attachment(path)
@@ -163,7 +182,7 @@ module SIS
         if @batch
           fail_with_error!(e)
         else
-          add_error(nil, "#{e.message}\n#{e.backtrace.join "\n"}", failure: true)
+          SisBatch.add_error(nil, e.message, sis_batch: @batch, failure: true, backtrace: e.backtrace)
           raise e
         end
       ensure
@@ -178,66 +197,42 @@ module SIS
         errors.order(:id).pluck(:file, :message)
       end
 
-      def add_error(csv, message, row: nil, failure: false, backtrace: nil)
-        file = csv ? csv[:file] : nil
-        @root_account.sis_batch_errors.create!(sis_batch: @batch,
-                                               file: file,
-                                               message: message,
-                                               failure: failure,
-                                               backtrace: backtrace,
-                                               row: row)
-      end
-
-      def add_warning(csv, message, row: nil)
-        add_error(csv, message, row: row)
-      end
-
       def calculate_progress
         (((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100
       end
 
       def update_progress
         return unless @batch
-        if update_progress?
-          completed_count = @batch.parallel_importers.where(:workflow_state => "completed").count
-          current_progress = (completed_count.to_f * 100 / @parallel_importers.values.map(&:count).sum).round
-          SisBatch.where(:id => @batch).where("progress IS NULL or progress < ?", current_progress).update_all(:progress => current_progress)
-        end
-      end
-
-      def update_progress?
-        @last_progress_update ||= Time.now
-        update_interval = Setting.get('sis_batch_progress_interval', 2.seconds).to_i
-        @last_progress_update < update_interval.seconds.ago
+        completed_count = @batch.parallel_importers.where(workflow_state: "completed").count
+        current_progress = (completed_count.to_f * 100 / @parallel_importers.values.map(&:count).sum).round
+        SisBatch.where(:id => @batch).where("progress IS NULL or progress < ?", current_progress).update_all(progress: current_progress)
       end
 
       def run_parallel_importer(parallel_importer)
-        begin
-          if @batch.workflow_state == 'aborted'
-            parallel_importer.abort
-            return
-          end
-          importer_type = parallel_importer.importer_type.to_sym
-          importerObject = SIS::CSV.const_get(importer_type.to_s.camelcase + 'Importer').new(self)
-          att = parallel_importer.attachment
-          file = att.open
-          parallel_importer.start
-          csv = {:fullpath => file.path, :file => att.display_name}
-          count = importerObject.process(csv, parallel_importer.index, parallel_importer.batch_size)
-          update_progress # just update progress on completetion - the parallel jobs should be short enough
-          parallel_importer.complete(:rows_processed => count)
-        rescue => e
-          if parallel_importer.workflow_state == 'running'
-            parallel_importer.write_attribute(:workflow_state, 'retry')
-            run_parallel_importer(parallel_importer)
-          end
-          parallel_importer.fail
-          fail_with_error!(e)
-        ensure
-          file&.close
-          if is_last_parallel_importer_of_type?(parallel_importer)
-            queue_next_importer_set unless %w{aborted failed failed_with_messages}.include?(@batch.workflow_state)
-          end
+        if @batch.workflow_state == 'aborted'
+          parallel_importer.abort
+          return
+        end
+        importer_type = parallel_importer.importer_type.to_sym
+        importer_object = SIS::CSV.const_get(importer_type.to_s.camelcase + 'Importer').new(self)
+        att = parallel_importer.attachment
+        file = att.open
+        parallel_importer.start
+        csv = {:fullpath => file.path, :file => att.display_name}
+        count = importer_object.process(csv, parallel_importer.index, parallel_importer.batch_size)
+        parallel_importer.complete(rows_processed: count)
+        update_progress # just update progress on completion - the parallel jobs should be short enough
+      rescue => e
+        if parallel_importer.workflow_state == 'running'
+          parallel_importer.write_attribute(:workflow_state, 'retry')
+          run_parallel_importer(parallel_importer)
+        end
+        parallel_importer.fail
+        fail_with_error!(e)
+      ensure
+        file&.close
+        if is_last_parallel_importer_of_type?(parallel_importer)
+          queue_next_importer_set unless %w{aborted failed failed_with_messages}.include?(@batch.workflow_state)
         end
       end
 
@@ -252,8 +247,9 @@ module SIS
         })[:error_report]
         error_message = I18n.t("Error while importing CSV. Please contact support. "\
                                  "(Error report %{number})", number: err_id.to_s)
-        add_error(nil, error_message, failure: true, backtrace: e)
+        SisBatch.add_error(nil, error_message, sis_batch: @batch, failure: true, backtrace: e.backtrace)
         @batch.workflow_state = :failed_with_messages
+        @batch.finish(false)
         @batch.save!
       end
 
@@ -318,7 +314,7 @@ module SIS
         csv = {base: base, file: file, fullpath: File.join(base, file), attachment: att}
         if File.file?(csv[:fullpath]) && File.extname(csv[:fullpath]).downcase == '.csv'
           unless valid_utf8?(csv[:fullpath])
-            add_error(csv, I18n.t("Invalid UTF-8"), failure: true)
+            SisBatch.add_error(csv, I18n.t("Invalid UTF-8"), sis_batch: @batch, failure: true)
             return
           end
           begin
@@ -333,14 +329,14 @@ module SIS
                   false
                 end
               end
-              add_error(csv, I18n.t("Couldn't find Canvas CSV import headers"), failure: true) if importer.nil?
+              SisBatch.add_error(csv, I18n.t("Couldn't find Canvas CSV import headers"), sis_batch: @batch, failure: true) if importer.nil?
               break
             end
           rescue ::CSV::MalformedCSVError
-            add_error(csv, "Malformed CSV", failure: true)
+            SisBatch.add_error(csv, "Malformed CSV", sis_batch: @batch, failure: true)
           end
-        elsif !File.directory?(csv[:fullpath]) && !(csv[:fullpath] =~ IGNORE_FILES)
-          add_warning(csv, I18n.t("Skipping unknown file type"))
+        elsif !File.directory?(csv[:fullpath]) && (csv[:fullpath] !~ IGNORE_FILES)
+          SisBatch.add_error(csv, I18n.t("Skipping unknown file type"), sis_batch: @batch)
         end
       end
 

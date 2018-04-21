@@ -143,7 +143,7 @@ class AccountAuthorizationConfig::LDAP < AccountAuthorizationConfig
   end
 
   def test_ldap_search
-    timeout(Setting.get('test_ldap_search_timeout', '60').to_i) do
+    Timeout.timeout(Setting.get('test_ldap_search_timeout', '60').to_i) do
       conn = self.ldap_connection
       filter = self.ldap_filter("canvas_ldap_test_user")
       Net::LDAP::Filter.construct(filter)

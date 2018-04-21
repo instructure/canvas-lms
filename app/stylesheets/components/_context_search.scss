@@ -38,14 +38,14 @@
       height: 30px;
     }
     a.expand {
-      float: right;
+      float: direction(right);
       i {
         background: transparent url(/images/messages/expand-context.png) no-repeat 10px -23px;
       }
     }
     a.toggle {
       display: none;
-      float: left;
+      float: direction(left);
       margin: 0 14px 0 6px;
       i {
         width: 16px;
@@ -56,15 +56,15 @@
     .avatar {
       width: 32px;
       height: 32px;
-      float: left;
-      margin-right: 4px;
+      float: direction(left);
+      margin-#{direction(right)}: 4px;
       margin-top: -2px;
     }
     .avatar-box {
       width: 32px;
       height: 32px;
-      float: left;
-      margin-right: 4px;
+      float: direction(left);
+      margin-#{direction(right)}: 4px;
       background: transparent url(/images/messages/avatar-sprites.png) 0 0 no-repeat;
     }
     span.name, span.details {
@@ -86,7 +86,7 @@
       display: block;
     }
     span.context_info {
-      padding-left: 6px;
+      padding-#{direction(left)}: 6px;
     }
   }
   li.toggleable a.toggle i {
@@ -161,7 +161,7 @@
       display: block;
     }
     li.expanded, li.active.expanded {
-      padding-left: 11px;
+      padding-#{direction(left)}: 11px;
       .avatar-box {
         margin: 0 14px 0 0;
       }

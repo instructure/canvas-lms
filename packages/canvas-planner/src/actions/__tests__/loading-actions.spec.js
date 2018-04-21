@@ -188,6 +188,7 @@ describe('api actions', () => {
     it('dispatches GETTING_PAST_ITEMS and starts the saga', () => {
       const mockDispatch = jest.fn();
       Actions.scrollIntoPast()(mockDispatch, getBasicState);
+      expect(mockDispatch).toHaveBeenCalledWith(Actions.scrollIntoPastAction());
       expect(mockDispatch).toHaveBeenCalledWith(Actions.gettingPastItems());
       expect(mockDispatch).toHaveBeenCalledWith(Actions.startLoadingPastSaga());
     });
@@ -198,6 +199,16 @@ describe('api actions', () => {
       state.loading.allPastItemsLoaded = true;
       Actions.scrollIntoPast()(mockDispatch, () => state);
       expect(mockDispatch).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('loadPastButtonClicked', () => {
+    it('dispatches GETTING_PAST_ITEMS without the scroll into past action', () => {
+      const mockDispatch = jest.fn();
+      Actions.loadPastButtonClicked()(mockDispatch, getBasicState);
+      expect(mockDispatch).not.toHaveBeenCalledWith(Actions.scrollIntoPastAction());
+      expect(mockDispatch).toHaveBeenCalledWith(Actions.gettingPastItems());
+      expect(mockDispatch).toHaveBeenCalledWith(Actions.startLoadingPastSaga());
     });
   });
 

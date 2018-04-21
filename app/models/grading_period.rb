@@ -242,7 +242,7 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def recompute_scores
-    dates_or_workflow_state_changed = time_boundaries_changed? || workflow_state_changed?
+    dates_or_workflow_state_changed = time_boundaries_changed? || saved_change_to_workflow_state?
 
     if course_group?
       course = grading_period_group.course
@@ -254,14 +254,14 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def weight_actually_changed?
-    grading_period_group.weighted && weight_changed?
+    grading_period_group.weighted && saved_change_to_weight?
   end
 
   def time_boundaries_changed?
-    start_date_changed? || end_date_changed?
+    saved_change_to_start_date? || saved_change_to_end_date?
   end
 
   def dates_or_weight_or_workflow_state_changed?
-    time_boundaries_changed? || weight_actually_changed? || workflow_state_changed?
+    time_boundaries_changed? || weight_actually_changed? || saved_change_to_workflow_state?
   end
 end

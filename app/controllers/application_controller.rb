@@ -45,6 +45,7 @@ class ApplicationController < ActionController::Base
   around_action :set_locale
   around_action :enable_request_cache
   around_action :batch_statsd
+  around_action :report_to_datadog
 
   helper :all
 
@@ -441,6 +442,23 @@ class ApplicationController < ActionController::Base
 
   def batch_statsd(&block)
     CanvasStatsd::Statsd.batch(&block)
+  end
+
+  def report_to_datadog(&block)
+    if (metric = params[:datadog_metric]) && metric.present?
+      require 'datadog/statsd'
+      datadog = Datadog::Statsd.new('localhost', 8125)
+      datadog.batch do |statsd|
+        tags = [
+          "domain:#{request.host_with_port.sub(':', '_')}",
+          "action:#{controller_name}.#{action_name}",
+        ]
+        statsd.increment("graphql.rest_comparison.#{metric}.count", tags: tags)
+        statsd.time("graphql.rest_comparison.#{metric}.time", tags: tags, &block)
+      end
+    else
+      yield
+    end
   end
 
   def store_session_locale
@@ -1401,6 +1419,8 @@ class ApplicationController < ActionController::Base
     when AuthenticationMethods::AccessTokenError
       add_www_authenticate_header
       data = { errors: [{message: 'Invalid access token.'}] }
+    when AuthenticationMethods::AccessTokenScopeError
+      data = { errors: [{message: 'Insufficient scopes on access token.'}] }
     when ActionController::ParameterMissing
       data = { errors: [{message: "#{exception.param} is missing"}] }
     when BasicLTI::BasicOutcomes::Unauthorized,

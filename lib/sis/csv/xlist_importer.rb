@@ -37,7 +37,7 @@ module SIS
             begin
               importer.add_crosslist(row['xlist_course_id'], row['section_id'], row['status'])
             rescue ImportError => e
-              add_warning(csv, "#{e}")
+              SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
             end
           end
         end

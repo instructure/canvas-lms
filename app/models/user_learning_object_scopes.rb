@@ -110,8 +110,7 @@ module UserLearningObjectScopes
     opts[:due_before] ||= 2.weeks.from_now
     cache_timeout = opts[:cache_timeout] || 120.minutes
     objects_needing('Assignment', purpose, :student, cache_timeout, opts) do |assignment_scope, options|
-      assignments = assignment_scope.due_between_with_overrides(options[:due_after], options[:due_before])
-      assignments = assignments.filter_by_visibilities_in_given_courses(id, options[:shard_course_ids])
+      assignments = assignment_scope.due_between_for_user(options[:due_after], options[:due_before], self)
       assignments = assignments.need_submitting_info(id, options[:limit]) if purpose == 'submitting'
       assignments = assignments.having_submissions_for_user(id) if purpose == 'submitted'
       assignments = assignments.not_locked unless options[:include_locked]
@@ -137,16 +136,14 @@ module UserLearningObjectScopes
   end
 
   def ungraded_quizzes(opts={})
-    objects_needing('Quizzes::Quiz', 'viewing', :student, 15.minutes, opts.merge(:ungraded_quizzes => true)) do |quiz_scope, options|
+    objects_needing('Quizzes::Quiz', 'viewing', :student, 15.minutes, opts) do |quiz_scope, options|
       due_after = options[:due_after] || Time.zone.now
       due_before = options[:due_before] || 1.week.from_now
 
-      quizzes = quiz_scope.not_for_assignment.
-        visible_to_students_in_course_with_da(self.id, options[:shard_course_ids])
+      quizzes = quiz_scope.available
       quizzes = quizzes.not_locked unless opts[:include_locked]
       quizzes = quizzes.
-        available.
-        due_between_with_overrides(due_after, due_before).
+        ungraded_due_between_for_user(due_after, due_before, self).
         preload(:context)
       quizzes = quizzes.need_submitting_info(id, options[:limit]) if options[:needing_submitting]
       if options[:scope_only]

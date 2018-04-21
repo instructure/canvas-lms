@@ -30,7 +30,7 @@
   }
   a, button {
     color: $ic-font-color-dark;
-    padding-right: $contentBoxPadding;
+    padding-#{direction(right)}: $contentBoxPadding;
     cursor: pointer;
     background-color: transparent;
     border: 1px solid transparent;
@@ -39,7 +39,7 @@
     }
   }
   white-space: nowrap;
-  float: left;
+  float: direction(left);
   color: $ic-font-color-dark;
   background-color: $ic-color-medium-light;
   border: 1px solid $ic-border-color;
@@ -48,7 +48,7 @@
   position: relative;
   &.cannot_remove, &.cannot_remove:hover {
     div {
-      padding-right: $contentBoxPadding;
+      padding-#{direction(right)}: $contentBoxPadding;
     }
   }
 }

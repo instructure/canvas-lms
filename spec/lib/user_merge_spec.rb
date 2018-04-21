@@ -379,8 +379,8 @@ describe UserMerge do
 
       observer1 = user_with_pseudonym
       observer2 = user_with_pseudonym
-      user1.observers << observer1 << observer2
-      user2.observers << observer2
+      user1.linked_observers << observer1 << observer2
+      user2.linked_observers << observer2
       expect(ObserverEnrollment.count).to eql 3
       Enrollment.where(user_id: observer2, associated_user_id: user1).update_all(workflow_state: 'completed')
 
@@ -396,30 +396,30 @@ describe UserMerge do
     it "should move and uniquify observers" do
       observer1 = user_model
       observer2 = user_model
-      user1.observers << observer1 << observer2
-      user2.observers << observer2
+      user1.linked_observers << observer1 << observer2
+      user2.linked_observers << observer2
 
       UserMerge.from(user1).into(user2)
       data = UserMergeData.where(user_id: user2).first
-      expect(data.user_merge_data_records.where(context_type: 'UserObserver').count).to eq 2
+      expect(data.user_merge_data_records.where(context_type: 'UserObservationLink').count).to eq 2
       user1.reload
-      expect(user1.observers.active_user_observers).to be_empty
-      expect(user1.user_observers.first.workflow_state).to eq 'deleted'
+      expect(user1.linked_observers).to be_empty
+      expect(UserObservationLink.where(:student => user1).first.workflow_state).to eq 'deleted'
       user2.reload
-      expect(user2.observers.sort_by(&:id)).to eql [observer1, observer2]
+      expect(user2.linked_observers.sort_by(&:id)).to eql [observer1, observer2]
     end
 
     it "should move and uniquify observed users" do
       student1 = user_model
       student2 = user_model
-      user1.observed_users << student1 << student2
-      user2.observed_users << student2
+      user1.linked_students << student1 << student2
+      user2.linked_students << student2
 
       UserMerge.from(user1).into(user2)
       user1.reload
-      expect(user1.observed_users.active_user_observers).to be_empty
+      expect(user1.linked_students).to be_empty
       user2.reload
-      expect(user2.observed_users.sort_by(&:id)).to eql [student1, student2]
+      expect(user2.linked_students.sort_by(&:id)).to eql [student1, student2]
     end
 
     it "should move conversations to the new user" do

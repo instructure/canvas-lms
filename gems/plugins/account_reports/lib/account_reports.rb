@@ -21,11 +21,13 @@ require 'zip'
 
 module AccountReports
 
+  # This hash is modified below and should not be frozen.
   REPORTS = {}
 
-  class Report < Struct.new(:title, :description_partial, :parameters_partial, :parameters, :module, :proc)
+  Report = Struct.new(:title, :description_partial, :parameters_partial, :parameters, :module, :proc, :parallel_proc) do
+
     def title
-      title = super
+      title = self[:title]
       title = title.call if title.respond_to?(:call)
       title
     end
@@ -36,7 +38,16 @@ module AccountReports
       details[:module] ||= module_name
       module_name = "AccountReports::#{module_name}" unless module_name.include?("::")
       details[:proc] ||= module_name.constantize.method(report_type)
-      report = Report.new(details[:title], details[:description_partial], details[:parameters_partial], details[:parameters], details[:module], details[:proc])
+      if module_name.constantize.public_methods.include?(:"parallel_#{report_type}")
+        details[:parallel_proc] ||= module_name.constantize.method(:"parallel_#{report_type}")
+      end
+      report = Report.new(details[:title],
+                          details[:description_partial],
+                          details[:parameters_partial],
+                          details[:parameters],
+                          details[:module],
+                          details[:proc],
+                          details[:parallel_proc])
       REPORTS[report_type] = report
     end
   end

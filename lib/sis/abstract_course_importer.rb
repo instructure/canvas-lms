@@ -51,6 +51,7 @@ module SIS
         raise ImportError, "No short_name given for abstract course #{abstract_course_id}" if short_name.blank?
         raise ImportError, "No long_name given for abstract course #{abstract_course_id}" if long_name.blank?
         raise ImportError, "Improper status \"#{status}\" for abstract course #{abstract_course_id}" unless status =~ /\Aactive|\Adeleted/i
+        return if @batch.skip_deletes? && status =~ /deleted/i
 
         course = AbstractCourse.where(root_account_id: @root_account, sis_source_id: abstract_course_id).take
         course ||= AbstractCourse.new

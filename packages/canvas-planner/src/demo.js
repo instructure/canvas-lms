@@ -82,7 +82,7 @@ class DemoArea extends Component {
       stickyOffset: 0,
       stickyZIndex: 10,
       flashAlertFunctions,
-      userId: '1',
+      currentUser: {id: '1', displayName: 'Jane', avatarUrl: '/avatar/is/here'},
       ariaHideElement: document.getElementById('mount_point')
     };
     this.dayCount = 3;

@@ -26,10 +26,10 @@ module QuizzesNext
         return if assignments.empty?
 
         {
-          "original_course_id": course.id,
+          "original_course_uuid": course.uuid,
           "assignments": assignments.map do |assignment|
             {
-              "original_link_id": assignment.lti_resource_link_id,
+              "original_resource_link_id": assignment.lti_resource_link_id,
               "$canvas_assignment_id": assignment.id # transformed to new id
             }
           end
@@ -45,22 +45,17 @@ module QuizzesNext
       end
 
       def send_imported_content(new_course, imported_content)
-        # TODO: emit live events here with the imported data
-        #   - This gets called after the export is complete and has been imported into canvas
-        #
-        # imported_content["assignments"].each do |assignment|
-        #   emit_live_event(
-        #     body: {
-        #       "original_course_id" => imported_content["original_course_id"],
-        #       "new_course_id" => new_course.id
-        #       "original_resource_link_id" => assigment["original_link_id"],
-        #         - We want to send this so that quizzes next can identify the old quiz to copy
-        #
-        #       "new_resource_link_id" => Assignment.find(assignment["$canvas_assignment_id"]).resource_link_id
-        #         - We want to send this so that quizzes next can link the new quiz to the new canvas assignment
-        #     }
-        #   )
-        # end
+        imported_content[:assignments].each do |assignment|
+          next if QuizzesNext::Service.assignment_not_in_export?(assignment)
+          Canvas::LiveEvents.quizzes_next_quiz_duplicated(
+            {
+              original_course_uuid: imported_content[:original_course_uuid],
+              new_course_uuid: new_course.uuid,
+              original_resource_link_id: assignment[:original_resource_link_id],
+              new_resource_link_id: Assignment.find(assignment[:$canvas_assignment_id]).lti_resource_link_id
+            }
+          )
+        end
       end
 
       def import_completed?(_)

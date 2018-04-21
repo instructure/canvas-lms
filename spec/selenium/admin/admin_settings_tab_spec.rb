@@ -538,7 +538,7 @@ describe "admin settings tab" do
     end
   end
 
-  it "should show all the feature flags" do
+  it "shows all feature flags that are expected to be visible" do
     course_with_admin_logged_in(:account => Account.site_admin)
     provision_quizzes_next(Account.site_admin)
     get "/accounts/#{Account.site_admin.id}/settings"
@@ -546,6 +546,7 @@ describe "admin settings tab" do
     wait_for_ajaximations
 
     Feature.applicable_features(Account.site_admin).each do |feature|
+      next if feature.visible_on && !feature.visible_on.call(Account.site_admin)
       expect(f(".feature.#{feature.feature}")).to be_displayed
     end
   end

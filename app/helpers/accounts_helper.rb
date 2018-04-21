@@ -45,4 +45,11 @@ module AccountsHelper
       [I18n.t('#turnitin_settings.originality_report_never', "Never"), 'never']
     ]
   end
+
+  def dashboard_view_options(account)
+    [
+      [I18n.t('Card View'), 'cards'],
+      [I18n.t('Recent Activity'), 'activity'],
+    ].tap { |opts| opts << [I18n.t('List View'), 'planner'] if account.feature_enabled?(:student_planner)}
+  end
 end

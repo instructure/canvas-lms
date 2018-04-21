@@ -167,16 +167,13 @@ describe "accounts/settings.html.erb" do
         assign(:account, @account)
         assign(:root_account, @account)
         assign(:current_user, current_user)
-
-        allow(@account).to receive(:feature_enabled?).with(:post_grades).and_return(true)
-        allow(@account).to receive(:feature_enabled?).with(:google_docs_domain_restriction).and_return(true)
       end
 
       context "new_sis_integrations => false" do
         before do
-          allow(@account).to receive(:feature_enabled?).with(:new_sis_integrations).and_return(false)
+          @account.disable_feature!(:new_sis_integrations)
+          @account.enable_feature!(:post_grades)
           allow(@account).to receive(:grants_right?).with(current_user, :manage_account_memberships).and_return(true)
-          allow(@account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(true)
         end
 
         context "show old version of settings to regular admin user" do
@@ -203,8 +200,7 @@ describe "accounts/settings.html.erb" do
         let(:assignment_name_length) { "#account_settings_sis_assignment_name_length_value" }
 
         before do
-          allow(@account).to receive(:feature_enabled?).with(:new_sis_integrations).and_return(true)
-          allow(@account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(true)
+          @account.enable_feature!(:new_sis_integrations)
         end
 
         context "should show settings to regular admin user" do
@@ -232,7 +228,6 @@ describe "accounts/settings.html.erb" do
           context "for root account" do
             before do
               allow(@account).to receive(:sis_syncing).and_return({value: true, locked: true})
-              allow(@account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(true)
               do_render(current_user)
             end
 
@@ -266,7 +261,6 @@ describe "accounts/settings.html.erb" do
             context "not locked" do
               before do
                 allow(@account).to receive(:sis_syncing).and_return({value: true, locked: false, inherited: true })
-                allow(@account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(true)
                 do_render(current_user)
               end
 
@@ -329,9 +323,9 @@ describe "accounts/settings.html.erb" do
     it "should not show add admin button if don't have permission to any roles" do
       role = custom_account_role('CustomAdmin', :account => Account.site_admin)
       account_admin_user_with_role_changes(
-          :account => Account.site_admin,
-          :role => role,
-          :role_changes => {manage_account_memberships: true})
+        :account => Account.site_admin,
+        :role => role,
+        :role_changes => {manage_account_memberships: true})
       view_context(Account.default, @user)
       assign(:account, Account.default)
       assign(:announcements, AccountNotification.none.paginate)

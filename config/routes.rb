@@ -162,8 +162,12 @@ CanvasRails::Application.routes.draw do
 
   concern :conferences do
     resources :conferences do
+      # rubocop:disable SymbolArray
       match :join, via: [:get, :post]
       match :close, via: [:get, :post]
+      match :recording, via: [:get]
+      match :recording, via: [:delete], to: 'conferences#delete_recording', as: :delete_recording
+      # rubocop:enable SymbolArray
       get :settings
     end
   end
@@ -1293,6 +1297,8 @@ CanvasRails::Application.routes.draw do
       put 'users/:id/merge_into/accounts/:destination_account_id/users/:destination_user_id', controller: 'users', action: 'merge_into'
       post 'users/:id/split', controller: 'users', action: 'split'
 
+      post 'users/:id/pandata_token', controller: 'users', action: 'pandata_token'
+
       scope(controller: :user_observees) do
         get    'users/:user_id/observees', action: :index, as: 'user_observees'
         post   'users/:user_id/observees', action: :create
@@ -1326,6 +1332,7 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/courses', action: :courses_api, as: 'account_courses'
       get 'accounts/:account_id/sub_accounts', action: :sub_accounts, as: 'sub_accounts'
       get 'accounts/:account_id/courses/:id', controller: :courses, action: :show, as: 'account_course_show'
+      get 'accounts/:account_id/permissions', action: :permissions
       delete 'accounts/:account_id/users/:user_id', action: :remove_user
     end
 
@@ -1486,6 +1493,11 @@ CanvasRails::Application.routes.draw do
       get 'groups/:group_id/folders/by_path/*full_path', controller: :folders, action: :resolve_path
       get 'groups/:group_id/folders/by_path', controller: :folders, action: :resolve_path
       get 'groups/:group_id/folders/:id', controller: :folders, action: :show, as: 'group_folder'
+    end
+
+    scope(controller: :developer_key_account_bindings) do
+      post 'accounts/:account_id/developer_keys/:developer_key_id/developer_key_account_bindings', action: :create_or_update
+      get 'accounts/:account_id/developer_key_account_bindings', action: :index
     end
 
     scope(controller: :developer_keys) do

@@ -353,7 +353,6 @@ describe DiscussionTopic do
     end
 
     it "should not be visible to teachers locked to a different section in a course" do
-      @course.root_account.enable_feature!(:section_specific_announcements)
       section1 = @course.course_sections.create!(name: "Section 1")
       section2 = @course.course_sections.create!(name: "Section 2")
       new_teacher = user_factory
@@ -365,7 +364,6 @@ describe DiscussionTopic do
     end
 
     it "should be visible to teachers locked to the same section in a course" do
-      @course.root_account.enable_feature!(:section_specific_announcements)
       section1 = @course.course_sections.create!(name: "Section 1")
       section2 = @course.course_sections.create!(name: "Section 2")
       new_teacher = user_factory
@@ -391,6 +389,19 @@ describe DiscussionTopic do
       account = @course.root_account
       nobody_role = custom_account_role('NobodyAdmin', account: account)
       account_with_role_changes(account: account, role: nobody_role, role_changes: { read_course_content: true, read_forum: true })
+      admin = account_admin_user(account: account, role: nobody_role, active_user: true)
+      expect(@topic.visible_for?(admin)).to be_truthy
+    end
+
+    it "section-specific-topics should be visible to account admins" do
+      account = @course.root_account
+      account.enable_feature!(:section_specific_discussions)
+      section = @course.course_sections.create!(name: "Section of topic")
+      add_section_to_topic(@topic, section)
+      @topic.save!
+      nobody_role = custom_account_role('NobodyAdmin', account: account)
+      account_with_role_changes(account: account, role: nobody_role,
+        role_changes: { read_course_content: true, read_forum: true })
       admin = account_admin_user(account: account, role: nobody_role, active_user: true)
       expect(@topic.visible_for?(admin)).to be_truthy
     end
@@ -478,7 +489,7 @@ describe DiscussionTopic do
         it "should filter out-of-section students" do
           @course.root_account.enable_feature!(:section_specific_discussions)
           topic = @course.discussion_topics.create(
-            :title => "section specific topic", :title => "foo", :message => "bar", :user => @teacher)
+            :title => "foo", :message => "bar", :user => @teacher)
           section1 = @course.course_sections.create!
           section2 = @course.course_sections.create!
           student1 = create_enrolled_user(@course, section1, :name => 'student 1', :enrollment_type => 'StudentEnrollment')
@@ -2017,7 +2028,6 @@ describe DiscussionTopic do
       @course = course_factory({ :course_name => "Course 1", :active_all => true })
       @section = @course.course_sections.create!
       @course.save!
-      @course.root_account.enable_feature!(:section_specific_announcements)
       @announcement = Announcement.create!(
         :title => "some topic",
         :message => "I announce that i am lying",
@@ -2031,7 +2041,6 @@ describe DiscussionTopic do
       course = course_factory({ :course_name => "Course 1", :active_all => true })
       course.course_sections.create!
       course.course_sections.create!
-      course.root_account.enable_feature!(:section_specific_announcements)
       course.save!
       course
     end
@@ -2054,7 +2063,6 @@ describe DiscussionTopic do
     end
 
     it "only section specific topics can have sections" do
-      @course.root_account.enable_feature!(:section_specific_announcements)
       announcement = basic_announcement_model(course: @course)
       add_section_to_topic(announcement, @section)
       expect(announcement.valid?).to eq true
@@ -2065,7 +2073,6 @@ describe DiscussionTopic do
     end
 
     it "section specific topics must have sections" do
-      @course.root_account.enable_feature!(:section_specific_announcements)
       @announcement.is_section_specific = true
       expect(@announcement.valid?).to eq false
       errors = @announcement.errors[:is_section_specific]
@@ -2073,7 +2080,6 @@ describe DiscussionTopic do
     end
 
     it "group topics cannot be section specific" do
-      @course.root_account.enable_feature!(:section_specific_announcements)
       group_category = @course.group_categories.create(:name => "new category")
       @group = @course.groups.create(:name => "group", :group_category => group_category)
       student_in_course(active_all: true)
@@ -2103,20 +2109,6 @@ describe DiscussionTopic do
         :user => @teacher)
       add_section_to_topic(topic, @section)
       expect(topic.valid?).to eq true
-    end
-
-    it "does not allow announcements to be section-specific if the feature is disabled" do
-      @course.root_account.disable_feature!(:section_specific_announcements)
-      add_section_to_topic(@announcement, @section)
-      expect(@announcement.valid?).to eq false
-      errors = @announcement.errors[:is_section_specific]
-      expect(errors).to eq ["Section-specific announcements are disabled"]
-    end
-
-    it "allows announcements to be section-specific if the feature is enabled" do
-      @course.root_account.enable_feature!(:section_specific_announcements)
-      add_section_to_topic(@announcement, @section)
-      expect(@announcement.valid?).to eq true
     end
 
     it "does not allow graded discussions to be section-specific" do
@@ -2470,7 +2462,6 @@ describe DiscussionTopic do
   describe "users with permissions" do
     before :once do
       @course = course_factory(:active_all => true)
-      @course.root_account.enable_feature!(:section_specific_announcements)
       @course.root_account.enable_feature!(:section_specific_discussions)
       @section1 = @course.course_sections.create!
       @section2 = @course.course_sections.create!

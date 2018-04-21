@@ -33,7 +33,8 @@ import PresentationContent from '@instructure/ui-core/lib/components/Presentatio
 import IconPlus from 'instructure-icons/lib/Line/IconPlusLine'
 import IconSearchLine from 'instructure-icons/lib/Line/IconSearchLine'
 import IconTrash from 'instructure-icons/lib/Line/IconTrashLine'
-import IconReply from 'instructure-icons/lib/Line/IconReplyLine'
+import IconUnlock from 'instructure-icons/lib/Line/IconUnlockLine'
+import IconLock from 'instructure-icons/lib/Line/IconLockLine'
 
 import select from '../../shared/select'
 import propTypes from '../propTypes'
@@ -54,6 +55,7 @@ export default class IndexHeader extends Component {
     contextId: string.isRequired,
     isBusy: bool,
     selectedCount: number,
+    isToggleLocking: bool.isRequired,
     permissions: propTypes.permissions.isRequired,
     atomFeedUrl: string,
     searchAnnouncements: func.isRequired,
@@ -130,15 +132,33 @@ export default class IndexHeader extends Component {
                 />
               </GridCol>
               <GridCol width={6} textAlign="end">
-                {this.props.permissions.manage_content && !this.props.announcementsLocked &&
-                  <Button
-                    disabled={this.props.isBusy || this.props.selectedCount === 0}
-                    size="medium"
-                    margin="0 small 0 0"
-                    id="lock_announcements"
-                    onClick={this.props.toggleSelectedAnnouncementsLock}
-                    ><IconReply /><ScreenReaderContent>{I18n.t('Lock Selected Announcements')}</ScreenReaderContent></Button>}
-
+                {
+                  this.props.permissions.manage_content &&
+                  !this.props.announcementsLocked &&
+                  (this.props.isToggleLocking ? (
+                    <Button
+                      disabled={this.props.isBusy || this.props.selectedCount === 0}
+                      size="medium"
+                      margin="0 small 0 0"
+                      id="lock_announcements"
+                      onClick={this.props.toggleSelectedAnnouncementsLock}
+                    >
+                      <IconLock />
+                      <ScreenReaderContent>{I18n.t('Lock Selected Announcements')}</ScreenReaderContent>
+                    </Button>
+                  ) : (
+                    <Button
+                      disabled={this.props.isBusy || this.props.selectedCount === 0}
+                      size="medium"
+                      margin="0 small 0 0"
+                      id="lock_announcements"
+                      onClick={this.props.toggleSelectedAnnouncementsLock}
+                    >
+                      <IconUnlock />
+                      <ScreenReaderContent>{I18n.t('Unlock Selected Announcements')}</ScreenReaderContent>
+                    </Button>
+                  ))
+                }
                 {this.props.permissions.manage_content &&
                   <Button
                     disabled={this.props.isBusy || this.props.selectedCount === 0}
@@ -171,6 +191,7 @@ export default class IndexHeader extends Component {
 const connectState = state => Object.assign({
   isBusy: state.isLockingAnnouncements || state.isDeletingAnnouncements,
   selectedCount: state.selectedAnnouncements.length,
+  isToggleLocking: state.isToggleLocking,
 }, select(state, ['contextType', 'contextId', 'permissions', 'atomFeedUrl', 'announcementsLocked']))
 const selectedActions = ['searchAnnouncements', 'toggleSelectedAnnouncementsLock', 'deleteSelectedAnnouncements']
 const connectActions = dispatch => bindActionCreators(select(actions, selectedActions), dispatch)

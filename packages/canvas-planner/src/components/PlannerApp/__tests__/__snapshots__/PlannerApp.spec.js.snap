@@ -2,7 +2,7 @@
 
 exports[`renders base component using dayKeys 1`] = `
 <div
-  className="PlannerApp"
+  className="PlannerApp large"
 >
   <ShowOnFocusButton
     buttonProps={
@@ -67,7 +67,9 @@ exports[`renders base component using dayKeys 1`] = `
 `;
 
 exports[`renders empty component with no assignments 1`] = `
-<div>
+<div
+  className="PlannerApp large"
+>
   <div>
     <ShowOnFocusButton
       buttonProps={
@@ -88,7 +90,7 @@ exports[`renders empty component with no assignments 1`] = `
 
 exports[`shows new activity button when new activity is indicated 1`] = `
 <div
-  className="PlannerApp"
+  className="PlannerApp large"
 >
   <StickyButton
     buttonRef={[Function]}
@@ -162,7 +164,7 @@ exports[`shows new activity button when new activity is indicated 1`] = `
 
 exports[`shows only the loading component when the isLoading prop is true 1`] = `
 <div
-  className="PlannerApp"
+  className="PlannerApp large"
 >
   <ShowOnFocusButton
     buttonProps={
@@ -197,7 +199,7 @@ exports[`shows only the loading component when the isLoading prop is true 1`] = 
 
 exports[`shows the loading past indicator when loadingPast prop is true 1`] = `
 <div
-  className="PlannerApp"
+  className="PlannerApp large"
 >
   <ShowOnFocusButton
     buttonProps={

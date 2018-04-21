@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "activesupport", ">= 3.2", "< 5.2"
 
-  spec.add_dependency "i18n", "~> 0.7"
+  spec.add_dependency "i18n", ">= 0.7", "< 2"
   spec.add_dependency "ruby_parser", "~> 3.7"
   spec.add_dependency "ya2yaml", ">= 0.30"
   spec.add_dependency "i18n_extraction"

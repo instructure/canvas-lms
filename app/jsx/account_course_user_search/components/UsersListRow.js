@@ -31,14 +31,14 @@ import UserLink from './UserLink'
 export default function UsersListRow({accountId, user, permissions, handlers}) {
   return (
     <tr>
-      <td>
+      <th scope="row">
         <UserLink
           href={`/accounts/${accountId}/users/${user.id}`}
           name={user.name}
           avatar_url={user.avatar_url}
           size="x-small"
         />
-      </td>
+      </th>
       <td>{user.email}</td>
       <td>{user.sis_user_id}</td>
       <td><FriendlyDatetime dateTime={user.last_login} /></td>
@@ -46,7 +46,7 @@ export default function UsersListRow({accountId, user, permissions, handlers}) {
         {permissions.can_masquerade && (
           <Tooltip tip={I18n.t('Act as %{name}', {name: user.name})}>
             <Button variant="icon" size="small" href={`/users/${user.id}/masquerade`}>
-              <IconMasqueradeLine title={I18n.t('Act as %{name}', {name: user.name})} />
+              <IconMasqueradeLine height="1.5em" title={I18n.t('Act as %{name}', {name: user.name})} />
             </Button>
           </Tooltip>
         )}
@@ -57,7 +57,7 @@ export default function UsersListRow({accountId, user, permissions, handlers}) {
               size="small"
               href={`/conversations?user_name=${user.name}&user_id=${user.id}`}
             >
-              <IconMessageLine title={I18n.t('Send message to %{name}', {name: user.name})} />
+              <IconMessageLine height="1.5em" title={I18n.t('Send message to %{name}', {name: user.name})} />
             </Button>
           </Tooltip>
         )}

@@ -33,13 +33,13 @@ else
   ruby '2.4.0', :engine => 'ruby', :engine_version => '2.4.0'
 end
 
-# force a different lockfile for rails 5.1
-unless CANVAS_RAILS5_0
+# force a different lockfile for rails 5.2
+unless CANVAS_RAILS5_1
   Bundler::SharedHelpers.class_eval do
     class << self
       def default_lockfile
         lockfile = "#{Bundler.default_gemfile}.lock"
-        lockfile << ".51" unless CANVAS_RAILS5_0
+        lockfile << ".52" unless CANVAS_RAILS5_1
         Pathname.new(lockfile)
       end
     end
@@ -58,4 +58,4 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
-gem 'iconv', '1.0.4'
+gem 'iconv', '1.0.5'

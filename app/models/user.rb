@@ -37,7 +37,7 @@ class User < ActiveRecord::Base
 
   before_save :infer_defaults
   after_create :set_default_feature_flags
-  after_update :clear_cached_short_name, if: -> (user) {user.short_name_changed? || (user.read_attribute(:short_name).nil? && user.name_changed?)}
+  after_update :clear_cached_short_name, if: -> (user) {user.saved_change_to_short_name? || (user.read_attribute(:short_name).nil? && user.saved_change_to_name?)}
 
   serialize :preferences
   include TimeZoneHelper
@@ -51,6 +51,7 @@ class User < ActiveRecord::Base
   has_many :communication_channels, -> { order('communication_channels.position ASC') }, dependent: :destroy
   has_many :notification_policies, through: :communication_channels
   has_one :communication_channel, -> { where("workflow_state<>'retired'").order(:position) }
+  has_many :ignores
   has_many :planner_notes, :dependent => :destroy
 
   has_many :enrollments, :dependent => :destroy
@@ -59,16 +60,15 @@ class User < ActiveRecord::Base
   has_many :not_removed_enrollments, -> { where.not(workflow_state: ['rejected', 'deleted', 'inactive']) }, class_name: 'Enrollment', multishard: true
   has_many :observer_enrollments
   has_many :observee_enrollments, :foreign_key => :associated_user_id, :class_name => 'ObserverEnrollment'
-  has_many :user_observers, dependent: :destroy, inverse_of: :user
-  has_many :active_user_observers, -> { where.not(:workflow_state => 'deleted') }, :class_name => "UserObserver", inverse_of: :user
-  has_many :observers, :through => :active_user_observers, :class_name => 'User'
 
-  has_many :user_observees,
-           class_name: 'UserObserver',
-           foreign_key: :observer_id,
-           dependent: :destroy,
-           inverse_of: :observer
-  has_many :observed_users, :through => :user_observees, :source => :user
+  has_many :as_student_observation_links, -> { where.not(:workflow_state => 'deleted') }, class_name: 'UserObservationLink',
+    foreign_key: :user_id, dependent: :destroy, inverse_of: :student
+  has_many :as_observer_observation_links, -> { where.not(:workflow_state => 'deleted') }, class_name: 'UserObservationLink',
+    foreign_key: :observer_id, dependent: :destroy, inverse_of: :observer
+
+  has_many :linked_observers, :through => :as_student_observation_links, :source => :observer, :class_name => 'User'
+  has_many :linked_students, :through => :as_observer_observation_links, :source => :student, :class_name => 'User'
+
   has_many :all_courses, :source => :course, :through => :enrollments
   has_many :all_courses_for_active_enrollments, -> { Enrollment.active }, :source => :course, :through => :enrollments
   has_many :group_memberships, -> { preload(:group) }, dependent: :destroy
@@ -196,7 +196,6 @@ class User < ActiveRecord::Base
     self.from("(#{scopes.join("\nUNION\n")}) users")
   }
   scope :active, -> { where("users.workflow_state<>'deleted'") }
-  scope :active_user_observers, -> { where.not(user_observers: {workflow_state: 'deleted'}) }
 
   scope :has_current_student_enrollments, -> do
     where("EXISTS (?)",
@@ -368,7 +367,7 @@ class User < ActiveRecord::Base
   end
 
   def update_account_associations_if_necessary
-    update_account_associations if !self.class.skip_updating_account_associations? && self.workflow_state_changed? && self.id_was
+    update_account_associations if !self.class.skip_updating_account_associations? && self.saved_change_to_workflow_state? && self.id_before_last_save
   end
 
   def update_account_associations(opts = nil)
@@ -888,8 +887,8 @@ class User < ActiveRecord::Base
       if root_account == :all
         # make sure to hit all shards
         enrollment_scope = self.enrollments.shard(self)
-        user_observer_scope = self.user_observers.shard(self)
-        user_observee_scope = self.user_observees.shard(self)
+        user_observer_scope = self.as_student_observation_links.shard(self)
+        user_observee_scope = self.as_observer_observation_links.shard(self)
         pseudonym_scope = self.pseudonyms.active.shard(self)
         account_users = self.account_users.active.shard(self)
         has_other_root_accounts = false
@@ -900,8 +899,8 @@ class User < ActiveRecord::Base
         # student view user won't be cross shard, so that will still be the
         # right shard
         enrollment_scope = fake_student? ? self.enrollments : root_account.enrollments.where(user_id: self)
-        user_observer_scope = self.user_observers.shard(self)
-        user_observee_scope = self.user_observees.shard(self)
+        user_observer_scope = self.as_student_observation_links.shard(self)
+        user_observee_scope = self.as_observer_observation_links.shard(self)
         pseudonym_scope = root_account.pseudonyms.active.where(user_id: self)
 
         account_users = root_account.account_users.where(user_id: self).to_a +
@@ -1019,7 +1018,7 @@ class User < ActiveRecord::Base
     given { |user| user == self }
     can :read and can :read_grades and can :read_profile and can :read_as_admin and can :manage and
       can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and
-      can :update_avatar and can :manage_feature_flags
+      can :update_avatar and can :manage_feature_flags and can :api_show_user
 
     given { |user| user == self && user.user_can_edit_name? }
     can :rename
@@ -1049,7 +1048,7 @@ class User < ActiveRecord::Base
     can :read and can :read_reports
 
     given {|user| self.check_accounts_right?(user, :read_roster) }
-    can :read_full_profile
+    can :read_full_profile and can :api_show_user
 
     given {|user| self.check_accounts_right?(user, :view_all_grades) }
     can :read_grades
@@ -1058,7 +1057,7 @@ class User < ActiveRecord::Base
       self.check_accounts_right?(user, :manage_user_logins) && self.adminable_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) }
     end
     can :manage_user_details and can :rename and can :read_profile and can :update_avatar and can :remove_avatar and
-      can :manage_feature_flags
+      can :manage_feature_flags and can :api_show_user
 
     given{ |user| self.pseudonyms.shard(self).any?{ |p| p.grants_right?(user, :update) } }
     can :merge
@@ -1081,7 +1080,7 @@ class User < ActiveRecord::Base
     end
     can :reset_mfa
 
-    given { |user| user && user.user_observees.active.where(user_id: self.id).exists? }
+    given { |user| user && user.as_observer_observation_links.where(user_id: self.id).exists? }
     can :read and can :read_as_parent
   end
 
@@ -1381,6 +1380,17 @@ class User < ActiveRecord::Base
 
   def dashboard_positions=(new_positions)
     preferences[:dashboard_positions] = new_positions
+  end
+
+  # Use the user's preferences for the default view
+  # Otherwise, use the account's default (if set)
+  # Fallback to using cards (default option on the Account settings page)
+  def dashboard_view
+    preferences[:dashboard_view] || account.default_dashboard_view || 'cards'
+  end
+
+  def dashboard_view=(new_dashboard_view)
+    preferences[:dashboard_view] = new_dashboard_view
   end
 
   def course_nicknames
@@ -2637,8 +2647,8 @@ class User < ActiveRecord::Base
 
   def adminable_accounts
     @adminable_accounts ||= shard.activate do
-      Rails.cache.fetch(['adminable_accounts', self, ApplicationController.region].cache_key) do
-        adminable_accounts_scope.to_a
+      Rails.cache.fetch(['adminable_accounts_1', self, ApplicationController.region].cache_key) do
+        adminable_accounts_scope.order(Account.best_unicode_collation_key('name'), :id).to_a
       end
     end
   end

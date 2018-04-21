@@ -49,6 +49,7 @@ module Api::V1::Assignment
       moderated_grading
       omit_from_final_grade
       anonymous_instructor_annotations
+      anonymous_grading
     )
   }.freeze
 
@@ -158,6 +159,10 @@ module Api::V1::Assignment
     end
 
     hash['is_quiz_assignment'] = assignment.quiz? && assignment.quiz.assignment?
+    hash['can_duplicate'] = assignment.can_duplicate?
+    hash['original_assignment_id'] = assignment.duplicate_of&.id
+    hash['original_assignment_name'] = assignment.duplicate_of&.name
+    hash['workflow_state'] = assignment.workflow_state
 
     if assignment.quiz_lti?
       hash['is_quiz_lti_assignment'] = true
@@ -297,7 +302,7 @@ module Api::V1::Assignment
       end
     end
 
-    hash['published'] = !assignment.unpublished?
+    hash['published'] = assignment.published?
     if can_manage
       hash['unpublishable'] = assignment.can_unpublish?
     end
@@ -335,6 +340,8 @@ module Api::V1::Assignment
       override = assignment.planner_override_for(user)
       hash['planner_override'] = planner_override_json(override, user, session)
     end
+
+    hash['anonymous_grading'] = value_to_boolean(assignment.anonymous_grading)
 
     hash
   end
@@ -653,6 +660,10 @@ module Api::V1::Assignment
 
     if assignment_params.key?('moderated_grading')
       assignment.moderated_grading = value_to_boolean(assignment_params['moderated_grading'])
+    end
+
+    if assignment_params.key?('anonymous_grading') && assignment.course.feature_enabled?(:anonymous_marking)
+      assignment.anonymous_grading = value_to_boolean(assignment_params['anonymous_grading'])
     end
 
     apply_report_visibility_options!(assignment_params, assignment)

@@ -89,7 +89,7 @@ FakeDashboard.defaultProps = {
 }
 
 QUnit.module('Dashboard Options Menu', {
-  teardown () {
+  afterEach () {
     ReactDOM.unmountComponentAtNode(container)
   }
 })
@@ -170,14 +170,14 @@ test('it should toggle color overlays', function () {
   ReactDOM.render(
     <FakeDashboard
       menuRef={(c) => { dashboardMenu = c }}
-      recent_activity_dashboard={false}
+      dashboard_view='cards'
     />, container)
 
   dashboardMenu.handleColorOverlayOptionSelect(null, [''])
-  ok(document.getElementsByClassName('ic-DashboardCard__header_hero')[0].style.opacity === '0')
-  ok(document.getElementsByClassName('ic-DashboardCard__header-button-bg')[0].style.opacity === '1')
+  strictEqual(document.getElementsByClassName('ic-DashboardCard__header_hero')[0].style.opacity, '0')
+  strictEqual(document.getElementsByClassName('ic-DashboardCard__header-button-bg')[0].style.opacity, '1')
 
   dashboardMenu.handleColorOverlayOptionSelect(null, ['colorOverlays'])
-  ok(document.getElementsByClassName('ic-DashboardCard__header_hero')[0].style.opacity === '0.6')
-  ok(document.getElementsByClassName('ic-DashboardCard__header-button-bg')[0].style.opacity === '0')
+  strictEqual(document.getElementsByClassName('ic-DashboardCard__header_hero')[0].style.opacity, '0.6')
+  strictEqual(document.getElementsByClassName('ic-DashboardCard__header-button-bg')[0].style.opacity, '0')
 });

@@ -63,7 +63,7 @@ table.table {
   // left align the first column for student info tables
   &.left-first {
     th:first-child, td:first-child {
-      text-align: left;
+      text-align: direction(left);
     }
   }
 }
@@ -77,9 +77,9 @@ table.table {
 
 // Force labels for dropdowns to align left on small screens
 .text-right-responsive {
-  text-align: right;
+  text-align: direction(right);
   @media screen and (max-width: 1143px) {
-    text-align: left;
+    text-align: direction(left);
   }
 }
 

@@ -76,6 +76,7 @@ it('notifies the UI to perform dynamic updates', () => {
     {lifecycleExperimental: true}); // so componentDidUpdate gets called on setProps
   wrapper.setProps({isLoading: false});
   expect(mockUpdate).toHaveBeenCalledTimes(1);
+  expect(mockUpdate).toHaveBeenCalledWith(0);
 });
 
 it('shows new activity button when new activity is indicated', () => {

@@ -1,3 +1,5 @@
+@import 'base/environment';
+
 // these are the styles for the  Add people dialog
 .addpeople {
   .addpeople__peoplesearch {
@@ -14,7 +16,7 @@
         justify-content: center;
       }
       .peoplesearch__selection {
-        text-align: left;
+        text-align: direction(left);
         margin: 0 1em;
         flex: 0 0 auto;
         width: 30%;

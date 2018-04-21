@@ -99,7 +99,7 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
 
 @mixin dashcardHeaderButton {
   position: absolute;
-  top: $ic-sp; right: $ic-sp;
+  top: $ic-sp; #{direction(right)}: $ic-sp;
   width: $ic-sp*3;
   height: $ic-sp*3;
   border-radius: 50%;
@@ -156,7 +156,7 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
   @include ic-badge-maker(18px, var(--ic-brand-primary), $ic-color-light);
   transition: all 0.2s;
   position: absolute;
-  top: -0.5rem; right: -0.875rem;
+  top: -0.5rem; #{direction(right)}: -0.875rem;
   z-index: 1; // when dashcard links get squished, don't cut off badges
 }
 
@@ -190,7 +190,7 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
 }
 
 .DashboardCardMenu__ColorPicker {
-  padding-left: 8px;
+  padding-#{direction(left)}: 8px;
 }
 
 .DashboardCardMenu__MovementItem {
@@ -199,6 +199,6 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
 }
 
 .DashboardCardMenu__MovementIcon {
-  margin-right: $ic-sp;
+  margin-#{direction(right)}: $ic-sp;
   font-size: $ic-font-size--large;
 }

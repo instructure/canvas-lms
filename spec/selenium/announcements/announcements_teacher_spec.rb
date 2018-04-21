@@ -34,7 +34,6 @@ describe "announcements" do
     end
 
     it "should allow saving of section announcement", test_id:3469728, priority: "1" do
-      @course.root_account.enable_feature!(:section_specific_announcements)
       @course.course_sections.create!(name: "Section 1")
       @course.course_sections.create!(name: "Section 2")
       AnnouncementNewEdit.visit_new(@course)
@@ -47,7 +46,6 @@ describe "announcements" do
     end
 
     it "should not allow empty sections", test_id:3469730, priority: "1" do
-      @course.root_account.enable_feature!(:section_specific_announcements)
       @course.course_sections.create!(name: "Section 1")
       @course.course_sections.create!(name: "Section 2")
       AnnouncementNewEdit.visit_new(@course)
@@ -72,7 +70,6 @@ describe "announcements" do
     context "section specific announcements" do
       before (:once) do
         course_with_teacher(active_course: true)
-        @course.account.set_feature_flag! :section_specific_announcements, 'on'
         @section = @course.course_sections.create!(name: 'test section')
 
         @announcement = @course.announcements.create!(:user => @teacher, message: 'hello my favorite section!')
@@ -93,78 +90,6 @@ describe "announcements" do
       end
     end
 
-    describe "shared bulk topics specs" do
-      let(:url) { "/courses/#{@course.id}/announcements/" }
-      let(:what_to_create) { Announcement }
-
-      before :once do
-        @context = @course
-        5.times do |i|
-          title = "new #{i.to_s.rjust(3, '0')}"
-          what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => title, :user => @user) : announcement_model(:title => title, :user => @user)
-        end
-      end
-
-      before :each do
-        get url
-        @checkboxes = ff('.toggleSelected')
-      end
-
-      it "should bulk delete topics", priority: "1", test_id: 220360 do
-        skip_if_safari(:alert)
-        5.times { |i| @checkboxes[i].click }
-        f('#delete').click
-        driver.switch_to.alert.accept
-        wait_for_ajax_requests
-        expect(f("#content")).not_to contain_css('.discussion-topic')
-        expect(what_to_create.where(:workflow_state => 'active').count).to eq 0
-      end
-
-      it "should bulk lock topics", priority: "1", test_id: 220361 do
-        5.times { |i| @checkboxes[i].click }
-        scroll_page_to_top # if we only scroll until it's in view, its tooltip can interfere with clicks
-        move_to_click('label[for=lock]')
-        wait_for_ajax_requests
-        #TODO: check the UI to make sure the topics have a locked symbol
-        expect(what_to_create.where(locked: true).count).to eq 5
-      end
-
-      it "should search by title", priority: "1", test_id: 150525 do
-        expected_text = 'hey there'
-        update_attributes_and_validate(:title, expected_text)
-      end
-
-      it "should search by body", priority: "1", test_id: 220358 do
-        body_text = 'new topic body'
-        update_attributes_and_validate(:message, body_text, 'topic')
-      end
-
-      it "should search by author", priority: "1", test_id: 220359 do
-        user_name = 'jake@instructure.com'
-        title = 'new one'
-        new_teacher = teacher_in_course(:course => @course, :active_all => true, :name => user_name)
-        what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => title, :user => new_teacher.user) : announcement_model(:title => title, :user => new_teacher.user)
-        refresh_and_filter(:string, 'jake', user_name)
-      end
-
-      it "should search an entire phrase" do
-        replace_content(f('#searchTerm'), 'new 001')
-        expect(ff('.discussionTopicIndexList .discussion-topic').count).to eq 1
-      end
-
-      it "should return multiple items in the search", priority: "1", test_id: 220362 do
-        new_title = 'updated'
-        what_to_create.first.update_attributes(:title => "#{new_title} first")
-        what_to_create.last.update_attributes(:title => "#{new_title} last")
-        refresh_and_filter(:string, new_title, new_title, 2)
-      end
-
-      it "should filter by unread", priority: "1", test_id: 220363 do
-        what_to_create.last.change_read_state('unread', @user)
-        refresh_and_filter(:css, '#discussionsFilter', 'new 004')
-      end
-    end
-
     describe "shared main page topics specs" do
       let(:url) { "/courses/#{@course.id}/announcements" }
       let(:new_url) { "/courses/#{@course.id}/discussion_topics/new?is_announcement=true" }
@@ -175,44 +100,10 @@ describe "announcements" do
         @context = @course
       end
 
-      it "should have a lock that appears and disappears when the cog menu is used to lock/unlock the announcement for comments", priority: "1", test_id: 220365 do
-        title = "My announcement"
-        announcement_model(:title => title, :user => @user)
-        get url
-
-        expect(f("#content")).not_to contain_css('.discussion-info-icons .icon-lock')
-        f('.discussion-actions .al-trigger').click
-        wait_for_ajaximations
-        f('.al-options li a.icon-lock').click
-        wait_for_ajaximations
-        expect(f('.discussion-info-icons .icon-lock')).not_to be_nil
-        f('.discussion-actions .al-trigger').click
-        wait_for_ajaximations
-        f('.al-options li a.icon-lock').click
-        wait_for_ajaximations
-        expect(f("#content")).not_to contain_css('.discussion-info-icons .icon-lock')
-      end
-
-      it "should remove an announcement when it is deleted from the delete option in the cog menu", priority: "1", test_id: 220364 do
-        skip_if_safari(:alert)
-        title = "My announcement"
-        announcement_model(:title => title, :user => @user)
-        get url
-
-        expect(f('.discussion-topic')).not_to be_nil
-        f('.discussion-actions .al-trigger').click
-        f('.al-options li a.icon-trash').click
-        alert_present?
-        alert = driver.switch_to.alert
-        expect(alert.text).to match "Are you sure you want to delete this announcement?"
-        alert.accept
-        expect(f("#content")).not_to contain_css('.discussion-topic')
-      end
-
       it "should start a new topic", priority: "1", test_id: 150528 do
         get url
 
-        expect_new_page_load { f('.btn-primary').click }
+        expect_new_page_load { f('#add_announcement').click }
         edit_announcement(@topic_title, 'new topic')
       end
 
@@ -244,7 +135,7 @@ describe "announcements" do
           what_to_create.last.update_attributes(:assignment => @course.assignments.create!(:name => 'graded topic assignment'))
         end
         get url
-        expect_new_page_load { f('.discussion-title').click }
+        expect_new_page_load { f('.ic-announcement-row h3').click }
         expect_new_page_load { f(".edit-btn").click }
 
         add_attachment_and_validate
@@ -257,19 +148,6 @@ describe "announcements" do
         expect_new_page_load { f(".edit-btn").click }
 
         edit_announcement(edit_name, 'edit message')
-      end
-
-      it "should delete a topic", priority: "1", test_id: 150526 do
-        skip_if_safari(:alert)
-        what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => @topic_title, :user => @user) : announcement_model(:title => @topic_title, :user => @user)
-        get url
-
-        f('.toggleSelected').click
-        f('#delete').click
-        driver.switch_to.alert.accept
-        wait_for_ajaximations
-        expect(what_to_create.last.workflow_state).to eq 'deleted'
-        expect(f("#content")).not_to contain_css('.discussionTopicIndexList')
       end
     end
 
@@ -307,36 +185,6 @@ describe "announcements" do
       expect(f('.discussion-fyi')).to include_text(time_new)
     end
 
-    it "should add and remove an external feed to announcements", priority: "1", test_id: 220370 do
-      get "/courses/#{@course.id}/announcements"
-
-      #add external feed to announcements
-      feed_name = 'http://www.google.com'
-
-      f(".add_external_feed_link").click
-      wait_for_ajaximations
-      expect(f("#external_feed_url")).to be_displayed
-      f('#external_feed_url').send_keys(feed_name)
-
-      f('#external_feed_enable_header_match').click
-      wait_for_ajaximations
-      expect(f('#external_feed_header_match')).to be_displayed
-      f('#external_feed_header_match').send_keys('blah')
-
-      expect {
-        submit_form(f('#add_external_feed_form'))
-        wait_for_ajaximations
-      }.to change(ExternalFeed, :count).by(1)
-
-      #delete external feed
-      expect(f(".external_feed")).to include_text('feed')
-      expect {
-        f('.external_feed .close').click
-        wait_for_ajax_requests
-        expect(f("#content")).not_to contain_css('.external_feed')
-      }.to change(ExternalFeed, :count).by(-1)
-    end
-
     it "should remove delayed_post_at when unchecking delay_posting", priority: "1", test_id: 220371 do
       topic = @course.announcements.create!(:title => @topic_title, :user => @user, :delayed_post_at => 10.days.ago, :message => "message")
       get "/courses/#{@course.id}/announcements/#{topic.id}"
@@ -365,8 +213,8 @@ describe "announcements" do
       enter_student_view
       get "/courses/#{@course.id}/announcements"
 
-      announcement = f('.discussionTopicIndexList .discussion-topic')
-      expect(announcement.find_element(:css, '.discussion-summary')).to include_text(@announcement.message)
+      announcement = f('.ic-announcement-row')
+      expect(announcement.find_element(:css, '.ic-announcement-row__content')).to include_text(@announcement.message)
     end
 
     it "should always see student replies when 'initial post required' is turned on", priority: "1", test_id: 150524 do

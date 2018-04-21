@@ -109,15 +109,12 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def feature_must_be_enabled_for_section_specific
-    return true unless self.is_section_specific
+    return true unless self.is_section_specific && !self.is_announcement
 
-    if self.is_announcement && !self.context.root_account.feature_enabled?(:section_specific_announcements)
-      self.errors.add(:is_section_specific, t("Section-specific announcements are disabled"))
-    elsif !self.is_announcement && !self.context.root_account.feature_enabled?(:section_specific_discussions)
-      self.errors.add(:is_section_specific, t("Section-specific discussions are disabled"))
-    else
-      true
+    if !self.context.root_account.feature_enabled?(:section_specific_discussions)
+      return self.errors.add(:is_section_specific, t("Section-specific discussions are disabled"))
     end
+    return true
   end
 
   def only_course_topics_can_be_section_specific
@@ -202,7 +199,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def update_materialized_view_if_changed
-    if self.sort_by_rating_changed?
+    if self.saved_change_to_sort_by_rating?
       update_materialized_view
     end
   end
@@ -220,7 +217,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def update_subtopics
-    if !self.deleted? && (self.has_group_category? || !!self.group_category_id_was)
+    if !self.deleted? && (self.has_group_category? || !!self.group_category_id_before_last_save)
       send_later_if_production :refresh_subtopics
     end
   end
@@ -277,7 +274,7 @@ class DiscussionTopic < ActiveRecord::Base
       self.sync_assignment
       self.assignment.workflow_state = "published" if is_announcement && deleted_assignment
       self.assignment.description = self.message
-      if group_category_id_changed?
+      if saved_change_to_group_category_id?
         self.assignment.validate_assignment_overrides(force_override_destroy: true)
       end
       self.assignment.save
@@ -287,7 +284,7 @@ class DiscussionTopic < ActiveRecord::Base
     # ungraded to graded, or from one assignment to another; we ignore the
     # transition from graded to ungraded) we acknowledge that the users that
     # have posted have contributed to the topic
-    if self.assignment_id && self.assignment_id_changed?
+    if self.assignment_id && self.saved_change_to_assignment_id?
       recalculate_context_module_actions!
     end
   end
@@ -331,7 +328,9 @@ class DiscussionTopic < ActiveRecord::Base
 
   def update_materialized_view
     # kick off building of the view
-    DiscussionTopic::MaterializedView.for(self).update_materialized_view(xlog_location: self.class.current_xlog_location)
+    self.class.connection.after_transaction_commit do
+      DiscussionTopic::MaterializedView.for(self).update_materialized_view(xlog_location: self.class.current_xlog_location)
+    end
   end
 
   def group_category_deleted_with_entries?
@@ -386,6 +385,14 @@ class DiscussionTopic < ActiveRecord::Base
     copy_title =
       opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"), self.title)
     result = self.duplicate_base_model(copy_title, opts_with_default)
+
+    # Start with a position guaranteed to not conflict with existing ones.
+    # Clients are encouraged to set the correct position later on and do
+    # an insert_at upon save.
+
+    if self.pinned
+      result.position = self.context.discussion_topics.active.where(:pinned => true).maximum(:position) + 1
+    end
 
     if self.assignment && opts_with_default[:duplicate_assignment]
       result.assignment = self.assignment.duplicate({
@@ -863,7 +870,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   on_update_send_to_streams do
     check_state = !is_announcement ? 'unpublished' : 'post_delayed'
-    became_active = workflow_state_was == check_state && workflow_state == 'active'
+    became_active = workflow_state_before_last_save == check_state && workflow_state == 'active'
     if should_send_to_stream && (@content_changed || became_active)
       self.active_participants_with_visibility
     end
@@ -1126,14 +1133,13 @@ class DiscussionTopic < ActiveRecord::Base
     non_nil_users = users.compact
     section_ids = DiscussionTopicSectionVisibility.active.where(:discussion_topic_id => self.id).
       pluck(:course_section_id)
-    user_ids = non_nil_users.map(&:id)
+    user_ids = non_nil_users.pluck(:id)
     # Context is known to be a course here
-    users_in_sections = Enrollment.select(:user_id).active.where(:course_id => self.context_id,
-      :course_section_id => section_ids, :user_id => user_ids).map(&:user_id).to_set
-    unlocked_teachers = Enrollment.select(:user_id).active.instructor.
-      where(:course_id => self.context_id, :limit_privileges_to_course_section => false,
-        :user_id => user_ids).
-      map(&:user_id).to_set
+    users_in_sections = self.context.enrollments.active.
+      where(:user_id => user_ids, :course_section_id => section_ids).pluck(:user_id).to_set
+    unlocked_teachers = self.context.enrollments.active.instructor.
+      where(:limit_privileges_to_course_section => false, :user_id => user_ids).
+      pluck(:user_id).to_set
     permitted_user_ids = users_in_sections.union(unlocked_teachers)
     return non_nil_users.select { |u| permitted_user_ids.include?(u.id) }
   end

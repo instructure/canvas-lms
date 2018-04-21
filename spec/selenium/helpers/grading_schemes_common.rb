@@ -24,12 +24,14 @@ module GradingSchemesCommon
 
   def simple_grading_standard(context)
     @standard = context.grading_standards.create!(
-      :title => "My Grading Standard",
-      :standard_data => {
-        "scheme_0" => {:name => "A", :value => "90"},
-        "scheme_1" => {:name => "B", :value => "80"},
-        "scheme_2" => {:name => "C", :value => "70"}
-    })
+      title: "My Grading Standard",
+      standard_data: {
+        "scheme_0" => { name: "A", value: "90" },
+        "scheme_1" => { name: "B", value: "80" },
+        "scheme_2" => { name: "C", value: "70" },
+        "scheme_3" => { name: "D", value: "0" }
+      }
+    )
   end
 
   def should_add_a_grading_scheme(options = {name: "new grading standard"})

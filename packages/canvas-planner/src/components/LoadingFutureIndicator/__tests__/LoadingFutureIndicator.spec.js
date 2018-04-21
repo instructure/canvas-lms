@@ -34,23 +34,7 @@ it('renders all future items loaded regardless of other props', () => {
   expect(wrapper).toMatchSnapshot();
 });
 
-it('invokes the callback when the waypoint is triggered', () => {
-  const mockLoad = jest.fn();
-  const activeFunc = () => {return true;};
-  const wrapper = shallow(<LoadingFutureIndicator onLoadMore={mockLoad} plannerActive={activeFunc} />);
-  wrapper.instance().handleWaypoint();
-  expect(mockLoad).toHaveBeenCalledWith();
-});
-
-it('does not invoke the callback when the waypoint is triggered, but the planner is not active', () => {
-  const mockLoad = jest.fn();
-  const activeFunc = () => {return false;};
-  const wrapper = shallow(<LoadingFutureIndicator onLoadMore={mockLoad} plannerActive={activeFunc} />);
-  wrapper.instance().handleWaypoint();
-  expect(mockLoad.mock.calls.length).toBe(0);
-});
-
-it('invokes the callback when loading more button is clicked', () => {
+it('invokes the callback when the load more button is clicked', () => {
   const mockLoad = jest.fn();
   const wrapper = shallow(<LoadingFutureIndicator onLoadMore={mockLoad} />);
   wrapper.find('Button').simulate('click');

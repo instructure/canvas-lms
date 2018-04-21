@@ -130,6 +130,7 @@ describe "admin avatars" do
     end
 
     it "should display student avatar in tray", priority: "1", test_id: 3299466 do
+      skip_if_chrome('fragile in chrome')
       get("/courses/#{@course.id}/gradebook")
       f("a[data-student_id='#{@student.id}']").click
       expect(f(".StudentContextTray__Avatar a span")).to have_attribute('style', /http/)

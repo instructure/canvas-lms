@@ -19,3 +19,14 @@
 export function reorderDiscussionsURL ({ contextType, contextId }) {
   return `/api/v1/${contextType}s/${contextId}/discussion_topics/reorder`
 }
+
+export function setSortableId(discussions) {
+  let pinnedDiscussion = false
+  for( let i = 0; i < discussions.length; i++) {
+    if(discussions[i].pinned) {
+      pinnedDiscussion = true
+      break;
+    }
+  }
+  return !pinnedDiscussion ? discussions : discussions.map((discussion, index) => ({...discussion, sortableId: index}))
+}

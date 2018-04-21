@@ -98,7 +98,7 @@
 .alert .close {
   position: relative;
   top: -2px;
-  right: -21px;
+  #{direction(right)}: -21px;
   line-height: $baseLineHeight;
 }
 
@@ -152,7 +152,7 @@
 
   .close_link {
     position: absolute;
-    right: $ic-sp/3;
+    #{direction(right)}: $ic-sp/3;
     top: 50%;
     margin-top: -12px;
     text-decoration: none;
@@ -165,7 +165,7 @@
   .ic-flash__icon {
     position: absolute;
     top: 0;
-    left: 0;
+    #{direction(left)}: 0;
     width: $ic-sp*3;
     height: 100%;
     display: flex;
@@ -176,7 +176,7 @@
     i[class*=icon-],
     i[class^=icon-] {
       &:before {
-        left: -1px; // account for left border, so icon looks centered
+        #{direction(left)}: -1px; // account for left border, so icon looks centered
       }
     }
 
@@ -248,7 +248,7 @@ a.Button--flash {
   &:after {
     content: "";
     position: fixed;
-    top: 0; left: 0;
+    top: 0; #{direction(left)}: 0;
     width: 100%;
     height: 3px;
     background: $ic-color-action;
@@ -263,18 +263,18 @@ a.Button--flash {
 // left and right border, making Canvas appear as if
 // it is inside a frame.
 body.is-masquerading-or-student-view {
-  border-right: 3px solid $ic-color-action;
-  .ic-app-header { border-left: 3px solid $ic-color-action; }
+  border-#{direction(right)}: 3px solid $ic-color-action;
+  .ic-app-header { border-#{direction(left)}: 3px solid $ic-color-action; }
 }
 
 .ic-alert-masquerade-student-view-module {
   flex: 1;
   padding: 0 $ic-sp/2;
-  &:first-of-type { padding-left: 0; }
+  &:first-of-type { padding-#{direction(left)}: 0; }
   &:last-of-type {
-    padding-right: 0;
+    padding-#{direction(right)}: 0;
     &.ic-alert-masquerade-student-view-module--buttons {
-      text-align: right;
+      text-align: direction(right);
     }
   }
   &.ic-alert-masquerade-student-view-module--header {
@@ -316,8 +316,8 @@ $ic-notification-border-thickness: 2px;
     }
     .ic-notification__message { flex: 1; }
     .ic-notification__actions {
-      margin-left: $ic-sp*2;
-      @include breakpoint(desktop) { margin-left: $ic-sp*3; }
+      margin-#{direction(left)}: $ic-sp*2;
+      @include breakpoint(desktop) { margin-#{direction(left)}: $ic-sp*3; }
     }
     .ic-notification__title {
       display: block;
@@ -334,8 +334,8 @@ $ic-notification-border-thickness: 2px;
   display: flex;
   justify-content: center;
   align-items: center;
-  border-top-left-radius: ($baseBorderRadius - $ic-notification-border-thickness);
-  border-bottom-left-radius: ($baseBorderRadius - $ic-notification-border-thickness);
+  border-top-#{direction(left)}-radius: ($baseBorderRadius - $ic-notification-border-thickness);
+  border-bottom-#{direction(left)}-radius: ($baseBorderRadius - $ic-notification-border-thickness);
   box-sizing: border-box;
   @include overwrite-default-icon-size($ic-notification-icon-size);
   i[class*=icon-], i[class^=icon-] {
@@ -345,7 +345,7 @@ $ic-notification-border-thickness: 2px;
 }
 
 .ic-notification__title {
-  margin-right: $ic-sp/3;
+  margin-#{direction(right)}: $ic-sp/3;
   @include fontSize($ic-font-size--small);
   display: inline;
   font-weight: bold;
@@ -370,7 +370,7 @@ $ic-notification-border-thickness: 2px;
 
 .ic-notification__admin-actions {
   position: absolute;
-  right: $ic-sp;
+  #{direction(right)}: $ic-sp;
   top: $ic-sp;
 }
 
@@ -380,6 +380,6 @@ $ic-notification-border-thickness: 2px;
 
 .notification_account_content_text {
   font-size: 0.8em;
-  padding-left: 12px;
+  padding-#{direction(left)}: 12px;
   line-height: 22px;
 }

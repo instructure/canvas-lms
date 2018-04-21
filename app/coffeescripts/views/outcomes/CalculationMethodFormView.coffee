@@ -37,6 +37,7 @@ define [
     afterRender: ->
       if @hadFocus
         @$calculation_int.focus().val(@$calculation_int.val())
+        @$calculation_int[0].selectionStart = @selectionStart
       @hadFocus = undefined
 
     attach: ->
@@ -71,6 +72,8 @@ define [
     render: ->
       @hadFocus = !_.isEmpty(@$calculation_int) and
         document.activeElement is @$calculation_int[0]
+      if @hadFocus
+        @selectionStart = document.activeElement.selectionStart
       @undelegateEvents()
       super
       @delegateEvents()

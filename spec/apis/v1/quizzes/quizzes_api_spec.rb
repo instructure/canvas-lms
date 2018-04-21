@@ -1,5 +1,5 @@
-
-# Copyright (C) 2012 Instructure, Inc.
+#
+# Copyright (C) 2012 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -820,6 +820,12 @@ describe Quizzes::QuizzesApiController, type: :request do
           @quiz = create_quiz(due_at: 7.days.from_now)
           call_update({ due_at: due_date }, 200)
           expect(@quiz.reload.due_at).to eq due_date
+        end
+
+        it "allows dates within the same minute to be considered equal" do
+          quiz_params = {due_at: 'Sun, 18 Mar 2018', lock_at: 'Sun, 18 Mar 2018', unlock_at: 'Fri, 16 Mar 2018', quiz_type: 'assignment'}
+          api_params = {due_at: '2018-03-27 23:59:59 ', lock_at: '2018-03-27 23:59:00'}
+          api_update_quiz(quiz_params, api_params, expected_status: 200)
         end
 
         it "allows changing the due date when the quiz is only visible to overrides" do

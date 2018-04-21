@@ -42,7 +42,7 @@ module WikiAndTinyCommon
 
     f("#{form} .file_name").send_keys(path)
     wait_for_ajaximations
-    f("#{form} button").click
+    f("#{form}").submit
     expect(f("body")).not_to contain_jqcss("#{form}:visible")
   end
 

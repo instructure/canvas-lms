@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@import 'base/environment';
+
 //mathquill.scss is just the stock mathquill.css file that comes with the
 //javascript library.  we had to rename it to be an scss file because
 //sass can only import sass/scss files.
@@ -45,7 +47,7 @@ div.math-dialog > span {
   // it and the buttonpane
   margin-bottom: -5px;
   min-height: 247px;
-  margin-left: 5px;
+  margin-#{direction(left)}: 5px;
   width: 96%;
 }
 
@@ -90,8 +92,8 @@ div.math-dialog > span {
 }
 
 .math-toggle {
-  text-align: right;
-  padding-right: 10px;
+  text-align: direction(right);
+  padding-#{direction(right)}: 10px;
 }
 
 #mathquill-view, #mathjax-view {

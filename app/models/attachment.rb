@@ -714,7 +714,9 @@ class Attachment < ActiveRecord::Base
         copy_access_attributes!(atts)
         atts.each do |a|
           # update content tags to refer to the new file
-          ContentTag.where(:content_id => a, :content_type => 'Attachment').update_all(content_id: self.id)
+          if ContentTag.where(:content_id => a, :content_type => 'Attachment').update_all(content_id: self.id, updated_at: Time.now.utc) > 0
+            ContextModule.where(:id => ContentTag.where(:content_id => self.id, :content_type => 'Attachment').select(:context_module_id)).touch_all
+          end
           # update replacement pointers pointing at the overwritten file
           context.attachments.where(:replacement_attachment_id => a).update_all(replacement_attachment_id: self.id)
           # delete the overwritten file (unless the caller is queueing them up)
@@ -1334,7 +1336,10 @@ class Attachment < ActiveRecord::Base
     att.send_to_purgatory(deleted_by_user)
     att.destroy_content
     att.thumbnail&.destroy
-    att.uploaded_data = File.open Rails.root.join('public', 'file_removed', 'file_removed.pdf')
+    file_removed_file = File.open Rails.root.join('public', 'file_removed', 'file_removed.pdf')
+    # TODO set the instfs_uuid of the attachment to a single "file removed" file to avoid
+    # upload the same file over and over. This instfs_uuid should be retrieved from the inst-fs services
+    Attachments::Storage.store_for_attachment(att, file_removed_file)
     CrocodocDocument.where(attachment_id: att.children_and_self.select(:id)).delete_all
     Canvadoc.where(attachment_id: att.children_and_self.select(:id)).delete_all
     att.save!
@@ -1398,7 +1403,11 @@ class Attachment < ActiveRecord::Base
   def destroy_content
     raise 'must be a root_attachment' if self.root_attachment_id
     return unless self.filename
-    if Attachment.s3_storage?
+    if instfs_hosted?
+      self.instfs_uuid = nil
+      # TODO: once inst-fs has a delete method, call here
+      # for now these objects will be orphaned
+    elsif Attachment.s3_storage?
       self.s3object.delete unless ApplicationController.try(:test_cluster?)
     else
       FileUtils.rm full_filename
@@ -1440,7 +1449,11 @@ class Attachment < ActiveRecord::Base
       old_content_type = self.content_type
       scope = Attachment.where(:md5 => self.md5, :namespace => self.namespace, :root_attachment_id => nil)
       scope.update_all(:content_type => "invalid/invalid") # prevents find_existing_attachment_for_md5 from reattaching the child to the old root
-      destination.uploaded_data = open
+
+      # TODO when RECNVS-323 is complete, branch here to call an inst-fs
+      # copy method to avoid sending object when it is not necessary
+      Attachments::Storage.store_for_attachment(destination, open)
+
       scope.where.not(:id => destination).update_all(:content_type => old_content_type)
     end
     destination.save!
@@ -1843,7 +1856,7 @@ class Attachment < ActiveRecord::Base
         tmpfile.rewind
         attachment = opts[:attachment] || Attachment.new(:filename => File.basename(uri.path))
         attachment.filename ||= File.basename(uri.path)
-        attachment.uploaded_data = tmpfile
+        Attachments::Storage.store_for_attachment(attachment, tmpfile)
         if attachment.content_type.blank? || attachment.content_type == "unknown/unknown"
           # uploaded_data= clobbers the content_type set in preflight; if it was given, prefer it to the HTTP response
           attachment.content_type = if attachment.content_type_was.present? && attachment.content_type_was != 'unknown/unknown'
@@ -1893,7 +1906,7 @@ class Attachment < ActiveRecord::Base
             new_attachment.root_attachment = existing_attachment
           else
             new_attachment.write_attribute(:filename, attachment.filename)
-            new_attachment.uploaded_data = attachment.open
+            Attachments::Storage.store_for_attachment(new_attachment, attachment.open)
           end
 
           new_attachment.content_type = attachment.content_type

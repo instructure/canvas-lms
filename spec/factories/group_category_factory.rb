@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Factories
-  VALID_GROUP_CATEGORY_ATTRIBUTES = [:name, :context, :group_limit]
+  VALID_GROUP_CATEGORY_ATTRIBUTES = [:name, :context, :group_limit, :sis_source_id]
 
   def group_category(opts = {})
     opts[:name] = opts[:name].present? ? opts[:name] : 'foo'

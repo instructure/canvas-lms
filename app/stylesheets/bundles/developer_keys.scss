@@ -18,6 +18,10 @@
 
 @import "base/environment";
 
+.center-content {
+  text-align: center;
+}
+
 #keys {
   tr:hover {
     td {
@@ -32,12 +36,12 @@
     }
   }
   td {
-    &.icon_react a {
-      margin-right: 5px;
-      margin-bottom: 3px;
-    }
     &.icon_react {
-      min-width: 90px;
+      min-width: 87px;
+      a {
+        margin-right: 5px;
+        margin-bottom: 3px;
+      }
     }
     span.name {
       font-weight: bold;
@@ -58,9 +62,9 @@
       height: $ic-sp * 3;
       border: 1px solid $ic-border-color;
       padding: 2px;
-      margin-right: $ic-sp / 2;
+      margin-#{direction(right)}: $ic-sp / 2;
       vertical-align: middle;
-      float: left;
+      float: direction(left);
     }
     .details {
       max-width: 200px;
@@ -102,4 +106,3 @@
     padding: 3px 2px;
   }
 }
-

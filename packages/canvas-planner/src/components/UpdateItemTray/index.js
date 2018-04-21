@@ -30,15 +30,13 @@ import TextArea from '@instructure/ui-core/lib/components/TextArea';
 import DateInput from '@instructure/ui-core/lib/components/DateInput';
 import moment from 'moment-timezone';
 
+import { courseShape } from '../plannerPropTypes';
 import styles from './styles.css';
 import theme from './theme.js';
 
 export class UpdateItemTray extends Component {
   static propTypes = {
-    courses: PropTypes.arrayOf(PropTypes.shape({
-      id: PropTypes.string,
-      longName: PropTypes.string,
-    })).isRequired,
+    courses: PropTypes.arrayOf(PropTypes.shape(courseShape)).isRequired,
     noteItem: PropTypes.object,
     onSavePlannerItem: PropTypes.func.isRequired,
     onDeletePlannerItem: PropTypes.func.isRequired,

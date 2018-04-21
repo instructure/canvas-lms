@@ -18,64 +18,85 @@
 
 import QuizFormulaSolution from 'quiz_formula_solution'
 
-QUnit.module('QuizForumlaSolution', {
-  setup() {},
-  teardown() {}
+QUnit.module('QuizFormulaSolution', () => {
+  test('sets .result to the given formula', () => {
+    const solution = new QuizFormulaSolution('= 0')
+    equal(solution.result, '= 0')
+  })
+
+  QUnit.module('#rawText()', () => {
+    function checkText(input, expected) {
+      const solution = new QuizFormulaSolution(input)
+      equal(solution.rawText(), expected)
+    }
+
+    test('returns the right-hand side of the formula', () => {
+      checkText('= 0', '0')
+      checkText('= 2.5', '2.5')
+      checkText('= 17', '17')
+      checkText('= -25.12', '-25.12')
+      checkText('= 1000000000.45', '1000000000.45')
+    })
+  })
+
+  QUnit.module('#rawValue()', () => {
+    function checkValue(input, expected) {
+      const solution = new QuizFormulaSolution(input)
+      equal(solution.rawValue(), expected)
+    }
+
+    test('returns the numeric form of the right-hand side of the formula', () => {
+      checkValue('= 0', 0)
+      checkValue('= 2.5', 2.5)
+      checkValue('= 17', 17)
+      checkValue('= -25.12', -25.12)
+      checkValue('= 1000000000.45', 1000000000.45)
+    })
+
+    test('returns NaN for non-numeric text', () => {
+      const solution = new QuizFormulaSolution('= NotReallyValuable')
+      ok(Number.isNaN(solution.rawValue()))
+    })
+
+    test('returns NaN for null', () => {
+      const solution = new QuizFormulaSolution(null)
+      ok(Number.isNaN(solution.rawValue()))
+    })
+
+    test('returns NaN for undefined', () => {
+      const solution = new QuizFormulaSolution(undefined)
+      ok(Number.isNaN(solution.rawValue()))
+    })
+  })
+
+  QUnit.module('#isValid()', () => {
+    function checkSolutionValidity(input, validity) {
+      const solution = new QuizFormulaSolution(input)
+      equal(solution.isValid(), validity)
+    }
+
+    test('returns true for decimals', () => {
+      checkSolutionValidity('= 2.5', true)
+    })
+
+    test('returns true for 0', () => {
+      checkSolutionValidity('= 0', true)
+    })
+
+    test('returns false for formulas not starting with =', () => {
+      checkSolutionValidity('0', false)
+    })
+
+    test('returns false for NaN', () => {
+      checkSolutionValidity('= NaN', false)
+    })
+
+    test('returns false for Infinity', () => {
+      checkSolutionValidity('= Infinity', false)
+    })
+
+    test('returns false for non-numeric text', () => {
+      checkSolutionValidity('= ABCDE', false)
+    })
+  })
 })
-
-test('constructor: property setting', () => {
-  const solution = new QuizFormulaSolution('= 0')
-  equal(solution.result, '= 0')
-})
-const checkValue = function(input, expected) {
-  const solution = new QuizFormulaSolution(input)
-  equal(solution.rawValue(), expected)
-}
-const checkText = function(input, expected) {
-  const solution = new QuizFormulaSolution(input)
-  equal(solution.rawText(), expected)
-}
-test('can parse out raw values', () => {
-  checkValue('= 0', 0)
-  checkValue('= 2.5', 2.5)
-  checkValue('= 17', 17)
-  checkValue('= -25.12', -25.12)
-  return checkValue('= 1000000000.45', 1000000000.45)
-})
-
-test('parsing out text of value', () => {
-  checkText('= 0', '0')
-  checkText('= 2.5', '2.5')
-  checkText('= 17', '17')
-  checkText('= -25.12', '-25.12')
-  return checkText('= 1000000000.45', '1000000000.45')
-})
-
-test('parses bad numbers effectively', () => {
-  let solution = new QuizFormulaSolution('= NotReallyValuable')
-  ok(isNaN(solution.rawValue()))
-  solution = new QuizFormulaSolution(null)
-  ok(isNaN(solution.rawValue()))
-  solution = new QuizFormulaSolution(undefined)
-  ok(isNaN(solution.rawValue()))
-})
-
-QUnit.module('QuizForumlaSolution#isValid', {
-  setup() {},
-  teardown() {}
-})
-const checkSolutionValidity = function(input, validity) {
-  const solution = new QuizFormulaSolution(input)
-  equal(solution.isValid(), validity)
-}
-test('false without starting with =', () => checkSolutionValidity('0', false))
-
-test('false if NaN', () => checkSolutionValidity('= NaN', false))
-
-test('false if Infinity', () => checkSolutionValidity('= Infinity', false))
-
-test('false if not a number', () => checkSolutionValidity('= ABCDE', false))
-
-test('true for valid number', () => checkSolutionValidity('= 2.5', true))
-
-test('true for 0', () => checkSolutionValidity('= 0', true))

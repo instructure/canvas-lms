@@ -144,7 +144,7 @@
 #           "type": "datetime"
 #         },
 #         "workflow_state": {
-#           "description": "The current state of the SIS import. - 'created': The SIS import has been created.\n - 'importing': The SIS import is currently processing.\n - 'cleanup_batch': The SIS import is currently cleaning up courses, sections, and enrollments not included in the batch for batch_mode imports.\n - 'imported': The SIS import has completed successfully.\n - 'imported_with_messages': The SIS import completed with errors or warnings.\n - 'failed_with_messages': The SIS import failed with errors.\n - 'failed': The SIS import failed.",
+#           "description": "The current state of the SIS import.\n - 'created': The SIS import has been created.\n - 'importing': The SIS import is currently processing.\n - 'cleanup_batch': The SIS import is currently cleaning up courses, sections, and enrollments not included in the batch for batch_mode imports.\n - 'imported': The SIS import has completed successfully.\n - 'imported_with_messages': The SIS import completed with errors or warnings.\n - 'aborted': The SIS import was aborted.\n - 'failed_with_messages': The SIS import failed with errors.\n - 'failed': The SIS import failed.",
 #           "example": "imported",
 #           "type": "string",
 #           "allowableValues": {
@@ -207,6 +207,11 @@
 #         },
 #         "multi_term_batch_mode": {
 #           "description": "Enables batch mode against all terms in term file. Requires change_threshold to be set.",
+#           "example": "false",
+#           "type": "boolean"
+#         },
+#         "skip_deletes": {
+#           "description": "When set the import will skip any deletes.",
 #           "example": "false",
 #           "type": "boolean"
 #         },
@@ -336,6 +341,10 @@ class SisImportsApiController < ApplicationController
   # @argument multi_term_batch_mode [Boolean]
   #   Runs batch mode against all terms in terms file. Requires change_threshold.
   #
+  # @argument skip_deletes [Boolean]
+  #   When set the import will skip any deletes. This does not account for
+  #   objects that are deleted during the batch mode cleanup process.
+  #
   # @argument override_sis_stickiness [Boolean]
   #   Many fields on records in Canvas can be marked "sticky," which means that
   #   when something changes in the UI apart from the SIS, that field gets
@@ -463,6 +472,8 @@ class SisImportsApiController < ApplicationController
           batch.enable_diffing(params[:diffing_data_set_identifier],
                                remaster: value_to_boolean(params[:diffing_remaster_data_set]))
         end
+
+        batch.options[:skip_deletes] = value_to_boolean(params[:skip_deletes])
 
         if value_to_boolean(params[:override_sis_stickiness])
           batch.options[:override_sis_stickiness] = true

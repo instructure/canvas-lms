@@ -7,20 +7,20 @@
 
 // Make wrapper ul behave like the grid
 .thumbnails {
-  margin-left: -$gridGutterWidth;
+  margin-#{direction(left)}: -$gridGutterWidth;
   list-style: none;
   @include clearfix();
 }
 // Fluid rows have no left margin
 .row-fluid .thumbnails {
-  margin-left: 0;
+  margin-#{direction(left)}: 0;
 }
 
 // Float li to make thumbnails appear in a row
 .thumbnails > li {
-  float: left; // Explicity set the float since we don't require .span* classes
+  float: direction(left); // Explicity set the float since we don't require .span* classes
   margin-bottom: $baseLineHeight;
-  margin-left: $gridGutterWidth;
+  margin-#{direction(left)}: $gridGutterWidth;
 }
 
 // The actual thumbnail (can be `a` or `div`)
@@ -43,8 +43,8 @@ a.thumbnail:hover {
 .thumbnail > img {
   display: block;
   max-width: 100%;
-  margin-left: auto;
-  margin-right: auto;
+  margin-#{direction(left)}: auto;
+  margin-#{direction(right)}: auto;
 }
 .thumbnail .caption {
   padding: 9px;

@@ -36,7 +36,7 @@
   display: none;
   position: absolute;
   top: 100%;
-  left: 0;
+  #{direction(left)}: 0;
   z-index: 999999;
   border: 1px solid $ic-border-light;
   background: $ic-color-light;
@@ -58,7 +58,7 @@
 }
 
 .ic-tokeninput-input {
-  padding-right: 20px;
+  padding-#{direction(right)}: 20px;
   width: 100%;
   -moz-box-sizing: border-box;
   -ms-box-sizing: border-box;
@@ -71,7 +71,7 @@
   cursor: default;
   outline: none;
   top: 2px;
-  right: 6px;
+  #{direction(right)}: 6px;
   @include fontSize($ic-font-size--small);
   cursor: default;
 }
@@ -99,17 +99,17 @@
 .ic-tokeninput-selected:before {
   content: '✓';
   position: absolute;
-  left: 4px;
+  #{direction(left)}: 4px;
 }
 
 .token-input-wrapper{
   width: 204px;
   min-height: 50px;
-  float: left;
+  float: direction(left);
 }
 
 .ic-tokens {
-  margin-left: 5px;
+  margin-#{direction(left)}: 5px;
   flex-wrap: wrap;
   z-index: 1;
   list-style: none;
@@ -182,13 +182,13 @@ $ic-token-padding: 3px 15px;
   a.browser {
     position: absolute;
     top: $ic-sp/2;
-    right: $ic-sp/2;
+    #{direction(right)}: $ic-sp/2;
     cursor: pointer;
-    text-align: right;
+    text-align: direction(right);
   }
 
   > span {
-    float: left;
+    float: direction(left);
     color: $ic-color-medium-lighter;
     padding: $contentBoxPadding/2;
   }
@@ -199,7 +199,7 @@ $ic-token-padding: 3px 15px;
   }
 
   &.browsable > div {
-    padding-right: 20px;
+    padding-#{direction(right)}: 20px;
   }
 
   ul {
@@ -233,7 +233,7 @@ $ic-token-padding: 3px 15px;
 
   input {
     box-shadow: none;
-    float: left;
+    float: direction(left);
     border: 0;
     outline: none;
     padding: $contentBoxPadding;

@@ -77,7 +77,7 @@ describe SisBatch do
   end
 
   it 'should make parallel importers' do
-    @account.enable_feature!(:sis_imports_refactor)
+    @account.enable_feature!(:refactor_of_sis_imports)
     batch = process_csv_data([%{user_id,login_id,status
                                 user_1,user_1,active},
                               %{course_id,short_name,long_name,term_id,status
@@ -101,8 +101,8 @@ describe SisBatch do
 
   describe "parallel imports" do
     it "should do cool stuff" do
-      PluginSetting.create!(:name => 'sis_import', :settings => {:minimum_rows_for_parallel => 2})
-      @account.enable_feature!(:sis_imports_refactor)
+      PluginSetting.create!(name: 'sis_import', settings: {parallelism: '12'})
+      @account.enable_feature!(:refactor_of_sis_imports)
       batch = process_csv_data([
         %{user_id,login_id,status
           user_1,user_1,active
@@ -114,13 +114,20 @@ describe SisBatch do
           course_3,course_3,course_3,term_1,active
           course_4,course_4,course_4,term_1,active}
       ])
+      expect(Setting.get("sis_parallel_import/#{@account.global_id}_num_strands", "1")).to eq '12'
       expect(batch.reload).to be_imported
-      expect(batch.parallel_importers.group(:importer_type).count).to eq({"course" => 2, "user" => 2})
+      expect(batch.parallel_importers.group(:importer_type).count).to eq({"course" => 1, "user" => 1})
       expect(batch.parallel_importers.order(:id).pluck(:importer_type, :rows_processed)).to eq [
-        ['course', 2], ['course', 2], ['user', 2], ['user', 1]
+        ['course', 4], ['user', 3]
       ]
       expect(Pseudonym.where(:sis_user_id => %w{user_1 user_2 user_3}).count).to eq 3
       expect(Course.where(:sis_source_id => %w{course_1 course_2 course_3 course_4}).count).to eq 4
+    end
+
+    it 'should set rows_for_parallel' do
+      expect(SisBatch.rows_for_parallel(10)).to eq 25
+      expect(SisBatch.rows_for_parallel(4_001)).to eq 41
+      expect(SisBatch.rows_for_parallel(400_000)).to eq 1_000
     end
   end
 
@@ -486,6 +493,44 @@ s2,test_1,section2,active},
       expect(@course.reload).to be_deleted
     end
 
+    it "should skip deletes if skip_deletes is set" do
+      process_csv_data(
+        [
+          %{user_id,login_id,status
+          user_1,user_1,active},
+          %{course_id,short_name,long_name,term_id,status
+          course_1,course_1,course_1,term_1,active},
+          %{section_id,course_id,name,status
+          section_1,course_1,section_1,active},
+          %{section_id,user_id,role,status
+          section_1,user_1,student,active}
+        ])
+      batch = create_csv_data(
+        [
+          %{user_id,login_id,status
+          user_1,user_1,deleted},
+          %{course_id,short_name,long_name,term_id,status
+          course_1,course_1,course_1,term_1,deleted},
+          %{section_id,course_id,name,status
+          section_1,course_1,section_1,deleted},
+          %{section_id,user_id,role,status
+          section_1,user_1,student,deleted}
+        ]) do |batch|
+        batch.options = {}
+        batch.batch_mode = true
+        batch.options[:skip_deletes] = true
+        batch.save!
+        batch.process_without_send_later
+        run_jobs
+      end
+      expect(batch.reload.workflow_state).to eq 'imported'
+      p = Pseudonym.where(sis_user_id: 'user_1').take
+      expect(p.workflow_state).to eq 'active'
+      expect(Course.where(sis_source_id: 'course_1').take.workflow_state).to eq 'claimed'
+      expect(CourseSection.where(sis_source_id: 'section_1').take.workflow_state).to eq 'active'
+      expect(Enrollment.where(user: p.user).take.workflow_state).to eq 'active'
+    end
+
     it "should treat crosslisted sections as belonging to their original course" do
       @term1 = @account.enrollment_terms.first
       @term2 = @account.enrollment_terms.create!(:name => 'term2')
@@ -521,14 +566,14 @@ s2,test_1,section2,active},
   context 'sis_import_feature on' do
     include_examples 'sis_import_feature'
     before do
-      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:sis_imports_refactor).and_return(true)
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:refactor_of_sis_imports).and_return(true)
     end
   end
 
   context 'sis_import_feature off' do
     include_examples 'sis_import_feature'
     before do
-      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:sis_imports_refactor).and_return(false)
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:refactor_of_sis_imports).and_return(false)
     end
   end
 
@@ -756,6 +801,27 @@ test_1,u1,student,active}
         expect(@e1.reload).to be_active
         expect(@e2.reload).to be_active
         expect(batch.sis_batch_errors.first.message).to eq "1 enrollments would be deleted and exceeds the set threshold of 20%"
+      end
+
+      it 'should not delete batch mode if skip_deletes is set' do
+        batch = create_csv_data(
+          [
+            %{course_id,short_name,long_name,account_id,term_id,status
+test_1,TC 101,Test Course 101,,term1,active},
+            %{course_id,user_id,role,status,section_id
+test_1,u1,student,active}
+          ]) do |batch|
+          batch.options = {}
+          batch.batch_mode = true
+          batch.options[:skip_deletes] = true
+          batch.save!
+          batch.process_without_send_later
+          run_jobs
+        end
+
+        expect(batch.workflow_state).to eq 'imported'
+        expect(@e1.reload).to be_active
+        expect(@e2.reload).to be_active
       end
 
       it 'should delete batch mode below threshold' do

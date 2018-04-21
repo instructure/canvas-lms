@@ -126,7 +126,7 @@ module LoginAndSessionMethods
 
   def displayed_username
     f('[aria-label="Global Navigation"] a[href="/profile"]').click
-    f('[aria-label="Global navigation tray"] h1').text
+    f('[aria-label="Global navigation tray"] h2').text
   end
 
 

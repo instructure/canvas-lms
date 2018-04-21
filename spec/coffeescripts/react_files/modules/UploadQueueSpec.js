@@ -58,18 +58,17 @@ test('Enqueues uploads, flush clears', function() {
   this.queue.attemptNextUpload = original
 })
 
-test('processes one upload at a time', function() {
-  expect(2)
+test('processes one upload at a time', function(assert) {
+  const done = assert.async()
   const original = this.queue.createUploader
   this.queue.createUploader = mockFileUploader
   this.queue.enqueue('foo')
   this.queue.enqueue('bar')
   this.queue.enqueue('baz')
   equal(this.queue.length(), 2) // first item starts, remainder are waiting
-  stop()
   window.setTimeout(() => {
-    start()
     equal(this.queue.length(), 1) // after two more ticks there is only one remaining
+    done();
   }, 2)
   this.queue.createUploader = original
 })

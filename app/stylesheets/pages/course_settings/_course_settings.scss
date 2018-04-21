@@ -71,7 +71,7 @@ ul.user_list {
 
 ul.user_list li.user {
   min-height: 30px;
-  padding-left: 10px;
+  padding-#{direction(left)}: 10px;
   color: #444;
   line-height: 1em;
   padding: 8px;
@@ -86,7 +86,7 @@ ul.user_list li.user {
     padding: 0;
     margin: (-8px) 0 0 -8px;
     border-bottom: 10px solid transparent;
-    border-left: 10px solid #06A9EE;
+    border-#{direction(left)}: 10px solid #06A9EE;
     display: block;
     position: relative;
   }
@@ -98,13 +98,13 @@ ul.user_list li.user:hover {
 
 ul.user_list li.user .email {
   font-size: 0.8em;
-  margin-left: 10px;
+  margin-#{direction(left)}: 10px;
 }
 
 ul.user_list li.user .associated_user {
   display: none;
   font-size: 0.8em;
-  margin-left: 10px;
+  margin-#{direction(left)}: 10px;
 }
 
 ul.user_list li.user.observer_enrollment .associated_user {
@@ -113,12 +113,12 @@ ul.user_list li.user.observer_enrollment .associated_user {
 
 ul.user_list li.user .section {
   font-size: 0.8em;
-  margin-left: 10px;
+  margin-#{direction(left)}: 10px;
 }
 
 ul.user_list li.user .short_name {
   font-size: 0.8em;
-  margin-left: 10px;
+  margin-#{direction(left)}: 10px;
   margin-top: 2px;
 }
 
@@ -132,8 +132,8 @@ ul.user_list li.user .enrollment_type {
 }
 
 ul.user_list li.user .links {
-  float: right;
-  padding-right: 20px;
+  float: direction(right);
+  padding-#{direction(right)}: 20px;
   padding-top: 5px;
   visibility: hidden;
 }
@@ -143,8 +143,8 @@ ul.user_list li.user .links a {
 }
 
 ul.user_list li.user:hover .links {
-  float: right;
-  padding-right: 20px;
+  float: direction(right);
+  padding-#{direction(right)}: 20px;
   visibility: visible;
 }
 
@@ -161,8 +161,8 @@ ul.user_list div.enrollment_type.pending {
     border-bottom: 1px solid #CCC;
     background-color: #F7F7F7;
     .id-holder {
-      float: left;
-      padding-right: 1em;
+      float: direction(left);
+      padding-#{direction(right)}: 1em;
     }
   }
   #user_list_boxes {
@@ -189,15 +189,15 @@ ul.user_list div.enrollment_type.pending {
 }
 
 #sections .section .section_links {
-  float: right;
+  float: direction(right);
 }
 
 #sections .section .users_count {
-  padding-left: 5px;
+  padding-#{direction(left)}: 5px;
 }
 
 #edit_section_form {
-  float: left;
+  float: direction(left);
 }
 
 .nav_list {
@@ -246,7 +246,7 @@ ul.user_list div.enrollment_type.pending {
     .disabled_message {
       display: block;
       font-size: 0.8em;
-      padding-left: 10px;
+      padding-#{direction(left)}: 10px;
       line-height: 0.7em;
       font-style: italic;
     }
@@ -263,7 +263,7 @@ ul.user_list div.enrollment_type.pending {
   padding: 0;
   li {
     @include name_bubbles;
-    clear: left;
+    clear: direction(left);
   }
 }
 
@@ -296,7 +296,7 @@ ul.user_list div.enrollment_type.pending {
 // a link in the right-side-bar
 .Button--course-settings {
   i[class*=icon-], i[class^=icon-] {
-    margin-right: .5rem;
+    margin-#{direction(right)}: .5rem;
   }
 }
 
@@ -308,7 +308,7 @@ ul.user_list div.enrollment_type.pending {
     vertical-align: baseline;
   }
   td {
-    padding-right: 10px;
+    padding-#{direction(right)}: 10px;
   }
   .tall-row {
     padding-top: 3px;
@@ -339,13 +339,13 @@ ul.user_list div.enrollment_type.pending {
 }
 
 input.move-nav-item-label-spacer {
-  margin-right: 10px;
+  margin-#{direction(right)}: 10px;
 }
 
 .move-nav-item-or {
   display: inline-block;
   width: 60px;
-  margin-left: 20px;
+  margin-#{direction(left)}: 20px;
 }
 
 .move-nav-item-select-spacer {
@@ -383,9 +383,9 @@ td.center-text {
 .master_course_restrictions {
   display: none;
   margin-top: 5px;
-  margin-left: 18px;
+  margin-#{direction(left)}: 18px;
 }
 
 .master_course_restrictions .ic-Checkbox-group {
-  margin-left: 18px;
+  margin-#{direction(left)}: 18px;
 }

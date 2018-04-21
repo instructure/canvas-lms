@@ -36,10 +36,16 @@ export default class ColumnHeader extends React.Component {
   constructor (props) {
     super(props);
 
+    this.handleBlur = this.handleBlur.bind(this)
+    this.handleFocus = this.handleFocus.bind(this)
     this.handleKeyDown = this.handleKeyDown.bind(this);
-  }
 
-  state = { menuShown: false, skipFocusOnClose: false };
+    this.state = {
+      hasFocus: false,
+      menuShown: false,
+      skipFocusOnClose: false
+    }
+  }
 
   bindOptionsMenuTrigger = (ref) => { this.optionsMenuTrigger = ref };
 
@@ -84,6 +90,14 @@ export default class ColumnHeader extends React.Component {
       this.optionsMenuTrigger.focus();
     }
   };
+
+  handleBlur() {
+    this.setState({hasFocus: false})
+  }
+
+  handleFocus() {
+    this.setState({hasFocus: true})
+  }
 
   onToggle = (menuShown) => {
     const newState = { menuShown };

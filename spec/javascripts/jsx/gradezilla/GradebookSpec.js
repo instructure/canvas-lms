@@ -8240,6 +8240,19 @@ QUnit.module('Gradebook', () => {
         ok(message.includes('invalid grade'))
       })
 
+      test('updates cells in the student row', () => {
+        sinon.stub(gradebook, 'updateRowCellsForStudentIds')
+        gradebook.gradeSubmission(submission, gradeInfo)
+        strictEqual(gradebook.updateRowCellsForStudentIds.callCount, 1)
+      })
+
+      test('uses the id of the student when updating the row cells', () => {
+        sinon.stub(gradebook, 'updateRowCellsForStudentIds')
+        gradebook.gradeSubmission(submission, gradeInfo)
+        const [userIds] = gradebook.updateRowCellsForStudentIds.lastCall.args
+        deepEqual(userIds, ['1101'])
+      })
+
       test('re-renders the submission tray if it is open', function () {
         sinon.stub(gradebook, 'getSubmissionTrayState').callsFake(() => ({ open: true }))
         gradebook.gradeSubmission(submission, gradeInfo)

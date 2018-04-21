@@ -35,6 +35,7 @@ const FakeDashboard = function (props) {
         ref={(c) => { props.headerRef(c) }}
         planner_enabled={props.planner_enabled}
         planner_selected={props.planner_selected}
+        dashboard_view={props.dashboard_view}
         recent_activity_dashboard={props.recent_activity_dashboard}
       />
       <div
@@ -65,12 +66,14 @@ FakeDashboard.propTypes = {
   recent_activity_dashboard: PropTypes.bool,
   planner_enabled: PropTypes.bool,
   planner_selected: PropTypes.bool,
+  dashboard_view: PropTypes.string
 }
 
 FakeDashboard.defaultProps = {
   recent_activity_dashboard: false,
   planner_enabled: false,
   planner_selected: false,
+  dashboard_view: 'cards'
 }
 
 let plannerStub
@@ -228,6 +231,7 @@ test('it should add planner classes to the page when planner is loaded', () => {
   ReactDOM.render(
     <FakeDashboard
       headerRef={(c) => { dashboardHeader = c }}
+      dashboard_view='planner'
       planner_enabled
       planner_selected
     />, container)

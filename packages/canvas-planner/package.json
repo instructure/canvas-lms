@@ -15,9 +15,10 @@
     "lint:fix": "eslint src/ --fix",
     "build": "./scripts/build",
     "prepublish": "yarn build",
+    "build:dev": "NODE_ENV=development BABEL_ENV=production babel src --out-dir lib --ignore spec.js,test.js,demo.js --quiet",
     "build:lib": "BABEL_ENV=production babel src --out-dir lib --ignore spec.js,test.js,demo.js --quiet",
     "build:es": "BABEL_ENV=production ES_MODULES=1 babel src --out-dir es --ignore spec.js,test.js,demo.js --quiet",
-    "build:watch": "yarn run build:lib -- --watch",
+    "build:watch": "yarn run build:dev --watch",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch",
@@ -39,7 +40,7 @@
   "author": "Instructure, Inc.",
   "license": "AGPL-3.0",
   "dependencies": {
-    "@instructure/ui-core": "^4.7.2",
+    "@instructure/ui-core": "^4.8.0",
     "axios": "^0.16.0",
     "babel-plugin-inline-react-svg": "^0.4.0",
     "change-case": "^3.0.1",
@@ -59,7 +60,6 @@
     "react-dom": "^0.14.7 || ^15",
     "react-moment-proptypes": "^1.4.0",
     "react-redux": "^5.0.3",
-    "react-waypoint": "^7.0.3",
     "redux": "^3.5.2",
     "redux-actions": "^2.0.1",
     "redux-logger": "^3.0.1",
@@ -69,7 +69,7 @@
     "velocity-animate": "^1.5.0"
   },
   "devDependencies": {
-    "@instructure/ui-presets": "^4.6.0",
+    "@instructure/ui-presets": "^4.7.2",
     "babel-cli": "^6",
     "babel-core": "^6",
     "babel-eslint": "^7",

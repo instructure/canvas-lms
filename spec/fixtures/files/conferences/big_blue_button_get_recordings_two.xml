@@ -1,0 +1,74 @@
+
+<response>
+  <returncode>SUCCESS</returncode>
+  <recordings>
+    <recording>
+      <recordID>0858103f804f6e06b6de665dab79584b22c7cf91-1511807048982</recordID>
+      <meetingID>instructure_web_conference_3Fn2k10wu0jK7diwJHs2FkDU0oXyX1ErUZCavikc</meetingID>
+      <internalMeetingID>0858103f804f6e06b6de665dab79584b22c7cf91-1511807048982</internalMeetingID>
+      <name>John Doe's conference</name>
+      <isBreakout>false</isBreakout>
+      <published>true</published>
+      <state>published</state>
+      <startTime>1511807048982</startTime>
+      <endTime>1511807068542</endTime>
+      <participants>1</participants>
+      <metadata>
+        <meetingName>John Doe's conference</meetingName>
+        <meetingId>instructure_web_conference_3Fn2k10wu0jK7diwJHs2FkDU0oXyX1ErUZCavikc</meetingId>
+        <canvas-recording-ready-user>John Doe &lt;jdoe@mockmail.com&gt;</canvas-recording-ready-user>
+        <canvas-recording-ready-url>http://canvas.blah.com/mock/recording_ready</canvas-recording-ready-url>
+        <isBreakout>false</isBreakout>
+      </metadata>
+      <playback>
+        <format>
+          <type>presentation</type>
+          <url>http://bbb.blah.com/mock/playback/0858103f804f6e06b6de665dab79584b22c7cf91-1511807048982</url>
+          <processingTime>9590</processingTime>
+          <length>0</length>
+          <preview>
+            <images>
+              <image alt="Welcome to" height="136" width="176">http://bbb.blah.com/mock/playback/0858103f804f6e06b6de665dab79584b22c7cf91-1511807048982/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1511807049008/thumbnails/thumb-1.png</image>
+              <image alt="(this slide left blank for use as a whiteboard)" height="136" width="176">http://bbb.blah.com/mock/playback/0858103f804f6e06b6de665dab79584b22c7cf91-1511807048982/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1511807049008/thumbnails/thumb-2.png</image>
+              <image alt="(this slide left blank for use as a whiteboard)" height="136" width="176">http://bbb.blah.com/mock/playback/0858103f804f6e06b6de665dab79584b22c7cf91-1511807048982/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1511807049008/thumbnails/thumb-3.png</image>
+            </images>
+          </preview>
+        </format>
+      </playback>
+    </recording>
+    <recording>
+      <recordID>0858103f804f6e06b6de665dab79584b22c7cf91-1511809970509</recordID>
+      <meetingID>instructure_web_conference_3Fn2k10wu0jK7diwJHs2FkDU0oXyX1ErUZCavikc</meetingID>
+      <internalMeetingID>0858103f804f6e06b6de665dab79584b22c7cf91-1511809970509</internalMeetingID>
+      <name>John Doe's conference</name>
+      <isBreakout>false</isBreakout>
+      <published>true</published>
+      <state>published</state>
+      <startTime>1511809970509</startTime>
+      <endTime>1511811548853</endTime>
+      <participants>2</participants>
+      <metadata>
+        <meetingName>John Doe's conference</meetingName>
+        <meetingId>instructure_web_conference_3Fn2k10wu0jK7diwJHs2FkDU0oXyX1ErUZCavikc</meetingId>
+        <canvas-recording-ready-user>John Doe &lt;jdoe@mockmail.com&gt;</canvas-recording-ready-user>
+        <canvas-recording-ready-url>http://canvas.blah.com/mock/recording_ready</canvas-recording-ready-url>
+        <isBreakout>false</isBreakout>
+      </metadata>
+      <playback>
+        <format>
+          <type>presentation</type>
+          <url>http://bbb.blah.com/mock/playback/0858103f804f6e06b6de665dab79584b22c7cf91-1511809970509</url>
+          <processingTime>35788</processingTime>
+          <length>26</length>
+          <preview>
+            <images>
+              <image alt="Welcome to" height="136" width="176">http://bbb.blah.com/mock/playback/0858103f804f6e06b6de665dab79584b22c7cf91-1511809970509/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1511809970514/thumbnails/thumb-1.png</image>
+              <image alt="(this slide left blank for use as a whiteboard)" height="136" width="176">http://bbb.blah.com/mock/playback/0858103f804f6e06b6de665dab79584b22c7cf91-1511809970509/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1511809970514/thumbnails/thumb-2.png</image>
+              <image alt="(this slide left blank for use as a whiteboard)" height="136" width="176">http://bbb.blah.com/mock/playback/0858103f804f6e06b6de665dab79584b22c7cf91-1511809970509/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1511809970514/thumbnails/thumb-3.png</image>
+            </images>
+          </preview>
+        </format>
+      </playback>
+    </recording>
+  </recordings>
+</response>

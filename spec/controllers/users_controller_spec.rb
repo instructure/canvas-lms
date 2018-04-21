@@ -276,7 +276,7 @@ describe UsersController do
           expect(response).to be_success
           new_pseudo = Pseudonym.where(unique_id: 'jane@example.com').first
           new_user = new_pseudo.user
-          expect(new_user.observed_users).to eq [@user]
+          expect(new_user.linked_students).to eq [@user]
           oe = new_user.observer_enrollments.first
           expect(oe.course).to eq @course
           expect(oe.associated_user).to eq @user
@@ -484,7 +484,7 @@ describe UsersController do
         u = User.where(name: 'Jacob Fugal').first
         expect(u).to be_pre_registered
         expect(response).to be_success
-        expect(u.observed_users).to include(@user)
+        expect(u.linked_students).to include(@user)
       end
     end
 
@@ -776,7 +776,7 @@ describe UsersController do
       let(:observer) { user_with_pseudonym(active_all: true) }
 
       it "returns the grade and the total for a student, filtered by grading period" do
-        student.observers << observer
+        student.linked_observers << observer
         user_session(observer)
         get('grades_for_student', params: {enrollment_id: student_enrollment.id,
           grading_period_id: grading_period.id})
@@ -798,7 +798,7 @@ describe UsersController do
 
       it "does not filter the grades by a grading period if " \
       "'All Grading Periods' is selected" do
-        student.observers << observer
+        student.linked_observers << observer
         all_grading_periods_id = 0
         user_session(observer)
         get('grades_for_student', params: {grading_period_id: all_grading_periods_id,
@@ -850,8 +850,8 @@ describe UsersController do
           observer = user_with_pseudonym(active_all: true)
           course_with_user('StudentEnrollment', course: test_course, user: student1, active_all: true)
           course_with_user('StudentEnrollment', course: test_course, user: student2, active_all: true)
-          student1.observers << observer
-          student2.observers << observer
+          student1.linked_observers << observer
+          student2.linked_observers << observer
           observer
         end
 
@@ -1511,36 +1511,12 @@ describe UsersController do
 
     it 'sets the proper user preference on PUT requests' do
       put :dashboard_view, params: {:dashboard_view => 'cards'}
-      expect(@user.preferences[:dashboard_view]).to eql('cards')
+      expect(@user.dashboard_view).to eql('cards')
     end
 
     it 'does not allow arbitrary values to be set' do
       put :dashboard_view, params: {:dashboard_view => 'a non-whitelisted value'}
       assert_status(400)
-    end
-  end
-
-  describe "show_planner?" do
-    before(:each) do
-      course_factory
-      user_factory(active_all: true)
-      user_session(@user)
-      subject.instance_variable_set(:@current_user, @user)
-    end
-
-    it "should be false if preferences[:dashboard_view] is not set" do
-      @user.preferences.delete(:dashboard_view)
-      expect(subject.show_planner?).to be_falsey
-    end
-
-    it "should be false if preferences[:dashboard_view] is not planner" do
-      @user.preferences[:dashboard_view] = 'something_that_isnt_planner'
-      expect(subject.show_planner?).to be_falsey
-    end
-
-    it "should be true if preferences[:dashboard_view] is planner" do
-      @user.preferences[:dashboard_view] = 'planner'
-      expect(subject.show_planner?).to be_truthy
     end
   end
 

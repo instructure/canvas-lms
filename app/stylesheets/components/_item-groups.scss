@@ -276,15 +276,15 @@
   min-width: 1px; // firefox flex breaks the parent container
   margin: 0 $ic-sp;
   @include breakpoint(desktop) {
-    margin-left: $ic-sp;
-    margin-right: $ic-sp*2;
+    margin-#{direction(left)}: $ic-sp;
+    margin-#{direction(right)}: $ic-sp*2;
   }
 }
 
 .ig-list .ig-row {
   position: relative;
   display: block;
-  padding: $ic-sp $ic-sp/2 $ic-sp ($ic-sp/2 + 4); // add 4px for width of published-state border
+  padding: direction-sides($ic-sp $ic-sp/2 $ic-sp ($ic-sp/2 + 4)); // add 4px for width of published-state border
   box-sizing: border-box;
   border-radius: $baseBorderRadius;
   color: $ic-font-color--subdued;
@@ -321,7 +321,7 @@
       box-sizing: border-box;
       position: absolute;
       top: -1px;
-      left: -1px;
+      #{direction(left)}: -1px;
       width: 0.25rem;
       height: calc(100% + 2px);
       background-color: $ic-color-success;
@@ -363,14 +363,14 @@
 
 .ig-handle {
   + .ig-type-icon {
-    margin-left: $ic-sp*0.75;
+    margin-#{direction(left)}: $ic-sp*0.75;
   }
 }
 
 .ig-title {
   box-sizing: border-box;
   font-weight: bold;
-  padding-right: $ic-sp;
+  padding-#{direction(right)}: $ic-sp;
   line-height: $ic-label-line-height;
   margin-bottom: $ic-sp/4;
   min-width: 1px; // firefox flex breaks the parent container
@@ -401,26 +401,26 @@
 .ig-admin {
   box-sizing: border-box;
   white-space: nowrap;
-  padding-left: $ic-sp;
-  @include breakpoint(desktop) { padding-left: 0; }
+  padding-#{direction(left)}: $ic-sp;
+  @include breakpoint(desktop) { padding-#{direction(left)}: 0; }
 
   .publish-icon, .lock-icon {
-    margin-right: $ic-sp/2;
+    margin-#{direction(right)}: $ic-sp/2;
     i[class*=icon-]:before,
     i[class^=icon-]:before { @include fontSize(18px); }
   }
 
   > a {
-    margin-right: 10px;
+    margin-#{direction(right)}: 10px;
   }
 
   .mastery-path-icon {
-    margin-right: 10px;
+    margin-#{direction(right)}: 10px;
     padding: 2px 7px;
     font-size: 0.8em;
 
     i {
-      margin-right: 5px;
+      margin-#{direction(right)}: 5px;
     }
   }
 }
@@ -435,15 +435,15 @@
 
 [class^=ig-indent] {
   // anything > 2 is still 60px;
-  margin-left: 60px;
+  margin-#{direction(left)}: 60px;
 }
 
 .ig-indent1 {
-  margin-left: 20px;
+  margin-#{direction(left)}: 20px;
 }
 
 .ig-indent2 {
-  margin-left: 40px;
+  margin-#{direction(left)}: 40px;
 }
 
 .ig-text {

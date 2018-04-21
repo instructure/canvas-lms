@@ -17,19 +17,20 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-export default function generator ({ borders, colors, media, spacing, typography }) {
+export default function generator ({ borders, colors, spacing, typography }) {
   return {
     fontFamily: typography.fontFamily,
     color: colors.licorice,
 
-    padding: `${spacing.small} ${spacing.xSmall}`,
-    paddingMedium: `${spacing.small}`,
+    padding: spacing.small,
+    paddingMedium: spacing.small,
     paddingLarge: `${spacing.small} ${spacing.medium}`,
 
     borderWidth: borders.widthSmall,
     borderColor: colors.tiara,
     bottomMarginPhoneUp: spacing.xSmall,
 
-    ...media
+    gutterWidth: spacing.medium,
+    buttonPadding: spacing.small,
   };
 }

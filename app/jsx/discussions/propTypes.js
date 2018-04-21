@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { shape, bool, number } from 'prop-types'
+import { shape, bool, number, string } from 'prop-types'
 
 const propTypes = {}
 
@@ -24,6 +24,13 @@ propTypes.permissions = shape({
   create: bool.isRequired,
   manage_content: bool.isRequired,
   moderate: bool.isRequired,
+})
+
+propTypes.discussionTopicMenuTools = shape({
+  base_url: string.isRequired,
+  canvas_icon_class: string.isRequired,
+  icon_url: string.isRequired,
+  title: string.isRequired,
 })
 
 propTypes.courseSettings = shape({

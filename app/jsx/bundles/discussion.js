@@ -67,9 +67,8 @@ ReactDOM.render(
 
 // Rendering of the section tooltip
 const container = document.querySelector('#section_tooltip_root')
-const sectionSpecificAnnouncement = ENV.DISCUSSION.TOPIC.IS_ANNOUNCEMENT
-                                    && (ENV.TOTAL_USER_COUNT || ENV.DISCUSSION.TOPIC.COURSE_SECTIONS)
-if (container && sectionSpecificAnnouncement) {
+const sectionSpecificAnnouncement = (ENV.TOTAL_USER_COUNT || ENV.DISCUSSION.TOPIC.COURSE_SECTIONS)
+if (container && sectionSpecificAnnouncement && !ENV.DISCUSSION.IS_ASSIGNMENT && !ENV.DISCUSSION.IS_GROUP) {
   ReactDOM.render(
     <SectionsTooltip
       totalUserCount={ENV.TOTAL_USER_COUNT}

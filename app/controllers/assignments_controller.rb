@@ -524,6 +524,9 @@ class AssignmentsController < ApplicationController
       if @context.grading_periods?
         hash[:active_grading_periods] = GradingPeriod.json_for(@context, @current_user)
       end
+
+      hash[:ANONYMOUS_GRADING_ENABLED] = @context.feature_enabled?(:anonymous_marking)
+
       append_sis_data(hash)
       if context.is_a?(Course)
         hash[:allow_self_signup] = true  # for group creation

@@ -95,7 +95,7 @@ $preview-html-background: whitesmoke;
 .ef-file-preview-header-filename {
   @include fontSize(18px);
   padding: 0;
-  padding-left: 24px;
+  padding-#{direction(left)}: 24px;
   margin: 0;
   flex: 1 0 264px;
   height: $preview-header-height;
@@ -140,7 +140,7 @@ $preview-html-background: whitesmoke;
   white-space: nowrap;
   @include breakpoint(desktop) { padding: 0 24px; }
   &:hover, &:focus { color: $ic-color-light; text-decoration: none;}
-  [class^=icon-] { margin-right: 3px; }
+  [class^=icon-] { margin-#{direction(right)}: 3px; }
 
   &:focus {
     text-decoration: underline;
@@ -236,7 +236,7 @@ a.ef-file-preview-button, button.ef-file-preview-button div {
 ////////////////////////////////
 .ef-file-preview-information-container {
   background: $preview-info-bg;
-  border-left: 1px solid $preview-border-color;
+  border-#{direction(left)}: 1px solid $preview-border-color;
   padding: 24px;
 }
 .ef-file-preview-infotable {
@@ -245,7 +245,7 @@ a.ef-file-preview-button, button.ef-file-preview-button div {
   border-collapse: collapse;
   table-layout: fixed;
   td, th, a {
-    text-align: left;
+    text-align: direction(left);
     color: $preview-font-color;
   }
   th {

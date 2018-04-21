@@ -54,31 +54,31 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def invalidate_course_cache
-    if self.workflow_state_changed?
+    if self.saved_change_to_workflow_state?
       Rails.cache.delete(self.class.course_cache_key(self.course))
     end
   end
 
   def sync_default_restrictions
     if self.use_default_restrictions_by_type
-      if self.use_default_restrictions_by_type_changed? || self.default_restrictions_by_type_changed?
+      if self.saved_change_to_use_default_restrictions_by_type? || self.saved_change_to_default_restrictions_by_type?
         MasterCourses::RESTRICTED_OBJECT_TYPES.each do |type|
           new_type_restrictions = self.default_restrictions_by_type[type] || {}
           count = self.master_content_tags.where(:use_default_restrictions => true, :content_type => type).
             update_all(:restrictions => new_type_restrictions)
           next unless count > 0
 
-          old_type_restrictions = self.default_restrictions_by_type_was[type] || {}
+          old_type_restrictions = self.default_restrictions_by_type_before_last_save[type] || {}
           if new_type_restrictions.any?{|setting, locked| locked && !old_type_restrictions[setting]} # tightened restrictions
             self.touch_all_content_for_tags(type)
           end
         end
       end
     else
-      if self.default_restrictions_changed?
+      if self.saved_change_to_default_restrictions?
         count = self.master_content_tags.where(:use_default_restrictions => true).
           update_all(:restrictions => self.default_restrictions)
-        if count > 0 && self.default_restrictions.any?{|setting, locked| locked && !self.default_restrictions_was[setting]} # tightened restrictions
+        if count > 0 && self.default_restrictions.any?{|setting, locked| locked && !self.default_restrictions_before_last_save[setting]} # tightened restrictions
           self.touch_all_content_for_tags
         end
       end

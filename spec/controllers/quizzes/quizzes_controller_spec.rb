@@ -1032,39 +1032,56 @@ describe Quizzes::QuizzesController do
       expect(assigns[:submission]).to eql(s)
     end
 
-    it "should not allow student viewing if the assignment is muted" do
-      user_session(@student)
-      @quiz.generate_quiz_data
-      @quiz.workflow_state = 'available'
-      @quiz.published_at = Time.now
-      @quiz.save
+    context "when assignment is muted" do
+      before do
+        @quiz.generate_quiz_data
+        @quiz.workflow_state = 'available'
+        @quiz.published_at = Time.zone.now
+        @quiz.save!
+        @quiz.assignment.mute!
+      end
 
-      expect(@quiz.assignment).not_to be_nil
-      @quiz.assignment.mute!
-      s = @quiz.generate_submission(@student2)
-      @submission = @quiz.generate_submission(@student)
-      get 'history', params: {:course_id => @course.id, :quiz_id => @quiz.id, :user_id => @student2.id}
+      it "should not allow student viewing" do
+        user_session(@student)
 
-      expect(response).to be_redirect
-      expect(response).to redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}")
-      expect(flash[:notice]).to match(/You cannot view the quiz history while the quiz is muted/)
-    end
+        @quiz.generate_submission(@student2)
+        @submission = @quiz.generate_submission(@student)
+        get 'history', params: {:course_id => @course.id, :quiz_id => @quiz.id, :user_id => @student2.id}
 
-    it "should allow teacher viewing if the assignment is muted" do
-      user_session(@teacher)
+        expect(response).to be_redirect
+        expect(response).to redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}")
+        expect(flash[:notice]).to match(/You cannot view the quiz history while the quiz is muted/)
+      end
 
-      @quiz.generate_quiz_data
-      @quiz.workflow_state = 'available'
-      @quiz.published_at = Time.now
-      @quiz.save
+      it "should allow teacher viewing" do
+        user_session(@teacher)
 
-      expect(@quiz.assignment).not_to be_nil
-      @quiz.assignment.mute!
-      s = @quiz.generate_submission(@student)
-      @submission = @quiz.generate_submission(@teacher)
-      get 'history', params: {:course_id => @course.id, :quiz_id => @quiz.id, :user_id => @student.id}
+        @quiz.generate_submission(@student)
+        @submission = @quiz.generate_submission(@teacher)
+        get 'history', params: {:course_id => @course.id, :quiz_id => @quiz.id, :user_id => @student.id}
 
-      expect(response).to be_success
+        expect(response).to be_success
+      end
+
+      it "should allow teacher viewing if the term has ended" do
+        @course.enrollment_term.update!(end_at: 1.day.ago)
+        user_session(@teacher)
+
+        @quiz.generate_submission(@student)
+        get 'history', params: {:course_id => @course.id, :quiz_id => @quiz.id, :user_id => @student.id}
+
+        expect(response).to be_success
+      end
+
+      it "should allow teacher viewing if the enrollment is concluded" do
+        @teacher.enrollments.find_by!(course: @course).conclude
+        user_session(@teacher)
+
+        @quiz.generate_submission(@student)
+        get 'history', params: {:course_id => @course.id, :quiz_id => @quiz.id, :user_id => @student.id}
+
+        expect(response).to be_success
+      end
     end
 
     context "with non-utf8 submission data" do

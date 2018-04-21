@@ -48,11 +48,15 @@ class GradebookExporter
     # Notepad treat the BOM as a required magic number rather than use heuristics. These tools add a BOM when saving
     # text as UTF-8, and cannot interpret UTF-8 unless the BOM is present or the file contains only ASCII.
     # https://en.wikipedia.org/wiki/Byte_order_mark#UTF-8
-    bom = @options[:encoding] == 'UTF-8' ? "\xEF\xBB\xBF" : ''
+    bom = include_bom?(@options[:encoding]) ? "\xEF\xBB\xBF" : ''
     csv_data.prepend(bom)
   end
 
   private
+
+  def include_bom?(encoding)
+    encoding == 'UTF-8' && @user.feature_enabled?(:include_byte_order_mark_in_gradebook_exports)
+  end
 
   def buffer_columns(column_name, buffer_value=nil)
     column_count = COLUMN_COUNTS.fetch(column_name)
@@ -133,7 +137,7 @@ class GradebookExporter
       end
       csv << row
 
-      group_filler_length = groups.size * (include_points? ? 6 : 2)
+      group_filler_length = groups.size * column_count_per_group
 
       # Possible muted row
       if assignments.any?(&:muted)
@@ -317,4 +321,9 @@ class GradebookExporter
   def include_points?
     !@course.apply_group_weights?
   end
+
+  def column_count_per_group
+    include_points? ? 6 : 4
+  end
+  private :column_count_per_group
 end

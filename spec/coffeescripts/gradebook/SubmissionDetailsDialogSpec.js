@@ -59,6 +59,15 @@ test('speed_grader_enabled sets speedgrader url', function() {
   equal(dialog.dialog.find('.more-details-link').length, 1)
 })
 
+test('speed_grader_enabled omits student_id from speedgrader url for anonymously graded assignments', function() {
+  this.assignment.anonymous_grading = true
+  this.options.context_url = 'http://some-fake-url'
+  const dialog = new SubmissionDetailsDialog(this.assignment, this.user, this.options)
+
+  const urlObject = new URL(dialog.submission.speedGraderUrl)
+  strictEqual(urlObject.hash, '')
+})
+
 test('speed_grader_enabled as false does not set speedgrader url', function() {
   const dialog = new SubmissionDetailsDialog(this.assignment, this.user, {
     speed_grader_enabled: false,
@@ -67,6 +76,16 @@ test('speed_grader_enabled as false does not set speedgrader url', function() {
   equal(dialog.submission.speedGraderUrl, null)
   dialog.open()
   equal(dialog.dialog.find('.more-details-link').length, 0)
+})
+
+test('speedgrader url quotes the student id', function() {
+  // Supply a value for context_url so we have a well-formed speedGraderUrl
+  this.options.context_url = 'http://localhost';
+  const submissionDetailsDialog = new SubmissionDetailsDialog(this.assignment, this.user, this.options);
+
+  const urlObject = new URL(submissionDetailsDialog.submission.speedGraderUrl);
+  strictEqual(decodeURI(urlObject.hash), '#{"student_id":"1"}');
+  submissionDetailsDialog.dialog.dialog('destroy');
 })
 
 test('lateness correctly passes through to the template', function() {

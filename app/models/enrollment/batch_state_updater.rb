@@ -44,7 +44,7 @@ class Enrollment::BatchStateUpdater
     Enrollment.transaction do
       # cache some data before the destroy that is needed after the destroy
       invited_user_ids = Enrollment.where(id: batch, workflow_state: 'invited').distinct.pluck(:user_id)
-      students = Enrollment.of_student_type.where(id: batch).preload(user: :observers).to_a
+      students = Enrollment.of_student_type.where(id: batch).preload(user: :linked_observers).to_a
       user_course_tuples = Enrollment.where(id: batch).active.select(%i(user_id course_id)).distinct.to_a
       user_ids = Enrollment.where(id: batch).distinct.pluck(:user_id)
       courses = Course.where(id: Enrollment.where(id: batch).select(:course_id).distinct).to_a
@@ -61,6 +61,7 @@ class Enrollment::BatchStateUpdater
       reset_notifications_cache(user_course_tuples)
       update_assignment_overrides(batch, courses, user_ids)
       needs_grading_count_updated(courses)
+      recache_all_course_grade_distribution(courses)
       update_cached_due_dates(students, root_account)
       batch.count
     end
@@ -139,16 +140,25 @@ class Enrollment::BatchStateUpdater
     courses.each do |c|
       assignment_ids = Assignment.where(context_id: c, context_type: 'Course').pluck(:id)
       next unless assignment_ids
-      AssignmentOverrideStudent.
-        where(user_id: user_ids, assignment_id: assignment_ids).
-        where.not(user_id: c.enrollments.where(user_id: user_ids).
-        where.not(id: batch).select(:user_id)).each(&:destroy)
+      # this is handled in :update_cached_due_dates
+      AssignmentOverrideStudent.suspend_callbacks(:update_cached_due_dates) do
+        AssignmentOverrideStudent.
+          where(user_id: user_ids, assignment_id: assignment_ids).
+          where.not(user_id: c.enrollments.where(user_id: user_ids).
+          where.not(id: batch).select(:user_id)).each(&:destroy)
+      end
     end
   end
 
   def self.needs_grading_count_updated(courses)
     courses.each do |c|
       c.assignments.touch_all
+    end
+  end
+
+  def self.recache_all_course_grade_distribution(courses)
+    courses.each do |c|
+      c.recache_grade_distribution
     end
   end
 

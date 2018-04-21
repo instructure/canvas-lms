@@ -157,7 +157,7 @@ class UsersController < ApplicationController
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
     :user_dashboard, :toggle_recent_activity_dashboard, :toggle_hide_dashcard_color_overlays,
     :masquerade, :external_tool, :dashboard_sidebar, :settings, :activity_stream,
-    :activity_stream_summary]
+    :activity_stream_summary, :pandata_token]
   before_action :require_registered_user, :only => [:delete_user_service,
     :create_user_service]
   before_action :reject_student_view_student, :only => [:delete_user_service,
@@ -316,7 +316,7 @@ class UsersController < ApplicationController
       url = url_for request.parameters.merge(:host => oauth_request.original_host_with_port, :only_path => false)
       redirect_to url
     else
-     if params[:service] == "linked_in"
+      if params[:service] == "linked_in"
         begin
           raise "No OAuth LinkedIn User" unless oauth_request.user
 
@@ -531,13 +531,13 @@ class UsersController < ApplicationController
     js_env({
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
       :PREFERENCES => {
-        :recent_activity_dashboard => show_recent_activity?,
+        :dashboard_view => @current_user.dashboard_view,
         :hide_dashcard_color_overlays => @current_user.preferences[:hide_dashcard_color_overlays],
         :custom_colors => @current_user.custom_colors,
-        :show_planner => show_planner?
       },
       :STUDENT_PLANNER_ENABLED => planner_enabled?,
-      :STUDENT_PLANNER_COURSES => planner_enabled? && map_courses_for_menu(@current_user.courses_with_primary_enrollment, :include_section_tabs => true),
+      :STUDENT_PLANNER_COURSES => planner_enabled? && map_courses_for_menu(@current_user.courses_with_primary_enrollment,
+                                                                           :include_section_tabs => true),
       :STUDENT_PLANNER_GROUPS => planner_enabled? && map_groups_for_planner(@current_user.current_groups.where(context_type: 'Account'))
     })
 
@@ -580,7 +580,7 @@ class UsersController < ApplicationController
     Shackles.activate(:slave) do
       prepare_current_user_dashboard_items
 
-      if @show_recent_feedback = (@current_user.student_enrollments.active.exists?)
+      if (@show_recent_feedback = @current_user.student_enrollments.active.exists?)
         @recent_feedback = (@current_user && @current_user.recent_feedback) || []
       end
     end
@@ -607,7 +607,7 @@ class UsersController < ApplicationController
   def dashboard_view
     if request.get?
       render json: {
-        dashboard_view: @current_user.preferences[:dashboard_view]
+        dashboard_view: @current_user.dashboard_view
       }
     elsif request.put?
       valid_options = ['activity', 'cards', 'planner']
@@ -616,7 +616,7 @@ class UsersController < ApplicationController
         return render(json: { :message => "Invalid Dashboard View Option" }, status: :bad_request)
       end
 
-      @current_user.preferences[:dashboard_view] = params[:dashboard_view]
+      @current_user.dashboard_view = params[:dashboard_view]
       @current_user.save!
       render json: {}
     end
@@ -1070,7 +1070,7 @@ class UsersController < ApplicationController
   #     }
   def ignore_stream_item
     @current_user.shard.activate do # can't just pass in the user's shard to relative_id_for, since local ids will be incorrectly scoped to the current shard, not the user's
-      if item = @current_user.stream_item_instances.where(stream_item_id: Shard.relative_id_for(params[:id], Shard.current, Shard.current)).first
+      if (item = @current_user.stream_item_instances.where(stream_item_id: Shard.relative_id_for(params[:id], Shard.current, Shard.current)).first)
         item.update_attribute(:hidden, true) # observer handles cache invalidation
       end
     end
@@ -1153,6 +1153,7 @@ class UsersController < ApplicationController
       @service = UserService.register_from_params(@current_user, params[:user_service])
       render :json => @service
     rescue => e
+      Canvas::Errors.capture_exception(:user_service, e)
       render :json => {:errors => true}, :status => :bad_request
     end
   end
@@ -1232,7 +1233,7 @@ class UsersController < ApplicationController
   # @returns User
   def api_show
     @user = api_find(User, params[:id])
-    if @user.grants_any_right?(@current_user, session, :manage, :manage_user_details)
+    if @user.grants_right?(@current_user, session, :api_show_user)
       render :json => user_json(@user, @current_user, session, %w{locale avatar_url permissions}, @current_user.pseudonym.account)
     else
       render_unauthorized_action
@@ -1801,12 +1802,12 @@ class UsersController < ApplicationController
       user_params.delete(:avatar_image)
 
       managed_attributes << :avatar_image
-      if token = avatar.try(:[], :token)
-        if av_json = avatar_for_token(@user, token)
+      if (token = avatar.try(:[], :token))
+        if (av_json = avatar_for_token(@user, token))
           user_params[:avatar_image] = { :type => av_json['type'],
             :url => av_json['url'] }
         end
-      elsif url = avatar.try(:[], :url)
+      elsif (url = avatar.try(:[], :url))
         user_params[:avatar_image] = { :url => url }
       end
     end
@@ -2032,7 +2033,7 @@ class UsersController < ApplicationController
           end
         end
 
-        if @courses.all? { |c, e| e.blank? }
+        if @courses.all? { |_c, e| e.blank? }
           flash[:error] = t('errors.no_teacher_courses', "There are no courses shared between this teacher and student")
           redirect_to_referrer_or_default(root_url)
         end
@@ -2212,6 +2213,50 @@ class UsersController < ApplicationController
     render :json => {:invited_users => invited_users, :errored_users => errored_users}
   end
 
+  # @API Get a Pandata jwt token and its expiration date
+  #
+  # Returns a jwt token that can be used to send events to Pandata
+  #
+  # @argument app_key [String]
+  #   The pandata appKey for this mobile app
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/users/<user_id>/pandata_token \
+  #          -X POST \
+  #          -H 'Authorization: Bearer <token>'
+  #          -F 'app_key=MOBILE_APPS_KEY' \
+  #
+  # @example_response
+  #   {
+  #     "token": "wek23klsdnsoieioeoi3of9deeo8r8eo8fdn",
+  #     "expires_at": 1521667783000,
+  #   }
+  def pandata_token
+    user = api_find(User, params[:id])
+    settings = Canvas::DynamicSettings.find(service: 'pandata')
+
+    if params[:app_key] == settings["ios-pandata-key"]
+      key = settings["ios-pandata-key"]
+      sekrit = settings["ios-pandata-secret"]
+    elsif params[:app_key] == settings["android-pandata-key"]
+      key = settings["android-pandata-key"]
+      sekrit = settings["android-pandata-secret"]
+    else
+      return render(json: { :message => "Invalid app key" }, status: :bad_request)
+    end
+
+    expires_at = Time.zone.now + 1.day.to_i
+    body = {
+      iss: key,
+      exp: expires_at.to_i,
+      aud: 'PANDATA',
+      sub: user.global_id
+    }
+
+    token = Canvas::Security.create_jwt(body, expires_at, sekrit)
+    render json: {token: token, expires_at: expires_at.to_f * 1000}
+  end
+
   protected
 
   def teacher_activity_report(teacher, course, student_enrollments)
@@ -2221,8 +2266,8 @@ class UsersController < ApplicationController
 
     # find last interactions
     last_comment_dates = SubmissionCommentInteraction.in_course_between(course, teacher.id, ids)
-    last_comment_dates.each do |(user_id, author_id), date|
-      next unless student = data[user_id]
+    last_comment_dates.each do |(user_id, _author_id), date|
+      next unless (student = data[user_id])
       student[:last_interaction] = [student[:last_interaction], date].compact.max
     end
     scope = ConversationMessage.
@@ -2231,7 +2276,7 @@ class UsersController < ApplicationController
     # fake_arel can't pass an array in the group by through the scope
     last_message_dates = scope.group(['conversation_participants.user_id', 'conversation_messages.author_id']).maximum(:created_at)
     last_message_dates.each do |key, date|
-      next unless student = data[key.first.to_i]
+      next unless (student = data[key.first.to_i])
       student[:last_interaction] = [student[:last_interaction], date].compact.max
     end
 
@@ -2245,19 +2290,19 @@ class UsersController < ApplicationController
 
 
     ungraded_submissions.each do |submission|
-      next unless student = data[submission.user_id]
+      next unless (student = data[submission.user_id])
       student[:ungraded] << submission
     end
 
     if course.root_account.enable_user_notes?
-      data.each { |k,v| v[:last_user_note] = nil }
+      data.each { |_k,v| v[:last_user_note] = nil }
       # find all last user note times in one query
       note_dates = UserNote.active.
           group(:user_id).
           where("created_by_id = ? AND user_id IN (?)", teacher, ids).
           maximum(:created_at)
       note_dates.each do |user_id, date|
-        next unless student = data[user_id]
+        next unless (student = data[user_id])
         student[:last_user_note] = date
       end
     end
@@ -2542,8 +2587,8 @@ class UsersController < ApplicationController
         @pseudonym.send(:skip_session_maintenance=, true)
       end
       @user.save!
-      if @observee && !@user.user_observees.where(user_id: @observee).exists?
-        UserObserver.create_or_restore(observee: @observee, observer: @user)
+      if @observee && !@user.as_observer_observation_links.where(user_id: @observee).exists?
+        UserObservationLink.create_or_restore(student: @observee, observer: @user)
       end
 
       if notify_policy.is_self_registration?

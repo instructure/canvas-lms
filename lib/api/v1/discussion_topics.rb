@@ -94,7 +94,8 @@ module Api::V1::DiscussionTopics
       include_all_dates: false,
       override_dates: true,
       include_root_topic_data: false,
-      root_topic_fields: []
+      root_topic_fields: [],
+      include_overrides: false,
     )
 
     opts[:user_can_moderate] = context.grants_right?(user, session, :moderate_forum) if opts[:user_can_moderate].nil?
@@ -111,7 +112,7 @@ module Api::V1::DiscussionTopics
       json[:assignment] = assignment_json(topic.assignment, user, session,
         include_discussion_topic: false, override_dates: opts[:override_dates],
         include_all_dates: opts[:include_all_dates],
-        exclude_response_fields: excludes)
+        exclude_response_fields: excludes, include_overrides: opts[:include_overrides])
     end
 
     if opts[:include_sections_user_count] && !topic.is_section_specific
@@ -137,6 +138,7 @@ module Api::V1::DiscussionTopics
         json[field_name] ||= root_topics[topic.root_topic_id][field_name] if root_topics[topic.root_topic_id]
       end
     end
+
     json
   end
 
@@ -162,6 +164,7 @@ module Api::V1::DiscussionTopics
       user_can_see_posts: topic.user_can_see_posts?(user), podcast_url: url,
       read_state: topic.read_state(user), unread_count: topic.unread_count(user),
       subscribed: topic.subscribed?(user), topic_children: topic.child_topics.pluck(:id),
+      group_topic_children: topic.child_topics.pluck(:id, :context_id).map{|id, group_id| {id: id, group_id: group_id}},
       attachments: attachments, published: topic.published?,
       can_unpublish: opts[:user_can_moderate] ? topic.can_unpublish?(opts) : false,
       locked: topic.locked?, can_lock: topic.can_lock?, comments_disabled: topic.comments_disabled?,

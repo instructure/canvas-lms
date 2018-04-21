@@ -24,6 +24,7 @@ let textarea = null
 
 QUnit.module('ValidatedMixin', {
   setup() {
+    tinymce.remove()
     textarea = $("<textarea id='a42' name='message' data-rich_text='true'></textarea>")
     $('#fixtures').append(textarea)
     ValidatedMixin.$ = $
@@ -34,8 +35,15 @@ QUnit.module('ValidatedMixin', {
   }
 })
 
-test('it can find tinymce instances as fields', () => {
-  tinymce.init({selector: '#fixtures textarea#a42'})
-  const element = ValidatedMixin.findField('message')
-  equal(element.length, 1)
+test('it can find tinymce instances as fields', (assert) => {
+
+  const done = assert.async()
+  tinymce.init({
+    selector: '#fixtures textarea#a42',
+    }).then(() => {
+      const element = ValidatedMixin.findField('message')
+      equal(element.length, 1)
+      done()
+    })
+
 })

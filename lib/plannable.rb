@@ -57,7 +57,7 @@ module Plannable
 
   def planner_override_for(user)
     return nil unless planner_enabled?
-    self.planner_overrides.where(user_id: user).take
+    self.planner_overrides.where(user_id: user).where.not(workflow_state: 'deleted').take
   end
   private
 
@@ -129,9 +129,14 @@ module Plannable
         @columns.each.with_index.all? do |columns, i|
           columns = [columns] unless columns.is_a?(Array)
           columns.all? do |col|
-            type = TYPE_MAP[@model.columns_hash[col].type]
-            nullable = @model.columns_hash[col].null
-            type && (nullable && bookmark[i].nil? || type.(bookmark[i]))
+            col = @model.columns_hash[col]
+            if col
+              type = TYPE_MAP[col.type]
+              nullable = col.null
+              type && (nullable && bookmark[i].nil? || type.call(bookmark[i]))
+            else
+              true
+            end
           end
         end
     end
@@ -194,7 +199,7 @@ module Plannable
 
     def type_for_column(col)
       col = col.first if col.is_a?(Array)
-      @model.columns_hash[col].type
+      @model.columns_hash[col]&.type
     end
 
     # Generate a sql comparison like so:

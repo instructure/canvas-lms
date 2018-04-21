@@ -85,7 +85,7 @@
   .ratings {
     font-weight: normal;
     display: inline-block;
-    text-align: left;
+    text-align: direction(left);
     margin-bottom: 0px;
     margin-top: 25px;
     .rating {
@@ -95,7 +95,7 @@
       width: 13px;
       height: 13px;
       display: inline-block;
-      margin-right: 3px;
+      margin-#{direction(right)}: 3px;
       vertical-align: sub;
     }
   }
@@ -135,7 +135,7 @@
       width: 140px;
     }
     dd {
-      margin-left: 160px;
+      margin-#{direction(left)}: 160px;
       padding-bottom: 10px;
     }
     span {

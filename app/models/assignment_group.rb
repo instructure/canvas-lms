@@ -68,7 +68,7 @@ class AssignmentGroup < ActiveRecord::Base
   protected :generate_default_values
 
   def update_student_grades
-    if self.rules_changed? || self.group_weight_changed?
+    if self.saved_change_to_rules? || self.saved_change_to_group_weight?
       self.class.connection.after_transaction_commit { self.context.recompute_student_scores }
     end
   end
@@ -154,7 +154,7 @@ class AssignmentGroup < ActiveRecord::Base
   scope :for_course, lambda { |course| where(:context_id => course, :context_type => 'Course') }
 
   def course_grading_change
-    self.context.grade_weight_changed! if group_weight_changed? && self.context && self.context.group_weighting_scheme == 'percent'
+    self.context.grade_weight_changed! if saved_change_to_group_weight? && self.context && self.context.group_weighting_scheme == 'percent'
     true
   end
 

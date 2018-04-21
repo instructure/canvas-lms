@@ -172,6 +172,38 @@
 #           "description": "(Present only if requested through include[]=content_details) If applicable, returns additional details specific to the associated object",
 #           "example": {"points_possible": 20, "due_at": "2012-12-31T06:00:00-06:00", "unlock_at": "2012-12-31T06:00:00-06:00", "lock_at": "2012-12-31T06:00:00-06:00"},
 #           "$ref": "ContentDetails"
+#         },
+#         "published": {
+#           "description": "(Optional) Whether this module item is published. This field is present only if the caller has permission to view unpublished items.",
+#           "type": "boolean",
+#           "example": true
+#         }
+#       }
+#     }
+#
+# @model ModuleItemSequenceNode
+#     {
+#       "id": "ModuleItemSequenceNode",
+#       "description": "",
+#       "properties": {
+#         "prev": {
+#           "description": "The previous ModuleItem in the sequence",
+#           "$ref": "ModuleItem"
+#         },
+#         "current": {
+#           "description": "The ModuleItem being queried",
+#           "$ref": "ModuleItem",
+#           "example": {"id": 768, "module_id": 123, "title": "A lonely page", "type": "Page"}
+#         },
+#         "next": {
+#           "description": "The next ModuleItem in the sequence",
+#           "$ref": "ModuleItem",
+#           "example": {"id": 769, "module_id": 127, "title": "Project 1", "type": "Assignment"}
+#         },
+#         "mastery_path": {
+#           "type": "object",
+#           "description": "The conditional release rule for the module item, if applicable",
+#           "example": {"locked": true, "assignment_sets": [], "selected_set_id": null, "awaiting_choice": false, "still_processing": false, "modules_url": "/courses/11/modules", "choose_url": "/courses/11/modules/items/9/choose", "modules_tab_disabled": false}
 #         }
 #       }
 #     }
@@ -182,15 +214,19 @@
 #       "description": "",
 #       "properties": {
 #         "items": {
-#           "description": "an array containing one hash for each appearence of the asset in the module sequence (up to 10 total)",
-#           "example": [{"prev": null, "current": {"id": 768, "module_id": 123, "title": "A lonely page", "type": "Page"}, "next": {"id": 769, "module_id": 127, "title": "Project 1", "type": "Assignment"}, "mastery_path": {"locked": true, "assignment_sets": [], "selected_set_id": null, "awaiting_choice": false, "still_processing": false, "modules_url": "/courses/11/modules", "choose_url": "/courses/11/modules/items/9/choose", "modules_tab_disabled": false}}],
+#           "description": "an array containing one ModuleItemSequenceNode for each appearence of the asset in the module sequence (up to 10 total)",
+#           "example": [{"prev": null,
+#                        "current": {"id": 768, "module_id": 123, "title": "A lonely page", "type": "Page"},
+#                        "next": {"id": 769, "module_id": 127, "title": "Project 1", "type": "Assignment"},
+#                        "mastery_path": {"locked": true, "assignment_sets": [], "selected_set_id": null, "awaiting_choice": false, "still_processing": false, "modules_url": "/courses/11/modules", "choose_url": "/courses/11/modules/items/9/choose", "modules_tab_disabled": false}}],
 #           "type": "array",
-#           "items": { "type": "object" }
+#           "items": { "$ref": "ModuleItemSequenceNode" }
 #         },
 #         "modules": {
 #           "description": "an array containing each Module referenced above",
 #           "type": "array",
-#           "items": { "$ref": "Module" }
+#           "items": { "$ref": "Module" },
+#           "example": [{"id": 123, "name": "Overview"}, {"id": 127, "name": "Imaginary Numbers"}]
 #         }
 #       }
 #     }

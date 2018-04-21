@@ -49,6 +49,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   after_save :save_assignment_submission
   after_save :context_module_action
   before_create :assign_validation_token
+  after_save :delete_ignores
 
   has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
   has_many :events, class_name: 'Quizzes::QuizSubmissionEvent'
@@ -59,7 +60,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   after_update :grade_submission!, if: :just_completed?
 
   def just_completed?
-    submission_id? && workflow_state_changed? && completed?
+    submission_id? && saved_change_to_workflow_state? && completed?
   end
 
   def grade_submission!
@@ -791,6 +792,13 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   def assign_validation_token
     self.validation_token = SecureRandom.hex(32)
+  end
+
+  def delete_ignores
+    if completed?
+      Ignore.where(asset_type: 'Quizzes::Quiz', asset_id: quiz_id, user_id: user_id, purpose: 'submitting').delete_all
+    end
+    true
   end
 
   def valid_token?(token)

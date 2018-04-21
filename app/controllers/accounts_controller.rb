@@ -197,6 +197,30 @@ class AccountsController < ApplicationController
     end
   end
 
+  # @API Permissions
+  # Returns permission information for the calling user and the given account.
+  # You may use `self` as the account id to check permissions against the domain root account.
+  # The caller must have an account role or admin (teacher/TA/designer) enrollment in a course
+  # in the account. See also {api:CoursesController#permissions the Course counterpart}.
+  #
+  # @argument permissions[] [String]
+  #   List of permissions to check against the authenticated user.
+  #   Permission names are documented in the {api:RoleOverridesController#add_role Create a role} endpoint.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/accounts/self/permissions \
+  #       -H 'Authorization: Bearer <token>' \
+  #       -d 'permissions[]=manage_account_memberships' \
+  #       -d 'permissions[]=become_user'
+  #
+  # @example_response
+  #   {'manage_account_memberships': 'false', 'become_user': 'true'}
+  def permissions
+    return unless authorized_action(@account, @current_user, :read)
+    permissions = Array(params[:permissions]).map(&:to_sym)
+    render json: @account.rights_status(@current_user, session, *permissions)
+  end
+
   # @API Get the sub-accounts of an account
   #
   # List accounts that are sub-accounts of the given account.
@@ -406,27 +430,21 @@ class AccountsController < ApplicationController
 
     if params[:search_term]
       search_term = params[:search_term]
-      is_id = search_term.to_s =~ Api::ID_REGEX
-      if is_id && @courses.except(:order).where(id: search_term).exists?
-        @courses = Course.where(id: search_term)
-      elsif is_id && !SearchTermHelper.valid_search_term?(search_term)
-        @courses = Course.none
+      SearchTermHelper.validate_search_term(search_term)
+
+      if params[:search_by] == "teacher"
+        @courses = @courses.where("EXISTS (?)", TeacherEnrollment.active.joins(:user).where(
+          ActiveRecord::Base.wildcard('users.name', params[:search_term])
+        ).where("enrollments.course_id=courses.id"))
       else
-        SearchTermHelper.validate_search_term(search_term)
+        name = ActiveRecord::Base.wildcard('courses.name', search_term)
+        code = ActiveRecord::Base.wildcard('courses.course_code', search_term)
 
-        if params[:search_by] == "teacher"
-          @courses = @courses.where("EXISTS (?)", TeacherEnrollment.active.joins(:user).where(
-            ActiveRecord::Base.wildcard('users.name', params[:search_term])).where("enrollments.course_id=courses.id"))
+        if @account.grants_any_right?(@current_user, :read_sis, :manage_sis)
+          sis_source = ActiveRecord::Base.wildcard('courses.sis_source_id', search_term)
+          @courses = @courses.merge(Course.where(:id => search_term).or(Course.where(code)).or(Course.where(name)).or(Course.where(sis_source)))
         else
-          name = ActiveRecord::Base.wildcard('courses.name', search_term)
-          code = ActiveRecord::Base.wildcard('courses.course_code', search_term)
-
-          if @account.grants_any_right?(@current_user, :read_sis, :manage_sis)
-            sis_source = ActiveRecord::Base.wildcard('courses.sis_source_id', search_term)
-            @courses = @courses.where("#{name} OR #{code} OR #{sis_source}")
-          else
-            @courses = @courses.where("#{name} OR #{code}")
-          end
+          @courses = @courses.merge(Course.where(:id => search_term).or(Course.where(code)).or(Course.where(name)))
         end
       end
     end
@@ -482,6 +500,9 @@ class AccountsController < ApplicationController
           params[:account].delete :services
         end
       end
+
+      # Set default Dashboard View
+      set_default_dashboard_view(params.dig(:account, :settings)&.delete(:default_dashboard_view))
 
       # account settings (:manage_account_settings)
       account_settings = account_params.slice(:name, :default_time_zone, :settings)
@@ -709,6 +730,9 @@ class AccountsController < ApplicationController
 
         remove_ip_filters = params[:account].delete(:remove_ip_filters)
         params[:account][:ip_filters] = [] if remove_ip_filters
+
+        # Set default Dashboard view
+        set_default_dashboard_view(params.dig(:account, :settings)&.delete(:default_dashboard_view))
 
         if @account.update_attributes(strong_account_params)
           format.html { redirect_to account_settings_url(@account) }
@@ -1128,6 +1152,15 @@ class AccountsController < ApplicationController
     end
   end
 
+  def set_default_dashboard_view(new_view)
+    if new_view != @account.default_dashboard_view
+      if authorized_action(@account, @current_user, :manage_account_settings)
+        # NOTE: Only _sets_ the property. It's up to the caller to `save` it
+        @account.default_dashboard_view = new_view
+      end
+    end
+  end
+
   def format_avatar_count(count = 0)
     count > 99 ? "99+" : count
   end
@@ -1184,7 +1217,7 @@ class AccountsController < ApplicationController
                                    :strict_sis_check, :storage_quota, :students_can_create_courses,
                                    :sub_account_includes, :teachers_can_create_courses, :trusted_referers,
                                    :turnitin_host, :turnitin_account_id, :users_can_edit_name,
-                                   :app_center_access_token].freeze
+                                   :app_center_access_token, :default_dashboard_view].freeze
 
   def permitted_account_attributes
     [:name, :turnitin_account_id, :turnitin_shared_secret, :include_crosslisted_courses,

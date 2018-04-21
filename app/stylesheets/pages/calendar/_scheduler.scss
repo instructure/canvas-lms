@@ -22,7 +22,7 @@
   padding: 1em;
   background-color: $bodyBackground;
   border: 1px solid $ic-border-light;
-  margin-left: 0px;
+  margin-#{direction(left)}: 0px;
   h3, .h3 {
     margin-top: 0px;
   }
@@ -66,10 +66,10 @@
     margin-bottom: 0;
   }
   .alert {
-    float: right;
+    float: direction(right);
     width: auto;
     padding: 4px 10px;
-    margin-right: 5px;
+    margin-#{direction(right)}: 5px;
     a {
       text-decoration: underline;
     }
@@ -150,7 +150,7 @@
     width: $date_column_width - 80;
   }
   .time_field {
-    text-align: right;
+    text-align: direction(right);
     width: $time_column_width - 30;
   }
   .error {
@@ -192,7 +192,7 @@
     margin: 0;
     padding: 0;
   }
-  .right-column-wrapper {
+  .#{direction(right)}-column-wrapper {
     width: 400px;
   }
 }
@@ -229,7 +229,7 @@
 
 .ag_sections {
   @include reset_list;
-  padding-left: 35px;
+  padding-#{direction(left)}: 35px;
   li {
     label {
       width: 150px;
@@ -241,7 +241,7 @@
   display: block;
   width: 16px;
   height: 16px;
-  float: left;
+  float: direction(left);
   background-image: url(/images/jqueryui/icon_sprite.png);
   background-position: (-16px) -80px;
   border: none;
@@ -253,25 +253,25 @@
 }
 
 .ag_contexts_done {
-  float: right;
+  float: direction(right);
   margin: 5px 5px 0 0;
 }
 
 .delete-block-link {
   display: block;
-  float: right;
+  float: direction(right);
   color: black;
   line-height: 28px;
 }
 
 .left-column-wrapper {
   width: 250px;
-  float: left;
+  float: direction(left);
 }
 
 .right-column-wrapper {
   width: 325px;
-  float: left;
+  float: direction(left);
 }
 
 .details-wrapper {
@@ -283,7 +283,7 @@
     vertical-align: baseline;
   }
   .split-link {
-    margin-right: 3px;
+    margin-#{direction(right)}: 3px;
   }
 }
 
@@ -340,7 +340,7 @@
     li {
       overflow: hidden;
       white-space: nowrap;
-      float: left;
+      float: direction(left);
       margin: 1px 2px 1px 4px;
       padding: 0 14px 0 11px;
       color: #000;

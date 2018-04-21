@@ -99,9 +99,12 @@ export function loadFutureItems () {
   };
 }
 
-export function scrollIntoPast () {
+export const scrollIntoPastAction = createAction('SCROLL_INTO_PAST');
+
+function loadPastItems (byScrolling) {
   return (dispatch, getState) => {
     if (getState().loading.allPastItemsLoaded) return;
+    if (byScrolling) dispatch(scrollIntoPastAction());
     dispatch(gettingPastItems({
       seekingNewActivity: false,
     }));
@@ -109,12 +112,20 @@ export function scrollIntoPast () {
   };
 }
 
+export function scrollIntoPast () {
+    return loadPastItems(true);
+}
+
+export function loadPastButtonClicked () {
+  return loadPastItems(false);
+}
+
 export const loadPastUntilNewActivity = () => (dispatch, getState) => {
   dispatch(gettingPastItems({
     seekingNewActivity: true,
   }));
   dispatch(startLoadingPastUntilNewActivitySaga());
-  return 'loadPastUntilNewActivity';
+  return 'loadPastUntilNewActivity'; // for testing
 };
 
 export function sendFetchRequest (loadingOptions) {

@@ -103,7 +103,7 @@ function sectionSpecificEnabled() {
   }
 
   const isAnnouncement = ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement
-  return isAnnouncement ? ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED : ENV.SECTION_SPECIFIC_DISCUSSIONS_ENABLED
+  return isAnnouncement || ENV.SECTION_SPECIFIC_DISCUSSIONS_ENABLED
 }
 
 if ((contextType === 'courses') && !isAnnouncement && ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT) {

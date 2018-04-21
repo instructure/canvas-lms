@@ -64,7 +64,7 @@ table.report_example, table.report {
 
 table.report.sortable {
   th.tablesorter-header {
-    padding-right: 20px;
+    padding-#{direction(right)}: 20px;
     cursor: pointer;
     background: url(/images/tablesorter/bg.png) no-repeat right center;
     &:hover {

@@ -529,7 +529,6 @@ class Quizzes::QuizzesApiController < ApplicationController
   end
 
   # @API Reorder quiz items
-  # @beta
   #
   # Change order of the quiz questions or groups within the quiz
   #
@@ -549,7 +548,6 @@ class Quizzes::QuizzesApiController < ApplicationController
   end
 
   # @API Validate quiz access code
-  # @beta
   #
   # Accepts an access code and returns a boolean indicating whether that access code is correct
   #

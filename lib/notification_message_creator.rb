@@ -64,8 +64,11 @@ class NotificationMessageCreator
     # the to_list (which currently never happens, I think), duplicate messages could be sent.
     to_user_channels.each do |user, channels|
       next unless asset_filtered_by_user(user)
-      user_locale = infer_locale(:user => user,
-                                 :context => user_asset_context(asset_filtered_by_user(user)))
+      user_locale = infer_locale(
+        :user => user,
+        :context => user_asset_context(asset_filtered_by_user(user)),
+        :ignore_browser_locale => true
+      )
       I18n.with_locale(user_locale) do
         channels.each do |default_channel|
           if @notification.registration?

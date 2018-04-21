@@ -59,12 +59,12 @@
 #right-side table.channel_list tr.channel.unconfirmed > td a {
 }
 .email_meta {
-  text-align: left;
+  text-align: direction(left);
   width: 32px;
   box-sizing: border-box;
 }
 .email_actions {
-  text-align: right;
+  text-align: direction(right);
   white-space: nowrap;
   width: 100%;
 }

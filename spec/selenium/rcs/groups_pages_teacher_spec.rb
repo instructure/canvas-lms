@@ -17,7 +17,7 @@
 
 require_relative '../common'
 require_relative '../helpers/groups_common'
-require_relative '../helpers/announcements_common'
+require_relative '../helpers/legacy_announcements_common'
 require_relative '../helpers/discussions_common'
 require_relative '../helpers/wiki_and_tiny_common'
 require_relative '../helpers/files_common'

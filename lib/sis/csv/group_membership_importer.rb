@@ -36,7 +36,7 @@ module SIS
             begin
               importer.add_group_membership(row['user_id'], row['group_id'], row['status'])
             rescue ImportError => e
-              add_warning(csv, "#{e}")
+              SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
             end
           end
         end

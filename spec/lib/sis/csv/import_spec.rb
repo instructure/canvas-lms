@@ -328,7 +328,7 @@ describe SIS::CSV::Import do
 
   describe "parallel imports" do
     it 'should retry an importer once' do
-      @account.enable_feature!(:sis_imports_refactor)
+      @account.enable_feature!(:refactor_of_sis_imports)
       expect_any_instance_of(Attachment).to receive(:open).twice
       process_csv_data(
         "term_id,name,status,start_date,end_date",

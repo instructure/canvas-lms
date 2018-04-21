@@ -828,6 +828,27 @@ describe AssignmentsController do
         expect(assigns[:js_env][:dummy]).to be nil
       end
     end
+
+    describe 'js_env ANONYMOUS_GRADING_ENABLED' do
+      before(:each) do
+        @course.account.enable_feature!(:anonymous_moderated_marking)
+        user_session(@teacher)
+      end
+
+      it 'is false when the anonymous marking flag is not enabled' do
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+
+        expect(assigns[:js_env][:ANONYMOUS_GRADING_ENABLED]).to be false
+      end
+
+      it 'is true when the anonymous marking flag is enabled' do
+        @course.enable_feature!(:anonymous_marking)
+
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+
+        expect(assigns[:js_env][:ANONYMOUS_GRADING_ENABLED]).to be true
+      end
+    end
   end
 
   describe "DELETE 'destroy'" do

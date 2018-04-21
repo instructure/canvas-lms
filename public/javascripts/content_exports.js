@@ -66,7 +66,7 @@ $(document).ready(function(event) {
           $exporter_form.hide();
           $(".export_progress").progressbar('option', 'value', 100);
           $(".progress_message").text(I18n.t("Your content has been exported."));
-          $("#export_files").append('<p>' + htmlEscape(I18n.t('labels.new_export', "New Export:")) + ' <a href="' + htmlEscape(content_export.download_url) + '">' + htmlEscape(I18n.t('links.download_plain', "Click here to download")) + '</a> </p>')
+          $("#export_files").append('<p><a href="' + htmlEscape(content_export.download_url) + '">' +  htmlEscape(I18n.t("New Export")) + '</a></p>')
         } else if(content_export.workflow_state == 'failed') {
           var code = "content_export_" + content_export.id;
           $(".progress_bar_holder").hide();

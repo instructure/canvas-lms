@@ -17,6 +17,21 @@
 %>
 
 <% blueprint_subscription ||= nil %>
+<% if blueprint_subscription %>
+  <script>
+    function gotoBlueprintInfo() {
+      let path = window.location.pathname;
+      // toggle the trailing / so the browser actually navigates
+      if (path.lastIndexOf('/') === path.length - 1) {
+        path = path.substr(0, path.length-1);
+      } else {
+        path = path + '/';
+      }
+      const shabang = '<%= "#!/blueprint/blueprint_subscriptions/#{blueprint_subscription.id}/#{blueprint_subscription.last_migration_id}" %>';
+      window.location.replace(path + shabang);
+    }
+  </script>
+<% end %>
 <div>
   <%= external_tools_menu_items(@course_settings_sub_navigation_tools, {link_class: "Button Button--link Button--link--has-divider Button--course-settings course-settings-sub-navigation-lti", settings_key: :course_settings_sub_navigation}) %>
   <% if can_do(@context, @current_user, :use_student_view) %>
@@ -102,7 +117,7 @@
     <% end %>
 
     <% if blueprint_subscription %>
-      <%= link_to "#!/blueprint/blueprint_subscriptions/#{blueprint_subscription.id}/#{blueprint_subscription.last_migration_id}", :onclick => 'setTimeout(function(){window.location.reload()}, 0)', :class => 'Button Button--link Button--link--has-divider Button--course-settings blueprint_information_button' do %>
+      <%= link_to "#!/blueprint/blueprint_subscriptions/#{blueprint_subscription.id}/#{blueprint_subscription.last_migration_id}", :onclick => 'gotoBlueprintInfo()', :class => 'Button Button--link Button--link--has-divider Button--course-settings blueprint_information_button' do %>
         <i class="icon-blueprint"></i><%= t('Blueprint Information') %>
       <% end %>
     <% end %>

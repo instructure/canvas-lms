@@ -26,7 +26,7 @@ import HelpDialog from '../../help_dialog/HelpDialog'
 export default function HelpTray({trayTitle, closeTray, links, hasLoaded}) {
   return (
     <Container as="div" padding="medium" id="help_tray">
-      <Heading level="h3" as="h1">{trayTitle}</Heading>
+      <Heading level="h3" as="h2">{trayTitle}</Heading>
       <hr />
       <HelpDialog links={links} hasLoaded={hasLoaded} onFormSubmit={closeTray}/>
     </Container>

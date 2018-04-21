@@ -41,11 +41,11 @@ $context_module_bg_color: #f2f3f4;
     }
   }
   .reorder_module_link, .move_item_link {
-    padding-left: 2px;
+    padding-#{direction(left)}: 2px;
   }
   .links {
-    padding-right: 10px;
-    text-align: right;
+    padding-#{direction(right)}: 10px;
+    text-align: direction(right);
     white-space: nowrap;
   }
   .header {
@@ -54,7 +54,7 @@ $context_module_bg_color: #f2f3f4;
     padding: 6px 0;
     color: #323232;
     .links {
-      float: right;
+      float: direction(right);
     }
   }
 
@@ -76,14 +76,14 @@ $context_module_bg_color: #f2f3f4;
 
     .module-item-status-icon {
       width: 16px;
-      padding-right: 10px;
+      padding-#{direction(right)}: 10px;
 
       .icon-mark-as-read {
         opacity: 0.4;
       }
 
       + .ig-admin {
-        margin-left: $ic-sp;
+        margin-#{direction(left)}: $ic-sp;
       }
     }
 
@@ -104,8 +104,8 @@ $context_module_bg_color: #f2f3f4;
   h2 .name {
     display: inline;
     position: absolute;
-    left: 45px;
-    right: 140px;
+    #{direction(left)}: 45px;
+    #{direction(right)}: 140px;
     top: 6px;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -113,15 +113,15 @@ $context_module_bg_color: #f2f3f4;
   }
   &.student-view {
     h2 .name {
-      left: 20px;
+      #{direction(left)}: 20px;
     }
   }
 
   h2 .name {
     display: inline;
     position: absolute;
-    left: 45px;
-    right: 140px;
+    #{direction(left)}: 45px;
+    #{direction(right)}: 140px;
     top: 6px;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -129,7 +129,7 @@ $context_module_bg_color: #f2f3f4;
   }
   &.student-view {
     h2 .name {
-      left: 20px;
+      #{direction(left)}: 20px;
     }
   }
 
@@ -157,7 +157,7 @@ $context_module_bg_color: #f2f3f4;
     }
     .delete_prerequisite_link {
       text-decoration: none;
-      padding-left: 3px;
+      padding-#{direction(left)}: 3px;
     }
     .header .links,
     .manage_module {
@@ -243,11 +243,11 @@ $context_module_bg_color: #f2f3f4;
   }
   .manage_module, .show_hide, .progression_container {
     font-size: 0.8em;
-    float: left;
-    padding-left: 15px;
+    float: direction(left);
+    padding-#{direction(left)}: 15px;
   }
   .progression_container {
-    float: right;
+    float: direction(right);
   }
   a.add-small {
     line-height: normal;
@@ -255,14 +255,14 @@ $context_module_bg_color: #f2f3f4;
   div.footer {
     @include clearfix;
     padding: 13px 10px 2px;
-    margin-left: 15px;
+    margin-#{direction(left)}: 15px;
     color: #666;
   }
   .prerequisites .criterion {
-    float: left;
+    float: direction(left);
     border: 1px solid #aaa;
     background-color: #def;
-    margin-left: 3px;
+    margin-#{direction(left)}: 3px;
     padding: 0.2em 4px;
     font-size: 0.8em;
     color: #444;
@@ -273,7 +273,7 @@ $context_module_bg_color: #f2f3f4;
   border-bottom: 1px dotted #e0e0e0;
   &.indent_0 {
     td .type_icon {
-      padding-right: 15px;
+      padding-#{direction(right)}: 15px;
     }
     .outdent_item_link {
       display: none !important;
@@ -281,42 +281,42 @@ $context_module_bg_color: #f2f3f4;
   }
   &.indent_1 {
     td .type_icon {
-      padding-right: 15px;
+      padding-#{direction(right)}: 15px;
     }
     .type_icon {
-      padding-left: 20px;
+      padding-#{direction(left)}: 20px;
     }
   }
   &.indent_2 {
     td .type_icon {
-      padding-right: 15px;
+      padding-#{direction(right)}: 15px;
     }
     .type_icon {
-      padding-left: 40px;
+      padding-#{direction(left)}: 40px;
     }
   }
   &.indent_3 {
     td .type_icon {
-      padding-right: 15px;
+      padding-#{direction(right)}: 15px;
     }
     .type_icon {
-      padding-left: 60px;
+      padding-#{direction(left)}: 60px;
     }
   }
   &.indent_4 {
     td .type_icon {
-      padding-right: 15px;
+      padding-#{direction(right)}: 15px;
     }
     .type_icon {
-      padding-left: 80px;
+      padding-#{direction(left)}: 80px;
     }
   }
   &.indent_5 {
     td .type_icon {
-      padding-right: 15px;
+      padding-#{direction(right)}: 15px;
     }
     .type_icon {
-      padding-left: 100px;
+      padding-#{direction(left)}: 100px;
     }
     .indent_item_link {
       display: none !important;
@@ -381,7 +381,7 @@ $context_module_bg_color: #f2f3f4;
   }
   .completion_requirement {
     font-size: 0.8em;
-    padding-left: 5px;
+    padding-#{direction(left)}: 5px;
     margin-top: -4px;
     color: #888;
     display: block;
@@ -453,7 +453,7 @@ $context_module_bg_color: #f2f3f4;
     }
   }
   .module_item_icons {
-    text-align: left;
+    text-align: direction(left);
     white-space: nowrap;
     width: 3.2em;
   }
@@ -508,7 +508,7 @@ $context_module_bg_color: #f2f3f4;
       display: none;
     }
     .ig-info {
-      margin-left: $ic-sp/4;
+      margin-#{direction(left)}: $ic-sp/4;
     }
     .criterion img {
       display: none;
@@ -535,16 +535,16 @@ $context_module_bg_color: #f2f3f4;
     vertical-align: top;
     color: #888;
     font-size: 0.8em;
-    text-align: left;
+    text-align: direction(left);
     white-space: nowrap;
   }
   td.points_possible_display {
-    padding-right: 15px;
+    padding-#{direction(right)}: 15px;
     width: 40px;
   }
   td.due_date_display {
-    padding-right: 5px;
-    padding-left: 15px;
+    padding-#{direction(right)}: 5px;
+    padding-#{direction(left)}: 15px;
     width: 40px;
   }
 }

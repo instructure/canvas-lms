@@ -62,6 +62,7 @@ function props() {
       user_name: "billy bob",
       vendor_code: "b3w9w9bf",
       workflow_state: "active",
+      visible: false,
     }
   }
 }
@@ -159,6 +160,7 @@ test('includes "Never" when last_used_at is null', () => {
   testWrapperOk(propsModified, 'Never')
 });
 
-test('includes notes', () => {
-  testWrapperOk(props(), "all the notas")
-});
+test('it renders the developer key state control', () => {
+  testWrapperOk(props(), 'Key state for the current account')
+})
+

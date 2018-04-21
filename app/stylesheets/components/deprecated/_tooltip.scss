@@ -52,9 +52,9 @@
   }
   .tooltip_text {
     background-color: #444;
-    background-position: left bottom;
+    background-position: direction(left) bottom;
     color: #fff;
-    left: 0px;
+    #{direction(left)}: 0px;
     max-width: 250px;
     padding: 2px 7px 2px;
     white-space: nowrap;
@@ -62,7 +62,7 @@
     font-weight: normal;
   }
   .right {
-    right: 0px;
-    background-position: right bottom;
+    #{direction(right)}: 0px;
+    background-position: direction(right) bottom;
   }
 }

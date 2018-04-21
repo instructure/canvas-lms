@@ -3,7 +3,7 @@
     float: none;
     display: inline-block;
     margin-bottom: 10px;
-    margin-left: 0;
+    margin-#{direction(left)}: 0;
 }
 .form-search .bootstrap-select.btn-group,
 .form-inline .bootstrap-select.btn-group,
@@ -14,15 +14,15 @@
 .bootstrap-select.btn-group.pull-right,
 .bootstrap-select.btn-group[class*="span"].pull-right,
 .row-fluid .bootstrap-select.btn-group[class*="span"].pull-right {
-    float: right;
+    float: direction(right);
 }
 
 .input-append .bootstrap-select.btn-group {
-    margin-left: -1px;
+    margin-#{direction(left)}: -1px;
 }
 
 .input-prepend .bootstrap-select.btn-group {
-    margin-right: -1px;
+    margin-#{direction(right)}: -1px;
 }
 
 .bootstrap-select:not([class*="span"]) {
@@ -48,14 +48,14 @@
 .bootstrap-select.btn-group .btn .filter-option {
     overflow: hidden;
     position: absolute;
-    left: 12px;
-    right: 25px;
-    text-align: left;
+    #{direction(left)}: 12px;
+    #{direction(right)}: 25px;
+    text-align: #{direction(left)};
 }
 
 .bootstrap-select.btn-group .btn .caret {
     position: absolute;
-    right: 12px;
+    #{direction(right)}: 12px;
 }
 
 .bootstrap-select.btn-group > .disabled,
@@ -108,7 +108,7 @@
 }
 
 .bootstrap-select.btn-group .dropdown-menu li > a.opt {
-    padding-left: 35px;
+    padding-#{direction(left)}: 35px;
 }
 
 .bootstrap-select.btn-group .dropdown-menu li > a {
@@ -137,7 +137,7 @@
 }
 
 .bootstrap-select.btn-group .dropdown-menu li small {
-    padding-left: 0.5em;
+    padding-#{direction(left)}: 0.5em;
 }
 
 .bootstrap-select.btn-group .dropdown-menu li:not(.disabled) > a:hover small,
@@ -159,7 +159,7 @@
     border-bottom-color: rgba(0, 0, 0, 0.2);
     position: absolute;
     bottom: -4px;
-    left: 9px;
+    #{direction(left)}: 9px;
     display: none;
 }
 
@@ -171,7 +171,7 @@
     border-bottom: 6px solid white;
     position: absolute;
     bottom: -4px;
-    left: 10px;
+    #{direction(left)}: 10px;
     display: none;
 }
 
@@ -191,12 +191,12 @@
 }
 
 .bootstrap-select.show-menu-arrow.pull-right .dropdown-toggle:before {
-    right: 12px;
-    left: auto;
+  #{direction(right)}: 12px;
+  #{direction(left)}: auto;
 }
 .bootstrap-select.show-menu-arrow.pull-right .dropdown-toggle:after {
-    right: 13px;
-    left: auto;
+  #{direction(right)}: 13px;
+  #{direction(left)}: auto;
 }
 
 .bootstrap-select.show-menu-arrow.open > .dropdown-toggle:before,

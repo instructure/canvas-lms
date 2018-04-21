@@ -103,7 +103,11 @@ module Submittable
 
   def update_assignment
     if self.deleted?
-      self.assignment.destroy if self.for_assignment? && !self.assignment.deleted?
+      if self.for_assignment? && !self.assignment.deleted?
+        self.class.connection.after_transaction_commit do
+          self.assignment.destroy
+        end
+      end
     else
       if !self.assignment_id && @old_assignment_id
         self.context_module_tags.each(&:confirm_valid_module_requirements)
@@ -115,9 +119,11 @@ module Submittable
           submission_types: 'wiki_page'
         ).update_all(workflow_state: 'deleted', updated_at: Time.now.utc)
       elsif self.assignment && @saved_by != :assignment
-        self.clear_changes_information # needed to prevent an infinite loop in rails 4.2
-        self.sync_assignment
-        self.assignment.save
+        # let the stack unwind before we sync this, so that we're not nesting callbacks
+        self.class.connection.after_transaction_commit do
+          self.sync_assignment
+          self.assignment.save
+        end
       end
     end
   end

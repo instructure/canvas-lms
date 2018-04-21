@@ -39,7 +39,7 @@
   &:before {
     content: "";
     position: absolute;
-    top: 50%; left: 0;
+    top: 50%; #{direction(left)}: 0;
     height: 1px; width: 100%;
     background: $ic-border-light;
   }
@@ -56,7 +56,7 @@
 .ic-ThemeCard-add-template-menu {
   .ui-menu-item a {
     min-width: 240px; // override default kyle menu width
-    padding-left: $ic-sp*2;
+    padding-#{direction(left)}: $ic-sp*2;
     padding-top: $ic-sp/4;
     padding-bottom: $ic-sp/4;
   }

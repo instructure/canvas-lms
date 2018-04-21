@@ -145,7 +145,7 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
       outline: none;
     }
 
-    .ui-icon { left: $ic-sp - 2; }
+    .ui-icon { #{direction(left)}: $ic-sp - 2; }
   }
 
   // Style overwrites for "mini accordion", used in Pages sidebar
@@ -156,10 +156,10 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
       border-radius: $ic-border-radius/2;
       a {
         @include fontSize(13px);
-        padding: $ic-sp/2 $ic-sp $ic-sp/2 $ic-sp*2;
+        padding: direction-sides($ic-sp/2 $ic-sp $ic-sp/2 $ic-sp*2);
 
       }
-      .ui-icon { left: $ic-sp/2 - 2; }
+      .ui-icon { #{direction(left)}: $ic-sp/2 - 2; }
     }
     .ui-accordion-content {
       &.ui-accordion-content-active {

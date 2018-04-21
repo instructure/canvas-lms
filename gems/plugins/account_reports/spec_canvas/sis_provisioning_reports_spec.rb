@@ -1257,10 +1257,10 @@ describe "Default Account Reports" do
       before(:once) do
         create_an_account
         create_some_users_with_pseudonyms
-        @uo1 = UserObserver.create_or_restore(observee: @user1, observer: @user2)
-        uo2 = UserObserver.create_or_restore(observee: @user3, observer: @user4)
-        UserObserver.create_or_restore(observee: @user6, observer: @user7)
-        UserObserver.where(id: [@uo1.id, uo2.id]).update_all(sis_batch_id: @sis.id)
+        @uo1 = UserObservationLink.create_or_restore(student: @user1, observer: @user2)
+        uo2 = UserObservationLink.create_or_restore(student: @user3, observer: @user4)
+        UserObservationLink.create_or_restore(student: @user6, observer: @user7)
+        UserObservationLink.where(id: [@uo1.id, uo2.id]).update_all(sis_batch_id: @sis.id)
       end
 
       it 'should run user_observer provisioning report' do

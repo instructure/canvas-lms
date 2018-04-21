@@ -20,11 +20,12 @@ define [
   'jquery'
   '../../arr/walk'
   'Backbone'
+  'jsx/shared/helpers/rtlHelper'
   'jst/discussions/EntryCollectionView'
   'jst/discussions/entryStats'
   '../DiscussionTopic/EntryView',
   '../../jquery/scrollIntoView'
-], (I18n, $, walk, {View}, template, entryStatsTemplate, EntryView) ->
+], (I18n, $, walk, {View}, {isRTL}, template, entryStatsTemplate, EntryView) ->
 
   class EntryCollectionView extends View
 
@@ -93,7 +94,8 @@ define [
         $el    = $(this)
         level = $el.parents('li.entry').length
         offset = (level - 1) * 30
-        $el.css('padding-left', offset).removeAttr('data-should-position')
+        directionToPad = if isRTL(this) then 'right' else 'left'
+        $el.css("padding-#{directionToPad}", offset).removeAttr('data-should-position')
         $el.find('.discussion-title').attr
           'role': 'heading'
           'aria-level': level + 1

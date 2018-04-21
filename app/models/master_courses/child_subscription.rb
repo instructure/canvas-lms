@@ -41,7 +41,7 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
   self.content_tag_association = :child_content_tags
 
   def invalidate_course_cache
-    if self.workflow_state_changed?
+    if self.saved_change_to_workflow_state?
       Rails.cache.delete(self.class.course_cache_key(self.child_course))
     end
   end

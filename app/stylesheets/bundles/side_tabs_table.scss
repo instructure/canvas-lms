@@ -18,19 +18,21 @@
 
 // this is legacy stuff, don't use it. please delete it if you can
 
+@import 'base/environment';
+
 table.side_tabs_table {
   border-collapse: collapse;
   td {
     vertical-align: top;
     &.left {
       width: 25%;
-      border-right: 1px solid #ccc;
-      padding-right: 5px;
+      border-#{direction(right)}: 1px solid #ccc;
+      padding-#{direction(right)}: 5px;
     }
     &.right {
       width: 65%;
-      border-left: 1px solid #ccc;
-      padding-left: 5px;
+      border-#{direction(left)}: 1px solid #ccc;
+      padding-#{direction(left)}: 5px;
     }
   }
   ul.side_tabs {
@@ -53,7 +55,7 @@ table.side_tabs_table {
       }
       div.sub_content {
         font-size: 0.8em;
-        padding-left: 10px;
+        padding-#{direction(left)}: 10px;
         color: #888;
       }
     }

@@ -29,6 +29,7 @@ import Badge from '@instructure/ui-core/lib/components/Badge';
 import Opportunities from '../Opportunities';
 import {addDay, savePlannerItem, deletePlannerItem, cancelEditingPlannerItem, openEditingPlannerItem, getNextOpportunities, getInitialOpportunities, dismissOpportunity, clearUpdateTodo} from '../../actions';
 
+import { courseShape, opportunityShape } from '../plannerPropTypes';
 import styles from './styles.css';
 import theme from './theme.js';
 import formatMessage from '../../format-message';
@@ -37,10 +38,7 @@ import {notifier} from '../../dynamic-ui';
 export class PlannerHeader extends Component {
 
   static propTypes = {
-    courses: PropTypes.arrayOf(PropTypes.shape({
-      id: PropTypes.string,
-      longName: PropTypes.string,
-    })).isRequired,
+    courses: PropTypes.arrayOf(PropTypes.shape(courseShape)).isRequired,
     addDay: PropTypes.func,
     savePlannerItem: PropTypes.func.isRequired,
     deletePlannerItem: PropTypes.func.isRequired,
@@ -50,10 +48,7 @@ export class PlannerHeader extends Component {
     preTriggerDynamicUiUpdates: PropTypes.func,
     locale: PropTypes.string.isRequired,
     timeZone: PropTypes.string.isRequired,
-    opportunities: PropTypes.shape({
-      items: PropTypes.arrayOf(PropTypes.object),
-      nextUrl: PropTypes.string,
-    }).isRequired,
+    opportunities: PropTypes.shape(opportunityShape).isRequired,
     getInitialOpportunities: PropTypes.func.isRequired,
     getNextOpportunities: PropTypes.func.isRequired,
     dismissOpportunity: PropTypes.func.isRequired,
@@ -230,6 +225,7 @@ export class PlannerHeader extends Component {
       <div className={styles.root}>
         <Button
           variant="icon"
+          margin="0 medium 0 0"
           onClick={this.toggleUpdateItemTray}
           ref={(b) => { this.addNoteBtn = b; }}
         >
@@ -246,6 +242,7 @@ export class PlannerHeader extends Component {
             <Button
               onClick={this.toggleOpportunitiesDropdown}
               variant="icon"
+              margin="0 medium 0 0"
               ref={(b) => { this.opportunitiesButton = b; }}
               buttonRef={(b) => { this.opportunitiesHtmlButton = b; }}
             >

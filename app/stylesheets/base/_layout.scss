@@ -26,8 +26,11 @@ body {
   background: $ic-color-light;
   font-weight: 300;
 
-  &:not(.is-inside-submission-frame):not(.embedded) {
+  &:not(.is-inside-submission-frame):not(.embedded):not(.dashboard-is-planner) {
     min-width: 768px;
+  }
+  &.dashboard-is-planner {
+    min-width: 470px; /* or the dashboard header starts to wrap */
   }
 
   &.no-headers, &.embedded {
@@ -105,7 +108,7 @@ div.content_notice {
     display: inline-block;
   }
   i {
-    padding-right: 8px;
+    padding-#{direction(right)}: 8px;
   }
 }
 
@@ -136,13 +139,13 @@ iframe.tool_launch {
 #skip_navigation_link {
   @include accessibility-prompt;
   position: absolute;
-  left: -10000px;
+  #{direction(left)}: -10000px;
   top: auto;
   width: 1px;
   height: 1px;
   overflow: hidden;
   &:focus {
-    left: 0;
+    #{direction(left)}: 0;
     top: 0;
     width: auto;
     height: auto;

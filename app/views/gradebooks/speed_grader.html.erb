@@ -51,11 +51,15 @@
             <%= @assignment.muted? ? t("Unmute Assignment") : t("Mute Assignment") %>
           </span>
         </button>
-        <button id="keyboard-shortcut-info-icon" class="Button Button--icon-action gradebookActions__Button" type="button" title="<%= t('Keyboard Shortcuts') %>">
-          <i class="icon-keyboard-shortcuts" aria-hidden="true"></i>
-          <span class="screenreader-only" aria-hidden="true"><%= t('Keyboard Shortcuts') %></span>
-        </button>
-        <% if help_link %>
+
+        <% unless @anonymous_moderated_marking_enabled %>
+          <button id="keyboard-shortcut-info-icon" class="Button Button--icon-action gradebookActions__Button" type="button" title="<%= t('Keyboard Shortcuts') %>">
+            <i class="icon-keyboard-shortcuts" aria-hidden="true"></i>
+            <span class="screenreader-only" aria-hidden="true"><%= t('Keyboard Shortcuts') %></span>
+          </button>
+        <% end %>
+
+        <% if help_link && !@anonymous_moderated_marking_enabled %>
           <%= link_to help_link_url,
                 class: help_link_classes(["Button Button--icon-action gradebookActions__Button exclude_external_icon"]),
                 title: help_link_name,
@@ -64,10 +68,15 @@
             <span class="screenreader-only" aria-hidden="true"><%= help_link_name %></span>
           <% end %>
         <% end %>
-        <button id="settings_link" class="Button Button--icon-action gradebookActions__Button" type="button" title="<%= t('Settings') %>">
-          <i class="icon-settings" aria-hidden="true"></i>
-          <span class="screenreader-only" aria-hidden="true"><%= t('Speedgrader Settings') %></span>
-        </button>
+
+        <% if @anonymous_moderated_marking_enabled %>
+          <span id="speedgrader-settings"></span>
+        <% else %>
+          <button id="settings_link" class="Button Button--icon-action gradebookActions__Button" type="button" title="<%= t('Settings') %>">
+            <i class="icon-settings" aria-hidden="true"></i>
+            <span class="screenreader-only" aria-hidden="true"><%= t('SpeedGrader Settings') %></span>
+          </button>
+        <% end %>
       </div>
       <div class="assignmentDetails">
         <a id="assignment_url" href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>">

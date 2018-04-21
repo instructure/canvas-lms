@@ -61,10 +61,10 @@ The publish button has two states on click (publish and published) and a hover s
 .btn-published,
 .btn-unpublish {
   transition: none;
-  padding-left: 9px;
+  padding-#{direction(left)}: 9px;
 
   i {
-    margin-right: 4px;
+    margin-#{direction(right)}: 4px;
     vertical-align: text-top;
     line-height: 17px;
   }

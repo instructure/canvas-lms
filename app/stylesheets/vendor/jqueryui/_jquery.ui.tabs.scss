@@ -18,18 +18,18 @@
     background: transparent;
     border-width: 0 0 1px 0;
     box-shadow: none; //override .ui-widget-header
-    li { 
-      list-style: none; 
-      float: left; 
-      position: relative; 
-      top: 1px; 
-      margin: 0 .2em 1px 0; 
-      border-bottom: 0 !important; 
-      padding: 0; 
+    li {
+      list-style: none;
+      float: direction(left);
+      position: relative;
+      top: 1px;
+      margin: direction-sides(0 .2em 1px 0);
+      border-bottom: 0 !important;
+      padding: 0;
       white-space: nowrap;
-      a { 
-        float: left; 
-        padding: .5em .9em; 
+      a {
+        float: direction(left);
+        padding: .5em .9em;
         text-decoration: none;
         font-weight: bold;
         text-shadow: 0 1px 0 rgba(255,255,255,0.5);

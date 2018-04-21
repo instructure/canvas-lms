@@ -56,6 +56,11 @@
 #           "description": "A weight value that contributes to the overall weight of a grading period set which is used to calculate how much assignments in this period contribute to the total grade",
 #           "type": "integer",
 #           "example": "33.33"
+#         },
+#         "is_closed": {
+#           "description": "If true, the grading period's close_date has passed.",
+#           "example": true,
+#           "type": "boolean"
 #         }
 #       }
 #    }

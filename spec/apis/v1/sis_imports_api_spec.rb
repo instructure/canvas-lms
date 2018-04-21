@@ -73,6 +73,7 @@ describe SisImportsApiController, type: :request do
           "diffing_data_set_identifier" => nil,
           "diffed_against_import_id" => nil,
           "diffing_drop_status" => nil,
+          "skip_deletes" => false,
           "change_threshold" => nil,
     })
     batch.process_without_send_later
@@ -115,6 +116,7 @@ describe SisImportsApiController, type: :request do
           "diffing_data_set_identifier" => nil,
           "diffed_against_import_id" => nil,
           "diffing_drop_status" => nil,
+          "skip_deletes" => false,
           "change_threshold" => nil,
     })
 
@@ -168,6 +170,7 @@ describe SisImportsApiController, type: :request do
           "clear_sis_stickiness" => nil,
           "diffing_data_set_identifier" => nil,
           "diffed_against_import_id" => nil,
+          "skip_deletes" => false,
           "diffing_drop_status" => nil,
           "change_threshold" => nil
     }
@@ -358,7 +361,7 @@ describe SisImportsApiController, type: :request do
           { :import_type => 'instructure_csv',
             :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv')})
     batch = SisBatch.find(json["id"])
-    expect(batch.options).to eq({})
+    expect(batch.options).to eq({skip_deletes: false})
     batch.destroy
 
     json = api_call(:post,
@@ -369,7 +372,7 @@ describe SisImportsApiController, type: :request do
             :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
             :override_sis_stickiness => "1"})
     batch = SisBatch.find(json["id"])
-    expect(batch.options).to eq({:override_sis_stickiness => true})
+    expect(batch.options).to eq({override_sis_stickiness: true, skip_deletes: false})
     batch.destroy
 
     json = api_call(:post,
@@ -381,8 +384,7 @@ describe SisImportsApiController, type: :request do
             :override_sis_stickiness => "1",
             :add_sis_stickiness => "1"})
     batch = SisBatch.find(json["id"])
-    expect(batch.options).to eq({:override_sis_stickiness => true,
-                             :add_sis_stickiness => true})
+    expect(batch.options).to eq({override_sis_stickiness: true, add_sis_stickiness: true, skip_deletes: false})
     batch.destroy
 
     json = api_call(:post,
@@ -394,8 +396,7 @@ describe SisImportsApiController, type: :request do
             :override_sis_stickiness => "1",
             :clear_sis_stickiness => "1"})
     batch = SisBatch.find(json["id"])
-    expect(batch.options).to eq({:override_sis_stickiness => true,
-                             :clear_sis_stickiness => true})
+    expect(batch.options).to eq({override_sis_stickiness: true, clear_sis_stickiness: true, skip_deletes: false})
     batch.destroy
 
     json = api_call(:post,
@@ -406,7 +407,7 @@ describe SisImportsApiController, type: :request do
             :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
             :add_sis_stickiness => "1"})
     batch = SisBatch.find(json["id"])
-    expect(batch.options).to eq({})
+    expect(batch.options).to eq({skip_deletes: false})
     batch.destroy
 
     json = api_call(:post,
@@ -417,7 +418,7 @@ describe SisImportsApiController, type: :request do
             :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
             :clear_sis_stickiness => "1"})
     batch = SisBatch.find(json["id"])
-    expect(batch.options).to eq({})
+    expect(batch.options).to eq({skip_deletes: false})
     batch.destroy
   end
 
@@ -687,6 +688,7 @@ describe SisImportsApiController, type: :request do
           "clear_sis_stickiness" => nil,
           "diffing_data_set_identifier" => nil,
           "diffed_against_import_id" => nil,
+          "skip_deletes" => false,
           "diffing_drop_status" => nil,
           "change_threshold" => nil,
       }]

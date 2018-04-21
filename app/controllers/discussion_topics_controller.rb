@@ -176,10 +176,16 @@ require 'atom'
 #           "type": "string"
 #         },
 #         "topic_children": {
-#           "description": "An array of topic_ids for the group discussions the user is a part of.",
+#           "description": "DEPRECATED An array of topic_ids for the group discussions the user is a part of.",
 #           "example": [5, 7, 10],
 #           "type": "array",
 #           "items": { "type": "integer"}
+#         },
+#         "group_topic_children": {
+#           "description": "An array of group discussions the user is a part of. Fields include: id, group_id",
+#           "example": [{"id": 5, "group_id": 1}, {"id": 7, "group_id": 5}, {"id": 10, "group_id": 4}],
+#           "type": "array",
+#           "items": { "type": "object"}
 #         },
 #         "root_topic_id": {
 #           "description": "If the topic is for grading and a group assignment this will point to the original topic in the course.",
@@ -249,17 +255,18 @@ class DiscussionTopicsController < ApplicationController
   #
   # Returns the paginated list of discussion topics for this course or group.
   #
-  # @argument include[] [String, "all_dates", "sections", "sections_user_count"]
+  # @argument include[] [String, "all_dates", "sections", "sections_user_count", "overrides"]
   #   If "all_dates" is passed, all dates associated with graded discussions'
   #   assignments will be included.
   #   if "sections" is passed, includes the course sections that are associated
-  #   with the topic, if the topic is specific to sertain sections of the course.
+  #   with the topic, if the topic is specific to certain sections of the course.
   #   If "sections_user_count" is passed, then:
   #     (a) If sections were asked for *and* the topic is specific to certain
-  #         course sections sections, includes the number of users in each
+  #         course sections, includes the number of users in each
   #         section. (as part of the section json asked for above)
   #     (b) Else, includes at the root level the total number of users in the
   #         topic's context (group or course) that the topic applies to.
+  #   If "overrides" is passed, the overrides for the assignment will be included
   #
   # @argument order_by [String, "position"|"recent_activity"|"title"]
   #   Determines the order of the discussion topic list. Defaults to "position".
@@ -402,6 +409,7 @@ class DiscussionTopicsController < ApplicationController
           include_all_dates: include_params.include?('all_dates'),
           :include_sections => include_params.include?('sections'),
           :include_sections_user_count => include_params.include?('sections_user_count'),
+          :include_overrides => include_params.include?('overrides'),
           master_course_status: mc_status,
           root_topic_fields: root_topic_fields)
       end
@@ -514,9 +522,7 @@ class DiscussionTopicsController < ApplicationController
       js_hash[:STUDENT_PLANNER_ENABLED] = @context.grants_any_right?(@current_user, session, :manage)
     end
 
-    if @context.account.feature_enabled?(:section_specific_announcements) &&
-        @topic.is_section_specific && @context.is_a?(Course)
-
+    if @topic.is_section_specific && @context.is_a?(Course)
       selected_section_ids = @topic.discussion_topic_section_visibilities.pluck(:course_section_id)
       js_hash['SELECTED_SECTION_LIST'] = sections.select{|s| selected_section_ids.include?(s.id)}.map do |section|
         {
@@ -525,9 +531,6 @@ class DiscussionTopicsController < ApplicationController
         }
       end
     end
-    js_hash[:SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED] = @context.account.
-      feature_enabled?(:section_specific_announcements)
-
 
     js_hash[:SECTION_SPECIFIC_DISCUSSIONS_ENABLED] = @context.account.feature_enabled?(:section_specific_discussions)
 
@@ -638,11 +641,10 @@ class DiscussionTopicsController < ApplicationController
             @context_module_tag = ContextModuleItem.find_tag_with_preferred([@topic, @topic.root_topic, @topic.assignment], params[:module_item_id])
             @sequence_asset = @context_module_tag.try(:content)
 
-            if @context.is_a?(Course) &&
-                @context.account.feature_enabled?(:section_specific_announcements) &&
-                @topic.is_section_specific
+            if @context.is_a?(Course) && @topic.is_section_specific
               user_counts = Enrollment.where(:course_section_id => @topic.course_sections,
-                                             course_id: @context).active.group(:course_section_id).count
+                                             course_id: @context).not_fake.active_or_pending_by_date_ignoring_access.
+                                             group(:course_section_id).count
               section_data = @topic.course_sections.map do |cs|
                 cs.attributes.slice(*%w{id name}).merge(:user_count => user_counts[cs.id] || 0)
               end
@@ -693,7 +695,9 @@ class DiscussionTopicsController < ApplicationController
               :THREADED => @topic.threaded?,
               :ALLOW_RATING => @topic.allow_rating,
               :SORT_BY_RATING => @topic.sort_by_rating,
-              :TODO_DATE => @topic.todo_date
+              :TODO_DATE => @topic.todo_date,
+              :IS_ASSIGNMENT => @topic.assignment_id?,
+              :IS_GROUP => @topic.group_category_id?
             }
             if params[:hide_student_names]
               env_hash[:HIDE_STUDENT_NAMES] = true
@@ -715,13 +719,12 @@ class DiscussionTopicsController < ApplicationController
             end
 
             js_hash = {:DISCUSSION => env_hash}
-            if @context.account.feature_enabled?(:section_specific_announcements) && @context.is_a?(Course)
-              js_hash[:TOTAL_USER_COUNT] = @topic.context.enrollments.active.count
+            if @context.is_a?(Course)
+              js_hash[:TOTAL_USER_COUNT] = @topic.context.enrollments.not_fake.
+                active_or_pending_by_date_ignoring_access.count
             end
             js_hash[:COURSE_ID] = @context.id if @context.is_a?(Course)
             js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
-            js_hash[:SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED] = @context.account.
-              feature_enabled?(:section_specific_announcements)
             js_hash[:STUDENT_CONTEXT_CARDS_ENABLED] = @context.is_a?(Course) &&
               @domain_root_account.feature_enabled?(:student_context_cards) &&
               @context.grants_right?(@current_user, session, :manage)
@@ -1033,8 +1036,7 @@ class DiscussionTopicsController < ApplicationController
   end
 
   def verify_specific_section_visibilities
-    return unless @topic.is_section_specific
-    return unless @context.is_a? Course
+    return unless @topic.is_section_specific && @context.is_a?(Course)
     visibilities = @context.course_section_visibility(@current_user)
 
     invalid_sections =
@@ -1113,9 +1115,8 @@ class DiscussionTopicsController < ApplicationController
 
     prefer_assignment_availability_dates(discussion_topic_hash)
 
-    unless process_future_date_parameters(discussion_topic_hash)
-      process_lock_parameters(discussion_topic_hash)
-    end
+    process_future_date_parameters(discussion_topic_hash)
+    process_lock_parameters(discussion_topic_hash)
 
     process_published_parameters(discussion_topic_hash)
     if is_new && @topic.published? && params[:assignment]
@@ -1217,23 +1218,22 @@ class DiscussionTopicsController < ApplicationController
       else
         @topic.unlock(without_save: true)
       end
-      true
-    else
-      false
     end
   end
 
   def process_lock_parameters(discussion_topic_hash)
     # Handle locking/unlocking (overrides workflow state if provided). It appears that the locked param as a hash
     # is from old code and is not being used. Verification requested.
-    if params.has_key?(:locked) && !params[:locked].is_a?(Hash)
-      should_lock = value_to_boolean(params[:locked])
-      if should_lock != @topic.locked?
-        if should_lock
-          @topic.lock(without_save: true)
-        else
-          discussion_topic_hash[:lock_at] = nil
-          @topic.unlock(without_save: true)
+    if !(@topic.lock_at_changed?)
+      if params.has_key?(:locked) && !params[:locked].is_a?(Hash)
+        should_lock = value_to_boolean(params[:locked])
+        if should_lock != @topic.locked?
+          if should_lock
+            @topic.lock(without_save: true)
+          else
+            discussion_topic_hash[:lock_at] = nil
+            @topic.unlock(without_save: true)
+          end
         end
       end
     end

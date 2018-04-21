@@ -43,7 +43,7 @@ class UserObserveesController < ApplicationController
   # @returns [User]
   def index
     includes = params[:include] || []
-    observed_users = user.observed_users.active_user_observers.active.order_by_sortable_name
+    observed_users = user.linked_students.active.order_by_sortable_name
     observed_users = Api.paginate(observed_users, self, api_v1_user_observees_url)
     render json: users_json(observed_users, @current_user, session,includes )
   end
@@ -162,7 +162,7 @@ class UserObserveesController < ApplicationController
   def destroy
     raise ActiveRecord::RecordNotFound unless has_observee?(observee)
 
-    user.user_observees.active.where(user_id: observee).destroy_all
+    user.as_observer_observation_links.where(user_id: observee).destroy_all
     render json: user_json(observee, @current_user, session)
   end
 
@@ -178,13 +178,13 @@ class UserObserveesController < ApplicationController
 
   def add_observee(observee)
     unless has_observee?(observee)
-      UserObserver.create_or_restore(observee: observee, observer: user)
+      UserObservationLink.create_or_restore(student: observee, observer: user)
       user.touch
     end
   end
 
   def has_observee?(observee)
-    user.user_observees.active.where(user_id: observee).exists?
+    user.as_observer_observation_links.where(user_id: observee).exists?
   end
 
   def self_or_admin_permission_check

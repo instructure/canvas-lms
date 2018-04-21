@@ -107,9 +107,9 @@ module MasterCourses::Restrictor
   def mark_downstream_changes(changed_columns=nil)
     return if @importing_migration || @skip_downstream_changes || !is_child_content? # don't mark changes on import
 
-    changed_columns ||= self.changes.keys & self.class.base_class.restricted_column_settings.values.flatten
+    changed_columns ||= self.saved_changes.keys & self.class.base_class.restricted_column_settings.values.flatten
     state_column = self.is_a?(Attachment) ? "file_state" : "workflow_state"
-    if self.changes[state_column]&.last == "deleted"
+    if self.saved_changes[state_column]&.last == "deleted"
       changed_columns.delete(state_column)
       changed_columns << "manually_deleted"
     end

@@ -27,11 +27,14 @@ We use jQuery UI button set
 */
 
 .ui-buttonset {
-  margin-right: 7px;
+  margin-#{direction(right)}: 7px;
   .ui-button {
-    margin-left: 0;
-    margin-right: -5px;
+    margin-#{direction(left)}: 0;
+    margin-#{direction(right)}: -5px;
     border-radius: 0;
+    // because vendor/jqueryui/button.js:384 has specific code to decide which
+    // class to apply based on if it is RTL or not, we don't need to use the
+    // sass-direction helper here to flip these ourselves.
     &.ui-corner-right {
       border-top-right-radius: $baseBorderRadius;
       border-bottom-right-radius: $baseBorderRadius;

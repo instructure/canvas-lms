@@ -29,7 +29,7 @@ module Api::V1::WikiPage
     opts.delete(:include_assignment) unless wiki_page.context.try(:feature_enabled?, :conditional_release)
 
     hash = api_json(wiki_page, current_user, session, :only => WIKI_PAGE_JSON_ATTRS)
-    hash['page_id'] = wiki_page.id
+    hash['page_id'] = wiki_page.id || 0 # for new page js_env; otherwise Backbone will try to POST instead of PUT
     hash['editing_roles'] ||= 'teachers'
     hash['last_edited_by'] = user_display_json(wiki_page.user, wiki_page.context) if wiki_page.user
     hash['published'] = wiki_page.active?

@@ -507,4 +507,54 @@ describe RoleOverride do
       expect(RoleOverride.manageable_permissions(@account).keys).to include(:manage_frozen_assignments)
     end
   end
+
+  describe 'specific permissions' do
+    before(:once) do
+      account_model
+    end
+
+    describe 'select_final_grade' do
+      let(:permission) { RoleOverride.permissions[:select_final_grade] }
+
+      it 'is enabled by default for teachers, TAs and admins' do
+        expect(permission[:true_for]).to match_array %w(TeacherEnrollment TaEnrollment AccountAdmin)
+      end
+
+      it 'is available to teachers, TAs, admins and account memberships' do
+        expect(permission[:available_to]).to match_array %w(TeacherEnrollment TaEnrollment AccountAdmin AccountMembership)
+      end
+
+      it 'is allowed when Anonymous Moderated Marking is enabled for the account' do
+        @account.root_account.enable_feature!(:anonymous_moderated_marking)
+        expect(permission[:account_allows].call(@account)).to be true
+      end
+
+      it 'is not allowed when Anonymous Moderated Marking is disabled for the account' do
+        @account.root_account.disable_feature!(:anonymous_moderated_marking)
+        expect(permission[:account_allows].call(@account)).to be false
+      end
+    end
+
+    describe 'view_audit_trail' do
+      let(:permission) { RoleOverride.permissions[:view_audit_trail] }
+
+      it 'is enabled by default for teachers, TAs and admins' do
+        expect(permission[:true_for]).to match_array %w(TeacherEnrollment AccountAdmin)
+      end
+
+      it 'is available to teachers, TAs, admins and account memberships' do
+        expect(permission[:available_to]).to match_array %w(TeacherEnrollment AccountAdmin AccountMembership)
+      end
+
+      it 'is allowed when Anonymous Moderated Marking is enabled for the account' do
+        @account.root_account.enable_feature!(:anonymous_moderated_marking)
+        expect(permission[:account_allows].call(@account)).to be true
+      end
+
+      it 'is not allowed when Anonymous Moderated Marking is disabled for the account' do
+        @account.root_account.disable_feature!(:anonymous_moderated_marking)
+        expect(permission[:account_allows].call(@account)).to be false
+      end
+    end
+  end
 end

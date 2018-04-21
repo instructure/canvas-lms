@@ -374,14 +374,24 @@ describe SectionsController, type: :request do
         site_admin_user
       end
 
-      it "should set the sis source id" do
-        json = api_call(:post, @path_prefix, @path_params, { :course_section =>
-          { :name => 'Name', :start_at => '2011-01-01T01:00Z', :end_at => '2011-07-01T01:00Z', :sis_section_id => 'fail' }})
+      it "should set the sis source id and integration_id" do
+        section_params = {name: 'Name', sis_section_id: 'fail', integration_id: 'int1'}
+        json = api_call(:post, @path_prefix, @path_params, {course_section: section_params})
         @course.reload
         section = @course.active_course_sections.find(json['id'].to_i)
         expect(section.name).to eq 'Name'
         expect(section.sis_source_id).to eq 'fail'
+        expect(section.integration_id).to eq 'int1'
         expect(section.sis_batch_id).to eq nil
+      end
+
+      it "should set the integration_id by itself" do
+        section_params = {name: 'Name', integration_id: 'int1'}
+        json = api_call(:post, @path_prefix, @path_params, {course_section: section_params})
+        @course.reload
+        section = @course.active_course_sections.find(json['id'].to_i)
+        expect(section.name).to eq 'Name'
+        expect(section.integration_id).to eq 'int1'
       end
 
       it "should allow reactivating deleting sections using sis_section_id" do

@@ -134,6 +134,26 @@ a[class^=icon-] {
     font-style: normal !important;
   }
 
+  // flip all the arrows around in RTL
+  @if $direction == 'rtl' {
+    &[class*=right],
+    &[class*=left] {
+      &:before {
+        transform: scale(-1, 1);
+      }
+    }
+  }
+}
+
+// TODO: this is not the best place for this, we should probably have instructure-ui
+// handle it itself, but until instUI fixes it, flip all the left & right
+// instructure-icons arrows in RTL
+@if $direction == 'rtl' {
+  svg[name^="IconArrow"] {
+    &[name*="Right"], &[name*="Left"] {
+      transform: scale(-1, 1);
+    }
+  }
 }
 
 i[class*=icon-], i[class^=icon-] {
@@ -162,7 +182,7 @@ i[class*=icon-], i[class^=icon-] {
 // things look nicer
 a[class*=icon-], a[class^=icon-] {
   &:before {
-    margin-right: 4px;
+    margin-#{direction(right)}: 4px;
     vertical-align: text-bottom;
   }
 }

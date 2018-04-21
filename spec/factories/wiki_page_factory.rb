@@ -29,7 +29,8 @@ module Factories
       course: @page.course,
       wiki_page: @page,
       submission_types: 'wiki_page',
-      title: 'Content Page Assignment'
+      title: 'Content Page Assignment',
+      due_at: nil
     }.merge(opts))
   end
 

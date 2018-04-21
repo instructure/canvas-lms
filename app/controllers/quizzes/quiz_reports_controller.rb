@@ -190,7 +190,6 @@ class Quizzes::QuizReportsController < ApplicationController
   end
 
   # @API Abort the generation of a report, or remove a previously generated one
-  # @beta
   #
   # This API allows you to cancel a previous request you issued for a report to
   # be generated. Or in the case of an already generated report, you'd like to

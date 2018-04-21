@@ -164,7 +164,7 @@ describe "grading standards" do
     std.find_element(:css, ".edit_grading_standard_button").click
     std.find_element(:css, "button.save_button")
     wait_for_ajax_requests
-    expect(@standard.reload.data.length).to eq 3
+    expect(@standard.reload.data.length).to eq 4
   end
 
   context 'course settings' do

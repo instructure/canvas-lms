@@ -17,16 +17,12 @@
 #
 
 # @API Quiz Submission Files
-# @beta
-#
-
 class Quizzes::QuizSubmissionFilesController < ApplicationController
   include Api::V1::Submission
 
   before_action :require_user, :require_context
 
   # @API Upload a file
-  # @beta
   #
   # Associate a new quiz submission file
   #

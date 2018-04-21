@@ -89,7 +89,7 @@
     <textarea class="message_html" style="display: none;"><%= h(entry.try_rescue(:message)) %></textarea>
     <div class="link_box">
       <% if entry && entry.attachment %>
-        <div class="attachment_data" style="float: left;">
+        <div class="attachment_data pull-left">
           <%= before_label :attached_file, "Attached File" %> <a href="<%= file_download_url(entry.attachment, :verifier => entry.attachment.uuid) %>" class="attachment_name"><%= entry.attachment.try_rescue(:display_name) || nbsp %></a>
         </div>
       <% end %>

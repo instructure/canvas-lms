@@ -42,6 +42,7 @@ describe "conversations new" do
     end
 
     it "should start a group conversation when there is only one recipient", priority: "2", test_id: 201499 do
+      skip_if_chrome('fragile in chrome')
       conversations
       compose course: @course, to: [@s1], subject: 'single recipient', body: 'hallo!'
       c = @s1.conversations.last.conversation
@@ -50,6 +51,7 @@ describe "conversations new" do
     end
 
     it "should start a group conversation when there is more than one recipient", priority: "2", test_id: 201500 do
+      skip_if_chrome('fragile in chrome')
       conversations
       compose course: @course, to: [@s1, @s2], subject: 'multiple recipients', body: 'hallo!'
       c = @s1.conversations.last.conversation
@@ -146,6 +148,7 @@ describe "conversations new" do
     end
 
     it "should allow selecting multiple recipients in one search", priority: "2", test_id: 201941 do
+      skip_if_chrome('fragile in chrome')
       conversations
       fj('#compose-btn').click
       wait_for_ajaximations
@@ -159,6 +162,7 @@ describe "conversations new" do
     end
 
     it "should not send the message on shift-enter", priority: "1", test_id: 206019 do
+      skip_if_chrome('fragile in chrome')
       conversations
       compose course: @course, to: [@s1], subject: 'context-free', body: 'hallo!', send: false
       driver.action.key_down(:shift).perform
@@ -237,6 +241,7 @@ describe "conversations new" do
       end
 
       it "should leave the value the same as before after unlocking", priority: "2", test_id: 206023 do
+        skip_if_chrome('fragile in chrome')
         conversations
         compose course: @course, subject: 'lockme', body: 'hallo!', send: false
 

@@ -272,6 +272,12 @@ $gradebook_cell_padding_top: 8px;
   &:hover .Gradebook__ColumnHeaderAction button {
     opacity: 1;
   }
+
+  .Gradebook__ColumnHeaderContent.focused {
+    .Gradebook__ColumnHeaderAction button {
+      opacity: 1;
+    }
+  }
 }
 
 .odd .slick-cell {

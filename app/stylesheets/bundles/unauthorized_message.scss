@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@import 'base/environment';
+
 #unauthorized_message {
   border: 1px solid #000;
   margin: 4em auto;
@@ -32,7 +34,7 @@
       background: transparent url(/images/warning_36.png) 0 4px no-repeat;
       position: absolute;
       top: 6px;
-      left: 22px;
+      #{direction(left)}: 22px;
       width: 42px;
       height: 42px;
     }

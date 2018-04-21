@@ -19,7 +19,7 @@
 	}
 	.embed_content > table td.search .search_result {
 		width: 40%;
-		float: left;
+		float: direction(left);
 		margin: 3px;
     padding: 3px;
     overflow: hidden;
@@ -27,22 +27,22 @@
     cursor: pointer;
 	}
 	.embed_content > table td.search .search_result.search_result_assignment {
-    padding-left: 22px;
+    padding-#{direction(left)}: 22px;
     background: url(/images/binder.png) no-repeat 3px 3px;
 	}
 	.embed_content > table td.search .search_result.search_result_discussion_topic,
 	.embed_content > table td.search .search_result.search_result_discussion_entry,
 	.embed_content > table td.search .search_result.search_result_announcement
   {
-    padding-left: 22px;
+    padding-#{direction(left)}: 22px;
     background: url(/images/word_bubble.png) no-repeat 3px 3px;
 	}
 	.embed_content > table td.search .search_result.search_result_calendar_event {
-    padding-left: 22px;
+    padding-#{direction(left)}: 22px;
     background: url(/images/history.png) no-repeat 3px 3px;
   }
 	.embed_content > table td.search .search_result.search_result_wiki_page {
-    padding-left: 22px;
+    padding-#{direction(left)}: 22px;
     background: url(/images/file.png) no-repeat 3px 3px;
   }
 	.embed_content > table td.search .search_result:hover {
@@ -55,11 +55,11 @@
     font-weight: bold;
   }
 	.embed_content > table td.search .search_result .links {
-		text-align: right;
+		text-align: direction(right);
 		font-size: 1.0em;
     font-weight: bold;
     opacity: 0.5;
-    margin-right: 10px;
+    margin-#{direction(right)}: 10px;
 	}
 	.embed_content > table td.search .search_result:hover .links {
     opacity: 1.0;
@@ -68,7 +68,7 @@
     max-height: 40px;
     overflow: hidden;
     font-size: 0.8em;
-    margin-left: 10px;
+    margin-#{direction(left)}: 10px;
     color: #888;
   }
 	.embed_content > table td.search .search_result:hover .teaser {
@@ -99,7 +99,7 @@
 	}
 	.embed_content .content_options ul {
 		display: none;
-		padding-left: 20px;
+		padding-#{direction(left)}: 20px;
 	}
 	.embed_content .content_options ul.opened {
 		display: block;

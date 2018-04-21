@@ -18,7 +18,7 @@
 class UserMergeDataRecord < ActiveRecord::Base
   belongs_to :previous_user, class_name: 'User'
   belongs_to :user_merge_data
-  belongs_to :context, polymorphic: [:account_user, :enrollment, :pseudonym,:user_observer,
+  belongs_to :context, polymorphic: [:account_user, :enrollment, :pseudonym, :user_observer, :user_observation_link,
                                      :attachment, :communication_channel, :user_service,
                                      :submission, {quiz_submission: 'Quizzes::QuizSubmission'}]
 

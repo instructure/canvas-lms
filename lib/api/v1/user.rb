@@ -59,10 +59,6 @@ module Api::V1::User
         if user_can_read_sis_data?(current_user, context)
           json.merge! :sis_user_id => pseudonym&.sis_user_id,
                       :integration_id => pseudonym&.integration_id
-          # TODO: don't send sis_login_id; it's garbage data
-          if @domain_root_account.settings['return_sis_login_id'] == 'true'
-            json.merge! :sis_login_id => pseudonym&.unique_id
-          end
         end
         json[:sis_import_id] = pseudonym&.sis_batch_id if @domain_root_account.grants_right?(current_user, session, :manage_sis)
         json[:root_account] = HostUrl.context_host(pseudonym&.account) if include_root_account

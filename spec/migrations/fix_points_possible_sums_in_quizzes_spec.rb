@@ -64,9 +64,11 @@ describe 'FixPointsPossibleSumsInQuizzes' do
 
     it "should only select quizzes that appear to have rounding error" do
       healthy_quiz = @course.quizzes.create!(title: 'decimal quiz')
-      healthy_quiz.build_assignment(force: true)
-      healthy_quiz.assignment.points_possible = 10.5
-      healthy_quiz.assignment.save!
+      a = Assignment.new
+      a.course = @course
+      a.points_possible = 10.5
+      a.quiz = healthy_quiz
+      a.save!
 
       nil_quiz = @course.quizzes.create!(title: 'no points quiz', quiz_type: 'survey')
 

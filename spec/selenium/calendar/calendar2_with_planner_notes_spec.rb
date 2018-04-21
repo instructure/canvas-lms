@@ -54,7 +54,7 @@ describe "calendar2" do
       wait_for_ajax_requests
       f('.fc-week td').click # click the first day of the month
       f('li[aria-controls="edit_planner_note_form_holder"]').click # the To Do tab
-      replace_content(f('#planner_note_date'), 1.day.from_now.to_date.iso8601)
+      replace_content(f('#planner_note_date'), 0.days.from_now.to_date.iso8601)
       replace_content(f('#planner_note_title'), title)
       f('button.save_note').click
       wait_for_ajaximations

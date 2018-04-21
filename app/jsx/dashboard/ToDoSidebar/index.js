@@ -110,9 +110,9 @@ export class ToDoSidebar extends Component {
     this.todoItemComponents = [];
     return (
       <div>
-        <Heading level="h2" border="bottom">
+        <h2 className="todo-list-header">
           <span tabIndex="-1" ref={elt => {this.titleFocus = elt}}>{I18n.t('To Do')}</span>
-        </Heading>
+        </h2>
         <List variant="unstyled">
           {
             visibleTodos.map((item, itemIndex) => (

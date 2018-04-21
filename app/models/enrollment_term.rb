@@ -51,7 +51,7 @@ class EnrollmentTerm < ActiveRecord::Base
   end
 
   def update_courses_later_if_necessary
-    if !self.new_record? && (self.start_at_changed? || self.end_at_changed?)
+    if !self.new_record? && (self.saved_change_to_start_at? || self.saved_change_to_end_at?)
       self.update_courses_and_states_later
     end
   end
@@ -227,6 +227,6 @@ class EnrollmentTerm < ActiveRecord::Base
   def grading_period_group_id_has_changed?
     # migration 20111111214313_add_trust_link_for_default_account
     # will throw an error without this check
-    respond_to?(:grading_period_group_id_changed?) && grading_period_group_id_changed?
+    respond_to?(:saved_change_to_grading_period_group_id?) && saved_change_to_grading_period_group_id?
   end
 end

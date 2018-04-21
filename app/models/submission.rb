@@ -131,9 +131,8 @@ class Submission < ActiveRecord::Base
     limit(limit)
   }
 
-  scope :for_course, lambda { |course|
-    where(assignment_id: course.assignments.except(:order))
-  }
+  scope :for_course, -> (course) { where(assignment: course.assignments.except(:order)) }
+  scope :for_assignment, -> (assignment) { where(assignment: assignment) }
 
   scope :missing, -> do
     joins(:assignment).
@@ -206,6 +205,8 @@ class Submission < ActiveRecord::Base
     ")
   end
 
+  scope :anonymized, -> { where.not(anonymous_id: nil) }
+
   workflow do
     state :submitted do
       event :grade_it, :transitions_to => :graded
@@ -216,6 +217,33 @@ class Submission < ActiveRecord::Base
     state :deleted
   end
   alias needs_review? pending_review?
+
+  def self.anonymous_ids_for(assignment)
+    anonymized.for_assignment(assignment).pluck(:anonymous_id)
+  end
+
+  # Returns a unique short id to be used for anonymous_id. If the
+  # generated short id is already in use, loop until an available
+  # one is generated. `anonymous_ids` are unique per assignment.
+  # This method will throw a unique constraint error from the
+  # database if it has used all unique ids.
+  # An optional argument of existing_anonymous_ids can be supplied
+  # to customize the handling of existing anonymous_ids. E.g. bulk
+  # generation of anonymous ids where you wouldn't want to
+  # continuously query the database
+  def self.generate_unique_anonymous_id(assignment:, existing_anonymous_ids: anonymous_ids_for(assignment))
+    loop do
+      short_id = Submission.generate_short_id
+      break short_id unless existing_anonymous_ids.include?(short_id)
+    end
+  end
+
+  # base58 to avoid literal problems with prefixed 0 (i.e. when 0x123
+  # is interpreted as a hex value `0x123 == 291`), and similar looking
+  # characters: 0/O, I/l
+  def self.generate_short_id
+    SecureRandom.base58(5)
+  end
 
   # see #needs_grading?
   # When changing these conditions, update index_submissions_needs_grading to
@@ -236,7 +264,7 @@ class Submission < ActiveRecord::Base
 
   # see .needs_grading_conditions
   def needs_grading?(was = false)
-    suffix = was ? "_was" : ""
+    suffix = was ? "_before_last_save" : ""
 
     !send("submission_type#{suffix}").nil? &&
     (send("workflow_state#{suffix}") == 'pending_review' ||
@@ -274,6 +302,11 @@ class Submission < ActiveRecord::Base
                 :assignment_changed_not_sub,
                 :grading_error_message,
                 :grade_change_event_author_id
+
+  # Because set_anonymous_id makes database calls, delay it until just before
+  # validation. Otherwise if we place it in any earlier (e.g.
+  # before/after_initialize), every Submission.new will make database calls.
+  before_validation :set_anonymous_id, if: :new_record?
   before_save :apply_late_policy, if: :late_policy_relevant_changes?
   before_save :update_if_pending
   before_save :validate_single_submission, :infer_values
@@ -293,6 +326,7 @@ class Submission < ActiveRecord::Base
   after_save :update_quiz_submission
   after_save :update_participation
   after_save :update_line_item_result
+  after_save :delete_ignores
 
   def autograded?
     # AutoGrader == (quiz_id * -1)
@@ -490,8 +524,8 @@ class Submission < ActiveRecord::Base
   end
 
   def update_final_score
-    if score_changed? || excused_changed? ||
-        (workflow_state_was == "pending_review" && workflow_state == "graded")
+    if saved_change_to_score? || saved_change_to_excused? ||
+        (workflow_state_before_last_save == "pending_review" && workflow_state == "graded")
       if skip_grade_calc
         Rails.logger.debug "GRADES: NOT recomputing scores for submission #{global_id} because skip_grade_calc was set"
       else
@@ -1167,7 +1201,7 @@ class Submission < ActiveRecord::Base
   private :attachment_fake_belongs_to_group
 
   def submit_attachments_to_canvadocs
-    if attachment_ids_changed? && submission_type != 'discussion_topic'
+    if saved_change_to_attachment_ids? && submission_type != 'discussion_topic'
       attachments.preload(:crocodoc_document, :canvadoc).each do |a|
         # associate previewable-document and submission for permission checks
         if a.canvadocable? && Canvadocs.annotations_supported?
@@ -1275,7 +1309,7 @@ class Submission < ActiveRecord::Base
   end
 
   def check_for_media_object
-    if self.media_comment_id.present? && self.media_comment_id_changed?
+    if self.media_comment_id.present? && self.saved_change_to_media_comment_id?
       MediaObject.ensure_media_object(self.media_comment_id, {
         :user => self.user,
         :context => self.user,
@@ -1651,7 +1685,7 @@ class Submission < ActiveRecord::Base
   end
 
   def assignment_graded_in_the_last_hour?
-    graded_at_was && graded_at_was > 1.hour.ago
+    graded_at_before_last_save && graded_at_before_last_save > 1.hour.ago
   end
 
   def teacher
@@ -1698,8 +1732,8 @@ class Submission < ActiveRecord::Base
   private :validate_single_submission
 
   def grade_change_audit(force_audit = self.assignment_changed_not_sub)
-    newly_graded = self.workflow_state_changed? && self.workflow_state == 'graded'
-    grade_changed = (self.changed & %w(grade score excused)).present?
+    newly_graded = self.saved_change_to_workflow_state? && self.workflow_state == 'graded'
+    grade_changed = (self.saved_changes.keys & %w(grade score excused)).present?
     return true unless newly_graded || grade_changed || force_audit
 
     if grade_change_event_author_id.present?
@@ -2177,7 +2211,7 @@ class Submission < ActiveRecord::Base
 
     return unless self.context.grants_right?(self.user, :participate_as_student)
 
-    if score_changed? || grade_changed? || excused_changed?
+    if saved_change_to_score? || saved_change_to_grade? || saved_change_to_excused?
       ContentParticipation.create_or_update({
         :content => self,
         :user => self.user,
@@ -2188,7 +2222,18 @@ class Submission < ActiveRecord::Base
 
   def update_line_item_result
     return if lti_result.nil?
-    lti_result.update(result_score: score) if score_changed?
+    lti_result.update(result_score: score) if saved_change_to_score?
+  end
+
+  def delete_ignores
+    if !submission_type.nil? || excused
+      Ignore.where(asset_type: 'Assignment', asset_id: assignment_id, user_id: user_id, purpose: 'submitting').delete_all
+
+      unless Submission.where(assignment_id: assignment_id).where(Submission.needs_grading_conditions).exists?
+        Ignore.where(asset_type: 'Assignment', asset_id: assignment_id, purpose: 'grading', permanent: false).delete_all
+      end
+    end
+    true
   end
 
   def point_data?
@@ -2401,4 +2446,9 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  private
+
+  def set_anonymous_id
+    self.anonymous_id = Submission.generate_unique_anonymous_id(assignment: anonymous_id)
+  end
 end

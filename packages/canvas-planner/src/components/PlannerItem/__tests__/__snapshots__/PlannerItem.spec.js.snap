@@ -2,6 +2,7 @@
 
 exports[`renders Announcement correctly with everything 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={true}
@@ -98,6 +99,7 @@ exports[`renders Announcement correctly with everything 1`] = `
 
 exports[`renders Announcement correctly with just date 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={false}
@@ -170,6 +172,7 @@ exports[`renders Announcement correctly with just date 1`] = `
 
 exports[`renders Announcement correctly with just points 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={false}
@@ -264,6 +267,7 @@ exports[`renders Announcement correctly with just points 1`] = `
 
 exports[`renders Announcement correctly without right side content 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={false}
@@ -334,6 +338,7 @@ exports[`renders Announcement correctly without right side content 1`] = `
 
 exports[`renders Assignment correctly with everything 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={true}
@@ -430,6 +435,7 @@ exports[`renders Assignment correctly with everything 1`] = `
 
 exports[`renders Assignment correctly with just date 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={false}
@@ -502,6 +508,7 @@ exports[`renders Assignment correctly with just date 1`] = `
 
 exports[`renders Assignment correctly with just points 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={false}
@@ -596,6 +603,7 @@ exports[`renders Assignment correctly with just points 1`] = `
 
 exports[`renders Assignment correctly without right side content 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={false}
@@ -666,6 +674,7 @@ exports[`renders Assignment correctly without right side content 1`] = `
 
 exports[`renders Calendar Event correctly with everything 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={true}
@@ -762,6 +771,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
 
 exports[`renders Calendar Event correctly with just date 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={false}
@@ -834,6 +844,7 @@ exports[`renders Calendar Event correctly with just date 1`] = `
 
 exports[`renders Calendar Event correctly with just points 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={false}
@@ -928,6 +939,7 @@ exports[`renders Calendar Event correctly with just points 1`] = `
 
 exports[`renders Calendar Event correctly without right side content 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={false}
@@ -998,6 +1010,7 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
 
 exports[`renders Discussion correctly with everything 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={true}
@@ -1094,6 +1107,7 @@ exports[`renders Discussion correctly with everything 1`] = `
 
 exports[`renders Discussion correctly with just date 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={false}
@@ -1166,6 +1180,7 @@ exports[`renders Discussion correctly with just date 1`] = `
 
 exports[`renders Discussion correctly with just points 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={false}
@@ -1260,6 +1275,7 @@ exports[`renders Discussion correctly with just points 1`] = `
 
 exports[`renders Discussion correctly without right side content 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={false}
@@ -1330,6 +1346,7 @@ exports[`renders Discussion correctly without right side content 1`] = `
 
 exports[`renders Note correctly with Group 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={false}
@@ -1402,6 +1419,7 @@ exports[`renders Note correctly with Group 1`] = `
 
 exports[`renders Note correctly with everything 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={true}
@@ -1427,7 +1445,13 @@ exports[`renders Note correctly with everything 1`] = `
       }
     }
   >
-    <IconNoteLightLine />
+    <Avatar
+      inline={true}
+      name="Jane"
+      size="small"
+      src="/picture/is/here"
+      variant="circle"
+    />
   </div>
   <div>
     <div>
@@ -1474,6 +1498,7 @@ exports[`renders Note correctly with everything 1`] = `
 
 exports[`renders Note correctly without Course 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={false}
@@ -1499,7 +1524,13 @@ exports[`renders Note correctly without Course 1`] = `
       }
     }
   >
-    <IconNoteLightLine />
+    <Avatar
+      inline={true}
+      name="Jane"
+      size="small"
+      src="/picture/is/here"
+      variant="circle"
+    />
   </div>
   <div>
     <div>
@@ -1544,6 +1575,7 @@ exports[`renders Note correctly without Course 1`] = `
 
 exports[`renders Page correctly with everything 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={true}
@@ -1640,6 +1672,7 @@ exports[`renders Page correctly with everything 1`] = `
 
 exports[`renders Page correctly with just date 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={false}
@@ -1712,6 +1745,7 @@ exports[`renders Page correctly with just date 1`] = `
 
 exports[`renders Page correctly with just points 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={false}
@@ -1806,6 +1840,7 @@ exports[`renders Page correctly with just points 1`] = `
 
 exports[`renders Page correctly without right side content 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={false}
@@ -1876,6 +1911,7 @@ exports[`renders Page correctly without right side content 1`] = `
 
 exports[`renders Quiz correctly with everything 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={true}
@@ -1972,6 +2008,7 @@ exports[`renders Quiz correctly with everything 1`] = `
 
 exports[`renders Quiz correctly with just date 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={false}
@@ -2044,6 +2081,7 @@ exports[`renders Quiz correctly with just date 1`] = `
 
 exports[`renders Quiz correctly with just points 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={false}
@@ -2138,6 +2176,7 @@ exports[`renders Quiz correctly with just points 1`] = `
 
 exports[`renders Quiz correctly without right side content 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={false}
@@ -2208,6 +2247,7 @@ exports[`renders Quiz correctly without right side content 1`] = `
 
 exports[`renders correctly 1`] = `
 <div>
+  <NotificationBadge />
   <div>
     <Checkbox
       checked={false}

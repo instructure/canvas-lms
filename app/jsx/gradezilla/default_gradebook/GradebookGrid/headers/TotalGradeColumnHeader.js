@@ -74,8 +74,6 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
     ...ColumnHeader.defaultProps
   };
 
-  state = { menuShown: false, skipFocusOnClose: false };
-
   switchGradeDisplay = () => { this.invokeAndSkipFocus(this.props.gradeDisplay) };
 
   invokeAndSkipFocus (action) {
@@ -101,7 +99,11 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
     const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`;
 
     return (
-      <div className="Gradebook__ColumnHeaderContent">
+      <div
+        className={`Gradebook__ColumnHeaderContent ${this.state.hasFocus ? 'focused' : ''}`}
+        onBlur={this.handleBlur}
+        onFocus={this.handleFocus}
+      >
         <div style={{ flex: 1, minWidth: '1px' }}>
           <Grid colSpacing="none" hAlign="space-between" vAlign="middle">
             <GridRow>

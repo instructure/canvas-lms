@@ -981,6 +981,82 @@ test('returns false when anonymousInstructorAnnotations is false', () => {
   strictEqual(assignment.toView().anonymousInstructorAnnotations, false)
 })
 
+QUnit.module('Assignment#canDuplicate')
+
+test('returns true if record can be duplicated', () => {
+  const assignment = new Assignment({
+    name: 'foo',
+    can_duplicate: true
+  })
+  equal(assignment.canDuplicate(), true)
+})
+
+test('returns false if record cannot be duplicated', () => {
+  const assignment = new Assignment({
+    name: 'foo',
+    can_duplicate: false
+  })
+  equal(assignment.canDuplicate(), false)
+})
+
+QUnit.module('Assignment#isDuplicating')
+
+test('returns true if record is duplicating', () => {
+  const assignment = new Assignment({
+    name: 'foo',
+    workflow_state: 'duplicating'
+  })
+  equal(assignment.isDuplicating(), true)
+})
+
+test('returns false if record is not duplicating', () => {
+  const assignment = new Assignment({
+    name: 'foo',
+    workflow_state: 'published'
+  })
+  equal(assignment.isDuplicating(), false)
+})
+
+QUnit.module('Assignment#failedToDuplicate')
+
+test('returns true if record failed to duplicate', () => {
+  const assignment = new Assignment({
+    name: 'foo',
+    workflow_state: 'failed_to_duplicate'
+  })
+  equal(assignment.failedToDuplicate(), true)
+})
+
+test('returns false if record did not fail to duplicate', () => {
+  const assignment = new Assignment({
+    name: 'foo',
+    workflow_state: 'published'
+  })
+  equal(assignment.failedToDuplicate(), false)
+})
+
+QUnit.module('Assignment#originalAssignmentID')
+
+test('returns the original assignment id', () => {
+  const originalAssignmentID = '42'
+  const assignment = new Assignment({
+    name: 'foo',
+    original_assignment_id: originalAssignmentID
+  })
+  equal(assignment.originalAssignmentID(), originalAssignmentID)
+})
+
+QUnit.module('Assignment#originalAssignmentName')
+
+test('returns the original assignment name', () => {
+  const originalAssignmentName = 'Original Assignment'
+  const assignment = new Assignment({
+    name: 'foo',
+    original_assignment_name: originalAssignmentName
+  })
+  equal(assignment.originalAssignmentName(), originalAssignmentName)
+})
+
 QUnit.module('Assignment#isQuizLTIAssignment')
 
 test('returns true if record uses quizzes 2', () => {

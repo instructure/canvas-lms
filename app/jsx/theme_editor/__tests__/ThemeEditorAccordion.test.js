@@ -50,7 +50,6 @@ function generateProps(type, overrides = {}) {
     },
     changeSomething() {},
     getDisplayValue: () => 'display_name',
-    refactorEnabled: true,
     ...overrides
   }
 }

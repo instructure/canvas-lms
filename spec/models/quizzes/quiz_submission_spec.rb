@@ -1557,6 +1557,24 @@ describe Quizzes::QuizSubmission do
         expect(@quiz_submission.teachers).to_not include other_teacher
       end
     end
+
+    describe '#delete_ignores' do
+      before :once do
+        student_in_course(active_all: true, course: @course)
+        @ignore = Ignore.create!(user: @student, asset: @quiz, purpose: 'submitting')
+      end
+
+      it 'should delete ignores when the user completes the submission' do
+        qs = @quiz.generate_submission(@student)
+        qs.complete!
+        expect {@ignore.reload}.to raise_error ActiveRecord::RecordNotFound
+      end
+
+      it 'should not delete ignores when the quiz submission is updated, but not completed' do
+        @quiz.generate_submission(@student)
+        expect(@ignore.reload).to eq @ignore
+      end
+    end
   end
 
   describe "associated submission" do

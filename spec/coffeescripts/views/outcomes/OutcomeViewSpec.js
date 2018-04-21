@@ -21,6 +21,7 @@ import fakeENV from 'helpers/fakeENV'
 import Outcome from 'compiled/models/Outcome'
 import OutcomeView from 'compiled/views/outcomes/OutcomeView'
 import I18nStubber from 'helpers/I18nStubber'
+import tinymce from 'compiled/editor/stocktiny'
 
 const newOutcome = (outcomeOptions, outcomeLinkOptions) =>
   new Outcome(buildOutcome(outcomeOptions, outcomeLinkOptions), {parse: true})
@@ -74,11 +75,15 @@ function createView(opts) {
 QUnit.module('OutcomeView', {
   setup() {
     fakeENV.setup()
+    // Sometimes TinyMCE has stuff on the dom that causes issues, likely from things that
+    // don't clean up properly, we make sure that these run in a clean tiny state each time
+    tinymce.remove()
     ENV.PERMISSIONS = {manage_outcomes: true}
     this.outcome1 = outcome1()
   },
   teardown() {
     fakeENV.teardown()
+    tinymce.remove() // Don't leave anything hanging around
     document.getElementById('fixtures').innerHTML = ''
   }
 })

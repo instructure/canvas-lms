@@ -27,7 +27,7 @@ class GradingPeriodGroup < ActiveRecord::Base
   validate :associated_with_course_or_root_account, if: :active?
 
   after_save :recompute_course_scores, if: :weighted_actually_changed?
-  after_save :recache_grading_period, if: :course_id_changed?
+  after_save :recache_grading_period, if: :saved_change_to_course_id?
   after_destroy :cleanup_associations_and_recompute_scores_later
 
   set_policy do
@@ -93,12 +93,12 @@ class GradingPeriodGroup < ActiveRecord::Base
   )
 
   def weighted_actually_changed?
-    !self.new_record? && weighted_changed?
+    !self.new_record? && saved_change_to_weighted?
   end
 
   def recache_grading_period
     DueDateCacher.recompute_course(course) if course
-    DueDateCacher.recompute_course(course_id_was) if course_id_was
+    DueDateCacher.recompute_course(course_id_before_last_save) if course_id_before_last_save
   end
 
   def associated_with_course_or_root_account

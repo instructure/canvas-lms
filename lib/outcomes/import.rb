@@ -86,6 +86,12 @@ module Outcomes
           guid: group[:vendor_guid]
         )
       end
+      if model.outcome_import_id == outcome_import_id
+        raise InvalidDataError, I18n.t(
+          'Group "%{guid}" has already appeared in this import',
+          guid: group[:vendor_guid]
+        )
+      end
       model.vendor_guid = group[:vendor_guid]
       model.title = group[:title]
       model.description = group[:description] || ''
@@ -105,20 +111,28 @@ module Outcomes
       parents = find_parents(outcome)
 
       model = find_prior_outcome(outcome)
-      model.context ||= context
+      model.context = context if model.new_record?
       unless context_visible?(model.context)
         raise InvalidDataError, I18n.t(
           'Outcome "%{guid}" not in visible context',
           guid: outcome[:vendor_guid]
         )
       end
+      if model.outcome_import_id == outcome_import_id
+        raise InvalidDataError, I18n.t(
+          'Outcome "%{guid}" has already appeared in this import',
+          guid: outcome[:vendor_guid]
+        )
+      end
+
       model.vendor_guid = outcome[:vendor_guid]
       model.title = outcome[:title]
       model.description = outcome[:description] || ''
       model.display_name = outcome[:display_name] || ''
       model.calculation_method = outcome[:calculation_method]
       model.calculation_int = outcome[:calculation_int]
-      model.workflow_state ||= 'active' # let removing the outcome_links content tags delete the underlying outcome
+      # let removing the outcome_links content tags delete the underlying outcome
+      model.workflow_state = 'active' if outcome[:workflow_state] == 'active'
 
       prior_rubric = model.rubric_criterion || {}
       changed = ->(k) { outcome[k].present? && outcome[k] != prior_rubric[k] }
@@ -130,8 +144,13 @@ module Outcomes
         model.save!
       elsif model.changed?
         raise InvalidDataError, I18n.t(
-          'Cannot modify fields for outcome from another context: %{changes}',
-          changes: model.changes.keys.inspect
+          'Cannot modify outcome from another context: %{changes}; outcome must be modified in %{context}',
+          changes: model.changes.keys.inspect,
+          context: if model.context.present?
+                     I18n.t('"%{name}"', name: model.context.name)
+                   else
+                     I18n.t('the global context')
+                   end
         )
       end
 
@@ -208,22 +227,33 @@ module Outcomes
     end
 
     def context_visible?(other_context)
+      return true if other_context.nil?
       other_context == context || context.account_chain.include?(other_context)
     end
 
     def update_outcome_parents(outcome, parents)
       existing_links = ContentTag.learning_outcome_links.where(context: context, content: outcome)
-      existing_parent_ids = existing_links.map(&:associated_asset_id)
-      updated_parent_ids = parents.map(&:id)
-      new_parents = parents.reject { |p| existing_parent_ids.include?(p.id) }
-      old_links = existing_links.reject { |l| updated_parent_ids.include?(l.associated_asset_id) }
 
+      next_parent_ids = parents.map(&:id)
+      resurrect = existing_links.
+        where(associated_asset_id: next_parent_ids).
+        where(associated_asset_type: 'LearningOutcomeGroup').
+        where(workflow_state: 'deleted')
+      resurrect.update_all(workflow_state: 'active')
+
+      kill = existing_links.
+        where.not(associated_asset_id: next_parent_ids).
+        where(associated_asset_type: 'LearningOutcomeGroup').
+        where(workflow_state: 'active')
+      kill.destroy_all
+
+      existing_parent_ids = existing_links.pluck(:associated_asset_id)
+      new_parents = parents.reject { |p| existing_parent_ids.include?(p.id) }
       new_parents.each { |p| p.add_outcome(outcome) }
-      old_links.each(&:destroy)
     end
 
     def outcome_import_id
-      @outcome_import_id ||= SecureRandom.random_number(2**32) # replace with OutcomeImport id
+      @outcome_import_id ||= @import&.id || SecureRandom.random_number(2**32)
     end
   end
 end

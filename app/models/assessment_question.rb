@@ -65,7 +65,11 @@ class AssessmentQuestion < ActiveRecord::Base
     # this has to be in an after_save, because translate_links may create attachments
     # with this question as the context, and if this question does not exist yet,
     # creating that attachment will fail.
-    translate_links if self.question_data_changed? && !@skip_translate_links
+    if self.saved_change_to_question_data? && !@skip_translate_links
+      AssessmentQuestion.connection.after_transaction_commit do
+        translate_links
+      end
+    end
   end
 
   def self.translate_links(ids)
@@ -183,8 +187,6 @@ class AssessmentQuestion < ActiveRecord::Base
       # we may be modifying this data (translate_links), and only want to work on a copy
       data = data.try(:dup)
     end
-    # force AR to think this attribute has changed
-    self.question_data_will_change!
     write_attribute(:question_data, data.to_hash.with_indifferent_access)
   end
 

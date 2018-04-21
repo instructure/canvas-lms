@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'formdata-polyfill'; // Need to support FormData.has for IE
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ThemeEditor from '../theme_editor/ThemeEditor'
@@ -34,8 +35,7 @@ ReactDOM.render(
       sharedBrandConfigs: window.ENV.sharedBrandConfigs,
       allowGlobalIncludes: window.ENV.allowGlobalIncludes,
       accountID: window.ENV.account_id,
-      useHighContrast: window.ENV.use_high_contrast,
-      refactorEnabled: window.ENV.REFACTOR_ENABLED
+      useHighContrast: window.ENV.use_high_contrast
     }}
   />,
   document.body

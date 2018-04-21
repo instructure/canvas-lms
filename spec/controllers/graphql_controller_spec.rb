@@ -72,4 +72,20 @@ describe GraphQLController do
       end
     end
   end
+
+  context "datadog rest metrics" do
+    require 'datadog/statsd'
+
+    # this is the dumbest place to put this test except every where else i
+    # could think of
+    it "records datadog metrics if requested" do
+      expect_any_instance_of(Datadog::Statsd).to receive :increment
+      get :graphiql, params: {datadog_metric: "this_is_a_test"}
+    end
+
+    it "doesn't normally datadog" do
+      get :graphiql
+      expect_any_instance_of(Datadog::Statsd).not_to receive :increment
+    end
+  end
 end

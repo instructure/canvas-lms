@@ -40,7 +40,8 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
         sample_bundles = {
           'bundles/common' => false,
           'plugins/analytics/analytics' => false, # to test that it works with plugins
-          'jst/tinymce/EquationEditorView' => true # to test that it works with handlebars-loaded css
+          'jst/tinymce/EquationEditorView' => false, # to test that it works with handlebars-loaded css
+          'jst/tinymce/InsertUpdateImageView' => true
         }
         sample_bundles.each do |bundle_name, includes_no_variables|
           fingerprints = BrandableCSS.variants.map do |variant|
@@ -50,7 +51,7 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
             data
           end
 
-          expect(fingerprints.length).to eq(4), 'We have 4 variants: new_styles_normal_contrast and new_styles_high_contrast & responsive_layout_normal_contrast and responsive_layout_high_contrast'
+          expect(fingerprints.length).to eq(8), 'We have 8 variants'
           msg = 'make sure the conbined results match the result of all_fingerprints_for'
           expect(fingerprints).to eq(BrandableCSS.all_fingerprints_for(bundle_name).values), msg
 

@@ -27,7 +27,7 @@ class SisBatch < ActiveRecord::Base
   belongs_to :errors_attachment, class_name: 'Attachment'
   has_many :sis_batch_error_files
   has_many :parallel_importers, inverse_of: :sis_batch
-  has_many :sis_batch_errors, inverse_of: :sis_batch
+  has_many :sis_batch_errors, inverse_of: :sis_batch, autosave: false
   belongs_to :generated_diff, class_name: 'Attachment'
   belongs_to :batch_mode_term, class_name: 'EnrollmentTerm'
   belongs_to :user
@@ -84,6 +84,49 @@ class SisBatch < ActiveRecord::Base
     Attachment.skip_3rd_party_submits(false)
   end
 
+  def self.add_error(csv, message, sis_batch:, row: nil, failure: false, backtrace: nil, row_info: nil)
+    error = build_error(csv, message, row: row, failure: failure, backtrace: backtrace, row_info: row_info, sis_batch: sis_batch)
+    error.save!
+  end
+
+  def self.build_error(csv, message, sis_batch:, row: nil, failure: false, backtrace: nil, row_info: nil)
+    file = csv ? csv[:file] : nil
+    sis_batch.sis_batch_errors.build(root_account: sis_batch.account,
+                                     file: file,
+                                     message: message,
+                                     failure: failure,
+                                     backtrace: backtrace,
+                                     row_info: row_info,
+                                     row: row,
+                                     created_at: Time.zone.now)
+  end
+
+  def self.bulk_insert_sis_errors(errors)
+    errors.each_slice(1000) do |batch|
+      errors_hash = batch.map do |error|
+        {
+          root_account_id: error.root_account_id,
+          created_at: error.created_at,
+          sis_batch_id: error.sis_batch_id,
+          failure: error.failure,
+          file: error.file,
+          message: error.message,
+          backtrace: error.backtrace,
+          row: error.row,
+          row_info: error.row_info
+        }
+      end
+      SisBatchError.bulk_insert(errors_hash)
+    end
+  end
+
+  def self.rows_for_parallel(rows)
+    # Try to have 100 jobs but don't have a job that processes less than 25
+    # rows but also not more than 1000 rows.
+    # Progress is calculated on the number of jobs remaining.
+    [[(rows/100.to_f).ceil, 25].max, 1000].min
+  end
+
   workflow do
     state :initializing
     state :created
@@ -110,25 +153,6 @@ class SisBatch < ActiveRecord::Base
   end
 
   class Aborted < RuntimeError; end
-
-  def add_errors(messages, failure: true)
-    messages.each_slice(1000) do |batch|
-      records = batch.map do |message|
-        {
-          root_account_id: self.account.id,
-          created_at: Time.zone.now,
-          sis_batch_id: self.id,
-          failute: failure,
-          message: message
-        }
-      end
-      SisBatchError.bulk_insert(records)
-    end
-  end
-
-  def add_warnings(messages)
-    add_errors(messages, failure: false)
-  end
 
   def self.queue_job_for_account(account, run_at=nil)
     job_args = {:priority => Delayed::LOW_PRIORITY, :max_attempts => 1}
@@ -207,8 +231,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   def batch_aborted(message)
-    self.sis_batch_errors.create!(root_account: self.account,
-                                  message: message)
+    SisBatch.add_error(nil, message, sis_batch: self)
     raise SisBatch::Aborted
   end
 
@@ -227,11 +250,16 @@ class SisBatch < ActiveRecord::Base
   scope :succeeded, -> { where(:workflow_state => %w[imported imported_with_messages]) }
 
   def self.use_parallel_importers?(account)
-    account.feature_enabled?(:sis_imports_refactor)
+    account.feature_enabled?(:refactor_of_sis_imports)
   end
 
   def self.strand_for_account(account)
     "sis_batch:account:#{Shard.birth.activate { account.id }}"
+  end
+
+  def skip_deletes?
+    self.options ||= {}
+    !!self.options[:skip_deletes]
   end
 
   def self.process_all_for_account(account)
@@ -337,7 +365,7 @@ class SisBatch < ActiveRecord::Base
     finalize_workflow_state(import_finished)
     write_errors_to_file
     populate_old_warnings_and_errors
-    self.progress = 100
+    self.progress = 100 if import_finished
     self.ended_at = Time.now.utc
     self.save!
 
@@ -449,7 +477,7 @@ class SisBatch < ActiveRecord::Base
     current_row ||= 0
     # delete enrollments for courses that weren't in this batch, in the selected term
     enrollments.find_in_batches do |batch|
-      if account.feature_enabled?(:sis_imports_refactor)
+      if account.feature_enabled?(:refactor_of_sis_imports)
         count = Enrollment::BatchStateUpdater.destroy_batch(batch)
         enrollment_count += count
         current_row += count
@@ -548,6 +576,7 @@ class SisBatch < ActiveRecord::Base
       "diffing_data_set_identifier" => self.diffing_data_set_identifier,
       "diffed_against_import_id" => self.options[:diffed_against_sis_batch_id],
       "diffing_drop_status" => self.options[:diffing_drop_status],
+      "skip_deletes" => self.options[:skip_deletes],
       "change_threshold" => self.change_threshold,
     }
     data["processing_errors"] = self.processing_errors if self.processing_errors.present?

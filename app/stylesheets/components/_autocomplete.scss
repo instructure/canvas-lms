@@ -85,7 +85,7 @@ ul[class*=ac-] {
 .ac-input-box {
   background: #fff;
   border: 1px solid #ccc;
-  border-radius: 3px 0 0 3px;
+  border-radius: direction-corners(3px 0 0 3px);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
   box-sizing: border-box;
   cursor: text;
@@ -106,8 +106,8 @@ ul[class*=ac-] {
 }
 
 .ac .btn {
-  border-left: none;
-  border-radius: 0 3px 3px 0;
+  border-#{direction(left)}: none;
+  border-radius: direction-corners(0 3px 3px 0);
   display: table-cell;
   &.disabled {
     color: #A6A6A6;
@@ -120,7 +120,7 @@ ul[class*=ac-] {
   box-shadow: none;
   display: inline;
   margin: 0;
-  margin-left: 8px;
+  margin-#{direction(left)}: 8px;
   min-width: 15px;
   padding: 0;
   width: 15px;
@@ -133,7 +133,7 @@ ul[class*=ac-] {
 
 .ac-placeholder {
   color: #999;
-  left: 12px;
+  #{direction(left)}: 12px;
   position: absolute;
   top: 5px;
   transition: opacity 0.2s linear;
@@ -142,7 +142,7 @@ ul[class*=ac-] {
 .ac-clear {
   display: none;
   position: absolute;
-  right: 4px;
+  #{direction(right)}: 4px;
   top: 5px;
 
   i:before {
@@ -173,7 +173,7 @@ ul[class*=ac-] {
   cursor: default;
   display: inline-block;
   line-height: normal;
-  margin: 2px 4px 2px 0;
+  margin: direction-sides(2px 4px 2px 0);
   // Please don't remove overflow. It fixes a weird webkit bug.
   overflow: hidden;
   padding: 0 18px 0 8px;
@@ -189,12 +189,12 @@ ul[class*=ac-] {
   }
 
   &:hover a, a:focus {
-    right: -1px;
+    #{direction(right)}: -1px;
   }
 
   a {
     position: absolute;
-    right: -9999em;
+    #{direction(right)}: -9999em;
     top: 0;
   }
 
@@ -225,7 +225,7 @@ i[class*=icon-].icon-messageRecipient--cancel {
     content: "";
     height: 0;
     position: absolute;
-    right: 15px;
+    #{direction(right)}: 15px;
     width: 0;
     z-index: 3;
   }
@@ -254,7 +254,7 @@ i[class*=icon-].icon-messageRecipient--cancel {
   @include fontSize($ic-font-size--xsmall);
   max-height: 250px;
   min-height: 50px;
-  left: 0;
+  #{direction(left)}: 0;
   overflow: auto;
   position: absolute;
   top: 36px;
@@ -268,11 +268,11 @@ i[class*=icon-].icon-messageRecipient--cancel {
   padding: 5px 8px 2px 8px;
 
   &:first-child {
-    border-radius: 10px 10px 0 0 !important;
+    border-radius: direction-corners(10px 10px 0 0) !important;
   }
 
   &:last-child {
-    border-radius: 0 0 10px 10px;
+    border-radius: direction-corners(0 0 10px 10px);
   }
 
   &.selected, &:hover {

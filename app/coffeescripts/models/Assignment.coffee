@@ -204,6 +204,10 @@ define [
       return @get 'anonymous_instructor_annotations' unless arguments.length > 0
       @set 'anonymous_instructor_annotations', anonymousInstructorAnnotationsBoolean
 
+    anonymousGrading: (anonymousGradingBoolean) =>
+      return @get 'anonymous_grading' unless arguments.length > 0
+      @set 'anonymous_grading', anonymousGradingBoolean
+
     peerReviews: (peerReviewBoolean) =>
       return @get 'peer_reviews' unless arguments.length > 0
       @set 'peer_reviews', peerReviewBoolean
@@ -391,6 +395,21 @@ define [
       else
         return @dueAt()
 
+    canDuplicate: =>
+      @get('can_duplicate')
+
+    isDuplicating: =>
+      @get('workflow_state') == 'duplicating'
+
+    failedToDuplicate: =>
+      @get('workflow_state') == 'failed_to_duplicate'
+
+    originalAssignmentID: =>
+      @get('original_assignment_id')
+
+    originalAssignmentName: =>
+      @get('original_assignment_name')
+
     is_quiz_assignment: =>
       @get('is_quiz_assignment')
 
@@ -417,9 +436,11 @@ define [
         'labelId', 'position', 'postToSIS', 'multipleDueDates', 'nonBaseDates',
         'allDates', 'hasDueDate', 'hasPointsPossible', 'singleSectionDueDate',
         'moderatedGrading', 'postToSISEnabled', 'isOnlyVisibleToOverrides',
-        'omitFromFinalGrade', 'is_quiz_assignment', 'isQuizLTIAssignment',
-        'secureParams', 'inClosedGradingPeriod', 'dueDateRequired', 'submissionTypesFrozen',
-        'anonymousInstructorAnnotations'
+        'omitFromFinalGrade', 'isDuplicating', 'failedToDuplicate',
+        'originalAssignmentName', 'is_quiz_assignment', 'isQuizLTIAssignment',
+        'secureParams', 'inClosedGradingPeriod', 'dueDateRequired',
+        'submissionTypesFrozen', 'anonymousInstructorAnnotations',
+        'anonymousGrading'
       ]
 
       hash =

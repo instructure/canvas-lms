@@ -47,8 +47,8 @@ environment_configuration(defined?(config) && config) do |config|
   # Raise exceptions instead of rendering exception templates
   config.action_dispatch.show_exceptions = true
 
-  # Print deprecation notices to the stderr
-  config.active_support.deprecation = :stderr
+  # Print deprecation notices to both stderr and the log
+  config.active_support.deprecation = [:stderr, :log]
 
   config.eager_load = false
 

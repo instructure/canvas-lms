@@ -85,9 +85,9 @@
     }
     .ui-listview-right {
       display: block;
-      float: right;
+      float: direction(right);
       .turnitin_similarity_score {
-        margin-right: 10px;
+        margin-#{direction(right)}: 10px;
       }
     }
 

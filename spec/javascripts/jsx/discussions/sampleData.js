@@ -28,6 +28,9 @@ const data = {
     },
     read_state: 'read',
     unread_count: 0,
+    permissions: {
+      delete: true
+    }
   }],
 }
 

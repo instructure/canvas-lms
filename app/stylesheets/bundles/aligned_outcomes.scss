@@ -16,10 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@import 'base/environment';
+
 #aligned_outcomes {
   .outcomes {
     list-style-type: none;
-    padding-left: 10px;
+    padding-#{direction(left)}: 10px;
     .outcome {
       margin-bottom: 5px;
       .short_description {
@@ -27,13 +29,13 @@
       }
       .description {
         font-size: 0.8em;
-        margin-left: 20px;
+        margin-#{direction(left)}: 20px;
       }
       .mastery {
         margin-top: 5px;
         font-size: 0.7em;
         font-style: italic;
-        margin-left: 20px;
+        margin-#{direction(left)}: 20px;
       }
     }
   }
@@ -42,7 +44,7 @@
 #align_outcomes_dialog {
   .all_outcomes {
     list-style-type: none;
-    padding-left: 10px;
+    padding-#{direction(left)}: 10px;
     .outcome {
       padding: 2px 5px;
       margin-bottom: 2px;

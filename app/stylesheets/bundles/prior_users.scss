@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@import 'base/environment';
+
 #users {
   border-collapse: collapse;
   width: 100%;
@@ -31,7 +33,7 @@
   .email {
     font-size: 0.8em;
     color: #888;
-    padding-left: 10px;
+    padding-#{direction(left)}: 10px;
   }
   .type {
     color: #888;

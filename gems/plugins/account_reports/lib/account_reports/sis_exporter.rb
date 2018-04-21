@@ -830,7 +830,7 @@ module AccountReports
                 p2.user_id AS observer_id,
                 user_observers.workflow_state AS ob_state,
                 user_observers.sis_batch_id AS o_batch_id").
-        joins("INNER JOIN #{UserObserver.quoted_table_name} ON pseudonyms.user_id=user_observers.user_id
+        joins("INNER JOIN #{UserObservationLink.quoted_table_name} ON pseudonyms.user_id=user_observers.user_id
                INNER JOIN #{Pseudonym.quoted_table_name} AS p2 ON p2.user_id=user_observers.observer_id").
         where("p2.account_id=pseudonyms.account_id")
 

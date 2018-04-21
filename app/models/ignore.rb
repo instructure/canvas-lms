@@ -24,8 +24,36 @@ class Ignore < ActiveRecord::Base
   validates_inclusion_of :permanent, :in => [false, true]
 
   def self.cleanup
-    # This may need an index in the future. right now it's just a table scan,
-    # cause I have no idea how many ignores are created
-    Ignore.where("updated_at<?", 6.months.ago).delete_all
+    Shackles.activate(:slave) do
+      Ignore.select(:id).
+        joins("LEFT JOIN #{Assignment.quoted_table_name} AS a ON a.id = ignores.asset_id AND 'Assignment' = ignores.asset_type
+          LEFT JOIN #{Quizzes::Quiz.quoted_table_name} AS q ON q.id = ignores.asset_id AND 'Quizzes::Quiz' = ignores.asset_type
+          LEFT JOIN #{AssessmentRequest.quoted_table_name} AS ar ON ar.id = ignores.asset_id AND 'AssessmentRequest' = ignores.asset_type
+          LEFT JOIN #{Submission.quoted_table_name} AS s ON ar.asset_id = s.id AND ar.asset_type = 'Submission'
+          LEFT JOIN #{Assignment.quoted_table_name} AS ara ON ara.id = s.assignment_id").
+        where("(a.id IS NULL AND q.id IS NULL AND ar.id IS NULL)
+          OR (a.workflow_state = 'deleted' AND a.updated_at < :deletion_time)
+          OR (q.workflow_state = 'deleted' AND q.updated_at < :deletion_time)
+          OR (ar.workflow_state = 'deleted' AND ar.updated_at < :deletion_time)
+          OR (NOT EXISTS (
+            WITH enrollments AS (
+              SELECT id, completed_at
+              FROM #{Enrollment.quoted_table_name}
+              WHERE enrollments.user_id = ignores.user_id
+                AND (enrollments.course_id = a.context_id
+                 OR enrollments.course_id = q.context_id
+                 OR enrollments.course_id = ara.context_id)
+                AND (enrollments.workflow_state <> 'deleted'
+                 OR enrollments.updated_at > :deletion_time)
+            )
+            SELECT 1 FROM enrollments WHERE enrollments.completed_at IS NULL
+            UNION
+            SELECT 1 FROM enrollments WHERE enrollments.completed_at > :conclude_time))",
+          {deletion_time: 1.month.ago, conclude_time: 6.months.ago}).find_in_batches do |batch|
+        Shackles.activate(:master) do
+          Ignore.where(id: batch).delete_all
+        end
+      end
+    end
   end
 end

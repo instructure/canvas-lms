@@ -156,6 +156,17 @@ it('renders an activity notification when there is new activity', () => {
   expect(nai.prop('title')).toBe(props.title);
 });
 
+it('does not render an activity notification when layout is not large', () => {
+  const props = getDefaultProps();
+  props.items[1].newActivity = true;
+  props.responsiveSize = 'medium';
+  const wrapper = shallow(
+    <Grouping {...props} />
+  );
+  const nai = wrapper.find('Animatable(NewActivityIndicator)');
+  expect(nai).toHaveLength(0);
+});
+
 it('renders a danger activity notification when there is a missing item', () => {
   const props = getDefaultProps();
   props.items[1].status = {missing: true};

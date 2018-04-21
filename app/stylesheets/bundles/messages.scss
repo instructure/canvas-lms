@@ -25,16 +25,16 @@ dl {
 }
 
 dt {
-  clear: left;
-  float: left;
+  clear: direction(left);
+  float: direction(left);
   font-weight: bold;
-  margin-right: 8px;
+  margin-#{direction(right)}: 8px;
 
   &:after { content: ":"; }
 }
 
 dd {
-  float: left;
+  float: direction(left);
 }
 
 .h6 {
@@ -52,7 +52,7 @@ dd {
   margin-bottom: 16px;
 
   header .label {
-    float: right;
+    float: direction(right);
     position: relative;
     top: 1px;
   }
@@ -86,8 +86,8 @@ table.grid tr:first-child td {
 .td-label {
   div {
     color: #888888;
-    padding-right: 10px;
-    text-align: right;
+    padding-#{direction(right)}: 10px;
+    text-align: direction(right);
   }
 }
 
@@ -126,7 +126,7 @@ table.grid tr:first-child td {
   overflow: hidden;
   padding: 4px 12px;
 
-  li { display: inline; float: left; margin: 0 16px 0 0; }
+  li { display: inline; float: direction(left); margin: direction-sides(0 16px 0 0); }
 }
 
 a.icon-off {

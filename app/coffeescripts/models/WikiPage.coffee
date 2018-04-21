@@ -31,7 +31,7 @@ define [
   class WikiPage extends Backbone.Model
     @mixin DefaultUrlMixin
     resourceName: 'pages'
-    idAttribute: 'url'
+    idAttribute: 'page_id'
 
     initialize: (attributes, options) ->
       super

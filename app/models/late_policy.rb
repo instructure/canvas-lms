@@ -73,7 +73,7 @@ class LatePolicy < ActiveRecord::Base
         'late_submission_minimum_percent_enabled',
         'late_submission_minimum_percent',
         'missing_submission_deduction_enabled'
-      ] & changed
+      ] & saved_changes.keys
     ).present?
   end
 end

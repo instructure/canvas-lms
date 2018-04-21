@@ -26,12 +26,13 @@ const defaultProps = () => ({
   closeForComments: () => {},
   permissions: {create: false, manage_content: false, moderate: false},
   togglePin: () => {},
-  discussions: [{id: 1}],
+  discussions: [{id: 1, filtered: false, permissions: {delete: true}}],
   discussionsPage: 1,
   isLoadingDiscussions: false,
   hasLoadedDiscussions: false,
   getDiscussions: () => {},
-  roles: ["student", "user"]
+  roles: ["student", "user"],
+  renderContainerBackground: () => {},
 })
 
 QUnit.module('DiscussionContainer component')
@@ -66,6 +67,34 @@ test('renders a draggable discussion row when user has moderate permissions', ()
   const props = defaultProps()
   props.permissions.moderate = true
   const tree = shallow(<DiscussionContainer {...props} />)
-  const node = tree.find('DragSource(DiscussionRow)')
+  const node = tree.find('DropTarget(DragSource(DiscussionRow))')
   ok(node.exists())
+})
+
+test('renders discussion row when discussion is not filtered', () => {
+  const props = defaultProps()
+  props.discussions = [{id: 1, filtered: false, permissions: {delete: true}}]
+  const tree = shallow(<DiscussionContainer {...props} />)
+  const node = tree.find('DiscussionRow')
+  ok(node.exists())
+})
+
+test('does not render a discussion row when discussion is filtered', () => {
+  const props = defaultProps()
+  props.discussions = [{id: 1, filtered: true}]
+  const tree = shallow(<DiscussionContainer {...props} />)
+  const node = tree.find('DiscussionRow')
+  ok(!node.exists())
+})
+
+test('renders background image if all discussions are filtered', () => {
+  const props = defaultProps()
+  const renderBackgroundSpy = sinon.spy()
+  props.discussions = [{id: 1, filtered: true}]
+  props.renderContainerBackground = renderBackgroundSpy
+
+  const tree = mount(<DiscussionContainer {...props} />)
+  const node = tree.find('DiscussionRow')
+  ok(renderBackgroundSpy.calledOnce)
+  ok(!node.exists())
 })

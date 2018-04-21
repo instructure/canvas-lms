@@ -150,6 +150,30 @@ define [
       real_min_str = (if real_minutes < 10 then "0" + real_minutes else real_minutes)
       "#{hours}:#{real_min_str}"
 
+    ###*
+     * Convert the total amount of minutes into a readable duration.
+     * @param {number}  Duration in minutes elapsed
+     * @return {string} String containing a formatted duration including hours and minutes
+     * Example:
+     *     ...
+     *     duration = 97
+     *     durationToString(duration)
+     *     ...
+     *     Returns
+     *       "Duration: 1 hour and 37 minutes"
+    ###
+    durationToString : (duration) ->
+      # stores the hours in the duration
+      hours = Math.floor(duration / 60)
+      # stores the remaining minutes after substracting the hours
+      minutes = duration % 60
+      if hours > 0
+        return I18n.t("Duration: %{hours} hours and %{minutes} minutes", {hours: hours, minutes: minutes})
+      else if minutes > 1
+        return I18n.t("Duration: %{minutes} minutes", {minutes: minutes})
+      else
+        return I18n.t("Duration: 1 minute")
+
     # helper for easily creating icon font markup
     addIcon : (icontype) ->
       new Handlebars.SafeString "<i class='icon-#{htmlEscape icontype}'></i>"

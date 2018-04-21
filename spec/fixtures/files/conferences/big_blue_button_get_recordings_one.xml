@@ -1,0 +1,39 @@
+<response>
+  <returncode>SUCCESS</returncode>
+  <recordings>
+    <recording>
+      <recordID>0225ccf234655ae60658ccac1e272d48781b491c-1511812307014</recordID>
+      <meetingID>instructure_web_conference_3Fn2k10wu0jK7diwJHs2FkDU0oXyX1ErUZCavikc</meetingID>
+      <internalMeetingID>0225ccf234655ae60658ccac1e272d48781b491c-1511812307014</internalMeetingID>
+      <name>John Doe's conference</name>
+      <isBreakout>false</isBreakout>
+      <published>true</published>
+      <state>published</state>
+      <startTime>1511812307014</startTime>
+      <endTime>1511812327102</endTime>
+      <participants>1</participants>
+      <metadata>
+        <meetingName>John Doe's conference</meetingName>
+        <meetingId>instructure_web_conference_3Fn2k10wu0jK7diwJHs2FkDU0oXyX1ErUZCavikc</meetingId>
+        <canvas-recording-ready-user>John Doe &lt;jdoe@mockmail.com&gt;</canvas-recording-ready-user>
+        <canvas-recording-ready-url>http://canvas.blah.com/mock/recording_ready</canvas-recording-ready-url>
+        <isBreakout>false</isBreakout>
+      </metadata>
+      <playback>
+        <format>
+          <type>presentation</type>
+          <url>http://bbb.blah.com/mock/playback/0225ccf234655ae60658ccac1e272d48781b491c-1511812307014</url>
+          <processingTime>9922</processingTime>
+          <length>0</length>
+          <preview>
+            <images>
+              <image alt="Welcome to" height="136" width="176">http://bbb.blah.com/mock/playback/0225ccf234655ae60658ccac1e272d48781b491c-1511812307014/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1511812307214/thumbnails/thumb-1.png</image>
+              <image alt="(this slide left blank for use as a whiteboard)" height="136" width="176">http://bbb.blah.com/mock/playback/0225ccf234655ae60658ccac1e272d48781b491c-1511812307014/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1511812307214/thumbnails/thumb-2.png</image>
+              <image alt="(this slide left blank for use as a whiteboard)" height="136" width="176">http://bbb.blah.com/mock/playback/0225ccf234655ae60658ccac1e272d48781b491c-1511812307014/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1511812307214/thumbnails/thumb-3.png</image>
+            </images>
+          </preview>
+        </format>
+      </playback>
+    </recording>
+  </recordings>
+</response>

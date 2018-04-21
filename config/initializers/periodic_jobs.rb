@@ -87,7 +87,7 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(Account, :update_all_update_account_associations)
   end
 
-  Delayed::Periodic.cron 'StreamItem.destroy_stream_items', '45 11 * * *' do
+  Delayed::Periodic.cron 'StreamItem.destroy_stream_items', '45 */6 * * *' do
     with_each_shard_by_database(StreamItem, :destroy_stream_items_using_setting)
   end
 
@@ -190,6 +190,10 @@ Rails.configuration.after_initialize do
 
   Delayed::Periodic.cron 'SisBatchErrors.cleanup_old_errors', '*/15 * * * *', priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(SisBatchError, :cleanup_old_errors)
+  end
+
+  Delayed::Periodic.cron 'AccountReport.delete_old_rows_and_runners', '*/15 * * * *', priority: Delayed::LOW_PRIORITY do
+    with_each_shard_by_database(AccountReport, :delete_old_rows_and_runners)
   end
 
   Delayed::Periodic.cron 'EnrollmentState.recalculate_expired_states', '*/5 * * * *', priority: Delayed::LOW_PRIORITY do

@@ -27,10 +27,6 @@ class AnnouncementNewEdit
       wait_for_tiny(f('textarea[name=message]'))
     end
 
-    def set_section_specific_announcements_flag(course, state)
-      course.account.set_feature_flag! :section_specific_announcements, state
-    end
-
     def new_announcement_url
       '/discussion_topics/new?is_announcement=true'
     end
