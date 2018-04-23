@@ -19,6 +19,9 @@
 import React from 'react'
 import TestUtils from 'react-addons-test-utils'
 import ReactDOM from 'react-dom'
+import Image from '@instructure/ui-core/lib/components/Image'
+import Link from '@instructure/ui-core/lib/components/Link'
+
 import DeveloperKey from 'jsx/developer_keys/DeveloperKey';
 
 class TestTable extends React.Component {
@@ -31,8 +34,12 @@ function makeTable (keyProps) {
   return (<TestTable><DeveloperKey {...keyProps} /></TestTable>)
 }
 
+function renderComponent (props) {
+  return TestUtils.renderIntoDocument(makeTable(props));
+}
+
 function testWrapperOk (keyProps, expectedString) {
-  const component = TestUtils.renderIntoDocument(makeTable(keyProps));
+  const component = renderComponent(keyProps)
   const renderedText = ReactDOM.findDOMNode(TestUtils.findRenderedDOMComponentWithTag(component, 'tr')).innerHTML;
   ok(renderedText.includes(expectedString))
 }
@@ -119,20 +126,26 @@ test('includes No User when userName is empty string and email is missing', () =
 });
 
 test('includes an image when name is present', () => {
-  testWrapperOk(defaultProps, '<img class="icon" src="http://my_image.com" alt="Atomic fireball Logo"')
+  const component = renderComponent(defaultProps)
+  ok(TestUtils.findRenderedComponentWithType(component, Image))
 });
 
-test('includes an image when name is not present', () => {
+test('includes an img box when name is null', () => {
   const propsModified = updateDefaultProps({ developerKey: { name: null } })
-  testWrapperOk(propsModified, '<img class="icon" src="http://my_image.com" alt="Unnamed Tool Logo"')
+  const component = renderComponent(propsModified)
+  ok(TestUtils.findRenderedComponentWithType(component, Image))
 });
 
-test('includes a blank image when icon_url is null', () => {
-  testWrapperOk(updateDefaultProps({ developerKey: { icon_url: null } }), '<img class="icon" src="#" alt=""')
+test('includes an empty box to mimic img box when icon_url is null', () => {
+  const propsModified = updateDefaultProps({ developerKey: { icon_url: null } })
+  const component = renderComponent(propsModified)
+  ok(TestUtils.findRenderedDOMComponentWithClass(component, 'emptyIconImage'))
 });
 
-test('includes a blank image when icon_url is empty string', () => {
-  testWrapperOk(updateDefaultProps({ developerKey: { icon_url: '' } }), '<img class="icon" src="#" alt=""')
+test('includes an empty box to mimic img box when icon_url is empty string', () => {
+  const propsModified = updateDefaultProps({ developerKey: { icon_url: '' } })
+  const component = renderComponent(propsModified)
+  ok(TestUtils.findRenderedDOMComponentWithClass(component, 'emptyIconImage'))
 });
 
 test('does not inactive when workflow_state is active', () => {
@@ -140,15 +153,14 @@ test('does not inactive when workflow_state is active', () => {
 });
 
 test('includes a user link', () => {
-  testWrapperOk(defaultProps, '<a href="/users/53532"')
-  testWrapperOk(defaultProps, '>billy bob</a>')
+  const component = renderComponent(defaultProps)
+  ok(TestUtils.findRenderedComponentWithType(component, Link))
 });
 
 test('does not include a user link when user_id is null', () => {
   const propsModified = updateDefaultProps({ developerKey: { user_id: null } })
-  testWrapperNotOk(propsModified, '<a href="/users/53532"')
-  testWrapperNotOk(propsModified, '>billy bob</a>')
-  testWrapperOk(propsModified, 'billy bob')
+  const component = renderComponent(propsModified)
+  equal(TestUtils.scryRenderedComponentsWithType(component, Link).length, 0)
 });
 
 test('includes a redirect_uri', () => {

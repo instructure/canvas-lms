@@ -28,7 +28,11 @@ class DeveloperKeysTable extends React.Component {
   focusLastDeveloperKey () {
     const developerKeyId = this.props.developerKeysList[this.props.developerKeysList.length - 1].id
     const ref = this[`developerKey-${developerKeyId}`]
-    this.props.inherited ? ref.focusName() : ref.focusDeleteLink()
+    if (this.props.inherited) {
+      ref.focusName()
+    } else {
+      ref.focusDeleteLink()
+    }
   }
 
   render () {
@@ -41,11 +45,11 @@ class DeveloperKeysTable extends React.Component {
         <Table caption={<ScreenReaderContent>{srcontent}</ScreenReaderContent>} id="keys">
         <thead>
           <tr>
-            <th scope="col">Name</th>
-            {!inherited && <th scope="col">User</th> }
-            <th scope="col">Details</th>
-            {!inherited && <th scope="col">Stats</th>}
-            <th scope="col" />
+            <th scope="col">{I18n.t('Name')}</th>
+            {!inherited && <th scope="col">{I18n.t('User')}</th> }
+            <th scope="col">{I18n.t('Details')}</th>
+            {!inherited && <th scope="col">{I18n.t('Stats')}</th>}
+            <th scope="col">{I18n.t('Inheritance')}</th>
             {!inherited &&  <th scope="col" />}
           </tr>
         </thead>

@@ -24,13 +24,6 @@ import RadioInput from '@instructure/ui-core/lib/components/RadioInput'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 
 export default class DeveloperKeyStateControl extends React.Component {
-  disabled() {
-    if (this.radioGroupValue() === 'allow') {
-      return false
-    }
-    return !this.props.developerKey.developer_key_account_binding.account_owns_binding
-  }
-
   setBindingState = newValue => {
     this.props.store.dispatch(
       this.props.actions.setBindingWorkflowState(
@@ -39,6 +32,13 @@ export default class DeveloperKeyStateControl extends React.Component {
         newValue
       )
     )
+  }
+
+  disabled() {
+    if (this.radioGroupValue() === 'allow') {
+      return false
+    }
+    return !this.props.developerKey.developer_key_account_binding.account_owns_binding
   }
 
   radioGroupValue() {

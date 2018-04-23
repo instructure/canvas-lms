@@ -18,8 +18,11 @@
 
 import Button from '@instructure/ui-core/lib/components/Button'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import Heading from '@instructure/ui-core/lib/components/Heading'
 import Spinner from '@instructure/ui-core/lib/components/Spinner'
 import TabList, { TabPanel } from '@instructure/ui-core/lib/components/TabList'
+
+import IconPlusLine from 'instructure-icons/lib/Line/IconPlusLine'
 
 import I18n from 'i18n!react_developer_keys'
 import React from 'react'
@@ -58,7 +61,7 @@ class DeveloperKeysApp extends React.Component {
 
     if (nextPage && !listDeveloperKeysPending) {
       return (
-        <Button type="button" onClick={this.showMoreButtonHandler}>
+        <Button onClick={this.showMoreButtonHandler}>
           {I18n.t("Show All Keys")}
         </Button>)
     }
@@ -83,7 +86,7 @@ class DeveloperKeysApp extends React.Component {
 
     if (inheritedNextPage && !listInheritedDeveloperKeysPending) {
       return (
-        <Button type="button" onClick={this.showMoreInheritedButtonHandler}>
+        <Button onClick={this.showMoreInheritedButtonHandler}>
           {I18n.t("Show All Keys")}
         </Button>)
     }
@@ -104,7 +107,7 @@ class DeveloperKeysApp extends React.Component {
       <div>
         <div className="ic-Action-header">
           <div className="ic-Action-header__Primary">
-            <h2 className="ic-Action-header__Heading">{I18n.t('Developer Keys')}</h2>
+            <Heading>{I18n.t('Developer Keys')}</Heading>
           </div>
           <div className="ic-Action-header__Secondary">
             <Button
@@ -112,7 +115,7 @@ class DeveloperKeysApp extends React.Component {
               onClick={this.showCreateDeveloperKey}
             >
               <ScreenReaderContent>{I18n.t('Create a')}</ScreenReaderContent>
-              <i className="icon-plus" />
+              <IconPlusLine />
               { I18n.t('Developer Key') }
             </Button>
           </div>

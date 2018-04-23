@@ -77,7 +77,7 @@ describe 'Developer Keys' do
     it "allows update through 'edit this key button'", test_id: 344078 do
       root_developer_key
       get "/accounts/#{Account.default.id}/developer_keys"
-      f("#reactContent tbody tr.key .edit_link").click
+      fj("#keys tbody tr.key button:has(svg[name='IconEditLine'])").click
       replace_content(f("input[name='developer_key[name]']"), "Cooler Tool")
       replace_content(f("input[name='developer_key[email]']"), "admins@example.com")
       replace_content(f("textarea[name='developer_key[redirect_uris]']"), "http://b/")
@@ -97,7 +97,7 @@ describe 'Developer Keys' do
       dk = root_developer_key
       dk.update_attribute(:redirect_uri, "http://a/")
       get "/accounts/#{Account.default.id}/developer_keys"
-      f("#reactContent tbody tr.key .edit_link").click
+      fj("#keys tbody tr.key button:has(svg[name='IconEditLine'])").click
       replace_content(f("input[name='developer_key[name]']"), "Cooler Tool")
       replace_content(f("input[name='developer_key[email]']"), "admins@example.com")
       replace_content(f("input[name='developer_key[redirect_uri]']"), "https://b/")
@@ -117,7 +117,7 @@ describe 'Developer Keys' do
       skip_if_safari(:alert)
       root_developer_key
       get "/accounts/#{Account.default.id}/developer_keys"
-      f("#reactContent tbody tr.key .edit_link").click
+      fj("#keys tbody tr.key button:has(svg[name='IconEditLine'])").click
       f("input[name='developer_key[icon_url]']").clear
       find_button("Save Key").click
 
@@ -126,19 +126,19 @@ describe 'Developer Keys' do
       key = Account.default.developer_keys.last
       expect(key.icon_url).to eq nil
 
-      f("#reactContent tbody tr.key .delete_link").click
+      fj("#keys tbody tr.key button:has(svg[name='IconTrashLine'])").click
       driver.switch_to.alert.accept
       driver.switch_to.default_content
-      expect(f("#reactContent")).not_to contain_css("tbody tr")
+      expect(f("#keys")).not_to contain_css("tbody tr")
       expect(Account.default.developer_keys.nondeleted.count).to eq 0
     end
 
     it "allows for pagination on account tab", test_id: 344532 do
       11.times { |i| Account.default.developer_keys.create!(name: "tool #{i}") }
       get "/accounts/#{Account.default.id}/developer_keys"
-      expect(ff("#reactContent tbody tr")).to have_size(10)
+      expect(ff("#keys tbody tr")).to have_size(10)
       find_button("Show All Keys").click
-      expect(ff("#reactContent tbody tr")).to have_size(11)
+      expect(ff("#keys tbody tr")).to have_size(11)
     end
 
     it "allows for pagination on inherited tab", test_id: 344532 do
@@ -155,16 +155,16 @@ describe 'Developer Keys' do
     it "renders the key not visible", test_id: 3485785 do
       root_developer_key
       get "/accounts/#{Account.default.id}/developer_keys"
-      f("#keys tbody tr.key .icon-eye").click
-      expect(f("#keys tbody")).to contain_css(".icon-off")
+      fj("#keys tbody tr.key button:has(svg[name='IconEyeLine'])").click
+      expect(f("#keys tbody tr.key")).to contain_css("svg[name='IconOffLine']")
       expect(root_developer_key.reload.visible).to eq false
     end
 
     it "renders the key visible", test_id: 3485785 do
       root_developer_key.update(visible: false)
       get "/accounts/#{Account.default.id}/developer_keys"
-      f("#keys tbody tr.key .icon-off").click
-      expect(f("#keys tbody")).not_to contain_css(".icon-off")
+      fj("#keys tbody tr.key button:has(svg[name='IconOffLine'])").click
+      expect(f("#keys tbody tr.key")).not_to contain_css("svg[name='IconOffLine']")
       expect(root_developer_key.reload.visible).to eq true
     end
 
