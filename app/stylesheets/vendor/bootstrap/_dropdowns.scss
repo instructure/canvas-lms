@@ -185,6 +185,6 @@
   > .dropdown-menu {
     #{direction(left)}: -100%;
     margin-#{direction(left)}: 10px;
-    border-radius: direction-corers(6px 0 6px 6px);
+    border-radius: direction-corners(6px 0 6px 6px);
   }
 }
