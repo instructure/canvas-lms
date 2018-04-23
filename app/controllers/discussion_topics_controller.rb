@@ -1365,7 +1365,9 @@ class DiscussionTopicsController < ApplicationController
       end
 
       if attachment
-        @attachment = @context.attachments.create!(:uploaded_data => attachment)
+        @attachment = @context.attachments.new
+        Attachments::Storage.store_for_attachment(@attachment, attachment)
+        @attachment.save!
         @attachment.handle_duplicates(:rename)
         @topic.attachment = @attachment
         @topic.save

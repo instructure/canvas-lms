@@ -1579,6 +1579,20 @@ describe DiscussionTopicsController do
       expect(attachment.reload).to be_deleted
     end
 
+    it "uses inst-fs if it is enabled" do
+      allow(InstFS).to receive(:enabled?).and_return(true)
+      uuid = "1234-abcd"
+      allow(InstFS).to receive(:direct_upload).and_return(uuid)
+
+      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
+      attachment_model :context => @course, :uploaded_data => data, :folder => Folder.unfiled_folder(@course)
+      put 'update', params: {course_id: @course.id, topic_id: @topic.id, attachment: data}, format: 'json'
+
+      @topic.reload
+      expect(@topic.attachment.instfs_uuid).to eq(uuid)
+
+    end
+
     it "editing section-specific topic to not-specific should clear out visibilities" do
       @announcement = Announcement.create!(context: @course, title: 'Test Announcement',
         message: 'Foo', delayed_post_at: '2013-01-01T00:00:00UTC',
