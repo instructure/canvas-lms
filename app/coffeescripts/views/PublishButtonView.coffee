@@ -37,6 +37,10 @@ define [
     @optionProperty 'publishText'
     @optionProperty 'unpublishText'
 
+    # This indicates that the button is disabled specifically because it is
+    # associated with an assignment that the current user cannot moderate
+    @optionProperty 'disabledForModeration'
+
     tagName:   'button'
     className: 'btn'
 
@@ -210,8 +214,12 @@ define [
 
       @$text.html "&nbsp;#{htmlEscape(options.text)}"
 
-      # unpublishable
-      if !@model.get('unpublishable')? or @model.get('unpublishable')
+      # uneditable because the current user cannot moderate
+      if @model.get('disabledForModeration')
+        @disableWithMessage('You are not the selected moderator for this assignment')
+
+      # unpublishable (i.e., able to be unpublished)
+      else if !@model.get('unpublishable')? or @model.get('unpublishable')
         @enable()
         @$el.attr 'title', options.text
 
@@ -219,9 +227,12 @@ define [
         if options.label
           @addAriaLabel(options.label)
 
-      # disabled
+      # editable, but cannot be unpublished because submissions exist
       else
-        @disable()
-        @$el.attr 'aria-disabled', true
-        @$el.attr 'title', @model.disabledMessage()
-        @addAriaLabel(@model.disabledMessage())
+        @disableWithMessage(@model.disabledMessage())
+
+    disableWithMessage: (message) ->
+      @disable()
+      @$el.attr 'aria-disabled', true
+      @$el.attr 'title', message
+      @addAriaLabel(message)

@@ -2202,11 +2202,17 @@ class ApplicationController < ActionController::Base
     js_env hash
   end
 
-  def set_js_assignment_data
+  def set_js_assignment_data(include_assignment_permissions: false)
     rights = [:manage_assignments, :manage_grades, :read_grades, :manage]
     permissions = @context.rights_status(@current_user, *rights)
     permissions[:manage_course] = permissions[:manage]
     permissions[:manage] = permissions[:manage_assignments]
+
+    if include_assignment_permissions
+      permissions[:by_assignment_id] = @context.assignments.map do |assignment|
+        [assignment.id, {update: assignment.user_can_update?(@current_user, session)}]
+      end.to_h
+    end
 
     js_env({
       :URLS => {

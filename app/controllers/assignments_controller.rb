@@ -50,7 +50,10 @@ class AssignmentsController < ApplicationController
       # It'd be nice to do this as an after_create, but it's not that simple
       # because of course import/copy.
       @context.require_assignment_group
-      set_js_assignment_data # in application_controller.rb, because the assignments page can be shared with the course home
+
+      set_js_assignment_data(
+        include_assignment_permissions: @context.root_account.feature_enabled?(:anonymous_moderated_marking)
+      )
 
       set_tutorial_js_env
       hash = {

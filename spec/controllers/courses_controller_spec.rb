@@ -473,6 +473,55 @@ describe CoursesController do
         expect(assigns[:future_enrollments]).to eq []
       end
     end
+
+    describe "per-assignment permissions" do
+      let(:js_permissions) { assigns[:js_env][:PERMISSIONS] }
+
+      before(:each) do
+        course_with_teacher_logged_in(active_all: true)
+
+        @course.update!(default_view: 'assignments')
+        @course.enable_feature!(:moderated_grading)
+
+        @editable_assignment = @course.assignments.create!(
+          moderated_grading: true,
+          grader_count: 2,
+          final_grader: @teacher
+        )
+      end
+
+      context "when Anonymous Moderated Marking is on" do
+        let(:assignment_permissions) { assigns[:js_env][:PERMISSIONS][:by_assignment_id] }
+
+        before(:each) do
+          @course.root_account.enable_feature!(:anonymous_moderated_marking)
+
+          ta_in_course(active_all: true)
+          @uneditable_assignment = @course.assignments.create!(
+            moderated_grading: true,
+            grader_count: 2,
+            final_grader: @ta
+          )
+        end
+
+        it "sets the 'update' attribute for an editable assignment to true" do
+          get 'show', params: {id: @course.id}
+          expect(assignment_permissions[@editable_assignment.id][:update]).to eq(true)
+        end
+
+        it "sets the 'update' attribute for an uneditable assignment to false" do
+          get 'show', params: {id: @course.id}
+          expect(assignment_permissions[@uneditable_assignment.id][:update]).to eq(false)
+        end
+      end
+
+      context "when Anonymous Moderated Marking is off" do
+        it "does not set permissions in js_env for individual assignments" do
+          get 'show', params: {id: @course.id}
+          expect(js_permissions).not_to include(:by_assignment_id)
+        end
+      end
+    end
   end
 
   describe "GET 'statistics'" do

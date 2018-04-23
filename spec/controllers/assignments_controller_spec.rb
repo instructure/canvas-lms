@@ -216,6 +216,55 @@ describe AssignmentsController do
         expect(assigns[:js_env][:PERMISSIONS][:manage_course]).to be_truthy
       end
     end
+
+    describe "per-assignment permissions" do
+      let(:js_permissions) { assigns[:js_env][:PERMISSIONS] }
+
+      before(:each) do
+        @course.enable_feature!(:moderated_grading)
+
+        @editable_assignment = @course.assignments.create!(
+          moderated_grading: true,
+          grader_count: 2,
+          final_grader: @teacher
+        )
+
+        user_session(@teacher)
+      end
+
+      context "when Anonymous Moderated Marking is on" do
+        let(:assignment_permissions) { assigns[:js_env][:PERMISSIONS][:by_assignment_id] }
+
+        before(:once) do
+          @course.root_account.enable_feature!(:anonymous_moderated_marking)
+
+          ta_in_course(active_all: true)
+
+          @noneditable_assignment = @course.assignments.create!(
+            moderated_grading: true,
+            grader_count: 2,
+            final_grader: @ta
+          )
+        end
+
+        it "sets the 'update' attribute for an editable assignment to true" do
+          get 'index', params: {course_id: @course.id}
+          expect(assignment_permissions[@editable_assignment.id][:update]).to eq(true)
+        end
+
+        it "sets the 'update' attribute for a non-editable assignment to false" do
+          get 'index', params: {course_id: @course.id}
+          expect(assignment_permissions[@noneditable_assignment.id][:update]).to eq(false)
+        end
+      end
+
+      context "when Anonymous Moderated Marking is off" do
+        it "does not set permissions in js_env for individual assignments" do
+          get 'index', params: {course_id: @course.id}
+          expect(js_permissions).not_to include(:by_assignment_id)
+        end
+      end
+    end
   end
 
   describe "GET 'show_moderate'" do

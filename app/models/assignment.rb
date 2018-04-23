@@ -1341,7 +1341,10 @@ class Assignment < ActiveRecord::Base
     can :grade and can :attach_submission_comment_files
 
     given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
-    can :update and can :create and can :read and can :attach_submission_comment_files
+    can :create and can :read and can :attach_submission_comment_files
+
+    given { |user, session| self.user_can_update?(user, session) }
+    can :update
 
     given do |user, session|
       self.context.grants_right?(user, session, :manage_assignments) &&
@@ -1349,6 +1352,16 @@ class Assignment < ActiveRecord::Base
          !in_closed_grading_period?)
     end
     can :delete
+  end
+
+  def user_can_update?(user, session=nil)
+    return false unless context.grants_right?(user, session, :manage_assignments)
+    return true unless moderated_grading? && context.root_account.feature_enabled?(:anonymous_moderated_marking)
+
+    # When Anonymous Moderated Marking is on, a moderated assignment may only be
+    # edited by the assignment's moderator (assuming one has been specified) or
+    # by an account admin.
+    final_grader_id.blank? || final_grader_id == user.id || context.account_membership_allows(user)
   end
 
   def user_can_read_grades?(user, session=nil)

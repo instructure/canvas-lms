@@ -82,6 +82,7 @@ define [
       @model.assignmentView = @
 
       @model.on('change:hidden', @toggleHidden)
+      @model.set('disabledForModeration', !@canEdit())
 
       if @canManage()
         @model.on('change:published', @updatePublishState)
@@ -173,7 +174,7 @@ define [
 
       if @editAssignmentView
         @editAssignmentView.hide()
-        @editAssignmentView.setTrigger @$editAssignmentButton
+        @editAssignmentView.setTrigger @$editAssignmentButton if @canEdit()
 
       @updateScore() if @canReadGrades()
 
@@ -201,6 +202,7 @@ define [
       data.canManage = @canManage()
       data = @_setJSONForGrade(data) unless data.canManage
 
+      data.canEdit = @canEdit()
       data.canMove = @canMove()
       data.canDelete = @canDelete()
       data.canDuplicate = @canDuplicate()
@@ -299,14 +301,24 @@ define [
       @model.destroy(callbacks)
       @$el.remove()
 
+    hasIndividualPermissions: ->
+      ENV.PERMISSIONS.by_assignment_id?
+
     canDelete: ->
-      (@userIsAdmin or @model.canDelete()) && !@model.isRestrictedByMasterCourse()
+      result = (@userIsAdmin or @model.canDelete()) && !@model.isRestrictedByMasterCourse()
+      if @hasIndividualPermissions() then result && @canEdit() else result
 
     canDuplicate: ->
       (@userIsAdmin || @canManage()) && @model.canDuplicate()
 
     canMove: ->
       @userIsAdmin or (@canManage() and @model.canMove())
+
+    canEdit: ->
+      if !@hasIndividualPermissions()
+        return @userIsAdmin or @canManage()
+
+      @userIsAdmin or (@canManage() and ENV.PERMISSIONS.by_assignment_id[@model.id].update)
 
     canManage: ->
       ENV.PERMISSIONS.manage

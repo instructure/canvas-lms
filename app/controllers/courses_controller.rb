@@ -1756,7 +1756,9 @@ class CoursesController < ApplicationController
         @padless = true
       when 'assignments'
         add_crumb(t('#crumbs.assignments', "Assignments"))
-        set_js_assignment_data
+        set_js_assignment_data(
+          include_assignment_permissions: @context.root_account.feature_enabled?(:anonymous_moderated_marking)
+        )
         js_env(:SIS_NAME => AssignmentUtil.post_to_sis_friendly_name(@context))
         js_env(:COURSE_HOME => true)
         @upcoming_assignments = get_upcoming_assignments(@context)

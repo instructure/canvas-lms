@@ -2574,6 +2574,41 @@ describe Assignment do
         end
       end
     end
+
+    describe "to update" do
+      context "when Anonymous Moderated Marking is enabled" do
+        before(:each) do
+          @course.root_account.enable_feature!(:anonymous_moderated_marking)
+          @course.enable_feature!(:moderated_grading)
+
+          @moderator = teacher_in_course(course: @course, active_all: true).user
+          @non_moderator = teacher_in_course(course: @course, active_all: true).user
+
+          @moderated_assignment = @course.assignments.create!(
+            moderated_grading: true,
+            grader_count: 3,
+            final_grader: @moderator
+          )
+        end
+
+        it "allows the designated moderator to update a moderated assignment" do
+          expect(@moderated_assignment.grants_right?(@moderator, :update)).to eq(true)
+        end
+
+        it "does not allow non-moderators to update a moderated assignment" do
+          expect(@moderated_assignment.grants_right?(@non_moderator, :update)).to eq(false)
+        end
+
+        it "allows an admin to update a moderated assignment" do
+          expect(@moderated_assignment.grants_right?(@admin, :update)).to eq(true)
+        end
+
+        it "allows a teacher to update a moderated assignment with no moderator selected" do
+          @moderated_assignment.update!(final_grader: nil)
+          expect(@moderated_assignment.grants_right?(@non_moderator, :update)).to eq(true)
+        end
+      end
+    end
   end
 
   context "as_json" do
