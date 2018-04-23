@@ -401,6 +401,7 @@ enum EnrollmentWorkflowState {
   completed
   creation_pending
   deleted
+  inactive
   invited
   rejected
 }
