@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'i18n!sr_gradebook'
+  'i18nObj'
   'ember'
   '../../../util/round'
   'jsx/gradebook/GradingSchemeHelper'
