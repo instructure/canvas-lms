@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import Assignment from 'compiled/models/Assignment'
 import Submission from 'compiled/models/Submission'
 import DateGroup from 'compiled/models/DateGroup'
@@ -1113,4 +1114,32 @@ test('returns false if submission types are not in frozenAttributes', () => {
 test('returns true if submission_types are in frozenAttributes', () => {
   const assignment = new Assignment({frozen_attributes: ['submission_types']})
   equal(assignment.submissionTypesFrozen(), true)
+})
+
+QUnit.module('Assignment#pollUntilFinishedDuplicating', {
+  setup() {
+    this.clock = sinon.useFakeTimers()
+    this.assignment = new Assignment({ workflow_state: 'duplicating' })
+    this.stub(this.assignment, 'fetch').returns($.Deferred().resolve())
+  },
+  teardown() {
+    this.clock.restore()
+  }
+})
+
+test('polls for updates', function() {
+  this.assignment.pollUntilFinishedDuplicating()
+  this.clock.tick(2000)
+  notOk(this.assignment.fetch.called)
+  this.clock.tick(2000)
+  ok(this.assignment.fetch.called)
+})
+
+test('stops polling when the assignment has finished duplicating', function () {
+  this.assignment.pollUntilFinishedDuplicating()
+  this.assignment.set({ workflow_state: 'unpublished' })
+  this.clock.tick(3000)
+  ok(this.assignment.fetch.calledOnce)
+  this.clock.tick(3000)
+  ok(this.assignment.fetch.calledOnce)
 })

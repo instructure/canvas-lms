@@ -29,8 +29,9 @@ define [
   'jsx/grading/helpers/GradingPeriodsHelper'
   'timezone'
   'jsx/shared/helpers/numberHelper'
+  '../util/PandaPubPoller'
 ], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, VeriCiteSettings, DateGroup, AssignmentOverrideCollection,
-    DateGroupCollection, I18n, GradingPeriodsHelper, tz, numberHelper) ->
+    DateGroupCollection, I18n, GradingPeriodsHelper, tz, numberHelper, PandaPubPoller) ->
 
   isAdmin = () ->
     _.contains(ENV.current_user_roles, 'admin')
@@ -549,6 +550,14 @@ define [
       assignment_id = @id
       $.ajaxJSON "/api/v1/courses/#{course_id}/assignments/#{assignment_id}/duplicate", 'POST',
         {}, callback
+
+    pollUntilFinishedDuplicating: (interval = 3000) =>
+      # TODO: implement pandapub streaming updates
+      poller = new PandaPubPoller interval, interval * 5, (done) =>
+        @fetch().always =>
+          done()
+          poller.stop() unless @isDuplicating()
+      poller.start()
 
     isOnlyVisibleToOverrides: (override_flag) ->
       return @get('only_visible_to_overrides') || false unless arguments.length > 0

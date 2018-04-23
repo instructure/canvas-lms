@@ -787,6 +787,21 @@ test('cannot move when canManage is false but the assignment group id is not loc
   ok(view.className().includes('sort-disabled'))
 })
 
+test('re-renders when assignment state changes', function() {
+  this.stub(AssignmentListItemView.prototype, 'render')
+  const view = createView(this.model)
+  ok(AssignmentListItemView.prototype.render.calledOnce)
+  this.model.trigger('change:workflow_state')
+  ok(AssignmentListItemView.prototype.render.calledTwice)
+})
+
+test('polls for updates if assignment is duplicating', function() {
+  this.stub(this.model, 'isDuplicating').returns(true)
+  this.stub(this.model, 'pollUntilFinishedDuplicating')
+  const view = createView(this.model)
+  ok(this.model.pollUntilFinishedDuplicating.calledOnce)
+})
+
 QUnit.module('AssignmentListItemViewSpec\u2014alternate grading type: percent', {
   setup() {
     return genSetup.call(this, assignment_grade_percent())

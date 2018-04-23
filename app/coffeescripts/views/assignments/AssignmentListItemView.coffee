@@ -87,10 +87,12 @@ define [
         @model.on('change:published', @updatePublishState)
 
         # re-render for attributes we are showing
-        attrs = ["name", "points_possible", "due_at", "lock_at", "unlock_at", "modules", "published"]
+        attrs = ["name", "points_possible", "due_at", "lock_at", "unlock_at", "modules", "published", "workflow_state"]
         observe = attrs.map((attr) -> "change:#{attr}").join(" ")
         @model.on(observe, @render)
       @model.on 'change:submission', @updateScore
+
+      @model.pollUntilFinishedDuplicating() if @model.isDuplicating()
 
     initializeChildViews: ->
       @publishIconView = false
