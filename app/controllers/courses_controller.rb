@@ -2926,6 +2926,7 @@ class CoursesController < ApplicationController
     preloads = %i/account root_account/
     preloads << :teachers if includes.include?('teachers')
     preloads << :grading_standard if includes.include?('total_scores')
+    preloads << :account if includes.include?('subaccount')
     if includes.include?('current_grading_period_scores')
       preloads << { enrollment_term: { grading_period_group: :grading_periods } }
       preloads << { grading_period_groups: :grading_periods }
