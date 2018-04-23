@@ -17,6 +17,7 @@
  */
 
 import Calendar from 'compiled/calendar/Calendar'
+import I18n from 'i18n!calendar'
 import fcUtil from 'compiled/util/fcUtil'
 import moment from 'moment'
 import tz from 'timezone'
@@ -62,6 +63,20 @@ const makeCal = () =>
 test('creates a fullcalendar instance', () => {
   const cal = makeCal()
   ok($('.fc')[0])
+})
+
+test('returns correct format for 24 hour times', function() {
+  const cal = makeCal()
+  const stub = sinon.stub(I18n, 'lookup').returns('%k:%M')
+  strictEqual(cal.eventTimeFormat(), "HH:mm")
+  stub.restore()
+})
+
+test('return correct format for non 24 hour times', function() {
+  const cal = makeCal()
+  const stub = sinon.stub(I18n, 'lookup').returns('whatever')
+  strictEqual(cal.eventTimeFormat(), null)
+  stub.restore()
 })
 
 test('collaborates with header and data source', () => {

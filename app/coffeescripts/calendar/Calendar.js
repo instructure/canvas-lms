@@ -276,6 +276,7 @@ export default class Calendar {
         eventDragStart: this.eventDragStart,
         eventDrop: this.eventDrop,
         eventClick: this.eventClick,
+        eventTimeFormat: this.eventTimeFormat(),
         eventResize: this.eventResize,
         eventResizeStart: this.eventResizeStart,
         dayClick: this.dayClick,
@@ -292,6 +293,13 @@ export default class Calendar {
 
       calendarDefaults
     )
+  }
+
+  // This is used to set a custom time format for regions who use 24 hours time.
+  // We return null in the non 24 time case so that we can allow the fullcallendar npm package
+  // to set whatever time format calendar events should be
+  eventTimeFormat () {
+    return I18n.lookup('time.formats.tiny_on_the_hour') === "%k:%M" ? "HH:mm" : null
   }
 
   today() {
