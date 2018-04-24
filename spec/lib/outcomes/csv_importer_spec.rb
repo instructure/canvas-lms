@@ -260,47 +260,45 @@ describe Outcomes::CsvImporter do
     expect(errors).to eq(expected)
   end
 
+  def expect_import_failure(rows, message)
+    expect { import_fake_csv(rows) }.to raise_error(Outcomes::Import::DataFormatError, message)
+  end
+
   describe 'throws user-friendly header errors' do
     it 'when the csv file is totally malformed' do
       rows = [headers] + (1..3).map { |ix| group_row(vendor_guid: ix) }.to_a
-      errors = []
-      import_fake_csv(rows, separator: ':(') do |status|
-        errors += status[:errors]
-      end
-      expect(errors).to eq([
-        [1, 'Invalid CSV File']
-      ])
+      expect { import_fake_csv(rows, separator: ':(') }.to raise_error(Outcomes::Import::DataFormatError, 'Invalid CSV File')
     end
 
     it 'when the file is empty' do
-      expect_import_error([], [[1, 'File has no data']])
+      expect_import_failure([], 'File has no data')
     end
 
     it 'when required headers are missing' do
-      expect_import_error(
+      expect_import_failure(
         [['parent_guids', 'ratings']],
-        [[1, 'Missing required fields: ["title", "vendor_guid", "object_type"]']]
+        'Missing required fields: ["title", "vendor_guid", "object_type"]'
       )
     end
 
     it 'when other headers are after the ratings header' do
-      expect_import_error(
+      expect_import_failure(
         [['parent_guids', 'ratings', 'vendor_guid', '', 'blagh', nil]],
-        [[1, 'Invalid fields after ratings: ["vendor_guid", "blagh"]']]
+        'Invalid fields after ratings: ["vendor_guid", "blagh"]'
       )
     end
 
     it 'when invalid headers are present' do
-      expect_import_error(
+      expect_import_failure(
         [['vendor_guid', 'title', 'object_type', 'spanish_inquisition', 'parent_guids', 'ratings']],
-        [[1, 'Invalid fields: ["spanish_inquisition"]']]
+        'Invalid fields: ["spanish_inquisition"]'
       )
     end
 
     it 'when no data rows are present' do
-      expect_import_error(
+      expect_import_failure(
         [headers + ['ratings']],
-        [[1, 'File has no outcomes data']]
+        'File has no outcomes data'
       )
     end
   end

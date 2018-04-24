@@ -69,7 +69,7 @@ export default class OutcomesImporter extends Component {
         then((response) => {
           const workflowState = response.data.workflow_state
           if (workflowState === 'succeeded' || workflowState === 'failed') {
-            this.completeUpload(response.data.processing_errors.length)
+            this.completeUpload(response.data.processing_errors.length, workflowState === 'succeeded')
             clearInterval(pollStatus)
           }
         })
@@ -91,16 +91,25 @@ export default class OutcomesImporter extends Component {
     }
   }
 
-  completeUpload (count) {
+  completeUpload (count, succeeded) {
     const {mount, resetOutcomeViews, invokedImport} = this.props
     if (mount) ReactDOM.unmountComponentAtNode(mount)
     resetOutcomeViews()
     if (!invokedImport) {
       return
     }
-    if (count > 0) {
-      const wereErrors = I18n.t({one: "was an error", other: "were errors"}, {count})
-      showFlashAlert({ type: 'error', message: I18n.t('There %{wereErrors} with your import, please examine your file and attempt the upload again. Check your email for more details.', {wereErrors}) })
+    if (!succeeded) {
+      showFlashAlert({
+        type: 'error',
+        message: I18n.t(
+          'There was an error with your import, please examine your file and attempt the upload again. Check your email for more details.'
+        )
+      })
+    } else if (count > 0) {
+      showFlashAlert({
+        type: 'warning',
+        message: I18n.t('There was a problem importing some of the outcomes in the uploaded file. Check your email for more details.')
+      })
     } else {
       showFlashAlert({ type: 'success', message: I18n.t('Your outcomes were successfully imported.') })
     }

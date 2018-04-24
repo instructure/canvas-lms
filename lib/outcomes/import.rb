@@ -20,6 +20,7 @@ module Outcomes
     include OutcomeImporter
 
     class InvalidDataError < RuntimeError; end
+    class DataFormatError < RuntimeError; end
 
     OBJECT_ONLY_FIELDS = %i[calculation_method calculation_int ratings].freeze
     VALID_WORKFLOWS = [nil, '', 'active', 'deleted'].freeze
