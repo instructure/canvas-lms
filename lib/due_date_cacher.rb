@@ -30,7 +30,8 @@ class DueDateCacher
   SQL_FRAGMENT
 
   def self.recompute(assignment, update_grades: false)
-    Rails.logger.debug "DDC.recompute(#{assignment&.id}) - #{caller(1..1).first}"
+    current_caller = caller(1..1).first
+    Rails.logger.debug "DDC.recompute(#{assignment&.id}) - #{current_caller}"
     return unless assignment.active?
     opts = {
       assignments: [assignment.id],
@@ -38,14 +39,14 @@ class DueDateCacher
         singleton: "cached_due_date:calculator:Assignment:#{assignment.global_id}"
       },
       update_grades: update_grades,
-      original_caller: caller(1..1).first
+      original_caller: current_caller
     }
 
     recompute_course(assignment.context, opts)
   end
 
-  def self.recompute_course(course, assignments: nil, inst_jobs_opts: {}, run_immediately: false, update_grades: false, original_caller: nil)
-    Rails.logger.debug "DDC.recompute_course(#{course.inspect}, #{assignments.inspect}, #{inst_jobs_opts.inspect}) - #{caller(1..1).first}"
+  def self.recompute_course(course, assignments: nil, inst_jobs_opts: {}, run_immediately: false, update_grades: false, original_caller: caller(1..1).first)
+    Rails.logger.debug "DDC.recompute_course(#{course.inspect}, #{assignments.inspect}, #{inst_jobs_opts.inspect}) - #{original_caller}"
     course = Course.find(course) unless course.is_a?(Course)
     inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Course:#{course.global_id}" if assignments.nil?
 
@@ -75,7 +76,7 @@ class DueDateCacher
       send_later_if_production_enqueue_args(:recompute, inst_jobs_opts)
   end
 
-  def initialize(course, assignments, user_ids = [], update_grades: false, original_caller: nil)
+  def initialize(course, assignments, user_ids = [], update_grades: false, original_caller: caller(1..1).first)
     @course = course
     @assignment_ids = Array(assignments).map { |a| a.is_a?(Assignment) ? a.id : a }
     @user_ids = Array(user_ids)
