@@ -155,6 +155,49 @@ describe Assignment do
         assignment.save!
       end
     end
+
+    describe 'update_cached_due_dates' do
+      it 'invokes DueDateCacher if due_at is changed' do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+
+        assignment.update!(due_at: assignment.due_at + 1.day)
+      end
+
+      it 'invokes DueDateCacher if workflow_state is changed' do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+
+        assignment.destroy
+      end
+
+      it 'invokes DueDateCacher if only_visible_to_overrides is changed' do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+
+        assignment.update!(only_visible_to_overrides: !assignment.only_visible_to_overrides?)
+      end
+
+      it 'invokes DueDateCacher if called in a before_save context' do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+        allow(assignment).to receive(:update_cached_due_dates?).and_return(true)
+        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+
+        assignment.save!
+      end
+
+      it 'invokes DueDateCacher if called in an after_save context' do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+
+        Assignment.suspend_callbacks(:update_cached_due_dates) do
+          assignment.update!(due_at: assignment.due_at + 1.day)
+        end
+
+        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+
+        assignment.update_cached_due_dates
+      end
+    end
   end
 
   describe "default values for boolean attributes" do
