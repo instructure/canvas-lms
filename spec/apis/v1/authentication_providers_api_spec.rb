@@ -206,11 +206,12 @@ describe "AuthenticationProviders API", type: :request do
       @saml_hash['login_handle_name'] = nil
       @saml_hash['change_password_url'] = nil
       @saml_hash['requested_authn_context'] = nil
-      @saml_hash['login_attribute'] = 'nameid'
+      @saml_hash['login_attribute'] = 'NameID'
       @saml_hash['unknown_user_url'] = nil
       @saml_hash['parent_registration'] = false
       @saml_hash['metadata_uri'] = nil
       @saml_hash['sig_alg'] = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
+      @saml_hash['strip_domain_from_login_attribute'] = false
       expect(json).to eq @saml_hash
     end
 

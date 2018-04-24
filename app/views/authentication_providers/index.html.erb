@@ -82,6 +82,10 @@
 
 <h2><%= t("Current Provider") %></h2>
 
+<datalist id="saml_login_attributes">
+  <%= options_for_select(AuthenticationProvider::SAML.login_attributes) %>
+</datalist>
+
 <% if @presenter.configs.empty? %>
   <div id="no_auth">
     <%= t(:no_auth_type_description, "This account does not currently integrate "\

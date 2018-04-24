@@ -49,16 +49,26 @@ TEXT
   <%= f.label :certificate_fingerprint, t('Certificate Fingerprint'), class: 'ic-Label', for: "certificate_fingerprint_#{presenter.id_suffix(aac)}" %>
   <%= f.text_field :certificate_fingerprint, class: 'ic-Input', id: "certificate_fingerprint_#{presenter.id_suffix(aac)}" %>
 </div>
-<%= render partial: 'login_attribute_dropdown', locals: { aac: aac, presenter: presenter, f: f } %>
 <div class="ic-Form-control">
-  <%= f.label :identifier_format, 'Identifier Format', class: 'ic-Label', for: "identifier_format_#{presenter.id_suffix(aac)}" %>
+  <%= f.label :login_attribute, t('Login Attribute'), class: 'ic-Label', for: "login_attributes_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field(:login_attribute,
+               class: 'ic-Input',
+               id: "login_attributes_#{presenter.id_suffix(aac)}",
+               list: "saml_login_attributes") %>
+</div>
+<div class="ic-Form-control">
+  <%= f.label :strip_domain_from_login_attribute, t('Strip Domain From Login Attribute Value'), class: 'ic-Label', for: "strip_domain_from_login_attribute_#{presenter.id_suffix(aac)}" %>
+  <%= f.check_box :strip_domain_from_login_attribute, class: 'strip_domain_from_login_attribute_checkbox', id: "strip_domain_from_login_attribute_#{presenter.id_suffix(aac)}" %>
+</div>
+<div class="ic-Form-control">
+  <%= f.label :identifier_format, t('Identifier Format'), class: 'ic-Label', for: "identifier_format_#{presenter.id_suffix(aac)}" %>
   <%= f.select(:identifier_format,
                presenter.saml_identifiers,
                {},
                class: 'ic-Input', id: "identifier_format_#{presenter.id_suffix(aac)}") %>
 </div>
 <div class="ic-Form-control">
-  <%= f.label :requested_authn_context, 'Authentication Context', class: 'ic-Label', for: "requested_authn_context_#{presenter.id_suffix(aac)}" %>
+  <%= f.label :requested_authn_context, t('Authentication Context'), class: 'ic-Label', for: "requested_authn_context_#{presenter.id_suffix(aac)}" %>
   <%= f.select(:requested_authn_context,
                presenter.saml_authn_contexts,
                {},

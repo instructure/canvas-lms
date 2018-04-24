@@ -47,7 +47,8 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
       :jit_provisioning,
       :metadata,
       :metadata_uri,
-      :sig_alg
+      :sig_alg,
+      :strip_domain_from_login_attribute
     ].freeze
   end
 
@@ -121,9 +122,8 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
 
   def self.login_attributes
     {
-        'NameID' => 'nameid',
+        'NameID' => 'NameID',
         'eduPersonPrincipalName' => 'eduPersonPrincipalName',
-        t(:saml_eppn_domain_stripped, "%{eppn} (domain stripped)", :eppn => "eduPersonPrincipalName") =>'eduPersonPrincipalName_stripped'
     }
   end
 
@@ -136,8 +136,23 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   end
 
   def login_attribute
-    return 'nameid' unless read_attribute(:login_attribute)
-    super
+    return 'NameID' unless read_attribute(:login_attribute)
+    result = super
+    # backcompat
+    return 'NameID' if result == 'nameid'
+    return 'eduPersonPrincipalName' if result == 'eduPersonPrincipalName_stripped'
+    result
+  end
+
+  def strip_domain_from_login_attribute?
+    # backcompat
+    return true if read_attribute(:login_attribute) == 'eduPersonPrincipalName_stripped'
+    !!settings['strip_domain_from_login_attribute']
+  end
+  alias strip_domain_from_login_attribute strip_domain_from_login_attribute?
+
+  def strip_domain_from_login_attribute=(value)
+    settings['strip_domain_from_login_attribute'] = ::Canvas::Plugin.value_to_boolean(value)
   end
 
   def signing_certificates

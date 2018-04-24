@@ -105,13 +105,13 @@ class Login::SamlController < ApplicationController
       assertion = response.assertions.first
       provider_attributes = assertion.attribute_statements.first&.to_h
       subject_name_id = assertion.subject.name_id
-      if aac.login_attribute == 'nameid'
-        unique_id = subject_name_id.id
-      elsif aac.login_attribute == 'eduPersonPrincipalName'
-        unique_id = provider_attributes["eduPersonPrincipalName"]
-      elsif aac.login_attribute == 'eduPersonPrincipalName_stripped'
-        unique_id = provider_attributes["eduPersonPrincipalName"]
-        unique_id = unique_id.split('@', 2)[0] if unique_id
+      unique_id = if aac.login_attribute == 'NameID'
+        subject_name_id.id
+      else
+        provider_attributes[aac.login_attribute]
+      end
+      if unique_id && aac.strip_domain_from_login_attribute?
+        unique_id = unique_id.split('@', 2)[0]
       end
 
       logger.info "Attempting SAML2 login for #{aac.login_attribute} #{unique_id} in account #{@domain_root_account.id}"
@@ -184,15 +184,15 @@ class Login::SamlController < ApplicationController
       return
     end
 
-    if aac.login_attribute == 'nameid'
-      unique_id = legacy_response.name_id
-    elsif aac.login_attribute == 'eduPersonPrincipalName'
-      unique_id = legacy_response.saml_attributes["eduPersonPrincipalName"]
-    elsif aac.login_attribute == 'eduPersonPrincipalName_stripped'
-      unique_id = legacy_response.saml_attributes["eduPersonPrincipalName"]
-      unique_id = unique_id.split('@', 2)[0] if unique_id
-    end
     provider_attributes = legacy_response.saml_attributes
+    unique_id = if aac.login_attribute == 'NameID'
+      legacy_response.name_id
+    else
+      provider_attributes[aac.login_attribute]
+    end
+    if unique_id && aac.strip_domain_from_login_attribute?
+      unique_id = unique_id.split('@', 2)[0]
+    end
 
     logger.info "Attempting SAML login for #{aac.login_attribute} #{unique_id} in account #{@domain_root_account.id}"
 
