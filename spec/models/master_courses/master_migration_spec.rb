@@ -1142,6 +1142,8 @@ describe MasterCourses::MasterMigration do
       end
 
       master_parent_folder.update_attribute(:name, "parent RENAMED")
+      master_parent_folder.sub_folders.create!(:name => "empty", :context => @copy_from)
+
       run_master_migration
 
       copied_att = @copy_to.attachments.where(:migration_id => att_tag.migration_id).first
