@@ -61,7 +61,8 @@ describe "moderated grading assignments" do
   context "with assignment moderation setting" do
     before(:each) do
       # turn on the moderation flag
-      Account.default.enable_feature!(:moderated_grading)
+      Account.default.enable_feature!(:anonymous_moderated_marking)
+      Account.default.enable_feature!(:anonymous_marking)
       @moderated_assignment = @course.assignments.create!(title: 'Moderated Assignment',
                                                           submission_types: 'online_text_entry',
                                                           points_possible: 10)
@@ -82,6 +83,59 @@ describe "moderated grading assignments" do
       AssignmentPage.select_moderate_checkbox
       AssignmentPage.select_grader_dropdown.click
       expect(AssignmentPage.select_grader_dropdown).to include_text(@teacher_two.name)
+    end
+  end
+
+  context "with moderator selected for an assignment" do
+    before(:each) do
+      # turn on the moderation flag
+      Account.default.enable_feature!(:anonymous_moderated_marking)
+      Account.default.enable_feature!(:anonymous_marking)
+
+      # create 2 teachers
+      @teacher_two = user_factory(active_all: true)
+      @course.enroll_teacher(@teacher_two,enrollment_state: 'active')
+      @teacher_three = user_factory(active_all: true)
+      @course.enroll_teacher(@teacher_three, enrollment_state: 'active')
+
+      # assign a moderator (teacher 2)
+      @moderated_assignment = @course.assignments.create!(title: 'Moderated Assignment',
+                                                          submission_types: 'online_text_entry',
+                                                          final_grader: @teacher_two,
+                                                          moderated_grading: true,
+                                                          points_possible: 10)
+
+    end
+
+    before do
+      user_session(@teacher_two)
+      AssignmentPage.visit_assignment_edit_page(@course.id, @moderated_assignment.id)
+    end
+
+    it "should allow moderator to edit assignment", priority: "1", test_id: 3488596 do
+      skip('This is skeleton code that acts as AC for GRADE-960 which is WIP')
+      expect(AssignmentPage.assignment_edit_permission_error_text).not_to exist
+    end
+
+    before do
+      user_session(@teacher_three)
+      AssignmentPage.visit_assignment_edit_page(@course.id, @moderated_assignment.id)
+    end
+
+    it "should not allow a non moderator to edit assignment", priority: "1", test_id: 3488597 do
+      skip('This is skeleton code that acts as AC for GRADE-960 which is WIP')
+      expect(AssignmentPage.assignment_edit_permission_error_text).to exist
+    end
+
+    before do
+      @account = Account.default
+      account_admin_user
+      user_session(@admin)
+    end
+
+    it "should allow admin to edit assignment", priority: "1", test_id: 3488598 do
+      skip('This is skeleton code that acts as AC for GRADE-960 which is WIP')
+      expect(AssignmentPage.assignment_edit_permission_error_text).not_to exist
     end
   end
 end

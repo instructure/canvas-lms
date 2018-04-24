@@ -39,6 +39,18 @@ class AssignmentPage
       f("input[type=checkbox][name='moderated_grading']")
     end
 
+    def assignment_edit_permission_error_text
+      # add locator for assignment edit error
+    end
+
+    def assignment_name_textfield
+      f("#assignment_name")
+    end
+
+    def assignment_save_button
+      find_button('Save')
+    end
+
     def filter_grader(grader_name)
       fj("option:contains(\"#{grader_name}\")")
     end
@@ -50,5 +62,12 @@ class AssignmentPage
     def select_grader_from_dropdown(grader_name)
       filter_grader(grader_name).click
     end
+
+    def edit_assignment_name(text)
+      assignment_name_textfield.send_keys(text)
+      assignment_save_button.click
+      wait_for_ajaximations
+    end
+
   end
 end
