@@ -65,6 +65,11 @@ RSpec.describe Outcomes::Import do
   end
   let(:importer) { TestImporter.new(context) }
 
+  # on export, nil database values are converted to ''
+  def simulate_export(attributes)
+    attributes.transform_values { |v| v.nil? ? '' : v }
+  end
+
   describe '#import_object' do
     it 'calls #import_group for a group' do
       importer.import_object(**group_attributes, vendor_guid: 'new_group', object_type: 'group')
@@ -395,6 +400,14 @@ RSpec.describe Outcomes::Import do
         it 'assigns parents for outcome in another context if attributes unchanged' do
           existing_outcome.update! outcome_attributes
           importer.import_outcome(**outcome_attributes, parent_guids: 'parent1')
+          expect(parent1.child_outcome_links.map(&:content)).to include existing_outcome
+        end
+
+        it 'can link an outcome with nil attributes to a different context' do
+          nil_attributes = outcome_attributes.merge(description: nil)
+          existing_outcome.update! nil_attributes
+          exported_attributes = simulate_export(nil_attributes)
+          importer.import_outcome(**exported_attributes, parent_guids: 'parent1')
           expect(parent1.child_outcome_links.map(&:content)).to include existing_outcome
         end
 
