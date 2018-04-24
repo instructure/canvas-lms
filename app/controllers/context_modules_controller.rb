@@ -278,6 +278,7 @@ class ContextModulesController < ApplicationController
       @modules.each do |m|
         m.updated_at = Time.now
         m.save_without_touching_context
+        Canvas::LiveEvents.module_updated(m)
       end
       @context.touch
 
