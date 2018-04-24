@@ -44,6 +44,9 @@ actions.listInheritedDeveloperKeysFailed = (error) => ({ type: actions.LIST_INHE
 actions.LIST_DEVELOPER_KEYS_REPLACE = 'LIST_DEVELOPER_KEYS_REPLACE';
 actions.listDeveloperKeysReplace = (payload) => ({ type: actions.LIST_DEVELOPER_KEYS_REPLACE, payload});
 
+actions.LIST_DEVELOPER_KEYS_REPLACE_BINDING_STATE = 'LIST_DEVELOPER_KEYS_REPLACE_BINDING_STATE';
+actions.listDeveloperKeysReplaceBindingState = (payload) => ({ type: actions.LIST_DEVELOPER_KEYS_REPLACE_BINDING_STATE, payload});
+
 actions.LIST_DEVELOPER_KEYS_DELETE = 'LIST_DEVELOPER_KEYS_DELETE';
 actions.listDeveloperKeysDelete = (payload) => ({ type: actions.LIST_DEVELOPER_KEYS_DELETE, payload});
 
@@ -131,7 +134,8 @@ actions.setBindingWorkflowState = (developerKeyId, accountId, workflowState) => 
       workflow_state: workflowState
     }
   })
-  .then(() => {
+  .then((response) => {
+    dispatch(actions.listDeveloperKeysReplaceBindingState(response.data))
     dispatch(actions.setBindingWorkflowStateSuccessful())
   })
   .catch((error) => {
