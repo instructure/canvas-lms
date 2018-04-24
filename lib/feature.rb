@@ -488,7 +488,7 @@ END
       description: -> { I18n.t('This feature enables users of right-to-left (RTL) languages to see the RTL layout under development. Eventually, this will become the default behavior and this option will be removed.') },
       applies_to: 'RootAccount',
       state: 'allowed',
-      development: true,
+      beta: true,
     },
     'force_rtl' =>
     {
