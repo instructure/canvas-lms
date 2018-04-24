@@ -211,7 +211,6 @@ class Assignment < ActiveRecord::Base
       result.send(:"#{attr}=", nil)
     end
     result.peer_review_count = 0
-    result.workflow_state = external_tool_tag.present? ? 'duplicating' : 'unpublished'
     # Default to the last position of all active assignments in the group.  Clients can still
     # override later.  Just helps to avoid duplicate positions.
     result.position = Assignment.active.where(assignment_group: assignment_group).maximum(:position) + 1
@@ -242,8 +241,15 @@ class Assignment < ActiveRecord::Base
     # Link the duplicated assignment to this assignment
     result.duplicate_of = self
 
-    # If this assignment uses an external tool, duplicate that too
-    result.external_tool_tag = self.external_tool_tag&.dup
+    # If this assignment uses an external tool, duplicate that too, and mark
+    # the assignment as "duplicating"
+    if external_tool_tag.present?
+      result.external_tool_tag = external_tool_tag.dup
+      result.workflow_state = 'duplicating'
+      result.duplication_started_at = Time.zone.now
+    else
+      result.workflow_state = 'unpublished'
+    end
 
     result
   end
@@ -252,6 +258,14 @@ class Assignment < ActiveRecord::Base
     return false if quiz?
     return false if external_tool_tag.present? && !quiz_lti?
     true
+  end
+
+  def self.clean_up_duplicating_assignments
+    duplicating_for_too_long.update_all(
+      duplication_started_at: nil,
+      workflow_state: 'failed_to_duplicate',
+      updated_at: Time.zone.now
+    )
   end
 
   def group_category_changes_ok?
@@ -2308,6 +2322,10 @@ class Assignment < ActiveRecord::Base
     else
       find api_id
     end
+  }
+
+  scope :duplicating_for_too_long, -> {
+    where("workflow_state = 'duplicating' AND duplication_started_at < ?", 5.minutes.ago)
   }
 
   def overdue?

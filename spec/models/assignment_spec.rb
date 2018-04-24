@@ -469,6 +469,7 @@ describe Assignment do
       expect(new_assignment.title).to eq "Wiki Assignment Copy"
       expect(new_assignment.wiki_page.title).to eq "Wiki Assignment Copy"
       expect(new_assignment.duplicate_of).to eq assignment
+      expect(new_assignment.workflow_state).to eq "unpublished"
       new_assignment.save!
       new_assignment2 = assignment.duplicate
       expect(new_assignment2.title).to eq "Wiki Assignment Copy 2"
@@ -511,6 +512,10 @@ describe Assignment do
       it "sets the assignment's state to 'duplicating'" do
         expect(assignment.duplicate.workflow_state).to eq('duplicating')
       end
+
+      it "sets duplication_started_at to the current time" do
+        expect(assignment.duplicate.duplication_started_at).to be_within(5).of(Time.zone.now)
+      end
     end
   end
 
@@ -545,6 +550,45 @@ describe Assignment do
 
         it { is_expected.to be true }
       end
+    end
+  end
+
+  describe "scope: duplicating_for_too_long" do
+    subject { described_class.duplicating_for_too_long }
+
+    let_once(:unpublished_assignment) do
+      @course.assignments.create!(workflow_state: 'unpublished', **assignment_valid_attributes)
+    end
+    let_once(:new_duplicating_assignment) do
+      @course.assignments.create!(
+        workflow_state: 'duplicating',
+        duplication_started_at: 5.seconds.ago,
+        **assignment_valid_attributes
+      )
+    end
+    let_once(:old_duplicating_assignment) do
+      @course.assignments.create!(
+        workflow_state: 'duplicating',
+        duplication_started_at: 10.minutes.ago,
+        **assignment_valid_attributes
+      )
+    end
+
+    it { is_expected.to eq([old_duplicating_assignment]) }
+  end
+
+  describe ".clean_up_duplicating_assignments" do
+    before { allow(described_class).to receive(:duplicating_for_too_long) }
+
+    it "marks all assignments that have been duplicating for too long as failed_to_duplicate" do
+      now = double('now')
+      expect(Time.zone).to receive(:now).and_return(now)
+      expect(described_class.duplicating_for_too_long).to receive(:update_all).with(
+        duplication_started_at: nil,
+        workflow_state: 'failed_to_duplicate',
+        updated_at: now
+      )
+      described_class.clean_up_duplicating_assignments
     end
   end
 
