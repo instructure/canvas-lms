@@ -424,7 +424,7 @@ class Assignment < ActiveRecord::Base
   after_save :remove_assignment_updated_flag # this needs to be after has_a_broadcast_policy for the message to be sent
 
   def validate_assignment_overrides(opts={})
-    if opts[:force_override_destroy] || saved_change_to_group_category_id?
+    if opts[:force_override_destroy] || will_save_change_to_group_category_id?
       # needs to be .each(&:destroy) instead of .update_all(:workflow_state =>
       # 'deleted') so that the override gets versioned properly
       active_assignment_overrides.
@@ -490,7 +490,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def needs_to_update_submissions?
-    !new_record? &&
+    !id_before_last_save.nil? &&
       (saved_change_to_points_possible? || saved_change_to_grading_type? || saved_change_to_grading_standard_id?) &&
       !submissions.graded.empty?
   end
@@ -509,7 +509,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def needs_to_recompute_grade?
-    !new_record? && (
+    !id_before_last_save.nil? && (
       saved_change_to_points_possible? ||
       saved_change_to_muted? ||
       saved_change_to_workflow_state? ||
@@ -2465,7 +2465,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_cached_due_dates?
-    saved_change_to_due_at? || saved_change_to_workflow_state? || saved_change_to_only_visible_to_overrides?
+    will_save_change_to_due_at? || saved_change_to_due_at? ||
+      will_save_change_to_workflow_state? || saved_change_to_workflow_state? ||
+      will_save_change_to_only_visible_to_overrides? || saved_change_to_only_visible_to_overrides?
   end
 
   def apply_late_policy
