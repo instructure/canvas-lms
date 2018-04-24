@@ -37,7 +37,7 @@
 .mejs-captions-selector .upload-track {
   color: white;
   margin: 3px 0 5px 5px;
-  float: left;
+  float: direction(left);
 }
 
 /* "x" button to remove a subtitle */

@@ -306,6 +306,25 @@ class RoleOverride < ActiveRecord::Base
         ],
         :applies_to_concluded => ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']
       },
+      :read_email_addresses => {
+        :label => lambda { t("See other users' primary email address") },
+        :available_to => [
+          'StudentEnrollment',
+          'TaEnrollment',
+          'DesignerEnrollment',
+          'TeacherEnrollment',
+          'TeacherlessStudentEnrollment',
+          'ObserverEnrollment',
+          'AccountAdmin',
+          'AccountMembership'
+        ],
+        :true_for => [
+          'TaEnrollment',
+          'TeacherEnrollment',
+          'AccountAdmin'
+        ],
+        :applies_to_concluded => ['TeacherEnrollment', 'TaEnrollment']
+      },
       :view_all_grades => {
         :label => lambda { t('permissions.view_all_grades', "View all grades") },
         :available_to => [
@@ -630,9 +649,14 @@ class RoleOverride < ActiveRecord::Base
           'AccountAdmin'
         ]
       },
+      :view_user_logins => {
+        :label => lambda { t("View login ids for users") },
+        :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment),
+        :true_for => %w(AccountAdmin TeacherEnrollment TaEnrollment)
+      },
       :manage_user_observers => {
         :label => lambda { t('permissions.manage_user_observers', "Manage observers for users") },
-        :account_only => true,
+        :account_only => :root,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
       },

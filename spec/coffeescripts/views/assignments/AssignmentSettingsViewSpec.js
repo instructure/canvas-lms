@@ -28,7 +28,7 @@ import 'helpers/jquery.simulate'
 
 const group = (opts = {}) => new AssignmentGroup({group_weight: 50, ...opts})
 
-const assignmentGroups = () => new AssignmentGroupCollection([group(), group()])
+const assignmentGroups = () => new AssignmentGroupCollection([group({name: "G1"}), group({name: "G2"})])
 
 const createView = function(opts = {}) {
   const course = new Course({apply_assignment_group_weights: opts.weighted})
@@ -54,7 +54,7 @@ QUnit.module('AssignmentSettingsView', {
 })
 
 test('should be accessible', assert => {
-  const view = createView(true)
+  const view = createView({weighted: true})
   const done = assert.async()
   assertions.isAccessible(view, done, {a11yReport: true})
 })

@@ -44,11 +44,16 @@ export default class CoursesListRow extends React.Component {
     term: shape({name: string.isRequired}).isRequired,
     roles: arrayOf(shape({id: string.isRequired})),
     showSISIds: bool.isRequired,
+    can_create_enrollments: bool,
     blueprint: bool
   }
 
   static defaultProps = {
-    roles: []
+    roles: [],
+    can_create_enrollments:
+      window.ENV &&
+      window.ENV.PERMISSIONS &&
+      window.ENV.PERMISSIONS.can_create_enrollments
   }
 
   constructor(props) {
@@ -122,7 +127,8 @@ export default class CoursesListRow extends React.Component {
       subaccount_name,
       showSISIds,
       term,
-      blueprint
+      blueprint,
+      can_create_enrollments
     } = this.props
     const {teachersToShow, newlyEnrolledStudents} = this.state
     const url = `/courses/${id}`
@@ -180,11 +186,13 @@ export default class CoursesListRow extends React.Component {
         <td>{subaccount_name}</td>
         <td>{I18n.n(total_students + newlyEnrolledStudents)}</td>
         <td style={{whiteSpace: 'nowrap'}}>
-          <Tooltip tip={addUsersTip}>
-            <Button variant="icon" size="small" onClick={this.openAddUsersToCourseDialog}>
-              <IconPlusLine title={addUsersTip} />
-            </Button>
-          </Tooltip>
+          {can_create_enrollments && (
+            <Tooltip tip={addUsersTip}>
+              <Button variant="icon" size="small" onClick={this.openAddUsersToCourseDialog}>
+                <IconPlusLine title={addUsersTip} />
+              </Button>
+            </Tooltip>
+          )}
           <Tooltip tip={statsTip}>
             <Button variant="icon" size="small" href={`${url}/statistics`}>
               <IconStatsLine height="1.5em" title={statsTip} />

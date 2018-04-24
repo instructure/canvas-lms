@@ -133,18 +133,18 @@
     <table>
       <tr>
         <td><%= before_label('allotted_storage', %{Allotted Storage}) %></td>
-        <td style="padding-left: 10px; text-align: right;"><%= number_to_human_size(@context.quota) %></td>
+        <td style="padding-<%= direction('left') %>: 10px; text-align: <%= direction('right') %>;"><%= number_to_human_size(@context.quota) %></td>
         <td></td>
       </tr>
       <tr>
         <td><%= before_label('uploaded_files', %{Uploaded Files}) %></td>
-        <td style="padding-left: 10px; text-align: right;"><%= number_to_human_size(@files_size) %></td>
-        <td style="padding-left: 10px; text-align: right;"><%= t 'file_count', 'file', :count => @file_count %></td>
+        <td style="padding-<%= direction('left') %>: 10px; text-align: <%= direction('right') %>;"><%= number_to_human_size(@files_size) %></td>
+        <td style="padding-<%= direction('left') %>: 10px; text-align: <%= direction('right') %>;"><%= t 'file_count', 'file', :count => @file_count %></td>
       </tr>
       <tr>
         <td><%= before_label('media_files', %{Media Files}) %></td>
-        <td style="padding-left: 10px; text-align: right;"><%= number_to_human_size(@media_files_size) %></td>
-        <td style="padding-left: 10px; text-align: right;"><%= t 'file_count', 'file', :count => @media_file_count %></td>
+        <td style="padding-<%= direction('left') %>: 10px; text-align: <%= direction('right') %>;"><%= number_to_human_size(@media_files_size) %></td>
+        <td style="padding-<%= direction('left') %>: 10px; text-align: <%= direction('right') %>;"><%= t 'file_count', 'file', :count => @media_file_count %></td>
       </tr>
     </table>
   </div>

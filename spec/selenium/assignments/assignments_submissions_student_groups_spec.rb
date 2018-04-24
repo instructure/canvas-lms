@@ -55,7 +55,7 @@ describe 'submissions' do
         f('button[type="submit"]').click
         wait_for_ajaximations
 
-        expect(f('#sidebar_content .header')).to include_text 'Turned In!'
+        expect(f('#sidebar_content .header')).to include_text 'Submitted!'
       end
 
       it 'Submitting Group Assignments - No File Warning', priority: "1", test_id: 238165 do

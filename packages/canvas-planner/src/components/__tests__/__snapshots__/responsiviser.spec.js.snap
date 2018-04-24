@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders large 1`] = `
-<ResponsiveComponent
+<ResponsiveSomeComponent
   responsiveSize="large"
 >
   <SomeComponent
@@ -13,11 +13,11 @@ exports[`renders large 1`] = `
       hello world
     </div>
   </SomeComponent>
-</ResponsiveComponent>
+</ResponsiveSomeComponent>
 `;
 
 exports[`renders medium 1`] = `
-<ResponsiveComponent
+<ResponsiveSomeComponent
   responsiveSize="large"
 >
   <SomeComponent
@@ -29,11 +29,11 @@ exports[`renders medium 1`] = `
       hello world
     </div>
   </SomeComponent>
-</ResponsiveComponent>
+</ResponsiveSomeComponent>
 `;
 
 exports[`renders medium 2`] = `
-<ResponsiveComponent
+<ResponsiveSomeComponent
   responsiveSize="large"
 >
   <SomeComponent
@@ -45,5 +45,5 @@ exports[`renders medium 2`] = `
       hello world
     </div>
   </SomeComponent>
-</ResponsiveComponent>
+</ResponsiveSomeComponent>
 `;

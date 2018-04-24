@@ -100,10 +100,10 @@
   </div>
 
   <input type="hidden" name="json_data_to_submit" value="" />
-  <div class="button-container" style="padding-left:7px;">
+  <div class="button-container" style="padding-<%= direction('left') %>:7px;">
     <button type="submit" class="btn"><%= t('buttons.save_changes', "Save Changes") %></button>
     <%= link_to t('#buttons.cancel', "Cancel"), :back , :class => "btn btn button-secondary" %>
-    <span id="assignments_without_changes_alert" style="display:none; margin-left: 50px;"><%= t('notices.unchanged', "Note: You uploaded some assignments that had no grade changes detected. They have been hidden.") %></span>
+    <span id="assignments_without_changes_alert" style="display:none; margin-<%= direction('left') %>: 50px;"><%= t('notices.unchanged', "Note: You uploaded some assignments that had no grade changes detected. They have been hidden.") %></span>
   </div>
 <% end -%>
 

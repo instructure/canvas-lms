@@ -21,7 +21,7 @@ import { encodeQueryString } from '../shared/queryString'
 
 function discussionQueryString(contextType, page) {
   const params = [
-    { per_page: 40 },
+    { per_page: 50 },
     { plain_messages: true },
     { include_assignment: true },
     { exclude_assignment_descriptions: true },

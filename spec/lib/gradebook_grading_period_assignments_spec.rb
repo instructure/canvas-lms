@@ -32,7 +32,7 @@ describe GradebookGradingPeriodAssignments do
       @assignment4 = @example_course.assignments.create!(due_at: 6.months.from_now)
     end
 
-    let(:hash) { GradebookGradingPeriodAssignments.new(@example_course).to_h }
+    let(:hash) { GradebookGradingPeriodAssignments.new(@example_course, {}).to_h }
 
     context "with grading periods" do
       before(:once) do
@@ -96,6 +96,92 @@ describe GradebookGradingPeriodAssignments do
         assignment = course.assignments.create!(due_at: 1.day.from_now)
         expect(hash[@period2.id]).not_to include(assignment.id.to_s)
       end
+
+      context 'with students that are not active' do
+        before(:once) do
+          @course = Course.create!
+          @student_enrollment = student_in_course(course: @course, active_all: true)
+          @assignment = @course.assignments.create!(due_at: @period2.end_date)
+          @settings = {}
+        end
+
+        let(:hash) { GradebookGradingPeriodAssignments.new(@course, @settings).to_h }
+
+
+        describe 'concluded students' do
+          before(:once) do
+            @student_enrollment.conclude
+          end
+
+          it 'does not include assignments assigned exclusively to concluded students' do
+            expect(hash[@period2.id]).to be_nil
+          end
+
+          it 'ignores deleted enrollments' do
+            # update_columns in order to avoid callbacks that would soft-delete the submission
+            @student_enrollment.update_columns(workflow_state: :deleted)
+            expect(hash[@period2.id]).to be_nil
+          end
+
+          it 'ignores enrollments in other courses' do
+            new_course = Course.create!
+            new_course.enroll_student(@student_enrollment.user, active_all: true)
+            expect(hash[@period2.id]).to be_nil
+          end
+
+          it 'ignores non-student enrollments' do
+            @course.enroll_ta(@student_enrollment.user, active_all: true)
+            expect(hash[@period2.id]).to be_nil
+          end
+
+          it 'optionally includes assignments assigned exclusively to concluded students' do
+            @settings[@course.id] = { 'show_concluded_enrollments' => 'true' }
+            expect(hash[@period2.id]).to include @assignment.id.to_s
+          end
+
+          it 'optionally excludes assignments assigned exclusively to concluded students' do
+            @settings[@course.id] = { 'show_concluded_enrollments' => 'false' }
+            expect(hash[@period2.id]).to be_nil
+          end
+        end
+
+        describe 'deactivated students' do
+          before(:once) do
+            @student_enrollment.deactivate
+          end
+
+          it 'does not include assignments assigned exclusively to deactivated students' do
+            expect(hash[@period2.id]).to be_nil
+          end
+
+          it 'ignores deleted enrollments' do
+            # update_columns in order to avoid callbacks that would soft-delete the submission
+            @student_enrollment.update_columns(workflow_state: :deleted)
+            expect(hash[@period2.id]).to be_nil
+          end
+
+          it 'ignores enrollments in other courses' do
+            new_course = Course.create!
+            new_course.enroll_student(@student_enrollment.user, active_all: true)
+            expect(hash[@period2.id]).to be_nil
+          end
+
+          it 'ignores non-student enrollments' do
+            @course.enroll_ta(@student_enrollment.user, active_all: true)
+            expect(hash[@period2.id]).to be_nil
+          end
+
+          it 'optionally includes assignments assigned exclusively to deactivated students' do
+            @settings[@course.id] = { 'show_inactive_enrollments' => 'true' }
+            expect(hash[@period2.id]).to include @assignment.id.to_s
+          end
+
+          it 'optionally excludes assignments assigned exclusively to deactivated students' do
+            @settings[@course.id] = { 'show_inactive_enrollments' => 'false' }
+            expect(hash[@period2.id]).to be_nil
+          end
+        end
+      end
     end
 
     it "returns an empty hash when grading periods are not in use" do
@@ -104,10 +190,10 @@ describe GradebookGradingPeriodAssignments do
   end
 
   it "raises an exception if context is not a course" do
-    expect { GradebookGradingPeriodAssignments.new({}) }.to raise_error("Context must be a course")
+    expect { GradebookGradingPeriodAssignments.new({}, {}) }.to raise_error("Context must be a course")
   end
 
   it "raises an exception if context has no id" do
-    expect { GradebookGradingPeriodAssignments.new(Course.new) }.to raise_error("Context must have an id")
+    expect { GradebookGradingPeriodAssignments.new(Course.new, {}) }.to raise_error("Context must have an id")
   end
 end

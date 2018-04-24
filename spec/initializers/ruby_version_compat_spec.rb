@@ -50,7 +50,7 @@ describe 'ruby_version_compat' do
 
   describe "force_utf8_params" do
     it "should allow null filenames through" do
-      testfile = fixture_file_upload("scribd_docs/txt.txt", "text/plain", true)
+      testfile = fixture_file_upload("docs/txt.txt", "text/plain", true)
       testfile.instance_variable_set(:@original_filename, nil)
       controller = ApplicationController.new
       allow(controller).to receive(:params).and_return({ :upload => { :file1 => testfile } })

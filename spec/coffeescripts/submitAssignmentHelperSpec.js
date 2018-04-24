@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {submitContentItem, recordEulaAgreement} from 'submit_assignment_helper'
+import {submitContentItem, recordEulaAgreement, verifyPledgeIsChecked} from 'submit_assignment_helper'
 import $ from 'jquery'
 
 const formHtml = `\
@@ -161,4 +161,47 @@ test('Clears the value if the input is not checked', () => {
     equal(val.value, '')
   }
   return clock.restore()
+})
+
+test('returns true if checkbox does not exist', () => {
+  ok(verifyPledgeIsChecked($('#does_not_exist')))
+})
+
+test('returns true if the checkbox exists and is checked', () => {
+  const checkbox = document.createElement('input')
+  checkbox.type = 'checkbox'
+  checkbox.checked = true
+  checkbox.id = 'test-checkbox'
+  document.getElementById('fixtures').appendChild(checkbox)
+
+  ok(verifyPledgeIsChecked($('#test-checkbox')))
+})
+
+test('returns false if the checkbox exists and is not checked', () => {
+  const checkbox = document.createElement('input')
+  checkbox.type = 'checkbox'
+  checkbox.checked = false
+  checkbox.id = 'test-checkbox'
+  document.getElementById('fixtures').appendChild(checkbox)
+
+  notOk(verifyPledgeIsChecked($('#test-checkbox')))
+})
+
+test('alerts the user is the checkbox is not checked', () => {
+  const errorMessage = 'You must agree to the submission pledge before you can submit this assignment.'
+
+  const alertSpy = sinon.spy()
+  const original_alert = window.alert
+  window.alert = alertSpy
+
+  const checkbox = document.createElement('input')
+  checkbox.type = 'checkbox'
+  checkbox.checked = false
+  checkbox.id = 'test-checkbox'
+  document.getElementById('fixtures').appendChild(checkbox)
+
+  verifyPledgeIsChecked($('#test-checkbox'))
+
+  ok(alertSpy.calledWith(errorMessage))
+  window.alert = original_alert
 })

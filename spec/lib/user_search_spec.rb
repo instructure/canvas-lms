@@ -173,6 +173,12 @@ describe UserSearch do
             expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq [user]
           end
 
+          it 'will not match against a sis id without :read_sis permission' do
+            RoleOverride.create!(context: Account.default, role: Role.get_built_in_role('TeacherEnrollment'),
+              permission: 'read_sis', enabled: false)
+            expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq []
+          end
+
           it 'will match against an sis id and regular id' do
             user2 = User.create(name: 'user two')
             pseudonym.sis_user_id = user2.id.to_s
@@ -183,6 +189,12 @@ describe UserSearch do
 
           it 'will match against a login id' do
             expect(UserSearch.for_user_in_context("UNIQUE_ID", course, user)).to eq [user]
+          end
+
+          it 'will not search login id without permission' do
+            RoleOverride.create!(context: Account.default, role: Role.get_built_in_role('TeacherEnrollment'),
+              permission: 'view_user_logins', enabled: false)
+            expect(UserSearch.for_user_in_context("UNIQUE_ID", course, user)).to eq []
           end
 
           it 'can match an SIS id and a user name in the same query' do
@@ -206,6 +218,12 @@ describe UserSearch do
 
           it 'matches against an email' do
             expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq [user]
+          end
+
+          it 'requires :read_email_addresses permission' do
+            RoleOverride.create!(context: Account.default, role: Role.get_built_in_role('TeacherEnrollment'),
+              permission: 'read_email_addresses', enabled: false)
+            expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
           end
 
           it 'can match an email and a name in the same query' do
@@ -233,6 +251,11 @@ describe UserSearch do
         describe 'searching by a DB ID' do
           it 'matches against the database id' do
             expect(UserSearch.for_user_in_context(user.id, course, user)).to eq [user]
+          end
+
+          it 'matches against a database id and a user simultaneously' do
+            other_user = student_in_course(course: course, name: user.id.to_s).user
+            expect(UserSearch.for_user_in_context(user.id, course, user)).to match_array [user, other_user]
           end
 
           describe "cross-shard users" do

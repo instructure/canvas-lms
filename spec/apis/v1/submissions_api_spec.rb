@@ -266,6 +266,33 @@ describe 'Submissions API', type: :request do
       expect(json.size).to eq 0
     end
 
+    it 'returns submissions based on graded_since' do
+      assignment = Assignment.create!(course: @course)
+      assignment.grade_student(@student1, grade: '10', grader: @teacher)
+
+      json = api_call(:get,
+                      "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
+                      {controller: 'submissions_api', action: 'for_students',
+                       format: 'json', section_id: 'sis_section_id:my-section-sis-id'},
+                      graded_since: 1.day.ago.iso8601,
+                      student_ids: 'all')
+      expect(json.size).to eq 1
+    end
+
+    it 'does not returns submissions based on graded_since' do
+      assignment = Assignment.create!(course: @course)
+      assignment.grade_student(@student1, grade: '10', grader: @teacher)
+      Submission.where(user_id: @student1, assignment_id: assignment).update_all(graded_at: 2.days.ago)
+
+      json = api_call(:get,
+                      "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
+                      {controller: 'submissions_api', action: 'for_students',
+                       format: 'json', section_id: 'sis_section_id:my-section-sis-id'},
+                      graded_since: 1.day.ago.iso8601,
+                      student_ids: 'all')
+      expect(json.size).to eq 0
+    end
+
     it 'should scope call to enrollment_state with post_to_sis' do
       @a1.post_to_sis = true
       @a1.save!
@@ -2293,11 +2320,11 @@ describe 'Submissions API', type: :request do
       @student3 = student_in_course(:active_all => true).user
       @assignment1 = @course.assignments.create! :title => 'assignment1', :grading_type => 'points', :points_possible => 15
       @assignment2 = @course.assignments.create! :title => 'assignment2', :grading_type => 'points', :points_possible => 25
-      bare_submission_model @assignment1, @student1, grade: 15, grader: @teacher, score: 15
-      bare_submission_model @assignment2, @student1, grade: 25, grader: @teacher, score: 25
-      bare_submission_model @assignment1, @student2, grade: 10, grader: @teacher, score: 10
-      bare_submission_model @assignment2, @student2, grade: 20, grader: @teacher, score: 20
-      bare_submission_model @assignment1, @student3, grade: 20, grader: @teacher, score: 20
+      bare_submission_model @assignment1, @student1, grade: 15, grader_id: @teacher.id, score: 15
+      bare_submission_model @assignment2, @student1, grade: 25, grader_id: @teacher.id, score: 25
+      bare_submission_model @assignment1, @student2, grade: 10, grader_id: @teacher.id, score: 10
+      bare_submission_model @assignment2, @student2, grade: 20, grader_id: @teacher.id, score: 20
+      bare_submission_model @assignment1, @student3, grade: 20, grader_id: @teacher.id, score: 20
     end
 
     context "teacher" do
@@ -3691,7 +3718,6 @@ describe 'Submissions API', type: :request do
         @context = @course
         @student2 = @student
         @user = @student1
-        @always_scribd = true
       end
 
       include_examples "file uploads api"
@@ -4460,11 +4486,11 @@ describe 'Submissions API', type: :request do
       @student3 = student_in_course(:active_all => true).user
       course_with_user('StudentViewEnrollment', :active_all => true)
 
-      section = @course.course_sections.build(:name => 'Another Section')
-      section.save
-      section.enroll_user(@student1, 'StudentEnrollment', 'active')
-      section.enroll_user(@student2, 'StudentEnrollment', 'active')
-      section.enroll_user(@student3, 'StudentEnrollment', 'active')
+      @section = @course.course_sections.build(:name => 'Another Section')
+      @section.save
+      @section.enroll_user(@student1, 'StudentEnrollment', 'active')
+      @section.enroll_user(@student2, 'StudentEnrollment', 'active')
+      @section.enroll_user(@student3, 'StudentEnrollment', 'active')
 
       @assignment = @course.assignments.create(points_possible: 100)
       @assignment.submit_homework @student1, :body => 'EHLO'
@@ -4567,6 +4593,24 @@ describe 'Submissions API', type: :request do
       response = api_call_as_user(@teacher, :get, @path, @params)
       assert_status(404)
       expect(response['errors'][0]['message']).to eq 'The specified resource does not exist.'
+    end
+
+    it 'doesnt show submissions from various inactive types of enrollments' do
+      inactive = ['deleted', 'rejected', 'inactive', 'invited']
+
+      @student4 = student_in_course(:active_all => true).user
+      enrollment = @section.enroll_user(@student4, 'StudentEnrollment', 'active')
+      @assignment.submit_homework @student4, :body => 'EHLO'
+
+      inactive.each do |state|
+        enrollment.workflow_state = state
+        enrollment.save!
+
+        json = api_call_as_user(@teacher, :get, @path, @params)
+        expect(json['graded']).to eq 1
+        expect(json['ungraded']).to eq 1
+        expect(json['not_submitted']).to eq 1
+      end
     end
   end
 end

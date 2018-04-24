@@ -26,7 +26,6 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
   const details = {
     course_id: plannable.course_id,
     title: plannable.name || plannable.title,
-    date: plannable.due_at || plannable.todo_date,
     completed: (markedComplete != null) ? markedComplete.marked_complete : (apiResponse.submissions
       && (apiResponse.submissions.submitted
       || apiResponse.submissions.excused
@@ -39,11 +38,6 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
     id: plannableId,
     uniqueId: `${plannable_type}-${plannableId}`,
   };
-  if (plannable_type === 'discussion_topic') {
-    if (plannable.assignment) {
-      details.date = plannable.assignment.due_at;
-    }
-  }
   if (plannable_type === 'discussion_topic' || plannable_type === 'announcement') {
     details.unread_count = plannable.unread_count;
   }
@@ -53,11 +47,6 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
 
   if (plannable_type === 'planner_note') {
     details.details = plannable.details;
-  }
-  // Standardize 00:00:00 date to 11:59PM on the current day to make due date less confusing
-  let currentDay = moment(details.date);
-  if (isMidnight(currentDay, timeZone)) {
-    details.date = currentDay.endOf('day').toISOString();
   }
   return details;
 };
@@ -97,6 +86,13 @@ export function transformApiToInternalItem (apiResponse, courses, groups, timeZo
   }
   const details = getItemDetailsFromPlannable(apiResponse, timeZone);
 
+  // Standardize 00:00:00 date to 11:59PM on the current day to make due date less confusing
+  let plannableDate = apiResponse.plannable_date
+  let currentDay = moment(plannableDate);
+  if (isMidnight(currentDay, timeZone)) {
+    plannableDate = currentDay.endOf('day').toISOString();
+  }
+
   if ((!contextInfo.context) && apiResponse.plannable_type === 'planner_note' && (details.course_id)) {
     const course = courses.find(c => c.id === details.course_id);
     // shouldn't happen, but if the course data is missing, skip it.
@@ -121,11 +117,12 @@ export function transformApiToInternalItem (apiResponse, courses, groups, timeZo
   return {
     ...contextInfo,
     id: apiResponse.plannable_id,
-    dateBucketMoment: moment.tz(details.date, timeZone).startOf('day'),
+    dateBucketMoment: moment.tz(plannableDate, timeZone).startOf('day'),
     type: getItemType(apiResponse.plannable_type),
     status: apiResponse.submissions,
     newActivity: apiResponse.new_activity,
     toggleAPIPending: false,
+    date: plannableDate,
     ...details
   };
 }

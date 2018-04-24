@@ -18,7 +18,7 @@
 
 <li class="<%= 'unpublished' if enrollment.course.created? || enrollment.course.claimed? %> <%= enrollment.state_based_on_date %> clearfix">
 
-  <a href="<%= course_user_path(enrollment.course_id, enrollment.user_id) %>" style="float: left; max-width: 800px;">
+  <a href="<%= course_user_path(enrollment.course_id, enrollment.user_id) %>" style="float: <%= direction('left') %>; max-width: 800px;">
     <span class="name" title="<%= enrollment.long_name(@current_user) %>">
       <%= enrollment.long_name(@current_user) %>
       <% if enrollment.course.created? || enrollment.course.claimed? %>
@@ -54,7 +54,7 @@
       <% end %>
     </span>
   </a>
-  <span style="float: right; margin-right: 5px; margin-top: 3px;">
+  <span style="float: <%= direction('right') %>; margin-<%= direction('right') %>: 5px; margin-top: 3px;">
     <% if enrollment.can_be_deleted_by(@current_user, enrollment.course, session) %>
       <a href="#" rel="<%= api_v1_destroy_enrollment_url(enrollment.course_id, enrollment.id, {:task => "delete"}) %>" class="unenroll_link" role="button">
         <i class="icon-end standalone-icon"></i>

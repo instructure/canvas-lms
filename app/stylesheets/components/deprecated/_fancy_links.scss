@@ -27,13 +27,13 @@
 
 a.external_link {
   padding-#{direction(right)}: 15px;
-  background: no-repeat right center;
+  background: no-repeat direction(right) center;
   background-image: url(/images/popout.png);
 }
 
 a.equella_content_link {
   padding-#{direction(left)}: 17px;
-  background: no-repeat left center;
+  background: no-repeat direction(left) center;
   background-image: url(/images/equella_icon.png);
 }
 
@@ -291,7 +291,7 @@ a.admin {
   background-repeat: no-repeat;
   background-position: direction(left) center;
   @include fontSize(12px);
-  padding: 1px 0 2px 20px;
+  padding: direction-sides(1px 0 2px 20px);
 }
 
 a {

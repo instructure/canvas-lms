@@ -90,7 +90,7 @@
   </div>
 <% elsif @submission.submission_type == "online_text_entry" %>
   <% js_bundle 'legacy/submissions_show_preview_text' %>
-  <div style="text-align: right; margin-top: 15px;">
+  <div style="text-align: <%= direction('right') %>; margin-top: 15px;">
     <select class="data_view">
       <option aria-label="<%= t("Assignment %{assignment} submission Paper View", :assignment=> @assignment.title) %>" value="paper"><%= t('Paper View') %></option>
       <option aria-label="<%= t("Assignment %{assignment} submission Plain Text View", :assignment=> @assignment.title) %>" value="plain_text"><%= t('Plain Text View') %></option>

@@ -41,55 +41,6 @@ describe LearningOutcomeResult do
       end
   end
 
-  describe '.association_type' do
-    it 'returns the correct representation of a quiz' do
-      expect(learning_outcome_result.association_type).to eq 'Quizzes::Quiz'
-
-      learning_outcome_result.association_type = 'Quiz'
-      learning_outcome_result.send(:save_without_callbacks)
-
-      expect(LearningOutcomeResult.first.association_type).to eq 'Quizzes::Quiz'
-    end
-
-    it 'returns the association type attribute if not a quiz' do
-      learning_outcome_result.association_object = assignment_model
-      learning_outcome_result.send(:save_without_callbacks)
-      expect(learning_outcome_result.association_type).to eq 'Assignment'
-    end
-  end
-
-  describe '.artifact_type' do
-    it 'returns the correct representation of a quiz submission' do
-      sub = learning_outcome_result.association_object.quiz_submissions.create!
-
-      learning_outcome_result.artifact = sub
-      learning_outcome_result.save
-      expect(learning_outcome_result.artifact_type).to eq 'Quizzes::QuizSubmission'
-
-      LearningOutcomeResult.where(id: learning_outcome_result).update_all(association_type: 'QuizSubmission')
-
-      expect(LearningOutcomeResult.find(learning_outcome_result.id).artifact_type).to eq 'Quizzes::QuizSubmission'
-    end
-  end
-
-  describe '.associated_asset_type' do
-    it 'returns the correct representation of a quiz' do
-      expect(learning_outcome_result.associated_asset_type).to eq 'Quizzes::Quiz'
-
-      learning_outcome_result.associated_asset_type = 'Quiz'
-      learning_outcome_result.send(:save_without_callbacks)
-
-      expect(LearningOutcomeResult.first.associated_asset_type).to eq 'Quizzes::Quiz'
-    end
-
-    it 'returns the associated asset type attribute if not a quiz' do
-      learning_outcome_result.associated_asset = assignment_model
-      learning_outcome_result.send(:save_without_callbacks)
-
-      expect(learning_outcome_result.associated_asset_type).to eq 'Assignment'
-    end
-  end
-
   describe '#submitted_or_assessed_at' do
     before(:once) do
       @submitted_at = 1.month.ago

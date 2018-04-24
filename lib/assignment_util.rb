@@ -29,11 +29,6 @@ module AssignmentUtil
   end
 
   def self.due_date_ok?(assignment)
-    if assignment.unlock_at && assignment.lock_at && assignment.due_at
-      unless in_date_range?(assignment.due_at, assignment.unlock_at, assignment.lock_at)
-        return false
-      end
-    end
     !due_date_required?(assignment) ||
     assignment.due_at.present? ||
     assignment.grading_type == 'not_graded'

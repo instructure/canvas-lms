@@ -80,7 +80,7 @@ ldap_tests << OpenStruct.new(
     <h3>
       <%= t(:test_ldap_dialog_page_title, "Testing Your LDAP Configuration") %>
     </h3>
-    <table style="margin-left:20px">
+    <table style="margin-<%= direction('left') %>:20px">
       <% ldap_tests.each do |test| %>
         <tr>
           <td><h4 style="width: 400px"><%= test.label %></h4></td>
@@ -89,7 +89,7 @@ ldap_tests << OpenStruct.new(
         <tr>
           <td colspan="2">
             <div id="ldap_<%= test.test_type %>_help"
-                 style="padding-left:15px;display:none">
+                 style="padding-<%= direction('left') %>:15px;display:none">
               <h4><%= test.help_header %></h4>
               <p>
                 <%= test.help_body %>
@@ -110,7 +110,7 @@ ldap_tests << OpenStruct.new(
       <tr>
         <td colspan="2">
           <div id="ldap_login_form"
-               style="padding-left:15px;padding-bottom:10px;display:none;">
+               style="padding-<%= direction('left') %>:15px;padding-bottom:10px;display:none;">
             <h4>
               <%= t(:test_ldap_login_form_header,
                     "Supply a valid LDAP username/password to test login:") %>
@@ -132,7 +132,7 @@ ldap_tests << OpenStruct.new(
                   <td>
                     <%= password_field :ldap_test_login, :pass, style: "width:170px" %>
                   </td>
-                  <td style="padding-left:26px;">
+                  <td style="padding-<%= direction('left') %>:26px;">
                     <input type="submit"
                            value="<%= t(:ldap_test_login_button, "Test Login") %>"/>
                   </td>
@@ -144,7 +144,7 @@ ldap_tests << OpenStruct.new(
       </tr>
       <tr>
         <td colspan="2">
-          <div id="ldap_login_help" style="padding-left:15px;display:none">
+          <div id="ldap_login_help" style="padding-<%= direction('left') %>:15px;display:none">
             <p id="ldap_login_help_error" style='color:red'>
               <%= t(:test_ldap_login_help_header,
                     "The LDAP server denied your credentials") %>
@@ -153,7 +153,7 @@ ldap_tests << OpenStruct.new(
         </td>
       </tr>
     </table>
-    <button type="button" class="btn submit_button ldap_test_close" style="float:right">
+    <button type="button" class="btn submit_button ldap_test_close" style="float:<%= direction('right') %>">
       <%= t(:test_ldap_dialog_close, "Close") %>
     </button>
   </div>

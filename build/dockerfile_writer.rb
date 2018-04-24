@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "erubis"
+require "erubi"
 require_relative "./docker_utils"
 
 class DockerfileWriter
@@ -45,7 +45,7 @@ class DockerfileWriter
 
   def run(filename)
     File.open(filename, "w") do |f|
-      f.write Erubis::Eruby.new(File.read("build/Dockerfile.template")).result(binding)
+      f.write eval(Erubi::Engine.new(File.read("build/Dockerfile.template")).src, nil, "build/Dockerfile.template")
     end
   end
 

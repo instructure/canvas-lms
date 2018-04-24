@@ -30,7 +30,7 @@ class RubricAssociation < ActiveRecord::Base
 
   belongs_to :context, polymorphic: [:course, :account]
   has_many :rubric_assessments, :dependent => :nullify
-  has_many :assessment_requests, :dependent => :destroy
+  has_many :assessment_requests, :dependent => :nullify
 
   has_a_broadcast_policy
 

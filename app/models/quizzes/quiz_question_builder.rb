@@ -162,7 +162,8 @@ class Quizzes::QuizQuestionBuilder
         variable_answers = q[:answers].select { |a| a[:blank_id] == variable }
 
         options = variable_answers.map do |a|
-          "<option value='#{a[:id]}'>#{CGI::escapeHTML(a[:text])}</option>"
+          answer_text = Utf8Cleaner.strip_invalid_utf8(a[:text])
+          "<option value='#{a[:id]}'>#{CGI.escapeHTML(answer_text)}</option>"
         end
 
         select = <<-HTML

@@ -404,7 +404,7 @@
         <div class="quiz_comment">
           <% if editable %>
             <span style="font-size: 0.8em;"><%= before_label(:additional_comments, "Additional Comments") %></span>
-            <textarea name="question_comment_<%= hash_get(question, :id) %>" style="display: block; width: auto; margin-left: 5px; margin-right: 5px; height: 50px;"><%= comment_get(user_answer, :more_comments) || "" %></textarea>
+            <textarea name="question_comment_<%= hash_get(question, :id) %>" style="display: block; width: auto; margin-<%= direction('left') %>: 5px; margin-<%= direction('right') %>: 5px; height: 50px;"><%= comment_get(user_answer, :more_comments) || "" %></textarea>
           <% else %>
             <%= comment_get(user_answer, :more_comments) %>
           <% end %>

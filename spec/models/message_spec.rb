@@ -42,7 +42,7 @@ describe Message do
     end
 
     it 'should sanitize html' do
-      expect_any_instance_of(Message).to receive(:load_html_template).and_return <<-ZOMGXSS
+      expect_any_instance_of(Message).to receive(:load_html_template).and_return [<<-ZOMGXSS, 'template.html.erb']
         <b>Your content</b>: <%= "<script>alert()</script>" %>
       ZOMGXSS
       user         = user_factory(active_all: true)
@@ -513,7 +513,7 @@ describe Message do
       message = Message.create!(context: submission)
       expect(message.author_short_name).to eq user.short_name
       expect(message.author_email_address).to eq user.email
-      expect(message.author_avatar_url).to match /secure.gravatar.com/
+      expect(message.author_avatar_url).to match 'http://localhost/images/messages/avatar-50.png'
     end
 
     it 'loads attributes from an author owned asset' do
@@ -523,7 +523,7 @@ describe Message do
       message = Message.create!(context: convo_message)
       expect(message.author_short_name).to eq user.short_name
       expect(message.author_email_address).to eq user.email
-      expect(message.author_avatar_url).to match /secure.gravatar.com/
+      expect(message.author_avatar_url).to match 'http://localhost/images/messages/avatar-50.png'
     end
 
     it "doesn't reveal the author's email address when the account setting is not set" do
@@ -533,7 +533,7 @@ describe Message do
       message = Message.create!(context: convo_message)
       expect(message.author_short_name).to eq user.short_name
       expect(message.author_email_address).to eq nil
-      expect(message.author_avatar_url).to match /secure.gravatar.com/
+      expect(message.author_avatar_url).to match 'http://localhost/images/messages/avatar-50.png'
     end
 
     it 'doesnt break when there is no author' do

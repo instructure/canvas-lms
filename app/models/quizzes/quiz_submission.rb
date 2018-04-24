@@ -113,12 +113,11 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def sanitize_responses
-    questions && questions.select { |q| q['question_type'] == 'essay_question' }.each do |q|
+    questions.select { |q| q['question_type'] == 'essay_question' }.each do |q|
       question_id = q['id']
       if graded?
-        if submission = submission_data.find { |s| s[:question_id] == question_id }
-          submission[:text] = Sanitize.clean(submission[:text] || "", CanvasSanitize::SANITIZE)
-        end
+        submission = submission_data.find { |s| s[:question_id] == question_id }
+        submission[:text] = Sanitize.clean(submission[:text] || "", CanvasSanitize::SANITIZE) if submission
       else
         question_key = "question_#{question_id}"
         if submission_data[question_key]
@@ -234,11 +233,11 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def points_possible_at_submission_time
-    self.questions_as_object.map { |q| q[:points_possible].to_f }.compact.sum || 0
+    self.questions.map { |q| q[:points_possible].to_f }.compact.sum || 0
   end
 
   def questions
-    Utf8Cleaner.recursively_strip_invalid_utf8!(self.quiz_data, true)
+    Utf8Cleaner.recursively_strip_invalid_utf8!(self.quiz_data, true) || []
   end
 
   def backup_submission_data(params)
@@ -334,14 +333,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     })
   end
 
-  def questions_as_object
-    self.quiz_data || []
-  end
-
   def quiz_question_ids
-    questions_as_object.map{ |question|
-      question["id"]
-    }.compact
+    questions.map { |question| question["id"] }.compact
   end
 
   def quiz_questions
@@ -698,9 +691,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     # first we update the version we've been modifying, so that all versions are current.
     update_submission_version(version, [:submission_data, :score, :fudge_points, :workflow_state])
 
-    if version.model.attempt == self.attempt && completed_before_changes
-      self.without_versioning(&:save)
-    else
+    if version.model.attempt != self.attempt || !completed_before_changes
       self.reload
 
       # score_to_keep should work regardless of the current model workflow_state and score
@@ -717,11 +708,14 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
         s.grade_matches_current_submission = true
         s.body = "user: #{self.user_id}, quiz: #{self.quiz_id}, score: #{self.kept_score}, time: #{Time.now}"
         s.saved_by = :quiz_submission
-        s.save!
       end
-
-      self.without_versioning(&:save)
     end
+
+    # submission has to be saved with versioning
+    # to help Auditors::GradeChange record grade_before correctly
+    self.submission.with_versioning(explicit: true, &:save) if self.submission.present?
+    self.without_versioning(&:save)
+
     self.reload
     grader = Quizzes::SubmissionGrader.new(self)
     if grader.outcomes_require_update(self, original_score)

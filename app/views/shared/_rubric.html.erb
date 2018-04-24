@@ -96,7 +96,7 @@
         <% end %>
       </div>
     </div>
-    <div style="float: right; font-size: 0.8em; display: none;" class="links displaying locked">
+    <div style="float: <%= direction('right') %>; font-size: 0.8em; display: none;" class="links displaying locked">
       <span style="<%= hidden if editable %>"><%= t 'messages.locked', "Can't change a rubric once you've started using it." %></span>
       <% if for_context %>
         <a href="<%= context_url(context, :context_rubric_url, rubric ? rubric.id : "{{ id }}") %>" class="delete_rubric_url" style="display: none;">&nbsp;</a>
@@ -105,10 +105,10 @@
       <% end %>
     </div>
 
-    <div class="editing" style="float: right;">
+    <div class="editing" style="float: <%= direction('right') %>;">
       <a href="<%= search_rubrics_url(:q => "") %>" class="find_rubric_link icon-search" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>" title="<%= t 'titles.find_existing_rubric', "Find Existing Rubric" %>"><%= t 'links.find_a_rubric', "Find a Rubric" %></a>
     </div>
-    <div class="editing" style="text-align: left">
+    <div class="editing" style="text-align: <%= direction('left') %>">
       <label for="rubric-title"><%= t('title', "Title:") %></label>
       <input id="rubric-title" type="text" class="no-margin-bottom" name="title" value="<%= rubric.title rescue t('defaults.rubric_title', "Some Rubric") %>" style="width: 200px;" maxlength="255" aria-label="<%= t('title', "Title:") %>"/>
       <a href="<%= search_rubrics_url(:q => "") %>" style="display: none;"><%= image_tag "find.png", :alt => '' %> <%= t 'links.find_rubric', "Find Rubric" %></a>
@@ -149,7 +149,7 @@
   <%= render :partial => "shared/rubric_criterion", :object => nil %>
   <tr class="summary">
     <td colspan="4">
-      <div class="total_points_holder" style="float: right; <%= hidden if rubric_association && rubric_association.hide_score_total %>">
+      <div class="total_points_holder" style="float: <%= direction('right') %>; <%= hidden if rubric_association && rubric_association.hide_score_total %>">
         <span><%= before_label :total_points, "Total Points" %>
           <% ot(:out_of, "%{points} *out of %{total}*", :points => capture { %>
             <span class="rubric_total">

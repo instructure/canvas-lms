@@ -662,6 +662,16 @@ describe "Accounts API", type: :request do
       expect(json[0].has_key?("storage_quota_used_mb")).to be_truthy
     end
 
+    it "should don't include fake students" do
+      @c1 = course_model(:name => 'c1', :account => @a1, :root_account => @a1)
+      @c1.student_view_student
+      @a1.account_users.create!(user: @user)
+      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?include[]=total_students",
+        { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param,
+          :format => 'json', :include => ['total_students'] }, {})
+      expect(json[0]["total_students"]).to eq 0
+    end
+
     it "should include enrollment term information for each course" do
       @c1 = course_model(:name => 'c1', :account => @a1, :root_account => @a1)
       @a1.account_users.create!(user: @user)
@@ -669,6 +679,36 @@ describe "Accounts API", type: :request do
                       { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param,
                         :format => 'json', :include => ['term'] })
       expect(json[0].has_key?('term')).to be_truthy
+    end
+
+    describe 'sort' do
+      before :once do
+        @me = @user
+        @sub2 = @a1.sub_accounts.create!(name: 'b', sis_source_id: 'sub2', root_account: @a1)
+        @sub1 = @a1.sub_accounts.create!(name: 'a', sis_source_id: 'sub1', root_account: @a1)
+
+        @a1.courses.create!(name: 'in root')
+        @sub1.courses.create!(name: 'in sub1')
+        @sub2.courses.create!(name: 'in sub2')
+      end
+
+      it 'should sort by account name using subaccount for backwards compatibility' do
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?sort=subaccount",
+                        {controller: 'accounts', action: 'courses_api',
+                         account_id: @a1.to_param, format: 'json', sort: 'subaccount'
+                        })
+        expect(json.first['name']).to eq('in sub1')
+        expect(json.last['name']).to eq('in root')
+      end
+
+      it 'should sort by account name' do
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?sort=account_name",
+                        {controller: 'accounts', action: 'courses_api',
+                         account_id: @a1.to_param, format: 'json', sort: 'account_name'
+                        })
+        expect(json.first['name']).to eq('in sub1')
+        expect(json.last['name']).to eq('in root')
+      end
     end
 
     describe "handles crosslisting properly" do

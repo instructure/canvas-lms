@@ -44,7 +44,7 @@ module Exporters
         end
 
         uploaded_data = Rack::Test::UploadedFile.new(zip_name, 'application/zip')
-        attachment.uploaded_data = uploaded_data
+        Attachments::Storage.store_for_attachment(attachment, uploaded_data)
         attachment.workflow_state = 'zipped'
         attachment.file_state = 'available'
         attachment.save!

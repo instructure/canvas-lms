@@ -51,7 +51,7 @@ describe AssignmentsApiController, type: :request do
                                        user,
                                        score: '99',
                                        grade: '99',
-                                       grader: @teacher,
+                                       grader_id: @teacher.id,
                                        submitted_at: now,
                                        grade_matches_current_submission: true
     return assignment,submission
@@ -739,6 +739,22 @@ describe AssignmentsApiController, type: :request do
                   course_id: @course.id.to_s, id: @assignment.to_param},
                  {assignment: {due_at: "2012-01-01T00:00:00Z"}}, {},
                  {expected_status: 400})
+      end
+
+      it "should not skip due date validation just because it somehow passed in no overrides" do
+        @assignment = @course.assignments.create!(
+          :unlock_at => Time.zone.parse("2011-01-02T00:00:00Z"),
+          :due_at => Time.zone.parse("2012-01-04T00:00:00Z")
+        )
+
+        # have to make the call without helpers to pass in an empty array correctly
+        p = Account.default.pseudonyms.create!(:unique_id => "#{@user.id}@example.com", :user => @user)
+        allow_any_instantiation_of(p).to receive(:works_for_account?).and_return(true)
+        put "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          params: {assignment: {lock_at: "2012-01-03T00:00:00Z", assignment_overrides: []}}.to_json,
+          headers: { "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" }
+        expect(response.code.to_i).to eq 400
+        expect(@assignment.reload.lock_at).to be_nil
       end
 
       it "should allow assignment update due_date on locked range" do
@@ -2182,7 +2198,7 @@ describe AssignmentsApiController, type: :request do
         it "allows setting an override due date in a closed grading period" do
           due_date = 3.days.ago.iso8601
           override_params = [{ student_ids: [@student.id], due_at: due_date }]
-          params = { due_at: 5.days.from_now.iso8601, assignment_overrides: override_params }
+          params = { due_at: 5.days.from_now.iso8601, lock_at: nil, assignment_overrides: override_params }
           call_create(params, 201)
           json = JSON.parse response.body
           assignment = Assignment.find(json["id"])
@@ -2191,7 +2207,7 @@ describe AssignmentsApiController, type: :request do
 
         it "allows a nil override due date when the last grading period is closed" do
           override_params = [{ student_ids: [@student.id], due_at: nil }]
-          params = { due_at: 3.days.from_now.iso8601, assignment_overrides: override_params }
+          params = { due_at: 3.days.from_now.iso8601, lock_at: nil, assignment_overrides: override_params }
           call_create(params, 201)
           json = JSON.parse response.body
           assignment = Assignment.find(json["id"])

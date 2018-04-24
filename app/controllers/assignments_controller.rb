@@ -141,7 +141,8 @@ class AssignmentsController < ApplicationController
         :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session),
         :COURSE_ID => @context.id,
         :ASSIGNMENT_ID => @assignment.id,
-        :EXTERNAL_TOOLS => external_tools_json(@external_tools, @context, @current_user, session)
+        :EXTERNAL_TOOLS => external_tools_json(@external_tools, @context, @current_user, session),
+        :EULA_URL => tool_eula_url
       })
       set_master_course_js_env_data(@assignment, @context)
       conditional_release_js_env(@assignment, includes: :rule)
@@ -168,10 +169,7 @@ class AssignmentsController < ApplicationController
       respond_to do |format|
         format.html do
           render locals: {
-            eula_url: @assignment.tool_settings_tool
-                      &.try(:tool_proxy)
-                      &.find_service(Assignment::Lti::EULA_SERVICE, 'GET')
-                      &.endpoint
+            eula_url: tool_eula_url
           }
         end
         format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}) }
@@ -562,6 +560,10 @@ class AssignmentsController < ApplicationController
   end
 
   protected
+
+  def tool_eula_url
+    @assignment.tool_settings_tool.try(:tool_proxy)&.find_service(Assignment::LTI_EULA_SERVICE, 'GET')&.endpoint
+  end
 
   def strong_assignment_params
     params.require(:assignment).

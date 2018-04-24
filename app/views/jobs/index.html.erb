@@ -30,16 +30,16 @@
     color: red;
   }
   dl#job-attributes dt {
-    float:left;
+    float:<%= direction('left') %>;
     clear:left;
   }
   dl#job-attributes dd {
-    padding-left: 2em;
-    float:left;
+    padding-<%= direction('left') %>: 2em;
+    float:<%= direction('left') %>;
   }
   #show-job {
-    margin-left: 25px;
-    float:left;
+    margin-<%= direction('left') %>: 25px;
+    float:<%= direction('left') %>;
   }
   #show-job dt {
     font-weight: bold;
@@ -54,11 +54,11 @@
     border: 2px solid #ccc;
     margin-bottom: 10px;
   }
-  #tags-wrapper h2 { float:left; }
+  #tags-wrapper h2 { float:<%= direction('left') %>; }
   #tags-flavor {
-    float:right;
+    float:<%= direction('right') %>;
   }
-  #jobs-grid { float:left; margin-top: 6px; }
+  #jobs-grid { float:<%= direction('left') %>; margin-top: 6px; }
   .slick-row.ui-state-active {
     color: black;
     font-weight: normal;
@@ -74,12 +74,12 @@
 <% css_bundle :slickgrid %>
 <% js_bundle :jobs %>
 
-<div id="running-wrapper" style="float:left">
+<div id="running-wrapper" style="float:<%= direction('left') %>">
   <h2><%= t 'headings.running_jobs', "Running Jobs" %></h2>
   <div id="running-grid" style="width:700px; height:250px;" class='grid'>
   </div>
 </div>
-<div id="tags-wrapper" style="float:right">
+<div id="tags-wrapper" style="float:<%= direction('right') %>">
   <h2><%= t 'headings.popular_tags', "Popular Tags" %></h2>
   <select id="tags-flavor">
     <%= options_for_select([[t('job_options.current', "Current"), 'current'],

@@ -20,7 +20,7 @@
   <h2>
     <%= @category.name %>
     <% if can_do(@portfolio, @current_user, :manage) %>
-    <div style="float: right; margin-right: 10px; font-size: 0.8em;">
+    <div style="float: <%= direction('right') %>; margin-<%= direction('right') %>: 10px; font-size: 0.8em;">
       <a href="#" class="manage_pages_link" style="font-style: italic;" title="<%= t('titles.manage_pages', "Add, remove or rearrange pages for this section") %>"><%= manage_pages_link_text %></a>
     </div>
     <% end %>

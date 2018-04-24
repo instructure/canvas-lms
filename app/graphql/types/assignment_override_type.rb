@@ -47,9 +47,9 @@ module Types
       }
     end
 
-    field :dueAt, TimeType, property: :due_at
-    field :lockAt, TimeType, property: :lock_at
-    field :unlockAt, TimeType, property: :unlock_at
+    field :dueAt, DateTimeType, property: :due_at
+    field :lockAt, DateTimeType, property: :lock_at
+    field :unlockAt, DateTimeType, property: :unlock_at
     field :allDay, types.Boolean, property: :all_day
   end
 

@@ -16,15 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 ENV["RAILS_ENV"] = ENV["RACK_ENV"]= "test"
-
+require_relative '../spec_helper'
 require 'pact/provider/rspec'
 require_relative 'proxy_app'
+require 'database_cleaner'
 
 # Require the provider states files for each service consumer
 require_relative 'provider_states_for_consumer'
 
 Pact.service_provider "CanvasAPI" do
-
   # Optional app configuration. Pact loads the app from config.ru by default
   # (it is recommended to let Pact use the config.ru if possible, so testing
   # conditions are closest to runtime conditions)
@@ -32,9 +32,9 @@ Pact.service_provider "CanvasAPI" do
 
   honours_pact_with 'Consumer' do
 
-  # This example points to a local file, however, on a real project with a continuous
-  # integration box, you would publish your pacts as artifacts,
-  # and point the pact_uri to the pact published by the last successful build.
+    # This example points to a local file, however, on a real project with a continuous
+    # integration box, you would publish your pacts as artifacts,
+    # and point the pact_uri to the pact published by the last successful build.
 
     pact_uri 'spec/pacts/consumer-canvasapi.json'
   end

@@ -813,7 +813,6 @@ CanvasRails::Application.routes.draw do
 
   get '' => 'users#user_dashboard', as: 'dashboard'
   get 'dashboard-sidebar' => 'users#dashboard_sidebar', as: :dashboard_sidebar
-  post 'users/toggle_recent_activity_dashboard' => 'users#toggle_recent_activity_dashboard'
   post 'users/toggle_hide_dashcard_color_overlays' => 'users#toggle_hide_dashcard_color_overlays'
   get 'styleguide' => 'info#styleguide'
   get 'accounts/:account_id/theme-preview' => 'brand_configs#show'
@@ -1410,6 +1409,7 @@ CanvasRails::Application.routes.draw do
       post 'accounts/:account_id/bounced_communication_channels/reset', action: :bulk_reset_bounce_counts
       get 'accounts/:account_id/unconfirmed_communication_channels.csv', action: :unconfirmed_channel_report
       post 'accounts/:account_id/unconfirmed_communication_channels/confirm', action: :bulk_confirm
+      delete 'users/self/communication_channels/push', action: :delete_push_token
       delete 'users/:user_id/communication_channels/:id', action: :destroy
       delete 'users/:user_id/communication_channels/:type/:address', action: :destroy, constraints: { address: %r{[^/?]+} }
     end

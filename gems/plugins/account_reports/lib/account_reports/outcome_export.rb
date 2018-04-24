@@ -28,7 +28,6 @@ module AccountReports
     end
 
     OUTCOME_EXPORT_SCALAR_HEADERS = [
-      'canvas_id',
       'vendor_guid',
       'object_type',
       'title',
@@ -66,7 +65,7 @@ module AccountReports
       LearningOutcomeGroup.connection.execute(<<~SQL)
         WITH RECURSIVE outcome_tree AS (
           SELECT
-            root_group.id AS canvas_id,
+            root_group.id,
             root_group.learning_outcome_group_id,
             root_group.workflow_state,
             #{vendor_guid_field('root_group')} AS vendor_guid,
@@ -81,7 +80,7 @@ module AccountReports
             AND root_group.workflow_state <> 'deleted'
           UNION ALL
           SELECT
-            child_group.id AS canvas_id,
+            child_group.id,
             child_group.learning_outcome_group_id,
             child_group.workflow_state,
             #{vendor_guid_field('child_group')} AS vendor_guid,
@@ -90,7 +89,7 @@ module AccountReports
             child_group.title,
             ot.generation + 1 as generation
           FROM #{LearningOutcomeGroup.quoted_table_name} child_group
-            JOIN outcome_tree ot ON child_group.learning_outcome_group_id = ot.canvas_id
+            JOIN outcome_tree ot ON child_group.learning_outcome_group_id = ot.id
           WHERE child_group.workflow_state <> 'deleted'
         )
         SELECT *,
@@ -126,7 +125,6 @@ module AccountReports
         order('learning_outcomes.id').
         group('learning_outcomes.id').
         select(<<~SQL)
-          learning_outcomes.id AS canvas_id,
           learning_outcomes.workflow_state,
           #{vendor_guid_field('learning_outcomes', prefix: 'canvas_outcome')} AS vendor_guid,
           learning_outcomes.short_description AS title,

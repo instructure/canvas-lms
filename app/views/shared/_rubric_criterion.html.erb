@@ -44,7 +44,7 @@
           <i class="learning_outcome_flag icon-outcomes" aria-hidden="true"></i>
           <span class="screenreader-only"><%= t("This criterion is linked to a Learning Outcome") %></span>
         </span>
-        <span class="description criterion_description_value"><%= description %></span>
+        <span class="description description_title"><%= description %></span>
         <span class="learning_outcome_id" style="display: none;"><%= criterion.try(:learning_outcome_id) %></span>
         <span class="criterion_id" style="display: none;"><%= criterion.try(:id) %></span>
         <% if !learning_outcome_criterion && !assessing %>
@@ -77,7 +77,7 @@
   <td style="padding: 0;">
     <% if !edit_view && criterion && rubric && rubric.free_form_criterion_comments %>
       <div class="custom_ratings_entry assessing">
-        <div style="margin-left: 5px; margin-top: 2px; <%= hidden unless rubric_association && rubric_association.summary_data && rubric_association.summary_data[:saved_comments] && rubric_association.summary_data[:saved_comments][criterion.id.to_s] %>" class="saved_custom_rating_holder">
+        <div style="margin-<%= direction('left') %>: 5px; margin-top: 2px; <%= hidden unless rubric_association && rubric_association.summary_data && rubric_association.summary_data[:saved_comments] && rubric_association.summary_data[:saved_comments][criterion.id.to_s] %>" class="saved_custom_rating_holder">
           <select class="saved_custom_rating">
             <option value=""><%= t "[ Select ]" %></option>
             <% (rubric_association.summary_data[:saved_comments][criterion.id.to_s] || [] rescue []).each do |comment| %>
@@ -103,7 +103,7 @@
              rating.edge = (idx == 0 || idx == ratings.length - 1);
              next_rating = ratings[idx+1] if idx != ratings.length - 1;
              rating_min = (next_rating ? next_rating.points : 0);
-             selected = assessment_rating ? (n(assessment_rating[:points]) > n(rating_min) && n(assessment_rating[:points]) <= n(rating.points)) : false
+             selected = assessment_rating && assessment_rating[:points] ? (n(assessment_rating[:points]) > n(rating_min) && n(assessment_rating[:points]) <= n(rating.points)) : false
              use_range = (criterion.try(:criterion_use_range) && rating_min.try(:to_f) != rating.points.try(:to_f) && range_rating_enabled);
           %>
           <td id="rating_<%= rating.id %>"

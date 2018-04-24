@@ -20,40 +20,49 @@ import Table from '@instructure/ui-core/lib/components/Table'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import React from 'react'
 import PropTypes from 'prop-types'
+import I18n from 'i18n!react_developer_keys'
+
 import DeveloperKey from './DeveloperKey'
 
 class DeveloperKeysTable extends React.Component {
   focusLastDeveloperKey () {
     const developerKeyId = this.props.developerKeysList[this.props.developerKeysList.length - 1].id
     const ref = this[`developerKey-${developerKeyId}`]
-    ref.focusDeleteLink()
+    this.props.inherited ? ref.focusName() : ref.focusDeleteLink()
   }
 
   render () {
+    const { inherited, developerKeysList } = this.props
+    if (developerKeysList.length === 0) { return null }
+    let srcontent = I18n.t('Developers Keys Table')
+    if (inherited) { srcontent = I18n.t('Inherited Developer Keys Table') }
     return (
       <div>
-        <Table caption={<ScreenReaderContent>Developer Keys Table</ScreenReaderContent>} id="keys">
+        <Table caption={<ScreenReaderContent>{srcontent}</ScreenReaderContent>} id="keys">
         <thead>
           <tr>
             <th scope="col">Name</th>
-            <th scope="col">User</th>
+            {!inherited && <th scope="col">User</th> }
             <th scope="col">Details</th>
-            <th scope="col">Stats</th>
+            {!inherited && <th scope="col">Stats</th>}
             <th scope="col" />
-            <th scope="col" />
+            {!inherited &&  <th scope="col" />}
           </tr>
         </thead>
-        <tbody id="tbody-id">
-        {this.props.developerKeysList.map(developerKey => (
-          <DeveloperKey
-            ref={(key) => {this[`developerKey-${developerKey.id}`] = key}}
-            key={developerKey.id}
-            developerKey={developerKey}
-            store={this.props.store}
-            actions={this.props.actions}
-            ctx={this.props.ctx}
-          />
-        ))}
+        <tbody>
+          {
+            this.props.developerKeysList.map(developerKey => (
+              <DeveloperKey
+                ref={(key) => {this[`developerKey-${developerKey.id}`] = key}}
+                key={developerKey.id}
+                developerKey={developerKey}
+                store={this.props.store}
+                actions={this.props.actions}
+                ctx={this.props.ctx}
+                inherited={this.props.inherited}
+              />
+            ))
+          }
         </tbody>
       </Table>
       </div>
@@ -72,7 +81,10 @@ DeveloperKeysTable.propTypes = {
     params: PropTypes.shape({
       contextId: PropTypes.string.isRequired
     })
-  }).isRequired
+  }).isRequired,
+  inherited: PropTypes.bool
 };
+
+DeveloperKeysTable.defaultProps = { inherited: false }
 
 export default DeveloperKeysTable

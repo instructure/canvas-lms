@@ -80,7 +80,7 @@ describe 'Canvadoc' do
       ff(".name.text")[2].click
       wait_for_ajaximations
       f(".btn-primary").click
-      expect(f(".scribd_file_preview_link")).to be_present
+      expect(f(".file_preview_link")).to be_present
     end
   end
 end

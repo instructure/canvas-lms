@@ -95,14 +95,22 @@ class Feature
   #     # queue a delayed_job to perform any nontrivial processing
   #     after_state_change_proc:  ->(user, context, old_state, new_state) { ... }
   #   }
+  VALID_STATES = %w(on allowed hidden hidden_in_prod).freeze
+  VALID_APPLIES_TO = %w(Course Account RootAccount User).freeze
 
   def self.register(feature_hash)
     @features ||= {}
     feature_hash.each do |feature_name, attrs|
+      validate_attrs(attrs)
       next if attrs[:development] && production_environment?
       feature = feature_name.to_s
       @features[feature] = Feature.new({feature: feature}.merge(attrs))
     end
+  end
+
+  def self.validate_attrs(attrs)
+    raise 'invalid state' unless VALID_STATES.include? attrs[:state]
+    raise 'invalid applies_to' unless VALID_APPLIES_TO.include? attrs[:applies_to]
   end
 
   # TODO: register built-in features here
@@ -117,8 +125,7 @@ stability of large SIS imports. The functionality of SIS imports has not changed
 END
         )},
         applies_to: 'RootAccount',
-        state: 'allowed',
-        beta: true
+        state: 'allowed'
       },
     'section_specific_discussions' =>
     {
@@ -478,9 +485,9 @@ END
     'allow_rtl' =>
     {
       display_name: -> { I18n.t('Allow RTL users to see RTL interface') },
-      description: -> { I18n.t('This feature flag is something an account can turn on if they want to allow the users of their account that speak languages that are normally written in Right to Left (eg: Arabic, Hebrew, Farsi) to see the RTL layout while we are working on it. once the feature is "ready" this feature flag will go away and anyone that speaks one of those languages will always see the RTL interface.') },
+      description: -> { I18n.t('This feature enables users of right-to-left (RTL) languages to see the RTL layout under development. Eventually, this will become the default behavior and this option will be removed.') },
       applies_to: 'RootAccount',
-      state: 'hidden',
+      state: 'allowed',
       development: true,
     },
     'force_rtl' =>
@@ -490,6 +497,13 @@ END
       applies_to: 'User',
       state: 'hidden',
       development: true,
+    },
+    'include_byte_order_mark_in_gradebook_exports' =>
+    {
+      display_name: -> { I18n.t('Include Byte-Order Mark in Gradebook Exports') },
+      description: -> { I18n.t('Optionally include a byte-order mark in Gradebook exports so they can be imported into Excel for users in some locales.') },
+      applies_to: 'User',
+      state: 'allowed'
     },
     'anonymous_grading' => {
       display_name: -> { I18n.t('Anonymous Grading') },
@@ -556,21 +570,6 @@ END
       development: false,
       root_opt_in: true,
       touch_context: true
-    },
-    'new_annotations' =>
-    {
-      display_name: -> { I18n.t('New Annotations') },
-      description: -> { I18n.t('Use the new document annotation tool') },
-      applies_to: 'Account',
-      state: 'hidden',
-      beta: true,
-      root_opt_in: true,
-      custom_transition_proc: ->(_, _, from_state, transitions) do
-        if from_state == 'on'
-          transitions['off'] = { 'locked' => true, 'message' => I18n.t('This feature cannot be disabled once it has been turned on.') }
-          transitions['allowed'] = { 'locked' => true, 'message' => I18n.t('This feature cannot be disabled once it has been turned on.') }
-        end
-      end
     },
     'master_courses' =>
     {

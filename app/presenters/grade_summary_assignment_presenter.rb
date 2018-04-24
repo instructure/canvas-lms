@@ -191,7 +191,7 @@ class GradeSummaryAssignmentPresenter
   def grade_distribution
     @grade_distribution ||= begin
       if stats = @summary.assignment_stats[assignment.id]
-        [stats.max, stats.min, stats.avg].map { |stat| stat.to_f.round(1) }
+        [stats.maximum, stats.minimum, stats.mean].map { |stat| stat.to_f.round(1) }
       end
     end
   end

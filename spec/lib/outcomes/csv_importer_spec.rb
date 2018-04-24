@@ -38,7 +38,7 @@ describe Outcomes::CsvImporter do
     end
   end
 
-  def outcome_row(**changes)
+  def outcome_row_with_headers(outcome_headers, **changes)
     valid = {
       title: 'title',
       vendor_guid: SecureRandom.uuid,
@@ -50,10 +50,14 @@ describe Outcomes::CsvImporter do
     }
 
     row = valid.merge(changes)
-    headers.map { |k| row[k.to_sym] }
+    outcome_headers.map { |k| row[k.to_sym] }
   end
 
-  def group_row(**changes)
+  def outcome_row(**changes)
+    outcome_row_with_headers(headers, **changes)
+  end
+
+  def group_row_with_headers(group_headers, **changes)
     valid = {
       title: 'title',
       vendor_guid: SecureRandom.uuid,
@@ -65,7 +69,11 @@ describe Outcomes::CsvImporter do
     }
 
     row = valid.merge(changes)
-    headers.map { |k| row[k.to_sym] }
+    group_headers.map { |k| row[k.to_sym] }
+  end
+
+  def group_row(**changes)
+    group_row_with_headers(headers, **changes)
   end
 
   before :once do
@@ -196,7 +204,7 @@ describe Outcomes::CsvImporter do
       uuid = SecureRandom.uuid
       import_fake_csv([
         headers + ['mastery_points', 'ratings'],
-        outcome_row(vendor_guid: uuid) + ['3.14', '5.34', 'awesome', '1.2', 'adequate']
+        outcome_row(vendor_guid: uuid) + ['3.14', '5.34', 'awesome', '1.2', 'adequate', '0', 'nonexistant']
       ])
 
       outcome = LearningOutcome.find_by(vendor_guid: uuid)
@@ -230,6 +238,17 @@ describe Outcomes::CsvImporter do
       rows = [headers] + (1..3).map { |ix| group_row(vendor_guid: ix) }.to_a
       import_fake_csv(rows, separator: ';')
       expect(LearningOutcomeGroup.count).to eq(4)
+    end
+
+    it 'does not require workflow_state' do
+      no_workflow = headers - ['workflow_state']
+      rows = [no_workflow] + (1..3).map do |ix|
+        group_row_with_headers(no_workflow, vendor_guid: ix)
+      end
+      rows = rows.to_a + [outcome_row_with_headers(no_workflow, vendor_guid: 'outcome')]
+      import_fake_csv(rows)
+      expect(LearningOutcomeGroup.count).to eq(4)
+      expect(LearningOutcome.count).to eq(1)
     end
   end
 

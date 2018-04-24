@@ -223,6 +223,7 @@ module CC::Exporter::WebZip
     end
 
     def parse_module_data
+      active_module_ids = Set.new(course.context_modules.active.map(&:id))
       course.context_modules.active.map do |mod|
         unlock_date = force_timezone(mod.unlock_at) if mod.unlock_at &.> Time.now
         {
@@ -230,7 +231,7 @@ module CC::Exporter::WebZip
           name: mod.name,
           status: user_module_status(mod),
           unlockDate: unlock_date,
-          prereqs: mod.prerequisites.map{|pre| pre[:id]},
+          prereqs: mod.prerequisites.map{|pre| pre[:id]}.select{|id| active_module_ids.include?(id)},
           requirement: requirement_type(mod),
           sequential: mod.require_sequential_progress || false,
           exportId: CC::CCHelper.create_key(mod),

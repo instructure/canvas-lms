@@ -42,7 +42,7 @@ class Assignment < ActiveRecord::Base
   OFFLINE_SUBMISSION_TYPES = %i(on_paper external_tool none not_graded wiki_page).freeze
   SUBMITTABLE_TYPES = %w(online_quiz discussion_topic wiki_page).freeze
 
-  Lti::EULA_SERVICE = 'vnd.Canvas.Eula'.freeze
+  LTI_EULA_SERVICE = 'vnd.Canvas.Eula'.freeze
 
   attr_accessor :previous_id, :updating_user, :copying, :user_submitted
 
@@ -72,6 +72,9 @@ class Assignment < ActiveRecord::Base
   belongs_to :grading_standard
   belongs_to :group_category
 
+  belongs_to :grader_section, class_name: 'CourseSection', optional: true
+  belongs_to :final_grader, class_name: 'User', optional: true
+
   belongs_to :duplicate_of, class_name: 'Assignment', optional: true, inverse_of: :duplicates
   has_many :duplicates, class_name: 'Assignment', inverse_of: :duplicate_of, foreign_key: 'duplicate_of_id'
 
@@ -80,6 +83,8 @@ class Assignment < ActiveRecord::Base
   has_many :line_items, inverse_of: :assignment, class_name: 'Lti::LineItem', dependent: :destroy
 
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :inverse_of => :context, :dependent => :destroy
+  has_one :score_statistic, dependent: :destroy
+
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :group_category_changes_ok?
   validate :anonymous_grading_changes_ok?
@@ -91,6 +96,33 @@ class Assignment < ActiveRecord::Base
   validate :moderation_setting_ok?
   validate :assignment_name_length_ok?
   validates :lti_context_id, presence: true, uniqueness: true
+
+  # TODO: remove this once the field is editable via the UI. Right now there's
+  # no user-facing way to set the grader count to a valid value.
+  before_validation(on: :create) do
+    if moderated_grading? && course.account.feature_enabled?(:anonymous_moderated_marking) && grader_count.zero?
+      self.grader_count = 2
+    end
+  end
+
+  before_create do
+    self.muted = true if moderated_grading? && course.account.feature_enabled?(:anonymous_moderated_marking)
+  end
+
+  validates :graders_anonymous_to_graders, absence: true, unless: :anonymous_grading?
+
+  with_options unless: :moderated_grading? do
+    validates :grader_comments_visible_to_graders, absence: true
+    validates :grader_section, absence: true
+    validates :final_grader, absence: true
+    validates :grader_names_visible_to_final_grader, absence: true
+  end
+
+  with_options if: -> { moderated_grading? && course.account.feature_enabled?(:anonymous_moderated_marking) } do
+    validates :grader_count, numericality: { greater_than: 0, message: "Number of graders must be positive" }
+    validate :grader_section_ok?
+    validate :final_grader_ok?
+  end
 
   accepts_nested_attributes_for :external_tool_tag, :update_only => true, :reject_if => proc { |attrs|
     # only accept the url, content_tyupe, content_id, and new_tab params, the other accessible
@@ -2148,10 +2180,9 @@ class Assignment < ActiveRecord::Base
   scope :for_course, lambda { |course_id| where(:context_type => 'Course', :context_id => course_id) }
   scope :for_group_category, lambda { |group_category_id| where(:group_category_id => group_category_id) }
 
-  # NOTE: only use for courses with differentiated assignments on
-  scope :visible_to_students_in_course_with_da, lambda { |user_id, course_id|
-    joins(:assignment_student_visibilities).
-    where(:assignment_student_visibilities => { :user_id => user_id, :course_id => course_id })
+  scope :visible_to_students_in_course_with_da, lambda { |user_id, _|
+    joins(:submissions).
+    where(submissions: { :user_id => user_id })
   }
 
   # course_ids should be courses that restrict visibility based on overrides
@@ -2649,11 +2680,11 @@ class Assignment < ActiveRecord::Base
 
   def validate_overrides_for_sis(overrides)
     unless AssignmentUtil.sis_integration_settings_enabled?(context) && AssignmentUtil.due_date_required_for_account?(context)
-      @skip_due_date_validation = true
+      @skip_sis_due_date_validation = true
       return
     end
     raise ActiveRecord::RecordInvalid unless assignment_overrides_due_date_ok?(overrides)
-    @skip_due_date_validation = true
+    @skip_sis_due_date_validation = true
   end
 
   def lti_resource_link_id
@@ -2664,13 +2695,19 @@ class Assignment < ActiveRecord::Base
   private
 
   def due_date_ok?
-    unless AssignmentUtil.due_date_ok?(self)
+    if unlock_at && lock_at && due_at
+      unless AssignmentUtil.in_date_range?(due_at, unlock_at, lock_at)
+        errors.add(:due_at, I18n.t("must be between availability dates"))
+        return false
+      end
+    end
+    unless @skip_sis_due_date_validation || AssignmentUtil.due_date_ok?(self)
       errors.add(:due_at, I18n.t("due_at", "cannot be blank when Post to Sis is checked"))
     end
   end
 
   def assignment_overrides_due_date_ok?(overrides={})
-    return true if @skip_due_date_validation
+    return true if @skip_sis_due_date_validation
 
     if AssignmentUtil.due_date_required?(self)
       overrides = gather_override_data(overrides)
@@ -2689,7 +2726,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def active_assignment_overrides?
-    @skip_due_date_validation || self.assignment_overrides.length > 0
+    self.assignment_overrides.exists?
   end
 
   def assignment_name_length_ok?
@@ -2702,6 +2739,26 @@ class Assignment < ActiveRecord::Base
 
     if self.title.to_s.length > name_length && self.grading_type != 'not_graded'
       errors.add(:title, I18n.t('The title cannot be longer than %{length} characters', length: name_length))
+    end
+  end
+
+  def grader_section_ok?
+    return if grader_section.blank?
+
+    if grader_section.workflow_state != 'active' || grader_section.course_id != course.id
+      errors.add(:grader_section, 'Selected moderated grading section must be active and in same course as assignment')
+    end
+  end
+
+  def final_grader_ok?
+    # TODO: once we can set a final grader via the UI, remove this early return
+    # and require a non-null final grader.
+    return if final_grader.blank?
+
+    if grader_section_id && grader_section.instructor_enrollments.where(user_id: final_grader_id, workflow_state: 'active').empty?
+      errors.add(:final_grader, 'Final grader must be enrolled in selected section')
+    elsif grader_section_id.nil? && course.participating_instructors.where(id: final_grader_id).empty?
+      errors.add(:final_grader, 'Final grader must be an instructor in this course')
     end
   end
 end

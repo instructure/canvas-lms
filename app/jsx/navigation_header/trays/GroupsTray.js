@@ -30,7 +30,7 @@ export default function GroupsTray({groups, hasLoaded}) {
   return (
     <Container as="div" padding="medium">
       <Heading level="h3" as="h2">{I18n.t('Groups')}</Heading>
-      <hr />
+      <hr role="presentation"/>
       <List variant="unstyled"  margin="small 0" itemSpacing="small">
         {hasLoaded ? (
           groups.map(group =>
@@ -38,7 +38,7 @@ export default function GroupsTray({groups, hasLoaded}) {
               <Link href={`/groups/${group.id}`}>{group.name}</Link>
             </ListItem>
           ).concat([
-            <ListItem key="hr"><hr /></ListItem>,
+            <ListItem key="hr"><hr role="presentation"/></ListItem>,
             <ListItem key="all">
               <Link href="/groups">{I18n.t('All Groups')}</Link>
             </ListItem>

@@ -1023,6 +1023,7 @@ describe DiscussionTopicsController do
         :require_initial_post => true,
         :podcast_has_student_posts => false,
         :delayed_post_at => '',
+        :locked => true,
         :lock_at => '',
         :message => 'Message',
         :delay_posting => false,
@@ -1047,6 +1048,27 @@ describe DiscussionTopicsController do
           assignment_group_id: @course.assignment_groups.first.id,
         }.merge(opts)
       }
+    end
+
+    describe "create_announcements_unlocked preference" do
+      before(:each) do
+        @teacher.create_announcements_unlocked(false)
+        user_session(@teacher)
+      end
+
+      it 'is updated when creating new announcements' do
+        post_params = topic_params(@course, {is_announcement: true, locked: false})
+        post('create', params: post_params, format: :json)
+        @teacher.reload
+        expect(@teacher.create_announcements_unlocked?).to be_truthy
+      end
+
+      it 'is not updated when creating new discussions' do
+        post_params = topic_params(@course, {is_announcement: false, locked: false})
+        post('create', params: post_params, format: :json)
+        @teacher.reload
+        expect(@teacher.create_announcements_unlocked?).to be_falsey
+      end
     end
 
     describe 'the new topic' do
@@ -1196,6 +1218,18 @@ describe DiscussionTopicsController do
       end
     end
 
+    it "should require authorization to create a discussion" do
+      @course.update_attribute(:is_public, true)
+      post 'create', params: topic_params(@course, {is_announcement: false}), :format => :json
+      assert_unauthorized
+    end
+
+    it "should require authorization to create an announcement" do
+      @course.update_attribute(:is_public, true)
+      post 'create', params: topic_params(@course, {is_announcement: true}), :format => :json
+      assert_unauthorized
+    end
+
     it 'logs an asset access record for the discussion topic' do
       user_session(@student)
       post 'create', params: topic_params(@course), :format => :json
@@ -1206,16 +1240,18 @@ describe DiscussionTopicsController do
 
     it 'creates an announcement that is locked by default' do
       user_session(@teacher)
-      post 'create',
-        params: topic_params(@course, {is_announcement: true}), :format => :json
+      params = topic_params(@course, {is_announcement: true})
+      params.delete(:locked)
+      post('create', params: params, format: :json)
       expect(response).to have_http_status :success
       expect(DiscussionTopic.last.locked).to be_truthy
     end
 
     it 'creates a discussion topic that is not locked by default' do
       user_session(@teacher)
-      post 'create',
-        params: topic_params(@course, {is_announcement: false}), :format => :json
+      params = topic_params(@course, {is_announcement: false})
+      params.delete(:locked)
+      post('create', params: params, format: :json)
       expect(response).to have_http_status :success
       expect(DiscussionTopic.last.locked).to be_falsy
     end
@@ -1316,6 +1352,40 @@ describe DiscussionTopicsController do
       user_session(@teacher)
     end
 
+    describe "create_announcements_unlocked preference" do
+
+      before(:each) do
+        @teacher.create_announcements_unlocked(false)
+        user_session(@teacher)
+      end
+
+      it 'is not updated when updating an existing announcements' do
+        topic = Announcement.create!(
+          context: @course,
+          title: 'Test Announcement',
+          message: 'Foo',
+          locked: 'true'
+        )
+        put_params = {course_id: @course.id, topic_id: topic.id, locked: false}
+        put('update', params: put_params)
+        @teacher.reload
+        expect(@teacher.create_announcements_unlocked?).to be_falsey
+      end
+
+      it 'is not updated when creating an existing discussions' do
+        topic = DiscussionTopic.create!(
+          context: @course,
+          title: 'Test Topic',
+          message: 'Foo',
+          locked: 'true'
+        )
+        put_params = {course_id: @course.id, topic_id: topic.id, locked: false}
+        put('update', params: put_params)
+        @teacher.reload
+        expect(@teacher.create_announcements_unlocked?).to be_falsey
+      end
+    end
+
     it 'does not allow setting specific sections for group discussions' do
       @course.root_account.enable_feature!(:section_specific_discussions)
       user_session(@teacher)
@@ -1372,6 +1442,24 @@ describe DiscussionTopicsController do
         title: "foobers"
       })
       expect(response).to have_http_status 200
+    end
+
+    it "can turn graded topic into ungraded section-specific topic in one edit" do
+      user_session(@teacher)
+      @course.root_account.enable_feature!(:section_specific_discussions)
+      assign = @course.assignments.create!(title: 'Graded Topic 1', submission_types: 'discussion_topic')
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      topic = assign.discussion_topic
+      put('update', params: {
+        course_id: @course.id,
+        topic_id: topic.id,
+        assignment: { set_assignment: "0" },
+        specific_sections: section1.id
+      })
+      expect(response).to have_http_status 200
+      topic.reload
+      expect(topic.assignment).to be_nil
     end
 
     it "should not clear lock_at if locked is not changed" do
@@ -1472,7 +1560,7 @@ describe DiscussionTopicsController do
     end
 
     it "attaches a file and handles duplicates" do
-      data = fixture_file_upload("scribd_docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
       attachment_model :context => @course, :uploaded_data => data, :folder => Folder.unfiled_folder(@course)
       put 'update', params: {course_id: @course.id, topic_id: @topic.id, attachment: data}, format: 'json'
       expect(response).to be_success

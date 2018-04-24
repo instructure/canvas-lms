@@ -19,6 +19,8 @@
 import Button from '@instructure/ui-core/lib/components/Button'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import TabList, { TabPanel } from '@instructure/ui-core/lib/components/TabList'
+
 import I18n from 'i18n!react_developer_keys'
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -27,119 +29,142 @@ import DeveloperKey from './DeveloperKey'
 import DeveloperKeyModal from './DeveloperKeyModal'
 
 class DeveloperKeysApp extends React.Component {
-  constructor (props) {
-    super(props);
-    this.showMoreButtonHandler = this.showMoreButtonHandler.bind(this)
+  setMainTableRef = (node) => {
+    this.mainTableRef = node
   }
 
-  getSpinner () {
-    return this.isLoading() ? (<Spinner title={I18n.t('Loading')} />) : null
-  }
-
-  showKeys (list) {
-    if (list.length === 0) { return null }
-    return (
-      <DeveloperKeysTable
-        ref={(table) => { this.DeveloperKeysTable = table; }}
-        store={this.props.store}
-        actions={this.props.actions}
-        developerKeysList={this.props.applicationState.listDeveloperKeys.list}
-        ctx={this.props.ctx}
-      />
-    )
-  }
-
-  addKeyButton () {
-    const createKeyLabel = I18n.t('Developer Key')
-
-    return (
-      <div className="ic-Action-header">
-        <div className="ic-Action-header__Primary">
-          <h2 className="ic-Action-header__Heading">{I18n.t('Developer Keys')}</h2>
-        </div>
-        <div className="ic-Action-header__Secondary">
-          <Button
-            variant="primary"
-            onClick={this.showCreateDeveloperKey}
-            >
-            <ScreenReaderContent>{I18n.t('Create a developer key')}</ScreenReaderContent>
-            <span aria-hidden="true">
-              <i className="icon-plus" />
-              { ` ${createKeyLabel}` }
-            </span>
-          </Button>
-        </div>
-      </div>
-    )
-  }
-
-  developerKeyModal () {
-    return (
-      <DeveloperKeyModal
-        store={this.props.store}
-        actions={this.props.actions}
-        createOrEditDeveloperKeyState={this.props.applicationState.createOrEditDeveloperKey}
-        ctx={this.props.ctx}
-      />
-    )
+  setInheritedTableRef = (node) => {
+    this.inheritedTableRef = node
   }
 
   showCreateDeveloperKey = () => {
     this.props.store.dispatch(this.props.actions.developerKeysModalOpen())
   }
 
-  nextPage () {
-    return this.props.applicationState.listDeveloperKeys.nextPage
-  }
-
-  showMoreButtonHandler (_event) {
-    this.DeveloperKeysTable.focusLastDeveloperKey()
-    this.props.store.dispatch(this.props.actions.getRemainingDeveloperKeys(this.nextPage(), []))
+  showMoreButtonHandler = (_event) => {
+    const {
+      applicationState: { listDeveloperKeys: { nextPage } },
+      store: { dispatch },
+      actions: { getRemainingDeveloperKeys }
+    } = this.props
+    this.mainTableRef.focusLastDeveloperKey()
+    dispatch(getRemainingDeveloperKeys(nextPage, []))
   }
 
   showMoreButton () {
-    if (this.nextPage() && !this.isLoading()) {
-      const showAll = I18n.t("Show All %{developerKeysCount} Keys", {developerKeysCount: this.props.env.developer_keys_count})
+    const {
+      applicationState: { listDeveloperKeys: { listDeveloperKeysPending, nextPage } }
+    } = this.props
 
+    if (nextPage && !listDeveloperKeysPending) {
       return (
         <Button type="button" onClick={this.showMoreButtonHandler}>
-          {showAll}
+          {I18n.t("Show All Keys")}
         </Button>)
     }
-
     return null
   }
 
-  isLoading () {
-    return this.props.applicationState.listDeveloperKeys.listDeveloperKeysPending
+  showMoreInheritedButtonHandler = (_event) => {
+    const {
+      applicationState: { listDeveloperKeys: { inheritedNextPage } },
+      store: { dispatch },
+      actions: { getRemainingInheritedDeveloperKeys }
+    } = this.props
+
+    this.inheritedTableRef.focusLastDeveloperKey()
+    dispatch(getRemainingInheritedDeveloperKeys(inheritedNextPage, []))
+  }
+
+  showMoreInheritedButton () {
+    const {
+      applicationState: { listDeveloperKeys: { listInheritedDeveloperKeysPending, inheritedNextPage } }
+    } = this.props
+
+    if (inheritedNextPage && !listInheritedDeveloperKeysPending) {
+      return (
+        <Button type="button" onClick={this.showMoreInheritedButtonHandler}>
+          {I18n.t("Show All Keys")}
+        </Button>)
+    }
+    return null
   }
 
   render () {
-    const { list } = this.props.applicationState.listDeveloperKeys;
+    const {
+      applicationState: {
+        listDeveloperKeys: { list, inheritedList, listDeveloperKeysPending, listInheritedDeveloperKeysPending },
+        createOrEditDeveloperKey
+      },
+      store,
+      actions,
+      ctx
+    } = this.props;
     return (
       <div>
-        {this.addKeyButton()}
-        {this.developerKeyModal()}
-        {this.showKeys(list)}
-        <div id="loading">
-          {this.getSpinner()}
-          {this.showMoreButton()}
+        <div className="ic-Action-header">
+          <div className="ic-Action-header__Primary">
+            <h2 className="ic-Action-header__Heading">{I18n.t('Developer Keys')}</h2>
+          </div>
+          <div className="ic-Action-header__Secondary">
+            <Button
+              variant="primary"
+              onClick={this.showCreateDeveloperKey}
+            >
+              <ScreenReaderContent>{I18n.t('Create a')}</ScreenReaderContent>
+              <i className="icon-plus" />
+              { I18n.t('Developer Key') }
+            </Button>
+          </div>
         </div>
+        <TabList variant="minimal">
+          <TabPanel title={I18n.t('Account')}>
+            <DeveloperKeyModal
+              store={store}
+              actions={actions}
+              createOrEditDeveloperKeyState={createOrEditDeveloperKey}
+              ctx={ctx}
+            />
+            <DeveloperKeysTable
+              ref={this.setMainTableRef}
+              store={store}
+              actions={actions}
+              developerKeysList={list}
+              ctx={ctx}
+            />
+            <div className="loadingSection">
+              {listDeveloperKeysPending ? <Spinner title={I18n.t('Loading')} /> : null}
+              {this.showMoreButton()}
+            </div>
+          </TabPanel>
+          <TabPanel  title={I18n.t('Inherited')}>
+            <DeveloperKeysTable
+              ref={this.setInheritedTableRef}
+              store={store}
+              actions={actions}
+              developerKeysList={inheritedList}
+              ctx={ctx}
+              inherited
+            />
+            <div className="loadingSection">
+              {listInheritedDeveloperKeysPending ? <Spinner title={I18n.t('Loading')} /> : null}
+              {this.showMoreInheritedButton()}
+            </div>
+          </TabPanel>
+        </TabList>
       </div>
     );
   }
 };
 
 DeveloperKeysApp.propTypes = {
-  env: PropTypes.shape({
-    developer_keys_count: PropTypes.number
-  }).isRequired,
   store: PropTypes.shape({
     dispatch: PropTypes.func.isRequired,
   }).isRequired,
   actions: PropTypes.shape({
     developerKeysModalOpen: PropTypes.func.isRequired,
     getRemainingDeveloperKeys: PropTypes.func.isRequired,
+    getRemainingInheritedDeveloperKeys: PropTypes.func.isRequired,
     setEditingDeveloperKey: PropTypes.func.isRequired
   }).isRequired,
   applicationState: PropTypes.shape({
@@ -151,7 +176,11 @@ DeveloperKeysApp.propTypes = {
       nextPage: PropTypes.string,
       listDeveloperKeysPending: PropTypes.bool.isRequired,
       listDeveloperKeysSuccessful: PropTypes.bool.isRequired,
+      nextInheritedPage: PropTypes.string,
+      listInheritedDeveloperKeysPending: PropTypes.bool.isRequired,
+      listInheritedDeveloperKeysSuccessful: PropTypes.bool.isRequired,
       list: PropTypes.arrayOf(DeveloperKey.propTypes.developerKey).isRequired,
+      inheritedList: PropTypes.arrayOf(DeveloperKey.propTypes.developerKey).isRequired,
     }).isRequired
   }).isRequired,
   ctx: DeveloperKeyModal.propTypes.ctx

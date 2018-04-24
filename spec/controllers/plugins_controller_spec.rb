@@ -32,6 +32,21 @@ describe PluginsController do
       expect(ps).to be_enabled
     end
 
+    it 'it trims posted params' do
+      ps = PluginSetting.new(name: 'big_blue_button')
+      ps.settings = { }.with_indifferent_access
+      ps.disabled = false
+      ps.save!
+
+      allow(controller).to receive(:require_setting_site_admin).and_return(true)
+      # The 'all' parameter is necessary for this test to pass when the
+      # multiple root acoounts plugin is installed
+      put 'update', params: {id: 'big_blue_button', settings: { domain: ' abc ', secret: 'secret', recording_enabled: '0' }, all: 1}
+      expect(response).to be_redirect
+      ps.reload
+      expect(ps.settings[:domain]).to eq 'abc'
+    end
+
     context "account_reports" do
       it 'can disable reports' do
         ps = PluginSetting.new(name: 'account_reports')

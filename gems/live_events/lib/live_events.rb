@@ -20,8 +20,9 @@ require 'canvas_statsd'
 
 module LiveEvents
   class << self
-    attr_accessor :logger, :cache, :statsd
+    attr_accessor :logger, :cache, :statsd, :stream_client
 
+    # rubocop:disable Style/TrivialAccessors
     def settings=(settings)
       @settings = settings
     end
@@ -37,6 +38,7 @@ module LiveEvents
     def max_queue_size
       @max_queue_size.call
     end
+    # rubocop:enable Style/TrivialAccessors
 
     require 'live_events/client'
     require 'live_events/async_worker'
@@ -55,10 +57,10 @@ module LiveEvents
     end
 
     # Post an event for the current account.
-    def post_event(event_name, payload, time = Time.now, ctx = nil, partition_key = nil)
-      if config = LiveEvents::Client.config
-        ctx ||= Thread.current[:live_events_ctx]
-        LiveEvents::Client.new(config).post_event(event_name, payload, time, ctx, partition_key)
+    def post_event(event_name:, payload:, time: Time.now, context: nil, partition_key: nil) # rubocop:disable Rails/SmartTimeZone
+      if (config = LiveEvents::Client.config)
+        context ||= Thread.current[:live_events_ctx]
+        LiveEvents::Client.new(config, @stream_client).post_event(event_name, payload, time, context, partition_key)
       end
     end
 

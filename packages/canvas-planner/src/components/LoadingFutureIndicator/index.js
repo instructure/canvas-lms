@@ -42,7 +42,7 @@ export default class LoadingFutureIndicator extends Component {
   }
 
   handleLoadMoreButton = () => {
-    this.props.onLoadMore({});
+    this.props.onLoadMore({loadMoreButtonClicked: true});
   }
 
   renderLoadMore () {

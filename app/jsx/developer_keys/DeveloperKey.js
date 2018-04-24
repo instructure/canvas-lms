@@ -105,11 +105,16 @@ class DeveloperKey extends React.Component {
   }
 
   developerName (developerKey) {
-    return developerKey.name || 'Unnamed Tool'
+    return developerKey.name || I18n.t('Unnamed Tool')
   }
 
   userName (developerKey) {
-    return developerKey.user_name || 'No User'
+    if (developerKey.user_name) {
+      return developerKey.user_name
+    } else if(developerKey.email) {
+      return I18n.t('Name Missing')
+    }
+    return I18n.t('No User')
   }
 
   isActive (developerKey) {
@@ -118,6 +123,10 @@ class DeveloperKey extends React.Component {
 
   focusDeleteLink() {
     this.deleteLink.focus();
+  }
+
+  focusName() {
+    this.keyName.focus();
   }
 
   getLinkHelper(options) {
@@ -145,6 +154,7 @@ class DeveloperKey extends React.Component {
   }
 
   refDeleteLink = (link) => { this.deleteLink = link; }
+  refKeyName = (link) => { this.keyName = link; }
 
   getDeleteLink(developerName) {
     return this.getLinkHelper({
@@ -208,7 +218,7 @@ class DeveloperKey extends React.Component {
       if (developerKey.name) {
         altText = I18n.t("%{developerName} Logo", {developerName: developerKey.name})
       } else {
-        altText = "Unnamed Tool Logo"
+        altText = I18n.t("Unnamed Tool Logo")
       }
     }
 
@@ -234,49 +244,60 @@ class DeveloperKey extends React.Component {
   }
 
   render () {
-    const { developerKey } = this.props;
+    const { developerKey, inherited } = this.props;
 
     return (
       <tr className={classNames('key', { inactive: !this.isActive(developerKey) })}>
         <td className="name">
           {this.makeImage(developerKey)}
-          {this.developerName(developerKey)}
+          <span ref={this.refKeyName}>
+            {this.developerName(developerKey)}
+          </span>
         </td>
 
-        <td>
-          <div>
-            {this.makeUserLink(developerKey)}
-          </div>
-          <div>
-            {developerKey.email}
-          </div>
-        </td>
+        {!inherited &&
+          <td>
+            <div>
+              {this.makeUserLink(developerKey)}
+            </div>
+            <div>
+              {developerKey.email}
+            </div>
+          </td>
+        }
 
         <td>
           <div className="details">
             <div>
               {developerKey.id}
             </div>
-            <div>
-              {I18n.t("Key:")} <span className='api_key'>{developerKey.api_key}</span>
-            </div>
-            <div>
-              {this.redirectURI(developerKey)}
-            </div>
+            {!inherited &&
+              <div>
+                {I18n.t("Key:")} <span className='api_key'>{developerKey.api_key}</span>
+              </div>
+            }
+            {!inherited &&
+              <div>
+                {this.redirectURI(developerKey)}
+              </div>
+            }
           </div>
         </td>
 
-        <td>
-          <div>
-            {I18n.t("Access Token Count: %{access_token_count}", {access_token_count: developerKey.access_token_count})}
-          </div>
-          <div>
-            {I18n.t("Created: %{created_at}", {created_at: $.datetimeString(developerKey.created_at)})}
-          </div>
-          <div>
-            {this.lastUsed(developerKey)}
-          </div>
-        </td>
+        {!inherited &&
+          <td>
+            <div>
+              {I18n.t("Access Token Count: %{access_token_count}", {access_token_count: developerKey.access_token_count})}
+            </div>
+            <div>
+              {I18n.t("Created: %{created_at}", {created_at: $.datetimeString(developerKey.created_at)})}
+            </div>
+            <div>
+              {this.lastUsed(developerKey)}
+            </div>
+          </td>
+        }
+
         <td>
           <DeveloperKeyStateControl
             developerKey={developerKey}
@@ -285,9 +306,11 @@ class DeveloperKey extends React.Component {
             ctx={this.props.ctx}
           />
         </td>
-        <td className="icon_react">
-          {this.links(developerKey)}
-        </td>
+        {!inherited &&
+          <td className="icon_react">
+            {this.links(developerKey)}
+          </td>
+        }
       </tr>
     );
   };
@@ -315,7 +338,10 @@ DeveloperKey.propTypes = {
     params: PropTypes.shape({
       contextId: PropTypes.string.isRequired
     })
-  }).isRequired
+  }).isRequired,
+  inherited: PropTypes.bool
 };
+
+DeveloperKey.defaultProps = { inherited: false }
 
 export default DeveloperKey

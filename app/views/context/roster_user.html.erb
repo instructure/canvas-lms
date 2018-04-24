@@ -140,13 +140,13 @@
                 <div><%= t 'enrolled_as', "Enrolled as a %{enrollment_type}", :enrollment_type => enrollment.readable_type %></div>
                 <div>created <%= datetime_string(enrollment.created_at) %></div>
                 <% if enrollment.is_a?(ObserverEnrollment) %>
-                  <div style="font-size: 0.8em; padding-left: 20px; <%= hidden unless enrollment.associated_user %>" class="associated_user" >
+                  <div style="font-size: 0.8em; padding-<%= direction('left') %>: 20px; <%= hidden unless enrollment.associated_user %>" class="associated_user" >
                     <%= t 'enrollment_linked_to', "linked to *%{linked_user}*",
                         :linked_user => context_user_name(@context, enrollment.associated_user),
                         :wrapper => '<span class="associated_user_name">\1</span>' %>
                   </div>
                 <% end %>
-                <div style="font-size: 0.8em; padding-left: 20px; <%= hidden unless enrollment.completed? || enrollment.inactive? %>" class="completed_at_holder">
+                <div style="font-size: 0.8em; padding-<%= direction('left') %>: 20px; <%= hidden unless enrollment.completed? || enrollment.inactive? %>" class="completed_at_holder">
                   <% if enrollment.workflow_state == 'inactive' %>
                     <%= t 'inactive' %>
                   <% elsif enrollment.completed_at %>
@@ -184,13 +184,13 @@
               <td>
                 <div class="elevate_enrollment_link_holder" style="<%= hidden if @enrollments.any?{|e| !e.limit_privileges_to_course_section } %>">
                   <%= t('user_only_view_section', %{this user can only view students in their assigned course section(s)}) %>
-                  <div style="margin-left: 10px; font-size: 0.8em;">
+                  <div style="margin-<%= direction('left') %>: 10px; font-size: 0.8em;">
                     <a href="<%= context_url(@context, :context_limit_user_grading_url, @user.id) %>" class="elevate_enrollment_link"><%= t('links.user_view_all_sections', %{let this user see all course users}) %></a>
                   </div>
                 </div>
                 <div class="restrict_enrollment_link_holder" style="<%= hidden unless @enrollments.any?{|e| !e.limit_privileges_to_course_section } %>">
                   <%= t('user_view_all_sections', %{this user can view students in any course section}) %>
-                  <div style="margin-left: 10px; font-size: 0.8em;">
+                  <div style="margin-<%= direction('left') %>: 10px; font-size: 0.8em;">
                     <a href="<%= context_url(@context, :context_limit_user_grading_url, @user.id) %>" class="restrict_enrollment_link"><%= t('links.user_only_view_section', %{limit this user to only see fellow section users}) %></a>
                   </div>
                 </div>

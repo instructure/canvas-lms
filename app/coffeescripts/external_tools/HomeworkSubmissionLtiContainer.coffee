@@ -26,10 +26,12 @@ define [
   '../views/assignments/ExternalContentFileSubmissionView'
   '../views/assignments/ExternalContentUrlSubmissionView'
   '../views/assignments/ExternalContentLtiLinkSubmissionView'
+  '../../../public/javascripts/submit_assignment_helper'
   'jquery.disableWhileLoading'
 ], ( Backbone, I18n, $, _, homeworkSubmissionTool, ExternalContentReturnView,
      ExternalToolCollection, ExternalContentFileSubmissionView,
-     ExternalContentUrlSubmissionView, ExternalContentLtiLinkSubmissionView) ->
+     ExternalContentUrlSubmissionView, ExternalContentLtiLinkSubmissionView,
+     SubmitAssignmentHelper) ->
 
   class HomeworkSubmissionLtiContainer
     @homeworkSubmissionViewMap:
@@ -57,7 +59,7 @@ define [
       tool = @externalToolCollection.findWhere({ id: toolId.toString(10) })
       @cleanupViewsForTool(tool)
       returnView = @createReturnView(tool)
-      $('#submit_from_external_tool_form_' + toolId).append(returnView.el)
+      $('#submit_from_external_tool_form_' + toolId).prepend(returnView.el)
       returnView.render()
       @renderedViews[toolId.toString(10)].push(returnView)
 
@@ -91,12 +93,15 @@ define [
         tool = `this.model` # this will return the model from returnView
         homeworkSubmissionView = @createHomeworkSubmissionView(tool, data)
         homeworkSubmissionView.parentView = this
+
         `this.remove()`
         $('#submit_from_external_tool_form_' + tool.get('id')).append(homeworkSubmissionView.el)
 
         @cleanupViewsForTool(tool)
         @renderedViews[tool.get('id')].push(homeworkSubmissionView)
         homeworkSubmissionView.render()
+        $('input.turnitin_pledge').click (e) ->
+          SubmitAssignmentHelper.recordEulaAgreement('#eula_agreement_timestamp', e.target.checked)
 
       returnView.on 'cancel', (data) ->
         return

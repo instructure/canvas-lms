@@ -71,3 +71,13 @@ it('renders the correct down icon', () => {
   );
   expect(wrapper.find(IconArrowDownLine)).toHaveLength(1);
 });
+
+it('adds aria-hidden when specified', () => {
+  const wrapper = shallow(
+    <StickyButton hidden>
+      Click me
+    </StickyButton>
+  );
+
+  expect(wrapper).toMatchSnapshot();
+});

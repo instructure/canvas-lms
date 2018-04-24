@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@import 'base/environment';
+
 .group_categories_area {
   min-height: 250px;
 }
@@ -23,7 +25,7 @@
 #group_categories_tabs {
   margin: 0 -1em -1em;
   > .collectionViewItems {
-    padding: 10px 130px 0 1em;
+    padding: direction-sides(10px 130px 0 1em);
   }
   > .tab-panel {
     position: relative;

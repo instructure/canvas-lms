@@ -54,12 +54,12 @@
 }
 ul.user_list {
   list-style: none;
-  padding-left: 0px;
+  padding-<%= direction('left') %>: 0px;
   margin-top: 0px;
   max-width: 400px;
 }
 ul.user_list li.user {
-  padding-left: 10px;
+  padding-<%= direction('left') %>: 10px;
   color: #444;
   line-height: 1.5em;
   -moz-border-radius: 5px;
@@ -84,8 +84,8 @@ ul.user_list li.user .enrollment_type {
   margin: -2px 10px 0px;
 }
 ul.user_list li.user .links {
-  float: right;
-  padding-right: 20px;
+  float: <%= direction('right') %>;
+  padding-<%= direction('right') %>: 20px;
   padding-top: 5px;
   visibility: hidden;
 }
@@ -93,8 +93,8 @@ ul.user_list li.user .links a {
   text-decoration: none;
 }
 ul.user_list li.user:hover .links {
-  float: right;
-  padding-right: 20px;
+  float: <%= direction('right') %>;
+  padding-<%= direction('right') %>: 20px;
   visibility: visible;
 }
 ul.user_list li.user.pending {
@@ -104,7 +104,7 @@ ul.user_list li.user.pending {
 h3 .tally {
   font-family: arial,sans-serif;
   font-size: 12px;
-  padding-left: 5px;
+  padding-<%= direction('left') %>: 5px;
 }
 .associated_user {
   display: none;
@@ -117,7 +117,7 @@ h3 .tally {
   background: none;
   border: 0;
   padding: 0;
-  text-align: left;
+  text-align: <%= direction('left') %>;
 }
 </style>
 <% end %>
@@ -127,12 +127,12 @@ h3 .tally {
     <td><%= f.blabel :name, :en => "Section Name" %></td>
     <td><%= f.text_field :name %></td>
   </tr>
-  <% if @section.sis_source_id && can_do(@context, @current_user, :read_sis) || can_do(@context, @current_user, :manage_sis) %>
+  <% if @section.sis_source_id && can_do(@context, @current_user, :read_sis) || can_do(@context.root_account, @current_user, :manage_sis) %>
     <tr>
       <td><%= f.blabel :sis_source_id, :en => "SIS ID" %></td>
       <td>
         <span class="course_form">
-          <% if can_do(@context, @current_user, :manage_sis) %>
+          <% if can_do(@context.root_account, @current_user, :manage_sis) %>
             <%= f.text_field :sis_source_id, :style => "width: 50px;", :title => "SIS ID", :value => @section.sis_source_id %>
           <% else %>
             <%= @section.sis_source_id %>
@@ -181,7 +181,7 @@ h3 .tally {
     <td colspan="2">
       <%= f.check_box :restrict_enrollments_to_section_dates %>
       <%= f.label :restrict_enrollments_to_section_dates, t('access_limit', "Users can only participate in the course between these dates") %>
-      <div style="font-size: 0.8em; padding-left: 25px;">
+      <div style="font-size: 0.8em; padding-<%= direction('left') %>: 25px;">
         <%= t('override_settings', 'This will override any term or course date settings.') %>
       </div>
     </td>
@@ -230,7 +230,7 @@ h3 .tally {
         <%= t('run_from', 'Runs from %{start_date} with no end date', :start_date => friendly_datetime(@section.start_at, context: @context).html_safe) %>
       <% end %>
     </div>
-    <div style="margin-left: 10px; font-size: 0.8em;">
+    <div style="margin-<%= direction('left') %>: 10px; font-size: 0.8em;">
       <%= t('Students can only participate in the course between these dates') if @section.restrict_enrollments_to_section_dates %>
     </div>
   <% end %>
@@ -278,7 +278,7 @@ h3 .tally {
         <td colspan="2">
           <div id="course_autocomplete_name_holder" style="margin-top: 20px;">
             <%= before_label('labels.selected_course', 'Selected Course') %>
-            <div style="margin-left: 20px;">
+            <div style="margin-<%= direction('left') %>: 20px;">
               <div id="course_autocomplete_name" style="font-weight: bold;"></div>
               <div id="sis_id_holder" style="display: none;"><%= before_label('labels.sis_id', 'SIS ID') %> <span class="sis_id">&nbsp;</span></div>
               <div id="account_name_holder" style="display: none;"><%= before_label('labels.account', 'Account') %> <span class="account_name"></span></div>

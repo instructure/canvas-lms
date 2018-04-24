@@ -22,7 +22,7 @@
   <div class="display_grading_standard">
     <div class="standard_title text-center">
       <% if !read_only %>
-      <div style="float: right;" class="displaying links">
+      <div style="float: <%= direction('right') %>;" class="displaying links">
         <a href="#"
            class="find_grading_standard_link no-hover"
            aria-label="<%= t('Find an Existing Grading Scheme') %>"
@@ -60,9 +60,9 @@
       </caption>
       <thead>
         <tr>
-          <th id="name_header" style="text-align: left; padding-right: 10px; width: 25%;"><%= before_label('name', 'Name') %></th>
+          <th id="name_header" style="text-align: <%= direction('left') %>; padding-<%= direction('right') %>: 10px; width: 25%;"><%= before_label('name', 'Name') %></th>
           <th colspan="3" style="width: 75%;">
-            <div style="float: left; margin-left: 10px;"><%= before_label('range', 'Range') %></div>
+            <div style="float: <%= direction('left') %>; margin-<%= direction('left') %>: 10px;"><%= before_label('range', 'Range') %></div>
             <div class="clear"></div>
           </th>
         </tr>
@@ -104,7 +104,7 @@
           </td>
           <td style="padding: 2px 5px; width: 25%;">
             <div class="editing_box">
-              <span style="padding-right: 5px;" aria-hidden="true"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
+              <span style="padding-<%= direction('right') %>: 5px;" aria-hidden="true"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
               <input
                 type="text"
                 class="standard_value"
@@ -115,7 +115,7 @@
                 style="width: 37px;"/>%
             </div>
             <div class="displaying">
-              <span style="padding-right: 5px;"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
+              <span style="padding-<%= direction('right') %>: 5px;"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
               <span class="min_score"><%= I18n.n((row[1] * 100).round(2)) %></span>%
             </div>
           </td>
@@ -145,11 +145,11 @@
         </td>
         <td style="padding: 2px 5px;">
           <div class="editing_box">
-            <span style="padding-right: 5px;"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
+            <span style="padding-<%= direction('right') %>: 5px;"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
             <span class="edit_max_score">&nbsp;</span>%
           </div>
           <div class="displaying">
-            <span style="padding-right: 5px;"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
+            <span style="padding-<%= direction('right') %>: 5px;"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
             <span class="max_score">&nbsp;</span>%
           </div>
         </td>
@@ -166,7 +166,7 @@
         </td>
       </tr>
     </table>
-    <div class="displaying" style="text-align: right;">
+    <div class="displaying" style="text-align: <%= direction('right') %>;">
       <% if !read_only %>
         <a href="<%= context_url(@context, :context_grading_standards_url) %>"><%= t('managing_grading_standards', 'manage grading schemes') %></a>
       <% end %>
@@ -203,17 +203,17 @@
               <div>
                 <div class="pull-left">
                   <a href="#" class="select_grading_standard_link"><b class="title">&nbsp;</b></a>
-                  <span class="user_name" style="padding-left: 10px; font-size: 0.8em; color: #888;">
+                  <span class="user_name" style="padding-<%= direction('left') %>: 10px; font-size: 0.8em; color: #888;">
                     &nbsp;
                   </span>
                 </div>
                 <div class="clear"></div>
               </div>
               <div class="clear"></div>
-              <div style="margin-left: 30px;" class="details">
+              <div style="margin-<%= direction('left') %>: 30px;" class="details">
                 <table style="font-size: 0.8em;">
                   <tr class="details_row blank" style="display: none;">
-                    <td class="name" style="padding-right: 20px;">&nbsp;</td>
+                    <td class="name" style="padding-<%= direction('right') %>: 20px;">&nbsp;</td>
                     <td style="padding: 2px 5px;"><span class="value">&nbsp;</span>%</td>
                     <td style="padding: 2px 5px;"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></td>
                     <td style="padding: 2px 5px;"><span class="next_value">&nbsp;</span>%</td>
@@ -226,7 +226,7 @@
         </td>
       </tr>
     </table>
-    <div style="margin-top: 5px; text-align: right"><a href="#" class="cancel_find_grading_standard_link"><%= t('#buttons.cancel', 'Cancel') %></a></div>
+    <div style="margin-top: 5px; text-align: <%= direction('right') %>"><a href="#" class="cancel_find_grading_standard_link"><%= t('#buttons.cancel', 'Cancel') %></a></div>
   </div>
   <a href="<%= context_url(((grading_standard.context || @context) rescue @context), :context_grading_standard_url, grading_standard ? grading_standard.id : "{{ id }}") rescue "#" %>" style="display: none;" class="update_grading_standard_url">&nbsp;</a>
   <textarea id="default_grading_standard_data" style="display: none;"><%= GradingStandard.default_grading_standard.to_json %></textarea>

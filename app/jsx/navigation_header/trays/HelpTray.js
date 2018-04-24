@@ -27,7 +27,7 @@ export default function HelpTray({trayTitle, closeTray, links, hasLoaded}) {
   return (
     <Container as="div" padding="medium" id="help_tray">
       <Heading level="h3" as="h2">{trayTitle}</Heading>
-      <hr />
+      <hr role="presentation"/>
       <HelpDialog links={links} hasLoaded={hasLoaded} onFormSubmit={closeTray}/>
     </Container>
   )

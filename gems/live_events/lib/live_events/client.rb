@@ -31,9 +31,9 @@ module LiveEvents
       res.dup
     end
 
-    def initialize(config = nil)
+    def initialize(config = nil, stream_client = nil)
       config ||= LiveEvents::Client.config
-      @kinesis = Aws::Kinesis::Client.new(Client.aws_config(config))
+      @stream_client = stream_client || Aws::Kinesis::Client.new(Client.aws_config(config))
       @stream_name = config['kinesis_stream_name']
     end
 
@@ -55,7 +55,7 @@ module LiveEvents
     end
 
     def valid?
-      @kinesis.describe_stream(stream_name: @stream_name, limit: 1)
+      @stream_client.describe_stream(stream_name: @stream_name, limit: 1)
       true
     rescue Aws::Kinesis::Errors::ServiceError
       false
@@ -81,22 +81,22 @@ module LiveEvents
 
       event_json = event.to_json
 
-      job = Proc.new {
+      job = proc do
         begin
-          @kinesis.put_record(stream_name: @stream_name,
+          @stream_client.put_record(stream_name: @stream_name,
                               data: event_json,
                               partition_key: partition_key)
 
-          LiveEvents.statsd.increment("#{statsd_prefix}.sends") if LiveEvents.statsd
+          LiveEvents&.statsd&.increment("#{statsd_prefix}.sends")
         rescue => e
           LiveEvents.logger.error("Error posting event #{e} event: #{event_json}")
-          LiveEvents.statsd.increment("#{statsd_prefix}.send_errors") if LiveEvents.statsd
+          LiveEvents&.statsd&.increment("#{statsd_prefix}.send_errors")
         end
-      }
+      end
 
       unless LiveEvents.worker.push(job)
         LiveEvents.logger.error("Error queueing job for worker event: #{event_json}")
-        LiveEvents.statsd.increment("#{statsd_prefix}.queue_full_errors") if LiveEvents.statsd
+        LiveEvents&.statsd&.increment("#{statsd_prefix}.queue_full_errors")
       end
     end
   end

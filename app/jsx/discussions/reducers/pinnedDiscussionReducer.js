@@ -19,12 +19,8 @@ import orderBy from 'lodash/orderBy'
 
 import { handleActions } from 'redux-actions'
 import { actionTypes } from '../actions'
-import subscriptionReducerMap from './subscriptionReducerMap'
 import duplicationReducerMap from './duplicationReducerMap'
 import deleteReducerMap from './deleteReducerMap'
-import cleanDiscussionFocusReducerMap from './cleanDiscussionFocusReducerMap'
-import searchReducerMap from './searchReducerMap'
-import { setSortableId } from '../utils'
 
 // We need to not change the ordering of the diccussions here, ie we can't
 // use the same .sort that we use in the GET_DISCUSSIONS_SUCCESS. This is
@@ -33,40 +29,40 @@ import { setSortableId } from '../utils'
 // eventually gets saved in the backend).
 function copyAndUpdateDiscussionState(oldState, updatedDiscussion) {
   const newState = oldState.slice()
-  const discussionIndex = newState.map(d => d.id).indexOf(updatedDiscussion.id)
+  const discussionIndex = newState.indexOf(updatedDiscussion.id)
 
   if (!updatedDiscussion.pinned && discussionIndex !== -1) {
     newState.splice(discussionIndex, 1)
   } else if (updatedDiscussion.pinned && discussionIndex === -1) {
-    newState.push(updatedDiscussion)
+    newState.push(updatedDiscussion.id)
   } else if (updatedDiscussion.pinned && discussionIndex !== -1) {
-    newState[discussionIndex] = updatedDiscussion
+    newState[discussionIndex] = updatedDiscussion.id
   }
   return newState
 }
 
 function orderPinnedDiscussions(state, order) {
-  const discussions = order ? order.map(id => state.find(discussion => discussion.id === id)) : state
-  return setSortableId(discussions)
+  return order ? order.map(id => state.find(discussionId => discussionId === id)) : state
 }
 
 const reducerMap = {
-  [actionTypes.ARRANGE_PINNED_DISCUSSIONS]: (state, action) =>
-    orderPinnedDiscussions(state, action.payload.order),
+  [actionTypes.ARRANGE_PINNED_DISCUSSIONS]: (state, action) => (
+    action.payload.order.slice()
+  ),
   [actionTypes.GET_DISCUSSIONS_SUCCESS]: (state, action) => {
-    const discussions = action.payload.data || []
-    const pinnedDiscussions = discussions.reduce((accumlator, discussion) => {
+    const allDiscussions = action.payload.data
+    const pinnedDiscussions = allDiscussions.reduce((acc, discussion) => {
       if (discussion.pinned) {
-        accumlator.push({ ...discussion, filtered: false })
+        acc.push(discussion)
       }
-      return accumlator
+      return acc
     }, [])
-    return setSortableId(orderBy(pinnedDiscussions, ['position'], ['asc']))
+    const sorted = orderBy(pinnedDiscussions, ['position'], ['asc'])
+    return sorted.map(d => d.id)
   },
-  [actionTypes.UPDATE_DISCUSSION_START]: (state, action) =>
-    copyAndUpdateDiscussionState(state, action.payload.discussion),
-  [actionTypes.UPDATE_DISCUSSION_FAIL]: (state, action) =>
-    copyAndUpdateDiscussionState(state, action.payload.discussion),
+  [actionTypes.UPDATE_DISCUSSION_SUCCESS]: (state, action) => (
+    copyAndUpdateDiscussionState(state, action.payload.discussion)
+  ),
   [actionTypes.DRAG_AND_DROP_START]: (state, action) => {
     const updatedState = copyAndUpdateDiscussionState(state, action.payload.discussion)
     return orderPinnedDiscussions(updatedState, action.payload.order)
@@ -77,7 +73,7 @@ const reducerMap = {
   }
 }
 
-Object.assign(reducerMap, subscriptionReducerMap, duplicationReducerMap, cleanDiscussionFocusReducerMap, searchReducerMap, deleteReducerMap)
+Object.assign(reducerMap, duplicationReducerMap, deleteReducerMap)
 
 const pinnedDiscussionReducer = handleActions(reducerMap, [])
 export default pinnedDiscussionReducer

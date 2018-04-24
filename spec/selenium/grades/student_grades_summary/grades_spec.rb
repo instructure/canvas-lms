@@ -223,6 +223,15 @@ describe "grades" do
       expect(fj('.assessment-comments:visible div').text).to eq 'cool, yo'
     end
 
+    it "shows the assessment link when there are assessment ratings with nil points" do
+      assessment = @rubric.rubric_assessments.first
+      assessment.ratings.first[:points] = nil
+      assessment.save!
+      get "/courses/#{@course.id}/grades"
+      assessments_link = f("#submission_#{@first_assignment.id} .toggle_rubric_assessments_link")
+      expect(assessments_link).to be_present
+    end
+
     it "should not display rubric on muted assignment", priority: "1", test_id: 229662 do
       get "/courses/#{@course.id}/grades"
 
@@ -253,10 +262,14 @@ describe "grades" do
     end
 
     it "should display assignment statistics", priority: "1", test_id: 229664 do
-      5.times do
+      all_students = Array.new(5) do
         s = student_in_course(:active_all => true).user
         @first_assignment.grade_student(s, grade: 4, grader: @teacher)
+
+        s
       end
+
+      GradeCalculator.new(all_students.map(&:id), @course).compute_and_save_scores
 
       get "/courses/#{@course.id}/grades"
       f('.toggle_score_details_link').click

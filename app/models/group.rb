@@ -569,6 +569,12 @@ class Group < ActiveRecord::Base
 
       given {|user, session| self.context && self.context.grants_right?(user, session, :read_sis)}
       can :read_sis
+
+      given {|user, session| self.context && self.context.grants_right?(user, session, :view_user_logins)}
+      can :view_user_logins
+
+      given {|user, session| self.context && self.context.grants_right?(user, session, :read_email_addresses)}
+      can :read_email_addresses
     end
   end
 

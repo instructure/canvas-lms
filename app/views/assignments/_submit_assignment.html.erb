@@ -86,7 +86,7 @@
         </td>
       </tr><tr>
         <td colspan="2" style="text-align: center;">
-          <div style="text-align: left;">
+          <div style="text-align: <%= direction('left') %>;">
             <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
           </div>
         </td>
@@ -116,7 +116,7 @@
       cursor: pointer;
       -moz-border-radius: 3px;
       width: 80%;
-      padding-right: 20px;
+      padding-<%= direction('right') %>: 20px;
     }
     #google_docs_tree li.file:hover {
       background-color: #eee;
@@ -128,11 +128,11 @@
       background-color: #ddd;
     }
     #google_docs_tree li.file .filename {
-      float: left;
+      float: <%= direction('left') %>;
       max-width: 98%;
     }
     #google_docs_tree li.file .popout {
-      float: right;
+      float: <%= direction('right') %>;
     }
     </style>
     <% if show_google_docs %>
@@ -176,7 +176,7 @@
                 </td>
               </tr><tr>
                 <td colspan="2" style="text-align: center;">
-                  <div style="text-align: left;">
+                  <div style="text-align: <%= direction('left') %>;">
                     <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
                   </div>
                 </td>
@@ -248,7 +248,7 @@
           </tr>
           <tr>
             <td colspan="2" style="text-align: center;">
-              <div style="text-align: left;">
+              <div style="text-align: <%= direction('left') %>;">
                 <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
               </div>
             </td>
@@ -313,7 +313,7 @@
             </td>
           </tr><tr>
             <td colspan="2" style="text-align: center;">
-              <div style="text-align: left;">
+              <div style="text-align: <%= direction('left') %>;">
                 <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :style => "height: 16px;", :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
               </div>
             </td>

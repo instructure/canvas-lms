@@ -68,6 +68,18 @@ it('shows the loading past indicator when loadingPast prop is true', () => {
   expect(wrapper).toMatchSnapshot();
 });
 
+it('renders loading past spinner when loading past and there are no future items', () => {
+  const wrapper = shallow(
+    <PlannerApp
+      days={[]}
+      timeZone="UTC"
+      changeToDashboardCardView={() => {}}
+      firstNewActivityDate={moment().add(-1, 'days')}
+      loadingPast
+    />);
+    expect(wrapper).toMatchSnapshot();
+});
+
 it('notifies the UI to perform dynamic updates', () => {
   const mockUpdate = jest.fn();
   const wrapper = shallow(<PlannerApp
@@ -93,4 +105,14 @@ it('shows new activity button when there is new activity, but no current items',
       firstNewActivityDate={moment().add(-1, 'days')}
     />);
   expect(wrapper.find('StickyButton')).toHaveLength(1);
+});
+
+it('shows load prior items button when there is more to load', () => {
+  const wrapper = shallow(<PlannerApp {...getDefaultValues()} />);
+  expect(wrapper.find('ShowOnFocusButton')).toHaveLength(1);
+});
+
+it('does not show load prior items button when all past items are loaded', () => {
+  const wrapper = shallow(<PlannerApp {...getDefaultValues()} allPastItemsLoaded />);
+  expect(wrapper.find('ShowOnFocusButton')).toHaveLength(0);
 });

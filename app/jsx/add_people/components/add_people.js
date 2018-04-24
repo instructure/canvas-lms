@@ -19,7 +19,8 @@
 import I18n from 'i18n!roster'
 import React from 'react'
 import {bool, func, shape, arrayOf, oneOfType} from 'prop-types'
-import Modal, {ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-core/lib/components/Modal'
+import Modal, {ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
+import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
 import Heading from '@instructure/ui-core/lib/components/Heading'
 import Button from '@instructure/ui-core/lib/components/Button'
 import Spinner from '@instructure/ui-core/lib/components/Spinner'
@@ -113,6 +114,11 @@ export default class AddPeople extends React.Component {
   }
   componentWillReceiveProps(nextProps) {
     if (nextProps.usersEnrolled) this.close()
+    if (nextProps.apiState && nextProps.apiState.error) {
+      this.setState({
+        focusToClose: true
+      })
+    }
   }
   componentDidUpdate() {
     this.manageFocus()
@@ -152,13 +158,16 @@ export default class AddPeople extends React.Component {
     if (this.state.focusToTop) {
       if (this.content) this.content.focus()
       this.setState({focusToTop: false})
+    } else if (this.state.focusToClose) {
+      if (this.modalCloseBtn) this.modalCloseBtn.focus();
+      this.setState({focusToClose: false});
     }
   }
 
   // modal next and back handlers ---------------------
   // on next callback from PeopleSearch page
   searchNext = () => {
-    this.setState({currentPage: PEOPLEVALIDATIONISSUES, focusToTop: true})
+    this.setState({currentPage: PEOPLEVALIDATIONISSUES, focusToClose: true})
     this.props.validateUsers()
   }
   // on next callback from PeopleValidationIssues page
@@ -297,18 +306,25 @@ export default class AddPeople extends React.Component {
 
     return (
       <Modal
-        closeButtonLabel={cancelLabel}
         id="add_people_modal"
         open={this.props.isOpen}
         label={modalTitle}
-        applicationElement={() => document.getElementById('application')}
         onDismiss={this.close}
         ref={node => { this.node = node }}
-        shouldCloseOnOverlayClick={false}
+        shouldCloseOnDocumentClick={false}
         size="medium"
         tabIndex="-1"
       >
         <ModalHeader>
+          <CloseButton
+            buttonRef={c => { this.modalCloseBtn = c }}
+            placement="end"
+            offset="medium"
+            variant="icon"
+            onClick={this.close}
+          >
+            {cancelLabel}
+          </CloseButton>
           <Heading tabIndex="-1">{modalTitle}</Heading>
         </ModalHeader>
         <ModalBody>

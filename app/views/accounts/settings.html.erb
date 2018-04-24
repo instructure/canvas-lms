@@ -41,7 +41,7 @@
     }
     fieldset.nested {
       margin-top: 0;
-      margin-left: 20px;
+      margin-<%= direction('left') %>: 20px;
     }
     legend{
       font-size: 1.1em;
@@ -696,10 +696,10 @@ acknowledge that you have read and agreed to the
                                       :class => 'notification_from_name_option' %>
             <%= settings.label :outgoing_email_default_name_option_default, :en => "Default Canvas Setting" %>
           </div>
-          <div style='padding-left: 2em;'>
+          <div style='padding-<%= direction('left') %>: 2em;'>
             <strong><%= t 'notifications.example', 'Example:' %></strong>
             <blockquote>
-              <table class="formtable" style='margin-left: 1.5em;'>
+              <table class="formtable" style='margin-<%= direction('left') %>: 1.5em;'>
               <tr>
                 <td><%= t 'notifications.from', 'From' %></td>
                 <td><%= HostUrl.outgoing_email_default_name %> <%= '<notifications@instructure.com>' %></td>
@@ -729,17 +729,17 @@ acknowledge that you have read and agreed to the
                                       :class => 'notification_from_name_option' %>
             <%= settings.label :outgoing_email_default_name_option_custom, :en => 'Custom "From" Name' %>
           </div>
-          <div style='padding-left: 2em;'>
+          <div style='padding-<%= direction('left') %>: 2em;'>
             <p>
               <%= t('notifications.custom_name_description', 'If selected, this will replace all other branding sent in Canvas notifications.') %>
               <br/>
               <%= text_field_tag 'account[settings][outgoing_email_default_name]', @account.settings[:outgoing_email_default_name] %>
             </p>
           </div>
-          <div style='padding-left: 2em;'>
+          <div style='padding-<%= direction('left') %>: 2em;'>
             <strong><%= t 'notifications.example', 'Example:' %></strong>
             <blockquote>
-            <table class="formtable" style='margin-left: 1.5em;'>
+            <table class="formtable" style='margin-<%= direction('left') %>: 1.5em;'>
               <tr>
                 <td><%= t 'notifications.from', 'From' %></td>
                 <td><strong id='custom_default_name_display'></strong> <%= '<notifications@instructure.com>' %></td>
@@ -775,7 +775,7 @@ acknowledge that you have read and agreed to the
             </tr>
           </table>
 
-          <table style="margin-left: 1.5em;" cellspacing="0" class="formtable">
+          <table style="margin-<%= direction('left') %>: 1.5em;" cellspacing="0" class="formtable">
             <tr>
               <td>
                 <b><%= t('notifications.external_services_warning_label', 'Pop-up Message Content:') %></b>

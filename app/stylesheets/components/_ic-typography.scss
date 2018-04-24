@@ -575,21 +575,21 @@ $popoverArrowDistanceFromCorner: $popoverArrowOuterWidth;
     height:0;
     content: "";
     top: -$popoverArrowOuterWidth * 2;
-    #{direction(left)}: $popoverArrowDistanceFromCorner;
+    left: $popoverArrowDistanceFromCorner;
   }
   &:after {
     border-bottom-color: $popoverTitleBackground;
     border-width: $popoverArrowWidth;
     top: -$popoverArrowWidth * 2;
-    #{direction(left)}: $popoverArrowDistanceFromCorner + 1;
+    left: $popoverArrowDistanceFromCorner + 1;
   }
   &.right:before {
-    #{direction(left)}: auto;
-    #{direction(right)}: $popoverArrowDistanceFromCorner;
+    left: auto;
+    right: $popoverArrowDistanceFromCorner;
   }
   &.right:after {
-    #{direction(left)}: auto;
-    #{direction(right)}: $popoverArrowDistanceFromCorner + 1;
+    left: auto;
+    right: $popoverArrowDistanceFromCorner + 1;
   }
   &.bottom:before {
     border-color: $popoverArrowOuterColor transparent transparent transparent;
@@ -604,12 +604,12 @@ $popoverArrowDistanceFromCorner: $popoverArrowOuterWidth;
   &.center:before {
     left: 50%;
     margin-left: -$popoverArrowOuterWidth;
-    #{direction(right)}: auto;
+    right: auto;
   }
   &.center:after {
     left: 50%;
     margin-left: -$popoverArrowWidth;
-    #{direction(right)}: auto;
+    right: auto;
   }
   &.middle:before {
     top: 50%;
@@ -625,26 +625,26 @@ $popoverArrowDistanceFromCorner: $popoverArrowOuterWidth;
     top: 50%;
     margin-top: -$popoverArrowOuterWidth;
     bottom: auto;
-    #{direction(left)}: -$popoverArrowOuterWidth * 2;
-    #{direction(right)}: auto;
+    left: -$popoverArrowOuterWidth * 2;
+    right: auto;
     border-color: transparent $popoverArrowOuterColor transparent transparent;
   }
   &.horizontal:after {
     top: 50%;
     margin-top: -$popoverArrowWidth;
     bottom: auto;
-    #{direction(left)}: -$popoverArrowWidth * 2;
-    #{direction(right)}: auto;
+    left: -$popoverArrowWidth * 2;
+    right: auto;
     border-color: transparent $popoverArrowColor transparent transparent;
   }
   &.right.horizontal:before {
-    #{direction(left)}: auto;
-    #{direction(right)}: -$popoverArrowOuterWidth * 2;
+    left: auto;
+    right: -$popoverArrowOuterWidth * 2;
     border-color: transparent transparent transparent $popoverArrowOuterColor;
   }
   &.right.horizontal:after {
-    #{direction(left)}: auto;
-    #{direction(right)}: -$popoverArrowWidth * 2;
+    left: auto;
+    right: -$popoverArrowWidth * 2;
     border-color: transparent transparent transparent $popoverArrowColor;
   }
   &.bottom.horizontal:before {

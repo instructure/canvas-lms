@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, { Component } from 'react';
+import classnames from 'classnames';
 import themeable from '@instructure/ui-themeable/lib';
 import Text from '@instructure/ui-core/lib/components/Text';
 import Checkbox from '@instructure/ui-core/lib/components/Checkbox';
@@ -31,10 +32,11 @@ import Calendar from 'instructure-icons/lib/Line/IconCalendarMonthLine';
 import Page from 'instructure-icons/lib/Line/IconMsWordLine';
 import NotificationBadge, { MissingIndicator, NewActivityIndicator } from '../NotificationBadge';
 import BadgeList from '../BadgeList';
+import responsiviser from '../responsiviser';
 import styles from './styles.css';
 import theme from './theme.js';
 import { arrayOf, bool, number, string, func, shape, object } from 'prop-types';
-import { badgeShape, userShape, statusShape } from '../plannerPropTypes';
+import { badgeShape, userShape, statusShape, sizeShape } from '../plannerPropTypes';
 import { showPillForOverdueStatus } from '../../utilities/statusUtils';
 import { momentObj } from 'react-moment-proptypes';
 import formatMessage from '../../format-message';
@@ -66,10 +68,12 @@ export class PlannerItem extends Component {
     newActivity: bool,
     showNotificationBadge: bool,
     currentUser: shape(userShape),
+    responsiveSize: sizeShape,
   };
 
   static defaultProps = {
     badges: [],
+    responsiveSize: 'large',
   };
 
   constructor (props) {
@@ -114,6 +118,10 @@ export class PlannerItem extends Component {
 
   getScrollable () {
     return this.rootDivRef;
+  }
+
+  getLayout() {
+    return this.props.responsiveSize;
   }
 
   renderDateField = () => {
@@ -259,7 +267,7 @@ export class PlannerItem extends Component {
       formatMessage('{assignmentType} {title} is incomplete',
         { assignmentType: assignmentType, title: this.props.title });
     return (
-      <div className={styles.root} ref={this.registerRootDivRef}>
+      <div className={classnames(styles.root, styles[this.getLayout()])} ref={this.registerRootDivRef}>
         <NotificationBadge>{this.renderNotificationBadge()}</NotificationBadge>
         <div className={styles.completed}>
           <Checkbox
@@ -286,4 +294,5 @@ export class PlannerItem extends Component {
   }
 }
 
-export default animatable(themeable(theme, styles)(PlannerItem));
+const ResponsivePlannerItem = responsiviser()(PlannerItem);
+export default animatable(themeable(theme, styles)(ResponsivePlannerItem));

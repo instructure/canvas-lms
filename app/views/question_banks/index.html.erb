@@ -35,19 +35,19 @@
     display: inline-block;
   }
   .question_bank .header_content {
-    float: left;
+    float: <%= direction('left') %>;
   }
   .question_bank #edit_bank_form {
-    float: left;
+    float: <%= direction('left') %>;
   }
   .question_bank .header .links {
-    float: right;
+    float: <%= direction('right') %>;
   }
   .question_bank:hover .header .links {
     opacity: 1.0;
   }
   .question_bank .content {
-    padding-left: 20px;
+    padding-<%= direction('left') %>: 20px;
     font-size: 0.8em;
   }
   </style>

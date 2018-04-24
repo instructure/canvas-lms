@@ -100,10 +100,19 @@ describe DeveloperKey do
     let(:root_account_key) { DeveloperKey.create!(account: root_account) }
     let(:root_account) { account_model }
 
+    context 'when account passed is nil' do
+      it 'returns nil' do
+        expect(site_admin_key.account_binding_for(nil)).to be_nil
+        expect(root_account_key.account_binding_for(nil)).to be_nil
+      end
+    end
+
     context 'when site admin' do
       context 'when binding state is "allow"' do
         before do
-          site_admin_key.developer_key_account_bindings.create!(account: root_account)
+          site_admin_key.developer_key_account_bindings.create!(
+            account: root_account, workflow_state: DeveloperKeyAccountBinding::ALLOW_STATE
+          )
         end
 
         it 'finds the site admin binding when requesting site admin account' do
@@ -112,6 +121,7 @@ describe DeveloperKey do
         end
 
         it 'finds the root account binding when requesting root account' do
+          site_admin_key.developer_key_account_bindings.first.update!(workflow_state: DeveloperKeyAccountBinding::ALLOW_STATE)
           binding = site_admin_key.account_binding_for(root_account)
           expect(binding.account).to eq root_account
         end

@@ -66,8 +66,8 @@ class User < ActiveRecord::Base
   has_many :as_observer_observation_links, -> { where.not(:workflow_state => 'deleted') }, class_name: 'UserObservationLink',
     foreign_key: :observer_id, dependent: :destroy, inverse_of: :observer
 
-  has_many :linked_observers, :through => :as_student_observation_links, :source => :observer, :class_name => 'User'
-  has_many :linked_students, :through => :as_observer_observation_links, :source => :student, :class_name => 'User'
+  has_many :linked_observers, -> { distinct }, :through => :as_student_observation_links, :source => :observer, :class_name => 'User'
+  has_many :linked_students, -> { distinct }, :through => :as_observer_observation_links, :source => :student, :class_name => 'User'
 
   has_many :all_courses, :source => :course, :through => :enrollments
   has_many :all_courses_for_active_enrollments, -> { Enrollment.active }, :source => :course, :through => :enrollments
@@ -94,6 +94,7 @@ class User < ActiveRecord::Base
   has_many :pseudonyms, -> { order(:position) }, dependent: :destroy
   has_many :active_pseudonyms, -> { where("pseudonyms.workflow_state<>'deleted'") }, class_name: 'Pseudonym'
   has_many :pseudonym_accounts, :source => :account, :through => :pseudonyms
+  has_many :active_pseudonym_accounts, :source => :account, :through => :active_pseudonyms
   has_one :pseudonym, -> { where("pseudonyms.workflow_state<>'deleted'").order(:position) }
   has_many :attachments, :as => 'context', :dependent => :destroy
   has_many :active_images, -> { where("attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted').order('attachments.display_name').preload(:thumbnail) }, as: :context, inverse_of: :context, class_name: 'Attachment'
@@ -233,6 +234,12 @@ class User < ActiveRecord::Base
     else
       active_observer_scope.where("users.id NOT IN (?)", users_observing_students)
     end
+  }
+
+  scope :linked_through_root_accounts, lambda {|root_accounts|
+    root_accounts = Array(root_accounts)
+    root_accounts << nil # TODO: remove after root_account_id is populated and is not-nulled (a)
+    where(UserObservationLink.table_name => {:root_account_id => root_accounts})
   }
 
   def reload(*)
@@ -1053,6 +1060,12 @@ class User < ActiveRecord::Base
     given {|user| self.check_accounts_right?(user, :view_all_grades) }
     can :read_grades
 
+    given {|user| self.check_accounts_right?(user, :view_user_logins) }
+    can :view_user_logins
+
+    given {|user| self.check_accounts_right?(user, :read_email_addresses) }
+    can :read_email_addresses
+
     given do |user|
       self.check_accounts_right?(user, :manage_user_logins) && self.adminable_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) }
     end
@@ -1298,7 +1311,9 @@ class User < ActiveRecord::Base
       @avatar_url ||= self.avatar_image_url
     end
     @avatar_url ||= fallback if self.avatar_image_source == 'no_pic'
-    @avatar_url ||= gravatar_url(size, fallback, request) if avatar_setting == 'enabled'
+    if (avatar_setting == 'enabled') && (self.avatar_image_source == 'gravatar')
+      @avatar_url ||= gravatar_url(size, fallback, request)
+    end
     @avatar_url ||= fallback
   end
 
@@ -1439,6 +1454,14 @@ class User < ActiveRecord::Base
 
   def disabled_inbox?
     !!preferences[:disable_inbox]
+  end
+
+  def create_announcements_unlocked?
+    preferences.fetch(:create_announcements_unlocked, false)
+  end
+
+  def create_announcements_unlocked(bool)
+    preferences[:create_announcements_unlocked] = bool
   end
 
   def use_new_conversations?
@@ -2396,7 +2419,7 @@ class User < ActiveRecord::Base
   end
 
   def user_can_edit_name?
-    associated_root_accounts.any? { |a| a.settings[:users_can_edit_name] != false } || associated_root_accounts.empty?
+    active_pseudonym_accounts.any? { |a| a.settings[:users_can_edit_name] != false } || active_pseudonym_accounts.empty?
   end
 
   def sections_for_course(course)

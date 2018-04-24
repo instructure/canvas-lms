@@ -1624,20 +1624,13 @@ describe Account do
       @account = Account.create!
     end
 
-    it "is true if hijack_crocodoc_sessions is true and new annotations are enabled" do
+    it "is true if hijack_crocodoc_sessions is true" do
       allow(Canvadocs).to receive(:hijack_crocodoc_sessions?).and_return(true)
-      @account.enable_feature!(:new_annotations)
       expect(@account).to be_migrate_to_canvadocs
     end
 
-    it "is false if new annotations are enabled but hijack_crocodoc_sessions is false" do
+    it "is false if hijack_crocodoc_sessions is false" do
       allow(Canvadocs).to receive(:hijack_crocodoc_sessions?).and_return(false)
-      @account.enable_feature!(:new_annotations)
-      expect(@account).not_to be_migrate_to_canvadocs
-    end
-
-    it "is false if hijack_crocodoc_sessions is true but new annotations are disabled" do
-      allow(Canvadocs).to receive(:hijack_crocodoc_sessions?).and_return(true)
       expect(@account).not_to be_migrate_to_canvadocs
     end
   end

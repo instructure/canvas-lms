@@ -38,7 +38,7 @@
         <%= before_label(:time_elapsed, "Time Elapsed") %>
       <% end %>
     </span>
-    <span style="font-size: 0.8em; padding-left: 10px;">
+    <span style="font-size: 0.8em; padding-<%= direction('left') %>: 10px;">
       <a href="#" class="hide_time_link"><%= t('links.hide_time_running', "Hide") %></a>
     </span>
     <% if @quiz.due_at %>

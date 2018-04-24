@@ -98,7 +98,7 @@
 <% unless @presenter.prior_enrollments.empty? %>
 <div style="margin-top: 20px; display: none;" id="previous_courses">
 <h2><%= t('titles.previous_courses', 'Previous Courses') %></h2>
-<table class="summary" style="margin-left: 20px; min-width: 350px;">
+<table class="summary" style="margin-<%= direction('left') %>: 20px; min-width: 350px;">
   <thead><tr>
     <th><%= t('course', 'Course') %></th>
     <th><%= t('percent', 'Percent') %></th>

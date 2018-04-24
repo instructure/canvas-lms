@@ -653,11 +653,6 @@ class ActiveRecord::Base
 
   include ActiveSupport::Callbacks::Suspension
 
-  # saves the record with all its save callbacks suspended.
-  def save_without_callbacks
-    suspend_callbacks(kind: [:validation, :save, (new_record? ? :create : :update)]) { save }
-  end
-
   def self.touch_all_records
     self.find_ids_in_ranges do |min_id, max_id|
       self.where(primary_key => min_id..max_id).touch_all
@@ -1268,6 +1263,13 @@ end
 class ActiveRecord::MigrationProxy
   delegate :connection, :tags, :cassandra_cluster, to: :migration
 
+  def initialize(*)
+    super
+    if version&.to_s&.length == 14 && version.to_s > Time.now.utc.strftime("%Y%m%d%H%M%S")
+      raise "please don't create migrations with a version number in the future: #{name} #{version}"
+    end
+  end
+
   def runnable?
     !migration.respond_to?(:runnable?) || migration.runnable?
   end
@@ -1507,6 +1509,17 @@ Autoextend.hook(:"ActiveRecord::Generators::MigrationGenerator",
                 singleton: true,
                 method: :prepend,
                 optional: true)
+
+module AlwaysUseMigrationDates
+  def next_migration_number(number)
+    if ActiveRecord::Base.timestamped_migrations
+      Time.now.utc.strftime("%Y%m%d%H%M%S")
+    else
+      SchemaMigration.normalize_migration_number(number)
+    end
+  end
+end
+ActiveRecord::Migration.prepend(AlwaysUseMigrationDates)
 
 module ExplainAnalyze
   def exec_explain(queries, analyze: false) # :nodoc:

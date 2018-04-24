@@ -51,7 +51,7 @@ module ErrorContext
       output_buffer = nil
       example = summary.example
       formatted_exception = ::RSpec::Core::Formatters::ExceptionPresenter.new(example.exception, example).fully_formatted(nil)
-      error_template.result(binding)
+      eval(error_template.src, binding, error_template_path)
     end
 
     def recent_spec_runs
@@ -72,10 +72,13 @@ module ErrorContext
       "(newest)<br>#{errors}<br>(oldest)".html_safe
     end
 
+    def error_template_path
+      File.join(File.dirname(__FILE__), "html_page_formatter", "template.html.erb")
+    end
+
     def error_template
       @error_template ||= begin
-        layout_path = File.join(File.dirname(__FILE__), "html_page_formatter", "template.html.erb")
-        ActionView::Template::Handlers::Erubis.new(File.read(layout_path))
+        ActionView::Template::Handlers::ERB::Erubi.new(File.read(error_template_path))
       end
     end
   end

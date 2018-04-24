@@ -111,7 +111,6 @@ describe CrocodocSessionsController do
   context "Migrate to Canvadocs" do
     before do
       @attachment.submit_to_crocodoc
-      Account.default.enable_feature!(:new_annotations)
       allow(Canvadocs).to receive(:enabled?).and_return true
       allow(Canvadocs).to receive(:annotations_supported?).and_return true
       allow(Canvadocs).to receive(:hijack_crocodoc_sessions?).and_return false

@@ -357,7 +357,7 @@
           border-bottom: 1px dotted #e1e2e3;
           padding-top: $ic-sp/2;
           padding-bottom: $ic-sp/2;
-          padding-left: $ic-sp*2.5;
+          padding-#{direction(left)}: $ic-sp*2.5;
           .ig-title {
             color: $ic-font-color-dark;
           }

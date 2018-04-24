@@ -495,9 +495,23 @@ test('re-renders the filters after updating submissions load state', function ()
   this.loaderPromises.gotSubmissions.resolve();
 });
 
+test('sets assignmentGroupsLoaded to false', function () {
+  const gradebook = this.createInitializedGradebook()
+  strictEqual(gradebook.contentLoadStates.assignmentGroupsLoaded, false)
+})
+
 QUnit.module('Gradebook#reloadStudentData', {
   setup () {
+    this.gradingPeriodSet = {
+      id: '1501',
+      grading_periods: [
+        { id: '701', weight: 50 },
+        { id: '702', weight: 50 }
+      ],
+      weighted: true
+    }
     this.loaderPromises = {
+      gotGradingPeriodAssignments: $.Deferred(),
       gotStudentIds: $.Deferred(),
       gotStudents: $.Deferred(),
       gotSubmissions: $.Deferred(),
@@ -647,12 +661,68 @@ test('includes the custom column data page callback when calling DataLoader.load
   strictEqual(options.customColumnDataPageCb, gradebook.gotCustomColumnDataChunk);
 });
 
+test('includes the getGradingPeriodAssignments param when calling DataLoader.loadGradebookData', function () {
+  const gradebook = createGradebook();
+  gradebook.reloadStudentData();
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  strictEqual(options.getGradingPeriodAssignments, false);
+});
+
+test('optionally sets getGradingPeriodAssignments to true', function () {
+  const gradebook = createGradebook();
+  const optionOverrides = { getGradingPeriodAssignments: true }
+  gradebook.reloadStudentData(optionOverrides);
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  strictEqual(options.getGradingPeriodAssignments, true);
+});
+
 test('requests data for hidden custom columns', function () {
   const gradebook = createGradebook({ custom_column_data_url: '/custom-column-data' });
   gradebook.reloadStudentData();
   const [options] = DataLoader.loadGradebookData.lastCall.args;
   strictEqual(options.customColumnDataParams.include_hidden, true);
 });
+
+test('calls gotGradingPeriodAssignments after grading period assignments are loaded', function () {
+  const gradebook = createGradebook({ grading_period_set: this.gradingPeriodSet })
+  this.stub(gradebook, 'gotGradingPeriodAssignments')
+  gradebook.reloadStudentData({ getGradingPeriodAssignments: true })
+  this.loaderPromises.gotGradingPeriodAssignments.resolve({ grading_period_assignments: {} })
+  strictEqual(gradebook.gotGradingPeriodAssignments.callCount, 1)
+})
+
+test('calls updateColumns after grading period assignments are loaded', function () {
+  const gradebook = createGradebook({ grading_period_set: this.gradingPeriodSet })
+  this.stub(gradebook, 'updateColumns')
+  gradebook.reloadStudentData({ getGradingPeriodAssignments: true })
+  this.loaderPromises.gotGradingPeriodAssignments.resolve({ grading_period_assignments: {} })
+  strictEqual(gradebook.updateColumns.callCount, 1)
+})
+
+test('calls the afterColumnsUpdated function (if it is supplied) when grading period assignments are loaded', function () {
+  const gradebook = createGradebook({ grading_period_set: this.gradingPeriodSet })
+  const afterColumnsUpdated = sinon.stub()
+  gradebook.reloadStudentData({ getGradingPeriodAssignments: true }, afterColumnsUpdated)
+  this.loaderPromises.gotGradingPeriodAssignments.resolve({ grading_period_assignments: {} })
+  strictEqual(afterColumnsUpdated.callCount, 1)
+})
+
+test('calls the afterColumnsUpdated function after columns are updated', function () {
+  const gradebook = createGradebook({ grading_period_set: this.gradingPeriodSet })
+  this.stub(gradebook, 'updateColumns')
+  const afterColumnsUpdated = sinon.stub()
+  gradebook.reloadStudentData(true, afterColumnsUpdated)
+  this.loaderPromises.gotGradingPeriodAssignments.resolve({ grading_period_assignments: {} })
+  sinon.assert.callOrder(gradebook.updateColumns, afterColumnsUpdated);
+})
+
+test('calls the passed function after grading period assignments are loaded', function () {
+  const gradebook = createGradebook({ grading_period_set: this.gradingPeriodSet })
+  const afterHeaderRewrite = sinon.stub()
+  gradebook.reloadStudentData(true, afterHeaderRewrite)
+  this.loaderPromises.gotGradingPeriodAssignments.resolve({ grading_period_assignments: {} })
+  strictEqual(afterHeaderRewrite.callCount, 1)
+})
 
 test('stores student ids when loaded', function () {
   const gradebook = createGradebook();
@@ -5126,7 +5196,7 @@ QUnit.module('Gradebook#toggleEnrollmentFilter', {
         updateColumnHeaders: this.stub()
       }
     };
-    this.stub(this.gradebook, 'reloadStudentData');
+    this.stub(this.gradebook, 'reloadStudentData').returns({});
     this.stub(this.gradebook, 'saveSettings').callsFake((_data, callback) => { callback() });
   }
 });
@@ -5573,7 +5643,7 @@ test('calls errorFn when response is not successful', function () {
   strictEqual(errorFn.callCount, 1);
 });
 
-QUnit.module('Gradebook#updateColumnsAndRenderViewOptionsMenu', function (hooks) {
+QUnit.module('Gradebook#updateColumns', function (hooks) {
   let gradebook;
 
   hooks.beforeEach(function () {
@@ -5581,16 +5651,15 @@ QUnit.module('Gradebook#updateColumnsAndRenderViewOptionsMenu', function (hooks)
     sinon.stub(gradebook.gradebookGrid, 'updateColumns');
     sinon.stub(gradebook, 'setVisibleGridColumns');
     sinon.stub(gradebook, 'updateColumnHeaders');
-    sinon.stub(gradebook, 'renderViewOptionsMenu');
   });
 
   test('sets the visible grid columns', function () {
-    gradebook.updateColumnsAndRenderViewOptionsMenu();
+    gradebook.updateColumns();
     strictEqual(gradebook.setVisibleGridColumns.callCount, 1);
   });
 
   test('sets the columns on the grid', function () {
-    gradebook.updateColumnsAndRenderViewOptionsMenu();
+    gradebook.updateColumns();
     strictEqual(gradebook.gradebookGrid.updateColumns.callCount, 1);
   });
 
@@ -5598,12 +5667,27 @@ QUnit.module('Gradebook#updateColumnsAndRenderViewOptionsMenu', function (hooks)
     gradebook.gradebookGrid.updateColumns.callsFake(() => {
       strictEqual(gradebook.setVisibleGridColumns.callCount, 1, 'setVisibleGridColumns was already called');
     });
-    gradebook.updateColumnsAndRenderViewOptionsMenu();
+    gradebook.updateColumns();
   });
 
   test('calls updateColumnHeaders', function () {
-    gradebook.updateColumnsAndRenderViewOptionsMenu();
+    gradebook.updateColumns();
     strictEqual(gradebook.updateColumnHeaders.callCount, 1);
+  });
+});
+
+QUnit.module('Gradebook#updateColumnsAndRenderViewOptionsMenu', function (hooks) {
+  let gradebook;
+
+  hooks.beforeEach(function () {
+    gradebook = createGradebook();
+    sinon.stub(gradebook, 'updateColumns');
+    sinon.stub(gradebook, 'renderViewOptionsMenu');
+  });
+
+  test('calls updateColumns', function () {
+    gradebook.updateColumnsAndRenderViewOptionsMenu();
+    strictEqual(gradebook.updateColumns.callCount, 1);
   });
 
   test('calls renderViewOptionsMenu', function () {
@@ -6249,9 +6333,17 @@ QUnit.module('Gradebook', () => {
       strictEqual(gradebook.getFilterColumnsBySetting('assignmentGroupId'), '2')
     })
 
-    test('deletes the assignment group filter setting when the filter is hidden', () => {
+    test('deletes the assignment group filter setting when the filter is hidden ' +
+      'and assignment groups have loaded', () => {
+      gradebook.setAssignmentGroupsLoaded(true)
       gradebook.updateFilterSettings(currentFilters.filter(type => type !== 'assignmentGroups'))
       strictEqual(gradebook.getFilterColumnsBySetting('assignmentGroupId'), null)
+    })
+
+    test('does not delete the assignment group filter setting when the filter is ' +
+      'hidden and assignment groups have not loaded', () => {
+      gradebook.updateFilterSettings(currentFilters.filter(type => type !== 'assignmentGroups'))
+      strictEqual(gradebook.getFilterColumnsBySetting('assignmentGroupId'), '2')
     })
 
     test('getFilterColumnsBySetting returns the grading period filter setting', () => {
@@ -6267,9 +6359,15 @@ QUnit.module('Gradebook', () => {
       strictEqual(gradebook.getFilterColumnsBySetting('contextModuleId'), '2')
     })
 
-    test('deletes the modules filter setting when the filter is hidden', () => {
+    test('deletes the modules filter setting when the filter is hidden and modules have loaded', () => {
+      gradebook.contentLoadStates.contextModulesLoaded = true
       gradebook.updateFilterSettings(currentFilters.filter(type => type !== 'modules'))
       strictEqual(gradebook.getFilterColumnsBySetting('contextModuleId'), null)
+    })
+
+    test('does not delete the modules filter setting when the filter is hidden and modules have not loaded', () => {
+      gradebook.updateFilterSettings(currentFilters.filter(type => type !== 'modules'))
+      strictEqual(gradebook.getFilterColumnsBySetting('contextModuleId'), '2')
     })
 
     test('getFilterColumnsBySetting returns the sections filter setting', () => {
@@ -8168,17 +8266,29 @@ QUnit.module('Gradebook', () => {
         }
         gradebook.addPendingGradeInfo(submission, invalidGradeInfo)
         Object.assign(gradeInfo, {enteredAs: 'points', grade: 'B', score: 9})
-        // return to ensure that any changes cause the hook to wait for the
-        // potential promise from the api
-        return gradebook.gradeSubmission(submission, gradeInfo)
       })
 
       test('removes an existing pending grade info for the submission', () => {
+        gradebook.gradeSubmission(submission, gradeInfo)
         strictEqual(gradebook.getPendingGradeInfo(submission), null)
       })
 
       test('does not update the grade via the api', () => {
+        gradebook.gradeSubmission(submission, gradeInfo)
         strictEqual(gradebook.apiUpdateSubmission.callCount, 0)
+      })
+
+      test('updates cells in the student row', () => {
+        sinon.stub(gradebook, 'updateRowCellsForStudentIds')
+        gradebook.gradeSubmission(submission, gradeInfo)
+        strictEqual(gradebook.updateRowCellsForStudentIds.callCount, 1)
+      })
+
+      test('uses the id of the student when updating the row cells', () => {
+        sinon.stub(gradebook, 'updateRowCellsForStudentIds')
+        gradebook.gradeSubmission(submission, gradeInfo)
+        const [userIds] = gradebook.updateRowCellsForStudentIds.lastCall.args
+        deepEqual(userIds, ['1101'])
       })
 
       test('re-renders the submission tray if it is open', function () {
@@ -8839,5 +8949,87 @@ QUnit.module('#setVisibleGridColumns', (hooks) => {
 
     gradebook.setVisibleGridColumns()
     deepEqual(gradebook.gridData.columns.frozen, ['total_grade'])
+  })
+})
+
+QUnit.module('Gradebook#gotGradingPeriodAssignments', () => {
+  test('sets the grading period assignments', function () {
+    const gradebook = createGradebook()
+    const gradingPeriodAssignments = { 1: [12, 7, 4], 8: [6, 2, 9] }
+    const fakeResponse = { grading_period_assignments: gradingPeriodAssignments }
+    gradebook.gotGradingPeriodAssignments(fakeResponse)
+    strictEqual(gradebook.courseContent.gradingPeriodAssignments, gradingPeriodAssignments)
+  })
+})
+
+QUnit.module('Gradebook#updateStudentHeadersAndReloadData', (hooks) => {
+  let gradebook
+
+  hooks.beforeEach(() => {
+    gradebook = createGradebook()
+    const reloadStudentDataResponse = { updateGradingPeriodAssignments: { then: (fn) => fn() } }
+    sinon.stub(gradebook, 'reloadStudentData').returns(reloadStudentDataResponse)
+  })
+
+  test('makes a call to update column headers', () => {
+    const updateColumnHeaders = sinon.stub(gradebook.gradebookGrid.gridSupport.columns, 'updateColumnHeaders')
+    gradebook.updateStudentHeadersAndReloadData()
+    strictEqual(updateColumnHeaders.callCount, 1)
+  })
+
+  test('updates the student column header', () => {
+    const updateColumnHeaders = sinon.stub(gradebook.gradebookGrid.gridSupport.columns, 'updateColumnHeaders')
+    gradebook.updateStudentHeadersAndReloadData()
+    const [columnHeadersToUpdate] = updateColumnHeaders.lastCall.args
+    deepEqual(columnHeadersToUpdate, ['student'])
+  })
+
+  test('reloads student data', () => {
+    gradebook.updateStudentHeadersAndReloadData()
+    strictEqual(gradebook.reloadStudentData.callCount, 1)
+  })
+
+  test('reloads the student data after the column headers have been updated', () => {
+    const updateColumnHeaders = sinon.stub(gradebook.gradebookGrid.gridSupport.columns, 'updateColumnHeaders')
+    gradebook.updateStudentHeadersAndReloadData()
+    sinon.assert.callOrder(updateColumnHeaders, gradebook.reloadStudentData)
+  })
+})
+
+QUnit.module('Gradebook#gotAllAssignmentGroups', (hooks) => {
+  let gradebook
+
+  hooks.beforeEach(() => {
+    gradebook = createGradebook()
+  })
+
+  test('sets the "assignment groups loaded" state', () => {
+    sinon.stub(gradebook, 'setAssignmentGroupsLoaded')
+    gradebook.gotAllAssignmentGroups([])
+    strictEqual(gradebook.setAssignmentGroupsLoaded.callCount, 1)
+  })
+
+  test('sets the "assignment groups loaded" state to true', () => {
+    sinon.stub(gradebook, 'setAssignmentGroupsLoaded')
+    gradebook.gotAllAssignmentGroups([])
+    strictEqual(gradebook.setAssignmentGroupsLoaded.getCall(0).args[0], true)
+  })
+})
+
+QUnit.module('Gradebook#setAssignmentGroupsLoaded', (hooks) => {
+  let gradebook
+
+  hooks.beforeEach(() => {
+    gradebook = createGradebook()
+  })
+
+  test('sets contentLoadStates.assignmentGroupsLoaded to true when passed true', () => {
+    gradebook.setAssignmentGroupsLoaded(true)
+    strictEqual(gradebook.contentLoadStates.assignmentGroupsLoaded, true)
+  })
+
+  test('sets contentLoadStates.assignmentGroupsLoaded to false when passed false', () => {
+    gradebook.setAssignmentGroupsLoaded(false)
+    strictEqual(gradebook.contentLoadStates.assignmentGroupsLoaded, false)
   })
 })

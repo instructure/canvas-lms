@@ -78,3 +78,11 @@ export function submitContentItem (contentItem) {
 
     return true;
   };
+
+export function verifyPledgeIsChecked(checkbox) {
+  if(checkbox.length > 0 && !checkbox.attr('checked')) {
+    alert(I18n.t('messages.agree_to_pledge', "You must agree to the submission pledge before you can submit this assignment."));
+    return false
+  }
+  return true
+}

@@ -49,7 +49,7 @@ describe "submissions" do
       type_in_tiny("#submission_body", 'text')
       f('button[type="submit"]').click
 
-      expect(f("#sidebar_content")).to include_text("Turned In!")
+      expect(f("#sidebar_content")).to include_text("Submitted!")
       expect(f("#content")).not_to contain_css(".error_text")
     end
 
@@ -115,7 +115,7 @@ describe "submissions" do
       f('#submission_comment').send_keys("hello comment")
       expect_new_page_load { f('#submit_file_button').click }
 
-      expect(f('#sidebar_content .header')).to include_text "Turned In!"
+      expect(f('#sidebar_content .header')).to include_text "Submitted!"
       expect(f('.details')).to include_text "testfile1"
       @submission = @assignment.reload.submissions.where(user_id: @student).first
       expect(@submission.submission_type).to eq 'online_upload'
@@ -193,7 +193,7 @@ describe "submissions" do
       # when
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       # expect
-      expect(f('#sidebar_content .details')).to include_text "Not Turned In!"
+      expect(f('#sidebar_content .details')).to include_text "Not Submitted!"
       expect(f('.submit_assignment_link')).to include_text "Submit Assignment"
     end
 
@@ -206,8 +206,8 @@ describe "submissions" do
       # when
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       # expect
-      expect(f('#sidebar_content .details')).not_to include_text "Turned In!"
-      expect(f('#sidebar_content .details')).not_to include_text "Not Turned In!"
+      expect(f('#sidebar_content .details')).not_to include_text "Submitted!"
+      expect(f('#sidebar_content .details')).not_to include_text "Not Submitted!"
       expect(f("#content")).not_to contain_css('.submit_assignment_link')
     end
 
@@ -376,7 +376,7 @@ describe "submissions" do
 
         expect_new_page_load { f('#submit_file_button').click }
 
-        expect(f('.details .header')).to include_text "Turned In!"
+        expect(f('.details .header')).to include_text "Submitted!"
         expect(f('.details')).to include_text "html-editing-test.html"
       end
 

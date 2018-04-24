@@ -16,12 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
 import $ from 'jquery'
 import EditPlannerNoteDetails from 'compiled/calendar/EditPlannerNoteDetails'
-import fcUtil from 'compiled/util/fcUtil'
 import tz from 'timezone'
-import detroit from 'timezone/America/Detroit'
 import french from 'timezone/fr_FR'
 import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'
@@ -61,7 +58,7 @@ const commonEvent = () => commonEventFactory(note, [{asset_string: 'user_1'}])
 
 test('should initialize input with start date', () => {
   const view = createView(commonEvent())
-  equal(view.$('.date_field').val(), 'Sat Jul 22, 2017')
+  equal(view.$('.date_field').val(), 'Jul 22, 2017')
 })
 
 test('should localize start date', () => {
@@ -76,7 +73,7 @@ test('should localize start date', () => {
     'date.abbr_month_names': ['août']
   })
   const view = createView(commonEvent())
-  equal(view.$('.date_field').val(), 'sam. 22 juil. 2017')
+  equal(view.$('.date_field').val(), '22 juil. 2017')
   I18nStubber.popFrame()
 })
 

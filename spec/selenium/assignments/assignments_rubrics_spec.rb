@@ -62,14 +62,6 @@ describe "assignment rubrics" do
       get "/courses/#{@course.id}/outcomes"
       expect_new_page_load{f(' .manage_rubrics').click}
 
-      # this was originally added in OUT-465. It will eventually be moved over
-      # into the below popover menu, so leaving the blow code in place for
-      # when that happens
-
-      # expect_new_page_load do
-      #   f('#popoverMenu button').click
-      #   f('[data-reactid*="manage-rubrics"]').click
-      # end
       expect do
        f('.add_rubric_link').click
        f('#add_criterion_container a:nth-of-type(1)').click
@@ -86,7 +78,7 @@ describe "assignment rubrics" do
        submit_form('#edit_rubric_form')
        wait_for_ajaximations
       end.to change(Rubric, :count).by(1)
-      expect(f('.rubric_table tbody tr:nth-of-type(3) .criterion_description_value')).
+      expect(f('.rubric_table tbody tr:nth-of-type(3) .description_title')).
                                 to include_text('criterion 1')
       expect(f('.rubric_table tbody tr:nth-of-type(3) .ratings td:nth-of-type(2) .rating_description_value')).
           to include_text('rating 1')
@@ -569,7 +561,7 @@ describe "assignment rubrics" do
 
         wait_for_ajaximations
 
-        expect(ffj('.criterion:visible .criterion_description_value')[2]).to include_text "no outcome row"
+        expect(ffj('.criterion:visible .description_title')[2]).to include_text "no outcome row"
       end
 
       it "should copy an existing learning outcome", priority: "1", test_id: 220343 do
@@ -582,7 +574,7 @@ describe "assignment rubrics" do
         f('#criterion_duplicate_menu ul li:nth-of-type(1)').click
         wait_for_ajaximations
 
-        expect(ffj('.criterion:visible .criterion_description_value')[2]).to include_text "Outcome row"
+        expect(ffj('.criterion:visible .description_title')[2]).to include_text "Outcome row"
       end
     end
   end

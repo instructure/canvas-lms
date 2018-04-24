@@ -61,7 +61,7 @@ class DeveloperKeyAccountBindingsController < ApplicationController
   #
   # @argument workflow_state [String]
   #   The workflow state for the binding. Must be one of "on", "off", or "allow".
-  #   Defaults to "allow".
+  #   Defaults to "off".
   #
   # @returns DeveloperKeyAccountBinding
   def create_or_update
@@ -126,7 +126,7 @@ class DeveloperKeyAccountBindingsController < ApplicationController
   def create_params
     workflow_state_param.merge(
       {
-        account_id: params[:account_id],
+        account: account,
         developer_key_id: params[:developer_key_id]
       }
     )

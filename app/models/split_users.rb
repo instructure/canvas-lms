@@ -124,18 +124,15 @@ class SplitUsers
       move_attachments(source_user, user, records.where(context_type: 'Attachment'))
       enrollment_ids = records.where(context_type: 'Enrollment', previous_user_id: user).pluck(:context_id)
       enrollments = Enrollment.where(id: enrollment_ids).where.not(user_id: user)
-      courses = []
-      enrollments.each do |e|
+      enrollments_to_update = enrollments.reject do |e|
         # skip conflicting enrollments
-        next if Enrollment.where(user_id: user,
-                                 course_section_id: e.course_section_id,
-                                 type: e.type,
-                                 role_id: e.role_id).where.not(id: e).shard(e.shard).exists?
-
-        e.user_id = user
-        e.save_without_callbacks
-        courses << e.course_id
+        Enrollment.where(user_id: user,
+                         course_section_id: e.course_section_id,
+                         type: e.type,
+                         role_id: e.role_id).where.not(id: e).shard(e.shard).exists?
       end
+      Enrollment.where(id: enrollments_to_update).update_all(user_id: user.id, updated_at: Time.now.utc)
+      courses = enrollments_to_update.map(&:course_id)
       transfer_enrollment_data(source_user, user, Course.where(id: courses))
       handle_submissions(source_user, user, records)
       account_users_ids = records.where(context_type: 'AccountUser').pluck(:context_id)

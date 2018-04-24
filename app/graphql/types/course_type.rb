@@ -36,8 +36,37 @@ module Types
 
     connection :assignmentsConnection do
       type AssignmentType.connection_type
-      resolve -> (course, _, ctx) {
-        Assignments::ScopedToUser.new(course, ctx[:current_user]).scope
+
+      argument :filter, AssignmentFilterInputType
+
+      resolve ->(course, args, ctx) {
+        assignments = Assignments::ScopedToUser.new(course, ctx[:current_user]).scope
+
+        assignments_resolver = ->(grading_period_id, has_grading_periods = nil) do
+          if grading_period_id
+            assignments.
+              joins(:submissions).
+              where(submissions: {grading_period_id: grading_period_id}).
+              distinct
+          elsif has_grading_periods
+            # this is the case where a grading_period_id was not passed *and*
+            # we are outside of any grading period (so we return nothing)
+            []
+          else
+            assignments
+          end
+        end
+
+        filter = args[:filter] || {}
+
+        if filter.key?(:gradingPeriodId)
+          assignments_resolver.call(filter[:gradingPeriodId])
+        else
+          Loaders::CurrentGradingPeriodLoader.load(course)
+            .then do |gp, has_grading_periods|
+            assignments_resolver.call(gp&.id, has_grading_periods)
+          end
+        end
       }
     end
 
@@ -155,5 +184,13 @@ module Types
     value "available"
     value "completed"
     value "deleted"
+  end
+
+  AssignmentFilterInputType = GraphQL::InputObjectType.define do
+    name "AssignmentFilter"
+    argument :gradingPeriodId, types.ID, <<-DESC
+    only return assignments for the given grading period. Defaults to the
+current grading period. Pass `null` to not filter by grading period.
+    DESC
   end
 end

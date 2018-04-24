@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import TestUtils from 'react-addons-test-utils'
+import {mount, shallow} from 'enzyme'
 import DeveloperKeyModal from 'jsx/developer_keys/DeveloperKeyModal'
 import $ from 'jquery'
 
@@ -77,7 +77,7 @@ test('it opens the modal if isOpen prop is true', () => {
     setEditingDeveloperKey: () => {}
   }
 
-  TestUtils.renderIntoDocument(
+  const wrapper = shallow(
     <DeveloperKeyModal
       closeModal={() => {}}
       createOrEditDeveloperKeyState={createDeveloperKeyState}
@@ -86,8 +86,8 @@ test('it opens the modal if isOpen prop is true', () => {
       mountNode={modalMountNode}
     />
   )
-
-  ok($('span[aria-label="Edit developer key"] h4').is(':visible'))
+  equal(wrapper.find('Modal').prop('open'), true)
+  ok(wrapper.find('Modal Heading [level="h4"]').exists())
 })
 
 test('it closes the modal if isOpen prop is false', () => {
@@ -96,7 +96,7 @@ test('it closes the modal if isOpen prop is false', () => {
     setEditingDeveloperKey: () => {}
   }
 
-  TestUtils.renderIntoDocument(
+  const wrapper = shallow(
     <DeveloperKeyModal
       closeModal={() => {}}
       createOrEditDeveloperKeyState={closedDeveloperKeyState}
@@ -105,8 +105,7 @@ test('it closes the modal if isOpen prop is false', () => {
       mountNode={modalMountNode}
     />
   )
-
-  notOk($('span[aria-label="Edit developer key"] h4').is(':visible'))
+  equal(wrapper.find('Modal').prop('open'), false)
 })
 
 test('it dismisses the modal when the "cancel" button is pressed', () => {
@@ -118,7 +117,7 @@ test('it dismisses the modal when the "cancel" button is pressed', () => {
     setEditingDeveloperKey: () => {}
   }
 
-  TestUtils.renderIntoDocument(
+  const wrapper = shallow(
     <DeveloperKeyModal
       createOrEditDeveloperKeyState={createDeveloperKeyState}
       actions={fakeActions}
@@ -126,10 +125,8 @@ test('it dismisses the modal when the "cancel" button is pressed', () => {
       mountNode={modalMountNode}
     />
   )
-  const [, button] = document.querySelectorAll(
-    '#fixtures span[aria-label="Edit developer key"] button'
-  )
-  TestUtils.Simulate.click(button)
+  const cancelButton = wrapper.find('Button').filterWhere(n => n.prop('children') === 'Cancel')
+  cancelButton.simulate('click')
 
   ok(closeModalSpy.called)
 })
@@ -143,7 +140,7 @@ test('clear the active key when the cancel button is closed', () => {
     setEditingDeveloperKey: setKeySpy
   }
 
-  TestUtils.renderIntoDocument(
+  const wrapper = shallow(
     <DeveloperKeyModal
       createOrEditDeveloperKeyState={createDeveloperKeyState}
       actions={fakeActions}
@@ -151,10 +148,8 @@ test('clear the active key when the cancel button is closed', () => {
       mountNode={modalMountNode}
     />
   )
-  const [, button] = document.querySelectorAll(
-    '#fixtures span[aria-label="Edit developer key"] button'
-  )
-  TestUtils.Simulate.click(button)
+  const cancelButton = wrapper.find('Button').filterWhere(n => n.prop('children') === 'Cancel')
+  cancelButton.simulate('click')
 
   ok(setKeySpy.called)
   equal(setKeySpy.args[0].length, 0)
@@ -177,7 +172,7 @@ test('it uses the create URL if a key is being created', () => {
     }
   }
 
-  TestUtils.renderIntoDocument(
+  const wrapper = shallow(
     <DeveloperKeyModal
       closeModal={() => {}}
       createOrEditDeveloperKeyState={createDeveloperKeyState}
@@ -188,12 +183,10 @@ test('it uses the create URL if a key is being created', () => {
     />
   )
 
-  const [, , button] = document.querySelectorAll(
-    '#fixtures span[aria-label="Edit developer key"] button'
-  )
+  const saveButton = wrapper.find('Button').filterWhere(n => n.prop('children') === 'Save Key')
+  saveButton.simulate('click')
 
-  TestUtils.Simulate.click(button)
-  const [[, url]] = createOrEditSpy.args
+  const url = createOrEditSpy.args[0][1]
   equal(url, '/api/v1/accounts/23/developer_keys')
 })
 
@@ -214,7 +207,7 @@ test('it uses POST if a key is being created', () => {
     }
   }
 
-  TestUtils.renderIntoDocument(
+  const wrapper = shallow(
     <DeveloperKeyModal
       closeModal={() => {}}
       createOrEditDeveloperKeyState={createDeveloperKeyState}
@@ -225,11 +218,10 @@ test('it uses POST if a key is being created', () => {
     />
   )
 
-  const [, , button] = document.querySelectorAll(
-    '#fixtures span[aria-label="Edit developer key"] button'
-  )
-  TestUtils.Simulate.click(button)
-  const [[, , method]] = createOrEditSpy.args
+  const saveButton = wrapper.find('Button').filterWhere(n => n.prop('children') === 'Save Key')
+  saveButton.simulate('click')
+
+  const method = createOrEditSpy.args[0][2]
   equal(method, 'post')
 })
 
@@ -245,7 +237,7 @@ test('it uses the edit URL if a key is being edited', () => {
     dispatch: dispatchSpy
   }
 
-  TestUtils.renderIntoDocument(
+  const wrapper = shallow(
     <DeveloperKeyModal
       closeModal={() => {}}
       createOrEditDeveloperKeyState={editDeveloperKeyState}
@@ -255,11 +247,10 @@ test('it uses the edit URL if a key is being edited', () => {
     />
   )
 
-  const [, , button] = document.querySelectorAll(
-    '#fixtures span[aria-label="Create developer key"] button'
-  )
-  TestUtils.Simulate.click(button)
-  const [[, url]] = createOrEditSpy.args
+  const saveButton = wrapper.find('Button').filterWhere(n => n.prop('children') === 'Save Key')
+  saveButton.simulate('click')
+
+  const url = createOrEditSpy.args[0][1]
   equal(url, `/api/v1/developer_keys/${developerKey.id}`)
 })
 
@@ -274,7 +265,7 @@ test('it uses PUT if a key is being edited', () => {
     dispatch: dispatchSpy
   }
 
-  TestUtils.renderIntoDocument(
+  const wrapper = shallow(
     <DeveloperKeyModal
       closeModal={() => {}}
       createOrEditDeveloperKeyState={editDeveloperKeyState}
@@ -284,13 +275,11 @@ test('it uses PUT if a key is being edited', () => {
     />
   )
 
-  const [, , button] = document.querySelectorAll(
-    '#fixtures span[aria-label="Create developer key"] button'
-  )
-  TestUtils.Simulate.click(button)
+  const saveButton = wrapper.find('Button').filterWhere(n => n.prop('children') === 'Save Key')
+  saveButton.simulate('click')
 
   ok(createOrEditSpy.called)
-  const [[, , method]] = createOrEditSpy.args
+  const method = createOrEditSpy.args[0][2]
   equal(method, `put`)
 })
 
@@ -305,7 +294,7 @@ test('it sends the contents of the form saving', () => {
     dispatch: dispatchSpy
   }
 
-  TestUtils.renderIntoDocument(
+  const wrapper = mount(
     <DeveloperKeyModal
       closeModal={() => {}}
       createOrEditDeveloperKeyState={editDeveloperKeyState}
@@ -315,10 +304,8 @@ test('it sends the contents of the form saving', () => {
     />
   )
 
-  const [, , button] = document.querySelectorAll(
-    '#fixtures span[aria-label="Create developer key"] button'
-  )
-  TestUtils.Simulate.click(button)
+  wrapper.node.submitForm()
+
   const [[sentFormData]] = createOrEditSpy.args
 
   equal(sentFormData.get('developer_key[name]'), developerKey.name)

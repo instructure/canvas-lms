@@ -31,9 +31,14 @@ QUnit.module('SpeedGraderSettingsMenu', hooks => {
     qunitTimeout = QUnit.config.testTimeout
     QUnit.config.testTimeout = 500 // protect against unresolved async mistakes
     props = {
+      assignmentID: '71',
+      courseID: '8',
+      helpURL: 'example.com/support',
       menuContentRef(ref) {
         $menuContent = ref
       },
+      openOptionsModal() {},
+      openKeyboardShortcutsModal() {},
       showHelpMenuItem: false,
       showModerationMenuItem: false
     }
@@ -83,11 +88,31 @@ QUnit.module('SpeedGraderSettingsMenu', hooks => {
     })
   })
 
+  test('calls the openOptionsModal prop when "Options" is clicked', () => {
+    props.openOptionsModal = sinon.stub()
+    mountComponent()
+    return clickToOpenMenu().then(() => {
+      const menuItem = getMenuItem('Options')
+      menuItem.simulate('click')
+      strictEqual(props.openOptionsModal.callCount, 1)
+    })
+  })
+
   test('includes a "Keyboard Shortcuts" menu item', () => {
     mountComponent()
     return clickToOpenMenu().then(() => {
       const menuItem = getMenuItem('Keyboard Shortcuts')
       strictEqual(menuItem.length, 1)
+    })
+  })
+
+  test('calls the openKeyboardShortcutsModal prop when "Keyboard Shortcuts" is clicked', () => {
+    props.openKeyboardShortcutsModal = sinon.stub()
+    mountComponent()
+    return clickToOpenMenu().then(() => {
+      const menuItem = getMenuItem('Keyboard Shortcuts')
+      menuItem.simulate('click')
+      strictEqual(props.openKeyboardShortcutsModal.callCount, 1)
     })
   })
 
@@ -108,6 +133,44 @@ QUnit.module('SpeedGraderSettingsMenu', hooks => {
     })
   })
 
+  test('calls window.open when the "Moderation Page" is clicked', () => {
+    props.showModerationMenuItem = true
+    sinon.stub(window, 'open')
+    mountComponent()
+    return clickToOpenMenu().then(() => {
+      const menuItem = getMenuItem('Moderation Page')
+      menuItem.simulate('click')
+      strictEqual(window.open.callCount, 1)
+      window.open.restore()
+    })
+  })
+
+  test('opens the moderation page when the "Moderation Page" is clicked', () => {
+    props.showModerationMenuItem = true
+    sinon.stub(window, 'open')
+    mountComponent()
+    return clickToOpenMenu().then(() => {
+      const menuItem = getMenuItem('Moderation Page')
+      menuItem.simulate('click')
+      const expectedURL = `/courses/${props.courseID}/assignments/${props.assignmentID}/moderate`
+      strictEqual(window.open.firstCall.args[0], expectedURL)
+      window.open.restore()
+    })
+  })
+
+  test('opens the page in a new tab when the "Moderation Page" is clicked', () => {
+    props.showModerationMenuItem = true
+    sinon.stub(window, 'open')
+    mountComponent()
+    return clickToOpenMenu().then(() => {
+      const menuItem = getMenuItem('Moderation Page')
+      menuItem.simulate('click')
+      const openInNewTabArgument = '_blank'
+      strictEqual(window.open.firstCall.args[1], openInNewTabArgument)
+      window.open.restore()
+    })
+  })
+
   test('does not include a "Help" menu item if passed showHelpMenuItem: false', () => {
     mountComponent()
     return clickToOpenMenu().then(() => {
@@ -122,6 +185,30 @@ QUnit.module('SpeedGraderSettingsMenu', hooks => {
     return clickToOpenMenu().then(() => {
       const menuItem = getMenuItem('Help')
       strictEqual(menuItem.length, 1)
+    })
+  })
+
+  test('sets the URL when "Help" is clicked', () => {
+    props.showHelpMenuItem = true
+    sinon.stub(SpeedGraderSettingsMenu, 'setURL')
+    mountComponent()
+    return clickToOpenMenu().then(() => {
+      const menuItem = getMenuItem('Help')
+      menuItem.simulate('click')
+      strictEqual(SpeedGraderSettingsMenu.setURL.callCount, 1)
+      SpeedGraderSettingsMenu.setURL.restore()
+    })
+  })
+
+  test('navigates to the help URL when "Help" is clicked', () => {
+    props.showHelpMenuItem = true
+    sinon.stub(SpeedGraderSettingsMenu, 'setURL')
+    mountComponent()
+    return clickToOpenMenu().then(() => {
+      const menuItem = getMenuItem('Help')
+      menuItem.simulate('click')
+      strictEqual(SpeedGraderSettingsMenu.setURL.firstCall.args[0], props.helpURL)
+      SpeedGraderSettingsMenu.setURL.restore()
     })
   })
 })

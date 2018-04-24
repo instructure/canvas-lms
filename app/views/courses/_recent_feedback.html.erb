@@ -50,7 +50,7 @@
     <div class="event-details">
       <% if comment && comment.media_comment? %>
         <% kaltura_thumbnail_url = CanvasKaltura::ClientV3.new.thumbnail_url(comment.media_comment_id, :width => 50, :height => 35, :bgcolor => "F3F4F5") %>
-        <img src="<%= kaltura_thumbnail_url %>" style="max-width: 50px; max-height: 35px; float: right; padding-left: 3px;" alt=""/>
+        <img src="<%= kaltura_thumbnail_url %>" style="max-width: 50px; max-height: 35px; float: <%= direction('right') %>; padding-<%= direction('left') %>: 3px;" alt=""/>
       <% end %>
       <b class="event-details__title recent_feedback_title">
         <%= recent_feedback.assignment.title %>

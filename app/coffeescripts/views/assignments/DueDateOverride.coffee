@@ -109,7 +109,8 @@ define [
       @clearExistingDueDateErrors(data)
       checkedRows = []
       for override in data.assignment_overrides
-        continue if _.contains(checkedRows, override.rowKey)
+        # Don't validate duplicates or overrides that are only on a student
+        continue if _.contains(checkedRows, override.rowKey) || override.student_ids
         dateValidator = new DateValidator({
           date_range: _.extend({}, ENV.VALID_DATE_RANGE)
           data: override

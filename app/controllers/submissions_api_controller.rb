@@ -281,6 +281,12 @@ class SubmissionsApiController < ApplicationController
   #   submissions.
   #   The value must be formatted as ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
   #
+  # @argument graded_since [DateTime]
+  #   If this argument is set, the response will only include submissions that
+  #   were graded after the specified date_time. This will exclude
+  #   submissions that have not been graded.
+  #   The value must be formatted as ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
+  #
   # @argument grading_period_id [Integer]
   #   The id of the grading period in which submissions are being requested
   #   (Requires grading periods to exist on the account)
@@ -439,6 +445,14 @@ class SubmissionsApiController < ApplicationController
       end
     end
 
+    if params[:graded_since].present?
+      if params[:graded_since] !~ Api::ISO8601_REGEX
+        return render(json: {errors: {graded_since: t('Invalid datetime for graded_since')}}, status: 400)
+      else
+        graded_since_date = Time.zone.parse(params[:graded_since])
+      end
+    end
+
     if params[:grouped].present?
       scope = (@section || @context).all_student_enrollments.
         preload(:root_account, :sis_pseudonym, :user => :pseudonyms).
@@ -447,6 +461,7 @@ class SubmissionsApiController < ApplicationController
 
       submissions_scope = Submission.active.where(user_id: student_enrollments.map(&:user_id), assignment_id: assignments)
       submissions_scope = submissions_scope.where("submitted_at>?", submitted_since_date) if submitted_since_date
+      submissions_scope = submissions_scope.where("graded_at>?", graded_since_date) if graded_since_date
       if params[:workflow_state].present?
         submissions_scope = submissions_scope.where(:workflow_state => params[:workflow_state])
       end
@@ -506,6 +521,7 @@ class SubmissionsApiController < ApplicationController
       submissions = submissions.where(:assignment_id => assignments)
       submissions = submissions.where(:workflow_state => params[:workflow_state]) if params[:workflow_state].present?
       submissions = submissions.where("submitted_at>?", submitted_since_date) if submitted_since_date
+      submissions = submissions.where("graded_at>?", graded_since_date) if graded_since_date
       submissions = submissions.preload(:user, :originality_reports, :quiz_submission)
 
       submissions = Api.paginate(submissions, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))
@@ -1032,7 +1048,7 @@ class SubmissionsApiController < ApplicationController
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
       student_scope = @context.students_visible_to(@current_user).
-        where("enrollments.type<>'StudentViewEnrollment'").distinct
+        where("enrollments.type<>'StudentViewEnrollment' AND enrollments.workflow_state = 'active'").distinct
       student_scope = @assignment.students_with_visibility(student_scope)
       student_ids = student_scope.pluck(:id)
 

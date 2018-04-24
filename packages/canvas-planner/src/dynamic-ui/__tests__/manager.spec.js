@@ -18,7 +18,7 @@
 
 import {DynamicUiManager as Manager} from '../manager';
 import {dismissedOpportunity, cancelEditingPlannerItem, setNaiAboveScreen, scrollToNewActivity} from '../../actions';
-import {gettingPastItems, gotItemsSuccess} from '../../actions/loading-actions';
+import {startLoadingItems, gettingFutureItems, gettingPastItems, gotItemsSuccess} from '../../actions/loading-actions';
 import { initialize as alertInitialize } from '../../utilities/alertUtils';
 
 class MockAnimator {
@@ -134,14 +134,6 @@ function registerStandardItems (manager, dayIndex, groupIndex, opts = {}) {
   });
 }
 
-beforeEach(() => {
-  alertInitialize({
-    visualSuccessCallback () {},
-    visualErrorCallback () {},
-    srAlertCallback () {}
-  });
-});
-
 describe('registerAnimatable', () => {
   it('throws if does not recognize the registry name', () => {
     const {manager} = createManagerWithMocks();
@@ -164,16 +156,47 @@ describe('action handling', () => {
     expect(() => manager.handleAction(action)).not.toThrow();
   });
 
-  it('performs an srAlert when days are loaded', () => {
-    const srAlertMock = jest.fn();
-    alertInitialize({
-      srAlertCallback: srAlertMock
+  describe('srAlert calls', () => {
+    let alertMocks = null;
+    beforeEach(() => {
+      alertMocks = {
+        visualSuccessCallback: jest.fn(),
+        visualErrorCallback: jest.fn(),
+        srAlertCallback: jest.fn(),
+      };
+      alertInitialize(alertMocks);
+      return alertMocks;
     });
-    const {manager} = createManagerWithMocks();
-    manager.handleAction(gotItemsSuccess(
-      [{uniqueId: 'day-1-group-1-item-0'}, {uniqueId: 'day-1-group-0-item-0'}],
-    ));
-    expect(srAlertMock).toHaveBeenCalled();
+
+    it('performs an srAlert when items are initially loading', () => {
+      const {manager} = createManagerWithMocks();
+      manager.handleAction(startLoadingItems());
+      expect(alertMocks.srAlertCallback).toHaveBeenCalledWith('loading');
+    });
+
+    it('performs an srAlert when future items are loading', () => {
+      const {manager} = createManagerWithMocks();
+      manager.handleAction(gettingFutureItems());
+      expect(alertMocks.srAlertCallback).toHaveBeenCalledWith('loading');
+    });
+
+    it('performs an srAlert when past items are loading', () => {
+      const {manager} = createManagerWithMocks();
+      manager.handleAction(gettingPastItems());
+      expect(alertMocks.srAlertCallback).toHaveBeenCalledWith('loading');
+    });
+
+    it('performs an srAlert when days are loaded', () => {
+      const srAlertMock = jest.fn();
+      alertInitialize({
+        srAlertCallback: srAlertMock
+      });
+      const {manager} = createManagerWithMocks();
+      manager.handleAction(gotItemsSuccess(
+        [{uniqueId: 'day-1-group-1-item-0'}, {uniqueId: 'day-1-group-0-item-0'}],
+      ));
+      expect(srAlertMock).toHaveBeenCalled();
+    });
   });
 
   it('dispatches actions to the animations', () => {
@@ -271,41 +294,6 @@ describe('manipulating items', () => {
     expect(animator.focusElement).toHaveBeenCalledWith('focusable-day-0-group-0-item-0');
     expect(animator.maintainViewportPosition).toHaveBeenCalled();
     expect(animator.scrollTo).toHaveBeenCalledWith('scrollable-day-0-group-0-item-0', 42);
-  });
-
-  describe('deleting an item', () => {
-    it('sets focus to the previous item if there is one', () => {
-      const {manager, animator} = createManagerWithMocks();
-      // when deleting, we need to assume the item has already been registered.
-      registerStandardDays(manager);
-      manager.handleOpenEditingPlannerItem();
-      manager.handleDeletedPlannerItem({payload: {uniqueId: 'day-1-group-1-item-2'}});
-      manager.preTriggerUpdates('fixed-element', 'app');
-      manager.triggerUpdates();
-      expect(animator.focusElement).toHaveBeenCalledWith('focusable-day-1-group-1-item-1');
-    });
-
-    it('sets focus to the fallback if there is no previous item', () => {
-      const {manager, animator} = createManagerWithMocks();
-      registerStandardDays(manager);
-      const fakeFallback = {getFocusable: () => 'fallback', getScrollable: () => 'scroll'};
-      manager.registerAnimatable('item', fakeFallback, -1, ['~~~item-fallback-focus~~~']);
-      manager.handleOpenEditingPlannerItem();
-      manager.handleDeletedPlannerItem({payload: {uniqueId: 'day-0-group-0-item-0'}});
-      manager.preTriggerUpdates('fixed-element', 'app');
-      manager.triggerUpdates();
-      expect(animator.focusElement).toHaveBeenCalledWith('fallback');
-    });
-
-    it('gives up setting item focus if deleting the first item and there is no fallback', () => {
-      const {manager, animator} = createManagerWithMocks();
-      registerStandardDays(manager);
-      manager.handleOpenEditingPlannerItem();
-      manager.handleDeletedPlannerItem({payload: {uniqueId: 'day-0-group-0-item-0'}});
-      manager.preTriggerUpdates('fixed-element', 'app');
-      manager.triggerUpdates();
-      expect(animator.focusElement).not.toHaveBeenCalled();
-    });
   });
 });
 

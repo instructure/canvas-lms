@@ -554,6 +554,7 @@ describe DiscussionTopicsController, type: :request do
         end
       end
 
+
       describe "section specific announcements" do
         before(:once) do
           course_with_teacher(active_course: true)
@@ -568,6 +569,27 @@ describe DiscussionTopicsController, type: :request do
           @course.enroll_student(@student1, :enrollment_state => 'active')
           @course.enroll_student(@student2, :enrollment_state => 'active')
           student_in_section(@section, user: @student1)
+        end
+
+        it "should render correct page count for users even with delayed posted date" do
+          @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>", :delayed_post_at => 2.days.from_now)
+          @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
+          [@topic2, @topic3].each do |topic|
+            topic.type = 'Announcement'
+            topic.save!
+          end
+
+          api_call_as_user(@student1,
+            :get, "/api/v1/courses/#{@course.id}/discussion_topics?only_announcements=1&per_page=2",
+            {
+              controller: "discussion_topics",
+              action: "index",
+              format: "json",
+              course_id: @course.id.to_s,
+              only_announcements: 1,
+              per_page: 2,
+            })
+          expect(!response.headers['Link'].split(',').last.include?("&page=2&")).to eq(true)
         end
 
         it "teacher should be able to see section specific announcements" do
@@ -814,6 +836,32 @@ describe DiscussionTopicsController, type: :request do
         expect(@topic.podcast_enabled?).to eq true
         expect(@topic.podcast_has_student_posts?).to eq true
         expect(@topic.require_initial_post?).to eq true
+      end
+
+      it "should return section count if section specific" do
+        post_at = 1.month.from_now
+        lock_at = 2.months.from_now
+        @course.root_account.enable_feature!(:section_specific_discussions)
+        discussion_topic_model(:context => @course, :title => "Section Specific Topic", :user => @teacher)
+        section1 = @course.course_sections.create!
+        @course.course_sections.create! # just to make sure we only copy the right one
+        @topic.is_section_specific = true
+        @topic.discussion_topic_section_visibilities << DiscussionTopicSectionVisibility.new(
+          :discussion_topic => @topic,
+          :course_section => section1,
+          :workflow_state => "active"
+        )
+        @topic.save!
+        api_response = api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                 {:title => "test title",
+                  :message => "test <b>message</b>",
+                  :discussion_type => "threaded",
+                  :delayed_post_at => post_at.as_json,
+                  :lock_at => lock_at.as_json,
+                  :podcast_has_student_posts => '1',
+                  :require_initial_post => '1'})
+        expect(api_response["sections"].count).to eq 1
       end
 
       it "should not unlock topic if lock_at changes but is still in the past" do
@@ -1619,7 +1667,7 @@ describe DiscussionTopicsController, type: :request do
     end
 
     it "should allow including attachments on top-level entries" do
-      data = fixture_file_upload("scribd_docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
         {:controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
@@ -1632,7 +1680,7 @@ describe DiscussionTopicsController, type: :request do
 
     it "should include attachments on replies to top-level entries" do
       top_entry = create_entry(@topic, :message => 'top-level message')
-      data = fixture_file_upload("scribd_docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{top_entry.id}/replies.json",
         {:controller => 'discussion_topics_api', :action => 'add_reply', :format => 'json',
@@ -1644,7 +1692,7 @@ describe DiscussionTopicsController, type: :request do
     end
 
     it "handles duplicate files when attaching" do
-      data = fixture_file_upload("scribd_docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
       attachment_model :context => @user, :uploaded_data => data, :folder => Folder.unfiled_folder(@user)
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",

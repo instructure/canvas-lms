@@ -22,7 +22,7 @@ module Outcomes
     class InvalidDataError < RuntimeError; end
 
     OBJECT_ONLY_FIELDS = %i[calculation_method calculation_int ratings].freeze
-    VALID_WORKFLOWS = ['', 'active', 'deleted'].freeze
+    VALID_WORKFLOWS = [nil, '', 'active', 'deleted'].freeze
 
     def check_object(object)
       %i[vendor_guid title].each do |field|
@@ -95,7 +95,7 @@ module Outcomes
       model.vendor_guid = group[:vendor_guid]
       model.title = group[:title]
       model.description = group[:description] || ''
-      model.workflow_state = group[:workflow_state] || 'active'
+      model.workflow_state = group[:workflow_state].presence || 'active'
       model.learning_outcome_group = parent
       model.outcome_import_id = outcome_import_id
       model.save!
@@ -142,7 +142,7 @@ module Outcomes
       if model.context == context
         model.outcome_import_id = outcome_import_id
         model.save!
-      elsif model.changed?
+      elsif non_vendor_guid_changes?(model)
         raise InvalidDataError, I18n.t(
           'Cannot modify outcome from another context: %{changes}; outcome must be modified in %{context}',
           changes: model.changes.keys.inspect,
@@ -162,10 +162,19 @@ module Outcomes
 
     private
 
+    def non_vendor_guid_changes?(model)
+      model.has_changes_to_save? && !(model.changes_to_save.length == 1 &&
+        model.changes_to_save.key?(
+          AcademicBenchmark.use_new_guid_columns? ? 'vendor_guid_2' : 'vendor_guid'
+        ))
+    end
+
     def find_prior_outcome(outcome)
-      if outcome[:canvas_id].present?
+      match = /canvas_outcome:(\d+)/.match(outcome[:vendor_guid])
+      if match
+        canvas_id = match[1]
         begin
-          LearningOutcome.find(outcome[:canvas_id])
+          LearningOutcome.find(canvas_id)
         rescue ActiveRecord::RecordNotFound
           raise InvalidDataError, I18n.t(
             'Outcome with canvas id "%{id}" not found',
@@ -173,28 +182,35 @@ module Outcomes
           )
         end
       else
-        LearningOutcome.find_or_initialize_by(
-          vendor_guid: outcome[:vendor_guid]
-        )
+        vendor_guid = outcome[:vendor_guid]
+        prior = LearningOutcome.find_by(vendor_clause(vendor_guid))
+        return prior if prior
+        LearningOutcome.new(vendor_guid: vendor_guid)
       end
     end
 
     def find_prior_group(group)
-      if group[:canvas_id].present?
+      vendor_guid = group[:vendor_guid]
+      clause = vendor_clause(group[:vendor_guid])
+
+      prior = LearningOutcomeGroup.where(clause).find_by(context: context)
+      return prior if prior
+
+      match = /canvas_outcome_group:(\d+)/.match(group[:vendor_guid])
+      if match
+        canvas_id = match[1]
         begin
-          LearningOutcomeGroup.find(group[:canvas_id])
+          by_id = LearningOutcomeGroup.find(canvas_id)
+          return by_id if by_id.context == context
         rescue ActiveRecord::RecordNotFound
           raise InvalidDataError, I18n.t(
             'Outcome group with canvas id %{id} not found',
             id: group[:canvas_id]
           )
         end
-      else
-        LearningOutcomeGroup.find_or_initialize_by(
-          vendor_guid: group[:vendor_guid],
-          context: context
-        )
       end
+
+      LearningOutcomeGroup.new(vendor_guid: vendor_guid, context: context)
     end
 
     def create_rubric(ratings, mastery_points)

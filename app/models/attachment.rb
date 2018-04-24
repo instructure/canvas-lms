@@ -1262,9 +1262,8 @@ class Attachment < ActiveRecord::Base
   include Workflow
 
   # Right now, using the state machine to manage whether an attachment has
-  # been uploaded to Scribd.  It can be uploaded to other places, or
-  # scrubbed in other ways.  All that work should be managed by the state
-  # machine.
+  # been uploaded or scrubbed in other ways.  All that work should be managed by
+  # the state machine.
   workflow do
     state :pending_upload do
       event :upload, :transitions_to => :processing

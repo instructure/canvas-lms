@@ -47,13 +47,27 @@ describe GradebookExporter do
 
       it "has headers in a default order" do
         expected_headers = [
-          "\xEF\xBB\xBFStudent", "ID", "SIS Login ID", "Section", "Current Points", "Final Points",
+          "Student", "ID", "SIS Login ID", "Section", "Current Points", "Final Points",
           "Current Score", "Unposted Current Score", "Final Score", "Unposted Final Score",
           "Current Grade", "Unposted Current Grade", "Final Grade", "Unposted Final Grade"
         ]
         actual_headers = CSV.parse(csv, headers: true).headers
 
         expect(actual_headers).to match_array(expected_headers)
+      end
+
+      describe "byte-order mark" do
+        it "is included when the user has it enabled" do
+          @teacher.enable_feature!(:include_byte_order_mark_in_gradebook_exports)
+          actual_headers = CSV.parse(exporter.to_csv, headers: true).headers
+          expect(actual_headers[0]).to eq("\xEF\xBB\xBFStudent")
+        end
+
+        it "is excluded when the user has it disabled" do
+          @teacher.disable_feature!(:include_byte_order_mark_in_gradebook_exports)
+          actual_headers = CSV.parse(exporter.to_csv, headers: true).headers
+          expect(actual_headers[0]).to eq("Student")
+        end
       end
 
       context "when muted assignments are present" do
@@ -91,10 +105,10 @@ describe GradebookExporter do
     context "internationalization" do
       it "can use localized column separators" do
         csv = exporter(col_sep: ";", encoding: "UTF-8").to_csv
-        headers = CSV.parse(csv, col_sep: ";", headers: true).headers
-        expect(headers[0]).to eq "\xEF\xBB\xBFStudent"
-        expect(headers[1]).to eq "ID"
-        expect(headers[2]).to eq "SIS Login ID"
+        actual_headers = CSV.parse(csv, col_sep: ";", headers: true).headers
+        expected_headers = ['Student', 'ID', 'SIS Login ID']
+
+        expect(actual_headers[0..2]).to eq(expected_headers)
       end
 
       it "can automatically determine the column separator to use" do
@@ -103,13 +117,15 @@ describe GradebookExporter do
         expect(csv).to match(/;8,5;/)
       end
 
-      it "prepends byte order marker with UTF-8 encoding" do
+      it "prepends byte order mark with UTF-8 encoding when the user enables it" do
+        @teacher.enable_feature!(:include_byte_order_mark_in_gradebook_exports)
         csv = exporter(encoding: "UTF-8").to_csv
         headers = CSV.parse(csv, headers: true).headers
         expect(headers[0]).to eq "\xEF\xBB\xBFStudent"
       end
 
-      it "omits byte order marker with US-ASCII encoding" do
+      it "omits byte order mark with US-ASCII encoding even when the user enables it" do
+        @teacher.enable_feature!(:include_byte_order_mark_in_gradebook_exports)
         csv = exporter(encoding: "US-ASCII").to_csv
         headers = CSV.parse(csv, headers: true).headers
         expect(headers[0]).to eq "Student".encode("US-ASCII")

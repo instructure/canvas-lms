@@ -37,6 +37,55 @@ describe Types::CourseType do
       expect(course_type.assignmentsConnection(current_user: @teacher).size).to eq 1
       expect(course_type.assignmentsConnection(current_user: @student).size).to eq 0
     end
+
+    context "grading periods" do
+      before(:once) do
+        gpg = GradingPeriodGroup.create! title: "asdf",
+          root_account: course.root_account
+        course.enrollment_term.update_attributes grading_period_group: gpg
+        @term1 = gpg.grading_periods.create! title: "past grading period",
+        start_date: 2.weeks.ago,
+          end_date: 1.weeks.ago
+        @term2 = gpg.grading_periods.create! title: "current grading period",
+        start_date: 2.days.ago,
+          end_date: 2.days.from_now
+        @term1_assignment1 = course.assignments.create! name: "asdf",
+          due_at: (1.5).weeks.ago
+        @term2_assignment1 = course.assignments.create! name: ";lkj",
+          due_at: Date.today
+      end
+
+      it "only returns assignments for the current grading period" do
+        expect(
+          course_type.assignmentsConnection(current_user: @student)
+        ).to eq [@term2_assignment1]
+      end
+
+      it "returns no assignments when outside of a grading period" do
+        @term2.destroy
+        expect(
+          course_type.assignmentsConnection(current_user: @student)
+        ).to eq []
+      end
+
+      it "returns assignments for the requested grading period" do
+        expect(
+          course_type.assignmentsConnection(
+            current_user: @student,
+            args: {filter: {gradingPeriodId: @term1.id.to_s}}
+          )
+        ).to eq [@term1_assignment1]
+      end
+
+      it "can still return assignments for all grading periods" do
+        expect(
+          course_type.assignmentsConnection(
+            current_user: @student,
+            args: {filter: {gradingPeriodId: nil}}
+          )
+        ).to eq course.assignments.published
+      end
+    end
   end
 
   describe "sectionsConnection" do

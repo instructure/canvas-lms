@@ -21,7 +21,7 @@ require_relative '../pages/gradebook_page'
 
 describe 'Screenreader Gradebook Student Information' do
   include_context 'in-process server selenium tests'
-  include_context 'reusable_course'
+  include_context 'reusable_gradebook_course'
   include GradebookCommon
 
   let(:srgb_page) { SRGB }

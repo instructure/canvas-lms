@@ -348,7 +348,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     q.generate_quiz_data
     q.save!
     qs = q.generate_submission student
-    io = fixture_file_upload('scribd_docs/doc.doc', 'application/msword', true)
+    io = fixture_file_upload('docs/doc.doc', 'application/msword', true)
     attach = qs.attachments.create! :filename => "doc.doc",
       :display_name => "attachment.png", :user => student,
       :uploaded_data => io

@@ -26,7 +26,7 @@ import $ from 'jquery'
 
 class RubricAddCriterionPopover extends React.Component {
   static propTypes = {
-    rubric: PropTypes.object.isRequired, // eslint-disable-line
+    rubric: PropTypes.instanceOf($).isRequired,
     duplicateFunction: PropTypes.func.isRequired,
   }
 

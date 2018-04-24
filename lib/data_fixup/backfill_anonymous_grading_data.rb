@@ -18,11 +18,20 @@
 
 module DataFixup::BackfillAnonymousGradingData
   def self.run(start_at, end_at)
-    Course.where(id: start_at..end_at).find_each(start: 0) do |course|
+    Course.where("id >= ? AND id <= ?", start_at, end_at).find_each(start: 0) do |course|
       next unless course.feature_enabled?(:anonymous_grading) && !course.feature_enabled?(:anonymous_marking)
 
       course.assignments.in_batches.update_all(anonymous_grading: true)
-      course.enable_feature!(:anonymous_marking)
+
+      # Manually build the feature flag because we're going to ignore
+      # validations at save time. This is because the feature is still
+      # in development, but we're doing a backfill for legacy courses
+      # so they are ready for the new code when its unveiled.
+      anonymous_marking_flag = course.feature_flags.where(feature: :anonymous_marking).first_or_initialize
+      if anonymous_marking_flag.state != 'on'
+        anonymous_marking_flag.state = 'on'
+        anonymous_marking_flag.save!(validate: false)
+      end
     end
   end
 end

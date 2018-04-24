@@ -176,7 +176,7 @@ describe GradeSummaryPresenter do
     end
 
     it 'works' do
-      s1, s2, s3, s4 = n_students_in_course(4)
+      s1, s2, s3, s4 = all_students = n_students_in_course(4)
       a = @course.assignments.create! points_possible: 10
       a.grade_student s1, grade:  0, grader: @teacher
       a.grade_student s2, grade:  5, grader: @teacher
@@ -186,16 +186,18 @@ describe GradeSummaryPresenter do
       a.grade_student s4, grade: 99, grader: @teacher
       s4.enrollments.each &:destroy
 
+      GradeCalculator.new(all_students.map(&:id), @course).compute_and_save_scores
+
       p = GradeSummaryPresenter.new(@course, @teacher, nil)
       stats = p.assignment_stats
       assignment_stats = stats[a.id]
-      expect(assignment_stats.max.to_f).to eq 10
-      expect(assignment_stats.min.to_f).to eq 0
-      expect(assignment_stats.avg.to_f).to eq 5
+      expect(assignment_stats.maximum.to_f).to eq 10
+      expect(assignment_stats.minimum.to_f).to eq 0
+      expect(assignment_stats.mean.to_f).to eq 5
     end
 
     it 'filters out test students and inactive enrollments' do
-      s1, s2, s3, removed_student = n_students_in_course(4, {:course => @course})
+      s1, s2, s3, removed_student = all_students = n_students_in_course(4, course: @course)
 
       fake_student = course_with_user('StudentViewEnrollment', {:course => @course}).user
       fake_student.preferences[:fake_student] = true
@@ -212,34 +214,38 @@ describe GradeSummaryPresenter do
         enrollment.save!
       end
 
+      GradeCalculator.new(all_students.map(&:id), @course).compute_and_save_scores
+
       p = GradeSummaryPresenter.new(@course, @teacher, nil)
       stats = p.assignment_stats
       assignment_stats = stats[a.id]
-      expect(assignment_stats.max.to_f).to eq 10
-      expect(assignment_stats.min.to_f).to eq 0
-      expect(assignment_stats.avg.to_f).to eq 5
+      expect(assignment_stats.maximum.to_f).to eq 10
+      expect(assignment_stats.minimum.to_f).to eq 0
+      expect(assignment_stats.mean.to_f).to eq 5
     end
 
     it 'doesnt factor nil grades into the average or min' do
-      s1, s2, s3, s4 = n_students_in_course(4)
+      s1, s2, s3, s4 = all_students = n_students_in_course(4)
       a = @course.assignments.create! points_possible: 10
       a.grade_student s1, grade:  2, grader: @teacher
       a.grade_student s2, grade:  6, grader: @teacher
       a.grade_student s3, grade: 10, grader: @teacher
       a.grade_student s4, grade: nil, grader: @teacher
 
+      GradeCalculator.new(all_students.map(&:id), @course).compute_and_save_scores
+
       p = GradeSummaryPresenter.new(@course, @teacher, nil)
       stats = p.assignment_stats
       assignment_stats = stats[a.id]
-      expect(assignment_stats.max.to_f).to eq 10
-      expect(assignment_stats.min.to_f).to eq 2
-      expect(assignment_stats.avg.to_f).to eq 6
+      expect(assignment_stats.maximum.to_f).to eq 10
+      expect(assignment_stats.minimum.to_f).to eq 2
+      expect(assignment_stats.mean.to_f).to eq 6
     end
 
     it 'returns a count of submissions ignoring test students and inactive enrollments' do
       @course = Course.create!
       teacher_in_course
-      s1, s2, s3, removed_student = n_students_in_course(4, {:course => @course})
+      s1, s2, s3, removed_student = all_students = n_students_in_course(4, course: @course)
 
       fake_student = course_with_user('StudentViewEnrollment', {:course => @course}).user
       fake_student.preferences[:fake_student] = true
@@ -255,6 +261,8 @@ describe GradeSummaryPresenter do
         enrollment.workflow_state = 'inactive'
         enrollment.save!
       end
+
+      GradeCalculator.new(all_students.map(&:id), @course).compute_and_save_scores
 
       p = GradeSummaryPresenter.new(@course, @teacher, nil)
       expect(p.assignment_stats.values.first.count).to eq 3

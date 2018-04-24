@@ -144,6 +144,7 @@ describe InstFS do
     let(:content_type) { 'text/plain' }
     let(:quota_exempt) { true }
     let(:on_duplicate) { 'rename' }
+    let(:include_param) { ['avatar'] }
     let(:capture_url) { 'http://canvas.host/api/v1/files/capture' }
 
     let(:default_args) do
@@ -156,7 +157,8 @@ describe InstFS do
         content_type: content_type,
         quota_exempt: quota_exempt,
         on_duplicate: on_duplicate,
-        capture_url: capture_url
+        capture_url: capture_url,
+        include_param: include_param
       }
     end
 
@@ -228,6 +230,10 @@ describe InstFS do
 
         it "include the on_duplicate method" do
           expect(capture_params['on_duplicate']).to eq on_duplicate
+        end
+
+        it "include the inlcude options" do
+          expect(capture_params['include']).to eq include_param
         end
       end
     end

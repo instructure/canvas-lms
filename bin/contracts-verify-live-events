@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+set -e
+
+docker-compose run --rm --no-deps -e RAILS_ENV=test \
+  web bundle exec rspec spec/contracts/service_consumers/live_events --tag pact

@@ -70,21 +70,52 @@ exports[`renders empty component with no assignments 1`] = `
 <div
   className="PlannerApp large"
 >
-  <div>
-    <ShowOnFocusButton
-      buttonProps={
-        Object {
-          "onClick": undefined,
-        }
+  <ShowOnFocusButton
+    buttonProps={
+      Object {
+        "onClick": undefined,
       }
-      buttonRef={[Function]}
-    >
-      Load prior dates
-    </ShowOnFocusButton>
-    <PlannerEmptyState
-      changeToDashboardCardView={[Function]}
-    />
-  </div>
+    }
+    buttonRef={[Function]}
+  >
+    Load prior dates
+  </ShowOnFocusButton>
+  <PlannerEmptyState
+    changeToDashboardCardView={[Function]}
+  />
+</div>
+`;
+
+exports[`renders loading past spinner when loading past and there are no future items 1`] = `
+<div
+  className="PlannerApp large"
+>
+  <StickyButton
+    buttonRef={[Function]}
+    direction="up"
+    hidden={true}
+    offset="0px"
+    onClick={[Function]}
+  >
+    New Activity
+  </StickyButton>
+  <ShowOnFocusButton
+    buttonProps={
+      Object {
+        "onClick": undefined,
+      }
+    }
+    buttonRef={[Function]}
+  >
+    Load prior dates
+  </ShowOnFocusButton>
+  <LoadingPastIndicator
+    allPastItemsLoaded={false}
+    loadingPast={true}
+  />
+  <div
+    id="planner-app-fixed-element"
+  />
 </div>
 `;
 
@@ -95,6 +126,7 @@ exports[`shows new activity button when new activity is indicated 1`] = `
   <StickyButton
     buttonRef={[Function]}
     direction="up"
+    hidden={true}
     offset="0px"
     onClick={[Function]}
   >
@@ -250,12 +282,6 @@ exports[`shows the loading past indicator when loadingPast prop is true 1`] = `
       ]
     }
     timeZone="UTC"
-  />
-  <LoadingFutureIndicator
-    allFutureItemsLoaded={false}
-    loadingFuture={false}
-    onLoadMore={[Function]}
-    plannerActive={[Function]}
   />
   <div
     id="planner-app-fixed-element"

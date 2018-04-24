@@ -43,7 +43,7 @@
       <option value="text_only_question"><%= t('question_type.text_only', "Text (no question)") %></option>
     </select>
     <span class="question_points_holder">
-      <span style="padding-left: 20px;"><%= before_label :points, 'pts' %></span>
+      <span style="padding-<%= direction('left') %>: 20px;"><%= before_label :points, 'pts' %></span>
       <input class="float_value" type="text" style="width: 25px; min-width: 0;" name="question_points" aria-label="<%= t "label.question.points", "Question point value" %>" <%= 'readonly' if points_are_locked %>/>
     </span>
   </div>
@@ -125,7 +125,7 @@
       <%= t('explanations.multi_answer_sets', "In the box below, every place you want to show an answer box, type a reference word (no spaces) surrounded by brackets") %><br/>
       (<%= t(:multi_answer_sets_example, 'i.e. "Roses are [color1], violets are [color2]"') %>)
     </div>
-    <div style="float: right; margin-right: 10%; font-size: 0.8em;">
+    <div style="float: <%= direction('right') %>; margin-<%= direction('right') %>: 10%; font-size: 0.8em;">
       <a href="#" class="toggle_question_content_views_link"><%= t '#editor.switch_editor_html', "HTML Editor" %></a>
       <a href="#" class="toggle_question_content_views_link" style="display:none;"><%= t '#editor.switch_editor_rich_text', "Rich Content Editor" %></a>
     </div>
@@ -206,7 +206,7 @@
     </div>
     <div class="form_answers">
     </div>
-    <div style="text-align: right;" class="add_answer">
+    <div style="text-align: <%= direction('right') %>;" class="add_answer">
       <a href="#" class="add_answer_link icon-add"><%= t('links.add_another_answer', "Add Another Answer") %></a>
     </div>
     <div class="matching_answer_incorrect_matches_holder" style="margin-top: 15px;">
@@ -218,7 +218,7 @@
     </div>
     <div class="missing_word_after_answer" style="margin-top: 15px;">
       <b><%= before_label(:missing_word_after, "Text to go after answers") %></b>
-      <div style="float: right; margin-right: 10%; font-size: 0.8em;">
+      <div style="float: <%= direction('right') %>; margin-<%= direction('right') %>: 10%; font-size: 0.8em;">
         <a href="#" class="toggle_text_after_answers_link"><%= t '#editor.switch_editor_html', "HTML Editor" %></a>
         <a href="#" class="toggle_text_after_answers_link" style="display:none;"><%= t '#editor.switch_editor_visual', "Rich Content Editor" %></a>
       </div>

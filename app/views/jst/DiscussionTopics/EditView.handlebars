@@ -145,8 +145,11 @@
             </label>
             {{#unless announcementsLocked}}
             <label class="checkbox" for="allow_user_comments">
-              {{checkbox "allow_user_comments"
-                checked=unlocked}}
+              {{#if title}}
+              {{checkbox "allow_user_comments" checked=unlocked}}
+              {{else}}
+              {{checkbox "allow_user_comments" checked=ENV.CREATE_ANNOUNCEMENTS_UNLOCKED}}
+              {{/if}}
               {{#t}}Allow users to comment{{/t}}
             </label>
             <label class="checkbox" for="require_initial_post" style="margin-left: 2em;">

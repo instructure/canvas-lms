@@ -21,3 +21,4 @@ export * from './middleware';
 export * from './manager';
 export * from './notifier';
 export * from './provider';
+export * from './util';

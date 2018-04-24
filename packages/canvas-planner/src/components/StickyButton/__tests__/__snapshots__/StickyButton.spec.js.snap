@@ -1,8 +1,29 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`adds aria-hidden when specified 1`] = `
+<button
+  aria-disabled={null}
+  aria-hidden="true"
+  className=""
+  onClick={[Function]}
+  style={
+    Object {
+      "top": "0",
+      "zIndex": null,
+    }
+  }
+  type="button"
+>
+  <span>
+    Click me
+  </span>
+</button>
+`;
+
 exports[`renders 1`] = `
 <button
   aria-disabled={null}
+  aria-hidden={null}
   className=""
   onClick={[Function]}
   style={

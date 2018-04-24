@@ -35,6 +35,7 @@ define [
         submission:
           submission_type: "online_upload"
           file_ids: [ attachment.id ]
+          eula_agreement_timestamp: $('#eula_agreement_timestamp').val()
         comment:
           text_comment: @assignmentSubmission.get('comment')
 

@@ -32,5 +32,7 @@ export default function generator ({ borders, colors, spacing, typography }) {
 
     gutterWidth: spacing.medium,
     buttonPadding: spacing.small,
+
+    labelColor: colors.brand,
   };
 }

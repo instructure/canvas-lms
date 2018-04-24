@@ -26,7 +26,7 @@ describe "Gradezilla" do
 
   describe 'letter grade assignment grading' do
     before :once do
-      entering_grades_setup('letter_grade','B')
+      assignments_with_grades_setup('letter_grade', 'B')
     end
 
     before :each do

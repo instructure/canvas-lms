@@ -29,7 +29,7 @@ export default function AccountsTray({accounts, hasLoaded}) {
   return (
     <Container as="div" padding="medium">
       <Heading level="h3" as="h2">{I18n.t('Admin')}</Heading>
-      <hr />
+      <hr role="presentation"/>
       <List variant="unstyled" margin="small 0" itemSpacing="small">
         {hasLoaded ? (
           accounts.map(account =>
@@ -37,7 +37,7 @@ export default function AccountsTray({accounts, hasLoaded}) {
               <Link href={`/accounts/${account.id}`}>{account.name}</Link>
             </ListItem>
           ).concat([
-            <ListItem key="hr"><hr /></ListItem>,
+            <ListItem key="hr"><hr role="presentation"/></ListItem>,
             <ListItem key="all">
               <Link href="/accounts">{I18n.t('All Accounts')}</Link>
             </ListItem>

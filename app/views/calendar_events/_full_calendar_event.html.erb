@@ -18,7 +18,7 @@
 
 <div id="full_calendar_event_holder">
   <div class="calendar_event" id="full_calendar_event">
-    <div style="float: right; text-align: right; font-size: 0.8em;">
+    <div style="float: <%= direction('right') %>; text-align: <%= direction('right') %>; font-size: 0.8em;">
       <div class="date_text" style="<%= hidden unless calendar_event && calendar_event.start_at %>">
         <span class="start_at_date_string" title="<%= date_string(calendar_event.start_at, :long) %>"><%= date_string(calendar_event.start_at, :long) %></span>
         <span class="non_all_day" style="<%= hidden if calendar_event.try_rescue(:all_day) %>">

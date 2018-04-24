@@ -55,7 +55,7 @@ describe Lti::LtiUserCreator do
       expect(lti_user.sis_source_id).to eq 'sis id!'
       expect(lti_user.opaque_identifier).to eq 'this is opaque'
 
-      expect(lti_user.avatar_url).to include 'https://secure.gravatar.com/avatar/'
+      expect(lti_user.avatar_url).to include 'http://localhost/images/messages/avatar-50.png'
       expect(lti_user.login_id).to eq 'login_id'
       expect(lti_user.id).to eq canvas_user.id
       expect(lti_user.timezone).to eq 'my/zone'
@@ -101,7 +101,7 @@ describe Lti::LtiUserCreator do
         observer_in_course(course: canvas_course, user: canvas_user2, associated_user: canvas_user)
 
         lti_user = course_observer_creator.convert
-        expect(lti_user.current_observee_ids).to match_array ['blah']
+        expect(lti_user.current_observee_ids).to match_array [canvas_user.lti_context_id]
       end
 
       describe "#current_enrollments" do

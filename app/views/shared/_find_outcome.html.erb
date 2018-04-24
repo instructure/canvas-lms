@@ -56,10 +56,10 @@
               </div>
             <% end %>
             <div class="button-container">
-              <button type="button" class="btn select_outcome_link" style="float: right; margin: 0 0.5em 0.5em 0.5em;">
+              <button type="button" class="btn select_outcome_link" style="float: <%= direction('right') %>; margin: 0 0.5em 0.5em 0.5em;">
                 <%= t 'buttons.add_outcome', "Add Outcome" %>
               </button>
-              <div style="float: right; margin-top: 0.5em;">
+              <div style="float: <%= direction('right') %>; margin-top: 0.5em;">
                 <% if purpose == 'rubric' %>
                   <input type="checkbox" class="criterion_for_scoring" checked /><label><%= t 'labels.use_for_scoring', "use this criterion for scoring" %></label>
                 <% elsif purpose == 'question_bank' %>

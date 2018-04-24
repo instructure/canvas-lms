@@ -52,6 +52,16 @@ describe "student planner" do
     validate_link_to_url(announcement, 'discussion_topics')
   end
 
+  it "shows and navigates to the events page", priority: "1", test_id: 3488530 do
+    skip('Unskip with ADMIN-278')
+    event = CalendarEvent.new(title: "New event")
+    event.context = @course
+    event.save!
+    go_to_list_view
+    validate_object_displayed('Calendar Event')
+    validate_link_to_url(event, 'calendar_events')
+  end
+
   it "shows course images when the feature is enabled", priority: "1", test_id: 3306206 do
     Account.default.enable_feature!(:course_card_images)
     @course_root = Folder.root_folders(@course).first
@@ -369,6 +379,20 @@ describe "student planner" do
       expect(fj("h2:contains('No Due Dates Assigned')")).to be_displayed
     end
 
+    it "groups the to-do item with other course items", priority: "1", test_id: 3482560 do
+      skip('unskip with ADMIN-917')
+      @assignment = @course.assignments.create({
+                                                 name: 'Assignment 1',
+                                                 due_at: Time.zone.now + 1.day,
+                                                 submission_types: 'online_text_entry'
+                                               })
+      @student1.planner_notes.create!(todo_date: Time.zone.now + 1.day, title: "Title Text", course_id: @course.id)
+      go_to_list_view
+      course_group = f('ol', f('.PlannerApp'))
+      group_items = ff('li', course_group)
+      expect(group_items.count).to eq(2)
+    end
+
     it "allows date of a to-do item to be edited", priority: "1", test_id: 3402913 do
       view_todo_item
       element = ff('input', @modal)[1]
@@ -386,6 +410,24 @@ describe "student planner" do
       expect(f('body')).to contain_jqcss("h2:contains(#{day.split(',')[0]})")
       @student_to_do.reload
       expect(format_date_for_view(@student_to_do.todo_date, :long)).to eq(day)
+    end
+
+    it "adds date and time to a to-do item", priority: "1", test_id: 3482559 do
+      skip('unskip with ADMIN-298')
+      go_to_list_view
+      todo_modal_button.click
+      modal = todo_sidebar_modal
+      element = ff('input', modal)[1]
+      element.click
+      fj("button:contains('15')").click
+
+      time_element = time_input
+      time_element.click
+      time_element.send_keys('9:00 am')
+      todo_save_button.click
+      time = calendar_time_string(PlannerNote.last.todo_time).chop
+      expect(fxpath("//div[contains(@class, 'PlannerApp')]//span[contains(text(),'DUE: #{time}')]")).
+        to be_displayed
     end
 
     it "updates the sidebar when clicking on mutiple to-do items", priority: "1", test_id: 3426619 do
@@ -503,6 +545,41 @@ describe "student planner" do
       f('body').send_keys(:arrow_down)
       wait_for_spinner
       expect(items_displayed.count).to be > current_items
+    end
+  end
+
+  context "with new activity button" do
+    before :once do
+      @old, @older, @oldest = new_activities_in_the_past
+      graded_discussion_in_the_future
+    end
+
+    before :each do
+      user_session(@student1)
+    end
+
+    it "scrolls to the next immediate new activity", priority: "1", test_id: 3468774 do
+      skip('fragile, need to skip now')
+      go_to_list_view
+      new_activity_button.click
+      wait_for_spinner
+      expect(first_item_on_page).to contain_link(@old.title.to_s)
+      new_activity_button.click
+      expect(first_item_on_page).to contain_link(@older.title.to_s)
+      new_activity_button.click
+      expect(first_item_on_page).to contain_link(@oldest.title.to_s)
+    end
+
+    it "shows new activity if there are activity above the current scroll position", priority: "1", test_id: 3468775 do
+      skip("fragile, need to skip now")
+      past_discussion = graded_discussion_in_the_past
+      graded_discussion_in_the_future
+      go_to_list_view
+      new_activity_button.click
+      expect(f('.PlannerApp')).to contain_link(past_discussion.title.to_s)
+      expect(f('.PlannerApp')).not_to contain_css("button:contains('New Activity')")
+      scroll_page_to_bottom
+      expect(f('.PlannerApp')).to contain_css("button:contains('New Activity')")
     end
   end
 

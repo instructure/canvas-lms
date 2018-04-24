@@ -60,7 +60,7 @@ DETAILS
   </div>
 <% else %>
   <h2><%= t('headers.my_eportfolios', "My ePortfolios") %></h2>
-  <ul class="unstyled_list" style="padding-left: 20px;">
+  <ul class="unstyled_list" style="padding-<%= direction('left') %>: 20px;">
     <%= render :partial => "eportfolio", :collection => @portfolios %>
   </ul>
 <% end %>
