@@ -1308,8 +1308,15 @@ describe Account do
     end
   end
 
+  it 'should set allow_sis_import if root_account' do
+    account = Account.create!
+    expect(account.allow_sis_import).to eq true
+    sub = account.sub_accounts.create!
+    expect(sub.allow_sis_import).to eq false
+  end
+
   describe "#ensure_defaults" do
-    it "assigns an lti_guid postfixed by canvas-lms" do``
+    it "assigns an lti_guid postfixed by canvas-lms" do
       account = Account.new
       account.uuid = '12345'
       account.ensure_defaults

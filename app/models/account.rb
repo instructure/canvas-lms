@@ -104,6 +104,7 @@ class Account < ActiveRecord::Base
 
   before_validation :verify_unique_sis_source_id
   before_save :ensure_defaults
+  before_create :enable_sis_imports, if: :root_account?
   after_save :update_account_associations_if_changed
 
   before_save :setup_cache_invalidation
@@ -367,6 +368,10 @@ class Account < ActiveRecord::Base
       filters[key] = ips.join(',') unless ips.empty?
     end
     settings[:ip_filters] = filters
+  end
+
+  def enable_sis_imports
+    self.allow_sis_import = true
   end
 
   def ensure_defaults
