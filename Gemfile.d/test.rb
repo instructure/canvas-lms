@@ -48,7 +48,7 @@ group :test do
   gem 'chromedriver-helper', require: false
   gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'
   gem 'test-queue', github: 'instructure/test-queue', ref: '1b92ebbca70705599c78a1bad5b16d6a37f741f2', require: false
-  gem 'testrailtagging', '0.3.8.3', require: false
+  gem 'testrailtagging', '0.3.8.4', require: false
 
   gem 'webmock', '3.3.0', require: false
     gem 'crack', '0.4.3', require: false
