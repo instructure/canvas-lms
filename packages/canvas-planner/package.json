@@ -40,6 +40,7 @@
   "author": "Instructure, Inc.",
   "license": "AGPL-3.0",
   "dependencies": {
+    "@instructure/ui-container": "^5.4.0",
     "@instructure/ui-core": "^4.8.0",
     "@instructure/ui-forms": "5.4.1-dev.1",
     "@instructure/ui-themeable": "5.4.1-dev.1",

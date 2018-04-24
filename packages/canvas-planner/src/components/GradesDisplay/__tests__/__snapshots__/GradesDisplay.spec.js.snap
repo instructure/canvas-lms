@@ -1,0 +1,97 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders some course grades 1`] = `
+<Container
+  display={null}
+>
+  <Container
+    as="div"
+    display={null}
+    margin="0 0 large 0"
+    textAlign="center"
+  >
+    <Text
+      as="span"
+      letterSpacing="normal"
+      size="medium"
+      weight="bold"
+    >
+      My Grades
+    </Text>
+  </Container>
+  <Container
+    as="div"
+    display={null}
+    margin="0 0 large 0"
+  >
+    <div
+      style={
+        Object {
+          "borderBottom": "solid thin blue",
+        }
+      }
+    >
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="small"
+        transform="uppercase"
+      >
+        Ticket to Ride 101
+      </Text>
+    </div>
+    <Text
+      as="div"
+      letterSpacing="normal"
+      size="large"
+      weight="light"
+    >
+      98.36%
+    </Text>
+  </Container>
+  <Container
+    as="div"
+    display={null}
+    margin="0 0 large 0"
+  >
+    <div
+      style={
+        Object {
+          "borderBottom": "solid thin green",
+        }
+      }
+    >
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="small"
+        transform="uppercase"
+      >
+        Ingenious 101
+      </Text>
+    </div>
+    <Text
+      as="div"
+      letterSpacing="normal"
+      size="large"
+      weight="light"
+    >
+      98.36%
+    </Text>
+  </Container>
+  <Container
+    as="div"
+    display={null}
+    textAlign="center"
+  >
+    <Text
+      as="span"
+      fontStyle="italic"
+      letterSpacing="normal"
+      size="x-small"
+    >
+      *Only most recent grading period shown.
+    </Text>
+  </Container>
+</Container>
+`;

@@ -19,14 +19,18 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import themeable from '@instructure/ui-themeable/lib';
 import Button from '@instructure/ui-core/lib/components/Button';
+import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton';
+import Container from '@instructure/ui-container/lib/components/Container';
 import IconPlusLine from 'instructure-icons/lib/Line/IconPlusLine';
 import IconAlertsLine from 'instructure-icons/lib/Line/IconAlertsLine';
+import IconGradebookLine from 'instructure-icons/lib/Line/IconGradebookLine';
 import Popover, {PopoverTrigger, PopoverContent} from '@instructure/ui-core/lib/components/Popover';
 import PropTypes from 'prop-types';
 import UpdateItemTray from '../UpdateItemTray';
 import Tray from '@instructure/ui-core/lib/components/Tray';
 import Badge from '@instructure/ui-core/lib/components/Badge';
 import Opportunities from '../Opportunities';
+import GradesDisplay from '../GradesDisplay';
 import {addDay, savePlannerItem, deletePlannerItem, cancelEditingPlannerItem, openEditingPlannerItem, getNextOpportunities, getInitialOpportunities, dismissOpportunity, clearUpdateTodo} from '../../actions';
 
 import { courseShape, opportunityShape } from '../plannerPropTypes';
@@ -83,6 +87,7 @@ export class PlannerHeader extends Component {
     this.state = {
       opportunities: props.opportunities.items,
       trayOpen: false,
+      gradesTrayOpen: false,
       opportunitiesOpen: false,
       dismissedTabSelected: false
     };
@@ -151,6 +156,10 @@ export class PlannerHeader extends Component {
 
   toggleUpdateItemTray = () => {
     this.setUpdateItemTray(!this.state.trayOpen);
+  }
+
+  toggleGradesTray = () => {
+    this.setState({gradesTrayOpen: !this.state.gradesTrayOpen});
   }
 
   setUpdateItemTray (trayOpen) {
@@ -229,6 +238,13 @@ export class PlannerHeader extends Component {
         >
           <IconPlusLine title={formatMessage("Add To Do")} />
         </Button>
+        <Button
+          variant="icon"
+          margin="0 medium 0 0"
+          onClick={this.toggleGradesTray}
+        >
+          <IconGradebookLine title={formatMessage("Show My Grades")} />
+        </Button>
         <Popover
           onDismiss={this.closeOpportunitiesDropdown}
           show={this.state.opportunitiesOpen}
@@ -279,6 +295,22 @@ export class PlannerHeader extends Component {
             onDeletePlannerItem={this.handleDeletePlannerItem}
             courses={this.props.courses}
           />
+        </Tray>
+        <Tray
+          label={formatMessage('My Grades')}
+          open={this.state.gradesTrayOpen}
+          placement="end"
+          shouldContainFocus
+          shouldReturnFocus
+          applicationElement={() => document.getElementById('application') }
+          onDismiss={this.toggleGradesTray}
+        >
+          <Container as="div" padding="large large medium">
+            <CloseButton placement="start" variant="icon" onClick={this.toggleGradesTray}>
+              {formatMessage("Close")}
+            </CloseButton>
+            <GradesDisplay courses={this.props.courses} />
+          </Container>
         </Tray>
       </div>
     );
