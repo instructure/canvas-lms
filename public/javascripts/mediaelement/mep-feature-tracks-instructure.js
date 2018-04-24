@@ -501,8 +501,8 @@ import htmlEscape from 'str/htmlEscape'
 				track = t.selectedTrack,
 				i,
 				sanitize = function (html) {
-					parser = new DOMParser();
-					doc = parser.parseFromString(html, "text/html");
+					var parser = new DOMParser();
+					var doc = parser.parseFromString(html, "text/html");
 
 					// Remove all nodes except those that are whitelisted
 					var elementWhitelist = [
