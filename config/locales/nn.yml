@@ -1768,8 +1768,8 @@ nn:
   app_placements_6d877225: App-plasseringar
   app_reregistration_87cc8817: "Ny registrering av app"
   app_was_installed_by_admin_and_is_locked_3bee4d39: "%{app}er installert av admin og er låst"
-  app_was_installed_by_the_master_course_and_is_lock_dbeb24a6: "%{app}er installert av masteremnet og er låst"
-  app_was_installed_by_the_master_course_e55ba1d7: "%{app}er installert av masteremnet"
+  app_was_installed_by_the_master_course_and_is_lock_dbeb24a6: "%{app}er installert av eit overordna emne og er låst"
+  app_was_installed_by_the_master_course_e55ba1d7: "%{app}er installert av eit overordna emne"
   appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "Legg til eit tal på slutten av kvar hendingstittel (f.eks. Hending 1, Hending 2, osv.)"
   appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "Legg til eit tal på slutten av kvar hendingstittel (f.eks. Hending 1, Hending 2, osv.)\" for=\"append_iterator"
   application: 
@@ -3365,7 +3365,7 @@ nn:
   check_to_select_all_98e484f1: "Merk for å velje alt"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Merk av for å ikkje legge til ein brukar for %{loginid}"
   checked_883b93fd: "merka av"
-  child_course_must_belong_to_the_same_root_account__66ed7b8e: "Underordna emne må høyre til den same rotkontoen som hovudemnet."
+  child_course_must_belong_to_the_same_root_account__66ed7b8e: "Underordna emne må høyre til den same rotkontoen som det overordna emnet."
   child_s_username_dde3aa9: "Barnets brukarnamn"
   chile_56_88238b47: "Chile (+56)"
   chile_9081cde6: Chile
