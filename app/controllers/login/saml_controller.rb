@@ -399,7 +399,7 @@ class Login::SamlController < ApplicationController
 
       logout_current_user
 
-      private_key = AccountAuthorizationConfig::SAML.private_key
+      private_key = AuthenticationProvider::SAML.private_key
       private_key = nil if aac.sig_alg.nil?
       forward_url = SAML2::Bindings::HTTPRedirect.encode(logout_response,
                                                          relay_state: relay_state,
@@ -418,7 +418,7 @@ class Login::SamlController < ApplicationController
     # This needs to be publicly available since external SAML
     # servers need to be able to access it without being authenticated.
     # It is used to disclose our SAML configuration settings.
-    metadata = AccountAuthorizationConfig::SAML.sp_metadata_for_account(@domain_root_account, request.host_with_port)
+    metadata = AuthenticationProvider::SAML.sp_metadata_for_account(@domain_root_account, request.host_with_port)
     render xml: metadata.to_xml
   end
 

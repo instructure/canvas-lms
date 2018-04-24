@@ -599,17 +599,17 @@ CanvasRails::Application.routes.draw do
     resources :account_notifications, only: [:create, :update, :destroy]
     concerns :announcements
     resources :submissions
-    delete 'authentication_providers' => 'account_authorization_configs#destroy_all', as: :remove_all_authentication_providers
-    put 'sso_settings' => 'account_authorization_configs#update_sso_settings',
+    delete 'authentication_providers' => 'authentication_providers#destroy_all', as: :remove_all_authentication_providers
+    put 'sso_settings' => 'authentication_providers#update_sso_settings',
         as: :update_sso_settings
 
-    resources :authentication_providers, controller: :account_authorization_configs, only: [:index, :create, :update, :destroy]
-    get 'test_ldap_connections' => 'account_authorization_configs#test_ldap_connection'
-    get 'test_ldap_binds' => 'account_authorization_configs#test_ldap_bind'
-    get 'test_ldap_searches' => 'account_authorization_configs#test_ldap_search'
-    match 'test_ldap_logins' => 'account_authorization_configs#test_ldap_login', via: [:get, :post]
-    get 'saml_testing' => 'account_authorization_configs#saml_testing'
-    get 'saml_testing_stop' => 'account_authorization_configs#saml_testing_stop'
+    resources :authentication_providers, only: [:index, :create, :update, :destroy]
+    get 'test_ldap_connections' => 'authentication_providers#test_ldap_connection'
+    get 'test_ldap_binds' => 'authentication_providers#test_ldap_bind'
+    get 'test_ldap_searches' => 'authentication_providers#test_ldap_search'
+    match 'test_ldap_logins' => 'authentication_providers#test_ldap_login', via: [:get, :post]
+    get 'saml_testing' => 'authentication_providers#saml_testing'
+    get 'saml_testing_stop' => 'authentication_providers#saml_testing_stop'
 
     get 'external_tools/sessionless_launch' => 'external_tools#sessionless_launch'
     resources :external_tools do
@@ -1364,7 +1364,7 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/admins', action: :index, as: 'account_admins'
     end
 
-    scope(controller: :account_authorization_configs) do
+    scope(controller: :authentication_providers) do
       get 'accounts/:account_id/sso_settings', action: :show_sso_settings, as: 'account_show_sso_settings_url'
       put 'accounts/:account_id/sso_settings', action: :update_sso_settings, as: 'account_update_sso_settings_url'
 

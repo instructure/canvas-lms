@@ -18,10 +18,16 @@
 class PopulateUnknownUserUrl < ActiveRecord::Migration[4.2]
   tag :predeploy
 
+  class AuthenticationProvider < ActiveRecord::Base
+    self.table_name = 'account_authorization_configs'
+
+    belongs_to :account
+  end
+
   def up
-    AccountAuthorizationConfig.select("*, unknown_user_url AS uuu").find_each do |aac|
+    AuthenticationProvider.select("*, unknown_user_url AS uuu").find_each do |aac|
       account = aac.account
-      if !account.unknown_user_url.present? && aac['uuu'].present?
+      if account.unknown_user_url.blank? && aac['uuu'].present?
         account.unknown_user_url = aac['uuu']
         account.save!
       end

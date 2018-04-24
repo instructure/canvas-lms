@@ -50,7 +50,7 @@ class ObjectView < HashView
   end
 
   # Some @object descriptions have multiple JSON parts.
-  # See e.g. AccountAuthorizationConfig
+  # See e.g. AuthenticationProvider
   def clean_json_text_parts
     clean_json_text.gsub(/(\})\s+(\{)/, "\\1#{SEP}\\2").split(SEP)
   end

@@ -19,7 +19,7 @@ class DisableOpenRegistrationForDelegatedAuth < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up
-    scope = Account.root_accounts.joins(:authentication_providers).readonly(false)
+    scope = Account.root_accounts.joins("INNER JOIN #{connection.quote_table_name('account_authorization_configs')} ON account_id=accounts.id").readonly(false)
     scope.where('account_authorization_configs.auth_type' => ['cas', 'saml']).each do |account|
       account.settings = { :open_registration => false }
       account.save!

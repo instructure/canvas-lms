@@ -64,8 +64,8 @@ class Account < ActiveRecord::Base
   has_many :developer_key_account_bindings, inverse_of: :account, dependent: :destroy
   has_many :authentication_providers,
            -> { order(:position) },
-           extend: AccountAuthorizationConfig::FindWithType,
-           class_name: "AccountAuthorizationConfig"
+           inverse_of: :account,
+           extend: AuthenticationProvider::FindWithType
 
   has_many :account_reports
   has_many :grading_standards, -> { where("workflow_state<>'deleted'") }, as: :context, inverse_of: :context
@@ -303,7 +303,7 @@ class Account < ActiveRecord::Base
   def enable_canvas_authentication
     return unless root_account?
     # for migrations creating a new db
-    return unless AccountAuthorizationConfig::Canvas.columns_hash.key?('workflow_state')
+    return unless AuthenticationProvider::Canvas.columns_hash.key?('workflow_state')
     return if authentication_providers.active.where(auth_type: 'canvas').exists?
     authentication_providers.create!(auth_type: 'canvas')
   end
@@ -959,12 +959,12 @@ class Account < ActiveRecord::Base
     if login_handle_name_is_customized?
       self.login_handle_name
     elsif self.delegated_authentication?
-      AccountAuthorizationConfig.default_delegated_login_handle_name
+      AuthenticationProvider.default_delegated_login_handle_name
     end
   end
 
   def login_handle_name_with_inference
-    customized_login_handle_name || AccountAuthorizationConfig.default_login_handle_name
+    customized_login_handle_name || AuthenticationProvider.default_login_handle_name
   end
 
   def self_and_all_sub_accounts
@@ -1106,7 +1106,7 @@ class Account < ActiveRecord::Base
   end
 
   def delegated_authentication?
-    authentication_providers.active.first.is_a?(AccountAuthorizationConfig::Delegated)
+    authentication_providers.active.first.is_a?(AuthenticationProvider::Delegated)
   end
 
   def forgot_password_external_url

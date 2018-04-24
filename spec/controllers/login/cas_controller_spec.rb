@@ -29,7 +29,7 @@ describe Login::CasController do
       st.success = response.is_success?
       st
     end
-    allow_any_instance_of(AccountAuthorizationConfig::CAS).to receive(:client).and_return(cas_client) if use_mock
+    allow_any_instance_of(AuthenticationProvider::CAS).to receive(:client).and_return(cas_client) if use_mock
   end
 
   it "should logout with specific cas ticket" do

@@ -24,7 +24,7 @@ describe AccountsController do
 
   context "SAML meta data" do
     before(:each) do
-      skip("requires SAML extension") unless AccountAuthorizationConfig::SAML.enabled?
+      skip("requires SAML extension") unless AuthenticationProvider::SAML.enabled?
       @account = Account.create!(:name => "test")
     end
 

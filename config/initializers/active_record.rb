@@ -1603,3 +1603,17 @@ if CANVAS_RAILS5_1
     end
   end
 end
+
+# fake Rails into grabbing correct column information for a table rename in-progress
+module TableRename
+  RENAMES = { 'authentication_providers' => 'account_authorization_configs' }.freeze
+
+  def columns(table_name)
+    if (old_name = RENAMES[table_name])
+      table_name = old_name if connection.table_exists?(old_name)
+    end
+    super
+  end
+end
+
+ActiveRecord::ConnectionAdapters::SchemaCache.prepend(TableRename)

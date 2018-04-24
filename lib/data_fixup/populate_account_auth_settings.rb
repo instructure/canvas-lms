@@ -16,15 +16,24 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module DataFixup::PopulateAccountAuthSettings
+  class AuthenticationProvider < ActiveRecord::Base
+    belongs_to :account
+  end
 
   def self.run
-    AccountAuthorizationConfig.select("*, login_handle_name AS lhn, change_password_url AS cpu").find_each do |aac|
+    AuthenticationProvider.table_name = if AuthenticationProvider.connection.table_exists?('account_authorization_configs')
+      'account_authorization_configs'
+    else
+      'authentication_providers'
+    end
+
+    AuthenticationProvider.select("*, login_handle_name AS lhn, change_password_url AS cpu").find_each do |aac|
       account = aac.account
-      if !account.login_handle_name.present? && aac['lhn'].present?
+      if account.login_handle_name.blank? && aac['lhn'].present?
         account.login_handle_name = aac['lhn']
       end
 
-      if !account.change_password_url.present? && aac['cpu'].present?
+      if account.change_password_url.blank? && aac['cpu'].present?
         account.change_password_url = aac['cpu']
       end
       account.save!

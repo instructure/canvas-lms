@@ -20,7 +20,7 @@ require_relative '../../spec_helper'
 
 describe Login::SamlController do
   before do
-    skip("requires SAML extension") unless AccountAuthorizationConfig::SAML.enabled?
+    skip("requires SAML extension") unless AuthenticationProvider::SAML.enabled?
   end
 
   it "should scope logins to the correct domain root account" do

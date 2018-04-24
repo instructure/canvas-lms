@@ -20,7 +20,7 @@ class GrandfatherCanvasAuthentication < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
 
   def up
-    AccountAuthorizationConfig::Canvas.reset_column_information
+    AuthenticationProvider::Canvas.reset_column_information
     Account.root_accounts.each do |account|
       if account.settings[:canvas_authentication] != false || !account.authentication_providers.active.exists?
         account.enable_canvas_authentication
@@ -29,6 +29,6 @@ class GrandfatherCanvasAuthentication < ActiveRecord::Migration[4.2]
   end
 
   def down
-    AccountAuthorizationConfig.where(auth_type: 'canvas').delete_all
+    AuthenticationProvider.where(auth_type: 'canvas').delete_all
   end
 end

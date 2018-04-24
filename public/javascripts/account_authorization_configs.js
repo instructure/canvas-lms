@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!account_authorization_configs'
+import I18n from 'i18n!authentication_providers'
 import htmlEscape from './str/htmlEscape'
 import React from 'react'
 import ReactDOM from 'react-dom'
