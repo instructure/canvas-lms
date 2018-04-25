@@ -2157,6 +2157,7 @@ define [
       submissionState = @submissionStateMap.getSubmissionState({ user_id: studentId, assignment_id: assignmentId })
       isGroupWeightZero = @assignmentGroups[assignment.assignment_group_id].group_weight == 0
 
+      anonymousModeratedMarkingEnabled: @options.anonymous_moderated_marking_enabled
       assignment: ConvertCase.camelize(assignment)
       colors: @getGridColors()
       comments: comments

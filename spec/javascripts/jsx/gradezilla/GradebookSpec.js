@@ -6955,6 +6955,19 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
     moxios.uninstall();
   });
 
+  test('anonymousModeratedMarkingEnabled is true when options.anonymous_moderated_marking_enabled is true', function () {
+    gradebook.options.anonymous_moderated_marking_enabled = true
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
+    strictEqual(props.anonymousModeratedMarkingEnabled, true);
+  });
+
+  test('anonymousModeratedMarkingEnabled is false when options.anonymous_moderated_marking_enabled is false', function () {
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
+    strictEqual(props.anonymousModeratedMarkingEnabled, false);
+  });
+
   test('gradingDisabled is true when the submission state is locked', function () {
     sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').returns({ locked: true });
     gradebook.setSubmissionTrayState(true, '1101', '2301');
