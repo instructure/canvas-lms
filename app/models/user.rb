@@ -1903,9 +1903,9 @@ class User < ActiveRecord::Base
   def calendar_events_for_calendar(opts={})
     opts = opts.dup
     context_codes = opts[:context_codes] || (opts[:contexts] ? setup_context_lookups(opts[:contexts]) : self.cached_context_codes)
-    return [] if (!context_codes || context_codes.empty?)
+    return [] if !context_codes || context_codes.empty?
     opts[:start_at] ||= 2.weeks.ago
-    opts[:end_at] ||= 1.weeks.from_now
+    opts[:end_at] ||= 1.week.from_now
 
     events = []
     events += calendar_events_for_contexts(context_codes, opts)

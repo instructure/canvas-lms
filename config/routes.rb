@@ -244,7 +244,7 @@ CanvasRails::Application.routes.draw do
     get 'grades/:id' => 'gradebooks#grade_summary', as: :student_grades
     post 'save_assignment_order' => 'gradebooks#save_assignment_order', as: :save_assignment_order
     concerns :announcements
-    get 'calendar' => 'calendars#show2', as: :old_calendar
+    get 'calendar' => 'calendars#show'
     get :locks
     concerns :discussions
     resources :assignments do
@@ -536,7 +536,7 @@ CanvasRails::Application.routes.draw do
     resources :collaborations
     get 'lti_collaborations' => 'collaborations#lti_index'
     get 'lti_collaborations/*all' => 'collaborations#lti_index'
-    get 'calendar' => 'calendars#show2', as: :old_calendar
+    get 'calendar' => 'calendars#show'
 
     resources :external_tools do
       get :finished
@@ -836,8 +836,8 @@ CanvasRails::Application.routes.draw do
 
   resources :plugins, only: [:index, :show, :update]
 
-  get 'calendar' => 'calendars#show2'
-  get 'calendar2' => 'calendars#show2'
+  get 'calendar' => 'calendars#show'
+  get 'calendar2' => 'calendars#show'
   get 'course_sections/:course_section_id/calendar_events/:id' => 'calendar_events#show', as: :course_section_calendar_event
   get 'files' => 'files#index'
   get "files/folder#{full_path_glob}", controller: 'files', action: 'react_files', format: false

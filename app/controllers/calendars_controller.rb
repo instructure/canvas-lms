@@ -17,9 +17,9 @@
 #
 
 class CalendarsController < ApplicationController
-  before_action :require_user, :except => [ :public_feed ]
+  before_action :require_user
 
-  def show2
+  def show
     get_context
     get_all_pertinent_contexts(include_groups: true, favorites_first: true, cross_shard: true)
     @manage_contexts = @contexts.select { |c|
@@ -102,96 +102,4 @@ class CalendarsController < ApplicationController
     StringifyIds.recursively_stringify_ids(@contexts_json)
     js_env(@hash) if @hash
   end
-
-  def build_calendar_events
-    opts = {
-      :contexts => @contexts,
-      :start_at => @first_day,
-      :end_at => @last_day + 1,
-      :include_undated => !!params[:include_undated],
-      :include_deleted_events => request.format == :json,
-      :updated_at => @updated_at
-    }
-    @events = @current_user.calendar_events_for_calendar(opts) if @current_user
-    if params[:include_undated] && @current_user
-      @undated_events = @current_user.undated_events(opts)
-    end
-    @events ||= []
-    @undated_events ||= []
-    args = []
-    format = request.format.to_sym.to_s
-    if format == 'json'
-      args << { :user_content => %w(description) }
-      if @current_user
-        args.last[:permissions] = { :user => @current_user, :session => session }
-      end
-    end
-    @events.concat(@undated_events).send("to_#{format}", *args)
-  end
-  protected :build_calendar_events
-
-  def calendar_events_for_request_format
-    @updated_at = params[:last_update_at] && !params[:last_update_at].empty? && (Time.parse(params[:last_update_at]) rescue nil)
-    if @updated_at
-      build_calendar_events
-    else #if we are rendering a request that does not have a ?last_udpated_at, then it is cacheable both server and client side.
-      cache_key = ['calendar_month', request.format, @month, @year, Digest::MD5.hexdigest(@contexts.map(&:cache_key).join)[0, 10]].join('/')
-
-      # This tries to 304 cache these on the clients browser, it is safe because it is not public, it is just for ajax requests,
-      # so we dont have the back button problem we have elsewhere, and Assignments and Calendar Events will both touch their context so that cache key is always accurate.
-      cancel_cache_buster
-      response.etag = cache_key
-      if request.fresh?(response)
-        @dont_render_again = true
-        head :not_modified and return
-      end
-
-      Rails.cache.fetch(cache_key) {
-        build_calendar_events
-      }
-    end
-  end
-  protected :calendar_events_for_request_format
-
-  def build_calendar_dates(event_to_focus)
-    @today = Time.zone.today
-
-    if params[:start_day] && params[:end_day]
-      @first_day = Date.parse(params[:start_day])
-      @last_day = Date.parse(params[:end_day])
-      if @first_day.day != 1
-        # TODO: this is assuming a month is asked for at a time, which is a bad assumption
-        @month = (@first_day + 1.month).month
-        @year = (@first_day + 1.month).year
-      else
-        @month = @first_day.month
-        @year = @first_day.year
-      end
-      @current = Date.new(y = @year, m = @month, d = 1)
-    else
-      if event_to_focus
-        use_start = event_to_focus.start_at.in_time_zone
-        @month = use_start.month
-        @year = use_start.year
-      else
-        @month = params[:month].to_i
-        @month = !@month || @month == 0 ? @today.month : @month
-        @year = params[:year].to_i
-        @year = !@year || @year == 0 ? @today.year : @year
-      end
-
-      @first_day = Date.parse(params[:start_day]) if params[:start_day]
-      @last_day = Date.parse(params[:end_day]) if params[:end_day]
-
-      first_day_of_month = Date.new(y=@year, m=@month, d=1)
-      last_day_of_previous_month = first_day_of_month - 1
-      @current = first_day_of_month
-      last_day_of_month = (first_day_of_month >> 1) - 1
-      first_day_of_next_month = last_day_of_month + 1
-      @first_day = last_day_of_previous_month - last_day_of_previous_month.wday
-      @last_day = first_day_of_next_month + (6 - first_day_of_next_month.wday) + 7
-    end
-  end
-  protected :build_calendar_dates
-
 end
