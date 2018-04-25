@@ -26,7 +26,7 @@ export default function ToggleIcon ({ toggled, OnIcon, OffIcon, onToggleOn,
   return (
     <span className={className}>
       <Button
-        variant="icon"
+        variant="ghost"
         size="small"
         theme={{borderWidth: "0"}}
         disabled={disabled}

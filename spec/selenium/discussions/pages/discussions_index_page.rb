@@ -83,7 +83,7 @@ class DiscussionsIndex
     end
 
     def discussion_title(title)
-      f('h3', discussion(title))
+      f('a', discussion(title))
     end
 
     def discussion_sections(title)
