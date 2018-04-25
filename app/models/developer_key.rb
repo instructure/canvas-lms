@@ -39,6 +39,8 @@ class DeveloperKey < ActiveRecord::Base
   before_save :protect_default_key
   after_save :clear_cache
   after_create :create_default_account_binding
+  before_validation :set_require_scopes
+  before_validation :validate_scopes!
 
   validates_as_url :redirect_uri, allowed_schemes: nil
   validate :validate_redirect_uris
@@ -220,9 +222,28 @@ class DeveloperKey < ActiveRecord::Base
     account_binding_for(target_account)&.workflow_state == DeveloperKeyAccountBinding::ON_STATE
   end
 
+  def api_token_scoping_on?
+    scoping_allowed = Account.site_admin.feature_allowed?(:api_token_scoping)
+    return scoping_allowed if account.blank?
+    scoping_allowed && account.feature_enabled?(:api_token_scoping)
+  end
+
   def create_default_account_binding
     owner_account = account || Account.site_admin
     owner_account.developer_key_account_bindings.create!(developer_key: self)
+  end
+
+  def set_require_scopes
+    return unless api_token_scoping_on?
+    self.require_scopes = self.scopes.present?
+  end
+
+  def validate_scopes!
+    return true unless api_token_scoping_on?
+    return true if self.scopes.empty?
+    invalid_scopes = self.scopes - TokenScopes::ALL_SCOPES
+    return true if invalid_scopes.empty?
+    self.errors[:scopes] << "cannot contain #{invalid_scopes.join(', ')}"
   end
 
   def site_admin?

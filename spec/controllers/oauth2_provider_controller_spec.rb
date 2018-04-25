@@ -145,7 +145,8 @@ describe Oauth2ProviderController do
 
       context 'when new developer key FF is enabled' do
         before do
-          allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
+          allow(Account.site_admin).to receive(:feature_allowed?).and_return(false)
+          allow(Account.default).to receive(:feature_enabled?).and_return(false)
           allow(Account.site_admin).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(true)
           allow(Account.default).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
         end

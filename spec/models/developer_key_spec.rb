@@ -70,6 +70,50 @@ describe DeveloperKey do
   end
 
   describe 'callbacks' do
+    it 'does not validate scopes' do
+      expect do
+        DeveloperKey.create!(
+          scopes: ['not_a_valid_scope']
+        )
+      end.not_to raise_exception
+    end
+
+    context 'when api token scoping FF is enabled' do
+      let(:valid_scopes) do
+        %w(url:POST|/api/v1/courses/:course_id/quizzes/:id/validate_access_code
+          url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id)
+      end
+
+      before { Account.site_admin.allow_feature!(:api_token_scoping) }
+
+      it 'raises an error if scopes contain invalid scopes' do
+        expect do
+          DeveloperKey.create!(
+            scopes: ['not_a_valid_scope']
+          )
+        end.to raise_exception('Validation failed: Scopes cannot contain not_a_valid_scope')
+      end
+
+      it 'does not raise an error if all scopes are valid scopes' do
+        expect do
+          DeveloperKey.create!(
+            scopes: valid_scopes
+          )
+        end.not_to raise_exception
+      end
+
+      it 'sets "require_scopes" to true if scopes are present' do
+        key = DeveloperKey.create!(scopes: valid_scopes)
+        expect(key.require_scopes).to eq true
+      end
+
+      it 'sets "require_scopes" to false if scopes are blank' do
+        key = DeveloperKey.create!
+        expect(key.require_scopes).to eq false
+      end
+    end
+
+
     context 'when site admin' do
       it 'it creates a binding on save' do
         key = DeveloperKey.create!(account: nil)

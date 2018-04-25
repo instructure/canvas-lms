@@ -81,6 +81,11 @@ describe DeveloperKeysController, type: :request do
     describe 'developer key account bindings' do
       specs_require_sharding
 
+      before do
+        allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
+        allow_any_instance_of(Account).to receive(:feature_allowed?).and_return(false)
+      end
+
       it 'does not include binding data' do
         user_session(account_admin_user(account: Account.site_admin))
         sa_key = Account.site_admin.shard.activate { DeveloperKey.create!(account: nil) }
