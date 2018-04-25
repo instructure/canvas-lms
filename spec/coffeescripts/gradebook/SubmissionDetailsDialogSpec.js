@@ -59,13 +59,42 @@ test('speed_grader_enabled sets speedgrader url', function() {
   equal(dialog.dialog.find('.more-details-link').length, 1)
 })
 
-test('speed_grader_enabled omits student_id from speedgrader url for anonymously graded assignments', function() {
+test('speedGraderUrl excludes student id when Anonymous Moderated Marking is ' +
+'enabled and the assignment is anonymously graded', function() {
+  this.options.anonymous_moderated_marking_enabled = true
   this.assignment.anonymous_grading = true
   this.options.context_url = 'http://some-fake-url'
   const dialog = new SubmissionDetailsDialog(this.assignment, this.user, this.options)
 
-  const urlObject = new URL(dialog.submission.speedGraderUrl)
-  strictEqual(urlObject.hash, '')
+  notOk(dialog.submission.speedGraderUrl.match(/student_id/))
+})
+
+test('speedGraderUrl includes student id when Anonymous Moderated Marking is ' +
+'enabled and the assignment is not anonymously graded', function() {
+  this.options.anonymous_moderated_marking_enabled = true
+  this.options.context_url = 'http://some-fake-url'
+  const dialog = new SubmissionDetailsDialog(this.assignment, this.user, this.options)
+
+  ok(dialog.submission.speedGraderUrl.match(/student_id/))
+})
+
+test('speedGraderUrl includes student id when Anonymous Moderated Marking is ' +
+'disabled and the assignment is anonymously graded', function() {
+  this.options.anonymous_moderated_marking_enabled = false
+  this.assignment.anonymous_grading = true
+  this.options.context_url = 'http://some-fake-url'
+  const dialog = new SubmissionDetailsDialog(this.assignment, this.user, this.options)
+
+  ok(dialog.submission.speedGraderUrl.match(/student_id/))
+})
+
+test('speedGraderUrl includes student id when Anonymous Moderated Marking is ' +
+'disabled and the assignment is not anonymously graded', function() {
+  this.options.anonymous_moderated_marking_enabled = false
+  this.options.context_url = 'http://some-fake-url'
+  const dialog = new SubmissionDetailsDialog(this.assignment, this.user, this.options)
+
+  ok(dialog.submission.speedGraderUrl.match(/student_id/))
 })
 
 test('speed_grader_enabled as false does not set speedgrader url', function() {
