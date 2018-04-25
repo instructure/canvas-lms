@@ -269,7 +269,7 @@ describe "grades" do
         s
       end
 
-      GradeCalculator.new(all_students.map(&:id), @course).compute_and_save_scores
+      AssignmentScoreStatisticsGenerator.update_score_statistics(@course.id)
 
       get "/courses/#{@course.id}/grades"
       f('.toggle_score_details_link').click

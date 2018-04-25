@@ -29,15 +29,6 @@ RSpec.describe ScoreStatistic, type: :model do
     it { is_expected.to validate_presence_of(:mean) }
     it { is_expected.to validate_presence_of(:count) }
 
-    it 'validates uniqueness of assignment' do
-      course = Course.create!
-      assignment = course.assignments.create!
-      existing_record = ScoreStatistic.new(assignment: assignment, maximum: 0, minimum: 0, mean: 0, count: 0)
-      existing_record.save(validate: false)
-
-      expect(subject).to validate_uniqueness_of(:assignment)
-    end
-
     it { is_expected.to validate_numericality_of(:maximum) }
     it { is_expected.to validate_numericality_of(:minimum) }
     it { is_expected.to validate_numericality_of(:mean) }

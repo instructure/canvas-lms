@@ -390,36 +390,7 @@ class GradeCalculator
     return if @grading_period   # only update score statistics when calculating course scores
     return unless @ignore_muted # only update when calculating final scores
 
-    # performance note: There is an overlap between
-    # Submission.not_placeholder and the submission where clause.
-    #
-    # note: because a score is needed for max/min/ave we are not filtering
-    # by assignment_student_visibilities, if a stat is added that doesn't
-    # require score then add a filter when the DA feature is on
-
-    statistics = Assignment.where(id: @assignments.map(&:id)).preload(:score_statistic).
-      joins(:submissions).
-      joins("INNER JOIN #{Enrollment.quoted_table_name} enrollments ON submissions.user_id = enrollments.user_id").
-      merge(@course.all_enrollments.of_student_type.active_or_pending).
-      merge(Submission.not_placeholder.where("submissions.excused IS NOT TRUE")).
-      group("assignments.id").
-      select("assignments.id, max(score) max, min(score) min, avg(score) avg, count(submissions.id) count").
-      index_by(&:id)
-
-    statistics.values.map do |assignment|
-      assignment_stats = {
-        maximum: assignment.max,
-        minimum: assignment.min,
-        mean: assignment.avg,
-        count: assignment.count
-      }
-
-      if assignment.score_statistic
-        assignment.score_statistic.update(assignment_stats)
-      else
-        assignment.create_score_statistic(assignment_stats)
-      end
-    end
+    AssignmentScoreStatisticsGenerator.update_score_statistics_in_singleton(@course.id)
   end
 
   def save_scores

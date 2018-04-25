@@ -184,9 +184,9 @@ describe GradeSummaryPresenter do
 
       # this student should be ignored
       a.grade_student s4, grade: 99, grader: @teacher
-      s4.enrollments.each &:destroy
+      s4.enrollments.each(&:destroy)
 
-      GradeCalculator.new(all_students.map(&:id), @course).compute_and_save_scores
+      AssignmentScoreStatisticsGenerator.update_score_statistics(@course.id)
 
       p = GradeSummaryPresenter.new(@course, @teacher, nil)
       stats = p.assignment_stats
@@ -214,7 +214,7 @@ describe GradeSummaryPresenter do
         enrollment.save!
       end
 
-      GradeCalculator.new(all_students.map(&:id), @course).compute_and_save_scores
+      AssignmentScoreStatisticsGenerator.update_score_statistics(@course.id)
 
       p = GradeSummaryPresenter.new(@course, @teacher, nil)
       stats = p.assignment_stats
@@ -232,7 +232,7 @@ describe GradeSummaryPresenter do
       a.grade_student s3, grade: 10, grader: @teacher
       a.grade_student s4, grade: nil, grader: @teacher
 
-      GradeCalculator.new(all_students.map(&:id), @course).compute_and_save_scores
+      AssignmentScoreStatisticsGenerator.update_score_statistics(@course.id)
 
       p = GradeSummaryPresenter.new(@course, @teacher, nil)
       stats = p.assignment_stats
@@ -262,7 +262,7 @@ describe GradeSummaryPresenter do
         enrollment.save!
       end
 
-      GradeCalculator.new(all_students.map(&:id), @course).compute_and_save_scores
+      AssignmentScoreStatisticsGenerator.update_score_statistics(@course.id)
 
       p = GradeSummaryPresenter.new(@course, @teacher, nil)
       expect(p.assignment_stats.values.first.count).to eq 3
