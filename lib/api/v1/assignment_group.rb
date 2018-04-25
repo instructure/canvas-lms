@@ -65,6 +65,7 @@ module Api::V1::AssignmentGroup
           include_discussion_topic: includes.include?('discussion_topic'),
           include_all_dates: includes.include?('all_dates'),
           include_module_ids: includes.include?('module_ids'),
+          include_grades_published: includes.include?('grades_published'),
           override_dates: opts[:override_assignment_dates],
           preloaded_user_content_attachments: user_content_attachments,
           include_visibility: includes.include?('assignment_visibility'),

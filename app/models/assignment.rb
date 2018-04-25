@@ -100,13 +100,13 @@ class Assignment < ActiveRecord::Base
   # TODO: remove this once the field is editable via the UI. Right now there's
   # no user-facing way to set the grader count to a valid value.
   before_validation(on: :create) do
-    if moderated_grading? && course.account.feature_enabled?(:anonymous_moderated_marking) && grader_count.zero?
+    if moderated_grading? && anonymous_moderated_marking? && grader_count.zero?
       self.grader_count = 2
     end
   end
 
   before_create do
-    self.muted = true if moderated_grading? && course.account.feature_enabled?(:anonymous_moderated_marking)
+    self.muted = true if moderated_grading? && anonymous_moderated_marking?
   end
 
   validates :graders_anonymous_to_graders, absence: true, unless: :anonymous_grading?
@@ -118,7 +118,7 @@ class Assignment < ActiveRecord::Base
     validates :grader_names_visible_to_final_grader, absence: true
   end
 
-  with_options if: -> { moderated_grading? && course.account.feature_enabled?(:anonymous_moderated_marking) } do
+  with_options if: -> { moderated_grading? && anonymous_moderated_marking? } do
     validates :grader_count, numericality: { greater_than: 0, message: "Number of graders must be positive" }
     validate :grader_section_ok?
     validate :final_grader_ok?
@@ -2610,6 +2610,13 @@ class Assignment < ActiveRecord::Base
     self.save
   end
 
+  def unmute!
+    return unless muted?
+    return super unless !grades_published? && anonymous_moderated_marking? && anonymous_grading?
+    errors.add :muted, I18n.t("Anonymous moderated assignments cannot be unmuted until grades are posted")
+    false
+  end
+
   def excused_for?(user)
     s = submissions.where(user_id: user.id).first_or_initialize
     s.excused?
@@ -2780,5 +2787,9 @@ class Assignment < ActiveRecord::Base
     elsif grader_section_id.nil? && course.participating_instructors.where(id: final_grader_id).empty?
       errors.add(:final_grader, 'Final grader must be an instructor in this course')
     end
+  end
+
+  def anonymous_moderated_marking?
+    course.root_account.feature_enabled?(:anonymous_moderated_marking)
   end
 end

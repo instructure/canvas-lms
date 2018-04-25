@@ -1718,6 +1718,107 @@ describe Assignment do
     end
   end
 
+  describe "#unmute!" do
+    before :once do
+      @assignment = assignment_model(course: @course)
+      @course.enable_feature! :anonymous_grading
+    end
+
+    it "returns falsey when assignment is not muted" do
+      expect(@assignment.unmute!).to be_falsey
+    end
+
+    context "when Anonymous Moderated Marking is enabled and assignment is anonymously graded" do
+      before :once do
+        @course.root_account.enable_feature! :anonymous_moderated_marking
+        @assignment.update_attributes(moderated_grading: true, anonymous_grading: true, grader_count: 1)
+        @assignment.mute!
+      end
+
+      context "when grades have not been published" do
+        it "does not unmute the assignment" do
+          @assignment.unmute!
+          expect(@assignment).to be_muted
+        end
+
+        it "adds an error for 'muted'" do
+          @assignment.unmute!
+          expect(@assignment.errors["muted"]).to eq(["Anonymous moderated assignments cannot be unmuted until grades are posted"])
+        end
+
+        it "returns false" do
+          expect(@assignment.unmute!).to eq(false)
+        end
+      end
+
+      context "when grades have been published" do
+        before :once do
+          @assignment.update_attribute(:grades_published_at, Time.now.utc)
+        end
+
+        it "unmutes the assignment" do
+          @assignment.unmute!
+          expect(@assignment).not_to be_muted
+        end
+
+        it "returns true" do
+          expect(@assignment.unmute!).to eq(true)
+        end
+      end
+    end
+
+    context "when Anonymous Moderated Marking is enabled and assignment is anonymously graded and not moderated" do
+      before :once do
+        @course.account.enable_feature! :anonymous_moderated_marking
+        @assignment.update_attributes(moderated_grading: false, anonymous_grading: true)
+        @assignment.mute!
+      end
+
+      it "unmutes the assignment" do
+        @assignment.unmute!
+        expect(@assignment).not_to be_muted
+      end
+
+      it "returns true" do
+        expect(@assignment.unmute!).to eq(true)
+      end
+    end
+
+    context "when Anonymous Moderated Marking is enabled and assignment is not anonymously graded" do
+      before :once do
+        @course.account.enable_feature! :anonymous_moderated_marking
+        @assignment.update_attributes(moderated_grading: true, anonymous_grading: false, grader_count: 1)
+        @assignment.mute!
+      end
+
+      it "unmutes the assignment" do
+        @assignment.unmute!
+        expect(@assignment).not_to be_muted
+      end
+
+      it "returns true" do
+        expect(@assignment.unmute!).to eq(true)
+      end
+    end
+
+    context "when Anonymous Moderated Marking is disabled and assignment is anonymously graded" do
+      before :once do
+        @course.account.disable_feature! :anonymous_moderated_marking
+        @assignment.update_attributes(moderated_grading: true, anonymous_grading: true, grader_count: 1)
+        @assignment.mute!
+      end
+
+      it "unmutes the assignment" do
+        @assignment.unmute!
+        expect(@assignment).not_to be_muted
+      end
+
+      it "returns true" do
+        expect(@assignment.unmute!).to eq(true)
+      end
+    end
+  end
+
   describe "infer_times" do
     it "should set to all_day" do
       assignment_model(:due_at => "Sep 3 2008 12:00am",

@@ -1957,7 +1957,7 @@ define [
       not @isFilteringColumnsByGradingPeriod()
 
     fieldsToExcludeFromAssignments: ['description', 'needs_grading_count', 'in_closed_grading_period']
-    fieldsToIncludeWithAssignments: ['module_ids', 'assignment_group_id']
+    fieldsToIncludeWithAssignments: ['grades_published', 'module_ids', 'assignment_group_id']
 
     studentsParams: ->
       enrollmentStates = ['invited', 'active']
@@ -2673,7 +2673,8 @@ define [
       manager = new AssignmentMuterDialogManager(
         assignment,
         "#{@options.context_url}/assignments/#{assignmentId}/mute",
-        @contentLoadStates.submissionsLoaded
+        @contentLoadStates.submissionsLoaded,
+        @options.anonymous_moderated_marking_enabled
       )
 
       {

@@ -130,6 +130,8 @@ module Api::V1::Assignment
       hash['in_closed_grading_period'] = assignment.in_closed_grading_period?
     end
 
+    hash['grades_published'] = assignment.grades_published? if opts[:include_grades_published]
+
     if !opts[:overrides].blank?
       hash['overrides'] = assignment_overrides_json(opts[:overrides], user)
     elsif opts[:include_overrides]

@@ -75,12 +75,15 @@ define [
         )
         .popup('open')
 
-      new AssignmentMuter(@$menu.find("[data-action=toggleMuting]"),
+      new AssignmentMuter(
+        @$menu.find("[data-action=toggleMuting]"),
         @assignment,
         "#{@gradebook.options.context_url}/assignments/#{@assignment.id}/mute",
-        (a, _z, status) =>
+        (a, _z, status) => (
           a.muted = status
           @gradebook.setAssignmentWarnings()
+        ),
+        canUnmute: @canUnmute()
       ).show()
 
     menuPopupOpenHandler: (menu) ->
@@ -88,7 +91,7 @@ define [
       @hideMenuActionsWithUnmetDependencies(menu)
 
       # Disable menu options if needed
-      @disableUnavailableMenuActions(menu) unless isAdmin()
+      @disableUnavailableMenuActions(menu)
 
 
     hideMenuActionsWithUnmetDependencies: (menu) ->
@@ -103,9 +106,14 @@ define [
 
     disableUnavailableMenuActions: (menu) ->
       return unless menu?
-      return unless @assignment?.inClosedGradingPeriod
 
-      actionsToDisable = ['curveGrades', 'setDefaultGrade']
+      actionsToDisable = []
+
+      if @assignment?.inClosedGradingPeriod and not isAdmin()
+        actionsToDisable = ['curveGrades', 'setDefaultGrade']
+
+      unless @canUnmute()
+        actionsToDisable.push('toggleMuting')
 
       for actionToDisable in actionsToDisable
         menuItem = menu.find("[data-action=#{actionToDisable}]")
@@ -171,3 +179,11 @@ define [
               false
       url = $.replaceTags @gradebook.options.re_upload_submissions_url, "assignment_id", @assignment.id
       @$re_upload_submissions_form.attr('action', url).dialog('open')
+
+    canUnmute: =>
+      not (
+        @gradebook.options.anonymous_moderated_marking_enabled and
+        @assignment.muted and
+        @assignment.anonymous_grading and
+        not @assignment.grades_published
+      )

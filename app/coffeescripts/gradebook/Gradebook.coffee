@@ -220,7 +220,7 @@ define [
         assignmentGroupsURL: assignmentGroupsURL
         assignmentGroupsParams:
           exclude_response_fields: @fieldsToExcludeFromAssignments
-          include: ['overrides']
+          include: ['grades_published', 'overrides']
         onlyLoadAssignmentGroups: true
       )
       $.when(overrideDataLoader.gotAssignmentGroups).then(@addOverridesToPostGradesStore)

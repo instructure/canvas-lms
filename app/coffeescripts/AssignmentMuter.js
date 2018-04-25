@@ -26,14 +26,16 @@ export default class AssignmentMuter {
     } else {
       this.$link = $(this.$link)
       this.updateLink()
-      this.$link.click((event) => {
-        event.preventDefault()
-        if (this.assignment.muted) {
-          this.confirmUnmute()
-        } else {
-          this.showDialog(onClose)
-        }
-      })
+      if (!this.options || this.options.canUnmute) {
+        this.$link.click((event) => {
+          event.preventDefault()
+          if (this.assignment.muted) {
+            this.confirmUnmute()
+          } else {
+            this.showDialog(onClose)
+          }
+        })
+      }
     }
   }
 
