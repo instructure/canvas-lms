@@ -1,5 +1,23 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`transformApiToInternalGrade transforms with grading periods 1`] = `
+Object {
+  "courseId": "42",
+  "grade": "D",
+  "hasGradingPeriods": true,
+  "score": 42.34,
+}
+`;
+
+exports[`transformApiToInternalGrade transforms without grading periods 1`] = `
+Object {
+  "courseId": "42",
+  "grade": "F",
+  "hasGradingPeriods": false,
+  "score": 34.42,
+}
+`;
+
 exports[`transformApiToInternalItem copes with a non-existent (e.g. concluded) course 1`] = `
 Object {
   "completed": false,

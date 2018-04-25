@@ -17,49 +17,103 @@
  */
 
 import React from 'react';
-import {arrayOf, shape} from 'prop-types';
+import themeable from '@instructure/ui-themeable/lib';
+import {bool, string, arrayOf, shape} from 'prop-types';
 import { courseShape } from '../plannerPropTypes';
 import formatMessage from '../../format-message';
+import ErrorAlert from '../ErrorAlert';
 
 import Container from '@instructure/ui-container/lib/components/Container';
+import Heading from '@instructure/ui-elements/lib/components/Heading';
+import Link from '@instructure/ui-elements/lib/components/Link';
+import Spinner from '@instructure/ui-elements/lib/components/Spinner';
 import Text from '@instructure/ui-elements/lib/components/Text';
+
+import styles from './styles.css';
+import theme from './theme.js';
 
 export class GradesDisplay extends React.Component {
   static propTypes = {
+    loading: bool,
+    loadingError: string,
     courses: arrayOf(shape(courseShape)).isRequired,
   }
 
+  static defaultProps = {
+    loading: false,
+  }
+
+  scoreString (score) {
+    const fixedScore = parseFloat(score);
+    if (isNaN(fixedScore)) return formatMessage('No Grade');
+    return `${fixedScore.toFixed(2)}%`;
+  }
+
+  renderSpinner () {
+    return <Container
+      as="div"
+      textAlign="center"
+      margin="0 0 large 0"
+    >
+      <Spinner
+        title={formatMessage("Grades are loading")}
+        size="small"
+      />
+    </Container>;
+  }
+
+  renderCaveat () {
+    if (this.props.loading) return;
+    if (this.props.courses.some(course => course.hasGradingPeriods)) {
+      return <Container as="div" textAlign="center">
+        <Text size="x-small" fontStyle="italic">{
+          formatMessage('*Only most recent grading period shown.')}
+        </Text>
+      </Container>;
+    }
+  }
+
   renderGrades () {
+    if (this.props.loadingError) return;
     return this.props.courses.map(course => {
       const courseNameStyles = {
-        borderBottom: `solid thin ${course.color}`
+        borderBottom: `solid thin`,
+        borderBottomColor: course.color,
       };
+
       return <Container key={course.id} as="div"
         margin="0 0 large 0"
       >
-        <div style={courseNameStyles}>
-          <Text size="small" transform="uppercase">
-            {course.shortName}
-          </Text>
+        <div className={styles.course} style={courseNameStyles}>
+          <Link href={course.href}>
+            <Text color="primary" size="small" transform="uppercase">
+              {course.shortName}
+            </Text>
+          </Link>
         </div>
-        <Text as="div" size="large" weight="light">98.36%</Text>
+        <Text as="div" size="large" weight="light">{this.scoreString(course.score)}</Text>
       </Container>;
     });
   }
 
+  renderError () {
+    if (this.props.loadingError) {
+      return <ErrorAlert error={this.props.loadingError}>{formatMessage('Error loading grades')}</ErrorAlert>;
+    }
+  }
+
   render () {
     return <Container>
-      <Container as="div" textAlign="center" margin="0 0 large 0">
-        <Text size="medium" weight="bold">{formatMessage('My Grades')}</Text>
+      {this.renderError()}
+      <Container textAlign="center">
+        <Heading level="h2" margin="0 0 large 0">
+          <Text size="medium" weight="bold">{formatMessage('My Grades')}</Text>
+        </Heading>
       </Container>
-      {this.renderGrades()}
-      <Container as="div" textAlign="center">
-        <Text size="x-small" fontStyle="italic">{
-          formatMessage('*Only most recent grading period shown.')}
-        </Text>
-      </Container>
+      {this.props.loading ? this.renderSpinner() : this.renderGrades()}
+      {this.renderCaveat()}
     </Container>;
   }
 }
 
-export default GradesDisplay;
+export default themeable(theme, styles)(GradesDisplay);

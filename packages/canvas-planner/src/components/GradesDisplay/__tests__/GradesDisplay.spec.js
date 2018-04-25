@@ -22,9 +22,41 @@ import {GradesDisplay} from '../index';
 
 it('renders some course grades', () => {
   const mockCourses = [
-    {id: '1', shortName: 'Ticket to Ride 101', color: 'blue'},
-    {id: '2', shortName: 'Ingenious 101', color: 'green'},
+    {id: '1', shortName: 'Ticket to Ride 101', color: 'blue', href: '/courses/1',
+      score: null, grade: null, hasGradingPeriods: true},
+    {id: '2', shortName: 'Ingenious 101', color: 'green', href: '/courses/2',
+      score: 42.34, grade: 'D', hasGradingPeriods: false},
+    {id: '3', shortName: 'Settlers of Catan 201', color: 'red', href: '/courses/3',
+      score: 'blahblah', grade: null, hasGradingPeriods: false},
   ];
   const wrapper = shallow(<GradesDisplay courses={mockCourses} />);
+  expect(wrapper).toMatchSnapshot();
+});
+
+it('does not render caveat if no courses have grading periods', () => {
+  const mockCourses = [
+    {id: '1', shortName: 'Ticket to Ride 101', color: 'blue', href: '/courses/1',
+      score: null, grade: null, hasGradingPeriods: false},
+  ];
+  const wrapper = shallow(<GradesDisplay courses={mockCourses} />);
+  expect(wrapper).toMatchSnapshot();
+});
+
+it('renders a loading spinner when loading', () => {
+  const mockCourses = [
+    {id: '1', shortName: 'Ticket to Ride 101', color: 'blue', href: '/courses/1',
+      score: null, grade: null, hasGradingPeriods: true},
+    {id: '2', shortName: 'Ingenious 101', color: 'green', href: '/courses/2',
+      score: 42.34, grade: 'D', hasGradingPeriods: false},
+  ];
+  const wrapper = shallow(<GradesDisplay loading courses={mockCourses} />);
+  expect(wrapper).toMatchSnapshot();
+});
+
+it('renders an ErrorAlert if there is an error loading grades', () => {
+  const mockCourses = [
+    {id: '1', shortName: 'Ticket to Ride 101', color: 'blue', href: '/courses/1'},
+  ];
+  const wrapper = shallow(<GradesDisplay courses={mockCourses} loadingError="There was an error" />);
   expect(wrapper).toMatchSnapshot();
 });

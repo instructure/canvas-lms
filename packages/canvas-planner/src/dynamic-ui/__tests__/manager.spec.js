@@ -18,7 +18,9 @@
 
 import {DynamicUiManager as Manager} from '../manager';
 import {dismissedOpportunity, setNaiAboveScreen} from '../../actions';
-import {startLoadingItems, gettingFutureItems, gettingPastItems, gotItemsSuccess} from '../../actions/loading-actions';
+import {
+  startLoadingItems, gettingFutureItems, gettingPastItems, gotItemsSuccess,
+  startLoadingGradesSaga, gotGradesSuccess} from '../../actions/loading-actions';
 import { initialize as alertInitialize } from '../../utilities/alertUtils';
 
 class MockAnimator {
@@ -148,6 +150,18 @@ describe('action handling', () => {
         [{uniqueId: 'day-1-group-1-item-0'}, {uniqueId: 'day-1-group-0-item-0'}],
       ));
       expect(srAlertMock).toHaveBeenCalled();
+    });
+
+    it('performs an srAlert when grades are loading', () => {
+      const {manager} = createManagerWithMocks();
+      manager.handleAction(startLoadingGradesSaga());
+      expect(alertMocks.srAlertCallback).toHaveBeenCalledWith('Loading Grades');
+    });
+
+    it('performs an srAlert when grades are loaded', () => {
+      const {manager} = createManagerWithMocks();
+      manager.handleAction(gotGradesSuccess());
+      expect(alertMocks.srAlertCallback).toHaveBeenCalledWith('Grades Loaded');
     });
   });
 

@@ -34,6 +34,10 @@ export const {
   startLoadingPastSaga,
   startLoadingFutureSaga,
   startLoadingPastUntilNewActivitySaga,
+
+  startLoadingGradesSaga,
+  gotGradesSuccess,
+  gotGradesError,
 } = createActions(
   'START_LOADING_ITEMS',
   'CONTINUE_LOADING_INITIAL_ITEMS',
@@ -45,6 +49,10 @@ export const {
   'START_LOADING_PAST_SAGA',
   'START_LOADING_FUTURE_SAGA',
   'START_LOADING_PAST_UNTIL_NEW_ACTIVITY_SAGA',
+
+  'START_LOADING_GRADES_SAGA',
+  'GOT_GRADES_SUCCESS',
+  'GOT_GRADES_ERROR',
 );
 
 export const gettingPastItems = createAction('GETTING_PAST_ITEMS', (opts = {seekingNewActivity: false}) => {

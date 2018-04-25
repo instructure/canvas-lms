@@ -169,6 +169,35 @@ export class DynamicUiManager {
     );
   }
 
+  handleStartLoadingGradesSaga = (action) => {
+    srAlert(formatMessage('Loading Grades'));
+  }
+
+  handleGotGradesSuccess = (action) => {
+    srAlert(formatMessage('Grades Loaded'));
+  }
+
+  handleOpenEditingPlannerItem = (action) => {
+    this.animationPlan.preOpenTrayElement = this.document.activeElement;
+  }
+
+  handleCancelEditingPlannerItem = (action) => {
+    Object.assign(this.animationPlan, {
+      focusPreOpenTrayElement: true,
+      ready: true,
+      noScroll: action.payload.noScroll,
+    });
+  }
+
+  handleSavedPlannerItem = (action) => {
+    this.animationPlan.focusItem = action.payload.item.uniqueId;
+    if (!action.payload.isNewItem && this.animationPlan.preOpenTrayElement) {
+      this.animationPlan.focusPreOpenTrayElement = true;
+      this.animationPlan.trigger = 'update';
+    }
+    this.animationPlan.ready = true;
+  }
+
   handleDismissedOpportunity = (action) => {
     const doomedComponentId = action.payload.plannable_id;
     this.planDeletedComponent('opportunity', doomedComponentId);

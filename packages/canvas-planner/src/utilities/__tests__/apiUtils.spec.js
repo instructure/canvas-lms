@@ -20,7 +20,8 @@ import {
   transformApiToInternalItem,
   transformInternalToApiItem,
   transformInternalToApiOverride,
-  transformPlannerNoteApiToInternalItem
+  transformPlannerNoteApiToInternalItem,
+  transformApiToInternalGrade,
 } from '../apiUtils';
 
 const courses = [{
@@ -561,5 +562,33 @@ describe('transformPlannerNoteApiToInternalItem', () => {
     const apiResponse = makePlannerNoteApiResponse({ course_id: '1'});
     const internalItem = transformPlannerNoteApiToInternalItem(apiResponse, courses, 'UTC');
     expect(internalItem).toMatchSnapshot();
+  });
+});
+
+describe('transformApiToInternalGrade', () => {
+  it('transforms with grading periods', () => {
+    expect(transformApiToInternalGrade({
+      id: '42',
+      has_grading_periods: true,
+      enrollments: [{
+        computed_current_score: 34.42,
+        computed_current_grade: 'F',
+        current_period_computed_current_score: 42.34,
+        current_period_computed_current_grade: 'D',
+      }],
+    })).toMatchSnapshot();
+  });
+
+  it('transforms without grading periods', () => {
+    expect(transformApiToInternalGrade({
+      id: '42',
+      has_grading_periods: false,
+      enrollments: [{
+        computed_current_score: 34.42,
+        computed_current_grade: 'F',
+        current_period_computed_current_score: 42.34,
+        current_period_computed_current_grade: 'D',
+      }],
+    })).toMatchSnapshot();
   });
 });

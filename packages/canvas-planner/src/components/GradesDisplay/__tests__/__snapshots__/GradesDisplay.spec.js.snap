@@ -1,22 +1,209 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`renders some course grades 1`] = `
+exports[`does not render caveat if no courses have grading periods 1`] = `
 <Container
   display={null}
 >
+  <Container
+    display={null}
+    textAlign="center"
+  >
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+      margin="0 0 large 0"
+    >
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="medium"
+        weight="bold"
+      >
+        My Grades
+      </Text>
+    </Heading>
+  </Container>
+  <Container
+    as="div"
+    display={null}
+    margin="0 0 large 0"
+  >
+    <div
+      style={
+        Object {
+          "borderBottom": "solid thin",
+          "borderBottomColor": "blue",
+        }
+      }
+    >
+      <Link
+        as="button"
+        ellipsis={false}
+        href="/courses/1"
+        linkRef={[Function]}
+        variant="default"
+      >
+        <Text
+          as="span"
+          color="primary"
+          letterSpacing="normal"
+          size="small"
+          transform="uppercase"
+        >
+          Ticket to Ride 101
+        </Text>
+      </Link>
+    </div>
+    <Text
+      as="div"
+      letterSpacing="normal"
+      size="large"
+      weight="light"
+    >
+      No Grade
+    </Text>
+  </Container>
+</Container>
+`;
+
+exports[`renders a loading spinner when loading 1`] = `
+<Container
+  display={null}
+>
+  <Container
+    display={null}
+    textAlign="center"
+  >
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+      margin="0 0 large 0"
+    >
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="medium"
+        weight="bold"
+      >
+        My Grades
+      </Text>
+    </Heading>
+  </Container>
   <Container
     as="div"
     display={null}
     margin="0 0 large 0"
     textAlign="center"
   >
-    <Text
-      as="span"
-      letterSpacing="normal"
-      size="medium"
-      weight="bold"
+    <Spinner
+      size="small"
+      title="Grades are loading"
+      variant="default"
+    />
+  </Container>
+</Container>
+`;
+
+exports[`renders an ErrorAlert if there is an error loading grades 1`] = `
+<Container
+  display={null}
+>
+  <ErrorAlert
+    error="There was an error"
+  >
+    Error loading grades
+  </ErrorAlert>
+  <Container
+    display={null}
+    textAlign="center"
+  >
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+      margin="0 0 large 0"
     >
-      My Grades
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="medium"
+        weight="bold"
+      >
+        My Grades
+      </Text>
+    </Heading>
+  </Container>
+</Container>
+`;
+
+exports[`renders some course grades 1`] = `
+<Container
+  display={null}
+>
+  <Container
+    display={null}
+    textAlign="center"
+  >
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+      margin="0 0 large 0"
+    >
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="medium"
+        weight="bold"
+      >
+        My Grades
+      </Text>
+    </Heading>
+  </Container>
+  <Container
+    as="div"
+    display={null}
+    margin="0 0 large 0"
+  >
+    <div
+      style={
+        Object {
+          "borderBottom": "solid thin",
+          "borderBottomColor": "blue",
+        }
+      }
+    >
+      <Link
+        as="button"
+        ellipsis={false}
+        href="/courses/1"
+        linkRef={[Function]}
+        variant="default"
+      >
+        <Text
+          as="span"
+          color="primary"
+          letterSpacing="normal"
+          size="small"
+          transform="uppercase"
+        >
+          Ticket to Ride 101
+        </Text>
+      </Link>
+    </div>
+    <Text
+      as="div"
+      letterSpacing="normal"
+      size="large"
+      weight="light"
+    >
+      No Grade
     </Text>
   </Container>
   <Container
@@ -27,18 +214,28 @@ exports[`renders some course grades 1`] = `
     <div
       style={
         Object {
-          "borderBottom": "solid thin blue",
+          "borderBottom": "solid thin",
+          "borderBottomColor": "green",
         }
       }
     >
-      <Text
-        as="span"
-        letterSpacing="normal"
-        size="small"
-        transform="uppercase"
+      <Link
+        as="button"
+        ellipsis={false}
+        href="/courses/2"
+        linkRef={[Function]}
+        variant="default"
       >
-        Ticket to Ride 101
-      </Text>
+        <Text
+          as="span"
+          color="primary"
+          letterSpacing="normal"
+          size="small"
+          transform="uppercase"
+        >
+          Ingenious 101
+        </Text>
+      </Link>
     </div>
     <Text
       as="div"
@@ -46,7 +243,7 @@ exports[`renders some course grades 1`] = `
       size="large"
       weight="light"
     >
-      98.36%
+      42.34%
     </Text>
   </Container>
   <Container
@@ -57,18 +254,28 @@ exports[`renders some course grades 1`] = `
     <div
       style={
         Object {
-          "borderBottom": "solid thin green",
+          "borderBottom": "solid thin",
+          "borderBottomColor": "red",
         }
       }
     >
-      <Text
-        as="span"
-        letterSpacing="normal"
-        size="small"
-        transform="uppercase"
+      <Link
+        as="button"
+        ellipsis={false}
+        href="/courses/3"
+        linkRef={[Function]}
+        variant="default"
       >
-        Ingenious 101
-      </Text>
+        <Text
+          as="span"
+          color="primary"
+          letterSpacing="normal"
+          size="small"
+          transform="uppercase"
+        >
+          Settlers of Catan 201
+        </Text>
+      </Link>
     </div>
     <Text
       as="div"
@@ -76,7 +283,7 @@ exports[`renders some course grades 1`] = `
       size="large"
       weight="light"
     >
-      98.36%
+      No Grade
     </Text>
   </Container>
   <Container

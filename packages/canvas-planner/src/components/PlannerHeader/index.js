@@ -31,7 +31,7 @@ import Tray from '@instructure/ui-core/lib/components/Tray';
 import Badge from '@instructure/ui-core/lib/components/Badge';
 import Opportunities from '../Opportunities';
 import GradesDisplay from '../GradesDisplay';
-import {addDay, savePlannerItem, deletePlannerItem, cancelEditingPlannerItem, openEditingPlannerItem, getNextOpportunities, getInitialOpportunities, dismissOpportunity, clearUpdateTodo} from '../../actions';
+import {addDay, savePlannerItem, deletePlannerItem, cancelEditingPlannerItem, openEditingPlannerItem, getNextOpportunities, getInitialOpportunities, dismissOpportunity, clearUpdateTodo, startLoadingGradesSaga} from '../../actions';
 
 import { courseShape, opportunityShape } from '../plannerPropTypes';
 import styles from './styles.css';
@@ -57,6 +57,7 @@ export class PlannerHeader extends Component {
     getNextOpportunities: PropTypes.func.isRequired,
     dismissOpportunity: PropTypes.func.isRequired,
     clearUpdateTodo: PropTypes.func.isRequired,
+    startLoadingGradesSaga: PropTypes.func.isRequired,
     todo: PropTypes.shape({
       updateTodoItem: PropTypes.shape({
         title: PropTypes.string,
@@ -72,6 +73,9 @@ export class PlannerHeader extends Component {
       futureNextUrl: PropTypes.string,
       pastNextUrl: PropTypes.string,
       seekingNewActivity: PropTypes.bool,
+      loadingGrades: PropTypes.bool,
+      gradesLoaded: PropTypes.bool,
+      gradesLoadingError: PropTypes.string,
     }).isRequired,
     ariaHideElement: PropTypes.instanceOf(Element).isRequired
   };
@@ -159,6 +163,11 @@ export class PlannerHeader extends Component {
   }
 
   toggleGradesTray = () => {
+    if (!this.state.gradesTrayOpen &&
+      !this.props.loading.loadingGrades &&
+      !this.props.loading.gradesLoaded) {
+      this.props.startLoadingGradesSaga();
+    }
     this.setState({gradesTrayOpen: !this.state.gradesTrayOpen});
   }
 
@@ -309,7 +318,11 @@ export class PlannerHeader extends Component {
             <CloseButton placement="start" variant="icon" onClick={this.toggleGradesTray}>
               {formatMessage("Close")}
             </CloseButton>
-            <GradesDisplay courses={this.props.courses} />
+            <GradesDisplay
+              courses={this.props.courses}
+              loading={this.props.loading.loadingGrades}
+              loadingError={this.props.loading.gradesLoadingError}
+            />
           </Container>
         </Tray>
       </div>
@@ -321,6 +334,6 @@ export const ThemedPlannerHeader = themeable(theme, styles)(PlannerHeader);
 export const NotifierPlannerHeader = notifier(ThemedPlannerHeader);
 
 const mapStateToProps = ({opportunities, loading, courses, todo}) => ({opportunities, loading, courses, todo});
-const mapDispatchToProps = {addDay, savePlannerItem, deletePlannerItem, cancelEditingPlannerItem, openEditingPlannerItem, getInitialOpportunities, getNextOpportunities, dismissOpportunity, clearUpdateTodo};
+const mapDispatchToProps = {addDay, savePlannerItem, deletePlannerItem, cancelEditingPlannerItem, openEditingPlannerItem, getInitialOpportunities, getNextOpportunities, dismissOpportunity, clearUpdateTodo, startLoadingGradesSaga};
 
 export default connect(mapStateToProps, mapDispatchToProps)(NotifierPlannerHeader);

@@ -238,3 +238,21 @@ it('adds to partialPastDays', () => {
     ]
   });
 });
+
+it('sets grades loading', () => {
+  const state = initialState();
+  const nextState = loadingReducer(state, Actions.startLoadingGradesSaga());
+  expect(nextState).toMatchObject({loadingGrades: true, gradesLoaded: false});
+});
+
+it('sets grades loaded', () => {
+  const state = initialState({loadingGrades: true});
+  const nextState = loadingReducer(state, Actions.gotGradesSuccess());
+  expect(nextState).toMatchObject({loadingGrades: false, gradesLoaded: true});
+});
+
+it('sets grades error', () => {
+  const state = initialState({loadingGrades: true});
+  const nextState = loadingReducer(state, Actions.gotGradesError({message: 'some error'}));
+  expect(nextState).toMatchObject({loadingGrades: false, gradesLoaded: false, gradesLoadingError: 'some error'});
+});

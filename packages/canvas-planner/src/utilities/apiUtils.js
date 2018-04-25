@@ -172,6 +172,20 @@ export function transformInternalToApiOverride (internalItem, userId) {
   };
 }
 
+export function transformApiToInternalGrade (apiResult) {
+  // Grades are the same across all enrollments, just look at first one
+  const courseId = apiResult.id;
+  const hasGradingPeriods = apiResult.has_grading_periods;
+  const enrollment = apiResult.enrollments[0];
+  let score = enrollment.computed_current_score;
+  let grade = enrollment.computed_current_grade;
+  if (hasGradingPeriods) {
+    score = enrollment.current_period_computed_current_score;
+    grade = enrollment.current_period_computed_current_grade;
+  }
+  return {courseId, hasGradingPeriods, grade, score};
+}
+
 function getCourseContext(course) {
   // shouldn't happen, but if the course data is missing, skip it.
   // this has the effect of a planner note showing up as a vanilla todo not associated with a course

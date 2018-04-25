@@ -221,6 +221,7 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
             },
           ]
         }
+        loading={false}
       />
     </Container>
   </Tray>
