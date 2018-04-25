@@ -43,6 +43,7 @@ QUnit.module('SubmissionTray', function (hooks) {
 
   function mountComponent (props) {
     const defaultProps = {
+      anonymousModeratedMarkingEnabled: false,
       contentRef (ref) {
         content = ref;
       },
@@ -200,11 +201,18 @@ QUnit.module('SubmissionTray', function (hooks) {
     strictEqual(speedGraderLink, speedGraderUrl);
   });
 
-  test('omits student_id from SpeedGrader link if enabled and assignment is anonymously graded', function() {
-    const speedGraderUrl = '/courses/1/gradebook/speed_grader?assignment_id=30';
+  test('omits student_id from SpeedGrader link if enabled and assignment is ' +
+  'anonymously graded and anonymous moderated marking is enabled', function() {
+    mountComponent({anonymousModeratedMarkingEnabled: true, assignment: {anonymousGrading: true}});
+    const speedGraderLink = document.querySelector('.SubmissionTray__Container a[href*="speed_grader"]').getAttribute('href');
+    notOk(speedGraderLink.match(/student_id/))
+  });
+
+  test('includes student_id in the SpeedGrader link if enabled and assignment is ' +
+  'anonymously graded and anonymous moderated marking is disabled', function() {
     mountComponent({assignment: {anonymousGrading: true}});
     const speedGraderLink = document.querySelector('.SubmissionTray__Container a[href*="speed_grader"]').getAttribute('href');
-    strictEqual(speedGraderLink, speedGraderUrl);
+    ok(speedGraderLink.match(/student_id/))
   });
 
   test('does not show SpeedGrader link if disabled', function () {
