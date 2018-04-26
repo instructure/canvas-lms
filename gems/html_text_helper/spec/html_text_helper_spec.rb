@@ -81,7 +81,7 @@ describe HtmlTextHelper do
 
   context ".html_to_text" do
     it "should format links in markdown-like style" do
-      expect(th.html_to_text("<a href='www.example.com'>Link</a>")).to eq("[Link](www.example.com)")
+      expect(th.html_to_text("<a href='www.example.com'>Link</a>")).to eq("[Link] (www.example.com)")
       expect(th.html_to_text("<a href='www.example.com'>www.example.com</a>")).to eq("www.example.com")
     end
 
@@ -94,7 +94,7 @@ describe HtmlTextHelper do
     end
 
     it "should turn images with alt text into markdown style links" do
-      expect(th.html_to_text('<img alt="an image" src="/image.png"')).to eq("[an image](/image.png)")
+      expect(th.html_to_text('<img alt="an image" src="/image.png"')).to eq("[an image] (/image.png)")
     end
 
     it "should not format src-less images" do
@@ -102,12 +102,12 @@ describe HtmlTextHelper do
     end
 
     it "should add base urls to links" do
-      expect(th.html_to_text('<a href="/link">Link</a>', base_url: "http://example.com")).to eq("[Link](http://example.com/link)")
-      expect(th.html_to_text('<a href="http://example.org/link">Link</a>', base_url: "http://example.com")).to eq("[Link](http://example.org/link)")
+      expect(th.html_to_text('<a href="/link">Link</a>', base_url: "http://example.com")).to eq("[Link] (http://example.com/link)")
+      expect(th.html_to_text('<a href="http://example.org/link">Link</a>', base_url: "http://example.com")).to eq("[Link] (http://example.org/link)")
     end
 
     it "should add base urls to img src" do
-      expect(th.html_to_text('<img src="/image.png" alt="Image" />', base_url: "http://example.com")).to eq("[Image](http://example.com/image.png)")
+      expect(th.html_to_text('<img src="/image.png" alt="Image" />', base_url: "http://example.com")).to eq("[Image] (http://example.com/image.png)")
       expect(th.html_to_text('<img src="http://example.org/image.png" />', base_url: "http://example.com")).to eq("http://example.org/image.png")
     end
 
@@ -215,7 +215,7 @@ EOS
 
     it "just uses the given link if it cannot be parsed" do
       html_input = '<a href="http://&example.org/link">Link</a>'
-      expect(th.html_to_text(html_input, base_url: "http://example.com")).to eq("[Link](http://&example.org/link)")
+      expect(th.html_to_text(html_input, base_url: "http://example.com")).to eq("[Link] (http://&example.org/link)")
     end
 
     it "just uses the img src given if it cannot be parsed" do
