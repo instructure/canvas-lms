@@ -50,6 +50,11 @@ describe 'Developer Keys' do
       wait_for_ajaximations
     end
 
+    def click_account_tab
+      fj("#reactContent span[role='tablist'] span:contains('Account')").click
+      wait_for_ajaximations
+    end
+
     it "allows creation through 'add developer key button'", test_id: 344077 do
       get "/accounts/#{Account.default.id}/developer_keys"
 
@@ -128,12 +133,23 @@ describe 'Developer Keys' do
       expect(Account.default.developer_keys.nondeleted.count).to eq 0
     end
 
-    it "allows for pagination", test_id: 344532 do
+    it "allows for pagination on account tab", test_id: 344532 do
       11.times { |i| Account.default.developer_keys.create!(name: "tool #{i}") }
       get "/accounts/#{Account.default.id}/developer_keys"
       expect(ff("#reactContent tbody tr")).to have_size(10)
       find_button("Show All Keys").click
       expect(ff("#reactContent tbody tr")).to have_size(11)
+    end
+
+    it "allows for pagination on inherited tab", test_id: 344532 do
+      site_admin_logged_in
+      11.times { |i| DeveloperKey.create!(name: "tool #{i}") }
+      DeveloperKey.all.each { |key| key.update(visible: true) }
+      get "/accounts/#{Account.default.id}/developer_keys"
+      click_inherited_tab
+      expect(ff("#keys tbody tr")).to have_size(10)
+      find_button("Show All Keys").click
+      expect(ff("#keys tbody tr")).to have_size(11)
     end
 
     it "renders the key not visible", test_id: 3485785 do
@@ -230,6 +246,28 @@ describe 'Developer Keys' do
         fj("span:contains('Off'):last").click
         keep_trying_until { expect(current_active_element.attribute('value')).to eq 'off' }
         expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'off'
+      end
+
+      it "persists state when switching between account and inheritance tabs", test_id: 3488599 do
+        root_developer_key
+        get "/accounts/#{Account.default.id}/developer_keys"
+        fj("span:contains('On'):last").click
+        click_inherited_tab
+        click_account_tab
+        expect(fxpath("//*[@id='keys']/tbody/tr/td[5]/fieldset/span/span/span/span[2]/span/span/span[1]/div/label/span[1]").css_value('background-color')).to be_truthy
+      end
+
+      it "persists state when switching between inheritance and account tabs", test_id: 3488600 do
+        site_admin_developer_key
+        DeveloperKey.find(site_admin_developer_key.id).update(visible: true)
+        DeveloperKeyAccountBinding.first.update(workflow_state: 'allow')
+        get "/accounts/#{Account.default.id}/developer_keys"
+        click_inherited_tab
+        fj("span:contains('Off'):last").click
+        click_account_tab
+        click_inherited_tab
+        expect(fj("fieldset:last")).not_to have_attribute('aria-disabled')
+        expect(fxpath("//*[@id='keys']/tbody/tr[1]/td[3]/fieldset/span/span/span/span[2]/span/span/span[3]/div/label/span[1]").css_value('background-color')).to be_truthy
       end
 
     end
