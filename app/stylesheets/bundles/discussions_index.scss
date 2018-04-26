@@ -77,8 +77,14 @@
   display: flex;
 }
 
+.discussions-container__wrapper {
+  position: relative;
+}
+
 .recent-activity-text-container {
-  float: direction(right);
+  position: absolute;
+  top: 4px;
+  #{direction(right)}: 4px;
 }
 
 .discussions-v2__container-image {
