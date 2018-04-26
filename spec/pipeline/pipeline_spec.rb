@@ -24,7 +24,7 @@ describe 'pipeline service' do
     end
 
     it 'calling it directly will raise an error since its not queued' do
-      expect { PipelineService::Commands::Send.new(object: @enrollment).call }.to raise_error(
+      expect { PipelineService::Commands::Publish.new(object: @enrollment).call }.to raise_error(
         RuntimeError, 'Missing config'
       )
     end
@@ -35,24 +35,13 @@ describe 'pipeline service' do
     let(:assignment) { double('assignment', context: context, submission_types: []) }
     let(:user) { double('user') }
 
-    let(:submission) do
-      double(
-        "submission",
-        pipeline_serializer:     PipelineService::Serializers::Submission,
-        assignment:              assignment,
-        'assignment=' =>         nil,
-        quiz_submission_version: 1,
-        '[]' =>                  'user',
-        media_comment_id:        1,
-        media_comment_type:      '',
-        originality_reports:     [],
-        originality_data:        [],
-        vericite_data:           {},
-        versioned_attachments:   [],
-        attachment:              nil,
-        submission_type:         '',
-        id: 1
-      )
+    before do
+      @user = User.create!
+      @course = Course.create!
+      @enrollment = StudentEnrollment.new(valid_enrollment_attributes)
+      @enrollment.save
+      @enrollment.update(workflow_state: 'completed')
+      byebug
     end
 
     before do
@@ -66,7 +55,7 @@ describe 'pipeline service' do
 
     it do
       expect(endpoint_instance).to receive(:call)
-      PipelineService::Commands::Send.new(object: submission, endpoint: endpoint).call
+      PipelineService::Commands::Publish.new(object: @enrollment, endpoint: endpoint).call
     end
 
   end
