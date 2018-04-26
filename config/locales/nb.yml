@@ -2697,28 +2697,28 @@ nb:
       no_files: "Ingen filer"
       upload_or_choose_file: "Last opp en fil, eller velg en fil du har lastet opp tidligere."
     syllabus: 
-      page_title: "Kursoversikt %{course}"
+      page_title: "Emneoversikt %{course}"
     syllabus_content: 
       buttons: 
-        update_syllabus: "Oppdater kursoversikt"
+        update_syllabus: "Oppdater emneoversikt"
       headers: 
         date: Dato
         details: Detaljer
       instructions: 
         syllabus: |-
-            Kursoversikt side viser tabellorientert oversikt over emneplanen, og reglene for
+            Emneoversikt side viser tabellorientert oversikt over emneplanen, og reglene for
             emnevurdering. Du kan legge til kommentarer, notater eller tanker du har om
             emnestrukturen, emnereglene og alt annet.
             
             For å legge til kommentarer, klikk på «rediger» -lenken’ øverst.
       labels: 
         assignments_summary: Emnesammendrag
-        syllabus_body: Kursoversikt-beskrivelsen
+        syllabus_body: Emneoversikt-beskrivelsen
       links: 
         edit_syllabus_description: Rediger
         jump_to_today: "Hopp til i dag"
       titles: 
-        course_syllabus: Kursoversikt
+        course_syllabus: Emneoversikt
     syllabus_right_side: 
       links: 
         edit_syllabus_description: "Rediger pensumbeskrivelsen"
@@ -5035,7 +5035,7 @@ nb:
     student_summary: 
       not_sorted: "Studentenes sammendragstabell"
     student_view_student_name: "Test Student"
-    syllabus: Kursoversikt
+    syllabus: Emneoversikt
     wiki_permissions: 
       all: "Hvem som helst"
       only_teachers: "Kun lærere"
@@ -5182,7 +5182,7 @@ nb:
       old_account_id: "Gammel konto-ID"
       open_enrollment: "Åpen påmelding"
       public_description: "Offentlig beskrivelse"
-      public_syllabus: "Offentlig kursoversikt"
+      public_syllabus: "Offentlig emneoversikt"
       replacement_course_id: "Erstatnings-ID for emne"
       restrict_enrollments_to_course_dates: "Begrens påmeldinger til emnedatoene"
       root_account_id: "Rot-konto ID"
@@ -5283,7 +5283,7 @@ nb:
   course_statistics: 
     unknown: ukjent
   course_storage_391e1bd: "Lagringsplass for emner"
-  course_syllabus_5de1b0af: Kursoversikt
+  course_syllabus_5de1b0af: Emneoversikt
   course_users: 
     greater_than_three: "Skriv inn søkeord med tre eller flere tegn"
     unknown_error: "Noe gikk galt med søket ditt. Prøv igjen"
@@ -5909,7 +5909,7 @@ nb:
     settings: Innstillinger
     site_admin: Site-admin
     stats: Statistikk
-    syllabus: Kursoversikt
+    syllabus: Emneoversikt
     users: Brukere
     wiki_pages: Sider
   css_ae1d10ce: CSS
@@ -9990,7 +9990,7 @@ nb:
         learning_outcomes: Læringsresultat
         quizzes: Tester
         rubrics: Vurderingsveiledning
-        syllabus_body: "Kursoversikt kropp"
+        syllabus_body: "Emneoversikt kropp"
         tool_profiles: Verktøyprofiler
         wikis: Wiki-sider
     cc: 
@@ -17480,7 +17480,7 @@ nb:
         modules: "Klikk for å sette inn en lenke til denne modulen"
         modules_page: "Klikk for å sette inn en lenke til modulsiden"
         quizzes: "Klikk for å sette inn en lenke til denne testen"
-        syllabus_page: "Klikk for å sette inn en lenke til kursoversikt"
+        syllabus_page: "Klikk for å sette inn en lenke til emneoversikt"
         users_page: "Klikk for å sette inn en lenke til personer siden"
         wiki_pages: "Klikk for å sette inn en lenke til denne siden"
         wiki_pages_index: "Klikk for å sette inn en lenke til wikien"
@@ -18143,10 +18143,10 @@ nb:
   switch_to_table_view_3aae9919: "Bytt til tabellvisning"
   switzerland_41_f861e414: "Sveits (+41)"
   switzerland_f4f7137c: Sveits
-  syllabus: Kursoversikt
-  syllabus_f191f65b: Kursoversikt
+  syllabus: Emneoversikt
+  syllabus_f191f65b: Emneoversikt
   syllabus_tutorial_tray_97e8ef82: "Emneplan Tutorial Tray"
-  syllabus_visibility_options_a81ef419: "Valg for kursoversiktsynlighet"
+  syllabus_visibility_options_a81ef419: "Valg for emneoversiktsynlighet"
   sync_68e5c167: Synkroniser
   sync_completed_successfully_8f68b542: "Synkronisering fullført"
   sync_grades_a16622ca: "Synkroniser karakterer"
@@ -18203,7 +18203,7 @@ nb:
     profile: Profil
     quizzes: Tester
     settings: Innstillinger
-    syllabus: Kursoversikt
+    syllabus: Emneoversikt
     tab_location_error: "Den faneplasseringen er ugyldig"
     tab_unmanagable_error: "%{css_class} kan ikke behandles"
   taiwan_886_9a5b6bbf: "Taiwan (+ 886)"
@@ -19046,7 +19046,7 @@ nb:
   upload_button: 
     upload: "Last opp"
   upload_course_files_syllabi_readings_or_other_docu_21f8725f: |-
-      Last opp emnefiler, kursoversikter, avlesninger eller andre dokumenter.
+      Last opp emnefiler, emneoversikter, avlesninger eller andre dokumenter.
       Lås mapper for å holde dem skjult fra studenter. Legg til filer til «Moduler», «Oppgaver», «Diskusjoner» eller «Sider».
   upload_course_files_syllabi_readings_or_other_docu_859d8f02: |-
       Last opp emnefiler, kursoversikter, avlesninger eller andre dokumenter.
@@ -19668,7 +19668,7 @@ nb:
   what_should_the_csv_file_look_like_985a59ac: "Hvordan bør en CSV fil se ut?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Når du legger til flere brukere, kan du bruke komma eller linjeskift for å separere brukere."
   when_enabled_global_javascript_and_css_files_can_b_ea21d216: "Når aktivert, kan globale JavaScript og CSS-filer lastes opp i *%{t_theme_editor}*."
-  when_people_visit_the_course_this_is_the_page_they_de94acc2: "Når personer besøker emnet, er dette siden de får se. Du kan sette den til å vise en aktivitetsstrøm, listen over emnemoduler, en kursoversikt, eller en tilpasset side du skriver selv. Standarden er selvfølgelig aktivitetsstrøm for emne."
+  when_people_visit_the_course_this_is_the_page_they_de94acc2: "Når personer besøker emnet, er dette siden de får se. Du kan sette den til å vise en aktivitetsstrøm, listen over emnemoduler, en emneoversikt, eller en tilpasset side du skriver selv. Standarden er selvfølgelig aktivitetsstrøm for emne."
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
       Dette er den første siden folk ser når de besøker emnet ditt.
       Vi har angitt «Moduler» som hjemmesiden din, men du kan endre dette selv.
