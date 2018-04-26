@@ -67,6 +67,11 @@ const closedDeveloperKeyState = {
   developerKey
 }
 
+const listDeveloperKeyScopesState = {
+  availableScopes: {},
+  listDeveloperKeyScopesPending: true
+}
+
 function modalMountNode() {
   return document.querySelector('#fixtures')
 }
@@ -79,6 +84,8 @@ test('it opens the modal if isOpen prop is true', () => {
 
   const wrapper = shallow(
     <DeveloperKeyModal
+      availableScopes={{}}
+      availableScopesPending={false}
       closeModal={() => {}}
       createOrEditDeveloperKeyState={createDeveloperKeyState}
       actions={fakeActions}
@@ -98,6 +105,8 @@ test('it closes the modal if isOpen prop is false', () => {
 
   const wrapper = shallow(
     <DeveloperKeyModal
+      availableScopes={{}}
+      availableScopesPending={false}
       closeModal={() => {}}
       createOrEditDeveloperKeyState={closedDeveloperKeyState}
       actions={fakeActions}
@@ -119,6 +128,8 @@ test('it dismisses the modal when the "cancel" button is pressed', () => {
 
   const wrapper = shallow(
     <DeveloperKeyModal
+      availableScopes={{}}
+      availableScopesPending={false}
       createOrEditDeveloperKeyState={createDeveloperKeyState}
       actions={fakeActions}
       store={{dispatch: () => {}}}
@@ -142,6 +153,8 @@ test('clear the active key when the cancel button is closed', () => {
 
   const wrapper = shallow(
     <DeveloperKeyModal
+      availableScopes={{}}
+      availableScopesPending={false}
       createOrEditDeveloperKeyState={createDeveloperKeyState}
       actions={fakeActions}
       store={{dispatch: () => {}}}
@@ -174,6 +187,8 @@ test('it uses the create URL if a key is being created', () => {
 
   const wrapper = shallow(
     <DeveloperKeyModal
+      availableScopes={{}}
+      availableScopesPending={false}
       closeModal={() => {}}
       createOrEditDeveloperKeyState={createDeveloperKeyState}
       actions={fakeActions}
@@ -209,6 +224,8 @@ test('it uses POST if a key is being created', () => {
 
   const wrapper = shallow(
     <DeveloperKeyModal
+      availableScopes={{}}
+      availableScopesPending={false}
       closeModal={() => {}}
       createOrEditDeveloperKeyState={createDeveloperKeyState}
       actions={fakeActions}
@@ -239,6 +256,8 @@ test('it uses the edit URL if a key is being edited', () => {
 
   const wrapper = shallow(
     <DeveloperKeyModal
+      availableScopes={{}}
+      availableScopesPending={false}
       closeModal={() => {}}
       createOrEditDeveloperKeyState={editDeveloperKeyState}
       actions={fakeActions}
@@ -267,6 +286,8 @@ test('it uses PUT if a key is being edited', () => {
 
   const wrapper = shallow(
     <DeveloperKeyModal
+      availableScopes={{}}
+      availableScopesPending={false}
       closeModal={() => {}}
       createOrEditDeveloperKeyState={editDeveloperKeyState}
       actions={fakeActions}
@@ -296,8 +317,11 @@ test('it sends the contents of the form saving', () => {
 
   const wrapper = mount(
     <DeveloperKeyModal
+      availableScopes={{}}
+      availableScopesPending={false}
       closeModal={() => {}}
       createOrEditDeveloperKeyState={editDeveloperKeyState}
+      listDeveloperKeyScopesState={listDeveloperKeyScopesState}
       actions={fakeActions}
       store={fakeStore}
       mountNode={modalMountNode}

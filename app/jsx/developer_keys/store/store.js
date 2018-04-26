@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createStore, applyMiddleware, combineReducers } from 'redux'
+import {createStore, applyMiddleware, combineReducers} from 'redux'
 import ReduxThunk from 'redux-thunk'
 import listDeveloperKeysReducer from '../reducers/listDeveloperKeysReducer'
 import deactivateDeveloperKeyReducer from '../reducers/deactivateDeveloperKeyReducer'
@@ -25,10 +25,9 @@ import deleteDeveloperKeyReducer from '../reducers/deleteDeveloperKeyReducer'
 import createOrEditDeveloperKeyReducer from '../reducers/createOrEditDeveloperKeyReducer'
 import makeVisibleDeveloperKeyReducer from '../reducers/makeVisibleDeveloperKeyReducer'
 import makeInvisibleDeveloperKeyReducer from '../reducers/makeInvisibleDeveloperKeyReducer'
+import listDeveloperKeyScopesReducer from '../reducers/listDeveloperKeyScopesReducer'
 
-const createStoreWithMiddleware = applyMiddleware(
-  ReduxThunk
-)(createStore);
+const createStoreWithMiddleware = applyMiddleware(ReduxThunk)(createStore)
 
 const developerKeysReducer = combineReducers({
   listDeveloperKeys: listDeveloperKeysReducer,
@@ -37,7 +36,8 @@ const developerKeysReducer = combineReducers({
   deleteDeveloperKey: deleteDeveloperKeyReducer,
   createOrEditDeveloperKey: createOrEditDeveloperKeyReducer,
   makeVisibleDeveloperKey: makeVisibleDeveloperKeyReducer,
-  makeInvisibleDeveloperKey: makeInvisibleDeveloperKeyReducer
-});
+  makeInvisibleDeveloperKey: makeInvisibleDeveloperKeyReducer,
+  listDeveloperKeyScopes: listDeveloperKeyScopesReducer
+})
 
 export default createStoreWithMiddleware(developerKeysReducer)

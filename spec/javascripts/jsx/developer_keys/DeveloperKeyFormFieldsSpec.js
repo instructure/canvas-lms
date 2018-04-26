@@ -42,12 +42,24 @@ const developerKey = {
 }
 
 function formFieldInputs(devKey) {
-  const component = TestUtils.renderIntoDocument(<DeveloperKeyFormFields developerKey={devKey} />)
+  const component = TestUtils.renderIntoDocument(
+    <DeveloperKeyFormFields
+      availableScopes={{}}
+      availableScopesPending={false}
+      developerKey={devKey}
+    />
+  )
   return TestUtils.scryRenderedDOMComponentsWithTag(component, 'input')
 }
 
 function formFieldTextAreas(devKey) {
-  const component = TestUtils.renderIntoDocument(<DeveloperKeyFormFields developerKey={devKey} />)
+  const component = TestUtils.renderIntoDocument(
+    <DeveloperKeyFormFields
+      availableScopes={{}}
+      availableScopesPending={false}
+      developerKey={devKey}
+    />
+  )
   return TestUtils.scryRenderedDOMComponentsWithTag(component, 'textarea')
 }
 
@@ -89,4 +101,9 @@ test('populates the key icon URL', () => {
 test('populates the key notes', () => {
   const [, input] = formFieldTextAreas(developerKey)
   equal(input.value, developerKey.notes)
+})
+
+test('renders the scopes component', () => {
+  const [, , , , , input] = formFieldInputs(developerKey)
+  equal(input.placeholder, "Search endpoints")
 })

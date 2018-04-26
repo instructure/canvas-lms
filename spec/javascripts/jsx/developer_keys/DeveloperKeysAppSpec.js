@@ -29,6 +29,11 @@ QUnit.module('DevelopersKeyApp',  {
   }
 });
 
+const listDeveloperKeyScopes = {
+  availableScopes: {},
+  listDeveloperKeyScopesPending: false
+}
+
 function developerKeyRows(componentNode, index) {
   const panel = componentNode.querySelectorAll("div[role='tabpanel']")[index]
   return panel.querySelectorAll("table#keys tr")
@@ -41,6 +46,7 @@ function generateKeyList(numKeys = 10) {
 function initialApplicationState(list = null, inheritedList = null) {
   return {
     createOrEditDeveloperKey: {},
+    listDeveloperKeyScopes,
     listDeveloperKeys: {
       listDeveloperKeysPending: false,
       listDeveloperKeysSuccessful: false,
@@ -218,6 +224,7 @@ test('displays the show more button', () => {
   const list = generateKeyList()
 
   const applicationState = {
+    listDeveloperKeyScopes,
     createOrEditDeveloperKey: {},
     listDeveloperKeys: {
       listDeveloperKeysPending: false,
@@ -234,6 +241,7 @@ test('displays the show more button', () => {
 })
 test('renders the list of developer_keys when there are some', () => {
   const applicationState = {
+    listDeveloperKeyScopes,
     createOrEditDeveloperKey: {},
     listDeveloperKeys: {
       listDeveloperKeysPending: false,
@@ -255,6 +263,7 @@ test('renders the list of developer_keys when there are some', () => {
 
 test('renders the spinner', () => {
   const applicationState = {
+    listDeveloperKeyScopes,
     createOrEditDeveloperKey: {},
     listDeveloperKeys: {
       listDeveloperKeysPending: true,
@@ -280,6 +289,7 @@ test('opens the modal when the create button is clicked', () => {
 
   const overrides = {
     applicationState: {
+      listDeveloperKeyScopes,
       createOrEditDeveloperKey: {},
       listDeveloperKeys: {
         listDeveloperKeysPending: true,
@@ -311,6 +321,7 @@ test('does not have the create button on inherited tab', () => {
 
   const overrides = {
     applicationState: {
+      listDeveloperKeyScopes,
       createOrEditDeveloperKey: {},
       listDeveloperKeys: {
         listInheritedDeveloperKeysPending: true,

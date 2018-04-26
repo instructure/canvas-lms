@@ -24,6 +24,7 @@ import TextArea from '@instructure/ui-core/lib/components/TextArea'
 import TextInput from '@instructure/ui-core/lib/components/TextInput'
 import React from 'react'
 import PropTypes from 'prop-types'
+import DeveloperKeyScopes from './DeveloperKeyScopes'
 
 export default class DeveloperKeyFormFields extends React.Component {
   fieldValue(field, defaultValue) {
@@ -83,7 +84,12 @@ export default class DeveloperKeyFormFields extends React.Component {
   }
 
   scopeSettings() {
-    return <div />
+    return (
+      <DeveloperKeyScopes
+        availableScopes={this.props.availableScopes}
+        availableScopesPending={this.props.availableScopesPending}
+      />
+    )
   }
 
   render() {
@@ -110,5 +116,12 @@ DeveloperKeyFormFields.propTypes = {
     redirect_uris: PropTypes.string,
     email: PropTypes.string,
     name: PropTypes.string
-  })
+  }),
+  availableScopes: PropTypes.objectOf(PropTypes.arrayOf(
+    PropTypes.shape({
+      resource: PropTypes.string,
+      scope: PropTypes.string
+    })
+  )).isRequired,
+  availableScopesPending: PropTypes.bool.isRequired
 }

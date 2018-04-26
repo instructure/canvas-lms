@@ -19,27 +19,31 @@
 import ACTION_NAMES from '../actions/developerKeysActions'
 
 const initialState = {
-  activateDeveloperKeyPending: false,
-  activateDeveloperKeySuccessful: false,
-  activateDeveloperKeyError: null
+  availableScopes: {},
+  listDeveloperKeyScopesPending: false,
+  listDeveloperKeyScopesSuccessful: false,
+  listDeveloperKeyScopesError: undefined
 }
 
 const developerKeysHandlers = {
-  [ACTION_NAMES.ACTIVATE_DEVELOPER_KEY_START]: (state, _action) => ({
+  [ACTION_NAMES.LIST_DEVELOPER_KEY_SCOPES_START]: state => ({
     ...state,
-    activateDeveloperKeyPending: true,
-    activateDeveloperKeySuccessful: false,
-    activateDeveloperKeyError: null
+    listDeveloperKeyScopesPending: true,
+    listDeveloperKeyScopesSuccessful: false,
+    listDeveloperKeyScopesError: undefined
   }),
-  [ACTION_NAMES.ACTIVATE_DEVELOPER_KEY_SUCCESSFUL]: (state, _action) => ({
+  [ACTION_NAMES.LIST_DEVELOPER_KEY_SCOPES_SUCCESSFUL]: (state, action) => ({
     ...state,
-    activateDeveloperKeyPending: false,
-    activateDeveloperKeySuccessful: true
+    availableScopes: action.payload || state.availableScopes,
+    listDeveloperKeyScopesPending: false,
+    listDeveloperKeyScopesSuccessful: true,
+    listDeveloperKeyScopesError: undefined
   }),
-  [ACTION_NAMES.ACTIVATE_DEVELOPER_KEY_FAILED]: (state, action) => ({
+  [ACTION_NAMES.LIST_DEVELOPER_KEY_SCOPES_FAILED]: state => ({
     ...state,
-    activateDeveloperKeyPending: false,
-    activateDeveloperKeyError: action.payload
+    listDeveloperKeyScopesSuccessful: false,
+    listDeveloperKeyScopesPending: false,
+    listDeveloperKeyScopesError: true
   })
 }
 

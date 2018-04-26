@@ -70,52 +70,56 @@ class DeveloperKeysTable extends React.Component {
     }
   }
 
-  render () {
-    const { inherited, developerKeysList } = this.props
-    if (developerKeysList.length === 0) { return null }
+  render() {
+    const {inherited, developerKeysList} = this.props
+    if (developerKeysList.length === 0) {
+      return null
+    }
     let srcontent = I18n.t('Developers Keys Table')
-    if (inherited) { srcontent = I18n.t('Inherited Developer Keys Table') }
+    if (inherited) {
+      srcontent = I18n.t('Inherited Developer Keys Table')
+    }
     return (
       <div>
         <Table caption={<ScreenReaderContent>{srcontent}</ScreenReaderContent>} id="keys">
-          <thead>
-            <tr>
-              <th scope="col">{I18n.t('Name')}</th>
-              {!inherited && <th scope="col">{I18n.t('User')}</th> }
-              <th scope="col">{I18n.t('Details')}</th>
-              {!inherited && <th scope="col">{I18n.t('Stats')}</th>}
-              <th scope="col" />
-              {!inherited &&  <th scope="col" />}
-            </tr>
-          </thead>
-          <tbody>
-            {
-              this.props.developerKeysList.map((developerKey) => (
-                <DeveloperKey
-                  ref={(key) => {this[`developerKey-${developerKey.id}`] = key}}
-                  key={developerKey.id}
-                  developerKey={developerKey}
-                  store={this.props.store}
-                  actions={this.props.actions}
-                  ctx={this.props.ctx}
-                  inherited={this.props.inherited}
-                  onDelete={this.createSetFocusCallback}
-                />
-              ))
-            }
+        <thead>
+          <tr>
+            <th scope="col">{I18n.t('Name')}</th>
+            {!inherited && <th scope="col">{I18n.t('User')}</th> }
+            <th scope="col">{I18n.t('Details')}</th>
+            {!inherited && <th scope="col">{I18n.t('Stats')}</th>}
+            <th scope="col" />
+            {!inherited &&  <th scope="col" />}
+          </tr>
+        </thead>
+        <tbody>
+          {
+            this.props.developerKeysList.map((developerKey) => (
+              <DeveloperKey
+                ref={key => {
+                  this[`developerKey-${developerKey.id}`] = key
+                }}
+                key={developerKey.id}
+                developerKey={developerKey}
+                store={this.props.store}
+                actions={this.props.actions}
+                ctx={this.props.ctx}
+                inherited={this.props.inherited}
+                onDelete={this.createSetFocusCallback}
+              />
+            ))}
           </tbody>
         </Table>
       </div>
     )
   }
-};
+}
 
 DeveloperKeysTable.propTypes = {
   store: PropTypes.shape({
-    dispatch: PropTypes.func.isRequired,
+    dispatch: PropTypes.func.isRequired
   }).isRequired,
-  actions: PropTypes.shape({
-  }).isRequired,
+  actions: PropTypes.shape({}).isRequired,
   developerKeysList: PropTypes.arrayOf(DeveloperKey.propTypes.developerKey).isRequired,
   ctx: PropTypes.shape({
     params: PropTypes.shape({

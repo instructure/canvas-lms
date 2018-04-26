@@ -17,21 +17,19 @@
  */
 
 import actions from 'jsx/developer_keys/actions/developerKeysActions'
-import reducer from 'jsx/developer_keys/reducers/listDeveloperKeysReducer'
-
-QUnit.module('listDeveloperKeysReducer');
+import reducer from '../listDeveloperKeysReducer'
 
 const defaults = reducer(undefined, {})
 
-test('there are defaults', () => {
-  equal(Array.isArray(defaults.list), true);
-  equal(defaults.list.length, 0);
-  equal(defaults.listDeveloperKeysPending, false);
-  equal(defaults.listDeveloperKeysSuccessful, false);
-  equal(defaults.listDeveloperKeysError, null);
+it('there are defaults', () => {
+  expect(Array.isArray(defaults.list)).toBe(true)
+  expect(defaults.list).toHaveLength(0)
+  expect(defaults.listDeveloperKeysPending).toBe(false)
+  expect(defaults.listDeveloperKeysSuccessful).toBe(false)
+  expect(defaults.listDeveloperKeysError).toBeNull()
 });
 
-test('responds to listDeveloperKeysStart', () => {
+it('responds to listDeveloperKeysStart', () => {
   const state = {
     listDeveloperKeysPending: false,
     listDeveloperKeysSuccessful: true,
@@ -40,12 +38,12 @@ test('responds to listDeveloperKeysStart', () => {
 
   const action = actions.listDeveloperKeysStart();
   const newState = reducer(state, action);
-  equal(newState.listDeveloperKeysPending, true);
-  equal(newState.listDeveloperKeysSuccessful, false);
-  equal(newState.listDeveloperKeysError, null);
+  expect(newState.listDeveloperKeysPending).toBe(true)
+  expect(newState.listDeveloperKeysSuccessful).toBe(false)
+  expect(newState.listDeveloperKeysError).toBeNull()
 });
 
-test('responds to listInheritedDeveloperKeysStart', () => {
+it('responds to listInheritedDeveloperKeysStart', () => {
   const state = {
     listInheritedDeveloperKeysPending: false,
     listInheritedDeveloperKeysSuccessful: true,
@@ -54,12 +52,12 @@ test('responds to listInheritedDeveloperKeysStart', () => {
 
   const action = actions.listInheritedDeveloperKeysStart();
   const newState = reducer(state, action);
-  equal(newState.listInheritedDeveloperKeysPending, true);
-  equal(newState.listInheritedDeveloperKeysSuccessful, false);
-  equal(newState.listInheritedDeveloperKeysError, null);
+  expect(newState.listInheritedDeveloperKeysPending).toBe(true)
+  expect(newState.listInheritedDeveloperKeysSuccessful).toBe(false)
+  expect(newState.listInheritedDeveloperKeysError).toBeNull()
 });
 
-test('responds to listDeveloperKeysSuccessful', () => {
+it('responds to listDeveloperKeysSuccessful', () => {
   const state = {
     listDeveloperKeysPending: true,
     listDeveloperKeysSuccessful: false,
@@ -68,12 +66,12 @@ test('responds to listDeveloperKeysSuccessful', () => {
   const payload = {developerKeys: []};
   const action = actions.listDeveloperKeysSuccessful(payload);
   const newState = reducer(state, action);
-  equal(newState.listDeveloperKeysPending, false);
-  equal(newState.listDeveloperKeysSuccessful, true);
-  equal(newState.list.length, payload.developerKeys.length);
+  expect(newState.listDeveloperKeysPending).toBe(false)
+  expect(newState.listDeveloperKeysSuccessful).toBe(true)
+  expect(newState.list).toHaveLength(payload.developerKeys.length)
 });
 
-test('responds to listDeveloperKeysSuccessful', () => {
+it('responds to listInheritedDeveloperKeysSuccessful', () => {
   const state = {
     listInheritedDeveloperKeysPending: true,
     listInheritedDeveloperKeysSuccessful: false,
@@ -82,12 +80,12 @@ test('responds to listDeveloperKeysSuccessful', () => {
   const payload = {developerKeys: [{id: 1}]};
   const action = actions.listInheritedDeveloperKeysSuccessful(payload);
   const newState = reducer(state, action);
-  equal(newState.listInheritedDeveloperKeysPending, false);
-  equal(newState.listInheritedDeveloperKeysSuccessful, true);
-  equal(newState.inheritedList.length, payload.developerKeys.length);
+  expect(newState.listInheritedDeveloperKeysPending).toBe(false)
+  expect(newState.listInheritedDeveloperKeysSuccessful).toBe(true)
+  expect(newState.inheritedList).toHaveLength(payload.developerKeys.length)
 });
 
-test('responds to listDeveloperKeysFailed', () => {
+it('responds to listDeveloperKeysFailed', () => {
   const state = {
     listDeveloperKeysPending: true,
     listDeveloperKeysError: null
@@ -96,11 +94,11 @@ test('responds to listDeveloperKeysFailed', () => {
 
   const action = actions.listDeveloperKeysFailed(error);
   const newState = reducer(state, action);
-  equal(newState.listDeveloperKeysPending, false);
-  equal(newState.listDeveloperKeysError, error);
+  expect(newState.listDeveloperKeysPending).toBe(false)
+  expect(newState.listDeveloperKeysError).toBe(error)
 });
 
-test('responds to listInheritedDeveloperKeysFailed', () => {
+it('responds to listInheritedDeveloperKeysFailed', () => {
   const state = {
     listInheritedDeveloperKeysPending: true,
     listInheritedDeveloperKeysError: null
@@ -109,11 +107,11 @@ test('responds to listInheritedDeveloperKeysFailed', () => {
 
   const action = actions.listInheritedDeveloperKeysFailed(error);
   const newState = reducer(state, action);
-  equal(newState.listInheritedDeveloperKeysPending, false);
-  equal(newState.listInheritedDeveloperKeysError, error);
+  expect(newState.listInheritedDeveloperKeysPending).toBe(false)
+  expect(newState.listInheritedDeveloperKeysError).toBe(error)
 });
 
-test('responds to listDeveloperKeysReplace', () => {
+it('responds to listDeveloperKeysReplace', () => {
   const state = {
     list: [
       {id: 11, name: 'a'},
@@ -126,12 +124,16 @@ test('responds to listDeveloperKeysReplace', () => {
   const action = actions.listDeveloperKeysReplace(payload);
   const newState = reducer(state, action);
 
-  propEqual(newState.list, [{id: 11, name: 'a'},
-                            {id: 22, name: 'zz'},
-                            {id: 33, name: 'c'}])
+  expect(newState.list).toEqual(
+    [
+      {id: 11, name: 'a'},
+      {id: 22, name: 'zz'},
+      {id: 33, name: 'c'}
+    ]
+  )
 });
 
-test('istDeveloperKeysReplaceBindingState replaces state in list', () => {
+it('istDeveloperKeysReplaceBindingState replaces state in list', () => {
   const state = {
     list: [
       {id: '11', name: 'a'},
@@ -148,10 +150,10 @@ test('istDeveloperKeysReplaceBindingState replaces state in list', () => {
   const action = actions.listDeveloperKeysReplaceBindingState(payload);
   const newState = reducer(state, action);
 
-  propEqual(newState.list[0].developer_key_account_binding.workflow_state, 'active')
+  expect(newState.list[0].developer_key_account_binding.workflow_state).toBe('active')
 });
 
-test('listDeveloperKeysReplaceBindingState in inherited list', () => {
+it('listDeveloperKeysReplaceBindingState in inherited list', () => {
   const state = {
     list: [],
     inheritedList: [
@@ -168,10 +170,10 @@ test('listDeveloperKeysReplaceBindingState in inherited list', () => {
   const action = actions.listDeveloperKeysReplaceBindingState(payload);
   const newState = reducer(state, action);
 
-  propEqual(newState.inheritedList[0].developer_key_account_binding.workflow_state, 'active')
+  expect(newState.inheritedList[0].developer_key_account_binding.workflow_state).toBe('active')
 });
 
-test('responds to listDeveloperKeysDelete', () => {
+it('responds to listDeveloperKeysDelete', () => {
   const state = {
     list: [
       {id: 44, name: 'dd'},
@@ -184,11 +186,15 @@ test('responds to listDeveloperKeysDelete', () => {
   const action = actions.listDeveloperKeysDelete(payload);
   const newState = reducer(state, action);
 
-  propEqual(newState.list, [{id: 44, name: 'dd'},
-                            {id: 66, name: 'ff'}])
+  expect(newState.list).toEqual(
+    [
+      {id: 44, name: 'dd'},
+      {id: 66, name: 'ff'}
+    ]
+  )
 });
 
-test('responds to listDeveloperKeysPrepend', () => {
+it('responds to listDeveloperKeysPrepend', () => {
   const state = {
     list: [
       {id: 77, name: 'AA'},
@@ -200,8 +206,12 @@ test('responds to listDeveloperKeysPrepend', () => {
   const action = actions.listDeveloperKeysPrepend(payload);
   const newState = reducer(state, action);
 
-  propEqual(newState.list, [{id: 99, name: 'OO'},
-                            {id: 77, name: 'AA'},
-                            {id: 88, name: 'BB'}])
+  expect(newState.list).toEqual(
+    [
+      {id: 99, name: 'OO'},
+      {id: 77, name: 'AA'},
+      {id: 88, name: 'BB'}
+    ]
+  )
 });
 

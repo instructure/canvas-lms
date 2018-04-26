@@ -20,7 +20,7 @@ import Button from '@instructure/ui-core/lib/components/Button'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import Heading from '@instructure/ui-core/lib/components/Heading'
 import Spinner from '@instructure/ui-core/lib/components/Spinner'
-import TabList, { TabPanel } from '@instructure/ui-core/lib/components/TabList'
+import TabList, {TabPanel} from '@instructure/ui-core/lib/components/TabList'
 
 import IconPlusLine from 'instructure-icons/lib/Line/IconPlusLine'
 
@@ -32,11 +32,11 @@ import DeveloperKey from './DeveloperKey'
 import DeveloperKeyModal from './DeveloperKeyModal'
 
 class DeveloperKeysApp extends React.Component {
-  setMainTableRef = (node) => {
+  setMainTableRef = node => {
     this.mainTableRef = node
   }
 
-  setInheritedTableRef = (node) => {
+  setInheritedTableRef = node => {
     this.inheritedTableRef = node
   }
 
@@ -53,11 +53,11 @@ class DeveloperKeysApp extends React.Component {
     this.props.store.dispatch(this.props.actions.developerKeysModalOpen())
   }
 
-  showMoreButtonHandler = (_event) => {
+  showMoreButtonHandler = _event => {
     const {
-      applicationState: { listDeveloperKeys: { nextPage } },
-      store: { dispatch },
-      actions: { getRemainingDeveloperKeys }
+      applicationState: {listDeveloperKeys: {nextPage}},
+      store: {dispatch},
+      actions: {getRemainingDeveloperKeys}
     } = this.props
 
     const callBack = this.mainTableRef.createSetFocusCallback()
@@ -65,10 +65,8 @@ class DeveloperKeysApp extends React.Component {
       .then((payload) => { callBack(payload.developerKeys)})
   }
 
-  showMoreButton () {
-    const {
-      applicationState: { listDeveloperKeys: { listDeveloperKeysPending, nextPage } }
-    } = this.props
+  showMoreButton() {
+    const {applicationState: {listDeveloperKeys: {listDeveloperKeysPending, nextPage}}} = this.props
 
     if (nextPage && !listDeveloperKeysPending) {
       return (
@@ -79,11 +77,11 @@ class DeveloperKeysApp extends React.Component {
     return null
   }
 
-  showMoreInheritedButtonHandler = (_event) => {
+  showMoreInheritedButtonHandler = _event => {
     const {
-      applicationState: { listDeveloperKeys: { inheritedNextPage } },
-      store: { dispatch },
-      actions: { getRemainingInheritedDeveloperKeys }
+      applicationState: {listDeveloperKeys: {inheritedNextPage}},
+      store: {dispatch},
+      actions: {getRemainingInheritedDeveloperKeys}
     } = this.props
 
     const callBack = this.inheritedTableRef.createSetFocusCallback()
@@ -91,9 +89,9 @@ class DeveloperKeysApp extends React.Component {
       .then((payload) => { callBack(payload.developerKeys) })
   }
 
-  showMoreInheritedButton () {
+  showMoreInheritedButton() {
     const {
-      applicationState: { listDeveloperKeys: { listInheritedDeveloperKeysPending, inheritedNextPage } }
+      applicationState: {listDeveloperKeys: {listInheritedDeveloperKeysPending, inheritedNextPage}}
     } = this.props
 
     if (inheritedNextPage && !listInheritedDeveloperKeysPending) {
@@ -105,16 +103,22 @@ class DeveloperKeysApp extends React.Component {
     return null
   }
 
-  render () {
+  render() {
     const {
       applicationState: {
-        listDeveloperKeys: { list, inheritedList, listDeveloperKeysPending, listInheritedDeveloperKeysPending },
-        createOrEditDeveloperKey
+        listDeveloperKeys: {
+          list,
+          inheritedList,
+          listDeveloperKeysPending,
+          listInheritedDeveloperKeysPending
+        },
+        createOrEditDeveloperKey,
+        listDeveloperKeyScopes
       },
       store,
       actions,
       ctx
-    } = this.props;
+    } = this.props
     return (
       <div>
         <div className="ic-Action-header">
@@ -141,6 +145,8 @@ class DeveloperKeysApp extends React.Component {
               store={store}
               actions={actions}
               createOrEditDeveloperKeyState={createOrEditDeveloperKey}
+              availableScopes={listDeveloperKeyScopes.availableScopes}
+              availableScopesPending={listDeveloperKeyScopes.listDeveloperKeyScopesPending}
               ctx={ctx}
             />
             <DeveloperKeysTable
@@ -176,13 +182,13 @@ class DeveloperKeysApp extends React.Component {
           </TabPanel>
         </TabList>
       </div>
-    );
+    )
   }
-};
+}
 
 DeveloperKeysApp.propTypes = {
   store: PropTypes.shape({
-    dispatch: PropTypes.func.isRequired,
+    dispatch: PropTypes.func.isRequired
   }).isRequired,
   actions: PropTypes.shape({
     developerKeysModalOpen: PropTypes.func.isRequired,
@@ -193,7 +199,7 @@ DeveloperKeysApp.propTypes = {
   applicationState: PropTypes.shape({
     createOrEditDeveloperKey: PropTypes.shape({
       developerKeyCreateOrEditFailed: PropTypes.bool.isRequired,
-      developerKeyCreateOrEditSuccessful: PropTypes.bool.isRequired,
+      developerKeyCreateOrEditSuccessful: PropTypes.bool.isRequired
     }),
     listDeveloperKeys: PropTypes.shape({
       nextPage: PropTypes.string,
@@ -203,10 +209,10 @@ DeveloperKeysApp.propTypes = {
       listInheritedDeveloperKeysPending: PropTypes.bool.isRequired,
       listInheritedDeveloperKeysSuccessful: PropTypes.bool.isRequired,
       list: PropTypes.arrayOf(DeveloperKey.propTypes.developerKey).isRequired,
-      inheritedList: PropTypes.arrayOf(DeveloperKey.propTypes.developerKey).isRequired,
+      inheritedList: PropTypes.arrayOf(DeveloperKey.propTypes.developerKey).isRequired
     }).isRequired
   }).isRequired,
   ctx: DeveloperKeyModal.propTypes.ctx
-};
+}
 
 export default DeveloperKeysApp

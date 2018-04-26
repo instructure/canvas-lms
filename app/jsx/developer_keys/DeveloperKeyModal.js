@@ -74,6 +74,8 @@ export default class DeveloperKeyModal extends React.Component {
       >
         <DeveloperKeyFormFields
           developerKey={this.props.createOrEditDeveloperKeyState.developerKey}
+          availableScopes={this.props.availableScopes}
+          availableScopesPending={this.props.availableScopesPending}
         />
       </form>
     )
@@ -126,6 +128,12 @@ export default class DeveloperKeyModal extends React.Component {
 }
 
 DeveloperKeyModal.propTypes = {
+  availableScopes: PropTypes.objectOf(PropTypes.arrayOf(
+    PropTypes.shape({
+      resource: PropTypes.string,
+      scope: PropTypes.string
+    })
+  )).isRequired,
   store: PropTypes.shape({
     dispatch: PropTypes.func.isRequired
   }).isRequired,
@@ -141,6 +149,7 @@ DeveloperKeyModal.propTypes = {
     developerKeyModalOpen: PropTypes.bool.isRequired,
     developerKey: DeveloperKeyFormFields.propTypes.developerKey
   }).isRequired,
+  availableScopesPending: PropTypes.bool.isRequired,
   ctx: PropTypes.shape({
     params: PropTypes.shape({
       contextId: PropTypes.string.isRequired
