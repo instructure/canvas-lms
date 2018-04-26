@@ -76,7 +76,7 @@ module Exporters
         assignment_group: assignment_group,
         workflow_state: 'unpublished'
       }
-      assignment_params[:post_to_sis] = quiz.assignment.post_to_sis if post_to_sis
+      assignment_params[:post_to_sis] = quiz.assignment.post_to_sis if quiz.assignment && post_to_sis
       assignment = course.assignments.create(assignment_params)
       assignment.quiz_lti! && assignment.save!
       @assignment = assignment

@@ -78,5 +78,16 @@ describe "Quizzes2 Exporter" do
       expect(assignment.external_tool_tag.url).to eq @tool.url
       expect(assignment.assignment_group.name).to eq Exporters::Quizzes2Exporter::GROUP_NAME
     end
+
+    it "doesn't fail when exporting an ungraded quiz and SIS grade export is enabled" do
+      @course.enable_feature!(:post_grades)
+      survey_quiz =  @course.quizzes.create!(title: 'blah', quiz_type: 'survey')
+      ce = @course.content_exports.create!(
+        export_type: ContentExport::QUIZZES2,
+        selected_content: survey_quiz.id
+      )
+      exporter = Exporters::Quizzes2Exporter.new(ce)
+      expect { exporter.export }.to change { @course.assignments.count }.by(1)
+    end
   end
 end

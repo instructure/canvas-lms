@@ -119,23 +119,16 @@ describe ContentExport do
     context 'failure cases' do
       it "fails if the quiz exporter fails" do
         @course.enable_feature!(:quizzes_next)
-        allow_any_instance_of(Exporters::Quizzes2Exporter).to receive(:export).and_raise('fake error')
+        allow_any_instance_of(Exporters::Quizzes2Exporter).to receive(:export).and_return(false)
         @ce.export_without_send_later
         expect(@ce.workflow_state).to eq "failed"
       end
 
       it "fails if the qti exporter fails" do
         @course.enable_feature!(:quizzes_next)
-        allow_any_instance_of(CC::CCExporter).to receive(:export).and_raise('fake error')
-        @ce.export_without_send_later
-        expect(@ce.workflow_state).to eq "failed"
-      end
-
-      it "does not set the status to exported if either exporter is unsuccessful" do
-        @course.enable_feature!(:quizzes_next)
         allow_any_instance_of(CC::CCExporter).to receive(:export).and_return(false)
         @ce.export_without_send_later
-        expect(@ce.workflow_state).to eq "exporting"
+        expect(@ce.workflow_state).to eq "failed"
       end
     end
   end
