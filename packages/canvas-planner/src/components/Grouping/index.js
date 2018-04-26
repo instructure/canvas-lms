@@ -151,6 +151,7 @@ export class Grouping extends Component {
           toggleAPIPending={item.toggleAPIPending}
           status={item.status}
           newActivity={item.newActivity}
+          allDay={item.allDay}
           showNotificationBadge={showNotificationBadgeOnItem}
           currentUser={this.props.currentUser}
         />

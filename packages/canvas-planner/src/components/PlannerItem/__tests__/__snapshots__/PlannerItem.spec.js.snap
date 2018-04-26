@@ -688,6 +688,81 @@ exports[`renders Assignment correctly without right side content 1`] = `
 </div>
 `;
 
+exports[`renders Calendar Event correctly with an all day date 1`] = `
+<div
+  className=""
+>
+  <NotificationBadge />
+  <div>
+    <Checkbox
+      checked={false}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Calendar Event I am a Calendar Event is incomplete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
+  </div>
+  <div
+    aria-hidden="true"
+    style={
+      Object {
+        "color": "#d71f85",
+      }
+    }
+  >
+    <IconCalendarMonthLine />
+  </div>
+  <div>
+    <div>
+      <div>
+        <Text
+          as="span"
+          color="secondary"
+          letterSpacing="normal"
+          size="x-small"
+        >
+          A Course about being Diffrient Calendar Event
+        </Text>
+      </div>
+      <div>
+        <Link
+          as="button"
+          ellipsis={false}
+          href="#"
+          linkRef={[Function]}
+          variant="default"
+        >
+          I am a Calendar Event
+        </Link>
+      </div>
+    </div>
+    <div>
+      <div />
+      <div>
+        <div>
+          <Text
+            as="span"
+            color="secondary"
+            letterSpacing="normal"
+            size="x-small"
+          >
+            All Day
+          </Text>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
 exports[`renders Calendar Event correctly with everything 1`] = `
 <div
   className=""
@@ -778,7 +853,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            DUE: 3:30 AM
+            3:30 AM
           </Text>
         </div>
       </div>
@@ -853,105 +928,8 @@ exports[`renders Calendar Event correctly with just date 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            DUE: 3:30 AM
+            3:30 AM
           </Text>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-`;
-
-exports[`renders Calendar Event correctly with just points 1`] = `
-<div
-  className=""
->
-  <NotificationBadge />
-  <div>
-    <Checkbox
-      checked={false}
-      disabled={false}
-      inline={false}
-      label={
-        <ScreenReaderContent
-          as="span"
-        >
-          Calendar Event I am a Calendar Event is incomplete
-        </ScreenReaderContent>
-      }
-      onChange={[Function]}
-      size="medium"
-      variant="simple"
-    />
-  </div>
-  <div
-    aria-hidden="true"
-    style={
-      Object {
-        "color": "#d71f85",
-      }
-    }
-  >
-    <IconCalendarMonthLine />
-  </div>
-  <div>
-    <div>
-      <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Calendar Event
-        </Text>
-      </div>
-      <div>
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          I am a Calendar Event
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
-      <div>
-        <div>
-          <Text
-            as="span"
-            color="secondary"
-            letterSpacing="normal"
-            size="medium"
-          >
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="large"
-            >
-              2
-            </Text>
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="x-small"
-            >
-               
-              pts
-            </Text>
-          </Text>
-        </div>
-        <div>
-          <Text
-            as="span"
-            color="secondary"
-            letterSpacing="normal"
-            size="x-small"
-          />
         </div>
       </div>
     </div>

@@ -565,13 +565,12 @@ module ApplicationHelper
     mapped
   end
 
-  # return enough group data for the planner to display items associated with
-  # account-level groups
+  # return enough group data for the planner to display items associated with groups
   def map_groups_for_planner(groups)
-    mapped = groups.select {|g| g.context_type == "Account"}.map do |g|
+    mapped = groups.map do |g|
       {
         id: g.id,
-        assetString: "group_#{g.id}",
+        assetString: g.asset_string,
         name: g.name,
         url: "/groups/#{g.id}"
       }

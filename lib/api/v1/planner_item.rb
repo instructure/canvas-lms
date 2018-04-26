@@ -37,7 +37,7 @@ module Api::V1::PlannerItem
   }.freeze
 
   def planner_item_json(item, user, session, opts = {})
-    context_data(item).merge({
+    context_data(item, use_effective_code: true).merge({
       :plannable_id => item.id,
       :planner_override => planner_override_json(item.planner_override_for(user), user, session),
       :new_activity => new_activity(item, user, opts)

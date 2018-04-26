@@ -127,8 +127,8 @@ export class PlannerItem extends Component {
   renderDateField = () => {
     if (this.props.date) {
 
-      if (this.props.associated_item === "Announcement") {
-        return this.props.date.format("LT");
+      if (this.props.associated_item === "Announcement" || this.props.associated_item === "Calendar Event") {
+        return this.props.allDay === true ? formatMessage('All Day') : this.props.date.format("LT");
       }
       return formatMessage(`DUE: {date}`, {date: this.props.date.format("LT")});
     }

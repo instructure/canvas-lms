@@ -49,6 +49,10 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
   if (plannable_type === 'planner_note') {
     details.details = plannable.details;
   }
+
+  if (plannable_type === 'calendar_event') {
+    details.allDay = plannable.all_day
+  }
   return details;
 };
 
@@ -59,6 +63,7 @@ const TYPE_MAPPING = {
   wiki_page: "Page",
   announcement: "Announcement",
   planner_note: "To Do",
+  calendar_event: "Calendar Event",
 };
 
 const getItemType = (plannableType) => {

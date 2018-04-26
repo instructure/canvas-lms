@@ -52,9 +52,8 @@ describe "student planner" do
     validate_link_to_url(announcement, 'discussion_topics')
   end
 
-  it "shows and navigates to the events page", priority: "1", test_id: 3488530 do
-    skip('Unskip with ADMIN-278')
-    event = CalendarEvent.new(title: "New event")
+  it "shows and navigates to the calendar events page", priority: "1", test_id: 3488530 do
+    event = CalendarEvent.new(title: "New event", start_at: 1.minute.from_now)
     event.context = @course
     event.save!
     go_to_list_view
