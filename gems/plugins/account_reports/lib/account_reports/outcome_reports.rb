@@ -130,6 +130,7 @@ module AccountReports
           lo.display_name        AS "learning outcome friendly name",
           lo.data                AS "learning outcome data",
           r.attempt              AS "attempt",
+          r.hide_points          AS "learning outcome points hidden",
           r.score                AS "outcome score",
           r.possible             AS "learning outcome points possible",
           r.mastery              AS "learning outcome mastered",
@@ -205,6 +206,7 @@ module AccountReports
           COALESCE(qr.mastery, r.mastery)             AS "learning outcome mastered",
           learning_outcomes.data                      AS "learning outcome data",
           COALESCE(qr.attempt, r.attempt)             AS "attempt",
+          r.hide_points                               AS "learning outcome points hidden",
           COALESCE(qr.score, r.score)                 AS "outcome score",
           c.name                                      AS "course name",
           c.id                                        AS "course id",
@@ -325,7 +327,15 @@ module AccountReports
         ratings = outcome_data[:ratings]&.sort_by { |r| r[:points] }&.reverse || []
         rating = ratings.detect { |r| r[:points] <= score } || {}
         row['learning outcome rating'] = rating[:description]
-        row['learning outcome rating points'] = rating[:points]
+
+        if row['learning outcome points hidden'] == true
+          row['outcome score'] = nil
+          row['learning outcome rating points'] = nil
+          row['learning outcome points possible'] = nil
+          row['learning outcome mastery score'] = nil
+        else
+          row['learning outcome rating points'] = rating[:points]
+        end
       end
     end
   end

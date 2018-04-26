@@ -122,6 +122,9 @@ describe "Outcome Reports" do
              end
     rating ||= {}
 
+    hide_points = outcome_result&.hide_points
+    hide = lambda { |v| hide_points ? nil : v }
+
     expectations = {
       'student name' => user.sortable_name,
       'student id' => user.id,
@@ -140,15 +143,15 @@ describe "Outcome Reports" do
       'learning outcome name' => outcome&.short_description,
       'learning outcome friendly name' => outcome&.display_name,
       'learning outcome id' => outcome&.id,
-      'learning outcome mastery score' => outcome&.mastery_points,
-      'learning outcome points possible' => outcome_result&.possible,
+      'learning outcome mastery score' => hide.call(outcome&.mastery_points),
+      'learning outcome points possible' => hide.call(outcome_result&.possible),
       'learning outcome mastered' => unless outcome_result&.mastery.nil?
                                        outcome_result.mastery? ? 1 : 0
                                      end,
       'learning outcome rating' => rating[:description],
-      'learning outcome rating points' => rating[:points],
+      'learning outcome rating points' => hide.call(rating[:points]),
       'attempt' => outcome_result&.attempt,
-      'outcome score' => outcome_result&.score,
+      'outcome score' => hide.call(outcome_result&.score),
       'account id' => course&.account&.id,
       'account name' => course&.account&.name,
       "assessment title" => quiz&.title || assignment&.title,
@@ -260,6 +263,12 @@ describe "Outcome Reports" do
         report = parse_report(report_record, order: order, parse_header: true)
         verify_all(report, all_values)
       end
+    end
+
+    it "should not include scores when hidden on learning outcome results" do
+      lor = user1_values[:outcome_result]
+      lor.update!(hide_points: true)
+      verify_all(report, all_values)
     end
 
     it "should not include invalid learning outcome results" do
