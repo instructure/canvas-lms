@@ -175,16 +175,16 @@ export class DiscussionsContainer extends Component {
   render () {
     return this.props.connectDropTarget (
       <div className="discussions-container__wrapper">
-        {!this.props.pinned ?
-        <span className="recent-activity-text-container">
-          <Text fontStyle="italic">{I18n.t('Ordered by Recent Activity')}</Text>
-        </span> : null }
         <span ref={this.wrapperToggleRef}>
           <ToggleDetails
             expanded={this.state.expanded}
             onToggle={this.toggleExpanded}
-            summary={<Text weight="bold">{this.props.title}</Text>}
+            summary={<Text weight="bold" as="h2">{this.props.title}</Text>}
           >
+            {!this.props.pinned ?
+            <span className="recent-activity-text-container">
+              <Text fontStyle="italic">{I18n.t('Ordered by Recent Activity')}</Text>
+            </span> : null }
             {this.props.discussions.length ? this.renderDiscussions() : this.renderBackgroundImage()}
           </ToggleDetails>
         </span>
