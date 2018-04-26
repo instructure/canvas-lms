@@ -304,7 +304,8 @@ class PlannerOverridesController < ApplicationController
                    ungraded_quiz_collection,
                    planner_note_collection,
                    page_collection,
-                   ungraded_discussion_collection]
+                   ungraded_discussion_collection,
+                   calendar_events_collection]
     BookmarkedCollection.merge(*collections)
   end
 
@@ -383,6 +384,16 @@ class PlannerOverridesController < ApplicationController
   def ungraded_discussion_collection
     item_collection('ungraded_discussions', @current_user.discussion_topics_needing_viewing(default_opts),
       DiscussionTopic, [:todo_date, :posted_at, :created_at], :id)
+  end
+
+  def calendar_events_collection
+    unless @context_codes
+      @context_codes = (@current_user.course_ids_for_todo_lists(:student, default_opts).map{|id| "course_#{id}"} || [])
+      @context_codes += (@current_user.cached_current_group_memberships.pluck(:group_id).map{|id| "group_#{id}"} || [])
+    end
+    item_collection('calendar_events', @current_user.calendar_events_for_contexts(@context_codes, start_at: start_date,
+      end_at: end_date, exclude_assignments: true),
+      CalendarEvent, [:start_at, :created_at], :id)
   end
 
   def item_collection(label, scope, base_model, *order_by)

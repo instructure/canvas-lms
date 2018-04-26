@@ -24,6 +24,7 @@ module Api::V1::PlannerItem
   include Api::V1::DiscussionTopics
   include Api::V1::WikiPage
   include Api::V1::PlannerOverride
+  include Api::V1::CalendarEvent
 
   PLANNABLE_TYPES = {
     'discussion_topic' => 'DiscussionTopic',
@@ -31,17 +32,21 @@ module Api::V1::PlannerItem
     'quiz' => 'Quizzes::Quiz',
     'assignment' => 'Assignment',
     'wiki_page' => 'WikiPage',
-    'planner_note' => 'PlannerNote'
+    'planner_note' => 'PlannerNote',
+    'calendar_event' => 'CalendarEvent'
   }.freeze
 
   def planner_item_json(item, user, session, opts = {})
     context_data(item).merge({
       :plannable_id => item.id,
-      :visible_in_planner => item.visible_in_planner_for?(user),
       :planner_override => planner_override_json(item.planner_override_for(user), user, session),
       :new_activity => new_activity(item, user, opts)
     }).merge(submission_statuses_for(user, item, opts)).tap do |hash|
-      if item.is_a?(PlannerNote)
+      if item.is_a?(::CalendarEvent)
+        hash[:plannable_date] = item.start_at || item.created_at
+        hash[:plannable_type] = 'calendar_event'
+        hash[:plannable] = event_json(item, user, session)
+      elsif item.is_a?(::PlannerNote)
         hash[:plannable_date] = item.todo_date || item.created_at
         hash[:plannable_type] = 'planner_note'
         hash[:plannable] = api_json(item, user, session)
@@ -85,7 +90,8 @@ module Api::V1::PlannerItem
   end
 
   def planner_items_json(items, user, session, opts = {})
-    notes, context_items = items.partition{|i| i.is_a?(::PlannerNote)}
+    _events, other_items = items.partition{|i| i.is_a?(::CalendarEvent)}
+    notes, context_items = other_items.partition{|i| i.is_a?(::PlannerNote)}
     ActiveRecord::Associations::Preloader.new.preload(notes, :user => {:pseudonym => :account}) if notes.any?
     wiki_pages, other_context_items = context_items.partition{|i| i.is_a?(::WikiPage)}
     ActiveRecord::Associations::Preloader.new.preload(wiki_pages, :wiki => [{:course => :root_account}, {:group => :root_account}]) if wiki_pages.any?

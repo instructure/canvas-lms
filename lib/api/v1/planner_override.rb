@@ -25,11 +25,12 @@ module Api::V1::PlannerOverride
     'quiz' => 'Quizzes::Quiz',
     'assignment' => 'Assignment',
     'wiki_page' => 'WikiPage',
-    'planner_note' => 'PlannerNote'
+    'planner_note' => 'PlannerNote',
+    'calendar_event' => 'CalendarEvent'
   }.freeze
 
   def planner_override_json(override, user, session)
-    return unless override.present?
+    return if override.blank?
     json = api_json(override, user, session)
     json['plannable_type'] = PLANNABLE_TYPES.key(json['plannable_type'])
     json

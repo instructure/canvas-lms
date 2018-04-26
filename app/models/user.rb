@@ -1892,6 +1892,14 @@ class User < ActiveRecord::Base
     end
   end
 
+  def calendar_events_for_contexts(context_codes, opts={})
+    event_codes = context_codes
+    event_codes += AppointmentGroup.manageable_by(self, context_codes).intersecting(opts[:start_at], opts[:end_at]).map(&:asset_string)
+    event_codes << asset_string
+    CalendarEvent.active.for_user_and_context_codes(self, event_codes, []).between(opts[:start_at], opts[:end_at]).
+      updated_after(opts[:updated_at])
+  end
+
   def calendar_events_for_calendar(opts={})
     opts = opts.dup
     context_codes = opts[:context_codes] || (opts[:contexts] ? setup_context_lookups(opts[:contexts]) : self.cached_context_codes)
@@ -1900,11 +1908,9 @@ class User < ActiveRecord::Base
     opts[:end_at] ||= 1.weeks.from_now
 
     events = []
-    ev = CalendarEvent
-    ev = CalendarEvent.active if !opts[:include_deleted_events]
-    event_codes = context_codes + AppointmentGroup.manageable_by(self, context_codes).intersecting(opts[:start_at], opts[:end_at]).map(&:asset_string)
-    events += ev.for_user_and_context_codes(self, event_codes, []).between(opts[:start_at], opts[:end_at]).updated_after(opts[:updated_at])
-    events += Assignment.published.for_context_codes(context_codes).due_between(opts[:start_at], opts[:end_at]).updated_after(opts[:updated_at]).with_just_calendar_attributes
+    events += calendar_events_for_contexts(context_codes, opts)
+    events += Assignment.published.for_context_codes(context_codes).due_between(opts[:start_at], opts[:end_at]).
+      updated_after(opts[:updated_at]).with_just_calendar_attributes
     events.sort_by{|e| [e.start_at, Canvas::ICU.collation_key(e.title || CanvasSort::First)] }.uniq
   end
 

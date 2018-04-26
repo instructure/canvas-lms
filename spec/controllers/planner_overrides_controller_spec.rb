@@ -106,6 +106,26 @@ describe PlannerOverridesController do
         expect(note["plannable"]["title"]).to eq @planner_note.title
       end
 
+      it "should show calendar events for the course and user" do
+        ce = calendar_event_model(start_at: 1.day.from_now)
+        ue = @student.calendar_events.create!(start_at: 2.days.from_now, title: 'user_event')
+        get :items_index
+        response_json = json_parse(response.body)
+        course_event = response_json.find { |i| i['plannable_type'] == 'calendar_event' && i['plannable_id'] == ce.id }
+        user_event = response_json.find { |i| i['plannable_type'] == 'calendar_event' && i['plannable_id'] == ue.id }
+        expect(course_event['plannable']['title']).to eq ce.title
+        expect(user_event['plannable']['title']).to eq 'user_event'
+      end
+
+      it "should show appointment groups" do
+        ag = appointment_group_model(title: 'appointment group')
+        ap = appointment_participant_model(participant: @student, course: @course, appointment_group: ag)
+        get :items_index
+        response_json = json_parse(response.body)
+        event = response_json.find { |i| i['plannable_type'] == 'calendar_event' && i['plannable_id'] == ap.id }
+        expect(event['plannable']['title']).to eq 'appointment group'
+      end
+
       it "should show planner overrides created on quizzes" do
         quiz = quiz_model(course: @course, due_at: 1.day.from_now)
         PlannerOverride.create!(plannable_id: quiz.id, plannable_type: Quizzes::Quiz, user_id: @student.id)
