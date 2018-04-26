@@ -45,10 +45,16 @@
 #            "description": "The workflow state of the binding. Will be one of 'on', 'off', or 'allow.'",
 #            "example": "on",
 #            "type": "number"
-#          }
+#          },
+#          "account_owns_binding": {
+#            "description": "True if the requested context owns the binding",
+#            "example": "true",
+#            "type": "boolean"
+#          },
 #       }
 #     }
 class DeveloperKeyAccountBindingsController < ApplicationController
+  before_action :require_context
   before_action :verify_feature_flags
   before_action :require_manage_developer_keys
   before_action :developer_key_in_account, only: :create_or_update
@@ -70,7 +76,7 @@ class DeveloperKeyAccountBindingsController < ApplicationController
     binding = existing_binding || DeveloperKeyAccountBinding.new(create_params)
     binding.assign_attributes workflow_state_param
     binding.save!
-    render json: DeveloperKeyAccountBindingSerializer.new(binding),
+    render json: DeveloperKeyAccountBindingSerializer.new(binding, @context),
            status: existing_binding.present? ? :ok : :created
   end
 
@@ -96,7 +102,7 @@ class DeveloperKeyAccountBindingsController < ApplicationController
 
   def index_serializer(bindings)
     bindings.map do |b|
-      DeveloperKeyAccountBindingSerializer.new(b)
+      DeveloperKeyAccountBindingSerializer.new(b, @context)
     end
   end
 

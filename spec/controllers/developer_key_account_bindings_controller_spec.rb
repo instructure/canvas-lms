@@ -85,7 +85,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
     end
 
     it 'renders a properly formatted developer key account binding' do
-      expected_keys = ['id', 'account_id', 'developer_key_id', 'workflow_state']
+      expected_keys = ['id', 'account_id', 'developer_key_id', 'workflow_state', 'account_owns_binding']
       user_session(authorized_admin)
       post :create_or_update, params: params
       expect(json_parse.keys).to match_array(expected_keys)
@@ -134,7 +134,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
     end
 
     it 'renders a properly formatted developer key account binding' do
-      expected_keys = ['id', 'account_id', 'developer_key_id', 'workflow_state']
+      expected_keys = ['id', 'account_id', 'developer_key_id', 'workflow_state', 'account_owns_binding']
       user_session(authorized_admin)
       post :create_or_update, params: params
       expect(json_parse.keys).to match_array(expected_keys)
@@ -186,7 +186,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
     end
 
     it 'renders properly formatted developer key account bindings' do
-      expected_keys = ['id', 'account_id', 'developer_key_id', 'workflow_state']
+      expected_keys = ['id', 'account_id', 'developer_key_id', 'workflow_state', 'account_owns_binding']
       user_session(authorized_admin)
       get :index, params: params, format: :json
       expect(json_parse.first.keys).to match_array(expected_keys)
@@ -340,7 +340,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
 
         user_session(sub_account_admin)
         get :index, params: sub_account_params.except(:developer_key_account_binding)
-        expect(json_parse.map{ |b| b['id'] }).to include root_account_binding.id
+        expect(json_parse.map{ |b| DeveloperKeyAccountBinding.find(b['id']) }).to include root_account_binding
       end
     end
   end

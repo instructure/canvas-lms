@@ -49,9 +49,8 @@ module Api::V1::DeveloperKey
       end
 
       if account_binding.present? && show_bindings
-        hash['developer_key_account_binding'] = DeveloperKeyAccountBindingSerializer.new(account_binding)
+        hash['developer_key_account_binding'] = DeveloperKeyAccountBindingSerializer.new(account_binding, context)
       end
-      hash['account_owns_binding'] = account_binding&.account == context && show_bindings
 
       unless inherited
         hash['account_name'] = key.account_name

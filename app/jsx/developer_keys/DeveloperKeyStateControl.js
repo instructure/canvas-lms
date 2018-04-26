@@ -28,7 +28,7 @@ export default class DeveloperKeyStateControl extends React.Component {
     if (this.radioGroupValue() === 'allow') {
       return false
     }
-    return !this.props.developerKey.account_owns_binding
+    return !this.props.developerKey.developer_key_account_binding.account_owns_binding
   }
 
   setBindingState = newValue => {
@@ -79,9 +79,9 @@ DeveloperKeyStateControl.propTypes = {
   developerKey: PropTypes.shape({
     id: PropTypes.string.isRequired,
     developer_key_account_binding: PropTypes.shape({
-      workflow_state: PropTypes.string.isRequired
+      workflow_state: PropTypes.string.isRequired,
+      account_owns_binding: PropTypes.bool
     }),
-    account_owns_binding: PropTypes.bool
   }),
   ctx: PropTypes.shape({
     params: PropTypes.shape({

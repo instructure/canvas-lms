@@ -61,7 +61,7 @@ describe DeveloperKeysController, type: :request do
       DeveloperKey.create!(account: nil)
       get '/api/v1/accounts/site_admin/developer_keys', params: { inherited: true }
       expect(json_parse.first.keys).to match_array(
-        %w[name created_at icon_url workflow_state id account_owns_binding]
+        %w[name created_at icon_url workflow_state id]
       )
     end
 
@@ -79,14 +79,14 @@ describe DeveloperKeysController, type: :request do
     end
 
     describe 'developer key account bindings' do
+      specs_require_sharding
+
       it 'does not include binding data' do
         user_session(account_admin_user(account: Account.site_admin))
         sa_key = DeveloperKey.create!(account: nil)
         get '/api/v1/accounts/site_admin/developer_keys'
-
-        site_admin_key_json = json_parse.find{ |d| d['id'] == sa_key.id }
+        site_admin_key_json = json_parse.find{ |d| d['id'] == sa_key.global_id }
         expect(site_admin_key_json['developer_key_account_binding']).to be_nil
-        expect(site_admin_key_json['account_owns_binding']).to eq false
       end
 
       context 'when new UI feature flag is enabled' do
@@ -101,9 +101,9 @@ describe DeveloperKeysController, type: :request do
             sa_key = DeveloperKey.create!(account: nil)
             get '/api/v1/accounts/site_admin/developer_keys'
 
-            site_admin_key_json = json_parse.find{ |d| d['id'] == sa_key.id }
-            expect(site_admin_key_json.dig('developer_key_account_binding', 'account_id')).to eq Account.site_admin.id
-            expect(site_admin_key_json['account_owns_binding']).to eq true
+            site_admin_key_json = json_parse.find{ |d| d['id'] == sa_key.global_id }
+            expect(Account.find(site_admin_key_json.dig('developer_key_account_binding', 'account_id'))).to eq Account.site_admin
+            expect(site_admin_key_json.dig('developer_key_account_binding', 'account_owns_binding')).to eq true
           end
         end
 
@@ -117,8 +117,8 @@ describe DeveloperKeysController, type: :request do
 
             delete "/api/v1/developer_keys/#{root_account_key.id}.json"
 
-            expect(json_parse.dig('developer_key_account_binding', 'account_id')).to eq Account.site_admin.id
-            expect(json_parse['account_owns_binding']).to eq false
+            expect(Account.find(json_parse.dig('developer_key_account_binding', 'account_id'))).to eq Account.site_admin
+            expect(json_parse.dig('developer_key_account_binding', 'account_owns_binding')).to eq false
           end
         end
       end
