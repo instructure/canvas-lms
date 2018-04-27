@@ -324,8 +324,16 @@ class SisBatch < ActiveRecord::Base
   def generate_diff
     return if self.diffing_remaster # joined the chain, but don't actually want to diff this one
     return unless self.diffing_data_set_identifier
+
+    # the previous batch may not have had diffing applied because of the change_threshold,
+    # so look for the latest one with a generated_diff_id (or a remaster)
     previous_batch = self.account.sis_batches.
-      succeeded.where(diffing_data_set_identifier: self.diffing_data_set_identifier).order(:created_at).last
+      succeeded.where(diffing_data_set_identifier: self.diffing_data_set_identifier).
+      where("diffing_remaster = 't' OR generated_diff_id IS NOT NULL").order(:created_at).last
+    # otherwise, the previous one may have been the first batch so fallback to the original query
+    previous_batch ||= self.account.sis_batches.
+      succeeded.where(diffing_data_set_identifier: self.diffing_data_set_identifier).order(:created_at).first
+
     previous_zip = previous_batch.try(:download_zip)
     return unless previous_zip
 
