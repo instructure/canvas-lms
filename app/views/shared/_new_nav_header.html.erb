@@ -40,13 +40,13 @@
               </a>
             </li>
           <% end %>
-          <li class="ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if current_page?(dashboard_url) %>">		
-            <a id="global_nav_dashboard_link" href="<%= dashboard_url %>" class="ic-app-header__menu-list-link">		
-              <div class="menu-item-icon-container" aria-hidden="true">		
-                  <%= svg_icon :sm_dashboard %>		
-              </div>		
-              <div class="menu-item__text"><%= t('Dashboard') %></div>		
-            </a>		
+          <li class="ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if current_page?(dashboard_url) %>">
+            <a id="global_nav_dashboard_link" href="<%= dashboard_url %>" class="ic-app-header__menu-list-link">
+              <div class="menu-item-icon-container" aria-hidden="true">
+                  <%= svg_icon :sm_dashboard %>
+              </div>
+              <div class="menu-item__text"><%= t('Dashboard') %></div>
+            </a>
          </li>
           <li class="menu-item ic-app-header__menu-list-item <%= 'ic-app-header__menu-list-item--active' if active_path?('/courses') %>">
             <a id="global_nav_courses_link" href="<%= courses_path %>" class="ic-app-header__menu-list-link">
@@ -80,6 +80,7 @@
               </div>
             </a>
           </li>
+          <% if !ENV['HIDE_INBOX_LINK']%>
           <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/conversations') %>">
             <a id="global_nav_conversations_link" href="/conversations" class="ic-app-header__menu-list-link">
               <div class="menu-item-icon-container" aria-hidden="true">
@@ -91,6 +92,7 @@
               </div>
             </a>
           </li>
+          <% end %>
           <% unless @current_user.nil? %>
             <%= render(:partial => 'external_tools/global_nav_menu_items') %>
           <% end %>
