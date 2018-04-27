@@ -164,9 +164,15 @@ class RoleOverridesController < ApplicationController
         :COURSE_ROLES => course_role_data,
         :ACCOUNT_PERMISSIONS => account_permissions(@context),
         :COURSE_PERMISSIONS => course_permissions(@context),
-        :IS_SITE_ADMIN => @context.site_admin?
+        :IS_SITE_ADMIN => @context.site_admin?,
+        :ACCOUNT_ID => @context.id
       })
 
+      if @context.is_a?(Account) && @context.feature_enabled?(:permissions_v2_ui)
+        js_bundle :permissions_index
+      else
+        js_bundle :roles
+      end
       @active_tab = 'permissions'
     end
   end

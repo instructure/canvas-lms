@@ -135,6 +135,14 @@ END
       state: 'hidden',
       development: true,
     },
+    'permissions_v2_ui' =>
+    {
+      display_name: -> { I18n.t('Updated Permissions Page') },
+      description: -> { I18n.t('Use the new interface for managing permissions') },
+      applies_to: 'Account',
+      state: 'hidden',
+      development: true,
+    },
     'google_docs_domain_restriction' =>
     {
       display_name: -> { I18n.t('features.google_docs_domain_restriction', 'Google Docs Domain Restriction') },
