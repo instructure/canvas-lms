@@ -36,37 +36,37 @@ describe("NavigationPanel", () => {
       assert.equal(links.length, 11);
       assert.ok(
         links.some(link => {
-          return link.title === "Assignment List";
+          return link.title === "Assignments";
         })
       );
       assert.ok(
         links.some(link => {
-          return link.title === "Wiki Home";
+          return link.title === "Pages";
         })
       );
       assert.ok(
         links.some(link => {
-          return link.title === "Discussions Index";
+          return link.title === "Discussions";
         })
       );
       assert.ok(
         links.some(link => {
-          return link.title === "Course Syllabus";
+          return link.title === "Syllabus";
         })
       );
       assert.ok(
         links.some(link => {
-          return link.title === "Announcement List";
+          return link.title === "Announcements";
         })
       );
       assert.ok(
         links.some(link => {
-          return link.title === "Quizzes List";
+          return link.title === "Quizzes";
         })
       );
       assert.ok(
         links.some(link => {
-          return link.title === "Files Index";
+          return link.title === "Files";
         })
       );
       assert.ok(

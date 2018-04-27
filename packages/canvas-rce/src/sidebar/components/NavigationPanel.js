@@ -29,31 +29,31 @@ class NavigationPanel extends Component {
           links: [
             {
               href: `/courses/${contextId}/assignments`,
-              title: formatMessage("Assignment List")
+              title: formatMessage("Assignments")
             },
             {
               href: `/courses/${contextId}/pages`,
-              title: formatMessage("Wiki Home")
+              title: formatMessage("Pages")
             },
             {
               href: `/courses/${contextId}/discussion_topics`,
-              title: formatMessage("Discussions Index")
+              title: formatMessage("Discussions")
             },
             {
               href: `/courses/${contextId}/assignments/syllabus`,
-              title: formatMessage("Course Syllabus")
+              title: formatMessage("Syllabus")
             },
             {
               href: `/courses/${contextId}/announcements`,
-              title: formatMessage("Announcement List")
+              title: formatMessage("Announcements")
             },
             {
               href: `/courses/${contextId}/quizzes`,
-              title: formatMessage("Quizzes List")
+              title: formatMessage("Quizzes")
             },
             {
               href: `/courses/${contextId}/files`,
-              title: formatMessage("Files Index")
+              title: formatMessage("Files")
             },
             {
               href: `/courses/${contextId}/collaborations`,
