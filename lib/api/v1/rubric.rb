@@ -43,6 +43,7 @@ module Api::V1::Rubric
   def rubric_json(rubric, user, session, opts = {})
     json_attributes = API_ALLOWED_RUBRIC_OUTPUT_FIELDS
     hash = api_json(rubric, user, session, json_attributes)
+    hash['criteria'] = rubric.data if opts[:style] == "full"
     hash['assessments'] = rubric_assessments_json(opts[:assessments], user, session, opts) if opts[:assessments].present?
     hash
   end

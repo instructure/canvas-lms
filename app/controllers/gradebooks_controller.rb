@@ -24,6 +24,8 @@ class GradebooksController < ApplicationController
   include Api::V1::Submission
   include Api::V1::CustomGradebookColumn
   include Api::V1::Section
+  include Api::V1::Rubric
+  include Api::V1::RubricAssessment
 
   before_action :require_context
   before_action :require_user, only: [:speed_grader, :speed_grader_settings, :grade_summary]
@@ -117,6 +119,8 @@ class GradebooksController < ApplicationController
       courses_with_grades: courses_with_grades_json,
       effective_due_dates: effective_due_dates,
       exclude_total: @exclude_total,
+      rubric_assessments: rubric_assessments_json(@presenter.submissions.flat_map(&:rubric_assessments), @current_user, session, style: 'full'),
+      rubrics: rubrics_json(@presenter.submissions.flat_map(&:rubric_assessments).map(&:rubric), @current_user, session, style: 'full'),
       save_assignment_order_url: course_save_assignment_order_url(@context),
       student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
       student_id: @presenter.student_id,
