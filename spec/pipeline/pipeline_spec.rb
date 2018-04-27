@@ -31,9 +31,9 @@ describe 'pipeline service' do
   end
 
   context "Submission" do
-    let(:context) { double('context') }
-    let(:assignment) { double('assignment', context: context, submission_types: []) }
-    let(:user) { double('user') }
+    # let(:context) { double('context') }
+    # let(:assignment) { double('assignment', context: context, submission_types: []) }
+    # let(:user) { double('user') }
 
     before do
       @user = User.create!
@@ -41,7 +41,6 @@ describe 'pipeline service' do
       @enrollment = StudentEnrollment.new(valid_enrollment_attributes)
       @enrollment.save
       @enrollment.update(workflow_state: 'completed')
-      byebug
     end
 
     before do
@@ -55,7 +54,10 @@ describe 'pipeline service' do
 
     it do
       expect(endpoint_instance).to receive(:call)
-      PipelineService::Commands::Publish.new(object: @enrollment, endpoint: endpoint).call
+      PipelineService::Commands::Publish.new(
+        object: @enrollment,
+        endpoint: endpoint
+      ).call
     end
 
   end
