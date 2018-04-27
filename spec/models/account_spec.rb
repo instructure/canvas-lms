@@ -1688,4 +1688,17 @@ describe Account do
       expect(@account.default_dashboard_view).to eq "planner"
     end
   end
+
+  it "should only send new account user notifications to active admins" do
+    active_admin = account_admin_user(:active_all => true)
+    deleted_admin = account_admin_user(:active_all => true)
+    deleted_admin.account_users.destroy_all
+    n = Notification.create(:name => "New Account User", :category => "TestImmediately")
+    [active_admin, deleted_admin].each do |u|
+      NotificationPolicy.create(:notification => n, :communication_channel => u.communication_channel, :frequency => "immediately")
+    end
+    user_factory(:active_all => true)
+    au = Account.default.account_users.create!(:user => @user)
+    expect(au.messages_sent[n.name].map(&:user)).to match_array [active_admin, @user]
+  end
 end

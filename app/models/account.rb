@@ -47,11 +47,12 @@ class Account < ActiveRecord::Base
   has_many :sub_accounts, -> { where("workflow_state<>'deleted'") }, class_name: 'Account', foreign_key: 'parent_account_id'
   has_many :all_accounts, -> { order(:name) }, class_name: 'Account', foreign_key: 'root_account_id'
   has_many :account_users, :dependent => :destroy
+  has_many :active_account_users, -> { active }, class_name: 'AccountUser'
   has_many :course_sections, :foreign_key => 'root_account_id'
   has_many :sis_batches
   has_many :abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'account_id'
   has_many :root_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'root_account_id'
-  has_many :users, :through => :account_users
+  has_many :users, :through => :active_account_users
   has_many :pseudonyms, -> { preload(:user) }, inverse_of: :account
   has_many :role_overrides, :as => :context, :inverse_of => :context
   has_many :course_account_associations
