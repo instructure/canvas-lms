@@ -44,7 +44,7 @@ class Pseudonym < ActiveRecord::Base
   before_destroy :retire_channels
 
   before_save :set_password_changed
-  before_validation :infer_defaults, :verify_unique_sis_user_id
+  before_validation :infer_defaults, :verify_unique_sis_user_id, :verify_unique_integration_id
   after_save :update_account_associations_if_account_changed
   has_a_broadcast_policy
 
@@ -239,6 +239,17 @@ class Pseudonym < ActiveRecord::Base
     )
     throw :abort
   end
+  
+  def verify_unique_integration_id
+    return true unless self.integration_id
+    existing_pseudo = Pseudonym.where(account_id: self.account_id, integration_id: self.integration_id.to_s).first
+    return true if !existing_pseudo || existing_pseudo.id == self.id
+    self.errors.add(:integration_id, :taken,
+      message: t('#errors.integration_id_in_use', "Integration ID \"%{integration_id}\" is already in use", :integration_id => self.integration_id)
+    )
+    throw :abort
+  end
+
 
   workflow do
     state :active
