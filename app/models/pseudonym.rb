@@ -232,20 +232,18 @@ class Pseudonym < ActiveRecord::Base
 
   def verify_unique_sis_user_id
     return true unless self.sis_user_id
-    existing_pseudo = Pseudonym.where(account_id: self.account_id, sis_user_id: self.sis_user_id.to_s).first
-    return true if !existing_pseudo || existing_pseudo.id == self.id
+    return true unless Pseudonym.where.not(id: id).where(account_id: self.account_id, sis_user_id: self.sis_user_id).exists?
     self.errors.add(:sis_user_id, :taken,
       message: t('#errors.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_user_id)
     )
     throw :abort
   end
-  
+
   def verify_unique_integration_id
     return true unless self.integration_id
-    existing_pseudo = Pseudonym.where(account_id: self.account_id, integration_id: self.integration_id.to_s).first
-    return true if !existing_pseudo || existing_pseudo.id == self.id
+    return true unless Pseudonym.where.not(id: id).where(account_id: self.account_id, integration_id: self.integration_id).exists?
     self.errors.add(:integration_id, :taken,
-      message: t('#errors.integration_id_in_use', "Integration ID \"%{integration_id}\" is already in use", :integration_id => self.integration_id)
+                    message: t('#errors.integration_id_in_use', "Integration ID \"%{integration_id}\" is already in use", integration_id: self.integration_id)
     )
     throw :abort
   end
