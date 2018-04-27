@@ -40,6 +40,15 @@ class DeveloperKeysApp extends React.Component {
     this.inheritedTableRef = node
   }
 
+  setAddKeyButtonRef = (node) => {
+    this.addDevKeyButton = node
+  }
+
+  setInheritedTabRef = (node) => { this.inheritedTab = node }
+
+  focusDevKeyButton = () => { this.addDevKeyButton.focus() }
+  focusInheritedTab = () => { this.inheritedTab.focus() }
+
   showCreateDeveloperKey = () => {
     this.props.store.dispatch(this.props.actions.developerKeysModalOpen())
   }
@@ -50,8 +59,10 @@ class DeveloperKeysApp extends React.Component {
       store: { dispatch },
       actions: { getRemainingDeveloperKeys }
     } = this.props
-    this.mainTableRef.focusLastDeveloperKey()
-    dispatch(getRemainingDeveloperKeys(nextPage, []))
+
+    const callBack = this.mainTableRef.createSetFocusCallback()
+    getRemainingDeveloperKeys(nextPage, [])(dispatch)
+      .then((payload) => { callBack(payload.developerKeys)})
   }
 
   showMoreButton () {
@@ -75,8 +86,9 @@ class DeveloperKeysApp extends React.Component {
       actions: { getRemainingInheritedDeveloperKeys }
     } = this.props
 
-    this.inheritedTableRef.focusLastDeveloperKey()
-    dispatch(getRemainingInheritedDeveloperKeys(inheritedNextPage, []))
+    const callBack = this.inheritedTableRef.createSetFocusCallback()
+    getRemainingInheritedDeveloperKeys(inheritedNextPage, [])(dispatch)
+      .then((payload) => { callBack(payload.developerKeys) })
   }
 
   showMoreInheritedButton () {
@@ -109,19 +121,22 @@ class DeveloperKeysApp extends React.Component {
           <div className="ic-Action-header__Primary">
             <Heading>{I18n.t('Developer Keys')}</Heading>
           </div>
-          <div className="ic-Action-header__Secondary">
-            <Button
-              variant="primary"
-              onClick={this.showCreateDeveloperKey}
-            >
-              <ScreenReaderContent>{I18n.t('Create a')}</ScreenReaderContent>
-              <IconPlusLine />
-              { I18n.t('Developer Key') }
-            </Button>
-          </div>
         </div>
         <TabList variant="minimal">
           <TabPanel title={I18n.t('Account')}>
+            <div className="ic-Action-header">
+              <div className="ic-Action-header__Secondary">
+                <Button
+                  variant="primary"
+                  onClick={this.showCreateDeveloperKey}
+                  buttonRef={this.setAddKeyButtonRef}
+                >
+                  <ScreenReaderContent>{I18n.t('Create a')}</ScreenReaderContent>
+                  <IconPlusLine />
+                  { I18n.t('Developer Key') }
+                </Button>
+              </div>
+            </div>
             <DeveloperKeyModal
               store={store}
               actions={actions}
@@ -134,13 +149,17 @@ class DeveloperKeysApp extends React.Component {
               actions={actions}
               developerKeysList={list}
               ctx={ctx}
+              setFocus={this.focusDevKeyButton}
             />
             <div className="loadingSection">
               {listDeveloperKeysPending ? <Spinner title={I18n.t('Loading')} /> : null}
               {this.showMoreButton()}
             </div>
           </TabPanel>
-          <TabPanel  title={I18n.t('Inherited')}>
+          <TabPanel
+            title={I18n.t('Inherited')}
+            tabRef={this.setInheritedTabRef}
+          >
             <DeveloperKeysTable
               ref={this.setInheritedTableRef}
               store={store}
@@ -148,6 +167,7 @@ class DeveloperKeysApp extends React.Component {
               developerKeysList={inheritedList}
               ctx={ctx}
               inherited
+              setFocus={this.focusInheritedTab}
             />
             <div className="loadingSection">
               {listInheritedDeveloperKeysPending ? <Spinner title={I18n.t('Loading')} /> : null}

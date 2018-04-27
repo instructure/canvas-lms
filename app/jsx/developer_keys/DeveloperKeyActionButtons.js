@@ -42,11 +42,13 @@ class DeveloperKeyActionButtons extends React.Component {
   }
 
   deleteLinkHandler = (event) => {
-    const { dispatch, deleteDeveloperKey, developerKey } = this.props
+    const { dispatch, deleteDeveloperKey, developerKey, onDelete } = this.props
     event.preventDefault()
     const confirmResult = confirm(I18n.t('Are you sure you want to delete this developer key?'))
     if (confirmResult) {
-      dispatch(deleteDeveloperKey(developerKey))
+      const callBack = onDelete()
+      deleteDeveloperKey(developerKey)(dispatch)
+        .then(() => { callBack() })
     }
   }
 
@@ -144,7 +146,8 @@ DeveloperKeyActionButtons.propTypes = {
     created_at: PropTypes.string.isRequired
   }).isRequired,
   visible: PropTypes.bool.isRequired,
-  developerName: PropTypes.string.isRequired
+  developerName: PropTypes.string.isRequired,
+  onDelete: PropTypes.func.isRequired
 };
 
 export default DeveloperKeyActionButtons

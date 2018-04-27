@@ -79,10 +79,17 @@ function renderComponent (overrides = {}) {
 }
 
 test('requests more inherited dev keys when the inherited "show all" button is clicked', () => {
+  const callbackSpy = sinon.spy()
   const overrides = {
     applicationState: initialApplicationState(generateKeyList(), generateKeyList(20)),
     actions: {
-      getRemainingInheritedDeveloperKeys: sinon.spy()
+      getRemainingInheritedDeveloperKeys: () => (
+        () => (
+          {
+            then: callbackSpy
+          }
+        )
+      )
     }
   }
   const component = renderComponent(overrides);
@@ -91,14 +98,21 @@ test('requests more inherited dev keys when the inherited "show all" button is c
   clickInheritedTab(componentNode)
   clickShowAllButton(componentNode, 1)
 
-  ok(overrides.actions.getRemainingInheritedDeveloperKeys.called)
+  ok(callbackSpy.called)
 })
 
 test('requests more account dev keys when the account "show all" button is clicked', () => {
+  const callbackSpy = sinon.spy()
   const overrides = {
     applicationState: initialApplicationState(generateKeyList()),
     actions: {
-      getRemainingDeveloperKeys: sinon.spy()
+      getRemainingDeveloperKeys: () => (
+        () => (
+          {
+            then: callbackSpy
+          }
+        )
+      )
     }
   }
   const component = renderComponent(overrides)
@@ -106,31 +120,45 @@ test('requests more account dev keys when the account "show all" button is click
 
   clickShowAllButton(componentNode)
 
-  ok(overrides.actions.getRemainingDeveloperKeys.called)
+  ok(callbackSpy.called)
 })
 
-test('calls the tables focusLastDeveloperKey after loading more account keys', () => {
+test('calls the tables createSetFocusCallback after loading more account keys', () => {
+  const callbackSpy = sinon.spy()
   const overrides = {
     applicationState: initialApplicationState(generateKeyList()),
     actions: {
-      getRemainingDeveloperKeys: sinon.spy()
+      getRemainingDeveloperKeys: () => (
+        () => (
+          {
+            then: callbackSpy
+          }
+        )
+      )
     }
   }
   const component = renderComponent(overrides);
   const componentNode = ReactDOM.findDOMNode(component)
   const focusSpy = sinon.spy()
-  component.mainTableRef.focusLastDeveloperKey = focusSpy
+  component.mainTableRef.createSetFocusCallback = focusSpy
 
   clickShowAllButton(componentNode)
 
   ok(focusSpy.called)
 })
 
-test('calls the tables focusLastDeveloperKey after loading more inherited keys', () => {
+test('calls the tables createSetFocusCallback after loading more inherited keys', () => {
+  const callbackSpy = sinon.spy()
   const overrides = {
     applicationState: initialApplicationState(generateKeyList(), generateKeyList()),
     actions: {
-      getRemainingInheritedDeveloperKeys: sinon.spy()
+      getRemainingInheritedDeveloperKeys: () => (
+        () => (
+          {
+            then: callbackSpy
+          }
+        )
+      )
     }
   }
   const component = renderComponent(overrides);
@@ -138,7 +166,7 @@ test('calls the tables focusLastDeveloperKey after loading more inherited keys',
   const focusSpy = sinon.spy()
 
   clickInheritedTab(componentNode)
-  component.inheritedTableRef.focusLastDeveloperKey = focusSpy
+  component.inheritedTableRef.createSetFocusCallback = focusSpy
 
   clickShowAllButton(componentNode, 1)
 
@@ -276,4 +304,38 @@ test('opens the modal when the create button is clicked', () => {
   TestUtils.Simulate.click(button)
 
   ok(openSpy.called)
+})
+
+test('does not have the create button on inherited tab', () => {
+  const openSpy = sinon.spy()
+
+  const overrides = {
+    applicationState: {
+      createOrEditDeveloperKey: {},
+      listDeveloperKeys: {
+        listInheritedDeveloperKeysPending: true,
+        listInheritedDeveloperKeysSuccessful: false,
+        listDeveloperKeysPending: true,
+        listDeveloperKeysSuccessful: false,
+        list: [],
+        inheritedList: [
+          {
+            id: "111",
+            api_key: "abc12345678",
+            created_at: "2012-06-07T20:36:50Z"
+          }
+        ]
+      },
+    },
+    actions: {
+      developerKeysModalOpen: openSpy
+    }
+  }
+
+  const component = renderComponent(overrides)
+  const componentNode = ReactDOM.findDOMNode(component)
+  clickInheritedTab(componentNode)
+  const button = componentNode.querySelector('.ic-Action-header__Secondary button')
+
+  notOk(button)
 })

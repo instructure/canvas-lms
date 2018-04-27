@@ -104,6 +104,10 @@ class DeveloperKey extends React.Component {
     return `${lastUsed} ${lastUsedDate}`
   }
 
+  handleDelete = () => (
+    this.props.onDelete(this.props.developerKey.id)
+  )
+
   refActionButtons = (link) => { this.actionButtons = link; }
   refKeyName = (link) => { this.keyName = link; }
 
@@ -179,6 +183,7 @@ class DeveloperKey extends React.Component {
               developerKey={this.props.developerKey}
               visible={this.props.developerKey.visible}
               developerName={this.developerName()}
+              onDelete={this.handleDelete}
             />
           </td>
         }
@@ -214,7 +219,8 @@ DeveloperKey.propTypes = {
       contextId: PropTypes.string.isRequired
     })
   }).isRequired,
-  inherited: PropTypes.bool
+  inherited: PropTypes.bool,
+  onDelete: PropTypes.func.isRequired
 };
 
 DeveloperKey.defaultProps = { inherited: false }

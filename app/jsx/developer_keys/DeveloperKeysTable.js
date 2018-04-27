@@ -25,13 +25,36 @@ import I18n from 'i18n!react_developer_keys'
 import DeveloperKey from './DeveloperKey'
 
 class DeveloperKeysTable extends React.Component {
-  focusLastDeveloperKey () {
-    const developerKeyId = this.props.developerKeysList[this.props.developerKeysList.length - 1].id
-    const ref = this[`developerKey-${developerKeyId}`]
-    if (this.props.inherited) {
-      ref.focusName()
+  createSetFocusCallback = (developerKeyId) => {
+    const { developerKeysList, setFocus, inherited } = this.props
+    let position
+    if (developerKeyId) {
+      position = developerKeysList.findIndex((key) => key.id === developerKeyId) - 1
     } else {
-      ref.focusDeleteLink()
+      position = undefined
+    }
+
+    const devKey = developerKeysList[position]
+    let ref = devKey ? this[`developerKey-${devKey.id}`] : undefined
+    // developerKeys will be populated when show more keys is resolved
+    return (developerKeys) => {
+      // if position is undefined it means that we are loading more keys
+      // and we want to calculate the end of the list after the promise
+      // resolves
+      if (position === undefined) {
+        const list = developerKeys || developerKeysList
+        ref = this[`developerKey-${list[list.length - 1].id}`]
+      }
+      // If ref is undefined it means that position was -1 and we deleted
+      // the first key in the list and focus should go to something other than
+      // a dev key
+      if (ref === undefined) {
+        setFocus()
+      } else if (inherited) {
+        ref.focusName()
+      } else {
+        ref.focusDeleteLink()
+      }
     }
   }
 
@@ -55,7 +78,7 @@ class DeveloperKeysTable extends React.Component {
         </thead>
         <tbody>
           {
-            this.props.developerKeysList.map(developerKey => (
+            this.props.developerKeysList.map((developerKey) => (
               <DeveloperKey
                 ref={(key) => {this[`developerKey-${developerKey.id}`] = key}}
                 key={developerKey.id}
@@ -64,6 +87,7 @@ class DeveloperKeysTable extends React.Component {
                 actions={this.props.actions}
                 ctx={this.props.ctx}
                 inherited={this.props.inherited}
+                onDelete={this.createSetFocusCallback}
               />
             ))
           }
@@ -86,9 +110,10 @@ DeveloperKeysTable.propTypes = {
       contextId: PropTypes.string.isRequired
     })
   }).isRequired,
-  inherited: PropTypes.bool
+  inherited: PropTypes.bool,
+  setFocus: PropTypes.func
 };
 
-DeveloperKeysTable.defaultProps = { inherited: false }
+DeveloperKeysTable.defaultProps = { inherited: false, setFocus: () => {} }
 
 export default DeveloperKeysTable
