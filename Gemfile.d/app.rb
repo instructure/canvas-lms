@@ -180,3 +180,8 @@ gem 'twitter', path: 'gems/twitter'
 gem 'vericite_api', '1.5.3'
 gem 'utf8_cleaner', path: 'gems/utf8_cleaner'
 gem 'workflow', path: 'gems/workflow'
+
+group :dynamodb do
+  gem "canvas_dynamodb", path: "gems/canvas_dynamodb"
+  gem "aws-sdk-dynamodb", "1.5.0"
+end
