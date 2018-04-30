@@ -374,6 +374,52 @@ describe UsersController, type: :request do
   end
 
   describe "todo_item_count" do
+    before :each do
+      @teacher = course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_all => true))
+      @teacher_course = @course
+      @student_course = course_factory(active_all: true)
+      @student_course.enroll_student(@user).accept!
+      # an assignment i need to submit (needs_submitting)
+      @student_assignment_ids = []
+      3.times do
+        a = Assignment.create!(:context => @student_course,
+                               :due_at => 6.days.from_now,
+                               :title => 'required work',
+                               :submission_types => 'online_text_entry',
+                               :points_possible => 10)
+        @student_assignment_ids << a.id
+      end
+      # one assignment submitted
+      assignment = @student_course.assignments[0]
+      assignment.submit_homework(@user, :submission_type => 'online_text_entry', :body => 'done')
+      # one assignment ignored
+      assignment = @student_course.assignments[1]
+      @user.ignore_item!(assignment, 'submitting', true)
+
+      # an assignment i created, and a student who submits the assignment (needs_grading)
+      @me = @user
+      @student = user_factory(active_all: true)
+      @user = @me
+      @teacher_course.enroll_student(@student).accept!
+      @teacher_assignment_ids = []
+      3.times do
+        a = Assignment.create!(:context => @teacher_course,
+                               :due_at => 1.day.from_now,
+                               :title => 'text',
+                               :submission_types => 'online_text_entry',
+                               :points_possible => 15)
+        a.submit_homework(@student, :submission_type => 'online_text_entry', :body => 'done')
+        @teacher_assignment_ids << a.id
+      end
+      # one assignment graded
+      submission = @teacher_course.assignments[0].submissions[0]
+      submission.workflow_state = 'graded'
+      submission.score = 90
+      submission.save!
+      # one assignment ignored
+      assignment = @teacher_course.assignments[1]
+      @user.ignore_item!(assignment, 'grading', true)
+    end
 
     it "should check for auth" do
       get("/api/v1/users/self/todo_item_count")
@@ -381,11 +427,23 @@ describe UsersController, type: :request do
     end
 
     it "returns the correct count" do
-      10.times { another_submission }
       json = api_call(:get, "/api/v1/users/self/todo_item_count",
                 :controller => "users", :action => "todo_item_count", :format => "json")
-      expect(json['needs_grading_count']).to eq 11
+      expect(json['needs_grading_count']).to eq 1
       expect(json['assignments_needing_submitting']).to eq 1
+    end
+
+    it "doesnt count assignments that dont need grading" do
+      a = Assignment.create!(:context => @teacher_course,
+                         :due_at => 1.day.from_now,
+                         :title => 'no grading',
+                         :submission_types => 'on_paper',
+                         :points_possible => 15)
+      a.submit_homework(@student, :submission_type => 'on_paper')
+
+      json = api_call(:get, "/api/v1/users/self/todo_item_count",
+                :controller => "users", :action => "todo_item_count", :format => "json")
+      expect(json['needs_grading_count']).to eq 1
     end
   end
 end

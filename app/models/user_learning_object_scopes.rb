@@ -194,6 +194,27 @@ module UserLearningObjectScopes
     end
   end
 
+  def assignments_needing_grading_count(opts={})
+    original_shard = Shard.current
+    as = shard.activate do
+      course_ids = course_ids_for_todo_lists(:instructor, opts)
+      Shard.partition_by_shard(course_ids) do |shard_course_ids|
+        next unless Shard.current == original_shard # only provide scope on current shard
+        Submission.active.
+          needs_grading.
+          joins(assignment: :course).
+          where(courses: { id: shard_course_ids }).
+          merge(Assignment.expecting_submission).
+          where("NOT EXISTS (?)",
+            Ignore.where(asset_type: 'Assignment',
+                       user_id: self,
+                       purpose: 'grading').where('asset_id=submissions.assignment_id'))
+      end
+    end
+
+    as.size
+  end
+
   def assignments_needing_grading(opts={})
     # not really any harm in extending the expires_in since we touch the user anyway when grades change
     objects_needing('Assignment', 'grading', :instructor, 120.minutes, opts) do |assignment_scope, options|
