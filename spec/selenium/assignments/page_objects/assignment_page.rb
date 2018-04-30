@@ -40,7 +40,7 @@ class AssignmentPage
     end
 
     def assignment_edit_permission_error_text
-      # add locator for assignment edit error
+      f("#unauthorized_message")
     end
 
     def assignment_name_textfield

@@ -127,8 +127,7 @@ describe "moderated grading assignments" do
       end
 
       it "allows assignment edits", priority: "1", test_id: 3488596 do
-        skip('This is skeleton code that acts as AC for GRADE-960 which is WIP')
-        expect(AssignmentPage.assignment_edit_permission_error_text).not_to be_present
+        expect(AssignmentPage.assignment_save_button).to be_present
       end
     end
 
@@ -139,7 +138,6 @@ describe "moderated grading assignments" do
       end
 
       it "does not allow assignment edits", priority: "1", test_id: 3488597 do
-        skip('This is skeleton code that acts as AC for GRADE-960 which is WIP')
         expect(AssignmentPage.assignment_edit_permission_error_text).to be_present
       end
     end
@@ -149,11 +147,11 @@ describe "moderated grading assignments" do
         @account = Account.default
         account_admin_user
         user_session(@admin)
+        AssignmentPage.visit_assignment_edit_page(@course.id, @moderated_assignment.id)
       end
 
       it "allows admin to edit assignment", priority: "1", test_id: 3488598 do
-        skip('This is skeleton code that acts as AC for GRADE-960 which is WIP')
-        expect(AssignmentPage.assignment_edit_permission_error_text).not_to be_present
+        expect(AssignmentPage.assignment_save_button).to be_present
       end
     end
   end
