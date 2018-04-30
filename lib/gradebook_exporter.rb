@@ -64,13 +64,10 @@ class GradebookExporter
   end
 
   def determine_column_separator
-    default_separator = I18n.t('number.format.separator', '.') == ',' ? ';' : ','
+    return ';' if @user.feature_enabled?(:use_semi_colon_field_separators_in_gradebook_exports)
+    return ',' unless @user.feature_enabled?(:autodetect_field_separators_for_gradebook_exports)
 
-    if I18n.exists?('csv.column_delimiter')
-      I18n.t('csv.column_delimiter', ',')
-    else
-      default_separator
-    end
+    I18n.t('number.format.separator', '.') == ',' ? ';' : ','
   end
 
   def csv_data
@@ -233,12 +230,7 @@ class GradebookExporter
   end
 
   def format_numbers(number)
-    # We only need ; as a column separator for those locales that use numbers not formatted similar to
-    # US numbers: 1,234.56.  The check below is essentially indirectly checking whether the current locale needs to have
-    # numbers reformatted
-    return I18n.n(number) if @options[:col_sep] == ';'
-
-    number
+    I18n.n(number)
   end
 
   def show_group_totals(student_enrollment, grade, groups)

@@ -513,6 +513,34 @@ END
       applies_to: 'User',
       state: 'allowed'
     },
+    'use_semi_colon_field_separators_in_gradebook_exports' =>
+    {
+      display_name: -> { I18n.t('Use semicolons to separate fields in Gradebook Exports') },
+      description: -> { I18n.t('Use semicolons instead of commas to separate fields in Gradebook exports so they can be imported into Excel for users in some locales.') },
+      applies_to: 'User',
+      state: 'allowed',
+      custom_transition_proc: ->(_user, context, _from_state, transitions) do
+        if context.feature_enabled?(:autodetect_field_separators_for_gradebook_exports)
+          transitions['on'] ||= {}
+          transitions['on']['locked'] = true
+          transitions['on']['warning'] = I18n.t("This feature can't be enabled while autodetection of field separators is enabled")
+        end
+      end
+    },
+    'autodetect_field_separators_for_gradebook_exports' =>
+    {
+      display_name: -> { I18n.t('Autodetect field separators in Gradebook Exports') },
+      description: -> { I18n.t('Attempt to detect an appropriate field separator in Gradebook exports based on the number format for your language.') },
+      applies_to: 'User',
+      state: 'allowed',
+      custom_transition_proc: ->(_user, context, _from_state, transitions) do
+        if context.feature_enabled?(:use_semi_colon_field_separators_in_gradebook_exports)
+          transitions['on'] ||= {}
+          transitions['on']['locked'] = true
+          transitions['on']['warning'] = I18n.t("This feature can't be enabled while semicolons are forced to be field separators")
+        end
+      end
+    },
     'anonymous_grading' => {
       display_name: -> { I18n.t('Anonymous Grading') },
       description: -> { I18n.t("Anonymous grading forces student names to be hidden in SpeedGrader™") },

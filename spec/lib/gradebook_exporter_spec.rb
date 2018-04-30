@@ -111,10 +111,17 @@ describe GradebookExporter do
         expect(actual_headers[0..2]).to eq(expected_headers)
       end
 
-      it "can automatically determine the column separator to use" do
+      it "can automatically determine the column separator to use when asked to autodetect" do
+        @teacher.enable_feature!(:autodetect_field_separators_for_gradebook_exports)
         @course.assignments.create!(title: "Verkefni 1", points_possible: 8.5)
         csv = exporter(locale: :is).to_csv
         expect(csv).to match(/;8,5;/)
+      end
+
+      it "uses comma as the column separator when not asked to autodetect" do
+        @course.assignments.create!(title: "Verkefni 1", points_possible: 8.5)
+        csv = exporter(locale: :is).to_csv
+        expect(csv).to match(/,"8,5",/)
       end
 
       it "prepends byte order mark with UTF-8 encoding when the user enables it" do
@@ -136,20 +143,72 @@ describe GradebookExporter do
           @assignment = @course.assignments.create!(title: 'Verkefni 1', points_possible: 10, grading_type: 'gpa_scale')
           student = student_in_course(course: @course, active_all: true).user
           @assignment.grade_student(student, grader: @teacher, score: 7.5)
-          csv = exporter(locale: :is).to_csv
-          @icsv = CSV.parse(csv, col_sep: ";", headers: true)
         end
 
-        it "localizes numbers" do
-          expect(@icsv[1]['Assignments Current Points']).to eq('7,5')
+        context 'when forcing the field separator to be a semicolon' do
+          before :each do
+            @teacher.enable_feature!(:use_semi_colon_field_separators_in_gradebook_exports)
+            @csv = exporter(locale: :is).to_csv
+            @icsv = CSV.parse(@csv, col_sep: ";", headers: true)
+          end
+
+          it "localizes numbers" do
+            expect(@icsv[1]['Assignments Current Points']).to eq('7,5')
+          end
+
+          it "does not localize grading scheme grades for assignments" do
+            expect(@icsv[1]["#{@assignment.title} (#{@assignment.id})"]).to eq('C')
+          end
+
+          it "does not localize grading scheme grades for the total" do
+            expect(@icsv[1]["Final Grade"]).to eq('C')
+          end
         end
 
-        it "does not localize grading scheme grades for assignments" do
-          expect(@icsv[1]["#{@assignment.title} (#{@assignment.id})"]).to eq('C')
-        end
+        context 'when not forcing the field separator to be a semicolon' do
+          before :each do
+            @teacher.disable_feature!(:use_semi_colon_field_separators_in_gradebook_exports)
+          end
 
-        it "does not localize grading scheme grades for the total" do
-          expect(@icsv[1]["Final Grade"]).to eq('C')
+          context 'when autodetecting field separator to use' do
+            before :each do
+              @teacher.enable_feature!(:autodetect_field_separators_for_gradebook_exports)
+              @csv = exporter(locale: :is).to_csv
+              @icsv = CSV.parse(@csv, col_sep: ";", headers: true)
+            end
+
+            it "localizes numbers" do
+              expect(@icsv[1]['Assignments Current Points']).to eq('7,5')
+            end
+
+            it "does not localize grading scheme grades for assignments" do
+              expect(@icsv[1]["#{@assignment.title} (#{@assignment.id})"]).to eq('C')
+            end
+
+            it "does not localize grading scheme grades for the total" do
+              expect(@icsv[1]["Final Grade"]).to eq('C')
+            end
+          end
+
+          context 'when not autodetecting field separator to use' do
+            before :each do
+              @teacher.disable_feature!(:autodetect_field_separators_for_gradebook_exports)
+              @csv = exporter(locale: :is).to_csv
+              @icsv = CSV.parse(@csv, col_sep: ",", headers: true)
+            end
+
+            it "localizes numbers" do
+              expect(@icsv[1]['Assignments Current Points']).to eq('7,5')
+            end
+
+            it "does not localize grading scheme grades for assignments" do
+              expect(@icsv[1]["#{@assignment.title} (#{@assignment.id})"]).to eq('C')
+            end
+
+            it "does not localize grading scheme grades for the total" do
+              expect(@icsv[1]["Final Grade"]).to eq('C')
+            end
+          end
         end
       end
     end
