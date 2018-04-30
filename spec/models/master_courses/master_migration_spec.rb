@@ -335,8 +335,8 @@ describe MasterCourses::MasterMigration do
       run_master_migration
 
       quiz_to = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
-      qgroup1_to = quiz_to.quiz_groups.where(:migration_id => mig_id(qgroup1)).first
-      qgroup2_to = quiz_to.quiz_groups.where(:migration_id => mig_id(qgroup2)).first
+      qgroup1_to = quiz_to.quiz_groups.where(:migration_id => mig_id(qgroup1.asset_string)).first
+      qgroup2_to = quiz_to.quiz_groups.where(:migration_id => mig_id(qgroup2.asset_string)).first
       qq2_to = quiz_to.quiz_questions.where(:migration_id => mig_id(qq2)).first
 
       qq2_to.update_attribute(:question_data, qq2_to.question_data.merge('question_text' => 'something')) # trigger a downstream change on the quiz
@@ -397,8 +397,7 @@ describe MasterCourses::MasterMigration do
       run_master_migration
 
       quiz_to = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
-      qgroup_to = quiz_to.quiz_groups.where(:migration_id => mig_id(qgroup)).first
-
+      qgroup_to = quiz_to.quiz_groups.where(:migration_id => mig_id(qgroup.asset_string)).first
       qgroup_to.update_attribute(:name, "downstream") # should mark it as a downstream change
       Timecop.freeze(2.minutes.from_now) do
         qgroup.update_attribute(:name, "upstream")
