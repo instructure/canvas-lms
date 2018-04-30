@@ -338,7 +338,7 @@ class Enrollment < ActiveRecord::Base
 
   def should_update_user_account_association?
     self.id_before_last_save.nil? || self.saved_change_to_course_id? || self.saved_change_to_course_section_id? ||
-      self.saved_change_to_root_account_id?
+      self.saved_change_to_root_account_id? || being_restored?
   end
 
   def update_user_account_associations_if_necessary
