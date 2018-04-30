@@ -725,9 +725,11 @@ describe Canvas::LiveEvents do
 
       expected_event_body = {
         module_id: context_module.id.to_s,
+        context_id: @course.id.to_s,
+        context_type: "Course",
         name: context_module.name,
         position: context_module.position,
-        workflow_state: context_module.workflow_state,
+        workflow_state: context_module.workflow_state
       }
 
       expect_event('module_created', expected_event_body).once
@@ -743,9 +745,11 @@ describe Canvas::LiveEvents do
 
       expected_event_body = {
         module_id: context_module.id.to_s,
+        context_id: @course.id.to_s,
+        context_type: "Course",
         name: context_module.name,
         position: context_module.position,
-        workflow_state: context_module.workflow_state,
+        workflow_state: context_module.workflow_state
       }
 
       expect_event('module_updated', expected_event_body).once
@@ -767,6 +771,9 @@ describe Canvas::LiveEvents do
 
       expected_event_body = {
         module_item_id: content_tag.id.to_s,
+        module_id: context_module.id.to_s,
+        context_id: @course.id.to_s,
+        context_type: "Course",
         position: content_tag.position,
         workflow_state: content_tag.workflow_state
       }
@@ -790,6 +797,9 @@ describe Canvas::LiveEvents do
 
       expected_event_body = {
         module_item_id: content_tag.id.to_s,
+        module_id: context_module.id.to_s,
+        context_id: @course.id.to_s,
+        context_type: "Course",
         position: content_tag.position,
         workflow_state: content_tag.workflow_state
       }

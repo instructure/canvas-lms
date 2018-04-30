@@ -267,6 +267,9 @@ class ContextModulesController < ApplicationController
     if authorized_action(@context.context_modules.temp_record, @current_user, :update)
       m = @context.context_modules.not_deleted.first
 
+      # A hash where the key is the module id and the value is the module position
+      order_before = Hash[@context.context_modules.not_deleted.pluck(:id, :position)]
+
       m.update_order(params[:order].split(","))
       # Need to invalidate the ordering cache used by context_module.rb
       @context.touch
@@ -278,7 +281,7 @@ class ContextModulesController < ApplicationController
       @modules.each do |m|
         m.updated_at = Time.now
         m.save_without_touching_context
-        Canvas::LiveEvents.module_updated(m)
+        Canvas::LiveEvents.module_updated(m) if m.position != order_before[m.id]
       end
       @context.touch
 
