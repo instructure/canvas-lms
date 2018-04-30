@@ -1099,11 +1099,9 @@ class DiscussionTopic < ActiveRecord::Base
     end
     topic = self.root_topic? ? self.child_topic_for(user) : self
     if topic
-      attachment_ids = topic.discussion_entries.where(:user_id => user).where.not(:attachment_id => nil).pluck(:attachment_id)
-      if attachment_ids.any?
-        submission.attachment_ids = attachment_ids.sort.map(&:to_s).join(",")
-        submission.save! if submission.changed?
-      end
+      attachment_ids = topic.discussion_entries.active.where(:user_id => user).where.not(:attachment_id => nil).pluck(:attachment_id)
+      submission.attachment_ids = attachment_ids.sort.map(&:to_s).join(",")
+      submission.save! if submission.changed?
     end
   end
 

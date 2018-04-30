@@ -1583,6 +1583,11 @@ describe DiscussionTopic do
       @topic.ensure_submission(@student)
       sub = @assignment.submissions.where(:user_id => @student).first
       expect(sub.attachments.to_a).to eq [@attachment]
+
+      entry.destroy
+      entry2 = @topic.reply_from(:user => @student, :text => "entry2")
+      @topic.ensure_submission(@student)
+      expect(sub.reload.attachments.to_a).to eq []
     end
 
     it "should associate attachments with graded discussion submissions even with silly deleted topics" do
