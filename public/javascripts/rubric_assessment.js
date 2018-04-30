@@ -276,7 +276,6 @@ window.rubricAssessment = {
     if(data) {
       var assessment = data;
       var total = 0;
-      var $criterion = null;
       for(var idx in assessment.data) {
         var rating = assessment.data[idx];
         var comments = rating.comments_enabled ? rating.comments : rating.description;
@@ -285,7 +284,7 @@ window.rubricAssessment = {
         } else {
           var comments_html = htmlEscape(comments);
         }
-        $criterion = $rubric.find("#criterion_" + rating.criterion_id);
+        var $criterion = $rubric.find("#criterion_" + rating.criterion_id);
         if(!rating.id) {
           $criterion.find(".rating").each(function() {
             var rating_val = parseFloat($(this).find(".points").text(), 10);
@@ -313,14 +312,14 @@ window.rubricAssessment = {
           $criterion
             .find(".criterion_description").addClass('original_completed').end()
             .find("#rating_" + rating.id).addClass('original_selected').addClass('selected').end()
+          rubricAssessment.highlightCriterionScore($criterion, rating.points);
+          if(!rating.ignore_for_scoring) {
+            total += rating.points;
+          }
         }
         if(comments) $criterion.find('.criterion_comments').show();
-        if(rating.points && !rating.ignore_for_scoring) {
-          total += rating.points;
-        }
       }
       total = window.rubricAssessment.roundAndFormat(total);
-      if ($criterion) rubricAssessment.highlightCriterionScore($criterion, total);
       $rubric.find(".rubric_total").text(total);
     }
   },

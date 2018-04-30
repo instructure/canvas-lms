@@ -43,12 +43,14 @@ describe "grades" do
       :anonymous_peer_reviews => true
     })
     rubric_model
+    @rubric.criteria[0][:criterion_use_range] = true
+    @rubric.save!
     @association = @rubric.associate_with(@first_assignment, @course, :purpose => 'grading')
     @assignment.assign_peer_review(@student_2, @student_1)
     @assignment.reload
 
     @submission = @first_assignment.submit_homework(@student_1, :body => 'student first submission')
-    @first_assignment.grade_student(@user, grade: 2, grader: @teacher)
+    @first_assignment.grade_student(@user, grade: 10, grader: @teacher)
     @assessment = @association.assess({
       :user => @student_1,
       :assessor => @teacher,
@@ -56,7 +58,7 @@ describe "grades" do
       :assessment => {
         :assessment_type => 'grading',
         :criterion_crit1 => {
-          :points => 2,
+          :points => 10,
           :comments => "cool, yo"
         }
       }
@@ -91,6 +93,17 @@ describe "grades" do
     @second_submission = @second_assignment.submit_homework(@student_1, :body => 'student second submission')
     @second_assignment.grade_student(@student_1, grade: 2, grader: @teacher)
     @second_submission.save!
+    @second_assessment = @association.assess({
+      :user => @student_1,
+      :assessor => @teacher,
+      :artifact => @second_submission,
+      :assessment => {
+        :assessment_type => 'grading',
+        :criterion_crit1 => {
+          :points => 2
+        }
+      }
+    })
 
     #third assignment data
     due_date = due_date + 1.days
@@ -207,20 +220,71 @@ describe "grades" do
       driver.execute_script '$("#grade_entry").blur()'
     end
 
-    it "should display rubric on assignment", priority: "1", test_id: 229661 do
+    it "should display rubric on assignment and properly highlight levels", priority: "1", test_id: 229661 do
+      zero_assignment = assignment_model({:title => 'zero assignment', :course => @course})
+      zero_association = @rubric.associate_with(zero_assignment, @course, :purpose => 'grading')
+      zero_submission = zero_assignment.submissions.find_by!(user: @student_1) # unsubmitted submission :/
+
+      zero_association.assess({
+        :user => @student_1,
+        :assessor => @teacher,
+        :artifact => zero_submission,
+        :assessment => {
+          :assessment_type => 'grading',
+          :criterion_crit1 => {
+            :points => 0
+          }
+        }
+      })
       get "/courses/#{@course.id}/grades"
 
-      # click rubric
+      # click first rubric
       f("#submission_#{@first_assignment.id} .toggle_rubric_assessments_link").click
       wait_for_ajaximations
       expect(fj('.rubric_assessments:visible .rubric_title')).to include_text(@rubric.title)
-      expect(fj('.rubric_assessments:visible .rubric_total')).to include_text('2')
+      expect(fj('.rubric_assessments:visible .rubric_total')).to include_text('10')
 
-      # check if proper rating is highlighted for a score of 2 on scale of 10|5|0
-      expect(fj('.rubric_assessments:visible .selected')).to include_text('5')
+      # check if only proper rating is highlighted for a score of 10 on scale of 10|5|0
+      expect(ffj('.rubric_assessments:visible .selected').length).to eq 1
+      expect(fj('.rubric_assessments:visible .selected')).to include_text('10')
 
       # check rubric comment
       expect(fj('.assessment-comments:visible div').text).to eq 'cool, yo'
+
+      # close first rubric
+      f("#submission_#{@first_assignment.id} .toggle_rubric_assessments_link").click
+
+      # click second rubric
+      f("#submission_#{zero_assignment.id} .toggle_rubric_assessments_link").click
+      expect(fj('.rubric_assessments:visible .rubric_total')).to include_text('0')
+
+      # check if only proper rating is highlighted for a score of 0 on scale of 10|5|0
+      expect(ffj('.rubric_assessments:visible .selected').length).to eq 1
+      expect(fj('.rubric_assessments:visible .selected')).to include_text('0')
+    end
+
+    context "rubric criterion ranges" do
+      it "should not highlight scores between ranges when range rating is disabled" do
+        get "/courses/#{@course.id}/grades"
+
+        # open rubric
+        f("#submission_#{@second_assignment.id} .toggle_rubric_assessments_link").click
+
+        # check if no highlights exist on a non-range criterion for a score of 2 on scale of 10|5|0
+        expect(find_with_jquery('.rubric_assessments:visible .selected')).to be nil
+      end
+
+      it "should highlight scores between ranges when range rating is enabled" do
+        @course.account.root_account.enable_feature!(:rubric_criterion_range)
+        get "/courses/#{@course.id}/grades"
+
+        # open rubric
+        f("#submission_#{@second_assignment.id} .toggle_rubric_assessments_link").click
+
+        # check if proper highlights exist on a range criterion for a score of 2 on scale of 10|5|0
+        expect(ffj('.rubric_assessments:visible .selected').length).to eq 1
+        expect(fj('.rubric_assessments:visible .selected')).to include_text('5')
+      end
     end
 
     it "shows the assessment link when there are assessment ratings with nil points" do

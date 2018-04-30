@@ -282,11 +282,11 @@ describe 'Speedgrader' do
     end
 
     context 'Using a rubric to grade' do
-      it 'should display correct grades for student', priority: "1", test_id: 164205 do
+      it 'should display correct grades for student with proper selected ratings', priority: "1", test_id: 164205 do
         course_with_student_logged_in(active_all: true)
-        rubric_model
+        rubric = outcome_with_rubric
         @assignment = @course.assignments.create!(name: 'assignment with rubric', points_possible: 10)
-        @association = @rubric.associate_with(
+        @association = rubric.associate_with(
           @assignment,
           @course,
           purpose: 'grading',
@@ -297,20 +297,24 @@ describe 'Speedgrader' do
           submission_type: "online_text_entry",
           has_rubric_assessment: true
         )
+        criterion1 = rubric.criteria.first
+        criterion2 = rubric.criteria.last
         @assessment = @association.assess(
           user: @student,
           assessor: @teacher,
           artifact: @submission,
           assessment: {
             assessment_type: 'grading',
-            criterion_crit1: { points: 5 }
+            "criterion_#{criterion1[:id]}": { points: 3 },
+            "criterion_#{criterion2[:id]}": { points: 0 }
           }
         )
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
         f('a.assess_submission_link').click
-
-        expect(f('#rating_rat2')).to have_class('selected')
-        expect(f('#rating_rat2 .points')).to include_text('5')
+        expect(ff("#criterion_#{criterion1[:id]} .selected").length).to eq 1
+        expect(f("#criterion_#{criterion1[:id]} .selected")).to include_text('3')
+        expect(ff("#criterion_#{criterion2[:id]} .selected").length).to eq 1
+        expect(f("#criterion_#{criterion2[:id]} .selected")).to include_text('0')
       end
     end
   end
