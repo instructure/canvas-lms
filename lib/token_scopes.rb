@@ -16,18 +16,30 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 class TokenScopes
-  def self.generate_scopes
-    api_routes = Rails.application.routes.routes.select { |route| /^\/api\/v1/ =~ route.path.spec.to_s }
-    api_route_hashes = api_routes.map { |route| { verb: route.verb, path: route.path.spec.to_s.gsub(/\(\.:format\)$/, '') } }
-    api_route_hashes += [
-      { verb: 'GET', path: '/api/sis/accounts/:account_id/assignments' }.freeze,
-      { verb: 'GET', path: '/api/sis/courses/:course_id/assignments' }.freeze,
-      { verb: 'PUT', path: '/api/sis/courses/:course_id/disable_post_to_sis' }.freeze,
-      { verb: 'GET', path: '/api/lti/courses/:course_id/membership_service' }.freeze,
-      { verb: 'GET', path: '/api/lti/groups/:group_id/membership_service' }.freeze,
-    ]
-    api_route_hashes.uniq.map { |route| "url:#{route[:verb]}|#{route[:path]}".freeze }
-  end
+  OAUTH2_SCOPE_NAMESPACE = '/auth/'.freeze
+  USER_INFO_SCOPE = {
+    resource: "oauth",
+    verb: "GET",
+    scope: "#{OAUTH2_SCOPE_NAMESPACE}userinfo"
+  }.freeze
 
-  SCOPES = self.generate_scopes.freeze
+  def self.api_routes
+    routes = Rails.application.routes.routes.select { |route| /^\/api\/(v1|sis)/ =~ route.path.spec.to_s }.map do |route|
+      path = route.path.spec.to_s.gsub(/\(\.:format\)$/, '')
+      {
+        resource: route.defaults[:controller],
+        verb: route.verb,
+        path: path,
+        scope: "url:#{route.verb}|#{path}".freeze
+      }
+    end
+    routes.uniq {|route| route[:scope]}
+  end
+  private_class_method :api_routes
+
+  API_ROUTES = api_routes.freeze
+  SCOPES = API_ROUTES.map { |route| route[:scope] }.freeze
+  ALL_SCOPES = [USER_INFO_SCOPE[:scope], *SCOPES].freeze
+  DETAILED_SCOPES = [USER_INFO_SCOPE, *API_ROUTES].freeze
+  GROUPED_DETAILED_SCOPES = DETAILED_SCOPES.group_by {|route| route[:resource]}.freeze
 end

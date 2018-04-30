@@ -85,7 +85,7 @@ module Canvas::Oauth
     end
 
     describe '#access_token' do
-      let(:scopes) {["#{AccessToken::OAUTH2_SCOPE_NAMESPACE}userinfo"]}
+      let(:scopes) {["#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"]}
 
       it 'creates a new token if none exists' do
         expect(user.access_tokens).to be_empty
@@ -106,13 +106,13 @@ module Canvas::Oauth
       end
 
       it 'will not return the full token for a userinfo scope' do
-        scope = "#{AccessToken::OAUTH2_SCOPE_NAMESPACE}userinfo"
+        scope = "#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"
         stub_out_cache key.id, [scope]
         expect(token.access_token.full_token).to be_nil
       end
 
       it 'finds an existing userinfo token if one exists' do
-        scope = "#{AccessToken::OAUTH2_SCOPE_NAMESPACE}userinfo"
+        scope = "#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"
         stub_out_cache key.id, [scope]
         access_token = user.access_tokens.create!(:developer_key => key, :scopes => [scope], :remember_access => true)
         expect(token.access_token).to eq access_token
@@ -120,7 +120,7 @@ module Canvas::Oauth
       end
 
       it 'ignores existing token if user did not remember access' do
-        scope = "#{AccessToken::OAUTH2_SCOPE_NAMESPACE}userinfo"
+        scope = "#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"
         stub_out_cache key.id, [scope]
         access_token = user.access_tokens.create!(:developer_key => key, :scopes => [scope])
         expect(token.access_token).not_to eq access_token
