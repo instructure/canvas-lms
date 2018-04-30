@@ -169,7 +169,8 @@ class AssignmentsController < ApplicationController
       respond_to do |format|
         format.html do
           render locals: {
-            eula_url: tool_eula_url
+            eula_url: tool_eula_url,
+            show_moderation_link: user_can_view_moderation_page?
           }
         end
         format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}) }
@@ -183,6 +184,8 @@ class AssignmentsController < ApplicationController
     raise ActiveRecord::RecordNotFound unless @assignment.moderated_grading? && @assignment.published?
 
     if authorized_action(@context, @current_user, :moderate_grades)
+      return render_unauthorized_action unless user_can_view_moderation_page?
+
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
       add_crumb(t('Moderate'))
 
@@ -600,5 +603,10 @@ class AssignmentsController < ApplicationController
     (@assignment.turnitin_enabled? && @context.turnitin_pledge) ||
     (@assignment.vericite_enabled? && @context.vericite_pledge) ||
     @assignment.course.account.closest_turnitin_pledge
+  end
+
+  def user_can_view_moderation_page?
+    return true unless @context.root_account.feature_enabled?(:anonymous_moderated_marking)
+    @assignment.final_grader_id.blank? || @assignment.final_grader_id == @current_user.id || @context.account_membership_allows(@current_user)
   end
 end

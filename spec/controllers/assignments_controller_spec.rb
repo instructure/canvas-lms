@@ -295,6 +295,46 @@ describe AssignmentsController do
         expect(permissions[:edit_grades]).to eq false
       end
     end
+
+    context "when Anonymous Moderated Grading is enabled" do
+      before :once do
+        @course.root_account.enable_feature!(:anonymous_moderated_marking)
+        course_with_user('TeacherEnrollment', {active_all: true, course: @course})
+        @other_teacher = @user
+        @assignment = @course.assignments.create!(
+          moderated_grading: true,
+          final_grader: @other_teacher,
+          grader_count: 2,
+          workflow_state: 'published'
+        )
+      end
+
+      it "renders the page when the current user is the selected moderator" do
+        user_session(@other_teacher)
+        get 'show_moderate', params: {course_id: @course.id, assignment_id: @assignment.id}
+        assert_status(200)
+      end
+
+      it "renders unauthorized when the current user is not the selected moderator" do
+        user_session(@teacher)
+        get 'show_moderate', params: {course_id: @course.id, assignment_id: @assignment.id}
+        assert_unauthorized
+      end
+
+      it "renders the page when the current user is an admin and not the selected moderator" do
+        account_admin_user(account: @course.root_account)
+        user_session(@admin)
+        get 'show_moderate', params: {course_id: @course.id, assignment_id: @assignment.id}
+        assert_status(200)
+      end
+
+      it "renders the page when no moderator is selected" do
+        @assignment.update!(final_grader: nil)
+        user_session(@teacher)
+        get 'show_moderate', params: {course_id: @course.id, assignment_id: @assignment.id}
+        assert_status(200)
+      end
+    end
   end
 
   describe "GET 'show'" do

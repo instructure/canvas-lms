@@ -59,7 +59,7 @@
           </a>
         <% end %>
         <%= assignment_submission_button(@assignment, @current_user, @current_user_submission) %>
-        <% if @assignment.moderated_grading? && can_do(@context, @current_user, :moderate_grades) %>
+        <% if show_moderation_link %>
           <a
             href='<%= course_assignment_moderate_url(@context, @assignment) %>'
             id="moderated_grading_button"
