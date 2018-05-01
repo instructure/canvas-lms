@@ -7,7 +7,7 @@ set -e
 
 script/remove-packages-from-yarn-integriry
 
-for name in $(cd packages; ls -1 */package.json | xargs dirname); do
+for name in $(cd packages; ls -1 */package.json | xargs -n 1 dirname); do
   echo -n "Clearning cache for packages/$name... "
   node_modules_dir="node_modules/$name"
   rm -rf $node_modules_dir
