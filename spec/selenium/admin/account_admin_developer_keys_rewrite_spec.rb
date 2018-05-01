@@ -270,6 +270,13 @@ describe 'Developer Keys' do
         expect(fxpath("//*[@id='keys']/tbody/tr[1]/td[3]/fieldset/span/span/span/span[2]/span/span/span[3]/div/label/span[1]").css_value('background-color')).to be_truthy
       end
 
+      it "only show create developer key button for account tab panel" do
+        get "/accounts/#{Account.default.id}/developer_keys"
+        expect(fj("#reactContent span:contains('Developer Key')")).to be_truthy
+        click_inherited_tab
+        expect(f("#reactContent")).not_to contain_jqcss("span:contains('Developer Key')")
+      end
+
     end
   end
 
