@@ -27,12 +27,6 @@ class User < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
 
-  def pipeline_serializer
-    PipelineService::Serializers::User
-  end
-
-
-
   include Context
   include ModelCache
 
