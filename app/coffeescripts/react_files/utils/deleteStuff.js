@@ -50,6 +50,7 @@ export default function deleteStuff(filesAndFolders, args) {
 
   const promises = filesAndFolders.map(item =>
     item.destroy({
+      emulateHTTP: true,
       emulateJSON: true,
       data: {
         force: 'true'
