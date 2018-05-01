@@ -72,8 +72,14 @@ class DueDateCacher
 
     current_caller = caller(1..1).first
     update_grades = inst_jobs_opts.delete(:update_grades) || false
-    new(course, assignments, user_ids, update_grades: update_grades, original_caller: current_caller).
-      send_later_if_production_enqueue_args(:recompute, inst_jobs_opts)
+    due_date_cacher = new(course, assignments, user_ids, update_grades: update_grades, original_caller: current_caller)
+
+    run_immediately = inst_jobs_opts.delete(:run_immediately) || false
+    if run_immediately
+      due_date_cacher.recompute
+    else
+      due_date_cacher.send_later_if_production_enqueue_args(:recompute, inst_jobs_opts)
+    end
   end
 
   def initialize(course, assignments, user_ids = [], update_grades: false, original_caller: caller(1..1).first)

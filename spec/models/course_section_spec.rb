@@ -285,7 +285,7 @@ describe CourseSection, "moving to new course" do
     expect(CourseAccountAssociation.where(course_id: course2).distinct.order(:account_id).pluck(:account_id)).to eq [account1.id, account2.id].sort
   end
 
-  it 'should call course#recompute_student_scores_without_send_later if :run_jobs_immediately' do
+  it 'should call DueDateCacher.recompute_users_for_course with run_immediately true if :run_jobs_immediately' do
     account1 = Account.create!(:name => "1")
     account2 = Account.create!(:name => "2")
     course1 = account1.courses.create!
@@ -298,11 +298,12 @@ describe CourseSection, "moving to new course" do
     e.save!
     course1.reload
 
-    expect(course2).to receive(:recompute_student_scores_without_send_later)
-    cs.move_to_course(course2, run_jobs_immediately: true)
+    expect(DueDateCacher).to receive(:recompute_users_for_course).
+      with([u.id], course2, nil, run_immediately: true, update_grades: true)
+    cs.move_to_course(course2, :run_jobs_immediately)
   end
 
-  it 'should call course##recompute_student_scores later without :run_jobs_immediately' do
+  it 'should call DueDateCacher.recompute_users_for_course with run_immediately false if without :run_jobs_immediately' do
     account1 = Account.create!(:name => "1")
     account2 = Account.create!(:name => "2")
     course1 = account1.courses.create!
@@ -315,7 +316,8 @@ describe CourseSection, "moving to new course" do
     e.save!
     course1.reload
 
-    expect(course2).to receive(:recompute_student_scores)
+    expect(DueDateCacher).to receive(:recompute_users_for_course).
+      with([u.id], course2, nil, run_immediately: false, update_grades: true)
     cs.move_to_course(course2)
   end
 

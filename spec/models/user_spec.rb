@@ -2619,7 +2619,7 @@ describe User do
 
     it "should batch DueDateCacher jobs" do
       expect(DueDateCacher).to receive(:recompute).never
-      expect(DueDateCacher).to receive(:recompute_course).twice # sync_enrollments and destroy_enrollments
+      expect(DueDateCacher).to receive(:recompute_users_for_course).twice # sync_enrollments and destroy_enrollments
       test_student = @course.student_view_student
       test_student.destroy
       test_student.reload.enrollments.each { |e| expect(e).to be_deleted }

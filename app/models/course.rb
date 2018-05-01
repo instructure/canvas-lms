@@ -2886,7 +2886,7 @@ class Course < ActiveRecord::Base
                          :skip_touch_user => true)
       end
     end
-    DueDateCacher.recompute_course(self)
+    DueDateCacher.recompute_users_for_course(fake_student.id, self)
     fake_student
   end
   private :sync_enrollments

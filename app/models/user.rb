@@ -884,8 +884,9 @@ class User < ActiveRecord::Base
     Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
       enrollment_scope.each{ |e| e.destroy }
     end
+    user_ids = enrollment_scope.pluck(:user_id).uniq
     courses_to_update.each do |course|
-      DueDateCacher.recompute_course(course)
+      DueDateCacher.recompute_users_for_course(user_ids, course)
     end
   end
 
