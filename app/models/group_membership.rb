@@ -165,7 +165,7 @@ class GroupMembership < ActiveRecord::Base
     assignments = Assignment.where(context_type: group.context_type, context_id: group.context_id).
       where(group_category_id: group.group_category_id).pluck(:id)
 
-    DueDateCacher.recompute_course(group.context_id, assignments: assignments)
+    DueDateCacher.recompute_users_for_course(user.id, group.context_id, assignments)
   end
 
   def touch_groups
