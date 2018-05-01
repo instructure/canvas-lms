@@ -1,6 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe 'pipeline service' do
+  let(:endpoint_instance) { double('endpoint instance', call: nil) }
+  let(:endpoint) { double('endpoint class', new: endpoint_instance) }
+
   before do
     @user = account_admin_user
     @course = Course.create!
@@ -29,6 +32,23 @@ describe 'pipeline service' do
     end
   end
 
+  context "Assignment" do
+    before do
+      @user       = User.create!
+      @course     = Course.create!
+      @enrollment = StudentEnrollment.new(valid_enrollment_attributes)
+      @assignment = ::Assignment.create!(context: @course)
+    end
+
+    it do
+      expect(endpoint_instance).to receive(:call)
+      PipelineService::Commands::Publish.new(
+        object: @assignment,
+        endpoint: endpoint
+      ).call
+    end
+  end
+
   context "Submission" do
     before do
       @user       = User.create!
@@ -44,8 +64,6 @@ describe 'pipeline service' do
       ENV['PIPELINE_PASSWORD']  = 'example_password'
       ENV['CANVAS_DOMAIN']      = 'someschool.com'
     end
-    let(:endpoint_instance) { double('endpoint instance', call: nil) }
-    let(:endpoint) { double('endpoint class', new: endpoint_instance) }
 
     it do
       expect(endpoint_instance).to receive(:call)
