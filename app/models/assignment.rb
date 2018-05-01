@@ -85,6 +85,8 @@ class Assignment < ActiveRecord::Base
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :inverse_of => :context, :dependent => :destroy
   has_one :score_statistic, dependent: :destroy
 
+  has_many :moderation_graders, inverse_of: :assignment
+
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :group_category_changes_ok?
   validate :anonymous_grading_changes_ok?
