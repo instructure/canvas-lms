@@ -4484,7 +4484,6 @@ describe 'Submissions API', type: :request do
       @student1 = student_in_course(:active_all => true).user
       @student2 = student_in_course(:active_all => true).user
       @student3 = student_in_course(:active_all => true).user
-      course_with_user('StudentViewEnrollment', :active_all => true)
 
       @section = @course.course_sections.build(:name => 'Another Section')
       @section.save
@@ -4607,6 +4606,110 @@ describe 'Submissions API', type: :request do
         enrollment.save!
 
         json = api_call_as_user(@teacher, :get, @path, @params)
+        expect(json['graded']).to eq 1
+        expect(json['ungraded']).to eq 1
+        expect(json['not_submitted']).to eq 1
+      end
+    end
+
+    context 'group assignments' do
+      it 'returns the summary grouped by groups' do
+        group_category = @course.group_categories.create(name: 'Project Groups')
+        group1 = group_category.groups.create(name: "Project Group 1", context: @course)
+        group2 = group_category.groups.create(name: "Project Group 2", context: @course)
+        group_category.save!
+        group1.users << @student1
+        group1.users << @student2
+        group2.users << @student3
+
+        assignment = @course.assignments.create(points_possible: 100, group_category: group_category, grade_group_students_individually: false)
+        assignment.submit_homework @student1, :body => 'EHLO'
+        assignment.submit_homework @student3, :body => 'EHLO'
+        assignment.grade_student @student1, score: 99, grader: @teacher
+        path = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submission_summary?grouped=true"
+        params = { controller: 'submissions_api', action: 'submission_summary',
+                    format: 'json', course_id: @course.to_param, assignment_id: assignment.to_param, grouped: true }
+
+        json = api_call_as_user(@teacher, :get, path, params)
+        expect(json['graded']).to eq 1
+        expect(json['ungraded']).to eq 1
+        expect(json['not_submitted']).to eq 0
+      end
+
+      it 'does not return the summary grouped by groups if the grouped param isnt sent' do
+        group_category = @course.group_categories.create(name: 'Project Groups')
+        group1 = group_category.groups.create(name: "Project Group 1", context: @course)
+        group2 = group_category.groups.create(name: "Project Group 2", context: @course)
+        group_category.save!
+        group1.users << @student1
+        group1.users << @student2
+        group2.users << @student3
+
+        assignment = @course.assignments.create(points_possible: 100, group_category: group_category, grade_group_students_individually: false)
+        assignment.submit_homework @student1, :body => 'EHLO'
+        assignment.grade_student @student1, score: 99, grader: @teacher
+
+        path = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submission_summary"
+        params = { controller: 'submissions_api', action: 'submission_summary',
+                    format: 'json', course_id: @course.to_param, assignment_id: assignment.to_param}
+
+        json = api_call_as_user(@teacher, :get, path, params)
+        expect(json['graded']).to eq 2
+        expect(json['ungraded']).to eq 0
+        expect(json['not_submitted']).to eq 1
+      end
+
+      it 'does not return the summary grouped by groups if grade_group_students_individually is true' do
+                group_category = @course.group_categories.create(name: 'Project Groups')
+        group1 = group_category.groups.create(name: "Project Group 1", context: @course)
+        group2 = group_category.groups.create(name: "Project Group 2", context: @course)
+        group_category.save!
+        group1.users << @student1
+        group1.users << @student2
+        group2.users << @student3
+
+        assignment = @course.assignments.create(points_possible: 100, group_category: group_category, grade_group_students_individually: true)
+        assignment.submit_homework @student1, :body => 'EHLO'
+        assignment.grade_student @student1, score: 99, grader: @teacher
+
+        path = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submission_summary?grouped=true"
+        params = { controller: 'submissions_api', action: 'submission_summary',
+                    format: 'json', course_id: @course.to_param, assignment_id: assignment.to_param, grouped: true}
+
+        json = api_call_as_user(@teacher, :get, path, params)
+        expect(json['graded']).to eq 1
+        expect(json['ungraded']).to eq 1
+        expect(json['not_submitted']).to eq 1
+      end
+
+      it 'does not return the summary grouped by groups if grade_group_students_individually is true without grouped param' do
+        group_category = @course.group_categories.create(name: 'Project Groups')
+        group1 = group_category.groups.create(name: "Project Group 1", context: @course)
+        group2 = group_category.groups.create(name: "Project Group 2", context: @course)
+        group_category.save!
+        group1.users << @student1
+        group1.users << @student2
+        group2.users << @student3
+
+        assignment = @course.assignments.create(points_possible: 100, group_category: group_category, grade_group_students_individually: true)
+        assignment.submit_homework @student1, :body => 'EHLO'
+        assignment.grade_student @student1, score: 99, grader: @teacher
+
+        path = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submission_summary"
+        params = { controller: 'submissions_api', action: 'submission_summary',
+                    format: 'json', course_id: @course.to_param, assignment_id: assignment.to_param}
+
+        json = api_call_as_user(@teacher, :get, path, params)
+        expect(json['graded']).to eq 1
+        expect(json['ungraded']).to eq 1
+        expect(json['not_submitted']).to eq 1
+      end
+
+      it 'doesnt error when the assignment isnt a group assignment' do
+        path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submission_summary?grouped=true"
+        params = { controller: 'submissions_api', action: 'submission_summary',
+                    format: 'json', course_id: @course.to_param, assignment_id: @assignment.to_param, grouped: true}
+        json = api_call_as_user(@teacher, :get, path, params)
         expect(json['graded']).to eq 1
         expect(json['ungraded']).to eq 1
         expect(json['not_submitted']).to eq 1

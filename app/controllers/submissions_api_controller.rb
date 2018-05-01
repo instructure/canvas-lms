@@ -1038,6 +1038,9 @@ class SubmissionsApiController < ApplicationController
   # Returns the number of submissions for the given assignment based on gradeable students
   # that fall into three categories: graded, ungraded, not submitted.
   #
+  # @argument grouped [Boolean]
+  #   If this argument is true, the response will take into account student groups.
+  #
   # @example_response
   #   {
   #     "graded": 5,
@@ -1047,10 +1050,14 @@ class SubmissionsApiController < ApplicationController
   def submission_summary
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
-      student_scope = @context.students_visible_to(@current_user).
-        where("enrollments.type<>'StudentViewEnrollment' AND enrollments.workflow_state = 'active'").distinct
-      student_scope = @assignment.students_with_visibility(student_scope)
-      student_ids = student_scope.pluck(:id)
+      student_ids = if should_group?
+                      @assignment.representatives(@current_user).map(&:id)
+                    else
+                      student_scope = @context.students_visible_to(@current_user).
+                        where("enrollments.type<>'StudentViewEnrollment' AND enrollments.workflow_state = 'active'").distinct
+                      student_scope = @assignment.students_with_visibility(student_scope)
+                      student_scope.pluck(:id)
+                    end
 
       graded = @context.submissions.graded.where(user_id: student_ids, assignment_id: @assignment).count
       ungraded = @context.submissions.
@@ -1058,10 +1065,19 @@ class SubmissionsApiController < ApplicationController
         where(user_id: student_ids, assignment_id: @assignment, excused: [nil, false]).
         except(:order).
         count
-      not_submitted = student_ids.count - graded - ungraded
+      total = if should_group?
+                @assignment.group_category.groups.count
+              else
+                student_ids.count
+              end
+      not_submitted = total - graded - ungraded
 
       render json: {graded: graded, ungraded: ungraded, not_submitted: not_submitted}
     end
+  end
+
+  def should_group?
+    value_to_boolean(params[:grouped]) && @assignment.group_category_id && !@assignment.grade_group_students_individually
   end
 
   private
