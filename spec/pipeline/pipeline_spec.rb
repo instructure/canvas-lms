@@ -31,10 +31,6 @@ describe 'pipeline service' do
   end
 
   context "Submission" do
-    # let(:context) { double('context') }
-    # let(:assignment) { double('assignment', context: context, submission_types: []) }
-    # let(:user) { double('user') }
-
     before do
       @user = User.create!
       @course = Course.create!
@@ -55,7 +51,7 @@ describe 'pipeline service' do
     it do
       expect(endpoint_instance).to receive(:call)
       PipelineService::Commands::Publish.new(
-        object: @enrollment,
+        object: @enrollment
         endpoint: endpoint
       ).call
     end
