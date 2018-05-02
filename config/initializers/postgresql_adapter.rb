@@ -201,10 +201,6 @@ module PostgreSQLAdapterExtensions
     select_value("SELECT 1 FROM pg_available_extensions WHERE name='#{extension}'").to_i == 1
   end
 
-  def set_search_path_on_function(function, args = "()", search_path = Shard.current.name)
-    execute("ALTER FUNCTION #{quote_table_name(function)}#{args} SET search_path TO #{search_path}")
-  end
-
   # temporarily adds schema to the search_path (i.e. so you can use an extension that won't work
   # using qualified names)
   def add_schema_to_search_path(schema)
