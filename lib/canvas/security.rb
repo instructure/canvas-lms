@@ -337,7 +337,7 @@ module Canvas::Security
     end
 
     def timestamp_is_future?(nbf_val)
-      now = Time.zone.now
+      now = Time.zone.now + 5.seconds
       (nbf_val.is_a?(Time) && nbf_val > now) || nbf_val > now.to_i
     end
 
