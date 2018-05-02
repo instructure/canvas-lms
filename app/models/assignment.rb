@@ -237,7 +237,10 @@ class Assignment < ActiveRecord::Base
 
     # Learning outcome alignments seem to get copied magically, possibly
     # through the rubric
-    result.rubric_association = self.rubric_association.clone
+    if self.rubric_association
+      result.rubric_association = self.rubric_association.clone
+      result.rubric_association.skip_updating_points_possible = true
+    end
 
     # Link the duplicated assignment to this assignment
     result.duplicate_of = self

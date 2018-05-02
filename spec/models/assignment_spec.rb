@@ -480,6 +480,20 @@ describe Assignment do
       expect(new_assignment3.title).to eq "Wiki Assignment Copy 3"
     end
 
+    it "should not explode duplicating a mismatched rubric association" do
+      assmt = @course.assignments.create!(:title => "assmt", :points_possible => 3)
+      rubric = @course.rubrics.new(:title => "rubric")
+      rubric.update_with_association(@teacher, {
+        criteria: {"0" => {description: "correctness", points: 15, ratings: {"0" => {points: 15, description: "asdf"}}, }, },
+      }, @course, {
+        association_object: assmt, update_if_existing: true,
+        use_for_grading: "1", purpose: "grading", skip_updating_points_possible: true
+      })
+      new_assmt = assmt.reload.duplicate
+      new_assmt.save!
+      expect(new_assmt.points_possible).to eq 3
+    end
+
     context "with an assignment that can't be duplicated" do
       let(:assignment) { @course.assignments.create!(assignment_valid_attributes) }
 
