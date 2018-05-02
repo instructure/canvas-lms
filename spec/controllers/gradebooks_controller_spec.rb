@@ -1235,45 +1235,89 @@ describe GradebooksController do
   end
 
   describe "POST 'update_submission'" do
+    let(:json) { JSON.parse(response.body) }
+
     describe "returned JSON" do
       before(:once) do
         @assignment = @course.assignments.create!(title: "Math 1.1")
-        @student = @course.enroll_user(User.create!(name: "Adam Jones"))
+        @student = @course.enroll_user(User.create!(name: "Adam Jones")).user
+        @submission = @assignment.submissions.find_by!(user: @student)
       end
 
-      before(:each) do
-        user_session(@teacher)
-        post(
-          'update_submission',
-          params: {
+      describe 'non-anonymous assignment' do
+        before(:each) do
+          user_session(@teacher)
+          post(
+            'update_submission',
+            params: {
+              course_id: @course.id,
+              submission: {
+                assignment_id: @assignment.id,
+                user_id: @student.id,
+                grade: 10
+              }
+            },
+            format: :json
+          )
+        end
+
+        it "includes assignment_visibility" do
+          submissions = json.map {|submission| submission['submission']}
+          expect(submissions).to all include('assignment_visible' => true)
+        end
+
+        it "includes missing in submission history" do
+          submission_history = json.first['submission']['submission_history']
+          submissions = submission_history.map {|submission| submission['submission']}
+          expect(submissions).to all include('missing' => false)
+        end
+
+        it "includes late in submission history" do
+          submission_history = json.first['submission']['submission_history']
+          submissions = submission_history.map {|submission| submission['submission']}
+          expect(submissions).to all include('late' => false)
+        end
+
+        it 'includes user_ids' do
+          submissions = json.map {|submission| submission['submission']}
+          expect(submissions).to all include('user_id')
+        end
+      end
+
+      describe 'anonymous assignment' do
+        before :once do
+          @course.root_account.enable_feature!(:anonymous_moderated_marking)
+        end
+
+        it 'works with the absense of user_id and the presence of anonymous_id' do
+          user_session(@teacher)
+          @assignment.update!(anonymous_grading: true)
+          post 'update_submission', params: {
             course_id: @course.id,
             submission: {
               assignment_id: @assignment.id,
-              user_id: @student.user_id,
+              anonymous_id: @submission.anonymous_id,
               grade: 10
             }
-          },
-          format: :json
-        )
-      end
+          }, format: :json
+          submissions = json.map {|submission| submission.fetch('submission').fetch('anonymous_id')}
+          expect(submissions).to contain_exactly(@submission.anonymous_id)
+        end
 
-      let(:json) { JSON.parse(response.body) }
-
-      it "includes assignment_visibility" do
-        submissions = json.map {|submission| submission['submission']}
-        expect(submissions).to all include('assignment_visible' => true)
-      end
-
-      it "includes missing in submission history" do
-        submission_history = json.first['submission']['submission_history']
-        submissions = submission_history.map {|submission| submission['submission']}
-        expect(submissions).to all include('missing' => false)
-      end
-
-      it "includes late in submission history" do
-        submission_history = json.first['submission']['submission_history']
-        submissions = submission_history.map {|submission| submission['submission']}
-        expect(submissions).to all include('late' => false)
+        it 'does not include user_ids' do
+          user_session(@teacher)
+          @assignment.update!(anonymous_grading: true)
+          post 'update_submission', params: {
+            course_id: @course.id,
+            submission: {
+              assignment_id: @assignment.id,
+              anonymous_id: @submission.anonymous_id,
+              grade: 10
+            }
+          }, format: :json
+          submissions = json.map {|submission| submission['submission'].key?('user_id')}
+          expect(submissions).to contain_exactly(false)
+        end
       end
     end
 

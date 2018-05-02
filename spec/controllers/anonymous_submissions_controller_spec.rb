@@ -19,6 +19,8 @@
 require_relative '../spec_helper'
 
 RSpec.describe AnonymousSubmissionsController do
+  it_behaves_like 'a submission update action', :anonymous_submissions
+
   describe "GET show" do
     before do
       course_with_student_and_submitted_homework

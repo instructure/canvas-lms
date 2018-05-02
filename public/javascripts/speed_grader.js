@@ -827,7 +827,6 @@ function getSelectedAssessment(){
 }
 
 function initRubricStuff(){
-
   $("#rubric_summary_container .button-container").appendTo("#rubric_assessments_list_and_edit_button_holder").find('.edit').text(I18n.t('edit_view_rubric', "View Rubric"));
 
   $(".toggle_full_rubric, .hide_rubric_link").click(function(e){
@@ -879,11 +878,14 @@ function initRubricStuff(){
       }
     }
     if (isAnonymous) {
+      // FIXME: data['rubric_assessment[user_id]'] should not contain anonymous_id,
+      // figure out how to fix the keys elsewhere
       data[`rubric_assessment[${anonymizableUserId}]`] = data['rubric_assessment[user_id]'];
       delete data['rubric_assessment[user_id]'];
+      data.graded_anonymously = true;
+    } else {
+      data.graded_anonymously = utils.shouldHideStudentNames();
     }
-
-    data['graded_anonymously'] = utils.shouldHideStudentNames();
     var url = $(".update_rubric_assessment_url").attr('href');
     var method = "POST";
     EG.toggleFullRubric('close');
@@ -2535,8 +2537,9 @@ EG = {
   },
 
   setOrUpdateSubmission: function(submission){
-
-    // find the student this submission belongs to and update their submission with this new one, if they dont have a submission, set this as their submission.
+    // find the student this submission belongs to and update their
+    // submission with this new one, if they dont have a submission,
+    // set this as their submission.
     const student = jsonData.studentMap[submission[anonymizableUserId]];
     if (!student) return;
 
@@ -2594,7 +2597,7 @@ EG = {
     const formData = {
       'submission[assignment_id]': jsonData.id,
       [`submission[${anonymizableUserId}]`]: EG.currentStudent[anonymizableId],
-      'submission[graded_anonymously]': utils.shouldHideStudentNames()
+      'submission[graded_anonymously]': isAnonymous ? true : utils.shouldHideStudentNames()
     };
 
     var grade = SpeedgraderHelpers.determineGradeToSubmit(

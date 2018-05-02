@@ -272,6 +272,7 @@ CanvasRails::Application.routes.draw do
           request.query_parameters.key?(:download)
         end
 
+      put 'anonymous_submissions/:anonymous_id', to: 'anonymous_submissions#update'
       resources :submissions do
         get 'originality_report/:asset_string' => 'submissions#originality_report', as: :originality_report
         post 'turnitin/resubmit' => 'submissions#resubmit_to_turnitin', as: :resubmit_to_turnitin

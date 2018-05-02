@@ -19,7 +19,7 @@
 require_relative '../spec_helper'
 require_relative '../support/request_helper'
 
-describe GradebooksController, type: :request do
+describe 'Access Different Gradebooks Environments', type: :request do
   before :once do
     course_with_teacher active_all: true
     @teacher_enrollment = @enrollment

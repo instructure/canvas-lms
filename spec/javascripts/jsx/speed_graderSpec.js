@@ -1493,6 +1493,7 @@ QUnit.module('SpeedGrader', function() {
       window.jsonData = jsonData
       teardownHandleFragmentChanged()
       window.location.hash = ''
+      document.querySelector('.ui-selectmenu-menu').remove()
     })
 
     test("the iframe src points to a user's submission", () => {
@@ -1565,6 +1566,7 @@ QUnit.module('SpeedGrader', function() {
     })
 
     anonymousHooks.afterEach(() => {
+      window.location.hash = ''
       window.jsonData = originalJsonData
       fakeENV.teardown()
     })
@@ -1649,6 +1651,7 @@ QUnit.module('SpeedGrader', function() {
 
         hooks.afterEach(() => {
           fixtures.innerHTML = ''
+          document.querySelector('.ui-selectmenu-menu').remove()
         })
 
         test('Students are listed anonymously', () => {
@@ -1793,6 +1796,7 @@ QUnit.module('SpeedGrader', function() {
         fixtures.innerHTML = ''
         fakeENV.teardown()
         window.jsonData = originalJsonData
+        document.querySelector('.ui-selectmenu-menu').remove()
       })
 
       test('default avatar image is hidden', () => {
@@ -1954,6 +1958,89 @@ QUnit.module('SpeedGrader', function() {
         equal(pathname, expectedPathname);
       });
     })
+
+    QUnit.module('#initRubricStuff', hooks => {
+      const rubricUrl = '/someRubricUrl';
+
+      hooks.beforeEach(() => {
+        fakeENV.setup({
+          ...ENV,
+          assignment_id: '17',
+          course_id: '29',
+          grading_role: 'moderator',
+          help_url: 'example.com/support',
+          show_help_menu_item: false,
+          RUBRIC_ASSESSMENT: {}
+        });
+        fixtures.innerHTML = `
+          <span id="speedgrader-settings"></span>
+          <div id="rubric_holder">
+            <div class="rubric"></div>
+            <div class='update_rubric_assessment_url' href=${rubricUrl}></div>
+            <button class='save_rubric_button'></button>
+          </div>
+        `;
+        sinon.stub($, 'getJSON');
+        sinon.stub($, 'ajaxJSON');
+        sinon.stub(SpeedGrader.EG, 'showSubmission');
+        sinon.stub($.fn, 'ready');
+        SpeedGrader.setup();
+        window.jsonData = windowJsonData;
+        SpeedGrader.EG.jsonReady();
+        $.fn.ready.restore();
+      });
+
+      hooks.afterEach(() => {
+        window.jsonData = originalJsonData;
+        SpeedGrader.EG.showSubmission.restore();
+        $.ajaxJSON.restore();
+        $.getJSON.restore();
+        fixtures.innerHTML = '';
+        fakeENV.teardown();
+      });
+
+      test('sets graded_anonymously to true for the rubric ajax request', () => {
+        SpeedGrader.EG.domReady();
+        const save_rubric_button = document.querySelector('.save_rubric_button');
+        save_rubric_button.click();
+        const {graded_anonymously} = $.ajaxJSON.getCalls().find(call => call.args[0] === rubricUrl).args[2];
+        strictEqual(graded_anonymously, true);
+      });
+    });
+
+    QUnit.module('#setOrUpdateSubmission', hooks => {
+      hooks.beforeEach(() => {
+        fakeENV.setup({
+          ...ENV,
+          assignment_id: '17',
+          course_id: '29',
+          grading_role: 'moderator',
+          help_url: 'example.com/support',
+          show_help_menu_item: false
+        });
+        fixtures.innerHTML = '<span id="speedgrader-settings"></span>';
+        sinon.stub($, 'getJSON');
+        sinon.stub($, 'ajaxJSON');
+        sinon.stub($.fn, 'ready');
+        SpeedGrader.setup();
+        window.jsonData = windowJsonData;
+        SpeedGrader.EG.jsonReady();
+        $.fn.ready.restore();
+      });
+
+      hooks.afterEach(() => {
+        window.jsonData = originalJsonData;
+        $.ajaxJSON.restore();
+        $.getJSON.restore();
+        fixtures.innerHTML = '';
+        fakeENV.teardown();
+      });
+
+      test('fetches student via anonymous_id', () => {
+        const {submission} = SpeedGrader.EG.setOrUpdateSubmission(alphaSubmission);
+        deepEqual(submission, alphaSubmission);
+      });
+    });
 
     QUnit.module('#renderAttachment', hooks => {
       hooks.beforeEach(() => {
@@ -2288,6 +2375,14 @@ QUnit.module('SpeedGrader', function() {
         handleGradingError.restore()
         ajaxJSON.restore()
       })
+
+      test('submission is always marked as graded anonymously', () => {
+        const ajaxJSON = sinon.stub($, 'ajaxJSON');
+        SpeedGrader.EG.handleGradeSubmit({}, false);
+        const [,,formData] = ajaxJSON.firstCall.args;
+        strictEqual(formData['submission[graded_anonymously]'], true);
+        ajaxJSON.restore();
+      });
     })
 
     QUnit.module('#updateSelectMenuStatus', hooks => {
@@ -2323,6 +2418,7 @@ QUnit.module('SpeedGrader', function() {
         delete SpeedGrader.EG.currentStudent
         teardownHandleFragmentChanged()
         window.location.hash = ''
+        document.querySelector('.ui-selectmenu-menu').remove()
       })
 
       test('calls updateSelectMenuStatus with "anonymous_id"', assert => {
@@ -2461,6 +2557,7 @@ QUnit.module('SpeedGrader', function() {
       }
       fakeENV.setup()
       sinon.stub($, 'getJSON')
+      sinon.stub($, 'ajaxJSON')
       sinon.stub(SpeedGrader.EG, 'domReady')
       sinon.stub(SpeedGrader.EG, 'showSubmission')
       SpeedGrader.setup()
@@ -2469,6 +2566,7 @@ QUnit.module('SpeedGrader', function() {
     suiteHooks.afterEach(() => {
       SpeedGrader.EG.showSubmission.restore()
       SpeedGrader.EG.domReady.restore()
+      $.ajaxJSON.restore()
       $.getJSON.restore()
       fakeENV.teardown()
       SpeedGrader.EG.currentStudent = originalCurrentStudent
@@ -2516,6 +2614,7 @@ QUnit.module('SpeedGrader', function() {
         <form id="add_a_comment" style="display:none;"></form>
       `
       sinon.stub($, 'getJSON')
+      sinon.stub($, 'ajaxJSON');
       sinon.stub(SpeedGrader.EG, 'domReady')
       sinon.stub(SpeedGrader.EG, 'showSubmission')
       SpeedGrader.setup()
@@ -2524,6 +2623,7 @@ QUnit.module('SpeedGrader', function() {
     hooks.afterEach(() => {
       SpeedGrader.EG.showSubmission.restore()
       SpeedGrader.EG.domReady.restore()
+      $.ajaxJSON.restore()
       $.getJSON.restore()
       fixtures.innerHTML = ''
     })
