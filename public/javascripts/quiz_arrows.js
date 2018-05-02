@@ -20,6 +20,7 @@
 
 import I18n from 'i18n!quizzes.show'
 import $ from 'jquery'
+import {direction} from 'jsx/shared/helpers/rtlHelper'
 
 // Create and append right/wrong arrows to all appropriate
 // answers on a quiz results page.
@@ -50,10 +51,10 @@ export default class QuizArrowApplicator {
 
   applyCSS () {
     $.each([this.rightTpl, this.wrongTpl, this.correctTpl, this.shortTpl, this.surveyAnswerTpl], function () {
-      this.css({ left: -128, top: 5 })
+      this.css({ [direction('left')]: -128, top: 5 })
     })
     $.each([this.unansweredTpl, this.creditFullTpl, this.creditNoneTpl, this.creditPartialTpl], function () {
-      this.css({ left: -108, top: 9 })
+      this.css({ [direction('left')]: -108, top: 9 })
     })
   }
 
