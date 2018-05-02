@@ -790,8 +790,11 @@ class Attachment < ActiveRecord::Base
   end
 
   def url_ttl
-    settings = root_account_id && Account.find_cached(root_account_id)&.settings
-    setting = settings && settings[:s3_url_ttl_seconds]
+    settings = begin
+      root_account_id && Account.find_cached(root_account_id).settings
+    rescue ::Canvas::AccountCacheError
+    end
+    setting = settings&.[](:s3_url_ttl_seconds)
     setting ||= Setting.get('attachment_url_ttl', 1.hour.to_s)
     setting.to_i.seconds
   end
