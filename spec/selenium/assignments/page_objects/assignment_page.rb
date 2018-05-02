@@ -19,7 +19,7 @@ class AssignmentPage
   class << self
     include SeleniumDependencies
 
-    def visit_as_student(course, assignment)
+    def visit(course, assignment)
       get "/courses/#{course}/assignments/#{assignment}"
     end
 
@@ -37,6 +37,14 @@ class AssignmentPage
 
     def moderate_checkbox
       f("input[type=checkbox][name='moderated_grading']")
+    end
+
+    def moderate_button
+      f("#moderated_grading_button")
+    end
+
+    def assignment_content
+      f("#content")
     end
 
     def assignment_edit_permission_error_text
