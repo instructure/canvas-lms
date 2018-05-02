@@ -230,9 +230,29 @@
             <label><%= t("Submitted Files") %>: <span class="labelText--not-bold"><%= t("(click to load)") %></span>&nbsp;</label>
             <div id="submission_files_list">
               <div id="submission_file_hidden"  class="submission-file" style='display:none;'>
-                <a class="submission-file-download icon-download" title="<%= t("Download this file") %>" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submissionId}}", :download => "{{attachmentId}}") %>"></a>
+                <%
+                  download_url = if anonymous_grading
+                    context_url(
+                      @context,
+                      :context_assignment_anonymous_submission_url,
+                      @assignment.id,
+                      "{{submissionId}}",
+                      download: "{{attachmentId}}"
+                    )
+                  else
+                    context_url(
+                      @context,
+                      :context_assignment_submission_url,
+                      @assignment.id,
+                      "{{submissionId}}",
+                      download: "{{attachmentId}}"
+                    )
+                  end
+                %>
+                <a class="submission-file-download icon-download" title="<%= t("Download this file") %>" href="<%= download_url %>"></a>
                 <span class="turnitin_score_container"></span>
-                <a class="display_name no-hover" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submissionId}}", :download => "{{attachmentId}}", :inline => 1) %>" title="<%= t('titles.preview_file', "Preview this File") %>">???</a>
+                <% resource = anonymous_grading ?  :context_assignment_anonymous_submission_url : :context_assignment_submission_url %>
+                <a class="display_name no-hover" href="<%= context_url(@context, resource, @assignment.id, "{{submissionId}}", :download => "{{attachmentId}}", :inline => 1) %>" title="<%= t('titles.preview_file', "Preview this File") %>">???</a>
               </div>
             </div>
             <% if @assignment.assignment_configuration_tool_lookup_ids.present? %>

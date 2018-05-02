@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,16 +17,26 @@
 #
 
 module Submissions
-  class PreviewsController < PreviewsBaseController
-    def show
-      @submission_for_show = Submissions::SubmissionForShow.new(
-        assignment_id: params.fetch(:assignment_id),
-        context: @context,
-        id: params.fetch(:id),
-        preview: params.fetch(:preview, false),
-        version: params.fetch(:version, nil)
-      )
-      super
+  class AnonymousSubmissionForShow < AbstractSubmissionForShow
+    attr_reader :anonymous_id
+
+    def initialize(anonymous_id:, assignment_id:, context:, preview: false, version: nil)
+      super(assignment_id: assignment_id, context: context, preview: preview, version: version)
+      @anonymous_id = anonymous_id
+    end
+
+    def user
+      @user ||= root_submission.user
+    end
+
+    private
+
+    def root_submission
+      @root_submission ||= assignment.submissions.
+        except(:preload).
+        active.
+        preload(versioned? ? :versions : nil).
+        find_or_initialize_by(anonymous_id: anonymous_id)
     end
   end
 end

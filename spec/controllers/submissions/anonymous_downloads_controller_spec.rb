@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,41 +18,12 @@
 
 require 'spec_helper'
 
-describe Submissions::DownloadsController do
+describe Submissions::AnonymousDownloadsController do
   describe 'GET :show' do
     before do
       course_with_student_and_submitted_homework
       @context = @course
       user_session(@student)
-    end
-
-    context 'with user id not present in course' do
-      before do
-        @attachment = @submission.attachment = attachment_model(context: @context)
-        @submission.save!
-        course_with_student(active_all: true)
-        user_session(@student)
-      end
-
-      it 'should set flash error' do
-        get :show, params: {
-          course_id: @context.id,
-          assignment_id: @assignment.id,
-          id: @student.id,
-          download: @submission.attachment_id
-        }
-        expect(flash[:error]).not_to be_nil
-      end
-
-      it "should redirect to context assignment url" do
-        get :show, params: {
-          course_id: @context.id,
-          assignment_id: @assignment.id,
-          id: @student.id,
-          download: @submission.attachment_id
-        }
-        expect(response).to redirect_to(course_assignment_url(@context, @assignment))
-      end
     end
 
     context "when attachment belongs to submission" do
@@ -65,7 +36,7 @@ describe Submissions::DownloadsController do
         get :show, params: {
           course_id: @context.id,
           assignment_id: @assignment.id,
-          id: @student.id,
+          anonymous_id: @submission.anonymous_id,
           download: @submission.attachment_id
         }
         expect(assigns(:attachment)).to eq @attachment
@@ -81,7 +52,7 @@ describe Submissions::DownloadsController do
         get :show, params: {
           course_id: @context.id,
           assignment_id: @assignment.id,
-          id: @student.id,
+          anonymous_id: @submission.anonymous_id,
           download: @submission.attachment_id
         },
           format: :json
@@ -106,7 +77,7 @@ describe Submissions::DownloadsController do
       get :show, params: {
         course_id: @context.id,
         assignment_id: @assignment.id,
-        id: @student.id,
+        anonymous_id: @submission.anonymous_id,
         download: attachment.id
       }
       expect(assigns(:attachment)).not_to be_nil
@@ -119,7 +90,7 @@ describe Submissions::DownloadsController do
       get :show, params: {
         course_id: @context.id,
         assignment_id: @assignment.id,
-        id: @student.id,
+        anonymous_id: @submission.anonymous_id,
         download: @submission.attachments.first.id
       }
       expect(assigns(:attachment)).not_to be_nil
@@ -145,7 +116,7 @@ describe Submissions::DownloadsController do
         get :show, params: {
           course_id: @original_context.id,
           assignment_id: @assignment.id,
-          id: @original_student.id,
+          anonymous_id: @submission.anonymous_id,
           download: @attachment.id,
           comment_id: @submission_comment.id
         }
@@ -171,7 +142,7 @@ describe Submissions::DownloadsController do
         attachment_ids: att.id,
         attachments: [att],
         user: @student)
-      get :show, params: {assignment_id: assignment.id, course_id: @course.id, id: @user.id, download: att.id}
+      get :show, params: {assignment_id: assignment.id, course_id: @course.id, anonymous_id: @submission.anonymous_id, download: att.id}
 
       expect(response).to be_redirect
       expect(response.headers["Location"]).to match %r{users/#{@student.id}/files/#{att.id}/download\?download_frd=true}

@@ -88,12 +88,12 @@ require 'action_controller_test_process'
 #       }
 #     }
 #
-class SubmissionsController < ApplicationController
+class SubmissionsController < SubmissionsBaseController
   include Submissions::ShowHelper
+  include Api::V1::Submission
+
   before_action :get_course_from_section, :only => :create
   before_action :require_context
-
-  include Api::V1::Submission
 
   def index
     @assignment = @context.assignments.active.find(params[:assignment_id])
@@ -108,41 +108,21 @@ class SubmissionsController < ApplicationController
   end
 
   def show
+    @submission_for_show = Submissions::SubmissionForShow.new(
+      assignment_id: params.fetch(:assignment_id),
+      context: @context,
+      id: params.fetch(:id)
+    )
     begin
-      service = Submissions::SubmissionForShow.new(
-        @context, params.slice(:assignment_id, :id)
-      )
-      @assignment = service.assignment
-      @submission = service.submission
+      @assignment = @submission_for_show.assignment
+      @submission = @submission_for_show.submission
     rescue ActiveRecord::RecordNotFound
       return render_user_not_found
     end
 
     return render_unauthorized_action unless @submission.can_view_details?(@current_user)
 
-    @visible_rubric_assessments = @submission.visible_rubric_assessments_for(@current_user)
-    @assessment_request = @submission.assessment_requests.where(assessor_id: @current_user).first
-    if authorized_action(@submission, @current_user, :read)
-      if @submission&.user_id == @current_user.id
-        @submission&.mark_read(@current_user)
-      end
-      respond_to do |format|
-        @submission.limit_comments(@current_user, session)
-        format.html
-        format.json do
-          @submission.limit_comments(@current_user, session)
-          render :json => @submission.as_json(
-            Submission.json_serialization_full_parameters(
-              except: %i(quiz_submission submission_history)
-            ).merge(permissions: {
-              user: @current_user,
-              session: session,
-              include_permissions: false
-            })
-          )
-        end
-      end
-    end
+    super
   end
 
   API_SUBMISSION_TYPES = {

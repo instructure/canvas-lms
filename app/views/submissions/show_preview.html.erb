@@ -85,7 +85,26 @@
   </div>
   <div style="text-align: center;">
   <% if @submission.processed %>
-    <img src="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :download => image.id) %>" alt="<%= t('url_preview', 'URL Preview') %>"/>
+    <%
+      preview_url = if anonymous_grading
+        context_url(
+          @context,
+          :context_assignment_anonymous_submission_url,
+          @assignment.id,
+          @submission.anonymous_id,
+          download: image.id
+        )
+      else
+        context_url(
+          @context,
+          :context_assignment_submission_url,
+          @assignment.id,
+          @submission.user_id,
+          download: image.id
+        )
+      end
+    %>
+    <img src="<%= preview_url %>" alt="<%= t('URL Preview') %>"/>
   <% end %>
   </div>
 <% elsif @submission.submission_type == "online_text_entry" %>
@@ -113,7 +132,25 @@
       <div class="file-upload-submission">
 
         <div class="file-upload-submission-info">
-          <% preview_url = context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :download => attachment.id) %>
+          <%
+            preview_url = if anonymous_grading
+              context_url(
+                @context,
+                :context_assignment_anonymous_submission_url,
+                @assignment.id,
+                @submission.anonymous_id,
+                download: attachment.id
+              )
+            else
+              context_url(
+                @context,
+                :context_assignment_submission_url,
+                @assignment.id,
+                @submission.user_id,
+                download: attachment.id
+              )
+            end
+          %>
           <a href="<%= preview_url %>" class="<%= attachment.mime_class %> file-upload-submission-info__link">
             <%= attachment.display_name %>
           </a>

@@ -3356,7 +3356,6 @@ describe 'Submissions API', type: :request do
     @submission = Submission.first
 
     comment = @submission.submission_comments.first
-    expect(comment).to be_present
     expect(comment.comment).to eq "Why U no submit"
   end
 
@@ -3515,7 +3514,6 @@ describe 'Submissions API', type: :request do
             :assignment_id => @assignment.id.to_s, :user_id => s1.user_id.to_s },
           { :submission => { :posted_grade => '10' } })
     @submission = @assignment.submission_for_student(s1.user)
-    expect(@submission).to be_present
     expect(@submission.grade).to eq '10'
 
     # grading s2 will fail because the teacher can't manipulate this student's section
@@ -3618,9 +3616,8 @@ describe 'Submissions API', type: :request do
 
     it "works with section ids" do
       @section = @course.default_section
-      api_call(:post, "/api/v1/sections/#{@section.id}/assignments/#{@assignment.id}/submissions", { :controller => "submissions", :action => "create", :format => "json", :section_id => @section.id.to_s, :assignment_id => @assignment.id.to_s }, { :submission => { :submission_type => "online_url", :url => "www.example.com/a/b?q=1" } })
-      @submission = @assignment.submissions.where(user_id: @user).first
-      expect(@submission).to be_present
+      api_call(:post, "/api/v1/sections/#{@section.id}/assignments/#{@assignment.id}/submissions", { :controller => "submissions", :action => "create", :format => "json", :section_id => @section.id.to_s, :assignment_id => @assignment.id.to_s }, { :submission => { :submission_type => "online_url", :url => "www.example.com/a/b?q=1" }}, {}, expected_status: 201)
+      @submission = @assignment.submissions.find_by!(user: @user)
       expect(@submission.url).to eq 'http://www.example.com/a/b?q=1'
     end
 
@@ -3628,8 +3625,7 @@ describe 'Submissions API', type: :request do
       def do_submit(opts)
         json = api_call(:post, @url, @args, { :submission => opts })
         expect(response['Location']).to eq "http://www.example.com/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}"
-        @submission = @assignment.submissions.where(user_id: @user).first
-        expect(@submission).to be_present
+        @submission = @assignment.submissions.find_by!(user: @user)
         expect(json.slice('user_id', 'assignment_id', 'score', 'grade')).to eq({
           'user_id' => @user.id,
           'assignment_id' => @assignment.id,
@@ -3647,7 +3643,7 @@ describe 'Submissions API', type: :request do
 
       it "creates with an initial comment" do
         json = api_call(:post, @url, @args, { :comment => { :text_comment => "ohai teacher" }, :submission => { :submission_type => "online_url", :url => "http://www.example.com/a/b" } })
-        @submission = @assignment.submissions.where(user_id: @user).first
+        @submission = @assignment.submissions.where(user: @user).first
         expect(@submission.submission_comments.size).to eq 1
         expect(@submission.submission_comments.first.attributes.slice('author_id', 'comment')).to eq({
           'author_id' => @user.id,

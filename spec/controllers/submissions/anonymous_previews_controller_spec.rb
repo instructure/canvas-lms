@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,17 +16,19 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Submissions
-  class PreviewsController < PreviewsBaseController
-    def show
-      @submission_for_show = Submissions::SubmissionForShow.new(
-        assignment_id: params.fetch(:assignment_id),
-        context: @context,
-        id: params.fetch(:id),
-        preview: params.fetch(:preview, false),
-        version: params.fetch(:version, nil)
-      )
-      super
+require_relative '../../spec_helper'
+
+RSpec.describe Submissions::AnonymousPreviewsController do
+  describe 'GET :show' do
+    before do
+      course_with_student_and_submitted_homework
+      @context = @course
+      user_session(@student)
+    end
+
+    it "renders show_preview" do
+      get :show, params: {course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id, preview: true}
+      expect(response).to render_template(:show_preview)
     end
   end
 end

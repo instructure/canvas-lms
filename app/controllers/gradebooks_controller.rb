@@ -636,7 +636,9 @@ class GradebooksController < ApplicationController
         end
         append_sis_data(env)
         js_env(env)
-        render
+
+        anonymous_grading = @assignment.anonymous_grading? && @anonymous_moderated_marking_enabled
+        render :speed_grader, locals: { anonymous_grading: anonymous_grading }
       end
 
       format.json do

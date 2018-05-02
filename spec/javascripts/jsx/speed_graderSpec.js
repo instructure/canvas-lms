@@ -2167,7 +2167,7 @@ QUnit.module('SpeedGrader', function() {
         const {pathname, search} = new URL(iframeSrc, 'https://someUrl/')
         strictEqual(
           `${pathname}${search}`,
-          `/courses/${course_id}/assignments/${assignment_id}/submissions/${anonymous_id}?preview=true&hide_student_name=1`
+          `/courses/${course_id}/assignments/${assignment_id}/anonymous_submissions/${anonymous_id}?preview=true&hide_student_name=1`
         )
       })
     })

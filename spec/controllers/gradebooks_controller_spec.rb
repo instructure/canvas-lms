@@ -1476,6 +1476,12 @@ describe GradebooksController do
       user_session(@teacher)
     end
 
+    it 'renders speed_grader template with locals' do
+      @assignment.publish
+      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
+      expect(response).to render_template(:speed_grader, locals: { anonymous_grading: false })
+    end
+
     it "redirects the user if course's large_roster? setting is true" do
       allow_any_instance_of(Course).to receive(:large_roster?).and_return(true)
 

@@ -249,14 +249,29 @@ CanvasRails::Application.routes.draw do
     concerns :discussions
     resources :assignments do
       get 'moderate' => 'assignments#show_moderate'
+
+      get 'anonymous_submissions/:anonymous_id', to: 'submissions/anonymous_previews#show',
+        constraints: ->(request) do
+          request.query_parameters.key?(:preview) && request.format == :html
+        end
+
+      get 'anonymous_submissions/:anonymous_id', to: 'submissions/anonymous_downloads#show',
+        constraints: ->(request) do
+          request.query_parameters.key?(:download)
+        end
+
+      get 'anonymous_submissions/:anonymous_id', to: 'anonymous_submissions#show', as: :anonymous_submission
+
       get 'submissions/:id', to: 'submissions/previews#show',
         constraints: ->(request) do
           request.query_parameters.key?(:preview) && request.format == :html
         end
+
       get 'submissions/:id', to: 'submissions/downloads#show',
         constraints: ->(request) do
           request.query_parameters.key?(:download)
         end
+
       resources :submissions do
         get 'originality_report/:asset_string' => 'submissions#originality_report', as: :originality_report
         post 'turnitin/resubmit' => 'submissions#resubmit_to_turnitin', as: :resubmit_to_turnitin

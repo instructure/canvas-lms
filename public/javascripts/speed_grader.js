@@ -1814,7 +1814,7 @@ EG = {
       }
       var $submission_file = $submission_file_hidden.clone(true).fillTemplateData({
         data: {
-          submissionId: submission.user_id,
+          submissionId: submission[anonymizableUserId],
           attachmentId: attachment.id,
           display_name: attachment.display_name
         },
@@ -2086,12 +2086,13 @@ EG = {
     this.emptyIframeHolder()
     const {context_id: courseId} = jsonData
     const {assignment_id: assignmentId} = this.currentStudent.submission
-    const submissionId = this.currentStudent.submission[anonymizableUserId]
+    const anonymizableSubmissionId = this.currentStudent.submission[anonymizableUserId]
+    const resourceSegment = isAnonymous ? 'anonymous_submissions' : 'submissions'
     const iframePreviewVersion = SpeedgraderHelpers.iframePreviewVersion(this.currentStudent.submission)
     const hideStudentNames = utils.shouldHideStudentNames() ? "&hide_student_name=1" : ""
     const queryParams = `${iframePreviewVersion}${hideStudentNames}`
     const src =
-      `/courses/${courseId}/assignments/${assignmentId}/submissions/${submissionId}?preview=true${queryParams}`
+      `/courses/${courseId}/assignments/${assignmentId}/${resourceSegment}/${anonymizableSubmissionId}?preview=true${queryParams}`
     const iframe = SpeedgraderHelpers.buildIframe(htmlEscape(src), {frameborder: 0, allowfullscreen: true}, domElement)
     $iframe_holder.html($.raw(iframe)).show();
   },

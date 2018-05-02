@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,15 +17,18 @@
 #
 
 module Submissions
-  class PreviewsController < PreviewsBaseController
+  class AnonymousDownloadsController < DownloadsBaseController
     def show
-      @submission_for_show = Submissions::SubmissionForShow.new(
+      @submission_for_show = Submissions::AnonymousSubmissionForShow.new(
+        anonymous_id: params.fetch(:anonymous_id),
         assignment_id: params.fetch(:assignment_id),
         context: @context,
-        id: params.fetch(:id),
         preview: params.fetch(:preview, false),
         version: params.fetch(:version, nil)
       )
+      @submission = @submission_for_show.submission
+      @assignment = @submission_for_show.assignment
+
       super
     end
   end
