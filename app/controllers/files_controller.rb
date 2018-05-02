@@ -1116,13 +1116,15 @@ class FilesController < ApplicationController
     cancel_cache_buster
     # include authenticator fingerprint so we don't redirect to an
     # authenticated thumbnail url for the wrong user
-    url = Rails.cache.fetch(['thumbnail_url', params[:uuid], params[:size], file_authenticator.fingerprint].cache_key, :expires_in => 30.minutes) do
+    cache_key = ['thumbnail_url', params[:uuid], params[:size], file_authenticator.fingerprint].cache_key
+    url = Rails.cache.read(cache_key)
+    unless url
       attachment = Attachment.active.where(id: params[:id], uuid: params[:uuid]).first if params[:id].present?
       thumb_opts = params.slice(:size)
       url = authenticated_thumbnail_url(attachment, thumb_opts)
-      url ||= '/images/no_pic.gif'
-      url
+      Rails.cache.write(cache_key, url, :expires_in => 30.minutes) if url
     end
+    url ||= '/images/no_pic.gif'
     redirect_to url
   end
 
