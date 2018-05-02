@@ -38,6 +38,10 @@ export function setupAnonymizableUserId (isAnonymous) {
   return isAnonymous ? 'anonymous_id' : 'user_id'
 }
 
+export function setupAnonymizableAuthorId (isAnonymous) {
+  return isAnonymous ? 'anonymous_id' : 'author_id'
+}
+
   const speedgraderHelpers = {
     urlContainer: function(submission, defaultEl, originalityReportEl) {
       if (submission.has_originality_report) {
@@ -164,7 +168,8 @@ export function setupAnonymizableUserId (isAnonymous) {
     setupIsAnonymous,
     setupAnonymizableId,
     setupAnonymizableUserId,
-    setupAnonymizableStudentId
+    setupAnonymizableStudentId,
+    setupAnonymizableAuthorId
   }
 
 export default speedgraderHelpers

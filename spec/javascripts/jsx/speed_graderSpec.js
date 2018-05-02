@@ -425,15 +425,6 @@ test('renderComment should add the comment text to the delete link for screenrea
   equal(deleteLinkScreenreaderText, 'Delete comment: test');
 });
 
-test('renderComment should add the comment text to the submit link for draft comments', () => {
-  const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[0];
-  commentToRender.draft = true;
-  const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions);
-  const submitLinkScreenreaderText = renderedComment.find('.submit_comment_button').attr('aria-label');
-
-  equal(submitLinkScreenreaderText, 'Submit comment: test');
-});
-
 QUnit.module('SpeedGrader#showGrade', {
   setup () {
     fakeENV.setup();
@@ -651,27 +642,6 @@ test('unexcuses the submission if the grade is blank and the assignment is compl
   SpeedgraderHelpers.determineGradeToSubmit.restore();
   SpeedGrader.EG.handleFragmentChanged.restore()
 });
-
-QUnit.module('loading a submission Preview', {
-  setup() {
-    fakeENV.setup();
-    this.stub($, 'ajaxJSON');
-    fixtures.innerHTML = `
-      <span id="speedgrader-settings"></span>
-      <div id="iframe_holder">not empty</div>
-    `
-  },
-
-  teardown() {
-    fakeENV.teardown();
-    fixtures.innerHTML = ''
-  }
-});
-
-test('entry point function, loadSubmissionPreview, is a function', () => {
-  // FIXME: loadSubmissionPreview needs a behavioral test
-  ok(typeof SpeedGrader.EG.loadSubmissionPreview === 'function');
-})
 
 QUnit.module('attachmentIframeContents', {
   setup () {
@@ -1500,6 +1470,11 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       submission_history: [],
     }
     const enrollment = { user_id: student.id, course_section_id: '1'}
+    const submissionComment = {
+      created_at: (new Date).toISOString(),
+      comment: 'a comment',
+      author_id: 1
+    }
     const submission = {
       id: '3',
       user_id: '1',
@@ -1507,7 +1482,8 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       workflow_state: 'active',
       submitted_at: (new Date).toISOString(),
       grade: 'A',
-      assignment_id: '456'
+      assignment_id: '456',
+      submission_comments: [submissionComment]
     }
     const windowJsonData = {
       ...assignment,
@@ -1566,6 +1542,41 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         `/courses/${course_id}/assignments/${assignment_id}/submissions/${user_id}?preview=true`
       )
     })
+
+    const commentBlankHtml = `
+      <div class="comment">
+        <span class="comment"></span>
+        <button class="submit_comment_button">
+          <span>Submit</span>
+        </button>
+        <a class="delete_comment_link icon-x">
+          <span class="screenreader-only">Delete comment</span>
+        </a>
+        <div class="comment_attachments"></div>
+      </div>
+    `;
+
+    const commentAttachmentBlank = `
+      <div class="comment_attachment">
+        <a href="example.com/{{ submitter_id }}/{{ id }}/{{ comment_id }}"><span class="display_name">&nbsp;</span></a>
+      </div>
+    `;
+
+    commentRenderingOptions = { commentBlank: $(commentBlankHtml), commentAttachmentBlank: $(commentAttachmentBlank) };
+
+    test('renderComment adds the comment text to the submit link for draft comments', () => {
+      fakeENV.setup({
+        ...ENV,
+        current_user_id: '1',
+        RUBRIC_ASSESSMENT: {}
+      })
+      const commentToRender = {...submissionComment}
+      commentToRender.draft = true
+      const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions)
+      const submitLinkScreenreaderText = renderedComment.find('.submit_comment_button').attr('aria-label')
+
+      equal(submitLinkScreenreaderText, 'Submit comment: a comment')
+    })
   })
 
   QUnit.module('Anonymous Assignments', anonymousHooks => {
@@ -1584,6 +1595,11 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     const unsortedPair = [omegaStudent, alphaStudent]
     const alphaEnrollment = {...alpha, course_section_id: '1'}
     const omegaEnrollment = {...omega, course_section_id: '1'}
+    const alphaSubmissionComment = {
+      created_at: (new Date).toISOString(),
+      comment: 'a comment',
+      ...alpha
+    };
     const alphaSubmission = {
       ...alpha,
       grade_matches_current_submission: true,
@@ -1598,7 +1614,8 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
           display_name: 'submission.txt'
 
         }
-      }]
+      }],
+      submission_comments: [alphaSubmissionComment]
     }
     alphaSubmission.submission_history = [{...alphaSubmission}]
     const omegaSubmission = {
@@ -1627,6 +1644,67 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     anonymousHooks.afterEach(() => {
       window.location.hash = ''
       window.jsonData = originalJsonData
+    })
+
+    QUnit.module('renderComment', hooks => {
+      hooks.beforeEach(() => {
+        fakeENV.setup({
+          ...ENV,
+          assignment_id: '17',
+          course_id: '29',
+          grading_role: 'moderator',
+          help_url: 'example.com/support',
+          show_help_menu_item: false,
+          RUBRIC_ASSESSMENT: {}
+        })
+
+        fixtures.innerHTML = `
+          <span id="speedgrader-settings"></span>
+        `
+        SpeedGrader.setup()
+        window.jsonData = windowJsonData
+        SpeedGrader.EG.jsonReady()
+        setupCurrentStudent()
+      })
+
+      hooks.afterEach(() => {
+        fixtures.innerHTML = ''
+        fakeENV.teardown()
+        window.jsonData = originalJsonData
+        delete SpeedGrader.EG.currentStudent
+        teardownHandleFragmentChanged()
+        window.location.hash = ''
+      })
+
+      const commentBlankHtml = `
+        <div class="comment">
+          <span class="comment"></span>
+          <button class="submit_comment_button">
+            <span>Submit</span>
+          </button>
+          <a class="delete_comment_link icon-x">
+            <span class="screenreader-only">Delete comment</span>
+          </a>
+          <div class="comment_attachments"></div>
+        </div>
+      `;
+
+      const commentAttachmentBlank = `
+        <div class="comment_attachment">
+          <a href="example.com/{{ submitter_id }}/{{ id }}/{{ comment_id }}"><span class="display_name">&nbsp;</span></a>
+        </div>
+      `;
+
+      commentRenderingOptions = { commentBlank: $(commentBlankHtml), commentAttachmentBlank: $(commentAttachmentBlank) };
+
+      test('renderComment add the comment text to the submit link for draft comments', () => {
+        const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[0];
+        commentToRender.draft = true;
+        const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions);
+        const submitLinkScreenreaderText = renderedComment.find('.submit_comment_button').attr('aria-label');
+
+        equal(submitLinkScreenreaderText, 'Submit comment: a comment');
+      });
     })
 
     QUnit.module('#jsonReady', contextHooks => {
@@ -2248,19 +2326,20 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         window.location.hash = ''
       })
 
-      test('calls ajaxJSON with submission url with anonymous id', () => {
-        $.ajaxJSON.restore()
-        sinon.stub($, 'ajaxJSON')
+      test('calls ajaxJSON with anonymous submission url with anonymous id', () => {
         SpeedGrader.EG.addSubmissionComment('draft comment')
-        const [url] = $.ajaxJSON.firstCall.args
-        deepEqual(url, `${assignmentURL}/submissions/${alphaStudent.anonymous_id}`)
+        const addSubmissionCommentAjaxJSON = $.ajaxJSON.getCalls().find(call =>
+          call.args[0] === `${assignmentURL}/anonymous_submissions/${alphaStudent.anonymous_id}`
+        )
+        notStrictEqual(addSubmissionCommentAjaxJSON, undefined)
       })
 
       test('calls ajaxJSON with with anonymous id in data', () => {
-        $.ajaxJSON.restore()
-        sinon.stub($, 'ajaxJSON')
         SpeedGrader.EG.addSubmissionComment('draft comment')
-        const [,,formData] = $.ajaxJSON.firstCall.args
+        const addSubmissionCommentAjaxJSON = $.ajaxJSON.getCalls().find(call =>
+          call.args[0] === `${assignmentURL}/anonymous_submissions/${alphaStudent.anonymous_id}`
+        )
+        const [,,formData] = addSubmissionCommentAjaxJSON.args
         strictEqual(formData['submission[anonymous_id]'], alphaStudent.anonymous_id)
       })
 
@@ -2683,7 +2762,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     let submission
 
     hooks.beforeEach(() => {
-
       fixtures.innerHTML = `
         <span id="speedgrader-settings"></span>
         <div id='grading_details_mount_point'></div>
@@ -2895,7 +2973,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     let submission
 
     hooks.beforeEach(() => {
-
       fixtures.innerHTML = `
         <span id="speedgrader-settings"></span>
         <div id='grading_details_mount_point'></div>
@@ -3018,11 +3095,11 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     })
 
     test('includes the value of ENV.provisional_select_url and provisionalGradeId in the URL', () => {
-      $.ajaxJSON.restore()
-      sinon.stub($, 'ajaxJSON')
       EG.submitSelectedProvisionalGrade(123)
-      const [url] = $.ajaxJSON.firstCall.args
-      strictEqual(url, 'provisional_select_url?123')
+      const addSubmissionCommentAjaxJSON = $.ajaxJSON.getCalls().find(call =>
+        call.args[0] === 'provisional_select_url?123'
+      )
+      notStrictEqual(addSubmissionCommentAjaxJSON, undefined)
     })
 
     QUnit.module('when the request completes successfully', () => {
@@ -3050,6 +3127,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
           <input type='text' id='grading-box-extended' />
         </div>
       `
+
       SpeedGrader.setup()
 
       sinon.stub(EG, 'submitSelectedProvisionalGrade')

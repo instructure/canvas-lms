@@ -19,7 +19,10 @@
 import fakeENV from 'helpers/fakeENV'
 import SpeedgraderHelpers, {
   setupIsAnonymous,
-  setupAnonymizableId
+  setupAnonymizableId,
+  setupAnonymizableUserId,
+  setupAnonymizableStudentId,
+  setupAnonymizableAuthorId
 } from 'speed_grader_helpers'
 
 QUnit.module('SpeedGrader', {
@@ -41,6 +44,18 @@ test('setupIsAnonymous is available on main object', () => {
 
 test('setupAnonymizableId is available on main object', () => {
   strictEqual(SpeedgraderHelpers.setupAnonymizableId, setupAnonymizableId)
+})
+
+test('setupAnonymizableUserId is available on main object', () => {
+  strictEqual(SpeedgraderHelpers.setupAnonymizableUserId, setupAnonymizableUserId)
+})
+
+test('setupAnonymizableStudentId is available on main object', () => {
+  strictEqual(SpeedgraderHelpers.setupAnonymizableStudentId, setupAnonymizableStudentId)
+})
+
+test('setupAnonymizableAuthorId is available on main object', () => {
+  strictEqual(SpeedgraderHelpers.setupAnonymizableAuthorId, setupAnonymizableAuthorId)
 })
 
 test('populateTurnitin sets correct URL for OriginalityReports', () => {
@@ -443,6 +458,7 @@ QUnit.module('SpeedgraderHelpers.setupIsAnonymous', suiteHooks => {
 
   test('returns true when assignment is anonymously graded', () => {
     strictEqual(setupIsAnonymous({anonymous_grading: true}), true)
+    fakeENV.teardown()
   })
 
   test('returns false when assignment is not anonymously graded', () => {
@@ -450,16 +466,42 @@ QUnit.module('SpeedgraderHelpers.setupIsAnonymous', suiteHooks => {
   })
 })
 
-QUnit.module('SpeedgraderHelpers.setupAnonymizableId', suiteHooks => {
-  suiteHooks.afterEach(() => {
-    fakeENV.teardown()
-  })
-
+QUnit.module('SpeedgraderHelpers.setupAnonymizableId', () => {
   test('returns anonymizable_id when anonymous', () => {
     strictEqual(setupAnonymizableId(true), 'anonymous_id')
   })
 
   test('returns id when anonymous', () => {
     strictEqual(setupAnonymizableId(false), 'id')
+  })
+})
+
+QUnit.module('SpeedgraderHelpers.setupAnonymizableUserId', () => {
+  test('returns anonymizable_id when anonymous', () => {
+    strictEqual(setupAnonymizableUserId(true), 'anonymous_id')
+  })
+
+  test('returns user_id when not anonymous', () => {
+    strictEqual(setupAnonymizableUserId(false), 'user_id')
+  })
+})
+
+QUnit.module('SpeedgraderHelpers.setupAnonymizableStudentId', () => {
+  test('returns anonymizable_id when anonymous', () => {
+    strictEqual(setupAnonymizableStudentId(true), 'anonymous_id')
+  })
+
+  test('returns student_id when not anonymous', () => {
+    strictEqual(setupAnonymizableStudentId(false), 'student_id')
+  })
+})
+
+QUnit.module('SpeedgraderHelpers.setupAnonymizableAuthorId', () => {
+  test('returns anonymizable_id when anonymous', () => {
+    strictEqual(setupAnonymizableAuthorId(true), 'anonymous_id')
+  })
+
+  test('returns author_id when not anonymous', () => {
+    strictEqual(setupAnonymizableAuthorId(false), 'author_id')
   })
 })

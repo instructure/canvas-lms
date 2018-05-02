@@ -48,6 +48,7 @@ import SpeedgraderHelpers, {
   setupAnonymizableId,
   setupAnonymizableStudentId,
   setupAnonymizableUserId,
+  setupAnonymizableAuthorId,
   setupIsAnonymous
 } from './speed_grader_helpers';
 import turnitinInfoTemplate from 'jst/_turnitinInfo';
@@ -81,6 +82,7 @@ let isAnonymous
 let anonymizableId
 let anonymizableUserId
 let anonymizableStudentId
+let anonymizableAuthorId
 
 let $window
 let $full_width_container
@@ -221,9 +223,7 @@ utils = {
     // this is for backwards compatability, we used to store the value as
     // strings "true" or "false", but now we store boolean true/false values.
     var settingVal = userSettings.get("eg_hide_student_names");
-    return settingVal === true ||
-      settingVal === "true" ||
-      ENV.force_anonymous_grading
+    return settingVal === true || settingVal === "true" || ENV.force_anonymous_grading
   }
 };
 
@@ -1134,6 +1134,7 @@ EG = {
     anonymizableId = setupAnonymizableId(isAnonymous)
     anonymizableUserId = setupAnonymizableUserId(isAnonymous)
     anonymizableStudentId = setupAnonymizableStudentId(isAnonymous)
+    anonymizableAuthorId = setupAnonymizableAuthorId(isAnonymous)
 
     mergeStudentsAndSubmission();
     if (jsonData.GROUP_GRADING_MODE && !jsonData.studentsWithSubmissions.length) {
@@ -2177,8 +2178,10 @@ EG = {
     // assignment (I am administrator in the course) or if I wrote
     // this comment... and if the student isn't concluded
     const isConcluded = EG.isStudentConcluded(EG.currentStudent[anonymizableId]);
-    var commentIsDeleteableByMe = (ENV.RUBRIC_ASSESSMENT.assessment_type === 'grading' ||
-                                   ENV.RUBRIC_ASSESSMENT.assessor_id === comment.author_id) && !isConcluded;
+    const commentIsDeleteableByMe = (
+      ENV.RUBRIC_ASSESSMENT.assessment_type === 'grading' ||
+      ENV.RUBRIC_ASSESSMENT.assessor_id === comment[anonymizableAuthorId]
+    ) && !isConcluded;
 
     commentElement.find('.delete_comment_link').click(function (_event) {
       $(this).parents('.comment').confirmDelete({
@@ -2219,7 +2222,7 @@ EG = {
     // this comment... and if the student isn't concluded
     const isConcluded = EG.isStudentConcluded(EG.currentStudent[anonymizableId]);
     var commentIsPublishableByMe = comment.draft &&
-        (comment.author_id.toString() === ENV.current_user_id) && !isConcluded;
+        (comment.author_id && comment.author_id.toString() === ENV.current_user_id) && !isConcluded;
 
     commentElement.find('.submit_comment_button').click(function (_event) {
       var updateUrl = '';
@@ -2285,7 +2288,7 @@ EG = {
 
     comment.posted_at = $.datetimeString(comment.created_at);
 
-    hideStudentName = opts.hideStudentNames && window.jsonData.studentMap[comment.author_id];
+    hideStudentName = opts.hideStudentNames && window.jsonData.studentMap[comment[anonymizableAuthorId]];
     if (hideStudentName) { comment.author_name = I18n.t('Student'); }
     commentElement = commentElement.fillTemplateData({ data: comment });
 
@@ -2386,7 +2389,7 @@ EG = {
       // that means that they did not type a comment, attach a file or record any media. so dont do anything.
       return false;
     }
-    const url = `${assignmentUrl}/submissions/${EG.currentStudent[anonymizableId]}`
+    const url = `${assignmentUrl}/${isAnonymous ? 'anonymous_' : ''}submissions/${EG.currentStudent[anonymizableId]}`
     var method = "PUT";
     var formData = {
       'submission[assignment_id]': jsonData.id,
