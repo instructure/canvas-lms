@@ -52,7 +52,7 @@ export default class DiscussionManageMenu extends Component {
 
   render () {
     return (
-      <span className="ic-item-row__manage-menu">
+      <span className="discussions-index-manage-menu">
         <PopoverMenu
           ref={this.props.menuRefFn}
           onSelect={this.props.onSelect}

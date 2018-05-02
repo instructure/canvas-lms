@@ -598,7 +598,7 @@ export class DiscussionRow extends Component {
     const actionsContent = [this.readCount(), this.publishButton(), this.subscribeButton()]
     return (
       <div>
-        <div className="ic-item-row__meta-actions">
+        <div>
           {maybeRenderMasteryPathsPill}
           {maybeRenderMasteryPathsLink}
           {maybeRenderPeerReviewIcon}

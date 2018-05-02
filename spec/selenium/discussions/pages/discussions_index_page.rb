@@ -109,7 +109,7 @@ class DiscussionsIndex
 
     # ---------------------- Discussion Menu ----------------------
     def discussion_menu(title)
-      f('.ic-item-row__manage-menu button', discussion(title))
+      f('.discussions-index-manage-menu button', discussion(title))
     end
 
     def discussion_settings_button
