@@ -199,8 +199,7 @@ export default class SubmissionTray extends React.Component {
 
   renderSpeedGraderLink (speedGraderProps) {
     const buttonProps = { variant: 'link', href: speedGraderProps.speedGraderUrl }
-
-    if (speedGraderProps.anonymousGrading) {
+    if (this.props.anonymousModeratedMarkingEnabled && speedGraderProps.anonymousGrading) {
       buttonProps.onClick = (e) => {
         e.preventDefault();
         this.props.onAnonymousSpeedGraderClick(speedGraderProps.speedGraderUrl);

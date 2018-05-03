@@ -201,6 +201,25 @@ QUnit.module('SubmissionTray', function (hooks) {
     strictEqual(speedGraderLink, speedGraderUrl);
   });
 
+  test('invokes "onAnonymousSpeedGraderClick" when the SpeedGrader link is clicked ' +
+  'if the assignment is anonymous and Anonymous Moderated Marking is enabled', function () {
+    const props = {
+      anonymousModeratedMarkingEnabled: true,
+      assignment: {
+        name: 'Book Report',
+        gradingType: 'points',
+        htmlUrl: 'http://htmlUrl/',
+        anonymousGrading: true,
+        muted: false,
+        published: true
+      },
+      onAnonymousSpeedGraderClick: sinon.stub()
+    }
+    mountComponent(props)
+    document.querySelector('.SubmissionTray__Container a[href*="speed_grader"]').click()
+    strictEqual(props.onAnonymousSpeedGraderClick.callCount, 1)
+  })
+
   test('omits student_id from SpeedGrader link if enabled and assignment is ' +
   'anonymously graded and anonymous moderated marking is enabled', function() {
     mountComponent({anonymousModeratedMarkingEnabled: true, assignment: {anonymousGrading: true}});
