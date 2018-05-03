@@ -50,7 +50,7 @@
       padding: 4px;
       @include fontSize(11px);
       min-height: 21px;
-      box-shadow: inset 33px 0 0 #F7F7F7, inset 34px 0 0 #CCC;
+      box-shadow: inset (33px * direction-rtl(-1, 1)) 0 0 #F7F7F7, inset (34px * direction-rtl(-1, 1)) 0 0 #CCC;
       div {
         margin: direction-sides(2px 0 0 33px);
       }
@@ -68,7 +68,6 @@
         position: absolute;
         margin: -4px;
         width: 33px;
-        #{direction(right)}: 4px;
       }
       &.existing-user::before {
         background-image: url(/images/circle-check.png);
