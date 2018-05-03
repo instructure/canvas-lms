@@ -317,6 +317,8 @@ define [
         for assignment in group.assignments
           assignment.assignment_group = group
           assignment.due_at = tz.parse(assignment.due_at)
+          if @options.anonymous_moderated_marking_enabled
+            assignment.moderation_in_progress = assignment.moderated_grading and !assignment.grades_published
           @updateAssignmentEffectiveDueDates(assignment)
           @assignments[assignment.id] = assignment
 
@@ -1301,8 +1303,7 @@ define [
       columns = []
 
       for column in @allAssignmentColumns
-        if @disabledAssignments && @disabledAssignments.indexOf(column.object.id) != -1
-          column.cssClass = "cannot_edit"
+        column.cssClass = "cannot_edit" if column.object.moderation_in_progress
         submissionType = ''+ column.object.submission_types
         columns.push(column) unless submissionType is "not_graded" or
                                 submissionType is "attendance" and not @show_attendance

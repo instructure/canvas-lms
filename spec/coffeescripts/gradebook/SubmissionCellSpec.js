@@ -547,3 +547,33 @@ test('#loadValue sets the value to grade when entered_grade is not available', f
   this.cell.loadValue()
   strictEqual(this.cell.val, 'complete')
 })
+
+QUnit.module('SubmissionCell#classesBasedOnSubmission', () => {
+  test('returns anonymous when moderation_in_progress is set on the assignment', () => {
+    const assignment = {moderation_in_progress: true}
+    strictEqual(SubmissionCell.classesBasedOnSubmission({}, assignment).includes('anonymous'), true)
+  })
+
+  test('returns muted when muted is set on the assignment', () => {
+    const assignment = {muted: true}
+    strictEqual(SubmissionCell.classesBasedOnSubmission({}, assignment).includes('muted'), true)
+  })
+
+  test('returns anonymous when muted and moderation_in_progress are set on the assignment', () => {
+    const assignment = {moderation_in_progress: true, muted: true}
+    strictEqual(SubmissionCell.classesBasedOnSubmission({}, assignment).includes('anonymous'), true)
+  })
+
+  test('does not return muted when muted and moderation_in_progress are set on the assignment', () => {
+    const assignment = {moderation_in_progress: true, muted: true}
+    strictEqual(SubmissionCell.classesBasedOnSubmission({}, assignment).includes('muted'), false)
+  })
+
+  test('does not return muted if it is not set on the assignment', () => {
+    strictEqual(SubmissionCell.classesBasedOnSubmission({}, {}).includes('muted'), false)
+  })
+
+  test('does not return anonymous if moderation_in_progress is not set on the assignment', function() {
+    strictEqual(SubmissionCell.classesBasedOnSubmission({}, {}).includes('anonymous'), false)
+  })
+})

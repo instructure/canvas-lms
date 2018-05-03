@@ -250,6 +250,53 @@ describe Submission do
             expect(@submission.grants_right?(@student, :grade)).to eq(false)
           end
         end
+
+        context 'when part of a moderated assignment' do
+          before(:once) do
+            @assignment.update!(
+              moderated_grading: true,
+              grader_count: 2
+            )
+            submission_spec_model(assignment: @assignment)
+          end
+
+          context 'with Anonymous Moderated Marking enabled' do
+            before(:once) do
+              @assignment.root_account.enable_feature!(:anonymous_moderated_marking)
+              @submission.assignment.reload
+            end
+
+            it 'may not be graded if grades are not published' do
+              expect(@submission.grants_right?(@teacher, :grade)).to eq false
+            end
+
+            it 'sets an error message indicating moderation is in progress if grades are not published' do
+              @submission.grants_right?(@teacher, :grade)
+              expect(@submission.grading_error_message).to eq 'This assignment is currently being moderated'
+            end
+
+            it 'may be graded if grades are not published but grade_posting_in_progress is true' do
+              @submission.grade_posting_in_progress = true
+              expect(@submission.grants_right?(@teacher, :grade)).to eq true
+            end
+
+            it 'may be graded when grades for the assignment are published' do
+              @submission.assignment.update!(grades_published_at: Time.zone.now)
+              expect(@submission.grants_right?(@teacher, :grade)).to eq true
+            end
+          end
+
+          context 'with Anonymous Moderated Marking disabled' do
+            it 'may be graded when grades for the assignment are not published' do
+              expect(@submission.grants_right?(@teacher, :grade)).to eq true
+            end
+
+            it 'may be graded when grades for the assignment are published' do
+              @submission.assignment.update!(grades_published_at: Time.zone.now)
+              expect(@submission.grants_right?(@teacher, :grade)).to eq true
+            end
+          end
+        end
       end
     end
   end
