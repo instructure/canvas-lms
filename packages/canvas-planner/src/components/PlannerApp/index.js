@@ -161,7 +161,7 @@ export class PlannerApp extends Component {
 
   renderLoadPastButton () {
     if (this.props.allPastItemsLoaded) return;
-    return (
+    return <Container as="div" textAlign="center">
       <ShowOnFocusButton
         buttonProps={{
           onClick: this.props.loadPastButtonClicked
@@ -169,7 +169,7 @@ export class PlannerApp extends Component {
         >
           {formatMessage('Load prior dates')}
       </ShowOnFocusButton>
-    );
+    </Container>;
   }
 
   renderNoAssignments() {

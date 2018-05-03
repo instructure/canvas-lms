@@ -4,16 +4,22 @@ exports[`renders base component using dayKeys 1`] = `
 <div
   className="PlannerApp large"
 >
-  <ShowOnFocusButton
-    buttonProps={
-      Object {
-        "onClick": undefined,
-      }
-    }
-    buttonRef={[Function]}
+  <Container
+    as="div"
+    display={null}
+    textAlign="center"
   >
-    Load prior dates
-  </ShowOnFocusButton>
+    <ShowOnFocusButton
+      buttonProps={
+        Object {
+          "onClick": undefined,
+        }
+      }
+      buttonRef={[Function]}
+    >
+      Load prior dates
+    </ShowOnFocusButton>
+  </Container>
   <LoadingPastIndicator
     allPastItemsLoaded={false}
     loadingPast={false}
@@ -70,16 +76,22 @@ exports[`renders empty component with no assignments 1`] = `
 <div
   className="PlannerApp large"
 >
-  <ShowOnFocusButton
-    buttonProps={
-      Object {
-        "onClick": undefined,
-      }
-    }
-    buttonRef={[Function]}
+  <Container
+    as="div"
+    display={null}
+    textAlign="center"
   >
-    Load prior dates
-  </ShowOnFocusButton>
+    <ShowOnFocusButton
+      buttonProps={
+        Object {
+          "onClick": undefined,
+        }
+      }
+      buttonRef={[Function]}
+    >
+      Load prior dates
+    </ShowOnFocusButton>
+  </Container>
   <PlannerEmptyState
     changeToDashboardCardView={[Function]}
   />
@@ -99,16 +111,22 @@ exports[`renders loading past spinner when loading past and there are no future 
   >
     New Activity
   </StickyButton>
-  <ShowOnFocusButton
-    buttonProps={
-      Object {
-        "onClick": undefined,
-      }
-    }
-    buttonRef={[Function]}
+  <Container
+    as="div"
+    display={null}
+    textAlign="center"
   >
-    Load prior dates
-  </ShowOnFocusButton>
+    <ShowOnFocusButton
+      buttonProps={
+        Object {
+          "onClick": undefined,
+        }
+      }
+      buttonRef={[Function]}
+    >
+      Load prior dates
+    </ShowOnFocusButton>
+  </Container>
   <LoadingPastIndicator
     allPastItemsLoaded={false}
     loadingPast={true}
@@ -132,16 +150,22 @@ exports[`shows new activity button when new activity is indicated 1`] = `
   >
     New Activity
   </StickyButton>
-  <ShowOnFocusButton
-    buttonProps={
-      Object {
-        "onClick": undefined,
-      }
-    }
-    buttonRef={[Function]}
+  <Container
+    as="div"
+    display={null}
+    textAlign="center"
   >
-    Load prior dates
-  </ShowOnFocusButton>
+    <ShowOnFocusButton
+      buttonProps={
+        Object {
+          "onClick": undefined,
+        }
+      }
+      buttonRef={[Function]}
+    >
+      Load prior dates
+    </ShowOnFocusButton>
+  </Container>
   <LoadingPastIndicator
     allPastItemsLoaded={false}
     loadingPast={false}
@@ -198,16 +222,22 @@ exports[`shows only the loading component when the isLoading prop is true 1`] = 
 <div
   className="PlannerApp large"
 >
-  <ShowOnFocusButton
-    buttonProps={
-      Object {
-        "onClick": undefined,
-      }
-    }
-    buttonRef={[Function]}
+  <Container
+    as="div"
+    display={null}
+    textAlign="center"
   >
-    Load prior dates
-  </ShowOnFocusButton>
+    <ShowOnFocusButton
+      buttonProps={
+        Object {
+          "onClick": undefined,
+        }
+      }
+      buttonRef={[Function]}
+    >
+      Load prior dates
+    </ShowOnFocusButton>
+  </Container>
   <LoadingPastIndicator
     allPastItemsLoaded={false}
     loadingPast={false}
@@ -233,16 +263,22 @@ exports[`shows the loading past indicator when loadingPast prop is true 1`] = `
 <div
   className="PlannerApp large"
 >
-  <ShowOnFocusButton
-    buttonProps={
-      Object {
-        "onClick": undefined,
-      }
-    }
-    buttonRef={[Function]}
+  <Container
+    as="div"
+    display={null}
+    textAlign="center"
   >
-    Load prior dates
-  </ShowOnFocusButton>
+    <ShowOnFocusButton
+      buttonProps={
+        Object {
+          "onClick": undefined,
+        }
+      }
+      buttonRef={[Function]}
+    >
+      Load prior dates
+    </ShowOnFocusButton>
+  </Container>
   <LoadingPastIndicator
     allPastItemsLoaded={false}
     loadingPast={true}
