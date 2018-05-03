@@ -19,7 +19,7 @@ import React, { Component } from 'react';
 import themeable from '@instructure/ui-themeable/lib';
 import {animatable} from '../../dynamic-ui';
 import {specialFallbackFocusId} from '../../dynamic-ui/util';
-import scopeTab from '@instructure/ui-utils/lib/dom/scopeTab';
+import scopeTab from '@instructure/ui-a11y/lib/utils/scopeTab';
 import keycode from 'keycode';
 
 import Opportunity from '../Opportunity';
