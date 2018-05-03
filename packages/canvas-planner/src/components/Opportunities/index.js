@@ -123,11 +123,13 @@ export class Opportunities extends Component {
             title={formatMessage('Close opportunities popover')}
             ref={(btnRef) =>{this.closeButton = btnRef;}}
             onClick={this.props.togglePopover}
-            >
-            <IconXLine className={styles.closeButtonIcon} />
-            <span className={styles.closeButtonText}>
-              {formatMessage('Close')}
-            </span>
+          >
+            <div className={styles.closeButtonContainer}>
+              <span className={styles.closeButtonText}>
+                {formatMessage('Close')}
+              </span>
+              <IconXLine className={styles.closeButtonIcon} />
+            </div>
           </Button>
         </div>
         <ol className={styles.list}>

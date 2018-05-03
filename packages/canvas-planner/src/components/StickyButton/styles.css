@@ -30,6 +30,7 @@
     border: var(--focusRingWidth) solid var(--focusRingColor);
     position: absolute;
     top: -0.25rem;
+    /* the placement and radii are symetrical, so no need to replace left/right with start/end */
     left: -0.25rem;
     border-bottom-left-radius: var(--borderRadius);
     border-bottom-right-radius: var(--borderRadius);
@@ -64,7 +65,7 @@
 .icon {
   display: block;
   font-size: 0.75rem;
-  margin-left: var(--iconMargin);
+  margin-inline-start: var(--iconMargin);
   transform: translate3d(0, -0.0625rem, 0);
   transition: all 0.2s;
 }
@@ -72,7 +73,7 @@
 .direction--up,
 .direction--down {
   .layout {
-    padding-right: var(--hasIconRightPadding);
+    padding-inline-end: var(--hasIconRightPadding);
   }
 }
 
