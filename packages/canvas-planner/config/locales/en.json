@@ -2,6 +2,9 @@
   "add_to_do_7def3c37": {
     "message": "Add To Do"
   },
+  "all_day_fb42c4fc": {
+    "message": "All Day"
+  },
   "all_items_loaded_aa256183": {
     "message": "All items loaded"
   },
@@ -68,6 +71,9 @@
   "edit_title_72e5a21e": {
     "message": "Edit { title }"
   },
+  "error_loading_grades_e0b38f4d": {
+    "message": "Error loading grades"
+  },
   "error_loading_more_items_3f109d9f": {
     "message": "Error loading more items"
   },
@@ -98,6 +104,12 @@
   "graded_25cd3fcd": {
     "message": "Graded"
   },
+  "grades_are_loading_c899652d": {
+    "message": "Grades are loading"
+  },
+  "grades_loaded_5056277c": {
+    "message": "Grades Loaded"
+  },
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
   },
@@ -119,6 +131,9 @@
   "loading_725811ca": {
     "message": "loading"
   },
+  "loading_grades_c842c887": {
+    "message": "Loading Grades"
+  },
   "loading_past_items_ca499e75": {
     "message": "Loading past items"
   },
@@ -134,6 +149,9 @@
   "missing_items_for_title_516511f8": {
     "message": "Missing items for { title }"
   },
+  "my_grades_98834476": {
+    "message": "My Grades"
+  },
   "new_activity_8b84847d": {
     "message": "New Activity"
   },
@@ -146,11 +164,17 @@
   "no_due_dates_assigned_e8f5bac8": {
     "message": "No Due Dates Assigned"
   },
+  "no_grade_3b4d7f3e": {
+    "message": "No Grade"
+  },
   "no_to_do_s_for_this_day_yet_90c5873d": {
     "message": "No \"To-Do''s\" for this day yet."
   },
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Nothing new needs attention."
+  },
+  "only_most_recent_grading_period_shown_f1ad6458": {
+    "message": "*Only most recent grading period shown."
   },
   "optional_add_course_ef0d70fc": {
     "message": "Optional: Add Course"
@@ -172,6 +196,9 @@
   },
   "save_11a80ec3": {
     "message": "Save"
+  },
+  "show_my_grades_ebd08684": {
+    "message": "Show My Grades"
   },
   "submitted_318fad53": {
     "message": "Submitted"
