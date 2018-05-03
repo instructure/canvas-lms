@@ -307,11 +307,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
         end
 
         if migrating_user && needs_migration
-          begin
-            MasterCourses::MasterMigration.start_new_migration!(template, migrating_user)
-          rescue MasterCourses::MasterMigration::MigrationRunningError
-            # meh
-          end
+          MasterCourses::MasterMigration.start_new_migration!(template, migrating_user, :retry_later => true)
         end
       end
     end
