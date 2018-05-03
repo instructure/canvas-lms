@@ -3938,6 +3938,7 @@ tr:
   content_for_section_1_7ecfb319: "Bölüm 1 İçeriği"
   content_for_section_2_e7c6e2a3: "Bölüm 2 İçeriği"
   content_for_section_3_90c1d235: "Bölüm 3 İçeriği"
+  content_import_files_cannot_be_downloaded_after_en_7e3a2099: "İçerik aktarma dosyaları %{ENV.CONTENT_MIGRATIONS_EXPIRE_DA} günden sonra indirilemez."
   content_imports: 
     errors: 
       import_failed: "Taşıma aktarımı sürecinde bir hata oluştu. Lütfen sistem yöneticisini bilgilendirin ve aşağıdaki kodu verin: \"%{code}\""
@@ -4761,9 +4762,13 @@ tr:
   count_participations_ac8f82b7: 
     one: "1 katılım"
     other: "%{count} katılım"
+  count_people_successfully_enrolled_into_course_nam_db8eed18: 
+    one: "%{user_name} başarılı bir şekilde *%{course_name}* dersine kaydoldu."
+    other: "%{count} kişi başarılı bir şekilde *%{course_name}* dersine kaydoldu."
   count_points_4735a2e8: 
     one: "1  puan"
     other: "%{count} puan"
+  count_pushed_changes_6fe7fba: "%{count} uygulanan değişiklik"
   count_quizzes_found_e5e29bb4: 
     one: "1 kısa sınav bulundu."
     other: "%{count} kısa sınav bulundu."
@@ -4775,9 +4780,16 @@ tr:
   count_results_displayed_ed39a0f0: 
     one: "Bir sonuç gösteriliyor"
     other: "%{count} sonuç gösteriliyor"
+  count_sets_of_grading_periods_found_c8857ae9: 
+    one: "1 notlandırma peryodu seti bulundu."
+    other: "%{count} notlandırma peryodu seti bulundu."
+    zero: "Eşleşen notlandırmar peryodu seti bulunamadı."
   count_students_30e46120: 
     one: "1 öğrenci"
     other: "%{count} öğrenci"
+  count_students_in_percentile_percentile_d0adecfe: 
+    one: "%{percentile}yüzdebirliğinde 1 öğrenci var. "
+    other: "  %{percentile}yüzdebirliğinde %{count}öğrenci var."
   count_students_will_get_num_points_c970fc01: 
     one: "1 öğrenci %{num} puan alacak"
     other: "%{count} öğrenci %{num} puan alacak"
@@ -4788,6 +4800,7 @@ tr:
     one: "1 gönderinin değerlendirilmesi gerek"
     other: "%{count} gönderinin değerlendirilmesi gerek"
   count_unread_replies_86976ab: "%{count} okunmamış cevap"
+  count_unsynced_changes_1fc147e5: "%{count}"
   count_users_374d6e47: "(%{count} Kullanıcı)"
   country_is_required_b0afbf52: "Ülke zorunludur"
   course: 
@@ -4860,6 +4873,7 @@ tr:
   course_atom_feed_9d95214e: "Ders Atom Yayını"
   course_calendar_7d3cba7b: "Ders Takvimi"
   course_canvas_id_9e36b24c: "Ders Canvas ID"
+  course_card_color_region_for_course_c356a69c: "%{course}dersi için ders görseli renk bölgesi "
   course_catalog_4cc7c8ce: "Ders Kataloğu"
   course_collaborations_dadb327e: "Ders İşbirlikleri"
   course_conferences_3d914c96: "Ders Konferansı"
