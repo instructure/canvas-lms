@@ -14,9 +14,27 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-class ObserverAlert < ActiveRecord::Base
-  belongs_to :user_observation_link, :inverse_of => :observer_alerts
-  belongs_to :observer_alert_threshold, :inverse_of => :observer_alerts
-  belongs_to :context, polymorphic: [:announcement, :assignment, :course, :account_notification]
+module Factories
+  def observer_alert_threshold_model(opts = {})
+    @observee = opts[:observee] || course_with_student(opts).user
+    @observer = opts[:observer] || user_model
+    @observation_link = UserObservationLink.create!(user_id: @observee, observer_id: @observer)
+
+    attrs = default_attrs.merge(opts.slice(*valid_attrs_list))
+    @observer_alert_threshold = @observation_link.observer_alert_thresholds.create(attrs)
+  end
+
+  def default_attrs
+    {
+      alert_type: 'value for type',
+      threshold: nil,
+      workflow_state: 'active',
+    }
+  end
+
+  def valid_attrs_list
+    [:alert_type, :threshold, :workflow_state]
+  end
 end

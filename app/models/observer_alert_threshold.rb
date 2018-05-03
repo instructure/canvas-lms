@@ -16,5 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class ObserverAlertThreshold < ActiveRecord::Base
-  belongs_to :user_observation_link, :inverse_of => :observer_alert_threshold
+  belongs_to :user_observation_link, :inverse_of => :observer_alert_thresholds
+  has_many :observer_alerts, :inverse_of => :observer_alert_threshold
+
+  scope :active, -> { where.not(workflow_state: 'deleted') }
+
+  def destroy
+    self.workflow_state = 'deleted'
+    self.save!
+  end
 end

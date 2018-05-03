@@ -14,9 +14,23 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-class ObserverAlert < ActiveRecord::Base
-  belongs_to :user_observation_link, :inverse_of => :observer_alerts
-  belongs_to :observer_alert_threshold, :inverse_of => :observer_alerts
-  belongs_to :context, polymorphic: [:announcement, :assignment, :course, :account_notification]
+module Api::V1::ObserverAlertThreshold
+  include Api::V1::Json
+  include ApplicationHelper
+
+  API_ALLOWED_OUTPUT_FIELDS = {
+    :only => %w(
+      id
+      user_observation_link_id
+      alert_type
+      threshold
+      workflow_state
+    ).freeze
+  }.freeze
+
+  def observer_alert_threshold_json(threshold, user, session, _opts = {})
+    api_json(threshold, user, session, API_ALLOWED_OUTPUT_FIELDS)
+  end
 end

@@ -1305,6 +1305,14 @@ CanvasRails::Application.routes.draw do
         put    'users/:user_id/observees/:observee_id', action: :update
         delete 'users/:user_id/observees/:observee_id', action: :destroy
       end
+
+      scope(controller: :observer_alert_thresholds_api) do
+        get 'users/:user_id/observer_alert_thresholds', action: :index
+        post 'users/:user_id/observer_alert_thresholds', action: :create
+        get 'users/:user_id/observer_alert_thresholds/:observer_alert_threshold_id', action: :show
+        put 'users/:user_id/observer_alert_thresholds/:observer_alert_threshold_id', action: :update
+        delete 'users/:user_id/observer_alert_thresholds/:observer_alert_threshold_id', action: :destroy
+      end
     end
 
     scope(controller: :custom_data) do
