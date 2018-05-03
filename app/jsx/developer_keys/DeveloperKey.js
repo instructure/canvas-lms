@@ -118,7 +118,7 @@ class DeveloperKey extends React.Component {
       <tr className={classNames('key', { inactive: !this.isActive(developerKey) })}>
         <td className="name">
           {this.makeImage(developerKey)}
-          <span ref={this.refKeyName}>
+          <span ref={this.refKeyName} tabIndex="0">
             {this.developerName(developerKey)}
           </span>
         </td>

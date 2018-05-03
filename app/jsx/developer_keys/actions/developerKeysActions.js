@@ -202,7 +202,6 @@ function retrieveRemainingDevKeys(url, developerKeysPassedIn, dispatch, retrieve
       }
       else {
         const payload = { next, developerKeys };
-        $.screenReaderFlashMessageExclusive(I18n.t("Loaded More Developer Keys."));
         dispatch(success(payload));
         return payload
       }
