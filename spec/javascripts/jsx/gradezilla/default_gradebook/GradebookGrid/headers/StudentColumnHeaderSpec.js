@@ -105,7 +105,7 @@ test('adds a class to the action container when the PopoverMenu is opened', func
 });
 
 test('renders a title for the More icon', function () {
-  const selectedElements = this.wrapper.find('PopoverMenu IconMoreSolid');
+  const selectedElements = this.wrapper.find('PopoverMenu IconMore');
 
   strictEqual(selectedElements.props().title, 'Student Name Options');
 });

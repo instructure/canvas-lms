@@ -253,7 +253,7 @@ test('renders master course lock icon if masterCourseData is provided', (assert)
 
 test('renders drag icon', () => {
   const tree = mount(<DiscussionRow {...makeProps({draggable: true})} />)
-  const node = tree.find('IconDragHandleLine')
+  const node = tree.find('IconDragHandle')
   ok(node.exists())
 })
 

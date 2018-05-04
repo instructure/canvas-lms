@@ -24,7 +24,7 @@ import Tray from '@instructure/ui-core/lib/components/Tray'
 import Link from '@instructure/ui-core/lib/components/Link'
 import Heading from '@instructure/ui-core/lib/components/Heading'
 import Container from '@instructure/ui-core/lib/components/Container'
-import IconRssLine from 'instructure-icons/lib/Line/IconRssLine'
+import IconRssLine from '@instructure/ui-icons/lib/Line/IconRss'
 import Text from '@instructure/ui-core/lib/components/Text'
 
 import { ConnectedAddExternalFeed } from './AddExternalFeed'

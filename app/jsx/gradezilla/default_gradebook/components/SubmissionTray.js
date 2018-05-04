@@ -27,7 +27,7 @@ import Link from '@instructure/ui-core/lib/components/Link';
 import Spinner from '@instructure/ui-core/lib/components/Spinner';
 import Tray from '@instructure/ui-core/lib/components/Tray';
 import Text from '@instructure/ui-core/lib/components/Text';
-import IconSpeedGraderLine from 'instructure-icons/lib/Line/IconSpeedGraderLine';
+import IconSpeedGraderLine from '@instructure/ui-icons/lib/Line/IconSpeedGrader';
 import Carousel from '../../../gradezilla/default_gradebook/components/Carousel';
 import GradeInput from '../../../gradezilla/default_gradebook/components/GradeInput';
 import LatePolicyGrade from '../../../gradezilla/default_gradebook/components/LatePolicyGrade';

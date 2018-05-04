@@ -25,7 +25,7 @@ import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReade
 import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
 import { MenuItem, MenuItemGroup, MenuItemSeparator } from '@instructure/ui-core/lib/components/Menu'
 import Button from '@instructure/ui-core/lib/components/Button'
-import IconMoreLine from 'instructure-icons/lib/Line/IconMoreLine'
+import IconMoreLine from '@instructure/ui-icons/lib/Line/IconMore'
 
 export default class DashboardOptionsMenu extends React.Component {
   static propTypes = {

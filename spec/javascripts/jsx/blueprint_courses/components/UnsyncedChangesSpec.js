@@ -18,7 +18,7 @@
 
 import React from 'react'
 import { Provider } from 'react-redux'
-import * as enzyme from 'enzyme'
+import {mount} from 'enzyme'
 import createStore from 'jsx/blueprint_courses/store'
 import {ConnectedUnsyncedChanges} from 'jsx/blueprint_courses/components/UnsyncedChanges'
 import MigrationStates from 'jsx/blueprint_courses/migrationStates'
@@ -84,7 +84,7 @@ function connect (props = {...defaultProps}) {
 QUnit.module('UnsyncedChanges component')
 
 test('renders the UnsyncedChanges component', () => {
-  const tree = enzyme.mount(connect())
+  const tree = mount(connect())
   let node = tree.find('UnsyncedChanges')
   ok(node.exists())
   node = tree.find('.bcs__history')
@@ -92,17 +92,17 @@ test('renders the UnsyncedChanges component', () => {
 })
 
 test('renders the migration options component', () => {
-  const tree = enzyme.mount(connect())
+  const tree = mount(connect())
   const node = tree.find('MigrationOptions')
   ok(node.exists())
 })
 
 test('renders the changes properly', () => {
-  const tree = enzyme.mount(connect())
+  const tree = mount(connect())
   const changes = tree.find('.bcs__unsynced-item')
   equal(changes.length, 3)
-  const locks = tree.find('.bcs__unsynced-item IconBlueprintLockSolid')
+  const locks = tree.find('.bcs__unsynced-item IconBlueprintLock')
   equal(locks.length, 1)
-  const unlocks = tree.find('.bcs__unsynced-item IconBlueprintSolid')
+  const unlocks = tree.find('.bcs__unsynced-item IconBlueprint')
   equal(unlocks.length, 2)
 })

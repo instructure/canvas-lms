@@ -26,8 +26,8 @@ import Text from '@instructure/ui-core/lib/components/Text'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent'
 
-import IconLock from 'instructure-icons/lib/Solid/IconBlueprintLockSolid'
-import IconUnlock from 'instructure-icons/lib/Solid/IconBlueprintSolid'
+import IconLock from '@instructure/ui-icons/lib/Solid/IconBlueprintLock'
+import IconUnlock from '@instructure/ui-icons/lib/Solid/IconBlueprint'
 
 const modes = {
   ADMIN_LOCKED: {

@@ -18,7 +18,7 @@
 
 import React from 'react';
 import { arrayOf, bool, func, shape, string } from 'prop-types'
-import IconMiniArrowDownSolid from 'instructure-icons/lib/Solid/IconMiniArrowDownSolid'
+import IconMiniArrowDownSolid from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
 import Button from '@instructure/ui-core/lib/components/Button';
 import {
   MenuItem,

@@ -63,7 +63,7 @@ describe 'Developer Keys' do
     end
 
     def click_edit_icon
-      fj("#keys tbody tr.key button:has(svg[name='IconEditLine'])").click
+      fj("#keys tbody tr.key button:has(svg[name='IconEdit'])").click
     end
 
     it "allows creation through 'add developer key button'", test_id: 344077 do
@@ -143,7 +143,7 @@ describe 'Developer Keys' do
       key = Account.default.developer_keys.last
       expect(key.icon_url).to eq nil
 
-      fj("#keys tbody tr.key button:has(svg[name='IconTrashLine'])").click
+      fj("#keys tbody tr.key button:has(svg[name='IconTrash'])").click
       driver.switch_to.alert.accept
       driver.switch_to.default_content
       expect(f("#keys")).not_to contain_css("tbody tr")
@@ -172,16 +172,16 @@ describe 'Developer Keys' do
     it "renders the key not visible", test_id: 3485785 do
       root_developer_key
       get "/accounts/#{Account.default.id}/developer_keys"
-      fj("#keys tbody tr.key button:has(svg[name='IconEyeLine'])").click
-      expect(f("#keys tbody tr.key")).to contain_css("svg[name='IconOffLine']")
+      fj("#keys tbody tr.key button:has(svg[name='IconEye'])").click
+      expect(f("#keys tbody tr.key")).to contain_css("svg[name='IconOff']")
       expect(root_developer_key.reload.visible).to eq false
     end
 
     it "renders the key visible", test_id: 3485785 do
       root_developer_key.update(visible: false)
       get "/accounts/#{Account.default.id}/developer_keys"
-      fj("#keys tbody tr.key button:has(svg[name='IconOffLine'])").click
-      expect(f("#keys tbody tr.key")).not_to contain_css("svg[name='IconOffLine']")
+      fj("#keys tbody tr.key button:has(svg[name='IconOff'])").click
+      expect(f("#keys tbody tr.key")).not_to contain_css("svg[name='IconOff']")
       expect(root_developer_key.reload.visible).to eq true
     end
 

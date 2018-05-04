@@ -223,7 +223,7 @@ test('adds a class to the action container when the PopoverMenu is opened', func
 });
 
 test('renders a title for the More icon based on the assignment name', function () {
-  const optionsMenuTrigger = this.wrapper.find('PopoverMenu IconMoreSolid');
+  const optionsMenuTrigger = this.wrapper.find('PopoverMenu IconMore');
 
   equal(optionsMenuTrigger.props().title, 'Assignment #1 Options');
 });

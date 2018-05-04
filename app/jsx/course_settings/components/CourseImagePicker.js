@@ -24,7 +24,7 @@ import Spinner from '@instructure/ui-core/lib/components/Spinner'
 import Grid, {GridCol, GridRow} from '@instructure/ui-core/lib/components/Grid'
 import Button from '@instructure/ui-core/lib/components/Button'
 import Heading from '@instructure/ui-core/lib/components/Heading'
-import IconXLine from 'instructure-icons/lib/Line/IconXLine'
+import IconXLine from '@instructure/ui-icons/lib/Line/IconX'
 import UploadArea from './UploadArea'
 import FlickrSearch from '../../shared/FlickrSearch'
 

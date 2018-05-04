@@ -24,7 +24,7 @@ import MenuItem from '@instructure/ui-core/lib/components/Menu/MenuItem'
 import MenuItemGroup from '@instructure/ui-core/lib/components/Menu/MenuItemGroup'
 import Button from '@instructure/ui-core/lib/components/Button'
 import AccessibleContent from '@instructure/ui-core/lib/components/AccessibleContent'
-import IconPlusLine from 'instructure-icons/lib/Line/IconPlusLine'
+import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus'
 import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
 import CustomHelpLinkConstants from './CustomHelpLinkConstants'
 

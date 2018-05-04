@@ -19,11 +19,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!custom_help_link'
-import IconSettingsLine from 'instructure-icons/lib/Line/IconSettingsLine'
-import IconFolderLine from 'instructure-icons/lib/Line/IconFolderLine'
-import IconInfoLine from 'instructure-icons/lib/Line/IconInfoLine'
-import IconLifePreserverLine from 'instructure-icons/lib/Line/IconLifePreserverLine'
-import IconQuestionLine from 'instructure-icons/lib/Line/IconQuestionLine'
+import IconSettingsLine from '@instructure/ui-icons/lib/Line/IconSettings'
+import IconFolderLine from '@instructure/ui-icons/lib/Line/IconFolder'
+import IconInfoLine from '@instructure/ui-icons/lib/Line/IconInfo'
+import IconLifePreserverLine from '@instructure/ui-icons/lib/Line/IconLifePreserver'
+import IconQuestionLine from '@instructure/ui-icons/lib/Line/IconQuestion'
 import CustomHelpLinkIconInput from './CustomHelpLinkIconInput'
 
 export default function CustomHelpLinkIcons(props) {

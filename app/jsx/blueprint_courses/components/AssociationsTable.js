@@ -28,7 +28,7 @@ import PresentationContent from '@instructure/ui-core/lib/components/Presentatio
 import Table from '@instructure/ui-core/lib/components/Table'
 import Button from '@instructure/ui-core/lib/components/Button'
 import Spinner from '@instructure/ui-core/lib/components/Spinner'
-import RemoveIcon from 'instructure-icons/lib/Solid/IconXSolid'
+import RemoveIcon from '@instructure/ui-icons/lib/Solid/IconX'
 
 import propTypes from '../propTypes'
 import FocusManager from '../focusManager'

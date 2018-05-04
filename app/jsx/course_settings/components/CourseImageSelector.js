@@ -17,9 +17,9 @@
  */
 
 import React from 'react'
-import IconMoreLine from 'instructure-icons/lib/Line/IconMoreLine'
-import IconEditLine from 'instructure-icons/lib/Line/IconEditLine'
-import IconTrashLine from 'instructure-icons/lib/Line/IconTrashLine'
+import IconMoreLine from '@instructure/ui-icons/lib/Line/IconMore'
+import IconEditLine from '@instructure/ui-icons/lib/Line/IconEdit'
+import IconTrashLine from '@instructure/ui-icons/lib/Line/IconTrash'
 import Button from '@instructure/ui-core/lib/components/Button'
 import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
 import {MenuItem} from '@instructure/ui-core/lib/components/Menu'

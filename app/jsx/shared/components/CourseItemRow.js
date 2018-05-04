@@ -33,10 +33,10 @@ import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReade
 import Text from '@instructure/ui-core/lib/components/Text'
 import Button from '@instructure/ui-core/lib/components/Button'
 import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
-import IconMore from 'instructure-icons/lib/Line/IconMoreLine'
+import IconMore from '@instructure/ui-icons/lib/Line/IconMore'
 
-import IconDragHandleLine from 'instructure-icons/lib/Line/IconDragHandleLine'
-import IconPeerReviewLine from 'instructure-icons/lib/Line/IconPeerReviewLine'
+import IconDragHandleLine from '@instructure/ui-icons/lib/Line/IconDragHandle'
+import IconPeerReviewLine from '@instructure/ui-icons/lib/Line/IconPeerReview'
 import LockIconView from 'compiled/views/LockIconView'
 import { author as authorShape } from '../proptypes/user'
 import masterCourseDataShape from '../proptypes/masterCourseData'

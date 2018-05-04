@@ -25,7 +25,7 @@ import Select from '@instructure/ui-core/lib/components/Select'
 import TextArea from '@instructure/ui-core/lib/components/TextArea'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
-import IconUserSolid from 'instructure-icons/lib/Solid/IconUserSolid'
+import IconUserSolid from '@instructure/ui-icons/lib/Solid/IconUser'
 import {courseParamsShape, inputParamsShape} from './shapes'
 import {parseNameList, findEmailInEntry, emailValidator} from '../helpers'
 

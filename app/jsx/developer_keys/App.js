@@ -22,7 +22,7 @@ import Heading from '@instructure/ui-core/lib/components/Heading'
 import Spinner from '@instructure/ui-core/lib/components/Spinner'
 import TabList, {TabPanel} from '@instructure/ui-core/lib/components/TabList'
 
-import IconPlusLine from 'instructure-icons/lib/Line/IconPlusLine'
+import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus'
 
 import I18n from 'i18n!react_developer_keys'
 import React from 'react'

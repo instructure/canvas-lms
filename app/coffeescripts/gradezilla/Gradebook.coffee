@@ -81,7 +81,7 @@ define [
   'jsx/grading/helpers/OutlierScoreHelper'
   'jsx/grading/LatePolicyApplicator'
   '@instructure/ui-core/lib/components/Button'
-  'instructure-icons/lib/Solid/IconSettingsSolid'
+  '@instructure/ui-icons/lib/Solid/IconSettings'
   'jsx/shared/FlashAlert'
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'

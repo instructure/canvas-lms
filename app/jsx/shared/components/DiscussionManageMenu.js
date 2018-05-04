@@ -20,7 +20,7 @@ import React, { Component } from 'react'
 import { func, string } from 'prop-types'
 
 import Button from '@instructure/ui-core/lib/components/Button'
-import IconMore from 'instructure-icons/lib/Line/IconMoreLine'
+import IconMore from '@instructure/ui-icons/lib/Line/IconMore'
 import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 

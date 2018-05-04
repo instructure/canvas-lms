@@ -27,7 +27,7 @@ import Spinner from '@instructure/ui-core/lib/components/Spinner'
 import CheckboxGroup from '@instructure/ui-core/lib/components/CheckboxGroup'
 import Modal, {ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-core/lib/components/Modal'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
-import IconSettingsLine from 'instructure-icons/lib/Line/IconSettingsLine'
+import IconSettingsLine from '@instructure/ui-icons/lib/Line/IconSettings'
 import propTypes from '../propTypes'
 
 const STUDENT_SETTINGS = ["allow_student_forum_attachments",

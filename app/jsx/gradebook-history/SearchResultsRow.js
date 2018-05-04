@@ -24,7 +24,7 @@ import environment from '../gradebook-history/environment';
 import GradeFormatHelper from '../gradebook/shared/helpers/GradeFormatHelper';
 import NumberHelper from '../shared/helpers/numberHelper';
 import I18n from 'i18n!gradebook_history';
-import IconOffLine from 'instructure-icons/lib/Line/IconOffLine';
+import IconOffLine from '@instructure/ui-icons/lib/Line/IconOff';
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
 import Tooltip from '@instructure/ui-core/lib/components/Tooltip';
 

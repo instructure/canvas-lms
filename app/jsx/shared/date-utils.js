@@ -22,7 +22,7 @@ import 'jquery.instructure_date_and_time'
 
 import Container from '@instructure/ui-core/lib/components/Container'
 import Text from '@instructure/ui-core/lib/components/Text'
-import IconTimer from 'instructure-icons/lib/Line/IconTimerLine'
+import IconTimer from '@instructure/ui-icons/lib/Line/IconTimer'
 
 /*
  * returns whether or not the current date is passed the date

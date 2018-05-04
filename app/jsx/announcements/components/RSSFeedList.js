@@ -28,7 +28,7 @@ import Grid, {GridRow, GridCol} from '@instructure/ui-core/lib/components/Grid'
 import Link from '@instructure/ui-core/lib/components/Link'
 import Spinner from '@instructure/ui-core/lib/components/Spinner'
 import Text from '@instructure/ui-core/lib/components/Text'
-import IconXLine from 'instructure-icons/lib/Line/IconXLine'
+import IconXLine from '@instructure/ui-icons/lib/Line/IconX'
 
 import actions from '../actions'
 import propTypes from '../propTypes'

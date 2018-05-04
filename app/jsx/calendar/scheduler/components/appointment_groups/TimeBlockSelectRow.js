@@ -22,7 +22,7 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!appointment_groups'
 import Button from '@instructure/ui-core/lib/components/Button'
 import Text from '@instructure/ui-core/lib/components/Text'
-import IconXSolid from 'instructure-icons/lib/Solid/IconXSolid'
+import IconXSolid from '@instructure/ui-icons/lib/Solid/IconX'
 import coupleTimeFields from 'compiled/util/coupleTimeFields'
 import 'jquery.instructure_date_and_time'
 

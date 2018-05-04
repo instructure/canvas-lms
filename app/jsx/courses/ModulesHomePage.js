@@ -18,8 +18,8 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import IconModuleSolid from 'instructure-icons/lib/Solid/IconModuleSolid'
-import IconUploadLine from 'instructure-icons/lib/Line/IconUploadLine'
+import IconModuleSolid from '@instructure/ui-icons/lib/Solid/IconModule'
+import IconUploadLine from '@instructure/ui-icons/lib/Line/IconUpload'
 import I18n from 'i18n!modules_home_page'
 
 export default class ModulesHomePage extends React.Component {

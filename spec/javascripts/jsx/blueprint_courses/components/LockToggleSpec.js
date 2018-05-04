@@ -53,7 +53,7 @@ test('renders a locked icon when LockToggle is locked', () => {
   const props = defaultProps()
   props.isLocked = true
   const tree = enzyme.shallow(<LockToggle {...props} />)
-  const node = tree.find('IconBlueprintLockSolid')
+  const node = tree.find('IconBlueprintLock')
   ok(node.exists())
 })
 
@@ -61,6 +61,6 @@ test('renders an unlocked icon when LockToggle is unlocked', () => {
   const props = defaultProps()
   props.isLocked = false
   const tree = enzyme.shallow(<LockToggle {...props} />)
-  const node = tree.find('IconBlueprintSolid')
+  const node = tree.find('IconBlueprint')
   ok(node.exists())
 })
