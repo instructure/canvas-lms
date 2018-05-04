@@ -43,20 +43,20 @@ describe "speed grader submissions" do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#%7B%22student_id%22%3A#{@submission.student.id}%7D"
 
-      #check for assignment title
+      # check for assignment title
       expect(f('#assignment_url')).to include_text(@assignment.title)
 
-      #check for assignment text in speed grader iframe
+      # check for assignment text in speed grader iframe
       check_first_student = -> do
         expect(f('#combo_box_container .ui-selectmenu-item-header')).to include_text(@student.name)
-        in_frame 'speedgrader_iframe' do
+        in_frame 'speedgrader_iframe','.is-inside-submission-frame' do
           expect(f('#main')).to include_text(@submission.body)
         end
       end
 
       check_second_student = -> do
         expect(f('#combo_box_container .ui-selectmenu-item-header')).to include_text(@student_2.name)
-        in_frame 'speedgrader_iframe' do
+        in_frame 'speedgrader_iframe','.is-inside-submission-frame' do
           expect(f('#main')).to include_text(@submission_2.body)
         end
       end
@@ -151,14 +151,14 @@ describe "speed grader submissions" do
       # was carried through to other students, ones with only 1 version.
       expect(f('#submission_to_view').find_elements(:css, 'option').length).to eq 2
 
-      in_frame 'speedgrader_iframe' do
+      in_frame 'speedgrader_iframe','.is-inside-submission-frame' do
         expect(f('#content')).to include_text('first student, second version')
       end
 
       click_option('#submission_to_view', '0', :value)
       wait_for_ajaximations
 
-      in_frame 'speedgrader_iframe' do
+      in_frame 'speedgrader_iframe','.is-inside-submission-frame' do
         wait_for_ajaximations
         expect(f('#content')).to include_text('first student, first version')
       end
@@ -173,7 +173,7 @@ describe "speed grader submissions" do
       f('#grade_container').find_element(:css, 'input').send_keys("5\n")
       wait_for_ajaximations
 
-      in_frame 'speedgrader_iframe' do
+      in_frame 'speedgrader_iframe','.is-inside-submission-frame' do
         expect(f('#content')).to include_text('second student')
       end
 
