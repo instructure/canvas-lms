@@ -73,20 +73,20 @@ describe "new account user search" do
 
     get "/accounts/#{sub_account.id}/users"
 
-    expect(f("#content")).not_to contain_jqcss('button:has([name="IconPlusLine"]):contains("People")')
+    expect(f("#content")).not_to contain_jqcss('button:has([name="IconPlus"]):contains("People")')
   end
 
   it "should show the create users button user has permission on the root_account" do
     sub_account = Account.create!(name: "sub", parent_account: @account)
     get "/accounts/#{sub_account.id}/users"
 
-    expect(f("#content")).to contain_jqcss('button:has([name="IconPlusLine"]):contains("People")')
+    expect(f("#content")).to contain_jqcss('button:has([name="IconPlus"]):contains("People")')
   end
 
   it "should be able to create users" do
     get "/accounts/#{@account.id}/users"
 
-    fj('button:has([name="IconPlusLine"]):contains("People")').click
+    fj('button:has([name="IconPlus"]):contains("People")').click
     modal = f('[aria-label="Add a New User"]')
     expect(modal).to be_displayed
 
@@ -110,7 +110,7 @@ describe "new account user search" do
     expect(new_row).to include_text(email)
 
     # should clear out the inputs
-    fj('button:has([name="IconPlusLine"]):contains("People")').click
+    fj('button:has([name="IconPlus"]):contains("People")').click
     expect(fj('[aria-label="Add a New User"] label:contains("Full Name") input').attribute('value')).to eq('')
   end
 
@@ -118,7 +118,7 @@ describe "new account user search" do
     name = 'Confirmation Disabled'
     get "/accounts/#{@account.id}/users"
 
-    fj('button:has([name="IconPlusLine"]):contains("People")').click
+    fj('button:has([name="IconPlus"]):contains("People")').click
     modal = f('[aria-label="Add a New User"]')
 
     set_value(fj('label:contains("Full Name") input', modal), name)
@@ -221,7 +221,7 @@ describe "new account user search" do
 
     get "/accounts/#{@account.id}/users"
 
-    fj("[data-automation='users list'] tr:contains('#{mask_user.name}') [role=button]:has([name='IconMasqueradeLine'])")
+    fj("[data-automation='users list'] tr:contains('#{mask_user.name}') [role=button]:has([name='IconMasquerade'])")
       .click
     expect(f('.ActAs__text')).to include_text mask_user.name
   end
@@ -231,7 +231,7 @@ describe "new account user search" do
 
     get "/accounts/#{@account.id}/users"
 
-    fj("[data-automation='users list'] tr:contains('#{conv_user.name}') [role=button]:has([name='IconMessageLine'])")
+    fj("[data-automation='users list'] tr:contains('#{conv_user.name}') [role=button]:has([name='IconMessage'])")
       .click
     expect(f('.message-header-input .ac-token')).to include_text conv_user.name
   end
@@ -241,7 +241,7 @@ describe "new account user search" do
 
     get "/accounts/#{@account.id}/users"
 
-    fj("[data-automation='users list'] tr:contains('#{edit_user.name}') [role=button]:has([name='IconEditLine'])").click
+    fj("[data-automation='users list'] tr:contains('#{edit_user.name}') [role=button]:has([name='IconEdit'])").click
 
     expect(fj('label:contains("Full Name") input').attribute('value')).to eq("Edit User")
   end

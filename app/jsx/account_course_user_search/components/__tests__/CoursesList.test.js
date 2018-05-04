@@ -129,8 +129,8 @@ describe('Account Course User Search CoursesList Sorting', () => {
         order: 'asc'
       }} />)
 
-      expect(wrapper.find('IconMiniArrowUpSolid')).toHaveLength(0)
-      const downArrow = wrapper.find('IconMiniArrowDownSolid')
+      expect(wrapper.find('IconMiniArrowUp')).toHaveLength(0)
+      const downArrow = wrapper.find('IconMiniArrowDown')
       expect(downArrow).toHaveLength(1)
       const header = downArrow.closest('th')
 
@@ -150,8 +150,8 @@ describe('Account Course User Search CoursesList Sorting', () => {
         order: 'desc'
       }} />)
 
-      expect(wrapper.find('IconMiniArrowDownSolid')).toHaveLength(0)
-      const upArrow = wrapper.find('IconMiniArrowUpSolid')
+      expect(wrapper.find('IconMiniArrowDown')).toHaveLength(0)
+      const upArrow = wrapper.find('IconMiniArrowUp')
       expect(upArrow).toHaveLength(1)
       const header = upArrow.closest('th')
 

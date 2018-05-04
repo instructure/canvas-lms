@@ -18,10 +18,10 @@
 
 import React from 'react'
 import {string, func, shape, arrayOf} from 'prop-types'
-import IconGroupLine from 'instructure-icons/lib/Line/IconGroupLine'
-import IconMoreLine from 'instructure-icons/lib/Line/IconMoreLine'
-import IconPlusLine from 'instructure-icons/lib/Line/IconPlusLine'
-import IconStudentViewLine from 'instructure-icons/lib/Line/IconStudentViewLine'
+import IconGroupLine from '@instructure/ui-icons/lib/Line/IconGroup'
+import IconMoreLine from '@instructure/ui-icons/lib/Line/IconMore'
+import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus'
+import IconStudentViewLine from '@instructure/ui-icons/lib/Line/IconStudentView'
 
 import Button from '@instructure/ui-core/lib/components/Button'
 import FormFieldGroup from '@instructure/ui-core/lib/components/FormFieldGroup'

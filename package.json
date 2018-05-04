@@ -10,6 +10,7 @@
     "@instructure/ui-alerts": "^5.8.1",
     "@instructure/ui-buttons": "^5.8.1",
     "@instructure/ui-core": "^4.8.0",
+    "@instructure/ui-icons": "^5.8.1",
     "@instructure/ui-menu": "^5.8.1",
     "@instructure/ui-overlays": "^5.8.1",
     "@instructure/ui-themeable": "^5.8.1",

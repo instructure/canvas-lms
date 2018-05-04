@@ -19,7 +19,7 @@
 import React from 'react'
 import {arrayOf, string, bool, func, shape, oneOf} from 'prop-types'
 import {isEqual, groupBy, map} from 'lodash'
-import IconPlusLine from 'instructure-icons/lib/Line/IconPlusLine'
+import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus'
 import Button from '@instructure/ui-core/lib/components/Button'
 import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
 import Grid, {GridCol, GridRow} from '@instructure/ui-core/lib/components/Grid'

@@ -17,8 +17,8 @@
  */
 
 import preventDefault from 'compiled/fn/preventDefault'
-import IconMiniArrowUpSolid from 'instructure-icons/lib/Solid/IconMiniArrowUpSolid'
-import IconMiniArrowDownSolid from 'instructure-icons/lib/Solid/IconMiniArrowDownSolid'
+import IconMiniArrowUp from '@instructure/ui-icons/lib/Solid/IconMiniArrowUp'
+import IconMiniArrowDown from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
 import ApplyTheme from '@instructure/ui-core/lib/components/ApplyTheme'
 import Tooltip from '@instructure/ui-core/lib/components/Tooltip'
 import Link from '@instructure/ui-core/lib/components/Link'
@@ -50,7 +50,7 @@ export default function UsersList (props) {
           >
             {label}
             {sort === id ?
-              (order === 'asc' ? <IconMiniArrowDownSolid /> : <IconMiniArrowUpSolid />) :
+              (order === 'asc' ? <IconMiniArrowDown /> : <IconMiniArrowUp />) :
               ''
             }
           </Tooltip>
