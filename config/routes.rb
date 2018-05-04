@@ -2023,8 +2023,11 @@ CanvasRails::Application.routes.draw do
       patch 'courses/:id/late_policy', action: :update
     end
 
+    scope(controller: :planner) do
+      get 'planner/items', action: :index, as: :planner_items
+    end
+
     scope(controller: :planner_overrides) do
-      get 'planner/items', action: :items_index, as: :planner_items
       get 'planner/overrides', action: :index, as: :planner_overrides
       get 'planner/overrides/:id', action: :show
       put 'planner/overrides/:id', action: :update

@@ -18,16 +18,7 @@
 
 module Api::V1::PlannerOverride
   include Api::V1::Json
-
-  PLANNABLE_TYPES = {
-    'discussion_topic' => 'DiscussionTopic',
-    'announcement' => 'DiscussionTopic',
-    'quiz' => 'Quizzes::Quiz',
-    'assignment' => 'Assignment',
-    'wiki_page' => 'WikiPage',
-    'planner_note' => 'PlannerNote',
-    'calendar_event' => 'CalendarEvent'
-  }.freeze
+  include PlannerHelper
 
   def planner_override_json(override, user, session)
     return if override.blank?

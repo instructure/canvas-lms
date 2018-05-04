@@ -25,16 +25,7 @@ module Api::V1::PlannerItem
   include Api::V1::WikiPage
   include Api::V1::PlannerOverride
   include Api::V1::CalendarEvent
-
-  PLANNABLE_TYPES = {
-    'discussion_topic' => 'DiscussionTopic',
-    'announcement' => 'DiscussionTopic',
-    'quiz' => 'Quizzes::Quiz',
-    'assignment' => 'Assignment',
-    'wiki_page' => 'WikiPage',
-    'planner_note' => 'PlannerNote',
-    'calendar_event' => 'CalendarEvent'
-  }.freeze
+  include PlannerHelper
 
   def planner_item_json(item, user, session, opts = {})
     context_data(item, use_effective_code: true).merge({
