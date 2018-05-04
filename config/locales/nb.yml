@@ -1671,7 +1671,7 @@ nb:
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: "Tillat emneinnholdet å lastes ned og vises i frakoblet modus"
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Tillat emnebilder å bli tildelt et emne og brukt på dashbord-kortene."
   allow_course_images_to_be_assigned_to_a_course_and_adb906f4: "Tillat bilder fra kurset å bli tildelt til et kurs og bli brukt på kortene på kontrollpanelet."
-  allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "La kort til instrumentbordet bestilles på nytt til hver bruker."
+  allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "La kort til dashbordet bestilles på nytt til hver bruker."
   allow_in_mastery_paths_5332c786: "Tillat i læringsstier"
   allow_intra_group_peer_reviews_53f1e455: "Tillat hverandrevurdering innad i gruppen"
   allow_lor_tools: "Tillat brukere å vise og bruke eksterne verktøy som er konfigurert for LOR."
@@ -1679,7 +1679,7 @@ nb:
   allow_opt_out_of_inbox: "Tillat brukere å trekke seg fra Samtale innboks. Dette vil føre til at alle samtalemeldinger og varslinger som skal sendes som ASAP varslinger til brukerens primære epost, skjuler Samtale innboksens uleste meldinger merke på innboksen, og skjuler samtalens varslingsinnstillinger."
   allow_outcome_extra_credit_57c1e84e: "Tillat ekstra kreditt for resultater"
   allow_passive_acceptance_of_terms_of_service_63ef5994: "Tillat passiv aksept av bruksvilkår"
-  allow_reorder_dashboard_cards_78215947: "Tillat ny bestilling av kort til instrumentbordet"
+  allow_reorder_dashboard_cards_78215947: "Tillat ny bestilling av kort til dashbordet"
   allow_replies_for_title_cfe7af6c: "Tillat svar for %{title}"
   allow_rtl_users_to_see_rtl_interface_3c4f8b86: "La RTL-brukere se RTL-grensesnittet"
   allow_students_to_download_course_content_and_view_810e66ec: "La studenter laste ned emneinnhold og se disse når de er frakoblet"
@@ -2234,7 +2234,7 @@ nb:
       submit_assignment: "Lever oppgave"
     cannot_delete_group: "Du må ha minst én oppgavegruppe"
     cant_unpublish_when_students_submit: "Kan ikke fjerne publisering om det finnes studentinnleveringer"
-    complete: Ferdig
+    complete: Godkjent
     confirm: 
       delete_assignment: "Er du sikker på at du vil slette denne oppgaven?"
       delete_group: "Er du sikker på at du ønsker å slette denne gruppen?"
@@ -2410,7 +2410,7 @@ nb:
         group_weight: Vekt
         total: Total
     higher_than_max: "Du kan ikke bruke et tall som er større enn antall oppgaver"
-    incomplete: Ufullstendig
+    incomplete: "Ikke godkjent"
     index_view: 
       add_assignment: Oppgave
       add_group: Gruppe
@@ -3927,14 +3927,14 @@ nb:
     profile: 
       notices: 
         contact_registered: "Kontaktmetode er registrert!"
-  complete_4f4efbc: fullfør
+  complete_4f4efbc: godkjent
   complete_all_items_e1779257: "Fullfør alle elementer"
-  complete_fd828dea: Fullført
+  complete_fd828dea: Godkjent
   complete_icon_7455be93: "fullført ikon"
   complete_one_item_90e5fb03: "Fullfør ett element"
-  complete_title_7482ddcf: "Fullført %{title}"
-  completed_19711ce7: Fullført
-  completed_9b809e44: fullført
+  complete_title_7482ddcf: "Godkjent %{title}"
+  completed_19711ce7: Godkjent
+  completed_9b809e44: godkjent
   completed_icon_521596e4: "fullført ikon"
   compose_message_8abd180a: "Skriv melding"
   concluded_63150003: Avsluttet
@@ -4584,7 +4584,7 @@ nb:
     index: 
       titles: 
         course_modules: Emnemoduler
-    module_complete: Fullfør
+    module_complete: Godkjent
     module_empty: "Det er ingen elementer i modulen \"%{module}\""
     module_item_next: 
       drag_to_reorder: "Dra for å ordne eller flytte elementet til en annen modul"
@@ -6048,8 +6048,8 @@ nb:
       show_less: "Vis mindre"
       show_more: "Vis mer"
   dashboard_7f1dbf71: Dashbord
-  dashboard_options_b240ed5a: "Alternativer for instrumentbord"
-  dashboard_view_d7d85969: Instrumentbordvisning
+  dashboard_options_b240ed5a: "Alternativer for dashbord"
+  dashboard_view_d7d85969: Dashbordvisning
   data_exports: "data eksporter"
   data_point_over_time_8d0a54cc: "%{data_point} Over tid"
   data_set_identifier_data_set_id_c228b5df: "Dataset Identifier: %{data_set_id}"
@@ -7126,7 +7126,7 @@ nb:
     with_section: "%{course_name}, %{section_name}"
     workflow: 
       active: Aktiv
-      completed: Fullført
+      completed: Godkjent
       deleted: Slettet
       inactive: Inaktiv
       invited: Invitert
@@ -7728,7 +7728,7 @@ nb:
   failed_to_open_discussion_for_comments_87412434: "Kunne ikke åpne kommentarer for diskusjonen"
   failed_to_pin_discussion_38a60900: "Kunne ikke feste diskusjon"
   failed_to_publish_draft_comment_853761e9: "Publisering av kommentaren til utkastet feilet"
-  failed_to_save_dashboard_selection_32e71c72: "Kunne ikke lagre instrumentbordutvalg"
+  failed_to_save_dashboard_selection_32e71c72: "Kunne ikke lagre dashbordutvalg"
   failed_to_save_please_try_again_later_bb7070fb: "Kunne ikke lagre, vennligst forsøk senere"
   failed_to_submit_draft_comment_1de83451: "Kunne ikke sende inn utkast til kommentar"
   failed_to_unpin_discussion_503eab82: |-
@@ -8518,8 +8518,8 @@ nb:
       show_concluded_enrollments: "Vis fullførte påmeldinger"
       view_grading_history: "Se på karakterhistorikk"
     grades: 
-      complete: Ferdig
-      incomplete: Ufullstendig
+      complete: Godkjent
+      incomplete: "Ikke godkjent"
     grading_box_extended: 
       labels: 
         grade: Karakter
@@ -8775,8 +8775,8 @@ nb:
   grading_box: 
     out_of_points_possible: "av %{assignment.points_possible}"
   grading_cell: 
-    grade_complete: Ferdig
-    grade_incomplete: Ufullstendig
+    grade_complete: Godkjent
+    grade_incomplete: "Ikke godkjent"
     grade_ungraded: "Ikke karaktersatt"
     out_of: "(av %{points})"
     out_of_nil: "Ingen mulige poeng"
@@ -9580,8 +9580,8 @@ nb:
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: "Inkluder denne oppgavens karakterer ved synkronisering til skolens studentinformasjonssystem"
   include_unpublished_assignments_83ebbaec: "Inkluder ikkepubliserte oppgaver"
   include_unpublished_courses_7a0e7aab: "Inkluder ikkepubliserte emner"
-  incomplete_95612d72: ufullstendig
-  incomplete_da3c2ea2: Ufullstendig
+  incomplete_95612d72: "ikke godkjent"
+  incomplete_da3c2ea2: "Ikke godkjent"
   incorrect_answer_7c17e63b: "Feil svar"
   incorrect_username_and_or_password_2de73abb: "Feil brukernavn og/eller passord"
   increase_indent_6af90f7c: "Øk innryk"
@@ -9609,7 +9609,7 @@ nb:
   inner_box_background_6f9092f: "Indre boksbakgrunn"
   inner_box_border_d0524b03: "Innerste boksramme"
   input_and_distribute_grades_for_students_display_g_95b9b6ee: "Legg inn fordelte karakterer for studenter Vis karakterer som poeng, prosent, fullstendig eller ufullstendig, bestått eller ikke bestått GPA-skala og bokstavkarakter. Gruppeoppgaver for vektet karakter."
-  input_and_distribute_grades_for_students_display_g_9a2e46a0: "Legg inn fordelte karakterer for studenter Vis karakterer som poeng, prosent, fullstendig eller ufullstendig, bestått eller ikke bestått, GPA-skala og bokstavkarakter. Gruppeoppgaver for vektet karakter."
+  input_and_distribute_grades_for_students_display_g_9a2e46a0: "Legg inn fordelte karakterer for studenter Vis karakterer som poeng, prosent, godkjent eller ikke godkjent, bestått eller ikke bestått, GPA-skala og bokstavkarakter. Gruppeoppgaver for vektet karakter."
   insert_math_equation_57c6e767: "Sett matte likning"
   insert_row_below_25187f89: "Sett inn rad under"
   installed_7b284a91: Installert
@@ -9733,9 +9733,9 @@ nb:
   italy_39_cfad867a: "Italia (+39)"
   italy_daec3097: Italia
   item_cannot_be_duplicated_cebf3109: "Elementet kan ikke dupliseres"
-  item_complete_d334fd43: "(Element fullført)"
+  item_complete_d334fd43: "(Element godkjent)"
   item_filter_ca3987d7: Elementfilter
-  item_incomplete_d6a16040: "(Element ufullstendig)"
+  item_incomplete_d6a16040: "(Element ikke godkjent)"
   item_name_is_not_currently_supported_d0d7dcb: "%{item_name} støttes ikke for øyeblikket"
   item_past_due_dc6e776: "Elements frist utløpt"
   item_select_fe0f320a: Elementvalg
@@ -13177,7 +13177,7 @@ nb:
   oops_something_went_wrong_with_making_a_copy_of_or_7e9d6695: "Oops! Noe gikk galt under kopiering av «%{originalAssignmentName}»"
   oops_there_was_a_problem_loading_content_locks_4ab29a2a: "Uff da! Det oppstod et problem under innlasting av innholdslåser."
   open_color_picker_f117df0a: "Åpne fargeplukker"
-  open_complete_incomplete_menu_cfe2033b: "Åpne fullstendig/ufullstendig meny"
+  open_complete_incomplete_menu_cfe2033b: "Åpne godkjent/ikke godkjent meny"
   open_discussion_title_for_comments_6baa3fa: "Åpne diskusjon %{title} for kommentarer"
   open_event_menu_e9a21e39: "Åpne hendelsesmeny"
   open_for_comments_1810648: "Åpne for kommentarer"
@@ -18857,7 +18857,7 @@ nb:
   tool_type_afa58fcb: Verktøystype
   tooltips: 
     finished: ferdig
-    incomplete: ufullstendig
+    incomplete: "ikke godkjent"
     vdd: 
       more_message: "og %{count} til …"
   top_66e0adb6: Topp
