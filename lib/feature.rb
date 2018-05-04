@@ -673,6 +673,15 @@ END
         is_provisioned
       end
     },
+    'import_to_quizzes_next' =>
+    {
+      display_name: -> { I18n.t('Quizzes.Next Importing') },
+      description: -> { I18n.t('Allow importing of QTI and Common Cartridge into Quizzes.Next.') },
+      applies_to: 'RootAccount',
+      beta: true,
+      development: true,
+      state: 'allowed'
+    },
     'developer_key_management' =>
     {
       display_name: -> { I18n.t('Developer Key management')},

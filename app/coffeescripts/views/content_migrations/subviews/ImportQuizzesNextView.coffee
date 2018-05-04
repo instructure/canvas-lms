@@ -17,15 +17,24 @@
 
 define [
   'Backbone'
-  'jst/content_migrations/CommonCartridge'
-  './MigrationView'
-],(Backbone, template, MigrationView) ->
-  class CommonCartridge extends MigrationView
+  'i18n!content_migrations'
+  'jst/content_migrations/subviews/ImportQuizzesNextView'
+  'jquery'
+], (Backbone, I18n, template, $) ->
+  class ImportQuizzesNextView extends Backbone.View
     template: template
+    @optionProperty 'quizzesNextEnabled'
+    @optionProperty 'questionBank'
 
-    @child 'chooseMigrationFile', '.chooseMigrationFile'
-    @child 'questionBank', '.selectQuestionBank'
-    @child 'dateShift', '.dateShift'
-    @child 'selectContent', '.selectContent'
-    @child 'overwriteAssessmentContent', '.overwriteAssessmentContent'
-    @child 'importQuizzesNext', '.importQuizzesNext'
+    events:
+      "change #importQuizzesNext" : "setAttribute"
+
+    setAttribute: =>
+      settings = @model.get('settings') || {}
+      checked = @$el.find('#importQuizzesNext').is(':checked')
+      settings.import_quizzes_next = checked
+      @questionBank.setEnabled(!checked,
+        I18n.t('This option is not compatible with Quizzes.Next'))
+      @model.set('settings', settings)
+
+    toJSON: -> @options
