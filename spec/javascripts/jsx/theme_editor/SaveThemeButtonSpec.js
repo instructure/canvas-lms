@@ -90,19 +90,17 @@ test('save', function (assert) {
 
 test('modal visibility', function () {
   const wrapper = shallow(<SaveThemeButton {...props} />);
-  let modal = wrapper.find('Modal');
+
+  let modal = wrapper.find('InstuiModal');
   ok(modal.exists(), 'renders a modal');
-  notOk(modal.props().isOpen, 'modal is closed');
+  notOk(modal.props().open, 'modal is closed');
 
   wrapper.setState({
     modalIsOpen: true
   });
 
-  modal = wrapper.find('Modal');
-
-  // wrapper.update();
-
-  ok(modal.props().isOpen, 'modal is open')
+  modal = wrapper.find('InstuiModal');
+  ok(modal.props().open, 'modal is open')
 })
 
 test('disabling button', () => {

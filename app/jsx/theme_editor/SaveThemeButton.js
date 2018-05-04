@@ -21,9 +21,7 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
 import customTypes from './PropTypes'
-import Modal from '../shared/modal'
-import ModalContent from '../shared/modal-content'
-import ModalButtons from '../shared/modal-buttons'
+import Modal, { ModalBody, ModalFooter } from 'jsx/shared/components/InstuiModal'
 
 export default class SaveThemeButton extends Component {
   static propTypes = {
@@ -96,8 +94,13 @@ export default class SaveThemeButton extends Component {
         >
           {I18n.t('Save theme')}
         </button>
-        <Modal title={I18n.t('Theme Name')} onSubmit={this.save} isOpen={this.state.modalIsOpen}>
-          <ModalContent>
+        <Modal
+          size="small"
+          label={I18n.t('Save Theme')}
+          open={this.state.modalIsOpen}
+          handleCloseClick={() => this.setState({modalIsOpen: false})}
+        >
+          <ModalBody>
             <div className="ic-Form-control">
               <label htmlFor="new_theme_theme_name" className="ic-Label">
                 {I18n.t('Theme Name')}
@@ -110,23 +113,24 @@ export default class SaveThemeButton extends Component {
                 onChange={e => this.setState({newThemeName: e.target.value})}
               />
             </div>
-          </ModalContent>
-          <ModalButtons>
+          </ModalBody>
+          <ModalFooter>
             <button
               type="button"
               className="Button"
               onClick={() => this.setState({modalIsOpen: false})}
             >
               {I18n.t('Cancel')}
-            </button>
+            </button>&nbsp;
             <button
-              type="submit"
+              type="button"
+              onClick={this.save}
               disabled={!this.state.newThemeName}
               className="Button Button--primary"
             >
               {I18n.t('Save theme')}
             </button>
-          </ModalButtons>
+          </ModalFooter>
         </Modal>
       </div>
     )
