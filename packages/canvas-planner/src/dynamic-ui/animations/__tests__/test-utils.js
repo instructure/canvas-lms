@@ -65,6 +65,9 @@ export function mockAnimator () {
     scrollTo: jest.fn(),
     scrollToTop: jest.fn(),
     isAboveScreen: jest.fn(),
+    isBelowScreen: jest.fn(),
+    isOnScreen: jest.fn(),
+    isOffScreen: jest.fn(),
   };
 }
 

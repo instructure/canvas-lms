@@ -68,9 +68,7 @@ export class Animator {
 
   scrollTo (elt, offset, onComplete) {
     this.queueAnimation(() => {
-      const viewportHeight = this.window.innerHeight;
-      const rect = elt.getBoundingClientRect();
-      if (rect.top < offset || rect.bottom > viewportHeight) {
+      if (this.isOffScreen(elt, offset)) {
         this.velocity(elt, 'scroll', {offset: -offset, duration: 1000, easing: 'ease-in-out', complete: onComplete});
       } else {
         // even though we didn't need to run the animation, execute the onComplete callback
@@ -92,14 +90,22 @@ export class Animator {
     return elt.getBoundingClientRect().top < offset;
   }
 
-  documentIsTallerThanScreen () {
+  isBelowScreen (elt) {
     // clientHeight is rounded to an integer, while the rect is a more precise
     // float. Add some padding so we err on the side of loading too much.
     // Also, Canvas's footer makes the document always at least as tall as
     // the viewport.
     const doc = this.window.document.documentElement;
-    return doc.getBoundingClientRect().height > doc.clientHeight + 2;
+    return elt.getBoundingClientRect().bottom + 2 > doc.clientHeight;
   }
+
+  isOnScreen (elt, offset) {
+    return !this.isOffScreen(elt, offset);
+  }
+
+  isOffScreen (elt, offset) {
+     return this.isAboveScreen(elt, offset) || this.isBelowScreen(elt);
+   }
 
   runAnimationQueue = () => {
     while (this.animationQueue.length) {

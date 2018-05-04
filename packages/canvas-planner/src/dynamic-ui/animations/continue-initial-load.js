@@ -17,13 +17,13 @@
  */
 
 import Animation from '../animation';
-import {continueLoadingInitialItems, loadFutureItems} from '../../actions/loading-actions';
+import {continueLoadingInitialItems, loadFutureItems} from '../../actions';
 
 export class ContinueInitialLoad extends Animation {
   uiDidUpdate () {
     const moreItemsToLoad = !this.store().getState().loading.allFutureItemsLoaded;
-    const documentIsShorterThanScreen = !this.animator().documentIsTallerThanScreen();
-    if (moreItemsToLoad && documentIsShorterThanScreen) {
+    const keepLoading = this.animator().isOnScreen(this.app().fixedElementForItemScrolling(), this.stickyOffset());
+    if (moreItemsToLoad && keepLoading) {
       // we have to do this after this animation is complete,
       // because these actions can't be received recursively.
       this.window().setTimeout(() => {
