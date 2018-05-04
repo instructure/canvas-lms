@@ -132,7 +132,7 @@ export default class DeveloperKeyScopesGroup extends React.Component {
         <Flex alignItems="start" padding="small none small small">
           <FlexItem grow shrink padding="none">
             <div className="toggle-scope-group">
-              <ToggleDetails fluidWidth summary={this.groupSummary()}>
+              <ToggleDetails summary={this.groupSummary()}>
                 {this.props.scopes.map(scope => (
                   <DeveloperKeyScope
                     checked={this.props.selectedScopes.includes(scope.scope)}

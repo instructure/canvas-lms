@@ -25,6 +25,9 @@ describe 'Developer Keys' do
       admin_logged_in
       Account.site_admin.allow_feature!(:developer_key_management_ui_rewrite)
       Account.default.enable_feature!(:developer_key_management_ui_rewrite)
+
+      Account.site_admin.allow_feature!(:api_token_scoping)
+      Account.default.enable_feature!(:api_token_scoping)
     end
 
     let(:root_developer_key) do
@@ -55,6 +58,10 @@ describe 'Developer Keys' do
       wait_for_ajaximations
     end
 
+    def click_scopes_checkbox
+      fxpath('//*[@class="scopes-group"]/span[1]/span[2]').click
+    end
+
     it "allows creation through 'add developer key button'", test_id: 344077 do
       get "/accounts/#{Account.default.id}/developer_keys"
 
@@ -63,6 +70,7 @@ describe 'Developer Keys' do
       f("input[name='developer_key[email]']").send_keys("admin@example.com")
       f("textarea[name='developer_key[redirect_uris]']").send_keys("http://example.com")
       f("input[name='developer_key[icon_url]']").send_keys("/images/delete.png")
+      click_scopes_checkbox
       find_button("Save Key").click
 
       expect(ff("#reactContent tbody tr").length).to eq 1
@@ -82,6 +90,7 @@ describe 'Developer Keys' do
       replace_content(f("input[name='developer_key[email]']"), "admins@example.com")
       replace_content(f("textarea[name='developer_key[redirect_uris]']"), "http://b/")
       replace_content(f("input[name='developer_key[icon_url]']"), "/images/add.png")
+      click_scopes_checkbox
       find_button("Save Key").click
 
       expect(ff("#reactContent tbody tr").length).to eq 1
@@ -102,6 +111,7 @@ describe 'Developer Keys' do
       replace_content(f("input[name='developer_key[email]']"), "admins@example.com")
       replace_content(f("input[name='developer_key[redirect_uri]']"), "https://b/")
       replace_content(f("input[name='developer_key[icon_url]']"), "/images/add.png")
+      click_scopes_checkbox
       find_button("Save Key").click
 
       expect(ff("#reactContent tbody tr").length).to eq 1
@@ -119,6 +129,7 @@ describe 'Developer Keys' do
       get "/accounts/#{Account.default.id}/developer_keys"
       fj("#keys tbody tr.key button:has(svg[name='IconEditLine'])").click
       f("input[name='developer_key[icon_url]']").clear
+      click_scopes_checkbox
       find_button("Save Key").click
 
       expect(ff("#reactContent tbody tr").length).to eq 1

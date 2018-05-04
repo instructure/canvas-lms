@@ -147,6 +147,7 @@ class DeveloperKeysApp extends React.Component {
               createOrEditDeveloperKeyState={createOrEditDeveloperKey}
               availableScopes={listDeveloperKeyScopes.availableScopes}
               availableScopesPending={listDeveloperKeyScopes.listDeveloperKeyScopesPending}
+              selectedScopes={listDeveloperKeyScopes.selectedScopes}
               ctx={ctx}
             />
             <DeveloperKeysTable

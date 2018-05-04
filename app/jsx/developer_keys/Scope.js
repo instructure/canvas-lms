@@ -22,28 +22,30 @@ import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import DeveloperKeyScopesMethod from './ScopesMethod'
 
-const DeveloperKeyScope = (props) => (
-  <div className="developer-key-scope">
-    <Flex alignItems="start" padding="small none small none">
-      <FlexItem shrink padding="none small none none">
-        <DeveloperKeyScopesMethod method={props.scope.verb} />
-      </FlexItem>
-      <FlexItem grow shrink padding="none small none none">
-        {props.scope.path}
-      </FlexItem>
-      <FlexItem padding="none">
-        <Checkbox
-          name="developer_key[scopes][]"
-          label={<ScreenReaderContent>{props.scope.path}</ScreenReaderContent>}
-          value={props.scope.scope}
-          onChange={props.onChange}
-          checked={props.checked}
-          inline
-        />
-      </FlexItem>
-    </Flex>
-  </div>
-)
+const DeveloperKeyScope = props => {
+  return (
+    <div className="developer-key-scope">
+      <Flex alignItems="start" padding="small none small none">
+        <FlexItem shrink padding="none small none none">
+          <DeveloperKeyScopesMethod method={props.scope.verb} />
+        </FlexItem>
+        <FlexItem grow shrink padding="none small none none">
+          {props.scope.path}
+        </FlexItem>
+        <FlexItem padding="none">
+          <Checkbox
+            name="developer_key[scopes][]"
+            label={<ScreenReaderContent>{props.scope.path}</ScreenReaderContent>}
+            value={props.scope.scope}
+            onChange={props.onChange}
+            checked={props.checked}
+            inline
+          />
+        </FlexItem>
+      </Flex>
+    </div>
+  )
+}
 
 DeveloperKeyScope.propTypes = {
   onChange: PropTypes.func.isRequired,

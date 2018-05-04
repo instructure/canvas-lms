@@ -22,7 +22,8 @@ const initialState = {
   availableScopes: {},
   listDeveloperKeyScopesPending: false,
   listDeveloperKeyScopesSuccessful: false,
-  listDeveloperKeyScopesError: undefined
+  listDeveloperKeyScopesError: undefined,
+  selectedScopes: []
 }
 
 const developerKeysHandlers = {
@@ -44,7 +45,13 @@ const developerKeysHandlers = {
     listDeveloperKeyScopesSuccessful: false,
     listDeveloperKeyScopesPending: false,
     listDeveloperKeyScopesError: true
-  })
+  }),
+  [ACTION_NAMES.LIST_DEVELOPER_KEY_SCOPES_SET]: (state, action) => {
+      return {
+        ...state,
+        selectedScopes: action.payload
+      }
+  }
 }
 
 export default (state = initialState, action) => {

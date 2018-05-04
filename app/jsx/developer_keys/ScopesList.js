@@ -38,7 +38,7 @@ export default class DeveloperKeyScopesList extends React.Component {
       formattedScopesArray,
       availableScopes: formattedScopesArray.slice(0, 10), // Only load 10 groups on initial render
       readOnlySelected: false,
-      selectedScopes: []
+      selectedScopes: this.props.selectedScopes || []
     }
   }
 
@@ -50,6 +50,7 @@ export default class DeveloperKeyScopesList extends React.Component {
     this.setState({
       selectedScopes
     })
+    this.props.dispatch(this.props.actions.listDeveloperKeyScopesSet(selectedScopes))
   }
 
   setReadOnlySelected = readOnlySelected => {
@@ -82,6 +83,8 @@ export default class DeveloperKeyScopesList extends React.Component {
       selectedScopes: newScopes,
       readOnlySelected: event.currentTarget.checked
     })
+
+    this.props.dispatch(this.props.actions.listDeveloperKeyScopesSet(newScopes))
   }
 
   noFilter() {
@@ -97,10 +100,10 @@ export default class DeveloperKeyScopesList extends React.Component {
   render() {
     return (
       <div className="scopes-list">
-        <View borderRadius="small" display="block" borderWidth="small" >
+        <View borderRadius="small" display="block" borderWidth="small">
           <Flex height="564px" width="100%" as="div" direction="column">
             <FlexItem padding="none" textAlign="start">
-              <View padding="small" display="block" borderWidth="none none medium none" >
+              <View padding="small" display="block" borderWidth="none none medium none">
                 <Flex>
                   <FlexItem grow shrink padding="none large none medium">
                     <Text size="medium" weight="bold">
@@ -156,6 +159,10 @@ export default class DeveloperKeyScopesList extends React.Component {
 }
 
 DeveloperKeyScopesList.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  actions: PropTypes.shape({
+    listDeveloperKeyScopesSet: PropTypes.func.isRequired
+  }).isRequired,
   availableScopes: PropTypes.objectOf(
     PropTypes.arrayOf(
       PropTypes.shape({
@@ -164,5 +171,6 @@ DeveloperKeyScopesList.propTypes = {
       })
     )
   ).isRequired,
-  filter: PropTypes.string.isRequired
+  filter: PropTypes.string.isRequired,
+  selectedScopes: PropTypes.arrayOf(PropTypes.string).isRequired
 }

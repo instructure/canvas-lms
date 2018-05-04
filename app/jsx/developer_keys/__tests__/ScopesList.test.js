@@ -115,6 +115,8 @@ const scopes = {
 }
 
 const props = {
+  dispatch: () => {},
+  actions: { listDeveloperKeyScopesSet: () => {} },
   availableScopes: {
     "oauth":[
        {

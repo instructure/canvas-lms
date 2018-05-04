@@ -203,6 +203,9 @@ actions.listDeveloperKeyScopesSuccessful = payload => ({
 actions.LIST_DEVELOPER_KEY_SCOPES_FAILED = 'LIST_DEVELOPER_KEY_SCOPES_FAILED'
 actions.listDeveloperKeyScopesFailed = () => ({type: actions.LIST_DEVELOPER_KEY_SCOPES_FAILED})
 
+actions.LIST_DEVELOPER_KEY_SCOPES_SET = 'LIST_DEVELOPER_KEY_SCOPES_SET'
+actions.listDeveloperKeyScopesSet = selectedScopes => ({type: actions.LIST_DEVELOPER_KEY_SCOPES_SET, payload: selectedScopes})
+
 actions.listDeveloperKeyScopes = accountId => dispatch => {
   dispatch(actions.listDeveloperKeyScopesStart())
   const url = `/api/v1/accounts/${accountId}/scopes?group_by=resource`

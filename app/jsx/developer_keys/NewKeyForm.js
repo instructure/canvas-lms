@@ -86,8 +86,11 @@ export default class DeveloperKeyFormFields extends React.Component {
   scopeSettings() {
     return (
       <DeveloperKeyScopes
+        developerKey={this.props.developerKey}
         availableScopes={this.props.availableScopes}
         availableScopesPending={this.props.availableScopesPending}
+        store={this.props.store}
+        actions={this.props.actions}
       />
     )
   }
@@ -109,6 +112,12 @@ DeveloperKeyFormFields.defaultProps = {
 }
 
 DeveloperKeyFormFields.propTypes = {
+  store: PropTypes.shape({
+    dispatch: PropTypes.func.isRequired
+  }).isRequired,
+  actions: PropTypes.shape({
+    listDeveloperKeyScopesSet: PropTypes.func.isRequired,
+  }).isRequired,
   developerKey: PropTypes.shape({
     notes: PropTypes.string,
     icon_url: PropTypes.string,

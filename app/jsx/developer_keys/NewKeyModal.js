@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Button from '@instructure/ui-core/lib/components/Button'
 import I18n from 'i18n!react_developer_keys'
+import $ from 'jquery'
+import Button from '@instructure/ui-core/lib/components/Button'
 import Heading from '@instructure/ui-core/lib/components/Heading'
 import Modal, {ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-core/lib/components/Modal'
 import Spinner from '@instructure/ui-core/lib/components/Spinner'
@@ -44,10 +45,19 @@ export default class DeveloperKeyModal extends React.Component {
   submitForm = () => {
     const method = this.developerKey() ? 'put' : 'post'
     const formData = new FormData(this.form)
+    const scopesArrayKey = 'developer_key[scopes][]'
 
-    this.props.store.dispatch(
-      this.props.actions.createOrEditDeveloperKey(formData, this.developerKeyUrl(), method)
-    )
+    this.props.selectedScopes.forEach((scope) => {
+      formData.append(scopesArrayKey, scope)
+    })
+
+    if (this.props.selectedScopes.length > 0) {
+      this.props.store.dispatch(
+        this.props.actions.createOrEditDeveloperKey(formData, this.developerKeyUrl(), method)
+      )
+    } else {
+      $.flashError(I18n.t('At least one scope must be selected.'))
+    }
   }
 
   modalBody() {
@@ -73,9 +83,11 @@ export default class DeveloperKeyModal extends React.Component {
         }}
       >
         <DeveloperKeyFormFields
-          developerKey={this.props.createOrEditDeveloperKeyState.developerKey}
+          developerKey={this.developerKey()}
           availableScopes={this.props.availableScopes}
           availableScopesPending={this.props.availableScopesPending}
+          store={this.props.store}
+          actions={this.props.actions}
         />
       </form>
     )
@@ -155,7 +167,8 @@ DeveloperKeyModal.propTypes = {
       contextId: PropTypes.string.isRequired
     })
   }).isRequired,
-  mountNode: PropTypes.func
+  mountNode: PropTypes.func,
+  selectedScopes: PropTypes.arrayOf(PropTypes.string).isRequired
 }
 
 DeveloperKeyModal.defaultProps = {

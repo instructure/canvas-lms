@@ -46,7 +46,8 @@ function props(pending = false) {
            }
         ]
       },
-      availableScopesPending: pending
+      availableScopesPending: pending,
+      store: { dispatch: () => {} }
     })
 }
 

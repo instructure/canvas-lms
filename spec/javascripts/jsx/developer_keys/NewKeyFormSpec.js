@@ -47,6 +47,7 @@ function formFieldInputs(devKey) {
       availableScopes={{}}
       availableScopesPending={false}
       developerKey={devKey}
+      store={ {dispatch: () => {}} }
     />
   )
   return TestUtils.scryRenderedDOMComponentsWithTag(component, 'input')
@@ -58,6 +59,7 @@ function formFieldTextAreas(devKey) {
       availableScopes={{}}
       availableScopesPending={false}
       developerKey={devKey}
+      store={ {dispatch: () => {}} }
     />
   )
   return TestUtils.scryRenderedDOMComponentsWithTag(component, 'textarea')

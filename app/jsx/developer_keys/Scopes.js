@@ -53,7 +53,10 @@ export default class DeveloperKeyScopes extends React.Component {
         <GridCol>
           <DeveloperKeyScopesList
             availableScopes={this.props.availableScopes}
+            selectedScopes={this.props.developerKey.scopes}
             filter={this.state.filter}
+            actions={this.props.actions}
+            dispatch={this.props.store.dispatch}
           />
         </GridCol>
       </GridRow>
@@ -92,5 +95,24 @@ DeveloperKeyScopes.propTypes = {
       scope: PropTypes.string
     })
   )).isRequired,
-  availableScopesPending: PropTypes.bool.isRequired
+  availableScopesPending: PropTypes.bool.isRequired,
+  store: PropTypes.shape({
+    dispatch: PropTypes.func.isRequired
+  }).isRequired,
+  actions: PropTypes.shape({
+    listDeveloperKeyScopesSet: PropTypes.func.isRequired,
+  }).isRequired,
+  developerKey: PropTypes.shape({
+    notes: PropTypes.string,
+    icon_url: PropTypes.string,
+    vendor_code: PropTypes.string,
+    redirect_uris: PropTypes.string,
+    email: PropTypes.string,
+    name: PropTypes.string,
+    scopes: PropTypes.arrayOf(PropTypes.string)
+  })
+}
+
+DeveloperKeyScopes.defaultProps = {
+  developerKey: undefined
 }

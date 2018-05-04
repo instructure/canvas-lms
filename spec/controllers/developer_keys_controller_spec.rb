@@ -212,6 +212,11 @@ describe DeveloperKeysController do
           post 'create', params: { account_id: root_account.id, developer_key: { scopes: valid_scopes } }
           expect(DeveloperKey.find(json_parse['id']).scopes).to be_blank
         end
+
+        it 'sets the scopes to empty if the scopes parameter is an empty string' do
+          post 'create', params: { account_id: root_account.id, developer_key: { scopes: '' } }
+          expect(DeveloperKey.find(json_parse['id']).scopes).to match_array []
+        end
       end
     end
 
@@ -273,6 +278,11 @@ describe DeveloperKeysController do
           allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(false)
           put 'update', params: { id: developer_key.id, developer_key: { scopes: valid_scopes } }
           expect(developer_key.reload.scopes).to be_blank
+        end
+
+        it 'sets the scopes to empty if the scopes parameter is an empty string' do
+          put 'update', params: { id: developer_key.id, developer_key: { scopes: '' } }
+          expect(developer_key.reload.scopes).to match_array []
         end
       end
     end

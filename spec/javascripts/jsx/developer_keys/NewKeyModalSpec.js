@@ -27,6 +27,16 @@ QUnit.module('NewKeyModal', {
   }
 })
 
+const selectedScopes = [
+  'url:GET|foo',
+  'url:GET|bar'
+]
+
+const fakeActions = {
+  createOrEditDeveloperKey: () => {},
+  setEditingDeveloperKey: () => {}
+}
+
 const developerKey = {
   access_token_count: 77,
   account_name: 'bob account',
@@ -77,11 +87,6 @@ function modalMountNode() {
 }
 
 test('it opens the modal if isOpen prop is true', () => {
-  const fakeActions = {
-    createOrEditDeveloperKey: () => {},
-    setEditingDeveloperKey: () => {}
-  }
-
   const wrapper = shallow(
     <DeveloperKeyModal
       availableScopes={{}}
@@ -91,6 +96,7 @@ test('it opens the modal if isOpen prop is true', () => {
       actions={fakeActions}
       store={{dispatch: () => {}}}
       mountNode={modalMountNode}
+      selectedScopes={selectedScopes}
     />
   )
   equal(wrapper.find('Modal').prop('open'), true)
@@ -98,11 +104,6 @@ test('it opens the modal if isOpen prop is true', () => {
 })
 
 test('it closes the modal if isOpen prop is false', () => {
-  const fakeActions = {
-    createOrEditDeveloperKey: () => {},
-    setEditingDeveloperKey: () => {}
-  }
-
   const wrapper = shallow(
     <DeveloperKeyModal
       availableScopes={{}}
@@ -112,6 +113,7 @@ test('it closes the modal if isOpen prop is false', () => {
       actions={fakeActions}
       store={{dispatch: () => {}}}
       mountNode={modalMountNode}
+      selectedScopes={selectedScopes}
     />
   )
   equal(wrapper.find('Modal').prop('open'), false)
@@ -134,6 +136,7 @@ test('it dismisses the modal when the "cancel" button is pressed', () => {
       actions={fakeActions}
       store={{dispatch: () => {}}}
       mountNode={modalMountNode}
+      selectedScopes={selectedScopes}
     />
   )
   const cancelButton = wrapper.find('Button').filterWhere(n => n.prop('children') === 'Cancel')
@@ -159,6 +162,7 @@ test('clear the active key when the cancel button is closed', () => {
       actions={fakeActions}
       store={{dispatch: () => {}}}
       mountNode={modalMountNode}
+      selectedScopes={selectedScopes}
     />
   )
   const cancelButton = wrapper.find('Button').filterWhere(n => n.prop('children') === 'Cancel')
@@ -195,6 +199,7 @@ test('it uses the create URL if a key is being created', () => {
       store={fakeStore}
       ctx={ctx}
       mountNode={modalMountNode}
+      selectedScopes={selectedScopes}
     />
   )
 
@@ -232,6 +237,7 @@ test('it uses POST if a key is being created', () => {
       store={fakeStore}
       ctx={ctx}
       mountNode={modalMountNode}
+      selectedScopes={selectedScopes}
     />
   )
 
@@ -263,6 +269,7 @@ test('it uses the edit URL if a key is being edited', () => {
       actions={fakeActions}
       store={fakeStore}
       mountNode={modalMountNode}
+      selectedScopes={selectedScopes}
     />
   )
 
@@ -293,6 +300,7 @@ test('it uses PUT if a key is being edited', () => {
       actions={fakeActions}
       store={fakeStore}
       mountNode={modalMountNode}
+      selectedScopes={selectedScopes}
     />
   )
 
@@ -325,6 +333,7 @@ test('it sends the contents of the form saving', () => {
       actions={fakeActions}
       store={fakeStore}
       mountNode={modalMountNode}
+      selectedScopes={selectedScopes}
     />
   )
 
@@ -339,4 +348,51 @@ test('it sends the contents of the form saving', () => {
   equal(sentFormData.get('developer_key[vendor_code]'), developerKey.vendor_code)
   equal(sentFormData.get('developer_key[icon_url]'), developerKey.icon_url)
   equal(sentFormData.get('developer_key[notes]'), developerKey.notes)
+})
+
+test('it adds each selected scope to the form data', () => {
+  const createOrEditSpy = sinon.spy()
+  const dispatchSpy = sinon.spy()
+  const fakeActions = { createOrEditDeveloperKey: createOrEditSpy }
+  const fakeStore = { dispatch: dispatchSpy }
+  const wrapper = mount(
+    <DeveloperKeyModal
+      availableScopes={{}}
+      availableScopesPending={false}
+      closeModal={() => {}}
+      createOrEditDeveloperKeyState={editDeveloperKeyState}
+      listDeveloperKeyScopesState={listDeveloperKeyScopesState}
+      actions={fakeActions}
+      store={fakeStore}
+      mountNode={modalMountNode}
+      selectedScopes={selectedScopes}
+    />
+  )
+  wrapper.node.submitForm()
+  const [[sentFormData]] = createOrEditSpy.args
+  deepEqual(sentFormData.getAll('developer_key[scopes][]'), selectedScopes)
+})
+
+test('flashes an error if no scopes are selected', () => {
+  const flashStub = sinon.stub($, 'flashError')
+  const createOrEditSpy = sinon.spy()
+  const dispatchSpy = sinon.spy()
+  const fakeActions = { createOrEditDeveloperKey: createOrEditSpy }
+  const fakeStore = { dispatch: dispatchSpy }
+  const wrapper = mount(
+    <DeveloperKeyModal
+      availableScopes={{}}
+      availableScopesPending={false}
+      closeModal={() => {}}
+      createOrEditDeveloperKeyState={editDeveloperKeyState}
+      listDeveloperKeyScopesState={listDeveloperKeyScopesState}
+      actions={fakeActions}
+      store={fakeStore}
+      mountNode={modalMountNode}
+      selectedScopes={[]}
+    />
+  )
+  wrapper.node.submitForm()
+  ok(flashStub.calledWith('At least one scope must be selected.'))
+  flashStub.restore()
 })
