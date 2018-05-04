@@ -1,28 +1,7 @@
-#
-# Copyright (C) 2017 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-
-class UpdateAssignmentStudentVisibilitiesView < ActiveRecord::Migration[5.0]
+class UpdateAssignmentStudentVisibilitiesViewSubmissionsJoin < ActiveRecord::Migration[5.0]
   tag :postdeploy
 
   def up
-    # Updates the previously created view to add the
-    # workflow_state = 'active' condition to the
-    # AssignmentOverrideStudent's JOIN
     self.connection.execute %(CREATE OR REPLACE VIEW #{connection.quote_table_name('assignment_student_visibilities')} AS
     SELECT DISTINCT a.id as assignment_id,
       e.user_id as user_id,
@@ -70,7 +49,7 @@ class UpdateAssignmentStudentVisibilitiesView < ActiveRecord::Migration[5.0]
       LEFT JOIN #{Submission.quoted_table_name} s
         ON s.user_id = e.user_id
         AND s.assignment_id = a.id
-        AND s.workflow_state != 'deleted'
+        AND s.workflow_state NOT IN ('deleted', 'unsubmitted')
 
       WHERE a.workflow_state NOT IN ('deleted','unpublished')
         AND(
@@ -81,6 +60,9 @@ class UpdateAssignmentStudentVisibilitiesView < ActiveRecord::Migration[5.0]
   end
 
   def down
+    # Updates the previously created view to add the
+    # workflow_state = 'active' condition to the
+    # AssignmentOverrideStudent's JOIN
     self.connection.execute %(CREATE OR REPLACE VIEW #{connection.quote_table_name('assignment_student_visibilities')} AS
     SELECT DISTINCT a.id as assignment_id,
       e.user_id as user_id,
@@ -114,6 +96,7 @@ class UpdateAssignmentStudentVisibilitiesView < ActiveRecord::Migration[5.0]
       LEFT JOIN #{AssignmentOverrideStudent.quoted_table_name} aos
         ON aos.assignment_id = a.id
         AND aos.user_id = e.user_id
+        AND aos.workflow_state = 'active'
 
       LEFT JOIN #{AssignmentOverride.quoted_table_name} ao
         ON ao.assignment_id = a.id

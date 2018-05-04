@@ -2011,6 +2011,34 @@ describe AssignmentsApiController, type: :request do
           to be_include 'Multiple Dates'
       end
 
+      it "should only notify students with visibility on creation" do
+        section2 = @course.course_sections.create!
+        student2 = student_in_section(section2, :user => user_with_communication_channel(:active_all => true))
+        student2.email_channel.notification_policies.create!(notification: @notification, frequency: 'immediately')
+
+        @user = @teacher
+        json = api_call(:post,
+          "/api/v1/courses/#{@course.id}/assignments.json",
+          {
+            :controller => 'assignments_api',
+            :action => 'create', :format => 'json',
+            :course_id => @course.id.to_s },
+          { :assignment => {
+            'name' => 'some assignment',
+            'published' => true,
+            'only_visible_to_overrides' => true,
+            'assignment_overrides' => {
+              '0' => {
+                'course_section_id' => section2.id,
+                'due_at' => Time.parse('2002 Jun 22 12:00:00').iso8601
+              }
+            }
+          }
+          })
+        expect(@student.messages).to be_empty
+        expect(student2.messages.detect{|m| m.notification_id == @notification.id}).to be_present
+      end
+
       it "should send notification of creation on save and publish" do
         assignment = @course.assignments.new(:name => "blah")
         assignment.workflow_state = 'unpublished'
@@ -2036,6 +2064,38 @@ describe AssignmentsApiController, type: :request do
           }
           })
         expect(@student.messages.detect{|m| m.notification_id == @notification.id}).to be_present
+      end
+
+      it "should use new overrides for notifications of creation on save and publish" do
+        assignment = @course.assignments.create!(:name => "blah", :workflow_state => 'unpublished',
+          :only_visible_to_overrides => true)
+        override = assignment.assignment_overrides.create!(:title => "blah", :set => @course.default_section, :set_type => "CourseSection")
+
+        section2 = @course.course_sections.create!
+        student2 = student_in_section(section2, :user => user_with_communication_channel(:active_all => true))
+        student2.email_channel.notification_policies.create!(notification: @notification, frequency: 'immediately')
+
+        @user = @teacher
+        json = api_call(:put,
+          "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+          {
+            :controller => 'assignments_api',
+            :action => 'update', :format => 'json',
+            :course_id => @course.id.to_s,
+            :id => assignment.to_param
+          },
+          { :assignment => {
+            'published' => true,
+            'assignment_overrides' => {
+              '0' => {
+                'course_section_id' => section2.id,
+                'due_at' => 1.day.from_now.iso8601
+              }
+            }
+          }
+          })
+        expect(@student.messages).to be_empty
+        expect(student2.messages.detect{|m| m.notification_id == @notification.id}).to be_present
       end
     end
 
