@@ -85,3 +85,9 @@
   height: 100%;
   padding: var(--padding);
 }
+
+.newActivityButton {
+  offset-inline-start: 0;
+  top: 100%;
+  position: absolute;
+}
