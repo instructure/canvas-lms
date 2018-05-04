@@ -4,16 +4,22 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
 <div
   className="PlannerApp large"
 >
-  <ShowOnFocusButton
-    buttonProps={
-      Object {
-        "onClick": undefined,
-      }
-    }
-    buttonRef={[Function]}
+  <Container
+    as="div"
+    display={null}
+    textAlign="center"
   >
-    Load prior dates
-  </ShowOnFocusButton>
+    <ShowOnFocusButton
+      buttonProps={
+        Object {
+          "onClick": undefined,
+        }
+      }
+      buttonRef={[Function]}
+    >
+      Load prior dates
+    </ShowOnFocusButton>
+  </Container>
   <LoadingPastIndicator
     allPastItemsLoaded={false}
     loadingPast={false}
@@ -160,16 +166,22 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
 <div
   className="PlannerApp large"
 >
-  <ShowOnFocusButton
-    buttonProps={
-      Object {
-        "onClick": undefined,
-      }
-    }
-    buttonRef={[Function]}
+  <Container
+    as="div"
+    display={null}
+    textAlign="center"
   >
-    Load prior dates
-  </ShowOnFocusButton>
+    <ShowOnFocusButton
+      buttonProps={
+        Object {
+          "onClick": undefined,
+        }
+      }
+      buttonRef={[Function]}
+    >
+      Load prior dates
+    </ShowOnFocusButton>
+  </Container>
   <LoadingPastIndicator
     allPastItemsLoaded={false}
     loadingPast={false}
@@ -232,16 +244,22 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
 <div
   className="PlannerApp large"
 >
-  <ShowOnFocusButton
-    buttonProps={
-      Object {
-        "onClick": undefined,
-      }
-    }
-    buttonRef={[Function]}
+  <Container
+    as="div"
+    display={null}
+    textAlign="center"
   >
-    Load prior dates
-  </ShowOnFocusButton>
+    <ShowOnFocusButton
+      buttonProps={
+        Object {
+          "onClick": undefined,
+        }
+      }
+      buttonRef={[Function]}
+    >
+      Load prior dates
+    </ShowOnFocusButton>
+  </Container>
   <LoadingPastIndicator
     allPastItemsLoaded={false}
     loadingPast={false}
@@ -310,16 +328,22 @@ exports[`PlannerApp renders base component using dayKeys 1`] = `
 <div
   className="PlannerApp large"
 >
-  <ShowOnFocusButton
-    buttonProps={
-      Object {
-        "onClick": undefined,
-      }
-    }
-    buttonRef={[Function]}
+  <Container
+    as="div"
+    display={null}
+    textAlign="center"
   >
-    Load prior dates
-  </ShowOnFocusButton>
+    <ShowOnFocusButton
+      buttonProps={
+        Object {
+          "onClick": undefined,
+        }
+      }
+      buttonRef={[Function]}
+    >
+      Load prior dates
+    </ShowOnFocusButton>
+  </Container>
   <LoadingPastIndicator
     allPastItemsLoaded={false}
     loadingPast={false}
