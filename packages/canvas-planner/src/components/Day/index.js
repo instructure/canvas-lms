@@ -77,11 +77,12 @@ export class Day extends Component {
 
   renderGrouping(groupKey, groupItems, index) {
     const courseInfo = groupItems[0].context || {};
+    const groupColor = (courseInfo.color ? courseInfo.color : this.props.currentUser.color) || null;
     return (
       <Grouping
         title={courseInfo.title}
         image_url={courseInfo.image_url}
-        color={courseInfo.color}
+        color={groupColor}
         timeZone={this.props.timeZone}
         updateTodo={this.props.updateTodo}
         items={groupItems}
@@ -89,7 +90,7 @@ export class Day extends Component {
         url={courseInfo.url}
         key={groupKey}
         theme={{
-          titleColor: courseInfo.color || null
+          titleColor: groupColor
         }}
         toggleCompletion={this.props.toggleCompletion}
         currentUser={this.props.currentUser}

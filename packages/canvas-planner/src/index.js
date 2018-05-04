@@ -169,7 +169,8 @@ export default function loadPlannerDashboard ({changeToCardView, getActiveApp, f
     currentUser: {
       id: env.current_user.id,
       displayName: env.current_user.display_name,
-      avatarUrl: env.current_user.avatar_image_url
+      avatarUrl: env.current_user.avatar_image_url,
+      color: env.PREFERENCES.custom_colors[`user_${env.current_user.id}`]
     },
     ariaHideElement: document.getElementById('application'),
     theme: '',

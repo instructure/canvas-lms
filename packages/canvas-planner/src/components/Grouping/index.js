@@ -190,6 +190,9 @@ export class Grouping extends Component {
             animatableIndex={animatableIndex}
             animatableItemIds={completedItemIds}
             notificationBadge={notificationBadge}
+            theme={{
+              labelColor: this.props.color
+            }}
           />
         </li>
       );

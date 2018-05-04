@@ -42,6 +42,8 @@ import { showPillForOverdueStatus } from '../../utilities/statusUtils';
 import { momentObj } from 'react-moment-proptypes';
 import formatMessage from '../../format-message';
 import {animatable} from '../../dynamic-ui';
+import ApplyTheme from '@instructure/ui-core/lib/components/ApplyTheme';
+import CheckboxFacade from '@instructure/ui-core/lib/components/Checkbox/CheckboxFacade';
 
 export class PlannerItem extends Component {
   static propTypes = {
@@ -261,7 +263,7 @@ export class PlannerItem extends Component {
             {...this.props.associated_item === "To Do" ? {onClick: this.toDoLinkClick} : {}}
             href={this.props.html_url || "#" }>
             <ScreenReaderContent>{this.linkLabel()}</ScreenReaderContent>
-            <PresentationContent>{this.props.title}</PresentationContent>
+            <PresentationContent><Text color="primary">{this.props.title}</Text></PresentationContent>
           </Link>
         </div>
       </div>
@@ -297,6 +299,15 @@ export class PlannerItem extends Component {
     }
   }
 
+  getCheckboxTheme = () => {
+    return {
+      checkedBackground: this.props.color,
+      checkedBorderColor: this.props.color,
+      borderColor: this.props.color,
+      hoverBorderColor: this.props.color
+    };
+  }
+
   render () {
     const assignmentType = this.assignmentType();
     const checkboxLabel = this.state.completed ?
@@ -309,6 +320,9 @@ export class PlannerItem extends Component {
       <div className={classnames(styles.root, styles[this.getLayout()], 'planner-item')} ref={this.registerRootDivRef}>
         {this.renderNotificationBadge()}
         <div className={styles.completed}>
+          <ApplyTheme theme={{
+            [CheckboxFacade.theme]: this.getCheckboxTheme()
+          }}>
           <Checkbox
             ref={this.registerFocusElementRef}
             label={<ScreenReaderContent>{checkboxLabel}</ScreenReaderContent>}
@@ -316,9 +330,10 @@ export class PlannerItem extends Component {
             onChange={this.props.toggleCompletion}
             disabled={this.props.toggleAPIPending}
           />
+          </ApplyTheme>
         </div>
         <div
-          className={assignmentType === 'To Do' ? styles.avatar : styles.icon}
+          className={this.props.associated_item === 'To Do' ? styles.avatar : styles.icon}
           style={{ color: this.props.color }}
           aria-hidden="true"
         >

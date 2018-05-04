@@ -20,6 +20,9 @@ import { shallow, mount } from 'enzyme';
 import moment from 'moment-timezone';
 import {Day} from '../index';
 
+const user = {id: '1', displayName: 'Jane',
+  avatarUrl: '/picture/is/here', color: "#00AC18"};
+
 it('renders the base component with required props', () => {
   const wrapper = shallow(
     <Day timeZone="America/Denver" day="2017-04-25" />
@@ -84,7 +87,7 @@ it('renders grouping correctly when having itemsForDay', () => {
   }];
 
   const wrapper = shallow(
-    <Day timeZone={TZ} day="2017-04-25" itemsForDay={items} animatableIndex={1}/>
+    <Day timeZone={TZ} day="2017-04-25" itemsForDay={items} animatableIndex={1} currentUser={user}/>
   );
   expect(wrapper).toMatchSnapshot();
 });
@@ -119,7 +122,7 @@ it('groups itemsForDay that have no context into the "Notes" category', () => {
   }];
 
   const wrapper = shallow(
-    <Day timeZone={TZ} day="2017-04-25" itemsForDay={items} />
+    <Day timeZone={TZ} day="2017-04-25" itemsForDay={items} currentUser={user}/>
   );
   expect(wrapper).toMatchSnapshot();
 });
@@ -145,7 +148,8 @@ it('groups itemsForDay that come in on prop changes', () => {
   }];
 
   const wrapper = shallow(
-    <Day timeZone={TZ} day="2017-04-25" itemsForDay={items} registerAnimatable={() => {}} deregisterAnimatable={() => {}} />
+    <Day timeZone={TZ} day="2017-04-25" itemsForDay={items} registerAnimatable={() => {}}
+         deregisterAnimatable={() => {}} currentUser={user}/>
   );
   expect(wrapper).toMatchSnapshot();
 
@@ -169,7 +173,7 @@ it('groups itemsForDay that come in on prop changes', () => {
 it('renders even when there are no items', () => {
   const date = moment.tz("Asia/Tokyo").add(13, 'days');
   const wrapper = shallow(
-    <Day timeZone="Asia/Tokyo" day={date.format('YYYY-MM-DD')} itemsForDay={[]} />
+    <Day timeZone="Asia/Tokyo" day={date.format('YYYY-MM-DD')} itemsForDay={[]} currentUser={user}/>
   );
   expect(wrapper.type).not.toBeNull();
 });
@@ -195,6 +199,7 @@ it('registers itself as animatable', () => {
       registerAnimatable={fakeRegister}
       deregisterAnimatable={fakeDeregister}
       updateTodo={() => {}}
+      currentUser={user}
     />
   );
   const instance = wrapper.instance();

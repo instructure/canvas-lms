@@ -365,7 +365,7 @@ describe('transformApiToInternalItem', () => {
     expect(result).toMatchSnapshot();
   });
 
-  it('extracts and transforms the proper data for a assignment response', () => {
+  it('extracts and transforms the proper data for an assignment response', () => {
     const apiResponse = makeApiResponse({
       plannable_type: 'assignment',
       plannable: makeAssignment({

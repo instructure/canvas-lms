@@ -21,6 +21,8 @@ import {PlannerItem} from '../index';
 import moment from 'moment-timezone';
 
 const DEFAULT_DATE = moment.tz('2011-12-17T03:30:00', "America/Los_Angeles");
+const user = {id: '1', displayName: 'Jane',
+  avatarUrl: '/picture/is/here', color: "#00AC18"};
 
 function defaultProps (option = {}) {
   return {
@@ -36,7 +38,7 @@ function defaultProps (option = {}) {
       html_url: option.html_url,
       toggleCompletion: () => {},
       updateTodo: () => {},
-      currentUser: {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here'},
+      currentUser: user,
       ...option
   };
 }
@@ -52,9 +54,8 @@ function noteProps (option) {
       title: option.title || "A note about note taking",
       toggleCompletion: () => {},
       updateTodo: () => {},
-      currentUser: {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here',
+      currentUser: user,
       ...option
-    },
   };
 }
 
@@ -80,7 +81,7 @@ function groupProps (option) {
     "badges": [],
     toggleCompletion: () => {},
     updateTodo: () => {},
-    currentUser: {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here'},
+    currentUser: user,
   };
 }
 
@@ -158,7 +159,7 @@ it('renders Assignment correctly with everything', () => {
         {
           associated_item: 'Assignment',
           completed: true,
-          title: "I am a Assignment",
+          title: "I am an Assignment",
           points: 4,
           html_url: "http://www.non_default_url.com",
           date: DEFAULT_DATE,
@@ -175,7 +176,7 @@ it('renders Assignment correctly with just points', () => {
         {
           associated_item: 'Assignment',
           completed: false,
-          title: "I am a Assignment",
+          title: "I am an Assignment",
           points: 2,
         })
     } />
@@ -190,7 +191,7 @@ it('renders Assignment correctly without right side content', () => {
         {
           associated_item: 'Assignment',
           completed: false,
-          title: "I am a Assignment",
+          title: "I am an Assignment",
         })
     } />
   );
@@ -204,7 +205,7 @@ it('renders Assignment correctly with just date', () => {
         {
           associated_item: 'Assignment',
           completed: false,
-          title: "I am a Assignment",
+          title: "I am an Assignment",
           date: DEFAULT_DATE,
         })
     } />
@@ -279,7 +280,7 @@ it('renders Announcement correctly with everything', () => {
         {
           associated_item: 'Announcement',
           completed: true,
-          title: "I am a Announcement",
+          title: "I am an Announcement",
           points: 4,
           date: DEFAULT_DATE,
         })
@@ -295,7 +296,7 @@ it('renders Announcement correctly with just points', () => {
         {
           associated_item: 'Announcement',
           completed: false,
-          title: "I am a Announcement",
+          title: "I am an Announcement",
           points: 2,
         })
     } />
@@ -310,7 +311,7 @@ it('renders Announcement correctly without right side content', () => {
         {
           associated_item: 'Announcement',
           completed: false,
-          title: "I am a Announcement",
+          title: "I am an Announcement",
         })
     } />
   );
@@ -324,7 +325,7 @@ it('renders Announcement correctly with just date', () => {
         {
           associated_item: 'Announcement',
           completed: false,
-          title: "I am a Announcement",
+          title: "I am an Announcement",
           date: DEFAULT_DATE,
         })
     } />
@@ -481,6 +482,22 @@ it('renders Note correctly without Course', () => {
           title: "I am a Note",
         })
     } />
+  );
+  expect(wrapper).toMatchSnapshot();
+});
+
+it('renders user-created Todo correctly', () => {
+  const wrapper = shallow(
+    <PlannerItem {
+                   ...defaultProps(
+                     {
+                       associated_item: null,
+                       completed: false,
+                       title: "do that one thing",
+                       courseName: "To Do",
+                       color: null,
+                     })
+                 } />
   );
   expect(wrapper).toMatchSnapshot();
 });

@@ -31,6 +31,15 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
   <div>
     <Animatable(ResponsiveGrouping)
       animatableIndex={1}
+      color="#00AC18"
+      currentUser={
+        Object {
+          "avatarUrl": "/picture/is/here",
+          "color": "#00AC18",
+          "displayName": "Jane",
+          "id": "1",
+        }
+      }
       items={
         Array [
           Object {
@@ -46,13 +55,22 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
       }
       theme={
         Object {
-          "titleColor": null,
+          "titleColor": "#00AC18",
         }
       }
       timeZone="America/Denver"
     />
     <Animatable(ResponsiveGrouping)
       animatableIndex={2}
+      color="#00AC18"
+      currentUser={
+        Object {
+          "avatarUrl": "/picture/is/here",
+          "color": "#00AC18",
+          "displayName": "Jane",
+          "id": "1",
+        }
+      }
       items={
         Array [
           Object {
@@ -68,7 +86,7 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
       }
       theme={
         Object {
-          "titleColor": null,
+          "titleColor": "#00AC18",
         }
       }
       timeZone="America/Denver"
@@ -108,6 +126,15 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
   <div>
     <Animatable(ResponsiveGrouping)
       animatableIndex={1}
+      color="#00AC18"
+      currentUser={
+        Object {
+          "avatarUrl": "/picture/is/here",
+          "color": "#00AC18",
+          "displayName": "Jane",
+          "id": "1",
+        }
+      }
       items={
         Array [
           Object {
@@ -123,13 +150,22 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
       }
       theme={
         Object {
-          "titleColor": null,
+          "titleColor": "#00AC18",
         }
       }
       timeZone="America/Denver"
     />
     <Animatable(ResponsiveGrouping)
       animatableIndex={2}
+      color="#00AC18"
+      currentUser={
+        Object {
+          "avatarUrl": "/picture/is/here",
+          "color": "#00AC18",
+          "displayName": "Jane",
+          "id": "1",
+        }
+      }
       items={
         Array [
           Object {
@@ -154,13 +190,22 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
       }
       theme={
         Object {
-          "titleColor": null,
+          "titleColor": "#00AC18",
         }
       }
       timeZone="America/Denver"
     />
     <Animatable(ResponsiveGrouping)
       animatableIndex={3}
+      color="#00AC18"
+      currentUser={
+        Object {
+          "avatarUrl": "/picture/is/here",
+          "color": "#00AC18",
+          "displayName": "Jane",
+          "id": "1",
+        }
+      }
       items={
         Array [
           Object {
@@ -170,7 +215,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
       }
       theme={
         Object {
-          "titleColor": null,
+          "titleColor": "#00AC18",
         }
       }
       timeZone="America/Denver"
@@ -210,6 +255,15 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
   <div>
     <Animatable(ResponsiveGrouping)
       animatableIndex={1}
+      color="#00AC18"
+      currentUser={
+        Object {
+          "avatarUrl": "/picture/is/here",
+          "color": "#00AC18",
+          "displayName": "Jane",
+          "id": "1",
+        }
+      }
       items={
         Array [
           Object {
@@ -225,13 +279,22 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
       }
       theme={
         Object {
-          "titleColor": null,
+          "titleColor": "#00AC18",
         }
       }
       timeZone="America/Denver"
     />
     <Animatable(ResponsiveGrouping)
       animatableIndex={2}
+      color="#00AC18"
+      currentUser={
+        Object {
+          "avatarUrl": "/picture/is/here",
+          "color": "#00AC18",
+          "displayName": "Jane",
+          "id": "1",
+        }
+      }
       items={
         Array [
           Object {
@@ -256,13 +319,22 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
       }
       theme={
         Object {
-          "titleColor": null,
+          "titleColor": "#00AC18",
         }
       }
       timeZone="America/Denver"
     />
     <Animatable(ResponsiveGrouping)
       animatableIndex={3}
+      color="#00AC18"
+      currentUser={
+        Object {
+          "avatarUrl": "/picture/is/here",
+          "color": "#00AC18",
+          "displayName": "Jane",
+          "id": "1",
+        }
+      }
       items={
         Array [
           Object {
@@ -272,7 +344,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
       }
       theme={
         Object {
-          "titleColor": null,
+          "titleColor": "#00AC18",
         }
       }
       timeZone="America/Denver"
@@ -312,6 +384,15 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
   <div>
     <Animatable(ResponsiveGrouping)
       animatableIndex={101}
+      color="#00AC18"
+      currentUser={
+        Object {
+          "avatarUrl": "/picture/is/here",
+          "color": "#00AC18",
+          "displayName": "Jane",
+          "id": "1",
+        }
+      }
       items={
         Array [
           Object {
@@ -328,7 +409,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
       }
       theme={
         Object {
-          "titleColor": null,
+          "titleColor": "#00AC18",
         }
       }
       timeZone="America/Denver"
@@ -336,6 +417,15 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
     />
     <Animatable(ResponsiveGrouping)
       animatableIndex={102}
+      color="#00AC18"
+      currentUser={
+        Object {
+          "avatarUrl": "/picture/is/here",
+          "color": "#00AC18",
+          "displayName": "Jane",
+          "id": "1",
+        }
+      }
       items={
         Array [
           Object {
@@ -362,7 +452,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
       }
       theme={
         Object {
-          "titleColor": null,
+          "titleColor": "#00AC18",
         }
       }
       timeZone="America/Denver"
@@ -370,6 +460,15 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
     />
     <Animatable(ResponsiveGrouping)
       animatableIndex={103}
+      color="#00AC18"
+      currentUser={
+        Object {
+          "avatarUrl": "/picture/is/here",
+          "color": "#00AC18",
+          "displayName": "Jane",
+          "id": "1",
+        }
+      }
       items={
         Array [
           Object {
@@ -385,7 +484,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
       }
       theme={
         Object {
-          "titleColor": null,
+          "titleColor": "#00AC18",
         }
       }
       timeZone="America/Denver"

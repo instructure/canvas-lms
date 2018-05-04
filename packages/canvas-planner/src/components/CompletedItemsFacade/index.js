@@ -91,6 +91,7 @@ export class CompletedItemsFacade extends Component {
     const IndicatorComponent = isNewItem ? NewActivityIndicator : MissingIndicator;
     const badgeMessage = formatMessage('{items} completed {items, plural,=1 {item} other {items}}', {items: this.props.itemCount});
     return (
+      <NotificationBadge>
       <div className={styles.activityIndicator}>
         <IndicatorComponent
         title={badgeMessage}
@@ -98,6 +99,7 @@ export class CompletedItemsFacade extends Component {
         animatableIndex={this.props.animatableIndex}
         getFocusable={this.getFocusable} />
       </div>
+      </NotificationBadge>
     );
   }
   render () {
@@ -108,7 +110,7 @@ export class CompletedItemsFacade extends Component {
     } : null;
     return (
       <div className={classnames(styles.root, 'planner-completed-items')} ref={elt => this.rootDiv = elt}>
-        <NotificationBadge>{this.renderNotificationBadge()}</NotificationBadge>
+        {this.renderNotificationBadge()}
         <div className={styles.contentPrimary}>
           <ToggleDetails
             ref={ref => this.buttonRef = ref}
