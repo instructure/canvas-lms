@@ -19,10 +19,11 @@ define [
   'Backbone'
   'jst/content_migrations/QTIZip'
   './MigrationView'
-],(Backbone, template, MigrationView) -> 
+],(Backbone, template, MigrationView) ->
   class QTIZipView extends MigrationView
     template: template
 
     @child 'chooseMigrationFile', '.chooseMigrationFile'
     @child 'questionBank', '.selectQuestionBank'
     @child 'overwriteAssessmentContent', '.overwriteAssessmentContent'
+    @child 'importQuizzesNext', '.importQuizzesNext'
