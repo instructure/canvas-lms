@@ -102,7 +102,7 @@ Object.entries({
       const icons = wrapper.find(`IconMiniArrow${expectedArrow}`)
       equal(icons.length, 1, `only one ${expectedArrow} arrow`)
       const header = icons.closest('UsersListHeader')
-      ok(header.find('ScreenReaderContent').text().match(RegExp(expectedTip, 'i')), 'has right tooltip')
+      ok(header.find('Tooltip').prop('tip').match(RegExp(expectedTip, 'i')), 'has right tooltip')
       ok(header.text().includes(label), `${label} is the one that has the ${expectedArrow} arrow`)
     })
 

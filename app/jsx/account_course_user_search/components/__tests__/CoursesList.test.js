@@ -132,14 +132,14 @@ describe('Account Course User Search CoursesList Sorting', () => {
       expect(wrapper.find('IconMiniArrowUp')).toHaveLength(0)
       const downArrow = wrapper.find('IconMiniArrowDown')
       expect(downArrow).toHaveLength(1)
-      const header = downArrow.closest('th')
+      const header = downArrow.closest('CourseListHeader')
 
       const expectedTip = {
         course_name: 'Click to sort by name descending',
         total_students: 'Click to sort by number of students descending'
       }[columnID] || `Click to sort by ${label} descending`
 
-      expect(header.text()).toMatch(RegExp(expectedTip, 'i'))
+      expect(header.find('Tooltip').prop('tip')).toMatch(RegExp(expectedTip, 'i'))
       expect(header.text()).toMatch(label)
     })
 
@@ -153,14 +153,14 @@ describe('Account Course User Search CoursesList Sorting', () => {
       expect(wrapper.find('IconMiniArrowDown')).toHaveLength(0)
       const upArrow = wrapper.find('IconMiniArrowUp')
       expect(upArrow).toHaveLength(1)
-      const header = upArrow.closest('th')
+      const header = upArrow.closest('CourseListHeader')
 
       const expectedTip = {
         course_name: 'Click to sort by name ascending',
         total_students: 'Click to sort by number of students ascending'
       }[columnID] || `Click to sort by ${label} ascending`
 
-      expect(header.text()).toMatch(RegExp(expectedTip, 'i'))
+      expect(header.find('Tooltip').prop('tip')).toMatch(RegExp(expectedTip, 'i'))
       expect(header.text()).toMatch(label)
     })
 

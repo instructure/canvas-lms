@@ -76,13 +76,11 @@ describe "new account course search" do
     expect(f('[data-automation="courses list"]')).not_to include_text("course 16")
     expect(f("#content")).not_to contain_css('button[title="Previous Page"]')
 
-    f('button[title="Next Page"]').click
+    fj('nav button:contains("2")').click
     wait_for_ajaximations
 
     expect(get_rows.count).to eq 1
     expect(get_rows.first).to include_text("course 16")
-    expect(f("#content")).to contain_css('button[title="Previous Page"]')
-    expect(f("#content")).not_to contain_css('button[title="Next Page"]')
   end
 
   it "should search by term", test_id: 3454772, priority: 1 do

@@ -156,15 +156,13 @@ describe "new account user search" do
     expect(f("[data-automation='users list']")).to_not include_text("Test User O")
     expect(f("#content")).not_to contain_css('button[title="Previous Page"]')
 
-    f('button[title="Next Page"]').click
+    fj('nav button:contains("2")').click
     wait_for_ajaximations
 
     expect(get_rows.count).to eq 12
     expect(get_rows.first).to include_text("Test User O")
     expect(get_rows.last).to include_text("Test User Z")
     expect(f("[data-automation='users list']")).not_to include_text("Test User A")
-    expect(f("#content")).to contain_css('button[title="Previous Page"]')
-    expect(f("#content")).not_to contain_css('button[title="Next Page"]')
   end
 
   it "should search by name" do

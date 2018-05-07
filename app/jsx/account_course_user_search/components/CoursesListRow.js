@@ -18,9 +18,9 @@
 
 import React from 'react'
 import {number, string, shape, arrayOf, bool} from 'prop-types'
-import Button from '@instructure/ui-core/lib/components/Button'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
-import Tooltip from '@instructure/ui-core/lib/components/Tooltip'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
 import IconBlueprintLine from '@instructure/ui-icons/lib/Line/IconBlueprint'
 import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus'
 import IconSettingsLine from '@instructure/ui-icons/lib/Line/IconSettings'
