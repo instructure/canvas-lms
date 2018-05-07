@@ -173,6 +173,9 @@
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Nothing new needs attention."
   },
+  "nothing_planned_43a37e78": {
+    "message": "Nothing planned"
+  },
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "*Only most recent grading period shown."
   },
@@ -200,6 +203,9 @@
   "show_my_grades_ebd08684": {
     "message": "Show My Grades"
   },
+  "startdate_to_enddate_d245175b": {
+    "message": "{ startDate } to { endDate }"
+  },
   "submitted_318fad53": {
     "message": "Submitted"
   },
@@ -208,6 +214,9 @@
   },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "The date and time this to do is due"
+  },
+  "there_s_nothing_today_heading_to_the_next_item_due_e4abf4bc": {
+    "message": "There''s nothing today.  Heading to the next item due."
   },
   "time_2b5aac58": {
     "message": "Time"
