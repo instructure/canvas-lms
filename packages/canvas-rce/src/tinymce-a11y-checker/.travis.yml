@@ -1,0 +1,8 @@
+language: node_js
+node_js:
+  - "node"
+  - "lts/*"
+script:
+  - npm run test:coverage
+  - npm run cypress:run
+  - npm run fmt-check
