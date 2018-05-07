@@ -1,6 +1,10 @@
-# TinyMCE Accessibility Checker Plugin
+# TinyMCE Accessibility Checker Plugin _(tinymce-a11y-checker)_
 
-## Installation
+> An accessibility checker plugin for TinyMCE.
+
+## Install
+
+You will need to have an instance of TinyMCE setup prior to using this plugin.
 
 ```bash
 npm install tinymce-a11y-checker --save
@@ -22,3 +26,11 @@ tinymce.init({
   toolbar: "check_a11y | bold italic ..."
 })
 ```
+
+## Contribute
+
+See [the contributing file](CONTRIBUTING.md)!
+
+PRs accepted.
+
+[MIT](../LICENSE)
