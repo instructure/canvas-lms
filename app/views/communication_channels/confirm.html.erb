@@ -26,7 +26,7 @@
 
 <div id="modal-box" class="ic-Login-confirmation">
   <header class="ic-Login-confirmation__header">
-    <%= image_tag("login/strongmind-logo@2x.png", class:"ic-Login-confirmation__logo", alt:"Strongmind Canvas by Instructure") %>
+    <%= image_tag("login/strongmind-logo@2x.png", class:"ic-Login-confirmation__logo", alt:"Strongmind Courseware") %>
   </header>
   <div class="ic-Login-confirmation__content">
   <h2 class="ic-Login-confirmation__headline"><%= t 'titles.welcome_aboard', "Welcome Aboard!" %></h2>
@@ -131,9 +131,9 @@ Which is you?", :count => @merge_opportunities.length %>
     </div>
   <% elsif @enrollment && @pseudonym %>
     <div class="disambiguation_box"<%= ' style="display: none;"'.html_safe if params[:register] %>>
-      <p><%= mt 'details.account_needed', "You've been invited to join **%{course}**. To accept this request you need a Canvas account. Click the link below to create a Canvas account.", :course => @course.name %></p>
+      <p><%= mt 'details.account_needed', "You've been invited to join **%{course}**. To accept this request you need a Courseware account. Click the link below to create a Courseware account.", :course => @course.name %></p>
       <div class="button_box ic-Login-confirmation__actions">
-        <a href="<%= login_url(:host => HostUrl.context_host(@root_account, @request.try(:host_with_port)), :confirm => @communication_channel.confirmation_code, :enrollment => @enrollment.uuid) %>" class="btn not_external"><%=  t 'buttons.have_account', "I Have a Canvas Account" %></a>
+        <a href="<%= login_url(:host => HostUrl.context_host(@root_account, @request.try(:host_with_port)), :confirm => @communication_channel.confirmation_code, :enrollment => @enrollment.uuid) %>" class="btn not_external"><%=  t 'buttons.have_account', "I Have a Courseware Account" %></a>
         <a href="#" class="btn" id="register"><%= t 'buttons.create_account', 'Create My Account' %></a>
       </div>
     </div>
@@ -165,16 +165,6 @@ Which is you?", :count => @merge_opportunities.length %>
           <%= time_zone_select :user, :time_zone, I18nTimeZone.us_zones, :model => I18nTimeZone, :default => @pseudonym.account.default_time_zone %>
         </div>
       </div>
-      <% if @pseudonym.account == Account.default %>
-      <div class="control-group">
-        <div class="controls">
-          <label for="user_subscribe_to_emails" class="checkbox">
-            <%= check_box :user, :subscribe_to_emails, :checked => true %>
-            <%= t "labels.subscribe_to_emails", "I want to receive information, news and tips from Instructure" %>
-          </label>
-        </div>
-      </div>
-      <% end %>
       <div class="control-group">
         <div class="controls">
           <% if require_terms? %>
