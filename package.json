@@ -37,7 +37,6 @@
     "ic-tabs": "0.1.3",
     "immutability-helper": "^2",
     "immutable": "^3.8.2",
-    "instructure-icons": "^4",
     "jquery": "https://github.com/ryankshaw/jquery.git#a755a3e9c99d5a70d8ea570836f94ae1ba56046d",
     "jquery-getscrollbarwidth": "^1.0.0",
     "jquery-ui-touch-punch": "^0.2.3",
