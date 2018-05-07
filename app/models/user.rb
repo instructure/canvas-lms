@@ -1406,8 +1406,8 @@ class User < ActiveRecord::Base
   # Use the user's preferences for the default view
   # Otherwise, use the account's default (if set)
   # Fallback to using cards (default option on the Account settings page)
-  def dashboard_view
-    preferences[:dashboard_view] || account.default_dashboard_view || 'cards'
+  def dashboard_view(current_account = account)
+    preferences[:dashboard_view] || current_account.default_dashboard_view || 'cards'
   end
 
   def dashboard_view=(new_dashboard_view)

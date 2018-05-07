@@ -554,6 +554,38 @@ describe AccountsController do
       expect(@account.default_dashboard_view).to eq "cards"
     end
 
+    it "should overwrite account users' existing dashboard_view if specified" do
+      account_with_admin_logged_in
+      @subaccount = @account.sub_accounts.create!
+      @account.enable_feature! :student_planner
+      @account.save!
+
+      course_with_teacher(:account => @subaccount, :active_all => true)
+      course_with_student(:account => @subaccount, :active_all => true)
+
+      @student.dashboard_view = "activity"
+      @student.save!
+
+      expect(@subaccount.default_dashboard_view).to be_nil
+      # Tests against user-set dashboard views
+      expect(@student.dashboard_view(@subaccount)).to eq "activity"
+      # ... as well as default views the user hasn't set
+      expect(@teacher.dashboard_view(@subaccount)).to eq "cards"
+
+      post "update", params: { id: @subaccount.id,
+                               account: {
+                                  settings: {
+                                    default_dashboard_view: "planner",
+                                    force_default_dashboard_view: true
+                                  }
+                                }
+                             }
+      run_jobs
+      expect([@subaccount.reload.default_dashboard_view,
+              @teacher.dashboard_view(@subaccount),
+              @student.reload.dashboard_view(@subaccount)]).to match_array(Array.new(3, "planner"))
+    end
+
     describe "quotas" do
       before :once do
         @account = Account.create!

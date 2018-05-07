@@ -1688,6 +1688,34 @@ describe Account do
     end
   end
 
+  describe "#update_user_dashboards" do
+    before :once do
+      @account = Account.create!
+
+      @user1 = user_factory(:active_all => true)
+      @account.account_users.create!(user: @user1)
+      @user1.dashboard_view = 'activity'
+      @user1.save
+
+      @user2 = user_factory(:active_all => true)
+      @account.account_users.create!(user: @user2)
+      @user2.dashboard_view = 'cards'
+      @user2.save
+    end
+
+    it "should add or overwrite all account users' dashboard_view preference" do
+      @account.enable_feature!(:student_planner)
+      @account.default_dashboard_view = 'planner'
+      @account.save!
+      @account.reload
+
+      expect([@user1.dashboard_view(@account), @user2.dashboard_view(@account)]).to match_array(['activity', 'cards'])
+      @account.update_user_dashboards_without_send_later
+      @account.reload
+      expect([@user1.reload.dashboard_view(@account), @user2.reload.dashboard_view(@account)]).to match_array(Array.new(2, 'planner'))
+    end
+  end
+
   it "should only send new account user notifications to active admins" do
     active_admin = account_admin_user(:active_all => true)
     deleted_admin = account_admin_user(:active_all => true)

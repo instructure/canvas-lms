@@ -176,6 +176,7 @@
                       <td><%= settings.blabel :default_dashboard_view, t("Default View for Dashboard") %></td>
                       <td>
                         <%= settings.select :default_dashboard_view, options_for_select(dashboard_view_options(@account), @account.default_dashboard_view) %>
+                        <p style="font-size: 0.9em;"><%= settings.check_box :force_default_dashboard_view, :checked => false %>  <%= settings.label :force_default_dashboard_view, t("Overwrite all users' existing default dashboard preferences") %></p>
                       </td>
                     </tr>
                   <% end %>

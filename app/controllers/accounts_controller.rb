@@ -559,6 +559,7 @@ class AccountsController < ApplicationController
 
         if success
           # Successfully completed
+          update_user_dashboards
           render :json => account_json(@account, @current_user, session, includes)
         else
           # Failed (hopefully with errors)
@@ -739,6 +740,7 @@ class AccountsController < ApplicationController
         set_default_dashboard_view(params.dig(:account, :settings)&.delete(:default_dashboard_view))
 
         if @account.update_attributes(strong_account_params)
+          update_user_dashboards
           format.html { redirect_to account_settings_url(@account) }
           format.json { render :json => @account }
         else
@@ -1165,6 +1167,11 @@ class AccountsController < ApplicationController
     end
   end
 
+  def update_user_dashboards
+    return unless value_to_boolean(params.dig(:account, :settings, :force_default_dashboard_view))
+    @account.update_user_dashboards
+  end
+
   def format_avatar_count(count = 0)
     count > 99 ? "99+" : count
   end
@@ -1221,7 +1228,7 @@ class AccountsController < ApplicationController
                                    :strict_sis_check, :storage_quota, :students_can_create_courses,
                                    :sub_account_includes, :teachers_can_create_courses, :trusted_referers,
                                    :turnitin_host, :turnitin_account_id, :users_can_edit_name,
-                                   :app_center_access_token, :default_dashboard_view].freeze
+                                   :app_center_access_token, :default_dashboard_view, :force_default_dashboard_view].freeze
 
   def permitted_account_attributes
     [:name, :turnitin_account_id, :turnitin_shared_secret, :include_crosslisted_courses,

@@ -532,7 +532,7 @@ class UsersController < ApplicationController
     js_env({
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
       :PREFERENCES => {
-        :dashboard_view => @current_user.dashboard_view,
+        :dashboard_view => @current_user.dashboard_view(@domain_root_account),
         :hide_dashcard_color_overlays => @current_user.preferences[:hide_dashcard_color_overlays],
         :custom_colors => @current_user.custom_colors,
       },
@@ -599,7 +599,7 @@ class UsersController < ApplicationController
   def dashboard_view
     if request.get?
       render json: {
-        dashboard_view: @current_user.dashboard_view
+        dashboard_view: @current_user.dashboard_view(@context)
       }
     elsif request.put?
       valid_options = ['activity', 'cards', 'planner']
