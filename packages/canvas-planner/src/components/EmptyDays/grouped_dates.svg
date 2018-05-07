@@ -1,12 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg viewBox="0 0 907 155" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
-    <title>Page 1</title>
-    <desc>Created with Sketch.</desc>
+<svg viewBox="0 0 907 155" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Nothing Planned</title>
     <defs>
         <polygon id="path-1" points="0 155 906.934 155 906.934 0.53 0 0.53"></polygon>
         <polygon id="path-3" points="3.31954245e-15 20.2987 3.31954245e-15 0.3897 60.0788 0.3897 60.0788 20.2987"></polygon>
-        <polygon id="path-5" points="1.4099 98 0.4099 98 0.4099 0.6049 1.4099 0.6049 1.4099 98"></polygon>
     </defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="Planner-All-Copy-5" transform="translate(-211.000000, -558.000000)">
@@ -79,13 +75,6 @@
                 <path d="M39.0173,78.8019 C39.0173,85.7819 44.6753,91.4399 51.6553,91.4399 C58.6343,91.4399 64.2923,85.7819 64.2923,78.8019 C64.2923,71.8229 58.6343,66.1639 51.6553,66.1639 C44.6753,66.1639 39.0173,71.8229 39.0173,78.8019" id="Fill-101" fill="#E5E7E9"></path>
                 <polygon id="Fill-103" fill="#9BE1A4" points="49.3122 113.6378 91.5072 113.6378 70.4102 28.7568"></polygon>
                 <polygon id="Stroke-105" stroke="#231F20" stroke-width="2" points="49.3122 113.6378 91.5072 113.6378 70.4102 28.7568"></polygon>
-                <g id="Group-109" transform="translate(70.000000, 57.470000)">
-                    <mask id="mask-6" fill="white">
-                        <use xlink:href="#path-5"></use>
-                    </mask>
-                    <g id="Clip-108"></g>
-                    <path d="M0.4099,0.6049 L0.4099,98.0009" id="Stroke-107" stroke="#0E1D25" stroke-width="2" mask="url(#mask-6)"></path>
-                </g>
                 <path d="M78.2234,95.7375 L70.4104,100.8955" id="Stroke-110" stroke="#0E1D25" stroke-width="2"></path>
                 <path d="M57.8825,79.1579 L70.4095,92.7479" id="Stroke-112" stroke="#0E1D25" stroke-width="2"></path>
                 <path d="M191.1101,23.7868 C191.1101,12.3308 200.3971,3.0438 211.8531,3.0438 C223.3101,3.0438 232.5971,12.3308 232.5971,23.7868 C232.5971,25.6318 232.3561,27.4198 231.9041,29.1218" id="Stroke-114" stroke="#C0C6CB" stroke-width="2"></path>
@@ -94,6 +83,7 @@
                 <polygon id="Fill-120" fill="#9BE1A4" points="148.903 113.6378 196.996 113.6378 172.949 7.7178"></polygon>
                 <polygon id="Stroke-122" stroke="#231F20" stroke-width="2" points="148.903 113.6378 196.996 113.6378 172.949 7.7178"></polygon>
                 <path d="M172.9489,41.7506 L172.9489,154.2556" id="Stroke-124" stroke="#0E1D25" stroke-width="2"></path>
+                <path d="M70,56 L70,155" id="Stroke-124" stroke="#0E1D25" stroke-width="2"></path>
                 <path d="M161.0515,82.8166 L169.6475,90.9586" id="Stroke-126" stroke="#0E1D25" stroke-width="2"></path>
                 <path d="M181.3679,60.5089 L172.9489,72.0159" id="Stroke-128" stroke="#0E1D25" stroke-width="2"></path>
                 <polygon id="Fill-130" fill="#FDBD99" points="69.6286 127.2921 59.2976 130.0271 63.3646 132.7621"></polygon>
