@@ -6834,7 +6834,7 @@ nn:
         body3: "Innhaldet er delt inn i avsnitt som har ei prikka linje. Du kan slette eller redigere innhaldet i eit avsnitt ved å klikke på ikona %{edit_icon} eller %{delete_icon} øvst i høgre hjørne på avsnittet."
         body4: "Dersom du vil legge til nye avsnitt, klikkar du på type innhald du vil legge til i vallista på høgre side i vindauget (%{showme})."
       pages: 
-        body1: "Klassene har fleire sider. Du kan sjå lista over sider for gjeldande klasser på høgre side i vindauget %{showme1}). Dersom du vil organisere eller legge til sider, klikkar du på \"%{manage_pages}\"-lenka (%{showme2})."
+        body1: "Seksjonane har fleire sider. Du kan sjå lista over sider for gjeldande seksjonar på høgre side i vindauget (%{showme1}). Dersom du vil organisere eller legge til sider, klikkar du på \"%{manage_pages}\"-lenka (%{showme2})."
         body2: "Du kan endre sidenamna ved å klikke på %{edit_icon}-ikonet, slette ei side ved å klikke på %{delete_icon}-ikonet eller omorganisere rekkefølgje på sidene ved å klikke på og dra dei."
       sections: 
         body1: "Du finn lista over område på venstre side i vindauget (%{showme1}). Kvart område inneheld fleire sider. Dersom du vil organisere eller legge til område, klikkar du på \"%{manage_sections}\"-lenka (%{showme2})."
@@ -14970,9 +14970,9 @@ nn:
     section_crosslisted: "Klassa er krysslista."
     section_decrosslisted: "Fjerna klassa frå krysslisting."
     section_delete_not_allowed: "Du kan ikkje slette ein seksjon som har påmeldingar"
-    section_deleted: "Emneklasse er sletta."
-    section_update_error: "Oppdatering av klasse mislukkast"
-    section_updated: "Klasse er oppdatert."
+    section_deleted: "Emneseksjon er sletta."
+    section_update_error: "Oppdatering av seksjon mislukkast"
+    section_updated: "Seksjon er oppdatert."
     show: 
       access_limit: "Brukarar kan berre delta på emnet mellom desse datoane"
       active_enrollment: 
@@ -14984,14 +14984,14 @@ nn:
         crosslist_section: "Krysslist denne klassa"
         crosslist_this_section: "Krysslist denne klassa"
         decrosslit_section: "Fjern klassa frå krysslisting"
-        edit_section: "Rediger klasse"
+        edit_section: "Rediger seksjon"
         recrosslist_section: "Krysslist klassa på nytt"
         uncrosslist_section: "Fjern denne klassa frå krysslisting"
         update_section: "Oppdater klassa"
       completed_enrollment: 
         one: "1 fullført påmelding"
         other: "%{count} fullførte påmeldingar"
-      crosslist_description: "Krysslisting gjer at du kan opprette ei klasse i ein konto og deretter flytte ho til eit emne i ein anna konto. Om du vil kryssliste emnet må du finne emnet du vil flytte til, enten ved å bruke søkeverktøy eller ved å oppgi emne-ID-en."
+      crosslist_description: "Krysslisting gjer at du kan opprette ein seksjon i ein konto og deretter flytte han til eit emne i ein anna konto. Om du vil kryssliste emnet må du finne emnet du vil flytte til, enten ved å bruke søkeverktøy eller ved å oppgi emne-ID-en."
       decrosslist_description: "Dette flyttar klassa tilbake til det opphavlege emnet, **%{course_name}**."
       decrosslist_long_description: "Karakterane for studentane på dette emnet er ikkje lenger synlege. Du kan hente inn karakterane seinare ved å kryssliste emnet på nytt, men i mellomtida kjem karakterane for desse studentane frå det opphavlege emnet."
       labels: 
@@ -15001,7 +15001,7 @@ nn:
           account: Konto
           selected_course: "Valt emne"
           sis_id: SIS-ID
-        name: Klassenamn
+        name: Seksjonsnamn
         search_for_course: "Søk etter emne"
         sis_id: SIS-ID
         sis_source_id: SIS-ID
@@ -15022,7 +15022,7 @@ nn:
         crosslist_this_section: "Krysslist denne klassa"
         current_enrollments: "Gjeldande påmeldingar"
         decrosslist_section: "Fjern denne klassa frå krysslisting"
-  sections_94731e51: Klasser
+  sections_94731e51: Seksjonar
   see_rubric_results_62a6447d: "Sjå vurderingsskjema-resultat"
   see_scoring_details_f7fd1f3b: "Sjå resultatdetaljar"
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Sjå LTI-verktøy* som fungerer bra med Canvas."
@@ -15874,7 +15874,7 @@ nn:
   show_admin_navigation_menu_92fb579f: "Vis admin-navigeringsmeny "
   show_all_artifacts_34b91a83: "Vis alle artefaktar"
   show_all_details_9879980c: "Vis alle detaljar"
-  show_all_sections_190203e8: "Vis alle klasser"
+  show_all_sections_190203e8: "Vis alle seksjonar"
   show_and_hide_courses_menu_9e09d1d0: "Vis og skjul emnemeny"
   show_attendance_columns_4d160e16: "Vis kolonnar for frammøte"
   show_by_709f525b: "Vis etter"
@@ -15951,7 +15951,7 @@ nn:
       enrollments: "Påmeldingar: %{enrollment_count}"
       group_enrollments: "Gruppepåmeldingar: %{group_enrollments_count}"
       groups: "Grupper: %{group_count}"
-      sections: "Klasser: %{section_count}"
+      sections: "Seksjonar: %{section_count}"
       terms: "Semester: %{term_count}"
       users: "Brukarar: %{user_count}"
     messages: 
@@ -16055,7 +16055,7 @@ nn:
   spring_grading_period_id_61aec82c: "Karaktersetjingsperiode-ID for våren"
   sr_gradebook: 
     all_grading_periods: "Alle periodar for karaktersetjing"
-    all_sections: "Alle klasser"
+    all_sections: "Alle seksjonar"
     assignment_muted: "Klikk for å gjere synleg."
     assignment_order_alpha: Alfabetisk
     assignment_order_assignment_groups: "Etter oppgåvegruppe og posisjon"
@@ -16107,7 +16107,7 @@ nn:
       name: namn
       root_account: root_account
       score: resultat
-      section: klasse
+      section: seksjonar
       section_id: section_id
       section_sis_id: section_sis_id
       sis_id: sis_id
@@ -16503,7 +16503,7 @@ nn:
       links: 
         add_new_term: "Legg til nytt semester"
       messages: 
-        classes_in_term: "Du kan ikkje slette eit semester som inneheld klasser."
+        classes_in_term: "Du kan ikkje slette eit semester som inneheld seksjonar."
         submitting: Leverer...
       page_title: "%{account} semester"
       prompts: 
@@ -17081,7 +17081,7 @@ nn:
   total_options_351e2682: "Alle alternativ"
   total_range_45c8549a: "Totalt spenn"
   total_results_outcomedetails_cnt_30ff1f8d: "Totalresultat: %{outcomeDetails.cnt}"
-  track_individual_student_and_class_progress_c13cf2d1: "Spor progresjon til enkeltstudentar og klasse"
+  track_individual_student_and_class_progress_c13cf2d1: "Spor progresjon til enkeltstudentar og seksjon"
   treat_ungraded_as_0_d38c2b41: "Behandle ikkje karaktersett som 0"
   tree_browser: 
     folder_tree_instructions: "Bruk navigasjonspilene opp eller ned for å bla gjennom trestrukturen. Trykk høgre for å vise mappene, trykk venstre for å skjule dei og trykk på Enter for elementet du har valt."
@@ -17168,7 +17168,7 @@ nn:
   unlock_date_cannot_be_after_due_date_8829d9ca: "Opplåsingsdato kan ikkje vere etter innleveringsfrist"
   unlock_date_cannot_be_after_lock_date_591f7fda: "Opplåsingsdato kan ikkje vere etter låsedato"
   unlock_date_cannot_be_before_course_start_9c7b8524: "Opplåsingsdato kan ikkje vere før emnestart"
-  unlock_date_cannot_be_before_section_start_793ddc66: "Opplåsingsdato kan ikkje vere før klassestart"
+  unlock_date_cannot_be_before_section_start_793ddc66: "Opplåsingsdato kan ikkje vere før starttid for seksjonen"
   unlock_date_cannot_be_before_term_start_d3c01813: "Opplåsingsdato kan ikkje vere før semesterstart"
   unlock_f6196bf5: "Lås opp"
   unlock_module_on_date_17144fbd: "Lås opp modul på dato"
@@ -17439,7 +17439,7 @@ nn:
       google_drive: "Studentane kan bruk Google Drive til å samarbeide om gruppeprosjekt.  Google Drive har sanntidsredigering av samarbeidsdokument, rekneark og presentasjonar."
       linked_in: "LinkedIn er ein ressurs for å bygge forretningsnettverk.  Mange av relasjonane du får når du studerer kan vere til stor hjelp også når du byrjar å jobbe."
       skype: "Skype er eit gratis verktøy for nettbaserte tale- og videosamtalar."
-      twitter: "Twitter er ein fantastisk ressurs for kommunikasjon utanfor klasserommet."
+      twitter: "Twitter er ein fantastisk ressurs for kommunikasjon utanfor undervisingsrommet."
       yo: "Yo er eit kommunikasjonsverktøy du brukar med berre eit enkelt klikk og utan teikn."
   user_settings_785eed40: Brukarinnstillingar
   user_successfully_deactivated_9d92d80d: "Brukaren er deaktivert"
@@ -17693,7 +17693,7 @@ nn:
       no_courses_message: |-
           Du har ingen emne, så denne sida er ikkje særleg interessant akkurat no.
           Når du har oppretta eller meldt deg på emne, kan du sjå
-          samtalar frå alle klassene her.
+          samtalar frå alle seksjonane her.
       unpublished_courses_message: |-
           Du er påmeld eit eller fleire emne som ikkje har starta enno. Når
           emna er tilgjengeleg, får du informasjon om dei her
@@ -18094,7 +18094,7 @@ nn:
   you_must_allow_at_least_one_appointment_per_time_s_76e22300: "Du må tillate minst ein avtale per tidsluke."
   you_must_allow_at_least_one_group_to_attend_68531eab: "Du må tillate at minst ei gruppe deltek"
   you_must_enter_a_date_f8eabfb1: "Du må oppgi ein dato"
-  you_must_have_a_student_or_section_selected_a99e45df: "Du må velje ein student eller ei klasse"
+  you_must_have_a_student_or_section_selected_a99e45df: "Du må velje ein student eller ein seksjon"
   you_must_log_in_to_view_replies_9ccd4da0: "Du må logge på for å vise svar"
   you_must_provide_a_value_or_unselect_the_option_3b28b754: "Du må oppgi ein verdi eller fjerne valet av dette alternativet"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Du må velje eit emne å kopiere innhald frå"
@@ -18115,7 +18115,7 @@ nn:
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "Du er tildelt ein kontorolle for kontoen %{account} ved %{website}. Rolletype: %{role_type}."
   you_ve_been_invited_to_course_90764f1: "Du er invitert til %{course}."
   you_ve_been_invited_to_course_course_role_role_typ_b8ab8f22: "Du er invitert til %{course}. Kursrolle: %{role_type}"
-  you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Du er invitert til å delta i ei klasse ved %{website}. Klassa er %{course}. Emnerolle: %{role_type}"
+  you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Du er invitert til å delta i ein seksjon ved %{website}. Seksjonen er %{course}. Emnerolle: %{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "Du er invitert til å delta på emnet %{course}. Emnerolle: %{role_type}"
   you_ve_been_invited_to_peer_review_reviewee_82580fb: "Du er invitert til fagfellevurdering av %{reviewee}."
   you_ve_been_invited_to_peer_review_reviewee_follow_2e71fce2: "Du er invitert til fagfellevurdering av %{reviewee}.  Når du skal vurdere, kan du følge lenka %{link}."
