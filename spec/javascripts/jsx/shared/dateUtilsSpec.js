@@ -46,9 +46,3 @@ test('isPassedDelayedPostAt correctly identifies date that is after as true when
   const check = isPassedDelayedPostAt({  delayedDate })
   ok(check)
 })
-
-test('isPassedDelayedPostAt correctly identifies date that is equal as not passed when using browser date', () => {
-  const delayedDate = moment()
-  const check = isPassedDelayedPostAt({ delayedDate })
-  notOk(check)
-})
