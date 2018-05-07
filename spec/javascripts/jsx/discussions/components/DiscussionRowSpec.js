@@ -139,7 +139,8 @@ test('renders "Delayed until" date label if discussion is delayed', () => {
   delayedDate.setYear(delayedDate.getFullYear() + 1)
   const discussion = { delayed_post_at: delayedDate.toString() }
   const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
-  const node = tree.find('.discussion-delayed-until')
+  const node = tree.find('.discussion-availability')
+  ok(node.text().includes('Not available'))
   ok(node.exists())
 })
 
@@ -156,7 +157,7 @@ test('renders available until if approprate', () => {
   futureDate.setYear(futureDate.getFullYear() + 1)
   const discussion = { lock_at: futureDate }
   const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
-  const node = tree.find('.discussion-available-until')
+  const node = tree.find('.discussion-availability')
   ok(node.exists())
   ok(node.text().includes('Available until'))
   // We need a relative date to ensure future-ness, so we can't really insist
@@ -168,7 +169,7 @@ test('renders locked at if appropriate', () => {
   pastDate.setYear(pastDate.getFullYear() - 1)
   const discussion = { lock_at: pastDate }
   const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
-  const node = tree.find('.discussion-was-locked')
+  const node = tree.find('.discussion-availability')
   ok(node.exists())
   ok(node.text().includes('Was locked at'))
   // We need a relative date to ensure past-ness, so we can't really insist

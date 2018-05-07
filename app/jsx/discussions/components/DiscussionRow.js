@@ -60,7 +60,6 @@ import LockIconView from 'compiled/views/LockIconView'
 
 import actions from '../actions'
 import compose from '../../shared/helpers/compose'
-import CourseItemRow from '../../shared/components/CourseItemRow'
 import CyoeHelper from '../../shared/conditional_release/CyoeHelper'
 import DiscussionManageMenu from '../../shared/components/DiscussionManageMenu'
 import discussionShape from '../../shared/proptypes/discussion'
@@ -453,16 +452,13 @@ export class DiscussionRow extends Component {
     }
 
     return (
-      <GridRow vAlign="middle">
-        <GridCol textAlign="start">
-          <SectionsTooltip
-            totalUserCount={this.props.discussion.user_count}
-            sections={this.props.discussion.sections}
-          />
-        </GridCol>
-      </GridRow>
+      <SectionsTooltip
+        totalUserCount={this.props.discussion.user_count}
+        sections={this.props.discussion.sections}
+      />
     )
   }
+
 
   renderTitle = () => {
     const refFn = (c) => { this._titleElement = c }
@@ -471,7 +467,12 @@ export class DiscussionRow extends Component {
       <div className="ic-item-row__content-col">
         <Heading level="h3" margin="0">
           <a style={{color:"inherit"}} className="discussion-title" ref={refFn} href={linkUrl}>
-            {this.props.discussion.title}
+            <span aria-hidden="true">
+              {this.props.discussion.title}
+            </span>
+            <ScreenReaderContent>
+              {this.getAccessibleTitle()}
+            </ScreenReaderContent>
           </a>
         </Heading>
       </div>
@@ -499,37 +500,43 @@ export class DiscussionRow extends Component {
     )
   }
 
-  renderAvailabilityDate = () => {
+  getAvailabilityString = () => {
     const availabilityBegin = this.props.discussion.delayed_post_at
     const availabilityEnd = this.props.discussion.lock_at
-
-    // Check if we are too early for the topic to be available
     if (availabilityBegin && !isPassedDelayedPostAt({ checkDate: null, delayedDate: availabilityBegin })) {
-      return (
-        <div className="discussion-delayed-until ic-item-row__content-col ic-discussion-row__content">
-          { I18n.t('Not available until %{date}',
-            {date: $.datetimeString(availabilityBegin)})}
-        </div>
-      )
+      return I18n.t('Not available until %{date}', {date: $.datetimeString(availabilityBegin)})
     }
     if (availabilityEnd) {
       if (isPassedDelayedPostAt({ checkDate: null, delayedDate: availabilityEnd })) {
-        return (
-          <div className="discussion-was-locked ic-item-row__content-col ic-discussion-row__content">
-            {I18n.t('Was locked at %{date}',
-              {date: $.datetimeString(availabilityEnd)})}
-          </div>
-        )
+        return I18n.t('Was locked at %{date}', {date: $.datetimeString(availabilityEnd)})
       } else {
-        return (
-          <div className="discussion-available-until ic-item-row__content-col ic-discussion-row__content">
-            {I18n.t('Available until %{date}',
-              {date: $.datetimeString(availabilityEnd)})}
-          </div>
-        )
+        return I18n.t('Available until %{date}',{date: $.datetimeString(availabilityEnd)})
       }
     }
-    return null
+    return ""
+  }
+
+  renderAvailabilityDate = () => {
+    // Check if we are too early for the topic to be available
+    const availabilityString = this.getAvailabilityString();
+    return availabilityString && (
+      <div className="discussion-availability ic-item-row__content-col ic-discussion-row__content">
+        {this.getAvailabilityString()}
+      </div>
+    )
+  }
+
+  getAccessibleTitle = () => {
+    let result = `${this.props.discussion.title} `
+    const availability = this.getAvailabilityString()
+    if (availability) result += `${availability} `
+    const assignment = this.props.discussion.assignment
+    const dueDateString = assignment && assignment.due_at ?
+      I18n.t('Due %{date} ', { date: $.datetimeString(assignment.due_at) }) : " "
+    result += dueDateString
+    const lastReplyAtDate = $.datetimeString(this.props.discussion.last_reply_at)
+    result += I18n.t('Last post at %{date}', { date: lastReplyAtDate })
+    return result
   }
 
   unmountMasterCourseLock = () => {
@@ -625,23 +632,29 @@ export class DiscussionRow extends Component {
             <FlexItem padding="xx-small" grow shrink>
               <Grid startAt="medium" vAlign="middle" rowSpacing="none" colSpacing="none">
                 <GridRow vAlign="middle">
-                  <GridCol textAlign="start">
+                  <GridCol vAlign="middle" textAlign="start">
                     {this.renderTitle()}
+                    {this.renderSectionsTooltip()}
                   </GridCol>
-                  <GridCol textAlign="end">
+                  <GridCol vAlign="top" textAlign="end">
                     {this.renderUpperRightBadges()}
                   </GridCol>
                 </GridRow>
-                {this.renderSectionsTooltip()} {/* This is wrapped in a GridRow if present */}
                 <GridRow>
                   <GridCol textAlign="start">
-                    {this.renderLastReplyAt()}
+                    <span aria-hidden="true">
+                      {this.renderLastReplyAt()}
+                    </span>
                   </GridCol>
                   <GridCol textAlign="center">
-                    {this.renderAvailabilityDate()}
+                    <span aria-hidden="true">
+                      {this.renderAvailabilityDate()}
+                    </span>
                   </GridCol>
                   <GridCol textAlign="end">
-                    {this.renderDueDate()}
+                    <span aria-hidden="true">
+                      {this.renderDueDate()}
+                    </span>
                   </GridCol>
                 </GridRow>
               </Grid>
