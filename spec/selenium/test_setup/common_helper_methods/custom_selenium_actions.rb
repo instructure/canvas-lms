@@ -66,6 +66,13 @@ module CustomSeleniumActions
     end
   end
 
+  # short for find with link partial text
+  def flnpt(partial_link_text, scope = nil)
+    stale_element_protection do
+      (scope || driver).find_element :partial_link_text, partial_link_text
+    end
+  end
+
   # find an element via fake-jquery-css selector
   #
   # useful for fake-jquery-css like `:visible`. if you're using
@@ -350,7 +357,7 @@ module CustomSeleniumActions
 
   # This function is to be used as a last resort ONLY
   # Make sure that you have tried:
-  # 1.) finding and clicking the element with f, fj, and fln statements.
+  # 1.) finding and clicking the element with f, fj, fln, and flnpt statements.
   # 2.) attempts to wait
   # 3.) attempt to click blocking items by finding them instead
   # 4.) attempts to find and click blocking items with xpath

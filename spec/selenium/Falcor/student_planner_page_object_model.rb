@@ -34,7 +34,7 @@ module PlannerPageObject
 
   def navigate_to_course_object(object)
     expect_new_page_load do
-      fln(object.title.to_s).click
+      flnpt(object.title.to_s).click
     end
   end
 
@@ -97,7 +97,7 @@ module PlannerPageObject
     @student_to_do = @student1.planner_notes.create!(todo_date: Time.zone.now,
                                                      title: "Student to do", course_id: @course.id)
     go_to_list_view
-    fln(@student_to_do.title).click
+    flnpt(@student_to_do.title).click
     @modal = todo_sidebar_modal(@student_to_do.title)
   end
 
@@ -137,6 +137,10 @@ module PlannerPageObject
 
   def new_activity_button
     fj("button:contains('New Activity')")
+  end
+
+  def today_button
+    f("#planner-today-btn")
   end
 
   def wait_for_planner_load

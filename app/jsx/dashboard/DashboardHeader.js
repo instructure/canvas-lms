@@ -20,7 +20,7 @@ import React from 'react';
 import I18n from 'i18n!dashboard';
 import axios from 'axios';
 import { bool, func, string } from 'prop-types';
-import { showFlashError } from '../shared/FlashAlert'
+import { showFlashAlert, showFlashError } from '../shared/FlashAlert'
 import DashboardOptionsMenu from '../dashboard_card/DashboardOptionsMenu';
 import loadCardDashboard from '../bundles/dashboard_card'
 
@@ -66,8 +66,8 @@ class DashboardHeader extends React.Component {
       const props = {
         changeToCardView: () => this.changeDashboard('cards'),
         getActiveApp: this.getActiveApp,
-        flashError: this.props.flashError,
-        flashMessage: this.props.flashMessage,
+        flashError: (message) => showFlashAlert({message, type: 'error'}),
+        flashMessage: (message) => showFlashAlert({message, type: 'info'}),
         srFlashMessage: this.props.screenReaderFlashMessage,
         externalFallbackFocusable: this.menuButtonFocusable,
         env: this.props.env,

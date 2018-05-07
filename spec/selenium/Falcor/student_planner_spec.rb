@@ -153,7 +153,7 @@ describe "student planner" do
 
     it "can follow course link to course", priority: "1", test_id: 3306198 do
       go_to_list_view
-      element = fln(@course[:name].upcase, f('.PlannerApp'))
+      element = flnpt(@course[:name].upcase, f('.PlannerApp'))
       expect_new_page_load do
         element.click
       end
@@ -191,7 +191,7 @@ describe "student planner" do
       expect(f('.PlannerApp')).not_to contain_link(past_discussion.title.to_s)
       expect(new_activity_button).to be_displayed
       new_activity_button.click
-      expect(f('.PlannerApp')).to contain_link(past_discussion.title.to_s)
+      expect(f('.PlannerApp')).to contain_link_partial_text(past_discussion.title.to_s)
     end
   end
 
@@ -256,7 +256,7 @@ describe "student planner" do
       todo_modal_button.click
       expect(todo_sidebar_modal).to contain_jqcss("button:contains('Save')")
       fj("button:contains('Close')").click
-      expect(f('body')).not_to contain_css("div[aria-label = 'Add To Do']")
+      expect(f('body')).not_to contain_css("[aria-label = 'Add To Do']")
     end
 
     it "adds text to the details field.", priority: "1", test_id: 3263161 do
@@ -440,7 +440,7 @@ describe "student planner" do
       modal = todo_sidebar_modal(@student_to_do.title)
       expect(f('input', modal)[:value]).to eq(@student_to_do.title)
       expect((f('select', modal)[:value]).to_i).to eq(@course.id)
-      fln(student_to_do2.title).click
+      flnpt(student_to_do2.title).click
       expect(f('input', modal)[:value]).to eq(student_to_do2.title)
       expect(f('select', modal)[:value]).to eq("none")
     end
@@ -466,15 +466,15 @@ describe "student planner" do
                                                      title: "Title Text")
       go_to_list_view
       # Opens the To Do edit sidebar
-      expect(f('.PlannerApp')).to contain_link(planner_note.title)
-      fln(planner_note.title).click
+      expect(f('.PlannerApp')).to contain_link_partial_text(planner_note.title)
+      flnpt(planner_note.title).click
       @modal = todo_sidebar_modal(planner_note.title)
       expect(ff('input', @modal)[1][:value]).to eq format_date_for_view(planner_note.todo_date, :long)
       @student1.time_zone = 'Minsk'
       @student1.save!
       refresh_page
-      expect(f('.PlannerApp')).to contain_link(planner_note.title)
-      fln(planner_note.title).click
+      expect(f('.PlannerApp')).to contain_link_partial_text(planner_note.title)
+      flnpt(planner_note.title).click
       @modal = todo_sidebar_modal(planner_note.title)
       expect(ff('input', @modal)[1][:value]).to eq format_date_for_view(planner_note.todo_date, :long)
     end
@@ -506,7 +506,7 @@ describe "student planner" do
       go_to_list_view
       open_opportunities_dropdown
       parent = f('#opportunities_parent')
-      fln('assignmentThatHasToBeDoneNow', parent).click
+      flnpt('assignmentThatHasToBeDoneNow', parent).click
       expect(f('.description.user_content')).to include_text("This will take a long time")
     end
 

@@ -13,7 +13,7 @@ exports[`renders Announcement correctly with everything 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Announcement I am a Announcement is complete
+          Announcement I am a Announcement is marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -43,7 +43,13 @@ exports[`renders Announcement correctly with everything 1`] = `
           A Course about being Diffrient Announcement
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -51,7 +57,16 @@ exports[`renders Announcement correctly with everything 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Announcement
+          <ScreenReaderContent
+            as="span"
+          >
+            Announcement I am a Announcement, at Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Announcement
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -89,7 +104,11 @@ exports[`renders Announcement correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            3:30 AM
+            <PresentationContent
+              as="span"
+            >
+              3:30 AM
+            </PresentationContent>
           </Text>
         </div>
       </div>
@@ -111,7 +130,7 @@ exports[`renders Announcement correctly with just date 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Announcement I am a Announcement is incomplete
+          Announcement I am a Announcement is not marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -141,7 +160,13 @@ exports[`renders Announcement correctly with just date 1`] = `
           A Course about being Diffrient Announcement
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -149,7 +174,16 @@ exports[`renders Announcement correctly with just date 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Announcement
+          <ScreenReaderContent
+            as="span"
+          >
+            Announcement I am a Announcement, at Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Announcement
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -163,7 +197,11 @@ exports[`renders Announcement correctly with just date 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            3:30 AM
+            <PresentationContent
+              as="span"
+            >
+              3:30 AM
+            </PresentationContent>
           </Text>
         </div>
       </div>
@@ -185,7 +223,7 @@ exports[`renders Announcement correctly with just points 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Announcement I am a Announcement is incomplete
+          Announcement I am a Announcement is not marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -215,7 +253,13 @@ exports[`renders Announcement correctly with just points 1`] = `
           A Course about being Diffrient Announcement
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -223,7 +267,16 @@ exports[`renders Announcement correctly with just points 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Announcement
+          <ScreenReaderContent
+            as="span"
+          >
+            Announcement I am a Announcement, at Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Announcement
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -260,7 +313,13 @@ exports[`renders Announcement correctly with just points 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          />
+          >
+            <PresentationContent
+              as="span"
+            >
+              3:30 AM
+            </PresentationContent>
+          </Text>
         </div>
       </div>
     </div>
@@ -281,7 +340,7 @@ exports[`renders Announcement correctly without right side content 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Announcement I am a Announcement is incomplete
+          Announcement I am a Announcement is not marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -311,7 +370,13 @@ exports[`renders Announcement correctly without right side content 1`] = `
           A Course about being Diffrient Announcement
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -319,7 +384,16 @@ exports[`renders Announcement correctly without right side content 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Announcement
+          <ScreenReaderContent
+            as="span"
+          >
+            Announcement I am a Announcement, at Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Announcement
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -332,7 +406,13 @@ exports[`renders Announcement correctly without right side content 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          />
+          >
+            <PresentationContent
+              as="span"
+            >
+              3:30 AM
+            </PresentationContent>
+          </Text>
         </div>
       </div>
     </div>
@@ -353,7 +433,7 @@ exports[`renders Assignment correctly with everything 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Assignment I am a Assignment is complete
+          Assignment I am a Assignment is marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -383,7 +463,13 @@ exports[`renders Assignment correctly with everything 1`] = `
           A Course about being Diffrient Assignment
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -391,7 +477,16 @@ exports[`renders Assignment correctly with everything 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Assignment
+          <ScreenReaderContent
+            as="span"
+          >
+            Assignment I am a Assignment, due Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Assignment
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -429,7 +524,11 @@ exports[`renders Assignment correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            DUE: 3:30 AM
+            <PresentationContent
+              as="span"
+            >
+              DUE: 3:30 AM
+            </PresentationContent>
           </Text>
         </div>
       </div>
@@ -451,7 +550,7 @@ exports[`renders Assignment correctly with just date 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Assignment I am a Assignment is incomplete
+          Assignment I am a Assignment is not marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -481,7 +580,13 @@ exports[`renders Assignment correctly with just date 1`] = `
           A Course about being Diffrient Assignment
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -489,7 +594,16 @@ exports[`renders Assignment correctly with just date 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Assignment
+          <ScreenReaderContent
+            as="span"
+          >
+            Assignment I am a Assignment, due Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Assignment
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -503,7 +617,11 @@ exports[`renders Assignment correctly with just date 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            DUE: 3:30 AM
+            <PresentationContent
+              as="span"
+            >
+              DUE: 3:30 AM
+            </PresentationContent>
           </Text>
         </div>
       </div>
@@ -525,7 +643,7 @@ exports[`renders Assignment correctly with just points 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Assignment I am a Assignment is incomplete
+          Assignment I am a Assignment is not marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -555,7 +673,13 @@ exports[`renders Assignment correctly with just points 1`] = `
           A Course about being Diffrient Assignment
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -563,7 +687,16 @@ exports[`renders Assignment correctly with just points 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Assignment
+          <ScreenReaderContent
+            as="span"
+          >
+            Assignment I am a Assignment, due Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Assignment
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -600,7 +733,13 @@ exports[`renders Assignment correctly with just points 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          />
+          >
+            <PresentationContent
+              as="span"
+            >
+              DUE: 3:30 AM
+            </PresentationContent>
+          </Text>
         </div>
       </div>
     </div>
@@ -621,7 +760,7 @@ exports[`renders Assignment correctly without right side content 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Assignment I am a Assignment is incomplete
+          Assignment I am a Assignment is not marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -651,7 +790,13 @@ exports[`renders Assignment correctly without right side content 1`] = `
           A Course about being Diffrient Assignment
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -659,7 +804,16 @@ exports[`renders Assignment correctly without right side content 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Assignment
+          <ScreenReaderContent
+            as="span"
+          >
+            Assignment I am a Assignment, due Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Assignment
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -672,7 +826,13 @@ exports[`renders Assignment correctly without right side content 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          />
+          >
+            <PresentationContent
+              as="span"
+            >
+              DUE: 3:30 AM
+            </PresentationContent>
+          </Text>
         </div>
       </div>
     </div>
@@ -693,7 +853,7 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Calendar Event I am a Calendar Event is incomplete
+          Calendar Event I am a Calendar Event is not marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -723,7 +883,13 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
           A Course about being Diffrient Calendar Event
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -731,7 +897,16 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Calendar Event
+          <ScreenReaderContent
+            as="span"
+          >
+            Calendar Event I am a Calendar Event, on December 17, 2011.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Calendar Event
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -745,7 +920,11 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            All Day
+            <PresentationContent
+              as="span"
+            >
+              All Day
+            </PresentationContent>
           </Text>
         </div>
       </div>
@@ -767,7 +946,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Calendar Event I am a Calendar Event is complete
+          Calendar Event I am a Calendar Event is marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -797,7 +976,13 @@ exports[`renders Calendar Event correctly with everything 1`] = `
           A Course about being Diffrient Calendar Event
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -805,7 +990,16 @@ exports[`renders Calendar Event correctly with everything 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Calendar Event
+          <ScreenReaderContent
+            as="span"
+          >
+            Calendar Event I am a Calendar Event, at Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Calendar Event
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -843,7 +1037,11 @@ exports[`renders Calendar Event correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            3:30 AM
+            <PresentationContent
+              as="span"
+            >
+              3:30 AM
+            </PresentationContent>
           </Text>
         </div>
       </div>
@@ -865,7 +1063,7 @@ exports[`renders Calendar Event correctly with just date 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Calendar Event I am a Calendar Event is incomplete
+          Calendar Event I am a Calendar Event is not marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -895,7 +1093,13 @@ exports[`renders Calendar Event correctly with just date 1`] = `
           A Course about being Diffrient Calendar Event
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -903,7 +1107,16 @@ exports[`renders Calendar Event correctly with just date 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Calendar Event
+          <ScreenReaderContent
+            as="span"
+          >
+            Calendar Event I am a Calendar Event, at Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Calendar Event
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -917,7 +1130,11 @@ exports[`renders Calendar Event correctly with just date 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            3:30 AM
+            <PresentationContent
+              as="span"
+            >
+              3:30 AM
+            </PresentationContent>
           </Text>
         </div>
       </div>
@@ -939,7 +1156,7 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Calendar Event I am a Calendar Event is incomplete
+          Calendar Event I am a Calendar Event is not marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -969,7 +1186,13 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
           A Course about being Diffrient Calendar Event
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -977,7 +1200,16 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Calendar Event
+          <ScreenReaderContent
+            as="span"
+          >
+            Calendar Event I am a Calendar Event, at Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Calendar Event
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -990,7 +1222,13 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          />
+          >
+            <PresentationContent
+              as="span"
+            >
+              3:30 AM
+            </PresentationContent>
+          </Text>
         </div>
       </div>
     </div>
@@ -1011,7 +1249,7 @@ exports[`renders Discussion correctly with everything 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Discussion I am a Discussion is complete
+          Discussion I am a Discussion is marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -1041,7 +1279,13 @@ exports[`renders Discussion correctly with everything 1`] = `
           A Course about being Diffrient Discussion
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -1049,7 +1293,16 @@ exports[`renders Discussion correctly with everything 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Discussion
+          <ScreenReaderContent
+            as="span"
+          >
+            Discussion I am a Discussion, due Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Discussion
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -1087,7 +1340,11 @@ exports[`renders Discussion correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            DUE: 3:30 AM
+            <PresentationContent
+              as="span"
+            >
+              DUE: 3:30 AM
+            </PresentationContent>
           </Text>
         </div>
       </div>
@@ -1109,7 +1366,7 @@ exports[`renders Discussion correctly with just date 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Discussion I am a Discussion is incomplete
+          Discussion I am a Discussion is not marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -1139,7 +1396,13 @@ exports[`renders Discussion correctly with just date 1`] = `
           A Course about being Diffrient Discussion
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -1147,7 +1410,16 @@ exports[`renders Discussion correctly with just date 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Discussion
+          <ScreenReaderContent
+            as="span"
+          >
+            Discussion I am a Discussion, due Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Discussion
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -1161,7 +1433,11 @@ exports[`renders Discussion correctly with just date 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            DUE: 3:30 AM
+            <PresentationContent
+              as="span"
+            >
+              DUE: 3:30 AM
+            </PresentationContent>
           </Text>
         </div>
       </div>
@@ -1183,7 +1459,7 @@ exports[`renders Discussion correctly with just points 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Discussion I am a Discussion is incomplete
+          Discussion I am a Discussion is not marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -1213,7 +1489,13 @@ exports[`renders Discussion correctly with just points 1`] = `
           A Course about being Diffrient Discussion
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -1221,7 +1503,16 @@ exports[`renders Discussion correctly with just points 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Discussion
+          <ScreenReaderContent
+            as="span"
+          >
+            Discussion I am a Discussion, due Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Discussion
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -1258,7 +1549,13 @@ exports[`renders Discussion correctly with just points 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          />
+          >
+            <PresentationContent
+              as="span"
+            >
+              DUE: 3:30 AM
+            </PresentationContent>
+          </Text>
         </div>
       </div>
     </div>
@@ -1279,7 +1576,7 @@ exports[`renders Discussion correctly without right side content 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Discussion I am a Discussion is incomplete
+          Discussion I am a Discussion is not marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -1309,7 +1606,13 @@ exports[`renders Discussion correctly without right side content 1`] = `
           A Course about being Diffrient Discussion
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -1317,7 +1620,16 @@ exports[`renders Discussion correctly without right side content 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Discussion
+          <ScreenReaderContent
+            as="span"
+          >
+            Discussion I am a Discussion, due Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Discussion
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -1330,7 +1642,13 @@ exports[`renders Discussion correctly without right side content 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          />
+          >
+            <PresentationContent
+              as="span"
+            >
+              DUE: 3:30 AM
+            </PresentationContent>
+          </Text>
         </div>
       </div>
     </div>
@@ -1351,7 +1669,7 @@ exports[`renders Note correctly with Group 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Page this is an account-level group page is incomplete
+          Page this is an account-level group page is not marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -1381,7 +1699,13 @@ exports[`renders Note correctly with Group 1`] = `
           Account-level group 1 Page
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -1389,7 +1713,16 @@ exports[`renders Note correctly with Group 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          this is an account-level group page
+          <ScreenReaderContent
+            as="span"
+          >
+            Page this is an account-level group page, due Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            this is an account-level group page
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -1403,7 +1736,11 @@ exports[`renders Note correctly with Group 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            DUE: 3:30 AM
+            <PresentationContent
+              as="span"
+            >
+              DUE: 3:30 AM
+            </PresentationContent>
           </Text>
         </div>
       </div>
@@ -1425,7 +1762,7 @@ exports[`renders Note correctly with everything 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Task I am a Note is complete
+          Task I am a Note is marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -1461,7 +1798,13 @@ exports[`renders Note correctly with everything 1`] = `
           Math 101 TO DO
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -1469,7 +1812,16 @@ exports[`renders Note correctly with everything 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Note
+          <ScreenReaderContent
+            as="span"
+          >
+            Task I am a Note, due Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Note
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -1483,7 +1835,11 @@ exports[`renders Note correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            DUE: 3:30 AM
+            <PresentationContent
+              as="span"
+            >
+              DUE: 3:30 AM
+            </PresentationContent>
           </Text>
         </div>
       </div>
@@ -1505,7 +1861,7 @@ exports[`renders Note correctly without Course 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Task I am a Note is incomplete
+          Task I am a Note is not marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -1541,7 +1897,13 @@ exports[`renders Note correctly without Course 1`] = `
            TO DO
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -1549,7 +1911,16 @@ exports[`renders Note correctly without Course 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Note
+          <ScreenReaderContent
+            as="span"
+          >
+            Task I am a Note, due Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Note
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -1562,7 +1933,13 @@ exports[`renders Note correctly without Course 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          />
+          >
+            <PresentationContent
+              as="span"
+            >
+              DUE: 3:30 AM
+            </PresentationContent>
+          </Text>
         </div>
       </div>
     </div>
@@ -1583,7 +1960,7 @@ exports[`renders Page correctly with everything 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Page I am a Page is complete
+          Page I am a Page is marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -1613,7 +1990,13 @@ exports[`renders Page correctly with everything 1`] = `
           A Course about being Diffrient Page
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -1621,7 +2004,16 @@ exports[`renders Page correctly with everything 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Page
+          <ScreenReaderContent
+            as="span"
+          >
+            Page I am a Page, due Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Page
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -1659,7 +2051,11 @@ exports[`renders Page correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            DUE: 3:30 AM
+            <PresentationContent
+              as="span"
+            >
+              DUE: 3:30 AM
+            </PresentationContent>
           </Text>
         </div>
       </div>
@@ -1681,7 +2077,7 @@ exports[`renders Page correctly with just date 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Page I am a Page is incomplete
+          Page I am a Page is not marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -1711,7 +2107,13 @@ exports[`renders Page correctly with just date 1`] = `
            Page
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -1719,7 +2121,16 @@ exports[`renders Page correctly with just date 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Page
+          <ScreenReaderContent
+            as="span"
+          >
+            Page I am a Page, due Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Page
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -1733,7 +2144,11 @@ exports[`renders Page correctly with just date 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            DUE: 3:30 AM
+            <PresentationContent
+              as="span"
+            >
+              DUE: 3:30 AM
+            </PresentationContent>
           </Text>
         </div>
       </div>
@@ -1755,7 +2170,7 @@ exports[`renders Page correctly with just points 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Page I am a Page is incomplete
+          Page I am a Page is not marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -1785,7 +2200,13 @@ exports[`renders Page correctly with just points 1`] = `
           A Course about being Diffrient Page
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -1793,7 +2214,16 @@ exports[`renders Page correctly with just points 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Page
+          <ScreenReaderContent
+            as="span"
+          >
+            Page I am a Page, due Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Page
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -1830,7 +2260,13 @@ exports[`renders Page correctly with just points 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          />
+          >
+            <PresentationContent
+              as="span"
+            >
+              DUE: 3:30 AM
+            </PresentationContent>
+          </Text>
         </div>
       </div>
     </div>
@@ -1851,7 +2287,7 @@ exports[`renders Page correctly without right side content 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Page I am a Page is incomplete
+          Page I am a Page is not marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -1881,7 +2317,13 @@ exports[`renders Page correctly without right side content 1`] = `
           A Course about being Diffrient Page
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -1889,7 +2331,16 @@ exports[`renders Page correctly without right side content 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Page
+          <ScreenReaderContent
+            as="span"
+          >
+            Page I am a Page, due Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Page
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -1902,7 +2353,13 @@ exports[`renders Page correctly without right side content 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          />
+          >
+            <PresentationContent
+              as="span"
+            >
+              DUE: 3:30 AM
+            </PresentationContent>
+          </Text>
         </div>
       </div>
     </div>
@@ -1923,7 +2380,7 @@ exports[`renders Quiz correctly with everything 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Quiz I am a Quiz is complete
+          Quiz I am a Quiz is marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -1953,7 +2410,13 @@ exports[`renders Quiz correctly with everything 1`] = `
           A Course about being Diffrient Quiz
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -1961,7 +2424,16 @@ exports[`renders Quiz correctly with everything 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Quiz
+          <ScreenReaderContent
+            as="span"
+          >
+            Quiz I am a Quiz, due Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Quiz
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -1999,7 +2471,11 @@ exports[`renders Quiz correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            DUE: 3:30 AM
+            <PresentationContent
+              as="span"
+            >
+              DUE: 3:30 AM
+            </PresentationContent>
           </Text>
         </div>
       </div>
@@ -2021,7 +2497,7 @@ exports[`renders Quiz correctly with just date 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Quiz I am a Quiz is incomplete
+          Quiz I am a Quiz is not marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -2051,7 +2527,13 @@ exports[`renders Quiz correctly with just date 1`] = `
           A Course about being Diffrient Quiz
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -2059,7 +2541,16 @@ exports[`renders Quiz correctly with just date 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Quiz
+          <ScreenReaderContent
+            as="span"
+          >
+            Quiz I am a Quiz, due Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Quiz
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -2073,7 +2564,11 @@ exports[`renders Quiz correctly with just date 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            DUE: 3:30 AM
+            <PresentationContent
+              as="span"
+            >
+              DUE: 3:30 AM
+            </PresentationContent>
           </Text>
         </div>
       </div>
@@ -2095,7 +2590,7 @@ exports[`renders Quiz correctly with just points 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Quiz I am a Quiz is incomplete
+          Quiz I am a Quiz is not marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -2125,7 +2620,13 @@ exports[`renders Quiz correctly with just points 1`] = `
           A Course about being Diffrient Quiz
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -2133,7 +2634,16 @@ exports[`renders Quiz correctly with just points 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Quiz
+          <ScreenReaderContent
+            as="span"
+          >
+            Quiz I am a Quiz, due Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Quiz
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -2170,7 +2680,13 @@ exports[`renders Quiz correctly with just points 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          />
+          >
+            <PresentationContent
+              as="span"
+            >
+              DUE: 3:30 AM
+            </PresentationContent>
+          </Text>
         </div>
       </div>
     </div>
@@ -2191,7 +2707,7 @@ exports[`renders Quiz correctly without right side content 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Quiz I am a Quiz is incomplete
+          Quiz I am a Quiz is not marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -2221,7 +2737,13 @@ exports[`renders Quiz correctly without right side content 1`] = `
           A Course about being Diffrient Quiz
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -2229,7 +2751,16 @@ exports[`renders Quiz correctly without right side content 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          I am a Quiz
+          <ScreenReaderContent
+            as="span"
+          >
+            Quiz I am a Quiz, due Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            I am a Quiz
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -2242,7 +2773,13 @@ exports[`renders Quiz correctly without right side content 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          />
+          >
+            <PresentationContent
+              as="span"
+            >
+              DUE: 3:30 AM
+            </PresentationContent>
+          </Text>
         </div>
       </div>
     </div>
@@ -2263,7 +2800,7 @@ exports[`renders correctly 1`] = `
         <ScreenReaderContent
           as="span"
         >
-          Assignment This Assignment is about awesome stuff is incomplete
+          Assignment This Assignment is about awesome stuff is not marked as done.
         </ScreenReaderContent>
       }
       onChange={[Function]}
@@ -2293,7 +2830,13 @@ exports[`renders correctly 1`] = `
           A Course about being Diffrient Assignment
         </Text>
       </div>
-      <div>
+      <div
+        style={
+          Object {
+            "position": "relative",
+          }
+        }
+      >
         <Link
           as="button"
           ellipsis={false}
@@ -2301,7 +2844,16 @@ exports[`renders correctly 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          This Assignment is about awesome stuff
+          <ScreenReaderContent
+            as="span"
+          >
+            Assignment This Assignment is about awesome stuff, due Saturday, December 17, 2011 3:30 AM.
+          </ScreenReaderContent>
+          <PresentationContent
+            as="span"
+          >
+            This Assignment is about awesome stuff
+          </PresentationContent>
         </Link>
       </div>
     </div>
@@ -2339,7 +2891,11 @@ exports[`renders correctly 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            DUE: 3:30 AM
+            <PresentationContent
+              as="span"
+            >
+              DUE: 3:30 AM
+            </PresentationContent>
           </Text>
         </div>
       </div>

@@ -28,7 +28,7 @@ function defaultProps (option = {}) {
       id: "1",
       uniqueId: "one",
       associated_item: option.associated_item || "Assignment",
-      date: option.date,
+      date: DEFAULT_DATE,
       courseName: 'A Course about being Diffrient',
       completed: !!option.completed,
       title: option.title || "This Assignment is about awesome stuff",
@@ -46,13 +46,15 @@ function noteProps (option) {
       id: "22",
       uniqueId: "twenty-two",
       associated_item: null,
-      date: option.date,
+      date: DEFAULT_DATE,
       courseName: option.courseName,
       completed: !!option.completed,
       title: option.title || "A note about note taking",
       toggleCompletion: () => {},
       updateTodo: () => {},
-      currentUser: {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here'},
+      currentUser: {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here',
+      ...option
+    },
   };
 }
 

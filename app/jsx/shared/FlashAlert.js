@@ -53,7 +53,7 @@ import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReade
 import Transition from '@instructure/ui-core/lib/components/Transition'
 
 const messageHolderId = 'flashalert_message_holder' // specs fail if I reuse jquery's elements
-const screenreaderMessageHolderId = 'flashalert_screenreader_holder'
+const screenreaderMessageHolderId = 'flash_screenreader_holder'
 const timeout = 10000
 
 // An Alert with a message and "Details" button which surfaces

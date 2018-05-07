@@ -169,6 +169,13 @@ define([
     setup: function() {
       fixtures = document.getElementById('fixtures');
       helper = new NotificationsHelper();
+      // Since this div can get created on the fly as needed, which is a black-box implementation detail,
+      // unreasonable to expect specs that test for screenreader messages to know that and clean up something
+      // it didn't explicitly create. We have to guarantee it's gone before these specs run.
+      const fsh = document.getElementById('flash_screenreader_holder');
+      if (fsh) {
+        fsh.parentElement.removeChild(fsh);
+      }
     },
     teardown: function() {
       fixtures.innerHTML = '';

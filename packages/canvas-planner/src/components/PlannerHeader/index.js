@@ -291,6 +291,7 @@ export class PlannerHeader extends Component {
     return (
       <div className={styles.root}>
         <Button
+          id="planner-today-btn"
           variant="light"
           margin="0 medium 0 0"
           onClick={this.handleTodayClick}
