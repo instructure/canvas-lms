@@ -148,7 +148,7 @@ module CustomSeleniumActions
       driver.switch_to.frame(id)
     else
       disable_implicit_wait do
-        keep_trying_until(1) do
+        keep_trying_until(3) do
           # when it does switch frame but loading element did not exist we need to switch back then switch to iframe again
           driver.switch_to.window saved_window_handle
           driver.switch_to.frame(id)
