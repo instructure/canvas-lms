@@ -30,11 +30,9 @@ Pact.service_provider "CanvasAPI" do
   app { CanvasRails::Application }
 
   honours_pact_with 'Consumer' do
-
     # This example points to a local file, however, on a real project with a continuous
     # integration box, you would publish your pacts as artifacts,
     # and point the pact_uri to the pact published by the last successful build.
-
     pact_uri 'spec/pacts/consumer-canvasapi.json'
   end
 
@@ -42,5 +40,4 @@ Pact.service_provider "CanvasAPI" do
   #  honours_pact_with 'Some other Service Consumer' do
   #    ...
   #  end
-
 end

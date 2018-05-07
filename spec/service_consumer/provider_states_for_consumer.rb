@@ -17,10 +17,17 @@
 require_relative 'pact_setup'
 
 Pact.provider_states_for 'Consumer' do
+
   provider_state 'a student in a course with an assignment' do
     set_up do
-      course = SetupData.create_and_enroll_student_in_course
-      SetupData.create_assignment(course)
+      course_with_student(active_all: true)
+      Assignment.create!(context: @course, title: "Assignment1")
+      Pseudonym.create!(user: @student, unique_id: 'testuser@instructure.com')
+      token = @student.access_tokens.create!().full_token
+
+      provider_param :token, token
+      provider_param :course_id, @course.id.to_s
+      provider_param :user_id, @student.id.to_s
     end
 
     tear_down do
@@ -30,7 +37,12 @@ Pact.provider_states_for 'Consumer' do
 
   provider_state 'a student in a course' do
     set_up do
-      SetupData.create_and_enroll_student_in_course
+      course_with_student(active_all: true)
+      Pseudonym.create!(user: @student, unique_id: 'testuser@instructure.com')
+      token = @student.access_tokens.create!().full_token
+
+      provider_param :token, token
+      provider_param :course_id, @course.id.to_s
     end
 
     tear_down do

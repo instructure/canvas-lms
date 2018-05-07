@@ -14,6 +14,10 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+Pact.configure do |config|
+  config.include Factories
+end
+
 Pact.set_up do
   DatabaseCleaner.strategy = :transaction
   DatabaseCleaner.start
@@ -23,35 +27,5 @@ Pact.tear_down do
   DatabaseCleaner.clean
   ActiveRecord::Base.connection.tables.each do |t|
     ActiveRecord::Base.connection.reset_pk_sequence!(t)
-  end
-end
-
-module SetupData
-  class << self
-    def create_and_enroll_student_in_course
-      course = create_course
-      create_user
-      enroll_student_in_course(course)
-      course
-    end
-
-    def create_course
-      course = Course.create!(name: "Pact Course", is_public: false)
-      course.offer!
-      course.save!
-      course
-    end
-
-    def create_user
-      @user = User.create!(name: "Student user")
-    end
-
-    def enroll_student_in_course(course)
-      course.enroll_student(@user).accept!
-    end
-
-    def create_assignment(course)
-      Assignment.create!(context: course, title: "Assignment1")
-    end
   end
 end

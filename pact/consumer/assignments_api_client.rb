@@ -21,11 +21,11 @@ require 'json'
 class AssignmentsApiClient
   include HTTParty
   base_uri 'localhost:1234'
-  headers "Authorization" => "Bearer token1234"
+  headers "Authorization" => "Bearer some_token"
 
   # TODO: modify these to use params
-  def list_assignments(course_id, params={})
-    JSON.parse(self.class.get("/api/v1/courses/#{course_id}/assignments").body)
+  def list_assignments(course_id, user_id)
+    JSON.parse(self.class.get("/api/v1/users/#{user_id}/courses/#{course_id}/assignments").body)
   rescue
     nil
   end

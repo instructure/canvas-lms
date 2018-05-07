@@ -32,31 +32,23 @@ describe 'Assignments', :pact => true do
         upon_receiving('List Assignments').
         with(method: :get,
           headers: {
-            "Authorization"  => Pact.term(
-              generate: "Bearer token",
-              matcher: /Bearer ([A-Za-z0-9]+)/
+            'Authorization' => Pact.provider_param(
+              'Bearer :{token}',
+              {token: 'some_token'}
             ),
-            "Connection": "close",
-            "Host": "localhost:1234",
-            "Version": "HTTP/1.1"
+            'Connection': 'close',
+            'Host': 'localhost:1234',
+            'Version': 'HTTP/1.1'
           },
-          'path' => Pact.term(
-            generate: '/api/v1/courses/1/assignments',
-            matcher: /\/api\/v1\/courses\/[0-9]+\/assignments/
-          ),
-          query: ''
-        ).
-        will_respond_with(
-          status: 200,
-          body: Pact.each_like(
-            "id":5,
-            "name":"some assignment"
+             'path' => Pact.provider_param("/api/v1/users/:{user_id}/courses/:{course_id}/assignments",
+                                            {user_id: '1', course_id: '1'}),
+          query: '').will_respond_with(
+            status: 200,
+            body: Pact.each_like('id':1, 'name':'Assignment1')
           )
-        )
-
-      response = assignmentsApi.list_assignments(1)
-      expect(response[0]['id']).to eq 5
-      expect(response[0]['name']).to eq 'some assignment'
+      response = assignmentsApi.list_assignments(1, 1)
+      expect(response[0]['id']).to eq 1
+      expect(response[0]['name']).to eq 'Assignment1'
     end
   end
 end
