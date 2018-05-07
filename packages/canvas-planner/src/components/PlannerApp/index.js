@@ -74,6 +74,7 @@ export class PlannerApp extends Component {
     currentUser: shape(userShape),
     responsiveSize: sizeShape,
     appRef: func,
+    focusFallback: func,
   };
   static defaultProps = {
     isLoading: false,
@@ -83,6 +84,7 @@ export class PlannerApp extends Component {
     plannerActive: () => {return false;},
     responsiveSize: 'large',
     appRef: () => {},
+    focusFallback: () => {},
   };
 
   constructor (props) {
@@ -97,7 +99,12 @@ export class PlannerApp extends Component {
     window.addEventListener('resize', this.onResize, false);
   }
 
-   componentWillUpdate () {
+  componentWillUpdate (nextProps) {
+    if (this.props.allPastItemsLoaded === false && nextProps.allPastItemsLoaded === true) {
+      if (this.loadPriorButton === document.activeElement) {
+        this.props.focusFallback();
+      }
+    }
     this.props.preTriggerDynamicUiUpdates();
   }
 
@@ -217,6 +224,7 @@ export class PlannerApp extends Component {
     if (this.props.allPastItemsLoaded) return;
     return <View as="div" textAlign="center">
       <ShowOnFocusButton
+        buttonRef={ref => this.loadPriorButton = ref}
         buttonProps={{
           onClick: this.props.loadPastButtonClicked
         }}

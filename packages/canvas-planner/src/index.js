@@ -103,6 +103,7 @@ export function render (element, options) {
           changeToDashboardCardView={opts.changeToDashboardCardView}
           plannerActive={plannerActive}
           currentUser={opts.currentUser}
+          focusFallback={() => dynamicUiManager.focusFallback('item')}
         />
       </Provider>
     </DynamicUiProvider>

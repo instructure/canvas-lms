@@ -17,6 +17,7 @@
  */
 
 import {DynamicUiManager as Manager} from '../manager';
+import {specialFallbackFocusId} from '../util';
 import {dismissedOpportunity, setNaiAboveScreen} from '../../actions';
 import {
   startLoadingItems, gettingFutureItems, gettingPastItems, gotItemsSuccess,
@@ -300,5 +301,15 @@ describe('managing nai scroll position', () => {
     gbcr.mockReturnValueOnce({top: 8});
     manager.handleScrollPositionChange();
     expect(store.dispatch).not.toHaveBeenCalled();
+  });
+});
+
+describe('fallback focus', () => {
+  it('focuses the specified fallback focus', () => {
+    const {manager, animator} = createManagerWithMocks();
+    const fakeFallback = {getFocusable: () => 'fallback', getScrollable: () => 'scroll'};
+    manager.registerAnimatable('item', fakeFallback, -1, [specialFallbackFocusId('item')]);
+    manager.focusFallback('item');
+    expect(animator.focusElement).toHaveBeenCalledWith('fallback');
   });
 });

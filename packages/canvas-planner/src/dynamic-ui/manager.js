@@ -61,6 +61,11 @@ export class DynamicUiManager {
     return this.stickyOffset + this.additionalOffset;
   }
 
+  focusFallback (type) {
+    const component = this.animatableRegistry.getComponent(type, specialFallbackFocusId(type));
+    if (component) this.animator.focusElement(component.component.getFocusable());
+  }
+
   getRegistry () { return this.animatableRegistry; }
   getAnimator () { return this.animator; }
   getStore () { return this.store; }

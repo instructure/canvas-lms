@@ -18,7 +18,7 @@
 import React from 'react';
 import moment from 'moment-timezone';
 import MockDate from 'mockdate';
-import { shallow } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 import { PlannerApp } from '../index';
 
 const TZ = 'Asia/Tokyo';
@@ -125,6 +125,23 @@ describe('PlannerApp', () => {
   it('does not show load prior items button when all past items are loaded', () => {
     const wrapper = shallow(<PlannerApp {...getDefaultValues()} allPastItemsLoaded />);
     expect(wrapper.find('ShowOnFocusButton')).toHaveLength(0);
+  });
+
+  describe('focus handling', () => {
+    const dae = document.activeElement;
+    afterEach(() => {
+      if (dae) dae.focus(); // else ?
+    });
+
+    it('calls fallbackFocus when the load prior focus button disappears', () => {
+      const focusFallback = jest.fn();
+      const wrapper = mount(<PlannerApp {...getDefaultValues()}
+        days={[]} allPastItemsLoaded={false} focusFallback={focusFallback} />);
+      const button = wrapper.find('ShowOnFocusButton button');
+      button.getDOMNode().focus();
+      wrapper.setProps({allPastItemsLoaded: true});
+      expect(focusFallback).toHaveBeenCalled();
+    });
   });
 
   describe('empty day calculation', () => {
