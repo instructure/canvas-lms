@@ -58,7 +58,8 @@ group :test do
   gem 'escape_code', '0.2', require: false
   gem 'hashdiff', '0.3.7'
   gem 'luminosity_contrast', '0.2.1'
-  gem 'pact', '1.24.0'
+  gem 'pact-support', github: 'tucker-m/pact-support', tag: 'pr1.2'
+  gem 'pact', github: 'tucker-m/pact-ruby', tag: 'pr1.2'
   gem 'pact-messages', '0.2.0'
   gem 'database_cleaner', '~> 1.5', '>= 1.5.3'
 end
