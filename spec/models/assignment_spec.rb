@@ -352,6 +352,47 @@ describe Assignment do
     end
   end
 
+  describe '#permits_moderation?' do
+    before(:once) do
+      @assignment = @course.assignments.create!(
+        moderated_grading: true,
+        grader_count: 2,
+        final_grader: @teacher
+      )
+    end
+
+    context 'when Anonymous Moderated Marking is enabled' do
+      before(:once) do
+        @course.root_account.enable_feature!(:anonymous_moderated_marking)
+      end
+
+      it 'returns false if the user is not the final grader and not an admin' do
+        assistant = User.create!
+        @course.enroll_ta(assistant, enrollment_state: 'active')
+        expect(@assignment.permits_moderation?(assistant)).to be false
+      end
+
+      it 'returns true if the user is the final grader' do
+        expect(@assignment.permits_moderation?(@teacher)).to be true
+      end
+
+      it 'returns true if the user is an admin' do
+        expect(@assignment.permits_moderation?(account_admin_user)).to be true
+      end
+    end
+
+    context 'when Anonymous Moderated Marking is disabled' do
+      it 'returns true if the user has moderate grades privileges' do
+        expect(@assignment.permits_moderation?(@teacher)).to be true
+      end
+
+      it 'returns false if the user does not have moderate grades privileges' do
+        @course.root_account.role_overrides.create!(permission: 'moderate_grades', enabled: false, role: teacher_role)
+        expect(@assignment.permits_moderation?(@teacher)).to be false
+      end
+    end
+  end
+
   describe '#tool_settings_resource_codes' do
     let(:expected_hash) do
       {

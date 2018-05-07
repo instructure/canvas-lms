@@ -732,6 +732,8 @@ class Course < ActiveRecord::Base
     participating_instructors.restrict_to_sections(section_ids)
   end
 
+  # Tread carefully — this method returns true for Teachers, TAs, and Designers
+  # in the course.
   def user_is_admin?(user)
     return unless user
     RequestCache.cache('user_is_admin', self, user) do

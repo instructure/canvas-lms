@@ -2760,6 +2760,14 @@ class Assignment < ActiveRecord::Base
     ContextExternalTool.opaque_identifier_for(external_tool_tag, shard)
   end
 
+  def permits_moderation?(user)
+    if root_account.feature_enabled?(:anonymous_moderated_marking)
+      final_grader_id == user.id || context.account_membership_allows(user)
+    else
+      context.grants_right?(user, :moderate_grades)
+    end
+  end
+
   def available_moderators
     moderators = course.moderators
     return moderators if final_grader_id.blank?
