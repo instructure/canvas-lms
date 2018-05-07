@@ -19,7 +19,7 @@
 import { handleActions } from 'redux-actions';
 import { formatDayKey } from '../utilities/dateUtils';
 import { findPlannerItemById } from '../utilities/storeUtils';
-import { daysToDaysHash, daysHashToDays, mergeDaysIntoDaysHash, itemsToDays } from '../utilities/daysUtils';
+import { daysToDaysHash, daysHashToDays, mergeDaysIntoDaysHash, itemsToDays, groupAndSortDayItems } from '../utilities/daysUtils';
 
 function savedPlannerItem (state, action) {
   if (action.error) return state;
@@ -57,6 +57,12 @@ function _deletePlannerItem(state, doomedPlannerItem) {
 function gotDaysSuccess (state, days) {
   const oldDaysHash = daysToDaysHash(state);
   const mergedDaysHash = mergeDaysIntoDaysHash(oldDaysHash, days);
+  days.forEach(d => {
+    const dayKey = d[0];
+    const dayItems = mergedDaysHash[dayKey].slice(0); // copy items array for this day
+    groupAndSortDayItems(dayItems);
+    mergedDaysHash[dayKey] = dayItems;
+  });
   return daysHashToDays(mergedDaysHash);
 }
 

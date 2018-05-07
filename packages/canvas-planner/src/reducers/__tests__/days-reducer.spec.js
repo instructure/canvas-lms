@@ -24,10 +24,10 @@ describe('getting new items', () => {
     const initialState = [];
 
     const gotDataAction = gotItemsSuccess([
-      { id: 'fourth', dateBucketMoment: moment.tz('2017-04-29', 'UTC') },
-      { id: 'second', dateBucketMoment: moment.tz('2017-04-28', 'UTC') },
-      { id: 'first', dateBucketMoment: moment.tz('2017-04-27', 'UTC') },
-      { id: 'third', dateBucketMoment: moment.tz('2017-04-28', 'UTC') },
+      { id: 'fourth', date: moment.tz('2017-04-29', 'UTC'), dateBucketMoment: moment.tz('2017-04-29', 'UTC'), title: 'aaa' },
+      { id: 'second', date: moment.tz('2017-04-28', 'UTC'), dateBucketMoment: moment.tz('2017-04-28', 'UTC'), title: 'aaa' },
+      { id: 'first',  date: moment.tz('2017-04-27', 'UTC'), dateBucketMoment: moment.tz('2017-04-27', 'UTC'), title: 'aaa' },
+      { id: 'third',  date: moment.tz('2017-04-28', 'UTC'), dateBucketMoment: moment.tz('2017-04-28', 'UTC'), title: 'bbb' },
     ]);
 
     const newState = daysReducer(initialState, gotDataAction);
@@ -38,9 +38,9 @@ describe('getting new items', () => {
     ]);
 
     const nextGotDataAction = gotItemsSuccess([
-      {id: 'fifth', dateBucketMoment: moment.tz('2017-04-29', 'UTC')},
-      {id: 'zeroth', dateBucketMoment: moment.tz('2017-04-26', 'UTC')},
-      {id: 'second', with: 'new data', dateBucketMoment: moment.tz('2017-04-28', 'UTC')}
+      {id: 'fifth', date: moment.tz('2017-04-29', 'UTC'), dateBucketMoment: moment.tz('2017-04-29', 'UTC'), title: 'aaa'},
+      {id: 'zeroth', date: moment.tz('2017-04-26', 'UTC') , dateBucketMoment: moment.tz('2017-04-26', 'UTC'), title: 'aaa'},
+      {id: 'second', with: 'new data',date: moment.tz('2017-04-28', 'UTC'), dateBucketMoment: moment.tz('2017-04-28', 'UTC'), title: 'aaa'}
     ]);
     const mergedState = daysReducer(newState, nextGotDataAction);
     expect(mergedState).toMatchObject([
@@ -55,11 +55,11 @@ describe('getting new items', () => {
 describe('saving planner items', () => {
   it('adds new items to the day', () => {
     const initialState = [
-      ['2017-04-27', [{id: '42', dateBucketMoment: moment.tz('2017-04-27', 'UTC')}]],
+      ['2017-04-27', [{id: '42', date: moment.tz('2017-04-27', 'UTC'), dateBucketMoment: moment.tz('2017-04-27', 'UTC'), title: 'aaa'}]],
     ];
     const newState = daysReducer(initialState, {
       type: 'SAVED_PLANNER_ITEM',
-      payload: {item: {id: '43', dateBucketMoment: moment.tz('2017-04-27', 'UTC')}},
+      payload: {item: {id: '43', date: moment.tz('2017-04-27', 'UTC'), dateBucketMoment: moment.tz('2017-04-27', 'UTC'), title: 'aaa'}},
     });
     expect(newState).toMatchObject([
       ['2017-04-27', [
@@ -73,19 +73,20 @@ describe('saving planner items', () => {
     // more than one item to make sure edited item gets merged, not deleted and re-added
     const initialState = [
       ['2017-04-27', [
-        {dateBucketMoment: moment.tz('2017-04-27', 'UTC'), id: '42', title: 'an event'},
-        {dateBucketMoment: moment.tz('2017-04-27', 'UTC'), id: '43', title: 'another event'},
+        {date: moment.tz('2017-04-27', 'UTC'), dateBucketMoment: moment.tz('2017-04-27', 'UTC'), id: '42', title: 'aaa event'},
+        {date: moment.tz('2017-04-27', 'UTC'), dateBucketMoment: moment.tz('2017-04-27', 'UTC'), id: '43', title: 'bbb event'},
       ]],
     ];
     const newState = daysReducer(initialState, {
       type: 'SAVED_PLANNER_ITEM',
-      payload: {item: {dateBucketMoment: moment.tz( '2017-04-27', 'UTC'), id: '42', title: 'renamed event'}},
+      payload: {item: {date: moment.tz( '2017-04-27', 'UTC'), dateBucketMoment: moment.tz( '2017-04-27', 'UTC'), id: '42', title: 'ccc event'}},
     });
-    expect(newState).toMatchObject([
-      ['2017-04-27', [
-        {id: '42', title: 'renamed event'},
-        {id: '43', title: 'another event'},
-      ]],
+
+    expect(newState[0][0]).toEqual('2017-04-27');
+    // new title, and resorted
+    expect(newState[0][1]).toMatchObject([
+      {id: '43', title: 'bbb event'},
+      {id: '42', title: 'ccc event'},
     ]);
   });
 

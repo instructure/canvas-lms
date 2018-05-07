@@ -94,3 +94,48 @@ export function purgeDuplicateDays (oldDays, newDays) {
   newDays.forEach(day => { delete purgedDaysHash[day[0]]; });
   return daysHashToDays(purgedDaysHash);
 }
+
+// sort the items:
+// First by grouping (alpha by course or group title, followed by the Notes (aka To Dos)
+// Then by due-time for each item w/in the grouping.
+export function groupAndSortDayItems (items) {
+  return items.sort(orderItems);
+}
+
+// ----- grouping and sorting helpers -----
+const cmpopts = {numeric: true};
+const locale =(window.ENV && window.ENV.LOCALE) || 'en';
+
+// order items by their grouping
+function getItemGroupTitle(item) {
+  if (item.context && item.context.id) {  // edited items have an empty context, so look for the id too
+    return item.context.title || `${item.context.type}${item.context.id}`;
+  }
+  return 'Notes';
+}
+
+function orderItemsByGrouping (a, b) {
+  let namea = getItemGroupTitle(a);
+  let nameb = getItemGroupTitle(b);
+  if (namea.localeCompare(nameb, locale, cmpopts) === 0) return 0;
+  if (namea === 'Notes') return 1;
+  if (nameb === 'Notes') return -1;
+  return namea.localeCompare(nameb, locale, cmpopts);
+}
+
+// order items by time, then title
+function orderItemsByTimeAndTitle (a, b) {
+  if (a.date.valueOf() === b.date.valueOf()) {
+    return a.title.localeCompare(b.title, locale, cmpopts);
+  }
+  return a.date < b.date ? -1 : 1;
+}
+
+// order items
+function orderItems (a, b) {
+  let order = orderItemsByGrouping(a, b);
+  if (order === 0) {
+    order = orderItemsByTimeAndTitle(a, b);
+  }
+  return order;
+}

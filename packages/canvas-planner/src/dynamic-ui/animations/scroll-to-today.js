@@ -58,7 +58,7 @@ export function scrollAndFocusTodayItem (manager, todayElem) {
 }
 
 function findTodayOrNext (registry) {
-  const today = moment();
+  const today = moment().startOf('day');
   const todayOrNextItem = registry.getAllItemsSorted().find(item => {
     return item.component.props.date >= today;
   });

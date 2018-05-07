@@ -403,20 +403,6 @@ describe('transformApiToInternalItem', () => {
     expect(result).toMatchSnapshot();
   });
 
-  it('extracts and transforms the proper data for an announcement response', () => {
-    const apiResponse = makeApiResponse({
-      plannable_type: 'announcement',
-      plannable: makeDiscussionTopic({ // TODO: Discussion topic is probably fine for now to simulate this, but probably should change later
-        due_at: undefined,
-        todo_date: undefined,
-        unread_count: 1
-      })
-    });
-
-    const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
-    expect(result).toMatchSnapshot();
-  });
-
   it('extracts and transforms the ID for a wiki page repsonse', () => {
     const apiResponse = makeApiResponse({
       plannable_type: 'wiki_page',

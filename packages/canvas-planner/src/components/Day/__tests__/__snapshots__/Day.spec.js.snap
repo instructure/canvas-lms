@@ -1,5 +1,286 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`groups itemsForDay that come in on prop changes 1`] = `
+<div
+  className="planner-day"
+>
+  <Heading
+    border="none"
+    color="inherit"
+    ellipsis={false}
+    level="h2"
+  >
+    <Text
+      as="div"
+      letterSpacing="normal"
+      lineHeight="condensed"
+      size="medium"
+      transform="uppercase"
+    >
+      Tuesday
+    </Text>
+    <Text
+      as="div"
+      letterSpacing="normal"
+      lineHeight="condensed"
+      size="medium"
+    >
+      April 25, 2017
+    </Text>
+  </Heading>
+  <div>
+    <Animatable(ResponsiveGrouping)
+      animatableIndex={1}
+      items={
+        Array [
+          Object {
+            "context": Object {
+              "id": 128,
+              "inform_students_of_overdue_submissions": true,
+              "type": "Course",
+            },
+            "date": "2017-04-25T23:59:00.000Z",
+            "title": "Black Friday",
+          },
+        ]
+      }
+      theme={
+        Object {
+          "titleColor": null,
+        }
+      }
+      timeZone="America/Denver"
+    />
+    <Animatable(ResponsiveGrouping)
+      animatableIndex={2}
+      items={
+        Array [
+          Object {
+            "context": Object {
+              "id": 256,
+              "inform_students_of_overdue_submissions": true,
+              "type": "Course",
+            },
+            "date": "2017-04-25T23:59:00.000Z",
+            "title": "San Juan",
+          },
+        ]
+      }
+      theme={
+        Object {
+          "titleColor": null,
+        }
+      }
+      timeZone="America/Denver"
+    />
+  </div>
+</div>
+`;
+
+exports[`groups itemsForDay that come in on prop changes 2`] = `
+<div
+  className="planner-day"
+>
+  <Heading
+    border="none"
+    color="inherit"
+    ellipsis={false}
+    level="h2"
+  >
+    <Text
+      as="div"
+      letterSpacing="normal"
+      lineHeight="condensed"
+      size="medium"
+      transform="uppercase"
+    >
+      Tuesday
+    </Text>
+    <Text
+      as="div"
+      letterSpacing="normal"
+      lineHeight="condensed"
+      size="medium"
+    >
+      April 25, 2017
+    </Text>
+  </Heading>
+  <div>
+    <Animatable(ResponsiveGrouping)
+      animatableIndex={1}
+      items={
+        Array [
+          Object {
+            "context": Object {
+              "id": 128,
+              "inform_students_of_overdue_submissions": true,
+              "type": "Course",
+            },
+            "date": "2017-04-25T23:59:00.000Z",
+            "title": "Black Friday",
+          },
+        ]
+      }
+      theme={
+        Object {
+          "titleColor": null,
+        }
+      }
+      timeZone="America/Denver"
+    />
+    <Animatable(ResponsiveGrouping)
+      animatableIndex={2}
+      items={
+        Array [
+          Object {
+            "context": Object {
+              "id": 256,
+              "inform_students_of_overdue_submissions": true,
+              "type": "Course",
+            },
+            "date": "2017-04-25T23:59:00.000Z",
+            "title": "San Juan",
+          },
+          Object {
+            "context": Object {
+              "id": 256,
+              "inform_students_of_overdue_submissions": true,
+              "type": "Course",
+            },
+            "date": "2017-04-25T23:59:00.000Z",
+            "title": "Roll for the Galaxy",
+          },
+        ]
+      }
+      theme={
+        Object {
+          "titleColor": null,
+        }
+      }
+      timeZone="America/Denver"
+    />
+    <Animatable(ResponsiveGrouping)
+      animatableIndex={3}
+      items={
+        Array [
+          Object {
+            "title": "Get work done!",
+          },
+        ]
+      }
+      theme={
+        Object {
+          "titleColor": null,
+        }
+      }
+      timeZone="America/Denver"
+    />
+  </div>
+</div>
+`;
+
+exports[`groups itemsForDay that have no context into the "Notes" category 1`] = `
+<div
+  className="planner-day"
+>
+  <Heading
+    border="none"
+    color="inherit"
+    ellipsis={false}
+    level="h2"
+  >
+    <Text
+      as="div"
+      letterSpacing="normal"
+      lineHeight="condensed"
+      size="medium"
+      transform="uppercase"
+    >
+      Tuesday
+    </Text>
+    <Text
+      as="div"
+      letterSpacing="normal"
+      lineHeight="condensed"
+      size="medium"
+    >
+      April 25, 2017
+    </Text>
+  </Heading>
+  <div>
+    <Animatable(ResponsiveGrouping)
+      animatableIndex={1}
+      items={
+        Array [
+          Object {
+            "context": Object {
+              "id": 128,
+              "inform_students_of_overdue_submissions": true,
+              "type": "Course",
+            },
+            "date": "2017-04-25T23:59:00.000Z",
+            "title": "Black Friday",
+          },
+        ]
+      }
+      theme={
+        Object {
+          "titleColor": null,
+        }
+      }
+      timeZone="America/Denver"
+    />
+    <Animatable(ResponsiveGrouping)
+      animatableIndex={2}
+      items={
+        Array [
+          Object {
+            "context": Object {
+              "id": 256,
+              "inform_students_of_overdue_submissions": true,
+              "type": "Course",
+            },
+            "date": "2017-04-25T23:59:00.000Z",
+            "title": "San Juan",
+          },
+          Object {
+            "context": Object {
+              "id": 256,
+              "inform_students_of_overdue_submissions": true,
+              "type": "Course",
+            },
+            "date": "2017-04-25T23:59:00.000Z",
+            "title": "Roll for the Galaxy",
+          },
+        ]
+      }
+      theme={
+        Object {
+          "titleColor": null,
+        }
+      }
+      timeZone="America/Denver"
+    />
+    <Animatable(ResponsiveGrouping)
+      animatableIndex={3}
+      items={
+        Array [
+          Object {
+            "title": "Get work done!",
+          },
+        ]
+      }
+      theme={
+        Object {
+          "titleColor": null,
+        }
+      }
+      timeZone="America/Denver"
+    />
+  </div>
+</div>
+`;
+
 exports[`renders grouping correctly when having itemsForDay 1`] = `
 <div
   className="planner-day"
@@ -40,6 +321,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
               "type": "Course",
               "url": "http://www.non_default_url.com",
             },
+            "date": "2017-04-25T23:59:00.000Z",
             "title": "Black Friday",
           },
         ]
@@ -63,6 +345,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
               "type": "Course",
               "url": "http://www.non_default_url.com",
             },
+            "date": "2017-04-25T23:59:00.000Z",
             "title": "San Juan",
           },
           Object {
@@ -72,6 +355,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
               "type": "Course",
               "url": "http://www.non_default_url.com",
             },
+            "date": "2017-04-25T23:59:00.000Z",
             "title": "Roll for the Galaxy",
           },
         ]
@@ -94,6 +378,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
               "inform_students_of_overdue_submissions": false,
               "type": "Group",
             },
+            "date": "2017-04-25T23:59:00.000Z",
             "title": "Same id, different type",
           },
         ]
