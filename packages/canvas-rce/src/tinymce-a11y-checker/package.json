@@ -11,19 +11,14 @@
     "test-watch": "jest --watch src",
     "cypress:open": "cypress open",
     "cypress:run": "node cypress/run.js",
-    "dev": "webpack-dev-server --open",
+    "start": "webpack-dev-server --open",
     "extract": "format-message extract \"src/**/*.js\" > locales/en.json",
     "fmt": "prettier --no-semi --write \"src/**/*.js\"",
     "fmt-check": "prettier --no-semi -l \"src/**/*.js\"",
     "build": "scripts/build",
     "prepublish": "npm run build"
   },
-  "keywords": [
-    "tinymce",
-    "accessibility",
-    "plugin",
-    "a11y"
-  ],
+  "keywords": ["tinymce", "accessibility", "plugin", "a11y"],
   "author": "Brent Burgoyne",
   "license": "MIT",
   "devDependencies": {
@@ -64,16 +59,9 @@
     "wcag-element-contrast": "^1.0.1"
   },
   "jest": {
-    "setupFiles": [
-      "./jest-setup.js"
-    ],
-    "snapshotSerializers": [
-      "<rootDir>/node_modules/enzyme-to-json/serializer"
-    ],
-    "coveragePathIgnorePatterns": [
-      "/node_modules/",
-      "placeholder-svg.js"
-    ],
+    "setupFiles": ["./jest-setup.js"],
+    "snapshotSerializers": ["<rootDir>/node_modules/enzyme-to-json/serializer"],
+    "coveragePathIgnorePatterns": ["/node_modules/", "placeholder-svg.js"],
     "coverageThreshold": {
       "global": {
         "branches": 85,
