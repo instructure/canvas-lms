@@ -5955,6 +5955,7 @@ QUnit.module('Gradebook#updateCurrentGradingPeriod', {
     this.stub(this.gradebook, 'sortGridRows');
     this.stub(this.gradebook, 'updateFilteredContentInfo');
     this.stub(this.gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+    this.stub(this.gradebook, 'renderActionMenu');
   },
 
   teardown () {
@@ -6005,6 +6006,11 @@ test('has no effect when the grading period has not changed', function () {
   strictEqual(this.gradebook.updateFilteredContentInfo.callCount, 0, 'setAssignmentVisibility was not called');
   strictEqual(this.gradebook.updateColumnsAndRenderViewOptionsMenu.callCount, 0,
     'updateColumnsAndRenderViewOptionsMenu was not called');
+});
+
+test('renders the action menu', function () {
+  this.gradebook.updateCurrentGradingPeriod('1401');
+  strictEqual(this.gradebook.renderActionMenu.callCount, 1)
 });
 
 QUnit.module('Gradebook#updateCurrentModule', {
@@ -6248,7 +6254,15 @@ QUnit.module('Gradebook', () => {
         export_gradebook_csv_url: 'http://example.com/export',
         gradebook_import_url: 'http://example.com/import',
         post_grades_feature: false,
-        publish_to_sis_enabled: false
+        publish_to_sis_enabled: false,
+        grading_period_set: {
+          id: '1501',
+          grading_periods: [
+            { id: '701' },
+            { id: '702' }
+          ],
+        },
+        current_grading_period_id: '702'
       };
     });
 
@@ -6268,6 +6282,12 @@ QUnit.module('Gradebook', () => {
       const gradebook = createGradebook(options);
       const props = gradebook.getActionMenuProps();
       strictEqual(props.publishGradesToSis.isEnabled, false);
+    });
+
+    test('sets gradingPeriodId', () => {
+      const gradebook = createGradebook(options);
+      const props = gradebook.getActionMenuProps();
+      strictEqual(props.gradingPeriodId, '702');
     });
   });
 
@@ -6322,6 +6342,7 @@ QUnit.module('Gradebook', () => {
       sinon.stub(gradebook, 'updateFilteredContentInfo')
       sinon.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
       sinon.stub(gradebook, 'renderViewOptionsMenu')
+      sinon.stub(gradebook, 'renderActionMenu')
     })
 
     hooks.afterEach(() => {
