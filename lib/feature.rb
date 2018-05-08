@@ -678,17 +678,15 @@ END
       display_name: -> { I18n.t('Developer Key management')},
       description: -> { I18n.t('New Features for Developer Key management') },
       applies_to: 'RootAccount',
-      state: 'hidden',
-      development: true
+      state: 'hidden'
     },
     'developer_key_management_ui_rewrite' =>
-      {
-        display_name: -> { I18n.t('Developer Key management UI Rewrite')},
-        description: -> { I18n.t('React UI rewrite Developer Key management') },
-        applies_to: 'RootAccount',
-        state: 'hidden',
-        development: true
-      },
+    {
+      display_name: -> { I18n.t('Developer Key management UI Rewrite')},
+      description: -> { I18n.t('React UI rewrite Developer Key management') },
+      applies_to: 'RootAccount',
+      state: 'hidden'
+    },
     'common_cartridge_page_conversion' => {
       display_name: -> { I18n.t('Common Cartridge HTML File to Page Conversion') },
       description: -> { I18n.t('If enabled, Common Cartridge importers will convert HTML files into Pages') },
@@ -700,8 +698,7 @@ END
       display_name: -> { I18n.t('API Token Scoping')},
       description: -> { I18n.t('If enabled, scopes will be validated on API requests if the developer key being used requires scopes.') },
       applies_to: 'RootAccount',
-      state: 'hidden',
-      development: true
+      state: 'hidden'
     }
   )
 
