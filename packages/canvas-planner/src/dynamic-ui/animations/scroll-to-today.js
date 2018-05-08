@@ -24,7 +24,7 @@ import { alert } from '../../utilities/alertUtils';
 
 export class ScrollToToday extends Animation {
   uiDidUpdate () {
-    const t = this.document().querySelector('.planner-today');
+    const t = this.document().querySelector('.planner-today h2');
     if (t) {
       scrollAndFocusTodayItem(this.manager(), t);
     } else {
