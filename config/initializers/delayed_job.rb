@@ -48,6 +48,8 @@ Delayed::Settings.select_random_from_batch  = ->{ Setting.get('jobs_select_rando
 Delayed::Settings.num_strands               = ->(strand_name){ Setting.get("#{strand_name}_num_strands", nil) }
 Delayed::Settings.worker_procname_prefix    = ->{ "#{Shard.current(:delayed_jobs).id}~" }
 Delayed::Settings.pool_procname_suffix      = " (#{Canvas.revision})" if Canvas.revision
+Delayed::Settings.worker_health_check_type  = Delayed::CLI.instance&.config&.dig('health_check', 'type')&.to_sym || :none
+Delayed::Settings.worker_health_check_config = Delayed::CLI.instance&.config&.[]('health_check')
 
 Delayed::Settings.default_job_options = ->{
   {

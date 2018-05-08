@@ -207,4 +207,8 @@ Rails.configuration.after_initialize do
   Delayed::Periodic.cron 'Assignment.clean_up_duplicating_assignments', '*/5 * * * *', priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(Assignment, :clean_up_duplicating_assignments)
   end
+
+  Delayed::Periodic.cron 'abandoned job cleanup', '*/10 * * * *' do
+    Delayed::Worker::HealthCheck.reschedule_abandoned_jobs
+  end
 end
