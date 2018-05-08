@@ -1879,13 +1879,13 @@ class User < ActiveRecord::Base
     self.shard.activate do
       Shackles.activate(:slave) do
         visible_instances = visible_stream_item_instances(opts).
-            preload(stream_item: :context).
-            limit(Setting.get('recent_stream_item_limit', 100))
+          preload(stream_item: :context).
+          limit(Setting.get('recent_stream_item_limit', 100))
         visible_instances.map do |sii|
           si = sii.stream_item
-          next unless si.present?
+          next if si.blank?
           next if si.asset_type == 'Submission'
-          next if si.context_type == "Course" && (si.context.concluded? || !self.participating_enrollments.any?{|e| e.course_id == si.context_id})
+          next if si.context_type == "Course" && (si.context.concluded? || self.participating_enrollments.none?{|e| e.course_id == si.context_id})
           si.unread = sii.unread?
           si
         end.compact
@@ -1896,7 +1896,6 @@ class User < ActiveRecord::Base
   def calendar_events_for_contexts(context_codes, opts={})
     event_codes = context_codes
     event_codes += AppointmentGroup.manageable_by(self, context_codes).intersecting(opts[:start_at], opts[:end_at]).map(&:asset_string)
-    event_codes << asset_string
     CalendarEvent.active.for_user_and_context_codes(self, event_codes, []).between(opts[:start_at], opts[:end_at]).
       updated_after(opts[:updated_at])
   end

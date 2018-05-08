@@ -390,6 +390,7 @@ class PlannerOverridesController < ApplicationController
     unless @context_codes
       @context_codes = (@current_user.course_ids_for_todo_lists(:student, default_opts).map{|id| "course_#{id}"} || [])
       @context_codes += (@current_user.cached_current_group_memberships.pluck(:group_id).map{|id| "group_#{id}"} || [])
+      @context_codes << @current_user.asset_string
     end
     item_collection('calendar_events', @current_user.calendar_events_for_contexts(@context_codes, start_at: start_date,
       end_at: end_date, exclude_assignments: true),
