@@ -16,6 +16,7 @@
     "fmt": "prettier --no-semi --write \"src/**/*.js\"",
     "fmt-check": "prettier --no-semi -l \"src/**/*.js\"",
     "build": "scripts/build",
+    "build:demo": "webpack",
     "prepublish": "npm run build"
   },
   "keywords": ["tinymce", "accessibility", "plugin", "a11y"],

@@ -1,8 +1,20 @@
 language: node_js
 node_js:
-  - "node"
-  - "lts/*"
+  - node
+  - lts/*
 script:
   - npm run test:coverage
   - npm run cypress:run
   - npm run fmt-check
+  - npm run build:demo
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN
+  keep-history: true
+  local-dir: demo
+  on:
+    branch: master
+env:
+  global:
+    secure: lly+fmMbNglekqoSb3AA74YDm6iMYv1fMmuh65LMIWAbwAHRmko4yaBV5CjFKy6TosoY2/7P5ljLUXD7rmgLxuU1hFNeuN+/n5P37xzr405+k4Q5AzIcmFni/5me4QDBmQOf3qSVLA/xS7FxwvE43MTS6f3kuoxtyVJBIruSL6YeqcpgL9PP/OhsT+83sni1cQJMaEVDyQV+T1dSjT1+wc5Bhxt83Y12WUH97jJjHTRpFlRtEOBbF4z5lGK+guxbcAKnIfpKMg4mjRBucl7nwODUMzfXjcyObuQwHP7Qu7j+x3kM578TAOCVVnF3lS7zbIFVyGfaSzyFvl5v542rNRTmUd329pWDh42pUOm+bR9ksec7gmUfekdWkPvlcvkU6APrRaz7KrMJXoXXESZ2cDTlby4j/vIiPAWxQTi3axYhc+MjD2Dy9s502XPI7Mn7Fchs/h+id6/tmunvGfIWpp3x1NdPhP4C0CsiEjtlHinNSeLEcSVyW/2VPXKCAD1hUHXr7Wa2zQd/kF9ZJsY9P1QhoT9VIR4y9bvgy+93zy+E4FjqeOZgXENDKzzn8GZuVvYfxYjkIPolo5XvWA0Jgc600kZAU7L8xllxdGukl4TYwWSCU028FxRBPHp/Xa3TWDzpjHf1jEDS2fsgl8Ds1IkHo1gn0oJHheyCqLAbDb0=
