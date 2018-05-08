@@ -35,10 +35,11 @@ module SIS
       end
 
       Course.update_account_associations(course_ids_to_update_associations.to_a) unless course_ids_to_update_associations.empty?
-      courses_to_update_sis_batch_id.in_groups_of(1000, false) do |batch|
-        Course.where(:id => batch).update_all(:sis_batch_id => @batch.id)
+      courses_to_update_sis_batch_id.in_groups_of(1000, false) do |courses|
+        Course.where(:id => courses).update_all(:sis_batch_id => @batch.id)
       end if @batch
 
+      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data) if @batch.using_parallel_importers?
       MasterCourses::MasterTemplate.create_associations_from_sis(@root_account, blueprint_associations, messages, @batch_user)
 
       @logger.debug("Courses took #{Time.now - start} seconds")
@@ -48,7 +49,7 @@ module SIS
   private
 
     class Work
-      attr_accessor :success_count
+      attr_accessor :success_count, :roll_back_data
 
       def initialize(batch, root_account, logger, a1, a2, m, batch_user, blueprint_associations)
         @batch = batch
@@ -56,6 +57,7 @@ module SIS
         @root_account = root_account
         @courses_to_update_sis_batch_id = a1
         @course_ids_to_update_associations = a2
+        @roll_back_data = []
         @blueprint_associations = blueprint_associations
         @messages = m
         @logger = logger
@@ -207,6 +209,8 @@ module SIS
             course_changes = course.changes
             course.save_without_broadcasting!
             auditor_state_changes(course, state_changes, course_changes)
+            data = SisBatchRollBackData.build_data(sis_batch: @batch, context: course)
+            @roll_back_data << data if data
           else
             msg = "A course did not pass validation "
             msg += "(" + "course: #{course_id} / #{short_name}, error: " +
@@ -228,8 +232,18 @@ module SIS
           end
         end
 
-        course.update_enrolled_users if update_enrollments
+        enrollment_data = course.update_enrolled_users(sis_batch: @batch) if update_enrollments
+        @roll_back_data.push(*enrollment_data) if enrollment_data
+        maybe_write_roll_back_data
+
         @success_count += 1
+      end
+
+      def maybe_write_roll_back_data
+        if @roll_back_data.count > 1000
+          SisBatchRollBackData.bulk_insert_roll_back_data(@roll_back_data)
+          @roll_back_data = []
+        end
       end
 
       def auditor_state_changes(course, state_changes, changes = {})

@@ -28,18 +28,21 @@ module SIS
       importer.abstract_courses_to_update_sis_batch_id.in_groups_of(1000, false) do |batch|
         AbstractCourse.where(:id => batch).update_all(:sis_batch_id => @batch.id)
       end if @batch
+      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data) if @batch.using_parallel_importers?
+
       @logger.debug("AbstractCourses took #{Time.now - start} seconds")
       return importer.success_count
     end
 
   private
     class Work
-      attr_accessor :success_count, :abstract_courses_to_update_sis_batch_id
+      attr_accessor :success_count, :abstract_courses_to_update_sis_batch_id, :roll_back_data
 
       def initialize(batch, root_account, logger)
         @batch = batch
         @root_account = root_account
         @abstract_courses_to_update_sis_batch_id = []
+        @roll_back_data = []
         @logger = logger
         @success_count = 0
       end
@@ -81,6 +84,8 @@ module SIS
         if course.changed?
           course.sis_batch_id = @batch.id if @batch
           course.save!
+          data = SisBatchRollBackData.build_data(sis_batch: @batch, context: course)
+          @roll_back_data << data if data
         elsif @batch
           @abstract_courses_to_update_sis_batch_id << course.id
         end
