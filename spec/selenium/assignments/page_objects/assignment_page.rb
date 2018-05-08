@@ -35,6 +35,10 @@ class AssignmentPage
       f("select[name='final_grader_id']")
     end
 
+    def grader_count_input
+      f("input[name='grader_count']")
+    end
+
     def moderate_checkbox
       f("input[type=checkbox][name='moderated_grading']")
     end
@@ -77,5 +81,9 @@ class AssignmentPage
       wait_for_ajaximations
     end
 
+    def add_number_of_graders(number)
+      grader_count_input.send_keys(number)
+      driver.action.send_keys(:enter).perform
+    end
   end
 end

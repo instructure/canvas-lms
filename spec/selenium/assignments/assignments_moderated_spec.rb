@@ -88,7 +88,17 @@ describe "moderated grading assignments" do
     it "should allow user to select final moderator", priority: "1", test_id: 3482530 do
       AssignmentPage.select_moderate_checkbox
       AssignmentPage.select_grader_dropdown.click
+
       expect(AssignmentPage.select_grader_dropdown).to include_text(@teacher_two.name)
+    end
+
+    it "should allow user to input number of graders", priority: "1", test_id: 3490818 do
+      # default value for the input is 2, or if the class has <= 2 active instructors the default is 1
+      skip('refs: GRADE-974, unskip when merging to master')
+      AssignmentPage.select_moderate_checkbox
+      AssignmentPage.add_number_of_graders(2)
+
+      expect(@moderated_assignment.grader_count).to eq 2
     end
   end
 
@@ -114,6 +124,7 @@ describe "moderated grading assignments" do
       @moderated_assignment = @course.assignments.create!(
         title: 'Moderated Assignment',
         submission_types: 'online_text_entry',
+        grader_count: 2,
         final_grader: @teacher_two,
         moderated_grading: true,
         points_possible: 10
