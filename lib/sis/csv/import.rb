@@ -80,6 +80,7 @@ module SIS
         @parallel_queue = settings[:queue_for_parallel_jobs]
         @parallel_queue = nil if @parallel_queue.blank?
         update_pause_vars
+        @batch.data[:use_parallel_imports] = false
       end
 
       def self.process(root_account, opts = {})

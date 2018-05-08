@@ -27,6 +27,7 @@ class SisBatch < ActiveRecord::Base
   belongs_to :errors_attachment, class_name: 'Attachment'
   has_many :parallel_importers, inverse_of: :sis_batch
   has_many :sis_batch_errors, inverse_of: :sis_batch, autosave: false
+  has_many :roll_back_data, inverse_of: :sis_batch, class_name: 'SisBatchRollBackData', autosave: false
   belongs_to :generated_diff, class_name: 'Attachment'
   belongs_to :batch_mode_term, class_name: 'EnrollmentTerm'
   belongs_to :user
@@ -252,6 +253,10 @@ class SisBatch < ActiveRecord::Base
 
   def self.use_parallel_importers?(account)
     account.feature_enabled?(:refactor_of_sis_imports)
+  end
+
+  def using_parallel_importers?
+    self&.data&.dig(:use_parallel_imports)
   end
 
   def self.strand_for_account(account)

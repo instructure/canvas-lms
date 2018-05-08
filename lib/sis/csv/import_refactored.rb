@@ -73,6 +73,7 @@ module SIS
         end
         @rows_for_parallel = nil
         update_pause_vars
+        @batch.data[:use_parallel_imports] = true
         sleep(@pause_duration)
       end
 

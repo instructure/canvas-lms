@@ -84,6 +84,7 @@ describe SisBatch do
                                 course_1,course_1,course_1,term_1,active}])
     expect(batch.parallel_importers.count).to eq 2
     expect(batch.parallel_importers.pluck(:importer_type)).to match_array %w(course user)
+    expect(batch.data[:use_parallel_imports]).to eq true
   end
 
   it "should keep the batch in initializing state during create_with_attachment" do
