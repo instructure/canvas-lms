@@ -1153,6 +1153,7 @@ define [
         @updateFilteredContentInfo()
         @updateColumnsAndRenderViewOptionsMenu()
         @updateGradingPeriodFilterVisibility()
+        @renderActionMenu()
 
     updateCurrentModule: (moduleId) =>
       if @getFilterColumnsBySetting('contextModuleId') != moduleId
@@ -1334,6 +1335,7 @@ define [
         publishGradesToSis:
           isEnabled: @options.publish_to_sis_enabled
           publishToSisUrl: @options.publish_to_sis_url
+        gradingPeriodId: @getGradingPeriodToShow()
 
       progressData = @options.gradebook_csv_progress
 
