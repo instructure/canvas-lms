@@ -708,6 +708,13 @@ END
       description: -> { I18n.t('If enabled, scopes will be validated on API requests if the developer key being used requires scopes.') },
       applies_to: 'RootAccount',
       state: 'hidden'
+    },
+    'non_scoring_rubrics' => {
+      display_name: -> { I18n.t('Non-scoring Rubrics')},
+      description: -> { I18n.t('If enabled, the option will be presented to have non-scoring rubrics.') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      development: true
     }
   )
 

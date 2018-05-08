@@ -38,9 +38,18 @@ import 'vendor/jquery.ba-tinypubsub'
 import './vendor/jquery.scrollTo'
 import 'compiled/jquery/fixDialogButtons'
 
-  var rubricEditing = {
+  const rubricEditing = {
     htmlBody: null,
-
+    hidePoints: (...args) => {
+      args.forEach(($el) => {
+        $el.find('.toggle_for_hide_points').addClass('hidden')
+      })
+    },
+    showPoints: (...args) => {
+      args.forEach(($el) => {
+        $el.find('.toggle_for_hide_points').removeClass('hidden')
+      })
+    },
     localizedPoints: function(points) {
       return I18n.n(points, {precision: 2, strip_insignificant_zeros: true})
     },
@@ -316,6 +325,8 @@ import 'compiled/jquery/fixDialogButtons'
       if(data['rubric_association[use_for_grading]'] == '0') {
         data['rubric_association[hide_score_total]'] = $rubric.find(".totalling_rubric_checkbox").attr('checked') ? "1" : "0";
       }
+      data['rubric_association[hide_points]'] = $rubric.find(".hide_points_checkbox").attr('checked') ? "1" : "0";
+      data['rubric_association[hide_outcome_results]'] = $rubric.find(".hide_outcome_results_checkbox").attr('checked') ? "1" : "0";
       data['rubric[free_form_criterion_comments]'] = $rubric.find(".rubric_custom_rating").attr('checked') ? "1" : "0";
       data['rubric_association[id]'] = vals.rubric_association_id;
       // make sure the association is always updated, see the comment on
@@ -389,7 +400,7 @@ import 'compiled/jquery/fixDialogButtons'
       $rubric = $original_rubric.clone(true).addClass('editing');
       $rubric.find(".edit_rubric").remove();
 
-      data = $rubric.getTemplateData({textValues: ['use_for_grading', 'free_form_criterion_comments', 'hide_score_total']});
+      data = $rubric.getTemplateData({textValues: ['use_for_grading', 'free_form_criterion_comments', 'hide_score_total', 'hide_points', 'hide_outcome_results']});
       $original_rubric.hide().after($rubric.show());
 
       $tr = $("#edit_rubric").clone(true).show().removeAttr('id').addClass('edit_rubric');
@@ -397,9 +408,11 @@ import 'compiled/jquery/fixDialogButtons'
       $rubric.find('.rubric_table').append($tr);
 
       $rubric.find(":text:first").focus().select();
-      $form.find(".grading_rubric_checkbox").attr('checked', data.use_for_grading == "true").triggerHandler('change');
-      $form.find(".rubric_custom_rating").attr('checked', data.free_form_criterion_comments == "true").triggerHandler('change');
-      $form.find(".totalling_rubric_checkbox").attr('checked', data.hide_score_total == "true").triggerHandler('change');
+      $form.find(".grading_rubric_checkbox").attr('checked', data.use_for_grading === "true").triggerHandler('change');
+      $form.find(".rubric_custom_rating").attr('checked', data.free_form_criterion_comments === "true").triggerHandler('change');
+      $form.find(".totalling_rubric_checkbox").attr('checked', data.hide_score_total === "true").triggerHandler('change');
+      $form.find(".hide_points_checkbox").attr('checked', data.hide_points === "true").triggerHandler('change');
+      $form.find(".hide_outcome_results_checkbox").attr('checked', data.hide_outcome_results === "true").triggerHandler('change');
       var createText = I18n.t('buttons.create_rubric', "Create Rubric");
       var updateText = I18n.t('buttons.update_rubric', "Update Rubric");
       $form.find(".save_button").text($rubric.attr('id') == 'rubric_new' ? createText : updateText);
@@ -1020,6 +1033,8 @@ import 'compiled/jquery/fixDialogButtons'
         $rubric.loadingImage('remove');
         rubric.rubric_association_id = data.rubric_association.id;
         rubric.use_for_grading = data.rubric_association.use_for_grading;
+        rubric.hide_points = data.rubric_association.hide_points
+        rubric.hide_outcome_results = data.rubric_association.hide_outcome_results
         rubric.permissions = rubric.permissions || {};
         if(data.rubric_association.permissions) {
           rubric.permissions.update_association = data.rubric_association.permissions.update;
@@ -1132,6 +1147,13 @@ import 'compiled/jquery/fixDialogButtons'
     }).triggerHandler('change');
     $("#edit_rubric_form #totalling_rubric").change(function() {
       $(this).parents(".rubric").find(".total_points_holder").showIf(!$(this).attr('checked'));
+    });
+    $("#edit_rubric_form #hide_points").change(function(e) {
+      if (e.target.checked) {
+        rubricEditing.hidePoints($(this).parents('.rubric'), $('#rubric_rating_dialog'))
+      } else {
+        rubricEditing.showPoints($(this).parents('.rubric'), $('#rubric_rating_dialog'))
+      }
     });
     $("#edit_rubric_form .grading_rubric_checkbox").change(function() {
       $(this).parents(".rubric").find(".totalling_rubric").css('visibility', $(this).attr('checked') ? 'hidden' : 'visible');

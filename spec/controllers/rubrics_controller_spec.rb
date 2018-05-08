@@ -280,6 +280,7 @@ describe RubricsController do
       expect(assigns[:rubric].title).to eql("newer title")
       expect(response).to be_success
     end
+
     it "should update the association if specified" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
@@ -289,6 +290,31 @@ describe RubricsController do
       expect(assigns[:association]).to eql(@rubric_association)
       expect(assigns[:rubric].rubric_associations.where(id: @rubric_association).first.title).to eql("some title")
       expect(response).to be_success
+    end
+
+    it "should update attributes on the association if specified" do
+      course_with_teacher_logged_in(:active_all => true)
+      rubric_association_model(:user => @user, :context => @course)
+      update_params = {
+        course_id: @course.id,
+        id: @rubric.id,
+        rubric: {
+          title: "new title"
+        },
+        rubric_association: {
+          association_type: @rubric_association.association_object.class.to_s,
+          association_id: @rubric_association.association_object.id,
+          id: @rubric_association.id,
+          hide_points: '1',
+          hide_score_total: '1',
+          hide_outcome_results: '1'
+        }
+      }
+      put 'update', params: update_params
+      @rubric_association.reload
+      expect(@rubric_association.hide_points).to eq true
+      expect(@rubric_association.hide_score_total).to eq true
+      expect(@rubric_association.hide_outcome_results).to eq true
     end
 
     it "should add an outcome association if one is linked" do
@@ -542,7 +568,6 @@ describe RubricsController do
         get 'show', params: {id: "1", course_id: @course.id}
       end
     end
-
 
     it "works" do
       r = Rubric.create! user: @teacher, context: Account.default
