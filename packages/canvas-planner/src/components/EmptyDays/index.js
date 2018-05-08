@@ -23,7 +23,7 @@ import classnames from 'classnames';
 import themeable from '@instructure/ui-themeable/lib';
 import Heading from '@instructure/ui-core/lib/components/Heading';
 import Text from '@instructure/ui-core/lib/components/Text';
-import Container from '@instructure/ui-core/lib/components/Container';
+import View from '@instructure/ui-layout/lib/components/View';
 import { string } from 'prop-types';
 import styles from './styles.css';
 import theme from './theme.js';
@@ -64,14 +64,14 @@ export class EmptyDays extends Component {
           <Heading border={'bottom'}>
             {this.renderDate(start, end)}
           </Heading>
-          <Container as="div" padding="small 0 0 0">
+          <View as="div" padding="small 0 0 0">
             <GroupedDates role="img" aria-hidden="true" />
             <div className={styles.nothingPlannedContainer}>
               <div className={styles.nothingPlanned}>
                 <Text size="large">{formatMessage('Nothing planned')}</Text>
               </div>
             </div>
-          </Container>
+          </View>
       </div>
     );
   }

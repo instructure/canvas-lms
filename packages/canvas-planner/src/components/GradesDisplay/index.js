@@ -23,7 +23,7 @@ import { courseShape } from '../plannerPropTypes';
 import formatMessage from '../../format-message';
 import ErrorAlert from '../ErrorAlert';
 
-import Container from '@instructure/ui-container/lib/components/Container';
+import View from '@instructure/ui-layout/lib/components/View';
 import Heading from '@instructure/ui-elements/lib/components/Heading';
 import Link from '@instructure/ui-elements/lib/components/Link';
 import Spinner from '@instructure/ui-elements/lib/components/Spinner';
@@ -50,7 +50,7 @@ export class GradesDisplay extends React.Component {
   }
 
   renderSpinner () {
-    return <Container
+    return <View
       as="div"
       textAlign="center"
       margin="0 0 large 0"
@@ -59,17 +59,17 @@ export class GradesDisplay extends React.Component {
         title={formatMessage("Grades are loading")}
         size="small"
       />
-    </Container>;
+    </View>;
   }
 
   renderCaveat () {
     if (this.props.loading) return;
     if (this.props.courses.some(course => course.hasGradingPeriods)) {
-      return <Container as="div" textAlign="center">
+      return <View as="div" textAlign="center">
         <Text size="x-small" fontStyle="italic">{
           formatMessage('*Only most recent grading period shown.')}
         </Text>
-      </Container>;
+      </View>;
     }
   }
 
@@ -81,7 +81,7 @@ export class GradesDisplay extends React.Component {
         borderBottomColor: course.color,
       };
 
-      return <Container key={course.id} as="div"
+      return <View key={course.id} as="div"
         margin="0 0 large 0"
       >
         <div className={styles.course} style={courseNameStyles}>
@@ -92,7 +92,7 @@ export class GradesDisplay extends React.Component {
           </Link>
         </div>
         <Text as="div" size="large" weight="light">{this.scoreString(course.score)}</Text>
-      </Container>;
+      </View>;
     });
   }
 
@@ -103,16 +103,16 @@ export class GradesDisplay extends React.Component {
   }
 
   render () {
-    return <Container>
+    return <View>
       {this.renderError()}
-      <Container textAlign="center">
+      <View textAlign="center">
         <Heading level="h2" margin="0 0 large 0">
           <Text size="medium" weight="bold">{formatMessage('My Grades')}</Text>
         </Heading>
-      </Container>
+      </View>
       {this.props.loading ? this.renderSpinner() : this.renderGrades()}
       {this.renderCaveat()}
-    </Container>;
+    </View>;
   }
 }
 

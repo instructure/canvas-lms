@@ -138,13 +138,13 @@ exports[`renders the base component with required props 1`] = `
     </Text>
   </Heading>
   <div>
-    <Container
+    <View
       display="block"
       margin="small 0 0 0"
       textAlign="center"
     >
       No "To-Do's" for this day yet.
-    </Container>
+    </View>
   </div>
 </div>
 `;

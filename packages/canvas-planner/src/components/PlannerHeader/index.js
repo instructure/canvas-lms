@@ -20,7 +20,7 @@ import { connect } from 'react-redux';
 import themeable from '@instructure/ui-themeable/lib';
 import Button from '@instructure/ui-core/lib/components/Button';
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton';
-import Container from '@instructure/ui-container/lib/components/Container';
+import View from '@instructure/ui-layout/lib/components/View';
 import IconPlusLine from 'instructure-icons/lib/Line/IconPlusLine';
 import IconAlertsLine from 'instructure-icons/lib/Line/IconAlertsLine';
 import IconGradebookLine from 'instructure-icons/lib/Line/IconGradebookLine';
@@ -331,7 +331,7 @@ export class PlannerHeader extends Component {
           applicationElement={() => document.getElementById('application') }
           onDismiss={this.toggleGradesTray}
         >
-          <Container as="div" padding="large large medium">
+          <View as="div" padding="large large medium">
             <CloseButton placement="start" variant="icon" onClick={this.toggleGradesTray}>
               {formatMessage("Close")}
             </CloseButton>
@@ -340,7 +340,7 @@ export class PlannerHeader extends Component {
               loading={this.props.loading.loadingGrades}
               loadingError={this.props.loading.gradesLoadingError}
             />
-          </Container>
+          </View>
         </Tray>
       </div>
     );

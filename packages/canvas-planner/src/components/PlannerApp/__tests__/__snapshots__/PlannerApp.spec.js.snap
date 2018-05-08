@@ -4,9 +4,9 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
 <div
   className="PlannerApp large"
 >
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     textAlign="center"
   >
     <ShowOnFocusButton
@@ -19,7 +19,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
     >
       Load prior dates
     </ShowOnFocusButton>
-  </Container>
+  </View>
   <LoadingPastIndicator
     allPastItemsLoaded={false}
     loadingPast={false}
@@ -88,9 +88,9 @@ exports[`PlannerApp empty day calculation merges 3 consecutive empty days in the
 <div
   className="PlannerApp large"
 >
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     textAlign="center"
   >
     <ShowOnFocusButton
@@ -103,7 +103,7 @@ exports[`PlannerApp empty day calculation merges 3 consecutive empty days in the
     >
       Load prior dates
     </ShowOnFocusButton>
-  </Container>
+  </View>
   <LoadingPastIndicator
     allPastItemsLoaded={false}
     loadingPast={false}
@@ -166,9 +166,9 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
 <div
   className="PlannerApp large"
 >
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     textAlign="center"
   >
     <ShowOnFocusButton
@@ -181,7 +181,7 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
     >
       Load prior dates
     </ShowOnFocusButton>
-  </Container>
+  </View>
   <LoadingPastIndicator
     allPastItemsLoaded={false}
     loadingPast={false}
@@ -244,9 +244,9 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
 <div
   className="PlannerApp large"
 >
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     textAlign="center"
   >
     <ShowOnFocusButton
@@ -259,7 +259,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
     >
       Load prior dates
     </ShowOnFocusButton>
-  </Container>
+  </View>
   <LoadingPastIndicator
     allPastItemsLoaded={false}
     loadingPast={false}
@@ -328,9 +328,9 @@ exports[`PlannerApp renders base component 1`] = `
 <div
   className="PlannerApp large"
 >
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     textAlign="center"
   >
     <ShowOnFocusButton
@@ -343,7 +343,7 @@ exports[`PlannerApp renders base component 1`] = `
     >
       Load prior dates
     </ShowOnFocusButton>
-  </Container>
+  </View>
   <LoadingPastIndicator
     allPastItemsLoaded={false}
     loadingPast={false}
@@ -400,9 +400,9 @@ exports[`PlannerApp renders empty component with no assignments 1`] = `
 <div
   className="PlannerApp large"
 >
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     textAlign="center"
   >
     <ShowOnFocusButton
@@ -415,7 +415,7 @@ exports[`PlannerApp renders empty component with no assignments 1`] = `
     >
       Load prior dates
     </ShowOnFocusButton>
-  </Container>
+  </View>
   <PlannerEmptyState
     changeToDashboardCardView={[Function]}
   />
@@ -435,9 +435,9 @@ exports[`PlannerApp renders loading past spinner when loading past and there are
   >
     New Activity
   </StickyButton>
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     textAlign="center"
   >
     <ShowOnFocusButton
@@ -450,7 +450,7 @@ exports[`PlannerApp renders loading past spinner when loading past and there are
     >
       Load prior dates
     </ShowOnFocusButton>
-  </Container>
+  </View>
   <LoadingPastIndicator
     allPastItemsLoaded={false}
     loadingPast={true}
@@ -474,9 +474,9 @@ exports[`PlannerApp shows new activity button when new activity is indicated 1`]
   >
     New Activity
   </StickyButton>
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     textAlign="center"
   >
     <ShowOnFocusButton
@@ -489,7 +489,7 @@ exports[`PlannerApp shows new activity button when new activity is indicated 1`]
     >
       Load prior dates
     </ShowOnFocusButton>
-  </Container>
+  </View>
   <LoadingPastIndicator
     allPastItemsLoaded={false}
     loadingPast={false}
@@ -546,9 +546,9 @@ exports[`PlannerApp shows only the loading component when the isLoading prop is 
 <div
   className="PlannerApp large"
 >
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     textAlign="center"
   >
     <ShowOnFocusButton
@@ -561,12 +561,12 @@ exports[`PlannerApp shows only the loading component when the isLoading prop is 
     >
       Load prior dates
     </ShowOnFocusButton>
-  </Container>
+  </View>
   <LoadingPastIndicator
     allPastItemsLoaded={false}
     loadingPast={false}
   />
-  <Container
+  <View
     display="block"
     padding="xx-large medium"
     textAlign="center"
@@ -576,7 +576,7 @@ exports[`PlannerApp shows only the loading component when the isLoading prop is 
       title="Loading planner items"
       variant="default"
     />
-  </Container>
+  </View>
   <div
     id="planner-app-fixed-element"
   />
@@ -587,9 +587,9 @@ exports[`PlannerApp shows the loading past indicator when loadingPast prop is tr
 <div
   className="PlannerApp large"
 >
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     textAlign="center"
   >
     <ShowOnFocusButton
@@ -602,7 +602,7 @@ exports[`PlannerApp shows the loading past indicator when loadingPast prop is tr
     >
       Load prior dates
     </ShowOnFocusButton>
-  </Container>
+  </View>
   <LoadingPastIndicator
     allPastItemsLoaded={false}
     loadingPast={true}

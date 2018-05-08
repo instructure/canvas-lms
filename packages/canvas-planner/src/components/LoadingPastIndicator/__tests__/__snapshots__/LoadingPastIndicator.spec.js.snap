@@ -2,13 +2,13 @@
 
 exports[`prioritizes loading complete over currently loading 1`] = `
 <div>
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     padding="small"
     textAlign="center"
   >
-    <Container
+    <View
       display="block"
       margin="small"
     >
@@ -16,7 +16,7 @@ exports[`prioritizes loading complete over currently loading 1`] = `
         aria-hidden="true"
         role="img"
       />
-    </Container>
+    </View>
     <Text
       as="div"
       letterSpacing="normal"
@@ -31,19 +31,19 @@ exports[`prioritizes loading complete over currently loading 1`] = `
     >
       You've scrolled back to your very first To-Do!
     </Text>
-  </Container>
+  </View>
 </div>
 `;
 
 exports[`renders TV when all past items loaded 1`] = `
 <div>
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     padding="small"
     textAlign="center"
   >
-    <Container
+    <View
       display="block"
       margin="small"
     >
@@ -51,7 +51,7 @@ exports[`renders TV when all past items loaded 1`] = `
         aria-hidden="true"
         role="img"
       />
-    </Container>
+    </View>
     <Text
       as="div"
       letterSpacing="normal"
@@ -66,28 +66,24 @@ exports[`renders TV when all past items loaded 1`] = `
     >
       You've scrolled back to your very first To-Do!
     </Text>
-  </Container>
+  </View>
 </div>
 `;
 
 exports[`renders spinner while loading 1`] = `
 <div>
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     padding="small"
     textAlign="center"
   >
-    <Container
-      display="inline"
-    >
-      <Spinner
-        margin="0 x-small 0 0"
-        size="small"
-        title="Loading past items"
-        variant="default"
-      />
-    </Container>
+    <Spinner
+      margin="0 x-small 0 0"
+      size="small"
+      title="Loading past items"
+      variant="default"
+    />
     <Text
       as="span"
       color="secondary"
@@ -96,7 +92,7 @@ exports[`renders spinner while loading 1`] = `
     >
       Loading past items
     </Text>
-  </Container>
+  </View>
 </div>
 `;
 

@@ -207,9 +207,9 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
     shouldReturnFocus={true}
     size="small"
   >
-    <Container
+    <View
       as="div"
-      display={null}
+      display="auto"
       padding="large large medium"
     >
       <CloseButton
@@ -235,7 +235,7 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
         }
         loading={false}
       />
-    </Container>
+    </View>
   </Tray>
 </div>
 `;

@@ -1,11 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`does not render caveat if no courses have grading periods 1`] = `
-<Container
-  display={null}
+<View
+  display="auto"
 >
-  <Container
-    display={null}
+  <View
+    display="auto"
     textAlign="center"
   >
     <Heading
@@ -24,10 +24,10 @@ exports[`does not render caveat if no courses have grading periods 1`] = `
         My Grades
       </Text>
     </Heading>
-  </Container>
-  <Container
+  </View>
+  <View
     as="div"
-    display={null}
+    display="auto"
     margin="0 0 large 0"
   >
     <div
@@ -64,16 +64,16 @@ exports[`does not render caveat if no courses have grading periods 1`] = `
     >
       No Grade
     </Text>
-  </Container>
-</Container>
+  </View>
+</View>
 `;
 
 exports[`renders a loading spinner when loading 1`] = `
-<Container
-  display={null}
+<View
+  display="auto"
 >
-  <Container
-    display={null}
+  <View
+    display="auto"
     textAlign="center"
   >
     <Heading
@@ -92,10 +92,10 @@ exports[`renders a loading spinner when loading 1`] = `
         My Grades
       </Text>
     </Heading>
-  </Container>
-  <Container
+  </View>
+  <View
     as="div"
-    display={null}
+    display="auto"
     margin="0 0 large 0"
     textAlign="center"
   >
@@ -105,21 +105,21 @@ exports[`renders a loading spinner when loading 1`] = `
       title="Grades are loading"
       variant="default"
     />
-  </Container>
-</Container>
+  </View>
+</View>
 `;
 
 exports[`renders an ErrorAlert if there is an error loading grades 1`] = `
-<Container
-  display={null}
+<View
+  display="auto"
 >
   <ErrorAlert
     error="There was an error"
   >
     Error loading grades
   </ErrorAlert>
-  <Container
-    display={null}
+  <View
+    display="auto"
     textAlign="center"
   >
     <Heading
@@ -138,16 +138,16 @@ exports[`renders an ErrorAlert if there is an error loading grades 1`] = `
         My Grades
       </Text>
     </Heading>
-  </Container>
-</Container>
+  </View>
+</View>
 `;
 
 exports[`renders some course grades 1`] = `
-<Container
-  display={null}
+<View
+  display="auto"
 >
-  <Container
-    display={null}
+  <View
+    display="auto"
     textAlign="center"
   >
     <Heading
@@ -166,10 +166,10 @@ exports[`renders some course grades 1`] = `
         My Grades
       </Text>
     </Heading>
-  </Container>
-  <Container
+  </View>
+  <View
     as="div"
-    display={null}
+    display="auto"
     margin="0 0 large 0"
   >
     <div
@@ -206,10 +206,10 @@ exports[`renders some course grades 1`] = `
     >
       No Grade
     </Text>
-  </Container>
-  <Container
+  </View>
+  <View
     as="div"
-    display={null}
+    display="auto"
     margin="0 0 large 0"
   >
     <div
@@ -246,10 +246,10 @@ exports[`renders some course grades 1`] = `
     >
       42.34%
     </Text>
-  </Container>
-  <Container
+  </View>
+  <View
     as="div"
-    display={null}
+    display="auto"
     margin="0 0 large 0"
   >
     <div
@@ -286,10 +286,10 @@ exports[`renders some course grades 1`] = `
     >
       No Grade
     </Text>
-  </Container>
-  <Container
+  </View>
+  <View
     as="div"
-    display={null}
+    display="auto"
     textAlign="center"
   >
     <Text
@@ -300,6 +300,6 @@ exports[`renders some course grades 1`] = `
     >
       *Only most recent grading period shown.
     </Text>
-  </Container>
-</Container>
+  </View>
+</View>
 `;

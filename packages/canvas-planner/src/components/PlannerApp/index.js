@@ -20,7 +20,7 @@ import React, { Component } from 'react';
 import classnames from 'classnames';
 import moment from 'moment-timezone';
 import { connect } from 'react-redux';
-import Container from '@instructure/ui-core/lib/components/Container';
+import View from '@instructure/ui-layout/lib/components/View';
 import Spinner from '@instructure/ui-core/lib/components/Spinner';
 import { arrayOf, oneOfType, shape, bool, object, string, number, func } from 'prop-types';
 import { momentObj } from 'react-moment-proptypes';
@@ -162,7 +162,7 @@ export class PlannerApp extends Component {
   }
 
   renderLoading () {
-    return <Container
+    return <View
       display="block"
       padding="xx-large medium"
       textAlign="center"
@@ -171,7 +171,7 @@ export class PlannerApp extends Component {
         title={formatMessage('Loading planner items')}
         size="medium"
       />
-    </Container>;
+    </View>;
   }
 
   renderNewActivity () {
@@ -215,7 +215,7 @@ export class PlannerApp extends Component {
 
   renderLoadPastButton () {
     if (this.props.allPastItemsLoaded) return;
-    return <Container as="div" textAlign="center">
+    return <View as="div" textAlign="center">
       <ShowOnFocusButton
         buttonProps={{
           onClick: this.props.loadPastButtonClicked
@@ -223,7 +223,7 @@ export class PlannerApp extends Component {
         >
           {formatMessage('Load prior dates')}
       </ShowOnFocusButton>
-    </Container>;
+    </View>;
   }
 
   renderNoAssignments() {

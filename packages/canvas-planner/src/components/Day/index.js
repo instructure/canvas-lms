@@ -22,7 +22,7 @@ import moment from 'moment-timezone';
 import themeable from '@instructure/ui-themeable/lib';
 import Heading from '@instructure/ui-core/lib/components/Heading';
 import Text from '@instructure/ui-core/lib/components/Text';
-import Container from '@instructure/ui-core/lib/components/Container';
+import View from '@instructure/ui-layout/lib/components/View';
 import { shape, string, number, arrayOf, func } from 'prop-types';
 import { userShape, itemShape } from '../plannerPropTypes';
 import styles from './styles.css';
@@ -136,13 +136,13 @@ export class Day extends Component {
                 );
               })
             ) : (
-              <Container
+              <View
                 textAlign="center"
                 display="block"
                 margin="small 0 0 0"
               >
                 {formatMessage('No "To-Do\'s" for this day yet.')}
-              </Container>
+              </View>
             )
           }
         </div>

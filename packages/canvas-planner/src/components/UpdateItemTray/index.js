@@ -18,7 +18,7 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 import themeable from '@instructure/ui-themeable/lib';
-import Container from '@instructure/ui-core/lib/components/Container';
+import View from '@instructure/ui-layout/lib/components/View';
 import FormFieldGroup from '@instructure/ui-core/lib/components/FormFieldGroup';
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
 import Button from '@instructure/ui-core/lib/components/Button';
@@ -266,7 +266,7 @@ export class UpdateItemTray extends Component {
   render () {
     return (
       <div className={styles.root}>
-        <Container
+        <View
           as="div"
           padding="large medium medium"
         >
@@ -283,11 +283,11 @@ export class UpdateItemTray extends Component {
             {this.renderCourseSelect()}
             {this.renderDetailsInput()}
           </FormFieldGroup>
-          <Container as="div" margin="small 0 0" textAlign="end">
+          <View as="div" margin="small 0 0" textAlign="end">
             {this.renderDeleteButton()}
             {this.renderSaveButton()}
-          </Container>
-        </Container>
+          </View>
+        </View>
       </div>
     );
   }

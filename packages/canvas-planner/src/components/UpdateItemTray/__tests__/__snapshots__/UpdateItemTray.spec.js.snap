@@ -2,9 +2,9 @@
 
 exports[`renders the item to update if provided 1`] = `
 <div>
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     padding="large medium medium"
   >
     <FormFieldGroup
@@ -99,9 +99,9 @@ exports[`renders the item to update if provided 1`] = `
         value="You made this item to remind you of something, but you forgot what."
       />
     </FormFieldGroup>
-    <Container
+    <View
       as="div"
-      display={null}
+      display="auto"
       margin="small 0 0"
       textAlign="end"
     >
@@ -130,16 +130,16 @@ exports[`renders the item to update if provided 1`] = `
       >
         Save
       </Button>
-    </Container>
-  </Container>
+    </View>
+  </View>
 </div>
 `;
 
 exports[`updates state when new note is passed in 1`] = `
 <div>
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     padding="large medium medium"
   >
     <FormFieldGroup
@@ -239,9 +239,9 @@ exports[`updates state when new note is passed in 1`] = `
         value="You made this item to remind you of something, but you forgot what."
       />
     </FormFieldGroup>
-    <Container
+    <View
       as="div"
-      display={null}
+      display="auto"
       margin="small 0 0"
       textAlign="end"
     >
@@ -270,16 +270,16 @@ exports[`updates state when new note is passed in 1`] = `
       >
         Save
       </Button>
-    </Container>
-  </Container>
+    </View>
+  </View>
 </div>
 `;
 
 exports[`updates state when new note is passed in 2`] = `
 <div>
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     padding="large medium medium"
   >
     <FormFieldGroup
@@ -379,9 +379,9 @@ exports[`updates state when new note is passed in 2`] = `
         value="This is another reminder"
       />
     </FormFieldGroup>
-    <Container
+    <View
       as="div"
-      display={null}
+      display="auto"
       margin="small 0 0"
       textAlign="end"
     >
@@ -410,7 +410,7 @@ exports[`updates state when new note is passed in 2`] = `
       >
         Save
       </Button>
-    </Container>
-  </Container>
+    </View>
+  </View>
 </div>
 `;
