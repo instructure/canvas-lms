@@ -47,7 +47,9 @@ const workingMenuProps = () => (
 
     publishGradesToSis: {
       isEnabled: false
-    }
+    },
+
+    gradingPeriodId: "1234"
   }
 );
 const previousExportProps = () => (
@@ -289,6 +291,18 @@ test('starts the export using the GradebookExportManager instance', function () 
   this.menuItem.click();
 
   equal(this.spies.startExport.callCount, 1);
+
+  return exportResult;
+});
+
+test('passes the grading period to the GradebookExportManager', function () {
+  const exportResult = this.getPromise('resolved');
+
+  this.spies.startExport.returns(exportResult);
+
+  this.menuItem.click();
+
+  strictEqual(this.spies.startExport.firstCall.args[0], "1234");
 
   return exportResult;
 });
