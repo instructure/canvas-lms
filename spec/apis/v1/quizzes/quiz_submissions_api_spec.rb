@@ -755,7 +755,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
   describe "GET /courses/:course_id/quizzes/:quiz_id/submssions/:id/time" do
     around(:once_and_each) do |block|
-      Timecop.freeze { block.call }
+      Timecop.freeze(Time.local(2018, 5, 8, 10, 5, 0)) { block.call }
     end
 
     let_once(:now) { Time.zone.now }
