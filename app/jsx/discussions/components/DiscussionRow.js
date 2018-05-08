@@ -481,6 +481,9 @@ export class DiscussionRow extends Component {
 
   renderLastReplyAt = () => {
     const datetimeString = $.datetimeString(this.props.discussion.last_reply_at)
+    if (!datetimeString.length) {
+      return null
+    }
     return (
       <div className="ic-item-row__content-col ic-discussion-row__content last-reply-at">
         { I18n.t('Last post at %{date}', { date: datetimeString }) }
@@ -535,7 +538,9 @@ export class DiscussionRow extends Component {
       I18n.t('Due %{date} ', { date: $.datetimeString(assignment.due_at) }) : " "
     result += dueDateString
     const lastReplyAtDate = $.datetimeString(this.props.discussion.last_reply_at)
-    result += I18n.t('Last post at %{date}', { date: lastReplyAtDate })
+    if (lastReplyAtDate.length > 0) {
+      result += I18n.t('Last post at %{date}', { date: lastReplyAtDate })
+    }
     return result
   }
 
@@ -669,9 +674,6 @@ export class DiscussionRow extends Component {
     // necessary because discussions return html from RCE
     const contentWrapper = document.createElement('span')
     contentWrapper.innerHTML = this.props.discussion.message
-    const textContent = contentWrapper.textContent.trim()
-    const delayedLabel = I18n.t('Delayed until:');
-    const postedAtLabel = I18n.t('Posted on:');
 
     return this.props.connectDragPreview (
       <div>

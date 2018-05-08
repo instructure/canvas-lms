@@ -152,6 +152,13 @@ test('renders a last reply at date', () => {
   ok(node.text().includes('Feb'))
 })
 
+test('does not render last reply at date if there is none', () => {
+  const discussion = { last_reply_at: "" }
+  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const node = tree.find('.ic-discussion-row')
+  ok(!node.text().includes('Last post at'))
+})
+
 test('renders available until if approprate', () => {
   const futureDate = new Date
   futureDate.setYear(futureDate.getFullYear() + 1)
