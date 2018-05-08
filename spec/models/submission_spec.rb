@@ -4054,6 +4054,41 @@ describe Submission do
     end
   end
 
+  describe "#can_view_details" do
+    before :each do
+      @assignment.root_account.enable_feature!(:anonymous_moderated_marking)
+      @assignment.update!(anonymous_grading: true, muted: true)
+      @submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'a body')
+    end
+
+    it "returns true if anonymous_moderated_marking is not enabled" do
+      @assignment.root_account.disable_feature!(:anonymous_moderated_marking)
+      expect(@submission.can_view_details?(@student)).to be true
+    end
+
+    it "returns true for submitting student if assignment anonymous grading and muted" do
+      expect(@submission.can_view_details?(@student)).to be true
+    end
+
+    it "returns false for non-submitting student if assignment anonymous grading and muted" do
+      new_student = User.create!
+      @context.enroll_student(new_student, enrollment_state: 'active')
+      expect(@submission.can_view_details?(@new_student)).to be false
+    end
+
+    it "returns false for teacher if assignment anonymous grading and muted" do
+      expect(@submission.can_view_details?(@teacher)).to be false
+    end
+
+    it "returns false for admin if assignment anonymous grading and muted" do
+      expect(@submission.can_view_details?(account_admin_user)).to be false
+    end
+
+    it "returns true for site admin if assignment anonymous grading and muted" do
+      expect(@submission.can_view_details?(site_admin_user)).to be true
+    end
+  end
+
   describe "#needs_grading?" do
     before :once do
       @submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'a body')

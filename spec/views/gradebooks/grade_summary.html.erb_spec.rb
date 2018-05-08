@@ -83,4 +83,57 @@ describe "/gradebooks/grade_summary" do
     expect(response).not_to be_nil
     expect(response.body).to match(/Test Student scores are not included in grade statistics./)
   end
+
+  describe "submission details link when anonymous_moderated_marking enabled" do
+    before(:each) do
+      course_with_teacher
+      student_in_course
+      @assignment = @course.assignments.create!(title: 'Moderated Assignment', anonymous_grading: true, muted: true)
+      @assignment.submit_homework @student, :submission_type => "online_text_entry", :body => "o hai"
+      @assignment.root_account.enable_feature!(:anonymous_moderated_marking)
+      @submission_details_url = context_url(@course, :context_assignment_submission_url, @assignment, @student.id)
+    end
+
+    it "should be shown for submitting student if assignment is anonymous grading and muted" do
+      @user = @student
+      assign(:presenter, GradeSummaryPresenter.new(@course, @student, @student.id))
+      view_context
+      render "gradebooks/grade_summary"
+      expect(response).to have_tag("a[href='#{@submission_details_url}']")
+    end
+
+    it "should be hidden for non-submitting student if assignment is anonymous grading and muted" do
+      view_context
+      new_student = User.create!
+      @course.enroll_student(new_student, enrollment_state: 'active')
+      assign(:presenter, GradeSummaryPresenter.new(@course, new_student, @student.id))
+      user_session(new_student)
+      render "gradebooks/grade_summary"
+      expect(response).not_to have_tag("a[href='#{@submission_details_url}']")
+    end
+
+    it "should be hidden for teacher if assignment is anonymous grading and muted" do
+      @user = @teacher
+      assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
+      view_context
+      render "gradebooks/grade_summary"
+      expect(response).not_to have_tag("a[href='#{@submission_details_url}']")
+    end
+
+    it "should be hidden for admin if assignment is anonymous grading and muted" do
+      @user = account_admin_user
+      assign(:presenter, GradeSummaryPresenter.new(@course, @user, @student.id))
+      view_context
+      render "gradebooks/grade_summary"
+      expect(response).not_to have_tag("a[href='#{@submission_details_url}']")
+    end
+
+    it "should be shown for site admin if assignment is anonymous grading and muted" do
+      @user = site_admin_user
+      assign(:presenter, GradeSummaryPresenter.new(@course, @user, @student.id))
+      view_context
+      render "gradebooks/grade_summary"
+      expect(response).to have_tag("a[href='#{@submission_details_url}']")
+    end
+  end
 end

@@ -446,6 +446,12 @@ class Submission < ActiveRecord::Base
     can :view_vericite_report
   end
 
+  def can_view_details?(user)
+    return true unless self.assignment.root_account.feature_enabled?(:anonymous_moderated_marking)
+    return true unless self.assignment.anonymous_grading && self.assignment.muted
+    user == self.user || Account.site_admin.grants_right?(user, :update)
+  end
+
   def can_view_plagiarism_report(type, user, session)
     if(type == "vericite")
       plagData = self.vericite_data_hash
