@@ -19,6 +19,18 @@
 import {FocusItemOnSave} from '../index';
 import {createAnimation, mockRegistryEntry} from './test-utils';
 import {savedPlannerItem} from '../../../actions';
+import {initialize as alertInitialize} from '../../../utilities/alertUtils';
+
+let alertMocks = null;
+
+beforeEach(() => {
+  alertMocks = {
+    visualSuccessCallback: jest.fn(),
+    visualErrorCallback: jest.fn(),
+    srAlertCallback: jest.fn(),
+  };
+  alertInitialize(alertMocks);
+});
 
 function createMockFixture () {
   const createResult = createAnimation(FocusItemOnSave);
@@ -53,4 +65,13 @@ it('leaves focus alone (on the checkbox) if the item was toggled', () => {
   expect(animator.focusElement).not.toHaveBeenCalled();
   expect(animator.maintainViewportPositionFromMemo).toHaveBeenCalledWith('fixed-element', 'position-memo');
   expect(animator.scrollTo).toHaveBeenCalledWith('i1-scrollable', 34);
+});
+
+it('alerts if the saved item is not loaded', () => {
+  const {animation, animator, app, registry} = createAnimation(FocusItemOnSave);
+  animation.acceptAction(savedPlannerItem({item: {uniqueId: 'out-of-loaded-range-item'}}));
+  animation.invokeUiWillUpdate();
+  animation.invokeUiDidUpdate();
+  expect(alertMocks.visualSuccessCallback).toHaveBeenCalled();
+  expect(animator.focusElement).not.toHaveBeenCalled();
 });

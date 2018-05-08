@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+import moment from 'moment-timezone';
 import loadingReducer from '../loading-reducer';
 import * as Actions from '../../actions/loading-actions';
 import * as OtherActions from '../../actions';
@@ -35,7 +37,7 @@ function linkHeader (nextLink) {
 }
 
 function mockItem (id) {
-  return { id };
+  return { uniqueId: id, title: id.toString(), date: moment.tz('2018-01-01', 'UTC') };
 }
 
 it('sets loading to true on START_LOADING_ITEMS', () => {
@@ -165,29 +167,6 @@ it('clears past url when not found', () => {
     allFutureItemsLoaded: false,
     pastNextUrl: null,
     allPastItemsLoaded: true,
-  });
-});
-
-it('adds to partialPastDays', () => {
-  const originalDays = [
-    ['2017-12-18', ['original items']],
-  ];
-  const state = initialState({
-    originalState: 'original state',
-    partialPastDays: originalDays,
-  });
-  const newDays = [
-    ['2017-12-17', ['prior items']],
-    ['2017-12-19', ['future items']],
-  ];
-  const newState = loadingReducer(state, Actions.gotPartialPastDays(newDays));
-  expect(newState).toMatchObject({
-    originalState: 'original state',
-    partialPastDays: [
-      newDays[0],
-      ...originalDays,
-      newDays[1],
-    ]
   });
 });
 

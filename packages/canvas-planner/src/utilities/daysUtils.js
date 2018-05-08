@@ -46,6 +46,8 @@ export function mergeDaysHashes (oldDaysHash, newDaysHash) {
   oldDaysHash = {...oldDaysHash};
   const mergedDaysHash = _.mergeWith(oldDaysHash, newDaysHash, (oldDayItems, newDayItems) => {
     if (oldDayItems == null) oldDayItems = [];
+    // this is only called when necessary to merge new items into old items.
+    // that way we avoid sorting items that have already been sorted.
     return mergeItems(oldDayItems, newDayItems);
   });
   return mergedDaysHash;
@@ -76,17 +78,55 @@ export function daysToItems (days) {
 }
 
 export function mergeItems(oldItems, newItems) {
-  const newItemsMap = new Map(newItems.map(item => [item.id, item]));
+  const newItemsMap = new Map(newItems.map(item => [item.uniqueId, item]));
   const oldItemsMerged = oldItems.map(oldItem => {
-    const newItem = newItemsMap.get(oldItem.id);
+    const newItem = newItemsMap.get(oldItem.uniqueId);
     if (newItem) {
-      newItemsMap.delete(newItem.id);
+      newItemsMap.delete(newItem.uniqueId);
       return newItem;
     } else {
       return oldItem;
     }
   });
-  return oldItemsMerged.concat([...newItemsMap.values()]);
+  const resultingItems = oldItemsMerged.concat([...newItemsMap.values()]);
+  // mergeItems is only called as needed to merge new items into old items,
+  // so sorting here is ok and won't wind up sorting every day on every merge.
+  return groupAndSortDayItems(resultingItems);
+}
+
+// returns {dayIndex, itemIndex, item}. Both indexes are -1 and item is undefined if the item isn't found.
+export function findItemInDays (days, uniqueId) {
+  let dayIndex = -1;
+  let itemIndex = -1;
+  if (uniqueId !== undefined) {
+    dayIndex = days.findIndex(day => {
+      const items = day[1];
+      itemIndex = items.findIndex(itemToCheck => itemToCheck.uniqueId === uniqueId);
+      return itemIndex !== -1;
+    });
+  }
+  const item = dayIndex !== -1 ? days[dayIndex][1][itemIndex] : undefined;
+  return {dayIndex, itemIndex, item};
+}
+
+export function deleteItemFromDaysAt (days, dayIndex, itemIndex) {
+  const oldItems = days[dayIndex][1];
+  const newItems = oldItems.filter((_, index) => index !== itemIndex);
+  if (newItems.length === 0) {
+    return days.filter((_, index) => index !== dayIndex);
+  } else {
+    const newDay = days[dayIndex].slice(0); // copy
+    newDay[1] = newItems;
+    const newDays = days.slice(0);
+    newDays[dayIndex] = newDay;
+    return newDays;
+  }
+}
+
+export function deleteItemFromDays (days, doomedItem) {
+  const {dayIndex, itemIndex} = findItemInDays(days, doomedItem.uniqueId);
+  if (dayIndex === -1 || itemIndex === -1) return days;
+  return deleteItemFromDaysAt(days, dayIndex, itemIndex);
 }
 
 export function purgeDuplicateDays (oldDays, newDays) {

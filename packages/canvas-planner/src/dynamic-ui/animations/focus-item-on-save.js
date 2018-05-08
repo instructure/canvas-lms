@@ -17,6 +17,8 @@
  */
 
 import Animation from '../animation';
+import formatMessage from '../../format-message';
+import {alert} from '../../utilities/alertUtils';
 
 export class FocusItemOnSave extends Animation {
   fixedElement () {
@@ -27,12 +29,14 @@ export class FocusItemOnSave extends Animation {
     const action = this.acceptedAction('SAVED_PLANNER_ITEM');
     const savedItemUniqueId = action.payload.item.uniqueId;
     const itemComponentToFocus = this.registry().getComponent('item', savedItemUniqueId);
-    if (itemComponentToFocus == null) return;
-    if (!action.payload.wasToggled) {
-      this.animator().focusElement(itemComponentToFocus.component.getFocusable('update'));
+    if (itemComponentToFocus != null) {
+      if (!action.payload.wasToggled) {
+        this.animator().focusElement(itemComponentToFocus.component.getFocusable('update'));
+      }
+        this.maintainViewportPositionOfFixedElement();
+      this.animator().scrollTo(itemComponentToFocus.component.getScrollable(), this.stickyOffset());
+    } else {
+      alert(formatMessage('Success: To Do created'));
     }
-    this.maintainViewportPositionOfFixedElement();
-    this.animator().scrollTo(itemComponentToFocus.component.getScrollable(), this.stickyOffset());
-
   }
 }
