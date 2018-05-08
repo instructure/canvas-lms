@@ -56,8 +56,14 @@ function defaultRefreshTokenHandler() {
   throw new Error('Token expired, no refresh function provided')
 }
 
-function modifyFileUrl(file) {
-  return {...file, url: downloadToWrap(file.url)}
+function normalizeFileData(file) {
+  return {
+    // copy the name to the default display name if none provided
+    display_name: file.name,
+    ...file,
+    // wrap the url
+    url: downloadToWrap(file.url)
+  }
 }
 
 class RceApiSource {
@@ -118,7 +124,7 @@ class RceApiSource {
     return this.fetchPage(uri).then(({bookmark, files}) => {
       return {
         bookmark,
-        files: files.map(modifyFileUrl)
+        files: files.map(normalizeFileData)
       }
     })
   }
@@ -173,7 +179,7 @@ class RceApiSource {
       .then(uploadResults => {
         return this.finalizeUpload(preflightProps, uploadResults)
       })
-      .then(modifyFileUrl)
+      .then(normalizeFileData)
   }
 
   finalizeUpload(preflightProps, uploadResults) {
@@ -221,7 +227,7 @@ class RceApiSource {
     let headers = headerFor(this.jwt)
     let base = this.baseUri('file')
     let uri = `${base}/${id}`
-    return this.apiFetch(uri, headers).then(modifyFileUrl)
+    return this.apiFetch(uri, headers).then(normalizeFileData)
   }
 
   // @private

@@ -480,5 +480,17 @@ describe('sources/api', () => {
         fetchMock.restore()
       })
     })
+
+    it("defaults display_name to name", () => {
+      const url = "/file/url?download_frd=1"
+      const name = "filename"
+      fetchMock.mock("*", {url, name})
+      sinon.stub(fileUrl, "downloadToWrap")
+      return apiSource.getFile(id).then(file => {
+        assert.equal(file.display_name, name)
+        fileUrl.downloadToWrap.restore()
+        fetchMock.restore()
+      })
+    })
   })
 })
