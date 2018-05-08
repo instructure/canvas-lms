@@ -104,6 +104,7 @@
     "eslint-plugin-jest": "^21",
     "eslint-plugin-jsx-a11y": "^6",
     "eslint-plugin-notice": "^0.6",
+    "eslint-plugin-prettier": "^2.6.0",
     "eslint-plugin-promise": "^3",
     "eslint-plugin-qunit": "^3",
     "eslint-plugin-react": "^7",

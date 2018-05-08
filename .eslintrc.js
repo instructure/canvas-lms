@@ -29,7 +29,8 @@ module.exports = {
     "promise",
     "import",
     "notice",
-    "jest"
+    "jest",
+    "prettier"
   ],
   // 0 - off, 1 - warning, 2 - error
   rules: {
@@ -67,16 +68,30 @@ module.exports = {
     }],
     "promise/avoid-new": [0],
   },
-  overrides: {
-    files: ['app/**/*', 'spec/**/*', 'public/**/*'],
-    rules: {
-      "import/no-amd": "error",
-      "import/no-commonjs": "error",
-      "import/no-extraneous-dependencies": "off", // allows 'i18n!webzip_exports' and 'compiled/foo/bar'
-      "import/no-nodejs-modules": "error",
-      "import/no-unresolved": "off",
-      "import/no-webpack-loader-syntax": "off"
+  overrides: [
+    {
+      files: ['app/**/*', 'spec/**/*', 'public/**/*'],
+      rules: {
+        "import/no-amd": "error",
+        "import/no-commonjs": "error",
+        "import/no-extraneous-dependencies": "off", // allows 'i18n!webzip_exports' and 'compiled/foo/bar'
+        "import/no-nodejs-modules": "error",
+        "import/no-unresolved": "off",
+        "import/no-webpack-loader-syntax": "off"
+      },
+    },
+    {
+      // If you are starting a new project or section of greenfield code,
+      // or if there is a folder of code that your team controls that you want
+      // to start ensuring conforms to prettier, add it to this array to opt-in
+      // now to conform to prettier.
+      files: [
+        'app/jsx/permissions/**/*.js'
+      ],
+      rules: {
+        'prettier/prettier': 'error'
+      }
     }
-  }
+  ]
 }
 
