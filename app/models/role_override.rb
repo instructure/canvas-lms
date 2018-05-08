@@ -636,7 +636,7 @@ class RoleOverride < ActiveRecord::Base
         :true_for => [
           'AccountAdmin'
         ],
-        :account_allows => lambda {|a| a.feature_allowed?(:master_courses)}
+        :account_allows => lambda {|a| a.root_account.feature_allowed?(:master_courses)}
       },
       :manage_user_logins => {
         :label => lambda { t('permissions.manage_user_logins', "Modify login details for users") },
