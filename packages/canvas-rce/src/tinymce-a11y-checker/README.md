@@ -2,6 +2,10 @@
 
 > An accessibility checker plugin for TinyMCE.
 
+[![Build Status](https://travis-ci.com/instructure/tinymce-a11y-checker.svg?branch=master)](https://travis-ci.com/instructure/tinymce-a11y-checker)
+[![npm](https://img.shields.io/npm/v/tinymce-a11y-checker.svg)](https://www.npmjs.com/package/tinymce-a11y-checker)
+
+
 ## Install
 
 You will need to have an instance of TinyMCE setup prior to using this plugin.
