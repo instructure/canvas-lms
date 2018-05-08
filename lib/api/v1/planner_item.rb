@@ -115,6 +115,19 @@ module Api::V1::PlannerItem
       has_feedback: ss[:has_feedback].include?(item.id)
     }
 
+    if submission_status[:submissions][:has_feedback]
+      relevant_submissions = user.recent_feedback.select {|s| s.assignment_id == item.id}
+      ActiveRecord::Associations::Preloader.new.preload(relevant_submissions, [visible_submission_comments: :author])
+      feedback_data = relevant_submissions
+                      .flat_map(&:visible_submission_comments)
+                      .flat_map {|comment| {
+                        comment: comment.comment,
+                        author_name: comment.author_name,
+                        author_avatar_url: comment.author.avatar_url
+                      }}
+      submission_status[:submissions][:feedback] = feedback_data if feedback_data.present?
+    end
+
     submission_status
   end
 

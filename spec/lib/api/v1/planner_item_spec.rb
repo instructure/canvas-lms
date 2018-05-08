@@ -173,6 +173,21 @@ describe Api::V1::PlannerItem do
         expect(json[:submissions][:has_feedback]).to be true
         expect(json[:submissions][:graded]).to be false
       end
+
+      it 'should include comment data for assignments with feedback' do
+        submission = @assignment.submit_homework(@student, body: "the stuff")
+        submission.add_comment(user: @teacher, comment: "nice work, fam")
+        submission.update(score: 10)
+        submission.grade_it!
+
+        json = api.planner_item_json(@assignment, @student, session, { start_at: 1.week.ago })
+        expect(json[:submissions][:has_feedback]).to be true
+        expect(json[:submissions][:feedback]).to include({
+                                                          comment: "nice work, fam",
+                                                          author_name: @teacher.name,
+                                                          author_avatar_url: @teacher.avatar_url
+                                                        })
+      end
     end
   end
 
