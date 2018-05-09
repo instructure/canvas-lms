@@ -2279,6 +2279,10 @@ class ApplicationController < ActionController::Base
     @user_has_google_drive ||= google_drive_connection.authorized?
   end
 
+  def self.instance_id
+    nil
+  end
+
   def self.region
     nil
   end

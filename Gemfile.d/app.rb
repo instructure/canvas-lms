@@ -61,7 +61,7 @@ gem 'inst-jobs', '0.14.5'
   gem 'rufus-scheduler', '3.4.2', require: false
     gem 'et-orbi', '1.0.8', require: false
 gem 'switchman-inst-jobs', '1.1.4'
-gem 'inst-jobs-autoscaling', '1.0.2'
+gem 'inst-jobs-autoscaling', '1.0.3'
   gem 'aws-sdk-autoscaling', '1.5.0', require: false
 gem 'ffi', '1.9.23', require: false
 gem 'hashery', '2.1.2', require: false
