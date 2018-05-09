@@ -397,8 +397,11 @@ describe SubmissionsController do
     context "google doc" do
       before(:each) do
         course_with_student_logged_in(active_all: true)
-        allow(@student).to receive(:gmail).and_return('student@does-not-match.com')
         @assignment = @course.assignments.create!(title: 'some assignment', submission_types: 'online_upload')
+      end
+
+      it "should not save if domain restriction prevents it" do
+        allow(@student).to receive(:gmail).and_return('student@does-not-match.com')
         account = Account.default
         flag    = FeatureFlag.new
         account.settings[:google_docs_domain] = 'example.com'
@@ -411,9 +414,6 @@ describe SubmissionsController do
         allow(@user).to receive(:user_services).and_return(mock_user_service)
         expect(mock_user_service).to receive(:where).with(service: "google_drive").
           and_return(double(first: double(token: "token", secret: "secret")))
-      end
-
-      it "should not save if domain restriction prevents it" do
         google_docs = double
         expect(GoogleDrive::Connection).to receive(:new).and_return(google_docs)
 
@@ -422,6 +422,16 @@ describe SubmissionsController do
              submission: { submission_type: 'google_doc' },
              google_doc: { document_id: '12345' }})
         expect(response).to be_redirect
+      end
+
+      it "should use instfs to save google doc if instfs is enabled" do
+        allow(InstFS).to receive(:enabled?).and_return(true)
+        uuid = "1234-abcd"
+        allow(InstFS).to receive(:direct_upload).and_return(uuid)
+
+        attachment = @assignment.submissions.first.attachments.new
+        SubmissionsController.new.store_google_doc_attachment(attachment, File.open("public/images/a.png"))
+        expect(attachment.instfs_uuid).to eq uuid
       end
     end
   end

@@ -443,22 +443,30 @@ class SubmissionsController < SubmissionsBaseController
     end
 
     # process the file and create an attachment
-    filename = "google_doc_#{Time.now.strftime("%Y%m%d%H%M%S")}#{@current_user.id}.#{file_extension}"
+    filename = "google_doc_#{Time.zone.now.strftime('%Y%m%d%H%M%S')}#{@current_user.id}.#{file_extension}"
+
+    attachment = @assignment.attachments.new
+    attachment.user = @current_user
+    attachment.display_name = display_name
+
     Dir.mktmpdir do |dirname|
-      path     = File.join(dirname, filename)
+      path = File.join(dirname, filename)
       File.open(path, 'wb') do |f|
         f.write(document_response.body)
       end
-
-      @attachment = @assignment.attachments.new(
-        uploaded_data: Rack::Test::UploadedFile.new(path, content_type, true),
-        display_name: display_name, user: @current_user
-      )
-      @attachment.save!
+      store_google_doc_attachment(attachment, Rack::Test::UploadedFile.new(path, content_type, true))
+      attachment.save!
     end
-    @attachment
+    attachment
   end
   protected :submit_google_doc
+
+  def store_google_doc_attachment(attachment, uploaded_data)
+    # This seemingly-redundant method was extracted to facilitate testing
+    # as storing of the document was previously deeply tied to fetching
+    # the document from Google
+    Attachments::Storage.store_for_attachment(attachment, uploaded_data)
+  end
 
   def turnitin_report
     plagiarism_report('turnitin')
