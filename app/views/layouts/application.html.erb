@@ -322,7 +322,7 @@
     // Please use Strings, Numbers, or Bools for value types.
 
       let visitor = {
-          id:              '<%= @current_user.uuid if @current_user%>',
+          id:              '<%= lti_opaque_hash_for_current_user %>',
           name:            '<%= @current_user.name if @current_user%>',
           email:           '<%= @current_user.email  if @current_user%>',
           school_name:     '<%= @current_user.school_name if @current_user %>',
@@ -331,7 +331,7 @@
           full_path:       '<%= request.try(:fullpath)%>',
           rails_env:       '<%= Rails.env %>',
       }
-
+      
       let account = {
           id:  '<%= ENV["CANVAS_DOMAIN"] %>'
       }

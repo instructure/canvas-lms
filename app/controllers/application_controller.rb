@@ -168,6 +168,13 @@ class ApplicationController < ActionController::Base
   end
   helper_method :js_env
 
+  def lti_opaque_hash_for_current_user
+    if @current_user
+      ContextExternalTool.opaque_identifier_for(@current_user, @current_user.shard)
+    end
+  end
+  helper_method :lti_opaque_hash_for_current_user
+
   # add keys to JS environment necessary for the RCE at the given risk level
   def rce_js_env(risk_level, root_account: @domain_root_account, domain: request.env['HTTP_HOST'], context: @context)
     rce_env_hash = Services::RichContent.env_for(root_account,
