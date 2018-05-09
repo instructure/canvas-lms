@@ -31,6 +31,7 @@ type Assignment implements Node, Timestamped {
   htmlUrl: URL
   id: ID!
   lockAt: DateTime
+  lockInfo: LockInfo
   muted: Boolean
   name: String
   needsGradingCount: Int
@@ -536,6 +537,18 @@ enum GroupMembershipState {
   rejected
   requested
 }
+
+type LockInfo {
+  canView: Boolean
+  isLocked: Boolean
+  lockAt: DateTime
+  lockedObject: Lockable
+  module: Module
+  unlockAt: DateTime
+}
+
+# Types that can be locked
+union Lockable = Assignment | Discussion | Module | Page | Quiz
 
 type Module implements Node, Timestamped {
   # legacy canvas id
