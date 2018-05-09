@@ -1373,12 +1373,12 @@ class Assignment < ActiveRecord::Base
 
   def user_can_update?(user, session=nil)
     return false unless context.grants_right?(user, session, :manage_assignments)
-    return true unless moderated_grading? && context.root_account.feature_enabled?(:anonymous_moderated_marking)
+    return true unless moderated_grading? && root_account.feature_enabled?(:anonymous_moderated_marking)
 
     # When Anonymous Moderated Marking is on, a moderated assignment may only be
     # edited by the assignment's moderator (assuming one has been specified) or
-    # by an account admin.
-    final_grader_id.blank? || final_grader_id == user.id || context.account_membership_allows(user)
+    # by an account admin with 'Select Final Grader for Moderation' privileges.
+    final_grader_id.blank? || permits_moderation?(user)
   end
 
   def user_can_read_grades?(user, session=nil)
@@ -2754,7 +2754,7 @@ class Assignment < ActiveRecord::Base
 
   def permits_moderation?(user)
     if root_account.feature_enabled?(:anonymous_moderated_marking)
-      final_grader_id == user.id || context.account_membership_allows(user)
+      final_grader_id == user.id || context.account_membership_allows(user, :select_final_grade)
     else
       context.grants_right?(user, :moderate_grades)
     end

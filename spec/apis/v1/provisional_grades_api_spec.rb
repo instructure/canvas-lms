@@ -26,12 +26,17 @@ describe 'Provisional Grades API', type: :request do
       api_call_as_user(@teacher, http_verb, @path, @params, {}, {}, expected_status: 401)
     end
 
+    it 'is unauthorized if the user is an account admin without "Select Final Grade for Moderation" permission' do
+      @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :select_final_grade)
+      api_call_as_user(account_admin_user, http_verb, @path, @params, {}, {}, expected_status: 401)
+    end
+
     it 'is authorized if the user is the final grader' do
       @assignment.update!(final_grader: @teacher, grader_count: 2)
       api_call_as_user(@teacher, http_verb, @path, @params, {}, {}, expected_status: 200)
     end
 
-    it 'is authorized if the user is an account admin' do
+    it 'is authorized if the user is an account admin with "Select Final Grade for Moderation" permission' do
       api_call_as_user(account_admin_user, http_verb, @path, @params, {}, {}, expected_status: 200)
     end
   end

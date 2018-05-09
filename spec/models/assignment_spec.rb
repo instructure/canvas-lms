@@ -376,8 +376,13 @@ describe Assignment do
         expect(@assignment.permits_moderation?(@teacher)).to be true
       end
 
-      it 'returns true if the user is an admin' do
+      it 'returns true if the user is an admin with "select final grader for moderation" privileges' do
         expect(@assignment.permits_moderation?(account_admin_user)).to be true
+      end
+
+      it 'returns false if the user is an admin without "select final grader for moderation" privileges' do
+        @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :select_final_grade)
+        expect(@assignment.permits_moderation?(account_admin_user)).to be false
       end
     end
 
@@ -5462,6 +5467,11 @@ describe Assignment do
     it 'returns a list of active, available moderators in the course' do
       expected_moderator_ids = [@first_teacher, @second_teacher, @first_ta, @second_ta].map(&:id)
       expect(@assignment.available_moderators.map(&:id)).to match_array expected_moderator_ids
+    end
+
+    it 'excludes admins' do
+      admin = account_admin_user
+      expect(@course.moderators).not_to include admin
     end
 
     it 'excludes deactivated moderators in the course (see exception below)' do

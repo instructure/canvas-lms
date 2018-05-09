@@ -370,6 +370,22 @@ describe AssignmentsController do
         assert_unauthorized
       end
 
+      it "renders unauthorized when no moderator is selected and the user is not an admin" do
+        @assignment.update!(final_grader: nil)
+        user_session(@teacher)
+        get 'show_moderate', params: {course_id: @course.id, assignment_id: @assignment.id}
+        assert_status(401)
+      end
+
+      it "renders unauthorized when no moderator is selected and the user is an admin without " \
+      "'Select Final Grade for Moderation' permission" do
+        @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :select_final_grade)
+        @assignment.update!(final_grader: nil)
+        user_session(account_admin_user)
+        get 'show_moderate', params: {course_id: @course.id, assignment_id: @assignment.id}
+        assert_status(401)
+      end
+
       it "renders the page when the current user is an admin and not the selected moderator" do
         account_admin_user(account: @course.root_account)
         user_session(@admin)
@@ -377,9 +393,10 @@ describe AssignmentsController do
         assert_status(200)
       end
 
-      it "renders the page when no moderator is selected" do
+      it "renders the page when no moderator is selected and the user is an admin with " \
+      "'Select Final Grade for Moderation' permission" do
         @assignment.update!(final_grader: nil)
-        user_session(@teacher)
+        user_session(account_admin_user)
         get 'show_moderate', params: {course_id: @course.id, assignment_id: @assignment.id}
         assert_status(200)
       end

@@ -203,6 +203,11 @@ describe Course do
       @course.enrollments.find_by!(user_id: @ta).conclude
       expect(@course.moderators).not_to include @ta
     end
+
+    it 'excludes admins' do
+      admin = account_admin_user
+      expect(@course.moderators).not_to include admin
+    end
   end
 
   describe "#recompute_student_scores" do
