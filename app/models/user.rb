@@ -546,7 +546,7 @@ class User < ActiveRecord::Base
         current_associations[key] = [aa.id, aa.depth]
       end
 
-      users_or_user_ids.each do |user_id|
+      users_or_user_ids.uniq.sort_by{|u| u.try(:id) || u}.each do |user_id|
         if user_id.is_a? User
           user = user_id
           user_id = user.id
@@ -558,7 +558,7 @@ class User < ActiveRecord::Base
           account_ids_with_depth = calculate_account_associations(user, data, account_chain_cache)
         end
 
-        account_ids_with_depth.each do |account_id, depth|
+        account_ids_with_depth.sort_by(&:first).each do |account_id, depth|
           key = [user_id, account_id]
           association = current_associations[key]
           if association.nil?
