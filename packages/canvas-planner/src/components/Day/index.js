@@ -124,7 +124,7 @@ export class Day extends Component {
                     timeZone={this.props.timeZone}
                     updateTodo={this.props.updateTodo}
                     items={groupItems}
-                    animatableIndex={groupIndex}
+                    animatableIndex={this.props.animatableIndex * 100 + groupIndex + 1}
                     url={courseInfo.url}
                     key={cid}
                     theme={{

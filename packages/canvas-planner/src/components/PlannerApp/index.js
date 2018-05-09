@@ -379,7 +379,7 @@ export class PlannerApp extends Component {
     // It might just not be loaded yet. If so, sneak it back to today so it isn't displayed.
     if (tomorrow.isAfter(lastDay)) tomorrow = today;
     const dayHash = daysToDaysHash(this.props.days);
-    let dayIndex = 0;
+    let dayIndex = 1;
 
     const pastChildren = this.renderPast(workingDay, dayBeforeYesterday, dayHash, dayIndex);
     dayIndex += pastChildren.length;

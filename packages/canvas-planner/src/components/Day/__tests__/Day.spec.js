@@ -119,7 +119,7 @@ it('renders grouping correctly when having itemsForDay', () => {
   }];
 
   const wrapper = shallow(
-    <Day timeZone="America/Denver" day="2017-04-25" itemsForDay={items} />
+    <Day timeZone="America/Denver" day="2017-04-25" itemsForDay={items} animatableIndex={1}/>
   );
   expect(wrapper).toMatchSnapshot();
 });

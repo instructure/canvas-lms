@@ -62,7 +62,7 @@ export class CompletedItemsFacade extends Component {
     this.props.deregisterAnimatable('item', this, this.props.animatableItemIds);
   }
 
-  getFocusable () { return this.buttonRef; }
+  getFocusable = () => { return this.buttonRef; }
 
   getScrollable () { return this.rootDiv; }
 
@@ -95,7 +95,8 @@ export class CompletedItemsFacade extends Component {
         <IndicatorComponent
         title={badgeMessage}
         itemIds={this.props.animatableItemIds}
-        animatableIndex={this.props.animatableIndex} />
+        animatableIndex={this.props.animatableIndex}
+        getFocusable={this.getFocusable} />
       </div>
     );
   }

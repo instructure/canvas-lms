@@ -30,7 +30,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
   </Heading>
   <div>
     <Animatable(ResponsiveGrouping)
-      animatableIndex={0}
+      animatableIndex={101}
       items={
         Array [
           Object {
@@ -53,7 +53,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
       url="http://www.non_default_url.com"
     />
     <Animatable(ResponsiveGrouping)
-      animatableIndex={1}
+      animatableIndex={102}
       items={
         Array [
           Object {
@@ -85,7 +85,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
       url="http://www.non_default_url.com"
     />
     <Animatable(ResponsiveGrouping)
-      animatableIndex={2}
+      animatableIndex={103}
       items={
         Array [
           Object {

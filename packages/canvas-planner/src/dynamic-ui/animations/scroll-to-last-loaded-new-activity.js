@@ -39,16 +39,11 @@ export class ScrollToLastLoadedNewActivity extends Animation {
     // only want groups in the day that have new activity items
     newActivityDayComponentIds = _.intersection(newActivityDayComponentIds, newActivityItemIds);
 
-    const {component: newActivityIndicator, componentIds: newActivityIndicatorComponentIds} =
+    const {component: newActivityIndicator} =
       this.registry().getLastComponent('new-activity-indicator', newActivityDayComponentIds);
 
-    // focus the group because it's right beside the new activity indicator. If we put the focus on
-    // an item, the focus might be off the screen when we scroll to the new activity indicator.
-    const {component: groupComponentToFocus} =
-      this.registry().getLastComponent('group', newActivityIndicatorComponentIds);
-
     this.maintainViewportPositionOfFixedElement();
-    this.animator().focusElement(groupComponentToFocus.getFocusable());
+    this.animator().focusElement(newActivityIndicator.getFocusable());
     this.animator().scrollTo(newActivityIndicator.getScrollable(), this.manager().totalOffset());
   }
 }

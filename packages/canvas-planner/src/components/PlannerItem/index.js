@@ -114,7 +114,7 @@ export class PlannerItem extends Component {
     this.checkboxRef = elt;
   }
 
-  getFocusable (which) {
+  getFocusable = (which) => {
     return (which === 'update' || which === 'delete') ? this.itemLink : this.checkboxRef;
   }
 
@@ -252,7 +252,8 @@ export class PlannerItem extends Component {
             <IndicatorComponent
             title={this.props.title}
             itemIds={[this.props.uniqueId]}
-            animatableIndex={this.props.animatableIndex} />
+            animatableIndex={this.props.animatableIndex}
+            getFocusable={this.getFocusable} />
           </div>
         </NotificationBadge>
       );
