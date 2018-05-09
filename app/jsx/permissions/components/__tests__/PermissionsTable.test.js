@@ -16,10 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createStore, applyMiddleware } from 'redux'
-import ReduxThunk from 'redux-thunk'
-import rootReducer from 'jsx/announcements/reducer'
+import '@instructure/ui-themes/lib/canvas'
+import React from 'react'
+import {mount, shallow} from 'enzyme'
+import PermissionsTable from '../PermissionsTable'
 
-export default function mockStore (initialState) {
-  return applyMiddleware(ReduxThunk)(createStore)(rootReducer, initialState)
-}
+const defaultProps = () => ({
+  roles: [{id: '1', label: 'Role 1'}, {id: '2', label: 'Role 2'}],
+  permissions: [
+    {permission_name: 'permission_1', label: 'Permission 1'},
+    {permission_name: 'permission_2', label: 'Permission 2'}
+  ]
+})
+
+test('renders the Permissions Table', () => {
+  const tree = mount(<PermissionsTable {...defaultProps()} />)
+  expect(tree.exists()).toBe(true)
+})
+
+// TODO: add more once we get something more fleshed out

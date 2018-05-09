@@ -16,18 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import actions from 'jsx/permissions/actions'
-import reducer from 'jsx/permissions/reducer'
+import {createStore, applyMiddleware} from 'redux'
+import ReduxThunk from 'redux-thunk'
+import rootReducer from 'jsx/announcements/reducer'
 
-QUnit.module('Discussions reducer')
-
-const reduce = (action, state = {}) => reducer(state, action)
-
-test('GET_PERMISSIONS_SUCCESS does its job', () => {
-  const oldState = { isLoadngPermissions: true, hasLoadedPermissions: false, permissions: [] }
-  const dispatchData = { "permission1": true, "permission2": true }
-  const newState = reduce(actions.getPermissionsSuccess(dispatchData), oldState)
-  equal(newState.isLoadingPermissions, false)
-  equal(newState.hasLoadedPermissions, true)
-  deepEqual(newState.permissions, [ "permission1", "permission2" ])
-})
+export default function mockStore(initialState) {
+  return applyMiddleware(ReduxThunk)(createStore)(rootReducer, initialState)
+}

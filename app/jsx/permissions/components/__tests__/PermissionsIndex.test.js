@@ -17,37 +17,20 @@
  */
 
 import React from 'react'
-import { mount, shallow } from 'enzyme'
+import {mount, shallow} from 'enzyme'
 
 import PermissionsIndex from 'jsx/permissions/components/PermissionsIndex'
 
 const defaultProps = () => ({
-  permissions: [],
   contextId: 1,
-  isLoadingPermissions: false,
-  hasLoadedPermissions: false,
-  getPermissions: ()=> {}
+  accountPermissions: [],
+  coursePermissions: [],
+  accountRoles: [],
+  courseRoles: []
 })
-
-QUnit.module('PermissionsIndex component')
 
 test('renders the component', () => {
   const tree = mount(<PermissionsIndex {...defaultProps()} />)
   const node = tree.find('PermissionsIndex')
-  ok(node.exists())
-})
-
-test('displays spinner when loading permissions', () => {
-  const props = defaultProps()
-  props.isLoadingPermissions = true
-  const tree = shallow(<PermissionsIndex {...props} />)
-  const node = tree.find('Spinner')
-  ok(node.exists())
-})
-
-test('calls getPermissions if hasLoadedPermissions is false', () => {
-  const props = defaultProps()
-  props.getPermissions = sinon.spy()
-  mount(<PermissionsIndex {...props} />)
-  equal(props.getPermissions.callCount, 1)
+  expect(node.exists())
 })

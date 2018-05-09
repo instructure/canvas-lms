@@ -16,34 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import createPermissionsIndex from 'jsx/permissions/index'
+import createPermissionsIndex from '../index'
 
 let app = null
-const container = document.getElementById('fixtures')
-
-QUnit.module('Announcements app', {
-  teardown: () => {
-    if (app) {
-      app.unmount()
-      app = null
-    }
-    container.innerHTML = ''
-  }
-})
 
 const defaultData = () => ({
-  contextIds: [1],
+  contextId: 1,
+  accountPermissions: [],
+  coursePermissions: [],
+  accountRoles: [],
+  courseRoles: []
 })
 
-test('mounts Announcements to container component', () => {
-  app = createPermissionsIndex(container, defaultData())
+const indexContainer = document.createElement('div')
+document.body.appendChild(indexContainer)
+
+test('mounts permissions to container component', () => {
+  app = createPermissionsIndex(indexContainer, defaultData())
   app.render()
-  ok(container.querySelector('.permissions-v2__wrapper'))
+  expect(document.querySelector('.permissions-v2__wrapper')).not.toBeNull()
 })
 
-test('unmounts Announcements from container component', () => {
-  app = createPermissionsIndex(container, defaultData())
+test('unmounts permissions from container component', () => {
+  app = createPermissionsIndex(indexContainer, defaultData())
   app.render()
   app.unmount()
-  notOk(document.querySelector('.announcements-v2__wrapper'))
+  expect(document.querySelector('.permissions-v2__wrapper')).toBeNull()
 })

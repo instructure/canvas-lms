@@ -19,11 +19,29 @@
 import createPermissionsIndex from 'jsx/permissions'
 
 const root = document.querySelector('#content')
+
+// We only want a 1-level flatten
+function flatten(arr) {
+  let result = []
+  arr.forEach(a => {
+    result = result.concat(a)
+  })
+  return result
+}
+
+// The ENV variables containing the permissions are an array of:
+// { group_name: "foo" group_permissions: [array of permissions] }
+// so we want to flatten this out to just the permissions.
+function flattenPermissions(permissionsFromEnv) {
+  return flatten(permissionsFromEnv.map(item => item.group_permissions))
+}
+
 const app = createPermissionsIndex(root, {
-  contextId: ENV.ACCOUNT_ID,
-  permissions: [],
-  isLoadingPermissions: false,
-  hasLoadedPermissions: false,
+  contextId: ENV.ACCOUNT_ID, // This is at present always an account, I think?
+  accountPermissions: flattenPermissions(ENV.ACCOUNT_PERMISSIONS),
+  coursePermissions: flattenPermissions(ENV.COURSE_PERMISSIONS),
+  accountRoles: ENV.ACCOUNT_ROLES,
+  courseRoles: ENV.COURSE_ROLES
 })
 
 app.render()

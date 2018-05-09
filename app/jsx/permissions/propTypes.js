@@ -16,13 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { shape, string, bool } from 'prop-types'
+import {shape, string} from 'prop-types'
 
 const propTypes = {}
 
 propTypes.permission = shape({
-  name: string.isRequired,
-  value: bool.isRequred
+  permission_name: string.isRequired,
+  label: string.isRequired
+})
+
+propTypes.role = shape({
+  id: string.isRequired,
+  label: string.isRequired,
+  base_role_name: string
 })
 
 export default propTypes

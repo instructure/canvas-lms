@@ -18,11 +18,11 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Provider } from 'react-redux'
+import {Provider} from 'react-redux'
 
 // TODO: we probably want this one eventually
 // import { subscribeFlashNotifications } from '../shared/reduxNotifications'
-import { ConnectedPermissionsIndex } from './components/PermissionsIndex'
+import {ConnectedPermissionsIndex} from './components/PermissionsIndex'
 
 import createStore from './store'
 
@@ -45,5 +45,5 @@ export default function createPermissionsIndex(root, data = {}) {
   // For some reason this is not working  TODO figure this out
   // subscribeFlashNotifications(store)
 
-  return { unmount, render }
+  return {unmount, render}
 }

@@ -16,29 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { combineReducers } from 'redux'
-import { handleActions } from 'redux-actions'
-import { actionTypes } from './actions'
+import {combineReducers} from 'redux'
+import {handleActions} from 'redux-actions'
+import {actionTypes} from './actions'
 
-const isLoadingPermissions = handleActions({
-  [actionTypes.GET_PERMISSIONS_START]: (_state, _action) => true,
-  [actionTypes.GET_PERMISSIONS_SUCCESS]: (_state, _action) => false
-}, false)
+// Our general pattern for reducers should be something like this.  That is,
+// each field in our state has a handleActions that describe, for that field
+// what (if anything) that action should do to that field in our state.
+// It is ok, even expected, that a given action type will appear in more than
+// one of these handleActions calls.  (TODO: Since some of these fields are
+// themselves arrays of structs, see what nice ways there might be of
+// breaking that down, if needed).
+//
+// The functions will in general be more complicated than we have in this
+// commented-out example below.
+//
+// const contextId = handleActions({
+//   [actionTypes.GET_PERMISSIONS_START]: (_state, _action) => true,
+//   [actionTypes.GET_PERMISSIONS_SUCCESS]: (_state, _action) => false
+// }, false)
+//
+// const accountPermissions = handleActions({
+//   [actionTypes.GET_PERMISSIONS_SUCCESS]: (_state, _action) => true,
+// }, false)
+//
 
-const hasLoadedPermissions = handleActions({
-  [actionTypes.GET_PERMISSIONS_SUCCESS]: (_state, _action) => true,
-}, false)
-
-const permissions = handleActions({
-  // TODO for some reason the data passed in isn't already being stored in
-  // the "payload" field -- figure out what is going on
-  [actionTypes.GET_PERMISSIONS_SUCCESS]: (state, action) => Object.keys(action.payload)
-}, [])
-
-
+// For now we have no real reducers so we
 export default combineReducers({
-  isLoadingPermissions,
-  hasLoadedPermissions,
-  permissions,
-  contextId: (state, _action) => (state || "")
+  contextId: (state, _action) => state || '',
+  accountPermissions: (state, _action) => state || '',
+  coursePermissions: (state, _action) => state || '',
+  accountRoles: (state, _action) => state || '',
+  courseRoles: (state, _action) => state || ''
 })

@@ -17,10 +17,10 @@
  */
 
 import I18n from 'i18n!permissions_v2'
-import React, { Component } from 'react'
-import { func, bool, number, arrayOf, string } from 'prop-types'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
+import React, {Component} from 'react'
+import {number, arrayOf} from 'prop-types'
+import {connect} from 'react-redux'
+import {bindActionCreators} from 'redux'
 
 import Spinner from '@instructure/ui-core/lib/components/Spinner'
 import Heading from '@instructure/ui-core/lib/components/Heading'
@@ -28,58 +28,31 @@ import Text from '@instructure/ui-core/lib/components/Text'
 
 import select from '../../shared/select'
 import actions from '../actions'
+import propTypes from '../propTypes'
+
+import PermissionsTable from './PermissionsTable'
 
 export default class PermissionsIndex extends Component {
   static propTypes = {
-    permissions: arrayOf(string),
-    isLoadingPermissions: bool.isRequired,
-    hasLoadedPermissions: bool.isRequired,
-    getPermissions: func.isRequired,
-    contextId: number.isRequired
+    contextId: number.isRequired,
+    accountPermissions: arrayOf(propTypes.permission).isRequired,
+    coursePermissions: arrayOf(propTypes.permission).isRequired,
+    accountRoles: arrayOf(propTypes.role).isRequired,
+    courseRoles: arrayOf(propTypes.role).isRequired
   }
 
   static defaultProps = {
     permissions: []
   }
 
-  componentDidMount () {
-    if (!this.props.hasLoadedPermissions) {
-      this.props.getPermissions(this.props.contextId)
-    }
-  }
-
-  renderSpinner () {
-    return this.props.isLoadingPermissions ? (
-      <div style={{textAlign: 'center'}}>
-        <Spinner size="small" title={I18n.t('Loading Permissions')} />
-        <Text size="small" as="p">
-          {I18n.t('Loading Permissions')}
-        </Text>
-      </div>
-    ) : null
-  }
-
-  renderPermissions () {
-    if (this.props.hasLoadedPermissions) {
-      const permissionNames = this.props.permissions.map(name => ((
-        <span key={`permission-${name}`}> {name} </span>
-      )))
-      return (
-        <Text as="p">
-          {permissionNames}
-        </Text>
-      )
-    } else {
-      return null
-    }
-  }
-
-  render () {
+  render() {
     return (
       <div className="permissions-v2__wrapper">
-        <Heading>{I18n.t('Permissions V2 Page')}</Heading>
-        {this.renderSpinner()}
-        {this.renderPermissions()}
+        <Heading>{I18n.t('Account Permissions Table')}</Heading>
+        <PermissionsTable
+          roles={this.props.accountRoles}
+          permissions={this.props.accountPermissions}
+        />
       </div>
     )
   }
@@ -88,11 +61,12 @@ export default class PermissionsIndex extends Component {
 function mapStateToProps(state) {
   return {
     contextId: state.contextId,
-    isLoadingPermissions: state.isLoadingPermissions,
-    hasLoadedPermissions: state.hasLoadedPermissions,
-    permissions: state.permissions
+    accountPermissions: state.accountPermissions,
+    coursePermissions: state.coursePermissions,
+    accountRoles: state.accountRoles,
+    courseRoles: state.courseRoles
   }
 }
 
-const connectActions = dispatch => bindActionCreators(select(actions, [ 'getPermissions' ]), dispatch)
+const connectActions = dispatch => bindActionCreators(select(actions, ['getPermissions']), dispatch)
 export const ConnectedPermissionsIndex = connect(mapStateToProps, connectActions)(PermissionsIndex)

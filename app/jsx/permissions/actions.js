@@ -30,31 +30,34 @@ const actionTypes = {
 
 const actions = {}
 
-actions.getPermissionsStart = function(contextId) {
-  return {
-    type: actionTypes.GET_PERMISSIONS_START,
-    payload: contextId
-  }
-}
+// Some sample actions: TODO: remove these once we have some new ones
+//
+// actions.getPermissionsStart = function(contextId) {
+//   return {
+//     type: actionTypes.GET_PERMISSIONS_START,
+//     payload: contextId
+//   }
+// }
+//
+// actions.getPermissionsSuccess = function(response) {
+//   return {
+//     type: actionTypes.GET_PERMISSIONS_SUCCESS,
+//     payload: response
+//   }
+// }
+//
+// actions.getPermissions = function(contextId) {
+//   return dispatch => {
+//     dispatch(actions.getPermissionsStart(contextId))
+//     apiClient
+//       .getPermissions(contextId)
+//       .then(response => {
+//         dispatch(actions.getPermissionsSuccess(response.data))
+//       })
+//       .catch(_response => {
+//         $.screenReaderFlashMessageExclusive(I18n.t('Loading permissions failed'))
+//       })
+//   }
+// }
 
-actions.getPermissionsSuccess = function(response) {
-  return {
-    type: actionTypes.GET_PERMISSIONS_SUCCESS,
-    payload: response
-  }
-}
-
-actions.getPermissions = function(contextId) {
-  return dispatch => {
-    dispatch(actions.getPermissionsStart(contextId))
-    apiClient.getPermissions(contextId)
-      .then(response => {
-        dispatch(actions.getPermissionsSuccess(response.data))
-      })
-      .catch(_response => {
-        $.screenReaderFlashMessageExclusive(I18n.t('Loading permissions failed'))
-      })
-  }
-}
-
-export { actionTypes, actions as default }
+export {actionTypes, actions as default}
