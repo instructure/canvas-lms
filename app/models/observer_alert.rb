@@ -19,4 +19,7 @@ class ObserverAlert < ActiveRecord::Base
   belongs_to :user_observation_link, :inverse_of => :observer_alerts
   belongs_to :observer_alert_threshold, :inverse_of => :observer_alerts
   belongs_to :context, polymorphic: [:discussion_topic, :assignment, :course, :account_notification]
+
+  scope :active, -> { where.not(workflow_state: ['dismissed', 'deleted']) }
+  scope :unread, -> { where(workflow_state: 'unread')}
 end

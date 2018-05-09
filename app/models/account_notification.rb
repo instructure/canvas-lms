@@ -24,6 +24,8 @@ class AccountNotification < ActiveRecord::Base
   validates_length_of :message, :maximum => maximum_text_length, :allow_nil => false, :allow_blank => false
   sanitize_field :message, CanvasSanitize::SANITIZE
 
+  after_save :create_alert
+
   ACCOUNT_SERVICE_NOTIFICATION_FLAGS = %w[account_survey_notifications]
   validates_inclusion_of :required_account_service, in: ACCOUNT_SERVICE_NOTIFICATION_FLAGS, allow_nil: true
 
@@ -32,6 +34,33 @@ class AccountNotification < ActiveRecord::Base
   def validate_dates
     if self.start_at && self.end_at
       errors.add(:end_at, t('errors.invalid_account_notification_end_at', "Account notification end time precedes start time")) if self.end_at < self.start_at
+    end
+  end
+
+  def create_alert
+    if self.start_at > Time.zone.now
+      self.send_later_enqueue_args(:create_alert, {
+        :run_at => self.start_at,
+        :on_conflict => :overwrite,
+        :singleton => "create_notification_alert:#{self.id}"
+      })
+      return
+    end
+
+    return unless self.account.root_account?
+
+    roles = self.account_notification_roles.map(&:role_name)
+    return if roles.count > 0 && (roles & ['StudentEnrollment', 'ObserverEnrollment']).none?
+
+    links = UserObservationLink.active.where(:root_account => self.account)
+    return if links.count == 0
+
+    thresholds = ObserverAlertThreshold.active.where(user_observation_link: links, alert_type: 'institution_announcement')
+    thresholds.each do |threshold|
+      ObserverAlert.create(user_observation_link: threshold.user_observation_link,
+                           observer_alert_threshold: threshold, context: self,
+                           alert_type: 'institution_announcement', action_date: self.start_at,
+                           title: I18n.t('Announcement posted: %{account_name}', { account_name: self.account.name}))
     end
   end
 
