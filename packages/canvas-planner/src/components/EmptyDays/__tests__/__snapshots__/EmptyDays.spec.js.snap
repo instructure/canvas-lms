@@ -35,7 +35,7 @@ exports[`renders the component 1`] = `
           letterSpacing="normal"
           size="large"
         >
-          Nothing planned
+          Nothing Planned Yet
         </Text>
       </div>
     </div>
@@ -78,7 +78,7 @@ exports[`renders the today className when surrounds Today 1`] = `
           letterSpacing="normal"
           size="large"
         >
-          Nothing planned
+          Nothing Planned Yet
         </Text>
       </div>
     </div>

@@ -68,7 +68,7 @@ export class EmptyDays extends Component {
             <GroupedDates role="img" aria-hidden="true" />
             <div className={styles.nothingPlannedContainer}>
               <div className={styles.nothingPlanned}>
-                <Text size="large">{formatMessage('Nothing planned')}</Text>
+                <Text size="large">{formatMessage('Nothing Planned Yet')}</Text>
               </div>
             </div>
           </View>

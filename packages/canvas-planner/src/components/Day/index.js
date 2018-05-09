@@ -141,7 +141,7 @@ export class Day extends Component {
                 display="block"
                 margin="small 0 0 0"
               >
-                {formatMessage('No "To-Do\'s" for this day yet.')}
+                {formatMessage('Nothing Planned Yet')}
               </View>
             )
           }
