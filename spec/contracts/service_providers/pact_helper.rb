@@ -16,19 +16,26 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require 'pact/consumer/rspec'
+require_relative '../pact_config'
 
+# see https://github.com/realestate-com-au/pact/blob/master/documentation/configuration.md
 Pact.configure do |config|
   config.diff_formatter = :list
   config.logger.level = Logger::DEBUG
+  config.pact_dir = 'pacts'
   config.pactfile_write_mode = :overwrite
   config.pactfile_write_order = :chronological
 end
 
-Pact.service_consumer 'Consumer' do
-  has_pact_with 'CanvasAPI' do
-    mock_service :canvas_api do
-      port 1234
-      pact_specification_version '2.0.0'
+# Only load this code block when running API contract tests, otherwise the Pact
+# mock server will cause the canvas specs to fail.
+if ENV.fetch('RUN_API_CONTRACT_TESTS', '0') == '1'
+  Pact.service_consumer PactConfig::Consumers::GENERIC_CONSUMER do
+    has_pact_with PactConfig::Providers::CANVAS_LMS_API do
+      mock_service :canvas_lms_api do
+        port PactConfig.mock_provider_service_port
+        pact_specification_version '2.0.0'
+      end
     end
   end
 end

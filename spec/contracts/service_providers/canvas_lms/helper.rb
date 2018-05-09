@@ -14,18 +14,5 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-Pact.configure do |config|
-  config.include Factories
-end
 
-Pact.set_up do
-  DatabaseCleaner.strategy = :transaction
-  DatabaseCleaner.start
-end
-
-Pact.tear_down do
-  DatabaseCleaner.clean
-  ActiveRecord::Base.connection.tables.each do |t|
-    ActiveRecord::Base.connection.reset_pk_sequence!(t)
-  end
-end
+Dir[File.dirname(__FILE__) + '/helper/**/*.rb'].each { |f| require f }

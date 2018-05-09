@@ -5,8 +5,8 @@ set -e
 if [ -f ../config/consul.yml ]; then # canvas is running in docker
   docker-compose run --rm --no-deps -e RAILS_ENV=test web \
     bundle exec rspec spec/contracts/service_consumers/live_events \
-      --tag pact --format doc
+      --tag pact_live_events --format doc
 else
-  bundle exec rspec spec/contracts/service_consumers/live_events \
-    --tag pact --format doc
+  RAILS_ENV=test bundle exec rspec spec/contracts/service_consumers/live_events \
+    --tag pact_live_events --format doc
 fi

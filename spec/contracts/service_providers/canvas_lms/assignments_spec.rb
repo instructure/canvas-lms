@@ -15,38 +15,40 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../assignments_api_client'
-require_relative 'pact_helper'
+require_relative 'helper'
+require_relative '../pact_helper'
 
-describe 'Assignments', :pact => true do
+describe 'Assignments', :pact do
 
-  subject(:assignmentsApi) {AssignmentsApiClient.new}
-
-  before do
-    AssignmentsApiClient.base_uri 'localhost:1234'
-  end
+  subject(:assignments_api) { Helper::ApiClient::Assignments.new }
 
   context 'List Assignments' do
     it 'should return JSON body' do
-      canvas_api.given('a student in a course with an assignment').
+      canvas_lms_api.given('a student in a course with an assignment').
         upon_receiving('List Assignments').
-        with(method: :get,
+        with(
+          method: :get,
           headers: {
             'Authorization' => Pact.provider_param(
               'Bearer :{token}',
-              {token: 'some_token'}
+              { token: 'some_token' }
             ),
             'Connection': 'close',
-            'Host': 'localhost:1234',
+            'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1'
           },
-             'path' => Pact.provider_param("/api/v1/users/:{user_id}/courses/:{course_id}/assignments",
-                                            {user_id: '1', course_id: '1'}),
-          query: '').will_respond_with(
-            status: 200,
-            body: Pact.each_like('id':1, 'name':'Assignment1')
-          )
-      response = assignmentsApi.list_assignments(1, 1)
+          'path' => Pact.provider_param(
+            "/api/v1/users/:{user_id}/courses/:{course_id}/assignments",
+            { user_id: '1', course_id: '1' }
+          ),
+          query: ''
+        ).
+        will_respond_with(
+          status: 200,
+          body: Pact.each_like('id': 1, 'name': 'Assignment1')
+        )
+
+      response = assignments_api.list_assignments(1, 1)
       expect(response[0]['id']).to eq 1
       expect(response[0]['name']).to eq 'Assignment1'
     end

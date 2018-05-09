@@ -17,10 +17,18 @@
 #
 
 module PactConfig
-  CANVAS_LMS_LIVE_EVENTS = 'Canvas LMS Live Events'.freeze
-  CANVAS_LMS_API = 'Canvas LMS API'.freeze
+  # These constants ensure we use the correct strings and thus help avoid our
+  # accidentally breaking the contract tests
 
+  module Providers
+    CANVAS_LMS_API = 'Canvas LMS API'.freeze
+    CANVAS_LMS_LIVE_EVENTS = 'Canvas LMS Live Events'.freeze
+    ALL = Providers.constants.map { |c| Providers.const_get(c) }.freeze
+  end
+
+  # Add new API and LiveEvents consumers to this Consumers module
   module Consumers
+    GENERIC_CONSUMER = 'Generic Consumer'.freeze
     QUIZ_LTI = 'Quiz LTI'.freeze
     ALL = Consumers.constants.map { |c| Consumers.const_get(c) }.freeze
   end
@@ -47,8 +55,6 @@ module PactConfig
       ENV.fetch('PACT_BROKER_HOST', 'pact-broker.docker')
     end
 
-    private
-
     def consumer_tag
       jenkins_build? ? 'latest/master' : 'latest'
     end
@@ -60,6 +66,16 @@ module PactConfig
     def broker_username
       ENV.fetch('PACT_BROKER_USERNAME', 'pact')
     end
+
+    def mock_provider_service_base_uri
+      "localhost:#{mock_provider_service_port}"
+    end
+
+    def mock_provider_service_port
+      1234
+    end
+
+    private
 
     def jenkins_build?
       !ENV['JENKINS_URL'].nil?

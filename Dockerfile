@@ -83,11 +83,13 @@ RUN mkdir -p .yardoc \
              node_modules \
              packages/canvas-planner/lib \
              packages/canvas-planner/node_modules \
+             pacts \
              public/dist \
              public/doc/api \
              public/javascripts/client_apps \
              public/javascripts/compiled \
              public/javascripts/translations \
+             reports \
              tmp \
              /home/docker/.bundler/ \
              /home/docker/.cache/yarn \

@@ -17,22 +17,27 @@
 
 require 'httparty'
 require 'json'
+require_relative '../../../../pact_config'
 
-class CoursesApiClient
-  include HTTParty
-  base_uri 'localhost:1234'
-  headers "Authorization" => "Bearer some_token"
+module Helper
+  module ApiClient
+    class Courses
+      include HTTParty
+      base_uri PactConfig.mock_provider_service_base_uri
+      headers "Authorization" => "Bearer some_token"
 
-  # TODO: modify these to use params
-  def list_your_courses
-    JSON.parse(self.class.get('/api/v1/courses').body)
-  rescue
-    nil
-  end
+      # TODO: modify these to use params
+      def list_your_courses
+        JSON.parse(self.class.get('/api/v1/courses').body)
+      rescue
+        nil
+      end
 
-  def list_students(course_id)
-    JSON.parse(self.class.get("/api/v1/courses/#{course_id}/users", query: "enrollment_type[]=student").body)
-  rescue
-    nil
+      def list_students(course_id)
+        JSON.parse(self.class.get("/api/v1/courses/#{course_id}/users", query: "enrollment_type[]=student").body)
+      rescue
+        nil
+      end
+    end
   end
 end
