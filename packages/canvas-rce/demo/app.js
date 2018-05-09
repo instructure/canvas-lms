@@ -69,7 +69,7 @@ function renderDemos(
     getProps("textarea2", language)
   );
   ReactDOM.render(
-    <CanvasRce rceProps={getProps("textarea3")} />,
+    <CanvasRce rceProps={getProps("textarea3", language)} />,
     document.getElementById("editor3")
   );
 
