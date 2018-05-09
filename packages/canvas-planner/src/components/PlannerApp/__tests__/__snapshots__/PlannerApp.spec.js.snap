@@ -38,25 +38,25 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
   />
   <Animatable(Day)
     animatableIndex={1}
-    day="2017-04-22"
-    itemsForDay={Array []}
-    timeZone="Asia/Tokyo"
-  />
-  <Animatable(Day)
-    animatableIndex={2}
     day="2017-04-23"
     itemsForDay={Array []}
     timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
-    animatableIndex={3}
+    animatableIndex={2}
     day="2017-04-24"
+    itemsForDay={Array []}
+    timeZone="Asia/Tokyo"
+  />
+  <Animatable(Day)
+    animatableIndex={3}
+    day="2017-04-25"
     itemsForDay={Array []}
     timeZone="Asia/Tokyo"
   />
   <EmptyDays
     animatableIndex={4}
-    day="2017-04-25"
+    day="2017-04-26"
     endday="2017-04-28"
     timeZone="Asia/Tokyo"
   />
@@ -67,6 +67,54 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
       Array [
         Object {
           "dateBucketMoment": "2017-04-28T15:00:00.000Z",
+        },
+      ]
+    }
+    timeZone="Asia/Tokyo"
+  />
+  <div
+    id="planner-app-fixed-element"
+  />
+  <LoadingFutureIndicator
+    allFutureItemsLoaded={false}
+    loadingFuture={false}
+    onLoadMore={[Function]}
+    plannerActive={[Function]}
+  />
+</div>
+`;
+
+exports[`PlannerApp empty day calculation does not render an empty tomorrow when tomorrow may only be partially loaded 1`] = `
+<div
+  className="PlannerApp large"
+>
+  <View
+    as="div"
+    display="auto"
+    textAlign="center"
+  >
+    <ShowOnFocusButton
+      buttonProps={
+        Object {
+          "onClick": undefined,
+        }
+      }
+      buttonRef={[Function]}
+    >
+      Load prior dates
+    </ShowOnFocusButton>
+  </View>
+  <LoadingPastIndicator
+    allPastItemsLoaded={false}
+    loadingPast={false}
+  />
+  <Animatable(Day)
+    animatableIndex={0}
+    day="2017-04-24"
+    itemsForDay={
+      Array [
+        Object {
+          "dateBucketMoment": "2017-04-23T15:00:00.000Z",
         },
       ]
     }
@@ -212,18 +260,12 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
   />
   <Animatable(Day)
     animatableIndex={2}
-    day="2017-04-22"
-    itemsForDay={Array []}
-    timeZone="Asia/Tokyo"
-  />
-  <Animatable(Day)
-    animatableIndex={3}
     day="2017-04-23"
     itemsForDay={Array []}
     timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
-    animatableIndex={4}
+    animatableIndex={3}
     day="2017-04-24"
     itemsForDay={Array []}
     timeZone="Asia/Tokyo"

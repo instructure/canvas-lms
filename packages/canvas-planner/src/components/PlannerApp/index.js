@@ -369,12 +369,15 @@ export class PlannerApp extends Component {
   //    if we find a string of 3 or more empty days, emit an <EmptyDays> for the interval
   renderDays () {
     const children = [];
-    let workingDay = moment(this.props.days[0][0]).tz(this.props.timeZone);
-    let lastDay = moment(this.props.days[this.props.days.length-1][0]).tz(this.props.timeZone);
+    let workingDay = moment.tz(this.props.days[0][0], this.props.timeZone);
+    let lastDay = moment.tz(this.props.days[this.props.days.length-1][0], this.props.timeZone);
     const today = moment.tz(this.props.timeZone).startOf('day');
-    const tomorrow = today.clone().add(1, 'day');
+    let tomorrow = today.clone().add(1, 'day');
     const dayBeforeYesterday = today.clone().add(-2, 'day');
     if (lastDay.isBefore(today)) lastDay = today;
+    // We don't want to render an empty tomorrow if we don't know it's actually empty.
+    // It might just not be loaded yet. If so, sneak it back to today so it isn't displayed.
+    if (tomorrow.isAfter(lastDay)) tomorrow = today;
     const dayHash = daysToDaysHash(this.props.days);
     let dayIndex = 0;
 

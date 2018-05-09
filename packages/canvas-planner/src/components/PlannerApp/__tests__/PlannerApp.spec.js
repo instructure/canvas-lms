@@ -174,6 +174,13 @@ describe('PlannerApp', () => {
       expect(wrapper).toMatchSnapshot();
     });
 
+    it('does not render an empty tomorrow when tomorrow may only be partially loaded', () => {
+      let days = [moment.tz(TZ).add(0, 'day')];
+      days = days.map(d => [d.format('YYYY-MM-DD'), [{dateBucketMoment: d}]]);
+      const wrapper = shallow(<PlannerApp {...getDefaultValues({days})} />);
+      expect(wrapper).toMatchSnapshot();
+    });
+
     it('empty days internals are correct', () => {
       const countSpy = jest.spyOn(PlannerApp.prototype, 'countEmptyDays');
       const emptyDaysSpy = jest.spyOn(PlannerApp.prototype, 'renderEmptyDays');
