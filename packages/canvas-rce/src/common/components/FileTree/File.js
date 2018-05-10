@@ -17,6 +17,7 @@
  */
 
 import React, { Component } from "react";
+import { number, string, shape, func } from "prop-types";
 import { css } from "aphrodite";
 import styles from "./styles";
 import IconDocumentLine from "instructure-icons/lib/Line/IconDocumentLine";
@@ -55,10 +56,10 @@ export default class File extends Component {
 }
 
 File.propTypes = {
-  file: React.PropTypes.shape({
-    id: React.PropTypes.number,
-    name: React.PropTypes.string,
-    type: React.PropTypes.string
+  file: shape({
+    id: number,
+    name: string,
+    type: string
   }).isRequired,
-  onSelect: React.PropTypes.func
+  onSelect: func
 };

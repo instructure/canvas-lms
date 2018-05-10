@@ -16,7 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Component, PropTypes } from "react";
+import PropTypes from "prop-types";
+
+import React, { Component } from "react";
 import TabList from "@instructure/ui-core/lib/components/TabList";
 import TabPanel from "@instructure/ui-core/lib/components/TabList/TabPanel";
 import Tab from "@instructure/ui-core/lib/components/TabList/Tab";

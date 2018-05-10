@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import PropTypes from "prop-types";
+
 import React, { Component } from "react";
 import File from "./File";
 import Loading from "../Loading";
@@ -95,19 +97,19 @@ export default class Folder extends Component {
   }
 }
 
-const folderPropType = React.PropTypes.shape({
-  id: React.PropTypes.number,
-  name: React.PropTypes.string,
-  loading: React.PropTypes.bool,
-  fileIds: React.PropTypes.arrayOf(React.PropTypes.number),
-  folderIds: React.PropTypes.arrayOf(React.PropTypes.number)
+const folderPropType = PropTypes.shape({
+  id: PropTypes.number,
+  name: PropTypes.string,
+  loading: PropTypes.bool,
+  fileIds: PropTypes.arrayOf(PropTypes.number),
+  folderIds: PropTypes.arrayOf(PropTypes.number)
 });
 
 Folder.propTypes = {
-  folders: React.PropTypes.objectOf(folderPropType),
-  files: React.PropTypes.objectOf(File.propTypes.file),
+  folders: PropTypes.objectOf(folderPropType),
+  files: PropTypes.objectOf(File.propTypes.file),
   folder: folderPropType.isRequired,
-  onToggle: React.PropTypes.func,
+  onToggle: PropTypes.func,
   onSelect: File.propTypes.onSelect
 };
 
