@@ -1014,15 +1014,17 @@ ActiveRecord::Relation.class_eval do
     loose_mode = options[:loose] && is_integer
     # loose_mode: if we don't care about getting exactly batch_size ids in between
     # don't get the max - just get the min and add batch_size so we get that many _at most_
-    values = loose_mode ? "min(id)" : "min(id), max(id)"
+    values = loose_mode ? "MIN(id)" : "MIN(id), MAX(id)"
 
     batch_size = options[:batch_size].try(:to_i) || 1000
-    subquery_scope = except(:select).select("#{quoted_table_name}.#{primary_key} as id").reorder(primary_key).limit(loose_mode ? 1 : batch_size)
-    subquery_scope = subquery_scope.where("#{quoted_table_name}.#{primary_key} <= ?", options[:end_at]) if options[:end_at]
+    quoted_primary_key = "#{klass.connection.quote_local_table_name(table_name)}.#{klass.connection.quote_column_name(primary_key)}"
+    as_id = " AS id" unless primary_key == 'id'
+    subquery_scope = except(:select).select("#{quoted_primary_key}#{as_id}").reorder(primary_key.to_sym).limit(loose_mode ? 1 : batch_size)
+    subquery_scope = subquery_scope.where("#{quoted_primary_key} <= ?", options[:end_at]) if options[:end_at]
 
-    first_subquery_scope = options[:start_at] ? subquery_scope.where("#{quoted_table_name}.#{primary_key} >= ?", options[:start_at]) : subquery_scope
+    first_subquery_scope = options[:start_at] ? subquery_scope.where("#{quoted_primary_key} >= ?", options[:start_at]) : subquery_scope
 
-    ids = connection.select_rows("select #{values} from (#{first_subquery_scope.to_sql}) as subquery").first
+    ids = connection.select_rows("SELECT #{values} FROM (#{first_subquery_scope.to_sql}) AS subquery").first
 
     while ids.first.present?
       ids.map!(&:to_i) if is_integer
@@ -1030,8 +1032,8 @@ ActiveRecord::Relation.class_eval do
 
       yield(*ids)
       last_value = ids.last
-      next_subquery_scope = subquery_scope.where(["#{quoted_table_name}.#{primary_key}>?", last_value])
-      ids = connection.select_rows("select #{values} from (#{next_subquery_scope.to_sql}) as subquery").first
+      next_subquery_scope = subquery_scope.where(["#{quoted_primary_key}>?", last_value])
+      ids = connection.select_rows("SELECT #{values} FROM (#{next_subquery_scope.to_sql}) AS subquery").first
     end
   end
 end
