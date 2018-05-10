@@ -97,11 +97,9 @@ class DemoOptions extends Component {
       expanded: false
     };
     this.inputs = {};
-    this.handleChange = this.handleChange.bind(this);
-    this.toggle = this.toggle.bind(this);
   }
 
-  handleChange() {
+  handleChange = () => {
     renderDemos(
       this.inputs.host.value,
       this.inputs.jwt.value,
@@ -109,15 +107,15 @@ class DemoOptions extends Component {
       this.inputs.contextType.value,
       this.inputs.contextId.value
     );
-  }
+  };
 
   componentDidMount() {
     this.handleChange();
   }
 
-  toggle() {
+  toggle = () => {
     this.setState({ expanded: !this.state.expanded });
-  }
+  };
 
   render() {
     return (

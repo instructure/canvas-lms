@@ -30,7 +30,6 @@ class LoadMore extends Component {
     this.state = {
       nextFocus: Infinity
     };
-    this.loadMore = this.loadMore.bind(this);
   }
 
   componentDidUpdate() {
@@ -50,10 +49,10 @@ class LoadMore extends Component {
     return this.refs.parent.querySelectorAll(this.props.focusSelector);
   }
 
-  loadMore(ev) {
+  loadMore = ev => {
     this.setState({ nextFocus: this.focusableElements().length });
     this.props.loadMore(ev);
-  }
+  };
 
   render() {
     const hasChildren = React.Children.count(this.props.children) > 0;

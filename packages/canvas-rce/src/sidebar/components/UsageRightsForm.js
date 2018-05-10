@@ -54,9 +54,6 @@ export default class UsageRightsForm extends Component {
       usageRight: Object.keys(usageRightsValues)[0],
       copyrightHolder: ""
     };
-    this.handleUsageRight = this.handleUsageRight.bind(this);
-    this.handleCCLicense = this.handleCCLicense.bind(this);
-    this.handleCopyrightHolder = this.handleCopyrightHolder.bind(this);
   }
 
   isCreativeCommons() {
@@ -67,17 +64,17 @@ export default class UsageRightsForm extends Component {
     return this.state.usageRight === Object.keys(usageRightsValues)[0];
   }
 
-  handleUsageRight(ev) {
+  handleUsageRight = ev => {
     this.setState({ usageRight: ev.target.value });
-  }
+  };
 
-  handleCCLicense(ev) {
+  handleCCLicense = ev => {
     this.setState({ ccLicense: ev.target.value });
-  }
+  };
 
-  handleCopyrightHolder(ev) {
+  handleCopyrightHolder = ev => {
     this.setState({ copyrightHolder: ev.target.value });
-  }
+  };
 
   value() {
     if (this.isNotSelected()) {

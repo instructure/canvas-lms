@@ -23,17 +23,12 @@ import styles from "./styles";
 import IconDocumentLine from "instructure-icons/lib/Line/IconDocumentLine";
 
 export default class File extends Component {
-  constructor(props) {
-    super(props);
-    this.handleSelect = this.handleSelect.bind(this);
-  }
-
-  handleSelect() {
+  handleSelect = () => {
     const { onSelect, file } = this.props;
     if (onSelect) {
       onSelect(file.id);
     }
-  }
+  };
 
   icon() {
     switch (this.props.file.type) {

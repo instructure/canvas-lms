@@ -35,7 +35,6 @@ class UploadForm extends Component {
   constructor(props) {
     super(props);
     this.state = { file: {}, altResolved: false };
-    this.setAltResolved = this.setAltResolved.bind(this);
   }
 
   componentWillMount() {
@@ -228,9 +227,9 @@ class UploadForm extends Component {
     }
   }
 
-  setAltResolved(resolved) {
+  setAltResolved = resolved => {
     this.setState({ ...this.state, altResolved: resolved });
-  }
+  };
 
   renderForm() {
     if (this.props.upload.formExpanded) {

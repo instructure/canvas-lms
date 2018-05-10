@@ -44,7 +44,6 @@ export default class RCEWrapper extends React.Component {
 
     // test override points
     this.indicator = false;
-    this.handleTextareaChange = this.handleTextareaChange.bind(this);
   }
 
   // getCode and setCode naming comes from tinyMCE
@@ -234,11 +233,11 @@ export default class RCEWrapper extends React.Component {
     return options;
   }
 
-  handleTextareaChange() {
+  handleTextareaChange = () => {
     if (this.isHidden()) {
       this.setCode(this.textareaValue());
     }
-  }
+  };
 
   unhandleTextareaChange() {
     if (this._textareaEl) {

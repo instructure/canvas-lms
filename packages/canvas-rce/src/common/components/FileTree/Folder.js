@@ -28,17 +28,12 @@ import IconMiniArrowRightLine from "instructure-icons/lib/Line/IconMiniArrowRigh
 import IconFolderLine from "instructure-icons/lib/Line/IconFolderLine";
 
 export default class Folder extends Component {
-  constructor(props) {
-    super(props);
-    this.handleToggle = this.handleToggle.bind(this);
-  }
-
-  handleToggle() {
+  handleToggle = () => {
     const { onToggle, folder } = this.props;
     if (onToggle) {
       onToggle(folder.id);
     }
-  }
+  };
 
   files() {
     return this.props.folder.fileIds

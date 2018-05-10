@@ -28,11 +28,6 @@ import scroll from "../../common/scroll";
 import { StyleSheet, css } from "aphrodite";
 
 class LinkToNewPage extends Component {
-  constructor(props) {
-    super(props);
-    this.handleLinkClick = this.handleLinkClick.bind(this);
-  }
-
   validScrollTarget(target, parents) {
     return (
       parents.scrolled < 1 && //only want to scroll 1 parent
@@ -61,12 +56,12 @@ class LinkToNewPage extends Component {
     }
   }
 
-  handleLinkClick(e, link) {
+  handleLinkClick = (e, link) => {
     if (this.props.onLinkClick) {
       e.preventDefault();
       this.props.onLinkClick(link);
     }
-  }
+  };
 
   toggleForm(e) {
     e.preventDefault();

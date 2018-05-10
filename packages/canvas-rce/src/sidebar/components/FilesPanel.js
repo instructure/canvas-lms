@@ -24,19 +24,14 @@ import formatMessage from "../../format-message";
 import UploadForm from "./UploadForm";
 
 export default class FilesPanel extends Component {
-  constructor(props) {
-    super(props);
-    this.handleSelect = this.handleSelect.bind(this);
-  }
-
-  handleSelect(id) {
+  handleSelect = id => {
     const file = this.props.files[id];
     this.props.onLinkClick({
       title: file.name,
       href: file.url,
       embed: file.embed
     });
-  }
+  };
 
   renderUploadForm() {
     if (this.props.withUploadForm) {

@@ -29,12 +29,7 @@ const J_KEY = 74;
 const K_KEY = 75;
 
 export default class FileTree extends Component {
-  constructor(props) {
-    super(props);
-    this.handleKeyDown = this.handleKeyDown.bind(this);
-  }
-
-  handleKeyDown(event) {
+  handleKeyDown = event => {
     switch (event.keyCode) {
       case DOWN_KEY:
       case J_KEY:
@@ -48,7 +43,7 @@ export default class FileTree extends Component {
         return;
     }
     event.stopPropagation();
-  }
+  };
 
   navigableNodes() {
     return Array.from(this.containerNode.querySelectorAll("button"));

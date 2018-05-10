@@ -31,9 +31,6 @@ let nextId = 1;
 class LinkSet extends Component {
   constructor(props) {
     super(props);
-    this.handleLinkClick = this.handleLinkClick.bind(this);
-    this.handleDragStart = this.handleDragStart.bind(this);
-    this.handleLoadMoreClick = this.handleLoadMoreClick.bind(this);
     this.describedByID = `rce-LinkSet-describedBy-${nextId++}`;
   }
 
@@ -43,23 +40,23 @@ class LinkSet extends Component {
     }
   }
 
-  handleLinkClick(e, link) {
+  handleLinkClick = (e, link) => {
     if (this.props.onLinkClick) {
       e.preventDefault();
       this.props.onLinkClick(link);
     }
-  }
+  };
 
-  handleDragStart(ev, link) {
+  handleDragStart = (ev, link) => {
     dragHtml(ev, renderLinkHtml(link));
-  }
+  };
 
-  handleLoadMoreClick(e) {
+  handleLoadMoreClick = e => {
     e.preventDefault();
     if (this.props.fetchNextPage) {
       this.props.fetchNextPage();
     }
-  }
+  };
 
   hasLinks() {
     return this.props.collection.links.length > 0;
