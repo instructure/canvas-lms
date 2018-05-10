@@ -300,8 +300,8 @@ END
     },
     'recurring_calendar_events' =>
     {
-      display_name: -> { I18n.t('Recurring Calendar Events') },
-      description: -> { I18n.t("Allows the scheduling of recurring calendar events") },
+      display_name: -> { I18n.t('Duplicating Calendar Events') },
+      description: -> { I18n.t("Allows the duplication of Calendar Events") },
       applies_to: 'Course',
       state: 'hidden',
       root_opt_in: true,
