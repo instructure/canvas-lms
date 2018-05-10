@@ -3253,6 +3253,7 @@ de:
     edit_planner_note: 
       calendar: "Kalender:"
       date: "Datum:"
+      time: "Zeit:"
       title: "Titel:"
     end_before_start_error: "Beginnzeit muss vor Endzeit liegen"
     ends_in_past_error: "Sie können keinen Terminblock erstellen, dessen Ende in der Vergangenheit liegt"
@@ -3463,6 +3464,7 @@ de:
   cannot_have_a_blueprint_course_with_students_248e3e76: "Darf keinen Musterkurs mit Studenten haben"
   cannot_modify_fields_for_outcome_from_another_cont_dc001fe7: "Kann nicht Felder für das Ergebnis aus einem anderen Zusammenhang ändern: %{changes}"
   cannot_modify_outcome_from_another_context_changes_a80561a4: "Ein Ergebnis aus einem anderen Kontext kann nicht geändert werden: %{changes}; Ergebnis muss geändert werden in %{context}"
+  cannot_move_assignments_due_to_closed_grading_peri_59fc3c4: "Wegen der geschlossenen Benotungszeiträume können die Aufgaben nicht verschoben werden."
   cannot_restrict_by_section_unless_groups_are_empty_662d3144: "Eine Beschränkung nach Abschnitt ist nur bei Gruppen möglich, die leer sind und deren Größe nicht beschränkt ist."
   cannot_save_new_assignment_3bda0792: "Speichern neuer Aufgabe nicht möglich"
   cannot_set_only_visible_to_overrides_when_due_in_a_fac518ce: "Die Sichtbarkeit nur bei Außerkraftsetzungsszenarien kann nicht aktiviert werden, wenn die Fälligkeit innerhalb eines abgeschlossenen Benotungszeitraums liegt."
@@ -5172,6 +5174,7 @@ de:
   course_quizzes_c337653c: Kursquizze
   course_restore: 
     restore_error: "Fehler beim Wiederherstellen des Kurses. Kurs wurde nicht wiederhergestellt."
+  course_results_updated_df9d1c95: "Kursergebnisse aktualisiert."
   course_role_role_type_119c2f64: "Kursrolle: %{role_type}"
   course_roles_1314f962: Kursrollen
   course_roster_78f70e97: Kursteilnehmerliste
@@ -5769,6 +5772,7 @@ de:
   courses_navigation_menu_b3638384: Kurs-Navigationsmenü
   courses_people_680bb173: "Kurse und Teilnehmer"
   create_132b3be1: Erstellen
+  create_a_64f6f82: "Erstellen Sie ein/e/n"
   create_a_developer_key_cabaa013: "Einen Entwicklerschlüssel erstellen"
   create_a_new_account_4cf7c0f9: "Ein neues Konto anlegen"
   create_a_new_module_6f31b0fe: "Ein neues Modul erstellen"
@@ -6340,6 +6344,7 @@ de:
     vendor_code: "Anbietercode (LTI 2):"
   developer_key_management_5a5866bd: Entwicklerschlüsselverwaltung
   developer_key_management_ui_rewrite_26a9ee26: "Entwicklerschlüsselverwaltung UI Rewrite"
+  developer_key_settings_889721f1: Entwicklerschlüsseleinstellungen
   developer_keys: 
     button: 
       saving: "Schlüssel wird gespeichert ..."
@@ -6366,6 +6371,7 @@ de:
     unnamed_tool: "Unbenanntes Tool"
   developer_keys_d70ba44a: Entwicklerschlüssel
   developername_logo_88951d4: "%{developerName} Logo"
+  developers_keys_table_69ae6b7e: Entwicklerschlüsseltabelle
   dialog_form_wrapper: 
     cancel: Abbrechen
     save_settings: "Einstellungen speichern"
@@ -7653,6 +7659,7 @@ de:
     user_navigation_configured: "Benutzernavigation konfiguriert"
     wiki_page_menu_configured: "Menü \"Wiki-Seite\" konfiguriert"
   external_url_e9b87215: "Externer URL"
+  extra_credit_not_permitted_on_outcomes_score_adjus_714dd746: "Zusätzliche Gutschrift auf Ergebnisse nicht zulässig, Punktzahl maximal angepasst für %{outcome}"
   extract_error_error_file_names_a4989ed0: "Extraktionsfehler, %{error}: %{file_names}"
   extreme_critical_emergency_80b3dbda: "ÄUSSERST KRITISCHER NOTFALL!"
   faculty_journal_5634938e: Fachjournal
@@ -8857,6 +8864,7 @@ de:
   group_set_name_2aed2347: "Name des Gruppensets"
   group_settings: 
     invitation_sent: "Einladung versandt"
+  group_weight_for_d46c5db4: "Gruppengewicht für:"
   groups: 
     add_group: "Gruppe hinzufügen"
     add_group_category: 
@@ -9362,6 +9370,7 @@ de:
   i_agree_to_the_terms_of_use_18e16f0c: "Ich stimme den *Nutzungsbedingungen* zu."
   i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: "Ich stimme den *Nutzungsbedingungen* und der **Datenschutzrichtlinie** zu."
   i_agree_to_the_tool_s_270301a5: "Ich bin damit einverstanden, dass das Tool"
+  i_agree_to_the_tool_s_end_user_license_agreement_1ba71197: "Ich bin mit der *Lizenzvereinbarung für Endbenutzer für das Tool einverstanden.*"
   i_cannot_get_things_done_until_i_hear_back_from_yo_83ba46b7: "Um meine Arbeit fortzusetzen, benötige ich eine Antwort von Ihnen."
   i_cb2f5130: i
   i_have_obtained_permission_to_use_this_file_6386f087: "Ich habe die Berechtigung zur Nutzung dieser Datei erhalten."
@@ -9495,6 +9504,7 @@ de:
   inactive_enrollments_3b84be3d: "Inaktiv Anmeldungen"
   inbox_bb245a60: Posteingang
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "Einen Link in einen Screencast/Screenshots einfügen, z. B. mit *Jing*."
+  include_byte_order_mark_in_gradebook_exports_d2ad0d4e: "Byte-Order-Markierung mit Notenbuch exportieren"
   include_course_settings_c4c08764: "Kurseinstellungen einbeziehen"
   include_deleted_enrollments_1c87684a: "Gelöschte Einschreibungen einschließen"
   include_deleted_objects_3cced3b5: "Gelöschte Objekte einschließen;"
@@ -9533,6 +9543,8 @@ de:
   information_7f11072: Informationen
   information_816d9fa5: Informationen
   information_icon_8a514faa: Informationssymbol
+  inherited_d4d0bc33: Geerbt
+  inherited_developer_keys_table_e4a65b67: "Tabelle geerbter Entwicklerschlüssel"
   inner_box_background_6f9092f: "Hintergrund des inneren Kästchens"
   inner_box_border_d0524b03: "Rand des inneren Kästchens"
   input_and_distribute_grades_for_students_display_g_95b9b6ee: |-
@@ -9632,6 +9644,7 @@ de:
   invalid_csv_file_grades_could_not_be_updated_4d5c120c: "CSV-Datei ungültig Noten konnten nicht aktualisiert werden."
   invalid_csv_file_grades_could_not_be_updated_6ebdeca4: "Ungültige. CSV-Datei, Noten konnten nicht aktualisiert werden."
   invalid_date_or_invalid_datetime_for_attr_6661103f: "Datum, oder Datum/Uhrzeit ungültig für %{attr}"
+  invalid_datetime_for_graded_since_884cce5: "Datum/Uhrzeit ungültig für graded_since"
   invalid_datetime_for_submitted_since_a238f3a6: "Datum/Uhrzeit ungültig für submitted_since"
   invalid_field_type_61d31870: "%{field} ungültig: „%{type}“"
   invalid_fields_after_ratings_fields_815ff223: "Ungültige Felder nach der Einstufung: %{fields}"
@@ -10060,6 +10073,8 @@ de:
   lock_date_cannot_be_after_section_end_d37da70c: "Das Sperrdatum darf nicht nach dem Ende des Abschnitts liegen."
   lock_date_cannot_be_after_term_end_cf1a188f: "Das Sperrdatum darf nicht nach dem Ende des Semesters liegen."
   lock_date_cannot_be_before_due_date_ac30f54: "Das Sperrdatum darf nicht vor dem Abgabetermin liegen."
+  lock_discussion_title_failed_9d49f2d: "Sperren der Diskussion %{title} fehlgeschlagen"
+  lock_discussion_title_succeeded_fb24ebfc: "Sperren der Diskussion %{title} erfolgreich"
   lock_icon_a9916601: "Sperren Icon"
   lock_questions_after_answering_5aecef9d: "Fragen nach der Beantwortung sperren"
   lock_selected_announcements_33740f80: "Ausgewählte Ankündigungen sperren"
@@ -12433,6 +12448,7 @@ de:
     other: "Das Leistungsziel muss mindestens %{count}-mal erreicht werden. Für Punktzahlen über dem Leistungsziel wird ein Mittelwert ermittelt, um die Gesamtpunktzahl zu berechnen."
   must_be_a_valid_number_59f0069: "Muss eine gültige Zahl sein"
   must_be_after_start_date_95e251a3: "muss nach dem Beginndatum liegen"
+  must_be_between_availability_dates_ceaca984: "muss innerhalb der Verfügbarkeitsdaten liegen"
   must_be_on_or_after_end_date_e4dda631: "darf nicht vor dem Enddatum liegen"
   must_belong_to_a_root_account_f84323f6: "muss zu einem Root-Konto gehören"
   must_belong_to_an_active_course_9711934: "muss zu einem aktiven Kurs gehören"
@@ -12504,6 +12520,7 @@ de:
   name_is_too_long_48daa8db: "Name ist zu lang"
   name_is_too_long_must_be_under_length_characters_b8dad44c: "Der Name muss kürzer als %{length} Zeichen sein."
   name_is_unlocked_click_to_lock_b8b9a2c8: "%{name} ist entsperrt Zum Sperren klicken"
+  name_missing_f4f3eb9e: "Name fehlt"
   name_only_5f56718e: "Nur Name"
   name_options_bc5c95ce: "%{name} Optionen"
   name_unposted_current_score_e98e95fd: "%{name} Nicht gepostete aktuelle Punktzahl"
@@ -12644,6 +12661,7 @@ de:
   no_unassigned_terms_deb7b76b: "Keine nicht zugewiesenen Semester"
   no_unresponsive_links_found_8ea497f9: "Keine nicht funktionierenden Links gefunden"
   no_usage_rights_object_supplied_304b8d40: "Kein „usage_rights“-Objekt bereitgestellt"
+  no_user_98e6ccc4: "Kein Benutzer"
   no_users_found_64a043ff: "Keine Benutzer gefunden"
   no_users_were_selected_to_add_to_the_course_a51c6083: "Es wurden keine Benutzer für den Kurs ausgewählt."
   no_way_to_export_gradebooks_provided_b4c2939d: "Keine Möglichkeit zum Notenbuchexport vorgesehen!"
@@ -13102,6 +13120,7 @@ de:
   option_4_aec96b1f: Option 4
   option_index_6308524d: "Option %{index}"
   option_name_ba758e08: "%{option_name}"
+  optionally_include_a_byte_order_mark_in_gradebook__555cc605: "Sie können optional eine Byte-Order-Markierung mit dem Notenbuch exportieren, sodass sie für Benutzer in einigen Gebietsschemata nach Excel importiert werden können."
   options: 
     ? "no"
     : Nein
@@ -14716,6 +14735,7 @@ de:
   quiz_submission_dca0c013: Quizabgabe
   quiz_successfully_updated_ece5c63d: "Quiz erfolgreich aktualisiert"
   quiz_title_4b50ade9: Quiz-Titel
+  quiz_title_quiz_type_report_type_report_9350daf7: "%{quiz_title} %{quiz_type} %{report_type} Bericht"
   quiz_type_be1633db: Quiz-Typ
   quizzes: 
     alerts: 
@@ -16545,6 +16565,7 @@ de:
         current_enrollments: "Aktuelle Einschreibungen"
         decrosslist_section: "Zweiteintragung für diesen Abschnitt entfernen"
   sections_94731e51: Abschnitte
+  see_other_users_primary_email_address_59c8473f: "Siehe primäre E-Mail-Adressen anderer Benutzer"
   see_rubric_results_62a6447d: "Siehe Bewertungsschemaergebnisse"
   see_scoring_details_f7fd1f3b: "Bewertungsdetails ansehen"
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Sehen Sie sich einige LTI-Tools an*, die großartig mit Canvas zusammenarbeiten."
@@ -17443,6 +17464,7 @@ de:
   show_all_artifacts_34b91a83: "Alle Artefakte anzeigen"
   show_all_details_9879980c: "Alle Details zeigen"
   show_all_developerkeyscount_keys_63ef34ca: "Alle %{developerKeysCount} Schlüssel anzeigen"
+  show_all_keys_fa88c55c: "Alle Schlüssel anzeigen"
   show_all_sections_190203e8: "Alle Kursabschnitte zeigen"
   show_and_hide_courses_menu_9e09d1d0: "Kurs-Menü ein- und ausblenden"
   show_attendance_columns_4d160e16: "Anwesenheitsspalten anzeigen"
@@ -18209,6 +18231,7 @@ de:
       kann bei großen Kursen eine Weile dauern. Sie können die
       Seite verlassen. Sie werden benachrichtigt, wenn der Download
       abgeschlossen ist.
+  the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "Das System, das SIS-Importe verarbeitet, wurde für eine bessere Stabilität großer SIS-Importe umgestaltet. Die Funktionalität von SIS-Importen hat sich nicht geändert."
   the_error_stack_trace_if_there_is_one_b7e008a1: "Der Fehler-Stack-Trace, sollte es einen geben."
   the_field_field_is_required_56512820: "Das Feld „%{field}“ ist erforderlich."
   the_field_field_must_have_no_spaces_d1c2fc37: "Das Feld „%{field}“ darf keine Leerzeichen enthalten."
@@ -18377,6 +18400,7 @@ de:
   this_enables_users_to_generate_and_download_course_4c69c531: "Damit können Benutzer Kurs-ePub erzeugen und herunterladen."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Diese Funktion kann nicht deaktiviert werden, da sie bei mindestens einem Unterkonto oder Kurs aktiviert ist."
   this_feature_cannot_be_disabled_once_it_has_been_t_db7cc39e: "Diese Funktion lässt sich nicht deaktivieren, wenn sie einmal aktiviert wurde."
+  this_feature_enables_users_of_right_to_left_rtl_la_17bd0fae: "Diese Funktion ermöglicht es Benutzern mit RTL-Sprachen (Rechts-nach-Links), das RTL-Layout in Entwicklung zu sehen. Schließlich wird dies das Standardverhalten, und diese Option wird entfernt."
   this_feature_flag_is_something_an_account_can_turn_8467f6f7: "Dieses Funktions-Flag kann für ein Konto aktiviert werden, wenn Sie möchten, dass Benutzer dieses Kontos, die eine Sprache sprechen, die von rechts nach links geschrieben wird (z. B. Arabisch, Hebräisch, Farsi), das RTL-Layout sehen, während wir daran arbeiten. Sobald die Funktion „fertig“ ist, verschwindet dieses Funktions-Flag, und jeder, der eine dieser Sprachen spricht, kann die RTL-Schnittstelle sehen."
   this_field_is_required_fa58c4a: "Dieses Feld ist ein Pflichtfeld."
   this_field_name_is_required_988caebc: "Dieses Feld „%{name}“ ist ein Pflichtfeld."
@@ -18721,8 +18745,10 @@ de:
   to_date_cannot_come_before_from_date_3eeb2633: "Das „Bis-Datum“ darf nicht vor dem „Von-Datum“ liegen."
   to_do_1d554f36: "Zu erledigen"
   to_do_5526f10a: "Zu erledigen:"
+  to_do_date_ddfb582c: "Aufgabendatum:"
   to_do_items_loading_d1cdfcd5: "Zu erledigende Aufgaben werden geladen"
   to_do_list_dashboard_d741f64e: Aufgabenlisten-Dashboard
+  to_do_time_a7e17623: Aufgabenzeit
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Um den Kursbeobachter *%{name}* mit einem Studenten zu verknüpfen, geben Sie den Namen des Studenten unten ein, um ihn zu suchen und klicken dann auf „Aktualisieren“."
   to_minscore_43e5452e: "bis %{minScore}%"
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Um eine Diskussion oben auf der Seite anzuheften, ziehen Sie die Diskussion hierher, oder wählen Sie „Anheften“ aus dem Diskussionseinstellungen-Menü."
@@ -18765,6 +18791,7 @@ de:
   total_options_351e2682: "Optionen für Gesamt"
   total_range_45c8549a: "Bereich insgesamt"
   total_results_outcomedetails_cnt_30ff1f8d: "Gesamtergebnisse: %{outcomeDetails.cnt}"
+  totalcount_total_replies_b6988c0a: "%{totalCount} Antworten insgesamt"
   tours: 
     quiz_regrade: 
       got_it: "OK, verstanden"
@@ -18863,6 +18890,8 @@ de:
   unlock_date_cannot_be_before_course_start_9c7b8524: "Das Freigabedatum kann nicht vor dem Kursstart liegen."
   unlock_date_cannot_be_before_section_start_793ddc66: "Das Freigabedatum kann nicht vor dem Start des Kursabschnitts liegen."
   unlock_date_cannot_be_before_term_start_d3c01813: "Das Freigabedatum kann nicht vor dem Beginn des Semesters liegen."
+  unlock_discussion_title_failed_42a4252f: "Entsperren der Diskussion %{title} fehlgeschlagen"
+  unlock_discussion_title_succeeded_cd97847c: "Entsperren der Diskussion %{title} erfolgreich"
   unlock_f6196bf5: Entsperren
   unlock_module_on_date_17144fbd: "Modul freischalten am"
   unlock_selected_announcements_37485f05: "Ausgewählte Ankündigungen entsperren"
@@ -18872,6 +18901,8 @@ de:
   unmatched_login_list_283ca77: "Liste der nicht zugeordneten Anmeldungen"
   unmute_assignment_29a49038: "Aufgabe lautschalten"
   unnamed_account_id_e688ad87: "Unbenanntes Konto (%{id})"
+  unnamed_tool_961cb95b: "Unbenanntes Tool"
+  unnamed_tool_logo_410f37d0: "Unbenanntes Tool-Logo"
   unpin_a318452a: Lösen
   unpin_discussion_title_8c2a0942: "Lösen einer Diskussion %{title}"
   unpin_of_discussion_title_failed_852116d4: "Lösen der Diskussion %{title} fehlgeschlagen"
@@ -18895,6 +18926,7 @@ de:
   unpublished_courses_title: "Nicht veröffentlichte Kurse"
   unpublished_dfd8801: "nicht veröffentlicht"
   unread_e9c1b19c: Ungelesen
+  unreadcount_unread_replies_509e167f: "%{unreadCount} ungelesene Antworten"
   unregister_service_985238e9: "Service deregistrieren"
   unreserved_e86b7425: Frei
   unsafe_file_link_8a18eceb: "Unsichere Dateiverknüpfung"
@@ -19148,6 +19180,7 @@ de:
       profile: Profil
       settings: Einstellungen
   user_profile_picture_46bffbc7: Benutzerprofilbild
+  user_results_updated_9ce38dce: "Benutzerergebnisse aktualisiert."
   user_s_settings_d65644b4: "%{user}s Einstellungen"
   user_search_panel_18f80511: Benutzersuchbereich
   user_search_results_f5445b8b: "Ergebnisse der Benutzersuche"
@@ -19473,6 +19506,7 @@ de:
   view_grades_for_name_45aeb2f2: "Anzeigen der Noten für %{name}"
   view_grading_history_e64bb8fe: "Notenverlauf anzeigen"
   view_in_speedgrader_773b9d81: "In SpeedGrader ansehen"
+  view_login_ids_for_users_142bbe7a: "Anmelde-IDs für Benutzer anzeigen"
   view_longer_description_6b762087: "ausführliche Beschreibung anzeigen"
   view_name_app_62a2ad8e: "%{name}-App anzeigen"
   view_next_file_a8a4a885: "Nächste Datei anzeigen"
