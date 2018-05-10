@@ -77,6 +77,7 @@ class Enrollment < ActiveRecord::Base
   after_save :recalculate_enrollment_state
   after_save :add_to_favorites_later
   after_destroy :update_assignment_overrides_if_needed
+
   after_save -> { PipelineService.publish(self) }
 
   attr_accessor :already_enrolled, :need_touch_user, :skip_touch_user
