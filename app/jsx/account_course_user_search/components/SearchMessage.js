@@ -155,6 +155,7 @@ export default class SearchMessage extends Component {
                   key={pageNumber}
                   onClick={() => this.handleSetPage(pageNumber)}
                   current={isCurrent}
+                  aria-label={I18n.t('Page %{pageNum}', { pageNum: pageNumber })}
                 >
                     { isCurrent && this.state.pageBecomingCurrent ? (
                       <Spinner size="x-small" title={I18n.t('Loading...')} />
