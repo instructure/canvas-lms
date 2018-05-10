@@ -39,7 +39,7 @@ group :test do
       gem 'rainbow', '3.0.0', require: false
   gem 'rubocop-rspec', '1.22.2', require: false
 
-  gem 'once-ler', '0.1.3'
+  gem 'once-ler', '0.1.4'
 
   # Keep this gem synced with docker-compose/seleniumff/Dockerfile
   gem 'selenium-webdriver', '2.53.4'
