@@ -39,7 +39,7 @@ gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
 gem 'switchman', '1.11.2'
   gem 'open4', '1.3.4', require: false
-gem 'switchman-inst-jobs'
+gem 'switchman-inst-jobs', '1.1.1'
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
   gem 'will_paginate', '3.1.6', require: false
