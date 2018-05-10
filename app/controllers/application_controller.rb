@@ -825,7 +825,7 @@ class ApplicationController < ActionController::Base
           groups = @context.current_groups.shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current).to_a
         end
       end
-      groups.reject!{|g| g.context_type == "Course" && g.context.concluded?}
+      groups = @context.filter_visible_groups_for_user(groups)
 
       if opts[:favorites_first]
         favorite_course_ids = @context.favorite_context_ids("Course")

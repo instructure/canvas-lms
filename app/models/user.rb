@@ -632,11 +632,15 @@ class User < ActiveRecord::Base
   # Returns an array of groups which are currently visible for the user.
   def visible_groups
     @visible_groups ||= begin
-      enrollments = self.cached_current_enrollments(preload_dates: true, preload_courses: true)
-      self.current_groups.select do |group|
-        group.context_type != 'Course' || enrollments.any? do |en|
-          en.course == group.context && !(en.inactive? || en.completed?) && (en.admin? || en.course.available?)
-        end
+      filter_visible_groups_for_user(self.current_groups)
+    end
+  end
+
+  def filter_visible_groups_for_user(groups)
+    enrollments = self.cached_current_enrollments(preload_dates: true, preload_courses: true)
+    groups.select do |group|
+      group.context_type != 'Course' || enrollments.any? do |en|
+        en.course == group.context && !(en.inactive? || en.completed?) && (en.admin? || en.course.available?)
       end
     end
   end
