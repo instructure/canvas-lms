@@ -103,9 +103,9 @@ gem 'ritex', '1.0.1', require: false
 gem 'rotp', '3.3.1', require: false
 gem 'net-ldap', '0.16.1', require: false
 gem 'ruby-duration', '3.2.3', require: false
-gem 'ruby-saml-mod', '0.3.7'
+gem 'ruby-saml-mod', '0.3.8'
 gem 'saml2', '2.1.0'
-  gem 'nokogiri-xmlsec-instructure', '0.9.4', require: false
+  gem 'nokogiri-xmlsec-instructure', '0.9.6', require: false
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.2.1', require: 'zip'
 gem 'safe_yaml', '1.0.4', require: false
