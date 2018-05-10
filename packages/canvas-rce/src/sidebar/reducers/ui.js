@@ -52,15 +52,15 @@ function selectedTabIndex(state = 0, action) {
   }
 }
 
-function selectedAccordionIndex(state = 0, action) {
+function selectedAccordionIndex(state = "", action) {
   switch (action.type) {
     case RESET_UI:
-      return 0;
+      return "";
 
     case CHANGE_TAB:
       // switch links panel accordion tab back to first tab any time we
       // switch _back to_ links panel
-      return 0;
+      return "";
 
     case CHANGE_ACCORDION:
       return action.index;

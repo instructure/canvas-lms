@@ -119,7 +119,7 @@ Sidebar.propTypes = {
   hidden: PropTypes.bool,
   selectedTabIndex: PropTypes.number,
   onChangeTab: PropTypes.func,
-  selectedAccordionIndex: PropTypes.number,
+  selectedAccordionIndex: PropTypes.string,
   onChangeAccordion: PropTypes.func,
   contextType: PropTypes.string.isRequired,
   contextId: PropTypes.string.isRequired,
@@ -155,7 +155,7 @@ Sidebar.propTypes = {
 Sidebar.defaultProps = {
   hidden: false,
   selectedTabIndex: 0,
-  selectedAccordionIndex: 0,
+  selectedAccordionIndex: "",
   canUploadFiles: false,
   files: {},
   folders: {}
