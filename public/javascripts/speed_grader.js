@@ -220,8 +220,7 @@ utils = {
     var settingVal = userSettings.get("eg_hide_student_names");
     return settingVal === true ||
       settingVal === "true" ||
-      ENV.force_anonymous_grading ||
-      isAnonymousModeratedMarkingEnabled()
+      ENV.force_anonymous_grading
   }
 };
 

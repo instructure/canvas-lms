@@ -1441,7 +1441,7 @@ QUnit.module('SpeedGrader', function() {
     }
 
     anonymousHooks.beforeEach(() => {
-      fakeENV.setup({anonymous_moderated_marking_enabled: true})
+      fakeENV.setup({anonymous_moderated_marking_enabled: true, force_anonymous_grading: true})
       window.jsonData = windowJsonData
     })
 

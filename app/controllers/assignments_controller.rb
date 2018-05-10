@@ -173,7 +173,7 @@ class AssignmentsController < ApplicationController
         format.html do
           render locals: {
             eula_url: tool_eula_url,
-            show_moderation_link: @assignment.permits_moderation?(@current_user)
+            show_moderation_link: @assignment.moderated_grading? && @assignment.permits_moderation?(@current_user)
           }
         end
         format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}) }
