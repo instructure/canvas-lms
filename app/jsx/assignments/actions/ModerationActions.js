@@ -35,6 +35,8 @@ import _ from 'underscore'
     UPDATE_MODERATION_SET_FAILED: 'UPDATE_MODERATION_SET_FAILED',
     PUBLISHED_GRADES: 'PUBLISHED_GRADES',
     PUBLISHED_GRADES_FAILED: 'PUBLISHED_GRADES_FAILED',
+    UNMUTED: 'UNMUTED',
+    UNMUTED_FAILED: 'UNMUTED_FAILED',
     GOT_STUDENTS: 'GOT_STUDENTS',
     SORT_MARK1_COLUMN: 'SORT_MARK1_COLUMN',
     SORT_MARK2_COLUMN: 'SORT_MARK2_COLUMN',
@@ -172,6 +174,45 @@ import _ from 'underscore'
       };
     },
 
+    unmuteStarted () {
+      return {
+        type: this.ACTION_DISPATCHED,
+        payload: {
+          name: 'unmute'
+        }
+      };
+    },
+
+    unmuteFinished () {
+      return {
+        type: this.ACTION_RETURNED,
+        payload: {
+          name: 'unmute'
+        }
+      };
+    },
+
+    unmuted (message) {
+      return {
+        type: this.UNMUTED,
+        payload: {
+          message,
+          time: Date.now()
+        }
+      };
+    },
+
+    unmuteFailed (message) {
+      return {
+        type: this.UNMUTED_FAILED,
+        payload: {
+          message,
+          time: Date.now(),
+          error: true
+        },
+      };
+    },
+
     selectingProvisionalGradesFailed (message) {
       var error = new Error(message);
       error.time = Date.now();
@@ -225,6 +266,19 @@ import _ from 'underscore'
                    I18n.t('An error occurred publishing grades.');
                  dispatch(this.publishGradesFailed(message));
                });
+      };
+    },
+
+    unmuteAssignment (ajaxLib = axios) {
+      return (dispatch, getState) => {
+        const endpoint = getState().urls.unmute_assignment_url;
+        ajaxLib.put(endpoint)
+          .then((_response) => {
+            dispatch(this.unmuted(I18n.t('Success! Grades for this assignment are now visible to students.')));
+          })
+          .catch((_response) => {
+            dispatch(this.unmuteFailed(I18n.t('An error occurred updating the assignment.')));
+          });
       };
     },
 

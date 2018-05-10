@@ -268,27 +268,57 @@ describe AssignmentsController do
   end
 
   describe "GET 'show_moderate'" do
-    it "should set the js_env for URLS" do
+    before(:each) do
       user_session(@teacher)
-      assignment = @course.assignments.create(:title => "some assignment")
-      assignment.workflow_state = 'published'
-      assignment.moderated_grading = true
-      assignment.save!
-
-      get 'show_moderate', params: {:course_id => @course.id, :assignment_id => assignment.id}
-      expect(assigns[:js_env][:URLS][:student_submissions_url]).to eq "http://test.host/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submissions?include[]=user_summary&include[]=provisional_grades"
-      expect(assigns[:js_env][:URLS][:provisional_grades_base_url]).to eq "http://test.host/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/provisional_grades"
     end
 
-    it "should set the js_env for ASSIGNMENT_TITLE" do
-      user_session(@teacher)
-      assignment = @course.assignments.create(:title => "some assignment")
-      assignment.workflow_state = 'published'
-      assignment.moderated_grading = true
-      assignment.save!
+    let(:assignment) do
+      @course.assignments.create(
+        title: 'some assignment',
+        workflow_state: 'published',
+        moderated_grading: true
+      )
+    end
 
-      get 'show_moderate', params: {:course_id => @course.id, :assignment_id => assignment.id}
+    describe 'js_env for URLS' do
+      let(:urls) { assigns[:js_env][:URLS] }
+
+      it 'sets student_submissions_url' do
+        get 'show_moderate', params: {course_id: @course.id, assignment_id: assignment.id}
+        expect(urls[:student_submissions_url]).to eq "http://test.host/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submissions?include[]=user_summary&include[]=provisional_grades"
+      end
+
+      it 'sets provisional_grades_base_url' do
+        get 'show_moderate', params: {course_id: @course.id, assignment_id: assignment.id}
+        expect(urls[:provisional_grades_base_url]).to eq "http://test.host/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/provisional_grades"
+      end
+
+      it 'sets unmute_assignment_url' do
+        get 'show_moderate', params: {course_id: @course.id, assignment_id: assignment.id}
+        expect(urls[:unmute_assignment_url]).to eq "http://test.host/courses/#{@course.id}/assignments/#{assignment.id}/mute?status=false"
+      end
+    end
+
+    it "sets the js_env for ASSIGNMENT_TITLE" do
+      get 'show_moderate', params: {course_id: @course.id, assignment_id: assignment.id}
       expect(assigns[:js_env][:ASSIGNMENT_TITLE]).to eq "some assignment"
+    end
+
+    describe "js_env for ANONYMOUS_MODERATED_MARKING_ENABLED" do
+      let(:anonymous_moderated_marking_enabled) { assigns[:js_env][:ANONYMOUS_MODERATED_MARKING_ENABLED] }
+
+      it 'is set to true when Anonymous Moderated Marking is enabled' do
+        assignment.root_account.enable_feature!(:anonymous_moderated_marking)
+        assignment.update!(grader_count: 1, final_grader: @teacher)
+
+        get 'show_moderate', params: {course_id: @course.id, assignment_id: assignment.id}
+        expect(anonymous_moderated_marking_enabled).to be true
+      end
+
+      it 'is set to false when Anonymous Moderated Marking is not enabled' do
+        get 'show_moderate', params: {course_id: @course.id, assignment_id: assignment.id}
+        expect(anonymous_moderated_marking_enabled).to be false
+      end
     end
 
     describe 'permissions' do

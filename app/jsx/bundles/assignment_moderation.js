@@ -34,9 +34,12 @@ const store = configureStore({
   },
   inflightAction: {
     review: false,
-    publish: false
+    publish: false,
+    unmute: false
   },
   assignment: {
+    anonymousModeratedMarkingEnabled: window.ENV.ANONYMOUS_MODERATED_MARKING_ENABLED,
+    muted: window.ENV.ASSIGNMENT_MUTED,
     published: window.ENV.GRADES_PUBLISHED,
     title: window.ENV.ASSIGNMENT_TITLE,
     course_id: window.ENV.COURSE_ID,

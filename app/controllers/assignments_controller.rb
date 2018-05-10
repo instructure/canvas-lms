@@ -193,6 +193,8 @@ class AssignmentsController < ApplicationController
 
     can_edit_grades = @context.grants_right?(@current_user, :manage_grades)
     js_env({
+      ANONYMOUS_MODERATED_MARKING_ENABLED: @assignment.root_account.feature_enabled?(:anonymous_moderated_marking),
+      ASSIGNMENT_MUTED: @assignment.muted?,
       ASSIGNMENT_TITLE: @assignment.title,
       GRADES_PUBLISHED: @assignment.grades_published?,
       COURSE_ID: @context.id,
@@ -204,6 +206,7 @@ class AssignmentsController < ApplicationController
       URLS: {
         student_submissions_url: polymorphic_url([:api_v1, @context, @assignment, :submissions]) + "?include[]=user_summary&include[]=provisional_grades",
         publish_grades_url: api_v1_publish_provisional_grades_url({course_id: @context.id, assignment_id: @assignment.id}),
+        unmute_assignment_url: course_assignment_mute_url(course_id: @context.id, assignment_id: @assignment.id, status: 'false'),
         list_gradeable_students: api_v1_course_assignment_gradeable_students_url({course_id: @context.id, assignment_id: @assignment.id}) + "?include[]=provisional_grades&per_page=50",
         add_moderated_students: api_v1_add_moderated_students_url({course_id: @context.id, assignment_id: @assignment.id}),
         assignment_speedgrader_url: speed_grader_course_gradebook_url({course_id: @context.id, assignment_id: @assignment.id}),
