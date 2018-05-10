@@ -1313,6 +1313,10 @@ CanvasRails::Application.routes.draw do
         put 'users/:user_id/observer_alert_thresholds/:observer_alert_threshold_id', action: :update
         delete 'users/:user_id/observer_alert_thresholds/:observer_alert_threshold_id', action: :destroy
       end
+
+      scope(controller: :observer_alerts_api) do
+        get 'users/:user_id/observer_alerts/:student_id', action: :alerts_by_student, as: 'observer_alerts_by_student'
+      end
     end
 
     scope(controller: :custom_data) do

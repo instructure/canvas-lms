@@ -17,7 +17,7 @@
 #
 
 module Factories
-  def observer_alert_threshold_model(opts = {})
+  def observer_alert_model(opts = {})
     if opts[:uol]
       @observation_link = opts[:uol]
     else
@@ -26,14 +26,25 @@ module Factories
       @observation_link = UserObservationLink.create!(user_id: @observee, observer_id: @observer)
     end
 
-    valid_attrs = [:alert_type, :threshold, :workflow_state]
+    valid_attrs = [:title, :alert_type, :workflow_state, :action_date]
     default_attrs = {
+      title: 'value for type',
       alert_type: 'value for type',
-      threshold: nil,
       workflow_state: 'active',
+      action_date: Time.zone.now
     }
 
     attrs = default_attrs.deep_merge(opts.slice(*valid_attrs))
-    @observer_alert_threshold = @observation_link.observer_alert_thresholds.create(attrs)
+
+    if opts[:oat_id]
+      attrs[:observer_alert_threshold_id] = opts[:oat_id]
+    else
+      @observer_alert_threshold = observer_alert_threshold_model(opts)
+      attrs[:observer_alert_threshold_id] = @observer_alert_threshold.id
+    end
+
+    attrs[:context] = opts[:context] || nil
+
+    @observer_alert = @observation_link.observer_alerts.create(attrs)
   end
 end
