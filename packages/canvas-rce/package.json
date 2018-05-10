@@ -137,9 +137,6 @@
     "tinymce": "^4.5.7",
     "tinymce-light-skin": "~1.3.0"
   },
-  "peerDependencies": {
-    "babel-polyfill": "^6.7.4"
-  },
   "devDependencies": {
     "@instructure/ui-presets": "^5.8.1",
     "babel-cli": "^6.22.2",
@@ -151,7 +148,6 @@
     "babel-plugin-minify-dead-code-elimination": "^0.4.1",
     "babel-plugin-minify-guarded-expressions": "^0.4.1",
     "babel-plugin-transform-inline-environment-variables": "^0.4.1",
-    "babel-polyfill": "^6.7.4",
     "cross-env": "^5.0.0",
     "eslint": "^4.19.1",
     "eslint-config-prettier": "^2.9.0",
