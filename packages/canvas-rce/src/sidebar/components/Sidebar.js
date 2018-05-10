@@ -19,10 +19,10 @@
 import PropTypes from "prop-types";
 
 import React, { Component } from "react";
-import TabList from "@instructure/ui-core/lib/components/TabList";
-import TabPanel from "@instructure/ui-core/lib/components/TabList/TabPanel";
+import TabList from "@instructure/ui-tabs/lib/components/TabList";
+import TabPanel from "@instructure/ui-tabs/lib/components/TabList/TabPanel";
 import Tab from "@instructure/ui-core/lib/components/TabList/Tab";
-import ApplyTheme from "@instructure/ui-core/lib/components/ApplyTheme";
+import ApplyTheme from "@instructure/ui-themeable/lib/components/ApplyTheme";
 import LinksPanel from "./LinksPanel";
 import FilesPanel from "./FilesPanel";
 import ImagesPanel from "./ImagesPanel";

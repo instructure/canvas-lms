@@ -22,7 +22,9 @@ import CanvasRce from "../src/rce/CanvasRce";
 import * as fakeSource from "../src/sidebar/sources/fake";
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
-import { Button, Select, TextInput } from "@instructure/ui-core/lib/components";
+import Button from "@instructure/ui-buttons/lib/components/Button";
+import Select from "@instructure/ui-core/lib/components/Select";
+import TextInput from "@instructure/ui-forms/lib/components/TextInput";
 import Url from "url";
 
 function getProps(textareaId, language = "en") {

@@ -113,6 +113,29 @@
     keycode "^2.1.8"
     prop-types "^15.5.10"
 
+"@instructure/ui-billboard@^5.8.1":
+  version "5.8.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-billboard/-/ui-billboard-5.8.1.tgz#ba9e5d9c8e7e2a55f0e12876493754a7c9736af3"
+  dependencies:
+    "@instructure/ui-elements" "^5.8.1"
+    "@instructure/ui-layout" "^5.8.1"
+    "@instructure/ui-themeable" "^5.8.1"
+    "@instructure/ui-utils" "^5.8.1"
+    classnames "^2.2.5"
+    prop-types "^15.5.10"
+
+"@instructure/ui-breadcrumb@^5.8.1":
+  version "5.8.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-breadcrumb/-/ui-breadcrumb-5.8.1.tgz#57f849dcf827e39f7d972402be9c6e339a483b77"
+  dependencies:
+    "@instructure/ui-elements" "^5.8.1"
+    "@instructure/ui-icons" "^5.8.1"
+    "@instructure/ui-layout" "^5.8.1"
+    "@instructure/ui-themeable" "^5.8.1"
+    "@instructure/ui-utils" "^5.8.1"
+    classnames "^2.2.5"
+    prop-types "^15.5.10"
+
 "@instructure/ui-buttons@^5.8.1":
   version "5.8.1"
   resolved "https://registry.yarnpkg.com/@instructure/ui-buttons/-/ui-buttons-5.8.1.tgz#ff6bb4cc5e0395cea1a4a9d8aba884b7da6782c6"
@@ -135,7 +158,7 @@
     classnames "^2.2.5"
     prop-types "^15.5.10"
 
-"@instructure/ui-core@^4.1.0", "@instructure/ui-core@^4.7.3", "@instructure/ui-core@^4.8.0":
+"@instructure/ui-core@^4.7.3", "@instructure/ui-core@^4.8.0":
   version "4.8.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-core/-/ui-core-4.8.0.tgz#fb32698507f52fd77bb471c199018c1e8671d57b"
   dependencies:
@@ -149,6 +172,36 @@
     keycode "^2.1.8"
     no-scroll "^2.1.0"
     numeral "^2.0.6"
+    prop-types "^15.5.10"
+
+"@instructure/ui-core@^5.8.1":
+  version "5.8.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-core/-/ui-core-5.8.1.tgz#6639fd1f622de607de8b1744ab479a3ab8170a89"
+  dependencies:
+    "@instructure/ui-a11y" "^5.8.1"
+    "@instructure/ui-alerts" "^5.8.1"
+    "@instructure/ui-billboard" "^5.8.1"
+    "@instructure/ui-breadcrumb" "^5.8.1"
+    "@instructure/ui-buttons" "^5.8.1"
+    "@instructure/ui-container" "^5.8.1"
+    "@instructure/ui-elements" "^5.8.1"
+    "@instructure/ui-forms" "^5.8.1"
+    "@instructure/ui-i18n" "^5.8.1"
+    "@instructure/ui-icons" "^5.8.1"
+    "@instructure/ui-layout" "^5.8.1"
+    "@instructure/ui-menu" "^5.8.1"
+    "@instructure/ui-motion" "^5.8.1"
+    "@instructure/ui-overlays" "^5.8.1"
+    "@instructure/ui-pagination" "^5.8.1"
+    "@instructure/ui-portal" "^5.8.1"
+    "@instructure/ui-tabs" "^5.8.1"
+    "@instructure/ui-themeable" "^5.8.1"
+    "@instructure/ui-toggle-details" "^5.8.1"
+    "@instructure/ui-tree-browser" "^5.8.1"
+    "@instructure/ui-utils" "^5.8.1"
+    classnames "^2.2.5"
+    keycode "^2.1.8"
+    no-scroll "^2.1.0"
     prop-types "^15.5.10"
 
 "@instructure/ui-elements@^5.8.1":
@@ -252,6 +305,18 @@
     no-scroll "^2.1.0"
     prop-types "^15.5.10"
 
+"@instructure/ui-pagination@^5.8.1":
+  version "5.8.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-pagination/-/ui-pagination-5.8.1.tgz#666ebf25ab6ead447ac6554ef1a7da9c3faf562c"
+  dependencies:
+    "@instructure/ui-buttons" "^5.8.1"
+    "@instructure/ui-elements" "^5.8.1"
+    "@instructure/ui-icons" "^5.8.1"
+    "@instructure/ui-layout" "^5.8.1"
+    "@instructure/ui-themeable" "^5.8.1"
+    "@instructure/ui-utils" "^5.8.1"
+    prop-types "^15.5.10"
+
 "@instructure/ui-portal@^5.8.1":
   version "5.8.1"
   resolved "https://registry.yarnpkg.com/@instructure/ui-portal/-/ui-portal-5.8.1.tgz#9349bf05a428034d338ffb5c37f361f60577b5da"
@@ -266,6 +331,18 @@
     "@instructure/ui-themeable" "^5.8.1"
     "@instructure/ui-utils" "^5.8.1"
     classnames "^2.2.5"
+    prop-types "^15.5.10"
+
+"@instructure/ui-tabs@^5.8.1":
+  version "5.8.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-tabs/-/ui-tabs-5.8.1.tgz#3f87e5618e4f7f878f53c3470e33d1fca75a5ecd"
+  dependencies:
+    "@instructure/ui-layout" "^5.8.1"
+    "@instructure/ui-motion" "^5.8.1"
+    "@instructure/ui-themeable" "^5.8.1"
+    "@instructure/ui-utils" "^5.8.1"
+    classnames "^2.2.5"
+    keycode "^2.1.8"
     prop-types "^15.5.10"
 
 "@instructure/ui-themeable@^4.8.0":
@@ -306,6 +383,17 @@
     "@instructure/ui-themeable" "^5.8.1"
     "@instructure/ui-utils" "^5.8.1"
     classnames "^2.2.5"
+    prop-types "^15.5.10"
+
+"@instructure/ui-tree-browser@^5.8.1":
+  version "5.8.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-tree-browser/-/ui-tree-browser-5.8.1.tgz#11bb1d907e1b797f7b30362504d4aa0b0d6148fa"
+  dependencies:
+    "@instructure/ui-icons" "^5.8.1"
+    "@instructure/ui-themeable" "^5.8.1"
+    "@instructure/ui-utils" "^5.8.1"
+    classnames "^2.2.5"
+    keycode "^2.1.8"
     prop-types "^15.5.10"
 
 "@instructure/ui-utils@^4.8.0":
@@ -2336,15 +2424,21 @@ caniuse-lite@^1.0.30000792, caniuse-lite@^1.0.30000805, caniuse-lite@^1.0.300008
 "canvas-rce@file:./packages/canvas-rce/canvas":
   version "3.1.1"
   dependencies:
-    "@instructure/ui-core" "^4.1.0"
+    "@instructure/ui-a11y" "^5.8.1"
+    "@instructure/ui-buttons" "^5.8.1"
+    "@instructure/ui-core" "^5.8.1"
+    "@instructure/ui-elements" "^5.8.1"
+    "@instructure/ui-forms" "^5.8.1"
+    "@instructure/ui-icons" "^5.8.1"
     "@instructure/ui-layout" "^5.8.1"
+    "@instructure/ui-tabs" "^5.8.1"
+    "@instructure/ui-themeable" "^5.8.1"
     "@instructure/ui-themes" "^5.8.1"
     "@instructure/ui-toggle-details" "^5.8.1"
     aphrodite "^1.1.0"
     bloody-offset "0.0.0"
     format-message "^5.1.0"
     format-message-generate-id "^5.1.0"
-    instructure-icons "3 || 4"
     isomorphic-fetch "2.2.1"
     prop-types "^15"
     react "^0.14.8 || ^15.0.0"
@@ -5845,7 +5939,7 @@ install@~0.1.7:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/install/-/install-0.1.8.tgz#9980ef93e30dfb534778d163bc86ddd472ad5fe8"
 
-"instructure-icons@3 || 4", instructure-icons@4.x, instructure-icons@^4, instructure-icons@^4.3.0, instructure-icons@^4.3.1:
+instructure-icons@4.x, instructure-icons@^4, instructure-icons@^4.3.0, instructure-icons@^4.3.1:
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/instructure-icons/-/instructure-icons-4.3.2.tgz#bdcd677ba39c4cac9d2bd80cab6638336a2ab9cd"
   dependencies:

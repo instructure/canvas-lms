@@ -23,9 +23,9 @@ import File from "./File";
 import Loading from "../Loading";
 import { css } from "aphrodite";
 import styles from "./styles";
-import IconMiniArrowDownLine from "instructure-icons/lib/Line/IconMiniArrowDownLine";
-import IconMiniArrowRightLine from "instructure-icons/lib/Line/IconMiniArrowRightLine";
-import IconFolderLine from "instructure-icons/lib/Line/IconFolderLine";
+import IconMiniArrowDownLine from "@instructure/ui-icons/lib/Line/IconMiniArrowDown";
+import IconMiniArrowRightLine from "@instructure/ui-icons/lib/Line/IconMiniArrowRight";
+import IconFolderLine from "@instructure/ui-icons/lib/Line/IconFolder";
 
 export default class Folder extends Component {
   handleToggle = () => {

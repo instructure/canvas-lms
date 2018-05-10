@@ -20,7 +20,7 @@ import React, { Component } from "react";
 import { number, string, shape, func } from "prop-types";
 import { css } from "aphrodite";
 import styles from "./styles";
-import IconDocumentLine from "instructure-icons/lib/Line/IconDocumentLine";
+import IconDocumentLine from "@instructure/ui-icons/lib/Line/IconDocument";
 
 export default class File extends Component {
   handleSelect = () => {
