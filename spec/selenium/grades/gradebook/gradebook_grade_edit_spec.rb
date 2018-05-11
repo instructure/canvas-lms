@@ -248,6 +248,50 @@ describe "editing grades" do
     expect_flash_message :error, "refresh"
   end
 
+  context "for a moderated assignment" do
+    before(:each) do
+      # turn on the moderation flag
+      Account.default.enable_feature!(:anonymous_moderated_marking)
+      Account.default.enable_feature!(:anonymous_marking)
+
+      # create 1 teacher
+      @teacher_one = user_factory(active_all: true)
+      @course.enroll_teacher(
+        @teacher_one,
+        enrollment_state: 'active'
+      )
+
+      now = Time.zone.now
+      # create a moderated assignment
+      @moderated_assignment = @course.assignments.create!(
+        title: 'Moderated Assignment',
+        submission_types: 'online_text_entry',
+        grader_count: 1,
+        final_grader: @teacher_one,
+        due_at: 1.week.from_now(now),
+        moderated_grading: true,
+        points_possible: 10
+      )
+
+      user_session(@teacher_one)
+      grade_page.visit_gradebook(@course)
+    end
+
+    it "is not allowed until grades are posted", priority: "1", test_id: 3492444 do
+      grade_page.cell_click(3, 0)
+      expect(grade_page.grading_cell_attributes(3, 0).attribute("class")).to include "cannot_edit"
+      expect(grade_page.cell_tooltip(3, 0).text).to eq("Moderated Assignment")
+    end
+
+    it "is allowed if grades are posted ",priority: "1", test_id: 3492444 do
+      @moderated_assignment.update!(grades_published_at: Time.zone.now)
+      @moderated_assignment.unmute!
+      refresh_page
+      grade_page.enter_grade("20000", 3, 0)
+      expect(grade_page.cell_graded?("20,000", 3, 0)).to be true
+    end
+  end
+
   context 'with grading periods' do
     before(:once) do
       root_account = @course.root_account = Account.default
