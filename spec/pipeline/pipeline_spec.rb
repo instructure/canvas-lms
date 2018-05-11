@@ -51,18 +51,16 @@ describe 'pipeline service' do
 
   context "Submission" do
     before do
+      ENV['PIPELINE_ENDPOINT']  = 'https://example.com'
+      ENV['PIPELINE_USER_NAME'] = 'example_user'
+      ENV['PIPELINE_PASSWORD']  = 'example_password'
+      ENV['CANVAS_DOMAIN']      = 'someschool.com'
+
       @user       = User.create!
       @course     = Course.create!
       @enrollment = StudentEnrollment.new(valid_enrollment_attributes)
       @enrollment.save
       @enrollment.update(workflow_state: 'completed')
-    end
-
-    before do
-      ENV['PIPELINE_ENDPOINT']  = 'https://example.com'
-      ENV['PIPELINE_USER_NAME'] = 'example_user'
-      ENV['PIPELINE_PASSWORD']  = 'example_password'
-      ENV['CANVAS_DOMAIN']      = 'someschool.com'
     end
 
     it do
@@ -73,6 +71,16 @@ describe 'pipeline service' do
       ).call
     end
 
-  end
+    it 'will use the enrollment type with hashes' do
+      ENV['SYNCHRONOUS_PIPELINE_JOBS'] = 'true'
+      expect(endpoint).to receive(:new).with(hash_including(object: @enrollment))
 
+      PipelineService::Commands::Publish.new(
+        object: { id: @enrollment.id },
+        endpoint: endpoint
+      ).call
+
+      ENV['SYNCHRONOUS_PIPELINE_JOBS'] = nil
+    end
+  end
 end
