@@ -2753,7 +2753,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def permits_moderation?(user)
-    if root_account.feature_enabled?(:anonymous_moderated_marking)
+    if anonymous_moderated_marking?
       final_grader_id == user.id || context.account_membership_allows(user, :select_final_grade)
     else
       context.grants_right?(user, :moderate_grades)
@@ -2781,6 +2781,33 @@ class Assignment < ActiveRecord::Base
     return max_course_count if grader_count.blank?
 
     [grader_count, max_course_count].max
+  end
+
+  def can_view_other_grader_identities?(user)
+    return false unless context.grants_any_right?(user, :manage_grades, :view_all_grades)
+    return true unless anonymous_moderated_marking? && moderated_grading?
+
+    return grader_names_visible_to_final_grader? if final_grader_id == user.id
+    return true if context.account_membership_allows(user, :select_final_grade)
+    return false unless grader_comments_visible_to_graders?
+
+    !(anonymous_grading? && graders_anonymous_to_graders?)
+  end
+
+  def can_view_other_grader_comments?(user)
+    return false unless context.grants_any_right?(user, :manage_grades, :view_all_grades)
+    return true unless anonymous_moderated_marking? && moderated_grading?
+
+    return true if final_grader_id == user.id || context.account_membership_allows(user, :select_final_grade)
+
+    grader_comments_visible_to_graders?
+  end
+
+  def can_view_student_names?(user)
+    return false unless context.grants_any_right?(user, :manage_grades, :view_all_grades)
+    return true unless anonymous_moderated_marking?
+
+    !anonymous_grading?
   end
 
   private
@@ -2853,7 +2880,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def anonymous_moderated_marking?
-    course.root_account.feature_enabled?(:anonymous_moderated_marking)
+    root_account.feature_enabled?(:anonymous_moderated_marking)
   end
 
   def clear_moderated_grading_attributes(assignment)
