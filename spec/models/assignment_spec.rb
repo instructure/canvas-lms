@@ -1457,6 +1457,81 @@ describe Assignment do
         expect(@assignment.submissions.first.graded_anonymously).to be_truthy
       end
     end
+
+    context 'for a moderated assignment with Anonymous Moderated Marking enabled' do
+      before(:once) do
+        @course.root_account.enable_feature!(:anonymous_moderated_marking)
+        student_in_course
+        teacher_in_course
+        @first_teacher = @teacher
+
+        teacher_in_course
+        @second_teacher = @teacher
+
+        assignment_model(course: @course, moderated_grading: true, grader_count: 2)
+      end
+
+      it 'allows addition of provisional graders up to the set grader count' do
+        @assignment.grade_student(@student, grader: @first_teacher, provisional: true, score: 1)
+        @assignment.grade_student(@student, grader: @second_teacher, provisional: true, score: 2)
+
+        expect(@assignment.moderation_graders).to have(2).items
+      end
+
+      it 'does not allow provisional graders beyond the set grader count' do
+        @assignment.grade_student(@student, grader: @first_teacher, provisional: true, score: 1)
+        @assignment.grade_student(@student, grader: @second_teacher, provisional: true, score: 2)
+
+        teacher_in_course
+        @superfluous_teacher = @teacher
+
+        expect { @assignment.grade_student(@student, grader: @superfluous_teacher, provisional: true, score: 2) }.
+          to raise_error(Assignment::GradeError, 'Maximum number of graders reached')
+      end
+
+      it 'allows the same grader to re-grade an assignment' do
+        @assignment.grade_student(@student, grader: @first_teacher, provisional: true, score: 1)
+
+        expect(@assignment.moderation_graders).to have(1).item
+      end
+
+      it 'creates at most one entry per grader' do
+        first_student = @student
+
+        student_in_course
+        second_student = @student
+
+        @assignment.grade_student(first_student, grader: @first_teacher, provisional: true, score: 1)
+        @assignment.grade_student(second_student, grader: @first_teacher, provisional: true, score: 2)
+
+        expect(@assignment.moderation_graders).to have(1).item
+      end
+
+      context 'with a final grader' do
+        before(:once) do
+          teacher_in_course(active_all: true)
+          @final_grader = @teacher
+
+          @assignment.update!(final_grader: @final_grader)
+        end
+
+        it 'allows the moderator to issue a grade regardless of the current grader count' do
+          @assignment.grade_student(@student, grader: @first_teacher, provisional: true, score: 1)
+          @assignment.grade_student(@student, grader: @second_teacher, provisional: true, score: 2)
+          @assignment.grade_student(@student, grader: @final_grader, provisional: true, score: 10)
+
+          expect(@assignment.moderation_graders).to have(3).items
+        end
+
+        it 'excludes the moderator from the current grader count when considering provisional graders' do
+          @assignment.grade_student(@student, grader: @final_grader, provisional: true, score: 10)
+          @assignment.grade_student(@student, grader: @first_teacher, provisional: true, score: 1)
+          @assignment.grade_student(@student, grader: @second_teacher, provisional: true, score: 2)
+
+          expect(@assignment.moderation_graders).to have(3).items
+        end
+      end
+    end
   end
 
   describe "#all_context_module_tags" do
@@ -1616,6 +1691,90 @@ describe Assignment do
       submission = @assignment.submissions.first
       comment = submission.submission_comments.first
       expect(comment).not_to be_hidden
+    end
+
+    context 'for moderated assignments with Anonymous Moderated Marking enabled' do
+      before(:once) do
+        @assignment.root_account.enable_feature!(:anonymous_moderated_marking)
+
+        teacher_in_course
+        @first_teacher = @teacher
+
+        teacher_in_course
+        @second_teacher = @teacher
+
+        assignment_model(course: @course, moderated_grading: true, grader_count: 2)
+      end
+
+      let(:submission) { @assignment.submissions.first }
+
+      it 'allows graders to submit comments up to the set grader count' do
+        @assignment.update_submission(@student, commenter: @first_teacher, comment: 'hi', provisional: true)
+        @assignment.update_submission(@student, commenter: @second_teacher, comment: 'hi', provisional: true)
+
+        expect(@assignment.moderation_graders).to have(2).items
+      end
+
+      it 'does not allow graders to comment beyond the set grader count' do
+        @assignment.update_submission(@student, commenter: @first_teacher, comment: 'hi', provisional: true)
+        @assignment.update_submission(@student, commenter: @second_teacher, comment: 'hi', provisional: true)
+
+        teacher_in_course
+        @superfluous_teacher = @teacher
+
+        expect { @assignment.update_submission(@student, commenter: @superfluous_teacher, comment: 'hi', provisional: true) }.
+          to raise_error(Assignment::GradeError, 'Maximum number of graders reached')
+      end
+
+      it 'allows the same grader to issue multiple comments' do
+        @assignment.update_submission(@student, commenter: @first_teacher, comment: 'hi', provisional: true)
+
+        expect(@assignment.moderation_graders).to have(1).item
+      end
+
+      it 'creates at most one entry per grader' do
+        first_student = @student
+
+        student_in_course
+        second_student = @student
+
+        @assignment.update_submission(first_student, commenter: @first_teacher, comment: 'hi', provisional: true)
+        @assignment.update_submission(second_student, commenter: @first_teacher, comment: 'hi', provisional: true)
+
+        expect(@assignment.moderation_graders).to have(1).item
+      end
+
+      it 'creates at most one entry when a grader both grades and comments' do
+        @assignment.update_submission(@student, commenter: @first_teacher, comment: 'hi', provisional: true)
+        @assignment.grade_student(@student, grader: @first_teacher, provisional: true, score: 10)
+
+        expect(@assignment.moderation_graders).to have(1).item
+      end
+
+      context 'with a final grader' do
+        before(:once) do
+          teacher_in_course(active_all: true)
+          @final_grader = @teacher
+
+          @assignment.update!(final_grader: @final_grader)
+        end
+
+        it 'allows the moderator to comment regardless of the current grader count' do
+          @assignment.update_submission(@student, commenter: @first_teacher, comment: 'hi', provisional: true)
+          @assignment.update_submission(@student, commenter: @second_teacher, comment: 'hi', provisional: true)
+          @assignment.update_submission(@student, commenter: @final_grader, comment: 'hi', provisional: true)
+
+          expect(@assignment.moderation_graders).to have(3).items
+        end
+
+        it 'excludes the moderator from the current grader count when considering provisional graders' do
+          @assignment.update_submission(@student, commenter: @final_grader, comment: 'hi', provisional: true)
+          @assignment.update_submission(@student, commenter: @first_teacher, comment: 'hi', provisional: true)
+          @assignment.update_submission(@student, commenter: @second_teacher, comment: 'hi', provisional: true)
+
+          expect(@assignment.moderation_graders).to have(3).items
+        end
+      end
     end
   end
 
@@ -5717,6 +5876,7 @@ describe Assignment do
       a.submission_types = 'not_graded'
       expect(a).not_to be_valid
     end
+
   end
 
   describe "context_module_tag_info" do

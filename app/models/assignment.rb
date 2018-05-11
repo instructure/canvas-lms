@@ -1519,13 +1519,15 @@ class Assignment < ActiveRecord::Base
     submissions = []
     grade_group_students = !(grade_group_students_individually || opts[:excused])
 
-    if grade_group_students
-      find_or_create_submissions(students) do |submission|
+    ensure_grader_can_adjudicate(grader: opts[:grader], provisional: opts[:provisional]) do
+      if grade_group_students
+        find_or_create_submissions(students) do |submission|
+          submissions << save_grade_to_submission(submission, original_student, group, opts)
+        end
+      else
+        submission = find_or_create_submission(original_student)
         submissions << save_grade_to_submission(submission, original_student, group, opts)
       end
-    else
-      submission = find_or_create_submission(original_student)
-      submissions << save_grade_to_submission(submission, original_student, group, opts)
     end
 
     submissions.compact
@@ -1730,14 +1732,16 @@ class Assignment < ActiveRecord::Base
       opts[:assessment_request].complete unless opts[:assessment_request].rubric_association
     end
 
-    if opts[:comment] && Canvas::Plugin.value_to_boolean(opts[:group_comment])
-      uuid = CanvasSlug.generate_securish_uuid
-      res = find_or_create_submissions(students) do |submission|
-        save_comment_to_submission(submission, group, opts, uuid)
+    ensure_grader_can_adjudicate(grader: opts[:commenter], provisional: opts[:provisional]) do
+      if opts[:comment] && Canvas::Plugin.value_to_boolean(opts[:group_comment])
+        uuid = CanvasSlug.generate_securish_uuid
+        res = find_or_create_submissions(students) do |submission|
+          save_comment_to_submission(submission, group, opts, uuid)
+        end
+      else
+        submission = find_or_create_submission(original_student)
+        res << save_comment_to_submission(submission, group, opts)
       end
-    else
-      submission = find_or_create_submission(original_student)
-      res << save_comment_to_submission(submission, group, opts)
     end
     res
   end
@@ -1856,6 +1860,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def student_needs_provisional_grade?(student, preloaded_counts=nil)
+    # For Anonymous Moderated Marking, we aren't concerned with the assignment's
+    # moderation set or the hard-coded provisional grade limit.  Instead we
+    # check (elsewhere) that we're below the assignment's max grader count.
+    return true if anonymous_moderated_marking?
+
     pg_count = if preloaded_counts
       preloaded_counts[student.id] || 0
     else
@@ -2886,5 +2895,55 @@ class Assignment < ActiveRecord::Base
   def clear_moderated_grading_attributes(assignment)
     assignment.final_grader_id = nil
     assignment.grader_count = nil
+  end
+
+  def create_moderation_grader_if_needed(grader:)
+    return false if moderation_graders.where(user: grader).exists?
+
+    if provisional_moderation_graders.count >= grader_count
+      raise GradeError, 'Maximum number of graders reached' unless grader.id == final_grader_id
+    end
+
+    existing_anonymous_ids = moderation_graders.pluck(:anonymous_id)
+    new_anonymous_id = Anonymity.generate_id(existing_ids: existing_anonymous_ids)
+    moderation_graders.create!(user: grader, anonymous_id: new_anonymous_id)
+
+    true
+  end
+
+  def provisional_moderation_graders
+    if final_grader_id.present?
+      moderation_graders.where.not(user_id: final_grader_id)
+    else
+      moderation_graders
+    end
+  end
+
+  # This is a helper method intended to ensure the number of provisional graders
+  # for a moderated assignment (if Anonymous Moderated Marking is enabled) doesn't
+  # exceed the prescribed maximum. Currently, it is used for submitting grades and
+  # comments via SpeedGrader. If the assignment is not moderated, the grade/comment
+  # being issued is not provisional, or Anonymous Moderated Marking is off, this
+  # method will simply execute the provided block without any additional checks.
+  def ensure_grader_can_adjudicate(grader:, provisional: false)
+    unless provisional && moderated_grading? && anonymous_moderated_marking?
+      yield and return
+    end
+
+    Assignment.transaction do
+      # If we can't add a new grader, this will raise an error and abort
+      # the transaction.
+      added_moderation_grader = create_moderation_grader_if_needed(grader: grader)
+
+      yield
+
+      # If we added a grader, attempt to handle a potential race condition:
+      # multiple new graders could have tried to add themselves simultaneously
+      # when there weren't enough slots open for all of them. If we ended up
+      # with too many provisional graders, throw an error to roll things back.
+      if added_moderation_grader && provisional_moderation_graders.count > grader_count
+        raise GradeError, 'Maximum number of graders reached'
+      end
+    end
   end
 end
