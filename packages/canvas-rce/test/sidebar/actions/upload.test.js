@@ -499,4 +499,36 @@ describe("Upload data actions", () => {
       });
     });
   });
+
+  describe('handleFailures', () => {
+    it('calls quota exceeded when the file size exceeds the quota', () => {
+      const fakeDispatch = sinon.spy();
+      const error = {
+        response: new Response('{ "message": "file size exceeds quota" }', { status: 400})
+      }
+      return actions.handleFailures(error, fakeDispatch).then(() => {
+        sinon.assert.calledWith(fakeDispatch,
+          sinon.match({
+            type: 'QUOTA_EXCEEDED_UPLOAD',
+            error
+          })
+        );
+      })
+
+    });
+    it('calls failUpload for other errors', () => {
+      const fakeDispatch = sinon.spy();
+      const error = {
+        response: new Response('{ "message": "we don\'t like you " }', { status: 400})
+      }
+      return actions.handleFailures(error, fakeDispatch).then(() => {
+        sinon.assert.calledWith(fakeDispatch,
+          sinon.match({
+            type: 'FAIL_FILE_UPLOAD',
+            error
+          })
+        );
+      })
+    })
+  })
 });

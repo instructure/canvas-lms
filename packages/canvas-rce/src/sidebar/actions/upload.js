@@ -28,6 +28,7 @@ export const FAIL_FILE_UPLOAD = "FAIL_FILE_UPLOAD";
 export const COMPLETE_FILE_UPLOAD = "COMPLETE_FILE_UPLOAD";
 export const TOGGLE_UPLOAD_FORM = "TOGGLE_UPLOAD_FORM";
 export const PROCESSED_FOLDER_BATCH = "PROCESSED_FOLDER_BATCH";
+export const QUOTA_EXCEEDED_UPLOAD = "QUOTA_EXCEEDED_UPLOAD";
 
 export function receiveFolder({ id, name, parentId }) {
   return { type: RECEIVE_FOLDER, id, name, parentId };
@@ -43,6 +44,10 @@ export function startUpload(fileMetaProps) {
 
 export function failUpload(error) {
   return { type: FAIL_FILE_UPLOAD, error };
+}
+
+export function quotaExceeded(error) {
+  return { type: QUOTA_EXCEEDED_UPLOAD, error };
 }
 
 export function completeUpload(results) {
@@ -174,6 +179,19 @@ export function setAltText(altText, results) {
   return results;
 }
 
+export function handleFailures(error, dispatch) {
+  return error.response
+  .json()
+  .then(resp => {
+    if (resp.message === "file size exceeds quota") {
+      dispatch(quotaExceeded(error));
+    } else {
+      dispatch(failUpload(error));
+    }
+  })
+  .catch(error => dispatch(failUpload(error)))
+}
+
 export function uploadPreflight(tabContext, fileMetaProps) {
   return (dispatch, getState) => {
     const { source, jwt, host, contextId, contextType } = getState();
@@ -202,6 +220,6 @@ export function uploadPreflight(tabContext, fileMetaProps) {
       .then(results => {
         dispatch(allUploadCompleteActions(results, fileMetaProps));
       })
-      .catch(error => dispatch(failUpload(error)));
+      .catch(err => handleFailures(err, dispatch));
   };
 }
