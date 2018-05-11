@@ -54,6 +54,39 @@ describe EpubExport do
     end
   end
 
+  describe "attachment" do
+    let_once(:cartridge_path) do
+      File.join(File.dirname(__FILE__), "/../fixtures/migration/unicode-filename-test-export.imscc")
+    end
+
+    let_once(:content_export) do
+      @course.content_exports.create({
+        user: @student
+      }).tap do |content_export|
+        content_export.create_attachment({
+          context: @course,
+          filename: File.basename(cartridge_path),
+          uploaded_data: File.open(cartridge_path)
+        })
+      end
+    end
+
+    let_once(:epub_export) do
+      @course.epub_exports.create({
+        user: @student,
+        content_export: content_export
+      })
+    end
+
+    it "should be stored in instfs if instfs is enabled" do
+      allow(InstFS).to receive(:enabled?).and_return(true)
+      uuid = "1234-abcd"
+      allow(InstFS).to receive(:direct_upload).and_return(uuid)
+      epub_export.convert_to_epub_without_send_later
+      expect(epub_export.epub_attachment.instfs_uuid).to eq uuid
+    end
+  end
+
 
   describe "mark_exported" do
     let_once(:content_export) do

@@ -180,10 +180,10 @@ class EpubExport < ActiveRecord::Base
         file_path,
         mime_type.try(:content_type)
       )
-      self.attachments.create({
-        filename: File.basename(file_path),
-        uploaded_data: file
-      })
+      attachment = self.attachments.new
+      attachment.filename = File.basename(file_path)
+      Attachments::Storage.store_for_attachment(attachment, file)
+      attachment.save!
     rescue Errno::ENOENT => e
       mark_as_failed
       raise e
