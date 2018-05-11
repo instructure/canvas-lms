@@ -34,12 +34,6 @@ class AddAnonymousModeratedMarkingFieldsToAssignment < ActiveRecord::Migration[5
     add_column :assignments, :grader_comments_visible_to_graders, :boolean
     change_column_default :assignments, :grader_comments_visible_to_graders, from: nil, to: false
 
-    # Graders from (section, or "all sections" if not set)
-    add_reference :assignments, :grader_section, limit: 8, foreign_key: { to_table: :course_sections }
-
-    # Grader that determines final grade
-    add_reference :assignments, :final_grader, limit: 8, foreign_key: { to_table: :users }
-
     # Final grader can view other grader names
     add_column :assignments, :grader_names_visible_to_final_grader, :boolean
     change_column_default :assignments, :grader_names_visible_to_final_grader, from: nil, to: false
