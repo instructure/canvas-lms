@@ -370,7 +370,14 @@ class AssignmentsController < ApplicationController
   def toggle_mute
     return nil unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
     @assignment = @context.assignments.active.find(params[:assignment_id])
-    method = if params[:status] == "true" then :mute! else :unmute! end
+
+    toggle_value = params[:status] == 'true'
+
+    unless toggle_value
+      return render_unauthorized_action if !@assignment.grades_published? && @assignment.root_account.feature_enabled?(:anonymous_moderated_marking)
+    end
+
+    method = toggle_value ? :mute! : :unmute!
 
     respond_to do |format|
       if @assignment && @assignment.send(method)

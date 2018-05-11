@@ -45,7 +45,8 @@
           <i class="icon-gradebook" aria-hidden="true"></i>
           <span class="screenreader-only" aria-hidden="true"><%= t("Gradebook") %></span>
         </a>
-        <button type="button" data-muted="<%= @assignment.muted? %>" id="mute_link" class="Button Button--icon-action gradebookActions__Button" title="<%= t('Mute/Unmute Assignment') %>">
+        <button type="button" data-muted="<%= @assignment.muted? %>" id="mute_link"
+          class="Button Button--icon-action gradebookActions__Button<%= @disable_unmute_assignment ? " disabled" : "" %>" title="<%= t('Mute/Unmute Assignment') %>">
           <i class=<%= @assignment.muted? ? "icon-muted" : "icon-unmuted"  %> aria-hidden="true"></i>
           <span class="screenreader-only" aria-hidden="true">
             <%= @assignment.muted? ? t("Unmute Assignment") : t("Mute Assignment") %>

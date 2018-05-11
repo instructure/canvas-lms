@@ -641,6 +641,52 @@ describe AssignmentsController do
     end
   end
 
+  describe "PUT 'toggle_mute'" do
+    it "should require authorization" do
+      put 'toggle_mute', params: { course_id: @course.id, assignment_id: @assignment.id, status: true }, format: 'json'
+      assert_unauthorized
+    end
+
+    context "while logged in" do
+      before :each do
+        user_session(@teacher)
+      end
+
+      context "with anonymous moderated marking enabled and moderated grading on" do
+        before :each do
+          @course.account.enable_feature!(:anonymous_moderated_marking)
+          @assignment.update!(moderated_grading: true, grader_count: 1)
+        end
+
+        it "should fail if anonymous_moderated_marking is enabled, grades are not published, and status is false" do
+          put 'toggle_mute', params: { course_id: @course.id, assignment_id: @assignment.id, status: false }, format: 'json'
+          assert_unauthorized
+        end
+
+        it "should mute if anonymous_moderated_marking is enabled, grades are not published, and status is true" do
+          @assignment.update!(muted: false)
+          put 'toggle_mute', params: { course_id: @course.id, assignment_id: @assignment.id, status: true }, format: 'json'
+          @assignment.reload
+          expect(@assignment).to be_muted
+        end
+      end
+
+      it "should mute if status is true" do
+        @assignment.update!(muted: false)
+        put 'toggle_mute', params: { course_id: @course.id, assignment_id: @assignment.id, status: true }, format: 'json'
+        @assignment.reload
+        expect(@assignment).to be_muted
+      end
+
+      it "should unmute if status is false" do
+        @assignment.update_attribute(:muted, true)
+        put 'toggle_mute', params: { course_id: @course.id, assignment_id: @assignment.id, status: false }, format: 'json'
+        @assignment.reload
+        expect(@assignment).not_to be_muted
+      end
+    end
+  end
+
   describe "GET 'new'" do
     it "should require authorization" do
       #controller.use_rails_error_handling!

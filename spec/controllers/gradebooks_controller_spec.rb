@@ -1508,6 +1508,30 @@ describe GradebooksController do
       get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
       expect(assigns[:js_env][:grading_type]).to eq('percent')
     end
+
+    it 'sets disable_unmute_assignment to false if the assignment is not muted' do
+      @assignment.update!(muted: false)
+      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
+      expect(assigns[:disable_unmute_assignment]).to eq false
+    end
+
+    it 'sets disable_unmute_assignment to false if anonymous moderated marking is disabled' do
+      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
+      expect(assigns[:disable_unmute_assignment]).to eq false
+    end
+
+    it 'sets disable_unmute_assignment to false if assignment grades have been published' do
+      @assignment.update!(grades_published_at: Time.zone.now)
+      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
+      expect(assigns[:disable_unmute_assignment]).to eq false
+    end
+
+    it 'sets disable_unmute_assignment to true if assignment muted, anonymous moderated marking enabled, and grades not published' do
+      @assignment.update!(muted: true, grades_published_at: nil, moderated_grading: true, grader_count: 1)
+      @assignment.root_account.enable_feature!(:anonymous_moderated_marking)
+      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
+      expect(assigns[:disable_unmute_assignment]).to eq true
+    end
   end
 
   describe "POST 'speed_grader_settings'" do

@@ -87,6 +87,28 @@ describe "/gradebooks/speed_grader" do
     end
   end
 
+  describe 'mute button' do
+    it 'is rendered' do
+      render 'gradebooks/speed_grader'
+      html = Nokogiri::HTML.fragment(response.body)
+      expect(html.at_css('#mute_link')).to be_present
+    end
+
+    it 'is enabled if user can mute assignment' do
+      assign(:disable_unmute_assignment, false)
+      render 'gradebooks/speed_grader'
+      html = Nokogiri::HTML.fragment(response.body)
+      expect(html.at_css('#mute_link.disabled')).not_to be_present
+    end
+
+    it 'is disabled if user cannot mute assignment' do
+      assign(:disable_unmute_assignment, true)
+      render 'gradebooks/speed_grader'
+      html = Nokogiri::HTML.fragment(response.body)
+      expect(html.at_css('#mute_link.disabled')).to be_present
+    end
+  end
+
   context 'when group assignment' do
     before do
       assign(:can_comment_on_submission, true)
