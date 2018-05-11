@@ -2,9 +2,6 @@
   "all_day_fb42c4fc": {
     "message": "כל היום"
   },
-  "no_to_do_s_for_this_day_yet_90c5873d": {
-    "message": "עדיין אין ״מטלות לביצוע״ לתאריך זה."
-  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {הצגת פריט # שהושלם}\n  other {הצגת # פריטים שהושלמו}\n}"
   },

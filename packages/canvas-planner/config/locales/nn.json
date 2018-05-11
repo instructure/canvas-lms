@@ -8,9 +8,6 @@
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } til { endDate }"
   },
-  "no_to_do_s_for_this_day_yet_90c5873d": {
-    "message": "Ingen gjeremål enno i dag. "
-  },
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "*Kun nyaste karaktersetjingsperiode viser."
   },
@@ -94,9 +91,6 @@
   },
   "replies_4a8577c8": {
     "message": "Svar"
-  },
-  "nothing_planned_43a37e78": {
-    "message": "Intenting er planlagt"
   },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Er du sikker på at du vil slette dette planelementet?"
