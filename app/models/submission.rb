@@ -17,6 +17,7 @@
 #
 
 require 'atom'
+require 'anonymity'
 
 class Submission < ActiveRecord::Base
   include Canvas::GradeValidations
@@ -225,29 +226,6 @@ class Submission < ActiveRecord::Base
 
   def self.anonymous_ids_for(assignment)
     anonymized.for_assignment(assignment).pluck(:anonymous_id)
-  end
-
-  # Returns a unique short id to be used for anonymous_id. If the
-  # generated short id is already in use, loop until an available
-  # one is generated. `anonymous_ids` are unique per assignment.
-  # This method will throw a unique constraint error from the
-  # database if it has used all unique ids.
-  # An optional argument of existing_anonymous_ids can be supplied
-  # to customize the handling of existing anonymous_ids. E.g. bulk
-  # generation of anonymous ids where you wouldn't want to
-  # continuously query the database
-  def self.generate_unique_anonymous_id(assignment:, existing_anonymous_ids: anonymous_ids_for(assignment))
-    loop do
-      short_id = Submission.generate_short_id
-      break short_id unless existing_anonymous_ids.include?(short_id)
-    end
-  end
-
-  # base58 to avoid literal problems with prefixed 0 (i.e. when 0x123
-  # is interpreted as a hex value `0x123 == 291`), and similar looking
-  # characters: 0/O, I/l
-  def self.generate_short_id
-    SecureRandom.base58(5)
   end
 
   # see #needs_grading?
@@ -2459,6 +2437,6 @@ class Submission < ActiveRecord::Base
   private
 
   def set_anonymous_id
-    self.anonymous_id = Submission.generate_unique_anonymous_id(assignment: anonymous_id)
+    self.anonymous_id = Anonymity.generate_id(existing_ids: Submission.anonymous_ids_for(assignment))
   end
 end

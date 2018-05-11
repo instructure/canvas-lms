@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require 'anonymity'
+
 class DueDateCacher
   INFER_SUBMISSION_WORKFLOW_STATE_SQL = <<~SQL_FRAGMENT
     CASE
@@ -109,10 +111,7 @@ class DueDateCacher
           due_date = submission_info[:due_at] ? "'#{submission_info[:due_at].iso8601}'::timestamptz" : 'NULL'
           grading_period_id = submission_info[:grading_period_id] || 'NULL'
 
-          anonymous_id = Submission.generate_unique_anonymous_id(
-            assignment: assignment_id,
-            existing_anonymous_ids: existing_anonymous_ids
-          )
+          anonymous_id = Anonymity.generate_id(existing_ids: existing_anonymous_ids)
           existing_anonymous_ids << anonymous_id
           sql_ready_anonymous_id = Submission.connection.quote(anonymous_id)
           values << [assignment_id, student_id, due_date, grading_period_id, sql_ready_anonymous_id]
