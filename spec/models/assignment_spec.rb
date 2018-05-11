@@ -3585,6 +3585,28 @@ describe Assignment do
     end
   end
 
+  describe "#quiz_lti!" do
+    before :once do
+      assignment_model(:submission_types => "online_quiz", :course => @course)
+      tool = @c.context_external_tools.create!(
+        :name => 'Quizzes.Next',
+        :consumer_key => 'test_key',
+        :shared_secret => 'test_secret',
+        :tool_id => 'Quizzes 2',
+        :url => 'http://example.com/launch'
+      )
+      @a.external_tool_tag_attributes = { :content => tool }
+    end
+
+    it "changes submission_types and break assignment's tie to quiz" do
+      expect(@a.reload.quiz).not_to be nil
+      expect(@a.submission_types).to eq 'online_quiz'
+      @a.quiz_lti! && @a.save!
+      expect(@a.reload.quiz).to be nil
+      expect(@a.submission_types).to eq 'external_tool'
+    end
+  end
+
   describe "linked submissions" do
     shared_examples_for "submittable" do
       before :once do

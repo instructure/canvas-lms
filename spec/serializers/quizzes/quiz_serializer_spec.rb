@@ -61,7 +61,7 @@ describe Quizzes::QuizSerializer do
     :points_possible, :cant_go_back, :access_code, :ip_filter, :due_at,
     :lock_at, :unlock_at, :published, :show_correct_answers_at,
     :hide_correct_answers_at, :show_correct_answers_last_attempt,
-    :has_access_code
+    :has_access_code, :migration_id
   ].each do |attribute|
 
       it "serializes #{attribute}" do

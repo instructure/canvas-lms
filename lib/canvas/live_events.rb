@@ -439,6 +439,28 @@ module Canvas::LiveEvents
     post_event_stringified('quiz_export_complete', payload, amended_context(content_export.context))
   end
 
+  def self.content_migration_completed(content_migration)
+    post_event_stringified(
+      'content_migration_completed',
+      content_migration_data(content_migration),
+      amended_context(content_migration.context)
+    )
+  end
+
+  def self.content_migration_data(content_migration)
+    context = content_migration.context
+    import_quizzes_next =
+      content_migration.migration_settings&.[](:import_quizzes_next) == true
+    {
+      content_migration_id: content_migration.global_id,
+      context_id: context.global_id,
+      context_type: context.class.to_s,
+      lti_context_id: context.lti_context_id,
+      context_uuid: context.uuid,
+      import_quizzes_next: import_quizzes_next
+    }
+  end
+
   def self.course_section_created(section)
     post_event_stringified('course_section_created', get_course_section_data(section))
   end

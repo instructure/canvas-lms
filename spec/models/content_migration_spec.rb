@@ -604,4 +604,30 @@ describe ContentMigration do
       expect(ContentMigration.expired.pluck(:id)).to be_empty
     end
   end
+
+  context 'Quizzes.Next CC import' do
+    before do
+      allow(@cm.root_account).
+        to receive(:feature_enabled?).
+        with(:import_to_quizzes_next).
+        and_return(true)
+      allow(@cm.migration_settings).
+        to receive(:[]).
+        with(:import_quizzes_next).
+        and_return(true)
+    end
+
+    let(:importer) { instance_double('QuizzesNext::Importers::CourseContentImporter') }
+
+    it 'calls QuizzesNext::Importers' do
+      expect(@cm.migration_settings).
+        to receive(:[]).
+        with(:migration_ids_to_import)
+      expect(Importers).not_to receive(:content_importer_for)
+      expect(QuizzesNext::Importers::CourseContentImporter).
+        to receive(:new).and_return(importer)
+      expect(importer).to receive(:import_content)
+      @cm.import!({})
+    end
+  end
 end

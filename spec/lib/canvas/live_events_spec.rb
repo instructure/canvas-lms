@@ -639,6 +639,37 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe '.content_migration_completed' do
+    let(:course) { course_factory() }
+    let(:migration) { ContentMigration.create!(:context => course) }
+
+    before do
+      migration.migration_settings[:import_quizzes_next] = true
+    end
+
+    it 'sent events with expected payload' do
+      expect_event(
+        'content_migration_completed',
+        hash_including(
+          content_migration_id: migration.global_id.to_s,
+          context_id: course.global_id.to_s,
+          context_type: course.class.to_s,
+          context_uuid: course.uuid,
+          import_quizzes_next: true
+        ),
+        hash_including(
+          context_type: course.class.to_s,
+          context_id: course.global_id.to_s,
+          root_account_id: course.root_account.global_id.to_s,
+          root_account_uuid: course.root_account.uuid,
+          root_account_lti_guid: course.root_account.lti_guid.to_s
+        )
+      ).once
+
+      Canvas::LiveEvents.content_migration_completed(migration)
+    end
+  end
+
   describe '.course_section_created' do
     it 'should trigger a course section creation live event' do
       course_with_student_submissions

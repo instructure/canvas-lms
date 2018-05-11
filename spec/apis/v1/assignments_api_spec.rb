@@ -4623,6 +4623,32 @@ describe AssignmentsApiController, type: :request do
         it { is_expected.to have_received(:fail_to_duplicate) }
       end
     end
+
+    context "with the cc_imported_successfully parameter" do
+      subject { @assignment }
+
+      let(:params) do
+        ActionController::Parameters.new(cc_imported_successfully: cc_imported_successfully)
+      end
+
+      before do
+        allow(@assignment).to receive(:finish_importing)
+        allow(@assignment).to receive(:fail_to_import)
+        update_from_params(@assignment, params, @teacher)
+      end
+
+      context "when cc_imported_successfully is true" do
+        let(:cc_imported_successfully) { true }
+
+        it { is_expected.to have_received(:finish_importing) }
+      end
+
+      context "when cc_imported_successfully is false" do
+        let(:cc_imported_successfully) { false }
+
+        it { is_expected.to have_received(:fail_to_import) }
+      end
+    end
   end
 
   context "as an observer viewing assignments" do

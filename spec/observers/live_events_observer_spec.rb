@@ -302,6 +302,26 @@ describe LiveEventsObserver do
     end
   end
 
+
+  describe "content_migration_completed" do
+    it "posts update events" do
+      expect(Canvas::LiveEvents).to receive(:content_migration_completed).once
+      user_model
+      account_model
+      course_model(name: "CS101", account: @account)
+      @cm = ContentMigration.create!(
+        context: @course,
+        user: @teacher,
+        workflow_state: 'importing',
+        migration_settings: {
+          import_quizzes_next: true
+        }
+      )
+      @cm.workflow_state = 'imported'
+      @cm.save!
+    end
+  end
+
   describe "modules" do
     it "posts create events" do
       expect(Canvas::LiveEvents).to receive(:module_created).with(anything)
