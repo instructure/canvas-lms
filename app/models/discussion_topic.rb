@@ -1158,8 +1158,13 @@ class DiscussionTopic < ActiveRecord::Base
     return participants_in_section
   end
 
+  def visible_to_admins_only?
+    self.context.respond_to?(:available?) && !self.context.available? ||
+      unpublished? || not_available_yet? || not_available_anymore?
+  end
+
   def active_participants(include_observers=false)
-    if self.context.respond_to?(:available?) && !self.context.available? && self.context.respond_to?(:participating_admins)
+    if visible_to_admins_only? && self.context.respond_to?(:participating_admins)
       self.context.participating_admins
     else
       self.participants(include_observers)
