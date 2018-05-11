@@ -1159,6 +1159,14 @@ describe Assignment do
       expect(comment).to be_hidden
     end
 
+    it "hides grading comments if commenter is teacher and assignment is muted after commenting" do
+      @assignment.update_submission(@user, comment: 'hi', author: @teacher)
+      @assignment.mute!
+      submission = @assignment.submissions.first
+      comment = submission.submission_comments.first
+      expect(comment).to be_hidden
+    end
+
     it "should not hide grading comments if assignment is not muted even if commenter is teacher" do
       @assignment.update_submission(@user, comment: 'hi', author: @teacher)
       submission = @assignment.submissions.first
@@ -1169,6 +1177,14 @@ describe Assignment do
     it "should not hide grading comments if assignment is muted and commenter is student" do
       @assignment.mute!
       @assignment.update_submission(@user, comment: 'hi', author: @student1)
+      submission = @assignment.submissions.first
+      comment = submission.submission_comments.first
+      expect(comment).not_to be_hidden
+    end
+
+    it "does not hide grading comments if commenter is student and assignment is muted after commenting" do
+      @assignment.update_submission(@user, comment: 'hi', author: @student1)
+      @assignment.mute!
       submission = @assignment.submissions.first
       comment = submission.submission_comments.first
       expect(comment).not_to be_hidden
@@ -3552,6 +3568,31 @@ describe Assignment do
       group_comment_id = comments[0].group_comment_id
       expect(group_comment_id).to be_present
       expect(comments.all? { |c| c.group_comment_id == group_comment_id }).to be_truthy
+    end
+
+    it "hides grading comments for all group members if commenter is teacher and assignment is muted after commenting" do
+      @a.update_submission(@u1, :comment => "woot", :group_comment => "1", author: @teacher)
+      @a.mute!
+
+      comments = @a.submissions.map(&:submission_comments).flatten
+      expect(comments.map(&:hidden?)).to all(be true)
+    end
+
+    it "does not hide grading comments for all group members if commenter is student and assignment is muted after commenting" do
+      @a.update_submission(@u1, :comment => "woot", :group_comment => "1", author: @u1)
+      @a.mute!
+
+      comments = @a.submissions.map(&:submission_comments).flatten
+      expect(comments.map(&:hidden?)).to all(be false)
+    end
+
+    it "shows grading comments for all group members if commenter is teacher and assignment is unmuted" do
+      @a.mute!
+      @a.update_submission(@u1, :comment => "woot", :group_comment => "1", author: @teacher)
+      @a.unmute!
+
+      comments = @a.submissions.map(&:submission_comments).flatten
+      expect(comments.map(&:hidden?)).to all(be false)
     end
 
     it "return the single submission if the user is not in a group" do
