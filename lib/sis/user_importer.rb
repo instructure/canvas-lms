@@ -20,7 +20,7 @@ module SIS
   class UserImporter < BaseImporter
 
     def process(messages)
-      start = Time.now
+      start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger, messages)
       User.skip_updating_account_associations do
         User.process_as_sis(@sis_options) do
@@ -34,18 +34,17 @@ module SIS
       end
       User.update_account_associations(importer.users_to_add_account_associations, :incremental => true, :precalculated_associations => {@root_account.id => 0})
       User.update_account_associations(importer.users_to_update_account_associations)
-      importer.pseudos_to_set_sis_batch_ids.in_groups_of(1000, false) do |batch|
-        Pseudonym.where(:id => batch).update_all(:sis_batch_id => @batch.id)
-      end if @batch
-      @logger.debug("Users took #{Time.now - start} seconds")
-      return importer.success_count
+      importer.pseudos_to_set_sis_batch_ids.in_groups_of(1000, false) {|ids| Pseudonym.where(id: ids).update_all(sis_batch_id: @batch.id)} if @batch
+      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data) if @batch.using_parallel_importers?
+      @logger.debug("Users took #{Time.zone.now - start} seconds")
+      importer.success_count
     end
 
   private
     class Work
       attr_accessor :success_count, :users_to_set_sis_batch_ids,
           :pseudos_to_set_sis_batch_ids, :users_to_add_account_associations,
-          :users_to_update_account_associations
+          :users_to_update_account_associations, :roll_back_data
 
       def initialize(batch, root_account, logger, messages)
         @batch = batch
@@ -55,6 +54,7 @@ module SIS
         @messages = messages
         @success_count = 0
 
+        @roll_back_data = []
         @users_to_set_sis_batch_ids = []
         @pseudos_to_set_sis_batch_ids = []
         @users_to_add_account_associations = []
@@ -234,7 +234,10 @@ module SIS
               User.transaction(:requires_new => true) do
                 if user.changed?
                   user_touched = true
-                  if !user.save && user.errors.size > 0
+                  if user.save
+                    u_data = SisBatchRollBackData.build_data(sis_batch: @batch, context: user)
+                    @roll_back_data << u_data if u_data
+                  elsif user.errors.size > 0
                     message = generate_user_warning(user.errors.first.join(" "), user_row.user_id, user_row.login_id)
                     raise ImportError, message
                   end
@@ -244,7 +247,10 @@ module SIS
                 pseudo.user_id = user.id
                 if pseudo.changed?
                   pseudo.sis_batch_id = @batch.id if @batch
-                  if !pseudo.save_without_broadcasting && pseudo.errors.size > 0
+                  if pseudo.save_without_broadcasting
+                    p_data = SisBatchRollBackData.build_data(sis_batch: @batch, context: pseudo)
+                    @roll_back_data << p_data if p_data
+                  elsif pseudo.errors.size > 0
                     message = generate_user_warning(pseudo.errors.first.join(" "), user_row.user_id, user_row.login_id)
                     raise ImportError, message
                   end
@@ -300,6 +306,8 @@ module SIS
               if cc.changed?
                 if cc.valid?
                   cc.save_without_broadcasting
+                  cc_data = SisBatchRollBackData.build_data(sis_batch: @batch, context: cc)
+                  @roll_back_data << cc_data if cc_data
                 else
                   msg = "An email did not pass validation "
                   msg += "(" + "#{user_row.email}, error: "
@@ -349,29 +357,49 @@ module SIS
             elsif @batch && pseudo.sis_batch_id != @batch.id
               @pseudos_to_set_sis_batch_ids << pseudo.id
             end
-            @success_count += 1
+            maybe_write_roll_back_data
 
+            @success_count += 1
           end
         end
       end
 
-      def remove_enrollments_if_last_login(user, user_id)
-        return false if @root_account.pseudonyms.active.where(user_id: user).
-          where("sis_user_id != ? OR sis_user_id IS NULL",  user_id).exists?
-
-        enrollment_ids = @root_account.enrollments.active.where(user_id: user).
-          where.not(workflow_state: 'deleted').pluck(:id)
-        if enrollment_ids.any?
-          Enrollment.where(id: enrollment_ids).update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
-          EnrollmentState.where(enrollment_id: enrollment_ids).update_all(state: 'deleted', state_is_current: true)
+      def maybe_write_roll_back_data
+        if @roll_back_data.count > 1000
+          SisBatchRollBackData.bulk_insert_roll_back_data(@roll_back_data)
+          @roll_back_data = []
         end
+      end
 
-        d = enrollment_ids.count
+      def remove_enrollments_if_last_login(user, user_id)
+        return false if @root_account.pseudonyms.active.where(user_id: user).where("sis_user_id != ? OR sis_user_id IS NULL", user_id).exists?
+
+        enrollments = @root_account.enrollments.active.where(user_id: user).
+          where.not(workflow_state: 'deleted').select(:id, :workflow_state).to_a
+        if enrollments.any?
+          Enrollment.where(id: enrollments.map(&:id)).update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
+          EnrollmentState.where(enrollment_id: enrollments.map(&:id)).update_all(state: 'deleted', state_is_current: true)
+          e_data = SisBatchRollBackData.build_dependent_data(sis_batch: @batch, contexts: enrollments, updated_state: 'deleted')
+          @roll_back_data.push(*e_data) if e_data
+        end
+        gms = @root_account.all_group_memberships.active.where(user_id: user).select(:id, :workflow_state).to_a
+        gm_data = SisBatchRollBackData.build_dependent_data(sis_batch: @batch, contexts: gms, updated_state: 'deleted')
+        @roll_back_data.push(*gm_data) if gm_data
+
+        admins = user.account_users.active.shard(@root_account).where(account_id: @root_account.all_accounts).select(:id, :workflow_state).to_a
+        a_data = SisBatchRollBackData.build_dependent_data(sis_batch: @batch, contexts: admins, updated_state: 'deleted')
+        @roll_back_data.push(*a_data) if a_data
+
+        root_admins = user.account_users.active.shard(@root_account).where(account_id: @root_account).select(:id, :workflow_state).to_a
+        r_data = SisBatchRollBackData.build_dependent_data(sis_batch: @batch, contexts: root_admins, updated_state: 'deleted')
+        @roll_back_data.push(*r_data) if r_data
+
+        d = enrollments.count
         d += @root_account.all_group_memberships.active.where(user_id: user).
           update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
-        d += user.account_users.shard(@root_account).where(account_id: @root_account.all_accounts).
+        d += user.account_users.active.shard(@root_account).where(account_id: @root_account.all_accounts).
           update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
-        d += user.account_users.shard(@root_account).where(account_id: @root_account).
+        d += user.account_users.active.shard(@root_account).where(account_id: @root_account).
           update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
         if d > 0
           should_update_account_associations = true

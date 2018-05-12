@@ -1221,6 +1221,36 @@ describe SIS::CSV::UserImporter do
     expect(gm.workflow_state).to eq 'deleted'
   end
 
+  it 'should create rollback data' do
+    @account.enable_feature!(:refactor_of_sis_imports)
+    batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
+    )
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,active"
+    )
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
+      "test_1,user_1,student,,active,,,"
+    )
+    c = @account.courses.where(sis_source_id: "test_1").first
+    g = c.groups.create(name: 'group1')
+    u = Pseudonym.where(sis_user_id: 'user_1').first.user
+    gm = g.group_memberships.create(user: u, workflow_state: 'accepted')
+    expect(gm.workflow_state).to eq 'accepted'
+
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,deleted",
+      batch: batch1
+    )
+    expect(batch1.roll_back_data.count).to eq 4
+    expect(batch1.roll_back_data.pluck(:context_type).sort).to eq ["CommunicationChannel", "Enrollment", "GroupMembership", "Pseudonym"]
+  end
+
   it 'removes account memberships when a user is deleted' do
     @badmin = user_with_managed_pseudonym(:name => 'bad admin', :account => @account, :sis_user_id => 'badmin')
     tie_user_to_account(@badmin, :account => @account)
