@@ -20,7 +20,7 @@ module SIS
   class SectionImporter < BaseImporter
 
     def process
-      start = Time.now
+      start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger)
       CourseSection.suspend_callbacks(:delete_enrollments_later_if_deleted) do
         Course.skip_updating_account_associations do
@@ -38,18 +38,16 @@ module SIS
       # it can run really fast
       Shackles.activate(:slave) do
         # ideally we change this to find_in_batches, and call (the currently non-existent) Enrollment.destroy_batch
-        Enrollment.where(course_section_id: importer.deleted_section_ids.to_a).active.find_each do |enrollment|
+        Enrollment.where(course_section_id: importer.deleted_section_ids.to_a).active.find_in_batches do |enrollments|
           Shackles.activate(:master) do
-            begin
-              enrollment.destroy
-            rescue => e
-              ::Canvas::Errors.capture(e, type: :sis_import, account: @batch.account)
-              raise ImportError, "Failed to remove enrollment #{enrollment.id} from section #{enrollment.course_section.sis_source_id}"
-            end
+            new_data = Enrollment::BatchStateUpdater.destroy_batch(enrollments, sis_batch: @batch)
+            importer.roll_back_data.push(*new_data)
+            SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data) if @batch.using_parallel_importers?
+            importer.roll_back_data = []
           end
         end
       end
-      @logger.debug("Sections took #{Time.now - start} seconds")
+      @logger.debug("Sections took #{Time.zone.now - start} seconds")
       return importer.success_count
     end
 
@@ -58,7 +56,8 @@ module SIS
         :success_count,
         :sections_to_update_sis_batch_ids,
         :course_ids_to_update_associations,
-        :deleted_section_ids
+        :deleted_section_ids,
+        :roll_back_data
       )
 
       def initialize(batch, root_account, logger)
@@ -67,6 +66,7 @@ module SIS
         @logger = logger
         @success_count = 0
         @sections_to_update_sis_batch_ids = []
+        @roll_back_data = []
         @course_ids_to_update_associations = Set.new
         @deleted_section_ids = Set.new
       end
@@ -131,6 +131,8 @@ module SIS
           section.sis_batch_id = @batch.id if @batch
           if section.valid?
             section.save
+            data = SisBatchRollBackData.build_data(sis_batch: @batch, context: section)
+            @roll_back_data << data if data
           else
             msg = "A section did not pass validation "
             msg += "(" + "section: #{section_id} / #{name}, course: #{course_id}, error: "
