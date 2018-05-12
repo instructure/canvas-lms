@@ -78,4 +78,21 @@ describe SIS::CSV::GroupMembershipImporter do
     expect(importer.errors.last.last).to eq "User U001 doesn't have an enrollment in the course of group G002."
   end
 
+  it 'should create rollback data' do
+    @account.enable_feature!(:refactor_of_sis_imports)
+    batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
+    process_csv_data_cleanly(
+      "group_id,user_id,status",
+      "G001,U001,accepted",
+      batch: batch1
+    )
+    batch2 = @account.sis_batches.create! { |sb| sb.data = {} }
+    process_csv_data_cleanly(
+      "group_id,user_id,status",
+      "G001,U001,deleted",
+      batch: batch2
+    )
+    expect(batch1.roll_back_data.where(previous_workflow_state: 'non-existent').count).to eq 1
+    expect(batch2.roll_back_data.first.updated_workflow_state).to eq 'deleted'
+  end
 end
