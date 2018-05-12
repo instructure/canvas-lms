@@ -1677,7 +1677,7 @@ fr:
   allow_lor_tools: "Autoriser les utilisateurs à voir et utiliser des outils externes configurés pour LOR."
   allow_multiple_attempts_e67a0a37: "Autoriser plusieurs tentatives"
   allow_opt_out_of_inbox: "Permet aux utilisateurs de sortir de la boîte de réception des conversations. Cela aura les conséquences suivantes : tous les messages et notifications des conversations seront envoyés sous forme d’alertes ASAP à l’adresse e-mail principale de l’utilisateur, et le symbole des messages non lus de la boîte de réception des conversations et les préférences de notification seront masqués."
-  allow_outcome_extra_credit_57c1e84e: "Autoriser l'obtention de crédits supplémentaires"
+  allow_outcome_extra_credit_57c1e84e: "Autoriser l'obtention de crédits supplémentaires pour les résultats"
   allow_passive_acceptance_of_terms_of_service_63ef5994: "Autoriser l'acceptation passive des Conditions d'utilisation"
   allow_reorder_dashboard_cards_78215947: "Autoriser la réorganisation des cartes du tableau de configuration."
   allow_replies_for_title_cfe7af6c: "Autoriser les réponses pour %{title}"
