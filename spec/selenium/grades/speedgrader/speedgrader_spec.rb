@@ -241,6 +241,48 @@ describe 'Speedgrader' do
       end
     end
 
+    context 'rubric with outcomes' do
+      before :once do
+        init_course_with_students
+        @teacher = @user
+        @assignment = @course.assignments.create!(
+          title: 'Outcome Rubric',
+          points_possible: 8
+        )
+
+        rubric = outcome_with_rubric
+        rubric.save!
+        rubric.associate_with(@assignment, @course, purpose: 'grading')
+        rubric.reload
+      end
+
+      describe 'flashes a warning when grade changes in' do
+        before :each do
+          user_session(@teacher)
+        end
+
+        it 'speedgrader' do
+          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
+          f('button.toggle_full_rubric').click
+          replace_content f('.learning_outcome_criterion input.criterion_points'), '5'
+          f('button.save_rubric_button').click
+          wait_for_ajax_requests
+          expect_flash_message :warning
+        end
+
+        it 'submissions page' do
+          get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@students[0].id}"
+          f('a.assess_submission_link').click
+          wait_for_animations
+          replace_content f('.learning_outcome_criterion input.criterion_points'), '5'
+          scroll_into_view('button.save_rubric_button')
+          f('button.save_rubric_button').click
+          wait_for_ajax_requests
+          expect_flash_message :warning
+        end
+      end
+    end
+
     context 'Using a rubric to grade' do
       it 'should display correct grades for student', priority: "1", test_id: 164205 do
         course_with_student_logged_in(active_all: true)

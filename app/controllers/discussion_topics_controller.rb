@@ -346,6 +346,10 @@ class DiscussionTopicsController < ApplicationController
       end
     end
 
+    if params[:only_announcements] && !@context.grants_any_right?(@current_user, :manage, :read_course_content)
+      scope = scope.active.where('delayed_post_at IS NULL OR delayed_post_at<?', Time.now.utc)
+    end
+
     @topics = Api.paginate(scope, self, topic_pagination_url)
 
     if params[:exclude_context_module_locked_topics]
@@ -510,7 +514,8 @@ class DiscussionTopicsController < ApplicationController
          map { |category| { id: category.id, name: category.name } },
       HAS_GRADING_PERIODS: @context.grading_periods?,
       SECTION_LIST: sections.map { |section| { id: section.id, name: section.name } },
-      ANNOUNCEMENTS_LOCKED: announcements_locked?
+      ANNOUNCEMENTS_LOCKED: announcements_locked?,
+      CREATE_ANNOUNCEMENTS_UNLOCKED: @current_user.create_announcements_unlocked?
     }
 
     post_to_sis = Assignment.sis_grade_export_enabled?(@context)
@@ -1077,6 +1082,7 @@ class DiscussionTopicsController < ApplicationController
       prior_version = @topic.dup
       if model_type == :announcements && @context.is_a?(Course)
         @topic.locked = true
+        save_lock_preferences
       end
     else
       @topic = @context.send(model_type).active.find(params[:id] || params[:topic_id])
@@ -1136,6 +1142,14 @@ class DiscussionTopicsController < ApplicationController
       DiscussionTopic.transaction do
         if !@topic.is_section_specific
           @topic.course_sections = []
+        else
+          # HACK: For some reason apply_assignment_parameters saves the submittable
+          # so we can't run it until everything is already good.  But if the topic
+          # is section specific stuff isn't good until we clear out the assignment,
+          # so do that here.  This is terrible.
+          if params[:assignment] && !value_to_boolean(params[:assignment][:set_assignment])
+            @topic.assignment = nil
+          end
         end
         @topic.update_attributes(discussion_topic_hash)
         @topic.root_topic.try(:save)
@@ -1157,7 +1171,15 @@ class DiscussionTopicsController < ApplicationController
         @topic = DiscussionTopic.find(@topic.id)
         @topic.broadcast_notifications(prior_version)
 
-        render :json => discussion_topic_api_json(@topic, @context, @current_user, session)
+        if @context.is_a?(Course)
+          render :json => discussion_topic_api_json(@topic,
+                                                    @context,
+                                                    @current_user,
+                                                    session,
+                                                    {include_sections: true, include_sections_user_count: true})
+        else
+          render :json => discussion_topic_api_json(@topic, @context, @current_user, session)
+        end
       else
         errors = @topic.errors.as_json[:errors]
         errors.merge!(@topic.root_topic.errors.as_json[:errors]) if @topic.root_topic
@@ -1208,8 +1230,11 @@ class DiscussionTopicsController < ApplicationController
   def process_future_date_parameters(discussion_topic_hash)
     # Set the delayed_post_at and lock_at if provided. This will be used to determine if the values have changed
     # in order to know if we should rely on this data to update the workflow state
-    @topic.delayed_post_at = discussion_topic_hash[:delayed_post_at] if params.has_key? :delayed_post_at
-    @topic.lock_at = discussion_topic_hash[:lock_at] if params.has_key? :lock_at
+    @topic.delayed_post_at = discussion_topic_hash[:delayed_post_at] if params.key? :delayed_post_at
+    if discussion_topic_hash[:lock_at].present? && @topic&.lock_at&.to_i == Time.zone.parse(discussion_topic_hash[:lock_at]).to_i
+      params.delete(:lock_at)
+    end
+    @topic.lock_at = discussion_topic_hash[:lock_at] if params.key? :lock_at
 
     if @topic.delayed_post_at_changed? || @topic.lock_at_changed?
       @topic.workflow_state = @topic.should_not_post_yet ? 'post_delayed' : 'active'
@@ -1219,6 +1244,14 @@ class DiscussionTopicsController < ApplicationController
         @topic.unlock(without_save: true)
       end
     end
+  end
+
+  def save_lock_preferences
+    return if @current_user.nil?
+    return if !params.key?(:locked) || params[:locked].is_a?(Hash)
+    should_lock = value_to_boolean(params[:locked])
+    @current_user.create_announcements_unlocked(!should_lock)
+    @current_user.save
   end
 
   def process_lock_parameters(discussion_topic_hash)

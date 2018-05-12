@@ -63,7 +63,7 @@ module Api::V1::User
         json[:sis_import_id] = pseudonym&.sis_batch_id if @domain_root_account.grants_right?(current_user, session, :manage_sis)
         json[:root_account] = HostUrl.context_host(pseudonym&.account) if include_root_account
 
-        if pseudonym
+        if pseudonym && context.grants_right?(current_user, session, :view_user_logins)
           json[:login_id] = pseudonym.unique_id
         end
       end
@@ -78,7 +78,7 @@ module Api::V1::User
       end
       # include a permissions check here to only allow teachers and admins
       # to see user email addresses.
-      if includes.include?('email') && !excludes.include?('personal_info') && context.grants_right?(current_user, session, :read_roster)
+      if includes.include?('email') && !excludes.include?('personal_info') && context.grants_right?(current_user, session, :read_email_addresses)
         json[:email] = user.email
       end
 

@@ -17,28 +17,29 @@
  */
 import React from 'react';
 import { shallow, mount } from 'enzyme';
-import {CompletedItemsFacade} from '../index';
+import { CompletedItemsFacade } from '../index';
 
-it('renders as a div with a Checkbox and a string of text indicating count', () => {
+it('renders ToggleDetails with text indicating count', () => {
   const wrapper = shallow(
     <CompletedItemsFacade
       onClick={() => {}}
       itemCount={3}
     />
   );
-  expect(wrapper).toMatchSnapshot();
+
+  expect(wrapper.find('ToggleDetails').props().summary).toEqual('Show 3 completed items');
 });
 
 it('calls the onClick prop when clicked', () => {
   const fakeOnClick = jest.fn();
-  const wrapper = shallow(
+  const wrapper = mount(
     <CompletedItemsFacade
       onClick={fakeOnClick}
       itemCount={0}
     />
   );
 
-  wrapper.find('Button').simulate('click');
+  wrapper.find('button').simulate('click');
   expect(fakeOnClick).toHaveBeenCalled();
 });
 

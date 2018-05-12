@@ -73,10 +73,12 @@ class ExternalFeedPage
       type_in_box(feed_url_textbox, url)
       display_length_option(article_length).click
       add_feed_button.click
+      wait_for_ajaximations
     end
 
     def delete_first_feed
       f('button', external_feeds[0]).click
+      wait_for_ajaximations
     end
   end
 end

@@ -275,6 +275,24 @@ describe "discussions" do
           assignment_topic.assignment.update_attributes(points_possible: 10)
         end
 
+        it "should show criterion Popover menu" do
+          resize_screen_to_default
+          get "/courses/#{course.id}/discussion_topics/#{assignment_topic.id}"
+          wait_for_ajax_requests
+
+          f('.al-trigger').click
+          wait_for_ajaximations
+
+          f('.icon-rubric').click
+          wait_for_ajaximations
+
+          dialog = fj(".ui-dialog:visible")
+          fj(".icon-plus:visible", dialog).click
+          wait_for_ajaximations
+
+          expect(f("#criterion_duplicate_menu")).to be_displayed
+        end
+
         it "should change points when used for grading", priority: "1", test_id: 344537 do
           resize_screen_to_default
           get "/courses/#{course.id}/discussion_topics/#{assignment_topic.id}"

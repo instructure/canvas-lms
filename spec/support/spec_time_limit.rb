@@ -74,6 +74,10 @@ module SpecTimeLimit
       stat_key = TestQueue::Runner::RSpec::GroupQueue.stat_key_for(example.example)
       return unless stats[stat_key]
 
+      # specs inside Timecop.freeze filters can report taking 0 time. In those
+      # cases, we just shoot for the target time.
+      return if stats[stat_key] == 0
+
       # since actual time can depend on external factors (hardware, load,
       # photons, etc.), apply a generous fudge factor ... you should only
       # ever hit the threshold when you introduce something :bananas:, e.g.

@@ -1702,7 +1702,7 @@ class Account < ActiveRecord::Base
   end
 
   def migrate_to_canvadocs?
-    Canvadocs.hijack_crocodoc_sessions? && feature_enabled?(:new_annotations)
+    Canvadocs.hijack_crocodoc_sessions?
   end
 
   def update_terms_of_service(terms_params)

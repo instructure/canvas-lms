@@ -275,7 +275,9 @@ class AssessmentQuestion < ActiveRecord::Base
       qq.assessment_question = self
       qq.workflow_state = 'generated'
       qq.duplicate_index = duplicate_index
-      qq.save_without_callbacks
+      Quizzes::QuizQuestion.suspend_callbacks(:validate_blank_questions, :infer_defaults, :update_quiz) do
+        qq.save!
+      end
     end
   end
 

@@ -153,6 +153,13 @@ describe ApplicationController do
         expect(controller.js_env[:DOMAIN_ROOT_ACCOUNT_ID]).to eq Account.default.global_id
       end
     end
+
+    it 'matches against weird http_accept headers' do
+      # sometimes we get browser requests for an endpoint that just pass */* as
+      # the accept header. I don't think we can simulate this in a test, so
+      # this test just verifies the condition in js_env works across updates
+      expect(Mime::Type.new("*/*") == "*/*").to be_truthy
+    end
   end
 
   describe "clean_return_to" do

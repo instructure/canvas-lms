@@ -1,27 +1,19 @@
 <div class="form-dialog-content sync-to-sis-message-content">
-  {{#if canDisableSync}}
-    <span class="disable-sync-to-sis-message">
-      {{#t}} Are you sure you want to disable Sync to {{sisName}} for all assignments?{{/t}}
-    </span>
-  {{else}}
-    <span class="disable-sync-to-sis-message alert">
-      {{#t}}You are not authorized to disable the Sync to {{sisName}} option.{{/t}}
-    </span>
-  {{/if}}
+  <span class="disable-sync-to-sis-message">
+    {{#t}} Are you sure you want to disable Sync to {{sisName}} for all assignments?{{/t}}
+  </span>
 </div>
 
 <div class="form-controls">
   <button
     id="cancel-assignment-settings"
-    class="btn dialog_closer {{#unless canDisableSync}}disabled{{/unless}}"
+    class="btn dialog_closer"
     type="button"
-    {{#if cannotDisableSync}}aria-disabled="true"{{/if}}
   >{{#t}}Cancel{{/t}}</button>
   <button
     id="update-assignment-settings"
-    class="btn btn-primary {{#unless canDisableSync}}disabled{{/unless}}"
+    class="btn btn-primary"
     data-text-while-loading='{{#t}}Disabling...{{/t}}'
     type="submit"
-    {{#if cannotDisableSync}}aria-disabled="true"{{/if}}
   >{{#t}}Disable{{/t}}</button>
 </div>

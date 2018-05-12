@@ -17,8 +17,9 @@
 
 define [
   'jquery'
-  'Backbone'
-], ($, Backbone) ->
+  'Backbone',
+  '../../../../public/javascripts/submit_assignment_helper'
+], ($, Backbone, SubmitAssignmentHepler) ->
 
   class ExternalContentHomeworkSubmissionView extends Backbone.View
     @optionProperty 'externalTool'
@@ -42,4 +43,5 @@ define [
       event.preventDefault()
       event.stopPropagation()
       @model.set('comment', @$el.find('.submission_comment').val())
-      @submitHomework()
+      if SubmitAssignmentHepler.verifyPledgeIsChecked($('input.turnitin_pledge.external-tool'))
+        @submitHomework()

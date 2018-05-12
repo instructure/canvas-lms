@@ -69,6 +69,7 @@ class DashboardHeader extends React.Component {
         flashError: this.props.flashError,
         flashMessage: this.props.flashMessage,
         srFlashMessage: this.props.screenReaderFlashMessage,
+        externalFallbackFocusable: this.menuButtonFocusable,
         env: this.props.env,
       }
       Planner.default(props)
@@ -156,6 +157,7 @@ class DashboardHeader extends React.Component {
               hide_dashcard_color_overlays={this.props.hide_dashcard_color_overlays}
               planner_enabled={this.props.planner_enabled}
               onDashboardChange={this.changeDashboard}
+              menuButtonRef={(ref) => {this.menuButtonFocusable = ref}}
             />
           </div>
         </div>

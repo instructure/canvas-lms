@@ -163,8 +163,7 @@ import $ from 'jquery'
             data-popup-within='#application'
             data-append-to-body={true}
           >
-            <i className='icon-settings' />
-            <i className='icon-mini-arrow-down' />
+            <i className='icon-more' />
           </button>
           <ul className='al-options' role='menu' aria-hidden='true' aria-expanded='false' tabIndex='0'>
             {menuItems.concat(externalToolMenuItems)}

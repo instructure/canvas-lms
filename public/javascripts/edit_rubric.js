@@ -49,17 +49,19 @@ import 'compiled/jquery/fixDialogButtons'
         $(this).attr('id', 'criterion_' + (i + 1));
       });
     },
-    updateAddCriterionLinks($rubric, forceFocus = false) {
-      if ($rubric.find("#add_criterion_holder").length === 0) { return; }
+    updateAddCriterionLinks($rubric, focusTarget = null) {
+      if (!$rubric.is(":visible") || $rubric.find("#add_criterion_holder").length === 0) { return; }
       $("#add_criterion_container").remove();
       $rubric.find("#add_criterion_holder").append($('<span/>').attr('id', 'add_criterion_container'));
-      ReactDOM.render(
-        <RubricAddCriterionPopover rubric={$rubric} duplicateFunction={rubricEditing.copyCriterion} />,
-        document.getElementById("add_criterion_container")
-      );
-      if (forceFocus) {
-        $rubric.find("#add_criterion_container .icon-plus").focus()
-      }
+      setTimeout(() => {
+        ReactDOM.render(
+          <RubricAddCriterionPopover rubric={$rubric} duplicateFunction={rubricEditing.copyCriterion} />,
+          document.getElementById("add_criterion_container")
+        );
+        if (focusTarget) {
+          $rubric.find(`"#add_criterion_container ${focusTarget}:visible`).focus()
+        }
+      }, 0)
     },
     copyCriterion($rubric, criterion_index) {
       const $criterion = rubricEditing.addCriterion($rubric, criterion_index);
@@ -79,10 +81,10 @@ import 'compiled/jquery/fixDialogButtons'
       $criterion.addClass("new_criterion");
       $criterion.removeClass('blank');
       $rubric.find(".summary").before($criterion.show());
-      const forceFocus = $criterion.hasClass("learning_outcome_criterion")
+      const focusTarget = $criterion.hasClass("learning_outcome_criterion") ? '.icon-plus' : null
       rubricEditing.updateCriteria($rubric);
       rubricEditing.sizeRatings($criterion);
-      rubricEditing.updateAddCriterionLinks($rubric, forceFocus);
+      rubricEditing.updateAddCriterionLinks($rubric, focusTarget);
       return $criterion;
     },
     addNewRatingColumn: function($this) {
@@ -163,14 +165,13 @@ import 'compiled/jquery/fixDialogButtons'
       $criterion.find("textarea.long_description").text(outcome.get('description'));
       $criterion.find(".long_description_holder").toggleClass('empty', !outcome.get('description'));
 
-      $criterion.find(".criterion_description_value").text(outcome.get('title'));
+      $criterion.find(".description_title").text(outcome.get('title'));
       $criterion.find(".criterion_description").val(outcome.get('title')).focus().select();
 
       $criterion.find(".mastery_points").text(outcome.get('mastery_points'));
       $criterion.find(".edit_criterion_link").remove();
       $criterion.find(".rating .links").remove();
-      rubricEditing.updateAddCriterionLinks($rubric);
-      $rubric.find("#add_criterion_container .icon-search").focus();
+      rubricEditing.updateAddCriterionLinks($rubric, '.icon-search');
       $criterion.find(".long_description_holder").show();
     },
     hideCriterionAdd: function($rubric) {
@@ -726,7 +727,7 @@ import 'compiled/jquery/fixDialogButtons'
           description      = $rubric_long_description_dialog.find("textarea.description").val(),
           $criterion       = $rubric_long_description_dialog.data('current_criterion');
       if($criterion) {
-        $criterion.fillTemplateData({data: {long_description: long_description, criterion_description_value: description}});
+        $criterion.fillTemplateData({data: {long_description: long_description, description_title: description}});
         $criterion.find("textarea.long_description").val(long_description);
         $criterion.find("textarea.description").val(description);
         $criterion.find(".long_description_holder").toggleClass('empty', !long_description);
@@ -1048,7 +1049,7 @@ import 'compiled/jquery/fixDialogButtons'
       $criterion.hide();
       rubricEditing.editCriterion($criterion);
       return false;
-    }).delegate('.criterion_description_value', 'click', function(event) {
+    }).delegate('.description_title', 'click', function() {
       var $criterion = $(this).parents(".criterion")
       rubricEditing.editCriterion($criterion);
       return false;
@@ -1066,7 +1067,7 @@ import 'compiled/jquery/fixDialogButtons'
       const $rubric = $criterion.parents(".rubric");
       if ($criterion.hasClass("new_criterion")) {
         $criterion.remove();
-        rubricEditing.updateAddCriterionLinks($rubric, true);
+        rubricEditing.updateAddCriterionLinks($rubric, '.icon-plus');
       } else {
         // focusing before the fadeOut so safari
         // screenreader can handle focus properly

@@ -20,14 +20,11 @@ import changeCase from 'change-case';
 import {AnimatableRegistry} from './animatable-registry';
 import {Animator} from './animator';
 import {AnimationCollection} from './animation-collection';
+import {specialFallbackFocusId} from './util';
 import {daysToItems} from '../utilities/daysUtils';
 import {srAlert} from '../utilities/alertUtils';
 import formatMessage from '../format-message';
 import {setNaiAboveScreen} from '../actions';
-
-export function specialFallbackFocusId (type) {
-  return `~~~${type}-fallback-focus~~~`;
-}
 
 export class DynamicUiManager {
   static defaultOptions =  {
@@ -49,6 +46,8 @@ export class DynamicUiManager {
   setStickyOffset (offset) {
     this.stickyOffset = offset;
   }
+
+  getStickyOffset () { return this.stickyOffset; }
 
   setStore (store) {
     this.store = store;
@@ -197,6 +196,11 @@ export class DynamicUiManager {
     if (handler) handler(action);
   }
 
+  alertLoading = () => { srAlert(formatMessage('loading')); }
+  handleStartLoadingItems = this.alertLoading
+  handleGettingFutureItems = this.alertLoading
+  handleGettingPastItems = this.alertLoading
+
   handleGotDaysSuccess = (action) => {
     const newDays = action.payload.internalDays;
     const newItems = daysToItems(newDays);
@@ -237,11 +241,6 @@ export class DynamicUiManager {
       this.animationPlan.trigger = 'update';
     }
     this.animationPlan.ready = true;
-  }
-
-  handleDeletedPlannerItem = (action) => {
-    const doomedItemId = action.payload.uniqueId;
-    this.planDeletedComponent('item', doomedItemId);
   }
 
   handleDismissedOpportunity = (action) => {

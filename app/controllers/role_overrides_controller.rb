@@ -281,6 +281,9 @@ class RoleOverridesController < ApplicationController
   #     view_all_grades                  -- [ TAd ] View all grades
   #     view_group_pages                 -- [sTADo] View the group pages of all student groups
   #     lti_add_edit                     -- [ TAD ] LTI add and edit
+  #     read_email_addresses             -- [sTAdo] See other users' primary email address
+  #     view_user_logins                 -- [ TA  ] View login ids for users
+  #
   #
   #   Some of these permissions are applicable only for roles on the site admin
   #   account, on a root account, or for course-level roles with a particular base role type;

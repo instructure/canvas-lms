@@ -155,7 +155,7 @@ class UsersController < ApplicationController
 
   before_action :require_user, :only => [:grades, :merge, :kaltura_session,
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
-    :user_dashboard, :toggle_recent_activity_dashboard, :toggle_hide_dashcard_color_overlays,
+    :user_dashboard, :toggle_hide_dashcard_color_overlays,
     :masquerade, :external_tool, :dashboard_sidebar, :settings, :activity_stream,
     :activity_stream_summary, :pandata_token]
   before_action :require_registered_user, :only => [:delete_user_service,
@@ -425,11 +425,11 @@ class UsersController < ApplicationController
           page_opts = {}
           if search_term
             users = UserSearch.for_user_in_context(search_term, @context, @current_user, session,
-              {order: params[:order], sort: params[:sort], role_filter_id: params[:role_filter_id]})
+              {order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id]})
             page_opts[:total_entries] = nil # doesn't calculate a total count
           else
             users = UserSearch.scope_for(@context, @current_user,
-              {order: params[:order], sort: params[:sort], role_filter_id: params[:role_filter_id]})
+              {order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id]})
           end
 
           includes = (params[:include] || []) & %w{avatar_url email last_login time_zone}
@@ -586,15 +586,6 @@ class UsersController < ApplicationController
     end
 
     render :layout => false
-  end
-
-  # This should be considered as deprecated in favor of the dashboard_view endpoint
-  # instead. DON'T USE THIS AGAIN
-  def toggle_recent_activity_dashboard
-    @current_user.preferences[:recent_activity_dashboard] =
-      !@current_user.preferences[:recent_activity_dashboard]
-    @current_user.save!
-    render json: {}
   end
 
   def toggle_hide_dashcard_color_overlays
@@ -1145,8 +1136,6 @@ class UsersController < ApplicationController
           Diigo::Connection.diigo_get_bookmarks(service)
         when 'skype'
           true
-        when 'yo'
-          true
         else
           raise "Unknown Service"
       end
@@ -1397,6 +1386,15 @@ class UsersController < ApplicationController
   #
   # @argument enable_sis_reactivation [Boolean]
   #   When true, will first try to re-activate a deleted user with matching sis_user_id if possible.
+  #
+  # @argument destination [URL]
+  #
+  #   If you're setting the password for the newly created user, you can provide this param
+  #   with a valid URL pointing into this Canvas installation, and the response will include
+  #   a destination field that's a URL that you can redirect a browser to and have the newly
+  #   created user automatically logged in. The URL is only valid for a short time, and must
+  #   match the domain this request is directed to, and be for a well-formed path that Canvas
+  #   can recognize.
   #
   # @returns User
   def create
@@ -2556,6 +2554,7 @@ class UsersController < ApplicationController
       pseudonym_params.delete(:password)
       pseudonym_params.delete(:password_confirmation)
     end
+    password_provided = @pseudonym.new_record? && pseudonym_params.key?(:password)
     if params[:pseudonym][:authentication_provider_id]
       @pseudonym.authentication_provider = @context.
           authentication_providers.active.
@@ -2587,8 +2586,9 @@ class UsersController < ApplicationController
         @pseudonym.send(:skip_session_maintenance=, true)
       end
       @user.save!
-      if @observee && !@user.as_observer_observation_links.where(user_id: @observee).exists?
-        UserObservationLink.create_or_restore(student: @observee, observer: @user)
+
+      if @observee && !@user.as_observer_observation_links.where(user_id: @observee, root_account: @context).exists?
+        UserObservationLink.create_or_restore(student: @observee, observer: @user, root_account: @context)
       end
 
       if notify_policy.is_self_registration?
@@ -2599,7 +2599,24 @@ class UsersController < ApplicationController
 
       data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :message_sent => message_sent, :course => @user.self_enrollment_course }
       if api_request?
-        render(:json => user_json(@user, @current_user, session, includes))
+        result = user_json(@user, @current_user, session, includes)
+        # if they passed a destination, and it matches the current canvas installation,
+        # add a session_token to it for the newly created user and return it
+        if params[:destination] && password_provided &&
+          (_routes.recognize_path(params[:destination]) rescue false) &&
+          (uri = URI.parse(params[:destination]) rescue nil) &&
+          uri.host == request.host &&
+          uri.port == request.port
+
+          # add session_token to the query
+          qs = URI.decode_www_form(uri.query || '')
+          qs.delete_if { |(k, _v)| k == 'session_token' }
+          qs << ['session_token', SessionToken.new(@pseudonym.id, current_user_id: @user.id)]
+          uri.query = URI.encode_www_form(qs)
+
+          result['destination'] = uri.to_s
+        end
+        render(:json => result)
       else
         render(:json => data)
       end

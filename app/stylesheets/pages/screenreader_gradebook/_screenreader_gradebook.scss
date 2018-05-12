@@ -120,7 +120,7 @@ select.grading_box.pass_fail {
 }
 
 span.late-pill, span.missing-pill {
-  padding-left: 12px;
+  padding-#{direction(left)}: 12px;
   text-transform: uppercase;
 }
 
@@ -131,11 +131,11 @@ span.late-pill, span.missing-pill {
 
 .submission_late_penalty {
   color: $ic-color-danger;
-  padding-left: 12px;
+  padding-#{direction(left)}: 12px;
 }
 
 .submission_final_grade {
-  padding-left: 12px;
+  padding-#{direction(left)}: 12px;
 }
 
 // short-term hack until this version of srgb rides into the sunset
@@ -146,7 +146,7 @@ span.late-pill, span.missing-pill {
 .deduction-box {
   display: flex;
   .deduction-box-labels {
-    margin-right: .5em;
+    margin-#{direction(right)}: .5em;
   }
   .deduction-box-values {
     flex: 1

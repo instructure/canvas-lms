@@ -22,14 +22,20 @@ class Loaders::ForeignKeyLoader < GraphQL::Batch::Loader
     @column = fk
   end
 
-  def load(key)
-    super(key.to_s)
+  def load(id)
+    super(Shard.global_id_for(id))
   end
 
   def perform(ids)
-    records = @scope.where(@column => ids).group_by { |o| o.send(@column).to_s }
+    Shard.partition_by_shard(ids) { |sharded_ids|
+      @scope.where(@column => sharded_ids).
+        group_by { |o| o.send(@column).to_s }.
+        each { |id, os|
+          fulfill(Shard.global_id_for(id), os)
+        }
+    }
     ids.each { |id|
-      fulfill(id, records[id])
+      fulfill(id, nil) unless fulfilled?(id)
     }
   end
 end

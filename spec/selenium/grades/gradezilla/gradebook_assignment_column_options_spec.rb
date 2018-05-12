@@ -21,7 +21,7 @@ require_relative '../pages/gradezilla_page'
 require_relative '../pages/gradezilla_cells_page'
 require_relative '../pages/gradezilla_grade_detail_tray_page'
 
-describe "Gradezilla - Assignment Column Options" do
+describe "Gradezilla - Assignment Column" do
   include_context "in-process server selenium tests"
   include GradezillaCommon
   include GroupsCommon
@@ -52,7 +52,7 @@ describe "Gradezilla - Assignment Column Options" do
   before(:each) { user_session(@teacher) }
 
   context "with Sorting" do
-    it "sorts by Missing" do
+    it "sorts by Missing", test_id: 3253336, priority: "1" do
       third_student = @course.students.find_by!(name: 'Student 3')
       @assignment.submissions.find_by!(user: third_student).update!(late_policy_status: "missing")
       Gradezilla.visit(@course)
@@ -128,6 +128,34 @@ describe "Gradezilla - Assignment Column Options" do
       Gradezilla::Cells.edit_grade(@course.students[2],@assignment, 'EX')
 
       expect { Gradezilla::Cells.get_grade(@course.students[2], @assignment) }.to become 'Excused'
+    end
+  end
+
+  context "with anonymous assignment" do
+    before(:each) do
+      # enable anonymous flags at account level
+      Account.default.enable_feature!(:anonymous_moderated_marking)
+      Account.default.enable_feature!(:anonymous_marking)
+
+      # re-use the course and student setup from the describe block up-above
+      # update assignment to be an anonymous assignment
+      @assignment.update_attributes(title: "Anon Assignment", anonymous_grading: true)
+
+      # visit new gradebook as teacher
+      Gradezilla.visit(@course)
+    end
+
+    it "assignment header cell contains ANONYMOUS label" do
+      expect(Gradezilla.select_assignment_header_secondary_label('Anon Assignment').text).to eq 'ANONYMOUS'
+    end
+
+    it "speedgrader link on tray displays warning", priority: "1", test_id: 3481216 do
+      skip('This is skeleton code that acts as AC for GRADE-1050 which is WIP')
+      Gradezilla::Cells.open_tray(@course.students.first, @assignment)
+      Gradezilla::GradeDetailTray.speedgrader_link.click
+
+      expect(Gradezilla.overlay_info_screen.text).to
+            include_text('Anonymous Mode On: Unable to access specific student. Go to assignment in Speedgrader?')
     end
   end
 end

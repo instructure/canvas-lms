@@ -54,7 +54,7 @@
     <%= t :overview, "Student peer reviews will be considered complete when students have commented
       at least once on the page." %>
   <% end %>
-<ul class="unstyled_list" style="margin-left: 20px;">
+<ul class="unstyled_list" style="margin-<%= direction('left') %>: 20px;">
   <li style="<%= hidden unless @students.empty? %>" class="no_students_message"><%= t 'messages.no_students_found', "No Students Found" %></li>
   <% @students.each do |student| %>
     <% submission = @submissions.to_a.find{|s| s.user_id == student.id} %>
@@ -63,7 +63,7 @@
         <span class="assessor_name"><%= student.last_name_first %></span>
         <span class="user_id student_review_id" style="display: none;"><%= student.id %></span>
       </a>
-      <ul class="unstyled_list peer_reviews" style="padding-left: 21px; font-size: 0.8em; width: 50%;">
+      <ul class="unstyled_list peer_reviews" style="padding-<%= direction('left') %>: 21px; font-size: 0.8em; width: 50%;">
         <li class="peer_review no_requests_message" style="<%= hidden unless !submission || submission.assigned_assessments.empty? %>"><%= t :none_assigned, "None Assigned" %></li>
         <% if submission %>
         <% Canvas::ICU.collate_by(submission.assigned_assessments) {|r| r.asset.user.sortable_name }.each do |request| %>
@@ -73,7 +73,7 @@
         <% end %>
         <% end %>
       </ul>
-      <div style="margin-left: 25px; font-size: 0.7em;" class="assign_box">
+      <div style="margin-<%= direction('left') %>: 25px; font-size: 0.7em;" class="assign_box">
         <a href="#" class="assign_peer_review_link"><%= t 'links.assign_peer_review', "Give %{student} another submission to assess", :student => student.name %>
           <i class="icon-add" role="presentation"></i>
         </a>

@@ -195,6 +195,28 @@ module AccountReports::ReportHelper
     end
   end
 
+  def loaded_pseudonym(pseudonyms, u, include_deleted: false, enrollment: nil)
+    context = enrollment || root_account
+    user_pseudonyms = pseudonyms[u.id] || []
+    u.instance_variable_set(include_deleted ? :@all_pseudonyms : :@all_active_pseudonyms, user_pseudonyms)
+    SisPseudonym.for(u, context, {type: :trusted, require_sis: false, include_deleted: include_deleted})
+  end
+
+  def load_cross_shard_logins(users, include_deleted: false)
+    shards = root_account.trusted_account_ids.map {|id| Shard.shard_for(id)}
+    shards << root_account.shard
+    User.preload_shard_associations(users)
+    shards = shards & users.map(&:associated_shards).flatten
+    pseudonyms = Pseudonym.shard(shards.uniq).where(user_id: users)
+    pseudonyms = pseudonyms.active unless include_deleted
+    pseudonyms.each do |p|
+      p.account = root_account if p.account_id == root_account.id
+    end
+    preloads = Account.reflections['role_links'] ? {account: :role_links} : :account
+    ActiveRecord::Associations::Preloader.new.preload(pseudonyms, preloads)
+    pseudonyms.group_by(&:user_id)
+  end
+
   def include_deleted_objects
     if @account_report.has_parameter? "include_deleted"
       @include_deleted = value_to_boolean(@account_report.parameters["include_deleted"])
@@ -284,7 +306,7 @@ module AccountReports::ReportHelper
         return
       end
       report_runner.start
-      Shackles.activate(:slave) {AccountReports::REPORTS[@account_report.report_type][:parallel_proc].call(@account_report, report_runner)}
+      Shackles.activate(:slave) {AccountReports::REPORTS[@account_report.report_type].parallel_proc.call(@account_report, report_runner)}
       update_parallel_progress(account_report: @account_report,report_runner: report_runner)
     rescue => e
       report_runner.fail

@@ -19,11 +19,12 @@ require_relative "../spec_helper"
 
 describe DataFixup::DeleteDuplicateNotificationEndpoints do
   it "removes duplciate notification endpoints based on arn" do
+      sns_client = double()
+      allow(sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: 'arn')
+      allow(DeveloperKey).to receive(:sns).and_return(sns_client)
       at = AccessToken.create!(:user => user_model, :developer_key => DeveloperKey.default)
-      ne1 = at.notification_endpoints.build(token: 'token', arn: 'arn')
-      ne2 = at.notification_endpoints.build(token: 'TOKEN', arn: 'arn')
-      ne1.save_without_callbacks
-      ne2.save_without_callbacks
+      ne1 = at.notification_endpoints.create!(token: 'token')
+      ne2 = at.notification_endpoints.create!(token: 'TOKEN')
 
       DataFixup::DeleteDuplicateNotificationEndpoints.run
 

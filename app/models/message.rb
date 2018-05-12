@@ -16,8 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'hey'
-
 class Message < ActiveRecord::Base
   # Included modules
   include Rails.application.routes.url_helpers
@@ -420,23 +418,22 @@ class Message < ActiveRecord::Base
 
   # Public: Apply an HTML email template to this message.
   #
-  # _binding - The binding to attach to the template.
-  #
   # Returns an HTML template (or nil).
-  def apply_html_template(_binding)
+  def apply_html_template(binding)
     orig_i18n_scope = @i18n_scope
     @i18n_scope = "#{@i18n_scope}.html"
-    return nil unless template = load_html_template
+    template, template_path = load_html_template
+    return nil unless template
 
     # Add the attribute 'inner_html' with the value of inner_html into the _binding
     @output_buffer = nil
-    inner_html = ActionView::Template::Handlers::Erubis.new(template, :bufvar => '@output_buffer').result(_binding)
-    setter = eval "inner_html = nil; lambda { |v| inner_html = v }", _binding
+    inner_html = eval(ActionView::Template::Handlers::ERB::Erubi.new(template, :bufvar => '@output_buffer').src, binding, template_path)
+    setter = eval "inner_html = nil; lambda { |v| inner_html = v }", binding
     setter.call(inner_html)
 
     layout_path = Canvas::MessageHelper.find_message_path('_layout.email.html.erb')
     @output_buffer = nil
-    ActionView::Template::Handlers::Erubis.new(File.read(layout_path)).result(_binding)
+    eval(ActionView::Template::Handlers::ERB::Erubi.new(File.read(layout_path)).src, binding, layout_path)
   ensure
     @i18n_scope = orig_i18n_scope
   end
@@ -444,26 +441,26 @@ class Message < ActiveRecord::Base
   def load_html_template
     html_file = template_filename('email.html')
     html_path = Canvas::MessageHelper.find_message_path(html_file)
-    File.read(html_path) if File.exist?(html_path)
+    [File.read(html_path), html_path] if File.exist?(html_path)
   end
 
   # Public: Assign the body, subject and url to the message.
   #
   # message_body_template - Raw template body
   # path_type             - Path to send the message across, e.g, 'email'.
-  # _binding              - Message binding
   #
   # Returns message body
-  def populate_body(message_body_template, path_type, _binding, filename)
+  def populate_body(message_body_template, path_type, binding, filename)
     # Build the body content based on the path type
-    self.body = Erubis::Eruby.new(message_body_template,
-      bufvar: '@output_buffer', filename: filename).result(_binding)
-    self.html_body = apply_html_template(_binding) if path_type == 'email'
+    self.body = eval(Erubi::Engine.new(message_body_template,
+      bufvar: '@output_buffer').src, binding, filename)
+    self.html_body = apply_html_template(binding) if path_type == 'email'
 
     # Append a footer to the body if the path type is email
     if path_type == 'email'
-      raw_footer_message = File.read(Canvas::MessageHelper.find_message_path('_email_footer.email.erb'))
-      footer_message = Erubis::Eruby.new(raw_footer_message, :bufvar => "@output_buffer").result(_binding)
+      footer_path = Canvas::MessageHelper.find_message_path('_email_footer.email.erb')
+      raw_footer_message = File.read(footer_path)
+      footer_message = eval(Erubi::Engine.new(raw_footer_message, :bufvar => "@output_buffer").src, nil, footer_path)
       if footer_message.present?
         self.body = <<-END.strip_heredoc
           #{self.body}
@@ -516,9 +513,9 @@ class Message < ActiveRecord::Base
         self.url     = @message_content_link || nil
       else
         # Message doesn't exist so we flag the message as an error
-        main_link    = Erubis::Eruby.new(self.notification.main_link || "").result(binding)
-        self.subject = Erubis::Eruby.new(subject).result(binding)
-        self.body    = Erubis::Eruby.new(body).result(binding)
+        main_link    = eval(Erubi::Engine.new(self.notification.main_link || "").src)
+        self.subject = eval(Erubi::Engine.new(subject).src)
+        self.body    = eval(Erubi::Engine.new(body).src)
         self.transmission_errors = "couldn't find #{Canvas::MessageHelper.find_message_path(filename)}"
       end
     end
@@ -827,21 +824,6 @@ class Message < ActiveRecord::Base
     msg_id = AssetSignature.generate(self)
     Twitter::Messenger.new(self, twitter_service, host, msg_id).deliver
     complete_dispatch
-  end
-
-  # Internal: Deliver the message through Yo.
-  #
-  # Returns nothing.
-  def deliver_via_yo
-    plugin = Canvas::Plugin.find(:yo)
-    if plugin && plugin.enabled? && plugin.setting(:api_token)
-      service = self.user.user_services.where(service: 'yo').first
-      Hey.api_token ||= plugin.setting(:api_token)
-      Hey::Yo.user(service.service_user_id, link: self.url)
-      complete_dispatch
-    else
-      cancel
-    end
   end
 
   # Internal: Send the message through SMS. This currently sends it via Twilio if the recipient is a E.164 phone

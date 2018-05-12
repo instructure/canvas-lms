@@ -33,12 +33,14 @@ export default class DashboardOptionsMenu extends React.Component {
     hide_dashcard_color_overlays: PropTypes.bool,
     planner_enabled: PropTypes.bool,
     onDashboardChange: PropTypes.func.isRequired,
+    menuButtonRef: PropTypes.func,
   }
 
   static defaultProps = {
     hide_dashcard_color_overlays: false,
     planner_enabled: false,
     view: 'cards',
+    menuButtonRef: () => {},
   }
 
   constructor (props) {
@@ -96,7 +98,7 @@ export default class DashboardOptionsMenu extends React.Component {
     return (
       <PopoverMenu
         trigger={
-          <Button variant="icon">
+          <Button variant="icon" buttonRef={this.props.menuButtonRef}>
             <ScreenReaderContent>{I18n.t('Dashboard Options')}</ScreenReaderContent>
             <IconMoreLine />
           </Button>

@@ -20,7 +20,9 @@ import {
   MaintainScrollPosition,
   ScrollToNewActivity,
   ScrollToLastLoadedNewActivity,
-
+  ContinueInitialLoad,
+  FocusPriorItemOnLoadMore,
+  FocusPriorItemOnDelete,
   // ResetFocus,
   // FocusSavedItem,
   // SetFocusToPriorLoadedItem,
@@ -31,6 +33,14 @@ import {
 
 export class AnimationCollection {
   static actionsToAnimations = [
+    {
+      expected: [
+        'CONTINUE_LOADING_INITIAL_ITEMS',
+        'START_LOADING_FUTURE_SAGA',
+        'GOT_DAYS_SUCCESS',
+      ],
+      animation: ContinueInitialLoad,
+    },
     {
       expected: [
         'SCROLL_TO_NEW_ACTIVITY',
@@ -52,13 +62,22 @@ export class AnimationCollection {
       ],
       animation: MaintainScrollPosition,
     },
+    {
+      expected: [
+        'GETTING_FUTURE_ITEMS', // checks if the load more button was initiator of this action
+        'GOT_DAYS_SUCCESS',
+      ],
+      animation: FocusPriorItemOnLoadMore,
+    },
+    {
+      expected: [
+        'DELETED_PLANNER_ITEM',
+      ],
+      animation: FocusPriorItemOnDelete,
+    }
 
 
     // animations for the future. no, the format doesn't match.
-
-    // [['LOAD_FUTURE_ITEMS',
-    //   'GOT_DAYS_SUCCESS',
-    // ], SetFocusToPriorLoadedItem],
 
     // [['OPEN_EDITING_PLANNER_ITEM',
     //   'CANCEL_EDITING_PLANNER_ITEM',

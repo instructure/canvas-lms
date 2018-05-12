@@ -22,8 +22,8 @@ describe UserObservationLink do
   let_once(:student) { user_factory }
 
   it 'should fail when there is not observer or observee' do
-    expect { UserObservationLink.create_or_restore(student: nil, observer: student) }.
-      to raise_error(ArgumentError, 'student and observer are required')
+    expect { UserObservationLink.create_or_restore(student: nil, observer: student, root_account: Account.default) }.
+      to raise_error(ArgumentError, 'student, observer and root_account are required')
   end
 
   it "should not allow a user to observe oneself" do
@@ -36,7 +36,7 @@ describe UserObservationLink do
     observee = observer.as_observer_observation_links.first
     observee.destroy
 
-    re_observee = UserObservationLink.create_or_restore(observer: observer, student: student)
+    re_observee = UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
     expect(observee.id).to eq re_observee.id
     expect(re_observee.workflow_state).to eq 'active'
   end
@@ -50,13 +50,13 @@ describe UserObservationLink do
     observer_enroll = observer.observer_enrollments.first
     observer_enroll.destroy
 
-    UserObservationLink.create_or_restore(observer: observer, student: student)
+    UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
     expect(observer_enroll.reload).to_not be_deleted
   end
 
   it 'should create an observees when one does not exist' do
     observer = user_with_pseudonym
-    re_observee = UserObservationLink.create_or_restore(observer: observer, student: student)
+    re_observee = UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
     expect(re_observee).to eq student.as_student_observation_links.first
   end
 
@@ -83,7 +83,7 @@ describe UserObservationLink do
     p = observer.pseudonyms.first
     p.workflow_state = 'active'
     p.save!
-    UserObservationLink.create_or_restore(observer: observer, student: student)
+    UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
     observer.reload
     expect(enrollments.reload.map(&:workflow_state)).to eql ["active", "active"]
   end
@@ -196,9 +196,55 @@ describe UserObservationLink do
       parent = nil
       @shard2.activate do
         parent = user_with_pseudonym(account: course.account, active_all: true)
-        UserObservationLink.create_or_restore(observer: parent, student: student)
+        UserObservationLink.create_or_restore(observer: parent, student: student, root_account: Account.default)
       end
       expect(parent.enrollments.shard(parent).first.course).to eq course
+    end
+  end
+
+  context "root account restrictions" do
+    before :once do
+      @a1 = account_model
+      @c1 = course_factory(account: @a1, active_all: true)
+      @a2 = account_model
+      @c2 = course_factory(account: @a2, active_all: true)
+      @observer = user_with_pseudonym(account: @a1)
+      pseudonym(@observer, account: @a2)
+    end
+
+    it "should only add the observer in courses on the same root account as the link when created" do
+      e1 = student_in_course(course: @c1, user: student, active_all: true)
+      e2 = student_in_course(course: @c2, user: student, active_all: true)
+      UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a1)
+      expect(@observer.enrollments.pluck(:course_id)).to eq [@c1.id]
+    end
+
+    it "should only add observers linked on the same root account to a new student enrollment" do
+      @observer2 = user_with_pseudonym(account: @a2)
+      UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a1)
+      UserObservationLink.create_or_restore(observer: @observer2, student: student, root_account: @a2)
+      e1 = student_in_course(course: @c1, user: student, active_all: true)
+      expect(@observer.enrollments.pluck(:course_id)).to eq [@c1.id]
+      expect(@observer2.enrollments).to be_empty
+    end
+
+    it "should only remove the observer in courses on the same root account as the link" do
+      e1 = student_in_course(course: @c1, user: student, active_all: true)
+      e2 = student_in_course(course: @c2, user: student, active_all: true)
+      link1 = UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a1)
+      link2 = UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a2)
+      expect(@observer.enrollments.active.pluck(:course_id)).to match_array([@c1.id, @c2.id])
+      link1.destroy
+      expect(@observer.enrollments.active.pluck(:course_id)).to eq [@c2.id]
+    end
+
+    it "should only update observer enrollments linked on the same root account" do
+      UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a1)
+      UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a2)
+      e1 = student_in_course(course: @c1, user: student, active_all: true)
+      e2 = student_in_course(course: @c2, user: student, active_all: true)
+      e1.destroy
+      expect(@observer.enrollments.active.pluck(:course_id)).to eq [@c2.id]
     end
   end
 end

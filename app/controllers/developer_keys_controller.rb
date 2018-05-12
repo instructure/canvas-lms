@@ -28,7 +28,7 @@ class DeveloperKeysController < ApplicationController
     respond_to do |format|
       format.html do
         set_navigation
-        js_env(accountEndpoint: api_v1_account_developer_keys_path(@context), developer_keys_count: @keys.total_entries)
+        js_env(accountEndpoint: api_v1_account_developer_keys_path(@context))
 
         if use_new_dev_key_features?
           render :index_react
@@ -37,7 +37,11 @@ class DeveloperKeysController < ApplicationController
         end
       end
 
-      format.json { render :json => developer_keys_json(@keys, @current_user, session, account_context, use_new_dev_key_features?) }
+      format.json do
+        render :json => developer_keys_json(
+          @keys, @current_user, session, account_context, use_new_dev_key_features?, inherited: params[:inherited].present?
+        )
+      end
     end
   end
 
@@ -78,17 +82,17 @@ class DeveloperKeysController < ApplicationController
     unless use_new_dev_key_features?
       return @context.site_admin? ? DeveloperKey : @context.developer_keys
     end
-    return DeveloperKey if @context.site_admin?
-    DeveloperKey.where(account_id: @context.id).or(DeveloperKey.visible.where(account_id: nil))
-  end
-
-  def create_or_update_developer_key_binding(developer_key)
-    return unless use_new_dev_key_features?
-    return unless params[:account_id] && permitted_params[:binding_workflow_state]
-    developer_key.set_developer_key_account_binding_state!(
-      account: account_from_params,
-      workflow_state: permitted_params[:binding_workflow_state]
-    )
+    if params[:inherited].present?
+      return DeveloperKey.none if @context.site_admin?
+      Account.site_admin.shard.activate do
+        # site_admin keys have a nil account_id
+        DeveloperKey.visible.where(account_id: nil)
+      end
+    elsif @context.site_admin?
+      DeveloperKey
+    else
+      DeveloperKey.where(account_id: @context.id)
+    end
   end
 
   def account_from_params

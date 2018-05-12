@@ -1243,7 +1243,7 @@ describe GradebooksController do
       user_session(@teacher)
       @assignment = @course.assignments.create!(:title => "some assignment")
       @student = @course.enroll_user(User.create!(:name => "some user"))
-      data = fixture_file_upload("scribd_docs/doc.doc", "application/msword", true)
+      data = fixture_file_upload("docs/doc.doc", "application/msword", true)
       post 'update_submission',
         params: {:course_id => @course.id,
         :attachments => { "0" => { :uploaded_data => data } },

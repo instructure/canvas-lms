@@ -22,7 +22,7 @@
   text-align: center;
 }
 
-#keys {
+#keys, .keys {
   tr:hover {
     td {
       .api_key {
@@ -105,4 +105,10 @@
     white-space: nowrap;
     padding: 3px 2px;
   }
+}
+
+.loadingSection {
+  margin: auto;
+  text-align: center;
+  padding: 1rem;
 }

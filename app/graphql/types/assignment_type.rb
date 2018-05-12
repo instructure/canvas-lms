@@ -36,9 +36,13 @@ module Types
       "the assignment is out of this many points",
       property: :points_possible
 
-    field :dueAt, types.String,
+    field :dueAt, DateTimeType,
       "when this assignment is due",
       property: :due_at
+    field :lockAt, DateTimeType, property: :lock_at
+    field :unlockAt, DateTimeType, property: :unlock_at
+
+    field :muted, types.Boolean, property: :muted?
 
     field :state, !AssignmentState, property: :workflow_state
 

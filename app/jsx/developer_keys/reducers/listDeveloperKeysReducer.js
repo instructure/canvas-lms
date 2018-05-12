@@ -22,7 +22,13 @@ const initialState = {
   listDeveloperKeysPending: false,
   listDeveloperKeysSuccessful: false,
   listDeveloperKeysError: null,
+  listInheritedDeveloperKeysPending: false,
+  listInheritedDeveloperKeysSuccessful: false,
+  listInheritedDeveloperKeysError: null,
   list: [],
+  inheritedList: [],
+  nextPage: null,
+  inheritedNextPage: null
 }
 
 const developerKeysHandlers = {
@@ -42,6 +48,24 @@ const developerKeysHandlers = {
       listDeveloperKeysSuccessful: true,
       list,
       nextPage: action.payload.next
+    }
+  },
+  [ACTION_NAMES.LIST_INHERITED_DEVELOPER_KEYS_START]: (state, action) => ({
+    ...state,
+    inheritedList: action.payload ? [] : state.inheritedList,
+    listInheritedDeveloperKeysPending: true,
+    listInheritedDeveloperKeysSuccessful: false,
+    listInheritedDeveloperKeysError: null
+  }),
+  [ACTION_NAMES.LIST_INHERITED_DEVELOPER_KEYS_SUCCESSFUL]: (state, action) => {
+    const inheritedList = state.inheritedList.slice()
+    inheritedList.push(...action.payload.developerKeys)
+    return {
+      ...state,
+      listInheritedDeveloperKeysPending: false,
+      listInheritedDeveloperKeysSuccessful: true,
+      inheritedList,
+      inheritedNextPage: action.payload.next
     }
   },
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_REPLACE]: (state, action) => ({
@@ -64,6 +88,11 @@ const developerKeysHandlers = {
       ...state,
       listDeveloperKeysPending: false,
       listDeveloperKeysError: action.payload
+  }),
+  [ACTION_NAMES.LIST_INHERITED_DEVELOPER_KEYS_FAILED]: (state, action) => ({
+      ...state,
+      listInheritedDeveloperKeysPending: false,
+      listInheritedDeveloperKeysError: action.payload
   }),
 };
 

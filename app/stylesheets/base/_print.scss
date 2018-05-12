@@ -42,7 +42,7 @@
   }
 
   .ic-Layout-wrapper,
-  .ic-Layout-columns { margin-left: 0 !important; }
+  .ic-Layout-columns { margin-#{direction(left)}: 0 !important; }
 
   // this is for firefox, if things dont have overflow:visible then it wont print any more than one page.
   .ic-Layout-wrapper,
@@ -90,7 +90,7 @@
       margin: 0; padding: 0;
       li {
         margin: 0; padding: 0;
-        padding-left: 10px;
+        padding-#{direction(left)}: 10px;
         &:after {
           content: "   →   ";
         }
@@ -98,7 +98,7 @@
           content: "";
         }
         &:first-of-type {
-          padding-left: 0;
+          padding-#{direction(left)}: 0;
         }
         &.home {
           display: none;
@@ -106,7 +106,7 @@
       }
       a {
         text-decoration: none !important;
-        padding-right: 10px;
+        padding-#{direction(right)}: 10px;
       }
     }
   }

@@ -182,7 +182,7 @@ class PlannerOverridesController < ApplicationController
       items = params[:filter] == 'new_activity' ? unread_items : planner_items
       items = Api.paginate(items, self, api_v1_planner_items_url)
       {
-        json: planner_items_json(items, @current_user, session, {start_at: start_date, due_after: start_date, due_before: end_date}),
+        json: planner_items_json(items, @current_user, session, {due_after: start_date, due_before: end_date}),
         link: response.headers["Link"].to_s,
       }
     end

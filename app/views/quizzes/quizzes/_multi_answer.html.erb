@@ -47,7 +47,7 @@
         <label for="question_<%= hash_get(question, :id) %>_answer_<%= hash_get(answer, :id) %>" aria-label="<%= answer_label %>"><%= (hash_get(answer, :left_html) || hash_get(answer, :html)).present? ? (hash_get(answer, :left_html) || hash_get(answer, :html)).html_safe : (hash_get(answer, :left) || hash_get(answer, :text)) %></label>
         <% if !user_answer %>
           <br/>
-          <div style="margin-left: 20px;">
+          <div style="margin-<%= direction('left') %>: 20px;">
           </div>
         <% end %>
       <% end %>

@@ -90,17 +90,6 @@ test('html safety: should html-escape translations and interpolations if any int
   )
 })
 
-test('html safety: should html-escape translations and interpolations if any placeholders are flagged as safe', () => {
-  equal(
-    t('bar', "only one of these won't get escaped: <input>, %{a}, %h{b} & %{c}", {
-      a: '<img>',
-      b: '<br>',
-      c: '<hr>'
-    }),
-    'only one of these won&#39;t get escaped: &lt;input&gt;, &lt;img&gt;, <br> &amp; &lt;hr&gt;'
-  )
-})
-
 test('wrappers: should auto-html-escape', () => {
   equal(t('bar', '*2* > 1', {wrapper: '<b>$1</b>'}), '<b>2</b> &gt; 1')
 })
@@ -188,7 +177,7 @@ test('uses precision from number if not specified', function() {
 
 test('uses precision specified', function() {
   equal(I18n.localizeNumber(1.2, {precision: 3}), `1${this.separator}200`)
-  equal(I18n.localizeNumber(1.2345, {precision: 3}), `1${this.separator}234`)
+  equal(I18n.localizeNumber(1.2345, {precision: 3}), `1${this.separator}235`)
 })
 
 test('formats as a percentage if set to true', function() {

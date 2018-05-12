@@ -52,7 +52,7 @@ describe "submissions" do
       expect_new_page_load { submit_form(assignment_form) }
 
       expect(@course.student_view_student.submissions.count).to eq 1
-      expect(f('#sidebar_content .details')).to include_text "Turned In!"
+      expect(f('#sidebar_content .details')).to include_text "Submitted!"
     end
   end
 end

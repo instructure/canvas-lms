@@ -20,7 +20,7 @@
   <a href="<%= context_url(@context, :context_question_banks_url, :include_bookmarked => '1', :inherited => '1') %>" class="find_question_banks_url" style="display: none;">&nbsp;</a>
   <a href="/<%= @quiz.context_url_prefix %>/question_banks/{{ question_bank_id }}/questions?inherited=1" class="question_bank_questions_url" style="display: none;">&nbsp;</a>
   <a href="<%= context_url(@context, :context_quiz_quiz_questions_url, @quiz.id) %>" class="add_questions_url" style="display: none;">&nbsp;</a>
-  <div style="float: right; padding-right: 5px; line-height: 2.5em;">
+  <div style="float: <%= direction('right') %>; padding-<%= direction('right') %>: 5px; line-height: 2.5em;">
     <a href="<%= context_url(@context, :context_question_banks_url) %>"><%= t('links.view_question_banks', "View Course Question Banks") %></a>
   </div>
   <div class="clear"></div>
@@ -77,7 +77,7 @@
 </div>
 <div id="find_bank_dialog" style="display: none;">
   <a href="<%= context_url(@context, :context_question_banks_url, :include_bookmarked => '1', :inherited => '1') %>" class="find_question_banks_url" style="display: none;">&nbsp;</a>
-  <div style="float: right; padding-right: 5px; line-height: 2.5em;">
+  <div style="float: <%= direction('right') %>; padding-<%= direction('right') %>: 5px; line-height: 2.5em;">
     <a href="<%= context_url(@context, :context_question_banks_url) %>"><%= t('links.view_question_banks', "View Course Question Banks") %></a>
   </div>
   <div class="clear"></div>

@@ -367,6 +367,7 @@ define [
           @saveColumnWidthPreference(column.id, column.width)
 
     initialize: ->
+      @setAssignmentGroupsLoaded(false)
       @setStudentsLoaded(false)
       @setSubmissionsLoaded(false)
 
@@ -401,9 +402,7 @@ define [
         @courseContent.students.setStudentIds(response.user_ids)
         @buildRows()
 
-      dataLoader.gotGradingPeriodAssignments?.then (response) =>
-        @courseContent.gradingPeriodAssignments = response.grading_period_assignments
-
+      dataLoader.gotGradingPeriodAssignments?.then @gotGradingPeriodAssignments
       dataLoader.gotAssignmentGroups.then @gotAllAssignmentGroups
       dataLoader.gotCustomColumns.then @gotCustomColumns
       dataLoader.gotStudents.then @gotAllStudents
@@ -456,12 +455,12 @@ define [
       else
         $('#gradebook_grid').trigger('resize.fillWindowWithMe')
 
-    reloadStudentData: =>
+    reloadStudentData: (optionOverrides = {}, afterColumnsUpdated) =>
       @setStudentsLoaded(false)
       @setSubmissionsLoaded(false)
       @renderFilters()
 
-      dataLoader = DataLoader.loadGradebookData(
+      dataLoaderOptions =
         courseId: @options.context_id
         perPage: @options.api_max_per_page
         studentsURL: @options.students_stateless_url
@@ -476,7 +475,14 @@ define [
         customColumnDataPageCb: @gotCustomColumnDataChunk
         customColumnDataParams:
           include_hidden: true
-      )
+        getGradingPeriodAssignments: false
+
+      dataLoader = DataLoader.loadGradebookData(Object.assign(dataLoaderOptions, optionOverrides))
+
+      dataLoader.gotGradingPeriodAssignments?.then (response) =>
+        @gotGradingPeriodAssignments(response)
+        @updateColumns()
+        afterColumnsUpdated() if afterColumnsUpdated
 
       dataLoader.gotStudentIds.then (response) =>
         @courseContent.students.setStudentIds(response.user_ids)
@@ -554,6 +560,7 @@ define [
       @invalidateRowsForStudentIds(_.uniq(studentIds))
 
     gotAllAssignmentGroups: (assignmentGroups) =>
+      @setAssignmentGroupsLoaded(true)
       # purposely passing the @options and assignmentGroups by reference so it can update
       # an assigmentGroup's .group_weight and @options.group_weighting_scheme
       for group in assignmentGroups
@@ -563,6 +570,9 @@ define [
           assignment.due_at = tz.parse(assignment.due_at)
           @updateAssignmentEffectiveDueDates(assignment)
           @assignments[assignment.id] = assignment
+
+    gotGradingPeriodAssignments: ({ grading_period_assignments: gradingPeriodAssignments }) =>
+      @courseContent.gradingPeriodAssignments = gradingPeriodAssignments
 
     gotSections: (sections) =>
       @setSections(sections.map(htmlEscape))
@@ -1139,6 +1149,7 @@ define [
         @updateFilteredContentInfo()
         @updateColumnsAndRenderViewOptionsMenu()
         @updateGradingPeriodFilterVisibility()
+        @renderActionMenu()
 
     updateCurrentModule: (moduleId) =>
       if @getFilterColumnsBySetting('contextModuleId') != moduleId
@@ -1320,6 +1331,7 @@ define [
         publishGradesToSis:
           isEnabled: @options.publish_to_sis_enabled
           publishToSisUrl: @options.publish_to_sis_url
+        gradingPeriodId: @getGradingPeriodToShow()
 
       progressData = @options.gradebook_csv_progress
 
@@ -1342,10 +1354,13 @@ define [
       renderComponent(ActionMenu, mountPoint, props)
 
     renderFilters: =>
+      # Sections and grading periods are passed into the constructor, and therefore are always
+      # available, whereas assignment groups and context modules are fetched via the DataLoader,
+      # so we need to wait until they are loaded to set their filter visibility.
       @updateSectionFilterVisibility()
-      @updateAssignmentGroupFilterVisibility()
+      @updateAssignmentGroupFilterVisibility() if @contentLoadStates.assignmentGroupsLoaded
       @updateGradingPeriodFilterVisibility()
-      @updateModulesFilterVisibility()
+      @updateModulesFilterVisibility() if @contentLoadStates.contextModulesLoaded
       @renderSearchFilter()
 
     renderGridColor: =>
@@ -2001,10 +2016,13 @@ define [
 
     ## Gradebook Bulk UI Update Methods
 
-    updateColumnsAndRenderViewOptionsMenu: =>
+    updateColumns: =>
       @setVisibleGridColumns()
       @gradebookGrid.updateColumns()
       @updateColumnHeaders()
+
+    updateColumnsAndRenderViewOptionsMenu: =>
+      @updateColumns()
       @renderViewOptionsMenu()
 
     ## React Header Component Ref Methods
@@ -2141,6 +2159,7 @@ define [
       submissionState = @submissionStateMap.getSubmissionState({ user_id: studentId, assignment_id: assignmentId })
       isGroupWeightZero = @assignmentGroups[assignment.assignment_group_id].group_weight == 0
 
+      anonymousModeratedMarkingEnabled: @options.anonymous_moderated_marking_enabled
       assignment: ConvertCase.camelize(assignment)
       colors: @getGridColors()
       comments: comments
@@ -2324,6 +2343,9 @@ define [
     setAssignmentsLoaded: (loaded) =>
       @contentLoadStates.assignmentsLoaded = loaded
 
+    setAssignmentGroupsLoaded: (loaded) =>
+      @contentLoadStates.assignmentGroupsLoaded = loaded
+
     setStudentsLoaded: (loaded) =>
       @contentLoadStates.studentsLoaded = loaded
 
@@ -2466,13 +2488,17 @@ define [
       @getEnrollmentFilters()[enrollmentFilter] = !@getEnrollmentFilters()[enrollmentFilter]
       @applyEnrollmentFilter() unless skipApply
 
-    applyEnrollmentFilter: () =>
+    updateStudentHeadersAndReloadData: =>
+      @gradebookGrid.gridSupport.columns.updateColumnHeaders(['student'])
+      optionOverrides =
+        getGradingPeriodAssignments: @gradingPeriodSet?
+      afterColumnsUpdated = => @getHeaderComponentRef('student')?.focusAtEnd()
+      @reloadStudentData(optionOverrides, afterColumnsUpdated)
+
+    applyEnrollmentFilter: =>
       showInactive = @getEnrollmentFilters().inactive
       showConcluded = @getEnrollmentFilters().concluded
-      @saveSettings({ showInactive, showConcluded }, =>
-        @gradebookGrid.gridSupport.columns.updateColumnHeaders(['student'])
-        @reloadStudentData()
-      )
+      @saveSettings({ showInactive, showConcluded }, @updateStudentHeadersAndReloadData)
 
     getEnrollmentFilters: () =>
       @gridDisplaySettings.showEnrollments
@@ -2739,6 +2765,7 @@ define [
             )
         else
           @removePendingGradeInfo(submission)
+          @updateRowCellsForStudentIds([submission.userId])
           @renderSubmissionTray() if @getSubmissionTrayState().open
       else
         FlashAlert.showFlashAlert({

@@ -131,6 +131,7 @@ export default class UsersPane extends React.Component {
           collection={{data: users, loading: isLoading, links}}
           setPage={this.handleSetPage}
           noneFoundMessage={I18n.t('No users found')}
+          dataType="User"
         />
       </div>
     )

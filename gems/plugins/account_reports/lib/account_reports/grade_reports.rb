@@ -78,27 +78,37 @@ module AccountReports
       headers << I18n.t('unposted final score')
 
       write_report headers do |csv|
-
-        students.find_each do |student|
-          arr = []
-          arr << student["user_name"]
-          arr << student["user_id"]
-          arr << student["sis_user_id"]
-          arr << student["course_name"]
-          arr << student["course_id"]
-          arr << student["course_sis_id"]
-          arr << student["section_name"]
-          arr << student["course_section_id"]
-          arr << student["section_sis_id"]
-          arr << student["term_name"]
-          arr << student["term_id"]
-          arr << student["term_sis_id"]
-          arr << student["current_score"]
-          arr << student["final_score"]
-          arr << student["enroll_state"]
-          arr << student["unposted_current_score"]
-          arr << student["unposted_final_score"]
-          csv << arr
+        students.preload(:root_account, :sis_pseudonym).find_in_batches do |student_chunk|
+          users = student_chunk.map {|e| User.new(id: e.user_id)}.compact
+          users.uniq!
+          users_by_id = users.index_by(&:id)
+          pseudonyms = load_cross_shard_logins(users, include_deleted: @include_deleted)
+          student_chunk.each do |student|
+            p = loaded_pseudonym(pseudonyms,
+                                 users_by_id[student.user_id],
+                                 include_deleted: @include_deleted,
+                                 enrollment: student)
+            next unless p
+            arr = []
+            arr << student["user_name"]
+            arr << student["user_id"]
+            arr << p.sis_user_id
+            arr << student["course_name"]
+            arr << student["course_id"]
+            arr << student["course_sis_id"]
+            arr << student["section_name"]
+            arr << student["course_section_id"]
+            arr << student["section_sis_id"]
+            arr << student["term_name"]
+            arr << student["term_id"]
+            arr << student["term_sis_id"]
+            arr << student["current_score"]
+            arr << student["final_score"]
+            arr << student["enroll_state"]
+            arr << student["unposted_current_score"]
+            arr << student["unposted_final_score"]
+            csv << arr
+          end
         end
       end
     end
@@ -158,15 +168,24 @@ module AccountReports
       headers << I18n.t('unposted final score')
 
       generate_and_run_report headers do |csv|
-        students.find_in_batches do |student_chunk|
+        students.preload(:root_account, :sis_pseudonym).find_in_batches do |student_chunk|
+          users = student_chunk.map {|e| User.new(id: e.user_id)}.compact
+          users.uniq!
+          users_by_id = users.index_by(&:id)
+          pseudonyms = load_cross_shard_logins(users, include_deleted: @include_deleted)
           students_by_course = student_chunk.group_by { |x| x.course_id }
           students_by_course.each do |course_id, course_students|
             scores = indexed_scores(course_students, grading_periods)
             course_students.each do |student|
+              p = loaded_pseudonym(pseudonyms,
+                                   users_by_id[student.user_id],
+                                   include_deleted: @include_deleted,
+                                   enrollment: student)
+              next unless p
               arr = []
               arr << student["user_name"]
               arr << student["user_id"]
-              arr << student["sis_user_id"]
+              arr << p.sis_user_id
               arr << student["course_name"]
               arr << student["course_id"]
               arr << student["course_sis_id"]
@@ -219,46 +238,45 @@ module AccountReports
     end
 
     def student_grade_scope
-      students = root_account.pseudonyms.except(:preload).
-        select("pseudonyms.id, u.name AS user_name, e.user_id, e.course_id,
-                pseudonyms.sis_user_id, c.name AS course_name,
+      students = root_account.enrollments.
+        select("u.name AS user_name, enrollments.user_id, enrollments.course_id,
+                c.name AS course_name,
+                enrollments.root_account_id, enrollments.sis_pseudonym_id,
                 c.sis_source_id AS course_sis_id, s.name AS section_name,
-                e.course_section_id, s.sis_source_id AS section_sis_id,
-                e.id as enrollment_id,
+                enrollments.course_section_id, s.sis_source_id AS section_sis_id,
+                enrollments.id AS enrollment_id,
                 t.name AS term_name, t.id AS term_id,
                 t.sis_source_id AS term_sis_id,
                 sc.current_score,
                 sc.final_score,
                 sc.unposted_current_score,
                 sc.unposted_final_score,
-           CASE WHEN e.workflow_state = 'active' THEN 'active'
-                WHEN e.workflow_state = 'completed' THEN 'concluded'
-                WHEN e.workflow_state = 'inactive' THEN 'inactive'
-                WHEN e.workflow_state = 'deleted' THEN 'deleted' END AS enroll_state").
-        order("t.id, c.id, e.id").
-        joins("INNER JOIN #{User.quoted_table_name} u ON pseudonyms.user_id = u.id
-               INNER JOIN #{Enrollment.quoted_table_name} e ON pseudonyms.user_id = e.user_id
-                 AND e.type = 'StudentEnrollment'
-               INNER JOIN #{Course.quoted_table_name} c ON c.id = e.course_id
+           CASE WHEN enrollments.workflow_state = 'active' THEN 'active'
+                WHEN enrollments.workflow_state = 'completed' THEN 'concluded'
+                WHEN enrollments.workflow_state = 'inactive' THEN 'inactive'
+                WHEN enrollments.workflow_state = 'deleted' THEN 'deleted' END AS enroll_state").
+        order("t.id, c.id, enrollments.id").
+        joins("INNER JOIN #{User.quoted_table_name} u ON enrollments.user_id = u.id
+               INNER JOIN #{Course.quoted_table_name} c ON c.id = enrollments.course_id
                INNER JOIN #{EnrollmentTerm.quoted_table_name} t ON c.enrollment_term_id = t.id
-               INNER JOIN #{CourseSection.quoted_table_name} s ON e.course_section_id = s.id
-               LEFT JOIN #{Score.quoted_table_name} sc ON sc.enrollment_id = e.id AND sc.course_score IS TRUE")
+               INNER JOIN #{CourseSection.quoted_table_name} s ON enrollments.course_section_id = s.id
+               LEFT JOIN #{Score.quoted_table_name} sc ON sc.enrollment_id = enrollments.id AND sc.course_score IS TRUE").
+        where("enrollments.type='StudentEnrollment'")
 
       if @include_deleted
-        students = students.where("e.workflow_state IN ('active', 'completed', 'inactive', 'deleted')")
+        students = students.where("enrollments.workflow_state IN ('active', 'completed', 'inactive', 'deleted')")
         if @account_report.parameters.has_key? 'limiting_period'
           limiting_period = @account_report.parameters['limiting_period'].to_i
-          students = students.where("e.workflow_state = 'active'
+          students = students.where("enrollments.workflow_state = 'active'
                                     OR c.conclude_at >= ?
-                                    OR (e.workflow_state IN ('inactive', 'deleted')
-                                    AND e.updated_at >= ?)",
+                                    OR (enrollments.workflow_state IN ('inactive', 'deleted')
+                                    AND enrollments.updated_at >= ?)",
                                     limiting_period.days.ago, limiting_period.days.ago)
         end
       else
         students = students.where(
-          "pseudonyms.workflow_state<>'deleted'
-           AND c.workflow_state='available'
-           AND e.workflow_state IN ('active', 'completed')
+          "c.workflow_state='available'
+           AND enrollments.workflow_state IN ('active', 'completed')
            AND sc.workflow_state <> 'deleted'")
       end
 

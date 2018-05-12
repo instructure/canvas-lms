@@ -26,8 +26,7 @@ import IconStudentViewLine from 'instructure-icons/lib/Line/IconStudentViewLine'
 import Button from '@instructure/ui-core/lib/components/Button'
 import FormFieldGroup from '@instructure/ui-core/lib/components/FormFieldGroup'
 import {GridCol} from '@instructure/ui-core/lib/components/Grid'
-import MenuItem from '@instructure/ui-core/lib/components/Menu/MenuItem'
-import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
+import Menu, { MenuItem } from '@instructure/ui-menu/lib/components/Menu'
 
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import Select from '@instructure/ui-core/lib/components/Select'
@@ -81,7 +80,7 @@ export default function UsersToolbar(props) {
               </Button>
             </CreateOrUpdateUserModal>
           )}{' '}
-          <PopoverMenu
+          <Menu
             trigger={
               <Button theme={{iconPlusTextMargin: '0'}}>
                 <IconMoreLine margin="0" title={I18n.t('More People Options')} />
@@ -94,7 +93,7 @@ export default function UsersToolbar(props) {
             <MenuItem onClick={() => window.location = `/accounts/${props.accountId}/groups`}>
               <IconGroupLine /> {I18n.t('View user groups')}
             </MenuItem>
-          </PopoverMenu>
+          </Menu>
         </GridCol>
       </FormFieldGroup>
     </form>

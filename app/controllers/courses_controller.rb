@@ -369,7 +369,7 @@ class CoursesController < ApplicationController
   # @argument exclude_blueprint_courses [Boolean]
   #   When set, only return courses that are not configured as blueprint courses.
   #
-  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"public_description"|"total_scores"|"current_grading_period_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"|"course_image"]
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"public_description"|"total_scores"|"current_grading_period_scores"|"term"|"account"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"|"course_image"]
   #   - "needs_grading_count": Optional information to include with each Course.
   #     When needs_grading_count is given, and the current user has grading
   #     rights, the total number of submissions needing grading for all
@@ -409,6 +409,8 @@ class CoursesController < ApplicationController
   #   - "term": Optional information to include with each Course. When
   #     term is given, the information for the enrollment term for each course
   #     is returned.
+  #   - "account": Optional information to include with each Course. When
+  #     account is given, the account json for each course is returned.
   #   - "course_progress": Optional information to include with each Course.
   #     When course_progress is given, each course will include a
   #     'course_progress' object with the fields: 'requirement_count', an integer
@@ -494,7 +496,7 @@ class CoursesController < ApplicationController
   # @API List courses for a user
   # Returns a paginated list of active courses for this user. To view the course list for a user other than yourself, you must be either an observer of that user or an administrator.
   #
-  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"public_description"|"total_scores"|"current_grading_period_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"|"course_image"]
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"public_description"|"total_scores"|"current_grading_period_scores"|"term"|"account"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"|"course_image"]
   #   - "needs_grading_count": Optional information to include with each Course.
   #     When needs_grading_count is given, and the current user has grading
   #     rights, the total number of submissions needing grading for all
@@ -531,6 +533,8 @@ class CoursesController < ApplicationController
   #   - "term": Optional information to include with each Course. When
   #     term is given, the information for the enrollment term for each course
   #     is returned.
+  #   - "account": Optional information to include with each Course. When
+  #     account is given, the account json for each course is returned.
   #   - "course_progress": Optional information to include with each Course.
   #     When course_progress is given, each course will include a
   #     'course_progress' object with the fields: 'requirement_count', an integer
@@ -672,7 +676,6 @@ class CoursesController < ApplicationController
   # @argument course[default_view]  [String, "feed"|"wiki"|"modules"|"syllabus"|"assignments"]
   #   The type of page that users will see when they first visit the course
   #   * 'feed' Recent Activity Dashboard
-  #   * 'wiki' Wiki Front Page
   #   * 'modules' Course Modules/Sections Page
   #   * 'assignments' Course Assignments List
   #   * 'syllabus' Course Syllabus Page
@@ -1637,7 +1640,7 @@ class CoursesController < ApplicationController
   #
   # Accepts the same include[] parameters as the list action plus:
   #
-  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"public_description"|"total_scores"|"current_grading_period_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"|"all_courses"|"permissions"|"observed_users"|"course_image"]
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"public_description"|"total_scores"|"current_grading_period_scores"|"term"|"account"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"|"all_courses"|"permissions"|"observed_users"|"course_image"]
   #   - "all_courses": Also search recently deleted courses.
   #   - "permissions": Include permissions the current user has
   #     for the course.
@@ -1754,6 +1757,7 @@ class CoursesController < ApplicationController
       when 'assignments'
         add_crumb(t('#crumbs.assignments', "Assignments"))
         set_js_assignment_data
+        js_env(:SIS_NAME => AssignmentUtil.post_to_sis_friendly_name(@context))
         js_env(:COURSE_HOME => true)
         @upcoming_assignments = get_upcoming_assignments(@context)
       when 'modules'
@@ -2926,6 +2930,7 @@ class CoursesController < ApplicationController
     preloads = %i/account root_account/
     preloads << :teachers if includes.include?('teachers')
     preloads << :grading_standard if includes.include?('total_scores')
+    preloads << :account if includes.include?('subaccount') || includes.include?('account')
     if includes.include?('current_grading_period_scores')
       preloads << { enrollment_term: { grading_period_group: :grading_periods } }
       preloads << { grading_period_groups: :grading_periods }

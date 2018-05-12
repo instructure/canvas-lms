@@ -18,37 +18,6 @@
 require_relative '../../../helpers/gradebook_common'
 
 module GradebookLargeDataSetup
-  shared_context 'reusable_course' do
-    let(:test_course)       { course_factory(active_course: true) }
-    let(:teacher)           { user_factory(active_all: true) }
-    let(:student)           { user_factory(active_all: true) }
-    let(:concluded_student) { user_factory(name: 'Concluded Student', active_all: true) }
-    let(:observer)          { user_factory(active_all: true) }
-    let(:enroll_teacher_and_students) do
-      test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active')
-      test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')
-      test_course.enroll_user(concluded_student, 'StudentEnrollment', enrollment_state: 'completed')
-    end
-    let(:assignment_group_1) { test_course.assignment_groups.create! name: 'Group 1' }
-    # let(:assignment_group_2) { test_course.assignment_groups.create! name: 'Group 2' }
-    let(:assignment_1) do
-      test_course.assignments.create!(
-        title: 'Points Assignment',
-        grading_type: 'points',
-        points_possible: 10,
-        submission_types: 'online_text_entry',
-        due_at: 2.days.ago,
-        assignment_group: assignment_group_1
-      )
-    end
-    let(:student_submission) do
-      assignment_1.submit_homework(
-        student,
-        submission_type: 'online_text_entry',
-        body: 'Hello!'
-      )
-    end
-  end
   def init_course_with_students(num = 1)
     course_with_teacher(active_all: true)
 

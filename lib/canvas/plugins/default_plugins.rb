@@ -87,26 +87,6 @@ Canvas::Plugin.register('twitter', nil,
   validator: 'TwitterValidator',
   encrypted_settings: [:consumer_secret]
 )
-Canvas::Plugin.register('yo', nil, {
-  :name => lambda{ t :name, 'Yo'},
-  :description => lambda{ t :description, 'Just Yo' },
-  :website => 'http://www.justyo.co',
-  :author => 'Instructure',
-  :author_website => 'http://www.instructure.com',
-  :version => '1.0.0',
-  :settings_partial => 'plugins/yo_settings',
-  :validator => 'YoValidator'
-})
-Canvas::Plugin.register('scribd', nil, {
-  :name => lambda{ t :name, 'Scribd' },
-  :description => lambda{ t :description, 'Scribd document previews' },
-  :website => 'http://www.scribd.com',
-  :author => 'Instructure',
-  :author_website => 'http://www.instructure.com',
-  :version => '1.0.0',
-  :settings_partial => 'plugins/scribd_settings',
-  :validator => 'ScribdValidator'
-})
 Canvas::Plugin.register('etherpad', :collaborations, {
   :name => lambda{ t :name, 'EtherPad' },
   :description => lambda{ t :description, 'EtherPad document sharing' },

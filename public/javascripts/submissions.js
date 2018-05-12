@@ -156,6 +156,10 @@ import './rubric_assessment' /*global rubricAssessment*/
       parentsUntil("#application").siblings().not("#aria_alerts").attr('data-hide_from_rubric', true)
     $rubric.hide()
   }
+  function toggleRubric ($rubric) {
+    var ariaSetting = $rubric.is(":visible");
+    $("#application").find("[data-hide_from_rubric]").attr("aria-hidden", ariaSetting)
+  }
   function closeRubric () {
     $("#rubric_holder").fadeOut(function() {
       toggleRubric($(this));
@@ -167,10 +171,6 @@ import './rubric_assessment' /*global rubricAssessment*/
       toggleRubric($(this));
       $(this).find('.hide_rubric_link').focus();
     });
-  }
-  function toggleRubric ($rubric) {
-    var ariaSetting = $rubric.is(":visible");
-    $("#application").find("[data-hide_from_rubric]").attr("aria-hidden", ariaSetting)
   }
   function windowResize () {
     var $frame = $("#preview_frame");
@@ -273,11 +273,11 @@ import './rubric_assessment' /*global rubricAssessment*/
       });
       $(".save_rubric_button").click(function() {
         var $rubric = $(this).parents("#rubric_holder").find(".rubric");
-        var data = rubricAssessment.assessmentData($rubric);
+        var submitted_data = rubricAssessment.assessmentData($rubric);
         var url = $(".update_rubric_assessment_url").attr('href');
         var method = "POST";
         $rubric.loadingImage();
-        $.ajaxJSON(url, method, data, function(data) {
+        $.ajaxJSON(url, method, submitted_data, function(data) {
           $rubric.loadingImage('remove');
           var assessment = data;
           var found = false;
@@ -304,11 +304,16 @@ import './rubric_assessment' /*global rubricAssessment*/
           $("#rubric_assessment_option_" + assessment.id).text(assessment.assessor_name);
           $("#new_rubric_assessment_option").remove();
           $("#rubric_assessments_list").show();
-          rubricAssessment.populateRubric($rubric, assessment);
-          var submission = assessment.artifact;
-          if (submission) {
-            showGrade(submission);
-          }
+          /* the 500 timeout is due to the fadeOut in the closeRubric function, which defaults to 400.
+          We need to ensure any warning messages are read out after the fadeOut manages the page focus
+          so that any messages are not interrupted in voiceover utilities */
+          setTimeout(function () {
+            rubricAssessment.populateRubric($rubric, assessment, submitted_data);
+            var submission = assessment.artifact;
+            if (submission) {
+              showGrade(submission);
+            }
+          }, 500)
           closeRubric();
         });
       });

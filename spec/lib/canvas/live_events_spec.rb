@@ -22,7 +22,52 @@ describe Canvas::LiveEvents do
   # The only methods tested in here are ones that have any sort of logic happening.
 
   def expect_event(event_name, event_body, event_context = nil)
-    expect(LiveEvents).to receive(:post_event).with(event_name, event_body, anything, event_context)
+    expect(LiveEvents).to receive(:post_event).with(
+      event_name: event_name,
+      payload: event_body,
+      time: anything,
+      context: event_context
+    )
+  end
+
+  context 'when using a custom stream client' do
+
+    class FakeSettings
+      def call
+        {
+          'kinesis_stream_name' => 'fake_stream',
+          'aws_region' => 'us-east-1'
+        }
+      end
+    end
+
+    class FakeStreamClient
+      attr_accessor :data
+
+      def put_record(stream_name:, data:, partition_key:) # rubocop:disable Lint/UnusedMethodArgument
+        @data = JSON.parse(data)
+      end
+
+      def body
+        @data['body']
+      end
+    end
+
+    it 'sends the event message with the injected client' do
+      fake_client = FakeStreamClient.new
+      LiveEvents.stream_client = fake_client
+      LiveEvents.set_context(nil)
+      LiveEvents.settings = FakeSettings.new
+      course = course_model
+      amended_context = described_class.amended_context(course)
+      event_name = 'a_fake_event'
+      payload = { fake: 'yes' }
+
+      described_class.post_event_stringified(event_name, payload, amended_context)
+      run_jobs
+
+      expect(fake_client.body).to eq({ 'fake' => 'yes' })
+    end
   end
 
   describe '.amended_context' do
@@ -104,7 +149,6 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.group_category_updated(group_category)
     end
   end
-
 
   describe ".group_updated" do
     it "should include the context" do
@@ -370,7 +414,10 @@ describe Canvas::LiveEvents do
   context 'submissions' do
     let(:submission) do
       course_with_student_submissions
-      @course.assignments.first.submissions.first
+      @student.update(lti_context_id: SecureRandom.uuid)
+      s = @course.assignments.first.submissions.first
+      s.update(lti_user_id: @student.lti_context_id)
+      s
     end
 
     let(:group) do
@@ -668,6 +715,98 @@ describe Canvas::LiveEvents do
       expect_event('quizzes_next_quiz_duplicated', event_payload).once
 
       Canvas::LiveEvents.quizzes_next_quiz_duplicated(event_payload)
+    end
+  end
+
+  describe '.module_created' do
+    it 'should trigger a context module created live event' do
+      course_with_student_submissions
+      context_module = ContextModule.create!(context: @course)
+
+      expected_event_body = {
+        module_id: context_module.id.to_s,
+        context_id: @course.id.to_s,
+        context_type: "Course",
+        name: context_module.name,
+        position: context_module.position,
+        workflow_state: context_module.workflow_state
+      }
+
+      expect_event('module_created', expected_event_body).once
+
+      Canvas::LiveEvents.module_created(context_module)
+    end
+  end
+
+  describe '.module_updated' do
+    it 'should trigger a context module updated live event' do
+      course_with_student_submissions
+      context_module = ContextModule.create!(context: @course)
+
+      expected_event_body = {
+        module_id: context_module.id.to_s,
+        context_id: @course.id.to_s,
+        context_type: "Course",
+        name: context_module.name,
+        position: context_module.position,
+        workflow_state: context_module.workflow_state
+      }
+
+      expect_event('module_updated', expected_event_body).once
+
+      Canvas::LiveEvents.module_updated(context_module)
+    end
+  end
+
+  describe '.module_item_created' do
+    it 'should trigger a context module item created live event' do
+      course_with_student_submissions
+      context_module = ContextModule.create!(context: @course)
+      content_tag = ContentTag.create!(
+        title: "content",
+        context: @course,
+        context_module: context_module,
+        content: @course.assignments.first
+      )
+
+      expected_event_body = {
+        module_item_id: content_tag.id.to_s,
+        module_id: context_module.id.to_s,
+        context_id: @course.id.to_s,
+        context_type: "Course",
+        position: content_tag.position,
+        workflow_state: content_tag.workflow_state
+      }
+
+      expect_event('module_item_created', expected_event_body).once
+
+      Canvas::LiveEvents.module_item_created(content_tag)
+    end
+  end
+
+  describe '.module_item_updated' do
+    it 'should trigger a context module updated live event' do
+      course_with_student_submissions
+      context_module = ContextModule.create!(context: @course)
+      content_tag = ContentTag.create!(
+        title: "content",
+        context: @course,
+        context_module: context_module,
+        content: @course.assignments.first
+      )
+
+      expected_event_body = {
+        module_item_id: content_tag.id.to_s,
+        module_id: context_module.id.to_s,
+        context_id: @course.id.to_s,
+        context_type: "Course",
+        position: content_tag.position,
+        workflow_state: content_tag.workflow_state
+      }
+
+      expect_event('module_item_updated', expected_event_body).once
+
+      Canvas::LiveEvents.module_item_updated(content_tag)
     end
   end
 end

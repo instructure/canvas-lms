@@ -115,7 +115,7 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
       display: inline-block;
     }
 
-    .cell.first { padding-#{direction(left)}:  6px; }
+    .cell.first { padding-#{direction(left)}: 6px; }
     .cell.last  { padding-#{direction(right)}: 6px; }
 
     .no_points                    { display: none; }

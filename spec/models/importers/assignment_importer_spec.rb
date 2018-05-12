@@ -66,6 +66,24 @@ describe "Importing assignments" do
     expect(a.points_possible).to eq rubric.points_possible
   end
 
+  it "should import association settings when rubric is included" do
+    file_data = get_import_data('', 'assignment')
+    context = get_import_context('')
+    migration = context.content_migrations.create!
+
+    assignment_hash = file_data.find{|h| h['migration_id'] == '4469882339231'}.with_indifferent_access
+    rubric_model({context: context, migration_id: assignment_hash[:grading][:rubric_id]})
+    assignment_hash[:rubric_use_for_grading] = true
+    assignment_hash[:rubric_hide_points] = true
+    assignment_hash[:rubric_hide_outcome_results] = true
+
+    Importers::AssignmentImporter.import_from_migration(assignment_hash, context, migration)
+    ra = Assignment.where(migration_id: assignment_hash[:migration_id]).first.rubric_association
+    expect(ra.use_for_grading).to be true
+    expect(ra.hide_points).to be true
+    expect(ra.hide_outcome_results).to be true
+  end
+
   it "should import group category into existing group with same name when marked as a group assignment" do
     file_data = get_import_data('', 'assignment')
     context = get_import_context('')

@@ -53,6 +53,7 @@ function makeApiResponse (overrides = {}, assignmentOverrides = {}) {
     plannable: makeAssignment(assignmentOverrides),
     submissions: false,
     new_activity: false,
+    plannable_date: '2018-03-27T18:58:51Z',
     ...overrides,
   };
 }
@@ -413,8 +414,9 @@ describe('transformApiToInternalItem', () => {
   it('adds the dateBucketMoment field', () => {
     const apiResponse = makeApiResponse({
       plannable_type: 'assignment',
+      plannable_date: moment.tz('2017-05-24', 'Asia/Tokyo'),
       plannable: makeAssignment({
-        due_at: moment.tz('2017-05-24', 'Asia/Tokyo'),
+        due_at: moment.tz('2018-03-28', 'Asia/Tokyo'),
       })
     });
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'Europe/Paris');

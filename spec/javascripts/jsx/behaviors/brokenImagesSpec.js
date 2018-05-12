@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 import $ from 'jquery'
-import attachErrorHandler from 'compiled/behaviors/broken-images'
+import { attachErrorHandler, getImagesAndAttach } from 'compiled/behaviors/broken-images'
 import {setTimeout} from 'timers'
 
 let server
@@ -68,4 +68,27 @@ test('on error handler sets appropriate alt text indicating the image is locked'
     server.restore()
     done()
   }, 100)
+})
+
+QUnit.module('getImagesAndAttach', {
+  setup() {
+    $('#fixtures').html(
+      `<img id="borked" src="broken_image.jpg" alt="broken">
+       <img id="empty_src" src alt="empty_src">
+      `
+    )
+  },
+  teardown() {
+    $('#fixtures').empty()
+  }
+});
+
+test('does not attach error handler to images with an empty source', () => {
+  getImagesAndAttach()
+  ok(!$('img#empty_src').data('events'))
+})
+
+test('attaches error handler to elements with a non-empty source', () => {
+  getImagesAndAttach()
+  ok($('img#borked').data('events').error)
 })

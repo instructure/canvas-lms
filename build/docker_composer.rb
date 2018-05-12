@@ -183,6 +183,7 @@ class DockerComposer
 
       tasks = []
       tasks << "ci:disable_structure_dump"
+      tasks << "db:migrate:predeploy"
       tasks << "db:migrate"
       tasks << "ci:prepare_test_shards" if ENV["PREPARE_TEST_DATABASE"] == "1"
       tasks << "canvas:quizzes:create_event_partitions"

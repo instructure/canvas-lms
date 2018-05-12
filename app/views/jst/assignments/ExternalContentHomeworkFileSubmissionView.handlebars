@@ -1,5 +1,5 @@
 <div style="padding: 20px;">
-  <form class="form-horizontal" role="form">
+  <form class="form-horizontal external-tool-submission" role="form">
 
     <div class="control-group">
       <label class="control-label">File</label>
@@ -18,6 +18,13 @@
 
     <div class="control-group">
       <div class="controls">
+        {{#if ENV.EULA_URL}}
+          <label class="checkbox">
+            <input type="checkbox" class="turnitin_pledge external-tool" name="turnitin_pledge">
+              {{#t }}I agree to the tool's <a href="{{ENV.EULA_URL}}" target="_blank">End-User License Agreement.</a>{{/t}}
+            </input>
+          </label>
+        {{/if}}
         <button type="button" class="cancel_button btn">{{#t '#buttons.cancel'}}Cancel{{/t}}</button>
         <button type="submit" class="submit_button btn btn-primary">{{#t 'buttons.submit_assignment'}}Submit Assignment{{/t}}</button>
       </div>

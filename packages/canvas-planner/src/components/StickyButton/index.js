@@ -30,6 +30,7 @@ class StickyButton extends Component {
     children: node.isRequired,
     onClick: func,
     disabled: bool,
+    hidden: bool,
     direction: oneOf(['none', 'up', 'down']),
     zIndex: number,
     offset: string,
@@ -71,6 +72,7 @@ class StickyButton extends Component {
     const {
       children,
       disabled,
+      hidden,
       direction,
       zIndex,
       offset,
@@ -93,6 +95,7 @@ class StickyButton extends Component {
         className={classnames(classes)}
         style={style}
         aria-disabled={(disabled) ? 'true' : null}
+        aria-hidden={(hidden) ? 'true' : null}
         ref={this.props.buttonRef}
       >
         <span className={styles.layout}>

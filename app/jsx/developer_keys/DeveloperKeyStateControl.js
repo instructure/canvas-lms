@@ -59,6 +59,7 @@ export default class DeveloperKeyStateControl extends React.Component {
         }
         onChange={this.setBindingState}
         disabled={this.disabled()}
+        name={this.props.developerKey.id}
       >
         <RadioInput label={I18n.t('On')} value="on" context="success" />
         <RadioInput label={I18n.t('Allow')} value="allow" context="off" />

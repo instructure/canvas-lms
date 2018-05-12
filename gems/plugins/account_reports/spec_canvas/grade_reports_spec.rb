@@ -88,7 +88,12 @@ describe "Default Account Reports" do
       @enrollment1.find_score.update_attribute(:unposted_final_score, 92)
     end
 
-    it "should run grade export for a term" do
+    it "should run grade export for a term and return one line per enrollment" do
+      user_with_managed_pseudonym(user: @user1, account: @account)
+      p = @account.pseudonyms.where(sis_user_id: 'user_sis_id_01').take
+      @enrollment1.sis_pseudonym = p
+      @enrollment1.save!
+
       parameters = {}
       parameters["enrollment_term"] = @term1.id
       parsed = read_report('grade_export_csv', {order: 13, params: parameters})

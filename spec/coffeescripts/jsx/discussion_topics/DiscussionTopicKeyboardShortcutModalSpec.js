@@ -21,6 +21,8 @@ import DiscussionTopicKeyboardShortcutModal from 'jsx/discussion_topics/Discussi
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-addons-test-utils'
+import I18n from 'i18n!KeyboardShortcutModal'
+
 
 const SHORTCUTS = [
   {

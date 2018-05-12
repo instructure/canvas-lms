@@ -214,6 +214,22 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
         let(:unauthorized_admin) { sub_account_admin }
         let(:params) { valid_parameters }
       end
+
+      it 'succeeds when account is site admin and developer key has no bindings' do
+        site_admin_key = DeveloperKey.create!
+        site_admin_key.developer_key_account_bindings.destroy_all
+        site_admin_params = {
+          account_id: 'site_admin',
+          developer_key_id: site_admin_key.global_id,
+          developer_key_account_binding: {
+            workflow_state: 'on'
+          }
+        }
+
+        user_session(account_admin_user(account: Account.site_admin))
+        post :create_or_update, params: site_admin_params
+        expect(response).to be_success
+      end
     end
 
     describe "GET #index" do

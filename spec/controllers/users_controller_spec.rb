@@ -596,9 +596,12 @@ describe UsersController do
         u = User.create! { |u| u.workflow_state = 'registered' }
         u.communication_channels.create!(:path => 'jacob@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
         u.pseudonyms.create!(:unique_id => 'jon@instructure.com')
-        expect_any_instance_of(CommunicationChannel).to receive(:send_merge_notification!)
+        notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
+
         post 'create', params: {:account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :send_confirmation => '0' }, :user => { :name => 'Jacob Fugal' }}, format: 'json'
         expect(response).to be_success
+        p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
+        expect(Message.where(:communication_channel_id => p.user.email_channel, :notification_id => notification).first).to be_present
       end
 
       it "should not notify the user if the merge opportunity can't log in'" do
@@ -1107,14 +1110,14 @@ describe UsersController do
       expect(response).to redirect_to User.default_avatar_fallback
     end
 
-    it "should pass along the default fallback to gravatar" do
+    it "should pass along the default fallback to placeholder image" do
       course_with_student_logged_in(:active_all => true)
       @account = Account.default
       @account.enable_service(:avatars)
       @account.save!
       expect(@account.service_enabled?(:avatars)).to be_truthy
       get 'avatar_image', params: {:user_id  => @user.id}
-      expect(response).to redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI.escape("http://test.host/images/messages/avatar-50.png")}"
+      expect(response).to redirect_to "http://test.host/images/messages/avatar-50.png"
     end
 
     it "should take an invalid id and return silhouette" do
@@ -1467,22 +1470,6 @@ describe UsersController do
       get 'teacher_activity', params: {user_id: @teacher.id, course_id: @course.id}
 
       expect(assigns[:courses][@course][0][:ungraded]).to eq [s1]
-    end
-  end
-
-  describe '#toggle_recent_activity_dashboard' do
-    it 'updates user preference based on value provided' do
-      course_factory
-      user_factory(active_all: true)
-      user_session(@user)
-
-      expect(@user.preferences[:recent_activity_dashboard]).to be_falsy
-
-      post :toggle_recent_activity_dashboard
-
-      expect(@user.reload.preferences[:recent_activity_dashboard]).to be_truthy
-      expect(response).to be_success
-      expect(JSON.parse(response.body)).to be_empty
     end
   end
 

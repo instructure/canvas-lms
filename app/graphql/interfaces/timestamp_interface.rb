@@ -21,7 +21,7 @@ module Interfaces
     name "Timestamped"
     description "Contains timestamp metadata"
 
-    field :createdAt, Types::TimeType, property: :created_at
-    field :updatedAt, Types::TimeType, property: :updated_at
+    field :createdAt, Types::DateTimeType, property: :created_at
+    field :updatedAt, Types::DateTimeType, property: :updated_at
   end
 end

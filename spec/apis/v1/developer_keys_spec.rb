@@ -56,6 +56,28 @@ describe DeveloperKeysController, type: :request do
       confirm_valid_key_in_json(json, key)
     end
 
+    it 'should only include a subset of attributes if inherited is set' do
+      user_session(account_admin_user(account: Account.site_admin))
+      DeveloperKey.create!(account: nil)
+      get '/api/v1/accounts/site_admin/developer_keys', params: { inherited: true }
+      expect(json_parse.first.keys).to match_array(
+        %w[name created_at icon_url workflow_state id account_owns_binding]
+      )
+    end
+
+    it 'not query for bindings' do
+      admin_session
+      key = DeveloperKey.create!
+      expect_any_instance_of(DeveloperKey).not_to receive(:account_binding_for)
+      api_call(:get, "/api/v1/accounts/#{sa_id}/developer_keys.json", {
+        controller: 'developer_keys',
+        action: 'index',
+        format: 'json',
+        account_id: sa_id.to_s
+      })
+
+    end
+
     describe 'developer key account bindings' do
       it 'does not include binding data' do
         user_session(account_admin_user(account: Account.site_admin))

@@ -10,11 +10,6 @@ def create_notification(values = {})
   Canvas::MessageHelper.create_notification(values)
 end
 
-def create_scribd_mime_type(ext, name)
-  ping
-  ScribdMimeType.where(extension: ext, name: name).first_or_create
-end
-
 namespace :db do
   desc "Generate security.yml key"
   task :generate_security_key do
@@ -35,34 +30,6 @@ namespace :db do
   task :reset_encryption_key_hash do
     ENV['UPDATE_ENCRYPTION_KEY_HASH'] = "1"
     Rake::Task['db:load_environment'].invoke
-  end
-
-  desc "Make sure all scribd mime types are set up correctly"
-  task :ensure_scribd_mime_types => :load_environment do
-    create_scribd_mime_type('doc', 'application/msword')
-    create_scribd_mime_type('ppt', 'application/vnd.ms-powerpoint')
-    create_scribd_mime_type('pdf', 'application/pdf')
-    create_scribd_mime_type('xls', 'application/vnd.ms-excel')
-    create_scribd_mime_type('ps', 'application/postscript')
-    create_scribd_mime_type('rtf', 'application/rtf')
-    create_scribd_mime_type('rtf', 'text/rtf')
-    create_scribd_mime_type('docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-    create_scribd_mime_type('pptx', 'application/vnd.openxmlformats-officedocument.presentationml.presentation')
-    create_scribd_mime_type('xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    create_scribd_mime_type('ppt', 'application/mspowerpoint')
-    create_scribd_mime_type('xls', 'application/excel')
-    create_scribd_mime_type('txt', 'text/plain')
-    create_scribd_mime_type('odt', 'application/vnd.oasis.opendocument.text')
-    create_scribd_mime_type('odp', 'application/vnd.oasis.opendocument.presentation')
-    create_scribd_mime_type('ods', 'application/vnd.oasis.opendocument.spreadsheet')
-    create_scribd_mime_type('sxw', 'application/vnd.sun.xml.writer')
-    create_scribd_mime_type('sxi', 'application/vnd.sun.xml.impress')
-    create_scribd_mime_type('sxc', 'application/vnd.sun.xml.calc')
-    create_scribd_mime_type('xltx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.template')
-    create_scribd_mime_type('ppsx', 'application/vnd.openxmlformats-officedocument.presentationml.slideshow')
-    create_scribd_mime_type('potx', 'application/vnd.openxmlformats-officedocument.presentationml.template')
-    create_scribd_mime_type('dotx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.template')
-    puts 'Scribd Mime Types added'
   end
 
   desc "Make sure all message templates have notifications in the db"
@@ -204,7 +171,7 @@ namespace :db do
   end
 
   desc "generate data"
-  task :generate_data => [:configure_default_settings, :load_notifications, :ensure_scribd_mime_types,
+  task :generate_data => [:configure_default_settings, :load_notifications,
       :evaluate_notification_templates] do
   end
 

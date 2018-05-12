@@ -45,6 +45,20 @@ test('responds to listDeveloperKeysStart', () => {
   equal(newState.listDeveloperKeysError, null);
 });
 
+test('responds to listInheritedDeveloperKeysStart', () => {
+  const state = {
+    listInheritedDeveloperKeysPending: false,
+    listInheritedDeveloperKeysSuccessful: true,
+    listInheritedDeveloperKeysError: {}
+  };
+
+  const action = actions.listInheritedDeveloperKeysStart();
+  const newState = reducer(state, action);
+  equal(newState.listInheritedDeveloperKeysPending, true);
+  equal(newState.listInheritedDeveloperKeysSuccessful, false);
+  equal(newState.listInheritedDeveloperKeysError, null);
+});
+
 test('responds to listDeveloperKeysSuccessful', () => {
   const state = {
     listDeveloperKeysPending: true,
@@ -59,6 +73,20 @@ test('responds to listDeveloperKeysSuccessful', () => {
   equal(newState.list.length, payload.developerKeys.length);
 });
 
+test('responds to listDeveloperKeysSuccessful', () => {
+  const state = {
+    listInheritedDeveloperKeysPending: true,
+    listInheritedDeveloperKeysSuccessful: false,
+    inheritedList: []
+  };
+  const payload = {developerKeys: [{id: 1}]};
+  const action = actions.listInheritedDeveloperKeysSuccessful(payload);
+  const newState = reducer(state, action);
+  equal(newState.listInheritedDeveloperKeysPending, false);
+  equal(newState.listInheritedDeveloperKeysSuccessful, true);
+  equal(newState.inheritedList.length, payload.developerKeys.length);
+});
+
 test('responds to listDeveloperKeysFailed', () => {
   const state = {
     listDeveloperKeysPending: true,
@@ -70,6 +98,19 @@ test('responds to listDeveloperKeysFailed', () => {
   const newState = reducer(state, action);
   equal(newState.listDeveloperKeysPending, false);
   equal(newState.listDeveloperKeysError, error);
+});
+
+test('responds to listInheritedDeveloperKeysFailed', () => {
+  const state = {
+    listInheritedDeveloperKeysPending: true,
+    listInheritedDeveloperKeysError: null
+  };
+  const error = {};
+
+  const action = actions.listInheritedDeveloperKeysFailed(error);
+  const newState = reducer(state, action);
+  equal(newState.listInheritedDeveloperKeysPending, false);
+  equal(newState.listInheritedDeveloperKeysError, error);
 });
 
 test('responds to listDeveloperKeysReplace', () => {

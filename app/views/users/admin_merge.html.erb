@@ -24,7 +24,7 @@
   margin: 10px 0;
 }
 .merge_results td, .merge_results th {
-  padding-right: 10px;
+  padding-<%= direction('right') %>: 10px;
   padding-bottom: 3px;
   vertical-align: top;
 }
@@ -35,14 +35,14 @@
   border-top: 1px solid #ddd;
 }
 .merge_results .result > td {
-  border-left: 1px solid #ddd;
+  border-<%= direction('left') %>: 1px solid #ddd;
 }
 .merge_results thead .result > td {
   font-weight: bold;
 }
 .merge_results th {
   font-weight: bold;
-  padding-right: 10px;
+  padding-<%= direction('right') %>: 10px;
 }
 </style>
 <% end %>
@@ -76,7 +76,7 @@
             :pending_other_user_name => @pending_other_user.name, :pending_other_user_email => @pending_other_user.email) %>
       <%= render :partial => 'merge_results', :locals => {:user => @user, :other_user => @pending_other_user} %>
       <a class="btn" id="prepare_to_merge" style="width: 6em;" href="<%= user_admin_merge_url(@user.id, :new_user_id => @pending_other_user.id) %>"><%= t('prepare_to_merge', "Prepare to Merge Users") %></a>
-      <span style="font-size: 0.8em; padding-left: 50px;">
+      <span style="font-size: 0.8em; padding-<%= direction('left') %>: 50px;">
         <a class="btn" id="switch_user_positions" style="width: 6em;" href="<%= user_admin_merge_url(@pending_other_user.id, :pending_user_id => @user.id) %>"><%= t('switch_user_positions', "Switch User Positions") %></a>
         <a class="btn merge_with_other" style="width: 13em;" href="<%= user_admin_merge_url(@user.id, :clear => 1) %>"><%= t('merge_somone_else', 'Merge Someone Else With %{user_name}', :user_name => @user.name) %></a>
         <a class="btn merge_with_other" style="width: 13em;" href="<%= user_admin_merge_url(@pending_other_user.id, :clear => 1) %>"><%= t('merge_somone_else', 'Merge Someone Else With %{user_name}', :user_name => @pending_other_user.name) %></a>
@@ -109,7 +109,7 @@
                 <% end %>
               </div>
               <div style="margin-top: 20px;">
-                <span id="selected_name" style="font-weight: bold; padding-right: 10px;"></span>
+                <span id="selected_name" style="font-weight: bold; padding-<%= direction('right') %>: 10px;"></span>
                 <a href="#" style="display: none;" rel="<%= user_admin_merge_url(@user.id, :pending_user_id => "{{ id }}") %>" id="select_name" type='button' class='btn btn-small select_button'><%= t 'links.select', "Select" %></a>
               </div>
             <% end %>

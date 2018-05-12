@@ -163,7 +163,7 @@ class AssignmentGroupsController < ApplicationController
       group_ids = ([@group.id] + (order.empty? ? [] : @context.assignments.where(id: order).distinct.except(:order).pluck(:assignment_group_id)))
       assignments = @context.active_assignments.where(id: order)
 
-      return render_unauthorized_action unless can_reorder_assignments?(assignments, @group)
+      return render json: { message: t("Cannot move assignments due to closed grading periods") }, status: :unauthorized unless can_reorder_assignments?(assignments, @group)
 
       assignments.update_all(assignment_group_id: @group.id, updated_at: Time.now.utc)
       @context.active_quizzes.where(assignment_id: order).update_all(assignment_group_id: @group.id, updated_at: Time.now.utc)

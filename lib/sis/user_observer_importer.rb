@@ -81,9 +81,9 @@ module SIS
       def add_remove_observer(observer, student, observer_id, student_id, status)
         case status.downcase
         when 'active'
-          user_observer = UserObservationLink.create_or_restore(observer: observer, student: student)
+          user_observer = UserObservationLink.create_or_restore(observer: observer, student: student, root_account: @root_account)
         when 'deleted'
-          user_observer = observer.as_observer_observation_links.where(user_id: student).take
+          user_observer = observer.as_observer_observation_links.for_root_accounts(@root_account).where(user_id: student).take
           if user_observer
             user_observer.destroy
           else

@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../common'
+require_relative 'page_objects/assignment_page'
 
 describe "moderated grading assignments" do
   include_context "in-process server selenium tests"
@@ -44,7 +45,6 @@ describe "moderated grading assignments" do
   end
 
   context "student tray" do
-
     before(:each) do
       @account = Account.default
       @account.enable_feature!(:student_context_cards)
@@ -58,4 +58,30 @@ describe "moderated grading assignments" do
     end
   end
 
+  context "with assignment moderation setting" do
+    before(:each) do
+      # turn on the moderation flag
+      Account.default.enable_feature!(:moderated_grading)
+      @moderated_assignment = @course.assignments.create!(title: 'Moderated Assignment',
+                                                          submission_types: 'online_text_entry',
+                                                          points_possible: 10)
+      # create a second section and enroll a second teacher
+      @second_section = @course.course_sections.create! :name => 'Second Section'
+      @section2 = @course.course_sections.create!
+
+      @teacher_two = user_factory(:active_all => true)
+      @course.enroll_teacher(@teacher_two, :section => @section2,
+                             :enrollment_state => 'active')
+      # visit assignment edit page as first teacher
+      user_session(@teacher)
+      AssignmentPage.visit_assignment_edit_page(@course.id, @moderated_assignment.id)
+    end
+
+    it "should allow user to select final moderator", priority: "1", test_id: 3482530 do
+      skip('This is skeleton code that acts as AC for GRADE-973 which is WIP')
+      AssignmentPage.select_moderate_checkbox
+      AssignmentPage.select_grader_dropdown.click
+      expect(AssignmentPage.select_grader_dropdown).to include_text(@teacher_two.name)
+    end
+  end
 end

@@ -23,7 +23,7 @@ class GradingPeriodSetsController < ApplicationController
 
   def index
     paginated_sets = Api.paginate(
-      GradingPeriodGroup.for(@context),
+      GradingPeriodGroup.for(@context).order(:id),
       self,
       api_v1_account_grading_period_sets_url
     )
@@ -102,16 +102,6 @@ class GradingPeriodSetsController < ApplicationController
   def check_manage_rights
     render_json_unauthorized and return unless @context.root_account?
     render_json_unauthorized and return unless @context.grants_right?(@current_user, :manage)
-  end
-
-  def paginate_for(grading_period_sets)
-    paginated_sets, meta = Api.jsonapi_paginate(
-      grading_period_sets,
-      self,
-      api_v1_account_grading_period_sets_url
-    )
-    meta[:primaryCollection] = 'grading_period_sets'
-    [paginated_sets, meta]
   end
 
   def serialize_json_api(grading_period_sets, meta = {})

@@ -23,11 +23,11 @@
     <div class="post_date created_at"><%= datetime_string(submission_comment.created_at) rescue nbsp %></div>
     <%= image_tag "grading_icon.png", :class => "topic_icon", :alt => t(:grading_alt, "grading"), :title => t(:submission_comment, "Submission Comment"), :style => brief ? "padding: 2px;" : "" %>
     <a href="<%= context_url(context, :context_assignment_submission_url, submission_comment.submission.assignment_id, submission_comment.submission.user_id) %>" class="title subject"><%= submission_comment.submission.assignment.title rescue t(:assignment, "Assignment") %>, <%= context_user_name(context, submission_comment.submission.user) %></a>
-    <a span="padding-left: 10px;" href="<%= context_url(context, :context_user_url, submission_comment ? submission_comment.author_id : '{{ user_id }}') %>" class="user_name"><%= context_user_name(context, submission_comment.author) rescue nbsp %></a>
+    <a span="padding-<%= direction('left') %>: 10px;" href="<%= context_url(context, :context_user_url, submission_comment ? submission_comment.author_id : '{{ user_id }}') %>" class="user_name"><%= context_user_name(context, submission_comment.author) rescue nbsp %></a>
     <div class="clear"></div>
   </div>
   <div class="content">
-    <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar((submission_comment.author_id rescue nil), context.asset_string, 30) %></div>
+    <div style="float: <%= direction('left') %>; margin: 0; margin-<%= direction('right') %>: 5px; margin-<%= direction('left') %>: -10px;"><%= avatar((submission_comment.author_id rescue nil), context.asset_string, 30) %></div>
     <div class="message user_content formatted_body"><%= user_content(submission_comment.try(:formatted_body)) || nbsp %></div>
     <div class="attachments_list" style="margin-top: 5px; <%= hidden unless submission_comment && !submission_comment.attachments.empty? %>">
       <% (submission_comment.attachments rescue []).each do |attachment| %>

@@ -337,7 +337,8 @@ class Enrollment < ActiveRecord::Base
   end
 
   def should_update_user_account_association?
-    self.new_record? || self.saved_change_to_course_id? || self.saved_change_to_course_section_id? || self.saved_change_to_root_account_id?
+    self.id_before_last_save.nil? || self.saved_change_to_course_id? || self.saved_change_to_course_section_id? ||
+      self.saved_change_to_root_account_id? || being_restored?
   end
 
   def update_user_account_associations_if_necessary
@@ -401,7 +402,7 @@ class Enrollment < ActiveRecord::Base
   protected :audit_groups_for_deleted_enrollments
 
   def observers
-    student? ? user.linked_observers.active : []
+    student? ? user.linked_observers.active.linked_through_root_accounts(self.root_account_id) : []
   end
 
   def create_linked_enrollments

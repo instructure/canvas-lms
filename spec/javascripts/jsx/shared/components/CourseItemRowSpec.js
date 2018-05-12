@@ -233,12 +233,6 @@ test('renders no manage menu when showManageMenu is false', () => {
   notOk(menu.exists())
 })
 
-test('renders no manage menu when showManageMenu is true but manageMenuOptions is empty', () => {
-  const tree = mount(<CourseItemRow {...makeProps({ showManageMenu: true })} />)
-  const menu = tree.find('.ic-item-row__manage-menu')
-  notOk(menu.exists())
-})
-
 test('renders manage menu when showManageMenu is true and manageMenuOptions is not empty', () => {
   const tree = mount(<CourseItemRow {...makeProps({ showManageMenu: true, manageMenuOptions: ['one', 'two'] })} />)
   const menu = tree.find('.ic-item-row__manage-menu')

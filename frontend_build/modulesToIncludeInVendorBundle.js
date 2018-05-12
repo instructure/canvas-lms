@@ -39,8 +39,6 @@ module.exports = [
   'react-modal',
   'underscore',
   'vendor/date',
-  'vendor/i18n',
-  'vendor/i18n_js_extension',
   'vendor/jquery.ba-tinypubsub',
   'vendor/jquery.pageless',
   'vendor/jquery.scrollTo',

@@ -268,6 +268,16 @@ describe Quizzes::QuizSubmission do
         # now when a score is updated we have a real grader associated!
         expect(qs.submission.reload.grader_id).to eq @user.id
       end
+
+      it "should save a new version of submission" do
+        qs = @quiz.generate_submission(@user)
+        qs.submission_data = { "question_1" => "1658" }
+        Quizzes::SubmissionGrader.new(qs).grade_submission
+
+        qs.reload
+        expect { qs.update_scores(:submission_version_number => 1, :fudge_points => 3) }.
+          to change { qs.submission.versions.count }.by 1
+      end
     end
 
     describe '#backup_submission_data' do
@@ -1364,8 +1374,8 @@ describe Quizzes::QuizSubmission do
         @quiz = @course.quizzes.create! title: 'Test Quiz'
         @submission = @quiz.quiz_submissions.build
       end
-      it "takes ids from questions_as_object" do
-        allow(@submission).to receive(:questions_as_object).and_return [{"id" => 2}, {"id" => 3}]
+      it "takes ids from questions" do
+        allow(@submission).to receive(:questions).and_return [{"id" => 2}, {"id" => 3}]
 
         expect(@submission.quiz_question_ids).to eq [2, 3]
       end

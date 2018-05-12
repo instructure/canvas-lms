@@ -176,6 +176,7 @@ class CoursesPane extends React.Component {
           collection={courses}
           setPage={this.setPage}
           noneFoundMessage={I18n.t('No courses found')}
+          dataType="Course"
         />
       </div>
     )

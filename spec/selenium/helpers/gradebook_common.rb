@@ -18,7 +18,7 @@
 require_relative '../common'
 
 module GradebookCommon
-  shared_context 'reusable_course' do
+  shared_context 'reusable_gradebook_course' do
     let(:test_course)       { course_factory(active_course: true) }
     let(:teacher)           { user_factory(active_all: true) }
     let(:student)           { user_factory(active_all: true) }

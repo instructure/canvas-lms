@@ -554,7 +554,7 @@ class Gradezilla
     end
 
     def assignment_header_cell_element(title)
-      f(".slick-header-column[title=\"#{title}\"]")
+      f(assignment_header_cell_selector(title))
     end
 
     def assignment_header_menu_trigger_element(assignment_name)
@@ -656,6 +656,10 @@ class Gradezilla
       f(assignment_header_cell_selector(name))
     end
 
+    def select_assignment_header_secondary_label(name)
+      fj(assignment_header_cell_selector(name) + " .Gradebook__ColumnHeaderDetail--secondary")
+    end
+
     def select_assignment_header_cell_label_element(name)
       assignment_header_cell_label_element(name)
     end
@@ -702,6 +706,10 @@ class Gradezilla
 
     def gradebook_slick_header_columns
       ff(".slick-header-column").map(&:text)
+    end
+
+    def overlay_info_screen
+      fj(".overlay_screen")
     end
     # ----------------------END NEW----------------------------
 

@@ -28,9 +28,9 @@ module Types
 
     field :title, types.String
 
-    field :startDate, TimeType, property: :start_date
-    field :endDate, TimeType, property: :end_date
-    field :closeDate, TimeType, <<-DOC, property: :close_date
+    field :startDate, DateTimeType, property: :start_date
+    field :endDate, DateTimeType, property: :end_date
+    field :closeDate, DateTimeType, <<-DOC, property: :close_date
     assignments can only be graded before the grading period closes
     DOC
 

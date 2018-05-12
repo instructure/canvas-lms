@@ -298,6 +298,7 @@ RSpec.configure do |config|
   config.raise_errors_for_deprecations!
   config.color = true
   config.order = :random
+  config.filter_run_excluding :pact
 
   config.include Helpers
   config.include Factories
@@ -383,6 +384,11 @@ RSpec.configure do |config|
     end
 
     Timecop.safe_mode = true
+
+    # cache brand variables because if we try to look them up inside a Timecop
+    # block, we will conflict our active record patch to prevent future
+    # migrations.
+    BrandableCSS.default_variables_md5
   end
 
   config.before do
@@ -488,7 +494,7 @@ RSpec.configure do |config|
   end
 
   def default_uploaded_data
-    fixture_file_upload('scribd_docs/doc.doc', 'application/msword', true)
+    fixture_file_upload('docs/doc.doc', 'application/msword', true)
   end
 
   def factory_with_protected_attributes(ar_klass, attrs, do_save = true)
@@ -785,7 +791,7 @@ RSpec.configure do |config|
   end
 
   def dummy_io
-    fixture_file_upload('scribd_docs/doc.doc', 'application/msword', true)
+    fixture_file_upload('docs/doc.doc', 'application/msword', true)
   end
 
   def consider_all_requests_local(value)

@@ -47,6 +47,60 @@ describe "Files API", type: :request do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
   end
 
+  describe 'create file' do
+    def call_course_create_file
+      api_call(:post, "/api/v1/courses/#{@course.id}/files", {
+        controller: 'courses',
+        action: 'create_file',
+        course_id: @course.id,
+        format: 'json',
+        name: 'test_file.png',
+        size: '12345',
+        content_type: 'image/png',
+        success_include: ['avatar'],
+        no_redirect: 'true'
+      })
+    end
+
+    it 'includes success_include param in file create url' do
+      local_storage!
+      json = call_course_create_file
+      query = Rack::Utils.parse_nested_query(URI(json['upload_url']).query)
+      expect(query['success_include']).to include('avatar')
+    end
+
+    it 'includes include param in create success url' do
+      s3_storage!
+      json = call_course_create_file
+      query = Rack::Utils.parse_nested_query(URI(json['upload_params']['success_url']).query)
+      expect(query['include']).to include('avatar')
+    end
+
+    it 'includes include capture param in inst_fs token' do
+      secret = 'secret'
+      allow(InstFS).to receive(:enabled?).and_return true
+      allow(InstFS).to receive(:jwt_secret).and_return(secret)
+      json = call_course_create_file
+      query = Rack::Utils.parse_nested_query(URI(json['upload_url']).query)
+      payload = Canvas::Security.decode_jwt(query['token'], [secret])
+      expect(payload['capture_params']['include']).to include('avatar')
+    end
+  end
+
+  describe 'api_create' do
+    it 'includes success_include as include when redirecting' do
+      local_storage!
+      a = attachment_model(workflow_state: :unattached)
+      params = a.ajax_upload_params(@pseudonym, '/url', '/s3')[:upload_params]
+      raw_api_call(:post, "/files_api", params.merge({
+        controller: 'files',
+        action: 'api_create',
+        success_include: ['avatar'],
+      }))
+      expect(redirect_params['include']).to include('avatar')
+    end
+  end
+
   describe "api_create_success" do
     before :once do
       @attachment = Attachment.new
@@ -70,9 +124,18 @@ describe "Files API", type: :request do
       @attachment.save!
     end
 
-    def call_create_success
-      api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
-               {:controller => "files", :action => "api_create_success", :format => "json", :id => @attachment.to_param, :uuid => @attachment.uuid})
+    def call_create_success(params = {})
+      api_call(
+        :post,
+        "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
+        params.merge({
+          controller: "files",
+          action: "api_create_success",
+          format: "json",
+          id: @attachment.to_param,
+          uuid: @attachment.uuid
+        })
+      )
     end
 
     it "should set the attachment to available (local storage)" do
@@ -198,6 +261,24 @@ describe "Files API", type: :request do
       assert_status(400)
     end
 
+    it "includes canvadoc preview url if requested and available" do
+      allow(Canvadocs).to receive(:enabled?).and_return(true)
+      allow(Canvadoc).to receive(:mime_types).and_return([@attachment.content_type])
+      local_storage!
+      upload_data
+      json = call_create_success(include: ['preview_url'])
+      expect(json['preview_url']).to include('/api/v1/canvadoc_session')
+    end
+
+    it "includes nil preview url if requested and not available" do
+      allow(Canvadocs).to receive(:enabled?).and_return(false)
+      allow(Canvadoc).to receive(:mime_types).and_return([])
+      local_storage!
+      upload_data
+      json = call_create_success(include: ['preview_url'])
+      expect(json['preview_url']).to be_nil
+    end
+
     context "upload success context callback" do
       before do
         allow_any_instance_of(Course).to receive(:file_upload_success_callback)
@@ -315,6 +396,20 @@ describe "Files API", type: :request do
       expect(attachment.display_name).to eq params[:name]
       expect(existing).to be_deleted
       expect(existing.replacement_attachment).to eq attachment
+    end
+
+    it "redirect has preview_url include if requested" do
+      raw_api_call(
+        :post,
+        "/api/v1/files/capture?#{base_params.to_query}",
+        base_params.merge(
+          controller: "files",
+          action: "api_capture",
+          format: "json",
+          include: ["preview_url"]
+        )
+      )
+      expect(redirect_params['include']).to include('preview_url')
     end
   end
 
@@ -508,6 +603,11 @@ describe "Files API", type: :request do
           "html_url" => "http://www.example.com/about/#{@user.id}"
         }
       ]
+    end
+
+    it "includes an instfs_uuid if ?include[]-ed" do
+      json = api_call(:get, @files_path, @files_path_options.merge(include: ['instfs_uuid']))
+      expect(json[0].key? "instfs_uuid").to be true
     end
 
   end

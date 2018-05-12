@@ -29,12 +29,10 @@ module Factories
 
   # just create the object, we don't care about callbacks or usual side effects
   def bare_submission_model(assignment, user, opts = {})
-    opts = (opts.presence || {submission_type: "online_text_entry", body: "o hai"}).merge(workflow_state: "submitted")
-    submitted_at = opts.delete(:submitted_at)
+    opts = (opts.presence || {submission_type: "online_text_entry", body: "o hai"}).
+      merge(workflow_state: "submitted", updated_at: Time.now.utc)
     submission = assignment.submissions.find_by!(user: user)
-    submission.attributes = opts
-    submission.submitted_at = submitted_at if submitted_at
-    submission.save_without_callbacks
+    submission.update_columns(opts)
     submission
   end
 

@@ -23,7 +23,7 @@ class CourseSection < ActiveRecord::Base
   belongs_to :nonxlist_course, :class_name => 'Course'
   belongs_to :root_account, :class_name => 'Account'
   belongs_to :enrollment_term
-  has_many :enrollments, -> { preload(:user).where("enrollments.workflow_state<>'deleted'") }, dependent: :destroy
+  has_many :enrollments, -> { preload(:user).where("enrollments.workflow_state<>'deleted'") }
   has_many :all_enrollments, :class_name => 'Enrollment'
   has_many :student_enrollments, -> { where("enrollments.workflow_state NOT IN ('deleted', 'completed', 'rejected', 'inactive')").preload(:user) }, class_name: 'StudentEnrollment'
   has_many :students, :through => :student_enrollments, :source => :user
@@ -74,7 +74,9 @@ class CourseSection < ActiveRecord::Base
 
   def delete_enrollments_if_deleted
     if workflow_state == 'deleted'
-      self.enrollments.active.find_each(&:destroy)
+      self.enrollments.where.not(workflow_state: 'deleted').find_in_batches do |batch|
+        Enrollment::BatchStateUpdater.destroy_batch(batch)
+      end
     end
   end
 
@@ -244,14 +246,8 @@ class CourseSection < ActiveRecord::Base
       old_course.send_later_if_production(:update_account_associations) unless Course.skip_updating_account_associations?
     end
 
-    # generate submissions in the new course for the students being cross-listed
-    DueDateCacher.recompute_course(course)
-
-    if opts.include?(:run_jobs_immediately)
-      course.recompute_student_scores_without_send_later(user_ids)
-    else
-      course.recompute_student_scores(user_ids)
-    end
+    run_immediately = opts.include?(:run_jobs_immediately)
+    DueDateCacher.recompute_users_for_course(user_ids, course, nil, run_immediately: run_immediately, update_grades: true)
   end
 
   def crosslist_to_course(course, *opts)

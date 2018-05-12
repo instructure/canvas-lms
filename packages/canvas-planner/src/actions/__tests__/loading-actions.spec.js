@@ -123,10 +123,10 @@ describe('api actions', () => {
       const mockDispatch = jest.fn();
       Actions.getPlannerItems(moment('2017-12-18'))(mockDispatch, getBasicState);
       expect(mockDispatch).toHaveBeenCalledWith(Actions.startLoadingItems());
+      expect(mockDispatch).toHaveBeenCalledWith(Actions.continueLoadingInitialItems());
       expect(mockDispatch).toHaveBeenCalledWith(Actions.startLoadingFutureSaga());
-
-      expect(typeof mockDispatch.mock.calls[1][0]).toBe('function');
-      const getFirstNewActivityDateThunk = mockDispatch.mock.calls[1][0];
+      const getFirstNewActivityDateThunk = mockDispatch.mock.calls[2][0];
+      expect(typeof getFirstNewActivityDateThunk).toBe('function');
       const mockMoment = moment();
       const newActivityPromise = getFirstNewActivityDateThunk(mockDispatch, getBasicState);
       return moxiosRespond([{dateBucketMoment: mockMoment}], newActivityPromise).then((result) => {
@@ -171,7 +171,7 @@ describe('api actions', () => {
     it('dispatches GETTING_FUTURE_ITEMS and starts the saga', () => {
       const mockDispatch = jest.fn();
       Actions.loadFutureItems()(mockDispatch, getBasicState);
-      expect(mockDispatch).toHaveBeenCalledWith(Actions.gettingFutureItems());
+      expect(mockDispatch).toHaveBeenCalledWith(Actions.gettingFutureItems({loadMoreButtonClicked: false}));
       expect(mockDispatch).toHaveBeenCalledWith(Actions.startLoadingFutureSaga());
     });
 

@@ -1922,6 +1922,22 @@ describe Course, "gradebook_to_csv_in_background" do
       end
     end
   end
+  it "create_attachment uses inst-fs if inst-fs is enabled" do
+    @uuid = "1234-abcd"
+    allow(InstFS).to receive(:direct_upload).and_return(@uuid)
+    allow(InstFS).to receive(:enabled?).and_return(true)
+    @user = user_factory(active_all: true)
+    student_in_course(active_all: true)
+
+    attachment = @user.attachments.build
+    attachment.content_type = "text/csv"
+    attachment.file_state = "hidden"
+    attachment.filename = "exported file"
+    attachment.save!
+
+    @course.create_attachment(attachment, "some, csv, data, up, in, here")
+    expect(attachment.instfs_uuid).to eq(@uuid)
+  end
 end
 
 describe Course, "update_account_associations" do

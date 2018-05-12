@@ -35,8 +35,8 @@
   <thead>
     <tr>
       <th><%= t('table_headings.content', %{Content}) %></th>
-      <th style="text-align: right;"><%= t('table_headings.num_times_viewed', %{Times Viewed}) %></th>
-      <th style="text-align: right;"><%= t('table_headings.num_times_participated', %{Times Participated}) %></th>
+      <th style="text-align: <%= direction('right') %>;"><%= t('table_headings.num_times_viewed', %{Times Viewed}) %></th>
+      <th style="text-align: <%= direction('right') %>;"><%= t('table_headings.num_times_participated', %{Times Participated}) %></th>
       <th><%= t('table_headings.last_viewed_time', %{Last Viewed}) %></th>
     </tr>
   </thead>

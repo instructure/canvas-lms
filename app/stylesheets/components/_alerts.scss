@@ -80,7 +80,7 @@
 // Base styles
 
 .alert {
-  padding: $ic-sp $ic-sp*3 $ic-sp $ic-sp;
+  padding: direction-sides($ic-sp $ic-sp*3 $ic-sp $ic-sp);
   background-color: $ic-bg-light-alert;
   border-radius: $ic-border-radius;
   color: $ic-bg-light-alert-text;

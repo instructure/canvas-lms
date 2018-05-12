@@ -64,7 +64,7 @@ export default class CourseItemRow extends Component {
     peerReview: bool,
     icon: node,
     showManageMenu: bool,
-    manageMenuOptions: arrayOf(node),
+    manageMenuOptions: func,
     onManageMenuSelect: func,
     sectionToolTip: node,
     replyButton: node,
@@ -99,7 +99,7 @@ export default class CourseItemRow extends Component {
     connectDropTarget: (component) => component,
     onSelectedChanged () {},
     showManageMenu: false,
-    manageMenuOptions: [],
+    manageMenuOptions: () => [],
     onManageMenuSelect () {},
     sectionToolTip: null,
     replyButton: null,
@@ -110,6 +110,7 @@ export default class CourseItemRow extends Component {
 
   state = {
     isSelected: this.props.defaultSelected,
+    manageMenuShown: false
   }
 
   componentDidMount () {
@@ -146,6 +147,10 @@ export default class CourseItemRow extends Component {
     this.setState({ isSelected: e.target.checked }, () => {
       this.props.onSelectedChanged({ selected: this.state.isSelected, id: this.props.id })
     })
+  }
+
+  toggleManageMenuShown = (shown, _) => {
+    this.setState({ manageMenuShown: shown })
   }
 
   initializeMasterCourseIcon = (container) => {
@@ -241,17 +246,18 @@ export default class CourseItemRow extends Component {
             }
             {this.props.actionsContent}
             <span ref={this.initializeMasterCourseIcon} className="ic-item-row__master-course-lock" />
-            {this.props.showManageMenu && this.props.manageMenuOptions.length > 0 &&
+            {this.props.showManageMenu &&
               (<span className="ic-item-row__manage-menu">
                 <PopoverMenu
                   ref={(c) => { this._manageMenu = c }}
                   onSelect={this.props.onManageMenuSelect}
+                  onToggle={this.toggleManageMenuShown}
                   trigger={
                     <Button variant="icon" size="small">
                       <IconMore />
                       <ScreenReaderContent>{I18n.t('Manage options for %{name}', { name: this.props.title })}</ScreenReaderContent>
                     </Button>
-                  }>{this.props.manageMenuOptions}</PopoverMenu>
+                  }>{this.state.manageMenuShown ? this.props.manageMenuOptions() : null}</PopoverMenu>
               </span>)}
           </div>
           <div className="ic-item-row__meta-content">

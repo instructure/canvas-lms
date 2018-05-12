@@ -30,7 +30,8 @@ class DueDateCacher
   SQL_FRAGMENT
 
   def self.recompute(assignment, update_grades: false)
-    Rails.logger.debug "DDC.recompute(#{assignment&.id}) - #{caller(1..1).first}"
+    current_caller = caller(1..1).first
+    Rails.logger.debug "DDC.recompute(#{assignment&.id}) - #{current_caller}"
     return unless assignment.active?
     opts = {
       assignments: [assignment.id],
@@ -38,14 +39,14 @@ class DueDateCacher
         singleton: "cached_due_date:calculator:Assignment:#{assignment.global_id}"
       },
       update_grades: update_grades,
-      original_caller: caller(1..1).first
+      original_caller: current_caller
     }
 
     recompute_course(assignment.context, opts)
   end
 
-  def self.recompute_course(course, assignments: nil, inst_jobs_opts: {}, run_immediately: false, update_grades: false, original_caller: nil)
-    Rails.logger.debug "DDC.recompute_course(#{course.inspect}, #{assignments.inspect}, #{inst_jobs_opts.inspect}) - #{caller(1..1).first}"
+  def self.recompute_course(course, assignments: nil, inst_jobs_opts: {}, run_immediately: false, update_grades: false, original_caller: caller(1..1).first)
+    Rails.logger.debug "DDC.recompute_course(#{course.inspect}, #{assignments.inspect}, #{inst_jobs_opts.inspect}) - #{original_caller}"
     course = Course.find(course) unless course.is_a?(Course)
     inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Course:#{course.global_id}" if assignments.nil?
 
@@ -71,11 +72,17 @@ class DueDateCacher
 
     current_caller = caller(1..1).first
     update_grades = inst_jobs_opts.delete(:update_grades) || false
-    new(course, assignments, user_ids, update_grades: update_grades, original_caller: current_caller).
-      send_later_if_production_enqueue_args(:recompute, inst_jobs_opts)
+    due_date_cacher = new(course, assignments, user_ids, update_grades: update_grades, original_caller: current_caller)
+
+    run_immediately = inst_jobs_opts.delete(:run_immediately) || false
+    if run_immediately
+      due_date_cacher.recompute
+    else
+      due_date_cacher.send_later_if_production_enqueue_args(:recompute, inst_jobs_opts)
+    end
   end
 
-  def initialize(course, assignments, user_ids = [], update_grades: false, original_caller: nil)
+  def initialize(course, assignments, user_ids = [], update_grades: false, original_caller: caller(1..1).first)
     @course = course
     @assignment_ids = Array(assignments).map { |a| a.is_a?(Assignment) ? a.id : a }
     @user_ids = Array(user_ids)
@@ -211,11 +218,12 @@ class DueDateCacher
           "count(nullif(workflow_state in ('completed'), false)) as prior_count",
           "count(nullif(workflow_state in ('rejected', 'deleted'), false)) as deleted_count"
         ).
-          where(course_id: @course, type: ['StudentEnrollment', 'StudentViewEnrollment'])
+          where(course_id: @course, type: ['StudentEnrollment', 'StudentViewEnrollment']).
+          group(:user_id)
 
         scope = scope.where(user_id: @user_ids) if @user_ids.present?
 
-        scope.group(:user_id).find_each do |record|
+        scope.find_each do |record|
           if record.accepted_count == 0 && record.deleted_count > 0
             counts.deleted_student_ids << record.user_id
           elsif record.accepted_count == 0 && record.prior_count > 0

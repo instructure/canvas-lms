@@ -262,10 +262,14 @@ describe "grades" do
     end
 
     it "should display assignment statistics", priority: "1", test_id: 229664 do
-      5.times do
+      all_students = Array.new(5) do
         s = student_in_course(:active_all => true).user
         @first_assignment.grade_student(s, grade: 4, grader: @teacher)
+
+        s
       end
+
+      AssignmentScoreStatisticsGenerator.update_score_statistics(@course.id)
 
       get "/courses/#{@course.id}/grades"
       f('.toggle_score_details_link').click

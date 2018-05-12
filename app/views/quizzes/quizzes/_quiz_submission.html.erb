@@ -62,7 +62,7 @@
     submission_data = @submission.data
     submission_data_hash = {}
     submission_data.each{|d| submission_data_hash[d[:question_id]] = d }
-    submission_questions = @submission.questions_as_object
+    submission_questions = @submission.questions
     submission_questions_hash = {}
     submission_questions.each{|q| submission_questions_hash[q[:id]] = q }
 %>
@@ -188,12 +188,12 @@
   </div>
   <div class="update_scores_final_score">
     <b><%= before_label(:final_score, "Final Score") %></b>
-      <%= score_out_of_points_possible(@submission.score || 0, @quiz.points_possible || 0, :id => 'after_fudge_points_total', :style => 'font-size: 1.5em; padding-left: 5px') %>
+      <%= score_out_of_points_possible(@submission.score || 0, @quiz.points_possible || 0, :id => 'after_fudge_points_total', :style => "font-size: 1.5em; padding-#{direction('left')}: 5px") %>
   </div>
 <% end %>
 
 <% if !editable %>
-<div class="quiz_score" style="text-align: right; font-size: 1.2em; <%= hidden if @quiz.ungraded? %>">
+<div class="quiz_score" style="text-align: <%= direction('right') %>; font-size: 1.2em; <%= hidden if @quiz.ungraded? %>">
   <% if @quiz.survey? %>
     <%= before_label(:survey_score, "Survey Score") %>
   <% else %>

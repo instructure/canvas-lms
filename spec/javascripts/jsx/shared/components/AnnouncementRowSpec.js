@@ -182,7 +182,7 @@ test('does not render Allow Comments menu item if announcements are globally loc
   // This is a way to get around that.
   const courseItemRow = tree.find("CourseItemRow")
   ok(courseItemRow.exists())
-  const menuItems = courseItemRow.props().manageMenuOptions
+  const menuItems = courseItemRow.props().manageMenuOptions()
   strictEqual(menuItems.length, 1)
   strictEqual(menuItems[0].key, 'delete')
 })

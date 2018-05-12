@@ -39,9 +39,9 @@ class AccountReport < ActiveRecord::Base
     state :deleted
   end
 
-  scope :complete, -> { where(progress: 100) }
-  scope :most_recent, -> { order(updated_at: :desc).limit(1) }
-  scope :active, -> { where.not(workflow_state: 'deleted') }
+  scope :complete, -> {where(progress: 100)}
+  scope :most_recent, -> {order(updated_at: :desc).limit(1)}
+  scope :active, -> {where.not(workflow_state: 'deleted')}
 
   alias_method :destroy_permanently!, :destroy
   def destroy
@@ -80,7 +80,7 @@ class AccountReport < ActiveRecord::Base
     self.created? || self.running?
   end
 
-  def run_report(type=nil)
+  def run_report(type = nil)
     self.report_type ||= type
     if AccountReport.available_reports[self.report_type]
       begin
@@ -94,8 +94,8 @@ class AccountReport < ActiveRecord::Base
       self.save
     end
   end
-  handle_asynchronously :run_report, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1,
-    :n_strand => proc { |ar| ['account_reports', ar.account.root_account.global_id]}
+  handle_asynchronously :run_report, priority: Delayed::LOW_PRIORITY, max_attempts: 1,
+                        n_strand: proc {|ar| ['account_reports', ar.account.root_account.global_id]}
 
   def has_parameter?(key)
     self.parameters.is_a?(Hash) && self.parameters[key].presence

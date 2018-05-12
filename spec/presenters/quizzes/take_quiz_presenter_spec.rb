@@ -36,7 +36,7 @@ describe Quizzes::TakeQuizPresenter do
   end
 
   before do
-    allow(submission).to receive(:questions_as_object).and_return all_questions
+    allow(submission).to receive(:questions).and_return all_questions
   end
 
   describe "current_questions" do

@@ -58,10 +58,7 @@ class Canvadoc < ActiveRecord::Base
   end
 
   def has_annotations?
-    account_context = attachment.context.try(:account)
-    account_context ||= attachment.context.try(:root_account)
-    new_annotations_enabled = account_context&.feature_enabled?(:new_annotations)
-    new_annotations_enabled || has_annotations == true
+    Canvadocs.annotations_supported? || has_annotations == true
   end
 
   def self.mime_types

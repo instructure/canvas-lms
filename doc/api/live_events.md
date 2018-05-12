@@ -543,3 +543,37 @@ by `asset_type` and `asset_id`.
 | `icon` | The icon to display with the message.  Defaults to warning. |
 | `start_at` | When to send out the notification. |
 | `end_at` | When to expire the notification. |
+
+#### `module_created`
+
+| Field | Description |
+| ----- | ----------- |
+| `module_id` | The Canvas id of the module. |
+| `name` | The name of the module. |
+| `position` | The position of the module in the course. |
+| `workflow_state` | The workflow state of the module. |
+
+#### `module_updated`
+
+| Field | Description |
+| ----- | ----------- |
+| `module_id` | The Canvas id of the module. |
+| `name` | The name of the module. |
+| `position` | The position of the module in the course. |
+| `workflow_state` | The workflow state of the module. |
+
+#### `module_item_created`
+
+| Field | Description |
+| ----- | ----------- |
+| `module_item_id` | The Canvas id of the module item. |
+| `position` | The position of the module item in the module. |
+| `workflow_state` | The workflow state of the module item. |
+
+#### `module_item_updated`
+
+| Field | Description |
+| ----- | ----------- |
+| `module_item_id` | The Canvas id of the module item. |
+| `position` | The position of the module item in the module. |
+| `workflow_state` | The workflow state of the module item. |

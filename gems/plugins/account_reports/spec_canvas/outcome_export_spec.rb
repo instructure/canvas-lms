@@ -29,7 +29,9 @@ describe "Outcome Reports" do
     end
 
     def match_outcome(outcome)
-      match_row('canvas_id' => outcome.id.to_s)
+      object_type = outcome.class == LearningOutcome ? 'canvas_outcome' : 'canvas_outcome_group'
+      vendor_guid = outcome.vendor_guid || "#{object_type}:#{outcome.id}"
+      match_row('vendor_guid' => vendor_guid)
     end
 
     def include_outcome(outcome)
@@ -38,6 +40,10 @@ describe "Outcome Reports" do
 
     def row_index(outcome)
       report.find_index { |row| match_outcome(outcome).matches?(row) }
+    end
+
+    def find_object(object)
+      report.find { |row| match_outcome(object).matches?(row) }
     end
 
     def have_n_ratings(n)
@@ -53,7 +59,7 @@ describe "Outcome Reports" do
         'outcome_export_csv',
         parse_header: true,
         account: account,
-        order: [2,0],
+        order: 'skip',
         **report_options
       )
     end
@@ -74,8 +80,8 @@ describe "Outcome Reports" do
       it 'includes outcome groups' do
         expect(report.length).to eq 4
         expect(report).to all(match_row('object_type' => 'group'))
-        expect(report[0]).to match_outcome(@root_group_1)
-        expect(report[3]).to match_outcome(@child_group_2_1)
+        expect(find_object(@root_group_1)).to match_outcome(@root_group_1)
+        expect(find_object(@child_group_2_1)).to match_outcome(@child_group_2_1)
       end
 
       it 'includes only outcome groups in current account' do
@@ -85,11 +91,11 @@ describe "Outcome Reports" do
       end
 
       it 'includes relevant fields' do
-        expect(report[0]['canvas_id']).to eq @root_group_1.id.to_s
-        expect(report[0]['object_type']).to eq 'group'
-        expect(report[0]['title']).to eq 'new outcome group'
-        expect(report[0]['description']).to match(/outcome group description/)
-        expect(report[0]['workflow_state']).to eq 'active'
+        group = find_object(@root_group_1)
+        expect(group['object_type']).to eq 'group'
+        expect(group['title']).to eq 'new outcome group'
+        expect(group['description']).to match(/outcome group description/)
+        expect(group['workflow_state']).to eq 'active'
       end
 
       it 'does not include deleted outcome groups' do
@@ -105,22 +111,20 @@ describe "Outcome Reports" do
           @child_group_1_1.update! vendor_guid_2: 'monkey'
         end
 
+        let(:guids) { report.map { |row| row['vendor_guid'] } }
+
         it 'defaults to vendor_guid field when AcademicBenchmark.use_new_guid_columns? not set' do
           allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return false
-          expect(report[0]['vendor_guid']).to eq 'lion'
-          expect(report[1]['vendor_guid']).to eq 'bear'
-          expect(report[2]['vendor_guid']).to eq 'monkey'
+          expect(guids).to include('lion', 'bear', 'monkey')
         end
 
         it 'defaults to vendor_guid_2 field when AcademicBenchmark.use_new_guid_columns? set' do
           allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return true
-          expect(report[0]['vendor_guid']).to eq 'tiger'
-          expect(report[1]['vendor_guid']).to eq 'bear'
-          expect(report[2]['vendor_guid']).to eq 'monkey'
+          expect(guids).to include('tiger', 'bear', 'monkey')
         end
 
         it 'uses canvas id for vendor_guid if and only if vendor_guid is not present' do
-          expect(report[3]['vendor_guid']).to eq "canvas_outcome_group:#{@child_group_2_1.id}"
+          expect(guids).to include("canvas_outcome_group:#{@child_group_2_1.id}")
         end
       end
 
@@ -130,12 +134,12 @@ describe "Outcome Reports" do
       end
 
       it 'includes parent of outcome groups' do
-        expect(report[2]['parent_guids']).to eq 'monkey'
-        expect(report[3]['parent_guids']).to eq "canvas_outcome_group:#{@root_group_2.id}"
+        expect(find_object(@child_group_1_1)['parent_guids']).to eq 'monkey'
+        guid = "canvas_outcome_group:#{@root_group_2.id}"
+        expect(find_object(@child_group_2_1)['parent_guids']).to eq guid
       end
 
       it 'includes parent before children' do
-        report_options[:order] = 'skip'
         expect(row_index(@root_group_1)).to be < row_index(@child_group_1_1)
         expect(row_index(@root_group_2)).to be < row_index(@child_group_2_1)
       end
@@ -168,8 +172,8 @@ describe "Outcome Reports" do
       it 'includes outcomes' do
         expect(report.length).to eq 4
         expect(report).to all(match_row('object_type' => 'outcome'))
-        expect(report[0]).to match_outcome(@root_outcome_1)
-        expect(report[1]).to match_outcome(@root_outcome_2)
+        expect(find_object(@root_outcome_1)).to match_outcome(@root_outcome_1)
+        expect(find_object(@root_outcome_2)).to match_outcome(@root_outcome_2)
       end
 
       it 'includes only outcomes linked in current account' do
@@ -192,18 +196,19 @@ describe "Outcome Reports" do
       end
 
       it 'includes relevant fields' do
-        expect(report[0]['canvas_id']).to eq @root_outcome_1.id.to_s
-        expect(report[0]['object_type']).to eq 'outcome'
-        expect(report[0]['title']).to eq @root_outcome_1.title
-        expect(report[0]['description']).to eq @root_outcome_1.description
-        expect(report[0]['display_name']).to eq @root_outcome_1.display_name
-        expect(report[0]['calculation_method']).to eq 'highest'
-        expect(report[0]['calculation_int']).to eq nil
-        expect(report[0]['workflow_state']).to eq @root_outcome_1.workflow_state
-        expect(report[0]['mastery_points']).to eq '3.0'
+        outcome = find_object(@root_outcome_1)
+        expect(outcome['object_type']).to eq 'outcome'
+        expect(outcome['title']).to eq @root_outcome_1.title
+        expect(outcome['description']).to eq @root_outcome_1.description
+        expect(outcome['display_name']).to eq @root_outcome_1.display_name
+        expect(outcome['calculation_method']).to eq 'highest'
+        expect(outcome['calculation_int']).to eq nil
+        expect(outcome['workflow_state']).to eq @root_outcome_1.workflow_state
+        expect(outcome['mastery_points']).to eq '3.0'
 
-        expect(report[1]['calculation_method']).to eq 'n_mastery'
-        expect(report[1]['calculation_int']).to eq '5'
+        other = find_object(@root_outcome_2)
+        expect(other['calculation_method']).to eq 'n_mastery'
+        expect(other['calculation_int']).to eq '5'
       end
 
       it 'does not include deleted outcomes' do
@@ -221,20 +226,21 @@ describe "Outcome Reports" do
 
         it 'defaults to vendor_guid field when AcademicBenchmark.use_new_guid_columns? not set' do
           allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return false
-          expect(report[0]['vendor_guid']).to eq 'lion'
-          expect(report[1]['vendor_guid']).to eq 'bear'
-          expect(report[2]['vendor_guid']).to eq 'llama'
+          expect(find_object(@root_outcome_1)['vendor_guid']).to eq 'lion'
+          expect(find_object(@root_outcome_2)['vendor_guid']).to eq 'bear'
+          expect(find_object(@root_outcome_3)['vendor_guid']).to eq 'llama'
         end
 
         it 'defaults to vendor_guid_2 field when AcademicBenchmark.use_new_guid_columns? set' do
           allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return true
-          expect(report[0]['vendor_guid']).to eq 'tiger'
-          expect(report[1]['vendor_guid']).to eq 'bear'
-          expect(report[2]['vendor_guid']).to eq 'llama'
+          expect(find_object(@root_outcome_1)['vendor_guid']).to eq 'tiger'
+          expect(find_object(@root_outcome_2)['vendor_guid']).to eq 'bear'
+          expect(find_object(@root_outcome_3)['vendor_guid']).to eq 'llama'
         end
 
         it 'uses canvas id for vendor_guid if vendor_guid is not present' do
-          expect(report[3]['vendor_guid']).to eq "canvas_outcome:#{@root_outcome_4.id}"
+          guid = "canvas_outcome:#{@root_outcome_4.id}"
+          expect(find_object(@root_outcome_4)['vendor_guid']).to eq guid
         end
       end
 
@@ -251,7 +257,6 @@ describe "Outcome Reports" do
         end
 
         it 'includes groups before outcomes' do
-          report_options[:order] = 'skip'
           LearningOutcomeGroup.where.not(learning_outcome_group_id: nil).to_a.
             product(LearningOutcome.all).
             each do |group, outcome|
@@ -265,18 +270,20 @@ describe "Outcome Reports" do
 
         it 'includes multiple parents if group is linked to multiple outcome groups' do
           @root_group_1.add_outcome(@nested_outcome)
-          expect(report[7]['parent_guids']).
+          expect(find_object(@nested_outcome)['parent_guids']).
             to eq "canvas_outcome_group:#{@root_group_1.id} canvas_outcome_group:#{@group_1_1_1.id}"
         end
       end
 
       context 'with ratings' do
+        let(:first_outcome) { find_object(@root_outcome_1) }
+
         it 'includes all ratings' do
-          expect(report[0]).to have_n_ratings(2)
-          expect(report[0][RATING_INDEX]).to eq '3.0'
-          expect(report[0][RATING_INDEX + 1]).to eq 'Rockin'
-          expect(report[0][RATING_INDEX + 2]).to eq '0.0'
-          expect(report[0][RATING_INDEX + 3]).to eq 'Lame'
+          expect(first_outcome).to have_n_ratings(2)
+          expect(first_outcome[RATING_INDEX]).to eq '3.0'
+          expect(first_outcome[RATING_INDEX + 1]).to eq 'Rockin'
+          expect(first_outcome[RATING_INDEX + 2]).to eq '0.0'
+          expect(first_outcome[RATING_INDEX + 3]).to eq 'Lame'
         end
 
         it 'includes different number of fields depending on how many ratings are present' do
@@ -291,13 +298,13 @@ describe "Outcome Reports" do
             ]
           }
           @root_outcome_1.save!
-          expect(report[0]).to have_n_ratings(6)
-          expect(report[0][RATING_INDEX]).to eq '10.0'
-          expect(report[0][RATING_INDEX + 1]).to eq 'a fly'
-          expect(report[0][RATING_INDEX + 10]).to eq '0.0'
-          expect(report[0][RATING_INDEX + 11]).to eq 'I know'
-          expect(report[0][RATING_INDEX + 12]).to be_nil
-          expect(report[0][RATING_INDEX + 13]).to be_nil
+          expect(first_outcome).to have_n_ratings(6)
+          expect(first_outcome[RATING_INDEX]).to eq '10.0'
+          expect(first_outcome[RATING_INDEX + 1]).to eq 'a fly'
+          expect(first_outcome[RATING_INDEX + 10]).to eq '0.0'
+          expect(first_outcome[RATING_INDEX + 11]).to eq 'I know'
+          expect(first_outcome[RATING_INDEX + 12]).to be_nil
+          expect(first_outcome[RATING_INDEX + 13]).to be_nil
         end
       end
 

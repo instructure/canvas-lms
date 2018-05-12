@@ -16,7 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 import React, { Component } from 'react'
+import {connect} from 'react-redux'
+import {bindActionCreators} from 'redux'
 import { DropTarget } from 'react-dnd';
 import { string, func, bool, arrayOf } from 'prop-types'
 import I18n from 'i18n!discussions_v2'
@@ -25,11 +28,12 @@ import ToggleDetails from '@instructure/ui-core/lib/components/ToggleDetails'
 import Text from '@instructure/ui-core/lib/components/Text'
 import update from 'immutability-helper'
 
-import DiscussionRow, { DraggableDiscussionRow } from '../../shared/components/DiscussionRow'
+import select from '../../shared/select'
+import actions from '../actions'
+import { ConnectedDiscussionRow, ConnectedDraggableDiscussionRow } from './DiscussionRow'
 import { discussionList } from '../../shared/proptypes/discussion'
-import masterCourseDataShape from '../../shared/proptypes/masterCourseData'
 import propTypes from '../propTypes'
-import CyoeHelper from '../../shared/conditional_release/CyoeHelper'
+
 
 // Handle drag and drop on a discussion. The props passed in tell us how we
 // should update the discussion if something is dragged into this container
@@ -51,38 +55,29 @@ const discussionTarget = {
   },
 }
 
-export default class DiscussionsContainer extends Component {
+export class DiscussionsContainer extends Component {
   static propTypes = {
-    discussions: discussionList.isRequired,
-    permissions: propTypes.permissions.isRequired,
-    masterCourseData: masterCourseDataShape,
-    title: string.isRequired,
-    toggleSubscribe: func.isRequired,
-    discussionTopicMenuTools: arrayOf(propTypes.discussionTopicMenuTools),
-    updateDiscussion: func.isRequired,
-    handleDrop: func, // eslint-disable-line
-    duplicateDiscussion: func.isRequired,
     cleanDiscussionFocus: func.isRequired,
-    pinned: bool,
     closedState: bool, // eslint-disable-line
     connectDropTarget: func,
-    roles: arrayOf(string), // eslint-disable-line
-    renderContainerBackground: func.isRequired,
+    deleteDiscussion: func.isRequired,
+    deleteFocusDone: func.isRequired,
+    deleteFocusPending: bool.isRequired, // eslint-disable-line
+    discussions: discussionList.isRequired,
+    handleDrop: func, // eslint-disable-line
     onMoveDiscussion: func,
-    deleteDiscussion: func,
-    contextType: string.isRequired,
+    permissions: propTypes.permissions.isRequired,
+    pinned: bool,
+    renderContainerBackground: func.isRequired,
+    title: string.isRequired,
   }
 
   static defaultProps = {
-    masterCourseData: null,
-    connectDropTarget (component) {return component},
-    pinned: undefined,
     closedState: undefined,
-    roles: ['user', 'student'],
-    onMoveDiscussion: null,
-    discussionTopicMenuTools: [],
-    deleteDiscussion: null,
+    connectDropTarget (component) {return component},
     handleDrop: undefined,
+    onMoveDiscussion: null,
+    pinned: undefined,
   }
 
   constructor(props) {
@@ -90,26 +85,37 @@ export default class DiscussionsContainer extends Component {
     this.moveCard = this.moveCard.bind(this)
     this.state = {
       discussions: props.discussions,
+      expanded: true,
     }
   }
 
   componentWillReceiveProps(props) {
-    if((this.props.discussions.length >= 1
-      && props.discussions.length === 0)
-      || (props.discussions[0]
-      && props.discussions[0].focusOn === "toggleButton")) {
-      if(this.toggleBtn) {
-        setTimeout(() => {
-          this.toggleBtn.focus()
-          this.props.cleanDiscussionFocus()
-        });
-      }
-    }
+    if(this.props.discussions === props.discussions) { return }
+    this.setState({ discussions: props.discussions, expanded: true })
+    this.handleDeleteFocus(props)
+  }
 
-    if(this.props.discussions !== props.discussions) {
-      this.setState({
-        discussions: props.discussions,
-      })
+  getDiscussionPosition = (discussion) => {
+    const { id } = discussion
+    return this.state.discussions.findIndex((d) => d.id === id)
+  }
+
+  toggleExpanded = () => {
+    this.setState({expanded: !this.state.expanded})
+  }
+
+  handleDeleteFocus(newProps) {
+    // Set the focus to the container toggle button if we are deleting an element,
+    // and the new discussions list is empty or explictly said to set focus to
+    // that toggle button.
+    if (!this.toggleBtn) { return }
+    if (!newProps.deleteFocusPending) { return }
+    if (this.props.discussions.length === 0) { return }
+
+    if (newProps.discussions.length === 0 || newProps.discussions[0].focusOn === "toggleButton") {
+      this.toggleBtn.focus()
+      this.props.cleanDiscussionFocus()
+      this.props.deleteFocusDone()
     }
   }
 
@@ -118,75 +124,44 @@ export default class DiscussionsContainer extends Component {
   }
 
   moveCard(dragIndex, hoverIndex) {
+    // Only pinned discussions can be repositioned, others are sorted by
+    // recent activity
+    if (!this.props.pinned) { return }
+
     const { discussions } = this.state
     const dragDiscussion = discussions[dragIndex]
     if (!dragDiscussion) {
       return
     }
+
     const newDiscussions = update(this.state, {
       discussions: {
         $splice: [[dragIndex, 1], [hoverIndex, 0, dragDiscussion]],
       },
     })
-    newDiscussions.discussions = newDiscussions.discussions.map((discussion, index) => ({...discussion, sortableId: index}))
     this.setState({discussions: newDiscussions.discussions})
   }
 
   renderDiscussions () {
-    return this.state.discussions.reduce((accumlator, discussion) => {
-      if (discussion.filtered) { return accumlator }
-      const cyoe = CyoeHelper.getItemData(discussion.assignment_id)
-      const row = this.props.permissions.moderate
-        ? <DraggableDiscussionRow
+    return this.state.discussions.map((discussion) => (
+      this.props.permissions.moderate
+        ? <ConnectedDraggableDiscussionRow
             key={discussion.id}
             discussion={discussion}
-            displayManageMenu={discussion.permissions.delete}
-            displayPinMenuItem={this.props.permissions.moderate}
-            displayDuplicateMenuItem={this.props.permissions.manage_content}
-            displayLockMenuItem={discussion.can_lock}
-            displayDeleteMenuItem={
-              !(discussion.is_master_course_child_content && discussion.restricted_by_master_course)
-            }
-            displayMasteryPathsMenuItem={cyoe.isCyoeAble}
-            canPublish={this.props.permissions.publish}
-            masterCourseData={this.props.masterCourseData}
-            onToggleSubscribe={this.props.toggleSubscribe}
-            duplicateDiscussion={this.props.duplicateDiscussion}
-            discussionTopicMenuTools={this.props.discussionTopicMenuTools}
-            cleanDiscussionFocus={this.props.cleanDiscussionFocus}
-            updateDiscussion={this.props.updateDiscussion}
-            onMoveDiscussion={this.props.onMoveDiscussion}
             deleteDiscussion={this.props.deleteDiscussion}
-            contextType={this.props.contextType}
+            getDiscussionPosition={this.getDiscussionPosition}
+            onMoveDiscussion={this.props.onMoveDiscussion}
             moveCard={this.moveCard}
             draggable
           />
-        : <DiscussionRow
+        : <ConnectedDiscussionRow
             key={discussion.id}
             discussion={discussion}
-            displayManageMenu={discussion.permissions.delete}
-            displayPinMenuItem={this.props.permissions.moderate}
-            displayDuplicateMenuItem={this.props.permissions.manage_content}
-            displayLockMenuItem={discussion.can_lock}
-            displayDeleteMenuItem={
-              !(discussion.is_master_course_child_content && discussion.restricted_by_master_course)
-            }
-            displayMasteryPathsMenuItem={cyoe.isCyoeAble}
-            canPublish={this.props.permissions.publish}
-            masterCourseData={this.props.masterCourseData}
-            discussionTopicMenuTools={this.props.discussionTopicMenuTools}
-            onToggleSubscribe={this.props.toggleSubscribe}
-            cleanDiscussionFocus={this.props.cleanDiscussionFocus}
-            duplicateDiscussion={this.props.duplicateDiscussion}
-            updateDiscussion={this.props.updateDiscussion}
-            onMoveDiscussion={this.props.onMoveDiscussion}
             deleteDiscussion={this.props.deleteDiscussion}
-            contextType={this.props.contextType}
+            onMoveDiscussion={this.props.onMoveDiscussion}
             draggable={false}
           />
-      accumlator.push(row)
-      return accumlator
-    }, [])
+    ))
   }
 
   renderBackgroundImage() {
@@ -200,20 +175,17 @@ export default class DiscussionsContainer extends Component {
   render () {
     return this.props.connectDropTarget (
       <div className="discussions-container__wrapper">
-        {!this.props.pinned ?
-        <span className="recent-activity-text-container">
-          <Text fontStyle="italic">{I18n.t('Ordered by Recent Activity')}</Text>
-        </span> : null }
         <span ref={this.wrapperToggleRef}>
           <ToggleDetails
-            defaultExpanded
-            summary={<Text weight="bold">{this.props.title}</Text>}
+            expanded={this.state.expanded}
+            onToggle={this.toggleExpanded}
+            summary={<Text weight="bold" as="h2">{this.props.title}</Text>}
           >
-              {
-                this.props.discussions.filter(d => !d.filtered).length
-                  ? this.renderDiscussions()
-                  : this.renderBackgroundImage()
-              }
+            {!this.props.pinned ?
+            <span className="recent-activity-text-container">
+              <Text fontStyle="italic">{I18n.t('Ordered by Recent Activity')}</Text>
+            </span> : null }
+            {this.props.discussions.length ? this.renderDiscussions() : this.renderBackgroundImage()}
           </ToggleDetails>
         </span>
       </div>
@@ -221,8 +193,42 @@ export default class DiscussionsContainer extends Component {
   }
 }
 
+export const mapState = (state, ownProps) => {
+  // Filter out any discussions that are filtered here to keep things simplier
+  // in the render calls
+  const { discussions } = ownProps
+  const filteredDiscussions = discussions.filter((d) => !d.filtered)
+
+  const propsFromState = {
+    contextId: state.contextId,
+    deleteFocusPending: state.deleteFocusPending,
+    discussions: filteredDiscussions,
+    permissions: state.permissions,
+  }
+  return Object.assign({}, ownProps, propsFromState)
+}
+
+const mapDispatch = (dispatch) => {
+  const actionKeys = [
+    'cleanDiscussionFocus',
+    'deleteFocusDone',
+    'handleDrop',
+  ]
+  return bindActionCreators(select(actions, actionKeys), dispatch)
+}
+
 export const DroppableDiscussionsContainer = DropTarget('Discussion', discussionTarget, (dragConnect, monitor) => ({
   connectDropTarget: dragConnect.dropTarget(),
   isOver: monitor.isOver(),
   canDrop: monitor.canDrop(),
 }))(DiscussionsContainer)
+
+export const ConnectedDiscussionsContainer = connect(
+  mapState,
+  mapDispatch
+)(DiscussionsContainer)
+
+export const DroppableConnectedDiscussionsContainer = connect(
+  mapState,
+  mapDispatch
+)(DroppableDiscussionsContainer)

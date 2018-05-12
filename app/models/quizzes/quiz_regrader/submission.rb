@@ -78,7 +78,7 @@ class Quizzes::QuizRegrader::Submission
   def regraded_question_data
     pos = 0
 
-    submission.quiz_data.map do |question|
+    submission.questions.map do |question|
       id = question[:id]
 
       pos += 1 unless question[:question_type] == Quizzes::QuizQuestion::Q_TEXT_ONLY

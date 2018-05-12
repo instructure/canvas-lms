@@ -162,6 +162,24 @@ describe RubricAssociation do
       expect(assess.reload).not_to be_nil
     end
 
+    it "should not delete assessment requests when an association is destroyed" do
+      submission_student = student_in_course(active_all: true, course: @course).user
+      review_student = student_in_course(active_all: true, course: @course).user
+      assignment = @course.assignments.create!
+      submission = assignment.find_or_create_submission(submission_student)
+      outcome_with_rubric
+      ra = @rubric.rubric_associations.create!(
+        :association_object => assignment,
+        :context => @course,
+        :purpose => 'grading'
+      )
+      request = AssessmentRequest.create!(user: submission_student, asset: submission, assessor_asset: review_student,
+        assessor: review_student, rubric_association: ra)
+      expect(request).not_to be_nil
+      ra.destroy
+      expect(request.reload).not_to be_nil
+    end
+
     it "should let account admins without manage_courses do things" do
       @rubric = @course.rubrics.create! { |r| r.user = @teacher }
       ra_params = rubric_association_params_for_assignment(@assignment)

@@ -116,7 +116,7 @@ class ApplicationController < ActionController::Base
   #       ENV.FOO_BAR #> [1,2,3]
   #
   def js_env(hash = {}, overwrite = false)
-    return {} unless request.format.html? || @include_js_env
+    return {} unless request.format.html? || request.format == "*/*" || @include_js_env
     # set some defaults
     unless @js_env
       editor_css = [
@@ -1743,8 +1743,6 @@ class ApplicationController < ActionController::Base
     @features_enabled[feature] ||= begin
       if [:question_banks].include?(feature)
         true
-      elsif feature == :yo
-        Canvas::Plugin.find(:yo).try(:enabled?)
       elsif feature == :twitter
         !!Twitter::Connection.config
       elsif feature == :linked_in
@@ -2376,6 +2374,7 @@ class ApplicationController < ActionController::Base
         can_read_course_list: can_read_course_list,
         can_read_roster: can_read_roster,
         can_create_courses: @account.grants_right?(@current_user, session, :manage_courses),
+        can_create_enrollments: @account.grants_any_right?(@current_user, session, :manage_students, :manage_admin_users),
         can_create_users: @account.root_account.grants_right?(@current_user, session, :manage_user_logins),
         analytics: @account.service_enabled?(:analytics),
         can_masquerade: @account.grants_right?(@current_user, session, :become_user),

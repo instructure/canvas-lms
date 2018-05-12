@@ -425,24 +425,22 @@ function setupHeader () {
       this.elements.nav.click($.proxy(this.toAssignment, this));
       this.elements.mute.link.click($.proxy(this.onMuteClick, this));
 
+      this.elements.settings.form.submit(this.submitSettingsForm.bind(this));
       if (!ENV.anonymous_moderated_marking_enabled) {
-        this.elements.settings.form.submit(this.submitSettingsForm.bind(this));
         this.elements.settings.link.click(this.showSettingsModal.bind(this));
       }
       this.elements.keyinfo.icon.click(this.keyboardShortcutInfoModal.bind(this));
     },
     createModals () {
-      if (!ENV.anonymous_moderated_marking_enabled) {
-        this.elements.settings.form.dialog({
-          autoOpen: false,
-          modal: true,
-          resizable: false,
-          width: 400
-        }).fixDialogButtons();
-        // FF hack - when reloading the page, firefox seems to "remember" the disabled state of this
-        // button. So here we'll manually re-enable it.
-        this.elements.settings.form.find(".submit_button").removeAttr('disabled')
-      }
+      this.elements.settings.form.dialog({
+        autoOpen: false,
+        modal: true,
+        resizable: false,
+        width: 400
+      }).fixDialogButtons();
+      // FF hack - when reloading the page, firefox seems to "remember" the disabled state of this
+      // button. So here we'll manually re-enable it.
+      this.elements.settings.form.find(".submit_button").removeAttr('disabled')
 
       this.elements.mute.modal.dialog({
         autoOpen: false,
@@ -518,9 +516,11 @@ function setupHeader () {
       });
     },
 
-    showSettingsModal (e) {
-      e.preventDefault();
-      this.elements.settings.form.dialog('open');
+    showSettingsModal (event) {
+      if (event) {
+        event.preventDefault()
+      }
+      this.elements.settings.form.dialog('open')
     },
 
     onMuteClick (e) {
@@ -770,11 +770,12 @@ function initRubricStuff(){
   });
 
   selectors.get('#rubric_assessments_select').change(() => {
+    const editingData = rubricAssessment.assessmentData($("#rubric_full"))
     var selectedAssessment = getSelectedAssessment();
     rubricAssessment.populateRubricSummary(
       $("#rubric_summary_holder .rubric_summary"),
       selectedAssessment,
-      isAssessmentEditableByMe(selectedAssessment)
+      editingData
     );
   });
 
@@ -2867,7 +2868,22 @@ function setupSelectors() {
 }
 
 function renderSettingsMenu () {
+  function showKeyboardShortcutsModal () {
+    // need to place at end of execution queue to make focus work properly
+    setTimeout(header.keyboardShortcutInfoModal.bind(header), 0)
+  }
+
+  function showOptionsModal () {
+    // need to place at end of execution queue to make focus work properly
+    setTimeout(header.showSettingsModal.bind(header), 0)
+  }
+
   const props =  {
+    assignmentID: ENV.assignment_id,
+    courseID: ENV.course_id,
+    helpURL: ENV.help_url,
+    openOptionsModal: showOptionsModal,
+    openKeyboardShortcutsModal: showKeyboardShortcutsModal,
     showModerationMenuItem: ENV.grading_role === 'moderator',
     showHelpMenuItem: ENV.show_help_menu_item
   }
@@ -2878,11 +2894,10 @@ function renderSettingsMenu () {
 
 export default {
   setup () {
+    setupSelectors()
     if (ENV.anonymous_moderated_marking_enabled) {
       renderSettingsMenu()
     }
-
-    setupSelectors()
 
     function registerQuizzesNext (overriddenShowSubmission) {
       showSubmissionOverride = overriddenShowSubmission;

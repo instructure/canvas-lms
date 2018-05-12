@@ -973,6 +973,19 @@ describe GradeCalculator do
             expect(overall_course_score.unposted_final_points).to eq(468.70)
           end
         end
+
+        it 'schedules assignment score statistic updates as a singleton' do
+          calculator = GradeCalculator.new(@student.id, @course)
+          expect(AssignmentScoreStatisticsGenerator).to receive(:update_score_statistics_in_singleton).with(@course.id)
+
+          calculator.compute_and_save_scores
+        end
+
+        it 'does not update score statistics when calculating scores for muted assignments' do
+          calculator = GradeCalculator.new(@student.id, @course, ignore_muted: false)
+          expect(AssignmentScoreStatisticsGenerator).not_to receive(:update_score_statistics_in_singleton).with(@course.id)
+          calculator.compute_and_save_scores
+        end
       end
 
       describe 'assignment group scores' do
@@ -1119,6 +1132,13 @@ describe GradeCalculator do
           not_to (change { @student.enrollments.first.scores.where.not(grading_period_id: nil).map(&:updated_at) })
       end
 
+      it 'schedules assignment score statistic updates as a singleton' do
+        calculator = GradeCalculator.new(@student.id, @course)
+        expect(AssignmentScoreStatisticsGenerator).to receive(:update_score_statistics_in_singleton).with(@course.id)
+
+        calculator.compute_and_save_scores
+      end
+
       context 'when a grading period is provided' do
         it 'updates the grading period score' do
           GradeCalculator.new(@student.id, @course, grading_period: @first_period).compute_and_save_scores
@@ -1128,6 +1148,13 @@ describe GradeCalculator do
         it 'updates the overall course score' do
           GradeCalculator.new(@student.id, @course, grading_period: @first_period).compute_and_save_scores
           expect(overall_course_score.current_score).to eq(91.37)
+        end
+
+        it 'does not update score statistics when calculating non-course scores' do
+          calculator_options = { grading_period: @first_period, update_course_score: false }
+          calculator = GradeCalculator.new(@student.id, @course, calculator_options)
+          expect(AssignmentScoreStatisticsGenerator).not_to receive(:update_score_statistics_in_singleton).with(@course.id)
+          calculator.compute_and_save_scores
         end
 
         it 'does not update scores for other grading periods' do

@@ -19,6 +19,7 @@
 module Api::V1::Course
   include Api::V1::Json
   include Api::V1::EnrollmentTerm
+  include Api::V1::Account
   include Api::V1::SectionEnrollments
   include Api::V1::PostGradesStatus
   include Api::V1::User
@@ -96,6 +97,8 @@ module Api::V1::Course
       hash['teachers'] = course.teachers.distinct.map { |teacher| user_display_json(teacher) } if includes.include?('teachers')
       hash['tabs'] = tabs_available_json(course, user, session, ['external']) if includes.include?('tabs')
       hash['locale'] = course.locale unless course.locale.nil?
+      hash['account'] = account_json(course.account, user, session, []) if includes.include?('account')
+      # undocumented, but leaving for backwards compatibility.
       hash['subaccount_name'] = course.account.name if includes.include?('subaccount')
       add_helper_dependant_entries(hash, course, builder)
       apply_nickname(hash, course, user) if user

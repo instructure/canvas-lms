@@ -72,7 +72,7 @@
           t('links.preview_survey_again', "Preview the Survey Again") :
           t('links.preview_quiz_again', "Preview the Quiz Again") %><% end %><br/>
     <% elsif !@quiz.single_attempt? || can_do(@quiz, @current_user, :update) %>
-      <div style="margin-left: 20px; margin-top: 20px; line-height: 1.3em;">
+      <div style="margin-<%= direction('left') %>: 20px; margin-top: 20px; line-height: 1.3em;">
         <% if (@submission.attempt > 1 || (@submission.attempt == 1 && can_do(@quiz, @current_user, :update))) &&
             (can_do(@quiz, @current_user, :grade) || !@quiz.muted?) %>
           <%= t(:attempts_so_far, {:one => "1 Attempt so far", :other => "%{count} Attempts so far"}, :count => @submission.attempt) %><br/>
@@ -93,7 +93,7 @@
         <div style="margin-top: 10px; font-size: 1.2em;">
         <% if (!@locked && (@quiz.unlimited_attempts? || @submission.attempts_left > 0)) || can_do(@quiz, @current_user, :update) %>
           <%= link_to_take_or_retake_poll %><br/>
-          <span style="font-size: 0.7em; padding-left: 20px;">
+          <span style="font-size: 0.7em; padding-<%= direction('left') %>: 20px;">
             (<%= score_to_keep_message %>)
           </span>
         <% end %>

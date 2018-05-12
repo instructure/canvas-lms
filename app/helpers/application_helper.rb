@@ -248,6 +248,12 @@ module ApplicationHelper
     @current_user.try(:feature_enabled?, :force_rtl) || (@domain_root_account.try(:feature_enabled?, :allow_rtl) && I18n.rtl?)
   end
 
+  # this is exactly the same as our sass helper with the same name
+  # see: https://www.npmjs.com/package/sass-direction
+  def direction(left_or_right)
+    use_rtl? ? {'left' => 'right', 'right' => 'left'}[left_or_right] : left_or_right
+  end
+
   def css_variant(opts = {})
     variant = use_responsive_layout? ? 'responsive_layout' : 'new_styles'
     use_high_contrast = @current_user && @current_user.prefers_high_contrast? || opts[:force_high_contrast]
@@ -432,9 +438,7 @@ module ApplicationHelper
       :http_status              => @status,
       :error_id                 => @error && @error.id,
       :disableGooglePreviews    => !service_enabled?(:google_docs_previews),
-      :disableScribdPreviews    => !feature_enabled?(:scribd),
       :disableCrocodocPreviews  => !feature_enabled?(:crocodoc),
-      :enableScribdHtml5        => feature_enabled?(:scribd_html5),
       :logPageViews             => !@body_class_no_headers,
       :maxVisibleEditorButtons  => 3,
       :editorButtons            => editor_buttons,

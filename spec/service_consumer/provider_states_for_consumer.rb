@@ -14,25 +14,27 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+require_relative 'pact_setup'
 
 Pact.provider_states_for 'Consumer' do
-    provider_state 'a student in a course with an assignment' do
-      set_up do
-
-      end
-
-      tear_down do
-
-      end
+  provider_state 'a student in a course with an assignment' do
+    set_up do
+      course = SetupData.create_and_enroll_student_in_course
+      SetupData.create_assignment(course)
     end
 
-    provider_state 'a student in a course' do
-      set_up do
+    tear_down do
 
-      end
-
-      tear_down do
-
-      end
     end
-end 
+  end
+
+  provider_state 'a student in a course' do
+    set_up do
+      SetupData.create_and_enroll_student_in_course
+    end
+
+    tear_down do
+
+    end
+  end
+end

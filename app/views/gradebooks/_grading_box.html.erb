@@ -54,13 +54,13 @@
   <select
     class="grading_value grading_box pass_fail"
     id="student_grading_<%= assignment.id %>"
-    style="<%= hidden unless submission %> text-align: left;"
+    style="<%= hidden unless submission %> text-align: <%= direction('left') %>;"
   >
-    <option value="" style="padding-left: 5px;">---</option>
-    <option value="complete" style="padding-left: 5px;" <%= "selected" if complete_selected %>>
+    <option value="" style="padding-<%= direction('left') %>: 5px;">---</option>
+    <option value="complete" style="padding-<%= direction('left') %>: 5px;" <%= "selected" if complete_selected %>>
       <%= t("Complete") %>
     </option>
-    <option value="incomplete" style="padding-left: 5px;" <%= "selected" if incomplete_selected %>>
+    <option value="incomplete" style="padding-<%= direction('left') %>: 5px;" <%= "selected" if incomplete_selected %>>
       <%= t("Incomplete") %>
     </option>
   </select>

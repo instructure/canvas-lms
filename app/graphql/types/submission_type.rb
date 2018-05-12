@@ -49,8 +49,8 @@ module Types
       "excused assignments are ignored when calculating grades",
       property: :excused?
 
-    field :submittedAt, TimeType, property: :submitted_at
-    field :gradedAt, TimeType, property: :graded_at
+    field :submittedAt, DateTimeType, property: :submitted_at
+    field :gradedAt, DateTimeType, property: :graded_at
 
     field :state, SubmissionStateType, property: :workflow_state
 

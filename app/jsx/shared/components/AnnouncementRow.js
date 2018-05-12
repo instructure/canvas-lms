@@ -38,26 +38,7 @@ import CourseItemRow from './CourseItemRow'
 import UnreadBadge from './UnreadBadge'
 import announcementShape from '../proptypes/announcement'
 import masterCourseDataShape from '../proptypes/masterCourseData'
-import { isPassedDelayedPostAt } from '../../announcements/utils'
-
-function makeTimestamp({delayed_post_at, posted_at}) {
-  return (delayed_post_at
-    && !isPassedDelayedPostAt({ currentDate: null, delayedDate: delayed_post_at}))
-    ? {
-        title: (
-          <span>
-            <Container margin="0 x-small">
-              <Text color="secondary">
-                <IconTimer />
-              </Text>
-            </Container>
-            {I18n.t('Delayed until:')}
-          </span>
-        ),
-        date: delayed_post_at
-      }
-    : {title: I18n.t('Posted on:'), date: delayed_post_at || posted_at}
-}
+import { makeTimestamp } from '../date-utils'
 
 export default function AnnouncementRow({
   announcement,
@@ -69,7 +50,7 @@ export default function AnnouncementRow({
   canHaveSections,
   announcementsLocked
 }) {
-  const timestamp = makeTimestamp(announcement)
+  const timestamp = makeTimestamp(announcement, I18n.t('Delayed until:'), I18n.t('Posted on:'))
   const readCount =
     announcement.discussion_subentry_count > 0 ? (
       <UnreadBadge
@@ -92,43 +73,46 @@ export default function AnnouncementRow({
     </Container>
   )
 
-  const MenuList = [
-    <MenuItem
-      key="delete"
-      value={{action: 'delete', id: announcement.id}}
-      id="delete-announcement-menu-option"
-    >
-      <span aria-hidden="true">
-        <IconTrash />&nbsp;&nbsp;{I18n.t('Delete')}
-      </span>
-      <ScreenReaderContent>
-        {I18n.t('Delete announcement %{title}', {title: announcement.title})}
-      </ScreenReaderContent>
-    </MenuItem>
-  ]
-  if (!announcementsLocked) {
-    MenuList.push(
+  const renderMenuList = () => {
+    const menuList = [
       <MenuItem
-        key="lock"
-        value={{action: 'lock', id: announcement.id, lock: !announcement.locked}}
-        id="lock-announcement-menu-option"
+        key="delete"
+        value={{action: 'delete', id: announcement.id}}
+        id="delete-announcement-menu-option"
       >
-        {announcement.locked ? (
-          <span aria-hidden="true">
-            <IconUnlock />&nbsp;&nbsp;{I18n.t('Allow Comments')}
-          </span>
-        ) : (
-          <span aria-hidden="true">
-            <IconLock />&nbsp;&nbsp;{I18n.t('Disallow Comments')}
-          </span>
-        )}
+        <span aria-hidden="true">
+          <IconTrash />&nbsp;&nbsp;{I18n.t('Delete')}
+        </span>
         <ScreenReaderContent>
-          {announcement.locked
-            ? I18n.t('Allow replies for %{title}', {title: announcement.title})
-            : I18n.t('Disallow replies for %{title}', {title: announcement.title})}
+          {I18n.t('Delete announcement %{title}', {title: announcement.title})}
         </ScreenReaderContent>
       </MenuItem>
-    )
+    ]
+    if (!announcementsLocked) {
+      menuList.push(
+        <MenuItem
+          key="lock"
+          value={{action: 'lock', id: announcement.id, lock: !announcement.locked}}
+          id="lock-announcement-menu-option"
+        >
+          {announcement.locked ? (
+            <span aria-hidden="true">
+              <IconUnlock />&nbsp;&nbsp;{I18n.t('Allow Comments')}
+            </span>
+          ) : (
+            <span aria-hidden="true">
+              <IconLock />&nbsp;&nbsp;{I18n.t('Disallow Comments')}
+            </span>
+          )}
+          <ScreenReaderContent>
+            {announcement.locked
+              ? I18n.t('Allow replies for %{title}', {title: announcement.title})
+              : I18n.t('Disallow replies for %{title}', {title: announcement.title})}
+          </ScreenReaderContent>
+        </MenuItem>
+      )
+    }
+    return menuList
   }
 
   // necessary because announcements return html from RCE
@@ -179,7 +163,7 @@ export default function AnnouncementRow({
       actionsContent={readCount}
       showManageMenu={canManage}
       onManageMenuSelect={onManageMenuSelect}
-      manageMenuOptions={(canManage && MenuList) || null}
+      manageMenuOptions={renderMenuList}
       hasReadBadge
     />
   )

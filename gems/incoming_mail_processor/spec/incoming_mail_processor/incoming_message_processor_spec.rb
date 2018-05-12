@@ -51,13 +51,13 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
     end
   end
 
-  def get_fixture (name)
+  def get_fixture(name)
     mail = Mail.read(MAIL_FIXTURES_PATH + name)
     return mail
   end
 
 
-  def get_expected_text (name)
+  def get_expected_text(name)
     file = File.open(MAIL_FIXTURES_PATH + 'expected/' + name + '.text_body', 'rb')
     content = file.read
     file.close
@@ -65,7 +65,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
     return content
   end
 
-  def get_expected_html (name)
+  def get_expected_html(name)
     file = File.open(MAIL_FIXTURES_PATH + 'expected/' + name + '.html_body', 'rb')
     content = file.read
     file.close
@@ -73,7 +73,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
     return content
   end
 
-  def test_message (filename)
+  def test_message(filename)
     message = get_processed_message(filename)
 
     text_body =  message.body.strip
@@ -221,7 +221,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
     end
 
     it "should be able to extract text and html bodies from no_image.eml" do
-      message = test_message('no_image.eml')
+      test_message('no_image.eml')
     end
 
     it "assumes text/plain when no content-type header is present" do

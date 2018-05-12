@@ -19,7 +19,7 @@
 <% content_for :page_title do %><%= t('Dashboard') %><% end %>
 <% css_bundle :dashboard %>
 <% js_bundle :dashboard %>
-<% @body_classes << "dashboard-is-planner" if user_dashboard_view == 'planner' %>
+<% @body_classes << "dashboard-is-planner" if show_planner? %>
 
 <% content_for :auto_discovery do %>
   <% if @current_user %>
@@ -28,7 +28,7 @@
 <% end %>
 
 <% content_for :right_side do %>
-  <% if user_dashboard_view != 'planner' %>
+  <% unless show_planner? %>
     <div class="placeholder"></div>
   <% end %>
 <% end %>
@@ -41,9 +41,9 @@
     <h1 class="ic-Dashboard-header__title"><%= t "Dashboard" %></h1>
   </div>
   <% if planner_enabled? %>
-    <div id="dashboard-planner" class="StudentPlanner__Container" style="display: <%= user_dashboard_view == 'planner' ? 'block' : 'none' %>"></div>
+    <div id="dashboard-planner" class="StudentPlanner__Container" style="display: <%= show_planner? ? 'block' : 'none' %>"></div>
   <% end %>
-  <div id="dashboard-activity" class="ic-Dashboard-Activity" style="display: <%= user_dashboard_view == 'activity' ? 'block' : 'none' %>">
+  <div id="dashboard-activity" class="ic-Dashboard-Activity" style="display: <%= show_recent_activity? ? 'block' : 'none' %>">
     <%= render :partial => 'shared/recent_activity' %>
   </div>
 

@@ -53,7 +53,7 @@
       <% elsif page_section["section_type"] == "submission" %>
         <% submission = @portfolio.user.submissions.where(id: page_section["submission_id"]).first if page_section["submission_id"].present? %>
         <% if submission %>
-          <iframe class="submission_preview" src="<%= eportfolio_entry_preview_submission_path(@portfolio, @page, submission.id) %>" style="border: 1px solid #aaa; width: 100%; height: 300px; display: block; margin-left: auto; margin-right: auto;" title="<%= t("%{assignment} preview", :assignment=> submission.assignment.title) %>">
+          <iframe class="submission_preview" src="<%= eportfolio_entry_preview_submission_path(@portfolio, @page, submission.id) %>" style="border: 1px solid #aaa; width: 100%; height: 300px; display: block; margin-<%= direction('left') %>: auto; margin-<%= direction('right') %>: auto;" title="<%= t("%{assignment} preview", :assignment=> submission.assignment.title) %>">
           </iframe>
         <% end %>
       <% end %>

@@ -223,26 +223,7 @@ class GradeSummaryPresenter
   end
 
   def assignment_stats
-    # performance note: There is an overlap between
-    # Submission.not_placeholder and the submission where clause.
-    #
-    # note: because a score is needed for max/min/ave we are not filtering
-    # by assignment_student_visibilities, if a stat is added that doesn't
-    # require score then add a filter when the DA feature is on
-    @stats ||= begin
-      Rails.cache.fetch(GradeSummaryPresenter.cache_key(@context, 'assignment_stats')) do
-        @context.assignments.active.except(:order).
-          joins(:submissions).
-          joins("INNER JOIN #{Enrollment.quoted_table_name} enrollments ON submissions.user_id = enrollments.user_id").
-          merge(Enrollment.of_student_type.active_or_pending).
-          merge(Submission.not_placeholder).
-          where(enrollments: {course_id: @context}).
-          where("submissions.excused IS NOT TRUE").
-          group("assignments.id").
-          select("assignments.id, max(score) max, min(score) min, avg(score) avg, count(submissions.id) count").
-          index_by(&:id)
-      end
-    end
+    @stats ||= ScoreStatistic.where(assignment: @context.assignments.active.except(:order)).index_by(&:assignment_id)
   end
 
   def assignment_presenters

@@ -144,6 +144,7 @@ module.exports = {
       /node_modules\/jquery\//,
       /vendor\/md5/,
       /tinymce\/tinymce/, // has 'require' and 'define' but they are from it's own internal closure
+      /i18nliner\/dist\/lib\/i18nliner/ // i18nLiner has a `require('fs')` that it doesn't actually need, ignore it.
     ],
     rules: [
       // to get tinymce to work. see: https://github.com/tinymce/tinymce/issues/2836
@@ -159,11 +160,6 @@ module.exports = {
         loaders: ['imports-loader?this=>window']
       },
 
-      // vendor/i18n.js does not export or define anything, it just creates a global
-      {
-        test: /vendor\/i18n/,
-        loaders: ['exports-loader?I18n']
-      },
       {
         test: /\.js$/,
         include: [
@@ -246,7 +242,7 @@ module.exports = {
     },
 
     // A lot of our files expect a global `I18n` variable, this will provide it if it is used
-    new webpack.ProvidePlugin({I18n: 'vendor/i18n'}),
+    new webpack.ProvidePlugin({I18n: 'i18n-js'}),
 
     // sets these environment variables in compiled code.
     // process.env.NODE_ENV will make it so react and others are much smaller and don't run their

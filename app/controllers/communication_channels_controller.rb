@@ -18,7 +18,7 @@
 
 # @API Communication Channels
 #
-# API for accessing users' email addresses, SMS phone numbers, Twitter, and Yo
+# API for accessing users' email addresses, SMS phone numbers, and Twitter
 # communication channels.
 #
 # In this API, the `:user_id` parameter can always be replaced with `self` if
@@ -40,7 +40,7 @@
 #           "type": "string"
 #         },
 #         "type": {
-#           "description": "The type of communcation channel being described. Possible values are: 'email', 'push', 'sms', 'twitter' or 'yo'. This field determines the type of value seen in 'address'.",
+#           "description": "The type of communcation channel being described. Possible values are: 'email', 'push', 'sms', or 'twitter'. This field determines the type of value seen in 'address'.",
 #           "example": "email",
 #           "type": "string",
 #           "allowableValues": {
@@ -48,8 +48,7 @@
 #               "email",
 #               "push",
 #               "sms",
-#               "twitter",
-#               "yo"
+#               "twitter"
 #             ]
 #           }
 #         },
@@ -78,7 +77,7 @@
 #     }
 #
 class CommunicationChannelsController < ApplicationController
-  before_action :require_user, :only => [:create, :destroy, :re_send_confirmation]
+  before_action :require_user, :only => [:create, :destroy, :re_send_confirmation, :delete_push_token]
   before_action :reject_student_view_student
 
   include Api::V1::CommunicationChannel
@@ -488,6 +487,28 @@ class CommunicationChannelsController < ApplicationController
       end
     else
       render :json => @cc.errors, :status => :bad_request
+    end
+  end
+
+  # @API Delete a push notification endpoint
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/users/self/communication_channels/push
+  #          -H 'Authorization: Bearer <token>
+  #          -X DELETE
+  #          -d 'push_token=<push_token>'
+  #
+  # @returns {success: true}
+  def delete_push_token
+    @cc = @current_user.communication_channels.unretired.of_type(CommunicationChannel::TYPE_PUSH).take
+    raise ActiveRecord::RecordNotFound unless @cc
+
+    endpoints = @current_user.notification_endpoints.where("lower(token) = ?", params[:push_token].downcase)
+    if endpoints&.destroy_all
+      @current_user.touch
+      return render json: {success: true}
+    else
+      return render json: endpoints.errors, status: :bad_request
     end
   end
 

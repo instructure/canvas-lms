@@ -158,11 +158,12 @@ describe CollaborationsController do
       end
 
       it "should include avatar_image_url" do
-        get 'members', params: {id: @collab.id, include: ['avatar_image_url']}
         @student.avatar_image_url = 'https://www.example.com/awesome-avatar.png'
+        @student.save!
+        get 'members', params: {id: @collab.id, include: ['avatar_image_url']}
         hash = JSON.parse(@response.body).first
 
-        expect(hash['avatar_image_url']).to eq @student.lti_context_id
+        expect(hash['avatar_image_url']).to eq @student.avatar_image_url
       end
     end
   end

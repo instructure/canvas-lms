@@ -40,19 +40,19 @@
     overflow: auto;
     height: 126px;
     .ui-widget {
-      margin: 0 8px 8px 0;
+      margin: direction-sides(0 8px 8px 0);
     }
     .person {
       display: inline-block;
       position: relative;
       background: #FFF;
-      margin: 0 8px 8px 0;
+      margin: direction-sides(0 8px 8px 0);
       padding: 4px;
       @include fontSize(11px);
       min-height: 21px;
-      box-shadow: inset 33px 0 0 #F7F7F7, inset 34px 0 0 #CCC;
+      box-shadow: inset (33px * direction-rtl(-1, 1)) 0 0 #F7F7F7, inset (34px * direction-rtl(-1, 1)) 0 0 #CCC;
       div {
-        margin: 2px 0 0 33px;
+        margin: direction-sides(2px 0 0 33px);
       }
       .name::after {
         content: " ";

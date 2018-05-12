@@ -24,7 +24,7 @@ class GradebookCsvsController < ApplicationController
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       current_time = Time.zone.now.strftime('%FT%H%M')
       name = t('grades_filename', "Grades") + "-" + @context.short_name.to_s
-      filename = "#{current_time}_#{name}.csv".gsub(/ /, '_')
+      filename = "#{current_time}_#{name}.csv".gsub(%r{/| }, '_')
 
       csv_options = {
         include_sis_id: @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis),

@@ -115,6 +115,7 @@ class GradeCalculator
     calculate_grading_period_scores if @update_all_grading_period_scores
     compute_scores
     save_scores
+    update_score_statistics
     invalidate_caches
     # The next line looks weird, but it is intended behaviour.  Its
     # saying "if we're on the branch not calculating muted scores, run
@@ -383,6 +384,13 @@ class GradeCalculator
 
   def points_column(type)
     "#{column_prefix}#{type}_points"
+  end
+
+  def update_score_statistics
+    return if @grading_period   # only update score statistics when calculating course scores
+    return unless @ignore_muted # only update when calculating final scores
+
+    AssignmentScoreStatisticsGenerator.update_score_statistics_in_singleton(@course.id)
   end
 
   def save_scores

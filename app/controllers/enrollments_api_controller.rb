@@ -376,9 +376,14 @@ class EnrollmentsApiController < ApplicationController
   #   Return grades for the given grading_period.  If this parameter is not
   #   specified, the returned grades will be for the whole course.
   #
+  # @argument enrollment_term_id [Integer]
+  #   Returns only enrollments for the specified enrollment term. This parameter
+  #   only applies to the user enrollments path. May pass the ID from the
+  #   enrollment terms api or the SIS id prepended with 'sis_term_id:'.
+  #
   # @argument sis_account_id[] [String]
   #   Returns only enrollments for the specified SIS account ID(s). Does not
-  #   look into subaccounts. May pass in array or string.
+  #   look into sub_accounts. May pass in array or string.
   #
   # @argument sis_course_id[] [String]
   #   Returns only enrollments matching the specified SIS course ID(s).
@@ -864,7 +869,13 @@ class EnrollmentsApiController < ApplicationController
       # by default, return active and invited courses. don't use the existing
       # current_and_invited_enrollments scope because it won't return enrollments
       # on unpublished courses.
-      enrollments = enrollments.where(workflow_state: %w{active invited}) unless params[:state].present?
+      enrollments = enrollments.where(workflow_state: %w{active invited}) if params[:state].blank?
+    end
+
+    terms = @domain_root_account.enrollment_terms.active
+    if params[:enrollment_term_id]
+      term = api_find(terms, params[:enrollment_term_id])
+      enrollments = enrollments.joins(:course).where(courses: {enrollment_term_id: term})
     end
 
     @shard_scope = user

@@ -435,13 +435,8 @@ module AccountReports
 
     def enrollment_row(e, include_other_roots, p, p2, pseudonyms, users_by_id)
       row = []
-      if e.nxc_id.nil?
-        row << e.course_id unless @sis_format
-        row << e.course_sis_id
-      else
-        row << e.nxc_id unless @sis_format
-        row << e.nxc_sis_id
-      end
+      row << e.course_id unless @sis_format
+      row << e.course_sis_id
       row << e.user_id unless @sis_format
       row << p.sis_user_id
       row << e.sis_role
@@ -481,7 +476,6 @@ module AccountReports
     def enrollment_query
       enrol = root_account.enrollments.
         select("enrollments.*, courses.sis_source_id AS course_sis_id,
-                nxc.id AS nxc_id, nxc.sis_source_id AS nxc_sis_id,
                 cs.sis_source_id AS course_section_sis_id,
                 CASE WHEN cs.workflow_state = 'deleted' THEN 'deleted'
                      WHEN courses.workflow_state = 'deleted' THEN 'deleted'
@@ -493,8 +487,7 @@ module AccountReports
                      WHEN enrollments.workflow_state = 'deleted' THEN 'deleted'
                      WHEN enrollments.workflow_state = 'rejected' THEN 'rejected' END AS enroll_state").
         joins("INNER JOIN #{CourseSection.quoted_table_name} cs ON cs.id = enrollments.course_section_id
-               INNER JOIN #{Course.quoted_table_name} ON courses.id = cs.course_id
-               LEFT OUTER JOIN #{Course.quoted_table_name} nxc ON cs.nonxlist_course_id = nxc.id").
+               INNER JOIN #{Course.quoted_table_name} ON courses.id = cs.course_id").
         where("enrollments.type <> 'StudentViewEnrollment'")
       enrol = enrol.where.not(enrollments: {sis_batch_id: nil}) if @created_by_sis
       enrol = add_course_sub_account_scope(enrol)
@@ -527,28 +520,6 @@ module AccountReports
         headers << I18n.t('root_account') if include_other_roots
       end
       headers
-    end
-
-    def loaded_pseudonym(pseudonyms, u, include_deleted: false, enrollment: nil)
-      context = enrollment || root_account
-      user_pseudonyms = pseudonyms[u.id] || []
-      u.instance_variable_set(include_deleted ? :@all_pseudonyms : :@all_active_pseudonyms, user_pseudonyms)
-      SisPseudonym.for(u, context, {type: :trusted, require_sis: false, include_deleted: include_deleted})
-    end
-
-    def load_cross_shard_logins(users, include_deleted: false)
-      shards = root_account.trusted_account_ids.map {|id| Shard.shard_for(id)}
-      shards << root_account.shard
-      User.preload_shard_associations(users)
-      shards = shards & users.map(&:associated_shards).flatten
-      pseudonyms = Pseudonym.shard(shards.uniq).where(user_id: users)
-      pseudonyms = pseudonyms.active unless include_deleted
-      pseudonyms.each do |p|
-        p.account = root_account if p.account_id == root_account.id
-      end
-      preloads = Account.reflections['role_links'] ? { account: :role_links } : :account
-      ActiveRecord::Associations::Preloader.new.preload(pseudonyms, preloads)
-      pseudonyms.group_by(&:user_id)
     end
 
     def groups

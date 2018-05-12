@@ -59,6 +59,8 @@ const types = [
   'DELETE_DISCUSSION_START',
   'DELETE_DISCUSSION_SUCCESS',
   'DELETE_DISCUSSION_FAIL',
+  'DELETE_FOCUS_PENDING',
+  'DELETE_FOCUS_CLEANUP',
   'CLEAN_DISCUSSION_FOCUS'
 ]
 
@@ -81,33 +83,36 @@ function copyAndUpdateDiscussion(discussion, updatedFields, focusOn) {
   return discussionCopy
 }
 
-const defaultFailMessage = I18n.t('Updating discussion failed')
-
-// We are assuming success here (mostly for the sake of drag and drop, where
-// it would look really awkward to drop it, have it snap back to the original
-// position, and then snap to the new position shortly after).
-// focusOn must be one of 'title' or 'manageMenu' (or can be left unspecified)
-// If set to a value, it will cause focus to end up on the title or manage menu
-// of the updated discussion.
-
-// TODO change this to the onSuccess paradigm. Much easier
 actions.updateDiscussion = function(discussion, updatedFields, { successMessage, failMessage }, focusOn) {
   return (dispatch, getState) => {
-    const discussionCopy = copyAndUpdateDiscussion(discussion, updatedFields, focusOn)
-    dispatch(actions.updateDiscussionStart({discussion: discussionCopy}))
-
+    dispatch(actions.updateDiscussionStart())
     apiClient.updateDiscussion(getState(), discussion, updatedFields)
-      .then(_ => {
-        dispatch(actions.updateDiscussionSuccess())
+      .then(res => {
+        const newDiscussion = res.data
+
+        // Students lose the manage menu if they close a discussion that they
+        // created. This can ruin the focus, and we need to correct it here
+        // if so. The check is here, not in the caller of the updateDiscussion,
+        // because we don't know if the menu disappears until we get the result
+        // back from this call. This is terrible.
+        if (focusOn) {
+          if (focusOn === "manageMenu") {
+            const realFocus = newDiscussion.permissions.delete ? "manageMenu" : "title"
+            newDiscussion.focusOn = realFocus
+          } else {
+            newDiscussion.focusOn = focusOn
+          }
+        }
+
+        dispatch(actions.updateDiscussionSuccess({discussion: newDiscussion}))
         if (successMessage) {
           $.screenReaderFlashMessage(successMessage)
         }
       })
       .catch(err => {
-        $.screenReaderFlashMessage(failMessage || defaultFailMessage)
+        $.screenReaderFlashMessage(failMessage || I18n.t('Updating discussion failed'))
         dispatch(actions.updateDiscussionFail({
-          message: failMessage || defaultFailMessage,
-          discussion,
+          message: failMessage || I18n.t('Updating discussion failed'),
           err
         }))
       })
@@ -124,7 +129,7 @@ actions.updateDiscussion = function(discussion, updatedFields, { successMessage,
 // failed.
 actions.handleDrop = function(discussion, updatedFields, order) {
   return (dispatch, getState) => {
-    const originalOrder = order ? getState().pinnedDiscussions.map(d => d.id) : undefined
+    const originalOrder = order ? getState().pinnedDiscussionIds.slice() : undefined
     const discussionCopy = copyAndUpdateDiscussion(discussion, updatedFields)
     dispatch(actions.dragAndDropStart({discussion: discussionCopy, order}))
     apiClient.updateDiscussion(getState(), discussion, updatedFields)
@@ -168,23 +173,79 @@ actions.handleDrop = function(discussion, updatedFields, order) {
 actions.searchDiscussions = function searchDiscussions ({ searchTerm, filter }) {
   return (dispatch, getState) => {
     dispatch(actions.updateDiscussionsSearch({ searchTerm, filter }))
-    const state = getState()
-    const pinned = state.pinnedDiscussions
-    const unpinned = state.unpinnedDiscussions
-    const closed = state.closedForCommentsDiscussions
-    const allDiscussions = pinned.concat(unpinned).concat(closed)
-    const numDisplayed = allDiscussions.filter(d => !d.filtered).length
+    const { allDiscussions } = getState()
+    const unfiltered = Object.keys(allDiscussions).filter((id) => {
+      const discussion = allDiscussions[id]
+      return !discussion.filtered
+    })
+    const numDisplayed = unfiltered.length
     $.screenReaderFlashMessageExclusive(I18n.t('%{count} discussions found.', { count: numDisplayed }))
+  }
+}
+
+
+function nextFocusableDiscussion(state, discussionId) {
+  const { allDiscussions } = state
+  const pinned = state.pinnedDiscussionIds
+  const unpinned = state.unpinnedDiscussionIds
+  const closed = state.closedForCommentsDiscussionIds
+
+  // Find which category has the requested discussion
+  let container = null
+  let index = null
+  const pinnedIndex = pinned.indexOf(discussionId)
+  const unpinnedIndex = unpinned.indexOf(discussionId)
+  const closedIndex = closed.indexOf(discussionId)
+  if (pinnedIndex !== -1) {
+    container = pinned
+    index = pinnedIndex
+  } else if (unpinnedIndex !== -1) {
+    container = unpinned
+    index = unpinnedIndex
+  } else if (closedIndex !== -1) {
+    container = closed
+    index = closedIndex
+  } else {
+    throw new Error("discussionId does not exist in any container")
+  }
+
+  // 0 is a special case, where we have to go back out to the toggle button
+  // (as there are no previous discussions we can put focus on). Also note
+  // that it is possible for this to return nothing, ie if there is only a
+  // single element in a container. The same logic that handles if element 0
+  // requests you put focus back on the toggle button will also handle if
+  // there aren't any elements left in this container, and push the focus back
+  // to the containers toggle button as well.
+  let focusId, focusOn
+  if(index === 0) {
+    const nextDiscussion = allDiscussions[container[index + 1]]
+    if (nextDiscussion) {
+      focusId = nextDiscussion.id
+      focusOn = "toggleButton"
+    }
+  } else {
+    const prevDiscussion = allDiscussions[container[index - 1]]
+    if (prevDiscussion) {
+      focusId = prevDiscussion.id
+      focusOn = prevDiscussion.permissions.delete ? 'manageMenu' : 'title'
+    }
+  }
+
+  return {
+    focusOn,
+    focusId
   }
 }
 
 actions.deleteDiscussion = function(discussion) {
   return (dispatch, getState) => {
-    const discussionCopy = copyAndUpdateDiscussion(discussion, {})
+    const state = getState()
     dispatch(actions.deleteDiscussionStart())
-    apiClient.deleteDiscussion(getState(), {discussion: discussionCopy})
+    apiClient.deleteDiscussion(state, {discussion})
       .then(_ => {
-        dispatch(actions.deleteDiscussionSuccess({discussion: discussionCopy}))
+        const nextFocusDiscussion = nextFocusableDiscussion(state, discussion.id)
+        dispatch(actions.deleteFocusPending())
+        dispatch(actions.deleteDiscussionSuccess({discussion, nextFocusDiscussion}))
         $.screenReaderFlashMessage(I18n.t('Successfully deleted discussion %{title}', { title: discussion.title }))
       })
       .catch(err => {
@@ -196,6 +257,10 @@ actions.deleteDiscussion = function(discussion) {
         }))
       })
   }
+}
+
+actions.deleteFocusDone = function() {
+  return (dispatch) => dispatch(actions.deleteFocusCleanup())
 }
 
 
@@ -263,9 +328,14 @@ actions.duplicateDiscussion = function(discussionId) {
     // This is a no-op, just here to maintain a pattern
     dispatch(actions.duplicateDiscussionStart())
     apiClient.duplicateDiscussion(getState(), discussionId).then(response => {
-      const successMessage = I18n.t('Duplication of %{title} succeeded', { title: response.data.title })
+      const newDiscussion = response.data
+      newDiscussion.focusOn = 'title'
+      const successMessage = I18n.t('Duplication of %{title} succeeded', { title: newDiscussion.title })
       $.screenReaderFlashMessageExclusive(successMessage)
-      dispatch(actions.duplicateDiscussionSuccess({ newDiscussion: response.data, originalId: discussionId }))
+      dispatch(actions.duplicateDiscussionSuccess({
+        newDiscussion,
+        originalId: discussionId
+      }))
     }).catch(err => {
       const failMessage = I18n.t('Duplication failed')
       $.screenReaderFlashMessageExclusive(failMessage)

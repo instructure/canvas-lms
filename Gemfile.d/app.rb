@@ -71,7 +71,7 @@ if CANVAS_RAILS5_1
 else
   gem 'i18n', '1.0.0'
 end
-gem 'i18nliner', '0.0.14'
+gem 'i18nliner', '0.1.0'
   gem 'ruby2ruby', '2.4.1', require: false
   gem 'ruby_parser', '3.11.0', require: false
 gem 'icalendar', '1.5.4', require: false
@@ -81,9 +81,10 @@ gem 'json', '2.1.0'
 gem 'oj', '3.3.9'
 gem 'jwt', '1.5.6', require: false
 gem 'json-jwt', '1.7.2', require: false
-gem 'twilio-ruby', '5.7.1', require: false
+gem 'twilio-ruby', '5.7.2', require: false
 
-gem 'mail', '2.6.6', require: false
+gem 'mail', '2.7.0', require: false
+  gem 'mini_mime', '1.0.0', require: false
 gem 'marginalia', '1.5.0', require: false
 gem 'mime-types', '1.25.1', require: 'mime/types'
 gem 'mini_magick', '4.8.0'
@@ -102,19 +103,18 @@ gem 'ritex', '1.0.1', require: false
 gem 'rotp', '3.3.1', require: false
 gem 'net-ldap', '0.16.1', require: false
 gem 'ruby-duration', '3.2.3', require: false
-gem 'ruby-saml-mod', '0.3.7'
+gem 'ruby-saml-mod', '0.3.8'
 gem 'saml2', '2.1.0'
-  gem 'nokogiri-xmlsec-instructure', '0.9.4', require: false
+  gem 'nokogiri-xmlsec-instructure', '0.9.6', require: false
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.2.1', require: 'zip'
 gem 'safe_yaml', '1.0.4', require: false
 gem 'sanitize', '2.1.0', require: false
 gem 'shackles', '1.4.0'
 
-gem 'useragent', '0.16.8', require: false
+gem 'useragent', '0.16.10', require: false
 
 gem 'crocodoc-ruby', '0.0.1', require: false
-gem 'hey', '1.3.1', require: false
 gem 'sentry-raven', '2.7.2', require: false
 gem 'canvas_statsd', '2.0.4'
   gem 'statsd-ruby', '1.4.0', require: false

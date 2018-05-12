@@ -26,6 +26,7 @@ import 'jqueryui/dialog'
 import './jquery.instructure_misc_plugins' /* showIf */
 import './jquery.templateData'
 import './vendor/jquery.scrollTo'
+import 'compiled/jquery.rails_flash_notifications' // eslint-disable-line
 
 // TODO: stop managing this in the view and get it out of the global scope submissions/show.html.erb
 /*global rubricAssessment*/
@@ -154,6 +155,16 @@ window.rubricAssessment = {
     setInterval(rubricAssessment.sizeRatings, 2500);
   },
 
+  checkScoreAdjustment: ($criterion, rating, rawData) => {
+    const rawPoints = rawData[`rubric_assessment[criterion_${rating.criterion_id}][points]`]
+    const points = rubricAssessment.roundAndFormat(rating.points)
+    if (rawPoints > points) {
+      const criterionDescription = htmlEscape($criterion.find('.description_title').text())
+      $.flashWarning((I18n.t("Extra credit not permitted on outcomes, " +
+        "score adjusted to maximum possible for %{outcome}", {outcome: criterionDescription})))
+    }
+  },
+
   highlightCriterionScore: function($criterion, val){
     $criterion.find(".rating").each(function() {
       const rating_val = numberHelper.parse($(this).find(".points").text());
@@ -247,7 +258,7 @@ window.rubricAssessment = {
     }
   },
 
-  populateRubric: function($rubric, data) {
+  populateRubric: function($rubric, data, submitted_data = null) {
     $rubric = rubricAssessment.findRubric($rubric);
     var id = $rubric.attr('id').substring(7);
     $rubric.find(".user_id").text(ENV.RUBRIC_ASSESSMENT.assessment_user_id || data.user_id).end()
@@ -283,6 +294,9 @@ window.rubricAssessment = {
             }
           });
         }
+        if (submitted_data && $criterion.hasClass('learning_outcome_criterion')) {
+          rubricAssessment.checkScoreAdjustment($criterion, rating, submitted_data)
+        }
         $criterion
           .find(".custom_rating_field").val(comments).end()
           .find(".custom_rating_comments").html(comments_html).end()
@@ -311,16 +325,21 @@ window.rubricAssessment = {
     }
   },
 
-  populateRubricSummary: function($rubricSummary, data) {
+  populateRubricSummary: function($rubricSummary, data, editing_data) {
     $rubricSummary.find(".criterion_points").text("").end()
       .find(".rating_custom").text("");
 
     if(data) {
       var assessment = data;
       var total = 0;
+      let $criterion = null;
       for(var idx in assessment.data) {
         var rating = assessment.data[idx];
-        $rubricSummary.find("#criterion_" + rating.criterion_id)
+        $criterion = $rubricSummary.find("#criterion_" + rating.criterion_id);
+        if (editing_data && $criterion.hasClass('learning_outcome_criterion')) {
+          rubricAssessment.checkScoreAdjustment($criterion, rating, editing_data)
+        }
+        $criterion
           .find(".rating").hide().end()
           .find(".rating_" + rating.id).show().end()
           .find('.criterion_points')
@@ -328,11 +347,11 @@ window.rubricAssessment = {
           .end()
           .find(".ignore_for_scoring").showIf(rating.ignore_for_scoring);
         if(ratingHasScore(rating) && !$rubricSummary.hasClass('free_form')){
-          $rubricSummary.find("#criterion_" + rating.criterion_id)
-            .find(".rating.description").show().text(rating.description).end()
+          $criterion.find(".rating.description").show()
+          .text(rating.description).end()
         }
         if(rating.comments_enabled && rating.comments) {
-          $rubricSummary.find("#criterion_" + rating.criterion_id).find(".rating_custom").show().text(rating.comments);
+          $criterion.find(".rating_custom").show().text(rating.comments);
         }
         if(rating.points && !rating.ignore_for_scoring) {
           total += rating.points;

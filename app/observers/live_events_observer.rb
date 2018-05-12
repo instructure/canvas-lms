@@ -32,7 +32,9 @@ class LiveEventsObserver < ActiveRecord::Observer
           :user,
           :user_account_association,
           :account_notification,
-          :course_section
+          :course_section,
+          :context_module,
+          :content_tag
 
   NOP_UPDATE_FIELDS = [ "updated_at", "sis_batch_id" ].freeze
   def after_update(obj)
@@ -88,6 +90,10 @@ class LiveEventsObserver < ActiveRecord::Observer
       Canvas::LiveEvents.user_updated(obj)
     when CourseSection
       Canvas::LiveEvents.course_section_updated(obj)
+    when ContextModule
+      Canvas::LiveEvents.module_updated(obj)
+    when ContentTag
+      Canvas::LiveEvents.module_item_updated(obj) if obj.tag_type == "context_module"
     end
     end
   end
@@ -129,6 +135,10 @@ class LiveEventsObserver < ActiveRecord::Observer
       Canvas::LiveEvents.user_created(obj)
     when CourseSection
       Canvas::LiveEvents.course_section_created(obj)
+    when ContextModule
+      Canvas::LiveEvents.module_created(obj)
+    when ContentTag
+      Canvas::LiveEvents.module_item_created(obj) if obj.tag_type == "context_module"
     end
     end
   end

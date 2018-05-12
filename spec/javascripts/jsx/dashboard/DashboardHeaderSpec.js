@@ -34,9 +34,7 @@ const FakeDashboard = function (props) {
         id="dashboard_header_container"
         ref={(c) => { props.headerRef(c) }}
         planner_enabled={props.planner_enabled}
-        planner_selected={props.planner_selected}
         dashboard_view={props.dashboard_view}
-        recent_activity_dashboard={props.recent_activity_dashboard}
       />
       <div
         id="flashalert_message_holder"
@@ -63,16 +61,12 @@ const FakeDashboard = function (props) {
 }
 
 FakeDashboard.propTypes = {
-  recent_activity_dashboard: PropTypes.bool,
   planner_enabled: PropTypes.bool,
-  planner_selected: PropTypes.bool,
   dashboard_view: PropTypes.string
 }
 
 FakeDashboard.defaultProps = {
-  recent_activity_dashboard: false,
   planner_enabled: false,
-  planner_selected: false,
   dashboard_view: 'cards'
 }
 
@@ -109,7 +103,7 @@ test('it should switch dashboard view appropriately when changeDashboard is call
     <FakeDashboard
       headerRef={(c) => { dashboardHeader = c }}
       planner_enabled={false}
-      planner_selected={false}
+      dashboard_view='activity'
     />, container)
 
   dashboardHeader.changeDashboard('cards')
@@ -133,7 +127,7 @@ test('it should switch dashboard view appropriately with Student Planner enabled
     <FakeDashboard
       headerRef={(c) => { dashboardHeader = c }}
       planner_enabled
-      recent_activity_dashboard
+      dashboard_view='activity'
     />, container)
 
   dashboardHeader.changeDashboard('cards')
@@ -171,7 +165,7 @@ test('it should use the dashboard view endpoint when Student Planner is enabled'
     <FakeDashboard
       headerRef={(c) => { dashboardHeader = c }}
       planner_enabled
-      recent_activity_dashboard
+      dashboard_view='activity'
     />, container)
 
   dashboardHeader.changeDashboard('cards')
@@ -192,7 +186,7 @@ test('it should show the card dashboard if planner is selected, but not enabled'
     <FakeDashboard
       headerRef={() => false}
       planner_enabled={false}
-      planner_selected
+      dashboard_view='planner'
     />, container)
 
   strictEqual(document.getElementById('dashboard-planner'), null)
@@ -209,7 +203,7 @@ test('it should show a flash error if saving dashboard API call fails', (assert)
     <FakeDashboard
       headerRef={(c) => { dashboardHeader = c }}
       planner_enabled
-      recent_activity_dashboard
+      dashboard_view='activity'
     />, container)
 
   moxios.stubRequest('/dashboard/view', {
@@ -233,7 +227,6 @@ test('it should add planner classes to the page when planner is loaded', () => {
       headerRef={(c) => { dashboardHeader = c }}
       dashboard_view='planner'
       planner_enabled
-      planner_selected
     />, container)
 
   ok(document.body.classList.contains('dashboard-is-planner'))

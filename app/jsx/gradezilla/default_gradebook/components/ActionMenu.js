@@ -77,7 +77,9 @@ const { arrayOf, bool, func, object, shape, string } = PropTypes;
       publishGradesToSis: shape({
         isEnabled: bool.isRequired,
         publishToSisUrl: string
-      })
+      }),
+
+      gradingPeriodId: string.isRequired
     };
 
     static gotoUrl (url) {
@@ -124,7 +126,7 @@ const { arrayOf, bool, func, object, shape, string } = PropTypes;
       this.setExportInProgress(true);
       $.flashMessage(I18n.t('Gradebook export started'));
 
-      return this.exportManager.startExport().then((resolution) => {
+      return this.exportManager.startExport(this.props.gradingPeriodId).then((resolution) => {
         this.setExportInProgress(false);
 
         const attachmentUrl = resolution.attachmentUrl;

@@ -29,14 +29,14 @@
   -moz-border-radius: 5px;
 }
 #deleted_items_list li .links {
-  float: right;
+  float: <%= direction('right') %>;
 }
 #deleted_items_list li .name {
   font-weight: bold;
   font-side: 1.1em;
 }
 #deleted_items_list li .type {
-  margin-left: 20px;
+  margin-<%= direction('left') %>: 20px;
   font-style: italic;
 }
 #deleted_items_list li .details {
@@ -49,7 +49,7 @@
   font-style: italic;
 }
 #deleted_items_list li .dates td {
-  padding-right: 5px;
+  padding-<%= direction('right') %>: 5px;
 }
 
 </style>

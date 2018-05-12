@@ -217,7 +217,7 @@ ul.user_list div.enrollment_type.pending {
     cursor: pointer;
     display: block;
     @include fontSize($ic-font-size--small);
-    padding: 4px 0 4px 25px;
+    padding: direction-sides(4px 0 4px 25px);
     border: solid $section_tabs_border_bottom_color;
     border-width: 0 1px 1px;
     &:hover, &:focus {
@@ -333,7 +333,7 @@ ul.user_list div.enrollment_type.pending {
     white-space: nowrap;
   }
   i.date-warning {
-    padding: 8px 0 0 8px;
+    padding: direction-sides(8px 0 0 8px);
     color: $btnWarningBackground;
   }
 }

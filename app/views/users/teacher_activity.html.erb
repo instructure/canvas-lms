@@ -84,7 +84,7 @@
           <td data-number="<%= (student[:ungraded].map(&:submitted_at).compact.min || 1.day.from_now).to_i / 3600 %>">
             <% student[:ungraded].each do |submission| %>
               <%= link_to(submission.assignment.title, speed_grader_course_gradebook_path(course, :assignment_id => submission.assignment.id, :anchor => { :student_id => student[:enrollment].user_id }.to_json)) %><br/>
-              <div style="padding-bottom: 5px; margin-top: -2px; padding-left: 20px; font-size: 0.8em; color: #888;">
+              <div style="padding-bottom: 5px; margin-top: -2px; padding-<%= direction('left') %>: 20px; font-size: 0.8em; color: #888;">
                 <% if submission.submitted_at %>
                   <%= t 'submitted_time', { :zero => "submitted less than 1 day ago", :one => "submitted 1 day ago", :other => "submitted %{count} days ago" }, :count => (((Time.now - submission.submitted_at)/60)/1440).abs.to_i %>
                 <% end %>

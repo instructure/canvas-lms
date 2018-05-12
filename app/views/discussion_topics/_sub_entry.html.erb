@@ -34,7 +34,7 @@
     <div class="clear"></div>
   </div>
   <div class="content">
-    <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar(entry.try_rescue(:user_id), context_code: entry_context.asset_string, size: 30) %></div>
+    <div style="float: <%= direction('left') %>; margin: 0 5px 0 -10px;"><%= avatar(entry.try_rescue(:user_id), context_code: entry_context.asset_string, size: 30) %></div>
     <div class="course_id" style="display: none;"><%= entry_context.id if entry_context && entry_context.is_a?(Course) %></div>
     <div class="message user_content" style="<%= hidden unless entry %>"><%= user_content(entry.try_rescue(:message)) || nbsp %></div>
     <textarea class="message_html" style="display: none;"><%= h(entry.try_rescue(:message)) %></textarea>

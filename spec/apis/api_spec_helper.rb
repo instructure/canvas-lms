@@ -269,3 +269,7 @@ def assert_jsonapi_compliance(json, primary_set, associations = [])
     expect(json['meta']['primaryCollection']).to eq primary_set
   end
 end
+
+def redirect_params
+  Rack::Utils.parse_nested_query(URI(response.headers['Location']).query)
+end

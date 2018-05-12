@@ -73,6 +73,7 @@ module SIS
         end
         @rows_for_parallel = nil
         update_pause_vars
+        sleep(@pause_duration)
       end
 
       def self.process(root_account, opts = {})
@@ -306,7 +307,6 @@ module SIS
         # site-wide in the Setting table.
         @batch.reload(:select => 'data') # update to catch changes to pause vars
         @batch.data ||= {}
-        @pause_every = (@batch.data[:pause_every] || Setting.get('sis_batch_pause_every', 100)).to_i
         @pause_duration = (@batch.data[:pause_duration] || Setting.get('sis_batch_pause_duration', 0)).to_f
       end
 

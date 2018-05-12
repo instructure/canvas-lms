@@ -94,7 +94,7 @@
 
   <% if @context.feature_enabled?(:outcome_gradebook) %>
     <div class="outcome-gradebook-container">
-      <div class="outcome-menus hidden" style="text-align: right;">
+      <div class="outcome-menus hidden" style="text-align: <%= direction('right') %>;">
         <span data-component="SectionFilter"></span>
         <span data-component="GradebookMenu" data-variant="DefaultGradebookLearningMastery"></span>
       </div>

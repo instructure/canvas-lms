@@ -31,7 +31,11 @@
         <tr>
           <th class="comm-event" scope="row">
             <div class="row-title-cell">
-              <span class="category-name show-popover"
+              <span class="screenreader-only">
+                  {{{title}}}
+                  {{{description}}}
+              </span>
+              <span class="category-name show-popover" tabindex="0" aria-hidden="true"
                     title="<div class='popover-title'>{{title}}</div>
                            <div class='popover-content'>
                              <p>{{description}}</p>

@@ -34,7 +34,7 @@
     <a class="rename_section_url" style="display: none;" href="<%= eportfolio_category_path(@portfolio, "{{ id }}") %>"></a>
   </li>
 </ul>
-<ul style="font-size: 0.8em;line-height: 1.85em; font-style: italic; margin-left: 10px;" id="section_list_manage">
+<ul style="font-size: 0.8em;line-height: 1.85em; font-style: italic; margin-<%= direction('left') %>: 10px;" id="section_list_manage">
   <li style="display: none;" class="add_section"><button type="button" class="Button Button--link add_section_link no-hover icon-add"><%= t("Add Section") %></button></li>
   <li style="display: none;">
     <a href="<%= eportfolio_categories_path(@portfolio) %>" class="add_section_url"></a>

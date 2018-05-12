@@ -575,8 +575,8 @@ body .ui-selectmenu-dropdown {
   .ui-selectmenu-status {
     @include fontSize(14px);
     padding: 0 20px 0;
-    padding: 0 0 0 20px;
-    margin: 0 20px 0 0;
+    padding: direction-sides(0 0 0 20px);
+    margin: direction-sides(0 20px 0 0);
     height: 1.3125em;
     .ui-icon {
       top: 3px !important;
@@ -707,7 +707,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 }
 
 #plagiarism_platform_info_container {
-  padding: 5px 20px 0px 0px;
+  padding: direction-sides(5px 20px 0px 0px);
 
   #plagiarism_resubmit_button {
     width: 100%;

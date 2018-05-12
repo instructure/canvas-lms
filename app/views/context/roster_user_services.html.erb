@@ -50,7 +50,7 @@
   vertical-align: middle;
 }
 .user_list {
-  padding-left: 30px;
+  padding-<%= direction('left') %>: 30px;
   margin-top: 10px;
   margin-bottom: 20px;
 }
@@ -69,13 +69,13 @@
   margin-bottom: 0;
 }
 .short_description {
-  padding-left: 30px;
+  padding-<%= direction('left') %>: 30px;
   font-size: 0.8em;
   max-width: 500px;
 }
 .service_type img {
   vertical-align: middle;
-  padding-right: 5px;
+  padding-<%= direction('right') %>: 5px;
 }
 </style>
 <% end %>

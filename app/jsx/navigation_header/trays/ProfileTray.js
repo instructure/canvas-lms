@@ -55,7 +55,7 @@ export default function ProfileTray({
           <Button type="submit" size="small" margin="medium 0">{I18n.t('Logout')}</Button>
         </form>
       </Container>
-      <hr />
+      <hr role="presentation"/>
       <List variant="unstyled" margin="small 0" itemSpacing="small">
         {[
           profileEnabled && (

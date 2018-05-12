@@ -611,7 +611,7 @@ describe AssignmentGroupsApiController, type: :request do
         @submission = bare_submission_model(@assignment, @student, {
           score: '25',
           grade: '25',
-          grader: @teacher,
+          grader_id: @teacher.id,
           submitted_at: Time.zone.now
         })
 

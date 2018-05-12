@@ -77,4 +77,20 @@ describe "/quizzes/quizzes/history" do
       expect(response.body).not_to match /grade-by-question-warning/
     end
   end
+
+  context 'with anonymous grading' do
+    before do
+      allow(@course).to receive(:feature_enabled?).and_call_original
+      allow(@course).to receive(:feature_enabled?).with(:anonymous_grading).and_return(true)
+    end
+
+    it "doesn't display the user name" do
+      quiz = assign(:quiz, @course.quizzes.create!)
+      submission = assign(:submission, quiz.generate_submission(@user))
+      assign(:current_submission, submission)
+      assign(:version_instances, submission.submitted_attempts)
+      render 'quizzes/quizzes/history'
+      expect(response.body).not_to include(@user.name)
+    end
+  end
 end

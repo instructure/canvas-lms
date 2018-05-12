@@ -25,6 +25,17 @@ shared_examples_for "an object whose dates are overridable" do
   let(:course) { overridable.context }
   let(:override) { assignment_override_model(overridable_type => overridable) }
 
+  describe "#teacher_due_date_for_display" do
+    it "returns nil when differentiated with no due dates" do
+      student_in_course(course: course)
+      overridable.update!(due_at: nil, only_visible_to_overrides: true)
+      override.update!(set_type: "ADHOC")
+      override.assignment_override_students.create(user: @student)
+
+      expect(overridable.teacher_due_date_for_display(@student)).to be_nil
+    end
+  end
+
   describe "overridden_for" do
     before do
       student_in_course(:course => course)
