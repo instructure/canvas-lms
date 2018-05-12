@@ -344,6 +344,7 @@ describe SIS::CSV::EnrollmentImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user@example.com,active"
     )
+    # should be able to create an enrollment in a deleted state
     process_csv_data_cleanly(
       "course_id,user_id,role,section_id,status,associated_user_id",
       "test_1,user_1,student,,deleted,"
@@ -844,6 +845,38 @@ describe SIS::CSV::EnrollmentImporter do
     )
     expect(observer.enrollments.count).to eq 1
     expect(observer.enrollments.first.workflow_state).to eq 'deleted'
+  end
+
+  it 'should create rollback data' do
+    @account.enable_feature!(:refactor_of_sis_imports)
+    batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
+    )
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "student_user,user1,User,Uno,user@example.com,active",
+      "observer_user,user2,User,Two,user2@example.com,active"
+    )
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      "test_1,student_user,student,,active,",
+      "test_1,observer_user,observer,,active,student_user",
+      batch: batch1
+    )
+    g = Course.where(sis_source_id: 'test_1').take.groups.create!(name: 'group')
+    g.group_memberships.create!(user: Pseudonym.where(sis_user_id: 'student_user').take.user)
+    batch2 = @account.sis_batches.create! { |sb| sb.data = {} }
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      "test_1,student_user,student,,deleted,",
+      "test_1,observer_user,observer,,deleted,student_user",
+      batch: batch2
+    )
+    expect(batch1.roll_back_data.where(previous_workflow_state: 'non-existent').count).to eq 2
+    expect(batch2.roll_back_data.where(updated_workflow_state: 'deleted').count).to eq 3
+    expect(batch2.roll_back_data.where(context_type: 'GroupMembership').count).to eq 1
   end
 
   it "should not create enrollments for deleted users" do

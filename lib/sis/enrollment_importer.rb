@@ -67,6 +67,9 @@ module SIS
           {:priority => Delayed::LOW_PRIORITY, :strand => "batch_add_to_favorites_#{@root_account.global_id}"},
           sliced_ids)
       end
+      new_data = Enrollment::BatchStateUpdater.destroy_batch(i.enrollments_to_delete, sis_batch: @batch) if i.enrollments_to_delete.any?
+      i.roll_back_data.push(*new_data)
+      SisBatchRollBackData.bulk_insert_roll_back_data(i.roll_back_data) if @batch.using_parallel_importers?
 
       @logger.debug("Enrollments with batch operations took #{Time.now - start} seconds")
       return i.success_count
@@ -77,7 +80,7 @@ module SIS
       attr_accessor :enrollments_to_update_sis_batch_ids, :courses_to_touch_ids,
           :incrementally_update_account_associations_user_ids, :update_account_association_user_ids,
           :account_chain_cache, :users_to_touch_ids, :success_count, :courses_to_recache_due_dates,
-          :enrollments_to_add_to_favorites
+          :enrollments_to_add_to_favorites, :roll_back_data, :enrollments_to_delete
 
       def initialize(batch, root_account, logger, messages)
         @batch = batch
@@ -92,6 +95,8 @@ module SIS
         @courses_to_recache_due_dates = {}
         @enrollments_to_add_to_favorites = []
         @enrollments_to_update_sis_batch_ids = []
+        @roll_back_data = []
+        @enrollments_to_delete = []
         @account_chain_cache = {}
         @course = @section = nil
         @course_roles_by_account_id = {}
@@ -281,6 +286,8 @@ module SIS
               end
             elsif enrollment_info.status =~ /\Adeleted/i
               enrollment.workflow_state = 'deleted'
+              @enrollments_to_delete << enrollment unless enrollment.id.nil?
+              next unless enrollment.id.nil?
             elsif enrollment_info.status =~ /\Acompleted/i
               enrollment.workflow_state = 'completed'
               enrollment.completed_at ||= Time.now
@@ -339,6 +346,8 @@ module SIS
                 end
                 next
               end
+              data = SisBatchRollBackData.build_data(sis_batch: @batch, context: enrollment)
+              @roll_back_data << data if data
             elsif @batch
               @enrollments_to_update_sis_batch_ids << enrollment.id
             end
