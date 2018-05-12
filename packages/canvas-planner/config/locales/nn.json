@@ -107,6 +107,9 @@
   "assignmenttype_title_is_complete_813e54f8": {
     "message": "{ assignmentType } { title } er fullført"
   },
+  "nothing_planned_yet_8675ffe9": {
+    "message": "Ingenting er planlagt"
+  },
   "grades_are_loading_c899652d": {
     "message": "Lastar karakterar"
   },
