@@ -890,6 +890,7 @@ test_1,u1,student,active}
         end
 
         it 'should use multi_term_batch_mode' do
+          @account.enable_feature!(:refactor_of_sis_imports)
           batch = create_csv_data([
                                     %{term_id,name,status
                                       term1,term1,active
@@ -908,6 +909,8 @@ test_1,u1,student,active}
           expect(@e2.reload).to be_deleted
           expect(@c1.reload).to be_deleted
           expect(@c2.reload).to be_deleted
+          expect(batch.roll_back_data.where(previous_workflow_state: 'created').count).to eq 2
+          expect(batch.roll_back_data.where(updated_workflow_state: 'deleted').count).to eq 6
           expect(batch.reload.workflow_state).to eq 'imported'
         end
 

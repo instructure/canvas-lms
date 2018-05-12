@@ -431,18 +431,35 @@ class SisBatch < ActiveRecord::Base
   def remove_non_batch_courses(courses, total_rows, current_row)
     # delete courses that weren't in this batch, in the selected term
     current_row ||= 0
-    courses.find_each do |course|
-      course.clear_sis_stickiness(:workflow_state)
-      course.skip_broadcasts = true
-      course.destroy
-
-      Auditors::Course.record_deleted(course, self.user, :source => :sis, :sis_batch => self)
-
-      current_row += 1
-      self.fast_update_progress(current_row.to_f/total_rows * 100)
+    courses.find_in_batches do |batch|
+      if self.using_parallel_importers?
+        count = Course.destroy_batch(batch, sis_batch: self, batch_mode: true)
+        finish_course_destroy(batch)
+        current_row += count
+      else
+        batch.each do |course|
+          course.clear_sis_stickiness(:workflow_state)
+          course.skip_broadcasts = true
+          course.destroy
+          Auditors::Course.record_deleted(course, self.user, :source => :sis, :sis_batch => self)
+          current_row += 1
+        end
+      end
+      self.fast_update_progress(current_row.to_f / total_rows * 100)
     end
+
     self.data[:counts][:batch_courses_deleted] = current_row
     current_row
+  end
+
+  def finish_course_destroy(courses)
+    courses.each do |course|
+      Auditors::Course.record_deleted(course, self.user, source: :sis, sis_batch: self)
+      og_sticky = course.stuck_sis_fields
+      course.clear_sis_stickiness(:workflow_state)
+      course.skip_broadcasts = true
+      course.save! unless og_sticky == course.stuck_sis_fields
+    end
   end
 
   def term_sections_scope
@@ -463,11 +480,19 @@ class SisBatch < ActiveRecord::Base
     section_count = 0
     current_row ||= 0
     # delete sections who weren't in this batch, whose course was in the selected term
-    sections.find_each do |section|
-      section.destroy
-      section_count += 1
-      current_row += 1
-      self.fast_update_progress(current_row.to_f/total_rows * 100)
+    sections.find_in_batches do |batch|
+      if self.using_parallel_importers?
+        count = CourseSection.destroy_batch(batch, sis_batch: self, batch_mode: true)
+        section_count += count
+        current_row += count
+      else
+        batch.each do |section|
+          section.destroy
+          section_count += 1
+          current_row += 1
+          self.fast_update_progress(current_row.to_f / total_rows * 100)
+        end
+      end
     end
     self.data[:counts][:batch_sections_deleted] = section_count
     current_row
@@ -491,10 +516,11 @@ class SisBatch < ActiveRecord::Base
     current_row ||= 0
     # delete enrollments for courses that weren't in this batch, in the selected term
     enrollments.find_in_batches do |batch|
-      if account.feature_enabled?(:refactor_of_sis_imports)
-        count = Enrollment::BatchStateUpdater.destroy_batch(batch)
-        enrollment_count += count
-        current_row += count
+      if self.using_parallel_importers?
+        data = Enrollment::BatchStateUpdater.destroy_batch(batch, sis_batch: self, batch_mode: true)
+        SisBatchRollBackData.bulk_insert_roll_back_data(data)
+        enrollment_count += data.count
+        current_row += data.count
       else
         batch.each do |enrollment|
           enrollment.destroy

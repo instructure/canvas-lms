@@ -1245,6 +1245,27 @@ class Course < ActiveRecord::Base
     save!
   end
 
+  def self.destroy_batch(courses, sis_batch: nil, batch_mode: false)
+    enroll_scope = Enrollment.where(course_id: courses, workflow_state: 'deleted')
+    enroll_scope.find_in_batches do |e_batch|
+      user_ids = e_batch.map(&:user_id).uniq.sort
+      data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch,
+                                                       contexts: e_batch,
+                                                       updated_state: 'deleted',
+                                                       batch_mode_delete: batch_mode)
+      SisBatchRollBackData.bulk_insert_roll_back_data(data) if data
+      Enrollment.where(id: e_batch.map(&:id)).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
+      EnrollmentState.where(:enrollment_id => e_batch.map(&:id)).
+        update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1", 'deleted', true])
+      User.where(id: user_ids).touch_all
+      User.send_later_if_production(:update_account_associations, user_ids) if user_ids.any?
+    end
+    c_data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: courses, updated_state: 'deleted', batch_mode_delete: batch_mode)
+    SisBatchRollBackData.bulk_insert_roll_back_data(c_data) if c_data
+    Course.where(id: courses).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
+    courses.count
+  end
+
   def call_event(event)
     self.send(event) if self.current_state.events.include? event.to_sym
   end
