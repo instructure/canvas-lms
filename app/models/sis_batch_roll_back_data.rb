@@ -24,6 +24,11 @@ class SisBatchRollBackData < ActiveRecord::Base
                                        pseudonym user user_observer}
 
   scope :expired_data, -> {where('created_at < ?', 30.days.ago)}
+  scope :active, -> {where(workflow_state: 'active')}
+
+  RESTORE_ORDER = %w{Account EnrollmentTerm AbstractCourse Course CourseSection
+                     GroupCategory Group User Pseudonym CommunicationChannel
+                     Enrollment GroupMembership UserObserver AccountUser}
 
   def self.cleanup_expired_data
     return unless expired_data.exists?
@@ -68,6 +73,21 @@ class SisBatchRollBackData < ActiveRecord::Base
       data_hash = batch.map {|data| data.attributes.except('id')}
       SisBatchRollBackData.bulk_insert(data_hash)
     end
+  end
+
+  def restore_to_state
+    case context_type
+    when 'CommunicationChannel'
+      (previous_workflow_state == 'non-existent') ? 'retired' : previous_workflow_state
+    when 'GroupCategory'
+      (previous_workflow_state == 'active') ? nil : Time.zone.now
+    else
+      (previous_workflow_state == 'non-existent') ? 'deleted' : previous_workflow_state
+    end
+  end
+
+  def to_restore_array
+    [context_id, restore_to_state]
   end
 
 end

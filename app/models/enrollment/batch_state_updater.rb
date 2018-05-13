@@ -162,8 +162,8 @@ class Enrollment::BatchStateUpdater
   end
 
   def self.needs_grading_count_updated(courses)
-    courses.each do |c|
-      c.assignments.touch_all
+    Assignment.where(context_id: courses).find_ids_in_batches(batch_size: 10_000) do |assignment_ids|
+      Assignment.where(id: assignment_ids).touch_all
     end
   end
 
@@ -181,4 +181,23 @@ class Enrollment::BatchStateUpdater
     end
   end
 
+  # this is to be used for enrollments that just changed workflow_states but are
+  # not deleted. This also skips notifying users.
+  def self.run_call_backs_for(batch)
+    raise ArgumentError, 'Cannot call with more than 1000 enrollments' if batch.count > 1_000
+    Enrollment.transaction do
+      students = Enrollment.of_student_type.where(id: batch).preload(user: :linked_observers).to_a
+      user_ids = Enrollment.where(id: batch).distinct.pluck(:user_id)
+      courses = Course.where(id: Enrollment.where(id: batch).select(:course_id).distinct).to_a
+      root_account = courses.first.root_account
+      touch_and_update_associations(user_ids)
+      update_linked_enrollments(students)
+      needs_grading_count_updated(courses)
+      recache_all_course_grade_distribution(courses)
+      update_cached_due_dates(students, root_account)
+      touch_all_graders_if_needed(students)
+      EnrollmentState.send_later_if_production(:force_recalculation, batch.map(&:id))
+      User.update_account_associations(user_ids)
+    end
+  end
 end

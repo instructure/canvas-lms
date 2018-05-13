@@ -164,6 +164,8 @@ describe SIS::CSV::TermImporter do
       batch: batch2
     )
     expect(batch2.roll_back_data.where(updated_workflow_state: 'deleted').count).to eq 1
+    batch2.restore_states_for_batch
+    expect(@account.enrollment_terms.where(sis_source_id: 'T001').take.workflow_state).to eq 'active'
   end
 
 end

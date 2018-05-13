@@ -104,6 +104,8 @@ describe SIS::CSV::SectionImporter do
     )
     # 1. section, 2. enrollment, 3. group_membership
     expect(batch1.roll_back_data.count).to eq 3
+    batch1.restore_states_for_batch
+    expect(@account.course_sections.where(sis_source_id: '1B').active.count).to eq 1
   end
 
   it 'should ignore unsupported column account_id' do

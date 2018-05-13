@@ -646,6 +646,10 @@ describe SIS::CSV::CourseImporter do
     expect(batch2.roll_back_data.where(context_type: 'Course').first.previous_workflow_state).to eq 'claimed'
     expect(batch2.roll_back_data.where(context_type: 'Course').first.updated_workflow_state).to eq 'deleted'
     expect(batch2.roll_back_data.where(context_type: 'Enrollment').first.updated_workflow_state).to eq 'deleted'
+    batch2.restore_states_for_batch
+    course = @account.all_courses.where(sis_source_id: 'data_2').take
+    expect(course.workflow_state).to eq 'claimed'
+    expect(course.enrollments.take.workflow_state).to eq 'active'
   end
 
   context "blueprint courses" do

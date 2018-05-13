@@ -139,6 +139,8 @@ class SisBatch < ActiveRecord::Base
     state :aborted
     state :failed
     state :failed_with_messages
+    state :partially_restored
+    state :restored
   end
 
   def process
@@ -669,5 +671,75 @@ class SisBatch < ActiveRecord::Base
     file = temp.path
     temp.close!
     file
+  end
+
+  def restore_states_for_type(type, scope)
+    case type
+    when 'GroupCategory'
+      restore_group_categories(scope)
+    when 'Enrollment'
+      restore_enrollment_data(scope)
+    else
+      restore_workflow_states(scope, type)
+    end
+  end
+
+  def restore_enrollment_data(scope)
+    Enrollment.where(id: scope.where(previous_workflow_state: 'deleted').select(:context_id)).find_in_batches do |enrollments|
+      Enrollment::BatchStateUpdater.destroy_batch(enrollments)
+    end
+    scope = scope.where.not(previous_workflow_state: 'deleted')
+    restore_workflow_states(scope, 'Enrollment')
+    Enrollment.where(id: scope.where.not(previous_workflow_state: 'deleted').select(:context_id)).find_in_batches do |enrollments|
+      Enrollment::BatchStateUpdater.run_call_backs_for(enrollments)
+    end
+  end
+
+  def restore_group_categories(scope)
+    scope.where(previous_workflow_state: 'active').find_in_batches do |gcs|
+      GroupCategory.where(id: gcs.map(&:context_id)).update_all(deleted_at: nil, updated_at: Time.zone.now)
+    end
+    scope.where.not(previous_workflow_state: 'active').find_in_batches do |gcs|
+      GroupCategory.where(id: gcs.map(&:context_id)).update_all(deleted_at: Time.zone.now, updated_at: Time.zone.now)
+    end
+  end
+
+  def restore_workflow_states(scope, type)
+    type.constantize.transaction do
+      scope.order(:context_id).find_in_batches(batch_size: 5_000) do |data|
+        type.constantize.connection.execute(restore_sql(type, data.map(&:to_restore_array)))
+      end
+    end
+  end
+
+  def restore_states_for_batch(batch_mode: nil, undelete_only: false)
+    roll_back = self.roll_back_data.active
+    roll_back = roll_back.where(updated_workflow_state: %w(retired deleted)) if undelete_only
+    roll_back = roll_back.where(batch_mode_delete: batch_mode) if batch_mode
+    types = roll_back.distinct.order(:context_type).pluck(:context_type)
+    SisBatchRollBackData::RESTORE_ORDER.each do |type|
+      next unless types.include? type
+      scope = roll_back.where(context_type: type)
+      restore_states_for_type(type, scope)
+    end
+    roll_back.find_in_batches(batch_size: 10_000) do |batch|
+      SisBatchRollBackData.where(id: batch).update_all(workflow_state: 'restored', updated_at: Time.zone.now)
+    end
+    self.workflow_state = (undelete_only || batch_mode) ? 'partially_restored' : 'restored'
+    self.save!
+  end
+
+  # retuns values "(1,'deleted'),(2,'deleted'),(3,'other_state'),(4,'active')"
+  def to_sql_values(data)
+    data.map { |v| "(#{v.first},'#{v.last}')" }.join(',')
+  end
+
+  def restore_sql(type, data)
+    <<-SQL
+      UPDATE #{type.constantize.quoted_table_name} AS t
+        SET workflow_state = x.workflow_state
+        FROM (VALUES #{to_sql_values(data)}) AS x(id, workflow_state)
+        WHERE t.id=x.id AND x.workflow_state IS DISTINCT FROM t.workflow_state
+    SQL
   end
 end

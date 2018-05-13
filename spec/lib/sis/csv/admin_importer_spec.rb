@@ -128,5 +128,9 @@ describe SIS::CSV::AdminImporter do
       batch: batch2
     )
     expect(batch2.roll_back_data.first.updated_workflow_state).to eq 'deleted'
+    batch2.restore_states_for_batch
+    user = @account.pseudonyms.where(sis_user_id: 'U001').take.user
+    admin = @account.account_users.where(user_id: user).take
+    expect(admin.workflow_state).to eq 'active'
   end
 end

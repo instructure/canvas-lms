@@ -103,6 +103,8 @@ describe SIS::CSV::GroupImporter do
     )
     expect(batch1.roll_back_data.where(previous_workflow_state: 'non-existent').count).to eq 1
     expect(batch3.roll_back_data.where(updated_workflow_state: 'deleted').count).to eq 2
+    batch3.restore_states_for_batch
+    expect(@account.all_groups.where(sis_source_id: 'G001').take.workflow_state).to eq 'available'
   end
 
   it "should update group attributes" do

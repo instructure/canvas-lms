@@ -1238,7 +1238,8 @@ describe SIS::CSV::UserImporter do
     )
     c = @account.courses.where(sis_source_id: "test_1").first
     g = c.groups.create(name: 'group1')
-    u = Pseudonym.where(sis_user_id: 'user_1').first.user
+    p = @account.pseudonyms.where(sis_user_id: 'user_1').take
+    u = p.user
     gm = g.group_memberships.create(user: u, workflow_state: 'accepted')
     expect(gm.workflow_state).to eq 'accepted'
 
@@ -1249,6 +1250,10 @@ describe SIS::CSV::UserImporter do
     )
     expect(batch1.roll_back_data.count).to eq 4
     expect(batch1.roll_back_data.pluck(:context_type).sort).to eq ["CommunicationChannel", "Enrollment", "GroupMembership", "Pseudonym"]
+    batch1.restore_states_for_batch
+    expect(p.reload.workflow_state).to eq 'active'
+    expect(u.communication_channels.active.count).to eq 1
+    expect(gm.reload.workflow_state).to eq 'accepted'
   end
 
   it 'removes account memberships when a user is deleted' do

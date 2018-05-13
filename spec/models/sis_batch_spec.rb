@@ -912,6 +912,12 @@ test_1,u1,student,active}
           expect(batch.roll_back_data.where(previous_workflow_state: 'created').count).to eq 2
           expect(batch.roll_back_data.where(updated_workflow_state: 'deleted').count).to eq 6
           expect(batch.reload.workflow_state).to eq 'imported'
+          batch.restore_states_for_batch
+          expect(batch.reload).to be_restored
+          expect(@e1.reload).to be_active
+          expect(@e2.reload).to be_active
+          expect(@c1.reload).to be_created
+          expect(@c2.reload).to be_created
         end
 
         it 'should not use multi_term_batch_mode if no terms are passed' do

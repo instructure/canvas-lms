@@ -865,7 +865,8 @@ describe SIS::CSV::EnrollmentImporter do
       "test_1,observer_user,observer,,active,student_user",
       batch: batch1
     )
-    g = Course.where(sis_source_id: 'test_1').take.groups.create!(name: 'group')
+    course = @account.all_courses.where(sis_source_id: 'test_1').take
+    g = course.groups.create!(name: 'group')
     g.group_memberships.create!(user: Pseudonym.where(sis_user_id: 'student_user').take.user)
     batch2 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
@@ -877,6 +878,9 @@ describe SIS::CSV::EnrollmentImporter do
     expect(batch1.roll_back_data.where(previous_workflow_state: 'non-existent').count).to eq 2
     expect(batch2.roll_back_data.where(updated_workflow_state: 'deleted').count).to eq 3
     expect(batch2.roll_back_data.where(context_type: 'GroupMembership').count).to eq 1
+    batch2.restore_states_for_batch
+    expect(course.enrollments.active.count).to eq 2
+    expect(g.group_memberships.active.count).to eq 1
   end
 
   it "should not create enrollments for deleted users" do

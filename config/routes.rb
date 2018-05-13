@@ -1249,6 +1249,7 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/sis_imports/:id', action: :show
       get 'accounts/:account_id/sis_imports', action: :index, as: "account_sis_imports"
       put 'accounts/:account_id/sis_imports/:id/abort', action: :abort
+      put 'accounts/:account_id/sis_imports/:id/restore_states', action: :restore_states
     end
 
     scope(controller: :sis_import_errors_api) do

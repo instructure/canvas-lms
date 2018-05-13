@@ -166,6 +166,8 @@ describe SIS::CSV::GroupCategoryImporter do
     expect(batch1.roll_back_data.where(previous_workflow_state: 'non-existent').count).to eq 1
     expect(batch2.roll_back_data.where(updated_workflow_state: 'deleted').count).to eq 1
     expect(batch3.roll_back_data.where(updated_workflow_state: 'active').count).to eq 1
+    batch3.restore_states_for_batch
+    expect(@account.all_group_categories.where(sis_source_id: 'Gc003').take.deleted_at).not_to be_nil
   end
 
 end

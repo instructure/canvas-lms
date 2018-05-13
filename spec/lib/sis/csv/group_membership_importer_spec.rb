@@ -94,5 +94,7 @@ describe SIS::CSV::GroupMembershipImporter do
     )
     expect(batch1.roll_back_data.where(previous_workflow_state: 'non-existent').count).to eq 1
     expect(batch2.roll_back_data.first.updated_workflow_state).to eq 'deleted'
+    batch2.restore_states_for_batch
+    expect(@account.all_groups.where(sis_source_id: 'G001').take.group_memberships.take.workflow_state).to eq 'accepted'
   end
 end

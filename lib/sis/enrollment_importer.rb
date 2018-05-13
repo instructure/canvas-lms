@@ -284,9 +284,16 @@ module SIS
               @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info)
             end
           elsif enrollment_info.status =~ /\Adeleted/i
-            enrollment.workflow_state = 'deleted'
-            @enrollments_to_delete << enrollment unless enrollment.id.nil?
-            next unless enrollment.id.nil?
+            # we support creating deleted enrollments, but we want to preserve
+            # the state for roll_back_data so only set workflow_state for new
+            # objects otherwise delete them in a batch at the end unless it is
+            # already deleted.
+            if enrollment.id.nil?
+              enrollment.workflow_state = 'deleted'
+            else
+              @enrollments_to_delete << enrollment if enrollment.workflow_state != 'deleted'
+              next
+            end
           elsif enrollment_info.status =~ /\Acompleted/i
             enrollment.workflow_state = 'completed'
             enrollment.completed_at ||= Time.now
