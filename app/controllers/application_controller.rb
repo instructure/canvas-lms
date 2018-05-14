@@ -2362,7 +2362,11 @@ class ApplicationController < ActionController::Base
     can_manage_account = @account.grants_right?(@current_user, session, :manage_account_settings)
 
     unless can_read_course_list || can_read_roster
-      return render_unauthorized_action
+      if @redirect_on_unauth
+        return redirect_to account_settings_url(@account)
+      else
+        return render_unauthorized_action
+      end
     end
 
     js_env({
