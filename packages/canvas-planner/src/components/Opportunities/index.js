@@ -23,12 +23,12 @@ import scopeTab from '@instructure/ui-a11y/lib/utils/scopeTab';
 import keycode from 'keycode';
 
 import Opportunity from '../Opportunity';
-import Button from '@instructure/ui-core/lib/components/Button';
+import Button from '@instructure/ui-buttons/lib/components/Button';
 import { findDOMNode } from 'react-dom';
 import { array, string, func, number, oneOfType} from 'prop-types';
 import formatMessage from '../../format-message';
 
-import IconXLine from 'instructure-icons/lib/Line/IconXLine';
+import IconXLine from '@instructure/ui-icons/lib/Line/IconX';
 
 import styles from './styles.css';
 import theme from './theme.js';

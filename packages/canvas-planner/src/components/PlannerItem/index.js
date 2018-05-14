@@ -18,19 +18,19 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
 import themeable from '@instructure/ui-themeable/lib';
-import Text from '@instructure/ui-core/lib/components/Text';
-import Checkbox from '@instructure/ui-core/lib/components/Checkbox';
-import Link from '@instructure/ui-core/lib/components/Link';
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
-import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent';
-import Pill from '@instructure/ui-core/lib/components/Pill';
-import Avatar from '@instructure/ui-core/lib/components/Avatar';
-import Assignment from 'instructure-icons/lib/Line/IconAssignmentLine';
-import Quiz from 'instructure-icons/lib/Line/IconQuizLine';
-import Announcement from 'instructure-icons/lib/Line/IconAnnouncementLine';
-import Discussion from 'instructure-icons/lib/Line/IconDiscussionLine';
-import Calendar from 'instructure-icons/lib/Line/IconCalendarMonthLine';
-import Page from 'instructure-icons/lib/Line/IconMsWordLine';
+import Text from '@instructure/ui-elements/lib/components/Text';
+import Checkbox, {CheckboxFacade} from '@instructure/ui-forms/lib/components/Checkbox';
+import Link from '@instructure/ui-elements/lib/components/Link';
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
+import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent';
+import Pill from '@instructure/ui-elements/lib/components/Pill';
+import Avatar from '@instructure/ui-elements/lib/components/Avatar';
+import Assignment from '@instructure/ui-icons/lib/Line/IconAssignment';
+import Quiz from '@instructure/ui-icons/lib/Line/IconQuiz';
+import Announcement from '@instructure/ui-icons/lib/Line/IconAnnouncement';
+import Discussion from '@instructure/ui-icons/lib/Line/IconDiscussion';
+import Calendar from '@instructure/ui-icons/lib/Line/IconCalendarMonth';
+import Page from '@instructure/ui-icons/lib/Line/IconMsWord';
 import NotificationBadge, { MissingIndicator, NewActivityIndicator } from '../NotificationBadge';
 import BadgeList from '../BadgeList';
 import responsiviser from '../responsiviser';
@@ -42,8 +42,7 @@ import { showPillForOverdueStatus } from '../../utilities/statusUtils';
 import { momentObj } from 'react-moment-proptypes';
 import formatMessage from '../../format-message';
 import {animatable} from '../../dynamic-ui';
-import ApplyTheme from '@instructure/ui-core/lib/components/ApplyTheme';
-import CheckboxFacade from '@instructure/ui-core/lib/components/Checkbox/CheckboxFacade';
+import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme';
 
 export class PlannerItem extends Component {
   static propTypes = {

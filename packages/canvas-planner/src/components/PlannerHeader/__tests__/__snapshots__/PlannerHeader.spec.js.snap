@@ -25,7 +25,7 @@ exports[`new activity button does not show when there is no new activity 1`] = `
     type="button"
     variant="icon"
   >
-    <IconPlusLine
+    <IconPlus
       title="Add To Do"
     />
   </Button>
@@ -39,21 +39,19 @@ exports[`new activity button does not show when there is no new activity 1`] = `
     type="button"
     variant="icon"
   >
-    <IconGradebookLine
+    <IconGradebook
       title="Show My Grades"
     />
   </Button>
   <Popover
     alignArrow={false}
-    applicationElement={null}
-    closeButtonLabel={null}
-    closeButtonRef={[Function]}
     constrain="none"
     contentRef={[Function]}
     defaultFocusElement={null}
     defaultShow={false}
     insertAt="bottom"
     label={null}
+    liveRegion={null}
     mountNode={null}
     offsetX={0}
     offsetY={0}
@@ -76,6 +74,7 @@ exports[`new activity button does not show when there is no new activity 1`] = `
     shouldRenderOffscreen={false}
     shouldReturnFocus={true}
     show={false}
+    stacking="topmost"
     trackPosition={true}
     variant="default"
     withArrow={true}
@@ -93,6 +92,7 @@ exports[`new activity button does not show when there is no new activity 1`] = `
       >
         <Badge
           count={1}
+          elementRef={[Function]}
           formatOverflowText={[Function]}
           placement="top end"
           pulse={false}
@@ -100,7 +100,7 @@ exports[`new activity button does not show when there is no new activity 1`] = `
           type="count"
           variant="primary"
         >
-          <IconAlertsLine
+          <IconAlerts
             title="1 opportunity"
           />
         </Badge>
@@ -139,12 +139,11 @@ exports[`new activity button does not show when there is no new activity 1`] = `
     applicationElement={[Function]}
     border={false}
     closeButtonLabel="Close"
-    closeButtonRef={[Function]}
-    closeButtonVariant="icon"
     contentRef={[Function]}
     defaultFocusElement={null}
     insertAt="bottom"
     label="Add To Do"
+    liveRegion={null}
     mountNode={null}
     onClose={[Function]}
     onDismiss={[Function]}
@@ -180,15 +179,12 @@ exports[`new activity button does not show when there is no new activity 1`] = `
     />
   </Tray>
   <Tray
-    applicationElement={[Function]}
     border={false}
-    closeButtonLabel={null}
-    closeButtonRef={[Function]}
-    closeButtonVariant="icon"
     contentRef={[Function]}
     defaultFocusElement={null}
     insertAt="bottom"
     label="My Grades"
+    liveRegion={null}
     mountNode={null}
     onClose={[Function]}
     onDismiss={[Function]}
@@ -265,7 +261,7 @@ exports[`new activity button shows when there is new activity 1`] = `
     type="button"
     variant="icon"
   >
-    <IconPlusLine
+    <IconPlus
       title="Add To Do"
     />
   </Button>
@@ -279,21 +275,19 @@ exports[`new activity button shows when there is new activity 1`] = `
     type="button"
     variant="icon"
   >
-    <IconGradebookLine
+    <IconGradebook
       title="Show My Grades"
     />
   </Button>
   <Popover
     alignArrow={false}
-    applicationElement={null}
-    closeButtonLabel={null}
-    closeButtonRef={[Function]}
     constrain="none"
     contentRef={[Function]}
     defaultFocusElement={null}
     defaultShow={false}
     insertAt="bottom"
     label={null}
+    liveRegion={null}
     mountNode={null}
     offsetX={0}
     offsetY={0}
@@ -316,6 +310,7 @@ exports[`new activity button shows when there is new activity 1`] = `
     shouldRenderOffscreen={false}
     shouldReturnFocus={true}
     show={false}
+    stacking="topmost"
     trackPosition={true}
     variant="default"
     withArrow={true}
@@ -333,6 +328,7 @@ exports[`new activity button shows when there is new activity 1`] = `
       >
         <Badge
           count={1}
+          elementRef={[Function]}
           formatOverflowText={[Function]}
           placement="top end"
           pulse={false}
@@ -340,7 +336,7 @@ exports[`new activity button shows when there is new activity 1`] = `
           type="count"
           variant="primary"
         >
-          <IconAlertsLine
+          <IconAlerts
             title="1 opportunity"
           />
         </Badge>
@@ -379,12 +375,11 @@ exports[`new activity button shows when there is new activity 1`] = `
     applicationElement={[Function]}
     border={false}
     closeButtonLabel="Close"
-    closeButtonRef={[Function]}
-    closeButtonVariant="icon"
     contentRef={[Function]}
     defaultFocusElement={null}
     insertAt="bottom"
     label="Add To Do"
+    liveRegion={null}
     mountNode={null}
     onClose={[Function]}
     onDismiss={[Function]}
@@ -420,15 +415,12 @@ exports[`new activity button shows when there is new activity 1`] = `
     />
   </Tray>
   <Tray
-    applicationElement={[Function]}
     border={false}
-    closeButtonLabel={null}
-    closeButtonRef={[Function]}
-    closeButtonVariant="icon"
     contentRef={[Function]}
     defaultFocusElement={null}
     insertAt="bottom"
     label="My Grades"
+    liveRegion={null}
     mountNode={null}
     onClose={[Function]}
     onDismiss={[Function]}
@@ -516,7 +508,7 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
     type="button"
     variant="icon"
   >
-    <IconPlusLine
+    <IconPlus
       title="Add To Do"
     />
   </Button>
@@ -530,21 +522,19 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
     type="button"
     variant="icon"
   >
-    <IconGradebookLine
+    <IconGradebook
       title="Show My Grades"
     />
   </Button>
   <Popover
     alignArrow={false}
-    applicationElement={null}
-    closeButtonLabel={null}
-    closeButtonRef={[Function]}
     constrain="none"
     contentRef={[Function]}
     defaultFocusElement={null}
     defaultShow={false}
     insertAt="bottom"
     label={null}
+    liveRegion={null}
     mountNode={null}
     offsetX={0}
     offsetY={0}
@@ -567,6 +557,7 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
     shouldRenderOffscreen={false}
     shouldReturnFocus={true}
     show={false}
+    stacking="topmost"
     trackPosition={true}
     variant="default"
     withArrow={true}
@@ -584,6 +575,7 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
       >
         <Badge
           count={1}
+          elementRef={[Function]}
           formatOverflowText={[Function]}
           placement="top end"
           pulse={false}
@@ -591,7 +583,7 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
           type="count"
           variant="primary"
         >
-          <IconAlertsLine
+          <IconAlerts
             title="1 opportunity"
           />
         </Badge>
@@ -630,12 +622,11 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
     applicationElement={[Function]}
     border={false}
     closeButtonLabel="Close"
-    closeButtonRef={[Function]}
-    closeButtonVariant="icon"
     contentRef={[Function]}
     defaultFocusElement={null}
     insertAt="bottom"
     label="Add To Do"
+    liveRegion={null}
     mountNode={null}
     onClose={[Function]}
     onDismiss={[Function]}
@@ -671,15 +662,12 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
     />
   </Tray>
   <Tray
-    applicationElement={[Function]}
     border={false}
-    closeButtonLabel={null}
-    closeButtonRef={[Function]}
-    closeButtonVariant="icon"
     contentRef={[Function]}
     defaultFocusElement={null}
     insertAt="bottom"
     label="My Grades"
+    liveRegion={null}
     mountNode={null}
     onClose={[Function]}
     onDismiss={[Function]}

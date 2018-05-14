@@ -24,7 +24,7 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import PlannerApp from './components/PlannerApp';
 import PlannerHeader from './components/PlannerHeader';
-import ApplyTheme from '@instructure/ui-core/lib/components/ApplyTheme';
+import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme';
 import i18n from './i18n';
 import configureStore from './store/configureStore';
 import { initialOptions, getPlannerItems, scrollIntoPast, loadFutureItems } from './actions';

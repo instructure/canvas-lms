@@ -26,7 +26,7 @@ exports[`renders nothing if no opportunities 1`] = `
         <span>
           Close
         </span>
-        <IconXLine />
+        <IconX />
       </div>
     </Button>
   </div>
@@ -62,7 +62,7 @@ exports[`renders the base component correctly with one opportunity 1`] = `
         <span>
           Close
         </span>
-        <IconXLine />
+        <IconX />
       </div>
     </Button>
   </div>
@@ -110,7 +110,7 @@ exports[`renders the right course with the right opportunity 1`] = `
         <span>
           Close
         </span>
-        <IconXLine />
+        <IconX />
       </div>
     </Button>
   </div>

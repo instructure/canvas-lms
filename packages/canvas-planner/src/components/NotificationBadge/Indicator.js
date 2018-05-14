@@ -18,8 +18,8 @@
 
 import React, { Component } from 'react';
 import { string, func } from 'prop-types';
-import Badge from '@instructure/ui-core/lib/components/Badge';
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
+import Badge from '@instructure/ui-elements/lib/components/Badge';
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 
 export default class Indicator extends Component {
   static propTypes = {

@@ -19,7 +19,7 @@ import React, { Component } from 'react';
 import classnames from 'classnames';
 import themeable from '@instructure/ui-themeable/lib';
 import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails';
-import Pill from '@instructure/ui-core/lib/components/Pill';
+import Pill from '@instructure/ui-elements/lib/components/Pill';
 import BadgeList from '../BadgeList';
 import NotificationBadge, { MissingIndicator, NewActivityIndicator} from '../NotificationBadge';
 import { func, number, string, arrayOf, shape, oneOf } from 'prop-types';

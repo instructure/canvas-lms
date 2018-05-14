@@ -438,17 +438,21 @@ describe "student planner" do
                                                        title: "Student to do 2")
       view_todo_item
       modal = todo_sidebar_modal(@student_to_do.title)
-      expect(f('input', modal)[:value]).to eq(@student_to_do.title)
-      expect((f('select', modal)[:value]).to_i).to eq(@course.id)
+      title_input = f('input', modal)
+      course_name_dropdown = fj('span:contains("Course")>span>span>input', modal)
+
+      expect(title_input[:value]).to eq(@student_to_do.title)
+      expect(course_name_dropdown[:value]).to eq("#{@course.name} - #{@course.short_name}")
+
       flnpt(student_to_do2.title).click
-      expect(f('input', modal)[:value]).to eq(student_to_do2.title)
-      expect(f('select', modal)[:value]).to eq("none")
+      expect(title_input[:value]).to eq(student_to_do2.title)
+      expect(course_name_dropdown[:value]).to eq("Optional: Add Course")
     end
 
     it "allows editing the course of a to-do item", priority: "1", test_id: 3418827 do
       view_todo_item
-      element = fj("select:contains('Unnamed Course')")
-      fj("option:contains('Optional: Add Course')", element).click
+      fj(":contains('Unnamed Course')>span>input[role=combobox]").click
+      fj("[role='option'] :contains('Optional: Add Course')").click
       todo_save_button.click
       @student_to_do.reload
       expect(@student_to_do.course_id).to be nil
@@ -457,8 +461,8 @@ describe "student planner" do
     it "has courses in the course combo box.", priority: "1", test_id: 3263160 do
       go_to_list_view
       todo_modal_button.click
-      element = fj("select:contains('Optional: Add Course')")
-      expect(fj("option:contains('Unnamed Course')", element)).to be
+      fj(":contains('Optional: Add Course')>span>input[role=combobox]").click
+      expect(fj("[role='option'] :contains('Unnamed Course')")).to be
     end
 
     it "ensures time zones with offsets higher than UTC update the planner items" do

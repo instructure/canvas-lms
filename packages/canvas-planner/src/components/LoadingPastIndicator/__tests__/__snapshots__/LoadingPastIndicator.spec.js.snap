@@ -79,6 +79,7 @@ exports[`renders spinner while loading 1`] = `
     textAlign="center"
   >
     <Spinner
+      as="div"
       margin="0 x-small 0 0"
       size="small"
       title="Loading past items"

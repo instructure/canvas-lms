@@ -30,7 +30,7 @@ exports[`renders the base component correctly 1`] = `
         type="button"
         variant="icon"
       >
-        <IconXLine
+        <IconX
           title="Dismiss this is a description about the opportunity"
         />
       </Button>
@@ -99,7 +99,7 @@ exports[`renders the base component correctly without points 1`] = `
         type="button"
         variant="icon"
       >
-        <IconXLine
+        <IconX
           title="Dismiss this is a description about the opportunity"
         />
       </Button>

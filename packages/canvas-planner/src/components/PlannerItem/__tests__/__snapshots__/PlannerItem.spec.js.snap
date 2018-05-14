@@ -34,7 +34,7 @@ exports[`renders Announcement correctly with everything 1`] = `
       }
     }
   >
-    <IconAnnouncementLine />
+    <IconAnnouncement />
   </div>
   <div>
     <div>
@@ -165,7 +165,7 @@ exports[`renders Announcement correctly with just date 1`] = `
       }
     }
   >
-    <IconAnnouncementLine />
+    <IconAnnouncement />
   </div>
   <div>
     <div>
@@ -272,7 +272,7 @@ exports[`renders Announcement correctly with just points 1`] = `
       }
     }
   >
-    <IconAnnouncementLine />
+    <IconAnnouncement />
   </div>
   <div>
     <div>
@@ -403,7 +403,7 @@ exports[`renders Announcement correctly without right side content 1`] = `
       }
     }
   >
-    <IconAnnouncementLine />
+    <IconAnnouncement />
   </div>
   <div>
     <div>
@@ -510,7 +510,7 @@ exports[`renders Assignment correctly with everything 1`] = `
       }
     }
   >
-    <IconAssignmentLine />
+    <IconAssignment />
   </div>
   <div>
     <div>
@@ -641,7 +641,7 @@ exports[`renders Assignment correctly with just date 1`] = `
       }
     }
   >
-    <IconAssignmentLine />
+    <IconAssignment />
   </div>
   <div>
     <div>
@@ -748,7 +748,7 @@ exports[`renders Assignment correctly with just points 1`] = `
       }
     }
   >
-    <IconAssignmentLine />
+    <IconAssignment />
   </div>
   <div>
     <div>
@@ -879,7 +879,7 @@ exports[`renders Assignment correctly without right side content 1`] = `
       }
     }
   >
-    <IconAssignmentLine />
+    <IconAssignment />
   </div>
   <div>
     <div>
@@ -986,7 +986,7 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
       }
     }
   >
-    <IconCalendarMonthLine />
+    <IconCalendarMonth />
   </div>
   <div>
     <div>
@@ -1093,7 +1093,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
       }
     }
   >
-    <IconCalendarMonthLine />
+    <IconCalendarMonth />
   </div>
   <div>
     <div>
@@ -1224,7 +1224,7 @@ exports[`renders Calendar Event correctly with just date 1`] = `
       }
     }
   >
-    <IconCalendarMonthLine />
+    <IconCalendarMonth />
   </div>
   <div>
     <div>
@@ -1331,7 +1331,7 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
       }
     }
   >
-    <IconCalendarMonthLine />
+    <IconCalendarMonth />
   </div>
   <div>
     <div>
@@ -1438,7 +1438,7 @@ exports[`renders Discussion correctly with everything 1`] = `
       }
     }
   >
-    <IconDiscussionLine />
+    <IconDiscussion />
   </div>
   <div>
     <div>
@@ -1569,7 +1569,7 @@ exports[`renders Discussion correctly with just date 1`] = `
       }
     }
   >
-    <IconDiscussionLine />
+    <IconDiscussion />
   </div>
   <div>
     <div>
@@ -1676,7 +1676,7 @@ exports[`renders Discussion correctly with just points 1`] = `
       }
     }
   >
-    <IconDiscussionLine />
+    <IconDiscussion />
   </div>
   <div>
     <div>
@@ -1807,7 +1807,7 @@ exports[`renders Discussion correctly without right side content 1`] = `
       }
     }
   >
-    <IconDiscussionLine />
+    <IconDiscussion />
   </div>
   <div>
     <div>
@@ -1914,7 +1914,7 @@ exports[`renders Note correctly with Group 1`] = `
       }
     }
   >
-    <IconMsWordLine />
+    <IconMsWord />
   </div>
   <div>
     <div>
@@ -2247,7 +2247,7 @@ exports[`renders Page correctly with everything 1`] = `
       }
     }
   >
-    <IconMsWordLine />
+    <IconMsWord />
   </div>
   <div>
     <div>
@@ -2378,7 +2378,7 @@ exports[`renders Page correctly with just date 1`] = `
       }
     }
   >
-    <IconMsWordLine />
+    <IconMsWord />
   </div>
   <div>
     <div>
@@ -2485,7 +2485,7 @@ exports[`renders Page correctly with just points 1`] = `
       }
     }
   >
-    <IconMsWordLine />
+    <IconMsWord />
   </div>
   <div>
     <div>
@@ -2616,7 +2616,7 @@ exports[`renders Page correctly without right side content 1`] = `
       }
     }
   >
-    <IconMsWordLine />
+    <IconMsWord />
   </div>
   <div>
     <div>
@@ -2723,7 +2723,7 @@ exports[`renders Quiz correctly with everything 1`] = `
       }
     }
   >
-    <IconQuizLine />
+    <IconQuiz />
   </div>
   <div>
     <div>
@@ -2854,7 +2854,7 @@ exports[`renders Quiz correctly with just date 1`] = `
       }
     }
   >
-    <IconQuizLine />
+    <IconQuiz />
   </div>
   <div>
     <div>
@@ -2961,7 +2961,7 @@ exports[`renders Quiz correctly with just points 1`] = `
       }
     }
   >
-    <IconQuizLine />
+    <IconQuiz />
   </div>
   <div>
     <div>
@@ -3092,7 +3092,7 @@ exports[`renders Quiz correctly without right side content 1`] = `
       }
     }
   >
-    <IconQuizLine />
+    <IconQuiz />
   </div>
   <div>
     <div>
@@ -3199,7 +3199,7 @@ exports[`renders correctly 1`] = `
       }
     }
   >
-    <IconAssignmentLine />
+    <IconAssignment />
   </div>
   <div>
     <div>

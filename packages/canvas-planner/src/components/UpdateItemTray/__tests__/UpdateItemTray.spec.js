@@ -259,7 +259,7 @@ it('invokes save callback with updated data', () => {
   />);
   wrapper.instance().handleTitleChange({target: {value: 'new title'}});
   wrapper.instance().handleDateChange({}, '2017-05-01T14:00:00Z');
-  wrapper.instance().handleCourseIdChange({target: {value: '43'}});
+  wrapper.instance().handleCourseIdChange(null, {value: '43'});
   wrapper.instance().handleChange('details', 'new details');
   wrapper.instance().handleSave();
   expect(saveMock).toHaveBeenCalledWith({

@@ -18,17 +18,17 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import themeable from '@instructure/ui-themeable/lib';
-import Button from '@instructure/ui-core/lib/components/Button';
+import Button from '@instructure/ui-buttons/lib/components/Button';
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton';
 import View from '@instructure/ui-layout/lib/components/View';
-import IconPlusLine from 'instructure-icons/lib/Line/IconPlusLine';
-import IconAlertsLine from 'instructure-icons/lib/Line/IconAlertsLine';
-import IconGradebookLine from 'instructure-icons/lib/Line/IconGradebookLine';
-import Popover, {PopoverTrigger, PopoverContent} from '@instructure/ui-core/lib/components/Popover';
+import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus';
+import IconAlertsLine from '@instructure/ui-icons/lib/Line/IconAlerts';
+import IconGradebookLine from '@instructure/ui-icons/lib/Line/IconGradebook';
+import Popover, {PopoverTrigger, PopoverContent} from '@instructure/ui-overlays/lib/components/Popover';
 import PropTypes from 'prop-types';
 import UpdateItemTray from '../UpdateItemTray';
-import Tray from '@instructure/ui-core/lib/components/Tray';
-import Badge from '@instructure/ui-core/lib/components/Badge';
+import Tray from '@instructure/ui-overlays/lib/components/Tray';
+import Badge from '@instructure/ui-elements/lib/components/Badge';
 import Opportunities from '../Opportunities';
 import GradesDisplay from '../GradesDisplay';
 import StickyButton from '../StickyButton';
@@ -369,7 +369,6 @@ export class PlannerHeader extends Component {
           placement="end"
           shouldContainFocus
           shouldReturnFocus
-          applicationElement={() => document.getElementById('application') }
           onDismiss={this.toggleGradesTray}
         >
           <View as="div" padding="large large medium">
