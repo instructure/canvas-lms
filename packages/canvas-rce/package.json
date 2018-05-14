@@ -118,7 +118,6 @@
   "dependencies": {
     "@instructure/ui-a11y": "^5.8.1",
     "@instructure/ui-buttons": "^5.8.1",
-    "@instructure/ui-core": "^5.8.1",
     "@instructure/ui-elements": "^5.8.1",
     "@instructure/ui-forms": "^5.8.1",
     "@instructure/ui-icons": "^5.8.1",
