@@ -95,7 +95,7 @@ test('getRemainingInheritedDeveloperKeys requests keys from the specified URL wi
 test('listDeveloperKeyScopes makes a request to the scopes endpoint', () => {
   const getStub = sinon.stub(axios, 'get').returns(thenStub())
   actions.listDeveloperKeyScopes(1)(store.dispatch)
-  ok(getStub.calledWith('/api/v1/accounts/1/scopes?group_by=resource'))
+  ok(getStub.calledWith('/api/v1/accounts/1/scopes?group_by=resource_name'))
   axios.get.restore()
 })
 

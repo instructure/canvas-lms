@@ -18,7 +18,7 @@
 class TokenScopes
   OAUTH2_SCOPE_NAMESPACE = '/auth/'.freeze
   USER_INFO_SCOPE = {
-    resource: "oauth",
+    resource: :oauth2,
     verb: "GET",
     scope: "#{OAUTH2_SCOPE_NAMESPACE}userinfo"
   }.freeze
@@ -27,10 +27,11 @@ class TokenScopes
     routes = Rails.application.routes.routes.select { |route| /^\/api\/(v1|sis)/ =~ route.path.spec.to_s }.map do |route|
       path = route.path.spec.to_s.gsub(/\(\.:format\)$/, '')
       {
-        resource: route.defaults[:controller],
+        controller: route.defaults[:controller]&.to_sym,
+        action: route.defaults[:action]&.to_sym,
         verb: route.verb,
         path: path,
-        scope: "url:#{route.verb}|#{path}".freeze
+        scope: "url:#{route.verb}|#{path}".freeze,
       }
     end
     routes.uniq {|route| route[:scope]}
@@ -41,5 +42,4 @@ class TokenScopes
   SCOPES = API_ROUTES.map { |route| route[:scope] }.freeze
   ALL_SCOPES = [USER_INFO_SCOPE[:scope], *SCOPES].freeze
   DETAILED_SCOPES = [USER_INFO_SCOPE, *API_ROUTES].freeze
-  GROUPED_DETAILED_SCOPES = DETAILED_SCOPES.group_by {|route| route[:resource]}.freeze
 end

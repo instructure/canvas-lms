@@ -14,24 +14,30 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+module ApiScopeMapperLoader
 
-require File.expand_path('../spec_helper', File.dirname(__FILE__))
+  # The ApiScopeMapper is a generated file that we don't commit.
+  # This method ensures that if the file doesn't exist specs and canvas won't blow up.
+  def self.load
+    unless File.exist?(Rails.root.join('lib', 'api_scope_mapper.rb')) || defined? ApiScopeMapper
+      Object.const_set("ApiScopeMapper", api_scope_mapper_fallback)
+    end
+    ApiScopeMapper
+  end
 
+  def self.api_scope_mapper_fallback
+    klass = Class.new(Object)
+    klass.class_eval do
+      def self.lookup_resource(controller, _)
+        controller
+      end
 
-describe TokenScopes do
-  describe "SCOPES" do
-    it "formats the scopes with url:http_verb|api_path" do
-      TokenScopes::SCOPES.sort.each do |scope|
-        expect(/^url:(?:GET|OPTIONS|POST|PUT|PATCH|DELETE)\|\/api\/.+/ =~ scope).not_to be_nil
+      def self.name_for_resource(resource)
+        resource
       end
     end
-
-    it "does not include the optional format part of the route path" do
-      TokenScopes::SCOPES.each do |scope|
-        expect(/\(\.:format\)/ =~ scope).to be_nil
-      end
-    end
-
+    klass
   end
 
 end

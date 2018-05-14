@@ -18,6 +18,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 describe 'Developer Keys' do
+  # We want to force the usage of the fallback scope mapper here, not the generated version
+  Object.const_set("ApiScopeMapper", ApiScopeMapperLoader.api_scope_mapper_fallback)
+
   include_context 'in-process server selenium tests'
 
   describe 'with developer key management UI rewrite feature flag' do
@@ -327,8 +330,13 @@ describe 'Developer Keys' do
       def expand_scope_group_by_filter(scope)
         get "/accounts/#{Account.default.id}/developer_keys"
         find_button("Developer Key").click
+        filter_scopes_by_name(scope)
+        fj(".toggle-scope-group span:contains('#{scope}')").click
+      end
+
+      def filter_scopes_by_name(scope)
+        f("input[placeholder='Search endpoints']").clear
         f("input[placeholder='Search endpoints']").send_keys scope
-        fj(".toggle-scope-group span:contains('#{scope} scopes')").click
       end
 
       it "allows filtering by scope group name" do
@@ -385,8 +393,9 @@ describe 'Developer Keys' do
         click_scope_group_checkbox
         find_button("Save Key").click
         click_edit_icon
+        filter_scopes_by_name 'assignment_groups_api'
         click_scope_group_checkbox
-        f("input[placeholder='Search endpoints']").send_keys 'account_domain_lookups'
+        filter_scopes_by_name 'account_domain_lookups'
         click_scope_group_checkbox
         dk = DeveloperKey.last
         find_button("Save Key").click

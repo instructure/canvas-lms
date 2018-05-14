@@ -80,7 +80,7 @@ export default class DeveloperKeyScopesGroup extends React.Component {
     return (
       <Flex justifyItems="space-between">
         <FlexItem grow shrink>
-          <Text>{I18n.t('%{scopeName} scopes', {scopeName: this.props.name})}</Text>
+          <Text>{this.props.name}</Text>
         </FlexItem>
         <FlexItem padding="none none none medium" grow>{this.selectedMethods()}</FlexItem>
       </Flex>

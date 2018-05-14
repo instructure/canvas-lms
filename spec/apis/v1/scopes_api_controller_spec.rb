@@ -19,6 +19,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe ScopesApiController, type: :request do
+
+  # We want to force the usage of the fallback scope mapper here, not the generated version
+  Object.const_set("ApiScopeMapper", ApiScopeMapperLoader.api_scope_mapper_fallback)
+
   describe "index" do
     before do
       allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
@@ -44,14 +48,24 @@ describe ScopesApiController, type: :request do
       end
 
       it "returns expected scopes" do
-        json = api_call(:get, api_url, scope_params)
-        expect(json).to match_array TokenScopes::DETAILED_SCOPES.as_json
+        json = api_call(:get, "/api/v1/accounts/#{@account.id}/scopes", scope_params)
+        expect(json).to include({
+                                  "resource"=>"oauth2",
+                                  "verb"=>"GET",
+                                  "scope"=>"/auth/userinfo",
+                                  "resource_name"=>"oauth2"
+                                })
       end
 
       it "groups scopes when group_by is passed in" do
-        scope_params[:group_by] = "resource"
-        json = api_call(:get, api_url, scope_params)
-        expect(json).to match_array TokenScopes::GROUPED_DETAILED_SCOPES.as_json
+        scope_params[:group_by] = "resource_name"
+        json = api_call(:get, "/api/v1/accounts/#{@account.id}/scopes", scope_params)
+        expect(json["oauth2"]).to eq [{
+                                        "resource"=>"oauth2",
+                                        "verb"=>"GET",
+                                        "scope"=>"/auth/userinfo",
+                                        "resource_name"=>"oauth2"
+                                      }]
       end
 
       it "returns 403 when feature flag is disabled" do
@@ -71,7 +85,12 @@ describe ScopesApiController, type: :request do
           scope_params.merge(account_id: Account.site_admin.id)
         )
 
-        expect(json).to match_array TokenScopes::DETAILED_SCOPES.as_json
+        expect(json).to include({
+                                  "resource"=>"oauth2",
+                                  "verb"=>"GET",
+                                  "scope"=>"/auth/userinfo",
+                                  "resource_name"=>"oauth2"
+                                })
       end
     end
 

@@ -208,7 +208,7 @@ actions.listDeveloperKeyScopesSet = selectedScopes => ({type: actions.LIST_DEVEL
 
 actions.listDeveloperKeyScopes = accountId => dispatch => {
   dispatch(actions.listDeveloperKeyScopesStart())
-  const url = `/api/v1/accounts/${accountId}/scopes?group_by=resource`
+  const url = `/api/v1/accounts/${accountId}/scopes?group_by=resource_name`
 
   axios
     .get(url)

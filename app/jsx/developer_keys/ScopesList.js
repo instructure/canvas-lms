@@ -144,7 +144,7 @@ export default class DeveloperKeyScopesList extends React.Component {
             <FlexItem grow shrink>
               {this.state.availableScopes.map(scopeGroup => {
                 return Object.keys(scopeGroup).reduce((result, key) => {
-                  if (this.noFilter() || key.indexOf(this.props.filter.toLowerCase()) > -1) {
+                  if (this.noFilter() || key.toLowerCase().indexOf(this.props.filter.toLowerCase()) > -1) {
                     result.push(
                       <LazyLoad
                         offset={1000}

@@ -70,3 +70,6 @@ docker-compose.local.*
 # pact artifacts
 /reports/
 /pacts/
+
+# generated scope names
+/lib/api_scope_mapper.rb
