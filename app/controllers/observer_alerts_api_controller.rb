@@ -31,4 +31,15 @@ class ObserverAlertsApiController < ApplicationController
 
     render json: alerts.map { |alert| observer_alert_json(alert, @current_user, session) }
   end
+
+  def alerts_count
+    links = UserObservationLink.active.where(observer: @current_user)
+    links = links.where(user_id: params[:student_id]) if params[:student_id]
+
+    return render_unauthorized_action unless links.count > 0
+
+    alerts = ObserverAlert.unread.where(user_observation_link: links)
+
+    render json: { unread_count: alerts.count }
+  end
 end

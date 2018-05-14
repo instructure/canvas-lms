@@ -1313,6 +1313,11 @@ CanvasRails::Application.routes.draw do
 
       post 'users/:id/pandata_token', controller: 'users', action: 'pandata_token'
 
+      scope(controller: :observer_alerts_api) do
+        get '/users/:user_id/observer_alerts/unread_count', action: :alerts_count
+        get 'users/:user_id/observer_alerts/:student_id', action: :alerts_by_student
+      end
+
       scope(controller: :user_observees) do
         get    'users/:user_id/observees', action: :index, as: 'user_observees'
         post   'users/:user_id/observees', action: :create

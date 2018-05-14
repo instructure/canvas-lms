@@ -81,4 +81,32 @@ describe ObserverAlertsApiController, type: :request do
     end
   end
 
+  describe 'alerts_count' do
+    before :once do
+      @course = course_model
+      @assignment = assignment_model(context: @course)
+
+      observer_alert_model(course: @course, alert_type: 'assignment_grade_high', context: @assignment, workflow_state: 'unread')
+      @observee_student = @observee
+      observer_alert_model(course: @course, alert_type: 'assignment_grade_high', context: @assignment, workflow_state: 'unread', observer: @observer)
+      observer_alert_model(course: @course, alert_type: 'assignment_grade_low', context: @assignment, workflow_state: 'read', observer: @observer)
+    end
+
+    it 'only returns the number of unread alerts for the user' do
+      path = "/api/v1/users/self/observer_alerts/unread_count"
+      params = {user_id: 'self', controller: 'observer_alerts_api', action: 'alerts_count', format: 'json'}
+      json = api_call_as_user(@observer, :get, path, params)
+      expect(json['unread_count']).to eq 2
+    end
+
+    it 'will only return the unread count for the specific student id provided' do
+      path = "/api/v1/users/self/observer_alerts/unread_count?student_id=#{@observee_student.id}"
+      params = {user_id: 'self', student_id: @observee_student.to_param, controller: 'observer_alerts_api',
+                action: 'alerts_count', format: 'json'}
+
+      json = api_call_as_user(@observer, :get, path, params)
+      expect(json['unread_count']).to eq 1
+    end
+  end
+
 end

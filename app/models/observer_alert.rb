@@ -33,7 +33,7 @@ class ObserverAlert < ActiveRecord::Base
   validates :user_observation_link_id, :observer_alert_threshold_id, :alert_type, :action_date, :title, presence: true
 
   scope :active, -> { where.not(workflow_state: ['dismissed', 'deleted']) }
-  scope :unread, -> { where(workflow_state: 'unread')}
+  scope :unread, -> { where(workflow_state: 'unread') }
 
   def self.clean_up_old_alerts
     ObserverAlert.where('created_at < ?', 6.months.ago).delete_all
