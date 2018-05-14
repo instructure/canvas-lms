@@ -142,7 +142,6 @@ module CustomSeleniumActions
   end
 
   def in_frame(id, loading_locator = nil)
-    f("[id=\"#{id}\"],[name=\"#{id}\"]") # ensure frame is loaded
     saved_window_handle = driver.window_handle
     if loading_locator.nil?
       driver.switch_to.frame(id)
