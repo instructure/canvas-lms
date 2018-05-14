@@ -128,7 +128,11 @@ export default function factory(spec) {
     _load(key, url, params, options={}) {
       this.mergeState(key, {loading: true})
 
-      return ajaxJSON(url, 'GET', params).then((data, _textStatus, xhr) => {
+      ajaxJSON.abortRequest(this.previousLoadRequest)
+      const xhr = ajaxJSON(url, 'GET', params)
+      this.previousLoadRequest = xhr
+
+      return xhr.then((data, _textStatus, xhr) => {
         if (this.jsonKey) data = data[this.jsonKey]
         if (options.wrap) data = [data]
         if (options.append) data = (this.getStateFor(key).data || []).concat(data)

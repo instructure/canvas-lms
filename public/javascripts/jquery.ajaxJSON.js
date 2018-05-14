@@ -20,6 +20,8 @@ import $ from 'jquery'
 import authenticity_token from 'compiled/behaviors/authenticity_token'
 import INST from './INST'
 
+const DONE_READY_STATE = 4
+
 const _getJSON = $.getJSON
 $.getJSON = function(url, data, _callback) {
   const xhr = _getJSON.apply($, arguments)
@@ -45,6 +47,9 @@ $.ajaxJSON = function(url, submit_type, data={}, success, error, options) {
     data.authenticity_token = authenticity_token()
   }
   const ajaxError = function(xhr, textStatus, errorThrown) {
+    if (textStatus === 'abort') {
+      return // request aborted, do nothing
+    }
     let data = xhr
     if(xhr.responseText) {
       const text = xhr.responseText.replace(/(<([^>]+)>)/ig,"")
@@ -110,6 +115,12 @@ $.ajaxJSON.storeRequest = function(xhr, url, submit_type, data) {
 }
 
 $.ajaxJSON.findRequest = xhr => $.ajaxJSON.passedRequests.find(req => req.xhr === xhr)
+
+$.ajaxJSON.abortRequest = xhr => {
+  if (xhr && xhr.readyState !== DONE_READY_STATE) {
+    xhr.abort()
+  }
+}
 
 $.ajaxJSON.isUnauthenticated = function(xhr) {
   if (xhr.status !== 401) {

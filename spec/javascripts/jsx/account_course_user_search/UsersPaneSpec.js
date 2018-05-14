@@ -18,7 +18,7 @@
 
 import React from 'react';
 import { shallow } from 'enzyme';
-import UsersPane from 'jsx/account_course_user_search/components/UsersPane';
+import UsersPane, { SEARCH_DEBOUNCE_TIME } from 'jsx/account_course_user_search/components/UsersPane';
 import UserActions from 'jsx/account_course_user_search/actions/UserActions';
 
 QUnit.module('Account Course User Search UsersPane View');
@@ -58,7 +58,7 @@ test('handleUpdateSearchFilter dispatches applySearchFilter action', (assert) =>
   setTimeout(() => {
     ok(spy.called);
     done();
-  }, 250);
+  }, SEARCH_DEBOUNCE_TIME);
 });
 
 test('have an h1 on the page', () => {

@@ -27,6 +27,7 @@ import SearchMessage from './SearchMessage'
 import UserActions from '../actions/UserActions'
 
 const MIN_SEARCH_LENGTH = 3;
+export const SEARCH_DEBOUNCE_TIME = 750
 
 export default class UsersPane extends React.Component {
   static propTypes = {
@@ -80,7 +81,7 @@ export default class UsersPane extends React.Component {
     this.props.onUpdateQueryParams(searchFilter)
   }
 
-  debouncedDispatchApplySearchFilter = _.debounce(this.handleApplyingSearchFilter, 250)
+  debouncedDispatchApplySearchFilter = _.debounce(this.handleApplyingSearchFilter, SEARCH_DEBOUNCE_TIME)
 
   handleUpdateSearchFilter = (searchFilter) => {
     this.props.store.dispatch(UserActions.updateSearchFilter({page: null, ...searchFilter}));
