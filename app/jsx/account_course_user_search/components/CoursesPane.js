@@ -27,6 +27,7 @@ import AccountsTreeStore from '../store/AccountsTreeStore'
 import CoursesList from './CoursesList'
 import CoursesToolbar from './CoursesToolbar'
 import SearchMessage from './SearchMessage'
+import { SEARCH_DEBOUNCE_TIME } from './UsersPane'
 
 const MIN_SEARCH_LENGTH = 3
 const stores = [CoursesStore, TermsStore, AccountsTreeStore]
@@ -62,7 +63,7 @@ class CoursesPane extends React.Component {
     }
 
     // Doing this here because the class property version didn't work :(
-    this.debouncedApplyFilters = debounce(this.onApplyFilters, 250)
+    this.debouncedApplyFilters = debounce(this.onApplyFilters, SEARCH_DEBOUNCE_TIME)
   }
 
   componentWillMount () {
