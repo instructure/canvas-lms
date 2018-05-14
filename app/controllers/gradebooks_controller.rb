@@ -459,13 +459,14 @@ class GradebooksController < ApplicationController
         submission[:grader] = @current_user
         submission.delete(:provisional) unless @assignment.moderated_grading?
         if params[:attachments]
-          attachments = []
-          params[:attachments].keys.each do |idx|
-            attachment = params[:attachments][idx].permit(Attachment.permitted_attributes)
-            attachment[:user] = @current_user
-            attachments << @assignment.attachments.create(attachment)
+          submission[:comment_attachments] = params[:attachments].keys.map do |idx|
+            attachment_json = params[:attachments][idx].permit(Attachment.permitted_attributes)
+            attachment_json[:user] = @current_user
+            attachment = @assignment.attachments.new(attachment_json.except(:uploaded_data))
+            Attachments::Storage.store_for_attachment(attachment, attachment_json[:uploaded_data])
+            attachment.save!
+            attachment
           end
-          submission[:comment_attachments] = attachments
         end
         begin
           if [:grade, :score, :excuse, :excused].any? { |k| submission.key? k }

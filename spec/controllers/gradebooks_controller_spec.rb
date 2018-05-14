@@ -1273,6 +1273,23 @@ describe GradebooksController do
       expect(assigns[:submissions][0].submission_comments[0].attachments[0].display_name).to eql("doc.doc")
     end
 
+    it "stores attached files in instfs if instfs is enabled" do
+      allow(InstFS).to receive(:enabled?).and_return(true)
+      uuid = "1234-abcd"
+      allow(InstFS).to receive(:direct_upload).and_return(uuid)
+      user_session(@teacher)
+      @assignment = @course.assignments.create!(:title => "some assignment")
+      @student = @course.enroll_user(User.create!(:name => "some user"))
+      data = fixture_file_upload("docs/doc.doc", "application/msword", true)
+      post 'update_submission',
+        params: {:course_id => @course.id,
+        :attachments => { "0" => { :uploaded_data => data } },
+        :submission => { :comment => "some comment",
+                         :assignment_id => @assignment.id,
+                         :user_id => @student.user_id }}
+      expect(assigns[:submissions][0].submission_comments[0].attachments[0].instfs_uuid).to eql(uuid)
+    end
+
     it "does not allow updating submissions for concluded courses" do
       user_session(@teacher)
       @teacher_enrollment.complete

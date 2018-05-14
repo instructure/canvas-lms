@@ -520,6 +520,23 @@ describe SubmissionsController do
       expect(assigns[:submission].submission_comments[0].attachments.map{|a| a.display_name}).to be_include("txt.txt")
     end
 
+    it "should store comment files in instfs if instfs is enabled" do
+      allow(InstFS).to receive(:enabled?).and_return(true)
+      uuid = "1234-abcd"
+      allow(InstFS).to receive(:direct_upload).and_return(uuid)
+      course_with_student_logged_in(:active_all => true)
+      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
+      @submission = @assignment.submit_homework(@user)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
+      put 'update', params: {
+        :course_id => @course.id, 
+        :assignment_id => @assignment.id, 
+        :id => @user.id, 
+        :submission => {:comment => "some comment"}, 
+        :attachments => {"0" => {:uploaded_data => data}}}
+      expect(assigns[:submission].submission_comments[0].attachments[0].instfs_uuid).to eql(uuid)
+    end
+
     describe 'allows a teacher to add draft comments to a submission' do
       before(:each) do
         course_with_teacher(active_all: true)

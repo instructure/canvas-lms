@@ -597,13 +597,14 @@ class SubmissionsController < ApplicationController
       admin_in_context = !@context_enrollment || @context_enrollment.admin?
 
       if params[:attachments]
-        attachments = []
-        params[:attachments].keys.each do |idx|
-          attachment = params[:attachments][idx].permit(Attachment.permitted_attributes)
-          attachment[:user] = @current_user
-          attachments << @assignment.attachments.create(attachment)
+        params[:submission][:comment_attachments] = params[:attachments].keys.map do |idx|
+          attachment_json = params[:attachments][idx].permit(Attachment.permitted_attributes)
+          attachment_json[:user] = @current_user
+          attachment = @assignment.attachments.new(attachment_json.except(:uploaded_data))
+          Attachments::Storage.store_for_attachment(attachment, attachment_json[:uploaded_data])
+          attachment.save!
+          attachment
         end
-        params[:submission][:comment_attachments] = attachments#.map{|a| a.id}.join(",")
       end
       unless @submission.grants_right?(@current_user, session, :submit)
         @request = @submission.assessment_requests.where(assessor_id: @current_user).first if @current_user
