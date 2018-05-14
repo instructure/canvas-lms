@@ -295,15 +295,23 @@ class Assignment
     def rubric_assessements_to_json(rubric_assessments)
       rubric_assessments.map do |assessment|
         json = assessment.as_json(methods: [:assessor_name], include_root: false)
+        assessor_id = json[:assessor_id]
 
         if anonymous_graders?
-          assessor_id = json.delete(:assessor_id)
+          json.delete(:assessor_id)
           json[:anonymous_assessor_id] = grader_ids_to_anonymous_ids[assessor_id.to_s]
           json.delete(:assessor_name) unless assessor_id == @user.id
         end
 
         if anonymous_students?
           json[:anonymous_user_id] = student_ids_to_anonymous_ids[json.delete(:user_id)]
+        end
+
+        if grader_comments_hidden? && other_grader?(assessor_id)
+          json['data'].each do |datum|
+            datum.delete(:comments)
+            datum.delete(:comments_html)
+          end
         end
 
         json
@@ -326,7 +334,7 @@ class Assignment
                                         created_at draft group_comment_id id media_comment_id
                                         media_comment_type)
 
-      submission_comments.map do |submission_comment|
+      visible_submission_comments(submission_comments).map do |submission_comment|
         json = submission_comment.as_json(include_root: false,
                                           methods: @submission_comment_methods,
                                           only: @submission_comment_fields)
@@ -360,6 +368,16 @@ class Assignment
       @anonymous_graders = !@assignment.can_view_other_grader_identities?(@user)
     end
 
+    def grader_comments_hidden?
+      return @grader_comments_hidden unless @grader_comments_hidden.nil?
+      @grader_comments_hidden = !@assignment.can_view_other_grader_comments?(@user)
+    end
+
+    def visible_submission_comments(submission_comments)
+      return submission_comments unless grader_comments_hidden?
+      submission_comments.reject {|submission_comment| other_grader?(submission_comment.author_id)}
+    end
+
     def student_ids_to_anonymous_ids
       return @student_ids_to_anonymous_ids if @student_ids_to_anonymous_ids
       # ensure each student has membership, even without a submission
@@ -372,6 +390,10 @@ class Assignment
 
     def grader_ids_to_anonymous_ids
       @assignment.grader_ids_to_anonymous_ids
+    end
+
+    def other_grader?(user_id)
+      !student_ids_to_anonymous_ids.key?(user_id.to_s) && user_id != @user.id
     end
   end
 end
