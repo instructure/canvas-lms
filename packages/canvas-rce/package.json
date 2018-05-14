@@ -141,7 +141,7 @@
     "babel-polyfill": "^6.7.4"
   },
   "devDependencies": {
-    "@instructure/ui-presets": "^5.7.0",
+    "@instructure/ui-presets": "^5.8.1",
     "babel-cli": "^6.22.2",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.2",

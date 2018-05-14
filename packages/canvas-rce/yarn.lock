@@ -78,21 +78,25 @@
     lodash "^4.2.0"
     to-fast-properties "^2.0.0"
 
-"@instructure/babel-plugin-themeable-styles@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/babel-plugin-themeable-styles/-/babel-plugin-themeable-styles-5.7.0.tgz#b55b9c67dfc2e0a0dae5dc6f42f1cb2ddac36dd2"
+"@instructure/babel-plugin-themeable-styles@^5.8.1":
+  version "5.8.1"
+  resolved "https://registry.yarnpkg.com/@instructure/babel-plugin-themeable-styles/-/babel-plugin-themeable-styles-5.8.1.tgz#28883915d15c3293d92a59a1424e1b11a3b4e5d1"
   dependencies:
-    "@instructure/postcss-themeable-styles" "^5.7.0"
+    "@instructure/postcss-themeable-styles" "^5.8.1"
     babel-template "^6.26.0"
     css-modules-require-hook "^4.2.3"
 
-"@instructure/babel-plugin-transform-class-display-name@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/babel-plugin-transform-class-display-name/-/babel-plugin-transform-class-display-name-5.7.0.tgz#9bfdd62ea439e365835700e2103dfe9287be3cf5"
+"@instructure/babel-plugin-transform-class-display-name@^5.8.1":
+  version "5.8.1"
+  resolved "https://registry.yarnpkg.com/@instructure/babel-plugin-transform-class-display-name/-/babel-plugin-transform-class-display-name-5.8.1.tgz#47d3e57b41d7ac9c75ceb5cfb9a41056b2de0056"
 
-"@instructure/postcss-themeable-styles@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/postcss-themeable-styles/-/postcss-themeable-styles-5.7.0.tgz#7f0813215ff327d1a87ba2c905f9d1b13ce1f172"
+"@instructure/canvas-supported-browsers@^1":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@instructure/canvas-supported-browsers/-/canvas-supported-browsers-1.0.0.tgz#dd82d1ab612892edea11693f6e5057b565eb467e"
+
+"@instructure/postcss-themeable-styles@^5.8.1":
+  version "5.8.1"
+  resolved "https://registry.yarnpkg.com/@instructure/postcss-themeable-styles/-/postcss-themeable-styles-5.8.1.tgz#8f560b3f6e5eaa38efb5e844243c10d4d0c4cbb8"
 
 "@instructure/ui-core@^4.1.0":
   version "4.8.0"
@@ -110,14 +114,15 @@
     numeral "^2.0.6"
     prop-types "^15.5.10"
 
-"@instructure/ui-presets@^4.6.0 || ^5", "@instructure/ui-presets@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-presets/-/ui-presets-5.7.0.tgz#4497775e55ac980d8e35d723c629adeff061e8ec"
+"@instructure/ui-presets@^4.6.0 || ^5", "@instructure/ui-presets@^5.8.1":
+  version "5.8.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-presets/-/ui-presets-5.8.1.tgz#dbad8367929c619746796590ae6da99c7e1f0a04"
   dependencies:
-    "@instructure/babel-plugin-themeable-styles" "^5.7.0"
-    "@instructure/babel-plugin-transform-class-display-name" "^5.7.0"
-    "@instructure/postcss-themeable-styles" "^5.7.0"
-    "@instructure/ui-testbed" "^5.7.0"
+    "@instructure/babel-plugin-themeable-styles" "^5.8.1"
+    "@instructure/babel-plugin-transform-class-display-name" "^5.8.1"
+    "@instructure/canvas-supported-browsers" "^1"
+    "@instructure/postcss-themeable-styles" "^5.8.1"
+    "@instructure/ui-testbed" "^5.8.1"
     autoprefixer "^8.0.0"
     babel-cli "^6.26.0"
     babel-core "^6.26.0"
@@ -141,7 +146,7 @@
     eslint "^4.17.0"
     eslint-loader "^1.9.0"
     eslint-plugin-import "^2.7.0"
-    eslint-plugin-instructure-ui "^5.7.0"
+    eslint-plugin-instructure-ui "^5.8.1"
     eslint-plugin-jsx-a11y "^6.0.3"
     eslint-plugin-mocha "^4.11.0"
     eslint-plugin-notice "^0.5.6"
@@ -180,9 +185,9 @@
     webpack-dev-server "^2.11.0"
     which "^1.3.0"
 
-"@instructure/ui-testbed@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-testbed/-/ui-testbed-5.7.0.tgz#1d4ea1f544e23fe1ddcd70eab6aa70f72b14f3f9"
+"@instructure/ui-testbed@^5.8.1":
+  version "5.8.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-testbed/-/ui-testbed-5.8.1.tgz#95bb5250ed0818e3c0039516844f6f6001ba3bd2"
   dependencies:
     axe-core "^2.6.1"
     chai "^4.1.0"
@@ -3418,9 +3423,9 @@ eslint-plugin-format-message@^5.2.6:
     read-pkg-up "^2.0.0"
     resolve "^1.6.0"
 
-eslint-plugin-instructure-ui@^5.7.0:
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-instructure-ui/-/eslint-plugin-instructure-ui-5.7.0.tgz#15a7deb002b4b1491337e36b76326e5570a6d1ab"
+eslint-plugin-instructure-ui@^5.8.1:
+  version "5.8.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-instructure-ui/-/eslint-plugin-instructure-ui-5.8.1.tgz#2d91c8811d118e896de316004ac681b2a9c4cb18"
   dependencies:
     eslint-module-utils "^2.2.0"
     eslint-plugin-import "^2.7.0"
