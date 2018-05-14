@@ -65,10 +65,19 @@ function cellMappingsForMultipleGradingPeriods (assignment, student, selectedGra
   return { ...cellMapping, ...gradingPeriodInfo };
 }
 
+function cellMappingsForAnonymousModeratedMarking (assignment) {
+  if (assignment.moderated_grading && !assignment.grades_published) {
+    return { locked: true, hideGrade: false };
+  } else {
+    return { locked: false, hideGrade: false };
+  }
+}
 
-function cellMapForSubmission (assignment, student, hasGradingPeriods, selectedGradingPeriodID, isAdmin) {
+function cellMapForSubmission (assignment, student, hasGradingPeriods, selectedGradingPeriodID, isAdmin, anonymousModeratedMarkingEnabled) {
   if (!assignment.published) {
     return { locked: true, hideGrade: true };
+  } else if (anonymousModeratedMarkingEnabled) {
+    return cellMappingsForAnonymousModeratedMarking(assignment);
   } else if (!visibleToStudent(assignment, student)) {
     return { locked: true, hideGrade: true };
   } else if (hasGradingPeriods) {
@@ -95,10 +104,11 @@ function missingSubmission (student, assignment) {
 }
 
 class SubmissionStateMap {
-  constructor ({ hasGradingPeriods, selectedGradingPeriodID, isAdmin }) {
+  constructor ({ hasGradingPeriods, selectedGradingPeriodID, isAdmin, anonymousModeratedMarkingEnabled }) {
     this.hasGradingPeriods = hasGradingPeriods;
     this.selectedGradingPeriodID = selectedGradingPeriodID;
     this.isAdmin = isAdmin;
+    this.anonymousModeratedMarkingEnabled = anonymousModeratedMarkingEnabled;
     this.submissionCellMap = {};
     this.submissionMap = {};
   }
@@ -120,7 +130,8 @@ class SubmissionStateMap {
       student,
       this.hasGradingPeriods,
       this.selectedGradingPeriodID,
-      this.isAdmin
+      this.isAdmin,
+      this.anonymousModeratedMarkingEnabled
     ];
 
     this.submissionCellMap[student.id][assignment.id] = cellMapForSubmission(...params);

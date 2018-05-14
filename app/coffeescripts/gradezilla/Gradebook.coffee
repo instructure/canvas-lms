@@ -1186,6 +1186,7 @@ define [
         hasGradingPeriods: @gradingPeriodSet?
         selectedGradingPeriodID: @getGradingPeriodToShow()
         isAdmin: isAdmin()
+        anonymousModeratedMarkingEnabled: @options.anonymous_moderated_marking_enabled
 
     initPostGradesStore: ->
       @postGradesStore = PostGradesStore
