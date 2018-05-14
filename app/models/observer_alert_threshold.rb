@@ -19,6 +19,19 @@ class ObserverAlertThreshold < ActiveRecord::Base
   belongs_to :user_observation_link, :inverse_of => :observer_alert_thresholds
   has_many :observer_alerts, :inverse_of => :observer_alert_threshold
 
+  ALERT_TYPES = %w(
+    assignment_missing
+    assignment_grade_high
+    assignment_grade_low
+    course_grade_high
+    course_grade_low
+    course_announcement
+    institution_announcement
+  ).freeze
+  validates :alert_type, inclusion: { in: ALERT_TYPES }
+  validates :user_observation_link_id, :alert_type, presence: true
+  validates :alert_type, uniqueness: { scope: :user_observation_link }
+
   scope :active, -> { where.not(workflow_state: 'deleted') }
 
   def destroy

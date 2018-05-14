@@ -29,7 +29,7 @@ module Factories
     valid_attrs = [:title, :alert_type, :workflow_state, :action_date]
     default_attrs = {
       title: 'value for type',
-      alert_type: 'value for type',
+      alert_type: 'course_announcement',
       workflow_state: 'active',
       action_date: Time.zone.now
     }

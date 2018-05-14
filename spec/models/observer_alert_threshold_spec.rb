@@ -21,14 +21,18 @@ describe ObserverAlertThreshold do
   it 'can link to an user_observation_link' do
     observer = user_factory()
     student = user_factory()
-    link = UserObservationLink.new(:student => student, :observer => observer, 
+    link = UserObservationLink.create!(:student => student, :observer => observer,
                             :root_account => @account)
-    link.save!
-    threshold = ObserverAlertThreshold.new(:user_observation_link => link, :alert_type => 'missing')
-    threshold.save!
+    threshold = ObserverAlertThreshold.create(:user_observation_link => link, :alert_type => 'assignment_missing')
 
-    saved_threshold = ObserverAlertThreshold.find(threshold.id)
-    expect(saved_threshold).not_to be_nil
-    expect(saved_threshold.user_observation_link).not_to be_nil
+    expect(threshold.valid?).to eq true
+    expect(threshold.user_observation_link).not_to be_nil
+  end
+
+  it 'wont allow random types of alert_type' do
+    link = UserObservationLink.create!(student: user_model, observer: user_model, root_account: @account)
+    threshold = ObserverAlertThreshold.create(user_observation_link: link, alert_type: 'jigglypuff')
+
+    expect(threshold.valid?).to eq false
   end
 end

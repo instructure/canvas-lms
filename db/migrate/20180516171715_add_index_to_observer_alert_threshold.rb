@@ -16,24 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Factories
-  def observer_alert_threshold_model(opts = {})
-    if opts[:uol]
-      @observation_link = opts[:uol]
-    else
-      @observee = opts[:observee] || course_with_student(opts).user
-      @observer = opts[:observer] || user_model
-      @observation_link = UserObservationLink.create!(user_id: @observee, observer_id: @observer)
-    end
-
-    valid_attrs = [:alert_type, :threshold, :workflow_state]
-    default_attrs = {
-      alert_type: 'course_announcement',
-      threshold: nil,
-      workflow_state: 'active',
-    }
-
-    attrs = default_attrs.deep_merge(opts.slice(*valid_attrs))
-    @observer_alert_threshold = @observation_link.observer_alert_thresholds.create(attrs)
+class AddIndexToObserverAlertThreshold < ActiveRecord::Migration[5.1]
+  tag :predeploy
+  def change
+    add_index :observer_alert_thresholds, [:alert_type, :user_observation_link_id], unique: true, name: 'observer_alert_thresholds_on_alert_type_and_observer'
   end
 end

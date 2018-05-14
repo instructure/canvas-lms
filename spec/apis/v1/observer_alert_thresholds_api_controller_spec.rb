@@ -24,7 +24,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
 
   context '#index' do
     before :once do
-      observer_alert_threshold_model(active_all: true, alert_type: 'missing_assignment')
+      observer_alert_threshold_model(alert_type: 'assignment_missing')
       @path = "/api/v1/users/#{@observer.id}/observer_alert_thresholds?student_id=#{@observee.id}"
       @params = {user_id: @observer.to_param, student_id: @observee.to_param,
         controller: 'observer_alert_thresholds_api', action: 'index', format: 'json'}
@@ -35,7 +35,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
         json = api_call_as_user(@observer, :get, @path, @params)
         expect(json.length).to eq 1
         expect(json[0]['user_observation_link_id']).to eq @observation_link.id
-        expect(json[0]['alert_type']).to eq 'missing_assignment'
+        expect(json[0]['alert_type']).to eq 'assignment_missing'
       end
 
       it 'only returns active thresholds' do
@@ -87,7 +87,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
 
   context '#show' do
     before :once do
-      observer_alert_threshold_model(active_all: true, alert_type: 'missing_assignment')
+      observer_alert_threshold_model(alert_type: 'assignment_missing')
       @path = "/api/v1/users/#{@observer.id}/observer_alert_thresholds/#{@observer_alert_threshold.id}"
       @params = {user_id: @observer.to_param, observer_alert_threshold_id: @observer_alert_threshold.to_param,
         controller: 'observer_alert_thresholds_api', action: 'show', format: 'json'}
@@ -97,7 +97,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
       json = api_call_as_user(@observer, :get, @path, @params)
       expect(json['id']).to eq @observer_alert_threshold.id
       expect(json['user_observation_link_id']).to eq @observation_link.id
-      expect(json['alert_type']).to eq 'missing_assignment'
+      expect(json['alert_type']).to eq 'assignment_missing'
     end
 
     it 'errors without proper user_observation_link' do
@@ -163,11 +163,22 @@ describe ObserverAlertThresholdsApiController, type: :request do
       expect(response.code).to eq "200"
       expect(json['something_sneaky']).to eq nil
     end
+
+    it 'updates if threshold already exists' do
+      observer_alert_threshold_model(uol: @uol, alert_type: 'assignment_grade_low', threshold: '50')
+      create_params = {alert_type: 'assignment_grade_low', threshold: '65'}
+      params = {user_id: @observer.to_param, student_id: @uol.user_id, observer_alert_threshold: create_params,
+        controller: 'observer_alert_thresholds_api', action: 'create', format: 'json'}
+      json = api_call_as_user(@observer, :post, @path, params)
+      expect(json['id']).to eq @observer_alert_threshold.id
+      expect(json['threshold']).to eq '65'
+      expect(@uol.observer_alert_thresholds.active.where(alert_type: 'assignment_grade_low').count).to eq 1
+    end
   end
 
   context '#update' do
     before :once do
-      observer_alert_threshold_model(active_all: true, alert_type: 'assignment_grade_low', threshold: "88")
+      observer_alert_threshold_model(alert_type: 'assignment_grade_low', threshold: "88")
       @path = "/api/v1/users/#{@observer.id}/observer_alert_thresholds/#{@observer_alert_threshold.id}"
       @params = {user_id: @observer.to_param, observer_alert_threshold_id: @observer_alert_threshold.to_param,
         controller: 'observer_alert_thresholds_api', action: 'update', format: 'json'}
@@ -195,7 +206,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
 
   context '#destroy' do
     before :once do
-      observer_alert_threshold_model(active_all: true, alert_type: 'assignment_grade_low', threshold: "88")
+      observer_alert_threshold_model(alert_type: 'assignment_grade_low', threshold: "88")
       @path = "/api/v1/users/#{@observer.id}/observer_alert_thresholds/#{@observer_alert_threshold.id}"
       @params = {user_id: @observer.to_param, observer_alert_threshold_id: @observer_alert_threshold.to_param,
         controller: 'observer_alert_thresholds_api', action: 'destroy', format: 'json'}

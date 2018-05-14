@@ -23,24 +23,28 @@ describe ObserverAlert do
 
   it 'can link to a threshold and observation link' do
     assignment = assignment_model()
-    assignment.save!
     observer = user_factory()
     student = user_factory()
-    link = UserObservationLink.new(:student => student, :observer => observer,
-                            :root_account => @account)
-    link.save!
-    threshold = ObserverAlertThreshold.new(:user_observation_link => link, :alert_type => 'missing')
-    threshold.save!
+    link = UserObservationLink.create!(student: student, observer: observer, root_account: @account)
+    threshold = ObserverAlertThreshold.create!(user_observation_link: link, alert_type: 'assignment_missing')
 
-    alert = ObserverAlert.new(:user_observation_link => link, :observer_alert_threshold => threshold,
-                      :context => assignment, :alert_type => 'missing', :action_date => Time.zone.now,
-                      :title => 'Assignment missing')
-    alert.save!
+    alert = ObserverAlert.create(user_observation_link: link, observer_alert_threshold: threshold,
+                      context: assignment, alert_type: 'assignment_missing', action_date: Time.zone.now,
+                      title: 'Assignment missing')
 
-    saved_alert = ObserverAlert.find(alert.id)
-    expect(saved_alert).not_to be_nil
-    expect(saved_alert.user_observation_link).not_to be_nil
-    expect(saved_alert.observer_alert_threshold).not_to be_nil
+    expect(alert.valid?).to eq true
+    expect(alert.user_observation_link).not_to be_nil
+    expect(alert.observer_alert_threshold).not_to be_nil
+  end
+
+  it 'wont allow random types of alert_type' do
+    assignment = assignment_model
+    link = UserObservationLink.create!(student: user_model, observer: user_model, root_account: @account)
+    threshold = ObserverAlertThreshold.create!(user_observation_link: link, alert_type: 'assignment_missing')
+    alert = ObserverAlert.create(user_observation_link: link, observer_alert_threshold: threshold,
+      context: assignment, alert_type: 'jigglypuff', action_date: Time.zone.now, title: 'Assignment missing')
+
+    expect(alert.valid?).to eq false
   end
 
   describe 'course_announcement' do

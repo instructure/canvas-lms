@@ -51,11 +51,19 @@ class ObserverAlertThresholdsApiController < ApplicationController
     return render_unauthorized_action unless link
 
     attrs = create_params.merge(user_observation_link: link)
-    begin
+
+    threshold = link.observer_alert_thresholds.active.where(alert_type: attrs[:alert_type]).take
+    if threshold
+      # update if duplicate
+      threshold.update(threshold: attrs[:threshold])
+    else
       threshold = link.observer_alert_thresholds.create(attrs)
+    end
+
+    if threshold.valid?
       render json: observer_alert_threshold_json(threshold, @current_user, session)
-    rescue ActiveRecord::NotNullViolation
-      render :json => ['missing required parameters'], :status => :bad_request
+    else
+      render json: threshold.errors, status: :bad_request
     end
   end
 

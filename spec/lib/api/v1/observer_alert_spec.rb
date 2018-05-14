@@ -50,7 +50,7 @@ describe "Api::V1::ObserverAlert" do
       alert = observer_alert_model
       json = api.observer_alert_json(alert, user, session)
       expect(json['title']).to eq('value for type')
-      expect(json['alert_type']).to eq('value for type')
+      expect(json['alert_type']).to eq('course_announcement')
       expect(json['workflow_state']).to eq('active')
       expect(json['user_observation_link_id']).to eq @observation_link.id
       expect(json['observer_alert_threshold_id']).to eq @observer_alert_threshold.id
