@@ -7,12 +7,20 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "%{user_name}, you just sent a message in Canvas.", :user_name => content(:user_name) %>
+  <% if IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
+    <%= t "%{user_name}, you just sent a message in Canvas.", :user_name => content(:user_name) %>
+  <% else %>
+    <%= t "%{user_name}, you just sent a message in Canvas - Do not reply", :user_name => content(:user_name) %>
+  <% end %>
 <% end %>
 
 <% define_content :footer_link do %>
   <a href="<%= content :link %>">
-    <%= t :view_message, "View this message in Conversations" %>
+    <% if IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
+      <%= t "View this message in Conversations" %>
+    <% else %>
+      <%= t "Reply to this message in Canvas" %>
+    <% end %>
   </a>
 <% end %>
 
@@ -28,7 +36,8 @@
 <% elsif IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
   <%= t("You can reply to this message in Canvas by replying directly to this email, or by clicking this link: %{link}.  If you need to include an attachment, please log in to Canvas and reply through the Inbox.", link: content(:link)) %>
 <% else %>
-  <%= t("You can reply to this message in Canvas by clicking this link: %{link}.", link: content(:link)) %>
+  <%= t"Please do not reply to this email, it will not be delivered." %>
+  <%= t"You can " %><a href="<%= content :link %>"><%= t"reply to this message in Canvas." %></a>
 <% end %>
 
 <% unless asset.attachments.empty? %>
