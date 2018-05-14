@@ -36,6 +36,7 @@ class Assignment < ActiveRecord::Base
   include TurnitinID
   include Plannable
   include DuplicatingObjects
+  include LockedFor
 
   ALLOWED_GRADING_TYPES = %w(points percent letter_grade gpa_scale pass_fail not_graded).freeze
 
@@ -1235,22 +1236,24 @@ class Assignment < ActiveRecord::Base
     ])
   end
 
-  def locked_for?(user, opts={})
+  def low_level_locked_for?(user, opts={})
     return false if opts[:check_policies] && context.grants_right?(user, :read_as_admin)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       assignment_for_user = self.overridden_for(user)
       if (assignment_for_user.unlock_at && assignment_for_user.unlock_at > Time.zone.now)
-        locked = {:asset_string => assignment_for_user.asset_string, :unlock_at => assignment_for_user.unlock_at}
+        locked = {object: assignment_for_user, unlock_at: assignment_for_user.unlock_at}
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts)
-        locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
+        locked = {object: self, module: item.context_module}
       elsif (assignment_for_user.lock_at && assignment_for_user.lock_at < Time.zone.now)
-        locked = {:asset_string => assignment_for_user.asset_string, :lock_at => assignment_for_user.lock_at, :can_view => true}
+        locked = {object: assignment_for_user, lock_at: assignment_for_user.lock_at, can_view: true}
       else
         each_submission_type do |submission, _, short_type|
           next unless self.send("#{short_type}?")
-          if submission_locked = submission.locked_for?(user, opts.merge(:skip_assignment => true))
+          if submission_locked = submission.low_level_locked_for?(user, opts.merge(:skip_assignment => true))
+
             locked = submission_locked
+
           end
           break
         end

@@ -30,6 +30,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   include SearchTermHelper
   include Plannable
   include Canvas::DraftStateValidations
+  include LockedFor
 
   attr_readonly :context_id, :context_type
   attr_accessor :notify_of_update
@@ -752,8 +753,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   alias_method :to_s, :quiz_title
 
-
-  def locked_for?(user, opts={})
+  def low_level_locked_for?(user, opts={})
     ::Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       user_submission = user && quiz_submissions.where(user_id: user.id).first
       return false if user_submission && user_submission.manually_unlocked
@@ -764,7 +764,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       lock_time_already_occurred = quiz_for_user.lock_at && quiz_for_user.lock_at <= Time.zone.now
 
       locked = false
-      lock_info = { asset_string: asset_string }
+      lock_info = { object: quiz_for_user }
       if unlock_time_not_yet_reached
         locked = lock_info.merge({ unlock_at: quiz_for_user.unlock_at })
       elsif lock_time_already_occurred
@@ -772,19 +772,19 @@ class Quizzes::Quiz < ActiveRecord::Base
       elsif !opts[:skip_assignment] && (assignment_lock = locked_by_assignment?(user, opts))
         locked = assignment_lock
       elsif (module_lock = locked_by_module_item?(user, opts))
-        locked = lock_info.merge({ context_module: module_lock.context_module.attributes })
+        locked = lock_info.merge({module: module_lock.context_module})
       elsif !context.try_rescue(:is_public) && !context.grants_right?(user, :participate_as_student) && !opts[:is_observer]
         locked = lock_info.merge({ missing_permission: :participate_as_student.to_s })
       end
 
-    locked
+      locked
     end
   end
 
   def locked_by_assignment?(user, opts = {})
     return false unless for_assignment?
 
-    assignment.locked_for?(user, opts)
+    assignment.low_level_locked_for?(user, opts)
   end
 
   def clear_locked_cache(user)
