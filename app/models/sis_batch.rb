@@ -75,8 +75,8 @@ class SisBatch < ActiveRecord::Base
     Attachment.new.tap do |att|
       Attachment.skip_3rd_party_submits(true)
       att.context = batch
-      att.uploaded_data = data
       att.display_name = display_name
+      Attachments::Storage.store_for_attachment(att, data)
       att.save!
     end
   ensure

@@ -590,6 +590,22 @@ s2,test_1,section2,active},
     expect(CSV.parse(error_file.open).map.to_a.size).to eq 4 # header and 3 errors
   end
 
+  it "should store error file in instfs if instfs is enabled" do
+    # enable instfs
+    allow(InstFS).to receive(:enabled?).and_return(true)
+    uuid = "1234-abcd"
+    allow(InstFS).to receive(:direct_upload).and_return(uuid)
+
+    # generate some errors
+    batch = @account.sis_batches.create!
+    3.times do |i|
+      batch.sis_batch_errors.create(root_account: @account, file: 'users.csv', message: "some error #{i}", row: i)
+    end
+    batch.finish(false)
+    error_file = batch.reload.errors_attachment
+    expect(error_file.instfs_uuid).to eq uuid
+  end
+
   context "with csv diffing" do
 
     it 'should not fail for empty diff file' do
