@@ -144,7 +144,6 @@ test('does not initialize sis toggle if post_to_sis feature option disabled', fu
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true, published: true})
   quiz.set('post_to_sis', true)
   const view = createView(quiz, {canManage: true, post_to_sis: false})
-  console.log('end spec')
   ok(!view.sisButtonView)
 })
 
