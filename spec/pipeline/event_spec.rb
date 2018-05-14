@@ -18,8 +18,13 @@ describe 'pipeline service' do
     @enrollment.save!
   end
 
-  it do
+  it 'will post to the client if workflow_state is "completed"'do
     expect(http_client).to receive(:post)
     @enrollment.update(workflow_state: 'completed')
+  end
+
+  it 'will not post to the client if workflow_state is "completed"'do
+    expect(http_client).to_not receive(:post)
+    @enrollment.update(workflow_state: 'invited')
   end
 end
