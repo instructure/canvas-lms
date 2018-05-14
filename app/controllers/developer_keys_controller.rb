@@ -148,6 +148,7 @@ class DeveloperKeysController < ApplicationController
         :redirect_uris,
         :vendor_code,
         :visible,
+        :require_scopes,
         scopes: []
       )
     end

@@ -22,11 +22,32 @@ import I18n from 'i18n!react_developer_keys'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import TextArea from '@instructure/ui-core/lib/components/TextArea'
 import TextInput from '@instructure/ui-core/lib/components/TextInput'
+
 import React from 'react'
 import PropTypes from 'prop-types'
+
 import DeveloperKeyScopes from './Scopes'
 
 export default class DeveloperKeyFormFields extends React.Component {
+  constructor (props) {
+    super(props)
+
+    const { developerKey } = props
+    this.state = {
+      requireScopes: developerKey && developerKey.require_scopes
+    }
+  }
+
+  get keyForm () {
+    return this.keyFormRef
+  }
+
+  get requireScopes () {
+    return this.state.requireScopes
+  }
+
+  setKeyFormRef = node => { this.keyFormRef = node }
+
   fieldValue(field, defaultValue) {
     const {developerKey} = this.props
     if (Object.keys(developerKey).length > 0) {
@@ -35,74 +56,74 @@ export default class DeveloperKeyFormFields extends React.Component {
     return developerKey[field]
   }
 
-  developerKeySettings() {
-    return (
-      <FormFieldGroup
-        rowSpacing="small"
-        vAlign="middle"
-        description={<ScreenReaderContent>{I18n.t('Developer Key Settings')}</ScreenReaderContent>}
-      >
-        <TextInput
-          label={I18n.t('Key Name:')}
-          name="developer_key[name]"
-          defaultValue={this.fieldValue('name', 'Unnamed Tool')}
-        />
-        <TextInput
-          label={I18n.t('Owner Email:')}
-          name="developer_key[email]"
-          defaultValue={this.fieldValue('email')}
-        />
-        <TextInput
-          label={I18n.t('Redirect URI (Legacy):')}
-          name="developer_key[redirect_uri]"
-          defaultValue={this.fieldValue('redirect_uri')}
-        />
-        <TextArea
-          label={I18n.t('Redirect URIs:')}
-          name="developer_key[redirect_uris]"
-          defaultValue={this.fieldValue('redirect_uris')}
-          resize="both"
-        />
-        <TextInput
-          label={I18n.t('Vendor Code (LTI 2):')}
-          name="developer_key[vendor_code]"
-          defaultValue={this.fieldValue('vendor_code')}
-        />
-        <TextInput
-          label={I18n.t('Icon URL:')}
-          name="developer_key[icon_url]"
-          defaultValue={this.fieldValue('icon_url')}
-        />
-        <TextArea
-          label={I18n.t('Notes:')}
-          name="developer_key[notes]"
-          defaultValue={this.fieldValue('notes')}
-          resize="both"
-        />
-      </FormFieldGroup>
-    )
-  }
-
-  scopeSettings() {
-    return (
-      <DeveloperKeyScopes
-        developerKey={this.props.developerKey}
-        availableScopes={this.props.availableScopes}
-        availableScopesPending={this.props.availableScopesPending}
-        store={this.props.store}
-        actions={this.props.actions}
-      />
-    )
+  handleRequireScopesChange = () => {
+    this.setState({ requireScopes: !this.state.requireScopes })
   }
 
   render() {
     return (
-      <Grid hAlign="center">
-        <GridRow>
-          <GridCol width={3}>{this.developerKeySettings()}</GridCol>
-          <GridCol width={8}>{this.scopeSettings()}</GridCol>
-        </GridRow>
-      </Grid>
+      <form ref={this.setKeyFormRef}>
+        <Grid hAlign="center">
+          <GridRow>
+            <GridCol width={3}>
+              <FormFieldGroup
+                rowSpacing="small"
+                vAlign="middle"
+                description={<ScreenReaderContent>{I18n.t('Developer Key Settings')}</ScreenReaderContent>}
+              >
+                <TextInput
+                  label={I18n.t('Key Name:')}
+                  name="developer_key[name]"
+                  defaultValue={this.fieldValue('name', 'Unnamed Tool')}
+                />
+                <TextInput
+                  label={I18n.t('Owner Email:')}
+                  name="developer_key[email]"
+                  defaultValue={this.fieldValue('email')}
+                />
+                <TextInput
+                  label={I18n.t('Redirect URI (Legacy):')}
+                  name="developer_key[redirect_uri]"
+                  defaultValue={this.fieldValue('redirect_uri')}
+                />
+                <TextArea
+                  label={I18n.t('Redirect URIs:')}
+                  name="developer_key[redirect_uris]"
+                  defaultValue={this.fieldValue('redirect_uris')}
+                  resize="both"
+                />
+                <TextInput
+                  label={I18n.t('Vendor Code (LTI 2):')}
+                  name="developer_key[vendor_code]"
+                  defaultValue={this.fieldValue('vendor_code')}
+                />
+                <TextInput
+                  label={I18n.t('Icon URL:')}
+                  name="developer_key[icon_url]"
+                  defaultValue={this.fieldValue('icon_url')}
+                />
+                <TextArea
+                  label={I18n.t('Notes:')}
+                  name="developer_key[notes]"
+                  defaultValue={this.fieldValue('notes')}
+                  resize="both"
+                />
+              </FormFieldGroup>
+            </GridCol>
+            <GridCol width={8}>
+              <DeveloperKeyScopes
+                availableScopes={this.props.availableScopes}
+                availableScopesPending={this.props.availableScopesPending}
+                developerKey={this.props.developerKey}
+                requireScopes={this.state.requireScopes}
+                onRequireScopesChange={this.handleRequireScopesChange}
+                dispatch={this.props.dispatch}
+                listDeveloperKeyScopesSet={this.props.listDeveloperKeyScopesSet}
+              />
+            </GridCol>
+          </GridRow>
+        </Grid>
+      </form>
     )
   }
 }
@@ -112,19 +133,16 @@ DeveloperKeyFormFields.defaultProps = {
 }
 
 DeveloperKeyFormFields.propTypes = {
-  store: PropTypes.shape({
-    dispatch: PropTypes.func.isRequired
-  }).isRequired,
-  actions: PropTypes.shape({
-    listDeveloperKeyScopesSet: PropTypes.func.isRequired,
-  }).isRequired,
+  dispatch: PropTypes.func.isRequired,
+  listDeveloperKeyScopesSet: PropTypes.func.isRequired,
   developerKey: PropTypes.shape({
     notes: PropTypes.string,
     icon_url: PropTypes.string,
     vendor_code: PropTypes.string,
     redirect_uris: PropTypes.string,
     email: PropTypes.string,
-    name: PropTypes.string
+    name: PropTypes.string,
+    require_scopes: PropTypes.bool
   }),
   availableScopes: PropTypes.objectOf(PropTypes.arrayOf(
     PropTypes.shape({

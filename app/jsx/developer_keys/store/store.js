@@ -27,7 +27,13 @@ import makeVisibleDeveloperKeyReducer from '../reducers/makeVisibleReducer'
 import makeInvisibleDeveloperKeyReducer from '../reducers/makeInvisibleReducer'
 import listDeveloperKeyScopesReducer from '../reducers/listScopesReducer'
 
-const createStoreWithMiddleware = applyMiddleware(ReduxThunk)(createStore)
+const middleware = [
+  ReduxThunk,
+
+  // this is so redux-logger is not included in the production webpack bundle
+  (process.env.NODE_ENV !== 'production') && require('redux-logger')() // eslint-disable-line global-require
+].filter(Boolean)
+const createStoreWithMiddleware = applyMiddleware(...middleware)(createStore)
 
 const developerKeysReducer = combineReducers({
   listDeveloperKeys: listDeveloperKeysReducer,

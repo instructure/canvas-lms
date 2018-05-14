@@ -19,7 +19,7 @@
 import React from 'react'
 import {mount, shallow} from 'enzyme'
 import DeveloperKeyModal from 'jsx/developer_keys/NewKeyModal'
-import $ from 'jquery'
+import $ from '../../../../app/coffeescripts/jquery.rails_flash_notifications'
 
 QUnit.module('NewKeyModal', {
   teardown() {
@@ -100,7 +100,7 @@ test('it opens the modal if isOpen prop is true', () => {
     />
   )
   equal(wrapper.find('Modal').prop('open'), true)
-  ok(wrapper.find('Modal Heading [level="h4"]').exists())
+  ok(wrapper.find('Modal Heading [level="h3"]').exists())
 })
 
 test('it closes the modal if isOpen prop is false', () => {
@@ -322,6 +322,47 @@ test('it sends the contents of the form saving', () => {
   const fakeStore = {
     dispatch: dispatchSpy
   }
+  const developerKey2 = Object.assign({}, developerKey, { require_scopes: true, scopes: ['test'] })
+  const editDeveloperKeyState2 = Object.assign({}, editDeveloperKeyState, { developerKey: developerKey2 })
+
+  const wrapper = mount(
+    <DeveloperKeyModal
+      availableScopes={{}}
+      availableScopesPending={false}
+      closeModal={() => {}}
+      createOrEditDeveloperKeyState={editDeveloperKeyState2}
+      listDeveloperKeyScopesState={listDeveloperKeyScopesState}
+      actions={fakeActions}
+      store={fakeStore}
+      mountNode={modalMountNode}
+      selectedScopes={selectedScopes}
+    />
+  )
+
+  wrapper.node.submitForm()
+
+  const [[sentFormData]] = createOrEditSpy.args
+
+  equal(sentFormData.get('developer_key[name]'), developerKey.name)
+  equal(sentFormData.get('developer_key[email]'), developerKey.email)
+  equal(sentFormData.get('developer_key[redirect_uri]'), developerKey.redirect_uri)
+  equal(sentFormData.get('developer_key[redirect_uris]'), developerKey.redirect_uris)
+  equal(sentFormData.get('developer_key[vendor_code]'), developerKey.vendor_code)
+  equal(sentFormData.get('developer_key[icon_url]'), developerKey.icon_url)
+  equal(sentFormData.get('developer_key[notes]'), developerKey.notes)
+  equal(sentFormData.get('developer_key[require_scopes]'), 'true')
+})
+
+test('sends form content without scopes and require_scopes set to false when not require_scopes', () => {
+  const createOrEditSpy = sinon.spy()
+  const dispatchSpy = sinon.spy()
+
+  const fakeActions = {
+    createOrEditDeveloperKey: createOrEditSpy
+  }
+  const fakeStore = {
+    dispatch: dispatchSpy
+  }
 
   const wrapper = mount(
     <DeveloperKeyModal
@@ -348,6 +389,7 @@ test('it sends the contents of the form saving', () => {
   equal(sentFormData.get('developer_key[vendor_code]'), developerKey.vendor_code)
   equal(sentFormData.get('developer_key[icon_url]'), developerKey.icon_url)
   equal(sentFormData.get('developer_key[notes]'), developerKey.notes)
+  equal(sentFormData.get('developer_key[require_scopes]'), 'false')
 })
 
 test('it adds each selected scope to the form data', () => {
@@ -355,12 +397,14 @@ test('it adds each selected scope to the form data', () => {
   const dispatchSpy = sinon.spy()
   const fakeActions = { createOrEditDeveloperKey: createOrEditSpy }
   const fakeStore = { dispatch: dispatchSpy }
+  const developerKey2 = Object.assign({}, developerKey, { require_scopes: true, scopes: ['test'] })
+  const editDeveloperKeyState2 = Object.assign({}, editDeveloperKeyState, { developerKey: developerKey2 })
   const wrapper = mount(
     <DeveloperKeyModal
       availableScopes={{}}
       availableScopesPending={false}
       closeModal={() => {}}
-      createOrEditDeveloperKeyState={editDeveloperKeyState}
+      createOrEditDeveloperKeyState={editDeveloperKeyState2}
       listDeveloperKeyScopesState={listDeveloperKeyScopesState}
       actions={fakeActions}
       store={fakeStore}
@@ -379,12 +423,14 @@ test('flashes an error if no scopes are selected', () => {
   const dispatchSpy = sinon.spy()
   const fakeActions = { createOrEditDeveloperKey: createOrEditSpy }
   const fakeStore = { dispatch: dispatchSpy }
+  const developerKey2 = Object.assign({}, developerKey, { require_scopes: true, scopes: [] })
+  const editDeveloperKeyState2 = Object.assign({}, editDeveloperKeyState, { developerKey: developerKey2 })
   const wrapper = mount(
     <DeveloperKeyModal
       availableScopes={{}}
       availableScopesPending={false}
       closeModal={() => {}}
-      createOrEditDeveloperKeyState={editDeveloperKeyState}
+      createOrEditDeveloperKeyState={editDeveloperKeyState2}
       listDeveloperKeyScopesState={listDeveloperKeyScopesState}
       actions={fakeActions}
       store={fakeStore}

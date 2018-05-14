@@ -115,6 +115,8 @@ const scopes = {
 }
 
 const props = {
+  dispatch: () => {},
+  listDeveloperKeyScopesSet: () => {},
   availableScopes: {
     "oauth":[
        {
@@ -139,8 +141,7 @@ const props = {
     ]
   },
   filter: '',
-  actions: {listDeveloperKeyScopesSet: () => {}},
-  dispatch: () => {}
+  actions: {listDeveloperKeyScopesSet: () => {}}
 }
 
 it("renders each group", () => {
@@ -174,7 +175,7 @@ it("only renders 10 groups on the initaial render", () => {
   expect(wrapper.instance().state.availableScopes).toHaveLength(10)
 })
 
-describe("handlerReadOnlySelected", () => {
+describe("handleReadOnlySelected", () => {
   it("selects all scopes with GET as the verb", () => {
     const wrapper = mount(<DeveloperKeyScopesList {...props} />)
     const fakeEvent = {

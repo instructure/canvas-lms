@@ -102,14 +102,14 @@ describe DeveloperKey do
         end.not_to raise_exception
       end
 
-      it 'sets "require_scopes" to true if scopes are present' do
-        key = DeveloperKey.create!(scopes: valid_scopes)
-        expect(key.require_scopes).to eq true
+      it 'does not set "require_scopes" to true if scopes are present and require_scopes is false' do
+        key = DeveloperKey.create!(scopes: valid_scopes, require_scopes: false)
+        expect(key.require_scopes).to eq false
       end
 
-      it 'sets "require_scopes" to false if scopes are blank' do
-        key = DeveloperKey.create!
-        expect(key.require_scopes).to eq false
+      it 'does not set "require_scopes" to false if scopes are blank and require_scopes is true' do
+        key = DeveloperKey.create!(require_scopes: true)
+        expect(key.require_scopes).to eq true
       end
     end
 

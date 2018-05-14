@@ -42,22 +42,37 @@ export default class DeveloperKeyModal extends React.Component {
     return this.developerKey() ? I18n.t('Create developer key') : I18n.t('Edit developer key')
   }
 
+  get submissionForm () {
+    return this.newForm ? this.newForm.keyForm : <form />
+  }
+
+  get requireScopes () {
+    return this.newForm && this.newForm.requireScopes
+  }
+
   submitForm = () => {
     const method = this.developerKey() ? 'put' : 'post'
-    const formData = new FormData(this.form)
-    const scopesArrayKey = 'developer_key[scopes][]'
+    const formData = new FormData(this.submissionForm)
 
-    this.props.selectedScopes.forEach((scope) => {
-      formData.append(scopesArrayKey, scope)
-    })
-
-    if (this.props.selectedScopes.length > 0) {
-      this.props.store.dispatch(
-        this.props.actions.createOrEditDeveloperKey(formData, this.developerKeyUrl(), method)
-      )
-    } else {
+    if (!this.requireScopes) {
+      formData.delete('developer_key[scopes][]')
+      formData.append('developer_key[require_scopes]', false)
+    } else if (this.props.selectedScopes.length === 0 &&
+      this.props.createOrEditDeveloperKeyState.developerKey.scopes.length === 0
+    ) {
       $.flashError(I18n.t('At least one scope must be selected.'))
+      return
+    } else {
+      const scopesArrayKey = 'developer_key[scopes][]'
+
+      this.props.selectedScopes.forEach((scope) => {
+        formData.append(scopesArrayKey, scope)
+      })
+      formData.append('developer_key[require_scopes]', true)
     }
+    this.props.store.dispatch(
+      this.props.actions.createOrEditDeveloperKey(formData, this.developerKeyUrl(), method)
+    )
   }
 
   modalBody() {
@@ -76,26 +91,24 @@ export default class DeveloperKeyModal extends React.Component {
   }
 
   developerKeyForm() {
-    return (
-      <form
-        ref={el => {
-          this.form = el
-        }}
-      >
-        <DeveloperKeyFormFields
-          developerKey={this.developerKey()}
-          availableScopes={this.props.availableScopes}
-          availableScopesPending={this.props.availableScopesPending}
-          store={this.props.store}
-          actions={this.props.actions}
-        />
-      </form>
-    )
+    const {
+      availableScopes,
+      availableScopesPending,
+      createOrEditDeveloperKeyState: { developerKey }
+    } = this.props;
+
+    return <DeveloperKeyFormFields
+      ref={this.setNewFormRef}
+      developerKey={developerKey}
+      availableScopes={availableScopes}
+      availableScopesPending={availableScopesPending}
+      dispatch={this.props.store.dispatch}
+      listDeveloperKeyScopesSet={this.props.actions.listDeveloperKeyScopesSet}
+    />
   }
 
-  modalContainerRef = div => {
-    this.modalContainer = div
-  }
+  setNewFormRef = node => { this.newForm = node }
+  modalContainerRef = node => { this.modalContainer = node }
 
   modalIsOpen() {
     return this.props.createOrEditDeveloperKeyState.developerKeyModalOpen
@@ -124,7 +137,7 @@ export default class DeveloperKeyModal extends React.Component {
           mountNode={this.props.mountNode}
         >
           <ModalHeader>
-            <Heading level="h4">{I18n.t('Key Settings')}</Heading>
+            <Heading level="h3" as="h2">{I18n.t('Key Settings')}</Heading>
           </ModalHeader>
           <ModalBody>{this.modalBody()}</ModalBody>
           <ModalFooter>
@@ -152,7 +165,8 @@ DeveloperKeyModal.propTypes = {
   actions: PropTypes.shape({
     createOrEditDeveloperKey: PropTypes.func.isRequired,
     developerKeysModalClose: PropTypes.func.isRequired,
-    setEditingDeveloperKey: PropTypes.func.isRequired
+    setEditingDeveloperKey: PropTypes.func.isRequired,
+    listDeveloperKeyScopesSet: PropTypes.func.isRequired
   }).isRequired,
   createOrEditDeveloperKeyState: PropTypes.shape({
     developerKeyCreateOrEditSuccessful: PropTypes.bool.isRequired,

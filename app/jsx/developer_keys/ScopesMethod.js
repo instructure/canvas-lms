@@ -19,7 +19,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import Pill from '@instructure/ui-core/lib/components/Pill'
 
-export default class DeveloperKeyScopesList extends React.Component {
+export default class ScopesMethod extends React.Component {
   methodColorMap() {
     return({
       get: 'primary',
@@ -48,11 +48,11 @@ export default class DeveloperKeyScopesList extends React.Component {
   }
 }
 
-DeveloperKeyScopesList.propTypes = {
+ScopesMethod.propTypes = {
   method: PropTypes.string.isRequired,
   margin: PropTypes.string
 }
 
-DeveloperKeyScopesList.defaultProps = {
+ScopesMethod.defaultProps = {
   margin: undefined
 }

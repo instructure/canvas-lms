@@ -65,7 +65,7 @@ export default class DeveloperKeyScopesList extends React.Component {
       selectedScopes,
       readOnlySelected: this.onlySelectGet(selectedScopes)
     })
-    this.props.dispatch(this.props.actions.listDeveloperKeyScopesSet(selectedScopes))
+    this.props.dispatch(this.props.listDeveloperKeyScopesSet(selectedScopes))
   }
 
   uniqueSelectedScopes(selectedScopes) {
@@ -94,7 +94,8 @@ export default class DeveloperKeyScopesList extends React.Component {
       selectedScopes: newScopes,
       readOnlySelected: event.currentTarget.checked
     })
-    this.props.dispatch(this.props.actions.listDeveloperKeyScopesSet(newScopes))
+
+    this.props.dispatch(this.props.listDeveloperKeyScopesSet(newScopes))
   }
 
   noFilter() {
@@ -176,9 +177,7 @@ export default class DeveloperKeyScopesList extends React.Component {
 
 DeveloperKeyScopesList.propTypes = {
   dispatch: PropTypes.func.isRequired,
-  actions: PropTypes.shape({
-    listDeveloperKeyScopesSet: PropTypes.func.isRequired
-  }).isRequired,
+  listDeveloperKeyScopesSet: PropTypes.func.isRequired,
   availableScopes: PropTypes.objectOf(
     PropTypes.arrayOf(
       PropTypes.shape({

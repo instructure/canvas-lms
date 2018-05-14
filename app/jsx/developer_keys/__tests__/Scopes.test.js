@@ -18,9 +18,10 @@
 
 import React from 'react'
 import { mount } from 'enzyme'
+import sinon from 'sinon'
 import DeveloperKeyScopes from '../Scopes'
 
-function props(pending = false) {
+function props(pending = false, requireScopes = true, onRequireScopesChange = () => {}) {
   return({
       developerKey: {},
       availableScopes: {
@@ -47,7 +48,10 @@ function props(pending = false) {
         ]
       },
       availableScopesPending: pending,
-      store: { dispatch: () => {} }
+      dispatch: () => {},
+      listDeveloperKeyScopesSet: () => {},
+      requireScopes,
+      onRequireScopesChange
     })
 }
 
@@ -73,4 +77,29 @@ it('handles filter input change by setting the filter state', () => {
   const eventDup = { currentTarget: { value: 'banana' } }
   wrapper.instance().handleFilterChange(eventDup)
   expect(wrapper.state().filter).toBe('banana')
+})
+
+it('renders Billboard if requireScopes is false', () => {
+  const wrapper = mount(<DeveloperKeyScopes {...props(undefined, false)} />)
+  wrapper.find('Billboard')
+  expect(wrapper.find('Billboard')).toHaveLength(1)
+})
+
+it('does not render Billboard if requireScopes is true', () => {
+  const wrapper = mount(<DeveloperKeyScopes {...props(undefined, true)} />)
+  wrapper.find('Billboard')
+  expect(wrapper.find('Billboard')).toHaveLength(0)
+})
+
+it('renders DeveloperKeyScopesList if requireScopes is true', () => {
+  const wrapper = mount(<DeveloperKeyScopes {...props(undefined, true)} />)
+  wrapper.find('DeveloperKeyScopesList')
+  expect(wrapper.find('DeveloperKeyScopesList')).toHaveLength(1)
+})
+
+it('controls requireScopes change when clicking requireScopes button', () => {
+  const requireScopesStub = sinon.stub()
+  const wrapper = mount(<DeveloperKeyScopes {...props(undefined, true, requireScopesStub)} />)
+  wrapper.find('Checkbox').filterWhere(n => n.prop('variant') === 'toggle').props().onChange()
+  expect(requireScopesStub.called).toBe(true)
 })
