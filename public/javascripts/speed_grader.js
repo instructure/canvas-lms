@@ -1378,7 +1378,19 @@ EG = {
     this.refreshFullRubric();
   },
 
+  removeModerationBarAndShowSubmission() {
+    $full_width_container.removeClass("with_moderation_tabs")
+    $moderation_bar.hide()
+    this.showSubmission()
+    this.setReadOnly(false)
+  },
+
   handleModerationTabs: function(index_to_load) {
+    if (isAnonymousModeratedMarkingEnabled()) {
+      this.removeModerationBarAndShowSubmission()
+      return
+    }
+
     var prov_grades = this.currentStudent.submission && this.currentStudent.submission.provisional_grades;
     var final_grade = this.currentStudent.submission && this.currentStudent.submission.final_provisional_grade;
 
@@ -1457,10 +1469,7 @@ EG = {
         }
       }
     } else {
-      $full_width_container.removeClass("with_moderation_tabs");
-      $moderation_bar.hide();
-      this.showSubmission();
-      this.setReadOnly(false);
+      this.removeModerationBarAndShowSubmission()
     }
   },
 

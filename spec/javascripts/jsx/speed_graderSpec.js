@@ -2208,4 +2208,115 @@ QUnit.module('SpeedGrader', function() {
       })
     })
   })
+
+  QUnit.module('#handleModerationTabs', (suiteHooks) => {
+    let originalCurrentStudent
+
+    suiteHooks.beforeEach(() => {
+      fixtures.innerHTML = `
+        <div id="moderation_bar"></div>
+      `
+      originalCurrentStudent = SpeedGrader.EG.currentStudent
+      SpeedGrader.EG.currentStudent = {
+        id: 4,
+        name: 'Guy B. Studying',
+        submission: {
+          provisional_grades: [
+            {score: 3, grade: '3', provisional_grade_id: '22', scorer_id: '93'},
+            {score: 4, grade: '4', provisional_grade_id: '91', scorer_id: '77'}
+          ]
+        }
+      }
+      fakeENV.setup()
+      sinon.stub($, 'getJSON')
+      sinon.stub(SpeedGrader.EG, 'domReady')
+      sinon.stub(SpeedGrader.EG, 'showSubmission')
+      SpeedGrader.setup()
+    })
+
+    suiteHooks.afterEach(() => {
+      SpeedGrader.EG.showSubmission.restore()
+      SpeedGrader.EG.domReady.restore()
+      $.getJSON.restore()
+      fakeENV.teardown()
+      SpeedGrader.EG.currentStudent = originalCurrentStudent
+      fixtures.innerHTML = ''
+    })
+
+    test('shows the moderation bar if there are provisional grades', () => {
+      SpeedGrader.EG.handleModerationTabs()
+      const moderationBar = document.getElementById('moderation_bar')
+      strictEqual(moderationBar.style.display, '')
+    })
+
+    test('hides the moderation bar if there are not any provisional grades', () => {
+      SpeedGrader.EG.currentStudent.submission.provisional_grades = []
+      SpeedGrader.EG.handleModerationTabs()
+      const moderationBar = document.getElementById('moderation_bar')
+      strictEqual(moderationBar.style.display, 'none')
+    })
+
+    QUnit.module('when Anonymous Moderated Marking is enabled', (hooks) => {
+      hooks.beforeEach(() => {
+        ENV.anonymous_moderated_marking_enabled = true
+      })
+
+      test('hides the moderation bar if there are provisional grades', () => {
+        SpeedGrader.EG.handleModerationTabs()
+        const moderationBar = document.getElementById('moderation_bar')
+        strictEqual(moderationBar.style.display, 'none')
+      })
+
+      test('hides the moderation bar if there are not any provisional grades', () => {
+        SpeedGrader.EG.currentStudent.submission.provisional_grades = []
+        SpeedGrader.EG.handleModerationTabs()
+        const moderationBar = document.getElementById('moderation_bar')
+        strictEqual(moderationBar.style.display, 'none')
+      })
+    })
+  })
+
+  QUnit.module('#removeModerationBarAndShowSubmission', function(hooks) {
+    hooks.beforeEach(() => {
+      fixtures.innerHTML = `
+        <div id="full_width_container" class="with_moderation_tabs"></div>
+        <div id="moderation_bar"></div>
+        <form id="add_a_comment" style="display:none;"></form>
+      `
+      sinon.stub($, 'getJSON')
+      sinon.stub(SpeedGrader.EG, 'domReady')
+      sinon.stub(SpeedGrader.EG, 'showSubmission')
+      SpeedGrader.setup()
+    })
+
+    hooks.afterEach(() => {
+      SpeedGrader.EG.showSubmission.restore()
+      SpeedGrader.EG.domReady.restore()
+      $.getJSON.restore()
+      fixtures.innerHTML = ''
+    })
+
+    test('removes the "with_moderation_tabs" class from the container', () => {
+      SpeedGrader.EG.removeModerationBarAndShowSubmission()
+      const containerClasses = document.getElementById('full_width_container').className
+      strictEqual(containerClasses.includes('with_moderation_tabs'), false)
+    })
+
+    test('hides the moderation bar', () => {
+      SpeedGrader.EG.removeModerationBarAndShowSubmission()
+      const moderationBar = document.getElementById('moderation_bar')
+      strictEqual(moderationBar.style.display, 'none')
+    })
+
+    test('calls showSubmission', () => {
+      SpeedGrader.EG.removeModerationBarAndShowSubmission()
+      strictEqual(SpeedGrader.EG.showSubmission.callCount, 1)
+    })
+
+    test('reveals the comment form', () => {
+      SpeedGrader.EG.removeModerationBarAndShowSubmission()
+      const addCommentForm = document.getElementById('add_a_comment')
+      strictEqual(addCommentForm.style.display, '')
+    })
+  })
 })
