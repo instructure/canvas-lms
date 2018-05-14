@@ -31,12 +31,12 @@ class Assignment
 
     def json
       Attachment.skip_thumbnails = true
-      submission_fields = %i(anonymous_id id submitted_at workflow_state grade
+      submission_fields = %i(id submitted_at workflow_state grade
                              grade_matches_current_submission graded_at turnitin_data
                              submission_type score points_deducted assignment_id submission_comments
                              grading_period_id excused updated_at)
 
-      submission_fields << (anonymous_moderated_marking? ? :anonymous_id : :user_id)
+      submission_fields << (anonymous_students? ? :anonymous_id : :user_id)
 
       comment_fields = %i(comment id author_name created_at author_id media_comment_type
                           media_comment_id cached_attachments attachments draft
@@ -94,7 +94,7 @@ class Assignment
       student_fields = %i(name id sortable_name)
       rubric_assessment_excludes = []
 
-      if anonymous_moderated_marking?
+      if anonymous_students?
         submissions.each do |submission|
           student_ids_to_anonymous_ids[submission.user_id.to_s] = submission.anonymous_id
         end
@@ -105,7 +105,7 @@ class Assignment
 
       res[:context][:students] = students.map do |u|
         json = u.as_json(include_root: false, methods: submission_comment_methods, only: student_fields)
-        json[:anonymous_id] = student_ids_to_anonymous_ids[u.id.to_s]
+        json[:anonymous_id] = student_ids_to_anonymous_ids[u.id.to_s] if anonymous_students?
 
         if preloaded_pg_counts
           json[:needs_provisional_grade] = @assignment.student_needs_provisional_grade?(u, preloaded_pg_counts)
@@ -132,7 +132,7 @@ class Assignment
 
       res[:context][:enrollments] = enrollments.map do |enrollment|
         enrollment_json = enrollment.as_json(include_root: false, only: enrollment_fields)
-        if anonymous_moderated_marking?
+        if anonymous_students?
           enrollment_json[:anonymous_id] = student_ids_to_anonymous_ids[enrollment.user_id.to_s]
           enrollment_json.delete(:user_id)
         end
@@ -199,7 +199,7 @@ class Assignment
             methods: submission_comment_methods,
             only: comment_fields
           )
-          if anonymous_moderated_marking? && student_ids_to_anonymous_ids.key?(comment_json[:author_id].to_s)
+          if anonymous_students? && student_ids_to_anonymous_ids.key?(comment_json[:author_id].to_s)
             author_id = comment_json.delete(:author_id).to_s
             comment_json.delete(:author_name)
             comment_json[:anonymous_id] = student_ids_to_anonymous_ids[author_id]
@@ -321,8 +321,8 @@ class Assignment
 
     private
 
-    def anonymous_moderated_marking?
-      @course.root_account.feature_enabled?(:anonymous_moderated_marking) && @assignment.anonymous_grading?
+    def anonymous_students?
+      !@assignment.can_view_student_names?(@user)
     end
   end
 end
