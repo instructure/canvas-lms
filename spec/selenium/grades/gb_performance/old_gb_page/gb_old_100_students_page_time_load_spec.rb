@@ -26,16 +26,14 @@ describe "gradebook" do
 
   before(:once) do
     assignment_setup
-    @gradebook_page = Gradebook::MultipleGradingPeriods.new
-
   end
 
   before(:each) { user_session(@teacher) }
 
   it "page should load within acceptable time ", priority:"1" do
-    page_load_start_time = Time.now
-    @gradebook_page.visit_gradebook(@course)
-    page_load_finish_time = Time.now
+    page_load_start_time = Time.zone.now
+    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
+    page_load_finish_time = Time.zone.now
     page_load_time = page_load_finish_time - page_load_start_time
     puts "The gradebook page /courses/#{@course}/gradebook loaded in #{page_load_time} seconds"
     Rails.logger.debug "The gradebook page /courses/#{@course}/gradebook loaded in #{page_load_time} seconds"

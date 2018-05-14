@@ -25,7 +25,6 @@ describe "gradebook with grading periods" do
   include GradebookSetup
 
   context 'with close and end dates' do
-    let(:page) { Gradebook::MultipleGradingPeriods.new }
     now = Time.zone.now
 
     before(:once) do
@@ -42,15 +41,16 @@ describe "gradebook with grading periods" do
 
       it 'assignment in ended grading period should be gradable', test_id: 2947119, priority: "1" do
         @course.assignments.create!(due_at: 13.days.ago(now), title: "assign in ended")
-        page.visit_gradebook(@course, @teacher)
+        Gradebook::MultipleGradingPeriods.visit_gradebook(@course, @teacher)
+        Gradebook::MultipleGradingPeriods.select_grading_period(0)
+        Gradebook::MultipleGradingPeriods.enter_grade("10", 0, 0)
 
-        page.select_grading_period(0)
-        page.enter_grade("10", 0, 0)
-        expect(page.cell_graded?("10", 0, 0)).to be true
+        expect(Gradebook::MultipleGradingPeriods.cell_graded?("10", 0, 0)).to be true
 
-        page.select_grading_period(@gp_ended.id)
-        page.enter_grade("8", 0, 0)
-        expect(page.cell_graded?("8", 0, 0)).to be true
+        Gradebook::MultipleGradingPeriods.select_grading_period(@gp_ended.id)
+        Gradebook::MultipleGradingPeriods.enter_grade("8", 0, 0)
+
+        expect(Gradebook::MultipleGradingPeriods.cell_graded?("8", 0, 0)).to be true
       end
     end
 
@@ -63,11 +63,11 @@ describe "gradebook with grading periods" do
       it 'assignment in closed grading period should be gradable', test_id: 2947126, priority: "1" do
 
         assignment = @course.assignments.create!(due_at: 18.days.ago(now), title: "assign in closed")
-        page.visit_gradebook(@course, @admin)
+        Gradebook::MultipleGradingPeriods.visit_gradebook(@course, @admin)
+        Gradebook::MultipleGradingPeriods.select_grading_period(@gp_closed.id)
+        Gradebook::MultipleGradingPeriods.enter_grade("10", 0, 0)
 
-        page.select_grading_period(@gp_closed.id)
-        page.enter_grade("10", 0, 0)
-        expect(page.cell_graded?("10", 0, 0)).to be true
+        expect(Gradebook::MultipleGradingPeriods.cell_graded?("10", 0, 0)).to be true
         expect(Submission.where(assignment_id: assignment.id, user_id: @student.id).first.grade).to eq "10"
       end
     end
@@ -76,14 +76,14 @@ describe "gradebook with grading periods" do
       user_session(@teacher)
 
       @course.assignments.create!(due_at: 18.days.ago, title: "assign in closed")
-      page.visit_gradebook(@course, @teacher)
+      Gradebook::MultipleGradingPeriods.visit_gradebook(@course, @teacher)
+      Gradebook::MultipleGradingPeriods.select_grading_period(0)
 
-      page.select_grading_period(0)
-      # expect(page.grading_cell(0, 0)).to contain_css(page.ungradable_selector)
-      expect(page.grading_cell_attributes(0, 0)).to contain_css(".cannot_edit")
+      expect(Gradebook::MultipleGradingPeriods.grading_cell_attributes(0, 0)).to contain_css(".cannot_edit")
 
-      page.select_grading_period(@gp_closed.id)
-      expect(page.grading_cell_attributes(0, 0)).to contain_css(".cannot_edit")
+      Gradebook::MultipleGradingPeriods.select_grading_period(@gp_closed.id)
+
+      expect(Gradebook::MultipleGradingPeriods.grading_cell_attributes(0, 0)).to contain_css(".cannot_edit")
     end
   end
 end

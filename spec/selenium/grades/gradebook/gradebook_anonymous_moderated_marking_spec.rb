@@ -26,8 +26,6 @@ describe 'Original Gradebook' do
     Account.default.enable_feature!(:anonymous_moderated_marking)
     Account.default.enable_feature!(:anonymous_grading)
 
-    @gradebook = Gradebook::MultipleGradingPeriods.new
-
     # create a course with a teacher
     @anonymous_course = create_course(course_name: 'anonymous_course', active_all: true)
     @teacher1 = User.create!(name: 'Teacher1')
@@ -65,13 +63,13 @@ describe 'Original Gradebook' do
   context 'with Anonymous Moderated Marking ON in submission detail' do
     before(:each) do
       user_session(@teacher1)
-      @gradebook.visit_gradebook(@anonymous_course)
-      open_comment_dialog(0,1)
+      Gradebook::MultipleGradingPeriods.visit_gradebook(@anonymous_course)
+      Gradebook::MultipleGradingPeriods.open_comment_dialog(0,1)
     end
 
     it 'cannot navigate to speedgrader for specific student', priority: '1', test_id: 3493483 do
       # try to navigate to @student_2
-      submission_detail_speedgrader_link.click
+      Gradebook::MultipleGradingPeriods.submission_detail_speedgrader_link.click
       driver.switch_to.window(driver.window_handles.last)
       wait_for_ajaximations
       expect(driver.current_url).not_to include "student_id"
