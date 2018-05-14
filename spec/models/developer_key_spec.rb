@@ -113,7 +113,6 @@ describe DeveloperKey do
       end
     end
 
-
     context 'when site admin' do
       it 'it creates a binding on save' do
         key = DeveloperKey.create!(account: nil)

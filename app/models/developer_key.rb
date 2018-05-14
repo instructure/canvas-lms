@@ -210,6 +210,10 @@ class DeveloperKey < ActiveRecord::Base
     binding || DeveloperKeyAccountBinding.find_in_account_priority(accounts.reverse, self.id, false)
   end
 
+  def owner_account
+    account || Account.site_admin
+  end
+
   private
 
   def binding_on_in_account?(target_account)
@@ -230,10 +234,6 @@ class DeveloperKey < ActiveRecord::Base
 
   def create_default_account_binding
     owner_account.developer_key_account_bindings.create!(developer_key: self)
-  end
-
-  def owner_account
-    account || Account.site_admin
   end
 
   def set_require_scopes
