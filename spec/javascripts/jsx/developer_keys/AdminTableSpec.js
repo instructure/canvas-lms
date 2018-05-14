@@ -19,10 +19,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-addons-test-utils'
-import DeveloperKeysTable from 'jsx/developer_keys/DeveloperKeysTable'
+import DeveloperKeysTable from 'jsx/developer_keys/AdminTable'
 import $ from 'jquery'
 
-QUnit.module('DeveloperKeysTable',  {
+QUnit.module('AdminTable',  {
   teardown() {
     document.getElementById('fixtures').innerHTML = ''
   }

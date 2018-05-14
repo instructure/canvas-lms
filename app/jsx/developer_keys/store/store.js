@@ -19,13 +19,13 @@
 import {createStore, applyMiddleware, combineReducers} from 'redux'
 import ReduxThunk from 'redux-thunk'
 import listDeveloperKeysReducer from '../reducers/listDeveloperKeysReducer'
-import deactivateDeveloperKeyReducer from '../reducers/deactivateDeveloperKeyReducer'
-import activateDeveloperKeyReducer from '../reducers/activateDeveloperKeyReducer'
-import deleteDeveloperKeyReducer from '../reducers/deleteDeveloperKeyReducer'
-import createOrEditDeveloperKeyReducer from '../reducers/createOrEditDeveloperKeyReducer'
-import makeVisibleDeveloperKeyReducer from '../reducers/makeVisibleDeveloperKeyReducer'
-import makeInvisibleDeveloperKeyReducer from '../reducers/makeInvisibleDeveloperKeyReducer'
-import listDeveloperKeyScopesReducer from '../reducers/listDeveloperKeyScopesReducer'
+import deactivateDeveloperKeyReducer from '../reducers/deactivateReducer'
+import activateDeveloperKeyReducer from '../reducers/activateReducer'
+import deleteDeveloperKeyReducer from '../reducers/deleteReducer'
+import createOrEditDeveloperKeyReducer from '../reducers/createOrEditReducer'
+import makeVisibleDeveloperKeyReducer from '../reducers/makeVisibleReducer'
+import makeInvisibleDeveloperKeyReducer from '../reducers/makeInvisibleReducer'
+import listDeveloperKeyScopesReducer from '../reducers/listScopesReducer'
 
 const createStoreWithMiddleware = applyMiddleware(ReduxThunk)(createStore)
 

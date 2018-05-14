@@ -20,7 +20,7 @@ import React from 'react'
 import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
-import DeveloperKeyScopesMethod from './DeveloperKeyScopesMethod'
+import DeveloperKeyScopesMethod from './ScopesMethod'
 
 const DeveloperKeyScope = (props) => (
   <div className="developer-key-scope">

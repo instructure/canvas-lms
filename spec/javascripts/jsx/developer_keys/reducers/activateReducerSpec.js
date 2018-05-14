@@ -17,9 +17,9 @@
  */
 
 import actions from 'jsx/developer_keys/actions/developerKeysActions'
-import reducer from 'jsx/developer_keys/reducers/activateDeveloperKeyReducer'
+import reducer from 'jsx/developer_keys/reducers/activateReducer'
 
-QUnit.module('activateDeveloperKeyReducer');
+QUnit.module('activateReducer');
 
 const defaults = reducer(undefined, {})
 
@@ -67,5 +67,3 @@ test('responds to activateDeveloperKeyFailed', () => {
   equal(newState.activateDeveloperKeyPending, false);
   equal(newState.activateDeveloperKeyError, error);
 });
-
-

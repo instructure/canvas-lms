@@ -18,10 +18,10 @@
 
 import React from 'react'
 import {mount, shallow} from 'enzyme'
-import DeveloperKeyModal from 'jsx/developer_keys/DeveloperKeyModal'
+import DeveloperKeyModal from 'jsx/developer_keys/NewKeyModal'
 import $ from 'jquery'
 
-QUnit.module('DeveloperKeyModal', {
+QUnit.module('NewKeyModal', {
   teardown() {
     $('#fixtures').empty()
   }

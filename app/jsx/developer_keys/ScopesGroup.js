@@ -23,8 +23,8 @@ import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-core/lib/components/Text'
 import ToggleDetails from '@instructure/ui-core/lib/components/ToggleDetails'
-import DeveloperKeyScopesMethod from './DeveloperKeyScopesMethod'
-import DeveloperKeyScope from './DeveloperKeyScope'
+import DeveloperKeyScopesMethod from './ScopesMethod'
+import DeveloperKeyScope from './Scope'
 
 export default class DeveloperKeyScopesGroup extends React.Component {
   state = { groupChecked: this.allScopesAreSelected(this.props) }

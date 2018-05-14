@@ -23,7 +23,7 @@ import Modal, {ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-core/l
 import Spinner from '@instructure/ui-core/lib/components/Spinner'
 import React from 'react'
 import PropTypes from 'prop-types'
-import DeveloperKeyFormFields from './DeveloperKeyFormFields'
+import DeveloperKeyFormFields from './NewKeyForm'
 
 export default class DeveloperKeyModal extends React.Component {
   developerKeyUrl() {

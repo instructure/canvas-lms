@@ -18,7 +18,7 @@
 
 import React from 'react'
 import { mount } from 'enzyme'
-import DeveloperKeyScopesGroup from '../DeveloperKeyScopesGroup'
+import DeveloperKeyScopesGroup from '../ScopesGroup'
 
 const scopes = [{
     "resource":"account_domain_lookups",

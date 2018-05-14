@@ -18,7 +18,7 @@
 
 import React from 'react'
 import { mount } from 'enzyme'
-import DeveloperKeyScope from '../DeveloperKeyScope'
+import DeveloperKeyScope from '../Scope'
 
 const scope = {
   "resource":"account_domain_lookups",
@@ -71,4 +71,3 @@ it('renders the scope verb', () => {
   const wrapper = mount(<DeveloperKeyScope {...props} />)
   expect(wrapper.find('.developer-key-scope').text()).toContain(scope.verb)
 })
-

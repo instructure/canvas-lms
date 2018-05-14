@@ -18,7 +18,7 @@
 
 import React from 'react'
 import { mount } from 'enzyme'
-import DeveloperKeyScopesList from '../DeveloperKeyScopesList'
+import DeveloperKeyScopesList from '../ScopesList'
 
 const scopes = {
   "oauth":[

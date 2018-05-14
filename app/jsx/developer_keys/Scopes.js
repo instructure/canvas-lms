@@ -25,7 +25,7 @@ import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReade
 import Spinner from '@instructure/ui-core/lib/components/Spinner'
 import Text from '@instructure/ui-core/lib/components/Text'
 import TextInput from '@instructure/ui-core/lib/components/TextInput'
-import DeveloperKeyScopesList from './DeveloperKeyScopesList'
+import DeveloperKeyScopesList from './ScopesList'
 
 export default class DeveloperKeyScopes extends React.Component {
   state = { filter: '' }

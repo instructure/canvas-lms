@@ -27,9 +27,9 @@ import IconPlusLine from 'instructure-icons/lib/Line/IconPlusLine'
 import I18n from 'i18n!react_developer_keys'
 import React from 'react'
 import PropTypes from 'prop-types'
-import DeveloperKeysTable from './DeveloperKeysTable'
+import DeveloperKeysTable from './AdminTable'
 import DeveloperKey from './DeveloperKey'
-import DeveloperKeyModal from './DeveloperKeyModal'
+import DeveloperKeyModal from './NewKeyModal'
 
 class DeveloperKeysApp extends React.Component {
   setMainTableRef = node => {

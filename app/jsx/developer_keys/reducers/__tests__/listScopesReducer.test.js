@@ -17,17 +17,15 @@
  */
 
 import actions from 'jsx/developer_keys/actions/developerKeysActions'
-import reducer from 'jsx/developer_keys/reducers/listDeveloperKeyScopesReducer'
-
-QUnit.module('listDeveloperKeyScopesReducer')
+import reducer from 'jsx/developer_keys/reducers/listScopesReducer'
 
 const defaults = reducer(undefined, {})
 
 test('there are defaults', () => {
-  deepEqual(defaults.availableScopes, {})
-  equal(defaults.listDeveloperKeyScopesPending, false)
-  equal(defaults.listDeveloperKeyScopesSuccessful, false)
-  equal(defaults.listDeveloperKeyScopesError, undefined)
+  expect(defaults.availableScopes).toEqual({})
+  expect(defaults.listDeveloperKeyScopesPending).toBeFalsy()
+  expect(defaults.listDeveloperKeyScopesSuccessful).toBeFalsy()
+  expect(defaults.listDeveloperKeyScopesError).toBeUndefined()
 })
 
 test('responds to listDeveloperKeyScopesStart', () => {
@@ -35,10 +33,10 @@ test('responds to listDeveloperKeyScopesStart', () => {
   const action = actions.listDeveloperKeyScopesStart()
   const newState = reducer(state, action)
 
-  deepEqual(newState.availableScopes, {})
-  equal(newState.listDeveloperKeyScopesPending, true)
-  equal(newState.listDeveloperKeyScopesSuccessful, false)
-  equal(newState.listDeveloperKeyScopesError, undefined)
+  expect(newState.availableScopes).toEqual({})
+  expect(newState.listDeveloperKeyScopesPending).toBeTruthy()
+  expect(newState.listDeveloperKeyScopesSuccessful).toBeFalsy()
+  expect(newState.listDeveloperKeyScopesError).toBeUndefined()
 })
 
 test('responds to listDeveloperKeyScopesSuccessful', () => {
@@ -47,10 +45,10 @@ test('responds to listDeveloperKeyScopesSuccessful', () => {
   const action = actions.listDeveloperKeyScopesSuccessful(payload)
   const newState = reducer(state, action)
 
-  deepEqual(newState.availableScopes, payload)
-  equal(newState.listDeveloperKeyScopesPending, false)
-  equal(newState.listDeveloperKeyScopesSuccessful, true)
-  equal(newState.listDeveloperKeyScopesError, undefined)
+  expect(newState.availableScopes).toEqual(payload)
+  expect(newState.listDeveloperKeyScopesPending).toBeFalsy()
+  expect(newState.listDeveloperKeyScopesSuccessful).toBeTruthy()
+  expect(newState.listDeveloperKeyScopesError).toBeUndefined()
 })
 
 test('responds to listDeveloperKeyScopesFailed', () => {
@@ -58,8 +56,8 @@ test('responds to listDeveloperKeyScopesFailed', () => {
   const action = actions.listDeveloperKeyScopesFailed()
   const newState = reducer(state, action)
 
-  deepEqual(newState.availableScopes, {})
-  equal(newState.listDeveloperKeyScopesPending, false)
-  equal(newState.listDeveloperKeyScopesSuccessful, false)
-  equal(newState.listDeveloperKeyScopesError, true)
+  expect(newState.availableScopes).toEqual({})
+  expect(newState.listDeveloperKeyScopesPending).toBeFalsy()
+  expect(newState.listDeveloperKeyScopesSuccessful).toBeFalsy()
+  expect(newState.listDeveloperKeyScopesError).toBeTruthy()
 })

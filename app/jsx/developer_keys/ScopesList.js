@@ -24,8 +24,8 @@ import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReade
 import Text from '@instructure/ui-core/lib/components/Text'
 import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
 import View from '@instructure/ui-layout/lib/components/View'
-import DeveloperKeyScopesGroup from './DeveloperKeyScopesGroup'
-import DeveloperKeyScopesMethod from './DeveloperKeyScopesMethod'
+import DeveloperKeyScopesGroup from './ScopesGroup'
+import DeveloperKeyScopesMethod from './ScopesMethod'
 
 export default class DeveloperKeyScopesList extends React.Component {
   constructor(props) {

@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import page from 'page'
 import qs from 'qs'
-import DeveloperKeysApp from './DeveloperKeysApp'
+import DeveloperKeysApp from './App'
 import actions from './actions/developerKeysActions'
 import store from './store/store'
 

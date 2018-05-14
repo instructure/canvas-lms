@@ -18,7 +18,7 @@
 
 import React from 'react'
 import { mount } from 'enzyme'
-import DeveloperKeyScopesMethod from '../DeveloperKeyScopesMethod'
+import DeveloperKeyScopesMethod from '../ScopesMethod'
 
 const props = {
   method: 'get',

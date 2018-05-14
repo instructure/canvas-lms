@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 import TestUtils from 'react-addons-test-utils'
 import Spinner from '@instructure/ui-core/lib/components/Spinner'
 
-import DeveloperKeysApp from 'jsx/developer_keys/DeveloperKeysApp';
+import DeveloperKeysApp from 'jsx/developer_keys/App';
 
 QUnit.module('DevelopersKeyApp',  {
   teardown() {

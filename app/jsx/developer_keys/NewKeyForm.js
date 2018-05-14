@@ -24,7 +24,7 @@ import TextArea from '@instructure/ui-core/lib/components/TextArea'
 import TextInput from '@instructure/ui-core/lib/components/TextInput'
 import React from 'react'
 import PropTypes from 'prop-types'
-import DeveloperKeyScopes from './DeveloperKeyScopes'
+import DeveloperKeyScopes from './Scopes'
 
 export default class DeveloperKeyFormFields extends React.Component {
   fieldValue(field, defaultValue) {

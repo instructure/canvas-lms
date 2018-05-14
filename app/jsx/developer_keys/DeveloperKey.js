@@ -26,8 +26,8 @@ import PropTypes from 'prop-types'
 import Image from '@instructure/ui-core/lib/components/Image'
 import Link from '@instructure/ui-core/lib/components/Link'
 
-import DeveloperKeyActionButtons from './DeveloperKeyActionButtons'
-import DeveloperKeyStateControl from './DeveloperKeyStateControl'
+import DeveloperKeyActionButtons from './ActionButtons'
+import DeveloperKeyStateControl from './InheritanceStateControl'
 
 
 class DeveloperKey extends React.Component {

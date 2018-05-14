@@ -18,9 +18,9 @@
 
 import React from 'react'
 import TestUtils from 'react-addons-test-utils'
-import DeveloperKeyFormFields from 'jsx/developer_keys/DeveloperKeyFormFields'
+import DeveloperKeyFormFields from 'jsx/developer_keys/NewKeyForm'
 
-QUnit.module('DeveloperKeyFormFields')
+QUnit.module('NewKeyForm')
 
 const developerKey = {
   access_token_count: 77,

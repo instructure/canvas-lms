@@ -17,9 +17,9 @@
  */
 
 import actions from 'jsx/developer_keys/actions/developerKeysActions'
-import reducer from 'jsx/developer_keys/reducers/makeVisibleDeveloperKeyReducer'
+import reducer from 'jsx/developer_keys/reducers/makeVisibleReducer'
 
-QUnit.module('makeVisibleDeveloperKeyReducer');
+QUnit.module('makeVisibleReducer');
 
 const defaults = reducer(undefined, {})
 
@@ -67,5 +67,3 @@ test('responds to makeVisibleDeveloperKeyFailed', () => {
   equal(newState.makeVisibleDeveloperKeyPending, false);
   equal(newState.makeVisibleDeveloperKeyError, error);
 });
-
-

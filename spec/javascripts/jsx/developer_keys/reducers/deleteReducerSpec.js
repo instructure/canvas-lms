@@ -17,7 +17,7 @@
  */
 
 import actions from 'jsx/developer_keys/actions/developerKeysActions'
-import reducer from 'jsx/developer_keys/reducers/deleteDeveloperKeyReducer'
+import reducer from 'jsx/developer_keys/reducers/deleteReducer'
 
 QUnit.module('deleteDeveloperKeyReducer');
 
@@ -67,5 +67,3 @@ test('responds to deleteDeveloperKeyFailed', () => {
   equal(newState.deleteDeveloperKeyPending, false);
   equal(newState.deleteDeveloperKeyError, error);
 });
-
-

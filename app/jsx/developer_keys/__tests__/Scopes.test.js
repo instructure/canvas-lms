@@ -18,7 +18,7 @@
 
 import React from 'react'
 import { mount } from 'enzyme'
-import DeveloperKeyScopes from '../DeveloperKeyScopes'
+import DeveloperKeyScopes from '../Scopes'
 
 function props(pending = false) {
   return({

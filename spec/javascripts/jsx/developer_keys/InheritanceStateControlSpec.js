@@ -19,9 +19,9 @@
 import React from 'react'
 import TestUtils from 'react-addons-test-utils'
 import ReactDOM from 'react-dom'
-import DeveloperKeyStateControl from 'jsx/developer_keys/DeveloperKeyStateControl'
+import DeveloperKeyStateControl from 'jsx/developer_keys/InheritanceStateControl'
 
-QUnit.module('DeveloperKeyStateControl')
+QUnit.module('InheritanceStateControl')
 
 function developerKey(workflowState, isOwnedByAccount) {
   return {
