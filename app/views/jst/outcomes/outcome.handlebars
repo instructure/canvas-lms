@@ -16,12 +16,12 @@
   <tr>
     {{#each ratings}}
     <td class="rating">
-      <h5>{{description}}</h5>
+      <h3>{{description}}</h3>
       {{#t}}{{n points precision=2 strip_insignificant_zeros=true}} Points{{/t}}
     </td>
     {{/each}}
     <td class="total">
-      <h5 class="total">{{#t "total_points"}}Total Points{{/t}}</h5>
+      <h3 class="total">{{#t "total_points"}}Total Points{{/t}}</h3>
       {{#t}}{{n points_possible precision=2 strip_insignificant_zeros=true}} Points{{/t}}
     </td>
   </tr>
