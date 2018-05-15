@@ -30,7 +30,7 @@ module Factories
     default_attrs = {
       alert_type: 'course_announcement',
       threshold: nil,
-      workflow_state: 'active',
+      workflow_state: 'active'
     }
 
     attrs = default_attrs.deep_merge(opts.slice(*valid_attrs))

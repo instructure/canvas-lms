@@ -540,9 +540,7 @@ class Submission < ActiveRecord::Base
       alert_type: ['assignment_grade_high', 'assignment_grade_low'])
 
     thresholds.each do |threshold|
-      threshold_value = threshold.threshold.to_i
-      next if threshold.alert_type == 'assignment_grade_high' && self.score < threshold_value
-      next if threshold.alert_type == 'assignment_grade_low' && self.score > threshold_value
+      next unless threshold.did_pass_threshold(saved_changes['score'][0], self.score)
 
       ObserverAlert.create!(observer: threshold.observer, student: self.user,
                             observer_alert_threshold: threshold,

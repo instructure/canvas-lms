@@ -56,6 +56,53 @@ describe ObserverAlert do
     end
   end
 
+  describe 'course_grade alerts' do
+    before :once do
+      course_with_teacher()
+      @threshold1 = observer_alert_threshold_model(course: @course, alert_type: 'course_grade_high', threshold: 80)
+      @student1 = @student
+      @enrollment1 = @student1.enrollments.where(course: @course).first
+
+      @threshold2 = observer_alert_threshold_model(course: @course, alert_type: 'course_grade_low', threshold: 30)
+      @student2 = @student
+      @enrollment2 = @student2.enrollments.where(course: @course).first
+
+      @assignment = assignment_model(context: @course, points_possible: 100)
+    end
+
+    it 'doesnt create an alert if the threshold isnt met' do
+      @assignment.grade_student(@student1, score: 70, grader: @teacher)
+      @assignment.grade_student(@student2, score: 40, grader: @teacher)
+      alerts = ObserverAlert.where(context: @course)
+      expect(alerts.count).to eq 0
+    end
+
+    it 'creates an alert if the threshold is met' do
+      @assignment.grade_student(@student1, score: 90, grader: @teacher)
+      @assignment.grade_student(@student2, score: 20, grader: @teacher)
+
+      alert1 = ObserverAlert.where(observer_alert_threshold: @threshold1).first
+      alert2 = ObserverAlert.where(observer_alert_threshold: @threshold2).first
+
+      expect(alert1).not_to be_nil
+      expect(alert2).not_to be_nil
+
+      expect(alert1.title).to include('Course grade: ')
+      expect(alert2.title).to include('Course grade: ')
+    end
+
+    it 'doesnt create an alert if the old score was already above the threshold' do
+      @assignment.grade_student(@student1, score: 100, grader: @teacher)
+      @assignment.grade_student(@student2, score: 0, grader: @teacher)
+
+      alert1 = ObserverAlert.where(observer_alert_threshold: @threshold1)
+      alert2 = ObserverAlert.where(observer_alert_threshold: @threshold2)
+
+      expect(alert1.count).to eq 1
+      expect(alert2.count).to eq 1
+    end
+  end
+
   describe 'course_announcement' do
     before :once do
       @course = course_factory
