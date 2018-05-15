@@ -213,24 +213,20 @@ class DeveloperKey < ActiveRecord::Base
   private
 
   def binding_on_in_account?(target_account)
-    do_binding_check = Account.site_admin.feature_allowed?(:developer_key_management_ui_rewrite)
-    unless target_account.site_admin?
-      do_binding_check &&= target_account.feature_enabled?(:developer_key_management_ui_rewrite)
-    end
-
-    return true unless do_binding_check
+    return true unless target_account.root_account.feature_enabled?(:developer_key_management_ui_rewrite)
     account_binding_for(target_account)&.workflow_state == DeveloperKeyAccountBinding::ON_STATE
   end
 
   def api_token_scoping_on?
-    scoping_allowed = Account.site_admin.feature_allowed?(:api_token_scoping)
-    return scoping_allowed if account.blank?
-    scoping_allowed && account.feature_enabled?(:api_token_scoping)
+    owner_account.root_account.feature_enabled?(:api_token_scoping)
   end
 
   def create_default_account_binding
-    owner_account = account || Account.site_admin
     owner_account.developer_key_account_bindings.create!(developer_key: self)
+  end
+
+  def owner_account
+    account || Account.site_admin
   end
 
   def set_require_scopes

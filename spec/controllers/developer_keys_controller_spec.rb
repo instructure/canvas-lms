@@ -62,13 +62,6 @@ describe DeveloperKeysController do
         describe "js bundles" do
           render_views
 
-          it 'includes developer_keys_react' do
-            allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(true)
-            get 'index', params: {account_id: Account.site_admin.id}
-            expect(response).to render_template(:index_react)
-            expect(response).to be_success
-          end
-
           it 'includes developer_keys' do
             get 'index', params: {account_id: Account.site_admin.id}
             expect(response).to render_template(:index)
@@ -115,9 +108,8 @@ describe DeveloperKeysController do
           before do
             site_admin_key
             root_account_key
-            allow_any_instance_of(Account).to receive(:feature_allowed?)
-            allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(true)
-            allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
+            allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(true)
+            allow_any_instance_of(Account).to receive(:feature_enabled?).with(:api_token_scoping).and_return(false)
           end
 
           context 'on site_admin account' do
@@ -184,10 +176,7 @@ describe DeveloperKeysController do
         before do
           Account.site_admin.allow_feature!(:api_token_scoping)
           allow_any_instance_of(Account).to receive(:feature_enabled?).with(:api_token_scoping).and_return(true)
-
-          Account.site_admin.allow_feature!(:developer_key_management_ui_rewrite)
           allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
-
           user_session(@admin)
         end
 
@@ -250,12 +239,8 @@ describe DeveloperKeysController do
         let(:developer_key) { DeveloperKey.create!(account: account_model) }
 
         before do
-          Account.site_admin.allow_feature!(:api_token_scoping)
           allow_any_instance_of(Account).to receive(:feature_enabled?).with(:api_token_scoping).and_return(true)
-
-          Account.site_admin.allow_feature!(:developer_key_management_ui_rewrite)
           allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
-
           user_session(@admin)
         end
 
@@ -313,13 +298,11 @@ describe DeveloperKeysController do
         site_admin_key
         root_account_key
 
-        allow_any_instance_of(Account).to receive(:feature_allowed?)
-        allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(true)
+        allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
         allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
       end
 
       it 'does not inherit site admin keys if feature flag is off' do
-        allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(false)
         site_admin_key.update!(visible: true)
         get 'index', params: {account_id: test_domain_root_account.id}
         expect(assigns[:keys]).to match_array [root_account_key]

@@ -33,7 +33,7 @@ describe ExternalToolsController, type: :request do
     end
 
     it "should include allow_membership_service_access if feature flag enabled" do
-      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:api_token_scoping)
+      allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:membership_service_for_lti_tools).and_return(true)
       et = tool_with_everything(@course, allow_membership_service_access: true)
       json = api_call(:get, "/api/v1/courses/#{@course.id}/external_tools/#{et.id}.json",

@@ -170,10 +170,6 @@ class DeveloperKeyAccountBindingsController < ApplicationController
   end
 
   def verify_feature_flags
-    allowed = Account.site_admin.feature_allowed?(:developer_key_management_ui_rewrite)
-    unless account.site_admin?
-      allowed &&= account.root_account.feature_enabled?(:developer_key_management_ui_rewrite)
-    end
-    head :unauthorized unless allowed
+    head :unauthorized unless account.root_account.feature_enabled?(:developer_key_management_ui_rewrite)
   end
 end

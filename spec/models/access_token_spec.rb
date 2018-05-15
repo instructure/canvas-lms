@@ -286,7 +286,7 @@ describe AccessToken do
       end
 
       before do
-        Account.site_admin.allow_feature!(:developer_key_management_ui_rewrite)
+        allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
         allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite) { true }
       end
 

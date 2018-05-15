@@ -63,13 +63,7 @@ class ScopesApiController < ApplicationController
 
   private
   def check_feature_flag
-    if @context.root_account.site_admin?
-      return if @context.root_account.feature_allowed?(:api_token_scoping)
-    else
-      return if Account.site_admin.feature_allowed?(:api_token_scoping) &&
-        @context.root_account.feature_enabled?(:api_token_scoping)
-    end
-
+    return if @context.root_account.feature_enabled?(:api_token_scoping)
     render json: [], status: :forbidden
   end
 end

@@ -23,7 +23,6 @@ describe 'Developer Keys' do
   describe 'with developer key management UI rewrite feature flag' do
     before(:each) do
       admin_logged_in
-      Account.site_admin.allow_feature!(:developer_key_management_ui_rewrite)
       Account.default.enable_feature!(:developer_key_management_ui_rewrite)
 
       Account.site_admin.allow_feature!(:api_token_scoping)
@@ -201,6 +200,7 @@ describe 'Developer Keys' do
       end
 
       it "root account inherits 'on' binding workflow state from site admin key", test_id: 3482823 do
+        pending 'This test will be valid once the "new developer keys" site admin setting exists'
         site_admin_logged_in
         site_admin_developer_key.update(visible: true)
         get "/accounts/#{Account.site_admin.id}/developer_keys"
@@ -212,6 +212,7 @@ describe 'Developer Keys' do
       end
 
       it "root account inherits 'off' binding workflow state from site admin key", test_id: 3482823 do
+        pending 'This test will be valid once the "new developer keys" site admin setting exists'
         site_admin_logged_in
         site_admin_developer_key.update(visible: true)
         get "/accounts/#{Account.site_admin.id}/developer_keys"
@@ -223,6 +224,7 @@ describe 'Developer Keys' do
       end
 
       it "root account keeps self binding workflow state if site admin key state is 'allow'", test_id: 3482823 do
+        pending 'This test will be valid once the "new developer keys" site admin setting exists'
         site_admin_logged_in
         site_admin_developer_key.update!(visible: true)
         site_admin_developer_key.developer_key_account_bindings.first.update!(workflow_state: 'allow')

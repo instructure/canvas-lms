@@ -789,7 +789,6 @@ describe Account do
 
     it "should include 'Developer Keys' for the admin users of a sub account" do
       account = Account.create!
-      Account.site_admin.allow_feature!(:developer_key_management)
       account.enable_feature!(:developer_key_management)
       sub_account = Account.create!(parent_account: account)
       admin = account_admin_user(:account => sub_account)
