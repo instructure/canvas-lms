@@ -41,8 +41,6 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
 
   before do
     allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
-    allow_any_instance_of(Account).to receive(:feature_allowed?).and_return(false)
-    allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(true)
     allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
   end
 
@@ -62,13 +60,6 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
       user_session(authorized_admin)
       post :create_or_update, params: params
       expect(response).to be_success
-    end
-
-    it 'renders unauthorized if the flag is not enabled in site admin' do
-      allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(false)
-      user_session(authorized_admin)
-      post :create_or_update, params: params
-      expect(response).to be_unauthorized
     end
 
     it 'renders unauthorized if the flag is not enabled in the root account' do
@@ -115,13 +106,6 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
       expect(response).to be_unauthorized
     end
 
-    it 'renders unauthorized if the flag is not enabled in site admin' do
-      allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(false)
-      user_session(unauthorized_admin)
-      post :create_or_update, params: params, format: :json
-      expect(response).to be_unauthorized
-    end
-
     it 'renders unauthorized if the flag is not enabled in the root account' do
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(false)
       user_session(unauthorized_admin)
@@ -152,13 +136,6 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
     let(:expected_binding_index) { DeveloperKeyAccountBinding.where(account_id: account.account_chain_ids.concat([Account.site_admin.id])) }
 
     it 'renders unauthorized if the user does not have "manage_developer_keys"' do
-      user_session(unauthorized_admin)
-      get :index, params: params, format: :json
-      expect(response).to be_unauthorized
-    end
-
-    it 'renders unauthorized if the flag is not enabled in site admin' do
-      allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(false)
       user_session(unauthorized_admin)
       get :index, params: params, format: :json
       expect(response).to be_unauthorized

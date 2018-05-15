@@ -96,7 +96,6 @@ describe DeveloperKeysController, type: :request do
 
       context 'when new UI feature flag is enabled' do
         before do
-          allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(true)
           allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
         end
 

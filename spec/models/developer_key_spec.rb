@@ -84,7 +84,7 @@ describe DeveloperKey do
           url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id)
       end
 
-      before { Account.site_admin.allow_feature!(:api_token_scoping) }
+      before { Account.site_admin.enable_feature!(:api_token_scoping) }
 
       it 'raises an error if scopes contain invalid scopes' do
         expect do
