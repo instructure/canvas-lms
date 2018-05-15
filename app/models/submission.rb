@@ -310,6 +310,7 @@ class Submission < ActiveRecord::Base
   after_save :update_participation
   after_save :update_line_item_result
   after_save :delete_ignores
+  after_save :create_alert
 
   def autograded?
     # AutoGrader == (quiz_id * -1)
@@ -530,6 +531,31 @@ class Submission < ActiveRecord::Base
       self.assignment&.send_later_if_production(:multiple_module_actions, [self.user_id], :scored, self.score)
     end
     true
+  end
+
+  def create_alert
+    return unless saved_change_to_score? && self.grader_id && !self.autograded?
+
+    links = self.user.as_student_observation_links.active
+    return unless links.count > 0
+
+    thresholds = ObserverAlertThreshold.active.where(user_observation_link: links,
+      alert_type: ['assignment_grade_high', 'assignment_grade_low'])
+
+    thresholds.each do |threshold|
+      threshold_value = threshold.threshold.to_i
+      next if threshold.alert_type == 'assignment_grade_high' && self.score < threshold_value
+      next if threshold.alert_type == 'assignment_grade_low' && self.score > threshold_value
+
+      ObserverAlert.create!(user_observation_link_id: threshold.user_observation_link_id,
+                            observer_alert_threshold: threshold,
+                            context: self.assignment, alert_type: threshold.alert_type, action_date: self.graded_at,
+                            title: I18n.t("Assignment graded: %{score} on %{assignmentName} in %{courseName}", {
+                              score: self.score,
+                              assignmentName: self.assignment.title,
+                              courseName: self.assignment.course.name
+                            }))
+    end
   end
 
   def update_quiz_submission

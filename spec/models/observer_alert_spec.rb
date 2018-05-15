@@ -18,6 +18,9 @@
 require_relative '../sharding_spec_helper'
 
 describe ObserverAlert do
+  include Api
+  include Api::V1::ObserverAlertThreshold
+
   it 'can link to a threshold and observation link' do
     assignment = assignment_model()
     assignment.save!
@@ -137,6 +140,57 @@ describe ObserverAlert do
       notification = account_notification(account: @account, role_ids: role_ids)
       alert = ObserverAlert.where(context: notification).first
       expect(alert.context).to eq notification
+    end
+  end
+
+  describe 'assignment_grade' do
+    before :once do
+      course_with_teacher()
+      @threshold1 = observer_alert_threshold_model(alert_type: 'assignment_grade_high', threshold: '80', course: @course)
+      @threshold2 = observer_alert_threshold_model(alert_type: 'assignment_grade_low', threshold: '40', course: @course)
+      assignment_model(context: @course)
+    end
+
+    it 'doesnt create an alert if there are no observers on that student' do
+      student = student_in_course(course: @course).user
+      @assignment.grade_student(student, score: 50, grader: @teacher)
+
+      alerts = ObserverAlert.where(context: @assignment)
+      expect(alerts.count).to eq 0
+    end
+
+    it 'doesnt create an alert if there is no threshold for that observer' do
+      student = student_in_course(course: @course).user
+      observer_enrollment = course_with_observer(course: @course, associated_user_id: student.id)
+      UserObservationLink.create!(student: student, observer: observer_enrollment.user, root_account: @account)
+
+      @assignment.grade_student(student, score: 80, grader: @teacher)
+
+      alerts = ObserverAlert.where(context: @assignment)
+      expect(alerts.count).to eq 0
+    end
+
+    it 'doesnt create an alert if the threshold is not met' do
+      @assignment.grade_student(@threshold1.user_observation_link.student, score: 70, grader: @teacher)
+      @assignment.grade_student(@threshold2.user_observation_link.student, score: 50, grader: @teacher)
+
+      alerts = ObserverAlert.where(context: @assignment)
+      expect(alerts.count).to eq 0
+    end
+
+    it 'creates an alert if the threshold is met' do
+      @assignment.grade_student(@threshold1.user_observation_link.student, score: 100, grader: @teacher)
+      @assignment.grade_student(@threshold2.user_observation_link.student, score: 10, grader: @teacher)
+
+      alert1 = ObserverAlert.where(context: @assignment, alert_type: 'assignment_grade_high').first
+      expect(alert1).not_to be_nil
+      expect(alert1.observer_alert_threshold).to eq @threshold1
+      expect(alert1.title).to include('Assignment graded: ')
+
+      alert2 = ObserverAlert.where(context: @assignment, alert_type: 'assignment_grade_low').first
+      expect(alert2).not_to be_nil
+      expect(alert2.observer_alert_threshold).to eq @threshold2
+      expect(alert2.title).to include('Assignment graded: ')
     end
   end
 end
