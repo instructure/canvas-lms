@@ -636,10 +636,15 @@ class ActiveRecord::Base
 
     start ||= current_xlog_location
     Shackles.activate(:slave) do
+      diff_fn = connection.send(:postgresql_version) >= 100000 ?
+        "pg_wal_lsn_diff" :
+        "pg_xlog_location_diff"
       fn = connection.send(:postgresql_version) >= 100000 ?
         "pg_last_wal_replay_lsn()" :
         "pg_last_xlog_replay_location()"
-      while connection.select_value("SELECT #{fn}") < start
+      # positive == first value greater, negative == second value greater
+      # SELECT pg_xlog_location_diff(<START>, pg_last_xlog_replay_location())
+      while connection.select_value("SELECT #{diff_fn}(#{connection.quote(start)}, #{fn})").to_i >= 0
         sleep 0.1
       end
     end
