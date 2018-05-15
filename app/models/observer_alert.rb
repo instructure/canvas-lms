@@ -22,4 +22,8 @@ class ObserverAlert < ActiveRecord::Base
 
   scope :active, -> { where.not(workflow_state: ['dismissed', 'deleted']) }
   scope :unread, -> { where(workflow_state: 'unread')}
+  
+  def self.clean_up_old_alerts
+    ObserverAlert.where('created_at < ?', 6.months.ago).delete_all
+  end
 end

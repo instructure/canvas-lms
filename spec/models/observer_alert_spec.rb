@@ -80,6 +80,22 @@ describe ObserverAlert do
     end
   end
 
+  describe 'clean_up_old_alerts' do
+    it 'deletes alerts older than 6 months ago but leaves newer ones' do
+      observer_alert_threshold_model()
+      a1 = ObserverAlert.create(user_observation_link: @observation_link, observer_alert_threshold: @observer_alert_threshold,
+                           context: @account, alert_type: 'institution_announcement', title: 'announcement',
+                           action_date: Time.zone.now, created_at: 6.months.ago)
+      a2 = ObserverAlert.create(user_observation_link: @observation_link, observer_alert_threshold: @observer_alert_threshold,
+                           context: @account, alert_type: 'institution_announcement', title: 'announcement',
+                           action_date: Time.zone.now)
+
+      ObserverAlert.clean_up_old_alerts
+      expect(ObserverAlert.where(id: a1.id).first).to be_nil
+      expect(ObserverAlert.find(a2.id)).not_to be_nil
+    end
+  end
+
   describe 'institution_announcement' do
     before :once do
       @no_link_account = account_model
