@@ -100,8 +100,12 @@ module Exporters
       @files.each { |file| process_file(file) }
     end
 
+    def mock_session
+      @user && {:user_id => @user.id} # used for public_to_auth_users courses
+    end
+
     def process_folder(folder)
-      return unless folder.grants_right?(@user, :read_contents)
+      return unless folder.grants_right?(@user, mock_session, :read_contents)
       @folder_list << folder unless folder.root_folder?
       folder.sub_folders.active.each do |sub_folder|
         process_folder(sub_folder)
@@ -112,7 +116,7 @@ module Exporters
     end
 
     def process_file(att)
-      if att.grants_right?(@user, :download)
+      if att.grants_right?(@user, mock_session, :download)
         @file_list << att
         @total_size += (att.size || 0)
       end

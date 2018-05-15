@@ -711,6 +711,21 @@ describe ContentExportsApiController, type: :request do
           end
         end
 
+        it "should include files in public-to-institution courses" do
+          t_course.update_attribute(:is_public_to_auth_users, true)
+          other_user = user_with_pseudonym(:active_all => true)
+          json = api_call_as_user(other_user, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=zip",
+            { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'zip' })
+          run_jobs
+          export = t_course.content_exports.where(id: json['id']).first
+          expect(export).to be_present
+          expect(export.attachment).to be_present
+          tf = export.attachment.open need_local_file: true
+          Zip::File.open(tf) do |zf|
+            expect(zf.entries.map(&:name)).to match_array %w(file1.txt)
+          end
+        end
+
         it "should reject common cartridge export due to permissions" do
           api_call_as_user(t_student, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                    { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge' },
