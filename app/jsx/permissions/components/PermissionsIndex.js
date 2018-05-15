@@ -33,6 +33,7 @@ import actions from '../actions'
 import {COURSE, ACCOUNT} from '../propTypes'
 
 import {ConnectedPermissionsTable} from './PermissionsTable'
+import {ConnectedRoleTray} from './RoleTray'
 
 const SEARCH_DELAY = 350
 const COURSE_TAB_INDEX = 0
@@ -89,6 +90,7 @@ export default class PermissionsIndex extends Component {
   render() {
     return (
       <div className="permissions-v2__wrapper">
+        <ConnectedRoleTray />
         <TabList onChange={this.onTabChanged}>
           <TabPanel title={I18n.t('Course Roles')}>
             {this.renderHeader()}

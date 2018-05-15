@@ -24,7 +24,8 @@ import PermissionsTable from '../PermissionsTable'
 import {COURSE} from '../../propTypes'
 
 const defaultProps = () => ({
-  roles: [{id: '1', label: 'Role 1'}, {id: '2', label: 'Role 2'}],
+  displayRoleTray: () => {},
+  roles: [{id: '1', label: 'Role 1', displayed: true}, {id: '2', label: 'Role 2', displayed: true}],
   permissions: [
     {permission_name: 'permission_1', label: 'Permission 1', contextType: COURSE, displayed: true},
     {permission_name: 'permission_2', label: 'Permission 2', contextType: COURSE, displayed: true}

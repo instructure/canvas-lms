@@ -18,13 +18,15 @@
 
 import I18n from 'i18n!permissions'
 import React, {Component} from 'react'
-import {arrayOf} from 'prop-types'
+import {arrayOf, func} from 'prop-types'
 import {connect} from 'react-redux'
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import Text from '@instructure/ui-core/lib/components/Text'
 
+import actions from '../actions'
 import propTypes from '../propTypes'
 
 // const COL_WIDTH = 140
@@ -33,7 +35,8 @@ import propTypes from '../propTypes'
 export default class PermissionsTable extends Component {
   static propTypes = {
     roles: arrayOf(propTypes.role).isRequired,
-    permissions: arrayOf(propTypes.permission).isRequired
+    permissions: arrayOf(propTypes.permission).isRequired,
+    setAndOpenRoleTray: func.isRequired
   }
 
   state = {
@@ -55,6 +58,15 @@ export default class PermissionsTable extends Component {
     }
   }
 
+  openRoleTray(role) {
+    // TODO ideally (according to kendal) we should have this close the current
+    //      tray (an animation) before loading the new tray. I was hoping that
+    //      calling hideTrays() here would be enough to do that, but it is
+    //      alas not the case. The `Admin > People` page has an example of
+    //      how this should look, so I should check there for inspiration.
+    this.props.setAndOpenRoleTray(role)
+  }
+
   renderTopHeader() {
     return (
       <tr className="ic-permissions__top-header">
@@ -71,7 +83,9 @@ export default class PermissionsTable extends Component {
                 style={{top: `${this.state.topOffset}px`}}
                 className="ic-permissions__header-content"
               >
-                <a href="#">{role.label}</a>
+                <Button variant="link" onClick={() => this.openRoleTray(role)}>
+                  {role.label}
+                </Button>
               </div>
             </div>
           </th>
@@ -134,7 +148,7 @@ export default class PermissionsTable extends Component {
       <table className="ic-permissions__table">
         <tbody>{this.renderTopHeader()}</tbody>
         {this.props.permissions.map(perm => (
-          <tbody key={perm.id}>
+          <tbody key={perm.permission_name}>
             <tr>
               {this.renderLeftHeader(perm)}
               {this.props.roles.map(role => (
@@ -175,7 +189,7 @@ function mapStateToProps(state, ownProps) {
 }
 
 const mapDispatchToProps = {
-  // THERE WILL BE STUFF HERE LATER
+  setAndOpenRoleTray: actions.setAndOpenRoleTray
 }
 
 export const ConnectedPermissionsTable = connect(mapStateToProps, mapDispatchToProps)(

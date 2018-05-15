@@ -72,3 +72,16 @@ it('UPDATE_PERMISSIONS_SEARCH filters properly', () => {
     }
   }
 })
+
+it('DISPLAY_ROLE_TRAY sets the activeRoleTray in the store', () => {
+  const originalState = {activeRoleTray: null}
+  const payload = {role: 'newRoleSim'}
+  const newState = reduce(actions.displayRoleTray(payload), originalState)
+  expect(newState.activeRoleTray).toEqual(payload)
+})
+
+it('HIDE_ALL_TRAYS sets the activeRoleTray in the store', () => {
+  const originalState = {activeRoleTray: {role: 'banana'}}
+  const newState = reduce(actions.hideAllTrays(), originalState)
+  expect(newState.activeRoleTray).toBeNull()
+})

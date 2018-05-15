@@ -47,6 +47,7 @@ const permissions = [
 
 const store = {
   getState: () => ({
+    activeRoleTray: null,
     contextId: 1,
     permissions,
     roles: []

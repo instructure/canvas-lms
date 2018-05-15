@@ -41,6 +41,17 @@ $darkRowBg: #f9f9f9;
   margin: 20px;
 }
 
+.ic-permissions_role_tray {
+  hr {
+    margin-top: 7px;
+    margin-bottom: 7px;
+  }
+}
+
+.ic-permissions_role_tray_table_role_expandable {
+  margin-#{direction(left)}: -6px;
+}
+
 // the <table> itself
 .ic-permissions__table {
   width: 100%;

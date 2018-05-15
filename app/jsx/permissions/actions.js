@@ -15,12 +15,17 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import $ from 'jquery'
 import I18n from 'i18n!permissions'
 import {createActions} from 'redux-actions'
 
-const types = ['UPDATE_PERMISSIONS_SEARCH']
+const types = [
+  'DISPLAY_ROLE_TRAY',
+  'GET_PERMISSIONS_START',
+  'GET_PERMISSIONS_SUCCESS',
+  'HIDE_ALL_TRAYS',
+  'UPDATE_PERMISSIONS_SEARCH'
+]
 
 const actions = createActions(...types)
 
@@ -37,6 +42,13 @@ actions.searchPermissions = function searchPermissions({permissionSearchString, 
       {count: numDisplayedPermissions}
     )
     $.screenReaderFlashMessageExclusive(message)
+  }
+}
+
+actions.setAndOpenRoleTray = function(role) {
+  return dispatch => {
+    dispatch(actions.hideAllTrays())
+    dispatch(actions.displayRoleTray({role}))
   }
 }
 

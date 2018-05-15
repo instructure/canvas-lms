@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import $ from 'jquery'
-import sinon from 'sinon'
 
 import actions from '../actions'
 
@@ -55,25 +54,52 @@ const permissions = [
 
 it('searchPermissions dispatches updatePermissionsSearch', () => {
   const state = {contextId: 1, permissions, roles: []}
-  const dispatchSpy = sinon.spy()
+  const dispatchMock = jest.fn()
   actions.searchPermissions({permissionSearchString: 'add', contextType: COURSE})(
-    dispatchSpy,
+    dispatchMock,
     () => state
   )
-  const dispatchArgs = dispatchSpy.firstCall.args
-  expect(dispatchArgs).toHaveLength(1)
-  expect(dispatchArgs[0].type).toEqual('UPDATE_PERMISSIONS_SEARCH')
-  expect(dispatchArgs[0].payload.permissionSearchString).toEqual('add')
-  expect(dispatchArgs[0].payload.contextType).toEqual(COURSE)
+
+  const expectedDispatch = {
+    type: 'UPDATE_PERMISSIONS_SEARCH',
+    payload: {
+      permissionSearchString: 'add',
+      contextType: COURSE
+    }
+  }
+
+  expect(dispatchMock).toHaveBeenCalledTimes(1)
+  expect(dispatchMock).toHaveBeenCalledWith(expectedDispatch)
 })
 
 it('searchPermissions announces when search is complete', () => {
   const state = {contextId: 1, permissions, roles: []}
-  const dispatchSpy = sinon.spy()
-  const flashStub = sinon.spy($, 'screenReaderFlashMessageExclusive')
+  const dispatchMock = jest.fn()
+  const flashMock = jest.spyOn($, 'screenReaderFlashMessageExclusive')
   actions.searchPermissions({permissionSearchString: 'add', contextType: COURSE})(
-    dispatchSpy,
+    dispatchMock,
     () => state
   )
-  expect(flashStub.firstCall.args[0].includes('found')).toEqual(true)
+
+  expect(flashMock).toHaveBeenCalledTimes(1)
+  expect(flashMock).toHaveBeenCalledWith('0 permissions found')
+})
+
+it('setAndOpenRoleTray dispatches hideAllTrays and dispalyRoleTray', () => {
+  const dispatchMock = jest.fn()
+  actions.setAndOpenRoleTray('banana')(dispatchMock, () => {})
+
+  const expectedHideDispatch = {
+    type: 'HIDE_ALL_TRAYS'
+  }
+  const expectedDisplayRoleDispatch = {
+    type: 'DISPLAY_ROLE_TRAY',
+    payload: {
+      role: 'banana'
+    }
+  }
+
+  expect(dispatchMock).toHaveBeenCalledTimes(2)
+  expect(dispatchMock).toHaveBeenCalledWith(expectedHideDispatch)
+  expect(dispatchMock).toHaveBeenCalledWith(expectedDisplayRoleDispatch)
 })
