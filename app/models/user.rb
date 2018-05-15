@@ -1026,7 +1026,8 @@ class User < ActiveRecord::Base
     given { |user| user == self }
     can :read and can :read_grades and can :read_profile and can :read_as_admin and can :manage and
       can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and
-      can :update_avatar and can :manage_feature_flags and can :api_show_user
+      can :update_avatar and can :manage_feature_flags and can :api_show_user and
+      can :read_email_addresses and can :view_user_logins
 
     given { |user| user == self && user.user_can_edit_name? }
     can :rename

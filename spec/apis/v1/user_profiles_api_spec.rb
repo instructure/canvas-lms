@@ -148,6 +148,15 @@ describe "User Profile API", type: :request do
     })
   end
 
+  it "respects :read_email_addresses permission" do
+    RoleOverride.create!(:context => Account.default, :permission => 'read_email_addresses',
+                         :role => Role.get_built_in_role('AccountAdmin'), :enabled => false)
+    json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
+             :controller => "profile", :action => "settings", :user_id => @student.to_param, :format => 'json')
+    expect(json['id']).to eq @student.id
+    expect(json['primary_email']).to be_nil
+  end
+
   it "should return this user's avatars, if allowed" do
     @user = @student
     @student.register
