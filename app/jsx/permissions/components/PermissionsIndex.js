@@ -22,9 +22,7 @@ import {number, arrayOf} from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
-import Spinner from '@instructure/ui-core/lib/components/Spinner'
-import Heading from '@instructure/ui-core/lib/components/Heading'
-import Text from '@instructure/ui-core/lib/components/Text'
+import TabList, {TabPanel} from '@instructure/ui-core/lib/components/TabList'
 
 import select from '../../shared/select'
 import actions from '../actions'
@@ -41,18 +39,23 @@ export default class PermissionsIndex extends Component {
     courseRoles: arrayOf(propTypes.role).isRequired
   }
 
-  static defaultProps = {
-    permissions: []
-  }
-
   render() {
     return (
       <div className="permissions-v2__wrapper">
-        <Heading>{I18n.t('Account Permissions Table')}</Heading>
-        <PermissionsTable
-          roles={this.props.accountRoles}
-          permissions={this.props.accountPermissions}
-        />
+        <TabList>
+          <TabPanel title={I18n.t('Course Roles')}>
+            <PermissionsTable
+              roles={this.props.courseRoles}
+              permissions={this.props.coursePermissions}
+            />
+          </TabPanel>
+          <TabPanel title={I18n.t('Account Roles')}>
+            <PermissionsTable
+              roles={this.props.accountRoles}
+              permissions={this.props.accountPermissions}
+            />
+          </TabPanel>
+        </TabList>
       </div>
     )
   }
