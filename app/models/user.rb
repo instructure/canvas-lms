@@ -324,6 +324,7 @@ class User < ActiveRecord::Base
       record.self_enrollment_course = course
       if course && course.self_enrollment_enabled?
         record.errors.add(attr, "full") if course.self_enrollment_limit_met?
+        record.errors.add(attr, "concluded") if course.concluded?("StudentEnrollment")
         record.errors.add(attr, "already_enrolled") if course.user_is_student?(record, :include_future => true)
       else
         record.errors.add(attr, "invalid")

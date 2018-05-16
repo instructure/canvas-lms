@@ -42,7 +42,7 @@
     <h2 class="ic-Login-confirmation__headline">
       <%= t('titles.course_enrollment', 'Enroll in %{course}', :course => @course.name) %>
     </h2>
-    <% if !@course.self_enrollment_enabled? %>
+    <% if !@course.self_enrollment_enabled? || @course.concluded?("StudentEnrollment") %>
       <%= render :partial => 'enrollment_closed' %>
     <% elsif @current_user && @course.user_is_student?(@current_user, :include_future => true) %>
       <% if params[:enrolled] %>
