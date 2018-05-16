@@ -218,6 +218,7 @@ class Course < ActiveRecord::Base
   validate :validate_course_dates
   validate :validate_course_image
   validate :validate_default_view
+  validates :sis_source_id, uniqueness: {scope: :root_account}, allow_nil: true
   validates_presence_of :account_id, :root_account_id, :enrollment_term_id, :workflow_state
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
