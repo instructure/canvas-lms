@@ -48,3 +48,52 @@ test('showPoints shows elements marked with class toggle_for_hide_points', () =>
   rubricEditing.showPoints($('.rubric'))
   notOk($('.toggle_for_hide_points').hasClass('hidden'))
 })
+
+const rubricHtml =
+  '<div class="edit_rubric_test">' +
+  ' <div class="rubric">' +
+  '  <form id="edit_rubric_form">' +
+  '   <input type="checkbox" id="hide_points" class="hide_points_checkbox" />' +
+  '   <div class="rubric_grading">' +
+  '    <input type="checkbox" id="grading_rubric" class="grading_rubric_checkbox" />' +
+  '   </div>' +
+  '   <div class="totalling_rubric">' +
+  '    <input type="checkbox" id="totalling_rubric" class="totalling_rubric_checkbox" />' +
+  '   </div>' +
+  '  </form>' +
+  ' </div>' +
+  '</div>';
+
+test('clicking hide_points checkbox hides grading_rubric checkbox', () => {
+  $(document.body).append($(rubricHtml))
+  rubricEditing.init()
+  $('.hide_points_checkbox').prop('checked', true)
+  $('.hide_points_checkbox').triggerHandler('change')
+  ok($('.rubric_grading').attr('style').includes('display: none;'))
+})
+
+test('clicking hide_points checkbox unchecks grading_rubric checkbox if checked', () => {
+  $(document.body).append($(rubricHtml))
+  rubricEditing.init()
+  $('.hide_points_checkbox').prop('checked', true)
+  $('.grading_rubric_checkbox').prop('checked', true)
+  $('.hide_points_checkbox').triggerHandler('change')
+  notOk($('.grading_rubric_checkbox').prop('checked'))
+})
+
+test('clicking hide_points checkbox hides totalling_rubric checkbox', () => {
+  $(document.body).append($(rubricHtml))
+  rubricEditing.init()
+  $('.hide_points_checkbox').prop('checked', true)
+  $('.hide_points_checkbox').triggerHandler('change')
+  ok($('.totalling_rubric').attr('style').includes('display: none'))
+})
+
+test('clicking hide_points checkbox unchecks totalling_rubric checkbox if checked', () => {
+  $(document.body).append($(rubricHtml))
+  rubricEditing.init()
+  $('.hide_points_checkbox').prop('checked', true)
+  $('.totalling_rubric_checkbox').prop('checked', true)
+  $('.hide_points_checkbox').triggerHandler('change')
+  notOk($('.totalling_rubric_checkbox').prop('checked'))
+})
