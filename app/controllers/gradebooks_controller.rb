@@ -599,7 +599,9 @@ class GradebooksController < ApplicationController
     @can_comment_on_submission = !@context.completed? && !@context_enrollment.try(:completed?)
     @disable_unmute_assignment = @assignment.muted && !@assignment.grades_published? && anonymous_moderated_marking_enabled?
     respond_to do |format|
+
       format.html do
+        rubric = @assignment&.rubric_association&.rubric
         @headers = false
         @outer_frame = true
         @anonymous_moderated_marking_enabled = anonymous_moderated_marking_enabled?
@@ -617,6 +619,8 @@ class GradebooksController < ApplicationController
           course_id: @context.id,
           assignment_id: @assignment.id,
           assignment_title: @assignment.title,
+          rubric: rubric ? rubric_json(rubric, @current_user, session, style: 'full') : nil,
+          nonScoringRubrics: @domain_root_account.feature_enabled?(:non_scoring_rubrics),
           can_comment_on_submission: @can_comment_on_submission,
           show_help_menu_item: show_help_link?,
           help_url: help_link_url

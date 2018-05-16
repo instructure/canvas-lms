@@ -23,7 +23,13 @@ import { rubric, pointsAssessment } from './fixtures'
 
 describe('the Rubric component', () => {
   it('renders as expected', () => {
-    const modal = shallow(<Rubric rubric={rubric} rubricAssessment={pointsAssessment}/>)
+    const modal = shallow(
+      <Rubric
+        rubric={rubric}
+        rubricAssessment={pointsAssessment}
+        rubricAssociation={pointsAssessment.rubric_association}
+      />
+    )
     expect(modal.debug()).toMatchSnapshot()
   })
 
@@ -34,6 +40,7 @@ describe('the Rubric component', () => {
       <Rubric
         rubric={rubric}
         rubricAssessment={hidden}
+        rubricAssociation={hidden.rubric_association}
       />)
     expect(modal.debug()).toMatchSnapshot()
   })

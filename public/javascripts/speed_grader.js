@@ -1213,11 +1213,8 @@ EG = {
     if (!jsonData.rubric_association) { return; }
     if (!rubricFull.filter(":visible").length) { return; }
 
-    rubricAssessment.populateRubric(
-      rubricFull.find(".rubric"),
-      rubricAssessmentToPopulate()
-    );
-
+    const container = rubricFull.find(".rubric")
+    rubricAssessment.populateNewRubric(container, rubricAssessmentToPopulate(), jsonData.rubric_association)
     $("#grading").height(rubricFull.height());
   },
 

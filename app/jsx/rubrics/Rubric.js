@@ -23,9 +23,9 @@ import I18n from 'i18n!edit_rubric'
 
 import Criterion from './Criterion'
 
-import { rubricShape, rubricAssessmentShape } from './types'
+import { rubricShape, rubricAssessmentShape, rubricAssociationShape } from './types'
 
-const Rubric = ({ rubric, rubricAssessment }) => {
+const Rubric = ({ rubric, rubricAssessment, rubricAssociation }) => {
   const byCriteria = _.keyBy(rubricAssessment.data, (ra) => ra.criterion_id)
   const criteria = rubric.criteria.map((criterion) => {
     const assessment = byCriteria[criterion.id]
@@ -59,7 +59,7 @@ const Rubric = ({ rubric, rubricAssessment }) => {
           {criteria}
           <tr>
             <td colSpan="3" className="total-points">
-              {rubricAssessment.rubric_association.hide_score_total === true ? null : total}
+              {rubricAssociation.hide_score_total === true ? null : total}
             </td>
           </tr>
         </tbody>
@@ -69,7 +69,11 @@ const Rubric = ({ rubric, rubricAssessment }) => {
 }
 Rubric.propTypes = {
   rubric: PropTypes.shape(rubricShape).isRequired,
-  rubricAssessment: PropTypes.shape(rubricAssessmentShape).isRequired
+  rubricAssessment: PropTypes.shape(rubricAssessmentShape).isRequired,
+  rubricAssociation: PropTypes.shape(rubricAssociationShape)
+}
+Rubric.defaultProps = {
+  rubricAssociation: {}
 }
 
 export default Rubric

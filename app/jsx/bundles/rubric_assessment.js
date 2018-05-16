@@ -37,12 +37,12 @@ const findRubricAssessment = (id) => {
 }
 
 document.querySelectorAll(".react_rubric_container").forEach((rubricElement) => {
+  const assessment = findRubricAssessment(rubricElement.dataset.rubricAssessmentId)
   ReactDOM.render((
     <Rubric
-      rubricId={rubricElement.dataset.rubricId}
-      rubricAssessmentId={rubricElement.dataset.rubricAssessmentId}
       rubric={findRubric(rubricElement.dataset.rubricId)}
-      rubricAssessment={findRubricAssessment(rubricElement.dataset.rubricAssessmentId)}
+      rubricAssessment={assessment}
+      rubricAssociation={assessment.rubric_association}
     />
   ), rubricElement)
 })

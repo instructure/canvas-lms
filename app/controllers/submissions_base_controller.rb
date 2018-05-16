@@ -17,6 +17,8 @@
 #
 
 class SubmissionsBaseController < ApplicationController
+  include Api::V1::Rubric
+
   def show
     @visible_rubric_assessments = @submission.visible_rubric_assessments_for(@current_user)
     @assessment_request = @submission.assessment_requests.where(assessor_id: @current_user).first
@@ -27,7 +29,17 @@ class SubmissionsBaseController < ApplicationController
 
     respond_to do |format|
       @submission.limit_comments(@current_user, session)
-      format.html { render 'submissions/show' }
+      format.html do
+        rubric_association = @assignment&.rubric_association
+        rubric_association_json = rubric_association&.as_json
+        rubric = rubric_association&.rubric
+        js_env({
+          nonScoringRubrics: @domain_root_account.feature_enabled?(:non_scoring_rubrics),
+          rubric: rubric ? rubric_json(rubric, @current_user, session, style: 'full') : nil,
+          rubricAssociation: rubric_association_json ? rubric_association_json['rubric_association'] : nil
+        })
+         render 'submissions/show'
+      end
       format.json do
         @submission.limit_comments(@current_user, session)
         render :json => @submission.as_json(

@@ -56,6 +56,5 @@ export const rubricAssociationShape = {
 
 export const rubricAssessmentShape = {
   data: PropTypes.arrayOf(PropTypes.shape(assessmentShape)).isRequired,
-  rubric_association: PropTypes.shape(rubricAssociationShape).isRequired,
   score: PropTypes.number.isRequired
 }
