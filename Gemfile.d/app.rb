@@ -63,7 +63,9 @@ gem 'inst-jobs', '0.14.5'
 gem 'switchman-inst-jobs', '1.1.4'
 gem 'inst-jobs-autoscaling', '1.0.3'
   gem 'aws-sdk-autoscaling', '1.5.0', require: false
-gem 'ffi', '1.9.23', require: false
+# ffi 1.9.2x seem to have issues on RHEL & CentOS causing segfaults
+# check https://github.com/ffi/ffi/issues/621 for resolution prior to bumping version
+gem 'ffi', '1.9.18', require: false
 gem 'hashery', '2.1.2', require: false
 gem 'highline', '1.7.10', require: false
 gem 'httparty', '0.16.1'
