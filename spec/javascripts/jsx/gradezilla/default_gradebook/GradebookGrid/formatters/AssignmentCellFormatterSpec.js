@@ -541,7 +541,7 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
         strictEqual(renderCell().querySelectorAll('i.icon-check.Grade--complete').length, 1)
       })
 
-      test('renders a checkmark when the grade is "incomplete"', () => {
+      test('renders an x-mark when the grade is "incomplete"', () => {
         submission.grade = 'Incomplete (i18n)'
         submission.rawGrade = 'incomplete'
         submission.score = 0

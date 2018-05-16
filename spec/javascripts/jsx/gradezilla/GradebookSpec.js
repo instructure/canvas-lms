@@ -4531,23 +4531,6 @@ QUnit.module('Gradebook Grid Events', () => {
       strictEqual(gradebook.onBeforeEditCell(null, eventObject), false);
     });
 
-    test('returns false when the student enrollment is concluded', () => {
-      gradebook.students[1101].isConcluded = true;
-      strictEqual(gradebook.onBeforeEditCell(null, eventObject), false);
-    });
-
-    test('returns false when the submission is locked', () => {
-      gradebook.submissionStateMap.getSubmissionState
-        .withArgs({ user_id: '1101', assignment_id: '2301' }).returns({ locked: true });
-      strictEqual(gradebook.onBeforeEditCell(null, eventObject), false);
-    });
-
-    test('returns true when the submission state is undefined', () => {
-      gradebook.submissionStateMap.getSubmissionState
-        .withArgs({ user_id: '1101', assignment_id: '2301' }).returns(undefined);
-      strictEqual(gradebook.onBeforeEditCell(null, eventObject), true);
-    });
-
     test('returns true when the cell is not in an assignment column', () => {
       eventObject.column = { type: 'custom_column' };
       strictEqual(gradebook.onBeforeEditCell(null, eventObject), true);
@@ -7985,6 +7968,91 @@ test('affects submissions that are in not-closed grading periods', function () {
 
 QUnit.module('Gradebook', () => {
   let gradebook
+
+  QUnit.module('#isGradeEditable()', hooks => {
+    hooks.beforeEach(() => {
+      gradebook = createGradebook()
+      gradebook.students = {1101: {id: '1101', isConcluded: false}}
+      sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').returns({hideGrade: false, locked: false})
+    })
+
+    hooks.afterEach(() => {
+      gradebook.submissionStateMap.getSubmissionState.restore()
+    })
+
+    test('returns true when the submission state is not locked', () => {
+      strictEqual(gradebook.isGradeEditable('1101', '2301'), true)
+    })
+
+    test('returns false when the submission state is locked', () => {
+      gradebook.submissionStateMap.getSubmissionState.returns({hideGrade: false, locked: true})
+      strictEqual(gradebook.isGradeEditable('1101', '2301'), false)
+    })
+
+    test('returns false when the submission state is not defined', () => {
+      gradebook.submissionStateMap.getSubmissionState.returns(undefined)
+      strictEqual(gradebook.isGradeEditable('1101', '2301'), false)
+    })
+
+    test('uses the given assignment id when retrieving submission state', () => {
+      gradebook.isGradeEditable('1101', '2301')
+      const submission = gradebook.submissionStateMap.getSubmissionState.lastCall.args[0]
+      strictEqual(submission.assignment_id, '2301')
+    })
+
+    test('uses the given student id when retrieving submission state', () => {
+      gradebook.isGradeEditable('1101', '2301')
+      const submission = gradebook.submissionStateMap.getSubmissionState.lastCall.args[0]
+      strictEqual(submission.user_id, '1101')
+    })
+
+    test('returns false when the student enrollment is concluded', () => {
+      gradebook.students[1101].isConcluded = true
+      strictEqual(gradebook.isGradeEditable('1101', '2301'), false)
+    })
+
+    test('returns false when the student is not loaded', () => {
+      delete gradebook.students[1101]
+      strictEqual(gradebook.isGradeEditable('1101', '2301'), false)
+    })
+  })
+
+  QUnit.module('#isGradeVisible()', hooks => {
+    hooks.beforeEach(() => {
+      gradebook = createGradebook()
+      sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').returns({hideGrade: false, locked: true})
+    })
+
+    hooks.afterEach(() => {
+      gradebook.submissionStateMap.getSubmissionState.restore()
+    })
+
+    test('returns true when the submission state is not hiding the grade', () => {
+      strictEqual(gradebook.isGradeVisible('1101', '2301'), true)
+    })
+
+    test('returns false when the submission state is hiding the grade', () => {
+      gradebook.submissionStateMap.getSubmissionState.returns({hideGrade: true, locked: true})
+      strictEqual(gradebook.isGradeVisible('1101', '2301'), false)
+    })
+
+    test('returns false when the submission state is not defined', () => {
+      gradebook.submissionStateMap.getSubmissionState.returns(undefined)
+      strictEqual(gradebook.isGradeVisible('1101', '2301'), false)
+    })
+
+    test('uses the given assignment id when retrieving submission state', () => {
+      gradebook.isGradeVisible('1101', '2301')
+      const submission = gradebook.submissionStateMap.getSubmissionState.lastCall.args[0]
+      strictEqual(submission.assignment_id, '2301')
+    })
+
+    test('uses the given student id when retrieving submission state', () => {
+      gradebook.isGradeVisible('1101', '2301')
+      const submission = gradebook.submissionStateMap.getSubmissionState.lastCall.args[0]
+      strictEqual(submission.user_id, '1101')
+    })
+  })
 
   QUnit.module('#addPendingGradeInfo()', hooks => {
     let pendingGradeInfo

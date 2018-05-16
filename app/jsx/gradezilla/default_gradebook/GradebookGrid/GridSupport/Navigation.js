@@ -19,7 +19,6 @@
 import GridHelper from './GridHelper';
 import {isRTL} from '../../../../shared/helpers/rtlHelper';
 
-
 function isLeftArrow (event) {
   return event.which === 37;
 }

@@ -259,7 +259,6 @@ define [
       @gradebookGrid = new GradebookGrid({
         $container: document.getElementById('gradebook_grid')
         activeBorderColor: '#1790DF' # $active-border-color
-        change_grade_url: @options.change_grade_url
         data: @gridData
         editable: @options.gradebook_is_editable
         gradebook: @
@@ -1716,13 +1715,9 @@ define [
       if obj.column.type == 'custom_column' && @getCustomColumn(obj.column.customColumnId)?.read_only
         return false
       return true if obj.column.type != 'assignment'
-      return false unless student = @student(obj.item.id)
-      return false if student.isConcluded
-      submissionState = @submissionStateMap.getSubmissionState({
-        user_id: obj.item.id,
-        assignment_id: obj.column.assignmentId
-      })
-      not submissionState?.locked
+
+      # Allow editing when the student has been loaded.
+      !!@student(obj.item.id)
 
     # The current cell editor has been changed and is valid
     onCellChange: (event, obj) =>
@@ -2356,6 +2351,16 @@ define [
 
     setSubmissionsLoaded: (loaded) =>
       @contentLoadStates.submissionsLoaded = loaded
+
+    isGradeEditable: (studentId, assignmentId) =>
+      student = @student(studentId)
+      return false if !student || student.isConcluded
+      submissionState = @submissionStateMap.getSubmissionState(assignment_id: assignmentId, user_id: studentId)
+      submissionState? && !submissionState.locked
+
+    isGradeVisible: (studentId, assignmentId) =>
+      submissionState = @submissionStateMap.getSubmissionState(assignment_id: assignmentId, user_id: studentId)
+      submissionState? && !submissionState.hideGrade
 
     addPendingGradeInfo: (submission, gradeInfo) =>
       { userId, assignmentId } = submission
