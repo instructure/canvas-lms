@@ -21,6 +21,7 @@
 $border-color: #ddd;
 $borderShadow: inset 0 1px 0 0 $border-color;
 
+$faintRowBg: #fafafa;
 $lightRowBg: #fff;
 $darkRowBg: #f9f9f9;
 
@@ -75,6 +76,43 @@ $darkRowBg: #f9f9f9;
     text-align: center;
   }
 
+  // STICKY PROPERTIES
+  .ic-permissions__corner-stone {
+    position: sticky;
+    left: 0;
+    top: 0;
+    z-index: 100;
+    background-color: $faintRowBg;
+  }
+
+  .ic-permissions__corner-stone:after{
+    content:'';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    border-bottom: 1px solid $border-color;
+  }
+
+  .ic-permissions__main-left-header {
+    position: sticky;
+    left: 0;
+    z-index: 9;
+  }
+
+  // the header cells of the expanded row
+  .ic-permissions__left-header__expanded {
+    position: sticky;
+    left: 0;
+
+    .ic-permissions__left-header__col-wrapper {
+
+      .ic-permissions__header-content {
+        text-align: right;
+      }
+    }
+  }
+
   // header cell for the top and side headers
   .ic-permissions__header-content {
     position: absolute;
@@ -83,11 +121,27 @@ $darkRowBg: #f9f9f9;
     background-color: inherit;
   }
 
+  .ic-permissions__top-header__col-wrapper-th {
+    position: sticky;
+    top: 0;
+    z-index: 8;
+    background: $faintRowBg;
+  }
+
+  .ic-permissions__top-header__col-wrapper-th:after{
+    content:'';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    border-bottom: 1px solid $border-color;
+  }
+
   // the top "fixed" header
   .ic-permissions__top-header__col-wrapper {
     height: 50px;
     width: 140px;
-    background: #fafafa;
+    background: $faintRowBg;
   }
 
   // the left "fixed" header
@@ -98,22 +152,10 @@ $darkRowBg: #f9f9f9;
 
     .ic-permissions__header-content {
       text-align: left;
-      padding-right: 10px;
 
       // that border shadow effect on the left side header
       border-right: 1px solid #ddd;
       box-shadow: 3px 4px 5px 0 #e8e8e8, $borderShadow;
-    }
-  }
-
-  // the header cells of the expanded row
-  .ic-permissions__left-header__expanded {
-
-    .ic-permissions__left-header__col-wrapper {
-
-      .ic-permissions__header-content {
-        text-align: right;
-      }
     }
   }
 

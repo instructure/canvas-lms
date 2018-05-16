@@ -41,26 +41,6 @@ export default class PermissionsTable extends Component {
     expanded: {}
   }
 
-  // we should debounce this onScroll event because it's very trigger happy
-  // and is going to kill our performance otherwise by causing soooo many re-renders a second
-  onScroll = e => {
-    this.setState({
-      leftOffset: e.target.scrollLeft,
-      topOffset: e.target.scrollTop
-    })
-  }
-
-  fixScroll = e => {
-    const sidebarWidth = 300
-    const leftOffset = e.target.offsetParent.offsetLeft
-    const leftScroll = this.contentWrapper.scrollLeft
-
-    if (leftOffset - sidebarWidth < leftScroll) {
-      const newScroll = Math.max(0, this.contentWrapper.scrollLeft - sidebarWidth)
-      this.contentWrapper.scrollLeft = newScroll
-    }
-  }
-
   toggleExpanded(id) {
     return () => {
       const expanded = Object.assign(this.state.expanded)
@@ -77,9 +57,14 @@ export default class PermissionsTable extends Component {
   renderTopHeader() {
     return (
       <tr className="ic-permissions__top-header">
-        <td />
+        <td className="ic-permissions__corner-stone" />
         {this.props.roles.map(role => (
-          <th key={role.id} scope="col" aria-label={role.label}>
+          <th
+            key={role.id}
+            scope="col"
+            aria-label={role.label}
+            className="ic-permissions__top-header__col-wrapper-th"
+          >
             <div className="ic-permissions__top-header__col-wrapper">
               <div
                 style={{top: `${this.state.topOffset}px`}}
@@ -96,7 +81,7 @@ export default class PermissionsTable extends Component {
 
   renderLeftHeader(perm) {
     return (
-      <th scope="row" aria-label={perm.label}>
+      <th scope="row" className="ic-permissions__main-left-header" aria-label={perm.label}>
         <div className="ic-permissions__left-header__col-wrapper">
           <div
             style={{left: `${this.state.leftOffset}px`}}
@@ -135,11 +120,7 @@ export default class PermissionsTable extends Component {
         {this.props.roles.map(role => (
           <td key={role.id}>
             <div className="ic-permissions__cell-content">
-              <input
-                onFocus={this.fixScroll}
-                type="checkbox"
-                aria-label="toggle some mini permission"
-              />
+              <input type="checkbox" aria-label="toggle some mini permission" />
             </div>
           </td>
         ))}
@@ -158,9 +139,7 @@ export default class PermissionsTable extends Component {
               {this.props.roles.map(role => (
                 <td key={role.id}>
                   <div className="ic-permissions__cell-content">
-                    <button onFocus={this.fixScroll} aria-label="toggle some permission">
-                      √
-                    </button>
+                    <button aria-label="toggle some permission">√</button>
                   </div>
                 </td>
               ))}
@@ -176,7 +155,6 @@ export default class PermissionsTable extends Component {
     return (
       <div
         className="ic-permissions__table-container"
-        onScroll={this.onScroll}
         ref={c => {
           this.contentWrapper = c
         }}
