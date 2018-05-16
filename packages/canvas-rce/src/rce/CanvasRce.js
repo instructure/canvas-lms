@@ -26,9 +26,6 @@ import formatMessage from "../format-message";
 import Bridge from "../bridge";
 import skin from "tinymce-light-skin";
 
-// for pretranslated builds (see async.js for details)
-import '../async';
-
 export default class CanvasRce extends Component {
   static propTypes = {
     skin: PropTypes.object,
@@ -39,26 +36,13 @@ export default class CanvasRce extends Component {
     rcePropsToggle: PropTypes.bool
   };
 
-  state = { ready: false };
-
   componentWillMount() {
     if (!this.props.skin) {
       skin.useCanvas();
     }
     tinyRCE.DOM.loadCSS = () => {};
-
     this.normalizedProps = normalizeProps(this.props.rceProps, tinyRCE);
-    const language = this.normalizedProps.language;
-
-    if (!process.env.BUILD_LOCALE && language !== "en") {
-      // for non-pretranslated builds (see async.js for details)
-      import(`../locales/${language}`).then(() => {
-        formatMessage.setup({ locale: language });
-        this.setState({ ready: true });
-      });
-    } else {
-      this.setState({ ready: true });
-    }
+    formatMessage.setup({ locale: this.normalizedProps.language });
   }
 
   componentDidMount() {
@@ -73,9 +57,8 @@ export default class CanvasRce extends Component {
   }
 
   render() {
-    if (this.state.ready) {
-      return <RCEWrapper {...this.normalizedProps} ref={node => (this.rce = node)} />;
-    }
-    return null;
+    return (
+      <RCEWrapper {...this.normalizedProps} ref={node => (this.rce = node)} />
+    );
   }
 }

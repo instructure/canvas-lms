@@ -26,12 +26,7 @@
   "license": "AGPL-3.0",
   "babel": {
     "presets": [
-      [
-        "@instructure/ui-presets/babel",
-        {
-          "node": true
-        }
-      ],
+      "@instructure/ui-presets/babel",
       [
         "quiz-presets/babel-preset-instructure-quizzes",
         {

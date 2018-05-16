@@ -34,8 +34,8 @@ const fakeRCEWrapper = React.createClass({
   }
 });
 fakeRCEWrapper["@noCallThru"] = true;
+
 const CanvasRce = proxyquire("../../src/rce/CanvasRce", {
-  "../async": { "@noCallThru": true },
   "./RCEWrapper": fakeRCEWrapper,
   "./tinyRCE": {
     "@noCallThru": true,

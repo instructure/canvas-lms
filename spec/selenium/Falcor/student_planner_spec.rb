@@ -189,7 +189,7 @@ describe "student planner" do
       go_to_list_view
       # confirm the past discussion is not loaded
       expect(f('.PlannerApp')).not_to contain_link(past_discussion.title.to_s)
-      expect(f('.PlannerApp')).to contain_jqcss("button:contains('New Activity')")
+      expect(new_activity_button).to be_displayed
       new_activity_button.click
       expect(f('.PlannerApp')).to contain_link(past_discussion.title.to_s)
     end
