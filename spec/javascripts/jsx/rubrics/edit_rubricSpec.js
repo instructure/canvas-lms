@@ -19,7 +19,7 @@ import $ from 'jquery'
 import rubricEditing from 'edit_rubric'
 
 QUnit.module('edit_rubric', {
-  afterEach: () => {
+  teardown: () => {
     $('.edit_rubric_test').remove()
   }
 })

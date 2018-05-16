@@ -809,6 +809,9 @@ import { uploadFile as rawUploadFile } from 'jsx/shared/upload_file'
   //  property_validations: hash, where key names are form element names
   //    and key values are functions to call on the given data.  The function
   //    should return nothing if valid, an error message for display otherwise.
+  //  labels: map of element names to labels to be used in error reporting.  The validation
+  //    will attempt to determine the appropriate label via HTML <label for="..."> elements
+  //    if not specified
   $.fn.validateForm = function(options) {
     if (this.length === 0) {
       return false;
@@ -833,7 +836,9 @@ import { uploadFile as rawUploadFile } from 'jsx/shared/upload_file'
           if (!errors[name]) {
             errors[name] = [];
           }
-          var fieldPrompt = $form.getFieldLabelString(name);
+          var fieldPrompt = options.labels && options.labels[name]
+          fieldPrompt = fieldPrompt || $form.getFieldLabelString(name);
+
           errors[name].push(I18n.t('errors.required', "Required field")+(fieldPrompt ? ': '+fieldPrompt : ''));
         }
       });

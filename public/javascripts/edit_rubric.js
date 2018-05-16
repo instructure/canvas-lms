@@ -555,6 +555,7 @@ import 'compiled/jquery/fixDialogButtons'
         }
         $rubric_long_description_dialog
           .fillFormData(data).fillTemplateData({data: data})
+          .hideErrors()
           .find('.editing').show().end()
           .find(".displaying").hide().end();
       } else {
@@ -652,6 +653,7 @@ import 'compiled/jquery/fixDialogButtons'
       $rubric_rating_dialog
         .data('current_criterion', $criterion)
         .data('current_rating', $rating)
+        .hideErrors()
         .dialog({
           title: I18n.t('titles.edit_rubric_rating', "Edit Rating"),
           width: 400,
@@ -739,6 +741,13 @@ import 'compiled/jquery/fixDialogButtons'
       var long_description = $rubric_long_description_dialog.find("textarea.long_description").val(),
           description      = $rubric_long_description_dialog.find("textarea.description").val(),
           $criterion       = $rubric_long_description_dialog.data('current_criterion');
+      const valid = $rubric_long_description_dialog.validateForm({
+        required: ['description'],
+        labels: { description: I18n.t('Description') }
+      })
+      if (!valid) {
+        return
+      }
       if($criterion) {
         $criterion.fillTemplateData({data: {long_description: long_description, description_title: description}});
         $criterion.find("textarea.long_description").val(long_description);
@@ -766,15 +775,23 @@ import 'compiled/jquery/fixDialogButtons'
     });
 
     $rubric_rating_dialog.find(".save_button").click(function(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      const data = $rubric_rating_dialog.find("#edit_rating_form").getFormData();
+      const valid = $rubric_rating_dialog.find("#edit_rating_form").validateForm({
+        data,
+        required: ['description'],
+        labels: { description: I18n.t('Rating Title') }
+      })
+      if (!valid) {
+        return
+      }
       const $rating = $rubric_rating_dialog.data('current_rating');
       const $criterion = $rubric_rating_dialog.data('current_criterion');
       const $target = $rating.find('.edit_rating_link');
       const use_range = $criterion.find('.criterion_use_range').attr('checked')
       const $nextRating = $rating.next('.rating')
       const $previousRating = $rating.prev('.rating')
-      event.preventDefault();
-      event.stopPropagation();
-      const data = $rubric_rating_dialog.find("#edit_rating_form").getFormData();
       data.points = round(numberHelper.parse(data.points), 2);
       if (isNaN(data.points)) {
         data.points = numberHelper.parse($criterion.find(".criterion_points").val());
