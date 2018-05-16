@@ -12,6 +12,8 @@ server.listen(8080, "127.0.0.1", () => {
     videoRecording: false
   }
   cypress.run({ config }).then(results => {
-    return server.close()
+    server.close()
+    // Exit non-zero if there were any failures
+    return process.exit(results.failures)
   })
 })

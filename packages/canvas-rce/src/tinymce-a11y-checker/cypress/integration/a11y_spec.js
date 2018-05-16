@@ -11,7 +11,8 @@ describe("a11y Checker", () => {
     cy.get("[aria-label='Check Accessibility']").click()
     cy.get("[aria-label='Accessibility Checker']").within(() => {
       cy.contains("Prev").click()
-      cy.contains("Change heading tag to paragraph").click()
+      cy.get("input[type=text]").type("Kitten")
+
       cy.contains("Apply").click()
       let issueTitle = cy.contains("Issue 1/8")
       expect(issueTitle).to.exist
