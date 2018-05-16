@@ -33,10 +33,10 @@ const Comments = ({ assessment, freeForm }) => (
   <div className={freeForm ? 'rubric-freeform' : ''}>
     <Text size="x-small" weight={freeForm ? 'normal' : 'light'}>
       {
-        assessment.comments_html ?
+        assessment && assessment.comments_html ?
           // eslint-disable-next-line react/no-danger
           <div dangerouslySetInnerHTML={{ __html: assessment.comments_html }} />
-          : assessment.comments
+          : assessment && assessment.comments
       }
     </Text>
   </div>
@@ -130,16 +130,17 @@ export default class Criterion extends React.Component {
     const { assessment, criterion, freeForm } = this.props
     const { dialogOpen } = this.state
 
-    const comments = <Comments assessment={assessment} freeForm={freeForm} />
-    const ratings = freeForm ? comments : (
-      <Ratings tiers={criterion.ratings} points={assessment.points} />
-    )
-
+    const points = assessment && assessment.points
     const outcome = criterion.learning_outcome_id !== undefined
-    const points = assessment.points
     const pointsPossible = criterion.points
     const longDescription = criterion.long_description
     const threshold = criterion.mastery_points
+
+    const comments = <Comments assessment={assessment} freeForm={freeForm} />
+    const ratings = freeForm ? comments : (
+      <Ratings tiers={criterion.ratings} points={points} />
+    )
+
     return (
       <tr className="rubric-criterion">
         <th scope="row" className="description-header">

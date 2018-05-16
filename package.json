@@ -113,6 +113,7 @@
     "eslint-plugin-react": "^7",
     "exports-loader": "^0.7",
     "expose-loader": "^0.7",
+    "fetch-mock": "^6.4.2",
     "file-loader": "^1.1.10",
     "fontfaceobserver": "^2",
     "gglobby": "0.0.3",

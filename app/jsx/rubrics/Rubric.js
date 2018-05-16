@@ -59,7 +59,7 @@ const Rubric = ({ rubric, rubricAssessment, rubricAssociation }) => {
           {criteria}
           <tr>
             <td colSpan="3" className="total-points">
-              {rubricAssociation.hide_score_total === true ? null : total}
+              {rubricAssociation && !rubricAssociation.hide_score_total ? total : null}
             </td>
           </tr>
         </tbody>
