@@ -56,14 +56,6 @@ it("removes all scopes from 'selected scopes' when the checbox is unchecked", ()
   expect(props.setSelectedScopes).toHaveBeenCalledTimes(3)
 })
 
-it("sets read only selected to false when a checkbox is clicked", () => {
-  const wrapper = mount(<DeveloperKeyScopesGroup {...props} />)
-  wrapper.find('button').first().simulate('click')
-  const checkBox = wrapper.find('input[type="checkbox"]').at(1)
-  checkBox.simulate('change', { target: { checked: true } })
-  expect(props.setReadOnlySelected).toHaveBeenLastCalledWith(false)
-})
-
 it("checks the selected scopes", () => {
   const wrapper = mount(<DeveloperKeyScopesGroup {...props} />)
   wrapper.find('button').first().simulate('click')

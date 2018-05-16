@@ -115,8 +115,6 @@ const scopes = {
 }
 
 const props = {
-  dispatch: () => {},
-  actions: { listDeveloperKeyScopesSet: () => {} },
   availableScopes: {
     "oauth":[
        {
@@ -140,7 +138,9 @@ const props = {
        }
     ]
   },
-  filter: ''
+  filter: '',
+  actions: {listDeveloperKeyScopesSet: () => {}},
+  dispatch: () => {}
 }
 
 it("renders each group", () => {
@@ -210,5 +210,79 @@ describe("handlerReadOnlySelected", () => {
     expect(state.selectedScopes).toEqual(expect.arrayContaining(
       []
     ))
+  })
+})
+
+describe("initial state", () => {
+  it("initializes selectedScopes to empty array if selectedScopes prop is undefined", () => {
+    const wrapper = mount(<DeveloperKeyScopesList {...props}/>)
+    const state = wrapper.instance().state
+    expect(state.selectedScopes).toEqual([])
+  })
+})
+
+describe("uniqueSelectedScopes", () => {
+  it("filter out duplicate elements", () => {
+    const wrapper = mount(<DeveloperKeyScopesList {...props}/>)
+    const duplicate = ['a', 'b', 'c', 'd', 'a', 'a', 'a', 'b']
+    const filtered = wrapper.instance().uniqueSelectedScopes(duplicate)
+    expect(filtered).toEqual(expect.arrayContaining(
+      ['a', 'b', 'c', 'd']
+    ))
+  })
+
+  it("does nothing to empty array", () => {
+    const wrapper = mount(<DeveloperKeyScopesList {...props}/>)
+    const filtered = wrapper.instance().uniqueSelectedScopes([])
+    expect(filtered).toEqual([])
+  })
+
+  it("does nothing to array with no duplicate elements", () => {
+    const wrapper = mount(<DeveloperKeyScopesList {...props}/>)
+    const noDuplicate = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+    const filtered = wrapper.instance().uniqueSelectedScopes(noDuplicate)
+    expect(filtered).toEqual(expect.arrayContaining(
+      ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+    ))
+  })
+})
+
+describe("setSelectedScopes", () => {
+  describe("Read Only check box", () => {
+    it("is not checked when no scope is selected", () => {
+      const wrapper = mount(<DeveloperKeyScopesList {...props}/>)
+      wrapper.instance().setSelectedScopes([])
+      const state = wrapper.instance().state
+      expect(state.readOnlySelected).toEqual(false)
+    })
+
+    it("is checked when all possible GET is selected", () => {
+      const wrapper = mount(<DeveloperKeyScopesList {...props}/>)
+      wrapper.instance().setSelectedScopes(['/auth/userinfo', 'url:GET|/api/v1/accounts/search'])
+      const state = wrapper.instance().state
+      expect(state.readOnlySelected).toEqual(true)
+    })
+
+    it("is not checked when some of the GET is selected but nothing else", () => {
+      const wrapper = mount(<DeveloperKeyScopesList {...props}/>)
+      wrapper.instance().setSelectedScopes(['/auth/userinfo'])
+      const state = wrapper.instance().state
+      expect(state.readOnlySelected).toEqual(false)
+    })
+
+    it("is not checked when any verb that is not GET and all possible GET is selected", () => {
+      const wrapper = mount(<DeveloperKeyScopesList {...props}/>)
+      wrapper.instance().setSelectedScopes(['url:POST|/api/v1/account_domain_lookups', '/auth/userinfo',
+      'url:GET|/api/v1/accounts/search'])
+      const state = wrapper.instance().state
+      expect(state.readOnlySelected).toEqual(false)
+    })
+
+    it("is not checked when any verb that is not GET is selected only", () => {
+      const wrapper = mount(<DeveloperKeyScopesList {...props}/>)
+      wrapper.instance().setSelectedScopes(['url:POST|/api/v1/account_domain_lookups'])
+      const state = wrapper.instance().state
+      expect(state.readOnlySelected).toEqual(false)
+    })
   })
 })

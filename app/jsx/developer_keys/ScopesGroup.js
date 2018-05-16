@@ -102,7 +102,6 @@ export default class DeveloperKeyScopesGroup extends React.Component {
     }
 
     this.props.setSelectedScopes(newScopes)
-    this.props.setReadOnlySelected(false)
     this.setState({
       groupChecked: event.currentTarget.checked
     })
@@ -119,8 +118,6 @@ export default class DeveloperKeyScopesGroup extends React.Component {
     }
 
     this.props.setSelectedScopes(newScopes)
-    this.props.setReadOnlySelected(false)
-
     this.setState({
       groupChecked: false
     })

@@ -37,8 +37,8 @@ export default class DeveloperKeyScopesList extends React.Component {
     this.state = {
       formattedScopesArray,
       availableScopes: formattedScopesArray.slice(0, 10), // Only load 10 groups on initial render
-      readOnlySelected: false,
-      selectedScopes: this.props.selectedScopes || []
+      selectedScopes: this.props.selectedScopes || [],
+      readOnlySelected: this.onlySelectGet(this.uniqueSelectedScopes(this.props.selectedScopes))
     }
   }
 
@@ -46,17 +46,30 @@ export default class DeveloperKeyScopesList extends React.Component {
     this.delayedRender()
   }
 
-  setSelectedScopes = selectedScopes => {
+  onlySelectGet(selectedScopes) {
+    const scopes = selectedScopes || []
+    const allAvailableGetScopes = this.availableGetScopes()
+    if (scopes.length !== allAvailableGetScopes.length) {
+      return false
+    }
+    const nonGetScopes = scopes.filter(s => !allAvailableGetScopes.includes(s))
+    if (nonGetScopes.length > 0) {
+      return false
+    }
+    return true
+  }
+
+  setSelectedScopes = scope => {
+    const selectedScopes = this.uniqueSelectedScopes(scope)
     this.setState({
-      selectedScopes
+      selectedScopes,
+      readOnlySelected: this.onlySelectGet(selectedScopes)
     })
     this.props.dispatch(this.props.actions.listDeveloperKeyScopesSet(selectedScopes))
   }
 
-  setReadOnlySelected = readOnlySelected => {
-    this.setState({
-      readOnlySelected
-    })
+  uniqueSelectedScopes(selectedScopes) {
+    return [...new Set(selectedScopes)]
   }
 
   delayedRender = () => {
@@ -72,9 +85,7 @@ export default class DeveloperKeyScopesList extends React.Component {
   handleReadOnlySelected = event => {
     let newScopes = []
     if (event.currentTarget.checked) {
-      newScopes = this.allScopes(this.props.availableScopes)
-        .filter(s => s.verb === 'GET')
-        .map(s => s.scope)
+      newScopes = this.availableGetScopes()
     } else {
       newScopes = []
     }
@@ -83,12 +94,17 @@ export default class DeveloperKeyScopesList extends React.Component {
       selectedScopes: newScopes,
       readOnlySelected: event.currentTarget.checked
     })
-
     this.props.dispatch(this.props.actions.listDeveloperKeyScopesSet(newScopes))
   }
 
   noFilter() {
     return this.props.filter === '' || !this.props.filter
+  }
+
+  availableGetScopes() {
+    return this.allScopes(this.props.availableScopes)
+    .filter(s => s.verb === 'GET')
+    .map(s => s.scope)
   }
 
   allScopes(availableScopes) {
