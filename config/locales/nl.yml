@@ -4985,7 +4985,7 @@ nl:
       other: "%{count} cursussen verwerkt"
     course: Cursus
     course_format: 
-      blended: Samengevoegd
+      blended: Blended
       not_set: "Niet ingesteld"
       on_campus: On-Campus
       online: Online
