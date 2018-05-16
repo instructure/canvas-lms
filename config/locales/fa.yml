@@ -1885,7 +1885,7 @@ fa:
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "مطمئنید که می خواهید این طرح نمره گذاری حذف شود؟"
   are_you_sure_you_want_to_delete_this_to_do_item_497016ea: "مطمئنید که می خواهید این مورد فهرست اقدام حذف شود؟"
   are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
-    one: "آیا مطمئن هستید که میخواهید کپی خود از این مکالمات حذف کنید؟ این عمل قابل لغو نیست"
+    one: "آیا مطمئن هستید که می خواهید کپی خود از این گفتگوها را حذف کنید؟ این عمل قابل لغو نیست."
     other: "آیا مطمئن هستید که می خواهید کپی خود از این گفتگوها را حذف کنید؟ این عمل قابل لغو نیست."
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "مطمئنید که می خواهید رزرو شما برای این رویداد حذف شود؟"
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "آیا مطمئن هستید که می خواهید همگام سازی به %{sisName} را برای همه تکالیف غیرفعال کنید؟"
@@ -1897,7 +1897,7 @@ fa:
   are_you_sure_you_want_to_submit_this_comment_fbe76ba6: "مطمئنید که می خواهید این نظر ارسال شود؟"
   are_you_sure_you_want_to_sync_these_grades_to_the__ca3c28a4: "آیا مطمئن هستید که می خواهید این نمرات را برای سیستم اطلاعات دانش آموزان همگام سازی کنید؟ شما فقط باید درصورتی این کار را انجام دهید که همه نمرات شما نهایی شده باشند."
   are_you_sure_you_want_to_unarchive_these_conversat_ec7d7e8d: 
-    one: "آیا مطمئن هستید که میخواهید این مکالمات را از بایگانی خارج کنید؟"
+    one: "آیا مطمئن هستید که می خواهید این گفتگوها را از بایگانی خارج کنید؟"
     other: "آیا مطمئن هستید که می خواهید این گفتگوها را از بایگانی خارج کنید؟"
   argentina_54_375d6af4: آرژانتین(+54)
   arrange_by_34a545de: "مرتب سازی بر اساس"
@@ -4758,7 +4758,7 @@ fa:
     one: "%{count} دانشجو"
     other: "%{count} دانشجو"
   count_students_in_percentile_percentile_d0adecfe: 
-    one: "%{count} داشجو در %{percentile} درصد"
+    one: "%{count} دانشجو در %{percentile} درصد."
     other: "%{count} دانشجو در %{percentile} درصد."
   count_students_will_get_num_points_c970fc01: 
     one: "%{count} دانشجو، %{num} امتیاز کسب خواهند کرد"
@@ -7761,7 +7761,7 @@ fa:
     hide_notes: "مخفی کردن ستون یادداشت ها"
     hide_student_names: "مخفی کردن نام دانشجویان"
     invalid_assignment_groups_warning: 
-      one: "نمره شامل  %{groups} نمی شود، زیرا هیچ امتیاز ممکنی  ندارد."
+      one: "نمره شامل %{groups} نمی شود، زیرا هیچ امتیاز ممکنی  ندارند"
       other: "نمره شامل %{groups} نمی شود، زیرا هیچ امتیاز ممکنی  ندارند"
     keyboard_assignment_desc: "رفتن به صفحه جزئیات تکلیف فعلی"
     keyboard_close_menu: "بستن منوی تکلیف فعال کنونی"
@@ -11605,7 +11605,7 @@ fa:
       twitter: 
         tweet: "هشدار کانواس - ضبط آماده است: %{title}، %{name}"
   messages_deleted_8f781481: 
-    one: "پیام حذف شد!"
+    one: "پیام ها حذف شد!"
     other: "پیام ها حذف شد!"
   mexico_52_60d635c7: "مکزیک (+52)"
   mgp_grade_export_d29b471f: "صدور نمره MGP"
@@ -15618,7 +15618,7 @@ fa:
   scheduler_shown_df77ca6f: "زمان بند نمایش داده شده"
   school_of_rock_4b7b1fd0: "School of Rock"
   score_does_not_include_groups_because_they_have_no_80d12f42: 
-    one: "نمره شامل  %{groups} نمی شود، زیرا آنها هیچ امتیاز ممکن ندارند"
+    one: "نمره شامل %{groups} نیست زیرا آنها هیچ امتیاز ممکنی ندارند"
     other: "نمره شامل %{groups} نیست زیرا آنها هیچ امتیاز ممکنی ندارند"
   score_f7ac9e08: نمره
   score_muted_82eef66: "نمره: (غیر فعال)"
@@ -15892,7 +15892,7 @@ fa:
   select_a_log_type_to_search_247fc6b4: "نوع گزارش ثبت وقایع را برای جستجو انتخاب کنید."
   select_a_predefined_color_c77ab2f5: "یک رنگ از پیش تعیین شده انتخاب کنید."
   select_all_count_courses_4fc63811: 
-    one: "انتخاب همه (%{count}) درس"
+    one: "انتخاب همه درس های (%{count})"
     other: "انتخاب همه درس های (%{count})"
   select_all_students_7c2c34b3: "انتخاب همه دانشجویان"
   select_audio_file_7d905cce: "انتخاب فایل صوتی"
