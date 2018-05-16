@@ -6144,6 +6144,153 @@ describe Assignment do
     end
   end
 
+  describe '#moderated_grader_limit_reached?' do
+    before(:once) do
+      @course = Course.create!
+      teacher = User.create!
+      second_teacher = User.create!
+      @ta = User.create!
+      @course.enroll_teacher(teacher, enrollment_state: 'active')
+      @course.enroll_teacher(second_teacher, enrollment_state: 'active')
+      @course.enroll_ta(@ta, enrollment_state: 'active')
+      @assignment = @course.assignments.create!(
+        final_grader: teacher,
+        grader_count: 2,
+        moderated_grading: true
+      )
+      @assignment.moderation_graders.create!(user: second_teacher, anonymous_id: '12345')
+    end
+
+    it 'returns false if anonymous moderated marking is off' do
+      @assignment.moderation_graders.create!(user: @ta, anonymous_id: '54321')
+      expect(@assignment.moderated_grader_limit_reached?).to eq false
+    end
+
+    context 'when anonymous moderated marking is enabled' do
+      before :once do
+        @course.root_account.enable_feature!(:anonymous_moderated_marking)
+      end
+
+      it 'returns false if all grader slots are not filled' do
+        expect(@assignment.moderated_grader_limit_reached?).to eq false
+      end
+
+      it 'returns true if all grader slots are filled' do
+        @assignment.moderation_graders.create!(user: @ta, anonymous_id: '54321')
+        expect(@assignment.moderated_grader_limit_reached?).to eq true
+      end
+
+      it 'returns false if moderated grading is off' do
+        @assignment.moderation_graders.create!(user: @ta, anonymous_id: '54321')
+        @assignment.moderated_grading = false
+        expect(@assignment.moderated_grader_limit_reached?).to eq false
+      end
+    end
+  end
+
+  describe '#can_be_moderated_grader?' do
+    before(:once) do
+      @course = Course.create!
+      @teacher = User.create!
+      @second_teacher = User.create!
+      @final_teacher = User.create!
+      @course.enroll_teacher(@teacher, enrollment_state: 'active')
+      @course.enroll_teacher(@second_teacher, enrollment_state: 'active')
+      @course.enroll_teacher(@final_teacher, enrollment_state: 'active')
+      @assignment = @course.assignments.create!(
+        final_grader: @final_teacher,
+        grader_count: 2,
+        moderated_grading: true
+      )
+      @assignment.moderation_graders.create!(user: @second_teacher, anonymous_id: '12345')
+      @course.root_account.enable_feature!(:anonymous_moderated_marking)
+    end
+
+    shared_examples 'grader permissions are checked' do
+      it 'returns true when the user has default teacher permissions' do
+        expect(@assignment.can_be_moderated_grader?(@teacher)).to be true
+      end
+
+      it 'returns true when the user has permission to only manage grades' do
+        @course.root_account.role_overrides.create!(permission: 'manage_grades', enabled: true, role: teacher_role)
+        @course.root_account.role_overrides.create!(permission: 'view_all_grades', enabled: false, role: teacher_role)
+        expect(@assignment.can_be_moderated_grader?(@teacher)).to be true
+      end
+
+      it 'returns true when the user has permission to only view all grades' do
+        @course.root_account.role_overrides.create!(permission: 'manage_grades', enabled: false, role: teacher_role)
+        @course.root_account.role_overrides.create!(permission: 'view_all_grades', enabled: true, role: teacher_role)
+        expect(@assignment.can_be_moderated_grader?(@teacher)).to be true
+      end
+
+      it 'returns false when the user does not have sufficient privileges' do
+        @course.root_account.role_overrides.create!(permission: 'manage_grades', enabled: false, role: teacher_role)
+        @course.root_account.role_overrides.create!(permission: 'view_all_grades', enabled: false, role: teacher_role)
+        expect(@assignment.can_be_moderated_grader?(@teacher)).to be false
+      end
+    end
+
+    context 'when the assignment is not moderated' do
+      before :once do
+        @assignment.update!(moderated_grading: false)
+      end
+
+      it_behaves_like 'grader permissions are checked'
+    end
+
+    context 'when the assignment is moderated' do
+      it_behaves_like 'grader permissions are checked'
+
+      context 'and moderator limit is reached' do
+        before :once do
+          @assignment.update!(grader_count: 1)
+        end
+
+        it 'returns false' do
+          expect(@assignment.can_be_moderated_grader?(@teacher)).to be false
+        end
+
+        it 'returns true if user is one of the moderators' do
+          expect(@assignment.can_be_moderated_grader?(@second_teacher)).to be true
+        end
+
+        it 'returns true if user is the final grader' do
+          expect(@assignment.can_be_moderated_grader?(@final_teacher)).to be true
+        end
+      end
+    end
+  end
+
+  describe '#can_view_speed_grader?' do
+    before :once do
+      @course = Course.create!
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher, enrollment_state: 'active')
+      @assignment = @course.assignments.create!(
+        final_grader: @teacher,
+        grader_count: 2,
+        moderated_grading: true
+      )
+    end
+
+    it 'returns false when the course does not allow speed grader' do
+      expect(@assignment.context).to receive(:allows_speed_grader?).and_return false
+      expect(@assignment.can_view_speed_grader?(@teacher)).to be false
+    end
+
+    it 'returns false when user cannot be moderated grader' do
+      expect(@assignment.context).to receive(:allows_speed_grader?).and_return true
+      expect(@assignment).to receive(:can_be_moderated_grader?).and_return false
+      expect(@assignment.can_view_speed_grader?(@teacher)).to be false
+    end
+
+    it 'returns true when the course allows speed grader and user can be grader' do
+      expect(@assignment.context).to receive(:allows_speed_grader?).and_return true
+      expect(@assignment).to receive(:can_be_moderated_grader?).and_return true
+      expect(@assignment.can_view_speed_grader?(@teacher)).to be true
+    end
+  end
+
   describe 'Anonymous Moderated Marking setting validation' do
     before(:once) do
       @course.account.enable_feature!(:anonymous_moderated_marking)

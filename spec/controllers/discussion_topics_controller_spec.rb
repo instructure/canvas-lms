@@ -431,6 +431,14 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]).to be_nil
     end
 
+    it "should hide speedgrader when moderated graders limit is reached" do
+      user_session(@teacher)
+      course_topic(user: @teacher, with_assignment: true)
+      allow_any_instance_of(Assignment).to receive(:can_be_moderated_grader?).and_return(false)
+      get 'show', params: {:course_id => @course.id, :id => @topic.id}
+      expect(assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]).to be_nil
+    end
+
     it "should setup speedgrader template for variable substitution" do
       user_session(@teacher)
       course_topic(user: @teacher, with_assignment: true)

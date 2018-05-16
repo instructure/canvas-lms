@@ -317,7 +317,7 @@ module Quizzes
     private
 
     def show_speedgrader?
-      quiz.assignment.present? && quiz.published? && context.allows_speed_grader?
+      quiz.assignment.present? && quiz.published? && quiz.assignment.can_view_speed_grader?(current_user)
     end
 
     def quiz_locked_for_user?

@@ -2792,6 +2792,21 @@ class Assignment < ActiveRecord::Base
     [grader_count, max_course_count].max
   end
 
+  def moderated_grader_limit_reached?
+    moderated_grading? && anonymous_moderated_marking? && moderation_graders.count >= grader_count
+  end
+
+  def can_be_moderated_grader?(user)
+    return false unless context.grants_any_right?(user, :manage_grades, :view_all_grades)
+    return true unless moderated_grader_limit_reached?
+    # Final grader can always be a moderated grader, and existing moderated graders can re-grade
+    final_grader_id == user.id || moderation_graders.where(user_id: user.id).exists?
+  end
+
+  def can_view_speed_grader?(user)
+    context.allows_speed_grader? && can_be_moderated_grader?(user)
+  end
+
   def can_view_other_grader_identities?(user)
     return false unless context.grants_any_right?(user, :manage_grades, :view_all_grades)
     return true unless anonymous_moderated_marking? && moderated_grading?

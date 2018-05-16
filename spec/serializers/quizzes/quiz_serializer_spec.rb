@@ -126,10 +126,10 @@ describe Quizzes::QuizSerializer do
 
     # nil when context doesn't allow speedgrader
     allow(@quiz).to receive(:published?).and_return true
-    expect(@context).to receive(:allows_speed_grader?).and_return false
+    expect(assignment).to receive(:can_view_speed_grader?).with(@user).and_return false
     expect(@serializer.as_json[:quiz][:speed_grader_url]).to be_nil
 
-    expect(@context).to receive(:allows_speed_grader?).and_return true
+    expect(assignment).to receive(:can_view_speed_grader?).with(@user).and_return true
     json = @serializer.as_json[:quiz]
     expect(json[:speed_grader_url]).to eq(
       controller.send(:speed_grader_course_gradebook_url, @quiz.context, assignment_id: @quiz.assignment.id)
