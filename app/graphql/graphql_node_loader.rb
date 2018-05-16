@@ -44,6 +44,12 @@ module GraphQLNodeLoader
       end
     when "GradingPeriod"
       Loaders::IDLoader.for(GradingPeriod).load(id).then(check_read_permission)
+    when "Module"
+      Loaders::IDLoader.for(ContextModule).load(id).then do |mod|
+        Loaders::AssociationLoader.for(ContextModule, :context)
+          .load(mod)
+          .then(check_read_permission)
+      end
     else
       raise UnsupportedTypeError.new("don't know how to load #{type}")
     end

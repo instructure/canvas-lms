@@ -537,6 +537,16 @@ enum GroupMembershipState {
   requested
 }
 
+type Module implements Node, Timestamped {
+  # legacy canvas id
+  _id: ID!
+  createdAt: DateTime
+  id: ID!
+  name: String
+  unlockAt: DateTime
+  updatedAt: DateTime
+}
+
 type Mutation {
   createAssignment(assignment: AssignmentInput!): Assignment
 }
@@ -552,6 +562,7 @@ enum NodeType {
   Course
   Enrollment
   GradingPeriod
+  Module
   Section
   User
 }

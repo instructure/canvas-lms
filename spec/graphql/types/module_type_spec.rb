@@ -16,24 +16,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-Types::LegacyNodeType = GraphQL::EnumType.define do
-  name "NodeType"
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
 
-  value "Assignment"
-  value "Course"
-  value "Section"
-  value "User"
-  value "Enrollment"
-  value "GradingPeriod"
-  value "Module"
+describe Types::ModuleType do
+  let_once(:course) { course_factory(active_all: true) }
+  let_once(:mod) { course.context_modules.create! name: "module", unlock_at: 1.week.from_now }
+  let(:module_type) { GraphQLTypeTester.new(Types::ModuleType, mod) }
 
-=begin
-  # TODO: seems like we should be able to dynamically generate the types that
-  # go here (but i'm getting a circular dep. error when i try)
-    CanvasSchema.types.values.select { |t|
-      t.respond_to?(:interfaces) && t.interfaces.include?(CanvasSchema.types["Node"])
-    }.each { |t|
-      value t
-    }
-=end
+  it "works" do
+    expect(module_type.name).to eq mod.name
+    expect(module_type.unlockAt).to eq mod.unlock_at
+  end
 end

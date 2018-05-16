@@ -171,4 +171,32 @@ describe "legacyNode" do
       ).to be_nil
     end
   end
+
+  context "modules" do
+    before(:once) do
+      @module = @course.context_modules.create! name: "asdf"
+      @query = <<~GQL
+      query {
+        module: legacyNode(type: Module, _id: "#{@module.id}") {
+          ... on Module {
+            _id
+          }
+        }
+      }
+      GQL
+    end
+
+    it "works" do
+      expect(
+        run_query(@query, @student)["data"]["module"]["_id"]
+      ).to eq @module.id.to_s
+    end
+
+    it "requires read permission" do
+      @module.unpublish
+      expect(
+        run_query(@query, @student)["data"]["module"]
+      ).to be_nil
+    end
+  end
 end

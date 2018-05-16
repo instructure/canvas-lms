@@ -16,24 +16,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-Types::LegacyNodeType = GraphQL::EnumType.define do
-  name "NodeType"
+module Types
+  ModuleType = GraphQL::ObjectType.define do
+    name "Module"
 
-  value "Assignment"
-  value "Course"
-  value "Section"
-  value "User"
-  value "Enrollment"
-  value "GradingPeriod"
-  value "Module"
+    implements GraphQL::Relay::Node.interface
+    interfaces [Interfaces::TimestampInterface]
 
-=begin
-  # TODO: seems like we should be able to dynamically generate the types that
-  # go here (but i'm getting a circular dep. error when i try)
-    CanvasSchema.types.values.select { |t|
-      t.respond_to?(:interfaces) && t.interfaces.include?(CanvasSchema.types["Node"])
-    }.each { |t|
-      value t
-    }
-=end
+    global_id_field :id
+    field :_id, !types.ID, "legacy canvas id", property: :id
+
+    field :name, types.String
+
+    field :unlockAt, DateTimeType, property: :unlock_at
+  end
 end
