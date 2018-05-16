@@ -71,6 +71,7 @@ class DeveloperKeysController < ApplicationController
   end
 
   protected
+
   def set_navigation
     @active_tab = 'developer_keys'
     add_crumb t('#crumbs.developer_keys', "Developer Keys")
@@ -104,8 +105,13 @@ class DeveloperKeysController < ApplicationController
     @_use_new_dev_key_features ||= begin
       requested_context = @context || account_from_params || @key&.account
       return if requested_context.blank?
-      requested_context.root_account.feature_enabled?(:developer_key_management_ui_rewrite)
+      has_site_admin_access?(requested_context) ||
+        requested_context.root_account.feature_enabled?(:developer_key_management_ui_rewrite)
     end
+  end
+
+  def has_site_admin_access?(requested_context)
+    requested_context.site_admin? && Setting.get(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, nil).present?
   end
 
   def set_key

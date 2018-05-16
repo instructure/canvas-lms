@@ -62,7 +62,9 @@ class ScopesApiController < ApplicationController
   end
 
   private
+
   def check_feature_flag
+    return if @context.try(:site_admin?) && Setting.get(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, nil).present?
     return if @context.root_account.feature_enabled?(:api_token_scoping)
     render json: [], status: :forbidden
   end

@@ -288,6 +288,7 @@ describe AccessToken do
       before do
         allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
         allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite) { true }
+        Setting.set(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, 'true')
       end
 
       shared_examples_for 'an access token that honors developer key bindings' do

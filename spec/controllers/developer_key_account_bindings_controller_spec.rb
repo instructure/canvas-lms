@@ -40,8 +40,8 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
   end
 
   before do
-    allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
-    allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
+    Setting.set(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, 'true')
+    root_account.enable_feature!(:developer_key_management_ui_rewrite)
   end
 
   shared_examples 'the developer key account binding create endpoint' do
@@ -63,6 +63,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
     end
 
     it 'renders unauthorized if the flag is not enabled in the root account' do
+      allow_any_instance_of(Account).to receive(:feature_enabled?)
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(false)
       user_session(authorized_admin)
       post :create_or_update, params: params
@@ -107,6 +108,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
     end
 
     it 'renders unauthorized if the flag is not enabled in the root account' do
+      allow_any_instance_of(Account).to receive(:feature_enabled?)
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(false)
       user_session(unauthorized_admin)
       post :create_or_update, params: params, format: :json
@@ -142,6 +144,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
     end
 
     it 'renders unauthorized if the flag is not enabled in the root account' do
+      allow_any_instance_of(Account).to receive(:feature_enabled?)
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(false)
       user_session(unauthorized_admin)
       get :index, params: params, format: :json
@@ -208,6 +211,23 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
         user_session(account_admin_user(account: Account.site_admin))
         post :create_or_update, params: site_admin_params
         expect(response).to be_success
+      end
+
+      it 'fails when there is no setting and the account is site admin and developer key has no bindings' do
+        Setting.remove(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES)
+        site_admin_key = DeveloperKey.create!
+        site_admin_key.developer_key_account_bindings.destroy_all
+        site_admin_params = {
+          account_id: 'site_admin',
+          developer_key_id: site_admin_key.global_id,
+          developer_key_account_binding: {
+            workflow_state: 'on'
+          }
+        }
+
+        user_session(account_admin_user(account: Account.site_admin))
+        post :create_or_update, params: site_admin_params
+        expect(response).to be_unauthorized
       end
     end
 
