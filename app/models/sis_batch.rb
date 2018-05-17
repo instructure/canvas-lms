@@ -72,12 +72,14 @@ class SisBatch < ActiveRecord::Base
   end
 
   def self.create_data_attachment(batch, data, display_name)
-    Attachment.new.tap do |att|
-      Attachment.skip_3rd_party_submits(true)
-      att.context = batch
-      att.display_name = display_name
-      Attachments::Storage.store_for_attachment(att, data)
-      att.save!
+    batch.shard.activate do
+      Attachment.new.tap do |att|
+        Attachment.skip_3rd_party_submits(true)
+        att.context = batch
+        att.display_name = display_name
+        Attachments::Storage.store_for_attachment(att, data)
+        att.save!
+      end
     end
   ensure
     Attachment.skip_3rd_party_submits(false)
