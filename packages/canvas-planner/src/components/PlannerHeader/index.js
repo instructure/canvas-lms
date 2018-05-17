@@ -131,7 +131,7 @@ export class PlannerHeader extends Component {
     }
 
     opportunities = opportunities.slice(0, 10);
-    this.setUpdateItemTray(!!nextProps.todo.updateTodoItem || this.state.trayOpen);
+    this.setUpdateItemTray(!!nextProps.todo.updateTodoItem);
     this.setState({opportunities});
   }
 
@@ -166,10 +166,7 @@ export class PlannerHeader extends Component {
 
   handleCancelPlannerItem = () => {
     this.toggleUpdateItemTray();
-    // let the dynamic ui manager manage focus on cancel.
-    if (this.props.cancelEditingPlannerItem) {
-      this.props.cancelEditingPlannerItem();
-    }
+    this.props.cancelEditingPlannerItem();
   }
 
   toggleAriaHiddenStuff = (hide) => {
@@ -231,10 +228,6 @@ export class PlannerHeader extends Component {
     this._doToggleOpportunitiesDropdown(!this.state.opportunitiesOpen);
   }
 
-  noteBtnOnClose = () => {
-    this.props.clearUpdateTodo();
-  }
-
   opportunityTitle = () => {
     return (
       formatMessage(`{
@@ -247,7 +240,7 @@ export class PlannerHeader extends Component {
   }
 
   getTrayLabel = () => {
-    if (this.props.todo.updateTodoItem) {
+    if (this.props.todo.updateTodoItem && this.props.todo.updateTodoItem.title) {
       return formatMessage('Edit {title}', { title: this.props.todo.updateTodoItem.title });
     }
     return formatMessage("Add To Do");
@@ -272,7 +265,7 @@ export class PlannerHeader extends Component {
 
     const firstLoadedMoment = getFirstLoadedMoment(this.props.days, this.props.timeZone);
     const firstNewActivityLoaded = firstLoadedMoment.isSame(this.props.firstNewActivityDate) || firstLoadedMoment.isBefore(this.props.firstNewActivityDate);
-    return (!(firstNewActivityLoaded && !this.props.ui.naiAboveScreen))
+    return (!(firstNewActivityLoaded && !this.props.ui.naiAboveScreen));
   }
 
   renderNewActivity () {
@@ -288,7 +281,7 @@ export class PlannerHeader extends Component {
         >
           {formatMessage("New Activity")}
         </StickyButton>
-      )
+      );
     }
   }
 
@@ -358,7 +351,6 @@ export class PlannerHeader extends Component {
           shouldContainFocus={true}
           shouldReturnFocus={false}
           applicationElement={() => document.getElementById('application') }
-          onExited={this.noteBtnOnClose}
           onDismiss={this.handleCancelPlannerItem}
         >
           <UpdateItemTray

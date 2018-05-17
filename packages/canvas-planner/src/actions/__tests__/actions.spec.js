@@ -241,12 +241,13 @@ describe('api actions', () => {
 });
 
   describe('savePlannerItem', () => {
-    it('dispatches saving and saved actions', () => {
+    it('dispatches saving, clearUpdateTodo, and saved actions', () => {
       const mockDispatch = jest.fn();
       const plannerItem = simpleItem();
       const savePromise = Actions.savePlannerItem(plannerItem)(mockDispatch, getBasicState);
       expect(isPromise(savePromise)).toBe(true);
       expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVING_PLANNER_ITEM', payload: {item: plannerItem, isNewItem: true}});
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_UPDATE_TODO'});
       expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVED_PLANNER_ITEM', payload: savePromise});
     });
 
@@ -256,6 +257,7 @@ describe('api actions', () => {
       const savePromise = Actions.savePlannerItem(plannerItem)(mockDispatch, getBasicState);
       expect(isPromise(savePromise)).toBe(true);
       expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVING_PLANNER_ITEM', payload: {item: plannerItem, isNewItem: false}});
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_UPDATE_TODO'});
       expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVED_PLANNER_ITEM', payload: savePromise});
     });
 
@@ -362,12 +364,13 @@ describe('api actions', () => {
   });
 
   describe('deletePlannerItem', () => {
-    it('dispatches deleting and deleted actions', () => {
+    it('dispatches deleting, clearUpdateTodo, and deleted actions', () => {
       const mockDispatch = jest.fn();
       const plannerItem = simpleItem();
       const deletePromise = Actions.deletePlannerItem(plannerItem)(mockDispatch, getBasicState);
       expect(isPromise(deletePromise)).toBe(true);
       expect(mockDispatch).toHaveBeenCalledWith({type: 'DELETING_PLANNER_ITEM', payload: plannerItem});
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_UPDATE_TODO'});
       expect(mockDispatch).toHaveBeenCalledWith({type: 'DELETED_PLANNER_ITEM', payload: deletePromise});
     });
 
@@ -493,6 +496,15 @@ describe('api actions', () => {
           wasToggled: true,
         });
       });
+    });
+  });
+
+  describe('cancelEditingPlannerItem', () => {
+    it('dispatches clearUpdateTodo and canceledEditingPlannerItem actions', () => {
+      const mockDispatch = jest.fn();
+      Actions.cancelEditingPlannerItem()(mockDispatch, getBasicState);
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_UPDATE_TODO'});
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'CANCELED_EDITING_PLANNER_ITEM'});
     });
   });
 });

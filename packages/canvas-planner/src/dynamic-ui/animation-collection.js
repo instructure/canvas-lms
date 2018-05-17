@@ -78,7 +78,7 @@ export class AnimationCollection {
     {
       expected: [
         'OPEN_EDITING_PLANNER_ITEM',
-        'CANCEL_EDITING_PLANNER_ITEM',
+        'CANCELED_EDITING_PLANNER_ITEM',
       ],
       animation: ReturnFocusOnCancelEditing,
     },

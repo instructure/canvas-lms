@@ -173,7 +173,6 @@ exports[`new activity button does not show when there is no new activity 1`] = `
         ]
       }
       locale="en"
-      noteItem={null}
       onDeletePlannerItem={[Function]}
       onSavePlannerItem={[Function]}
       timeZone="America/Denver"
@@ -413,7 +412,6 @@ exports[`new activity button shows when there is new activity 1`] = `
         ]
       }
       locale="en"
-      noteItem={null}
       onDeletePlannerItem={[Function]}
       onSavePlannerItem={[Function]}
       timeZone="America/Denver"
@@ -664,7 +662,6 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
         ]
       }
       locale="en"
-      noteItem={null}
       onDeletePlannerItem={[Function]}
       onSavePlannerItem={[Function]}
       timeZone="America/Denver"

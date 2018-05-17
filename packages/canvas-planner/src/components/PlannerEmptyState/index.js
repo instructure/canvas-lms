@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, { Component } from 'react';
+import classnames from 'classnames';
 import themeable from '@instructure/ui-themeable/lib';
 import { func } from 'prop-types';
 
@@ -42,7 +43,7 @@ class PlannerEmptyState extends Component {
 
   render () {
     return (
-      <div className={styles.root}>
+      <div className={classnames(styles.root, 'planner-empty-state')}>
         <DesertSvg className={styles.desert} aria-hidden="true" />
         <div className={styles.title}>
           <Heading>{formatMessage("No Due Dates Assigned")}</Heading>

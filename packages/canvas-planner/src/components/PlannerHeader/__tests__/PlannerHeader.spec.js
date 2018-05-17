@@ -20,7 +20,6 @@ import { shallow, mount } from 'enzyme';
 import { PlannerHeader } from '../index';
 import moment from "moment-timezone";
 import sinon from 'sinon';
-import {getFirstLoadedMoment} from "../../../utilities/dateUtils";
 
 const TZ = 'America/Denver';
 const plannerDays = [
@@ -66,7 +65,6 @@ function defaultProps (options) {
       naiAboveScreen: false
     },
     todo: {
-      updateTodoItem: null
     },
     ...options,
   };
@@ -151,16 +149,6 @@ it('renders the tray with the name of an existing item when provided', () => {
     <PlannerHeader {...defaultProps({todo: {updateTodoItem: {title: 'abc'}}})} />
   );
   expect(findEditTray(wrapper).prop('label')).toBe('Edit abc');
-});
-
-it('calls clearUpdateTodo when closing the tray', () => {
-  const fakeClearFunc = jest.fn();
-  const wrapper = mount(
-    <PlannerHeader {...defaultProps()} clearUpdateTodo={fakeClearFunc} />
-  );
-  wrapper.instance().toggleUpdateItemTray();
-  wrapper.instance().noteBtnOnClose();
-  expect(fakeClearFunc).toHaveBeenCalled();
 });
 
 it('does not call getNextOpportunities when component has 12 opportunities', () => {
@@ -367,12 +355,13 @@ it('sets the maxHeight on the Opportunities', () => {
   expect(wrapper.find('Animatable(Opportunities)').prop('maxHeight')).toEqual(640);
 });
 
-it('leaves the tray in current open state when receiving new empty todo props', () => {
+it('opens the tray when it gets an updateTodoItem prop', () => {
   const wrapper = shallow(
     <PlannerHeader {...defaultProps()} />
   );
-  wrapper.instance().toggleUpdateItemTray();
-  wrapper.setProps({...defaultProps({todo: {}})});
+
+  expect(findEditTray(wrapper).prop('open')).toBe(false);
+  wrapper.setProps({...defaultProps({todo: {updateTodoItem: {}}})});
   expect(findEditTray(wrapper).prop('open')).toBe(true);
 });
 

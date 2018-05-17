@@ -18,7 +18,7 @@
 
 import {ReturnFocusOnCancelEditing} from '../index';
 import {createAnimation} from './test-utils';
-import {openEditingPlannerItem, cancelEditingPlannerItem} from '../../../actions';
+import {openEditingPlannerItem, canceledEditingPlannerItem} from '../../../actions';
 
 function setup (hasPriorFocus = true) {
   const createResult = createAnimation(ReturnFocusOnCancelEditing);
@@ -28,7 +28,7 @@ function setup (hasPriorFocus = true) {
   document.activeElement = hasPriorFocus ? 'prior-focus' : document.body;
   animation.acceptAction(openEditingPlannerItem());
   document.activeElement = 'current-focus';
-  animation.acceptAction(cancelEditingPlannerItem());
+  animation.acceptAction(canceledEditingPlannerItem());
   return createResult;
 }
 

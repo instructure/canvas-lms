@@ -60,3 +60,19 @@ it('clears the todo note item on CLEAR_UPDATE_TODO', () => {
   expect(newState).toEqual({});
 });
 
+it('sets a default updateTodoItem if missing', () => {
+  const initialState = basicTodo();
+  const newState = todoReducer(initialState, {
+    type: 'OPEN_EDITING_PLANNER_ITEM'
+  });
+  expect(newState.updateTodoItem).toBeDefined;
+});
+
+it('leaves existing updateTodoItem alone if provided', () => {
+  const updateTodoItem = {title: 'foo'};
+  const initialState = basicTodo({updateTodoItem});
+  const newState = todoReducer(initialState, {
+    type: 'OPEN_EDITING_PLANNER_ITEM'
+  });
+  expect(newState.updateTodoItem).toEqual(updateTodoItem);
+});

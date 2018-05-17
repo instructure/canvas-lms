@@ -170,12 +170,16 @@ module PlannerPageObject
     f('textarea', modal)
   end
 
-  def todo_sidebar_modal(title = nil)
+  def todo_sidebar_modal_selector(title = nil)
     if title
-      f("[aria-label = 'Edit #{title}']")
+      "[aria-label = 'Edit #{title}']"
     else
-      f("[aria-label = 'Add To Do']")
+      "[aria-label = 'Add To Do']"
     end
+  end
+
+  def todo_sidebar_modal(title = nil)
+    f(todo_sidebar_modal_selector(title))
   end
 
   def wait_for_spinner
