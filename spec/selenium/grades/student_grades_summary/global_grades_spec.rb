@@ -21,7 +21,6 @@ require_relative "../pages/student_grades_page"
 
 describe 'Global Grades' do
   include_context "in-process server selenium tests"
-  let(:student_grades_page) {StudentGradesPage.new}
 
   before(:once) do
 
@@ -80,7 +79,7 @@ describe 'Global Grades' do
     # verify url has correct course id
     expect(driver.current_url).to eq app_url + "/courses/#{@course2.id}/grades/#{@student.id}"
     # verify assignment score is correct
-    expect(student_grades_page.final_grade.text).to eq(course_score)
+    expect(StudentGradesPage.final_grade.text).to eq(course_score)
   end
 
 end

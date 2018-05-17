@@ -38,8 +38,6 @@ describe 'Student Gradebook' do
     assignments
   end
 
-  let(:student_grades_page) { StudentGradesPage.new }
-
   grades = [
     5, 10, 15,
     19, 15, 10,
@@ -176,12 +174,12 @@ describe 'Student Gradebook' do
     a3.grade_student(@student, grade: 19, grader: @teacher)
 
     user_session(@teacher)
-    student_grades_page.visit_as_teacher(@course, @student)
-    expect(student_grades_page.assignment_row(a3)).to have_class 'dropped'
+    StudentGradesPage.visit_as_teacher(@course, @student)
+    expect(StudentGradesPage.assignment_row(a3)).to have_class 'dropped'
 
     user_session(@student)
-    student_grades_page.visit_as_student(@course)
-    expect(student_grades_page.assignment_row(a3)).to have_class 'dropped'
+    StudentGradesPage.visit_as_student(@course)
+    expect(StudentGradesPage.assignment_row(a3)).to have_class 'dropped'
   end
 
   context 'Comments' do
@@ -222,10 +220,10 @@ describe 'Student Gradebook' do
       user_session(student)
       get "/courses/#{published_course.id}/grades"
 
-      student_grades_page.toggle_comment_module
+      StudentGradesPage.toggle_comment_module
       unless f('.score_details_table').displayed?
         # 1st click seems to fail on chrome 1 out of 5 times so adding a second click
-        student_grades_page.toggle_comment_module
+        StudentGradesPage.toggle_comment_module
       end
       expect(fj('.score_details_table span:first')).to include_text('good job')
     end

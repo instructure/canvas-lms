@@ -23,8 +23,6 @@ describe 'Late Policy statuses:' do
   include_context "late_policy_course_setup"
   include GradezillaCommon
 
-  let(:student_grades_page) { StudentGradesPage.new }
-
   describe "grade display late policy pills" do
 
     before(:once) do
@@ -46,7 +44,7 @@ describe 'Late Policy statuses:' do
       end
 
       before(:each) do
-        student_grades_page.visit_as_teacher(@course, @course.students.first)
+        StudentGradesPage.visit_as_teacher(@course, @course.students.first)
       end
 
       it 'missing submission does not have missing pill' do
@@ -64,30 +62,30 @@ describe 'Late Policy statuses:' do
       end
 
       before(:each) do
-        student_grades_page.visit_as_teacher(@course, @course.students.first)
+        StudentGradesPage.visit_as_teacher(@course, @course.students.first)
       end
 
       it 'missing submission has missing pill' do
-        expect(student_grades_page.status_pill(@a2.id, 'missing')).to be_displayed
+        expect(StudentGradesPage.status_pill(@a2.id, 'missing')).to be_displayed
       end
 
       it 'late submission has late pill' do
-        expect(student_grades_page.status_pill(@a1.id, 'late')).to be_displayed
+        expect(StudentGradesPage.status_pill(@a1.id, 'late')).to be_displayed
       end
 
       it 'late submission has late penalty' do
-        student_grades_page.show_details_button.click
+        StudentGradesPage.show_details_button.click
         late_penalty_value = "-" + @course.students.first.submissions.find_by(assignment_id:@a1.id).points_deducted.to_s
 
         # the data from rails and data from ui are not in the same format
-        expect(student_grades_page.submission_late_penalty_text(@a1.id).to_f.to_s).to eq late_penalty_value
+        expect(StudentGradesPage.submission_late_penalty_text(@a1.id).to_f.to_s).to eq late_penalty_value
       end
 
       it 'late submission has final grade' do
-        student_grades_page.show_details_button.click
+        StudentGradesPage.show_details_button.click
         final_grade_value = @course.students.first.submissions.find_by(assignment_id:@a1.id).published_grade
 
-        expect(student_grades_page.late_submission_final_score_text(@a1.id)).to eq final_grade_value
+        expect(StudentGradesPage.late_submission_final_score_text(@a1.id)).to eq final_grade_value
       end
     end
   end
