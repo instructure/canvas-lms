@@ -62,6 +62,10 @@ describe 'Developer Keys' do
       fxpath('//*[@class="scopes-group"]/span[1]/span[2]').click
     end
 
+    def click_edit_icon
+      fj("#keys tbody tr.key button:has(svg[name='IconEditLine'])").click
+    end
+
     it "allows creation through 'add developer key button'", test_id: 344077 do
       get "/accounts/#{Account.default.id}/developer_keys"
 
@@ -85,7 +89,8 @@ describe 'Developer Keys' do
     it "allows update through 'edit this key button'", test_id: 344078 do
       root_developer_key
       get "/accounts/#{Account.default.id}/developer_keys"
-      fj("#keys tbody tr.key button:has(svg[name='IconEditLine'])").click
+      click_edit_icon
+      wait_for_ajaximations
       replace_content(f("input[name='developer_key[name]']"), "Cooler Tool")
       replace_content(f("input[name='developer_key[email]']"), "admins@example.com")
       replace_content(f("textarea[name='developer_key[redirect_uris]']"), "http://b/")
@@ -106,7 +111,8 @@ describe 'Developer Keys' do
       dk = root_developer_key
       dk.update_attribute(:redirect_uri, "http://a/")
       get "/accounts/#{Account.default.id}/developer_keys"
-      fj("#keys tbody tr.key button:has(svg[name='IconEditLine'])").click
+      click_edit_icon
+      wait_for_ajaximations
       replace_content(f("input[name='developer_key[name]']"), "Cooler Tool")
       replace_content(f("input[name='developer_key[email]']"), "admins@example.com")
       replace_content(f("input[name='developer_key[redirect_uri]']"), "https://b/")
@@ -127,7 +133,7 @@ describe 'Developer Keys' do
       skip_if_safari(:alert)
       root_developer_key
       get "/accounts/#{Account.default.id}/developer_keys"
-      fj("#keys tbody tr.key button:has(svg[name='IconEditLine'])").click
+      click_edit_icon
       f("input[name='developer_key[icon_url]']").clear
       click_scopes_checkbox
       find_button("Save Key").click
@@ -287,7 +293,89 @@ describe 'Developer Keys' do
         click_inherited_tab
         expect(f("#reactContent")).not_to contain_jqcss("span:contains('Developer Key')")
       end
+    end
 
+    context "scopes" do
+      let(:expected_scopes) do
+        [
+          "url:GET|/api/v1/accounts/search",
+          "url:POST|/api/v1/account_domain_lookups",
+          "url:PUT|/api/v1/account_domain_lookups/:id",
+          "url:DELETE|/api/v1/account_domain_lookups/:id",
+          "url:GET|/api/v1/accounts/search",
+          "url:POST|/api/v1/account_domain_lookups",
+          "url:PUT|/api/v1/account_domain_lookups/:id",
+          "url:DELETE|/api/v1/account_domain_lookups/:id"
+        ]
+      end
+
+      before(:each) do
+        Account.site_admin.allow_feature!(:api_token_scoping)
+        Account.default.enable_feature!(:api_token_scoping)
+        expand_scope_group_by_filter('account_domain_lookups')
+      end
+
+      def expand_scope_group_by_filter(scope)
+        get "/accounts/#{Account.default.id}/developer_keys"
+        find_button("Developer Key").click
+        f("input[placeholder='Search endpoints']").send_keys scope
+        fj(".toggle-scope-group span:contains('#{scope} scopes')").click
+      end
+
+      it "allows filtering by scope group name" do
+        expect(ff(".toggle-scope-group")).to have_size(1)
+      end
+
+      it "expands scope group when group name is selected" do
+        expect(f(".toggle-scope-group button").attribute('aria-expanded')).to eq 'true'
+        expect(ff(".toggle-scope-group .developer-key-scope")).to have_size(4)
+      end
+
+      it "includes proper scopes for scope group" do
+        scope_group = f(".toggle-scope-group")
+        expect(scope_group).to contain_css("span[title='GET']")
+        expect(scope_group).to contain_css("span[title='POST']")
+        expect(scope_group).to contain_css("span[title='PUT']")
+        expect(scope_group).to contain_css("span[title='DELETE']")
+      end
+
+      it "scope group select all checkbox adds all associated scopes" do
+        click_scopes_checkbox
+        # checks that all UI pills have been added to scope group if selected
+        expect(ff(".toggle-scope-group span[title='GET']")).to have_size(2)
+        expect(ff(".toggle-scope-group span[title='POST']")).to have_size(2)
+        expect(ff(".toggle-scope-group span[title='PUT']")).to have_size(2)
+        expect(ff(".toggle-scope-group span[title='DELETE']")).to have_size(2)
+      end
+
+      it "scope group individual checkbox adds only associated scope" do
+        fxpath("//*[@class='developer-key-scope']/span[1]/span[3]").click
+        # adds a UI pill to scope group with http verb if scope selected
+        expect(ff(".toggle-scope-group span[title='GET']")).to have_size(2)
+        expect(ff(".toggle-scope-group span[title='POST']")).to have_size(1)
+        expect(ff(".toggle-scope-group span[title='PUT']")).to have_size(1)
+        expect(ff(".toggle-scope-group span[title='DELETE']")).to have_size(1)
+      end
+
+      it "adds scopes to backend developer key via UI" do
+        click_scopes_checkbox
+        find_button("Save Key").click
+        wait_for_ajaximations
+        expect(DeveloperKey.last.scopes).to eq expected_scopes
+      end
+
+      it "removes scopes from backend developer key via UI" do
+        click_scopes_checkbox
+        find_button("Save Key").click
+        click_edit_icon
+        click_scopes_checkbox
+        f("input[placeholder='Search endpoints']").send_keys 'account_domain_lookups'
+        click_scopes_checkbox
+        dk = DeveloperKey.last
+        find_button("Save Key").click
+        wait_for_ajaximations
+        expect(dk.reload.scopes).not_to eq expected_scopes
+      end
     end
   end
 
