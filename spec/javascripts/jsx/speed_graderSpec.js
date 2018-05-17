@@ -21,7 +21,7 @@ import natcompare from 'compiled/util/natcompare';
 import fakeENV from 'helpers/fakeENV';
 import JQuerySelectorCache from 'jsx/shared/helpers/JQuerySelectorCache';
 import numberHelper from 'jsx/shared/helpers/numberHelper';
-import SpeedGrader from 'speed_grader';
+import SpeedGrader, {teardownHandleFragmentChanged} from 'speed_grader';
 import SpeedgraderHelpers from 'speed_grader_helpers';
 import userSettings from 'compiled/userSettings';
 import 'jquery.ajaxJSON';
@@ -1381,6 +1381,8 @@ QUnit.module('SpeedGrader', function() {
       fakeENV.teardown()
       delete SpeedGrader.EG.currentStudent
       window.jsonData = jsonData
+      teardownHandleFragmentChanged()
+      window.location.hash = ''
     })
 
     test("the iframe src points to a user's submission", () => {
@@ -1739,6 +1741,8 @@ QUnit.module('SpeedGrader', function() {
         fakeENV.teardown()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
+        teardownHandleFragmentChanged()
+        window.location.hash = ''
       })
 
       test('updates the location hash with the anonymous id object', () => {
@@ -1869,6 +1873,8 @@ QUnit.module('SpeedGrader', function() {
         fakeENV.teardown()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
+        teardownHandleFragmentChanged()
+        window.location.hash = ''
       })
 
       test('assessment_user_id is set via anonymous id', () => {
@@ -1908,6 +1914,8 @@ QUnit.module('SpeedGrader', function() {
         fakeENV.teardown()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
+        teardownHandleFragmentChanged()
+        window.location.hash = ''
       })
 
       test('attachmentElement has submitter_id set to anonymous id', () => {
@@ -1946,6 +1954,8 @@ QUnit.module('SpeedGrader', function() {
         fakeENV.teardown()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
+        teardownHandleFragmentChanged()
+        window.location.hash = ''
       })
 
       test('calls isStudentConcluded with student looked up by anonymous id', () => {
@@ -1992,6 +2002,8 @@ QUnit.module('SpeedGrader', function() {
         fakeENV.teardown()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
+        teardownHandleFragmentChanged()
+        window.location.hash = ''
       })
 
       test('calls ajaxJSON with submission url with anonymous id', () => {
@@ -2045,6 +2057,8 @@ QUnit.module('SpeedGrader', function() {
         fakeENV.teardown()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
+        teardownHandleFragmentChanged()
+        window.location.hash = ''
       })
 
       test('calls isStudentConcluded with student looked up by anonymous id', () => {
@@ -2095,6 +2109,8 @@ QUnit.module('SpeedGrader', function() {
         fakeENV.teardown()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
+        teardownHandleFragmentChanged()
+        window.location.hash = ''
       })
 
       test('calls updateSelectMenuStatus with "anonymous_id"', assert => {
@@ -2141,6 +2157,8 @@ QUnit.module('SpeedGrader', function() {
         fakeENV.teardown()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
+        teardownHandleFragmentChanged()
+        window.location.hash = ''
       })
 
       test("the iframe src points to a user's submission by anonymous_id", () => {
@@ -2193,6 +2211,8 @@ QUnit.module('SpeedGrader', function() {
         fakeENV.teardown()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
+        teardownHandleFragmentChanged()
+        window.location.hash = ''
       })
 
       test('attachment src points to the submission download url', () => {

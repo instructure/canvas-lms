@@ -173,7 +173,7 @@ function setupHandleFragmentChanged () {
   return false
 }
 
-function teardownHandleFragmentChanged () {
+export function teardownHandleFragmentChanged () {
   if (EG.isHandleFragmentChangedSet) {
     window.removeEventListener('hashchange', EG.handleFragmentChanged);
     EG.isHandleFragmentChangedSet = false
