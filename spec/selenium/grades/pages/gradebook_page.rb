@@ -106,6 +106,10 @@ module Gradebook
         fj("a:contains('More details in the SpeedGrader')")
       end
 
+      def grade_grid
+        f('#gradebook_grid .container_1')
+      end
+
       # actions
       def visit_gradebook(course, user = nil)
         if user.present?
@@ -115,10 +119,7 @@ module Gradebook
       end
 
       def total_score_for_row(row)
-        grade_grid = f('#gradebook_grid .container_1')
-        rows = grade_grid.find_elements(:css, '.slick-row')
-        total = f('.total-cell', rows[row])
-        total.text
+        f('.total-cell', grade_grid.find_elements(:css, '.slick-row')[row]).text
       end
 
       def select_grading_period(grading_period_id)
@@ -204,6 +205,19 @@ module Gradebook
         # thing again once it has fetched them from the server, completely replacing it
         wait_for_ajax_requests
         fj('.submission_details_dialog:visible')
+      end
+
+      def student_grid
+        f('#gradebook_grid .container_0')
+      end
+
+      def student_row(student)
+        rows = student_grid.find_elements(:css, '.slick-row')
+        rows.index{|row| row.text.include?(student.name)}
+      end
+
+      def student_total_grade(student)
+        total_score_for_row(student_row(student))
       end
     end
   end

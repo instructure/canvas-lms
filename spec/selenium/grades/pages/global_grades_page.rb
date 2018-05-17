@@ -40,7 +40,7 @@ class GlobalGrades
 
     def get_score_for_course(course)
       selected_course = course_row(course)
-      score(selected_course).text
+      score(selected_course).text.split("\n")[0]
     end
 
     def course_row(course)

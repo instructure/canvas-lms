@@ -18,6 +18,7 @@
 require_relative "../../common"
 require_relative "../pages/global_grades_page"
 require_relative "../pages/student_grades_page"
+require_relative "../pages/gradebook_page"
 
 describe 'Global Grades' do
   include_context "in-process server selenium tests"
@@ -30,9 +31,8 @@ describe 'Global Grades' do
     student_in_course(active_all: true)
 
     # create a second course and enroll student
-    @course2 = course_with_teacher(user: @teacher, course_name: "Course 2").course
+    @course2 = course_with_teacher(user: @teacher, course_name: "Course 2", active_all: true).course
     @course2.enroll_student(@student, allow_multiple_enrollments: true).accept(true)
-    @course2.offer!
 
     # create 3 assignments
     @assignment1 = @course2.assignments.create!(
@@ -63,23 +63,45 @@ describe 'Global Grades' do
     @a3.grade_student(@student, grade: 9, grader: @teacher)
   end
 
-  before(:each) do
-    user_session(@student)
+  context 'as student' do
+    before(:each) do
+      user_session(@student)
 
-    # navigate to global grades page
-    GlobalGrades.visit
-  end
+      # navigate to global grades page
+      GlobalGrades.visit
+    end
 
-  it 'goes to student grades page', priority: "1", test_id: 3491485 do
-    # grab score to compare
-    course_score = GlobalGrades.get_score_for_course(@course2)
-    # find link for Second Course and click
-    GlobalGrades.click_course_link(@course2)
+    it 'goes to student grades page', priority: "1", test_id: 3491485 do
+      # grab score to compare
+      course_score = GlobalGrades.get_score_for_course(@course2)
+      # find link for Second Course and click
+      wait_for_new_page_load(GlobalGrades.click_course_link(@course2))
 
     # verify url has correct course id
     expect(driver.current_url).to eq app_url + "/courses/#{@course2.id}/grades/#{@student.id}"
     # verify assignment score is correct
     expect(StudentGradesPage.final_grade.text).to eq(course_score)
+    end
   end
 
+  context 'as teacher' do
+    before(:each) do
+      user_session(@teacher)
+
+      # navigate to global grades page
+      GlobalGrades.visit
+    end
+
+    it 'goes to gradebook page', priority: "1", test_id: 3494790 do
+      # grab scores to compare
+      course_score = GlobalGrades.get_score_for_course(@course2)
+      # find link for Second Course and click
+      wait_for_new_page_load(GlobalGrades.click_course_link(@course2))
+
+      # verify url has correct course id
+      expect(driver.current_url).to eq app_url + "/courses/#{@course2.id}/gradebook"
+      # verify assignment score is correct
+      expect(Gradebook::MultipleGradingPeriods.student_total_grade(@student)).to eq(course_score)
+    end
+  end
 end
