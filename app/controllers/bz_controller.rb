@@ -110,62 +110,6 @@ class BzController < ApplicationController
     end
   end
 
-
-  def get_assignment_info(assignment_id)
-    assignment = Assignment.find(assignment_id)
-    sg = Assignment::SpeedGrader.new(
-      assignment,
-      @current_user,
-      avatars: false,
-      grading_role: :grader
-    ).json
-
-    rubric = assignment.rubric
-
-    criteria = []
-    if rubric
-      rubric.data.each do |criterion|
-        obj = {}
-        obj["description"] = criterion["description"]
-        obj["criterion_id"] = criterion["id"]
-        if criterion["description"]
-          obj["section"] = criterion["description"][/^([0-9]+)/, 1]
-          obj["subsection"] = criterion["description"][/^[0-9]+\.([0-9]+)/, 1]
-        else
-          obj["section"] = 0
-          obj["subsection"] = 0
-        end
-        obj["points_available"] = criterion["points"]
-        criteria << obj
-      end
-    end
-
-    criteria = criteria.sort_by { |h| [h["section"], h["subsection"]] }
-
-    sections = []
-    criteria.each do |c|
-      if sections.length == 0 || sections[-1] != c["section"]
-        sections << c["section"]
-      end
-    end
-
-    sections_points_available = []
-    criteria.each do |c|
-      sections_points_available[c["section"].to_i] = 0.0 if sections_points_available[c["section"].to_i].nil?
-      sections_points_available[c["section"].to_i] += c["points_available"].to_f
-    end
-
-    assignment_info = {}
-    assignment_info[:sg] = sg
-    assignment_info[:assignment] = assignment
-    assignment_info[:rubric] = rubric
-    assignment_info[:criteria] = criteria
-    assignment_info[:sections] = sections
-    assignment_info[:sections_points_available] = sections_points_available
-
-    assignment_info
-  end
-
   def grade_details
     @is_staff = @current_user.id == 1
 
@@ -194,137 +138,8 @@ class BzController < ApplicationController
   end
 
   def grades_download
-    assignments_info = []
-
-    students = []
-
-    if params[:assignment_id]
-      assignments_info << get_assignment_info(params[:assignment_id])
-      students = Course.find(Assignment.find(params[:assignment_id]).context_id).students.active
-    elsif params[:course_id]
-      Course.find(params[:course_id]).assignments.active.each do |a|
-        assignments_info << get_assignment_info(a.id)
-      end
-      students = Course.find(params[:course_id]).students.active
-    end
-
-
-    csv = CSV.generate do |csv|
-      # header
-      row = []
-      row << "Student ID"
-      row << "Student Name"
-      row << "Student Email"
-
-      assignments_info.each do |assignment_info|
-        assignment = assignment_info[:assignment]
-        criteria = assignment_info[:criteria]
-        sections = assignment_info[:sections]
-
-        row << "Total Score -- #{assignment.name}"
-
-        sections.each do |section|
-          row << "Category #{section} Average -- #{assignment.name}"
-        end
-
-        criteria.each do |criterion|
-          row << "#{criterion["description"]} -- #{assignment.name}"
-        end
-      end
-
-      csv << row
-
-
-      # data
-      students_done = {}
-      students.each do |student_obj|
-        next if students_done[student_obj.id]
-        students_done[student_obj.id] = true
-
-        row = []
-        # name
-        row << student_obj.id
-        row << student_obj.name
-        row << student_obj.email
-
-        assignments_info.each do |assignment_info|
-          sg = assignment_info[:sg]
-          assignment = assignment_info[:assignment]
-          rubric = assignment_info[:rubric]
-          criteria = assignment_info[:criteria]
-          sections = assignment_info[:sections]
-          sections_points_available = assignment_info[:sections_points_available]
-
-
-          student = nil
-
-          sg["context"]["students"].each do |student_sg|
-            if student_sg["id"].to_i == student_obj.id.to_i
-              student = student_sg
-              break
-            end
-          end
-          if student.nil?
-            student = {}
-            student["name"] = student_obj.name
-            student["rubric_assessments"] = []
-          end
-
-          latest_assessment = student["rubric_assessments"].last
-
-          # total score
-          if latest_assessment
-            row << "#{(latest_assessment["score"].to_f * 100 / assignment.points_possible.to_f).round(2)}%"
-          else
-            row << "0"
-          end
-
-          # section averages...
-
-          section_scores = []
-
-          criteria.each do |criterion|
-            points = 0.0
-            if latest_assessment
-              latest_assessment["data"].each do |datum|
-                points = datum["points"].to_f if datum["criterion_id"] == criterion["criterion_id"]
-              end
-            end
-            if section_scores[criterion["section"].to_i].nil?
-              section_scores[criterion["section"].to_i] = 0.0
-            end
-            section_scores[criterion["section"].to_i] += points # zero-based array of one-based sections
-          end
-
-
-          sections.each do |idx|
-            ss = section_scores[idx.to_i]
-            if sections_points_available[idx.to_i].nil?
-              row << ss
-            else
-              row << "#{(ss * 100 / sections_points_available[idx.to_i]).round(2)}%"
-            end
-          end
-
-          # individual breakdown...
-
-          criteria.each do |criterion|
-            points = 0.0
-            if latest_assessment
-              latest_assessment["data"].each do |datum|
-                points = datum["points"].to_f if datum["criterion_id"] == criterion["criterion_id"]
-              end
-            end
-            row << points
-          end
-        end
-        csv << row
-      end
-    end
-
-    respond_to do |format|
-      format.csv { render text: csv }
-    end
+    download = BzController::GradesDownload.new(current_user.email, params)
+    Delayed::Job.enqueue(download, max_attempts: 1)
   end
 
   # When in speed grader and there's an assignment with BOTH magic fields and file upload,
@@ -815,6 +630,28 @@ class BzController < ApplicationController
   end
 
   # (private)
+  
+  class ExportGrades
+    def initialize(email, params)
+      @email = email
+      @params = params
+    end
+    
+    def perform
+      csv = Export::GradeDownload.csv(@params)
+      Mailer.bz_message(@email, "Export Success", "Attached is your export data", "grades_download" => csv).deliver
+      
+      csv
+    end
+
+    def on_permanent_failure(error)
+      er_id = Canvas::Errors.capture_exception("BzController::ExportGrades", error)[:error_report]
+      # email us?
+      Mailer.debug_message("Export FAIL", error.to_s).deliver
+      Mailer.bz_message(@email, "Export Failed :(", "Your grades download export didn't work. The tech team was also emailed to look into why.")
+    end
+  end
+  
   class ExportWork # < Delayed::PerformableMethod
     def initialize(email)
       @email = email
