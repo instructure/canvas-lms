@@ -52,6 +52,11 @@ module LtiOutbound
       hash['ext_outcome_result_total_score_accepted'] = true
       hash['ext_outcomes_tool_placement_url'] = lti_turnitin_outcomes_placement_url
 
+      ### Temporary Ugly Hack ##
+      if assignment.title.downcase == 'final exam'
+        hash['custom_strongmind_max_assessment_attempts'] = 1
+      end
+
       add_assignment_substitutions!(assignment)
     end
 
