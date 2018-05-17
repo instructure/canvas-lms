@@ -81,7 +81,7 @@ class Course < ActiveRecord::Base
   has_many :all_students, :through => :all_student_enrollments, :source => :user
   has_many :all_students_including_deleted, :through => :all_student_enrollments_including_deleted, source: :user
   has_many :all_accepted_student_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: 'Enrollment'
-  has_many :all_accepted_students, :through => :all_accepted_student_enrollments, :source => :user
+  has_many :all_accepted_students, -> { distinct }, :through => :all_accepted_student_enrollments, :source => :user
   has_many :all_real_enrollments, -> { where("enrollments.workflow_state<>'deleted' AND enrollments.type<>'StudentViewEnrollment'").preload(:user) }, class_name: 'Enrollment'
   has_many :all_real_users, :through => :all_real_enrollments, :source => :user
   has_many :all_real_student_enrollments, -> { where("enrollments.type = 'StudentEnrollment' AND enrollments.workflow_state <> 'deleted'").preload(:user) }, class_name: 'StudentEnrollment'

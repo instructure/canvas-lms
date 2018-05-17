@@ -304,23 +304,6 @@ describe AssignmentsController do
       expect(assigns[:js_env][:ASSIGNMENT_TITLE]).to eq "some assignment"
     end
 
-    describe "js_env for ANONYMOUS_MODERATED_MARKING_ENABLED" do
-      let(:anonymous_moderated_marking_enabled) { assigns[:js_env][:ANONYMOUS_MODERATED_MARKING_ENABLED] }
-
-      it 'is set to true when Anonymous Moderated Marking is enabled' do
-        assignment.root_account.enable_feature!(:anonymous_moderated_marking)
-        assignment.update!(grader_count: 1, final_grader: @teacher)
-
-        get 'show_moderate', params: {course_id: @course.id, assignment_id: assignment.id}
-        expect(anonymous_moderated_marking_enabled).to be true
-      end
-
-      it 'is set to false when Anonymous Moderated Marking is not enabled' do
-        get 'show_moderate', params: {course_id: @course.id, assignment_id: assignment.id}
-        expect(anonymous_moderated_marking_enabled).to be false
-      end
-    end
-
     describe 'permissions' do
       before(:once) do
         @user = User.create!
@@ -429,6 +412,60 @@ describe AssignmentsController do
         user_session(account_admin_user)
         get 'show_moderate', params: {course_id: @course.id, assignment_id: @assignment.id}
         assert_status(200)
+      end
+
+      describe "js_env" do
+        let_once(:grader_1) do
+          course_with_user('TeacherEnrollment', {active_all: true, course: @course})
+          @user
+        end
+        let_once(:grader_2) do
+          course_with_user('TeacherEnrollment', {active_all: true, course: @course})
+          @user
+        end
+
+        let(:env) { assigns[:js_env] }
+
+        before :once do
+          @assignment.moderation_graders.create!(anonymous_id: "abcde", user: grader_1)
+          @assignment.moderation_graders.create!(anonymous_id: "fghij", user: grader_2)
+        end
+
+        before :each do
+          user_session(@other_teacher)
+        end
+
+        it "includes ASSIGNMENT.course_id" do
+          get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
+          expect(env[:ASSIGNMENT][:course_id]).to be(@course.id)
+        end
+
+        it "includes ASSIGNMENT.id" do
+          get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
+          expect(env[:ASSIGNMENT][:id]).to be(@assignment.id)
+        end
+
+        it "includes ASSIGNMENT.grades_published" do
+          @assignment.update!(grades_published_at: 1.day.ago)
+          get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
+          expect(env[:ASSIGNMENT][:grades_published]).to be(true)
+        end
+
+        it "includes ASSIGNMENT.muted" do
+          get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
+          expect(env[:ASSIGNMENT][:muted]).to be(true)
+        end
+
+        it "includes ASSIGNMENT.title" do
+          get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
+          expect(env[:ASSIGNMENT][:title]).to eql(@assignment.title)
+        end
+
+        it "includes moderation graders in GRADERS" do
+          get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
+          moderation_grader_ids = @assignment.moderation_graders.map(&:id)
+          expect(env[:GRADERS].map {|grader| grader[:id]}).to match_array(moderation_grader_ids)
+        end
       end
     end
   end
