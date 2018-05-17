@@ -25,17 +25,19 @@ module SIS
       EnrollmentTerm.process_as_sis(@sis_options) do
         yield importer
       end
+      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data) if @batch.using_parallel_importers?
       @logger.debug("Terms took #{Time.now - start} seconds")
       return importer.success_count
     end
 
   private
     class Work
-      attr_accessor :success_count
+      attr_accessor :success_count, :roll_back_data
 
       def initialize(batch, root_account, logger)
         @batch = batch
         @root_account = root_account
+        @roll_back_data = []
         @logger = logger
         @success_count = 0
       end
@@ -84,6 +86,8 @@ module SIS
         end
 
         if term.save
+          data = SisBatchRollBackData.build_data(sis_batch: @batch, context: term)
+          @roll_back_data << data if data
           @success_count += 1
         else
           msg = "A term did not pass validation "
