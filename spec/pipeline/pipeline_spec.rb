@@ -12,8 +12,6 @@ describe 'pipeline service' do
     @enrollment = StudentEnrollment.new(valid_enrollment_attributes)
     @enrollment.course = @course
     @enrollment.save!
-    allow(PipelineService::Endpoints::Pipeline).to receive(:http_client)
-      .and_return(http_client)
   end
 
   context "Missing configuration" do
@@ -28,24 +26,37 @@ describe 'pipeline service' do
 
     it 'wont raise an error through the api cus its queued' do
       ENV.delete 'SYNCHRONOUS_PIPELINE_JOBS'
+      expect(PipelineService::Endpoints::Pipeline).to receive(:http_client)
+        .and_return(http_client)
+
       expect { PipelineService.publish(@enrollment) }.to_not raise_error
     end
 
     it 'calling it directly will raise an error since its not queued' do
+      allow(PipelineService::Endpoints::Pipeline).to receive(:http_client)
+        .and_return(http_client)
+
       expect { PipelineService::Commands::Publish.new(object: @enrollment).call }
         .to raise_error(RuntimeError, 'Missing config')
     end
   end
 
   context "Assignment" do
+    let(:account_admin) { double('account admin') }
+    let(:response) { double('response', parsed_response: {}) }
+    let(:http_client_for_fetcher) { double('http_client_for_fetcher', get: response) }
+
     before do
-      @user       = User.create!
-      @course     = Course.create!
-      @enrollment = StudentEnrollment.new(valid_enrollment_attributes)
-      @assignment = ::Assignment.create!(context: @course)
+      allow(PipelineService::Account).to receive(:account_admin).and_return(account_admin)
+      allow(PipelineService::Serializers::Assignment).to receive(:http_client).and_return(http_client_for_fetcher)
+      allow(PipelineService::Serializers::Assignment).to receive(:token).and_return('sometoken')
+
     end
 
     it do
+      allow(PipelineService::Endpoints::Pipeline).to receive(:http_client)
+        .and_return(http_client)
+
       expect(http_client).to receive(:messages_post)
       ::Assignment.create!(context: @course)
     end
@@ -57,15 +68,12 @@ describe 'pipeline service' do
       ENV['PIPELINE_USER_NAME'] = 'example_user'
       ENV['PIPELINE_PASSWORD']  = 'example_password'
       ENV['CANVAS_DOMAIN']      = 'someschool.com'
-
-      @user       = User.create!
-      @course     = Course.create!
-      @enrollment = StudentEnrollment.new(valid_enrollment_attributes)
-      @enrollment.save
-
     end
 
     it do
+      allow(PipelineService::Endpoints::Pipeline).to receive(:http_client)
+        .and_return(http_client)
+
       expect(http_client).to receive(:messages_post)
       @enrollment.update(workflow_state: 'completed')
     end
