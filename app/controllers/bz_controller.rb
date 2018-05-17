@@ -138,7 +138,7 @@ class BzController < ApplicationController
   end
 
   def grades_download
-    download = BzController::GradesDownload.new(current_user.email, params)
+    download = BzController::ExportGrades.new(current_user.email, params)
     Delayed::Job.enqueue(download, max_attempts: 1)
   end
 
