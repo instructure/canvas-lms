@@ -21,7 +21,7 @@ class PlannerOverride < ActiveRecord::Base
 
   include Workflow
   belongs_to :plannable, polymorphic:
-    [:announcement, :assignment, :discussion_topic, :planner_note, :wiki_page, quiz: 'Quizzes::Quiz']
+    [:announcement, :assignment, :discussion_topic, :planner_note, :wiki_page, :calendar_event, quiz: 'Quizzes::Quiz']
   belongs_to :user
   validates_presence_of :plannable_id, :workflow_state, :user_id
   validates_uniqueness_of :plannable_id, scope: [:user_id, :plannable_type]
