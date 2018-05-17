@@ -256,15 +256,6 @@ describe 'Developer Keys' do
         expect(fj("fieldset:last")).not_to have_attribute('aria-disabled')
       end
 
-      it "allows for root account dev key status 'allow'", test_id: 3482823 do
-        root_developer_key
-        DeveloperKeyAccountBinding.last.update(workflow_state: 'off')
-        get "/accounts/#{Account.default.id}/developer_keys"
-        fj("span:contains('Allow'):last").click
-        keep_trying_until { expect(current_active_element.attribute('value')).to eq 'allow' }
-        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'allow'
-      end
-
       it "allows for root account dev key status 'on'", test_id: 3482823 do
         root_developer_key
         get "/accounts/#{Account.default.id}/developer_keys"
@@ -301,7 +292,7 @@ describe 'Developer Keys' do
         click_account_tab
         click_inherited_tab
         expect(fj("fieldset:last")).not_to have_attribute('aria-disabled')
-        expect(fxpath("//*[@id='keys']/tbody/tr[1]/td[3]/fieldset/span/span/span/span[2]/span/span/span[3]/div/label/span[1]").css_value('background-color')).to be_truthy
+        expect(fxpath("//*[@id='keys']/tbody/tr[1]/td[3]/fieldset/span/span/span/span[2]/span/span/span[2]/div/label/span[2]").css_value('background-color')).to be_truthy
       end
 
       it "only show create developer key button for account tab panel" do

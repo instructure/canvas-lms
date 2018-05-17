@@ -38,7 +38,11 @@ function component(keyList, inherited, props = {}) {
       store={{dispatch: () => {}}}
       actions={{}}
       developerKeysList={keyList || devKeyList()}
-      ctx={{}}
+      ctx={{
+        params: {
+          contextId: ""
+        }
+      }}
       inherited={inherited}
       {...props}
     />

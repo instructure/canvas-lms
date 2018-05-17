@@ -23,6 +23,18 @@ import DeveloperKeyStateControl from 'jsx/developer_keys/InheritanceStateControl
 
 QUnit.module('InheritanceStateControl')
 
+const rootAccountCTX = {
+  params: {
+    contextId: "1"
+  }
+}
+
+const siteAdminCTX = {
+  params: {
+    contextId: "site_admin"
+  }
+}
+
 function developerKey(workflowState, isOwnedByAccount) {
   return {
     developer_key_account_binding: {
@@ -32,8 +44,8 @@ function developerKey(workflowState, isOwnedByAccount) {
   }
 }
 
-function componentNode(key) {
-  const component = TestUtils.renderIntoDocument(<DeveloperKeyStateControl developerKey={key} />)
+function componentNode(key, context = rootAccountCTX) {
+  const component = TestUtils.renderIntoDocument(<DeveloperKeyStateControl developerKey={key} ctx={context}/>)
   return ReactDOM.findDOMNode(component)
 }
 
@@ -57,10 +69,10 @@ test('the correct state for the developer key', () => {
   ok(offRadioInput.checked)
 })
 
-test('renders "allow" if no binding is sent', () => {
+test('renders "allow" if no binding is sent only for site_admin', () => {
   const modifiedKey = developerKey()
   modifiedKey.developer_key_account_binding = undefined
-  const allowRadioInput = componentNode(modifiedKey).querySelector('input[value="allow"]')
+  const allowRadioInput = componentNode(modifiedKey, siteAdminCTX).querySelector('input[value="allow"]')
   ok(allowRadioInput.checked)
 })
 
@@ -72,6 +84,20 @@ test('renders an "off" option', () => {
   ok(componentNode().querySelector('input[value="off"]'))
 })
 
-test('renders an "allow" option', () => {
-  ok(componentNode().querySelector('input[value="allow"]'))
+test('renders an "allow" option only for site_admin', () => {
+  ok(componentNode(developerKey(), siteAdminCTX).querySelector('input[value="allow"]'))
+})
+
+test('do not render an "allow" option only for root-account', () => {
+  notOk(componentNode(rootAccountCTX).querySelector('input[value="allow"]'))
+})
+
+test('renders "allow" if "allow" is set as the workflow state for site admin', () => {
+  const allowRadioInput = componentNode(developerKey("allow"), siteAdminCTX).querySelector('input[value="allow"]')
+  ok(allowRadioInput.checked)
+})
+
+test('renders "off" if "allow" is set as the workflow state for root account', () => {
+  const offRadioInput = componentNode(developerKey("allow"), rootAccountCTX).querySelector('input[value="off"]')
+  ok(offRadioInput.checked)
 })

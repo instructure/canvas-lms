@@ -48,12 +48,20 @@ export default class DeveloperKeyStateControl extends React.Component {
     return 'allow'
   }
 
+  isSiteAdmin() {
+    return this.props.ctx.params.contextId === "site_admin"
+  }
+
+  getDefaultValue() {
+    return this.radioGroupValue() === 'allow' && !this.isSiteAdmin() ? 'off' : this.radioGroupValue()
+  }
+
   render() {
     return (
       <RadioInputGroup
         size="medium"
         variant="toggle"
-        defaultValue={this.radioGroupValue()}
+        defaultValue={this.getDefaultValue()}
         description={
           <ScreenReaderContent>{I18n.t('Key state for the current account')}</ScreenReaderContent>
         }
@@ -62,7 +70,7 @@ export default class DeveloperKeyStateControl extends React.Component {
         name={this.props.developerKey.id}
       >
         <RadioInput label={I18n.t('On')} value="on" context="success" />
-        <RadioInput label={I18n.t('Allow')} value="allow" context="off" />
+        {this.isSiteAdmin() && <RadioInput label={I18n.t('Allow')} value="allow" context="off"/>}
         <RadioInput label={I18n.t('Off')} value="off" context="danger" />
       </RadioInputGroup>
     )

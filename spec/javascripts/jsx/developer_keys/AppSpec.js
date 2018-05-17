@@ -79,6 +79,11 @@ function renderComponent (overrides = {}) {
     applicationState: initialApplicationState(),
     actions: {},
     store: fakeStore(),
+    ctx: {
+      params: {
+        contextId: ""
+      }
+    },
     ...overrides
   }
   return TestUtils.renderIntoDocument(<DeveloperKeysApp {...props} />);
