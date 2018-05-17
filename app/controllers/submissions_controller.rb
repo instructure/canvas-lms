@@ -586,6 +586,7 @@ class SubmissionsController < SubmissionsBaseController
       params[:submission][:commenter] = @current_user
       admin_in_context = !@context_enrollment || @context_enrollment.admin?
 
+      error = nil
       if params[:attachments]
         params[:submission][:comment_attachments] = params[:attachments].keys.map do |idx|
           attachment_json = params[:attachments][idx].permit(Attachment.permitted_attributes)
@@ -617,6 +618,7 @@ class SubmissionsController < SubmissionsBaseController
       rescue => e
         Canvas::Errors.capture_exception(:submissions, e)
         logger.error(e)
+        error = e
       end
       respond_to do |format|
         if @submissions
@@ -645,9 +647,14 @@ class SubmissionsController < SubmissionsBaseController
         else
           @error_message = t('errors_update_failed', "Update Failed")
           flash[:error] = @error_message
+
+          error_json = {base: @error_message}
+          error_json[:error_code] = error.error_code if error
+          error_status = error&.status_code || :bad_request
+
           format.html { render :show, id: @assignment.context.id }
-          format.json { render :json => {:errors => {:base => @error_message}}, :status => :bad_request }
-          format.text { render :json => {:errors => {:base => @error_message}}, :status => :bad_request }
+          format.json { render json: {errors: error_json}, status: error_status }
+          format.text { render json: {errors: error_json}, status: error_status }
         end
       end
     end

@@ -1486,7 +1486,7 @@ describe Assignment do
         @superfluous_teacher = @teacher
 
         expect { @assignment.grade_student(@student, grader: @superfluous_teacher, provisional: true, score: 2) }.
-          to raise_error(Assignment::GradeError, 'Maximum number of graders reached')
+          to raise_error(Assignment::MaxGradersReachedError)
       end
 
       it 'allows the same grader to re-grade an assignment' do
@@ -1723,7 +1723,7 @@ describe Assignment do
         @superfluous_teacher = @teacher
 
         expect { @assignment.update_submission(@student, commenter: @superfluous_teacher, comment: 'hi', provisional: true) }.
-          to raise_error(Assignment::GradeError, 'Maximum number of graders reached')
+          to raise_error(Assignment::MaxGradersReachedError)
       end
 
       it 'allows the same grader to issue multiple comments' do
@@ -6563,5 +6563,15 @@ describe Assignment do
     @override_s1 = differentiated_assignment(assignment: @assignment, course_section: @section1)
     @override_s1.due_at = 1.day.from_now
     @override_s1.save!
+  end
+
+  describe Assignment::MaxGradersReachedError do
+    subject { Assignment::MaxGradersReachedError.new }
+
+    it { is_expected.to be_a Assignment::GradeError }
+
+    it 'has an error_code of MAX_GRADERS_REACHED' do
+      expect(subject.error_code).to eq 'MAX_GRADERS_REACHED'
+    end
   end
 end

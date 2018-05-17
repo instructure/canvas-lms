@@ -1488,15 +1488,6 @@ class Assignment < ActiveRecord::Base
     self.all_submissions.where(user_id: user.id).first_or_initialize
   end
 
-  class GradeError < StandardError
-    attr_accessor :status_code
-
-    def initialize(message = nil, status_code = nil)
-      super(message)
-      self.status_code = status_code
-    end
-  end
-
   def compute_grade_and_score(grade, score)
     if grade
       score = self.grade_to_score(grade)
@@ -2926,7 +2917,7 @@ class Assignment < ActiveRecord::Base
     return false if moderation_graders.where(user: grader).exists?
 
     if provisional_moderation_graders.count >= grader_count
-      raise GradeError, 'Maximum number of graders reached' unless grader.id == final_grader_id
+      raise MaxGradersReachedError unless grader.id == final_grader_id
     end
 
     existing_anonymous_ids = moderation_graders.pluck(:anonymous_id)
@@ -2967,7 +2958,7 @@ class Assignment < ActiveRecord::Base
       # when there weren't enough slots open for all of them. If we ended up
       # with too many provisional graders, throw an error to roll things back.
       if added_moderation_grader && provisional_moderation_graders.count > grader_count
-        raise GradeError, 'Maximum number of graders reached'
+        raise MaxGradersReachedError
       end
     end
   end

@@ -2056,6 +2056,37 @@ QUnit.module('SpeedGrader', function() {
         strictEqual(formData['submission[anonymous_id]'], alphaStudent.anonymous_id)
         ajaxJSON.restore()
       })
+
+      test('calls handleGradingError if an error is encountered', () => {
+        $.ajaxJSON.restore()
+        const ajaxJSON = sinon.stub($, 'ajaxJSON').callsFake((_url, _method, _form, _success, error) => {
+          error()
+        })
+        const handleGradingError = sinon.stub(SpeedGrader.EG, 'handleGradingError')
+        const revertFromFormSubmit = sinon.stub(SpeedGrader.EG, 'revertFromFormSubmit')
+
+        SpeedGrader.EG.addSubmissionComment('terrible failure')
+        strictEqual(handleGradingError.callCount, 1)
+
+        revertFromFormSubmit.restore()
+        handleGradingError.restore()
+        ajaxJSON.restore()
+      })
+
+      test('calls revertFromFormSubmit to clear the comment if an error is encountered', () => {
+        $.ajaxJSON.restore()
+        const ajaxJSON = sinon.stub($, 'ajaxJSON').callsFake((_url, _method, _form, _success, error) => {
+          error()
+        })
+        const revertFromFormSubmit = sinon.stub(SpeedGrader.EG, 'revertFromFormSubmit')
+
+        SpeedGrader.EG.addSubmissionComment('terrible failure')
+        const [params] = revertFromFormSubmit.firstCall.args
+        deepEqual(params, {errorSubmitting: true})
+
+        revertFromFormSubmit.restore()
+        ajaxJSON.restore()
+      })
     })
 
     QUnit.module('#handleGradeSubmit', hooks => {
@@ -2107,6 +2138,30 @@ QUnit.module('SpeedGrader', function() {
         SpeedGrader.EG.handleGradeSubmit({}, false)
         const [,,formData] = ajaxJSON.firstCall.args
         strictEqual(formData['submission[anonymous_id]'], alphaStudent.anonymous_id)
+        ajaxJSON.restore()
+      })
+
+      test('calls handleGradingError if an error is encountered', () => {
+        const ajaxJSON = sinon.stub($, 'ajaxJSON').callsFake((_url, _method, _form, _success, error) => { error() })
+        const handleGradingError = sinon.stub(SpeedGrader.EG, 'handleGradingError')
+
+        SpeedGrader.EG.handleGradeSubmit({}, false)
+        strictEqual(handleGradingError.callCount, 1)
+
+        handleGradingError.restore()
+        ajaxJSON.restore()
+      })
+
+      test('clears the grade input if an error is encountered', () => {
+        const ajaxJSON = sinon.stub($, 'ajaxJSON').callsFake((_url, _method, _form, _success, error) => { error() })
+        const handleGradingError = sinon.stub(SpeedGrader.EG, 'handleGradingError')
+        const showGrade = sinon.stub(SpeedGrader.EG, 'showGrade')
+
+        SpeedGrader.EG.handleGradeSubmit({}, false)
+        strictEqual(showGrade.firstCall.args.length, 0)
+
+        showGrade.restore()
+        handleGradingError.restore()
         ajaxJSON.restore()
       })
     })
@@ -2370,6 +2425,36 @@ QUnit.module('SpeedGrader', function() {
       SpeedGrader.EG.removeModerationBarAndShowSubmission()
       const addCommentForm = document.getElementById('add_a_comment')
       strictEqual(addCommentForm.style.display, '')
+    })
+  })
+
+  QUnit.module('#handleGradingError', (hooks) => {
+    hooks.beforeEach(() => {
+      sinon.stub($, 'flashError')
+    })
+
+    hooks.afterEach(() => {
+      $.flashError.restore()
+    })
+
+    test('shows an error message in a flash dialog', () => {
+      SpeedGrader.EG.handleGradingError({})
+      strictEqual($.flashError.callCount, 1)
+    })
+
+    test('shows a specific error message if given a MAX_GRADERS_REACHED error code', () => {
+      const maxGradersError = {base: 'too many graders', error_code: 'MAX_GRADERS_REACHED'}
+      SpeedGrader.EG.handleGradingError({errors: maxGradersError})
+
+      const [errorMessage] = $.flashError.firstCall.args
+      strictEqual(errorMessage, 'The maximum number of graders has been reached for this assignment.')
+    })
+
+    test('shows a generic error message if not given a MAX_GRADERS_REACHED error code', () => {
+      SpeedGrader.EG.handleGradingError({})
+
+      const [errorMessage] = $.flashError.firstCall.args
+      strictEqual(errorMessage, 'An error occurred updating this assignment.')
     })
   })
 })

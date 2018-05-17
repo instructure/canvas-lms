@@ -452,6 +452,7 @@ class GradebooksController < ApplicationController
       }).index_by(&:id)
 
       request_error_status = nil
+      error = nil
       @submissions = []
       submissions.compact.each do |submission|
         @assignment = assignments[submission[:assignment_id].to_i]
@@ -506,15 +507,14 @@ class GradebooksController < ApplicationController
           end
         rescue Assignment::GradeError => e
           logger.info "GRADES: grade_student failed because '#{e.message}'"
-          request_error_status = e.status_code
-          @error_message = e.to_s
+          error = e
         end
       end
       @submissions = @submissions.reverse.uniq.reverse
       @submissions = nil if submissions.empty?  # no valid submissions
 
       respond_to do |format|
-        if @submissions && !@error_message#&& !@submission.errors || @submission.errors.empty?
+        if @submissions && error.nil?
           flash[:notice] = t('notices.updated', 'Assignment submission was successfully updated.')
           format.html { redirect_to course_gradebook_url(@assignment.context) }
           format.json {
@@ -525,12 +525,20 @@ class GradebooksController < ApplicationController
                    :as_text => true
           }
         else
-          flash[:error] = t('errors.submission_failed', "Submission was unsuccessful: %{error}", :error => @error_message || t('errors.submission_failed_default', 'Submission Failed'))
-          request_error_status ||= :bad_request
+          error_message = error&.to_s
+          flash[:error] = t(
+            'errors.submission_failed',
+            "Submission was unsuccessful: %{error}",
+            error: error_message || t('errors.submission_failed_default', 'Submission Failed')
+          )
+          request_error_status = error&.status_code || :bad_request
+
+          error_json = {base: error_message}
+          error_json[:error_code] = error.error_code if error
 
           format.html { render :show, course_id: @assignment.context.id }
-          format.json { render json: { errors: { base: @error_message } }, status: request_error_status }
-          format.text { render json: { errors: { base: @error_message } }, status: request_error_status }
+          format.json { render json: { errors: error_json }, status: request_error_status }
+          format.text { render json: { errors: error_json }, status: request_error_status }
         end
       end
     end

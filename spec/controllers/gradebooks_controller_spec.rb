@@ -1463,6 +1463,47 @@ describe GradebooksController do
         expect(json[0]['submission']['submission_comments'].first['submission_comment']['comment']).to eq 'provisional!'
       end
     end
+
+    describe 'provisional grade error handling for Anonymous Moderated Marking' do
+      before(:once) do
+        course_with_student(active_all: true)
+        teacher_in_course(active_all: true)
+        @course.root_account.enable_feature!(:anonymous_moderated_marking)
+
+        @assignment = @course.assignments.create!(
+          title: 'yet another assignment',
+          moderated_grading: true,
+          grader_count: 1
+        )
+      end
+
+      let(:submission_params) do
+        { provisional: true, assignment_id: @assignment.id, user_id: @student.id, score: 1 }
+      end
+      let(:request_params) { {course_id: @course.id, submission: submission_params} }
+
+      let(:response_json) { JSON.parse(response.body) }
+
+      it 'returns an error code of MAX_GRADERS_REACHED if a MaxGradersReachedError is raised' do
+        @assignment.grade_student(@student, provisional: true, grade: 5, grader: @teacher)
+        @previous_teacher = @teacher
+
+        teacher_in_course(active_all: true)
+        user_session(@teacher)
+
+        post 'update_submission', params: request_params, format: :json
+        expect(response_json.dig('errors', 'error_code')).to eq 'MAX_GRADERS_REACHED'
+      end
+
+      it 'returns a generic error if a GradeError is raised' do
+        invalid_submission_params = submission_params.merge(excused: true)
+        invalid_request_params = request_params.merge(submission: invalid_submission_params)
+        user_session(@teacher)
+
+        post 'update_submission', params: invalid_request_params, format: :json
+        expect(response_json.dig('errors', 'base')).to be_present
+      end
+    end
   end
 
   describe "GET 'speed_grader'" do

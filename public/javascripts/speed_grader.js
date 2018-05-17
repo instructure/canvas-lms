@@ -2446,7 +2446,7 @@ EG = {
     $comments.scrollTop(9999999);  // the scrollTop part forces it to scroll down to the bottom so it shows the most recent comment.
   },
 
-  revertFromFormSubmit: function(draftComment) {
+  revertFromFormSubmit: ({draftComment = null, errorSubmitting = false} = {}) => {
     // This is to continue existing behavior of creating finalized comments by default
     if (draftComment === undefined) {
       draftComment = false;
@@ -2460,7 +2460,7 @@ EG = {
       // Show a different message when auto-saving a draft comment
       $comment_saved.show();
       $comment_saved_message.attr("tabindex",-1).focus();
-    } else {
+    } else if (!errorSubmitting) {
       $comment_submitted.show();
       $comment_submitted_message.attr("tabindex",-1).focus();
     }
@@ -2509,15 +2509,21 @@ EG = {
       $.each(submissions, function(){
         EG.setOrUpdateSubmission(this.submission);
       });
-      EG.revertFromFormSubmit(draftComment);
+      EG.revertFromFormSubmit({draftComment});
       window.setTimeout(function() {
         $rightside_inner.scrollTo($rightside_inner[0].scrollHeight, 500);
       });
     }
+
+    const formError = (data, _xhr, _textStatus, _errorThrown) => {
+      EG.handleGradingError(data);
+      EG.revertFromFormSubmit({errorSubmitting: true});
+    }
+
     if($add_a_comment.find("input[type='file']:visible").length) {
-      $.ajaxJSONFiles(url + ".text", method, formData, $add_a_comment.find("input[type='file']:visible"), formSuccess);
+      $.ajaxJSONFiles(url + ".text", method, formData, $add_a_comment.find("input[type='file']:visible"), formSuccess, formError);
     } else {
-      $.ajaxJSON(url, method, formData, formSuccess);
+      $.ajaxJSON(url, method, formData, formSuccess, formError);
     }
 
     $("#comment_attachments").empty();
@@ -2614,7 +2620,7 @@ EG = {
       }
     }
 
-    $.ajaxJSON(url, method, formData, function(submissions) {
+    const submissionSuccess = submissions => {
       var pointsPossible = jsonData.points_possible;
       var score = submissions[0].submission.score;
 
@@ -2635,7 +2641,14 @@ EG = {
       EG.refreshSubmissionsToView();
       $multiple_submissions.change();
       EG.showGrade();
-    });
+    };
+
+    const submissionError = (data, _xhr, _textStatus, _errorThrown) => {
+      EG.handleGradingError(data);
+      EG.showGrade();
+    };
+
+    $.ajaxJSON(url, method, formData, submissionSuccess, submissionError);
   },
 
   showGrade: function() {
@@ -2837,6 +2850,17 @@ EG = {
     teardownHandleFragmentChanged()
     teardownBeforeLeavingSpeedgrader()
     return undefined
+  },
+
+  handleGradingError (data={}) {
+    let errorMessage
+    if (data.errors && data.errors.error_code === 'MAX_GRADERS_REACHED') {
+      errorMessage = I18n.t('The maximum number of graders has been reached for this assignment.');
+    } else {
+      errorMessage = I18n.t('An error occurred updating this assignment.');
+    }
+
+    $.flashError(errorMessage);
   }
 }
 
