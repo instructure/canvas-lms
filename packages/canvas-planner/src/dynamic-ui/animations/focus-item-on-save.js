@@ -28,8 +28,10 @@ export class FocusItemOnSave extends Animation {
     const savedItemUniqueId = action.payload.item.uniqueId;
     const itemComponentToFocus = this.registry().getComponent('item', savedItemUniqueId);
     if (itemComponentToFocus == null) return;
+    if (!action.payload.wasToggled) {
+      this.animator().focusElement(itemComponentToFocus.component.getFocusable('update'));
+    }
     this.maintainViewportPositionOfFixedElement();
-    this.animator().focusElement(itemComponentToFocus.component.getFocusable('update'));
     this.animator().scrollTo(itemComponentToFocus.component.getScrollable(), this.stickyOffset());
 
   }

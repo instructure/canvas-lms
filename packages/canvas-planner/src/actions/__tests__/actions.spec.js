@@ -418,7 +418,7 @@ describe('api actions', () => {
       const savingItem = {...plannerItem, show: true, toggleAPIPending: true};
       const savePromise = Actions.togglePlannerItemCompletion(plannerItem)(mockDispatch, getBasicState);
       expect(isPromise(savePromise)).toBe(true);
-      expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVED_PLANNER_ITEM', payload: {item: savingItem, isNewItem: false}});
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVING_PLANNER_ITEM', payload: {item: savingItem, isNewItem: false, wasToggled: true}});
       expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVED_PLANNER_ITEM', payload: savePromise});
     });
 
@@ -462,6 +462,7 @@ describe('api actions', () => {
         togglePromise
       ).then((result) => {
         expect(result).toMatchObject({
+          wasToggled: true,
           item: {
             ...plannerItem,
             completed: false,
@@ -488,7 +489,8 @@ describe('api actions', () => {
       ).then((result) => {
         expect(fakeAlert).toHaveBeenCalled();
         expect(result).toMatchObject({
-          item: { ...plannerItem}
+          item: { ...plannerItem},
+          wasToggled: true,
         });
       });
     });
