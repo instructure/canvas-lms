@@ -64,7 +64,7 @@ module SIS
         group_membership = GroupMembership.where(group_id: group, user_id: user).take
         group_membership ||= group.group_memberships.build(:user => user)
 
-        group_membership.sis_batch_id = @batch.id if @batch
+        group_membership.sis_batch_id = @batch.id
 
         case status
         when /accepted/i

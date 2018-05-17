@@ -20,17 +20,16 @@ module SIS
   class TermImporter < BaseImporter
 
     def process
-      start = Time.now
+      start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger)
       EnrollmentTerm.process_as_sis(@sis_options) do
         yield importer
       end
       SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data) if @batch.using_parallel_importers?
       @logger.debug("Terms took #{Time.now - start} seconds")
-      return importer.success_count
+      importer.success_count
     end
 
-  private
     class Work
       attr_accessor :success_count, :roll_back_data
 
@@ -50,7 +49,7 @@ module SIS
         return if @batch.skip_deletes? && status =~ /deleted/i
 
         term = @root_account.enrollment_terms.where(sis_source_id: term_id).first_or_initialize
-        term.sis_batch_id = @batch.id if @batch
+        term.sis_batch_id = @batch.id
 
         if date_override_enrollment_type
           # only configure the date override if this row is present

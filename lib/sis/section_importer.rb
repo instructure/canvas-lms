@@ -32,7 +32,7 @@ module SIS
       Course.update_account_associations(importer.course_ids_to_update_associations.to_a) unless importer.course_ids_to_update_associations.empty?
       importer.sections_to_update_sis_batch_ids.in_groups_of(1000, false) do |batch|
         CourseSection.where(:id => batch).update_all(:sis_batch_id => @batch.id)
-      end if @batch
+      end
       # there could be a ton of deleted sections, and it would be really slow to do a normal find_each
       # that would order by id. So do it on the slave, to force a cursor that avoids the sort so that
       # it can run really fast
@@ -48,7 +48,7 @@ module SIS
         end
       end
       @logger.debug("Sections took #{Time.zone.now - start} seconds")
-      return importer.success_count
+      importer.success_count
     end
 
     class Work
@@ -125,10 +125,12 @@ module SIS
           section.start_at = start_date
           section.end_at = end_date
         end
-        section.restrict_enrollments_to_section_dates = (section.start_at.present? || section.end_at.present?) unless section.stuck_sis_fields.include?(:restrict_enrollments_to_section_dates)
+        unless section.stuck_sis_fields.include?(:restrict_enrollments_to_section_dates)
+          section.restrict_enrollments_to_section_dates = (section.start_at.present? || section.end_at.present?)
+        end
 
         if section.changed?
-          section.sis_batch_id = @batch.id if @batch
+          section.sis_batch_id = @batch.id
           if section.valid?
             section.save
             data = SisBatchRollBackData.build_data(sis_batch: @batch, context: section)
@@ -139,7 +141,7 @@ module SIS
             msg += section.errors.full_messages.join(", ") + ")"
             raise ImportError, msg
           end
-        elsif @batch
+        else
           @sections_to_update_sis_batch_ids << section.id
         end
 

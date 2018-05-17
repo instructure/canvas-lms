@@ -22,7 +22,7 @@ module SIS
   class EnrollmentImporter < BaseImporter
 
     def process(messages)
-      start = Time.now
+      start = Time.zone.now
       i = Work.new(@batch, @root_account, @logger, messages)
 
       Enrollment.skip_touch_callbacks(:course) do
@@ -38,10 +38,10 @@ module SIS
           end
         end
       end
-      @logger.debug("Raw enrollments took #{Time.now - start} seconds")
+      @logger.debug("Raw enrollments took #{Time.zone.now - start} seconds")
       i.enrollments_to_update_sis_batch_ids.in_groups_of(1000, false) do |batch|
         Enrollment.where(:id => batch).update_all(:sis_batch_id => @batch.id)
-      end if @batch
+      end
       # We batch these up at the end because we don't want to keep touching the same course over and over,
       # and to avoid hitting other callbacks for the course (especially broadcast_policy)
       i.courses_to_touch_ids.to_a.in_groups_of(1000, false) do |batch|
@@ -71,11 +71,10 @@ module SIS
       i.roll_back_data.push(*new_data)
       SisBatchRollBackData.bulk_insert_roll_back_data(i.roll_back_data) if @batch.using_parallel_importers?
 
-      @logger.debug("Enrollments with batch operations took #{Time.now - start} seconds")
-      return i.success_count
+      @logger.debug("Enrollments with batch operations took #{Time.zone.now - start} seconds")
+      i.success_count
     end
 
-  private
     class Work
       attr_accessor :enrollments_to_update_sis_batch_ids, :courses_to_touch_ids,
           :incrementally_update_account_associations_user_ids, :update_account_association_user_ids,
@@ -321,7 +320,7 @@ module SIS
                 end
               end
               enrollment.sis_batch_id = enrollment_info.sis_batch_id if enrollment_info.sis_batch_id
-              enrollment.sis_batch_id = @batch.id if @batch
+              enrollment.sis_batch_id = @batch.id
               enrollment.skip_touch_user = true
               begin
                 enrollment.save_without_broadcasting!
@@ -348,7 +347,7 @@ module SIS
               end
               data = SisBatchRollBackData.build_data(sis_batch: @batch, context: enrollment)
               @roll_back_data << data if data
-            elsif @batch
+            else
               @enrollments_to_update_sis_batch_ids << enrollment.id
             end
 

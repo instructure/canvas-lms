@@ -104,7 +104,7 @@ module SIS
         # only update the name on groups that haven't had their name changed since the last sis import
         group.name = name if name.present? && !group.stuck_sis_fields.include?(:name)
         group.context = context
-        group.sis_batch_id = @batch.id if @batch
+        group.sis_batch_id = @batch.id
         group.workflow_state = status == 'deleted' ? 'deleted' : 'available'
 
         if group.save

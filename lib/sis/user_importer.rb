@@ -34,7 +34,7 @@ module SIS
       end
       User.update_account_associations(importer.users_to_add_account_associations, :incremental => true, :precalculated_associations => {@root_account.id => 0})
       User.update_account_associations(importer.users_to_update_account_associations)
-      importer.pseudos_to_set_sis_batch_ids.in_groups_of(1000, false) {|ids| Pseudonym.where(id: ids).update_all(sis_batch_id: @batch.id)} if @batch
+      importer.pseudos_to_set_sis_batch_ids.in_groups_of(1000, false) {|ids| Pseudonym.where(id: ids).update_all(sis_batch_id: @batch.id)}
       SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data) if @batch.using_parallel_importers?
       @logger.debug("Users took #{Time.zone.now - start} seconds")
       importer.success_count

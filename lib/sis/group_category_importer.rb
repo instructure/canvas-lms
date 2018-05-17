@@ -20,15 +20,14 @@ module SIS
   class GroupCategoryImporter < BaseImporter
 
     def process
-      start = Time.now
+      start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger)
       yield importer
       SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data) if @batch.using_parallel_importers?
-      @logger.debug("Group categories took #{Time.now - start} seconds")
-      return importer.success_count
+      @logger.debug("Group categories took #{Time.zone.now - start} seconds")
+      importer.success_count
     end
 
-    private
     class Work
       attr_accessor :success_count, :roll_back_data
 
@@ -79,7 +78,7 @@ module SIS
         gc.context = context
         gc.root_account_id = @root_account.id
         gc.sis_source_id = sis_id
-        gc.sis_batch_id = @batch.id if @batch
+        gc.sis_batch_id = @batch.id
 
         case status
         when /active/i
