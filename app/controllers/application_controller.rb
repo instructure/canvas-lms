@@ -1933,7 +1933,7 @@ class ApplicationController < ActionController::Base
 
   def logout_current_user
     logged_in_user.try(:stamp_logout_time!)
-    InstFS.logout(logged_in_user)
+    InstFS.logout(logged_in_user) rescue nil
     destroy_session
   end
 

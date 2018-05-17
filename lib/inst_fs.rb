@@ -18,7 +18,8 @@
 module InstFS
   class << self
     def enabled?
-      Canvas::Plugin.find('inst_fs').enabled?
+      # true if plugin is enabled AND all settings values are set
+      Canvas::Plugin.find('inst_fs').enabled? && !!app_host && !!jwt_secret
     end
 
     def login_pixel(user, session, oauth_host)
@@ -63,7 +64,10 @@ module InstFS
     end
 
     def jwt_secret
-      Base64.decode64(setting("secret"))
+      secret = setting("secret")
+      if secret
+        Base64.decode64(secret)
+      end
     end
 
     def upload_preflight_json(context:, user:, acting_as:, folder:, filename:, content_type:, quota_exempt:, on_duplicate:, capture_url:, target_url: nil, progress_json: nil, include_param: nil)
