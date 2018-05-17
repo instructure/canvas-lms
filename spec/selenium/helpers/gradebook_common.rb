@@ -134,6 +134,10 @@ module GradebookCommon
     fj('.submission_details_dialog:visible')
   end
 
+  def submission_detail_speedgrader_link
+    fj("a:contains('More details in the SpeedGrader')")
+  end
+
   def final_score_for_row(row)
     grade_grid = f('#gradebook_grid .container_1')
     cells = find_slick_cells(row, grade_grid)
