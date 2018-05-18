@@ -55,7 +55,7 @@
           <textarea class="long_description" aria-label="<%= t "Long Description" %>" style="display: none;"><%= h((criterion.try(:long_description) || '')) %></textarea>
         </div>
         <div class="hide_when_learning_outcome <%= range_rating_visible ? '' : 'hidden' %>">
-          <div class="criterion_use_range_div editing">
+          <div class="criterion_use_range_div editing toggle_for_hide_points <%= rubric_association&.hide_points ? 'hidden' : '' %>">
             <label><%= t 'Range' %>
               <input type="checkbox" class="criterion_use_range" <%= 'checked' if (criterion.try(:criterion_use_range) && range_rating_enabled) %>/></label>
           </div>
