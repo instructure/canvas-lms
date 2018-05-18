@@ -6,10 +6,8 @@ describe 'pipeline service' do
   let(:http_client) { double('http_client') }
 
   before do
-    ENV['SYNCHRONOUS_PIPELINE_JOBS'] = 'true'
-    allow(
-      PipelineService::Events::Responders::SIS::PostJob
-    ).to receive(:http_client).and_return(http_client)
+    PipelineService.queue_mode = 'synchronous'
+    allow(PipelineService::Events::HTTPClient).to receive(:post)
 
     @user = account_admin_user
     @course = Course.create!
@@ -19,12 +17,12 @@ describe 'pipeline service' do
   end
 
   it 'will post to the client if workflow_state is "completed"'do
-    expect(http_client).to receive(:post)
+    expect(PipelineService::Events::HTTPClient).to receive(:post)
     @enrollment.update(workflow_state: 'completed')
   end
 
   it 'will not post to the client if workflow_state is "completed"'do
-    expect(http_client).to_not receive(:post)
+    expect(PipelineService::Events::HTTPClient).to_not receive(:post)
     @enrollment.update(workflow_state: 'invited')
   end
 end

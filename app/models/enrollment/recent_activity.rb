@@ -55,7 +55,7 @@ class Enrollment
       result = all_enrollments_scope.update_all(options)
 
       all_enrollments_scope.ids.each do |id|
-        PipelineService.publish(options.merge(id: id), noun: 'enrollment')
+        PipelineService.publish(options.merge(id: id))
       end
 
       result

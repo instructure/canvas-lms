@@ -3,10 +3,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe 'pipeline service' do
   let(:endpoint_instance) { double('endpoint instance', call: nil) }
   let(:endpoint) { double('endpoint class', new: endpoint_instance) }
-  let(:http_client) { double('http_client', messages_post: nil) }
 
   before do
-    ENV['SYNCHRONOUS_PIPELINE_JOBS'] = 'true'
+    PipelineService.queue_mode = 'synchronous'
+    allow(PipelineService::HTTPClient).to receive(:post)
+    allow(PipelineService::Events::HTTPClient).to receive(:post)
     @user = account_admin_user
     @course = Course.create!
     @enrollment = StudentEnrollment.new(valid_enrollment_attributes)
@@ -25,17 +26,11 @@ describe 'pipeline service' do
     end
 
     it 'wont raise an error through the api cus its queued' do
-      ENV.delete 'SYNCHRONOUS_PIPELINE_JOBS'
-      expect(PipelineService::Endpoints::Pipeline).to receive(:http_client)
-        .and_return(http_client)
-
+      PipelineService.queue_mode = 'asynchronous'
       expect { PipelineService.publish(@enrollment) }.to_not raise_error
     end
 
     it 'calling it directly will raise an error since its not queued' do
-      allow(PipelineService::Endpoints::Pipeline).to receive(:http_client)
-        .and_return(http_client)
-
       expect { PipelineService::Commands::Publish.new(object: @enrollment).call }
         .to raise_error(RuntimeError, 'Missing config')
     end
@@ -48,46 +43,29 @@ describe 'pipeline service' do
 
     before do
       allow(PipelineService::Account).to receive(:account_admin).and_return(account_admin)
-      allow(PipelineService::Serializers::Assignment).to receive(:http_client).and_return(http_client_for_fetcher)
       allow(PipelineService::Serializers::Assignment).to receive(:token).and_return('sometoken')
-
     end
 
-    it do
-      allow(PipelineService::Endpoints::Pipeline).to receive(:http_client)
-        .and_return(http_client)
-
-      expect(http_client).to receive(:messages_post)
+    it 'works (happy path)' do
+      expect(PipelineService::HTTPClient)
+        .to receive(:get)
+          .at_least(:once)
+          .and_return(double('response', parsed_response: nil))
       ::Assignment.create!(context: @course)
     end
   end
 
   context "Submission" do
-    before do
-      ENV['PIPELINE_ENDPOINT']  = 'https://example.com'
-      ENV['PIPELINE_USER_NAME'] = 'example_user'
-      ENV['PIPELINE_PASSWORD']  = 'example_password'
-      ENV['CANVAS_DOMAIN']      = 'someschool.com'
-    end
-
-    it do
-      allow(PipelineService::Endpoints::Pipeline).to receive(:http_client)
-        .and_return(http_client)
-
-      expect(http_client).to receive(:messages_post)
+    it 'works' do
+      expect(PipelineService::HTTPClient).to receive(:post)
       @enrollment.update(workflow_state: 'completed')
     end
+  end
 
-    # TODO: move this test to the shim
-    xit 'will use the enrollment type with hashes' do
-      # byebug
-      # expect(endpoint).to receive(:new).with(hash_including(object: @enrollment))
-      expect(PipelineService::Endpoints::Pipeline).to receive(:http_client)
-        .and_return(http_client)
-      expect(http_client).to receive(:messages_post)
-      PipelineService::Commands::Publish.new(
-        object: { id: @enrollment.id }
-      ).call
+  context "Enrollment" do
+    it 'will use the enrollment type with hashes' do
+      expect(PipelineService::HTTPClient).to receive(:post)
+      PipelineService.publish({ id: @enrollment.id })
     end
   end
 end
