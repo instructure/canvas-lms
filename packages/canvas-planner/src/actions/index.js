@@ -68,6 +68,7 @@ export const {
 );
 
 export * from './loading-actions';
+export * from './sidebar-actions';
 
 function saveExistingPlannerItem (apiItem) {
   return axios({
@@ -195,8 +196,8 @@ export const cancelEditingPlannerItem = () => {
   return (dispatch, getState) => {
     dispatch(clearUpdateTodo());
     dispatch(canceledEditingPlannerItem());
-  }
-}
+  };
+};
 
 function saveExistingPlannerOverride (apiOverride) {
   return axios({

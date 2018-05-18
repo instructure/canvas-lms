@@ -20,6 +20,7 @@ import moment from 'moment-timezone';
 import {
   mergeNewItemsIntoDays, findItemInDays, deleteItemFromDays, deleteItemFromDaysAt,
 } from '../utilities/daysUtils';
+import { isInMomentRange } from '../utilities/dateUtils';
 
 // This algorithm divides the timeline into 5 sections:
 // distant past: we haven't started loading this yet.
@@ -69,10 +70,7 @@ function momentForDayAtIndex (state, days, dayIndex) {
 }
 
 function itemInRange(firstDayMoment, lastDayMoment, item) {
-  const itemMoment = item.dateBucketMoment;
-  const isFirstOrAfter = itemMoment.isSame(firstDayMoment) || itemMoment.isAfter(firstDayMoment);
-  const isLastOrBefore = itemMoment.isSame(lastDayMoment) || itemMoment.isBefore(lastDayMoment);
-  return isFirstOrAfter && isLastOrBefore;
+  return isInMomentRange(item.date, firstDayMoment, lastDayMoment);
 }
 
 // The loaded range is a special case because the range of the days array can extend to infinity
@@ -120,6 +118,9 @@ export default function savePlannerItem (state, action) {
   if (!state) return undefined; // leave it to other reducers to generate initial state
   if (action.type !== 'SAVED_PLANNER_ITEM') return state;
   if (action.error) return state;
+  // Save actions from the todo sidebar that happen before the planner is loaded will mess up its
+  // initial state, so we ignore them.
+  if (!state.loading.plannerLoaded) return state;
 
   const item = action.payload.item;
   if (itemDateIsLoaded(state, item)) {

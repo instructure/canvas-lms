@@ -63,6 +63,7 @@ function makeState (options = {}) {
   const days = options.days || itemsToDays([itemIdAt(0, 0)]);
   const loadingOptions = options.loading || {};
   const loading = {
+    plannerLoaded: true,
     partialPastDays: [],
     partialFutureDays: [],
     allPastItemsLoaded: false,
@@ -88,6 +89,13 @@ it('does nothing if action.error', () => {
   const initialState = makeState();
   const action = savedPlannerItem({item: itemIdAt('failed to save', 0)});
   action.error = true;
+  const nextState = reducer(initialState, action);
+  expect(nextState).toMatchSnapshotAndBe(initialState);
+});
+
+it('does nothing if the planner is not loaded', () => {
+  const initialState = makeState({loading: {plannerLoaded: false}});
+  const action = savedPlannerItem({item: itemIdAt('blah', 0)});
   const nextState = reducer(initialState, action);
   expect(nextState).toMatchSnapshotAndBe(initialState);
 });

@@ -72,6 +72,7 @@ function defaultMockActionsToAnimations (animations) {
 function createManagerWithMocks (opts = {}) {
   let animations = [];
   opts = Object.assign({
+    plannerActive: () => true,
     animator: new MockAnimator(),
     document: new MockDocument(),
     actionsToAnimations: defaultMockActionsToAnimations(animations),
@@ -200,6 +201,22 @@ describe('action handling', () => {
     expect(animations[0].invokeUiDidUpdate).toHaveBeenCalled();
     expect(animations[1].invokeUiWillUpdate).not.toHaveBeenCalled();
     expect(animations[1].invokeUiDidUpdate).not.toHaveBeenCalled();
+  });
+
+  it('skips sending actions to animations when planner is not active', () => {
+    const {manager, animations} = createManagerWithMocks({plannerActive: () => false});
+    manager.handleAction({some: 'action'});
+    expect(animations[0].acceptAction).not.toHaveBeenCalled();
+  });
+
+  it('skips lifecycle methods when planner is not active', () => {
+    const {manager, animations} = createManagerWithMocks({plannerActive: () => false});
+    animations[0].isReady.mockReturnValue(true);
+    manager.preTriggerUpdates();
+    manager.triggerUpdates();
+    manager.uiStateUnchanged({some: 'action'});
+    expect(animations[0].invokeUiWillUpdate).not.toHaveBeenCalled();
+    expect(animations[0].invokeUiDidUpdate).not.toHaveBeenCalled();
   });
 });
 

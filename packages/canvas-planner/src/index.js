@@ -24,10 +24,14 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import PlannerApp from './components/PlannerApp';
 import PlannerHeader from './components/PlannerHeader';
+import ToDoSidebar from './components/ToDoSidebar';
 import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme';
 import i18n from './i18n';
 import configureStore from './store/configureStore';
-import { initialOptions, getPlannerItems, scrollIntoPast, loadFutureItems } from './actions';
+import {
+  initialOptions, getPlannerItems, scrollIntoPast, loadFutureItems,
+
+ } from './actions';
 import { registerScrollEvents } from './utilities/scrollUtils';
 import { initialize as initializeAlerts } from './utilities/alertUtils';
 import moment from 'moment-timezone';
@@ -44,10 +48,11 @@ const defaultOptions = {
   stickyZIndex: 5,
 };
 
-const dynamicUiManager = new DynamicUiManager();
-export const store = configureStore(dynamicUiManager);
+let externalPlannerActive;
+const plannerActive = () => externalPlannerActive ? externalPlannerActive() : false;
 
-let plannerActive = () => { return false; };
+const dynamicUiManager = new DynamicUiManager({plannerActive});
+export const store = configureStore(dynamicUiManager);
 
 function handleScrollIntoPastAttempt () {
   if (!plannerActive()) return;
@@ -128,6 +133,15 @@ export function renderHeader (element, auxElement, options) {
   , opts.theme), element);
 }
 
+// This method allows you to render the To Do Sidebar into a separate DOM node
+export function renderToDoSidebar (element) {
+  ReactDOM.render(
+    <Provider store={store}>
+      <ToDoSidebar courses={window.ENV.STUDENT_PLANNER_COURSES} timeZone={ENV.TIMEZONE} locale={ENV.LOCALE} />
+    </Provider>
+  , element);
+}
+
 function applyTheme (el, theme) {
   return theme ? (
     <ApplyTheme
@@ -157,7 +171,7 @@ export default function loadPlannerDashboard ({changeToCardView, getActiveApp, f
 
   const stickyElementRect = stickyElement.getBoundingClientRect();
   const stickyOffset = stickyElementRect.bottom - stickyElementRect.top + 24;
-  plannerActive = () => getActiveApp() === 'planner';
+  externalPlannerActive = () => getActiveApp() === 'planner';
 
   const options = {
     flashAlertFunctions: {
