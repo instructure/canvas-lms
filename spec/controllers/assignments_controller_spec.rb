@@ -856,6 +856,44 @@ describe AssignmentsController do
       let(:request_params) { [:edit, params: {course_id: course, id: @assignment}] }
     end
 
+    shared_examples 'course feature flag made available by Anonymous Moderated Marking account flag' do
+      before(:each) do
+        user_session(@teacher)
+      end
+
+      it 'is false when the feature flag is not enabled' do
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+
+        expect(assigns[:js_env][js_env_attribute]).to be false
+      end
+
+      it 'is false when the feature flag is enabled' do
+        @course.enable_feature!(feature_flag)
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+
+        expect(assigns[:js_env][js_env_attribute]).to be false
+      end
+
+      context 'when Anonymous Moderated Marking is enabled' do
+        before(:once) do
+          @course.account.enable_feature!(:anonymous_moderated_marking)
+        end
+
+        it 'is false when the feature flag is not enabled' do
+          get 'edit', params: { course_id: @course.id, id: @assignment.id }
+
+          expect(assigns[:js_env][js_env_attribute]).to be false
+        end
+
+        it 'is true when the feature flag is enabled' do
+          @course.enable_feature!(feature_flag)
+          get 'edit', params: { course_id: @course.id, id: @assignment.id }
+
+          expect(assigns[:js_env][js_env_attribute]).to be true
+        end
+      end
+    end
+
     it "should require authorization" do
       #controller.use_rails_error_handling!
       get 'edit', params: {:course_id => @course.id, :id => @assignment.id}
@@ -1066,23 +1104,16 @@ describe AssignmentsController do
     end
 
     describe 'js_env ANONYMOUS_GRADING_ENABLED' do
-      before(:each) do
-        @course.account.enable_feature!(:anonymous_moderated_marking)
-        user_session(@teacher)
+      it_behaves_like 'course feature flag made available by Anonymous Moderated Marking account flag' do
+        let(:js_env_attribute) { :ANONYMOUS_GRADING_ENABLED }
+        let(:feature_flag) { :anonymous_marking }
       end
+    end
 
-      it 'is false when the anonymous marking flag is not enabled' do
-        get 'edit', params: { course_id: @course.id, id: @assignment.id }
-
-        expect(assigns[:js_env][:ANONYMOUS_GRADING_ENABLED]).to be false
-      end
-
-      it 'is true when the anonymous marking flag is enabled' do
-        @course.enable_feature!(:anonymous_marking)
-
-        get 'edit', params: { course_id: @course.id, id: @assignment.id }
-
-        expect(assigns[:js_env][:ANONYMOUS_GRADING_ENABLED]).to be true
+    describe 'js_env MODERATED_GRADING_ENABLED' do
+      it_behaves_like 'course feature flag made available by Anonymous Moderated Marking account flag' do
+        let(:js_env_attribute) { :MODERATED_GRADING_ENABLED }
+        let(:feature_flag) { :moderated_grading }
       end
     end
   end

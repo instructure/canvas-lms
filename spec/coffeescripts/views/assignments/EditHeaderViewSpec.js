@@ -62,8 +62,8 @@ test('renders', () => {
   ok(view.$('.header-bar-right').length > 0, 'header bar is rendered')
 })
 
-test('renders the moderated grading form field group if Anonymous Moderated Marking is enabled', () => {
-  ENV.ANONYMOUS_MODERATED_MARKING_ENABLED = true
+test('renders the moderated grading form field group if Moderated Grading is enabled', () => {
+  ENV.MODERATED_GRADING_ENABLED = true
   function beforeRender(editView) {
     sinon.stub(editView.model, 'renderModeratedGradingFormFieldGroup')
   }
@@ -72,7 +72,7 @@ test('renders the moderated grading form field group if Anonymous Moderated Mark
   view.model.renderModeratedGradingFormFieldGroup.restore()
 })
 
-test('does not render the moderated grading form field group if Anonymous Moderated Marking is disabled', () => {
+test('does not render the moderated grading form field group if Moderated Grading is disabled', () => {
   function beforeRender(editView) {
     sinon.stub(editView.model, 'renderModeratedGradingFormFieldGroup')
   }

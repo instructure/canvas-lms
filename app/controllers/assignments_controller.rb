@@ -540,7 +540,11 @@ class AssignmentsController < ApplicationController
         hash[:active_grading_periods] = GradingPeriod.json_for(@context, @current_user)
       end
 
-      hash[:ANONYMOUS_GRADING_ENABLED] = @context.feature_enabled?(:anonymous_marking)
+      hash[:ANONYMOUS_GRADING_ENABLED] =
+        hash[:ANONYMOUS_MODERATED_MARKING_ENABLED] && @context.feature_enabled?(:anonymous_marking)
+
+      hash[:MODERATED_GRADING_ENABLED] =
+        hash[:ANONYMOUS_MODERATED_MARKING_ENABLED] && @context.feature_enabled?(:moderated_grading)
 
       append_sis_data(hash)
       if context.is_a?(Course)

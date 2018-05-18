@@ -53,7 +53,7 @@ define [
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
         @toggleConditionalReleaseTab(@model.gradingType())
 
-      if ENV.ANONYMOUS_MODERATED_MARKING_ENABLED
+      if ENV.MODERATED_GRADING_ENABLED
         @model.renderModeratedGradingFormFieldGroup()
 
     canDelete: ->
