@@ -72,8 +72,8 @@ describe QuizzesNext::ExportService do
         {
           "original_course_uuid": 1234,
           "assignments": [
-            {"original_resource_link_id": "link-id-0", "$canvas_assignment_id": 0},
-            {"original_resource_link_id": "link-id-1", "$canvas_assignment_id": 1}
+            {"original_resource_link_id": "link-id-0", "$canvas_assignment_id": 0, "original_assignment_id": 0},
+            {"original_resource_link_id": "link-id-1", "$canvas_assignment_id": 1, "original_assignment_id": 1}
           ]
         }
       )
@@ -88,94 +88,75 @@ describe QuizzesNext::ExportService do
 
   describe '.send_imported_content' do
     let(:new_course) { double('course') }
-
-    it 'emits live events for each copied assignment' do
-      new_assignment1 = assignment_model(id: 100001)
-      new_assignment2 = assignment_model(id: 100002)
-
-      imported_content = {
+    let(:new_assignment1) { assignment_model(id: 1) }
+    let(:new_assignment2) { assignment_model(id: 2) }
+    let(:old_assignment1) { assignment_model(id: 3) }
+    let(:old_assignment2) { assignment_model(id: 4) }
+    let(:basic_import_content) do
+      {
         'original_course_uuid': '100005',
         'assignments': [
           {
-            'original_resource_link_id': '1234',
-            '$canvas_assignment_id': new_assignment1.id
-          },
-          {
-            'original_resource_link_id': '5678',
-            '$canvas_assignment_id': new_assignment2.id
+            'original_resource_link_id': 'link-1234',
+            '$canvas_assignment_id': new_assignment1.id,
+            'original_assignment_id': old_assignment1.id
           }
         ]
       }
+    end
+
+    before do
       allow(new_course).to receive(:uuid).and_return('100006')
+      allow(new_course).to receive(:lti_context_id).and_return('ctx-1234')
+    end
+
+    it 'emits live events for each copied assignment' do
+      basic_import_content[:assignments] << {
+          'original_resource_link_id': 'link-5678',
+          '$canvas_assignment_id': new_assignment2.id,
+          'original_assignment_id': old_assignment2.id
+        }
 
       expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).twice
-      ExportService.send_imported_content(new_course, imported_content)
+      ExportService.send_imported_content(new_course, basic_import_content)
     end
 
     it 'ignores not found assignments' do
-      new_assignment1 = assignment_model(id: 100001)
-      new_assignment2 = assignment_model(id: 100002)
+      basic_import_content[:assignments] << {
+          'original_resource_link_id': '5678',
+          '$canvas_assignment_id': Canvas::Migration::ExternalContent::Translator::NOT_FOUND
+        }
 
-      imported_content = {
-        'original_course_uuid': '100005',
-        'assignments': [
-          {
-            'original_resource_link_id': '1234',
-            '$canvas_assignment_id': new_assignment1.id
-          },
-          {
-            'original_resource_link_id': '5678',
-            '$canvas_assignment_id': new_assignment2.id
-          },
-          {
-            'original_resource_link_id': '5678',
-            '$canvas_assignment_id': Canvas::Migration::ExternalContent::Translator::NOT_FOUND
-          }
-        ]
-      }
-      allow(new_course).to receive(:uuid).and_return('100006')
-
-      expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).twice
-      ExportService.send_imported_content(new_course, imported_content)
+      expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).once
+      ExportService.send_imported_content(new_course, basic_import_content)
     end
 
     it 'includes the new assignment id in the live event payload' do
-      new_assignment = assignment_model
-
-      imported_content = {
-        'original_course_uuid': '100005',
-        'assignments': [
-          {
-            'original_resource_link_id': '1234',
-            '$canvas_assignment_id': new_assignment.id
-          }
-        ]
-      }
-      allow(new_course).to receive(:uuid).and_return('100006')
-
       expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).with(
-        hash_including(new_assignment_id: new_assignment.id)
+        hash_including(new_assignment_id: new_assignment1.global_id)
       )
-      ExportService.send_imported_content(new_course, imported_content)
+      ExportService.send_imported_content(new_course, basic_import_content)
     end
 
     it 'puts new assignments in the "duplicating" state' do
-      new_assignment = assignment_model
-
-      imported_content = {
-        'original_course_uuid': '100005',
-        'assignments': [
-          {
-            'original_resource_link_id': '1234',
-            '$canvas_assignment_id': new_assignment.id
-          }
-        ]
-      }
-      allow(new_course).to receive(:uuid).and_return('100006')
       allow(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated)
 
-      ExportService.send_imported_content(new_course, imported_content)
-      expect(new_assignment.reload.workflow_state).to eq('duplicating')
+      ExportService.send_imported_content(new_course, basic_import_content)
+      expect(new_assignment1.reload.workflow_state).to eq('duplicating')
+    end
+
+    it 'sets the new assignment as duplicate of the old assignment' do
+      allow(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated)
+
+      ExportService.send_imported_content(new_course, basic_import_content)
+      expect(new_assignment1.reload.duplicate_of).to eq(old_assignment1)
+    end
+
+    it 'sets the external_tool_tag to be the same as the old tag' do
+      allow(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated)
+
+      ExportService.send_imported_content(new_course, basic_import_content)
+      expect(new_assignment1.reload.external_tool_tag).to eq(old_assignment1.external_tool_tag)
     end
   end
 end
