@@ -57,12 +57,24 @@ describe 'Developer Keys' do
       wait_for_ajaximations
     end
 
-    def click_scopes_checkbox
+    def click_edit_icon
+      fj("#keys tbody tr.key button:has(svg[name='IconEdit'])").click
+    end
+
+    def click_scope_group_checkbox
       fxpath('//*[@class="scopes-group"]/span[1]/span[2]').click
     end
 
-    def click_edit_icon
-      fj("#keys tbody tr.key button:has(svg[name='IconEdit'])").click
+    def click_scope_checkbox
+      fxpath("//*[@class='developer-key-scope']/span[1]/span[3]").click
+    end
+
+    def select_all_readonly_checkbox
+      fxpath("//*[@class='scopes-list']/span/div/span/span/span/span[2]/div")
+    end
+
+    def all_endpoints_readonly_checkbox_selected?
+      f(".scopes-list input[type='checkbox']").selected?
     end
 
     it "allows creation through 'add developer key button'", test_id: 344077 do
@@ -73,7 +85,7 @@ describe 'Developer Keys' do
       f("input[name='developer_key[email]']").send_keys("admin@example.com")
       f("textarea[name='developer_key[redirect_uris]']").send_keys("http://example.com")
       f("input[name='developer_key[icon_url]']").send_keys("/images/delete.png")
-      click_scopes_checkbox
+      click_scope_group_checkbox
       find_button("Save Key").click
 
       expect(ff("#reactContent tbody tr").length).to eq 1
@@ -94,7 +106,7 @@ describe 'Developer Keys' do
       replace_content(f("input[name='developer_key[email]']"), "admins@example.com")
       replace_content(f("textarea[name='developer_key[redirect_uris]']"), "http://b/")
       replace_content(f("input[name='developer_key[icon_url]']"), "/images/add.png")
-      click_scopes_checkbox
+      click_scope_group_checkbox
       find_button("Save Key").click
 
       expect(ff("#reactContent tbody tr").length).to eq 1
@@ -116,7 +128,7 @@ describe 'Developer Keys' do
       replace_content(f("input[name='developer_key[email]']"), "admins@example.com")
       replace_content(f("input[name='developer_key[redirect_uri]']"), "https://b/")
       replace_content(f("input[name='developer_key[icon_url]']"), "/images/add.png")
-      click_scopes_checkbox
+      click_scope_group_checkbox
       find_button("Save Key").click
 
       expect(ff("#reactContent tbody tr").length).to eq 1
@@ -134,7 +146,7 @@ describe 'Developer Keys' do
       get "/accounts/#{Account.default.id}/developer_keys"
       click_edit_icon
       f("input[name='developer_key[icon_url]']").clear
-      click_scopes_checkbox
+      click_scope_group_checkbox
       find_button("Save Key").click
 
       expect(ff("#reactContent tbody tr").length).to eq 1
@@ -300,21 +312,16 @@ describe 'Developer Keys' do
     context "scopes" do
       let(:expected_scopes) do
         [
-          "url:GET|/api/v1/accounts/search",
-          "url:POST|/api/v1/account_domain_lookups",
-          "url:PUT|/api/v1/account_domain_lookups/:id",
-          "url:DELETE|/api/v1/account_domain_lookups/:id",
-          "url:GET|/api/v1/accounts/search",
-          "url:POST|/api/v1/account_domain_lookups",
-          "url:PUT|/api/v1/account_domain_lookups/:id",
-          "url:DELETE|/api/v1/account_domain_lookups/:id"
+          "url:GET|/api/v1/courses/:course_id/assignment_groups/:assignment_group_id",
+          "url:POST|/api/v1/courses/:course_id/assignment_groups",
+          "url:PUT|/api/v1/courses/:course_id/assignment_groups/:assignment_group_id",
+          "url:DELETE|/api/v1/courses/:course_id/assignment_groups/:assignment_group_id"
         ]
       end
 
       before(:each) do
         Account.site_admin.allow_feature!(:api_token_scoping)
         Account.default.enable_feature!(:api_token_scoping)
-        expand_scope_group_by_filter('account_domain_lookups')
       end
 
       def expand_scope_group_by_filter(scope)
@@ -325,15 +332,18 @@ describe 'Developer Keys' do
       end
 
       it "allows filtering by scope group name" do
+        expand_scope_group_by_filter('assignment_groups_api')
         expect(ff(".toggle-scope-group")).to have_size(1)
       end
 
       it "expands scope group when group name is selected" do
+        expand_scope_group_by_filter('assignment_groups_api')
         expect(f(".toggle-scope-group button").attribute('aria-expanded')).to eq 'true'
         expect(ff(".toggle-scope-group .developer-key-scope")).to have_size(4)
       end
 
       it "includes proper scopes for scope group" do
+        expand_scope_group_by_filter('assignment_groups_api')
         scope_group = f(".toggle-scope-group")
         expect(scope_group).to contain_css("span[title='GET']")
         expect(scope_group).to contain_css("span[title='POST']")
@@ -342,7 +352,8 @@ describe 'Developer Keys' do
       end
 
       it "scope group select all checkbox adds all associated scopes" do
-        click_scopes_checkbox
+        expand_scope_group_by_filter('assignment_groups_api')
+        click_scope_group_checkbox
         # checks that all UI pills have been added to scope group if selected
         expect(ff(".toggle-scope-group span[title='GET']")).to have_size(2)
         expect(ff(".toggle-scope-group span[title='POST']")).to have_size(2)
@@ -351,7 +362,8 @@ describe 'Developer Keys' do
       end
 
       it "scope group individual checkbox adds only associated scope" do
-        fxpath("//*[@class='developer-key-scope']/span[1]/span[3]").click
+        expand_scope_group_by_filter('assignment_groups_api')
+        click_scope_checkbox
         # adds a UI pill to scope group with http verb if scope selected
         expect(ff(".toggle-scope-group span[title='GET']")).to have_size(2)
         expect(ff(".toggle-scope-group span[title='POST']")).to have_size(1)
@@ -360,23 +372,44 @@ describe 'Developer Keys' do
       end
 
       it "adds scopes to backend developer key via UI" do
-        click_scopes_checkbox
+        skip 'Reneable once PLAT-3398 is merged'
+        expand_scope_group_by_filter('assignment_groups_api')
+        click_scope_group_checkbox
         find_button("Save Key").click
         wait_for_ajaximations
         expect(DeveloperKey.last.scopes).to eq expected_scopes
       end
 
       it "removes scopes from backend developer key via UI" do
-        click_scopes_checkbox
+        expand_scope_group_by_filter('assignment_groups_api')
+        click_scope_group_checkbox
         find_button("Save Key").click
         click_edit_icon
-        click_scopes_checkbox
+        click_scope_group_checkbox
         f("input[placeholder='Search endpoints']").send_keys 'account_domain_lookups'
-        click_scopes_checkbox
+        click_scope_group_checkbox
         dk = DeveloperKey.last
         find_button("Save Key").click
         wait_for_ajaximations
         expect(dk.reload.scopes).not_to eq expected_scopes
+      end
+
+      it "keeps all endpoints read only checkbox checked after save" do
+        get "/accounts/#{Account.default.id}/developer_keys"
+        find_button("Developer Key").click
+        select_all_readonly_checkbox.click
+        find_button("Save Key").click
+        click_edit_icon
+        expect(all_endpoints_readonly_checkbox_selected?).to eq true
+      end
+
+      it "keeps all endpoints read only checkbox checked if check/unchecking another http verb" do
+        expand_scope_group_by_filter('assignment_groups_api')
+        select_all_readonly_checkbox.click
+        click_scope_checkbox
+        expect(f(".toggle-scope-group input[type='checkbox']").selected?).to eq false
+        click_scope_checkbox
+        expect(all_endpoints_readonly_checkbox_selected?).to eq true
       end
     end
   end
