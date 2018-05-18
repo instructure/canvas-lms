@@ -42,10 +42,37 @@ const permissions = handleActions(
   []
 )
 
+function changePermission(permission, permissionName, enabled, locked) {
+  return {
+    ...permission,
+    permissions: {
+      ...permission.permissions,
+      [permissionName]: {
+        ...permission.permissions[permissionName],
+        enabled,
+        locked
+      }
+    }
+  }
+}
+
+const courseRolesReducer = handleActions(
+  {
+    [actionTypes.UPDATE_PERMISSIONS]: (state, action) => {
+      const {courseRoleId, permissionName, enabled, locked} = action.payload
+      const newState = state.map(
+        p => (p.id === courseRoleId ? changePermission(p, permissionName, enabled, locked) : p)
+      )
+      return newState
+    }
+  },
+  false
+)
+
 export default combineReducers({
   contextId: (state, _action) => state || '',
   permissions,
-  roles: (state, _action) => state || [],
+  activeAddTray: activeAddTrayReducer,
   activeRoleTray: activeRoleTrayReducer,
-  activeAddTray: activeAddTrayReducer
+  roles: courseRolesReducer
 })

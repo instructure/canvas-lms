@@ -27,6 +27,7 @@ import Button from '@instructure/ui-buttons/lib/components/Button'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
 import actions from '../actions'
+import {ConnectedPermissionButton} from './PermissionButton'
 import propTypes from '../propTypes'
 
 // const COL_WIDTH = 140
@@ -163,7 +164,11 @@ export default class PermissionsTable extends Component {
               {this.props.roles.map(role => (
                 <td key={role.id}>
                   <div className="ic-permissions__cell-content">
-                    <button aria-label="toggle some permission">√</button>
+                    <ConnectedPermissionButton
+                      permission={role.permissions[perm.permission_name]}
+                      permissionName={perm.permission_name}
+                      courseRoleId={role.id}
+                    />
                   </div>
                 </td>
               ))}

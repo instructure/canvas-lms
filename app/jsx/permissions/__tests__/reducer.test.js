@@ -97,3 +97,35 @@ it('HIDE_ALL_TRAYS sets the activeAddTray to false in the store', () => {
   const newState = reduce(actions.hideAllTrays(), originalState)
   expect(newState.activeAddTray).toBeFalsy()
 })
+
+it('UPDATE_PERMISSIONS sets enabled in the store', () => {
+  const originalState = {
+    roles: [{id: '1', permissions: {become_user: {enabled: true, locked: true}}}]
+  }
+  const payload = {courseRoleId: '1', permissionName: 'become_user', enabled: false, locked: true}
+  const newState = reduce(actions.updatePermissions(payload), originalState)
+  const expectedState = {
+    activeAddTray: null,
+    activeRoleTray: null,
+    contextId: '',
+    permissions: [],
+    roles: [{id: '1', permissions: {become_user: {enabled: false, locked: true}}}]
+  }
+  expect(newState).toEqual(expectedState)
+})
+
+it('UPDATE_PERMISSIONS sets locked in the store', () => {
+  const originalState = {
+    roles: [{id: '1', permissions: {become_user: {enabled: true, locked: true}}}]
+  }
+  const payload = {courseRoleId: '1', permissionName: 'become_user', enabled: true, locked: false}
+  const newState = reduce(actions.updatePermissions(payload), originalState)
+  const expectedState = {
+    activeAddTray: null,
+    activeRoleTray: null,
+    contextId: '',
+    permissions: [],
+    roles: [{id: '1', permissions: {become_user: {enabled: true, locked: false}}}]
+  }
+  expect(newState).toEqual(expectedState)
+})

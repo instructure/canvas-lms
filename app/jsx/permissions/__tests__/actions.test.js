@@ -119,3 +119,22 @@ it('setAndOpenAddTray dispatches hideAllTrays and displayAddTray', () => {
   expect(dispatchMock).toHaveBeenCalledWith(expectedHideDispatch)
   expect(dispatchMock).toHaveBeenCalledWith(expectedDisplayAddDispatch)
 })
+
+it('updatePermission dispatches updatePermissions', () => {
+  const state = ''
+  const dispatchMock = jest.fn()
+  actions.modifyPermissions('add', '1', true, true)(dispatchMock, () => state)
+
+  const expectedDispatch = {
+    type: 'UPDATE_PERMISSIONS',
+    payload: {
+      permissionName: 'add',
+      courseRoleId: '1',
+      enabled: true,
+      locked: true
+    }
+  }
+
+  expect(dispatchMock).toHaveBeenCalledTimes(1)
+  expect(dispatchMock).toHaveBeenCalledWith(expectedDispatch)
+})

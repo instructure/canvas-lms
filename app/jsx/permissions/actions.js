@@ -25,7 +25,8 @@ const types = [
   'GET_PERMISSIONS_START',
   'GET_PERMISSIONS_SUCCESS',
   'HIDE_ALL_TRAYS',
-  'UPDATE_PERMISSIONS_SEARCH'
+  'UPDATE_PERMISSIONS_SEARCH',
+  'UPDATE_PERMISSIONS'
 ]
 
 const actions = createActions(...types)
@@ -57,6 +58,17 @@ actions.setAndOpenAddTray = function() {
   return dispatch => {
     dispatch(actions.hideAllTrays())
     dispatch(actions.displayAddTray())
+  }
+}
+
+actions.modifyPermissions = function modifyPermissions(
+  permissionName,
+  courseRoleId,
+  enabled,
+  locked
+) {
+  return dispatch => {
+    dispatch(actions.updatePermissions({permissionName, courseRoleId, enabled, locked}))
   }
 }
 

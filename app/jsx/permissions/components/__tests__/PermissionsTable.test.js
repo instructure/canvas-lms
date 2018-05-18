@@ -18,23 +18,49 @@
 
 import '@instructure/ui-themes/lib/canvas'
 import React from 'react'
+import {Provider} from 'react-redux'
 import {mount} from 'enzyme'
 import PermissionsTable from '../PermissionsTable'
 
 import {COURSE} from '../../propTypes'
 
 const defaultProps = () => ({
-  displayRoleTray: () => {},
-  roles: [{id: '1', label: 'Role 1', displayed: true}, {id: '2', label: 'Role 2', displayed: true}],
+  roles: [
+    {
+      id: '1',
+      label: 'Role 1',
+      permissions: {permission_1: 'permission_1', permission_2: 'permission_2'}
+    },
+    {
+      id: '2',
+      label: 'Role 2',
+      permissions: {permission_1: 'permission_1', permission_2: 'permission_2'}
+    }
+  ],
   permissions: [
     {permission_name: 'permission_1', label: 'Permission 1', contextType: COURSE, displayed: true},
     {permission_name: 'permission_2', label: 'Permission 2', contextType: COURSE, displayed: true}
   ]
 })
 
+const store = {
+  getState: () => ({
+    contextId: 1,
+    permissions: [],
+    roles: []
+  }),
+  dispatch() {},
+  subscribe() {}
+}
+
 it('renders the Permissions Table', () => {
-  const tree = mount(<PermissionsTable {...defaultProps()} />)
-  expect(tree.exists()).toBe(true)
+  const tree = mount(
+    <Provider store={store}>
+      <PermissionsTable {...defaultProps()} />
+    </Provider>
+  )
+  const node = tree.find('PermissionsTable')
+  expect(node.exists()).toBe(true)
 })
 
 // TODO: add more once we get something more fleshed out

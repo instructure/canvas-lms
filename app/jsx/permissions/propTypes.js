@@ -38,4 +38,13 @@ propTypes.role = shape({
   displayed: bool.isRequired
 })
 
+propTypes.rolePermission = shape({
+  enabled: bool.isRequired,
+  explicit: bool.isRequired,
+  locked: bool.isRequired,
+  readonly: bool.isRequired,
+  applies_to_descendants: bool,
+  applies_to_self: bool
+})
+
 export default propTypes
