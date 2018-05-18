@@ -241,7 +241,7 @@ exports[`Point Rubric when assessing with a custom criterion renders the root co
     <LongDescriptionDialog close={[Function]} longDescription=\\"\\" open={false} />
   </th>
   <td className=\\"ratings\\">
-    <Ratings assessing={true} tiers={{...}} onPointChange={[Function]} points={3.2} />
+    <Ratings assessing={true} tiers={{...}} onPointChange={[Function]} points={3.2} masteryThreshold={8} />
   </td>
   <td>
     <Points assessing={true} onPointChange={[Function]} points={3.2} pointsPossible={8} pointsText={{...}} />
@@ -306,7 +306,7 @@ exports[`Point Rubric when assessing with a outcome criterion renders the root c
     <Threshold threshold={3} />
   </th>
   <td className=\\"ratings\\">
-    <Ratings assessing={true} tiers={{...}} onPointChange={[Function]} points={3} />
+    <Ratings assessing={true} tiers={{...}} onPointChange={[Function]} points={3} masteryThreshold={3} />
   </td>
   <td>
     <Points assessing={true} onPointChange={[Function]} points={3} pointsPossible={3} pointsText={{...}} />
@@ -356,7 +356,7 @@ exports[`Point Rubric with a custom criterion renders the root component as expe
     </div>
   </th>
   <td className=\\"ratings\\">
-    <Ratings assessing={false} tiers={{...}} onPointChange={[Function]} points={3.2} />
+    <Ratings assessing={false} tiers={{...}} onPointChange={[Function]} points={3.2} masteryThreshold={8} />
   </td>
   <td>
     <Points assessing={false} onPointChange={{...}} points={3.2} pointsPossible={8} pointsText={{...}} />
@@ -434,7 +434,7 @@ exports[`Point Rubric with a outcome criterion renders the root component as exp
     </div>
   </th>
   <td className=\\"ratings\\">
-    <Ratings assessing={false} tiers={{...}} onPointChange={[Function]} points={3} />
+    <Ratings assessing={false} tiers={{...}} onPointChange={[Function]} points={3} masteryThreshold={3} />
   </td>
   <td>
     <Points assessing={false} onPointChange={{...}} points={3} pointsPossible={3} pointsText={{...}} />

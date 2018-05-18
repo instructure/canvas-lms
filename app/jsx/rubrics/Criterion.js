@@ -133,7 +133,7 @@ export default class Criterion extends React.Component {
       savedComments
     } = this.props
     const { dialogOpen } = this.state
-
+    const isOutcome = criterion.learning_outcome_id !== undefined
     const assessing = onAssessmentChange !== null
     const updatePoints = (text) => {
       let points = numberHelper.parse(text)
@@ -161,6 +161,7 @@ export default class Criterion extends React.Component {
         tiers={criterion.ratings}
         onPointChange={onPointChange}
         points={assessment.points}
+        masteryThreshold={isOutcome ? criterion.mastery_points : criterion.points}
       />
     )
 
@@ -187,7 +188,6 @@ export default class Criterion extends React.Component {
     )
 
     const points = assessment && assessment.points
-    const outcome = criterion.learning_outcome_id !== undefined
     const pointsText = assessment.pointsText
     const pointsPossible = criterion.points
     const longDescription = criterion.long_description
@@ -197,7 +197,7 @@ export default class Criterion extends React.Component {
       <tr className="rubric-criterion">
         <th scope="row" className="description-header">
           <div className="description container">
-            {outcome ? <OutcomeIcon /> : ''}
+            {isOutcome ? <OutcomeIcon /> : ''}
             <Text size="small">
               {criterion.description}
             </Text>

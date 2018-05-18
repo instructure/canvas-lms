@@ -27,7 +27,8 @@ describe('The Ratings component', () => {
       { description: 'Meh', long_description: 'More Verbosity', points: 5 },
       { description: 'Subpar', points: 2 }
     ],
-    points: 4
+    points: 4,
+    masteryThreshold: 10
   }
 
   const component = (mods) => shallow(<Ratings {...{ ...props, ...mods }} />)
@@ -37,7 +38,7 @@ describe('The Ratings component', () => {
 
   it('highlights the right rating', () => {
     const ratings = (points) =>
-      component({ points }).find('Rating').map((el) => el.prop('selected'))
+      component({ points }).find('Rating').map((el) => el.shallow().hasClass('selected'))
 
     expect(ratings(9)).toEqual([true, false, false])
     expect(ratings(5)).toEqual([false, true, false])
@@ -50,5 +51,13 @@ describe('The Ratings component', () => {
 
     el.find('Rating').first().prop('onClick').call()
     expect(onPointChange.args[0]).toEqual([10])
+  })
+
+  it('uses the right mastery level', () => {
+    const mastery = (points, mastery_level) =>
+      component({ points }).find('Rating').map((el) => el.shallow().hasClass(mastery_level))
+    expect(mastery(10, 'full')).toEqual([true, false, false])
+    expect(mastery(5, 'partial')).toEqual([false, true, false])
+    expect(mastery(1, 'none')).toEqual([false, false, true])
   })
 })

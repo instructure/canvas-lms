@@ -34,13 +34,13 @@ const Rating = (props) => {
     description,
     long_description,
     points,
-    selected,
-    onClick
+    onClick,
+    classes
   } = props
 
   return (
     <div
-      className={classNames('rating-tier', { selected })}
+      className={classes}
       onClick={onClick}
       onKeyPress={(e) => e.key === 'Enter' ? onClick() : null}
       role="button"
@@ -59,9 +59,21 @@ const Rating = (props) => {
       <Text size="x-small" fontStyle="italic" lineHeight="condensed">
         {long_description}
       </Text>
+      <div className='shader'><div className="triangle"/></div>
     </div>
   )
 }
+
+const getMasteryLevel = (points, masteryThreshold) => {
+  if (points >= masteryThreshold) {
+    return 'full'
+  } else if (points >= masteryThreshold/2) {
+    return 'partial'
+  } else {
+    return 'none'
+  }
+}
+
 Rating.propTypes = {
   ...tierShape,
   selected: PropTypes.bool
@@ -70,7 +82,7 @@ Rating.defaultProps = {
   selected: false,
 }
 
-const Ratings = ({ assessing, tiers, points, onPointChange }) => {
+const Ratings = ({ assessing, tiers, points, onPointChange, masteryThreshold }) => {
   const pairs = tiers.map((tier, index) => {
     const next = tiers[index + 1]
     return { current: tier.points, next: next ? next.points : 0 }
@@ -83,15 +95,16 @@ const Ratings = ({ assessing, tiers, points, onPointChange }) => {
   return (
     <div className={classNames("rating-tier-list", { 'react-assessing': assessing })}>
       {
-        tiers.map((tier, index) => (
-          <Rating
-            // eslint-disable-next-line react/no-array-index-key
-            key={index}
-            onClick={() => onPointChange(tier.points)}
-            selected={selectedIndex === index}
-            {...tier}
-          />
-        ))
+        tiers.map((tier, index) => {
+          const selected = selectedIndex === index
+          const classes = classNames({
+            'rating-tier': true,
+            'selected': selected,
+          }, selected && getMasteryLevel(points, masteryThreshold))
+          return ( // eslint-disable-next-line react/no-array-index-key
+            <Rating key={index} onClick={() => onPointChange(tier.points)} classes={classes} {...tier} />
+          )
+        })
       }
     </div>
   )
