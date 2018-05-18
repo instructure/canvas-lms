@@ -26,4 +26,3 @@ module AssignmentGradeTypeSetup
     @assignment.grade_student(@students[0], grade: grade, grader: @teacher)
   end
 end
-
