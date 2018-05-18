@@ -17,13 +17,6 @@
 #
 
 module Types
-  # TODO - inherit from app-specific object
-  class QuizType < ApplicationObjectType
-    graphql_name "Quiz"
-
-    implements GraphQL::Relay::Node.interface
-    implements Interfaces::TimestampInterface
-
-    field :_id, ID, "legacy canvas id", method: :id, null: false
+  class ApplicationObjectType < GraphQL::Schema::Object
   end
 end
