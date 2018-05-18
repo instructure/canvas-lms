@@ -28,6 +28,7 @@ module ExternalAuthObservation
 
     def logout_url
       if response.is_a?(SAML2::Response)
+        aac = @account_auth_config
         idp = aac.idp_metadata.identity_providers.first
         name_id = response.assertions.first.subject.name_id
 
@@ -43,10 +44,10 @@ module ExternalAuthObservation
 
         # sign the request
         private_key = AccountAuthorizationConfig::SAML.private_key
-        private_key = nil if sig_alg.nil?
+        private_key = nil if aac.sig_alg.nil?
         SAML2::Bindings::HTTPRedirect.encode(logout_request,
                                              private_key: private_key,
-                                             sig_alg: sig_alg)
+                                             sig_alg: aac.sig_alg)
       else
         saml_request = Onelogin::Saml::LogoutRequest.generate(
           response.name_qualifier,
