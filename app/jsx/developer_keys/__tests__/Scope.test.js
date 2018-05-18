@@ -50,7 +50,7 @@ it('does not check the checkbox if the checked prop is false', () => {
   expect(wrapper.find('input[type="checkbox"]').props().checked).toBe(false)
 })
 
-it('renders the scope path', () => {
+it('renders the scope scope', () => {
   const props = {
     onChange: jest.fn(),
     checked: false,
@@ -58,7 +58,7 @@ it('renders the scope path', () => {
   }
 
   const wrapper = mount(<DeveloperKeyScope {...props} />)
-  expect(wrapper.find('.developer-key-scope').text()).toContain(scope.path)
+  expect(wrapper.find('.developer-key-scope').text()).toContain(scope.scope)
 })
 
 it('renders the scope verb', () => {

@@ -30,12 +30,12 @@ const DeveloperKeyScope = props => {
           <DeveloperKeyScopesMethod method={props.scope.verb} />
         </FlexItem>
         <FlexItem grow shrink padding="none small none none">
-          {props.scope.path}
+          {props.scope.scope}
         </FlexItem>
         <FlexItem padding="none">
           <Checkbox
             name="developer_key[scopes][]"
-            label={<ScreenReaderContent>{props.scope.path}</ScreenReaderContent>}
+            label={<ScreenReaderContent>{props.scope.scope}</ScreenReaderContent>}
             value={props.scope.scope}
             onChange={props.onChange}
             checked={props.checked}
