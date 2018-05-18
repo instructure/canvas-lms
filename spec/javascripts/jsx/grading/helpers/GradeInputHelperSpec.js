@@ -153,6 +153,40 @@ QUnit.module('GradeInputHelper', () => {
         strictEqual(hasGradeChanged(), true)
       })
     })
+
+    QUnit.module('when the pending grade is entered as "passFail"', contextHooks => {
+      contextHooks.beforeEach(() => {
+        options.enterGradesAs = 'passFail'
+        Object.assign(pendingGradeInfo, {enteredAs: 'passFail', grade: 'complete', score: 10})
+        Object.assign(submission, {enteredGrade: 'complete', grade: 'complete'})
+      })
+
+      QUnit.module('when the assignment is out of zero points', nestedContextHooks => {
+        nestedContextHooks.beforeEach(() => {
+          options.pointsPossible = 0
+          pendingGradeInfo.score = 0
+          submission.score = 0
+        })
+
+        test('returns false when the pending grade matches the submission grade', () => {
+          strictEqual(hasGradeChanged(), false)
+        })
+
+        test('returns true when the pending grade differs from the submission grade', () => {
+          pendingGradeInfo.grade = 'incomplete'
+          strictEqual(hasGradeChanged(), true)
+        })
+      })
+
+      test('returns false when the pending score matches the submission score', () => {
+        strictEqual(hasGradeChanged(), false)
+      })
+
+      test('returns true when the pending score differs from the submission score', () => {
+        pendingGradeInfo.score = 0
+        strictEqual(hasGradeChanged(), true)
+      })
+    })
   })
 
   QUnit.module('.parseTextValue()', () => {
