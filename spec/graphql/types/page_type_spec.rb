@@ -16,25 +16,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-Types::LegacyNodeType = GraphQL::EnumType.define do
-  name "NodeType"
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
 
-  value "Assignment"
-  value "Course"
-  value "Section"
-  value "User"
-  value "Enrollment"
-  value "GradingPeriod"
-  value "Module"
-  value "Page"
+describe Types::PageType do
+  let_once(:course) { course_factory(active_all: true) }
+  let_once(:wiki) { course.create_wiki! has_no_front_page: false, title: "asdf" }
+  let_once(:page) { wiki.front_page }
+  let(:page_type) { GraphQLTypeTester.new(Types::PageType, page) }
 
-=begin
-  # TODO: seems like we should be able to dynamically generate the types that
-  # go here (but i'm getting a circular dep. error when i try)
-    CanvasSchema.types.values.select { |t|
-      t.respond_to?(:interfaces) && t.interfaces.include?(CanvasSchema.types["Node"])
-    }.each { |t|
-      value t
-    }
-=end
+  it "works" do
+    expect(page_type.title).to eq page.title
+  end
 end

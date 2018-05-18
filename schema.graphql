@@ -563,6 +563,7 @@ enum NodeType {
   Enrollment
   GradingPeriod
   Module
+  Page
   Section
   User
 }
@@ -570,6 +571,15 @@ enum NodeType {
 enum OrderDirection {
   ascending
   descending
+}
+
+type Page implements Node, Timestamped {
+  # legacy canvas id
+  _id: ID!
+  createdAt: DateTime
+  id: ID!
+  title: String
+  updatedAt: DateTime
 }
 
 # Information about pagination in a connection.

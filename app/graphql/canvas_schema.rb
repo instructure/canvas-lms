@@ -41,10 +41,11 @@ CanvasSchema = GraphQL::Schema.define do
     when Enrollment then Types::EnrollmentType
     when GradingPeriod then Types::GradingPeriodType
     when ContextModule then Types::ModuleType
+    when WikiPage then Types::PageType
     end
   }
 
-  orphan_types [Types::ModuleType]
+  orphan_types [Types::ModuleType, Types::PageType]
 
   instrument :field, AssignmentOverrideInstrumenter.new
 end
