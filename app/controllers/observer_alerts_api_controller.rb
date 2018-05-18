@@ -42,4 +42,23 @@ class ObserverAlertsApiController < ApplicationController
 
     render json: { unread_count: alerts.count }
   end
+
+  def update
+    alert = ObserverAlert.find(params[:observer_alert_id])
+    link = alert.user_observation_link
+    return render_unauthorized_action unless link.observer == @current_user
+
+    case params[:workflow_state]
+    when 'read'
+      alert.workflow_state = 'read'
+    when 'dismissed'
+      alert.workflow_state = 'dismissed'
+    end
+
+    if alert.save
+      render json: observer_alert_json(alert, @current_user, session)
+    else
+      render(json: alert.errors, status: :bad_request)
+    end
+  end
 end

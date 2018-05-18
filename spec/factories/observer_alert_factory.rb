@@ -30,7 +30,7 @@ module Factories
     default_attrs = {
       title: 'value for type',
       alert_type: 'course_announcement',
-      workflow_state: 'active',
+      workflow_state: 'unread',
       action_date: Time.zone.now
     }
 

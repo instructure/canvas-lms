@@ -28,7 +28,7 @@ describe ObserverAlertsApiController, type: :request do
       @assignment = assignment_model(context: @course)
 
       observer_alert_model(course: @course, alert_type: 'assignment_grade_high', context: @assignment)
-      @oat = @observer_alert_threshold
+      @threshold = @observer_alert_threshold
 
       observer_alert_model(course: @course, observer: @observer, observee: @observee, uol: @observation_link,
         alert_type: 'assignment_grade_low', context: @assignment)
@@ -50,10 +50,10 @@ describe ObserverAlertsApiController, type: :request do
 
       expect(alert['title']).to eq('value for type')
       expect(alert['alert_type']).to eq('assignment_grade_high')
-      expect(alert['workflow_state']).to eq('active')
+      expect(alert['workflow_state']).to eq('unread')
       expect(alert['html_url']).to eq course_assignment_url(@course, @assignment)
       expect(alert['user_observation_link_id']).to eq @observation_link.id
-      expect(alert['observer_alert_threshold_id']).to eq @oat.id
+      expect(alert['observer_alert_threshold_id']).to eq @threshold.id
     end
 
     it 'returns all alerts for student' do
@@ -81,7 +81,7 @@ describe ObserverAlertsApiController, type: :request do
     end
   end
 
-  describe 'alerts_count' do
+  describe '#alerts_count' do
     before :once do
       @course = course_model
       @assignment = assignment_model(context: @course)
@@ -109,4 +109,51 @@ describe ObserverAlertsApiController, type: :request do
     end
   end
 
+  context '#update' do
+    before :each do
+      @course = course_model
+      @assignment = assignment_model(context: @course)
+
+      observer_alert_model(course: @course, alert_type: 'assignment_grade_high', context: @assignment)
+
+      @path = "/api/v1/users/#{@observer.id}/observer_alerts/#{@observer_alert.id}"
+      @params = {user_id: @observer.to_param, observer_alert_id: @observer_alert.to_param,
+        controller: 'observer_alerts_api', action: 'update', format: 'json'}
+    end
+
+    it 'updates the workflow_state to read' do
+      path = "#{@path}/read"
+      params = @params.merge(workflow_state: 'read')
+      json = api_call_as_user(@observer, :put, path, params)
+      expect(json['workflow_state']).to eq 'read'
+    end
+
+    it 'updates the workflow_state to dismissed' do
+      path = "#{@path}/dismissed"
+      params = @params.merge(workflow_state: 'dismissed')
+      json = api_call_as_user(@observer, :put, path, params)
+      expect(json['workflow_state']).to eq 'dismissed'
+    end
+
+    it 'doesnt allow other workflow_states' do
+      path = "#{@path}/hijacked"
+      params = @params.merge(workflow_state: 'hijacked')
+      json = api_call_as_user(@observer, :put, path, params)
+      expect(json['workflow_state']).to eq 'unread'
+    end
+
+    it 'doesnt update any other attribute' do
+      path = "#{@path}/read"
+      params = @params.merge(workflow_state: 'read', observer_alert: {alert_type: 'course_grade_low'})
+      json = api_call_as_user(@observer, :put, path, params)
+      expect(json['alert_type']).to eq 'assignment_grade_high'
+    end
+
+    it 'errors without valid user_observation_link' do
+      user = user_model
+      params = @params.merge(workflow_state: 'read')
+      api_call_as_user(user, :put, "#{@path}/read", params)
+      expect(response.code).to eq "401"
+    end
+  end
 end

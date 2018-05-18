@@ -1336,6 +1336,7 @@ CanvasRails::Application.routes.draw do
 
       scope(controller: :observer_alerts_api) do
         get 'users/:user_id/observer_alerts/:student_id', action: :alerts_by_student, as: 'observer_alerts_by_student'
+        put 'users/:user_id/observer_alerts/:observer_alert_id/:workflow_state', action: :update
       end
     end
 
