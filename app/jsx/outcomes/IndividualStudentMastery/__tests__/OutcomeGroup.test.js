@@ -21,6 +21,26 @@ import { render, shallow } from 'enzyme'
 import { Set } from 'immutable'
 import OutcomeGroup from '../OutcomeGroup'
 
+const outcome = (id, title) => ({
+  id,
+  title,
+  mastered: false,
+  ratings: [
+    { description: 'My first rating' },
+    { description: 'My second rating' }
+  ],
+  results: [
+    {
+      id: 1,
+      percent: 0.1,
+      alignment: {
+        html_url: 'http://foo',
+        name: 'My alignment'
+      }
+    }
+  ]
+})
+
 const defaultProps = (props = {}) => (
   Object.assign({
     outcomeGroup: {
@@ -82,11 +102,22 @@ it('renders correctly expanded', () => {
   expect(wrapper.debug()).toMatchSnapshot()
 })
 
-it('passes expanded=true to the child outcome when expanded', () => {
-  const props = defaultProps()
-  props.expandedOutcomes = Set([100])
+it('renders outcomes in alphabetical order by title', () => {
+  const props = defaultProps({
+    outcomes: [
+      outcome(1, 'ZZ Top'),
+      outcome(2, 'Aardvark'),
+      outcome(3, 'abba'),
+      outcome(4, 'Aerosmith')
+    ]
+  })
   const wrapper = shallow(<OutcomeGroup {...props} />)
-  expect(wrapper.find('Outcome').prop('expanded')).toBe(true)
+  const outcomes = wrapper.find('Outcome')
+  expect(outcomes).toHaveLength(4)
+  expect(outcomes.get(0).props.outcome.title).toEqual('Aardvark')
+  expect(outcomes.get(1).props.outcome.title).toEqual('abba')
+  expect(outcomes.get(2).props.outcome.title).toEqual('Aerosmith')
+  expect(outcomes.get(3).props.outcome.title).toEqual('ZZ Top')
 })
 
 describe('handleToggle()', () => {

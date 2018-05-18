@@ -148,3 +148,25 @@ describe('expand and contract', () => {
     })
   })
 })
+
+it('renders outcome groups in alphabetical order by title', (done) => {
+  fetchOutcomes.mockImplementation(() => Promise.resolve({
+    outcomeGroups: [
+      { id: 1, title: 'ZZ Top Albums' },
+      { id: 2, title: 'Aerosmith Albums' },
+      { id: 3, title: 'Aardvark Albums' },
+      { id: 4, title: 'abba Albums' }
+    ],
+    outcomes: []
+  }))
+  const wrapper = mount(<IndividualStudentMastery {...props} />)
+  setTimeout(() => {
+    const groups = wrapper.find('OutcomeGroup')
+    expect(groups).toHaveLength(4)
+    expect(groups.get(0).props.outcomeGroup.title).toEqual('Aardvark Albums')
+    expect(groups.get(1).props.outcomeGroup.title).toEqual('abba Albums')
+    expect(groups.get(2).props.outcomeGroup.title).toEqual('Aerosmith Albums')
+    expect(groups.get(3).props.outcomeGroup.title).toEqual('ZZ Top Albums')
+    done()
+  })
+})

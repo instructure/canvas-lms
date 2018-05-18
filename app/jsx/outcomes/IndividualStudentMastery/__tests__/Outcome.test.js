@@ -20,6 +20,16 @@ import React from 'react'
 import { render, shallow } from 'enzyme'
 import Outcome from '../Outcome'
 
+const result = (id = 1, date = new Date()) => ({
+  id,
+  percent: 0.1,
+  assignment: {
+    html_url: 'http://foo',
+    name: 'My alignment'
+  },
+  submitted_or_assessed_at: date.toISOString()
+})
+
 const defaultProps = (props = {}) => (
   Object.assign({
     outcome: {
@@ -95,6 +105,28 @@ describe('header', () => {
 it('includes the individual results', () => {
   const wrapper = shallow(<Outcome {...defaultProps()} />)
   expect(wrapper.find('AssignmentResult')).toHaveLength(1)
+})
+
+it('renders the results by most recent', () => {
+  const props = defaultProps()
+  const now = new Date()
+  const minuteAgo = new Date(now - 60000)
+  const hourAgo = new Date(now - 3600000)
+  const yearishAgo = new Date(now - 3600000 * 24 * 360)
+  props.outcome.results = [
+    result(1, hourAgo),
+    result(2, now),
+    result(3, minuteAgo),
+    result(4, yearishAgo)
+  ]
+
+  const wrapper = shallow(<Outcome {...props} />)
+  const results = wrapper.find('AssignmentResult')
+  expect(results).toHaveLength(4)
+  expect(results.get(0).props.result.id).toEqual(2) // now
+  expect(results.get(1).props.result.id).toEqual(3) // minuteAgo
+  expect(results.get(2).props.result.id).toEqual(1) // hourAgo
+  expect(results.get(3).props.result.id).toEqual(4) // yearishAgo
 })
 
 describe('handleToggle()', () => {

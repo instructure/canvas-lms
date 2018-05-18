@@ -28,6 +28,7 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import IconArrowOpenDown from '@instructure/ui-icons/lib/Solid/IconArrowOpenDown'
 import IconArrowOpenEnd from '@instructure/ui-icons/lib/Solid/IconArrowOpenEnd'
 import IconOutcomes from '@instructure/ui-icons/lib/Line/IconOutcomes'
+import natcompare from 'compiled/util/natcompare'
 import AssignmentResult from './AssignmentResult'
 import * as shapes from './shapes'
 
@@ -84,6 +85,8 @@ export default class Outcome extends React.Component {
 
   render () {
     const { outcome, expanded } = this.props
+    const { results } = outcome
+
     return (
       <ToggleDetails
         divider="dashed"
@@ -97,7 +100,7 @@ export default class Outcome extends React.Component {
         <View as="div" borderWidth="small 0 0 0">
           <List variant="unstyled" delimiter="dashed">
           {
-            outcome.results.map((result) => (
+            results.sort(natcompare.byKey('submitted_or_assessed_at')).reverse().map((result) => (
               <ListItem key={result.id}><AssignmentResult result={result} outcome={outcome} /></ListItem>
             ))
           }

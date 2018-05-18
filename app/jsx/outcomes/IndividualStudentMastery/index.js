@@ -23,6 +23,7 @@ import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
 import List, { ListItem } from '@instructure/ui-elements/lib/components/List'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import Text from '@instructure/ui-elements/lib/components/Text'
+import natcompare from 'compiled/util/natcompare'
 import OutcomeGroup from './OutcomeGroup'
 import fetchOutcomes from './fetchOutcomes'
 import { Set } from 'immutable'
@@ -135,7 +136,7 @@ class IndividualStudentMastery extends React.Component {
       <div>
         <List variant="unstyled">
           {
-            outcomeGroups.map((outcomeGroup) => (
+            outcomeGroups.sort(natcompare.byKey('title')).map((outcomeGroup) => (
               <ListItem key={outcomeGroup.id}>
                 <OutcomeGroup
                   outcomeGroup={outcomeGroup}

@@ -28,6 +28,7 @@ import Pill from '@instructure/ui-elements/lib/components/Pill'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import IconArrowOpenDown from '@instructure/ui-icons/lib/Solid/IconArrowOpenDown'
 import IconArrowOpenEnd from '@instructure/ui-icons/lib/Solid/IconArrowOpenEnd'
+import natcompare from 'compiled/util/natcompare'
 import Outcome from './Outcome'
 import * as shapes from './shapes'
 
@@ -77,7 +78,7 @@ export default class OutcomeGroup extends React.Component {
           <View as="div" borderWidth="small 0 0 0">
             <List variant="unstyled" divider="solid">
               {
-                outcomes.map((outcome) => (
+                outcomes.sort(natcompare.byKey('title')).map((outcome) => (
                   <ListItem key={outcome.id} margin="0">
                     <Outcome
                       outcome={outcome}
