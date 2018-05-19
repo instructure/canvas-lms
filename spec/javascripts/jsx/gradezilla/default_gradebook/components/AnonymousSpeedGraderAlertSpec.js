@@ -20,95 +20,90 @@ import React from 'react'
 import {shallow} from 'enzyme'
 import AnonymousSpeedGraderAlert from 'jsx/gradezilla/default_gradebook/components/AnonymousSpeedGraderAlert'
 
-function defaultProps(props = {}) {
-  return {
-    speedGraderUrl: 'http://test.url:3000',
-    onClose: () => {},
-    ...props
-  }
-}
-
-QUnit.module('AnonymousSpeedGraderAlert', function(suiteHooks) {
+QUnit.module('AnonymousSpeedGraderAlert', suiteHooks => {
+  let $applicationElement
   let clock
+  let props
+  let wrapper
 
-  suiteHooks.beforeEach(function() {
-    const applicationElement = document.createElement('div')
-    applicationElement.id = 'application'
-    document.getElementById('fixtures').appendChild(applicationElement)
+  suiteHooks.beforeEach(() => {
+    $applicationElement = document.createElement('div')
+    $applicationElement.id = 'application'
+    document.body.appendChild($applicationElement)
+
     clock = sinon.useFakeTimers()
+
+    props = {
+      onClose() {},
+      speedGraderUrl: 'http://test.url:3000'
+    }
   })
 
-  suiteHooks.afterEach(function() {
-    document.getElementById('fixtures').innerHTML = ''
+  suiteHooks.afterEach(() => {
+    wrapper.unmount()
+    $applicationElement.remove()
     clock.restore()
   })
 
-  QUnit.module('AnonymousSpeedGraderAlert layout', hooks => {
-    let wrapper
+  function mountComponent() {
+    wrapper = shallow(<AnonymousSpeedGraderAlert {...props} />)
+  }
 
-    hooks.beforeEach(function() {
-      wrapper = shallow(<AnonymousSpeedGraderAlert {...defaultProps()} />)
+  function getButton(label) {
+    return wrapper
+      .find('Button')
+      .filterWhere(el => el.children().text() === label)
+      .first()
+  }
+
+  test('alert is closed initially', () => {
+    mountComponent()
+    strictEqual(wrapper.find('Alert').prop('open'), false)
+  })
+
+  QUnit.module('#open()', hooks => {
+    hooks.beforeEach(() => {
+      mountComponent()
     })
 
-    hooks.afterEach(function() {
-      wrapper.unmount()
-      document.getElementById('fixtures').innerHTML = ''
-    })
-
-    test('alert is closed initially', function() {
-      strictEqual(wrapper.find('Alert').prop('open'), false)
-    })
-
-    test('overlay has a label of "Anonymous Mode On"', function() {
-      equal(wrapper.find('Overlay').prop('label'), 'Anonymous Mode On')
-    })
-
-    test('alert has a "Cancel" button', function() {
-      strictEqual(wrapper.find('Button').someWhere(el => el.children().text() === 'Cancel'), true)
-    })
-
-    test('alert has an "Open SpeedGrader" button', function() {
-      strictEqual(wrapper.find('Button').someWhere(el => el.children().text() === 'Open SpeedGrader'), true)
-    })
-
-    test('"Open SpeedGrader" button links to the supplied SpeedGrader URL', function() {
-      wrapper.instance().open()
-
-      const openButton = wrapper.find('Button').filterWhere(b => b.children().text() === 'Open SpeedGrader').first();
-      strictEqual(openButton.prop('href'), 'http://test.url:3000')
-    })
-
-    test('alert opens', function() {
+    test('opens the alert', () => {
       wrapper.instance().open()
       strictEqual(wrapper.find('Alert').prop('open'), true)
-    })
-
-    test('alert unmounts when closed', function() {
-      const statusModal = wrapper.instance()
-      statusModal.open()
-      clock.tick(50) // wait for Modal to transition open
-      statusModal.close()
+      wrapper.instance().close()
       clock.tick(50) // wait for Modal to transition closed
-      strictEqual(wrapper.find('Alert').prop('open'), false)
     })
   })
 
-  QUnit.module('AnonymousSpeedGraderAlert Behavior', hooks => {
-    let wrapper
-
-    hooks.beforeEach(function() {
-      wrapper = shallow(<AnonymousSpeedGraderAlert {...defaultProps()} />)
-    })
-
-    hooks.afterEach(function() {
-      wrapper.unmount()
-    })
-
-    test('clicking Cancel closes the overlay', function() {
+  QUnit.module('when the modal is open', hooks => {
+    hooks.beforeEach(() => {
+      mountComponent()
       wrapper.instance().open()
+    })
 
-      const cancelButton = wrapper.find('Button').filterWhere(el => el.children().text() === 'Cancel').first()
-      cancelButton.simulate('click')
+    hooks.afterEach(() => {
+      wrapper.instance().close()
+      clock.tick(50) // wait for Modal to transition closed
+    })
+
+    test('overlay has a label of "Anonymous Mode On"', () => {
+      equal(wrapper.find('Overlay').prop('label'), 'Anonymous Mode On')
+    })
+
+    test('includes a "Cancel" button', () => {
+      strictEqual(getButton('Cancel').length, 1)
+    })
+
+    test('includes an "Open SpeedGrader" button', () => {
+      strictEqual(getButton('Open SpeedGrader').length, 1)
+    })
+
+    test('"Open SpeedGrader" button links to the supplied SpeedGrader URL', () => {
+      const button = getButton('Open SpeedGrader')
+      strictEqual(button.prop('href'), 'http://test.url:3000')
+    })
+
+    test('"Cancel" button closes the alert when clicked', () => {
+      getButton('Cancel').simulate('click')
       strictEqual(wrapper.find('Alert').prop('open'), false)
     })
   })

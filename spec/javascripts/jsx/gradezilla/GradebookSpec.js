@@ -33,6 +33,7 @@ import ActionMenu from 'jsx/gradezilla/default_gradebook/components/ActionMenu';
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator';
 import DataLoader from 'jsx/gradezilla/DataLoader';
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
+import AnonymousSpeedGraderAlert from 'jsx/gradezilla/default_gradebook/components/AnonymousSpeedGraderAlert'
 import GradebookApi from 'jsx/gradezilla/default_gradebook/apis/GradebookApi';
 import LatePolicyApplicator from 'jsx/grading/LatePolicyApplicator';
 import SubmissionStateMap from 'jsx/gradezilla/SubmissionStateMap';
@@ -9107,12 +9108,13 @@ QUnit.module('Gradebook#showAnonymousSpeedGraderAlertForURL', (hooks) => {
 
   test('renders the alert with the supplied speedGraderURL', function () {
     gradebook = createGradebook();
-
+    sinon.stub(AnonymousSpeedGraderAlert.prototype, 'open');
     sinon.spy(gradebook, 'renderAnonymousSpeedGraderAlert');
     gradebook.showAnonymousSpeedGraderAlertForURL('http://test.url:3000');
 
     strictEqual(anonymousSpeedGraderAlertProps().speedGraderUrl, 'http://test.url:3000');
     gradebook.renderAnonymousSpeedGraderAlert.restore();
+    AnonymousSpeedGraderAlert.prototype.open.restore();
   });
 });
 
