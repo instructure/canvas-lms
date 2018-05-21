@@ -179,6 +179,13 @@ describe Assignment do
         assignment.update!(only_visible_to_overrides: !assignment.only_visible_to_overrides?)
       end
 
+      it 'invokes DueDateCacher if moderated_grading is changed' do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+
+        assignment.update!(moderated_grading: !assignment.moderated_grading)
+      end
+
       it 'invokes DueDateCacher if called in a before_save context' do
         assignment = @course.assignments.new(assignment_valid_attributes)
         allow(assignment).to receive(:update_cached_due_dates?).and_return(true)

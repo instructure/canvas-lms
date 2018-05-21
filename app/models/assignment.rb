@@ -2553,7 +2553,9 @@ class Assignment < ActiveRecord::Base
   def update_cached_due_dates?
     will_save_change_to_due_at? || saved_change_to_due_at? ||
       will_save_change_to_workflow_state? || saved_change_to_workflow_state? ||
-      will_save_change_to_only_visible_to_overrides? || saved_change_to_only_visible_to_overrides?
+      will_save_change_to_only_visible_to_overrides? ||
+      saved_change_to_only_visible_to_overrides? ||
+      saved_change_to_moderated_grading?
   end
 
   def apply_late_policy

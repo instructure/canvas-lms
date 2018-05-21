@@ -920,7 +920,7 @@ describe Assignment::SpeedGrader do
       assignment.moderation_graders.create!(user: teacher, anonymous_id: 'teach')
       assignment.moderation_graders.create!(user: ta, anonymous_id: 'atata')
 
-      selection = assignment.moderated_grading_selections.create!(student: student_1)
+      selection = assignment.moderated_grading_selections.find_by(student_id: student_1.id)
 
       submission_1.add_comment(author: teacher, comment: 'comment by teacher', provisional: false)
       submission_1.add_comment(author: teacher, comment: 'provisional comment by teacher', provisional: true)
@@ -1214,7 +1214,7 @@ describe Assignment::SpeedGrader do
       assignment.moderation_graders.create!(user: teacher, anonymous_id: 'teach')
       assignment.moderation_graders.create!(user: ta, anonymous_id: 'atata')
 
-      selection = assignment.moderated_grading_selections.create!(student: student)
+      selection = assignment.moderated_grading_selections.find_by(student_id: student.id)
 
       submission.add_comment(author: teacher, comment: 'comment by teacher', provisional: false)
       submission.add_comment(author: teacher, comment: 'provisional comment by teacher', provisional: true)

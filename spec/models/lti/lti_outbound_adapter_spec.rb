@@ -359,6 +359,7 @@ describe Lti::LtiOutboundAdapter do
           url: tool.url
         )
       )
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:anonymous_moderated_marking).and_return(false)
     end
 
     it 'builds the expected encrypted JWT with the correct course data' do

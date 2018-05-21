@@ -18,6 +18,8 @@
 require 'anonymity'
 
 class DueDateCacher
+  include Moderation
+
   INFER_SUBMISSION_WORKFLOW_STATE_SQL = <<~SQL_FRAGMENT
     CASE
     WHEN grade IS NOT NULL OR excused IS TRUE THEN
@@ -108,6 +110,8 @@ class DueDateCacher
         existing_anonymous_ids = Submission.where.not(user: nil).
           where(user: students_without_priors).
           anonymous_ids_for(assignment_id)
+
+        create_moderation_selections_for_assignment(assignment_id, student_due_dates.keys, @user_ids)
 
         students_without_priors.each do |student_id|
           submission_info = student_due_dates[student_id]

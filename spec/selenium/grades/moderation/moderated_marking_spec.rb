@@ -97,8 +97,6 @@ describe 'Moderated Marking' do
 
       # grader-count = 1, final_grader = Teacher1
       @moderated_assignment.update(grader_count: 1)
-      # add reviewer
-      @moderated_assignment.moderated_grading_selections.create!(student: @student1)
 
       # give a grade as non-final grader
       @student1_submission = @moderated_assignment.submit_homework(@student1, :body => 'student 1 submission moderated assignment')
@@ -112,14 +110,14 @@ describe 'Moderated Marking' do
       expect(AssignmentPage.page_action_list.text).to include 'SpeedGrader™'
     end
 
-    it 'speedgrader link not visible to non-final-grader' do # test_id: 3496271 
+    it 'speedgrader link not visible to non-final-grader' do # test_id: 3496271
       user_session(@teacher2)
       AssignmentPage.visit(@moderated_course.id, @moderated_assignment.id)
 
       expect(AssignmentPage.page_action_list.text).not_to include 'SpeedGrader™'
     end
 
-    it 'informs user that maximum number of grades has been reached for the submission' do # test_id: 3496271 
+    it 'informs user that maximum number of grades has been reached for the submission' do # test_id: 3496271
       user_session(@teacher2)
       get "/courses/#{@moderated_course.id}/gradebook/speed_grader?assignment_id=#{@moderated_assignment.id}"
       wait_for_ajaximations
