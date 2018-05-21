@@ -110,8 +110,8 @@ QUnit.module('GraderCountNumberInput', hooks => {
 
   test('shows an error message on blur if the grader count is the empty string', () => {
     mountComponent()
-    numberInput().simulate('change', { target: { value: '' } })
-    numberInput().simulate('blur')
+    numberInput().simulate('change', {target: {value: '' }})
+    numberInput().simulate('blur', {type: 'blur', target: {value: ''}})
     ok(numberInputContainer().text().includes('Must have at least 1 grader'))
   })
 
