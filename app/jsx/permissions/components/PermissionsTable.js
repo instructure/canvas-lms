@@ -19,6 +19,7 @@
 import I18n from 'i18n!permissions'
 import React, {Component} from 'react'
 import {arrayOf} from 'prop-types'
+import {connect} from 'react-redux'
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 
@@ -164,3 +165,19 @@ export default class PermissionsTable extends Component {
     )
   }
 }
+
+function mapStateToProps(state, ownProps) {
+  const stateProps = {
+    roles: state.roles.filter(r => r.displayed),
+    permissions: state.permissions.filter(p => p.displayed)
+  }
+  return {...ownProps, ...stateProps}
+}
+
+const mapDispatchToProps = {
+  // THERE WILL BE STUFF HERE LATER
+}
+
+export const ConnectedPermissionsTable = connect(mapStateToProps, mapDispatchToProps)(
+  PermissionsTable
+)

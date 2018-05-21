@@ -18,18 +18,20 @@
 
 import '@instructure/ui-themes/lib/canvas'
 import React from 'react'
-import {mount, shallow} from 'enzyme'
+import {mount} from 'enzyme'
 import PermissionsTable from '../PermissionsTable'
+
+import {COURSE} from '../../propTypes'
 
 const defaultProps = () => ({
   roles: [{id: '1', label: 'Role 1'}, {id: '2', label: 'Role 2'}],
   permissions: [
-    {permission_name: 'permission_1', label: 'Permission 1'},
-    {permission_name: 'permission_2', label: 'Permission 2'}
+    {permission_name: 'permission_1', label: 'Permission 1', contextType: COURSE, displayed: true},
+    {permission_name: 'permission_2', label: 'Permission 2', contextType: COURSE, displayed: true}
   ]
 })
 
-test('renders the Permissions Table', () => {
+it('renders the Permissions Table', () => {
   const tree = mount(<PermissionsTable {...defaultProps()} />)
   expect(tree.exists()).toBe(true)
 })

@@ -16,48 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!announcements_v2'
-
 import $ from 'jquery'
-import * as apiClient from './apiClient'
-// We probably will want these eventually
-// import { notificationActions } from '../shared/reduxNotifications'
+import I18n from 'i18n!permissions'
+import {createActions} from 'redux-actions'
 
-const actionTypes = {
-  GET_PERMISSIONS_START: 'GET_PERMISSIONS_START',
-  GET_PERMISSIONS_SUCCESS: 'GET_PERMISSIONS_SUCCESS'
+const types = ['UPDATE_PERMISSIONS_SEARCH']
+
+const actions = createActions(...types)
+
+actions.searchPermissions = function searchPermissions({permissionSearchString, contextType}) {
+  return (dispatch, getState) => {
+    dispatch(actions.updatePermissionsSearch({permissionSearchString, contextType}))
+    const markedPermissions = getState().permissions
+    const numDisplayedPermissions = markedPermissions.filter(p => p.displayed).length
+    const message = I18n.t(
+      {
+        one: 'One permission found',
+        other: '%{count} permissions found'
+      },
+      {count: numDisplayedPermissions}
+    )
+    $.screenReaderFlashMessageExclusive(message)
+  }
 }
 
-const actions = {}
-
-// Some sample actions: TODO: remove these once we have some new ones
-//
-// actions.getPermissionsStart = function(contextId) {
-//   return {
-//     type: actionTypes.GET_PERMISSIONS_START,
-//     payload: contextId
-//   }
-// }
-//
-// actions.getPermissionsSuccess = function(response) {
-//   return {
-//     type: actionTypes.GET_PERMISSIONS_SUCCESS,
-//     payload: response
-//   }
-// }
-//
-// actions.getPermissions = function(contextId) {
-//   return dispatch => {
-//     dispatch(actions.getPermissionsStart(contextId))
-//     apiClient
-//       .getPermissions(contextId)
-//       .then(response => {
-//         dispatch(actions.getPermissionsSuccess(response.data))
-//       })
-//       .catch(_response => {
-//         $.screenReaderFlashMessageExclusive(I18n.t('Loading permissions failed'))
-//       })
-//   }
-// }
+const actionTypes = types.reduce((acc, type) => {
+  acc[type] = type
+  return acc
+}, {})
 
 export {actionTypes, actions as default}

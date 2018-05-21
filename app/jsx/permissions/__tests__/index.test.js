@@ -22,22 +22,20 @@ let app = null
 
 const defaultData = () => ({
   contextId: 1,
-  accountPermissions: [],
-  coursePermissions: [],
-  accountRoles: [],
-  courseRoles: []
+  permissions: [],
+  roles: []
 })
 
 const indexContainer = document.createElement('div')
 document.body.appendChild(indexContainer)
 
-test('mounts permissions to container component', () => {
+it('mounts permissions to container component', () => {
   app = createPermissionsIndex(indexContainer, defaultData())
   app.render()
   expect(document.querySelector('.permissions-v2__wrapper')).not.toBeNull()
 })
 
-test('unmounts permissions from container component', () => {
+it('unmounts permissions from container component', () => {
   app = createPermissionsIndex(indexContainer, defaultData())
   app.render()
   app.unmount()

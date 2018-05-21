@@ -41,11 +41,27 @@ import {actionTypes} from './actions'
 // }, false)
 //
 
-// For now we have no real reducers so we
+const permissions = handleActions(
+  {
+    // Note we may want to extract this out if it turns out to be
+    // identical to what we do for role filtering
+    [actionTypes.UPDATE_PERMISSIONS_SEARCH]: (state, action) => {
+      const {permissionSearchString, contextType} = action.payload
+      const regex = new RegExp(permissionSearchString, 'i')
+      return state.map(permission => {
+        if (permission.contextType === contextType && regex.test(permission.label)) {
+          return {...permission, displayed: true}
+        } else {
+          return {...permission, displayed: false}
+        }
+      })
+    }
+  },
+  []
+)
+
 export default combineReducers({
   contextId: (state, _action) => state || '',
-  accountPermissions: (state, _action) => state || '',
-  coursePermissions: (state, _action) => state || '',
-  accountRoles: (state, _action) => state || '',
-  courseRoles: (state, _action) => state || ''
+  permissions,
+  roles: (state, _action) => state || []
 })

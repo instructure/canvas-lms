@@ -18,42 +18,85 @@
 
 import I18n from 'i18n!permissions_v2'
 import React, {Component} from 'react'
-import {number, arrayOf} from 'prop-types'
+import {func} from 'prop-types'
 import {connect} from 'react-redux'
-import {bindActionCreators} from 'redux'
+import {debounce} from 'lodash'
 
+import Container from '@instructure/ui-core/lib/components/Container'
+import Grid, {GridCol, GridRow} from '@instructure/ui-core/lib/components/Grid'
+import IconSearchLine from 'instructure-icons/lib/Line/IconSearchLine'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import TabList, {TabPanel} from '@instructure/ui-core/lib/components/TabList'
+import TextInput from '@instructure/ui-core/lib/components/TextInput'
 
-import select from '../../shared/select'
 import actions from '../actions'
-import propTypes from '../propTypes'
+import {COURSE, ACCOUNT} from '../propTypes'
 
-import PermissionsTable from './PermissionsTable'
+import {ConnectedPermissionsTable} from './PermissionsTable'
+
+const SEARCH_DELAY = 350
+const COURSE_TAB_INDEX = 0
 
 export default class PermissionsIndex extends Component {
   static propTypes = {
-    contextId: number.isRequired,
-    accountPermissions: arrayOf(propTypes.permission).isRequired,
-    coursePermissions: arrayOf(propTypes.permission).isRequired,
-    accountRoles: arrayOf(propTypes.role).isRequired,
-    courseRoles: arrayOf(propTypes.role).isRequired
+    searchPermissions: func.isRequired
+  }
+
+  state = {
+    permissionSearchString: '',
+    contextType: COURSE
+  }
+
+  onSearchStringChange = e => {
+    this.setState({permissionSearchString: e.target.value}, this.filterPermissions)
+  }
+
+  onTabChanged = (newIndex, oldIndex) => {
+    if (newIndex === oldIndex) return
+    const newContextType = newIndex === COURSE_TAB_INDEX ? COURSE : ACCOUNT
+    this.setState({permissionSearchString: '', contextType: newContextType}, () =>
+      this.props.searchPermissions(this.state)
+    )
+  }
+
+  filterPermissions = debounce(() => this.props.searchPermissions(this.state), SEARCH_DELAY, {
+    leading: false,
+    trailing: true
+  })
+
+  renderHeader() {
+    return (
+      <Container display="block">
+        <Grid>
+          <GridRow vAlign="middle">
+            <GridCol width={4}>
+              <TextInput
+                label={<ScreenReaderContent>{I18n.t('Search Permissions')}</ScreenReaderContent>}
+                placeholder={I18n.t('Search Permissions')}
+                icon={() => <IconSearchLine />}
+                onChange={this.onSearchStringChange}
+                name="permission_search"
+              />
+            </GridCol>
+            <GridCol width={7}>ROLE FILTER GOES HERE {/* TODO */}</GridCol>
+            <GridCol width={1}>ADD ROLE BUTTON {/* TODO */}</GridCol>
+          </GridRow>
+        </Grid>
+      </Container>
+    )
   }
 
   render() {
     return (
       <div className="permissions-v2__wrapper">
-        <TabList>
+        <TabList onChange={this.onTabChanged}>
           <TabPanel title={I18n.t('Course Roles')}>
-            <PermissionsTable
-              roles={this.props.courseRoles}
-              permissions={this.props.coursePermissions}
-            />
+            {this.renderHeader()}
+            <ConnectedPermissionsTable />
           </TabPanel>
           <TabPanel title={I18n.t('Account Roles')}>
-            <PermissionsTable
-              roles={this.props.accountRoles}
-              permissions={this.props.accountPermissions}
-            />
+            {this.renderHeader()}
+            <ConnectedPermissionsTable />
           </TabPanel>
         </TabList>
       </div>
@@ -61,15 +104,14 @@ export default class PermissionsIndex extends Component {
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    contextId: state.contextId,
-    accountPermissions: state.accountPermissions,
-    coursePermissions: state.coursePermissions,
-    accountRoles: state.accountRoles,
-    courseRoles: state.courseRoles
-  }
+function mapStateToProps(_state, ownProps) {
+  return ownProps
 }
 
-const connectActions = dispatch => bindActionCreators(select(actions, ['getPermissions']), dispatch)
-export const ConnectedPermissionsIndex = connect(mapStateToProps, connectActions)(PermissionsIndex)
+const mapDispatchToProps = {
+  searchPermissions: actions.searchPermissions
+}
+
+export const ConnectedPermissionsIndex = connect(mapStateToProps, mapDispatchToProps)(
+  PermissionsIndex
+)

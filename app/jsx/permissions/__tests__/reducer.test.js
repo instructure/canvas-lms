@@ -16,23 +16,59 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import actions from 'jsx/permissions/actions'
-import reducer from 'jsx/permissions/reducer'
+import actions from '../actions'
+import {COURSE, ACCOUNT} from '../propTypes'
+import reducer from '../reducer'
 
-// QUnit.module('Permissions reducer')
+const reduce = (action, state = {}) => reducer(state, action)
 
-// const reduce = (action, state = {}) => reducer(state, action)
-// SAMPLE SPEC FOR SAMPLE REDUCER
-//
-// test('GET_PERMISSIONS_SUCCESS does its job', () => {
-//   const oldState = { isLoadngPermissions: true, hasLoadedPermissions: false, permissions: [] }
-//   const dispatchData = { "permission1": true, "permission2": true }
-//   const newState = reduce(actions.getPermissionsSuccess(dispatchData), oldState)
-//   equal(newState.isLoadingPermissions, false)
-//   equal(newState.hasLoadedPermissions, true)
-//   deepEqual(newState.permissions, [ "permission1", "permission2" ])
-// })
+const permissions = [
+  {
+    permission_name: 'add_section',
+    label: 'add section',
+    contextType: COURSE,
+    displayed: undefined
+  },
+  {
+    permission_name: 'irrelevant1',
+    label: 'add assignment',
+    contectType: COURSE,
+    displayed: undefined
+  },
+  {
+    permission_name: 'ignore_this_add',
+    label: 'delete everything',
+    contextType: COURSE,
+    displayed: undefined
+  },
+  {
+    permission_name: 'ignore_because_account',
+    label: 'add course',
+    contextType: ACCOUNT,
+    displayed: undefined
+  }
+]
 
-test('dummy test please remove this', () => {
-  expect(true) // eslint-disable-line
+it('UPDATE_PERMISSIONS_SEARCH filters properly', () => {
+  const originalState = {contextId: 1, permissions, roles: []}
+  const payload = {
+    permissionSearchString: 'add',
+    contextType: COURSE
+  }
+  const newState = reduce(actions.updatePermissionsSearch(payload), originalState)
+  expect(newState.permissions).toHaveLength(originalState.permissions.length)
+  for (let i = 0; i < originalState.permissions.length; i++) {
+    // All fields other than displayed should stay unchanged
+    expect(newState.permissions[i].permission_name).toEqual(
+      originalState.permissions[i].permission_name
+    )
+    expect(newState.permissions[i].label).toEqual(originalState.permissions[i].label)
+    expect(newState.permissions[i].contextType).toEqual(originalState.permissions[i].contextType)
+    // Only the first permission should match the search
+    if (i === 0) {
+      expect(newState.permissions[i].displayed).toEqual(true)
+    } else {
+      expect(newState.permissions[i].displayed).toEqual(false)
+    }
+  }
 })

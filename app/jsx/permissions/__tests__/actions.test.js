@@ -15,40 +15,65 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import $ from 'jquery'
+import sinon from 'sinon'
 
 import actions from '../actions'
 
-// function getState() {
-//   return { contextId: 1 }
-// }
+import {COURSE, ACCOUNT} from '../propTypes'
 
-// SAMPLE API MOCKER
-//  let sandbox = []
-// const mockApiClient = (method, res) => {
-//   sandbox.push(sinon.sandbox.create())
-//   sandbox[sandbox.length - 1].stub(apiClient, method).returns(res)
-// }
-//
-// const mockSuccess = (method, data = {}) => mockApiClient(method, Promise.resolve(data))
+// This is needed for $.screenReaderFlashMessageExclusive to work.
+// TODO: This is terrible, make it unterrible
+import 'compiled/jquery.rails_flash_notifications' // eslint-disable-line
 
-// SAMPLE REDUX SETUPER
-// QUnit.module('Discussions redux actions', {
-//   teardown () {
-//     sandbox.forEach(mock => mock.restore())
-//     sandbox = []
-//   }
-// })
+const permissions = [
+  {
+    permission_name: 'add_course',
+    label: 'add section',
+    contextType: COURSE,
+    displayed: undefined
+  },
+  {
+    permission_name: 'irrelevant1',
+    label: 'add assignment',
+    contectType: COURSE,
+    displayed: undefined
+  },
+  {
+    permission_name: 'ignore_this_add',
+    label: 'delete everything',
+    contextType: COURSE,
+    displayed: undefined
+  },
+  {
+    permission_name: 'ignore_because_account',
+    label: 'add course',
+    contextType: ACCOUNT,
+    displayed: undefined
+  }
+]
 
-// SAMPLE SPEC FOR SAMPLE ACTION
-//
-// test('calls api for getting permissions if requested', () => {
-//   const dispatchSpy = sinon.spy()
-//   mockSuccess('getPermissions', {})
-//   actions.getPermissions(1)(dispatchSpy, getState)
-//   equal(apiClient.getPermissions.callCount, 1)
-//   deepEqual(apiClient.getPermissions.firstCall.args, [1])
-// })
+it('searchPermissions dispatches updatePermissionsSearch', () => {
+  const state = {contextId: 1, permissions, roles: []}
+  const dispatchSpy = sinon.spy()
+  actions.searchPermissions({permissionSearchString: 'add', contextType: COURSE})(
+    dispatchSpy,
+    () => state
+  )
+  const dispatchArgs = dispatchSpy.firstCall.args
+  expect(dispatchArgs).toHaveLength(1)
+  expect(dispatchArgs[0].type).toEqual('UPDATE_PERMISSIONS_SEARCH')
+  expect(dispatchArgs[0].payload.permissionSearchString).toEqual('add')
+  expect(dispatchArgs[0].payload.contextType).toEqual(COURSE)
+})
 
-test('dummy test please remove this', () => {
-  expect(true) // eslint-disable-line
+it('searchPermissions announces when search is complete', () => {
+  const state = {contextId: 1, permissions, roles: []}
+  const dispatchSpy = sinon.spy()
+  const flashStub = sinon.spy($, 'screenReaderFlashMessageExclusive')
+  actions.searchPermissions({permissionSearchString: 'add', contextType: COURSE})(
+    dispatchSpy,
+    () => state
+  )
+  expect(flashStub.firstCall.args[0].includes('found')).toEqual(true)
 })

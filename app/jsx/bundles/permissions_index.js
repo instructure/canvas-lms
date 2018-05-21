@@ -17,6 +17,7 @@
  */
 
 import createPermissionsIndex from 'jsx/permissions'
+import {COURSE, ACCOUNT} from '../permissions/propTypes'
 
 const root = document.querySelector('#content')
 
@@ -36,12 +37,19 @@ function flattenPermissions(permissionsFromEnv) {
   return flatten(permissionsFromEnv.map(item => item.group_permissions))
 }
 
-const app = createPermissionsIndex(root, {
+function markAndCombineArrays(courseArray, accountArray) {
+  const markedCourseArray = courseArray.map((a) => ({...a, contextType: COURSE, displayed: true }))
+  const markedAccountArray = accountArray.map((a) => ({...a, contextType: ACCOUNT, displayed: false }))
+  return markedCourseArray.concat(markedAccountArray)
+}
+
+const initialState = {
   contextId: ENV.ACCOUNT_ID, // This is at present always an account, I think?
-  accountPermissions: flattenPermissions(ENV.ACCOUNT_PERMISSIONS),
-  coursePermissions: flattenPermissions(ENV.COURSE_PERMISSIONS),
-  accountRoles: ENV.ACCOUNT_ROLES,
-  courseRoles: ENV.COURSE_ROLES
-})
+  permissions: markAndCombineArrays(flattenPermissions(ENV.COURSE_PERMISSIONS),
+    flattenPermissions(ENV.ACCOUNT_PERMISSIONS)),
+  roles: markAndCombineArrays(ENV.COURSE_ROLES, ENV.ACCOUNT_ROLES)
+}
+
+const app = createPermissionsIndex(root, initialState)
 
 app.render()
