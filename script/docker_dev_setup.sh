@@ -41,7 +41,7 @@ if [[ $OS == 'Darwin' ]]; then
   dependencies='docker docker-machine docker-compose dinghy'
 elif [[ $OS == 'Linux' ]]; then
   install='sudo apt-get update && sudo apt-get install -y'
-  dependencies='docker docker-compose'
+  dependencies='docker.io docker-compose'
 else
   echo 'This script only supports MacOS and Linux :('
   exit 1
@@ -258,8 +258,8 @@ function setup_canvas {
   copy_docker_config
   build_images
   install_gems
-  prepare_database
   compile_assets
+  prepare_database
 }
 
 function display_next_steps {
