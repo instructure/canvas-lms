@@ -27,7 +27,7 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import IconArrowOpenDown from '@instructure/ui-icons/lib/Solid/IconArrowOpenDown'
 import IconArrowOpenRight from '@instructure/ui-icons/lib/Solid/IconArrowOpenRight'
 import IconOutcomes from '@instructure/ui-icons/lib/Line/IconOutcomes'
-import AlignmentResult from './AlignmentResult'
+import AssignmentResult from './AssignmentResult'
 import * as shapes from './shapes'
 
 const spacyIcon = (expanded) => () => {
@@ -109,7 +109,7 @@ export default class Outcome extends React.Component {
           <List variant="unstyled" delimiter="dashed">
           {
             outcome.results.map((result) => (
-              <ListItem key={result.id}><AlignmentResult result={result} outcome={outcome} /></ListItem>
+              <ListItem key={result.id}><AssignmentResult result={result} outcome={outcome} /></ListItem>
             ))
           }
           </List>

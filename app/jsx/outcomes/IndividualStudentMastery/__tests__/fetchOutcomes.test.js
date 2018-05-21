@@ -64,11 +64,11 @@ describe('fetchOutcomes', () => {
     resultsResponses: {
       1: {
         outcome_results: [
-          { id: 1, score: 3.0, links: { alignment: 'assignment_1' } },
-          { id: 2, score: 2.0, links: { alignment: 'assignment_2' } }
+          { id: 1, score: 3.0, links: { assignment: 'assignment_1' } },
+          { id: 2, score: 2.0, links: { assignment: 'assignment_2' } }
         ],
         linked: {
-          alignments: [
+          assignments: [
             { id: 'assignment_1', name: 'Assignment 1' },
             { id: 'assignment_2', name: 'Assignment 2' }
           ]
@@ -76,10 +76,10 @@ describe('fetchOutcomes', () => {
       },
       2: {
         outcome_results: [
-          { id: 3, score: 3.0, links: { alignment: 'assignment_1' } },
+          { id: 3, score: 3.0, links: { assignment: 'assignment_1' } },
         ],
         linked: {
-          alignments: [
+          assignments: [
             { id: 'assignment_1', name: 'Assignment 1' }
           ]
         }
@@ -96,11 +96,11 @@ describe('fetchOutcomes', () => {
       mastered: false,
       results: [
         {
-          alignment: { id: 'assignment_1', name: 'Assignment 1' },
+          assignment: { id: 'assignment_1', name: 'Assignment 1' },
           score: 3
         },
         {
-          alignment: { id: 'assignment_2', name: 'Assignment 2' },
+          assignment: { id: 'assignment_2', name: 'Assignment 2' },
           score: 2
         }
       ]
@@ -113,7 +113,7 @@ describe('fetchOutcomes', () => {
       mastered: false,
       results: [
         {
-          alignment: { id: 'assignment_1', name: 'Assignment 1' },
+          assignment: { id: 'assignment_1', name: 'Assignment 1' },
           score: 3
         }
       ]
@@ -126,7 +126,7 @@ describe('fetchOutcomes', () => {
     fetchMock.mock('/api/v1/courses/1/outcome_rollups?user_ids[]=2', rollupsResponse)
     Object.keys(resultsResponses).forEach((id) => {
       fetchMock.mock(
-        `/api/v1/courses/1/outcome_results?user_ids[]=2&outcome_ids[]=${id}&include[]=alignments&per_page=100`,
+        `/api/v1/courses/1/outcome_results?user_ids[]=2&outcome_ids[]=${id}&include[]=assignments&per_page=100`,
         resultsResponses[id]
       )
     })

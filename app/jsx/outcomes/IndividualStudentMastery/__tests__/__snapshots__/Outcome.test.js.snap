@@ -5,7 +5,7 @@ exports[`renders the Outcome component 1`] = `
   <View as=\\"div\\" borderWidth=\\"small 0 0 0\\" display=\\"auto\\">
     <List variant=\\"unstyled\\" delimiter=\\"dashed\\" as=\\"ul\\" margin=\\"none\\" size=\\"medium\\">
       <ListItem>
-        <AlignmentResult result={{...}} outcome={{...}} />
+        <AssignmentResult result={{...}} outcome={{...}} />
       </ListItem>
     </List>
   </View>

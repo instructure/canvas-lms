@@ -23,18 +23,25 @@ import View from '@instructure/ui-layout/lib/components/View'
 import Link from '@instructure/ui-elements/lib/components/Link'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import IconAssignment from '@instructure/ui-icons/lib/Line/IconAssignment'
+import IconQuiz from '@instructure/ui-icons/lib/Line/IconQuiz'
 import * as shapes from './shapes'
 import Ratings from '../../rubrics/Ratings'
 
-const AlignmentResult = ({ outcome, result }) => {
+const AssignmentResult = ({ outcome, result }) => {
   const { ratings } = outcome
-  const { html_url: url, name } = result.alignment
+  const { html_url: url, name, submission_types: types } = result.assignment
+  const isQuiz = types && types.indexOf('online_quiz') >= 0
+
   return (
     <Flex padding="small" direction="column" alignItems="stretch">
       <FlexItem>
         <Link href={ url }>
           <Flex alignItems="center">
-            <FlexItem><Text size="medium"><IconAssignment /></Text></FlexItem>
+            <FlexItem><Text size="medium">
+              {
+                isQuiz ? <IconQuiz /> : <IconAssignment />
+              }
+            </Text></FlexItem>
             <FlexItem padding="0 x-small"><Text weight="bold">{ name }</Text></FlexItem>
           </Flex>
         </Link>
@@ -51,9 +58,9 @@ const AlignmentResult = ({ outcome, result }) => {
   )
 }
 
-AlignmentResult.propTypes = {
+AssignmentResult.propTypes = {
   result: shapes.outcomeResultShape.isRequired,
   outcome: shapes.outcomeShape.isRequired
 }
 
-export default AlignmentResult
+export default AssignmentResult

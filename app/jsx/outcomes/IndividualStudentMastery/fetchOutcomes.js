@@ -31,7 +31,7 @@ const fetchOutcomes = (courseId, studentId) => {
   let outcomeLinks
   let outcomeRollups
   let outcomeResultsByOutcomeId
-  let alignmentsByAlignmentId
+  let assignmentsByAssignmentId
 
   return Promise.all([
     fetchUrl(`/api/v1/courses/${courseId}/outcome_groups`),
@@ -45,7 +45,7 @@ const fetchOutcomes = (courseId, studentId) => {
     })
     .then(() => (
       Promise.all(outcomeLinks.map((outcomeLink) => (
-        fetchUrl(`/api/v1/courses/${courseId}/outcome_results?user_ids[]=${studentId}&outcome_ids[]=${outcomeLink.outcome.id}&include[]=alignments&per_page=100`) // eslint-disable-line max-len
+        fetchUrl(`/api/v1/courses/${courseId}/outcome_results?user_ids[]=${studentId}&outcome_ids[]=${outcomeLink.outcome.id}&include[]=assignments&per_page=100`) // eslint-disable-line max-len
       )))
     ))
     .then((responses) => {
@@ -53,7 +53,7 @@ const fetchOutcomes = (courseId, studentId) => {
         acc[outcomeLinks[i].outcome.id] = response.outcome_results.filter((r) => !r.hidden);
         return acc
       }, {})
-      alignmentsByAlignmentId = _.indexBy(_.flatten(responses.map((response) => response.linked.alignments)), (a) => a.id)
+      assignmentsByAssignmentId = _.indexBy(_.flatten(responses.map((response) => response.linked.assignments)), (a) => a.id)
     })
     .then(() => {
       const outcomes = outcomeLinks.map((outcomeLink) => ({ groupId: outcomeLink.outcome_group.id, ...outcomeLink.outcome }))
@@ -65,11 +65,11 @@ const fetchOutcomes = (courseId, studentId) => {
         outcome.score = scoreData.score
         outcome.mastered = scoreData.score >= outcome.mastery_points
       })
-      // add results, alignments
+      // add results, assignments
       outcomes.forEach((outcome) => {
         outcome.results = outcomeResultsByOutcomeId[outcome.id] // eslint-disable-line no-param-reassign
         outcome.results.forEach((result) => {
-          result.alignment = alignmentsByAlignmentId[result.links.alignment] // eslint-disable-line no-param-reassign
+          result.assignment = assignmentsByAssignmentId[result.links.assignment] // eslint-disable-line no-param-reassign
         })
       })
       return { outcomeGroups, outcomes }

@@ -34,9 +34,11 @@ const defaultProps = (props = {}) => (
           id: 1,
           score: 1,
           percent: 0.1,
-          alignment: {
+          assignment: {
+            id: 1,
             html_url: 'http://foo',
-            name: 'My alignment'
+            name: 'My assignment',
+            submission_types: 'online_quiz'
           }
         }
       ],
@@ -84,7 +86,7 @@ describe('header', () => {
 
 it('includes the individual results', () => {
   const wrapper = shallow(<Outcome {...defaultProps()} />)
-  expect(wrapper.find('AlignmentResult')).toHaveLength(1)
+  expect(wrapper.find('AssignmentResult')).toHaveLength(1)
 })
 
 it('defaults to unexpanded', () => {

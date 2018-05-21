@@ -18,7 +18,7 @@
 
 import React from 'react'
 import { render, shallow } from 'enzyme'
-import AlignmentResult from '../AlignmentResult'
+import AssignmentResult from '../AssignmentResult'
 
 const defaultProps = (props = {}) => (
   Object.assign({
@@ -36,25 +36,27 @@ const defaultProps = (props = {}) => (
       id: 1,
       score: 1,
       percent: 0.1,
-      alignment: {
+      assignment: {
+        id: 1,
         html_url: 'http://foo',
-        name: 'My alignment'
+        name: 'My assignment',
+        submission_types: 'online_quiz'
       }
     }
   }, props)
 )
 
 it('renders the AlignmentResult component', () => {
-  const wrapper = shallow(<AlignmentResult {...defaultProps()}/>)
+  const wrapper = shallow(<AssignmentResult {...defaultProps()}/>)
   expect(wrapper.debug()).toMatchSnapshot()
 })
 
 it('includes the assignment name', () => {
-  const wrapper = render(<AlignmentResult {...defaultProps()}/>)
-  expect(wrapper.text()).toMatch('My alignment')
+  const wrapper = render(<AssignmentResult {...defaultProps()}/>)
+  expect(wrapper.text()).toMatch('My assignment')
 })
 
 it('includes the ratings of the outcome', () => {
-  const wrapper = render(<AlignmentResult {...defaultProps()}/>)
+  const wrapper = render(<AssignmentResult {...defaultProps()}/>)
   expect(wrapper.text()).toMatch('My second rating')
 })

@@ -18,13 +18,15 @@
 
 import PropTypes from 'prop-types'
 
-export const alignmentShape = PropTypes.shape({
+export const assignmentShape = PropTypes.shape({
+  id: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
-  html_url: PropTypes.string.isRequired
+  html_url: PropTypes.string.isRequired,
+  submission_types: PropTypes.string.isRequired
 })
 
 export const outcomeResultShape = PropTypes.shape({
-  alignment: alignmentShape.isRequired,
+  assignment: assignmentShape.isRequired,
   id: PropTypes.number.isRequired,
   score: PropTypes.number.isRequired,
   percent: PropTypes.number

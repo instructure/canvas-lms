@@ -7,12 +7,12 @@ exports[`renders the AlignmentResult component 1`] = `
       <Flex alignItems=\\"center\\" as=\\"span\\" direction=\\"row\\" justifyItems=\\"start\\" inline={false} visualDebug={false} wrapItems={false}>
         <FlexItem as=\\"span\\" grow={false} shrink={false}>
           <Text size=\\"medium\\" as=\\"span\\" letterSpacing=\\"normal\\">
-            <IconAssignment />
+            <IconQuiz />
           </Text>
         </FlexItem>
         <FlexItem padding=\\"0 x-small\\" as=\\"span\\" grow={false} shrink={false}>
           <Text weight=\\"bold\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
-            My alignment
+            My assignment
           </Text>
         </FlexItem>
       </Flex>
