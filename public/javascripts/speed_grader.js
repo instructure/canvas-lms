@@ -1719,17 +1719,15 @@ EG = {
     clearInterval(sessionTimer);
 
     function currentIndex (context, submissionToViewVal) {
-      var result;
       if (submissionToViewVal) {
-        result = Number(submissionToViewVal);
-      } else if (context.currentStudent && context.currentStudent.submission &&
-                 context.currentStudent.submission.currentSelectedIndex ) {
-        result = context.currentStudent.submission.currentSelectedIndex;
-      } else {
-        result = 0;
-      }
+        return Number(submissionToViewVal);
+      } else if (context.currentStudent &&
+        context.currentStudent.submission &&
+        context.currentStudent.submission.currentSelectedIndex ) {
 
-      return result;
+        return context.currentStudent.submission.currentSelectedIndex;
+      }
+      return 0;
     };
 
     const $submission_to_view = $("#submission_to_view")
@@ -1809,13 +1807,14 @@ EG = {
       if (browserableCssClasses.test(attachment.mime_class)) {
         browserableAttachments.push(attachment);
       }
+      const anonymizableSubmissionIdKey = isAnonymous ? 'anonymousId' : 'submissionId';
       var $submission_file = $submission_file_hidden.clone(true).fillTemplateData({
         data: {
-          submissionId: submission[anonymizableUserId],
+          [anonymizableSubmissionIdKey]: submission[anonymizableId],
           attachmentId: attachment.id,
           display_name: attachment.display_name
         },
-        hrefValues: ['submissionId', 'attachmentId']
+        hrefValues: [anonymizableSubmissionIdKey, 'attachmentId']
       }).appendTo($submission_files_list)
         .find('a.display_name')
         .data('attachment', attachment)
@@ -2194,8 +2193,9 @@ EG = {
     let contents;
     const genericSrc = unescape($submission_file_hidden.find('.display_name').attr('href'));
 
+    const anonymizableSubmissionIdToken = isAnonymous ? 'anonymousId' : 'submissionId';
     const src = genericSrc
-      .replace('{{submissionId}}', this.currentStudent.submission[anonymizableUserId])
+      .replace(`{{${anonymizableSubmissionIdToken}}}`, this.currentStudent.submission[anonymizableUserId])
       .replace('{{attachmentId}}', attachment.id);
 
     if (attachment.mime_class === 'image') {

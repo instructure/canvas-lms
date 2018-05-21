@@ -1408,10 +1408,7 @@ QUnit.module('SpeedGrader', function() {
       submission_history: [],
       rubric_assessments: []
     }
-    const omegaStudent = {
-      ...omega,
-      submission_history: []
-    }
+    const omegaStudent = {...omega}
     const studentAnonymousIds = [alphaStudent.anonymous_id, omegaStudent.anonymous_id]
     const sortedPair = [alphaStudent, omegaStudent]
     const unsortedPair = [omegaStudent, alphaStudent]
@@ -1423,12 +1420,21 @@ QUnit.module('SpeedGrader', function() {
       workflow_state: 'active',
       submitted_at: new Date(),
       grade: 'A',
-      assignment_id: '456'
+      assignment_id: '456',
+      versioned_attachments: [{
+        attachment: {
+          id: 1,
+          display_name: 'submission.txt'
+
+        }
+      }]
     }
+    alphaSubmission.submission_history = [{...alphaSubmission}]
     const omegaSubmission = {
       ...alphaSubmission,
-      ...omega
+      ...omega,
     }
+    omegaSubmission.submission_history = [{...omegaSubmission}]
     const windowJsonData = {
       ...assignment,
       context_id: '123',
@@ -1751,7 +1757,12 @@ QUnit.module('SpeedGrader', function() {
       })
     })
 
-    QUnit.module('#handleSubmissionSelectChange', hooks => {
+    QUnit.module('#handleSubmissionSelectionChange', hooks => {
+      let courses
+      let assignments
+      let submissions
+      let params
+
       hooks.beforeEach(() => {
         fakeENV.setup({
           ...ENV,
@@ -1761,10 +1772,24 @@ QUnit.module('SpeedGrader', function() {
           help_url: 'example.com/support',
           show_help_menu_item: false
         })
+        courses = `/courses/${ENV.course_id}`;
+        assignments = `/assignments/${ENV.assignment_id}`;
+        submissions = `/anonymous_submissions/{{anonymousId}}`;
+        params = `?download={{attachmentId}}`;
         fixtures.innerHTML = `
           <span id="speedgrader-settings"></span>
           <div id="full_width_container"></div>
-        `
+          <div id="submission_file_hidden">
+            <a
+              class="display_name"
+              href="${courses}${assignments}${submissions}${params}"
+            </a>
+          </div>
+          <div id="submission_files_list">
+            <a class="display_name"></a>
+          </div>
+          <select id="submission_to_view"><option selected="selected" value="${alphaStudent.anonymous_id}"></option></select>
+        `;
         sinon.stub($, 'getJSON')
         sinon.stub($, 'ajaxJSON')
         SpeedGrader.setup()
@@ -1796,6 +1821,14 @@ QUnit.module('SpeedGrader', function() {
         deepEqual(isStudentConcluded.firstCall.args, [alpha.anonymous_id])
         isStudentConcluded.restore()
       })
+
+      test('submission files list template is populated with anonymous submission data', () => {
+        SpeedGrader.EG.currentStudent = alphaStudent;
+        SpeedGrader.EG.handleSubmissionSelectionChange();
+        const {pathname} = new URL(document.querySelector('#submission_files_list a').href);
+        const expectedPathname = `${courses}${assignments}/anonymous_submissions/${alphaSubmission.anonymous_id}`;
+        equal(pathname, expectedPathname);
+      });
     })
 
     QUnit.module('#renderAttachment', hooks => {
@@ -2172,7 +2205,7 @@ QUnit.module('SpeedGrader', function() {
       })
     })
 
-    QUnit.module('#attachmentIframe', hooks => {
+    QUnit.module('#attachmentIframeContents', hooks => {
       const {context_id: course_id} = windowJsonData
       const {assignment_id} = alphaSubmission
       const {anonymous_id} = alphaStudent
@@ -2192,7 +2225,7 @@ QUnit.module('SpeedGrader', function() {
           <div id="submission_file_hidden">
             <a
               class="display_name"
-              href="/courses/${course_id}/assignments/${assignment_id}/submissions/{{submissionId}}?download={{attachmentId}}">
+              href="/courses/${course_id}/assignments/${assignment_id}/submissions/{{anonymousId}}?download={{attachmentId}}">
             </a>
           </div>
         `
