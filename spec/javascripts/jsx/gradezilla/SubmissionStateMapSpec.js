@@ -123,6 +123,18 @@ QUnit.module('#setSubmissionCellState', function() {
   });
 
   QUnit.module('anonymous moderated marking enabled', function() {
+    test('the submission state is locked when the student is not assigned', function() {
+      const assignment = {
+        id: '1',
+        published: true,
+        only_visible_to_overrides: true,
+        assignment_visibility: ['2']
+      }
+      const map = createAndSetupMap(assignment, studentWithSubmission, { anonymousModeratedMarkingEnabled: true })
+      const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id })
+      strictEqual(submission.locked, true)
+    })
+
     test('the submission state is not locked if not moderated grading', function() {
       const assignment = {
         id: '1',

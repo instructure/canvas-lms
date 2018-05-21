@@ -65,19 +65,11 @@ function cellMappingsForMultipleGradingPeriods (assignment, student, selectedGra
   return { ...cellMapping, ...gradingPeriodInfo };
 }
 
-function cellMappingsForAnonymousModeratedMarking (assignment) {
-  if (assignment.moderated_grading && !assignment.grades_published) {
-    return { locked: true, hideGrade: false };
-  } else {
-    return { locked: false, hideGrade: false };
-  }
-}
-
 function cellMapForSubmission (assignment, student, hasGradingPeriods, selectedGradingPeriodID, isAdmin, anonymousModeratedMarkingEnabled) {
   if (!assignment.published) {
     return { locked: true, hideGrade: true };
-  } else if (anonymousModeratedMarkingEnabled) {
-    return cellMappingsForAnonymousModeratedMarking(assignment);
+  } else if (assignment.moderated_grading && !assignment.grades_published && anonymousModeratedMarkingEnabled) {
+    return { locked: true, hideGrade: false };
   } else if (!visibleToStudent(assignment, student)) {
     return { locked: true, hideGrade: true };
   } else if (hasGradingPeriods) {
