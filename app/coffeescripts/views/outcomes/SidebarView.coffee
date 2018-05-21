@@ -192,13 +192,15 @@ define [
 
     # passing in FindDialog because of circular dependency
     findDialog: (FindDialog) =>
-      unless findDialog
+      if !findDialog
         findDialog = new FindDialog
           title: I18n.t 'titles.find_outcomes', 'Find Outcomes'
           selectedGroup: @selectedGroup()
           directoryView: new FindDirectoryView
             outcomeGroup: @selectedGroup()
         findDialog.on 'import', @addAndSelect, this
+      else
+        findDialog.updateSelection(@selectedGroup())
       findDialog.show()
 
     # Find a directory for a given outcome group or add a new directory view.

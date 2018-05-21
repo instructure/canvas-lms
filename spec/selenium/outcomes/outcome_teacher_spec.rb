@@ -63,21 +63,62 @@ describe "outcomes as a teacher" do
       msg = "redmine bug on this functionality"
       expect(msg).to eq ""
     end
+  end
 
-    context "find/import dialog" do
-      it "should not allow importing top level groups" do
-        get outcome_url
-        wait_for_ajaximations
+  context "find/import dialog" do
+    before do
+      course_with_teacher_logged_in
+      @account = Account.default
+      account_outcome(1)
+    end
 
-        f('.find_outcome').click
-        wait_for_ajaximations
-        groups = ff('.outcome-group')
-        expect(groups.size).to eq 1
-        groups.each do |g|
-          g.click
-          expect(f('.ui-dialog-buttonpane .btn-primary')).not_to be_displayed
-        end
+    it "should not allow importing top level groups" do
+      get outcome_url
+      wait_for_ajaximations
+
+      f('.find_outcome').click
+      wait_for_ajaximations
+      groups = ff('.outcome-group')
+      expect(groups.size).to eq 1
+      groups.each do |g|
+        g.click
+        expect(f('.ui-dialog-buttonpane .btn-primary')).not_to be_displayed
       end
+    end
+
+    it "should update the selected group when re-opened" do
+      group1 = outcome_group_model(title: 'outcome group 1', context: @course)
+      group2 = outcome_group_model(title: 'outcome group 2', context: @course)
+
+      get outcome_url
+      wait_for_ajaximations
+
+      f(".outcomes-sidebar .outcome-group[data-id = '#{group1.id}']").click
+      wait_for_ajaximations
+
+      goto_account_default_outcomes
+
+      f(".ellipsis[title='outcome 0']").click
+      wait_for_ajaximations
+
+      f('.ui-dialog-buttonpane .btn-primary').click
+      alert = driver.switch_to.alert
+      expect(alert.text).to include "outcome group 1"
+      alert.dismiss
+
+      f('.ui-dialog-buttonpane .ui-button').click
+      f(".outcomes-sidebar .outcome-group[data-id = '#{group2.id}']").click
+      wait_for_ajaximations
+
+      goto_account_default_outcomes
+
+      f(".ellipsis[title='outcome 0']").click
+      wait_for_ajaximations
+
+      f('.ui-dialog-buttonpane .btn-primary').click
+      alert = driver.switch_to.alert
+      expect(alert.text).to include "outcome group 2"
+      alert.dismiss
     end
   end
 

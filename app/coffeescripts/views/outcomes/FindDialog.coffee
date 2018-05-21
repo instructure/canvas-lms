@@ -81,6 +81,9 @@ define [
 
       @showOrHideImport()
 
+    updateSelection: (selectedGroup) =>
+      @selectedGroup = selectedGroup
+
     # link an outcome or copy/link an outcome group into @selectedGroup
     import: (e) =>
       e.preventDefault()
@@ -126,7 +129,7 @@ define [
     showOrHideImport: =>
       model = @sidebar.selectedModel()
       canShow = true
-      if !model || model.get 'dontImport' 
+      if !model || model.get 'dontImport'
         canShow = false
       else if model && model instanceof OutcomeGroup && @disableGroupImport
         canShow = false
