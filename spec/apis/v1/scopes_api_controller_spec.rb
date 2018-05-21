@@ -59,6 +59,7 @@ describe ScopesApiController, type: :request do
 
       it "groups scopes when group_by is passed in" do
         scope_params[:group_by] = "resource_name"
+
         json = api_call(:get, "/api/v1/accounts/#{@account.id}/scopes", scope_params)
         expect(json["oauth2"]).to eq [{
                                         "resource"=>"oauth2",

@@ -163,6 +163,11 @@ h3.beta {
   border-left: 3px solid #0073ac;
 }
 
+.method_details code.scope {
+  background-color: #eee;
+  padding: 1px;
+}
+
 h2 .defined-in {
   float:right;
   font-size:10px;

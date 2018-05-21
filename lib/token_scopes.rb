@@ -23,15 +23,26 @@ class TokenScopes
     scope: "#{OAUTH2_SCOPE_NAMESPACE}userinfo"
   }.freeze
 
+  def self.named_scopes
+    named_scopes = TokenScopes::DETAILED_SCOPES.each_with_object([]) do |frozen_scope, arr|
+      scope = frozen_scope.dup
+      api_scope_mapper_class = ApiScopeMapperLoader.load
+      scope[:resource] ||= api_scope_mapper_class.lookup_resource(scope[:controller], scope[:action])
+      scope[:resource_name] = api_scope_mapper_class.name_for_resource(scope[:resource])
+      arr << scope if scope[:resource_name]
+      scope
+    end
+    Canvas::ICU.collate_by(named_scopes) {|s| s[:resource_name]}
+  end
+
   def self.api_routes
     routes = Rails.application.routes.routes.select { |route| /^\/api\/(v1|sis)/ =~ route.path.spec.to_s }.map do |route|
-      path = route.path.spec.to_s.gsub(/\(\.:format\)$/, '')
       {
         controller: route.defaults[:controller]&.to_sym,
         action: route.defaults[:action]&.to_sym,
         verb: route.verb,
-        path: path,
-        scope: "url:#{route.verb}|#{path}".freeze,
+        path: route.path.spec.to_s.gsub(/\(\.:format\)$/, ''),
+        scope: TokenScopesHelper.scope_from_route(route).freeze,
       }
     end
     routes.uniq {|route| route[:scope]}

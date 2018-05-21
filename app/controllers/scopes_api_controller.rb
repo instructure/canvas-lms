@@ -70,16 +70,8 @@ class ScopesApiController < ApplicationController
   #
   # @returns [Scope]
   def index
+    named_scopes = TokenScopes.named_scopes
     if authorized_action(@context, @current_user, :manage_role_overrides)
-      named_scopes = TokenScopes::DETAILED_SCOPES.each_with_object([]) do |frozen_scope, arr|
-        scope = frozen_scope.dup
-        api_scope_mapper_class = ApiScopeMapperLoader.load
-        scope[:resource] ||= api_scope_mapper_class.lookup_resource(scope[:controller], scope[:action])
-        scope[:resource_name] = api_scope_mapper_class.name_for_resource(scope[:resource])
-        arr << scope if scope[:resource_name]
-        scope
-      end
-      named_scopes = Canvas::ICU.collate_by(named_scopes) {|s| s[:resource_name]}
       scopes = params[:group_by] == "resource_name" ? named_scopes.group_by {|route| route[:resource_name]} : named_scopes
       render json: scopes
     end
