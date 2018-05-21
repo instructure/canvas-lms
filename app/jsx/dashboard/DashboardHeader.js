@@ -154,7 +154,6 @@ class DashboardHeader extends React.Component {
           <div id="DashboardOptionsMenu_Container">
             <DashboardOptionsMenu
               view={this.state.currentDashboard}
-              hide_dashcard_color_overlays={this.props.hide_dashcard_color_overlays}
               planner_enabled={this.props.planner_enabled}
               onDashboardChange={this.changeDashboard}
               menuButtonRef={(ref) => {this.menuButtonFocusable = ref}}
@@ -168,7 +167,6 @@ class DashboardHeader extends React.Component {
 
 DashboardHeader.propTypes = {
   dashboard_view: string,
-  hide_dashcard_color_overlays: bool,
   planner_enabled: bool.isRequired,
   flashError: func,
   flashMessage: func,
@@ -177,7 +175,6 @@ DashboardHeader.propTypes = {
 
 DashboardHeader.defaultProps = {
   dashboard_view: 'cards',
-  hide_dashcard_color_overlays: false,
   flashError: () => {},
   flashMessage: () => {},
   screenReaderFlashMessage: () => {},
