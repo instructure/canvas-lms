@@ -70,6 +70,8 @@ function cellMapForSubmission (assignment, student, hasGradingPeriods, selectedG
     return { locked: true, hideGrade: true };
   } else if (assignment.moderated_grading && !assignment.grades_published && anonymousModeratedMarkingEnabled) {
     return { locked: true, hideGrade: false };
+  } else if (assignment.anonymous_grading && assignment.muted && anonymousModeratedMarkingEnabled) {
+    return { locked: true, hideGrade: true };
   } else if (!visibleToStudent(assignment, student)) {
     return { locked: true, hideGrade: true };
   } else if (hasGradingPeriods) {

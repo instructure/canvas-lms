@@ -894,7 +894,7 @@ define [
     handleAssignmentMutingChange: (assignment) =>
       @gradebookGrid.gridSupport.columns.updateColumnHeaders([@getAssignmentColumnId(assignment.id)])
       @updateFilteredContentInfo()
-      @buildRows()
+      @resetGrading()
 
     handleSubmissionsDownloading: (assignmentId) =>
       @getAssignment(assignmentId).hasDownloadedSubmissions = true

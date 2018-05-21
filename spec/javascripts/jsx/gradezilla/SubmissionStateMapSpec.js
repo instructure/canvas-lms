@@ -204,6 +204,40 @@ QUnit.module('#setSubmissionCellState', function() {
       const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id });
       strictEqual(submission.hideGrade, false);
     });
+
+    QUnit.module('when the assignment is anonymous', function(hooks) {
+      let assignment
+
+      hooks.beforeEach(() => {
+        assignment = { id: '1', published: true, anonymous_grading: true }
+      })
+
+      test('the submission state is locked when the assignment is muted', function() {
+        assignment.muted = true
+        const map = createAndSetupMap(assignment, studentWithSubmission, { anonymousModeratedMarkingEnabled: true })
+        const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id })
+        strictEqual(submission.locked, true)
+      })
+
+      test('the submission state is hidden when the assignment is muted', function() {
+        assignment.muted = true
+        const map = createAndSetupMap(assignment, studentWithSubmission, { anonymousModeratedMarkingEnabled: true })
+        const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id })
+        strictEqual(submission.hideGrade, true)
+      })
+
+      test('the submission state is unlocked when the assignment is unmuted', function() {
+        const map = createAndSetupMap(assignment, studentWithSubmission, { anonymousModeratedMarkingEnabled: true })
+        const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id })
+        strictEqual(submission.locked, false)
+      })
+
+      test('the submission state is not hidden when the assignment is unmuted', function() {
+        const map = createAndSetupMap(assignment, studentWithSubmission, { anonymousModeratedMarkingEnabled: true })
+        const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id })
+        strictEqual(submission.hideGrade, false)
+      })
+    })
   });
 
   QUnit.module('no submission', function() {

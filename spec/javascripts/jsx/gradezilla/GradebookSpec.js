@@ -9258,3 +9258,18 @@ QUnit.module('Gradebook#setAssignmentGroupsLoaded', (hooks) => {
     strictEqual(gradebook.contentLoadStates.assignmentGroupsLoaded, false)
   })
 })
+
+QUnit.module('Gradebook#handleAssignmentMutingChange', (hooks) => {
+  let gradebook
+
+  hooks.beforeEach(() => {
+    gradebook = createGradebook()
+  })
+
+  test('resets grading', () => {
+    sinon.stub(gradebook, 'resetGrading')
+    gradebook.handleAssignmentMutingChange({ id: '2301' })
+    strictEqual(gradebook.resetGrading.callCount, 1)
+    gradebook.resetGrading.restore()
+  })
+})
