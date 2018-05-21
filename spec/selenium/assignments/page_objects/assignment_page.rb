@@ -47,6 +47,10 @@ class AssignmentPage
       f("#moderated_grading_button")
     end
 
+    def page_action_list
+      f('.page-action-list')
+    end
+
     def assignment_content
       f("#content")
     end

@@ -110,6 +110,10 @@ module Gradebook
         f('#gradebook_grid .container_1')
       end
 
+      def flash_message_holder
+        f('#flash_screenreader_holder')
+      end
+
       # actions
       def visit_gradebook(course, user = nil)
         if user.present?
