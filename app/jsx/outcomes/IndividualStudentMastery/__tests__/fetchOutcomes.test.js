@@ -24,69 +24,68 @@ describe('fetchOutcomes', () => {
     fetchMock.restore()
   })
 
-  const groups = [
-    {
-      id: 1,
-      title: 'Group 1'
-    },
-    {
-      id: 2,
-      title: 'Group 2'
-    }
-  ]
-
-  const links = [
-    {
-      outcome_group: { id: 1 },
-      outcome: {
-        id: 1,
-        title: 'Outcome 1'
-      }
-    },
-    {
-      outcome_group: { id: 2 },
-      outcome: {
-        id: 2,
-        title: 'Outcome 2'
-      }
-    }
-  ]
-
-  const rollups = {
-    rollups: [
+  const defaultResponses = () => ({
+    groupsResponse: [
       {
-        scores: [
-          { score: 3.0, links: { outcome: 1 } },
-          { score: 1.0, links: { outcome: 2 } },
-        ]
+        id: 1,
+        title: 'Group 1'
+      },
+      {
+        id: 2,
+        title: 'Group 2'
       }
-    ]
-  }
-
-  const results1 = {
-    outcome_results: [
-      { id: 1, score: 3.0, links: { alignment: 'assignment_1' } },
-      { id: 2, score: 2.0, links: { alignment: 'assignment_2' } }
     ],
-    linked: {
-      alignments: [
-        { id: 'assignment_1', name: 'Assignment 1' },
-        { id: 'assignment_2', name: 'Assignment 2' }
-      ]
-    }
-  }
-
-  const results2 = {
-    outcome_results: [
-      { id: 3, score: 3.0, links: { alignment: 'assignment_1' } },
+    linksResponse: [
+      {
+        outcome_group: { id: 1 },
+        outcome: {
+          id: 1,
+          title: 'Outcome 1'
+        }
+      },
+      {
+        outcome_group: { id: 2 },
+        outcome: {
+          id: 2,
+          title: 'Outcome 2'
+        }
+      }
     ],
-    linked: {
-      alignments: [
-        { id: 'assignment_1', name: 'Assignment 1' }
+    rollupsResponse: {
+      rollups: [
+        {
+          scores: [
+            { score: 3.0, links: { outcome: 1 } },
+            { score: 1.0, links: { outcome: 2 } },
+          ]
+        }
       ]
+    },
+    resultsResponses: {
+      1: {
+        outcome_results: [
+          { id: 1, score: 3.0, links: { alignment: 'assignment_1' } },
+          { id: 2, score: 2.0, links: { alignment: 'assignment_2' } }
+        ],
+        linked: {
+          alignments: [
+            { id: 'assignment_1', name: 'Assignment 1' },
+            { id: 'assignment_2', name: 'Assignment 2' }
+          ]
+        }
+      },
+      2: {
+        outcome_results: [
+          { id: 3, score: 3.0, links: { alignment: 'assignment_1' } },
+        ],
+        linked: {
+          alignments: [
+            { id: 'assignment_1', name: 'Assignment 1' }
+          ]
+        }
+      }
     }
-  }
-
+  })
 
   const expectedOutcomes = [
     {
@@ -121,12 +120,16 @@ describe('fetchOutcomes', () => {
     }
   ]
 
-  const mockAll = () => {
-    fetchMock.mock('/api/v1/courses/1/outcome_groups', groups)
-    fetchMock.mock('/api/v1/courses/1/outcome_group_links?outcome_style=full', links)
-    fetchMock.mock('/api/v1/courses/1/outcome_rollups?user_ids[]=2', rollups)
-    fetchMock.mock('/api/v1/courses/1/outcome_results?user_ids[]=2&outcome_ids[]=1&include[]=alignments&per_page=100', results1)
-    fetchMock.mock('/api/v1/courses/1/outcome_results?user_ids[]=2&outcome_ids[]=2&include[]=alignments&per_page=100', results2)
+  const mockAll = ({ groupsResponse, linksResponse, rollupsResponse, resultsResponses }) => {
+    fetchMock.mock('/api/v1/courses/1/outcome_groups', groupsResponse)
+    fetchMock.mock('/api/v1/courses/1/outcome_group_links?outcome_style=full', linksResponse)
+    fetchMock.mock('/api/v1/courses/1/outcome_rollups?user_ids[]=2', rollupsResponse)
+    Object.keys(resultsResponses).forEach((id) => {
+      fetchMock.mock(
+        `/api/v1/courses/1/outcome_results?user_ids[]=2&outcome_ids[]=${id}&include[]=alignments&per_page=100`,
+        resultsResponses[id]
+      )
+    })
   }
 
   it('throws error if http throws error', (done) => {
@@ -137,12 +140,23 @@ describe('fetchOutcomes', () => {
   })
 
   it('handles complete request', (done) => {
-    mockAll()
+    const responses = defaultResponses()
+    mockAll(responses)
     fetchOutcomes(1, 2)
       .then(({ outcomeGroups, outcomes }) => {
-        expect(outcomeGroups).toMatchObject(groups)
+        expect(outcomeGroups).toMatchObject(responses.groupsResponse)
         expect(outcomes).toMatchObject(expectedOutcomes)
         done()
+      })
+  })
+
+  it('removes hidden results', () => {
+    const responses = defaultResponses()
+    responses.resultsResponses['1'].outcome_results[1].hidden = true
+    mockAll(responses)
+    fetchOutcomes(1, 2)
+      .then(({ outcomes }) => {
+        expect(outcomes[0].results).toHaveLength(1)
       })
   })
 })

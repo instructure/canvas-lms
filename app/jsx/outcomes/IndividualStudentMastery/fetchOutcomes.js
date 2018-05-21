@@ -50,7 +50,7 @@ const fetchOutcomes = (courseId, studentId) => {
     ))
     .then((responses) => {
       outcomeResultsByOutcomeId = responses.reduce((acc, response, i) => {
-        acc[outcomeLinks[i].outcome.id] = response.outcome_results;
+        acc[outcomeLinks[i].outcome.id] = response.outcome_results.filter((r) => !r.hidden);
         return acc
       }, {})
       alignmentsByAlignmentId = _.indexBy(_.flatten(responses.map((response) => response.linked.alignments)), (a) => a.id)
