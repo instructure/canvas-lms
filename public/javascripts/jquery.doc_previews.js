@@ -45,7 +45,7 @@ import './jquery.loadingImg'
       "application/vnd.oasis.opendocument.text":                                   [1, 1],
       "application/vnd.openxmlformats-officedocument.presentationml.template":     [1, 1],
       "application/vnd.openxmlformats-officedocument.presentationml.slideshow":    [1, 1],
-      "text/plain":                                                                [1, false],
+      "text/plain":                                                                [1, 1],
       "application/vnd.openxmlformats-officedocument.presentationml.presentation": [1, 1],
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document":   [1, 1],
       "application/postscript":                                                    [1, 1],
