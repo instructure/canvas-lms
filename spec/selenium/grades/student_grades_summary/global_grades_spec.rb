@@ -23,33 +23,39 @@ require_relative "../pages/gradebook_page"
 describe 'Global Grades' do
   include_context "in-process server selenium tests"
 
+  SCORE1 = 90.0
+  SCORE2 = 76.0
+  SCORE3 = 9.0
+
   before(:once) do
 
     now = Time.zone.now
 
-    course_factory(active_all: true, course_name: "Course 1")
-    student_in_course(active_all: true)
+    @ungraded_course = course_factory(active_all: true, course_name: "Course 1")
+    @student = user_factory(active_all: true)
+    @ungraded_course.enroll_student(@student, enrollment_state: 'active')
 
     # create a second course and enroll student
-    @course2 = course_with_teacher(user: @teacher, course_name: "Course 2", active_all: true).course
-    @course2.enroll_student(@student, allow_multiple_enrollments: true).accept(true)
+    @graded_course = course_factory(course_name: "Course 2", active_course: true)
+    @graded_course.enroll_teacher(@teacher, enrollment_state: 'active')
+    @graded_course.enroll_student(@student, allow_multiple_enrollments: true, enrollment_state: 'active')
 
     # create 3 assignments
-    @assignment1 = @course2.assignments.create!(
+    @assignment1 = @graded_course.assignments.create!(
       title: 'assignment one',
       grading_type: 'points',
       points_possible: 100,
       due_at: now,
       submission_types: 'online_text_entry'
     )
-    @a2 = @course2.assignments.create!(
+    @assignment2 = @graded_course.assignments.create!(
       title: 'assignment two',
       grading_type: 'points',
       points_possible: 100,
       due_at: now,
       submission_types: 'online_text_entry'
     )
-    @a3 = @course2.assignments.create!(
+    @assignment3 = @graded_course.assignments.create!(
       title: 'assignment three',
       grading_type: 'points',
       points_possible: 10,
@@ -58,9 +64,9 @@ describe 'Global Grades' do
     )
 
     # Grade the assignments
-    @assignment1.grade_student(@student, grade: 90, grader: @teacher)
-    @a2.grade_student(@student, grade: 76, grader: @teacher)
-    @a3.grade_student(@student, grade: 9, grader: @teacher)
+    @assignment1.grade_student(@student, grade: SCORE1, grader: @teacher)
+    @assignment2.grade_student(@student, grade: SCORE2, grader: @teacher)
+    @assignment3.grade_student(@student, grade: SCORE3, grader: @teacher)
   end
 
   context 'as student' do
@@ -73,14 +79,14 @@ describe 'Global Grades' do
 
     it 'goes to student grades page', priority: "1", test_id: 3491485 do
       # grab score to compare
-      course_score = GlobalGrades.get_score_for_course(@course2)
+      course_score = GlobalGrades.get_score_for_course(@graded_course)
       # find link for Second Course and click
-      wait_for_new_page_load(GlobalGrades.click_course_link(@course2))
+      wait_for_new_page_load(GlobalGrades.click_course_link(@graded_course))
 
-    # verify url has correct course id
-    expect(driver.current_url).to eq app_url + "/courses/#{@course2.id}/grades/#{@student.id}"
-    # verify assignment score is correct
-    expect(StudentGradesPage.final_grade.text).to eq(course_score)
+      # verify url has correct course id
+      expect(driver.current_url).to eq app_url + "/courses/#{@graded_course.id}/grades/#{@student.id}"
+      # verify assignment score is correct
+      expect(StudentGradesPage.final_grade.text).to eq(course_score)
     end
   end
 
@@ -92,14 +98,30 @@ describe 'Global Grades' do
       GlobalGrades.visit
     end
 
+    it 'has grades table with courses', priority: "1", test_id: 3500053 do
+      expect(GlobalGrades.course_details).to include_text(@ungraded_course.name)
+      expect(GlobalGrades.course_details).to include_text(@graded_course.name)
+    end
+
+    it 'has grades table with student average' do # test id 350053
+      expect(GlobalGrades.score(@graded_course)).to include_text("average for 1 student")
+      # calculate expected grade average
+      grade = ((SCORE1 + SCORE2 + SCORE3)/(@assignment1.points_possible + @assignment2.points_possible + @assignment3.points_possible))*100
+      expect(GlobalGrades.get_score_for_course_no_percent(@graded_course)).to eq grade.round(2)
+    end
+
+    it 'has grades table with interactions report' do # test id 350053
+      expect(GlobalGrades.report(@graded_course)).to contain_link("Student Interactions Report")
+    end
+
     it 'goes to gradebook page', priority: "1", test_id: 3494790 do
       # grab scores to compare
-      course_score = GlobalGrades.get_score_for_course(@course2)
+      course_score = GlobalGrades.get_score_for_course(@graded_course)
       # find link for Second Course and click
-      wait_for_new_page_load(GlobalGrades.click_course_link(@course2))
+      wait_for_new_page_load(GlobalGrades.click_course_link(@graded_course))
 
       # verify url has correct course id
-      expect(driver.current_url).to eq app_url + "/courses/#{@course2.id}/gradebook"
+      expect(driver.current_url).to eq app_url + "/courses/#{@graded_course.id}/gradebook"
       # verify assignment score is correct
       expect(Gradebook::MultipleGradingPeriods.student_total_grade(@student)).to eq(course_score)
     end
