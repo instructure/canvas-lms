@@ -107,12 +107,18 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
     render_unauthorized_action and return unless @assignment.permits_moderation?(@current_user)
 
     pg = @assignment.provisional_grades.find(params[:provisional_grade_id])
-    selection = @assignment.moderated_grading_selections.where(student_id: pg.submission.user_id).first
+    submission = pg.submission
+    selection = @assignment.moderated_grading_selections.where(student_id: submission.user_id).first
     return render :json => { :message => 'student not in moderation set' }, :status => :bad_request unless selection
     selection.provisional_grade = pg
     selection.save!
-    pg.submission.touch # so the selection is reloaded for other moderators
-    render :json => selection.as_json(:include_root => false, :only => %w(assignment_id student_id selected_provisional_grade_id))
+    submission.touch # so the selection is reloaded for other moderators
+    json = selection.as_json(include_root: false, only: %w(assignment_id student_id selected_provisional_grade_id))
+    unless @assignment.can_view_student_names?(@current_user)
+      json.delete(:student_id)
+      json[:anonymous_id] = submission.anonymous_id
+    end
+    render json: json
   end
 
   # @API Copy provisional grade

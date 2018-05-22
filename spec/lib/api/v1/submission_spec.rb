@@ -43,6 +43,7 @@ describe Api::V1::Submission do
 
   describe 'speedgrader_url' do
     it "links to the speed grader for a student's submission" do
+      expect(assignment).to receive(:can_view_student_names?).with(user).and_return true
       json = fake_controller.provisional_grade_json(provisional_grade, submission, assignment, user)
       path = "/courses/#{course.id}/gradebook/speed_grader"
       query = { 'assignment_id' => assignment.id.to_s }
@@ -50,16 +51,13 @@ describe Api::V1::Submission do
       expect(json.fetch('speedgrader_url')).to match_path(path).and_query(query).and_fragment(fragment)
     end
 
-    context 'when an assignment is anonymously graded' do
-      let(:anonymous_assignment) { assignment.tap { |c| c.anonymous_grading = true } }
-
-      it "links to the speed grader for a student's anonymous submission" do
-        json = fake_controller.provisional_grade_json(provisional_grade, submission, anonymous_assignment, user)
-        path = "/courses/#{course.id}/gradebook/speed_grader"
-        query = { 'assignment_id' => assignment.id.to_s }
-        fragment = { 'provisional_grade_id' => provisional_grade.id, 'anonymous_id' => submission.anonymous_id }
-        expect(json.fetch('speedgrader_url')).to match_path(path).and_query(query).and_fragment(fragment)
-      end
+    it "links to the speed grader for a student's anonymous submission when grader cannot view student names" do
+      expect(assignment).to receive(:can_view_student_names?).with(user).and_return false
+      json = fake_controller.provisional_grade_json(provisional_grade, submission, assignment, user)
+      path = "/courses/#{course.id}/gradebook/speed_grader"
+      query = { 'assignment_id' => assignment.id.to_s }
+      fragment = { 'provisional_grade_id' => provisional_grade.id, 'anonymous_id' => submission.anonymous_id }
+      expect(json.fetch('speedgrader_url')).to match_path(path).and_query(query).and_fragment(fragment)
     end
   end
 

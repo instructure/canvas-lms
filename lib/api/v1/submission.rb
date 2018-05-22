@@ -292,16 +292,21 @@ module Api::V1::Submission
 
   def provisional_grade_json(provisional_grade, submission, assignment, current_user, includes = [])
     json = provisional_grade.grade_attributes
-    json.merge!(speedgrader_url: speed_grader_url(submission, assignment, provisional_grade))
+    json.merge!(speedgrader_url: speed_grader_url(submission, assignment, provisional_grade, current_user))
     if includes.include?('submission_comments')
       json['submission_comments'] = submission_comments_json(provisional_grade.submission_comments, current_user)
     end
-    if includes.include?('rubric_assessment')
-      json['rubric_assessments'] = provisional_grade.rubric_assessments.map do |ra|
-        ra.as_json(:methods => [:assessor_name], :include_root => false)
+    if assignment.can_view_other_grader_identities?(current_user)
+      if includes.include?('rubric_assessment')
+        json['rubric_assessments'] = provisional_grade.rubric_assessments.map do |ra|
+          ra.as_json(:methods => [:assessor_name], :include_root => false)
+        end
       end
+    else
+      json.merge!(anonymous_grader_id: assignment.grader_ids_to_anonymous_ids[json.delete(:scorer_id).to_s])
     end
-    if includes.include?('crocodoc_urls')
+
+    if includes.include?('crocodoc_urls') && assignment.can_view_student_names?(current_user)
       json['crocodoc_urls'] = submission.versioned_attachments.map do |a|
         provisional_grade.attachment_info(current_user, a)
       end
@@ -311,7 +316,7 @@ module Api::V1::Submission
 
   def submission_provisional_grades_json(submission, assignment, current_user, includes)
     provisional_grades = submission.provisional_grades
-    if assignment.context.grants_right?(current_user, :moderate_grades)
+    if assignment.permits_moderation?(current_user)
       provisional_grades = provisional_grades.sort_by { |pg| pg.final ? CanvasSort::Last : pg.created_at }
     else
       provisional_grades = provisional_grades.select { |pg| pg.scorer_id == current_user.id }
@@ -328,12 +333,12 @@ module Api::V1::Submission
     submission.originality_reports.present?
   end
 
-  def speed_grader_url(submission, assignment, provisional_grade)
+  def speed_grader_url(submission, assignment, provisional_grade, current_user)
     anchor = { provisional_grade_id: provisional_grade.id }
-    if assignment.anonymous_grading?
-      anchor[:anonymous_id] = submission.anonymous_id
-    else
+    if assignment.can_view_student_names?(current_user)
       anchor[:student_id] = submission.user_id
+    else
+      anchor[:anonymous_id] = submission.anonymous_id
     end
     speed_grader_course_gradebook_url(
       course_id: assignment.context.id,

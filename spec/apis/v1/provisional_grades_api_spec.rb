@@ -63,6 +63,17 @@ describe 'Provisional Grades API', type: :request do
       end
 
       it_behaves_like 'authorization when Anonymous Moderated Marking is enabled', :put
+
+      it "should use anonymous_id instead of student_id if user cannot view student names" do
+        allow_any_instance_of(Assignment).to receive(:can_view_student_names?).and_return false
+        json = api_call_as_user(@teacher, :put, @path, @params)
+        expect(json).to eq({
+                             'assignment_id' => @assignment.id,
+                             'anonymous_id' => @pg.submission.anonymous_id,
+                             'selected_provisional_grade_id' => @pg.id
+                           })
+        expect(@selection.reload.provisional_grade).to eq(@pg)
+      end
     end
   end
 

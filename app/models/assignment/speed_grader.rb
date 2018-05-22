@@ -366,9 +366,7 @@ class Assignment
     end
 
     def grader_ids_to_anonymous_ids
-      @grader_ids_to_anonymous_ids ||= @assignment.moderation_graders.each_with_object({}) do |grader, map|
-        map[grader.user_id.to_s] = grader.anonymous_id
-      end
+      @assignment.grader_ids_to_anonymous_ids
     end
   end
 end

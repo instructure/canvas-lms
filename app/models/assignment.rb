@@ -2829,10 +2829,15 @@ class Assignment < ActiveRecord::Base
     grader_comments_visible_to_graders?
   end
 
+  def grader_ids_to_anonymous_ids
+    @grader_ids_to_anonymous_ids ||= moderation_graders.each_with_object({}) do |grader, map|
+      map[grader.user_id.to_s] = grader.anonymous_id
+    end
+  end
+
   def can_view_student_names?(user)
     return false unless context.grants_any_right?(user, :manage_grades, :view_all_grades)
     return true unless anonymous_moderated_marking?
-
     !anonymous_grading?
   end
 
