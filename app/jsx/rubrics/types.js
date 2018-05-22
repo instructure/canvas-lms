@@ -31,7 +31,10 @@ export const ratingShape = {
 export const assessmentShape = {
   criterion_id: PropTypes.string.isRequired,
   comments: PropTypes.string,
-  points: PropTypes.number
+  points: PropTypes.number,
+  pointText: PropTypes.string,
+  focusPoints: PropTypes.number,
+  saveCommentsForLater: PropTypes.bool
 }
 
 export const criterionShape = {
@@ -47,11 +50,15 @@ export const criterionShape = {
 export const rubricShape = {
   criteria: PropTypes.arrayOf(PropTypes.shape(criterionShape)),
   free_form_criterion_comments: PropTypes.bool,
+  points_possible: PropTypes.number.isRequired,
   title: PropTypes.string.isRequired
 }
 
 export const rubricAssociationShape = {
-  hide_score_total: PropTypes.bool
+  hide_score_total: PropTypes.bool,
+  summary_data: PropTypes.shape({
+    saved_comments: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.string))
+  })
 }
 
 export const rubricAssessmentShape = {

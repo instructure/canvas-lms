@@ -17,6 +17,7 @@
  */
 import React from 'react'
 import { shallow } from 'enzyme'
+import sinon from 'sinon'
 import Ratings from '../Ratings'
 
 describe('The Ratings component', () => {
@@ -34,11 +35,6 @@ describe('The Ratings component', () => {
     expect(component().debug()).toMatchSnapshot()
   })
 
-  it('renders the Rating sub-components as expected', () => {
-    component().find('Rating')
-      .forEach((el) => expect(el.shallow().debug()).toMatchSnapshot())
-  })
-
   it('highlights the right rating', () => {
     const ratings = (points) =>
       component({ points }).find('Rating').map((el) => el.prop('selected'))
@@ -46,5 +42,13 @@ describe('The Ratings component', () => {
     expect(ratings(9)).toEqual([true, false, false])
     expect(ratings(5)).toEqual([false, true, false])
     expect(ratings(1)).toEqual([false, false, true])
+  })
+
+  it('calls onPointChange when a rating is clicked', () => {
+    const onPointChange = sinon.spy()
+    const el = component({ onPointChange })
+
+    el.find('Rating').first().prop('onClick').call()
+    expect(onPointChange.args[0]).toEqual([10])
   })
 })

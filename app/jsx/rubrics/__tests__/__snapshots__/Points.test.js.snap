@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`The Points component renders an error when points is a string 1`] = `
+"<div className=\\"container graded-points\\">
+  <TextInput inline={true} label={{...}} messages={{...}} onChange={[Function]} value=\\"stringy\\" width=\\"4rem\\" type=\\"text\\" size=\\"medium\\" textAlign=\\"start\\" disabled={false} readOnly={false} inputRef={[Function]} layout=\\"stacked\\" />
+   
+  / 2.0 pts
+</div>"
+`;
+
+exports[`The Points component renders as expected with fractional points 1`] = `
+"<div className=\\"container graded-points\\">
+  1.1
+   
+  / 2.0 pts
+</div>"
+`;
+
+exports[`The Points component renders blank when points are undefined 1`] = `
+"<div className=\\"container graded-points\\">
+  <TextInput inline={true} label={{...}} messages={{...}} onChange={[Function]} value=\\"\\" width=\\"4rem\\" type=\\"text\\" size=\\"medium\\" textAlign=\\"start\\" disabled={false} readOnly={false} inputRef={[Function]} layout=\\"stacked\\" />
+   
+  / 2.0 pts
+</div>"
+`;
+
+exports[`The Points component renders the root component as expected 1`] = `
+"<div className=\\"container graded-points\\">
+  1
+   
+  / 2.0 pts
+</div>"
+`;

@@ -30,14 +30,15 @@ _.toPairs(rubrics).forEach(([key, rubric]) => {
 
   describe(rubric.title, () => {
     criteriaTypes.forEach((criteriaType, ix) => {
-      const props = {
+      const basicProps = {
         assessment: assessment.data[ix],
         criterion: rubric.criteria[ix],
-        freeForm: key === 'freeForm'
+        freeForm: key === 'freeForm',
       }
 
-      describe(`with a ${criteriaType} criterion`, () => {
+      const testRenderedSnapshots = (props) => {
         const component = (mods) => shallow(<Criterion {...{ ...props, ...mods }} />)
+
         it('renders the root component as expected', () => {
           expect(component().debug()).toMatchSnapshot()
         })
@@ -48,6 +49,14 @@ _.toPairs(rubrics).forEach(([key, rubric]) => {
               .forEach((el) => expect(el.shallow().debug()).toMatchSnapshot())
           })
         })
+      }
+
+      describe(`with a ${criteriaType} criterion`, () => {
+        testRenderedSnapshots(basicProps)
+      })
+
+      describe(`when assessing with a ${criteriaType} criterion`, () => {
+        testRenderedSnapshots({ ...basicProps, onAssessmentChange: () => {}})
       })
     })
   })
@@ -73,7 +82,7 @@ describe('Criterion', () => {
         assessment={assessments.freeForm.data[1]}
         criterion={rubrics.freeForm.criteria[1]}
         freeForm
-        />
+      />
     )
 
     const render = shallow(component)

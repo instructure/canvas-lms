@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
+import sinon from 'sinon'
 import { shallow } from 'enzyme'
 import _ from 'lodash'
 import Rubric from '../Rubric'
@@ -43,5 +44,32 @@ describe('the Rubric component', () => {
         rubricAssociation={hidden.rubric_association}
       />)
     expect(modal.debug()).toMatchSnapshot()
+  })
+
+  it('updates the total score when an individual criterion point assessment changes', () => {
+    const onAssessmentChange = sinon.spy()
+    const renderAssessing = (assessment) =>
+      shallow(
+        <Rubric
+          onAssessmentChange={onAssessmentChange}
+          rubric={rubric}
+          rubricAssessment={assessment}
+          rubricAssociation={assessment.rubric_association}
+        />
+      )
+
+    const el = renderAssessing(pointsAssessment)
+    const updated = { ...pointsAssessment.data[0], points: 2 }
+    el.find('Criterion').first().prop('onAssessmentChange')(updated)
+
+    expect(onAssessmentChange.args).toEqual([
+      [{
+        ...pointsAssessment,
+        data: [updated, pointsAssessment.data[1]],
+        score: 2 + pointsAssessment.data[1].points
+      }]
+    ])
+
+    expect(renderAssessing(onAssessmentChange.args[0][0]).debug()).toMatchSnapshot()
   })
 })

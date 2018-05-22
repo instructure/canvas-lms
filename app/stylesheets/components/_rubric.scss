@@ -72,6 +72,11 @@
   padding: 0px 5px;
 }
 
+.react-rubric .edit-freeform-comments {
+  min-width: 15rem;
+  padding: 1rem;
+}
+
 .react-rubric .ratings .rating-tier-list {
   margin: 0;
   display: flex;
@@ -91,8 +96,14 @@
   border-bottom: 0;
 }
 
-.react-rubric .rating-tier.selected {
+.react-rubric .rating-tier.selected,  {
   background-color: #cfa;
+}
+
+.react-rubric .react-assessing .rating-tier:focus,
+.react-rubric .react-assessing .rating-tier:hover {
+  background-color: #ad9;
+  cursor: pointer;
 }
 
 .react-rubric .graded-points {

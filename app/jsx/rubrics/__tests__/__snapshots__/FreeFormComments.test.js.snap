@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`The FreeFormComments component renders the root component as expected 1`] = `
+"<div className=\\"edit-freeform-comments\\">
+  <Select label=\\"Saved Comments\\" assistiveText=\\"Select from saved comments\\" onChange={[Function]} editable={false} allowEmpty={true} emptyOption=\\"---\\" selectedOption={{...}} size=\\"medium\\" loadingText={{...}} visibleOptionsCount={8} optionsMaxWidth={{...}} inputRef={[Function]} filter={[Function]} formatSelectedOption={[Function]} closeOnSelect={true}>
+    <option value=\\"first\\">
+      [ Select ]
+    </option>
+    <option value=\\"0\\">
+      I award you no points
+    </option>
+    <option value=\\"1\\">
+      May god have mercy on your soul
+    </option>
+  </Select>
+  <br />
+  <TextArea label=\\"Comments\\" maxHeight=\\"50rem\\" onChange={[Function]} resize=\\"vertical\\" size=\\"small\\" value=\\"some things\\" autoGrow={true} inline={false} messages={{...}} disabled={false} readOnly={false} textareaRef={[Function]} layout=\\"stacked\\" />
+  <br />
+  <Checkbox checked={false} label=\\"Save this comment for reuse\\" size=\\"small\\" onChange={[Function]} variant=\\"simple\\" disabled={false} inline={false} />
+</div>"
+`;
