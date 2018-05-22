@@ -6,9 +6,11 @@ describe 'pipeline service' do
   let(:http_client) { double('http_client') }
 
   before do
+
     PipelineService.queue_mode = 'synchronous'
     allow(PipelineService::Events::HTTPClient).to receive(:post)
-
+    allow(PipelineService::HTTPClient).to receive(:get).and_return(double('get_response', parsed_response: ''))
+    allow(PipelineService::TokenBuilder).to receive(:build)
     @user = account_admin_user
     @course = Course.create!
     @enrollment = StudentEnrollment.new(valid_enrollment_attributes)
