@@ -16,7 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class ObserverAlertThreshold < ActiveRecord::Base
-  belongs_to :user_observation_link, :inverse_of => :observer_alert_thresholds
+  belongs_to :student, :class_name => 'User', inverse_of: :as_student_observer_alert_thresholds, :foreign_key => :user_id
+  belongs_to :observer, :class_name => 'User', inverse_of: :as_observer_observer_alert_thresholds
   has_many :observer_alerts, :inverse_of => :observer_alert_threshold
 
   ALERT_TYPES = %w(
@@ -29,10 +30,24 @@ class ObserverAlertThreshold < ActiveRecord::Base
     institution_announcement
   ).freeze
   validates :alert_type, inclusion: { in: ALERT_TYPES }
-  validates :user_observation_link_id, :alert_type, presence: true
-  validates :alert_type, uniqueness: { scope: :user_observation_link }
+  validates :user_id, :observer_id, :alert_type, presence: true
+  validates :alert_type, uniqueness: { scope: [:user_id, :observer_id] }
+  validate :validate_users_link
 
   scope :active, -> { where.not(workflow_state: 'deleted') }
+
+  def validate_users_link
+    unless users_are_still_linked?
+      errors.add(:observer_id, "Observer must be linked to Student")
+    end
+  end
+
+  # TODO: search cross-shard enrollments
+  def users_are_still_linked?
+    return true if observer.as_observer_observation_links.active.where(student: student).any?
+    return true if observer.enrollments.active.where(associated_user: student).any?
+    false
+  end
 
   def destroy
     self.workflow_state = 'deleted'

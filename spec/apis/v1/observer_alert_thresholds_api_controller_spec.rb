@@ -22,48 +22,63 @@ describe ObserverAlertThresholdsApiController, type: :request do
   include Api
   include Api::V1::ObserverAlertThreshold
 
-  context '#index' do
+  describe '#index' do
     before :once do
       observer_alert_threshold_model(alert_type: 'assignment_missing')
-      @path = "/api/v1/users/#{@observer.id}/observer_alert_thresholds?student_id=#{@observee.id}"
-      @params = {user_id: @observer.to_param, student_id: @observee.to_param,
+      @path = "/api/v1/users/#{@observer.id}/observer_alert_thresholds?student_id=#{@student.id}"
+      @params = {user_id: @observer.to_param, student_id: @student.to_param,
         controller: 'observer_alert_thresholds_api', action: 'index', format: 'json'}
     end
 
-    describe 'with student_id' do
+    context 'with student_id' do
       it 'returns the thresholds' do
         json = api_call_as_user(@observer, :get, @path, @params)
         expect(json.length).to eq 1
-        expect(json[0]['user_observation_link_id']).to eq @observation_link.id
+        expect(json[0]['user_id']).to eq @student.id
+        expect(json[0]['observer_id']).to eq @observer.id
         expect(json[0]['alert_type']).to eq 'assignment_missing'
       end
 
       it 'only returns active thresholds' do
-        to_destroy = @observation_link.observer_alert_thresholds.create(alert_type: 'assignment_grade_low')
+        to_destroy = observer_alert_threshold_model(observer: @observer, student: @student, alert_type: 'assignment_grade_low')
         to_destroy.destroy!
 
         json = api_call_as_user(@observer, :get, @path, @params)
         expect(json.length).to eq 1
 
-        thresholds = @observation_link.observer_alert_thresholds.reload
-        expect(thresholds.count).to eq 2
+        count = ObserverAlertThreshold.where(observer: @observer, student: @student).count
+        expect(count).to eq 2
       end
 
-      it 'errors without proper user_observation_link' do
-        user = user_model
-        path = "/api/v1/users/#{@observer.id}/observer_alert_thresholds?student_id=#{user.id}"
-        params = {user_id: @observer.to_param, student_id: user.to_param,
+      it 'returns an empty array if there arent any thresholds' do
+        observer = user_model
+        student = user_model
+        UserObservationLink.create(observer: observer, student: student)
+        path = "/api/v1/users/#{observer.id}/observer_alert_thresholds?student_id=#{student.id}"
+        params = {user_id: observer.to_param, student_id: student.to_param,
           controller: 'observer_alert_thresholds_api', action: 'index', format: 'json'}
 
-        api_call_as_user(@observer, :get, path, params)
+        json = api_call_as_user(observer, :get, path, params)
+        expect(json.length).to eq 0
+      end
+
+      it 'errors if users are no longer linked' do
+        observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
+        observer_alert_threshold_model(observer: observer, student: @student, alert_type: 'course_grade_high')
+        observer.enrollments.active.map(&:destroy)
+        @observation_link.destroy
+        path = "/api/v1/users/#{observer.id}/observer_alert_thresholds?student_id=#{@student.id}"
+        params = {user_id: observer.to_param, student_id: @student.to_param,
+          controller: 'observer_alert_thresholds_api', action: 'index', format: 'json'}
+
+        api_call_as_user(observer, :get, path, params)
         expect(response.code).to eq "401"
       end
     end
 
-    describe 'without student_id' do
+    context 'without student_id' do
       it 'returns the thresholds' do
-        link = UserObservationLink.create(observer_id: @observer, user_id: user_model)
-        link.observer_alert_thresholds.create(alert_type: 'assignment_grade_high')
+        observer_alert_threshold_model(observer: @observer, student: @student, alert_type: 'assignment_grade_high')
 
         path = "/api/v1/users/#{@observer.id}/observer_alert_thresholds"
         params = {user_id: @observer.to_param, controller: 'observer_alert_thresholds_api',
@@ -73,19 +88,32 @@ describe ObserverAlertThresholdsApiController, type: :request do
         expect(json.length).to eq 2
       end
 
-      it 'errors without proper user_observation_link' do
-        user = user_model
-        path = "/api/v1/users/#{user.id}/observer_alert_thresholds"
-        params = {user_id: user.to_param, controller: 'observer_alert_thresholds_api',
-          action: 'index', format: 'json'}
+      it 'returns an empty array if there arent any thresholds' do
+        observer = user_model
+        student = user_model
+        UserObservationLink.create(observer: observer, student: student)
+        path = "/api/v1/users/#{observer.id}/observer_alert_thresholds"
+        params = {user_id: observer.to_param, controller: 'observer_alert_thresholds_api', action: 'index', format: 'json'}
 
-        api_call_as_user(user, :get, path, params)
+        json = api_call_as_user(observer, :get, path, params)
+        expect(json.length).to eq 0
+      end
+
+      it 'errors if users are no longer linked' do
+        observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
+        observer_alert_threshold_model(observer: observer, student: @student, alert_type: 'course_grade_high')
+        observer.enrollments.active.map(&:destroy)
+        @observation_link.destroy
+        path = "/api/v1/users/#{observer.id}/observer_alert_thresholds"
+        params = {user_id: observer.to_param, controller: 'observer_alert_thresholds_api', action: 'index', format: 'json'}
+
+        api_call_as_user(observer, :get, path, params)
         expect(response.code).to eq "401"
       end
     end
   end
 
-  context '#show' do
+  describe '#show' do
     before :once do
       observer_alert_threshold_model(alert_type: 'assignment_missing')
       @path = "/api/v1/users/#{@observer.id}/observer_alert_thresholds/#{@observer_alert_threshold.id}"
@@ -96,11 +124,12 @@ describe ObserverAlertThresholdsApiController, type: :request do
     it 'returns the threshold' do
       json = api_call_as_user(@observer, :get, @path, @params)
       expect(json['id']).to eq @observer_alert_threshold.id
-      expect(json['user_observation_link_id']).to eq @observation_link.id
+      expect(json['user_id']).to eq @student.id
+      expect(json['observer_id']).to eq @observer.id
       expect(json['alert_type']).to eq 'assignment_missing'
     end
 
-    it 'errors without proper user_observation_link' do
+    it 'errors if users are not linked' do
       user = user_model
       path = "/api/v1/users/#{user.id}/observer_alert_thresholds/#{@observer_alert_threshold.id}"
       params = {user_id: user.to_param, observer_alert_threshold_id: @observer_alert_threshold.to_param,
@@ -111,53 +140,55 @@ describe ObserverAlertThresholdsApiController, type: :request do
     end
   end
 
-  context '#create' do
+  describe '#create' do
     before :once do
       @observer = user_model
-      @observee = user_model
-      @uol = UserObservationLink.create(observer_id: @observer, user_id: @observee)
+      @student = user_model
+      @link = UserObservationLink.create(observer: @observer, student: @student)
       @path = "/api/v1/users/#{@observer.id}/observer_alert_thresholds"
     end
 
     it 'creates the threshold' do
-      create_params = {alert_type: 'assignment_grade_high', threshold: "88"}
-      params = {user_id: @observer.to_param, student_id: @uol.user_id, observer_alert_threshold: create_params,
+      create_params = {alert_type: 'assignment_grade_high', threshold: "88", observer_id: @observer.to_param, user_id: @student.to_param}
+      params = {user_id: @observer.to_param, observer_alert_threshold: create_params,
         controller: 'observer_alert_thresholds_api', action: 'create', format: 'json'}
       json = api_call_as_user(@observer, :post, @path, params)
       expect(json['alert_type']).to eq 'assignment_grade_high'
-      expect(json['user_observation_link_id']).to eq @uol.id
+      expect(json['user_id']).to eq @student.id
+      expect(json['observer_id']).to eq @observer.id
       expect(json['threshold']).to eq "88"
     end
 
-    it 'errors with bad student_id' do
-      create_params = {alert_type: 'assignment_grade_high', threshold: "88"}
-      params = {user_id: @observer.to_param, student_id: @uol.user_id + 100, observer_alert_threshold: create_params,
+    it 'errors with bad user_id' do
+      create_params = {alert_type: 'assignment_grade_high', threshold: "88", observer_id: @observer.to_param, user_id: @student.id + 100}
+      params = {user_id: @observer.to_param, observer_alert_threshold: create_params,
         controller: 'observer_alert_thresholds_api', action: 'create', format: 'json'}
       api_call_as_user(@observer, :post, @path, params)
-      expect(response.code).to eq "401"
+      expect(response.code).to eq "400"
     end
 
-    it 'errors if user_observation_link doesnt belong to user' do
+    it 'errors if users are not linked' do
       user = user_model
       path = "/api/v1/users/#{user.id}/observer_alert_thresholds"
-      create_params = {alert_type: 'assignment_grade_high', threshold: "88"}
-      params = {user_id: user.to_param, student_id: @uol.user_id, observer_alert_threshold: create_params,
+      create_params = {alert_type: 'assignment_grade_high', threshold: "88", observer_id: user.to_param, user_id: @student.to_param}
+      params = {user_id: user.to_param, observer_alert_threshold: create_params,
         controller: 'observer_alert_thresholds_api', action: 'create', format: 'json'}
       api_call_as_user(user, :post, path, params)
-      expect(response.code).to eq "401"
+      expect(response.code).to eq "400"
     end
 
     it 'errors without required params' do
-      create_params = {threshold: "88"}
-      params = {user_id: @observer.to_param, student_id: @uol.user_id, observer_alert_threshold: create_params,
+      create_params = {threshold: "88", observer_id: @observer.to_param, user_id: @student.to_param}
+      params = {user_id: @observer.to_param, observer_alert_threshold: create_params,
         controller: 'observer_alert_thresholds_api', action: 'create', format: 'json'}
       api_call_as_user(@observer, :post, @path, params)
       expect(response.code).to eq "400"
     end
 
     it 'ignores improper params' do
-      create_params = {something_sneaky: 'sneaky!', alert_type: 'assignment_grade_high', threshold: "88"}
-      params = {user_id: @observer.to_param, student_id: @uol.user_id, observer_alert_threshold: create_params,
+      create_params = {something_sneaky: 'sneaky!', alert_type: 'assignment_grade_high',
+        threshold: "88", observer_id: @observer.to_param, user_id: @student.to_param}
+      params = {user_id: @observer.to_param, observer_alert_threshold: create_params,
         controller: 'observer_alert_thresholds_api', action: 'create', format: 'json'}
       json = api_call_as_user(@observer, :post, @path, params)
       expect(response.code).to eq "200"
@@ -165,18 +196,18 @@ describe ObserverAlertThresholdsApiController, type: :request do
     end
 
     it 'updates if threshold already exists' do
-      observer_alert_threshold_model(uol: @uol, alert_type: 'assignment_grade_low', threshold: '50')
-      create_params = {alert_type: 'assignment_grade_low', threshold: '65'}
-      params = {user_id: @observer.to_param, student_id: @uol.user_id, observer_alert_threshold: create_params,
+      observer_alert_threshold_model(observer: @observer, student: @student, alert_type: 'assignment_grade_low', threshold: '50')
+      create_params = {alert_type: 'assignment_grade_low', threshold: '65', observer_id: @observer.to_param, user_id: @student.to_param}
+      params = {user_id: @observer.to_param, observer_alert_threshold: create_params,
         controller: 'observer_alert_thresholds_api', action: 'create', format: 'json'}
       json = api_call_as_user(@observer, :post, @path, params)
       expect(json['id']).to eq @observer_alert_threshold.id
       expect(json['threshold']).to eq '65'
-      expect(@uol.observer_alert_thresholds.active.where(alert_type: 'assignment_grade_low').count).to eq 1
+      expect(ObserverAlertThreshold.active.where(observer: @observer, student: @student, alert_type: 'assignment_grade_low').count).to eq 1
     end
   end
 
-  context '#update' do
+  describe '#update' do
     before :once do
       observer_alert_threshold_model(alert_type: 'assignment_grade_low', threshold: "88")
       @path = "/api/v1/users/#{@observer.id}/observer_alert_thresholds/#{@observer_alert_threshold.id}"
@@ -185,16 +216,16 @@ describe ObserverAlertThresholdsApiController, type: :request do
     end
 
     it 'updates the threshold' do
-      update_params = {threshold: "50", alert_type: "assignment_missing",
-        user_observation_link_id: @observation_link.id + 100}
+      update_params = {threshold: "50", alert_type: "assignment_missing"}
       params = @params.merge({observer_alert_threshold: update_params})
       json = api_call_as_user(@observer, :put, @path, params)
       expect(json['alert_type']).to eq 'assignment_grade_low'
       expect(json['threshold']).to eq "50"
-      expect(json['user_observation_link_id']).to eq @observation_link.id
+      expect(json['user_id']).to eq @student.id
+      expect(json['observer_id']).to eq @observer.id
     end
 
-    it 'errors without proper user_observation_link' do
+    it 'errors if users are not linked' do
       user = user_model
       path = "/api/v1/users/#{user.id}/observer_alert_thresholds/#{@observer_alert_threshold.id}"
       params = @params.merge({user_id: user.to_param, observer_alert_threshold: {threshold: "50"}})
@@ -204,7 +235,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
     end
   end
 
-  context '#destroy' do
+  describe '#destroy' do
     before :once do
       observer_alert_threshold_model(alert_type: 'assignment_grade_low', threshold: "88")
       @path = "/api/v1/users/#{@observer.id}/observer_alert_thresholds/#{@observer_alert_threshold.id}"
@@ -216,11 +247,11 @@ describe ObserverAlertThresholdsApiController, type: :request do
       json = api_call_as_user(@observer, :delete, @path, @params)
       expect(json['id']).to eq @observer_alert_threshold.id
 
-      thresholds = @observation_link.observer_alert_thresholds.active.reload
-      expect(thresholds.count).to eq 0
+      count = ObserverAlertThreshold.active.where(observer: @observer, student: @student).count
+      expect(count).to eq 0
     end
 
-    it 'errors without proper user_observation_link' do
+    it 'errors if users are not linked' do
       user = user_model
       path = "/api/v1/users/#{user.id}/observer_alert_thresholds/#{@observer_alert_threshold.id}"
       params = @params.merge({user_id: user.to_param})

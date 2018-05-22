@@ -24,7 +24,8 @@ module Api::V1::ObserverAlert
     :only => %w(
       id
       title
-      user_observation_link_id
+      user_id
+      observer_id
       observer_alert_threshold_id
       alert_type
       context_type

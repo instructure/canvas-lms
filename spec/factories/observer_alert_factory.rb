@@ -18,15 +18,16 @@
 
 module Factories
   def observer_alert_model(opts = {})
-    if opts[:uol]
-      @observation_link = opts[:uol]
-    else
-      @observee = opts[:observee] || course_with_student(opts).user
-      @observer = opts[:observer] || user_model
-      @observation_link = UserObservationLink.create!(user_id: @observee, observer_id: @observer)
-    end
 
-    valid_attrs = [:title, :alert_type, :workflow_state, :action_date]
+    opts[:observer] ||= user_model
+    @observer = opts[:observer]
+    opts[:student] ||= course_with_student(opts).user
+    @student = opts[:student]
+
+
+    @observation_link = opts[:link] || UserObservationLink.create!(student: @student, observer: @observer)
+
+    valid_attrs = [:title, :alert_type, :workflow_state, :action_date, :student, :observer]
     default_attrs = {
       title: 'value for type',
       alert_type: 'course_announcement',
@@ -36,8 +37,8 @@ module Factories
 
     attrs = default_attrs.deep_merge(opts.slice(*valid_attrs))
 
-    if opts[:oat_id]
-      attrs[:observer_alert_threshold_id] = opts[:oat_id]
+    if opts[:threshold_id]
+      attrs[:observer_alert_threshold_id] = opts[:threshold_id]
     else
       @observer_alert_threshold = observer_alert_threshold_model(opts)
       attrs[:observer_alert_threshold_id] = @observer_alert_threshold.id
@@ -45,6 +46,6 @@ module Factories
 
     attrs[:context] = opts[:context] || nil
 
-    @observer_alert = @observation_link.observer_alerts.create(attrs)
+    @observer_alert = ObserverAlert.create(attrs)
   end
 end

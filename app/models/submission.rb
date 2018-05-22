@@ -536,10 +536,7 @@ class Submission < ActiveRecord::Base
   def create_alert
     return unless saved_change_to_score? && self.grader_id && !self.autograded?
 
-    links = self.user.as_student_observation_links.active
-    return unless links.count > 0
-
-    thresholds = ObserverAlertThreshold.active.where(user_observation_link: links,
+    thresholds = ObserverAlertThreshold.active.where(student: self.user,
       alert_type: ['assignment_grade_high', 'assignment_grade_low'])
 
     thresholds.each do |threshold|
@@ -547,7 +544,7 @@ class Submission < ActiveRecord::Base
       next if threshold.alert_type == 'assignment_grade_high' && self.score < threshold_value
       next if threshold.alert_type == 'assignment_grade_low' && self.score > threshold_value
 
-      ObserverAlert.create!(user_observation_link_id: threshold.user_observation_link_id,
+      ObserverAlert.create!(observer: threshold.observer, student: self.user,
                             observer_alert_threshold: threshold,
                             context: self.assignment, alert_type: threshold.alert_type, action_date: self.graded_at,
                             title: I18n.t("Assignment graded: %{score} on %{assignmentName} in %{courseName}", {

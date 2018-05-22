@@ -27,9 +27,6 @@ class UserObservationLink < ActiveRecord::Base
   belongs_to :observer, :class_name => 'User', inverse_of: :as_observer_observation_links
   belongs_to :root_account, :class_name => 'Account'
 
-  has_many :observer_alert_thresholds, :inverse_of => :user_observation_link
-  has_many :observer_alerts, :inverse_of => :user_observation_link
-
   after_create :create_linked_enrollments
 
   validate :not_same_user, :if => lambda { |uo| uo.changed? }

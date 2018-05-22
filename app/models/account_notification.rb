@@ -52,12 +52,9 @@ class AccountNotification < ActiveRecord::Base
     roles = self.account_notification_roles.map(&:role_name)
     return if roles.count > 0 && (roles & ['StudentEnrollment', 'ObserverEnrollment']).none?
 
-    links = UserObservationLink.active.where(:root_account => self.account)
-    return if links.count == 0
-
-    thresholds = ObserverAlertThreshold.active.where(user_observation_link: links, alert_type: 'institution_announcement')
+    thresholds = ObserverAlertThreshold.active.where(observer: User.of_account(self.account), alert_type: 'institution_announcement')
     thresholds.each do |threshold|
-      ObserverAlert.create(user_observation_link: threshold.user_observation_link,
+      ObserverAlert.create(student: threshold.student, observer: threshold.observer,
                            observer_alert_threshold: threshold, context: self,
                            alert_type: 'institution_announcement', action_date: self.start_at,
                            title: I18n.t('Announcement posted: %{account_name}', { account_name: self.account.name}))

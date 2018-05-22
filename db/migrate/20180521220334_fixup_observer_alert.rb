@@ -16,24 +16,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Factories
-  def observer_alert_threshold_model(opts = {})
+class FixupObserverAlert < ActiveRecord::Migration[5.1]
+  tag :predeploy
+  def change
+    ObserverAlert.delete_all # no data expected. This should be a no-op, but just in case
+    remove_column :observer_alerts, :html_url
 
-    opts[:observer] ||= user_model
-    @observer = opts[:observer]
-    opts[:student] ||= course_with_student(opts).user
-    @student = opts[:student]
-
-    @observation_link = opts[:link] || UserObservationLink.create!(student: @student, observer: @observer)
-
-    valid_attrs = [:alert_type, :threshold, :workflow_state, :student, :observer]
-    default_attrs = {
-      alert_type: 'course_announcement',
-      threshold: nil,
-      workflow_state: 'active',
-    }
-
-    attrs = default_attrs.deep_merge(opts.slice(*valid_attrs))
-    @observer_alert_threshold = ObserverAlertThreshold.create(attrs)
+    change_table :observer_alerts do |t|
+      t.remove_belongs_to :user_observation_link, foreign_key: { to_table: 'user_observers' }
+      t.references :user, null: false, foreign_key: { to_table: 'users'}
+      t.references :observer, null: false, foreign_key: { to_table: 'users'}
+    end
   end
 end

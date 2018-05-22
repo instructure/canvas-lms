@@ -16,7 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class ObserverAlert < ActiveRecord::Base
-  belongs_to :user_observation_link, :inverse_of => :observer_alerts
+  belongs_to :student, :class_name => 'User', inverse_of: :as_student_observer_alerts, :foreign_key => :user_id
+  belongs_to :observer, :class_name => 'User', inverse_of: :as_observer_observer_alerts
   belongs_to :observer_alert_threshold, :inverse_of => :observer_alerts
   belongs_to :context, polymorphic: [:discussion_topic, :assignment, :course, :account_notification]
 
@@ -30,10 +31,24 @@ class ObserverAlert < ActiveRecord::Base
     institution_announcement
   ).freeze
   validates :alert_type, inclusion: { in: ALERT_TYPES }
-  validates :user_observation_link_id, :observer_alert_threshold_id, :alert_type, :action_date, :title, presence: true
+  validates :user_id, :observer_id, :observer_alert_threshold_id, :alert_type, :action_date, :title, presence: true
+  validate :validate_users_link
 
   scope :active, -> { where.not(workflow_state: ['dismissed', 'deleted']) }
   scope :unread, -> { where(workflow_state: 'unread') }
+
+  def validate_users_link
+    unless users_are_still_linked?
+      errors.add(:observer_id, "Observer must be linked to Student")
+    end
+  end
+
+  # TODO: search cross-shard enrollments
+  def users_are_still_linked?
+    return true if observer.as_observer_observation_links.active.where(student: student).any?
+    return true if observer.enrollments.active.where(associated_user: student).any?
+    false
+  end
 
   def self.clean_up_old_alerts
     ObserverAlert.where('created_at < ?', 6.months.ago).delete_all

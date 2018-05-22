@@ -18,20 +18,28 @@
 require_relative '../spec_helper'
 
 describe ObserverAlertThreshold do
-  it 'can link to an user_observation_link' do
-    observer = user_factory()
-    student = user_factory()
-    link = UserObservationLink.create!(:student => student, :observer => observer,
-                            :root_account => @account)
-    threshold = ObserverAlertThreshold.create(:user_observation_link => link, :alert_type => 'assignment_missing')
-
-    expect(threshold.valid?).to eq true
-    expect(threshold.user_observation_link).not_to be_nil
+  before :once do
+    @student = user_model
+    @observer = user_model
+    UserObservationLink.create(student: @student, observer: @observer)
   end
 
-  it 'wont allow random types of alert_type' do
-    link = UserObservationLink.create!(student: user_model, observer: user_model, root_account: @account)
-    threshold = ObserverAlertThreshold.create(user_observation_link: link, alert_type: 'jigglypuff')
+  it 'can link to an user_observation_link' do
+    threshold = ObserverAlertThreshold.create(student: @student, observer: @observer, alert_type: 'assignment_missing')
+
+    expect(threshold.valid?).to eq true
+    expect(threshold.user_id).not_to be_nil
+    expect(threshold.observer_id).not_to be_nil
+  end
+
+  it 'wont allow random alert_type' do
+    threshold = ObserverAlertThreshold.create(student: @student, observer: @observer, alert_type: 'jigglypuff')
+
+    expect(threshold.valid?).to eq false
+  end
+
+  it 'observer must be linked to student' do
+    threshold = ObserverAlertThreshold.create(student: user_model, observer: @observer, alert_type: 'assignment_missing')
 
     expect(threshold.valid?).to eq false
   end

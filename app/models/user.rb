@@ -68,6 +68,16 @@ class User < ActiveRecord::Base
   has_many :as_observer_observation_links, -> { where.not(:workflow_state => 'deleted') }, class_name: 'UserObservationLink',
     foreign_key: :observer_id, dependent: :destroy, inverse_of: :observer
 
+  has_many :as_student_observer_alert_thresholds, -> { where.not(workflow_state: 'deleted') }, class_name: 'ObserverAlertThreshold',
+    foreign_key: :user_id, dependent: :destroy, inverse_of: :student
+  has_many :as_student_observer_alerts, -> { where.not(workflow_state: 'deleted') }, class_name: 'ObserverAlert',
+    foreign_key: :user_id, dependent: :destroy, inverse_of: :student
+
+  has_many :as_observer_observer_alert_thresholds, -> { where.not(workflow_state: 'deleted') }, class_name: 'ObserverAlertThreshold',
+    foreign_key: :observer_id, dependent: :destroy, inverse_of: :observer
+  has_many :as_observer_observer_alerts, -> { where.not(workflow_state: 'deleted') }, class_name: 'ObserverAlert',
+    foreign_key: :observer_id, dependent: :destroy, inverse_of: :observer
+
   has_many :linked_observers, -> { distinct }, :through => :as_student_observation_links, :source => :observer, :class_name => 'User'
   has_many :linked_students, -> { distinct }, :through => :as_observer_observation_links, :source => :student, :class_name => 'User'
 

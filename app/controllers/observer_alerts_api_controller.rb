@@ -24,29 +24,28 @@ class ObserverAlertsApiController < ApplicationController
   before_action :require_user
 
   def alerts_by_student
-    link = @current_user.as_observer_observation_links.active.where(student: params[:student_id]).take
-    return render_unauthorized_action unless link
+    all_alerts = @current_user.as_observer_observer_alerts.active.where(student: params[:student_id]).select(&:users_are_still_linked?)
 
-    alerts = Api.paginate(link.observer_alerts.active, self, api_v1_observer_alerts_by_student_url)
+    alerts = Api.paginate(all_alerts, self, api_v1_observer_alerts_by_student_url)
 
     render json: alerts.map { |alert| observer_alert_json(alert, @current_user, session) }
   end
 
   def alerts_count
-    links = UserObservationLink.active.where(observer: @current_user)
-    links = links.where(user_id: params[:student_id]) if params[:student_id]
+    all_alerts = if params[:student_id]
+                   ObserverAlert.unread.where(observer: @current_user, student: params[:student_id])
+                 else
+                   ObserverAlert.unread.where(observer: @current_user)
+                 end
 
-    return render_unauthorized_action unless links.count > 0
-
-    alerts = ObserverAlert.unread.where(user_observation_link: links)
+    alerts = all_alerts.select(&:users_are_still_linked?)
 
     render json: { unread_count: alerts.count }
   end
 
   def update
     alert = ObserverAlert.find(params[:observer_alert_id])
-    link = alert.user_observation_link
-    return render_unauthorized_action unless link.observer == @current_user
+    return render_unauthorized_action unless alert.observer_id == @current_user.id && alert.users_are_still_linked?
 
     case params[:workflow_state]
     when 'read'
