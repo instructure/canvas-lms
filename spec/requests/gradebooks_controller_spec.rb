@@ -100,6 +100,48 @@ describe GradebooksController, type: :request do
         js_env = js_env_from_response(response)
         expect(js_env).to have_key 'help_url'
       end
+
+      describe 'grading_role' do
+        let(:js_env) do
+          get speed_grader_course_gradebook_path(course_id: @course.id), params: {assignment_id: @assignment.id }
+          js_env_from_response(response)
+        end
+
+        context 'for a moderated assignment with no grades published' do
+          before(:once) do
+            @course.root_account.enable_feature!(:anonymous_moderated_marking)
+            @assignment.update!(
+              final_grader: @teacher,
+              grader_count: 2,
+              grades_published_at: nil,
+              moderated_grading: true
+            )
+          end
+
+          it 'is set to :moderator if the user can moderate the assignment' do
+            expect(js_env.fetch('grading_role')).to eq 'moderator'
+          end
+
+          it 'is set to :provisional_grader if the user cannot moderate the assignment' do
+            ta_in_course(active_all: true)
+            user_session(@ta)
+
+            expect(js_env.fetch('grading_role')).to eq 'provisional_grader'
+          end
+        end
+
+        it 'is set to :grader for a moderated assignment whose grades have been published' do
+          @assignment.update!(
+            moderated_grading: true,
+            grades_published_at: Time.zone.now
+          )
+          expect(js_env.fetch('grading_role')).to eq 'grader'
+        end
+
+        it 'is set to :grader for a non-moderated assignment' do
+          expect(js_env.fetch('grading_role')).to eq 'grader'
+        end
+      end
     end
   end
 

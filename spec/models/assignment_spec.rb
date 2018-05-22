@@ -6212,14 +6212,14 @@ describe Assignment do
   describe '#moderated_grader_limit_reached?' do
     before(:once) do
       @course = Course.create!
-      teacher = User.create!
+      @teacher = User.create!
       second_teacher = User.create!
       @ta = User.create!
-      @course.enroll_teacher(teacher, enrollment_state: 'active')
+      @course.enroll_teacher(@teacher, enrollment_state: 'active')
       @course.enroll_teacher(second_teacher, enrollment_state: 'active')
       @course.enroll_ta(@ta, enrollment_state: 'active')
       @assignment = @course.assignments.create!(
-        final_grader: teacher,
+        final_grader: @teacher,
         grader_count: 2,
         moderated_grading: true
       )
@@ -6236,14 +6236,20 @@ describe Assignment do
         @course.root_account.enable_feature!(:anonymous_moderated_marking)
       end
 
-      it 'returns false if all grader slots are not filled' do
+      it 'returns false if all provisional grader slots are not filled' do
         expect(@assignment.moderated_grader_limit_reached?).to eq false
       end
 
-      it 'returns true if all grader slots are filled' do
+      it 'returns true if all provisional grader slots are filled' do
         @assignment.moderation_graders.create!(user: @ta, anonymous_id: '54321')
         expect(@assignment.moderated_grader_limit_reached?).to eq true
       end
+
+      it 'ignores grades issued by the final grader when determining if slots are filled' do
+        @assignment.moderation_graders.create!(user: @teacher, anonymous_id: '00000')
+        expect(@assignment.moderated_grader_limit_reached?).to eq false
+      end
+
 
       it 'returns false if moderated grading is off' do
         @assignment.moderation_graders.create!(user: @ta, anonymous_id: '54321')

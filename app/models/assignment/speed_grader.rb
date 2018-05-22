@@ -134,12 +134,14 @@ class Assignment
       Submission.bulk_load_versioned_originality_reports(submission_histories)
       Submission.bulk_load_text_entry_originality_reports(submission_histories)
 
+      provisional_grades = @assignment.provisional_grades
+      provisional_grades = provisional_grades.preload(:scorer) unless anonymous_graders?
       preloaded_prov_grades =
         case @grading_role
         when :moderator
-          @assignment.provisional_grades.order(:id).to_a.group_by(&:submission_id)
+          provisional_grades.order(:id).to_a.group_by(&:submission_id)
         when :provisional_grader
-          @assignment.provisional_grades.not_final.where(:scorer_id => @user).order(:id).to_a.
+          provisional_grades.not_final.where(scorer: @user).order(:id).to_a.
             group_by(&:submission_id)
         else
           {}
@@ -309,9 +311,12 @@ class Assignment
     end
 
     def provisional_grade_to_json(provisional_grade)
-      return provisional_grade.grade_attributes unless anonymous_graders?
       provisional_grade.grade_attributes.tap do |json|
-        json[:anonymous_grader_id] = grader_ids_to_anonymous_ids[json.delete(:scorer_id).to_s]
+        if anonymous_graders?
+          json[:anonymous_grader_id] = grader_ids_to_anonymous_ids[json.delete(:scorer_id).to_s]
+        else
+          json[:scorer_name] = provisional_grade.scorer&.name
+        end
       end
     end
 

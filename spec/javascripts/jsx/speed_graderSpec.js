@@ -25,6 +25,7 @@ import SpeedGrader, {teardownHandleFragmentChanged} from 'speed_grader';
 import SpeedgraderHelpers from 'speed_grader_helpers';
 import userSettings from 'compiled/userSettings';
 import 'jquery.ajaxJSON';
+import ReactDOM from 'react-dom';
 
 const fixtures = document.getElementById('fixtures')
 const setupCurrentStudent = () => SpeedGrader.EG.handleStudentChanged()
@@ -2578,6 +2579,524 @@ QUnit.module('SpeedGrader', function() {
 
       const [errorMessage] = $.flashError.firstCall.args
       strictEqual(errorMessage, 'An error occurred updating this assignment.')
+    })
+  })
+
+  QUnit.module('#renderProvisionalGradeSelector', function(hooks) {
+    const EG = SpeedGrader.EG
+    let submission
+
+    hooks.beforeEach(() => {
+      fakeENV.setup()
+      ENV.grading_type = 'gpa_scale'
+
+      fixtures.innerHTML = `
+        <div id='grading_details_mount_point'></div>
+        <div id='grading_box_selected_grader'></div>
+        <input type='text' id='grade' />
+      `
+
+      SpeedGrader.setup()
+      EG.currentStudent = {
+        submission: {
+          provisional_grades: [
+            {provisional_grade_id: '1', readonly: true, grade: '1', scorer_name: 'Gradual'},
+            {provisional_grade_id: '2', readonly: true, grade: '2', scorer_name: 'Gradus'},
+          ]
+        }
+      }
+      EG.setupProvisionalGraderDisplayNames()
+
+      submission = EG.currentStudent.submission
+
+      sinon.stub(EG, 'setupProvisionalGraderDisplayNames')
+      sinon.stub(ReactDOM, 'render')
+      sinon.stub(ReactDOM, 'unmountComponentAtNode')
+    })
+
+    hooks.afterEach(() => {
+      ReactDOM.unmountComponentAtNode.restore()
+      ReactDOM.render.restore()
+      EG.setupProvisionalGraderDisplayNames.restore()
+
+      fixtures.innerHTML = ''
+      fakeENV.teardown()
+    })
+
+    test('displays the component if at least one provisional grade is present', () => {
+      EG.renderProvisionalGradeSelector()
+      strictEqual(ReactDOM.render.callCount, 1)
+    })
+
+    test('unmounts the component if no provisional grades are present', () => {
+      submission.provisional_grades = []
+      EG.renderProvisionalGradeSelector()
+      strictEqual(ReactDOM.unmountComponentAtNode.callCount, 1)
+    })
+
+    test('passes jsonData.points_possible to the component as pointsPossible', () => {
+      window.jsonData.points_possible = 12
+      EG.renderProvisionalGradeSelector()
+
+      const [SpeedGraderProvisionalGradeSelector] = ReactDOM.render.firstCall.args
+      strictEqual(SpeedGraderProvisionalGradeSelector.props.pointsPossible, 12)
+    })
+
+    test('passes the assignment grading type to the component as gradingType', () => {
+      EG.renderProvisionalGradeSelector()
+
+      const [SpeedGraderProvisionalGradeSelector] = ReactDOM.render.firstCall.args
+      strictEqual(SpeedGraderProvisionalGradeSelector.props.gradingType, 'gpa_scale')
+    })
+
+    test('passes the list of provisional grades to the component', () => {
+      EG.renderProvisionalGradeSelector()
+
+      const [SpeedGraderProvisionalGradeSelector] = ReactDOM.render.firstCall.args
+      deepEqual(
+        SpeedGraderProvisionalGradeSelector.props.provisionalGrades,
+        submission.provisional_grades
+      )
+    })
+
+    test('passes the hash of grader display names to the component', () => {
+      EG.renderProvisionalGradeSelector()
+
+      const [SpeedGraderProvisionalGradeSelector] = ReactDOM.render.firstCall.args
+      deepEqual(
+        SpeedGraderProvisionalGradeSelector.props.provisionalGraderDisplayNames,
+        {1: 'Gradual', 2: 'Gradus'}
+      )
+    })
+
+    test('calls setupProvisionalGraderDisplayNames if showingNewStudent is true', () => {
+      SpeedGrader.EG.renderProvisionalGradeSelector({showingNewStudent: true})
+      strictEqual(SpeedGrader.EG.setupProvisionalGraderDisplayNames.callCount, 1)
+    })
+
+    test('does not call setupProvisionalGraderDisplayNames if showingNewStudent is not true', () => {
+      SpeedGrader.EG.renderProvisionalGradeSelector()
+      strictEqual(SpeedGrader.EG.setupProvisionalGraderDisplayNames.callCount, 0)
+    })
+  })
+
+  QUnit.module('#handleProvisionalGradeSelected', function(hooks) {
+    const EG = SpeedGrader.EG
+    let submission
+
+    hooks.beforeEach(() => {
+      fakeENV.setup()
+      fixtures.innerHTML = `
+        <div id='grading_details_mount_point'></div>
+        <div id='grading_box_selected_grader'></div>
+        <input type='text' id='grade' />
+      `
+
+      SpeedGrader.setup()
+      EG.currentStudent = {
+        submission: {
+          provisional_grades: [
+            {provisional_grade_id: '1', readonly: true, scorer_name: 'Gradual', grade: 11},
+            {provisional_grade_id: '2', readonly: true, scorer_name: 'Gradus', grade: 22},
+          ]
+        }
+      }
+      EG.setupProvisionalGraderDisplayNames()
+
+      submission = EG.currentStudent.submission
+      sinon.stub(EG, 'submitSelectedProvisionalGrade')
+      sinon.stub(EG, 'setActiveProvisionalGradeFields')
+      sinon.stub(EG, 'renderProvisionalGradeSelector')
+    })
+
+    hooks.afterEach(() => {
+      EG.renderProvisionalGradeSelector.restore()
+      EG.setActiveProvisionalGradeFields.restore()
+      EG.submitSelectedProvisionalGrade.restore()
+
+      fixtures.innerHTML = ''
+      fakeENV.teardown()
+    })
+
+    test('calls submitSelectedProvisionalGrade with the grade ID when selectedGrade is passed', () => {
+      EG.handleProvisionalGradeSelected({selectedGrade: submission.provisional_grades[0]})
+
+      const [selectedGradeId] = EG.submitSelectedProvisionalGrade.firstCall.args
+      strictEqual(selectedGradeId, '1')
+    })
+
+    test('calls setActiveProvisionalGradeFields with the selected grade when selectedGrade is passed', () => {
+      EG.handleProvisionalGradeSelected({selectedGrade: submission.provisional_grades[0]})
+
+      const {grade} = EG.setActiveProvisionalGradeFields.firstCall.args[0]
+      strictEqual(grade.provisional_grade_id, '1')
+    })
+
+    test('calls setActiveProvisionalGradeFields with the selected label when selectedGrade is passed', () => {
+      EG.handleProvisionalGradeSelected({selectedGrade: submission.provisional_grades[0]})
+
+      const {label} = EG.setActiveProvisionalGradeFields.firstCall.args[0]
+      strictEqual(label, 'Gradual')
+    })
+
+    test('calls setActiveProvisionalGradeFields with the label "Custom" when isNewGrade is passed', () => {
+      EG.handleProvisionalGradeSelected({isNewGrade: true})
+
+      const {label} = EG.setActiveProvisionalGradeFields.firstCall.args[0]
+      strictEqual(label, 'Custom')
+    })
+
+    test('calls renderProvisionalGradeSelector when isNewGrade is passed', () => {
+      EG.handleProvisionalGradeSelected({isNewGrade: true})
+      strictEqual(EG.renderProvisionalGradeSelector.callCount, 1)
+    })
+
+    test('unselects existing grades when isNewGrade is passed', () => {
+      EG.handleProvisionalGradeSelected({isNewGrade: true})
+      strictEqual(submission.provisional_grades.some(grade => grade.selected), false)
+    })
+  })
+
+  QUnit.module('#setActiveProvisionalGradeFields', (hooks) => {
+    const EG = SpeedGrader.EG
+
+    hooks.beforeEach(() => {
+      fakeENV.setup()
+      fixtures.innerHTML = `
+        <div id='grading_details_mount_point'></div>
+        <div id='grading-box-selected-grader'></div>
+        <div id='grade_container'>
+          <input type='text' id='grading-box-extended' />
+          <div class="score"></div>
+        </div>
+      `
+
+      SpeedGrader.setup()
+      EG.currentStudent = {
+        submission: {
+          provisional_grades: [
+            {provisional_grade_id: '1', readonly: true, scorer_name: 'Gradual', grade: 11},
+            {provisional_grade_id: '2', readonly: true, scorer_name: 'Gradus', grade: 22},
+          ]
+        }
+      }
+      EG.setupProvisionalGraderDisplayNames()
+    })
+
+    hooks.afterEach(() => {
+      fixtures.innerHTML = ''
+      fakeENV.teardown()
+    })
+
+    test('sets the selected grader text to the passed-in label', () => {
+      EG.setActiveProvisionalGradeFields({label: 'fred'})
+      strictEqual($('#grading-box-selected-grader').text(), 'fred')
+    })
+
+    test('sets the selected grader text to empty if no label is passed', () => {
+      EG.setActiveProvisionalGradeFields()
+      strictEqual($('#grading-box-selected-grader').text(), '')
+    })
+
+    test('sets the grade input value to the passed-in grade', () => {
+      EG.setActiveProvisionalGradeFields({grade: {grade: 500}})
+      strictEqual($('#grading-box-extended').val(), '500')
+    })
+
+    test('does not set the grade input value if no grade is passed', () => {
+      $('#grading-box-extended').val(234)
+      EG.setActiveProvisionalGradeFields()
+      strictEqual($('#grading-box-extended').val(), '234')
+    })
+
+    test('sets the score field to the score of the passed-in grade', () => {
+      EG.setActiveProvisionalGradeFields({grade: {score: 10}})
+      strictEqual($('.score').text(), '10')
+    })
+
+    test('does not set the score field if no grade is passed', () => {
+      $('.score').text('234')
+      EG.setActiveProvisionalGradeFields()
+      strictEqual($('.score').text(), '234')
+    })
+  })
+
+  QUnit.module('#fetchProvisionalGrades', (hooks) => {
+    const EG = SpeedGrader.EG
+
+    hooks.beforeEach(() => {
+      fakeENV.setup()
+      ENV.grading_role = 'moderator'
+
+      fixtures.innerHTML = `
+        <div id='grading_details_mount_point'></div>
+        <div id='grading-box-selected-grader'></div>
+        <div id='grade_container'>
+          <input type='text' id='grading-box-extended' />
+        </div>
+      `
+
+      SpeedGrader.setup()
+      EG.currentStudent = {
+        anonymous_id: 'abcde',
+        submission: {
+          provisional_grades: [
+            {provisional_grade_id: '1', readonly: true, scorer_name: 'Gradual', grade: 11},
+            {provisional_grade_id: '2', readonly: true, scorer_name: 'Gradus', grade: 22},
+          ],
+          updated_at: 'never'
+        }
+      }
+      EG.setupProvisionalGraderDisplayNames()
+      ENV.anonymous_moderated_marking_enabled = true
+      ENV.provisional_status_url = 'some_url_or_other'
+
+      sinon.stub(EG, 'onProvisionalGradesFetched')
+      sinon.stub($, 'getJSON').callsFake((url, params, success) => {
+        success({needs_provisional_grade: true})
+      })
+    })
+
+    hooks.afterEach(() => {
+      EG.onProvisionalGradesFetched.restore()
+      $.getJSON.restore()
+
+      fixtures.innerHTML = ''
+      fakeENV.teardown()
+    })
+
+    test('calls onProvisionalGradesFetched upon fetching data', () => {
+      EG.fetchProvisionalGrades()
+
+      const [data] = EG.onProvisionalGradesFetched.firstCall.args
+      deepEqual(data, {needs_provisional_grade: true})
+    })
+
+    QUnit.module('provisional status URL', () => {
+      test('includes the ID of the current student', () => {
+        EG.fetchProvisionalGrades()
+
+        const [url] = $.getJSON.firstCall.args
+        strictEqual(url.includes('anonymous_id=abcde'), true)
+      })
+
+      test('includes the last_updated_at parameter if the user is a moderator', () => {
+        EG.fetchProvisionalGrades()
+
+        const [url] = $.getJSON.firstCall.args
+        strictEqual(url.includes('last_updated_at=never'), true)
+      })
+
+      test('omits the last_updated_at parameter if the user is not a moderator', () => {
+        ENV.grading_role = 'provisional_grader'
+        EG.fetchProvisionalGrades()
+
+        const [url] = $.getJSON.firstCall.args
+        strictEqual(url.includes('last_updated_at=never'), false)
+      })
+    })
+  })
+
+  QUnit.module('#onProvisionalGradesFetched', (hooks) => {
+    const EG = SpeedGrader.EG
+    let submission
+
+    hooks.beforeEach(() => {
+      fakeENV.setup()
+
+      fixtures.innerHTML = `
+        <div id='grading_details_mount_point'></div>
+        <div id='grading-box-selected-grader'></div>
+        <div id='grade_container'>
+          <input type='text' id='grading-box-extended' />
+        </div>
+      `
+
+      SpeedGrader.setup()
+      EG.currentStudent = {
+        anonymous_id: 'abcde',
+        submission: {
+          provisional_grades: [
+            {provisional_grade_id: '1', readonly: true, scorer_name: 'Gradual', grade: 11},
+            {provisional_grade_id: '2', readonly: true, scorer_name: 'Gradus', grade: 22},
+          ],
+          updated_at: 'never'
+        }
+      }
+      EG.setupProvisionalGraderDisplayNames()
+      ENV.anonymous_moderated_marking_enabled = true
+
+      submission = EG.currentStudent.submission
+
+      sinon.stub(EG, 'showStudent')
+      sinon.stub(SpeedgraderHelpers, 'submissionState').callsFake(() => 'not_submitted')
+    })
+
+    hooks.afterEach(() => {
+      SpeedgraderHelpers.submissionState.restore()
+      EG.showStudent.restore()
+
+      fixtures.innerHTML = ''
+      fakeENV.teardown()
+    })
+
+    test('sets needs_provisional_grade to the supplied value', () => {
+      EG.onProvisionalGradesFetched({needs_provisional_grade: true})
+      strictEqual(EG.currentStudent.needs_provisional_grade, true)
+    })
+
+    test('calls SpeedGraderHelpers.submissionState to set currentStudent.submission_state', () => {
+      EG.onProvisionalGradesFetched({needs_provisional_grade: true})
+      strictEqual(EG.currentStudent.submission_state, 'not_submitted')
+    })
+
+    test('calls showStudent', () => {
+      EG.onProvisionalGradesFetched({})
+      strictEqual(EG.showStudent.callCount, 1)
+    })
+
+    QUnit.module('when the user is a moderator and provisional_grades are returned', () => {
+      const fakeData = {
+        provisional_grades: [{grade: -1}],
+        updated_at: 'now',
+        final_provisional_grade: {grade: -999}
+      }
+
+      test('sets submission.provisional_grades to the supplied value', () => {
+        ENV.grading_role = 'moderator'
+        EG.onProvisionalGradesFetched(fakeData)
+        deepEqual(submission.provisional_grades, [{grade: -1}])
+      })
+
+      test('sets submission.updated_at to the supplied value', () => {
+        ENV.grading_role = 'moderator'
+        EG.onProvisionalGradesFetched(fakeData)
+        deepEqual(submission.updated_at, 'now')
+      })
+
+      test('sets submission.final_provisional_grade to the supplied value', () => {
+        ENV.grading_role = 'moderator'
+        EG.onProvisionalGradesFetched(fakeData)
+        deepEqual(submission.final_provisional_grade, {grade: -999})
+      })
+    })
+  })
+
+  QUnit.module('#submitSelectedProvisionalGrade', (hooks) => {
+    const EG = SpeedGrader.EG
+
+    hooks.beforeEach(() => {
+      fakeENV.setup()
+      ENV.provisional_select_url = "provisional_select_url?{{provisional_grade_id}}"
+
+      fixtures.innerHTML = `
+        <div id='grading_details_mount_point'></div>
+        <div id='grading-box-selected-grader'></div>
+        <div id='grade_container'>
+          <input type='text' id='grading-box-extended' />
+        </div>
+      `
+
+      SpeedGrader.setup()
+      EG.currentStudent = {
+        anonymous_id: 'abcde',
+        submission: {
+          provisional_grades: [
+            {provisional_grade_id: '1', readonly: true, scorer_name: 'Gradual', grade: 11},
+            {provisional_grade_id: '2', readonly: true, scorer_name: 'Gradus', grade: 22},
+          ],
+          updated_at: 'never'
+        }
+      }
+      EG.setupProvisionalGraderDisplayNames()
+      ENV.anonymous_moderated_marking_enabled = true
+
+      sinon.stub($, 'ajaxJSON').callsFake((url, method, params, success) => {
+        success(params)
+      })
+      sinon.stub(EG, 'fetchProvisionalGrades')
+      sinon.stub(EG, 'renderProvisionalGradeSelector')
+    })
+
+    hooks.afterEach(() => {
+      EG.renderProvisionalGradeSelector.restore()
+      EG.fetchProvisionalGrades.restore()
+      $.ajaxJSON.restore()
+      teardownHandleFragmentChanged()
+      window.location.hash = ''
+
+      fixtures.innerHTML = ''
+      fakeENV.teardown()
+    })
+
+    test('includes the value of ENV.provisional_select_url and provisionalGradeId in the URL', () => {
+      EG.submitSelectedProvisionalGrade(123)
+      const [url] = $.ajaxJSON.firstCall.args
+      strictEqual(url, 'provisional_select_url?123')
+    })
+
+    QUnit.module('when the request completes successfully', () => {
+      test('calls fetchProvisionalGrades when refetchOnSuccess is true', () => {
+        EG.submitSelectedProvisionalGrade(1, true)
+        strictEqual(EG.fetchProvisionalGrades.callCount, 1)
+      })
+
+      test('calls renderProvisionalGradeSelector when refetchOnSuccess is false', () => {
+        EG.submitSelectedProvisionalGrade(1, false)
+        strictEqual(EG.renderProvisionalGradeSelector.callCount, 1)
+      })
+    })
+  })
+
+  QUnit.module('provisional grader display names', (hooks) => {
+    const EG = SpeedGrader.EG
+
+    hooks.beforeEach(() => {
+      fakeENV.setup()
+
+      fixtures.innerHTML = `
+        <div id='grading_details_mount_point'></div>
+        <div id='grading-box-selected-grader'></div>
+        <div id='grade_container'>
+          <input type='text' id='grading-box-extended' />
+        </div>
+      `
+
+      SpeedGrader.setup()
+      ENV.anonymous_moderated_marking_enabled = true
+
+      sinon.stub(EG, 'submitSelectedProvisionalGrade')
+      sinon.spy(EG, 'setActiveProvisionalGradeFields')
+    })
+
+    hooks.afterEach(() => {
+      EG.setActiveProvisionalGradeFields.restore()
+      EG.submitSelectedProvisionalGrade.restore()
+      teardownHandleFragmentChanged()
+      window.location.hash = ''
+
+      fixtures.innerHTML = ''
+      fakeENV.teardown()
+    })
+
+    test('assigns anonymous grader names based on sorted anonymous grader ID', () => {
+      EG.currentStudent = {
+        anonymous_id: 'abcde',
+        submission: {
+          provisional_grades: [
+            {provisional_grade_id: '1', readonly: true, anonymous_grader_id: 'bbbbb', grade: 11},
+            {provisional_grade_id: '2', readonly: true, anonymous_grader_id: 'aaaaa', grade: 22},
+          ],
+          updated_at: 'never'
+        }
+      }
+      EG.setupProvisionalGraderDisplayNames()
+
+      const selectedGrade = EG.currentStudent.submission.provisional_grades[0]
+      EG.handleProvisionalGradeSelected({selectedGrade})
+
+      const {label} = EG.setActiveProvisionalGradeFields.firstCall.args[0]
+      strictEqual(label, 'Grader 2')
     })
   })
 })

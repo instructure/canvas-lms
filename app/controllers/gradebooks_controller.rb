@@ -597,7 +597,7 @@ class GradebooksController < ApplicationController
     end
 
     grading_role = if moderated_grading_enabled_and_no_grades_published
-      if @context.grants_right?(@current_user, :moderate_grades)
+      if @assignment.permits_moderation?(@current_user)
         :moderator
       else
         :provisional_grader

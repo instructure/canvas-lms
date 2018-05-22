@@ -28,6 +28,7 @@ import StatusPill from 'jsx/grading/StatusPill';
 import JQuerySelectorCache from 'jsx/shared/helpers/JQuerySelectorCache';
 import numberHelper from 'jsx/shared/helpers/numberHelper';
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
+import SpeedGraderProvisionalGradeSelector from 'jsx/speed_grader/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderSettingsMenu from 'jsx/speed_grader/SpeedGraderSettingsMenu'
 import studentViewedAtTemplate from 'jst/speed_grader/student_viewed_at';
 import submissionsDropdownTemplate from 'jst/speed_grader/submissions_dropdown';
@@ -89,6 +90,7 @@ let $resize_overlay
 let $right_side
 let $width_resizer
 let $gradebook_header
+let $grading_box_selected_grader
 let assignmentUrl
 let $rightside_inner
 let $moderation_bar
@@ -162,7 +164,9 @@ let utils
 let sessionTimer
 let isAdmin
 let showSubmissionOverride
+let provisionalGraderDisplayNames
 let EG
+const customProvisionalGraderLabel = I18n.t('Custom')
 
 function setupHandleFragmentChanged () {
   if (!EG.isHandleFragmentChangedSet) {
@@ -1321,33 +1325,8 @@ EG = {
         this.currentStudent.submission.grade = null; // otherwise it may be tricked into showing the wrong submission_state
       }
 
-      const {course_id: courseId, assignment_id: assignmentId} = ENV;
-      const resourceSegment = isAnonymous ? 'anonymous_provisional_grades' : 'provisional_grades';
-      const resourceUrl = `/api/v1/courses/${courseId}/assignments/${assignmentId}/${resourceSegment}/status`;
-
-      let status_url = `${resourceUrl}?${anonymizableStudentId}=${this.currentStudent[anonymizableId]}`;
-      if (ENV.grading_role == 'moderator') {
-        status_url += "&last_updated_at=";
-        if (this.currentStudent.submission) status_url += this.currentStudent.submission.updated_at;
-      }
-
-      // hit the API to check whether we still can give a provisional grade
-      $full_width_container.disableWhileLoading(
-        $.getJSON(status_url, {}, function(data) {
-          EG.currentStudent.needs_provisional_grade = data.needs_provisional_grade;
-
-          if (ENV.grading_role == 'moderator' && data.provisional_grades) {
-            if (!EG.currentStudent.submission) EG.currentStudent.submission = {}
-            EG.currentStudent.submission.provisional_grades = data.provisional_grades;
-            EG.currentStudent.submission.updated_at = data.updated_at;
-            EG.currentStudent.submission.final_provisional_grade = data.final_provisional_grade;
-          }
-
-          EG.currentStudent.submission_state =
-            SpeedgraderHelpers.submissionState(EG.currentStudent, ENV.grading_role);
-          EG.showStudent();
-        })
-      );
+      // check whether we still can give a provisional grade
+      $full_width_container.disableWhileLoading(this.fetchProvisionalGrades());
     } else {
       this.showStudent();
     }
@@ -1365,6 +1344,20 @@ EG = {
     if (ENV.grading_role == "moderator") {
       this.current_prov_grade_index = null;
       this.handleModerationTabs(0); // sets up tabs and loads first grade
+
+      if (isAnonymousModeratedMarkingEnabled()) {
+        this.renderProvisionalGradeSelector({showingNewStudent: true})
+
+        const selectedGrade = currentStudentProvisionalGrades().find(grade => grade.selected);
+        if (selectedGrade) {
+          this.setActiveProvisionalGradeFields({
+            label: provisionalGraderDisplayNames[selectedGrade.provisional_grade_id],
+            grade: selectedGrade
+          });
+        } else {
+          this.setActiveProvisionalGradeFields();
+        }
+      }
     } else {
       // showSubmissionOverride is optionally set if the user is
       // using the quizzes.next lti tool. Rather than reload the tool based
@@ -2650,6 +2643,27 @@ EG = {
       EG.refreshSubmissionsToView();
       $multiple_submissions.change();
       EG.showGrade();
+
+      if (
+        isAnonymousModeratedMarkingEnabled() &&
+        ENV.grading_role === 'moderator' &&
+        currentStudentProvisionalGrades().length > 0
+      ) {
+        // This is the ID of the possibly-new grade that the server returned
+        const newProvisionalGradeId = submissions[0].submission.provisional_grade_id;
+        const existingGrade = currentStudentProvisionalGrades().find(
+          provisionalGrade => provisionalGrade.provisional_grade_id === newProvisionalGradeId
+        );
+
+        // If it's not a new grade but an existing one, update the grade to match
+        if (existingGrade) {
+          existingGrade.grade = grade;
+          existingGrade.score = score;
+        }
+
+        EG.submitSelectedProvisionalGrade(newProvisionalGradeId, !existingGrade);
+        EG.setActiveProvisionalGradeFields({grade: existingGrade, label: customProvisionalGraderLabel});
+      }
     };
 
     const submissionError = (data, _xhr, _textStatus, _errorThrown) => {
@@ -2870,6 +2884,160 @@ EG = {
     }
 
     $.flashError(errorMessage);
+  },
+
+  // (This *should* properly be called selectProvisionalGrade, but it has a
+  // different name to avoid confusion with the method on the EG object with
+  // that name. This one is only called when Anonymous Moderated Marking is
+  // on, meaning we don't need to update the moderation tab.)
+  submitSelectedProvisionalGrade (provisionalGradeId, refetchOnSuccess=false) {
+    const selectGradeUrl = $.replaceTags(
+      ENV.provisional_select_url,
+      { provisional_grade_id: provisionalGradeId }
+    );
+
+    const submitSucceeded = (data) => {
+      const selectedProvisionalGradeId = data.selected_provisional_grade_id;
+      // Update the "selected" field on our grades manually. No need to bother
+      // the server solely to verify the new selections.
+      currentStudentProvisionalGrades().forEach(grade => {
+        grade.selected = grade.provisional_grade_id === selectedProvisionalGradeId;
+      })
+
+      if (refetchOnSuccess) {
+        // If this involved submitting a new provisional grade, re-fetch the
+        // list of grades so we have a real data structure for the new one
+        this.fetchProvisionalGrades();
+      } else {
+        // Otherwise we just selected an existing grade and didn't change
+        // anything, so go ahead and re-render
+        this.renderProvisionalGradeSelector();
+      }
+    }
+
+    $.ajaxJSON(selectGradeUrl, 'PUT', {}, submitSucceeded);
+  },
+
+  setupProvisionalGraderDisplayNames() {
+    provisionalGraderDisplayNames = {};
+
+    let provisionalGrades = currentStudentProvisionalGrades();
+    // For anonymous assignments, we sort by anonymous grader ID and
+    // number our graders based on that order
+    if (provisionalGrades.length > 0 && provisionalGrades[0].anonymous_grader_id) {
+      provisionalGrades = _.sortBy(provisionalGrades, (grade) => grade.anonymous_grader_id);
+    }
+
+    let provisionalGradesCounted = 0;
+    provisionalGrades.forEach((grade) => {
+      if (grade.readonly) {
+        provisionalGradesCounted += 1;
+        const displayName = grade.anonymous_grader_id
+          ? I18n.t('Grader %{graderIndex}', {graderIndex: provisionalGradesCounted})
+          : grade.scorer_name;
+        provisionalGraderDisplayNames[grade.provisional_grade_id] = displayName;
+      } else {
+        provisionalGraderDisplayNames[grade.provisional_grade_id] = customProvisionalGraderLabel;
+      }
+    })
+  },
+
+  fetchProvisionalGrades() {
+    const {course_id: courseId, assignment_id: assignmentId} = ENV;
+    const resourceSegment = isAnonymous ? 'anonymous_provisional_grades' : 'provisional_grades';
+    const resourceUrl = `/api/v1/courses/${courseId}/assignments/${assignmentId}/${resourceSegment}/status`;
+
+    let status_url = `${resourceUrl}?${anonymizableStudentId}=${EG.currentStudent[anonymizableId]}`
+    if (ENV.grading_role === 'moderator') {
+      status_url += "&last_updated_at="
+      if (EG.currentStudent.submission) {
+        status_url += EG.currentStudent.submission.updated_at;
+      }
+    }
+
+    // Check with the API ("hit the API" sounds so brutish) to get the updated
+    // list of provisional grades. We return this so that disableWhileLoading
+    // has access to the Deferred object.
+    return $.getJSON(status_url, {}, EG.onProvisionalGradesFetched)
+  },
+
+  onProvisionalGradesFetched (data) {
+    EG.currentStudent.needs_provisional_grade = data.needs_provisional_grade;
+
+    if (ENV.grading_role === 'moderator' && data.provisional_grades) {
+      if (!EG.currentStudent.submission) EG.currentStudent.submission = {}
+      EG.currentStudent.submission.provisional_grades = data.provisional_grades;
+      EG.currentStudent.submission.updated_at = data.updated_at;
+      EG.currentStudent.submission.final_provisional_grade = data.final_provisional_grade;
+    }
+
+    EG.currentStudent.submission_state = SpeedgraderHelpers.submissionState(EG.currentStudent, ENV.grading_role);
+    EG.showStudent();
+  },
+
+  setActiveProvisionalGradeFields({label='', grade=null} = {}) {
+    $grading_box_selected_grader.text(label);
+
+    if (grade !== null) {
+      $grade.val(grade.grade);
+      $score.text(grade.score);
+    }
+  },
+
+  handleProvisionalGradeSelected ({selectedGrade, isNewGrade=false} = {}) {
+    if (selectedGrade) {
+      const selectedGradeId = selectedGrade.provisional_grade_id;
+
+      this.submitSelectedProvisionalGrade(selectedGradeId);
+      this.setActiveProvisionalGradeFields({
+        grade: selectedGrade,
+        label: provisionalGraderDisplayNames[selectedGradeId]
+      });
+    } else if (isNewGrade) {
+      // If this is a "new" grade with no value, don't submit anything to the
+      // server. This will only happen when the moderator selects a custom
+      // grade for a given student for the first time (since no provisional grade
+      // object exists yet). If/when the grade text field gets updated,
+      // handleGradeSubmit will fire, create the new object, and re-fetch the
+      // provisional grades from the server.
+      this.setActiveProvisionalGradeFields({label: customProvisionalGraderLabel});
+
+      // For now, set the grader fields appropriately and mark the grades we have
+      // as not-selected until we get the new one.
+      currentStudentProvisionalGrades().forEach(grade => {
+        grade.selected = false;
+      });
+      this.renderProvisionalGradeSelector();
+    }
+  },
+
+  renderProvisionalGradeSelector ({showingNewStudent=false} = {}) {
+    const mountPoint = document.getElementById('grading_details_mount_point');
+    const provisionalGrades = currentStudentProvisionalGrades();
+
+    // Only show the selector if the current student has at least one grade from
+    // a provisional grader (i.e., not the moderator).
+    if (!provisionalGrades.some(grade => grade.readonly)) {
+      ReactDOM.unmountComponentAtNode(mountPoint);
+      return;
+    }
+
+    if (showingNewStudent) {
+      this.setupProvisionalGraderDisplayNames();
+    }
+
+    const props = {
+      gradingType: ENV.grading_type,
+      onGradeSelected: params => {
+        this.handleProvisionalGradeSelected(params)
+      },
+      pointsPossible: jsonData.points_possible,
+      provisionalGraderDisplayNames,
+      provisionalGrades
+    }
+
+    const gradeSelector = <SpeedGraderProvisionalGradeSelector {...props} />
+    ReactDOM.render(gradeSelector, mountPoint)
   }
 }
 
@@ -2942,6 +3110,7 @@ function setupSelectors() {
   $grade_container = $('#grade_container')
   $grade = $grade_container.find('input, select')
   $gradebook_header = $('#gradebook_header')
+  $grading_box_selected_grader = $('#grading-box-selected-grader')
   $grded_so_far = $('#x_of_x_graded')
   $iframe_holder = $('#iframe_holder')
   $left_side = $('#left_side')
@@ -3016,6 +3185,13 @@ function renderSettingsMenu () {
 
   const settingsMenu = <SpeedGraderSettingsMenu {...props} />
   ReactDOM.render(settingsMenu, document.getElementById('speedgrader-settings'))
+}
+
+// Helper function that guard against provisional_grades being null, allowing
+// Anonymous Moderated Marking-related moderation code to forgo that check
+// when considering provisional grades.
+function currentStudentProvisionalGrades () {
+  return EG.currentStudent.submission.provisional_grades || [];
 }
 
 export default {

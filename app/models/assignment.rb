@@ -2795,7 +2795,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def moderated_grader_limit_reached?
-    moderated_grading? && anonymous_moderated_marking? && moderation_graders.count >= grader_count
+    moderated_grading? && anonymous_moderated_marking? && provisional_moderation_graders.count >= grader_count
   end
 
   def can_be_moderated_grader?(user)

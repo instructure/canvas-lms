@@ -364,4 +364,17 @@ describe ModeratedGrading::NullProvisionalGrade do
     expect(sub).to receive(:submission_comments).and_return(comments)
     expect(ModeratedGrading::NullProvisionalGrade.new(sub, 1, false).submission_comments).to eq(comments)
   end
+
+  describe 'scorer' do
+    it 'returns the associated scorer if scorer_id is present' do
+      scorer = user_factory(active_user: true)
+      scored_grade = ModeratedGrading::NullProvisionalGrade.new(nil, scorer.id, true)
+      expect(scored_grade.scorer).to eq scorer
+    end
+
+    it 'returns nil if scorer_id is nil' do
+      scored_grade = ModeratedGrading::NullProvisionalGrade.new(nil, nil, true)
+      expect(scored_grade.scorer).to be nil
+    end
+  end
 end

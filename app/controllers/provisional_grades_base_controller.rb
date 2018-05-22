@@ -48,11 +48,16 @@ class ProvisionalGradesBaseController < ApplicationController
 
     selection = @assignment.moderated_grading_selections.where(student_id: @student).first
 
+    include_scorer_names = @assignment.can_view_other_grader_identities?(@current_user)
+    provisional_grades = submission.provisional_grades
+    provisional_grades = provisional_grades.preload(:scorer) if include_scorer_names
+
     json[:provisional_grades] = []
-    submission.provisional_grades.order(:id).each do |pg|
+    provisional_grades.order(:id).each do |pg|
       pg_json = provisional_grade_json(pg, submission, @assignment, @current_user, %w(submission_comments rubric_assessment))
       pg_json[:selected] = !!(selection && selection.selected_provisional_grade_id == pg.id)
       pg_json[:readonly] = !pg.final && (pg.scorer_id != @current_user.id)
+      pg_json[:scorer_name] = pg.scorer.name if include_scorer_names
 
       if pg.final
         json[:final_provisional_grade] = pg_json

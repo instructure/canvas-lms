@@ -77,5 +77,31 @@ RSpec.shared_examples 'a provisional grades status action' do |controller|
       json = api_call_as_user(@ta, :get, @path, @params, {}, {}, { expected_status: 404 })
       expect(json.fetch('errors')).to include({'message' => 'The specified resource does not exist.'})
     end
+
+    context 'when called as a moderator' do
+      let(:provisional_grades_json) do
+        json = api_call_as_user(@teacher, :get, @path, @params, {}, {}, { expected_status: 200 })
+        json.fetch('provisional_grades')
+      end
+
+      before(:once) do
+        @assignment.root_account.enable_feature!(:anonymous_moderated_marking)
+        @assignment.update!(grader_count: 1, final_grader: @teacher)
+
+        @ta.update!(name: 'Nobody Important')
+        @submission.find_or_create_provisional_grade!(@ta)
+        @params.merge!(last_updated_at: @submission.updated_at-1)
+      end
+
+      it 'omits the scorer_name parameter from provisional grades if the final grader cannot view grader names' do
+        @assignment.update!(grader_names_visible_to_final_grader: false)
+        expect(provisional_grades_json.first).not_to have_key('scorer_name')
+      end
+
+      it 'includes the scorer_name parameter for provisional grades if the final grader can view grader names' do
+        @assignment.update!(grader_names_visible_to_final_grader: true)
+        expect(provisional_grades_json.first['scorer_name']).to eq 'Nobody Important'
+      end
+    end
   end
 end
