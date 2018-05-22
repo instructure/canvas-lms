@@ -808,6 +808,13 @@ test('polls for updates if assignment is duplicating', function() {
   ok(this.model.pollUntilFinishedDuplicating.calledOnce)
 })
 
+test('polls for updates if assignment is importing', function() {
+  this.stub(this.model, 'isImporting').returns(true)
+  this.stub(this.model, 'pollUntilFinishedImporting')
+  const view = createView(this.model)
+  ok(this.model.pollUntilFinishedImporting.calledOnce)
+})
+
 QUnit.module('AssignmentListItemViewSpec - editing assignments', function(hooks) {
   hooks.beforeEach(function() {
     fakeENV.setup({
