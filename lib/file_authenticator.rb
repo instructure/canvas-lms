@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class FileAuthenticator
+  attr_reader :user, :acting_as, :oauth_host
+
   def initialize(user, acting_as, oauth_host)
     @user = user # logged in user
     @acting_as = acting_as # user being acted as
