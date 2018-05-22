@@ -1487,22 +1487,6 @@ class User < ActiveRecord::Base
     true
   end
 
-  def generate_access_verifier(ts)
-    require 'openssl'
-    digest = OpenSSL::Digest::MD5.new
-    OpenSSL::HMAC.hexdigest(digest, uuid, ts.to_s)
-  end
-
-  private :generate_access_verifier
-  def access_verifier
-    ts = Time.now.utc.to_i
-    [ts, generate_access_verifier(ts)]
-  end
-
-  def valid_access_verifier?(ts, sig)
-    ts.to_i > 5.minutes.ago.to_i && ts.to_i < 1.minute.from_now.to_i && sig == generate_access_verifier(ts.to_i)
-  end
-
   def uuid
     if !read_attribute(:uuid)
       self.update_attribute(:uuid, CanvasSlug.generate_securish_uuid)
