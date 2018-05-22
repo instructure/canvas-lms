@@ -2900,7 +2900,7 @@ class CoursesController < ApplicationController
     return render_unauthorized_action unless @current_user.present?
     @user = params[:user_id]=="self" ? @current_user : api_find(User,params[:user_id])
 
-    is_teacher = @user.enrollments.where(type: 'TeacherEnrollment')
+    is_teacher = @current_user.enrollments.where(type: 'TeacherEnrollment').count
 
     if is_teacher > 0
       return true
