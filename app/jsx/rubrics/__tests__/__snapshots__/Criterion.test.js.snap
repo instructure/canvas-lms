@@ -26,7 +26,9 @@ exports[`Free-form Rubric when assessing with a custom criterion renders the roo
         Description of criterion
       </Text>
     </div>
-    <LongDescriptionDialog close={[Function]} longDescription=\\"\\" open={false} />
+    <div className=\\"long-description\\">
+      <LongDescriptionDialog close={[Function]} longDescription=\\"\\" open={false} />
+    </div>
   </th>
   <td className=\\"ratings\\">
     <FreeFormComments comments=\\"\\" saveLater={false} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
@@ -38,7 +40,7 @@ exports[`Free-form Rubric when assessing with a custom criterion renders the roo
 `;
 
 exports[`Free-form Rubric when assessing with a outcome criterion renders the LongDescription sub-component(s) as expected 1`] = `
-"<Button margin=\\"none\\" variant=\\"link\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" fluidWidth={false} buttonRef={[Function]}>
+"<Button fluidWidth={true} variant=\\"link\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" buttonRef={[Function]}>
   <Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
     view longer description
   </Text>
@@ -88,8 +90,10 @@ exports[`Free-form Rubric when assessing with a outcome criterion renders the ro
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
     </div>
-    <LongDescription showLongDescription={[Function]} />
-    <LongDescriptionDialog close={[Function]} longDescription=\\"sa Sivert.\\" open={false} />
+    <div className=\\"long-description\\">
+      <LongDescription showLongDescription={[Function]} />
+      <LongDescriptionDialog close={[Function]} longDescription=\\"sa Sivert.\\" open={false} />
+    </div>
     <Threshold threshold={3} />
   </th>
   <td className=\\"ratings\\">
@@ -131,7 +135,9 @@ exports[`Free-form Rubric with a custom criterion renders the root component as 
         Description of criterion
       </Text>
     </div>
-    <LongDescriptionDialog close={[Function]} longDescription=\\"\\" open={false} />
+    <div className=\\"long-description\\">
+      <LongDescriptionDialog close={[Function]} longDescription=\\"\\" open={false} />
+    </div>
   </th>
   <td className=\\"ratings\\">
     <Comments assessment={{...}} freeForm={true} />
@@ -151,7 +157,7 @@ exports[`Free-form Rubric with a outcome criterion renders the Comments sub-comp
 `;
 
 exports[`Free-form Rubric with a outcome criterion renders the LongDescription sub-component(s) as expected 1`] = `
-"<Button margin=\\"none\\" variant=\\"link\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" fluidWidth={false} buttonRef={[Function]}>
+"<Button fluidWidth={true} variant=\\"link\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" buttonRef={[Function]}>
   <Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
     view longer description
   </Text>
@@ -201,8 +207,10 @@ exports[`Free-form Rubric with a outcome criterion renders the root component as
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
     </div>
-    <LongDescription showLongDescription={[Function]} />
-    <LongDescriptionDialog close={[Function]} longDescription=\\"sa Sivert.\\" open={false} />
+    <div className=\\"long-description\\">
+      <LongDescription showLongDescription={[Function]} />
+      <LongDescriptionDialog close={[Function]} longDescription=\\"sa Sivert.\\" open={false} />
+    </div>
     <Threshold threshold={3} />
   </th>
   <td className=\\"ratings\\">
@@ -238,7 +246,9 @@ exports[`Point Rubric when assessing with a custom criterion renders the root co
         Description of criterion
       </Text>
     </div>
-    <LongDescriptionDialog close={[Function]} longDescription=\\"\\" open={false} />
+    <div className=\\"long-description\\">
+      <LongDescriptionDialog close={[Function]} longDescription=\\"\\" open={false} />
+    </div>
   </th>
   <td className=\\"ratings\\">
     <Ratings assessing={true} tiers={{...}} onPointChange={[Function]} points={3.2} masteryThreshold={8} />
@@ -251,7 +261,7 @@ exports[`Point Rubric when assessing with a custom criterion renders the root co
 `;
 
 exports[`Point Rubric when assessing with a outcome criterion renders the LongDescription sub-component(s) as expected 1`] = `
-"<Button margin=\\"none\\" variant=\\"link\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" fluidWidth={false} buttonRef={[Function]}>
+"<Button fluidWidth={true} variant=\\"link\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" buttonRef={[Function]}>
   <Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
     view longer description
   </Text>
@@ -301,8 +311,10 @@ exports[`Point Rubric when assessing with a outcome criterion renders the root c
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
     </div>
-    <LongDescription showLongDescription={[Function]} />
-    <LongDescriptionDialog close={[Function]} longDescription=\\"sa Sivert.\\" open={false} />
+    <div className=\\"long-description\\">
+      <LongDescription showLongDescription={[Function]} />
+      <LongDescriptionDialog close={[Function]} longDescription=\\"sa Sivert.\\" open={false} />
+    </div>
     <Threshold threshold={3} />
   </th>
   <td className=\\"ratings\\">
@@ -347,7 +359,9 @@ exports[`Point Rubric with a custom criterion renders the root component as expe
         Description of criterion
       </Text>
     </div>
-    <LongDescriptionDialog close={[Function]} longDescription=\\"\\" open={false} />
+    <div className=\\"long-description\\">
+      <LongDescriptionDialog close={[Function]} longDescription=\\"\\" open={false} />
+    </div>
     <div className=\\"assessment-comments\\">
       <Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Instructor Comments
@@ -373,7 +387,7 @@ exports[`Point Rubric with a outcome criterion renders the Comments sub-componen
 `;
 
 exports[`Point Rubric with a outcome criterion renders the LongDescription sub-component(s) as expected 1`] = `
-"<Button margin=\\"none\\" variant=\\"link\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" fluidWidth={false} buttonRef={[Function]}>
+"<Button fluidWidth={true} variant=\\"link\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" buttonRef={[Function]}>
   <Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
     view longer description
   </Text>
@@ -423,8 +437,10 @@ exports[`Point Rubric with a outcome criterion renders the root component as exp
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
     </div>
-    <LongDescription showLongDescription={[Function]} />
-    <LongDescriptionDialog close={[Function]} longDescription=\\"sa Sivert.\\" open={false} />
+    <div className=\\"long-description\\">
+      <LongDescription showLongDescription={[Function]} />
+      <LongDescriptionDialog close={[Function]} longDescription=\\"sa Sivert.\\" open={false} />
+    </div>
     <Threshold threshold={3} />
     <div className=\\"assessment-comments\\">
       <Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">

@@ -46,6 +46,13 @@
 
 .react-rubric .description-header {
   height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  & .long-description button {
+    margin: 0;
+    padding: 0;
+  }
 }
 
 .react-rubric .assessment-comments {

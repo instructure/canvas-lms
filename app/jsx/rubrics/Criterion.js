@@ -59,7 +59,7 @@ const OutcomeIcon = () => (
 
 const LongDescription = ({ showLongDescription }) => (
   // eslint-disable-next-line jsx-a11y/anchor-is-valid
-  <Button margin="none" variant="link" onClick={() => showLongDescription()}>
+  <Button fluidWidth variant="link" onClick={() => showLongDescription()}>
     <Text size="x-small">{I18n.t('view longer description')}</Text>
   </Button>
 )
@@ -202,16 +202,18 @@ export default class Criterion extends React.Component {
               {criterion.description}
             </Text>
           </div>
-          {
-            longDescription !== "" ? (
-              <LongDescription showLongDescription={this.openModal} />
-            ) : null
-          }
-          <LongDescriptionDialog
-            close={this.closeModal}
-            longDescription={longDescription}
-            open={dialogOpen}
-            />
+          <div className="long-description">
+            {
+              longDescription !== "" ? (
+                <LongDescription showLongDescription={this.openModal} />
+              ) : null
+            }
+            <LongDescriptionDialog
+              close={this.closeModal}
+              longDescription={longDescription}
+              open={dialogOpen}
+              />
+          </div>
           {
             threshold !== undefined ? <Threshold threshold={threshold} /> : null
           }
