@@ -19,6 +19,7 @@ require_relative "../../common"
 require_relative "../pages/global_grades_page"
 require_relative "../pages/student_grades_page"
 require_relative "../pages/gradebook_page"
+require_relative "../pages/student_interactions_report_page"
 
 describe 'Global Grades' do
   include_context "in-process server selenium tests"
@@ -67,6 +68,8 @@ describe 'Global Grades' do
     @assignment1.grade_student(@student, grade: SCORE1, grader: @teacher)
     @assignment2.grade_student(@student, grade: SCORE2, grader: @teacher)
     @assignment3.grade_student(@student, grade: SCORE3, grader: @teacher)
+
+    GRADE = ((SCORE1 + SCORE2 + SCORE3)/(@assignment1.points_possible + @assignment2.points_possible + @assignment3.points_possible))*100
   end
 
   context 'as student' do
@@ -106,8 +109,8 @@ describe 'Global Grades' do
     it 'has grades table with student average' do # test id 350053
       expect(GlobalGrades.score(@graded_course)).to include_text("average for 1 student")
       # calculate expected grade average
-      grade = ((SCORE1 + SCORE2 + SCORE3)/(@assignment1.points_possible + @assignment2.points_possible + @assignment3.points_possible))*100
-      expect(GlobalGrades.get_score_for_course_no_percent(@graded_course)).to eq grade.round(2)
+
+      expect(GlobalGrades.get_score_for_course_no_percent(@graded_course)).to eq GRADE.round(2)
     end
 
     it 'has grades table with interactions report' do # test id 350053
@@ -124,6 +127,14 @@ describe 'Global Grades' do
       expect(driver.current_url).to eq app_url + "/courses/#{@graded_course.id}/gradebook"
       # verify assignment score is correct
       expect(Gradebook::MultipleGradingPeriods.student_total_grade(@student)).to eq(course_score)
+    end
+
+    it 'goes to student interactions report', priority: "1", test_id: 3500433 do
+      GlobalGrades.click_report_link(@graded_course)
+
+      expect(StudentInteractionsReport.report).to be_displayed
+      # verify current score
+      expect(StudentInteractionsReport.current_score(@student.name)).to eq("#{GRADE.round(1)}%")
     end
   end
 end

@@ -72,5 +72,9 @@ class GlobalGrades
     def report(course)
       f('.report',course_row(course))
     end
+
+    def click_report_link(course)
+      fln("Student Interactions Report", report(course)).click
+    end
   end
 end
