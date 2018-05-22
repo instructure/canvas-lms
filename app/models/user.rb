@@ -1739,6 +1739,14 @@ class User < ActiveRecord::Base
     end
   end
 
+  def non_student_enrollment?
+    # We should be able to remove this method when the planner works for teachers/other course roles
+    Rails.cache.fetch([self, 'has_non_student_enrollment', ApplicationController.region ].cache_key) do
+      self.enrollments.shard(in_region_associated_shards).where.not(type: %w{StudentEnrollment StudentViewEnrollment ObserverEnrollment}).
+        where.not(workflow_state: %w{rejected inactive deleted}).exists?
+    end
+  end
+
   def participating_student_current_and_concluded_course_ids
     @participating_student_current_and_concluded_course_ids ||=
       participating_course_ids('student_current_and_concluded') do |enrollments|

@@ -509,7 +509,8 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
-    if planner_enabled?
+    # Use the legacy to do list for non-students until it is ready for other roles
+    if planner_enabled? && !@current_user.non_student_enrollment?
       js_bundle :react_todo_sidebar
       css_bundle :react_todo_sidebar
     end
