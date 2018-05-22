@@ -797,4 +797,168 @@ describe ApplicationHelper do
       end
     end
   end
+
+  describe "file_access_user" do
+    context "not on the files domain" do
+      before :each do
+        @files_domain = false
+      end
+
+      it "should return @current_user" do
+        @current_user = user_model
+        expect(file_access_user).to be @current_user
+      end
+    end
+
+    context "on the files domain" do
+      before :each do
+        @files_domain = true
+      end
+
+      it "should return access user from session" do
+        access_user = user_model
+        session['file_access_user_id'] = access_user.id
+        expect(file_access_user).to eql access_user
+      end
+
+      it "should return nil if not set" do
+        expect(file_access_user).to be nil
+      end
+    end
+  end
+
+  describe "file_access_real_user" do
+    context "not on the files domain" do
+      before :each do
+        @files_domain = false
+      end
+
+      let(:logged_in_user) { user_model }
+
+      it "should return logged_in_user" do
+        expect(file_access_real_user).to be logged_in_user
+      end
+    end
+
+    context "on the files domain" do
+      before :each do
+        @files_domain = true
+      end
+
+      it "should return real access user from session" do
+        real_access_user = user_model
+        session['file_access_real_user_id'] = real_access_user.id
+        expect(file_access_real_user).to eql real_access_user
+      end
+
+      it "should return access user from session if real access user not set" do
+        access_user = user_model
+        session['file_access_user_id'] = access_user.id
+        session['file_access_real_user_id'] = nil
+        expect(file_access_real_user).to eql access_user
+      end
+
+      it "should return real access user over access user if both set" do
+        access_user = user_model
+        real_access_user = user_model
+        session['file_access_user_id'] = access_user.id
+        session['file_access_real_user_id'] = real_access_user.id
+        expect(file_access_real_user).to eql real_access_user
+      end
+
+      it "should return nil if neither set" do
+        expect(file_access_real_user).to be nil
+      end
+    end
+  end
+
+  describe "file_authenticator" do
+    context "not on the files domain, logged in" do
+      before :each do
+        @files_domain = false
+        @current_user = user_model
+      end
+
+      let(:logged_in_user) { user_model }
+      let(:current_host) { 'non-files-domain' }
+      let(:request) { double('request', host_with_port: current_host) }
+
+      it "creates an authenticator for the logged in user" do
+        expect(file_authenticator.user).to eql logged_in_user
+      end
+
+      it "creates an authenticator with the acting user" do
+        expect(file_authenticator.acting_as).to eql @current_user
+      end
+
+      it "creates an authenticator for the current host" do
+        expect(file_authenticator.oauth_host).to eql current_host
+      end
+    end
+
+    context "not on the files domain, not logged in" do
+      before :each do
+        @files_domain = false
+        @current_user = nil
+      end
+
+      let(:logged_in_user) { nil }
+      let(:current_host) { 'non-files-domain' }
+      let(:request) { double('request', host_with_port: current_host) }
+
+      it "creates a public authenticator" do
+        expect(file_authenticator.user).to be nil
+        expect(file_authenticator.acting_as).to be nil
+        expect(file_authenticator.oauth_host).to be nil
+      end
+    end
+
+    context "on the files domain with access user" do
+      let(:access_user) { user_model }
+      let(:real_access_user) { user_model }
+
+      before :each do
+        @files_domain = true
+        session['file_access_user_id'] = access_user.id
+        session['file_access_real_user_id'] = real_access_user.id
+      end
+
+      let(:logged_in_user) { nil }
+      let(:current_host) { 'files-domain' }
+      let(:request) { double('request', host_with_port: current_host) }
+
+      it "creates an authenticator for the real access user" do
+        expect(file_authenticator.user).to eql real_access_user
+      end
+
+      it "creates an authenticator with the acting access user" do
+        expect(file_authenticator.acting_as).to eql access_user
+      end
+
+      it "creates an authenticator without an oauth host" do
+        # i.e. inst-fs session must already exist. this is not an ideal
+        # limitation, but we don't know where to redirect them for oauth
+        expect(file_authenticator.oauth_host).to be nil
+      end
+    end
+
+    context "on the files domain without access user" do
+      before :each do
+        @files_domain = true
+        session['file_access_user_id'] = nil
+        session['file_access_real_user_id'] = nil
+      end
+
+      let(:logged_in_user) { nil }
+      let(:current_host) { 'files-domain' }
+      let(:request) { double('request', host_with_port: current_host) }
+
+      it "creates a public authenticator" do
+        authenticator = file_authenticator
+        expect(authenticator.user).to be nil
+        expect(authenticator.acting_as).to be nil
+        expect(authenticator.oauth_host).to be nil
+      end
+    end
+  end
 end

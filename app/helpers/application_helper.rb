@@ -914,8 +914,43 @@ module ApplicationHelper
     @domain_root_account&.feature_enabled?(:student_planner) && @current_user.has_student_enrollment?
   end
 
+  def file_access_user
+    if !@files_domain
+      @current_user
+    elsif session['file_access_user_id'].present?
+      @file_access_user ||= User.where(id: session['file_access_user_id']).first
+    else
+      nil
+    end
+  end
+
+  def file_access_real_user
+    if !@files_domain
+      logged_in_user
+    elsif session['file_access_real_user_id'].present?
+      # NOTE: this will never be set yet. a follow-on commit will take to
+      # setting it based on logged_in_user.
+      #
+      # as such, for now, file_access_real_user will always equal the
+      # file_access_user (corresponds to @current_user) on the files domain,
+      # instead of corresponding to the logged_in_user. this will break inst-fs
+      # if redirecting through the files domain while masquerading.
+      @file_access_real_user ||= User.where(id: session['file_access_real_user_id']).first
+    else
+      file_access_user
+    end
+  end
+
+  def file_access_oauth_host
+    if logged_in_user && !@files_domain
+      request.host_with_port
+    else
+      nil
+    end
+  end
+
   def file_authenticator
-    FileAuthenticator.new(logged_in_user, @current_user, request.host_with_port)
+    FileAuthenticator.new(file_access_real_user, file_access_user, file_access_oauth_host)
   end
 
   def authenticated_download_url(attachment)
