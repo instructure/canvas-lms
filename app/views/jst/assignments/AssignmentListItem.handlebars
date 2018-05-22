@@ -21,6 +21,20 @@
       </button>
     </div>
   {{else}}
+  {{#if isImporting}}
+    <div class="ig-row__layout">
+      {{>spinner}} {{#t}}Importing "{{name}}"{{/t}}
+    </div>
+  {{else}}
+  {{#if failedToImport}}
+    <span aria-live="polite">{{#t}}Oops! Something went wrong importing "{{name}}"{{/t}}</span>
+    <div class="import-failed-actions">
+      <button class="import-failed-cancel btn">
+        <span class="screenreader-only">{{#t}}Cancel importing "{{name}}"{{/t}}</span>
+        <span aria-hidden="true">{{#t}}Cancel{{/t}}</span>
+      </button>
+    </div>
+  {{else}}
   <div class="ig-row__layout">
     {{#if canManage}}
     <div aria-hidden='true' class="ig-handle">
@@ -197,6 +211,8 @@
     </div>
 
     <form data-view="edit-assignment" class="form-dialog"></form>
+  {{/if}}
+  {{/if}}
   {{/if}}
   {{/if}}
   {{/if}}
