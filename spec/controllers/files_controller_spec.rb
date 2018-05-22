@@ -305,27 +305,27 @@ describe FilesController do
     it "should remember most recent sf_verifier in session" do
       user1 = user_factory(active_all: true)
       file1 = user_file
-      ts1, sf_verifier1 = user1.access_verifier
+      verifier1 = Users::AccessVerifier.generate(user: user1)
 
       user2 = user_factory(active_all: true)
       file2 = user_file
-      ts2, sf_verifier2 = user2.access_verifier
+      verifier2 = Users::AccessVerifier.generate(user: user2)
 
       # first verifier
       user_session(user1)
-      get 'show', params: {:user_id => user1.id, :id => file1.id, :ts => ts1, :sf_verifier => sf_verifier1}
+      get 'show', params: verifier1.merge(id: file1.id)
       expect(response).to be_success
 
-      expect(session[:file_access_user_id]).to eq user1.id
+      expect(session[:file_access_user_id]).to eq user1.global_id
       expect(session[:file_access_expiration]).not_to be_nil
       expect(session[:permissions_key]).not_to be_nil
       permissions_key = session[:permissions_key]
 
       # second verifier, should update session
-      get 'show', params: {:user_id => user2.id, :id => @file.id, :ts => ts2, :sf_verifier => sf_verifier2}
+      get 'show', params: verifier2.merge(id: file2.id)
       expect(response).to be_success
 
-      expect(session[:file_access_user_id]).to eq user2.id
+      expect(session[:file_access_user_id]).to eq user2.global_id
       expect(session[:file_access_expiration]).not_to be_nil
       expect(session[:permissions_key]).not_to eq permissions_key
       permissions_key = session[:permissions_key]
@@ -333,10 +333,19 @@ describe FilesController do
       # repeat access, even without verifier, should extend expiration (though
       # we can't assert that, because milliseconds) and thus change
       # permissions_key
-      get 'show', params: {:user_id => user2.id, :id => @file.id}
+      get 'show', params: {id: file2.id}
       expect(response).to be_success
 
       expect(session[:permissions_key]).not_to eq permissions_key
+    end
+
+    it "should reject invalid sf_verifiers" do
+      user = user_factory(active_all: true)
+      file = user_file
+      verifier = Users::AccessVerifier.generate(user: user)
+      get 'show', params: verifier.merge(id: file.id, sf_verifier: 'invalid')
+      expect(response).to be_redirect
+      expect(response.location).to match('login')
     end
 
     it "should set cache headers for non text files" do
@@ -673,17 +682,17 @@ describe FilesController do
 
       it "should skip verification for an account-context file" do
         account_js_file
-        verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
-        ts, sf_verifier = @teacher.access_verifier
-        get 'show_relative', params: { :download => 1, :inline => 1, :sf_verifier => sf_verifier, :ts => ts, :user_id => @teacher.id, :verifier => verifier, :account_id => @account.id, :file_id => @file.id, :file_path => @file.full_path }
+        file_verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
+        user_verifier = Users::AccessVerifier.generate(user: @teacher)
+        get 'show_relative', params: user_verifier.merge(:download => 1, :inline => 1, :verifier => file_verifier, :account_id => @account.id, :file_id => @file.id, :file_path => @file.full_path)
         expect(response).to be_success
       end
 
       it "should enforce verification for contexts other than account" do
         course_file
-        verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
-        ts, sf_verifier = @teacher.access_verifier
-        get 'show_relative', params: { :download => 1, :inline => 1, :sf_verifier => sf_verifier, :ts => ts, :user_id => @teacher.id, :verifier => verifier, :account_id => @account.id, :file_id => @file.id, :file_path => @file.full_path }
+        file_verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
+        user_verifier = Users::AccessVerifier.generate(user: @teacher)
+        get 'show_relative', params: user_verifier.merge(:download => 1, :inline => 1, :verifier => file_verifier, :account_id => @account.id, :file_id => @file.id, :file_path => @file.full_path)
         assert_unauthorized
       end
 

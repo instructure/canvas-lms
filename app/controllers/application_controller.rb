@@ -1701,13 +1701,11 @@ class ApplicationController < ActionController::Base
     res = "#{request.protocol}#{host}"
 
     shard.activate do
-      ts, sig = @current_user && @current_user.access_verifier
-
       # add parameters so that the other domain can create a session that
       # will authorize file access but not full app access.  We need this in
       # case there are relative URLs in the file that point to other pieces
       # of content.
-      opts = { :user_id => @current_user.try(:id), :ts => ts, :sf_verifier => sig }
+      opts = generate_access_verifier
       opts[:verifier] = verifier if verifier.present?
 
       if download

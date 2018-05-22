@@ -192,16 +192,20 @@ class FilesController < ApplicationController
   end
 
   def check_file_access_flags
-    if params[:user_id] && params[:ts] && params[:sf_verifier]
-      user = api_find(User, params[:user_id]) if params[:user_id].present?
-      if user && user.valid_access_verifier?(params[:ts], params[:sf_verifier])
-        # attachment.rb checks for this session attribute when determining
-        # permissions, but it should be ignored by the rest of the models'
-        # permission checks
-        session['file_access_user_id'] = user.id
-        session['file_access_expiration'] = 1.hour.from_now.to_i
-        session[:permissions_key] = SecureRandom.uuid
-      end
+    begin
+      access_verifier = validate_access_verifier
+    rescue Users::AccessVerifier::InvalidVerifier
+      render_unauthorized_action
+      return false
+    end
+
+    if access_verifier[:user]
+      # attachment.rb checks for this session attribute when determining
+      # permissions, but it should be ignored by the rest of the models'
+      # permission checks
+      session['file_access_user_id'] = access_verifier[:user].global_id
+      session['file_access_expiration'] = 1.hour.from_now.to_i
+      session[:permissions_key] = SecureRandom.uuid
     end
     # These sessions won't get deleted when the user logs out since this
     # is on a separate domain, so we've added our own (stricter) timeout.

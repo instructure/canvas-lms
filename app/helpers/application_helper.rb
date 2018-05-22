@@ -915,6 +915,14 @@ module ApplicationHelper
 
   end
 
+  def generate_access_verifier
+    Users::AccessVerifier.generate(user: @current_user)
+  end
+
+  def validate_access_verifier
+    Users::AccessVerifier.validate(params)
+  end
+
   def file_access_user
     if !@files_domain
       @current_user
