@@ -22,6 +22,7 @@ describe "Tiny MCE editor plugins" do
   include WikiAndTinyCommon
 
   it "should load all folders for the image plugin", priority: "1", test_id: 420486 do
+    skip('fragile')
     course_with_teacher_logged_in
     @root_folder = Folder.root_folders(@course).first
     11.times { |i| @root_folder.sub_folders.create!(:name => "sf #{i}", :context => @course) }
