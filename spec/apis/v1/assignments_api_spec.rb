@@ -861,6 +861,16 @@ describe AssignmentsApiController, type: :request do
           json = api_get_assignments_index_from_course(@course)
           expect(json).to eq []
         end
+
+        it "should not show assignments assigned to  the user has an inactive sectionenrollments for" do
+          inactive_enrollment = @course.enroll_student(@student2, :allow_multiple_enrollments => true,
+            :enrollment_state => 'inactive', :section => @section2)
+
+          user_session @student2
+          @user = @student2
+          json = api_get_assignments_index_from_course(@course)
+          expect(json).to eq []
+        end
       end
 
       context "as an observer" do
