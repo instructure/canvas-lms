@@ -153,10 +153,11 @@ DeveloperKeyScopes.propTypes = {
     name: PropTypes.string,
     scopes: PropTypes.arrayOf(PropTypes.string)
   }),
-  requireScopes: PropTypes.bool.isRequired,
+  requireScopes: PropTypes.bool,
   onRequireScopesChange: PropTypes.func.isRequired
 }
 
 DeveloperKeyScopes.defaultProps = {
-  developerKey: undefined
+  developerKey: undefined,
+  requireScopes: false
 }

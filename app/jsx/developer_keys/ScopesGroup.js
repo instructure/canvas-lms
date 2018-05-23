@@ -161,12 +161,9 @@ export default class DeveloperKeyScopesGroup extends React.Component {
 
 DeveloperKeyScopesGroup.propTypes = {
   setSelectedScopes: PropTypes.func.isRequired,
-  setReadOnlySelected: PropTypes.func.isRequired,
   scopes: PropTypes.arrayOf(
     PropTypes.shape({
-      scope: PropTypes.string.isRequired,
-      resource: PropTypes.string.isRequired,
-      path: PropTypes.string.isRequired,
+      scope: PropTypes.string,
       verb: PropTypes.string.isRequired
     })
   ).isRequired,

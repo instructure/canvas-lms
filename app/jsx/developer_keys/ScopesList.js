@@ -37,7 +37,7 @@ export default class DeveloperKeyScopesList extends React.Component {
     this.state = {
       formattedScopesArray,
       availableScopes: formattedScopesArray.slice(0, 10), // Only load 10 groups on initial render
-      selectedScopes: this.props.selectedScopes || [],
+      selectedScopes: this.props.selectedScopes,
       readOnlySelected: this.onlySelectGet(this.uniqueSelectedScopes(this.props.selectedScopes))
     }
   }
@@ -47,12 +47,11 @@ export default class DeveloperKeyScopesList extends React.Component {
   }
 
   onlySelectGet(selectedScopes) {
-    const scopes = selectedScopes || []
     const allAvailableGetScopes = this.availableGetScopes()
-    if (scopes.length !== allAvailableGetScopes.length) {
+    if (selectedScopes.length !== allAvailableGetScopes.length) {
       return false
     }
-    const nonGetScopes = scopes.filter(s => !allAvailableGetScopes.includes(s))
+    const nonGetScopes = selectedScopes.filter(s => !allAvailableGetScopes.includes(s))
     if (nonGetScopes.length > 0) {
       return false
     }
@@ -159,7 +158,6 @@ export default class DeveloperKeyScopesList extends React.Component {
                           name={key}
                           selectedScopes={this.state.selectedScopes}
                           setSelectedScopes={this.setSelectedScopes}
-                          setReadOnlySelected={this.setReadOnlySelected}
                         />
                       </LazyLoad>
                     )
@@ -187,5 +185,9 @@ DeveloperKeyScopesList.propTypes = {
     )
   ).isRequired,
   filter: PropTypes.string.isRequired,
-  selectedScopes: PropTypes.arrayOf(PropTypes.string).isRequired
+  selectedScopes: PropTypes.arrayOf(PropTypes.string)
+}
+
+DeveloperKeyScopesList.defaultProps = {
+  selectedScopes: []
 }
