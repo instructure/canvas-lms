@@ -28,8 +28,8 @@ QUnit.module('NewKeyModal', {
 })
 
 const selectedScopes = [
-  'url:GET|foo',
-  'url:GET|bar'
+  "url:POST|/api/v1/accounts/:account_id/account_notifications",
+  "url:PUT|/api/v1/accounts/:account_id/account_notifications/:id"
 ]
 
 const fakeActions = {

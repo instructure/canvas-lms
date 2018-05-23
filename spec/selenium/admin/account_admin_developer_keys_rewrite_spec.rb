@@ -380,7 +380,6 @@ describe 'Developer Keys' do
       end
 
       it "adds scopes to backend developer key via UI" do
-        skip 'Reneable once PLAT-3398 is merged'
         expand_scope_group_by_filter('assignment_groups_api')
         click_scope_group_checkbox
         find_button("Save Key").click

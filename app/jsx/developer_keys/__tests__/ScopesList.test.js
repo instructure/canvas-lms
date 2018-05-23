@@ -222,27 +222,30 @@ describe("initial state", () => {
   })
 })
 
-describe("uniqueSelectedScopes", () => {
-  it("filter out duplicate elements", () => {
+describe("verify no duplicate elements get posted", () => {
+  it("filter out duplicate elements when setting the state", () => {
     const wrapper = mount(<DeveloperKeyScopesList {...props}/>)
     const duplicate = ['a', 'b', 'c', 'd', 'a', 'a', 'a', 'b']
-    const filtered = wrapper.instance().uniqueSelectedScopes(duplicate)
-    expect(filtered).toEqual(expect.arrayContaining(
+    wrapper.instance().setSelectedScopes(duplicate)
+    const state = wrapper.instance().state
+    expect(state.selectedScopes).toEqual(expect.arrayContaining(
       ['a', 'b', 'c', 'd']
     ))
   })
 
-  it("does nothing to empty array", () => {
+  it("does nothing to empty array when setting the state", () => {
     const wrapper = mount(<DeveloperKeyScopesList {...props}/>)
-    const filtered = wrapper.instance().uniqueSelectedScopes([])
-    expect(filtered).toEqual([])
+    wrapper.instance().setSelectedScopes([])
+    const state = wrapper.instance().state
+    expect(state.selectedScopes).toEqual([])
   })
 
-  it("does nothing to array with no duplicate elements", () => {
+  it("does nothing to array with no duplicate elements when setting the state", () => {
     const wrapper = mount(<DeveloperKeyScopesList {...props}/>)
     const noDuplicate = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
-    const filtered = wrapper.instance().uniqueSelectedScopes(noDuplicate)
-    expect(filtered).toEqual(expect.arrayContaining(
+    wrapper.instance().setSelectedScopes(noDuplicate)
+    const state = wrapper.instance().state
+    expect(state.selectedScopes).toEqual(expect.arrayContaining(
       ['a', 'b', 'c', 'd', 'e', 'f', 'g']
     ))
   })

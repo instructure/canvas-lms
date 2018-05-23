@@ -188,3 +188,4 @@ DeveloperKeyModal.propTypes = {
 DeveloperKeyModal.defaultProps = {
   mountNode: () => document.body
 }
+
