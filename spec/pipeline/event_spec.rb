@@ -20,8 +20,6 @@ describe 'pipeline service' do
     PipelineService.queue_mode = 'synchronous'
     allow(PipelineService::Events::HTTPClient).to receive(:post)
     allow(PipelineService::HTTPClient).to receive(:get).and_return(double('get_response', parsed_response: ''))
-    allow(PipelineService::TokenBuilder).to receive(:build).and_return('faketoken')
-
   end
 
   it 'will post to the client if workflow_state is "completed"'do
