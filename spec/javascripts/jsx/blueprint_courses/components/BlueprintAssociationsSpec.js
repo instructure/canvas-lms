@@ -19,7 +19,7 @@
 import React from 'react'
 import * as enzyme from 'enzyme'
 import BlueprintAssociations from 'jsx/blueprint_courses/components/BlueprintAssociations'
-import sampleData from '../sampleData'
+import getSampleData from '../getSampleData'
 
 QUnit.module('BlueprintAssociations component')
 
@@ -37,8 +37,8 @@ const defaultProps = () => ({
   isLoadingAssociations: false,
   isSavingAssociations: false,
   hasUnsyncedChanges: false,
-  subAccounts: sampleData.subAccounts,
-  terms: sampleData.terms,
+  subAccounts: getSampleData().subAccounts,
+  terms: getSampleData().terms,
 })
 
 test('renders the BlueprintAssociations component', () => {
@@ -69,8 +69,8 @@ test('renders a child AssociationsTable component', () => {
 
 test('render save warning if there are existing associations, new associations, and unsynced changes', () => {
   const props = defaultProps()
-  props.existingAssociations = sampleData.courses
-  props.addedAssociations = sampleData.courses
+  props.existingAssociations = getSampleData().courses
+  props.addedAssociations = getSampleData().courses
   props.hasUnsyncedChanges = true
   const tree = enzyme.shallow(<BlueprintAssociations {...props} />)
   const node = tree.find('Alert')
@@ -79,8 +79,8 @@ test('render save warning if there are existing associations, new associations, 
 
 test('render no save warning if there are existing associations, new associations, but no unsynced changes', () => {
   const props = defaultProps()
-  props.existingAssociations = sampleData.courses
-  props.addedAssociations = sampleData.courses
+  props.existingAssociations = getSampleData().courses
+  props.addedAssociations = getSampleData().courses
   props.hasUnsyncedChanges = false
   const tree = enzyme.shallow(<BlueprintAssociations {...props} />)
   const node = tree.find('Alert')
@@ -89,7 +89,7 @@ test('render no save warning if there are existing associations, new association
 
 test('render no save warning if there are existing associations, unsynced changes, but no new associations', () => {
   const props = defaultProps()
-  props.existingAssociations = sampleData.courses
+  props.existingAssociations = getSampleData().courses
   props.addedAssociations = []
   props.hasUnsyncedChanges = true
   const tree = enzyme.shallow(<BlueprintAssociations {...props} />)
@@ -100,7 +100,7 @@ test('render no save warning if there are existing associations, unsynced change
 test('render no save warning if there are new associations, unsynced changes, but no existing associations', () => {
   const props = defaultProps()
   props.existingAssociations = []
-  props.addedAssociations = sampleData.courses
+  props.addedAssociations = getSampleData().courses
   props.hasUnsyncedChanges = true
   const tree = enzyme.shallow(<BlueprintAssociations {...props} />)
   const node = tree.find('Alert')

@@ -19,7 +19,7 @@
 import React from 'react'
 import * as enzyme from 'enzyme'
 import SyncHistory from 'jsx/blueprint_courses/components/SyncHistory'
-import sampleData from '../sampleData'
+import getSampleData from '../getSampleData'
 
 QUnit.module('SyncHistory component')
 
@@ -30,7 +30,7 @@ const defaultProps = () => ({
   loadAssociations: () => {},
   isLoadingAssociations: false,
   hasLoadedAssociations: false,
-  migrations: sampleData.history,
+  migrations: getSampleData().history,
 })
 
 test('renders the SyncHistory component', () => {

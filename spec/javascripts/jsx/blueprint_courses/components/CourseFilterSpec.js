@@ -19,13 +19,13 @@
 import React from 'react'
 import * as enzyme from 'enzyme'
 import CourseFilter from 'jsx/blueprint_courses/components/CourseFilter'
-import data from '../sampleData'
+import getSampleData from '../getSampleData'
 
 QUnit.module('CourseFilter component')
 
 const defaultProps = () => ({
-  subAccounts: data.subAccounts,
-  terms: data.terms,
+  subAccounts: getSampleData().subAccounts,
+  terms: getSampleData().terms,
 })
 
 test('renders the CourseFilter component', () => {
