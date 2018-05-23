@@ -27,6 +27,7 @@ describe 'Global Grades' do
   SCORE1 = 90.0
   SCORE2 = 76.0
   SCORE3 = 9.0
+  SCORE4 = 8.0
 
   before(:once) do
 
@@ -40,6 +41,21 @@ describe 'Global Grades' do
     @graded_course = course_factory(course_name: "Course 2", active_course: true)
     @graded_course.enroll_teacher(@teacher, enrollment_state: 'active')
     @graded_course.enroll_student(@student, allow_multiple_enrollments: true, enrollment_state: 'active')
+
+    # create grading periods
+    gpg = GradingPeriodGroup.new
+    gpg.account_id = @graded_course.root_account
+    gpg.save!
+    gpg.grading_periods.create! start_date: 6.months.ago,
+                                end_date: 3.months.ago,
+                                close_date: 2.days.from_now(now),
+                                title: "old grading period"
+    gpg.grading_periods.create! start_date: 2.months.ago(now),
+                                end_date:   2.months.from_now(now),
+                                close_date: 3.months.from_now(now),
+                                title: "current grading period"
+    term = @graded_course.enrollment_term
+    term.update_attribute :grading_period_group, gpg
 
     # create 3 assignments
     @assignment1 = @graded_course.assignments.create!(
@@ -63,13 +79,25 @@ describe 'Global Grades' do
       due_at: now,
       submission_types: 'online_text_entry'
     )
+    @assignment4 = @graded_course.assignments.create!(
+      title: 'assignment 4',
+      grading_type: 'points',
+      points_possible: 10,
+      due_at: 4.months.ago(now),
+      submission_types: 'online_text_entry'
+    )
 
     # Grade the assignments
     @assignment1.grade_student(@student, grade: SCORE1, grader: @teacher)
     @assignment2.grade_student(@student, grade: SCORE2, grader: @teacher)
     @assignment3.grade_student(@student, grade: SCORE3, grader: @teacher)
+    @assignment4.grade_student(@student, grade: SCORE4, grader: @teacher)
 
-    GRADE = ((SCORE1 + SCORE2 + SCORE3)/(@assignment1.points_possible + @assignment2.points_possible + @assignment3.points_possible))*100
+    GRADE_CURRENT_GP = ((SCORE1 + SCORE2 + SCORE3)/(@assignment1.points_possible + @assignment2.points_possible +
+      @assignment3.points_possible))*100
+    GRADE_OLD_GP = ((SCORE4/@assignment4.points_possible)*100)
+    GRADE_TOTAL = ((SCORE1 + SCORE2 + SCORE3 + SCORE4)/(@assignment1.points_possible + @assignment2.points_possible +
+      @assignment3.points_possible + @assignment4.points_possible))*100
   end
 
   context 'as student' do
@@ -91,6 +119,12 @@ describe 'Global Grades' do
       # verify assignment score is correct
       expect(StudentGradesPage.final_grade.text).to eq(course_score)
     end
+
+    it 'show score for grading period' do
+      GlobalGrades.select_grading_period(@graded_course, "old grading period")
+      # verify course grade
+      expect(GlobalGrades.get_score_for_course_no_percent(@graded_course)).to eq(GRADE_OLD_GP.round(2))
+    end
   end
 
   context 'as teacher' do
@@ -110,7 +144,7 @@ describe 'Global Grades' do
       expect(GlobalGrades.score(@graded_course)).to include_text("average for 1 student")
       # calculate expected grade average
 
-      expect(GlobalGrades.get_score_for_course_no_percent(@graded_course)).to eq GRADE.round(2)
+      expect(GlobalGrades.get_score_for_course_no_percent(@graded_course)).to eq GRADE_TOTAL.round(2)
     end
 
     it 'has grades table with interactions report' do # test id 350053
@@ -118,15 +152,13 @@ describe 'Global Grades' do
     end
 
     it 'goes to gradebook page', priority: "1", test_id: 3494790 do
-      # grab scores to compare
-      course_score = GlobalGrades.get_score_for_course(@graded_course)
       # find link for Second Course and click
       wait_for_new_page_load(GlobalGrades.click_course_link(@graded_course))
 
       # verify url has correct course id
       expect(driver.current_url).to eq app_url + "/courses/#{@graded_course.id}/gradebook"
       # verify assignment score is correct
-      expect(Gradebook::MultipleGradingPeriods.student_total_grade(@student)).to eq(course_score)
+      expect(Gradebook::MultipleGradingPeriods.student_total_grade(@student)).to eq("#{GRADE_CURRENT_GP.round(2)}%")
     end
 
     it 'goes to student interactions report', priority: "1", test_id: 3500433 do
@@ -134,7 +166,7 @@ describe 'Global Grades' do
 
       expect(StudentInteractionsReport.report).to be_displayed
       # verify current score
-      expect(StudentInteractionsReport.current_score(@student.name)).to eq("#{GRADE.round(1)}%")
+      expect(StudentInteractionsReport.current_score(@student.name)).to eq("#{GRADE_TOTAL.round(1)}%")
     end
   end
 end

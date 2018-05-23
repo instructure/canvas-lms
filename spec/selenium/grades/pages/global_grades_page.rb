@@ -40,6 +40,7 @@ class GlobalGrades
     def select_grading_period(course, grading_period)
       selected_course = course_row(course)
       click_option(grading_period_dropdown(selected_course), grading_period)
+      wait_for_ajaximations
     end
 
     def get_score_for_course(course)
