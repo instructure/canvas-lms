@@ -299,7 +299,23 @@ describe Canvas::LiveEvents do
       expect_event('grade_change',
         hash_including(
           assignment_id: submission.global_assignment_id.to_s,
-          user_id: @student.global_id.to_s
+          user_id: @student.global_id.to_s,
+          student_id: @student.global_id.to_s,
+          student_sis_id: nil
+        ), course_context)
+      Canvas::LiveEvents.grade_changed(submission, 0)
+    end
+
+    it "should include the student_sis_id if present" do
+      course_with_student_submissions
+      user_with_pseudonym(user: @student)
+      @pseudonym.sis_user_id = 'sis-id-1'
+      @pseudonym.save!
+      submission = @course.assignments.first.submissions.first
+
+      expect_event('grade_change',
+        hash_including(
+          student_sis_id: 'sis-id-1'
         ), course_context)
       Canvas::LiveEvents.grade_changed(submission, 0)
     end
