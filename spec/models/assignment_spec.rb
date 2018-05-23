@@ -2357,6 +2357,42 @@ describe Assignment do
       @assignment.unmute!
       expect(@assignment.muted?).to eql false
     end
+
+    context 'when Anonymous Moderated Marking is enabled' do
+      before(:once) do
+        @course.root_account.enable_feature!(:anonymous_moderated_marking)
+      end
+
+      it 'does not mute non-anonymous, non-moderated assignments when created' do
+        assignment = @course.assignments.create!
+        expect(assignment).not_to be_muted
+      end
+
+      it 'mutes anonymous assignments when created' do
+        assignment = @course.assignments.create!(anonymous_grading: true)
+        expect(assignment).to be_muted
+      end
+
+      it 'mutes moderated assignments when created' do
+        assignment = @course.assignments.create!(moderated_grading: true, grader_count: 1)
+        expect(assignment).to be_muted
+      end
+
+      it 'mutes assignments when they are update from non-anonymous to anonymous' do
+        assignment = @course.assignments.create!
+        expect { assignment.update!(anonymous_grading: true) }.to change {
+          assignment.muted?
+        }.from(false).to(true)
+      end
+
+      it 'does not mute assignments when they are updated from anonymous to non-anonymous' do
+        assignment = @course.assignments.create!(anonymous_grading: true)
+        assignment.update!(muted: false)
+        expect { assignment.update!(anonymous_grading: false) }.not_to change {
+          assignment.muted?
+        }.from(false)
+      end
+    end
   end
 
   describe "#unmute!" do

@@ -448,7 +448,8 @@ class Assignment < ActiveRecord::Base
               :process_if_quiz,
               :default_values,
               :maintain_group_category_attribute,
-              :validate_assignment_overrides
+              :validate_assignment_overrides,
+              :mute_if_changed_to_anonymous
 
 
   after_save  :update_submissions_and_grades_if_details_changed,
@@ -2838,6 +2839,12 @@ class Assignment < ActiveRecord::Base
   end
 
   private
+
+  def mute_if_changed_to_anonymous
+    return unless anonymous_grading_changed?
+
+    self.muted = true if anonymous_grading? && anonymous_moderated_marking?
+  end
 
   def due_date_ok?
     if unlock_at && lock_at && due_at

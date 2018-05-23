@@ -41,6 +41,7 @@ describe 'Original Gradebook' do
       submission_types: 'online_upload',
       anonymous_grading: true
     )
+    @anonymous_assignment.unmute!
 
     # add two students
     @student_1 = User.create!(name: 'Student M. First')

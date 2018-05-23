@@ -26,6 +26,7 @@ RSpec.describe AnonymousSubmissionsController do
       @course.root_account.enable_feature!(:anonymous_moderated_marking)
       @assignment.update!(anonymous_grading: true)
       @submission.update!(score: 10)
+      @assignment.unmute!
     end
 
     let(:body) { JSON.parse(response.body)['submission'] }
