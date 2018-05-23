@@ -239,11 +239,17 @@ describe DeveloperKeysController do
         let(:invalid_scopes) { ['url:POST|/api/v1/banana', 'not_a_scope'] }
         let(:root_account) { account_model }
         let(:developer_key) { DeveloperKey.create!(account: account_model) }
+        let(:site_admin_key) { DeveloperKey.create! }
 
         before do
           allow_any_instance_of(Account).to receive(:feature_enabled?).with(:api_token_scoping).and_return(true)
           allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
           user_session(@admin)
+        end
+
+        it 'allows setting scopes for site admin keys' do
+          put 'update', params: { id: site_admin_key.id, developer_key: { scopes: valid_scopes } }
+          expect(site_admin_key.reload.scopes).to match_array valid_scopes
         end
 
         it 'allows setting scopes' do

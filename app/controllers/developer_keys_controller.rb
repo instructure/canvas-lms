@@ -103,7 +103,7 @@ class DeveloperKeysController < ApplicationController
 
   def use_new_dev_key_features?
     @_use_new_dev_key_features ||= begin
-      requested_context = @context || account_from_params || @key&.account
+      requested_context = @context || account_from_params || @key&.owner_account
       return if requested_context.blank?
       has_site_admin_access?(requested_context) ||
         requested_context.root_account.feature_enabled?(:developer_key_management_ui_rewrite)
