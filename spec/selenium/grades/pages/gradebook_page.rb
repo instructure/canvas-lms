@@ -216,6 +216,10 @@ module Gradebook
         rows.index{|row| row.text.include?(student.name)}
       end
 
+      def grading_cell_content(x,y)
+        grading_cell(x, y).find(".cell-content")
+      end
+
       def student_total_grade(student)
         total_score_for_row(student_row(student))
       end

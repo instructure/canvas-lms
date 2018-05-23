@@ -75,4 +75,25 @@ describe 'Original Gradebook' do
       expect(driver.current_url).not_to include "student_id"
     end
   end
+
+  context 'with Anonymous Moderated Marking ON has grade cells', priority: '1', test_id: 3496299 do
+    before(:each) do
+      user_session(@teacher1)
+      Gradebook::MultipleGradingPeriods.visit_gradebook(@anonymous_course)
+      Gradebook::MultipleGradingPeriods.enter_grade("11", 0, 0)
+      Gradebook::MultipleGradingPeriods.toggle_assignment_mute_option(@anonymous_assignment.id)
+    end
+
+    it 'greyed out with grades invisible when assignment is muted' do
+      grade_cell_grayed = Gradebook::MultipleGradingPeriods.grading_cell_content(0,0)
+      class_attribute_fetched = grade_cell_grayed.attribute("class")
+      expect(class_attribute_fetched).to include "grayed-out cannot_edit"
+    end
+
+    it 'not greyed out with grades visible when assignment is unmuted' do
+      refresh_page
+      Gradebook::MultipleGradingPeriods.toggle_assignment_mute_option(@anonymous_assignment.id)
+      expect(Gradebook::MultipleGradingPeriods.cell_graded?("11", 0, 0)).to be true
+    end
+  end
 end
