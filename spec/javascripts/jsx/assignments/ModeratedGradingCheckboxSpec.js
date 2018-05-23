@@ -27,6 +27,7 @@ QUnit.module('ModeratedGradingCheckbox', hooks => {
   hooks.beforeEach(() => {
     props = {
       checked: false,
+      gradedSubmissionsExist: false,
       onChange: () => {}
     }
   })
@@ -53,6 +54,17 @@ QUnit.module('ModeratedGradingCheckbox', hooks => {
     props.checked = true
     mountComponent()
     strictEqual(checkbox().node.checked, true)
+  })
+
+  test('enables the checkbox if no graded submissions exist', () => {
+    mountComponent()
+    strictEqual(checkbox().node.disabled, false)
+  })
+
+  test('disables the checkbox if graded submissions exist', () => {
+    props.gradedSubmissionsExist = true
+    mountComponent()
+    strictEqual(checkbox().node.disabled, true)
   })
 
   test('calls onChange when checked', () => {

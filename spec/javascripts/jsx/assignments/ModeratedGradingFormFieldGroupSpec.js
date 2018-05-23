@@ -28,6 +28,7 @@ QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
     props = {
       availableModerators: [{name: 'John Doe', id: '923'}, {name: 'Jane Doe', id: '492'}],
       finalGraderID: undefined,
+      gradedSubmissionsExist: false,
       locale: 'en',
       maxGraderCount: 10,
       moderatedGradingEnabled: true
