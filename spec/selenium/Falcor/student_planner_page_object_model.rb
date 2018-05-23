@@ -143,6 +143,7 @@ module PlannerPageObject
     wait_for_dom_ready
     wait_for_ajaximations
     todo_modal_button
+    f('.planner-day, .planner-empty-state') # one or the other will be rendered
   end
 
   def wait_for_dashboard_load
