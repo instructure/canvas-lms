@@ -21,6 +21,8 @@ For example, the corresponding scope for the `GET /api/v1/courses/:course_id/rub
 url:GET|/api/v1/courses/:course_id/rubrics
 ```
 ### How do developer key scopes function?
+When requesting an access token, third-party applications should specify a `scope` parameter (See [here](/doc/api/file.oauth_endpoints.html#get-login-oauth2-auth)). The requested scopes must be a subset of the scopes set for the developer key.
+
 When a client makes any API request, Canvas will verify the requested endpoint's scope has been granted by the account administrator to the developer key of the request's access token.
 
 If the requested endpoint's scope has not been granted Canvas will respond with `401 Unauthorized`.
@@ -29,6 +31,8 @@ If the requested endpoint's scope has not been granted Canvas will respond with 
 For developer keys created in a specific root account, administrators for that account may grant or revoke scopes. When requesting a developer key, application owners should communicate with administrators which scopes their integrations require.
 
 For global developer keys, an Instructure employee may grant or revoke scopes.
+
+*Note:* If a scope is removed from a developer key, all access tokens derived from that key will be invalidated. In this case, clients should request a new access token.
 
 ### Where can I see what scopes are available?
 A complete list of available scopes can be found [here](/doc/api/file.api_token_scopes.html).

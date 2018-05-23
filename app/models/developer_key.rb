@@ -38,6 +38,7 @@ class DeveloperKey < ActiveRecord::Base
   before_save :nullify_empty_icon_url
   before_save :protect_default_key
   after_save :clear_cache
+  after_update :invalidate_access_tokens_if_scopes_removed!
   after_create :create_default_account_binding
   before_validation :validate_scopes!
 
@@ -215,6 +216,17 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   private
+
+  def invalidate_access_tokens_if_scopes_removed!
+    return unless api_token_scoping_on?
+    return unless saved_change_to_scopes?
+    return if (scopes_before_last_save - scopes).blank?
+    send_later_if_production(:invalidate_access_tokens!)
+  end
+
+  def invalidate_access_tokens!
+    access_tokens.destroy_all
+  end
 
   def binding_on_in_account?(target_account)
     if target_account.site_admin?
