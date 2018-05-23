@@ -27,6 +27,14 @@ class AssignmentPage
       get "/courses/#{course}/assignments/#{assignment}/edit"
     end
 
+    def visit_new_assignment_create_page(course)
+      get "/courses/#{course}/assignments/new"
+    end
+
+    def assignment_form
+      f('#edit_assignment_form')
+    end
+
     def submission_detail_link
       fj("a:contains('Submission Details')")
     end
