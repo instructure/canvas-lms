@@ -20,6 +20,7 @@ import React from 'react'
 import {mount} from 'enzyme'
 import {Provider} from 'react-redux'
 
+import * as StudentActions from 'jsx/assignments/GradeSummary/students/StudentActions'
 import Layout from 'jsx/assignments/GradeSummary/components/Layout'
 import configureStore from 'jsx/assignments/GradeSummary/configureStore'
 
@@ -35,11 +36,18 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
         id: '2301',
         title: 'Example Assignment'
       },
-      graders: [{graderId: '1101'}, {graderId: '1102'}]
+      graders: [
+        {graderId: '1101', graderName: 'Miss Frizzle'},
+        {graderId: '1102', graderName: 'Mr. Keating'}
+      ]
     }
+    sinon
+      .stub(StudentActions, 'loadStudents')
+      .returns(StudentActions.setLoadStudentsStatus(StudentActions.LOAD_STUDENTS_STARTED))
   })
 
   suiteHooks.afterEach(() => {
+    StudentActions.loadStudents.restore()
     wrapper.unmount()
   })
 
@@ -57,14 +65,56 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
     strictEqual(wrapper.find('Header').length, 1)
   })
 
-  test('includes a "no graders" message when there are no graders', () => {
-    storeEnv.graders = []
-    mountComponent()
-    ok(wrapper.text().includes('Moderation is unable to occur'))
-  })
-
   test('excludes the "no graders" message when there are graders', () => {
     mountComponent()
     notOk(wrapper.text().includes('Moderation is unable to occur'))
+  })
+
+  test('loads students upon mounting', () => {
+    mountComponent()
+    strictEqual(StudentActions.loadStudents.callCount, 1)
+  })
+
+  QUnit.module('when there are no graders', hooks => {
+    hooks.beforeEach(() => {
+      storeEnv.graders = []
+    })
+
+    test('includes a "no graders" message when there are no graders', () => {
+      mountComponent()
+      ok(wrapper.text().includes('Moderation is unable to occur'))
+    })
+
+    test('does not load students', () => {
+      mountComponent()
+      strictEqual(StudentActions.loadStudents.callCount, 0)
+    })
+  })
+
+  QUnit.module('when students have not yet loaded', () => {
+    test('displays a spinner', () => {
+      mountComponent()
+      strictEqual(wrapper.find('Spinner').length, 1)
+    })
+  })
+
+  QUnit.module('when some students have loaded', hooks => {
+    let students
+
+    hooks.beforeEach(() => {
+      students = [{id: '1111', displayName: 'Adam Jones'}, {id: '1112', displayName: 'Betty Ford'}]
+    })
+
+    test('renders the GradesGrid', () => {
+      mountComponent()
+      store.dispatch(StudentActions.addStudents(students))
+      strictEqual(wrapper.find('GradesGrid').length, 1)
+    })
+
+    test('does not display a spinner', () => {
+      mountComponent()
+      store.dispatch(StudentActions.addStudents(students))
+      strictEqual(wrapper.find('Spinner').length, 0)
+    })
   })
 })

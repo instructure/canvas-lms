@@ -4241,6 +4241,28 @@ describe 'Submissions API', type: :request do
         api_call_as_user(@ta, :get, @path, @params, {}, {}, { :expected_status => 401 })
       end
 
+      context "when Anonymous Moderated Marking is enabled" do
+        before(:once) { @course.root_account.enable_feature!(:anonymous_moderated_marking) }
+
+        it "is unauthorized when the user is not the assigned final grader" do
+          api_call_as_user(@teacher, :get, @path, @params, {}, {}, expected_status: 401)
+        end
+
+        it "is unauthorized when the user is an account admin without 'Select Final Grade for Moderation' permission" do
+          @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :select_final_grade)
+          api_call_as_user(account_admin_user, :get, @path, @params, {}, {}, expected_status: 401)
+        end
+
+        it "is authorized when the user is the final grader" do
+          @assignment.update!(final_grader: @teacher, grader_count: 2)
+          api_call_as_user(@teacher, :get, @path, @params, {}, {}, expected_status: 200)
+        end
+
+        it "is authorized when the user is an account admin with 'Select Final Grade for Moderation' permission" do
+          api_call_as_user(account_admin_user, :get, @path, @params, {}, {}, expected_status: 200)
+        end
+      end
+
       it "includes provisional grades with selections" do
         sub = @assignment.grade_student(@student1, :score => 90, :grader => @ta, :provisional => true).first
         pg = sub.provisional_grades.first

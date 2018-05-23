@@ -20,7 +20,7 @@ import fakeENV from 'helpers/fakeENV'
 
 import getEnv from 'jsx/assignments/GradeSummary/getEnv'
 
-QUnit.module('GradeSummary getEnv', suiteHooks => {
+QUnit.module('GradeSummary getEnv()', suiteHooks => {
   suiteHooks.beforeEach(() => {
     fakeENV.setup({
       ASSIGNMENT: {

@@ -16,26 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {applyMiddleware, combineReducers, createStore} from 'redux'
-import ReduxThunk from 'redux-thunk'
+export const ADD_PROVISIONAL_GRADES = 'ADD_PROVISIONAL_GRADES'
 
-import gradesReducer from './grades/gradesReducer'
-import studentsReducer from './students/studentsReducer'
-
-const createStoreWithMiddleware = applyMiddleware(ReduxThunk)(createStore)
-
-export default function configureStore(env) {
-  const contextReducer = state =>
-    state || {
-      assignment: env.assignment,
-      graders: env.graders
-    }
-
-  const reducer = combineReducers({
-    context: contextReducer,
-    grades: gradesReducer,
-    students: studentsReducer
-  })
-
-  return createStoreWithMiddleware(reducer)
+export function addProvisionalGrades(provisionalGrades) {
+  return {type: ADD_PROVISIONAL_GRADES, payload: {provisionalGrades}}
 }

@@ -858,7 +858,7 @@ class SubmissionsApiController < ApplicationController
       student_scope = student_scope.order(:id)
       students = Api.paginate(student_scope, self, api_v1_course_assignment_gradeable_students_url(@context, @assignment))
       if (include_pg = includes.include?('provisional_grades'))
-        return unless authorized_action(@context, @current_user, :moderate_grades)
+        render_unauthorized_action and return unless @assignment.permits_moderation?(@current_user)
         submissions = @assignment.submissions.where(user_id: students).preload(:provisional_grades).index_by(&:user_id)
         selections = @assignment.moderated_grading_selections.where(student_id: students).index_by(&:student_id)
       end
