@@ -375,6 +375,19 @@ describe ContextModulesController do
       expect(m2.reload.position).to eq 1
       expect(m2.updated_at > time).to be_truthy
     end
+
+    it "should fire the module_updated live event for any module with changed positions" do
+      course_with_teacher_logged_in(active_all: true)
+      m1 = @course.context_modules.create!(position: 1)
+      m2 = @course.context_modules.create!(position: 2)
+      m3 = @course.context_modules.create!(position: 3)
+      time = 1.minute.ago
+      ContextModule.where(:id => [m1, m2, m3]).update_all(:updated_at => time)
+
+      expect(Canvas::LiveEvents).to receive(:module_updated).twice
+      post 'reorder', params: {:course_id => @course.id, :order => "#{m2.id},#{m1.id},#{m3.id}"}
+      expect(response).to be_success
+    end
   end
 
   describe "POST 'reorder_items'" do

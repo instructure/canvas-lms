@@ -17,7 +17,7 @@
  */
 
 import * as LA from './loading-actions.js';
-import {anyNewActivityDays} from '../utilities/statusUtils';
+import {anyNewActivityDays, didWeFindToday} from '../utilities/statusUtils';
 import {itemsToDays} from '../utilities/daysUtils';
 
 export const mergeFutureItems = (newFutureItems, response) => (dispatch, getState) => {
@@ -38,16 +38,24 @@ export const mergePastItems = (newPastItems, response) => (dispatch, getState) =
   return mergeCompleteDays(completeDays, dispatch, state.loading.allPastItemsLoaded, response);
 };
 
-export const mergePastItemsForNewActivity = (newPastItems, response) => (dispatch, getState) => {
+function mergePastItemsFor(foundPredicate, newPastItems, response, dispatch, getState) {
   dispatch(LA.gotPartialPastDays(itemsToDays(newPastItems), response));
   const state = getState();
   const completeDays = extractCompleteDays(
     state.loading.partialPastDays, state.loading.allPastItemsLoaded, 'desc',
   );
-  if (anyNewActivityDays(completeDays) || state.loading.allPastItemsLoaded) {
+  if (foundPredicate(completeDays) || state.loading.allPastItemsLoaded) {
     return mergeCompleteDays(completeDays, dispatch, state.loading.allPastItemsLoaded, response);
   }
   return false;
+}
+
+export const mergePastItemsForNewActivity = (newPastItems, response) => (dispatch, getState) => {
+  return mergePastItemsFor(anyNewActivityDays, newPastItems, response, dispatch, getState);
+};
+
+export const mergePastItemsForToday = (newPastItems, response) => (dispatch, getState) => {
+ return mergePastItemsFor(didWeFindToday, newPastItems, response, dispatch, getState);
 };
 
 function mergeCompleteDays (completeDays, dispatch, allItemsLoaded, response) {

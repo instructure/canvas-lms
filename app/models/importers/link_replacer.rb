@@ -125,6 +125,9 @@ module Importers
         end
         if item_updates.present?
           item.class.where(:id => item.id).update_all(item_updates)
+            if version = (item.current_version rescue nil)
+              replace_item_placeholders!({:type => :version, :item => version}, {:yaml => field_links.values.flatten})
+            end
         end
 
         unless skip_associations

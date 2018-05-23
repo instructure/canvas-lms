@@ -20,7 +20,7 @@ module Api::V1::DeveloperKey
   include Api::V1::Json
 
   DEVELOPER_KEY_JSON_ATTRS = %w(
-    name created_at email user_id user_name icon_url notes workflow_state
+    name created_at email user_id user_name icon_url notes workflow_state scopes
   ).freeze
   INHERITED_DEVELOPER_KEY_JSON_ATTRS = %w[name created_at icon_url workflow_state].freeze
 
@@ -49,9 +49,8 @@ module Api::V1::DeveloperKey
       end
 
       if account_binding.present? && show_bindings
-        hash['developer_key_account_binding'] = DeveloperKeyAccountBindingSerializer.new(account_binding)
+        hash['developer_key_account_binding'] = DeveloperKeyAccountBindingSerializer.new(account_binding, context)
       end
-      hash['account_owns_binding'] = account_binding&.account == context && show_bindings
 
       unless inherited
         hash['account_name'] = key.account_name

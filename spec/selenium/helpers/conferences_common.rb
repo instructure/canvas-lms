@@ -90,6 +90,14 @@ module ConferencesCommon
     expect(first_conference_in_list(new_conference_list)).not_to include_text 'Recording'
   end
 
+  def verify_conference_includes_recordings_with_statistics
+    expect(first_conference_in_list(new_conference_list)).to include_text 'statistics'
+  end
+
+  def verify_conference_does_not_include_recordings_with_statistics
+    expect(first_conference_in_list(new_conference_list)).not_to include_text 'statistics'
+  end
+
   def initialize_wimba_conference_plugin
     PluginSetting.create!(
       name: 'wimba',

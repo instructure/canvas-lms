@@ -110,6 +110,23 @@ module CanvasPartman::Concerns
         end
       end
 
+      def _insert_record(values)
+        if ::ActiveRecord.version >= Gem::Version.new("5.2")
+          begin
+            prev_table = @arel_table
+            prev_builder = @predicate_builder
+            @arel_table = arel_table_from_key_values(values)
+            @predicate_builder = nil
+            super
+          ensure
+            @arel_table = prev_table
+            @predicate_builder = prev_builder
+          end
+        else
+          super
+        end
+      end
+
       # :nodoc:
       def arel_table_from_key_values(attributes)
         partition_table_name = infer_partition_table_name(attributes)
@@ -136,7 +153,7 @@ module CanvasPartman::Concerns
       # @return [String]
       #  The table name for the partition.
       def infer_partition_table_name(attributes)
-        attr = attributes.detect { |(k, _v)| k.name == partitioning_field }
+        attr = attributes.detect { |(k, _v)| (k.is_a?(String) ? k : k.name) == partitioning_field }
 
         if attr.nil? || attr[1].nil?
           raise ArgumentError.new <<-ERROR

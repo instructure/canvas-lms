@@ -61,7 +61,9 @@ module BroadcastPolicy
               other_attributes.write_from_database(key, value.value)
             end
           end
-          @mutations_before_last_save = ActiveRecord::AttributeMutationTracker.new(other_attributes)
+          @mutations_before_last_save = CANVAS_RAILS5_1 ?
+            ActiveRecord::AttributeMutationTracker.new(other_attributes) :
+            ActiveModel::AttributeMutationTracker.new(other_attributes)
         end
         yield
       ensure

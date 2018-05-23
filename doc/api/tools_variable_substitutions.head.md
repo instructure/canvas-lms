@@ -70,7 +70,7 @@ curl 'https://<domain>.instructure.com/api/v1/courses/<course_id>/external_tools
 ```
 
 ## Via XML Configuration
-Custom fields can also be <a href="http://canvas.docker/doc/api/file.tools_xml.html">configured via XML</a>.
+Custom fields can also be <a href="/doc/api/file.tools_xml.html">configured via XML</a>.
 
 This would create a tool in a course with custom fields, some of which are specific for a
 particular placement:

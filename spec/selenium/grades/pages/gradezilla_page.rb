@@ -95,7 +95,7 @@ class Gradezilla
     end
 
     def student_column_cell_element(x,y)
-      f("div .slick-cell.l#{x}.r#{y}.meta-cell")
+      f("div .slick-cell.b#{x}.f#{y}.meta-cell")
     end
 
     def total_header_options_menu_item_element(menu_item)

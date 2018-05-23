@@ -17,7 +17,7 @@
 #
 
 class UpdateAssignmentStudentVisibilitiesView < ActiveRecord::Migration[5.0]
-  tag :predeploy
+  tag :postdeploy
 
   def up
     # Updates the previously created view to add the

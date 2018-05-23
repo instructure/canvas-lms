@@ -19,7 +19,7 @@ class AssignmentPage
   class << self
     include SeleniumDependencies
 
-    def visit_as_student(course, assignment)
+    def visit(course, assignment)
       get "/courses/#{course}/assignments/#{assignment}"
     end
 
@@ -32,11 +32,35 @@ class AssignmentPage
     end
 
     def select_grader_dropdown
-      f("select[name='grader-dropdown']")
+      f("select[name='final_grader_id']")
+    end
+
+    def grader_count_input
+      f("input[name='grader_count']")
     end
 
     def moderate_checkbox
       f("input[type=checkbox][name='moderated_grading']")
+    end
+
+    def moderate_button
+      f("#moderated_grading_button")
+    end
+
+    def assignment_content
+      f("#content")
+    end
+
+    def assignment_edit_permission_error_text
+      f("#unauthorized_message")
+    end
+
+    def assignment_name_textfield
+      f("#assignment_name")
+    end
+
+    def assignment_save_button
+      find_button('Save')
     end
 
     def filter_grader(grader_name)
@@ -49,6 +73,18 @@ class AssignmentPage
 
     def select_grader_from_dropdown(grader_name)
       filter_grader(grader_name).click
+    end
+
+    def edit_assignment_name(text)
+      assignment_name_textfield.send_keys(text)
+      assignment_save_button.click
+      wait_for_ajaximations
+    end
+
+    def add_number_of_graders(number)
+      grader_count_input.clear
+      grader_count_input.send_keys(number)
+      driver.action.send_keys(:enter).perform
     end
   end
 end

@@ -2011,6 +2011,34 @@ describe AssignmentsApiController, type: :request do
           to be_include 'Multiple Dates'
       end
 
+      it "should only notify students with visibility on creation" do
+        section2 = @course.course_sections.create!
+        student2 = student_in_section(section2, :user => user_with_communication_channel(:active_all => true))
+        student2.email_channel.notification_policies.create!(notification: @notification, frequency: 'immediately')
+
+        @user = @teacher
+        json = api_call(:post,
+          "/api/v1/courses/#{@course.id}/assignments.json",
+          {
+            :controller => 'assignments_api',
+            :action => 'create', :format => 'json',
+            :course_id => @course.id.to_s },
+          { :assignment => {
+            'name' => 'some assignment',
+            'published' => true,
+            'only_visible_to_overrides' => true,
+            'assignment_overrides' => {
+              '0' => {
+                'course_section_id' => section2.id,
+                'due_at' => Time.parse('2002 Jun 22 12:00:00').iso8601
+              }
+            }
+          }
+          })
+        expect(@student.messages).to be_empty
+        expect(student2.messages.detect{|m| m.notification_id == @notification.id}).to be_present
+      end
+
       it "should send notification of creation on save and publish" do
         assignment = @course.assignments.new(:name => "blah")
         assignment.workflow_state = 'unpublished'
@@ -2036,6 +2064,38 @@ describe AssignmentsApiController, type: :request do
           }
           })
         expect(@student.messages.detect{|m| m.notification_id == @notification.id}).to be_present
+      end
+
+      it "should use new overrides for notifications of creation on save and publish" do
+        assignment = @course.assignments.create!(:name => "blah", :workflow_state => 'unpublished',
+          :only_visible_to_overrides => true)
+        override = assignment.assignment_overrides.create!(:title => "blah", :set => @course.default_section, :set_type => "CourseSection")
+
+        section2 = @course.course_sections.create!
+        student2 = student_in_section(section2, :user => user_with_communication_channel(:active_all => true))
+        student2.email_channel.notification_policies.create!(notification: @notification, frequency: 'immediately')
+
+        @user = @teacher
+        json = api_call(:put,
+          "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+          {
+            :controller => 'assignments_api',
+            :action => 'update', :format => 'json',
+            :course_id => @course.id.to_s,
+            :id => assignment.to_param
+          },
+          { :assignment => {
+            'published' => true,
+            'assignment_overrides' => {
+              '0' => {
+                'course_section_id' => section2.id,
+                'due_at' => 1.day.from_now.iso8601
+              }
+            }
+          }
+          })
+        expect(@student.messages).to be_empty
+        expect(student2.messages.detect{|m| m.notification_id == @notification.id}).to be_present
       end
     end
 
@@ -2453,6 +2513,162 @@ describe AssignmentsApiController, type: :request do
       expect(@assignment.lock_at).to be_nil
       expect(@assignment.unlock_at).to be_nil
       expect(@assignment.peer_reviews_assign_at).to be_nil
+    end
+
+    describe 'final_grader_id' do
+      before(:once) do
+        course_with_teacher(active_all: true)
+      end
+
+      context 'when Anonymous Moderated Marking is enabled' do
+        before(:once) do
+          course_with_teacher(active_all: true)
+          @course.root_account.enable_feature!(:anonymous_moderated_marking)
+        end
+
+        it 'allows updating final_grader_id for a participating instructor with "Select Final Grade" permissions' do
+          assignment = @course.assignments.create!(name: 'Some Assignment', moderated_grading: true, grader_count: 2)
+          api_call(
+            :put,
+            "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+            {
+              controller: 'assignments_api',
+              action: 'update',
+              format: 'json',
+              course_id: @course.id,
+              id: assignment.to_param
+            },
+            { assignment: { final_grader_id: @teacher.id } },
+          )
+          expect(json_parse(response.body)['final_grader_id']).to eq @teacher.id
+        end
+
+        it 'does not allow updating final_grader_id if the user does not have "Select Final Grade" permissions' do
+          assignment = @course.assignments.create!(name: 'Some Assignment', moderated_grading: true, grader_count: 2)
+          @course.root_account.role_overrides.create!(
+            permission: 'select_final_grade',
+            role: teacher_role,
+            enabled: false
+          )
+          api_call(
+            :put,
+            "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+            {
+              controller: 'assignments_api',
+              action: 'update',
+              format: 'json',
+              course_id: @course.id,
+              id: assignment.to_param
+            },
+            { assignment: { final_grader_id: @teacher.id } },
+          )
+          error = json_parse(response.body)['errors']['final_grader_id'].first
+          expect(error['message']).to eq 'user does not have permission to select final grade'
+        end
+
+        it 'does not allow updating final_grader_id if the user is not active in the course' do
+          assignment = @course.assignments.create!(name: 'Some Assignment', moderated_grading: true, grader_count: 2)
+          deactivated_teacher = User.create!
+          deactivated_teacher = @course.enroll_teacher(deactivated_teacher, enrollment_state: 'inactive')
+          api_call(
+            :put,
+            "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+            {
+              controller: 'assignments_api',
+              action: 'update',
+              format: 'json',
+              course_id: @course.id,
+              id: assignment.to_param
+            },
+            { assignment: { final_grader_id: deactivated_teacher.id } },
+          )
+          error = json_parse(response.body)['errors']['final_grader_id'].first
+          expect(error['message']).to eq 'course has no active instructors with this ID'
+        end
+
+        it 'does not allow updating final_grader_id if the course has no user with the supplied ID' do
+          user_not_enrolled_in_course = User.create!
+          assignment = @course.assignments.create!(name: 'Some Assignment', moderated_grading: true, grader_count: 2)
+          api_call(
+            :put,
+            "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+            {
+              controller: 'assignments_api',
+              action: 'update',
+              format: 'json',
+              course_id: @course.id,
+              id: assignment.to_param
+            },
+            { assignment: { final_grader_id: user_not_enrolled_in_course.id } },
+          )
+          error = json_parse(response.body)['errors']['final_grader_id'].first
+          expect(error['message']).to eq 'course has no active instructors with this ID'
+        end
+
+        it 'skips final_grader_id validation if the field has not changed' do
+          assignment = @course.assignments.create!(
+            final_grader: @teacher,
+            grader_count: 2,
+            moderated_grading: true,
+            name: 'Some Assignment'
+          )
+          @course.root_account.role_overrides.create!(
+            permission: 'select_final_grade',
+            role: teacher_role,
+            enabled: false
+          )
+          api_call(
+            :put,
+            "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+            {
+              controller: 'assignments_api',
+              action: 'update',
+              format: 'json',
+              course_id: @course.id,
+              id: assignment.to_param
+            },
+            { assignment: { name: 'a fancy new name' } },
+          )
+          expect(response).to be_success
+        end
+      end
+
+      context 'when Anonymous Moderated Marking is disabled' do
+        it 'ignores updates to final_grader_id' do
+          assignment = @course.assignments.create!(name: 'Some Assignment', moderated_grading: true)
+          api_call(
+            :put,
+            "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+            {
+              controller: 'assignments_api',
+              action: 'update',
+              format: 'json',
+              course_id: @course.id,
+              id: assignment.to_param
+            },
+            { assignment: { final_grader_id: @teacher.id } },
+          )
+          expect(json_parse(response.body)['final_grader_id']).to be_nil
+        end
+      end
+    end
+
+    it 'allows updating grader_count' do
+      course_with_teacher(active_all: true)
+      assignment = @course.assignments.create!(name: 'Some Assignment', moderated_grading: true)
+      api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+        {
+          controller: 'assignments_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id,
+          id: assignment.to_param
+        },
+        { assignment: { grader_count: 4 } },
+      )
+      expect(json_parse(response.body)['grader_count']).to eq 4
     end
 
     it "should not allow updating an assignment title to longer than 255 characters" do
@@ -4343,6 +4559,68 @@ describe AssignmentsApiController, type: :request do
         update_from_params(@assignment, params, @teacher)
 
         expect(@assignment).to be_anonymous_grading
+      end
+
+      it 'does not set final_grader_id if the assignment is not moderated' do
+        options = { final_grader_id: @teacher.id }
+        params = ActionController::Parameters.new(options.as_json)
+        update_from_params(@assignment, params, @teacher)
+        expect(@assignment.final_grader).to be_nil
+      end
+
+      context "when the assignment is moderated" do
+        before(:once) do
+          @assignment.update!(moderated_grading: true, grader_count: 2)
+        end
+
+        it 'nils out the final_grader_id when passed final_grader_id: ""' do
+          @assignment.update!(final_grader: @teacher)
+          options = { final_grader_id: '' }
+          params = ActionController::Parameters.new(options.as_json)
+          update_from_params(@assignment, params, @teacher)
+          expect(@assignment.final_grader).to be_nil
+        end
+
+        it 'nils out the final_grader_id when passed final_grader_id: nil' do
+          @assignment.update!(final_grader: @teacher)
+          options = { final_grader_id: nil }
+          params = ActionController::Parameters.new(options.as_json)
+          update_from_params(@assignment, params, @teacher)
+          expect(@assignment.final_grader).to be_nil
+        end
+
+        it 'sets the final_grader_id if the user exists' do
+          options = { final_grader_id: @teacher.id }
+          params = ActionController::Parameters.new(options.as_json)
+          update_from_params(@assignment, params, @teacher)
+          expect(@assignment.final_grader).to eq @teacher
+        end
+      end
+    end
+
+    context "with the duplicated_successfully parameter" do
+      subject { @assignment }
+
+      let(:params) do
+        ActionController::Parameters.new(duplicated_successfully: duplicated_successfully)
+      end
+
+      before do
+        allow(@assignment).to receive(:finish_duplicating)
+        allow(@assignment).to receive(:fail_to_duplicate)
+        update_from_params(@assignment, params, @teacher)
+      end
+
+      context "when duplicated_successfully is true" do
+        let(:duplicated_successfully) { true }
+
+        it { is_expected.to have_received(:finish_duplicating) }
+      end
+
+      context "when duplicated_successfully is false" do
+        let(:duplicated_successfully) { false }
+
+        it { is_expected.to have_received(:fail_to_duplicate) }
       end
     end
   end

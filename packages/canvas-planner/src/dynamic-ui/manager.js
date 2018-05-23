@@ -53,13 +53,25 @@ export class DynamicUiManager {
     this.store = store;
   }
 
+  setApp (app) {
+    this.app = app;
+  }
+
   totalOffset () {
     return this.stickyOffset + this.additionalOffset;
+  }
+
+  focusFallback (type) {
+    const component = this.animatableRegistry.getComponent(type, specialFallbackFocusId(type));
+    if (component) this.animator.focusElement(component.component.getFocusable());
   }
 
   getRegistry () { return this.animatableRegistry; }
   getAnimator () { return this.animator; }
   getStore () { return this.store; }
+  getApp () { return this.app; }
+  getDocument () { return this.document; }
+
   static expectedActionsFor (animationClass) {
     return AnimationCollection.expectedActionsFor(animationClass);
   }
@@ -80,23 +92,6 @@ export class DynamicUiManager {
     this.animationPlan = this.animationPlan.nextAnimationPlan || {};
   }
 
-  animationWillScroll () {
-    return this.animationPlan.scrollToTop ||
-      this.animationPlan.focusItem ||
-      // This works around a chrome bug where focusing something in the sticky header jumps the
-      // scroll position to the top of the document, so we need to maintain the scroll position.
-      this.animationPlan.focusPreOpenTrayElement
-    ;
-  }
-
-  shouldMaintainCurrentScrollingPosition () {
-    // We need to maintain our scrolling postion in the viewport if:
-    // 1. we will not animate and do not want to scroll from the current position at all,
-    //    which is the case when the user is scrolling into the past and we load more items, or
-    // 2. we are about to animate a scroll, in which case we want to start in the current spot
-    return !!(this.animationPlan.noScroll || this.animationWillScroll());
-  }
-
   uiStateUnchanged (action) {
     // pretend there was a ui update so the animations can respond to actions that don't change
     // the redux state.
@@ -104,11 +99,7 @@ export class DynamicUiManager {
     this.animationCollection.uiDidUpdate();
   }
 
-  preTriggerUpdates = (fixedElement, triggerer) => {
-    // only the app should be allowed to muck with the scroll position (the header should not).
-    if (triggerer === 'app') {
-      this.animator.recordFixedElement(fixedElement);
-    }
+  preTriggerUpdates = () => {
     this.animationCollection.uiWillUpdate();
   }
 
@@ -120,47 +111,17 @@ export class DynamicUiManager {
     const animationPlan = this.animationPlan;
     if (!animationPlan.ready) return;
 
-    if (this.shouldMaintainCurrentScrollingPosition()) {
-      this.animator.maintainViewportPosition();
-    }
-
-    if (this.animationPlan.scrollToTop) {
-      this.triggerScrollToTop();
-    } else if (this.animationPlan.focusItem) {
-      this.triggerFocusItemComponent();
-    } else if (this.animationPlan.focusOpportunity) {
+    if (this.animationPlan.focusOpportunity) {
       this.triggerFocusOpportunity();
-    } else if (this.animationPlan.focusPreOpenTrayElement && this.animationPlan.preOpenTrayElement) {
-      this.triggerFocusPreOpenTrayElement();
     }
 
     this.clearAnimationPlan();
-  }
-
-  triggerScrollToTop () {
-    this.animator.scrollToTop();
-  }
-
-  triggerFocusItemComponent () {
-    const itemComponentToFocus = this.animatableRegistry.getComponent('item', this.animationPlan.focusItem);
-    if (itemComponentToFocus == null) return;
-    this.animator.focusElement(itemComponentToFocus.component.getFocusable(this.animationPlan.trigger));
-    this.animator.scrollTo(itemComponentToFocus.component.getScrollable(), this.stickyOffset);
   }
 
   triggerFocusOpportunity () {
     const oppToFocus = this.animatableRegistry.getComponent('opportunity', this.animationPlan.focusOpportunity);
     if (oppToFocus == null) return;
     this.animator.focusElement(oppToFocus.component.getFocusable(this.animationPlan.trigger));
-  }
-
-  triggerFocusPreOpenTrayElement () {
-    this.animator.focusElement(this.animationPlan.preOpenTrayElement);
-
-    // make sure the focused item is in view in case they scrolled away from it while the tray was open
-    if (!this.animationPlan.noScroll) {
-      this.animator.scrollTo(this.animationPlan.preOpenTrayElement, this.stickyOffset);
-    }
   }
 
   handleScrollPositionChange () {
@@ -211,36 +172,14 @@ export class DynamicUiManager {
         other {# items}
       }`, { count: newItems.length})
     );
-
-    if (!newItems.length) {
-      this.clearAnimationPlan();
-      return;
-    }
-    this.animationPlan.ready = true;
-
-    this.animationPlan.newItems = newItems;
-    this.animationPlan.newComponentIds = newItems.map(item => item.uniqueId);
   }
 
-  handleOpenEditingPlannerItem = (action) => {
-    this.animationPlan.preOpenTrayElement = this.document.activeElement;
+  handleStartLoadingGradesSaga = (action) => {
+    srAlert(formatMessage('Loading Grades'));
   }
 
-  handleCancelEditingPlannerItem = (action) => {
-    Object.assign(this.animationPlan, {
-      focusPreOpenTrayElement: true,
-      ready: true,
-      noScroll: action.payload.noScroll,
-    });
-  }
-
-  handleSavedPlannerItem = (action) => {
-    this.animationPlan.focusItem = action.payload.item.uniqueId;
-    if (!action.payload.isNewItem && this.animationPlan.preOpenTrayElement) {
-      this.animationPlan.focusPreOpenTrayElement = true;
-      this.animationPlan.trigger = 'update';
-    }
-    this.animationPlan.ready = true;
+  handleGotGradesSuccess = (action) => {
+    srAlert(formatMessage('Grades Loaded'));
   }
 
   handleDismissedOpportunity = (action) => {

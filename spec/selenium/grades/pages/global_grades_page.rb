@@ -29,6 +29,10 @@ class GlobalGrades
       f('.percent', course)
     end
 
+    def course_link(course)
+      fxpath("//a[text()='#{course.name}']")
+    end
+
     def select_grading_period(course, grading_period)
       selected_course = course_row(course)
       click_option(grading_period_dropdown(selected_course), grading_period)
@@ -50,8 +54,12 @@ class GlobalGrades
       nil
     end
 
-    def visit()
+    def visit
       get '/grades'
+    end
+
+    def click_course_link(course)
+      course_link(course).click
     end
   end
 end

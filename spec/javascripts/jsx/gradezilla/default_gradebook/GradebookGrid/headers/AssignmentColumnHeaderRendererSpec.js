@@ -45,6 +45,7 @@ QUnit.module('AssignmentColumnHeaderRenderer', function (suiteHooks) {
 
     assignment = {
       id: '2301',
+      anonymous_grading: false,
       assignment_visibility: null,
       course_id: '1201',
       grading_type: 'points',
@@ -172,17 +173,17 @@ QUnit.module('AssignmentColumnHeaderRenderer', function (suiteHooks) {
       equal(component.props.downloadSubmissionsAction, gradebook.getDownloadSubmissionsAction.returnValues[0]);
     });
 
-    test('includes the assignment anonymous grading status when true', function () {
-      assignment.anonymous_grading = true;
-      render();
-      strictEqual(component.props.assignment.anonymousGrading, true);
-    });
+    test('the anonymousGrading prop is `false` when the assignment is anonymous', function () {
+      assignment.anonymous_grading = true
+      render()
+      // anonymousGrading can only be true if Anonymous Moderated Marking is enabled
+      strictEqual(component.props.assignment.anonymousGrading, false)
+    })
 
-    test('includes the assignment anonymous grading status when false', function () {
-      assignment.anonymous_grading = false;
-      render();
-      strictEqual(component.props.assignment.anonymousGrading, false);
-    });
+    test('the anonymousGrading prop is `false` when the assignment is not anonymous', function () {
+      render()
+      strictEqual(component.props.assignment.anonymousGrading, false)
+    })
 
     test('shows the "enter grades as" setting for a "points" assignment', function () {
       assignment.grading_type = 'points';
@@ -504,6 +505,23 @@ QUnit.module('AssignmentColumnHeaderRenderer', function (suiteHooks) {
       render();
       equal(component.props.sortBySetting.settingKey, 'grade');
     });
+
+    QUnit.module('when Anonymous Moderated Marking is enabled', function (hooks) {
+      hooks.beforeEach(() => {
+        gradebook.options.anonymous_moderated_marking_enabled = true
+      })
+
+      test('the anonymousGrading prop is `true` when the assignment is anonymous', function () {
+        assignment.anonymous_grading = true
+        render()
+        strictEqual(component.props.assignment.anonymousGrading, true)
+      })
+
+      test('the anonymousGrading prop is `false` when the assignment is not anonymous', function () {
+        render()
+        strictEqual(component.props.assignment.anonymousGrading, false)
+      })
+    })
   });
 
   QUnit.module('#destroy', function () {

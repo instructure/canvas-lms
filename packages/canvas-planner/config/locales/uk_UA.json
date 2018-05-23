@@ -1,6 +1,6 @@
 {
-  "no_to_do_s_for_this_day_yet_90c5873d": {
-    "message": "Немає \"Завдань\" на цей день ще."
+  "all_day_fb42c4fc": {
+    "message": "Весь день"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Show # completed item}\n  other {Show # completed items}\n}"
@@ -112,6 +112,9 @@
   },
   "save_11a80ec3": {
     "message": "Зберегти"
+  },
+  "time_2b5aac58": {
+    "message": "Час"
   },
   "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
     "message": "Ви прокрутили назад до самого першого завдання!"

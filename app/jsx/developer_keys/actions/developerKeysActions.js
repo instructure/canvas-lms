@@ -44,6 +44,9 @@ actions.listInheritedDeveloperKeysFailed = (error) => ({ type: actions.LIST_INHE
 actions.LIST_DEVELOPER_KEYS_REPLACE = 'LIST_DEVELOPER_KEYS_REPLACE';
 actions.listDeveloperKeysReplace = (payload) => ({ type: actions.LIST_DEVELOPER_KEYS_REPLACE, payload});
 
+actions.LIST_DEVELOPER_KEYS_REPLACE_BINDING_STATE = 'LIST_DEVELOPER_KEYS_REPLACE_BINDING_STATE';
+actions.listDeveloperKeysReplaceBindingState = (payload) => ({ type: actions.LIST_DEVELOPER_KEYS_REPLACE_BINDING_STATE, payload});
+
 actions.LIST_DEVELOPER_KEYS_DELETE = 'LIST_DEVELOPER_KEYS_DELETE';
 actions.listDeveloperKeysDelete = (payload) => ({ type: actions.LIST_DEVELOPER_KEYS_DELETE, payload});
 
@@ -131,7 +134,8 @@ actions.setBindingWorkflowState = (developerKeyId, accountId, workflowState) => 
       workflow_state: workflowState
     }
   })
-  .then(() => {
+  .then((response) => {
+    dispatch(actions.listDeveloperKeysReplaceBindingState(response.data))
     dispatch(actions.setBindingWorkflowStateSuccessful())
   })
   .catch((error) => {
@@ -188,8 +192,8 @@ actions.getDeveloperKeys = (url, newSearch) => (dispatch, _getState) => {
   );
 };
 
-function retrieveRemainingDevKeys(url, developerKeysPassedIn, dispatch, getState, retrieve, success, failure) {
-  axios.get(url)
+function retrieveRemainingDevKeys(url, developerKeysPassedIn, dispatch, retrieve, success, failure) {
+  return axios.get(url)
     .then((response) => {
       const { next } = parseLinkHeader(response.headers.link);
       const developerKeys = developerKeysPassedIn.concat(response.data);
@@ -198,37 +202,33 @@ function retrieveRemainingDevKeys(url, developerKeysPassedIn, dispatch, getState
       }
       else {
         const payload = { next, developerKeys };
-        if (getState().listDeveloperKeys.list.length !== 0) {
-          $.screenReaderFlashMessageExclusive(I18n.t("Loaded More Developer Keys."));
-        }
         dispatch(success(payload));
+        return payload
       }
     })
     .catch((err) => dispatch(failure(err)));
 }
 
-actions.getRemainingDeveloperKeys = (url, developerKeysPassedIn) => (dispatch, getState) => {
+actions.getRemainingDeveloperKeys = (url, developerKeysPassedIn) => (dispatch) => {
   dispatch(actions.listDeveloperKeysStart());
 
-  retrieveRemainingDevKeys(
+  return retrieveRemainingDevKeys(
     url,
     developerKeysPassedIn,
     dispatch,
-    getState,
     actions.getRemainingDeveloperKeys,
     actions.listDeveloperKeysSuccessful,
     actions.listDeveloperKeysFailed
   );
 };
 
-actions.getRemainingInheritedDeveloperKeys = (url, developerKeysPassedIn) => (dispatch, getState) => {
+actions.getRemainingInheritedDeveloperKeys = (url, developerKeysPassedIn) => (dispatch) => {
   dispatch(actions.listInheritedDeveloperKeysStart());
 
-  retrieveRemainingDevKeys(
+  return retrieveRemainingDevKeys(
     `${url}?${inherited}`,
     developerKeysPassedIn,
     dispatch,
-    getState,
     actions.getRemainingInheritedDeveloperKeys,
     actions.listInheritedDeveloperKeysSuccessful,
     actions.listInheritedDeveloperKeysFailed
@@ -299,11 +299,11 @@ actions.makeVisibleDeveloperKey = (developerKey) => (dispatch, _getState) => {
     .catch((err) => dispatch(actions.makeVisibleDeveloperKeyFailed(err)));
 };
 
-actions.deleteDeveloperKey = (developerKey) => (dispatch, _getState) => {
+actions.deleteDeveloperKey = (developerKey) => (dispatch) => {
   dispatch(actions.deleteDeveloperKeyStart());
 
   const url = `/api/v1/developer_keys/${developerKey.id}`
-  axios.delete(url)
+  return axios.delete(url)
     .then((response) => {
       dispatch(actions.listDeveloperKeysDelete(response.data))
       dispatch(actions.deleteDeveloperKeySuccessful())

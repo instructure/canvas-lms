@@ -34,6 +34,10 @@ export const {
   startLoadingPastSaga,
   startLoadingFutureSaga,
   startLoadingPastUntilNewActivitySaga,
+  startLoadingGradesSaga,
+  gotGradesSuccess,
+  gotGradesError,
+  startLoadingPastUntilTodaySaga,
 } = createActions(
   'START_LOADING_ITEMS',
   'CONTINUE_LOADING_INITIAL_ITEMS',
@@ -45,6 +49,10 @@ export const {
   'START_LOADING_PAST_SAGA',
   'START_LOADING_FUTURE_SAGA',
   'START_LOADING_PAST_UNTIL_NEW_ACTIVITY_SAGA',
+  'START_LOADING_GRADES_SAGA',
+  'GOT_GRADES_SUCCESS',
+  'GOT_GRADES_ERROR',
+  'START_LOADING_PAST_UNTIL_TODAY_SAGA',
 );
 
 export const gettingPastItems = createAction('GETTING_PAST_ITEMS', (opts = {seekingNewActivity: false}) => {
@@ -129,6 +137,14 @@ export const loadPastUntilNewActivity = () => (dispatch, getState) => {
   }));
   dispatch(startLoadingPastUntilNewActivitySaga());
   return 'loadPastUntilNewActivity'; // for testing
+};
+
+export const loadPastUntilToday = () => (dispatch, getState) => {
+  dispatch(gettingPastItems({
+    seekingNewActivity: false,
+  }));
+  dispatch(startLoadingPastUntilTodaySaga());
+  return 'loadPastUntilToday'; // for testing
 };
 
 export function sendFetchRequest (loadingOptions) {

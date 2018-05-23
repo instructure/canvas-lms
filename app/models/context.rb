@@ -95,19 +95,17 @@ module Context
       context = context.respond_to?(:account) ? context.account : context.parent_account
       context_codes << context.asset_string if context
     end
-    codes_order = {}
-    context_codes.each_with_index{|c, idx| codes_order[c] = idx }
     associations = RubricAssociation.bookmarked.for_context_codes(context_codes).include_rubric
-    associations = associations.to_a.select{|a| a.rubric }.uniq{|a| [a.rubric_id, a.context_code] }
-    contexts = associations.group_by{|a| a.context_code }.map do |code, associations|
-      context_name = associations.first.context_name
-      res = {
+    associations = associations.to_a.select(&:rubric).uniq{|a| [a.rubric_id, a.context_code] }
+    contexts = associations.group_by(&:context_code).map do |code, code_associations|
+      context_name = code_associations.first.context_name
+      {
         :rubrics => associations.length,
         :context_code => code,
         :name => context_name
       }
     end
-    contexts.sort_by{|c| codes_order[c[:context_code]] || CanvasSort::Last }
+    Canvas::ICU.collate_by(contexts) { |r| r[:name] }
   end
 
   def active_record_types

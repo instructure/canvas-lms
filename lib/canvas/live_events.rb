@@ -481,9 +481,11 @@ module Canvas::LiveEvents
   def self.get_context_module_data(context_module)
     {
       module_id: context_module.id,
+      context_id: context_module.context_id,
+      context_type: context_module.context_type,
       name: context_module.name,
       position: context_module.position,
-      workflow_state: context_module.workflow_state,
+      workflow_state: context_module.workflow_state
     }
   end
 
@@ -498,6 +500,9 @@ module Canvas::LiveEvents
   def self.get_context_module_item_data(context_module_item)
     {
       module_item_id: context_module_item.id,
+      module_id: context_module_item.context_module_id,
+      context_id: context_module_item.context_id,
+      context_type: context_module_item.context_type,
       position: context_module_item.position,
       workflow_state: context_module_item.workflow_state
     }

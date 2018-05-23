@@ -25,7 +25,6 @@ class SisBatch < ActiveRecord::Base
   serialize :processing_warnings, Array
   belongs_to :attachment
   belongs_to :errors_attachment, class_name: 'Attachment'
-  has_many :sis_batch_error_files
   has_many :parallel_importers, inverse_of: :sis_batch
   has_many :sis_batch_errors, inverse_of: :sis_batch, autosave: false
   belongs_to :generated_diff, class_name: 'Attachment'
@@ -73,12 +72,14 @@ class SisBatch < ActiveRecord::Base
   end
 
   def self.create_data_attachment(batch, data, display_name)
-    Attachment.new.tap do |att|
-      Attachment.skip_3rd_party_submits(true)
-      att.context = batch
-      att.uploaded_data = data
-      att.display_name = display_name
-      att.save!
+    batch.shard.activate do
+      Attachment.new.tap do |att|
+        Attachment.skip_3rd_party_submits(true)
+        att.context = batch
+        att.uploaded_data = data
+        att.display_name = display_name
+        att.save!
+      end
     end
   ensure
     Attachment.skip_3rd_party_submits(false)
@@ -324,8 +325,16 @@ class SisBatch < ActiveRecord::Base
   def generate_diff
     return if self.diffing_remaster # joined the chain, but don't actually want to diff this one
     return unless self.diffing_data_set_identifier
+
+    # the previous batch may not have had diffing applied because of the change_threshold,
+    # so look for the latest one with a generated_diff_id (or a remaster)
     previous_batch = self.account.sis_batches.
-      succeeded.where(diffing_data_set_identifier: self.diffing_data_set_identifier).order(:created_at).last
+      succeeded.where(diffing_data_set_identifier: self.diffing_data_set_identifier).
+      where("diffing_remaster = 't' OR generated_diff_id IS NOT NULL").order(:created_at).last
+    # otherwise, the previous one may have been the first batch so fallback to the original query
+    previous_batch ||= self.account.sis_batches.
+      succeeded.where(diffing_data_set_identifier: self.diffing_data_set_identifier).order(:created_at).first
+
     previous_zip = previous_batch.try(:download_zip)
     return unless previous_zip
 

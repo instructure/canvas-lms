@@ -127,7 +127,7 @@ describe "gradebook" do
     end
 
     it "should allow editing grades", priority: "1", test_id: 210026 do
-      cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
+      cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .b2')
       expect(f('.gradebook-cell', cell)).to include_text '10'
       cell.click
       expect(ff('.grade', cell)).to_not be_blank

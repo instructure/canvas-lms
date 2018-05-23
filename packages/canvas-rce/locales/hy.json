@@ -1,0 +1,182 @@
+{
+  "group_navigation_99f191a": {
+    "message": "Խմբի նավարկում"
+  },
+  "cc_attribution_share_alike_669e7f16": {
+    "message": "CC-ին պատկանելություն, հավասարապես"
+  },
+  "quizzes_7e598f57": {
+    "message": "Թեստեր"
+  },
+  "cc_attribution_non_commercial_no_derivatives_9fe74c00": {
+    "message": "CC-ին պատկանելություն, ոչ կոմերցիոն, առանց ածանցյալների"
+  },
+  "c_2001_acme_inc_283f7f80": {
+    "message": "(c) 2001թ. Acme Inc."
+  },
+  "upload_a_new_file_96e6d4ff": {
+    "message": "Բեռնել նոր ֆայլ"
+  },
+  "folder_705fd2d7": {
+    "message": "Թղթապանակ"
+  },
+  "assignment_list_a833f59d": {
+    "message": "Հանձնարարությունների ցանկ"
+  },
+  "discussions_a5f96392": {
+    "message": "Քննարկումներ"
+  },
+  "cc_attribution_no_derivatives_b006744f": {
+    "message": "CC-ին պատկանելություն, առանց ածանցյալների"
+  },
+  "usage_right_ff96f3e2": {
+    "message": "Օգտագործման իրավունք՝"
+  },
+  "click_to_embed_image_33107dd8": {
+    "message": "Սեղմեք պատկերի տեղադրման համար"
+  },
+  "i_hold_the_copyright_71ee91b1": {
+    "message": "Ես հեղինակային իրավունք ունեմ"
+  },
+  "files_c300e900": {
+    "message": "Ֆայլեր"
+  },
+  "people_b4ebb13c": {
+    "message": "Մարդիկ"
+  },
+  "loading_25990131": {
+    "message": "Բեռնում է..."
+  },
+  "announcements_a4b8ed4a": {
+    "message": "Հայտարարություններ"
+  },
+  "formatting_press_down_to_select_df728c30": {
+    "message": "Ֆորմատավորում, ընտրելու համար սեղմեք ներքև"
+  },
+  "background_color_press_down_to_select_ef99fdac": {
+    "message": "Ֆոնի գույն, ընտրելու համար սեղմեք ներքև"
+  },
+  "files_index_af7c662b": {
+    "message": "Ֆայլերի ցուցիչ"
+  },
+  "the_material_is_subject_to_fair_use_exception_41bc6a4b": {
+    "message": "Նյութը վերաբերում է բարեխիղճ օգտագործման բացառությունների կատեգորիային:"
+  },
+  "link_to_other_content_in_the_group_3fe25379": {
+    "message": "Հղում խմբի մյուս բովանդակությանը:"
+  },
+  "discussions_index_6c36ced": {
+    "message": "Քննարկումների ցուցիչ"
+  },
+  "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
+    "message": "Սեղմեք ցանկացած ֆայլ՝ դրան  հղում տեղադրելու համար:"
+  },
+  "copyright_holder_66ee111": {
+    "message": "Հեղինակային իրավունք ունեցող անձը՝"
+  },
+  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
+    "message": "Ֆորմատավորված տեքստի դաշտ, տեղեկությունների համար սեղմել ALT+F8 "
+  },
+  "enter_search_terms_e397b1f0": {
+    "message": "մուտքագրել որոնման պայմանները"
+  },
+  "pages_e5414c2c": {
+    "message": "Էջեր"
+  },
+  "cc_attribution_f6de631f": {
+    "message": "CC-ին պատկանելություն "
+  },
+  "insert_link_6dc23cae": {
+    "message": "Տեղադրել հղումը"
+  },
+  "collaborations_5c56c15f": {
+    "message": "Համատեղ աշխատանքներ"
+  },
+  "what_would_you_like_to_call_the_new_page_d7e4488a": {
+    "message": "Ինչպե՞ս կցանկանայիք անվանել նոր էջը:"
+  },
+  "click_any_image_to_embed_the_image_in_the_page_2cdd1136": {
+    "message": "Սեղմեք ցանկացած պատկեր այն էջում տեղադրելու համար:"
+  },
+  "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
+    "message": "Սեղմեք ցանկացած էջ՝ այդ էջին հղում տեղադրելու համար:"
+  },
+  "link_7262adec": {
+    "message": "Հղում"
+  },
+  "grades_a61eba0a": {
+    "message": "Գնահատականներ"
+  },
+  "links_14b70841": {
+    "message": "Հղումներ"
+  },
+  "course_syllabus_5de1b0af": {
+    "message": "Դասընթացի ուսումնական ծրագիր"
+  },
+  "upload_8b403d05": {
+    "message": "Բեռնել"
+  },
+  "modules_c4325335": {
+    "message": "Մոդուլներ"
+  },
+  "announcement_list_da155734": {
+    "message": "Հայտարարությունների ցուցակ"
+  },
+  "link_to_a_new_page_6c4ad034": {
+    "message": "Նոր էջին հղում"
+  },
+  "insert_math_equation_57c6e767": {
+    "message": "Զետեղել մաթեմատիկական հավասարում"
+  },
+  "i_have_obtained_permission_to_use_this_file_6386f087": {
+    "message": "Ես թույլտվություն եմ ստացել օգտագործելու այս ֆայլը:"
+  },
+  "cc_attribution_non_commercial_share_alike_c7edb1e5": {
+    "message": "CC-ին պատկանելություն, ոչ կոմերցիոն, հավասար բաժիններով"
+  },
+  "wiki_home_9cd54d0": {
+    "message": "Վիկիի տնային էջ"
+  },
+  "upload_a_new_image_890df275": {
+    "message": "Բեռնել նոր պատկեր"
+  },
+  "search_280d00bd": {
+    "message": "Որոնել"
+  },
+  "assignments_1e02582c": {
+    "message": "Հանձնարարություններ"
+  },
+  "cc_attribution_non_commercial_39e0d30d": {
+    "message": "CC-ին պատկանելություն, ոչ կոմերցիոն"
+  },
+  "the_material_is_licensed_under_creative_commons_3242cb5e": {
+    "message": "Նյութը արտոնագրված է  Creative Commons կողմից"
+  },
+  "images_7ce26570": {
+    "message": "Պատկերներ"
+  },
+  "link_to_other_content_in_the_course_879163b5": {
+    "message": "Կապակցել դասընթացի այլ բովանդակության հետ:"
+  },
+  "font_size_press_down_to_select_6c25dc2d": {
+    "message": "Տառերի չափ, ընտրելու համար սեղմեք ներքև"
+  },
+  "course_navigation_dd035109": {
+    "message": "Նավարկում դասընթացում"
+  },
+  "choose_usage_rights_33683854": {
+    "message": "Ընտրել օգտագործման իրավունքները..."
+  },
+  "text_color_press_down_to_select_8f5ad9b5": {
+    "message": "Տեքստի գույն, ընտրելու համար սեղմեք ներքև"
+  },
+  "embed_image_1080badc": {
+    "message": "Տեղադրել պատկերը"
+  },
+  "creative_commons_license_725584ae": {
+    "message": "\"Creative Commons\" լիցենզիա"
+  },
+  "the_material_is_in_the_public_domain_279c39a3": {
+    "message": "Նյութը գտնվում է հանրությանը հասանելի դոմենում"
+  }
+}

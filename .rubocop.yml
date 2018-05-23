@@ -141,6 +141,8 @@ RSpec/HookArgument:
   Enabled: false
 RSpec/VerifiedDoubles:
   Enabled: false
+RSpec/NamedSubject:
+  Enabled: false
 
 # RSpec cops we care extra about
 RSpec/EmptyExampleGroup:

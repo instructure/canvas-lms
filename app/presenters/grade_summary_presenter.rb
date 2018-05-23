@@ -223,12 +223,7 @@ class GradeSummaryPresenter
   end
 
   def assignment_stats
-    @stats ||= begin
-      Rails.cache.fetch(GradeSummaryPresenter.cache_key(@context, 'assignment_stats')) do
-        ScoreStatistic.where(assignment: @context.assignments.active.except(:order)).
-          index_by(&:assignment_id)
-      end
-    end
+    @stats ||= ScoreStatistic.where(assignment: @context.assignments.active.except(:order)).index_by(&:assignment_id)
   end
 
   def assignment_presenters

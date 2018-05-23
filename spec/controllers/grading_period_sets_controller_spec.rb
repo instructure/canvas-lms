@@ -35,22 +35,40 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
     end
 
     describe "GET #index" do
+      before :once do
+        @groups = (1..10).map do |i|
+          group_helper.create_for_account(root_account, title: "Grading Period Set #{i}")
+        end
+      end
+
       it "fetches grading period sets" do
-        group_helper.create_for_account(root_account)
-
         get :index, params: {account_id: root_account.to_param}, session: valid_session
-
-        expect(json_parse.fetch('grading_period_sets').count).to eql 1
+        expect(json_parse.fetch('grading_period_sets').count).to be 10
       end
 
       it "includes grading periods" do
-        group = group_helper.create_for_account(root_account)
+        group = @groups.first
         period = Factories::GradingPeriodHelper.new.create_for_group(group)
         get :index, params: {account_id: root_account.to_param}, session: valid_session
-        sets = json_parse.fetch('grading_period_sets')
-        periods = sets.first.fetch('grading_periods')
-        expect(periods.count).to eql 1
+        set = json_parse.fetch('grading_period_sets').detect {|s| s['id'] == group.id.to_s}
+        periods = set.fetch('grading_periods')
+        expect(periods.count).to be 1
         expect(periods.first.fetch('id').to_s).to eql period.id.to_s
+      end
+
+      it "paginates the grading period sets" do
+        get :index, params: {account_id: root_account.to_param}, session: valid_session
+        expect(json_parse['meta']).to have_key('pagination')
+      end
+
+      it "orders the grading period sets by id" do
+        # the next two lines force an unordered query to be consistently out of
+        # natural order, which ensures the assertion can predictably fail
+        @groups.take(5).map(&:destroy)
+        @groups.take(5).each { |group| group.update!(workflow_state: 'active') }
+        get :index, params: {account_id: root_account.to_param}, session: valid_session
+        set_ids = json_parse.fetch('grading_period_sets').map {|set| set['id']}
+        expect(set_ids).to eql @groups.map(&:id).map(&:to_s).sort
       end
     end
 

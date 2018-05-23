@@ -28,8 +28,8 @@ class Login::Oauth2Controller < Login::OauthBaseController
   def create
     return unless validate_request
 
-    @aac = AccountAuthorizationConfig.find(jwt['aac_id'])
-    raise ActiveRecord::RecordNotFound unless @aac.is_a?(AccountAuthorizationConfig::Oauth2)
+    @aac = AuthenticationProvider.find(jwt['aac_id'])
+    raise ActiveRecord::RecordNotFound unless @aac.is_a?(AuthenticationProvider::Oauth2)
 
     unique_id = nil
     provider_attributes = {}

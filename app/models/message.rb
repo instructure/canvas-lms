@@ -885,6 +885,16 @@ class Message < ActiveRecord::Base
   private
   def infer_from_name
     return name_helper.from_name if name_helper.from_name.present?
+    if name_helper.asset.is_a? AppointmentGroup
+      if !name_helper.asset.contexts_for_user(user).nil?
+        names = name_helper.asset.contexts_for_user(user).map(&:name).join(", ")
+        if names == ""
+          return name_helper.asset.context.name
+        else
+          return names
+        end
+      end
+    end
     return context_context.nickname_for(user) if can_use_name_for_from?(context_context)
 
     if root_account && root_account.settings[:outgoing_email_default_name]

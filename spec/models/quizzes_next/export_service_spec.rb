@@ -87,8 +87,9 @@ describe QuizzesNext::ExportService do
   end
 
   describe '.send_imported_content' do
+    let(:new_course) { double('course') }
+
     it 'emits live events for each copied assignment' do
-      new_course = double('course')
       new_assignment1 = assignment_model(id: 100001)
       new_assignment2 = assignment_model(id: 100002)
 
@@ -112,7 +113,6 @@ describe QuizzesNext::ExportService do
     end
 
     it 'ignores not found assignments' do
-      new_course = double('course')
       new_assignment1 = assignment_model(id: 100001)
       new_assignment2 = assignment_model(id: 100002)
 
@@ -137,6 +137,45 @@ describe QuizzesNext::ExportService do
 
       expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).twice
       ExportService.send_imported_content(new_course, imported_content)
+    end
+
+    it 'includes the new assignment id in the live event payload' do
+      new_assignment = assignment_model
+
+      imported_content = {
+        'original_course_uuid': '100005',
+        'assignments': [
+          {
+            'original_resource_link_id': '1234',
+            '$canvas_assignment_id': new_assignment.id
+          }
+        ]
+      }
+      allow(new_course).to receive(:uuid).and_return('100006')
+
+      expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).with(
+        hash_including(new_assignment_id: new_assignment.id)
+      )
+      ExportService.send_imported_content(new_course, imported_content)
+    end
+
+    it 'puts new assignments in the "duplicating" state' do
+      new_assignment = assignment_model
+
+      imported_content = {
+        'original_course_uuid': '100005',
+        'assignments': [
+          {
+            'original_resource_link_id': '1234',
+            '$canvas_assignment_id': new_assignment.id
+          }
+        ]
+      }
+      allow(new_course).to receive(:uuid).and_return('100006')
+      allow(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated)
+
+      ExportService.send_imported_content(new_course, imported_content)
+      expect(new_assignment.reload.workflow_state).to eq('duplicating')
     end
   end
 end

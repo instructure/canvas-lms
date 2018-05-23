@@ -1,0 +1,233 @@
+{
+  "announcement_list_da155734": {
+    "message": "Lista de anúncio"
+  },
+  "announcements_a4b8ed4a": {
+    "message": "Anúncios"
+  },
+  "assignment_list_a833f59d": {
+    "message": "Lista de tarefas"
+  },
+  "assignments_1e02582c": {
+    "message": "Tarefas"
+  },
+  "background_color_press_down_to_select_ef99fdac": {
+    "message": "Cor de fundo, pressione para selecionar"
+  },
+  "c_2001_acme_inc_283f7f80": {
+    "message": "(c) 2001 Acme Inc."
+  },
+  "cancel_file_upload_9903e7b9": {
+    "message": "Cancelar carregamento de arquivo"
+  },
+  "cancel_image_upload_2c771950": {
+    "message": "Cancelar carregamento de imagem"
+  },
+  "cc_attribution_f6de631f": {
+    "message": "Atribuição CC"
+  },
+  "cc_attribution_no_derivatives_b006744f": {
+    "message": "Atribuição CC não à obras derivadas"
+  },
+  "cc_attribution_non_commercial_39e0d30d": {
+    "message": "Atribuição CC uso não comercial"
+  },
+  "cc_attribution_non_commercial_no_derivatives_9fe74c00": {
+    "message": "Atribuição CC uso não comercial, não à obras derivadas"
+  },
+  "cc_attribution_non_commercial_share_alike_c7edb1e5": {
+    "message": "Atribuição CC uso não comercial, compartilhamento pela mesma licença"
+  },
+  "cc_attribution_share_alike_669e7f16": {
+    "message": "Atribuição CC compartilhamento pela mesma licença"
+  },
+  "choose_usage_rights_33683854": {
+    "message": "Escolher direitos de uso..."
+  },
+  "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
+    "message": "Clique em qualquer arquivo para inserir um link de download para este arquivo."
+  },
+  "click_any_image_to_embed_the_image_in_the_page_2cdd1136": {
+    "message": "Clique em qualquer imagem para incorporá-la à página."
+  },
+  "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
+    "message": "Clique em qualquer página para inserir um link para para essa página."
+  },
+  "click_to_embed_image_33107dd8": {
+    "message": "Clique para incorporar imagem"
+  },
+  "click_to_embed_imagename_c41ea8df": {
+    "message": "Clique para incorporar { imageName }"
+  },
+  "click_to_insert_a_link_into_the_editor_c19613aa": {
+    "message": "Clique para inserir um link no editor."
+  },
+  "click_to_insert_a_link_to_this_item_39794098": {
+    "message": "Clique para inserir um link para este item."
+  },
+  "close_flickr_form_b32e600a": {
+    "message": "Fechar formulário do Flickr"
+  },
+  "collaborations_5c56c15f": {
+    "message": "Colaborações"
+  },
+  "copyright_holder_66ee111": {
+    "message": "Titular do Copyright:"
+  },
+  "course_navigation_dd035109": {
+    "message": "Navegação do curso"
+  },
+  "course_syllabus_5de1b0af": {
+    "message": "Programa do curso"
+  },
+  "creative_commons_license_725584ae": {
+    "message": "Licença do Creative Commons:"
+  },
+  "discussions_a5f96392": {
+    "message": "Discussões"
+  },
+  "discussions_index_6c36ced": {
+    "message": "Índice de discussões"
+  },
+  "embed_image_1080badc": {
+    "message": "Imagem incorporada"
+  },
+  "enter_search_terms_e397b1f0": {
+    "message": "inserir termos de pesquisa"
+  },
+  "file_upload_form_4aaad554": {
+    "message": "Formulário de carregamento de arquivo"
+  },
+  "files_c300e900": {
+    "message": "Arquivos"
+  },
+  "files_index_af7c662b": {
+    "message": "Índice de arquivos"
+  },
+  "folder_705fd2d7": {
+    "message": "Pasta"
+  },
+  "font_size_press_down_to_select_6c25dc2d": {
+    "message": "Tamanho da fonte, pressione para selecionar"
+  },
+  "formatting_press_down_to_select_df728c30": {
+    "message": "Formatação, pressione para selecionar"
+  },
+  "grades_a61eba0a": {
+    "message": "Notas"
+  },
+  "group_navigation_99f191a": {
+    "message": "Navegação do grupo"
+  },
+  "i_have_obtained_permission_to_use_this_file_6386f087": {
+    "message": "Você obteve permissão para usar este arquivo."
+  },
+  "i_hold_the_copyright_71ee91b1": {
+    "message": "Eu posso o copyright"
+  },
+  "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+    "message": "Se você não selecionar os direitos de uso agora, esse arquivo terá a publicação cancelada depois do seu carregamento ser realizado."
+  },
+  "image_upload_form_7b74079a": {
+    "message": "Formulário de carregamento de imagem"
+  },
+  "images_7ce26570": {
+    "message": "Imagens"
+  },
+  "insert_equella_links_49a8dacd": {
+    "message": "Inserir links Equella"
+  },
+  "insert_link_6dc23cae": {
+    "message": "Inserir link"
+  },
+  "insert_math_equation_57c6e767": {
+    "message": "Insira Equação da Matemática"
+  },
+  "link_7262adec": {
+    "message": "Link"
+  },
+  "link_to_a_new_page_6c4ad034": {
+    "message": "Link para uma nova página"
+  },
+  "link_to_other_content_in_the_course_879163b5": {
+    "message": "Vincular a outros conteúdos no curso."
+  },
+  "link_to_other_content_in_the_group_3fe25379": {
+    "message": "Vincular a outros conteúdos no grupo."
+  },
+  "link_to_url_52dd935c": {
+    "message": "Link para URL"
+  },
+  "links_14b70841": {
+    "message": "Links"
+  },
+  "load_more_results_460f49a9": {
+    "message": "Carregar mais resultados"
+  },
+  "loading_25990131": {
+    "message": "Carregando..."
+  },
+  "loading_failed_b3524381": {
+    "message": "Falha no carregamento..."
+  },
+  "modules_c4325335": {
+    "message": "Módulos"
+  },
+  "no_results_940393cf": {
+    "message": "Sem resultados."
+  },
+  "pages_e5414c2c": {
+    "message": "Páginas"
+  },
+  "people_b4ebb13c": {
+    "message": "Pessoas"
+  },
+  "quizzes_7e598f57": {
+    "message": "Testes"
+  },
+  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
+    "message": "Área de Texto Rico. Pressione ALT + F8 para obter ajuda"
+  },
+  "search_280d00bd": {
+    "message": "Buscar"
+  },
+  "search_flickr_6884b518": {
+    "message": "Procurar no Flickr"
+  },
+  "select_a_file_53ba40ac": {
+    "message": "Escolher um arquivo"
+  },
+  "select_a_folder_to_upload_your_file_into_b82d12b": {
+    "message": "Selecione uma pasta para a qual carregar o seu arquivo"
+  },
+  "text_color_press_down_to_select_8f5ad9b5": {
+    "message": "Cor do texto, pressione para selecionar"
+  },
+  "the_material_is_in_the_public_domain_279c39a3": {
+    "message": "O material está no domínio público"
+  },
+  "the_material_is_licensed_under_creative_commons_3242cb5e": {
+    "message": "O material está licenciado sob Creative Commons"
+  },
+  "the_material_is_subject_to_fair_use_exception_41bc6a4b": {
+    "message": "O material está sujeito à exceção de uso justo"
+  },
+  "upload_8b403d05": {
+    "message": "Upload"
+  },
+  "upload_a_new_file_96e6d4ff": {
+    "message": "Upload de novo arquivo"
+  },
+  "upload_a_new_image_890df275": {
+    "message": "Upload de nova imagem"
+  },
+  "usage_right_ff96f3e2": {
+    "message": "Direito de uso:"
+  },
+  "what_would_you_like_to_call_the_new_page_d7e4488a": {
+    "message": "Você gostaria de chamar a nova página?"
+  },
+  "wiki_home_9cd54d0": {
+    "message": "Página inicial do wiki"
+  }
+}

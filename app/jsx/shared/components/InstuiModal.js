@@ -17,12 +17,13 @@
  */
 
 import React from 'react'
-import {string, node} from 'prop-types'
-import Heading from '@instructure/ui-core/lib/components/Heading'
+import {string, node, func} from 'prop-types'
+import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
 import I18n from 'i18n!modal'
-import Modal, {ModalHeader} from '@instructure/ui-core/lib/components/Modal'
+import Modal, { ModalHeader } from '@instructure/ui-overlays/lib/components/Modal'
 
-export {ModalBody, ModalFooter, ModalHeader} from '@instructure/ui-core/lib/components/Modal'
+export {ModalBody, ModalFooter, ModalHeader} from '@instructure/ui-overlays/lib/components/Modal'
 
 /*
 ---
@@ -36,23 +37,30 @@ to
 import Modal, {ModalBody, ModalFooter} from '../shared/components/InstuiModal'
 ---
 */
-export default function InstuiModal ({label, children, ...otherPropsToPassOnToModal}) {
+export default function InstuiModal ({label, handleCloseClick, children, ...otherPropsToPassOnToModal}) {
   return (
     <Modal {...otherPropsToPassOnToModal}
       label={label}
-      closeButtonLabel={I18n.t('Close')}
-      applicationElement={() => document.getElementById('application')}
     >
-      {label && (
-        <ModalHeader>
-          <Heading>{label}</Heading>
-        </ModalHeader>
-      )}
+      <ModalHeader>
+        {label && (
+            <Heading level="h3" as="h2">{label}</Heading>
+        )}
+        <CloseButton
+          placement="end"
+          offset="medium"
+          variant="icon"
+          onClick={handleCloseClick}
+        >
+          {I18n.t('Close')}
+        </CloseButton>
+      </ModalHeader>
       {children}
     </Modal>
   )
 }
 InstuiModal.propTypes = {
   label: string,
+  handleCloseClick: func.isRequired,
   children: node.isRequired
 }

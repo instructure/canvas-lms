@@ -34,6 +34,7 @@ module Api::V1::QuizQuestion
     question_name
     question_type
     question_text
+    position
     points_possible
     correct_comments
     incorrect_comments
@@ -52,9 +53,9 @@ module Api::V1::QuizQuestion
 
   # @param [Quizzes::Quiz#quiz_data] quiz_data
   #   If you specify a quiz_data construct from a submission (or a quiz), then
-  #   the questions will be modified to use the position index found in that
+  #   the questions will be modified to use the fields found in that
   #   data. This is needed if you're rendering questions for a submission
-  #   as each submission may position each question differently.
+  #   as each submission might have differen data.
   def questions_json(questions, user, session, context=nil, includes=[], censored=false, quiz_data=nil, opts={})
     questions.map do |question|
       question_json(question, user, session, context, includes, censored, quiz_data, opts)
@@ -64,7 +65,8 @@ module Api::V1::QuizQuestion
   def question_json(question, user, session, _context=nil, includes=[], censored=false, quiz_data=nil, opts={})
     hsh = api_json(question, user, session, API_ALLOWED_QUESTION_OUTPUT_FIELDS) do |json, q|
       API_ALLOWED_QUESTION_DATA_OUTPUT_FIELDS.each do |field|
-        json.send("#{field}=", q.question_data[field])
+        question_data = quiz_data&.find { |data_question| data_question[:id] == q[:id] } || q.question_data
+        json.send("#{field}=", question_data[field])
       end
     end
 
@@ -88,12 +90,6 @@ module Api::V1::QuizQuestion
     # Remove the answer weights if we're censoring the data for student access;
     # the answer weights denote the correct answer !!!!!
     hsh = censor(hsh) if censored
-
-    if quiz_data
-      if question_data = quiz_data.detect { |question| question[:id] == hsh[:id] }
-        hsh[:position] = question_data[:position]
-      end
-    end
 
     hsh
   end

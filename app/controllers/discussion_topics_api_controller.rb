@@ -697,14 +697,15 @@ class DiscussionTopicsApiController < ApplicationController
 
   def create_attachment
     context = (@current_user || @context)
-    attachment_params = { :uploaded_data => params[:attachment] }
-
+    attachment_params = {}
     if @topic.for_assignment?
       attachment_params.merge!(:folder_id => @current_user.submissions_folder(@context))
       context = @current_user
     end
-
-    context.attachments.create(attachment_params)
+    attachment = context.attachments.new(attachment_params)
+    Attachments::Storage.store_for_attachment(attachment, params[:attachment])
+    attachment.save!
+    attachment
   end
 
   def visible_topics(topic)

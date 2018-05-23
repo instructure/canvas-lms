@@ -161,8 +161,8 @@ define [
     render: ->
       return unless @isMasterCourseContent()
 
+      @$el.attr 'role', 'button'
       if(!@disabled)
-        @$el.attr 'role', 'button'
         @$el.attr 'tabindex', '0'
 
       @$el.html '<i></i><span class="lock-text screenreader-only"></span>'
@@ -220,6 +220,8 @@ define [
       @$el.addClass options.buttonClass
       if !@disabled
         @$el.attr 'aria-pressed', options.buttonClass is @lockedClass
+      else
+        @$el.attr 'aria-disabled', true
       @$icon.attr('class', options.iconClass)
 
       @$text.html "#{htmlEscape(options.label || options.hint)}"

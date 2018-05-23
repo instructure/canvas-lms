@@ -560,7 +560,52 @@ describe ConversationsController, type: :request do
         json = api_call(:post, "/api/v1/conversations",
                 { :controller => 'conversations', :action => 'create', :format => 'json' },
                 { :recipients => [@bob.id], :body => "test", :context_code => "course_#{@course.id}" })
-        expect(conversation(@bob).conversation.context).to eql(@course)
+        expect(@bob.conversations.last.conversation.context).to eql(@course)
+      end
+
+      it "should not re-use a private conversation with a different explicit context" do
+        course1 = @course
+        course2 = course_with_teacher(:user => @me, :active_all => true).course
+        course_with_student(:course => course2, :user => @bob, :active_all => true)
+
+        json = api_call(:post, "/api/v1/conversations",
+          { :controller => 'conversations', :action => 'create', :format => 'json' },
+          { :recipients => [@bob.id], :body => "test", :context_code => "course_#{course1.id}" })
+        conv1 = Conversation.find(json.first["id"])
+        expect(conv1.context).to eql(course1)
+
+        json2 = api_call(:post, "/api/v1/conversations",
+          { :controller => 'conversations', :action => 'create', :format => 'json' },
+          { :recipients => [@bob.id], :body => "test", :context_code => "course_#{course2.id}" })
+        conv2 = Conversation.find(json2.first["id"])
+        expect(conv2.context).to eql(course2)
+      end
+
+      it "should re-use a private conversation with an old contextless private hash if the original context matches" do
+        course1 = @course
+        course2 = course_with_teacher(:user => @me, :active_all => true).course
+        course_with_student(:course => course2, :user => @bob, :active_all => true)
+
+        json = api_call(:post, "/api/v1/conversations",
+          { :controller => 'conversations', :action => 'create', :format => 'json' },
+          { :recipients => [@bob.id], :body => "test", :context_code => "course_#{course1.id}" })
+        conv1 = Conversation.find(json.first["id"])
+        expect(conv1.context).to eql(course1)
+
+        # revert it to the old format
+        old_hash = Conversation.private_hash_for(conv1.conversation_participants.pluck(:user_id))
+        ConversationParticipant.where(:conversation_id => conv1).update_all(:private_hash => old_hash)
+        Conversation.where(:id => conv1).update_all(:private_hash => old_hash)
+
+        json2 = api_call(:post, "/api/v1/conversations",
+          { :controller => 'conversations', :action => 'create', :format => 'json' },
+          { :recipients => [@bob.id], :body => "test", :context_code => "course_#{course1.id}" })
+        expect(json2.first["id"]).to eq conv1.id # should reuse the conversation
+
+        json3 = api_call(:post, "/api/v1/conversations",
+          { :controller => 'conversations', :action => 'create', :format => 'json' },
+          { :recipients => [@bob.id], :body => "test", :context_code => "course_#{course2.id}" })
+        expect(json3.first["id"]).to_not eq conv1.id # should make a new one
       end
 
       describe "context is an account for admins validation" do
@@ -771,14 +816,13 @@ describe ConversationsController, type: :request do
                   { :controller => 'conversations', :action => 'create', :format => 'json' },
                   { :recipients => [@bob.id, @joe.id, @billy.id], :body => "test", :context_code => "course_#{@course.id}" })
           expect(json.size).to eql 3
-          expect(json.map{ |c| c['id'] }.sort).to eql @me.all_conversations.map(&:conversation_id).sort
 
           batch = ConversationBatch.first
           expect(batch).not_to be_nil
           expect(batch).to be_sent
 
-          [@me, @bob].each {|u| expect(u.conversations.first.conversation.context).to be_nil} # an existing conversation does not get a context
-          [@billy, @joe].each {|u| expect(u.conversations.first.conversation.context).to eql(@course)}
+          expect(@me.all_conversations.last.conversation.context).to eq @course
+          [@bob, @billy, @joe].each {|u| expect(u.conversations.first.conversation.context).to eql(@course)}
         end
 
         it "constraints the length of the subject of a conversation batch" do
@@ -818,8 +862,8 @@ describe ConversationsController, type: :request do
           expect(batch).to be_created
           batch.deliver
 
-         [@me, @bob].each {|u| expect(u.conversations.first.conversation.context).to be_nil} # an existing conversation does not get a context
-          [@billy, @joe].each {|u| expect(u.conversations.first.conversation.context).to eql(@course)}
+          expect(@me.all_conversations.last.conversation.context).to eq @course
+          [@bob, @billy, @joe].each {|u| expect(u.conversations.first.conversation.context).to eql(@course)}
         end
       end
 

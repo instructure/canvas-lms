@@ -21,6 +21,7 @@ module Canvas::Oauth
 
     REDIS_PREFIX = 'oauth2:'
     USER_KEY = 'user'
+    REAL_USER_KEY = 'real_user'
     CLIENT_KEY = 'client_id'
     SCOPES_KEY = 'scopes'
     PURPOSE_KEY = 'purpose'
@@ -46,6 +47,14 @@ module Canvas::Oauth
 
     def user
       @user ||= User.find(code_data[USER_KEY])
+    end
+
+    def real_user
+      @real_user ||=
+        begin
+          real_user_id = code_data[REAL_USER_KEY]
+          real_user_id ? User.find(real_user_id) : user
+        end
     end
 
     def scopes
@@ -112,6 +121,14 @@ module Canvas::Oauth
         }
       }
 
+      unless real_user == user
+        json['real_user'] = {
+          'id' => real_user.id,
+          'name' => real_user.name,
+          'global_id' => real_user.global_id.to_s
+        }
+      end
+
       json['refresh_token'] = access_token.plaintext_refresh_token if access_token.plaintext_refresh_token
 
       if access_token.expires_at && key.auto_expire_tokens
@@ -132,14 +149,16 @@ module Canvas::Oauth
       end
     end
 
-    def self.generate_code_for(user_id, client_id, options = {})
+    def self.generate_code_for(user_id, real_user_id, client_id, options = {})
       code = SecureRandom.hex(64)
       code_data = {
         USER_KEY => user_id,
+        REAL_USER_KEY => real_user_id,
         CLIENT_KEY => client_id,
         SCOPES_KEY => options[:scopes],
         PURPOSE_KEY => options[:purpose],
-        REMEMBER_ACCESS => options[:remember_access] }
+        REMEMBER_ACCESS => options[:remember_access]
+      }
       Canvas.redis.setex("#{REDIS_PREFIX}#{code}", Setting.get('oath_token_request_timeout', 10.minutes.to_s).to_i, code_data.to_json)
       return code
     end

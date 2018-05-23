@@ -46,7 +46,7 @@ describe "AuthenticationProviders API", type: :request do
   context "/index" do
     def call_index(status=200)
       api_call(:get, "/api/v1/accounts/#{@account.id}/authentication_providers",
-             { :controller => 'account_authorization_configs', :action => 'index', :account_id => @account.id.to_s, :format => 'json' },
+             { :controller => 'authentication_providers', :action => 'index', :account_id => @account.id.to_s, :format => 'json' },
              {}, {}, :expected_status => status)
     end
 
@@ -73,7 +73,7 @@ describe "AuthenticationProviders API", type: :request do
 
     def call_create(params, status = 200)
       json = api_call(:post, "/api/v1/accounts/#{@account.id}/authentication_providers",
-             { :controller => 'account_authorization_configs', :action => 'create', :account_id => @account.id.to_s, :format => 'json' },
+             { :controller => 'authentication_providers', :action => 'create', :account_id => @account.id.to_s, :format => 'json' },
              params, {}, :expected_status => status)
       @account.reload
       json
@@ -165,7 +165,11 @@ describe "AuthenticationProviders API", type: :request do
 
     it "should error if empty post params sent" do
       json = call_create({}, 422)
-      expect(json['errors'].first).to eq({ 'field' => 'auth_type', 'message' => "invalid auth_type, must be one of #{AccountAuthorizationConfig::VALID_AUTH_TYPES.join(',')}", 'error_code' => 'inclusion' })
+      expect(json['errors'].first).to eq({
+        'field' => 'auth_type',
+        'message' => "invalid auth_type, must be one of #{AuthenticationProvider::VALID_AUTH_TYPES.join(',')}",
+        'error_code' => 'inclusion'
+      })
     end
 
     it "should return unauthorized error" do
@@ -189,7 +193,7 @@ describe "AuthenticationProviders API", type: :request do
   context "/show" do
     def call_show(id, status = 200)
       api_call(:get, "/api/v1/accounts/#{@account.id}/authentication_providers/#{id}",
-             { :controller => 'account_authorization_configs', :action => 'show', :account_id => @account.id.to_s, :id => id.to_param, :format => 'json' },
+             { :controller => 'authentication_providers', :action => 'show', :account_id => @account.id.to_s, :id => id.to_param, :format => 'json' },
              {}, {}, :expected_status => status)
     end
 
@@ -202,11 +206,12 @@ describe "AuthenticationProviders API", type: :request do
       @saml_hash['login_handle_name'] = nil
       @saml_hash['change_password_url'] = nil
       @saml_hash['requested_authn_context'] = nil
-      @saml_hash['login_attribute'] = 'nameid'
+      @saml_hash['login_attribute'] = 'NameID'
       @saml_hash['unknown_user_url'] = nil
       @saml_hash['parent_registration'] = false
       @saml_hash['metadata_uri'] = nil
       @saml_hash['sig_alg'] = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
+      @saml_hash['strip_domain_from_login_attribute'] = false
       expect(json).to eq @saml_hash
     end
 
@@ -248,7 +253,7 @@ describe "AuthenticationProviders API", type: :request do
   context "/update" do
     def call_update(id, params, status = 200)
       json = api_call(:put, "/api/v1/accounts/#{@account.id}/authentication_providers/#{id}",
-             { :controller => 'account_authorization_configs', :action => 'update', :account_id => @account.id.to_s, :id => id.to_param, :format => 'json' },
+             { :controller => 'authentication_providers', :action => 'update', :account_id => @account.id.to_s, :id => id.to_param, :format => 'json' },
              params, {}, :expected_status => status)
       @account.reload
       json
@@ -338,7 +343,7 @@ describe "AuthenticationProviders API", type: :request do
   context "/destroy" do
     def call_destroy(id, status = 200)
       json = api_call(:delete, "/api/v1/accounts/#{@account.id}/authentication_providers/#{id}",
-             { :controller => 'account_authorization_configs', :action => 'destroy', :account_id => @account.id.to_s, :id => id.to_param, :format => 'json' },
+             { :controller => 'authentication_providers', :action => 'destroy', :account_id => @account.id.to_s, :id => id.to_param, :format => 'json' },
              {}, {}, :expected_status => status)
       @account.reload
       json
@@ -395,7 +400,7 @@ describe "AuthenticationProviders API", type: :request do
       api_call(:put,
                sso_path,
                {
-                 controller: 'account_authorization_configs',
+                 controller: 'authentication_providers',
                  action: 'update_sso_settings',
                  account_id: @account.id.to_s,
                  format: 'json'
@@ -459,7 +464,7 @@ describe "AuthenticationProviders API", type: :request do
         response = api_call(:get,
                             sso_path,
                             {
-                              controller: "account_authorization_configs",
+                              controller: "authentication_providers",
                               action: "show_sso_settings",
                               account_id: @account.id.to_s,
                               format: 'json'
@@ -475,10 +480,11 @@ describe "AuthenticationProviders API", type: :request do
   describe "API JSON" do
     describe 'federated_attributes' do
       it 'excludes provisioning only attributes when jit_provisioning is off' do
-        aac = AccountAuthorizationConfig::SAML.new(
+        aac = AuthenticationProvider::SAML.new(
           federated_attributes: { 'integration_id' => { 'attribute' => 'internal_id' },
                                   'sis_user_id' => { 'attribute' => 'external_id',
-                                                     'provisioning_only' => true }})
+                                                     'provisioning_only' => true }}
+        )
         expect(aac.federated_attributes_for_api).to eq('integration_id' => 'internal_id')
       end
 
@@ -487,7 +493,7 @@ describe "AuthenticationProviders API", type: :request do
                                                        'provisioning_only' => false },
                                  'sis_user_id' => { 'attribute' => 'external_id',
                                                     'provisioning_only' => true }}
-        aac = AccountAuthorizationConfig::SAML.new(federated_attributes: federated_attributes,
+        aac = AuthenticationProvider::SAML.new(federated_attributes: federated_attributes,
                                                    jit_provisioning: true)
         expect(aac.federated_attributes_for_api).to eq(federated_attributes)
       end

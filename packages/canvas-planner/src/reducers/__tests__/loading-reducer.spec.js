@@ -86,17 +86,17 @@ it('sets only opportunities fields on ALL_OPPORTUNITIES_LOADED', () => {
   });
 });
 
-it('purges complete days from partial days on GOT_DAYS_SUCCES', () => {
+it('purges complete days from partial days on GOT_DAYS_SUCCESS', () => {
   const state = initialState({
-    partialFutureDays: [['2017-12-18', []], ['2017-12-19', []]],
-    partialPastDays: [['2017-12-17', []], ['2017-12-16', []]],
+    partialFutureDays: [['2017-12-18', []], ['2017-12-19', []], ['2017-12-20', [{id:1}]]],
+    partialPastDays: [['2017-12-17', []], ['2017-12-16', []], ['2017-12-15', [{id:2}]]],
   });
   const newState = loadingReducer(state, Actions.gotDaysSuccess([
     ['2017-12-18', []], ['2017-12-17', []]
   ]));
   expect(newState).toMatchObject({
-    partialFutureDays: [['2017-12-19', []]],
-    partialPastDays: [['2017-12-16', []]],
+    partialFutureDays: [['2017-12-20', [{id:1}]]],
+    partialPastDays: [['2017-12-15', [{id:2}]]],
   });
 });
 
@@ -237,4 +237,22 @@ it('adds to partialPastDays', () => {
       newDays[2],
     ]
   });
+});
+
+it('sets grades loading', () => {
+  const state = initialState();
+  const nextState = loadingReducer(state, Actions.startLoadingGradesSaga());
+  expect(nextState).toMatchObject({loadingGrades: true, gradesLoaded: false});
+});
+
+it('sets grades loaded', () => {
+  const state = initialState({loadingGrades: true});
+  const nextState = loadingReducer(state, Actions.gotGradesSuccess());
+  expect(nextState).toMatchObject({loadingGrades: false, gradesLoaded: true});
+});
+
+it('sets grades error', () => {
+  const state = initialState({loadingGrades: true});
+  const nextState = loadingReducer(state, Actions.gotGradesError({message: 'some error'}));
+  expect(nextState).toMatchObject({loadingGrades: false, gradesLoaded: false, gradesLoadingError: 'some error'});
 });

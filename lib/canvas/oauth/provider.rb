@@ -99,18 +99,18 @@ module Canvas::Oauth
       uri == OAUTH2_OOB_URI
     end
 
-    def self.confirmation_redirect(controller, provider, current_user)
+    def self.confirmation_redirect(controller, provider, current_user, real_user=nil)
       # skip the confirmation page if access is already (or automatically) granted
       if provider.authorized_token?(current_user)
-        final_redirect(controller, final_redirect_params(controller.session[:oauth2], current_user))
+        final_redirect(controller, final_redirect_params(controller.session[:oauth2], current_user, real_user))
       else
         controller.oauth2_auth_confirm_url
       end
     end
 
-    def self.final_redirect_params(oauth_session, current_user, options = {})
+    def self.final_redirect_params(oauth_session, current_user, real_user=nil, options = {})
       options = {:scopes => oauth_session[:scopes], :remember_access => options[:remember_access], :purpose => oauth_session[:purpose]}
-      code = Canvas::Oauth::Token.generate_code_for(current_user.global_id, oauth_session[:client_id], options)
+      code = Canvas::Oauth::Token.generate_code_for(current_user.global_id, real_user&.global_id, oauth_session[:client_id], options)
       redirect_params = { :code => code }
       redirect_params[:state] = oauth_session[:state] if oauth_session[:state]
       redirect_params

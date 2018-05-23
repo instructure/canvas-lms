@@ -148,8 +148,9 @@ a[class^=icon-] {
 // TODO: this is not the best place for this, we should probably have instructure-ui
 // handle it itself, but until instUI fixes it, flip all the left & right
 // instructure-icons arrows in RTL
+// example of things this flips: IconArrowRightSolid as well a IconExpandLeftLine
 @if $direction == 'rtl' {
-  svg[name^="IconArrow"] {
+  svg[name^="Icon"] {
     &[name*="Right"], &[name*="Left"] {
       transform: scale(-1, 1);
     }

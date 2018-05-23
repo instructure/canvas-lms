@@ -14,6 +14,7 @@
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "build": "./scripts/build",
+    "build:canvas": "./scripts/build",
     "build:dev": "NODE_ENV=development BABEL_ENV=production babel src --out-dir lib --ignore spec.js,test.js,demo.js --quiet",
     "build:lib": "BABEL_ENV=production babel src --out-dir lib --ignore spec.js,test.js,demo.js --quiet",
     "build:es": "BABEL_ENV=production ES_MODULES=1 babel src --out-dir es --ignore spec.js,test.js,demo.js --quiet",
@@ -39,8 +40,12 @@
   "author": "Instructure, Inc.",
   "license": "AGPL-3.0",
   "dependencies": {
+    "@instructure/ui-a11y": "^5.7.0",
     "@instructure/ui-core": "^4.8.0",
-    "@instructure/ui-toggle-details": "^5.0.0",
+    "@instructure/ui-forms": "^5.7.0",
+    "@instructure/ui-layout": "^5.7.0",
+    "@instructure/ui-themeable": "^5.7.0",
+    "@instructure/ui-toggle-details": "^5.7.0",
     "axios": "^0.16.0",
     "babel-plugin-inline-react-svg": "^0.4.0",
     "change-case": "^3.0.1",
@@ -52,7 +57,6 @@
     "instructure-icons": "^4.3.0",
     "keycode": "^2.1.9",
     "lodash": "^4",
-    "moment": "~2.10.6",
     "moment-timezone": "^0.5.13",
     "parse-link-header": "^1.0.1",
     "prop-types": "^15.5.9",
@@ -94,9 +98,13 @@
     "jest": "^22",
     "json-server": "^0.9.6",
     "lint-staged": "^3.4.0",
+    "mockdate": "^2.0.2",
     "moxios": "^0.4.0",
     "npm-run-all": "^4",
     "webpack": "^3"
+  },
+  "resolutions": {
+    "moment": "2.10.6"
   },
   "lint-staged": {
     "*.js": "eslint"

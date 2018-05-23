@@ -337,7 +337,8 @@ class Enrollment < ActiveRecord::Base
   end
 
   def should_update_user_account_association?
-    self.new_record? || self.saved_change_to_course_id? || self.saved_change_to_course_section_id? || self.saved_change_to_root_account_id?
+    self.id_before_last_save.nil? || self.saved_change_to_course_id? || self.saved_change_to_course_section_id? ||
+      self.saved_change_to_root_account_id? || being_restored?
   end
 
   def update_user_account_associations_if_necessary
@@ -825,7 +826,9 @@ class Enrollment < ActiveRecord::Base
     if result
       self.user.try(:update_account_associations)
       self.user.touch
-      scores.update_all(workflow_state: :deleted)
+      scores.update_all(updated_at: Time.zone.now, workflow_state: :deleted)
+
+      Assignment.remove_user_as_final_grader(user_id, course_id) if remove_user_as_final_grader?
     end
     result
   end
@@ -1424,11 +1427,21 @@ class Enrollment < ActiveRecord::Base
   def other_enrollment_of_same_type
     return @other_enrollment_of_same_type if defined?(@other_enrollment_of_same_type)
 
-    @other_enrollment_of_same_type = Enrollment.where(
+    @other_enrollment_of_same_type = other_enrollments_of_type(type).first
+  end
+
+  def other_enrollments_of_type(types)
+    Enrollment.where(
       course_id: course,
       user_id: user,
-      type: type
-    ).where.not(id: id, workflow_state: :deleted).first
+      type: Array.wrap(types)
+    ).where.not(id: id, workflow_state: :deleted)
+  end
+
+  def remove_user_as_final_grader?
+    instructor? &&
+      root_account.feature_enabled?(:anonymous_moderated_marking) &&
+      !other_enrollments_of_type(['TaEnrollment', 'TeacherEnrollment']).exists?
   end
 
   def being_restored?(to_state: workflow_state)

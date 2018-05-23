@@ -96,6 +96,7 @@ module Types
     value "deleted"
     value "rejected"
     value "completed"
+    value "inactive"
   end
 
   EnrollmentTypeType = GraphQL::EnumType.define do

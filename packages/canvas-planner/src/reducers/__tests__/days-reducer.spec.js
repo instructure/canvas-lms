@@ -50,26 +50,6 @@ describe('getting new items', () => {
       ['2017-04-29', [{id: 'fourth'}, {id: 'fifth'}]],
     ]);
   });
-
-  it ('fills in the blanks for missing days', () => {
-    const initialState = [];
-    const action = gotItemsSuccess([
-      { id: 'fourth', dateBucketMoment: moment.tz('2017-06-04', 'UTC') },
-      { id: 'seventh', dateBucketMoment: moment.tz('2017-06-07', 'UTC') },
-      { id: 'fifth', dateBucketMoment: moment.tz('2017-06-05', 'UTC') },
-      { id: 'first', dateBucketMoment: moment.tz('2017-06-01', 'UTC') },
-    ]);
-    const newState = daysReducer(initialState, action);
-    expect(newState).toMatchObject([
-      ['2017-06-01', [{id: 'first'}]],
-      ['2017-06-02', []],
-      ['2017-06-03', []],
-      ['2017-06-04', [{id: 'fourth'}]],
-      ['2017-06-05', [{id: 'fifth'}]],
-      ['2017-06-06', []],
-      ['2017-06-07', [{id: 'seventh'}]],
-    ]);
-  });
 });
 
 describe('saving planner items', () => {
@@ -199,4 +179,21 @@ describe('deleting planner items', () => {
     });
     expect(newState).toBe(initialState);
   });
+
+  it('removes the day if it winds up empty', () => {
+    const initialState = [
+      ['2017-04-27', [{id: '42'}, {id: '43'}]],
+      ['2017-04-28', [{id: '44'}]],
+      ['2017-04-29', [{id: '47'}, {id: '48'}]],
+    ];
+    const newState = daysReducer(initialState, {
+      type: 'DELETED_PLANNER_ITEM',
+      payload: {dateBucketMoment: moment.tz('2017-04-28', 'UTC'), id: '44'},
+    });
+    expect(newState).toMatchObject([
+      ['2017-04-27', [{id: '42'}, {id: '43'}]],
+      ['2017-04-29', [{id: '47'}, {id: '48'}]],
+    ]);
+  });
+
 });

@@ -18,8 +18,12 @@
 class MoveSamlEntityIdToAccount < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
+  class AuthenticationProvider < ActiveRecord::Base
+    self.table_name = 'account_authorization_configs'
+  end
+
   def up
-    AccountAuthorizationConfig::SAML.active.where.not(entity_id: nil).each do |ap|
+    AuthenticationProvider.where(workflow_state: 'active', auth_type: 'saml').where.not(entity_id: nil).each do |ap|
       ap.account.settings[:saml_entity_id] ||= ap.entity_id
       ap.account.save!
     end

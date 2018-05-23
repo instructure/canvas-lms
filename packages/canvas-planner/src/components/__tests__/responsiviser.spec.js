@@ -72,6 +72,9 @@ beforeAll(() => {
 afterAll(() => {
   resetWindow();
 });
+afterEach(() => {
+  jest.restoreAllMocks();
+});
 
 
 it('renders large', () => {
@@ -84,7 +87,6 @@ it('renders large', () => {
 });
 
 it('renders medium', () => {
-  debugger;
   const ResponsiveComponent = responsiviser()(SomeComponent);
   const wrapper = mount(<ResponsiveComponent/>);
   expect(wrapper).toMatchSnapshot();   // large

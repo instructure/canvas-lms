@@ -3290,6 +3290,7 @@ da:
     edit_planner_note: 
       calendar: "Kalender:"
       date: "Dato:"
+      time: "Tid:"
       title: "Overskrift:"
     end_before_start_error: "Starttidspunkt skal være før sluttidspunkt"
     ends_in_past_error: "Du kan ikke oprette et tidsrum til aftaler, som slutter i fortiden"
@@ -3500,6 +3501,7 @@ da:
   cannot_have_a_blueprint_course_with_students_248e3e76: "Kan ikke have et blueprint-fag med studerende"
   cannot_modify_fields_for_outcome_from_another_cont_dc001fe7: "Kan ikke ændre felter til læringsudbytte fra en anden kontekst: %{changes}"
   cannot_modify_outcome_from_another_context_changes_a80561a4: "Kan ikke ændre læringsudbyttet fra en anden kontekst: %{changes}; læringsudbytte skal ændres i %{context}"
+  cannot_move_assignments_due_to_closed_grading_peri_59fc3c4: "Kan ikke flytte opgaver på grund af lukkede karakterperioder"
   cannot_restrict_by_section_unless_groups_are_empty_662d3144: "Kan ikke begrænse pr. sektion medmindre grupper er tomme og ikke begrænset i størrelse"
   cannot_save_new_assignment_3bda0792: "kan ikke gemme ny opgave"
   cannot_set_only_visible_to_overrides_when_due_in_a_fac518ce: "Kan ikke indstille til kun synlig for tilsidesættelser, når den forfalder i en lukket karakterperiode"
@@ -5223,6 +5225,7 @@ da:
   course_quizzes_c337653c: "Fagets test"
   course_restore: 
     restore_error: "Der opstod en fejl under forsøget på at gendanne fagset. Faget blev ikke gendannet."
+  course_results_updated_df9d1c95: "Fagresultater opdateret."
   course_role_role_type_119c2f64: "Fag-rolle: %{role_type}"
   course_roles_1314f962: "Fagets roller"
   course_roster_78f70e97: Fagliste
@@ -5820,6 +5823,7 @@ da:
   courses_navigation_menu_b3638384: "Navigationsmenu for fag"
   courses_people_680bb173: "Fag og deltagere"
   create_132b3be1: Opret
+  create_a_64f6f82: "Opret en"
   create_a_developer_key_cabaa013: "Opret en udvikler-nøgle"
   create_a_new_account_4cf7c0f9: "Opret ny konto"
   create_a_new_module_6f31b0fe: "Opret et nyt modul"
@@ -6392,6 +6396,7 @@ da:
     vendor_code: "Leverandørkode (LTI 2):"
   developer_key_management_5a5866bd: "Håndtering af udvikler-nøgle"
   developer_key_management_ui_rewrite_26a9ee26: "Udvikler-nøgle håndtering UI-omskrivning"
+  developer_key_settings_889721f1: Udvikler-nøgleindstillinger
   developer_keys: 
     button: 
       saving: "Gemmer nøgle ..."
@@ -6418,6 +6423,7 @@ da:
     unnamed_tool: "Værktøj uden navn"
   developer_keys_d70ba44a: "Udvikler nøgler"
   developername_logo_88951d4: "%{developerName} Logo"
+  developers_keys_table_69ae6b7e: Udvikler-nøgletabel
   dialog_form_wrapper: 
     cancel: Annuller
     save_settings: "Gem indstillinger"
@@ -7712,6 +7718,7 @@ da:
     user_navigation_configured: "Brugernavigation konfigureret"
     wiki_page_menu_configured: "Wikiside menu konfigureret"
   external_url_e9b87215: "Ekstern URL"
+  extra_credit_not_permitted_on_outcomes_score_adjus_714dd746: "Ekstra kredit ikke tilladt for læringsudbytter, resultat justeret til maksimalt muligt for %{outcome}"
   extract_error_error_file_names_a4989ed0: "Uddrag fejl, %{error} : %{file_names}"
   extreme_critical_emergency_80b3dbda: "EKSTREMT KRITISK NØDSTILFÆLDE!"
   faculty_journal_5634938e: Undervisernotater
@@ -8927,6 +8934,7 @@ da:
   group_set_name_2aed2347: "Navn på gruppesæt"
   group_settings: 
     invitation_sent: "Invitation sendt"
+  group_weight_for_d46c5db4: "Vægtning af grupper for:"
   groups: 
     add_group: "Tilføj gruppe"
     add_group_category: 
@@ -9438,6 +9446,7 @@ da:
   i_agree_to_the_terms_of_use_18e16f0c: "Jeg er enig i *Betingelserne for brug*."
   i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: "Jeg accepterer *Betingelser for brug* og **datapolitikken**."
   i_agree_to_the_tool_s_270301a5: "Jeg er enig i værktøjets"
+  i_agree_to_the_tool_s_end_user_license_agreement_1ba71197: "Jeg er enig i værktøjets *Slutbrugeraftale.*"
   i_cannot_get_things_done_until_i_hear_back_from_yo_83ba46b7: "Jeg kan ikke gøre noget, før jeg hører fra dig"
   i_cb2f5130: i
   i_have_obtained_permission_to_use_this_file_6386f087: "Jeg har opnået tilladelse til at bruge denne fil."
@@ -9571,6 +9580,7 @@ da:
   inactive_enrollments_3b84be3d: "Inaktive tilmeldinger"
   inbox_bb245a60: Indbakke
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "Inkluder et link til et screencast/screenshot ved brug af f.eks. *Jing*"
+  include_byte_order_mark_in_gradebook_exports_d2ad0d4e: "Inkluder byterækkefølgemærke i karakteroversigt-eksporter"
   include_course_settings_c4c08764: "Inkluder fag-indstillinger"
   include_deleted_enrollments_1c87684a: "Inkluder slettede tilmeldinger"
   include_deleted_objects_3cced3b5: "Inkluder slettede objekter;"
@@ -9609,6 +9619,8 @@ da:
   information_7f11072: information
   information_816d9fa5: information
   information_icon_8a514faa: Informationsikon
+  inherited_d4d0bc33: Nedarvet
+  inherited_developer_keys_table_e4a65b67: "Nedarvet udvikler-nøgletabel"
   inner_box_background_6f9092f: "Baggrund for invendigt felt"
   inner_box_border_d0524b03: "Kant til indre felt"
   input_and_distribute_grades_for_students_display_g_95b9b6ee: |-
@@ -9711,6 +9723,7 @@ da:
   invalid_csv_file_grades_could_not_be_updated_4d5c120c: "Ugyldig CSV-fil. Karakterer kunne ikke opdateres."
   invalid_csv_file_grades_could_not_be_updated_6ebdeca4: "Ugyldig csv-fil, karakterer kunne ikke opdateres."
   invalid_date_or_invalid_datetime_for_attr_6661103f: "Ugyldig dato eller ugyldig dato og klokkeslæt for %{attr}"
+  invalid_datetime_for_graded_since_884cce5: "Ugyldig datetime for graded_since"
   invalid_datetime_for_submitted_since_a238f3a6: "Ugyldig datetime for submitted_since"
   invalid_field_type_61d31870: "Ugyldig %{field}: \"%{type}\""
   invalid_fields_after_ratings_fields_815ff223: "Ugyldige felter efter vurderinger: %{fields}"
@@ -10145,6 +10158,8 @@ da:
   lock_date_cannot_be_after_section_end_d37da70c: "Låsningsdato kan ikke ligge efter sektionens afslutning"
   lock_date_cannot_be_after_term_end_cf1a188f: "Låsningsdato kan ikke ligge efter semesterets afslutning"
   lock_date_cannot_be_before_due_date_ac30f54: "Låsningsdato kan ikke ligge før afleveringsdatoer"
+  lock_discussion_title_failed_9d49f2d: "Låsning af diskussion %{title} mislykkedes"
+  lock_discussion_title_succeeded_fb24ebfc: "Låsning af diskussion %{title} lykkedes"
   lock_icon_a9916601: "lås ikon"
   lock_questions_after_answering_5aecef9d: "Lås spørgsmål efter besvarelse"
   lock_selected_announcements_33740f80: "Lås valgte beskeder"
@@ -12540,6 +12555,7 @@ da:
     other: "Skal opnå opfyldelse af læringsmål mindst %{count} gange. Resultater for opfyldelse af læringsmål beregnes som gennemsnit for at nå frem til det endelige resultat."
   must_be_a_valid_number_59f0069: "Skal være et gyldigt tal"
   must_be_after_start_date_95e251a3: "skal være efter startdatoen"
+  must_be_between_availability_dates_ceaca984: "skal være mellem ledige datoer"
   must_be_on_or_after_end_date_e4dda631: "skal være på eller efter slutdato"
   must_belong_to_a_root_account_f84323f6: "skal tilhøre en rodkonto"
   must_belong_to_an_active_course_9711934: "skal tilhøre et aktivt fag"
@@ -12611,6 +12627,7 @@ da:
   name_is_too_long_48daa8db: "Navn er for langt"
   name_is_too_long_must_be_under_length_characters_b8dad44c: "Navn er for lang, skal være under %{length} tegn"
   name_is_unlocked_click_to_lock_b8b9a2c8: "%{name} er låst op. Klik for at låse."
+  name_missing_f4f3eb9e: "Navn mangler"
   name_only_5f56718e: "Kun navn"
   name_options_bc5c95ce: "%{name} Muligheder"
   name_unposted_current_score_e98e95fd: "%{name} ikke postet nuværende resultat"
@@ -12756,6 +12773,7 @@ da:
   no_unassigned_terms_deb7b76b: "Ingen utildelte betingelser"
   no_unresponsive_links_found_8ea497f9: "Ingen brudte link fundet"
   no_usage_rights_object_supplied_304b8d40: "Ikke oplyst objekt til 'usage_rights'"
+  no_user_98e6ccc4: "Ingen bruger"
   no_users_found_64a043ff: "Ikke fundet nogen brugere"
   no_users_were_selected_to_add_to_the_course_a51c6083: "Ingen brugere blev valgt til at tilføje til faget"
   no_way_to_export_gradebooks_provided_b4c2939d: "Der gives ingen måde at eksportere karakterbøger på!"
@@ -13216,6 +13234,7 @@ da:
   option_4_aec96b1f: "Mulighed 4"
   option_index_6308524d: "Mulighed %{index}"
   option_name_ba758e08: "%{option_name}"
+  optionally_include_a_byte_order_mark_in_gradebook__555cc605: "Indsæt eventuelt et byterækkefølgemærke i karakteroversigt-eksporterne, så de kan importeres til Excel for brugere i nogle lokaliteter."
   options: 
     ? "no"
     : Nej
@@ -14843,6 +14862,7 @@ da:
   quiz_submission_dca0c013: "Indsendelse af test"
   quiz_successfully_updated_ece5c63d: "Test blev opdateret"
   quiz_title_4b50ade9: Testoverskrift
+  quiz_title_quiz_type_report_type_report_9350daf7: "%{quiz_title} %{quiz_type} %{report_type} Rapport"
   quiz_type_be1633db: Testtype
   quizzes: 
     alerts: 
@@ -16672,6 +16692,7 @@ da:
         current_enrollments: "Aktuelle tilmeldinger"
         decrosslist_section: "Fjern denne sektions krydsliste."
   sections_94731e51: Sektioner
+  see_other_users_primary_email_address_59c8473f: "Se andre brugers primære e-mailadresse"
   see_rubric_results_62a6447d: "Se rubrik-resultater"
   see_scoring_details_f7fd1f3b: "Se detaljer om resultat"
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Se nogle LTI-værktøjer*, som fungerer fint med Canvas."
@@ -17568,6 +17589,7 @@ da:
   show_all_artifacts_34b91a83: "Vis alle genstande"
   show_all_details_9879980c: "Vis alle detaljer"
   show_all_developerkeyscount_keys_63ef34ca: "Vis alle %{developerKeysCount} nøgler"
+  show_all_keys_fa88c55c: "Vis alle nøgler"
   show_all_sections_190203e8: "Vis alle sektioner"
   show_and_hide_courses_menu_9e09d1d0: "Vis og skjul fagets menu"
   show_attendance_columns_4d160e16: "Vis fremmødekolonner"
@@ -18342,6 +18364,7 @@ da:
       kan tage et stykke tid for store fag. Du kan forlade
       siden, og så får du en meddelelse, når overførslen
       er afsluttet.
+  the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "Motoren, som behandler SIS-importen, er blevet omstruktureret for bedre at kunne håndtere store SIS-importers stabilitet. SIS-importernes funktionalitet er ikke blevet ændret."
   the_error_stack_trace_if_there_is_one_b7e008a1: "Fejlstakspor, hvis det findes"
   the_field_field_is_required_56512820: "Feltet \"%{field}\" er påkrævet"
   the_field_field_must_have_no_spaces_d1c2fc37: "Feltet \"%{field}\" må ikke have mellemrum"
@@ -18511,6 +18534,7 @@ da:
   this_enables_users_to_generate_and_download_course_4c69c531: "Dette giver brugere mulighed for at danne og downloade ePub."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Denne funktion kan ikke deaktiveres, fordi der er mindst en underkonto eller et fag med denne funktion aktiveret."
   this_feature_cannot_be_disabled_once_it_has_been_t_db7cc39e: "Denne funktion kan ikke deaktiveres, når den først er aktiveret."
+  this_feature_enables_users_of_right_to_left_rtl_la_17bd0fae: "Denne funktion gør det muligt for brugere af højre-til-venstre-sprog (RTL) at se RTL-layoutet under udvikling. Dette bliver med tiden standardadfærd, og denne mulighed fjernes."
   this_feature_flag_is_something_an_account_can_turn_8467f6f7: "Dette funktionsflag er noget, en konto kan tænde, hvis de vil tillade brugerne af deres konto at bruge sprog, der normalt skrives fra højre til venstre (fx: arabisk, hebraisk, persisk) for at se højre-til-venstre-layoutet, mens vi arbejder på det. Når funktionen er \"klar\", vil dette funktionsflag gå væk, og alle, der taler et af disse sprog, vil altid se højre-til-venstre-grænsefladen."
   this_field_is_required_fa58c4a: "Dette felt er påkrævet"
   this_field_name_is_required_988caebc: "Dette felt \"%{name}\" er påkrævet."
@@ -18857,8 +18881,10 @@ da:
   to_date_cannot_come_before_from_date_3eeb2633: "Til dato må ikke være før Fra dato"
   to_do_1d554f36: Opgaveliste
   to_do_5526f10a: "Opgaveliste:"
+  to_do_date_ddfb582c: "Opgaveliste dato:"
   to_do_items_loading_d1cdfcd5: "Elementer i opgaveliste indlæses"
   to_do_list_dashboard_d741f64e: "Oversigt over opgaveliste"
+  to_do_time_a7e17623: "Opgaveliste tid:"
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Begynd med at indtaste den studerendes navn nedenfor for at finde dem, og klik så på Opdater for at linke fag-observatøren *%{name}* til en studerende."
   to_minscore_43e5452e: "til %{minScore}%"
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Træk en diskussion her eller vælg Fastgør fra indstillingsmenuen til diskussioner for at fastgøre en diskussion til toppen af siden."
@@ -18901,6 +18927,7 @@ da:
   total_options_351e2682: "I alt muligheder"
   total_range_45c8549a: "Samlet omfang"
   total_results_outcomedetails_cnt_30ff1f8d: "Samlede resultater: %{outcomeDetails.cnt}"
+  totalcount_total_replies_b6988c0a: "%{totalCount} samlede svar"
   tours: 
     quiz_regrade: 
       got_it: "Ok, forstået"
@@ -19000,6 +19027,8 @@ da:
   unlock_date_cannot_be_before_course_start_9c7b8524: "Oplåsningsdato kan ikke ligge før fagets start"
   unlock_date_cannot_be_before_section_start_793ddc66: "Oplåsningsdato kan ikke ligge før sektionens start"
   unlock_date_cannot_be_before_term_start_d3c01813: "Oplåsningsdato kan ikke ligge før semesterstart"
+  unlock_discussion_title_failed_42a4252f: "Oplåsning af diskussion %{title} mislykkedes"
+  unlock_discussion_title_succeeded_cd97847c: "Oplåsning af diskussion %{title} lykkedes"
   unlock_f6196bf5: "Lås op"
   unlock_module_on_date_17144fbd: "Lås modul op på datoen"
   unlock_selected_announcements_37485f05: "Lås markerede meddelelser op"
@@ -19009,6 +19038,8 @@ da:
   unmatched_login_list_283ca77: "Login-liste uden match"
   unmute_assignment_29a49038: "Offentliggør opgave"
   unnamed_account_id_e688ad87: "Konto uden navn (%{id})"
+  unnamed_tool_961cb95b: "Værktøj uden navn"
+  unnamed_tool_logo_410f37d0: "Værktøjslogo uden navn"
   unpin_a318452a: Frigør
   unpin_discussion_title_8c2a0942: "Frigør diskussion %{title}"
   unpin_of_discussion_title_failed_852116d4: "Frigørelse af diskussion %{title} mislykkedes"
@@ -19033,6 +19064,7 @@ da:
   unpublished_dfd8801: "Ikke offentliggjort"
   unpublishing_1fa99dc6: "Fjerner offentliggørelse ..."
   unread_e9c1b19c: Ulæst
+  unreadcount_unread_replies_509e167f: "%{unreadCount} ulæste svar"
   unregister_service_985238e9: "Annuller tjenestens registrering"
   unreserved_e86b7425: "Ikke reserveret"
   unsafe_file_link_8a18eceb: "usikkert fillink"
@@ -19290,6 +19322,7 @@ da:
       profile: Profil
       settings: Indstillinger
   user_profile_picture_46bffbc7: "Billede til brugerprofil"
+  user_results_updated_9ce38dce: "Brugerresultater opdateret."
   user_s_settings_d65644b4: "%{user}s indstillinger"
   user_search_panel_18f80511: "Brugerens søgepanel"
   user_search_results_f5445b8b: "Brugerens søgeresultater"
@@ -19614,6 +19647,7 @@ da:
   view_grades_for_name_45aeb2f2: "Vis karakterer for %{name}"
   view_grading_history_e64bb8fe: "Vis karakterhistorik"
   view_in_speedgrader_773b9d81: "Vis i SpeedGrader"
+  view_login_ids_for_users_142bbe7a: "Se brugeres login-ID’er"
   view_longer_description_6b762087: "vis længere beskrivelse"
   view_name_app_62a2ad8e: "Vis %{name} app"
   view_next_file_a8a4a885: "Vis næste fil"

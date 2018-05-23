@@ -19,6 +19,8 @@ define [
   'jquery'
   'underscore'
   'Backbone'
+  'react'
+  'react-dom'
   '../backbone-ext/DefaultUrlMixin'
   '../models/TurnitinSettings'
   '../models/VeriCiteSettings'
@@ -27,10 +29,13 @@ define [
   '../collections/DateGroupCollection'
   'i18n!assignments'
   'jsx/grading/helpers/GradingPeriodsHelper'
+  'jsx/assignments/ModeratedGradingFormFieldGroup.js'
   'timezone'
   'jsx/shared/helpers/numberHelper'
-], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, VeriCiteSettings, DateGroup, AssignmentOverrideCollection,
-    DateGroupCollection, I18n, GradingPeriodsHelper, tz, numberHelper) ->
+  '../util/PandaPubPoller'
+], ($, _, {Model}, React, ReactDOM, DefaultUrlMixin, TurnitinSettings, VeriCiteSettings, DateGroup,
+    AssignmentOverrideCollection, DateGroupCollection, I18n, GradingPeriodsHelper, ModeratedGradingFormFieldGroup,
+    tz, numberHelper, PandaPubPoller) ->
 
   isAdmin = () ->
     _.contains(ENV.current_user_roles, 'admin')
@@ -196,9 +201,9 @@ define [
       return @get 'post_to_sis' unless arguments.length > 0
       @set 'post_to_sis', postToSisBoolean
 
-    moderatedGrading: (moderatedGradingBoolean) =>
-      return @get 'moderated_grading' unless arguments.length > 0
-      @set 'moderated_grading', moderatedGradingBoolean
+    moderatedGrading: (enabled) =>
+      return @get('moderated_grading') or false unless arguments.length > 0
+      @set('moderated_grading', enabled)
 
     anonymousInstructorAnnotations: (anonymousInstructorAnnotationsBoolean) =>
       return @get 'anonymous_instructor_annotations' unless arguments.length > 0
@@ -550,9 +555,30 @@ define [
       $.ajaxJSON "/api/v1/courses/#{course_id}/assignments/#{assignment_id}/duplicate", 'POST',
         {}, callback
 
+    pollUntilFinishedDuplicating: (interval = 3000) =>
+      # TODO: implement pandapub streaming updates
+      poller = new PandaPubPoller interval, interval * 5, (done) =>
+        @fetch().always =>
+          done()
+          poller.stop() unless @isDuplicating()
+      poller.start()
+
     isOnlyVisibleToOverrides: (override_flag) ->
       return @get('only_visible_to_overrides') || false unless arguments.length > 0
       @set 'only_visible_to_overrides', override_flag
 
     isRestrictedByMasterCourse: ->
       @get('is_master_course_child_content') && @get('restricted_by_master_course')
+
+    renderModeratedGradingFormFieldGroup: ->
+      props =
+        currentGraderCount: @get('grader_count')
+        finalGraderID: @get('final_grader_id')
+        moderatedGradingEnabled: @moderatedGrading()
+        availableModerators: ENV.AVAILABLE_MODERATORS
+        maxGraderCount: ENV.MODERATED_GRADING_MAX_GRADER_COUNT
+        locale: ENV.LOCALE
+
+      formFieldGroup = React.createElement(ModeratedGradingFormFieldGroup, props)
+      mountPoint = document.querySelector("[data-component='ModeratedGradingFormFieldGroup']")
+      ReactDOM.render(formFieldGroup, mountPoint)

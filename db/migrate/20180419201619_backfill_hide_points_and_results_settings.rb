@@ -20,14 +20,6 @@ class BackfillHidePointsAndResultsSettings < ActiveRecord::Migration[5.1]
   tag :postdeploy
 
   def up
-    DataFixup::BackfillNulls.send_later_if_production_enqueue_args(
-      :run,
-      {priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups'},
-      RubricAssociation,
-      {
-        hide_points: false,
-        hide_outcome_results: false
-      }
-    )
+    DataFixup::BackfillNulls.run(RubricAssociation, [:hide_points, :hide_outcome_results], default_value: false)
   end
 end

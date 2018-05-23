@@ -195,6 +195,7 @@ test('renders the StatusesModal', function () {
     'arrangeColumnsBy',
     'renderGradebookSettingsModal',
     'renderSettingsButton',
+    'renderAnonymousSpeedGraderAlert',
     'updatePostGradesFeatureButton',
     'initPostGradesStore',
   ].forEach(fn => this.stub(gradebook, fn));
@@ -5955,6 +5956,7 @@ QUnit.module('Gradebook#updateCurrentGradingPeriod', {
     this.stub(this.gradebook, 'sortGridRows');
     this.stub(this.gradebook, 'updateFilteredContentInfo');
     this.stub(this.gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+    this.stub(this.gradebook, 'renderActionMenu');
   },
 
   teardown () {
@@ -6005,6 +6007,11 @@ test('has no effect when the grading period has not changed', function () {
   strictEqual(this.gradebook.updateFilteredContentInfo.callCount, 0, 'setAssignmentVisibility was not called');
   strictEqual(this.gradebook.updateColumnsAndRenderViewOptionsMenu.callCount, 0,
     'updateColumnsAndRenderViewOptionsMenu was not called');
+});
+
+test('renders the action menu', function () {
+  this.gradebook.updateCurrentGradingPeriod('1401');
+  strictEqual(this.gradebook.renderActionMenu.callCount, 1)
 });
 
 QUnit.module('Gradebook#updateCurrentModule', {
@@ -6248,7 +6255,15 @@ QUnit.module('Gradebook', () => {
         export_gradebook_csv_url: 'http://example.com/export',
         gradebook_import_url: 'http://example.com/import',
         post_grades_feature: false,
-        publish_to_sis_enabled: false
+        publish_to_sis_enabled: false,
+        grading_period_set: {
+          id: '1501',
+          grading_periods: [
+            { id: '701' },
+            { id: '702' }
+          ],
+        },
+        current_grading_period_id: '702'
       };
     });
 
@@ -6268,6 +6283,12 @@ QUnit.module('Gradebook', () => {
       const gradebook = createGradebook(options);
       const props = gradebook.getActionMenuProps();
       strictEqual(props.publishGradesToSis.isEnabled, false);
+    });
+
+    test('sets gradingPeriodId', () => {
+      const gradebook = createGradebook(options);
+      const props = gradebook.getActionMenuProps();
+      strictEqual(props.gradingPeriodId, '702');
     });
   });
 
@@ -6322,6 +6343,7 @@ QUnit.module('Gradebook', () => {
       sinon.stub(gradebook, 'updateFilteredContentInfo')
       sinon.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
       sinon.stub(gradebook, 'renderViewOptionsMenu')
+      sinon.stub(gradebook, 'renderActionMenu')
     })
 
     hooks.afterEach(() => {
@@ -6953,6 +6975,19 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
     ReactDOM.unmountComponentAtNode(node);
     $fixtures.innerHTML = '';
     moxios.uninstall();
+  });
+
+  test('anonymousModeratedMarkingEnabled is true when options.anonymous_moderated_marking_enabled is true', function () {
+    gradebook.options.anonymous_moderated_marking_enabled = true
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
+    strictEqual(props.anonymousModeratedMarkingEnabled, true);
+  });
+
+  test('anonymousModeratedMarkingEnabled is false when options.anonymous_moderated_marking_enabled is false', function () {
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
+    strictEqual(props.anonymousModeratedMarkingEnabled, false);
   });
 
   test('gradingDisabled is true when the submission state is locked', function () {
@@ -8925,6 +8960,114 @@ QUnit.module('#renderGradebookSettingsModal', (hooks) => {
     gradebook = createGradebook({ locale: 'de' });
     gradebook.renderGradebookSettingsModal();
     strictEqual(gradebookSettingsModalProps().locale, 'de');
+  });
+});
+
+QUnit.module('Gradebook#renderAnonymousSpeedGraderAlert', (hooks) => {
+  let gradebook;
+  const onClose = () => {}
+  const alertProps = {
+    speedGraderUrl: 'http://test.url:3000',
+    onClose
+  };
+
+  function anonymousSpeedGraderAlertProps () {
+    return ReactDOM.render.firstCall.args[0].props;
+  }
+
+  hooks.beforeEach(() => {
+    sinon.stub(ReactDOM, 'render');
+  });
+
+  hooks.afterEach(() => {
+    ReactDOM.render.restore();
+  });
+
+  test('renders the AnonymousSpeedGraderAlert component', function () {
+    gradebook = createGradebook();
+    gradebook.renderAnonymousSpeedGraderAlert(alertProps);
+    const componentName = ReactDOM.render.firstCall.args[0].type.name;
+    strictEqual(componentName, 'AnonymousSpeedGraderAlert');
+  });
+
+  test('passes speedGraderUrl to the modal as a prop', function () {
+    gradebook = createGradebook();
+    gradebook.renderAnonymousSpeedGraderAlert(alertProps);
+    strictEqual(anonymousSpeedGraderAlertProps().speedGraderUrl, 'http://test.url:3000');
+  });
+
+  test('passes onClose to the modal as a prop', function () {
+    gradebook = createGradebook();
+
+    gradebook.renderAnonymousSpeedGraderAlert(alertProps)
+    strictEqual(anonymousSpeedGraderAlertProps().onClose, onClose);
+  });
+});
+
+QUnit.module('Gradebook#showAnonymousSpeedGraderAlertForURL', (hooks) => {
+  let gradebook;
+
+  function anonymousSpeedGraderAlertProps () {
+    return gradebook.renderAnonymousSpeedGraderAlert.firstCall.args[0];
+  }
+
+  hooks.beforeEach(() => {
+    $fixtures.innerHTML = `
+      <div id="application">
+        <div id="wrapper">
+          <div data-component='AnonymousSpeedGraderAlert'></div>
+        </div>
+      </div>
+    `;
+  });
+
+  hooks.afterEach(() => {
+    $fixtures.innerHTML = '';
+  });
+
+  test('renders the alert with the supplied speedGraderURL', function () {
+    gradebook = createGradebook();
+
+    sinon.spy(gradebook, 'renderAnonymousSpeedGraderAlert');
+    gradebook.showAnonymousSpeedGraderAlertForURL('http://test.url:3000');
+
+    strictEqual(anonymousSpeedGraderAlertProps().speedGraderUrl, 'http://test.url:3000');
+    gradebook.renderAnonymousSpeedGraderAlert.restore();
+  });
+});
+
+QUnit.module('Gradebook#hideAnonymousSpeedGraderAlert', (hooks) => {
+  let gradebook;
+
+  hooks.beforeEach(() => {
+    $fixtures.innerHTML = `
+      <div id="application">
+        <div id="wrapper">
+          <div data-component='AnonymousSpeedGraderAlert'></div>
+        </div>
+      </div>
+    `;
+
+    sinon.stub(ReactDOM, 'unmountComponentAtNode');
+  });
+
+  hooks.afterEach(() => {
+    ReactDOM.unmountComponentAtNode.restore();
+
+    $fixtures.innerHTML = '';
+  });
+
+  test('unmounts the component at the alert mount point', function () {
+    const clock = sinon.useFakeTimers();
+    gradebook = createGradebook();
+    gradebook.hideAnonymousSpeedGraderAlert();
+
+    // allow the component to unmount (which is handled via a delayed call)
+    clock.tick(0);
+
+    const mountPoint = ReactDOM.unmountComponentAtNode.firstCall.args[0];
+    strictEqual(mountPoint.dataset.component, 'AnonymousSpeedGraderAlert');
+    clock.restore();
   });
 });
 

@@ -89,6 +89,16 @@ describe "Api::V1::Assignment" do
 
         expect(json['submissions_download_url']).to eq "/course/#{@course.id}/assignment/#{assignment.id}/submissions?zip=1"
       end
+
+      it "optionally includes 'grades_published' for moderated assignments" do
+        json = api.assignment_json(assignment, user, session, {include_grades_published: true})
+        expect(json["grades_published"]).to eq(true)
+      end
+
+      it "excludes 'grades_published' by default" do
+        json = api.assignment_json(assignment, user, session)
+        expect(json).not_to have_key "grades_published"
+      end
     end
 
     context "for a quiz" do

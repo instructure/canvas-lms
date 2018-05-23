@@ -18,11 +18,11 @@
 class FixEmptyHostedDomainForGoogle < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
-  def self.up
-    DataFixup::SetEmptyGoogleHostedDomainToNull.send_later_if_production_enqueue_args(
-      :run, { priority: Delayed::LOWER_PRIORITY, max_attempts: 1 })
+  class AuthenticationProvider < ActiveRecord::Base
+    self.table_name = 'account_authorization_configs'
   end
 
-  def self.down
+  def self.up
+    AuthenticationProvider.where(auth_type: 'google', auth_filter: '').update_all(auth_filter: nil)
   end
 end

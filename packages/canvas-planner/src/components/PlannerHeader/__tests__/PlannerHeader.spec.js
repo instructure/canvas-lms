@@ -35,6 +35,7 @@ function defaultProps (options) {
     deletePlannerItem: () => {},
     dismissOpportunity: () => {},
     clearUpdateTodo: () => {},
+    startLoadingGradesSaga: () => {},
     ariaHideElement: document.createElement('div'),
     loading: {
       allPastItemsLoaded: false,
@@ -45,6 +46,8 @@ function defaultProps (options) {
       futureNextUrl: null,
       pastNextUrl: null,
       seekingNewActivity: false,
+      loadingGrades: false,
+      gradesLoaded: false,
     },
     todo: {
       updateTodoItem: null
@@ -53,7 +56,17 @@ function defaultProps (options) {
   };
 }
 
-it('renders the base component correctly with two buttons and a tray', () => {
+// These are terrible, but the property selectors weren't working for me
+// (even though the children property apparently works)
+function findEditTray (wrapper) {
+  return wrapper.find('Tray').at(0);
+}
+
+function findGradesTray (wrapper) {
+  return wrapper.find('Tray').at(1);
+}
+
+it('renders the base component correctly with buttons and trays', () => {
   const wrapper = shallow(
     <PlannerHeader {...defaultProps()} />
   );
@@ -66,9 +79,9 @@ it('toggles the new item tray', () => {
   );
   const button = wrapper.find('[children="Add To Do"]');
   button.simulate('click');
-  expect(wrapper.find('Tray').props().open).toEqual(true);
+  expect(findEditTray(wrapper).props().open).toEqual(true);
   button.simulate('click');
-  expect(wrapper.find('Tray').props().open).toEqual(false);
+  expect(findEditTray(wrapper).props().open).toEqual(false);
 });
 
 it('sends focus back to the add new item button', () => {
@@ -121,7 +134,7 @@ it('renders the tray with the name of an existing item when provided', () => {
   const wrapper = shallow(
     <PlannerHeader {...defaultProps({todo: {updateTodoItem: {title: 'abc'}}})} />
   );
-  expect(wrapper.find('Tray').prop('label')).toBe('Edit abc');
+  expect(findEditTray(wrapper).prop('label')).toBe('Edit abc');
 });
 
 it('calls clearUpdateTodo when closing the tray', () => {
@@ -309,13 +322,13 @@ it('edits new item in open tray', () => {
 
   // edit a PlannerItem
   wrapper.setProps({...defaultProps({todo: {updateTodoItem: todo1}})});
-  expect(wrapper.find('Tray').prop('open')).toEqual(true);
+  expect(findEditTray(wrapper).prop('open')).toEqual(true);
   expect(wrapper.find('UpdateItemTray').prop('noteItem')).toEqual(todo1);
   expect(openEditingPlannerItem).toHaveBeenCalledTimes(1);
 
   // edit another PlannerItem in open tray
   wrapper.setProps({...defaultProps({todo: {updateTodoItem: todo2}})});
-  expect(wrapper.find('Tray').props().open).toEqual(true);
+  expect(findEditTray(wrapper).props().open).toEqual(true);
   expect(wrapper.find('UpdateItemTray').prop('noteItem')).toEqual(todo2);
   expect(openEditingPlannerItem).toHaveBeenCalledTimes(2);
 });
@@ -343,5 +356,49 @@ it('leaves the tray in current open state when receiving new empty todo props', 
   );
   wrapper.instance().toggleUpdateItemTray();
   wrapper.setProps({...defaultProps({todo: {}})});
-  expect(wrapper.find('Tray').prop('open')).toBe(true);
+  expect(findEditTray(wrapper).prop('open')).toBe(true);
+});
+
+it('toggles the grades tray', () => {
+  const wrapper = mount(
+    <PlannerHeader {...defaultProps()} />
+  );
+  const button = wrapper.find('[children="Show My Grades"]');
+  button.simulate('click');
+  expect(findGradesTray(wrapper).props().open).toEqual(true);
+  button.simulate('click');
+  expect(findGradesTray(wrapper).props().open).toEqual(false);
+});
+
+it('calls startLoadingGradesSaga when grades are not loaded and the grades tray opens', () => {
+  const props = defaultProps();
+  props.startLoadingGradesSaga = jest.fn();
+  const wrapper = shallow(<PlannerHeader {...props} />);
+  wrapper.instance().toggleGradesTray();
+  expect(props.startLoadingGradesSaga).toHaveBeenCalled();
+});
+
+it('passes loading to the GradesDisplay when grades are loading', () => {
+  const props = defaultProps();
+  props.loading.loadingGrades = true;
+  const wrapper = shallow(<PlannerHeader {...props} />);
+  expect(wrapper.find('GradesDisplay').prop('loading')).toBe(true);
+});
+
+it('does not start the grades saga when grades are loading', () => {
+  const props = defaultProps();
+  props.loading.loadingGrades = true;
+  props.startLoadingGradesSaga = jest.fn();
+  const wrapper = shallow(<PlannerHeader {...props} />);
+  wrapper.instance().toggleGradesTray();
+  expect(props.startLoadingGradesSaga).not.toHaveBeenCalled();
+});
+
+it('does not start the grades saga when grades have been loaded', () => {
+  const props = defaultProps();
+  props.loading.gradesLoaded = true;
+  props.startLoadingGradesSaga = jest.fn();
+  const wrapper = shallow(<PlannerHeader {...props} />);
+  wrapper.instance().toggleGradesTray();
+  expect(props.startLoadingGradesSaga).not.toHaveBeenCalled();
 });

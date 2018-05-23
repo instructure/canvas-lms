@@ -19,6 +19,5 @@ class ScoreStatistic < ApplicationRecord
   belongs_to :assignment
 
   validates :assignment, :maximum, :minimum, :mean, :count, presence: true
-  validates :assignment, uniqueness: true
   validates :maximum, :minimum, :mean, :count, numericality: true
 end

@@ -50,7 +50,10 @@ class AssignmentsController < ApplicationController
       # It'd be nice to do this as an after_create, but it's not that simple
       # because of course import/copy.
       @context.require_assignment_group
-      set_js_assignment_data # in application_controller.rb, because the assignments page can be shared with the course home
+
+      set_js_assignment_data(
+        include_assignment_permissions: @context.root_account.feature_enabled?(:anonymous_moderated_marking)
+      )
 
       set_tutorial_js_env
       hash = {
@@ -169,7 +172,8 @@ class AssignmentsController < ApplicationController
       respond_to do |format|
         format.html do
           render locals: {
-            eula_url: tool_eula_url
+            eula_url: tool_eula_url,
+            show_moderation_link: @assignment.moderated_grading? && @assignment.permits_moderation?(@current_user)
           }
         end
         format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}) }
@@ -182,32 +186,32 @@ class AssignmentsController < ApplicationController
 
     raise ActiveRecord::RecordNotFound unless @assignment.moderated_grading? && @assignment.published?
 
-    if authorized_action(@context, @current_user, :moderate_grades)
-      add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
-      add_crumb(t('Moderate'))
+    render_unauthorized_action and return unless @assignment.permits_moderation?(@current_user)
 
-      can_edit_grades = @context.grants_right?(@current_user, :manage_grades)
-      js_env({
-        ASSIGNMENT_TITLE: @assignment.title,
-        GRADES_PUBLISHED: @assignment.grades_published?,
-        COURSE_ID: @context.id,
-        STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards),
-        PERMISSIONS: {
-          view_grades: can_edit_grades || @context.grants_right?(@current_user, :view_all_grades),
-          edit_grades: can_edit_grades
-        },
-        URLS: {
-          student_submissions_url: polymorphic_url([:api_v1, @context, @assignment, :submissions]) + "?include[]=user_summary&include[]=provisional_grades",
-          publish_grades_url: api_v1_publish_provisional_grades_url({course_id: @context.id, assignment_id: @assignment.id}),
-          list_gradeable_students: api_v1_course_assignment_gradeable_students_url({course_id: @context.id, assignment_id: @assignment.id}) + "?include[]=provisional_grades&per_page=50",
-          add_moderated_students: api_v1_add_moderated_students_url({course_id: @context.id, assignment_id: @assignment.id}),
-          assignment_speedgrader_url: speed_grader_course_gradebook_url({course_id: @context.id, assignment_id: @assignment.id}),
-          provisional_grades_base_url: polymorphic_url([:api_v1, @context, @assignment]) + "/provisional_grades"
-        }})
+    add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
+    add_crumb(t('Moderate'))
 
-      respond_to do |format|
-        format.html { render }
-      end
+    can_edit_grades = @context.grants_right?(@current_user, :manage_grades)
+    js_env({
+      ASSIGNMENT_TITLE: @assignment.title,
+      GRADES_PUBLISHED: @assignment.grades_published?,
+      COURSE_ID: @context.id,
+      STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards),
+      PERMISSIONS: {
+        view_grades: can_edit_grades || @context.grants_right?(@current_user, :view_all_grades),
+        edit_grades: can_edit_grades
+      },
+      URLS: {
+        student_submissions_url: polymorphic_url([:api_v1, @context, @assignment, :submissions]) + "?include[]=user_summary&include[]=provisional_grades",
+        publish_grades_url: api_v1_publish_provisional_grades_url({course_id: @context.id, assignment_id: @assignment.id}),
+        list_gradeable_students: api_v1_course_assignment_gradeable_students_url({course_id: @context.id, assignment_id: @assignment.id}) + "?include[]=provisional_grades&per_page=50",
+        add_moderated_students: api_v1_add_moderated_students_url({course_id: @context.id, assignment_id: @assignment.id}),
+        assignment_speedgrader_url: speed_grader_course_gradebook_url({course_id: @context.id, assignment_id: @assignment.id}),
+        provisional_grades_base_url: polymorphic_url([:api_v1, @context, @assignment]) + "/provisional_grades"
+      }})
+
+    respond_to do |format|
+      format.html { render }
     end
   end
 
@@ -472,17 +476,20 @@ class AssignmentsController < ApplicationController
 
       post_to_sis = Assignment.sis_grade_export_enabled?(@context)
       hash = {
+        ANONYMOUS_MODERATED_MARKING_ENABLED: @context.root_account.feature_enabled?(:anonymous_moderated_marking),
         ASSIGNMENT_GROUPS: json_for_assignment_groups,
         ASSIGNMENT_INDEX_URL: polymorphic_url([@context, :assignments]),
         ASSIGNMENT_OVERRIDES: assignment_overrides_json(
           @assignment.overrides_for(@current_user, ensure_set_not_empty: true),
           @current_user
         ),
+        AVAILABLE_MODERATORS: @assignment.available_moderators.map { |user| { name: user.name, id: user.id } },
         COURSE_ID: @context.id,
         GROUP_CATEGORIES: group_categories,
         HAS_GRADED_SUBMISSIONS: @assignment.graded_submissions_exist?,
         KALTURA_ENABLED: !!feature_enabled?(:kaltura),
         HAS_GRADING_PERIODS: @context.grading_periods?,
+        MODERATED_GRADING_MAX_GRADER_COUNT: @assignment.moderated_grading_max_grader_count,
         PLAGIARISM_DETECTION_PLATFORM: Lti::ToolProxy.capability_enabled_in_context?(
           @assignment.course,
           Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2

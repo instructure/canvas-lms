@@ -57,7 +57,7 @@ describe "external tool buttons" do
 
     expect(f("#external_tool_button_dialog")).to be_displayed
 
-    in_frame('external_tool_button_frame') do
+    in_frame('external_tool_button_frame', element) do
       f(element).click
     end
     expect(f("body")).not_to contain_jqcss("#external_tool_button_dialog:visible")

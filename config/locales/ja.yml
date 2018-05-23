@@ -2597,8 +2597,8 @@ ja:
         assigned_peer_reviews: "割り当てられたピア レビュー"
         comments: "コメント:"
         submission: 提出
-        submission_not_turned_in: 提出されていません!
-        submission_turned_in: 提出されました!
+        submission_not_turned_in: 未提出です！
+        submission_turned_in: 提出しました！
     submission_types_form: 
       advanced_turnitin_settings: "Turnitin の詳細設定"
       advanced_vericite_settings: 上級VeriCite設定
@@ -3291,6 +3291,7 @@ ja:
     edit_planner_note: 
       calendar: "カレンダー:"
       date: "日付:"
+      time: 時間：
       title: タイトル：
     end_before_start_error: 開始時刻は終了時刻より前である必要があります
     ends_in_past_error: 過去の日時に終了する予定スロットは作成できません
@@ -3501,6 +3502,7 @@ ja:
   cannot_have_a_blueprint_course_with_students_248e3e76: 受講者とブループリントコースを持つことはできません
   cannot_modify_fields_for_outcome_from_another_cont_dc001fe7: "他のコンテクストから結果のフィールドを変更することはできません：%{changes}"
   cannot_modify_outcome_from_another_context_changes_a80561a4: "他のコンテクストから結果を変更することはできません：%{changes}; 結果は次のように変更しなければなりません。%{context}"
+  cannot_move_assignments_due_to_closed_grading_peri_59fc3c4: 採点期間終了のため、割り当てを移動できません
   cannot_restrict_by_section_unless_groups_are_empty_662d3144: グループが空欄であり、サイズに制限がない場合を除き、セクションを制限できません
   cannot_save_new_assignment_3bda0792: 新しい課題を保存できません
   cannot_set_only_visible_to_overrides_when_due_in_a_fac518ce: 終了した採点期間の締め切り後に、表示されているものだけを上書きするよう設定することはできません
@@ -5218,6 +5220,7 @@ ja:
   course_quizzes_c337653c: "コース クイズ"
   course_restore: 
     restore_error: コースを復元する際にエラーが発生しました。コースは復元されませんでした。
+  course_results_updated_df9d1c95: コースの結果が更新されました。
   course_role_role_type_119c2f64: "コースの役割: %{role_type}"
   course_roles_1314f962: コースの役割
   course_roster_78f70e97: コース名簿
@@ -5815,6 +5818,7 @@ ja:
   courses_navigation_menu_b3638384: コースナビゲーションメニュー
   courses_people_680bb173: コース＆ピープル
   create_132b3be1: 作成
+  create_a_64f6f82: （）を作成する
   create_a_developer_key_cabaa013: 開発者鍵を作成する
   create_a_new_account_4cf7c0f9: "新規 アカウントの作成"
   create_a_new_module_6f31b0fe: 新しいモジュールを作成する
@@ -6383,6 +6387,7 @@ ja:
     vendor_code: "ベンダーコード (LTI 2):"
   developer_key_management_5a5866bd: 開発者キー管理
   developer_key_management_ui_rewrite_26a9ee26: 開発者キー管理UIの書き換え
+  developer_key_settings_889721f1: 開発者キーの設定
   developer_keys: 
     button: 
       saving: 鍵を保存しています...
@@ -6409,6 +6414,7 @@ ja:
     unnamed_tool: 名前のないツール
   developer_keys_d70ba44a: 開発者鍵
   developername_logo_88951d4: "%{developerName}ロゴ"
+  developers_keys_table_69ae6b7e: 開発者キーの表
   dialog_form_wrapper: 
     cancel: キャンセル
     save_settings: 設定の保存
@@ -7706,6 +7712,7 @@ ja:
     user_navigation_configured: ユーザのナビゲーションが構成されました
     wiki_page_menu_configured: "Wiki ページ メニューが設定されました"
   external_url_e9b87215: "外部 Url"
+  extra_credit_not_permitted_on_outcomes_score_adjus_714dd746: "結果に余分なクレジットは認められません。スコアは（）の最大可能のものに調整されています%{outcome}"
   extract_error_error_file_names_a4989ed0: "抽出エラー、%{error}：%{file_names}"
   extreme_critical_emergency_80b3dbda: 極めて重要な緊急事態
   faculty_journal_5634938e: 講師日誌
@@ -8921,6 +8928,7 @@ ja:
   group_set_name_2aed2347: "グループ セット名"
   group_settings: 
     invitation_sent: 招待が送信されました
+  group_weight_for_d46c5db4: グループの比重：
   groups: 
     add_group: グループの追加
     add_group_category: 
@@ -9429,6 +9437,7 @@ ja:
   i_agree_to_the_terms_of_use_18e16f0c: 私は*利用規約*に同意します。
   i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: "*使用上の条件*と**個人情報保護方針**に同意します。"
   i_agree_to_the_tool_s_270301a5: 私はこのツールに同意します
+  i_agree_to_the_tool_s_end_user_license_agreement_1ba71197: ツールの*エンドユーザーライセンス契約に同意します。*
   i_cannot_get_things_done_until_i_hear_back_from_yo_83ba46b7: 回答があるまで何もできません
   i_cb2f5130: i
   i_have_obtained_permission_to_use_this_file_6386f087: このファイルを使用する権限を取得しています。
@@ -9562,6 +9571,7 @@ ja:
   inactive_enrollments_3b84be3d: 不活発な登録
   inbox_bb245a60: 受信箱
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "*Jing* などを使用するスクリーンキャスト/スクリーンショットへのリンクを含めます。"
+  include_byte_order_mark_in_gradebook_exports_d2ad0d4e: グレードブックのエクスポートにバイトオーダーのマークを含める
   include_course_settings_c4c08764: コース設定を含める
   include_deleted_enrollments_1c87684a: 削除された登録を含む
   include_deleted_objects_3cced3b5: 削除されたオブジェクトを含む;
@@ -9600,6 +9610,8 @@ ja:
   information_7f11072: 情報
   information_816d9fa5: 情報
   information_icon_8a514faa: インフォメーションのアイコン
+  inherited_d4d0bc33: 引き継がれた
+  inherited_developer_keys_table_e4a65b67: 引き継がれた開発者キーの表
   inner_box_background_6f9092f: インナーボックスの背景
   inner_box_border_d0524b03: インナーボックスのボーダー
   input_and_distribute_grades_for_students_display_g_95b9b6ee: |-
@@ -9699,6 +9711,7 @@ ja:
   invalid_csv_file_grades_could_not_be_updated_4d5c120c: "無効な CSV ファイル。成績を更新することができませんでした。"
   invalid_csv_file_grades_could_not_be_updated_6ebdeca4: 無効なcsvファイルです。等級は更新されませんでした。
   invalid_date_or_invalid_datetime_for_attr_6661103f: "無効な日付または無効な日時%{attr}"
+  invalid_datetime_for_graded_since_884cce5: （）の無効な日付graded_since
   invalid_datetime_for_submitted_since_a238f3a6: （）の無効な日付submitted_since
   invalid_field_type_61d31870: "無効な %{field}：\"%{type}\""
   invalid_fields_after_ratings_fields_815ff223: "採点後無効なフィールド：%{fields}"
@@ -10130,6 +10143,8 @@ ja:
   lock_date_cannot_be_after_section_end_d37da70c: ロック日をセクションの終了日より後にすることはできません
   lock_date_cannot_be_after_term_end_cf1a188f: ロック日を期間の終了日より後にすることはできません
   lock_date_cannot_be_before_due_date_ac30f54: ロック日を期日より前にすることはできません
+  lock_discussion_title_failed_9d49f2d: "ディスカッション %{title} の更新に失敗しました"
+  lock_discussion_title_succeeded_fb24ebfc: "ディスカッション %{title} が正常にロックされました"
   lock_icon_a9916601: アイコンをロック
   lock_questions_after_answering_5aecef9d: 解答の後で問題をロックする
   lock_selected_announcements_33740f80: 選択したアナウンスメントをロックする
@@ -12526,6 +12541,7 @@ ja:
     other: "熟達を %{count}達成する必要があります。熟達以上のスコアを平均したものが最終スコアとなります。"
   must_be_a_valid_number_59f0069: 有効な番号でなければなりません
   must_be_after_start_date_95e251a3: 開始日翌日以降でなければなりません
+  must_be_between_availability_dates_ceaca984: 利用可能な日付けの間でなければなりません
   must_be_on_or_after_end_date_e4dda631: 終了日以降でなければなりません
   must_belong_to_a_root_account_f84323f6: ルートアカウントに属していなければなりません
   must_belong_to_an_active_course_9711934: アクティブコースに属していなければなりません
@@ -12597,6 +12613,7 @@ ja:
   name_is_too_long_48daa8db: 名前が長すぎます
   name_is_too_long_must_be_under_length_characters_b8dad44c: "名前が長すぎます。%{length} 文字未満でなければなりません"
   name_is_unlocked_click_to_lock_b8b9a2c8: "%{name} ロック解除されています。クリックしてロックする。"
+  name_missing_f4f3eb9e: 名前がありません
   name_only_5f56718e: 名前のみ
   name_options_bc5c95ce: "%{name} オプション"
   name_unposted_current_score_e98e95fd: "%{name}掲載されていない現在のスコア"
@@ -12739,6 +12756,7 @@ ja:
   no_unassigned_terms_deb7b76b: 割り当てられていない期間はありません
   no_unresponsive_links_found_8ea497f9: 応答していないリンクは見つかりません
   no_usage_rights_object_supplied_304b8d40: "'usage_rights' オブジェクトが入力されていません"
+  no_user_98e6ccc4: ユーザーなし
   no_users_found_64a043ff: ユーザが見つかりません
   no_users_were_selected_to_add_to_the_course_a51c6083: コースに追加するユーザーが選択されていません
   no_way_to_export_gradebooks_provided_b4c2939d: 提供されたグレードブックをエクスポートする方法がありません！
@@ -13199,6 +13217,7 @@ ja:
   option_4_aec96b1f: オプション4
   option_index_6308524d: "オプション%{index}"
   option_name_ba758e08: "%{option_name}"
+  optionally_include_a_byte_order_mark_in_gradebook__555cc605: オプションとして、成績表エクスポートにバイトオーダーマークを含めて、一部のロケールのユーザー用にExcelにインポートできるようにします。
   options: 
     ? "no"
     : いいえ
@@ -14828,6 +14847,7 @@ ja:
   quiz_submission_dca0c013: クイズへの提出物
   quiz_successfully_updated_ece5c63d: クイズは正常に更新されました
   quiz_title_4b50ade9: "クイズ タイトル"
+  quiz_title_quiz_type_report_type_report_9350daf7: "%{quiz_title} %{quiz_type} %{report_type} 報告"
   quiz_type_be1633db: "クイズ タイプ"
   quizzes: 
     alerts: 
@@ -16660,6 +16680,7 @@ ja:
         current_enrollments: 現在の登録
         decrosslist_section: このセクションのクロスリスティングを除去
   sections_94731e51: セクション
+  see_other_users_primary_email_address_59c8473f: 他のユーザーのプライマリ電子メールアドレスを表示する
   see_rubric_results_62a6447d: 注釈の結果を参照
   see_scoring_details_f7fd1f3b: 採点の詳細を参照
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "Canvasと素晴らしい働きをする*いくつかのLTI ツールを見る*。"
@@ -17562,6 +17583,7 @@ ja:
   show_all_artifacts_34b91a83: すべての成果物を表示
   show_all_details_9879980c: 詳細をすべて表示
   show_all_developerkeyscount_keys_63ef34ca: "すべての %{developerKeysCount} キーを表示する"
+  show_all_keys_fa88c55c: "すべての  キーを表示する"
   show_all_sections_190203e8: すべてのセクションを表示
   show_and_hide_courses_menu_9e09d1d0: コースメニューを表示、非表示にします
   show_attendance_columns_4d160e16: 出席者列の表示
@@ -18333,6 +18355,7 @@ ja:
       ダウンロードプロセスが開始さしました。これは
       大規模なコースではしばらく時間がかかります。ページを離れても
       ダウンロード完了時に通知が届きます。
+  the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: SISのインポートを処理するエンジンは、大規模なSISインポートの安定性をよりよく処理できるよう、リファクタリングされています。SISのインポート機能は変更されていません。
   the_error_stack_trace_if_there_is_one_b7e008a1: 存在する場合のエラースタックトレース
   the_field_field_is_required_56512820: "\"%{field}\" 名前フィールドは必須です"
   the_field_field_must_have_no_spaces_d1c2fc37: "\"%{field}\" フィールドにはスペスはありません"
@@ -18504,6 +18527,7 @@ ja:
   this_enables_users_to_generate_and_download_course_4c69c531: これはユーザーに、コースのePubの生成とダウンロードを有効にします。
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: この機能を有効にしたサブアカウントまたはコースが少なくとも1つ存在するため、この機能を無効にすることができません。
   this_feature_cannot_be_disabled_once_it_has_been_t_db7cc39e: この機能は、一旦オンにすると無効にすることができません。
+  this_feature_enables_users_of_right_to_left_rtl_la_17bd0fae: この機能により、右から左（RTL）言語のユーザーは、開発中のRTLレイアウトを見ることができます。最終的にはこれはデフォルトの動作となり、このオプションは削除されます。
   this_feature_flag_is_something_an_account_can_turn_8467f6f7: "この機能フラグは、通常右から左にかかれる言語（アラビア語、ヘブライ語、ペルシア語など）を話すアカウントのユーザーが、作業中に RTL レイアウトを表示できるようにするためにアカウントを有効にすることができます。 機能が「準備完了」になると、この機能フラグは消え、それらの言語のどれかを話す人にはいつでも RTL インターフェイスが表示されます。"
   this_field_is_required_fa58c4a: このフィールドは必須項目です
   this_field_name_is_required_988caebc: "このフィールド \"%{name}\" は必須です。"
@@ -18849,8 +18873,10 @@ ja:
   to_date_cannot_come_before_from_date_3eeb2633: 「終了日時」は「開始日時」の前に来ることはできません
   to_do_1d554f36: タスク
   to_do_5526f10a: タスク：
+  to_do_date_ddfb582c: タスク日付：
   to_do_items_loading_d1cdfcd5: タスクの読み込み
   to_do_list_dashboard_d741f64e: タスクリストダッシュボード
+  to_do_time_a7e17623: タスク時間
   to_link_the_course_observer_name_to_a_student_star_f993c826: "受講生にコースオブザーバー*%{name}* をリンクするためには、彼らをみつけるために受講生の名前を下にタイプし、更新をクリックします。"
   to_minscore_43e5452e: "%{minScore}% まで"
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "ディスカッションをページの上部に固定するには、ここにディスカッションをドラッグして、ディスカッションの設定メニューから [固定] を選択します。"
@@ -18893,6 +18919,7 @@ ja:
   total_options_351e2682: 合計オプション
   total_range_45c8549a: 総合的範囲
   total_results_outcomedetails_cnt_30ff1f8d: "合計結果:%{outcomeDetails.cnt}"
+  totalcount_total_replies_b6988c0a: "%{totalCount} 合計回答数"
   tours: 
     quiz_regrade: 
       got_it: わかりました
@@ -18992,6 +19019,8 @@ ja:
   unlock_date_cannot_be_before_course_start_9c7b8524: ロック解除日をコース開始日より前にすることはできません
   unlock_date_cannot_be_before_section_start_793ddc66: ロック解除日をセクション開始日より前にすることはできません
   unlock_date_cannot_be_before_term_start_d3c01813: ロック解除日を期間の開始日より前にすることはできません
+  unlock_discussion_title_failed_42a4252f: "ディスカッション %{title} のロック解除に失敗しました"
+  unlock_discussion_title_succeeded_cd97847c: "ディスカッション %{title} が正常にロック解除されました"
   unlock_f6196bf5: ロック解除する
   unlock_module_on_date_17144fbd: 指定の日にモジュールを解除
   unlock_selected_announcements_37485f05: 選択したアナウンスメントのロックを解除する
@@ -19001,6 +19030,8 @@ ja:
   unmatched_login_list_283ca77: マッチのないログインリスト
   unmute_assignment_29a49038: 課題のミュート解除
   unnamed_account_id_e688ad87: "名前のないアカウント(%{id})"
+  unnamed_tool_961cb95b: 名前のないツール
+  unnamed_tool_logo_410f37d0: 名前のないツールロゴ
   unpin_a318452a: 固定の解除
   unpin_discussion_title_8c2a0942: "ディスカッションを固定解除する%{title}"
   unpin_of_discussion_title_failed_852116d4: "ディスカッション %{title} の固定解除に失敗しました"
@@ -19025,6 +19056,7 @@ ja:
   unpublished_dfd8801: 未公開
   unpublishing_1fa99dc6: 公開取り消し中...
   unread_e9c1b19c: 未読です
+  unreadcount_unread_replies_509e167f: "%{unreadCount} 未読の返信"
   unregister_service_985238e9: サービスの登録解除
   unreserved_e86b7425: 予約取り消し
   unsafe_file_link_8a18eceb: 安全でないファイルリンク
@@ -19282,6 +19314,7 @@ ja:
       profile: プロフィール
       settings: 設定
   user_profile_picture_46bffbc7: "ユーザ プロフィール画像"
+  user_results_updated_9ce38dce: ユーザーの結果が更新されました。
   user_s_settings_d65644b4: "%{user} の設定"
   user_search_panel_18f80511: ユーザー検索パネル
   user_search_results_f5445b8b: ユーザー検索の結果
@@ -19602,6 +19635,7 @@ ja:
   view_grades_for_name_45aeb2f2: "～の成績を表示%{name}"
   view_grading_history_e64bb8fe: 採点履歴の表示
   view_in_speedgrader_773b9d81: "SpeedGrader で表示"
+  view_login_ids_for_users_142bbe7a: ユーザーのログインIDを表示する
   view_longer_description_6b762087: 詳細説明を表示
   view_name_app_62a2ad8e: "%{name} アプリを表示"
   view_next_file_a8a4a885: 次のファイルを表示

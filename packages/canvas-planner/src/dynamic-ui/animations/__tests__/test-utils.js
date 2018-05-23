@@ -18,17 +18,32 @@
 
 import {DynamicUiManager} from '../../manager';
 
-export function mockRegistryEntry (ids, name) {
+export function mockRegistryEntry (ids, name, date) {
   return {
     componentIds: ids,
-    component: mockComponent(name),
+    component: mockComponent(name, date),
   };
 }
 
-export function mockComponent(name) {
+export function mockApp () {
   return {
-    getFocusable () { return `${name}-focusable`; },
-    getScrollable () { return `${name}-scrollable`; },
+    fixedElementForItemScrolling: jest.fn(),
+  };
+}
+
+export function mockDocument () {
+  return {
+    activeElement: 'active-element',
+    querySelector: jest.fn(),
+    body: {},
+  };
+}
+
+export function mockComponent(name, date) {
+  return {
+    getFocusable: jest.fn(() => `${name}-focusable`),
+    getScrollable: jest.fn(() => `${name}-scrollable`),
+    props: {date},
   };
 }
 
@@ -43,11 +58,16 @@ export function mockRegistry () {
 
 export function mockAnimator () {
   return {
+    getWindow: jest.fn(() => window),
     focusElement: jest.fn(),
-    maintainViewportPosition: jest.fn(),
+    elementPositionMemo: jest.fn(),
+    maintainViewportPositionFromMemo: jest.fn(),
     scrollTo: jest.fn(),
     scrollToTop: jest.fn(),
     isAboveScreen: jest.fn(),
+    isBelowScreen: jest.fn(),
+    isOnScreen: jest.fn(),
+    isOffScreen: jest.fn(),
   };
 }
 
@@ -63,10 +83,14 @@ export function mockManager () {
     registry: mockRegistry(),
     animator: mockAnimator(),
     store: mockStore(),
+    app: mockApp(),
+    document: mockDocument(),
 
     getRegistry () { return this.registry; },
     getAnimator () { return this.animator; },
     getStore () { return this.store; },
+    getApp () { return this.app; },
+    getDocument () { return this.document; },
     getStickyOffset () { return 34; },
     totalOffset () { return 42; },
   };

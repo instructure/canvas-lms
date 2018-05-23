@@ -144,15 +144,15 @@ class ProvisionalGradesController < ApplicationController
   #   }
   #
   def select
-    if authorized_action(@context, @current_user, :moderate_grades)
-      pg = @assignment.provisional_grades.find(params[:provisional_grade_id])
-      selection = @assignment.moderated_grading_selections.where(student_id: pg.submission.user_id).first
-      return render :json => { :message => 'student not in moderation set' }, :status => :bad_request unless selection
-      selection.provisional_grade = pg
-      selection.save!
-      pg.submission.touch # so the selection is reloaded for other moderators
-      render :json => selection.as_json(:include_root => false, :only => %w(assignment_id student_id selected_provisional_grade_id))
-    end
+    render_unauthorized_action and return unless @assignment.permits_moderation?(@current_user)
+
+    pg = @assignment.provisional_grades.find(params[:provisional_grade_id])
+    selection = @assignment.moderated_grading_selections.where(student_id: pg.submission.user_id).first
+    return render :json => { :message => 'student not in moderation set' }, :status => :bad_request unless selection
+    selection.provisional_grade = pg
+    selection.save!
+    pg.submission.touch # so the selection is reloaded for other moderators
+    render :json => selection.as_json(:include_root => false, :only => %w(assignment_id student_id selected_provisional_grade_id))
   end
 
   # @API Copy provisional grade
@@ -167,16 +167,16 @@ class ProvisionalGradesController < ApplicationController
   #
   # @returns ProvisionalGrade
   def copy_to_final_mark
-    if authorized_action @context, @current_user, :moderate_grades
-      pg = @assignment.provisional_grades.find(params[:provisional_grade_id])
-      return render :json => { :message => 'provisional grade is already final' }, :status => :bad_request if pg.final
-      selection = @assignment.moderated_grading_selections.where(student_id: pg.submission.user_id).first
-      return render :json => { :message => 'student not in moderation set' }, :status => :bad_request unless selection
-      final_mark = pg.copy_to_final_mark!(@current_user)
-      selection.provisional_grade = final_mark
-      selection.save!
-      render :json => provisional_grade_json(final_mark, pg.submission, @assignment, @current_user, %w(submission_comments rubric_assessment crocodoc_urls)).merge(:selected => true)
-    end
+    render_unauthorized_action and return unless @assignment.permits_moderation?(@current_user)
+
+    pg = @assignment.provisional_grades.find(params[:provisional_grade_id])
+    return render :json => { :message => 'provisional grade is already final' }, :status => :bad_request if pg.final
+    selection = @assignment.moderated_grading_selections.where(student_id: pg.submission.user_id).first
+    return render :json => { :message => 'student not in moderation set' }, :status => :bad_request unless selection
+    final_mark = pg.copy_to_final_mark!(@current_user)
+    selection.provisional_grade = final_mark
+    selection.save!
+    render :json => provisional_grade_json(final_mark, pg.submission, @assignment, @current_user, %w(submission_comments rubric_assessment crocodoc_urls)).merge(:selected => true)
   end
 
   # @API Publish provisional grades for an assignment
@@ -195,7 +195,8 @@ class ProvisionalGradesController < ApplicationController
   #        -X POST
   #
   def publish
-    if !@context.grants_all_rights?(@current_user, :moderate_grades, :manage_grades)
+    can_manage_grades = @context.grants_right?(@current_user, :manage_grades)
+    unless can_manage_grades && @assignment.permits_moderation?(@current_user)
       render_unauthorized_action and return
     end
 

@@ -305,6 +305,7 @@ type Course implements Node, Timestamped {
 
     # Returns the elements in the list that come before the specified global ID.
     before: String
+    filter: CourseUsersFilter
 
     # Returns the first _n_ elements from the list.
     first: Int
@@ -312,9 +313,21 @@ type Course implements Node, Timestamped {
     # Returns the last _n_ elements from the list.
     last: Int
 
-    # only include users with the given ids
+    # Only include users with the given ids.
+    #
+    # **This field is deprecated, use `filter: {userIds}` instead.**
     userIds: [ID!]
   ): UserConnection
+}
+
+# Users in a course can be returned based on these enrollment states
+enum CourseFilterableEnrollmentState {
+  active
+  completed
+  creation_pending
+  inactive
+  invited
+  rejected
 }
 
 type CoursePermissions {
@@ -323,6 +336,15 @@ type CoursePermissions {
   sendMessages: Boolean
   viewAllGrades: Boolean
   viewAnalytics: Boolean
+}
+
+input CourseUsersFilter {
+  #       only return users with the given enrollment state. defaults
+  #       to `invited`, `creation_pending`, `active`
+  enrollmentStates: [CourseFilterableEnrollmentState!]
+
+  # only include users with the given ids
+  userIds: [ID!]
 }
 
 # States that Courses can be in
@@ -379,6 +401,7 @@ enum EnrollmentWorkflowState {
   completed
   creation_pending
   deleted
+  inactive
   invited
   rejected
 }

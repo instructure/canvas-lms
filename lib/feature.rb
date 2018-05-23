@@ -135,6 +135,14 @@ END
       state: 'hidden',
       development: true,
     },
+    'permissions_v2_ui' =>
+    {
+      display_name: -> { I18n.t('Updated Permissions Page') },
+      description: -> { I18n.t('Use the new interface for managing permissions') },
+      applies_to: 'Account',
+      state: 'hidden',
+      development: true,
+    },
     'google_docs_domain_restriction' =>
     {
       display_name: -> { I18n.t('features.google_docs_domain_restriction', 'Google Docs Domain Restriction') },
@@ -292,8 +300,8 @@ END
     },
     'recurring_calendar_events' =>
     {
-      display_name: -> { I18n.t('Recurring Calendar Events') },
-      description: -> { I18n.t("Allows the scheduling of recurring calendar events") },
+      display_name: -> { I18n.t('Duplicating Calendar Events') },
+      description: -> { I18n.t("Allows the duplication of Calendar Events") },
       applies_to: 'Course',
       state: 'hidden',
       root_opt_in: true,
@@ -488,7 +496,7 @@ END
       description: -> { I18n.t('This feature enables users of right-to-left (RTL) languages to see the RTL layout under development. Eventually, this will become the default behavior and this option will be removed.') },
       applies_to: 'RootAccount',
       state: 'allowed',
-      development: true,
+      beta: true,
     },
     'force_rtl' =>
     {
@@ -504,6 +512,34 @@ END
       description: -> { I18n.t('Optionally include a byte-order mark in Gradebook exports so they can be imported into Excel for users in some locales.') },
       applies_to: 'User',
       state: 'allowed'
+    },
+    'use_semi_colon_field_separators_in_gradebook_exports' =>
+    {
+      display_name: -> { I18n.t('Use semicolons to separate fields in Gradebook Exports') },
+      description: -> { I18n.t('Use semicolons instead of commas to separate fields in Gradebook exports so they can be imported into Excel for users in some locales.') },
+      applies_to: 'User',
+      state: 'allowed',
+      custom_transition_proc: ->(_user, context, _from_state, transitions) do
+        if context.feature_enabled?(:autodetect_field_separators_for_gradebook_exports)
+          transitions['on'] ||= {}
+          transitions['on']['locked'] = true
+          transitions['on']['warning'] = I18n.t("This feature can't be enabled while autodetection of field separators is enabled")
+        end
+      end
+    },
+    'autodetect_field_separators_for_gradebook_exports' =>
+    {
+      display_name: -> { I18n.t('Autodetect field separators in Gradebook Exports') },
+      description: -> { I18n.t('Attempt to detect an appropriate field separator in Gradebook exports based on the number format for your language.') },
+      applies_to: 'User',
+      state: 'allowed',
+      custom_transition_proc: ->(_user, context, _from_state, transitions) do
+        if context.feature_enabled?(:use_semi_colon_field_separators_in_gradebook_exports)
+          transitions['on'] ||= {}
+          transitions['on']['locked'] = true
+          transitions['on']['warning'] = I18n.t("This feature can't be enabled while semicolons are forced to be field separators")
+        end
+      end
     },
     'anonymous_grading' => {
       display_name: -> { I18n.t('Anonymous Grading') },
@@ -637,22 +673,29 @@ END
         is_provisioned
       end
     },
+    'import_to_quizzes_next' =>
+    {
+      display_name: -> { I18n.t('Quizzes.Next Importing') },
+      description: -> { I18n.t('Allow importing of QTI and Common Cartridge into Quizzes.Next.') },
+      applies_to: 'RootAccount',
+      beta: true,
+      development: true,
+      state: 'allowed'
+    },
     'developer_key_management' =>
     {
       display_name: -> { I18n.t('Developer Key management')},
       description: -> { I18n.t('New Features for Developer Key management') },
       applies_to: 'RootAccount',
-      state: 'hidden',
-      development: true
+      state: 'hidden'
     },
     'developer_key_management_ui_rewrite' =>
-      {
-        display_name: -> { I18n.t('Developer Key management UI Rewrite')},
-        description: -> { I18n.t('React UI rewrite Developer Key management') },
-        applies_to: 'RootAccount',
-        state: 'hidden',
-        development: true
-      },
+    {
+      display_name: -> { I18n.t('Developer Key management UI Rewrite')},
+      description: -> { I18n.t('React UI rewrite Developer Key management') },
+      applies_to: 'RootAccount',
+      state: 'hidden'
+    },
     'common_cartridge_page_conversion' => {
       display_name: -> { I18n.t('Common Cartridge HTML File to Page Conversion') },
       description: -> { I18n.t('If enabled, Common Cartridge importers will convert HTML files into Pages') },
@@ -664,8 +707,7 @@ END
       display_name: -> { I18n.t('API Token Scoping')},
       description: -> { I18n.t('If enabled, scopes will be validated on API requests if the developer key being used requires scopes.') },
       applies_to: 'RootAccount',
-      state: 'hidden',
-      development: true
+      state: 'hidden'
     }
   )
 

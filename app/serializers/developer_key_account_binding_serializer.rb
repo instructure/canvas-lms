@@ -16,8 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class DeveloperKeyAccountBindingSerializer
-  def initialize(developer_key_account_binding)
+  def initialize(developer_key_account_binding, context)
     @binding = developer_key_account_binding
+    @context = context
   end
 
   def as_json
@@ -25,7 +26,8 @@ class DeveloperKeyAccountBindingSerializer
       id: @binding.global_id,
       account_id: @binding.account.global_id,
       developer_key_id: @binding.developer_key.global_id,
-      workflow_state: @binding.workflow_state
+      workflow_state: @binding.workflow_state,
+      account_owns_binding: @binding.account == @context
     }
   end
 end

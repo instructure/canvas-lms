@@ -183,8 +183,23 @@
   }
 }
 
-.ic-item-row__manage-menu {
-  display: inline-block;
-  margin: direction-sides(0 -8px -8px -10px);
-  transform: translateY(-5px);
+.discussion-title {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  &:hover {
+    text-decoration: none;
+  }
+  @include ic-focus-base;
+  &:focus {
+    @include ic-focus-variant;
+  }
+}
+
+// TODO: We should try to not need this CSS
+.discussion-row-mastery-paths-pill {
+  margin-#{direction(left)}: 6px;
+  margin-#{direction(right)}: 6px;
+  margin-top: -4px;
 }

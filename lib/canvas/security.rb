@@ -211,26 +211,29 @@ module Canvas::Security
   def self.re_encrypt_data(encryption_key)
     {
         Account =>  {
-            :encrypted_column => :turnitin_crypted_secret,
-            :salt_column => :turnitin_salt,
-            :key => 'instructure_turnitin_secret_shared' },
-        AccountAuthorizationConfig => {
-            :encrypted_column => :auth_crypted_password,
-            :salt_column => :auth_password_salt,
-            :key => 'instructure_auth' },
+          :encrypted_column => :turnitin_crypted_secret,
+          :salt_column => :turnitin_salt,
+          :key => 'instructure_turnitin_secret_shared'
+        },
+        AuthenticationProvider => {
+          :encrypted_column => :auth_crypted_password,
+          :salt_column => :auth_password_salt,
+          :key => 'instructure_auth'
+        },
         UserService => {
-            :encrypted_column => :crypted_password,
-            :salt_column => :password_salt,
-            :key => 'instructure_user_service' },
+          :encrypted_column => :crypted_password,
+          :salt_column => :password_salt,
+          :key => 'instructure_user_service'
+        },
         User => {
-            :encrypted_column => :otp_secret_key_enc,
-            :salt_column => :otp_secret_key_salt,
-            :key => 'otp_secret_key'
+          :encrypted_column => :otp_secret_key_enc,
+          :salt_column => :otp_secret_key_salt,
+          :key => 'otp_secret_key'
         }
     }.each do |(model, definition)|
       model.where("#{definition[:encrypted_column]} IS NOT NULL").
-          select([:id, definition[:encrypted_column], definition[:salt_column]]).
-          find_each do |instance|
+        select([:id, definition[:encrypted_column], definition[:salt_column]]).
+        find_each do |instance|
         cleartext = Canvas::Security.decrypt_password(instance.read_attribute(definition[:encrypted_column]),
                                                       instance.read_attribute(definition[:salt_column]),
                                                       definition[:key],

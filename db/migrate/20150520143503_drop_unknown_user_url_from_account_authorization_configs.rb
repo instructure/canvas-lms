@@ -19,7 +19,9 @@ class DropUnknownUserUrlFromAccountAuthorizationConfigs < ActiveRecord::Migratio
   tag :postdeploy
 
   def up
-    remove_column :account_authorization_configs, :unknown_user_url
+    AuthenticationProvider.maybe_recreate_view do
+      remove_column :account_authorization_configs, :unknown_user_url
+    end
   end
 
   def down

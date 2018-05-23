@@ -2,9 +2,9 @@
 
 exports[`renders the item to update if provided 1`] = `
 <div>
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     padding="large medium medium"
   >
     <FormFieldGroup
@@ -36,26 +36,30 @@ exports[`renders the item to update if provided 1`] = `
         type="text"
         value="Planner Item"
       />
-      <DateInput
-        datePickerRef={[Function]}
-        dateValue="2017-04-25 01:49:00-0700"
+      <DateTimeInput
+        dateLabel="Date"
+        dateNextLabel="Next Month"
+        datePreviousLabel="Previous Month"
+        description={
+          <ScreenReaderContent
+            as="span"
+          >
+            The date and time this to do is due
+          </ScreenReaderContent>
+        }
         disabled={false}
-        format="LL"
-        inline={false}
-        inputRef={[Function]}
-        invalidDateMessage={[Function]}
-        label="Date"
+        invalidDateTimeMessage={[Function]}
         layout="stacked"
         locale="en"
+        messageFormat="LLL"
         messages={Array []}
-        nextLabel="Next Month"
-        onDateChange={[Function]}
-        placement="start"
-        previousLabel="Previous Month"
+        onChange={[Function]}
+        readOnly={false}
         required={true}
-        size="medium"
+        timeLabel="Time"
+        timeStep={30}
         timezone="Asia/Tokyo"
-        validationFeedback={true}
+        value="2017-04-25T08:49:00.000Z"
       />
       <Select
         disabled={false}
@@ -95,9 +99,9 @@ exports[`renders the item to update if provided 1`] = `
         value="You made this item to remind you of something, but you forgot what."
       />
     </FormFieldGroup>
-    <Container
+    <View
       as="div"
-      display={null}
+      display="auto"
       margin="small 0 0"
       textAlign="end"
     >
@@ -126,16 +130,16 @@ exports[`renders the item to update if provided 1`] = `
       >
         Save
       </Button>
-    </Container>
-  </Container>
+    </View>
+  </View>
 </div>
 `;
 
 exports[`updates state when new note is passed in 1`] = `
 <div>
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     padding="large medium medium"
   >
     <FormFieldGroup
@@ -167,26 +171,30 @@ exports[`updates state when new note is passed in 1`] = `
         type="text"
         value="Planner Item 1"
       />
-      <DateInput
-        datePickerRef={[Function]}
-        dateValue="2017-04-25"
+      <DateTimeInput
+        dateLabel="Date"
+        dateNextLabel="Next Month"
+        datePreviousLabel="Previous Month"
+        description={
+          <ScreenReaderContent
+            as="span"
+          >
+            The date and time this to do is due
+          </ScreenReaderContent>
+        }
         disabled={false}
-        format="LL"
-        inline={false}
-        inputRef={[Function]}
-        invalidDateMessage={[Function]}
-        label="Date"
+        invalidDateTimeMessage={[Function]}
         layout="stacked"
         locale="en"
+        messageFormat="LLL"
         messages={Array []}
-        nextLabel="Next Month"
-        onDateChange={[Function]}
-        placement="start"
-        previousLabel="Previous Month"
+        onChange={[Function]}
+        readOnly={false}
         required={true}
-        size="medium"
+        timeLabel="Time"
+        timeStep={30}
         timezone="Asia/Tokyo"
-        validationFeedback={true}
+        value="2017-04-28T11:00:00.000Z"
       />
       <Select
         disabled={false}
@@ -231,9 +239,9 @@ exports[`updates state when new note is passed in 1`] = `
         value="You made this item to remind you of something, but you forgot what."
       />
     </FormFieldGroup>
-    <Container
+    <View
       as="div"
-      display={null}
+      display="auto"
       margin="small 0 0"
       textAlign="end"
     >
@@ -262,16 +270,16 @@ exports[`updates state when new note is passed in 1`] = `
       >
         Save
       </Button>
-    </Container>
-  </Container>
+    </View>
+  </View>
 </div>
 `;
 
 exports[`updates state when new note is passed in 2`] = `
 <div>
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     padding="large medium medium"
   >
     <FormFieldGroup
@@ -303,26 +311,30 @@ exports[`updates state when new note is passed in 2`] = `
         type="text"
         value="Planner Item 2"
       />
-      <DateInput
-        datePickerRef={[Function]}
-        dateValue="2017-12-25"
+      <DateTimeInput
+        dateLabel="Date"
+        dateNextLabel="Next Month"
+        datePreviousLabel="Previous Month"
+        description={
+          <ScreenReaderContent
+            as="span"
+          >
+            The date and time this to do is due
+          </ScreenReaderContent>
+        }
         disabled={false}
-        format="LL"
-        inline={false}
-        inputRef={[Function]}
-        invalidDateMessage={[Function]}
-        label="Date"
+        invalidDateTimeMessage={[Function]}
         layout="stacked"
         locale="en"
+        messageFormat="LLL"
         messages={Array []}
-        nextLabel="Next Month"
-        onDateChange={[Function]}
-        placement="start"
-        previousLabel="Previous Month"
+        onChange={[Function]}
+        readOnly={false}
         required={true}
-        size="medium"
+        timeLabel="Time"
+        timeStep={30}
         timezone="Asia/Tokyo"
-        validationFeedback={true}
+        value="2017-04-28T11:00:00.000Z"
       />
       <Select
         disabled={false}
@@ -367,9 +379,9 @@ exports[`updates state when new note is passed in 2`] = `
         value="This is another reminder"
       />
     </FormFieldGroup>
-    <Container
+    <View
       as="div"
-      display={null}
+      display="auto"
       margin="small 0 0"
       textAlign="end"
     >
@@ -398,7 +410,7 @@ exports[`updates state when new note is passed in 2`] = `
       >
         Save
       </Button>
-    </Container>
-  </Container>
+    </View>
+  </View>
 </div>
 `;

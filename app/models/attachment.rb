@@ -790,8 +790,11 @@ class Attachment < ActiveRecord::Base
   end
 
   def url_ttl
-    settings = root_account_id && Account.find_cached(root_account_id)&.settings
-    setting = settings && settings[:s3_url_ttl_seconds]
+    settings = begin
+      root_account_id && Account.find_cached(root_account_id).settings
+    rescue ::Canvas::AccountCacheError
+    end
+    setting = settings&.[](:s3_url_ttl_seconds)
     setting ||= Setting.get('attachment_url_ttl', 1.hour.to_s)
     setting.to_i.seconds
   end
@@ -1485,7 +1488,8 @@ class Attachment < ActiveRecord::Base
   end
 
   def canvadocable?
-    Canvadocs.enabled? && Canvadoc.mime_types.include?(content_type_with_text_match)
+    canvadocable_mime_types = self&.folder&.for_submissions? ? Canvadoc.submission_mime_types : Canvadoc.mime_types
+    Canvadocs.enabled? && canvadocable_mime_types.include?(content_type_with_text_match)
   end
 
   def self.submit_to_canvadocs(ids)

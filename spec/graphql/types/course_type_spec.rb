@@ -204,7 +204,10 @@ describe Types::CourseType do
       @student1 = @student
       @student2 = student_in_course(active_all: true).user
       @inactive_user = student_in_course.tap { |enrollment|
-        enrollment.update_attribute :workflow_state, 'inactive'
+        enrollment.invite
+      }.user
+      @concluded_user = student_in_course.tap { |enrollment|
+        enrollment.complete
       }.user
     end
 
@@ -215,10 +218,19 @@ describe Types::CourseType do
     end
 
     it "returns only the specified users" do
+      # deprecated method
       expect(
         course_type.usersConnection(
           current_user: @teacher,
           args: {userIds: @student1}
+        )
+      ).to eq [@student1]
+
+      # current method
+      expect(
+        course_type.usersConnection(
+          current_user: @teacher,
+          args: {filter: {userIds: @student1}}
         )
       ).to eq [@student1]
     end
@@ -229,6 +241,15 @@ describe Types::CourseType do
       expect(
         course_type.usersConnection(current_user: other_teacher)
       ).to be_nil
+    end
+
+    it "allows filtering by enrollment state" do
+      expect(
+        course_type.usersConnection(
+          current_user: @teacher,
+          args: {filter: {enrollmentStates: ["active", "completed"]}}
+        )
+      ).to eq [@teacher, @student1, @student2, @concluded_user]
     end
   end
 

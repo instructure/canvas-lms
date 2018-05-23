@@ -57,7 +57,7 @@ nn:
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Ein partnar-ID er nødvendig for å bruke Academic Benchmarks"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "Ein partnarnøkkel er nødvendig for å bruke Academic Benchmarks"
   a_problem_occurred_adding_reviewers_57b083d9: "Det oppstod eit problem då nye fagfellevurderarar blei lagt til."
-  a_section_is_required_64103992: "Klasse er obligatorisk"
+  a_section_is_required_64103992: "Seksjon er obligatorisk"
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "SIS-integrasjon er ikkje satt opp og dei nye integrasjonsinnstillingane for Enable er ikkje aktivert"
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "Ein tabell som inneheld namnet på karakterskjemaet og knappar for redigering eller sletting av skjemaet."
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Ein tabell med svar og overordna statistikk om studentars svaralternativer."
@@ -89,9 +89,9 @@ nn:
   access_token_count_access_token_count_dfb5463c: "Tal på tilgangs-token %{access_token_count}"
   access_token_is_valid_until_d2f048cf: "Tilgangstoken er gyldig til"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Tilgangstoken kan gi andre applikasjonar lov til å gjere API-kall på dine vegne. Du kan óg generere tilgangstoken og *bruke Canvas sine opne API-ar* til å sette opp eigne integrasjonar. "
-  accordion_section_1_7888782d: "Accordion-klasse 1"
-  accordion_section_2_e1812997: "Accordion-klasse 2"
-  accordion_section_3_96861901: "Accordion-klasse 3"
+  accordion_section_1_7888782d: "Accordion-seksjon 1"
+  accordion_section_2_e1812997: "Accordion-seksjon 2"
+  accordion_section_3_96861901: "Accordion-seksjon 3"
   account: 
     ask_canvas_network: "Spør Canvas-nettsamfunnet"
     default_account_name: Standardkonto
@@ -261,7 +261,7 @@ nn:
       error_text: "Mislukkast, rapporter følgande feilkode til systemansvarleg: Feilrapport: %{error};"
       extra_text_term: "Semester: %{term_name};"
       message: "%{type} rapport er generert med følgande innstillingar. Konto: %{account}; %{options}"
-      section_text: "For klasse: %{section};"
+      section_text: "For seksjon: %{section};"
       start_text: "Start: %{start_at};"
       term_text: "Semester: %{term_name};"
     grades: 
@@ -327,12 +327,12 @@ nn:
     report_header_parent_account_id: parent_account_id
     report_header_role: rolle
     report_header_role_id: role_id
-    report_header_section: klasse
+    report_header_section: seksjon
     report_header_section__id: section_id
-    report_header_section_id: klasse-ID
-    report_header_section_name: "namn på klasse"
-    report_header_section_sis: klasse-SIS
-    report_header_section_sis_id: klasse-SIS-ID
+    report_header_section_id: seksjon-ID
+    report_header_section_name: "namn på seksjon"
+    report_header_section_sis: seksjon-SIS
+    report_header_section_sis_id: seksjon-SIS-ID
     report_header_short__name: short_name
     report_header_short_name: "kort namn"
     report_header_sis_id: SIS-ID
@@ -766,7 +766,7 @@ nn:
       account_reports: 
         excelsior: 
           outcome: 
-            text: "Klassemønster:"
+            text: "Seksjonsmønster:"
     find_not_authorized: "Du har ikkje autorisasjon for tilgang til denne %{type}"
     find_not_found: "Finn ikkje ein %{type} med den ID-en"
     grade_export_csv_description: 
@@ -816,7 +816,7 @@ nn:
           enrollments: 
             check_box: "CSV-fil over påmeldingar"
           sections: 
-            check_box: "CSV-fil over klasser"
+            check_box: "CSV-fil over seksjonar"
           users: 
             check_box: "CSV-fil over brukarar"
     no_user_message: "Finn ikkje brukar med denne ID-en"
@@ -861,7 +861,7 @@ nn:
               groups: 
                 check_box: "CSV-fil for grupper"
               sections: 
-                check_box: "CSV-fil over klasser"
+                check_box: "CSV-fil over seksjonar"
               terms: 
                 check_box: "CSV-fil for semester"
               users: 
@@ -870,7 +870,7 @@ nn:
                 check_box: "CSV-fil for x-liste"
             sis_default: 
               parameters: 
-                note: "*Semesterinnstillingar påverkar berre CSV-filer for emne, klasser, påmeldingar og x-lister."
+                note: "*Semesterinnstillingar påverkar berre CSV-filer for emne, seksjonar, påmeldingar og x-lister."
     provisioning_csv_description: 
       account_reports: 
         sis_export: 
@@ -894,7 +894,7 @@ nn:
           groups: 
             check_box: "CSV-fil for grupper"
           sections: 
-            check_box: "CSV-fil over klasser"
+            check_box: "CSV-fil over seksjonar"
           terms: 
             check_box: "CSV-fil for semester"
           users: 
@@ -903,7 +903,7 @@ nn:
             check_box: "CSV-fil for x-liste"
         sis_default: 
           parameters: 
-            note: "*Semesterinnstillingar påverkar berre CSV-filer for emne, klasser, påmeldingar og x-lister."
+            note: "*Semesterinnstillingar påverkar berre CSV-filer for emne, seksjonar, påmeldingar og x-lister."
     public_courses_csv_description: 
       account_reports: 
         default: 
@@ -946,7 +946,7 @@ nn:
           quiz_id: 
             field: Quiz-ID
           section_id: 
-            field: Klasse-ID
+            field: Seksjon-ID
     settings: 
       about_google_docs: |-
           Førehandsvisingar i Google Docs gjer at brukarane kan vise dokument som ligg
@@ -1176,7 +1176,7 @@ nn:
       group_enrollments: Gruppepåmeldingar
       groups: Grupper
       imported_items_title: "Importerte element"
-      sections_label: Klasser
+      sections_label: Seksjonar
       terms_label: Semester
       users_label: Brukarar
     sis_batch_messages: 
@@ -1202,7 +1202,7 @@ nn:
           groups: 
             check_box: "CSV-fil for grupper"
           sections: 
-            check_box: "CSV-fil over klasser"
+            check_box: "CSV-fil over seksjonar"
           terms: 
             check_box: "CSV-fil for semester"
           users: 
@@ -1211,7 +1211,7 @@ nn:
             check_box: "CSV-fil for x-liste"
         sis_default: 
           parameters: 
-            note: "*Semesterinnstillingar påverkar berre CSV-filer for emne, klasser, påmeldingar og x-lister."
+            note: "*Semesterinnstillingar påverkar berre CSV-filer for emne, seksjonar, påmeldingar og x-lister."
     sis_import: 
       add_sis_stickiness_instructions: "Dersom du vel dette alternativet, vil endringar som er gjort gjennom SIS-importen behandlast som om dei er endringar i brukargrensesnittet og hindre overstyrande SIS-importar i å endre felta som er endra her."
       add_sis_stickiness_label: "Behandle som endringar i brukargrensesnittet"
@@ -1422,7 +1422,7 @@ nn:
           one: "Kan ikkje slette oppføringa fordi ei avhengig %{record} eksisterer"
   activity_by_category_9c2033d1: "Aktivitet etter kategori"
   activity_by_date_878c5b49: "Aktivitet etter dato"
-  activity_compared_to_class_8133cb0: "Aktivitet samanlikna med klasse"
+  activity_compared_to_class_8133cb0: "Aktivitet samanlikna med seksjon"
   add_2nd_review_ea988088: "Legg til 2. gjennomgang"
   add_8523c19b: "Legg til"
   add_a_comment_872470ac: "Legg til ein kommentar"
@@ -1477,12 +1477,12 @@ nn:
   add_quiz_ip_filter_c7b37dc5: "Legg til IP-filter for quizar"
   add_rating_89d7fbde: "Legg til vurdering"
   add_recipient_ff135ed7: "Legg til mottakar"
-  add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Legg til, fjerne eller ordne klasse på nytt for porteføljen"
+  add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Legg til, fjerne eller ordne seksjon på nytt for porteføljen"
   add_review_2fb1590c: "Legg til gjennomgang"
   add_rubric_3636d9a6: "Legg til vurderingsskjema"
-  add_section_8b027a1c: "Legg til klasse"
+  add_section_8b027a1c: "Legg til seksjon"
   add_set_of_grading_periods_5b4d6e51: "Legg til fleire periodar for karaktersetjing"
-  add_students_by_searching_by_name_course_section_o_abb9e2f2: "Legg til studentar ved å søkje på namn, emneklasse eller gruppe. Etter å ha skrive inn tekst, kan du navigere i resultatet ved å bruke ned-piltasten på  tastaturet. Vel resultat ved å trykkje Enter-tasten. "
+  add_students_by_searching_by_name_course_section_o_abb9e2f2: "Legg til studentar ved å søkje på namn, emneseksjon eller gruppe. Etter å ha skrive inn tekst, kan du navigere i resultatet ved å bruke ned-piltasten på  tastaturet. Vel resultat ved å trykkje Enter-tasten. "
   add_students_tas_and_observers_to_your_course_e84692dd: "Legg til studentar, undervisingsassistentar og observatørar på emnet"
   add_students_to_the_course_874be8fb: "Legg til studentar på emnet "
   add_sub_account_to_account_name_b104db90: "Legg underkonto til %{account_name}"
@@ -1589,9 +1589,9 @@ nn:
   all_items_a49b66c7: "Alle element"
   all_modules_20c9a1c8: "Alle modular"
   all_my_files_a0213441: "Alle filene mine"
-  all_my_sections_375248b3: "Alle mine klasser"
+  all_my_sections_375248b3: "Alle mine seksjonar"
   all_roles_f3bba14d: "Alle roller"
-  all_sections_daf11554: "Alle klasser"
+  all_sections_daf11554: "Alle seksjonar"
   all_start_dates_must_be_before_the_end_date_d949eca9: "Alle startdatoar må setjast før sluttdatoen"
   all_students_have_taken_the_quiz_b558f8b4: "Alle studentar har tatt quizen"
   all_students_have_taken_the_survey_494f9f42: "Alle studentar har teke undersøkinga"
@@ -1617,7 +1617,7 @@ nn:
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Tillat å sende varsel gjennom vår dispatch-kø"
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Tillat at verktøyet får tilgang til IMS-namn og rolletildelingsteneste. "
   allowed_attempts_4e229caa: "Tillatne forsøk"
-  allows_creating_announcements_for_a_specific_secti_14e0a63d: "Tillet oppretting av kunngjeringar for ei spesifikk klasse"
+  allows_creating_announcements_for_a_specific_secti_14e0a63d: "Tillet oppretting av kunngjeringar for ein spesifikk seksjon"
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Gir faglærarar løyve til å markere karakterdata for masseeksport til SIS-integrasjonar."
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Tillet duplisering av modular i Canvas"
   allows_the_duplicating_of_objects_in_canvas_c86f3665: "Tillet duplisering av objekt i Canvas"
@@ -1768,8 +1768,8 @@ nn:
   app_placements_6d877225: App-plasseringar
   app_reregistration_87cc8817: "Ny registrering av app"
   app_was_installed_by_admin_and_is_locked_3bee4d39: "%{app}er installert av admin og er låst"
-  app_was_installed_by_the_master_course_and_is_lock_dbeb24a6: "%{app}er installert av masteremnet og er låst"
-  app_was_installed_by_the_master_course_e55ba1d7: "%{app}er installert av masteremnet"
+  app_was_installed_by_the_master_course_and_is_lock_dbeb24a6: "%{app}er installert av eit overordna emne og er låst"
+  app_was_installed_by_the_master_course_e55ba1d7: "%{app}er installert av eit overordna emne"
   appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "Legg til eit tal på slutten av kvar hendingstittel (f.eks. Hending 1, Hending 2, osv.)"
   appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "Legg til eit tal på slutten av kvar hendingstittel (f.eks. Hending 1, Hending 2, osv.)\" for=\"append_iterator"
   application: 
@@ -2285,7 +2285,7 @@ nn:
     non_number: "Du må bruke eit tal"
     notices: 
       assignment_delete: "Oppgåva er sletta"
-      assignment_not_available: "Oppgåva du spør etter er ikkje tilgjengeleg for emneklassen din."
+      assignment_not_available: "Oppgåva du spør etter er ikkje tilgjengeleg for emneseksjonen din."
       created: "Oppgåva er oppretta."
       updated: "Oppgåva er oppdatert."
     overdue_assignments: "Oppgåver med passert innleveringsfrist"
@@ -2839,7 +2839,7 @@ nn:
     update: Oppdatering
     view_account_roster: "Vis kontoliste"
     view_course_roster: "Vis kursliste"
-  by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Som standard er alle koplingar aktiverte for eit emne.  Studentar ser ikkje lenker til klasser som er utan innhald.  Dersom du f.eks. ikkje har oppretta quizar, er ikkje koplinga til quizar synleg. Du kan sortere og spesifikt deaktivere koplingar dersom det er område i emnet du ikkje vil at studentane skal ha tilgang til."
+  by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Som standard er alle koplingar aktiverte for eit emne.  Studentar ser ikkje lenker til seksjonar som er utan innhald.  Dersom du f.eks. ikkje har oppretta quizar, er ikkje koplinga til quizar synleg. Du kan sortere og spesifikt deaktivere koplingar dersom det er område i emnet du ikkje vil at studentane skal ha tilgang til."
   by_lti_2_registration_url_e421e523: "Etter LTI 2 sin registrerings-URL"
   by_url_a163275e: "Etter URL"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
@@ -3050,7 +3050,7 @@ nn:
       count: "Tal:"
       date: Dato
       delete: Slett
-      different_date_for_each_section: "Bruk ulike datoar for kvar klasse"
+      different_date_for_each_section: "Bruk ulike datoar for kvar seksjon"
       edit_calendar_event_header: "Rediger kalenderhending"
       end_time: Sluttidspunkt
       event_description: "Skildring av hending"
@@ -3234,7 +3234,7 @@ nn:
   calendars_toggle_list_visibility_488db143: "Vis/skjul liste i kalender"
   can_create_rename_and_edit_course_pages_by_default_f9ad4253: "kan opprette, endre namn på og redigere sider som standard"
   can_edit_this_page_role_selection_6ccec3c7: "Kan redigere denne sida"
-  can_interact_with_users_in_their_section_only_48cb8c43: "Kan berre sjå brukarar frå eigen klasse"
+  can_interact_with_users_in_their_section_only_48cb8c43: "Kan berre sjå brukarar frå eigen seksjon"
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Kan ikkje rekne ut poengsum før ei oppgåve har moglege poeng"
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Kan ikkje slette justeringar som er baserte på tilknytte vurderingsskjema. Dersom du vil fjerne forbindelsane, må du fjerne rada frå vurderingsskjemaet"
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Kan ikkje utføre differensiering opp mot meir enn ei fil av same type"
@@ -3248,7 +3248,7 @@ nn:
   cancel_submitting_comment_2666e98b: "Avbryt sending av kommentar"
   cancel_updating_comment_6816d855: "Avbryt oppdatering av kommentar"
   cannot_access_group_in_concluded_course_90a8db52: "Får ikkje tilgang til gruppe i avslutta emne"
-  cannot_add_section_to_a_non_section_specific_discu_d2a7f263: "Kan ikkje legge til klasse i ein diskusjon som ikkje er klassespesifikk"
+  cannot_add_section_to_a_non_section_specific_discu_d2a7f263: "Kan ikkje legge til seksjon i ein diskusjon som ikkje er seksjonspesifikk"
   cannot_autograde_at_this_time_a146ad9d: "Kan ikkje autosetje karakter akkurat no"
   cannot_be_associated_with_a_different_account_ac863be2: "kan ikkje vere tilknytte ein annan konto"
   cannot_be_blank_for_any_assignees_when_post_to_sis_2edd9b2a: "kan ikkje vere tom for påmeldte når Send til SIS er avkryssa"
@@ -3267,7 +3267,7 @@ nn:
   cannot_delete_an_override_with_a_due_date_within_a_fa94ca3b: "Kan ikkje slette ei overstyring med ein innleveringsfrist innanfor ein karaktersetjingsperiode"
   cannot_grade_at_this_time_489744b0: "Kan ikkje karaktersetje akkurat no"
   cannot_have_a_blueprint_course_with_students_248e3e76: "Kan ikkje ha eit blåkopiemne med studentar"
-  cannot_restrict_by_section_unless_groups_are_empty_662d3144: "Kan ikkje avgrense klassevis med mindre gruppene er tomme og ikkje har storleiksgrense"
+  cannot_restrict_by_section_unless_groups_are_empty_662d3144: "Kan ikkje avgrense seksjonvis med mindre gruppene er tomme og ikkje har storleiksgrense"
   cannot_set_only_visible_to_overrides_when_due_in_a_fac518ce: "Kan ikkje setje kun synleg for overstyring når fristen er innanfor ein lukka karaktersetjingsperiode"
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Kan ikkje setje overstyrt innleveringsfrist til ein dato innanfor ein lukka karaktersetjingsperiode"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Kan ikkje setje sis_account_id på ein root_accout."
@@ -3352,7 +3352,7 @@ nn:
       update_assignment_points: "Med total poengsum for oppgåva på  %{assignmentPoints} og totalsum i vurderingsskjema på %{rubricPoints}, blir resultatet ein høgast mogleg poengsum på %{toPercentage_pointRatio} for studentinnleveringar som er karaktersette med vurderingsskjemaet."
     titles: 
       update_assignment_points: "Vil du endre oppgåvepoeng slik at dei samsvarer med vurderingsskjemaet?"
-  change_section_to_sectionname_6e947e90: "Endre klasse til %{sectionName}"
+  change_section_to_sectionname_6e947e90: "Endre seksjon til %{sectionName}"
   change_sis_ids_3a47154d: "Endre SIS-ID-ar"
   changed_item_1d16a85f: "Endra element"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Endringane gjeld sjølv om du forlèt denne sida."
@@ -3365,7 +3365,7 @@ nn:
   check_to_select_all_98e484f1: "Merk for å velje alt"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Merk av for å ikkje legge til ein brukar for %{loginid}"
   checked_883b93fd: "merka av"
-  child_course_must_belong_to_the_same_root_account__66ed7b8e: "Underordna emne må høyre til den same rotkontoen som hovudemnet."
+  child_course_must_belong_to_the_same_root_account__66ed7b8e: "Underordna emne må høyre til den same rotkontoen som det overordna emnet."
   child_s_username_dde3aa9: "Barnets brukarnamn"
   chile_56_88238b47: "Chile (+56)"
   chile_9081cde6: Chile
@@ -3794,9 +3794,9 @@ nn:
       labels: 
         all_quizzes: "Alle quizar"
       select_quizzes: "Vel quizar som skal eksporterast"
-  content_for_section_1_7ecfb319: "Innhald for klasse 1"
-  content_for_section_2_e7c6e2a3: "Innhald for klasse 2"
-  content_for_section_3_90c1d235: "Innhald for klasse 3"
+  content_for_section_1_7ecfb319: "Innhald for seksjon 1"
+  content_for_section_2_e7c6e2a3: "Innhald for seksjon 2"
+  content_for_section_3_90c1d235: "Innhald for seksjon 3"
   content_imports: 
     errors: 
       import_failed: "Det oppstod ein feil under import av overføringa.  Ta kontakt med systemansvarleg og gi dei følgande kode: \"%{code}\""
@@ -4024,11 +4024,11 @@ nn:
           enrollment_sis_defined: "Påmeldinga er definert av universitetet og kan ikkje slettast"
         user_account_details: Brukarkontodetaljar
         user_grades: "Karakterar for %{user}"
-        user_only_view_section: "avgrens brukaren til å sjå berre brukarar i same klasse"
+        user_only_view_section: "avgrens brukaren til å sjå berre brukarar i same seksjon"
         user_outcomes: "Resultat for %{user}"
         user_view_all_sections: "la brukaren sjå alle emnebrukarane"
-      user_only_view_section: "brukaren kan berre sjå studentar i dei tildelte klasser"
-      user_view_all_sections: "brukaren kan sjå studentar i alle klasser"
+      user_only_view_section: "brukaren kan berre sjå studentar i tildelte seksjon(ar)"
+      user_view_all_sections: "brukaren kan sjå studentar i alle seksjonar"
     no_user: 
       course: "Brukaren finst ikkje eller er ikkje medlem av dette emnet akkurat no"
       group: "Brukaren finst ikkje eller er ikkje medlem av denne gruppa akkurat no"
@@ -4087,14 +4087,14 @@ nn:
           enrollment_sis_defined: "Påmeldinga er definert av universitetet og kan ikkje slettast"
         user_account_details: Brukarkontodetaljar
         user_grades: Karakterar
-        user_only_view_section: "avgrens brukaren til å sjå berre brukarar i same klasse"
+        user_only_view_section: "avgrens brukaren til å sjå berre brukarar i same seksjon"
         user_outcomes: Resultat
         user_view_all_sections: "la brukaren sjå alle emnebrukarane"
       no_messages: "Ingen meldingar"
       no_services: "%{user} har ikkje kopla eksterne tenester til kontoen enno."
       services_not_visible: "%{user} sine registrerte tenester er ikkje synlege for deg akkurat no."
-      user_only_view_section: "brukaren kan berre sjå studentar i dei tildelte klasser"
-      user_view_all_sections: "brukaren kan sjå studentar i alle klasser"
+      user_only_view_section: "brukaren kan berre sjå studentar i tildelte seksjon(ar)"
+      user_view_all_sections: "brukaren kan sjå studentar i alle seksjonar"
     roster_user_services: 
       headings: 
         registered_services: "Registrerte tenester"
@@ -4331,7 +4331,7 @@ nn:
     one: "%{contextName} og %{count} annan"
     other: "%{contextName} og %{count} andre"
   continue_ac067716: "Hald fram"
-  continue_typing_to_find_additional_sections_or_stu_49786085: "Hald fram med å skrive for å finne fleire klasser eller studentar."
+  continue_typing_to_find_additional_sections_or_stu_49786085: "Hald fram med å skrive for å finne fleire seksjonar eller studentar."
   contributed_to_this_module_item_and_is_complete_2799d5c: "Bidratt til denne delen av modulen og har fullført"
   conversation_dialog: 
     message_sent: "Meldinga er send"
@@ -4837,15 +4837,15 @@ nn:
     cant_be_blank: "Kan ikkje stå tom"
   course_section: 
     sis_id_taken: "SIS-ID \"%{sis_id}\" er allereie i bruk"
-  course_section_7a988066: Emneklasser
-  course_section_name_ea880ed1: "Emneklasse %{name}"
+  course_section_7a988066: Emneseksjonar
+  course_section_name_ea880ed1: "Emneseksjonar %{name}"
   course_selection_245808bf: Emneval
   course_set_up_tutorial_6ab7c2d1: "Sett opp emne-rettleiing"
   course_set_up_tutorial_provides_tips_on_how_to_lev_3c098131: "Sett opp emne-rettleiinga gir tips om korleis du best mogleg kan gjere bruk av funksjonar og val i Canvas. Den gjer spesielt nytte for seg om du er ny brukar i Canvas eller er i ferd med å setje opp eit nytt emne for første gong på ein stund. "
   course_settings: 
     buttons: 
-      add_section: "Legg til klasse"
-      adding_section: "Legg til klasse..."
+      add_section: "Legg til seksjon"
+      adding_section: "Legg til seksjon..."
       re_sending_all: "Sender ikkje godkjende invitasjonar på nytt..."
       re_sent_all: "Alle invitasjonar som ikkje er godkjende er sende på nytt."
     cancel: Avbryt
@@ -4853,20 +4853,20 @@ nn:
       delete_section: "Er du sikker på at du vil slette denne klassa?"
       publish_grades: "Er du sikker på at du vil sende karakterane til studentinformasjonssystemet? Du bør gjere dette berre dersom alle karakterane er ferdigstilte."
       re_publish_grades: "Er du sikker på at du vil sende karakterane på nytt til studentinformasjonssystemet?"
-    edit_sections_placeholder: "Oppgi eit klassenamn"
-    edit_sections_title: Klassenamn
+    edit_sections_placeholder: "Oppgi eit seksjonsnamn"
+    edit_sections_title: Seksjonsnamn
     errors: 
       invalid_sis_status: "Ugyldig SIS-publiseringsstatus"
       invitation: "Invitasjon mislukka.  Prøv på nytt seinare."
       publish_grades: "Noko gjekk gale under sendinga av karakterane til studentinformasjonssystemet. Prøv på nytt seinare."
       re_send_all: "Kan ikkje sende. Prøv på nytt seinare"
-      section: "Kan ikkje legge til klasse, prøv på nytt seinare"
+      section: "Kan ikkje legge til seksjon, prøv på nytt seinare"
     flash: 
       invitation: "Invitasjonen er send."
       linkError: "Noko gjekk gale under oppdateringa av brukaren sine studentlenker. Prøv på nytt seinare."
       links: "Studentlenkene er oppdaterte"
-      sectionError: "Noko gjekk gale under oppdateringa av brukaren sine klasser. Prøv på nytt seinare."
-      sections: "Klassepåmeldingane er oppdaterte"
+      sectionError: "Noko gjekk gale under oppdatering av brukaren sine seksjonar. Prøv på nytt seinare."
+      sections: "Seksjonspåmeldingane er oppdaterte"
     invitation_sent: "Invitasjonen er send."
     invitation_sent_now: "Akkurat no"
     link_students_placeholder: "Oppgi eit studentnamn"
@@ -4884,7 +4884,7 @@ nn:
       link_to_students: "Lenker til studentar"
       move_course: "Flytt emne"
       reset_course_content_dialog_help: "Tilbakestill emneinnhald"
-      section_enrollments: Klassepåmeldingar
+      section_enrollments: Seksjonspåmeldingar
   course_settings_sub_navigation_b95deae: "Navigering i emneinnstillingar"
   course_setup_wizard_is_showing_a7c087c1: "Viser installasjonsvegvisar for emnet."
   course_sis_7ae8f649: emne-SIS
@@ -5058,13 +5058,13 @@ nn:
         have_been_enrolled: "Følgande brukarar er registrerte"
         name: Namn
         next: Neste
-        section: Klasse
+        section: Seksjon
         user_might_not_exist: "Dersom formatet er korrekt, kan du kontakte Canvas-admin for å sikre at brukaren har ein Canvas-konto."
         user_role: "Rolle:"
         validating: Validerer...
         will_not_be_added: "Brukarane har feil og blir ikkje lagt til. Sørg for at dei er korrekt formaterte."
       edit_sections_view: 
-        edit_sections_desc: "Klasser er ein annan måte å organisere brukarar på. Dette gjer at du kan undervise fleire klasser i det same emnet, og ha alt emneinnhaldet på same plass. Nedanfor kan du flytte ein brukar til ei anna klasse, eller legge til/fjerne klassepåmeldingar. Brukarane må vere i minst eit område til kvar tid."
+        edit_sections_desc: "Seksjonar er ein annan måte å organisere brukarar på. Dette gjer at du kan undervise fleire seksjonar i det same emnet, og ha alt emneinnhaldet på same plass. Nedanfor kan du flytte ein brukar til ei anna seksjon, eller legge til/fjerne seksjonspåmeldingar. Brukarane må vere i minst eit område til kvar tid."
       index: 
         cannot_add_users: "Nye brukarar kan ikkje leggast til fordi emnet er avslutta"
         filter_field_description: "Søk etter personar. Når du skriv i dette feltet, blir listene over personar automatisk filtrerte slik at dei berre inkluderer namna som samsvarer med dine inndata."
@@ -5093,7 +5093,7 @@ nn:
         groups: Grupper
       roster_user: 
         links: 
-          edit_sections: "Rediger klasser"
+          edit_sections: "Rediger seksjonar"
           link_to_students: "Lenker til studentar"
           remove_from_course: "Fjern frå emnet"
           resend_invitation: "Send invitasjonen på nytt"
@@ -5108,7 +5108,7 @@ nn:
         name: Namn
         no_people_found: "Finn ikkje personar"
         role: Rolle
-        section: Klasse
+        section: Seksjon
         total_activity: "Total aktivitet"
         you_can_search_by: "Du kan søke etter:"
       section: 
@@ -5120,8 +5120,8 @@ nn:
     settings: 
       alerts_title: Varsel
       buttons: 
-        add_section: Klasse
-        edit_section_name: "Rediger klassenamn"
+        add_section: Seksjon
+        edit_section_name: "Rediger seksjonsnamn"
         move_course: "Flytt emne"
         update_course: "Oppdater emnedetaljar"
       course_conclude_at_warning_message: "Emnet er sett til å slutte ved midnatt, som betyr at føregåande dag er den siste dagen emnet er aktivt."
@@ -5142,7 +5142,7 @@ nn:
         grade_publishing: "Publisering av karakterar"
         move_course: "Flytt emnet til ein annan rotkonto"
         navigation: Emnenavigering
-        sections: "Klasser i emnet"
+        sections: "Seksjonar i emnet"
       help: 
         edit_navigation: "Dra og slepp elementa for å omorganisere dei i emnenavigasjonen."
       images: 
@@ -5173,7 +5173,7 @@ nn:
         course_lock_all_announcements: "Slå av kommentering av kunngjeringar"
         course_name: Namn
         course_offline_export: "Fråkopla emne"
-        course_section_name: "Legg til ei ny klasse"
+        course_section_name: "Legg til ei ny seksjon"
         course_status_published: "Emnet er publisert"
         course_status_unpublished: "Emnet er ikkje publisert"
         course_visibility: Synlegheit
@@ -5209,9 +5209,9 @@ nn:
         more_options: "fleire alternativ"
         move_course: "Flytt til ein annan konto"
         title: 
-          cant_delete: "Du kan ikkje slette klasser med påmelde brukarar"
-          delete_section: "Slett klasse"
-          edit_section: "Rediger klasse"
+          cant_delete: "Du kan ikkje slette seksjonar med påmelde brukarar"
+          delete_section: "Slett seksjon"
+          edit_section: "Rediger seksjon"
       megabytes: megabyte
       move_module: 
         place: Plassering
@@ -5237,7 +5237,7 @@ nn:
         feature_options: Funksjonsval
         grade_publishing: "Publisering av karakterar"
         navigation: Navigasjon
-        sections: Klasser
+        sections: Seksjonar
         tools: Appar
       titles: 
         edit_navigation: "Rediger emnenavigasjon"
@@ -5366,8 +5366,8 @@ nn:
         date: Dato
         details: Detaljar
       syllabus: 
-        hide_specific_dates: "Skjul spesifikke datoar for klasser, gruppe og person"
-        show_specific_dates: "Vis spesifikke datoar for klasser, gruppe og person"
+        hide_specific_dates: "Skjul spesifikke datoar for seksjonar, gruppe og person"
+        show_specific_dates: "Vis spesifikke datoar for seksjonar, gruppe og person"
     titles: 
       rss_feed: "%{course} straum"
     to_do_list: 
@@ -5394,7 +5394,7 @@ nn:
       eller Quizar. Oppgåvegrupper kan vektast.
   create_assignments_on_the_assignments_page_organiz_90c78fdc: |-
       Opprett innleveringar på Oppgåve-sida. Innleveringar kan organiserast
-      under ulike overskrifter/oppgåvegrupper som t.d. Heimearbeid, Arbeid i klassen, Oppgåver, Diskusjonar
+      under ulike overskrifter/oppgåvegrupper som t.d. Heimearbeid, Arbeid på campus, Oppgåver, Diskusjonar
       eller Quizar. Oppgåvegrupper kan vektast.
   create_content_for_your_course_500a7032: "Opprett emneinnhald"
   create_criterion_6df4d4ad: "Opprett kriterium"
@@ -5773,7 +5773,7 @@ nn:
   delete_rating_24876355: "Slett vurdering"
   delete_requirement_bce2d943: "Slett vilkår"
   delete_rubric_9b66412d: "Slett vurderingsskjema"
-  delete_section_name_a48d9d79: "Slett klasse \"%{name}\""
+  delete_section_name_a48d9d79: "Slett seksjon \"%{name}\""
   delete_selected_a023ccf8: "Slett Valt"
   delete_survey_56fddbbd: "Slett Undersøking"
   delete_term_name_f707abc9: "Slett semester %{name}"
@@ -6236,7 +6236,7 @@ nn:
     subscribed: Abonnerer
     subscribed_hint: "Du abonnerer på dette emnet. Klikk her for å avslutte abonnementet."
     this_student: "Denne studenten"
-    toggle_message: "vis/skjul klasse"
+    toggle_message: "vis/skjul seksjon"
     uknown_author: "Ukjend forfattar"
     unknown: Ukjent
     unknown_author: "Ukjend forfattar"
@@ -6312,7 +6312,7 @@ nn:
   due_date_cannot_be_after_section_end_b0f54388: "Innleveringsfristen kan ikkje vere etter at klassa er låst"
   due_date_cannot_be_after_term_end_5d504cb1: "Innleveringsfristen kan ikkje vere etter semesterslutt"
   due_date_cannot_be_before_course_start_ecc523ba: "Innleveringsfristen kan ikkje vere før emnestart"
-  due_date_cannot_be_before_section_start_f8950484: "Innleveringsfristen kan ikkje vere før klassestart"
+  due_date_cannot_be_before_section_start_f8950484: "Innleveringsfristen kan ikkje vere før oppstart for seksjon"
   due_date_cannot_be_before_term_start_ea660b2c: "Innleveringsfristen kan ikkje vere før semesterstart"
   due_date_cannot_be_before_unlock_date_f263aab0: "Innleveringsfristen kan ikkje vere før datosperre er oppheva"
   due_date_cannot_fall_in_a_closed_grading_period_e4336124: "Innleveringsfrist kan ikkje vere innanfor ein lukka karaktersetjingsperiode"
@@ -6412,7 +6412,7 @@ nn:
       criterion_long_description: "Lang skildring av kriterium"
       edit_rubric_rating: "Rediger vurdering"
       find_existing_rubric: "Finn gjeldande vurderingsskjema"
-  edit_section_name_558cc89: "Rediger klasse \"%{name}\""
+  edit_section_name_558cc89: "Rediger seksjon \"%{name}\""
   edit_survey_b0d6890d: "Rediger undersøking"
   edit_term_name_29a8a322: "Rediger semester %{name}"
   edit_text_27d8aa3d: "Rediger %{text}"
@@ -6603,7 +6603,7 @@ nn:
   eportfolio: 
     buttons: 
       done_editing: "Redigering fullført"
-      manage_sections: "Administrer klasser"
+      manage_sections: "Administrer seksjonar"
     confirm_delete_message: "Er du sikker på at du vil slette denne meldinga?"
     confirm_delete_page: "Vil du slette denne sida og alt innhald?"
     confirm_delete_section: "Vil du slette denne klassa og alt innhald?"
@@ -6614,8 +6614,8 @@ nn:
       missing_file: "Vel ei fil"
       name_required: "Namn er obligatorisk"
       name_too_long: "Namnet er for langt"
-      section_name_invalid: "Klassenamnet er ikkje gyldig"
-      section_name_too_long: "Klassenamnet er for langt"
+      section_name_invalid: "Seksjonsnamnet er ikkje gyldig"
+      section_name_too_long: "Seksjonsnamnet er for langt"
       upload_failed: "Opplasting mislukkast."
     first_category: Heim
     first_entry: 
@@ -6632,7 +6632,7 @@ nn:
     errors: 
       missing_page: "Kan ikkje finne denne sida"
   eportfolio_category: 
-    default_section: Klassenamn
+    default_section: Seksjonsnamn
   eportfolio_entries: 
     errors: 
       not_found: "Finn ikkje"
@@ -6660,7 +6660,7 @@ nn:
       updated_at: "sist oppdatert %{updated_at}"
     help_link_text: "%{help_icon} Korleis...?"
     manage_pages_link_text: "Organiser/administrer sider"
-    manage_sections_link_text: "Organiser klasser"
+    manage_sections_link_text: "Organiser seksjonar"
     notices: 
       created: "Portefølje er oppretta"
       deleted: "Portefølje er sletta"
@@ -6702,7 +6702,7 @@ nn:
       rich_text: 
         default_content: "Ingenting er lagt inn"
     show: 
-      add_submission: "Dersom du vil lage ei ny side for denne innleveringa, kan du velje ei klasse og oppgi namnet på den nye sida."
+      add_submission: "Dersom du vil lage ei ny side for denne innleveringa, kan du velje ein seksjon og oppgi namnet på den nye sida."
       attachment_count: 
         one: "1 vedlegg"
         other: "%{count} vedlegg"
@@ -6740,7 +6740,7 @@ nn:
         loading_submission: "Lastar innlevering"
         make_public: "Endre til Offentleg"
         page_name: Sidenamn
-        section: Klasse
+        section: Seksjon
         show_comments: "Endre kommentarar til Offentleg"
         uploading_file: "Lastar opp"
       links: 
@@ -6757,7 +6757,7 @@ nn:
         view_original: "Vis opphavleg fil"
         wizard: Oppstartvegvisar
       login_required: "Du må vere *pålogga* for å kunne kommenterer på denne sida."
-      new_section: "Ny klasse"
+      new_section: "Ny seksjon"
       no_comments: "Ingen kommentarar"
       no_files: "Ingen filer er opplasta"
       no_submissions: "Finn ingen innleveringar"
@@ -6820,12 +6820,12 @@ nn:
         instructions: "Bruke e-portefølje"
         introduction: Introduksjon
         page_content: Sideinnhald
-        pages: Klassesider
-        sections: Porteføljeklasser
+        pages: Seksjonssider
+        sections: Porteføljeseksjonar
         settings: Porteføljeinnstillingar
         submissions: "Legg til innleveringar"
       introduction: 
-        body: "i e-porteføljen kan du vise fram arbeidet ditt. Porteføljen er oppbygd av klasser og sider. Du finn lista over klasser på venstre side i vindauget (%{showme1}). Kvart område inneheld fleire sider som du ser på høgre side i vindauget (%{showme2})."
+        body: "i e-porteføljen kan du vise fram arbeidet ditt. Porteføljen er delt inn i område og sider. Du finn lista over område på venstre side i vindauget (%{showme1}). Kvart område inneheld fleire sider som du ser på høgre side i vindauget (%{showme2})."
       links: 
         portfolio: "Sjå porteføljen"
       page_content: 
@@ -6834,15 +6834,15 @@ nn:
         body3: "Innhaldet er delt inn i avsnitt som har ei prikka linje. Du kan slette eller redigere innhaldet i eit avsnitt ved å klikke på ikona %{edit_icon} eller %{delete_icon} øvst i høgre hjørne på avsnittet."
         body4: "Dersom du vil legge til nye avsnitt, klikkar du på type innhald du vil legge til i vallista på høgre side i vindauget (%{showme})."
       pages: 
-        body1: "Klassene har fleire sider. Du kan sjå lista over sider for gjeldande klasser på høgre side i vindauget %{showme1}). Dersom du vil organisere eller legge til sider, klikkar du på \"%{manage_pages}\"-lenka (%{showme2})."
+        body1: "Seksjonane har fleire sider. Du kan sjå lista over sider for gjeldande seksjonar på høgre side i vindauget (%{showme1}). Dersom du vil organisere eller legge til sider, klikkar du på \"%{manage_pages}\"-lenka (%{showme2})."
         body2: "Du kan endre sidenamna ved å klikke på %{edit_icon}-ikonet, slette ei side ved å klikke på %{delete_icon}-ikonet eller omorganisere rekkefølgje på sidene ved å klikke på og dra dei."
       sections: 
-        body1: "Du finn lista over klasser på venstre side i vindauget (%{showme1}). Kvar klasse inneheld fleire sider. Dersom du vil organisere eller legge til klasser, klikkar du på \"%{manage_sections}\"-lenka (%{showme2})."
-        body2: "Du kan endre alle klassenamn ved å klikke på %{edit_icon}-ikonet, omorganisere klasser ved å klikke på og dra dei eller slette klasser ved å klikke på %{delete_icon}-ikonet."
+        body1: "Du finn lista over område på venstre side i vindauget (%{showme1}). Kvart område inneheld fleire sider. Dersom du vil organisere eller legge til område, klikkar du på \"%{manage_sections}\"-lenka (%{showme2})."
+        body2: "Du kan endre alle seksjonsnamn ved å klikke på %{edit_icon}-ikonet, omorganisere seksjonar ved å klikke på og dra dei eller slette seksjonar ved å klikke på %{delete_icon}-ikonet."
       settings: 
         body: "Dersom du vil endre innstillingane for e-porteføljen, klikkar du på \"Porteføljeinnstillingar\"-lenka (%{showme}). Du kan endre namnet på porteføljen og veksle mellom offentleg og privat. Private porteføljer er berre synlege for dei du gir tilgang."
       submissions: 
-        body1: "Som du kanskje har lagt merke til finn du nedst på denne sida ei liste over dei siste innleveringane frå klassene dine (%{showme}). Du kan enkelt legge innleveringar frå denne sida til i nye sider i porteføljen din. Det er berre å klikke på innleveringa du vil legge til og eit popup-vindauge kjem til syne."
+        body1: "Som du kanskje har lagt merke til finn du nedst på denne sida ei liste over dei siste innleveringane frå seksjonane dine (%{showme}). Du kan enkelt legge innleveringar frå denne sida til i nye sider i porteføljen din. Det er berre å klikke på innleveringa du vil legge til og eit popup-vindauge kjem til syne."
         body2: "Flott. Dersom du skal fullføre innleveringa, må du velje klassa du vill legge innleveringa til og endre sidenamnet. Etter at du har klikka på \"Legg til side\" går du til ei ny side der det er mogleg å redigere detaljar."
   eportfolios_f6dc4579: e-porteføljer
   epub_exporting_f5592ff2: EPUB-eksport
@@ -7324,11 +7324,11 @@ nn:
       no_active_students: "Enten er det ikkje aktive studentar i emnet eller så kan ingen karaktersetjast av deg."
       no_students_in_groups_back: "Fordi det ikkje finst tildelte brukarar kan innleveringar for denne oppgåva ikkje karaktersetjast i SpeedGrader™. Tildel brukarar til gruppesettet og prøv på nytt. Klikk på 'OK' for å tilbake."
       no_students_in_groups_close: "Fordi det ikkje finst tildelte brukarar kan innleveringar for denne oppgåva ikkje karaktersetjast i SpeedGrader™. Tildel brukarar til gruppesettet og prøv på nytt. Klikk på 'OK' for å lukke vindauget."
-      no_students_in_section: "Finn ingen studentar i klassa, går tilbake til å vise alle klassene."
+      no_students_in_section: "Finn ingen studentar i seksjonen, går tilbake til å vise alle seksjonane."
       scores_updated: 
         one: "1 studentresultat er oppdatert"
         other: "%{count} studentresultat er oppdaterte"
-    all_sections: "Alle klasser"
+    all_sections: "Alle seksjonar"
     allow_message: "Klikk på \"Tillat\"-knappen for å starte opptak."
     begin_record_prompt: "Klikk på \"Opptak\"-knappen for å starte."
     buttons: 
@@ -7426,7 +7426,7 @@ nn:
       student_placeholder: Student
     secondary_id: "Sekundær ID"
     section_to_show_menu: 
-      choose_a_section_to_show: "Vel ei klasse du vil vise"
+      choose_a_section_to_show: "Vel ein seksjon du vil vise"
       showing_course: "Viser emne"
       showing_sections: "Viser *%{currentSection}*"
     show_all_details_button: "Vis alle detaljar"
@@ -7606,11 +7606,11 @@ nn:
       headers: 
         import_error: "Det er noko i opplastinga eg fekk frå deg som eg ikkje forstår:"
         missing_assignment: "Du har lasta opp oppgåver som ikkje har vore i karakterboka di tidlegare. Er dette ei ny oppgåve, eller dreiar det seg om ei gjeldande oppgåve?"
-        missing_student: "Du har lasta opp rader for følgande studentar, og eg finn ikkje ut om dei er frå di klasse. Fint om du kan informere meg om kven dei er."
+        missing_student: "Du har lasta opp rader for følgande studentar, og eg finn ikkje ut om dei er frå din seksjon. Fint om du kan informere meg om kven dei er."
         no_changes: "Eg finn ikkje endringar i karakterboka du lasta opp."
         past_grading_periods_prevent_editing: "Kan ikkje redigere følgande oppgåver fordi dei ikkje er i ei gjeldande karaktersetjingsperiode:"
       ignore_assignment_option: "Uekte, ignorer"
-      ignore_student_option: "Ikkje i mi klasse. Ignorer denne rada."
+      ignore_student_option: "Ikkje i mi seksjon. Ignorer denne rada."
       labels: 
         points_possible: "Moglege poeng"
       links: 
@@ -7761,7 +7761,7 @@ nn:
     screenreader: 
       page_titles: "Karakterbok: Individuell vising"
     speed_grader: 
-      all_sections: "Alle klasser"
+      all_sections: "Alle seksjonar"
       attach: "Legg ved"
       buttons: 
         save: Lagre
@@ -7813,7 +7813,7 @@ nn:
         previous: Førre
         remove_attachment: "Fjern vedlegget"
         settings: Innstillingar
-        show_all_sections: "Vis alle klasser"
+        show_all_sections: "Vis alle seksjonar"
         submit_same_score: "Bruk same karakter for den nye innleveringa"
       loading: lastar...
       no_annotation: "Merknader er ikkje tilgjengelege for dette dokumentet"
@@ -8036,7 +8036,7 @@ nn:
       delete_category_success: "Kategori er sletta"
       update_category_success: "Kategori er oppdatert."
   group_category: 
-    cant_restrict_self_signup: "Kan ikkje avgrense sjølvregistrering då ei gruppe med medlemmar frå fleire klasser finst i kategorien"
+    cant_restrict_self_signup: "Kan ikkje avgrense sjølvregistrering då ei gruppe med medlemmar frå fleire seksjonar finst i kategorien"
     empty_course_or_account_id: "Må ha ein konto eller emne-ID"
     greater_than_1: "Må vere større enn 1"
     group_categories: 
@@ -8055,10 +8055,10 @@ nn:
   group_category_id_7001cf89: group_category_id
   group_category_locked: "Gruppekategorien kan ikkje endrast fordi studentar allereie har levert arbeid for denne oppgåva"
   group_details_e51122f1: Gruppedetaljar
-  group_group_name_is_for_a_different_section_4d84d256: "Gruppa %{group_name} høyrer til ei anna klasse"
+  group_group_name_is_for_a_different_section_4d84d256: "Gruppa %{group_name} høyrer til ein annan seksjon"
   group_group_name_is_full_297880d6: "Gruppa %{group_name} er full"
   group_group_name_is_joined_by_invitation_only_4ac2a9e5: "Gruppa %{group_name}kan ein berre bli med i etter invitasjon"
-  group_is_for_a_different_section_6a843a4d: "Gruppa høyrer til ei anna klasse"
+  group_is_for_a_different_section_6a843a4d: "Gruppa høyrer til ein annan seksjon"
   group_is_full_56849d78: "Gruppa er full"
   group_is_joined_by_invitation_only_d00f5a63: "Gruppa kan ein berre bli med i etter invitasjon"
   group_leader_user_name_6f24bebb: "gruppeleiar %{user_name}"
@@ -8067,7 +8067,7 @@ nn:
   group_membership: 
     errors: 
       group_full: "Gruppa er full."
-      not_in_group_section: "%{student} deler ikkje klasse med dei andre medlemmane i %{group}."
+      not_in_group_section: "%{student} deler ikkje seksjon med dei andre medlemmane i %{group}."
   group_name_b69c144: Gruppenamn
   group_name_group_announcements_5ce81c6d: "%{group_name} – gruppekunngjeringar"
   group_name_group_calendar_7f10e0ed: "%{group_name} – gruppekalender"
@@ -8305,7 +8305,7 @@ nn:
         group_structure: Gruppestruktur
         leave_group_limit_blank: "La stå tom, utan avgrensing"
         limit_group_size: "Avgrens grupper til %{group_limit} medlemmar"
-        require_same_section: "Gruppemedlemmar må vere i same klasse"
+        require_same_section: "Gruppemedlemmar må vere i same seksjon"
         save: Lagre
         saving: Lagrar...
         self_signup: Sjølvregistrering
@@ -8319,7 +8319,7 @@ nn:
         group_limit_blurb: "Grupper er avgrensa til *%{group_limit}* medlemmar."
         message_all_unassigned_option: "Send melding til alle studentar som ikkje er tilordna gruppe"
         randomly_assign_students_option: "Tilordne studentar tilfeldig"
-        restricted_self_signup_blurb: "Alle studentane i ei gruppe skal vere i same klasse."
+        restricted_self_signup_blurb: "Alle studentane i ei gruppe skal vere i same seksjon."
         self_organized_warning: "Desse gruppene er organiserte av studentane sjølve. I motsetning til andre typar grupper kan studentar tilhøyre meir enn ei av desse gruppene samtidig, så gruppene kan ikkje vere i bruk for karaktersetjing av oppgåver."
         self_signup_blurb: "Eigenregistrering er aktivert for desse gruppene."
         settings: Innstillingar
@@ -8331,7 +8331,7 @@ nn:
         group_set_name: Gruppesettnamn
         leave_group_limit_blank: "La stå tom, utan avgrensing"
         limit_group_size: "Avgrens grupper til %{group_limit} medlemmar"
-        require_same_section: "Gruppemedlemmar må vere i same klasse"
+        require_same_section: "Gruppemedlemmar må vere i same seksjon"
         save: Lagre
         saving: Lagrar...
       group_detail: 
@@ -8430,8 +8430,8 @@ nn:
       for fillagring. Gruppene kan samarbeide om dokument eller planlegge webkonferansar.
       Det er som eit miniemne der du kan jobbe med færre studentar
       på eit meir fokusert prosjekt.
-  groups_cannot_have_size_restrictions_to_assign_by__7d36fa32: "Grupper kan ikkje ha storleiksgrense ved klassetildeling"
-  groups_must_be_empty_to_assign_by_section_a9fafa72: "Grupper må vere tomme ved klassetildeling"
+  groups_cannot_have_size_restrictions_to_assign_by__7d36fa32: "Grupper kan ikkje ha storleiksgrense ved seksjonstildeling"
+  groups_must_be_empty_to_assign_by_section_a9fafa72: "Grupper må vere tomme ved seksjonstildeling"
   groups_navigation_menu_76b5acc6: "Meny for gruppenavigasjon"
   groupweight_of_total_9579ae8c: "%{groupWeight}% av totalen"
   guatemala_502_ae25c68f: "Guatemala (+502)"
@@ -9193,7 +9193,7 @@ nn:
   lock_at_time_3c8a044e: "Lås den: %{time}"
   lock_c341af13: Lås
   lock_date_cannot_be_after_course_end_a473158b: "Låsedato kan ikkje vere etter emneslutt"
-  lock_date_cannot_be_after_section_end_d37da70c: "Låsedato kan ikkje vere etter klasseslutt"
+  lock_date_cannot_be_after_section_end_d37da70c: "Låsedato kan ikkje vere etter seksjonsslutt"
   lock_date_cannot_be_after_term_end_cf1a188f: "Låsedato kan ikkje vere etter semesterslutt"
   lock_date_cannot_be_before_due_date_ac30f54: "Låsedato kan ikkje vere før innleveringsfrist"
   lock_questions_after_answering_5aecef9d: "Lås spørsmåla etter at svara er gitte"
@@ -10236,7 +10236,7 @@ nn:
       title: "Send eit svar"
     email: 
       footer: |-
-          Du får denne e-postmeldinga fordi du deltek i ei eller fleire klasser som brukar Canvas.  Dersom du vil endre eller slå av e-postvarsla, kan du gå til :
+          Du får denne e-postmeldinga fordi du deltek i ein eller fleire seksjonar som brukar Canvas.  Dersom du vil endre eller slå av e-postvarsla, kan du gå til :
           %{url}
     enrollment_accepted: 
       email: 
@@ -10307,7 +10307,7 @@ nn:
       email: 
         details: "Du må registrere deg i Canvas før du kan delta i klassa.  Du kan gå inn på emnesida her for å kome i gang."
         html: 
-          body: "Du er invitert til å delta i ei klasse ved %{website}. Klassa er %{course}. Emnerolle: %{role_type}"
+          body: "Du er invitert til å delta i ein seksjon ved %{website}. Seksjonen er %{course}. Emnerolle: %{role_type}"
           details: "Du må registrere deg i Canvas før du kan delta i klassa."
           email: E-post
           link: "Klikk her for å sjå emnesida"
@@ -11257,7 +11257,7 @@ nn:
   move_outcome_group_cfa1a505: "Flytt læringsmålgruppe"
   move_page_e25b123d: "Flytt side"
   move_right_e4ddc6bf: "Flytt høgre"
-  move_section_d3866941: "Flytt klasse"
+  move_section_d3866941: "Flytt seksjon"
   move_student_49d6bc9d: "Flytt student"
   move_text_down_7176acd4: "Flytt %{text} ned"
   move_text_up_91fb4241: "Flytt %{text} opp"
@@ -11294,8 +11294,8 @@ nn:
   must_belong_to_an_active_root_account_d59a05af: "må høyre til ein aktiv rotkonto"
   must_contribute_to_the_page_fff632c: "Må bidra til sida"
   must_contribute_to_this_module_item_to_complete_it_84ed571c: "Må bidra til dette modulelementet for å fullføre det"
-  must_have_at_least_1_group_per_section_9809e708: "Må ha minst 1 gruppe for kvar klasse"
-  must_have_at_least_as_many_groups_as_sections_to_a_af2a9dfb: "Må ha minst like mange grupper som klasser ved klassetildeling"
+  must_have_at_least_1_group_per_section_9809e708: "Må ha minst 1 gruppe for kvar seksjon"
+  must_have_at_least_as_many_groups_as_sections_to_a_af2a9dfb: "Må ha minst like mange grupper som seksjonar ved seksjonstildeling"
   must_mark_as_done_91cff799: "Må merkast som fullført"
   must_mark_as_done_bf6cc563: "må merkast som fullført"
   must_mark_this_module_item_done_in_order_to_comple_ca3c390f: "Må markere modulelementet som ferdig for å fullføre"
@@ -11490,7 +11490,7 @@ nn:
   norway_47_bc598662: "Noreg (+47)"
   norway_c11471b3: Noreg
   not_a_number: "må vere eit positivt tal"
-  not_all_sections_will_be_assigned_this_item_4e2b8eaa: "Ikkje alle klassene blir tildelte dette elementet."
+  not_all_sections_will_be_assigned_this_item_4e2b8eaa: "Ikkje alle seksjonane blir tildelte dette elementet."
   not_anonymously_graded_87574f91: "Ikkje anonymt karaktersett"
   not_available_487d3648: "Ikkje tilgjengeleg"
   not_available_during_sync_ae645e8c: "Utilgjengeleg under synkronisering"
@@ -11882,7 +11882,7 @@ nn:
   only_a_maximum_of_100_events_can_be_created_ad703982: "maksimum 100 hendingar kan opprettast"
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "maksimum %{limit} hendingar kan opprettast"
   only_after_their_last_attempt_3593d101: "Berre etter siste forsøk"
-  only_announcements_can_be_section_specific_1ff992a: "Berre kunngjeringar kan vere klassespesifikke"
+  only_announcements_can_be_section_specific_1ff992a: "Berre kunngjeringar kan vere seksjonsspesifikke"
   only_available_to_students_with_link_not_visible_i_b21ec391: "Berre tilgjengeleg for studentar med lenke. Ikkje synleg i studentmapper."
   only_once_after_each_attempt_cc842738: "Berre ein gong etter kvart forsøk"
   only_teachers_can_see_this_course_until_it_is_publ_6fac97a7: "Berre faglærarar kan sjå dette emnet før det er publisert"
@@ -12434,10 +12434,10 @@ nn:
         default_enrollment_status: "Status for sletta påmeldingar"
         email_preference: E-postinnstilling
         lms_delivery_name: "LMS leveringsnamn"
-        map_sections_to_courses: "Tilordne IMS-klasser til Canvas-emne"
-        section_end_days_adjustment: "Justering av sluttdatoar for klasse"
-        section_name_selection: "Utval av klassenamn"
-        section_start_days_adjustment: "Justering av startdatoar for klasse"
+        map_sections_to_courses: "Tilordne IMS-seksjonar til Canvas-emne"
+        section_end_days_adjustment: "Justering av sluttdatoar for seksjon"
+        section_name_selection: "Utval av seksjonsnamn"
+        section_start_days_adjustment: "Justering av startdatoar for seksjon"
         term_end_days_adjustment: "Justering av sluttdatoar for semester"
         term_start_days_adjustment: "Justering av startdatoar for semester"
     index: 
@@ -12852,7 +12852,7 @@ nn:
           sine ressursar på dine vegner. Dei blir vanlegvis oppretta automatisk
           etter behov, men om [du utviklar eit nytt eller avgrensa
           prosjekt](%{documentation_url}), kan du generere token her.
-      google_drive_description: "Når du har gitt tilgang til Google Drive, kan du levere inn oppgåvene direkte frå Google Drive og opprette og dele dokument med medlemmar i klassene."
+      google_drive_description: "Når du har gitt tilgang til Google Drive, kan du levere inn oppgåvene direkte frå Google Drive og opprette og dele dokument med medlemmar i seksjonane."
       headers: 
         application_abbrev: App
         dates: Datoar
@@ -14382,7 +14382,7 @@ nn:
       other: "%{count} personar"
     sections_count: 
       one: "1 klasse"
-      other: "%{count} klasser"
+      other: "%{count} seksjonar"
   record_media_6637ff19: Medieopptak
   record_with_microphone_only_e4ee07aa: "Ta opp berre med mikrofon"
   record_with_webcam_af21e07c: "Ta opp berre med nettkamera"
@@ -14478,7 +14478,7 @@ nn:
   reported_3de7086a: Rapportert
   require_an_access_code_600e06e8: "Krev ein tilgangskode"
   require_assignment_due_date_778b200d: "Krav om innleveringsfrist"
-  require_group_members_to_be_in_the_same_section_7f6c36af: "Gruppemedlemmar må vere i same klasse"
+  require_group_members_to_be_in_the_same_section_7f6c36af: "Gruppemedlemmar må vere i same seksjon"
   require_respondus_lockdown_browser_31425b3a: "Krev Respondus LockDown Browser"
   require_usage_rights_for_uploaded_files_4507865b: "Krev bruksrettar for opplasta filer"
   required_access_code_592902d7: "Obligatorisk tilgangskode"
@@ -14565,7 +14565,7 @@ nn:
       manage_outcomes: "Administrer læringsmål"
       manage_role_overrides: "Administrer løyve"
       manage_rubrics: "Opprett og rediger vurderingsskjema"
-      manage_sections: "Administrer (opprett/rediger/slett) emneklasser"
+      manage_sections: "Administrer (opprett/rediger/slett) emneseksjonar"
       manage_sis: "Administrer SIS-data"
       manage_site_settings: "Administrer innstillingar for nettstader og programtillegg"
       manage_storage_quotas: "Administrer lagringskvotar"
@@ -14585,7 +14585,7 @@ nn:
       read_reports: "Sjå rapportar om emnebruken"
       read_roster: "Sjå brukarlister"
       send_messages: "Send meldingar til individuelle emnedeltakarar"
-      send_messages_all: "Send meldingar til heile klasser"
+      send_messages_all: "Send meldingar til heile seksjonar"
       suspend_accounts: "Suspender kontoar"
       undelete_courses: "Gjer om sletting av emne"
       view_all_grades: "Vis alle karakterar"
@@ -14826,7 +14826,7 @@ nn:
       result: Resultat
       result_for: "Resultat for:"
       results_loading: "Resultat for denne studenten lastar framleis..."
-      select_a_section: "Vel ei klasse"
+      select_a_section: "Vel ein seksjon"
       select_student: "Vel ein student"
       student_info: Studentinformasjon
     outcome_information: 
@@ -14857,7 +14857,7 @@ nn:
         download_results: "Last ned resultat (.csv)"
         hide_student_names_label: "Skjul studentnamn"
       section_select: 
-        select_a_section: "Vel ei klasse"
+        select_a_section: "Vel ein seksjon"
       sort_select: 
         sort_assignments: "Sorter oppgåver"
     student_information: 
@@ -14873,7 +14873,7 @@ nn:
       details: 
         hidden: skjult
         secondary_id: "Sekundær ID"
-        sections: "Klasser:"
+        sections: "Seksjonar:"
       index: 
         empty_student_selection: "Vel ein student for å sjå meir informasjon."
         grades: Karakterar
@@ -14891,7 +14891,7 @@ nn:
       join_course: "Ta del i dette emnet"
       next: Neste
       previous: Førre
-    course_sections: "Klasser på emnet"
+    course_sections: "Seksjonar på emnet"
     enrollments_observers: Observatørar
     enrollments_students: Studentar
     enrollments_tas: Undervisingsassistentar
@@ -14919,7 +14919,7 @@ nn:
   search_title_body_or_author_1d26711f: "Søk tittel, brødtekst eller forfattar"
   search_users_48b1789e: "Søk brukarar..."
   searching_b0207e7f: Søker
-  searching_for_announcements_in_sections_must_span__80e4dfe4: "Søk etter kunngjeringar i klasser må gjerast innanfor eit emne"
+  searching_for_announcements_in_sections_must_span__80e4dfe4: "Søk etter kunngjeringar i seksjonar må gjerast innanfor eit emne"
   second_reviewer_90046c68: "Andre fagfellevurderar"
   secondary_button_36a86f03: "Sekundær knapp"
   secondary_button_text_e92b3e52: "Tekst sekundær knapp"
@@ -14933,11 +14933,11 @@ nn:
       delete_enrollment: "Er du sikker på at du vil slette denne påmeldinga for godt?"
     default_course_name: "Emne-ID \"%{course_id}\""
     enrolled_as_designer: "påmeld som designar"
-    enrolled_as_limited_designer: "påmeld som designar med tilgang berre til klasse"
-    enrolled_as_limited_observer: "påmeld som observatør med tilgang berre til klasse"
-    enrolled_as_limited_student: "påmeld som student med tilgang berre til klasse"
-    enrolled_as_limited_ta: "påmeld som undervisingsassistent med tilgang berre til klasse"
-    enrolled_as_limited_teacher: "påmeld som faglærar med tilgang berre til klasse"
+    enrolled_as_limited_designer: "påmeld som designar med tilgang berre til seksjonar"
+    enrolled_as_limited_observer: "påmeld som observatør med tilgang berre til seksjonar"
+    enrolled_as_limited_student: "påmeld som student med tilgang berre til seksjonar"
+    enrolled_as_limited_ta: "påmeld som undervisingsassistent med tilgang berre til seksjon"
+    enrolled_as_limited_teacher: "påmeld som faglærar med tilgang berre til seksjon"
     enrolled_as_observer: "påmeld som observatør"
     enrolled_as_student: "påmeld som student"
     enrolled_as_ta: "påmeld som undervisingsassistent"
@@ -14947,32 +14947,32 @@ nn:
       course_not_authorized_for_crosslist: "%{course_name} ikkje godkjent for krysslisting"
     status: 
       confirming_course: "Stadfestar %{course_name}..."
-      removing_crosslisting_of_section: "Fjernar krysslisting av klasse..."
-  section_84b5391: klasse
-  section_c7f66a0d: Klasse
-  section_count_sections_42196f3f: "%{section_count} klasse/r"
+      removing_crosslisting_of_section: "Fjernar krysslisting av seksjon..."
+  section_84b5391: seksjon
+  section_c7f66a0d: Seksjon
+  section_count_sections_42196f3f: "%{section_count} seksjon/ar"
   section_does_not_belong_to_course_for_this_discuss_39fd6808: "Klassa høyrer ikkje til emnet som eig diskusjonsemnet"
-  section_ends_at_bb9df3c0: "Klasse sluttar på"
-  section_filter_cde54d0a: Klassefilter
-  section_id_6f73f3d5: klasse-ID
-  section_id_b5aad4a7: Klasse-ID
-  section_name_b6d82574: Klassenamn
-  section_section_names_98f172e6: "Klasse: %{section_names}"
-  section_sis_2a80d2fa: Klasse-SIS
-  section_sis_94511bcd: klasse-SIS
-  section_specific_announcements_e0d355d9: "Klassespesifikke kunngjeringar"
-  section_specific_discussions_are_disabled_9e3fd431: "Klassespesifikke diskusjonar er slått av"
-  section_specific_topics_must_have_sections_11868960: "Klassespesifikke diskusjonsemne må ha klasser"
-  section_starts_at_65eaed1: "Klasse startar på"
+  section_ends_at_bb9df3c0: "Seksjon sluttar på"
+  section_filter_cde54d0a: Seksjonsfilter
+  section_id_6f73f3d5: seksjon-ID
+  section_id_b5aad4a7: Seksjon-ID
+  section_name_b6d82574: Seksjonsnamn
+  section_section_names_98f172e6: "Seksjon: %{section_names}"
+  section_sis_2a80d2fa: Seksjon-SIS
+  section_sis_94511bcd: seksjon-SIS
+  section_specific_announcements_e0d355d9: "Seksjonsspesifikke kunngjeringar"
+  section_specific_discussions_are_disabled_9e3fd431: "Seksjonsspesifikke diskusjonar er slått av"
+  section_specific_topics_must_have_sections_11868960: "Seksjonsspesifikke diskusjonsemne må ha seksjonar"
+  section_starts_at_65eaed1: "Seksjon startar på"
   sections: 
-    section_created: "Klasse er oppretta."
-    section_creation_failed: "Oppretting av klasse mislukkast"
+    section_created: "Seksjon er oppretta."
+    section_creation_failed: "Oppretting av seksjon mislukkast"
     section_crosslisted: "Klassa er krysslista."
     section_decrosslisted: "Fjerna klassa frå krysslisting."
-    section_delete_not_allowed: "Du kan ikkje slette ei klasse som har påmeldingar"
-    section_deleted: "Emneklasse er sletta."
-    section_update_error: "Oppdatering av klasse mislukkast"
-    section_updated: "Klasse er oppdatert."
+    section_delete_not_allowed: "Du kan ikkje slette ein seksjon som har påmeldingar"
+    section_deleted: "Emneseksjon er sletta."
+    section_update_error: "Oppdatering av seksjon mislukkast"
+    section_updated: "Seksjon er oppdatert."
     show: 
       access_limit: "Brukarar kan berre delta på emnet mellom desse datoane"
       active_enrollment: 
@@ -14984,14 +14984,14 @@ nn:
         crosslist_section: "Krysslist denne klassa"
         crosslist_this_section: "Krysslist denne klassa"
         decrosslit_section: "Fjern klassa frå krysslisting"
-        edit_section: "Rediger klasse"
+        edit_section: "Rediger seksjon"
         recrosslist_section: "Krysslist klassa på nytt"
         uncrosslist_section: "Fjern denne klassa frå krysslisting"
         update_section: "Oppdater klassa"
       completed_enrollment: 
         one: "1 fullført påmelding"
         other: "%{count} fullførte påmeldingar"
-      crosslist_description: "Krysslisting gjer at du kan opprette ei klasse i ein konto og deretter flytte ho til eit emne i ein anna konto. Om du vil kryssliste emnet må du finne emnet du vil flytte til, enten ved å bruke søkeverktøy eller ved å oppgi emne-ID-en."
+      crosslist_description: "Krysslisting gjer at du kan opprette ein seksjon i ein konto og deretter flytte han til eit emne i ein anna konto. Om du vil kryssliste emnet må du finne emnet du vil flytte til, enten ved å bruke søkeverktøy eller ved å oppgi emne-ID-en."
       decrosslist_description: "Dette flyttar klassa tilbake til det opphavlege emnet, **%{course_name}**."
       decrosslist_long_description: "Karakterane for studentane på dette emnet er ikkje lenger synlege. Du kan hente inn karakterane seinare ved å kryssliste emnet på nytt, men i mellomtida kjem karakterane for desse studentane frå det opphavlege emnet."
       labels: 
@@ -15001,7 +15001,7 @@ nn:
           account: Konto
           selected_course: "Valt emne"
           sis_id: SIS-ID
-        name: Klassenamn
+        name: Seksjonsnamn
         search_for_course: "Søk etter emne"
         sis_id: SIS-ID
         sis_source_id: SIS-ID
@@ -15022,7 +15022,7 @@ nn:
         crosslist_this_section: "Krysslist denne klassa"
         current_enrollments: "Gjeldande påmeldingar"
         decrosslist_section: "Fjern denne klassa frå krysslisting"
-  sections_94731e51: Klasser
+  sections_94731e51: Seksjonar
   see_rubric_results_62a6447d: "Sjå vurderingsskjema-resultat"
   see_scoring_details_f7fd1f3b: "Sjå resultatdetaljar"
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Sjå LTI-verktøy* som fungerer bra med Canvas."
@@ -15874,7 +15874,7 @@ nn:
   show_admin_navigation_menu_92fb579f: "Vis admin-navigeringsmeny "
   show_all_artifacts_34b91a83: "Vis alle artefaktar"
   show_all_details_9879980c: "Vis alle detaljar"
-  show_all_sections_190203e8: "Vis alle klasser"
+  show_all_sections_190203e8: "Vis alle seksjonar"
   show_and_hide_courses_menu_9e09d1d0: "Vis og skjul emnemeny"
   show_attendance_columns_4d160e16: "Vis kolonnar for frammøte"
   show_by_709f525b: "Vis etter"
@@ -15951,7 +15951,7 @@ nn:
       enrollments: "Påmeldingar: %{enrollment_count}"
       group_enrollments: "Gruppepåmeldingar: %{group_enrollments_count}"
       groups: "Grupper: %{group_count}"
-      sections: "Klasser: %{section_count}"
+      sections: "Seksjonar: %{section_count}"
       terms: "Semester: %{term_count}"
       users: "Brukarar: %{user_count}"
     messages: 
@@ -16055,7 +16055,7 @@ nn:
   spring_grading_period_id_61aec82c: "Karaktersetjingsperiode-ID for våren"
   sr_gradebook: 
     all_grading_periods: "Alle periodar for karaktersetjing"
-    all_sections: "Alle klasser"
+    all_sections: "Alle seksjonar"
     assignment_muted: "Klikk for å gjere synleg."
     assignment_order_alpha: Alfabetisk
     assignment_order_assignment_groups: "Etter oppgåvegruppe og posisjon"
@@ -16107,7 +16107,7 @@ nn:
       name: namn
       root_account: root_account
       score: resultat
-      section: klasse
+      section: seksjonar
       section_id: section_id
       section_sis_id: section_sis_id
       sis_id: sis_id
@@ -16503,7 +16503,7 @@ nn:
       links: 
         add_new_term: "Legg til nytt semester"
       messages: 
-        classes_in_term: "Du kan ikkje slette eit semester som inneheld klasser."
+        classes_in_term: "Du kan ikkje slette eit semester som inneheld seksjonar."
         submitting: Leverer...
       page_title: "%{account} semester"
       prompts: 
@@ -17081,7 +17081,7 @@ nn:
   total_options_351e2682: "Alle alternativ"
   total_range_45c8549a: "Totalt spenn"
   total_results_outcomedetails_cnt_30ff1f8d: "Totalresultat: %{outcomeDetails.cnt}"
-  track_individual_student_and_class_progress_c13cf2d1: "Spor progresjon til enkeltstudentar og klasse"
+  track_individual_student_and_class_progress_c13cf2d1: "Spor progresjon til enkeltstudentar og seksjon"
   treat_ungraded_as_0_d38c2b41: "Behandle ikkje karaktersett som 0"
   tree_browser: 
     folder_tree_instructions: "Bruk navigasjonspilene opp eller ned for å bla gjennom trestrukturen. Trykk høgre for å vise mappene, trykk venstre for å skjule dei og trykk på Enter for elementet du har valt."
@@ -17168,7 +17168,7 @@ nn:
   unlock_date_cannot_be_after_due_date_8829d9ca: "Opplåsingsdato kan ikkje vere etter innleveringsfrist"
   unlock_date_cannot_be_after_lock_date_591f7fda: "Opplåsingsdato kan ikkje vere etter låsedato"
   unlock_date_cannot_be_before_course_start_9c7b8524: "Opplåsingsdato kan ikkje vere før emnestart"
-  unlock_date_cannot_be_before_section_start_793ddc66: "Opplåsingsdato kan ikkje vere før klassestart"
+  unlock_date_cannot_be_before_section_start_793ddc66: "Opplåsingsdato kan ikkje vere før starttid for seksjonen"
   unlock_date_cannot_be_before_term_start_d3c01813: "Opplåsingsdato kan ikkje vere før semesterstart"
   unlock_f6196bf5: "Lås opp"
   unlock_module_on_date_17144fbd: "Lås opp modul på dato"
@@ -17439,7 +17439,7 @@ nn:
       google_drive: "Studentane kan bruk Google Drive til å samarbeide om gruppeprosjekt.  Google Drive har sanntidsredigering av samarbeidsdokument, rekneark og presentasjonar."
       linked_in: "LinkedIn er ein ressurs for å bygge forretningsnettverk.  Mange av relasjonane du får når du studerer kan vere til stor hjelp også når du byrjar å jobbe."
       skype: "Skype er eit gratis verktøy for nettbaserte tale- og videosamtalar."
-      twitter: "Twitter er ein fantastisk ressurs for kommunikasjon utanfor klasserommet."
+      twitter: "Twitter er ein fantastisk ressurs for kommunikasjon utanfor undervisingsrommet."
       yo: "Yo er eit kommunikasjonsverktøy du brukar med berre eit enkelt klikk og utan teikn."
   user_settings_785eed40: Brukarinnstillingar
   user_successfully_deactivated_9d92d80d: "Brukaren er deaktivert"
@@ -17693,7 +17693,7 @@ nn:
       no_courses_message: |-
           Du har ingen emne, så denne sida er ikkje særleg interessant akkurat no.
           Når du har oppretta eller meldt deg på emne, kan du sjå
-          samtalar frå alle klassene her.
+          samtalar frå alle seksjonane her.
       unpublished_courses_message: |-
           Du er påmeld eit eller fleire emne som ikkje har starta enno. Når
           emna er tilgjengeleg, får du informasjon om dei her
@@ -18094,7 +18094,7 @@ nn:
   you_must_allow_at_least_one_appointment_per_time_s_76e22300: "Du må tillate minst ein avtale per tidsluke."
   you_must_allow_at_least_one_group_to_attend_68531eab: "Du må tillate at minst ei gruppe deltek"
   you_must_enter_a_date_f8eabfb1: "Du må oppgi ein dato"
-  you_must_have_a_student_or_section_selected_a99e45df: "Du må velje ein student eller ei klasse"
+  you_must_have_a_student_or_section_selected_a99e45df: "Du må velje ein student eller ein seksjon"
   you_must_log_in_to_view_replies_9ccd4da0: "Du må logge på for å vise svar"
   you_must_provide_a_value_or_unselect_the_option_3b28b754: "Du må oppgi ein verdi eller fjerne valet av dette alternativet"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Du må velje eit emne å kopiere innhald frå"
@@ -18115,7 +18115,7 @@ nn:
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "Du er tildelt ein kontorolle for kontoen %{account} ved %{website}. Rolletype: %{role_type}."
   you_ve_been_invited_to_course_90764f1: "Du er invitert til %{course}."
   you_ve_been_invited_to_course_course_role_role_typ_b8ab8f22: "Du er invitert til %{course}. Kursrolle: %{role_type}"
-  you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Du er invitert til å delta i ei klasse ved %{website}. Klassa er %{course}. Emnerolle: %{role_type}"
+  you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Du er invitert til å delta i ein seksjon ved %{website}. Seksjonen er %{course}. Emnerolle: %{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "Du er invitert til å delta på emnet %{course}. Emnerolle: %{role_type}"
   you_ve_been_invited_to_peer_review_reviewee_82580fb: "Du er invitert til fagfellevurdering av %{reviewee}."
   you_ve_been_invited_to_peer_review_reviewee_follow_2e71fce2: "Du er invitert til fagfellevurdering av %{reviewee}.  Når du skal vurdere, kan du følge lenka %{link}."

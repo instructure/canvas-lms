@@ -17,12 +17,11 @@
  */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import Container from '@instructure/ui-core/lib/components/Container';
+import View from '@instructure/ui-layout/lib/components/View';
 import Spinner from '@instructure/ui-core/lib/components/Spinner';
 import Text from '@instructure/ui-core/lib/components/Text';
 import ErrorAlert from '../ErrorAlert';
 import formatMessage from '../../format-message';
-import {animateSlideDown} from '../../utilities/scrollUtils';
 import TV from './tv.svg';
 
 export default class LoadingPastIndicator extends Component {
@@ -57,17 +56,17 @@ export default class LoadingPastIndicator extends Component {
   renderNoMore () {
     if (this.props.allPastItemsLoaded) {
       return (
-        <Container as="div" padding="small" textAlign="center">
-          <Container display="block" margin="small">
+        <View as="div" padding="small" textAlign="center">
+          <View display="block" margin="small">
             <TV role="img" aria-hidden="true" />
-          </Container>
+          </View>
           <Text size="large" as="div">
             {formatMessage('Beginning of Your To-Do History')}
           </Text>
           <Text size="medium" as="div">
             {formatMessage('You\'ve scrolled back to your very first To-Do!')}
           </Text>
-        </Container>
+        </View>
       );
     }
   }
@@ -75,14 +74,12 @@ export default class LoadingPastIndicator extends Component {
   renderLoading () {
     if (this.props.loadingPast && !this.props.allPastItemsLoaded) {
       return (
-        <Container as="div" padding="small" textAlign="center">
-          <Container display="inline">
-            <Spinner size="small" margin="0 x-small 0 0" title={formatMessage('Loading past items')}/>
-          </Container>
+        <View as="div" padding="small" textAlign="center">
+          <Spinner size="small" margin="0 x-small 0 0" title={formatMessage('Loading past items')}/>
           <Text size="small" color="secondary">
             {formatMessage('Loading past items')}
           </Text>
-        </Container>
+        </View>
       );
     }
   }

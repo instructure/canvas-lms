@@ -638,7 +638,9 @@ class DiscussionTopicsController < ApplicationController
       log_asset_access(@topic, 'topics', 'topics')
       respond_to do |format|
         if topics && topics.length == 1 && !@topic.grants_right?(@current_user, session, :update)
-          format.html { redirect_to named_context_url(topics[0].context, :context_discussion_topics_url, :root_discussion_topic_id => @topic.id) }
+          redirect_params = { :root_discussion_topic_id => @topic.id }
+          redirect_params[:module_item_id] = params[:module_item_id] if params[:module_item_id].present?
+          format.html { redirect_to named_context_url(topics[0].context, :context_discussion_topics_url, redirect_params) }
         else
           format.html do
 
@@ -1363,7 +1365,9 @@ class DiscussionTopicsController < ApplicationController
       end
 
       if attachment
-        @attachment = @context.attachments.create!(:uploaded_data => attachment)
+        @attachment = @context.attachments.new
+        Attachments::Storage.store_for_attachment(@attachment, attachment)
+        @attachment.save!
         @attachment.handle_duplicates(:rename)
         @topic.attachment = @attachment
         @topic.save
@@ -1372,13 +1376,15 @@ class DiscussionTopicsController < ApplicationController
   end
 
   def child_topic
+    extra_params = {}
     if params[:headless]
-      extra_params = {
+      extra_params.merge(
         :headless => 1,
         :hide_student_names => params[:hide_student_names],
         :student_id => params[:student_id]
-      }
+      )
     end
+    extra_params[:module_item_id] = params[:module_item_id] if params[:module_item_id].present?
 
     @root_topic = @context.context.discussion_topics.find(params[:root_discussion_topic_id])
     @topic = @root_topic.ensure_child_topic_for(@context)

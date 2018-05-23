@@ -67,6 +67,7 @@ define [
     hide: => @show(false)
 
     setTitle: (new_text) =>
+      @$titleText.attr('aria-label', new_text + " click to change")
       @$titleText.text(new_text)
 
     showPicker: (visible = true) ->

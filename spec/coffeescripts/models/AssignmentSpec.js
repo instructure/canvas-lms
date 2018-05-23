@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
+import React from 'react'
 import Assignment from 'compiled/models/Assignment'
 import Submission from 'compiled/models/Submission'
 import DateGroup from 'compiled/models/DateGroup'
@@ -157,6 +159,23 @@ test("when value 'assignment', sets record value to 'none'", () => {
   assignment.assignmentType('assignment')
   equal(assignment.assignmentType(), 'assignment')
   deepEqual(assignment.get('submission_types'), ['none'])
+})
+
+QUnit.module('Assignment#moderatedGrading', () => {
+  test('returns false if the moderated_grading attribute is undefined', () => {
+    const assignment = new Assignment()
+    strictEqual(assignment.moderatedGrading(), false)
+  })
+
+  test('returns false if the moderated_grading attribute is set to false', () => {
+    const assignment = new Assignment({ moderated_grading: false })
+    strictEqual(assignment.moderatedGrading(), false)
+  })
+
+  test('returns true if the moderated_grading attribute is set to true', () => {
+    const assignment = new Assignment({ moderated_grading: true })
+    strictEqual(assignment.moderatedGrading(), true)
+  })
 })
 
 QUnit.module('Assignment#assignmentType as a getter')
@@ -1113,4 +1132,116 @@ test('returns false if submission types are not in frozenAttributes', () => {
 test('returns true if submission_types are in frozenAttributes', () => {
   const assignment = new Assignment({frozen_attributes: ['submission_types']})
   equal(assignment.submissionTypesFrozen(), true)
+})
+
+QUnit.module('Assignment#pollUntilFinishedDuplicating', {
+  setup() {
+    this.clock = sinon.useFakeTimers()
+    this.assignment = new Assignment({ workflow_state: 'duplicating' })
+    this.stub(this.assignment, 'fetch').returns($.Deferred().resolve())
+  },
+  teardown() {
+    this.clock.restore()
+  }
+})
+
+test('polls for updates', function() {
+  this.assignment.pollUntilFinishedDuplicating()
+  this.clock.tick(2000)
+  notOk(this.assignment.fetch.called)
+  this.clock.tick(2000)
+  ok(this.assignment.fetch.called)
+})
+
+test('stops polling when the assignment has finished duplicating', function () {
+  this.assignment.pollUntilFinishedDuplicating()
+  this.assignment.set({ workflow_state: 'unpublished' })
+  this.clock.tick(3000)
+  ok(this.assignment.fetch.calledOnce)
+  this.clock.tick(3000)
+  ok(this.assignment.fetch.calledOnce)
+})
+
+QUnit.module('Assignment#renderModeratedGradingFormFieldGroup', (hooks) => {
+  const fixtures = document.getElementById('fixtures')
+  const availableModerators = [{ name: 'John Doe', id: '21' }, { name: 'Jane Doe', id: '89' }]
+  const mountPointID = 'ModeratedGradingFormFieldGroup'
+
+  hooks.beforeEach(() => {
+    fakeENV.setup({
+      ANONYMOUS_MODERATED_MARKING_ENABLED: false,
+      AVAILABLE_MODERATORS: availableModerators,
+      LOCALE: 'en',
+      MODERATED_GRADING_MAX_GRADER_COUNT: 7
+    })
+    fixtures.innerHTML = `<span data-component="${mountPointID}"></span>`
+  })
+
+  hooks.afterEach(() => {
+    fixtures.innerHTML = ''
+  })
+
+  test('renders the moderated grading form field group', () => {
+    const assignment = new Assignment()
+    assignment.renderModeratedGradingFormFieldGroup()
+    strictEqual(document.getElementsByClassName('ModeratedGrading__Container').length, 1)
+  })
+
+  test('passes the final_grader_id as a prop to the component', () => {
+    const assignment = new Assignment()
+    assignment.set('final_grader_id', '293')
+    sinon.spy(React, 'createElement')
+    assignment.renderModeratedGradingFormFieldGroup()
+    const [,props] = React.createElement.getCall(0).args
+    strictEqual(props.finalGraderID, '293')
+    React.createElement.restore()
+  })
+
+  test('passes moderated_grading as a prop to the component', () => {
+    const assignment = new Assignment()
+    assignment.set('moderated_grading', true)
+    sinon.spy(React, 'createElement')
+    assignment.renderModeratedGradingFormFieldGroup()
+    const [,props] = React.createElement.getCall(0).args
+    strictEqual(props.moderatedGradingEnabled, true)
+    React.createElement.restore()
+  })
+
+  test('passes available moderators in the ENV as a prop to the component', () => {
+    const assignment = new Assignment()
+    assignment.set('moderated_grading', true)
+    sinon.spy(React, 'createElement')
+    assignment.renderModeratedGradingFormFieldGroup()
+    const [,props] = React.createElement.getCall(0).args
+    strictEqual(props.availableModerators, availableModerators)
+    React.createElement.restore()
+  })
+
+  test('passes max grader count in the ENV as a prop to the component', () => {
+    const assignment = new Assignment()
+    sinon.spy(React, 'createElement')
+    assignment.renderModeratedGradingFormFieldGroup()
+    const [,props] = React.createElement.getCall(0).args
+    strictEqual(props.maxGraderCount, ENV.MODERATED_GRADING_MAX_GRADER_COUNT)
+    React.createElement.restore()
+  })
+
+  test('passes locale in the ENV as a prop to the component', () => {
+    const assignment = new Assignment()
+    sinon.spy(React, 'createElement')
+    assignment.renderModeratedGradingFormFieldGroup()
+    const [,props] = React.createElement.getCall(0).args
+    strictEqual(props.locale, ENV.LOCALE)
+    React.createElement.restore()
+  })
+
+  test('passes current grader count as a prop to the component', () => {
+    const assignment = new Assignment()
+    assignment.set('grader_count', 4)
+    sinon.spy(React, 'createElement')
+    assignment.renderModeratedGradingFormFieldGroup()
+    const [,props] = React.createElement.getCall(0).args
+    strictEqual(props.currentGraderCount, 4)
+    React.createElement.restore()
+  })
 })

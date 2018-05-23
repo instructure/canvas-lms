@@ -23,50 +23,53 @@ describe "SpeedGrader with Anonymous Moderated Marking enabled" do
   include_context "in-process server selenium tests"
   include SpeedGraderCommon
 
-  before(:each) do
+  before do
     Account.default.enable_feature!(:anonymous_moderated_marking)
     Account.default.enable_feature!(:anonymous_marking)
     course_with_teacher_logged_in
     outcome_with_rubric
-    @assignment = @course.assignments.create(
+    @assignment = @course.assignments.create!(
       name: 'some topic',
       points_possible: 10,
       submission_types: 'discussion_topic',
-      description: 'a little bit of content'
+      description: 'a little bit of content',
+      anonymous_grading: true
     )
     student = user_with_pseudonym(
-      name: 'first student',
+      name: 'Fen',
       active_user: true,
       username: 'student@example.com',
       password: 'qwertyuiop'
     )
-    @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
+    @course.enroll_user(student, "StudentEnrollment", enrollment_state: :active)
     # create and enroll second student
     student_2 = user_with_pseudonym(
-      name: 'second student',
+      name: 'Zaz',
       active_user: true,
       username: 'student2@example.com',
       password: 'qwertyuiop'
     )
-    @course.enroll_user(student_2, "StudentEnrollment", :enrollment_state => 'active')
+    @course.enroll_user(student_2, "StudentEnrollment", enrollment_state: :active)
     Speedgrader.visit(@course.id, @assignment.id)
   end
 
   context "shows unique anonymous student IDs" do
     it "when teacher visits the page", priority: "1", test_id: 3481048 do
-      skip('This is skeleton code that acts as AC for GRADE-895 which is WIP')
-      student_names = Speedgrader.students_select_menu_list
-      expect(student_names.first.text).to eq("Student 1")
-      expect(student_names.last.text).to eq("Student 2")
+      Speedgrader.students_dropdown_button.click
+      student_names = Speedgrader.students_select_menu_list.map(&:text)
+      expect(student_names).to eql ['Student 1', 'Student 2']
     end
 
-    it "when teacher selects a submission and refreshes page", priority: "1", test_id: 3481049 do
-      skip('This is skeleton code that acts as AC for GRADE-895 which is WIP')
-      Speedgrader.click_next_or_prev_student(:next)
-      current_student = Speedgrader.selected_student
-      expect(current_student.text).to eq("Student 2")
-      refresh_page
-      expect(current_student.text).to eq("Student 2")
+    context "give a teacher as selected student two's submission" do
+      before do
+        Speedgrader.click_next_or_prev_student(:next)
+        Speedgrader.students_dropdown_button.click
+        @current_student = Speedgrader.selected_student
+      end
+
+      it "when teacher selects a submission and refreshes page", priority: "1", test_id: 3481049 do
+        expect { refresh_page }.not_to change { Speedgrader.selected_student.text }.from('Student 2')
+      end
     end
   end
 end

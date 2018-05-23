@@ -98,7 +98,8 @@ module CC
           att = Attachment.new
           att.context = @content_export
           att.user = @content_export.user
-          att.uploaded_data = Rack::Test::UploadedFile.new(@export_path, @export_type || Attachment.mimetype(@export_path))
+          data = Rack::Test::UploadedFile.new(@export_path, @export_type || Attachment.mimetype(@export_path))
+          Attachments::Storage.store_for_attachment(att, data)
           if att.save
             @content_export.attachment = att
             @content_export.save

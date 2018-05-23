@@ -64,6 +64,9 @@ module Api::V1::DiscussionTopics
     if opts[:root_topic_fields]&.length
       root_topics = get_root_topic_data(topics, opts[:root_topic_fields])
     end
+    if opts[:include_sections_user_count] && context
+      opts[:context_user_count] = context.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count
+    end
     topics.inject([]) do |result, topic|
       if topic.visible_for?(user)
         result << discussion_topic_api_json(topic, context || topic.context, user, session, opts, root_topics)
@@ -116,7 +119,7 @@ module Api::V1::DiscussionTopics
     end
 
     if opts[:include_sections_user_count] && !topic.is_section_specific
-      json[:user_count] = topic.context.enrollments.active.count
+      json[:user_count] = opts[:context_user_count] || context.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count
     end
 
     if opts[:include_sections] && topic.is_section_specific

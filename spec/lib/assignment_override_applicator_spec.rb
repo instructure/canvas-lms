@@ -800,7 +800,7 @@ describe AssignmentOverrideApplicator do
 
     it "should return a readonly assignment object" do
       expect(@overridden).to be_readonly
-      expect{ @overridden.save! }.to raise_exception ActiveRecord::ReadOnlyRecord
+      expect{ @overridden.save!(validate: false) }.to raise_exception ActiveRecord::ReadOnlyRecord
     end
 
     it "should cast datetimes to the active time zone" do

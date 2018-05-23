@@ -32,4 +32,5 @@ package_dirs.each do |d|
   linter_options[:file_regex] = /#{d}\/.*\.js$/
   eslint = Linter.new(linter_options)
   eslint.run
+  Dir.chdir cwd
 end

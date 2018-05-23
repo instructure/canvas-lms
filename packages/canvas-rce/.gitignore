@@ -1,0 +1,8 @@
+node_modules
+lib
+.nyc_output
+coverage
+npm-debug*
+doc/*.js
+github-pages/*.js
+canvas

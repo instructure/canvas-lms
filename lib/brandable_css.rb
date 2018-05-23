@@ -125,7 +125,10 @@ module BrandableCSS
     end
 
     def check_if_we_need_to_create_a_db_migration
-      migrations = ActiveRecord::Migrator.migrations(ActiveRecord::Migrator.migrations_paths.first)
+      path = ActiveRecord::Migrator.migrations_paths.first
+      migrations = CANVAS_RAILS5_1 ?
+        ActiveRecord::Migrator.migrations(path) :
+        ActiveRecord::MigrationContext.new(path).migrations
       ['predeploy', 'postdeploy'].each do |pre_or_post|
         migration = migrations.find { |m| m.name == MIGRATION_NAME + pre_or_post.camelize }
         # they can't have the same id, so we just add 1 to the postdeploy one

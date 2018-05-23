@@ -20,6 +20,7 @@ module Outcomes
     include OutcomeImporter
 
     class InvalidDataError < RuntimeError; end
+    class DataFormatError < RuntimeError; end
 
     OBJECT_ONLY_FIELDS = %i[calculation_method calculation_int ratings].freeze
     VALID_WORKFLOWS = [nil, '', 'active', 'deleted'].freeze
@@ -127,8 +128,8 @@ module Outcomes
 
       model.vendor_guid = outcome[:vendor_guid]
       model.title = outcome[:title]
-      model.description = outcome[:description] || ''
-      model.display_name = outcome[:display_name] || ''
+      model.description = infer_nil_value(model, :description, outcome)
+      model.display_name = infer_nil_value(model, :display_name, outcome)
       model.calculation_method = outcome[:calculation_method]
       model.calculation_int = outcome[:calculation_int]
       # let removing the outcome_links content tags delete the underlying outcome
@@ -161,6 +162,20 @@ module Outcomes
     end
 
     private
+
+    # There is no representation for `nil` in the export format. All nil values
+    # are seen as "" when re-imported. We don't want to change those values when
+    # we re-import (and we want to be able to link to those values from other
+    # contexts), so we infer cases where `nil` was probably exported as ""
+    def infer_nil_value(model, key, outcome)
+      prior = model.send(key)
+      current = outcome[key]
+      if current.blank? && prior.blank?
+        prior
+      else
+        current
+      end
+    end
 
     def non_vendor_guid_changes?(model)
       model.has_changes_to_save? && !(model.changes_to_save.length == 1 &&

@@ -305,4 +305,19 @@ describe "ratio of submissions graded" do
     expect(doc.at_css('#ratio_of_submissions_graded')).to be_nil
   end
 
+  describe 'assignment moderation' do
+    let(:moderate_button) { Nokogiri::HTML(response.body).at_css('#moderated_grading_button') }
+
+    it 'shows the moderation link for moderated assignments' do
+      @assignment.update!(moderated_grading: true)
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      expect(moderate_button).not_to be_nil
+    end
+
+    it 'does not show the moderation link for non-moderated assignments' do
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      expect(moderate_button).to be_nil
+    end
+  end
 end

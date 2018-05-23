@@ -47,11 +47,12 @@ class Account < ActiveRecord::Base
   has_many :sub_accounts, -> { where("workflow_state<>'deleted'") }, class_name: 'Account', foreign_key: 'parent_account_id'
   has_many :all_accounts, -> { order(:name) }, class_name: 'Account', foreign_key: 'root_account_id'
   has_many :account_users, :dependent => :destroy
+  has_many :active_account_users, -> { active }, class_name: 'AccountUser'
   has_many :course_sections, :foreign_key => 'root_account_id'
   has_many :sis_batches
   has_many :abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'account_id'
   has_many :root_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'root_account_id'
-  has_many :users, :through => :account_users
+  has_many :users, :through => :active_account_users
   has_many :pseudonyms, -> { preload(:user) }, inverse_of: :account
   has_many :role_overrides, :as => :context, :inverse_of => :context
   has_many :course_account_associations
@@ -64,8 +65,8 @@ class Account < ActiveRecord::Base
   has_many :developer_key_account_bindings, inverse_of: :account, dependent: :destroy
   has_many :authentication_providers,
            -> { order(:position) },
-           extend: AccountAuthorizationConfig::FindWithType,
-           class_name: "AccountAuthorizationConfig"
+           inverse_of: :account,
+           extend: AuthenticationProvider::FindWithType
 
   has_many :account_reports
   has_many :grading_standards, -> { where("workflow_state<>'deleted'") }, as: :context, inverse_of: :context
@@ -104,6 +105,7 @@ class Account < ActiveRecord::Base
 
   before_validation :verify_unique_sis_source_id
   before_save :ensure_defaults
+  before_create :enable_sis_imports, if: :root_account?
   after_save :update_account_associations_if_changed
 
   before_save :setup_cache_invalidation
@@ -303,7 +305,7 @@ class Account < ActiveRecord::Base
   def enable_canvas_authentication
     return unless root_account?
     # for migrations creating a new db
-    return unless AccountAuthorizationConfig::Canvas.columns_hash.key?('workflow_state')
+    return unless AuthenticationProvider::Canvas.columns_hash.key?('workflow_state')
     return if authentication_providers.active.where(auth_type: 'canvas').exists?
     authentication_providers.create!(auth_type: 'canvas')
   end
@@ -367,6 +369,10 @@ class Account < ActiveRecord::Base
       filters[key] = ips.join(',') unless ips.empty?
     end
     settings[:ip_filters] = filters
+  end
+
+  def enable_sis_imports
+    self.allow_sis_import = true
   end
 
   def ensure_defaults
@@ -487,7 +493,7 @@ class Account < ActiveRecord::Base
   end
 
   def fast_course_base(opts = {})
-    opts[:order] ||= "#{Course.best_unicode_collation_key("courses.name")} ASC"
+    opts[:order] ||= Course.best_unicode_collation_key("courses.name").asc
     columns = "courses.id, courses.name, courses.workflow_state, courses.course_code, courses.sis_source_id, courses.enrollment_term_id"
     associated_courses = self.associated_courses(
       :include_crosslisted_courses => opts[:include_crosslisted_courses]
@@ -959,12 +965,12 @@ class Account < ActiveRecord::Base
     if login_handle_name_is_customized?
       self.login_handle_name
     elsif self.delegated_authentication?
-      AccountAuthorizationConfig.default_delegated_login_handle_name
+      AuthenticationProvider.default_delegated_login_handle_name
     end
   end
 
   def login_handle_name_with_inference
-    customized_login_handle_name || AccountAuthorizationConfig.default_login_handle_name
+    customized_login_handle_name || AuthenticationProvider.default_login_handle_name
   end
 
   def self_and_all_sub_accounts
@@ -1106,7 +1112,7 @@ class Account < ActiveRecord::Base
   end
 
   def delegated_authentication?
-    authentication_providers.active.first.is_a?(AccountAuthorizationConfig::Delegated)
+    authentication_providers.active.first.is_a?(AuthenticationProvider::Delegated)
   end
 
   def forgot_password_external_url

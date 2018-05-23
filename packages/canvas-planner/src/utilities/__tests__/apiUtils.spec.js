@@ -20,7 +20,8 @@ import {
   transformApiToInternalItem,
   transformInternalToApiItem,
   transformInternalToApiOverride,
-  transformPlannerNoteApiToInternalItem
+  transformPlannerNoteApiToInternalItem,
+  transformApiToInternalGrade,
 } from '../apiUtils';
 
 const courses = [{
@@ -46,7 +47,6 @@ function makeApiResponse (overrides = {}, assignmentOverrides = {}) {
     type: "submitting",
     ignore: `/api/v1/users/self/todo/assignment_10/submitting?permanent=0`,
     ignore_permanently: `/api/v1/users/self/todo/assignment_10/submitting?permanent=1`,
-    visible_in_planner: true,
     planner_override: null,
     html_url: `/courses/1/assignments/10#submit`,
     plannable_type: 'assignment',
@@ -267,6 +267,21 @@ function makeWikiPage(overrides = {}) {
   };
 }
 
+function makeCalendarEvent(overrides = {}) {
+  return {
+    id: 1,
+    title: 'calendar_event title',
+    created_at: "2018-04-28 00:36:25Z",
+    start_at: '2018-05-04 19:00:00Z',
+    description: 'calendar event description',
+    all_day: false,
+    effective_context_code: 'course_1',
+    url: '/api/v1/calendar_event/1',
+    html_url: '/calendar?event_id=1&include_contexts=course_1',
+    ...overrides,
+  }
+}
+
 describe('transformApiToInternalItem', () => {
   it('extracts and transforms the proper data for responses containing a status', () => {
     const apiResponse = makeApiResponse({
@@ -409,6 +424,26 @@ describe('transformApiToInternalItem', () => {
     });
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
     expect(result.id).toEqual('1');
+  });
+
+  it('extracts and transforms the proper data for a calendar event response', () => {
+    const apiResponse = makeApiResponse({
+      plannable_type: 'calendar_event',
+      plannable: makeCalendarEvent()
+    });
+
+    const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
+    expect(result).toMatchSnapshot();
+  });
+
+  it('extracts and transforms the proper data for a calendar event response with an all day date', () => {
+    const apiResponse = makeApiResponse({
+      plannable_type: 'calendar_event',
+      plannable: makeCalendarEvent({all_day: true})
+    });
+
+    const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
+    expect(result).toMatchSnapshot();
   });
 
   it('adds the dateBucketMoment field', () => {
@@ -561,5 +596,33 @@ describe('transformPlannerNoteApiToInternalItem', () => {
     const apiResponse = makePlannerNoteApiResponse({ course_id: '1'});
     const internalItem = transformPlannerNoteApiToInternalItem(apiResponse, courses, 'UTC');
     expect(internalItem).toMatchSnapshot();
+  });
+});
+
+describe('transformApiToInternalGrade', () => {
+  it('transforms with grading periods', () => {
+    expect(transformApiToInternalGrade({
+      id: '42',
+      has_grading_periods: true,
+      enrollments: [{
+        computed_current_score: 34.42,
+        computed_current_grade: 'F',
+        current_period_computed_current_score: 42.34,
+        current_period_computed_current_grade: 'D',
+      }],
+    })).toMatchSnapshot();
+  });
+
+  it('transforms without grading periods', () => {
+    expect(transformApiToInternalGrade({
+      id: '42',
+      has_grading_periods: false,
+      enrollments: [{
+        computed_current_score: 34.42,
+        computed_current_grade: 'F',
+        current_period_computed_current_score: 42.34,
+        current_period_computed_current_grade: 'D',
+      }],
+    })).toMatchSnapshot();
   });
 });

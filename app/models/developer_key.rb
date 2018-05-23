@@ -39,6 +39,8 @@ class DeveloperKey < ActiveRecord::Base
   before_save :protect_default_key
   after_save :clear_cache
   after_create :create_default_account_binding
+  before_validation :set_require_scopes
+  before_validation :validate_scopes!
 
   validates_as_url :redirect_uri, allowed_schemes: nil
   validate :validate_redirect_uris
@@ -103,12 +105,13 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def set_visible
-    self.visible = !site_admin? # ask Karl if this should honor the visible set on object intialization
+    self.visible = !site_admin?
     true
   end
 
   def authorized_for_account?(target_account)
-    return true unless account_id
+    return false unless binding_on_in_account?(target_account)
+    return true if account_id.blank?
     return true if target_account.id == account_id
     target_account.account_chain_ids.include?(account_id)
   end
@@ -195,14 +198,12 @@ class DeveloperKey < ActiveRecord::Base
     # If no account was specified return nil to prevent unneeded searching
     return if binding_account.blank?
 
-    # If not site admin we need to look up the account chain
-    accounts = if binding_account.site_admin?
-      [binding_account.id]
-    else
-      Account.account_chain_ids(binding_account).push(Account.site_admin.id).reverse
-    end
-
     # First check for explicitly set bindings starting with site admin and working down
+    binding = DeveloperKeyAccountBinding.find_site_admin_cached(self)
+    return binding if binding.present?
+
+    # Search for bindings in the account chain starting with the highest account
+    accounts = Account.account_chain_ids(binding_account).reverse
     binding = DeveloperKeyAccountBinding.find_in_account_priority(accounts, self.id)
 
     # If no explicity set bindings were found check for 'allow' bindings
@@ -211,11 +212,34 @@ class DeveloperKey < ActiveRecord::Base
 
   private
 
+  def binding_on_in_account?(target_account)
+    return true unless target_account.root_account.feature_enabled?(:developer_key_management_ui_rewrite)
+    account_binding_for(target_account)&.workflow_state == DeveloperKeyAccountBinding::ON_STATE
+  end
+
+  def api_token_scoping_on?
+    owner_account.root_account.feature_enabled?(:api_token_scoping)
+  end
+
   def create_default_account_binding
-    owner_account = account || Account.site_admin
-    developer_key_account_bindings.create!(
-      account: owner_account
-    )
+    owner_account.developer_key_account_bindings.create!(developer_key: self)
+  end
+
+  def owner_account
+    account || Account.site_admin
+  end
+
+  def set_require_scopes
+    return unless api_token_scoping_on?
+    self.require_scopes = self.scopes.present?
+  end
+
+  def validate_scopes!
+    return true unless api_token_scoping_on?
+    return true if self.scopes.empty?
+    invalid_scopes = self.scopes - TokenScopes::ALL_SCOPES
+    return true if invalid_scopes.empty?
+    self.errors[:scopes] << "cannot contain #{invalid_scopes.join(', ')}"
   end
 
   def site_admin?

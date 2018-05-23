@@ -1,0 +1,248 @@
+{
+  "group_navigation_99f191a": {
+    "message": "التنقل عبر المجموعة"
+  },
+  "cc_attribution_share_alike_669e7f16": {
+    "message": "سمة CC المشاركة أيضًا"
+  },
+  "link_to_url_52dd935c": {
+    "message": "ارتباط إلى عنوان URL"
+  },
+  "quizzes_7e598f57": {
+    "message": "الاختبارات"
+  },
+  "cc_attribution_non_commercial_no_derivatives_9fe74c00": {
+    "message": "سمة CC غير التجارية بدون مشتقات"
+  },
+  "c_2001_acme_inc_283f7f80": {
+    "message": "(c) 2001 Acme Inc."
+  },
+  "upload_a_new_file_96e6d4ff": {
+    "message": "تحميل ملف جديد"
+  },
+  "file_upload_form_4aaad554": {
+    "message": "نموذج تحميل ملف"
+  },
+  "folder_705fd2d7": {
+    "message": "مجلد"
+  },
+  "insert_equella_links_49a8dacd": {
+    "message": "إدراج ارتباطات Equella"
+  },
+  "assignment_list_a833f59d": {
+    "message": "قائمة المهام"
+  },
+  "alternative_text_a834dcad": {
+    "message": "نص بديل:"
+  },
+  "discussions_a5f96392": {
+    "message": "المناقشات"
+  },
+  "cc_attribution_no_derivatives_b006744f": {
+    "message": "سمة CC بدون مشتقات"
+  },
+  "usage_right_ff96f3e2": {
+    "message": "حق الاستخدام:"
+  },
+  "click_to_embed_image_33107dd8": {
+    "message": "انقر لتضمين الصورة "
+  },
+  "i_hold_the_copyright_71ee91b1": {
+    "message": "أمتلك حقوق النشر"
+  },
+  "files_c300e900": {
+    "message": "الملفات"
+  },
+  "cancel_image_upload_2c771950": {
+    "message": "إلغاء تحميل صورة"
+  },
+  "people_b4ebb13c": {
+    "message": "الأشخاص"
+  },
+  "check_if_the_image_is_decorative_283649b7": {
+    "message": "تحقق إذا كانت الصورة للتزيين"
+  },
+  "loading_25990131": {
+    "message": "جارٍ التحميل..."
+  },
+  "announcements_a4b8ed4a": {
+    "message": "الإعلانات"
+  },
+  "select_a_file_53ba40ac": {
+    "message": "تحديد ملف"
+  },
+  "formatting_press_down_to_select_df728c30": {
+    "message": "التنسيق، اضغط لأسفل للتحديد"
+  },
+  "background_color_press_down_to_select_ef99fdac": {
+    "message": "لون الخلفية، اضغط لأسفل للتحديد"
+  },
+  "files_index_af7c662b": {
+    "message": "فهرس الملفات"
+  },
+  "cancel_file_upload_9903e7b9": {
+    "message": "إلغاء تحميل ملف"
+  },
+  "the_material_is_subject_to_fair_use_exception_41bc6a4b": {
+    "message": "تخضع المادة إلى استثناء الاستخدام العادل"
+  },
+  "enter_the_alternative_text_for_this_image_88047c47": {
+    "message": "أدخل نصًا بديلاً لهذه الصورة"
+  },
+  "link_to_other_content_in_the_group_3fe25379": {
+    "message": "ارتباط يؤدي إلى محتوى آخر في المجموعة."
+  },
+  "discussions_index_6c36ced": {
+    "message": "فهرس المناقشات"
+  },
+  "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
+    "message": "انقر فوق أي ملف لإدراج ارتباط تنزيل يؤدي إلى ذلك الملف."
+  },
+  "copyright_holder_66ee111": {
+    "message": "مالك حقوق النشر:"
+  },
+  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
+    "message": "منطقة نص منسق. اضغط على ALT+F8 للمساعدة"
+  },
+  "enter_search_terms_e397b1f0": {
+    "message": "إدخال كلمات البحث"
+  },
+  "pages_e5414c2c": {
+    "message": "الصفحات"
+  },
+  "cc_attribution_f6de631f": {
+    "message": "سمة CC"
+  },
+  "insert_link_6dc23cae": {
+    "message": "إدراج الارتباط"
+  },
+  "collaborations_5c56c15f": {
+    "message": "عمليات التعاون"
+  },
+  "what_would_you_like_to_call_the_new_page_d7e4488a": {
+    "message": "ماذا تود أن تسمي الصفحة الجديدة؟"
+  },
+  "click_any_image_to_embed_the_image_in_the_page_2cdd1136": {
+    "message": "انقر فوق أية صورة لتضمين الصورة في الصفحة."
+  },
+  "search_flickr_6884b518": {
+    "message": "البحث في Flickr"
+  },
+  "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
+    "message": "انقر فوق أي صفحة لإدراج ارتباط يؤدي إلى تلك الصفحة."
+  },
+  "click_to_insert_a_link_into_the_editor_c19613aa": {
+    "message": "انقر لإدراج ارتباط إلى المحرر."
+  },
+  "decorative_image_fde98579": {
+    "message": "صورة تزيين"
+  },
+  "click_to_insert_a_link_to_this_item_39794098": {
+    "message": "انقر لإدراج ارتباط إلى هذا العنصر."
+  },
+  "load_more_results_460f49a9": {
+    "message": "تحميل المزيد من النتائج"
+  },
+  "link_7262adec": {
+    "message": "ارتباط"
+  },
+  "grades_a61eba0a": {
+    "message": "الدرجات"
+  },
+  "links_14b70841": {
+    "message": "ارتباطات"
+  },
+  "loading_failed_b3524381": {
+    "message": "فشل التحميل..."
+  },
+  "click_to_embed_imagename_c41ea8df": {
+    "message": "انقر لتضمين { imageName }"
+  },
+  "close_flickr_form_b32e600a": {
+    "message": "نموذج إغلاق Flickr"
+  },
+  "course_syllabus_5de1b0af": {
+    "message": "مناهج المساق"
+  },
+  "upload_8b403d05": {
+    "message": "تحميل"
+  },
+  "modules_c4325335": {
+    "message": "الوحدات"
+  },
+  "no_results_940393cf": {
+    "message": "لا توجد نتائج."
+  },
+  "announcement_list_da155734": {
+    "message": "قائمة الإعلانات"
+  },
+  "link_to_a_new_page_6c4ad034": {
+    "message": "ارتباط إلى صفحة جديدة"
+  },
+  "insert_math_equation_57c6e767": {
+    "message": "إدخال معادلة رياضية"
+  },
+  "i_have_obtained_permission_to_use_this_file_6386f087": {
+    "message": "لقد حصلت على إذن لاستخدام هذا الملف."
+  },
+  "cc_attribution_non_commercial_share_alike_c7edb1e5": {
+    "message": "سمة CC غير التجارية بمشاركة المتشابهين"
+  },
+  "wiki_home_9cd54d0": {
+    "message": "الصفحة الرئيسية لـ Wiki"
+  },
+  "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+    "message": "إن لم تحدد الآن حقوق الاستخدام، فسيتم إلغاء نشر هذا الملف بعد تحميله."
+  },
+  "upload_a_new_image_890df275": {
+    "message": "تحميل صورة جديدة"
+  },
+  "search_280d00bd": {
+    "message": "بحث"
+  },
+  "assignments_1e02582c": {
+    "message": "المهام"
+  },
+  "cc_attribution_non_commercial_39e0d30d": {
+    "message": "سمة CC غير التجارية"
+  },
+  "quizzes_list_d812caa6": {
+    "message": "قائمة الاختبارات"
+  },
+  "image_upload_form_7b74079a": {
+    "message": "نموذج تحميل صورة"
+  },
+  "the_material_is_licensed_under_creative_commons_3242cb5e": {
+    "message": "المادة مرخصة بموجب المشاع الإبداعي"
+  },
+  "images_7ce26570": {
+    "message": "الصور"
+  },
+  "link_to_other_content_in_the_course_879163b5": {
+    "message": "ارتباط يؤدي إلى محتوى آخر في المساق."
+  },
+  "font_size_press_down_to_select_6c25dc2d": {
+    "message": "حجم الخط، اضغط لأسفل للتحديد"
+  },
+  "select_a_folder_to_upload_your_file_into_b82d12b": {
+    "message": "حدد مجلدًا لتحميل ملفك عليه"
+  },
+  "course_navigation_dd035109": {
+    "message": "التنقل عبر المساق"
+  },
+  "choose_usage_rights_33683854": {
+    "message": "اختيار حقوق الاستخدام..."
+  },
+  "text_color_press_down_to_select_8f5ad9b5": {
+    "message": "لون النص، اضغط لأسفل للتحديد"
+  },
+  "embed_image_1080badc": {
+    "message": "تضمين صورة"
+  },
+  "creative_commons_license_725584ae": {
+    "message": "ترخيص المشاع الإبداعي:"
+  },
+  "the_material_is_in_the_public_domain_279c39a3": {
+    "message": "توجد المادة في المجال العام"
+  }
+}

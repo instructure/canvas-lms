@@ -85,7 +85,7 @@ module Canvas::Oauth
     end
 
     describe '#access_token' do
-      let(:scopes) {["#{AccessToken::OAUTH2_SCOPE_NAMESPACE}userinfo"]}
+      let(:scopes) {["#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"]}
 
       it 'creates a new token if none exists' do
         expect(user.access_tokens).to be_empty
@@ -106,13 +106,13 @@ module Canvas::Oauth
       end
 
       it 'will not return the full token for a userinfo scope' do
-        scope = "#{AccessToken::OAUTH2_SCOPE_NAMESPACE}userinfo"
+        scope = "#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"
         stub_out_cache key.id, [scope]
         expect(token.access_token.full_token).to be_nil
       end
 
       it 'finds an existing userinfo token if one exists' do
-        scope = "#{AccessToken::OAUTH2_SCOPE_NAMESPACE}userinfo"
+        scope = "#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"
         stub_out_cache key.id, [scope]
         access_token = user.access_tokens.create!(:developer_key => key, :scopes => [scope], :remember_access => true)
         expect(token.access_token).to eq access_token
@@ -120,7 +120,7 @@ module Canvas::Oauth
       end
 
       it 'ignores existing token if user did not remember access' do
-        scope = "#{AccessToken::OAUTH2_SCOPE_NAMESPACE}userinfo"
+        scope = "#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"
         stub_out_cache key.id, [scope]
         access_token = user.access_tokens.create!(:developer_key => key, :scopes => [scope])
         expect(token.access_token).not_to eq access_token
@@ -189,6 +189,7 @@ module Canvas::Oauth
       it 'does not put anything else into the json' do
         expect(json.keys.sort).to match_array(['access_token', 'refresh_token', 'user', 'expires_in', 'token_type'])
       end
+
       it 'does not put expires_in in the json when auto_expire_tokens is false' do
         key = token.key
         key.auto_expire_tokens = false
@@ -196,6 +197,19 @@ module Canvas::Oauth
         expect(json.keys.sort).to match_array(['access_token', 'refresh_token', 'user', 'token_type'])
       end
 
+      it 'puts real_user in the json when masquerading' do
+        real_user = User.new
+        allow(token).to receive(:real_user).and_return(real_user)
+        expect(json['real_user']).to eq({
+          'id' => real_user.id,
+          'name' => real_user.name,
+          'global_id' => real_user.global_id.to_s
+        })
+      end
+
+      it 'does not put real_user in the json when not masquerading' do
+        expect(json['real_user']).to be_nil
+      end
     end
 
     describe '.generate_code_for' do
@@ -204,26 +218,26 @@ module Canvas::Oauth
 
       it 'returns the new code' do
         allow(Canvas).to receive_messages(:redis => double(:setex => true))
-        expect(Token.generate_code_for(1, 1)).to eq code
+        expect(Token.generate_code_for(1, 2, 3)).to eq code
       end
 
       it 'sets the new data hash into redis with 10 min ttl' do
         redis = Object.new
-        code_data = {user: 1, client_id: 1, scopes: nil, purpose: nil, remember_access: nil}
+        code_data = {user: 1, real_user: 2, client_id: 3, scopes: nil, purpose: nil, remember_access: nil}
         #should have 10 min (in seconds) ttl passed as second param
         expect(redis).to receive(:setex).with('oauth2:brand_new_code', 600, code_data.to_json)
         allow(Canvas).to receive_messages(:redis => redis)
-        Token.generate_code_for(1, 1)
+        Token.generate_code_for(1, 2, 3)
       end
 
       it 'sets the new data hash into redis with 10 sec ttl' do
         redis = Object.new
-        code_data = {user: 1, client_id: 1, scopes: nil, purpose: nil, remember_access: nil}
+        code_data = {user: 1, real_user: 2, client_id: 3, scopes: nil, purpose: nil, remember_access: nil}
         #should have 10 sec ttl passed as second param with setting
         Setting.set('oath_token_request_timeout', '10')
         expect(redis).to receive(:setex).with('oauth2:brand_new_code', 10, code_data.to_json)
         allow(Canvas).to receive_messages(:redis => redis)
-        Token.generate_code_for(1, 1)
+        Token.generate_code_for(1, 2, 3)
       end
     end
 

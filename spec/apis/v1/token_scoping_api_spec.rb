@@ -27,12 +27,24 @@ describe "ApplicationController Token Scoping", type: :request do
       quiz.publish!
       quiz
     end
+    let(:valid_scopes) do
+      [
+        "url:GET|/api/v1/courses/:course_id/quizzes",
+        "url:GET|/api/v1/courses/:course_id/quizzes/:id",
+        "url:GET|/api/v1/courses/:course_id/users",
+        "url:GET|/api/v1/courses/:id",
+        "url:GET|/api/v1/users/:user_id/profile",
+        "url:POST|/api/v1/courses/:course_id/assignments",
+        "url:POST|/api/v1/courses/:course_id/quizzes",
+        "url:PUT|/api/v1/courses/:course_id/quizzes/:id"
+      ]
+    end
     let(:account) { course.account }
-    let(:developer_key) { account.developer_keys.create!(require_scopes: true) }
+    let(:developer_key) { account.developer_keys.create!(require_scopes: true, scopes: valid_scopes) }
 
     before(:once) do
       course_with_teacher(user: user_with_pseudonym, active_all: true)
-      Account.site_admin.allow_feature!(:api_token_scoping)
+      Account.site_admin.enable_feature!(:api_token_scoping)
       Account.default.enable_feature!(:api_token_scoping)
     end
 
@@ -41,16 +53,7 @@ describe "ApplicationController Token Scoping", type: :request do
         AccessToken.create!(
           user: user,
           developer_key: developer_key,
-          scopes: [
-            'url:GET|/api/v1/users/:user_id/profile',
-            'url:GET|/api/v1/courses/:id',
-            'url:GET|/api/v1/courses/:course_id/quizzes',
-            'url:GET|/api/v1/courses/:course_id/quizzes/:id',
-            'url:GET|/api/v1/courses/:course_id/users',
-            'url:POST|/api/v1/courses/:course_id/assignments',
-            'url:POST|/api/v1/courses/:course_id/quizzes',
-            'url:PUT|/api/v1/courses/:course_id/quizzes/:id'
-          ]
+          scopes: valid_scopes
         )
       end
 

@@ -63,8 +63,8 @@ $page-dark: #ebeff2;
   box-sizing: border-box;
   display: inline-block;
   height: 18px;
-  float: left;
-  margin-right: 24px;
+  float: direction(left);
+  margin-#{direction(right)}: 24px;
   min-height: 18px; /* overwrites .checkbox in g_vendor */
   padding: 0;
   width: 18px;
@@ -81,7 +81,7 @@ $page-dark: #ebeff2;
   box-sizing: border-box;
   color: $font-color;
   box-sizing: border-box;
-  padding-left: 22px;
+  padding-#{direction(left)}: 22px;
 }
 
 .outcome-gradebook-wrapper {
@@ -95,8 +95,8 @@ $page-dark: #ebeff2;
 
 .outcome-gradebook-sidebar {
   background: $page-dark;
-  border-left: 1px solid $border-dark;
-  float: right;
+  border-#{direction(left)}: 1px solid $border-dark;
+  float: direction(right);
   position: relative;
 }
 
@@ -161,7 +161,7 @@ $page-dark: #ebeff2;
 
 .gradebook-header {
   display: flex;
-  align-items: right;
+  align-items: direction(right);
   @include clearfix;
   padding-top: $ic-sp;
   + .assignment-gradebook-container {
@@ -171,7 +171,7 @@ $page-dark: #ebeff2;
 
   .header-buttons {
     flex: 1;
-    text-align: right;
+    text-align: direction(right);
     margin-bottom: $ic-sp;
 
     .post-grades-button-placeholder {
@@ -188,7 +188,7 @@ $page-dark: #ebeff2;
 /* slickgrid overrides */
 .outcome-gradebook-wrapper {
   .slick-viewport {
-    border-left: 1px solid $border-light;
+    border-#{direction(left)}: 1px solid $border-light;
     border-top: 1px solid $border-dark;
   }
 
@@ -256,14 +256,14 @@ $page-dark: #ebeff2;
   }
 
   .slick-headerrow, .slick-header {
-    border-left: 1px solid transparent;
+    border-#{direction(left)}: 1px solid transparent;
   }
 
   .slick-headerrow-column {
     background: #fff;
     border: 1px solid transparent;
-    border-left: none;
-    border-right-color: $border-light;
+    border-#{direction(left)}: none;
+    border-#{direction(right)}-color: $border-light;
     border-bottom-color: $border-light;
     border-top-color: $border-light;
     line-height: 37px;
@@ -287,8 +287,8 @@ $page-dark: #ebeff2;
       color: $font-color;
     }
 
-    &.r1 {
-      border-left: 1px solid $border-light;
+    &.f1 {
+      border-#{direction(left)}: 1px solid $border-light;
     }
   }
 
@@ -296,9 +296,9 @@ $page-dark: #ebeff2;
     .slick-cell {
       border: 1px solid transparent;
       border-top: none;
-      border-left: none;
+      border-#{direction(left)}: none;
       border-bottom-color: $border-light;
-      border-right-color: $border-light;
+      border-#{direction(right)}-color: $border-light;
       @include fontSize(15px);
       height: 37px;
       line-height: 37px;
@@ -307,7 +307,7 @@ $page-dark: #ebeff2;
   }
 
   .outcome-student-header-cell {
-    text-align: right;
+    text-align: direction(right);
   }
 
   .outcome-student-cell.slick-cell {
@@ -319,14 +319,14 @@ $page-dark: #ebeff2;
   }
 
   .outcome-student-cell-content {
-    padding-left: 8px;
+    padding-#{direction(left)}: 8px;
     margin-top: 1px;
     .avatar {
       width: 25px;
       height: 25px;
       margin-top: 3px;
-      margin-right: 4px;
-      float: left;
+      margin-#{direction(right)}: 4px;
+      float: direction(left);
       position: relative;
       z-index: 1;
     }
@@ -334,8 +334,8 @@ $page-dark: #ebeff2;
 }
 
 .outcome-cell-wrapper {
-  text-align: right;
-  padding-right: 10px;
+  text-align: direction(right);
+  padding-#{direction(right)}: 10px;
 }
 
 .outcome-score {
@@ -347,7 +347,7 @@ $page-dark: #ebeff2;
   display: inline-block;
   height: 18px;
   width: 18px;
-  margin-left: 10px;
+  margin-#{direction(left)}: 10px;
   vertical-align: text-top;
 
   &.exceeds      { background: $exceeds-color; }

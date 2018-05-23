@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "sexp_processor", "~> 4.2"
   spec.add_dependency "ruby_parser", "~> 3.7"
-  spec.add_dependency "activesupport", ">= 3.2", "< 5.2"
+  spec.add_dependency "activesupport", ">= 3.2"
   spec.add_dependency "i18nliner", "~> 0.1"
 
   spec.add_development_dependency "bundler", "~> 1.5"

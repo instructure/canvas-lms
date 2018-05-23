@@ -20,6 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-addons-test-utils'
 import DeveloperKeysTable from 'jsx/developer_keys/DeveloperKeysTable'
+import $ from 'jquery'
 
 QUnit.module('DeveloperKeysTable',  {
   teardown() {
@@ -31,7 +32,7 @@ function devKeyList(numKeys = 10) {
   return [...Array(numKeys).keys()].map(n => ({id: `${n}`, api_key: "abc12345678", created_at: "2012-06-07T20:36:50Z"}))
 }
 
-function component(keyList, inherited) {
+function component(keyList, inherited, props = {}) {
   return TestUtils.renderIntoDocument(
     <DeveloperKeysTable
       store={{dispatch: () => {}}}
@@ -39,6 +40,7 @@ function component(keyList, inherited) {
       developerKeysList={keyList || devKeyList()}
       ctx={{}}
       inherited={inherited}
+      {...props}
     />
   )
 }
@@ -71,18 +73,83 @@ test('does render the "Stats" heading if not inherited', () => {
   equal(node.querySelectorAll('th')[3].innerText, 'Stats')
 })
 
-test('focuses name if inherited', () => {
-  const table = component(devKeyList(), true)
+test('focuses name if inherited  and show more button clicked', () => {
+  const list = devKeyList()
+  const table = component(list, true)
   const focusSpy = sinon.spy()
   table['developerKey-9'].focusName = focusSpy
-  table.focusLastDeveloperKey()
+  table.createSetFocusCallback()([list[9]])
   ok(focusSpy.called)
 })
 
-test('focuses delete icon if inherited', () => {
-  const table = component(devKeyList())
+test('makes correct screenReader notification if inherited  and show more button clicked', () => {
+  const list = devKeyList()
+  const table = component(list, true)
+  const flashSpy = sinon.spy()
+  const tmp = $.screenReaderFlashMessageExclusive
+  $.screenReaderFlashMessageExclusive = flashSpy
+  table.createSetFocusCallback()([list[9]])
+  ok(flashSpy.calledWith("Loaded more developer keys. Focus moved to the name of the last loaded developer key in the list."))
+  $.screenReaderFlashMessageExclusive = tmp
+})
+
+test('focuses delete icon if not inherited and show more button clicked', () => {
+  const list = devKeyList()
+  const table = component(list)
   const focusSpy = sinon.spy()
   table['developerKey-9'].focusDeleteLink = focusSpy
-  table.focusLastDeveloperKey()
+  table.createSetFocusCallback()([list[9]])
   ok(focusSpy.called)
+})
+
+test('makes correct screenReader notification if not inherited  and show more button clicked', () => {
+  const list = devKeyList()
+  const table = component(list)
+  const flashSpy = sinon.spy()
+  const tmp = $.screenReaderFlashMessageExclusive
+  $.screenReaderFlashMessageExclusive = flashSpy
+  table.createSetFocusCallback()([list[9]])
+  ok(flashSpy.calledWith("Loaded more developer keys. Focus moved to the delete button of the last loaded developer key in the list."))
+  $.screenReaderFlashMessageExclusive = tmp
+})
+
+test('focuses delete icon if not inherited after key deleted', () => {
+  const list = devKeyList()
+  const table = component(list)
+  const focusSpy = sinon.spy()
+  table['developerKey-8'].focusDeleteLink = focusSpy
+  table.createSetFocusCallback('9')()
+  ok(focusSpy.called)
+})
+
+
+test('makes correct screenReader notification if not inherited and key deleted', () => {
+  const list = devKeyList()
+  const table = component(list)
+  const flashSpy = sinon.spy()
+  const tmp = $.screenReaderFlashMessageExclusive
+  $.screenReaderFlashMessageExclusive = flashSpy
+  table.createSetFocusCallback('9')()
+  ok(flashSpy.calledWith("Developer key 9 deleted. Focus moved to the delete button of the previous developer key in the list."))
+  $.screenReaderFlashMessageExclusive = tmp
+})
+
+test('focuses on external button if first item deleted', () => {
+  const list = devKeyList()
+  const setFocus = sinon.spy()
+  const table = component(list, undefined, { setFocus })
+  table.createSetFocusCallback('0')()
+  ok(setFocus.called)
+})
+
+
+test('makes correct screenReader notification if first item deleted', () => {
+  const list = devKeyList()
+  const table = component(list)
+  const flashSpy = sinon.spy()
+  const tmp = $.screenReaderFlashMessageExclusive
+  $.screenReaderFlashMessageExclusive = flashSpy
+  table.createSetFocusCallback('0')()
+  ok(flashSpy.calledWith("Developer key 0 deleted. Focus moved to add developer key button."))
+  $.screenReaderFlashMessageExclusive = tmp
 })

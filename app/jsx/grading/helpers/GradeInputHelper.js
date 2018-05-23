@@ -16,19 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import Big from 'big.js'
 import round from 'compiled/util/round'
 import {gradeToScore, scoreToGrade} from '../../gradebook/GradingSchemeHelper'
 import numberHelper from '../../shared/helpers/numberHelper'
 
 const MAX_PRECISION = 15 // the maximum precision of a score persisted to the database
 
-function precisionOf(value) {
-  const parts = value.toString().split('.')
-  return parts.length === 2 ? Math.min(parts[1].length, MAX_PRECISION) : 0
+function toNumber(bigValue) {
+  return Number.parseFloat(bigValue.round(MAX_PRECISION).toString(), 10)
 }
 
-function roundScore(score, precision = MAX_PRECISION) {
-  return round(score, precision)
+function pointsFromPercentage(percentage, pointsPossible) {
+  return toNumber(new Big(percentage).div(100).times(pointsPossible))
+}
+
+function percentageFromPoints(points, pointsPossible) {
+  return toNumber(new Big(points).div(pointsPossible).times(100))
 }
 
 function invalid(value) {
@@ -54,7 +58,7 @@ function parseAsGradingScheme(value, options) {
   return {
     enteredAs: 'gradingScheme',
     percent: options.pointsPossible ? percentage : 0,
-    points: options.pointsPossible ? percentage / 100 * options.pointsPossible : 0,
+    points: options.pointsPossible ? pointsFromPercentage(percentage, options.pointsPossible) : 0,
     schemeKey: scoreToGrade(percentage, options.gradingScheme)
   }
 }
@@ -66,7 +70,7 @@ function parseAsPercent(value, options) {
   }
 
   let percent = percentage
-  let points = roundScore(percentage / 100 * options.pointsPossible, precisionOf(percentage) + 2)
+  let points = pointsFromPercentage(percentage, options.pointsPossible)
 
   if (!options.pointsPossible) {
     points = numberHelper.parse(value)
@@ -90,7 +94,7 @@ function parseAsPoints(value, options) {
     return null
   }
 
-  const percent = options.pointsPossible ? points / options.pointsPossible * 100 : 0
+  const percent = options.pointsPossible ? percentageFromPoints(points, options.pointsPossible) : 0
 
   return {
     enteredAs: 'points',

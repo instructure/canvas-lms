@@ -37,7 +37,7 @@
   }
   td {
     &.icon_react {
-      min-width: 87px;
+      min-width: 120px;
       a {
         margin-right: 5px;
         margin-bottom: 3px;
@@ -111,4 +111,13 @@
   margin: auto;
   text-align: center;
   padding: 1rem;
+}
+
+.emptyIconImage {
+  height: 36px;
+  width: 36px;
+  display: block;
+  float: left;
+  border: 1px solid #C7CDD1;
+  margin-right: .25rem;
 }

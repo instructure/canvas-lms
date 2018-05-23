@@ -51,3 +51,14 @@ test('calls flashError with base error message when errors are present', functio
   ])
   ok(mock.verify())
 })
+
+test("errors if waitAndSaveUserAvatar is called more than 50 times without successful save", function(assert) {
+  const done = assert.async()
+  this.mock($).expects('getJSON').returns(Promise.resolve([{ token: "avatar-token" }]))
+  const mock = this.mock(this.avatarDialogView).expects('handleErrorUpdating')
+  const maxCalls = 50
+  this.avatarDialogView.waitAndSaveUserAvatar("fake-token", "fake-url", maxCalls).then(() => {
+    ok(mock.verify()) 
+    done()
+  }).catch(done)
+})

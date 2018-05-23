@@ -57,14 +57,14 @@ it('disables the Outcome Views when upload starts', () => {
 it('resets the Outcome Views when upload is complete', () => {
   const resetOutcomeViews = jest.fn()
   const modal = shallow(<OutcomesImporter {...defaultProps({ resetOutcomeViews })}/>)
-  modal.instance().completeUpload(10)
+  modal.instance().completeUpload(10, true)
   expect(resetOutcomeViews).toBeCalled()
 })
 
 it('shows a flash alert when upload successfully completes', () => {
   const resetOutcomeViews = jest.fn()
   const modal = shallow(<OutcomesImporter {...defaultProps({ resetOutcomeViews })}/>)
-  modal.instance().completeUpload(0)
+  modal.instance().completeUpload(0, true)
   expect(showFlashAlert).toBeCalledWith({
     type: 'success',
     message: 'Your outcomes were successfully imported.'
@@ -74,10 +74,22 @@ it('shows a flash alert when upload successfully completes', () => {
 it('shows a flash alert when upload fails', () => {
   const resetOutcomeViews = jest.fn()
   const modal = shallow(<OutcomesImporter {...defaultProps({ resetOutcomeViews })}/>)
-  modal.instance().completeUpload(10)
+  modal.instance().completeUpload(1, false)
   expect(showFlashAlert).toBeCalledWith({
     type: 'error',
-    message: 'There were errors with your import, please examine your file and attempt the upload again. Check your email for more details.'
+    message: 'There was an error with your import, please examine your file and attempt the upload again.' +
+             ' Check your email for more details.'
+  })
+  expect(resetOutcomeViews).toBeCalled()
+})
+
+it('shows a flash alert when upload successfully completes but with warnings', () => {
+  const resetOutcomeViews = jest.fn()
+  const modal = shallow(<OutcomesImporter {...defaultProps({ resetOutcomeViews })}/>)
+  modal.instance().completeUpload(10, true)
+  expect(showFlashAlert).toBeCalledWith({
+    type: 'warning',
+    message: 'There was a problem importing some of the outcomes in the uploaded file. Check your email for more details.'
   })
   expect(resetOutcomeViews).toBeCalled()
 })

@@ -90,6 +90,45 @@ describe SectionTabPresenter do
       path = SectionTabPresenter.new(assignments_tab, course).path
       expect(path).to eq "/courses/1/assignments?message_handler_id=1&resource_link_fragment=nav"
     end
+
+    context 'with lti 2 tab' do
+      let(:tab) do
+        {
+          href: :course_basic_lti_launch_request_path,
+          args: args
+        }
+      end
+
+      context 'with keys as symbols' do
+        let(:args) { {message_handler_id: 5, resource_link_fragment: "nav", course_id: 1} }
+
+        it 'handles the tab correctly' do
+          expect(SectionTabPresenter.new(tab, course).path).to eq(
+            '/courses/1/lti/basic_lti_launch_request/5?resource_link_fragment=nav'
+          )
+        end
+      end
+
+      context 'with keys as strings' do
+        let(:args) { {"message_handler_id"=>5, "resource_link_fragment"=>"nav", "course_id"=>1}.with_indifferent_access }
+
+        it 'handles the tab correctly' do
+          expect(SectionTabPresenter.new(tab, course).path).to eq(
+            '/courses/1/lti/basic_lti_launch_request/5?resource_link_fragment=nav'
+          )
+        end
+      end
+
+      context 'with indifferent access hash' do
+        let(:args) { {"message_handler_id"=>5, "resource_link_fragment"=>"nav", "course_id"=>1} }
+
+        it 'handles the tab correctly' do
+          expect(SectionTabPresenter.new(tab, course).path).to eq(
+            '/courses/1/lti/basic_lti_launch_request/5?resource_link_fragment=nav'
+          )
+        end
+      end
+    end
   end
 
   describe '#path_args' do

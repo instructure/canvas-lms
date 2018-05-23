@@ -234,7 +234,7 @@ describe "add_people" do
 
       expect(f(".addpeople__peoplereadylist")).to be_displayed
 
-      names = ff(".addpeople__peoplereadylist tbody tr td:first-child")
+      names = ff(".addpeople__peoplereadylist tbody tr th:first-child")
       expect(names).to have_size(3)
 
       # Z and X have names, y has email copied to name

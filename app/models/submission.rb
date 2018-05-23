@@ -50,12 +50,17 @@ class Submission < ActiveRecord::Base
     not_applicable: {
       status: false,
       message: I18n.t('This assignment is not applicable to this student')
+    }.freeze,
+    moderation_in_progress: {
+      status: false,
+      message: I18n.t('This assignment is currently being moderated')
     }.freeze
   }.freeze
 
   attr_readonly :assignment_id
   attr_accessor :visible_to_user,
-                :skip_grade_calc
+                :skip_grade_calc,
+                :grade_posting_in_progress
   attr_writer :versioned_originality_reports,
               :text_entry_originality_reports
 
@@ -1482,6 +1487,10 @@ class Submission < ActiveRecord::Base
 
   def can_grade_symbolic_status(user = nil)
     user ||= grader
+
+    if assignment.root_account&.feature_enabled?(:anonymous_moderated_marking)
+      return :moderation_in_progress unless assignment.grades_published? || grade_posting_in_progress
+    end
 
     return :not_applicable if deleted?
     return :unpublished unless assignment.published?

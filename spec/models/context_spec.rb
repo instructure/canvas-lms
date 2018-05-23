@@ -182,4 +182,24 @@ describe Context do
       expect(Context.asset_name(event2)).to eq ''
     end
   end
+
+  describe '.rubric_contexts' do
+    def add_rubric(context)
+      r = Rubric.create!(context: context, title: 'testing')
+      RubricAssociation.create!(context: context, rubric: r, purpose: :bookmark, association_object: context)
+    end
+
+    it 'returns contexts in alphabetically sorted order' do
+      great_grandparent = Account.default
+      grandparent = Account.create!(name: 'AAA', parent_account: great_grandparent)
+      add_rubric(grandparent)
+      parent = Account.create!(name: 'ZZZ', parent_account: grandparent)
+      add_rubric(parent)
+      course = Course.create!(:name => 'MMM', account: parent)
+      add_rubric(course)
+
+      contexts = course.rubric_contexts(nil).map { |r| r[:name] }
+      expect(contexts).to eq(['AAA', 'MMM', 'ZZZ'])
+    end
+  end
 end

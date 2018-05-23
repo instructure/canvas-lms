@@ -40,7 +40,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
   end
 
   before do
-    allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(true)
+    allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
     allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
   end
 
@@ -62,13 +62,6 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
       expect(response).to be_success
     end
 
-    it 'renders unauthorized if the flag is not enabled in site admin' do
-      allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(false)
-      user_session(authorized_admin)
-      post :create_or_update, params: params
-      expect(response).to be_unauthorized
-    end
-
     it 'renders unauthorized if the flag is not enabled in the root account' do
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(false)
       user_session(authorized_admin)
@@ -85,7 +78,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
     end
 
     it 'renders a properly formatted developer key account binding' do
-      expected_keys = ['id', 'account_id', 'developer_key_id', 'workflow_state']
+      expected_keys = ['id', 'account_id', 'developer_key_id', 'workflow_state', 'account_owns_binding']
       user_session(authorized_admin)
       post :create_or_update, params: params
       expect(json_parse.keys).to match_array(expected_keys)
@@ -113,13 +106,6 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
       expect(response).to be_unauthorized
     end
 
-    it 'renders unauthorized if the flag is not enabled in site admin' do
-      allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(false)
-      user_session(unauthorized_admin)
-      post :create_or_update, params: params, format: :json
-      expect(response).to be_unauthorized
-    end
-
     it 'renders unauthorized if the flag is not enabled in the root account' do
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(false)
       user_session(unauthorized_admin)
@@ -134,7 +120,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
     end
 
     it 'renders a properly formatted developer key account binding' do
-      expected_keys = ['id', 'account_id', 'developer_key_id', 'workflow_state']
+      expected_keys = ['id', 'account_id', 'developer_key_id', 'workflow_state', 'account_owns_binding']
       user_session(authorized_admin)
       post :create_or_update, params: params
       expect(json_parse.keys).to match_array(expected_keys)
@@ -150,13 +136,6 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
     let(:expected_binding_index) { DeveloperKeyAccountBinding.where(account_id: account.account_chain_ids.concat([Account.site_admin.id])) }
 
     it 'renders unauthorized if the user does not have "manage_developer_keys"' do
-      user_session(unauthorized_admin)
-      get :index, params: params, format: :json
-      expect(response).to be_unauthorized
-    end
-
-    it 'renders unauthorized if the flag is not enabled in site admin' do
-      allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(false)
       user_session(unauthorized_admin)
       get :index, params: params, format: :json
       expect(response).to be_unauthorized
@@ -186,7 +165,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
     end
 
     it 'renders properly formatted developer key account bindings' do
-      expected_keys = ['id', 'account_id', 'developer_key_id', 'workflow_state']
+      expected_keys = ['id', 'account_id', 'developer_key_id', 'workflow_state', 'account_owns_binding']
       user_session(authorized_admin)
       get :index, params: params, format: :json
       expect(json_parse.first.keys).to match_array(expected_keys)
@@ -303,7 +282,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
         sub_account.update!(parent_account: account_model)
         user_session(sub_account_admin)
         post :create_or_update, params: sub_account_params
-        expect(response).to be_unauthorized
+        expect(response).to be_not_found
       end
 
       it_behaves_like 'the developer key update endpoint' do
@@ -340,7 +319,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
 
         user_session(sub_account_admin)
         get :index, params: sub_account_params.except(:developer_key_account_binding)
-        expect(json_parse.map{ |b| b['id'] }).to include root_account_binding.id
+        expect(json_parse.map{ |b| DeveloperKeyAccountBinding.find(b['id']) }).to include root_account_binding
       end
     end
   end

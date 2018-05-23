@@ -174,7 +174,12 @@ define [
       classes.push('resubmitted') if submission.grade_matches_current_submission == false
       classes.push('late') if submission.late
       classes.push('ungraded') if ''+assignment.submission_types is "not_graded"
-      classes.push('muted') if assignment.muted
+      if assignment.anonymous_grading and (assignment.muted or assignment.moderation_in_progress)
+        classes.push('anonymous')
+      else if assignment.moderation_in_progress
+        classes.push('moderated')
+      else if assignment.muted
+        classes.push('muted')
       classes.push(submission.submission_type) if submission.submission_type
       classes
 

@@ -1,0 +1,37 @@
+<%
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<% unless AuthenticationProvider::Google.globally_configured? %>
+  <p><%= mt(<<-TEXT, google_url: "https://console.developers.google.com/project", callback_url: oauth2_login_callback_url)
+You will need to create a web application in the [Google Developer Console](%{google_url}).
+You should add %{callback_url} as a redirect URI.
+After you create your app, make a note of the Client ID and Client Secret, and enter them here.
+TEXT
+      %></p>
+  <%= render partial: 'oauth2_fields', locals: { aac: aac, presenter: presenter, f: f } %>
+<% end %>
+<p><%= t(<<-TEXT)
+To restrict to users from specific Google Apps domain, enter the domain here.
+TEXT
+%></p>
+<div class="ic-Form-control">
+  <%= f.label :hosted_domain, t('Google Apps Domain'), class: 'ic-Label', for: "hosted_domain_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :hosted_domain, placeholder: 'school.edu', class: 'ic-Input', id: "hosted_domain_#{presenter.id_suffix(aac)}" %>
+</div>
+<%= render partial: 'login_attribute_dropdown', locals: { aac: aac, presenter: presenter, f: f } %>
+<%= render partial: 'jit_provisioning_field', locals: { aac: aac, presenter: presenter, f: f } %>

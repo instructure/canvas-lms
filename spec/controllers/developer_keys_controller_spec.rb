@@ -62,13 +62,6 @@ describe DeveloperKeysController do
         describe "js bundles" do
           render_views
 
-          it 'includes developer_keys_react' do
-            allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(true)
-            get 'index', params: {account_id: Account.site_admin.id}
-            expect(response).to render_template(:index_react)
-            expect(response).to be_success
-          end
-
           it 'includes developer_keys' do
             get 'index', params: {account_id: Account.site_admin.id}
             expect(response).to render_template(:index)
@@ -115,8 +108,8 @@ describe DeveloperKeysController do
           before do
             site_admin_key
             root_account_key
-            allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(true)
-            allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
+            allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(true)
+            allow_any_instance_of(Account).to receive(:feature_enabled?).with(:api_token_scoping).and_return(false)
           end
 
           context 'on site_admin account' do
@@ -171,6 +164,44 @@ describe DeveloperKeysController do
         key = DeveloperKey.find(json_data['id'])
         expect(key.account).to be nil
       end
+
+      describe 'scopes' do
+        let(:valid_scopes) do
+          %w(url:POST|/api/v1/courses/:course_id/quizzes/:id/validate_access_code
+             url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id)
+        end
+        let(:invalid_scopes) { ['url:POST/banana', 'url:POST/invalid/scope'] }
+        let(:root_account) { account_model }
+
+        before do
+          Account.site_admin.allow_feature!(:api_token_scoping)
+          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:api_token_scoping).and_return(true)
+          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
+          user_session(@admin)
+        end
+
+        it 'allows setting scopes' do
+          post 'create', params: { account_id: root_account.id, developer_key: { scopes: valid_scopes } }
+          expect(DeveloperKey.find(json_parse['id']).scopes).to match_array valid_scopes
+        end
+
+        it 'returns an error if an invalid scope is used' do
+          post 'create', params: { account_id: root_account.id, developer_key: { scopes: invalid_scopes } }
+          expect(json_parse.dig('errors', 'scopes').first['attribute']).to eq 'scopes'
+        end
+
+        it 'does not create the key if any scopes are invalid' do
+          expect do
+            post 'create', params: { account_id: root_account.id, developer_key: { scopes: invalid_scopes.concat(valid_scopes) } }
+          end.not_to change(DeveloperKey, :count)
+        end
+
+        it 'does not set scopes if the "developer_key_management_ui_rewrite" flag is disabled' do
+          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(false)
+          post 'create', params: { account_id: root_account.id, developer_key: { scopes: valid_scopes } }
+          expect(DeveloperKey.find(json_parse['id']).scopes).to be_blank
+        end
+      end
     end
 
     describe "PUT 'update'" do
@@ -191,6 +222,43 @@ describe DeveloperKeysController do
         put 'update', params: {id: dk.id, developer_key: { event: :activate }, account_id: Account.site_admin.id}
         expect(response).to be_success
         expect(dk.reload.state).to eq :active
+      end
+
+      describe 'scopes' do
+        let(:valid_scopes) do
+          %w(url:POST|/api/v1/courses/:course_id/quizzes/:id/validate_access_code
+             url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id)
+        end
+        let(:invalid_scopes) { ['url:POST|/api/v1/banana', 'not_a_scope'] }
+        let(:root_account) { account_model }
+        let(:developer_key) { DeveloperKey.create!(account: account_model) }
+
+        before do
+          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:api_token_scoping).and_return(true)
+          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
+          user_session(@admin)
+        end
+
+        it 'allows setting scopes' do
+          put 'update', params: { id: developer_key.id, developer_key: { scopes: valid_scopes } }
+          expect(developer_key.reload.scopes).to match_array valid_scopes
+        end
+
+        it 'returns an error if an invalid scope is used' do
+          put 'update', params: { id: developer_key.id, developer_key: { scopes: invalid_scopes } }
+          expect(json_parse.dig('errors', 'scopes').first['attribute']).to eq 'scopes'
+        end
+
+        it 'does not persist scopes if any are invalid' do
+          put 'update', params: { id: developer_key.id, developer_key: { scopes: invalid_scopes.concat(valid_scopes) } }
+          expect(developer_key.reload.scopes).to be_blank
+        end
+
+        it 'does not set scopes if the "developer_key_management_ui_rewrite" flag is disabled' do
+          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(false)
+          put 'update', params: { id: developer_key.id, developer_key: { scopes: valid_scopes } }
+          expect(developer_key.reload.scopes).to be_blank
+        end
       end
     end
 
@@ -220,12 +288,11 @@ describe DeveloperKeysController do
         site_admin_key
         root_account_key
 
-        allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(true)
+        allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
         allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
       end
 
       it 'does not inherit site admin keys if feature flag is off' do
-        allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(false)
         site_admin_key.update!(visible: true)
         get 'index', params: {account_id: test_domain_root_account.id}
         expect(assigns[:keys]).to match_array [root_account_key]

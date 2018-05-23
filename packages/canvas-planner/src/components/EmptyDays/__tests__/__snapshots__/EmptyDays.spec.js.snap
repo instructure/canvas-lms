@@ -1,0 +1,87 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders the component 1`] = `
+<div
+  className="planner-empty-days"
+>
+  <Heading
+    border="bottom"
+    color="inherit"
+    ellipsis={false}
+    level="h2"
+  >
+    <Text
+      as="div"
+      letterSpacing="normal"
+      lineHeight="condensed"
+      size="medium"
+    >
+      April 23 to April 26
+    </Text>
+  </Heading>
+  <View
+    as="div"
+    display="auto"
+    padding="small 0 0 0"
+  >
+    <GroupedDates
+      aria-hidden="true"
+      role="img"
+    />
+    <div>
+      <div>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="large"
+        >
+          Nothing Planned Yet
+        </Text>
+      </div>
+    </div>
+  </View>
+</div>
+`;
+
+exports[`renders the today className when surrounds Today 1`] = `
+<div
+  className="planner-empty-days planner-today"
+>
+  <Heading
+    border="bottom"
+    color="inherit"
+    ellipsis={false}
+    level="h2"
+  >
+    <Text
+      as="div"
+      letterSpacing="normal"
+      lineHeight="condensed"
+      size="medium"
+    >
+      April 22 to April 26
+    </Text>
+  </Heading>
+  <View
+    as="div"
+    display="auto"
+    padding="small 0 0 0"
+  >
+    <GroupedDates
+      aria-hidden="true"
+      role="img"
+    />
+    <div>
+      <div>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="large"
+        >
+          Nothing Planned Yet
+        </Text>
+      </div>
+    </div>
+  </View>
+</div>
+`;

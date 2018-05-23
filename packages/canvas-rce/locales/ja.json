@@ -1,0 +1,248 @@
+{
+  "group_navigation_99f191a": {
+    "message": "グループ ナビゲーション"
+  },
+  "cc_attribution_share_alike_669e7f16": {
+    "message": "CC 属性 平等分担"
+  },
+  "link_to_url_52dd935c": {
+    "message": "URLへのリンク "
+  },
+  "quizzes_7e598f57": {
+    "message": "クイズ"
+  },
+  "cc_attribution_non_commercial_no_derivatives_9fe74c00": {
+    "message": "CC 属性 非営利 派生物なし"
+  },
+  "c_2001_acme_inc_283f7f80": {
+    "message": "(c) 2001 Acme Inc."
+  },
+  "upload_a_new_file_96e6d4ff": {
+    "message": "新しいファイルをアップロードする"
+  },
+  "file_upload_form_4aaad554": {
+    "message": "ファイルアップロードフォーム"
+  },
+  "folder_705fd2d7": {
+    "message": "フォルダ"
+  },
+  "insert_equella_links_49a8dacd": {
+    "message": "Equella リンクを挿入してください"
+  },
+  "assignment_list_a833f59d": {
+    "message": "課題リスト"
+  },
+  "alternative_text_a834dcad": {
+    "message": "代替テキスト："
+  },
+  "discussions_a5f96392": {
+    "message": "ディスカッション"
+  },
+  "cc_attribution_no_derivatives_b006744f": {
+    "message": "CC 属性 派生物なし"
+  },
+  "usage_right_ff96f3e2": {
+    "message": "使用権:"
+  },
+  "click_to_embed_image_33107dd8": {
+    "message": "クリックして画像を埋め込む"
+  },
+  "i_hold_the_copyright_71ee91b1": {
+    "message": "著作権を保有しています"
+  },
+  "files_c300e900": {
+    "message": "ファイル"
+  },
+  "cancel_image_upload_2c771950": {
+    "message": "画像のアップロードをキャンセルする"
+  },
+  "people_b4ebb13c": {
+    "message": "メンバー"
+  },
+  "check_if_the_image_is_decorative_283649b7": {
+    "message": "画像が装飾かどうかを確認する"
+  },
+  "loading_25990131": {
+    "message": "読み込んでいます..."
+  },
+  "announcements_a4b8ed4a": {
+    "message": "アナウンス"
+  },
+  "select_a_file_53ba40ac": {
+    "message": "ファイルを選択"
+  },
+  "formatting_press_down_to_select_df728c30": {
+    "message": "書式設定、押して選択"
+  },
+  "background_color_press_down_to_select_ef99fdac": {
+    "message": "背景色、押して選択"
+  },
+  "files_index_af7c662b": {
+    "message": "ファイルのインデックス"
+  },
+  "cancel_file_upload_9903e7b9": {
+    "message": "ファイルのアップロードをキャンセルする"
+  },
+  "the_material_is_subject_to_fair_use_exception_41bc6a4b": {
+    "message": "この資料は公正使用の例外に該当します"
+  },
+  "enter_the_alternative_text_for_this_image_88047c47": {
+    "message": "この画像の代替テキストを入力する"
+  },
+  "link_to_other_content_in_the_group_3fe25379": {
+    "message": "グループ内の他のコンテンツにリンクします。"
+  },
+  "discussions_index_6c36ced": {
+    "message": "ディスカッションのインデックス"
+  },
+  "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
+    "message": "ファイルをクリックして、そのファイルにダウンロード リンクを挿入します。"
+  },
+  "copyright_holder_66ee111": {
+    "message": "著作権保有者:"
+  },
+  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
+    "message": "リッチテキストエリア。ヘルプへは、ALT+F8を押してください"
+  },
+  "enter_search_terms_e397b1f0": {
+    "message": "検索語を入力"
+  },
+  "pages_e5414c2c": {
+    "message": "ページ"
+  },
+  "cc_attribution_f6de631f": {
+    "message": "CC 属性"
+  },
+  "insert_link_6dc23cae": {
+    "message": "リンクの挿入"
+  },
+  "collaborations_5c56c15f": {
+    "message": "共同作業"
+  },
+  "what_would_you_like_to_call_the_new_page_d7e4488a": {
+    "message": "新しいページの名前は何にしますか?"
+  },
+  "click_any_image_to_embed_the_image_in_the_page_2cdd1136": {
+    "message": "画像をクリックして、その画像をページに埋め込みます。"
+  },
+  "search_flickr_6884b518": {
+    "message": "Flickr を検索"
+  },
+  "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
+    "message": "ページをクリックして、そのページにリンクを挿入します。"
+  },
+  "click_to_insert_a_link_into_the_editor_c19613aa": {
+    "message": "クリックすると、エディタにリンクが挿入されます。"
+  },
+  "decorative_image_fde98579": {
+    "message": "装飾の画像"
+  },
+  "click_to_insert_a_link_to_this_item_39794098": {
+    "message": "クリックするとこのアイテムへのリンクが挿入されます。"
+  },
+  "load_more_results_460f49a9": {
+    "message": "さらに結果をロード"
+  },
+  "link_7262adec": {
+    "message": "リンク"
+  },
+  "grades_a61eba0a": {
+    "message": "成績"
+  },
+  "links_14b70841": {
+    "message": "リンク"
+  },
+  "loading_failed_b3524381": {
+    "message": "読み込みに失敗しました..."
+  },
+  "click_to_embed_imagename_c41ea8df": {
+    "message": "クリックして { imageName } を埋め込む"
+  },
+  "close_flickr_form_b32e600a": {
+    "message": "Flickr フォームを閉じる"
+  },
+  "course_syllabus_5de1b0af": {
+    "message": "コース要綱"
+  },
+  "upload_8b403d05": {
+    "message": "アップロード"
+  },
+  "modules_c4325335": {
+    "message": "モジュール"
+  },
+  "no_results_940393cf": {
+    "message": "結果がありません。"
+  },
+  "announcement_list_da155734": {
+    "message": "アナウンス リスト"
+  },
+  "link_to_a_new_page_6c4ad034": {
+    "message": "新しいページへのリンク"
+  },
+  "insert_math_equation_57c6e767": {
+    "message": "数学数式を挿入"
+  },
+  "i_have_obtained_permission_to_use_this_file_6386f087": {
+    "message": "このファイルを使用する権限を取得しています。"
+  },
+  "cc_attribution_non_commercial_share_alike_c7edb1e5": {
+    "message": "CC 属性 非営利 平等分担"
+  },
+  "wiki_home_9cd54d0": {
+    "message": "Wiki ホーム"
+  },
+  "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+    "message": "今すぐ使用権を選択しないと、このファイルはアップロード後に公開されません。"
+  },
+  "upload_a_new_image_890df275": {
+    "message": "新しい画像をアップロードする"
+  },
+  "search_280d00bd": {
+    "message": "検索"
+  },
+  "assignments_1e02582c": {
+    "message": "課題"
+  },
+  "cc_attribution_non_commercial_39e0d30d": {
+    "message": "CC 属性 非営利"
+  },
+  "quizzes_list_d812caa6": {
+    "message": "クイズリスト"
+  },
+  "image_upload_form_7b74079a": {
+    "message": "画像アップロードフォーム"
+  },
+  "the_material_is_licensed_under_creative_commons_3242cb5e": {
+    "message": "この資料はクリエイティブ コモンズ ライセンスの対象となります"
+  },
+  "images_7ce26570": {
+    "message": "画像"
+  },
+  "link_to_other_content_in_the_course_879163b5": {
+    "message": "コース内の他のコンテンツにリンクします。"
+  },
+  "font_size_press_down_to_select_6c25dc2d": {
+    "message": "フォント サイズ、押して選択"
+  },
+  "select_a_folder_to_upload_your_file_into_b82d12b": {
+    "message": "ファイルをアップロードするフォルダを選択"
+  },
+  "course_navigation_dd035109": {
+    "message": "コース ナビゲーション"
+  },
+  "choose_usage_rights_33683854": {
+    "message": "使用権を選択..."
+  },
+  "text_color_press_down_to_select_8f5ad9b5": {
+    "message": "テキスト色、押して選択"
+  },
+  "embed_image_1080badc": {
+    "message": "画像の埋め込み"
+  },
+  "creative_commons_license_725584ae": {
+    "message": "クリエイティブ コモンズ ライセンス:"
+  },
+  "the_material_is_in_the_public_domain_279c39a3": {
+    "message": "この資料はパブリック ドメインです"
+  }
+}

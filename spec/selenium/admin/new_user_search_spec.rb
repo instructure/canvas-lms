@@ -87,7 +87,7 @@ describe "new account user search" do
     get "/accounts/#{@account.id}/users"
 
     fj('button:has([name="IconPlusLine"]):contains("People")').click
-    modal = f('[aria-label="Add a new user"]')
+    modal = f('[aria-label="Add a New User"]')
     expect(modal).to be_displayed
 
     name = 'Test User'
@@ -111,7 +111,7 @@ describe "new account user search" do
 
     # should clear out the inputs
     fj('button:has([name="IconPlusLine"]):contains("People")').click
-    expect(fj('[aria-label="Add a new user"] label:contains("Full Name") input').attribute('value')).to eq('')
+    expect(fj('[aria-label="Add a New User"] label:contains("Full Name") input').attribute('value')).to eq('')
   end
 
   it "should be able to create users with confirmation disabled", priority: "1", test_id: 3399311 do
@@ -119,7 +119,7 @@ describe "new account user search" do
     get "/accounts/#{@account.id}/users"
 
     fj('button:has([name="IconPlusLine"]):contains("People")').click
-    modal = f('[aria-label="Add a new user"]')
+    modal = f('[aria-label="Add a New User"]')
 
     set_value(fj('label:contains("Full Name") input', modal), name)
 

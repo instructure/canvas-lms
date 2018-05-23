@@ -1,6 +1,6 @@
 module Consts
   APP_COFFEE_PATH = "app/coffeescripts/calendar/CalendarEvent.coffee".freeze
-  APP_COFFEE_BUNDLE_PATH = "app/coffeescripts/bundles/account_authorization_configs.coffee".freeze
+  APP_COFFEE_BUNDLE_PATH = "app/coffeescripts/bundles/authentication_providers.coffee".freeze
   COFFEE_SPEC_PATH = "spec/coffeescripts/calendar/CalendarSpec.coffee".freeze
 
   APP_JSX_PATH = "app/jsx/dashboard_card/DashboardCardAction.js".freeze

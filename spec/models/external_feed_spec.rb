@@ -76,7 +76,7 @@ describe ExternalFeed do
     account1 = account_model
     course_with_student(:account => account1, :course => @course).update!(workflow_state: :active)
     @feed = external_feed_model
-    @group = group_model(:is_public => true, :context => @course, :external_feeds => [@feed])
+    @group = group_model(:is_public => true, :context => @course)
     @feed.update!(context: @group)
     expect(@feed.inactive?).to be(false)
   end
@@ -85,7 +85,7 @@ describe ExternalFeed do
     account1 = account_model
     course_with_student(:account => account1, course: @course)
     @feed = external_feed_model
-    @group = group_model(:is_public => true, :context => @course, :external_feeds => [@feed])
+    @group = group_model(:is_public => true, :context => @course)
     @feed.update!(context: @group)
     @course.complete!
     expect(@feed.inactive?).to be(true)
@@ -95,7 +95,7 @@ describe ExternalFeed do
     account1 = account_model
     course_with_student(:account => account1, course: @course)
     @feed = external_feed_model
-    group_model(:is_public => true, :context => @course, :external_feeds => [@feed])
+    group_model(:is_public => true, :context => @course)
     @feed.update!(context: @group)
     @course.destroy!
     expect(@feed.inactive?).to be(true)

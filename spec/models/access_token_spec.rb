@@ -274,6 +274,111 @@ describe AccessToken do
     it "foreign account should be authorized if there is no account" do
       expect(@at_without_account.authorized_for_account?(@foreign_ac)).to be true
     end
+
+    context 'when the developer key new feature flags are on' do
+      let(:root_account) { account_model }
+      let(:root_account_key) { DeveloperKey.create!(account: root_account) }
+      let(:site_admin_key) { DeveloperKey.create! }
+      let(:sub_account) do
+        account = account_model
+        account.update!(root_account: root_account)
+        account
+      end
+
+      before do
+        allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
+        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite) { true }
+      end
+
+      shared_examples_for 'an access token that honors developer key bindings' do
+        let(:access_token) { raise 'set in example' }
+        let(:binding) { raise 'set in example' }
+        let(:account) { raise 'set in example' }
+
+        it 'authorizes if the binding state is on' do
+          binding.update!(workflow_state: 'on')
+          expect(access_token.authorized_for_account?(account)).to eq true
+        end
+
+        it 'does not authorize if the binding state is off' do
+          binding.update!(workflow_state: 'off')
+          expect(access_token.authorized_for_account?(account)).to eq false
+        end
+
+        it 'does not authorize if the binding state is allow' do
+          binding.update!(workflow_state: 'allow')
+          expect(access_token.authorized_for_account?(account)).to eq false
+        end
+      end
+
+      describe 'site admin key' do
+        context 'when target account is site admin' do
+          it_behaves_like 'an access token that honors developer key bindings' do
+            let(:access_token) { AccessToken.create!(user: user_model, developer_key: site_admin_key) }
+            let(:binding) { site_admin_key.developer_key_account_bindings.find_by(account: Account.site_admin) }
+            let(:account) { Account.site_admin }
+          end
+        end
+
+        context 'when target account is root account' do
+          let(:access_token) { AccessToken.create!(user: user_model, developer_key: site_admin_key) }
+          let(:binding) { site_admin_key.developer_key_account_bindings.create!(account: root_account) }
+
+          before do
+            site_admin_key.developer_key_account_bindings.find_by(account: Account.site_admin).update!(
+              workflow_state: 'allow'
+            )
+          end
+
+          it_behaves_like 'an access token that honors developer key bindings' do
+            let(:access_token) { AccessToken.create!(user: user_model, developer_key: site_admin_key) }
+            let(:binding) { site_admin_key.developer_key_account_bindings.create!(account: root_account) }
+            let(:account) { root_account }
+          end
+
+          it 'does not authorize if the root account binding state is on but site admin off' do
+            binding.update!(workflow_state: 'on')
+            site_admin_key.developer_key_account_bindings.find_by(account: Account.site_admin).update!(
+              workflow_state: 'off'
+            )
+            expect(access_token.authorized_for_account?(root_account)).to eq false
+          end
+        end
+
+        context 'when target is a sub account' do
+          let(:access_token) { AccessToken.create!(user: user_model, developer_key: site_admin_key) }
+          let(:binding) { site_admin_key.developer_key_account_bindings.create!(account: root_account) }
+
+          before do
+            site_admin_key.developer_key_account_bindings.find_by(account: Account.site_admin).update!(
+              workflow_state: 'allow'
+            )
+          end
+
+          it_behaves_like 'an access token that honors developer key bindings' do
+            let(:access_token) { AccessToken.create!(user: user_model, developer_key: site_admin_key) }
+            let(:binding) { site_admin_key.developer_key_account_bindings.create!(account: root_account) }
+            let(:account) { sub_account }
+          end
+
+          it 'does not authorize if the root account binding state is on but site admin off' do
+            binding.update!(workflow_state: 'on')
+            site_admin_key.developer_key_account_bindings.find_by(account: Account.site_admin).update!(
+              workflow_state: 'off'
+            )
+            expect(access_token.authorized_for_account?(sub_account)).to eq false
+          end
+        end
+      end
+
+      describe 'root acount key' do
+        it_behaves_like 'an access token that honors developer key bindings' do
+          let(:access_token) { AccessToken.create!(user: user_model, developer_key: root_account_key) }
+          let(:binding) { root_account_key.developer_key_account_bindings.find_by!(account: root_account) }
+          let(:account) { root_account }
+        end
+      end
+    end
   end
 
   describe "regenerate_access_token" do

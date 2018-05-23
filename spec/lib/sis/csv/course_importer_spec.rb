@@ -692,5 +692,29 @@ describe SIS::CSV::CourseImporter do
       mm = @template.master_migrations.last
       expect(mm).to be_completed # jobs should have kept running now
     end
+
+    it "should try to queue the migration in another job if one is already running" do
+      other_mm = @template.master_migrations.create!(:user => @admin)
+      @template.active_migration = other_mm
+      @template.save!
+
+      account_admin_user(:active_all => true)
+      c1 = @account.courses.create!(:sis_source_id => "acourse1")
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,status,blueprint_course_id",
+        "#{c1.sis_source_id},shortname,long name,active,#{@mc.sis_source_id}",
+        :batch => @account.sis_batches.create!(:user => @admin, :data => {})
+      )
+      # should wait to requeue
+      job = Delayed::Job.last
+      expect(job.tag).to eq "MasterCourses::MasterMigration.start_new_migration!"
+      expect(job.run_at > 5.minutes.from_now).to be_truthy
+      job.update_attribute(:run_at, Time.now.utc)
+      other_mm.update_attribute(:workflow_state, "completed")
+      run_jobs
+      mm = @template.reload.master_migrations.last
+      expect(mm).to_not eq other_mm
+      expect(mm).to be_completed
+    end
   end
 end

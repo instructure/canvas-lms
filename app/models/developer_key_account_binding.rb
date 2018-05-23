@@ -17,16 +17,19 @@
 #
 
 class DeveloperKeyAccountBinding < ApplicationRecord
-  DEFAULT_STATE = 'off'.freeze
   ALLOW_STATE = 'allow'.freeze
+  ON_STATE = 'on'.freeze
+  OFF_STATE = 'off'.freeze
+  DEFAULT_STATE = OFF_STATE
 
   belongs_to :account
   belongs_to :developer_key
 
   validates :account, :developer_key, presence: true
-  validates :workflow_state, inclusion: { in: ['off', 'allow', 'on'] }
+  validates :workflow_state, inclusion: { in: [OFF_STATE, ALLOW_STATE, ON_STATE] }
 
   before_validation :infer_workflow_state
+  after_update :clear_cache_if_site_admin
 
   # Find a DeveloperKeyAccountBinding in order of account_ids. The search for a binding will
   # be prioritized by the order of account_ids. If a binding is found for the first account
@@ -62,7 +65,37 @@ class DeveloperKeyAccountBinding < ApplicationRecord
     self.find_by(id: binding_id)
   end
 
+  def self.find_site_admin_cached(developer_key)
+    # Site admin bindings don't exists for non-site admin developer keys
+    return nil if developer_key.account_id.present?
+    Shard.default.activate do
+      MultiCache.fetch(site_admin_cache_key(developer_key)) do
+        Shackles.activate(:slave) do
+          binding = self.where.not(workflow_state: ALLOW_STATE).find_by(
+            account: Account.site_admin,
+            developer_key: developer_key
+          )
+          binding
+        end
+      end
+    end
+  end
+
+  def self.clear_site_admin_cache(developer_key)
+    Shard.default.activate do
+      MultiCache.delete(site_admin_cache_key(developer_key))
+    end
+  end
+
+  def self.site_admin_cache_key(developer_key)
+    "accounts/site_admin/developer_key_account_bindings/#{developer_key.global_id}"
+  end
+
   private
+
+  def clear_cache_if_site_admin
+    self.class.clear_site_admin_cache(developer_key) if account.site_admin?
+  end
 
   def infer_workflow_state
     self.workflow_state ||= DEFAULT_STATE

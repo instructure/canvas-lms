@@ -28,6 +28,7 @@ class Announcement < DiscussionTopic
 
   before_save :infer_content
   before_save :respect_context_lock_rules
+  after_save :create_alert
   validates_presence_of :context_id
   validates_presence_of :context_type
   validates_presence_of :message
@@ -132,5 +133,23 @@ class Announcement < DiscussionTopic
 
   def assignment
     nil
+  end
+
+  def create_alert
+    return if !saved_changes.keys.include?('workflow_state') || saved_changes['workflow_state'][1] != 'active'
+    return if self.context_type != 'Course'
+
+    observers = self.course.enrollments.active.where(type: 'ObserverEnrollment')
+    observers.each do |observer|
+      link = UserObservationLink.active.
+        where(user_id: observer.associated_user_id, observer_id: observer.user_id).first
+
+      threshold = ObserverAlertThreshold.where(user_observation_link: link, alert_type: 'course_announcement').first
+      next if threshold.nil?
+
+      ObserverAlert.create!(user_observation_link: link, observer_alert_threshold: threshold,
+                            context: self, alert_type: 'course_announcement', action_date: self.updated_at,
+                            title: I18n.t("Announcement posted: %{title}", title: self.title))
+    end
   end
 end

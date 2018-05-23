@@ -200,5 +200,25 @@ describe CC::CCHelper do
       doc = Nokogiri::HTML.parse(@exporter.html_content(html))
       expect(doc.at_css("a").attr('href')).to eq "$CANVAS_OBJECT_REFERENCE$/assignments/silly-migration-id"
     end
+
+    it "preserves query parameters on links" do
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true)
+      page = @course.wiki_pages.create!(:title => "something")
+      other_page = @course.wiki_pages.create!(:title => "LinkByTitle")
+      assignment = @course.assignments.create!(:name => "Thing")
+      mod = @course.context_modules.create!(:name => "Stuff")
+      tag = mod.content_tags.create! content: assignment, context: @course
+      html = %Q{
+        <a href="/courses/#{@course.id}/pages/something?embedded=true">Something</a>
+        <a href="/courses/#{@course.id}/pages/LinkByTitle?embedded=true">Something</a>
+        <a href="/courses/#{@course.id}/assignments/#{assignment.id}?bamboozled=true">Thing</a>
+        <a href="/courses/#{@course.id}/modules/items/#{tag.id}?seriously=0">i-Tem</a>
+      }
+      translated = @exporter.html_content(html)
+      expect(translated).to include "$WIKI_REFERENCE$/pages/something?embedded=true"
+      expect(translated).to include "$WIKI_REFERENCE$/pages/#{other_page.url}?embedded=true"
+      expect(translated).to include "$CANVAS_OBJECT_REFERENCE$/assignments/#{CC::CCHelper.create_key(assignment)}?bamboozled=true"
+      expect(translated).to include "$CANVAS_COURSE_REFERENCE$/modules/items/#{CC::CCHelper.create_key(tag)}?seriously=0"
+    end
   end
 end

@@ -62,6 +62,7 @@ export function daysToDaysHash (days) {
 export function daysHashToDays (days) {
   return _.chain(days)
     .toPairs()
+    .filter(d => d[1] && d[1].length) // discard any day with no items
     .sortBy(_.head)
     .value();
 }

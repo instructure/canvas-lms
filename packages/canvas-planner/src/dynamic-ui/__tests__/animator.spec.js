@@ -34,7 +34,6 @@ function mockWindow (opts = {}) {
   const queue = [];
   return {
     queue,
-    innerHeight: 100,
     scroll: jest.fn(),
     requestAnimationFrame: (fn) => queue.push(fn),
     runAnimationFrames: () => {
@@ -48,6 +47,7 @@ function mockDocument (opts = {}) {
   return {
     documentElement: opts.documentElement || {
       getBoundingClientRect: jest.fn(),
+      clientHeight: 100,
     }
   };
 }
@@ -59,6 +59,7 @@ function makeAnimator (opts = {}) {
     document: mockDocument(opts),
     ...opts,
   };
+  mocks.window.document = mocks.document;
   const animator = new Animator(mocks);
   return { animator, mocks };
 }
@@ -75,7 +76,7 @@ it('focuses elements', () => {
 it('scrolls to elements with that are below the viewport', () => {
   const {animator, mocks} = makeAnimator();
   const elt = mockElement();
-  elt.getBoundingClientRect.mockReturnValueOnce({top: 95, left: 0, bottom: 105, right: 42});
+  elt.getBoundingClientRect.mockReturnValue({top: 95, left: 0, bottom: 105, right: 42});
   animator.scrollTo(elt, 5);
   expect(mocks.velocity).not.toHaveBeenCalled();
   mocks.window.runAnimationFrames();
@@ -109,8 +110,8 @@ it('maintains scroll position of element', () => {
   mocks.document.documentElement.getBoundingClientRect.mockReturnValueOnce({
     top: -5, left: 0, bottom: 123, right: 50,
   });
-  animator.recordFixedElement(elt);
-  animator.maintainViewportPosition(elt);
+  const fixedMemo = animator.elementPositionMemo(elt);
+  animator.maintainViewportPositionFromMemo(elt, fixedMemo);
   expect(mocks.window.scroll).not.toHaveBeenCalled();
   mocks.window.runAnimationFrames();
   // 15 = 52 - (-5) - 42
@@ -144,4 +145,44 @@ it('determines when an element is above the screen', () => {
   const elt = mockElement();
   elt.getBoundingClientRect.mockReturnValue({top: 41});
   expect(animator.isAboveScreen(elt, 42)).toBe(true);
+});
+
+it('determines when an element is on or above the screen', () => {
+  const {animator, mocks} = makeAnimator();
+  const elt = mockElement();
+  mocks.document.documentElement.clientHeight = 45; // account for small buffer
+  elt.getBoundingClientRect.mockReturnValue({bottom: 42});
+  expect(animator.isBelowScreen(elt, 5)).toBe(false);
+});
+
+it('determines when an element is below the screen', () => {
+  const {animator, mocks} = makeAnimator();
+  const elt = mockElement();
+  mocks.document.documentElement.clientHeight = 40;
+  elt.getBoundingClientRect.mockReturnValue({bottom: 41});
+  expect(animator.isBelowScreen(elt, 5)).toBe(true);
+});
+
+it('determines if an element is on screen', () => {
+  const {animator, mocks} = makeAnimator();
+  const elt = mockElement();
+  elt.getBoundingClientRect.mockReturnValue({top: 43, bottom: 44});
+  mocks.document.documentElement.clientHeight = 47;
+  expect(animator.isOnScreen(elt, 42)).toBe(true);
+});
+
+it('determines if an element is off screen below', () => {
+  const {animator, mocks} = makeAnimator();
+  const elt = mockElement();
+  elt.getBoundingClientRect.mockReturnValue({top: 43, bottom: 45});
+  mocks.document.documentElement.clientHeight = 45;
+  expect(animator.isOffScreen(elt, 42)).toBe(true);
+});
+
+it('determines if an element is off screen above', () => {
+  const {animator, mocks} = makeAnimator();
+  const elt = mockElement();
+  elt.getBoundingClientRect.mockReturnValue({top: 41, bottom: 44});
+  mocks.document.documentElement.clientHeight = 50;
+  expect(animator.isOffScreen(elt, 42)).toBe(true);
 });

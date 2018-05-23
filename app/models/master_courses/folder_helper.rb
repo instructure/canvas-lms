@@ -62,7 +62,7 @@ class MasterCourses::FolderHelper
     cutoff_time = content_export.master_migration&.master_template&.last_export_completed_at
     return unless cutoff_time
 
-    updated_folders = content_export.context.folders.where('updated_at>?', cutoff_time)
+    updated_folders = content_export.context.folders.where('updated_at>?', cutoff_time).where.not(cloned_item_id: nil)
     updated_folders.each do |source_folder|
       dest_folder = child_course.folders.active.where(cloned_item_id: source_folder.cloned_item_id).take
       if dest_folder && dest_folder.name != source_folder.name

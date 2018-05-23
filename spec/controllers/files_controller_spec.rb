@@ -341,10 +341,10 @@ describe FilesController do
 
     it "should set cache headers for non text files" do
       get 'show', params: {:course_id => @course.id, :id => @file.id, :download => 1, :verifier => @file.uuid, :download_frd => 1}
-      expect(response.header["Cache-Control"]).to include "private, max-age"
+      expect(response.header["Cache-Control"]).to include "private"
+      expect(response.header["Cache-Control"]).to include "max-age=#{1.day.seconds}"
       expect(response.header["Cache-Control"]).not_to include "no-cache"
       expect(response.header["Cache-Control"]).not_to include "no-store"
-      expect(response.header["Cache-Control"]).not_to include "max-age=0"
       expect(response.header["Cache-Control"]).not_to include "must-revalidate"
       expect(response.header).to include("Expires")
       expect(response.header).not_to include("Pragma")
@@ -354,11 +354,9 @@ describe FilesController do
       @file.content_type = "text/html"
       @file.save
       get 'show', params: {:course_id => @course.id, :id => @file.id, :download => 1, :verifier => @file.uuid, :download_frd => 1}
-      expect(response.header["Cache-Control"]).not_to include "private, max-age"
+      expect(response.header["Cache-Control"]).not_to include "private"
       expect(response.header["Cache-Control"]).to include "no-cache"
       expect(response.header["Cache-Control"]).to include "no-store"
-      expect(response.header["Cache-Control"]).to include "max-age=0"
-      expect(response.header["Cache-Control"]).to include "must-revalidate"
       expect(response.header).not_to include("Expires")
       expect(response.header).to include("Pragma")
     end
@@ -1141,6 +1139,33 @@ describe FilesController do
       post "api_create", params: params[:upload_params].merge(:file => @content)
       assert_status(400)
     end
+
+    it "should forward params[:success_include] to the api_create_success redirect as params[:include] if present" do
+      local_storage!
+      params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "")
+      post "api_create", params: params[:upload_params].merge(:file => @content, :success_include => 'foo')
+      expect(response).to be_redirect
+      expect(response.location).to include('include%5B%5D=foo') # include[]=foo, url encoded
+    end
+
+    it "should add 'include=avatar' to the api_create_success redirect for profile pictures" do
+      profile_pic = factory_with_protected_attributes(
+        Attachment,
+        user: @teacher,
+        context: @teacher,
+        folder: @teacher.profile_pics_folder,
+        file_state: 'deleted',
+        workflow_state: 'unattached',
+        filename: 'profile.png',
+        content_type: 'image/png',
+      )
+
+      local_storage!
+      params = profile_pic.ajax_upload_params(@teacher.pseudonym, "", "")
+      post "api_create", params: params[:upload_params].merge(:file => @content)
+      expect(response).to be_redirect
+      expect(response.location).to include('include%5B%5D=avatar') # include[]=avatar, url encoded
+    end
   end
 
   describe "POST api_capture" do
@@ -1286,6 +1311,7 @@ describe FilesController do
 
       progress.reload
       expect(progress).to be_completed
+      expect(progress.results["id"]).to_not be_nil
     end
   end
 

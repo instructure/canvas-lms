@@ -19,18 +19,24 @@ define [
   'Backbone'
   'jst/content_migrations/subviews/QuestionBank'
   'jquery'
-], (Backbone, template, $) -> 
+], (Backbone, template, $) ->
   class QuestionBankView extends Backbone.View
     template: template
     @optionProperty 'questionBanks'
+    @optionProperty 'disabled_message'
 
     els:
       ".questionBank" : "$questionBankSelect"
       "#createQuestionInput" : "$createQuestionInput"
+      "#questionBankDisabledMsg" : "$questionBankDisabledMsg"
 
-    events: 
+    events:
       'change .questionBank'              :  'setQuestionBankValues'
       'keyup #createQuestionInput'        :  'updateNewQuestionName'
+
+    initialize:(options) ->
+        options.is_disabled = false
+        super
 
     updateNewQuestionName: (event) =>
       @setQbName()
@@ -62,6 +68,18 @@ define [
       id = @$questionBankSelect.val()
       settings.question_bank_id = id if id != ""
       @model.set 'settings', settings
+
+    setEnabled: (enabled, disabled_msg) ->
+      if enabled
+        @$questionBankDisabledMsg.hide()
+      else
+        @$questionBankSelect.val( '' )
+        @$createQuestionInput.hide()
+        @setQbId()
+        if disabled_msg
+            @$questionBankDisabledMsg.text(disabled_msg)
+        @$questionBankDisabledMsg.show()
+      @$questionBankSelect.prop('disabled', !enabled)
 
     toJSON: -> @options
 

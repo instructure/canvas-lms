@@ -1,0 +1,248 @@
+{
+  "group_navigation_99f191a": {
+    "message": "Gruppnavigering"
+  },
+  "cc_attribution_share_alike_669e7f16": {
+    "message": "CC Attribut Dela Lika"
+  },
+  "link_to_url_52dd935c": {
+    "message": "Länk till URL"
+  },
+  "quizzes_7e598f57": {
+    "message": "Quizzes"
+  },
+  "cc_attribution_non_commercial_no_derivatives_9fe74c00": {
+    "message": "CC Attribut Ej Kommersiell Inga Derivat"
+  },
+  "c_2001_acme_inc_283f7f80": {
+    "message": "(c) 2001 Acme Inc."
+  },
+  "upload_a_new_file_96e6d4ff": {
+    "message": "Ladda upp en ny fil"
+  },
+  "file_upload_form_4aaad554": {
+    "message": "Fil uppladdningsformulär"
+  },
+  "folder_705fd2d7": {
+    "message": "Mapp"
+  },
+  "insert_equella_links_49a8dacd": {
+    "message": "För in Equella länkar"
+  },
+  "assignment_list_a833f59d": {
+    "message": "Uppgiftslista"
+  },
+  "alternative_text_a834dcad": {
+    "message": "Alternativ text:"
+  },
+  "discussions_a5f96392": {
+    "message": "Diskussioner"
+  },
+  "cc_attribution_no_derivatives_b006744f": {
+    "message": "CC Erkänner inga bearbetningar"
+  },
+  "usage_right_ff96f3e2": {
+    "message": "Användarrättigheter:"
+  },
+  "click_to_embed_image_33107dd8": {
+    "message": "Klicka för att bädda in bild"
+  },
+  "i_hold_the_copyright_71ee91b1": {
+    "message": "Jag är upprättshavare"
+  },
+  "files_c300e900": {
+    "message": "Filer"
+  },
+  "cancel_image_upload_2c771950": {
+    "message": "Avbryt bilduppladdning"
+  },
+  "people_b4ebb13c": {
+    "message": "Personer"
+  },
+  "check_if_the_image_is_decorative_283649b7": {
+    "message": "Kontrollera om bilden är dekorativ"
+  },
+  "loading_25990131": {
+    "message": "Laddar..."
+  },
+  "announcements_a4b8ed4a": {
+    "message": "Meddelanden"
+  },
+  "select_a_file_53ba40ac": {
+    "message": "Välj en fil"
+  },
+  "formatting_press_down_to_select_df728c30": {
+    "message": "Formatering, tryck ner för att välja "
+  },
+  "background_color_press_down_to_select_ef99fdac": {
+    "message": "Bakgrundsfärg, tryck ner för att välja"
+  },
+  "files_index_af7c662b": {
+    "message": "Filindex"
+  },
+  "cancel_file_upload_9903e7b9": {
+    "message": "Avbryt filuppladdning"
+  },
+  "the_material_is_subject_to_fair_use_exception_41bc6a4b": {
+    "message": "Materialet är föremål för rättvist användningsundantag."
+  },
+  "enter_the_alternative_text_for_this_image_88047c47": {
+    "message": "Ange alternativ text för den här bilden"
+  },
+  "link_to_other_content_in_the_group_3fe25379": {
+    "message": "Länka till annat innehåll i gruppen."
+  },
+  "discussions_index_6c36ced": {
+    "message": "Diskussionindex"
+  },
+  "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
+    "message": "Klicka på en fil för att lägga till en nedladdningslänk för den filen."
+  },
+  "copyright_holder_66ee111": {
+    "message": "Upphovsrättshavare:"
+  },
+  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
+    "message": "Rik text-område. Tryck ALT+F8 för hjälp"
+  },
+  "enter_search_terms_e397b1f0": {
+    "message": "uppge söktermer"
+  },
+  "pages_e5414c2c": {
+    "message": "Sidor"
+  },
+  "cc_attribution_f6de631f": {
+    "message": "CC Attribut"
+  },
+  "insert_link_6dc23cae": {
+    "message": "Skriv in länk"
+  },
+  "collaborations_5c56c15f": {
+    "message": "Samarbeten"
+  },
+  "what_would_you_like_to_call_the_new_page_d7e4488a": {
+    "message": "Vad vill du kalla den nya sidan?"
+  },
+  "click_any_image_to_embed_the_image_in_the_page_2cdd1136": {
+    "message": "Klicka på en bild för att bädda in bilden på sidan."
+  },
+  "search_flickr_6884b518": {
+    "message": "Sök Flickr"
+  },
+  "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
+    "message": "Klicka på en sida för att lägga till en länk till sidan."
+  },
+  "click_to_insert_a_link_into_the_editor_c19613aa": {
+    "message": "Klicka för att infoga en länk i redigeraren."
+  },
+  "decorative_image_fde98579": {
+    "message": "Dekorativ-bild"
+  },
+  "click_to_insert_a_link_to_this_item_39794098": {
+    "message": "Klicka för att infoga en länk till detta föremål."
+  },
+  "load_more_results_460f49a9": {
+    "message": "Hämta fler resultat"
+  },
+  "link_7262adec": {
+    "message": "Länk"
+  },
+  "grades_a61eba0a": {
+    "message": "Betyg"
+  },
+  "links_14b70841": {
+    "message": "Länkar"
+  },
+  "loading_failed_b3524381": {
+    "message": "Laddning misslyckades..."
+  },
+  "click_to_embed_imagename_c41ea8df": {
+    "message": "Klicka för att bädda in { imageName }"
+  },
+  "close_flickr_form_b32e600a": {
+    "message": "Stäng Flickr formuläret"
+  },
+  "course_syllabus_5de1b0af": {
+    "message": "Kursplan för kursen"
+  },
+  "upload_8b403d05": {
+    "message": "Ladda upp"
+  },
+  "modules_c4325335": {
+    "message": "Moduler"
+  },
+  "no_results_940393cf": {
+    "message": "Inga resultat."
+  },
+  "announcement_list_da155734": {
+    "message": "Meddelandelista"
+  },
+  "link_to_a_new_page_6c4ad034": {
+    "message": "Länka till en ny sida"
+  },
+  "insert_math_equation_57c6e767": {
+    "message": "För in en matematisk ekvation"
+  },
+  "i_have_obtained_permission_to_use_this_file_6386f087": {
+    "message": "Jag har fått tillåtelse att använda den här filen."
+  },
+  "cc_attribution_non_commercial_share_alike_c7edb1e5": {
+    "message": "CC Attribut Ej Kommersiell Dela Lika"
+  },
+  "wiki_home_9cd54d0": {
+    "message": "Wiki hem"
+  },
+  "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+    "message": "Om du inte väljer användningsrättigheter nu kommer den här filen att publiceras efter att den har laddats upp."
+  },
+  "upload_a_new_image_890df275": {
+    "message": "Ladda upp en ny bild"
+  },
+  "search_280d00bd": {
+    "message": "Sök"
+  },
+  "assignments_1e02582c": {
+    "message": "Uppgifter"
+  },
+  "cc_attribution_non_commercial_39e0d30d": {
+    "message": "CC Attribut Ej Kommersiell"
+  },
+  "quizzes_list_d812caa6": {
+    "message": "Quizzes-lista"
+  },
+  "image_upload_form_7b74079a": {
+    "message": "Bild uppladdningsformulär"
+  },
+  "the_material_is_licensed_under_creative_commons_3242cb5e": {
+    "message": "Materialet har en licens från Creative Commons"
+  },
+  "images_7ce26570": {
+    "message": "Bilder"
+  },
+  "link_to_other_content_in_the_course_879163b5": {
+    "message": "Länka till annat innehåll i kursen."
+  },
+  "font_size_press_down_to_select_6c25dc2d": {
+    "message": "Typsnittsstorlek, trycker ner för att välja"
+  },
+  "select_a_folder_to_upload_your_file_into_b82d12b": {
+    "message": "Välj en mapp att ladda upp din fil till"
+  },
+  "course_navigation_dd035109": {
+    "message": "Kursnavigering"
+  },
+  "choose_usage_rights_33683854": {
+    "message": "Ändra användningsrättigheter"
+  },
+  "text_color_press_down_to_select_8f5ad9b5": {
+    "message": "Textfärg, tryck ner för att välja"
+  },
+  "embed_image_1080badc": {
+    "message": "Bädda in bild"
+  },
+  "creative_commons_license_725584ae": {
+    "message": "Gemensam kreativitets licens:"
+  },
+  "the_material_is_in_the_public_domain_279c39a3": {
+    "message": "Materialet är i den offentliga domänen"
+  }
+}

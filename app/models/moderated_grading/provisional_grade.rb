@@ -101,6 +101,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   end
 
   def publish!
+    submission.grade_posting_in_progress = true
     previously_graded = submission.grade.present? || submission.excused?
     submission.grade = grade
     submission.score = score
@@ -111,6 +112,8 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
     previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
     publish_submission_comments!
     publish_rubric_assessments!
+  ensure
+    submission.grade_posting_in_progress = false
   end
 
   def copy_to_final_mark!(scorer)

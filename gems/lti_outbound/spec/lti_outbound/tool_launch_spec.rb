@@ -394,6 +394,8 @@ describe LtiOutbound::ToolLaunch do
       expect(hash['lis_outcome_service_url']).to eq '/my/test/url'
       expect(hash['ext_ims_lis_basic_outcome_url']).to eq '/my/other/test/url'
       expect(hash['ext_outcome_data_values_accepted']).to eq 'url,text'
+      expect(hash['ext_outcome_result_total_score_accepted']).to be true
+      expect(hash['ext_outcome_submission_submitted_at_accepted']).to be true
       expect(hash['custom_canvas_assignment_title']).to eq '$Canvas.assignment.title'
       expect(hash['custom_canvas_assignment_points_possible']).to eq '$Canvas.assignment.pointsPossible'
       expect(hash['custom_canvas_assignment_id']).to eq '$Canvas.assignment.id'
@@ -408,6 +410,8 @@ describe LtiOutbound::ToolLaunch do
       expect(hash['lis_outcome_service_url']).to eq '/my/test/url'
       expect(hash['ext_ims_lis_basic_outcome_url']).to eq '/my/other/test/url'
       expect(hash['ext_outcome_data_values_accepted']).to eq 'url,text'
+      expect(hash['ext_outcome_result_total_score_accepted']).to be true
+      expect(hash['ext_outcome_submission_submitted_at_accepted']).to be true
       expect(hash['custom_canvas_assignment_title']).to eq '$Canvas.assignment.title'
       expect(hash['custom_canvas_assignment_points_possible']).to eq '$Canvas.assignment.pointsPossible'
     end

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -60,15 +60,13 @@ describe 'Speedgrader' do
     ]
   end
 
-  def let_speedgrader_load
+  def wait_for_grade_input
     wait = Selenium::WebDriver::Wait.new(timeout: 5)
     wait.until { Speedgrader.grade_input.attribute('value') != "" }
   end
 
   context 'grading' do
-
-    context 'should display grades correctly' do
-
+    describe 'displays grades correctly' do
       before(:each) do
         init_course_with_students 2
         user_session(@teacher)
@@ -79,8 +77,8 @@ describe 'Speedgrader' do
           title: 'Complete?',
           grading_type: 'pass_fail'
         )
-        @assignment.grade_student @students[0], grade: 'complete', grader: @teacher
-        @assignment.grade_student @students[1], grade: 'incomplete', grader: @teacher
+        @assignment.grade_student @students.first, grade: 'complete', grader: @teacher
+        @assignment.grade_student @students.second, grade: 'incomplete', grader: @teacher
 
         grader_speedgrader_assignment('complete', 'incomplete', false)
       end
@@ -116,7 +114,7 @@ describe 'Speedgrader' do
       it "page should load in acceptable time ", priority:"1" do
         page_load_time = Benchmark.measure do
           Speedgrader.visit(@course.id,@quiz.assignment_id)
-          let_speedgrader_load
+          wait_for_grade_input
         end
         Rails.logger.debug "SpeedGrader for course #{@course.id} and assignment"\
                              " #{@quiz.assignment_id} loaded in #{page_load_time.real} seconds"
@@ -160,7 +158,7 @@ describe 'Speedgrader' do
 
       it 'should allow pass grade on assignments worth 0 points', priority: "1", test_id: 400127 do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
-        let_speedgrader_load
+        wait_for_grade_input
         expect(Speedgrader.grade_input['value']).to eq('complete')
         expect(f('#grade_container label')).to include_text('(0 / 0)')
       end
@@ -168,7 +166,7 @@ describe 'Speedgrader' do
       it 'should display pass/fail correctly when total points possible is changed', priority: "1", test_id: 419289 do
         @assignment.update_attributes(points_possible: 1)
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
-        let_speedgrader_load
+        wait_for_grade_input
         expect(Speedgrader.grade_input['value']).to eq('complete')
         expect(f('#grade_container label')).to include_text('(1 / 1)')
       end
@@ -284,11 +282,11 @@ describe 'Speedgrader' do
     end
 
     context 'Using a rubric to grade' do
-      it 'should display correct grades for student', priority: "1", test_id: 164205 do
+      it 'should display correct grades for student with proper selected ratings', priority: "1", test_id: 164205 do
         course_with_student_logged_in(active_all: true)
-        rubric_model
+        rubric = outcome_with_rubric
         @assignment = @course.assignments.create!(name: 'assignment with rubric', points_possible: 10)
-        @association = @rubric.associate_with(
+        @association = rubric.associate_with(
           @assignment,
           @course,
           purpose: 'grading',
@@ -299,20 +297,24 @@ describe 'Speedgrader' do
           submission_type: "online_text_entry",
           has_rubric_assessment: true
         )
+        criterion1 = rubric.criteria.first
+        criterion2 = rubric.criteria.last
         @assessment = @association.assess(
           user: @student,
           assessor: @teacher,
           artifact: @submission,
           assessment: {
             assessment_type: 'grading',
-            criterion_crit1: { points: 5 }
+            "criterion_#{criterion1[:id]}": { points: 3 },
+            "criterion_#{criterion2[:id]}": { points: 0 }
           }
         )
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
         f('a.assess_submission_link').click
-
-        expect(f('#rating_rat2')).to have_class('selected')
-        expect(f('#rating_rat2 .points')).to include_text('5')
+        expect(ff("#criterion_#{criterion1[:id]} .selected").length).to eq 1
+        expect(f("#criterion_#{criterion1[:id]} .selected")).to include_text('3')
+        expect(ff("#criterion_#{criterion2[:id]} .selected").length).to eq 1
+        expect(f("#criterion_#{criterion2[:id]} .selected")).to include_text('0')
       end
     end
   end
@@ -680,7 +682,7 @@ describe 'Speedgrader' do
   def grader_speedgrader_assignment(grade1, grade2, clear_grade=true)
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
 
-    let_speedgrader_load
+    wait_for_grade_input
     expect(Speedgrader.grade_input).to have_value grade1
     Speedgrader.click_next_student_btn
     expect(Speedgrader.grade_input).to have_value grade2

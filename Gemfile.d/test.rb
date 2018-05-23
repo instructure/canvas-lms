@@ -39,7 +39,7 @@ group :test do
       gem 'rainbow', '3.0.0', require: false
   gem 'rubocop-rspec', '1.22.2', require: false
 
-  gem 'once-ler', '0.1.2'
+  gem 'once-ler', '0.1.3'
 
   # Keep this gem synced with docker-compose/seleniumff/Dockerfile
   gem 'selenium-webdriver', '2.53.4'
@@ -48,7 +48,7 @@ group :test do
   gem 'chromedriver-helper', require: false
   gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'
   gem 'test-queue', github: 'instructure/test-queue', ref: '1b92ebbca70705599c78a1bad5b16d6a37f741f2', require: false
-  gem 'testrailtagging', '0.3.8.3', require: false
+  gem 'testrailtagging', '0.3.8.4', require: false
 
   gem 'webmock', '3.3.0', require: false
     gem 'crack', '0.4.3', require: false
@@ -58,7 +58,8 @@ group :test do
   gem 'escape_code', '0.2', require: false
   gem 'hashdiff', '0.3.7'
   gem 'luminosity_contrast', '0.2.1'
-  gem 'pact', '1.22.2'
-  gem 'pact-messages', '0.1.1'
+  gem 'pact-support', github: 'tucker-m/pact-support', tag: 'pr1.2'
+  gem 'pact', github: 'tucker-m/pact-ruby', tag: 'pr1.2'
+  gem 'pact-messages', '0.2.0'
   gem 'database_cleaner', '~> 1.5', '>= 1.5.3'
 end

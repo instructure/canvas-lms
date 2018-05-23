@@ -17,6 +17,16 @@
  */
 import { handleActions } from 'redux-actions';
 
+function mergeGradesIntoCourses (courses, action) {
+  const grades = action.payload;
+  return courses.map(course => {
+    const newCourse = {...course, ...grades[course.id]};
+    delete newCourse.courseId; // remove confusing duplicate field
+    return newCourse;
+  });
+}
+
 export default handleActions({
   INITIAL_OPTIONS: (state, action) => action.payload.courses,
+  GOT_GRADES_SUCCESS: mergeGradesIntoCourses,
 }, []);

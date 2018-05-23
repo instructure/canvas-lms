@@ -97,6 +97,119 @@ describe Course do
     end
   end
 
+  describe "#moderated_grading_max_grader_count" do
+    before(:once) do
+      @course = Course.create!
+    end
+
+    it 'returns 1 if the course has no instructors' do
+      expect(@course.moderated_grading_max_grader_count).to eq 1
+    end
+
+    it 'returns 1 if the course has one instructor' do
+      teacher = User.create!
+      @course.enroll_teacher(teacher)
+      expect(@course.moderated_grading_max_grader_count).to eq 1
+    end
+
+    it 'returns 10 if the course has more than 11 instructors' do
+      create_users_in_course(@course, 6, enrollment_type: 'TeacherEnrollment')
+      create_users_in_course(@course, 6, enrollment_type: 'TaEnrollment')
+      expect(@course.moderated_grading_max_grader_count).to eq 10
+    end
+
+    it 'returns N-1 if the course has between 1 < N < 12 instructors' do
+      create_users_in_course(@course, 2, enrollment_type: 'TeacherEnrollment')
+      @course.enroll_ta(User.create!, enrollment_state: 'active')
+      expect { @course.enroll_ta(User.create!, enrollment_state: 'active') }.to change {
+        @course.moderated_grading_max_grader_count
+      }.from(2).to(3)
+    end
+
+    it 'ignores deactivated instructors' do
+      create_users_in_course(@course, 2, enrollment_type: 'TeacherEnrollment')
+      @course.enroll_ta(User.create!, enrollment_state: 'active').deactivate
+      expect(@course.moderated_grading_max_grader_count).to eq 1
+    end
+
+    it 'ignores concluded instructors' do
+      create_users_in_course(@course, 2, enrollment_type: 'TeacherEnrollment')
+      @course.enroll_ta(User.create!, enrollment_state: 'active').conclude
+      expect(@course.moderated_grading_max_grader_count).to eq 1
+    end
+
+    it 'ignores deleted instructors' do
+      create_users_in_course(@course, 2, enrollment_type: 'TeacherEnrollment')
+      @course.enroll_ta(User.create!, enrollment_state: 'active').destroy
+      expect(@course.moderated_grading_max_grader_count).to eq 1
+    end
+
+    it 'ignores non-instructors' do
+      create_users_in_course(@course, 2, enrollment_type: 'TeacherEnrollment')
+      @course.enroll_student(User.create!, enrollment_state: 'active')
+      expect(@course.moderated_grading_max_grader_count).to eq 1
+    end
+  end
+
+  describe '#moderators' do
+    before(:once) do
+      @course = Course.create!
+      @course.root_account.enable_feature!(:anonymous_moderated_marking)
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher)
+      @ta = User.create!
+      @course.enroll_ta(@ta)
+    end
+
+    it 'returns an empty list if the root account has Anonymous Moderated Marking disabled' do
+      @course.root_account.disable_feature!(:anonymous_moderated_marking)
+      expect(@course.moderators).to be_empty
+    end
+
+    it 'includes active teachers' do
+      expect(@course.moderators).to include @teacher
+    end
+
+    it 'includes active TAs' do
+      expect(@course.moderators).to include @ta
+    end
+
+    it 'excludes active teachers if teachers have "Select Final Grade" priveleges revoked' do
+      @course.root_account.role_overrides.create!(permission: 'select_final_grade', role: teacher_role, enabled: false)
+      expect(@course.moderators).not_to include @teacher
+    end
+
+    it 'excludes active TAs if TAs have "Select Final Grade" priveleges revoked' do
+      @course.root_account.role_overrides.create!(permission: 'select_final_grade', role: ta_role, enabled: false)
+      expect(@course.moderators).not_to include @ta
+    end
+
+    it 'excludes inactive teachers' do
+      @course.enrollments.find_by!(user_id: @teacher).deactivate
+      expect(@course.moderators).not_to include @teacher
+    end
+
+    it 'excludes concluded teachers' do
+      @course.enrollments.find_by!(user_id: @teacher).conclude
+      expect(@course.moderators).not_to include @teacher
+    end
+
+    it 'excludes inactive TAs' do
+      @course.enrollments.find_by!(user_id: @ta).deactivate
+      expect(@course.moderators).not_to include @ta
+    end
+
+    it 'excludes concluded TAs' do
+      @course.enrollments.find_by!(user_id: @ta).conclude
+      expect(@course.moderators).not_to include @ta
+    end
+
+    it 'excludes admins' do
+      admin = account_admin_user
+      expect(@course.moderators).not_to include admin
+    end
+  end
+
   describe "#recompute_student_scores" do
     it "should use all student ids except concluded and deleted if none are passed" do
       @course.save!
@@ -4150,10 +4263,10 @@ describe Course do
 
     it "should be preferred if delegated authentication is configured" do
       account = Account.create!
-      account.settings[:open_registration] = true
-      account.save!
       account.authentication_providers.create!(:auth_type => 'cas')
       account.authentication_providers.first.move_to_bottom
+      account.settings[:open_registration] = true
+      account.save!
       course_factory(account: account)
       expect(@course.user_list_search_mode_for(nil)).to eq :preferred
       expect(@course.user_list_search_mode_for(user_factory)).to eq :preferred

@@ -112,6 +112,7 @@ module UserLearningObjectScopes
     objects_needing('Assignment', purpose, :student, cache_timeout, opts) do |assignment_scope, options|
       assignments = assignment_scope.due_between_for_user(options[:due_after], options[:due_before], self)
       assignments = assignments.need_submitting_info(id, options[:limit]) if purpose == 'submitting'
+      assignments = assignments.submittable.or(assignments.where('due_at > ?', Time.zone.now)) if purpose == 'submitting'
       assignments = assignments.having_submissions_for_user(id) if purpose == 'submitted'
       assignments = assignments.not_locked unless options[:include_locked]
       assignments
@@ -124,9 +125,7 @@ module UserLearningObjectScopes
     opts[:cache_timeout] = 15.minutes
     assignments = assignments_for_student('submitting', opts)
     return assignments if opts[:scope_only]
-    select_available_assignments(assignments, opts).reject do |a|
-      a.due_at && a.due_at < Time.zone.now && !a.expects_submission?
-    end
+    select_available_assignments(assignments, opts)
   end
 
   def submitted_assignments(opts={})
@@ -193,6 +192,27 @@ module UserLearningObjectScopes
         end
       end
     end
+  end
+
+  def assignments_needing_grading_count(opts={})
+    original_shard = Shard.current
+    as = shard.activate do
+      course_ids = course_ids_for_todo_lists(:instructor, opts)
+      Shard.partition_by_shard(course_ids) do |shard_course_ids|
+        next unless Shard.current == original_shard # only provide scope on current shard
+        Submission.active.
+          needs_grading.
+          joins(assignment: :course).
+          where(courses: { id: shard_course_ids }).
+          merge(Assignment.expecting_submission).
+          where("NOT EXISTS (?)",
+            Ignore.where(asset_type: 'Assignment',
+                       user_id: self,
+                       purpose: 'grading').where('asset_id=submissions.assignment_id'))
+      end
+    end
+
+    as.size
   end
 
   def assignments_needing_grading(opts={})

@@ -23,23 +23,15 @@ import 'jqueryui/dialog'
 import I18n from 'i18n!react_developer_keys'
 import React from 'react'
 import PropTypes from 'prop-types'
+import Image from '@instructure/ui-core/lib/components/Image'
+import Link from '@instructure/ui-core/lib/components/Link'
+
+import DeveloperKeyActionButtons from './DeveloperKeyActionButtons'
 import DeveloperKeyStateControl from './DeveloperKeyStateControl'
 
 
 class DeveloperKey extends React.Component {
-  constructor (props) {
-    super(props);
-    this.activateLinkHandler = this.activateLinkHandler.bind(this);
-    this.deactivateLinkHandler = this.deactivateLinkHandler.bind(this);
-    this.editLinkHandler = this.editLinkHandler.bind(this);
-    this.deleteLinkHandler = this.deleteLinkHandler.bind(this);
-    this.focusDeleteLink = this.focusDeleteLink.bind(this);
-    this.makeVisibleLinkHandler = this.makeVisibleLinkHandler.bind(this);
-    this.makeInvisibleLinkHandler = this.makeInvisibleLinkHandler.bind(this);
-  }
-
-  activateLinkHandler (event)
-  {
+  activateLinkHandler = (event) => {
     event.preventDefault()
     this.props.store.dispatch(
       this.props.actions.activateDeveloperKey(
@@ -48,8 +40,7 @@ class DeveloperKey extends React.Component {
     )
   }
 
-  deactivateLinkHandler (event)
-  {
+  deactivateLinkHandler = (event) => {
     event.preventDefault()
     this.props.store.dispatch(
       this.props.actions.deactivateDeveloperKey(
@@ -58,54 +49,8 @@ class DeveloperKey extends React.Component {
     )
   }
 
-  makeVisibleLinkHandler (event)
-  {
-    event.preventDefault()
-    this.props.store.dispatch(
-      this.props.actions.makeVisibleDeveloperKey(
-        this.props.developerKey
-      )
-    )
-  }
-
-  makeInvisibleLinkHandler (event)
-  {
-    event.preventDefault()
-    this.props.store.dispatch(
-      this.props.actions.makeInvisibleDeveloperKey(
-        this.props.developerKey
-      )
-    )
-  }
-
-  deleteLinkHandler (event)
-  {
-    event.preventDefault()
-    const confirmResult = confirm(I18n.t('Are you sure you want to delete this developer key?'))
-    if (confirmResult) {
-      this.props.store.dispatch(
-        this.props.actions.deleteDeveloperKey(
-          this.props.developerKey
-        )
-      )
-    }
-  }
-
-  editLinkHandler (event)
-  {
-    event.preventDefault()
-    this.props.store.dispatch(
-      this.props.actions.setEditingDeveloperKey(
-        this.props.developerKey
-      )
-    )
-    this.props.store.dispatch(
-      this.props.actions.developerKeysModalOpen()
-    )
-  }
-
-  developerName (developerKey) {
-    return developerKey.name || I18n.t('Unnamed Tool')
+  developerName () {
+    return this.props.developerKey.name || I18n.t('Unnamed Tool')
   }
 
   userName (developerKey) {
@@ -121,114 +66,30 @@ class DeveloperKey extends React.Component {
     return developerKey.workflow_state !== "inactive"
   }
 
-  focusDeleteLink() {
-    this.deleteLink.focus();
+  focusDeleteLink = () => {
+    this.actionButtons.focusDeleteLink();
   }
 
   focusName() {
     this.keyName.focus();
   }
 
-  getLinkHelper(options) {
-    const iconClassName = `icon-${options.iconType} standalone-icon`
-    return (
-      <a href="#"
-        role={options.role}
-        aria-checked={options.ariaChecked} aria-label={options.ariaLabel}
-        className={options.className} title={options.title}
-        ref={options.refLink}
-        onClick={options.onClick}>
-          <i className={iconClassName} />
-      </a>)
-  }
-
-  getEditLink(developerName) {
-    return this.getLinkHelper({
-      ariaChecked: null,
-      ariaLabel: I18n.t("Edit key %{developerName}", {developerName}),
-      className: "edit_link",
-      title: I18n.t("Edit this key"),
-      onClick: this.editLinkHandler,
-      iconType: "edit"
-    })
-  }
-
-  refDeleteLink = (link) => { this.deleteLink = link; }
-  refKeyName = (link) => { this.keyName = link; }
-
-  getDeleteLink(developerName) {
-    return this.getLinkHelper({
-      ariaChecked: null,
-      ariaLabel: I18n.t("Delete key %{developerName}", {developerName}),
-      className: "delete_link",
-      title: I18n.t("Delete this key"),
-      onClick: this.deleteLinkHandler,
-      iconType: "trash",
-      refLink: this.refDeleteLink
-    })
-  }
-
-  getMakeVisibleLink() {
-    const label = I18n.t("Make key visible")
-    return this.getLinkHelper({
-      role: "checkbox",
-      ariaChecked: false,
-      ariaLabel: label,
-      className: "deactivate_link",
-      title: label,
-      onClick: this.makeVisibleLinkHandler,
-      iconType: "off",
-    })
-  }
-
-  getMakeInvisibleLink() {
-    const label = I18n.t("Make key invisible")
-    return this.getLinkHelper({
-      role: "checkbox",
-      ariaChecked: true,
-      ariaLabel: label,
-      className: "deactivate_link",
-      title: label,
-      onClick: this.makeInvisibleLinkHandler,
-      iconType: "eye",
-    })
-  }
-
-  links (developerKey) {
-    const developerNameCached = this.developerName(developerKey)
-    const editLink = this.getEditLink(developerNameCached)
-    const deleteLink = this.getDeleteLink(developerNameCached)
-    const makeVisibleLink = this.getMakeVisibleLink()
-    const makeInvisibleLink = this.getMakeInvisibleLink()
-
-    return (
-      <div>
-        {editLink}
-        {developerKey.visible ? makeInvisibleLink : makeVisibleLink}
-        {deleteLink}
-      </div>
-    )
-  }
-
   makeImage (developerKey) {
-    let src = '#'
-    let altText = ''
     if (developerKey.icon_url) {
-      src = developerKey.icon_url
-      if (developerKey.name) {
-        altText = I18n.t("%{developerName} Logo", {developerName: developerKey.name})
-      } else {
-        altText = I18n.t("Unnamed Tool Logo")
-      }
+      return <span className="icon">
+        <Image
+          src={developerKey.icon_url}
+          alt={I18n.t("%{developerName} Logo", {developerName: this.developerName()})}
+        />
+      </span>
     }
-
-    return (<img className="icon" src={src} alt={altText} />)
+    return <span className="emptyIconImage" />
   }
 
   makeUserLink (developerKey) {
     const name = this.userName(developerKey)
     if (!developerKey.user_id) { return name }
-    return (<a href={`/users/${developerKey.user_id}`}>{name}</a> );
+    return (<Link href={`/users/${developerKey.user_id}`}>{name}</Link> );
   }
 
   redirectURI (developerKey) {
@@ -243,6 +104,13 @@ class DeveloperKey extends React.Component {
     return `${lastUsed} ${lastUsedDate}`
   }
 
+  handleDelete = () => (
+    this.props.onDelete(this.props.developerKey.id)
+  )
+
+  refActionButtons = (link) => { this.actionButtons = link; }
+  refKeyName = (link) => { this.keyName = link; }
+
   render () {
     const { developerKey, inherited } = this.props;
 
@@ -250,7 +118,7 @@ class DeveloperKey extends React.Component {
       <tr className={classNames('key', { inactive: !this.isActive(developerKey) })}>
         <td className="name">
           {this.makeImage(developerKey)}
-          <span ref={this.refKeyName}>
+          <span ref={this.refKeyName} tabIndex="0">
             {this.developerName(developerKey)}
           </span>
         </td>
@@ -308,7 +176,15 @@ class DeveloperKey extends React.Component {
         </td>
         {!inherited &&
           <td className="icon_react">
-            {this.links(developerKey)}
+            <DeveloperKeyActionButtons
+              ref={this.refActionButtons}
+              dispatch={this.props.store.dispatch}
+              {...this.props.actions}
+              developerKey={this.props.developerKey}
+              visible={this.props.developerKey.visible}
+              developerName={this.developerName()}
+              onDelete={this.handleDelete}
+            />
           </td>
         }
       </tr>
@@ -331,15 +207,20 @@ DeveloperKey.propTypes = {
   }).isRequired,
   developerKey: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    api_key: PropTypes.string.isRequired,
-    created_at: PropTypes.string.isRequired
+    api_key: PropTypes.string,
+    created_at: PropTypes.string.isRequired,
+    visible: PropTypes.bool,
+    name: PropTypes.string,
+    user_id: PropTypes.string,
+    workflow_state: PropTypes.string
   }).isRequired,
   ctx: PropTypes.shape({
     params: PropTypes.shape({
       contextId: PropTypes.string.isRequired
     })
   }).isRequired,
-  inherited: PropTypes.bool
+  inherited: PropTypes.bool,
+  onDelete: PropTypes.func.isRequired
 };
 
 DeveloperKey.defaultProps = { inherited: false }

@@ -293,7 +293,7 @@ class GradebooksController < ApplicationController
     @gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
     per_page = Setting.get('api_max_per_page', '50').to_i
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(teacher_notes: true).first
-    ag_includes = [:assignments, :assignment_visibility]
+    ag_includes = [:assignments, :assignment_visibility, :grades_published]
     last_exported_attachment = @last_exported_gradebook_csv.try(:attachment)
     grading_standard = @context.grading_standard_or_default
     {
@@ -301,6 +301,7 @@ class GradebooksController < ApplicationController
       GRADEBOOK_OPTIONS: {
         api_max_per_page: per_page,
         chunk_size: Setting.get('gradebook2.submissions_chunk_size', '10').to_i,
+        anonymous_moderated_marking_enabled: anonymous_moderated_marking_enabled?,
         assignment_groups_url: api_v1_course_assignment_groups_url(
           @context,
           include: ag_includes,
@@ -590,7 +591,7 @@ class GradebooksController < ApplicationController
       format.html do
         @headers = false
         @outer_frame = true
-        @anonymous_moderated_marking_enabled = @context.root_account.feature_enabled?(:anonymous_moderated_marking)
+        @anonymous_moderated_marking_enabled = anonymous_moderated_marking_enabled?
         log_asset_access([ "speed_grader", @context ], "grades", "other")
         env = {
           CONTEXT_ACTION_SOURCE: :speed_grader,
@@ -709,6 +710,10 @@ class GradebooksController < ApplicationController
   helper_method :multiple_assignment_groups?
 
   private
+
+  def anonymous_moderated_marking_enabled?
+    @context.root_account.feature_enabled?(:anonymous_moderated_marking)
+  end
 
   def new_gradebook_env
     graded_late_submissions_exist = @context.submissions.graded.late.exists?
