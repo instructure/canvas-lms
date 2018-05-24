@@ -105,6 +105,7 @@
   border-top: var(--borderTopWidth) solid;
   border-color: var(--groupColor);
   color: var(--groupColor);
+  min-width: 1px;
 }
 
 .medium {

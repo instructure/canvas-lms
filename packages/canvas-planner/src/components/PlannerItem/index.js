@@ -37,7 +37,7 @@ import responsiviser from '../responsiviser';
 import styles from './styles.css';
 import theme from './theme.js';
 import { arrayOf, bool, number, string, func, shape, object } from 'prop-types';
-import { badgeShape, userShape, statusShape, sizeShape } from '../plannerPropTypes';
+import { badgeShape, userShape, statusShape, sizeShape, feedbackShape } from '../plannerPropTypes';
 import { showPillForOverdueStatus } from '../../utilities/statusUtils';
 import { momentObj } from 'react-moment-proptypes';
 import formatMessage from '../../format-message';
@@ -73,6 +73,7 @@ export class PlannerItem extends Component {
     currentUser: shape(userShape),
     responsiveSize: sizeShape,
     allDay: bool,
+    feedback: shape(feedbackShape),
   };
 
   static defaultProps = {
@@ -308,6 +309,21 @@ export class PlannerItem extends Component {
     };
   }
 
+  renderFeedback () {
+    const feedback = this.props.feedback;
+    if (feedback) {
+      return (
+        <div className={styles.feedback}>
+          <span className={styles.feedbackAvatar}>
+            <Avatar name={feedback.author_name || '?'} src={feedback.author_avatar_url} size="small"/>
+          </span>
+          <span className={styles.feedbackComment}><Text fontStyle="italic">{feedback.comment}</Text></span>
+        </div>
+      );
+    }
+    return null;
+  }
+
   render () {
     const assignmentType = this.assignmentType();
     const checkboxLabel = this.state.completed ?
@@ -340,8 +356,11 @@ export class PlannerItem extends Component {
           {this.renderIcon()}
         </div>
         <div className={styles.layout}>
-          {this.renderItemDetails()}
-          {this.renderItemMetrics()}
+          <div className={styles.innerLayout}>
+            {this.renderItemDetails()}
+            {this.renderItemMetrics()}
+          </div>
+          {this.renderFeedback()}
         </div>
       </div>
     );

@@ -182,11 +182,44 @@ describe Api::V1::PlannerItem do
 
         json = api.planner_item_json(@assignment, @student, session, { start_at: 1.week.ago })
         expect(json[:submissions][:has_feedback]).to be true
-        expect(json[:submissions][:feedback]).to include({
-                                                          comment: "nice work, fam",
-                                                          author_name: @teacher.name,
-                                                          author_avatar_url: @teacher.avatar_url
-                                                        })
+        expect(json[:submissions][:feedback]).to eq({
+                                                      comment: "nice work, fam",
+                                                      author_name: @teacher.name,
+                                                      author_avatar_url: @teacher.avatar_url
+                                                    })
+      end
+
+      it 'should discard comments by the user herself' do
+        submission = @assignment.submit_homework(@student, body: "the stuff")
+        submission.add_comment(user: @teacher, comment: "nice work, fam")
+        submission.add_comment(user: @student, comment: "I know, right?")
+        submission.update(score: 10)
+        submission.grade_it!
+
+        json = api.planner_item_json(@assignment, @student, session, { start_at: 1.week.ago })
+        expect(json[:submissions][:has_feedback]).to be true
+        expect(json[:submissions][:feedback]).to eq({
+                                                      comment: "nice work, fam",
+                                                      author_name: @teacher.name,
+                                                      author_avatar_url: @teacher.avatar_url
+                                                    })
+      end
+
+      it 'should select the most recent comment' do
+        submission = @assignment.submit_homework(@student, body: "the stuff")
+        submission.add_comment(user: @teacher, comment: "nice work, fam")
+        submission.add_comment(user: @student, comment: "I know, right?")
+        submission.add_comment(user: @teacher, comment: "don't let it go to your head.")
+        submission.update(score: 10)
+        submission.grade_it!
+
+        json = api.planner_item_json(@assignment, @student, session, { start_at: 1.week.ago })
+        expect(json[:submissions][:has_feedback]).to be true
+        expect(json[:submissions][:feedback]).to eq({
+                                                      comment: "don't let it go to your head.",
+                                                      author_name: @teacher.name,
+                                                      author_avatar_url: @teacher.avatar_url
+                                                    })
       end
     end
   end

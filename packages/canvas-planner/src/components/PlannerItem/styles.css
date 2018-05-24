@@ -47,7 +47,13 @@
 
 .layout {
   display: flex;
-  flex: 1;
+  flex-direction: column;
+  flex: 1 0;
+  min-width: 1px;
+}
+.innerLayout {
+  display: flex;
+  flex: 1 0;
   align-items: center;
   min-width: 1px;
 }
@@ -110,6 +116,21 @@
   flex: 1;
   text-align: end;
   min-width: 1px;
+}
+
+.feedback {
+  display: flex;
+  align-items: center;
+  
+  .feedbackAvatar {
+    flex-shrink: 0;
+    margin-inline-end: var(--gutterWidth);
+  }
+  .feedbackComment {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
 }
 
 .medium {

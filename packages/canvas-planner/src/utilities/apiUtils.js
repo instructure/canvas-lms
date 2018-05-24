@@ -39,6 +39,9 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
     id: plannableId,
     uniqueId: `${plannable_type}-${plannableId}`,
   };
+
+  details.feedback = apiResponse.submissions ? apiResponse.submissions.feedback : undefined;
+
   if (plannable_type === 'discussion_topic' || plannable_type === 'announcement') {
     details.unread_count = plannable.unread_count;
   }
@@ -111,7 +114,7 @@ export function transformApiToInternalItem (apiResponse, courses, groups, timeZo
     newActivity: apiResponse.new_activity,
     toggleAPIPending: false,
     date: plannableDate,
-    ...details
+    ...details,
   };
 }
 
