@@ -1532,6 +1532,7 @@ nb:
   add_new_group_7ac49f31: "Legg til ny gruppe"
   add_new_set_of_due_dates_e8e240f: "Legg til nytt sett av forfallsdatoer"
   add_new_term_d2217c0d: "Legg til nytt semester"
+  add_people_7948b7da: "Legg til personer"
   add_people_7ee4b2ec: "Legg til personer"
   add_people_to_coursename_5ea234e1: "Legg personer til: %{courseName}"
   add_quiz_ip_filter_c7b37dc5: "Legg til IP-filter for test"
@@ -1675,6 +1676,7 @@ nb:
   allow_in_mastery_paths_5332c786: "Tillat i læringsstier"
   allow_intra_group_peer_reviews_53f1e455: "Tillat hverandrevurdering innad i gruppen"
   allow_lor_tools: "Tillat brukere å vise og bruke eksterne verktøy som er konfigurert for LOR."
+  allow_moderator_to_review_multiple_independent_gra_c59d64f6: "La moderator evaluere flere uavhengige vurderinger for valgte innleveringer"
   allow_multiple_attempts_e67a0a37: "Tillat flere forsøk"
   allow_opt_out_of_inbox: "Tillat brukere å trekke seg fra Samtale innboks. Dette vil føre til at alle samtalemeldinger og varslinger som skal sendes som ASAP varslinger til brukerens primære epost, skjuler Samtale innboksens uleste meldinger merke på innboksen, og skjuler samtalens varslingsinnstillinger."
   allow_outcome_extra_credit_57c1e84e: "Tillat ekstra kreditt for resultater"
@@ -1695,6 +1697,7 @@ nb:
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Tillat lærere å markere karakterdata som til eksport i bulk til SIS-integrasjoner"
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Tillater duplisering av moduler i Canvas"
   allows_the_duplicating_of_objects_in_canvas_c86f3665: "Tillater kopiering av objekter i Canvas"
+  allows_the_duplication_of_calendar_events_7bb0d6c5: "Tillater duplisering av kalenderbegivenheter"
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Tillater planlegging av gjentagende kalenderhendelser"
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Tillater brukere med internasjonale telefonnumre å motta tekstmeldinger fra Canvas."
   alumno_88c80e37: Alumno
@@ -1791,6 +1794,7 @@ nb:
   announcement_fb4cb645: Kunngjøring
   announcement_filter_d35318a7: Kunngjøringsfilter
   announcement_not_found_d6d124c3: "Kunngjøring ikke funnet"
+  announcement_posted_title_f47bb7a4: "Kunngjøring lagt ut: %{title}"
   announcement_starts_at_2e987a38: "Kunngjøring begynner på"
   announcement_successfully_created_731a707f: "Kunngjøring ble opprettet"
   announcement_successfully_updated_7bc5130: "Kunngjøring ble oppdatert"
@@ -1846,6 +1850,9 @@ nb:
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonym karaktersetting tvinger studentnavn til å være skjult i SpeedGrader™"
   anonymous_instructor_annotations_2b6c822: "Anonyme Instruktørmerknader"
   anonymous_marking_92a4d623: "Anonym markering"
+  anonymous_mode_on_2dd9b94a: "Anonymmodus på"
+  anonymous_mode_on_feb53729: "Anonymmodus på:"
+  anonymous_moderated_assignments_cannot_be_unmuted__8f7b09e7: "Kan ikke fjerne demping på anonymt modererte oppgaver før karakterene publiseres"
   anonymous_moderated_marking_801bbb65: "Anonym moderert markering"
   anonymous_moderated_marking_allows_teachers_to_sel_af80885d: "Anonym moderert markering lar lærere velge moderatorer som kan anonymt karaktersette oppgaver. Etter dette kan en moderator velge eller gi en egentilpasset karater."
   anonymous_user: "Anonym bruker"
@@ -1860,6 +1867,7 @@ nb:
   answer_description_6b353cfd: Svarbeskrivelse
   answer_distribution_2a956e3f: Svarfordeling
   answer_incorrect_answer_80efe585: "%{answer}, (Feil svar)"
+  answer_sequence_cfeda025: "Svar Rekkefølge"
   answer_text_80_character_limit_2fce1113: "Svartekst (80 tegn maks)"
   answer_text_909894d6: Svartekst
   answer_weight_43420dc5: Svarvekt
@@ -2809,6 +2817,7 @@ nb:
     upload_error_unexpected: "En ukjent feil oppsto under nedlasting fra %{url}"
   attachment_deffe5a9: Vedlegg
   attempt_3dd42b18: forsøk
+  attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: "Forsøk på å oppdage egnet feltseparator i eksport av Karakteroversikten er basert på tallformatet til språket ditt."
   attendance: 
     options: 
       clear_attendance_marks: "Fjern oppmøtenotat"
@@ -2830,10 +2839,119 @@ nb:
     corrupted: "Detaljer Ikke Tilgjengelig"
     login: "LOGG INN"
     logout: "LOGG UT"
+  authentication_context_60748f2f: Autentiseringskontekst
+  authentication_provider: 
+    default_delegated_login_handle_name: "Logg inn"
+    default_login_handle_name: E-post
+  authentication_provider/ldap: 
+    test_bind_failed: "Kunne ikke binde med følgende feil: %{error}"
+    test_bind_timeout: "Tidsavbrudd ved sammenkobling"
+    test_connection_timeout: "Tidsavbrudd ved tilkobling"
+    test_host_unknown: "Ukjent vert: %{host}"
+    test_login_auth_exception: "Unntak ved innlogging: %{error}"
+    test_login_auth_failed: "Autentisering mislyktes"
+    test_search_failed: "Søket mislyktes med følgende feil: %{error}"
+  authentication_provider/saml: 
+    debug: 
+      logout_redirect: "LogoutRequest sendt til IdP"
+      wait_for_login: "Venter på innloggingsforsøk"
+  authentication_providers: 
+    account_required: "må være LDAP-autentisert"
+    index: 
+      delete_auth_confirmation: "Er du sikker? Det kan hende brukere ikke kan logge på hvis dette fjerne."
+      delete_auth_link: "Fjern verifisering"
+      ip_address_list_description: "Hvis du benytter en autentiseringstjeneste som krever at Canvas-tjeneren kontakter din tjener direkte, f.eks. LDAP, må du forsikre deg om at din server tillater oppkobling fra disse IP-adressene:"
+      no_auth_type_description: "Denne kontoen er for tiden ikke koblet mot en identitetsleverandør."
+      page_title: Autentiseringsinnstillinger
+      profile_page_link_example: "For eksempel, her er profilsiden: [%{friendlyname}](%{url})"
+      settings_description: "For at en bruker skal kunne autentisere via en ekstern identitetsleverandør (IdP), må brukeren ha en påloggingsidentifikator som er koblet til både denne kontoen og som samsvarer med den unike identifikatoren som sendes av IdP. For å se en brukers innlogginger, se «påloggingsinformasjon»-seksjonen på brukerens profilside. (Finnes ved å søke etter brukere i «Brukere»-fanen.)"
+      settings_title: Autentiseringsinnstillinger
+      test_ldap_link: "Test LDAP-autentisering"
+    ldap_fields: 
+      auth_filter_description: "Bruk *%{placeholder}* som en plassholder for brukernavnet som gis av brukeren. For eksempel: *(sAMAccountName=%{placeholder})*"
+      identifer_format_description: "LDAP-attributten som brukes til å finne Canvas-innloggingen. La stå blank for å bruke brukernavnet til brukeren."
+      ldap_timeout_failure_help2: "Hvis Canvas opplever for mange tidsavbrudd under kommunikasjon med LDAP-serveren, vil den blokkere ytterlige påloggingsforsøk fra å bruke den LDAP-serverene i %{time}. LDAP-serveren opplevde sist tidsavbrudd %{timestamp}."
+    ldap_settings_test: 
+      labels: 
+        pass: Passord
+        user: Brukernavn
+      ldap_test_login_button: Innloggingstest
+      test_ldap_bind_help_body: "LDAP-serveren avviste bindeforsøket. Ting å vurdere:"
+      test_ldap_bind_help_fixes_1: "Bekreft den gitte filterstrengen (dvs. '(sAMAccountName={{login}})')."
+      test_ldap_bind_help_fixes_2: "Krever brukernavnet mer definisjonsinformasjon? (dvs. 'cn=Canvas,ou=people,dc=example,dc=com')."
+      test_ldap_bind_help_header: "Canvas kan ikke koble opp mot (innlogging) på din LDAP-tjener"
+      test_ldap_bind_label: "Tester LDAP-tilkobling..."
+      test_ldap_connection_help_body: "Tilkoblingen ble enten tidsavbrutt eller avvist. Ting å vurdere:"
+      test_ldap_connection_help_fixes_1: "Canvas kobler til %{ips}"
+      test_ldap_connection_help_fixes_2: "Dette var bare en tilkoblingstest. SSL-sertifikater er ikke validert."
+      test_ldap_connection_help_fixes_3: "Kontroller brannmurinnstillingene dine. Har alle Canvas sine IP-adresser tillatelse til å koble til serveren din?"
+      test_ldap_connection_help_header: "Canvas kan ikke koble til din LDAP-tjener"
+      test_ldap_connection_label: "Tester tilkobling…"
+      test_ldap_dialog_close: Lukk
+      test_ldap_dialog_page_title: "Tester din LDAP-konfigurasjon"
+      test_ldap_login_form_header: "Bruk et gyldig LDAP-brukernavn/-passord for å teste innlogging:"
+      test_ldap_login_help_header: "LDAP-tjeneren avslo dine opplysninger"
+      test_ldap_login_label: "Test brukerinnlogging…"
+      test_ldap_search_help_body: "Søket entem mislyktes eller ga 0 resultater. Ting å vurdere:"
+      test_ldap_search_help_fixes_1: "Bekreft den gitte filterstrengen (dvs. '(sAMAccountName={{login}})')."
+      test_ldap_search_help_fixes_2: "Bekreft det angitte søkegrunnlaget (dvs. 'ou=people,dc=example,dc=com')."
+      test_ldap_search_help_fixes_3: "Bekreft at brukerobjektet i LDAP har søkeprivilegier for det angitte søkegrunnlaget."
+      test_ldap_search_help_header: "Canvas kan ikke søke i din LDAP-instans"
+      test_ldap_search_label: "Tester LDAP-søk…"
+    linkedin_fields: 
+      description: |-
+          Du vil måtte [registrere en søknad på LinkedIn](%{linkedin_url}).
+          Du bør legge til %{callback_url} som en OAuth 2.0-autorisert omadresserende URL og sette Applikasjonsstauts til Live
+          Etter du har opprettet applikasjonen, noter Client ID og Client Secret, og skriv de inn her.
+    login_required: "må oppgis"
+    no_changing_auth_types: "Kan ikke endre type autorisasjonskonfigurering, vennligst slett og lag en ny konfigurasjon."
+    password_required: "må oppgis"
+    saml_required: "En SAML-konfigurering kreves for å teste SAML"
+    saml_settings_test: 
+      refresh_debugging: Oppdater
+      saml_debug_instructions: "Når du har startet å feilsøke all informasjon for det neste SAML-påloggingsforsøket, vil forsøket innhentes. Klikk på «Oppdater» for å se om mer informasjon er blitt innhentet eller «Stans feilsøking» for å klarere innhentet data og stanse gjeldende feilsøkingsforsøk."
+      saml_debugging: SAML-feilsøking
+      saml_required: "En SAML-konfigurering kreves for å teste SAML"
+      start_debugging: "Start feilsøking"
+      stop_debugging: "Stopp feilsøking"
+    saml_testing: 
+      auth_request_to_idp: "AuthnRequest sendt til IdP"
+      auth_response_from_idp: "AuthnResponse fra IdP"
+      labels: 
+        canvas_login_fail_message: "Canvas pålogging feilmelding"
+        fingerprint_from_idp: "IdP sertifikat fingeravtrykk"
+        idp_in_response_to: "IdP inResponseTo"
+        idp_login_destination: "IdP LoginResponse destinasjon"
+        idp_logout_destination: "Idp LogoutResponse destinasjon"
+        idp_logout_in_response_to: "IdP logg av inResponseTo"
+        idp_logout_response_encoded: "IdP LogoutResponse kodet"
+        idp_logout_response_xml_encrypted: "IdP LogoutResponse XML"
+        idp_response_encoded: "IdP LoginResponse kodet"
+        idp_response_xml_decrypted: "IdP LoginResponse Dekryptert"
+        idp_response_xml_encrypted: "IdP LoginResponse Kryptert"
+        is_valid_login_response: "Canvas oppfatter responsen som gyldig"
+        logged_in_user_id: "Innlogget bruker-ID"
+        login_response_validation_error: Valideringsfeil
+        login_to_canvas_success: "Brukeren ble logget inn på Canvas"
+        logout_request_id: "Logout ber om id"
+        logout_to_idp_url: "LogoutRequest kodet URL"
+        logout_to_idp_xml: "LogoutRequest XML sent til IdP"
+        request_id: "Be om ID"
+        state_of_debug: Testtilstand
+        to_idp_url: "LoginRequest kodet URL"
+        to_idp_xml: "LoginRequest XML sent til IdP"
+      logout_request_to_idp: "LogoutRequest sendt til IdP"
+      logout_response_from_idp: "LogoutResponse fra IdP"
+    sso_settings_form: 
+      change_password_url_help: "La stå tomt for standard Canvas-oppførsel"
+      discovery_url_description: "Hvis en oppdagelses-URL er angitt, vil Canva videresende alle brukere til den URL-en når de må autentiseres. Den siden vil så måtte hjelpe brukere finne ut hvor de må gå for å logge på. Hvis ingen oppdagelses-URL er konfigurert, vil første konfigurasjon brukes for å prøve å autentisere brukeren."
+      login_handle_name_description: "Etiketten som brukes for unike påloggingsidentifikatorer. Eksempler: Pålogging, Brukernavn, Student-ID, osv."
+      unknown_user_url_description: "URL-adressen å omdirigere til når en autentisert bruker ikke er funnet i Canvas."
   authentication_with_provider_was_successful_but_no_6a194137: "Autentisering med %{provider} var vellykket, men ingen unik ID for å logge inn på Canvas ble gitt."
   author_s_name_b35e905a: "Forfatterens navn"
   authorize_e3f25bb4: Autoriser
   auto_leader_7791c30a: auto_leader
+  autodetect_field_separators_in_gradebook_exports_ed9a9d77: "Oppdat automatisk feltseparatorer i eksport av Karakteroversikten"
   automatically_apply_deduction_to_late_submissions_2b68166e: "Bruk automatisk fradrag for sene innleveringer"
   automatically_apply_grade_for_missing_submissions_2b5c1a72: "Bruk automatisk karakter for manglende innleveringer"
   availability_dates_438d71e0: "Datoer for tilgjengelighet"
@@ -2851,6 +2969,7 @@ nb:
   available_to_b7350e02: "Tilgjengelig til"
   available_until_date_2c0ccec3: "Tilgjengelig til dato:"
   available_until_date_cd125c62: "Tilgjengelig til dato"
+  available_until_date_d2fe6cb1: "Tilgjengelig til %{date}"
   available_until_f3b9c4ed: "Tilgjengelig Frem til"
   available_until_field_for_styleguide_85d5d65a: "Tilgjengelighetsfelt for stil-veileder"
   available_until_format_like_yyyy_mm_dd_hh_mm_622378d6: "Tilgjengelig til - formatter som DD-MM-ÅÅÅÅ tt:mm"
@@ -3277,7 +3396,7 @@ nb:
       location_address: "Adresse:"
       location_name: "Sted:"
       new_calendar_event_header: "Ny kalenderhendelse"
-      repeat: Gjenta
+      repeat: Dupliser
       start_time: Starttidspunkt
     edit_event: 
       tabs: 
@@ -3423,6 +3542,17 @@ nb:
     event: 
       due: "leveres innen"
       event_title: "leveres innen: %{event_title}"
+    show: 
+      calendar_feed: Kalenderstrøm
+      calendar_feed_instructions: "Kopier lenken nedenfor og lim den inn i hvilket som helst kalenderapp som aksepterer iCal strøm (Google Calendar, iCal, Outlook, etc.)"
+      calendars: Kalendere
+      feed_dialog_title: Kalenderstrøm
+      feed_title: "Kalender Atom-strøm for emne"
+      links: 
+        feed: "klikk her for å se strømmen"
+      page_title_header: Kalender
+      skip_to_calendar: "Til kalender"
+      undated_items: Udatert
     show2: 
       calendar_feed: Kalenderstrøm
       calendar_feed_instructions: "Kopier lenken nedenfor og lim den inn i hvilket som helst kalenderapp som aksepterer iCal strøm (Google Calendar, iCal, Outlook, etc.)"
@@ -3960,6 +4090,7 @@ nb:
       recording: "1 opptak"
       recordings: "%{recordingCount} opptak"
       settings: Innstillinger
+      type: "%{type}"
       view: Vis
     confirm: 
       close: |-
@@ -4003,6 +4134,7 @@ nb:
       recordings: "%{recordingCount} opptak"
       settings: Innstillinger
       start: Start
+      type: "%{type}"
       view: Vis
     no_concluded_conferences: "Det er ingen avsluttede konferanser"
     no_new_conferences: "Det er ingen nye konferanser"
@@ -5119,6 +5251,7 @@ nb:
   course_found_f5a40cd3: "Emner funnet"
   course_found_not_deleted_a20f72f0: "Emner funnet (ikke slettet)"
   course_grades_22adc27e: Emne-Karakterer
+  course_has_no_active_instructors_with_this_id_74f1d8a: "emnet har ingen aktive instruktører med denne ID-en"
   course_home_4c4c0107: "Emne hjem"
   course_home_sub_navigation_b1ee6b03: Emnenavigering
   course_id_8bd2a21c: "Emne ID"
@@ -6374,6 +6507,8 @@ nb:
     identifier: "ID: %{id}"
     redirect_uri: "URI: %{redirect_uri}"
   developer_key_921ddbae: Utviklernøkkel
+  developer_key_developerkeyid_deleted_focus_moved_t_80fffb4d: "Utviklernøkkel %{developerKeyId} slettet. Fokus flyttet til legg til utviklernøkkel-knapp."
+  developer_key_developerkeyid_deleted_focus_moved_t_9f5b5198: "Utviklernøkkel %{developerKeyId} slettet. Fokus flyttet til sletteknappen for tidligere utviklernøkler i listen."
   developer_key_form: 
     cancel: Avbryt
     icon_url: "Ikon-URL:"
@@ -6775,6 +6910,7 @@ nb:
   discussions_tutorial_tray_4ef79bcc: "Diskusjoner Tutorial Tray"
   discussions_with_groups_cannot_be_section_specific_1146d29: "Diskusjoner med grupper kan ikke være seksjonspesifikk"
   dismiss_dacdb625: Avvise
+  dismiss_itemtitle_c5020a4c: "Avvise %{itemTitle}"
   dismiss_this_5c74dddc: "Lukk denne"
   display_all_text_links_in_canvas_as_underlined_tex_e698e714: "Vis alle tekstlenker i Canvas som *understreket tekst*."
   display_as_e2a5c383: "Vis som"
@@ -6840,9 +6976,11 @@ nb:
   due_at_5e18eeac: "Forfall:"
   due_at_time_fa41cf6c: "Forfall: %{time}"
   due_by_c263dc10: "Frist ved"
+  due_date_2c6e4cfb: "Forfall %{date}"
   due_date_5d0a953c: "Forfallsdato:"
   due_date_6a281fe3: "Forfall: %{date}"
   due_date_822625d8: Forfallsdato
+  due_date_bf4eaf46: "Forfall %{date} "
   due_date_cannot_be_after_course_end_fd128a14: "Forfallsdato kan ikke være etter emneslutt"
   due_date_cannot_be_after_lock_date_675b30aa: "Forfallsdato kan ikke være etter låsdato"
   due_date_cannot_be_after_section_end_b0f54388: "Forfallsdato kan ikke være etter seksjon slutt"
@@ -6884,6 +7022,7 @@ nb:
   duplicate_modules_8ea35557: "Dupliser moduler"
   duplicate_objects_120eda73: "Kopier objekter"
   duplicate_provider_provider_d9842134: "Duplikat leverandør %{provider}"
+  duplicating_calendar_events_9932cd37: "Duplisere kalenderbegivenheter"
   duplication_failed_3351ffb1: "Kunne ikke duplisere"
   duplication_of_title_succeeded_2e0bd645: "Duplisering av %{title} var vellykket"
   duration_1_minute_29c7d5ab: "Varighet : 1 minutt"
@@ -8695,7 +8834,11 @@ nb:
   graded_on_submission_60ac3010: "Karaktersatt ved innlevering"
   graded_quiz_7fabdf1f: "Karaktersatt test"
   graded_survey_c0f0c395: "Karaktersatt undersøkelse"
+  grader_count_cannot_be_0_9228afe4: "Karaktertelling kan ikke være 0"
+  grader_count_is_required_45b6c85b: "Karaktertelling er påkrevd"
   grader_d1198a9c: Sensor
+  grader_is_required_62c88f67: "Karaktersetter er påkrevd"
+  grader_that_determines_final_grade_cc55f20: "Karaktersetter bestemmer sluttkarakter"
   graders_cannot_see_student_names_5ebd3116: "Karaktersetter kan ikke se studentnavn"
   grades_a61eba0a: Karakterer
   grades_are_now_reverted_to_original_scores_e6deade1: "Karakterene er nå satt tilbake til opprinnelig resultat"
@@ -9286,6 +9429,18 @@ nb:
   has_turnitin_score_3e1cacf6: "Har Turnitin-resultat"
   haven_t_been_graded_d7dee5bb: "Har ikke blitt karaktersatt"
   haven_t_submitted_yet_e63834db: "Har ikke levert enda"
+  hello_name_your_outcomes_import_failed_due_to_an_e_385db5d3: |-
+      Hei %{name},
+      
+      Vår resultatimport mislyktes på grunn av en feil med importen din. Se over filen din og prøv å laste den opp på nytt på %{url}
+      
+      Følgende feil oppstod:
+      %{row}
+      
+      For å se korrekt importformat, se over Canvas API Docs på %{doc_url}
+      
+      Takk,
+      Instructure
   hello_name_your_outcomes_import_failed_due_to_erro_4c3f236b: |-
       Hei %{name},
       
@@ -9301,7 +9456,18 @@ nb:
   hello_name_your_outcomes_were_successfully_importe_a510e0d: |-
       Hei %{name},
       
-      Resultatene dine ble importert. Du kan nå behandle de på %{url}
+      Resultatene dine har blitt importert. De kan nå administreres på %{url}
+      
+      Takk,
+      Instructure
+  hello_name_your_outcomes_were_successfully_importe_d0c37335: |-
+      Hei %{name},
+      
+      Resultatene dine har blitt importert, men med følgende problemer (opp til de første 100):
+      
+      %{rows}
+      
+      De kan nå administreres på %{url}
       
       Takk,
       Instructure
@@ -9462,6 +9628,7 @@ nb:
   id_del_alumno_bc4bcf8a: "ID del Alumno"
   id_del_curso_4ef15337: "ID del Curso"
   id_id_4e148481: "ID: %{id}"
+  identifier_format_6ca23365: Identifikatorformat
   idp_entity_id_25c51837: "IdP Entity ID"
   idp_metadata_uri_dae5314a: "IdP Metadata URI"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Hvis en attributt kun er merket som kun klargjøring, da vil den kun brukes når klargjøring i siste liten lager en ny bruker, og vil ikke holdes oppdatert hver gang brukeren logger på."
@@ -9701,6 +9868,7 @@ nb:
   instructure_default_old_66ef6e9b: "Instructure standard (gammel)"
   integration_id_a6977535: "Integrerings ID:"
   integration_id_int_id_is_already_in_use_f30f03b5: "Integrasjon ID \"%{int_id}\" er allerede i bruk"
+  integration_id_integration_id_is_already_in_use_bd1bbb09: "Integrasjon ID \"%{integration_id}\" er allerede i bruk"
   interactions_report_47c1219e: "Rapport over interaksjoner"
   international_sms_9edb9868: "internasjonal SMS"
   international_sms_send_from_recipient_s_country_43881ea4: "Internasjonal SMS - Send fra mottakerens land"
@@ -9727,6 +9895,8 @@ nb:
   invalid_restrictions_316cd740: "Ugyldige restriksjoner"
   invalid_sis_sync_status_b68db497: "Ugyldig SIS synkroniseringsstatus"
   invalid_state_parameter_7a5aa108: "Ugyldig tilstandsparameter"
+  invalid_timestamp_timestamp_in_future_5bc855d7: "Ugyldig tidsstempel – tidsstempelet er frem i tid"
+  invalid_timestamp_timestamp_not_parseable_dae79e92: "Ugyldig tidsstempel – tidsstempelet kan ikke analyseres"
   invalid_url_in_xml: "Ugyldig url in xml. Ampersands must be escaped."
   invalid_username_or_password_b60aa240: "Ugyldig brukernavn eller passord"
   invalid_utf_8_13c76a6: "Ugyldig UTF-8"
@@ -9871,6 +10041,7 @@ nb:
   last_login_b7bc0479: "Siste innlogging:"
   last_modified_by_ca4bb5e1: "Sist redigert av"
   last_name_303122f3: Etternavn
+  last_post_at_date_bf77652f: "Siste innlegg den %{date}"
   last_post_display_last_reply_at_b9896355: "Siste post %{display_last_reply_at}"
   last_pushed_update_last_export_at_9f634f7c: "Siste utsatte oppdatering: %{last_export_at}"
   last_used_f9457313: "Sist brukt:"
@@ -10104,6 +10275,8 @@ nb:
   load_more_results_460f49a9: "Last flere resultater"
   loaded_more_collaborations_13f1d630: "Lastet flere samarbeid"
   loaded_more_developer_keys_7ea76fbe: "Lastet flere utviklernøkler."
+  loaded_more_developer_keys_focus_moved_to_the_dele_f5b867f8: "Lastet inn flere utviklernøkler. Fokus flyttet til sletteknappen for sist lastet utviklernøkler i listen."
+  loaded_more_developer_keys_focus_moved_to_the_name_6e3c3b34: "Lastet inn flere utviklernøkler. Fokus flyttet til navnet på sist lastet utviklernøkkel i listen."
   loading_25990131: Laster...
   loading_6ac402e1: laster…
   loading_725811ca: "laster inn"
@@ -10133,6 +10306,8 @@ nb:
   loading_more_results_def6df65: "Laster inn flere resultater…"
   loading_more_sub_accounts_d0a30903: "Laster inn flere underkontoer …"
   loading_more_terms_4053e31f: "Laster inn flere betegnelser …"
+  loading_permissions_28495bdb: "Laster inn tillatelser"
+  loading_permissions_failed_73983eb3: "Kunne ikke laste inn tillatelser"
   loading_results_769c8819: "Laster resultater"
   loading_results_spinner_73ef739c: "Laster resultatspinner"
   loading_students_30b71301: "Laster inn studenter"
@@ -10262,7 +10437,7 @@ nb:
         logout_request_redirect_from_idp: "Mottatt LogoutRequest fra IdP"
         logout_response_redirect_from_idp: "Mottok LogoutResponse fra IdP"
         logout_response_redirect_to_idp: "Sender LogoutResponse til IdP"
-        redirect_from_idp: "Mottok LoginResponse fra IdP"
+        redirect_from_idp: "Mottatt LoginResponse fra IdP"
   login_6f3d6249: "Logg inn"
   login_attribute_731a8181: Innloggingsattributt
   login_button_661b410a: "Logg inn knapp"
@@ -12278,6 +12453,7 @@ nb:
   moderate_assignment_name_cf59e0a7: "Moderér %{assignment_name}"
   moderate_d0c85e92: Moderér
   moderate_grades_4f43f85d: "Moderer karakterer"
+  moderated_assignment_12873e87: "Moderert oppgave"
   moderated_grading_allows_multiple_graders_to_grade_5c0d53db: "Moderert Grading gjør at flere klassinger til karakteren utvalgte oppgaver selvstendig, med en moderator som gir den endelige karakteren."
   moderated_grading_cannot_be_enabled_for_group_assi_7e947ab7: "Moderert vurdering kan ikke aktiveres for gruppeoppgaver"
   moderated_grading_cannot_be_enabled_for_peer_revie_6b7eedc1: "Moderert vurdering kan ikke aktiveres for oppgaver som krever hverandrevurderinger"
@@ -12548,6 +12724,7 @@ nb:
   must_belong_to_an_active_root_account_d59a05af: "må tilhøre en aktiv rotkonto"
   must_contribute_to_the_page_fff632c: "Må bidra til siden"
   must_contribute_to_this_module_item_to_complete_it_84ed571c: "Må bidra til dette modulelementet for å fullføre det"
+  must_have_at_least_1_grader_d4a54e85: "Må ha minst 1 karaktersetter"
   must_have_at_least_1_group_per_section_9809e708: "Må ha minst en gruppe per seksjon"
   must_have_at_least_as_many_groups_as_sections_to_a_af2a9dfb: "Må ha minst like mange grupper som seksjoner for å tildele per seksjon"
   must_mark_as_done_91cff799: "Må merkes som ferdig"
@@ -12769,6 +12946,7 @@ nb:
   not_anonymously_graded_87574f91: "Ikke karaktersatt anonymt"
   not_available_487d3648: "Ikke tilgjengelig"
   not_available_during_sync_ae645e8c: "Ikke tilgjengelig under synkronisering"
+  not_available_until_date_3c1c73c2: "Ikke tilgjengelig før %{date}"
   not_available_until_next_submission_2175158: "Ikke tilgjengelig før neste innsending"
   not_calculated_in_final_grade_2b7d5bd1: "Ikke beregnet i siste karakter"
   not_completed_55fb4c00: "Ikke fullført"
@@ -13109,6 +13287,7 @@ nb:
   number_between_1_and_16_inclusive_31f5468d: "tall mellom 1 og 16 inkluderende"
   number_more_a46966: "%{number} Mer ..."
   number_of_allowed_attempts_3d10b740: "Antall tillatte forsøk"
+  number_of_graders_cde8dd54: "Antall karaktersettere"
   number_of_respondents_e1e7e8b: "Antall respondenter"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Antall poeng som skal ignoreres for hver student"
   numpoints_points_b1f0666a: "%{numPoints} poeng"
@@ -13205,6 +13384,7 @@ nb:
   open_message_d7b12975: "Åpne melding"
   open_name_color_picker_a2646a33: "Åpne %{name} fargevelger"
   open_sidebar_2852e8c8: "Åpne sidefeltet"
+  open_speedgrader_11604608: "Åpen SpeedGrader"
   open_submission_tray_4eb14e96: "Åpne innleveringsskuffen"
   open_the_grade_detail_tray_cea682a5: "Åpne karakterdetaljer-skuffen"
   open_theme_editor_2d924ebe: "Åpne Theme Editor"
@@ -13526,6 +13706,7 @@ nb:
     manage_webhooks: "Administrere webhooks"
     provision_catalog: "Klargjøre en katalog"
     provision_uuid: "Gi UUID-er til Quiz.Next"
+  permissions_v2_page_f96dde06: "Tillatelser V2-side"
   peru_51_d3d38d1f: "Peru (+51)"
   peru_7dcfdc91: Peru
   philippines_37a6289e: Filippinene
@@ -14391,6 +14572,7 @@ nb:
       yo: Yo
     you_have_no_services: "Ingen registrerte tjenester, du kan legge til noen under *innstillinger*."
   profile_6bd2baed: Profil
+  profile_photo_save_failed_too_many_times_e1ebda5: "Lagring av profilfoto mislyktes for mange ganger"
   profiles: 
     avatar_dialog: 
       from_gravatar: "Fra Gravatar"
@@ -16371,6 +16553,7 @@ nb:
   save_key_b4dede06: "Lagre nøkkel"
   save_publish_36440725: "Lagre og publiser"
   save_settings_cafe79a5: "Lagre innstillinger"
+  save_theme_36c73e6a: "Lagre tema"
   save_theme_f706116e: "Lagre tema"
   save_this_comment_for_reuse_5eda0b70: "Lagre denne kommentaren for bruk flere ganger"
   save_your_type_to_begin_specifying_conditional_con_9e4f536a: "Lagre din %{type} for å begynne å spesifisere betinget innhold."
@@ -16709,6 +16892,7 @@ nb:
   select_embedded_content_type_966f048a: "Velg innebygd innholdstype"
   select_final_grade_for_moderation_b76a0baf: "Velg endelig karakter for moderasjon"
   select_for_list_of_users_who_responded_791ce930: "Velg for liste over brukere som svarte."
+  select_grader_782af48: "Lagre karaktersetter"
   select_image_e1696a4d: "Velg bilde"
   select_indentation_d056bab8: "Velg innrykk"
   select_input_3dbd73c1: "Velg inngang"
@@ -17852,6 +18036,7 @@ nb:
     inexact_answer: "%{lower_bound} til %{upper_bound}"
     no_answer: "Intet svar"
   statistics_for_name_f4b7b0fc: "Statistikk for %{name}"
+  stats_9272cef3: Statistikker
   status_color_picker_9ea0156b: "%{status} Fargevelger"
   status_e051bb30: status
   status_e7fdbe06: Status
@@ -17862,6 +18047,7 @@ nb:
   storage_used_in_mb_c75fbd9c: "Lagringsplass brukt i MB"
   stream_items_api: 
     assessment_request_title: "Hverandrevurdering for %{title}"
+  strip_domain_from_login_attribute_value_bb6daa88: "Fjerne domene fra verdien til påloggingsattributten"
   student_5da6bfd1: Student
   student_921b864d: student
   student_assignment_outcome_map_title: "Studentens kompetanse"
@@ -17887,6 +18073,7 @@ nb:
   student_name_options_cb029725: "Alternativer for studentnavn"
   student_names_must_be_hidden_because_anonymous_gra_d2ca7255: "Studentnavn må være skjult fordi anonym karaktersetting er nødvendig."
   student_names_must_be_hidden_because_this_is_an_an_3c82287d: "Studentnavn må være skjult fordi dette er en anonym spørreundersøkelse."
+  student_number_db6f06c1: "Student %{number}"
   student_outcome_gradebook_description: "Student Learning Mastery Gradebook gir studentene en rask måte å vise egen fremdrift i forhold til læringsresultat for emner. Læringsmålene presenteres i et karakterboklignende format og studentenes fremdrift vises både som en numerisk score og om de overgår/innfrir/ikke innfrir forventningene i forhold til læringsmålet."
   student_planner_aee76000: Studentplanlegger
   student_planner_date_4cc73abb: "Planleggingsdato for student:"
@@ -18342,6 +18529,11 @@ nb:
   the_following_content_is_partner_provided_ed1da756: "Følgende innhold er gitt av en partner"
   the_following_errors_occurred_bdec1e44: "Følgende feil oppstod:"
   the_following_fields_are_invalid_fields_b3565800: "Følgende felt er ugyldige: %{fields}"
+  the_following_students_have_unsaved_changes_to_the_7762def7: |-
+      Følgende studenter har ulagrede endringer i testinnleveringene deres:
+      
+      %{users}
+      Vil du fortsette allikevel?
   the_following_users_are_ready_to_be_added_to_the_c_1ea01560: "Følgende brukere er klare til å bli lagt til kurset."
   the_following_users_could_not_be_created_2573360a: "Følgende brukere kunne ikke opprettes."
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "Fullt vertsnavn for kontoen (noe.instructure.com f.eks.)"
@@ -18420,6 +18612,7 @@ nb:
   there_are_count_unsynced_changes_25ed3bed: 
     one: "Det finnes 1 usynkronisert endring"
     other: "Det finnes %{count} usynkroniserte endringer"
+  there_are_currently_max_available_graders_597d07db: "Det er %{max} tilgjengelige karaktersettere for øyeblikket"
   there_are_currently_no_associated_courses_fba1754f: "Det er for øyeblikket ingen tilknyttede emner."
   there_are_no_announcements_for_this_course_5ee649c3: "Det er ingen kunngjøringer for dette emnet."
   there_are_no_available_signups_for_this_course_26b05c56: "Det er ingen tilgjengelige påmeldinger for dette emnet."
@@ -18436,6 +18629,7 @@ nb:
   there_was_a_problem_exporting_c33dc250: "Det oppstod et problem ved eksport."
   there_was_a_problem_fetching_periods_bdc09a8f: "Det oppstod et problem ved henting av perioder"
   there_was_a_problem_hiding_the_teacher_notes_colum_3f03014: "Det oppstod et problem med å skjule merknadspalten for lærere."
+  there_was_a_problem_importing_some_of_the_outcomes_482bac10: "Det oppstod et problem under import av noen av resultatene i den opplastede filen. Sjekk e-posten din for mer informasjon."
   there_was_a_problem_loading_students_5bdb6cf2: "Det oppstod et problem under lasting av studenter."
   there_was_a_problem_loading_submissions_39855ff0: "Det oppstod et problem under lasting av innleveringer."
   there_was_a_problem_loading_the_gradebook_69b2a17: "Det var et problem ved lasting av karakteroversikt."
@@ -18462,6 +18656,7 @@ nb:
   there_was_an_error_updating_this_assignment_please_59fc608d: "Det oppsto en feil under oppdatering av denne oppgaven. Last siden på nytt og prøv igjen."
   there_was_an_error_uploading_the_image_932fc4ce: "Det oppsto et avvik med opplasting av bildet"
   there_was_an_error_uploading_your_file_please_try__ce458566: "Det oppstod en feil under opplasting av filen. Vennligst prøv igjen."
+  there_was_an_error_with_your_import_please_examine_7b42f29d: "Det oppstod en feil med importen, se over filen din og prøv å laste den opp på nytt. Sjekk e-posten din for mer informasjon."
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "Det oppsto en feil med forespørselen din; vennligst prøv med et annet søk"
   there_was_an_unexpected_problem_with_the_sync_be079a67: "Det oppsto et uventet problem med synkroniseringen"
   there_was_an_unknown_error_registering_the_tool_b9a29954: "Det oppstod en ukjent feil under registrering av verktøyet"
@@ -18480,6 +18675,7 @@ nb:
   this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "Denne oppgaven teller ikke mot sluttkarakter."
   this_assignment_has_been_excused_87f1dc13: "Denne oppgaven har blitt fritatt."
   this_assignment_has_no_points_possible_and_cannot__b0b4f829: "Denne oppgaver har ingen mulige poeng, og kan ikke inkluderes i karakterutregningen."
+  this_assignment_is_currently_being_moderated_ffd280f2: "Denne oppgaven modereres"
   this_assignment_is_currently_muted_that_means_stud_94d63139: "Denne oppgaven er skjult. Det betyr at studentene ikke kan se karakterer eller tilbakemeldinger. Vil du oppheve skjuling nå?"
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Denne oppgaven er droppet og blir ikke tatt med i beregningen"
   this_assignment_is_excused_and_will_not_be_conside_5892de1f: "Denne oppgaven er fritatt og blir ikke vurdert i den totale beregningen"
@@ -18505,6 +18701,8 @@ nb:
   this_enables_an_updated_navigation_new_dashboard_a_8bd4cae: "Dette tillater en oppdatert navigering, nytt dashbord og et enklere og mer moderne utseende."
   this_enables_users_to_generate_and_download_course_4c69c531: "Dette gjør det mulig å generere og laste ned emne ePub."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Denne funksjonen kan ikke deaktiveres fordi det er minst én underkonto eller ett emne med denne funksjonen aktivert."
+  this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "Denne funksjonen kan ikke aktiveres mens automatisk oppdagelse av feltseparatorer er aktivert"
+  this_feature_can_t_be_enabled_while_semicolons_are_2e0adb54: "Denne funksjonen kan ikke aktiveres mens semikolon tvinges til å være feltseparatorer"
   this_feature_cannot_be_disabled_once_it_has_been_t_db7cc39e: "Denne funksjonen kan ikke deaktiveres når den har blitt slått på."
   this_feature_enables_users_of_right_to_left_rtl_la_17bd0fae: "Denne funksjonen tillater bruken av høyre-mot-venstre-språk for å se «høyre-mot-venstre»-oppsettet under utvikling. Etter hvert vil dette bli standard oppsett og dette valget vil fjernes."
   this_feature_flag_is_something_an_account_can_turn_8467f6f7: "Dette funksjonsflagget er noe en konto kan aktivere hvis de vil la brukerne av kontoen som snakker språk som vanligvis skrives fra høyre til venstre (f.eks: arabisk, hebraisk, farsi) for å se RTL-overlegget mens de jobber på det. så snart funksjonen er «klar» vil dette funksjonsflagget deaktiveres og alle som snakker ett av de språkene vil alltid kunne se RTL-grensesnittet."
@@ -18938,6 +19136,7 @@ nb:
   type_of_item_8a37f69d: "Type element"
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "UH oh! Kontakt din vennlig Catalog Developer . Feilmelding: %{message}"
   unable_to_accept_update_fd53a7e2: "Kan ikke akseptere oppdatering"
+  unable_to_access_specific_student_go_to_assignment_585e05e9: "Kunne ikke koble til den spesifikke studenten. Gå til oppgaven i SpeedGrader?"
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Kan ikke opprette resultatstatistikk fordi denne oppgaven har en forfallsdato innenfor en stengt vurderingsperiode for minst en student."
   unable_to_dismiss_update_df1e32eb: "Kan ikke fjerne oppdatering"
   unable_to_find_clever_district_district_id_61deb1cb: "Klarer ikke å finne Clever-distrikt %{district_id}"
@@ -19067,6 +19266,7 @@ nb:
   updated_current_grade_to_be_empty_c2ce1d13: "Oppdaterte nåværende karakter til å være tom"
   updated_current_grade_to_currentgrade_bfe2ea14: "Oppdaterte nåværende karakter til %{currentGrade}"
   updated_group_group_name_727b1d98: "Oppdatert Gruppe %{group_name}"
+  updated_permissions_page_f2e91060: "Oppdatert side for tillatelser"
   updated_terms_of_service_82f34148: "Oppdatert bruksavtale"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Oppdatert UI for å kunne søke og vise brukere og emner innenfor en konto."
   updating_6edbab78: Oppdaterer
@@ -19119,8 +19319,11 @@ nb:
   use_remote_version_of_rich_content_editor_52f7fc4b: "Bruk ekstern versjon av 'Rich innholdsredigering’"
   use_remote_version_of_rich_content_editor_and_side_a058a664: "Bruk ekstern versjon av  'Rich innholdsredigering' OG sidestolpe"
   use_remote_version_of_rich_content_editor_and_side_ebaaa986: "Bruk eksterne versjon av 'Rich innholdsredigering' OG sidestolpe i høyrisikoområder som tester"
+  use_semicolons_instead_of_commas_to_separate_field_f50945f2: "Bruk semikolon i stedet for komma til å separere felt i eksport av Karakteroversikten, slik at de kan importeres til Excel for brukere i enkelte lokaler."
+  use_semicolons_to_separate_fields_in_gradebook_exp_5fb3b39d: "Bruk semikolon til å separere felt i eksporter av Karakteroversikten"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Bruk det nye eksterne verktøyet for samarbeid for å aktivere flere valg for verktøy som brukes til samarbeid"
   use_the_new_document_annotation_tool_2cbc98d0: "Bruk det nye verktøyet for dokumentmerknader"
+  use_the_new_interface_for_managing_permissions_907e8e8f: "Bruk det nye grensesnittet for å administrere tillatelser"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Bruk det nye test-LTI-verktøyet i stedet for vanlige canvas-tester"
   use_the_new_scheduler_1273b832: "Bruk den nye planleggeren"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Bruk denne konfigurasjonen for foreldre/observatør-registrering"
@@ -19145,6 +19348,7 @@ nb:
   user_accepted_their_invitation_for_the_course_cour_9d600393: "%{user} aksepterte deres invitasjon til emnet, %{course}."
   user_access_tokens_title: "Brukers tilgangssymbol"
   user_avatars_e4fc4ed3: Brukeravatar
+  user_c95de254: Bruker
   user_content_aaf0fb5a: Brukerinnhold
   user_count_respondents_e30a8593: "%{user_count} respondenter"
   user_data_export_from_date_6ba21b89: "*Brukerdataeksport fra %{date}*"
@@ -19153,6 +19357,7 @@ nb:
     cant_come_before_from: "Til-datoen kan ikke være før fra-datoen"
     results_found: "%{length} resultat funnet"
   user_details_e9aef9e5: Brukerdetaljer
+  user_does_not_have_permission_to_select_final_grad_47560e75: "bruker har ikke tillatelse til å velge sluttkarakter"
   user_id_8256faeb: user_id
   user_id_bcace870: Bruker-ID
   user_id_or_sis_id_sis_id_should_be_prepended_with__980ff02b: "Bruker-ID, eller SIS-ID (SIS-ID bør stå foran med sis_user_id:)"
@@ -19649,6 +19854,7 @@ nb:
       weekly_message: 
         one: "Denne Canvas-installasjonen er kun for testing, og vil tilbakestilles hver uke."
         other: "Denne Canvas-installasjonen er kun for testing, og vil tilbakestilles hver %{count}. uke."
+  was_locked_at_date_acf1c576: "Ble låst den %{date}"
   watermark_c93fae0d: Vannmerke
   watermark_opacity_ce3d3097: "Vannmerke opasitet"
   watermarks_other_images_e970fc6a: "Vannmerker og andre bilder"
@@ -19917,6 +20123,7 @@ nb:
   you_are_not_authorized_to_disable_the_sync_to_sisn_54aebeb0: "Du har ikke tillatelse til å deaktivere synkronisering til %{sisName}."
   you_are_not_enrolled_in_any_courses_a5c63286: "Du er ikke påmeldt i noen emner."
   you_are_not_subscribed_to_this_topic_click_to_subs_38ce1f37: "Du abonnerer ikke på dette temaet. Klikk for å abonnere."
+  you_are_not_the_selected_moderator_for_this_assign_e57b483f: "Du er ikke valgt moderator for denne oppgaven"
   you_are_ready_to_sync_count_assignments_525eb8b1: 
     one: "Du er klar til å synkronisere 1 oppgave."
     other: "Du er klar til å synkronisere %{count} oppgaver."
