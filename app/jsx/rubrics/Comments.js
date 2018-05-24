@@ -18,10 +18,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import Text from '@instructure/ui-core/lib/components/Text'
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
 import Select from '@instructure/ui-forms/lib/components/Select'
 import TextArea from '@instructure/ui-forms/lib/components/TextArea'
 import I18n from 'i18n!edit_rubric'
+
+import { assessmentShape } from './types'
 
 const FreeFormComments = (props) => {
   const { savedComments, comments, saveLater, setComments, setSaveLater } = props
@@ -78,4 +81,57 @@ FreeFormComments.defaultProps = {
   saveLater: false
 }
 
-export default FreeFormComments
+const commentElement = (assessment) => (
+  assessment.comments_html ?
+    // eslint-disable-next-line react/no-danger
+    <div dangerouslySetInnerHTML={{ __html: assessment.comments_html }} />
+    : assessment.comments
+)
+
+export const CommentText = ({ assessment, placeholder, weight }) => (
+  <Text size="x-small" weight={weight}>
+    {assessment !== null ? commentElement(assessment) : placeholder}
+  </Text>
+)
+CommentText.propTypes = {
+  assessment: PropTypes.shape(assessmentShape),
+  placeholder: PropTypes.string,
+  weight: PropTypes.string.isRequired
+}
+CommentText.defaultProps = {
+  assessment: null,
+  placeholder: ''
+}
+
+const Comments = (props) => {
+  const { assessing, assessment, ...commentProps } = props
+  if (!assessing || assessment === null) {
+    return (
+      <div className="rubric-freeform">
+        <CommentText
+          assessment={assessment}
+          placeholder={I18n.t("This area will be used by the assessor to leave comments related to this criterion.")}
+          weight="normal"
+        />
+      </div>
+    )
+  }
+  else {
+    return (
+      <FreeFormComments
+        comments={assessment.comments}
+        saveLater={assessment.saveCommentsForLater}
+        {...commentProps}
+      />
+    )
+  }
+}
+Comments.propTypes = {
+  assessing: PropTypes.bool.isRequired,
+  assessment: PropTypes.shape(assessmentShape),
+  savedComments: PropTypes.arrayOf(PropTypes.string).isRequired,
+  setComments: PropTypes.func.isRequired,
+  setSaveLater: PropTypes.func.isRequired
+}
+
+export default Comments

@@ -77,7 +77,7 @@ CommentDialog.propTypes = {
   setComments: PropTypes.func.isRequired
 }
 
-const CommentInput = ({ initialize, ...props }) => (
+const CommentButton = ({ initialize, ...props }) => (
   <div>
     <Button variant="icon" margin="0 x-small 0 0" onClick={() => initialize()}>
       <IconFeedback title="Additional Comments" />
@@ -85,7 +85,7 @@ const CommentInput = ({ initialize, ...props }) => (
     <CommentDialog {...props} />
   </div>
 )
-CommentInput.propTypes = {
+CommentButton.propTypes = {
   comments: PropTypes.string,
   description: PropTypes.string.isRequired,
   finalize: PropTypes.func.isRequired,
@@ -93,9 +93,9 @@ CommentInput.propTypes = {
   open: PropTypes.bool,
   setComments: PropTypes.func.isRequired
 }
-CommentInput.defaultProps = {
+CommentButton.defaultProps = {
   open: false,
   comments: ''
 }
 
-export default CommentInput
+export default CommentButton

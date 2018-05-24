@@ -23,7 +23,7 @@ import { rubrics, assessments } from './fixtures'
 
 const criteriaTypes = ['custom', 'outcome']
 
-const subComponents = ['Threshold', 'Comments', 'OutcomeIcon', 'LongDescription', 'LongDescriptionDialog']
+const subComponents = ['Threshold', 'OutcomeIcon', 'LongDescription', 'LongDescriptionDialog']
 
 _.toPairs(rubrics).forEach(([key, rubric]) => {
   const assessment = assessments[key]
@@ -52,30 +52,23 @@ _.toPairs(rubrics).forEach(([key, rubric]) => {
       }
 
       describe(`with a ${criteriaType} criterion`, () => {
-        testRenderedSnapshots(basicProps)
-      })
+        describe('by default', () => {
+          testRenderedSnapshots(basicProps)
+        })
 
-      describe(`when assessing with a ${criteriaType} criterion`, () => {
-        testRenderedSnapshots({ ...basicProps, onAssessmentChange: () => {}})
+        describe('when assessing', () => {
+          testRenderedSnapshots({ ...basicProps, onAssessmentChange: () => {}})
+        })
+
+        describe('without an assessment', () => {
+          testRenderedSnapshots({ ...basicProps, assessment: undefined})
+        })
       })
     })
   })
 })
 
 describe('Criterion', () => {
-  it('directly renders comments_html', () => {
-    const component = shallow(
-      <Criterion
-        assessment={assessments.freeForm.data[1]}
-        criterion={rubrics.freeForm.criteria[1]}
-        freeForm
-      />
-    )
-
-    const el = component.find('Comments').shallow().findWhere((e) => e.children().length === 0)
-    expect(el.html()).toMatchSnapshot()
-  })
-
   it('can open and close the long description dialog', () => {
     const component = (
       <Criterion

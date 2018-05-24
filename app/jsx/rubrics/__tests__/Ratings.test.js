@@ -43,6 +43,7 @@ describe('The Ratings component', () => {
     expect(ratings(9)).toEqual([true, false, false])
     expect(ratings(5)).toEqual([false, true, false])
     expect(ratings(1)).toEqual([false, false, true])
+    expect(ratings(undefined)).toEqual([false, false, false])
   })
 
   it('calls onPointChange when a rating is clicked', () => {

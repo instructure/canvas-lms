@@ -34,6 +34,16 @@ describe('the Rubric component', () => {
     expect(modal.debug()).toMatchSnapshot()
   })
 
+  it('renders properly with no assessment', () => {
+    const modal = shallow(
+      <Rubric
+        rubric={rubric}
+        rubricAssociation={pointsAssessment.rubric_association}
+      />
+    )
+    expect(modal.debug()).toMatchSnapshot()
+  })
+
   const setCloned = (object, path, value) => _.setWith(_.clone(object), path, value, _.clone)
   it('hides the score total when needed', () => {
     const hidden = setCloned(pointsAssessment, 'rubric_association.hide_score_total', true)

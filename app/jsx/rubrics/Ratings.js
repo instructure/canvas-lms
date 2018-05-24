@@ -17,7 +17,6 @@
  */
 import React from 'react'
 import classNames from 'classnames'
-import _ from 'lodash'
 import PropTypes from 'prop-types'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import I18n from 'i18n!edit_rubric'
@@ -88,9 +87,10 @@ const Ratings = ({ assessing, tiers, points, onPointChange, masteryThreshold }) 
     return { current: tier.points, next: next ? next.points : 0 }
   })
 
-  const selectedIndex = _.findIndex(pairs, ({ current, next }) => (
+  const currentIndex = () => pairs.findIndex(({ current, next }) => (
     points > next && points <= current
   ))
+  const selectedIndex = points !== undefined ? currentIndex() : null
 
   return (
     <div className={classNames("rating-tier-list", { 'react-assessing': assessing })}>

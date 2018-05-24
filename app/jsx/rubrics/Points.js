@@ -16,10 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import I18n from 'i18n!edit_rubric'
+
+import { assessmentShape } from './types'
 
 export const roundIfWhole = (n) => (
   I18n.toNumber(n, { precision: Math.floor(n) === n ? 0 : 1 })
@@ -27,46 +30,66 @@ export const roundIfWhole = (n) => (
 const pointString = (n) => n !== null ? roundIfWhole(n) : ''
 
 export const possibleString = (possible) =>
-  I18n.t('/ %{possible} pts', {
+  I18n.t('%{possible} pts', {
     possible: I18n.toNumber(possible, { precision : 1 })
+  })
+
+export const scoreString = (points, possible) =>
+  I18n.t('%{points} / %{possible}', {
+    points: roundIfWhole(points),
+    possible: possibleString(possible)
   })
 
 const invalid = () => [{ text: I18n.t('Invalid value'), type: 'error' }]
 const messages = (points) => points === null ? invalid() : undefined
 
-const Points = ({ assessing, onPointChange, points, pointsText, pointsPossible }) => {
-  if (!assessing) {
+const Points = (props) => {
+  const {
+    assessing,
+    assessment,
+    onPointChange,
+    pointsPossible
+  } = props
+
+  if (assessment === null) {
     return (
       <div className="container graded-points">
-        {roundIfWhole(points)} {possibleString(pointsPossible)}
+        {possibleString(pointsPossible)}
       </div>
     )
   } else {
-    return (
-      <div className="container graded-points">
-        <TextInput
-          inline
-          label={<ScreenReaderContent>{I18n.t('Points')}</ScreenReaderContent>}
-          messages={messages(points)}
-          onChange={(e) => onPointChange(e.target.value)}
-          value={pointsText || pointString(points)}
-          width="4rem"
-        /> {possibleString(pointsPossible)}
-      </div>
-    )
+    const points = _.get(assessment, 'points', null)
+    const pointsText = _.get(assessment, 'pointsText')
+    if (!assessing) {
+      return (
+        <div className="container graded-points">
+          {scoreString(points, pointsPossible)}
+        </div>
+      )
+    } else {
+      return (
+        <div className="container graded-points">
+          <TextInput
+            inline
+            label={<ScreenReaderContent>{I18n.t('Points')}</ScreenReaderContent>}
+            messages={messages(points)}
+            onChange={(e) => onPointChange(e.target.value)}
+            value={pointsText || pointString(points)}
+            width="4rem"
+          /> {`/ ${possibleString(pointsPossible)}`}
+        </div>
+      )
+    }
   }
 }
 Points.propTypes = {
   assessing: PropTypes.bool,
+  assessment: PropTypes.shape(assessmentShape),
   onPointChange: PropTypes.func,
-  points: PropTypes.number,
   pointsPossible: PropTypes.number.isRequired,
-  pointsText: PropTypes.string,
 }
 Points.defaultProps = {
   assessing: false,
-  points: null,
-  pointsText: null,
   onPointChange: null
 }
 

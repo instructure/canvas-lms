@@ -10,9 +10,7 @@ exports[`The Points component renders an error when points is a string 1`] = `
 
 exports[`The Points component renders as expected with fractional points 1`] = `
 "<div className=\\"container graded-points\\">
-  1.1
-   
-  / 2.0 pts
+  1.1 / 2.0 pts
 </div>"
 `;
 
@@ -24,10 +22,14 @@ exports[`The Points component renders blank when points are undefined 1`] = `
 </div>"
 `;
 
+exports[`The Points component renders points possible with no assessment 1`] = `
+"<div className=\\"container graded-points\\">
+  2.0 pts
+</div>"
+`;
+
 exports[`The Points component renders the root component as expected 1`] = `
 "<div className=\\"container graded-points\\">
-  1
-   
-  / 2.0 pts
+  1 / 2.0 pts
 </div>"
 `;

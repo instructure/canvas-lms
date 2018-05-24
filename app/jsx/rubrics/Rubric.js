@@ -66,7 +66,7 @@ const Rubric = ({ onAssessmentChange, rubric, rubricAssessment, rubricAssociatio
   })
 
   const possible = rubric.points_possible
-  const points = rubricAssessment.score
+  const points = _.get(rubricAssessment, 'score', possible)
   const total = assessing ? totalAssessingString(points, possible) : totalString(points)
   const hideScore = _.get(rubricAssociation, 'hide_score_total') === true
   const noScore = _.get(rubricAssociation, 'score') === null
@@ -96,7 +96,11 @@ const Rubric = ({ onAssessmentChange, rubric, rubricAssessment, rubricAssociatio
 Rubric.propTypes = {
   onAssessmentChange: PropTypes.func,
   rubric: PropTypes.shape(rubricShape).isRequired,
-  rubricAssessment: PropTypes.shape(rubricAssessmentShape),
+  rubricAssessment: (props) => {
+    const shape = PropTypes.shape(rubricAssessmentShape)
+    const rubricAssessment = props.onAssessmentChange ? shape.isRequired : shape
+    return PropTypes.checkPropTypes({ rubricAssessment }, props, 'prop', 'Rubric')
+  },
   rubricAssociation: PropTypes.shape(rubricAssociationShape)
 }
 Rubric.defaultProps = {

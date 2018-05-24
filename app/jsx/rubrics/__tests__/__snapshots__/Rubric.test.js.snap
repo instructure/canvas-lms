@@ -56,6 +56,35 @@ exports[`the Rubric component renders as expected 1`] = `
 </div>"
 `;
 
+exports[`the Rubric component renders properly with no assessment 1`] = `
+"<div className=\\"react-rubric\\">
+  <Table caption=\\"Point Rubric\\" hover={false} size=\\"medium\\">
+    <thead>
+      <tr>
+        <th scope=\\"col\\">
+          Criteria
+        </th>
+        <th scope=\\"col\\">
+          Ratings
+        </th>
+        <th scope=\\"col\\">
+          Pts
+        </th>
+      </tr>
+    </thead>
+    <tbody className=\\"criterions\\">
+      <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={{...}} savedComments={{...}} />
+      <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={{...}} savedComments={{...}} />
+      <tr>
+        <td colSpan=\\"3\\" className=\\"total-points\\">
+          Total Points: 11.0
+        </td>
+      </tr>
+    </tbody>
+  </Table>
+</div>"
+`;
+
 exports[`the Rubric component updates the total score when an individual criterion point assessment changes 1`] = `
 "<div className=\\"react-rubric\\">
   <Table caption=\\"Point Rubric\\" hover={false} size=\\"medium\\">

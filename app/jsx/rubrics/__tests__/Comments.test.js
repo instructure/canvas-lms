@@ -18,24 +18,38 @@
 import sinon from 'sinon'
 import React from 'react'
 import { shallow } from 'enzyme'
-import FreeFormComments from '../FreeFormComments'
+import Comments from '../Comments'
 
-describe('The FreeFormComments component', () => {
+import { freeFormAssessment } from './fixtures'
+
+describe('The Comments component', () => {
   const props = {
+    assessing: true,
+    assessment: freeFormAssessment.data[1],
     savedComments: [
       'I award you no points',
       'May god have mercy on your soul'
     ],
-    comments: 'some things',
     saveLater: false,
     setComments: sinon.spy(),
     setSaveLater: sinon.spy()
   }
 
-  const component = (mods) => shallow(<FreeFormComments {...{ ...props, ...mods }} />)
+  const component = (mods) => shallow(<Comments {...{ ...props, ...mods }} />)
+  const editor = (mods) => component(mods).find('FreeFormComments').shallow()
+  const rating = (mods) => component(mods).find('CommentText').shallow()
 
-  it('renders the root component as expected', () => {
+  it('renders the root component as expected when assessing', () => {
     expect(component().debug()).toMatchSnapshot()
+  })
+
+  it('directly renders comments_html', () => {
+    const el = rating({ assessing: false }).findWhere((e) => e.children().length === 0)
+    expect(el.html()).toMatchSnapshot()
+  })
+
+  it('renders a placeholder when no assessment provided', () => {
+    expect(rating({ assessing: false, assessment: null }).debug()).toMatchSnapshot()
   })
 
   it('shows no selector when no comments are presented', () => {
@@ -44,7 +58,7 @@ describe('The FreeFormComments component', () => {
 
   it('can used saved comments from before', () => {
     const setComments = sinon.spy()
-    const el = component({ setComments })
+    const el = editor({ setComments })
     const option = el.find('option').last()
     el.find('Select').prop('onChange')(null, { value: option.prop('value') })
 
@@ -55,7 +69,7 @@ describe('The FreeFormComments component', () => {
 
   it('can check / uncheck save for later', () => {
     const setSaveLater = sinon.spy()
-    const el = component({ setSaveLater })
+    const el = editor({ setSaveLater })
     el.find('Checkbox').prop('onChange')({ target: { checked: true } })
 
     expect(setSaveLater.args).toEqual([[true]])

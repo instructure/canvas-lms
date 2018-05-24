@@ -18,9 +18,9 @@
 import sinon from 'sinon'
 import React from 'react'
 import { shallow } from 'enzyme'
-import CommentInput from '../CommentInput'
+import CommentButton from '../CommentButton'
 
-describe('The CommentInput component', () => {
+describe('The CommentButton component', () => {
   const props = {
     description: 'Criterion description',
     open: false,
@@ -30,7 +30,7 @@ describe('The CommentInput component', () => {
     setComments: sinon.spy()
   }
 
-  const component = (mods) => shallow(<CommentInput {...{ ...props, ...mods }} />)
+  const component = (mods) => shallow(<CommentButton {...{ ...props, ...mods }} />)
 
   it('renders the root component as expected', () => {
     expect(component().debug()).toMatchSnapshot()

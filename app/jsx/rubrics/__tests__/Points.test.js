@@ -21,18 +21,34 @@ import Points from '../Points'
 
 describe('The Points component', () => {
   const component = (props) => shallow(<Points {...props} />)
+  const id = { criterion_id: '_7506' }
 
   it('renders the root component as expected', () => {
-    expect(component({ points: 1, pointsText: '1', pointsPossible: 2 }).debug()).toMatchSnapshot()
+    expect(component({
+      assessment: { ...id, points: 1, pointsText: '1' },
+      pointsPossible: 2
+    }).debug()).toMatchSnapshot()
   })
 
   it('renders as expected with fractional points', () => {
-    expect(component({ points: 1.1, pointsText: '1.1', pointsPossible: 2 }).debug()).toMatchSnapshot()
+    expect(component({
+      assessment: { ...id, points: 1.1, pointsText: '1.1' },
+      pointsPossible: 2
+    }).debug()).toMatchSnapshot()
   })
 
   it('renders blank when points are undefined', () => {
     expect(component({
       assessing: true,
+      assessment: id,
+      pointsPossible: 2
+    }).debug()).toMatchSnapshot()
+  })
+
+  it('renders points possible with no assessment', () => {
+    expect(component({
+      assessing: false,
+      assessment: null,
       pointsPossible: 2
     }).debug()).toMatchSnapshot()
   })
@@ -40,8 +56,11 @@ describe('The Points component', () => {
   it('renders an error when points is a string', () => {
     const el = component({
       assessing: true,
-      points: null,
-      pointsText: 'stringy',
+      assessment: {
+        ...id,
+        points: null,
+        pointsText: 'stringy',
+      },
       pointsPossible: 2
     })
     expect(el.debug()).toMatchSnapshot()
