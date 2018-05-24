@@ -64,7 +64,6 @@ class Login::CasController < ApplicationController
         @domain_root_account.pseudonym_sessions.create!(pseudonym, false)
         session[:cas_session] = params[:ticket]
         session[:login_aac] = aac.id
-        pseudonym.claim_cas_ticket(params[:ticket])
 
         successful_login(pseudonym.user, pseudonym)
       else
