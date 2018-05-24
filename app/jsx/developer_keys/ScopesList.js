@@ -36,7 +36,7 @@ export default class DeveloperKeyScopesList extends React.Component {
 
     this.state = {
       formattedScopesArray,
-      availableScopes: formattedScopesArray.slice(0, 10), // Only load 10 groups on initial render
+      availableScopes: formattedScopesArray.slice(0, 8), // Only load 8 groups on initial render
       selectedScopes: this.props.selectedScopes,
       readOnlySelected: this.onlySelectGet(this.uniqueSelectedScopes(this.props.selectedScopes))
     }
@@ -74,9 +74,8 @@ export default class DeveloperKeyScopesList extends React.Component {
   delayedRender = () => {
     // Load the rest of the groups once the modal is open
     setTimeout(() => {
-      const upperIndex = this.state.formattedScopesArray.length
       this.setState({
-        availableScopes: this.state.formattedScopesArray.slice(0, upperIndex)
+        availableScopes: this.state.formattedScopesArray.slice()
       })
     }, 0)
   }

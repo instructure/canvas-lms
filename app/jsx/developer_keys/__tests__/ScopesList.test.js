@@ -169,10 +169,10 @@ it("only renders groups with names that match the fitler", () => {
   expect(wrapper.find('.LazyLoad')).toHaveLength(1)
 })
 
-it("only renders 10 groups on the initaial render", () => {
+it("only renders 8 groups on the initaial render", () => {
   const manyScopesProps = Object.assign({}, props, {availableScopes: scopes})
   const wrapper = mount(<DeveloperKeyScopesList {...manyScopesProps} />)
-  expect(wrapper.instance().state.availableScopes).toHaveLength(10)
+  expect(wrapper.instance().state.availableScopes).toHaveLength(8)
 })
 
 describe("handleReadOnlySelected", () => {

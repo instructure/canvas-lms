@@ -119,10 +119,6 @@ export default class DeveloperKeyModal extends React.Component {
     this.props.store.dispatch(this.props.actions.setEditingDeveloperKey())
   }
 
-  modalContainerRef = div => {
-    this.modalContainer = div
-  }
-
   render() {
     return (
       <div ref={this.modalContainerRef}>
