@@ -62,24 +62,6 @@ test('does not render create announcement button if we do not have create permis
   notOk(node.exists())
 })
 
-test('onSearch calls searchAnnouncements with searchInput value only once within debounce timeout', (assert) => {
-  const done = assert.async()
-  const searchSpy = sinon.spy()
-  const tree = mount(
-    <IndexHeader {...makeProps({ searchAnnouncements: searchSpy })} />
-  )
-
-  tree.find('input[name="announcements_search"]').node.value = 'foo'
-  tree.instance().onSearch()
-  tree.instance().onSearch()
-  tree.instance().onSearch()
-
-  setTimeout(() => {
-    strictEqual(searchSpy.callCount, 1)
-    done()
-  }, SEARCH_TIME_DELAY)
-})
-
 test('onSearch calls searchAnnouncements with searchInput value after debounce timeout', (assert) => {
   const done = assert.async()
   const searchSpy = sinon.spy()
