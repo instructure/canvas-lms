@@ -629,7 +629,7 @@ class EnrollmentsApiController < ApplicationController
     end
     params[:enrollment][:course_section_id] = @section.id if @section.present?
     if params[:enrollment][:course_section_id].present?
-      @section = @context.course_sections.active.find params[:enrollment].delete(:course_section_id)
+      @section = api_find(@context.course_sections.active, params[:enrollment].delete(:course_section_id))
       params[:enrollment][:section] = @section
     end
     api_user_id = params[:enrollment].delete(:user_id)

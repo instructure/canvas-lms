@@ -96,6 +96,24 @@ describe EnrollmentsApiController, type: :request do
         expect(new_enrollment).to be_an_instance_of StudentEnrollment
       end
 
+      it "accepts sis_section_id" do
+        @section.update_attribute(:sis_source_id, 'sis_id')
+        json = api_call :post, @path, @path_options,
+                        {
+                          :enrollment => {
+                            :user_id                            => @unenrolled_user.id,
+                            :type                               => 'StudentEnrollment',
+                            :enrollment_state                   => 'active',
+                            :course_section_id                  => 'sis_section_id:sis_id',
+                            :limit_privileges_to_course_section => true,
+                            :start_at                           => nil,
+                            :end_at                             => nil
+                          }
+                        }
+        new_enrollment = Enrollment.find(json['id'])
+        expect(new_enrollment.course_section).to eq @section
+      end
+
       it "should be unauthorized for users without manage_students permission" do
         @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :manage_students)
         json = api_call :post, @path, @path_options,
