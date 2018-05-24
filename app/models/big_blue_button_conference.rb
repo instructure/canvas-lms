@@ -55,11 +55,21 @@ class BigBlueButtonConference < WebConference
       :logoutURL => (settings[:default_return_url] || "http://www.instructure.com"),
       :record => settings[:record] ? "true" : "false",
       :welcome => settings[:record] ? t("This conference may be recorded.") : "",
+      "meta_canvas-recording-ready-user" => recording_ready_user,
       "meta_canvas-recording-ready-url" => recording_ready_url(current_host)
     }) or return nil
     @conference_active = true
     save
     conference_key
+  end
+
+  def recording_ready_user
+    if self.course.instructor_enrollments.active_or_pending.where(user_id: self.user).exists?
+      padded_user_email = self.user.email.ljust(128, ' ')
+      key = ActiveSupport::KeyGenerator.new(config[:secret_dec]).generate_key(config[:secret_dec], 32)
+      crypt = ActiveSupport::MessageEncryptor.new(key)
+      crypt.encrypt_and_sign(padded_user_email)
+    end
   end
 
   def recording_ready_url(current_host = nil)
