@@ -705,27 +705,34 @@ test_4,TC 104,Test Course 104,,term1,active
 
     it 'should not diff outside of diff threshold' do
       b1 = process_csv_data([
-%{course_id,short_name,long_name,account_id,term_id,status
-test_1,TC 101,Test Course 101,,term1,active
-test_4,TC 104,Test Course 104,,term1,active
-}], diffing_data_set_identifier: 'default', change_threshold: 1)
+        %{course_id,short_name,long_name,account_id,term_id,status
+        test_1,TC 101,Test Course 101,,term1,active
+        test_4,TC 104,Test Course 104,,term1,active
+      }], diffing_data_set_identifier: 'default', change_threshold: 1)
 
       # small change, less than 1% difference
       b2 = process_csv_data([
-%{course_id,short_name,long_name,account_id,term_id,status
-test_1,TC 101,Test Course 101,,term1,active
-test_4,TC 104,Test Course 104b,,term1,active
-}], diffing_data_set_identifier: 'default', change_threshold: 1)
+        %{course_id,short_name,long_name,account_id,term_id,status
+        test_1,TC 101,Test Course 101,,term1,active
+        test_4,TC 104,Test Course 104b,,term1,active
+      }], diffing_data_set_identifier: 'default', change_threshold: 1)
 
       # whoops left out the whole file, don't delete everything.
       b3 = process_csv_data([
-%{course_id,short_name,long_name,account_id,term_id,status
-}], diffing_data_set_identifier: 'default', change_threshold: 1)
+        %{course_id,short_name,long_name,account_id,term_id,status
+      }], diffing_data_set_identifier: 'default', change_threshold: 1)
+
+      # no change threshold, _should_ delete everything maybe?
+      b4 = process_csv_data([
+        %{course_id,short_name,long_name,account_id,term_id,status
+      }], diffing_data_set_identifier: 'default')
 
       expect(b2.data[:diffed_against_sis_batch_id]).to eq b1.id
       expect(b2.generated_diff_id).not_to be_nil
       expect(b3.data[:diffed_against_sis_batch_id]).to be_nil
       expect(b3.generated_diff_id).to be_nil
+      expect(b4.data[:diffed_against_sis_batch_id]).to eq b2.id
+      expect(b4.generated_diff_id).to_not be_nil
     end
 
     it 'should set batch_ids on change_sis_id' do

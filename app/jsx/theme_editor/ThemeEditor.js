@@ -47,6 +47,8 @@ const TABS = [
   }
 ]
 
+const OVERRIDE_FILE_KEYS = ['js_overrides', 'css_overrides', 'mobile_js_overrides', 'mobile_css_overrides'];
+
 function findVarDef(variableSchema, variableName) {
   for (let i = 0; i < variableSchema.length; i++) {
     for (let j = 0; j < variableSchema[i].variables.length; j++) {
@@ -91,11 +93,16 @@ export default class ThemeEditor extends React.Component {
     )
 
     this.originalThemeProperties = {...theme, ...brandConfig.variables}
+    this.originalThemeOverrides = _.pick(brandConfig, OVERRIDE_FILE_KEYS)
 
     this.state = {
       themeStore: {
         properties: {...this.originalThemeProperties},
-        files: []
+        files: OVERRIDE_FILE_KEYS.map(key => ({
+            customFileUpload: true,
+            variable_name: key,
+            value: this.originalThemeOverrides[key]
+        }))
       },
       changedValues: {},
       showProgressModal: false,
@@ -168,7 +175,13 @@ export default class ThemeEditor extends React.Component {
       if (opts.customFileUpload) {
         fileStorageObject.customFileUpload = true
       }
-      files.push(fileStorageObject)
+      const index = files.findIndex(x => x.variable_name === key);
+      if (index !== -1) {
+        files[index] = fileStorageObject;
+      } else {
+        files.push(fileStorageObject);
+      }
+
     } else {
       properties = {
         ...properties,
@@ -181,8 +194,20 @@ export default class ThemeEditor extends React.Component {
         ...properties,
         ...{[key]: this.originalThemeProperties[key]}
       }
-      files = files.filter(x => x.variable_name !== key)
+      const index = files.findIndex(x => x.variable_name === key)
+      if (index !== -1) {
+        files[index].value = this.originalThemeOverrides[key]
+      }
     }
+
+    if (opts.useDefault) {
+      properties[key] = this.getSchemaDefault(key)
+      const index = files.findIndex(x => x.variable_name === key)
+      if (index !== -1) {
+        files[index].value = ''
+      }
+    }
+
     this.setState({
       themeStore: {
         properties,
@@ -254,7 +279,7 @@ export default class ThemeEditor extends React.Component {
       if (properties[k] !== defaultVal && properties[k] && properties[k][0] !== '$') {
         processedData.append(`brand_config[variables][${k}]`, properties[k])
       } else {
-        processedData.append(`brand_config[variables][${k}]`, '')
+        processedData.append(`brand_config[variables][${k}]`, defaultVal)
       }
     })
     files.forEach(f => {
@@ -264,8 +289,8 @@ export default class ThemeEditor extends React.Component {
       processedData.append(keyName, f.value)
     });
     // We need to make sure that these are present with the upload
-    ['js_overrides', 'css_overrides', 'mobile_js_overrides', 'mobile_css_overrides'].forEach(name => {
-      if (!processedData.has(name)) {
+    OVERRIDE_FILE_KEYS.forEach(name => {
+      if (!processedData.has(name) || processedData.get(name) === 'undefined') {
         processedData.append(name, this.props.brandConfig[name] || '');
       }
     })

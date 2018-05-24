@@ -17,19 +17,21 @@
 
 module DataFixup::UpdateGradingStandardsToFullRange
   def self.run
-    GradingStandard.where(version: 2).find_each do |grading_standard|
-      next if grading_standard.valid?
+    GradingStandard.where(version: 2).find_ids_in_ranges do |min,max|
+      GradingStandard.where(version: 2, id: min..max).each do |grading_standard|
+        next if grading_standard.valid?
 
-      # Let's not update any records that already have a 0% bucket
-      next unless grading_standard.errors[:data].include?('grading schemes must have 0% for the lowest grade')
-      # or any records that have a negative bucket value because technically 0 will fit either in the highest bucket
-      # or in the first negative bucket following a positive bucket
-      next if grading_standard.errors[:data].include?('grading scheme values cannot be negative')
+        # Let's not update any records that already have a 0% bucket
+        next unless grading_standard.errors[:data].include?('grading schemes must have 0% for the lowest grade')
+        # or any records that have a negative bucket value because technically 0 will fit either in the highest bucket
+        # or in the first negative bucket following a positive bucket
+        next if grading_standard.errors[:data].include?('grading scheme values cannot be negative')
 
-      buckets = grading_standard.data.sort_by { |bucket| -bucket[1] }
-      buckets.last[1] = 0.0
+        buckets = grading_standard.data.sort_by { |bucket| -bucket[1] }
+        buckets.last[1] = 0.0
 
-      grading_standard.update_attribute(:data, buckets)
+        grading_standard.update_attribute(:data, buckets)
+      end
     end
   end
 end

@@ -42,6 +42,7 @@ class SectionTabPresenter
   end
 
   def path
+    tab.args = tab.args.symbolize_keys if tab.href.to_s == 'course_basic_lti_launch_request_path'
     tab.args.instance_of?(Hash) ? send(tab.href, tab.args) : send(tab.href, *path_args)
   end
 

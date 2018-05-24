@@ -53,7 +53,12 @@ export default class ThemeEditorImageRow extends Component {
       // we want to also clear out the value of the <input type=file>
       // but we don't want to mess with its value otherwise
       this.fileInput.value = ''
-      this.props.handleThemeStateChange(this.props.varDef.variable_name, null, {resetValue: true})
+      if (isSet(this.props.userInput.val)) {
+        // In this case, they clicked 'Use Default' so we need to make sure we really do go with the default
+        this.props.handleThemeStateChange(this.props.varDef.variable_name, null, {resetValue: true, useDefault: true})
+      } else {
+        this.props.handleThemeStateChange(this.props.varDef.variable_name, null, {resetValue: true})
+      }
     } else {
       this.props.handleThemeStateChange(
         this.props.varDef.variable_name,
