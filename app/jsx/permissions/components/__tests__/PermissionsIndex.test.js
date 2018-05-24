@@ -20,50 +20,15 @@ import React from 'react'
 import {Provider} from 'react-redux'
 import {mount} from 'enzyme'
 
-import {COURSE} from '../../propTypes'
+import {DEFAULT_PROPS, STORE} from '../../__tests__/examples'
 import PermissionsIndex from '../PermissionsIndex'
-
-const defaultProps = () => ({
-  contextId: 1,
-  permissions: [],
-  roles: [],
-  searchPermissions: () => {}
-})
-
-const permissions = [
-  {
-    permission_name: 'add_section',
-    label: 'add section',
-    contextType: COURSE,
-    displayed: true
-  },
-  {
-    permission_name: 'delete_section',
-    label: 'delete section',
-    contextType: COURSE,
-    displayed: true
-  }
-]
-
-const store = {
-  getState: () => ({
-    activeRoleTray: null,
-    contextId: 1,
-    permissions,
-    roles: []
-  }),
-  dispatch() {},
-  subscribe() {}
-}
 
 it('renders the component', () => {
   const tree = mount(
-    <Provider store={store}>
-      <PermissionsIndex {...defaultProps()} />
+    <Provider store={STORE}>
+      <PermissionsIndex {...DEFAULT_PROPS()} />
     </Provider>
   )
   const node = tree.find('PermissionsIndex')
   expect(node.exists()).toEqual(true)
 })
-
-// TODO: Figure out how to test debounce in jest

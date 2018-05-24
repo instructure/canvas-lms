@@ -17,7 +17,7 @@
  */
 
 import I18n from 'i18n!permission_button'
-import PropTypes from 'prop-types'
+import {func, string, number} from 'prop-types'
 import React from 'react'
 import {connect} from 'react-redux'
 
@@ -131,10 +131,10 @@ export default function PermissionButton(props) {
 }
 
 PermissionButton.propTypes = {
-  handleClick: PropTypes.func.isRequired,
+  handleClick: func.isRequired,
   permission: propTypes.rolePermission.isRequired,
-  permissionName: PropTypes.string.isRequired,
-  courseRoleId: PropTypes.string.isRequired
+  permissionName: string.isRequired,
+  courseRoleId: number.isRequired
 }
 
 function mapStateToProps(state, ownProps) {

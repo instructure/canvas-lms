@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import {COURSE} from '../../propTypes'
 import {mount, shallow} from 'enzyme'
 
 import RoleTray from '../RoleTray'
@@ -25,7 +26,7 @@ function makeDefaultProps() {
   return {
     assignedPermissions: [
       {
-        contextType: 'Course',
+        contextType: COURSE,
         displayed: true,
         label: 'Eat a banana',
         permission_name: 'banana'
@@ -43,7 +44,7 @@ function makeDefaultProps() {
     open: true,
     unassignedPermissions: [
       {
-        contextType: 'Course',
+        contextType: COURSE,
         displayed: true,
         label: 'Eat a pear',
         permission_name: 'pear'

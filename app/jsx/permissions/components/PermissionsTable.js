@@ -21,7 +21,8 @@ import React, {Component} from 'react'
 import {arrayOf, func} from 'prop-types'
 import {connect} from 'react-redux'
 import $ from 'jquery'
-import 'compiled/jquery.rails_flash_notifications'
+// For screenreaderFlashMessageExclusive  Maybe there's a better way
+import 'compiled/jquery.rails_flash_notifications' // eslint-disable-line
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Text from '@instructure/ui-elements/lib/components/Text'
@@ -29,9 +30,6 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import actions from '../actions'
 import {ConnectedPermissionButton} from './PermissionButton'
 import propTypes from '../propTypes'
-
-// const COL_WIDTH = 140
-// const ROW_HEIGHT = 60
 
 export default class PermissionsTable extends Component {
   static propTypes = {

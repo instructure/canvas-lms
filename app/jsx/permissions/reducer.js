@@ -25,8 +25,6 @@ import activeAddTrayReducer from './reducers/activeAddTrayReducer'
 
 const permissions = handleActions(
   {
-    // Note we may want to extract this out if it turns out to be
-    // identical to what we do for role filtering
     [actionTypes.UPDATE_PERMISSIONS_SEARCH]: (state, action) => {
       const {permissionSearchString, contextType} = action.payload
       const regex = new RegExp(permissionSearchString, 'i')
@@ -37,6 +35,47 @@ const permissions = handleActions(
           return {...permission, displayed: false}
         }
       })
+    },
+    [actionTypes.PERMISSIONS_TAB_CHANGED]: (state, action) => {
+      const newContextType = action.payload
+      return state.map(permission => {
+        const displayed = permission.contextType === newContextType
+        return {...permission, displayed}
+      })
+    }
+  },
+  []
+)
+
+const roles = handleActions(
+  {
+    [actionTypes.UPDATE_ROLE_FILTERS]: (state, action) => {
+      const {selectedRoles, contextType} = action.payload
+      const selectedRolesObject = selectedRoles.reduce((obj, role) => {
+        obj[role.id] = true  // eslint-disable-line
+        return obj
+      }, {})
+      return state.map(role => {
+        // Make sure displayed is actually a boolean
+        const displayed =
+          role.contextType === contextType &&
+          (selectedRoles.length === 0 || !!selectedRolesObject[role.id])
+        return {...role, displayed}
+      })
+    },
+    [actionTypes.PERMISSIONS_TAB_CHANGED]: (state, action) => {
+      const newContextType = action.payload
+      return state.map(role => {
+        const displayed = role.contextType === newContextType
+        return {...role, displayed}
+      })
+    },
+    [actionTypes.UPDATE_PERMISSIONS]: (state, action) => {
+      const {courseRoleId, permissionName, enabled, locked} = action.payload
+      const newState = state.map(
+        p => (p.id === courseRoleId ? changePermission(p, permissionName, enabled, locked) : p)
+      )
+      return newState
     }
   },
   []
@@ -56,23 +95,10 @@ function changePermission(permission, permissionName, enabled, locked) {
   }
 }
 
-const courseRolesReducer = handleActions(
-  {
-    [actionTypes.UPDATE_PERMISSIONS]: (state, action) => {
-      const {courseRoleId, permissionName, enabled, locked} = action.payload
-      const newState = state.map(
-        p => (p.id === courseRoleId ? changePermission(p, permissionName, enabled, locked) : p)
-      )
-      return newState
-    }
-  },
-  false
-)
-
 export default combineReducers({
+  activeRoleTray: activeRoleTrayReducer,
+  activeAddTray: activeAddTrayReducer,
   contextId: (state, _action) => state || '',
   permissions,
-  activeAddTray: activeAddTrayReducer,
-  activeRoleTray: activeRoleTrayReducer,
-  roles: courseRolesReducer
+  roles
 })

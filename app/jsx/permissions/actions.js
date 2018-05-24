@@ -25,8 +25,10 @@ const types = [
   'GET_PERMISSIONS_START',
   'GET_PERMISSIONS_SUCCESS',
   'HIDE_ALL_TRAYS',
+  'UPDATE_PERMISSIONS',
   'UPDATE_PERMISSIONS_SEARCH',
-  'UPDATE_PERMISSIONS'
+  'UPDATE_ROLE_FILTERS',
+  'PERMISSIONS_TAB_CHANGED'
 ]
 
 const actions = createActions(...types)
@@ -58,6 +60,18 @@ actions.setAndOpenAddTray = function() {
   return dispatch => {
     dispatch(actions.hideAllTrays())
     dispatch(actions.displayAddTray())
+  }
+}
+
+actions.filterRoles = function filterRoles({selectedRoles, contextType}) {
+  return (dispatch, _getState) => {
+    dispatch(actions.updateRoleFilters({selectedRoles, contextType}))
+  }
+}
+
+actions.tabChanged = function tabChanged(newContextType) {
+  return (dispatch, _getState) => {
+    dispatch(actions.permissionsTabChanged(newContextType))
   }
 }
 

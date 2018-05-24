@@ -20,40 +20,14 @@ import $ from 'jquery'
 import actions from '../actions'
 
 import {COURSE, ACCOUNT} from '../propTypes'
+import {PERMISSIONS, ROLES} from './examples'
 
 // This is needed for $.screenReaderFlashMessageExclusive to work.
 // TODO: This is terrible, make it unterrible
 import 'compiled/jquery.rails_flash_notifications' // eslint-disable-line
 
-const permissions = [
-  {
-    permission_name: 'add_course',
-    label: 'add section',
-    contextType: COURSE,
-    displayed: undefined
-  },
-  {
-    permission_name: 'irrelevant1',
-    label: 'add assignment',
-    contectType: COURSE,
-    displayed: undefined
-  },
-  {
-    permission_name: 'ignore_this_add',
-    label: 'delete everything',
-    contextType: COURSE,
-    displayed: undefined
-  },
-  {
-    permission_name: 'ignore_because_account',
-    label: 'add course',
-    contextType: ACCOUNT,
-    displayed: undefined
-  }
-]
-
 it('searchPermissions dispatches updatePermissionsSearch', () => {
-  const state = {contextId: 1, permissions, roles: []}
+  const state = {contextId: 1, permissions: PERMISSIONS, roles: []}
   const dispatchMock = jest.fn()
   actions.searchPermissions({permissionSearchString: 'add', contextType: COURSE})(
     dispatchMock,
@@ -73,7 +47,7 @@ it('searchPermissions dispatches updatePermissionsSearch', () => {
 })
 
 it('searchPermissions announces when search is complete', () => {
-  const state = {contextId: 1, permissions, roles: []}
+  const state = {contextId: 1, permissions: PERMISSIONS, roles: []}
   const dispatchMock = jest.fn()
   const flashMock = jest.spyOn($, 'screenReaderFlashMessageExclusive')
   actions.searchPermissions({permissionSearchString: 'add', contextType: COURSE})(
@@ -82,7 +56,7 @@ it('searchPermissions announces when search is complete', () => {
   )
 
   expect(flashMock).toHaveBeenCalledTimes(1)
-  expect(flashMock).toHaveBeenCalledWith('0 permissions found')
+  expect(flashMock).toHaveBeenCalledWith('2 permissions found')
 })
 
 it('setAndOpenRoleTray dispatches hideAllTrays and dispalyRoleTray', () => {
@@ -135,6 +109,35 @@ it('updatePermission dispatches updatePermissions', () => {
     }
   }
 
+  expect(dispatchMock).toHaveBeenCalledTimes(1)
+  expect(dispatchMock).toHaveBeenCalledWith(expectedDispatch)
+})
+
+it('filterRoles dispatches updateRoleFilters', () => {
+  const state = {contextId: 1, permissions: PERMISSIONS, roles: ROLES}
+  const dispatchMock = jest.fn()
+  actions.filterRoles({selectedRoles: [ROLES[0]], contextType: COURSE})(dispatchMock, () => state)
+  const expectedDispatch = {
+    type: 'UPDATE_ROLE_FILTERS',
+    payload: {
+      selectedRoles: [ROLES[0]],
+      contextType: COURSE
+    }
+  }
+
+  expect(dispatchMock).toHaveBeenCalledTimes(1)
+  expect(dispatchMock).toHaveBeenCalledWith(expectedDispatch)
+})
+
+it('tabChanged dispatches permissionsTabChanged', () => {
+  const state = {contextId: 1, permissions: PERMISSIONS, roles: ROLES}
+  const dispatchMock = jest.fn()
+  actions.tabChanged(ACCOUNT)(dispatchMock, () => state)
+  expect(dispatchMock).toHaveBeenCalledTimes(1)
+  const expectedDispatch = {
+    type: 'PERMISSIONS_TAB_CHANGED',
+    payload: ACCOUNT
+  }
   expect(dispatchMock).toHaveBeenCalledTimes(1)
   expect(dispatchMock).toHaveBeenCalledWith(expectedDispatch)
 })

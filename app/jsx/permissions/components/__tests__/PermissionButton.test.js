@@ -26,28 +26,28 @@ const handlingClick = jest.fn()
 const defaultProps = () => ({
   permission: {enabled: true, locked: false, readonly: false, explicit: true},
   permissionName: 'add',
-  courseRoleId: '1',
+  courseRoleId: 1,
   handleClick: handlingClick
 })
 
 const disabledProps = () => ({
   permission: {enabled: false, locked: false, readonly: false, explicit: true},
   permissionName: 'add',
-  courseRoleId: '1',
+  courseRoleId: 1,
   handleClick: handlingClick
 })
 
 const enabledAndLockedProps = () => ({
   permission: {enabled: true, locked: true, readonly: false, explicit: true},
   permissionName: 'add',
-  courseRoleId: '1',
+  courseRoleId: 1,
   handleClick: handlingClick
 })
 
 const disabledAndLockedProps = () => ({
   permission: {enabled: false, locked: true, readonly: false, explicit: true},
   permissionName: 'add',
-  courseRoleId: '1',
+  courseRoleId: 1,
   handleClick: handlingClick
 })
 

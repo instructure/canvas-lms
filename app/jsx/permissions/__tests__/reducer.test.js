@@ -18,59 +18,100 @@
 
 import actions from '../actions'
 import {COURSE, ACCOUNT} from '../propTypes'
+import {PERMISSIONS, ROLES} from './examples'
 import reducer from '../reducer'
 
 const reduce = (action, state = {}) => reducer(state, action)
 
-const permissions = [
-  {
-    permission_name: 'add_section',
-    label: 'add section',
-    contextType: COURSE,
-    displayed: undefined
-  },
-  {
-    permission_name: 'irrelevant1',
-    label: 'add assignment',
-    contectType: COURSE,
-    displayed: undefined
-  },
-  {
-    permission_name: 'ignore_this_add',
-    label: 'delete everything',
-    contextType: COURSE,
-    displayed: undefined
-  },
-  {
-    permission_name: 'ignore_because_account',
-    label: 'add course',
-    contextType: ACCOUNT,
-    displayed: undefined
+// Many actions should only ever result in the displayed field changing,
+// so this is a convenient way of testing for this.
+//
+// It isn't great to have expects in these utility functions (it can make
+// interpreting the failure message harder) but it avoids repeating this
+// over and over.
+const verifyPermissionsDidntChange = (oldPermissions, newPermissions) => {
+  expect(newPermissions).toHaveLength(oldPermissions.length)
+  for (let i = 0; i < newPermissions.length; ++i) {
+    expect(newPermissions.permission_name).toEqual(oldPermissions.permission_name)
+    expect(newPermissions.label).toEqual(newPermissions.label)
+    expect(newPermissions.contextType).toEqual(oldPermissions.contextType)
   }
-]
+}
+
+const verifyRolesDidntChange = (newRoles, oldRoles) => {
+  expect(newRoles).toHaveLength(oldRoles.length)
+  for (let i = 0; i < newRoles.length; ++i) {
+    expect(newRoles[i].id).toEqual(oldRoles[i].id)
+    expect(newRoles[i].label).toEqual(oldRoles[i].label)
+    expect(newRoles[i].base_role_type).toEqual(oldRoles[i].base_role_type)
+    expect(newRoles[i].contextType).toEqual(oldRoles[i].contextType)
+  }
+}
+
+// Verifies that only the indicies in trueIndices in checkDisplayed are set to true
+const checkDisplayed = (arr, trueIndices) => {
+  const indexSet = new Set(trueIndices)
+  for (let i = 0; i < arr.length; ++i) {
+    if (indexSet.has(i)) {
+      expect(arr[i].displayed).toEqual(true)
+    } else {
+      expect(arr[i].displayed).toEqual(false)
+    }
+  }
+}
 
 it('UPDATE_PERMISSIONS_SEARCH filters properly', () => {
-  const originalState = {contextId: 1, permissions, roles: []}
+  const originalState = {contextId: 1, permissions: PERMISSIONS, roles: ROLES}
   const payload = {
     permissionSearchString: 'add',
     contextType: COURSE
   }
   const newState = reduce(actions.updatePermissionsSearch(payload), originalState)
-  expect(newState.permissions).toHaveLength(originalState.permissions.length)
-  for (let i = 0; i < originalState.permissions.length; i++) {
-    // All fields other than displayed should stay unchanged
-    expect(newState.permissions[i].permission_name).toEqual(
-      originalState.permissions[i].permission_name
-    )
-    expect(newState.permissions[i].label).toEqual(originalState.permissions[i].label)
-    expect(newState.permissions[i].contextType).toEqual(originalState.permissions[i].contextType)
-    // Only the first permission should match the search
-    if (i === 0) {
-      expect(newState.permissions[i].displayed).toEqual(true)
-    } else {
-      expect(newState.permissions[i].displayed).toEqual(false)
-    }
+  verifyPermissionsDidntChange(originalState.permissions, newState.permissions)
+  verifyRolesDidntChange(originalState.roles, newState.roles)
+  checkDisplayed(newState.permissions, [0])
+})
+
+it('PERMISSIONS_TAB_CHANGED switches tabs', () => {
+  const originalState = {contextId: 1, permissions: PERMISSIONS, roles: ROLES}
+  const payload = ACCOUNT
+  const newState = reduce(actions.permissionsTabChanged(payload), originalState)
+  verifyPermissionsDidntChange(originalState.permissions, newState.permissions)
+  verifyRolesDidntChange(originalState.roles, newState.roles)
+  checkDisplayed(newState.permissions, [2, 3])
+  checkDisplayed(newState.roles, [2, 3])
+})
+
+it('UPDATE_ROLE_FILTER allows everything in correct type on an empty filter', () => {
+  const originalState = {contextId: 1, permissions: PERMISSIONS, roles: ROLES}
+  const payload = {
+    selectedRoles: [],
+    contextType: ACCOUNT
   }
+  const newState = reduce(actions.updateRoleFilters(payload), originalState)
+  verifyPermissionsDidntChange(originalState.permissions, newState.permissions)
+  verifyRolesDidntChange(originalState.roles, newState.roles)
+  checkDisplayed(newState.roles, [2, 3])
+})
+
+it('UPDATE_ROLE_FILTER filters properly', () => {
+  const originalState = {contextId: 1, permissions: PERMISSIONS, roles: ROLES}
+  const payload = {
+    selectedRoles: [
+      {
+        id: 2,
+        label: 'Course Sub-Admin',
+        base_role_type: 'Course Admin',
+        contextType: COURSE,
+        displayed: true
+      }
+    ],
+    contextType: COURSE
+  }
+  const newState = reduce(actions.updateRoleFilters(payload), originalState)
+  verifyPermissionsDidntChange(originalState.permissions, newState.permissions)
+  verifyRolesDidntChange(originalState.roles, newState.roles)
+  checkDisplayed(newState.roles, [1])
 })
 
 it('DISPLAY_ROLE_TRAY sets the activeRoleTray in the store', () => {
