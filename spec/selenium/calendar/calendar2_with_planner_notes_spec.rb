@@ -125,9 +125,8 @@ describe "calendar2" do
       expect(note.attribute('class')).to include("group_user_#{@student1.id}")
     end
 
-    it "creates an event on the calendar for wiki pages with to-do date (skipped)" do
-      skip('skip until ADMIN-190 is merged')
-      page = @course.wiki_pages.create!(title: 'Page1', todo_date: Time.zone.now + 2.days)
+    it "creates an event on the calendar for wiki pages with to-do date" do
+      page = @course.wiki_pages.create!(title: 'Page1', todo_date: 30.seconds.from_now)
       get '/calendar2'
       wait_for_ajax_requests
       f('.fc-content').click
@@ -137,18 +136,17 @@ describe "calendar2" do
       expect(f('.event-details-timestring')).to include_text(format_date_for_view(page.todo_date))
     end
 
-    it "creates a calendar event for non graded discussions with to do date (skipped)" do
-      skip('skip until ADMIN-190 is merged')
+    it "creates a calendar event for non graded discussions with to do date" do
       discussion = @course.discussion_topics.create!(user: @teacher, title: "topic 1",
                                         message: "somebody topic message",
-                                        todo_date: Time.zone.now + 2.days)
+                                        todo_date: 30.seconds.from_now)
       get '/calendar2'
       wait_for_ajax_requests
       f('.fc-content').click
       note = f('.event-details')
       expect(note).to contain_link(discussion.title.to_s)
       expect(note).to contain_link(@course.name)
-      expect(f('.event-details-timestring')).to include_text(format_date_for_view(page.todo_date))
+      expect(f('.event-details-timestring')).to include_text(format_date_for_view(discussion.todo_date))
     end
 
     context "with student planner disabled" do

@@ -107,7 +107,21 @@ define([
     ok(calendarEvent.consideredReserved(), 'true with appointment_group_url and parent_event_id');
   });
 
-
+  test('returns plannable event URL', () => {
+    const data = {
+      type: "wiki_page",
+      id: "wiki_page_789",
+      context_code: "course_123",
+      start_at: "2018-06-01T18:30:00Z",
+      plannable: {
+        url: "some-page",
+        html_url: "http://example.org/courses/123/pages/some-page",
+        page_id: "789",
+      }
+    };
+    calendarEvent = new CalendarEvent(data, ['course_123']);
+    equal(calendarEvent.fullDetailsURL(), 'http://example.org/courses/123/pages/some-page');
+  });
 
 
 })

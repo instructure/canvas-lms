@@ -126,7 +126,7 @@ class PlannerController < ApplicationController
     end
 
     items_response = Rails.cache.fetch(['planner_items', planner_overrides_meta_key, page, params[:filter], default_opts].cache_key, expires_in: 120.minutes) do
-      items = params[:filter] == 'new_activity' ? unread_items : planner_items
+      items = collection_for_filter(params[:filter])
       items = Api.paginate(items, self, api_v1_planner_items_url)
       {
         json: planner_items_json(items, @current_user, session, {due_after: start_date, due_before: end_date}),
@@ -139,6 +139,17 @@ class PlannerController < ApplicationController
   end
 
   private
+
+  def collection_for_filter(filter)
+    case filter
+    when 'new_activity'
+      unread_items
+    when 'ungraded_todo_items'
+      ungraded_todo_items
+    else
+      planner_items
+    end
+  end
 
   def planner_items
     collections = [*assignment_collections,
@@ -154,6 +165,12 @@ class PlannerController < ApplicationController
     collections = [unread_discussion_topic_collection,
                    unread_assignment_collection]
 
+    BookmarkedCollection.merge(*collections)
+  end
+
+  def ungraded_todo_items
+    collections = [page_collection,
+                   ungraded_discussion_collection]
     BookmarkedCollection.merge(*collections)
   end
 

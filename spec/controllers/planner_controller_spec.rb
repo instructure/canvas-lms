@@ -279,6 +279,18 @@ describe PlannerController do
           response_json = json_parse(response.body)
           expect(response_json).to eq []
         end
+
+        it "filters ungraded_todo_items" do
+          get :index, params: {filter: 'ungraded_todo_items'}
+          response_json = json_parse(response.body)
+          items = response_json.map{|i| [i['plannable_type'], i['plannable_id']]}
+          expect(items).to match_array(
+            [['discussion_topic', @course_topic.id],
+             ['discussion_topic', @group_topic.id],
+             ['wiki_page', @course_page.id],
+             ['wiki_page', @group_page.id]]
+          )
+        end
       end
 
       context "date sorting" do
