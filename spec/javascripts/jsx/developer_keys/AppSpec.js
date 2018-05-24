@@ -119,19 +119,15 @@ test('requests more account dev keys when the account "show all" button is click
     applicationState: initialApplicationState(generateKeyList()),
     actions: {
       getRemainingDeveloperKeys: () => (
-        () => (
-          {
-            then: callbackSpy
-          }
-        )
+        () => ({})
       )
     }
   }
   const component = renderComponent(overrides)
   const componentNode = ReactDOM.findDOMNode(component)
+  component.mainTableRef.createSetFocusCallback = callbackSpy
 
   clickShowAllButton(componentNode)
-
   ok(callbackSpy.called)
 })
 

@@ -298,24 +298,25 @@ actions.getDeveloperKeys = (url, newSearch) => (dispatch, _getState) => {
   );
 };
 
-function retrieveRemainingDevKeys(url, developerKeysPassedIn, dispatch, retrieve, success, failure) {
+function retrieveRemainingDevKeys(url, developerKeysPassedIn, dispatch, retrieve, success, failure, callback) {
   return axios.get(url)
     .then((response) => {
       const { next } = parseLinkHeader(response.headers.link);
       const developerKeys = developerKeysPassedIn.concat(response.data);
       if (next) {
-        dispatch(retrieve(next, developerKeys));
+        dispatch(retrieve(next, developerKeys, callback));
       }
       else {
         const payload = { next, developerKeys };
         dispatch(success(payload));
+        if (callback) { callback(payload.developerKeys) }
         return payload
       }
     })
     .catch(err => dispatch(failure(err)))
 }
 
-actions.getRemainingDeveloperKeys = (url, developerKeysPassedIn) => (dispatch) => {
+actions.getRemainingDeveloperKeys = (url, developerKeysPassedIn, callback) => (dispatch) => {
   dispatch(actions.listDeveloperKeysStart());
 
   return retrieveRemainingDevKeys(
@@ -324,11 +325,12 @@ actions.getRemainingDeveloperKeys = (url, developerKeysPassedIn) => (dispatch) =
     dispatch,
     actions.getRemainingDeveloperKeys,
     actions.listDeveloperKeysSuccessful,
-    actions.listDeveloperKeysFailed
+    actions.listDeveloperKeysFailed,
+    callback
   )
 }
 
-actions.getRemainingInheritedDeveloperKeys = (url, developerKeysPassedIn) => (dispatch) => {
+actions.getRemainingInheritedDeveloperKeys = (url, developerKeysPassedIn, callback) => (dispatch) => {
   dispatch(actions.listInheritedDeveloperKeysStart());
 
   return retrieveRemainingDevKeys(
@@ -337,7 +339,8 @@ actions.getRemainingInheritedDeveloperKeys = (url, developerKeysPassedIn) => (di
     dispatch,
     actions.getRemainingInheritedDeveloperKeys,
     actions.listInheritedDeveloperKeysSuccessful,
-    actions.listInheritedDeveloperKeysFailed
+    actions.listInheritedDeveloperKeysFailed,
+    callback
   )
 }
 

@@ -32,26 +32,21 @@ import DeveloperKey from './DeveloperKey'
 import DeveloperKeyModal from './NewKeyModal'
 
 class DeveloperKeysApp extends React.Component {
+  state = {
+    focusTab: false
+  }
+
   get isSiteAdmin() {
     return this.props.ctx.params.contextId === "site_admin"
   }
 
-  setMainTableRef = node => {
-    this.mainTableRef = node
-  }
-
-  setInheritedTableRef = node => {
-    this.inheritedTableRef = node
-  }
-
-  setAddKeyButtonRef = (node) => {
-    this.addDevKeyButton = node
-  }
-
+  setMainTableRef = (node) => { this.mainTableRef = node }
+  setInheritedTableRef = (node) => { this.inheritedTableRef = node }
+  setAddKeyButtonRef = (node) => { this.addDevKeyButton = node }
   setInheritedTabRef = (node) => { this.inheritedTab = node }
 
   focusDevKeyButton = () => { this.addDevKeyButton.focus() }
-  focusInheritedTab = () => { this.inheritedTab.focus() }
+  focusInheritedTab = () => { this.setState({focusTab: true}) }
 
   showCreateDeveloperKey = () => {
     this.props.store.dispatch(this.props.actions.developerKeysModalOpen())
@@ -63,10 +58,8 @@ class DeveloperKeysApp extends React.Component {
       store: {dispatch},
       actions: {getRemainingDeveloperKeys}
     } = this.props
-
     const callBack = this.mainTableRef.createSetFocusCallback()
-    getRemainingDeveloperKeys(nextPage, [])(dispatch)
-      .then((payload) => { callBack(payload.developerKeys)})
+    getRemainingDeveloperKeys(nextPage, [], callBack)(dispatch)
   }
 
   showMoreButton() {
@@ -89,8 +82,8 @@ class DeveloperKeysApp extends React.Component {
     } = this.props
 
     const callBack = this.inheritedTableRef.createSetFocusCallback()
-    getRemainingInheritedDeveloperKeys(inheritedNextPage, [])(dispatch)
-      .then((payload) => { callBack(payload.developerKeys) })
+    getRemainingInheritedDeveloperKeys(inheritedNextPage, [], callBack)(dispatch)
+      .then((foundActiveKey) => {if (!foundActiveKey) {this.focusInheritedTab()}})
   }
 
   showMoreInheritedButton() {
@@ -130,7 +123,7 @@ class DeveloperKeysApp extends React.Component {
             <Heading level="h1">{I18n.t('Developer Keys')}</Heading>
           </div>
         </div>
-        <TabList variant="minimal">
+        <TabList variant="minimal" focus={this.state.focusTab}>
           <TabPanel title={I18n.t('Account')}>
             <div className="ic-Action-header">
               <div className="ic-Action-header__Secondary">

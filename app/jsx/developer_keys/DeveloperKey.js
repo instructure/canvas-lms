@@ -82,9 +82,11 @@ class DeveloperKey extends React.Component {
     this.actionButtons.focusDeleteLink();
   }
 
-  focusName() {
-    this.keyName.focus();
+  focusToggleGroup = () => {
+    this.toggleGroup.focusToggleGroup();
   }
+
+  isDisabled = () => ( this.toggleGroup.isDisabled() )
 
   makeImage (developerKey) {
     if (developerKey.icon_url) {
@@ -126,6 +128,7 @@ class DeveloperKey extends React.Component {
 
   refActionButtons = (link) => { this.actionButtons = link; }
   refKeyName = (link) => { this.keyName = link; }
+  refToggleGroup = (link) => { this.toggleGroup = link }
 
   render () {
     const { developerKey, inherited } = this.props;
@@ -134,7 +137,7 @@ class DeveloperKey extends React.Component {
       <tr className={classNames('key', { inactive: !this.isActive(developerKey) })}>
         <td className="name">
           {this.makeImage(developerKey)}
-          <span ref={this.refKeyName} tabIndex="0">
+          <span ref={this.refKeyName}>
             {this.developerName(developerKey)}
           </span>
         </td>
@@ -220,6 +223,7 @@ class DeveloperKey extends React.Component {
 
         <td>
           <DeveloperKeyStateControl
+            ref={this.refToggleGroup}
             developerKey={developerKey}
             store={this.props.store}
             actions={this.props.actions}

@@ -28,8 +28,29 @@ QUnit.module('AdminTable',  {
   }
 })
 
+const onDevKeys = [
+  {id: `1`, api_key: "abc12345678", created_at: "2012-06-07T20:36:50Z", developer_key_account_binding: {workflow_state: "off",
+  account_owns_binding: false}},
+  {id: `2`, api_key: "abc12345671", created_at: "2012-06-09T20:36:50Z"},
+  {id: `3`, api_key: "abc12345679", created_at: "2012-06-08T20:36:50Z", developer_key_account_binding: {workflow_state: "on",
+  account_owns_binding: false}}
+]
+
+const offDevKeys = [
+  {id: `1`, api_key: "abc12345678", created_at: "2012-06-07T20:36:50Z", developer_key_account_binding: {workflow_state: "off",
+  account_owns_binding: false}},
+  {id: `3`, api_key: "abc12345678", created_at: "2012-06-07T20:36:50Z", developer_key_account_binding: {workflow_state: "off",
+  account_owns_binding: false}},
+  {id: `2`, api_key: "abc12345671", created_at: "2012-06-09T20:36:50Z"}
+]
+
 function devKeyList(numKeys = 10) {
   return [...Array(numKeys).keys()].map(n => ({id: `${n}`, api_key: "abc12345678", created_at: "2012-06-07T20:36:50Z"}))
+}
+
+function disabledDevKeyList(numKeys = 10) {
+  return [...Array(numKeys).keys()].map(n => ({id: `${n}`, api_key: "abc12345678", created_at: "2012-06-07T20:36:50Z", 
+  developer_key_account_binding: {workflow_state: "off", account_owns_binding: false}}))
 }
 
 function component(keyList, inherited, props = {}) {
@@ -77,16 +98,38 @@ test('does render the "Stats" heading if not inherited', () => {
   equal(node.querySelectorAll('th')[3].innerText, 'Stats')
 })
 
-test('focuses name if inherited  and show more button clicked', () => {
+test('focuses toggle group if inherited and show more button clicked', () => {
   const list = devKeyList()
   const table = component(list, true)
   const focusSpy = sinon.spy()
-  table['developerKey-9'].focusName = focusSpy
+  table['developerKey-9'].focusToggleGroup = focusSpy
   table.createSetFocusCallback()([list[9]])
   ok(focusSpy.called)
 })
 
-test('makes correct screenReader notification if inherited  and show more button clicked', () => {
+test('focuses Inherited tab if inherited, show more button clicked, and all the toggle buttons are disabled', () => {
+  const list = disabledDevKeyList()
+  const table = component(list, true)
+  notOk(table.createSetFocusCallback()([list[9]]))
+})
+
+test('focuses On button if inherited, show more button clicked and the last non-disabled button is On', () => {
+  const table = component(onDevKeys, true)
+  const focusSpy = sinon.spy()
+  table['developerKey-2'].focusToggleGroup = focusSpy
+  notEqual(table.createSetFocusCallback()([onDevKeys[2]]), null)
+  ok(focusSpy.called)
+})
+
+test('focuses Off button if inherited, show more button clicked and the last non-disabled button is Off', () => {
+  const table = component(offDevKeys, true)
+  const focusSpy = sinon.spy()
+  table['developerKey-2'].focusToggleGroup = focusSpy
+  notEqual(table.createSetFocusCallback()([offDevKeys[2]]), null)
+  ok(focusSpy.called)
+})
+
+test('makes correct screenReader notification if inherited and show more button clicked', () => {
   const list = devKeyList()
   const table = component(list, true)
   const flashSpy = sinon.spy()

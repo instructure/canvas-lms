@@ -27,23 +27,21 @@ import DeveloperKey from './DeveloperKey'
 class DeveloperKeysTable extends React.Component {
   createSetFocusCallback = (developerKeyId) => {
     const { developerKeysList, setFocus, inherited } = this.props
-    let position
-    if (developerKeyId) {
-      position = developerKeysList.findIndex((key) => key.id === developerKeyId) - 1
-    } else {
-      position = undefined
-    }
-
+    const position = developerKeyId ? (developerKeysList.findIndex((key) => key.id === developerKeyId) - 1) : undefined
     const devKey = developerKeysList[position]
-    let ref = devKey ? this[`developerKey-${devKey.id}`] : undefined
+    let ref = devKey ? this.developerKeyRef(devKey) : undefined
     // developerKeys will be populated when show more keys is resolved
     return (developerKeys) => {
       // if position is undefined it means that we are loading more keys
       // and we want to calculate the end of the list after the promise
       // resolves
       if (position === undefined) {
-        const list = developerKeys || developerKeysList
-        ref = this[`developerKey-${list[list.length - 1].id}`]
+        const reversedList = developerKeysList.concat(developerKeys).reverse()
+        const developerKey = reversedList.find((key) => {
+          const component = this.developerKeyRef(key)
+          return !component.isDisabled()
+        })
+        ref = developerKey ? this.developerKeyRef(developerKey) : undefined
       }
       let srMsg
       // If ref is undefined it means that position was -1 and we deleted
@@ -56,18 +54,22 @@ class DeveloperKeysTable extends React.Component {
         setFocus()
       } else if (inherited) {
         srMsg = I18n.t("Loaded more developer keys. Focus moved to the name of the last loaded developer key in the list.")
-        ref.focusName()
+        if (ref) { ref.focusToggleGroup() }
       } else {
         if (position === undefined) {
           srMsg = I18n.t("Loaded more developer keys. Focus moved to the delete button of the last loaded developer key in the list.")
         } else {
           srMsg = I18n.t("Developer key %{developerKeyId} deleted. Focus moved to the delete button of the previous developer key in the list.", {developerKeyId})
         }
-
         ref.focusDeleteLink()
       }
       $.screenReaderFlashMessageExclusive(srMsg);
+      return ref
     }
+  }
+
+  developerKeyRef(key) {
+    return this[`developerKey-${key.id}`]
   }
 
   render() {
