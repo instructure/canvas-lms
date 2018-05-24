@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import i18nLolcalize from 'compiled/str/i18nLolcalize'
 import I18n from 'i18n-js'
-import extend from '../../gems/canvas_i18nliner/node_modules/i18nliner/dist/lib/extensions/i18n_js'
+import extend from 'i18nliner/dist/lib/extensions/i18n_js'
 // add i18nliner's runtime extensions to the global I18n object
 extend(I18n)
 

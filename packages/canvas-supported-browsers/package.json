@@ -8,7 +8,6 @@
     "url": "git+https://github.com/instructure/canvas-lms.git"
   },
   "scripts": {
-    "build:canvas": "echo \"no build step needed\"",
     "test": "node --eval \"assert(require('.').includes('ie >= 11'))\""
   },
   "license": "MIT",
