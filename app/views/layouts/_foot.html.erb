@@ -1,4 +1,4 @@
-<%= InstFS.login_pixel(logged_in_user, session, request.host_with_port) %>
+<%= InstFS.login_pixel(logged_in_user, session, request.host_with_port) if logged_in_user && !@files_domain %>
 
 <script>
   INST = <%= raw(inst_env.to_json) %>;

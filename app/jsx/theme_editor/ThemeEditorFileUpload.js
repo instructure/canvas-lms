@@ -67,7 +67,8 @@ export default class ThemeEditorFileUpload extends Component {
     this.setState({selectedFileName: ''})
     this.props.handleThemeStateChange(this.props.name, null, {
       customFileUpload: true,
-      resetValue: true
+      resetValue: true,
+      useDefault: !this.hasUserInput() && this.props.currentValue
     })
     this.props.onChange(!this.hasUserInput() ? '' : null)
   }
