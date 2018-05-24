@@ -23,14 +23,22 @@ import 'jqueryui/dialog'
 import I18n from 'i18n!react_developer_keys'
 import React from 'react'
 import PropTypes from 'prop-types'
+
+import Button from '@instructure/ui-core/lib/components/Button'
+import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
+import Popover, { PopoverTrigger, PopoverContent } from '@instructure/ui-overlays/lib/components/Popover'
 import Image from '@instructure/ui-core/lib/components/Image'
 import Link from '@instructure/ui-core/lib/components/Link'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import View from '@instructure/ui-layout/lib/components/View'
 
 import DeveloperKeyActionButtons from './ActionButtons'
 import DeveloperKeyStateControl from './InheritanceStateControl'
 
 
 class DeveloperKey extends React.Component {
+  state = { showKey: false }
+
   get isSiteAdmin() {
     return this.props.ctx.params.contextId === "site_admin"
   }
@@ -112,6 +120,10 @@ class DeveloperKey extends React.Component {
     this.props.onDelete(this.props.developerKey.id)
   )
 
+  handleShowKey = () => {
+    this.setState({showKey: !this.state.showKey})
+  }
+
   refActionButtons = (link) => { this.actionButtons = link; }
   refKeyName = (link) => { this.keyName = link; }
 
@@ -145,7 +157,43 @@ class DeveloperKey extends React.Component {
             </div>
             {!inherited &&
               <div>
-                {I18n.t("Key:")} <span className='api_key'>{developerKey.api_key}</span>
+                <Popover
+                  placement="top"
+                  alignArrow
+                  on="click"
+                  show={this.state.showKey}
+                  shouldContainFocus
+                  shouldReturnFocus
+                  shouldCloseOnDocumentClick
+                  onDismiss={this.handleShowKey}
+                  label={I18n.t("Key")}
+                >
+                  <PopoverTrigger>
+                    <Button onClick={this.handleShowKey} size="small">
+                      {
+                        this.state.showKey ?
+                          I18n.t('Hide Key') :
+                          I18n.t('Show Key')
+                      }
+                      <ScreenReaderContent>
+                        {this.developerName()}
+                      </ScreenReaderContent>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent>
+                    <CloseButton
+                      placement="end"
+                      offset="x-small"
+                      variant="icon"
+                      onClick={this.handleShowKey}
+                    >
+                      {I18n.t('Close')}
+                    </CloseButton>
+                    <View padding="large small small small" display="block">
+                      { developerKey.api_key }
+                    </View>
+                  </PopoverContent>
+                </Popover>
               </div>
             }
             {!inherited &&

@@ -137,7 +137,7 @@ export default class DeveloperKeyModal extends React.Component {
           mountNode={this.props.mountNode}
         >
           <ModalHeader>
-            <Heading level="h3" as="h2">{I18n.t('Key Settings')}</Heading>
+            <Heading>{I18n.t('Key Settings')}</Heading>
           </ModalHeader>
           <ModalBody>{this.modalBody()}</ModalBody>
           <ModalFooter>

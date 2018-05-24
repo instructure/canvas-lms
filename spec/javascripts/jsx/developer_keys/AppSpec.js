@@ -20,6 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-addons-test-utils'
 import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import {mount} from 'enzyme'
 
 import DeveloperKeysApp from 'jsx/developer_keys/App';
 
@@ -36,7 +37,7 @@ const listDeveloperKeyScopes = {
 
 function developerKeyRows(componentNode, index) {
   const panel = componentNode.querySelectorAll("div[role='tabpanel']")[index]
-  return panel.querySelectorAll("table#keys tr")
+  return panel.querySelectorAll("table[data-automation='devKeyAdminTable'] tr")
 }
 
 function generateKeyList(numKeys = 10) {
@@ -244,6 +245,7 @@ test('displays the show more button', () => {
 
   ok(componentNode.innerHTML.includes("Show All Keys"))
 })
+
 test('renders the list of developer_keys when there are some', () => {
   const applicationState = {
     listDeveloperKeyScopes,
@@ -263,7 +265,42 @@ test('renders the list of developer_keys when there are some', () => {
 
   const component = renderComponent({ applicationState });
   const renderedText = ReactDOM.findDOMNode(TestUtils.findRenderedDOMComponentWithTag(component, 'table')).innerHTML;
-  ok(renderedText.includes("abc12345678"))
+  ok(renderedText.includes("111"))
+})
+
+test('displays the developer key on click of show key button', () => {
+  const applicationState = {
+    listDeveloperKeyScopes,
+    createOrEditDeveloperKey: {},
+    listDeveloperKeys: {
+      listDeveloperKeysPending: false,
+      listDeveloperKeysSuccessful: false,
+      list: [
+        {
+          id: "111",
+          api_key: "abc12345678",
+          created_at: "2012-06-07T20:36:50Z"
+        }
+      ]
+    },
+  };
+  const props = {
+    applicationState,
+    actions: { developerKeysModalOpen: () => {} },
+    store: fakeStore(),
+    ctx: {
+      params: {
+        contextId: ""
+      }
+    }
+  }
+  const wrapper = mount(
+    <DeveloperKeysApp {...props} />
+  )
+
+  wrapper.find('Button').at(1).simulate('click')
+  ok(wrapper.find('Popover').first().html().includes("Hide Key"))
+  wrapper.unmount()
 })
 
 test('renders the spinner', () => {

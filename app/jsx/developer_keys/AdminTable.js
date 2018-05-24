@@ -81,7 +81,11 @@ class DeveloperKeysTable extends React.Component {
     }
     return (
       <div>
-        <Table caption={<ScreenReaderContent>{srcontent}</ScreenReaderContent>} id="keys">
+        <Table
+          data-automation="devKeyAdminTable"
+          caption={<ScreenReaderContent>{srcontent}</ScreenReaderContent>}
+          size="medium"
+        >
         <thead>
           <tr>
             <th scope="col">{I18n.t('Name')}</th>

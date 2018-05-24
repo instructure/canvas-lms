@@ -93,6 +93,7 @@ export default class DeveloperKeyScopes extends React.Component {
   }
 
   render() {
+    const searchEndpoints = I18n.t('Search endpoints')
     return (
       <Grid>
         <GridRow rowSpacing="small">
@@ -118,8 +119,8 @@ export default class DeveloperKeyScopes extends React.Component {
               </FlexItem>
               <FlexItem>
                 <TextInput
-                  label={<ScreenReaderContent />}
-                  placeholder={I18n.t('Search endpoints')}
+                  label={<ScreenReaderContent>{searchEndpoints}</ScreenReaderContent>}
+                  placeholder={searchEndpoints}
                   type="search"
                   icon={() => <IconSearchLine />}
                   onChange={this.handleFilterChange}

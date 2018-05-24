@@ -100,7 +100,7 @@ test('it opens the modal if isOpen prop is true', () => {
     />
   )
   equal(wrapper.find('Modal').prop('open'), true)
-  ok(wrapper.find('Modal Heading [level="h3"]').exists())
+  ok(wrapper.find('Modal Heading [level="h2"]').exists())
 })
 
 test('it closes the modal if isOpen prop is false', () => {

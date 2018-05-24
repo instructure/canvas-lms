@@ -127,7 +127,7 @@ class DeveloperKeysApp extends React.Component {
       <div>
         <div className="ic-Action-header">
           <div className="ic-Action-header__Primary">
-            <Heading>{I18n.t('Developer Keys')}</Heading>
+            <Heading level="h1">{I18n.t('Developer Keys')}</Heading>
           </div>
         </div>
         <TabList variant="minimal">

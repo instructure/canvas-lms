@@ -61,7 +61,7 @@ describe 'Developer Keys' do
     end
 
     def click_edit_icon
-      fj("#keys tbody tr.key button:has(svg[name='IconEdit'])").click
+      fj("table[data-automation='devKeyAdminTable'] tbody tr.key button:has(svg[name='IconEdit'])").click
     end
 
     def click_enforce_scopes
@@ -164,19 +164,19 @@ describe 'Developer Keys' do
       key = Account.default.developer_keys.last
       expect(key.icon_url).to eq nil
 
-      fj("#keys tbody tr.key button:has(svg[name='IconTrash'])").click
+      fj("table[data-automation='devKeyAdminTable'] tbody tr.key button:has(svg[name='IconTrash'])").click
       driver.switch_to.alert.accept
       driver.switch_to.default_content
-      expect(f("#keys")).not_to contain_css("tbody tr")
+      expect(f("table[data-automation='devKeyAdminTable']")).not_to contain_css("tbody tr")
       expect(Account.default.developer_keys.nondeleted.count).to eq 0
     end
 
     it "allows for pagination on account tab", test_id: 344532 do
       11.times { |i| Account.default.developer_keys.create!(name: "tool #{i}") }
       get "/accounts/#{Account.default.id}/developer_keys"
-      expect(ff("#keys tbody tr")).to have_size(10)
+      expect(ff("table[data-automation='devKeyAdminTable'] tbody tr")).to have_size(10)
       find_button("Show All Keys").click
-      expect(ff("#keys tbody tr")).to have_size(11)
+      expect(ff("table[data-automation='devKeyAdminTable'] tbody tr")).to have_size(11)
     end
 
     it "allows for pagination on inherited tab", test_id: 344532 do
@@ -185,9 +185,9 @@ describe 'Developer Keys' do
       DeveloperKey.all.each { |key| key.update(visible: true) }
       get "/accounts/#{Account.default.id}/developer_keys"
       click_inherited_tab
-      expect(ff("#keys tbody tr")).to have_size(10)
+      expect(ff("table[data-automation='devKeyAdminTable'] tbody tr")).to have_size(10)
       find_button("Show All Keys").click
-      expect(ff("#keys tbody tr")).to have_size(11)
+      expect(ff("table[data-automation='devKeyAdminTable'] tbody tr")).to have_size(11)
     end
 
     it "renders the key not visible", test_id: 3485785 do
@@ -195,8 +195,8 @@ describe 'Developer Keys' do
       site_admin_developer_key
       site_admin_logged_in
       get "/accounts/site_admin/developer_keys"
-      fj("#keys tbody tr.key button:has(svg[name='IconEye'])").click
-      expect(f("#keys tbody tr.key")).to contain_css("svg[name='IconOff']")
+      fj("table[data-automation='devKeyAdminTable'] tbody tr.key button:has(svg[name='IconEye'])").click
+      expect(f("table[data-automation='devKeyAdminTable'] tbody tr.key")).to contain_css("svg[name='IconOff']")
       expect(site_admin_developer_key.reload.visible).to eq false
     end
 
@@ -205,8 +205,8 @@ describe 'Developer Keys' do
       site_admin_developer_key.update(visible: false)
       site_admin_logged_in
       get "/accounts/site_admin/developer_keys"
-      fj("#keys tbody tr.key button:has(svg[name='IconOff'])").click
-      expect(f("#keys tbody tr.key")).not_to contain_css("svg[name='IconOff']")
+      fj("table[data-automation='devKeyAdminTable'] tbody tr.key button:has(svg[name='IconOff'])").click
+      expect(f("table[data-automation='devKeyAdminTable'] tbody tr.key")).not_to contain_css("svg[name='IconOff']")
       expect(site_admin_developer_key.reload.visible).to eq true
     end
 
@@ -290,7 +290,7 @@ describe 'Developer Keys' do
         fj("span:contains('On'):last").click
         click_inherited_tab
         click_account_tab
-        expect(fxpath("//*[@id='keys']/tbody/tr/td[5]/fieldset/span/span/span/span[2]/span/span/span[1]/div/label/span[1]").css_value('background-color')).to be_truthy
+        expect(fxpath("//*[@data-automation='devKeyAdminTable']/tbody/tr/td[5]/fieldset/span/span/span/span[2]/span/span/span[1]/div/label/span[1]").css_value('background-color')).to be_truthy
       end
 
       it "persists state when switching between inheritance and account tabs", test_id: 3488600 do
@@ -303,7 +303,7 @@ describe 'Developer Keys' do
         click_account_tab
         click_inherited_tab
         expect(fj("fieldset:last")).not_to have_attribute('aria-disabled')
-        expect(fxpath("//*[@id='keys']/tbody/tr[1]/td[3]/fieldset/span/span/span/span[2]/span/span/span[2]/div/label/span[2]").css_value('background-color')).to be_truthy
+        expect(fxpath("//*[@data-automation='devKeyAdminTable']/tbody/tr[1]/td[3]/fieldset/span/span/span/span[2]/span/span/span[2]/div/label/span[2]").css_value('background-color')).to be_truthy
       end
 
       it "only show create developer key button for account tab panel" do
