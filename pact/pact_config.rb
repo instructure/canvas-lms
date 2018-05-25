@@ -22,6 +22,7 @@ module PactConfig
 
   module Providers
     CANVAS_LMS_API = 'Canvas LMS API'.freeze
+    CANVAS_API_VERSION = '0.10'.freeze
     CANVAS_LMS_LIVE_EVENTS = 'Canvas LMS Live Events'.freeze
     ALL = Providers.constants.map { |c| Providers.const_get(c) }.freeze
   end
