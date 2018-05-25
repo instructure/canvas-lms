@@ -80,13 +80,19 @@ open http://web.canvaslms.docker
 Normally you can just start everything with `docker-compose up`, and
 access Canvas at http://web.canvaslms.docker/.
 
-After pulling new code, you'll probably want to run migrations and
-update assets:
+After pulling new code, you'll want to update all your local gems, rebuild your
+docker images, pull plugin code, run migrations, and recompile assets. This can
+all be done with one command:
 
 ```
-$ docker-compose run --rm web bundle update
-$ docker-compose run --rm web bundle exec rake db:migrate
-$ docker-compose run --rm web bundle exec rake canvas:compile_assets
+./script/docker_dev_update.sh
+```
+
+Note that this command will pull `master` and all plugin code by default. If you
+want to update without switching from your local `HEAD`, run:
+
+```
+./script/docker_dev_update.sh -n code
 ```
 
 Changes you're making are not showing up? See the Caveats section below.
