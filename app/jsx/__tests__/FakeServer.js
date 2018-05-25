@@ -108,11 +108,15 @@ class RequestStub {
     if (responseData instanceof Array) {
       responseData.forEach((responseDatum, index) => {
         const headers = {}
-        headers.Link = [
-          `<${url}&page=1>; rel="first"`,
-          `<${url}&page=${index + 1}>; rel="current"`,
-          `<${url}&page=${responseData.length}>; rel="last"`
-        ].join(',')
+        const links = [
+          `<http://canvas.example.com${url}&page=1>; rel="first"`,
+          `<http://canvas.example.com${url}&page=${index + 1}>; rel="current"`,
+          `<http://canvas.example.com${url}&page=${responseData.length}>; rel="last"`
+        ]
+        if (index + 1 !== responseData.length) {
+          links.push(`<http://canvas.example${url}?page=${index + 2}>; rel="next"`)
+        }
+        headers.Link = links.join(',')
         const params = {...queryParams}
         if (index > 0) {
           params.page = index + 1
