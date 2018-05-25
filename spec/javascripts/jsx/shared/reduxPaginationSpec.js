@@ -216,7 +216,7 @@ test('can get all pagination results under a single set of dispatches', (assert)
     }
   }
   const thunk = () => new Promise((resolve, _reject) => resolve(mockResult))
-  const { actionCreators } = createPaginationActions('things', thunk, { headThunk: thunk, fetchAll: true })
+  const { actionCreators } = createPaginationActions('things', thunk, {totalCount: 250, fetchAll: true })
   actionCreators.getThings()(mockStore.dispatch, mockStore.getState)
   setTimeout(() => {
     equal(dispatchSpy.callCount, 2)

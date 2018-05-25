@@ -24,7 +24,7 @@ import {
   closedDiscussionBackground
 } from 'jsx/discussions/components/DiscussionBackgrounds'
 
-import SVGWrapper from 'jsx/shared/SVGWrapper'
+
 
 const defaultProps = () => ({
   permissions: {
@@ -37,24 +37,6 @@ const defaultProps = () => ({
 })
 
 QUnit.module('DiscussionBackgrounds components')
-
-test('renders the pinnedDiscussionBackground decorative component', () => {
-  const tree = shallow(pinnedDiscussionBackground(defaultProps()))
-  const node = tree.find(SVGWrapper)
-  ok(node.exists())
-})
-
-test('renders the unpinnedDiscussionsBackground decorative component', () => {
-  const tree = shallow(unpinnedDiscussionsBackground(defaultProps()))
-  const node = tree.find(SVGWrapper)
-  ok(node.exists())
-})
-
-test('renders the closedDiscussionBackground decorative component', () => {
-  const tree = shallow(closedDiscussionBackground(defaultProps()))
-  const node = tree.find(SVGWrapper)
-  ok(node.exists())
-})
 
 test('renders correct student view for the pinnedDiscussionBackground ', () => {
   const props = defaultProps()

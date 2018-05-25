@@ -239,6 +239,7 @@ export class DiscussionRow extends Component {
   const readCount = this.props.discussion.discussion_subentry_count > 0
     ? (
       <UnreadBadge
+        key={`Badge_${this.props.discussion.id}`}
         unreadCount={this.props.discussion.unread_count}
         unreadLabel={I18n.t('%{count} unread replies', { count: this.props.discussion.unread_count })}
         totalCount={this.props.discussion.discussion_subentry_count}
@@ -251,6 +252,7 @@ export class DiscussionRow extends Component {
 
   subscribeButton = () => (
     <ToggleIcon
+      key={`Subscribe_${this.props.discussion.id}`}
       toggled={this.props.discussion.subscribed}
       OnIcon={
         <Text color="success">
@@ -272,6 +274,7 @@ export class DiscussionRow extends Component {
   publishButton = () => (
     this.props.canPublish
     ? (<ToggleIcon
+         key={`Publish_${this.props.discussion.id}`}
          toggled={this.props.discussion.published}
          disabled={!this.props.discussion.can_unpublish && this.props.discussion.published}
          OnIcon={

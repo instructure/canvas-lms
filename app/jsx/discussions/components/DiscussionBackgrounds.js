@@ -20,29 +20,29 @@ import I18n from 'i18n!discussions_v2'
 import React from 'react'
 import { string } from 'prop-types'
 
-import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent'
 import Container from '@instructure/ui-core/lib/components/Container'
 import Link from '@instructure/ui-core/lib/components/Link'
 import Text from '@instructure/ui-core/lib/components/Text'
 
 import propTypes from '../propTypes'
-import SVGWrapper from '../../shared/SVGWrapper'
 
-const renderContainerSVG = props => (
+import pinnedUrl from '../../../../public/images/discussions/pinned.svg' // eslint-disable-line
+import unpinnedUrl from '../../../../public/images/discussions/unpinned.svg' // eslint-disable-line
+import closedForCommentsUrl from '../../../../public/images/discussions/closed-comments.svg' // eslint-disable-line
+
+const BackgroundSVG = props => (
   <Container margin="small auto" size="x-small" display="block">
-    <PresentationContent>
-      <SVGWrapper url={props.url} />
-    </PresentationContent>
+    <img alt="" src={props.url} />
   </Container>
 )
 
-renderContainerSVG.propTypes = {
+BackgroundSVG.propTypes = {
   url: string.isRequired
 }
 
 export const pinnedDiscussionBackground = (props) => (
   <Container margin="large" textAlign="center" display="block">
-    {renderContainerSVG({url: '/images/discussions/pinned.svg'})}
+    <BackgroundSVG url={pinnedUrl} />
     <Text as="div" margin="x-small auto" weight="bold">
       {I18n.t('You currently have no pinned discussions')}
     </Text>
@@ -60,7 +60,7 @@ pinnedDiscussionBackground.propTypes = {
 
 export const unpinnedDiscussionsBackground = (props) => (
   <Container margin="large" textAlign="center" display="block">
-    {renderContainerSVG({url: '/images/discussions/unpinned.svg'})}
+    <BackgroundSVG url={unpinnedUrl} />
     <Text as="div" margin="x-small auto" weight="bold">
       {I18n.t('There are no discussions to show in this section')}
     </Text>
@@ -78,7 +78,7 @@ unpinnedDiscussionsBackground.propTypes = {
 
 export const closedDiscussionBackground = (props) => (
   <Container margin="large" textAlign="center" display="block">
-    {renderContainerSVG({url: '/images/discussions/closed-comments.svg'})}
+    <BackgroundSVG url={closedForCommentsUrl} />
     <Text as="div" margin="x-small auto" weight="bold">
       {I18n.t('You currently have no discussions with closed comments')}
     </Text>

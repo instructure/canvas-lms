@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!discussions_v2'
 import React, {Component} from 'react'
-import {func, bool, string, arrayOf} from 'prop-types'
+import {func, bool, string} from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import {DragDropContext} from 'react-dnd'
