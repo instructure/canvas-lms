@@ -98,6 +98,11 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
     return headers.map(header => header.text())
   }
 
+  function goToPage(page) {
+    const onPageClick = wrapper.find('PageNavigation').prop('onPageClick')
+    onPageClick(page)
+  }
+
   test('displays the grader names in the column headers', () => {
     mountComponent()
     deepEqual(getGraderNames(), ['Miss Frizzle', 'Mr. Keating'])
@@ -145,5 +150,54 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
     mountComponent()
     wrapper.setProps({students})
     deepEqual(getStudentNames(), ['Student 1', 'Student 2', 'Student 3', 'Student 4'])
+  })
+
+  QUnit.module('when multiple pages of students are loaded', hooks => {
+    hooks.beforeEach(() => {
+      props.students = []
+      for (let id = 1111; id <= 1160; id++) {
+        props.students.push({id: `${id}`, displayName: `Student ${id}`})
+      }
+    })
+
+    test('displays only 20 rows on a page', () => {
+      mountComponent()
+      strictEqual(wrapper.find('tr.GradesGrid__BodyRow').length, 20)
+    })
+
+    test('displays the first 20 students on the first page', () => {
+      mountComponent()
+      const expectedNames = props.students.slice(0, 20).map(student => student.displayName)
+      deepEqual(getStudentNames(), expectedNames)
+    })
+
+    test('displays the next 20 students after navigating to the second page', () => {
+      mountComponent()
+      goToPage(2)
+      const expectedNames = props.students.slice(20, 40).map(student => student.displayName)
+      deepEqual(getStudentNames(), expectedNames)
+    })
+
+    test('updates the current page as students are added', () => {
+      const {students} = props
+      props.students = students.slice(0, 30) // page 2 has 10 students
+      mountComponent()
+      goToPage(2)
+      wrapper.setProps({students})
+      const expectedNames = students.slice(20, 40).map(student => student.displayName)
+      deepEqual(getStudentNames(), expectedNames)
+    })
+
+    test('continues enumeration on students across pages', () => {
+      const anonymousNames = []
+      for (let i = 0; i < props.students.length; i++) {
+        props.students[i].displayName = null
+        anonymousNames.push(`Student ${i + 1}`)
+      }
+      mountComponent()
+      goToPage(2)
+      // Student 21, Student 22, ..., Student 40
+      deepEqual(getStudentNames(), anonymousNames.slice(20, 40))
+    })
   })
 })

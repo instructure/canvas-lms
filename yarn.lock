@@ -288,6 +288,19 @@
     "@instructure/ui-utils" "^5.10.0"
     prop-types "^15.5.10"
 
+"@instructure/ui-pagination@^5":
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-pagination/-/ui-pagination-5.10.0.tgz#772588abdc4b4e7c26f5cf5dcddbab563f2d47e8"
+  dependencies:
+    "@instructure/ui-a11y" "^5.10.0"
+    "@instructure/ui-buttons" "^5.10.0"
+    "@instructure/ui-elements" "^5.10.0"
+    "@instructure/ui-icons" "^5.10.0"
+    "@instructure/ui-layout" "^5.10.0"
+    "@instructure/ui-themeable" "^5.10.0"
+    "@instructure/ui-utils" "^5.10.0"
+    prop-types "^15.5.10"
+
 "@instructure/ui-portal@^5.10.0":
   version "5.10.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-portal/-/ui-portal-5.10.0.tgz#affedfe35d89d3d0bb7b228c026b260bf37c6ee0"

@@ -18,16 +18,32 @@
 
 import React, {Component} from 'react'
 import {arrayOf, shape, string} from 'prop-types'
+import View from '@instructure/ui-layout/lib/components/View'
 import I18n from 'i18n!assignment_grade_summary'
 
 import Grid from './Grid'
+import PageNavigation from './PageNavigation'
 
-function studentToRow(student, index) {
+const ROWS_PER_PAGE = 20
+
+function studentToRow(student, pageStart, studentIndex) {
   return {
     studentId: student.id,
     studentName:
-      student.displayName || I18n.t('Student %{studentNumber}', {studentNumber: I18n.n(index + 1)})
+      student.displayName ||
+      I18n.t('Student %{studentNumber}', {studentNumber: I18n.n(pageStart + studentIndex + 1)})
   }
+}
+
+function studentsToPages(students) {
+  const pages = []
+  for (let pageStart = 0; pageStart < students.length; pageStart += ROWS_PER_PAGE) {
+    const pageStudents = students.slice(pageStart, pageStart + ROWS_PER_PAGE)
+    pages.push(
+      pageStudents.map((student, studentIndex) => studentToRow(student, pageStart, studentIndex))
+    )
+  }
+  return pages
 }
 
 export default class GradesGrid extends Component {
@@ -50,23 +66,40 @@ export default class GradesGrid extends Component {
   constructor(props) {
     super(props)
 
+    this.setPage = this.setPage.bind(this)
+
     this.state = {
-      rows: this.props.students.map(studentToRow)
+      currentPageIndex: 0,
+      pages: studentsToPages(this.props.students)
     }
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.students !== this.props.students) {
-      this.setState({
-        rows: nextProps.students.map(studentToRow)
-      })
+      const pages = studentsToPages(nextProps.students)
+      const currentPageIndex = Math.min(this.state.currentPageIndex, pages.length - 1)
+      this.setState({currentPageIndex, pages})
     }
   }
 
+  setPage(page) {
+    this.setState({currentPageIndex: page - 1})
+  }
+
   render() {
+    const rows = this.state.pages[this.state.currentPageIndex]
+
     return (
       <div className="GradesGridContainer">
-        <Grid graders={this.props.graders} grades={this.props.grades} rows={this.state.rows} />
+        <Grid graders={this.props.graders} grades={this.props.grades} rows={rows} />
+
+        <View as="div" margin="small">
+          <PageNavigation
+            currentPage={this.state.currentPageIndex + 1}
+            onPageClick={this.setPage}
+            pageCount={this.state.pages.length}
+          />
+        </View>
       </div>
     )
   }
