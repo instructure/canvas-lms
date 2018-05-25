@@ -31,8 +31,17 @@ import GradingPeriodsHelper from '../grading/helpers/GradingPeriodsHelper'
     return _.contains(assignment.assignment_visibility, student.id);
   }
 
-  function cellMapForSubmission(assignment, student, hasGradingPeriods, selectedGradingPeriodID, isAdmin) {
-    if (!visibleToStudent(assignment, student)) {
+  function cellMapForSubmission(
+    assignment,
+    student,
+    hasGradingPeriods,
+    selectedGradingPeriodID,
+    isAdmin,
+    anonymousModeratedMarkingEnabled
+  ) {
+    if (assignment.anonymous_grading && assignment.muted && anonymousModeratedMarkingEnabled) {
+      return { locked: true, hideGrade: true };
+    } else if (!visibleToStudent(assignment, student)) {
       return { locked: true, hideGrade: true, tooltip: TOOLTIP_KEYS.NONE };
     } else if (hasGradingPeriods) {
       return cellMappingsForMultipleGradingPeriods(assignment, student, selectedGradingPeriodID, isAdmin);
@@ -65,10 +74,11 @@ import GradingPeriodsHelper from '../grading/helpers/GradingPeriodsHelper'
   }
 
   class SubmissionState {
-    constructor({ hasGradingPeriods, selectedGradingPeriodID, isAdmin }) {
+    constructor({ hasGradingPeriods, selectedGradingPeriodID, isAdmin, anonymousModeratedMarkingEnabled }) {
       this.hasGradingPeriods = hasGradingPeriods;
       this.selectedGradingPeriodID = selectedGradingPeriodID;
       this.isAdmin = isAdmin;
+      this.anonymousModeratedMarkingEnabled = anonymousModeratedMarkingEnabled;
       this.submissionCellMap = {};
       this.submissionMap = {};
     }
@@ -90,7 +100,8 @@ import GradingPeriodsHelper from '../grading/helpers/GradingPeriodsHelper'
         student,
         this.hasGradingPeriods,
         this.selectedGradingPeriodID,
-        this.isAdmin
+        this.isAdmin,
+        this.anonymousModeratedMarkingEnabled
       ];
 
       this.submissionCellMap[student.id][assignment.id] = cellMapForSubmission(...params);

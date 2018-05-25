@@ -43,7 +43,7 @@ define [
   'jsx/gradezilla/individual-gradebook/components/GradebookSelector'
   'jquery.instructure_date_and_time'
 ], (
-  $, React, ReactDOM, 
+  $, React, ReactDOM,
   ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog,
   AssignmentMuter, CourseGradeCalculator, EffectiveDueDates, outcomeGrid, ic_submission_download_dialog,
   htmlEscape, CalculationMethodContent, SubmissionStateMap, GradingPeriodsApi, GradingPeriodSetsApi,
@@ -819,6 +819,7 @@ define [
         hasGradingPeriods: !!@has_grading_periods
         selectedGradingPeriodID: @get('selectedGradingPeriod.id') || '0'
         isAdmin: ENV.current_user_roles && _.contains(ENV.current_user_roles, "admin")
+        anonymousModeratedMarkingEnabled: ENV.GRADEBOOK_OPTIONS.anonymous_moderated_marking_enabled
       )
       map.setup(@get('students').toArray(), @get('assignmentsFromGroups.content').toArray())
       @set('submissionStateMap', map)

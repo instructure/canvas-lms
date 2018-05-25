@@ -50,6 +50,29 @@ define([
   // time this is being written a significant amount of work is needed
   // to be able to require javascript files that live in the spec directory
 
+  QUnit.module('SubmissionStateMap with anonymous moderated marking enabled');
+
+  test ('submission is unlocked if not anonymous', function() {
+    const assignment = { id: '1', muted: true };
+    const map = createAndSetupMap(assignment, { anonymousModeratedMarkingEnabled: true });
+    const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
+    strictEqual(state.locked, false);
+  });
+
+  test ('submission is unlocked if not muted', function() {
+    const assignment = { id: '1', anonymous_grading: true };
+    const map = createAndSetupMap(assignment, { anonymousModeratedMarkingEnabled: true });
+    const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
+    strictEqual(state.locked, false);
+  });
+
+  test ('submission is locked if anonymous and muted', function() {
+    const assignment = { id: '1', anonymous_grading: true, muted: true };
+    const map = createAndSetupMap(assignment, { anonymousModeratedMarkingEnabled: true });
+    const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
+    strictEqual(state.locked, true);
+  });
+
   QUnit.module('SubmissionStateMap with no grading periods');
 
   test('submission is locked for a student without assignment visibility', function() {
