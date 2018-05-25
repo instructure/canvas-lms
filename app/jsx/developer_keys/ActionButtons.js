@@ -65,7 +65,8 @@ class DeveloperKeyActionButtons extends React.Component {
   refDeleteLink = (link) => { this.deleteLink = link; }
 
   renderVisibilityIcon () {
-    const { visible, developerName } = this.props
+    const { developerName, visible, showVisibilityToggle } = this.props
+    if (!showVisibilityToggle) { return null }
     if (visible) {
       return <Tooltip
         tip={I18n.t("Make key invisible")}
@@ -149,7 +150,12 @@ DeveloperKeyActionButtons.propTypes = {
   }).isRequired,
   visible: PropTypes.bool.isRequired,
   developerName: PropTypes.string.isRequired,
-  onDelete: PropTypes.func.isRequired
+  onDelete: PropTypes.func.isRequired,
+  showVisibilityToggle: PropTypes.bool
 };
+
+DeveloperKeyActionButtons.defaultProps = {
+  showVisibilityToggle: true
+}
 
 export default DeveloperKeyActionButtons

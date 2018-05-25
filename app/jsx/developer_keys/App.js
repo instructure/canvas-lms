@@ -32,6 +32,10 @@ import DeveloperKey from './DeveloperKey'
 import DeveloperKeyModal from './NewKeyModal'
 
 class DeveloperKeysApp extends React.Component {
+  get isSiteAdmin() {
+    return this.props.ctx.params.contextId === "site_admin"
+  }
+
   setMainTableRef = node => {
     this.mainTableRef = node
   }
@@ -163,24 +167,28 @@ class DeveloperKeysApp extends React.Component {
               {this.showMoreButton()}
             </div>
           </TabPanel>
-          <TabPanel
-            title={I18n.t('Inherited')}
-            tabRef={this.setInheritedTabRef}
-          >
-            <DeveloperKeysTable
-              ref={this.setInheritedTableRef}
-              store={store}
-              actions={actions}
-              developerKeysList={inheritedList}
-              ctx={ctx}
-              inherited
-              setFocus={this.focusInheritedTab}
-            />
-            <div className="loadingSection">
-              {listInheritedDeveloperKeysPending ? <Spinner title={I18n.t('Loading')} /> : null}
-              {this.showMoreInheritedButton()}
-            </div>
-          </TabPanel>
+          {
+            this.isSiteAdmin
+              ? null
+              : <TabPanel
+                title={I18n.t('Inherited')}
+                tabRef={this.setInheritedTabRef}
+              >
+                <DeveloperKeysTable
+                  ref={this.setInheritedTableRef}
+                  store={store}
+                  actions={actions}
+                  developerKeysList={inheritedList}
+                  ctx={ctx}
+                  inherited
+                  setFocus={this.focusInheritedTab}
+                />
+                <div className="loadingSection">
+                  {listInheritedDeveloperKeysPending ? <Spinner title={I18n.t('Loading')} /> : null}
+                  {this.showMoreInheritedButton()}
+                </div>
+              </TabPanel>
+          }
         </TabList>
       </div>
     )
@@ -213,7 +221,11 @@ DeveloperKeysApp.propTypes = {
       inheritedList: PropTypes.arrayOf(DeveloperKey.propTypes.developerKey).isRequired
     }).isRequired
   }).isRequired,
-  ctx: DeveloperKeyModal.propTypes.ctx
+  ctx: PropTypes.shape({
+    params: PropTypes.shape({
+      contextId: PropTypes.string.isRequired
+    })
+  }).isRequired,
 }
 
 export default DeveloperKeysApp

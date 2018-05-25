@@ -31,6 +31,10 @@ import DeveloperKeyStateControl from './InheritanceStateControl'
 
 
 class DeveloperKey extends React.Component {
+  get isSiteAdmin() {
+    return this.props.ctx.params.contextId === "site_admin"
+  }
+
   activateLinkHandler = (event) => {
     event.preventDefault()
     this.props.store.dispatch(
@@ -184,6 +188,7 @@ class DeveloperKey extends React.Component {
               visible={this.props.developerKey.visible}
               developerName={this.developerName()}
               onDelete={this.handleDelete}
+              showVisibilityToggle={this.isSiteAdmin}
             />
           </td>
         }

@@ -192,19 +192,23 @@ describe 'Developer Keys' do
     end
 
     it "renders the key not visible", test_id: 3485785 do
-      root_developer_key
-      get "/accounts/#{Account.default.id}/developer_keys"
+      pending 'This test will be valid once the "new developer keys" site admin setting exists'
+      site_admin_developer_key
+      site_admin_logged_in
+      get "/accounts/site_admin/developer_keys"
       fj("#keys tbody tr.key button:has(svg[name='IconEye'])").click
       expect(f("#keys tbody tr.key")).to contain_css("svg[name='IconOff']")
-      expect(root_developer_key.reload.visible).to eq false
+      expect(site_admin_developer_key.reload.visible).to eq false
     end
 
     it "renders the key visible", test_id: 3485785 do
-      root_developer_key.update(visible: false)
-      get "/accounts/#{Account.default.id}/developer_keys"
+      pending 'This test will be valid once the "new developer keys" site admin setting exists'
+      site_admin_developer_key.update(visible: false)
+      site_admin_logged_in
+      get "/accounts/site_admin/developer_keys"
       fj("#keys tbody tr.key button:has(svg[name='IconOff'])").click
       expect(f("#keys tbody tr.key")).not_to contain_css("svg[name='IconOff']")
-      expect(root_developer_key.reload.visible).to eq true
+      expect(site_admin_developer_key.reload.visible).to eq true
     end
 
     context "Account Binding" do
