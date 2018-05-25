@@ -139,8 +139,9 @@ class PlannerNotesController < ApplicationController
   #
   # @returns [PlannerNote]
   def index
-    notes = @current_user.planner_notes.active
+    notes = @current_user.planner_notes.active.exclude_deleted_courses
     # Format & filter our notes by course code if passed
+
     if (context_codes = params.delete(:context_codes))
       # Append to our notes scope to include the context codes for courses
       course_codes = Array(context_codes).select{|c| c =~ /course_\d+/}

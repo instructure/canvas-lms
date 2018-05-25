@@ -74,6 +74,18 @@ describe PlannerNotesController do
           expect(response).to have_http_status(:success)
         end
 
+        it "excludes deleted courses" do
+          @course_1.destroy
+          get :index
+          note_ids = json_parse(response.body).map{|n| n["id"]}
+          expect(note_ids).to_not include(@course_1_note.id)
+          expect(note_ids).to include(@course_2_note.id)
+
+          get :index, params: {context_codes: ["course_#{@course_1.id}"]}
+          course_notes = json_parse(response.body)
+          expect(course_notes.length).to eq 0
+        end
+
         it "filters by context codes when specified" do
           get :index, params: {context_codes: ["course_#{@course_1.id}"]}
           course_notes = json_parse(response.body)
