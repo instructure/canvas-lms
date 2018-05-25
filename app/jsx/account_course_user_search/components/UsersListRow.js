@@ -28,7 +28,7 @@ import FriendlyDatetime from '../../shared/FriendlyDatetime'
 import CreateOrUpdateUserModal from '../../shared/components/CreateOrUpdateUserModal'
 import UserLink from './UserLink'
 
-export default function UsersListRow({accountId, user, permissions, handlers}) {
+export default function UsersListRow({accountId, user, permissions, handleSubmitEditUserForm}) {
   return (
     <tr>
       <th scope="row">
@@ -66,7 +66,7 @@ export default function UsersListRow({accountId, user, permissions, handlers}) {
             createOrUpdate="update"
             url={`/accounts/${accountId}/users/${user.id}`}
             user={user}
-            afterSave={handlers.handleSubmitEditUserForm}
+            afterSave={handleSubmitEditUserForm}
           >
             <span>
               <Tooltip tip={I18n.t('Edit %{name}', {name: user.name})}>
@@ -85,9 +85,7 @@ export default function UsersListRow({accountId, user, permissions, handlers}) {
 UsersListRow.propTypes = {
   accountId: string.isRequired,
   user: CreateOrUpdateUserModal.propTypes.user.isRequired,
-  handlers: shape({
-    handleSubmitEditUserForm: func.isRequired
-  }).isRequired,
+  handleSubmitEditUserForm: func.isRequired,
   permissions: shape({
     can_masquerade: bool,
     can_message_users: bool,

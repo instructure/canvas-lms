@@ -16,103 +16,95 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import preventDefault from 'compiled/fn/preventDefault'
-import IconMiniArrowUp from '@instructure/ui-icons/lib/Solid/IconMiniArrowUp'
-import IconMiniArrowDown from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
-import ApplyTheme from '@instructure/ui-core/lib/components/ApplyTheme'
-import Tooltip from '@instructure/ui-core/lib/components/Tooltip'
-import Link from '@instructure/ui-core/lib/components/Link'
 import Table from '@instructure/ui-core/lib/components/Table'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import React from 'react'
 import {arrayOf, string, object, func} from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 import UsersListRow from './UsersListRow'
+import UsersListHeader from './UsersListHeader'
 
 
-export default function UsersList (props) {
+export default class UsersList extends React.Component {
 
-  function UserListHeader ({id, tipAsc, tipDesc, label}) {
-    const {sort, order, search_term, role_filter_id} = props.userList.searchFilter
-    const newOrder = (sort === id && order === 'asc') || (!sort && id === 'username')
-      ? 'desc'
-      : 'asc'
-
-    return (
-      <th scope="col">
-        <ApplyTheme theme={{[Link.theme]: {fontWeight: 'bold'}}}>
-          <Tooltip
-            as={Link}
-            tip={(sort === id && order === 'asc') ? tipAsc : tipDesc}
-            onClick={preventDefault(() => {
-              props.onUpdateFilters({search_term, sort: id, order: newOrder, role_filter_id})
-            })}
-          >
-            {label}
-            {sort === id ?
-              (order === 'asc' ? <IconMiniArrowDown /> : <IconMiniArrowUp />) :
-              ''
-            }
-          </Tooltip>
-        </ApplyTheme>
-      </th>
-    )
+  shouldComponentUpdate(nextProps) {
+    let count = 0
+    for (let prop in this.props) {
+      ++count
+      if (this.props[prop] !== nextProps[prop]) {
+        // a change to searchFilter on it's own should not cause the list
+        // to re-render
+        if (prop !== 'searchFilter') {
+          return true
+        }
+      }
+    }
+    return count !== Object.keys(nextProps).length
   }
 
-  return (
-    <Table margin="small 0" caption={<ScreenReaderContent>{I18n.t('Users')}</ScreenReaderContent>}>
-      <thead>
-        <tr>
-          <UserListHeader
-            id="username"
-            label={I18n.t('Name')}
-            tipDesc={I18n.t('Click to sort by name ascending')}
-            tipAsc={I18n.t('Click to sort by name descending')}
-          />
-          <UserListHeader
-            id="email"
-            label={I18n.t('Email')}
-            tipDesc={I18n.t('Click to sort by email ascending')}
-            tipAsc={I18n.t('Click to sort by email descending')}
-          />
-          <UserListHeader
-            id="sis_id"
-            label={I18n.t('SIS ID')}
-            tipDesc={I18n.t('Click to sort by SIS ID ascending')}
-            tipAsc={I18n.t('Click to sort by SIS ID descending')}
-          />
-          <UserListHeader
-            id="last_login"
-            label={I18n.t('Last Login')}
-            tipDesc={I18n.t('Click to sort by last login ascending')}
-            tipAsc={I18n.t('Click to sort by last login descending')}
-          />
-          <th width="1" scope="col">
-            <ScreenReaderContent>{I18n.t('User option links')}</ScreenReaderContent>
-          </th>
-        </tr>
-      </thead>
-      <tbody data-automation="users list">
-        {props.users.map(user =>
-          <UsersListRow
-            handlers={props.handlers}
-            key={user.id}
-            accountId={props.accountId}
-            user={user}
-            permissions={props.permissions}
-          />
-        )}
-      </tbody>
-    </Table>
-  )
+  render() {
+    return (
+      <Table margin="small 0" caption={<ScreenReaderContent>{I18n.t('Users')}</ScreenReaderContent>}>
+        <thead>
+          <tr>
+            <UsersListHeader
+              id="username"
+              label={I18n.t('Name')}
+              tipDesc={I18n.t('Click to sort by name ascending')}
+              tipAsc={I18n.t('Click to sort by name descending')}
+              searchFilter={this.props.searchFilter}
+              onUpdateFilters={this.props.onUpdateFilters}
+            />
+            <UsersListHeader
+              id="email"
+              label={I18n.t('Email')}
+              tipDesc={I18n.t('Click to sort by email ascending')}
+              tipAsc={I18n.t('Click to sort by email descending')}
+              searchFilter={this.props.searchFilter}
+              onUpdateFilters={this.props.onUpdateFilters}
+            />
+            <UsersListHeader
+              id="sis_id"
+              label={I18n.t('SIS ID')}
+              tipDesc={I18n.t('Click to sort by SIS ID ascending')}
+              tipAsc={I18n.t('Click to sort by SIS ID descending')}
+              searchFilter={this.props.searchFilter}
+              onUpdateFilters={this.props.onUpdateFilters}
+            />
+            <UsersListHeader
+              id="last_login"
+              label={I18n.t('Last Login')}
+              tipDesc={I18n.t('Click to sort by last login ascending')}
+              tipAsc={I18n.t('Click to sort by last login descending')}
+              searchFilter={this.props.searchFilter}
+              onUpdateFilters={this.props.onUpdateFilters}
+            />
+            <th width="1" scope="col">
+              <ScreenReaderContent>{I18n.t('User option links')}</ScreenReaderContent>
+            </th>
+          </tr>
+        </thead>
+        <tbody data-automation="users list">
+          {this.props.users.map(user =>
+            <UsersListRow
+              handleSubmitEditUserForm={this.props.handleSubmitEditUserForm}
+              key={user.id}
+              accountId={this.props.accountId}
+              user={user}
+              permissions={this.props.permissions}
+            />
+          )}
+        </tbody>
+      </Table>
+    )
+  }
 }
 
 UsersList.propTypes = {
   accountId: string.isRequired,
   users: arrayOf(object).isRequired,
   permissions: object.isRequired,
-  handlers: object.isRequired,
-  userList: object.isRequired,
-  onUpdateFilters: func.isRequired,
-  onApplyFilters: func.isRequired
+  handleSubmitEditUserForm: func.isRequired,
+  searchFilter: object.isRequired,
+  onUpdateFilters: func.isRequired
 }
