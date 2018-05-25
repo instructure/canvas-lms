@@ -20,6 +20,8 @@ import React from 'react'
 import {mount} from 'enzyme'
 import {Provider} from 'react-redux'
 
+import * as AssignmentActions from 'jsx/assignments/GradeSummary/assignment/AssignmentActions'
+import * as GradeActions from 'jsx/assignments/GradeSummary/grades/GradeActions'
 import * as StudentActions from 'jsx/assignments/GradeSummary/students/StudentActions'
 import Layout from 'jsx/assignments/GradeSummary/components/Layout'
 import configureStore from 'jsx/assignments/GradeSummary/configureStore'
@@ -47,9 +49,13 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
     sinon
       .stub(StudentActions, 'loadStudents')
       .returns(StudentActions.setLoadStudentsStatus(StudentActions.STARTED))
+    sinon
+      .stub(GradeActions, 'selectProvisionalGrade')
+      .callsFake(gradeInfo => GradeActions.setSelectedProvisionalGrade(gradeInfo))
   })
 
   suiteHooks.afterEach(() => {
+    GradeActions.selectProvisionalGrade.restore()
     StudentActions.loadStudents.restore()
     wrapper.unmount()
   })
@@ -103,6 +109,41 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
       mountComponent()
       store.dispatch(StudentActions.addStudents(students))
       strictEqual(wrapper.find('Spinner').length, 0)
+    })
+  })
+
+  QUnit.module('GradesGrid', hooks => {
+    let grades
+
+    hooks.beforeEach(() => {
+      mountComponent()
+      const students = [
+        {id: '1111', displayName: 'Adam Jones'},
+        {id: '1112', displayName: 'Betty Ford'}
+      ]
+      store.dispatch(StudentActions.addStudents(students))
+      grades = [
+        {grade: 'A', graderId: '1101', id: '4601', score: 10, selected: false, studentId: '1111'}
+      ]
+      store.dispatch(GradeActions.addProvisionalGrades(grades))
+    })
+
+    test('onGradeSelect selects a provisional grade when grades have not been published', () => {
+      const onGradeSelect = wrapper.find('GradesGrid').prop('onGradeSelect')
+      onGradeSelect(grades[0])
+      const gradeInfo = store.getState().grades.provisionalGrades[1111][1101]
+      strictEqual(gradeInfo.selected, true)
+    })
+
+    test('is null when grades have not been published', () => {
+      store.dispatch(AssignmentActions.updateAssignment({gradesPublished: true}))
+      const onGradeSelect = wrapper.find('GradesGrid').prop('onGradeSelect')
+      strictEqual(onGradeSelect, null)
+    })
+
+    test('receives the selectProvisionalGradeStatuses from state', () => {
+      const statuses = wrapper.find('GradesGrid').prop('selectProvisionalGradeStatuses')
+      strictEqual(statuses, store.getState().grades.selectProvisionalGradeStatuses)
     })
   })
 })

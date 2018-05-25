@@ -36,12 +36,18 @@ export default class Grid extends Component {
     ).isRequired,
     grades: shape({}).isRequired,
     horizontalScrollRef: func.isRequired,
+    onGradeSelect: func,
     rows: arrayOf(
       shape({
         studentId: string.isRequired,
         studentName: string.isRequired
       }).isRequired
-    ).isRequired
+    ).isRequired,
+    selectProvisionalGradeStatuses: shape({}).isRequired
+  }
+
+  static defaultProps = {
+    onGradeSelect: null
   }
 
   shouldComponentUpdate(nextProps) {
@@ -62,19 +68,20 @@ export default class Grid extends Component {
                 <Text>{I18n.t('Student')}</Text>
               </th>
 
-              {this.props.graders.map((grader, index) => (
+              {this.props.graders.map(grader => (
                 <th
                   className="GradesGrid__GraderHeader"
                   key={grader.graderId}
                   role="columnheader"
                   scope="col"
                 >
-                  <Text>
-                    {grader.graderName ||
-                      I18n.t('Grader %{graderNumber}', {graderNumber: I18n.n(index + 1)})}
-                  </Text>
+                  <Text>{grader.graderName}</Text>
                 </th>
               ))}
+
+              <th className="GradesGrid__FinalGradeHeader" role="columnheader" scope="col">
+                <Text>{I18n.t('Final Grade')}</Text>
+              </th>
             </tr>
           </thead>
 
@@ -84,7 +91,11 @@ export default class Grid extends Component {
                 graders={this.props.graders}
                 grades={this.props.grades[row.studentId]}
                 key={index /* index used for performance reasons */}
+                onGradeSelect={this.props.onGradeSelect}
                 row={row}
+                selectProvisionalGradeStatus={
+                  this.props.selectProvisionalGradeStatuses[row.studentId]
+                }
               />
             ))}
           </tbody>

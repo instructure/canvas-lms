@@ -21,6 +21,7 @@
 $headerHeight: 50px;
 $rowHeight: 50px;
 $graderColumnWidth: 156px;
+$finalGradeColumnWidth: 176px;
 $studentColumnWidth: 200px;
 $headerBorderColor: rgb(199, 205, 209);
 
@@ -93,13 +94,23 @@ $headerBorderColor: rgb(199, 205, 209);
   line-height: $headerHeight;
 }
 
-.GradesGrid__GraderHeader {
+.GradesGrid__GraderHeader,
+.GradesGrid__FinalGradeHeader {
   max-width: $graderColumnWidth;
   min-width: $graderColumnWidth;
   overflow: hidden;
   padding: 0 $ic-sp;
   text-align: direction(left);
   text-overflow: ellipsis;
+}
+
+.GradesGrid__GraderHeader {
+  width: $graderColumnWidth;
+}
+
+.GradesGrid__FinalGradeHeader {
+  max-width: $finalGradeColumnWidth;
+  min-width: $finalGradeColumnWidth;
 }
 
 .GradesGrid__StudentColumnHeader {
@@ -124,8 +135,14 @@ $headerBorderColor: rgb(199, 205, 209);
 
 .GradesGrid__ProvisionalGradeCell {
   max-width: $graderColumnWidth;
-  padding: 0 $ic-sp;
+  padding: 0;
   text-align: direction(left);
+}
+
+.GradesGrid__FinalGradeCell {
+  max-width: $finalGradeColumnWidth;
+  padding: 0 0 0 $ic-sp;
+  text-align: center;
 }
 
 /* End GradesGrid */

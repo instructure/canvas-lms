@@ -17,13 +17,14 @@
  */
 
 import React, {Component} from 'react'
-import {arrayOf, func, shape, string} from 'prop-types'
+import {arrayOf, bool, func, shape, string} from 'prop-types'
 import {connect} from 'react-redux'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import View from '@instructure/ui-layout/lib/components/View'
 import I18n from 'i18n!assignment_grade_summary'
 
 import '../../../context_cards/StudentContextCardTrigger'
+import {selectProvisionalGrade} from '../grades/GradeActions'
 import {loadStudents} from '../students/StudentActions'
 import FlashMessageHolder from './FlashMessageHolder'
 import GradesGrid from './GradesGrid'
@@ -36,8 +37,11 @@ class Layout extends Component {
         graderId: string.isRequired
       })
     ).isRequired,
+    gradesPublished: bool.isRequired,
     loadStudents: func.isRequired,
     provisionalGrades: shape({}).isRequired,
+    selectGrade: func.isRequired,
+    selectProvisionalGradeStatuses: shape({}).isRequired,
     students: arrayOf(
       shape({
         id: string.isRequired
@@ -52,6 +56,8 @@ class Layout extends Component {
   }
 
   render() {
+    const onGradeSelect = this.props.gradesPublished ? null : this.props.selectGrade
+
     return (
       <div>
         <FlashMessageHolder />
@@ -64,6 +70,8 @@ class Layout extends Component {
               <GradesGrid
                 graders={this.props.graders}
                 grades={this.props.provisionalGrades}
+                onGradeSelect={onGradeSelect}
+                selectProvisionalGradeStatuses={this.props.selectProvisionalGradeStatuses}
                 students={this.props.students}
               />
             ) : (
@@ -79,7 +87,9 @@ class Layout extends Component {
 function mapStateToProps(state) {
   return {
     graders: state.context.graders,
+    gradesPublished: state.assignment.assignment.gradesPublished,
     provisionalGrades: state.grades.provisionalGrades,
+    selectProvisionalGradeStatuses: state.grades.selectProvisionalGradeStatuses,
     students: state.students.list
   }
 }
@@ -88,8 +98,15 @@ function mapDispatchToProps(dispatch) {
   return {
     loadStudents() {
       dispatch(loadStudents())
+    },
+
+    selectGrade(gradeInfo) {
+      dispatch(selectProvisionalGrade(gradeInfo))
     }
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Layout)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Layout)

@@ -17,12 +17,13 @@
  */
 
 import {Component} from 'react'
-import {oneOf} from 'prop-types'
+import {oneOf, shape} from 'prop-types'
 import {connect} from 'react-redux'
 import I18n from 'i18n!assignment_grade_summary'
 
 import {showFlashAlert} from '../../../shared/FlashAlert'
 import * as AssignmentActions from '../assignment/AssignmentActions'
+import * as GradeActions from '../grades/GradeActions'
 import * as StudentActions from '../students/StudentActions'
 
 function enumeratedStatuses(actions) {
@@ -82,6 +83,7 @@ class FlashMessageHolder extends Component {
   static propTypes = {
     loadStudentsStatus: oneOf(enumeratedStatuses(StudentActions)),
     publishGradesStatus: oneOf(assignmentStatuses),
+    selectProvisionalGradeStatuses: shape({}).isRequired,
     unmuteAssignmentStatus: oneOf(enumeratedStatuses(AssignmentActions))
   }
 
@@ -106,6 +108,28 @@ class FlashMessageHolder extends Component {
       }
     }
 
+    if (changes.selectProvisionalGradeStatuses) {
+      Object.keys(nextProps.selectProvisionalGradeStatuses).forEach(studentId => {
+        if (
+          nextProps.selectProvisionalGradeStatuses[studentId] !==
+          this.props.selectProvisionalGradeStatuses[studentId]
+        ) {
+          const status = nextProps.selectProvisionalGradeStatuses[studentId]
+          if (status === GradeActions.SUCCESS) {
+            showFlashAlert({
+              message: I18n.t('Grade saved.'),
+              type: 'success'
+            })
+          } else if (status === GradeActions.FAILURE) {
+            showFlashAlert({
+              message: I18n.t('There was a problem saving the grade.'),
+              type: 'error'
+            })
+          }
+        }
+      })
+    }
+
     if (changes.publishGradesStatus) {
       announcePublishGradesStatus(nextProps.publishGradesStatus)
     }
@@ -124,6 +148,7 @@ function mapStateToProps(state) {
   return {
     loadStudentsStatus: state.students.loadStudentsStatus,
     publishGradesStatus: state.assignment.publishGradesStatus,
+    selectProvisionalGradeStatuses: state.grades.selectProvisionalGradeStatuses,
     unmuteAssignmentStatus: state.assignment.unmuteAssignmentStatus
   }
 }

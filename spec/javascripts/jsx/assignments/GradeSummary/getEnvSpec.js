@@ -127,9 +127,9 @@ QUnit.module('GradeSummary getEnv()', suiteHooks => {
         deepEqual(graderIds, ['abcde', 'b01ng', 'h2asd'])
       })
 
-      test('sets .graderName to null', () => {
+      test('assigns enumerated names', () => {
         const graderNames = getEnv().graders.map(grader => grader.graderName)
-        deepEqual(graderNames, [null, null, null])
+        deepEqual(graderNames, ['Grader 1', 'Grader 2', 'Grader 3'])
       })
     })
   })

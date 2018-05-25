@@ -22,6 +22,7 @@ import {Provider} from 'react-redux'
 
 import * as FlashAlert from 'jsx/shared/FlashAlert'
 import * as AssignmentActions from 'jsx/assignments/GradeSummary/assignment/AssignmentActions'
+import * as GradeActions from 'jsx/assignments/GradeSummary/grades/GradeActions'
 import * as StudentActions from 'jsx/assignments/GradeSummary/students/StudentActions'
 import FlashMessageHolder from 'jsx/assignments/GradeSummary/components/FlashMessageHolder'
 import configureStore from 'jsx/assignments/GradeSummary/configureStore'
@@ -78,6 +79,64 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
     test('includes a message about loading students', () => {
       const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
       ok(message.includes('loading students'))
+    })
+  })
+
+  QUnit.module('when a provisional grade selection succeeds', hooks => {
+    hooks.beforeEach(() => {
+      mountComponent()
+      const gradeInfo = {
+        grade: 'A',
+        graderId: '1101',
+        id: '4601',
+        score: 10,
+        selected: false,
+        studentId: '1111'
+      }
+      store.dispatch(GradeActions.setSelectProvisionalGradeStatus(gradeInfo, GradeActions.SUCCESS))
+    })
+
+    test('displays a flash alert', () => {
+      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+    })
+
+    test('uses the success type', () => {
+      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
+      equal(type, 'success')
+    })
+
+    test('includes a "Grade saved" message', () => {
+      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
+      equal(message, 'Grade saved.')
+    })
+  })
+
+  QUnit.module('when a provisional grade selection fails', hooks => {
+    hooks.beforeEach(() => {
+      mountComponent()
+      const gradeInfo = {
+        grade: 'A',
+        graderId: '1101',
+        id: '4601',
+        score: 10,
+        selected: false,
+        studentId: '1111'
+      }
+      store.dispatch(GradeActions.setSelectProvisionalGradeStatus(gradeInfo, GradeActions.FAILURE))
+    })
+
+    test('displays a flash alert', () => {
+      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+    })
+
+    test('uses the error type', () => {
+      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
+      equal(type, 'error')
+    })
+
+    test('includes a message about saving the grade', () => {
+      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
+      equal(message, 'There was a problem saving the grade.')
     })
   })
 

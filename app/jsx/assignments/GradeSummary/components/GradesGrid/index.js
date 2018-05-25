@@ -17,7 +17,7 @@
  */
 
 import React, {Component} from 'react'
-import {arrayOf, shape, string} from 'prop-types'
+import {arrayOf, func, shape, string} from 'prop-types'
 import View from '@instructure/ui-layout/lib/components/View'
 import I18n from 'i18n!assignment_grade_summary'
 
@@ -56,12 +56,18 @@ export default class GradesGrid extends Component {
       })
     ).isRequired,
     grades: shape({}).isRequired,
+    onGradeSelect: func,
+    selectProvisionalGradeStatuses: shape({}).isRequired,
     students: arrayOf(
       shape({
         displayName: string,
         id: string.isRequired
       }).isRequired
     ).isRequired
+  }
+
+  static defaultProps = {
+    onGradeSelect: null
   }
 
   constructor(props) {
@@ -98,7 +104,9 @@ export default class GradesGrid extends Component {
               graders={this.props.graders}
               grades={this.props.grades}
               horizontalScrollRef={props.horizontalScrollRef}
+              onGradeSelect={this.props.onGradeSelect}
               rows={rows}
+              selectProvisionalGradeStatuses={this.props.selectProvisionalGradeStatuses}
             />
           )}
         </FocusableView>
