@@ -91,6 +91,7 @@ export default class FlashAlert extends React.Component {
     if (!liveRegion) {
       liveRegion = document.createElement('div')
       liveRegion.id = screenreaderMessageHolderId
+      liveRegion.setAttribute('role', 'alert')
       document.body.appendChild(liveRegion)
     }
     return liveRegion

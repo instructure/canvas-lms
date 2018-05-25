@@ -63,7 +63,6 @@ function getAllStudentsPages(url, callbacks) {
     })
     .catch(response => {
       callbacks.onFailure(response)
-      return Promise.reject(response) // allow for shared error handling
     })
 }
 

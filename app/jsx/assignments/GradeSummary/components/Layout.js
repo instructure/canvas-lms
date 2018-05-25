@@ -26,6 +26,7 @@ import I18n from 'i18n!assignment_grade_summary'
 
 import '../../../context_cards/StudentContextCardTrigger'
 import {loadStudents} from '../students/StudentActions'
+import FlashMessageHolder from './FlashMessageHolder'
 import GradesGrid from './GradesGrid'
 import Header from './Header'
 
@@ -73,6 +74,8 @@ class Layout extends Component {
 
     return (
       <div>
+        <FlashMessageHolder />
+
         <Header assignment={this.props.assignment} />
 
         <View as="div" margin="large 0 0 0">
