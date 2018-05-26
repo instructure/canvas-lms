@@ -36,14 +36,17 @@ class Header extends Component {
       title: string.isRequired
     }).isRequired,
     canPublish: bool.isRequired,
+    canUnmute: bool.isRequired,
     publishGrades: func.isRequired,
-    showNoGradersMessage: bool.isRequired
+    showNoGradersMessage: bool.isRequired,
+    unmuteAssignment: func.isRequired
   }
 
   constructor(props) {
     super(props)
 
     this.handlePublishClick = this.handlePublishClick.bind(this)
+    this.handleUnmuteClick = this.handleUnmuteClick.bind(this)
   }
 
   handlePublishClick() {
@@ -52,6 +55,15 @@ class Header extends Component {
     )
     if (window.confirm(message)) {
       this.props.publishGrades()
+    }
+  }
+
+  handleUnmuteClick() {
+    const message = I18n.t(
+      'Are you sure you want to display grades for this assignment to students?'
+    )
+    if (window.confirm(message)) {
+      this.props.unmuteAssignment()
     }
   }
 
@@ -82,10 +94,15 @@ class Header extends Component {
         <View as="div" margin="large 0 0 0" textAlign="end">
           <Button
             disabled={!this.props.canPublish}
+            margin="0 x-small 0 0"
             onClick={this.handlePublishClick}
             variant="primary"
           >
             {I18n.t('Post')}
+          </Button>
+
+          <Button disabled={!this.props.canUnmute} onClick={this.handleUnmuteClick}>
+            {I18n.t('Display to Students')}
           </Button>
         </View>
       </header>
@@ -94,12 +111,14 @@ class Header extends Component {
 }
 
 function mapStateToProps(state) {
-  const {assignment, publishGradesStatus} = state.assignment
+  const {assignment, publishGradesStatus, unmuteAssignmentStatus} = state.assignment
+  const {gradesPublished, muted} = assignment
 
   return {
     assignment,
-    canPublish: !assignment.gradesPublished && publishGradesStatus !== AssignmentActions.STARTED,
-    showNoGradersMessage: !assignment.gradesPublished && state.context.graders.length === 0
+    canPublish: !gradesPublished && publishGradesStatus !== AssignmentActions.STARTED,
+    canUnmute: gradesPublished && muted && unmuteAssignmentStatus !== AssignmentActions.STARTED,
+    showNoGradersMessage: !gradesPublished && state.context.graders.length === 0
   }
 }
 
@@ -107,6 +126,10 @@ function mapDispatchToProps(dispatch) {
   return {
     publishGrades() {
       dispatch(AssignmentActions.publishGrades())
+    },
+
+    unmuteAssignment() {
+      dispatch(AssignmentActions.unmuteAssignment())
     }
   }
 }

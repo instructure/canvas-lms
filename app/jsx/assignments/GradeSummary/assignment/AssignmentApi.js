@@ -18,9 +18,14 @@
 
 import axios from 'axios'
 
-/* eslint-disable import/prefer-default-export */
 export function publishGrades(courseId, assignmentId) {
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/provisional_grades/publish`
 
   return axios.post(url)
+}
+
+export function unmuteAssignment(courseId, assignmentId) {
+  const url = `/courses/${courseId}/assignments/${assignmentId}/mute?status=false`
+
+  return axios.put(url)
 }

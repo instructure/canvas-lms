@@ -89,4 +89,29 @@ QUnit.module('GradeSummary assignmentReducer()', suiteHooks => {
       equal(getPublishGradesStatus(), 'NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE')
     })
   })
+
+  QUnit.module('when handling "SET_UNMUTE_ASSIGNMENT_STATUS"', () => {
+    function setUnmuteAssignmentStatus(status) {
+      store.dispatch(AssignmentActions.setUnmuteAssignmentStatus(status))
+    }
+
+    function getUnmuteAssignmentStatus() {
+      return store.getState().assignment.unmuteAssignmentStatus
+    }
+
+    test('optionally sets the "unmute assignment" status to "failure"', () => {
+      setUnmuteAssignmentStatus(AssignmentActions.FAILURE)
+      equal(getUnmuteAssignmentStatus(), 'FAILURE')
+    })
+
+    test('optionally sets the "unmute assignment" status to "started"', () => {
+      setUnmuteAssignmentStatus(AssignmentActions.STARTED)
+      equal(getUnmuteAssignmentStatus(), 'STARTED')
+    })
+
+    test('optionally sets the "unmute assignment" status to "success"', () => {
+      setUnmuteAssignmentStatus(AssignmentActions.SUCCESS)
+      equal(getUnmuteAssignmentStatus(), 'SUCCESS')
+    })
+  })
 })

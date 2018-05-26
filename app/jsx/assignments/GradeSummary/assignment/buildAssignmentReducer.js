@@ -17,13 +17,22 @@
  */
 
 import buildReducer from '../buildReducer'
-import {SET_PUBLISH_GRADES_STATUS, UPDATE_ASSIGNMENT} from './AssignmentActions'
+import {
+  SET_PUBLISH_GRADES_STATUS,
+  SET_UNMUTE_ASSIGNMENT_STATUS,
+  UPDATE_ASSIGNMENT
+} from './AssignmentActions'
 
 const handlers = {}
 
 handlers[SET_PUBLISH_GRADES_STATUS] = (state, {payload}) => ({
   ...state,
   publishGradesStatus: payload.status
+})
+
+handlers[SET_UNMUTE_ASSIGNMENT_STATUS] = (state, {payload}) => ({
+  ...state,
+  unmuteAssignmentStatus: payload.status
 })
 
 handlers[UPDATE_ASSIGNMENT] = (state, {payload}) => ({
@@ -34,6 +43,7 @@ handlers[UPDATE_ASSIGNMENT] = (state, {payload}) => ({
 export default function buildAssignmentReducer(env) {
   return buildReducer(handlers, {
     assignment: env.assignment,
-    publishGradesStatus: null
+    publishGradesStatus: null,
+    unmuteAssignmentStatus: null
   })
 }

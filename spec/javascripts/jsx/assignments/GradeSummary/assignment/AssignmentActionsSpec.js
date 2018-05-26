@@ -121,4 +121,70 @@ QUnit.module('GradeSummary AssignmentActions', suiteHooks => {
       equal(publishGradesStatus, AssignmentActions.FAILURE)
     })
   })
+
+  QUnit.module('.unmuteAssignment()', hooks => {
+    let args
+    let rejectPromise
+    let resolvePromise
+
+    hooks.beforeEach(() => {
+      const fakePromise = {
+        then(callback) {
+          resolvePromise = callback
+          return fakePromise
+        },
+
+        catch(callback) {
+          rejectPromise = callback
+        }
+      }
+
+      sinon.stub(AssignmentApi, 'unmuteAssignment').callsFake((courseId, assignmentId) => {
+        args = {courseId, assignmentId}
+        return fakePromise
+      })
+
+      store.dispatch(AssignmentActions.unmuteAssignment())
+    })
+
+    hooks.afterEach(() => {
+      args = null
+      AssignmentApi.unmuteAssignment.restore()
+    })
+
+    test('sets the "unmuted assignment" status to "started"', () => {
+      const {unmuteAssignmentStatus} = store.getState().assignment
+      equal(unmuteAssignmentStatus, AssignmentActions.STARTED)
+    })
+
+    test('publishes grades through the api', () => {
+      strictEqual(AssignmentApi.unmuteAssignment.callCount, 1)
+    })
+
+    test('includes the course id when publishing through the api', () => {
+      strictEqual(args.courseId, '1201')
+    })
+
+    test('includes the assignment id when publishing through the api', () => {
+      strictEqual(args.assignmentId, '2301')
+    })
+
+    test('updates the assignment in the store when the request succeeds', () => {
+      resolvePromise()
+      const {assignment} = store.getState().assignment
+      strictEqual(assignment.muted, false)
+    })
+
+    test('sets the "unmuted assignment" status to "success" when the request succeeds', () => {
+      resolvePromise()
+      const {unmuteAssignmentStatus} = store.getState().assignment
+      equal(unmuteAssignmentStatus, AssignmentActions.SUCCESS)
+    })
+
+    test('sets the "unmuted assignment" status to "failure" when the request fails', () => {
+      rejectPromise(new Error('server error'))
+      const {unmuteAssignmentStatus} = store.getState().assignment
+      equal(unmuteAssignmentStatus, AssignmentActions.FAILURE)
+    })
+  })
 })

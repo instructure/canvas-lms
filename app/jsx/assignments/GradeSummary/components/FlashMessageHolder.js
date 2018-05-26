@@ -64,15 +64,31 @@ function announcePublishGradesStatus(status) {
   showFlashAlert({message, type})
 }
 
+function announceUnmuteAssignmentStatus(status) {
+  if (status === AssignmentActions.SUCCESS) {
+    showFlashAlert({
+      message: I18n.t('Grades for this assignment are now visible to students.'),
+      type: 'success'
+    })
+  } else if (status === AssignmentActions.FAILURE) {
+    showFlashAlert({
+      message: I18n.t('There was a problem updating the assignment.'),
+      type: 'error'
+    })
+  }
+}
+
 class FlashMessageHolder extends Component {
   static propTypes = {
     loadStudentsStatus: oneOf(enumeratedStatuses(StudentActions)),
-    publishGradesStatus: oneOf(assignmentStatuses)
+    publishGradesStatus: oneOf(assignmentStatuses),
+    unmuteAssignmentStatus: oneOf(enumeratedStatuses(AssignmentActions))
   }
 
   static defaultProps = {
     loadStudentsStatus: null,
-    publishGradesStatus: null
+    publishGradesStatus: null,
+    unmuteAssignmentStatus: null
   }
 
   componentWillReceiveProps(nextProps) {
@@ -93,6 +109,10 @@ class FlashMessageHolder extends Component {
     if (changes.publishGradesStatus) {
       announcePublishGradesStatus(nextProps.publishGradesStatus)
     }
+
+    if (changes.unmuteAssignmentStatus) {
+      announceUnmuteAssignmentStatus(nextProps.unmuteAssignmentStatus)
+    }
   }
 
   render() {
@@ -103,7 +123,8 @@ class FlashMessageHolder extends Component {
 function mapStateToProps(state) {
   return {
     loadStudentsStatus: state.students.loadStudentsStatus,
-    publishGradesStatus: state.assignment.publishGradesStatus
+    publishGradesStatus: state.assignment.publishGradesStatus,
+    unmuteAssignmentStatus: state.assignment.unmuteAssignmentStatus
   }
 }
 

@@ -17,7 +17,7 @@
  */
 
 import * as AssignmentApi from 'jsx/assignments/GradeSummary/assignment/AssignmentApi'
-import FakeServer, {pathFromRequest} from 'jsx/__tests__/FakeServer'
+import FakeServer, {paramsFromRequest, pathFromRequest} from 'jsx/__tests__/FakeServer'
 
 QUnit.module('GradeSummary AssignmentApi', suiteHooks => {
   let qunitTimeout
@@ -55,6 +55,40 @@ QUnit.module('GradeSummary AssignmentApi', suiteHooks => {
       server.for(url).respond({status: 500, body: {error: 'server error'}})
       try {
         await AssignmentApi.publishGrades('1201', '2301')
+      } catch (e) {
+        ok(e.message.includes('500'))
+      }
+    })
+  })
+
+  QUnit.module('.unmuteAssignment()', () => {
+    const url = `/courses/1201/assignments/2301/mute`
+
+    test('sends a request to unmute the assignment', async () => {
+      server.for(url).respond({status: 200, body: {}})
+      await AssignmentApi.unmuteAssignment('1201', '2301')
+      const request = server.receivedRequests[0]
+      equal(pathFromRequest(request), url)
+    })
+
+    test('sets muted status to false', async () => {
+      server.for(url).respond({status: 200, body: {}})
+      await AssignmentApi.unmuteAssignment('1201', '2301')
+      const request = server.receivedRequests[0]
+      equal(paramsFromRequest(request).status, 'false')
+    })
+
+    test('sends a PUT request', async () => {
+      server.for(url).respond({status: 200, body: {}})
+      await AssignmentApi.unmuteAssignment('1201', '2301')
+      const request = server.receivedRequests[0]
+      equal(request.method, 'PUT')
+    })
+
+    test('does not catch failures', async () => {
+      server.for(url).respond({status: 500, body: {error: 'server error'}})
+      try {
+        await AssignmentApi.unmuteAssignment('1201', '2301')
       } catch (e) {
         ok(e.message.includes('500'))
       }

@@ -22,12 +22,17 @@ export const FAILURE = 'FAILURE'
 export const GRADES_ALREADY_PUBLISHED = 'GRADES_ALREADY_PUBLISHED'
 export const NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE = 'NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE'
 export const SET_PUBLISH_GRADES_STATUS = 'SET_PUBLISH_GRADES_STATUS'
+export const SET_UNMUTE_ASSIGNMENT_STATUS = 'SET_UNMUTE_ASSIGNMENT_STATUS'
 export const STARTED = 'STARTED'
 export const SUCCESS = 'SUCCESS'
 export const UPDATE_ASSIGNMENT = 'UPDATE_ASSIGNMENT'
 
 export function setPublishGradesStatus(status) {
   return {type: SET_PUBLISH_GRADES_STATUS, payload: {status}}
+}
+
+export function setUnmuteAssignmentStatus(status) {
+  return {type: SET_UNMUTE_ASSIGNMENT_STATUS, payload: {status}}
 }
 
 export function updateAssignment(assignment) {
@@ -57,6 +62,23 @@ export function publishGrades() {
           default:
             dispatch(setPublishGradesStatus(FAILURE))
         }
+      })
+  }
+}
+
+export function unmuteAssignment() {
+  return function(dispatch, getState) {
+    const {assignment} = getState().assignment
+
+    dispatch(setUnmuteAssignmentStatus(STARTED))
+
+    AssignmentApi.unmuteAssignment(assignment.courseId, assignment.id)
+      .then(() => {
+        dispatch(updateAssignment({muted: false}))
+        dispatch(setUnmuteAssignmentStatus(SUCCESS))
+      })
+      .catch(() => {
+        dispatch(setUnmuteAssignmentStatus(FAILURE))
       })
   }
 }

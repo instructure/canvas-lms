@@ -176,4 +176,52 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
       equal(message, 'There was a problem publishing grades.')
     })
   })
+
+  test('does not display a flash alert when unmuting the assignment starts', () => {
+    mountComponent()
+    store.dispatch(AssignmentActions.setUnmuteAssignmentStatus(AssignmentActions.STARTED))
+    strictEqual(FlashAlert.showFlashAlert.callCount, 0)
+  })
+
+  QUnit.module('when unmuting the assignment succeeds', hooks => {
+    hooks.beforeEach(() => {
+      mountComponent()
+      store.dispatch(AssignmentActions.setUnmuteAssignmentStatus(AssignmentActions.SUCCESS))
+    })
+
+    test('displays a flash alert', () => {
+      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+    })
+
+    test('uses the success type', () => {
+      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
+      equal(type, 'success')
+    })
+
+    test('includes a message about grades being visible to students', () => {
+      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
+      equal(message, 'Grades for this assignment are now visible to students.')
+    })
+  })
+
+  QUnit.module('when unmuting the assignment fails', hooks => {
+    hooks.beforeEach(() => {
+      mountComponent()
+      store.dispatch(AssignmentActions.setUnmuteAssignmentStatus(AssignmentActions.FAILURE))
+    })
+
+    test('displays a flash alert', () => {
+      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+    })
+
+    test('uses the error type', () => {
+      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
+      equal(type, 'error')
+    })
+
+    test('includes a message about updating the assignment', () => {
+      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
+      equal(message, 'There was a problem updating the assignment.')
+    })
+  })
 })
