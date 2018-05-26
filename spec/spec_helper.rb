@@ -191,9 +191,8 @@ require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
 
 require 'i18n_tasks'
 
-factories = "#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb"
 legit_global_methods = Object.private_methods
-Dir.glob(factories).each { |file| require file }
+Dir[File.dirname(__FILE__) + "/factories/**/*.rb"].each {|f| require f }
 crap_factories = (Object.private_methods - legit_global_methods)
 if crap_factories.present?
   $stderr.puts "\e[31mError: Don't create global factories/helpers"
@@ -203,8 +202,7 @@ if crap_factories.present?
   exit! 1
 end
 
-examples = "#{File.dirname(__FILE__).gsub(/\\/, "/")}/shared_examples/*.rb"
-Dir.glob(examples).each { |file| require file }
+Dir[File.dirname(__FILE__) + "/shared_examples/**/*.rb"].each {|f| require f }
 
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
@@ -239,6 +237,27 @@ RSpec::Matchers.define :match_ignoring_whitespace do |expected|
 
   match do |actual|
     whitespaceless(actual) == whitespaceless(expected)
+  end
+end
+
+RSpec::Matchers.define :match_path do |expected|
+  match do |actual|
+    path = URI(actual).path
+    values_match?(expected, path)
+  end
+end
+
+RSpec::Matchers.define :and_query do |expected|
+  match do |actual|
+    query = Rack::Utils.parse_query(URI(actual).query)
+    values_match?(expected, query)
+  end
+end
+
+RSpec::Matchers.define :and_fragment do |expected|
+  match do |actual|
+    fragment = JSON.parse(URI.decode_www_form_component(URI(actual).fragment))
+    values_match?(expected, fragment)
   end
 end
 
@@ -863,16 +882,11 @@ class I18n::Backend::Simple
   alias_method :available_locales_without_stubs, :available_locales
 end
 
-Dir[Rails.root+'{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb'].each do |f|
-  require f
-end
+Dir[Rails.root+'{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb'].each { |file| require file }
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
-    # Choose a test framework:
     with.test_framework :rspec
-
-    # Choose one or more libraries:
     with.library :active_record
     with.library :active_model
     # Disable the action_controller matchers until shoulda-matchers supports new compound matchers

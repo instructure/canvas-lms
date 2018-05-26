@@ -1115,7 +1115,10 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/assignments/:assignment_id/gradeable_students", action: :gradeable_students, as: "course_assignment_gradeable_students"
     end
 
-
+    scope(controller: :anonymous_provisional_grades) do
+      get "courses/:course_id/assignments/:assignment_id/anonymous_provisional_grades/status",
+        action: :status, as: "course_assignment_anonymous_provisional_status"
+    end
 
     scope(controller: :provisional_grades) do
       get "courses/:course_id/assignments/:assignment_id/provisional_grades/status", action: :status, as: "course_assignment_provisional_status"

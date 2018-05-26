@@ -329,13 +329,16 @@ module Api::V1::Submission
   end
 
   def speed_grader_url(submission, assignment, provisional_grade)
+    anchor = { provisional_grade_id: provisional_grade.id }
+    if assignment.anonymous_grading?
+      anchor[:anonymous_id] = submission.anonymous_id
+    else
+      anchor[:student_id] = submission.user_id
+    end
     speed_grader_course_gradebook_url(
-      :course_id => assignment.context.id,
-      :assignment_id => assignment.id,
-      :anchor => {
-        student_id: submission.user_id,
-        provisional_grade_id: provisional_grade.id
-      }.to_json
+      course_id: assignment.context.id,
+      assignment_id: assignment.id,
+      anchor: anchor.to_json
     )
   end
 end

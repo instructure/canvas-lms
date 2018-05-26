@@ -634,9 +634,6 @@ class GradebooksController < ApplicationController
           show_help_menu_item: show_help_link?,
           help_url: help_link_url
         }
-        if [:moderator, :provisional_grader].include?(grading_role)
-          env[:provisional_status_url] = api_v1_course_assignment_provisional_status_path(@context.id, @assignment.id)
-        end
         if grading_role == :moderator
           env[:provisional_copy_url] = api_v1_copy_to_final_mark_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")

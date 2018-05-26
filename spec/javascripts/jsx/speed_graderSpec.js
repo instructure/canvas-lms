@@ -1331,7 +1331,7 @@ QUnit.module('SpeedGrader', function() {
       user_id: '1',
       grade_matches_current_submission: true,
       workflow_state: 'active',
-      submitted_at: new Date(),
+      submitted_at: (new Date).toISOString(),
       grade: 'A',
       assignment_id: '456'
     }
@@ -1418,7 +1418,8 @@ QUnit.module('SpeedGrader', function() {
       ...alpha,
       grade_matches_current_submission: true,
       workflow_state: 'active',
-      submitted_at: new Date(),
+      submitted_at: (new Date).toISOString(),
+      updated_at: (new Date).toISOString(),
       grade: 'A',
       assignment_id: '456',
       versioned_attachments: [{
@@ -1723,6 +1724,7 @@ QUnit.module('SpeedGrader', function() {
     })
 
     QUnit.module('#handleStudentChanged', hooks => {
+      let getJSON
       hooks.beforeEach(() => {
         fakeENV.setup({
           ...ENV,
@@ -1733,7 +1735,7 @@ QUnit.module('SpeedGrader', function() {
           show_help_menu_item: false
         })
         fixtures.innerHTML = '<span id="speedgrader-settings"></span>'
-        sinon.stub($, 'getJSON')
+        getJSON = sinon.stub($, 'getJSON')
         sinon.stub($, 'ajaxJSON')
         SpeedGrader.setup()
         window.jsonData = windowJsonData
@@ -1742,7 +1744,7 @@ QUnit.module('SpeedGrader', function() {
 
       hooks.afterEach(() => {
         $.ajaxJSON.restore()
-        $.getJSON.restore()
+        getJSON.restore()
         fixtures.innerHTML = ''
         fakeENV.teardown()
         window.jsonData = originalJsonData
@@ -1755,6 +1757,18 @@ QUnit.module('SpeedGrader', function() {
         setupCurrentStudent()
         deepEqual(JSON.parse(decodeURIComponent(document.location.hash.substr(1))), alpha)
       })
+
+      test('url fetches the anonymous_provisional_grades', () => {
+        SpeedGrader.EG.currentStudent = {
+          ...alphaStudent,
+          submission: alphaSubmission
+        };
+        setupCurrentStudent();
+        const [url] = getJSON.firstCall.args;
+        const {course_id: courseId, assignment_id: assignmentId} = ENV;
+        const params = `anonymous_id=${alphaStudent.anonymous_id}&last_updated_at=${alphaSubmission.updated_at}`;
+        strictEqual(url, `/api/v1/courses/${courseId}/assignments/${assignmentId}/anonymous_provisional_grades/status?${params}`);
+      });
     })
 
     QUnit.module('#handleSubmissionSelectionChange', hooks => {

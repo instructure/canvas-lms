@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2015 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,67 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require_relative '../api_spec_helper'
 
 describe 'Provisional Grades API', type: :request do
-  shared_examples 'authorization when Anonymous Moderated Marking is enabled' do
-    before(:once) { @course.root_account.enable_feature!(:anonymous_moderated_marking) }
-
-    it 'is unauthorized if the user is not the assigned final grader' do
-      api_call_as_user(@teacher, http_verb, @path, @params, {}, {}, expected_status: 401)
-    end
-
-    it 'is unauthorized if the user is an account admin without "Select Final Grade for Moderation" permission' do
-      @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :select_final_grade)
-      api_call_as_user(account_admin_user, http_verb, @path, @params, {}, {}, expected_status: 401)
-    end
-
-    it 'is authorized if the user is the final grader' do
-      @assignment.update!(final_grader: @teacher, grader_count: 2)
-      api_call_as_user(@teacher, http_verb, @path, @params, {}, {}, expected_status: 200)
-    end
-
-    it 'is authorized if the user is an account admin with "Select Final Grade for Moderation" permission' do
-      api_call_as_user(account_admin_user, http_verb, @path, @params, {}, {}, expected_status: 200)
-    end
-  end
-
-  describe "status" do
-    before(:once) do
-      course_with_teacher :active_all => true
-      ta_in_course :active_all => true
-      @student = student_in_course(:active_all => true).user
-      @assignment = @course.assignments.build
-      @assignment.moderated_grading = true
-      @assignment.save!
-      @submission = @assignment.submit_homework @student, :body => 'EHLO'
-      @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/provisional_grades/status"
-      @params = { :controller => 'provisional_grades', :action => 'status',
-                  :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.to_param,
-                  :student_id => @student.to_param }
-    end
-
-    it "should require authorization" do
-      api_call_as_user(@student, :get, @path, @params, {}, {}, { :expected_status => 401 })
-    end
-
-    it "should return whether a student needs a provisional grade" do
-      json = api_call_as_user(@ta, :get, @path, @params)
-      expect(json['needs_provisional_grade']).to be_truthy
-
-      @submission.find_or_create_provisional_grade!(@teacher)
-      json = api_call_as_user(@ta, :get, @path, @params)
-      expect(json['needs_provisional_grade']).to be_falsey
-
-      @assignment.moderated_grading_selections.create!(:student => @student)
-      json = api_call_as_user(@ta, :get, @path, @params)
-      expect(json['needs_provisional_grade']).to be_truthy
-
-      @submission.find_or_create_provisional_grade!(@ta)
-      json = api_call_as_user(@ta, :get, @path, @params)
-      expect(json['needs_provisional_grade']).to be_falsey
-    end
-  end
+  it_behaves_like 'a provisional grades status action', :provisional_grades
 
   describe "select" do
     before(:once) do
@@ -119,9 +62,7 @@ describe 'Provisional Grades API', type: :request do
         expect(@selection.reload.provisional_grade).to eq(@pg)
       end
 
-      it_behaves_like 'authorization when Anonymous Moderated Marking is enabled' do
-        let(:http_verb) { :put }
-      end
+      it_behaves_like 'authorization when Anonymous Moderated Marking is enabled', :put
     end
   end
 
@@ -169,9 +110,7 @@ describe 'Provisional Grades API', type: :request do
       expect(json['crocodoc_urls']).to eq([])
     end
 
-    it_behaves_like 'authorization when Anonymous Moderated Marking is enabled' do
-      let(:http_verb) { :post }
-    end
+    it_behaves_like 'authorization when Anonymous Moderated Marking is enabled', :post
   end
 
   describe "publish" do
@@ -372,9 +311,7 @@ describe 'Provisional Grades API', type: :request do
         end
       end
 
-      it_behaves_like 'authorization when Anonymous Moderated Marking is enabled' do
-        let(:http_verb) { :post }
-      end
+      it_behaves_like 'authorization when Anonymous Moderated Marking is enabled', :post
     end
   end
 end

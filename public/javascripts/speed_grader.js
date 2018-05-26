@@ -1316,9 +1316,13 @@ EG = {
         this.currentStudent.submission.grade = null; // otherwise it may be tricked into showing the wrong submission_state
       }
 
-      let status_url = `${ENV.provisional_status_url}?student_id=${this.currentStudent[anonymizableId]}`
+      const {course_id: courseId, assignment_id: assignmentId} = ENV;
+      const resourceSegment = isAnonymous ? 'anonymous_provisional_grades' : 'provisional_grades';
+      const resourceUrl = `/api/v1/courses/${courseId}/assignments/${assignmentId}/${resourceSegment}/status`;
+
+      let status_url = `${resourceUrl}?${anonymizableStudentId}=${this.currentStudent[anonymizableId]}`;
       if (ENV.grading_role == 'moderator') {
-        status_url += "&last_updated_at="
+        status_url += "&last_updated_at=";
         if (this.currentStudent.submission) status_url += this.currentStudent.submission.updated_at;
       }
 
