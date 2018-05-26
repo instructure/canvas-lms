@@ -19,7 +19,8 @@
 /* eslint-disable react/no-array-index-key */
 
 import React, {Component} from 'react'
-import {arrayOf, shape, string} from 'prop-types'
+import {arrayOf, func, shape, string} from 'prop-types'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import I18n from 'i18n!assignment_grade_summary'
 
@@ -34,6 +35,7 @@ export default class Grid extends Component {
       })
     ).isRequired,
     grades: shape({}).isRequired,
+    horizontalScrollRef: func.isRequired,
     rows: arrayOf(
       shape({
         studentId: string.isRequired,
@@ -48,16 +50,25 @@ export default class Grid extends Component {
 
   render() {
     return (
-      <div className="GradesGrid">
-        <table>
-          <thead className="GradesGrid__Header">
-            <tr className="GradesGrid__HeaderRow">
-              <th className="GradesGrid__StudentColumnHeader" scope="col">
+      <div className="GradesGrid" ref={this.props.horizontalScrollRef}>
+        <table role="table">
+          <caption>
+            {<ScreenReaderContent>{I18n.t('Grade Selection Table')}</ScreenReaderContent>}
+          </caption>
+
+          <thead>
+            <tr className="GradesGrid__HeaderRow" role="row">
+              <th className="GradesGrid__StudentColumnHeader" role="columnheader" scope="col">
                 <Text>{I18n.t('Student')}</Text>
               </th>
 
               {this.props.graders.map((grader, index) => (
-                <th className="GradesGrid__GraderHeader" key={grader.graderId} scope="col">
+                <th
+                  className="GradesGrid__GraderHeader"
+                  key={grader.graderId}
+                  role="columnheader"
+                  scope="col"
+                >
                   <Text>
                     {grader.graderName ||
                       I18n.t('Grader %{graderNumber}', {graderNumber: I18n.n(index + 1)})}
@@ -67,7 +78,7 @@ export default class Grid extends Component {
             </tr>
           </thead>
 
-          <tbody className="GradesGrid__Body">
+          <tbody>
             {this.props.rows.map((row, index) => (
               <GridRow
                 graders={this.props.graders}

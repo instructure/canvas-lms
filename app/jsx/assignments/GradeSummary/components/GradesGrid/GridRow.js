@@ -51,8 +51,8 @@ export default class GridRow extends Component {
 
   render() {
     return (
-      <tr className={`GradesGrid__BodyRow student_${this.props.row.studentId}`}>
-        <th className="GradesGrid__BodyRowHeader" scope="row">
+      <tr className={`GradesGrid__BodyRow student_${this.props.row.studentId}`} role="row">
+        <th className="GradesGrid__BodyRowHeader" role="rowheader" scope="row">
           <Text>{this.props.row.studentName}</Text>
         </th>
 
@@ -60,7 +60,7 @@ export default class GridRow extends Component {
           const classNames = ['GradesGrid__ProvisionalGradeCell', `grader_${grader.graderId}`]
 
           return (
-            <td className={classNames.join(' ')} key={grader.graderId}>
+            <td className={classNames.join(' ')} key={grader.graderId} role="cell">
               <Text>{getGrade(grader.graderId, this.props.grades)}</Text>
             </td>
           )

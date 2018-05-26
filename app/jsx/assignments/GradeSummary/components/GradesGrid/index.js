@@ -21,6 +21,7 @@ import {arrayOf, shape, string} from 'prop-types'
 import View from '@instructure/ui-layout/lib/components/View'
 import I18n from 'i18n!assignment_grade_summary'
 
+import FocusableView from '../FocusableView'
 import Grid from './Grid'
 import PageNavigation from './PageNavigation'
 
@@ -90,8 +91,17 @@ export default class GradesGrid extends Component {
     const rows = this.state.pages[this.state.currentPageIndex]
 
     return (
-      <div className="GradesGridContainer">
-        <Grid graders={this.props.graders} grades={this.props.grades} rows={rows} />
+      <div>
+        <FocusableView>
+          {props => (
+            <Grid
+              graders={this.props.graders}
+              grades={this.props.grades}
+              horizontalScrollRef={props.horizontalScrollRef}
+              rows={rows}
+            />
+          )}
+        </FocusableView>
 
         {this.state.pages.length > 1 && (
           <View as="div" margin="medium">

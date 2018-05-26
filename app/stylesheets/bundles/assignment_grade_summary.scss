@@ -20,9 +20,9 @@
 
 $headerHeight: 50px;
 $rowHeight: 50px;
-$graderColumnWidth: 116px;
+$graderColumnWidth: 156px;
 $studentColumnWidth: 200px;
-$maxGridBodyHeight: $rowHeight * 10;
+$headerBorderColor: rgb(199, 205, 209);
 
 .ic-Layout-columns {
   display: flex;
@@ -34,59 +34,80 @@ $maxGridBodyHeight: $rowHeight * 10;
   width: 100%;
 }
 
-.GradesGridContainer {
-  overflow: hidden;
+/* FocusableView */
+
+.FocusableView {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -0.25rem;
+    left: -0.25rem; /* stylelint-disable-line property-blacklist */
+    right: -0.25rem; /* stylelint-disable-line property-blacklist */
+    bottom: -0.25rem;
+    border: 1px solid var(--ic-link-color);
+    border-radius: $borderRadiusLarge;
+    opacity: 0;
+    transform: scale(0.01);
+    transition: all 0.2s;
+    pointer-events: none;
+  }
+
+  &:focus {
+    outline: none;
+
+    &::before {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
 }
+
+/* End FocusableView */
 
 /* GradesGrid */
 
 .GradesGrid {
+  background: white;
   overflow-x: auto;
+  // position: relative;
 
   &, * {
     box-sizing: border-box;
   }
 
   tr {
-    display: block;
     white-space: nowrap;
   }
 
   th, td {
-    display: inline-block;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 }
 
-.GradesGrid__Header {
-  display: block;
-}
-
 .GradesGrid__HeaderRow {
+  border-bottom: 1px solid $headerBorderColor;
   height: $headerHeight;
   line-height: $headerHeight;
 }
 
 .GradesGrid__GraderHeader {
+  max-width: $graderColumnWidth;
+  min-width: $graderColumnWidth;
   overflow: hidden;
   padding: 0 $ic-sp;
-  text-align: center;
+  text-align: direction(left);
   text-overflow: ellipsis;
-  width: $graderColumnWidth;
 }
 
 .GradesGrid__StudentColumnHeader {
+  max-width: $studentColumnWidth;
+  min-width: $studentColumnWidth;
   padding: 0 $ic-sp;
-  text-align: start;
+  text-align: direction(left);
   text-overflow: ellipsis;
-  width: $studentColumnWidth;
-}
-
-.GradesGrid__Body {
-  display: block;
-  max-height: $maxGridBodyHeight;
-  overflow-y: auto;
 }
 
 .GradesGrid__BodyRow {
@@ -97,13 +118,14 @@ $maxGridBodyHeight: $rowHeight * 10;
 .GradesGrid__BodyRowHeader {
   font-weight: normal;
   padding: 0 $ic-sp;
-  text-align: start;
+  text-align: direction(left);
   width: $studentColumnWidth;
 }
 
 .GradesGrid__ProvisionalGradeCell {
-  text-align: center;
-  width: $graderColumnWidth;
+  max-width: $graderColumnWidth;
+  padding: 0 $ic-sp;
+  text-align: direction(left);
 }
 
 /* End GradesGrid */

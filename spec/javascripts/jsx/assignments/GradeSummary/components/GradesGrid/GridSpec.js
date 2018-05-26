@@ -31,6 +31,7 @@ QUnit.module('GradeSummary Grid', suiteHooks => {
         {graderId: '1101', graderName: 'Miss Frizzle'},
         {graderId: '1102', graderName: 'Mr. Keating'}
       ],
+
       grades: {
         1111: {
           1101: {
@@ -71,6 +72,8 @@ QUnit.module('GradeSummary Grid', suiteHooks => {
           }
         }
       },
+
+      horizontalScrollRef: sinon.spy(),
       rows: [
         {studentId: '1111', studentName: 'Adam Jones'},
         {studentId: '1112', studentName: 'Betty Ford'},
@@ -129,5 +132,11 @@ QUnit.module('GradeSummary Grid', suiteHooks => {
     mountComponent()
     const gridRow = wrapper.find('GridRow').at(1)
     strictEqual(gridRow.prop('row'), props.rows[1])
+  })
+
+  test('binds the GradesGrid container using the horizontalScrollRef prop', () => {
+    mountComponent()
+    const [ref] = props.horizontalScrollRef.lastCall.args
+    strictEqual(ref, wrapper.find('.GradesGrid').get(0))
   })
 })
