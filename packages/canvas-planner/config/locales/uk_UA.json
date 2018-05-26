@@ -83,9 +83,6 @@
   "title_is_required_6ddcab69": {
     "message": "титул обов''язковий"
   },
-  "assignmenttype_title_is_complete_813e54f8": {
-    "message": "{ assignmentType } { title } завершено"
-  },
   "date_at_time_dbdb1b99": {
     "message": "{ date } в { time }"
   },
@@ -106,9 +103,6 @@
   },
   "no_due_dates_assigned_e8f5bac8": {
     "message": "Дату визначення не призначено "
-  },
-  "assignmenttype_title_is_incomplete_a1d5fac0": {
-    "message": "{ assignmentType } { title } є неповним"
   },
   "save_11a80ec3": {
     "message": "Зберегти"
