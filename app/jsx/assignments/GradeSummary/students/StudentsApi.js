@@ -27,10 +27,10 @@ function normalizeStudentPage(data) {
   const provisionalGrades = []
 
   data.forEach(studentDatum => {
-    const studentId = studentDatum.id
+    const studentId = studentDatum.id || studentDatum.anonymous_id
 
     students.push({
-      displayName: studentDatum.display_name,
+      displayName: studentDatum.display_name || null,
       id: studentId
     })
 
