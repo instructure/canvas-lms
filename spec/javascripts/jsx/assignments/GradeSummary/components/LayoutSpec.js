@@ -25,15 +25,17 @@ import Layout from 'jsx/assignments/GradeSummary/components/Layout'
 import configureStore from 'jsx/assignments/GradeSummary/configureStore'
 
 QUnit.module('GradeSummary Layout', suiteHooks => {
-  let storeEnv
   let store
+  let storeEnv
   let wrapper
 
   suiteHooks.beforeEach(() => {
     storeEnv = {
       assignment: {
         courseId: '1201',
+        gradesPublished: false,
         id: '2301',
+        muted: true,
         title: 'Example Assignment'
       },
       graders: [
@@ -41,6 +43,7 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
         {graderId: '1102', graderName: 'Mr. Keating'}
       ]
     }
+
     sinon
       .stub(StudentActions, 'loadStudents')
       .returns(StudentActions.setLoadStudentsStatus(StudentActions.STARTED))

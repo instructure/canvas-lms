@@ -21,6 +21,7 @@ import {mount} from 'enzyme'
 import {Provider} from 'react-redux'
 
 import * as FlashAlert from 'jsx/shared/FlashAlert'
+import * as AssignmentActions from 'jsx/assignments/GradeSummary/assignment/AssignmentActions'
 import * as StudentActions from 'jsx/assignments/GradeSummary/students/StudentActions'
 import FlashMessageHolder from 'jsx/assignments/GradeSummary/components/FlashMessageHolder'
 import configureStore from 'jsx/assignments/GradeSummary/configureStore'
@@ -77,6 +78,102 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
     test('includes a message about loading students', () => {
       const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
       ok(message.includes('loading students'))
+    })
+  })
+
+  test('does not display a flash alert when publishing grades starts', () => {
+    mountComponent()
+    store.dispatch(AssignmentActions.setPublishGradesStatus(AssignmentActions.STARTED))
+    strictEqual(FlashAlert.showFlashAlert.callCount, 0)
+  })
+
+  QUnit.module('when publishing grades succeeds', hooks => {
+    hooks.beforeEach(() => {
+      mountComponent()
+      store.dispatch(AssignmentActions.setPublishGradesStatus(AssignmentActions.SUCCESS))
+    })
+
+    test('displays a flash alert', () => {
+      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+    })
+
+    test('uses the success type', () => {
+      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
+      equal(type, 'success')
+    })
+
+    test('includes a message about grades being published', () => {
+      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
+      equal(message, 'Grades were successfully published to the gradebook.')
+    })
+  })
+
+  QUnit.module('when publishing grades fails for having already been published', hooks => {
+    hooks.beforeEach(() => {
+      mountComponent()
+      store.dispatch(
+        AssignmentActions.setPublishGradesStatus(AssignmentActions.GRADES_ALREADY_PUBLISHED)
+      )
+    })
+
+    test('displays a flash alert', () => {
+      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+    })
+
+    test('uses the error type', () => {
+      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
+      equal(type, 'error')
+    })
+
+    test('includes a message about grades already being published', () => {
+      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
+      equal(message, 'Assignment grades have already been published.')
+    })
+  })
+
+  QUnit.module('when publishing grades fails for not having all grade selections', hooks => {
+    hooks.beforeEach(() => {
+      mountComponent()
+      store.dispatch(
+        AssignmentActions.setPublishGradesStatus(
+          AssignmentActions.NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE
+        )
+      )
+    })
+
+    test('displays a flash alert', () => {
+      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+    })
+
+    test('uses the error type', () => {
+      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
+      equal(type, 'error')
+    })
+
+    test('includes a message about grades already being published', () => {
+      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
+      equal(message, 'All submissions must have a selected grade.')
+    })
+  })
+
+  QUnit.module('when publishing grades fails for some other reason', hooks => {
+    hooks.beforeEach(() => {
+      mountComponent()
+      store.dispatch(AssignmentActions.setPublishGradesStatus(AssignmentActions.FAILURE))
+    })
+
+    test('displays a flash alert', () => {
+      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+    })
+
+    test('uses the error type', () => {
+      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
+      equal(type, 'error')
+    })
+
+    test('includes a message about grades already being published', () => {
+      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
+      equal(message, 'There was a problem publishing grades.')
     })
   })
 })

@@ -22,29 +22,76 @@ import {connect} from 'react-redux'
 import I18n from 'i18n!assignment_grade_summary'
 
 import {showFlashAlert} from '../../../shared/FlashAlert'
+import * as AssignmentActions from '../assignment/AssignmentActions'
 import * as StudentActions from '../students/StudentActions'
 
 function enumeratedStatuses(actions) {
   return [actions.FAILURE, actions.STARTED, actions.SUCCESS]
 }
 
+const assignmentStatuses = [
+  AssignmentActions.FAILURE,
+  AssignmentActions.GRADES_ALREADY_PUBLISHED,
+  AssignmentActions.NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE,
+  AssignmentActions.STARTED,
+  AssignmentActions.SUCCESS
+]
+
+function announcePublishGradesStatus(status) {
+  let message, type
+
+  switch (status) {
+    case AssignmentActions.SUCCESS:
+      message = I18n.t('Grades were successfully published to the gradebook.')
+      type = 'success'
+      break
+    case AssignmentActions.GRADES_ALREADY_PUBLISHED:
+      message = I18n.t('Assignment grades have already been published.')
+      type = 'error'
+      break
+    case AssignmentActions.NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE:
+      message = I18n.t('All submissions must have a selected grade.')
+      type = 'error'
+      break
+    case AssignmentActions.FAILURE:
+      message = I18n.t('There was a problem publishing grades.')
+      type = 'error'
+      break
+    default:
+      return
+  }
+
+  showFlashAlert({message, type})
+}
+
 class FlashMessageHolder extends Component {
   static propTypes = {
-    loadStudentsStatus: oneOf(enumeratedStatuses(StudentActions))
+    loadStudentsStatus: oneOf(enumeratedStatuses(StudentActions)),
+    publishGradesStatus: oneOf(assignmentStatuses)
   }
 
   static defaultProps = {
-    loadStudentsStatus: null
+    loadStudentsStatus: null,
+    publishGradesStatus: null
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.loadStudentsStatus !== this.props.loadStudentsStatus) {
+    const changes = Object.keys(nextProps).reduce(
+      (changeMap, prop) => ({...changeMap, [prop]: nextProps[prop] !== this.props[prop]}),
+      {}
+    )
+
+    if (changes.loadStudentsStatus) {
       if (nextProps.loadStudentsStatus === StudentActions.FAILURE) {
         showFlashAlert({
           message: I18n.t('There was a problem loading students.'),
           type: 'error'
         })
       }
+    }
+
+    if (changes.publishGradesStatus) {
+      announcePublishGradesStatus(nextProps.publishGradesStatus)
     }
   }
 
@@ -55,7 +102,8 @@ class FlashMessageHolder extends Component {
 
 function mapStateToProps(state) {
   return {
-    loadStudentsStatus: state.students.loadStudentsStatus
+    loadStudentsStatus: state.students.loadStudentsStatus,
+    publishGradesStatus: state.assignment.publishGradesStatus
   }
 }
 

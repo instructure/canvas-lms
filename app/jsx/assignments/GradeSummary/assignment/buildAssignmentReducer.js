@@ -16,27 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {applyMiddleware, combineReducers, createStore} from 'redux'
-import ReduxThunk from 'redux-thunk'
+import buildReducer from '../buildReducer'
+import {SET_PUBLISH_GRADES_STATUS, UPDATE_ASSIGNMENT} from './AssignmentActions'
 
-import buildAssignmentReducer from './assignment/buildAssignmentReducer'
-import gradesReducer from './grades/gradesReducer'
-import studentsReducer from './students/studentsReducer'
+const handlers = {}
 
-const createStoreWithMiddleware = applyMiddleware(ReduxThunk)(createStore)
+handlers[SET_PUBLISH_GRADES_STATUS] = (state, {payload}) => ({
+  ...state,
+  publishGradesStatus: payload.status
+})
 
-export default function configureStore(env) {
-  const contextReducer = state =>
-    state || {
-      graders: env.graders
-    }
+handlers[UPDATE_ASSIGNMENT] = (state, {payload}) => ({
+  ...state,
+  assignment: {...state.assignment, ...payload.assignment}
+})
 
-  const reducer = combineReducers({
-    assignment: buildAssignmentReducer(env),
-    context: contextReducer,
-    grades: gradesReducer,
-    students: studentsReducer
+export default function buildAssignmentReducer(env) {
+  return buildReducer(handlers, {
+    assignment: env.assignment,
+    publishGradesStatus: null
   })
-
-  return createStoreWithMiddleware(reducer)
 }

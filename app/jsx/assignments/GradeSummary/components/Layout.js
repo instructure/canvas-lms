@@ -31,9 +31,6 @@ import Header from './Header'
 
 class Layout extends Component {
   static propTypes = {
-    assignment: shape({
-      title: string.isRequired
-    }).isRequired,
     graders: arrayOf(
       shape({
         graderId: string.isRequired
@@ -59,7 +56,7 @@ class Layout extends Component {
       <div>
         <FlashMessageHolder />
 
-        <Header assignment={this.props.assignment} graders={this.props.graders} />
+        <Header />
 
         {this.props.graders.length > 0 && (
           <View as="div" margin="large 0 0 0">
@@ -81,7 +78,6 @@ class Layout extends Component {
 
 function mapStateToProps(state) {
   return {
-    assignment: state.context.assignment,
     graders: state.context.graders,
     provisionalGrades: state.grades.provisionalGrades,
     students: state.students.list

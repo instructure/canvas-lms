@@ -573,7 +573,7 @@ class AssignmentsController < ApplicationController
   protected
 
   def new_moderate_env
-    shared_moderation_and_grade_summary_env.deep_merge({
+    {
       ASSIGNMENT: {
         course_id: @context.id,
         grades_published: @assignment.grades_published?,
@@ -581,17 +581,24 @@ class AssignmentsController < ApplicationController
         muted: @assignment.muted?,
         title: @assignment.title
       },
-      GRADERS: moderation_graders_json(@assignment, @current_user, session)
-    })
+      GRADERS: moderation_graders_json(@assignment, @current_user, session),
+      STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
+    }
   end
 
   def old_moderate_env
-    shared_moderation_and_grade_summary_env.deep_merge({
+    can_edit_grades = @context.grants_right?(@current_user, :manage_grades)
+    {
       ANONYMOUS_MODERATED_MARKING_ENABLED: false,
       ASSIGNMENT_MUTED: @assignment.muted?,
       ASSIGNMENT_TITLE: @assignment.title,
       COURSE_ID: @context.id,
       GRADES_PUBLISHED: @assignment.grades_published?,
+      PERMISSIONS: {
+        edit_grades: can_edit_grades,
+        view_grades: can_edit_grades || @context.grants_right?(@current_user, :view_all_grades)
+      },
+      STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards),
       URLS: {
         add_moderated_students: api_v1_add_moderated_students_url({course_id: @context.id, assignment_id: @assignment.id}),
         assignment_speedgrader_url: speed_grader_course_gradebook_url({course_id: @context.id, assignment_id: @assignment.id}),
@@ -601,17 +608,6 @@ class AssignmentsController < ApplicationController
         student_submissions_url: polymorphic_url([:api_v1, @context, @assignment, :submissions]) + "?include[]=user_summary&include[]=provisional_grades",
         unmute_assignment_url: course_assignment_mute_url(course_id: @context.id, assignment_id: @assignment.id, status: 'false')
       }
-    })
-  end
-
-  def shared_moderation_and_grade_summary_env
-    can_edit_grades = @context.grants_right?(@current_user, :manage_grades)
-    {
-      PERMISSIONS: {
-        edit_grades: can_edit_grades,
-        view_grades: can_edit_grades || @context.grants_right?(@current_user, :view_all_grades)
-      },
-      STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
     }
   end
 
