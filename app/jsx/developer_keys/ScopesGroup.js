@@ -22,7 +22,7 @@ import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-core/lib/components/Text'
-import ToggleDetails from '@instructure/ui-core/lib/components/ToggleDetails'
+import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails'
 import DeveloperKeyScopesMethod from './ScopesMethod'
 import DeveloperKeyScope from './Scope'
 
@@ -68,7 +68,7 @@ export default class DeveloperKeyScopesGroup extends React.Component {
         {[...methodSet].sort().map(method => (
           <DeveloperKeyScopesMethod
             method={method}
-            margin="none small none none"
+            margin="none none none x-small"
             key={`${this.props.name}-${method}`}
           />
         ))}
@@ -79,10 +79,12 @@ export default class DeveloperKeyScopesGroup extends React.Component {
   groupSummary() {
     return (
       <Flex justifyItems="space-between">
-        <FlexItem grow shrink>
-          <Text>{this.props.name}</Text>
+        <FlexItem padding="0 x-small 0 0">
+          <Text size="medium">{this.props.name}</Text>
         </FlexItem>
-        <FlexItem padding="none none none medium" grow>{this.selectedMethods()}</FlexItem>
+        <FlexItem>
+          {this.selectedMethods()}
+        </FlexItem>
       </Flex>
     )
   }
@@ -127,21 +129,7 @@ export default class DeveloperKeyScopesGroup extends React.Component {
     return (
       <div className="scopes-group">
         <Flex alignItems="start" padding="small none small small">
-          <FlexItem grow shrink padding="none">
-            <div className="toggle-scope-group">
-              <ToggleDetails summary={this.groupSummary()}>
-                {this.props.scopes.map(scope => (
-                  <DeveloperKeyScope
-                    checked={this.props.selectedScopes.includes(scope.scope)}
-                    scope={scope}
-                    key={scope.scope}
-                    onChange={this.handleSingleChange}
-                  />
-                ))}
-              </ToggleDetails>
-            </div>
-          </FlexItem>
-          <FlexItem padding="none small none none">
+        <FlexItem padding="none small none none">
             <Checkbox
               label={
                 <ScreenReaderContent>
@@ -152,6 +140,20 @@ export default class DeveloperKeyScopesGroup extends React.Component {
               checked={this.state.groupChecked}
               onChange={this.handleGroupChange}
             />
+          </FlexItem>
+          <FlexItem grow padding="none small none none">
+            <div className="toggle-scope-group">
+              <ToggleDetails summary={this.groupSummary()} fluidWidth>
+                {this.props.scopes.map(scope => (
+                  <DeveloperKeyScope
+                    checked={this.props.selectedScopes.includes(scope.scope)}
+                    scope={scope}
+                    key={scope.scope}
+                    onChange={this.handleSingleChange}
+                  />
+                ))}
+              </ToggleDetails>
+            </div>
           </FlexItem>
         </Flex>
       </div>

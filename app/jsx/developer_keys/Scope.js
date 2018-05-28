@@ -25,13 +25,7 @@ import DeveloperKeyScopesMethod from './ScopesMethod'
 const DeveloperKeyScope = props => {
   return (
     <div className="developer-key-scope">
-      <Flex alignItems="start" padding="small none small none">
-        <FlexItem shrink padding="none small none none">
-          <DeveloperKeyScopesMethod method={props.scope.verb} />
-        </FlexItem>
-        <FlexItem grow shrink padding="none small none none">
-          {props.scope.scope}
-        </FlexItem>
+      <Flex alignItems="start" padding="small medium small none">
         <FlexItem padding="none">
           <Checkbox
             label={<ScreenReaderContent>{`${props.scope.verb} ${props.scope.scope}`}</ScreenReaderContent>}
@@ -40,6 +34,12 @@ const DeveloperKeyScope = props => {
             checked={props.checked}
             inline
           />
+        </FlexItem>
+        <FlexItem grow shrink>
+          {props.scope.scope}
+        </FlexItem>
+        <FlexItem>
+          <DeveloperKeyScopesMethod method={props.scope.verb} />
         </FlexItem>
       </Flex>
     </div>

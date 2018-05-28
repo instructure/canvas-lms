@@ -121,22 +121,17 @@ export default class DeveloperKeyScopesList extends React.Component {
             <FlexItem padding="none" textAlign="start">
               <View padding="small" display="block" borderWidth="none none medium none">
                 <Flex>
-                  <FlexItem grow shrink padding="none large none medium">
-                    <Text size="medium" weight="bold">
-                      {I18n.t('All Endpoints')}
-                    </Text>
-                  </FlexItem>
                   <FlexItem>
-                    <Text size="medium" weight="bold">
-                      {I18n.t('Read only')}
-                    </Text>
-                    <DeveloperKeyScopesMethod method="get" margin="none small none small" />
                     <Checkbox
                       label={<ScreenReaderContent>{I18n.t('All GET scopes')}</ScreenReaderContent>}
                       onChange={this.handleReadOnlySelected}
                       checked={this.state.readOnlySelected}
                       inline
                     />
+                    <Text size="medium" weight="bold">
+                      {I18n.t('Read only')}
+                    </Text>
+                    <DeveloperKeyScopesMethod method="get" margin="none small none small" />
                   </FlexItem>
                 </Flex>
               </View>

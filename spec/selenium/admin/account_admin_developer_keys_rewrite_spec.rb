@@ -69,15 +69,15 @@ describe 'Developer Keys' do
     end
 
     def click_scope_group_checkbox
-      fxpath('//*[@class="scopes-group"]/span[1]/span[2]').click
+      fxpath('//*[@class="scopes-group"]/span[1]/span[1]').click
     end
 
     def click_scope_checkbox
-      fxpath("//*[@class='developer-key-scope']/span[1]/span[3]").click
+      fxpath("//*[@class='developer-key-scope']/span[1]/span[1]").click
     end
 
     def select_all_readonly_checkbox
-      fxpath("//*[@class='scopes-list']/span/div/span[1]/span/span/span[2]/div")
+      fxpath("//*[@class='scopes-list']/span/div/span[1]/span/span/span[1]/div")
     end
 
     def all_endpoints_readonly_checkbox_selected?
@@ -95,7 +95,6 @@ describe 'Developer Keys' do
       click_enforce_scopes
       click_scope_group_checkbox
       find_button("Save Key").click
-
       expect(ff("#reactContent tbody tr").length).to eq 1
       expect(Account.default.developer_keys.count).to eq 1
       key = Account.default.developer_keys.last
