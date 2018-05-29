@@ -24,7 +24,7 @@ import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import Text from '@instructure/ui-core/lib/components/Text'
+import Text from '@instructure/ui-elements/lib/components/Text'
 
 import actions from '../actions'
 import propTypes from '../propTypes'
