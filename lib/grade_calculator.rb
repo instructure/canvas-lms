@@ -901,7 +901,7 @@ class GradeCalculator
         gs[:possible].zero? || gs[:possible].nil?
       }
       final_grade = relevant_group_sums.reduce(0) { |grade,gs|
-        grade + (gs[:score].to_f / gs[:possible]) * gs[:weight]
+        grade + (gs[:score].to_d / gs[:possible]) * gs[:weight].to_d
       }
 
       # scale the grade up if total weights don't add up to 100%
@@ -912,9 +912,10 @@ class GradeCalculator
         final_grade *= 100.0 / full_weight
       end
 
+      rounded_grade = final_grade&.to_f.try(:round, 2)
       {
-        grade: final_grade.try(:round, 2),
-        total: final_grade.try(:round, 2),
+        grade: rounded_grade,
+        total: rounded_grade,
         dropped: dropped
       }
     else
