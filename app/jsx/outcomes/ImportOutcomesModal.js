@@ -20,14 +20,14 @@ import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 import {instanceOf} from 'prop-types'
 import I18n from 'i18n!outcomes'
-import Modal, { ModalHeader, ModalBody } from '@instructure/ui-core/lib/components/Modal'
-import Heading from '@instructure/ui-core/lib/components/Heading'
-import FileDrop from '@instructure/ui-core/lib/components/FileDrop'
-import Billboard from '@instructure/ui-core/lib/components/Billboard'
-import Text from '@instructure/ui-core/lib/components/Text'
-import Link from '@instructure/ui-core/lib/components/Link'
-import Container from '@instructure/ui-core/lib/components/Container'
-import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent'
+import Modal, { ModalHeader, ModalBody } from '@instructure/ui-overlays/lib/components/Modal'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
+import FileDrop from '@instructure/ui-forms/lib/components/FileDrop'
+import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import Link from '@instructure/ui-elements/lib/components/Link'
+import View from '@instructure/ui-layout/lib/components/View'
+import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
 import SVGWrapper from '../shared/SVGWrapper'
 
 export function showImportOutcomesModal (props) {
@@ -93,7 +93,6 @@ export default class ImportOutcomesModal extends Component {
         size="fullscreen"
         label={I18n.t('Import Outcomes')}
         closeButtonLabel={I18n.t('Close')}
-        applicationElement={() => document.getElementById('application')}
       >
         <ModalHeader>
           <Heading>{I18n.t('Import Outcomes')}</Heading>
@@ -118,9 +117,9 @@ export default class ImportOutcomesModal extends Component {
               </div>
             }
           />
-          <Container as="div" margin="large auto" textAlign='center'>
+          <View as="div" margin="large auto" textAlign='center'>
             <Link href="/doc/api/file.outcomes_csv.html">{I18n.t('Outcomes CSV Format')}</Link>
-          </Container>
+          </View>
         </ModalBody>
       </Modal>
     )
