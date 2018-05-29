@@ -22,11 +22,11 @@ import { arrayOf, bool, func, node, shape, string } from 'prop-types';
 import $ from 'jquery';
 import 'jquery.instructure_date_and_time'
 import I18n from 'i18n!gradebook_history';
-import Container from '@instructure/ui-core/lib/components/Container';
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
-import Spinner from '@instructure/ui-core/lib/components/Spinner';
-import Table from '@instructure/ui-core/lib/components/Table';
-import Text from '@instructure/ui-core/lib/components/Text';
+import View from '@instructure/ui-layout/lib/components/View';
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
+import Spinner from '@instructure/ui-elements/lib/components/Spinner';
+import Table from '@instructure/ui-elements/lib/components/Table';
+import Text from '@instructure/ui-elements/lib/components/Text';
 import { getHistoryNextPage } from '../gradebook-history/actions/SearchResultsActions';
 import SearchResultsRow from '../gradebook-history/SearchResultsRow';
 
@@ -167,9 +167,9 @@ class SearchResultsComponent extends Component {
     return (
       <div>
         {this.hasHistory() && this.showResults()}
-        <Container as="div" textAlign="center" margin="medium 0 0 0">
+        <View as="div" textAlign="center" margin="medium 0 0 0">
           {this.showStatus()}
-        </Container>
+        </View>
       </div>
     );
   }
