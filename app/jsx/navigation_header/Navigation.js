@@ -20,7 +20,7 @@ import _ from 'underscore'
 import $ from 'jquery'
 import I18n from 'i18n!new_nav'
 import React from 'react'
-import Tray from '@instructure/ui-core/lib/components/Tray'
+import Tray from '@instructure/ui-overlays/lib/components/Tray'
 import CoursesTray from './trays/CoursesTray'
 import GroupsTray from './trays/GroupsTray'
 import AccountsTray from './trays/AccountsTray'
@@ -288,7 +288,6 @@ export default class Navigation extends React.Component {
         size="small"
         open={this.state.isTrayOpen}
         onDismiss={this.closeTray}
-        applicationElement={() => document.getElementById('application')}
         shouldCloseOnDocumentClick
         mountNode={document.getElementById('nav-tray-portal')}
         closeButtonRef={element => {
