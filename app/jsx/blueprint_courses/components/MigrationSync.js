@@ -25,9 +25,9 @@ import select from '../../shared/select'
 import cx from 'classnames'
 import 'compiled/jquery.rails_flash_notifications'
 
-import Progress from '@instructure/ui-core/lib/components/Progress'
-import Button from '@instructure/ui-core/lib/components/Button'
-import Text from '@instructure/ui-core/lib/components/Text'
+import Progress from '@instructure/ui-elements/lib/components/Progress'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import Text from '@instructure/ui-elements/lib/components/Text'
 import IconRefreshLine from '@instructure/ui-icons/lib/Line/IconRefresh'
 
 import MigrationStates from '../migrationStates'

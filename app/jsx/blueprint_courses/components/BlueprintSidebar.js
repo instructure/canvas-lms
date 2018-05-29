@@ -20,10 +20,10 @@ import I18n from 'i18n!blueprint_settings'
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
-import Tray from '@instructure/ui-core/lib/components/Tray'
-import Button from '@instructure/ui-core/lib/components/Button'
-import Text from '@instructure/ui-core/lib/components/Text'
-import Heading from '@instructure/ui-core/lib/components/Heading'
+import Tray from '@instructure/ui-overlays/lib/components/Tray'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
 import IconBlueprint from '@instructure/ui-icons/lib/Solid/IconBlueprint'
 import IconXSolid from '@instructure/ui-icons/lib/Solid/IconX'
 
@@ -86,7 +86,6 @@ export default class BlueprintCourseSidebar extends Component {
           placement="end"
           onEntered={this.handleOpen}
           onExiting={this.handleClose}
-          applicationElement={() => document.getElementById('application')}
           contentRef={this.props.contentRef}
         >
           <div className="bcs__content">
