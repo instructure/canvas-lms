@@ -19,10 +19,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!appointment_groups'
-import Button from '@instructure/ui-core/lib/components/Button'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import IconMiniArrowRight from '@instructure/ui-icons/lib/Solid/IconMiniArrowRight'
 import IconMiniArrowDown from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
-import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid'
+import Grid, { GridCol, GridRow } from '@instructure/ui-layout/lib/components/Grid'
 
   class ContextSelector extends React.Component {
     static propTypes = {
