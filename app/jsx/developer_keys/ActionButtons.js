@@ -65,7 +65,7 @@ class DeveloperKeyActionButtons extends React.Component {
   refDeleteLink = (link) => { this.deleteLink = link; }
 
   renderVisibilityIcon () {
-    const { visible } = this.props
+    const { visible, developerName } = this.props
     if (visible) {
       return <Tooltip
         tip={I18n.t("Make key invisible")}
@@ -76,6 +76,7 @@ class DeveloperKeyActionButtons extends React.Component {
           size="small"
           onClick={this.makeInvisibleLinkHandler}
         >
+          <ScreenReaderContent>{I18n.t('Make key %{developerName} invisible', {developerName})}</ScreenReaderContent>
           <IconEyeLine />
         </Button>
       </Tooltip>
@@ -90,6 +91,7 @@ class DeveloperKeyActionButtons extends React.Component {
         size="small"
         onClick={this.makeVisibleLinkHandler}
       >
+        <ScreenReaderContent>{I18n.t('Make key %{developerName} visible', {developerName})}</ScreenReaderContent>
         <IconOffLine />
       </Button>
     </Tooltip>

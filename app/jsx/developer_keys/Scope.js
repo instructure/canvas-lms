@@ -34,7 +34,7 @@ const DeveloperKeyScope = props => {
         </FlexItem>
         <FlexItem padding="none">
           <Checkbox
-            label={<ScreenReaderContent>{props.scope.scope}</ScreenReaderContent>}
+            label={<ScreenReaderContent>{`${props.scope.verb} ${props.scope.scope}`}</ScreenReaderContent>}
             value={props.scope.scope}
             onChange={props.onChange}
             checked={props.checked}
