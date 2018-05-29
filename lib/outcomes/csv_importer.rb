@@ -28,13 +28,13 @@ module Outcomes
       title
       vendor_guid
       object_type
-      parent_guids
     ].freeze
 
     OPTIONAL_FIELDS = %i[
       canvas_id
       description
       display_name
+      parent_guids
       calculation_method
       calculation_int
       mastery_points

@@ -148,7 +148,7 @@ module AccountReports
       outcome_scope.find_each do |row|
         outcome = row.attributes.dup
         outcome['object_type'] = 'outcome'
-        outcome_data = YAML.safe_load(outcome['data'])
+        outcome_data = outcome['data'].present? ? YAML.safe_load(outcome['data']) : {}
         outcome['mastery_points'] = outcome_data.dig(:rubric_criterion, :mastery_points)
         outcome['mastery_points'] = I18n.n(outcome['mastery_points']) if outcome['mastery_points']
 
