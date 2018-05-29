@@ -20,8 +20,8 @@ import moment from 'moment';
 import React from 'react'
 import 'jquery.instructure_date_and_time'
 
-import Container from '@instructure/ui-core/lib/components/Container'
-import Text from '@instructure/ui-core/lib/components/Text'
+import View from '@instructure/ui-layout/lib/components/View'
+import Text from '@instructure/ui-elements/lib/components/Text'
 import IconTimer from '@instructure/ui-icons/lib/Line/IconTimer'
 
 /*
@@ -39,11 +39,11 @@ export function makeTimestamp({ delayed_post_at, posted_at }, delayedLabel, post
     ? {
         title: (
           <span>
-            <Container margin="0 x-small">
+            <View margin="0 x-small">
               <Text color="secondary">
                 <IconTimer />
               </Text>
-            </Container>
+            </View>
             {delayedLabel}
           </span>
         ),

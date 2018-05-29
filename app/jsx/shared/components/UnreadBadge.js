@@ -18,9 +18,9 @@
 
 import I18n from 'i18n!unread_badge'
 import React from 'react'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import { string, number, oneOfType, node } from 'prop-types'
-import Tooltip from '@instructure/ui-core/lib/components/Tooltip'
+import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
 
 export default function UnreadBadge ({ unreadCount, totalCount, unreadLabel, totalLabel }) {
   return (

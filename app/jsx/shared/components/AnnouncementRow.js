@@ -22,9 +22,9 @@ import {bool, func} from 'prop-types'
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
 
-import Container from '@instructure/ui-core/lib/components/Container'
-import Text from '@instructure/ui-core/lib/components/Text'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import View from '@instructure/ui-layout/lib/components/View'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import {MenuItem} from '@instructure/ui-core/lib/components/Menu'
 import IconTimer from '@instructure/ui-icons/lib/Line/IconTimer'
 import IconReply from '@instructure/ui-icons/lib/Line/IconReply'
@@ -66,11 +66,11 @@ export default function AnnouncementRow({
   ) : null
 
   const replyButton = announcement.locked ? null : (
-    <Container display="block" margin="x-small 0 0">
+    <View display="block" margin="x-small 0 0">
       <Text color="brand">
         <IconReply /> {I18n.t('Reply')}
       </Text>
-    </Container>
+    </View>
   )
 
   const renderMenuList = () => {
