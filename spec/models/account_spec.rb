@@ -795,15 +795,6 @@ describe Account do
       expect(tabs.map{|t| t[:id] }).not_to be_include(Account::TAB_DEVELOPER_KEYS)
     end
 
-    it "should include 'Developer Keys' for the admin users of a sub account" do
-      account = Account.create!
-      account.enable_feature!(:developer_key_management)
-      sub_account = Account.create!(parent_account: account)
-      admin = account_admin_user(:account => sub_account)
-      tabs = sub_account.tabs_available(admin)
-      expect(tabs.map{|t| t[:id] }).to include(Account::TAB_DEVELOPER_KEYS)
-    end
-
     it "should not include 'Developer Keys' for non-site_admin accounts" do
       tabs = @account.tabs_available(nil)
       expect(tabs.map{|t| t[:id] }).not_to be_include(Account::TAB_DEVELOPER_KEYS)
