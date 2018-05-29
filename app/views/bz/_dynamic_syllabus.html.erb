@@ -217,6 +217,7 @@
       <div><%= mod.intro_text ? mod.intro_text.html_safe : '' %></div>
       <% if progress && progress.workflow_state == 'completed' %>
         <a href="/courses/<%= @course.id %>/modules/items/<%= mod.content_tags.first.id %>" class="bz-button-pick-up">Completed</a>
+        <div class="bz-explain-grade-link"><a href="/bz/grade_details?module_item_id=<%= mod.content_tags.first.id %>">Explain Grade</a></div>
       <% elsif progress && progress.workflow_state == 'locked' && !@bypass_lock %>
         <!-- locked for non-teachers, no button needed -->
       <% else %>
