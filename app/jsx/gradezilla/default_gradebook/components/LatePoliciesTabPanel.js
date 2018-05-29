@@ -18,15 +18,15 @@
 
 import React from 'react';
 import { bool, func, number, shape, string } from 'prop-types';
-import Alert from '@instructure/ui-core/lib/components/Alert';
-import Container from '@instructure/ui-core/lib/components/Container';
-import FormFieldGroup from '@instructure/ui-core/lib/components/FormFieldGroup';
+import Alert from '@instructure/ui-alerts/lib/components/Alert';
+import View from '@instructure/ui-layout/lib/components/View';
+import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup';
 import NumberInput from '@instructure/ui-core/lib/components/NumberInput';
-import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent';
-import Spinner from '@instructure/ui-core/lib/components/Spinner';
-import Text from '@instructure/ui-core/lib/components/Text';
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
-import Checkbox from '@instructure/ui-core/lib/components/Checkbox';
+import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent';
+import Spinner from '@instructure/ui-elements/lib/components/Spinner';
+import Text from '@instructure/ui-elements/lib/components/Text';
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
+import Checkbox from '@instructure/ui-forms/lib/components/Checkbox';
 import Select from '@instructure/ui-core/lib/components/Select';
 import Round from 'compiled/util/round';
 import NumberHelper from '../../../shared/helpers/numberHelper';
@@ -226,27 +226,27 @@ class LatePoliciesTabPanel extends React.Component {
     const numberInputWidth = "5.5rem";
     return (
       <div id="LatePoliciesTabPanel__Container">
-        <Container as="div" margin="small">
+        <View as="div" margin="small">
           <Checkbox
             label={I18n.t('Automatically apply grade for missing submissions')}
             defaultChecked={data.missingSubmissionDeductionEnabled}
             onChange={this.changeMissingSubmissionDeductionEnabled}
             ref={(c) => { this.missingSubmissionCheckbox = c; }}
           />
-        </Container>
+        </View>
 
         <FormFieldGroup
           description={<ScreenReaderContent>{I18n.t('Missing policies')}</ScreenReaderContent>}
           messages={this.missingPolicyMessages(validationErrors)}
         >
-          <Container as="div" margin="small small small large">
+          <View as="div" margin="small small small large">
             <div style={{ marginLeft: '0.25rem'}}>
               <PresentationContent>
-                <Container as="div" margin="0 0 x-small 0">
+                <View as="div" margin="0 0 x-small 0">
                   <label htmlFor="missing-submission-grade">
                     <Text size="small" weight="bold">{I18n.t('Missing submission grade')}</Text>
                   </label>
-                </Container>
+                </View>
               </PresentationContent>
 
               <div className="NumberInput__Container">
@@ -265,13 +265,13 @@ class LatePoliciesTabPanel extends React.Component {
                 />
 
                 <PresentationContent>
-                  <Container as="div" margin="0 small">
+                  <View as="div" margin="0 small">
                     <Text>{I18n.t('%')}</Text>
-                  </Container>
+                  </View>
                 </PresentationContent>
               </div>
             </div>
-          </Container>
+          </View>
         </FormFieldGroup>
 
         <PresentationContent><hr /></PresentationContent>
@@ -287,27 +287,27 @@ class LatePoliciesTabPanel extends React.Component {
           </Alert>
         }
 
-        <Container as="div" margin="small">
+        <View as="div" margin="small">
           <Checkbox
             label={I18n.t('Automatically apply deduction to late submissions')}
             defaultChecked={data.lateSubmissionDeductionEnabled}
             onChange={this.changeLateSubmissionDeductionEnabled}
           />
-        </Container>
+        </View>
 
         <FormFieldGroup
           description={<ScreenReaderContent>{I18n.t('Late policies')}</ScreenReaderContent>}
           messages={this.latePolicyMessages(validationErrors)}
         >
-          <Container as="div" margin="small small small large">
+          <View as="div" margin="small small small large">
             <div style={{ marginLeft: '0.25rem' }}>
-              <Container display="inline" as="div" margin="0 small 0 0">
+              <View display="inline" as="div" margin="0 small 0 0">
                 <PresentationContent>
-                  <Container as="div" margin="0 0 x-small 0">
+                  <View as="div" margin="0 0 x-small 0">
                     <label htmlFor="late-submission-deduction">
                       <Text size="small" weight="bold">{I18n.t('Deduct')}</Text>
                     </label>
-                  </Container>
+                  </View>
                 </PresentationContent>
 
                 <div style={{display: 'flex', alignItems: 'center'}}>
@@ -325,20 +325,20 @@ class LatePoliciesTabPanel extends React.Component {
                     width={numberInputWidth}
                   />
                   <PresentationContent>
-                    <Container as="div" margin="0 small">
+                    <View as="div" margin="0 small">
                       <Text>{I18n.t('%')}</Text>
-                    </Container>
+                    </View>
                   </PresentationContent>
                 </div>
-              </Container>
+              </View>
 
-              <Container display="inline" as="div" margin="0 0 0 small">
+              <View display="inline" as="div" margin="0 0 0 small">
                 <PresentationContent>
-                  <Container as="div" margin="0 0 x-small 0">
+                  <View as="div" margin="0 0 x-small 0">
                     <label htmlFor="late-submission-interval">
                       <Text size="small" weight="bold">{I18n.t('For each late')}</Text>
                     </label>
-                  </Container>
+                  </View>
                 </PresentationContent>
 
                 <Select
@@ -353,18 +353,18 @@ class LatePoliciesTabPanel extends React.Component {
                   <option value="day">{I18n.t('Day')}</option>
                   <option value="hour" >{I18n.t('Hour')}</option>
                 </Select>
-              </Container>
+              </View>
             </div>
-          </Container>
+          </View>
 
-          <Container as="div" margin="small small small large">
+          <View as="div" margin="small small small large">
             <div style={{ marginLeft: '0.25rem' }}>
               <PresentationContent>
-                <Container as="div" margin="0 0 x-small 0">
+                <View as="div" margin="0 0 x-small 0">
                   <label htmlFor="late-submission-minimum-percent">
                     <Text size="small" weight="bold">{I18n.t('Lowest possible grade')}</Text>
                   </label>
-                </Container>
+                </View>
               </PresentationContent>
 
               <div style={{display: 'flex', alignItems: 'center'}}>
@@ -383,13 +383,13 @@ class LatePoliciesTabPanel extends React.Component {
                 />
 
                 <PresentationContent>
-                  <Container as="div" margin="0 small">
+                  <View as="div" margin="0 small">
                     <Text>{I18n.t('%')}</Text>
-                  </Container>
+                  </View>
                 </PresentationContent>
               </div>
             </div>
-          </Container>
+          </View>
         </FormFieldGroup>
       </div>
     );

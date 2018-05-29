@@ -19,8 +19,8 @@
 import React from 'react';
 import { arrayOf, bool, func, number, oneOf, shape, string } from 'prop-types';
 import Select from '@instructure/ui-core/lib/components/Select';
-import TextInput from '@instructure/ui-core/lib/components/TextInput';
-import Text from '@instructure/ui-core/lib/components/Text';
+import TextInput from '@instructure/ui-forms/lib/components/TextInput';
+import Text from '@instructure/ui-elements/lib/components/Text';
 import I18n from 'i18n!gradebook';
 import GradeFormatHelper from '../../../gradebook/shared/helpers/GradeFormatHelper';
 import {parseTextValue} from '../../../grading/helpers/GradeInputHelper'

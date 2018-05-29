@@ -19,10 +19,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import IconMiniArrowDownSolid from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
-import Button from '@instructure/ui-core/lib/components/Button'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import { MenuItem, MenuItemSeparator } from '@instructure/ui-core/lib/components/Menu'
 import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
-import Text from '@instructure/ui-core/lib/components/Text'
+import Text from '@instructure/ui-elements/lib/components/Text'
 import I18n from 'i18n!gradebook'
 
   const { oneOf, bool, string, func } = PropTypes;

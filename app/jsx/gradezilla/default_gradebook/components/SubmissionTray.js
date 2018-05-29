@@ -19,14 +19,14 @@
 import React from 'react';
 import { arrayOf, bool, func, number, oneOf, shape, string } from 'prop-types';
 import I18n from 'i18n!gradebook';
-import Avatar from '@instructure/ui-core/lib/components/Avatar';
-import Button from '@instructure/ui-core/lib/components/Button';
-import Container from '@instructure/ui-core/lib/components/Container';
-import Heading from '@instructure/ui-core/lib/components/Heading';
-import Link from '@instructure/ui-core/lib/components/Link';
-import Spinner from '@instructure/ui-core/lib/components/Spinner';
-import Tray from '@instructure/ui-core/lib/components/Tray';
-import Text from '@instructure/ui-core/lib/components/Text';
+import Avatar from '@instructure/ui-elements/lib/components/Avatar';
+import Button from '@instructure/ui-buttons/lib/components/Button';
+import View from '@instructure/ui-layout/lib/components/View';
+import Heading from '@instructure/ui-elements/lib/components/Heading';
+import Link from '@instructure/ui-elements/lib/components/Link';
+import Spinner from '@instructure/ui-elements/lib/components/Spinner';
+import Tray from '@instructure/ui-overlays/lib/components/Tray';
+import Text from '@instructure/ui-elements/lib/components/Text';
 import IconSpeedGraderLine from '@instructure/ui-icons/lib/Line/IconSpeedGrader';
 import Carousel from '../../../gradezilla/default_gradebook/components/Carousel';
 import GradeInput from '../../../gradezilla/default_gradebook/components/GradeInput';
@@ -206,12 +206,12 @@ export default class SubmissionTray extends React.Component {
       };
     }
     return (
-      <Container as="div" textAlign="center">
+      <View as="div" textAlign="center">
         <Button {...buttonProps}>
           <IconSpeedGraderLine />
           {I18n.t('SpeedGrader')}
         </Button>
-      </Container>
+      </View>
     );
   }
 
@@ -255,7 +255,6 @@ export default class SubmissionTray extends React.Component {
         contentRef={this.props.contentRef}
         label={I18n.t('Submission tray')}
         closeButtonLabel={I18n.t('Close submission tray')}
-        applicationElement={() => document.getElementById('application')}
         open={this.props.isOpen}
         shouldContainFocus
         placement="end"
@@ -264,7 +263,7 @@ export default class SubmissionTray extends React.Component {
       >
         <div className="SubmissionTray__Container">
           <div id="SubmissionTray__Content" style={{ display: 'flex', flexDirection: 'column' }}>
-            <Container as="div" padding={carouselContainerStyleOverride}>
+            <View as="div" padding={carouselContainerStyleOverride}>
               {avatarUrl && renderAvatar(name, avatarUrl)}
 
               <Carousel
@@ -282,7 +281,7 @@ export default class SubmissionTray extends React.Component {
                 </Link>
               </Carousel>
 
-              <Container as="div" margin="small 0" className="hr" />
+              <View as="div" margin="small 0" className="hr" />
 
               <Carousel
                 id="assignment-carousel"
@@ -301,10 +300,10 @@ export default class SubmissionTray extends React.Component {
 
               { this.props.speedGraderEnabled && this.renderSpeedGraderLink(speedGraderProps) }
 
-              <Container as="div" margin="small 0" className="hr" />
-            </Container>
+              <View as="div" margin="small 0" className="hr" />
+            </View>
 
-            <Container as="div" style={{ overflowY: 'auto', flex: '1 1 auto' }}>
+            <View as="div" style={{ overflowY: 'auto', flex: '1 1 auto' }}>
               <SubmissionStatus
                 assignment={this.props.assignment}
                 isConcluded={this.props.student.isConcluded}
@@ -327,19 +326,19 @@ export default class SubmissionTray extends React.Component {
               />
 
               {!!this.props.submission.pointsDeducted &&
-                <Container as="div" margin="small 0 0 0">
+                <View as="div" margin="small 0 0 0">
                   <LatePolicyGrade
                     assignment={this.props.assignment}
                     enterGradesAs={this.props.enterGradesAs}
                     gradingScheme={this.props.gradingScheme}
                     submission={this.props.submission}
                   />
-                </Container>
+                </View>
               }
 
-              <Container as="div" margin="small 0" className="hr" />
+              <View as="div" margin="small 0" className="hr" />
 
-              <Container as="div" id="SubmissionTray__RadioInputGroup" margin="0 0 small 0">
+              <View as="div" id="SubmissionTray__RadioInputGroup" margin="0 0 small 0">
                 <SubmissionTrayRadioInputGroup
                   colors={this.props.colors}
                   disabled={this.props.gradingDisabled}
@@ -349,14 +348,14 @@ export default class SubmissionTray extends React.Component {
                   submissionUpdating={this.props.submissionUpdating}
                   updateSubmission={this.props.updateSubmission}
                 />
-              </Container>
+              </View>
 
-              <Container as="div" margin="small 0" className="hr" />
+              <View as="div" margin="small 0" className="hr" />
 
-              <Container as="div" id="SubmissionTray__Comments" padding="xx-small">
+              <View as="div" id="SubmissionTray__Comments" padding="xx-small">
                 {this.renderSubmissionComments(submissionCommentsProps)}
-              </Container>
-            </Container>
+              </View>
+            </View>
           </div>
         </div>
       </Tray>

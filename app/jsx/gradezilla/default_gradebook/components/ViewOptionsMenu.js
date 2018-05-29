@@ -19,7 +19,7 @@
 import React from 'react';
 import { arrayOf, bool, func, shape, string } from 'prop-types'
 import IconMiniArrowDownSolid from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
-import Button from '@instructure/ui-core/lib/components/Button';
+import Button from '@instructure/ui-buttons/lib/components/Button';
 import {
   MenuItem,
   MenuItemGroup,
@@ -27,8 +27,8 @@ import {
   MenuItemSeparator
 } from '@instructure/ui-core/lib/components/Menu';
 import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu';
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
-import Text from '@instructure/ui-core/lib/components/Text';
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
+import Text from '@instructure/ui-elements/lib/components/Text';
 import I18n from 'i18n!gradebook';
 import { filterLabels } from '../../../gradezilla/default_gradebook/constants/ViewOptions';
 

@@ -80,7 +80,7 @@ define [
   'jsx/grading/helpers/GradeInputHelper'
   'jsx/grading/helpers/OutlierScoreHelper'
   'jsx/grading/LatePolicyApplicator'
-  '@instructure/ui-core/lib/components/Button'
+  '@instructure/ui-buttons/lib/components/Button'
   '@instructure/ui-icons/lib/Solid/IconSettings'
   'jsx/shared/FlashAlert'
   'jquery.ajaxJSON'

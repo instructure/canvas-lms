@@ -18,10 +18,10 @@
 
 import React, {Component} from 'react'
 import {arrayOf, bool, element, func, instanceOf, number, shape, string} from 'prop-types'
-import Button from '@instructure/ui-core/lib/components/Button'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import {MenuItem} from '@instructure/ui-core/lib/components/Menu'
 import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
-import TextInput from '@instructure/ui-core/lib/components/TextInput'
+import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import IconArrowOpenDownLine from '@instructure/ui-icons/lib/Line/IconArrowOpenDown'
 import I18n from 'i18n!gradebook'
 import GradeFormatHelper from '../../../../../gradebook/shared/helpers/GradeFormatHelper'

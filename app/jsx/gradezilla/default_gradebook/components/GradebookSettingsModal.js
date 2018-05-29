@@ -19,12 +19,12 @@
 import React from 'react';
 import { bool, func, string } from 'prop-types';
 import _ from 'underscore';
-import Button from '@instructure/ui-core/lib/components/Button';
+import Button from '@instructure/ui-buttons/lib/components/Button';
 import LatePoliciesTabPanel from '../../../gradezilla/default_gradebook/components/LatePoliciesTabPanel';
 import GradebookSettingsModalApi from '../../../gradezilla/default_gradebook/apis/GradebookSettingsModalApi';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from '@instructure/ui-core/lib/components/Modal';
-import Heading from '@instructure/ui-core/lib/components/Heading';
-import TabList, { TabPanel } from '@instructure/ui-core/lib/components/TabList';
+import Modal, { ModalBody, ModalFooter, ModalHeader } from '@instructure/ui-overlays/lib/components/Modal';
+import Heading from '@instructure/ui-elements/lib/components/Heading';
+import TabList, { TabPanel } from '@instructure/ui-tabs/lib/components/TabList';
 import I18n from 'i18n!gradebook';
 import { showFlashAlert } from '../../../shared/FlashAlert';
 
@@ -127,7 +127,6 @@ class GradebookSettingsModal extends React.Component {
         open={isOpen}
         label={title}
         closeButtonLabel={I18n.t('Close')}
-        applicationElement={() => document.getElementById('application')}
         onOpen={this.fetchLatePolicy}
         onDismiss={this.close}
         onExited={this.props.onClose}

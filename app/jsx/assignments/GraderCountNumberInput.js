@@ -19,7 +19,7 @@
 import {number, string} from 'prop-types'
 import React from 'react'
 import I18n from 'i18n!assignments'
-import NumberInput from '@instructure/ui-core/lib/components/NumberInput'
+import NumberInput from '@instructure/ui-forms/lib/components/NumberInput'
 
 const DEFAULT_GRADER_COUNT = 2
 

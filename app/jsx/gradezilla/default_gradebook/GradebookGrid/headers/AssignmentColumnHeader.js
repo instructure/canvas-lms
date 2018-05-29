@@ -19,9 +19,9 @@
 import React from 'react';
 import { arrayOf, bool, func, instanceOf, number, shape, string } from 'prop-types';
 import IconMoreSolid from '@instructure/ui-icons/lib/Solid/IconMore';
-import Button from '@instructure/ui-core/lib/components/Button';
-import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid';
-import Link from '@instructure/ui-core/lib/components/Link';
+import Button from '@instructure/ui-buttons/lib/components/Button';
+import Grid, { GridCol, GridRow } from '@instructure/ui-layout/lib/components/Grid';
+import Link from '@instructure/ui-elements/lib/components/Link';
 import {
   MenuItem,
   MenuItemFlyout,
@@ -29,10 +29,10 @@ import {
   MenuItemSeparator
 } from '@instructure/ui-core/lib/components/Menu';
 import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu';
-import Text from '@instructure/ui-core/lib/components/Text';
+import Text from '@instructure/ui-elements/lib/components/Text';
 import 'message_students';
 import I18n from 'i18n!gradebook';
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 import MessageStudentsWhoHelper from '../../../shared/helpers/messageStudentsWhoHelper'
 import ColumnHeader from './ColumnHeader'
 

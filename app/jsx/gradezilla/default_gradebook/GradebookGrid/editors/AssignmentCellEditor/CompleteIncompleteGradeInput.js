@@ -18,10 +18,10 @@
 
 import React, {Component} from 'react'
 import {bool, func, number, shape, string} from 'prop-types'
-import Button from '@instructure/ui-core/lib/components/Button'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import {MenuItem} from '@instructure/ui-core/lib/components/Menu'
 import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
-import Text from '@instructure/ui-core/lib/components/Text'
+import Text from '@instructure/ui-elements/lib/components/Text'
 import IconArrowOpenDownLine from '@instructure/ui-icons/lib/Line/IconArrowOpenDown'
 import IconCheckSolid from '@instructure/ui-icons/lib/Solid/IconCheck'
 import IconEndSolid from '@instructure/ui-icons/lib/Solid/IconEnd'

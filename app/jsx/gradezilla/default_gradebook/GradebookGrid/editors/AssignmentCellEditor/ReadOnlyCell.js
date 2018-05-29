@@ -18,9 +18,9 @@
 
 import React, {Component} from 'react'
 import {bool, func, instanceOf, number, oneOf, shape, string} from 'prop-types'
-import ApplyTheme from '@instructure/ui-core/lib/components/ApplyTheme'
-import Button from '@instructure/ui-core/lib/components/Button'
-import Text from '@instructure/ui-core/lib/components/Text'
+import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import Text from '@instructure/ui-elements/lib/components/Text'
 import IconCheckMark from '@instructure/ui-icons/lib/Solid/IconCheckMark'
 import IconExpandLeftLine from 'instructure-icons/lib/Line/IconExpandLeftLine'
 import IconEnd from '@instructure/ui-icons/lib/Solid/IconEnd'

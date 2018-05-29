@@ -19,9 +19,9 @@
 import React from 'react';
 import { bool, func, shape, string } from 'prop-types';
 import IconMoreSolid from '@instructure/ui-icons/lib/Solid/IconMore';
-import Button from '@instructure/ui-core/lib/components/Button';
-import Container from '@instructure/ui-core/lib/components/Container';
-import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid';
+import Button from '@instructure/ui-buttons/lib/components/Button';
+import View from '@instructure/ui-layout/lib/components/View';
+import Grid, { GridCol, GridRow } from '@instructure/ui-layout/lib/components/Grid';
 import {
   MenuItem,
   MenuItemFlyout,
@@ -29,9 +29,9 @@ import {
   MenuItemSeparator
 } from '@instructure/ui-core/lib/components/Menu';
 import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu';
-import Text from '@instructure/ui-core/lib/components/Text';
+import Text from '@instructure/ui-elements/lib/components/Text';
 import I18n from 'i18n!gradebook';
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 import ColumnHeader from './ColumnHeader'
 
 function renderTrigger (ref) {
@@ -112,9 +112,9 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
               </GridCol>
 
               <GridCol textAlign="center">
-                <Container className="Gradebook__ColumnHeaderDetail">
+                <View className="Gradebook__ColumnHeaderDetail">
                   <Text fontStyle="normal" size="x-small" weight="bold">{ I18n.t('Total') }</Text>
-                </Container>
+                </View>
               </GridCol>
 
               <GridCol textAlign="center" width="auto">

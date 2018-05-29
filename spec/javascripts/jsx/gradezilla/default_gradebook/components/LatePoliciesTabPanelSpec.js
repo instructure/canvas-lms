@@ -19,10 +19,10 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import _ from 'underscore';
-import Alert from '@instructure/ui-core/lib/components/Alert';
-import FormFieldGroup from '@instructure/ui-core/lib/components/FormFieldGroup';
+import Alert from '@instructure/ui-alerts/lib/components/Alert';
+import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup';
 import LatePoliciesTabPanel from 'jsx/gradezilla/default_gradebook/components/LatePoliciesTabPanel';
-import Spinner from '@instructure/ui-core/lib/components/Spinner';
+import Spinner from '@instructure/ui-elements/lib/components/Spinner';
 
 const latePolicyData = {
   missingSubmissionDeductionEnabled: true,
