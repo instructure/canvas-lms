@@ -9,6 +9,17 @@
   <h1><%= @course.intro_title %></h1>
   <div class="bz-course-intro-text"><%= @course.intro_text ? @course.intro_text.html_safe : '' %></div>
 
+  <table>
+    <%
+      # want to display only announcements here
+      lol = categorize_stream_items(@stream_items)
+      items = lol["Announcement"]
+    %>
+    <%= render :partial => 'shared/recent_activity_item', :collection => items %>
+  </table>
+
+
+
   <!--
     We need parts, which organized modules, have title, description, and task boxes.
       - let's put the part ID on the module table.
