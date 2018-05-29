@@ -17,11 +17,11 @@
  */
 
 import React from 'react';
-import Button from '@instructure/ui-core/lib/components/Button';
-import Link from '@instructure/ui-core/lib/components/Link';
-import Text from '@instructure/ui-core/lib/components/Text';
-import List from '@instructure/ui-core/lib/components/List';
-import ListItem from '@instructure/ui-core/lib/components/List/ListItem';
+import Button from '@instructure/ui-buttons/lib/components/Button';
+import Link from '@instructure/ui-elements/lib/components/Link';
+import Text from '@instructure/ui-elements/lib/components/Text';
+import List from '@instructure/ui-elements/lib/components/List';
+import ListItem from '@instructure/ui-elements/lib/components/List/ListItem';
 import AssignmentIcon from '@instructure/ui-icons/lib/Line/IconAssignment';
 import QuizIcon from '@instructure/ui-icons/lib/Line/IconQuiz';
 import AnnouncementIcon from '@instructure/ui-icons/lib/Line/IconAnnouncement';
