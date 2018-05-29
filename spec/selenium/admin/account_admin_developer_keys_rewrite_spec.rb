@@ -15,19 +15,20 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../common')
+require_relative '../helpers/developer_keys_rewrite_common'
 
 describe 'Developer Keys' do
+  include_context 'in-process server selenium tests'
+  include DeveloperKeysRewriteCommon
+
   # We want to force the usage of the fallback scope mapper here, not the generated version
   Object.const_set("ApiScopeMapper", ApiScopeMapperLoader.api_scope_mapper_fallback)
-
-  include_context 'in-process server selenium tests'
 
   describe 'with developer key management UI rewrite feature flag' do
     before(:each) do
       admin_logged_in
+      Setting.set(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, 'true')
       Account.default.enable_feature!(:developer_key_management_ui_rewrite)
-
       Account.site_admin.allow_feature!(:api_token_scoping)
       Account.default.enable_feature!(:api_token_scoping)
     end
@@ -48,40 +49,6 @@ describe 'Developer Keys' do
         redirect_uris: ['http://example.com'],
         icon_url: '/images/delete.png'
       )
-    end
-
-    def click_inherited_tab
-      fj("span:contains('Inherited'):last").click
-      wait_for_ajaximations
-    end
-
-    def click_account_tab
-      fj("#reactContent span[role='tablist'] span:contains('Account')").click
-      wait_for_ajaximations
-    end
-
-    def click_edit_icon
-      fj("table[data-automation='devKeyAdminTable'] tbody tr.key button:has(svg[name='IconEdit'])").click
-    end
-
-    def click_enforce_scopes
-      f("[data-automation='enforce_scopes'] div").click
-    end
-
-    def click_scope_group_checkbox
-      fxpath('//*[@class="scopes-group"]/span[1]/span[1]').click
-    end
-
-    def click_scope_checkbox
-      fxpath("//*[@class='developer-key-scope']/span[1]/span[1]").click
-    end
-
-    def select_all_readonly_checkbox
-      fxpath("//*[@class='scopes-list']/span/div/span[1]/span/span/span[1]/div")
-    end
-
-    def all_endpoints_readonly_checkbox_selected?
-      f(".scopes-list input[type='checkbox']").selected?
     end
 
     it "allows creation through 'add developer key button'", test_id: 344077 do
@@ -190,23 +157,20 @@ describe 'Developer Keys' do
       expect(ff("table[data-automation='devKeyAdminTable'] tbody tr")).to have_size(11)
     end
 
-    it "renders the key not visible", test_id: 3485785 do
-      pending 'This test will be valid once the "new developer keys" site admin setting exists'
+    it "renders the key not visible by default upon creation", test_id: 3485785 do
       site_admin_developer_key
       site_admin_logged_in
       get "/accounts/site_admin/developer_keys"
-      fj("table[data-automation='devKeyAdminTable'] tbody tr.key button:has(svg[name='IconEye'])").click
-      expect(f("table[data-automation='devKeyAdminTable'] tbody tr.key")).to contain_css("svg[name='IconOff']")
+      expect(f("table[data-automation='devKeyAdminTable'] tr.key")).to contain_css("svg[name='IconOff']")
       expect(site_admin_developer_key.reload.visible).to eq false
     end
 
     it "renders the key visible", test_id: 3485785 do
-      pending 'This test will be valid once the "new developer keys" site admin setting exists'
-      site_admin_developer_key.update(visible: false)
+      site_admin_developer_key
       site_admin_logged_in
       get "/accounts/site_admin/developer_keys"
-      fj("table[data-automation='devKeyAdminTable'] tbody tr.key button:has(svg[name='IconOff'])").click
-      expect(f("table[data-automation='devKeyAdminTable'] tbody tr.key")).not_to contain_css("svg[name='IconOff']")
+      fj("table[data-automation='devKeyAdminTable'] button:has(svg[name='IconOff'])").click
+      expect(f("table[data-automation='devKeyAdminTable'] tr.key")).not_to contain_css("svg[name='IconOff']")
       expect(site_admin_developer_key.reload.visible).to eq true
     end
 
@@ -226,10 +190,9 @@ describe 'Developer Keys' do
       end
 
       it "root account inherits 'on' binding workflow state from site admin key", test_id: 3482823 do
-        pending 'This test will be valid once the "new developer keys" site admin setting exists'
         site_admin_logged_in
         site_admin_developer_key.update(visible: true)
-        get "/accounts/#{Account.site_admin.id}/developer_keys"
+        get "/accounts/site_admin/developer_keys"
         fj("span:contains('On'):last").click
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
@@ -238,32 +201,32 @@ describe 'Developer Keys' do
       end
 
       it "root account inherits 'off' binding workflow state from site admin key", test_id: 3482823 do
-        pending 'This test will be valid once the "new developer keys" site admin setting exists'
         site_admin_logged_in
         site_admin_developer_key.update(visible: true)
-        get "/accounts/#{Account.site_admin.id}/developer_keys"
+        get "/accounts/site_admin/developer_keys"
         fj("span:contains('Off'):last").click
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
+        # checks that the state toggle is disabled from interaction
         expect(fj("fieldset:last").attribute('aria-disabled')).to eq 'true'
         expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'off'
       end
 
       it "root account keeps self binding workflow state if site admin key state is 'allow'", test_id: 3482823 do
-        pending 'This test will be valid once the "new developer keys" site admin setting exists'
         site_admin_logged_in
         site_admin_developer_key.update!(visible: true)
         site_admin_developer_key.developer_key_account_bindings.first.update!(workflow_state: 'allow')
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
         fj("span:contains('On'):last").click
-        get "/accounts/#{Account.site_admin.id}/developer_keys"
+        get "/accounts/site_admin/developer_keys"
         fj("span:contains('Off'):last").click
         expect(DeveloperKeyAccountBinding.where(account_id: Account.site_admin.id).first.workflow_state).to eq 'off'
         fj("span:contains('Allow'):last").click
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
         expect(DeveloperKeyAccountBinding.where(account_id: Account.default.id).first.workflow_state).to eq 'on'
+        # checks that the state toggle is enabled for interaction
         expect(fj("fieldset:last")).not_to have_attribute('aria-disabled')
       end
 
@@ -324,37 +287,35 @@ describe 'Developer Keys' do
         ]
       end
 
-      before(:each) do
-        Account.site_admin.allow_feature!(:api_token_scoping)
-        Account.default.enable_feature!(:api_token_scoping)
-      end
-
-      def expand_scope_group_by_filter(scope_group)
+      it "does not have enforce scopes toggle activated on initial dev key creation" do
         get "/accounts/#{Account.default.id}/developer_keys"
         find_button("Developer Key").click
-        click_enforce_scopes
-        filter_scopes_by_name(scope_group)
-        fj(".toggle-scope-group span:contains('#{scope_group}')").click
+        expect(f("span[data-automation='enforce_scopes']")).to contain_css("svg[name='IconXSolid']")
+        expect(f("form")).to contain_jqcss("h2:contains('When scope enforcement is disabled, tokens have access to all endpoints available to the authorizing user.')")
       end
 
-      def filter_scopes_by_name(scope)
-        f("input[placeholder='Search endpoints']").clear
-        f("input[placeholder='Search endpoints']").send_keys scope
+      it "enforce scopes toggle allows scope creation" do
+        expand_scope_group_by_filter('assignment_groups_api', Account.default.id)
+        click_scope_group_checkbox
+        expect(f("span[data-automation='enforce_scopes']")).to contain_css("svg[name='IconCheckSolid']")
+        find_button("Save Key").click
+        wait_for_ajaximations
+        expect(DeveloperKey.last.require_scopes).to eq true
       end
 
       it "allows filtering by scope group name" do
-        expand_scope_group_by_filter('assignment_groups_api')
+        expand_scope_group_by_filter('assignment_groups_api', Account.default.id)
         expect(ff(".toggle-scope-group")).to have_size(1)
       end
 
       it "expands scope group when group name is selected" do
-        expand_scope_group_by_filter('assignment_groups_api')
+        expand_scope_group_by_filter('assignment_groups_api', Account.default.id)
         expect(f(".toggle-scope-group button").attribute('aria-expanded')).to eq 'true'
         expect(ff(".toggle-scope-group .developer-key-scope")).to have_size(4)
       end
 
       it "includes proper scopes for scope group" do
-        expand_scope_group_by_filter('assignment_groups_api')
+        expand_scope_group_by_filter('assignment_groups_api', Account.default.id)
         scope_group = f(".toggle-scope-group")
         expect(scope_group).to contain_css("span[title='GET']")
         expect(scope_group).to contain_css("span[title='POST']")
@@ -363,7 +324,7 @@ describe 'Developer Keys' do
       end
 
       it "scope group select all checkbox adds all associated scopes" do
-        expand_scope_group_by_filter('assignment_groups_api')
+        expand_scope_group_by_filter('assignment_groups_api', Account.default.id)
         click_scope_group_checkbox
         # checks that all UI pills have been added to scope group if selected
         expect(ff(".toggle-scope-group span[title='GET']")).to have_size(2)
@@ -373,7 +334,7 @@ describe 'Developer Keys' do
       end
 
       it "scope group individual checkbox adds only associated scope" do
-        expand_scope_group_by_filter('assignment_groups_api')
+        expand_scope_group_by_filter('assignment_groups_api', Account.default.id)
         click_scope_checkbox
         # adds a UI pill to scope group with http verb if scope selected
         expect(ff(".toggle-scope-group span[title='GET']")).to have_size(2)
@@ -383,7 +344,16 @@ describe 'Developer Keys' do
       end
 
       it "adds scopes to backend developer key via UI" do
-        expand_scope_group_by_filter('assignment_groups_api')
+        expand_scope_group_by_filter('assignment_groups_api', Account.default.id)
+        click_scope_group_checkbox
+        find_button("Save Key").click
+        wait_for_ajaximations
+        expect(DeveloperKey.last.scopes).to eq expected_scopes
+      end
+
+      it "adds scopes to backend developer key via UI in site admin" do
+        site_admin_logged_in
+        expand_scope_group_by_filter('assignment_groups_api', Account.site_admin.id)
         click_scope_group_checkbox
         find_button("Save Key").click
         wait_for_ajaximations
@@ -392,7 +362,7 @@ describe 'Developer Keys' do
 
       it "removes scopes from backend developer key via UI" do
         skip 'will be fixed in PLAT-3391'
-        expand_scope_group_by_filter('assignment_groups_api')
+        expand_scope_group_by_filter('assignment_groups_api', Account.default.id)
         click_scope_group_checkbox
         find_button("Save Key").click
         click_edit_icon
@@ -415,8 +385,8 @@ describe 'Developer Keys' do
         expect(all_endpoints_readonly_checkbox_selected?).to eq true
       end
 
-      it "keeps all endpoints read only checkbox checked if check/unchecking another http verb" do
-        expand_scope_group_by_filter('assignment_groups_api')
+      it "keeps all endpoints read only checkbox checked if check/unchecking another http method" do
+        expand_scope_group_by_filter('assignment_groups_api', Account.default.id)
         select_all_readonly_checkbox.click
         click_scope_checkbox
         expect(f(".toggle-scope-group input[type='checkbox']").selected?).to eq false
