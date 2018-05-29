@@ -234,10 +234,7 @@ module SIS
               User.transaction(:requires_new => true) do
                 if user.changed?
                   user_touched = true
-                  if user.save
-                    u_data = SisBatchRollBackData.build_data(sis_batch: @batch, context: user)
-                    @roll_back_data << u_data if u_data
-                  elsif user.errors.size > 0
+                  if !user.save && user.errors.size > 0
                     message = generate_user_warning(user.errors.first.join(" "), user_row.user_id, user_row.login_id)
                     raise ImportError, message
                   end

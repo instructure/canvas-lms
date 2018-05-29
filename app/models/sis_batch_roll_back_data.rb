@@ -21,13 +21,13 @@ class SisBatchRollBackData < ActiveRecord::Base
                                        communication_channel course
                                        course_section enrollment enrollment_term
                                        group group_category group_membership
-                                       pseudonym user user_observer}
+                                       pseudonym user_observer}
 
   scope :expired_data, -> {where('created_at < ?', 30.days.ago)}
   scope :active, -> {where(workflow_state: 'active')}
 
   RESTORE_ORDER = %w{Account EnrollmentTerm AbstractCourse Course CourseSection
-                     GroupCategory Group User Pseudonym CommunicationChannel
+                     GroupCategory Group Pseudonym CommunicationChannel
                      Enrollment GroupMembership UserObserver AccountUser}
 
   def self.cleanup_expired_data
