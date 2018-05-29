@@ -12,8 +12,38 @@ require 'bz_grading'
 class BzController < ApplicationController
 
   # magic field dump uses an access token instead
-  before_filter :require_user, :except => [:magic_field_dump]
+  # and courses_for_email is unauthenticated since it isn't really sensitive
+  before_filter :require_user, :except => [:magic_field_dump, :courses_for_email]
   skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user, :user_retained_data_batch]
+
+  # this is meant to be used for requests from external services like LL kits
+  # to see what courses the user is in. SSO just gives email, and server side, there
+  # isn't an authentication token, so we just want to give back numbers for the email
+  # address. Since course IDs aren't really sensitive, I am just letting it go unauthenticated
+  # (worst this could reveal is that email address X is associated with Braven program Y... just
+  # hitting "forgot password" with that email can already reveal that anyway, so no new hole.)
+  #
+  # I am also not using an access token like with the api since that actually opens the attack
+  # surface - they have access to a LOT more if something goes wrong.
+
+  # Input: email=something
+  # Output: while(1);{"course_id":[list,of,course,ids]}
+  # course ids may be repeated.
+  def courses_for_email
+    email = params[:email]
+
+    result = {}
+    result["course_ids"] = []
+
+    ul = UserList.new(email)
+    ul.users.each do |u|
+      u.enrollments.active.each do |e|
+        result["course_ids"] << e.course_id
+      end
+    end
+
+    render :json => result
+  end
 
   def champion_connect_redirect
     redirect_to BeyondZConfiguration.join_url + "connect"
