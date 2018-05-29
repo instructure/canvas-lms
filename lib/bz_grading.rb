@@ -311,7 +311,7 @@ class BZGrading
       when 'past_due'
         'answered past due'
       when 'not_answered'
-        'not answered'
+        'no participation'
       when 'participation'
         'participation'
       when 'mastery'

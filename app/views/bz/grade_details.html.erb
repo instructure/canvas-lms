@@ -63,10 +63,19 @@
 
     var div = document.createElement("div");
     div.className = "grade-explained";
-    div.innerHTML =
-      "<span class=\"score\">" + prettyRound(info["points_amount"]) + "/" + prettyRound(info["points_possible"]) + " points</span>\n" +
-      (info["points_given"] ? "awarded for: " : "missed because: ") + "\n" +
-      "<span class=\"score-reason\">" + info["points_reason_english"] + "</span>";
+    if(info["points_amount"] == 0 || info["points_amount"] == info["points_possible") {
+      // full credit
+      div.innerHTML =
+        "<span class=\"score\">" + prettyRound(info["points_possible"]) + " points</span>\n" +
+        (info["points_given"] ? "awarded because: " : "deducted because: ") + "\n" +
+        "<span class=\"score-reason\">" + info["points_reason_english"] + "</span>";
+    } else {
+      // partial credit
+      div.innerHTML =
+        "<span class=\"score\">" + prettyRound(info["points_amount"]) + "/" + prettyRound(info["points_possible"]) + " points</span>\n" +
+        (info["points_given"] ? "awarded for: " : "missed because: ") + "\n" +
+        "<span class=\"score-reason\">" + info["points_reason_english"] + "</span>";
+    }
 
     div.id = info["field_name"];
 
