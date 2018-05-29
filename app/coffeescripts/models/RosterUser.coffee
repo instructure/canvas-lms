@@ -18,15 +18,18 @@
 define ['compiled/models/User', 'compiled/util/secondsToTime', 'underscore'], (User, secondsToTime, _) ->
 
   class RosterUser extends User
-
     defaults:
       avatar_url: '/images/messages/avatar-50.png'
 
     computedAttributes: [
       'sections'
+      'csrf'
       'total_activity_string'
       {name: 'html_url', deps: ['enrollments']}
     ]
+
+    csrf: ->
+      $.cookie('_csrf_token')
 
     html_url: ->
       @get('enrollments')[0]?.html_url
@@ -45,4 +48,3 @@ define ['compiled/models/User', 'compiled/util/secondsToTime', 'underscore'], (U
         secondsToTime(time)
       else
         ''
-

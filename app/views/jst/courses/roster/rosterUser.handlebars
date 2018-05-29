@@ -45,8 +45,18 @@
   <div>{{total_activity_string}}</div>
 </td>
 <td>
-  <div>{{sequence_control_string}}</div>
+  <div>{{csrf}}</div>
+  {{#each enrollments}}
+    <form action="/enrollments/{{id}}/settings/sequence_control" method='post'>
+      <input type="hidden" name='_method' value="put" />
+      <input type="hidden" name='value' value="true" />
+      <input type="hidden" name='authenticity_token' />
+      <input type="submit" />
+    </form>
+  {{/each}}
 </td>
+
+
 {{/if}}
 <td class="right">
   {{#if canManage}}

@@ -26,6 +26,10 @@ CanvasRails::Application.routes.draw do
   post "/api/graphql", to: "graphql#execute"
   get 'graphiql', to: 'graphql#graphiql'
 
+  resources(:enrollments) do
+    resources(:settings, controller: :enrollment_settings)
+  end
+  
   resources :submission_comments, only: [:update, :destroy]
 
   resources :epub_exports, only: [:index]
@@ -994,6 +998,8 @@ CanvasRails::Application.routes.draw do
 
       delete 'courses/:course_id/enrollments/:id', action: :destroy
     end
+
+
 
     scope(controller: :terms_api) do
       get 'accounts/:account_id/terms', action: :index, as: 'enrollment_terms'
