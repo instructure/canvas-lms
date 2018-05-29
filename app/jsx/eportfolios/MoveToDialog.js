@@ -20,9 +20,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
 import I18n from 'i18n!eportfolio'
-import Modal, {ModalHeader, ModalBody, ModalFooter } from '@instructure/ui-core/lib/components/Modal'
-import Button from '@instructure/ui-core/lib/components/Button'
-import Heading from '@instructure/ui-core/lib/components/Heading'
+import Modal, {ModalHeader, ModalBody, ModalFooter } from '@instructure/ui-overlays/lib/components/Modal'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
 import Select from '@instructure/ui-core/lib/components/Select'
 
   var MoveToDialog = React.createClass({
@@ -100,7 +100,6 @@ import Select from '@instructure/ui-core/lib/components/Select'
           modalSize='small'
           label={dialogLabel}
           closeButtonLabel={I18n.t('Cancel')}
-          applicationElement={() => document.getElementById('application')}
           onOpen={this.handleReady}
           onDismiss={this.handleRequestClose}
           onClose={this.handleClose}

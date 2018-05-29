@@ -19,9 +19,9 @@
 /*global jsonData*/
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Alert from '@instructure/ui-core/lib/components/Alert';
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
-import TextArea from '@instructure/ui-core/lib/components/TextArea';
+import Alert from '@instructure/ui-alerts/lib/components/Alert';
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
+import TextArea from '@instructure/ui-forms/lib/components/TextArea';
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper';
 import quizzesNextSpeedGrading from 'jsx/grading/quizzesNextSpeedGrading';
 import StatusPill from 'jsx/grading/StatusPill';
