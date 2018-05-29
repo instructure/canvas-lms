@@ -35,10 +35,13 @@ class DueDateCacher
     current_caller = caller(1..1).first
     Rails.logger.debug "DDC.recompute(#{assignment&.id}) - #{current_caller}"
     return unless assignment.active?
+    # We use a strand here instead of a singleton because a bunch of
+    # assignment updates with upgrade_grades could end up causing
+    # score table fights.
     opts = {
       assignments: [assignment.id],
       inst_jobs_opts: {
-        singleton: "cached_due_date:calculator:Assignment:#{assignment.global_id}"
+        strand: "cached_due_date:calculator:Course:Assignments:#{assignment.context.global_id}"
       },
       update_grades: update_grades,
       original_caller: current_caller
@@ -50,7 +53,7 @@ class DueDateCacher
   def self.recompute_course(course, assignments: nil, inst_jobs_opts: {}, run_immediately: false, update_grades: false, original_caller: caller(1..1).first)
     Rails.logger.debug "DDC.recompute_course(#{course.inspect}, #{assignments.inspect}, #{inst_jobs_opts.inspect}) - #{original_caller}"
     course = Course.find(course) unless course.is_a?(Course)
-    inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Course:#{course.global_id}" if assignments.nil?
+    inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Course:#{course.global_id}" if assignments.nil? && !inst_jobs_opts[:strand]
 
     assignments_to_recompute = assignments || Assignment.active.where(context: course).pluck(:id)
     return if assignments_to_recompute.empty?
