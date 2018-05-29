@@ -177,6 +177,7 @@
     "test": "concurrently --names \"packages,jest,karma\" \"yarn test:packages\" \"jest\" \"if [ \"$COVERAGE\" ]; then yarn test:karma; else yarn test:karma:concurrently; fi\"",
     "test:watch": "concurrently --names \"jest,karma\" \"jest --watch .\" \"yarn test:karma:watch\"",
     "test:jest": "echo 'this is here just so you know you can use jest, but just use the `jest` cli directly' && jest",
+    "test:jest:debug": "node --inspect node_modules/.bin/jest --runInBand --watch",
     "test:karma": "yarn run test:karma:watch --single-run",
     "test:karma:concurrently": "concurrently --names \"coffee,js1,js2\" \"JSPEC_GROUP=coffee yarn test:karma:headless\" \"JSPEC_GROUP=js1 yarn test:karma:headless\" \"JSPEC_GROUP=js2 yarn test:karma:headless\"",
     "test:karma:headless": "yarn run test:karma --browsers ChromeHeadlessNoSandbox",

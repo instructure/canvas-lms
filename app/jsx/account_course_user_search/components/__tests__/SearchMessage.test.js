@@ -60,6 +60,25 @@ describe("Pagination Handling", () => {
     const buttons = wrapper.find("PaginationButton").map(x => x.text());
     expect(buttons).toEqual(["1", "5", "Loading...", "7", "8", "9", "10"]);
   });
+
+  it("sets state to lastUnknown if there is no last link", () => {
+    const props = getProps();
+    const wrapper = mount(<SearchMessage {...props} />);
+    delete props.collection.links.last;
+    props.collection.links.next = { url: "next", page: "2" };
+    wrapper.setProps(props);
+    expect(wrapper.state().lastUnknown).toBe(true);
+  })
+
+  it("sets state to lastUnknown false if there is a last link", () => {
+    const props = getProps();
+    const wrapper = mount(<SearchMessage {...props} />);
+    delete props.collection.links.last;
+    props.collection.links.next = { url: "next", page: "2" };
+    wrapper.setProps(props);
+    wrapper.setProps(getProps());
+    expect(wrapper.state().lastUnknown).toBe(false);
+  })
 });
 
 describe("Screenreader Alerting", () => {

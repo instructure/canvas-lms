@@ -34,10 +34,7 @@ export default class SearchMessage extends Component {
   static propTypes = {
     collection: shape({
       data: array.isRequired,
-      links: shape({
-        current: linkPropType,
-        last: linkPropType
-      })
+      links: shape({ current: linkPropType })
     }).isRequired,
     setPage: func.isRequired,
     noneFoundMessage: string.isRequired,
@@ -67,6 +64,7 @@ export default class SearchMessage extends Component {
 
       if (nextProps.collection.links.last) {
         newState.lastKnownPage = nextProps.collection.links.last;
+        newState.lastUnknown = false
       } else {
         newState.lastKnownPage = nextProps.collection.links.next;
         newState.lastUnknown = true
