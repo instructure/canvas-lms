@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {func, object, string} from 'prop-types'
-import Button from '@instructure/ui-core/lib/components/Button'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import I18n from 'i18n!external_tools'
 
 
