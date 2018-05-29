@@ -949,7 +949,13 @@ module ApplicationHelper
   end
 
   def file_authenticator
-    FileAuthenticator.new(file_access_real_user, file_access_user, file_access_oauth_host)
+    FileAuthenticator.new(
+      user: file_access_real_user,
+      acting_as: file_access_user,
+      access_token: @access_token,
+      root_account: @domain_root_account,
+      oauth_host: file_access_oauth_host
+    )
   end
 
   def authenticated_download_url(attachment)
