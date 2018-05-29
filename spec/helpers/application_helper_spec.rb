@@ -873,6 +873,10 @@ describe ApplicationHelper do
   end
 
   describe "file_authenticator" do
+    before :each do
+      @domain_root_account = Account.default
+    end
+
     context "not on the files domain, logged in" do
       before :each do
         @files_domain = false
@@ -893,6 +897,15 @@ describe ApplicationHelper do
 
       it "creates an authenticator for the current host" do
         expect(file_authenticator.oauth_host).to eql current_host
+      end
+
+      it "creates an authenticator aware of the access token if present" do
+        @access_token = logged_in_user.access_tokens.create!
+        expect(file_authenticator.access_token).to eql @access_token
+      end
+
+      it "creates an authenticator aware of the root account" do
+        expect(file_authenticator.root_account).to eql @domain_root_account
       end
     end
 

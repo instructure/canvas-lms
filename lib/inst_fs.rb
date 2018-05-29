@@ -70,19 +70,27 @@ module InstFS
       end
     end
 
-    def upload_preflight_json(context:, user:, acting_as:, folder:, filename:, content_type:, quota_exempt:, on_duplicate:, capture_url:, target_url: nil, progress_json: nil, include_param: nil)
+    def upload_preflight_json(context:, root_account:, user:, acting_as:, access_token:, folder:, filename:, content_type:, quota_exempt:, on_duplicate:, capture_url:, target_url: nil, progress_json: nil, include_param: nil)
       raise ArgumentError unless !!target_url == !!progress_json # these params must both be present or both absent
 
-      token = upload_jwt(user, acting_as, capture_url,
-        context_type: context.class.to_s,
-        context_id: context.global_id.to_s,
-        user_id: acting_as.global_id.to_s,
-        folder_id: folder&.global_id.to_s,
-        root_account_id: context.respond_to?(:root_account) && context.root_account.global_id.to_s,
-        quota_exempt: !!quota_exempt,
-        on_duplicate: on_duplicate,
-        progress_id: progress_json && progress_json[:id],
-        include: include_param)
+      token = upload_jwt(
+        user: user,
+        acting_as: acting_as,
+        access_token: access_token,
+        root_account: root_account,
+        capture_url: capture_url,
+        capture_params: {
+          context_type: context.class.to_s,
+          context_id: context.global_id.to_s,
+          user_id: acting_as.global_id.to_s,
+          folder_id: folder&.global_id&.to_s,
+          root_account_id: root_account.global_id.to_s,
+          quota_exempt: !!quota_exempt,
+          on_duplicate: on_duplicate,
+          progress_id: progress_json && progress_json[:id],
+          include: include_param
+        }
+      )
 
       upload_params = {
         filename: filename,
@@ -183,10 +191,11 @@ module InstFS
       if options[:acting_as] && options[:acting_as] != options[:user]
         claims[:acting_as_user_id] = options[:acting_as].global_id.to_s
       end
+      amend_claims_for_access_token(claims, options[:access_token], options[:root_account])
       service_jwt(claims, expires_in)
     end
 
-    def upload_jwt(user, acting_as, capture_url, capture_params)
+    def upload_jwt(user:, acting_as:, access_token:, root_account:, capture_url:, capture_params:)
       expires_in = Setting.get('instfs.upload_jwt.expiration_minutes', '10').to_i.minutes
       claims = {
         iat: Time.now.utc.to_i,
@@ -198,6 +207,7 @@ module InstFS
       unless acting_as == user
         claims[:acting_as_user_id] = acting_as.global_id.to_s
       end
+      amend_claims_for_access_token(claims, access_token, root_account)
       service_jwt(claims, expires_in)
     end
 
@@ -236,6 +246,29 @@ module InstFS
         iat: Time.now.utc.to_i,
         resource: '/references'
       }, expires_in)
+    end
+
+    def amend_claims_for_access_token(claims, access_token, root_account)
+      return unless access_token
+      if whitelisted_access_token?(access_token)
+        # temporary workaround for legacy API consumers
+        claims[:legacy_api_developer_key_id] = access_token.global_developer_key_id.to_s
+        claims[:legacy_api_root_account_id] = root_account.global_id.to_s
+      else
+        # TODO: long term solution for updated API consumers goes here
+      end
+    end
+
+    def whitelisted_access_token?(access_token)
+      if access_token.nil?
+        false
+      elsif Setting.get('instfs.whitelist_all_developer_keys', 'false') == 'true'
+        true
+      else
+        whitelist = Setting.get('instfs.whitelisted_developer_key_global_ids', '')
+        whitelist = whitelist.split(',').map(&:to_i)
+        whitelist.include?(access_token.global_developer_key_id)
+      end
     end
   end
 
