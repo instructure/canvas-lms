@@ -20,9 +20,9 @@ import I18n from 'i18n!discussions_v2'
 import React from 'react'
 import { string } from 'prop-types'
 
-import Container from '@instructure/ui-core/lib/components/Container'
-import Link from '@instructure/ui-core/lib/components/Link'
-import Text from '@instructure/ui-core/lib/components/Text'
+import View from '@instructure/ui-layout/lib/components/View'
+import Link from '@instructure/ui-elements/lib/components/Link'
+import Text from '@instructure/ui-elements/lib/components/Text'
 
 import propTypes from '../propTypes'
 
@@ -31,9 +31,9 @@ import unpinnedUrl from '../../../../public/images/discussions/unpinned.svg' // 
 import closedForCommentsUrl from '../../../../public/images/discussions/closed-comments.svg' // eslint-disable-line
 
 const BackgroundSVG = props => (
-  <Container margin="small auto" size="x-small" display="block">
+  <View margin="small auto" size="x-small" display="block">
     <img alt="" src={props.url} />
-  </Container>
+  </View>
 )
 
 BackgroundSVG.propTypes = {
@@ -41,7 +41,7 @@ BackgroundSVG.propTypes = {
 }
 
 export const pinnedDiscussionBackground = (props) => (
-  <Container margin="large" textAlign="center" display="block">
+  <View margin="large" textAlign="center" display="block">
     <BackgroundSVG url={pinnedUrl} />
     <Text as="div" margin="x-small auto" weight="bold">
       {I18n.t('You currently have no pinned discussions')}
@@ -51,7 +51,7 @@ export const pinnedDiscussionBackground = (props) => (
         'To pin a discussion to the top of the page, drag a discussion here, or select Pin from the discussion settings menu.'
       )}
     </Text>}
-  </Container>
+  </View>
 )
 
 pinnedDiscussionBackground.propTypes = {
@@ -59,7 +59,7 @@ pinnedDiscussionBackground.propTypes = {
 }
 
 export const unpinnedDiscussionsBackground = (props) => (
-  <Container margin="large" textAlign="center" display="block">
+  <View margin="large" textAlign="center" display="block">
     <BackgroundSVG url={unpinnedUrl} />
     <Text as="div" margin="x-small auto" weight="bold">
       {I18n.t('There are no discussions to show in this section')}
@@ -67,7 +67,7 @@ export const unpinnedDiscussionsBackground = (props) => (
   {props.permissions.create && <Link href={`/${props.contextType}s/${props.contextID}/discussion_topics/new`}>
       {I18n.t('Click here to add a discussion')}
     </Link>}
-  </Container>
+  </View>
 )
 
 unpinnedDiscussionsBackground.propTypes = {
@@ -77,7 +77,7 @@ unpinnedDiscussionsBackground.propTypes = {
 }
 
 export const closedDiscussionBackground = (props) => (
-  <Container margin="large" textAlign="center" display="block">
+  <View margin="large" textAlign="center" display="block">
     <BackgroundSVG url={closedForCommentsUrl} />
     <Text as="div" margin="x-small auto" weight="bold">
       {I18n.t('You currently have no discussions with closed comments')}
@@ -87,7 +87,7 @@ export const closedDiscussionBackground = (props) => (
         'To close comments on a discussion, drag a discussion here, or select Close for Comments from the discussion settings menu.'
       )}
     </Text>}
-  </Container>
+  </View>
 )
 
 closedDiscussionBackground.propTypes = {

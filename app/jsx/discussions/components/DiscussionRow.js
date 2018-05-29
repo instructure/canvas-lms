@@ -29,11 +29,11 @@ import cx from 'classnames'
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
 
-import Badge from '@instructure/ui-core/lib/components/Badge'
-import Container from '@instructure/ui-core/lib/components/Container'
+import Badge from '@instructure/ui-elements/lib/components/Badge'
+import View from '@instructure/ui-layout/lib/components/View'
 import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
 import Grid, { GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import Heading from '@instructure/ui-core/lib/components/Heading'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
 
 import IconAssignmentLine from '@instructure/ui-icons/lib/Line/IconAssignment'
 import IconBookmarkLine from '@instructure/ui-icons/lib/Line/IconBookmark'
@@ -50,9 +50,9 @@ import IconTrashSolid from '@instructure/ui-icons/lib/Solid/IconTrash'
 import IconUnlock from '@instructure/ui-icons/lib/Line/IconUnlock'
 import IconUnpublishedLine from '@instructure/ui-icons/lib/Line/IconUnpublished'
 import IconUpdownLine from '@instructure/ui-icons/lib/Line/IconUpdown'
-import Pill from '@instructure/ui-core/lib/components/Pill'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-core/lib/components/Text'
+import Pill from '@instructure/ui-elements/lib/components/Pill'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import Text from '@instructure/ui-elements/lib/components/Text'
 import { MenuItem } from '@instructure/ui-core/lib/components/Menu'
 
 import DiscussionModel from 'compiled/models/DiscussionTopic'
@@ -686,9 +686,9 @@ export class DiscussionRow extends Component {
             <GridCol width="auto">
             {!(this.props.discussion.read_state === "read")
               ? <Badge margin="0 small x-small 0" standalone type="notification" />
-              : <Container display="block" margin="0 small x-small 0">
-            <Container display="block" margin="0 small x-small 0" />
-            </Container>}
+              : <View display="block" margin="0 small x-small 0">
+            <View display="block" margin="0 small x-small 0" />
+            </View>}
             </GridCol>
             <GridCol>
               {this.renderDiscussion()}
