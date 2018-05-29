@@ -21,7 +21,7 @@ exports[`renders the AlignmentResult component 1`] = `
   <FlexItem padding=\\"x-small 0\\" as=\\"span\\" grow={false} shrink={false}>
     <View padding=\\"x-small 0 0 0\\" display=\\"auto\\">
       <Text size=\\"small\\" fontStyle=\\"italic\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
-        Your score:
+        Your score
       </Text>
     </View>
   </FlexItem>

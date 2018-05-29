@@ -41,7 +41,7 @@ const AlignmentResult = ({ outcome, result }) => {
       </FlexItem>
       <FlexItem padding="x-small 0">
         <View padding="x-small 0 0 0">
-          <Text size="small" fontStyle="italic" weight="bold">{ I18n.t('Your score:') }</Text>
+          <Text size="small" fontStyle="italic" weight="bold">{ I18n.t('Your score') }</Text>
         </View>
       </FlexItem>
       <FlexItem borderWidth="small">
