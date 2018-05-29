@@ -19,7 +19,7 @@ import React from 'react'
 import classNames from 'classnames'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import Text from '@instructure/ui-core/lib/components/Text'
+import Text from '@instructure/ui-elements/lib/components/Text'
 import I18n from 'i18n!edit_rubric'
 
 import { ratingShape, tierShape } from './types'

@@ -17,9 +17,9 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import Button from '@instructure/ui-core/lib/components/Button'
-import CloseButton from '@instructure/ui-core/lib/components/CloseButton'
-import Heading from '@instructure/ui-core/lib/components/Heading'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
 import TextArea from '@instructure/ui-forms/lib/components/TextArea'
 import IconFeedback from '@instructure/ui-icons/lib/Line/IconFeedback'
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '@instructure/ui-overlays/lib/components/Modal'

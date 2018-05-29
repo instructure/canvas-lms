@@ -20,7 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
 import { MenuItem, MenuItemSeparator, MenuItemGroup } from '@instructure/ui-core/lib/components/Menu'
-import Text from '@instructure/ui-core/lib/components/Text'
+import Text from '@instructure/ui-elements/lib/components/Text'
 import I18n from 'i18n!edit_rubric'
 import $ from 'jquery'
 

@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import Button from '@instructure/ui-core/lib/components/Button'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import IconPlus from 'instructure-icons/lib/Line/IconPlusLine'
 import I18n from 'i18n!rubrics'
-import Table from '@instructure/ui-core/lib/components/Table'
+import Table from '@instructure/ui-elements/lib/components/Table'
 import ProficiencyRating from 'jsx/rubrics/ProficiencyRating'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import uuid from 'uuid/v1'
 import _ from 'underscore'
 import { fromJS, List } from 'immutable'

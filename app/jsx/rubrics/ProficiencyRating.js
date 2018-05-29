@@ -18,13 +18,13 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Button from '@instructure/ui-core/lib/components/Button'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import I18n from 'i18n!rubrics'
 import IconTrash from 'instructure-icons/lib/Line/IconTrashLine'
-import Popover, {PopoverTrigger, PopoverContent} from '@instructure/ui-core/lib/components/Popover'
-import RadioInput from '@instructure/ui-core/lib/components/RadioInput'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
-import TextInput from '@instructure/ui-core/lib/components/TextInput'
+import Popover, {PopoverTrigger, PopoverContent} from '@instructure/ui-overlays/lib/components/Popover'
+import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import ColorPicker, { PREDEFINED_COLORS } from '../shared/ColorPicker'
 
 function formatColor (color) {
