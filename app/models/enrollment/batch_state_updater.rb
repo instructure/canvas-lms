@@ -169,7 +169,7 @@ class Enrollment::BatchStateUpdater
 
   def self.recache_all_course_grade_distribution(courses)
     courses.each do |c|
-      c.recache_grade_distribution
+      c.recache_grade_distribution if c.respond_to?(:recache_grade_distribution)
     end
   end
 
