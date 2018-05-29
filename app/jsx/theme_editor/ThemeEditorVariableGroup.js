@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ToggleDetails from '@instructure/ui-core/lib/components/ToggleDetails'
+import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails'
 import {bool, func, node, number} from 'prop-types'
 import IconArrowOpenUpSolid from '@instructure/ui-icons/lib/Solid/IconArrowOpenUp'
 
