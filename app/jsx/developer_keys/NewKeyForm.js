@@ -16,13 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import FormFieldGroup from '@instructure/ui-core/lib/components/FormFieldGroup'
-import Grid, {GridCol, GridRow} from '@instructure/ui-core/lib/components/Grid'
+import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup'
+import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
 import I18n from 'i18n!react_developer_keys'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
-import TextArea from '@instructure/ui-core/lib/components/TextArea'
-import TextInput from '@instructure/ui-core/lib/components/TextInput'
-
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import TextArea from '@instructure/ui-forms/lib/components/TextArea'
+import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import React from 'react'
 import PropTypes from 'prop-types'
 

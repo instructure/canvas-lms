@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Button from '@instructure/ui-core/lib/components/Button'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
-import Heading from '@instructure/ui-core/lib/components/Heading'
-import Spinner from '@instructure/ui-core/lib/components/Spinner'
-import TabList, {TabPanel} from '@instructure/ui-core/lib/components/TabList'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 
 import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus'
 

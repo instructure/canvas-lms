@@ -21,11 +21,7 @@ import {mount, shallow} from 'enzyme'
 import DeveloperKeyModal from 'jsx/developer_keys/NewKeyModal'
 import $ from '../../../../app/coffeescripts/jquery.rails_flash_notifications'
 
-QUnit.module('NewKeyModal', {
-  teardown() {
-    $('#fixtures').empty()
-  }
-})
+QUnit.module('NewKeyModal')
 
 const selectedScopes = [
   "url:POST|/api/v1/accounts/:account_id/account_notifications",
@@ -351,6 +347,8 @@ test('it sends the contents of the form saving', () => {
   equal(sentFormData.get('developer_key[icon_url]'), developerKey.icon_url)
   equal(sentFormData.get('developer_key[notes]'), developerKey.notes)
   equal(sentFormData.get('developer_key[require_scopes]'), 'true')
+
+  wrapper.unmount()
 })
 
 test('sends form content without scopes and require_scopes set to false when not require_scopes', () => {
@@ -390,6 +388,8 @@ test('sends form content without scopes and require_scopes set to false when not
   equal(sentFormData.get('developer_key[icon_url]'), developerKey.icon_url)
   equal(sentFormData.get('developer_key[notes]'), developerKey.notes)
   equal(sentFormData.get('developer_key[require_scopes]'), 'false')
+
+  wrapper.unmount()
 })
 
 test('it adds each selected scope to the form data', () => {
@@ -415,6 +415,8 @@ test('it adds each selected scope to the form data', () => {
   wrapper.node.submitForm()
   const [[sentFormData]] = createOrEditSpy.args
   deepEqual(sentFormData.getAll('developer_key[scopes][]'), selectedScopes)
+
+  wrapper.unmount()
 })
 
 test('flashes an error if no scopes are selected', () => {
@@ -441,4 +443,6 @@ test('flashes an error if no scopes are selected', () => {
   wrapper.node.submitForm()
   ok(flashStub.calledWith('At least one scope must be selected.'))
   flashStub.restore()
+
+  wrapper.unmount()
 })

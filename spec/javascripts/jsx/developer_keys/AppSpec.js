@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-addons-test-utils'
-import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import {mount} from 'enzyme'
 
 import DeveloperKeysApp from 'jsx/developer_keys/App';

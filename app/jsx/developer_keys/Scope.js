@@ -17,9 +17,9 @@
  */
 import PropTypes from 'prop-types'
 import React from 'react'
-import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
+import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import DeveloperKeyScopesMethod from './ScopesMethod'
 
 const DeveloperKeyScope = props => {

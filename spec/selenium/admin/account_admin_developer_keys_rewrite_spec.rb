@@ -116,7 +116,7 @@ describe 'Developer Keys' do
       expect(key.icon_url).to eq "/images/add.png"
     end
 
-    it "allows deletion through 'delete this key button'", test_id: 344079 do
+    it "allows editing a developer key", test_id: 3469349 do
       skip_if_safari(:alert)
       root_developer_key
       get "/accounts/#{Account.default.id}/developer_keys"
@@ -130,10 +130,14 @@ describe 'Developer Keys' do
       expect(Account.default.developer_keys.count).to eq 1
       key = Account.default.developer_keys.last
       expect(key.icon_url).to eq nil
+    end
 
+    it "allows deletion through 'delete this key button'", test_id: 344079 do
+      skip_if_safari(:alert)
+      root_developer_key
+      get "/accounts/#{Account.default.id}/developer_keys"
       fj("table[data-automation='devKeyAdminTable'] tbody tr.key button:has(svg[name='IconTrash'])").click
-      driver.switch_to.alert.accept
-      driver.switch_to.default_content
+      accept_alert
       expect(f("table[data-automation='devKeyAdminTable']")).not_to contain_css("tbody tr")
       expect(Account.default.developer_keys.nondeleted.count).to eq 0
     end
@@ -290,14 +294,14 @@ describe 'Developer Keys' do
       it "does not have enforce scopes toggle activated on initial dev key creation" do
         get "/accounts/#{Account.default.id}/developer_keys"
         find_button("Developer Key").click
-        expect(f("span[data-automation='enforce_scopes']")).to contain_css("svg[name='IconXSolid']")
+        expect(f("span[data-automation='enforce_scopes']")).to contain_css("svg[name='IconX']")
         expect(f("form")).to contain_jqcss("h2:contains('When scope enforcement is disabled, tokens have access to all endpoints available to the authorizing user.')")
       end
 
       it "enforce scopes toggle allows scope creation" do
         expand_scope_group_by_filter('assignment_groups_api', Account.default.id)
         click_scope_group_checkbox
-        expect(f("span[data-automation='enforce_scopes']")).to contain_css("svg[name='IconCheckSolid']")
+        expect(f("span[data-automation='enforce_scopes']")).to contain_css("svg[name='IconCheck']")
         find_button("Save Key").click
         wait_for_ajaximations
         expect(DeveloperKey.last.require_scopes).to eq true

@@ -18,10 +18,11 @@
 
 import I18n from 'i18n!react_developer_keys'
 import $ from 'jquery'
-import Button from '@instructure/ui-core/lib/components/Button'
-import Heading from '@instructure/ui-core/lib/components/Heading'
-import Modal, {ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-core/lib/components/Modal'
-import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
+import Modal, {ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import React from 'react'
 import PropTypes from 'prop-types'
 import DeveloperKeyFormFields from './NewKeyForm'
@@ -127,12 +128,11 @@ export default class DeveloperKeyModal extends React.Component {
           onDismiss={this.closeModal}
           size="fullscreen"
           label={this.modalTitle()}
-          shouldCloseOnOverlayClick
-          closeButtonLabel={I18n.t('Cancel')}
-          applicationElement={() => [this.modalContainer]}
-          mountNode={this.props.mountNode}
         >
           <ModalHeader>
+            <CloseButton placement="end" onClick={this.closeModal}>
+              {I18n.t('Cancel')}
+            </CloseButton>
             <Heading>{I18n.t('Key Settings')}</Heading>
           </ModalHeader>
           <ModalBody>{this.modalBody()}</ModalBody>
@@ -177,11 +177,6 @@ DeveloperKeyModal.propTypes = {
       contextId: PropTypes.string.isRequired
     })
   }).isRequired,
-  mountNode: PropTypes.func,
   selectedScopes: PropTypes.arrayOf(PropTypes.string).isRequired
-}
-
-DeveloperKeyModal.defaultProps = {
-  mountNode: () => document.body
 }
 

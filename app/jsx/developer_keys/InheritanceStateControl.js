@@ -19,9 +19,9 @@
 import I18n from 'i18n!react_developer_keys'
 import PropTypes from 'prop-types'
 import React from 'react'
-import RadioInputGroup from '@instructure/ui-core/lib/components/RadioInputGroup'
-import RadioInput from '@instructure/ui-core/lib/components/RadioInput'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup'
+import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 export default class DeveloperKeyStateControl extends React.Component {
   setBindingState = newValue => {
@@ -79,7 +79,7 @@ export default class DeveloperKeyStateControl extends React.Component {
         description={
           <ScreenReaderContent>{I18n.t('Key state for the current account')}</ScreenReaderContent>
         }
-        onChange={this.setBindingState}
+        onChange={(e, val) => this.setBindingState(val)}
         disabled={this.disabled()}
         name={this.props.developerKey.id}
       >
