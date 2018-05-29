@@ -100,7 +100,7 @@ module Context
     contexts = associations.group_by(&:context_code).map do |code, code_associations|
       context_name = code_associations.first.context_name
       {
-        :rubrics => associations.length,
+        :rubrics => code_associations.length,
         :context_code => code,
         :name => context_name
       }

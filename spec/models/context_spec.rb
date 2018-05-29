@@ -212,8 +212,12 @@ describe Context do
       course = Course.create!(:name => 'MMM', account: parent)
       add_rubric(course)
 
-      contexts = course.rubric_contexts(nil).map { |r| r[:name] }
-      expect(contexts).to eq(['AAA', 'MMM', 'ZZZ'])
+      contexts = course.rubric_contexts(nil).map { |c| c.slice(:name, :rubrics) }
+      expect(contexts).to eq([
+        { name: 'AAA', rubrics: 1},
+        { name: 'MMM', rubrics: 1},
+        { name: 'ZZZ', rubrics: 1}
+      ])
     end
   end
 end
