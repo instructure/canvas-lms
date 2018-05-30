@@ -1,9 +1,68 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`The Ratings component renders the Rating sub-components as expected when range rating enabled 1`] = `
+"<div className=\\"rating-tier\\" onClick={[Function]} onKeyPress={[Function]} role=\\"button\\" tabIndex={0}>
+  <div className=\\"rating-points\\">
+    <Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      10.0 to &gt;5.0 pts
+    </Text>
+  </div>
+  <div className=\\"rating-description\\">
+    <Text size=\\"x-small\\" lineHeight=\\"condensed\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      Superb
+    </Text>
+  </div>
+  <Text size=\\"x-small\\" fontStyle=\\"italic\\" lineHeight=\\"condensed\\" as=\\"span\\" letterSpacing=\\"normal\\" />
+  <div className=\\"shader\\">
+    <div className=\\"triangle\\" />
+  </div>
+</div>"
+`;
+
+exports[`The Ratings component renders the Rating sub-components as expected when range rating enabled 2`] = `
+"<div className=\\"rating-tier selected partial\\" onClick={[Function]} onKeyPress={[Function]} role=\\"button\\" tabIndex={0}>
+  <div className=\\"rating-points\\">
+    <Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      5.0 to &gt;1.0 pts
+    </Text>
+  </div>
+  <div className=\\"rating-description\\">
+    <Text size=\\"x-small\\" lineHeight=\\"condensed\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      Meh
+    </Text>
+  </div>
+  <Text size=\\"x-small\\" fontStyle=\\"italic\\" lineHeight=\\"condensed\\" as=\\"span\\" letterSpacing=\\"normal\\">
+    More Verbosity
+  </Text>
+  <div className=\\"shader\\">
+    <div className=\\"triangle\\" />
+  </div>
+</div>"
+`;
+
+exports[`The Ratings component renders the Rating sub-components as expected when range rating enabled 3`] = `
+"<div className=\\"rating-tier\\" onClick={[Function]} onKeyPress={[Function]} role=\\"button\\" tabIndex={0}>
+  <div className=\\"rating-points\\">
+    <Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      1.0 to &gt;0.0 pts
+    </Text>
+  </div>
+  <div className=\\"rating-description\\">
+    <Text size=\\"x-small\\" lineHeight=\\"condensed\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      Subpar
+    </Text>
+  </div>
+  <Text size=\\"x-small\\" fontStyle=\\"italic\\" lineHeight=\\"condensed\\" as=\\"span\\" letterSpacing=\\"normal\\" />
+  <div className=\\"shader\\">
+    <div className=\\"triangle\\" />
+  </div>
+</div>"
+`;
+
 exports[`The Ratings component renders the root component as expected 1`] = `
 "<div className=\\"rating-tier-list\\">
-  <Rating onClick={[Function]} classes=\\"rating-tier\\" description=\\"Superb\\" points={10} selected={false} />
-  <Rating onClick={[Function]} classes=\\"rating-tier selected none\\" description=\\"Meh\\" long_description=\\"More Verbosity\\" points={5} selected={false} />
-  <Rating onClick={[Function]} classes=\\"rating-tier\\" description=\\"Subpar\\" points={2} selected={false} />
+  <Rating onClick={[Function]} classes=\\"rating-tier\\" endOfRangePoints={{...}} description=\\"Superb\\" points={10} selected={false} />
+  <Rating onClick={[Function]} classes=\\"rating-tier selected partial\\" endOfRangePoints={{...}} description=\\"Meh\\" long_description=\\"More Verbosity\\" points={5} selected={false} />
+  <Rating onClick={[Function]} classes=\\"rating-tier\\" endOfRangePoints={{...}} description=\\"Subpar\\" points={1} selected={false} />
 </div>"
 `;

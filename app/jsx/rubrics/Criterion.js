@@ -118,6 +118,7 @@ export default class Criterion extends React.Component {
     } = this.props
     const { dialogOpen } = this.state
     const isOutcome = criterion.learning_outcome_id !== undefined
+    const useRange = criterion.criterion_use_range
     const assessing = onAssessmentChange !== null && assessment !== null
     const updatePoints = (text) => {
       let points = numberHelper.parse(text)
@@ -144,6 +145,7 @@ export default class Criterion extends React.Component {
         tiers={criterion.ratings}
         onPointChange={onPointChange}
         points={_.get(assessment, 'points')}
+        useRange={useRange}
         masteryThreshold={isOutcome ? criterion.mastery_points : criterion.points}
       />
     )

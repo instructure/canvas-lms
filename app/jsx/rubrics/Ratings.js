@@ -23,10 +23,19 @@ import I18n from 'i18n!edit_rubric'
 
 import { ratingShape, tierShape } from './types'
 
-const pointString = (points) =>
-  I18n.t('%{points} pts', {
-    points: I18n.toNumber(points, { precision : 1 })
-  })
+const pointString = (points, endOfRangePoints) => {
+  if (endOfRangePoints !== null) {
+    return I18n.t('%{points} to >%{endOfRangePoints} pts', {
+      points: I18n.toNumber(points, { precision : 1 }),
+      endOfRangePoints: I18n.toNumber(endOfRangePoints, { precision : 1 })
+    })
+  }
+  else {
+    return I18n.t('%{points} pts', {
+      points: I18n.toNumber(points, { precision : 1 })
+    })
+  }
+}
 
 const Rating = (props) => {
   const {
@@ -34,6 +43,7 @@ const Rating = (props) => {
     long_description,
     points,
     onClick,
+    endOfRangePoints,
     classes
   } = props
 
@@ -47,7 +57,7 @@ const Rating = (props) => {
     >
       <div className="rating-points">
         <Text size="x-small">
-          {pointString(points)}
+          {pointString(points, endOfRangePoints)}
         </Text>
       </div>
       <div className="rating-description">
@@ -79,17 +89,40 @@ Rating.propTypes = {
 }
 Rating.defaultProps = {
   selected: false,
+  endOfRangePoints: null // eslint-disable-line react/default-props-match-prop-types
 }
 
-const Ratings = ({ assessing, tiers, points, onPointChange, masteryThreshold }) => {
+const Ratings = (props) => {
+  const {
+    assessing,
+    tiers,
+    points,
+    onPointChange,
+    masteryThreshold,
+    useRange
+  } = props
+
   const pairs = tiers.map((tier, index) => {
     const next = tiers[index + 1]
-    return { current: tier.points, next: next ? next.points : 0 }
+    return { current: tier.points, next: next ? next.points : null }
   })
 
-  const currentIndex = () => pairs.findIndex(({ current, next }) => (
-    points > next && points <= current
-  ))
+  const currentIndex = () => pairs.findIndex(({ current, next }) => {
+    const currentMatch = points === current
+    const withinRange = points > next && points <= current
+    const zeroAndInLastRange = points === 0 && next === null
+    return currentMatch || (useRange && (withinRange || zeroAndInLastRange))
+  })
+
+  const getRangePoints = (currentPoints, nextTier) => {
+    if (nextTier) {
+      return currentPoints === nextTier.points ? null : nextTier.points
+    } else if (currentPoints !== 0) {
+      return 0
+    }
+    return null
+  }
+
   const selectedIndex = points !== undefined ? currentIndex() : null
 
   return (
@@ -101,8 +134,14 @@ const Ratings = ({ assessing, tiers, points, onPointChange, masteryThreshold }) 
             'rating-tier': true,
             'selected': selected,
           }, selected && getMasteryLevel(points, masteryThreshold))
-          return ( // eslint-disable-next-line react/no-array-index-key
-            <Rating key={index} onClick={() => onPointChange(tier.points)} classes={classes} {...tier} />
+          return (
+            <Rating
+              key={index} // eslint-disable-line react/no-array-index-key
+              onClick={() => onPointChange(tier.points)}
+              classes={classes}
+              endOfRangePoints={useRange ? getRangePoints(tier.points, tiers[index + 1]) : null}
+              {...tier}
+            />
           )
         })
       }

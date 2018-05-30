@@ -25,10 +25,11 @@ describe('The Ratings component', () => {
     tiers: [
       { description: 'Superb', points: 10 },
       { description: 'Meh', long_description: 'More Verbosity', points: 5 },
-      { description: 'Subpar', points: 2 }
+      { description: 'Subpar', points: 1 }
     ],
-    points: 4,
-    masteryThreshold: 10
+    points: 5,
+    masteryThreshold: 10,
+    useRange: false
   }
 
   const component = (mods) => shallow(<Ratings {...{ ...props, ...mods }} />)
@@ -36,13 +37,24 @@ describe('The Ratings component', () => {
     expect(component().debug()).toMatchSnapshot()
   })
 
-  it('highlights the right rating', () => {
-    const ratings = (points) =>
-      component({ points }).find('Rating').map((el) => el.shallow().hasClass('selected'))
+  it('renders the Rating sub-components as expected when range rating enabled', () => {
+    const useRange = true
+    component({ useRange }).find('Rating')
+      .forEach((el) => expect(el.shallow().debug()).toMatchSnapshot())
+  })
 
-    expect(ratings(9)).toEqual([true, false, false])
+  it('highlights the right rating', () => {
+    const ratings = (points, useRange = false) =>
+      component({ points, useRange }).find('Rating').map((el) => el.shallow().hasClass('selected'))
+
+    expect(ratings(10)).toEqual([true, false, false])
+    expect(ratings(8)).toEqual([false, false, false])
+    expect(ratings(8, true)).toEqual([true, false, false])
     expect(ratings(5)).toEqual([false, true, false])
+    expect(ratings(3)).toEqual([false, false, false])
+    expect(ratings(3, true)).toEqual([false, true, false])
     expect(ratings(1)).toEqual([false, false, true])
+    expect(ratings(0, true)).toEqual([false, false, true])
     expect(ratings(undefined)).toEqual([false, false, false])
   })
 
