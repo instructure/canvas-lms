@@ -22,9 +22,6 @@
   content_for :page_title, join_title(t(:page_title, "Grades for %{student}", :student => @presenter.student_name), @context.name)
 %>
 <% whatif_instructions = t("You can view your grades based on What-If scores so that you know how grades will be affected by upcoming or resubmitted assignments. You can test scores for an assignment that already includes a score, or an assignment that has yet to be graded.") %>
-<%
-  cache([@domain_root_account.feature_enabled?(:non_scoring_rubrics)]) do
-%>
 <div id="grade-summary-content" style="display: none;">
   <% content_for :right_side do %>
     <div id="student-grades-right-content" style="display: none;">
@@ -568,4 +565,3 @@
   <a href="#" id="revert_score_template" class="revert_score_link" title="<%= t('titles.revert_score', "Revert to original score") %>"><i class="icon-reply-2"></i></a>
   <a href="<%= context_url(@context, :context_assignment_submission_url, "{{ assignment_id }}", @presenter.student_id) %>" class="update_submission_url" style="display: none;">&nbsp;</a>
 </div>
-<% end %>
