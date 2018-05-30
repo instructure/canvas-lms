@@ -111,9 +111,6 @@ module SIS
 
       def process_batch
         return unless any_left_to_process?
-        transaction_timeout = Setting.get('sis_transaction_seconds', '1').to_i.seconds
-        User.transaction do
-          tx_end_time = Time.now + transaction_timeout
           user_row = nil
           while !@batched_users.empty? && tx_end_time > Time.now
             user_row = @batched_users.shift
@@ -352,7 +349,6 @@ module SIS
             @success_count += 1
 
           end
-        end
       end
 
       def remove_enrollments_if_last_login(user, user_id)
