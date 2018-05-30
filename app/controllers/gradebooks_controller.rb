@@ -393,7 +393,8 @@ class GradebooksController < ApplicationController
         settings: gradebook_settings.fetch(@context.id, {}),
         login_handle_name: @context.root_account.settings[:login_handle_name],
         sis_name: @context.root_account.settings[:sis_name],
-        version: params.fetch(:version, nil)
+        version: params.fetch(:version, nil),
+        outcome_proficiency: outcome_proficiency
       }
     }
   end
@@ -733,6 +734,12 @@ class GradebooksController < ApplicationController
   helper_method :multiple_assignment_groups?
 
   private
+
+  def outcome_proficiency
+    if @context.root_account.feature_enabled?(:non_scoring_rubrics)
+      @context.account.resolved_outcome_proficiency&.as_json
+    end
+  end
 
   def anonymous_moderated_marking_enabled?
     @context.root_account.feature_enabled?(:anonymous_moderated_marking)

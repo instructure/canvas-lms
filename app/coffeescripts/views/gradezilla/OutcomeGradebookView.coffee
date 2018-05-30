@@ -61,11 +61,14 @@ define [
     hasOutcomes: $.Deferred()
 
     # child views rendered using the {{view}} helper in the template
-    checkboxes:
-      'exceeds':         new CheckboxView(Dictionary.exceedsMastery)
-      mastery:           new CheckboxView(Dictionary.mastery)
-      'near-mastery':    new CheckboxView(Dictionary.nearMastery)
-      remedial:          new CheckboxView(Dictionary.remedial)
+    checkboxes: [
+      new CheckboxView(Dictionary.exceedsMastery),
+      new CheckboxView(Dictionary.mastery),
+      new CheckboxView(Dictionary.nearMastery),
+      new CheckboxView(Dictionary.remedial)
+    ]
+
+    ratings: []
 
     events:
       'click .sidebar-toggle': 'onSidebarToggle'
@@ -73,6 +76,9 @@ define [
     constructor: (options) ->
       super
       @_validateOptions(options)
+      if ENV.GRADEBOOK_OPTIONS.outcome_proficiency?.ratings
+        @ratings = ENV.GRADEBOOK_OPTIONS.outcome_proficiency.ratings
+        @checkboxes = @ratings.map (rating) -> new CheckboxView({color: "\##{rating.color}", label: rating.description})
 
     # Public: Show/hide the sidebar.
     #
@@ -125,7 +131,7 @@ define [
     #
     # Returns nothing.
     _attachEvents: ->
-      view.on('togglestate', @_createFilter(name)) for name, view of @checkboxes
+      view.on('togglestate', @_createFilter("rating_#{i}")) for view, i in @checkboxes
       $.subscribe('currentSection/change', Grid.Events.sectionChangeFunction(@grid))
       $.subscribe('currentSection/change', @updateExportLink)
       @updateExportLink(@gradebook.getFilterRowsBySetting('sectionId'))
@@ -142,7 +148,7 @@ define [
     #
     # Returns an object.
     toJSON: ->
-      _.extend({}, @checkboxes)
+      _.extend({}, checkboxes: @checkboxes)
 
     # Public: Render the view once all needed data is loaded.
     #
@@ -160,6 +166,8 @@ define [
     #
     # Returns nothing.
     renderGrid: (response) =>
+      Grid.filter = _.range(@checkboxes.length).map (i) -> "rating_#{i}"
+      Grid.ratings = @ratings
       Grid.Util.saveOutcomes(response.linked.outcomes)
       Grid.Util.saveStudents(response.linked.users)
       Grid.Util.saveOutcomePaths(response.linked.outcome_paths)

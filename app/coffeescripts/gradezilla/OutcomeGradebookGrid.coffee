@@ -34,7 +34,9 @@ define [
   ###
 
   Grid =
-    filter: ['exceeds', 'mastery', 'near-mastery', 'remedial']
+    filter: []
+
+    ratings: []
 
     averageFn: 'mean'
 
@@ -356,33 +358,43 @@ define [
       #
       # value - The proposed value for the cell
       # columnDef - The object for the current column
-      # applyFilter - Wheter filtering should be applied
+      # applyFilter - Whether filtering should be applied
       #
       # Returns cell HTML
       cellHtml: (value, columnDef, shouldFilter) ->
         outcome     = Grid.Util.lookupOutcome(columnDef.field)
         return unless outcome and _.isNumber(value)
-        className   = Grid.View.masteryClassName(value, outcome)
+        [className, color] = Grid.View.masteryColor(value, outcome)
         return '' if shouldFilter and !_.include(Grid.filter, className)
-        cellTemplate(score: Math.round(value * 100.0) / 100.0, className: className, masteryScore: outcome.mastery_points)
+        cssColor = if color then "background-color:#{color};" else ''
+        cellTemplate(color: cssColor, score: Math.round(value * 100.0) / 100.0, className: className, masteryScore: outcome.mastery_points)
 
       studentCell: (row, cell, value, columnDef, dataContext) ->
         studentCellTemplate(_.extend value, course_id: ENV.GRADEBOOK_OPTIONS.context_id)
 
-      # Public: Create a string class name for the given score.
+      masteryColor: (score, outcome) ->
+        if Grid.ratings.length > 0
+          # Scaling the score against the points possible on an outcome will be fixed in OUT-2242
+          idx = Grid.ratings.findIndex((r) -> score >= r.points)
+          idx = if idx == -1 then Grid.ratings.length - 1 else idx
+          ["rating_#{idx}", "\##{Grid.ratings[idx].color}"]
+        else
+          Grid.View.legacyMasteryColor(score, outcome)
+
+      # Public: Create a string class name and color for the given score.
       #
       # score - The number score to evaluate.
       # outcome - The outcome to compare the score against.
       #
-      # Returns a string ('mastery', 'near-mastery', or 'remedial').
-      masteryClassName: (score, outcome) ->
+      # Returns an array with a className and CSS color.
+      legacyMasteryColor: (score, outcome) ->
         mastery     = outcome.mastery_points
         nearMastery = mastery / 2
         exceedsMastery = mastery + (mastery / 2)
-        return 'exceeds' if score >= exceedsMastery
-        return 'mastery' if score >= mastery
-        return 'near-mastery' if score >= nearMastery
-        'remedial'
+        return ['rating_0', '#6a843f'] if score >= exceedsMastery
+        return ['rating_1', '#8aac53'] if score >= mastery
+        return ['rating_2', '#e0d773'] if score >= nearMastery
+        ['rating_3', '#df5b59']
 
       getColumnResults: (data, column) ->
         _.chain(data)
