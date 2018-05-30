@@ -103,7 +103,7 @@ module AvatarHelper
       default_avatar
     end
 
-    if !url.match(%r{\Ahttps?://})
+    if !url.nil? && !url.match(%r{\Ahttps?://})
       # make sure that the url is not just a path
       url = "#{request.base_url}#{url}"
     end

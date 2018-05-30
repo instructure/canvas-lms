@@ -2571,6 +2571,27 @@ describe CoursesController, type: :request do
         ]
       end
 
+      context "avatar_url" do
+        before(:once) do
+          @course1.root_account.set_service_availability(:avatars, true)
+          @course1.root_account.save!
+          @ta.avatar_image = { 'type' => 'gravatar', 'url' => 'http://www.gravatar.com/ta.jpg' }
+          @ta.save!
+        end
+
+        it "includes avatar_url if requested" do
+          json = api_call(:get, api_url, api_route, :include => ['avatar_url'])
+          expect(json.detect { |item| item['id'] == @ta.id }['avatar_url']).to eq 'http://www.gravatar.com/ta.jpg'
+          expect(json.detect { |item| item['id'] == @student.id }['avatar_url']).to eq 'http://www.example.com/images/messages/avatar-50.png'
+        end
+
+        it "omits fallbacks if requested" do
+          json = api_call(:get, api_url, api_route, :include => ['avatar_url'], :no_avatar_fallback => '1')
+          expect(json.detect { |item| item['id'] == @ta.id }['avatar_url']).to eq 'http://www.gravatar.com/ta.jpg'
+          expect(json.detect { |item| item['id'] == @student.id }['avatar_url']).to be_nil
+        end
+      end
+
       context "sharding" do
         specs_require_sharding
 
