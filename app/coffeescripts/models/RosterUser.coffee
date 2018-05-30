@@ -23,13 +23,9 @@ define ['compiled/models/User', 'compiled/util/secondsToTime', 'underscore'], (U
 
     computedAttributes: [
       'sections'
-      'csrf'
       'total_activity_string'
       {name: 'html_url', deps: ['enrollments']}
     ]
-
-    csrf: ->
-      $.cookie('_csrf_token')
 
     html_url: ->
       @get('enrollments')[0]?.html_url
