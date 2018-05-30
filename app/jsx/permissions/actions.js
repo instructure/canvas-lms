@@ -20,6 +20,7 @@ import I18n from 'i18n!permissions'
 import {createActions} from 'redux-actions'
 
 const types = [
+  'DISPLAY_ADD_TRAY',
   'DISPLAY_ROLE_TRAY',
   'GET_PERMISSIONS_START',
   'GET_PERMISSIONS_SUCCESS',
@@ -49,6 +50,13 @@ actions.setAndOpenRoleTray = function(role) {
   return dispatch => {
     dispatch(actions.hideAllTrays())
     dispatch(actions.displayRoleTray({role}))
+  }
+}
+
+actions.setAndOpenAddTray = function() {
+  return dispatch => {
+    dispatch(actions.hideAllTrays())
+    dispatch(actions.displayAddTray())
   }
 }
 

@@ -103,3 +103,19 @@ it('setAndOpenRoleTray dispatches hideAllTrays and dispalyRoleTray', () => {
   expect(dispatchMock).toHaveBeenCalledWith(expectedHideDispatch)
   expect(dispatchMock).toHaveBeenCalledWith(expectedDisplayRoleDispatch)
 })
+
+it('setAndOpenAddTray dispatches hideAllTrays and displayAddTray', () => {
+  const dispatchMock = jest.fn()
+  actions.setAndOpenAddTray()(dispatchMock, () => {})
+
+  const expectedHideDispatch = {
+    type: 'HIDE_ALL_TRAYS'
+  }
+  const expectedDisplayAddDispatch = {
+    type: 'DISPLAY_ADD_TRAY'
+  }
+
+  expect(dispatchMock).toHaveBeenCalledTimes(2)
+  expect(dispatchMock).toHaveBeenCalledWith(expectedHideDispatch)
+  expect(dispatchMock).toHaveBeenCalledWith(expectedDisplayAddDispatch)
+})

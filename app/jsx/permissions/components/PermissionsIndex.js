@@ -22,25 +22,28 @@ import {func} from 'prop-types'
 import {connect} from 'react-redux'
 import {debounce} from 'lodash'
 
-import Container from '@instructure/ui-layout/lib/components/View'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import IconSearchLine from '@instructure/ui-icons/lib/Line/IconSearch'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Container from '@instructure/ui-core/lib/components/Container'
+import Grid, {GridCol, GridRow} from '@instructure/ui-core/lib/components/Grid'
+import IconSearchLine from 'instructure-icons/lib/Line/IconSearchLine'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import TabList, {TabPanel} from '@instructure/ui-core/lib/components/TabList'
+import TextInput from '@instructure/ui-core/lib/components/TextInput'
 
 import actions from '../actions'
 import {COURSE, ACCOUNT} from '../propTypes'
 
 import {ConnectedPermissionsTable} from './PermissionsTable'
 import {ConnectedRoleTray} from './RoleTray'
+import {ConnectedAddTray} from './AddTray'
 
 const SEARCH_DELAY = 350
 const COURSE_TAB_INDEX = 0
 
 export default class PermissionsIndex extends Component {
   static propTypes = {
-    searchPermissions: func.isRequired
+    searchPermissions: func.isRequired,
+    setAndOpenAddTray: func.isRequired
   }
 
   state = {
@@ -80,7 +83,15 @@ export default class PermissionsIndex extends Component {
               />
             </GridCol>
             <GridCol width={7}>ROLE FILTER GOES HERE {/* TODO */}</GridCol>
-            <GridCol width={1}>ADD ROLE BUTTON {/* TODO */}</GridCol>
+            <GridCol width={2}>
+              <Button
+                variant="primary"
+                margin="0 x-small 0 0"
+                onClick={this.props.setAndOpenAddTray}
+              >
+                {I18n.t('Add Role')}
+              </Button>
+            </GridCol>
           </GridRow>
         </Grid>
       </Container>
@@ -91,6 +102,7 @@ export default class PermissionsIndex extends Component {
     return (
       <div className="permissions-v2__wrapper">
         <ConnectedRoleTray />
+        <ConnectedAddTray />
         <TabList onChange={this.onTabChanged}>
           <TabPanel title={I18n.t('Course Roles')}>
             {this.renderHeader()}
@@ -111,7 +123,8 @@ function mapStateToProps(_state, ownProps) {
 }
 
 const mapDispatchToProps = {
-  searchPermissions: actions.searchPermissions
+  searchPermissions: actions.searchPermissions,
+  setAndOpenAddTray: actions.setAndOpenAddTray
 }
 
 export const ConnectedPermissionsIndex = connect(mapStateToProps, mapDispatchToProps)(

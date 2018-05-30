@@ -85,3 +85,15 @@ it('HIDE_ALL_TRAYS sets the activeRoleTray in the store', () => {
   const newState = reduce(actions.hideAllTrays(), originalState)
   expect(newState.activeRoleTray).toBeNull()
 })
+
+it('DISPLAY_ADD_TRAY sets the activeAddTray in the store', () => {
+  const originalState = {activeAddTray: false}
+  const newState = reduce(actions.displayAddTray(), originalState)
+  expect(newState.activeAddTray).toEqual(true)
+})
+
+it('HIDE_ALL_TRAYS sets the activeAddTray to false in the store', () => {
+  const originalState = {activeAddTray: true}
+  const newState = reduce(actions.hideAllTrays(), originalState)
+  expect(newState.activeAddTray).toBeFalsy()
+})

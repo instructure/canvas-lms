@@ -21,6 +21,7 @@ import {handleActions} from 'redux-actions'
 import {actionTypes} from './actions'
 
 import activeRoleTrayReducer from './reducers/activeRoleTrayReducer'
+import activeAddTrayReducer from './reducers/activeAddTrayReducer'
 
 const permissions = handleActions(
   {
@@ -45,5 +46,6 @@ export default combineReducers({
   contextId: (state, _action) => state || '',
   permissions,
   roles: (state, _action) => state || [],
-  activeRoleTray: activeRoleTrayReducer
+  activeRoleTray: activeRoleTrayReducer,
+  activeAddTray: activeAddTrayReducer
 })

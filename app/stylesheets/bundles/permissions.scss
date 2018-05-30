@@ -185,3 +185,10 @@ $darkRowBg: #f9f9f9;
   }
 
 }
+
+.permissions__add-tray-footer {
+    position: sticky;
+    bottom: 0;
+    background: $faintRowBg;
+    padding: 0 0 20px 0;
+}

@@ -40,6 +40,8 @@ import RoleTrayTable from './RoleTrayTable'
 import RoleTrayTableRow from './RoleTrayTableRow'
 import permissionPropTypes from '../propTypes'
 
+import {getPermissionsWithLabels, roleIsBaseRole} from '../helper/utils'
+
 export default class RoleTray extends Component {
   static propTypes = {
     assignedPermissions: PropTypes.arrayOf(permissionPropTypes.permission).isRequired,
@@ -369,32 +371,8 @@ export default class RoleTray extends Component {
   }
 }
 
-function roleIsBaseRole(role) {
-  // TODO wonder if there is a better way to see if this is the case, or if there
-  //      are any situations where this isn't actually the case
-  return role.role === role.base_role_type
-}
-
 function getBaseRoleLabel(role, state) {
   return state.roles.find(ele => ele.role === role.base_role_type).label
-}
-
-function getPermissionsWithLabels(allPermissions, rolePermissions) {
-  // Convert this to a map to avoid O(n^2) lookups when grabbing the permission labels.
-  const permLabelMap = allPermissions.reduce((acc, perm) => {
-    acc[perm.permission_name] = perm.label
-    return acc
-  }, {})
-
-  return Object.keys(rolePermissions).reduce((acc, permName) => {
-    const permission = rolePermissions[permName]
-    const label = permLabelMap[permName]
-    if (label) {
-      const permWithLabel = Object.assign({}, permission, {label})
-      acc.push(permWithLabel)
-    }
-    return acc
-  }, [])
 }
 
 function mapStateToProps(state, ownProps) {
