@@ -50,10 +50,10 @@
     $(document).unbind().on('change', '.sequence_control_toggle', function (event) {
       var toggle = $(event.currentTarget)
       $.ajax({
-          type: 'PUT',
-          dataType: 'json',
-          url: "/enrollments/" + toggle.data('enrollmentId') + "/settings/sequence_control",
-          data: {'value:': toggle.is(':checked')}
+        type:     'PUT',
+        dataType: 'json',
+        url:      "/enrollments/" + toggle.data('enrollmentId') + "/settings/sequence_control",
+        data:     { 'value': toggle.is(':checked') }
       });
     })
   </script>
