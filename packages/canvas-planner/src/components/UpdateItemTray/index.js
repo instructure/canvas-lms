@@ -61,6 +61,10 @@ export class UpdateItemTray extends Component {
     }
   }
 
+  editingExistingNote () {
+    return this.props.noteItem && this.props.noteItem.uniqueId
+  }
+
   getNoteUpdates (props) {
     const updates = _.cloneDeep(props.noteItem) || {};
     if (updates.context) {
@@ -158,7 +162,7 @@ export class UpdateItemTray extends Component {
   }
 
   renderDeleteButton () {
-    if (this.props.noteItem == null) return;
+    if (!this.editingExistingNote()) return;
     return <Button
       variant="light"
       margin="0 x-small 0 0"
@@ -248,7 +252,7 @@ export class UpdateItemTray extends Component {
   }
 
   renderTrayHeader () {
-    if (this.props.noteItem) {
+    if (this.editingExistingNote()) {
       return (
         <h2>{formatMessage('Edit {title}', { title: this.props.noteItem.title })}</h2>
       );
