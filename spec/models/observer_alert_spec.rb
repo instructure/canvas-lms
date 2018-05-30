@@ -155,6 +155,50 @@ describe ObserverAlert do
     end
   end
 
+  describe 'create_assignment_missing_alerts' do
+    before :once do
+      @course = course_factory()
+      @student1 = student_in_course(active_all: true, course: @course).user
+      @observer1 = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
+      observer_alert_threshold_model(student: @student, observer: @observer, alert_type: 'assignment_missing')
+
+      @student2 = student_in_course(active_all: true, course: @course).user
+      @observer2 = course_with_observer(course: @course, associated_user_id: @student2.id, active_all: true).user
+      @link2 = UserObservationLink.create!(student: @student2, observer: @observer2, root_account: @account)
+
+      assignment_model(context: @course, due_at: 5.minutes.ago, submission_types: 'online_text_entry')
+      @student3 = student_in_course(active_all: true, course: @course).user
+      @observer3 = course_with_observer(course: @course, associated_user_id: @student3.id, active_all: true).user
+      observer_alert_threshold_model(student: @student3, observer: @observer3, alert_type: 'assignment_missing')
+      @assignment.submit_homework(@student3, :submission_type => 'online_text_entry', :body => 'done')
+
+      ObserverAlert.create_assignment_missing_alerts
+    end
+
+    it 'creates an assignment_missing_alert' do
+      alert = ObserverAlert.active.where(student: @student1, alert_type: 'assignment_missing').first
+      expect(alert.alert_type).to eq 'assignment_missing'
+      expect(alert.context.user).to eq @student1
+    end
+
+    it 'doesnt create another alert if one already exists' do
+      alert = ObserverAlert.active.where(student: @student2, alert_type: 'assignment_missing').first
+      expect(alert).to be_nil
+    end
+
+    it 'doesnt create an alert if the submission is not missing' do
+      alert = ObserverAlert.where(student: @student3, alert_type: 'assignment_missing').first
+      expect(alert).to be_nil
+    end
+
+    it 'doesnt create an alert for if there is no threshold' do
+      ObserverAlert.create_assignment_missing_alerts
+      alert = ObserverAlert.where(student: @student2).first
+
+      expect(alert).to be_nil
+    end
+  end
+
   describe 'institution_announcement' do
     before :once do
       @no_link_account = account_model

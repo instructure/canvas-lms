@@ -216,6 +216,10 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(ObserverAlert, :clean_up_old_alerts)
   end
 
+  Delayed::Periodic.cron 'ObserverAlert.create_assignment_missing_alerts', '*/5 * * * *', priority: Delayed::LOW_PRIORITY do
+    with_each_shard_by_database(ObserverAlert, :create_missing_assignment_alerts)
+  end
+
   Delayed::Periodic.cron 'abandoned job cleanup', '*/10 * * * *' do
     Delayed::Worker::HealthCheck.reschedule_abandoned_jobs
   end
