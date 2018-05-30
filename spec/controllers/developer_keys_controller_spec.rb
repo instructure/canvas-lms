@@ -309,6 +309,12 @@ describe DeveloperKeysController do
         allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
       end
 
+      it 'responds with not found if the account is a sub account' do
+        allow(controller).to receive(:require_context_with_permission).and_return nil
+        get 'index', params: {account_id: sub_account.id}
+        expect(response).to be_not_found
+      end
+
       it 'does not inherit site admin keys if feature flag is off' do
         site_admin_key.update!(visible: true)
         get 'index', params: {account_id: test_domain_root_account.id}

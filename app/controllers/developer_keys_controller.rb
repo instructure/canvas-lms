@@ -23,6 +23,7 @@ class DeveloperKeysController < ApplicationController
   include Api::V1::DeveloperKey
 
   def index
+    raise ActiveRecord::RecordNotFound unless @context.root_account?
     scope = index_scope.nondeleted.preload(:account).order("id DESC")
     @keys = Api.paginate(scope, self, account_developer_keys_url(@context))
     respond_to do |format|
