@@ -379,6 +379,21 @@ class DiscussionTopicsController < ApplicationController
           js_env openTopics: open_topics, lockedTopics: locked_topics, newTopicURL: named_context_url(@context, :new_context_discussion_topic_url)
         end
 
+        fetch_params = {
+          per_page: 50,
+          plain_messages: true,
+          include_assignment: true,
+          exclude_assignment_descriptions: true,
+          exclude_context_module_locked_topics: true,
+          page: "__page__"
+        }
+        fetch_params[:include] = ['sections_user_count', 'sections'] if @context.is_a?(Course)
+
+        discussion_topics_fetch_url = send("api_v1_#{@context.class.to_s.downcase}_discussion_topics_path", fetch_params)
+        @discussion_topics_urls_to_prefetch = (scope.count / fetch_params[:per_page].to_f).ceil.times.map do |i|
+          discussion_topics_fetch_url.gsub(fetch_params[:page], (i+1).to_s)
+        end
+
         hash = {
           USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
           totalDiscussions: scope.count,
