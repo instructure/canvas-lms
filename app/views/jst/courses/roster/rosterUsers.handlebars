@@ -45,10 +45,17 @@
   {{else}}
   <div class="paginatedLoadingIndicator"></div>
   {{/if}}
-{{/if}}
 
-<script type="text/javascript">
-  $(document).on('change', '.sequence_control_toggle', function (event) {
-    alert('hi')
-  })
-</script>
+  <script type="text/javascript">
+    $(document).unbind().on('change', '.sequence_control_toggle', function (event) {
+      var toggle = $(event.currentTarget)
+      $.ajax({
+          type: 'PUT',
+          dataType: 'json',
+          url: "/enrollments/" + toggle.data('enrollmentId') + "/settings/sequence_control",
+          data: {'value:': toggle.is(':checked')}
+      });
+    })
+  </script>
+
+{{/if}}
