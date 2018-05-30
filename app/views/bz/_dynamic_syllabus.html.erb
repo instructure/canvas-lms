@@ -9,14 +9,17 @@
   <h1><%= @course.intro_title %></h1>
   <div class="bz-course-intro-text"><%= @course.intro_text ? @course.intro_text.html_safe : '' %></div>
 
-  <table>
-    <%
-      # want to display only announcements here
-      lol = categorize_stream_items(@stream_items)
-      items = lol["Announcement"]
-    %>
-    <%= render :partial => 'shared/recent_activity_item', :collection => items %>
-  </table>
+  <%
+    # want to display only announcements here
+    items = categorize_stream_items(@stream_items)["Announcement"]
+    if items.present?
+  %>
+    <table id="bz-announcements-list">
+      <%= render :partial => 'shared/recent_activity_item', :collection => items %>
+    </table>
+  <%
+    end
+  %>
 
 
 
