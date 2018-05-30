@@ -43,7 +43,7 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
     }
     sinon
       .stub(StudentActions, 'loadStudents')
-      .returns(StudentActions.setLoadStudentsStatus(StudentActions.LOAD_STUDENTS_STARTED))
+      .returns(StudentActions.setLoadStudentsStatus(StudentActions.STARTED))
   })
 
   suiteHooks.afterEach(() => {
@@ -65,30 +65,15 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
     strictEqual(wrapper.find('Header').length, 1)
   })
 
-  test('excludes the "no graders" message when there are graders', () => {
-    mountComponent()
-    notOk(wrapper.text().includes('Moderation is unable to occur'))
-  })
-
   test('loads students upon mounting', () => {
     mountComponent()
     strictEqual(StudentActions.loadStudents.callCount, 1)
   })
 
-  QUnit.module('when there are no graders', hooks => {
-    hooks.beforeEach(() => {
-      storeEnv.graders = []
-    })
-
-    test('includes a "no graders" message when there are no graders', () => {
-      mountComponent()
-      ok(wrapper.text().includes('Moderation is unable to occur'))
-    })
-
-    test('does not load students', () => {
-      mountComponent()
-      strictEqual(StudentActions.loadStudents.callCount, 0)
-    })
+  test('does not load students when there are not graders', () => {
+    storeEnv.graders = []
+    mountComponent()
+    strictEqual(StudentActions.loadStudents.callCount, 0)
   })
 
   QUnit.module('when students have not yet loaded', () => {

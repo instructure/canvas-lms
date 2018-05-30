@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable react/no-array-index-key */
+
 import React, {Component} from 'react'
 import {arrayOf, shape, string} from 'prop-types'
 import Text from '@instructure/ui-elements/lib/components/Text'
@@ -70,7 +72,7 @@ export default class Grid extends Component {
               <GridRow
                 graders={this.props.graders}
                 grades={this.props.grades[row.studentId]}
-                key={index}
+                key={index /* index used for performance reasons */}
                 row={row}
               />
             ))}

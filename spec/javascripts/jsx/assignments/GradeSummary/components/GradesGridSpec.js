@@ -152,12 +152,22 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
     deepEqual(getStudentNames(), ['Student 1', 'Student 2', 'Student 3', 'Student 4'])
   })
 
+  test('does not display page navigation when only one page of students is loaded', () => {
+    mountComponent()
+    strictEqual(wrapper.find('PageNavigation').length, 0)
+  })
+
   QUnit.module('when multiple pages of students are loaded', hooks => {
     hooks.beforeEach(() => {
       props.students = []
       for (let id = 1111; id <= 1160; id++) {
         props.students.push({id: `${id}`, displayName: `Student ${id}`})
       }
+    })
+
+    test('displays page navigation', () => {
+      mountComponent()
+      strictEqual(wrapper.find('PageNavigation').length, 1)
     })
 
     test('displays only 20 rows on a page', () => {

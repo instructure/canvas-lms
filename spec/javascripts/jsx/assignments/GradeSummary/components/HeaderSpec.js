@@ -29,7 +29,11 @@ QUnit.module('GradeSummary Header', suiteHooks => {
     props = {
       assignment: {
         title: 'Example Assignment'
-      }
+      },
+      graders: [
+        {graderId: '1101', graderName: 'Miss Frizzle'},
+        {graderId: '1102', graderName: 'Mr. Keating'}
+      ]
     }
   })
 
@@ -44,5 +48,16 @@ QUnit.module('GradeSummary Header', suiteHooks => {
   test('includes the assignment title as a heading', () => {
     mountComponent()
     equal(wrapper.find('h2').text(), 'Example Assignment')
+  })
+
+  test('includes a "no graders" message when there are no graders', () => {
+    props.graders = []
+    mountComponent()
+    ok(wrapper.text().includes('Moderation is unable to occur'))
+  })
+
+  test('excludes the "no graders" message when there are graders', () => {
+    mountComponent()
+    notOk(wrapper.text().includes('Moderation is unable to occur'))
   })
 })

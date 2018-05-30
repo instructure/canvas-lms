@@ -93,13 +93,15 @@ export default class GradesGrid extends Component {
       <div className="GradesGridContainer">
         <Grid graders={this.props.graders} grades={this.props.grades} rows={rows} />
 
-        <View as="div" margin="small">
-          <PageNavigation
-            currentPage={this.state.currentPageIndex + 1}
-            onPageClick={this.setPage}
-            pageCount={this.state.pages.length}
-          />
-        </View>
+        {this.state.pages.length > 1 && (
+          <View as="div" margin="medium">
+            <PageNavigation
+              currentPage={this.state.currentPageIndex + 1}
+              onPageClick={this.setPage}
+              pageCount={this.state.pages.length}
+            />
+          </View>
+        )}
       </div>
     )
   }

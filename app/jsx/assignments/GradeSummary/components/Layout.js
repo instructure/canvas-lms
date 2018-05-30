@@ -19,7 +19,6 @@
 import React, {Component} from 'react'
 import {arrayOf, func, shape, string} from 'prop-types'
 import {connect} from 'react-redux'
-import Text from '@instructure/ui-elements/lib/components/Text'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import View from '@instructure/ui-layout/lib/components/View'
 import I18n from 'i18n!assignment_grade_summary'
@@ -56,39 +55,25 @@ class Layout extends Component {
   }
 
   render() {
-    if (this.props.graders.length === 0) {
-      return (
-        <div>
-          <Header assignment={this.props.assignment} />
-
-          <View as="div" margin="medium 0 0 0">
-            <Text color="warning">
-              {I18n.t(
-                'Moderation is unable to occur at this time due to grades not being submitted.'
-              )}
-            </Text>
-          </View>
-        </div>
-      )
-    }
-
     return (
       <div>
         <FlashMessageHolder />
 
-        <Header assignment={this.props.assignment} />
+        <Header assignment={this.props.assignment} graders={this.props.graders} />
 
-        <View as="div" margin="large 0 0 0">
-          {this.props.students.length > 0 ? (
-            <GradesGrid
-              graders={this.props.graders}
-              grades={this.props.provisionalGrades}
-              students={this.props.students}
-            />
-          ) : (
-            <Spinner title={I18n.t('Students are loading')} />
-          )}
-        </View>
+        {this.props.graders.length > 0 && (
+          <View as="div" margin="large 0 0 0">
+            {this.props.students.length > 0 ? (
+              <GradesGrid
+                graders={this.props.graders}
+                grades={this.props.provisionalGrades}
+                students={this.props.students}
+              />
+            ) : (
+              <Spinner title={I18n.t('Students are loading')} />
+            )}
+          </View>
+        )}
       </div>
     )
   }

@@ -17,16 +17,20 @@
  */
 
 import {Component} from 'react'
-import {string} from 'prop-types'
+import {oneOf} from 'prop-types'
 import {connect} from 'react-redux'
 import I18n from 'i18n!assignment_grade_summary'
 
 import {showFlashAlert} from '../../../shared/FlashAlert'
 import * as StudentActions from '../students/StudentActions'
 
+function enumeratedStatuses(actions) {
+  return [actions.FAILURE, actions.STARTED, actions.SUCCESS]
+}
+
 class FlashMessageHolder extends Component {
   static propTypes = {
-    loadStudentsStatus: string
+    loadStudentsStatus: oneOf(enumeratedStatuses(StudentActions))
   }
 
   static defaultProps = {
