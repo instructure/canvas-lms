@@ -45,17 +45,18 @@
   <div>{{total_activity_string}}</div>
 </td>
 <td>
-  {{#each enrollments}}
+
     <form action="/enrollments/{{id}}/settings/sequence_control" method='post'>
       <input type="hidden" name='_method' value="put" />
       <input type="hidden" name='value' value="true" />
       <input type="hidden" name='authenticity_token' />
       <input type="submit" />
     </form>
-  {{/each}}
 
-  <label class="ic-Super-toggle--on-off" for="ff_toggle_high_contrast">
-    <input id="ff_toggle_high_contrast" class="ic-Super-toggle__input ff_toggle" type="checkbox" data-id="high_contrast">
+{{#each enrollments}}
+  {{id}}
+  <label class="ic-Super-toggle--on-off" for="toggle_sequence_control_{{id}}">
+    <input id="toggle_sequence_control_{{id}}" class="ic-Super-toggle__input ff_toggle sequence_control_toggle" type="checkbox" data-id="high_contrast" data-enrollment-id="{{id}}">
     <div class="ic-Super-toggle__container" aria-hidden="true" data-checked="On" data-unchecked="Off">
       <div class="ic-Super-toggle__switch">
         <div class="ic-Super-toggle__option--LEFT">
@@ -67,6 +68,11 @@
       </div>
     </div>
   </label>
+
+
+  {{/each}}
+
+
 </td>
 
 
