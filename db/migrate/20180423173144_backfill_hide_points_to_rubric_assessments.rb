@@ -18,15 +18,9 @@
 
 class BackfillHidePointsToRubricAssessments < ActiveRecord::Migration[5.1]
   tag :postdeploy
+  disable_ddl_transaction!
 
   def up
-    DataFixup::BackfillNulls.send_later_if_production_enqueue_args(
-      :run,
-      {priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups'},
-      RubricAssessment,
-      {
-        hide_points: false
-      }
-    )
+    DataFixup::BackfillNulls.run(RubricAssessment, :hide_points, default_value: false)
   end
 end

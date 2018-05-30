@@ -16,11 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class BackfillHidePointsAndHiddenToLearningOutcomeResults < ActiveRecord::Migration[5.1]
+class MakeRubricAssessmentHidePointsNotNull < ActiveRecord::Migration[5.1]
   tag :postdeploy
   disable_ddl_transaction!
 
-  def up
-    DataFixup::BackfillNulls.run(LearningOutcomeResult, [:hide_points, :hidden], default_value: false)
+  def change
+    change_column_null :rubric_assessments, :hide_points, false
   end
 end
