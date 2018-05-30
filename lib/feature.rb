@@ -133,7 +133,6 @@ END
       description: -> { I18n.t('Allows creating discussions for a specific section') },
       applies_to: 'Account',
       state: 'hidden',
-      development: true,
     },
     'permissions_v2_ui' =>
     {
