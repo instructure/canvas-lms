@@ -7,6 +7,7 @@ ko:
     headings: 
       page: "승인되지 않음"
     title: "승인되지 않음"
+  558x270_png_jpg_gif_c3faa839: "558x270 png, jpg, gif"
   558x558_png_jpg_gif_1_8x_the_standard_tile_size_so_c56cc472: "558x558 png, jpg, gif (표준 타일 크기의 1.8배이며, 필요에 따라 확대 혹은 축소될 수 있습니다.)"
   EditAppointmentGroupDetails: 
     affect_reservations: "이것이 예약에 미치는 영향은 무엇입니까?"
@@ -36,6 +37,7 @@ ko:
     cancel: 취소
     save: 저장
   _at_the_bottom__4360f2b4: "-- 맨 밑으로 --"
+  _b4455c8b: "%"
   academic_benchmark: 
     api_error: "기관 %{auth}에 대한 표준을 업데이트할 수 없습니다."
     bad_ab_file: "제공한 Academic Benchmark 파일에 오류가 있습니다."
@@ -53,6 +55,8 @@ ko:
         api_key: "API 키"
         api_url: "API URL"
         common_core_guid: "공통 핵심 GUID (선택 사항)"
+        partner_id: "파트너 ID"
+        partner_key: "파트너 키"
   account: 
     ask_canvas_network: "Canvas Network 커뮤니티에 묻기"
     default_account_name: "기본 계정"
@@ -68,6 +72,7 @@ ko:
     sis_id_in_use: "SIS ID \"%{sis_id}\"이(가) 이미 사용 중임"
     tab_admin_tools: "관리 도구"
     tab_authentication: 인증
+    tab_brand_configs: 테마
     tab_courses: 과목
     tab_developer_keys: "개발자 키"
     tab_faculty_journal: "교원 일지"
@@ -85,6 +90,7 @@ ko:
     tab_terms: 학기
     tab_users: 사용자
     turnitin_pledge: "이 과제 제출물은 자신의 원작임"
+  account_97b34646: 계정
   account_authorization_config: 
     default_delegated_login_handle_name: 로그인
     default_login_handle_name: 이메일
@@ -147,6 +153,7 @@ ko:
     saml_settings_test: 
       refresh_debugging: "새로 고침"
       saml_debug_instructions: "디버깅을 시작하면 이후에 시도하는 모든 SAML 로그인에 대한 모든 정보를 수집합니다. 수집한 자료를 확인하기 위해 \"새로 고침\"을 클릭하거나 \"디버깅 중지\"를 클릭해서 수집한 자료를 지우고 현재의 디버깅을 시도를 중지할 수 있습니다."
+      saml_debugging: "SAML 디버깅"
       saml_required: "SAML을 테스트하기 위해서 SAML 구성이 필요합니다."
       start_debugging: "디버깅 시작"
       stop_debugging: "디버깅 중지"
@@ -211,7 +218,14 @@ ko:
     report_header_name: 이름
     report_header_section: 섹션
     report_header_section__id: "섹션 ID"
+    report_header_section_name: 섹션명
+    report_header_start_date: 시작일
     report_header_status: 상태
+    report_header_student_id: "학생 ID"
+    report_header_student_name: "학생 이름"
+    report_header_term: 학기
+    report_header_user_id: "사용자 id"
+    report_header_user_name: "사용자 이름"
     sis_exporter: 
       reports: "보고서: %{files}"
   account_settings: 
@@ -249,9 +263,9 @@ ko:
     add_course_dialog_title: "새 과목 추가"
     add_course_or_user: 
       add_course_button: "과목 추가"
-      add_course_link: "새 과목 추가"
+      add_course_link: "새 과목"
       add_user_button: "사용자 추가"
-      add_user_link: "새 사용자 추가"
+      add_user_link: "새 사용자"
       display_name_help: "토론, 메세지, 댓글에서 해당 이름이 다른 사용자들에게 보여집니다."
       full_name_description: "채점시 선생님들이 사용할 이름입니다."
       labels: 
@@ -366,6 +380,7 @@ ko:
         time: 시간
       logging_content_pane: 
         authentication: "로그인 / 로그아웃 활동"
+        course: "과목 활동"
         select_default: "로그 유형 선택"
         select_label: "검색하려는 로그 유형을 선택하십시오."
       page_title: "%{account}의 관리 도구"
@@ -375,7 +390,7 @@ ko:
         generate_activity_username: "*%{user}*의 일반 활동"
         message_date_from: "시작 날짜"
         message_date_to: "끝 날짜"
-        search_people: "사람 검색"
+        search_people: "사용자 검색"
     assignment_scheduling_csv_parameters: 
       account_reports: 
         newark: 
@@ -430,6 +445,8 @@ ko:
       delete_button: "%{user} 삭제"
       page_title: "삭제 확인"
       title: "%{account}에서 %{user} 삭제 확인"
+    consortium_user_search: 
+      find_user_by_label: 로그인/이메일
     course: 
       course_unpublished_title: "이 과목은 아직 게시되지 않음"
       course_unpublished_tooltip: "게시되지 않음"
@@ -483,7 +500,7 @@ ko:
         default: 
           end: 
             parameters: 
-              header: "끝 날짜:"
+              header: "종료일:"
           start: 
             parameters: 
               header: "시작 날짜:"
@@ -496,6 +513,19 @@ ko:
             header: "시작 날짜:"
     default_account_quotas_not_updated: "기본 계정 할당량을 업데이트하지 않았음"
     default_account_quotas_updated: "기본 계정 할당량을 업데이트했음"
+    devry: 
+      no_submissions: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "종료일:"
+      submissions_detail: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "종료일:"
     find_not_authorized: "%{type}을(를) 액세스할 권한이 없음"
     find_not_found: "해당 ID를 가진 %{type}을(를) 찾을 수 없음"
     grade_export_csv_description: 
@@ -524,6 +554,8 @@ ko:
       account_reports: 
         samuel_merrit_university: 
           course: 
+            sis: 
+              text: "과목 SIS ID"
             text: "과목 ID"
           parameters: 
             note1: "해당 학기의 모든 과목에 대해 보고서를 생성하려면 과목 ID가 공란일 수 없습니다."
@@ -2163,7 +2195,7 @@ ko:
     time_block_row: 
       date_label: 날짜
       delete_link: "시간 범위 삭제"
-      end_time_label: "끝 시각"
+      end_time_label: "종료 시각"
       start_time_label: "시작 시각"
     titles: 
       edit_appointment_group: "약속 그룹 편집"
@@ -3308,6 +3340,8 @@ ko:
       all: 모두
       only_teachers: 교사만
       teachers_students: "교사와 학생"
+  course_activity_bfe11267: "과목 활동"
+  course_calendar_7d3cba7b: "과목 달력"
   course_copy_argument_error: "과목 복사에는 원본 과목이 필요합니다."
   course_copy_description: "Canvas 과목 복사를 위한 마이그레이션 플러그 인"
   course_copy_display: "과목 복사"
@@ -4541,7 +4575,9 @@ ko:
     default_from_name: "Instructure Canvas"
   email_e366fa29: 이메일
   enable_6f5d1328: 사용
-  end_date_e0093ed7: "끝 날짜"
+  end_date_cannot_be_before_start_date_eb62ed6d: "종료일은 시작일보다 이전일 수 없습니다."
+  end_date_e0093ed7: 종료일
+  end_time_250391e8: "종료 시각"
   enrollment: 
     default_course_name: 과목
     default_email: "이메일 없음"
@@ -5921,6 +5957,7 @@ ko:
     which_course_is_this_question_about: "이 질문은 어떤 과목에 대한 것입니까?"
     your_email_address: "이메일 주소"
   helpers: 
+    accessible_date_format: "YYYY-MM-DD hh:mm"
     course: 과목
     dashboard_helper: 
       announcement_details: "공지 사항 세부 정보"
@@ -6249,7 +6286,7 @@ ko:
   loading_25990131: "로드하는 중..."
   locales: 
     ko: "한국말 (crowd-sourced)"
-  lock_date_cannot_be_before_due_date_ac30f54: "잠금 해제 날짜는 기한 이전일 수 없음"
+  lock_date_cannot_be_before_due_date_ac30f54: "잠금 설정 날짜는 기한으로 설정한 날짜보다 이전일 수 없습니다."
   logged_out_user: "사용자 %{user_counter} 로그 아웃"
   login: 
     canvas: 
@@ -8408,6 +8445,7 @@ ko:
     ? "yes"
     : 예
   orbis_report_header_points_possible: "가능한 점수"
+  orbis_report_header_student_name: "학생 이름"
   outcome_groups: 
     invalid_file: "유효하지 않은 성과 그룹 파일"
   outcome_groups_api: 
@@ -11381,6 +11419,8 @@ ko:
     no_answer: "답 없음"
   step: 단계
   student_5da6bfd1: 학생
+  student_id_7cc45fb5: "학생 ID"
+  student_name_b446c661: "학생 이름"
   students_1b8cd07b: 학생
   students_who_have_taken_the_quiz_count_69dbbda0: 
     one: "이 퀴즈를 치른 학생 (%{count})"
@@ -11581,6 +11621,7 @@ ko:
   take_the_survey_ada59508: "설문 치르기"
   take_the_survey_again_24ce22c2: "설문 다시 치르기"
   teachers_52e2423f: 교사
+  term_41f37cae: 학기
   terms: 
     index: 
       date: 
@@ -11639,6 +11680,7 @@ ko:
       timespan: "%{start_at}*부터* %{end_at}까지"
   that_user_account_has_been_deleted_please_contact__350e0e0: "해당 사용자 계정은 삭제되었습니다.  계정을 다시 활성화하려면 시스템 관리자에게 문의하시기 바랍니다."
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "이 계정에 구성되어 있지 않은 기관에서 로그인했습니다."
+  themes_89bfe9c4: 테마
   there_was_a_problem_logging_in_at_institution_5a298155: "%{institution}에 로그인하는 데 문제가 있습니다."
   there_was_an_error_in_processing_your_request_6513a49a: "요청을 처리하는 중 오류 발생"
   this_field_is_required_fa58c4a: "이 필드가 필요함"
@@ -12280,6 +12322,12 @@ ko:
       archive: 저장소
       archive_link: "저장소 보기"
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "이제 이 퀴즈를 이미 치른 학생을 위한 다시 평가하기 옵션을 설정할 수 있습니다."
+  you_must_allow_at_least_one_group_to_attend_68531eab: "적어도 하나 이상의 참가할 그룹을 허용해야 합니다."
+  you_must_enter_a_date_f8eabfb1: "날짜를 입력해야 합니다."
+  you_must_log_in_to_view_replies_9ccd4da0: "답변을 보기 위해서는 로그인해야 합니다."
+  your_message_was_sent_977f6583: "메세지가 전송되었습니다!"
+  your_password_has_been_changed_df0e72aa: "비밀번호가 변경되었습니다."
+  yyyy_mm_dd_hh_mm_a01b6081: "YYYY-MM-DD hh:mm"
   zip_argument_error: ".zip 업로드는 업로드할 대상 폴더가 필요합니다."
   zip_file_display: "파일 가져오기"
   zip_file_file_description: ".zip 파일을 폴더에 압축 해제"
