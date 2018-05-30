@@ -174,6 +174,14 @@ Notes / Tips / Tricks
 	The advantage of this oauth sso is we can then do cross-domain communication with an authenticated
 	user - if we do have to iframe the resume app, for instance, we'll know which user is logged in
 	without needing them to do a separate manual step.
+
+* npm package installation errors
+
+Occasionally an npm package gets a new version which has a dependency on another npm package that no longer supports our version of npm / node. This will show up in a staging deploy. You'll see an error like
+    npm verb stack Error: No compatible version found: someNpmPackage@'>=2.1.1 <3.0.0'
+    npm verb stack Valid install targets:
+    npm verb stack ["1.0.0","1.0.1","1.1.0","1.1.2","1.1.3","2.0.0","2.0.2","2.0.3","2.1.0"]
+To resolve this, you need to track down the npm package with a new version and a breaking dependency. The easiest way to do this is login to production where the last successful npminstall ran and navigate to the app root. Then run ```npm ls --json```. Copy and paste that into a text editor and search for the failing package name. In this case, ```someNpmPackage```. Open up the npm-shrinkwrap.json file and lock the dependencies down to the production versions by copy / pasting the tree starting at the failing package and working up to its root.
 	
 # The rest is just the original Canvas README contents:
 
