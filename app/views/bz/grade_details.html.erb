@@ -28,8 +28,8 @@
     <td><a href="#<%= thing["field_name"] %>"><%= thing["field_name"] %></a></td>
     <td><%= thing["field_value"] %></td>
     <td><%= thing["field_timing"] %></td>
-    <td><%= thing["points_amount"] %></td>
-    <td><%= thing["points_possible"] %></td>
+    <td><%= thing["points_amount"].round(2) %></td>
+    <td><%= thing["points_possible"].round(2) %></td>
     <td><%= thing["points_reason_english"] %></td>
   </tr>
 <% end %>
@@ -40,6 +40,12 @@
 -->
 
 <% end %>
+
+<div class="bz-grade-details-total-score">
+  <span class="label">Total score:</span>
+  <span class="number"><%= @response_object["total_score"].round(2) %></span>
+</div>
+
 
   <%= @document.to_s.html_safe %>
 
@@ -57,10 +63,19 @@
 
     var div = document.createElement("div");
     div.className = "grade-explained";
-    div.innerHTML =
-      "<span class=\"score\">" + prettyRound(info["points_amount"]) + "/" + prettyRound(info["points_possible"]) + " points</span>\n" +
-      (info["points_given"] ? "awarded for: " : "missed because: ") + "\n" +
-      "<span class=\"score-reason\">" + info["points_reason_english"] + "</span>";
+    if(info["points_amount"] == 0 || info["points_amount"] == info["points_possible") {
+      // full credit
+      div.innerHTML =
+        "<span class=\"score\">" + prettyRound(info["points_possible"]) + " points</span>\n" +
+        (info["points_given"] ? "awarded because: " : "deducted because: ") + "\n" +
+        "<span class=\"score-reason\">" + info["points_reason_english"] + "</span>";
+    } else {
+      // partial credit
+      div.innerHTML =
+        "<span class=\"score\">" + prettyRound(info["points_amount"]) + "/" + prettyRound(info["points_possible"]) + " points</span>\n" +
+        (info["points_given"] ? "awarded for: " : "missed because: ") + "\n" +
+        "<span class=\"score-reason\">" + info["points_reason_english"] + "</span>";
+    }
 
     div.id = info["field_name"];
 
