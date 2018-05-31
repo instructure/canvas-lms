@@ -1581,4 +1581,15 @@ describe UsersController do
     end
   end
 
+  describe "#pandata_token" do
+    it 'should return bad_request if called without an access token' do
+      user_factory(active_all: true)
+      user_session(@user)
+      get 'pandata_token'
+      assert_status(400)
+      json = JSON.parse(response.body.gsub("while(1);", ""))
+      expect(json['message']).to eq "Access token required"
+    end
+  end
+
 end

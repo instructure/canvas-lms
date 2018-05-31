@@ -2206,7 +2206,9 @@ class UsersController < ApplicationController
 
   # @API Get a Pandata jwt token and its expiration date
   #
-  # Returns a jwt token that can be used to send events to Pandata
+  # Returns a jwt token that can be used to send events to Pandata.
+  #
+  # NOTE: This is currently only available to the mobile developer keys.
   #
   # @argument app_key [String]
   #   The pandata appKey for this mobile app
@@ -2224,6 +2226,15 @@ class UsersController < ApplicationController
   #   }
   def pandata_token
     settings = Canvas::DynamicSettings.find(service: 'pandata')
+    dk_ids = Setting.get("pandata_token_allowed_developer_key_ids", "").split(",")
+
+    unless @access_token
+      return render json: { :message => "Access token required" }, status: :bad_request
+    end
+
+    unless dk_ids.include?(@access_token.global_developer_key_id.to_s)
+      return render json: { :message => "Developer key not authorized" }, status: :forbidden
+    end
 
     if params[:app_key] == settings["ios-pandata-key"]
       key = settings["ios-pandata-key"]
@@ -2232,7 +2243,7 @@ class UsersController < ApplicationController
       key = settings["android-pandata-key"]
       sekrit = settings["android-pandata-secret"]
     else
-      return render(json: { :message => "Invalid app key" }, status: :bad_request)
+      return render json: { :message => "Invalid app key" }, status: :bad_request
     end
 
     expires_at = Time.zone.now + 1.day.to_i
@@ -2244,7 +2255,7 @@ class UsersController < ApplicationController
     }
 
     token = Canvas::Security.create_jwt(body, expires_at, sekrit)
-    render json: {token: token, expires_at: expires_at.to_f * 1000}
+    render json: { token: token, expires_at: expires_at.to_f * 1000 }
   end
 
   protected
