@@ -1,5 +1,7 @@
 <nav>
   <h2 class='first'>Basics</h2>
+  <a href="<%= url_for("file.changelog.html") %>" class="<%= 'current' if options[:object] == 'file.changelog.html' %>">API Change Log</a>
+  <a href="<%= url_for("file.breaking.html") %>" class="<%= 'current' if options[:object] == 'file.breaking.html' %>">API Breaking Changes</a>
   <a href="<%= url_for("file.object_ids.html") %>" class="<%= 'current' if options[:object] == 'file.object_ids.html' %>">SIS IDs</a>
   <a href="<%= url_for("file.pagination.html") %>" class="<%= 'current' if options[:object] == 'file.pagination.html' %>">Pagination</a>
   <a href="<%= url_for("file.throttling.html") %>" class="<%= 'current' if options[:object] == 'file.throttling.html' %>">Throttling</a>
