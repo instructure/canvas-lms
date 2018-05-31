@@ -1320,7 +1320,7 @@ CanvasRails::Application.routes.draw do
       put 'users/:id/merge_into/accounts/:destination_account_id/users/:destination_user_id', controller: 'users', action: 'merge_into'
       post 'users/:id/split', controller: 'users', action: 'split'
 
-      post 'users/:id/pandata_token', controller: 'users', action: 'pandata_token'
+      post 'users/self/pandata_token', controller: 'users', action: 'pandata_token'
 
       scope(controller: :observer_alerts_api) do
         get '/users/:user_id/observer_alerts/unread_count', action: :alerts_count

@@ -2106,7 +2106,7 @@ describe "Users API", type: :request do
     end
 
     it 'should return token and expiration' do
-      json = api_call(:post, "/api/v1/users/#{@user.id}/pandata_token",
+      json = api_call(:post, "/api/v1/users/self/pandata_token",
           { controller: 'users', action: 'pandata_token', format:'json', id: @user.to_param },
           { app_key: 'IOS_pandata_key'}
       )
@@ -2115,7 +2115,7 @@ describe "Users API", type: :request do
     end
 
     it 'should return a bad request for incorrect app keys' do
-      json = raw_api_call(:post, "/api/v1/users/#{@user.id}/pandata_token",
+      json = raw_api_call(:post, "/api/v1/users/self/pandata_token",
           { controller: 'users', action: 'pandata_token', format:'json', id: @user.to_param },
           { app_key: 'IOS_not_right'}
       )

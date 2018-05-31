@@ -2212,7 +2212,7 @@ class UsersController < ApplicationController
   #   The pandata appKey for this mobile app
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/users/<user_id>/pandata_token \
+  #     curl https://<canvas>/api/v1/users/self/pandata_token \
   #          -X POST \
   #          -H 'Authorization: Bearer <token>'
   #          -F 'app_key=MOBILE_APPS_KEY' \
@@ -2223,7 +2223,6 @@ class UsersController < ApplicationController
   #     "expires_at": 1521667783000,
   #   }
   def pandata_token
-    user = api_find(User, params[:id])
     settings = Canvas::DynamicSettings.find(service: 'pandata')
 
     if params[:app_key] == settings["ios-pandata-key"]
@@ -2241,7 +2240,7 @@ class UsersController < ApplicationController
       iss: key,
       exp: expires_at.to_i,
       aud: 'PANDATA',
-      sub: user.global_id
+      sub: @current_user.global_id
     }
 
     token = Canvas::Security.create_jwt(body, expires_at, sekrit)
