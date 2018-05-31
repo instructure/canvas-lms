@@ -12,6 +12,4 @@ class UserSettingsController < ApplicationController
       id: params[:user_id]
     )
   end
-
-
 end
