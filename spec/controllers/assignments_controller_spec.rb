@@ -1015,36 +1015,6 @@ describe AssignmentsController do
       expect(assigns[:js_env][:MODERATED_GRADING_MAX_GRADER_COUNT]).to eq @assignment.moderated_grading_max_grader_count
     end
 
-    describe 'js_env ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED' do
-      before(:each) do
-        user_session(@teacher)
-      end
-
-      after(:each) do
-        ENV.delete('ANONYMOUS_INSTRUCTOR_ANNOTATIONS')
-      end
-
-      it 'is true when the ANONYMOUS_INSTRUCTOR_ANNOTATIONS environment variable is set to true' do
-        ENV['ANONYMOUS_INSTRUCTOR_ANNOTATIONS'] = 'true'
-        get 'edit', params: { course_id: @course.id, id: @assignment.id }
-
-        expect(assigns[:js_env][:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED]).to be true
-      end
-
-      it 'is false when the ANONYMOUS_INSTRUCTOR_ANNOTATIONS environment variable is set to false' do
-        ENV['ANONYMOUS_INSTRUCTOR_ANNOTATIONS'] = 'false'
-        get 'edit', params: { course_id: @course.id, id: @assignment.id }
-
-        expect(assigns[:js_env][:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED]).to be false
-      end
-
-      it 'is false when the ANONYMOUS_INSTRUCTOR_ANNOTATIONS environment variable is not set' do
-        get 'edit', params: { course_id: @course.id, id: @assignment.id }
-
-        expect(assigns[:js_env][:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED]).to be false
-      end
-    end
-
     context 'plagiarism detection platform' do
       include_context 'lti2_spec_helper'
 

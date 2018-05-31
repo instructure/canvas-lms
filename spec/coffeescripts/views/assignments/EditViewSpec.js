@@ -930,41 +930,6 @@ test('does not show the load in new tab checkbox', function() {
   equal(this.view.$externalToolsNewTab.length, 0)
 })
 
-QUnit.module('EditView: Anonymous Instructor Annotations', {
-  setup() {
-    fakeENV.setup()
-    ENV.COURSE_ID = 1
-    this.server = sinon.fakeServer.create()
-  },
-  teardown() {
-    this.server.restore()
-    fakeENV.teardown()
-  },
-  editView() {
-    return editView.apply(this, arguments)
-  }
-})
-
-test('when environment is not set, does not enable editing the property', function() {
-  const view = this.editView()
-  strictEqual(view.toJSON().anonymousInstructorAnnotationsEnabled, false)
-  strictEqual(view.$el.find('input#assignment_anonymous_instructor_annotations').length, 0)
-})
-
-test('when environment is set to false, does not enable editing the property', function() {
-  ENV.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED = false
-  const view = this.editView()
-  strictEqual(view.toJSON().anonymousInstructorAnnotationsEnabled, false)
-  strictEqual(view.$el.find('input#assignment_anonymous_instructor_annotations').length, 0)
-})
-
-test('when environment is set to true, enables editing the property', function() {
-  ENV.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED = true
-  const view = this.editView()
-  strictEqual(view.toJSON().anonymousInstructorAnnotationsEnabled, true)
-  strictEqual(view.$el.find('input#assignment_anonymous_instructor_annotations').length, 1)
-})
-
 QUnit.module('EditView: anonymous grading', (hooks) => {
   let server;
   hooks.beforeEach(() => {
@@ -1008,6 +973,26 @@ QUnit.module('EditView: anonymous grading', (hooks) => {
     const anonymousGradingCheckbox = view.$el.find('input#assignment_anonymous_grading')
 
     strictEqual(anonymousGradingCheckbox.prop('disabled'), true)
+  })
+})
+
+QUnit.module('EditView: Anonymous Instructor Annotations', (hooks) => {
+  let server
+
+  hooks.beforeEach(() => {
+    fakeENV.setup()
+    ENV.COURSE_ID = 1
+    server = sinon.fakeServer.create()
+  })
+
+  hooks.afterEach(() => {
+    server.restore()
+    fakeENV.teardown()
+  })
+
+  test('shows a checkbox', () => {
+    const view = editView()
+    strictEqual(view.$el.find('input#assignment_anonymous_instructor_annotations').length, 1)
   })
 })
 

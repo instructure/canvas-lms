@@ -507,7 +507,6 @@ class AssignmentsController < ApplicationController
           }
         end,
         VALID_DATE_RANGE: CourseDateRange.new(@context),
-        ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED: ENV['ANONYMOUS_INSTRUCTOR_ANNOTATIONS'] == 'true'
       }
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
