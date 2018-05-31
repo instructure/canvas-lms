@@ -2895,6 +2895,10 @@ ja:
       test_ldap_search_help_fixes_3: "LDAP のユーザ オブジェクトに、提供された検索ベースに対する検索特権があることを確認してください。"
       test_ldap_search_help_header: "Canvas は LDAP インスタンスを検索できません"
       test_ldap_search_label: "LDAP 検索をテストしています..."
+    linkedin_fields: 
+      description: |-
+          [LinkedIn でアプリ登録](%{linkedin_url})を行う必要があります。
+          OAuth 2.0の承認済みリダイレクトURLとして %{callback_url} を追加し、アプリケーションステータスを「Live」に設定する必要があります。アプリケーションを作成したら、クライアント ID とクライアントシークレットを書き留め、ここに入力します。
     login_required: 入力が必要です
     no_changing_auth_types: 認証設定の種類は変更できません。削除した後、新しい設定を作成してください。
     password_required: 入力が必要です
