@@ -2111,7 +2111,8 @@ describe "Users API", type: :request do
           { controller: 'users', action: 'pandata_token', format:'json', id: @user.to_param },
           { app_key: 'IOS_pandata_key'}
       )
-      expect(json['token']).to be_present
+      expect(json['auth_token']).to be_present
+      expect(json['props_token']).to be_present
       expect(json['expires_at']).to be_present
     end
 

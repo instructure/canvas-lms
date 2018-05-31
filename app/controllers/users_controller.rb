@@ -2206,7 +2206,8 @@ class UsersController < ApplicationController
 
   # @API Get a Pandata jwt token and its expiration date
   #
-  # Returns a jwt token that can be used to send events to Pandata.
+  # Returns a jwt auth and props token that can be used to send events to
+  # Pandata.
   #
   # NOTE: This is currently only available to the mobile developer keys.
   #
@@ -2221,7 +2222,8 @@ class UsersController < ApplicationController
   #
   # @example_response
   #   {
-  #     "token": "wek23klsdnsoieioeoi3of9deeo8r8eo8fdn",
+  #     "auth_token": "wek23klsdnsoieioeoi3of9deeo8r8eo8fdn",
+  #     "props_token": "paowinefopwienpfiownepfiownepfownef",
   #     "expires_at": 1521667783000,
   #   }
   def pandata_token
@@ -2247,15 +2249,27 @@ class UsersController < ApplicationController
     end
 
     expires_at = Time.zone.now + 1.day.to_i
-    body = {
+    auth_body = {
       iss: key,
       exp: expires_at.to_i,
       aud: 'PANDATA',
-      sub: @current_user.global_id
+      sub: @current_user.global_id,
     }
 
-    token = Canvas::Security.create_jwt(body, expires_at, sekrit)
-    render json: { token: token, expires_at: expires_at.to_f * 1000 }
+    props_body = {
+      user_id: @current_user.global_id,
+      shard: @domain_root_account.shard.id,
+      root_account_id: @domain_root_account.local_id,
+      root_account_uuid: @domain_root_account.uuid
+    }
+
+    auth_token = Canvas::Security.create_jwt(auth_body, expires_at, sekrit)
+    props_token = Canvas::Security.create_jwt(props_body, nil, sekrit)
+    render json: {
+      auth_token: auth_token,
+      props_token: props_token,
+      expires_at: expires_at.to_f * 1000
+    }
   end
 
   protected
