@@ -221,6 +221,21 @@ it('updates state when new note is passed in', () => {
   expect(wrapper).toMatchSnapshot();
 });
 
+it('does not update state when the new note property is equal to the previous note property', () => {
+  const note = simpleItem({title: 'original title'});
+  const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={note} courses={[]} />);
+  let titleInput = wrapper.find('TextInput').first();
+  expect(titleInput.props().value).toBe('original title');
+
+  titleInput.props().onChange({target: {value: 'new title'}});
+  titleInput = wrapper.find('TextInput').first();
+  expect(titleInput.props().value).toBe('new title');
+
+  wrapper.setProps({noteItem: {...note}}); // new object, same content as original
+  titleInput = wrapper.find('TextInput').first();
+  expect(titleInput.props().value).toBe('new title');
+});
+
 //------------------------------------------------------------------------
 
 it('does not render the delete button if an item is not specified', () => {

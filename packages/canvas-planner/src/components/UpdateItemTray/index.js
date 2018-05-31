@@ -55,7 +55,7 @@ export class UpdateItemTray extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    if (nextProps.noteItem) {
+    if (!_.isEqual(this.props.noteItem, nextProps.noteItem)) {
       const updates = this.getNoteUpdates(nextProps);
       this.setState({updates}, this.updateMessages);
     }
