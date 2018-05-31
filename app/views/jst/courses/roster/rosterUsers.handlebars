@@ -53,7 +53,7 @@
         type:     'PUT',
         dataType: 'json',
         url:      "/enrollments/" + toggle.data('enrollmentId') + "/settings/sequence_control",
-        data:     { 'value': toggle.is(':checked') }
+        data:     { 'value': !toggle.is(':checked') }
       });
     })
   </script>
