@@ -6,4 +6,12 @@ class EnrollmentSettingsController < ApplicationController
       value: params[:value]
     )
   end
+
+  def index
+    render json: SettingsService.get_enrollment_settings(
+      id: params[:enrollment_id]
+    )
+  end
+
+
 end
