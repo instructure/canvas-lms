@@ -61,6 +61,8 @@ class User < ActiveRecord::Base
   has_many :observer_enrollments
   has_many :observee_enrollments, :foreign_key => :associated_user_id, :class_name => 'ObserverEnrollment'
 
+  has_many :observer_pairing_codes, -> { where("workflow_state<>'deleted' AND expires_at > ?", Time.zone.now) }, dependent: :destroy, inverse_of: :user
+
   has_many :as_student_observation_links, -> { where.not(:workflow_state => 'deleted') }, class_name: 'UserObservationLink',
     foreign_key: :user_id, dependent: :destroy, inverse_of: :student
   has_many :as_observer_observation_links, -> { where.not(:workflow_state => 'deleted') }, class_name: 'UserObservationLink',
@@ -2842,5 +2844,9 @@ class User < ActiveRecord::Base
       map[id] = "#{id}_#{huuid}"
     end
     User.where(:id => id_token_map.keys).to_a.select { |u| u.token == id_token_map[u.id] }
+  end
+
+  def generate_observer_pairing_code
+    observer_pairing_codes.create(expires_at: 1.day.from_now, code: SecureRandom.hex(3))
   end
 end
