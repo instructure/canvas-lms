@@ -29,7 +29,11 @@ CanvasRails::Application.routes.draw do
   resources(:enrollments) do
     resources(:settings, controller: :enrollment_settings)
   end
-  
+
+  resources(:users) do
+    resources(:settings, controller: :user_settings)
+  end
+
   resources :submission_comments, only: [:update, :destroy]
 
   resources :epub_exports, only: [:index]

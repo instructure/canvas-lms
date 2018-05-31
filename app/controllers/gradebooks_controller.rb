@@ -116,7 +116,9 @@ class GradebooksController < ApplicationController
            effective_due_dates: effective_due_dates,
            exclude_total: @exclude_total,
            student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
-           student_id: @presenter.student_id)
+           student_id: @presenter.student_id,
+           accomodations: ['EAP']
+         )
   end
 
   def save_assignment_order
