@@ -6535,6 +6535,8 @@ pt:
     identifier: "ID: %{id}"
     redirect_uri: "URI: %{redirect_uri}"
   developer_key_921ddbae: "Chave do desenvolvedor"
+  developer_key_developerkeyid_deleted_focus_moved_t_80fffb4d: "Chave do desenvolvedor %{developerKeyId} excluída. Foco movido para adicionar botão de chave de desenvolvedor."
+  developer_key_developerkeyid_deleted_focus_moved_t_9f5b5198: "Chave do desenvolvedor %{developerKeyId} excluída. O foco foi movido para o botão de exclusão da chave de desenvolvedor anterior na lista."
   developer_key_form: 
     cancel: Cancelar
     icon_url: "URL de ícone:"
