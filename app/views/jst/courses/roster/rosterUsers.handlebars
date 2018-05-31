@@ -47,7 +47,7 @@
   {{/if}}
 
   <script type="text/javascript">
-    $(document).unbind().on('change', '.sequence_control_toggle', function (event) {
+    $(document).on('change', '.sequence_control_toggle', function (event) {
       var toggle = $(event.currentTarget)
       $.ajax({
         type:     'PUT',
