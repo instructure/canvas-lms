@@ -2895,6 +2895,11 @@ zh-Hans:
       test_ldap_search_help_fixes_3: "验证 LDAP 中对提供的搜索库具有搜索权限的用户对象。"
       test_ldap_search_help_header: "Canvas 无法搜索 LDAP 实例"
       test_ldap_search_label: "正在测试 LDAP 搜索..."
+    linkedin_fields: 
+      description: |-
+          您需 [在 LinkedIn 上注册申请](%{linkedin_url})。
+          您应将 %{callback_url} 添加为 OAuth 2.0 授权的重定向 URL，并将申请状态设置为 Live「活跃」。
+          创建申请后，记下客户端 ID 和客户端密钥，并在此处输入。
     login_required: 必须提供
     no_changing_auth_types: 无法更改授权配置类型，请删除，然后创建新的配置。
     password_required: 必须提供
