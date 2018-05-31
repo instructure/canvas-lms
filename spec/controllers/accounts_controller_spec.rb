@@ -191,6 +191,162 @@ describe AccountsController do
     end
   end
 
+  describe "courses" do
+    it "should count total courses correctly" do
+      account = Account.create!
+      account_with_admin_logged_in(account: account)
+      course_factory(account: account)
+      @course.course_sections.create!
+      @course.course_sections.create!
+      @course.update_account_associations
+      expect(@account.course_account_associations.length).to eq 3 # one for each section, and the "nil" section
+
+      get 'show', params: {:id => @account.id}, :format => 'html'
+
+      expect(assigns[:associated_courses_count]).to eq 1
+    end
+
+    it "should redirect for admins without course read rights when course_user_search is enabled" do
+      Account.default.enable_feature!(:course_user_search)
+      account_admin_user_with_role_changes(:role_changes => {:read_course_list => false, :read_roster => false} )
+      user_session(@admin)
+
+      get 'show', params: {:id => Account.default.id}, :format => 'html'
+
+      expect(response).to redirect_to(account_settings_url(Account.default))
+    end
+
+    describe "check crosslisting" do
+      before :once do
+        @root_account = Account.create!
+        @account1 = Account.create!({ :root_account => @root_account })
+        @account2 = Account.create!({ :root_account => @root_account })
+        @course1 = course_factory({ :account => @account1, :course_name => "course1" })
+        @course2 = course_factory({ :account => @account2, :course_name => "course2" })
+        @course2.course_sections.create!
+        @course2.course_sections.first.crosslist_to_course(@course1)
+      end
+
+      it "if crosslisted a section to another account's course, don't show that other course" do
+        account_with_admin_logged_in(account: @account2)
+        get 'show', params: {:id => @account2.id }, :format => 'html'
+        expect(assigns[:associated_courses_count]).to eq 1
+      end
+
+      it "if crosslisted a section to this account, do *not* show other account's course" do
+        account_with_admin_logged_in(account: @account1)
+        get 'show', params: {:id => @account1.id }, :format => 'html'
+        expect(assigns[:associated_courses_count]).to eq 1
+      end
+
+      it "if crosslisted a section to another account, do show other if that param is not set" do
+        account_with_admin_logged_in(account: @account2)
+        get 'show', params: {:id => @account2.id, :include_crosslisted_courses => true}, :format => 'html'
+        expect(assigns[:associated_courses_count]).to eq 2
+      end
+
+      it "if crosslisted a section to this account, do *not* show other account's course even if param is not set" do
+        account_with_admin_logged_in(account: @account1)
+        get 'show', params: {:id => @account1.id, :include_crosslisted_courses => true}, :format => 'html'
+        expect(assigns[:associated_courses_count]).to eq 1
+      end
+    end
+
+    # Check that both published and un-published courses have the correct count
+    it "should count course's student enrollments" do
+      account_with_admin_logged_in
+      course_with_teacher(:account => @account)
+      c1 = @course
+      course_with_teacher(:course => c1)
+      @student = User.create
+      c1.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
+      c1.save
+
+      course_with_teacher(:account => @account, :active_all => true)
+      c2 = @course
+      @student1 = User.create
+      c2.enroll_user(@student1, "StudentEnrollment", :enrollment_state => 'active')
+      @student2 = User.create
+      c2.enroll_user(@student2, "StudentEnrollment", :enrollment_state => 'active')
+      c2.save
+
+      get 'show', params: {:id => @account.id}, :format => 'html'
+
+      expect(assigns[:courses].find {|c| c.id == c1.id}.student_count).to eq c1.student_enrollments.count
+      expect(assigns[:courses].find {|c| c.id == c2.id}.student_count).to eq c2.student_enrollments.count
+    end
+
+
+    it "should list student counts in unclaimed courses" do
+      account_with_admin_logged_in
+      c1 = @account.courses.create!(:name => "something", :workflow_state => 'created')
+      @student = User.create
+      c1.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
+
+      get 'show', params: {:id => @account.id}, :format => 'html'
+
+      expect(assigns[:courses].first.student_count).to eq 1
+    end
+
+    it "should not list rejected teachers" do
+      account_with_admin_logged_in
+      course_with_teacher(:account => @account)
+      @teacher2 = User.create(:name => "rejected")
+      reject = @course.enroll_user(@teacher2, "TeacherEnrollment")
+      reject.reject!
+
+      get 'show', params: {:id => @account.id}, :format => 'html'
+
+      expect(assigns[:courses].find {|c| c.id == @course.id}.teacher_names).to eq [@teacher.name]
+    end
+
+    it "should sort courses as specified" do
+      account_with_admin_logged_in(account: @account)
+      course_with_teacher(:account => @account)
+      expect_any_instance_of(Account).to receive(:fast_all_courses).with(include(order: "courses.created_at DESC"))
+      get 'show', params: {:id => @account.id, :courses_sort_order => "created_at_desc"}, :format => 'html'
+      expect(@admin.reload.preferences[:course_sort]).to eq 'created_at_desc'
+    end
+
+    it 'can search and sort simultaneously' do
+      account_with_admin_logged_in(account: @account)
+      @account.courses.create! name: 'blah A'
+      @account.courses.create! name: 'blah C'
+      @account.courses.create! name: 'blah B'
+      @account.courses.create! name: 'bleh Z'
+      get 'courses', params: {:account_id => @account.id, :course => {:name => 'blah'}, :courses_sort_order => 'name_desc'}, :format => 'html'
+      expect(assigns['courses'].map(&:name)).to eq(['blah C', 'blah B', 'blah A'])
+      expect(@admin.reload.preferences[:course_sort]).to eq 'name_desc'
+    end
+  end
+
+  context "special account ids" do
+    before :once do
+      account_with_admin(:account => Account.site_admin)
+      @account = Account.create!
+    end
+
+    before :each do
+      user_session(@admin)
+      allow(LoadAccount).to receive(:default_domain_root_account).and_return(@account)
+    end
+
+    it "should allow self" do
+      get 'show', params: {:id => 'self'}, :format => 'html'
+      expect(assigns[:account]).to eq @account
+    end
+
+    it "should allow default" do
+      get 'show', params: {:id => 'default'}, :format => 'html'
+      expect(assigns[:account]).to eq Account.default
+    end
+
+    it "should allow site_admin" do
+      get 'show', params: {:id => 'site_admin'}, :format => 'html'
+      expect(assigns[:account]).to eq Account.site_admin
+    end
+  end
+
   describe "update" do
     it "should update 'app_center_access_token'" do
       account_with_admin_logged_in

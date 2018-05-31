@@ -22,6 +22,7 @@ describe "new account course search" do
 
   before :once do
     account_model
+    @account.enable_feature!(:course_user_search)
     account_admin_user(:account => @account, :active_all => true)
   end
 
