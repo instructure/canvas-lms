@@ -1053,9 +1053,14 @@ class ExternalToolsController < ApplicationController
       return unless find_tool(tool_id, launch_type)
     end
 
-    if @tool&.url.blank? && @tool&.extension_setting(launch_type, :url).blank?
-      flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
-      return redirect_to named_context_url(@context, :context_url)
+    if @tool.blank? || (@tool.url.blank? && @tool&.extension_setting(launch_type, :url).blank? && launch_url.blank?)
+      respond_to do |format|
+        format.html do
+          flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
+          return redirect_to named_context_url(@context, :context_url)
+        end
+        format.json { render json: {errors: {external_tool: "Unable to find a matching external tool"}} and return }
+      end
     end
 
     # generate the launch
