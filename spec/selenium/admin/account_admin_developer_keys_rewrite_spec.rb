@@ -21,9 +21,6 @@ describe 'Developer Keys' do
   include_context 'in-process server selenium tests'
   include DeveloperKeysRewriteCommon
 
-  # We want to force the usage of the fallback scope mapper here, not the generated version
-  Object.const_set("ApiScopeMapper", ApiScopeMapperLoader.api_scope_mapper_fallback)
-
   describe 'with developer key management UI rewrite feature flag' do
     before(:each) do
       admin_logged_in
@@ -284,6 +281,7 @@ describe 'Developer Keys' do
     context "scopes" do
       let(:expected_scopes) do
         [
+          "url:GET|/api/v1/courses/:course_id/assignment_groups",
           "url:GET|/api/v1/courses/:course_id/assignment_groups/:assignment_group_id",
           "url:POST|/api/v1/courses/:course_id/assignment_groups",
           "url:PUT|/api/v1/courses/:course_id/assignment_groups/:assignment_group_id",
@@ -299,7 +297,7 @@ describe 'Developer Keys' do
       end
 
       it "enforce scopes toggle allows scope creation" do
-        expand_scope_group_by_filter('assignment_groups_api', Account.default.id)
+        expand_scope_group_by_filter('Assignment Groups', Account.default.id)
         click_scope_group_checkbox
         expect(f("span[data-automation='enforce_scopes']")).to contain_css("svg[name='IconCheck']")
         find_button("Save Key").click
@@ -308,18 +306,18 @@ describe 'Developer Keys' do
       end
 
       it "allows filtering by scope group name" do
-        expand_scope_group_by_filter('assignment_groups_api', Account.default.id)
+        expand_scope_group_by_filter('Assignment Groups', Account.default.id)
         expect(ff(".toggle-scope-group")).to have_size(1)
       end
 
       it "expands scope group when group name is selected" do
-        expand_scope_group_by_filter('assignment_groups_api', Account.default.id)
+        expand_scope_group_by_filter('Assignment Groups', Account.default.id)
         expect(f(".toggle-scope-group button").attribute('aria-expanded')).to eq 'true'
-        expect(ff(".toggle-scope-group .developer-key-scope")).to have_size(4)
+        expect(ff(".toggle-scope-group .developer-key-scope")).to have_size(5)
       end
 
       it "includes proper scopes for scope group" do
-        expand_scope_group_by_filter('assignment_groups_api', Account.default.id)
+        expand_scope_group_by_filter('Assignment Groups', Account.default.id)
         scope_group = f(".toggle-scope-group")
         expect(scope_group).to contain_css("span[title='GET']")
         expect(scope_group).to contain_css("span[title='POST']")
@@ -328,27 +326,27 @@ describe 'Developer Keys' do
       end
 
       it "scope group select all checkbox adds all associated scopes" do
-        expand_scope_group_by_filter('assignment_groups_api', Account.default.id)
+        expand_scope_group_by_filter('Assignment Groups', Account.default.id)
         click_scope_group_checkbox
         # checks that all UI pills have been added to scope group if selected
-        expect(ff(".toggle-scope-group span[title='GET']")).to have_size(2)
+        expect(ff(".toggle-scope-group span[title='GET']")).to have_size(3)
         expect(ff(".toggle-scope-group span[title='POST']")).to have_size(2)
         expect(ff(".toggle-scope-group span[title='PUT']")).to have_size(2)
         expect(ff(".toggle-scope-group span[title='DELETE']")).to have_size(2)
       end
 
       it "scope group individual checkbox adds only associated scope" do
-        expand_scope_group_by_filter('assignment_groups_api', Account.default.id)
+        expand_scope_group_by_filter('Assignment Groups', Account.default.id)
         click_scope_checkbox
         # adds a UI pill to scope group with http verb if scope selected
-        expect(ff(".toggle-scope-group span[title='GET']")).to have_size(2)
+        expect(ff(".toggle-scope-group span[title='GET']")).to have_size(3)
         expect(ff(".toggle-scope-group span[title='POST']")).to have_size(1)
         expect(ff(".toggle-scope-group span[title='PUT']")).to have_size(1)
         expect(ff(".toggle-scope-group span[title='DELETE']")).to have_size(1)
       end
 
       it "adds scopes to backend developer key via UI" do
-        expand_scope_group_by_filter('assignment_groups_api', Account.default.id)
+        expand_scope_group_by_filter('Assignment Groups', Account.default.id)
         click_scope_group_checkbox
         find_button("Save Key").click
         wait_for_ajaximations
@@ -357,7 +355,7 @@ describe 'Developer Keys' do
 
       it "adds scopes to backend developer key via UI in site admin" do
         site_admin_logged_in
-        expand_scope_group_by_filter('assignment_groups_api', Account.site_admin.id)
+        expand_scope_group_by_filter('Assignment Groups', Account.site_admin.id)
         click_scope_group_checkbox
         find_button("Save Key").click
         wait_for_ajaximations
@@ -366,11 +364,11 @@ describe 'Developer Keys' do
 
       it "removes scopes from backend developer key via UI" do
         skip 'will be fixed in PLAT-3391'
-        expand_scope_group_by_filter('assignment_groups_api', Account.default.id)
+        expand_scope_group_by_filter('Assignment Groups', Account.default.id)
         click_scope_group_checkbox
         find_button("Save Key").click
         click_edit_icon
-        filter_scopes_by_name 'assignment_groups_api'
+        filter_scopes_by_name 'Assignment Groups'
         click_scope_group_checkbox
         dk = DeveloperKey.last
         find_button("Save Key").click
@@ -390,7 +388,7 @@ describe 'Developer Keys' do
       end
 
       it "keeps all endpoints read only checkbox checked if check/unchecking another http method" do
-        expand_scope_group_by_filter('assignment_groups_api', Account.default.id)
+        expand_scope_group_by_filter('Assignment Groups', Account.default.id)
         select_all_readonly_checkbox.click
         click_scope_checkbox
         expect(f(".toggle-scope-group input[type='checkbox']").selected?).to eq false
