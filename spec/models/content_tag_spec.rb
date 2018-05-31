@@ -296,6 +296,23 @@ describe ContentTag do
     expect(@assignment.title).to eq 'some assignment (renamed)'
   end
 
+  it "should associate the tag with an external tool matching the url" do
+    course_factory
+    url = 'http://quiz-lti.docker/lti/launch'
+    tool = @course.context_external_tools.create!({
+      name: 'tool',
+      consumer_key: 'key',
+      shared_secret: 'secret',
+      url: url
+    })
+    assignment = @course.assignments.create!(
+      title: 'some assignment',
+      submission_types: 'external_tool',
+      external_tool_tag_attributes: { url: url }
+    )
+    expect(assignment.external_tool_tag.content).to eq(tool)
+  end
+
   describe ".update_for" do
     context "when updating a quiz" do
       before do
