@@ -52,13 +52,6 @@ class GraphQLTypeTester
             method_str = field.metadata[:type_class].method_str
             if type_obj.respond_to?(method_str)
               if args.present?
-
-                # THIS LINE JUST EXISTS FOR COMPATIBILITY WITH SPECS IN
-                # ANALYTICS, DELETE THIS IMMEDIATELY
-                args = args.each_with_object({}) { |(k,v), new_args|
-                  new_args[k.to_s.underscore.to_sym] = v
-                }
-
                 type_obj.send(method_str, **args)
               else
                 type_obj.send(method_str)
