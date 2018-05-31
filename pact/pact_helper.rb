@@ -15,29 +15,23 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'httparty'
-require 'json'
-require_relative '../../../../pact_config'
+require 'pact/consumer/rspec'
+require_relative 'pact_config'
 
-module Helper
-  module ApiClient
-    class Courses
-      include HTTParty
-      base_uri PactConfig.mock_provider_service_base_uri
-      headers "Authorization" => "Bearer some_token"
+# see https://github.com/realestate-com-au/pact/blob/master/documentation/configuration.md
+Pact.configure do |config|
+  config.diff_formatter = :list
+  config.logger.level = Logger::DEBUG
+  config.pact_dir = 'pacts'
+  config.pactfile_write_mode = :overwrite
+  config.pactfile_write_order = :chronological
+end
 
-      # TODO: modify these to use params
-      def list_your_courses
-        JSON.parse(self.class.get('/api/v1/courses').body)
-      rescue
-        nil
-      end
-
-      def list_students(course_id)
-        JSON.parse(self.class.get("/api/v1/courses/#{course_id}/users", query: "enrollment_type[]=student").body)
-      rescue
-        nil
-      end
+Pact.service_consumer PactConfig::Consumers::GENERIC_CONSUMER do
+  has_pact_with PactConfig::Providers::CANVAS_LMS_API do
+    mock_service :canvas_lms_api do
+      port PactConfig.mock_provider_service_port
+      pact_specification_version '2.0.0'
     end
   end
 end

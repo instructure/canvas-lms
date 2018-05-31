@@ -18,7 +18,7 @@
 ENV["RAILS_ENV"] = ENV["RACK_ENV"]= "test"
 
 require 'pact/provider/rspec'
-require_relative '../../pact_config'
+require_relative '../../../../pact/pact_config'
 require_relative '../../../spec_helper'
 require_relative 'provider_states_for_consumer'
 
