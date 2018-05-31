@@ -23,20 +23,29 @@ import React from 'react'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Container from '@instructure/ui-core/lib/components/Container'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import IconPlus from '@instructure/ui-icons/lib/Line/IconEdit'
 import IconArrowOpenStart from '@instructure/ui-icons/lib/Solid/IconArrowOpenStart'
 import Text from '@instructure/ui-core/lib/components/Text'
+import {ConnectedPermissionButton} from './PermissionButton'
+import permissionPropTypes from '../propTypes'
 
 // TODO Pass in props needed to actually generate the button sara is working on
 // TODO add expandable-ness to this. Will probably need to make this not a
 //      stateless component at that point in time
-export default function RoleTrayTableRow({description, expandable, title}) {
+export default function RoleTrayTableRow({
+  description,
+  expandable,
+  title,
+  permission,
+  permissionName,
+  role,
+  trayIcon
+}) {
   return (
     <Container as="div">
       <Flex justifyItems="space-between">
         <FlexItem>
           {expandable && (
-            <span className=".ic-permissions_role_tray_table_role_expandable">
+            <span className="ic-permissions_role_tray_table_role_expandable">
               <Button variant="icon" size="small">
                 <IconArrowOpenStart title={I18n.t('Expand permission')} />
               </Button>
@@ -60,9 +69,12 @@ export default function RoleTrayTableRow({description, expandable, title}) {
         </FlexItem>
 
         <FlexItem>
-          <Button variant="circle-primary" size="small">
-            <IconPlus />
-          </Button>
+          <ConnectedPermissionButton
+            permission={permission}
+            permissionName={permissionName}
+            courseRoleId={role.id}
+            trayIcon={trayIcon}
+          />
         </FlexItem>
       </Flex>
     </Container>
@@ -72,10 +84,15 @@ export default function RoleTrayTableRow({description, expandable, title}) {
 RoleTrayTableRow.propTypes = {
   description: PropTypes.string,
   expandable: PropTypes.bool,
+  permission: permissionPropTypes.rolePermission.isRequired,
+  permissionName: PropTypes.string.isRequired,
+  role: permissionPropTypes.role.isRequired,
+  trayIcon: PropTypes.bool,
   title: PropTypes.string.isRequired
 }
 
 RoleTrayTableRow.defaultProps = {
   description: '',
-  expandable: false
+  expandable: false,
+  trayIcon: false
 }

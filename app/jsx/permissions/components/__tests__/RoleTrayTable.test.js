@@ -17,16 +17,28 @@
  */
 
 import React from 'react'
+import {Provider} from 'react-redux'
 import {mount} from 'enzyme'
 
+import {ROLES, STORE} from '../../__tests__/examples'
 import RoleTrayTable from '../RoleTrayTable'
 import RoleTrayTableRow from '../RoleTrayTableRow'
 
+function createRowProps(title, roleId) {
+  const role = ROLES.find(r => r.id === roleId)
+  const permissionName = Object.keys(role.permissions)[0]
+  const permission = role.permissions[permissionName]
+
+  return {title, role, permission, permissionName}
+}
+
 it('renders the component with only one child', () => {
   const tree = mount(
-    <RoleTrayTable title="fruit">
-      <RoleTrayTableRow title="banana" />
-    </RoleTrayTable>
+    <Provider store={STORE}>
+      <RoleTrayTable title="fruit">
+        <RoleTrayTableRow {...createRowProps('banana', 1)} />
+      </RoleTrayTable>
+    </Provider>
   )
   const rootNode = tree.find('RoleTrayTable')
   const childrenNodes = tree.find('RoleTrayTableRow')
@@ -36,11 +48,13 @@ it('renders the component with only one child', () => {
 
 it('renders the component with multiple children', () => {
   const tree = mount(
-    <RoleTrayTable title="fruit">
-      <RoleTrayTableRow title="banana" />
-      <RoleTrayTableRow title="apple" />
-      <RoleTrayTableRow title="mango" />
-    </RoleTrayTable>
+    <Provider store={STORE}>
+      <RoleTrayTable title="fruit">
+        <RoleTrayTableRow {...createRowProps('banana', 1)} />
+        <RoleTrayTableRow {...createRowProps('apple', 2)} />
+        <RoleTrayTableRow {...createRowProps('mango', 3)} />
+      </RoleTrayTable>
+    </Provider>
   )
   const node = tree.find('RoleTrayTable')
   const childrenNodes = tree.find('RoleTrayTableRow')
@@ -50,9 +64,11 @@ it('renders the component with multiple children', () => {
 
 it('renders the title', () => {
   const tree = mount(
-    <RoleTrayTable title="fruit">
-      <RoleTrayTableRow title="banana" />
-    </RoleTrayTable>
+    <Provider store={STORE}>
+      <RoleTrayTable title="fruit">
+        <RoleTrayTableRow {...createRowProps('banana', 1)} />
+      </RoleTrayTable>
+    </Provider>
   )
   const node = tree.find('Text')
   expect(node.at(0).text()).toEqual('fruit')
@@ -60,14 +76,16 @@ it('renders the title', () => {
 
 it('sorts the children by title', () => {
   const tree = mount(
-    <RoleTrayTable title="fruit">
-      <RoleTrayTableRow title="banana" />
-      <RoleTrayTableRow title="apple" />
-      <RoleTrayTableRow title="mango" />
-    </RoleTrayTable>
+    <Provider store={STORE}>
+      <RoleTrayTable title="fruit">
+        <RoleTrayTableRow {...createRowProps('banana', 1)} />
+        <RoleTrayTableRow {...createRowProps('apple', 2)} />
+        <RoleTrayTableRow {...createRowProps('mango', 3)} />
+      </RoleTrayTable>
+    </Provider>
   )
-  const nodes = tree.find('Text')
-  expect(nodes.at(1).text()).toEqual('apple')
-  expect(nodes.at(2).text()).toEqual('banana')
-  expect(nodes.at(3).text()).toEqual('mango')
+  const nodes = tree.find('RoleTrayTableRow')
+  expect(nodes.at(0).text()).toEqual('apple')
+  expect(nodes.at(1).text()).toEqual('banana')
+  expect(nodes.at(2).text()).toEqual('mango')
 })

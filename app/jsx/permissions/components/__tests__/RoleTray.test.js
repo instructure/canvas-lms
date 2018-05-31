@@ -17,21 +17,17 @@
  */
 
 import React from 'react'
-import {COURSE} from '../../propTypes'
 import {mount, shallow} from 'enzyme'
 
+import {getPermissionsWithLabels} from '../../helper/utils'
+import {ROLES, PERMISSIONS} from '../../__tests__/examples'
 import RoleTray from '../RoleTray'
 
 function makeDefaultProps() {
+  const role = ROLES[0]
+  const perms = getPermissionsWithLabels(PERMISSIONS, role.permissions)
   return {
-    assignedPermissions: [
-      {
-        contextType: COURSE,
-        displayed: true,
-        label: 'Eat a banana',
-        permission_name: 'banana'
-      }
-    ],
+    assignedPermissions: perms,
     assignedTo: '365',
     basedOn: null,
     baseRoleLabels: ['Student', 'Teacher', 'TA'],
@@ -42,14 +38,8 @@ function makeDefaultProps() {
     label: 'Student',
     lastChanged: '1/1/1970',
     open: true,
-    unassignedPermissions: [
-      {
-        contextType: COURSE,
-        displayed: true,
-        label: 'Eat a pear',
-        permission_name: 'pear'
-      }
-    ]
+    role,
+    unassignedPermissions: perms
   }
 }
 

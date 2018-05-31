@@ -108,6 +108,7 @@ const DEFAULT_PROPS = () => ({
 const STORE = {
   getState: () => ({
     activeRoleTray: null,
+    activePermissionTray: null,
     contextId: 1,
     contextType: COURSE,
     permissionSearchString: '',

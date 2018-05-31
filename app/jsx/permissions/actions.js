@@ -24,19 +24,22 @@ import * as apiClient from './apiClient'
 import {showFlashError, showFlashSuccess} from '../shared/FlashAlert'
 
 const types = [
-  'DISPLAY_ADD_TRAY',
+  'ADD_NEW_ROLE',
+  'ADD_TRAY_SAVING_FAIL',
   'ADD_TRAY_SAVING_START',
   'ADD_TRAY_SAVING_SUCCESS',
-  'ADD_TRAY_SAVING_FAIL',
-  'ADD_NEW_ROLE',
+  'CLEAN_FOCUS',
+  'DISPLAY_ADD_TRAY',
+  'DISPLAY_PERMISSION_TRAY',
   'DISPLAY_ROLE_TRAY',
+  'FIX_FOCUS',
   'GET_PERMISSIONS_START',
   'GET_PERMISSIONS_SUCCESS',
   'HIDE_ALL_TRAYS',
+  'PERMISSIONS_TAB_CHANGED',
   'UPDATE_PERMISSIONS',
   'UPDATE_PERMISSIONS_SEARCH',
-  'UPDATE_ROLE_FILTERS',
-  'PERMISSIONS_TAB_CHANGED'
+  'UPDATE_ROLE_FILTERS'
 ]
 
 const actions = createActions(...types)
@@ -91,6 +94,13 @@ actions.setAndOpenAddTray = function() {
   }
 }
 
+actions.setAndOpenPermissionTray = function(permission) {
+  return dispatch => {
+    dispatch(actions.hideAllTrays())
+    dispatch(actions.displayPermissionTray({permission}))
+  }
+}
+
 actions.filterRoles = function filterRoles({selectedRoles, contextType}) {
   return (dispatch, _getState) => {
     dispatch(actions.updateRoleFilters({selectedRoles, contextType}))
@@ -111,6 +121,7 @@ actions.modifyPermissions = function modifyPermissions(
 ) {
   return dispatch => {
     dispatch(actions.updatePermissions({permissionName, courseRoleId, enabled, locked}))
+    dispatch(actions.fixFocus({permissionName, courseRoleId}))
   }
 }
 

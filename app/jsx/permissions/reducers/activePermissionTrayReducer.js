@@ -18,12 +18,14 @@
 import {handleActions} from 'redux-actions'
 import {actionTypes} from '../actions'
 
-const activeRoleTrayReducer = handleActions(
+const activePermissionTrayReducer = handleActions(
   {
-    [actionTypes.DISPLAY_ROLE_TRAY]: (state, action) => ({roleId: action.payload.role.id}),
+    [actionTypes.DISPLAY_PERMISSION_TRAY]: (state, action) => ({
+      permissionName: action.payload.permission.permission_name
+    }),
     [actionTypes.HIDE_ALL_TRAYS]: () => null
   },
   null
 )
 
-export default activeRoleTrayReducer
+export default activePermissionTrayReducer

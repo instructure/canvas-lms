@@ -25,6 +25,7 @@ import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications' // eslint-disable-line
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
+import Link from '@instructure/ui-elements/lib/components/Link'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
 import actions from '../actions'
@@ -35,7 +36,8 @@ export default class PermissionsTable extends Component {
   static propTypes = {
     roles: arrayOf(propTypes.role).isRequired,
     permissions: arrayOf(propTypes.permission).isRequired,
-    setAndOpenRoleTray: func.isRequired
+    setAndOpenRoleTray: func.isRequired,
+    setAndOpenPermissionTray: func.isRequired
   }
 
   state = {
@@ -65,6 +67,7 @@ export default class PermissionsTable extends Component {
     //      how this should look, so I should check there for inspiration.
     this.props.setAndOpenRoleTray(role)
   }
+
   renderTopHeader() {
     return (
       <tr className="ic-permissions__top-header">
@@ -113,7 +116,10 @@ export default class PermissionsTable extends Component {
               {this.state.expanded[perm.permission_name] ? 'v' : '>'}
             </button>
             */}
-            <a href="#">{perm.label}</a>
+            {/* eslint-disable-next-line */}
+            <Link as="button" onClick={() => this.props.setAndOpenPermissionTray(perm)}>
+              <Text>{perm.label}</Text>
+            </Link>
           </div>
         </div>
       </th>
@@ -201,7 +207,8 @@ function mapStateToProps(state, ownProps) {
 }
 
 const mapDispatchToProps = {
-  setAndOpenRoleTray: actions.setAndOpenRoleTray
+  setAndOpenRoleTray: actions.setAndOpenRoleTray,
+  setAndOpenPermissionTray: actions.setAndOpenPermissionTray
 }
 
 export const ConnectedPermissionsTable = connect(

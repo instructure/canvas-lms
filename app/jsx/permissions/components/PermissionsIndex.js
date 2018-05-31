@@ -36,6 +36,7 @@ import actions from '../actions'
 import propTypes, {COURSE, ACCOUNT} from '../propTypes'
 
 import {ConnectedPermissionsTable} from './PermissionsTable'
+import {ConnectedPermissionTray} from './PermissionTray'
 import {ConnectedRoleTray} from './RoleTray'
 import {ConnectedAddTray} from './AddTray'
 
@@ -147,6 +148,7 @@ export default class PermissionsIndex extends Component {
       <div className="permissions-v2__wrapper">
         <ConnectedRoleTray />
         <ConnectedAddTray />
+        <ConnectedPermissionTray />
         <TabList onChange={this.onTabChanged}>
           <TabPanel title={I18n.t('Course Roles')}>
             {this.renderHeader()}

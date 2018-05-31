@@ -18,12 +18,15 @@
 import {handleActions} from 'redux-actions'
 import {actionTypes} from '../actions'
 
-const activeRoleTrayReducer = handleActions(
+const setFocusReducer = handleActions(
   {
-    [actionTypes.DISPLAY_ROLE_TRAY]: (state, action) => ({roleId: action.payload.role.id}),
-    [actionTypes.HIDE_ALL_TRAYS]: () => null
+    [actionTypes.FIX_FOCUS]: (_state, action) => ({
+      permissionName: action.payload.permissionName,
+      roleId: action.payload.courseRoleId
+    }),
+    [actionTypes.CLEAN_FOCUS]: () => ({permissionName: null, roleId: null})
   },
-  null
+  {permissionName: null, roleId: null}
 )
 
-export default activeRoleTrayReducer
+export default setFocusReducer

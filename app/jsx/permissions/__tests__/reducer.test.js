@@ -116,9 +116,9 @@ it('UPDATE_ROLE_FILTER filters properly', () => {
 
 it('DISPLAY_ROLE_TRAY sets the activeRoleTray in the store', () => {
   const originalState = {activeRoleTray: null}
-  const payload = {role: 'newRoleSim'}
+  const payload = {role: {name: 'newRoleSim', id: '3'}}
   const newState = reduce(actions.displayRoleTray(payload), originalState)
-  expect(newState.activeRoleTray).toEqual(payload)
+  expect(newState.activeRoleTray).toEqual({roleId: '3'})
 })
 
 it('HIDE_ALL_TRAYS sets the activeRoleTray in the store', () => {
@@ -203,17 +203,8 @@ it('UPDATE_PERMISSIONS sets enabled in the store', () => {
   }
   const payload = {courseRoleId: '1', permissionName: 'become_user', enabled: false, locked: true}
   const newState = reduce(actions.updatePermissions(payload), originalState)
-  const expectedState = {
-    activeAddTray: {
-      show: false,
-      loading: false
-    },
-    activeRoleTray: null,
-    contextId: '',
-    permissions: [],
-    roles: [{id: '1', permissions: {become_user: {enabled: false, locked: true}}}]
-  }
-  expect(newState).toEqual(expectedState)
+  const expectedState = [{id: '1', permissions: {become_user: {enabled: false, locked: true}}}]
+  expect(newState.roles).toEqual(expectedState)
 })
 
 it('UPDATE_PERMISSIONS sets locked in the store', () => {
@@ -222,15 +213,19 @@ it('UPDATE_PERMISSIONS sets locked in the store', () => {
   }
   const payload = {courseRoleId: '1', permissionName: 'become_user', enabled: true, locked: false}
   const newState = reduce(actions.updatePermissions(payload), originalState)
-  const expectedState = {
-    activeAddTray: {
-      show: false,
-      loading: false
-    },
-    activeRoleTray: null,
-    contextId: '',
-    permissions: [],
-    roles: [{id: '1', permissions: {become_user: {enabled: true, locked: false}}}]
-  }
-  expect(newState).toEqual(expectedState)
+  const expectedState = [{id: '1', permissions: {become_user: {enabled: true, locked: false}}}]
+  expect(newState.roles).toEqual(expectedState)
+})
+
+it('DISPLAY_PERMISSION_TRAY sets the activePermissionTray in the store', () => {
+  const originalState = {activePermissionTray: null}
+  const payload = {permission: {label: 'newRoleSim', permission_name: 'role2'}}
+  const newState = reduce(actions.displayPermissionTray(payload), originalState)
+  expect(newState.activePermissionTray).toEqual({permissionName: 'role2'})
+})
+
+it('HIDE_ALL_TRAYS sets the activePermissionTray in the store', () => {
+  const originalState = {activePermissionTray: {permission: 'banana'}}
+  const newState = reduce(actions.hideAllTrays(), originalState)
+  expect(newState.activeRoleTray).toBeNull()
 })

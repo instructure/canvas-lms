@@ -22,11 +22,11 @@ export function getPermissionsWithLabels(allPermissions, rolePermissions) {
     return acc
   }, {})
 
-  return Object.keys(rolePermissions).reduce((acc, permName) => {
-    const permission = rolePermissions[permName]
-    const label = permLabelMap[permName]
+  return Object.keys(rolePermissions).reduce((acc, permissionName) => {
+    const permission = rolePermissions[permissionName]
+    const label = permLabelMap[permissionName]
     if (label) {
-      const permWithLabel = Object.assign({}, permission, {label})
+      const permWithLabel = Object.assign({}, permission, {label, permissionName})
       acc.push(permWithLabel)
     }
     return acc

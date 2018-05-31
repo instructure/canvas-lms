@@ -22,6 +22,8 @@ import {actionTypes} from './actions'
 
 import activeRoleTrayReducer from './reducers/activeRoleTrayReducer'
 import activeAddTrayReducer from './reducers/activeAddTrayReducer'
+import activePermissionTrayReducer from './reducers/activePermissionTrayReducer'
+import setFocusReducer from './reducers/setFocusReducer'
 
 const permissions = handleActions(
   {
@@ -99,7 +101,9 @@ function changePermission(permission, permissionName, enabled, locked) {
 export default combineReducers({
   activeRoleTray: activeRoleTrayReducer,
   activeAddTray: activeAddTrayReducer,
+  activePermissionTray: activePermissionTrayReducer,
   contextId: (state, _action) => state || '',
+  nextFocus: setFocusReducer,
   permissions,
   roles
 })

@@ -29,14 +29,18 @@ const defaultProps = () => ({
     {
       id: '1',
       label: 'Role 1',
-      permissions: {permission_1: 'permission_1', permission_2: 'permission_2'}
+      permissions: {permission_1: 'permission_1', permission_2: 'permission_2'},
+      displayed: true
     },
     {
       id: '2',
       label: 'Role 2',
-      permissions: {permission_1: 'permission_1', permission_2: 'permission_2'}
+      permissions: {permission_1: 'permission_1', permission_2: 'permission_2'},
+      displayed: true
     }
   ],
+  setAndOpenRoleTray: () => {},
+  setAndOpenPermissionTray: () => {},
   permissions: [
     {permission_name: 'permission_1', label: 'Permission 1', contextType: COURSE, displayed: true},
     {permission_name: 'permission_2', label: 'Permission 2', contextType: COURSE, displayed: true}

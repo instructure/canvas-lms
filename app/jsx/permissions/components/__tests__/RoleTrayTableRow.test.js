@@ -18,43 +18,89 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
+import {Provider} from 'react-redux'
 
+import {ROLES, STORE} from '../../__tests__/examples'
 import RoleTrayTableRow from '../RoleTrayTableRow'
 
+function createRowProps(title, roleId) {
+  const role = ROLES.find(r => r.id === roleId)
+  const permissionName = Object.keys(role.permissions)[0]
+  const permission = role.permissions[permissionName]
+  return {title, role, permission, permissionName}
+}
+
 it('renders the component', () => {
-  const tree = mount(<RoleTrayTableRow title="banana" />)
+  const tree = mount(
+    <Provider store={STORE}>
+      <RoleTrayTableRow {...createRowProps('banana', 1)} />
+    </Provider>
+  )
   const node = tree.find('RoleTrayTableRow')
   expect(node.exists()).toBeTruthy()
 })
 
 it('renders the title', () => {
-  const tree = mount(<RoleTrayTableRow title="banana" />)
+  const tree = mount(
+    <Provider store={STORE}>
+      <RoleTrayTableRow {...createRowProps('banana', 1)} />
+    </Provider>
+  )
   const node = tree.find('Text')
   expect(node.exists()).toBeTruthy()
-  expect(node.text()).toEqual('banana')
+  expect(node.at(0).text()).toEqual('banana')
 })
 
 it('renders the expandable button if expandable prop is true', () => {
-  const tree = mount(<RoleTrayTableRow title="banana" expandable />)
+  const props = createRowProps('banana', 1)
+  props.expandable = true
+  const tree = mount(
+    <Provider store={STORE}>
+      <RoleTrayTableRow {...props} />
+    </Provider>
+  )
+
   const node = tree.find('IconArrowOpenStart')
   expect(node.exists()).toBeTruthy()
 })
 
 it('does not render the expandable button if expandable prop is false', () => {
-  const tree = mount(<RoleTrayTableRow title="banana" />)
+  const props = createRowProps('banana', 1)
+  props.expandable = false
+  const tree = mount(
+    <Provider store={STORE}>
+      <RoleTrayTableRow {...props} />
+    </Provider>
+  )
+
   const node = tree.find('IconArrowOpenStart')
   expect(node.exists()).toBeFalsy()
 })
 
 it('renders the description if provided', () => {
-  const tree = mount(<RoleTrayTableRow title="banana" description="it's a fruit" />)
+  const props = createRowProps('banana', 1)
+  props.description = "it's a fruit"
+  const tree = mount(
+    <Provider store={STORE}>
+      <RoleTrayTableRow {...props} />
+    </Provider>
+  )
+
   const node = tree.find('Text')
+  expect(node).toHaveLength(4)
   expect(node.at(1).exists()).toBeTruthy()
   expect(node.at(1).text()).toEqual("it's a fruit")
 })
 
 it('does not render the description if not provided', () => {
-  const tree = mount(<RoleTrayTableRow title="banana" />)
+  const props = createRowProps('banana', 1)
+  props.description = ''
+  const tree = mount(
+    <Provider store={STORE}>
+      <RoleTrayTableRow {...props} />
+    </Provider>
+  )
+
   const node = tree.find('Text')
-  expect(node.at(1).exists()).toBeFalsy()
+  expect(node).toHaveLength(3)
 })

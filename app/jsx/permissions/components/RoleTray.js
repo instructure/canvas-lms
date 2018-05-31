@@ -55,12 +55,14 @@ export default class RoleTray extends Component {
     label: PropTypes.string.isRequired,
     lastChanged: PropTypes.string.isRequired,
     open: PropTypes.bool.isRequired,
+    role: permissionPropTypes.role,
     unassignedPermissions: PropTypes.arrayOf(permissionPropTypes.permission).isRequired
   }
 
   static defaultProps = {
     basedOn: null,
-    baseRoleLabels: []
+    baseRoleLabels: [],
+    role: null
   }
 
   state = {
@@ -227,6 +229,10 @@ export default class RoleTray extends Component {
               title={perm.label}
               description=""
               expandable={false}
+              role={this.props.role}
+              permissionName={perm.permissionName}
+              permission={perm}
+              trayIcon
             />
           ))}
         </RoleTrayTable>
@@ -240,6 +246,10 @@ export default class RoleTray extends Component {
               title={perm.label}
               description=""
               expandable={false}
+              role={this.props.role}
+              permissionName={perm.permissionName}
+              permission={perm}
+              trayIcon
             />
           ))}
         </RoleTrayTable>
@@ -392,7 +402,7 @@ function mapStateToProps(state, ownProps) {
     return {...stateProps, ...ownProps}
   }
 
-  const role = state.activeRoleTray.role
+  const role = state.roles.find(r => r.id === state.activeRoleTray.roleId)
   const isBaseRole = roleIsBaseRole(role)
   const displayedRoles = state.roles.filter(r => r.displayed)
   const displayedPermissions = state.permissions.filter(p => p.displayed)
@@ -419,6 +429,7 @@ function mapStateToProps(state, ownProps) {
     label: role.label,
     lastChanged: 'todo',
     open: true,
+    role,
     unassignedPermissions: permissions.filter(p => !p.enabled)
   }
   return {...ownProps, ...stateProps}

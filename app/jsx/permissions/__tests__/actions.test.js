@@ -81,7 +81,6 @@ it('setAndOpenRoleTray dispatches hideAllTrays and dispalyRoleTray', () => {
 it('setAndOpenAddTray dispatches hideAllTrays and displayAddTray', () => {
   const dispatchMock = jest.fn()
   actions.setAndOpenAddTray()(dispatchMock, () => {})
-
   const expectedHideDispatch = {
     type: 'HIDE_ALL_TRAYS'
   }
@@ -94,12 +93,30 @@ it('setAndOpenAddTray dispatches hideAllTrays and displayAddTray', () => {
   expect(dispatchMock).toHaveBeenCalledWith(expectedDisplayAddDispatch)
 })
 
-it('updatePermission dispatches updatePermissions', () => {
+it('setAndOpenPermissionTray dispatches hideAllTrays and dispalyPermissionTray', () => {
+  const dispatchMock = jest.fn()
+  actions.setAndOpenPermissionTray('banana')(dispatchMock, () => {})
+  const expectedHideDispatch = {
+    type: 'HIDE_ALL_TRAYS'
+  }
+  const expectedDisplayRoleDispatch = {
+    type: 'DISPLAY_PERMISSION_TRAY',
+    payload: {
+      permission: 'banana'
+    }
+  }
+
+  expect(dispatchMock).toHaveBeenCalledTimes(2)
+  expect(dispatchMock).toHaveBeenCalledWith(expectedHideDispatch)
+  expect(dispatchMock).toHaveBeenCalledWith(expectedDisplayRoleDispatch)
+})
+
+it('modifyPermissions dispatches updatePermissions', () => {
   const state = ''
   const dispatchMock = jest.fn()
   actions.modifyPermissions('add', '1', true, true)(dispatchMock, () => state)
 
-  const expectedDispatch = {
+  const expectedUpdatePermsDispatch = {
     type: 'UPDATE_PERMISSIONS',
     payload: {
       permissionName: 'add',
@@ -108,9 +125,17 @@ it('updatePermission dispatches updatePermissions', () => {
       locked: true
     }
   }
+  const expectedFixFocusDispatch = {
+    type: 'FIX_FOCUS',
+    payload: {
+      permissionName: 'add',
+      courseRoleId: '1'
+    }
+  }
 
-  expect(dispatchMock).toHaveBeenCalledTimes(1)
-  expect(dispatchMock).toHaveBeenCalledWith(expectedDispatch)
+  expect(dispatchMock).toHaveBeenCalledTimes(2)
+  expect(dispatchMock).toHaveBeenCalledWith(expectedUpdatePermsDispatch)
+  expect(dispatchMock).toHaveBeenCalledWith(expectedFixFocusDispatch)
 })
 
 it('filterRoles dispatches updateRoleFilters', () => {
