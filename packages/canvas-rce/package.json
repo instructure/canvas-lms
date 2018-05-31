@@ -164,10 +164,10 @@
     "fetch-mock": "5.12.2",
     "format-message-cli": "^5.1.0",
     "format-message-parse": "^5.1.0",
-    "jsdom": "7.0.2",
-    "jsdomify": "1.0.2",
-    "mocha": "^3.2.0",
-    "mocha-jsdom": "1.1.0",
+    "jsdom": "^9",
+    "jsdomify": "^3",
+    "mocha": "^5",
+    "mocha-jsdom": "^1",
     "nyc": "^11",
     "prettier": "^1.12.1",
     "proxyquire": "1.7.4",
@@ -177,5 +177,8 @@
     "skin-deep": "0.13.2",
     "webpack": "^2.2.1",
     "webpack-dev-server": "^2.4.1"
+  },
+  "resolutions": {
+    "babel-helper-evaluate-path": "0.4.1"
   }
 }
