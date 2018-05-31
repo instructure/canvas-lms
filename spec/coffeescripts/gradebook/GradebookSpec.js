@@ -943,43 +943,27 @@ QUnit.module('Gradebook#gotAllAssignmentGroups', suiteHooks => {
     $('#assignment_group_weights_dialog').remove()
   })
 
-  QUnit.module('when Anonymous Moderated Marking is enabled', hooks => {
-    hooks.beforeEach(() => {
-      gradebook.options.anonymous_moderated_marking_enabled = true
-    })
+  test('sets moderation_in_progress to true for a moderated assignment whose grades are not published', () => {
+    gradebook.gotAllAssignmentGroups(assignmentGroups)
+    strictEqual(moderatedUnpublishedAssignment.moderation_in_progress, true) })
 
-    test('sets moderation_in_progress to true for a moderated assignment whose grades are not published', () => {
-      gradebook.gotAllAssignmentGroups(assignmentGroups)
-      strictEqual(moderatedUnpublishedAssignment.moderation_in_progress, true) })
-
-    test('sets moderation_in_progress to false for a moderated assignment whose grades are published', () => {
-      gradebook.gotAllAssignmentGroups(assignmentGroups)
-      strictEqual(moderatedPublishedAssignment.moderation_in_progress, false)
-    })
-
-    test('sets moderation_in_progress to false for an unmoderated assignment', () => {
-      gradebook.gotAllAssignmentGroups(assignmentGroups)
-      strictEqual(unmoderatedAssignment.moderation_in_progress, false)
-    })
-
-    test('sets hide_grades_when_muted to true for an anonymous assignment', () => {
-      gradebook.gotAllAssignmentGroups(assignmentGroups)
-      strictEqual(anonymousUnmoderatedAssignment.hide_grades_when_muted, true)
-    })
-
-    test('sets hide_grades_when_muted to false for a non-anonymous assignment', () => {
-      gradebook.gotAllAssignmentGroups(assignmentGroups)
-      strictEqual(unmoderatedAssignment.hide_grades_when_muted, false)
-    })
+  test('sets moderation_in_progress to false for a moderated assignment whose grades are published', () => {
+    gradebook.gotAllAssignmentGroups(assignmentGroups)
+    strictEqual(moderatedPublishedAssignment.moderation_in_progress, false)
   })
 
-  test('does not set moderation_in_progress when anonymous moderated marking is off', () => {
+  test('sets moderation_in_progress to false for an unmoderated assignment', () => {
     gradebook.gotAllAssignmentGroups(assignmentGroups)
-    strictEqual(moderatedUnpublishedAssignment.moderation_in_progress, undefined)
+    strictEqual(unmoderatedAssignment.moderation_in_progress, false)
   })
 
-  test('does not set hide_grades_when_muted when anonymous moderated marking is off', () => {
+  test('sets hide_grades_when_muted to true for an anonymous assignment', () => {
     gradebook.gotAllAssignmentGroups(assignmentGroups)
-    strictEqual(moderatedUnpublishedAssignment.hide_grades_when_muted, undefined)
+    strictEqual(anonymousUnmoderatedAssignment.hide_grades_when_muted, true)
+  })
+
+  test('sets hide_grades_when_muted to false for a non-anonymous assignment', () => {
+    gradebook.gotAllAssignmentGroups(assignmentGroups)
+    strictEqual(unmoderatedAssignment.hide_grades_when_muted, false)
   })
 })

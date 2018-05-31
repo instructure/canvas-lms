@@ -151,8 +151,11 @@ describe Assignment::SpeedGrader do
 
   it "excludes provisional comments" do
     setup_assignment_with_homework
+    @assignment.moderated_grading = true
+    @assignment.grader_count = 2
+    @assignment.save!
     @submission = @assignment.submissions.first
-    @comment = @submission.add_comment(:comment => 'comment', :provisional => true)
+    @comment = @submission.add_comment(comment: 'comment', author: @teacher, provisional: true)
     json = Assignment::SpeedGrader.new(@assignment, @user).json
     expect(json[:submissions].first[:submission_comments]).to be_empty
   end
@@ -616,8 +619,6 @@ describe Assignment::SpeedGrader do
     let(:submission_json) { json['submissions'][0] }
 
     before :once do
-      course.account.enable_feature!(:anonymous_moderated_marking)
-
       course.enroll_student(student, section: section).accept!
       assignment.update_submission(student, comment: 'comment by student', commenter: student)
 
@@ -919,11 +920,6 @@ describe Assignment::SpeedGrader do
         expect(ras.count).to eq 1
         expect(ras[0]['assessor_id']).to eq @ta.id.to_s
       end
-
-      it "determines whether the student needs a provisional grade" do
-        expect(@json['context']['students'][0]['needs_provisional_grade']).to be_falsey
-        expect(@json['context']['students'][1]['needs_provisional_grade']).to be_truthy # other student
-      end
     end
 
     describe "for moderator" do
@@ -1202,8 +1198,6 @@ describe Assignment::SpeedGrader do
     let(:grader_json) { Assignment::SpeedGrader.new(assignment, ta, avatars: true, grading_role: :grader).json }
 
     before :once do
-      course.account.enable_feature!(:anonymous_moderated_marking)
-
       course.enroll_student(student_1, section: section_1).accept!
       course.enroll_student(student_2, section: section_2).accept!
 
@@ -1503,8 +1497,6 @@ describe Assignment::SpeedGrader do
     let(:submission_json) { json['submissions'][0] }
 
     before :once do
-      course.account.enable_feature!(:anonymous_moderated_marking)
-
       course.enroll_student(student, section: section).accept!
       assignment.update_submission(student, comment: 'comment by student', commenter: student)
 

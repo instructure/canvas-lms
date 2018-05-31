@@ -1440,7 +1440,6 @@ class Enrollment < ActiveRecord::Base
 
   def remove_user_as_final_grader?
     instructor? &&
-      root_account.feature_enabled?(:anonymous_moderated_marking) &&
       !other_enrollments_of_type(['TaEnrollment', 'TeacherEnrollment']).exists?
   end
 

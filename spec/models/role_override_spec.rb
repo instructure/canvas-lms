@@ -537,16 +537,6 @@ describe RoleOverride do
       it 'is available to account admins, account memberships, teachers, and TAs' do
         expect(permission[:available_to]).to match_array %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment)
       end
-
-      it 'is allowed when Anonymous Moderated Marking is enabled for the account' do
-        @account.root_account.enable_feature!(:anonymous_moderated_marking)
-        expect(permission[:account_allows].call(@account)).to be true
-      end
-
-      it 'is not allowed when Anonymous Moderated Marking is disabled for the account' do
-        @account.root_account.disable_feature!(:anonymous_moderated_marking)
-        expect(permission[:account_allows].call(@account)).to be false
-      end
     end
 
     describe 'view_audit_trail' do
@@ -558,16 +548,6 @@ describe RoleOverride do
 
       it 'is available to teachers, TAs, admins and account memberships' do
         expect(permission[:available_to]).to match_array %w(TeacherEnrollment AccountAdmin AccountMembership)
-      end
-
-      it 'is allowed when Anonymous Moderated Marking is enabled for the account' do
-        @account.root_account.enable_feature!(:anonymous_moderated_marking)
-        expect(permission[:account_allows].call(@account)).to be true
-      end
-
-      it 'is not allowed when Anonymous Moderated Marking is disabled for the account' do
-        @account.root_account.disable_feature!(:anonymous_moderated_marking)
-        expect(permission[:account_allows].call(@account)).to be false
       end
     end
   end

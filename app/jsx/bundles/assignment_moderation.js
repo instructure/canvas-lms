@@ -38,7 +38,6 @@ const store = configureStore({
     unmute: false
   },
   assignment: {
-    anonymousModeratedMarkingEnabled: window.ENV.ANONYMOUS_MODERATED_MARKING_ENABLED,
     muted: window.ENV.ASSIGNMENT_MUTED,
     published: window.ENV.GRADES_PUBLISHED,
     title: window.ENV.ASSIGNMENT_TITLE,

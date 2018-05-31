@@ -75,8 +75,6 @@ class Assignment
       all_provisional_rubric_assessments = @grading_role == :moderator &&
         (@assignment.visible_rubric_assessments_for(@user, :provisional_moderator => true) || [])
 
-      # if we're a provisional grader, calculate whether the student needs a grade
-      preloaded_pg_counts = is_provisional && @assignment.provisional_grades.not_final.group("submissions.user_id").count
       ActiveRecord::Associations::Preloader.new.preload(@assignment, :moderated_grading_selections) if is_provisional
 
       includes = [{ versions: :versionable }, :quiz_submission, :user, :attachment_associations, :assignment, :originality_reports]
@@ -90,11 +88,7 @@ class Assignment
       res[:context][:students] = @students.map do |student|
         json = student.as_json(include_root: false, methods: submission_comment_methods, only: student_json_fields)
         json[:anonymous_id] = student_ids_to_anonymous_ids[student.id.to_s] if anonymous_students?
-
-        if preloaded_pg_counts
-          json[:needs_provisional_grade] = @assignment.student_needs_provisional_grade?(student, preloaded_pg_counts)
-        end
-
+        json[:needs_provisional_grade] = @assignment.can_be_moderated_grader?(@user) if is_provisional
         json[:rubric_assessments] = rubric_assessements_to_json(current_user_rubric_assessments.select {|assessment| assessment.user_id == student.id})
         json
       end

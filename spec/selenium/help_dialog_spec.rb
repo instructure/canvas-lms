@@ -119,7 +119,7 @@ describe "help dialog" do
       expect(f("#help_tray")).not_to contain_css("a[href='#teacher_feedback']")
     end
 
-    it "should show the Help dialog on the speedGrader when help is clicked and feedback is enabled" do
+    it "shows the Help item in the SpeedGrader settings menu when feedback is enabled" do
       @course.enroll_student(User.create).accept!
       @assignment = @course.assignments.create
 
@@ -130,14 +130,14 @@ describe "help dialog" do
       Setting.set('show_feedback_link', 'true')
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       wait_for_ajaximations
-      trigger = f('#gradebook_header .help_dialog_trigger')
+
+      settings_menu = f('#speedgrader-settings')
+      settings_menu.click
+
+      trigger = f('ul[role=menu] span[name=help][role=menuitem]')
       make_full_screen
       trigger.location_once_scrolled_into_view
       expect(trigger).to be_displayed
-      trigger.click
-      wait_for_ajaximations
-      expect(f("#help-dialog")).to be_displayed
-      expect(f("#help-dialog a[href='#create_ticket']")).to be_displayed
     end
   end
 

@@ -161,22 +161,7 @@
     {{/if}}
 
     {{#unless isQuizLTIAssignment}}
-      {{#if anonymousModeratedMarkingEnabled}}
-        <span data-component="ModeratedGradingFormFieldGroup"></span>
-      {{else}}
-        <fieldset>
-          <div class="form-column-left">{{#t}}Moderated Grading{{/t}}</div>
-          <div class="form-column-right" style="margin-top: 14px;">
-            <label class="checkbox">
-              {{checkbox "moderatedGrading"
-                id="assignment_moderated_grading"
-                name="moderated_grading"
-              }}
-              {{#t}}Allow a moderator to review multiple independent grades for selected submissions{{/t}}
-            </label>
-          </div>
-        </fieldset>
-      {{/if}}
+      <span data-component="ModeratedGradingFormFieldGroup"></span>
     {{/unless}}
 
     {{#if anonymousGradingEnabled}}

@@ -50,25 +50,25 @@ define([
   // time this is being written a significant amount of work is needed
   // to be able to require javascript files that live in the spec directory
 
-  QUnit.module('SubmissionStateMap with anonymous moderated marking enabled');
+  QUnit.module('SubmissionStateMap');
 
   test ('submission has grade visible if not anonymous', function() {
     const assignment = { id: '1', muted: true };
-    const map = createAndSetupMap(assignment, { anonymousModeratedMarkingEnabled: true });
+    const map = createAndSetupMap(assignment);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
     strictEqual(state.hideGrade, false);
   });
 
   test ('submission has grade visible if not muted', function() {
     const assignment = { id: '1', anonymous_grading: true };
-    const map = createAndSetupMap(assignment, { anonymousModeratedMarkingEnabled: true });
+    const map = createAndSetupMap(assignment);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
     strictEqual(state.hideGrade, false);
   });
 
   test ('submission has grade hidden if anonymous and muted', function() {
     const assignment = { id: '1', anonymous_grading: true, muted: true };
-    const map = createAndSetupMap(assignment, { anonymousModeratedMarkingEnabled: true });
+    const map = createAndSetupMap(assignment);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
     strictEqual(state.hideGrade, true);
   });

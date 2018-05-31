@@ -45,7 +45,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   scope :not_final, -> { where(:final => false)}
 
   def must_be_final_or_student_in_need_of_provisional_grade
-    if !self.final && !self.submission.assignment.student_needs_provisional_grade?(self.submission.user)
+    if !self.final && !self.submission.assignment.can_be_moderated_grader?(self.scorer)
       raise(Assignment::GradeError, "Student already has the maximum number of provisional grades")
     end
   end

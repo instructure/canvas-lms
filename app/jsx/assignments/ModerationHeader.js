@@ -24,7 +24,6 @@ import I18n from 'i18n!moderated_grading'
     displayName: 'Header',
 
     propTypes: {
-      anonymousModeratedMarkingEnabled: PropTypes.bool.isRequired,
       muted: PropTypes.bool.isRequired,
       onPublishClick: PropTypes.func.isRequired,
       onReviewClick: PropTypes.func.isRequired,
@@ -111,7 +110,7 @@ import I18n from 'i18n!moderated_grading'
     },
 
     render () {
-      const showUnmuteButton = this.props.anonymousModeratedMarkingEnabled && this.props.permissions.editGrades
+      const showUnmuteButton = this.props.permissions.editGrades
 
       return (
         <div>

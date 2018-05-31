@@ -382,7 +382,6 @@ define [
         conditionalReleaseServiceEnabled: ENV?.CONDITIONAL_RELEASE_SERVICE_ENABLED or false
         lockedItems: @lockedItems
         anonymousGradingEnabled: ENV?.ANONYMOUS_GRADING_ENABLED or false
-        anonymousModeratedMarkingEnabled: ENV.ANONYMOUS_MODERATED_MARKING_ENABLED or false
 
     _attachEditorToDescription: =>
       return if @lockedItems.content
@@ -520,9 +519,8 @@ define [
       errors = @_validateSubmissionTypes data, errors
       errors = @_validateAllowedExtensions data, errors
       errors = @assignmentGroupSelector.validateBeforeSave(data, errors)
-      if ENV.ANONYMOUS_MODERATED_MARKING_ENABLED
-        Object.assign(errors, @validateFinalGrader(data))
-        Object.assign(errors, @validateGraderCount(data))
+      Object.assign(errors, @validateFinalGrader(data))
+      Object.assign(errors, @validateGraderCount(data))
       unless ENV?.IS_LARGE_ROSTER
         errors = @groupCategorySelector.validateBeforeSave(data, errors)
       errors = @_validatePointsPossible(data, errors)

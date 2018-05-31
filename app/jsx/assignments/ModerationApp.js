@@ -77,7 +77,6 @@ export default React.createClass({
         <FlashMessageHolder {...this.state.flashMessage} />
         <h1 className="screenreader-only">{I18n.t('Moderate %{assignment_name}', {assignment_name: this.state.assignment.title})}</h1>
         <Header
-          anonymousModeratedMarkingEnabled={this.state.assignment.anonymousModeratedMarkingEnabled}
           onPublishClick={
             () => {
               this.props.store.dispatch(Actions.publishStarted());

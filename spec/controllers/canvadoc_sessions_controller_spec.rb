@@ -203,9 +203,7 @@ describe CanvadocSessionsController do
       end
       let(:hmac) { Canvas::Security.hmac_sha1(blob.to_json) }
 
-      it "disables submission annotations for an anonymously-graded assignment " \
-      "when Anonymous Moderated Marking is enabled" do
-        @course.root_account.enable_feature!(:anonymous_moderated_marking)
+      it "disables submission annotations for an anonymously-graded assignment" do
         @assignment.update!(anonymous_grading: true)
         # The controller fetches different instances of the model objects we're
         # working with here, so unfortunately we can't mock them specifically.
@@ -215,9 +213,8 @@ describe CanvadocSessionsController do
         get :show, params: {blob: blob.to_json, hmac: hmac}
       end
 
-      it "enables submission annotations for an anonymously-graded assignment " \
-      "when Anonymous Moderated Marking is disabled" do
-        @assignment.update!(anonymous_grading: true)
+      it "enables submission annotations for a non-anonymously-graded assignment" do
+        @assignment.update!(anonymous_grading: false)
         # The controller fetches different instances of the model objects we're
         # working with here, so unfortunately we can't mock them specifically.
         expect_any_instance_of(Canvadoc).to receive(:session_url).

@@ -22,12 +22,8 @@ import I18n from 'i18n!gradebook'
 import './jquery.instructure_date_and_time'
 import './jquery.instructure_misc_helpers'
 
-export function isAnonymousModeratedMarkingEnabled () {
-  return !!ENV.anonymous_moderated_marking_enabled
-}
-
 export function setupIsAnonymous ({anonymous_grading}) {
-  return isAnonymousModeratedMarkingEnabled() && anonymous_grading
+  return anonymous_grading
 }
 
 export function setupAnonymizableId (isAnonymous) {
@@ -168,8 +164,7 @@ export function setupAnonymizableUserId (isAnonymous) {
     setupIsAnonymous,
     setupAnonymizableId,
     setupAnonymizableUserId,
-    setupAnonymizableStudentId,
-    isAnonymousModeratedMarkingEnabled
+    setupAnonymizableStudentId
   }
 
 export default speedgraderHelpers

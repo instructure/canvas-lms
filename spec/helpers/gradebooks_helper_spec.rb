@@ -56,44 +56,6 @@ describe GradebooksHelper do
     end
   end
 
-  describe '#anonymous_grading_required?' do
-    it 'returns false by default' do
-      assignment = assignment_model
-      expect(helper.anonymous_grading_required?(assignment)).to eq false
-    end
-
-    it 'returns true if course setting is on' do
-      assignment = assignment_model
-      assignment.context.enable_feature!(:anonymous_grading)
-      expect(helper.anonymous_grading_required?(assignment)).to eq true
-    end
-
-    it 'returns true if sub-account setting is on' do
-      root_account = Account.default
-      sub_account = root_account.sub_accounts.create!
-      sub_account.enable_feature!(:anonymous_grading)
-      sub_account_course = course_model(account: sub_account)
-      assignment = assignment_model(course: sub_account_course)
-      expect(helper.anonymous_grading_required?(assignment)).to eq true
-    end
-
-    it 'returns true if root account setting is on' do
-      root_account = Account.default
-      root_account.enable_feature!(:anonymous_grading)
-      sub_account = root_account.sub_accounts.create!
-      sub_account_course = course_model(account: sub_account)
-      assignment = assignment_model(course: sub_account_course)
-      expect(helper.anonymous_grading_required?(assignment)).to eq true
-    end
-
-    it 'returns true if site admin setting is on' do
-      site_admin_account = Account.site_admin
-      site_admin_account.enable_feature!(:anonymous_grading)
-      assignment = assignment_model
-      expect(helper.anonymous_grading_required?(assignment)).to eq true
-    end
-  end
-
   describe '#force_anonymous_grading?' do
     it 'returns false by default' do
       expect(helper.force_anonymous_grading?(assignment_model)).to eq false
@@ -104,26 +66,15 @@ describe GradebooksHelper do
       expect(helper.force_anonymous_grading?(assignment)).to eq true
     end
 
-    it 'returns true if anonymous grading flag set' do
-      Account.default.enable_feature!(:anonymous_grading)
-      expect(helper.force_anonymous_grading?(assignment_model)).to eq true
+    it 'returns true for an anonymously-graded assignment' do
+      assignment = assignment_model
+      assignment.anonymous_grading = true
+      expect(helper.force_anonymous_grading?(assignment)).to eq true
     end
 
-    context 'when Anonymous Moderated Marking is enabled' do
-      before(:once) do
-        Account.default.enable_feature!(:anonymous_moderated_marking)
-      end
-
-      it 'returns true for an anonymously-graded assignment' do
-        assignment = assignment_model
-        assignment.anonymous_grading = true
-        expect(helper.force_anonymous_grading?(assignment)).to eq true
-      end
-
-      it 'returns false for a non-anonymously-graded assignment' do
-        assignment = assignment_model
-        expect(helper.force_anonymous_grading?(assignment)).to eq false
-      end
+    it 'returns false for a non-anonymously-graded assignment' do
+      assignment = assignment_model
+      expect(helper.force_anonymous_grading?(assignment)).to eq false
     end
   end
 
@@ -138,8 +89,9 @@ describe GradebooksHelper do
     end
 
     it 'returns anonymous grading' do
-      Account.default.enable_feature!(:anonymous_grading)
-      expect(helper.force_anonymous_grading_reason(assignment_model)).to match(/anonymous grading/)
+      assignment = assignment_model
+      assignment.anonymous_grading = true
+      expect(helper.force_anonymous_grading_reason(assignment)).to match(/anonymous grading/)
     end
   end
 

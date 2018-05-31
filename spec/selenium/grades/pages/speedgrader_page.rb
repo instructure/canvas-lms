@@ -45,7 +45,15 @@ class Speedgrader
     end
 
     def settings_link
-      f('#settings_link')
+      f('#speedgrader-settings button')
+    end
+
+    def options_link
+      fxpath('//span[text() = "Options"]')
+    end
+
+    def keyboard_shortcuts_link
+      fxpath('//ul[@role = "menu"]//span[text() = "Keyboard Shortcuts"]')
     end
 
     def hide_students_chkbox
@@ -194,8 +202,16 @@ class Speedgrader
       settings_link.click
     end
 
+    def click_options_link
+      options_link.click
+    end
+
+    def click_keyboard_shortcuts_link
+      keyboard_shortcuts_link.click
+    end
+
     def select_hide_student_names
-      hide_students_chkbox
+      hide_students_chkbox.click
     end
 
     def click_next_student_btn

@@ -25,7 +25,6 @@ RSpec.describe AnonymousSubmissionsController do
     before do
       course_with_student_and_submitted_homework
       @context = @course
-      @course.root_account.enable_feature!(:anonymous_moderated_marking)
       @assignment.update!(anonymous_grading: true)
       @submission.update!(score: 10)
       @assignment.unmute!

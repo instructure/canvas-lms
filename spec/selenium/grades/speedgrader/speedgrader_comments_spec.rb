@@ -164,8 +164,9 @@ describe "speed grader" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       expect(f("#avatar_image")).to be_displayed
 
-      f("#settings_link").click
-      f('#hide_student_names').click
+      Speedgrader.click_settings_link
+      Speedgrader.click_options_link
+      Speedgrader.select_hide_student_names
       expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
 
       expect(f("#avatar_image")).not_to be_displayed

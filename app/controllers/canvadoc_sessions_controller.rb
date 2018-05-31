@@ -71,8 +71,6 @@ class CanvadocSessionsController < ApplicationController
   private
 
   def anonymous_grading_enabled?(attachment)
-    return false unless @domain_root_account.feature_enabled?(:anonymous_moderated_marking)
-
     Assignment.joins(submissions: :attachment_associations).
       where(
         submissions: {attachment_associations: {context_type: 'Submission', attachment: attachment}},

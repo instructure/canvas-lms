@@ -1186,7 +1186,6 @@ define [
         hasGradingPeriods: @gradingPeriodSet?
         selectedGradingPeriodID: @getGradingPeriodToShow()
         isAdmin: isAdmin()
-        anonymousModeratedMarkingEnabled: @options.anonymous_moderated_marking_enabled
 
     initPostGradesStore: ->
       @postGradesStore = PostGradesStore
@@ -2159,7 +2158,6 @@ define [
       submissionState = @submissionStateMap.getSubmissionState({ user_id: studentId, assignment_id: assignmentId })
       isGroupWeightZero = @assignmentGroups[assignment.assignment_group_id].group_weight == 0
 
-      anonymousModeratedMarkingEnabled: @options.anonymous_moderated_marking_enabled
       assignment: ConvertCase.camelize(assignment)
       colors: @getGridColors()
       comments: comments
@@ -2681,8 +2679,7 @@ define [
       manager = new AssignmentMuterDialogManager(
         assignment,
         "#{@options.context_url}/assignments/#{assignmentId}/mute",
-        @contentLoadStates.submissionsLoaded,
-        @options.anonymous_moderated_marking_enabled
+        @contentLoadStates.submissionsLoaded
       )
 
       {

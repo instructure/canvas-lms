@@ -25,7 +25,6 @@ import Header from 'jsx/assignments/ModerationHeader'
 QUnit.module('ModerationHeader', {
   setup() {
     this.props = {
-      anonymousModeratedMarkingEnabled: false,
       muted: false,
       onPublishClick() {},
       onReviewClick() {},
@@ -153,7 +152,6 @@ QUnit.module('ModerationHeader#unmuteAssignmentButton', (hooks) => {
 
   hooks.beforeEach(() => {
     props = {
-      anonymousModeratedMarkingEnabled: true,
       muted: true,
       onPublishClick() {},
       onReviewClick() {},
@@ -179,16 +177,9 @@ QUnit.module('ModerationHeader#unmuteAssignmentButton', (hooks) => {
     wrapper.unmount()
   })
 
-  test('renders the unmute button if Anonymous Moderated Marking is enabled', () => {
+  test('renders the unmute button', () => {
     renderHeader()
     strictEqual(wrapper.find(unmuteButtonSelector).exists(), true)
-  })
-
-  test('does not render the unmute button if Anonymous Moderated Marking is not enabled', () => {
-    props.anonymousModeratedMarkingEnabled = false
-
-    renderHeader()
-    strictEqual(wrapper.find(unmuteButtonSelector).exists(), false)
   })
 
   test('enables the unmute button if the assignment is published and muted', () => {

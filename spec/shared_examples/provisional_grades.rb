@@ -22,7 +22,7 @@ RSpec.shared_examples 'a provisional grades status action' do |controller|
       course_with_teacher(active_all: true)
       ta_in_course(active_all: true)
       @student = student_in_course(active_all: true).user
-      @assignment = @course.assignments.create!(moderated_grading: true)
+      @assignment = @course.assignments.create!(moderated_grading: true, grader_count: 2)
       @submission = @assignment.submit_homework @student, body: 'EHLO'
       @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/#{controller}/status"
       @resource_pair = if controller == :anonymous_provisional_grades
@@ -49,29 +49,6 @@ RSpec.shared_examples 'a provisional grades status action' do |controller|
       expect(json.fetch('errors')).to include({'message' => 'user not authorized to perform that action'})
     end
 
-    it 'when given a TA, it needs a provisional grade' do
-      json = api_call_as_user(@ta, :get, @path, @params, {}, {}, { expected_status: 200 })
-      expect(json['needs_provisional_grade']).to be true
-    end
-
-    it 'when given a TA and a selection exists, it needs a provisional grade' do
-      @assignment.moderated_grading_selections.create!(student: @student)
-      json = api_call_as_user(@ta, :get, @path, @params, {}, {}, { expected_status: 200 })
-      expect(json['needs_provisional_grade']).to be true
-    end
-
-    it 'when given a TA and a teacher-created provisional grade exists, it does not need a provisional grade' do
-      @submission.find_or_create_provisional_grade!(@teacher)
-      json = api_call_as_user(@ta, :get, @path, @params, {}, {}, { expected_status: 200 })
-      expect(json['needs_provisional_grade']).to be false
-    end
-
-    it 'when given a TA and a TA-created provisional grade, it does not need a provisional grade' do
-      @submission.find_or_create_provisional_grade!(@ta)
-      json = api_call_as_user(@ta, :get, @path, @params, {}, {}, { expected_status: 200 })
-      expect(json['needs_provisional_grade']).to be false
-    end
-
     it 'when called as a student, error message is not found' do
       @params[@resource_pair.flatten.first] = nil
       json = api_call_as_user(@ta, :get, @path, @params, {}, {}, { expected_status: 404 })
@@ -85,7 +62,6 @@ RSpec.shared_examples 'a provisional grades status action' do |controller|
       end
 
       before(:once) do
-        @assignment.root_account.enable_feature!(:anonymous_moderated_marking)
         @assignment.update!(grader_count: 1, final_grader: @teacher)
 
         @ta.update!(name: 'Nobody Important')

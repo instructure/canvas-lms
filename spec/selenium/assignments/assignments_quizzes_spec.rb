@@ -31,6 +31,7 @@ describe "quizzes assignments" do
       ag = @course.assignment_groups.create!(:name => "Quiz group")
       get "/courses/#{@course.id}/assignments"
       build_assignment_with_type("Quiz", :assignment_group_id => ag.id, :name => "New Quiz", :submit => true)
+      refresh_page
       expect_new_page_load { f("#assignment_group_#{ag.id}_assignments .ig-title").click }
       expect(driver.current_url).to match %r{/courses/\d+/quizzes/\d+}
     end

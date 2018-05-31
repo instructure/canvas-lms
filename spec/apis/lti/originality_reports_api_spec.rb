@@ -59,7 +59,6 @@ module Lti
         create: "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id}/originality_report"
       }
 
-      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:anonymous_moderated_marking).and_return(false)
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(true)
     end
 

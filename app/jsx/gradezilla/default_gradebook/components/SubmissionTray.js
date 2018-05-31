@@ -65,7 +65,6 @@ export default class SubmissionTray extends React.Component {
   };
 
   static propTypes = {
-    anonymousModeratedMarkingEnabled: bool.isRequired,
     assignment: shape({
       name: string.isRequired,
       htmlUrl: string.isRequired,
@@ -199,7 +198,7 @@ export default class SubmissionTray extends React.Component {
 
   renderSpeedGraderLink (speedGraderProps) {
     const buttonProps = { variant: 'link', href: speedGraderProps.speedGraderUrl }
-    if (this.props.anonymousModeratedMarkingEnabled && speedGraderProps.anonymousGrading) {
+    if (speedGraderProps.anonymousGrading) {
       buttonProps.onClick = (e) => {
         e.preventDefault();
         this.props.onAnonymousSpeedGraderClick(speedGraderProps.speedGraderUrl);
@@ -219,7 +218,7 @@ export default class SubmissionTray extends React.Component {
     const { name, avatarUrl } = this.props.student;
     const assignmentParam = `assignment_id=${this.props.submission.assignmentId}`;
     const studentParam = `#{"student_id":"${this.props.student.id}"}`;
-    const speedGraderUrlParams = this.props.anonymousModeratedMarkingEnabled && this.props.assignment.anonymousGrading
+    const speedGraderUrlParams = this.props.assignment.anonymousGrading
       ? assignmentParam
       : `${assignmentParam}${studentParam}`
     const speedGraderUrl = encodeURI(`/courses/${this.props.courseId}/gradebook/speed_grader?${speedGraderUrlParams}`)

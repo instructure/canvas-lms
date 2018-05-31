@@ -462,7 +462,6 @@ class Submission < ActiveRecord::Base
   end
 
   def can_view_details?(user)
-    return true unless self.assignment.root_account.feature_enabled?(:anonymous_moderated_marking)
     return true unless self.assignment.anonymous_grading && self.assignment.muted
     user == self.user || Account.site_admin.grants_right?(user, :update)
   end
@@ -1509,9 +1508,7 @@ class Submission < ActiveRecord::Base
   def can_grade_symbolic_status(user = nil)
     user ||= grader
 
-    if assignment.root_account&.feature_enabled?(:anonymous_moderated_marking)
-      return :moderation_in_progress unless assignment.grades_published? || grade_posting_in_progress
-    end
+    return :moderation_in_progress unless assignment.grades_published? || grade_posting_in_progress || assignment.permits_moderation?(user)
 
     return :not_applicable if deleted?
     return :unpublished unless assignment.published?

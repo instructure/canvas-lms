@@ -238,9 +238,8 @@ describe ModeratedGrading::ProvisionalGrade do
       expect(sub.graded_anonymously).to eq true
     end
 
-    context 'for a moderated assignment with Anonymous Moderated Marking enabled' do
+    context 'for a moderated assignment' do
       before(:each) do
-        course.root_account.enable_feature!(:anonymous_moderated_marking)
         assignment.update!(moderated_grading: true, grader_count: 2)
       end
 

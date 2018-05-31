@@ -1199,7 +1199,6 @@ QUnit.module('Assignment#renderModeratedGradingFormFieldGroup', (hooks) => {
 
   hooks.beforeEach(() => {
     fakeENV.setup({
-      ANONYMOUS_MODERATED_MARKING_ENABLED: false,
       AVAILABLE_MODERATORS: availableModerators,
       HAS_GRADED_SUBMISSIONS: false,
       LOCALE: 'en',

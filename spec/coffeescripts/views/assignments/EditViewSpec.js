@@ -149,16 +149,7 @@ test('rejects a letter for points_possible', function() {
   equal(errors.points_possible[0].message, 'Points possible must be a number')
 })
 
-test('does not validate presence of a final grader if anonymous moderated marking is disabled', function() {
-  const view = this.editView()
-  sinon.spy(view, 'validateFinalGrader')
-  view.validateBeforeSave({}, [])
-  strictEqual(view.validateFinalGrader.callCount, 0)
-  view.validateFinalGrader.restore()
-})
-
-test('validates presence of a final grader if anonymous moderated marking is enabled', function() {
-  ENV.ANONYMOUS_MODERATED_MARKING_ENABLED = true
+test('validates presence of a final grader', function() {
   const view = this.editView()
   sinon.spy(view, 'validateFinalGrader')
   view.validateBeforeSave({}, [])
@@ -166,16 +157,7 @@ test('validates presence of a final grader if anonymous moderated marking is ena
   view.validateFinalGrader.restore()
 })
 
-test('does not validate grader count if anonymous moderated marking is disabled', function() {
-  const view = this.editView()
-  sinon.spy(view, 'validateGraderCount')
-  view.validateBeforeSave({}, [])
-  strictEqual(view.validateGraderCount.callCount, 0)
-  view.validateGraderCount.restore()
-})
-
-test('validates grader count if anonymous moderated marking is enabled', function() {
-  ENV.ANONYMOUS_MODERATED_MARKING_ENABLED = true
+test('validates grader count', function() {
   const view = this.editView()
   sinon.spy(view, 'validateGraderCount')
   view.validateBeforeSave({}, [])
@@ -353,22 +335,6 @@ test('renders escaped angle brackets properly', function() {
   const desc = '<p>&lt;E&gt;</p>'
   const view = this.editView({description: '<p>&lt;E&gt;</p>'})
   equal(view.$description.val().match(desc), desc)
-})
-
-test('allows changing moderation setting if no graded submissions exist', function() {
-  ENV.HAS_GRADED_SUBMISSIONS = false
-  const view = this.editView({has_submitted_submissions: true, moderated_grading: true})
-  ok(view.$('[type=checkbox][name=moderated_grading]').prop('checked'))
-  notOk(view.$('[type=checkbox][name=moderated_grading]').prop('disabled'))
-  equal(view.$('[type=hidden][name=moderated_grading]').attr('value'), '0')
-})
-
-test('locks down moderation setting after students submit', function() {
-  ENV.HAS_GRADED_SUBMISSIONS = true
-  const view = this.editView({has_submitted_submissions: true, moderated_grading: true})
-  ok(view.$('[type=checkbox][name=moderated_grading]').prop('checked'))
-  ok(view.$('[type=checkbox][name=moderated_grading]').prop('disabled'))
-  equal(view.$('[type=hidden][name=moderated_grading]').attr('value'), '1')
 })
 
 test('routes to discussion details normally', function() {
@@ -1014,17 +980,10 @@ QUnit.module('EditView: Anonymous Moderated Marking', (hooks) => {
     fixtures.innerHTML = ''
   })
 
-  test('adds the ModeratedGradingFormFieldGroup mount point when anonymous moderated marking is on', () => {
-    ENV.ANONYMOUS_MODERATED_MARKING_ENABLED = true
+  test('adds the ModeratedGradingFormFieldGroup mount point', () => {
     const view = editView()
     view.toJSON()
     strictEqual(view.$el.find('[data-component="ModeratedGradingFormFieldGroup"]').length, 1)
-  })
-
-  test('does not add the ModeratedGradingFormFieldGroup mount point when anonymous moderated marking is off', () => {
-    const view = editView()
-    view.toJSON()
-    strictEqual(view.$el.find('[data-component="ModeratedGradingFormFieldGroup"]').length, 0)
   })
 })
 

@@ -20,6 +20,7 @@ require_relative "../../helpers/speed_grader_common"
 require_relative "../../helpers/gradebook_common"
 require_relative "../../helpers/quizzes_common"
 require_relative "../../helpers/groups_common"
+require_relative "../pages/speedgrader_page"
 
 describe "speed grader" do
   include_context "in-process server selenium tests"
@@ -183,8 +184,9 @@ describe "speed grader" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       Speedgrader.click_settings_link
+      Speedgrader.click_options_link
       click_option('#eg_sort_by', 'submitted_at', :value)
-      Speedgrader.select_hide_student_names.click
+      Speedgrader.select_hide_student_names
 
       expect_new_page_load do
         Speedgrader.submit_settings_form
@@ -206,6 +208,7 @@ describe "speed grader" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       Speedgrader.click_settings_link
+      Speedgrader.click_options_link
       click_option('#eg_sort_by', 'submission_status', :value)
       Speedgrader.select_hide_student_names.click
 
@@ -272,25 +275,29 @@ describe "speed grader" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
     # sort by submission date
-    f("#settings_link").click
+    Speedgrader.click_settings_link
+    Speedgrader.click_options_link
     f('select#eg_sort_by option[value="submitted_at"]').click
     expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
     expect(f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header')).to include_text @student.name
 
     # hide student names
-    f("#settings_link").click
+    Speedgrader.click_settings_link
+    Speedgrader.click_options_link
     f('#hide_student_names').click
     expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
     expect(f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header')).to include_text "Student 1"
 
     # make sure it works a second time too
-    f("#settings_link").click
+    Speedgrader.click_settings_link
+    Speedgrader.click_options_link
     f('select#eg_sort_by option[value="alphabetically"]').click
     expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
     expect(f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header')).to include_text "Student 1"
 
     # unselect the hide option
-    f("#settings_link").click
+    Speedgrader.click_settings_link
+    Speedgrader.click_options_link
     f('#hide_student_names').click
     expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
     expect(f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header')).to include_text @student.name

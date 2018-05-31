@@ -39,8 +39,7 @@ function createMap (opts = {}) {
   const defaults = {
     hasGradingPeriods: false,
     selectedGradingPeriodID: '0',
-    isAdmin: false,
-    anonymousModeratedMarkingEnabled: false
+    isAdmin: false
   };
 
   const params = { ...defaults, ...opts };
@@ -122,123 +121,121 @@ QUnit.module('#setSubmissionCellState', function() {
     strictEqual(submission.hideGrade, false);
   });
 
-  QUnit.module('anonymous moderated marking enabled', function() {
-    test('the submission state is locked when the student is not assigned', function() {
-      const assignment = {
-        id: '1',
-        published: true,
-        only_visible_to_overrides: true,
-        assignment_visibility: ['2']
-      }
-      const map = createAndSetupMap(assignment, studentWithSubmission, { anonymousModeratedMarkingEnabled: true })
+  test('the submission state is locked when the student is not assigned', function() {
+    const assignment = {
+      id: '1',
+      published: true,
+      only_visible_to_overrides: true,
+      assignment_visibility: ['2']
+    }
+    const map = createAndSetupMap(assignment, studentWithSubmission)
+    const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id })
+    strictEqual(submission.locked, true)
+  })
+
+  test('the submission state is not locked if not moderated grading', function() {
+    const assignment = {
+      id: '1',
+      published: true,
+      moderated_grading: false
+    };
+    const map = createAndSetupMap(assignment, studentWithSubmission);
+    const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id });
+    strictEqual(submission.locked, false);
+  });
+
+  test('the submission state has hideGrade not set if not moderated grading', function() {
+    const assignment = {
+      id: '1',
+      published: true,
+      moderated_grading: false
+    };
+    const map = createAndSetupMap(assignment, studentWithSubmission);
+    const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id });
+    strictEqual(submission.hideGrade, false);
+  });
+
+  test('the submission state is not locked if moderated grading and grades published', function() {
+    const assignment = {
+      id: '1',
+      published: true,
+      moderated_grading: true,
+      grades_published: true
+    };
+    const map = createAndSetupMap(assignment, studentWithSubmission);
+    const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id });
+    strictEqual(submission.locked, false);
+  });
+
+  test('the submission state has hideGrade not set if moderated grading and grades published', function() {
+    const assignment = {
+      id: '1',
+      published: true,
+      moderated_grading: true,
+      grades_published: true
+    };
+    const map = createAndSetupMap(assignment, studentWithSubmission);
+    const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id });
+    strictEqual(submission.hideGrade, false);
+  });
+
+  test('the submission state is locked if moderated grading and grades not published', function() {
+    const assignment = {
+      id: '1',
+      published: true,
+      moderated_grading: true,
+      grades_published: false
+    };
+    const map = createAndSetupMap(assignment, studentWithSubmission);
+    const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id });
+    strictEqual(submission.locked, true);
+  });
+
+  test('the submission state has hideGrade not set if moderated grading and grades not published', function() {
+    const assignment = {
+      id: '1',
+      published: true,
+      moderated_grading: true,
+      grades_published: false
+    };
+    const map = createAndSetupMap(assignment, studentWithSubmission);
+    const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id });
+    strictEqual(submission.hideGrade, false);
+  });
+
+  QUnit.module('when the assignment is anonymous', function(hooks) {
+    let assignment
+
+    hooks.beforeEach(() => {
+      assignment = { id: '1', published: true, anonymous_grading: true }
+    })
+
+    test('the submission state is locked when the assignment is muted', function() {
+      assignment.muted = true
+      const map = createAndSetupMap(assignment, studentWithSubmission)
       const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id })
       strictEqual(submission.locked, true)
     })
 
-    test('the submission state is not locked if not moderated grading', function() {
-      const assignment = {
-        id: '1',
-        published: true,
-        moderated_grading: false
-      };
-      const map = createAndSetupMap(assignment, studentWithSubmission, { anonymousModeratedMarkingEnabled: true });
-      const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id });
-      strictEqual(submission.locked, false);
-    });
-
-    test('the submission state has hideGrade not set if not moderated grading', function() {
-      const assignment = {
-        id: '1',
-        published: true,
-        moderated_grading: false
-      };
-      const map = createAndSetupMap(assignment, studentWithSubmission, { anonymousModeratedMarkingEnabled: true });
-      const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id });
-      strictEqual(submission.hideGrade, false);
-    });
-
-    test('the submission state is not locked if moderated grading and grades published', function() {
-      const assignment = {
-        id: '1',
-        published: true,
-        moderated_grading: true,
-        grades_published: true
-      };
-      const map = createAndSetupMap(assignment, studentWithSubmission, { anonymousModeratedMarkingEnabled: true });
-      const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id });
-      strictEqual(submission.locked, false);
-    });
-
-    test('the submission state has hideGrade not set if moderated grading and grades published', function() {
-      const assignment = {
-        id: '1',
-        published: true,
-        moderated_grading: true,
-        grades_published: true
-      };
-      const map = createAndSetupMap(assignment, studentWithSubmission, { anonymousModeratedMarkingEnabled: true });
-      const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id });
-      strictEqual(submission.hideGrade, false);
-    });
-
-    test('the submission state is locked if moderated grading and grades not published', function() {
-      const assignment = {
-        id: '1',
-        published: true,
-        moderated_grading: true,
-        grades_published: false
-      };
-      const map = createAndSetupMap(assignment, studentWithSubmission, { anonymousModeratedMarkingEnabled: true });
-      const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id });
-      strictEqual(submission.locked, true);
-    });
-
-    test('the submission state has hideGrade not set if moderated grading and grades not published', function() {
-      const assignment = {
-        id: '1',
-        published: true,
-        moderated_grading: true,
-        grades_published: false
-      };
-      const map = createAndSetupMap(assignment, studentWithSubmission, { anonymousModeratedMarkingEnabled: true });
-      const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id });
-      strictEqual(submission.hideGrade, false);
-    });
-
-    QUnit.module('when the assignment is anonymous', function(hooks) {
-      let assignment
-
-      hooks.beforeEach(() => {
-        assignment = { id: '1', published: true, anonymous_grading: true }
-      })
-
-      test('the submission state is locked when the assignment is muted', function() {
-        assignment.muted = true
-        const map = createAndSetupMap(assignment, studentWithSubmission, { anonymousModeratedMarkingEnabled: true })
-        const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id })
-        strictEqual(submission.locked, true)
-      })
-
-      test('the submission state is hidden when the assignment is muted', function() {
-        assignment.muted = true
-        const map = createAndSetupMap(assignment, studentWithSubmission, { anonymousModeratedMarkingEnabled: true })
-        const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id })
-        strictEqual(submission.hideGrade, true)
-      })
-
-      test('the submission state is unlocked when the assignment is unmuted', function() {
-        const map = createAndSetupMap(assignment, studentWithSubmission, { anonymousModeratedMarkingEnabled: true })
-        const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id })
-        strictEqual(submission.locked, false)
-      })
-
-      test('the submission state is not hidden when the assignment is unmuted', function() {
-        const map = createAndSetupMap(assignment, studentWithSubmission, { anonymousModeratedMarkingEnabled: true })
-        const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id })
-        strictEqual(submission.hideGrade, false)
-      })
+    test('the submission state is hidden when the assignment is muted', function() {
+      assignment.muted = true
+      const map = createAndSetupMap(assignment, studentWithSubmission)
+      const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id })
+      strictEqual(submission.hideGrade, true)
     })
-  });
+
+    test('the submission state is unlocked when the assignment is unmuted', function() {
+      const map = createAndSetupMap(assignment, studentWithSubmission)
+      const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id })
+      strictEqual(submission.locked, false)
+    })
+
+    test('the submission state is not hidden when the assignment is unmuted', function() {
+      const map = createAndSetupMap(assignment, studentWithSubmission)
+      const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id })
+      strictEqual(submission.hideGrade, false)
+    })
+  })
 
   QUnit.module('no submission', function() {
     test('the submission object is missing if the assignment is late', function () {

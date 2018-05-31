@@ -51,10 +51,7 @@ module Submissions
         if redirect?
           redirect_to(named_context_url(@context, redirect_path_name, @assignment.quiz.id, redirect_params))
         else
-          anonymous_grading = @assignment.anonymous_grading? &&
-            @context.root_account.feature_enabled?(:anonymous_moderated_marking)
-
-          render 'submissions/show_preview', locals: { anonymous_grading: anonymous_grading }
+          render 'submissions/show_preview', locals: { anonymous_grading: @assignment.anonymous_grading? }
         end
       end
     end

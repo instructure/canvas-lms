@@ -19,12 +19,11 @@ require_relative "../../common"
 require_relative "../../helpers/speed_grader_common"
 require_relative "../pages/speedgrader_page"
 
-describe "SpeedGrader with Anonymous Moderated Marking enabled" do
+describe "SpeedGrader with Anonymous Marking enabled" do
   include_context "in-process server selenium tests"
   include SpeedGraderCommon
 
   before do
-    Account.default.enable_feature!(:anonymous_moderated_marking)
     Account.default.enable_feature!(:anonymous_marking)
     course_with_teacher_logged_in
     outcome_with_rubric

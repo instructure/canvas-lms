@@ -52,41 +52,14 @@ describe DataFixup::BackfillAnonymousGradingData do
       @course.enable_feature!(:anonymous_grading)
     end
 
-    context "when the base Anonymous Moderated Marking flag is off" do
-      before(:once) do
-        @root_account.disable_feature!(:anonymous_moderated_marking)
-      end
-
-      it "does not cause Anonymous Marking for the course to register as enabled" do
-        # Note that technically this *does* flip on the Anonymous Marking
-        # feature flag for the course, but because it depends on the base
-        # AMM flag, any check for whether it's enabled while that flag is
-        # off will return false. This is confusing but is the "correct"
-        # behavior for these purposes.
-        do_backfill
-        expect(@course).not_to be_feature_enabled(:anonymous_marking)
-      end
-
-      it "sets assignments to be anonymously graded" do
-        do_backfill
-        expect(assignment_anonymously_graded).to be true
-      end
+    it "enables Anonymous Marking for the course" do
+      do_backfill
+      expect(@course).to be_feature_enabled(:anonymous_marking)
     end
 
-    context "when the base Anonymous Moderated Marking flag is on" do
-      before(:once) do
-        @root_account.enable_feature!(:anonymous_moderated_marking)
-      end
-
-      it "enables Anonymous Marking for the course" do
-        do_backfill
-        expect(@course).to be_feature_enabled(:anonymous_marking)
-      end
-
-      it "sets assignments to be anonymously graded" do
-        do_backfill
-        expect(assignment_anonymously_graded).to be true
-      end
+    it "sets assignments to be anonymously graded" do
+      do_backfill
+      expect(assignment_anonymously_graded).to be true
     end
   end
 end

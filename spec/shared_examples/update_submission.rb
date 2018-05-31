@@ -296,7 +296,7 @@ RSpec.shared_examples 'a submission update action' do |controller|
       before :once do
         course_with_student(active_all: true)
         @assignment = @course.assignments.create!(title: "some assignment",
-          submission_types: "online_url,online_upload", moderated_grading: true)
+          submission_types: "online_url,online_upload", moderated_grading: true, grader_count: 2)
         @submission = @assignment.submit_homework(@user)
       end
 
@@ -343,7 +343,6 @@ RSpec.shared_examples 'a submission update action' do |controller|
       before(:once) do
         course_with_student(active_all: true)
         teacher_in_course(active_all: true)
-        @course.root_account.enable_feature!(:anonymous_moderated_marking)
 
         @assignment = @course.assignments.create!(
           title: 'yet another assignment',

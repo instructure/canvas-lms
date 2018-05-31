@@ -72,6 +72,8 @@ describe "assignments" do
         before do
           @assignment = @course.assignments.create({name: "Test Moderated Assignment"})
           @assignment.update_attribute(:moderated_grading, true)
+          @assignment.update_attribute(:grader_count, 1)
+          @assignment.update_attribute(:final_grader, @teacher)
           @assignment.unpublish
         end
 
@@ -814,13 +816,12 @@ describe "assignments" do
       @course.start_at = nil
       @course.save!
       @assignment = @course.assignments.create({name: "Test Moderated Assignment"})
-      @assignment.update_attribute(:moderated_grading, true)
+      @assignment.update_attributes(
+        moderated_grading: true,
+        grader_count: 1,
+        final_grader: @teacher
+      )
       @assignment.publish
-    end
-
-    it "should show the moderated grading page for moderated grading assignments", priority: "1", test_id: 609651 do
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}/moderate"
-      expect(f('#assignment_moderation')).to be_displayed
     end
 
     it "should deny access for a regular student to the moderation page", priority: "1", test_id: 609652 do

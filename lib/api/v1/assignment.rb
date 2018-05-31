@@ -682,7 +682,7 @@ module Api::V1::Assignment
       assignment.moderated_grading = value_to_boolean(assignment_params['moderated_grading'])
     end
 
-    grader_changes = final_grader_changes(assignment, context, assignment_params)
+    grader_changes = final_grader_changes(assignment, assignment_params)
     assignment.final_grader_id = grader_changes.grader_id if grader_changes.grader_changed?
 
     if assignment_params.key?('anonymous_grading') && assignment.course.feature_enabled?(:anonymous_marking)
@@ -773,10 +773,9 @@ module Api::V1::Assignment
 
   private
 
-  def final_grader_changes(assignment, course, assignment_params)
+  def final_grader_changes(assignment, assignment_params)
     no_changes = OpenStruct.new(grader_changed?: false)
     return no_changes unless assignment.moderated_grading && assignment_params.key?('final_grader_id')
-    return no_changes unless course.root_account.feature_enabled?(:anonymous_moderated_marking)
 
     final_grader_id = assignment_params.fetch("final_grader_id")
     return OpenStruct.new(grader_changed?: true, grader_id: nil) if final_grader_id.blank?

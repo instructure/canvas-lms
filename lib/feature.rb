@@ -69,7 +69,7 @@ class Feature
   #     display_name: -> { I18n.t('features.automatic_essay_grading', 'Automatic Essay Grading') },
   #     description: -> { I18n.t('features.automatic_essay_grading_description, 'Popup text describing the feature goes here') },
   #     applies_to: 'Course', # or 'RootAccount' or 'Account' or 'User'
-  #     state: 'allowed',     # or 'off', 'on', 'hidden', or 'hidden_in_prod'
+  #     state: 'allowed',     # or 'on', 'hidden', or 'hidden_in_prod'
   #                           # - 'hidden' means the feature must be set by a site admin before it will be visible
   #                           #   (in that context and below) to other users
   #                           # - 'hidden_in_prod' registers 'hidden' in production environments or 'allowed' elsewhere

@@ -23,7 +23,6 @@ describe 'Original Gradebook' do
   include GradebookCommon
 
   before(:each) do
-    Account.default.enable_feature!(:anonymous_moderated_marking)
     Account.default.enable_feature!(:anonymous_grading)
 
     # create a course with a teacher
@@ -61,7 +60,7 @@ describe 'Original Gradebook' do
     student_enrollment2.update!(workflow_state: 'active')
   end
 
-  context 'with Anonymous Moderated Marking ON in submission detail' do
+  context 'submission detail' do
     before(:each) do
       user_session(@teacher1)
       Gradebook::MultipleGradingPeriods.visit_gradebook(@anonymous_course)
@@ -77,7 +76,7 @@ describe 'Original Gradebook' do
     end
   end
 
-  context 'with Anonymous Moderated Marking ON has grade cells', priority: '1', test_id: 3496299 do
+  context 'has grade cells', priority: '1', test_id: 3496299 do
     before(:each) do
       user_session(@teacher1)
       Gradebook::MultipleGradingPeriods.visit_gradebook(@anonymous_course)
@@ -89,12 +88,6 @@ describe 'Original Gradebook' do
       grade_cell_grayed = Gradebook::MultipleGradingPeriods.grading_cell_content(0,0)
       class_attribute_fetched = grade_cell_grayed.attribute("class")
       expect(class_attribute_fetched).to include "grayed-out cannot_edit"
-    end
-
-    it 'not greyed out with grades visible when assignment is unmuted' do
-      refresh_page
-      Gradebook::MultipleGradingPeriods.toggle_assignment_mute_option(@anonymous_assignment.id)
-      expect(Gradebook::MultipleGradingPeriods.cell_graded?("11", 0, 0)).to be true
     end
   end
 end

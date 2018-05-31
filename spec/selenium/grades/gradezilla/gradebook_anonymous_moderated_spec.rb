@@ -23,8 +23,6 @@ describe 'Anonymous Moderated Marking' do
   include_context 'in-process server selenium tests'
 
   before(:each) do
-    Account.default.enable_feature!(:anonymous_moderated_marking)
-
     # create a course with a teacher
     course_with_teacher(course_name: 'Course1', active_all: true)
   end

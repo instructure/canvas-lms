@@ -6198,18 +6198,6 @@ test('sets the submission state map .isAdmin when the current user roles do not 
   strictEqual(gradebook.submissionStateMap.isAdmin, false);
 });
 
-test('sets submission state map .anonymousModeratedMarkingEnabled when anonymous moderated marking flag is set', function () {
-  const gradebook = createGradebook({ anonymous_moderated_marking_enabled: true });
-  gradebook.initSubmissionStateMap();
-  strictEqual(gradebook.submissionStateMap.anonymousModeratedMarkingEnabled, true);
-});
-
-test('sets submission state map .anonymousModeratedMarkingEnabled to false when anonymous moderated marking flag is reset', function () {
-  const gradebook = createGradebook({ anonymous_moderated_marking_enabled: false });
-  gradebook.initSubmissionStateMap();
-  strictEqual(gradebook.submissionStateMap.anonymousModeratedMarkingEnabled, false);
-});
-
 QUnit.module('Gradebook#initPostGradesLtis');
 
 test('sets postGradesLtis as an array', function () {
@@ -6971,19 +6959,6 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
     ReactDOM.unmountComponentAtNode(node);
     $fixtures.innerHTML = '';
     moxios.uninstall();
-  });
-
-  test('anonymousModeratedMarkingEnabled is true when options.anonymous_moderated_marking_enabled is true', function () {
-    gradebook.options.anonymous_moderated_marking_enabled = true
-    gradebook.setSubmissionTrayState(true, '1101', '2301');
-    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
-    strictEqual(props.anonymousModeratedMarkingEnabled, true);
-  });
-
-  test('anonymousModeratedMarkingEnabled is false when options.anonymous_moderated_marking_enabled is false', function () {
-    gradebook.setSubmissionTrayState(true, '1101', '2301');
-    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
-    strictEqual(props.anonymousModeratedMarkingEnabled, false);
   });
 
   test('gradingDisabled is true when the submission state is locked', function () {

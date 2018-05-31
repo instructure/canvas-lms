@@ -543,47 +543,41 @@ describe SubmissionsController do
       expect(body['published_score']).to be nil
     end
 
-    context "for an assignment that has anonymous grading and muted with anonymous_moderated_marking enabled" do
-      before :each do
-        @assignment.root_account.enable_feature!(:anonymous_moderated_marking)
-      end
+    it "renders the page for submitting student" do
+      user_session(@student)
+      @assignment.update!(anonymous_grading: true, muted: true)
+      get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
+      assert_status(200)
+    end
 
-      it "renders the page for submitting student" do
-        user_session(@student)
-        @assignment.update!(anonymous_grading: true, muted: true)
-        get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
-        assert_status(200)
-      end
+    it "renders unauthorized for non-submitting student" do
+      new_student = User.create!
+      @context.enroll_student(new_student, enrollment_state: 'active')
+      user_session(new_student)
+      @assignment.update!(anonymous_grading: true, muted: true)
+      get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
+      assert_unauthorized
+    end
 
-      it "renders unauthorized for non-submitting student" do
-        new_student = User.create!
-        @context.enroll_student(new_student, enrollment_state: 'active')
-        user_session(new_student)
-        @assignment.update!(anonymous_grading: true, muted: true)
-        get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
-        assert_unauthorized
-      end
+    it "renders unauthorized for teacher" do
+      user_session(@teacher)
+      @assignment.update!(anonymous_grading: true, muted: true)
+      get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
+      assert_unauthorized
+    end
 
-      it "renders unauthorized for teacher" do
-        user_session(@teacher)
-        @assignment.update!(anonymous_grading: true, muted: true)
-        get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
-        assert_unauthorized
-      end
+    it "renders unauthorized for admin" do
+      user_session(account_admin_user)
+      @assignment.update!(anonymous_grading: true, muted: true)
+      get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
+      assert_unauthorized
+    end
 
-      it "renders unauthorized for admin" do
-        user_session(account_admin_user)
-        @assignment.update!(anonymous_grading: true, muted: true)
-        get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
-        assert_unauthorized
-      end
-
-      it "renders the page for site admin" do
-        user_session(site_admin_user)
-        @assignment.update!(anonymous_grading: true, muted: true)
-        get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
-        assert_status(200)
-      end
+    it "renders the page for site admin" do
+      user_session(site_admin_user)
+      @assignment.update!(anonymous_grading: true, muted: true)
+      get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
+      assert_status(200)
     end
 
     context "with user id not present in course" do

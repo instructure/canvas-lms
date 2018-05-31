@@ -18,7 +18,6 @@
 
 import fakeENV from 'helpers/fakeENV'
 import SpeedgraderHelpers, {
-  isAnonymousModeratedMarkingEnabled,
   setupIsAnonymous,
   setupAnonymizableId
 } from 'speed_grader_helpers'
@@ -34,10 +33,6 @@ QUnit.module('SpeedGrader', {
   teardown() {
     fixtures.innerHTML = ''
   }
-})
-
-test('isAnonymousModeratedMarkingEnabled is available on main object', () => {
-  strictEqual(SpeedgraderHelpers.isAnonymousModeratedMarkingEnabled, isAnonymousModeratedMarkingEnabled)
 })
 
 test('setupIsAnonymous is available on main object', () => {
@@ -441,55 +436,17 @@ test('Posts to the resubmit URL', () => {
   $.ajaxJSON = previousAjaxJson
 })
 
-QUnit.module('SpeedgraderHelpers.isAnonymousModeratedMarking', suiteHooks => {
-  suiteHooks.afterEach(() => {
-    fakeENV.teardown()
-  })
-
-  test('returns false when not set', () => {
-    delete ENV.anonymous_moderated_marking_enabled
-    strictEqual(isAnonymousModeratedMarkingEnabled(), false)
-  })
-
-  test('returns false when disabled', () => {
-    fakeENV.setup({anonymous_moderated_marking_enabled: false})
-    strictEqual(isAnonymousModeratedMarkingEnabled(), false)
-  })
-
-  test('returns true when enabled', () => {
-    fakeENV.setup({anonymous_moderated_marking_enabled: true})
-    strictEqual(isAnonymousModeratedMarkingEnabled(), true)
-  })
-})
-
 QUnit.module('SpeedgraderHelpers.setupIsAnonymous', suiteHooks => {
   suiteHooks.afterEach(() => {
     fakeENV.teardown()
   })
 
-  test('returns true when assignment is anonymously graded and Anonymous Moderated Marking is enabled', () => {
-    fakeENV.setup({anonymous_moderated_marking_enabled: true})
+  test('returns true when assignment is anonymously graded', () => {
     strictEqual(setupIsAnonymous({anonymous_grading: true}), true)
   })
 
-  test('returns false when assignment is not anonymously graded and Anonymous Moderated Marking is enabled', () => {
-    fakeENV.setup({anonymous_moderated_marking_enabled: true})
+  test('returns false when assignment is not anonymously graded', () => {
     strictEqual(setupIsAnonymous({anonymous_grading: false}), false)
-  })
-
-  test('returns false when assignment is anonymously graded and Anonymous Moderated Marking is disabled', () => {
-    fakeENV.setup({anonymous_moderated_marking_enabled: false})
-    strictEqual(setupIsAnonymous({anonymous_grading: true}), false)
-  })
-
-  test('returns false when assignment is not anonymously graded and Anonymous Moderated Marking is unset', () => {
-    delete ENV.anonymous_moderated_marking_enabled
-    strictEqual(setupIsAnonymous({anonymous_grading: false}), false)
-  })
-
-  test('returns false when assignment is anonymously graded and Anonymous Moderated Marking is unset', () => {
-    delete ENV.anonymous_moderated_marking_enabled
-    strictEqual(setupIsAnonymous({anonymous_grading: true}), false)
   })
 })
 
