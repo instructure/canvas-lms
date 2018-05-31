@@ -18,6 +18,7 @@
 
 import React from 'react'
 import { render, shallow } from 'enzyme'
+import { Set } from 'immutable'
 import OutcomeGroup from '../OutcomeGroup'
 
 const defaultProps = (props = {}) => (
@@ -29,6 +30,7 @@ const defaultProps = (props = {}) => (
     outcomes: [
       {
         id: 1,
+        expansionId: 100,
         mastered: false,
         ratings: [
           { description: 'My first rating' },
@@ -49,7 +51,10 @@ const defaultProps = (props = {}) => (
         ],
         title: 'My outcome'
       }
-    ]
+    ],
+    expanded: false,
+    expandedOutcomes: Set(),
+    onExpansionChange: () => {}
   }, props)
 )
 
@@ -72,37 +77,24 @@ it('includes the individual outcomes', () => {
   expect(wrapper.find('Outcome')).toHaveLength(1)
 })
 
-it('defaults to unexpanded', () => {
-  const wrapper = shallow(<OutcomeGroup {...defaultProps()} />)
-  expect(wrapper.state('expanded')).toBe(false)
+it('renders correctly expanded', () => {
+  const wrapper = shallow(<OutcomeGroup {...defaultProps()} expanded />)
+  expect(wrapper.debug()).toMatchSnapshot()
 })
 
-describe('expand()', () => {
-  it('expands when called', () => {
-    const wrapper = shallow(<OutcomeGroup {...defaultProps()} />)
-    wrapper.instance().expand()
-    expect(wrapper.state('expanded')).toBe(true)
-  })
-})
-
-describe('contract()', () => {
-  it('contracts when called', () => {
-    const wrapper = shallow(<OutcomeGroup {...defaultProps()} />).setState({ expanded: true })
-    wrapper.instance().contract()
-    expect(wrapper.state('expanded')).toBe(false)
-  })
+it('passes expanded=true to the child outcome when expanded', () => {
+  const props = defaultProps()
+  props.expandedOutcomes = Set([100])
+  const wrapper = shallow(<OutcomeGroup {...props} />)
+  expect(wrapper.find('Outcome').prop('expanded')).toBe(true)
 })
 
 describe('handleToggle()', () => {
-  it('expands when called with true', () => {
-    const wrapper = shallow(<OutcomeGroup {...defaultProps()} />)
+  it('calls the correct onExpansionChange callback', () => {
+    const props = defaultProps()
+    props.onExpansionChange = jest.fn()
+    const wrapper = shallow(<OutcomeGroup {...props} />)
     wrapper.instance().handleToggle(null, true)
-    expect(wrapper.state('expanded')).toBe(true)
-  })
-
-  it('contracts when called with false', () => {
-    const wrapper = shallow(<OutcomeGroup {...defaultProps()} />).setState({ expanded: true })
-    wrapper.instance().handleToggle(null, false)
-    expect(wrapper.state('expanded')).toBe(false)
+    expect(props.onExpansionChange).toBeCalledWith('group', 10, true)
   })
 })

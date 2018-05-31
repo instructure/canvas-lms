@@ -24,6 +24,7 @@ const defaultProps = (props = {}) => (
   Object.assign({
     outcome: {
       id: 1,
+      expansionId: 100,
       mastered: false,
       ratings: [
         { description: 'My first rating' },
@@ -43,12 +44,19 @@ const defaultProps = (props = {}) => (
         }
       ],
       title: 'My outcome'
-    }
+    },
+    expanded: false,
+    onExpansionChange: () => {}
   }, props)
 )
 
 it('renders the Outcome component', () => {
   const wrapper = shallow(<Outcome {...defaultProps()}/>)
+  expect(wrapper.debug()).toMatchSnapshot()
+})
+
+it('renders correct expanded', () => {
+  const wrapper = shallow(<Outcome {...defaultProps()} expanded />)
   expect(wrapper.debug()).toMatchSnapshot()
 })
 
@@ -89,37 +97,13 @@ it('includes the individual results', () => {
   expect(wrapper.find('AssignmentResult')).toHaveLength(1)
 })
 
-it('defaults to unexpanded', () => {
-  const wrapper = shallow(<Outcome {...defaultProps()} />)
-  expect(wrapper.state('expanded')).toBe(false)
-})
-
-describe('expand()', () => {
-  it('expands when called', () => {
-    const wrapper = shallow(<Outcome {...defaultProps()} />)
-    wrapper.instance().expand()
-    expect(wrapper.state('expanded')).toBe(true)
-  })
-})
-
-describe('contract()', () => {
-  it('contracts when called', () => {
-    const wrapper = shallow(<Outcome {...defaultProps()} />).setState({ expanded: true })
-    wrapper.instance().contract()
-    expect(wrapper.state('expanded')).toBe(false)
-  })
-})
-
 describe('handleToggle()', () => {
-  it('expands when called with true', () => {
-    const wrapper = shallow(<Outcome {...defaultProps()} />)
-    wrapper.instance().handleToggle(null, true)
-    expect(wrapper.state('expanded')).toBe(true)
-  })
+  it('calls onExpansionChange with the correct data', () => {
+    const props = defaultProps()
+    props.onExpansionChange = jest.fn()
 
-  it('contracts when called with false', () => {
-    const wrapper = shallow(<Outcome {...defaultProps()} />).setState({ expanded: true })
-    wrapper.instance().handleToggle(null, false)
-    expect(wrapper.state('expanded')).toBe(false)
+    const wrapper = shallow(<Outcome {...props} />)
+    wrapper.instance().handleToggle(null, true)
+    expect(props.onExpansionChange).toBeCalledWith('outcome', 100, true)
   })
 })

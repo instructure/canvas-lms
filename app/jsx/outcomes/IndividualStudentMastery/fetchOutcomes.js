@@ -17,6 +17,7 @@
  */
 
 import _ from 'lodash'
+import uuid from 'uuid'
 import parseLinkHeader from 'parse-link-header'
 
 const deepMerge = (lhs, rhs) => {
@@ -86,7 +87,13 @@ const fetchOutcomes = (courseId, studentId) => {
       assignmentsByAssignmentId = _.keyBy(_.flatten(responses.map((response) => response.linked.assignments)), (a) => a.id)
     })
     .then(() => {
-      const outcomes = outcomeLinks.map((outcomeLink) => ({ groupId: outcomeLink.outcome_group.id, ...outcomeLink.outcome }))
+      const outcomes = outcomeLinks.map((outcomeLink) => ({
+        // outcome ids are not unique (can appear in multiple groups), so we add unique
+        // id to manage expansion/contraction
+        expansionId: uuid(),
+        groupId: outcomeLink.outcome_group.id,
+        ...outcomeLink.outcome
+      }))
       const outcomesById = _.keyBy(outcomes, (o) => o.id)
 
       // add rollup scores, mastered

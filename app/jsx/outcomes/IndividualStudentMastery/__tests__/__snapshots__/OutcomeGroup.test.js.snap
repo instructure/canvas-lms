@@ -1,12 +1,26 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`renders correctly expanded 1`] = `
+"<View as=\\"div\\" className=\\"outcomeGroup\\" borderWidth=\\"small\\" background=\\"default\\" borderRadius=\\"large\\" display=\\"auto\\">
+  <ToggleDetails divider=\\"solid\\" icon={[Function]} iconExpanded={[Function]} summary={{...}} expanded={true} onToggle={[Function]} fluidWidth={true} variant=\\"default\\" size=\\"medium\\" iconPosition=\\"start\\" defaultExpanded={false}>
+    <View as=\\"div\\" borderWidth=\\"small 0 0 0\\" display=\\"auto\\">
+      <List variant=\\"unstyled\\" divider=\\"solid\\" as=\\"ul\\" margin=\\"none\\" delimiter=\\"none\\" size=\\"medium\\">
+        <ListItem margin=\\"0\\">
+          <Outcome outcome={{...}} expanded={false} onExpansionChange={[Function]} />
+        </ListItem>
+      </List>
+    </View>
+  </ToggleDetails>
+</View>"
+`;
+
 exports[`renders the OutcomeGroup component 1`] = `
 "<View as=\\"div\\" className=\\"outcomeGroup\\" borderWidth=\\"small\\" background=\\"default\\" borderRadius=\\"large\\" display=\\"auto\\">
   <ToggleDetails divider=\\"solid\\" icon={[Function]} iconExpanded={[Function]} summary={{...}} expanded={false} onToggle={[Function]} fluidWidth={true} variant=\\"default\\" size=\\"medium\\" iconPosition=\\"start\\" defaultExpanded={false}>
     <View as=\\"div\\" borderWidth=\\"small 0 0 0\\" display=\\"auto\\">
       <List variant=\\"unstyled\\" divider=\\"solid\\" as=\\"ul\\" margin=\\"none\\" delimiter=\\"none\\" size=\\"medium\\">
         <ListItem margin=\\"0\\">
-          <Outcome outcome={{...}} />
+          <Outcome outcome={{...}} expanded={false} onExpansionChange={[Function]} />
         </ListItem>
       </List>
     </View>

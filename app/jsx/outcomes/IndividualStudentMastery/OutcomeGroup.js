@@ -18,6 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import ImmutablePropTypes from 'react-immutable-proptypes'
 import I18n from 'i18n!outcomes'
 import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
 import View from '@instructure/ui-layout/lib/components/View'
@@ -26,12 +27,12 @@ import List, { ListItem } from '@instructure/ui-elements/lib/components/List'
 import Pill from '@instructure/ui-elements/lib/components/Pill'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import IconArrowOpenDown from '@instructure/ui-icons/lib/Solid/IconArrowOpenDown'
-import IconArrowOpenRight from '@instructure/ui-icons/lib/Solid/IconArrowOpenRight'
+import IconArrowOpenEnd from '@instructure/ui-icons/lib/Solid/IconArrowOpenEnd'
 import Outcome from './Outcome'
 import * as shapes from './shapes'
 
 const spacyIcon = (expanded) => () => {
-  const Icon = expanded ? IconArrowOpenDown : IconArrowOpenRight
+  const Icon = expanded ? IconArrowOpenDown : IconArrowOpenEnd
   return (
     <View padding="0 0 0 small"><Icon /></View>
   )
@@ -47,49 +48,20 @@ const outcomeGroupHeader = (outcomeGroup, numMastered, numGroup) => (
 export default class OutcomeGroup extends React.Component {
   static propTypes = {
     outcomeGroup: shapes.outcomeGroupShape.isRequired,
-    outcomes: PropTypes.arrayOf(shapes.outcomeShape).isRequired
+    outcomes: PropTypes.arrayOf(shapes.outcomeShape).isRequired,
+    expanded: PropTypes.bool.isRequired,
+    expandedOutcomes: ImmutablePropTypes.set.isRequired,
+    onExpansionChange: PropTypes.func.isRequired
   }
 
-  constructor () {
-    super()
-    this.handleToggle = this.handleToggle.bind(this)
-    this.state = { expanded: false }
-  }
-
-  contract () {
-    this.setState({ expanded: false }, () => {
-      if (this.outcomes) {
-        this.outcomes.forEach((o) => {
-          if (o) {
-            o.contract()
-          }
-        })
-      }
-    })
-  }
-
-  expand () {
-    this.setState({ expanded: true }, () => {
-      if (this.outcomes) {
-        this.outcomes.forEach((o) => {
-          if (o) {
-            o.expand()
-          }
-        })
-      }
-    })
-  }
-
-  handleToggle (_event, expanded) {
-    this.setState({ expanded })
+  handleToggle = (_event, expanded) => {
+    this.props.onExpansionChange('group', this.props.outcomeGroup.id, expanded)
   }
 
   render () {
-    const { outcomes, outcomeGroup } = this.props
+    const { outcomes, outcomeGroup, expanded, expandedOutcomes, onExpansionChange } = this.props
     const numMastered = outcomes.filter((o) => o.mastered).length
     const numGroup = outcomes.length
-
-    this.outcomes = []
 
     return (
       <View as="div" className="outcomeGroup" borderWidth="small" background="default" borderRadius="large">
@@ -98,7 +70,7 @@ export default class OutcomeGroup extends React.Component {
           icon={spacyIcon(false)}
           iconExpanded={spacyIcon(true)}
           summary={outcomeGroupHeader(outcomeGroup, numMastered, numGroup)}
-          expanded={this.state.expanded}
+          expanded={expanded}
           onToggle={this.handleToggle}
           fluidWidth
         >
@@ -107,7 +79,10 @@ export default class OutcomeGroup extends React.Component {
               {
                 outcomes.map((outcome) => (
                   <ListItem key={outcome.id} margin="0">
-                    <Outcome outcome={outcome} ref={(el) => this.outcomes.push(el)}/>
+                    <Outcome
+                      outcome={outcome}
+                      expanded={expandedOutcomes.has(outcome.expansionId)}
+                      onExpansionChange={onExpansionChange} />
                   </ListItem>
                 ))
               }

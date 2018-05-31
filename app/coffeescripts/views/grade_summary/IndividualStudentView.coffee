@@ -40,26 +40,37 @@ define [
       @render()
       masteryElement = React.createElement(IndividualStudentMastery, {
         courseId: @course_id,
-        studentId: @student_id
+        studentId: @student_id,
+        onExpansionChange: @updateToggles
       })
       @reactView = ReactDOM.render(masteryElement, $('.individualStudentView').get(0))
+
+    updateToggles: (anyExpanded, anyContracted) ->
+      collapseToggle = $('div.outcome-toggles a.icon-collapse')
+      expandToggle = $('div.outcome-toggles a.icon-expand')
+
+      if (anyExpanded)
+        collapseToggle.removeAttr('disabled')
+        collapseToggle.attr('aria-disabled', 'false')
+      else
+        collapseToggle.attr('disabled', 'disabled')
+        collapseToggle.attr('aria-disabled', 'true')
+
+      if (anyContracted)
+        expandToggle.removeAttr('disabled')
+        expandToggle.attr('aria-disabled', 'false')
+      else
+        expandToggle.attr('disabled', 'disabled')
+        expandToggle.attr('aria-disabled', 'true')
 
     bindToggles: () ->
       collapseToggle = $('div.outcome-toggles a.icon-collapse')
       expandToggle = $('div.outcome-toggles a.icon-expand')
       expandToggle.click((event) =>
         event.preventDefault()
-        expandToggle.attr('disabled', 'disabled')
-        expandToggle.attr('aria-disabled', 'true')
-        collapseToggle.removeAttr('disabled')
-        collapseToggle.attr('aria-disabled', 'false')
         @reactView.expand()
       )
       collapseToggle.click((event) =>
         event.preventDefault()
-        collapseToggle.attr('disabled', 'disabled')
-        collapseToggle.attr('aria-disabled', 'true')
-        expandToggle.removeAttr('disabled')
-        expandToggle.attr('aria-disabled', 'false')
         @reactView.contract()
       )

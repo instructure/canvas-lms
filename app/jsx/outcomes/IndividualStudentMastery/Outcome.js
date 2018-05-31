@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!outcomes'
 import View from '@instructure/ui-layout/lib/components/View'
 import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
@@ -25,13 +26,13 @@ import List, { ListItem } from '@instructure/ui-elements/lib/components/List'
 import Pill from '@instructure/ui-elements/lib/components/Pill'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import IconArrowOpenDown from '@instructure/ui-icons/lib/Solid/IconArrowOpenDown'
-import IconArrowOpenRight from '@instructure/ui-icons/lib/Solid/IconArrowOpenRight'
+import IconArrowOpenEnd from '@instructure/ui-icons/lib/Solid/IconArrowOpenEnd'
 import IconOutcomes from '@instructure/ui-icons/lib/Line/IconOutcomes'
 import AssignmentResult from './AssignmentResult'
 import * as shapes from './shapes'
 
 const spacyIcon = (expanded) => () => {
-  const Icon = expanded ? IconArrowOpenDown : IconArrowOpenRight
+  const Icon = expanded ? IconArrowOpenDown : IconArrowOpenEnd
   return (
     <View padding="0 0 0 small"><Icon /></View>
   )
@@ -39,25 +40,13 @@ const spacyIcon = (expanded) => () => {
 
 export default class Outcome extends React.Component {
   static propTypes = {
-    outcome: shapes.outcomeShape.isRequired
+    outcome: shapes.outcomeShape.isRequired,
+    expanded: PropTypes.bool.isRequired,
+    onExpansionChange: PropTypes.func.isRequired
   }
 
-  constructor () {
-    super()
-    this.handleToggle = this.handleToggle.bind(this)
-    this.state = { expanded: false }
-  }
-
-  contract () {
-    this.setState({ expanded: false })
-  }
-
-  expand () {
-    this.setState({ expanded: true })
-  }
-
-  handleToggle (_event, expanded) {
-    this.setState({ expanded })
+  handleToggle = (_event, expanded) => {
+    this.props.onExpansionChange('outcome', this.props.outcome.expansionId, expanded)
   }
 
   renderHeader () {
@@ -94,14 +83,14 @@ export default class Outcome extends React.Component {
   }
 
   render () {
-    const { outcome } = this.props
+    const { outcome, expanded } = this.props
     return (
       <ToggleDetails
         divider="dashed"
         icon={spacyIcon(false)}
         iconExpanded={spacyIcon(true)}
         summary={this.renderHeader()}
-        expanded={this.state.expanded}
+        expanded={expanded}
         onToggle={this.handleToggle}
         fluidWidth
       >
