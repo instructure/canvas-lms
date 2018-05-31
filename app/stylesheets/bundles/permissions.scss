@@ -29,7 +29,7 @@ $darkRowBg: #f9f9f9;
 .ic-permissions__table-container {
   // dimensions of the table on screen, the table will scroll inside this container
   // might want to change to match design
-  width: 800px;
+  width: 90%;
   height: 530px;
 
   // needed for scrolling + sticky headers
@@ -89,11 +89,17 @@ $darkRowBg: #f9f9f9;
 
   // STICKY PROPERTIES
   .ic-permissions__corner-stone {
+    width: 300px;
+    border-right: 1px solid #ddd;
+    box-shadow: 3px 4px 5px 0 #e8e8e8, inset 0 1px 0 0 #ddd;
     position: sticky;
     left: 0;
     top: 0;
     z-index: 100;
     background-color: $faintRowBg;
+  }
+  .ic-permission-corner-text{
+    margin-#{direction(left)}: 10px;
   }
 
   .ic-permissions__corner-stone:after{
@@ -123,9 +129,14 @@ $darkRowBg: #f9f9f9;
       }
     }
   }
-
+  // specifically for the column header content
+  .ic-permissions__header-content-col {
+    justify-content: center;
+  }
   // header cell for the top and side headers
   .ic-permissions__header-content {
+    display: flex;
+    align-items: center;
     position: absolute;
     width: inherit;
     height: inherit;
@@ -133,6 +144,7 @@ $darkRowBg: #f9f9f9;
   }
 
   .ic-permissions__top-header__col-wrapper-th {
+    box-shadow: 3px 4px 5px 0 #e8e8e8, inset 0 1px 0 0 #ddd;
     position: sticky;
     top: 0;
     z-index: 8;
@@ -150,6 +162,8 @@ $darkRowBg: #f9f9f9;
 
   // the top "fixed" header
   .ic-permissions__top-header__col-wrapper {
+    margin-left: auto;
+    margin-right: auto;
     height: 50px;
     width: 140px;
     background: $faintRowBg;

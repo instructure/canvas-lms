@@ -66,11 +66,16 @@ export default class PermissionsTable extends Component {
     //      how this should look, so I should check there for inspiration.
     this.props.setAndOpenRoleTray(role)
   }
-
   renderTopHeader() {
     return (
       <tr className="ic-permissions__top-header">
-        <td className="ic-permissions__corner-stone" />
+        <td className="ic-permissions__corner-stone">
+          <span className="ic-permission-corner-text">
+            <Text weight="bold" size="small">
+              {I18n.t('Permissions')}
+            </Text>
+          </span>
+        </td>
         {this.props.roles.map(role => (
           <th
             key={role.id}
@@ -81,10 +86,10 @@ export default class PermissionsTable extends Component {
             <div className="ic-permissions__top-header__col-wrapper">
               <div
                 style={{top: `${this.state.topOffset}px`}}
-                className="ic-permissions__header-content"
+                className="ic-permissions__header-content ic-permissions__header-content-col "
               >
                 <Button variant="link" onClick={() => this.openRoleTray(role)}>
-                  {role.label}
+                  <Text size="small">{role.label} </Text>
                 </Button>
               </div>
             </div>
@@ -102,9 +107,13 @@ export default class PermissionsTable extends Component {
             style={{left: `${this.state.leftOffset}px`}}
             className="ic-permissions__header-content"
           >
+            {/*
+            This button is for the expanding of permissions.  When we get more granular
+            we will uncomment this to allow that functionality to still stand
             <button onClick={this.toggleExpanded(perm.permission_name)}>
               {this.state.expanded[perm.permission_name] ? 'v' : '>'}
             </button>
+            */}
             <a href="#">{perm.label}</a>
           </div>
         </div>
