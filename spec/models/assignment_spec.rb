@@ -208,130 +208,6 @@ describe Assignment do
     end
   end
 
-  describe "default values for boolean attributes" do
-    before(:once) do
-      @assignment = @course.assignments.create!
-    end
-
-    let(:values) do
-      Assignment.where(id: @assignment).pluck(
-        :could_be_locked,
-        :grade_group_students_individually,
-        :anonymous_peer_reviews,
-        :turnitin_enabled,
-        :vericite_enabled,
-        :anonymous_grading,
-        :moderated_grading,
-        :omit_from_final_grade,
-        :freeze_on_copy,
-        :copied,
-        :only_visible_to_overrides,
-        :post_to_sis,
-        :peer_reviews_assigned,
-        :peer_reviews,
-        :automatic_peer_reviews,
-        :muted,
-        :intra_group_peer_reviews
-      ).first
-    end
-
-    it "saves boolean attributes as false if they are set to nil" do
-      @assignment.update!(
-        could_be_locked: nil,
-        grade_group_students_individually: nil,
-        anonymous_peer_reviews: nil,
-        turnitin_enabled: nil,
-        vericite_enabled: nil,
-        moderated_grading: nil,
-        omit_from_final_grade: nil,
-        freeze_on_copy: nil,
-        copied: nil,
-        only_visible_to_overrides: nil,
-        post_to_sis: nil,
-        peer_reviews_assigned: nil,
-        peer_reviews: nil,
-        automatic_peer_reviews: nil,
-        muted: nil,
-        intra_group_peer_reviews: nil,
-        anonymous_grading: nil,
-        graders_anonymous_to_graders: nil,
-      )
-
-      expect(values).to eq([false] * values.length)
-    end
-
-    it "saves boolean attributes as false if they are set to false" do
-      @assignment.update!(
-        could_be_locked: false,
-        grade_group_students_individually: false,
-        anonymous_peer_reviews: false,
-        turnitin_enabled: false,
-        vericite_enabled: false,
-        moderated_grading: false,
-        omit_from_final_grade: false,
-        freeze_on_copy: false,
-        copied: false,
-        only_visible_to_overrides: false,
-        post_to_sis: false,
-        peer_reviews_assigned: false,
-        peer_reviews: false,
-        automatic_peer_reviews: false,
-        muted: false,
-        intra_group_peer_reviews: false,
-        anonymous_grading: false,
-        graders_anonymous_to_graders: false,
-      )
-
-      expect(values).to eq([false] * values.length)
-    end
-
-    it "saves boolean attributes as true if they are set to true" do
-      # exluding the moderated_grading attribute because it cannot be
-      # true when peer_reviews is true
-      @assignment.update!(
-        could_be_locked: true,
-        grade_group_students_individually: true,
-        anonymous_peer_reviews: true,
-        turnitin_enabled: true,
-        vericite_enabled: true,
-        omit_from_final_grade: true,
-        freeze_on_copy: true,
-        copied: true,
-        only_visible_to_overrides: true,
-        post_to_sis: true,
-        peer_reviews_assigned: true,
-        peer_reviews: true,
-        automatic_peer_reviews: true,
-        muted: true,
-        intra_group_peer_reviews: true,
-        anonymous_grading: true,
-        graders_anonymous_to_graders: true,
-      )
-
-      values = Assignment.where(id: @assignment).pluck(
-        :could_be_locked,
-        :grade_group_students_individually,
-        :anonymous_peer_reviews,
-        :turnitin_enabled,
-        :vericite_enabled,
-        :omit_from_final_grade,
-        :freeze_on_copy,
-        :copied,
-        :only_visible_to_overrides,
-        :post_to_sis,
-        :peer_reviews_assigned,
-        :peer_reviews,
-        :automatic_peer_reviews,
-        :muted,
-        :intra_group_peer_reviews,
-        :anonymous_grading,
-        :graders_anonymous_to_graders
-      ).first
-
-      expect(values).to eq([true] * values.length)
-    end
-  end
-
   describe "scope: expects_submissions" do
     it 'includes assignments expecting online submissions' do
       assignment_model(submission_types: "online_text_entry,online_url,online_upload", course: @course)
@@ -662,7 +538,7 @@ describe Assignment do
       @course.enroll_ta(ta, enrollment_state: 'active')
       ta
     end
-    let_once(:assignment) { @course.assignments.create!(final_grader: @teacher, grader_count: 2, moderated_grading: true) }
+    let_once(:assignment) { @course.assignments.create!(final_grader: @teacher, grader_count: 2, moderated_grading: true, anonymous_grading: true) }
 
     shared_examples "grader comment hiding does not apply" do
       it 'returns true when the user has permission to manage grades' do
@@ -692,6 +568,14 @@ describe Assignment do
       context 'when the assignment is not moderated' do
         before :once do
           assignment.update!(moderated_grading: false)
+        end
+
+        it_behaves_like "grader comment hiding does not apply"
+      end
+
+      context 'when the assignment is not anonymously graded' do
+        before :once do
+          assignment.update!(anonymous_grading: false)
         end
 
         it_behaves_like "grader comment hiding does not apply"
@@ -6362,28 +6246,12 @@ describe Assignment do
       assignment_model(course: @course)
     end
 
-    describe 'Anonymous Grading validation' do
-      context 'when anonymous_grading is not enabled' do
-        subject { @course.assignments.build }
-
-        it { is_expected.to validate_absence_of(:graders_anonymous_to_graders) }
-      end
-
-      context 'when anonymous_grading is enabled' do
-        subject { @course.assignments.build(anonymous_grading: true) }
-
-        it { is_expected.not_to validate_absence_of(:graders_anonymous_to_graders) }
-      end
-    end
-
     describe 'Moderated Grading validation' do
       context 'when moderated_grading is not enabled' do
         subject(:assignment) { @course.assignments.build }
 
-        it { is_expected.to validate_absence_of(:grader_comments_visible_to_graders) }
         it { is_expected.to validate_absence_of(:grader_section) }
         it { is_expected.to validate_absence_of(:final_grader) }
-        it { is_expected.to validate_absence_of(:grader_names_visible_to_final_grader) }
 
         it 'before validation, sets final_grader_id to nil if it is present' do
           teacher = User.create!
@@ -6421,8 +6289,6 @@ describe Assignment do
           subject { @course.assignments.create(moderated_grading: true, grader_count: 1, final_grader: @section1_ta) }
 
           it { is_expected.to be_muted }
-          it { is_expected.not_to validate_absence_of(:grader_comments_visible_to_graders) }
-          it { is_expected.not_to validate_absence_of(:grader_names_visible_to_final_grader) }
           it { is_expected.to validate_numericality_of(:grader_count).is_greater_than(0) }
         end
 
