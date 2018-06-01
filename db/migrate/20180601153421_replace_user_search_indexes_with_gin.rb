@@ -34,7 +34,7 @@ class ReplaceUserSearchIndexesWithGin < ActiveRecord::Migration[5.1]
   end
 
   def down
-    if  (schema = connection.extension_installed?(:pg_trgm))
+    if (schema = connection.extension_installed?(:pg_trgm))
       add_index :users, "lower(name) #{schema}.gist_trgm_ops", name: "index_trgm_users_name", using: :gist, algorithm: :concurrently
       add_index :pseudonyms, "lower(sis_user_id) #{schema}.gist_trgm_ops", name: "index_trgm_pseudonyms_sis_user_id", using: :gist, algorithm: :concurrently
       add_index :communication_channels, "lower(path) #{schema}.gist_trgm_ops", name: "index_trgm_communication_channels_path", using: :gist, algorithm: :concurrently
