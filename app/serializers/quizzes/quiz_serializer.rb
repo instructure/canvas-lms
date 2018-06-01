@@ -329,7 +329,7 @@ module Quizzes
     end
 
     def hide_locked_description?
-      quiz_locked_for_user? && user_is_student?
+      user_is_student? && quiz_locked_for_user?
     end
 
     def due_dates

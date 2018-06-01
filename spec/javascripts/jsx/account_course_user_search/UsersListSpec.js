@@ -50,12 +50,10 @@ const usersProps = {
     can_message_users: true,
     can_edit_users: true
   },
-  userList: {
-    searchFilter: {
-      search_term: 'User',
-      sort: 'username',
-      order: 'asc'
-    }
+  searchFilter: {
+    search_term: 'User',
+    sort: 'username',
+    order: 'asc'
   },
   onUpdateFilters: sinon.spy(),
   onApplyFilters: sinon.spy(),
@@ -91,12 +89,10 @@ Object.entries({
   }).forEach(([sortOrder, {expectedArrow, unexpectedArrow, expectedTip}]) => {
     const props = {
       ...usersProps,
-      userList: {
-        searchFilter: {
-          search_term: 'User',
-          sort: columnID,
-          order: sortOrder
-        }
+      searchFilter: {
+        search_term: 'User',
+        sort: columnID,
+        order: sortOrder
       }
     }
 
@@ -105,7 +101,7 @@ Object.entries({
       equal(wrapper.find(`IconMiniArrow${unexpectedArrow}Solid`).length, 0, `no columns have an ${unexpectedArrow} arrow`)
       const icons = wrapper.find(`IconMiniArrow${expectedArrow}Solid`)
       equal(icons.length, 1, `only one ${expectedArrow} arrow`)
-      const header = icons.closest('UserListHeader')
+      const header = icons.closest('UsersListHeader')
       ok(header.find('ScreenReaderContent').text().match(RegExp(expectedTip, 'i')), 'has right tooltip')
       ok(header.text().includes(label), `${label} is the one that has the ${expectedArrow} arrow`)
     })
@@ -116,7 +112,7 @@ Object.entries({
         ...props,
         onUpdateFilters: sortSpy
       }} />)
-      const header = wrapper.find('UserListHeader').filterWhere(n => n.text().includes(label)).find('button')
+      const header = wrapper.find('UsersListHeader').filterWhere(n => n.text().includes(label)).find('button')
       header.simulate('click')
       ok(sortSpy.calledOnce)
       ok(sortSpy.calledWith({
@@ -127,4 +123,24 @@ Object.entries({
       }))
     })
   })
+})
+
+test('component should not update if props do not change', () => {
+  const instance = new UsersList(usersProps)
+  notOk(instance.shouldComponentUpdate({ ...usersProps }))
+})
+
+test('component should update if a prop is added', () => {
+  const instance = new UsersList(usersProps)
+  ok(instance.shouldComponentUpdate({ ...usersProps, newProp: true }))
+})
+
+test('component should update if a prop is changed', () => {
+  const instance = new UsersList(usersProps)
+  ok(instance.shouldComponentUpdate({ ...usersProps, users: {} }))
+})
+
+test('component should not update if only the searchFilter prop is changed', () => {
+  const instance = new UsersList(usersProps)
+  notOk(instance.shouldComponentUpdate({ ...usersProps, searchFilter: {} }))
 })

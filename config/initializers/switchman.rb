@@ -42,6 +42,7 @@ Rails.application.config.after_initialize do
       def settings
         return {} unless self.class.columns_hash.key?('settings')
         s = super
+        s = YAML.load(s) if s.is_a?(String) # no idea. it seems that sometimes rails forgets this column is serialized
         unless s.is_a?(Hash) || s.nil?
           s = s.unserialize(s.value)
         end

@@ -2891,6 +2891,11 @@ da:
       test_ldap_search_help_fixes_3: "Kontrollér, at brugerobjektet i LDAP har søgeprivilegier til den pågældende søgebasis."
       test_ldap_search_help_header: "Canvas kan ikke søge efter din LDAP-instans"
       test_ldap_search_label: "Tester LDAP-søgning ..."
+    linkedin_fields: 
+      description: |-
+          Du skal [registrere et program på LinkedIn](%{linkedin_url}).
+          Du skal tilføje %{callback_url} som et OAuth 2.0-autoriseret omdirigerings-URL og indstille programstatus til Live
+          Efter du opretter dit program, skal du notere dig kunde-id og kundehemmelighed og indtaste dem her.
     login_required: "skal formidles"
     no_changing_auth_types: "Kan ikke ændre autorisationskonfig. Slet og opret ny konfig."
     password_required: "skal formidles"
