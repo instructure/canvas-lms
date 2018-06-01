@@ -23,6 +23,7 @@ Dir["{gems,vendor}/plugins/*/config/pre_routes.rb"].each { |pre_routes|
 }
 
 CanvasRails::Application.routes.draw do
+  mount CanvasShim::Engine, at: "/canvas_shim"
   post "/api/graphql", to: "graphql#execute"
   get 'graphiql', to: 'graphql#graphiql'
 
