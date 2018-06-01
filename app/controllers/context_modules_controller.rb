@@ -74,11 +74,13 @@ class ContextModulesController < ApplicationController
       placements.select { |p| @menu_tools[p] = tools.select{|t| t.has_placement? p} }
 
       module_file_details = load_module_file_details if @context.grants_right?(@current_user, session, :manage_content)
-      enrollment = Enrollment.find_by(course_id: @context.id, user_id: @current_user.id)
-      settings = SettingsService.get_enrollment_settings(id: enrollment.id)
-      sequence_control = settings.any? {|item| item['setting'] == "sequence_control" and item["value"] == "true" }
-
-
+      begin
+        enrollment = Enrollment.find_by(course_id: @context.id, user_id: @current_user.id)
+        settings = SettingsService.get_enrollment_settings(id: enrollment.id)
+        sequence_control = settings.any? {|item| item['setting'] == "sequence_control" and item["value"] == "true" }
+      rescue
+        sequence_control = true
+      end
       js_env :course_id => @context.id,
         :CONTEXT_URL_ROOT => polymorphic_path([@context]),
         :FILES_CONTEXTS => [{asset_string: @context.asset_string}],
