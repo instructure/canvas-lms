@@ -81,20 +81,28 @@ it('handles filter input change by setting the filter state', () => {
 
 it('renders Billboard if requireScopes is false', () => {
   const wrapper = mount(<DeveloperKeyScopes {...props(undefined, false)} />)
-  wrapper.find('Billboard')
   expect(wrapper.find('Billboard')).toHaveLength(1)
+})
+
+it('does not render search box if requireScopes is false', () => {
+  const wrapper = mount(<DeveloperKeyScopes {...props(undefined, false)} />)
+  expect(wrapper.find('TextInput')).toHaveLength(0)
 })
 
 it('does not render Billboard if requireScopes is true', () => {
   const wrapper = mount(<DeveloperKeyScopes {...props(undefined, true)} />)
-  wrapper.find('Billboard')
   expect(wrapper.find('Billboard')).toHaveLength(0)
 })
 
 it('renders DeveloperKeyScopesList if requireScopes is true', () => {
   const wrapper = mount(<DeveloperKeyScopes {...props(undefined, true)} />)
-  wrapper.find('DeveloperKeyScopesList')
   expect(wrapper.find('DeveloperKeyScopesList')).toHaveLength(1)
+})
+
+
+it('does render search box if requireScopes is true', () => {
+  const wrapper = mount(<DeveloperKeyScopes {...props()} />)
+  expect(wrapper.find('TextInput')).toHaveLength(1)
 })
 
 it('controls requireScopes change when clicking requireScopes button', () => {
