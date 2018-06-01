@@ -179,7 +179,7 @@
               #tag = ContentTag.where(:content_id => page.id, :context_id => @context.id, :context_type => 'Course', :content_type => 'WikiPage').first
               mid = tag.id unless tag.nil?
             %>
-            <a href="/bz/grade_details?module_item_id=<%= mid %>"><%= assignment.title %></a>
+            <a href="/bz/grade_details?user_id=<%= @presenter.student_id %>&module_item_id=<%= mid %>"><%= assignment.title %></a>
           <% else %>
             <a href="<%= context_url(@context, :context_assignment_submission_url, assignment, @presenter.student_id) %>"><%= assignment.title %></a>
           <% end %>

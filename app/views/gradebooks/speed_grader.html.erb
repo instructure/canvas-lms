@@ -27,6 +27,19 @@ function viewAssignmentWithInlineAnswers(link) {
     content.appendChild(iframe);
     return false;
 }
+function viewAssignmentAudit(link) {
+    var content = document.getElementById('iframe_holder');
+    content.style.display = ''; // ensure visible
+    var url = link.href;
+    var info = JSON.parse(decodeURIComponent(location.hash.substring(1)));
+    url += '&amp;user_id=' + info['student_id'];
+    content.innerHTML = '';
+    var iframe = document.createElement('iframe');
+    iframe.src = url;
+    content.appendChild(iframe);
+    return false;
+}
+
 </script>
 
 <h4 id="speed_grader_loading">
@@ -209,6 +222,18 @@ function viewAssignmentWithInlineAnswers(link) {
           <h2>Inline Answers</h2>
           <div class="content_box">
             <a id="view-assignment-with-inline-answers" onclick="return viewAssignmentWithInlineAnswers(this);" href="/bz/assignment_with_magic_fields?course=<%=@context.id%>&amp;assignment=<%=@assignment.id%>">View Assignment with inline answers</a>
+
+            <% if @assignment.name.starts_with? "Course Participation -" %>
+              <%
+                mid = 0
+                disp_name = @assignment.name["Course Participation - ".length .. -1]
+                tag = @context.context_modules.active.where(:name => disp_name).first.content_tags.first
+                #tag = ContentTag.where(:content_id => page.id, :context_id => @context.id, :context_type => 'Course', :content_type => 'WikiPage').first
+                mid = tag.id unless tag.nil?
+              %>
+                <br />
+                <a id="view-grade-audit" onclick="return viewAssignmentAudit(this);" href="/bz/grade_details?module_item_id=<%= mid %>">Audit Participation Grade</a>
+              <% end %>
           </div>
         </div>
 
