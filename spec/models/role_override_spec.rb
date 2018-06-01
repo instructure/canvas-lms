@@ -557,4 +557,26 @@ describe RoleOverride do
       end
     end
   end
+
+  describe 'v2 permissions labels' do
+    before :each do
+      @account = account_model(:parent_account => Account.default)
+    end
+
+    it 'uses original labels when permissions v2 feature flag is off' do
+      @account.root_account.disable_feature!(:permissions_v2_ui)
+      expect(RoleOverride.v2_labels(@account, true)).to be false
+      expect(RoleOverride.v2_labels(@account, false)).to be false
+    end
+
+    it 'uses original labels when feature flag is on and there is no v2 label' do
+      @account.root_account.enable_feature!(:permissions_v2_ui)
+       expect(RoleOverride.v2_labels(@account, false)).to be false
+    end
+
+    it 'uses v2 labels when the feature flag is on and there is a v2 label' do
+      @account.root_account.enable_feature!(:permissions_v2_ui)
+       expect(RoleOverride.v2_labels(@account, true)).to be true
+    end
+  end
 end
