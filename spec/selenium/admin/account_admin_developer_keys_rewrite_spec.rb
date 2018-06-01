@@ -133,7 +133,7 @@ describe 'Developer Keys' do
       skip_if_safari(:alert)
       root_developer_key
       get "/accounts/#{Account.default.id}/developer_keys"
-      fj("table[data-automation='devKeyAdminTable'] tbody tr.key button:has(svg[name='IconTrash'])").click
+      fj("table[data-automation='devKeyAdminTable'] tbody tr button:has(svg[name='IconTrash'])").click
       accept_alert
       expect(f("table[data-automation='devKeyAdminTable']")).not_to contain_css("tbody tr")
       expect(Account.default.developer_keys.nondeleted.count).to eq 0
@@ -162,7 +162,7 @@ describe 'Developer Keys' do
       site_admin_developer_key
       site_admin_logged_in
       get "/accounts/site_admin/developer_keys"
-      expect(f("table[data-automation='devKeyAdminTable'] tr.key")).to contain_css("svg[name='IconOff']")
+      expect(f("table[data-automation='devKeyAdminTable'] tbody tr")).to contain_css("svg[name='IconOff']")
       expect(site_admin_developer_key.reload.visible).to eq false
     end
 
@@ -171,7 +171,7 @@ describe 'Developer Keys' do
       site_admin_logged_in
       get "/accounts/site_admin/developer_keys"
       fj("table[data-automation='devKeyAdminTable'] button:has(svg[name='IconOff'])").click
-      expect(f("table[data-automation='devKeyAdminTable'] tr.key")).not_to contain_css("svg[name='IconOff']")
+      expect(f("table[data-automation='devKeyAdminTable'] tr")).not_to contain_css("svg[name='IconOff']")
       expect(site_admin_developer_key.reload.visible).to eq true
     end
 
@@ -307,18 +307,18 @@ describe 'Developer Keys' do
 
       it "allows filtering by scope group name" do
         expand_scope_group_by_filter('Assignment Groups', Account.default.id)
-        expect(ff(".toggle-scope-group")).to have_size(1)
+        expect(ff("[data-automation='toggle-scope-group']")).to have_size(1)
       end
 
       it "expands scope group when group name is selected" do
         expand_scope_group_by_filter('Assignment Groups', Account.default.id)
-        expect(f(".toggle-scope-group button").attribute('aria-expanded')).to eq 'true'
-        expect(ff(".toggle-scope-group .developer-key-scope")).to have_size(5)
+        expect(f("[data-automation='toggle-scope-group'] button").attribute('aria-expanded')).to eq 'true'
+        expect(ff("[data-automation='developer-key-scope']")).to have_size(5)
       end
 
       it "includes proper scopes for scope group" do
         expand_scope_group_by_filter('Assignment Groups', Account.default.id)
-        scope_group = f(".toggle-scope-group")
+        scope_group = f("[data-automation='toggle-scope-group']")
         expect(scope_group).to contain_css("span[title='GET']")
         expect(scope_group).to contain_css("span[title='POST']")
         expect(scope_group).to contain_css("span[title='PUT']")
@@ -329,20 +329,20 @@ describe 'Developer Keys' do
         expand_scope_group_by_filter('Assignment Groups', Account.default.id)
         click_scope_group_checkbox
         # checks that all UI pills have been added to scope group if selected
-        expect(ff(".toggle-scope-group span[title='GET']")).to have_size(3)
-        expect(ff(".toggle-scope-group span[title='POST']")).to have_size(2)
-        expect(ff(".toggle-scope-group span[title='PUT']")).to have_size(2)
-        expect(ff(".toggle-scope-group span[title='DELETE']")).to have_size(2)
+        expect(ff("[data-automation='toggle-scope-group'] span[title='GET']")).to have_size(3)
+        expect(ff("[data-automation='toggle-scope-group'] span[title='POST']")).to have_size(2)
+        expect(ff("[data-automation='toggle-scope-group'] span[title='PUT']")).to have_size(2)
+        expect(ff("[data-automation='toggle-scope-group'] span[title='DELETE']")).to have_size(2)
       end
 
       it "scope group individual checkbox adds only associated scope" do
         expand_scope_group_by_filter('Assignment Groups', Account.default.id)
         click_scope_checkbox
         # adds a UI pill to scope group with http verb if scope selected
-        expect(ff(".toggle-scope-group span[title='GET']")).to have_size(3)
-        expect(ff(".toggle-scope-group span[title='POST']")).to have_size(1)
-        expect(ff(".toggle-scope-group span[title='PUT']")).to have_size(1)
-        expect(ff(".toggle-scope-group span[title='DELETE']")).to have_size(1)
+        expect(ff("[data-automation='toggle-scope-group'] span[title='GET']")).to have_size(3)
+        expect(ff("[data-automation='toggle-scope-group'] span[title='POST']")).to have_size(1)
+        expect(ff("[data-automation='toggle-scope-group'] span[title='PUT']")).to have_size(1)
+        expect(ff("[data-automation='toggle-scope-group'] span[title='DELETE']")).to have_size(1)
       end
 
       it "adds scopes to backend developer key via UI" do
@@ -391,7 +391,7 @@ describe 'Developer Keys' do
         expand_scope_group_by_filter('Assignment Groups', Account.default.id)
         select_all_readonly_checkbox.click
         click_scope_checkbox
-        expect(f(".toggle-scope-group input[type='checkbox']").selected?).to eq false
+        expect(f("[data-automation='toggle-scope-group'] input[type='checkbox']").selected?).to eq false
         click_scope_checkbox
         expect(all_endpoints_readonly_checkbox_selected?).to eq true
       end

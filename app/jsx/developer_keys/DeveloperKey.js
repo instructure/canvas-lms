@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import classNames from 'classnames'
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
 import 'jqueryui/dialog'
@@ -26,6 +25,7 @@ import PropTypes from 'prop-types'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
+import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
 import Popover, { PopoverTrigger, PopoverContent } from '@instructure/ui-overlays/lib/components/Popover'
 import Image from '@instructure/ui-elements/lib/components/Img'
 import Link from '@instructure/ui-elements/lib/components/Link'
@@ -88,14 +88,19 @@ class DeveloperKey extends React.Component {
 
   makeImage (developerKey) {
     if (developerKey.icon_url) {
-      return <span className="icon">
+      return <span>
         <Image
           src={developerKey.icon_url}
           alt={I18n.t("%{developerName} Logo", {developerName: this.developerName()})}
         />
       </span>
     }
-    return <span className="emptyIconImage" />
+    return <View
+      as="div"
+      height="36px"
+      width="36px"
+      borderWidth="small"
+    />
   }
 
   makeUserLink (developerKey) {
@@ -125,19 +130,22 @@ class DeveloperKey extends React.Component {
   }
 
   refActionButtons = (link) => { this.actionButtons = link; }
-  refKeyName = (link) => { this.keyName = link; }
   refToggleGroup = (link) => { this.toggleGroup = link }
 
   render () {
     const { developerKey, inherited } = this.props;
 
     return (
-      <tr className={classNames('key', { inactive: !this.isActive(developerKey) })}>
-        <td className="name">
-          {this.makeImage(developerKey)}
-          <span ref={this.refKeyName}>
-            {this.developerName(developerKey)}
-          </span>
+      <tr>
+        <td>
+          <Flex>
+            <FlexItem padding="0 xx-small 0 0">
+              {this.makeImage(developerKey)}
+            </FlexItem>
+            <FlexItem>
+              {this.developerName(developerKey)}
+            </FlexItem>
+          </Flex>
         </td>
 
         {!inherited &&
@@ -149,7 +157,10 @@ class DeveloperKey extends React.Component {
         }
 
         <td>
-          <div className="details">
+          <View
+            maxWidth="200px"
+            as="div"
+          >
             <div>
               {developerKey.id}
             </div>
@@ -199,7 +210,7 @@ class DeveloperKey extends React.Component {
                 {this.redirectURI(developerKey)}
               </div>
             }
-          </div>
+          </View>
         </td>
 
         {!inherited &&
@@ -226,7 +237,7 @@ class DeveloperKey extends React.Component {
           />
         </td>
         {!inherited &&
-          <td className="icon_react">
+          <td>
             <DeveloperKeyActionButtons
               ref={this.refActionButtons}
               dispatch={this.props.store.dispatch}

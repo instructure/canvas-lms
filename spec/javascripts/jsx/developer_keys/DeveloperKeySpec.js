@@ -136,18 +136,6 @@ test('includes an img box when name is null', () => {
   ok(TestUtils.findRenderedComponentWithType(component, Image))
 });
 
-test('includes an empty box to mimic img box when icon_url is null', () => {
-  const propsModified = updateDefaultProps({ developerKey: { icon_url: null } })
-  const component = renderComponent(propsModified)
-  ok(TestUtils.findRenderedDOMComponentWithClass(component, 'emptyIconImage'))
-});
-
-test('includes an empty box to mimic img box when icon_url is empty string', () => {
-  const propsModified = updateDefaultProps({ developerKey: { icon_url: '' } })
-  const component = renderComponent(propsModified)
-  ok(TestUtils.findRenderedDOMComponentWithClass(component, 'emptyIconImage'))
-});
-
 test('does not inactive when workflow_state is active', () => {
   testWrapperNotOk(defaultProps, 'inactive')
 });

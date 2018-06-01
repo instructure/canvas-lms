@@ -37,19 +37,19 @@ module DeveloperKeysRewriteCommon
   end
 
   def click_scope_group_checkbox
-    fxpath('//*[@class="scopes-group"]/span/span').click
+    fxpath('//*[@data-automation="scopes-group"]/span/span').click
   end
 
   def click_scope_checkbox
-    fxpath("//*[@class='developer-key-scope']/span/span").click
+    fxpath("//*[@data-automation='developer-key-scope']/span/span").click
   end
 
   def select_all_readonly_checkbox
-    fxpath("//*[@class='scopes-list']/span/div/span/span/span/span/div")
+    fxpath("//*[@data-automation='scopes-list']/span/div/span/span/span/span/div")
   end
 
   def all_endpoints_readonly_checkbox_selected?
-    f(".scopes-list input[type='checkbox']").selected?
+    f("[data-automation='scopes-list'] input[type='checkbox']").selected?
   end
 
   def expand_scope_group_by_filter(scope_group, context_id)
@@ -57,7 +57,7 @@ module DeveloperKeysRewriteCommon
     find_button("Developer Key").click
     click_enforce_scopes
     filter_scopes_by_name(scope_group)
-    fj(".toggle-scope-group span:contains('#{scope_group}')").click
+    fj("[data-automation='toggle-scope-group'] span:contains('#{scope_group}')").click
   end
 
   def filter_scopes_by_name(scope)
