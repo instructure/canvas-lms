@@ -58,11 +58,7 @@ module BroadcastPolicy
             # ignore newly added columns in the db that we don't really know
             # about yet
             if other_attributes[key].is_a?(ActiveRecord::Attribute.const_get(:Null))
-              other_attributes.delete(key)
-              next
-            end
-            unless self.class.columns_hash.key?(key)
-              other_attributes.delete(key)
+              other_attributes.instance_variable_get(:@attributes).delete(key)
               next
             end
             if value.value != other_attributes[key].value
