@@ -82,4 +82,17 @@ describe('the Rubric component', () => {
 
     expect(renderAssessing(onAssessmentChange.args[0][0]).debug()).toMatchSnapshot()
   })
+
+  it('does not have a points column in summary mode', () => {
+    const el = shallow(
+      <Rubric
+        rubric={rubric}
+        rubricAssessment={pointsAssessment}
+        rubricAssociation={pointsAssessment.rubric_association}
+        isSummary
+      />
+    )
+
+    expect(el.find('th')).toHaveLength(2)
+  })
 })

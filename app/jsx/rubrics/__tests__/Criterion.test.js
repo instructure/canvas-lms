@@ -95,4 +95,17 @@ describe('Criterion', () => {
     dialog.prop('close')()
     expectState(false)
   })
+
+  it('does not have a points column in summary mode', () => {
+    const el = shallow(
+      <Criterion
+        assessment={assessments.points.data[1]}
+        criterion={rubrics.points.criteria[1]}
+        freeForm={false}
+        isSummary
+      />
+    )
+
+    expect(el.find('td')).toHaveLength(1)
+  })
 })

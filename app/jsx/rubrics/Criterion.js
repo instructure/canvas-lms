@@ -116,10 +116,11 @@ export default class Criterion extends React.Component {
     const {
       assessment,
       criterion,
+      customRatings,
       freeForm,
       onAssessmentChange,
       savedComments,
-      customRatings
+      isSummary
     } = this.props
     const { dialogOpen } = this.state
     const isOutcome = criterion.learning_outcome_id !== undefined
@@ -135,24 +136,49 @@ export default class Criterion extends React.Component {
     }
     const onPointChange = assessing ? updatePoints : undefined
 
+    const pointsPossible = criterion.points
+    const pointsElement = () => (
+      <Points
+        key="points"
+        assessing={assessing}
+        assessment={assessment}
+        onPointChange={onPointChange}
+        pointsPossible={pointsPossible}
+      />
+    )
+
+    const pointsComment = () => (
+      <CommentText key="comment" assessment={assessment} weight="light" />
+    )
+
+    const pointsFooter = () => [
+      pointsComment(),
+      pointsElement()
+    ]
+
     const commentRating = (
       <Comments
         assessing={assessing}
         assessment={assessment}
+        footer={isSummary ? pointsElement() : null}
         savedComments={savedComments}
         setSaveLater={(saveCommentsForLater) => onAssessmentChange({ saveCommentsForLater })}
         setComments={(comments) => onAssessmentChange({ comments })}
       />
     )
+
     const ratings = freeForm ? commentRating : (
       <Ratings
         assessing={assessing}
+        customRatings={customRatings}
+        footer={isSummary ? pointsFooter() : null}
         tiers={criterion.ratings}
         onPointChange={onPointChange}
         points={_.get(assessment, 'points')}
-        useRange={useRange}
+        pointsPossible={pointsPossible}
         defaultMasteryThreshold={isOutcome ? criterion.mastery_points : criterion.points}
-        customRatings={customRatings}
+        isSummary={isSummary}
+        useRange={useRange}
       />
     )
 
@@ -181,7 +207,6 @@ export default class Criterion extends React.Component {
     ) : null
 
     const noComments = (_.get(assessment, 'comments') || '').length > 0
-    const pointsPossible = criterion.points
     const longDescription = criterion.long_description
     const threshold = criterion.mastery_points
 
@@ -213,7 +238,7 @@ export default class Criterion extends React.Component {
             (freeForm || assessing || noComments) ? null : (
               <div className="assessment-comments">
                 <Text size="x-small" weight="normal">{I18n.t('Instructor Comments')}</Text>
-                <CommentText assessment={assessment} weight="light" />
+                {pointsComment()}
               </div>
             )
           }
@@ -221,30 +246,31 @@ export default class Criterion extends React.Component {
         <td className="ratings">
           {ratings}
         </td>
-        <td>
-          <Points
-            assessing={assessing}
-            assessment={assessment}
-            onPointChange={onPointChange}
-            pointsPossible={pointsPossible}
-          />
-          {assessing && !freeForm ? commentInput : null}
-        </td>
+        {
+          !isSummary ? (
+            <td>
+              {pointsElement()}
+              {assessing && !freeForm ? commentInput : null}
+            </td>
+          ) : null
+        }
       </tr>
     )
   }
 }
 Criterion.propTypes = {
   assessment: PropTypes.shape(assessmentShape),
+  customRatings: PropTypes.arrayOf(PropTypes.object),
   criterion: PropTypes.shape(criterionShape).isRequired,
   freeForm: PropTypes.bool.isRequired,
   onAssessmentChange: PropTypes.func,
   savedComments: PropTypes.arrayOf(PropTypes.string),
-  customRatings: PropTypes.arrayOf(PropTypes.object)
+  isSummary: PropTypes.bool
 }
 Criterion.defaultProps = {
   assessment: null,
+  customRatings: [],
   onAssessmentChange: null,
   savedComments: [],
-  customRatings: []
+  isSummary: false
 }

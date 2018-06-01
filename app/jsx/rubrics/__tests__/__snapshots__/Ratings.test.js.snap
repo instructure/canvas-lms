@@ -1,5 +1,45 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`The Ratings component only renders the single selected Rating with a footer in summary mode 1`] = `
+"<div className=\\"rating-tier selected\\" onClick={{...}} onKeyPress={[Function]} role=\\"button\\" tabIndex={{...}}>
+  <div className=\\"rating-description\\">
+    <Text size=\\"x-small\\" lineHeight=\\"condensed\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      Meh
+    </Text>
+  </div>
+  <Text size=\\"x-small\\" fontStyle=\\"italic\\" lineHeight=\\"condensed\\" as=\\"span\\" letterSpacing=\\"normal\\">
+    More Verbosity
+  </Text>
+  <div className=\\"rating-footer\\">
+    <div>
+      ow my foot
+    </div>
+  </div>
+  <div className=\\"shader\\" style={{...}}>
+    <div className=\\"triangle\\" style={{...}} />
+  </div>
+</div>"
+`;
+
+exports[`The Ratings component renders a default rating if none of the ratings are selected 1`] = `
+"<div className=\\"rating-tier\\" onClick={{...}} onKeyPress={[Function]} role=\\"button\\" tabIndex={{...}}>
+  <div className=\\"rating-description\\">
+    <Text size=\\"x-small\\" lineHeight=\\"condensed\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      No details
+    </Text>
+  </div>
+  <Text size=\\"x-small\\" fontStyle=\\"italic\\" lineHeight=\\"condensed\\" as=\\"span\\" letterSpacing=\\"normal\\" />
+  <div className=\\"rating-footer\\">
+    <div>
+      ow my foot
+    </div>
+  </div>
+  <div className=\\"shader\\" style={{...}}>
+    <div className=\\"triangle\\" style={{...}} />
+  </div>
+</div>"
+`;
+
 exports[`The Ratings component renders the Rating sub-components as expected when range rating enabled 1`] = `
 "<div className=\\"rating-tier\\" onClick={{...}} onKeyPress={[Function]} role=\\"button\\" tabIndex={{...}}>
   <div className=\\"rating-points\\">
@@ -61,8 +101,8 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
 
 exports[`The Ratings component renders the root component as expected 1`] = `
 "<div className=\\"rating-tier-list\\">
-  <Rating assessing={false} onClick={[Function]} classes=\\"rating-tier\\" endOfRangePoints={{...}} tierColor=\\"transparent\\" description=\\"Superb\\" points={10} selected={false} />
-  <Rating assessing={false} onClick={[Function]} classes=\\"rating-tier selected\\" endOfRangePoints={{...}} tierColor=\\"#e0d773\\" description=\\"Meh\\" long_description=\\"More Verbosity\\" points={5} selected={false} />
-  <Rating assessing={false} onClick={[Function]} classes=\\"rating-tier\\" endOfRangePoints={{...}} tierColor=\\"transparent\\" description=\\"Subpar\\" points={1} selected={false} />
+  <Rating assessing={false} classes=\\"rating-tier\\" endOfRangePoints={{...}} footer={{...}} isSummary={false} onClick={[Function]} tierColor=\\"transparent\\" description=\\"Superb\\" points={10} selected={false} />
+  <Rating assessing={false} classes=\\"rating-tier selected\\" endOfRangePoints={{...}} footer={{...}} isSummary={false} onClick={[Function]} tierColor=\\"#e0d773\\" description=\\"Meh\\" long_description=\\"More Verbosity\\" points={5} selected={false} />
+  <Rating assessing={false} classes=\\"rating-tier\\" endOfRangePoints={{...}} footer={{...}} isSummary={false} onClick={[Function]} tierColor=\\"transparent\\" description=\\"Subpar\\" points={1} selected={false} />
 </div>"
 `;

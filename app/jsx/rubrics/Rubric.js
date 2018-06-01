@@ -37,7 +37,15 @@ const totalAssessingString = (score, possible) =>
     possible: I18n.toNumber(possible, { precision: 1 })
   })
 
-const Rubric = ({ onAssessmentChange, rubric, rubricAssessment, rubricAssociation, customRatings }) => {
+const Rubric = (props) => {
+  const {
+    customRatings,
+    onAssessmentChange,
+    rubric,
+    rubricAssessment,
+    rubricAssociation,
+    isSummary
+  } = props
   const assessing = onAssessmentChange !== null
   const priorData = _.get(rubricAssessment, 'data', [])
   const byCriteria = _.keyBy(priorData, (ra) => ra.criterion_id)
@@ -59,10 +67,11 @@ const Rubric = ({ onAssessmentChange, rubric, rubricAssessment, rubricAssociatio
         key={criterion.id}
         assessment={assessment}
         criterion={criterion}
+        customRatings={customRatings}
         freeForm={rubric.free_form_criterion_comments}
+        isSummary={isSummary}
         onAssessmentChange={assessing ? onCriteriaChange(criterion.id) : undefined}
         savedComments={allComments[criterion.id]}
-        customRatings={customRatings}
       />
     )
   })
@@ -80,7 +89,11 @@ const Rubric = ({ onAssessmentChange, rubric, rubricAssessment, rubricAssociatio
           <tr>
             <th scope="col">{I18n.t('Criteria')}</th>
             <th scope="col">{I18n.t('Ratings')}</th>
-            <th scope="col">{I18n.t('Pts')}</th>
+            {
+              isSummary ? null : (
+                <th scope="col">{I18n.t('Pts')}</th>
+              )
+            }
           </tr>
         </thead>
         <tbody className="criterions">
@@ -100,6 +113,7 @@ const Rubric = ({ onAssessmentChange, rubric, rubricAssessment, rubricAssociatio
   )
 }
 Rubric.propTypes = {
+  customRatings: PropTypes.arrayOf(PropTypes.object),
   onAssessmentChange: PropTypes.func,
   rubric: PropTypes.shape(rubricShape).isRequired,
   rubricAssessment: (props) => {
@@ -108,13 +122,14 @@ Rubric.propTypes = {
     return PropTypes.checkPropTypes({ rubricAssessment }, props, 'prop', 'Rubric')
   },
   rubricAssociation: PropTypes.shape(rubricAssociationShape),
-  customRatings: PropTypes.arrayOf(PropTypes.object)
+  isSummary: PropTypes.bool
 }
 Rubric.defaultProps = {
+  customRatings: [],
   onAssessmentChange: null,
   rubricAssessment: null,
   rubricAssociation: {},
-  customRatings: []
+  isSummary: false
 }
 
 export default Rubric

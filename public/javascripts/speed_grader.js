@@ -837,9 +837,10 @@ function initRubricStuff(){
   selectors.get('#rubric_assessments_select').change(() => {
     const editingData = rubricAssessment.assessmentData($("#rubric_full"))
     var selectedAssessment = getSelectedAssessment();
-    rubricAssessment.populateRubricSummary(
+    rubricAssessment.populateNewRubricSummary(
       $("#rubric_summary_holder .rubric_summary"),
       selectedAssessment,
+      jsonData.rubric_association,
       editingData
     );
   });

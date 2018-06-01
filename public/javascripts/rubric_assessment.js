@@ -276,11 +276,16 @@ window.rubricAssessment = {
   },
 
   fillAssessment: function(rubric, partialAssessment) {
+    const fillText = (c) => ({
+      pointsText: _.isNil(c.points) && _.isUndefined(c.pointsText) ? '--' : c.pointsText,
+      ...c
+    })
+    const defaultCriteria = (id) => ({ criterion_id: id, pointsText: '' })
     const prior = _.keyBy(_.cloneDeep(partialAssessment.data), (c) => c.criterion_id)
     return {
       score: 0,
       ...partialAssessment,
-      data: rubric.criteria.map((c) => (prior[c.id] || { criterion_id: c.id, score: null }))
+      data: rubric.criteria.map((c) => fillText(prior[c.id] || defaultCriteria(c.id)))
     }
   },
 
@@ -371,6 +376,29 @@ window.rubricAssessment = {
       }
       total = window.rubricAssessment.roundAndFormat(total);
       $rubric.find(".rubric_total").text(total);
+    }
+  },
+
+  populateNewRubricSummary: function(container, assessment, rubricAssociation, editData) {
+    if (ENV.nonScoringRubrics && ENV.rubric) {
+      if(assessment) {
+        const filled = rubricAssessment.fillAssessment(ENV.rubric, assessment || {})
+        ReactDOM.render(React.createElement(Rubric, {
+          customRatings: ENV.outcome_proficiency ? ENV.outcome_proficiency.ratings : [],
+          rubric: ENV.rubric,
+          rubricAssessment: filled,
+          rubricAssociation,
+          isSummary: true
+        }, null), container.get(0))
+      } else {
+        container.get(0).innerHTML = ''
+      }
+    } else {
+      rubricAssessment.populateRubricSummary(
+        container,
+        assessment,
+        editData
+      )
     }
   },
 

@@ -33,7 +33,7 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
     </div>
   </th>
   <td className=\\"ratings\\">
-    <Comments assessing={false} assessment={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
+    <Comments assessing={false} assessment={{...}} footer={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
   </td>
   <td>
     <Points assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={8} />
@@ -72,7 +72,7 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
     </div>
   </th>
   <td className=\\"ratings\\">
-    <Comments assessing={true} assessment={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
+    <Comments assessing={true} assessment={{...}} footer={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
   </td>
   <td>
     <Points assessing={true} assessment={{...}} onPointChange={[Function]} pointsPossible={8} />
@@ -111,7 +111,7 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
     </div>
   </th>
   <td className=\\"ratings\\">
-    <Comments assessing={false} assessment={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
+    <Comments assessing={false} assessment={{...}} footer={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
   </td>
   <td>
     <Points assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={8} />
@@ -177,7 +177,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
     <Threshold threshold={3} />
   </th>
   <td className=\\"ratings\\">
-    <Comments assessing={false} assessment={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
+    <Comments assessing={false} assessment={{...}} footer={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
   </td>
   <td>
     <Points assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={3} />
@@ -243,7 +243,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
     <Threshold threshold={3} />
   </th>
   <td className=\\"ratings\\">
-    <Comments assessing={true} assessment={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
+    <Comments assessing={true} assessment={{...}} footer={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
   </td>
   <td>
     <Points assessing={true} assessment={{...}} onPointChange={[Function]} pointsPossible={3} />
@@ -309,7 +309,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
     <Threshold threshold={3} />
   </th>
   <td className=\\"ratings\\">
-    <Comments assessing={false} assessment={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
+    <Comments assessing={false} assessment={{...}} footer={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
   </td>
   <td>
     <Points assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={3} />
@@ -348,7 +348,7 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
     </div>
   </th>
   <td className=\\"ratings\\">
-    <Ratings assessing={false} tiers={{...}} onPointChange={[Function]} points={3.2} useRange={false} defaultMasteryThreshold={8} customRatings={{...}} />
+    <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={3.2} pointsPossible={8} defaultMasteryThreshold={8} isSummary={false} useRange={false} />
   </td>
   <td>
     <Points assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={8} />
@@ -387,7 +387,7 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
     </div>
   </th>
   <td className=\\"ratings\\">
-    <Ratings assessing={true} tiers={{...}} onPointChange={[Function]} points={3.2} useRange={false} defaultMasteryThreshold={8} customRatings={{...}} />
+    <Ratings assessing={true} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={3.2} pointsPossible={8} defaultMasteryThreshold={8} isSummary={false} useRange={false} />
   </td>
   <td>
     <Points assessing={true} assessment={{...}} onPointChange={[Function]} pointsPossible={8} />
@@ -433,7 +433,7 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
     </div>
   </th>
   <td className=\\"ratings\\">
-    <Ratings assessing={false} tiers={{...}} onPointChange={[Function]} points={[undefined]} useRange={false} defaultMasteryThreshold={8} customRatings={{...}} />
+    <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={[undefined]} pointsPossible={8} defaultMasteryThreshold={8} isSummary={false} useRange={false} />
   </td>
   <td>
     <Points assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={8} />
@@ -499,7 +499,7 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
     <Threshold threshold={3} />
   </th>
   <td className=\\"ratings\\">
-    <Ratings assessing={false} tiers={{...}} onPointChange={[Function]} points={3} useRange={false} defaultMasteryThreshold={3} customRatings={{...}} />
+    <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={3} pointsPossible={3} defaultMasteryThreshold={3} isSummary={false} useRange={false} />
   </td>
   <td>
     <Points assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={3} />
@@ -565,7 +565,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
     <Threshold threshold={3} />
   </th>
   <td className=\\"ratings\\">
-    <Ratings assessing={true} tiers={{...}} onPointChange={[Function]} points={3} useRange={false} defaultMasteryThreshold={3} customRatings={{...}} />
+    <Ratings assessing={true} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={3} pointsPossible={3} defaultMasteryThreshold={3} isSummary={false} useRange={false} />
   </td>
   <td>
     <Points assessing={true} assessment={{...}} onPointChange={[Function]} pointsPossible={3} />
@@ -638,7 +638,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
     </div>
   </th>
   <td className=\\"ratings\\">
-    <Ratings assessing={false} tiers={{...}} onPointChange={[Function]} points={[undefined]} useRange={false} defaultMasteryThreshold={3} customRatings={{...}} />
+    <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={[undefined]} pointsPossible={3} defaultMasteryThreshold={3} isSummary={false} useRange={false} />
   </td>
   <td>
     <Points assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={3} />

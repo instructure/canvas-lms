@@ -27,7 +27,7 @@ import { assessmentShape } from './types'
 export const roundIfWhole = (n) => (
   I18n.toNumber(n, { precision: Math.floor(n) === n ? 0 : 1 })
 )
-const pointString = (n) => n !== null ? roundIfWhole(n) : ''
+const pointString = (n) => n !== undefined ? roundIfWhole(n) : '--'
 
 export const possibleString = (possible) =>
   I18n.t('%{possible} pts', {
@@ -36,13 +36,13 @@ export const possibleString = (possible) =>
 
 export const scoreString = (points, possible) =>
   I18n.t('%{points} / %{possible}', {
-    points: roundIfWhole(points),
+    points: pointString(points),
     possible: possibleString(possible)
   })
 
 const invalid = () => [{ text: I18n.t('Invalid value'), type: 'error' }]
 const messages = (points, pointsText) =>
-  (points === null && pointsText) ? invalid() : undefined
+  (_.isNil(points) && pointsText) ? invalid() : undefined
 
 const Points = (props) => {
   const {
@@ -68,6 +68,7 @@ const Points = (props) => {
         </div>
       )
     } else {
+      const usePointsText = pointsText !== null && pointsText !== undefined
       return (
         <div className="container graded-points">
           <TextInput
@@ -75,7 +76,7 @@ const Points = (props) => {
             label={<ScreenReaderContent>{I18n.t('Points')}</ScreenReaderContent>}
             messages={messages(points, pointsText)}
             onChange={(e) => onPointChange(e.target.value)}
-            value={pointsText || pointString(points)}
+            value={usePointsText ? pointsText : pointString(points)}
             width="4rem"
           /> {`/ ${possibleString(pointsPossible)}`}
         </div>

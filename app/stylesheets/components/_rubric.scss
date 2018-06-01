@@ -109,6 +109,10 @@
   position: relative;
 }
 
+.react-rubric .rating-tier .rating-footer {
+  padding-bottom: 1rem;
+}
+
 .react-rubric .rating-tier.selected {
   .shader {
     width: 100%;
@@ -137,4 +141,5 @@
 
 .react-rubric .graded-points {
   white-space: nowrap;
+  text-align: end;
 }

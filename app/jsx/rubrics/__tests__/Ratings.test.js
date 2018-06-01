@@ -23,13 +23,15 @@ import Ratings, { Rating } from '../Ratings'
 describe('The Ratings component', () => {
   const props = {
     assessing: false,
+    footer: null,
     tiers: [
       { description: 'Superb', points: 10 },
       { description: 'Meh', long_description: 'More Verbosity', points: 5 },
       { description: 'Subpar', points: 1 }
     ],
-    points: 5,
     defaultMasteryThreshold: 10,
+    points: 5,
+    isSummary: false,
     useRange: false
   }
 
@@ -89,23 +91,41 @@ describe('The Ratings component', () => {
     expect(ratings(0, true)).toEqual(['transparent', 'transparent', '#F8971C'])
   })
 
-  describe('Rating component', () => {
-    it('is navigable and clickable when assessing', () => {
-      const onClick = sinon.spy()
-      const wrapper = shallow(<Rating {...props.tiers[0]} assessing onClick={onClick} />)
-      const div = wrapper.find('div').at(0)
-      expect(div.prop('tabIndex')).toEqual(0)
-      div.simulate('click')
-      expect(onClick.called).toBe(true)
-    })
+  it('is navigable and clickable when assessing', () => {
+    const onClick = sinon.spy()
+    const wrapper = shallow(<Rating {...props.tiers[0]} assessing onClick={onClick} />)
+    const div = wrapper.find('div').at(0)
+    expect(div.prop('tabIndex')).toEqual(0)
+    div.simulate('click')
+    expect(onClick.called).toBe(true)
+  })
 
-    it('is not navigable or clickable when not assessing', () => {
-      const onClick = sinon.spy()
-      const wrapper = shallow(<Rating {...props.tiers[0]} assessing={false} onClick={onClick} />)
-      const div = wrapper.find('div').at(0)
-      expect(div.prop('tabIndex')).toBeNull()
-      div.simulate('click')
-      expect(onClick.called).toBe(false)
-    })
+  it('is not navigable or clickable when not assessing', () => {
+    const onClick = sinon.spy()
+    const wrapper = shallow(<Rating {...props.tiers[0]} assessing={false} onClick={onClick} />)
+    const div = wrapper.find('div').at(0)
+    expect(div.prop('tabIndex')).toBeNull()
+    div.simulate('click')
+    expect(onClick.called).toBe(false)
+  })
+
+  it('only renders the single selected Rating with a footer in summary mode', () => {
+    const el = component({ points: 5, isSummary: true, footer: <div>ow my foot</div> })
+    const ratings = el.find('Rating')
+
+    expect(ratings).toHaveLength(1)
+
+    const rating = ratings.at(0)
+    expect(rating.shallow().debug()).toMatchSnapshot()
+  })
+
+  it('renders a default rating if none of the ratings are selected', () => {
+    const el = component({ points: 6, isSummary: true, footer: <div>ow my foot</div> })
+    const ratings = el.find('Rating')
+
+    expect(ratings).toHaveLength(1)
+
+    const rating = ratings.at(0)
+    expect(rating.shallow().debug()).toMatchSnapshot()
   })
 })
