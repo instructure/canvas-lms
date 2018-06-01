@@ -17,7 +17,7 @@
  */
 
 import fetchMock from 'fetch-mock'
-import fetchOutcomes from '../fetchOutcomes'
+import fetchOutcomes, { fetchUrl } from '../fetchOutcomes'
 
 describe('fetchOutcomes', () => {
   afterEach(() => {
@@ -121,9 +121,9 @@ describe('fetchOutcomes', () => {
   ]
 
   const mockAll = ({ groupsResponse, linksResponse, rollupsResponse, resultsResponses }) => {
-    fetchMock.mock('/api/v1/courses/1/outcome_groups', groupsResponse)
-    fetchMock.mock('/api/v1/courses/1/outcome_group_links?outcome_style=full', linksResponse)
-    fetchMock.mock('/api/v1/courses/1/outcome_rollups?user_ids[]=2', rollupsResponse)
+    fetchMock.mock('/api/v1/courses/1/outcome_groups?per_page=100', groupsResponse)
+    fetchMock.mock('/api/v1/courses/1/outcome_group_links?outcome_style=full&per_page=100', linksResponse)
+    fetchMock.mock('/api/v1/courses/1/outcome_rollups?user_ids[]=2&per_page=100', rollupsResponse)
     Object.keys(resultsResponses).forEach((id) => {
       fetchMock.mock(
         `/api/v1/courses/1/outcome_results?user_ids[]=2&outcome_ids[]=${id}&include[]=assignments&per_page=100`,
@@ -150,13 +150,92 @@ describe('fetchOutcomes', () => {
       })
   })
 
-  it('removes hidden results', () => {
+  it('removes hidden results', (done) => {
     const responses = defaultResponses()
     responses.resultsResponses['1'].outcome_results[1].hidden = true
     mockAll(responses)
     fetchOutcomes(1, 2)
       .then(({ outcomes }) => {
         expect(outcomes[0].results).toHaveLength(1)
+        done()
       })
+  })
+
+  describe('fetchUrl', () => {
+    const mockRequests = (first, second, third) => {
+      fetchMock.mock('/first', {
+        body: first,
+        headers: {
+          link: '</current>; rel="current",</second>; rel="next",</first>; rel="first",</last>; rel="last"'
+        }
+      })
+      fetchMock.mock('/second', {
+        body: second,
+        headers: !third ? null : {
+          link: '</current>; rel="current",</third>; rel="next",</first>; rel="first",</last>; rel="last"'
+        }
+      })
+      if (third) {
+        fetchMock.mock('/third', {
+          body: third,
+          headers: {
+            link: '</current>; rel="current",</first>; rel="first",</last>; rel="last"'
+          }
+        })
+      }
+    }
+
+    it('combines result arrays', (done) => {
+      mockRequests(
+        [1, 'hello world', { foo: 'bar' }],
+        [2, 'goodbye', { baz: 'bat' }]
+      )
+      fetchUrl('/first').then((resp) => {
+        expect(resp).toEqual(
+          [1, 'hello world', { foo: 'bar' }, 2, 'goodbye', { baz: 'bat' }]
+        )
+        done()
+      })
+    })
+
+    it('combines result objects', (done) => {
+      mockRequests(
+        { a: 'b', c: ['d', 'e', 'f'] },
+        { g: 'h', c: ['i', 'j', 'k'] }
+      )
+      fetchUrl('/first').then((resp) => {
+        expect(resp).toEqual(
+          { a: 'b', c: ['d', 'e', 'f', 'i', 'j', 'k'], g: 'h' }
+        )
+        done()
+      })
+    })
+
+    it('handles three requests', (done) => {
+      mockRequests(
+        { a: 'b', c: ['d', 'e', 'f'] },
+        { g: 'h', c: ['i', 'j', 'k'] },
+        { a: 'x' }
+      )
+      fetchUrl('/first').then((resp) => {
+        expect(resp).toEqual(
+          { a: 'x', c: ['d', 'e', 'f', 'i', 'j', 'k'], g: 'h' }
+        )
+        done()
+      })
+    })
+
+    it('handles deeply nested objects', (done) => {
+      mockRequests(
+        { a: { b: { c: { d: ['e', 'f'], g: ['h', 'i'], j: 'k' } } } },
+        { a: { b: { c: { d: ['e2', 'f2'], g: ['h2', 'i2'], j: 'k2' } } } }
+      )
+      fetchUrl('/first').then((resp) => {
+        expect(resp).toEqual(
+          { a: { b: { c: { d: ['e', 'f', 'e2', 'f2'], g: ['h', 'i', 'h2', 'i2'], j: 'k2' } } } },
+        )
+        done()
+      })
+    })
   })
 })

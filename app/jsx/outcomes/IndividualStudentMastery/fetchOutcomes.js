@@ -16,14 +16,44 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import _ from 'lodash'
+import parseLinkHeader from 'parse-link-header'
 
-const fetchUrl = (url) => (
+const deepMerge = (lhs, rhs) => {
+  if (lhs === undefined || lhs === null) {
+    return rhs
+  } else if (Array.isArray(lhs)) {
+    return lhs.concat(rhs)
+  } else if (typeof lhs === 'object') {
+    return _.mergeWith(lhs, rhs, deepMerge)
+  } else {
+    return rhs
+  }
+}
+
+const combine = (promiseOfJson1, promiseOfJson2) => (
+  Promise.all([promiseOfJson1, promiseOfJson2])
+    .then(([json1, json2]) => deepMerge(json1, json2))
+)
+
+const parse = (response) => (
+  response.text()
+    .then((text) => (JSON.parse(text.replace('while(1);', ''))))
+)
+
+export const fetchUrl = (url) => (
   fetch(url, {
     credentials: 'include'
   })
-    .then((response) => response.text())
-    .then((text) => JSON.parse(text.replace('while(1);', '')))
+    .then((response) => {
+      const linkHeader = response.headers.get('link')
+      const next = linkHeader ? parseLinkHeader(linkHeader).next : null
+      if (next) {
+        return combine(parse(response), fetchUrl(next.url))
+      } else {
+        return parse(response)
+      }
+    })
 )
 
 const fetchOutcomes = (courseId, studentId) => {
@@ -34,9 +64,9 @@ const fetchOutcomes = (courseId, studentId) => {
   let assignmentsByAssignmentId
 
   return Promise.all([
-    fetchUrl(`/api/v1/courses/${courseId}/outcome_groups`),
-    fetchUrl(`/api/v1/courses/${courseId}/outcome_group_links?outcome_style=full`),
-    fetchUrl(`/api/v1/courses/${courseId}/outcome_rollups?user_ids[]=${studentId}`)
+    fetchUrl(`/api/v1/courses/${courseId}/outcome_groups?per_page=100`),
+    fetchUrl(`/api/v1/courses/${courseId}/outcome_group_links?outcome_style=full&per_page=100`),
+    fetchUrl(`/api/v1/courses/${courseId}/outcome_rollups?user_ids[]=${studentId}&per_page=100`)
   ])
     .then(([groups, links, rollups]) => {
       outcomeGroups = groups
@@ -53,11 +83,11 @@ const fetchOutcomes = (courseId, studentId) => {
         acc[outcomeLinks[i].outcome.id] = response.outcome_results.filter((r) => !r.hidden);
         return acc
       }, {})
-      assignmentsByAssignmentId = _.indexBy(_.flatten(responses.map((response) => response.linked.assignments)), (a) => a.id)
+      assignmentsByAssignmentId = _.keyBy(_.flatten(responses.map((response) => response.linked.assignments)), (a) => a.id)
     })
     .then(() => {
       const outcomes = outcomeLinks.map((outcomeLink) => ({ groupId: outcomeLink.outcome_group.id, ...outcomeLink.outcome }))
-      const outcomesById = _.indexBy(outcomes, (o) => o.id)
+      const outcomesById = _.keyBy(outcomes, (o) => o.id)
 
       // add rollup scores, mastered
       outcomeRollups.rollups[0].scores.forEach((scoreData) => {
