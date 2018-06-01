@@ -55,6 +55,12 @@ module BroadcastPolicy
           other_attributes = other.instance_variable_get(:@attributes).deep_dup
           @attributes.send(:attributes).each_key do |key|
             value = @attributes[key]
+            # ignore newly added columns in the db that we don't really know
+            # about yet
+            if other_attributes[key].is_a?(ActiveRecord::Attribute.const_get(:Null))
+              other_attributes.instance_variable_get(:@attributes).delete(key)
+              next
+            end
             if value.value != other_attributes[key].value
               other_attributes.write_from_user(key, value.value)
             else
