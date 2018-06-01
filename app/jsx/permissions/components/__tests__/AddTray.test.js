@@ -26,6 +26,8 @@ const defaultProps = () => ({
     {permission_name: 'account_permission', label: 'account_permission', displayed: true},
     {permission_name: 'course_permission', label: 'course_permission', displayed: true}
   ],
+  createNewRole: () => {},
+  loading: false,
   hideTray: () => {},
   open: true,
   allBaseRoles: [

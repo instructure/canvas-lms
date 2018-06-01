@@ -33,7 +33,7 @@ function createRowProps(title, roleId) {
 it('renders the component', () => {
   const tree = mount(
     <Provider store={STORE}>
-      <RoleTrayTableRow {...createRowProps('banana', 1)} />
+      <RoleTrayTableRow {...createRowProps('banana', '1')} />
     </Provider>
   )
   const node = tree.find('RoleTrayTableRow')
@@ -43,7 +43,7 @@ it('renders the component', () => {
 it('renders the title', () => {
   const tree = mount(
     <Provider store={STORE}>
-      <RoleTrayTableRow {...createRowProps('banana', 1)} />
+      <RoleTrayTableRow {...createRowProps('banana', '1')} />
     </Provider>
   )
   const node = tree.find('Text')
@@ -52,7 +52,7 @@ it('renders the title', () => {
 })
 
 it('renders the expandable button if expandable prop is true', () => {
-  const props = createRowProps('banana', 1)
+  const props = createRowProps('banana', '1')
   props.expandable = true
   const tree = mount(
     <Provider store={STORE}>
@@ -65,7 +65,7 @@ it('renders the expandable button if expandable prop is true', () => {
 })
 
 it('does not render the expandable button if expandable prop is false', () => {
-  const props = createRowProps('banana', 1)
+  const props = createRowProps('banana', '1')
   props.expandable = false
   const tree = mount(
     <Provider store={STORE}>
@@ -78,7 +78,7 @@ it('does not render the expandable button if expandable prop is false', () => {
 })
 
 it('renders the description if provided', () => {
-  const props = createRowProps('banana', 1)
+  const props = createRowProps('banana', '1')
   props.description = "it's a fruit"
   const tree = mount(
     <Provider store={STORE}>
@@ -93,7 +93,7 @@ it('renders the description if provided', () => {
 })
 
 it('does not render the description if not provided', () => {
-  const props = createRowProps('banana', 1)
+  const props = createRowProps('banana', '1')
   props.description = ''
   const tree = mount(
     <Provider store={STORE}>

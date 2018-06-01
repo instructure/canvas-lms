@@ -26,28 +26,45 @@ const handlingClick = jest.fn()
 const defaultProps = () => ({
   permission: {enabled: true, locked: false, readonly: false, explicit: true},
   permissionName: 'add',
-  courseRoleId: 1,
+  cleanFocus: () => {},
+  setFocus: false,
+  courseRoleId: '1',
   handleClick: handlingClick
 })
 
 const disabledProps = () => ({
   permission: {enabled: false, locked: false, readonly: false, explicit: true},
   permissionName: 'add',
-  courseRoleId: 1,
+  cleanFocus: () => {},
+  setFocus: false,
+  courseRoleId: '1',
   handleClick: handlingClick
 })
 
 const enabledAndLockedProps = () => ({
   permission: {enabled: true, locked: true, readonly: false, explicit: true},
   permissionName: 'add',
-  courseRoleId: 1,
+  cleanFocus: () => {},
+  setFocus: false,
+  courseRoleId: '1',
   handleClick: handlingClick
 })
 
 const disabledAndLockedProps = () => ({
   permission: {enabled: false, locked: true, readonly: false, explicit: true},
   permissionName: 'add',
-  courseRoleId: 1,
+  cleanFocus: () => {},
+  setFocus: false,
+  courseRoleId: '1',
+  handleClick: handlingClick
+})
+
+const readOnly = () => ({
+  permission: {enabled: false, locked: true, readonly: true, explicit: true},
+  permissionName: 'add',
+  cleanFocus: () => {},
+  setFocus: false,
+  courseRoleId: '1',
   handleClick: handlingClick
 })
 
@@ -104,4 +121,10 @@ it('displays disabled and locked correctly', () => {
   expect(check.exists()).toEqual(false)
   expect(x.exists()).toEqual(true)
   expect(lock.exists()).toEqual(true)
+})
+
+it('displays disabled when permission is readonly', () => {
+  const tree = mount(<PermissionButton {...readOnly()} />)
+  const button = tree.find('Button')
+  expect(button.props().disabled).toEqual(true)
 })

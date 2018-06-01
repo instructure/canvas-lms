@@ -44,25 +44,29 @@ import {getPermissionsWithLabels, roleIsBaseRole} from '../helper/utils'
 
 export default class RoleTray extends Component {
   static propTypes = {
+    id: PropTypes.string,
     assignedPermissions: PropTypes.arrayOf(permissionPropTypes.permission).isRequired,
     assignedTo: PropTypes.string.isRequired,
-    basedOn: PropTypes.string,
     baseRoleLabels: PropTypes.arrayOf(PropTypes.string),
+    basedOn: PropTypes.string,
     changedBy: PropTypes.string.isRequired,
     deletable: PropTypes.bool.isRequired,
     editable: PropTypes.bool.isRequired,
     hideTray: PropTypes.func.isRequired,
     label: PropTypes.string.isRequired,
     lastChanged: PropTypes.string.isRequired,
+    updateRoleNameAndBaseType: PropTypes.func,
     open: PropTypes.bool.isRequired,
     role: permissionPropTypes.role,
     unassignedPermissions: PropTypes.arrayOf(permissionPropTypes.permission).isRequired
   }
 
   static defaultProps = {
-    basedOn: null,
     baseRoleLabels: [],
-    role: null
+    basedOn: null,
+    role: null,
+    id: null,
+    updateRoleNameAndBaseType: () => {}
   }
 
   state = {
@@ -74,12 +78,14 @@ export default class RoleTray extends Component {
   // We need this so that if there is an alert displayed inside this tray
   // (such as the delete confirmation alert) it will disapear if we click
   // on a different role then we are currently operating on.
-  componentWillReceiveProps() {
-    this.setState({
-      deleteAlertVisable: false,
-      editTrayVisable: false,
-      editBaseRoleAlertVisable: false
-    })
+  componentWillReceiveProps(nextProps) {
+    if (this.props.id !== nextProps.id) {
+      this.setState({
+        deleteAlertVisable: false,
+        editTrayVisable: false,
+        editBaseRoleAlertVisable: false
+      })
+    }
   }
 
   hideTray = () => {
@@ -100,6 +106,10 @@ export default class RoleTray extends Component {
       },
       () => this.closeButton.focus()
     )
+  }
+
+  updateRole = event => {
+    this.props.updateRoleNameAndBaseType(this.props.id, event.target.value, this.props.basedOn)
   }
 
   hideEditTray = () => {
@@ -336,7 +346,7 @@ export default class RoleTray extends Component {
         <TextInput
           label={I18n.t('Role Name')}
           defaultValue={this.props.label}
-          onBlur={() => console.log('todo actually save this to backend here')}
+          onBlur={this.updateRole}
         />
       </Container>
 
@@ -427,6 +437,7 @@ function mapStateToProps(state, ownProps) {
     deletable: !isBaseRole,
     editable: !isBaseRole,
     label: role.label,
+    id: role.id,
     lastChanged: 'todo',
     open: true,
     role,
@@ -436,7 +447,8 @@ function mapStateToProps(state, ownProps) {
 }
 
 const mapDispatchToProps = {
-  hideTray: actions.hideAllTrays
+  hideTray: actions.hideAllTrays,
+  updateRoleNameAndBaseType: actions.updateRoleNameAndBaseType
 }
 
 export const ConnectedRoleTray = connect(

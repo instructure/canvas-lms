@@ -54,12 +54,13 @@ export default class PermissionsIndex extends Component {
 
   state = {
     permissionSearchString: '',
-    selectedRoles: [],
+    selectedRoles: [{value: '0', label: 'All Roles'}],
     contextType: COURSE
   }
 
   onRoleFilterChange = (_, value) => {
-    this.setState({selectedRoles: value}, this.filterRoles)
+    const valueCopy = value.filter(option => option.value !== '0')
+    this.setState({selectedRoles: valueCopy}, this.filterRoles)
   }
 
   onSearchStringChange = e => {
@@ -75,6 +76,14 @@ export default class PermissionsIndex extends Component {
         this.props.tabChanged(newContextType)
       }
     )
+  }
+
+  onAutocompleteBlur = e => {
+    if (e.target.value === '' && this.state.selectedRoles.length === 0) {
+      this.setState({
+        selectedRoles: [{value: '0', label: 'All Roles'}]
+      })
+    }
   }
 
   filterPermissions = debounce(() => this.props.searchPermissions(this.state), SEARCH_DELAY, {
@@ -108,9 +117,13 @@ export default class PermissionsIndex extends Component {
                 <Select
                   id="permissions-role-filter"
                   label={<ScreenReaderContent>{I18n.t('Filter Roles')}</ScreenReaderContent>}
-                  selectedOption={this.state.selectedRolesValue}
+                  selectedOption={this.state.selectedRoles}
+                  onBlur={this.onAutocompleteBlur}
                   multiple
                   editable
+                  assistiveText={I18n.t(
+                    'Start typing to search. Press the down arrow to navigate results.'
+                  )}
                   onChange={this.onRoleFilterChange}
                   formatSelectedOption={tag => (
                     <AccessibleContent

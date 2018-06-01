@@ -33,6 +33,7 @@ const types = [
   'DISPLAY_PERMISSION_TRAY',
   'DISPLAY_ROLE_TRAY',
   'FIX_FOCUS',
+  'UPDATE_ROLE',
   'GET_PERMISSIONS_START',
   'GET_PERMISSIONS_SUCCESS',
   'HIDE_ALL_TRAYS',
@@ -76,6 +77,20 @@ actions.createNewRole = function(label, baseRole) {
       .catch(_error => {
         dispatch(actions.addTraySavingFail())
         showFlashError(I18n.t('Failed to create new role'))()
+      })
+  }
+}
+
+actions.updateRoleNameAndBaseType = function(id, label, baseType) {
+  return (dispatch, getState) => {
+    apiClient
+      .updateRole(getState(), {id, label, base_role_type: baseType})
+      .then(res => {
+        $.screenReaderFlashMessage(I18n.t('Successfully updated role name'))
+        dispatch(actions.updateRole(res.data))
+      })
+      .catch(_ => {
+        $.screenReaderFlashMessage(I18n.t('Failed to update role name'))
       })
   }
 }

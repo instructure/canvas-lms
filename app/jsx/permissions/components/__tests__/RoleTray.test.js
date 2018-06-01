@@ -28,8 +28,10 @@ function makeDefaultProps() {
   const perms = getPermissionsWithLabels(PERMISSIONS, role.permissions)
   return {
     assignedPermissions: perms,
+    id: '1',
     assignedTo: '365',
     basedOn: null,
+    updateRoleNameAndBaseType: () => {},
     baseRoleLabels: ['Student', 'Teacher', 'TA'],
     changedBy: 'Bob Dobbs',
     deletable: false,
@@ -123,6 +125,15 @@ it('does not render delete icon if deletable is false', () => {
   const tree = shallow(<RoleTray {...props} />)
   const node = tree.find('IconTrash')
   expect(node.exists()).toBeFalsy()
+})
+
+it('updaterole calls updaterolenameandbasetype', () => {
+  const props = makeDefaultProps()
+  const mockFunction = jest.fn()
+  props.updateRoleNameAndBaseType = mockFunction
+  const tree = shallow(<RoleTray {...props} />)
+  tree.instance().updateRole({target: {value: 'blah'}})
+  expect(mockFunction).toHaveBeenCalledWith('1', 'blah', null)
 })
 
 it('renders edit icon if editable is true', () => {

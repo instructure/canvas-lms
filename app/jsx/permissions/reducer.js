@@ -79,7 +79,9 @@ const roles = handleActions(
       )
       return newState
     },
-    [actionTypes.ADD_NEW_ROLE]: (state, action) => [...state, action.payload]
+    [actionTypes.ADD_NEW_ROLE]: (state, action) => [...state, action.payload],
+    [actionTypes.UPDATE_ROLE]: (state, action) =>
+      state.map(r => (r.id === action.payload.id ? {...r, ...action.payload} : r))
   },
   []
 )

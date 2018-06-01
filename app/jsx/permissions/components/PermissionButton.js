@@ -70,7 +70,12 @@ export default class PermissionButton extends Component {
     <Menu
       placement="bottom center"
       trigger={
-        <Button variant="icon" size="medium" buttonRef={c => (this.button = c)}>
+        <Button
+          disabled={this.props.permission.readonly}
+          variant="icon"
+          size="medium"
+          buttonRef={c => (this.button = c)}
+        >
           <Text color={this.props.permission.enabled ? 'success' : 'error'}>
             {this.props.permission.enabled ? (
               <IconPublish size="x-small" />

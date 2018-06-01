@@ -56,7 +56,7 @@ const BASIC_ROLE_PERMISSION = {
 
 const ROLES = [
   {
-    id: 1,
+    id: '1',
     label: 'Course Admin',
     base_role_type: 'Course Admin',
     contextType: COURSE,
@@ -67,7 +67,7 @@ const ROLES = [
     }
   },
   {
-    id: 2,
+    id: '2',
     label: 'Course Sub-Admin',
     base_role_type: 'Course Admin',
     contextType: COURSE,
@@ -78,7 +78,7 @@ const ROLES = [
     }
   },
   {
-    id: 3,
+    id: '3',
     label: 'Account Admin',
     base_role_type: 'Account Admin',
     contextType: ACCOUNT,
@@ -86,7 +86,7 @@ const ROLES = [
     permissions: {add_course: BASIC_ROLE_PERMISSION, delete_course: BASIC_ROLE_PERMISSION}
   },
   {
-    id: 4,
+    id: '4',
     label: 'Account Sub-admin',
     base_role_type: 'Account Admin',
     contextType: ACCOUNT,

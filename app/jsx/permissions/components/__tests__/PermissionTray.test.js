@@ -24,12 +24,12 @@ import PermissionTray from '../PermissionTray'
 
 function makeDefaultProps() {
   return {
-    assignedRoles: ROLES.filter(r => r.id === 1),
+    assignedRoles: ROLES.filter(r => r.id === '1'),
     label: 'Student',
     permissionName: 'add_section',
     open: true,
     hideTray: () => {},
-    unassignedRoles: ROLES.filter(r => r.id === 2)
+    unassignedRoles: ROLES.filter(r => r.id === '2')
   }
 }
 

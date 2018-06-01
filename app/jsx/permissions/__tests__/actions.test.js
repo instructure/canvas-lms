@@ -16,11 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import $ from 'jquery'
+import moxios from 'moxios'
 
 import actions from '../actions'
 
 import {COURSE, ACCOUNT} from '../propTypes'
 import {PERMISSIONS, ROLES} from './examples'
+import {moxiosWait} from '../test-utils'
 
 // This is needed for $.screenReaderFlashMessageExclusive to work.
 // TODO: This is terrible, make it unterrible
@@ -109,6 +111,135 @@ it('setAndOpenPermissionTray dispatches hideAllTrays and dispalyPermissionTray',
   expect(dispatchMock).toHaveBeenCalledTimes(2)
   expect(dispatchMock).toHaveBeenCalledWith(expectedHideDispatch)
   expect(dispatchMock).toHaveBeenCalledWith(expectedDisplayRoleDispatch)
+})
+
+it('createNewRole dispatches addNewRole', () => {
+  moxios.install()
+  window.ENV = {}
+  window.ENV.flashAlertTimeout = 5
+  const mockDispatch = jest.fn()
+  const state = {contextId: 1, permissions: PERMISSIONS, roles: []}
+  const getState = () => state
+  actions.createNewRole('steven', 'StudentRoll')(mockDispatch, getState)
+  return moxiosWait(() => {
+    const request = moxios.requests.mostRecent()
+    request
+      .respondWith({
+        status: 200,
+        response: {
+          id: '9',
+          role: 'steven',
+          label: 'steven',
+          base_role_type: 'StudentEnrollment',
+          workflow_state: 'active'
+        }
+      })
+      .then(() => {
+        expect(mockDispatch).toHaveBeenCalledWith({
+          type: 'ADD_NEW_ROLE',
+          payload: {
+            id: '9',
+            role: 'steven',
+            label: 'steven',
+            base_role_type: 'StudentEnrollment',
+            workflow_state: 'active'
+          }
+        })
+        expect(mockDispatch).toHaveBeenCalledWith({
+          type: 'DISPLAY_ROLE_TRAY',
+          payload: {
+            role: {
+              base_role_type: 'StudentEnrollment',
+              id: '9',
+              label: 'steven',
+              role: 'steven',
+              workflow_state: 'active'
+            }
+          }
+        })
+        const expectedStartDispatch = {
+          type: 'ADD_TRAY_SAVING_START'
+        }
+        const expectedDisplayAddSuccessDispatch = {
+          type: 'ADD_TRAY_SAVING_SUCCESS'
+        }
+
+        const expectedHideDispatch = {
+          type: 'HIDE_ALL_TRAYS'
+        }
+
+        expect(mockDispatch).toHaveBeenCalledTimes(5)
+        expect(mockDispatch).toHaveBeenCalledWith(expectedStartDispatch)
+        expect(mockDispatch).toHaveBeenCalledWith(expectedDisplayAddSuccessDispatch)
+        expect(mockDispatch).toHaveBeenCalledWith(expectedHideDispatch)
+      })
+    moxios.uninstall()
+  })
+})
+
+it('updateRoleNameAndBaseType dispatches updateRole', () => {
+  moxios.install()
+  window.ENV = {}
+  window.ENV.flashAlertTimeout = 5
+  const mockDispatch = jest.fn()
+  const state = {contextId: 1, permissions: PERMISSIONS, roles: []}
+  const getState = () => state
+  actions.updateRoleNameAndBaseType('1', 'steven', 'StudentRoll')(mockDispatch, getState)
+  return moxiosWait(() => {
+    const request = moxios.requests.mostRecent()
+    request
+      .respondWith({
+        status: 200,
+        response: {
+          id: '9',
+          role: 'steven',
+          label: 'steven',
+          base_role_type: 'StudentEnrollment',
+          workflow_state: 'active'
+        }
+      })
+      .then(() => {
+        expect(mockDispatch).toHaveBeenCalledWith({
+          type: 'UPDATE_ROLE',
+          payload: {
+            id: '9',
+            role: 'steven',
+            label: 'steven',
+            base_role_type: 'StudentEnrollment',
+            workflow_state: 'active'
+          }
+        })
+      })
+    moxios.uninstall()
+  })
+})
+
+it('createNewRole dispatches addTraySavingFail', () => {
+  moxios.install()
+  const mockDispatch = jest.fn()
+  const state = {contextId: 1, permissions: PERMISSIONS, roles: []}
+  const getState = () => state
+  actions.createNewRole('steven', 'StudentRoll')(mockDispatch, getState)
+  return moxiosWait(() => {
+    const request = moxios.requests.mostRecent()
+    request
+      .respondWith({
+        status: 400,
+        response: {
+          id: '9',
+          role: 'steven',
+          label: 'steven',
+          base_role_type: 'StudentEnrollment',
+          workflow_state: 'active'
+        }
+      })
+      .then(() => {
+        expect(mockDispatch).toHaveBeenCalledWith({
+          type: 'ADD_TRAY_SAVING_FAIL'
+        })
+      })
+    moxios.uninstall()
+  })
 })
 
 it('modifyPermissions dispatches updatePermissions', () => {

@@ -36,7 +36,7 @@ it('renders the component with only one child', () => {
   const tree = mount(
     <Provider store={STORE}>
       <RoleTrayTable title="fruit">
-        <RoleTrayTableRow {...createRowProps('banana', 1)} />
+        <RoleTrayTableRow {...createRowProps('banana', '1')} />
       </RoleTrayTable>
     </Provider>
   )
@@ -50,9 +50,9 @@ it('renders the component with multiple children', () => {
   const tree = mount(
     <Provider store={STORE}>
       <RoleTrayTable title="fruit">
-        <RoleTrayTableRow {...createRowProps('banana', 1)} />
-        <RoleTrayTableRow {...createRowProps('apple', 2)} />
-        <RoleTrayTableRow {...createRowProps('mango', 3)} />
+        <RoleTrayTableRow {...createRowProps('banana', '1')} />
+        <RoleTrayTableRow {...createRowProps('apple', '2')} />
+        <RoleTrayTableRow {...createRowProps('mango', '3')} />
       </RoleTrayTable>
     </Provider>
   )
@@ -66,7 +66,7 @@ it('renders the title', () => {
   const tree = mount(
     <Provider store={STORE}>
       <RoleTrayTable title="fruit">
-        <RoleTrayTableRow {...createRowProps('banana', 1)} />
+        <RoleTrayTableRow {...createRowProps('banana', '1')} />
       </RoleTrayTable>
     </Provider>
   )
@@ -78,9 +78,9 @@ it('sorts the children by title', () => {
   const tree = mount(
     <Provider store={STORE}>
       <RoleTrayTable title="fruit">
-        <RoleTrayTableRow {...createRowProps('banana', 1)} />
-        <RoleTrayTableRow {...createRowProps('apple', 2)} />
-        <RoleTrayTableRow {...createRowProps('mango', 3)} />
+        <RoleTrayTableRow {...createRowProps('banana', '1')} />
+        <RoleTrayTableRow {...createRowProps('apple', '2')} />
+        <RoleTrayTableRow {...createRowProps('mango', '3')} />
       </RoleTrayTable>
     </Provider>
   )

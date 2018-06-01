@@ -217,6 +217,38 @@ it('UPDATE_PERMISSIONS sets locked in the store', () => {
   expect(newState.roles).toEqual(expectedState)
 })
 
+it('UPDATE_ROLE updates the label correct', () => {
+  const originalState = {
+    roles: [
+      {
+        base_role_type: 'StudentEnrollment',
+        id: '9',
+        label: 'steven',
+        role: 'steven',
+        workflow_state: 'active'
+      }
+    ]
+  }
+  const payload = {
+    base_role_type: 'StudentEnrollment',
+    id: '9',
+    label: 'steven awesome',
+    role: 'steven awesome',
+    workflow_state: 'active'
+  }
+  const newState = reduce(actions.updateRole(payload), originalState)
+  const expectedState = [
+    {
+      base_role_type: 'StudentEnrollment',
+      id: '9',
+      label: 'steven awesome',
+      role: 'steven awesome',
+      workflow_state: 'active'
+    }
+  ]
+  expect(newState.roles).toEqual(expectedState)
+})
+
 it('DISPLAY_PERMISSION_TRAY sets the activePermissionTray in the store', () => {
   const originalState = {activePermissionTray: null}
   const payload = {permission: {label: 'newRoleSim', permission_name: 'role2'}}

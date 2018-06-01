@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {Provider} from 'react-redux'
-import {mount} from 'enzyme'
+import {mount, shallow} from 'enzyme'
 
 import {DEFAULT_PROPS, STORE} from '../../__tests__/examples'
 import PermissionsIndex from '../PermissionsIndex'
@@ -31,4 +31,18 @@ it('renders the component', () => {
   )
   const node = tree.find('PermissionsIndex')
   expect(node.exists()).toEqual(true)
+})
+
+it('sets selected rolls correctly when there are no rolls selected', () => {
+  const tree = shallow(<PermissionsIndex {...DEFAULT_PROPS()} />)
+  tree.instance().onAutocompleteBlur({target: {value: ''}})
+  expect(tree.instance().state.selectedRoles[0].value).toEqual('0')
+})
+
+it('sets selected rolls correctly when we are changing role filter', () => {
+  const tree = shallow(<PermissionsIndex {...DEFAULT_PROPS()} />)
+  tree
+    .instance()
+    .onRoleFilterChange(null, [{value: '1', label: 'stuff'}, {value: '0', label: 'All Roles'}])
+  expect(tree.instance().state.selectedRoles[0].value).toEqual('1')
 })
