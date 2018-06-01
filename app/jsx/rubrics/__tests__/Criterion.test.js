@@ -119,13 +119,13 @@ describe('Criterion', () => {
     expect(comments({ isSummary: true })).toHaveLength(0)
   })
 
-  it('does not have a points column in summary mode', () => {
+  it('does not have a points column when hasPointsColumn is false', () => {
     const el = shallow(
       <Criterion
         assessment={assessments.points.data[1]}
         criterion={rubrics.points.criteria[1]}
         freeForm={false}
-        isSummary
+        hasPointsColumn={false}
       />
     )
 
@@ -144,5 +144,26 @@ describe('Criterion', () => {
     )
 
     expect(el.find('Points').prop('allowExtraCredit')).toEqual(true)
+  })
+
+  it('does shows points when hidePoints is false', () => {
+    const wrapper = shallow(
+      <Criterion assessment={assessments.points.data[1]}
+        criterion={rubrics.points.criteria[1]}
+        freeForm={false}
+      />
+    )
+    expect(wrapper.find('Points')).toHaveLength(1)
+  })
+
+  it('does not show points when hidePoints is true', () => {
+    const wrapper = shallow(
+      <Criterion assessment={assessments.points.data[1]}
+        criterion={rubrics.points.criteria[1]}
+        freeForm={false}
+        hidePoints
+      />
+    )
+    expect(wrapper.find('Points')).toHaveLength(0)
   })
 })

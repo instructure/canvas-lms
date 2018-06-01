@@ -48,13 +48,23 @@ const AssignmentResult = ({ outcome, result }) => {
       </FlexItem>
       <FlexItem padding="x-small 0">
         <View padding="x-small 0 0 0">
-          <Text size="small" fontStyle="italic" weight="bold">{ I18n.t('Your score') }</Text>
+          <Text size="small" fontStyle="italic" weight="bold">{
+            result.hide_points ? I18n.t('Your score') : I18n.t('Your score: %{score}', { score: result.score })
+          }</Text>
         </View>
       </FlexItem>
       <FlexItem borderWidth="small">
         <div className="react-rubric">
           <div className="ratings">
-            <Ratings tiers={ratings} points={result.score} assessing={false} />
+            <Ratings
+              tiers={ratings}
+              points={result.score}
+              hidePoints={result.hide_points}
+              useRange={false}
+              masteryThreshold={outcome.mastery_points}
+              assessing={false}
+              isSummary={false}
+            />
           </div>
         </div>
       </FlexItem>

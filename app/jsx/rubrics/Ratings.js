@@ -49,8 +49,8 @@ export const Rating = (props) => {
     long_description,
     points,
     onClick,
-    isSummary,
-    tierColor
+    tierColor,
+    hidePoints
   } = props
 
   const shaderStyle = { backgroundColor: tierColor }
@@ -58,7 +58,7 @@ export const Rating = (props) => {
 
   const ratingPoints = () => (
     <div className="rating-points">
-      <Text size="x-small">
+      <Text size="small" weight="bold">
         {pointString(points, endOfRangePoints)}
       </Text>
     </div>
@@ -72,13 +72,13 @@ export const Rating = (props) => {
       role={assessing ? "button" : null}
       tabIndex={assessing ? 0 : null}
     >
-      {isSummary ? null : ratingPoints()}
+      {hidePoints ? null : ratingPoints()}
       <div className="rating-description">
-        <Text size="x-small" lineHeight="condensed">
+        <Text size="small" lineHeight="condensed" weight="bold">
           {description}
         </Text>
       </div>
-      <Text size="x-small" fontStyle="italic" lineHeight="condensed">
+      <Text size="small" lineHeight="condensed">
         {long_description}
       </Text>
       {
@@ -121,12 +121,13 @@ Rating.propTypes = {
   assessing: PropTypes.bool.isRequired,
   footer: PropTypes.node,
   selected: PropTypes.bool,
-  isSummary: PropTypes.bool.isRequired
+  hidePoints: PropTypes.bool
 }
 Rating.defaultProps = {
   footer: null,
   selected: false,
-  endOfRangePoints: null // eslint-disable-line react/default-props-match-prop-types
+  endOfRangePoints: null, // eslint-disable-line react/default-props-match-prop-types
+  hidePoints: false
 }
 
 const Ratings = (props) => {
@@ -138,6 +139,7 @@ const Ratings = (props) => {
     tiers,
     points,
     pointsPossible,
+    hidePoints,
     onPointChange,
     isSummary,
     useRange
@@ -189,9 +191,9 @@ const Ratings = (props) => {
         classes={classes}
         endOfRangePoints={useRange ? getRangePoints(tier.points, tiers[index + 1]) : null}
         footer={footer}
-        isSummary={isSummary}
         onClick={() => onPointChange(tier.points)}
         tierColor={getTierColor(selected)}
+        hidePoints={isSummary || hidePoints}
         {...tier}
       />
     )
@@ -204,7 +206,7 @@ const Ratings = (props) => {
       description={I18n.t('No details')}
       footer={footer}
       points={0}
-      isSummary
+      hidePoints={isSummary || hidePoints}
     />
   )
 
@@ -219,10 +221,12 @@ Ratings.propTypes = {
   assessing: PropTypes.bool.isRequired,
   footer: PropTypes.node,
   onPointChange: PropTypes.func,
-  isSummary: PropTypes.bool.isRequired
+  isSummary: PropTypes.bool.isRequired,
+  hidePoints: PropTypes.bool
 }
 Ratings.defaultProps = {
   footer: null,
+  hidePoints: false,
   onPointChange: () => { }
 }
 

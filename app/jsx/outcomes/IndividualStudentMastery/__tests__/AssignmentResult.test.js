@@ -60,3 +60,16 @@ it('includes the ratings of the outcome', () => {
   const wrapper = render(<AssignmentResult {...defaultProps()}/>)
   expect(wrapper.text()).toMatch('My second rating')
 })
+
+it('shows scores when points are not hidden', () => {
+  const wrapper = render(<AssignmentResult {...defaultProps()}/>)
+  expect(wrapper.text()).toMatch('Your score: 1')
+})
+
+it('does not show scores when points are hidden', () => {
+  const props = defaultProps()
+  props.result.hide_points = true
+  const wrapper = render(<AssignmentResult {...props}/>)
+  expect(wrapper.text()).toMatch('Your score')
+  expect(wrapper.text()).not.toMatch('Your score: 1')
+})

@@ -24,7 +24,7 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
     <div className=\\"description container\\">
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Description of criterion
       </Text>
     </div>
@@ -63,7 +63,7 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
     <div className=\\"description container\\">
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Description of criterion
       </Text>
     </div>
@@ -102,7 +102,7 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
     <div className=\\"description container\\">
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Description of criterion
       </Text>
     </div>
@@ -156,7 +156,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the Outcom
 `;
 
 exports[`Free-form Rubric with a outcome criterion by default renders the Threshold sub-component(s) as expected 1`] = `
-"<Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+"<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
   threshold: 3.0
 </Text>"
 `;
@@ -166,7 +166,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
   <th scope=\\"row\\" className=\\"description-header\\">
     <div className=\\"description container\\">
       <OutcomeIcon />
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
     </div>
@@ -222,7 +222,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Ou
 `;
 
 exports[`Free-form Rubric with a outcome criterion when assessing renders the Threshold sub-component(s) as expected 1`] = `
-"<Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+"<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
   threshold: 3.0
 </Text>"
 `;
@@ -232,7 +232,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
   <th scope=\\"row\\" className=\\"description-header\\">
     <div className=\\"description container\\">
       <OutcomeIcon />
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
     </div>
@@ -288,7 +288,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
 `;
 
 exports[`Free-form Rubric with a outcome criterion without an assessment renders the Threshold sub-component(s) as expected 1`] = `
-"<Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+"<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
   threshold: 3.0
 </Text>"
 `;
@@ -298,7 +298,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
   <th scope=\\"row\\" className=\\"description-header\\">
     <div className=\\"description container\\">
       <OutcomeIcon />
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
     </div>
@@ -339,7 +339,7 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
     <div className=\\"description container\\">
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Description of criterion
       </Text>
     </div>
@@ -354,7 +354,7 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
     </div>
   </th>
   <td className=\\"ratings\\">
-    <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={3.2} pointsPossible={8} defaultMasteryThreshold={8} isSummary={false} useRange={false} />
+    <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={3.2} pointsPossible={8} defaultMasteryThreshold={8} isSummary={false} useRange={false} hidePoints={false} />
   </td>
   <td>
     <Points allowExtraCredit={true} assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={8} />
@@ -384,7 +384,7 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
     <div className=\\"description container\\">
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Description of criterion
       </Text>
     </div>
@@ -393,7 +393,7 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
     </div>
   </th>
   <td className=\\"ratings\\">
-    <Ratings assessing={true} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={3.2} pointsPossible={8} defaultMasteryThreshold={8} isSummary={false} useRange={false} />
+    <Ratings assessing={true} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={3.2} pointsPossible={8} defaultMasteryThreshold={8} isSummary={false} useRange={false} hidePoints={false} />
   </td>
   <td>
     <Points allowExtraCredit={true} assessing={true} assessment={{...}} onPointChange={[Function]} pointsPossible={8} />
@@ -424,7 +424,7 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
     <div className=\\"description container\\">
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Description of criterion
       </Text>
     </div>
@@ -433,7 +433,7 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
     </div>
   </th>
   <td className=\\"ratings\\">
-    <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={[undefined]} pointsPossible={8} defaultMasteryThreshold={8} isSummary={false} useRange={false} />
+    <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={[undefined]} pointsPossible={8} defaultMasteryThreshold={8} isSummary={false} useRange={false} hidePoints={false} />
   </td>
   <td>
     <Points allowExtraCredit={true} assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={8} />
@@ -478,7 +478,7 @@ exports[`Point Rubric with a outcome criterion by default renders the OutcomeIco
 `;
 
 exports[`Point Rubric with a outcome criterion by default renders the Threshold sub-component(s) as expected 1`] = `
-"<Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+"<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
   threshold: 3.0
 </Text>"
 `;
@@ -488,7 +488,7 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
   <th scope=\\"row\\" className=\\"description-header\\">
     <div className=\\"description container\\">
       <OutcomeIcon />
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
     </div>
@@ -505,7 +505,7 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
     </div>
   </th>
   <td className=\\"ratings\\">
-    <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={3} pointsPossible={3} defaultMasteryThreshold={3} isSummary={false} useRange={false} />
+    <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={3} pointsPossible={3} defaultMasteryThreshold={3} isSummary={false} useRange={false} hidePoints={false} />
   </td>
   <td>
     <Points allowExtraCredit={false} assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={3} />
@@ -550,7 +550,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the Outcom
 `;
 
 exports[`Point Rubric with a outcome criterion when assessing renders the Threshold sub-component(s) as expected 1`] = `
-"<Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+"<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
   threshold: 3.0
 </Text>"
 `;
@@ -560,7 +560,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
   <th scope=\\"row\\" className=\\"description-header\\">
     <div className=\\"description container\\">
       <OutcomeIcon />
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
     </div>
@@ -571,7 +571,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
     <Threshold threshold={3} />
   </th>
   <td className=\\"ratings\\">
-    <Ratings assessing={true} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={3} pointsPossible={3} defaultMasteryThreshold={3} isSummary={false} useRange={false} />
+    <Ratings assessing={true} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={3} pointsPossible={3} defaultMasteryThreshold={3} isSummary={false} useRange={false} hidePoints={false} />
   </td>
   <td>
     <Points allowExtraCredit={false} assessing={true} assessment={{...}} onPointChange={[Function]} pointsPossible={3} />
@@ -617,7 +617,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
 `;
 
 exports[`Point Rubric with a outcome criterion without an assessment renders the Threshold sub-component(s) as expected 1`] = `
-"<Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+"<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
   threshold: 3.0
 </Text>"
 `;
@@ -627,7 +627,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
   <th scope=\\"row\\" className=\\"description-header\\">
     <div className=\\"description container\\">
       <OutcomeIcon />
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
     </div>
@@ -638,7 +638,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
     <Threshold threshold={3} />
   </th>
   <td className=\\"ratings\\">
-    <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={[undefined]} pointsPossible={3} defaultMasteryThreshold={3} isSummary={false} useRange={false} />
+    <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={[undefined]} pointsPossible={3} defaultMasteryThreshold={3} isSummary={false} useRange={false} hidePoints={false} />
   </td>
   <td>
     <Points allowExtraCredit={false} assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={3} />

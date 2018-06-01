@@ -21,14 +21,14 @@ exports[`renders the AlignmentResult component 1`] = `
   <FlexItem padding=\\"x-small 0\\" as=\\"span\\" grow={false} shrink={false}>
     <View padding=\\"x-small 0 0 0\\" display=\\"auto\\">
       <Text size=\\"small\\" fontStyle=\\"italic\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
-        Your score
+        Your score: 1
       </Text>
     </View>
   </FlexItem>
   <FlexItem borderWidth=\\"small\\" as=\\"span\\" grow={false} shrink={false}>
     <div className=\\"react-rubric\\">
       <div className=\\"ratings\\">
-        <Ratings tiers={{...}} points={1} assessing={false} footer={{...}} onPointChange={[Function]} />
+        <Ratings tiers={{...}} points={1} hidePoints={false} useRange={false} masteryThreshold={[undefined]} assessing={false} isSummary={false} footer={{...}} onPointChange={[Function]} />
       </div>
     </div>
   </FlexItem>

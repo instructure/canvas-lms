@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import _ from 'lodash'
 import PropTypes from 'prop-types'
+import _ from 'lodash'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
@@ -92,7 +92,7 @@ LongDescriptionDialog.defaultProps = {
 }
 
 const Threshold = ({ threshold }) => (
-  <Text size="x-small">
+  <Text size="x-small" weight="normal">
     {
       I18n.t('threshold: %{pts}', {
         pts: I18n.toNumber(threshold, { precision: 1 } )
@@ -121,7 +121,9 @@ export default class Criterion extends React.Component {
       freeForm,
       onAssessmentChange,
       savedComments,
-      isSummary
+      isSummary,
+      hidePoints,
+      hasPointsColumn
     } = this.props
     const { dialogOpen } = this.state
     const isOutcome = criterion.learning_outcome_id !== undefined
@@ -139,14 +141,16 @@ export default class Criterion extends React.Component {
 
     const pointsPossible = criterion.points
     const pointsElement = () => (
-      <Points
-        key="points"
-        allowExtraCredit={!isOutcome || allowExtraCredit}
-        assessing={assessing}
-        assessment={assessment}
-        onPointChange={onPointChange}
-        pointsPossible={pointsPossible}
-      />
+      !hidePoints && (
+        <Points
+          key="points"
+          allowExtraCredit={!isOutcome || allowExtraCredit}
+          assessing={assessing}
+          assessment={assessment}
+          onPointChange={onPointChange}
+          pointsPossible={pointsPossible}
+        />
+      )
     )
 
     const pointsComment = () => (
@@ -181,6 +185,7 @@ export default class Criterion extends React.Component {
         defaultMasteryThreshold={isOutcome ? criterion.mastery_points : criterion.points}
         isSummary={isSummary}
         useRange={useRange}
+        hidePoints={hidePoints}
       />
     )
 
@@ -217,7 +222,7 @@ export default class Criterion extends React.Component {
         <th scope="row" className="description-header">
           <div className="description container">
             {isOutcome ? <OutcomeIcon /> : ''}
-            <Text size="small">
+            <Text size="small" weight="normal">
               {criterion.description}
             </Text>
           </div>
@@ -234,7 +239,7 @@ export default class Criterion extends React.Component {
               />
           </div>
           {
-            threshold !== undefined ? <Threshold threshold={threshold} /> : null
+            !hidePoints && threshold !== undefined ? <Threshold threshold={threshold} /> : null
           }
           {
             (freeForm || assessing || isSummary || noComments) ? null : (
@@ -249,12 +254,12 @@ export default class Criterion extends React.Component {
           {ratings}
         </td>
         {
-          !isSummary ? (
+          hasPointsColumn && (
             <td>
               {pointsElement()}
               {assessing && !freeForm ? commentInput : null}
             </td>
-          ) : null
+          )
         }
       </tr>
     )
@@ -268,13 +273,18 @@ Criterion.propTypes = {
   freeForm: PropTypes.bool.isRequired,
   onAssessmentChange: PropTypes.func,
   savedComments: PropTypes.arrayOf(PropTypes.string),
-  isSummary: PropTypes.bool
+  isSummary: PropTypes.bool,
+  hidePoints: PropTypes.bool,
+  hasPointsColumn: PropTypes.bool
 }
+
 Criterion.defaultProps = {
   allowExtraCredit: false,
   assessment: null,
   customRatings: [],
   onAssessmentChange: null,
   savedComments: [],
-  isSummary: false
+  isSummary: false,
+  hidePoints: false,
+  hasPointsColumn: true
 }

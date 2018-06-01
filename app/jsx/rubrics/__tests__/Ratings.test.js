@@ -160,4 +160,10 @@ describe('The Ratings component', () => {
     const rating = ratings.at(0)
     expect(rating.shallow().debug()).toMatchSnapshot()
   })
+
+  it('hides points on the default rating if points are hidden', () => {
+    const el = component({ points: 6, isSummary: true, footer: <div>ow my foot</div> })
+    const rating = el.find('Rating')
+    expect(rating.prop('hidePoints')).toBe(true)
+  })
 })

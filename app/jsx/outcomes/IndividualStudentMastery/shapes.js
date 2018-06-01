@@ -28,8 +28,10 @@ export const assignmentShape = PropTypes.shape({
 export const outcomeResultShape = PropTypes.shape({
   assignment: assignmentShape.isRequired,
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  score: PropTypes.number,
-  percent: PropTypes.number
+  score: PropTypes.number.isRequired,
+  percent: PropTypes.number,
+  hidden: PropTypes.bool,
+  hide_points: PropTypes.bool
 })
 
 export const ratingShape = PropTypes.shape({

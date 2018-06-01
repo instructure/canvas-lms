@@ -83,16 +83,39 @@ describe('the Rubric component', () => {
     expect(renderAssessing(onAssessmentChange.args[0][0]).debug()).toMatchSnapshot()
   })
 
-  it('does not have a points column in summary mode', () => {
-    const el = shallow(
-      <Rubric
-        rubric={rubric}
-        rubricAssessment={pointsAssessment}
-        rubricAssociation={pointsAssessment.rubric_association}
-        isSummary
-      />
-    )
+  describe('points column', () => {
+    const hasPointsColumn = (expected, { rubricProps = {}, assessmentProps = {}, associationProps = {}, ...otherProps }) => {
+      const el = shallow(
+        <Rubric
+          rubric={{...rubric, ...rubricProps}}
+          rubricAssessment={{...pointsAssessment, ...assessmentProps}}
+          rubricAssociation={{...pointsAssessment.association, ...associationProps}}
+          onAssessmentChange={() => {}}
+          {...otherProps}
+        />
+      )
+      expect(el.find('th')).toHaveLength(expected ? 3 : 2)
+      expect(el.find('Criterion').at(0).prop('hasPointsColumn')).toBe(expected)
+    }
 
-    expect(el.find('th')).toHaveLength(2)
+    it('does not have a points column in summary mode', () => {
+      hasPointsColumn(false, { isSummary: true })
+    })
+
+    it('has a points column if points visible', () => {
+      hasPointsColumn(true, {})
+    })
+
+    it('does not have a points column if points hidden and freeform', () => {
+      hasPointsColumn(false, { rubricProps: { free_form_criterion_comments: true }, associationProps: { hide_points: true }})
+    })
+
+    it('does not have a points column if points hidden and not assessing', () => {
+      hasPointsColumn(false, { associationProps: { hide_points: true }, onAssessmentChange: null })
+    })
+
+    it('does have a points column if points hidden, not freeform, and assessing', () => {
+      hasPointsColumn(true, { associationProps: { hide_points: true }})
+    })
   })
 })

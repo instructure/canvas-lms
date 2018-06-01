@@ -51,6 +51,9 @@ const Rubric = (props) => {
   const priorData = _.get(rubricAssessment, 'data', [])
   const byCriteria = _.keyBy(priorData, (ra) => ra.criterion_id)
   const allComments = _.get(rubricAssociation, 'summary_data.saved_comments', {})
+  const hidePoints = _.get(rubricAssociation, 'hide_points', false)
+  const freeForm = rubric.free_form_criterion_comments
+
   const onCriteriaChange = (id) => (update) => {
     const data = priorData.map((prior) => (
       prior.criterion_id === id ? { ...prior, ...update } : prior
@@ -61,6 +64,15 @@ const Rubric = (props) => {
       score: _.sum(data.map((result) => result.points !== null ? result.points : 0))
     })
   }
+
+  // we show the last column for points or comments button
+  const showPointsColumn = () => {
+    if (isSummary) { return false }
+    if (!hidePoints) { return true }
+    if (assessing && !freeForm) { return true } // comments button
+    return false
+  }
+
   const criteria = rubric.criteria.map((criterion) => {
     const assessment = byCriteria[criterion.id]
     return (
@@ -70,10 +82,12 @@ const Rubric = (props) => {
         assessment={assessment}
         criterion={criterion}
         customRatings={customRatings}
-        freeForm={rubric.free_form_criterion_comments}
+        freeForm={freeForm}
         isSummary={isSummary}
         onAssessmentChange={assessing ? onCriteriaChange(criterion.id) : undefined}
         savedComments={allComments[criterion.id]}
+        hidePoints={hidePoints}
+        hasPointsColumn={showPointsColumn()}
       />
     )
   })
@@ -81,8 +95,9 @@ const Rubric = (props) => {
   const possible = rubric.points_possible
   const points = _.get(rubricAssessment, 'score', possible)
   const total = assessing ? totalAssessingString(points, possible) : totalString(points)
-  const hideScore = _.get(rubricAssociation, 'hide_score_total') === true
+  const hideScoreTotal = _.get(rubricAssociation, 'hide_score_total') === true
   const noScore = _.get(rubricAssociation, 'score') === null
+  const showTotalPoints = !hidePoints && !hideScoreTotal
 
   return (
     <div className="react-rubric">
@@ -92,7 +107,7 @@ const Rubric = (props) => {
             <th scope="col">{I18n.t('Criteria')}</th>
             <th scope="col">{I18n.t('Ratings')}</th>
             {
-              isSummary ? null : (
+              showPointsColumn() && (
                 <th scope="col">{I18n.t('Pts')}</th>
               )
             }
@@ -100,15 +115,17 @@ const Rubric = (props) => {
         </thead>
         <tbody className="criterions">
           {criteria}
-          <tr>
-            <td colSpan="3">
-              <Flex justifyItems="end">
-                <FlexItem>
-                  {hideScore || noScore ? null : total}
-                </FlexItem>
-              </Flex>
-            </td>
-          </tr>
+          { showTotalPoints && (
+            <tr>
+              <td colSpan="3">
+                <Flex justifyItems="end">
+                  <FlexItem>
+                    {hideScoreTotal || noScore ? null : total}
+                  </FlexItem>
+                </Flex>
+              </td>
+            </tr>
+          )}
         </tbody>
       </Table>
     </div>
