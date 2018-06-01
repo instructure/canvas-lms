@@ -63,7 +63,7 @@
 
     var div = document.createElement("div");
     div.className = "grade-explained";
-    if(info["points_amount"] == 0 || info["points_amount"] == info["points_possible") {
+    if(info["points_amount"] == 0 || info["points_amount"] == info["points_possible"]) {
       // full credit
       div.innerHTML =
         "<span class=\"score\">" + prettyRound(info["points_possible"]) + " points</span>\n" +
