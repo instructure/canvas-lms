@@ -44,5 +44,25 @@ PactConfig::Consumers::ALL.each do |consumer|
         provider_param :course_id, @course.id.to_s
       end
     end
+
+    provider_state 'a user with a calendar event' do
+      set_up do
+        user_factory(name: 'Bob', active_user: true)
+        Pseudonym.create!(user: @user, unique_id: 'testuser@instructure.com')
+        token = @user.access_tokens.create!().full_token
+        @event = @user.calendar_events.create!
+      
+        provider_param :token, token
+        provider_param :event_id, @event.id.to_s
+      end
+    end
+
+    provider_state 'a user with many calendar events' do
+      set_up do
+        user_factory(name: 'Bob', active_user: true)
+        Pseudonym.create!(user: @user, unique_id: 'testuser@instructure.com')
+        token = @user.access_tokens.create!().full_token
+      end
+    end
   end
 end
