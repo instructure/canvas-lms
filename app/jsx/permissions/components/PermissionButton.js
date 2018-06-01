@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import {connect} from 'react-redux'
 
-import Button from '@instructure/ui-core/lib/components/Button'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import IconPublish from '@instructure/ui-icons/lib/Solid/IconPublish'
 import IconTrouble from '@instructure/ui-icons/lib/Line/IconTrouble'

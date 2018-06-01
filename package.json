@@ -17,6 +17,7 @@
     "@instructure/ui-menu": "^5",
     "@instructure/ui-overlays": "^5",
     "@instructure/ui-pagination": "^5",
+    "@instructure/ui-tabs": "^5",
     "@instructure/ui-themeable": "^5",
     "@instructure/ui-themes": "^5",
     "apollo-boost": "^0.1.4",
