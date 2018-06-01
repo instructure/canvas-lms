@@ -19,8 +19,16 @@ import $ from 'jquery'
 import I18n from 'i18n!permissions'
 import {createActions} from 'redux-actions'
 
+import * as apiClient from './apiClient'
+
+import {showFlashError, showFlashSuccess} from '../shared/FlashAlert'
+
 const types = [
   'DISPLAY_ADD_TRAY',
+  'ADD_TRAY_SAVING_START',
+  'ADD_TRAY_SAVING_SUCCESS',
+  'ADD_TRAY_SAVING_FAIL',
+  'ADD_NEW_ROLE',
   'DISPLAY_ROLE_TRAY',
   'GET_PERMISSIONS_START',
   'GET_PERMISSIONS_SUCCESS',
@@ -46,6 +54,26 @@ actions.searchPermissions = function searchPermissions({permissionSearchString, 
       {count: numDisplayedPermissions}
     )
     $.screenReaderFlashMessageExclusive(message)
+  }
+}
+
+actions.createNewRole = function(label, baseRole) {
+  return (dispatch, getState) => {
+    dispatch(actions.addTraySavingStart())
+    apiClient
+      .postNewRole(getState(), label, baseRole)
+      .then(res => {
+        const createdRole = res.data
+        dispatch(actions.addNewRole(createdRole))
+        dispatch(actions.addTraySavingSuccess())
+        dispatch(actions.hideAllTrays())
+        dispatch(actions.displayRoleTray({role: createdRole}))
+        showFlashSuccess(I18n.t('Successfully created new role'))()
+      })
+      .catch(error => {
+        dispatch(actions.addTraySavingFail())
+        showFlashError(I18n.t('Failed to create new role: Role already exists'))()
+      })
   }
 }
 

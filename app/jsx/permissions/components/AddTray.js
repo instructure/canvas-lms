@@ -31,62 +31,36 @@ import Text from '@instructure/ui-core/lib/components/Text'
 import Select from '@instructure/ui-core/lib/components/Select'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import Tray from '@instructure/ui-overlays/lib/components/Tray'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 
 import actions from '../actions'
-import RoleTrayTable from './RoleTrayTable'
-import RoleTrayTableRow from './RoleTrayTableRow'
 
-import {getPermissionsWithLabels, roleIsBaseRole} from '../helper/utils'
-
-const getCurrentPermissions = (displayedPermissions, role) => {
-  const permissions = getPermissionsWithLabels(displayedPermissions, role.permissions)
-  return {
-    assignedPermissions: permissions.filter(p => p.enabled),
-    unassignedPermissions: permissions.filter(p => !p.enabled)
-  }
-}
+import {roleIsBaseRole} from '../helper/utils'
 
 export default class AddTray extends Component {
   static propTypes = {
-    permissions: PropTypes.arrayOf(PropTypes.object).isRequired,
     allBaseRoles: PropTypes.arrayOf(PropTypes.object).isRequired,
     hideTray: PropTypes.func.isRequired,
-    open: PropTypes.bool.isRequired
+    createNewRole: PropTypes.func.isRequired,
+    open: PropTypes.bool.isRequired,
+    loading: PropTypes.bool.isRequired
   }
 
   constructor(props) {
     super(props)
-    // This is for the case when the tray is closed
-    const currentPermissions = props.allBaseRoles[0]
-      ? getCurrentPermissions(props.permissions, props.allBaseRoles[0])
-      : {
-          assignedPermissions: [],
-          unassignedPermissions: []
-        }
-
     this.state = {
       selectedRoleName: '',
-      selectedBaseType: this.props.allBaseRoles[0] || {label: ''},
-      assignedPermissions: currentPermissions.assignedPermissions,
-      unassignedPermissions: currentPermissions.unassignedPermissions
+      selectedBaseType: this.props.allBaseRoles[0] || {label: ''}
     }
   }
 
   componentWillReceiveProps(newProps) {
-    // This is for the case when the tray is closed
-    const currentPermissions = newProps.allBaseRoles[0]
-      ? getCurrentPermissions(newProps.permissions, newProps.allBaseRoles[0])
-      : {
-          assignedPermissions: [],
-          unassignedPermissions: []
-        }
-
-    this.setState({
-      selectedRoleName: '',
-      selectedBaseType: newProps.allBaseRoles[0] || {label: ''},
-      assignedPermissions: currentPermissions.assignedPermissions,
-      unassignedPermissions: currentPermissions.unassignedPermissions
-    })
+    if (!this.props.loading) {
+      this.setState({
+        selectedRoleName: '',
+        selectedBaseType: newProps.allBaseRoles[0] || {label: ''}
+      })
+    }
   }
 
   onChangeRoleName = event => {
@@ -95,11 +69,8 @@ export default class AddTray extends Component {
 
   onChangeBaseType = event => {
     const foundRole = this.props.allBaseRoles.find(element => element.label === event.target.value)
-    const permissions = getCurrentPermissions(this.props.permissions, foundRole)
     this.setState({
-      selectedBaseType: foundRole,
-      assignedPermissions: permissions.assignedPermissions,
-      unassignedPermissions: permissions.unassignedPermissions
+      selectedBaseType: foundRole
     })
   }
 
@@ -109,6 +80,11 @@ export default class AddTray extends Component {
       selectedBaseType: this.props.allBaseRoles[0] || {label: ''}
     })
     this.props.hideTray()
+  }
+
+  handleSaveButton = () => {
+    const newRole = this.state.selectedBaseType
+    this.props.createNewRole(this.state.selectedRoleName, newRole)
   }
 
   isDoneSelecting = () => !!this.state.selectedRoleName
@@ -133,26 +109,6 @@ export default class AddTray extends Component {
         </Container>
       </FlexItem>
     </Flex>
-  )
-
-  renderPermissions = () => (
-    <div>
-      {this.state.assignedPermissions.length !== 0 && (
-        <RoleTrayTable title="Assigned Permissions">
-          {this.state.assignedPermissions.map(perm => (
-            <RoleTrayTableRow title={perm.label} description="" expandable={false} />
-          ))}
-        </RoleTrayTable>
-      )}
-
-      {this.state.unassignedPermissions.length !== 0 && (
-        <RoleTrayTable title="Unassigned Permissions">
-          {this.state.unassignedPermissions.map(perm => (
-            <RoleTrayTableRow title={perm.label} description="" expandable={false} />
-          ))}
-        </RoleTrayTable>
-      )}
-    </div>
   )
 
   renderSelectRoleName = () => (
@@ -198,13 +154,21 @@ export default class AddTray extends Component {
             disabled={!this.isDoneSelecting()}
             type="submit"
             variant="primary"
-            onClick={this.submitSelection}
+            onClick={this.handleSaveButton}
             margin="0 x-small 0 0"
           >
             {I18n.t('Save')}
           </Button>
         </Container>
       </div>
+    )
+  }
+
+  renderLoadingIndicator() {
+    return (
+      <Container display="block" margin="auto">
+        <Spinner size="large" title={I18n.t('Saving New Role')} />
+      </Container>
     )
   }
 
@@ -218,23 +182,28 @@ export default class AddTray extends Component {
         placement="end"
       >
         {this.renderTrayHeader()}
-        <Container as="div" padding="small small x-large small">
-          {this.renderSelectRoleName()}
-          {this.renderSelectBaseRole()}
-          {this.renderPermissions()}
-        </Container>
-        {this.renderTrayFooter()}
+        {this.props.loading ? (
+          this.renderLoadingIndicator()
+        ) : (
+          <Container>
+            <Container as="div" padding="small small x-large small">
+              {this.renderSelectRoleName()}
+              {this.renderSelectBaseRole()}
+            </Container>
+            {this.renderTrayFooter()}
+          </Container>
+        )}
       </Tray>
     )
   }
 }
 
 function mapStateToProps(state, ownProps) {
-  if (!state.activeAddTray) {
+  if (state.activeAddTray && !state.activeAddTray.show) {
     const stateProps = {
       allBaseRoles: [],
       open: false,
-      permissions: []
+      loading: false
     }
     return {...stateProps, ...ownProps}
   }
@@ -249,12 +218,13 @@ function mapStateToProps(state, ownProps) {
   const stateProps = {
     allBaseRoles,
     open: true,
-    permissions: state.permissions
+    loading: state.activeAddTray && state.activeAddTray.loading
   }
   return {...ownProps, ...stateProps}
 }
 
 const mapDispatchToProps = {
+  createNewRole: actions.createNewRole,
   hideTray: actions.hideAllTrays
 }
 

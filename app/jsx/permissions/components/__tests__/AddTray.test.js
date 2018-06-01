@@ -188,52 +188,12 @@ test('renders the component', () => {
   expect(node.exists()).toBe(true)
 })
 
-it('renders unassigned permissions if any are present', () => {
+it('renders proper loading state for component', () => {
   const props = defaultProps()
-  props.permissions = [
-    {
-      permission_name: 'course_permission',
-      label: 'course_permission',
-      displayed: true
-    }
-  ]
-
+  props.loading = true
   const tree = shallow(<AddTray {...props} />)
-  const node = tree.find('RoleTrayTable')
+  const node = tree.find('Spinner')
   expect(node.exists()).toBeTruthy()
-  expect(node.props().title).toEqual('Unassigned Permissions')
-})
-
-it('renders assigned permissions if any are present', () => {
-  const props = defaultProps()
-  props.permissions = [
-    {permission_name: 'account_permission', label: 'account_permission', displayed: true}
-  ]
-
-  const tree = shallow(<AddTray {...props} />)
-  const node = tree.find('RoleTrayTable')
-  expect(node.exists()).toBeTruthy()
-  expect(node.props().title).toEqual('Assigned Permissions')
-})
-
-it('does not render assigned or unassigned permissions if none are present', () => {
-  const props = defaultProps()
-  props.permissions = []
-  const tree = shallow(<AddTray {...props} />)
-  const node = tree.find('RoleTrayTable')
-  expect(node.exists()).toBeFalsy()
-})
-
-it('role changes properly set permissions state', () => {
-  const props = defaultProps()
-  const tree = shallow(<AddTray {...props} />)
-  const inst = tree.instance()
-  inst.onChangeBaseType({
-    target: {
-      value: 'Teacher'
-    }
-  })
-  expect(tree.state().selectedBaseType.label).toEqual('Teacher')
 })
 
 it('onChangeRoleName changes role name properly', () => {

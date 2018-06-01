@@ -24,3 +24,14 @@ import axios from 'axios'
 // export function getPermissions (contextId) {
 //   return axios.get(`/api/v1/accounts/${contextId}/permissions`)
 // }
+
+export function postNewRole({contextId}, label, role) {
+  return axios.post(`/api/v1/accounts/${contextId}/roles`, {
+    label,
+    base_role_type: role.base_role_type
+  })
+}
+
+export function updateRole({contextId}, role) {
+  return axios.put(`/api/v1/accounts/${contextId}/roles/${role.id}`, role)
+}

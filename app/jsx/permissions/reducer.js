@@ -52,7 +52,7 @@ const roles = handleActions(
     [actionTypes.UPDATE_ROLE_FILTERS]: (state, action) => {
       const {selectedRoles, contextType} = action.payload
       const selectedRolesObject = selectedRoles.reduce((obj, role) => {
-        obj[role.id] = true  // eslint-disable-line
+        obj[role.id] = true // eslint-disable-line
         return obj
       }, {})
       return state.map(role => {
@@ -76,7 +76,8 @@ const roles = handleActions(
         p => (p.id === courseRoleId ? changePermission(p, permissionName, enabled, locked) : p)
       )
       return newState
-    }
+    },
+    [actionTypes.ADD_NEW_ROLE]: (state, action) => [...state, action.payload]
   },
   []
 )

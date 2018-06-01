@@ -128,15 +128,73 @@ it('HIDE_ALL_TRAYS sets the activeRoleTray in the store', () => {
 })
 
 it('DISPLAY_ADD_TRAY sets the activeAddTray in the store', () => {
-  const originalState = {activeAddTray: false}
+  const originalState = {
+    activeAddTray: {
+      show: false,
+      loading: false
+    }
+  }
   const newState = reduce(actions.displayAddTray(), originalState)
-  expect(newState.activeAddTray).toEqual(true)
+  expect(newState.activeAddTray).toEqual({
+    show: true,
+    loading: false
+  })
 })
 
 it('HIDE_ALL_TRAYS sets the activeAddTray to false in the store', () => {
-  const originalState = {activeAddTray: true}
+  const originalState = {
+    activeAddTray: {
+      show: true,
+      loading: false
+    }
+  }
   const newState = reduce(actions.hideAllTrays(), originalState)
-  expect(newState.activeAddTray).toBeFalsy()
+  expect(newState.activeAddTray).toEqual({
+    show: false,
+    loading: false
+  })
+})
+
+it('ADD_TRAY_SAVING_START sets the activeAddTray in the store', () => {
+  const originalState = {
+    activeAddTray: {
+      show: false,
+      loading: true
+    }
+  }
+  const newState = reduce(actions.addTraySavingStart(), originalState)
+  expect(newState.activeAddTray).toEqual({
+    show: false,
+    loading: true
+  })
+})
+
+it('ADD_TRAY_SAVING_SUCCESS sets the activeAddTray to false in the store', () => {
+  const originalState = {
+    activeAddTray: {
+      show: true,
+      loading: true
+    }
+  }
+  const newState = reduce(actions.addTraySavingSuccess(), originalState)
+  expect(newState.activeAddTray).toEqual({
+    show: true,
+    loading: false
+  })
+})
+
+it('ADD_TRAY_SAVING_FAIL sets the activeAddTray to false in the store', () => {
+  const originalState = {
+    activeAddTray: {
+      show: true,
+      loading: true
+    }
+  }
+  const newState = reduce(actions.addTraySavingFail(), originalState)
+  expect(newState.activeAddTray).toEqual({
+    show: true,
+    loading: false
+  })
 })
 
 it('UPDATE_PERMISSIONS sets enabled in the store', () => {
@@ -146,7 +204,10 @@ it('UPDATE_PERMISSIONS sets enabled in the store', () => {
   const payload = {courseRoleId: '1', permissionName: 'become_user', enabled: false, locked: true}
   const newState = reduce(actions.updatePermissions(payload), originalState)
   const expectedState = {
-    activeAddTray: null,
+    activeAddTray: {
+      show: false,
+      loading: false
+    },
     activeRoleTray: null,
     contextId: '',
     permissions: [],
@@ -162,7 +223,10 @@ it('UPDATE_PERMISSIONS sets locked in the store', () => {
   const payload = {courseRoleId: '1', permissionName: 'become_user', enabled: true, locked: false}
   const newState = reduce(actions.updatePermissions(payload), originalState)
   const expectedState = {
-    activeAddTray: null,
+    activeAddTray: {
+      show: false,
+      loading: false
+    },
     activeRoleTray: null,
     contextId: '',
     permissions: [],

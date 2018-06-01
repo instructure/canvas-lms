@@ -20,10 +20,16 @@ import {actionTypes} from '../actions'
 
 const activeAddTrayReducer = handleActions(
   {
-    [actionTypes.DISPLAY_ADD_TRAY]: () => true,
-    [actionTypes.HIDE_ALL_TRAYS]: () => false
+    [actionTypes.DISPLAY_ADD_TRAY]: state => ({...state, show: true}),
+    [actionTypes.HIDE_ALL_TRAYS]: state => ({...state, show: false}),
+    [actionTypes.ADD_TRAY_SAVING_START]: state => ({...state, loading: true}),
+    [actionTypes.ADD_TRAY_SAVING_SUCCESS]: state => ({...state, loading: false}),
+    [actionTypes.ADD_TRAY_SAVING_FAIL]: state => ({...state, loading: false})
   },
-  null
+  {
+    show: false,
+    loading: false
+  }
 )
 
 export default activeAddTrayReducer
