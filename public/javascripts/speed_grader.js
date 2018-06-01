@@ -874,6 +874,11 @@ function initRubricStuff(){
         data['final'] = '1';
       }
     }
+    if (isAnonymous) {
+      data[`rubric_assessment[${anonymizableUserId}]`] = data['rubric_assessment[user_id]'];
+      delete data['rubric_assessment[user_id]'];
+    }
+
     data['graded_anonymously'] = utils.shouldHideStudentNames();
     var url = $(".update_rubric_assessment_url").attr('href');
     var method = "POST";
@@ -2539,7 +2544,7 @@ EG = {
   setOrUpdateSubmission: function(submission){
 
     // find the student this submission belongs to and update their submission with this new one, if they dont have a submission, set this as their submission.
-    var student =  jsonData.studentMap[submission.user_id];
+    const student = jsonData.studentMap[submission[anonymizableUserId]];
     if (!student) return;
 
     student.submission = student.submission || {};

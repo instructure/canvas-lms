@@ -1150,7 +1150,116 @@ QUnit.module('SpeedGrader - clicking save rubric button', function(hooks) {
     $('.save_rubric_button').trigger('click');
     strictEqual(disableWhileLoadingStub.callCount, 1);
   });
+
+  test('sends the user ID in rubric_assessment[user_id] if the assignment is not anonymous', () => {
+    SpeedGrader.EG.domReady();
+    sinon.stub(window.rubricAssessment, 'assessmentData').returns({ 'rubric_assessment[user_id]': '1234' });
+    $('.save_rubric_button').trigger('click');
+
+    const [, , data] = $.ajaxJSON.lastCall.args;
+    strictEqual(data['rubric_assessment[user_id]'], '1234');
+    window.rubricAssessment.assessmentData.restore();
+  })
 });
+
+QUnit.module('SpeedGrader - clicking save rubric button for an anonymous assignment', (hooks) => {
+  let disableWhileLoadingStub
+
+  hooks.beforeEach(() => {
+    sinon.stub($, 'ajaxJSON');
+    disableWhileLoadingStub = sinon.stub($.fn, 'disableWhileLoading');
+    fakeENV.setup({
+      anonymous_moderated_marking_enabled: true,
+      assignment_id: '27',
+      course_id: '3',
+      help_url: '',
+      show_help_menu_item: false,
+      RUBRIC_ASSESSMENT: {},
+    });
+
+    sinon.stub(SpeedGrader.EG, 'handleFragmentChanged')
+    sinon.stub(window.rubricAssessment, 'assessmentData').returns({ 'rubric_assessment[user_id]': 'abcde' });
+
+    fixtures.innerHTML = `
+      <button class="save_rubric_button"></button>
+      <div id="speedgrader_comment_textarea_mount_point"></div>
+      <div id="speedgrader-settings"></div>
+    `
+    SpeedGrader.setup()
+    SpeedGrader.EG.currentStudent = {
+      id: 4,
+      name: 'P. Sextus Rubricius',
+      submission_state: 'not_graded',
+      submission: {
+        grading_period_id: 8,
+        score: 7,
+        grade: 70,
+        submission_comments: [],
+        submission_history: [{}]
+      }
+    };
+    window.jsonData = {
+      gradingPeriods: {},
+      id: 27,
+      GROUP_GRADING_MODE: false,
+      points_possible: 10,
+      anonymous_grading: true,
+      submissions: [],
+      context: {
+        students: [
+          {
+            id: 4,
+            name: 'P. Sextus Rubricius'
+          }
+        ],
+        enrollments: [
+          {
+            user_id: 4,
+            workflow_state: 'active',
+            course_section_id: 1
+          }
+        ],
+        active_course_sections: [1]
+      },
+      studentMap: {
+        4: SpeedGrader.EG.currentStudent
+      }
+    }
+    ENV.SUBMISSION = {
+      grading_role: 'teacher'
+    };
+    ENV.RUBRIC_ASSESSMENT = {
+      assessment_type: 'grading',
+      assessor_id: 1
+    };
+
+    SpeedGrader.EG.jsonReady();
+  })
+
+  hooks.afterEach(() => {
+    window.rubricAssessment.assessmentData.restore();
+    SpeedGrader.EG.handleFragmentChanged.restore();
+
+    fixtures.innerHTML = ''
+    fakeENV.teardown();
+    disableWhileLoadingStub.restore();
+    $.ajaxJSON.restore();
+  })
+
+  test('sends the anonymous submission ID in rubric_assessment[anonymous_id] if the assignment is anonymous', () => {
+    $('.save_rubric_button').trigger('click');
+
+    const [, , data] = $.ajaxJSON.lastCall.args;
+    strictEqual(data['rubric_assessment[anonymous_id]'], 'abcde');
+  })
+
+  test('omits rubric_assessment[user_id] if the assignment is anonymous', () => {
+    $('.save_rubric_button').trigger('click');
+
+    const [, , data] = $.ajaxJSON.lastCall.args;
+    notOk('rubric_assessment[user_id]' in data)
+  })
+})
 
 QUnit.module('SpeedGrader - no gateway timeout', {
   setup () {
