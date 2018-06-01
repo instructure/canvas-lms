@@ -2093,6 +2093,7 @@ describe "Users API", type: :request do
   describe 'POST pandata_token' do
     let(:fake_secrets){
       {
+        "pandata-url" => "https://example.com/pandata",
         "ios-pandata-key" => "IOS_pandata_key",
         "ios-pandata-secret" => "teamrocketblastoffatthespeedoflight",
         "android-pandata-key" => "ANDROID_pandata_key",
@@ -2111,6 +2112,7 @@ describe "Users API", type: :request do
           { controller: 'users', action: 'pandata_token', format:'json', id: @user.to_param },
           { app_key: 'IOS_pandata_key'}
       )
+      expect(json['url']).to be_present
       expect(json['auth_token']).to be_present
       expect(json['props_token']).to be_present
       expect(json['expires_at']).to be_present

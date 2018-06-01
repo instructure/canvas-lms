@@ -2266,6 +2266,7 @@ class UsersController < ApplicationController
     auth_token = Canvas::Security.create_jwt(auth_body, expires_at, sekrit)
     props_token = Canvas::Security.create_jwt(props_body, nil, sekrit)
     render json: {
+      url: settings["pandata-url"],
       auth_token: auth_token,
       props_token: props_token,
       expires_at: expires_at.to_f * 1000
