@@ -38,7 +38,8 @@ class ApiScopeMarkdownWriter
   private
 
   def header
-    "Api Token Scopes\n==========================\n".freeze
+    "Api Token Scopes\n==========================\n"\
+    "<h3 class='beta'>BETA: This API resource is not finalized, and there could be breaking changes before its final release.</h3>".freeze
   end
 
   def intro
