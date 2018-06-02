@@ -18,7 +18,7 @@
 
 module Api::V1::Context
 
-  def context_data(obj)
+  def context_data(obj, use_effective_code: false)
     if obj.respond_to?(:context_type) && obj.context_type.present?
       context_type = obj.context_type
       id = obj.context_id
@@ -29,6 +29,9 @@ module Api::V1::Context
       id = obj.context.id
     else
       return {}
+    end
+    if obj.try(:effective_context_code) && use_effective_code
+      context_type, _, id = obj.effective_context_code.rpartition('_')
     end
     {
       'context_type' => context_type.camelcase,

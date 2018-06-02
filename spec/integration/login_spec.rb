@@ -244,7 +244,7 @@ describe 'login' do
 
   context "SAML" do
     before do
-      skip("requires SAML extension") unless AccountAuthorizationConfig::SAML.enabled?
+      skip("requires SAML extension") unless AuthenticationProvider::SAML.enabled?
     end
 
     it 'redirects to the discovery page when hitting a deep link while unauthenticated' do

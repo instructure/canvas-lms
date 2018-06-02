@@ -50,7 +50,7 @@ const SCC_QUERY = gql`
           view_all_grades: viewAllGrades
           view_analytics: viewAnalytics
         }
-        usersConnection(userIds: [$studentId]) {
+        usersConnection(filter: {userIds: [$studentId], enrollmentStates: [invited, creation_pending, active, completed, inactive]}) {
           edges {
             node {
               _id

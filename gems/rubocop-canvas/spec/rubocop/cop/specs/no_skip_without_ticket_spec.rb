@@ -43,4 +43,16 @@ describe RuboCop::Cop::Specs::NoSkipWithoutTicket do
     })
     expect(cop.offenses.size).to eq(0)
   end
+
+  it 'allows conditional skipping without a ticket' do
+    inspect_source(%{
+      describe "date stuff" do
+        it 'should do date stuff' do
+          skip("redis required") unless Canvas.redis_eanbled?
+          next_year = 1.year.from_now
+        end
+      end
+    })
+    expect(cop.offenses.size).to eq(0)
+  end
 end

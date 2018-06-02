@@ -206,6 +206,16 @@ describe AccountsController do
       expect(assigns[:associated_courses_count]).to eq 1
     end
 
+    it "should redirect for admins without course read rights when course_user_search is enabled" do
+      Account.default.enable_feature!(:course_user_search)
+      account_admin_user_with_role_changes(:role_changes => {:read_course_list => false, :read_roster => false} )
+      user_session(@admin)
+
+      get 'show', params: {:id => Account.default.id}, :format => 'html'
+
+      expect(response).to redirect_to(account_settings_url(Account.default))
+    end
+
     describe "check crosslisting" do
       before :once do
         @root_account = Account.create!

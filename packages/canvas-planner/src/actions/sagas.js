@@ -16,15 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import axios from 'axios';
+import parseLinkHeader from 'parse-link-header';
 import { put, select, call, all, takeEvery } from 'redux-saga/effects';
 import { getFirstLoadedMoment, getLastLoadedMoment } from '../utilities/dateUtils';
+import { transformApiToInternalGrade } from '../utilities/apiUtils';
 
 import {
-  gotItemsError, sendFetchRequest,
+  gotItemsError, sendFetchRequest, gotGradesSuccess, gotGradesError,
 } from './loading-actions';
 
 import {
-  mergeFutureItems, mergePastItems, mergePastItemsForNewActivity
+  mergeFutureItems, mergePastItems, mergePastItemsForNewActivity, mergePastItemsForToday
 } from './saga-actions';
 
 
@@ -38,6 +41,8 @@ function* watchForSagas () {
   yield takeEvery('START_LOADING_PAST_SAGA', loadPastSaga);
   yield takeEvery('START_LOADING_FUTURE_SAGA', loadFutureSaga);
   yield takeEvery('START_LOADING_PAST_UNTIL_NEW_ACTIVITY_SAGA', loadPastUntilNewActivitySaga);
+  yield takeEvery('START_LOADING_GRADES_SAGA', loadGradesSaga);
+  yield takeEvery('START_LOADING_PAST_UNTIL_TODAY_SAGA', loadPastUntilTodaySaga);
 }
 
 // fromMomentFunction: function
@@ -81,6 +86,39 @@ export function* loadFutureSaga () {
 
 export function* loadPastUntilNewActivitySaga () {
   yield* loadingLoop(fromMomentPast, mergePastItemsForNewActivity, {intoThePast: true});
+}
+
+export function* loadGradesSaga () {
+  const loadingOptions = {
+    params: {
+      include: ['total_scores', 'current_grading_period_scores'],
+      enrollment_type: 'student',
+      enrollment_state: 'active',
+    },
+  };
+  try {
+    // exhaust pagination because we really do need all the grades.
+    let loadingUrl = '/api/v1/users/self/courses';
+    let gradesData = {};
+    while (loadingUrl != null) {
+      const response = yield call(axios.get, loadingUrl, loadingOptions);
+      response.data.forEach(apiData => {
+        const internalGrade = transformApiToInternalGrade(apiData);
+        gradesData[internalGrade.courseId] = internalGrade;
+      });
+
+      const links = parseLinkHeader(response.headers.link);
+      loadingUrl = links && links.next ? links.next.url : null;
+    }
+    yield put(gotGradesSuccess(gradesData));
+  } catch (loadingError) {
+    yield put(gotGradesError(loadingError));
+    throw loadingError;
+  }
+}
+
+export function* loadPastUntilTodaySaga () {
+  yield* loadingLoop(fromMomentPast, mergePastItemsForToday, {intoThePast: true});
 }
 
 function fromMomentPast (state) {

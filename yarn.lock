@@ -88,70 +88,54 @@
     normalize-path "^2.0.1"
     through2 "^2.0.3"
 
-"@instructure/ui-a11y@^5.1.1":
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-a11y/-/ui-a11y-5.1.1.tgz#70fe7c1a9e886b2b3e95f8a8b335c8e21dc47728"
+"@instructure/ui-a11y@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-a11y/-/ui-a11y-5.7.0.tgz#1f1f35c4004114b752f052f13a394e69a37f9c25"
   dependencies:
-    "@instructure/ui-container" "^5.1.1"
-    "@instructure/ui-themeable" "^5.1.1"
-    "@instructure/ui-utils" "^5.1.1"
+    "@instructure/ui-layout" "^5.7.0"
+    "@instructure/ui-themeable" "^5.7.0"
+    "@instructure/ui-utils" "^5.7.0"
     keycode "^2.1.8"
     prop-types "^15.5.10"
 
-"@instructure/ui-alerts@^5.0.1":
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-alerts/-/ui-alerts-5.1.1.tgz#84ca8fcb8338f7f080b9f6a0ccfe8dd395c4e767"
+"@instructure/ui-alerts@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-alerts/-/ui-alerts-5.7.0.tgz#4c797f5c145d48ead1a661c75aaba10c233df076"
   dependencies:
-    "@instructure/ui-a11y" "^5.1.1"
-    "@instructure/ui-buttons" "^5.1.1"
-    "@instructure/ui-container" "^5.1.1"
-    "@instructure/ui-icons" "^5.1.1"
-    "@instructure/ui-motion" "^5.1.1"
-    "@instructure/ui-themeable" "^5.1.1"
-    "@instructure/ui-utils" "^5.1.1"
+    "@instructure/ui-a11y" "^5.7.0"
+    "@instructure/ui-buttons" "^5.7.0"
+    "@instructure/ui-icons" "^5.7.0"
+    "@instructure/ui-layout" "^5.7.0"
+    "@instructure/ui-motion" "^5.7.0"
+    "@instructure/ui-themeable" "^5.7.0"
+    "@instructure/ui-utils" "^5.7.0"
     classnames "^2.2.5"
     keycode "^2.1.8"
     prop-types "^15.5.10"
 
-"@instructure/ui-buttons@^5.0.1", "@instructure/ui-buttons@^5.1.1":
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-buttons/-/ui-buttons-5.1.1.tgz#efc94360368c963cf755fc33f1fd1a6cb1eafd81"
+"@instructure/ui-buttons@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-buttons/-/ui-buttons-5.7.0.tgz#6a44aa70e894c9b8aa107e615c74de580d369b49"
   dependencies:
-    "@instructure/ui-a11y" "^5.1.1"
-    "@instructure/ui-container" "^5.1.1"
-    "@instructure/ui-icons" "^5.1.1"
-    "@instructure/ui-themeable" "^5.1.1"
-    "@instructure/ui-utils" "^5.1.1"
+    "@instructure/ui-a11y" "^5.7.0"
+    "@instructure/ui-icons" "^5.7.0"
+    "@instructure/ui-layout" "^5.7.0"
+    "@instructure/ui-themeable" "^5.7.0"
+    "@instructure/ui-utils" "^5.7.0"
     classnames "^2.2.5"
     keycode "^2.1.8"
     prop-types "^15.5.10"
 
-"@instructure/ui-container@^5.1.1":
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-container/-/ui-container-5.1.1.tgz#3633d505efa56c6f2969350fec64965339421620"
+"@instructure/ui-container@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-container/-/ui-container-5.7.0.tgz#6fc4b92c6c671013c53b67b82c990e05ae1b874d"
   dependencies:
-    "@instructure/ui-themeable" "^5.1.1"
-    "@instructure/ui-utils" "^5.1.1"
+    "@instructure/ui-themeable" "^5.7.0"
+    "@instructure/ui-utils" "^5.7.0"
     classnames "^2.2.5"
     prop-types "^15.5.10"
 
-"@instructure/ui-core@^4.1.0", "@instructure/ui-core@^4.7.3":
-  version "4.7.3"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-core/-/ui-core-4.7.3.tgz#849b85ccce71a22556cc43754d31ab4344de31a5"
-  dependencies:
-    "@instructure/ui-themeable" "^4.7.3"
-    "@instructure/ui-utils" "^4.7.3"
-    bowser "^1.7.0"
-    classnames "^2.2.5"
-    decimal.js "^7.2.1"
-    deep-equal "^1.0.1"
-    instructure-icons "^4.3.1"
-    keycode "^2.1.8"
-    no-scroll "^2.1.0"
-    numeral "^2.0.6"
-    prop-types "^15.5.10"
-
-"@instructure/ui-core@^4.8.0":
+"@instructure/ui-core@^4.1.0", "@instructure/ui-core@^4.7.3", "@instructure/ui-core@^4.8.0":
   version "4.8.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-core/-/ui-core-4.8.0.tgz#fb32698507f52fd77bb471c199018c1e8671d57b"
   dependencies:
@@ -167,118 +151,122 @@
     numeral "^2.0.6"
     prop-types "^15.5.10"
 
-"@instructure/ui-elements@^5.1.1":
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-elements/-/ui-elements-5.1.1.tgz#99cd20d4c2be5fdb8ccd6e9e4322ab440a7abc89"
+"@instructure/ui-elements@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-elements/-/ui-elements-5.7.0.tgz#49d2afb3dea31b938b1803ab8631b897ad7817c0"
   dependencies:
-    "@instructure/ui-a11y" "^5.1.1"
-    "@instructure/ui-container" "^5.1.1"
-    "@instructure/ui-icons" "^5.1.1"
-    "@instructure/ui-layout" "^5.1.1"
-    "@instructure/ui-motion" "^5.1.1"
-    "@instructure/ui-themeable" "^5.1.1"
-    "@instructure/ui-utils" "^5.1.1"
+    "@instructure/ui-a11y" "^5.7.0"
+    "@instructure/ui-container" "^5.7.0"
+    "@instructure/ui-icons" "^5.7.0"
+    "@instructure/ui-layout" "^5.7.0"
+    "@instructure/ui-motion" "^5.7.0"
+    "@instructure/ui-themeable" "^5.7.0"
+    "@instructure/ui-utils" "^5.7.0"
     classnames "^2.2.5"
     prop-types "^15.5.10"
 
-"@instructure/ui-i18n@^5.1.1":
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-i18n/-/ui-i18n-5.1.1.tgz#4064580d354b9c05e7253becbec68ffda8ae5d7b"
+"@instructure/ui-forms@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-forms/-/ui-forms-5.7.0.tgz#0acf21dc0077f477188699560a6d2320ff330d9b"
   dependencies:
-    "@instructure/ui-utils" "^5.1.1"
+    "@instructure/ui-a11y" "^5.7.0"
+    "@instructure/ui-buttons" "^5.7.0"
+    "@instructure/ui-elements" "^5.7.0"
+    "@instructure/ui-i18n" "^5.7.0"
+    "@instructure/ui-icons" "^5.7.0"
+    "@instructure/ui-layout" "^5.7.0"
+    "@instructure/ui-overlays" "^5.7.0"
+    "@instructure/ui-themeable" "^5.7.0"
+    "@instructure/ui-utils" "^5.7.0"
+    classnames "^2.2.5"
+    deep-equal "^1.0.1"
+    keycode "^2.1.8"
+    prop-types "^15.6.0"
+
+"@instructure/ui-i18n@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-i18n/-/ui-i18n-5.7.0.tgz#a750a6e2add2aa584144a97d3fb5672f8b479b81"
+  dependencies:
+    "@instructure/ui-utils" "^5.7.0"
     decimal.js "^9.0.1"
-    moment "^2.10.6"
     moment-timezone "^0.5.14"
     prop-types "^15.5.10"
 
-"@instructure/ui-icons@^5.1.1":
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-icons/-/ui-icons-5.1.1.tgz#9a0509a9edc864374888a468c0dc287968434808"
+"@instructure/ui-icons@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-icons/-/ui-icons-5.7.0.tgz#a7706dfba2e65186be055c8e4e2aaa4dc03df216"
   dependencies:
-    "@instructure/ui-svg-images" "^5.1.1"
+    "@instructure/ui-svg-images" "^5.7.0"
     prop-types "^15.5.10"
 
-"@instructure/ui-layout@^5.1.1":
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-layout/-/ui-layout-5.1.1.tgz#1aaba624a4af33b25747e9278c15bfaa7397df7c"
+"@instructure/ui-layout@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-layout/-/ui-layout-5.7.0.tgz#0d89c46435857a4bda8d134107d1c3ab6ccdff74"
   dependencies:
-    "@instructure/ui-a11y" "^5.1.1"
-    "@instructure/ui-container" "^5.1.1"
-    "@instructure/ui-motion" "^5.1.1"
-    "@instructure/ui-portal" "^5.1.1"
-    "@instructure/ui-themeable" "^5.1.1"
-    "@instructure/ui-utils" "^5.1.1"
+    "@instructure/ui-i18n" "^5.7.0"
+    "@instructure/ui-motion" "^5.7.0"
+    "@instructure/ui-portal" "^5.7.0"
+    "@instructure/ui-themeable" "^5.7.0"
+    "@instructure/ui-utils" "^5.7.0"
     classnames "^2.2.5"
     prop-types "^15.5.10"
 
-"@instructure/ui-menu@^5.0.1":
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-menu/-/ui-menu-5.1.1.tgz#6ce41ba75c8d8a54fc9914d28bfd531913700af8"
+"@instructure/ui-menu@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-menu/-/ui-menu-5.7.0.tgz#8d183c82e6ea5eb0edc6de60086d0580c8e4593c"
   dependencies:
-    "@instructure/ui-a11y" "^5.1.1"
-    "@instructure/ui-elements" "^5.1.1"
-    "@instructure/ui-icons" "^5.1.1"
-    "@instructure/ui-layout" "^5.1.1"
-    "@instructure/ui-overlays" "^5.1.1"
-    "@instructure/ui-themeable" "^5.1.1"
-    "@instructure/ui-utils" "^5.1.1"
+    "@instructure/ui-a11y" "^5.7.0"
+    "@instructure/ui-elements" "^5.7.0"
+    "@instructure/ui-icons" "^5.7.0"
+    "@instructure/ui-layout" "^5.7.0"
+    "@instructure/ui-overlays" "^5.7.0"
+    "@instructure/ui-themeable" "^5.7.0"
+    "@instructure/ui-utils" "^5.7.0"
     classnames "^2.2.5"
     keycode "^2.1.8"
     prop-types "^15.5.10"
 
-"@instructure/ui-motion@^5.1.1":
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-motion/-/ui-motion-5.1.1.tgz#28bbf9473b6cec8de1feb17b5c7f4fa730bb6726"
+"@instructure/ui-motion@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-motion/-/ui-motion-5.7.0.tgz#2dec87cce75fb3b6a1a1030619c8a1b18d9e7a14"
   dependencies:
-    "@instructure/ui-themeable" "^5.1.1"
-    "@instructure/ui-utils" "^5.1.1"
+    "@instructure/ui-themeable" "^5.7.0"
+    "@instructure/ui-utils" "^5.7.0"
     prop-types "^15.5.10"
 
-"@instructure/ui-overlays@^5.0.1", "@instructure/ui-overlays@^5.1.1":
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-overlays/-/ui-overlays-5.1.1.tgz#1a07bebdad48ff0cd51991428fa9a4a3ff53fc38"
+"@instructure/ui-overlays@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-overlays/-/ui-overlays-5.7.0.tgz#a54c628d9e720e942b0821ca05bc7ac32053ac0d"
   dependencies:
-    "@instructure/ui-a11y" "^5.1.1"
-    "@instructure/ui-buttons" "^5.1.1"
-    "@instructure/ui-container" "^5.1.1"
-    "@instructure/ui-elements" "^5.1.1"
-    "@instructure/ui-i18n" "^5.1.1"
-    "@instructure/ui-layout" "^5.1.1"
-    "@instructure/ui-motion" "^5.1.1"
-    "@instructure/ui-portal" "^5.1.1"
-    "@instructure/ui-themeable" "^5.1.1"
-    "@instructure/ui-utils" "^5.1.1"
+    "@instructure/ui-a11y" "^5.7.0"
+    "@instructure/ui-buttons" "^5.7.0"
+    "@instructure/ui-elements" "^5.7.0"
+    "@instructure/ui-i18n" "^5.7.0"
+    "@instructure/ui-layout" "^5.7.0"
+    "@instructure/ui-motion" "^5.7.0"
+    "@instructure/ui-portal" "^5.7.0"
+    "@instructure/ui-themeable" "^5.7.0"
+    "@instructure/ui-utils" "^5.7.0"
     classnames "^2.2.5"
     keycode "^2.1.8"
     no-scroll "^2.1.0"
     prop-types "^15.5.10"
 
-"@instructure/ui-portal@^5.1.1":
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-portal/-/ui-portal-5.1.1.tgz#cab82ba8b133de92fe5b5646319a605385c516a5"
+"@instructure/ui-portal@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-portal/-/ui-portal-5.7.0.tgz#30852032897d32d9e3f484e432532af1b5ec3246"
   dependencies:
-    "@instructure/ui-utils" "^5.1.1"
+    "@instructure/ui-utils" "^5.7.0"
     prop-types "^15.5.10"
 
-"@instructure/ui-svg-images@^5.1.1":
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-svg-images/-/ui-svg-images-5.1.1.tgz#f23e0ba9a644f7a950f8798a0c2601a61fd7ec1f"
+"@instructure/ui-svg-images@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-svg-images/-/ui-svg-images-5.7.0.tgz#1769281fdc2911e7e63626d6c5734792b4b53e80"
   dependencies:
-    "@instructure/ui-themeable" "^5.1.1"
-    "@instructure/ui-utils" "^5.1.1"
+    "@instructure/ui-themeable" "^5.7.0"
+    "@instructure/ui-utils" "^5.7.0"
     classnames "^2.2.5"
     prop-types "^15.5.10"
-
-"@instructure/ui-themeable@^4.7.3":
-  version "4.7.3"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-themeable/-/ui-themeable-4.7.3.tgz#d1732d54b0f64213cf521bb2875a4a28a015c69e"
-  dependencies:
-    "@instructure/ui-utils" "^4.7.3"
-    bowser "^1.7.0"
-    deep-equal "^1.0.1"
-    glamor "^2.20.37"
-    prop-types "^15.5.10"
-    tinycolor2 "^1.4.1"
 
 "@instructure/ui-themeable@^4.8.0":
   version "4.8.0"
@@ -291,51 +279,34 @@
     prop-types "^15.5.10"
     tinycolor2 "^1.4.1"
 
-"@instructure/ui-themeable@^5.1.1":
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-themeable/-/ui-themeable-5.1.1.tgz#296d377975e32bcbec5813d4bb962e8334a4ac0b"
+"@instructure/ui-themeable@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-themeable/-/ui-themeable-5.7.0.tgz#e91988a7d5c3df37b6bae5e4b105a392333baca7"
   dependencies:
-    "@instructure/ui-utils" "^5.1.1"
+    "@instructure/ui-utils" "^5.7.0"
     glamor "^2.20.37"
     prop-types "^15.5.10"
     tinycolor2 "^1.4.1"
 
 "@instructure/ui-themes@^4.1.0", "@instructure/ui-themes@^4.7.3":
-  version "4.7.3"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-themes/-/ui-themes-4.7.3.tgz#dca8c846bcaa47909755431577db1792ad4f9db3"
-
-"@instructure/ui-themes@^4.8.0":
   version "4.8.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-themes/-/ui-themes-4.8.0.tgz#37bf837e6497a2e75c75a1029318f993d0672579"
 
-"@instructure/ui-toggle-details@^5.0.0":
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-toggle-details/-/ui-toggle-details-5.1.1.tgz#5ce32619b14d5848b30846d82bb1b925a9b0b271"
+"@instructure/ui-themes@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-themes/-/ui-themes-5.7.0.tgz#843c7da02903451765cd3aab4435a7a277bd3d72"
+
+"@instructure/ui-toggle-details@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-toggle-details/-/ui-toggle-details-5.7.0.tgz#f8bc58c83a91c193c0095db556880ffa55970b13"
   dependencies:
-    "@instructure/ui-buttons" "^5.1.1"
-    "@instructure/ui-elements" "^5.1.1"
-    "@instructure/ui-icons" "^5.1.1"
-    "@instructure/ui-themeable" "^5.1.1"
-    "@instructure/ui-utils" "^5.1.1"
+    "@instructure/ui-buttons" "^5.7.0"
+    "@instructure/ui-elements" "^5.7.0"
+    "@instructure/ui-icons" "^5.7.0"
+    "@instructure/ui-themeable" "^5.7.0"
+    "@instructure/ui-utils" "^5.7.0"
     classnames "^2.2.5"
     prop-types "^15.5.10"
-
-"@instructure/ui-utils@^4.7.3":
-  version "4.7.3"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-utils/-/ui-utils-4.7.3.tgz#0484572d6d4203dde9158b495f276a73fd4a187b"
-  dependencies:
-    bowser "^1.7.0"
-    decimal.js "^7.2.1"
-    deep-equal "^1.0.1"
-    keycode "^2.1.8"
-    moment "^2.10.6"
-    moment-timezone "^0.5.14"
-    no-scroll "^2.1.0"
-    numeral "^2.0.6"
-    object.omit "^3.0.0"
-    object.pick "^1.2.0"
-    prop-types "^15.5.10"
-    shortid "^2.2.8"
 
 "@instructure/ui-utils@^4.8.0":
   version "4.8.0"
@@ -354,14 +325,15 @@
     prop-types "^15.5.10"
     shortid "^2.2.8"
 
-"@instructure/ui-utils@^5.1.1":
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-utils/-/ui-utils-5.1.1.tgz#74f778b0c89d88386d12b969074d61bcc4b01453"
+"@instructure/ui-utils@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-utils/-/ui-utils-5.7.0.tgz#b1804990ded8fdfb1d66a0d069f17627bec4ba5b"
   dependencies:
     bowser "^1.9.1"
     decimal.js "^9.0.1"
     deep-equal "^1.0.1"
     keycode "^2.1.8"
+    moment-timezone "^0.5.14"
     nanoid "^1.0.2"
     no-scroll "^2.1.0"
     numeral "^2.0.6"
@@ -699,7 +671,7 @@ append-transform@^0.4.0:
   dependencies:
     default-require-extensions "^1.0.0"
 
-aproba@^1.0.3:
+aproba@^1.0.3, aproba@^1.1.1:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/aproba/-/aproba-1.2.0.tgz#6802e6264efd18c790a1b0d517f0f2627bf2c94a"
 
@@ -1858,6 +1830,10 @@ big.js@^3.1.3:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/big.js/-/big.js-3.2.0.tgz#a5fc298b81b9e0dca2e458824784b65c52ba588e"
 
+big.js@^5.0.3:
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/big.js/-/big.js-5.0.3.tgz#9679fb0a3599a7d3df397f855e89c4dba016960e"
+
 binary-extensions@^1.0.0:
   version "1.11.0"
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-1.11.0.tgz#46aa1751fb6a2f93ee5e689bb1087d4b14c6c205"
@@ -1888,7 +1864,7 @@ bloody-offset@0.0.0:
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/bloody-offset/-/bloody-offset-0.0.0.tgz#ce9b898ac526c0aa39f02f02567fc0993069d629"
 
-bluebird@^3.3.0, bluebird@^3.4.6, bluebird@^3.4.7, bluebird@^3.5.0:
+bluebird@^3.3.0, bluebird@^3.4.6, bluebird@^3.4.7, bluebird@^3.5.0, bluebird@^3.5.1:
   version "3.5.1"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.5.1.tgz#d9551f9de98f1fcda1e683d17ee91a0602ee2eb9"
 
@@ -2213,6 +2189,24 @@ bytes@3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/bytes/-/bytes-3.0.0.tgz#d32815404d689699f85a4ea4fa8755dd13a96048"
 
+cacache@^10.0.4:
+  version "10.0.4"
+  resolved "https://registry.yarnpkg.com/cacache/-/cacache-10.0.4.tgz#6452367999eff9d4188aefd9a14e9d7c6a263460"
+  dependencies:
+    bluebird "^3.5.1"
+    chownr "^1.0.1"
+    glob "^7.1.2"
+    graceful-fs "^4.1.11"
+    lru-cache "^4.1.1"
+    mississippi "^2.0.0"
+    mkdirp "^0.5.1"
+    move-concurrently "^1.0.1"
+    promise-inflight "^1.0.1"
+    rimraf "^2.6.2"
+    ssri "^5.2.4"
+    unique-filename "^1.1.0"
+    y18n "^4.0.0"
+
 cache-base@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/cache-base/-/cache-base-1.0.1.tgz#0a7f46416831c8b662ee36fe4e7c59d76f666ab2"
@@ -2307,8 +2301,12 @@ caniuse-lite@^1.0.30000792, caniuse-lite@^1.0.30000805, caniuse-lite@^1.0.300008
 "canvas-planner@file:./packages/canvas-planner/copy-of-what-gets-published-to-npm-registry":
   version "1.0.16"
   dependencies:
+    "@instructure/ui-a11y" "^5.7.0"
+    "@instructure/ui-container" "^5.7.0"
     "@instructure/ui-core" "^4.8.0"
-    "@instructure/ui-toggle-details" "^5.0.0"
+    "@instructure/ui-forms" "^5.7.0"
+    "@instructure/ui-themeable" "^5.7.0"
+    "@instructure/ui-toggle-details" "^5.7.0"
     axios "^0.16.0"
     babel-plugin-inline-react-svg "^0.4.0"
     change-case "^3.0.1"
@@ -2320,7 +2318,6 @@ caniuse-lite@^1.0.30000792, caniuse-lite@^1.0.30000805, caniuse-lite@^1.0.300008
     instructure-icons "^4.3.0"
     keycode "^2.1.9"
     lodash "^4"
-    moment "~2.10.6"
     moment-timezone "^0.5.13"
     parse-link-header "^1.0.1"
     prop-types "^15.5.9"
@@ -2336,20 +2333,17 @@ caniuse-lite@^1.0.30000792, caniuse-lite@^1.0.30000805, caniuse-lite@^1.0.300008
     redux-thunk "^2.2.0"
     velocity-animate "^1.5.0"
 
-canvas-rce@3.1.0-hotfix.2:
-  version "3.1.0-hotfix.2"
-  resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-3.1.0-hotfix.2.tgz#fac485d84fd1458b2338f09fb9fa08cc2a443e12"
+"canvas-rce@file:./packages/canvas-rce/canvas":
+  version "3.1.1"
   dependencies:
     "@instructure/ui-core" "^4.1.0"
     "@instructure/ui-themes" "^4.1.0"
     aphrodite "^1.1.0"
     bloody-offset "0.0.0"
-    escape-html "1.0.3"
     format-message "^5.1.0"
     format-message-generate-id "^5.1.0"
     instructure-icons "3 || 4"
     isomorphic-fetch "2.2.1"
-    load-css "0.1.0"
     react "^0.14.8 || ^15.0.0"
     react-dom "^0.14.8 || ^15.0.0"
     react-redux "~4.4.5"
@@ -2533,6 +2527,10 @@ chokidar@^2.0.2:
     upath "^1.0.0"
   optionalDependencies:
     fsevents "^1.0.0"
+
+chownr@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/chownr/-/chownr-1.0.1.tgz#e2a75042a9551908bebd25b8523d5f9769d79181"
 
 ci-info@^1.0.0:
   version "1.1.2"
@@ -2816,13 +2814,13 @@ commander@^2.11.0, commander@^2.5.0, commander@^2.9.0:
   version "2.15.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.15.0.tgz#ad2a23a1c3b036e392469b8012cec6b33b4c1322"
 
-commander@~2.12.1:
-  version "2.12.2"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-2.12.2.tgz#0f5946c427ed9ec0d91a46bb9def53e54650e555"
-
 commander@~2.13.0:
   version "2.13.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.13.0.tgz#6964bca67685df7c1f1430c584f07d7597885b9c"
+
+commander@~2.15.0:
+  version "2.15.1"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-2.15.1.tgz#df46e867d0fc2aec66a34662b406a9ccafff5b0f"
 
 commander@~2.2.0:
   version "2.2.0"
@@ -2880,7 +2878,7 @@ concat-map@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
 
-concat-stream@^1.4.7, concat-stream@^1.6.0:
+concat-stream@^1.4.7, concat-stream@^1.5.0, concat-stream@^1.6.0:
   version "1.6.2"
   resolved "https://registry.yarnpkg.com/concat-stream/-/concat-stream-1.6.2.tgz#904bdf194cd3122fc675c77fc4ac3d4ff0fd1a34"
   dependencies:
@@ -2963,6 +2961,17 @@ convert-source-map@~1.1.0:
 cookie@0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.3.1.tgz#e7e0a1f9ef43b4c8ba925c5c5a96e806d16873bb"
+
+copy-concurrently@^1.0.0:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/copy-concurrently/-/copy-concurrently-1.0.5.tgz#92297398cae34937fcafd6ec8139c18051f0b5e0"
+  dependencies:
+    aproba "^1.1.1"
+    fs-write-stream-atomic "^1.0.8"
+    iferr "^0.1.5"
+    mkdirp "^0.5.1"
+    rimraf "^2.5.4"
+    run-queue "^1.0.0"
 
 copy-descriptor@^0.1.0:
   version "0.1.1"
@@ -3219,6 +3228,10 @@ custom-event@~1.0.0:
 cycle@1.0.x:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/cycle/-/cycle-1.0.3.tgz#21e80b2be8580f98b468f379430662b046c34ad2"
+
+cyclist@~0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/cyclist/-/cyclist-0.2.2.tgz#1b33792e11e914a2fd6d6ed6447464444e5fa640"
 
 d3@3.5.17:
   version "3.5.17"
@@ -3598,6 +3611,15 @@ duplexer2@^0.1.2, duplexer2@~0.1.0, duplexer2@~0.1.2:
   dependencies:
     readable-stream "^2.0.2"
 
+duplexify@^3.4.2, duplexify@^3.5.3:
+  version "3.5.4"
+  resolved "https://registry.yarnpkg.com/duplexify/-/duplexify-3.5.4.tgz#4bb46c1796eabebeec4ca9a2e66b808cb7a3d8b4"
+  dependencies:
+    end-of-stream "^1.0.0"
+    inherits "^2.0.1"
+    readable-stream "^2.0.0"
+    stream-shift "^1.0.0"
+
 ecc-jsbn@~0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/ecc-jsbn/-/ecc-jsbn-0.1.1.tgz#0fc73a9ed5f0d53c38193398523ef7e543777505"
@@ -3649,6 +3671,12 @@ encoding@^0.1.11:
   resolved "https://registry.yarnpkg.com/encoding/-/encoding-0.1.12.tgz#538b66f3ee62cd1ab51ec323829d1f9480c74beb"
   dependencies:
     iconv-lite "~0.4.13"
+
+end-of-stream@^1.0.0, end-of-stream@^1.1.0:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/end-of-stream/-/end-of-stream-1.4.1.tgz#ed29634d19baba463b6ce6b80a37213eab71ec43"
+  dependencies:
+    once "^1.4.0"
 
 end-of-stream@~0.1.5:
   version "0.1.5"
@@ -3828,7 +3856,7 @@ es6-weak-map@^2.0.1, es6-weak-map@^2.0.2:
     es6-iterator "^2.0.1"
     es6-symbol "^3.1.1"
 
-escape-html@1.0.3, escape-html@~1.0.3:
+escape-html@~1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/escape-html/-/escape-html-1.0.3.tgz#0258eae4d3d0c0974de1c169188ef0051d1d1988"
 
@@ -3926,6 +3954,13 @@ eslint-plugin-notice@^0.6:
     find-root "^1.1.0"
     lodash ">=2.4.0"
     metric-lcs "^0.1.2"
+
+eslint-plugin-prettier@^2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-prettier/-/eslint-plugin-prettier-2.6.0.tgz#33e4e228bdb06142d03c560ce04ec23f6c767dd7"
+  dependencies:
+    fast-diff "^1.1.1"
+    jest-docblock "^21.0.0"
 
 eslint-plugin-promise@^3:
   version "3.7.0"
@@ -4265,6 +4300,10 @@ fast-deep-equal@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/fast-deep-equal/-/fast-deep-equal-1.1.0.tgz#c053477817c86b51daa853c81e059b733d023614"
 
+fast-diff@^1.1.1:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/fast-diff/-/fast-diff-1.1.2.tgz#4b62c42b8e03de3f848460b639079920695d0154"
+
 fast-json-stable-stringify@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/fast-json-stable-stringify/-/fast-json-stable-stringify-2.0.0.tgz#d5142c0caee6b1189f87d3a76111064f86c8bbf2"
@@ -4462,6 +4501,13 @@ flatten@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/flatten/-/flatten-1.0.2.tgz#dae46a9d78fbe25292258cc1e780a41d95c03782"
 
+flush-write-stream@^1.0.0:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/flush-write-stream/-/flush-write-stream-1.0.3.tgz#c5d586ef38af6097650b49bc41b55fabb19f35bd"
+  dependencies:
+    inherits "^2.0.1"
+    readable-stream "^2.0.4"
+
 flux-standard-action@^0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/flux-standard-action/-/flux-standard-action-0.6.1.tgz#6f34211b94834ea1c3cc30f4e7afad3d0fbf71a2"
@@ -4591,6 +4637,13 @@ fragment-cache@^0.2.1:
   dependencies:
     map-cache "^0.2.2"
 
+from2@^2.1.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/from2/-/from2-2.3.0.tgz#8bfb5502bde4a4d36cfdeea007fcca21d7e382af"
+  dependencies:
+    inherits "^2.0.1"
+    readable-stream "^2.0.0"
+
 fs-access@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/fs-access/-/fs-access-1.0.1.tgz#d6a87f262271cefebec30c553407fb995da8777a"
@@ -4636,6 +4689,15 @@ fs-extra@~0.18.4:
 fs-readdir-recursive@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/fs-readdir-recursive/-/fs-readdir-recursive-1.1.0.tgz#e32fc030a2ccee44a6b5371308da54be0b397d27"
+
+fs-write-stream-atomic@^1.0.8:
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/fs-write-stream-atomic/-/fs-write-stream-atomic-1.0.10.tgz#b47df53493ef911df75731e70a9ded0189db40c9"
+  dependencies:
+    graceful-fs "^4.1.2"
+    iferr "^0.1.5"
+    imurmurhash "^0.1.4"
+    readable-stream "1 || 2"
 
 fs.realpath@^1.0.0:
   version "1.0.0"
@@ -5615,6 +5677,10 @@ ieee754@^1.1.4:
   version "1.1.8"
   resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.1.8.tgz#be33d40ac10ef1926701f6f08a2d86fbfd1ad3e4"
 
+iferr@^0.1.5:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/iferr/-/iferr-0.1.5.tgz#c60eed69e6d8fdb6b3104a1fcbca1c192dc5b501"
+
 ignore@^3.3.3, ignore@^3.3.5:
   version "3.3.7"
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-3.3.7.tgz#612289bfb3c220e186a58118618d5be8c1bab021"
@@ -6344,6 +6410,10 @@ jest-diff@^22.4.0:
     jest-get-type "^22.1.0"
     pretty-format "^22.4.0"
 
+jest-docblock@^21.0.0:
+  version "21.2.0"
+  resolved "https://registry.yarnpkg.com/jest-docblock/-/jest-docblock-21.2.0.tgz#51529c3b30d5fd159da60c27ceedc195faf8d414"
+
 jest-docblock@^22.4.0:
   version "22.4.0"
   resolved "https://registry.yarnpkg.com/jest-docblock/-/jest-docblock-22.4.0.tgz#dbf1877e2550070cfc4d9b07a55775a0483159b8"
@@ -6945,10 +7015,6 @@ liftoff@^2.1.0:
     rechoir "^0.6.2"
     resolve "^1.1.7"
 
-load-css@0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/load-css/-/load-css-0.1.0.tgz#82b8e7329ed1779bedb55ea172ed81625243e774"
-
 load-json-file@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/load-json-file/-/load-json-file-1.1.0.tgz#956905708d58b4bab4c2261b04f59f31c99374c0"
@@ -7327,7 +7393,7 @@ lru-cache@2:
   version "2.7.3"
   resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-2.7.3.tgz#6d4524e8b955f95d4f5b58851ce21dd72fb4e952"
 
-lru-cache@4.1.x, lru-cache@^4.0.1:
+lru-cache@4.1.x, lru-cache@^4.0.1, lru-cache@^4.1.1:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-4.1.2.tgz#45234b2e6e2f2b33da125624c4664929a0224c3f"
   dependencies:
@@ -7672,6 +7738,21 @@ minimist@~0.0.1:
   version "0.0.10"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-0.0.10.tgz#de3f98543dbf96082be48ad1a0c7cda836301dcf"
 
+mississippi@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/mississippi/-/mississippi-2.0.0.tgz#3442a508fafc28500486feea99409676e4ee5a6f"
+  dependencies:
+    concat-stream "^1.5.0"
+    duplexify "^3.4.2"
+    end-of-stream "^1.1.0"
+    flush-write-stream "^1.0.0"
+    from2 "^2.1.0"
+    parallel-transform "^1.1.0"
+    pump "^2.0.1"
+    pumpify "^1.3.3"
+    stream-each "^1.1.0"
+    through2 "^2.0.0"
+
 mixin-deep@^1.2.0:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/mixin-deep/-/mixin-deep-1.3.1.tgz#a49e7268dce1a0d9698e45326c5626df3543d0fe"
@@ -7714,14 +7795,25 @@ module-deps@^4.0.8:
     xtend "^4.0.0"
 
 moment-timezone@^0.5.13, moment-timezone@^0.5.14:
-  version "0.5.14"
-  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.14.tgz#4eb38ff9538b80108ba467a458f3ed4268ccfcb1"
+  version "0.5.16"
+  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.16.tgz#661717d5f55b4d2c2e002262d726c83785192a5a"
   dependencies:
     moment ">= 2.9.0"
 
-"moment@>= 2.9.0", moment@>=1.6.0, moment@>=2.5.0, moment@^2.10.6, moment@~2.10.6:
+moment@2.10.6, "moment@>= 2.9.0", moment@>=1.6.0, moment@>=2.5.0, moment@^2.10.6, moment@~2.10.6:
   version "2.10.6"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.10.6.tgz#6cb21967c79cba7b0ca5e66644f173662b3efa77"
+
+move-concurrently@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/move-concurrently/-/move-concurrently-1.0.1.tgz#be2c005fda32e0b29af1f05d7c4b33214c701f92"
+  dependencies:
+    aproba "^1.1.1"
+    copy-concurrently "^1.0.0"
+    fs-write-stream-atomic "^1.0.8"
+    mkdirp "^0.5.1"
+    rimraf "^2.5.4"
+    run-queue "^1.0.3"
 
 moxios@^0.4:
   version "0.4.0"
@@ -8022,6 +8114,10 @@ normalize-range@^0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/normalize-range/-/normalize-range-0.1.2.tgz#2d10c06bdfd312ea9777695a4d28439456b75942"
 
+normalize-scroll-left@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/normalize-scroll-left/-/normalize-scroll-left-0.1.2.tgz#6b79691ba79eb5fb107fa5edfbdc06b55caee2aa"
+
 normalize-selector@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/normalize-selector/-/normalize-selector-0.2.0.tgz#d0b145eb691189c63a78d201dc4fdb1293ef0c03"
@@ -8209,7 +8305,7 @@ on-finished@~2.3.0:
   dependencies:
     ee-first "1.1.1"
 
-once@^1.3.0, once@^1.3.3, once@^1.4.0:
+once@^1.3.0, once@^1.3.1, once@^1.3.3, once@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/once/-/once-1.4.0.tgz#583b1aa775961d4b113ac17d9c50baef9dd76bd1"
   dependencies:
@@ -8365,6 +8461,14 @@ page@visionmedia/page.js#1.6.4:
 pako@~1.0.5:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/pako/-/pako-1.0.6.tgz#0101211baa70c4bca4a0f63f2206e97b7dfaf258"
+
+parallel-transform@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/parallel-transform/-/parallel-transform-1.1.0.tgz#d410f065b05da23081fcd10f28854c29bda33b06"
+  dependencies:
+    cyclist "~0.2.2"
+    inherits "^2.0.3"
+    readable-stream "^2.1.5"
 
 param-case@^2.1.0:
   version "2.1.1"
@@ -9023,6 +9127,10 @@ progress@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/progress/-/progress-2.0.0.tgz#8a1be366bf8fc23db2bd23f10c6fe920b4389d1f"
 
+promise-inflight@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/promise-inflight/-/promise-inflight-1.0.1.tgz#98472870bf228132fcbdd868129bad12c3c029e3"
+
 promise@^7.0.3, promise@^7.1.1:
   version "7.3.1"
   resolved "https://registry.yarnpkg.com/promise/-/promise-7.3.1.tgz#064b72602b18f90f29192b8b1bc418ffd1ebd3bf"
@@ -9067,6 +9175,21 @@ public-encrypt@^4.0.0:
     create-hash "^1.1.0"
     parse-asn1 "^5.0.0"
     randombytes "^2.0.1"
+
+pump@^2.0.0, pump@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/pump/-/pump-2.0.1.tgz#12399add6e4cf7526d973cbc8b5ce2e2908b3909"
+  dependencies:
+    end-of-stream "^1.1.0"
+    once "^1.3.1"
+
+pumpify@^1.3.3:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/pumpify/-/pumpify-1.4.0.tgz#80b7c5df7e24153d03f0e7ac8a05a5d068bd07fb"
+  dependencies:
+    duplexify "^3.5.3"
+    inherits "^2.0.3"
+    pump "^2.0.0"
 
 punycode@1.3.2:
   version "1.3.2"
@@ -9395,6 +9518,18 @@ read-pkg@^3.0.0:
     normalize-package-data "^2.3.2"
     path-type "^3.0.0"
 
+"readable-stream@1 || 2", readable-stream@2, readable-stream@^2.0.0, readable-stream@^2.0.1, readable-stream@^2.0.2, readable-stream@^2.0.4, readable-stream@^2.0.6, readable-stream@^2.1.4, readable-stream@^2.1.5, readable-stream@^2.2.2, readable-stream@^2.3.0, readable-stream@^2.3.3, readable-stream@^2.3.5:
+  version "2.3.6"
+  resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-2.3.6.tgz#b11c27d88b8ff1fbe070643cf94b0c79ae1b0aaf"
+  dependencies:
+    core-util-is "~1.0.0"
+    inherits "~2.0.3"
+    isarray "~1.0.0"
+    process-nextick-args "~2.0.0"
+    safe-buffer "~5.1.1"
+    string_decoder "~1.1.1"
+    util-deprecate "~1.0.1"
+
 readable-stream@1.1.x, "readable-stream@1.x >=1.1.9", readable-stream@^1.0.26-2, readable-stream@^1.0.26-4, readable-stream@~1.1.9:
   version "1.1.14"
   resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-1.1.14.tgz#7cf4c54ef648e3813084c636dd2079e166c081d9"
@@ -9403,18 +9538,6 @@ readable-stream@1.1.x, "readable-stream@1.x >=1.1.9", readable-stream@^1.0.26-2,
     inherits "~2.0.1"
     isarray "0.0.1"
     string_decoder "~0.10.x"
-
-readable-stream@2, readable-stream@^2.0.1, readable-stream@^2.0.2, readable-stream@^2.0.6, readable-stream@^2.1.4, readable-stream@^2.1.5, readable-stream@^2.2.2, readable-stream@^2.3.0, readable-stream@^2.3.3, readable-stream@^2.3.5:
-  version "2.3.5"
-  resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-2.3.5.tgz#b4f85003a938cbb6ecbce2a124fb1012bd1a838d"
-  dependencies:
-    core-util-is "~1.0.0"
-    inherits "~2.0.3"
-    isarray "~1.0.0"
-    process-nextick-args "~2.0.0"
-    safe-buffer "~5.1.1"
-    string_decoder "~1.0.3"
-    util-deprecate "~1.0.1"
 
 "readable-stream@>=1.0.33-1 <1.1.0-0", readable-stream@~1.0.17:
   version "1.0.34"
@@ -9978,7 +10101,7 @@ right-align@^0.1.1:
   dependencies:
     align-text "^0.1.1"
 
-rimraf@2, rimraf@^2.2.8, rimraf@^2.5.1, rimraf@^2.5.4, rimraf@^2.6.0, rimraf@^2.6.1:
+rimraf@2, rimraf@^2.2.8, rimraf@^2.5.1, rimraf@^2.5.4, rimraf@^2.6.0, rimraf@^2.6.1, rimraf@^2.6.2:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-2.6.2.tgz#2ed8150d24a16ea8651e6d6ef0f47c4158ce7a36"
   dependencies:
@@ -10004,6 +10127,12 @@ run-async@^2.2.0:
   resolved "https://registry.yarnpkg.com/run-async/-/run-async-2.3.0.tgz#0371ab4ae0bdd720d4166d7dfda64ff7a445a6c0"
   dependencies:
     is-promise "^2.1.0"
+
+run-queue@^1.0.0, run-queue@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/run-queue/-/run-queue-1.0.3.tgz#e848396f057d223f24386924618e25694161ec47"
+  dependencies:
+    aproba "^1.1.1"
 
 rx-lite-aggregates@^4.0.8:
   version "4.0.8"
@@ -10130,6 +10259,10 @@ sequencify@~0.0.7:
 serialize-error@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/serialize-error/-/serialize-error-2.1.0.tgz#50b679d5635cdf84667bdc8e59af4e5b81d5f60a"
+
+serialize-javascript@^1.4.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/serialize-javascript/-/serialize-javascript-1.5.0.tgz#1aa336162c88a890ddad5384baebc93a655161fe"
 
 set-blocking@^2.0.0, set-blocking@~2.0.0:
   version "2.0.0"
@@ -10528,6 +10661,12 @@ sshpk@^1.7.0:
     jsbn "~0.1.0"
     tweetnacl "~0.14.0"
 
+ssri@^5.2.4:
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/ssri/-/ssri-5.3.0.tgz#ba3872c9c6d33a0704a7d71ff045e5ec48999d06"
+  dependencies:
+    safe-buffer "^5.1.1"
+
 stack-trace@0.0.x:
   version "0.0.10"
   resolved "https://registry.yarnpkg.com/stack-trace/-/stack-trace-0.0.10.tgz#547c70b347e8d32b4e108ea1a2a159e5fdde19c0"
@@ -10583,6 +10722,13 @@ stream-consume@~0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/stream-consume/-/stream-consume-0.1.1.tgz#d3bdb598c2bd0ae82b8cac7ac50b1107a7996c48"
 
+stream-each@^1.1.0:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/stream-each/-/stream-each-1.2.2.tgz#8e8c463f91da8991778765873fe4d960d8f616bd"
+  dependencies:
+    end-of-stream "^1.1.0"
+    stream-shift "^1.0.0"
+
 stream-http@^2.0.0, stream-http@^2.7.2:
   version "2.8.0"
   resolved "https://registry.yarnpkg.com/stream-http/-/stream-http-2.8.0.tgz#fd86546dac9b1c91aff8fc5d287b98fafb41bc10"
@@ -10592,6 +10738,10 @@ stream-http@^2.0.0, stream-http@^2.7.2:
     readable-stream "^2.3.3"
     to-arraybuffer "^1.0.0"
     xtend "^4.0.0"
+
+stream-shift@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/stream-shift/-/stream-shift-1.0.0.tgz#d5c752825e5367e786f78e18e445ea223a155952"
 
 stream-splicer@^2.0.0:
   version "2.0.0"
@@ -10651,15 +10801,21 @@ string-width@^2.0.0, string-width@^2.1.0, string-width@^2.1.1:
     is-fullwidth-code-point "^2.0.0"
     strip-ansi "^4.0.0"
 
-string_decoder@^1.0.0, string_decoder@~1.0.0, string_decoder@~1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/string_decoder/-/string_decoder-1.0.3.tgz#0fc67d7c141825de94282dd536bec6b9bce860ab"
+string_decoder@^1.0.0, string_decoder@~1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/string_decoder/-/string_decoder-1.1.1.tgz#9cf1611ba62685d7030ae9e4ba34149c3af03fc8"
   dependencies:
     safe-buffer "~5.1.0"
 
 string_decoder@~0.10.x:
   version "0.10.31"
   resolved "https://registry.yarnpkg.com/string_decoder/-/string_decoder-0.10.31.tgz#62e203bc41766c6c28c9fc84301dab1c5310fa94"
+
+string_decoder@~1.0.0:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/string_decoder/-/string_decoder-1.0.3.tgz#0fc67d7c141825de94282dd536bec6b9bce860ab"
+  dependencies:
+    safe-buffer "~5.1.0"
 
 stringify-entities@^1.0.1:
   version "1.3.1"
@@ -11077,17 +11233,17 @@ title-case@^2.1.0:
     no-case "^2.2.0"
     upper-case "^1.0.3"
 
-tmp@0.0.29, tmp@^0.0.29:
-  version "0.0.29"
-  resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.0.29.tgz#f25125ff0dd9da3ccb0c2dd371ee1288bb9128c0"
-  dependencies:
-    os-tmpdir "~1.0.1"
-
 tmp@0.0.33, tmp@0.0.x, tmp@^0.0.33:
   version "0.0.33"
   resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.0.33.tgz#6d34335889768d21b2bcda0aa277ced3b1bfadf9"
   dependencies:
     os-tmpdir "~1.0.2"
+
+tmp@^0.0.29:
+  version "0.0.29"
+  resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.0.29.tgz#f25125ff0dd9da3ccb0c2dd371ee1288bb9128c0"
+  dependencies:
+    os-tmpdir "~1.0.1"
 
 tmpl@1.0.x:
   version "1.0.4"
@@ -11232,7 +11388,7 @@ ua-parser-js@^0.7.9:
   version "0.7.17"
   resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-0.7.17.tgz#e9ec5f9498b9ec910e7ae3ac626a805c4d09ecac"
 
-uglify-es@^3.0.26:
+uglify-es@^3.3.4:
   version "3.3.9"
   resolved "https://registry.yarnpkg.com/uglify-es/-/uglify-es-3.3.9.tgz#0c1c4f0700bed8dbc124cdb304d2592ca203e677"
   dependencies:
@@ -11248,11 +11404,11 @@ uglify-js@^2.6, uglify-js@^2.8.29:
   optionalDependencies:
     uglify-to-browserify "~1.0.0"
 
-uglify-js@^3.0.21, uglify-js@^3.0.5:
-  version "3.3.4"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.3.4.tgz#d8ebb76f201a3798ac2f0b6519642fcca4a99834"
+uglify-js@^3.0.5:
+  version "3.3.23"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.3.23.tgz#48ea43e638364d18be292a6fdc2b5b7c35f239ab"
   dependencies:
-    commander "~2.12.1"
+    commander "~2.15.0"
     source-map "~0.6.1"
 
 uglify-js@~2.3:
@@ -11274,6 +11430,19 @@ uglifyjs-webpack-plugin@^0.4.6:
     source-map "^0.5.6"
     uglify-js "^2.8.29"
     webpack-sources "^1.0.1"
+
+uglifyjs-webpack-plugin@^1.2:
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/uglifyjs-webpack-plugin/-/uglifyjs-webpack-plugin-1.2.5.tgz#2ef8387c8f1a903ec5e44fa36f9f3cbdcea67641"
+  dependencies:
+    cacache "^10.0.4"
+    find-cache-dir "^1.0.0"
+    schema-utils "^0.4.5"
+    serialize-javascript "^1.4.0"
+    source-map "^0.6.1"
+    uglify-es "^3.3.4"
+    webpack-sources "^1.1.0"
+    worker-farm "^1.5.2"
 
 uid-number@^0.0.6:
   version "0.0.6"
@@ -11336,6 +11505,18 @@ uniqid@^4.0.0:
 uniqs@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/uniqs/-/uniqs-2.0.0.tgz#ffede4b36b25290696e6e165d4a59edb998e6b02"
+
+unique-filename@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/unique-filename/-/unique-filename-1.1.0.tgz#d05f2fe4032560871f30e93cbe735eea201514f3"
+  dependencies:
+    unique-slug "^2.0.0"
+
+unique-slug@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/unique-slug/-/unique-slug-2.0.0.tgz#db6676e7c7cc0629878ff196097c78855ae9f4ab"
+  dependencies:
+    imurmurhash "^0.1.4"
 
 unique-stream@^1.0.0:
   version "1.0.0"
@@ -11594,8 +11775,8 @@ watch@~0.18.0:
     minimist "^1.2.0"
 
 watchpack@^1.4.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/watchpack/-/watchpack-1.5.0.tgz#231e783af830a22f8966f65c4c4bacc814072eed"
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/watchpack/-/watchpack-1.6.0.tgz#4bc12c2ebe8aa277a71f1d3f14d685c7b446cd00"
   dependencies:
     chokidar "^2.0.2"
     graceful-fs "^4.1.2"
@@ -11634,20 +11815,7 @@ webpack-manifest-plugin@^1:
     fs-extra "^0.30.0"
     lodash ">=3.5 <5"
 
-webpack-parallel-uglify-plugin@^1:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/webpack-parallel-uglify-plugin/-/webpack-parallel-uglify-plugin-1.0.2.tgz#f0213872f870d50063c717c7bcff6374a4aa9068"
-  dependencies:
-    glob "^7.0.5"
-    mkdirp "^0.5.1"
-    pify "^3.0.0"
-    tmp "0.0.29"
-    uglify-es "^3.0.26"
-    uglify-js "^3.0.21"
-    webpack-sources "^1.0.0"
-    worker-farm "^1.3.1"
-
-webpack-sources@^1.0.0, webpack-sources@^1.0.1:
+webpack-sources@^1.0.1, webpack-sources@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/webpack-sources/-/webpack-sources-1.1.0.tgz#a101ebae59d6507354d71d8013950a3a8b7a5a54"
   dependencies:
@@ -11762,7 +11930,7 @@ wordwrap@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/wordwrap/-/wordwrap-1.0.0.tgz#27584810891456a4171c8d0226441ade90cbcaeb"
 
-worker-farm@^1.3.1:
+worker-farm@^1.5.2:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/worker-farm/-/worker-farm-1.6.0.tgz#aecc405976fab5a95526180846f0dba288f3a4a0"
   dependencies:
@@ -11879,6 +12047,10 @@ xxhashjs@^0.2.1:
 y18n@^3.2.0, y18n@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/y18n/-/y18n-3.2.1.tgz#6d15fba884c08679c0d77e88e7759e811e07fa41"
+
+y18n@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/y18n/-/y18n-4.0.0.tgz#95ef94f85ecc81d007c264e190a120f0a3c8566b"
 
 yallist@^2.1.2:
   version "2.1.2"

@@ -19,7 +19,7 @@ import React, { Component } from 'react';
 import themeable from '@instructure/ui-themeable/lib';
 import {animatable} from '../../dynamic-ui';
 import {specialFallbackFocusId} from '../../dynamic-ui/util';
-import scopeTab from '@instructure/ui-utils/lib/dom/scopeTab';
+import scopeTab from '@instructure/ui-a11y/lib/utils/scopeTab';
 import keycode from 'keycode';
 
 import Opportunity from '../Opportunity';
@@ -123,11 +123,13 @@ export class Opportunities extends Component {
             title={formatMessage('Close opportunities popover')}
             ref={(btnRef) =>{this.closeButton = btnRef;}}
             onClick={this.props.togglePopover}
-            >
-            <IconXLine className={styles.closeButtonIcon} />
-            <span className={styles.closeButtonText}>
-              {formatMessage('Close')}
-            </span>
+          >
+            <div className={styles.closeButtonContainer}>
+              <span className={styles.closeButtonText}>
+                {formatMessage('Close')}
+              </span>
+              <IconXLine className={styles.closeButtonIcon} />
+            </div>
           </Button>
         </div>
         <ol className={styles.list}>

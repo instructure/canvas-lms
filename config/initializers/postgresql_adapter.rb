@@ -156,7 +156,11 @@ module PostgreSQLAdapterExtensions
       desc_order_columns = inddef.scan(/(\w+) DESC/).flatten
       orders = desc_order_columns.any? ? Hash[desc_order_columns.map {|order_column| [order_column, :desc]}] : {}
 
-      ActiveRecord::ConnectionAdapters::IndexDefinition.new(table_name, index_name, unique, column_names, [], orders)
+      if CANVAS_RAILS5_1
+        ActiveRecord::ConnectionAdapters::IndexDefinition.new(table_name, index_name, unique, column_names, [], orders)
+      else
+        ActiveRecord::ConnectionAdapters::IndexDefinition.new(table_name, index_name, unique, column_names, orders: orders)
+      end
     end
   end
 
@@ -195,10 +199,6 @@ module PostgreSQLAdapterExtensions
 
   def extension_available?(extension)
     select_value("SELECT 1 FROM pg_available_extensions WHERE name='#{extension}'").to_i == 1
-  end
-
-  def set_search_path_on_function(function, args = "()", search_path = Shard.current.name)
-    execute("ALTER FUNCTION #{quote_table_name(function)}#{args} SET search_path TO #{search_path}")
   end
 
   # temporarily adds schema to the search_path (i.e. so you can use an extension that won't work

@@ -21,17 +21,27 @@
       </metadata>
       <playback>
         <format>
+          <type>statistics</type>
+          <url>https://bbb.blah.com/instructure/0225ccf234655ae60658ccac1e272d48781b491c-1511812307014/statistics/</url>
+          <length/>
+        </format>
+        <format>
           <type>presentation</type>
-          <url>http://bbb.blah.com/mock/playback/0225ccf234655ae60658ccac1e272d48781b491c-1511812307014</url>
+          <url>https://bbb.blah.com/instructure/0225ccf234655ae60658ccac1e272d48781b491c-1511812307014/presentation/</url>
           <processingTime>9922</processingTime>
           <length>0</length>
           <preview>
             <images>
-              <image alt="Welcome to" height="136" width="176">http://bbb.blah.com/mock/playback/0225ccf234655ae60658ccac1e272d48781b491c-1511812307014/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1511812307214/thumbnails/thumb-1.png</image>
-              <image alt="(this slide left blank for use as a whiteboard)" height="136" width="176">http://bbb.blah.com/mock/playback/0225ccf234655ae60658ccac1e272d48781b491c-1511812307014/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1511812307214/thumbnails/thumb-2.png</image>
-              <image alt="(this slide left blank for use as a whiteboard)" height="136" width="176">http://bbb.blah.com/mock/playback/0225ccf234655ae60658ccac1e272d48781b491c-1511812307014/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1511812307214/thumbnails/thumb-3.png</image>
+              <image alt="Welcome to" height="136" width="176">https://bbb.blah.com/instructure/0225ccf234655ae60658ccac1e272d48781b491c-1511812307014/presentation/thumbnails/thumb-1.png</image>
+              <image alt="(this slide left blank for use as a whiteboard)" height="136" width="176">https://bbb.blah.com/instructure/0225ccf234655ae60658ccac1e272d48781b491c-1511812307014/presentation/thumbnails/thumb-2.png</image>
+              <image alt="(this slide left blank for use as a whiteboard)" height="136" width="176">https://bbb.blah.com/instructure/0225ccf234655ae60658ccac1e272d48781b491c-1511812307014/presentation/thumbnails/thumb-3.png</image>
             </images>
           </preview>
+        </format>
+        <format>
+          <type>video</type>
+          <url>https://bbb.blah.com/instructure/0225ccf234655ae60658ccac1e272d48781b491c-1511812307014/capture/</url>
+          <length>0</length>
         </format>
       </playback>
     </recording>

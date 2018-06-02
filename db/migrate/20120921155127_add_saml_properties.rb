@@ -21,21 +21,14 @@ class AddSamlProperties < ActiveRecord::Migration[4.2]
   def self.up
     add_column :account_authorization_configs, :idp_entity_id, :string
     add_column :account_authorization_configs, :position, :integer
-    if connection.adapter_name =~ /postgres/i
-      update <<-SQL
-        UPDATE #{AccountAuthorizationConfig.quoted_table_name} aac
-        SET position =
-          CASE WHEN (SELECT count(*) FROM #{AccountAuthorizationConfig.quoted_table_name} WHERE account_id = aac.account_id) > 1
-            THEN aac.id
-            ELSE 1
-          END;
-      SQL
-    else
-      update <<-SQL
-        UPDATE #{AccountAuthorizationConfig.quoted_table_name}
-        SET position = account_authorization_configs.id;
-      SQL
-    end
+    update <<-SQL
+      UPDATE #{connection.quote_table_name('account_authorization_configs')} aac
+      SET position =
+        CASE WHEN (SELECT count(*) FROM #{connection.quote_table_name('account_authorization_configs')} WHERE account_id = aac.account_id) > 1
+          THEN aac.id
+          ELSE 1
+        END;
+    SQL
   end
 
   def self.down

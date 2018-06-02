@@ -69,11 +69,13 @@ export class PlannerItem extends Component {
     showNotificationBadge: bool,
     currentUser: shape(userShape),
     responsiveSize: sizeShape,
+    allDay: bool,
   };
 
   static defaultProps = {
     badges: [],
     responsiveSize: 'large',
+    allDay: false,
   };
 
   constructor (props) {
@@ -125,11 +127,10 @@ export class PlannerItem extends Component {
   }
 
   renderDateField = () => {
-    if (this.props.date &&
-        this.props.associated_item !== "To Do") {
+    if (this.props.date) {
 
-      if (this.props.associated_item === "Announcement") {
-        return this.props.date.format("LT");
+      if (this.props.associated_item === "Announcement" || this.props.associated_item === "Calendar Event") {
+        return this.props.allDay === true ? formatMessage('All Day') : this.props.date.format("LT");
       }
       return formatMessage(`DUE: {date}`, {date: this.props.date.format("LT")});
     }
@@ -246,15 +247,17 @@ export class PlannerItem extends Component {
     if (newItem || missing) {
       const IndicatorComponent = newItem ? NewActivityIndicator : MissingIndicator;
       return (
-        <div className={styles.activityIndicator}>
-          <IndicatorComponent
-          title={this.props.title}
-          itemIds={[this.props.uniqueId]}
-          animatableIndex={this.props.animatableIndex} />
-        </div>
+        <NotificationBadge>
+          <div className={styles.activityIndicator}>
+            <IndicatorComponent
+            title={this.props.title}
+            itemIds={[this.props.uniqueId]}
+            animatableIndex={this.props.animatableIndex} />
+          </div>
+        </NotificationBadge>
       );
     } else {
-      return null;
+      return <NotificationBadge/>;
     }
   }
 
@@ -267,8 +270,8 @@ export class PlannerItem extends Component {
       formatMessage('{assignmentType} {title} is incomplete',
         { assignmentType: assignmentType, title: this.props.title });
     return (
-      <div className={classnames(styles.root, styles[this.getLayout()])} ref={this.registerRootDivRef}>
-        <NotificationBadge>{this.renderNotificationBadge()}</NotificationBadge>
+      <div className={classnames(styles.root, styles[this.getLayout()], 'planner-item')} ref={this.registerRootDivRef}>
+        {this.renderNotificationBadge()}
         <div className={styles.completed}>
           <Checkbox
             ref={this.registerFocusElementRef}

@@ -764,11 +764,13 @@ class FilesController < ApplicationController
     @attachment.uploaded_data = params[:file] || params[:attachment] && params[:attachment][:uploaded_data]
     if @attachment.save
       # for consistency with the s3 upload client flow, we redirect to the success url here to finish up
+      includes = Array(params[:success_include])
+      includes << 'avatar' if @attachment.folder == @attachment.user&.profile_pics_folder
       redirect_to api_v1_files_create_success_url(@attachment,
         uuid: @attachment.uuid,
         on_duplicate: params[:on_duplicate],
         quota_exemption: params[:quota_exemption],
-        include: params[:success_include])
+        include: includes)
     else
       head :bad_request
     end
@@ -841,7 +843,7 @@ class FilesController < ApplicationController
     if params[:progress_id]
       progress = Progress.find(params[:progress_id])
 
-      json = attachment_json(@attachment, @current_user)
+      json = { "id" => @attachment.id }
       progress.set_results(json)
       progress.complete!
     end
@@ -1116,13 +1118,15 @@ class FilesController < ApplicationController
     cancel_cache_buster
     # include authenticator fingerprint so we don't redirect to an
     # authenticated thumbnail url for the wrong user
-    url = Rails.cache.fetch(['thumbnail_url', params[:uuid], params[:size], file_authenticator.fingerprint].cache_key, :expires_in => 30.minutes) do
+    cache_key = ['thumbnail_url', params[:uuid], params[:size], file_authenticator.fingerprint].cache_key
+    url = Rails.cache.read(cache_key)
+    unless url
       attachment = Attachment.active.where(id: params[:id], uuid: params[:uuid]).first if params[:id].present?
       thumb_opts = params.slice(:size)
       url = authenticated_thumbnail_url(attachment, thumb_opts)
-      url ||= '/images/no_pic.gif'
-      url
+      Rails.cache.write(cache_key, url, :expires_in => 30.minutes) if url
     end
+    url ||= '/images/no_pic.gif'
     redirect_to url
   end
 

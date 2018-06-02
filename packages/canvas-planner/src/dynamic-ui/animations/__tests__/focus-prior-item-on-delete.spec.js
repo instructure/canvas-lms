@@ -21,6 +21,15 @@ import {createAnimation, mockRegistryEntry} from './test-utils';
 import {deletedPlannerItem} from '../../../actions';
 import {specialFallbackFocusId} from '../../util';
 
+// it uses a timer to work around an inst ui bug. See code in uiDidUpdate
+jest.useFakeTimers();
+function prepareAnimation (animation) {
+  animation.acceptAction(deletedPlannerItem({uniqueId: 'doomed-item'}));
+  animation.uiWillUpdate();
+  animation.uiDidUpdate();
+  jest.runAllTimers();
+}
+
 it('sets focus to the item prior to the deleted item', () => {
   const {animation, registry, animator} = createAnimation(FocusPriorItemOnDelete);
   const mockRegistryEntries = [
@@ -31,8 +40,7 @@ it('sets focus to the item prior to the deleted item', () => {
   ];
   registry.getAllItemsSorted.mockReturnValueOnce(mockRegistryEntries);
   registry.getComponent.mockReturnValueOnce(mockRegistryEntries[1]);
-  animation.acceptAction(deletedPlannerItem({uniqueId: 'doomed-item'}));
-  animation.uiDidUpdate();
+  prepareAnimation(animation);
   expect(registry.getComponent).toHaveBeenCalledWith('item', 'prior-item-2');
   expect(animator.focusElement).toHaveBeenCalledWith('p2-focusable');
   expect(animator.scrollTo).toHaveBeenCalledWith('p2-scrollable', 34);
@@ -46,8 +54,7 @@ it('sets focus to the fallback item focus if deleted index is 0', () => {
   ];
   registry.getAllItemsSorted.mockReturnValueOnce(mockRegistryEntries);
   registry.getComponent.mockReturnValueOnce(mockRegistryEntry([specialFallbackFocusId('item')], 'fb'));
-  animation.acceptAction(deletedPlannerItem({uniqueId: 'doomed-item'}));
-  animation.uiDidUpdate();
+  prepareAnimation(animation);
   expect(registry.getComponent).toHaveBeenCalledWith('item', specialFallbackFocusId('item'));
   expect(animator.focusElement).toHaveBeenCalledWith('fb-focusable');
   expect(animator.scrollTo).toHaveBeenCalledWith('fb-scrollable', 34);
@@ -60,8 +67,7 @@ it('gives up without borking if there is no fallback', () => {
     mockRegistryEntry(['next-item-1'], 'n1'),
   ];
   registry.getAllItemsSorted.mockReturnValueOnce(mockRegistryEntries);
-  animation.acceptAction(deletedPlannerItem({uniqueId: 'doomed-item'}));
-  animation.uiDidUpdate();
+  prepareAnimation(animation);
   expect(registry.getComponent).toHaveBeenCalledWith('item', specialFallbackFocusId('item'));
   expect(animator.focusElement).not.toHaveBeenCalled();
   expect(animator.scrollTo).not.toHaveBeenCalled();

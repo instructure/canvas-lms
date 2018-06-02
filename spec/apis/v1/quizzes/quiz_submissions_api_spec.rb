@@ -509,9 +509,12 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         json = qs_api_create
         qs = Quizzes::QuizSubmission.find(json['quiz_submissions'][0]['id'])
         qs.mark_completed
-        qs.save
+        qs.reload
+        expect(qs).to be_complete
 
         qs_api_create
+        qs.reload
+        expect(qs).to be_untaken
       end
 
       context 'access validations' do
@@ -751,8 +754,8 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
   end
 
   describe "GET /courses/:course_id/quizzes/:quiz_id/submssions/:id/time" do
-    around(:all) do |group|
-      Timecop.freeze { group.run_examples }
+    around(:once_and_each) do |block|
+      Timecop.freeze(Time.local(2018, 5, 8, 10, 5, 0)) { block.call }
     end
 
     let_once(:now) { Time.zone.now }

@@ -277,14 +277,15 @@ module AccountReports::ReportHelper
   #    add_report_row or a little more efficient way would be to use
   #    build_report_row, and then add_report_rows at the end of the method.
   def write_report_in_batches(headers)
-    args = {priority: Delayed::LOW_PRIORITY, max_attempts: 1, n_strand: ["account_report_runner", root_account.global_id]}
-    @account_report.account_report_runners.find_each do |runner|
-      self.send_later_enqueue_args(:run_account_report_runner, args, runner, headers)
-    end
     # we use total_lines to track progress in the normal progress.
     # just use it here to do the same thing here even though it is not really
     # the number of lines.
     @account_report.update_attributes(total_lines: @account_report.account_report_runners.count)
+
+    args = {priority: Delayed::LOW_PRIORITY, max_attempts: 1, n_strand: ["account_report_runner", root_account.global_id]}
+    @account_report.account_report_runners.find_each do |runner|
+      self.send_later_enqueue_args(:run_account_report_runner, args, runner, headers)
+    end
   end
 
   def add_report_row(row:, row_number: nil, report_runner:, account_report: @account_report)

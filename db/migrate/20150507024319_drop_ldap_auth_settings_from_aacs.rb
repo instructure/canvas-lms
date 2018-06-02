@@ -19,8 +19,10 @@ class DropLdapAuthSettingsFromAacs < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up
-    remove_column :account_authorization_configs, :login_handle_name
-    remove_column :account_authorization_configs, :change_password_url
+    AuthenticationProvider.maybe_recreate_view do
+      remove_column :account_authorization_configs, :login_handle_name
+      remove_column :account_authorization_configs, :change_password_url
+    end
   end
 
   def down

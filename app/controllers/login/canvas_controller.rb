@@ -144,7 +144,7 @@ class Login::CanvasController < ApplicationController
   def maybe_render_mobile_login(status = nil)
     if mobile_device?
       @login_handle_name = @domain_root_account.login_handle_name_with_inference
-      @login_handle_is_email = @login_handle_name == AccountAuthorizationConfig.default_login_handle_name
+      @login_handle_is_email = @login_handle_name == AuthenticationProvider.default_login_handle_name
       js_env(
         GOOGLE_ANALYTICS_KEY: Setting.get('google_analytics_key', nil),
       )

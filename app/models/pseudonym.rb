@@ -26,10 +26,10 @@ class Pseudonym < ActiveRecord::Base
   has_many :sis_enrollments, class_name: 'Enrollment', inverse_of: :sis_pseudonym
   belongs_to :communication_channel
   belongs_to :sis_communication_channel, :class_name => 'CommunicationChannel'
-  belongs_to :authentication_provider, class_name: 'AccountAuthorizationConfig'
+  belongs_to :authentication_provider
   MAX_UNIQUE_ID_LENGTH = 100
 
-  CAS_TICKET_EXPIRED = 'expired'
+  CAS_TICKET_EXPIRED = 'expired'.freeze
   CAS_TICKET_TTL = 1.day
 
   validates_length_of :unique_id, :maximum => MAX_UNIQUE_ID_LENGTH
@@ -44,7 +44,7 @@ class Pseudonym < ActiveRecord::Base
   before_destroy :retire_channels
 
   before_save :set_password_changed
-  before_validation :infer_defaults, :verify_unique_sis_user_id
+  before_validation :infer_defaults, :verify_unique_sis_user_id, :verify_unique_integration_id
   after_save :update_account_associations_if_account_changed
   has_a_broadcast_policy
 
@@ -136,8 +136,8 @@ class Pseudonym < ActiveRecord::Base
   def self.custom_find_by_unique_id(unique_id)
     return unless unique_id
     active.by_unique_id(unique_id).where("authentication_provider_id IS NULL OR EXISTS (?)",
-      AccountAuthorizationConfig.active.where(auth_type: ['canvas', 'ldap']).
-        where("authentication_provider_id=account_authorization_configs.id")).first
+      AuthenticationProvider.active.where(auth_type: ['canvas', 'ldap']).
+        where("authentication_provider_id=authentication_providers.id")).first
   end
 
   def self.for_auth_configuration(unique_id, aac)
@@ -232,11 +232,17 @@ class Pseudonym < ActiveRecord::Base
 
   def verify_unique_sis_user_id
     return true unless self.sis_user_id
-    existing_pseudo = Pseudonym.where(account_id: self.account_id, sis_user_id: self.sis_user_id.to_s).first
-    return true if !existing_pseudo || existing_pseudo.id == self.id
+    return true unless Pseudonym.where.not(id: id).where(account_id: self.account_id, sis_user_id: self.sis_user_id).exists?
     self.errors.add(:sis_user_id, :taken,
-      message: t('#errors.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_user_id)
-    )
+      message: t('#errors.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", sis_id: self.sis_user_id))
+    throw :abort
+  end
+
+  def verify_unique_integration_id
+    return true unless self.integration_id
+    return true unless Pseudonym.where.not(id: id).where(account_id: self.account_id, integration_id: self.integration_id).exists?
+    self.errors.add(:integration_id, :taken,
+      message: t("Integration ID \"%{integration_id}\" is already in use", integration_id: self.integration_id))
     throw :abort
   end
 
@@ -359,7 +365,7 @@ class Pseudonym < ActiveRecord::Base
   def managed_password?
     if authentication_provider
       # explicit provider we can be sure if it's managed or not
-      !authentication_provider.is_a?(AccountAuthorizationConfig::Canvas)
+      !authentication_provider.is_a?(AuthenticationProvider::Canvas)
     else
       # otherwise we have to guess
       !!(self.sis_user_id && account.non_canvas_auth_configured?)
@@ -367,7 +373,7 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def passwordable?
-    authentication_provider.is_a?(AccountAuthorizationConfig::Canvas) ||
+    authentication_provider.is_a?(AuthenticationProvider::Canvas) ||
       (!authentication_provider && account.canvas_authentication?)
   end
 
@@ -422,14 +428,14 @@ class Pseudonym < ActiveRecord::Base
 
   def ldap_bind_result(password_plaintext)
     aps = case authentication_provider
-          when AccountAuthorizationConfig::LDAP
+          when AuthenticationProvider::LDAP
             [authentication_provider]
           when nil
             account.authentication_providers.active.where(auth_type: 'ldap')
-          #when AccountAuthorizationConfig::Canvas
+          # when AuthenticationProvider::Canvas
           else
             []
-          end
+    end
     aps.each do |config|
       res = config.ldap_bind_result(self.unique_id, password_plaintext)
       return res if res

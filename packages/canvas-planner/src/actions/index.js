@@ -17,11 +17,11 @@
  */
 import { createActions } from 'redux-actions';
 import axios from 'axios';
-import moment from 'moment';
 import configureAxios from '../utilities/configureAxios';
 import { alert } from '../utilities/alertUtils';
 import formatMessage from '../format-message';
 import parseLinkHeader from 'parse-link-header';
+import { makeEndOfDayIfMidnight } from '../utilities/dateUtils';
 
 import {
   transformInternalToApiItem,
@@ -47,7 +47,8 @@ export const {
   openEditingPlannerItem,
   cancelEditingPlannerItem,
   setNaiAboveScreen,
-  scrollToNewActivity
+  scrollToNewActivity,
+  scrollToToday,
 } = createActions(
   'INITIAL_OPTIONS',
   'ADD_OPPORTUNITIES',
@@ -65,6 +66,7 @@ export const {
   'CANCEL_EDITING_PLANNER_ITEM',
   'SET_NAI_ABOVE_SCREEN',
   'SCROLL_TO_NEW_ACTIVITY',
+  'SCROLL_TO_TODAY',
 );
 
 export * from './loading-actions';
@@ -146,9 +148,10 @@ export const dismissOpportunity = (id, plannerOverride) => {
 };
 
 export const savePlannerItem = (plannerItem) => {
-  plannerItem.date = moment(plannerItem.date).endOf('day').format('YYYY-MM-DDTHH:mm:ssZ');
-
   return (dispatch, getState) => {
+    plannerItem.date = makeEndOfDayIfMidnight(plannerItem.date, getState().timeZone);
+    plannerItem.date = plannerItem.date.toISOString();
+
     const isNewItem = !plannerItem.id;
     const overrideData = getOverrideDataOnItem(plannerItem);
     dispatch(savingPlannerItem({item: plannerItem, isNewItem}));

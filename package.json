@@ -7,19 +7,20 @@
     "yarn": "1.6.0"
   },
   "dependencies": {
-    "@instructure/ui-alerts": "^5.0.1",
-    "@instructure/ui-buttons": "^5.0.1",
+    "@instructure/ui-alerts": "^5.7.0",
+    "@instructure/ui-buttons": "^5.7.0",
     "@instructure/ui-core": "^4.8.0",
-    "@instructure/ui-menu": "^5.0.1",
-    "@instructure/ui-overlays": "^5.0.1",
-    "@instructure/ui-themeable": "^4.8.0",
-    "@instructure/ui-themes": "^4.8.0",
+    "@instructure/ui-menu": "^5.7.0",
+    "@instructure/ui-overlays": "^5.7.0",
+    "@instructure/ui-themeable": "^5.7.0",
+    "@instructure/ui-themes": "^5.7.0",
     "apollo-boost": "^0.1.4",
     "axios": "^0.16.0",
     "backbone": "1.1.1",
+    "big.js": "^5.0.3",
     "brandable_css": "0.1.0",
     "canvas-planner": "file:./packages/canvas-planner/copy-of-what-gets-published-to-npm-registry",
-    "canvas-rce": "3.1.0-hotfix.2",
+    "canvas-rce": "file:./packages/canvas-rce/canvas",
     "canvas_offline_course_viewer": "https://github.com/instructure/canvas_offline_course_viewer.git#1.2.0",
     "classnames": "^2.2.5",
     "color-slicer": "0.8.0",
@@ -44,6 +45,7 @@
     "md5": "^2.2.1",
     "mediaelement": "https://github.com/instructure/mediaelement.git#master",
     "moment": "~2.10.6",
+    "normalize-scroll-left": "^0.1.2",
     "page": "visionmedia/page.js#1.6.4",
     "parse-decimal-number": "1.0.0",
     "prop-types": "^15",
@@ -102,6 +104,7 @@
     "eslint-plugin-jest": "^21",
     "eslint-plugin-jsx-a11y": "^6",
     "eslint-plugin-notice": "^0.6",
+    "eslint-plugin-prettier": "^2.6.0",
     "eslint-plugin-promise": "^3",
     "eslint-plugin-qunit": "^3",
     "eslint-plugin-react": "^7",
@@ -156,7 +159,7 @@
     "webpack": "^3",
     "webpack-cleanup-plugin": "^0.5",
     "webpack-manifest-plugin": "^1",
-    "webpack-parallel-uglify-plugin": "^1",
+    "uglifyjs-webpack-plugin": "^1.2",
     "xsslint": "0.1.4",
     "yaml-loader": "^0.5"
   },
@@ -174,7 +177,7 @@
     "test:karma:watch": "karma start",
     "test:karma:watch:headless": "karma start --browsers ChromeHeadlessNoSandbox",
     "test:packages": "script/local-yarn test",
-    "preinstall": "script/local-yarn install && script/local-yarn build",
+    "preinstall": "script/uncache-packages && script/local-yarn install && script/local-yarn build:canvas",
     "build": "yarn run build:css && yarn run build:js",
     "build:watch": "concurrently \"yarn build:css:watch\" \"yarn build:js:watch\"",
     "build:css": "brandable_css",
@@ -192,6 +195,7 @@
     "upgrade-and-dedupe": "rm -rf yarn.lock node_modules && yes 1 | yarn install --flat --production && git checkout package.json && yarn install && git add yarn.lock && git commit -m 'update npm deps'"
   },
   "resolutions": {
-    "jquery": "https://github.com/ryankshaw/jquery.git#a755a3e9c99d5a70d8ea570836f94ae1ba56046d"
+    "jquery": "https://github.com/ryankshaw/jquery.git#a755a3e9c99d5a70d8ea570836f94ae1ba56046d",
+    "moment": "2.10.6"
   }
 }

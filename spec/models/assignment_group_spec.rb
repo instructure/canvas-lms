@@ -466,6 +466,26 @@ describe AssignmentGroup do
       @student_enrollment.conclude
       expect { @group.destroy }.not_to change { student_score.reload.state }
     end
+
+    it 'destroys active assignments belonging to the group' do
+      assignment = @course.assignments.create!
+      @group.destroy
+      expect(assignment.reload).to be_deleted
+    end
+
+    it 'does not run validations on soft-deleted assignments belonging to the group' do
+      now = Time.zone.now
+      assignment = @course.assignments.create!(
+        unlock_at: 3.days.ago(now),
+        due_at: now,
+        lock_at: 3.days.from_now(now),
+        workflow_state: 'deleted'
+      )
+      # update the assignment to be invalid, so that if validations are run
+      # we'll get an error
+      assignment.update_columns(lock_at: 2.days.ago(now))
+      expect { @group.destroy }.not_to raise_error
+    end
   end
 
   describe "#restore" do

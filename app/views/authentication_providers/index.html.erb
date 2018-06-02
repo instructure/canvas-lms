@@ -1,0 +1,120 @@
+<%
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<% add_crumb t(:page_title, "Authentication Settings") %>
+<% @active_tab = "authentication" %>
+<%- css_bundle(:federated_attributes) %>
+<% content_for :page_title do %>
+  <%= t(:page_title, "Authentication Settings")%>
+<% end %>
+
+<% content_for :right_side do %>
+  <div id="auth-config-right-side">
+
+    <% if @presenter.ldap_config? %>
+      <a href="#"
+         class="test_ldap_link btn button-sidebar-wide"
+         <%= image_tag "pending_review.png", :alt => '' %>
+         <%= t(:test_ldap_link, "Test LDAP Authentication")%>
+      </a>
+    <% end %>
+
+    <div id="add-authentication-provider"
+         class="add_auth_div"
+         data-options="<%= @presenter.sso_options.to_json %>">
+    </div>
+
+    <% if @presenter.auth? %>
+      <br/>
+      <%= link_to(account_remove_all_authentication_providers_url(@account),
+          data: { confirm: t(:delete_auth_confirmation,
+            'Are you sure? Users may not be able to log in if this is removed.') },
+          method: :delete,
+          class: "delete_auth_link Button Button--danger icon-trash button-sidebar-wide") do %>
+          <%= t(:delete_auth_link, "Remove Authentication") %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
+
+<h1><%= t(:settings_title, "Authentication Settings") %></h1>
+
+<p>
+  <%= t(:settings_description, 'In order for a user to authenticate through an external identity provider (IdP),
+  the user must have a login identifier that is both linked to this account and
+  that matches the unique identifier returned by the IdP. To see a user\'s current
+  logins, see the "Login Information" section on the user\'s profile page. (Found
+  by searching for the user on the "Users" tab.)') %><br/>
+  <%= mt(:profile_page_link_example,
+         'For example, here is your profile page: [%{friendlyname}](%{url})',
+         friendlyname: @current_user.last_name_first_or_unnamed,
+         url: context_url(@account, :context_user_url, @current_user)) %>
+</p>
+
+<% if @presenter.ips_configured? %>
+  <p>
+    <%= t(:ip_address_list_description,
+        "If you are using an authentication service that requires the Canvas "\
+        "servers to contact your servers directly, such as LDAP, you'll need "\
+        "to make sure that your servers can accept connections from these "\
+        "IP addresses:") %>
+    <pre> <%= @presenter.ip_list %> </pre>
+  </p>
+<% end %>
+
+<%= render partial: 'sso_settings_form',
+           locals: { presenter: @presenter, account: @account }%>
+
+<h2><%= t("Current Provider") %></h2>
+
+<datalist id="saml_login_attributes">
+  <%= options_for_select(AuthenticationProvider::SAML.login_attributes) %>
+</datalist>
+
+<% if @presenter.configs.empty? %>
+  <div id="no_auth">
+    <%= t(:no_auth_type_description, "This account does not currently integrate "\
+                                     "with an identity provider.") %>
+  </div>
+<% else %>
+  <% @presenter.configs.each do |aac| %>
+    <%= render partial: "aac_settings",
+               locals: { aac: aac, presenter: @presenter, account: @account } %>
+  <% end %>
+<% end %>
+
+<% @presenter.new_auth_types.each do |auth_type| %>
+  <%= render partial: "aac_settings",
+             locals: {
+               account: @account,
+               presenter: @presenter,
+               aac: @presenter.new_config(auth_type.sti_name)
+             } %>
+<% end %>
+
+<% if @presenter.ldap_configs.size > 0 %>
+  <%= render partial: 'ldap_settings_test',
+             locals: { account: @account, presenter: @presenter } %>
+<% end %>
+
+<% if @presenter.saml_enabled? && @presenter.saml_configs.size > 0 %>
+  <%= render partial: 'saml_settings_test',
+             locals: { account: @account, presenter: @presenter } %>
+<% end %>
+
+<% js_bundle :authentication_providers %>

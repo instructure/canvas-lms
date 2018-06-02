@@ -46,6 +46,14 @@ module PlannerPageObject
     expect(url).to eq(expected_url)
   end
 
+  def validate_calendar_url(object)
+    url = driver.current_url
+    domain = url.split('calendar')[0]
+    expected_url = domain + "calendar?event_id=#{object.id}&include_contexts=#{object.context_code}"
+    expected_url += "#view_start=#{object.start_at.to_date}&view_name=month"
+    expect(url).to eq(expected_url)
+  end
+
   # Pass what type of object it is. Ensure object's name starts with a capital letter
   def validate_object_displayed(object_type)
     expect(fxpath("//*[contains(@class, 'PlannerApp')]//span[contains(text(),'Unnamed Course #{object_type}')]")).to be_displayed
@@ -82,7 +90,7 @@ module PlannerPageObject
   # should pass the type of object as a string
   def validate_link_to_url(object, url_type)
     navigate_to_course_object(object)
-    validate_url(url_type, object)
+    object.is_a?(CalendarEvent) ? validate_calendar_url(object) : validate_url(url_type, object)
   end
 
   def view_todo_item
@@ -141,6 +149,11 @@ module PlannerPageObject
     wait_for_dom_ready
     wait_for_ajaximations
     f('.ic-dashboard-app')
+  end
+
+  def title_input(title = nil)
+    modal = todo_sidebar_modal(title)
+    ff('input', modal)[0]
   end
 
   def time_input

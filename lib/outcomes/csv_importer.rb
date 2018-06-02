@@ -58,9 +58,9 @@ module Outcomes
       begin
         parse_file(&update)
       rescue CSV::MalformedCSVError
-        file_errors << [1, I18n.t("Invalid CSV File")]
+        raise DataFormatError, I18n.t("Invalid CSV File")
       rescue ParseError => e
-        file_errors << [1, e.message]
+        raise DataFormatError, e.message
       end
       status = {
         errors: file_errors,

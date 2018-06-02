@@ -56,7 +56,7 @@ describe "speed grader - quiz submissions" do
     submissions.each do |s|
       s.click
       submission_date = s.text
-      in_frame('speedgrader_iframe') do
+      in_frame('speedgrader_iframe', '.quiz-header') do
         expect(f('.quiz-submission')).to include_text submission_date
       end
     end
@@ -69,8 +69,7 @@ describe "speed grader - quiz submissions" do
     f('#hide_student_names').click
     expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
     wait_for_ajaximations
-
-    in_frame 'speedgrader_iframe' do
+    in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
       expect(f('#main')).to include_text("Quiz Results for Student")
     end
   end
@@ -103,7 +102,7 @@ describe "speed grader - quiz submissions" do
 
     # navigate to speedgrader and confirm the point value is rounded to the nearest hundredth
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@q.assignment_id}"
-    in_frame('speedgrader_iframe') do
+    in_frame('speedgrader_iframe', '.quiz-header') do
       point_value_script = "return $('#question_#{@quest1.id} .question_input')[0].value"
       # sometimes jquery likes to be slow to load, so we do a keep trying so it can try again if $ is undefined
       keep_trying_until { expect(driver.execute_script(point_value_script)).to eq "2.67" }
@@ -151,7 +150,7 @@ describe "speed grader - quiz submissions" do
     input = f('#grade_container input')
     expect(input["readonly"]).to eq "true"
 
-    in_frame('speedgrader_iframe') do
+    in_frame('speedgrader_iframe', '.quiz-header') do
       question_inputs = ff('.header .question_input')
       question_inputs.each { |qi| replace_content(qi, 3) }
       submit_form('#update_history_form')
@@ -183,7 +182,7 @@ describe "speed grader - quiz submissions" do
       "assignment_id=#{@assignment.id}#%7B%22student_id%22%3A#{@student.id}%7D"
     wait_for_ajaximations
 
-    in_frame('speedgrader_iframe') do
+    in_frame('speedgrader_iframe', '.quiz-header') do
       expect(f('#content').text).to match(/User/)
       expect(f('#content').text).not_to match(/nobody@example.com/)
     end

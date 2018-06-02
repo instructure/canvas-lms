@@ -349,8 +349,7 @@ class ConferencesController < ApplicationController
 
   def recording
     if authorized_action(@conference, @current_user, :read)
-      recording = @conference.recordings.find{ |r| r[:recording_id] == params[:recording_id] }
-      @response = recording || {}
+      @response = @conference.recording(params[:recording_id]) || {}
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_conferences_url) }
         format.json { render :json => @response }

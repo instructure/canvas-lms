@@ -1,7 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`renders the base component correctly with two buttons and a tray 1`] = `
+exports[`renders the base component correctly with buttons and trays 1`] = `
 <div>
+  <Button
+    as="button"
+    buttonRef={[Function]}
+    fluidWidth={false}
+    margin="0 medium 0 0"
+    onClick={[Function]}
+    size="medium"
+    type="button"
+    variant="light"
+  >
+    Today
+  </Button>
   <Button
     as="button"
     buttonRef={[Function]}
@@ -14,6 +26,20 @@ exports[`renders the base component correctly with two buttons and a tray 1`] = 
   >
     <IconPlusLine
       title="Add To Do"
+    />
+  </Button>
+  <Button
+    as="button"
+    buttonRef={[Function]}
+    fluidWidth={false}
+    margin="0 medium 0 0"
+    onClick={[Function]}
+    size="medium"
+    type="button"
+    variant="icon"
+  >
+    <IconGradebookLine
+      title="Show My Grades"
     />
   </Button>
   <Popover
@@ -133,7 +159,7 @@ exports[`renders the base component correctly with two buttons and a tray 1`] = 
     shadow={true}
     shouldCloseOnDocumentClick={false}
     shouldContainFocus={true}
-    shouldReturnFocus={true}
+    shouldReturnFocus={false}
     size="small"
   >
     <UpdateItemTray
@@ -152,6 +178,64 @@ exports[`renders the base component correctly with two buttons and a tray 1`] = 
       onSavePlannerItem={[Function]}
       timeZone="America/Denver"
     />
+  </Tray>
+  <Tray
+    applicationElement={[Function]}
+    border={false}
+    closeButtonLabel={null}
+    closeButtonRef={[Function]}
+    closeButtonVariant="icon"
+    contentRef={[Function]}
+    defaultFocusElement={null}
+    insertAt="bottom"
+    label="My Grades"
+    mountNode={null}
+    onClose={[Function]}
+    onDismiss={[Function]}
+    onEnter={[Function]}
+    onEntered={[Function]}
+    onEntering={[Function]}
+    onExit={[Function]}
+    onExited={[Function]}
+    onExiting={[Function]}
+    onOpen={[Function]}
+    open={false}
+    placement="end"
+    shadow={true}
+    shouldCloseOnDocumentClick={false}
+    shouldContainFocus={true}
+    shouldReturnFocus={true}
+    size="small"
+  >
+    <View
+      as="div"
+      display="auto"
+      padding="large large medium"
+    >
+      <CloseButton
+        buttonRef={[Function]}
+        margin="0"
+        offset="x-small"
+        onClick={[Function]}
+        placement="start"
+        size="small"
+        variant="icon"
+      >
+        Close
+      </CloseButton>
+      <GradesDisplay
+        courses={
+          Array [
+            Object {
+              "id": "1",
+              "informStudentsOfOverdueSubmissions": true,
+              "shortName": "Course Short Name",
+            },
+          ]
+        }
+        loading={false}
+      />
+    </View>
   </Tray>
 </div>
 `;

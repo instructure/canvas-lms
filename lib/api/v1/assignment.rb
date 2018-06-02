@@ -35,6 +35,8 @@ module Api::V1::Assignment
       created_at
       updated_at
       due_at
+      final_grader_id
+      grader_count
       lock_at
       unlock_at
       assignment_group_id
@@ -129,6 +131,8 @@ module Api::V1::Assignment
     unless opts[:exclude_response_fields].include?('in_closed_grading_period')
       hash['in_closed_grading_period'] = assignment.in_closed_grading_period?
     end
+
+    hash['grades_published'] = assignment.grades_published? if opts[:include_grades_published]
 
     if !opts[:overrides].blank?
       hash['overrides'] = assignment_overrides_json(opts[:overrides], user)
@@ -379,6 +383,7 @@ module Api::V1::Assignment
     description
     position
     points_possible
+    grader_count
     grading_type
     allowed_extensions
     due_at
@@ -537,6 +542,21 @@ module Api::V1::Assignment
     end
   end
 
+  def assignment_final_grader_valid?(assignment, course)
+    return true unless assignment.final_grader_id && assignment.final_grader_id_changed?
+
+    final_grader = course.participating_instructors.find_by(id: assignment.final_grader_id)
+    if final_grader.nil?
+      assignment.errors.add('final_grader_id', I18n.t('course has no active instructors with this ID'))
+      false
+    elsif !course.grants_right?(final_grader, :select_final_grade)
+      assignment.errors.add('final_grader_id', I18n.t('user does not have permission to select final grade'))
+      false
+    else
+      true
+    end
+  end
+
   def assignment_editable_fields_valid?(assignment, user)
     return true if assignment.context.account_membership_allows(user)
     # if not in closed grading period editable fields are valid
@@ -662,8 +682,19 @@ module Api::V1::Assignment
       assignment.moderated_grading = value_to_boolean(assignment_params['moderated_grading'])
     end
 
+    grader_changes = final_grader_changes(assignment, context, assignment_params)
+    assignment.final_grader_id = grader_changes.grader_id if grader_changes.grader_changed?
+
     if assignment_params.key?('anonymous_grading') && assignment.course.feature_enabled?(:anonymous_marking)
       assignment.anonymous_grading = value_to_boolean(assignment_params['anonymous_grading'])
+    end
+
+    if assignment_params.key?('duplicated_successfully')
+      if value_to_boolean(assignment_params[:duplicated_successfully])
+        assignment.finish_duplicating
+      else
+        assignment.fail_to_duplicate
+      end
     end
 
     apply_report_visibility_options!(assignment_params, assignment)
@@ -734,6 +765,17 @@ module Api::V1::Assignment
 
   private
 
+  def final_grader_changes(assignment, course, assignment_params)
+    no_changes = OpenStruct.new(grader_changed?: false)
+    return no_changes unless assignment.moderated_grading && assignment_params.key?('final_grader_id')
+    return no_changes unless course.root_account.feature_enabled?(:anonymous_moderated_marking)
+
+    final_grader_id = assignment_params.fetch("final_grader_id")
+    return OpenStruct.new(grader_changed?: true, grader_id: nil) if final_grader_id.blank?
+
+    OpenStruct.new(grader_changed?: true, grader_id: final_grader_id)
+  end
+
   def apply_report_visibility_options!(assignment_params, assignment)
     if assignment_params[:report_visibility].present?
       settings = assignment.turnitin_settings
@@ -763,6 +805,7 @@ module Api::V1::Assignment
 
     updated_assignment = update_from_params(assignment, assignment_params, user, context)
     return invalid unless assignment_editable_fields_valid?(updated_assignment, user)
+    return invalid unless assignment_final_grader_valid?(updated_assignment, context)
 
     {
       assignment: assignment,

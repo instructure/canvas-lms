@@ -1,0 +1,248 @@
+{
+  "group_navigation_99f191a": {
+    "message": "Gruppennavigation"
+  },
+  "cc_attribution_share_alike_669e7f16": {
+    "message": "CC Zuordnung, zu gleichen Teilen"
+  },
+  "link_to_url_52dd935c": {
+    "message": "Link zum URL"
+  },
+  "quizzes_7e598f57": {
+    "message": "Quizzes"
+  },
+  "cc_attribution_non_commercial_no_derivatives_9fe74c00": {
+    "message": "CC Zuordnung, Nicht kommerziell, Keine Derivate"
+  },
+  "c_2001_acme_inc_283f7f80": {
+    "message": "© 2001 Acme Inc."
+  },
+  "upload_a_new_file_96e6d4ff": {
+    "message": "Neue Datei hochladen"
+  },
+  "file_upload_form_4aaad554": {
+    "message": "Datei hochladen (Formular)"
+  },
+  "folder_705fd2d7": {
+    "message": "Ordner"
+  },
+  "insert_equella_links_49a8dacd": {
+    "message": "Equella-Links einfügen"
+  },
+  "assignment_list_a833f59d": {
+    "message": "Aufgabenliste"
+  },
+  "alternative_text_a834dcad": {
+    "message": "Alternativer Text:"
+  },
+  "discussions_a5f96392": {
+    "message": "Diskussionen"
+  },
+  "cc_attribution_no_derivatives_b006744f": {
+    "message": "CC Zuordnung, Keine Derivate"
+  },
+  "usage_right_ff96f3e2": {
+    "message": "Nutzungsrecht:"
+  },
+  "click_to_embed_image_33107dd8": {
+    "message": "Durch Anklicken Bild einbetten"
+  },
+  "i_hold_the_copyright_71ee91b1": {
+    "message": "Ich bin der Urheberrechtsinhaber"
+  },
+  "files_c300e900": {
+    "message": "Dateien"
+  },
+  "cancel_image_upload_2c771950": {
+    "message": "Bild-Upload abbrechen"
+  },
+  "people_b4ebb13c": {
+    "message": "Personen"
+  },
+  "check_if_the_image_is_decorative_283649b7": {
+    "message": "Markieren, falls das Bild dekorativ ist"
+  },
+  "loading_25990131": {
+    "message": "Ladevorgang läuft..."
+  },
+  "announcements_a4b8ed4a": {
+    "message": "Ankündigungen"
+  },
+  "select_a_file_53ba40ac": {
+    "message": "Wählen Sie eine Datei aus."
+  },
+  "formatting_press_down_to_select_df728c30": {
+    "message": "Formatierung, zum Auswählen Nach-Unten-Taste drücken"
+  },
+  "background_color_press_down_to_select_ef99fdac": {
+    "message": "Hintergrundfarbe, zum Auswählen Nach-Unten-Taste drücken"
+  },
+  "files_index_af7c662b": {
+    "message": "Dateienindex"
+  },
+  "cancel_file_upload_9903e7b9": {
+    "message": "Datei-Upload abbrechen"
+  },
+  "the_material_is_subject_to_fair_use_exception_41bc6a4b": {
+    "message": "Das Material unterliegt den Ausnahmen der fairen Nutzung."
+  },
+  "enter_the_alternative_text_for_this_image_88047c47": {
+    "message": "Alternativen Text für dieses Bild eingeben"
+  },
+  "link_to_other_content_in_the_group_3fe25379": {
+    "message": "Links zu anderen Inhalten der Gruppe einfügen."
+  },
+  "discussions_index_6c36ced": {
+    "message": "Diskussionenindex"
+  },
+  "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
+    "message": "Um einen Downloadlink für eine Datei einzufügen, klicken Sie auf die entsprechende Datei."
+  },
+  "copyright_holder_66ee111": {
+    "message": "Urheberrechtsinhaber:"
+  },
+  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
+    "message": "Rich Text-Bereich. Für Hilfe ALT+F8 drücken"
+  },
+  "enter_search_terms_e397b1f0": {
+    "message": "Suchbegriffe eingeben"
+  },
+  "pages_e5414c2c": {
+    "message": "Seiten"
+  },
+  "cc_attribution_f6de631f": {
+    "message": "CC Zuordnung"
+  },
+  "insert_link_6dc23cae": {
+    "message": "Link einfügen"
+  },
+  "collaborations_5c56c15f": {
+    "message": "Kollaborationen"
+  },
+  "what_would_you_like_to_call_the_new_page_d7e4488a": {
+    "message": "Welchen Namen möchten Sie der neuen Seite geben?"
+  },
+  "click_any_image_to_embed_the_image_in_the_page_2cdd1136": {
+    "message": "Um ein Bild auf dieser Seite einzufügen, klicken Sie auf das entsprechende Bild."
+  },
+  "search_flickr_6884b518": {
+    "message": "Flickr suchen"
+  },
+  "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
+    "message": "Um einen Link zu einer Seite einzufügen, klicken Sie auf die entsprechende Seite."
+  },
+  "click_to_insert_a_link_into_the_editor_c19613aa": {
+    "message": "Einfügen eines Links in den Editor"
+  },
+  "decorative_image_fde98579": {
+    "message": "Dekoratives Bild"
+  },
+  "click_to_insert_a_link_to_this_item_39794098": {
+    "message": "Einfügen eines Links auf dieses Element"
+  },
+  "load_more_results_460f49a9": {
+    "message": "Weitere Ergebnisse laden"
+  },
+  "link_7262adec": {
+    "message": "Link"
+  },
+  "grades_a61eba0a": {
+    "message": "Noten"
+  },
+  "links_14b70841": {
+    "message": "Links"
+  },
+  "loading_failed_b3524381": {
+    "message": "Ladevorgang fehlgeschlagen"
+  },
+  "click_to_embed_imagename_c41ea8df": {
+    "message": "{ imageName } durch Anklicken einbetten"
+  },
+  "close_flickr_form_b32e600a": {
+    "message": "Flickr-Formular schließen"
+  },
+  "course_syllabus_5de1b0af": {
+    "message": "Kurssyllabus"
+  },
+  "upload_8b403d05": {
+    "message": "Hochladen"
+  },
+  "modules_c4325335": {
+    "message": "Module"
+  },
+  "no_results_940393cf": {
+    "message": "Keine Ergebnisse."
+  },
+  "announcement_list_da155734": {
+    "message": "Ankündigungsliste"
+  },
+  "link_to_a_new_page_6c4ad034": {
+    "message": "Link zu einer neuen Seite"
+  },
+  "insert_math_equation_57c6e767": {
+    "message": "Math. Gleichung einfügen"
+  },
+  "i_have_obtained_permission_to_use_this_file_6386f087": {
+    "message": "Ich habe die Berechtigung zur Nutzung dieser Datei erhalten."
+  },
+  "cc_attribution_non_commercial_share_alike_c7edb1e5": {
+    "message": "CC Zuordnung, Nicht kommerziell, zu gleichen Teilen"
+  },
+  "wiki_home_9cd54d0": {
+    "message": "Wikistartseite"
+  },
+  "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+    "message": "Wenn Sie jetzt keine Nutzungsrechte auswählen, wird diese Datei nach dem Hochladen nicht veröffentlicht."
+  },
+  "upload_a_new_image_890df275": {
+    "message": "Neues Bild hochladen"
+  },
+  "search_280d00bd": {
+    "message": "Suchen"
+  },
+  "assignments_1e02582c": {
+    "message": "Aufgaben"
+  },
+  "cc_attribution_non_commercial_39e0d30d": {
+    "message": "CC Zuordnung, Nicht kommerziell"
+  },
+  "quizzes_list_d812caa6": {
+    "message": "Quizliste"
+  },
+  "image_upload_form_7b74079a": {
+    "message": "Bild hochladen (Formular)"
+  },
+  "the_material_is_licensed_under_creative_commons_3242cb5e": {
+    "message": "Das Material ist unter Creative Commons lizenziert."
+  },
+  "images_7ce26570": {
+    "message": "Bilder"
+  },
+  "link_to_other_content_in_the_course_879163b5": {
+    "message": "Links zu anderen Kursinhalte einfügen."
+  },
+  "font_size_press_down_to_select_6c25dc2d": {
+    "message": "Schriftgröße, zum Auswählen Nach-Unten-Taste drücken"
+  },
+  "select_a_folder_to_upload_your_file_into_b82d12b": {
+    "message": "Wählen Sie einen Ordner zum Hochladen Ihrer Datei aus."
+  },
+  "course_navigation_dd035109": {
+    "message": "Kursnavigation"
+  },
+  "choose_usage_rights_33683854": {
+    "message": "Nutzungsrechte auswählen ...."
+  },
+  "text_color_press_down_to_select_8f5ad9b5": {
+    "message": "Textfarbe, zum Auswahlen Nach-Unten-Taste drücken"
+  },
+  "embed_image_1080badc": {
+    "message": "Bild einfügen"
+  },
+  "creative_commons_license_725584ae": {
+    "message": "Creative Commons-Lizenz:"
+  },
+  "the_material_is_in_the_public_domain_279c39a3": {
+    "message": "Das Material ist gemeinfrei."
+  }
+}

@@ -566,6 +566,7 @@ s2,test_1,section2,active},
   context 'sis_import_feature on' do
     include_examples 'sis_import_feature'
     before do
+      allow_any_instance_of(Account).to receive(:feature_enabled?).and_call_original
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:refactor_of_sis_imports).and_return(true)
     end
   end
@@ -573,6 +574,7 @@ s2,test_1,section2,active},
   context 'sis_import_feature off' do
     include_examples 'sis_import_feature'
     before do
+      allow_any_instance_of(Account).to receive(:feature_enabled?).and_call_original
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:refactor_of_sis_imports).and_return(false)
     end
   end

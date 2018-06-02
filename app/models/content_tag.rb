@@ -166,7 +166,14 @@ class ContentTag < ActiveRecord::Base
   end
 
   def duplicate_able?
-    ['assignment', 'discussion_topic', 'wiki_page'].include? self.content_type_class
+    case self.content_type_class
+    when 'assignment'
+      content&.can_duplicate?
+    when 'discussion_topic', 'wiki_page'
+      true
+    else
+      false
+    end
   end
 
   def content_type_class

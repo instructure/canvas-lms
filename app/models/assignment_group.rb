@@ -32,11 +32,11 @@ class AssignmentGroup < ActiveRecord::Base
   serialize :integration_data, Hash
 
   has_many :scores, -> { active }
-  has_many :assignments, -> { order('position, due_at, title') }, dependent: :destroy
+  has_many :assignments, -> { order('position, due_at, title') }
 
   has_many :active_assignments, -> {
     where("assignments.workflow_state<>'deleted'").order('assignments.position, assignments.due_at, assignments.title')
-  }, class_name: 'Assignment'
+  }, class_name: 'Assignment', dependent: :destroy
 
   has_many :published_assignments, -> {
     where(workflow_state: 'published').order('assignments.position, assignments.due_at, assignments.title')

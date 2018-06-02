@@ -85,6 +85,8 @@ class Assignment < ActiveRecord::Base
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :inverse_of => :context, :dependent => :destroy
   has_one :score_statistic, dependent: :destroy
 
+  has_many :moderation_graders, inverse_of: :assignment
+
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :group_category_changes_ok?
   validate :anonymous_grading_changes_ok?
@@ -97,16 +99,8 @@ class Assignment < ActiveRecord::Base
   validate :assignment_name_length_ok?
   validates :lti_context_id, presence: true, uniqueness: true
 
-  # TODO: remove this once the field is editable via the UI. Right now there's
-  # no user-facing way to set the grader count to a valid value.
-  before_validation(on: :create) do
-    if moderated_grading? && course.account.feature_enabled?(:anonymous_moderated_marking) && grader_count.zero?
-      self.grader_count = 2
-    end
-  end
-
   before_create do
-    self.muted = true if moderated_grading? && course.account.feature_enabled?(:anonymous_moderated_marking)
+    self.muted = true if moderated_grading? && anonymous_moderated_marking?
   end
 
   validates :graders_anonymous_to_graders, absence: true, unless: :anonymous_grading?
@@ -118,7 +112,7 @@ class Assignment < ActiveRecord::Base
     validates :grader_names_visible_to_final_grader, absence: true
   end
 
-  with_options if: -> { moderated_grading? && course.account.feature_enabled?(:anonymous_moderated_marking) } do
+  with_options if: -> { moderated_grading? && anonymous_moderated_marking? } do
     validates :grader_count, numericality: { greater_than: 0, message: "Number of graders must be positive" }
     validate :grader_section_ok?
     validate :final_grader_ok?
@@ -139,6 +133,7 @@ class Assignment < ActiveRecord::Base
   }
   before_validation do |assignment|
     assignment.points_possible = nil unless assignment.graded?
+    clear_moderated_grading_attributes(assignment) unless assignment.moderated_grading?
     assignment.lti_context_id ||= SecureRandom.uuid
     if assignment.external_tool? && assignment.external_tool_tag
       assignment.external_tool_tag.context = assignment
@@ -211,7 +206,6 @@ class Assignment < ActiveRecord::Base
       result.send(:"#{attr}=", nil)
     end
     result.peer_review_count = 0
-    result.workflow_state = "unpublished"
     # Default to the last position of all active assignments in the group.  Clients can still
     # override later.  Just helps to avoid duplicate positions.
     result.position = Assignment.active.where(assignment_group: assignment_group).maximum(:position) + 1
@@ -245,8 +239,15 @@ class Assignment < ActiveRecord::Base
     # Link the duplicated assignment to this assignment
     result.duplicate_of = self
 
-    # If this assignment uses an external tool, duplicate that too
-    result.external_tool_tag = self.external_tool_tag&.dup
+    # If this assignment uses an external tool, duplicate that too, and mark
+    # the assignment as "duplicating"
+    if external_tool_tag.present?
+      result.external_tool_tag = external_tool_tag.dup
+      result.workflow_state = 'duplicating'
+      result.duplication_started_at = Time.zone.now
+    else
+      result.workflow_state = 'unpublished'
+    end
 
     result
   end
@@ -255,6 +256,14 @@ class Assignment < ActiveRecord::Base
     return false if quiz?
     return false if external_tool_tag.present? && !quiz_lti?
     true
+  end
+
+  def self.clean_up_duplicating_assignments
+    duplicating_for_too_long.update_all(
+      duplication_started_at: nil,
+      workflow_state: 'failed_to_duplicate',
+      updated_at: Time.zone.now
+    )
   end
 
   def group_category_changes_ok?
@@ -688,6 +697,28 @@ class Assignment < ActiveRecord::Base
     else
       # no due at = all_day and all_day_date are irrelevant
       return false, nil
+    end
+  end
+
+  def self.remove_user_as_final_grader(user_id, course_id)
+    strand_identifier = Course.find(course_id).root_account.global_id
+    send_later_if_production_enqueue_args(
+      :remove_user_as_final_grader_immediately,
+      {
+        strand: "Assignment.remove_user_as_final_grader:#{strand_identifier}",
+        max_attempts: 1,
+        priority: Delayed::LOW_PRIORITY,
+      },
+      user_id,
+      course_id
+    )
+  end
+
+  def self.remove_user_as_final_grader_immediately(user_id, course_id)
+    Assignment.where(context_id: course_id, context_type: 'Course', final_grader_id: user_id).find_each do |assignment|
+      # going this route instead of doing an update_all so that we create a new
+      # assignment version when this update happens
+      assignment.update!(final_grader_id: nil)
     end
   end
 
@@ -1327,7 +1358,10 @@ class Assignment < ActiveRecord::Base
     can :grade and can :attach_submission_comment_files
 
     given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
-    can :update and can :create and can :read and can :attach_submission_comment_files
+    can :create and can :read and can :attach_submission_comment_files
+
+    given { |user, session| self.user_can_update?(user, session) }
+    can :update
 
     given do |user, session|
       self.context.grants_right?(user, session, :manage_assignments) &&
@@ -1335,6 +1369,16 @@ class Assignment < ActiveRecord::Base
          !in_closed_grading_period?)
     end
     can :delete
+  end
+
+  def user_can_update?(user, session=nil)
+    return false unless context.grants_right?(user, session, :manage_assignments)
+    return true unless moderated_grading? && root_account.feature_enabled?(:anonymous_moderated_marking)
+
+    # When Anonymous Moderated Marking is on, a moderated assignment may only be
+    # edited by the assignment's moderator (assuming one has been specified) or
+    # by an account admin with 'Select Final Grader for Moderation' privileges.
+    final_grader_id.blank? || permits_moderation?(user)
   end
 
   def user_can_read_grades?(user, session=nil)
@@ -2313,6 +2357,10 @@ class Assignment < ActiveRecord::Base
     end
   }
 
+  scope :duplicating_for_too_long, -> {
+    where("workflow_state = 'duplicating' AND duplication_started_at < ?", 5.minutes.ago)
+  }
+
   def overdue?
     due_at && due_at <= Time.zone.now
   end
@@ -2595,6 +2643,13 @@ class Assignment < ActiveRecord::Base
     self.save
   end
 
+  def unmute!
+    return unless muted?
+    return super unless !grades_published? && anonymous_moderated_marking? && anonymous_grading?
+    errors.add :muted, I18n.t("Anonymous moderated assignments cannot be unmuted until grades are posted")
+    false
+  end
+
   def excused_for?(user)
     s = submissions.where(user_id: user.id).first_or_initialize
     s.excused?
@@ -2697,6 +2752,37 @@ class Assignment < ActiveRecord::Base
     ContextExternalTool.opaque_identifier_for(external_tool_tag, shard)
   end
 
+  def permits_moderation?(user)
+    if root_account.feature_enabled?(:anonymous_moderated_marking)
+      final_grader_id == user.id || context.account_membership_allows(user, :select_final_grade)
+    else
+      context.grants_right?(user, :moderate_grades)
+    end
+  end
+
+  def available_moderators
+    moderators = course.moderators
+    return moderators if final_grader_id.blank?
+
+    # This captures scenarios where a user is selected as the final grader
+    # for an assignment, and then afterwards they are deactivated or concluded,
+    # or their 'Select Final Grade' permission is revoked. In these cases, we
+    # still want to keep that user as the moderator for the assignment (even
+    # though that user will not be included in the course.moderators list)
+    # because a workflow state (excluding a change to 'deleted') or permission
+    # change should have no bearing on their moderator status (this is a
+    # product decision).
+    moderators << final_grader if moderators.exclude?(final_grader)
+    moderators
+  end
+
+  def moderated_grading_max_grader_count
+    max_course_count = course.moderated_grading_max_grader_count
+    return max_course_count if grader_count.blank?
+
+    [grader_count, max_course_count].max
+  end
+
   private
 
   def due_date_ok?
@@ -2756,14 +2842,22 @@ class Assignment < ActiveRecord::Base
   end
 
   def final_grader_ok?
-    # TODO: once we can set a final grader via the UI, remove this early return
-    # and require a non-null final grader.
-    return if final_grader.blank?
+    return unless final_grader_id_changed?
+    return if final_grader_id.blank?
 
     if grader_section_id && grader_section.instructor_enrollments.where(user_id: final_grader_id, workflow_state: 'active').empty?
       errors.add(:final_grader, 'Final grader must be enrolled in selected section')
     elsif grader_section_id.nil? && course.participating_instructors.where(id: final_grader_id).empty?
       errors.add(:final_grader, 'Final grader must be an instructor in this course')
     end
+  end
+
+  def anonymous_moderated_marking?
+    course.root_account.feature_enabled?(:anonymous_moderated_marking)
+  end
+
+  def clear_moderated_grading_attributes(assignment)
+    assignment.final_grader_id = nil
+    assignment.grader_count = nil
   end
 end

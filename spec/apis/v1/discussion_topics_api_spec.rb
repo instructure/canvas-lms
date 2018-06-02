@@ -554,6 +554,17 @@ describe DiscussionTopicsController, type: :request do
         end
       end
 
+      it 'should return group_topic_children for group discussions' do
+        group_topic = group_discussion_topic_model(context: @course)
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
+                        {controller: 'discussion_topics', action: 'index', format: 'json', course_id: @course.id.to_s})
+
+        json_topic = json.select {|t| t['group_category_id']}.first
+
+        expect(json_topic).not_to be nil
+        expect(json_topic['group_category_id']).to eq group_topic.group_category_id
+        expect(json_topic['group_topic_children']).to eq group_topic.child_topics.map {|topic| {"id" => topic.id, "group_id" => topic.context_id}}
+      end
 
       describe "section specific announcements" do
         before(:once) do
@@ -694,6 +705,16 @@ describe DiscussionTopicsController, type: :request do
         api_call_as_user(@student, :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                         {:controller => 'discussion_topics_api', :action => 'show', :format => 'json',
                          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s}, {}, {}, :expected_status => 401)
+      end
+
+      it 'should return group_topic_children for group discussions' do
+        group_topic = group_discussion_topic_model(context: @course)
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{group_topic.id}",
+                        {controller: 'discussion_topics_api', action: 'show', format: 'json', course_id: @course.id.to_s, topic_id: group_topic.id.to_s})
+
+        expect(json).not_to be nil
+        expect(json['group_category_id']).to eq group_topic.group_category_id
+        expect(json['group_topic_children']).to eq group_topic.child_topics.map {|topic| {"id" => topic.id, "group_id" => topic.context_id}}
       end
 
       it "should properly translate a video media comment in the discussion topic's message" do

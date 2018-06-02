@@ -200,6 +200,14 @@ describe "Common Cartridge exporting" do
       expect(ccc_schema.validate(doc)).to be_empty
     end
 
+    it "should use instfs to host export files if it is enabled" do
+      allow(InstFS).to receive(:enabled?).and_return(true)
+      uuid = "1234-abcd"
+      allow(InstFS).to receive(:direct_upload).and_return(uuid)
+      @ce.export_without_send_later
+      expect(@ce.attachments.first.instfs_uuid).to eq(uuid)
+    end
+
     it "should create a quizzes-only export" do
 
       @q1 = @course.quizzes.create!(:title => 'quiz1')

@@ -104,16 +104,7 @@ class DeveloperKeysController < ApplicationController
     @_use_new_dev_key_features ||= begin
       requested_context = @context || account_from_params || @key&.account
       return if requested_context.blank?
-
-      # Check if account is the site admin account.  (There's only 1 site admin account.)
-      if requested_context.root_account.site_admin?
-        # Check if feature is allowed, based on 3 state toggle
-        requested_context.root_account.feature_allowed?(:developer_key_management_ui_rewrite)
-      else
-        # allow react to be shown for http://canvas.docker/accounts/1234/developer_keys
-        Account.site_admin.feature_allowed?(:developer_key_management_ui_rewrite) &&
-        requested_context.root_account.feature_enabled?(:developer_key_management_ui_rewrite)
-      end
+      requested_context.root_account.feature_enabled?(:developer_key_management_ui_rewrite)
     end
   end
 
@@ -138,6 +129,23 @@ class DeveloperKeysController < ApplicationController
   end
 
   def developer_key_params
+    if use_new_dev_key_features?
+      return params.require(:developer_key).permit(
+        :access_token_count,
+        :api_key,
+        :auto_expire_tokens,
+        :email,
+        :icon_url,
+        :name,
+        :notes,
+        :redirect_uri,
+        :redirect_uris,
+        :vendor_code,
+        :visible,
+        scopes: []
+      )
+    end
+
     params.require(:developer_key).permit(
       :access_token_count,
       :api_key,
@@ -149,7 +157,7 @@ class DeveloperKeysController < ApplicationController
       :redirect_uri,
       :redirect_uris,
       :vendor_code,
-      :visible,
+      :visible
     )
   end
 end

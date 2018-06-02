@@ -505,14 +505,16 @@ describe DiscussionTopicsController do
 
         group_category2 = @course.group_categories.create(:name => 'category 2')
         @course.groups.create!(:group_category => group_category2)
-      end
-
-      it "should assign groups from the topic's category" do
-        user_session(@teacher)
 
         course_topic(user: @teacher, with_assignment: true)
         @topic.group_category = @group_category
         @topic.save!
+
+        @group1.add_user(@student)
+      end
+
+      it "should assign groups from the topic's category" do
+        user_session(@teacher)
 
         get 'show', params: {:course_id => @course.id, :id => @topic.id}
         expect(assigns[:groups].size).to eql(2)
@@ -520,10 +522,6 @@ describe DiscussionTopicsController do
 
       it "should only show applicable groups if DA applies" do
         user_session(@teacher)
-
-        course_topic(user: @teacher, with_assignment: true)
-        @topic.group_category = @group_category
-        @topic.save!
 
         asmt = @topic.assignment
         asmt.only_visible_to_overrides = true
@@ -539,11 +537,6 @@ describe DiscussionTopicsController do
 
       it "should redirect to group for student if DA applies to section" do
         user_session(@student)
-        @group1.add_user(@student)
-
-        course_topic(user: @teacher, with_assignment: true)
-        @topic.group_category = @group_category
-        @topic.save!
 
         asmt = @topic.assignment
         asmt.only_visible_to_overrides = true
@@ -559,11 +552,6 @@ describe DiscussionTopicsController do
 
       it "should redirect to the student's group" do
         user_session(@student)
-        @group1.add_user(@student)
-
-        course_topic(user: @teacher, with_assignment: true)
-        @topic.group_category = @group_category
-        @topic.save!
 
         get 'show', params: {:course_id => @course.id, :id => @topic.id}
         redirect_path = "/groups/#{@group1.id}/discussion_topics?root_discussion_topic_id=#{@topic.id}"
@@ -577,11 +565,6 @@ describe DiscussionTopicsController do
           enabled: true
         )
         user_session(@student)
-        @group1.add_user(@student)
-
-        course_topic(user: @teacher, with_assignment: true)
-        @topic.group_category = @group_category
-        @topic.save!
 
         get 'show', params: {:course_id => @course.id, :id => @topic.id}
         redirect_path = "/groups/#{@group1.id}/discussion_topics?root_discussion_topic_id=#{@topic.id}"
@@ -590,11 +573,6 @@ describe DiscussionTopicsController do
 
       it "should not change the name of the child topic when navigating to it" do
         user_session(@student)
-        @group1.add_user(@student)
-
-        course_topic(user: @teacher, with_assignment: true)
-        @topic.group_category = @group_category
-        @topic.save!
 
         child_topic = @topic.child_topic_for(@student)
         old_title = child_topic.title
@@ -602,6 +580,24 @@ describe DiscussionTopicsController do
         get 'index', params: {:group_id => @group1.id, :root_discussion_topic_id => @topic.id}
 
         expect(@topic.child_topic_for(@student).title).to eq old_title
+      end
+
+      it "should plumb the module_item_id through group discussion redirect" do
+        user_session(@student)
+
+        get 'show', params: {:course_id => @course.id, :id => @topic.id, :module_item_id => 789}
+        expect(response).to be_redirect
+        expect(response.location).to include "/groups/#{@group1.id}/discussion_topics?"
+        expect(response.location).to include "module_item_id=789"
+      end
+
+      it "should plumb the module_item_id through child discussion redirect" do
+        user_session(@student)
+
+        get 'index', params: {:group_id => @group1.id, :root_discussion_topic_id => @topic.id, :module_item_id => 789}
+        expect(response).to be_redirect
+        expect(response.location).to include "/groups/#{@group1.id}/discussion_topics/#{@topic.child_topic_for(@student).id}?"
+        expect(response.location).to include "module_item_id=789"
       end
     end
 
@@ -1581,6 +1577,20 @@ describe DiscussionTopicsController do
 
       expect(@topic.reload.attachment).to be_nil
       expect(attachment.reload).to be_deleted
+    end
+
+    it "uses inst-fs if it is enabled" do
+      allow(InstFS).to receive(:enabled?).and_return(true)
+      uuid = "1234-abcd"
+      allow(InstFS).to receive(:direct_upload).and_return(uuid)
+
+      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
+      attachment_model :context => @course, :uploaded_data => data, :folder => Folder.unfiled_folder(@course)
+      put 'update', params: {course_id: @course.id, topic_id: @topic.id, attachment: data}, format: 'json'
+
+      @topic.reload
+      expect(@topic.attachment.instfs_uuid).to eq(uuid)
+
     end
 
     it "editing section-specific topic to not-specific should clear out visibilities" do

@@ -81,19 +81,33 @@ module Types
     connection :usersConnection do
       type UserType.connection_type
 
-      argument :userIds, types[!types.ID],
-        "only include users with the given ids",
+      argument :userIds, types[!types.ID], <<~DOC,
+        Only include users with the given ids.
+
+        **This field is deprecated, use `filter: {userIds}` instead.**
+        DOC
         prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User")
 
+      argument :filter, CourseUsersFilterInputType
+
       resolve ->(course, args, ctx) {
-        if course.grants_any_right?(ctx[:current_user], ctx[:session],
-            :read_roster, :view_all_grades, :manage_grades)
-          scope = UserSearch.scope_for(course, ctx[:current_user], include_inactive_enrollments: true)
-          scope = scope.where(users: {id: args[:userIds]}) if args[:userIds].present?
-          scope
-        else
-          nil
+        return nil unless course.grants_any_right?(
+          ctx[:current_user], ctx[:session],
+          :read_roster, :view_all_grades, :manage_grades
+        )
+
+        filter = args[:filter] || {}
+
+        scope = UserSearch.scope_for(course, ctx[:current_user],
+                                     include_inactive_enrollments: true,
+                                     enrollment_state: filter[:enrollmentStates])
+
+        user_ids = filter[:userIds] || args[:userIds]
+        if user_ids.present?
+          scope = scope.where(users: {id: user_ids})
         end
+
+        scope
       }
     end
 
@@ -192,5 +206,29 @@ module Types
     only return assignments for the given grading period. Defaults to the
 current grading period. Pass `null` to not filter by grading period.
     DESC
+  end
+
+  CourseUsersFilterInputType = GraphQL::InputObjectType.define do
+    name "CourseUsersFilter"
+
+    argument :userIds, types[!types.ID],
+      "only include users with the given ids",
+      prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User")
+
+    argument :enrollmentStates, types[!CourseFilterableEnrollmentWorkflowState], <<-DESC
+      only return users with the given enrollment state. defaults
+      to `invited`, `creation_pending`, `active`
+    DESC
+  end
+
+  CourseFilterableEnrollmentWorkflowState = GraphQL::EnumType.define do
+    name "CourseFilterableEnrollmentState"
+    description "Users in a course can be returned based on these enrollment states"
+    value "invited"
+    value "creation_pending"
+    value "active"
+    value "rejected"
+    value "completed"
+    value "inactive"
   end
 end

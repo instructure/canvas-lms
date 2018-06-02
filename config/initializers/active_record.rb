@@ -407,7 +407,7 @@ class ActiveRecord::Base
   end
 
   def self.best_unicode_collation_key(col)
-    if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
+    val = if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
       # For PostgreSQL, we can't trust a simple LOWER(column), with any collation, since
       # Postgres just defers to the C library which is different for each platform. The best
       # choice is the collkey function from pg_collkey which uses ICU to get a full unicode sort.
@@ -431,6 +431,7 @@ class ActiveRecord::Base
     else
       col
     end
+    Arel.sql(val)
   end
 
   def self.count_by_date(options = {})
@@ -459,9 +460,10 @@ class ActiveRecord::Base
   end
 
   def self.rank_sql(ary, col)
-    ary.each_with_index.inject('CASE '){ |string, (values, i)|
+    sql = ary.each_with_index.inject('CASE '){ |string, (values, i)|
       string << "WHEN #{col} IN (" << Array(values).map{ |value| connection.quote(value) }.join(', ') << ") THEN #{i} "
     } << "ELSE #{ary.size} END"
+    Arel.sql(sql)
   end
 
   def self.rank_hash(ary)
@@ -512,8 +514,7 @@ class ActiveRecord::Base
 
   # set up class-specific getters/setters for a polymorphic association, e.g.
   #   belongs_to :context, polymorphic: [:course, :account]
-  def self.belongs_to(name, scope = nil, options={})
-    options = scope if scope.is_a?(Hash)
+  def self.belongs_to(name, scope = nil, **options)
     if options[:polymorphic] == true
       raise "Please pass an array of valid types for polymorphic associations. Use exhaustive: false if you really don't want to validate them"
     end
@@ -635,10 +636,15 @@ class ActiveRecord::Base
 
     start ||= current_xlog_location
     Shackles.activate(:slave) do
+      diff_fn = connection.send(:postgresql_version) >= 100000 ?
+        "pg_wal_lsn_diff" :
+        "pg_xlog_location_diff"
       fn = connection.send(:postgresql_version) >= 100000 ?
         "pg_last_wal_replay_lsn()" :
         "pg_last_xlog_replay_location()"
-      while connection.select_value("SELECT #{fn}") < start
+      # positive == first value greater, negative == second value greater
+      # SELECT pg_xlog_location_diff(<START>, pg_last_xlog_replay_location())
+      while connection.select_value("SELECT #{diff_fn}(#{connection.quote(start)}, #{fn})").to_i >= 0
         sleep 0.1
       end
     end
@@ -994,7 +1000,7 @@ ActiveRecord::Relation.class_eval do
   def find_ids_in_batches(options = {})
     batch_size = options[:batch_size] || 1000
     key = "#{quoted_table_name}.#{primary_key}"
-    scope = except(:select).select(key).reorder(key).limit(batch_size)
+    scope = except(:select).select(key).reorder(Arel.sql(key)).limit(batch_size)
     ids = connection.select_values(scope.to_sql)
     ids = ids.map(&:to_i) unless options[:no_integer_cast]
     while ids.present?
@@ -1013,15 +1019,17 @@ ActiveRecord::Relation.class_eval do
     loose_mode = options[:loose] && is_integer
     # loose_mode: if we don't care about getting exactly batch_size ids in between
     # don't get the max - just get the min and add batch_size so we get that many _at most_
-    values = loose_mode ? "min(id)" : "min(id), max(id)"
+    values = loose_mode ? "MIN(id)" : "MIN(id), MAX(id)"
 
     batch_size = options[:batch_size].try(:to_i) || 1000
-    subquery_scope = except(:select).select("#{quoted_table_name}.#{primary_key} as id").reorder(primary_key).limit(loose_mode ? 1 : batch_size)
-    subquery_scope = subquery_scope.where("#{quoted_table_name}.#{primary_key} <= ?", options[:end_at]) if options[:end_at]
+    quoted_primary_key = "#{klass.connection.quote_local_table_name(table_name)}.#{klass.connection.quote_column_name(primary_key)}"
+    as_id = " AS id" unless primary_key == 'id'
+    subquery_scope = except(:select).select("#{quoted_primary_key}#{as_id}").reorder(primary_key.to_sym).limit(loose_mode ? 1 : batch_size)
+    subquery_scope = subquery_scope.where("#{quoted_primary_key} <= ?", options[:end_at]) if options[:end_at]
 
-    first_subquery_scope = options[:start_at] ? subquery_scope.where("#{quoted_table_name}.#{primary_key} >= ?", options[:start_at]) : subquery_scope
+    first_subquery_scope = options[:start_at] ? subquery_scope.where("#{quoted_primary_key} >= ?", options[:start_at]) : subquery_scope
 
-    ids = connection.select_rows("select #{values} from (#{first_subquery_scope.to_sql}) as subquery").first
+    ids = connection.select_rows("SELECT #{values} FROM (#{first_subquery_scope.to_sql}) AS subquery").first
 
     while ids.first.present?
       ids.map!(&:to_i) if is_integer
@@ -1029,8 +1037,8 @@ ActiveRecord::Relation.class_eval do
 
       yield(*ids)
       last_value = ids.last
-      next_subquery_scope = subquery_scope.where(["#{quoted_table_name}.#{primary_key}>?", last_value])
-      ids = connection.select_rows("select #{values} from (#{next_subquery_scope.to_sql}) as subquery").first
+      next_subquery_scope = subquery_scope.where(["#{quoted_primary_key}>?", last_value])
+      ids = connection.select_rows("SELECT #{values} FROM (#{next_subquery_scope.to_sql}) AS subquery").first
     end
   end
 end
@@ -1064,14 +1072,23 @@ module UpdateAndDeleteWithJoins
 
     sql = stmt.to_sql
 
-    binds = bound_attributes.map(&:value_for_database)
-    binds.map! { |value| connection.quote(value) }
-    collector = Arel::Collectors::Bind.new
-    arel.join_sources.each do |node|
-      connection.visitor.accept(node, collector)
+    if CANVAS_RAILS5_1
+      binds = bound_attributes.map(&:value_for_database)
+      binds.map! { |value| connection.quote(value) }
+      collector = Arel::Collectors::Bind.new
+      arel.join_sources.each do |node|
+        connection.visitor.accept(node, collector)
+      end
+      binds_in_join = collector.value.count { |x| x.is_a?(Arel::Nodes::BindParam) }
+      join_sql = collector.substitute_binds(binds).join
+    else
+      collector = connection.send(:collector)
+      arel.join_sources.each do |node|
+        connection.visitor.accept(node, collector)
+      end
+      join_sql = collector.value
     end
-    binds_in_join = collector.value.count { |x| x.is_a?(Arel::Nodes::BindParam) }
-    join_sql = collector.substitute_binds(binds).join
+
     tables, join_conditions = deconstruct_joins(join_sql)
 
     unless tables.empty?
@@ -1084,15 +1101,23 @@ module UpdateAndDeleteWithJoins
     join_conditions.each { |join| scope = scope.where(join) }
 
     # skip any binds that are used in the join
-    binds = scope.bound_attributes[binds_in_join..-1]
-    binds = binds.map(&:value_for_database)
-    binds.map! { |value| connection.quote(value) }
-    sql_string = Arel::Collectors::Bind.new
-    scope.arel.constraints.each do |node|
-      connection.visitor.accept(node, sql_string)
+    if CANVAS_RAILS5_1
+      binds = scope.bound_attributes[binds_in_join..-1]
+      binds = binds.map(&:value_for_database)
+      binds.map! { |value| connection.quote(value) }
+      sql_string = Arel::Collectors::Bind.new
+      scope.arel.constraints.each do |node|
+        connection.visitor.accept(node, sql_string)
+      end
+      where_sql = sql_string.substitute_binds(binds).join
+    else
+      collector = connection.send(:collector)
+      scope.arel.constraints.each do |node|
+        connection.visitor.accept(node, collector)
+      end
+      where_sql = collector.value
     end
-    sql.concat('WHERE ' + sql_string.substitute_binds(binds).join)
-
+    sql.concat('WHERE ' + where_sql)
     connection.update(sql, "#{name} Update")
   end
 
@@ -1111,16 +1136,25 @@ module UpdateAndDeleteWithJoins
     scope = self
     join_conditions.each { |join| scope = scope.where(join) }
 
-    binds = scope.bound_attributes
-    binds = binds.map(&:value_for_database)
-    binds.map! { |value| connection.quote(value) }
-    sql_string = Arel::Collectors::Bind.new
-    scope.arel.constraints.each do |node|
-      connection.visitor.accept(node, sql_string)
+    if CANVAS_RAILS5_1
+      binds = scope.bound_attributes
+      binds = binds.map(&:value_for_database)
+      binds.map! { |value| connection.quote(value) }
+      sql_string = Arel::Collectors::Bind.new
+      scope.arel.constraints.each do |node|
+        connection.visitor.accept(node, sql_string)
+      end
+      where_sql = sql_string.substitute_binds(binds).join
+    else
+      collector = connection.send(:collector)
+      scope.arel.constraints.each do |node|
+        connection.visitor.accept(node, collector)
+      end
+      where_sql = collector.value
     end
-    sql.concat('WHERE ' + sql_string.substitute_binds(binds).join)
+    sql.concat('WHERE ' + where_sql)
 
-    connection.delete(sql, "SQL", scope.bind_values)
+    connection.delete(sql, "SQL", CANVAS_RAILS5_1 ? scope.bind_values : [])
   end
 end
 ActiveRecord::Relation.prepend(UpdateAndDeleteWithJoins)
@@ -1398,7 +1432,9 @@ end
 
 module UnscopeCallbacks
   def run_callbacks(*args)
-    scope = self.class.all.klass.unscoped
+    # workaround for a rails 5.2.0 problem where .all sometimes tries to merge in a current_scope with a `skip_query_cache_value` and explodes
+    # TODO: can undo it when this is fixed https://github.com/rails/rails/issues/32640
+    scope = (self.class.current_scope || self.class.all).klass.unscoped
     scope.scoping { super }
   end
 end
@@ -1491,7 +1527,11 @@ module DupArraysInMutationTracker
     change
   end
 end
-ActiveRecord::AttributeMutationTracker.prepend(DupArraysInMutationTracker)
+if CANVAS_RAILS5_1
+  ActiveRecord::AttributeMutationTracker.prepend(DupArraysInMutationTracker)
+else
+  ActiveModel::AttributeMutationTracker.prepend(DupArraysInMutationTracker)
+end
 
 module IgnoreOutOfSequenceMigrationDates
   def current_migration_number(dirname)
@@ -1570,3 +1610,17 @@ if CANVAS_RAILS5_1
     end
   end
 end
+
+# fake Rails into grabbing correct column information for a table rename in-progress
+module TableRename
+  RENAMES = { 'authentication_providers' => 'account_authorization_configs' }.freeze
+
+  def columns(table_name)
+    if (old_name = RENAMES[table_name])
+      table_name = old_name if connection.table_exists?(old_name)
+    end
+    super
+  end
+end
+
+ActiveRecord::ConnectionAdapters::SchemaCache.prepend(TableRename)

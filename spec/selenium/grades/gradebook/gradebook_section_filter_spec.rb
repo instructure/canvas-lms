@@ -47,18 +47,18 @@ describe "gradebook" do
   it "should allow showing only a certain section", priority: "1", test_id: 210024 do
     get "/courses/#{@course.id}/gradebook"
     # grade the first assignment
-    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)
-    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2', 1)
+    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .b2', 0)
+    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .b2', 1)
 
     switch_to_section(@other_section)
     expect(fj('.section-select-button:visible')).to include_text(@other_section.name)
 
-    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')).to include_text '1'
+    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .b2')).to include_text '1'
 
     # verify that it remembers the section to show across page loads
     get "/courses/#{@course.id}/gradebook"
     expect(fj('.section-select-button:visible')).to include_text @other_section.name
-    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')).to include_text '1'
+    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .b2')).to include_text '1'
 
     # now verify that you can set it back
 
@@ -68,7 +68,7 @@ describe "gradebook" do
     expect(fj('.section-select-button:visible')).to include_text "All Sections"
 
     # validate all grades (i.e. submissions) were loaded
-    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')).to include_text '0'
-    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2')).to include_text '1'
+    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .b2')).to include_text '0'
+    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(2) .b2')).to include_text '1'
   end
 end

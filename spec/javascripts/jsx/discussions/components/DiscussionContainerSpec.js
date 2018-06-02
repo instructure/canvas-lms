@@ -18,8 +18,9 @@
 
 import React from 'react'
 import { mount, shallow } from 'enzyme'
+import moment from 'moment'
 
-import { DiscussionsContainer, mapState } from 'jsx/discussions/components/DiscussionContainer'
+import { DiscussionsContainer, mapState, discussionTarget } from 'jsx/discussions/components/DiscussionContainer'
 
 const defaultProps = () => ({
   title: "discussions",
@@ -70,6 +71,40 @@ test('renders a draggable discussion row when user has moderate permissions', ()
   ok(node.exists())
 })
 
+test('discussionTarget canDrop returns false if assignment due_at is in the past', () => {
+  const assignment = {due_at: '2017-05-13T00:59:59Z'}
+  const getItem = function () {
+    return {assignment}
+  }
+  const mockMonitor = {getItem}
+  ok(discussionTarget.canDrop({closedState: true}, mockMonitor))
+})
+
+test('discussionTarget canDrop returns true if not dragging to closed state', () => {
+  const assignment = {due_at: '2018-05-13T00:59:59Z'}
+  const getItem = function () {
+    return {assignment}
+  }
+  const mockMonitor = {getItem}
+  ok(discussionTarget.canDrop({closedState: false}, mockMonitor))
+})
+
+test('discussionTarget canDrop returns true if assignment due_at is in the future', () => {
+  moment.now = function () {
+      return +new Date('2015-05-13T00:59:59Z');
+  }
+  const assignment = {due_at: '2018-05-13T00:59:59Z'}
+  const getItem = function () {
+    return {assignment}
+  }
+  const mockMonitor = {getItem}
+  ok(!discussionTarget.canDrop({closedState: true}, mockMonitor))
+})
+
+moment.now = function () {
+    return +new Date();
+}
+
 test('connected mapStateToProps filters out filtered discussions', () => {
   const state = {}
   const ownProps = {
@@ -81,6 +116,8 @@ test('connected mapStateToProps filters out filtered discussions', () => {
   const connectedProps = mapState(state, ownProps)
   deepEqual(connectedProps.discussions, [{id: 2, filtered: false}])
 })
+
+
 
 test('renders background image no discussions are present', () => {
   const props = defaultProps()

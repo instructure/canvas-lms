@@ -25,7 +25,6 @@ class SisBatch < ActiveRecord::Base
   serialize :processing_warnings, Array
   belongs_to :attachment
   belongs_to :errors_attachment, class_name: 'Attachment'
-  has_many :sis_batch_error_files
   has_many :parallel_importers, inverse_of: :sis_batch
   has_many :sis_batch_errors, inverse_of: :sis_batch, autosave: false
   belongs_to :generated_diff, class_name: 'Attachment'

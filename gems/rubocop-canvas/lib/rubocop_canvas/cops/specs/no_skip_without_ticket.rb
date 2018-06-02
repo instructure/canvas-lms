@@ -26,7 +26,16 @@ module RuboCop
 
         METHOD = :skip
 
+        def on_if(node)
+          @conditional_sends ||= []
+          @conditional_sends.concat(node.children.select do |child_node|
+            child_node.is_a?(RuboCop::AST::SendNode) && child_node.method_name == METHOD
+          end)
+        end
+
         def on_send(node)
+          return if @conditional_sends&.include?(node)
+
           _receiver, method_name, *args = *node
           return unless method_name == METHOD
           first_arg = args.to_a.first

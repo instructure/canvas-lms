@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "aws-sdk-s3"
-  spec.add_dependency "activesupport", ">= 3.2", "< 5.2"
-  spec.add_dependency "activerecord", ">= 3.2", "< 5.2"
+  spec.add_dependency "activesupport", ">= 3.2"
+  spec.add_dependency "activerecord", ">= 3.2"
   spec.add_dependency "globby", ">= 0.1.2"
 end

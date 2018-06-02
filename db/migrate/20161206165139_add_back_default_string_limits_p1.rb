@@ -29,21 +29,23 @@ class AddBackDefaultStringLimitsP1 < ActiveRecord::Migration[4.2]
     add_string_limit_if_missing :access_tokens, :token_hint
     add_string_limit_if_missing :access_tokens, :crypted_refresh_token
 
-    add_string_limit_if_missing :account_authorization_configs, :auth_host
-    add_string_limit_if_missing :account_authorization_configs, :auth_base
-    add_string_limit_if_missing :account_authorization_configs, :auth_username
-    add_string_limit_if_missing :account_authorization_configs, :auth_crypted_password
-    add_string_limit_if_missing :account_authorization_configs, :auth_password_salt
-    add_string_limit_if_missing :account_authorization_configs, :auth_type
-    add_string_limit_if_missing :account_authorization_configs, :auth_over_tls
-    add_string_limit_if_missing :account_authorization_configs, :log_in_url
-    add_string_limit_if_missing :account_authorization_configs, :log_out_url
-    add_string_limit_if_missing :account_authorization_configs, :identifier_format
-    add_string_limit_if_missing :account_authorization_configs, :entity_id
-    add_string_limit_if_missing :account_authorization_configs, :requested_authn_context
-    add_string_limit_if_missing :account_authorization_configs, :idp_entity_id
-    add_string_limit_if_missing :account_authorization_configs, :workflow_state
-    add_string_limit_if_missing :account_authorization_configs, :metadata_uri
+    AuthenticationProvider.maybe_recreate_view do
+      add_string_limit_if_missing :account_authorization_configs, :auth_host
+      add_string_limit_if_missing :account_authorization_configs, :auth_base
+      add_string_limit_if_missing :account_authorization_configs, :auth_username
+      add_string_limit_if_missing :account_authorization_configs, :auth_crypted_password
+      add_string_limit_if_missing :account_authorization_configs, :auth_password_salt
+      add_string_limit_if_missing :account_authorization_configs, :auth_type
+      add_string_limit_if_missing :account_authorization_configs, :auth_over_tls
+      add_string_limit_if_missing :account_authorization_configs, :log_in_url
+      add_string_limit_if_missing :account_authorization_configs, :log_out_url
+      add_string_limit_if_missing :account_authorization_configs, :identifier_format
+      add_string_limit_if_missing :account_authorization_configs, :entity_id
+      add_string_limit_if_missing :account_authorization_configs, :requested_authn_context
+      add_string_limit_if_missing :account_authorization_configs, :idp_entity_id
+      add_string_limit_if_missing :account_authorization_configs, :workflow_state
+      add_string_limit_if_missing :account_authorization_configs, :metadata_uri
+    end
 
     add_string_limit_if_missing :account_notifications, :subject
     add_string_limit_if_missing :account_notifications, :icon

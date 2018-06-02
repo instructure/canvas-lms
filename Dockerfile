@@ -39,7 +39,7 @@ RUN curl -sL https://deb.nodesource.com/setup_8.x | bash - \
 
 RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="-i /var/lib/gems/$RUBY_MAJOR.0"; fi \
   && gem uninstall --all --ignore-dependencies --force $BUNDLER_INSTALL bundler \
-  && gem install bundler --no-document -v 1.15.2 \
+  && gem install bundler --no-document -v 1.16.1 \
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
 
 # We will need sfnt2woff in order to build fonts
@@ -81,6 +81,7 @@ RUN mkdir -p .yardoc \
              gems/selinimum/node_modules \
              log \
              node_modules \
+             packages/canvas-planner/lib \
              packages/canvas-planner/node_modules \
              public/dist \
              public/doc/api \

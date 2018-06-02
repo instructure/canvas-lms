@@ -57,6 +57,7 @@ define [
       @on "close", -> @$el[0].reset()
 
     onSaveSuccess: =>
+      @shouldPublish = false
       super
       if @assignmentGroup
         @assignmentGroup.get('assignments').add(@model)

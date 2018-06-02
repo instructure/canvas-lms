@@ -74,7 +74,7 @@ class MessageableUser < User
     scope = self.
       select(MessageableUser.build_select(options)).
       group(MessageableUser.connection.group_by(*columns)).
-      order(User.sortable_name_order_by_clause + ", users.id")
+      order(User.sortable_name_order_by_clause + Arel.sql(", users.id"))
 
     if options[:strict_checks]
       scope.where(AVAILABLE_CONDITIONS)

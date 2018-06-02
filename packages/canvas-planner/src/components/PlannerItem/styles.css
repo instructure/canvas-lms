@@ -19,16 +19,16 @@
 
 .completed {
   width: 1.375rem;
-  margin-left: var(--gutterWidth);
+  margin-inline-start: var(--gutterWidth);
 }
 
 .activityIndicator {
-  padding-right: 0;
-  padding-left: 0;
+  padding-inline-end: 0;
+  padding-inline-start: 0;
 }
 
 .activityIndicator + .completed {
-  margin-left: calc(var(--gutterWidth) - var(--activityIndicatorWidth))
+  margin-inline-start: calc(var(--gutterWidth) - var(--activityIndicatorWidth))
 }
 
 .icon {
@@ -92,10 +92,10 @@
 
 .metrics {
   box-sizing: border-box;
-  text-align: right;
+  text-align: end;
   flex: 0 0 7rem;
   min-width: 1px;
-  padding-left: var(--metricsPadding);
+  padding-inline-start: var(--metricsPadding);
 }
 
 .due,
@@ -118,6 +118,6 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    padding-right: 0.5rem;
+    padding-inline-end: 0.5rem;
   }
 }

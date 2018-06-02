@@ -237,6 +237,23 @@ describe ModeratedGrading::ProvisionalGrade do
       expect(sub.grade).not_to be_nil
       expect(sub.graded_anonymously).to eq true
     end
+
+    context 'for a moderated assignment with Anonymous Moderated Marking enabled' do
+      before(:each) do
+        course.root_account.enable_feature!(:anonymous_moderated_marking)
+        assignment.update!(moderated_grading: true, grader_count: 2)
+      end
+
+      it 'publishes a provisional grade' do
+        sub = submission_model(assignment: assignment, user: student)
+        provisional_grade = sub.find_or_create_provisional_grade!(scorer, score: 80, graded_anonymously: true)
+
+        provisional_grade.publish!
+        sub.reload
+
+        expect(sub.workflow_state).to eq 'graded'
+      end
+    end
   end
 
   describe "copy_to_final_mark!" do

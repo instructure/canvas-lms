@@ -241,9 +241,6 @@ module.exports = {
       })
     },
 
-    // A lot of our files expect a global `I18n` variable, this will provide it if it is used
-    new webpack.ProvidePlugin({I18n: 'i18n-js'}),
-
     // sets these environment variables in compiled code.
     // process.env.NODE_ENV will make it so react and others are much smaller and don't run their
     // debug/propType checking in prod.

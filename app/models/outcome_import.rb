@@ -74,8 +74,8 @@ class OutcomeImport < ApplicationRecord
     Attachment.new.tap do |att|
       Attachment.skip_3rd_party_submits(true)
       att.context = import
-      att.uploaded_data = data
       att.display_name = display_name
+      Attachments::Storage.store_for_attachment(att, data)
       att.save!
     end
   ensure
@@ -127,15 +127,14 @@ class OutcomeImport < ApplicationRecord
           self.update!(progress: status[:progress])
         end
 
-        if error_count == 0
-          job_completed!
-        else
-          job_failed!
-        end
+        job_completed!
+      rescue Outcomes::Import::DataFormatError => e
+        add_error(1, e.message, true)
+        job_failed!
       rescue => e
         report = ErrorReport.log_exception('outcomes_import', e)
         # no I18n on error report id
-        add_error(1, I18n.t('An unexpected error has occurred: see error report %{id}', id: report.id.to_s))
+        add_error(1, I18n.t('An unexpected error has occurred: see error report %{id}', id: report.id.to_s), true)
         job_failed!
       ensure
         file.close
@@ -144,10 +143,11 @@ class OutcomeImport < ApplicationRecord
     end
   end
 
-  def add_error(row, error)
+  def add_error(row, error, failure = false)
     outcome_import_errors.create!(
       row: row,
-      message: error
+      message: error,
+      failure: failure
     )
   end
 
@@ -191,28 +191,42 @@ class OutcomeImport < ApplicationRecord
     if succeeded?
       subject = I18n.t 'Outcomes Import Completed'
       user_name = user.name.split('@').first
-      body = I18n.t(<<-BODY, name: user_name, url: url).gsub(/^ +/, '')
-      Hello %{name},
+      if error_count == 0
+        body = I18n.t(<<-BODY, name: user_name, url: url).gsub(/^ +/, '')
+        Hello %{name},
 
-      Your outcomes were successfully imported. You can now manage them at %{url}
+        Your outcomes were successfully imported. You can now manage them at %{url}
 
-      Thank you,
-      Instructure
-      BODY
+        Thank you,
+        Instructure
+        BODY
+      else
+        rows = n_errors(100).map { |r, m| I18n.t("Row %{row}: %{message}", row: r, message: m) }.join("\n")
+        body = I18n.t(<<-BODY, name: user_name, rows: rows, url: url).gsub(/^ +/, '')
+        Hello %{name},
+
+        Your outcomes were successfully imported, but with the following issues (up to the first 100 warnings):
+
+        %{rows}
+
+        You can now manage them at %{url}
+
+        Thank you,
+        Instructure
+        BODY
+      end
     else
       subject = I18n.t 'Outcomes Import Failed'
       user_name = user.name.split('@').first
       doc_url = "#{HostUrl.protocol}://#{HostUrl.context_host(context)}/doc/api/file.outcomes_csv.html"
-      errors_count = I18n.t({one: "1 error", other: "%{count} errors"}, count: error_count)
-      errors_lead = error_count <= 100 ? I18n.t('The following errors occurred:') : I18n.t('Here are the first 100 errors that occurred:')
-      rows = n_errors(100).map { |r, m| I18n.t("Row %{row}: %{message}", row: r, message: m) }.join("\n")
-      body = I18n.t(<<-BODY, name: user_name, errors_count: errors_count, errors_lead: errors_lead, rows: rows, doc_url: doc_url, url: url).gsub(/^ +/, '')
+      row = n_errors(1).map { |r, m| I18n.t("Row %{row}: %{message}", row: r, message: m) }.first
+      body = I18n.t(<<-BODY, name: user_name, row: row, doc_url: doc_url, url: url).gsub(/^ +/, '')
       Hello %{name},
 
-      Your outcomes import failed due to %{errors_count} with your import. Please examine your file and attempt the upload again at %{url}
+      Your outcomes import failed due to an error with your import. Please examine your file and attempt the upload again at %{url}
 
-      %{errors_lead}
-      %{rows}
+      The following error occurred:
+      %{row}
 
       To view the proper import format, please review the Canvas API Docs at %{doc_url}
 

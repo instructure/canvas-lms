@@ -538,7 +538,7 @@ class UsersController < ApplicationController
       :STUDENT_PLANNER_ENABLED => planner_enabled?,
       :STUDENT_PLANNER_COURSES => planner_enabled? && map_courses_for_menu(@current_user.courses_with_primary_enrollment,
                                                                            :include_section_tabs => true),
-      :STUDENT_PLANNER_GROUPS => planner_enabled? && map_groups_for_planner(@current_user.current_groups.where(context_type: 'Account'))
+      :STUDENT_PLANNER_GROUPS => planner_enabled? && map_groups_for_planner(@current_user.current_groups)
     })
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
@@ -839,9 +839,7 @@ class UsersController < ApplicationController
       assignments_needing_submitting(
         include_ungraded: true,
         limit: ToDoListPresenter::ASSIGNMENT_LIMIT,
-        scope_only: true
-      ).
-      where('assignments.due_at IS NULL OR assignments.due_at > ?', Time.zone.now).
+        scope_only: true).
       reorder(:due_at, :id)
 
     grading_collection = BookmarkedCollection.wrap(bookmark, grading_scope)
@@ -864,7 +862,6 @@ class UsersController < ApplicationController
           :needing_submitting => true,
           :scope_only => true
         ).
-        where('quizzes.due_at IS NULL OR quizzes.due_at >= ?', Time.zone.now).
         reorder(:due_at, :id)
       quizzes_collection = BookmarkedCollection.wrap(quizzes_bookmark, quizzes_scope)
       quizzes_collection = BookmarkedCollection.transform(quizzes_collection) do |a|
@@ -898,17 +895,12 @@ class UsersController < ApplicationController
   #   }
   def todo_item_count
     return render_unauthorized_action unless @current_user
-    limit = ToDoListPresenter::ASSIGNMENT_LIMIT
-    grading = @current_user.assignments_needing_grading(limit: limit).map { |a| todo_item_json(a, @current_user, session, 'grading') }
-    submitting = @current_user.assignments_needing_submitting(include_ungraded: true, limit: limit).map do |a|
-      todo_item_json(a, @current_user, session, 'submitting')
-    end
+    grading = @current_user.assignments_needing_grading_count
+    submitting = @current_user.assignments_needing_submitting(include_ungraded: true, scope_only: true, limit: nil).size
     if Array(params[:include]).include? 'ungraded_quizzes'
-      submitting += @current_user.ungraded_quizzes(:needing_submitting => true, limit: limit).map { |q| todo_item_json(q, @current_user, session, 'submitting') }
-      submitting.sort_by! { |j| (j[:assignment] || j[:quiz])[:due_at] || CanvasSort::Last }
+      submitting += @current_user.ungraded_quizzes(:needing_submitting => true, scope_only: true, limit: nil).size
     end
-    count = grading.inject(0) {|sum, asg| sum += asg['needs_grading_count'] || 0}
-    render json: {needs_grading_count: count, assignments_needing_submitting: submitting.count}
+    render json: {needs_grading_count: grading, assignments_needing_submitting: submitting}
   end
 
   include Api::V1::Assignment
@@ -1223,7 +1215,7 @@ class UsersController < ApplicationController
   def api_show
     @user = api_find(User, params[:id])
     if @user.grants_right?(@current_user, session, :api_show_user)
-      render :json => user_json(@user, @current_user, session, %w{locale avatar_url permissions}, @current_user.pseudonym.account)
+      render :json => user_json(@user, @current_user, session, %w{locale avatar_url permissions email}, @current_user.pseudonym.account)
     else
       render_unauthorized_action
     end

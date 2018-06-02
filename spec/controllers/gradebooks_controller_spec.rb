@@ -741,6 +741,19 @@ describe GradebooksController do
         end
       end
 
+      it "includes anonymous_moderated_marking_enabled for Old Gradebook" do
+        @course.root_account.enable_feature!(:anonymous_moderated_marking)
+        get :show, params: { course_id: @course.id }
+        expect(gradebook_options.fetch(:anonymous_moderated_marking_enabled)).to eq(true)
+      end
+
+      it "includes anonymous_moderated_marking_enabled for New Gradebook" do
+        @course.enable_feature!(:new_gradebook)
+        @course.root_account.enable_feature!(:anonymous_moderated_marking)
+        get :show, params: { course_id: @course.id }
+        expect(gradebook_options.fetch(:anonymous_moderated_marking_enabled)).to eq(true)
+      end
+
       it "includes colors if New Gradebook is enabled" do
         @course.enable_feature!(:new_gradebook)
         get :show, params: {course_id: @course.id}

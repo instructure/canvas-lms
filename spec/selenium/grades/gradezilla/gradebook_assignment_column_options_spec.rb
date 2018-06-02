@@ -150,12 +150,13 @@ describe "Gradezilla - Assignment Column" do
     end
 
     it "speedgrader link on tray displays warning", priority: "1", test_id: 3481216 do
-      skip('This is skeleton code that acts as AC for GRADE-1050 which is WIP')
       Gradezilla::Cells.open_tray(@course.students.first, @assignment)
       Gradezilla::GradeDetailTray.speedgrader_link.click
 
-      expect(Gradezilla.overlay_info_screen.text).to
-            include_text('Anonymous Mode On: Unable to access specific student. Go to assignment in Speedgrader?')
+      expect(Gradezilla.overlay_info_screen.text.split(/\n/)).to include(
+        'Anonymous Mode On:',
+        'Unable to access specific student. Go to assignment in SpeedGrader?'
+      )
     end
   end
 end

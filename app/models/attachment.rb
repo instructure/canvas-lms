@@ -1488,7 +1488,8 @@ class Attachment < ActiveRecord::Base
   end
 
   def canvadocable?
-    Canvadocs.enabled? && Canvadoc.mime_types.include?(content_type_with_text_match)
+    canvadocable_mime_types = self&.folder&.for_submissions? ? Canvadoc.submission_mime_types : Canvadoc.mime_types
+    Canvadocs.enabled? && canvadocable_mime_types.include?(content_type_with_text_match)
   end
 
   def self.submit_to_canvadocs(ids)

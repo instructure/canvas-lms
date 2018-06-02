@@ -1,0 +1,305 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`does not render caveat if no courses have grading periods 1`] = `
+<View
+  display="auto"
+>
+  <View
+    display="auto"
+    textAlign="center"
+  >
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+      margin="0 0 large 0"
+    >
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="medium"
+        weight="bold"
+      >
+        My Grades
+      </Text>
+    </Heading>
+  </View>
+  <View
+    as="div"
+    display="auto"
+    margin="0 0 large 0"
+  >
+    <div
+      style={
+        Object {
+          "borderBottom": "solid thin",
+          "borderBottomColor": "blue",
+        }
+      }
+    >
+      <Link
+        as="button"
+        ellipsis={false}
+        href="/courses/1"
+        linkRef={[Function]}
+        variant="default"
+      >
+        <Text
+          as="span"
+          color="primary"
+          letterSpacing="normal"
+          size="small"
+          transform="uppercase"
+        >
+          Ticket to Ride 101
+        </Text>
+      </Link>
+    </div>
+    <Text
+      as="div"
+      letterSpacing="normal"
+      size="large"
+      weight="light"
+    >
+      No Grade
+    </Text>
+  </View>
+</View>
+`;
+
+exports[`renders a loading spinner when loading 1`] = `
+<View
+  display="auto"
+>
+  <View
+    display="auto"
+    textAlign="center"
+  >
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+      margin="0 0 large 0"
+    >
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="medium"
+        weight="bold"
+      >
+        My Grades
+      </Text>
+    </Heading>
+  </View>
+  <View
+    as="div"
+    display="auto"
+    margin="0 0 large 0"
+    textAlign="center"
+  >
+    <Spinner
+      as="div"
+      size="small"
+      title="Grades are loading"
+      variant="default"
+    />
+  </View>
+</View>
+`;
+
+exports[`renders an ErrorAlert if there is an error loading grades 1`] = `
+<View
+  display="auto"
+>
+  <ErrorAlert
+    error="There was an error"
+  >
+    Error loading grades
+  </ErrorAlert>
+  <View
+    display="auto"
+    textAlign="center"
+  >
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+      margin="0 0 large 0"
+    >
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="medium"
+        weight="bold"
+      >
+        My Grades
+      </Text>
+    </Heading>
+  </View>
+</View>
+`;
+
+exports[`renders some course grades 1`] = `
+<View
+  display="auto"
+>
+  <View
+    display="auto"
+    textAlign="center"
+  >
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+      margin="0 0 large 0"
+    >
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="medium"
+        weight="bold"
+      >
+        My Grades
+      </Text>
+    </Heading>
+  </View>
+  <View
+    as="div"
+    display="auto"
+    margin="0 0 large 0"
+  >
+    <div
+      style={
+        Object {
+          "borderBottom": "solid thin",
+          "borderBottomColor": "blue",
+        }
+      }
+    >
+      <Link
+        as="button"
+        ellipsis={false}
+        href="/courses/1"
+        linkRef={[Function]}
+        variant="default"
+      >
+        <Text
+          as="span"
+          color="primary"
+          letterSpacing="normal"
+          size="small"
+          transform="uppercase"
+        >
+          Ticket to Ride 101
+        </Text>
+      </Link>
+    </div>
+    <Text
+      as="div"
+      letterSpacing="normal"
+      size="large"
+      weight="light"
+    >
+      No Grade
+    </Text>
+  </View>
+  <View
+    as="div"
+    display="auto"
+    margin="0 0 large 0"
+  >
+    <div
+      style={
+        Object {
+          "borderBottom": "solid thin",
+          "borderBottomColor": "green",
+        }
+      }
+    >
+      <Link
+        as="button"
+        ellipsis={false}
+        href="/courses/2"
+        linkRef={[Function]}
+        variant="default"
+      >
+        <Text
+          as="span"
+          color="primary"
+          letterSpacing="normal"
+          size="small"
+          transform="uppercase"
+        >
+          Ingenious 101
+        </Text>
+      </Link>
+    </div>
+    <Text
+      as="div"
+      letterSpacing="normal"
+      size="large"
+      weight="light"
+    >
+      42.34%
+    </Text>
+  </View>
+  <View
+    as="div"
+    display="auto"
+    margin="0 0 large 0"
+  >
+    <div
+      style={
+        Object {
+          "borderBottom": "solid thin",
+          "borderBottomColor": "red",
+        }
+      }
+    >
+      <Link
+        as="button"
+        ellipsis={false}
+        href="/courses/3"
+        linkRef={[Function]}
+        variant="default"
+      >
+        <Text
+          as="span"
+          color="primary"
+          letterSpacing="normal"
+          size="small"
+          transform="uppercase"
+        >
+          Settlers of Catan 201
+        </Text>
+      </Link>
+    </div>
+    <Text
+      as="div"
+      letterSpacing="normal"
+      size="large"
+      weight="light"
+    >
+      No Grade
+    </Text>
+  </View>
+  <View
+    as="div"
+    display="auto"
+    textAlign="center"
+  >
+    <Text
+      as="span"
+      fontStyle="italic"
+      letterSpacing="normal"
+      size="x-small"
+    >
+      *Only most recent grading period shown.
+    </Text>
+  </View>
+</View>
+`;

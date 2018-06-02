@@ -24,10 +24,14 @@ import 'helpers/jquery.simulate'
 QUnit.module('PublishButtonView', {
   setup() {
     class Publishable extends Backbone.Model {
-      defaults = {
-        published: false,
-        publishable: true
+      defaults() {
+        return {
+          published: false,
+          publishable: true,
+          disabledForModeration: false
+        }
       }
+
       publish() {
         this.set('published', true)
         const dfrd = $.Deferred()
@@ -48,6 +52,7 @@ QUnit.module('PublishButtonView', {
     this.publish = new Publishable({published: false, unpublishable: true})
     this.published = new Publishable({published: true, unpublishable: true})
     this.disabled = new Publishable({published: true, unpublishable: false})
+    this.moderationDisabled = new Publishable({disabledForModeration: true})
   }
 })
 
@@ -278,4 +283,9 @@ test('click disabled published button should not trigger publish event', functio
   btnView.$el.trigger('mouseenter')
   btnView.$el.trigger('click')
   ok(!btnView.isPublish())
+})
+
+test('publish button is disabled if assignment is disabled for moderation', function() {
+  const buttonView = new PublishButtonView({model: this.moderationDisabled}).render()
+  strictEqual(buttonView.isDisabled(), true)
 })

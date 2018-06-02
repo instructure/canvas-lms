@@ -18,7 +18,6 @@
 ENV["RAILS_ENV"] = ENV["RACK_ENV"]= "test"
 require_relative '../spec_helper'
 require 'pact/provider/rspec'
-require_relative 'proxy_app'
 require 'database_cleaner'
 
 # Require the provider states files for each service consumer
@@ -28,7 +27,7 @@ Pact.service_provider "CanvasAPI" do
   # Optional app configuration. Pact loads the app from config.ru by default
   # (it is recommended to let Pact use the config.ru if possible, so testing
   # conditions are closest to runtime conditions)
-  app { ProxyApp.new }
+  app { CanvasRails::Application }
 
   honours_pact_with 'Consumer' do
 

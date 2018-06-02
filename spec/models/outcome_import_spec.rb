@@ -50,6 +50,14 @@ describe OutcomeImport, type: :model do
     expect(import).not_to be_changed
   end
 
+  it "should use instfs for attachment during create_with_attachment if instfs is enabled" do
+    allow(InstFS).to receive(:enabled?).and_return(true)
+    uuid = "1234-abcd"
+    allow(InstFS).to receive(:direct_upload).and_return(uuid)
+    import = create_import
+    expect(import.attachment.instfs_uuid).to eq uuid
+  end
+
   it "should save as latest outcome import" do
     import = create_import
     expect(@account.latest_outcome_import).to be_nil
@@ -88,6 +96,12 @@ describe OutcomeImport, type: :model do
           block.call(up)
         end
       end
+      expect(Outcomes::CsvImporter).to receive(:new).and_return(importer)
+    end
+
+    def mock_importer_error(msg)
+      importer = instance_double(Outcomes::CsvImporter)
+      expect(importer).to receive(:run).and_raise(Outcomes::Import::DataFormatError, msg)
       expect(Outcomes::CsvImporter).to receive(:new).and_return(importer)
     end
 
@@ -158,12 +172,45 @@ describe OutcomeImport, type: :model do
       import.run
     end
 
-    it 'emails user on failed completion' do
+    it 'emails user on successful completion but with warnings' do
       mock_importer([
         { progress: 0, errors: [] },
-        { progress: 50, errors: [[1, 'Very Bad Error']] },
+        { progress: 50, errors: [[2, 'The "title" field is required']] },
         { progress: 100, errors: [] }
       ])
+
+      attachment = fake_attachment(fake_file)
+      import = fake_import(attachment)
+      import.user = user_factory
+      import.save!
+      message = Message.new
+      expect(message).to receive(:communication_channel=).with(import.user.email_channel).and_call_original
+      expect(message).to receive(:user=).with(import.user).and_call_original
+      expect(Message).to receive(:new).with({
+        to: import.user.email,
+        from: "notifications@instructure.com",
+        subject: 'Outcomes Import Completed',
+        body: "Hello #{import.user.name},
+
+          Your outcomes were successfully imported, but with the following issues (up to the first 100 warnings):
+
+          Row 2: The \"title\" field is required
+
+          You can now manage them at http://localhost/accounts/#{@account.id}/outcomes
+
+          Thank you,
+          Instructure".gsub(/^ +/, ''),
+        delay_for: 0,
+        context: nil,
+        path_type: 'email',
+        from_name: "Instructure Canvas"
+      }).and_return(message)
+      expect(message).to receive(:deliver)
+      import.run
+    end
+
+    it 'emails user on failed completion' do
+      mock_importer_error('Very Bad Error')
 
       attachment = fake_attachment(fake_file)
       import = fake_import(attachment)
@@ -178,9 +225,9 @@ describe OutcomeImport, type: :model do
         subject: 'Outcomes Import Failed',
         body: "Hello #{import.user.name},
 
-          Your outcomes import failed due to 1 error with your import. Please examine your file and attempt the upload again at http://localhost/accounts/#{@account.id}/outcomes
+          Your outcomes import failed due to an error with your import. Please examine your file and attempt the upload again at http://localhost/accounts/#{@account.id}/outcomes
 
-          The following errors occurred:
+          The following error occurred:
           Row 1: Very Bad Error
 
           To view the proper import format, please review the Canvas API Docs at http://localhost/doc/api/file.outcomes_csv.html
@@ -196,52 +243,8 @@ describe OutcomeImport, type: :model do
       import.run
     end
 
-    it 'limits the errors emailed to first 100 rows on failed completion' do
-      errors = (1..200).map{|n| [n, 'Very Bad Error']}
-      printed_errors = (1..100).map{|n| "Row #{n}: Very Bad Error"}.join("\n")
-      mock_importer([
-        { progress: 0, errors: [] },
-        { progress: 50, errors: errors },
-        { progress: 100, errors: [] }
-      ])
-
-      attachment = fake_attachment(fake_file)
-      import = fake_import(attachment)
-      import.user = user_factory
-      import.save!
-      message = Message.new
-      expect(message).to receive(:communication_channel=).with(import.user.email_channel).and_call_original
-      expect(message).to receive(:user=).with(import.user).and_call_original
-      expect(Message).to receive(:new).with({
-        to: import.user.email,
-        from: "notifications@instructure.com",
-        subject: 'Outcomes Import Failed',
-        body: "Hello #{import.user.name},
-
-          Your outcomes import failed due to 200 errors with your import. Please examine your file and attempt the upload again at http://localhost/accounts/#{@account.id}/outcomes
-
-          Here are the first 100 errors that occurred:
-          #{printed_errors}
-
-          To view the proper import format, please review the Canvas API Docs at http://localhost/doc/api/file.outcomes_csv.html
-
-          Thank you,
-          Instructure".gsub(/^ +/, ''),
-        delay_for: 0,
-        context: nil,
-        path_type: 'email',
-        from_name: "Instructure Canvas"
-      }).and_return(message)
-      expect(message).to receive(:deliver)
-      import.run
-    end
-
     it 'sets outcome_import_errors' do
-      mock_importer([
-        { progress: 0, errors: [] },
-        { progress: 50, errors: [[1, 'Very Bad Error']] },
-        { progress: 100, errors: [] }
-      ])
+      mock_importer_error('Very Bad Error')
 
       attachment = fake_attachment(fake_file)
       import = fake_import(attachment)
@@ -251,7 +254,7 @@ describe OutcomeImport, type: :model do
       expect(errors.pluck(:row, :message)).to eq([
         [1, 'Very Bad Error']
       ])
-      expect(import.progress).to eq(100)
+      expect(import.progress).to eq(nil)
       expect(import.workflow_state).to eq('failed')
     end
 
@@ -265,7 +268,7 @@ describe OutcomeImport, type: :model do
 
       errors = import.outcome_import_errors.all.to_a
       expect(errors.length).to eq 1
-      expect(errors[0]).to have_attributes(row: 1, message: /An unexpected error has .*/)
+      expect(errors[0]).to have_attributes(row: 1, message: /An unexpected error has .*/, failure: true)
 
       error_report_id = errors[0].message.match(/error report (\d+)/)[1]
       expect(ErrorReport.find(error_report_id).message).to match(/undefined method/)

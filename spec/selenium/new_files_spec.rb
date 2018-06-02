@@ -479,5 +479,12 @@ describe "better_file_browsing" do
       expect(ff('.ef-name-col__text')[0]).to include_text 'b_file.txt'
       expect(ff('.ef-name-col__text')[1]).to include_text 'example.pdf'
     end
+
+    it "url-encodes sort header links" do
+      course_with_teacher_logged_in
+      folder = Folder.root_folders(@course).first.sub_folders.create!(name: 'eh?', context: @course)
+      get "/courses/#{@course.id}/files/folder/eh%3F"
+      expect(ff('.ef-plain-link').first.attribute('href')).to include '/files/folder/eh%3F?sort'
+    end
   end
 end

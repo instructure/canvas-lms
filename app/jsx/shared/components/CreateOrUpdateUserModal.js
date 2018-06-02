@@ -78,7 +78,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
   componentWillMount() {
     if (this.props.createOrUpdate === 'update') {
       // only get the attributes from the user that we are actually going to show in the <input>s
-      // and send to the server. Because if we send the server extraneous attributes like user[id] 
+      // and send to the server. Because if we send the server extraneous attributes like user[id]
       // it throws 401 errors
       const userDataFromProps = this.getInputFields().reduce((memo, {name}) => {
         const key = name.match(/user\[(.*)\]/)[1] // extracts 'short_name' from 'user[short_name]'
@@ -197,7 +197,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
         onDismiss={this.close}
         size="small"
         label={this.props.createOrUpdate === 'create'
-          ? I18n.t('Add a new user')
+          ? I18n.t('Add a New User')
           : (
             <span>
               <Avatar
@@ -206,7 +206,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
                 src={this.props.user.avatar_url}
               />
               {' '}
-              {I18n.t('Edit user details')}
+              {I18n.t('Edit User Details')}
             </span>
           )
         }

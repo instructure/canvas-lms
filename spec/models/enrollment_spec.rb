@@ -193,9 +193,45 @@ describe Enrollment do
       expect(override_student).to be_present
       expect(override_student).to be_active
     end
+
     it 'destroys assignment override students on the user if no other enrollments for the user exist in the course' do
       @enrollment.destroy
       expect(override_student).to be_deleted
+    end
+
+    context 'when the user is a final grader' do
+      before(:once) do
+        @course.root_account.enable_feature!(:anonymous_moderated_marking)
+        @teacher = User.create!
+        @another_teacher = User.create!
+        @course.enroll_teacher(@teacher, enrollment_state: 'active', allow_multiple_enrollments: true)
+        @course.enroll_teacher(@another_teacher, enrollment_state: 'active', allow_multiple_enrollments: true)
+        2.times { @course.assignments.create!(moderated_grading: true, final_grader: @teacher, grader_count: 2) }
+        @course.assignments.create!(moderated_grading: true, final_grader: @another_teacher, grader_count: 2)
+      end
+
+      it 'removes the user as final grader from all course assignments if Anonymous Moderated Marking is enabled' do
+        expect { @course.enrollments.find_by!(user: @teacher).destroy }.to change {
+          @course.assignments.order(:created_at).pluck(:final_grader_id)
+        }.from([nil, @teacher.id, @teacher.id, @another_teacher.id]).to([nil, nil, nil, @another_teacher.id])
+      end
+
+      it 'does not remove the user as final grader from assignments if the user ' \
+      'has other active enrollments of the same type' do
+        section_one = @course.course_sections.create!
+        @course.enroll_teacher(@teacher, active_all: true, allow_multiple_enrollments: true, section: section_one)
+        expect { @course.enrollments.find_by!(user: @teacher).destroy }.not_to change {
+          @course.assignments.order(:created_at).pluck(:final_grader_id)
+        }.from([nil, @teacher.id, @teacher.id, @another_teacher.id])
+      end
+
+      it 'does not remove the user as final grader from assignments if the user ' \
+      'has other active instructor enrollments' do
+        @course.enroll_ta(@teacher, active_all: true, allow_multiple_enrollments: true)
+        expect { @course.enrollments.find_by!(user: @teacher).destroy }.not_to change {
+          @course.assignments.order(:created_at).pluck(:final_grader_id)
+        }.from([nil, @teacher.id, @teacher.id, @another_teacher.id])
+      end
     end
   end
 

@@ -199,8 +199,43 @@ describe RubricAssessment do
             }
           }
         })
-        expect(assessment.score).to eql(5.0)
-        expect(assessment.artifact.score).to eql(5.0)
+        expect(assessment.score).to be 5.0
+        expect(assessment.artifact.score).to be 5.0
+      end
+
+      it "propagates hide_points value" do
+        @association.update!(hide_points: true)
+        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        assessment = @association.assess({
+          :user => @student,
+          :assessor => @teacher,
+          :artifact => @assignment.find_or_create_submission(@student),
+          :assessment => {
+            :assessment_type => 'grading',
+            criterion_id => {
+              :points => "3"
+            }
+          }
+        })
+        expect(assessment.hide_points).to be true
+        expect(LearningOutcomeResult.last.hide_points).to be true
+      end
+
+      it "propagates hide_outcome_results value" do
+        @association.update!(hide_outcome_results: true)
+        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        @association.assess({
+          :user => @student,
+          :assessor => @teacher,
+          :artifact => @assignment.find_or_create_submission(@student),
+          :assessment => {
+            :assessment_type => 'grading',
+            criterion_id => {
+              :points => "3"
+            }
+          }
+        })
+        expect(LearningOutcomeResult.last.hidden).to be true
       end
     end
 

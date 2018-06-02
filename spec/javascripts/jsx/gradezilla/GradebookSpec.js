@@ -195,6 +195,7 @@ test('renders the StatusesModal', function () {
     'arrangeColumnsBy',
     'renderGradebookSettingsModal',
     'renderSettingsButton',
+    'renderAnonymousSpeedGraderAlert',
     'updatePostGradesFeatureButton',
     'initPostGradesStore',
   ].forEach(fn => this.stub(gradebook, fn));
@@ -8959,6 +8960,114 @@ QUnit.module('#renderGradebookSettingsModal', (hooks) => {
     gradebook = createGradebook({ locale: 'de' });
     gradebook.renderGradebookSettingsModal();
     strictEqual(gradebookSettingsModalProps().locale, 'de');
+  });
+});
+
+QUnit.module('Gradebook#renderAnonymousSpeedGraderAlert', (hooks) => {
+  let gradebook;
+  const onClose = () => {}
+  const alertProps = {
+    speedGraderUrl: 'http://test.url:3000',
+    onClose
+  };
+
+  function anonymousSpeedGraderAlertProps () {
+    return ReactDOM.render.firstCall.args[0].props;
+  }
+
+  hooks.beforeEach(() => {
+    sinon.stub(ReactDOM, 'render');
+  });
+
+  hooks.afterEach(() => {
+    ReactDOM.render.restore();
+  });
+
+  test('renders the AnonymousSpeedGraderAlert component', function () {
+    gradebook = createGradebook();
+    gradebook.renderAnonymousSpeedGraderAlert(alertProps);
+    const componentName = ReactDOM.render.firstCall.args[0].type.name;
+    strictEqual(componentName, 'AnonymousSpeedGraderAlert');
+  });
+
+  test('passes speedGraderUrl to the modal as a prop', function () {
+    gradebook = createGradebook();
+    gradebook.renderAnonymousSpeedGraderAlert(alertProps);
+    strictEqual(anonymousSpeedGraderAlertProps().speedGraderUrl, 'http://test.url:3000');
+  });
+
+  test('passes onClose to the modal as a prop', function () {
+    gradebook = createGradebook();
+
+    gradebook.renderAnonymousSpeedGraderAlert(alertProps)
+    strictEqual(anonymousSpeedGraderAlertProps().onClose, onClose);
+  });
+});
+
+QUnit.module('Gradebook#showAnonymousSpeedGraderAlertForURL', (hooks) => {
+  let gradebook;
+
+  function anonymousSpeedGraderAlertProps () {
+    return gradebook.renderAnonymousSpeedGraderAlert.firstCall.args[0];
+  }
+
+  hooks.beforeEach(() => {
+    $fixtures.innerHTML = `
+      <div id="application">
+        <div id="wrapper">
+          <div data-component='AnonymousSpeedGraderAlert'></div>
+        </div>
+      </div>
+    `;
+  });
+
+  hooks.afterEach(() => {
+    $fixtures.innerHTML = '';
+  });
+
+  test('renders the alert with the supplied speedGraderURL', function () {
+    gradebook = createGradebook();
+
+    sinon.spy(gradebook, 'renderAnonymousSpeedGraderAlert');
+    gradebook.showAnonymousSpeedGraderAlertForURL('http://test.url:3000');
+
+    strictEqual(anonymousSpeedGraderAlertProps().speedGraderUrl, 'http://test.url:3000');
+    gradebook.renderAnonymousSpeedGraderAlert.restore();
+  });
+});
+
+QUnit.module('Gradebook#hideAnonymousSpeedGraderAlert', (hooks) => {
+  let gradebook;
+
+  hooks.beforeEach(() => {
+    $fixtures.innerHTML = `
+      <div id="application">
+        <div id="wrapper">
+          <div data-component='AnonymousSpeedGraderAlert'></div>
+        </div>
+      </div>
+    `;
+
+    sinon.stub(ReactDOM, 'unmountComponentAtNode');
+  });
+
+  hooks.afterEach(() => {
+    ReactDOM.unmountComponentAtNode.restore();
+
+    $fixtures.innerHTML = '';
+  });
+
+  test('unmounts the component at the alert mount point', function () {
+    const clock = sinon.useFakeTimers();
+    gradebook = createGradebook();
+    gradebook.hideAnonymousSpeedGraderAlert();
+
+    // allow the component to unmount (which is handled via a delayed call)
+    clock.tick(0);
+
+    const mountPoint = ReactDOM.unmountComponentAtNode.firstCall.args[0];
+    strictEqual(mountPoint.dataset.component, 'AnonymousSpeedGraderAlert');
+    clock.restore();
   });
 });
 

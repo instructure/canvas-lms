@@ -1,0 +1,48 @@
+<%
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<% unless AuthenticationProvider::Microsoft.globally_configured? %>
+  <p><%= mt(<<-TEXT, ms_app_url: "https://apps.dev.microsoft.com/", callback_url: oauth2_login_callback_url)
+You will need to register a [new app with Microsoft](%{ms_app_url}).
+You should configure %{callback_url} as the Redirect URI.
+After you save your app, make a note of the Application ID and Secret, and enter them here.
+TEXT
+      %></p>
+  <div class="ic-Form-control">
+    <%= f.label :application_id, t('Application ID'), class: 'ic-Label', for: "application_id_#{presenter.id_suffix(aac)}" %>
+    <%= f.text_field :application_id, class: 'ic-Input', id: "application_id_#{presenter.id_suffix(aac)}" %>
+  </div>
+  <div class="ic-Form-control">
+    <%= f.label :application_secret, t('Application Secret'), class: 'ic-Label', for: "application_secret_#{presenter.id_suffix(aac)}" %>
+    <%= f.password_field :application_secret, class: 'ic-Input', id: "application_secret_#{presenter.id_suffix(aac)}" %>
+  </div><% end %>
+<p><%= t(<<-TEXT)
+To restrict to users of your Azure Active Directory, enter your tenant here.
+TEXT
+%></p>
+<div class="ic-Form-control">
+  <%= f.label :tenant, t('Tenant'), class: 'ic-Label', for: "tenant_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :tenant, placeholder: 'mytenant.onmicrosoft.com', class: 'ic-Input', id: "tenant_#{presenter.id_suffix(aac)}" %>
+</div>
+<p><%= t <<-TEXT
+Note that email may not always be populated in the user's profile at Microsoft.
+Oid will not be populated for personal Microsoft accounts.
+TEXT
+%></p>
+<%= render partial: 'login_attribute_dropdown', locals: { aac: aac, presenter: presenter, f: f } %>
+<%= render partial: 'jit_provisioning_field', locals: { aac: aac, presenter: presenter, f: f } %>

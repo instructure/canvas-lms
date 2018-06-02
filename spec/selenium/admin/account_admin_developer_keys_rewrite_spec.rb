@@ -23,7 +23,6 @@ describe 'Developer Keys' do
   describe 'with developer key management UI rewrite feature flag' do
     before(:each) do
       admin_logged_in
-      Account.site_admin.allow_feature!(:developer_key_management_ui_rewrite)
       Account.default.enable_feature!(:developer_key_management_ui_rewrite)
     end
 
@@ -50,6 +49,11 @@ describe 'Developer Keys' do
       wait_for_ajaximations
     end
 
+    def click_account_tab
+      fj("#reactContent span[role='tablist'] span:contains('Account')").click
+      wait_for_ajaximations
+    end
+
     it "allows creation through 'add developer key button'", test_id: 344077 do
       get "/accounts/#{Account.default.id}/developer_keys"
 
@@ -72,7 +76,7 @@ describe 'Developer Keys' do
     it "allows update through 'edit this key button'", test_id: 344078 do
       root_developer_key
       get "/accounts/#{Account.default.id}/developer_keys"
-      f("#reactContent tbody tr.key .edit_link").click
+      fj("#keys tbody tr.key button:has(svg[name='IconEditLine'])").click
       replace_content(f("input[name='developer_key[name]']"), "Cooler Tool")
       replace_content(f("input[name='developer_key[email]']"), "admins@example.com")
       replace_content(f("textarea[name='developer_key[redirect_uris]']"), "http://b/")
@@ -92,7 +96,7 @@ describe 'Developer Keys' do
       dk = root_developer_key
       dk.update_attribute(:redirect_uri, "http://a/")
       get "/accounts/#{Account.default.id}/developer_keys"
-      f("#reactContent tbody tr.key .edit_link").click
+      fj("#keys tbody tr.key button:has(svg[name='IconEditLine'])").click
       replace_content(f("input[name='developer_key[name]']"), "Cooler Tool")
       replace_content(f("input[name='developer_key[email]']"), "admins@example.com")
       replace_content(f("input[name='developer_key[redirect_uri]']"), "https://b/")
@@ -112,7 +116,7 @@ describe 'Developer Keys' do
       skip_if_safari(:alert)
       root_developer_key
       get "/accounts/#{Account.default.id}/developer_keys"
-      f("#reactContent tbody tr.key .edit_link").click
+      fj("#keys tbody tr.key button:has(svg[name='IconEditLine'])").click
       f("input[name='developer_key[icon_url]']").clear
       find_button("Save Key").click
 
@@ -121,34 +125,45 @@ describe 'Developer Keys' do
       key = Account.default.developer_keys.last
       expect(key.icon_url).to eq nil
 
-      f("#reactContent tbody tr.key .delete_link").click
+      fj("#keys tbody tr.key button:has(svg[name='IconTrashLine'])").click
       driver.switch_to.alert.accept
       driver.switch_to.default_content
-      expect(f("#reactContent")).not_to contain_css("tbody tr")
+      expect(f("#keys")).not_to contain_css("tbody tr")
       expect(Account.default.developer_keys.nondeleted.count).to eq 0
     end
 
-    it "allows for pagination", test_id: 344532 do
+    it "allows for pagination on account tab", test_id: 344532 do
       11.times { |i| Account.default.developer_keys.create!(name: "tool #{i}") }
       get "/accounts/#{Account.default.id}/developer_keys"
-      expect(ff("#reactContent tbody tr")).to have_size(10)
+      expect(ff("#keys tbody tr")).to have_size(10)
       find_button("Show All Keys").click
-      expect(ff("#reactContent tbody tr")).to have_size(11)
+      expect(ff("#keys tbody tr")).to have_size(11)
+    end
+
+    it "allows for pagination on inherited tab", test_id: 344532 do
+      site_admin_logged_in
+      11.times { |i| DeveloperKey.create!(name: "tool #{i}") }
+      DeveloperKey.all.each { |key| key.update(visible: true) }
+      get "/accounts/#{Account.default.id}/developer_keys"
+      click_inherited_tab
+      expect(ff("#keys tbody tr")).to have_size(10)
+      find_button("Show All Keys").click
+      expect(ff("#keys tbody tr")).to have_size(11)
     end
 
     it "renders the key not visible", test_id: 3485785 do
       root_developer_key
       get "/accounts/#{Account.default.id}/developer_keys"
-      f("#keys tbody tr.key .icon-eye").click
-      expect(f("#keys tbody")).to contain_css(".icon-off")
+      fj("#keys tbody tr.key button:has(svg[name='IconEyeLine'])").click
+      expect(f("#keys tbody tr.key")).to contain_css("svg[name='IconOffLine']")
       expect(root_developer_key.reload.visible).to eq false
     end
 
     it "renders the key visible", test_id: 3485785 do
       root_developer_key.update(visible: false)
       get "/accounts/#{Account.default.id}/developer_keys"
-      f("#keys tbody tr.key .icon-off").click
-      expect(f("#keys tbody")).not_to contain_css(".icon-off")
+      fj("#keys tbody tr.key button:has(svg[name='IconOffLine'])").click
+      expect(f("#keys tbody tr.key")).not_to contain_css("svg[name='IconOffLine']")
       expect(root_developer_key.reload.visible).to eq true
     end
 
@@ -168,6 +183,7 @@ describe 'Developer Keys' do
       end
 
       it "root account inherits 'on' binding workflow state from site admin key", test_id: 3482823 do
+        pending 'This test will be valid once the "new developer keys" site admin setting exists'
         site_admin_logged_in
         site_admin_developer_key.update(visible: true)
         get "/accounts/#{Account.site_admin.id}/developer_keys"
@@ -179,6 +195,7 @@ describe 'Developer Keys' do
       end
 
       it "root account inherits 'off' binding workflow state from site admin key", test_id: 3482823 do
+        pending 'This test will be valid once the "new developer keys" site admin setting exists'
         site_admin_logged_in
         site_admin_developer_key.update(visible: true)
         get "/accounts/#{Account.site_admin.id}/developer_keys"
@@ -190,6 +207,7 @@ describe 'Developer Keys' do
       end
 
       it "root account keeps self binding workflow state if site admin key state is 'allow'", test_id: 3482823 do
+        pending 'This test will be valid once the "new developer keys" site admin setting exists'
         site_admin_logged_in
         site_admin_developer_key.update!(visible: true)
         site_admin_developer_key.developer_key_account_bindings.first.update!(workflow_state: 'allow')
@@ -230,6 +248,35 @@ describe 'Developer Keys' do
         fj("span:contains('Off'):last").click
         keep_trying_until { expect(current_active_element.attribute('value')).to eq 'off' }
         expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'off'
+      end
+
+      it "persists state when switching between account and inheritance tabs", test_id: 3488599 do
+        root_developer_key
+        get "/accounts/#{Account.default.id}/developer_keys"
+        fj("span:contains('On'):last").click
+        click_inherited_tab
+        click_account_tab
+        expect(fxpath("//*[@id='keys']/tbody/tr/td[5]/fieldset/span/span/span/span[2]/span/span/span[1]/div/label/span[1]").css_value('background-color')).to be_truthy
+      end
+
+      it "persists state when switching between inheritance and account tabs", test_id: 3488600 do
+        site_admin_developer_key
+        DeveloperKey.find(site_admin_developer_key.id).update(visible: true)
+        DeveloperKeyAccountBinding.first.update(workflow_state: 'allow')
+        get "/accounts/#{Account.default.id}/developer_keys"
+        click_inherited_tab
+        fj("span:contains('Off'):last").click
+        click_account_tab
+        click_inherited_tab
+        expect(fj("fieldset:last")).not_to have_attribute('aria-disabled')
+        expect(fxpath("//*[@id='keys']/tbody/tr[1]/td[3]/fieldset/span/span/span/span[2]/span/span/span[3]/div/label/span[1]").css_value('background-color')).to be_truthy
+      end
+
+      it "only show create developer key button for account tab panel" do
+        get "/accounts/#{Account.default.id}/developer_keys"
+        expect(fj("#reactContent span:contains('Developer Key')")).to be_truthy
+        click_inherited_tab
+        expect(f("#reactContent")).not_to contain_jqcss("span:contains('Developer Key')")
       end
 
     end

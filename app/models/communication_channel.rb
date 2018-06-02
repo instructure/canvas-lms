@@ -368,7 +368,7 @@ class CommunicationChannel < ActiveRecord::Base
     # Add twitter and yo (in that order) if the user's account is setup for them.
     rank_order << TYPE_TWITTER if twitter_service
     self.unretired.where('communication_channels.path_type IN (?)', rank_order).
-      order("#{self.rank_sql(rank_order, 'communication_channels.path_type')} ASC, communication_channels.position asc").to_a
+      order(Arel.sql("#{self.rank_sql(rank_order, 'communication_channels.path_type')} ASC, communication_channels.position asc")).to_a
   end
 
   scope :include_policies, -> { preload(:notification_policies) }

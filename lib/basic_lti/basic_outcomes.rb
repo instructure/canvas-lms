@@ -90,6 +90,10 @@ module BasicLTI
         @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultScore > textString').try(:content)
       end
 
+      def submission_submitted_at
+        @lti_request && @lti_request.at_css('imsx_POXBody > replaceResultRequest > submissionDetails > submittedAt').try(:content)
+      end
+
       def result_total_score
         @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultTotalScore > textString').try(:content)
       end
@@ -226,6 +230,14 @@ module BasicLTI
           error_message = I18n.t('lib.basic_lti.no_score', "No score given")
         end
 
+        submitted_at = submission_submitted_at
+        submitted_at_date = submitted_at.present? ? Time.zone.parse(submitted_at) : nil
+        if submitted_at.present? && submitted_at_date.nil?
+          error_message = I18n.t('Invalid timestamp - timestamp not parseable')
+        elsif submitted_at_date.present? && submitted_at_date > Time.zone.now + 1.minute
+          error_message = I18n.t('Invalid timestamp - timestamp in future')
+        end
+
         if error_message
           self.code_major = 'failure'
           self.description = error_message
@@ -251,7 +263,7 @@ to because the assignment has no points possible.
 
             send_later_enqueue_args(:fetch_attachment_and_save_submission, job_options, url, attachment, _tool, submission_hash, assignment, user, new_score, raw_score)
           else
-            create_homework_submission _tool, submission_hash, assignment, user, new_score, raw_score
+            create_homework_submission _tool, submission_hash, assignment, user, new_score, raw_score, submitted_at_date
           end
         end
 
@@ -260,7 +272,7 @@ to because the assignment has no points possible.
         true
       end
 
-      def create_homework_submission(_tool, submission_hash, assignment, user, new_score, raw_score)
+      def create_homework_submission(_tool, submission_hash, assignment, user, new_score, raw_score, submitted_at_date=nil)
         if submission_hash[:submission_type].present? && submission_hash[:submission_type] != 'external_tool'
           @submission = assignment.submit_homework(user, submission_hash.clone)
         end
@@ -269,9 +281,13 @@ to because the assignment has no points possible.
           submission_hash[:grade] = (new_score >= 1 ? "pass" : "fail") if assignment.grading_type == "pass_fail"
           submission_hash[:grader_id] = -_tool.id
           @submission = assignment.grade_student(user, submission_hash).first
-          if submission_hash[:submission_type] == 'external_tool'
+          if submission_hash[:submission_type] == 'external_tool' && submitted_at_date.nil?
             @submission.submitted_at = Time.zone.now
           end
+        end
+
+        if submitted_at_date.present?
+          @submission.submitted_at = submitted_at_date
         end
 
         if @submission

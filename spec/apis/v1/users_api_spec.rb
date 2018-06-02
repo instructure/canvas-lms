@@ -524,7 +524,8 @@ describe "Users API", type: :request do
          'integration_id' => nil,
          'login_id' => @other_user.pseudonym.unique_id,
          'locale' => nil,
-         'permissions' => {'can_update_name' => true, 'can_update_avatar' => false}
+         'permissions' => {'can_update_name' => true, 'can_update_avatar' => false},
+         'email' => @other_user.email
       })
     end
 

@@ -71,7 +71,7 @@ module Api::V1::Quiz
                          scope: user,
                          session: session,
                          root: :quizzes,
-                         each_serializer: Quizzes::QuizSerializer,
+                         each_serializer: Quizzes::QuizApiSerializer,
                          controller: self,
                          serializer_options: options).as_json
     else

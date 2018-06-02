@@ -1,0 +1,36 @@
+<%
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<% unless AuthenticationProvider::Twitter.globally_configured? %>
+  <p><%= mt(<<-TEXT, twitter_url: "https://apps.twitter.com/", callback_url: oauth_login_callback_url)
+You will need to [register an application on Twitter](%{twitter_url}).
+You should configure %{callback_url} as the Callback URL.
+After you create your application, make a note of the Consumer Key and Consumer Secret, and enter them here.
+TEXT
+      %></p>
+  <div class="ic-Form-control">
+    <%= f.label :consumer_key, 'Consumer Key', class: 'ic-Label', for: "consumer_key_#{presenter.id_suffix(aac)}" %>
+    <%= f.text_field :consumer_key, class: 'ic-Input', id: "consumer_key_#{presenter.id_suffix(aac)}" %>
+  </div>
+  <div class="ic-Form-control">
+    <%= f.label :consumer_secret, 'Consumer Secret', class: 'ic-Label', for: "consumer_secret_#{presenter.id_suffix(aac)}" %>
+    <%= f.password_field :consumer_secret, class: 'ic-Input', id: "consumer_secret_#{presenter.id_suffix(aac)}" %>
+  </div>
+<% end %>
+<%= render partial: 'login_attribute_dropdown', locals: { aac: aac, presenter: presenter, f: f } %>
+<%= render partial: 'jit_provisioning_field', locals: { aac: aac, presenter: presenter, f: f } %>

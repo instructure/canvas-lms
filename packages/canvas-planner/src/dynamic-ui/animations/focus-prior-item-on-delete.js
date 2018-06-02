@@ -22,9 +22,8 @@ import { specialFallbackFocusId } from '../util';
 export class FocusPriorItemOnDelete extends Animation {
   setItemFocusUniqueId = null
 
-  // using this hook to record some information when the action is being
-  // dispatched, before the doomed item is actually removed from the state.
-  shouldAcceptDeletedPlannerItem(action) {
+  uiWillUpdate () {
+    const action = this.acceptedAction('DELETED_PLANNER_ITEM');
     const doomedItemComponentId = action.payload.uniqueId;
     const sortedItemComponents = this.registry().getAllItemsSorted();
     const doomedItemComponentIndex = sortedItemComponents.findIndex(
@@ -34,7 +33,6 @@ export class FocusPriorItemOnDelete extends Animation {
     this.setItemFocusUniqueId = priorComponentIndex >= 0 ?
       sortedItemComponents[priorComponentIndex].componentIds[0] :
       specialFallbackFocusId('item');
-    return true;
   }
 
   uiDidUpdate () {
@@ -43,7 +41,11 @@ export class FocusPriorItemOnDelete extends Animation {
 
     const itemComponentToFocus = this.registry().getComponent('item', setItemFocusUniqueId);
     if (itemComponentToFocus == null) return;
-    this.animator().focusElement(itemComponentToFocus.component.getFocusable('delete'));
-    this.animator().scrollTo(itemComponentToFocus.component.getScrollable(), this.stickyOffset());
+    // Use a non-zero timeout to work around bug INSTUI-1141 where the Tray
+    // will steal focus back after a delete confirmation dialog.
+    this.window().setTimeout(() => {
+      this.animator().focusElement(itemComponentToFocus.component.getFocusable('delete'));
+      this.animator().scrollTo(itemComponentToFocus.component.getScrollable(), this.stickyOffset());
+    }, 25);
   }
 }

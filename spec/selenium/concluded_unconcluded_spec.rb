@@ -44,7 +44,7 @@ describe "concluded/unconcluded" do
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajax_requests
 
-    entry = f(".slick-cell.l2.r2")
+    entry = f(".slick-cell.b2.f2")
     expect(entry).to be_displayed
     entry.click
     expect(entry.find_element(:css, ".gradebook-cell-editable")).to be_displayed
@@ -54,7 +54,7 @@ describe "concluded/unconcluded" do
     @e.conclude
     get "/courses/#{@course.id}/gradebook"
 
-    entry = f(".slick-cell.l2.r2")
+    entry = f(".slick-cell.b2.f2")
     expect(entry).to be_displayed
     entry.click
     expect(entry.find_element(:css, ".gradebook-cell")).not_to have_class('gradebook-cell-editable')
@@ -63,9 +63,9 @@ describe "concluded/unconcluded" do
   it "should let the teacher add comments to the gradebook by default" do
     get "/courses/#{@course.id}/gradebook"
 
-    entry = f(".slick-cell.l2.r2")
+    entry = f(".slick-cell.b2.f2")
     expect(entry).to be_displayed
-    driver.execute_script("$('.slick-cell.l2.r2').mouseover();")
+    driver.execute_script("$('.slick-cell.b2.f2').mouseover();")
     entry.find_element(:css, ".gradebook-cell-comment").click
     wait_for_ajaximations
     expect(f(".submission_details_dialog")).to be_displayed
@@ -76,9 +76,9 @@ describe "concluded/unconcluded" do
     @e.conclude
     get "/courses/#{@course.id}/gradebook"
 
-    entry = f(".slick-cell.l2.r2")
+    entry = f(".slick-cell.b2.f2")
     expect(entry).to be_displayed
-    driver.execute_script("$('.slick-cell.l2.r2').mouseover();")
+    driver.execute_script("$('.slick-cell.b2.f2').mouseover();")
     expect(entry.find_element(:css, ".gradebook-cell-comment")).not_to be_displayed
   end
 end

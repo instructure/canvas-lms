@@ -27,17 +27,39 @@ module ExternalAuthObservation
     end
 
     def logout_url
-      saml_request = Onelogin::Saml::LogoutRequest.generate(
-        response.name_qualifier,
-        response.sp_name_qualifier,
-        response.name_id,
-        response.name_identifier_format,
-        response.session_index,
-        saml_settings
-      )
-      forward_url = saml_request.forward_url
-      uri = URI(forward_url)
-      uri.to_s
+      if response.is_a?(SAML2::Response)
+        idp = aac.idp_metadata.identity_providers.first
+        name_id = response.assertions.first.subject.name_id
+
+        logout_request = SAML2::LogoutRequest.initiate(
+          idp,
+          SAML2::NameID.new(aac.entity_id),
+          SAML2::NameID.new(name_id.id,
+                            name_id.format,
+                            name_qualifier: name_id.name_qualifier,
+                            sp_name_qualifier: name_id.sp_name_qualifier),
+          response.assertions.first.authn_statements.first&.session_index
+        )
+
+        # sign the request
+        private_key = AccountAuthorizationConfig::SAML.private_key
+        private_key = nil if sig_alg.nil?
+        SAML2::Bindings::HTTPRedirect.encode(logout_request,
+                                             private_key: private_key,
+                                             sig_alg: sig_alg)
+      else
+        saml_request = Onelogin::Saml::LogoutRequest.generate(
+          response.name_qualifier,
+          response.sp_name_qualifier,
+          response.name_id,
+          response.name_identifier_format,
+          response.session_index,
+          saml_settings
+        )
+        forward_url = saml_request.forward_url
+        uri = URI(forward_url)
+        uri.to_s
+      end
     end
   end
 end

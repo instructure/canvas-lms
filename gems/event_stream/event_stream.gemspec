@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'json_token'
   spec.add_dependency 'paginated_collection'
 
-  spec.add_dependency 'rails', ">= 4.2", "< 5.2"
+  spec.add_dependency 'rails', ">= 4.2"
 
   spec.add_development_dependency 'bundler', '~> 1.5'
   spec.add_development_dependency 'rspec', "~> 3.5.0"

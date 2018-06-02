@@ -134,6 +134,14 @@ test('renders out the title as a Text when not given an href prop', () => {
   equal(title.text(), 'Introduction to Board Games');
 });
 
+test('renders unique aria string for dismiss button', () => {
+  const wrapper = mount(
+    <ToDoItem {...getDefaultProps()} />
+  );
+  const dismissButton = wrapper.find('.ToDoSidebarItem__Close').find('Button');
+  equal(dismissButton.props()['aria-label'], 'Dismiss Introduction to Board Games');
+});
+
 test('calls the handleDismissClick prop when the dismiss X is clicked', () => {
   const handleDismissClick = sinon.spy();
   const wrapper = mount(

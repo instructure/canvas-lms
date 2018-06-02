@@ -1,0 +1,8 @@
+<label class="checkbox" for="importQuizzesNext" {{#unless quizzesNextEnabled}}style="color: #ccc;"{{/unless}}>
+        <input type="checkbox" id="importQuizzesNext" {{#unless quizzesNextEnabled}}disabled=true{{/unless}}/>
+  {{#t "import_quizzes_Next"}}Import assessment content as Quizzes.Next{{/t}}
+  <a href="#" class="element_toggler" style="margin-left: 10px" aria-controls="import_quizzesNext_helpDialog" aria-label="{{#t "import_quizzesNext_help_label"}}Import assessment as Quizzes.Next Help Icon{{/t}}" title="{{#t "import_quizzesNext_help_title_icon"}}Import assessment as Quizzes.Next Help Icon{{/t}}"><i class="icon-question"></i></a>
+    <div id="import_quizzesNext_helpDialog" data-read-on-open="true" data-turn-into-dialog='{width":600,"modal":true}' style="display:none" title={{#t "import_quizzesNext_help_title"}}Quizzes.Next{{/t}}>
+    {{#t "import_quizzesNext_help_text"}}Quizzes.Next is the new assessment engine for Canvas.<p></p>To learn more please contact your system administrator or visit{{/t}} <a href="https://community.canvaslms.com">https://community.canvaslms.com</a>.
+  </div>
+</label>

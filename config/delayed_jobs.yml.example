@@ -15,6 +15,10 @@ production:
   #
   # disable periodic jobs auditor -- this isn't normally necessary
   # disable_periodic_jobs: true
+  #
+  # health_check: # see inst-jobs documentation for possible options
+  #   type: consul
+  #   service_name: canvas_jobs
 
 default:
   workers:

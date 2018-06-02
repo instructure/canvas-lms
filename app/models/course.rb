@@ -218,6 +218,7 @@ class Course < ActiveRecord::Base
   validate :validate_course_dates
   validate :validate_course_image
   validate :validate_default_view
+  validates :sis_source_id, uniqueness: {scope: :root_account}, allow_nil: true
   validates_presence_of :account_id, :root_account_id, :enrollment_term_id, :workflow_state
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
@@ -244,6 +245,10 @@ class Course < ActiveRecord::Base
     end
 
   has_a_broadcast_policy
+
+  # A hard limit on the number of graders (excluding the moderator) a moderated
+  # assignment can have.
+  MODERATED_GRADING_GRADER_LIMIT = 10.freeze
 
   def [](attr)
     attr.to_s == 'asset_string' ? self.asset_string : super
@@ -732,6 +737,8 @@ class Course < ActiveRecord::Base
     participating_instructors.restrict_to_sections(section_ids)
   end
 
+  # Tread carefully — this method returns true for Teachers, TAs, and Designers
+  # in the course.
   def user_is_admin?(user)
     return unless user
     RequestCache.cache('user_is_admin', self, user) do
@@ -1873,7 +1880,7 @@ class Course < ActiveRecord::Base
         # order by course_section_id<>section.id so that if there *is* an existing enrollment for this section, we get it (false orders before true)
         e = self.all_enrollments.
           where(user_id: user, type: type, role_id: role.id, associated_user_id: associated_user_id).
-          order("course_section_id<>#{section.id}").
+          order(Arel.sql("course_section_id<>#{section.id}")).
           first
       end
       if e && (!e.active? || opts[:force_update])
@@ -3145,6 +3152,24 @@ class Course < ActiveRecord::Base
 
   def grading_standard_or_default
     default_grading_standard || GradingStandard.default_instance
+  end
+
+  def moderators
+    return [] unless root_account.feature_enabled?(:anonymous_moderated_marking)
+
+    active_instructors = users.merge(Enrollment.active_or_pending.of_instructor_type)
+    active_instructors.select { |user| grants_right?(user, :select_final_grade) }
+  end
+
+  def moderated_grading_max_grader_count
+    count = participating_instructors.distinct.count
+    # A moderated assignment must have at least 1 (non-moderator) grader.
+    return 1 if count < 2
+    # grader count cannot exceed the hard limit
+    return MODERATED_GRADING_GRADER_LIMIT if count > MODERATED_GRADING_GRADER_LIMIT + 1
+    # for any given assignment: 1 assigned moderator + N max graders = all participating instructors
+    # so N max graders = all participating instructors - 1 assigned moderator
+    count - 1
   end
 
   private

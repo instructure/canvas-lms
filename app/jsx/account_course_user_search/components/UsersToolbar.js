@@ -74,7 +74,7 @@ export default function UsersToolbar(props) {
               url={`/accounts/${props.accountId}/users`}
               afterSave={props.onApplyFilters} // update displayed results in case new user should appear
             >
-              <Button>
+              <Button aria-label={I18n.t('Add people')}>
                 <IconPlusLine />
                 {I18n.t('People')}
               </Button>

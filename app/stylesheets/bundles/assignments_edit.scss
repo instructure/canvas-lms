@@ -201,3 +201,77 @@ div.form-column-right, div.overrides-column-right {
     margin-top: -3px;
   }
 }
+
+.GradeAnonymously__Checkbox {
+  margin-top: 5px;
+}
+
+.GradeAnonymously__CheckboxLabelText {
+  font-size: 15px;
+}
+
+.ModeratedGrading__Container {
+  display: inline-block;
+  margin-#{direction(left)}: 4px;
+  margin-top: 20px;
+  width: 380px;
+
+  input[type="text"] {
+    height: auto;
+    line-height: 1;
+    margin: 0;
+    padding: auto;
+    box-shadow: none;
+    border: none;
+  }
+
+  .ModeratedGrading__GraderCountInputContainer {
+    label {
+      width: initial !important;
+    }
+  }
+
+  .ModeratedGrading__Checkbox {
+    margin-top: 5px;
+    margin-#{direction(right)}: 7px;
+    margin-bottom: 7px;
+    margin-#{direction(left)}: 20px;
+  }
+
+  .ModeratedGrading__CheckboxDescription {
+    margin-#{direction(left)}: 40px;
+    margin-#{direction(right)}: 5px;
+    display: block;
+    font-weight: initial;
+  }
+
+  .ModeratedGrading__CheckboxLabel {
+    display: block;
+    padding: 25px 0;
+  }
+
+  .ModeratedGrading__CheckboxLabelText {
+    font-size: 15px;
+  }
+
+  .ModeratedGrading__Content {
+    margin-#{direction(left)}: 40px;
+  }
+
+  .ModeratedGrading__FinalGraderSelectMenu {
+    margin: 10px 0;
+  }
+
+  .ModeratedGrading__FinalGraderSelectMenuLabelText {
+    font-size: 15px;
+  }
+
+  .ModeratedGrading__GraderCountInputContainer {
+    height: 98px;
+  }
+
+  .ModeratedGrading__GraderCountInputLabelText {
+    font-size: 15px;
+    width: initial;
+  }
+}

@@ -19,6 +19,28 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe 'Provisional Grades API', type: :request do
+  shared_examples 'authorization when Anonymous Moderated Marking is enabled' do
+    before(:once) { @course.root_account.enable_feature!(:anonymous_moderated_marking) }
+
+    it 'is unauthorized if the user is not the assigned final grader' do
+      api_call_as_user(@teacher, http_verb, @path, @params, {}, {}, expected_status: 401)
+    end
+
+    it 'is unauthorized if the user is an account admin without "Select Final Grade for Moderation" permission' do
+      @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :select_final_grade)
+      api_call_as_user(account_admin_user, http_verb, @path, @params, {}, {}, expected_status: 401)
+    end
+
+    it 'is authorized if the user is the final grader' do
+      @assignment.update!(final_grader: @teacher, grader_count: 2)
+      api_call_as_user(@teacher, http_verb, @path, @params, {}, {}, expected_status: 200)
+    end
+
+    it 'is authorized if the user is an account admin with "Select Final Grade for Moderation" permission' do
+      api_call_as_user(account_admin_user, http_verb, @path, @params, {}, {}, expected_status: 200)
+    end
+  end
+
   describe "status" do
     before(:once) do
       course_with_teacher :active_all => true
@@ -96,6 +118,10 @@ describe 'Provisional Grades API', type: :request do
                            })
         expect(@selection.reload.provisional_grade).to eq(@pg)
       end
+
+      it_behaves_like 'authorization when Anonymous Moderated Marking is enabled' do
+        let(:http_verb) { :put }
+      end
     end
   end
 
@@ -141,6 +167,10 @@ describe 'Provisional Grades API', type: :request do
       expect(json['score']).to eq 80
       expect(json['submission_comments'].first['comment']).to eq 'huttah!'
       expect(json['crocodoc_urls']).to eq([])
+    end
+
+    it_behaves_like 'authorization when Anonymous Moderated Marking is enabled' do
+      let(:http_verb) { :post }
     end
   end
 
@@ -340,6 +370,10 @@ describe 'Provisional Grades API', type: :request do
           expect(submission_2.reload).not_to be_graded
           expect(@assignment.reload.grades_published_at).to be_nil
         end
+      end
+
+      it_behaves_like 'authorization when Anonymous Moderated Marking is enabled' do
+        let(:http_verb) { :post }
       end
     end
   end

@@ -1,0 +1,248 @@
+{
+  "group_navigation_99f191a": {
+    "message": "Навигация группы"
+  },
+  "cc_attribution_share_alike_669e7f16": {
+    "message": "Принадлежность CC, поровну"
+  },
+  "link_to_url_52dd935c": {
+    "message": "Ссылка на URL"
+  },
+  "quizzes_7e598f57": {
+    "message": "Контрольные работы"
+  },
+  "cc_attribution_non_commercial_no_derivatives_9fe74c00": {
+    "message": "Принадлежность CC, некоммерческий, без производных"
+  },
+  "c_2001_acme_inc_283f7f80": {
+    "message": "(c) 2001 г. Acme Inc."
+  },
+  "upload_a_new_file_96e6d4ff": {
+    "message": "Загрузить новый файл"
+  },
+  "file_upload_form_4aaad554": {
+    "message": "Форма отправки файла"
+  },
+  "folder_705fd2d7": {
+    "message": "Папка"
+  },
+  "insert_equella_links_49a8dacd": {
+    "message": "Вставить ссылки на Equella"
+  },
+  "assignment_list_a833f59d": {
+    "message": "Список заданий"
+  },
+  "alternative_text_a834dcad": {
+    "message": "Альтернативный текст:"
+  },
+  "discussions_a5f96392": {
+    "message": "Обсуждения"
+  },
+  "cc_attribution_no_derivatives_b006744f": {
+    "message": "Принадлежность CC, без производных"
+  },
+  "usage_right_ff96f3e2": {
+    "message": "Право на использование:"
+  },
+  "click_to_embed_image_33107dd8": {
+    "message": "Щелкните для встраивания изображения"
+  },
+  "i_hold_the_copyright_71ee91b1": {
+    "message": "Я являюсь правообладателем"
+  },
+  "files_c300e900": {
+    "message": "Файлы"
+  },
+  "cancel_image_upload_2c771950": {
+    "message": "Отменить отправку изображения"
+  },
+  "people_b4ebb13c": {
+    "message": "Пользователи"
+  },
+  "check_if_the_image_is_decorative_283649b7": {
+    "message": "Проверьте, является ли изображение декоративным"
+  },
+  "loading_25990131": {
+    "message": "Загрузка..."
+  },
+  "announcements_a4b8ed4a": {
+    "message": "Объявления"
+  },
+  "select_a_file_53ba40ac": {
+    "message": "Выбрать файл"
+  },
+  "formatting_press_down_to_select_df728c30": {
+    "message": "Форматирование, нажмите стрелку вниз, чтобы выбрать"
+  },
+  "background_color_press_down_to_select_ef99fdac": {
+    "message": "Цвет фона, нажмите стрелку вниз, чтобы выбрать"
+  },
+  "files_index_af7c662b": {
+    "message": "Индекс файлов"
+  },
+  "cancel_file_upload_9903e7b9": {
+    "message": "Отменить отправку файла"
+  },
+  "the_material_is_subject_to_fair_use_exception_41bc6a4b": {
+    "message": "Материал относится к категории исключений добросовестного использования"
+  },
+  "enter_the_alternative_text_for_this_image_88047c47": {
+    "message": "Введите альтернативный текст для этого изображения"
+  },
+  "link_to_other_content_in_the_group_3fe25379": {
+    "message": "Ссылка на другое содержание в этой группе."
+  },
+  "discussions_index_6c36ced": {
+    "message": "Индекс обсуждений"
+  },
+  "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
+    "message": "Щелкните любой файл для вставки ссылки на этот файл."
+  },
+  "copyright_holder_66ee111": {
+    "message": "Правообладатель:"
+  },
+  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
+    "message": "Область форматированного текста. Нажмите ALT + F8 для справки"
+  },
+  "enter_search_terms_e397b1f0": {
+    "message": "введите критерии поиска"
+  },
+  "pages_e5414c2c": {
+    "message": "Страницы"
+  },
+  "cc_attribution_f6de631f": {
+    "message": "Принадлежность CC"
+  },
+  "insert_link_6dc23cae": {
+    "message": "Вставить ссылку"
+  },
+  "collaborations_5c56c15f": {
+    "message": "Совместные работы"
+  },
+  "what_would_you_like_to_call_the_new_page_d7e4488a": {
+    "message": "Как назвать новую страницу?"
+  },
+  "click_any_image_to_embed_the_image_in_the_page_2cdd1136": {
+    "message": "Щелкните любое изображение для встраивания изображения в страницу."
+  },
+  "search_flickr_6884b518": {
+    "message": "Поиск по Flickr"
+  },
+  "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
+    "message": "Щелкните любую страницу, чтобы вставить ссылку в эту страницу."
+  },
+  "click_to_insert_a_link_into_the_editor_c19613aa": {
+    "message": "Нажмите, чтобы вставить ссылку в редактор."
+  },
+  "decorative_image_fde98579": {
+    "message": "Декоративное изображение"
+  },
+  "click_to_insert_a_link_to_this_item_39794098": {
+    "message": "Нажмите, чтобы вставить ссылку на этот элемент."
+  },
+  "load_more_results_460f49a9": {
+    "message": "Загрузить больше результатов"
+  },
+  "link_7262adec": {
+    "message": "Ссылка"
+  },
+  "grades_a61eba0a": {
+    "message": "Баллы"
+  },
+  "links_14b70841": {
+    "message": "Ссылки"
+  },
+  "loading_failed_b3524381": {
+    "message": "Загрузка завершилась безрезультатно..."
+  },
+  "click_to_embed_imagename_c41ea8df": {
+    "message": "Щелкните для встраивания { imageName }"
+  },
+  "close_flickr_form_b32e600a": {
+    "message": "Закрыть форму Flickr"
+  },
+  "course_syllabus_5de1b0af": {
+    "message": "Программа обучения курса"
+  },
+  "upload_8b403d05": {
+    "message": "Загрузить"
+  },
+  "modules_c4325335": {
+    "message": "Модули"
+  },
+  "no_results_940393cf": {
+    "message": "Нет результатов."
+  },
+  "announcement_list_da155734": {
+    "message": "Список объявлений"
+  },
+  "link_to_a_new_page_6c4ad034": {
+    "message": "Ссылка на новую страницу"
+  },
+  "insert_math_equation_57c6e767": {
+    "message": "Вставить математическое уравнение"
+  },
+  "i_have_obtained_permission_to_use_this_file_6386f087": {
+    "message": "Разрешение на использование данного файла получено."
+  },
+  "cc_attribution_non_commercial_share_alike_c7edb1e5": {
+    "message": "Принадлежность CC, некоммерческий, поровну"
+  },
+  "wiki_home_9cd54d0": {
+    "message": "Домашняя страница вики"
+  },
+  "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+    "message": "Если вы не выберете права пользования сейчас, этот файл не будет опубликован после отправки."
+  },
+  "upload_a_new_image_890df275": {
+    "message": "Загрузить новое изображение"
+  },
+  "search_280d00bd": {
+    "message": "Поиск"
+  },
+  "assignments_1e02582c": {
+    "message": "Задания"
+  },
+  "cc_attribution_non_commercial_39e0d30d": {
+    "message": "Принадлежность CC, некоммерческий"
+  },
+  "quizzes_list_d812caa6": {
+    "message": "Список тестов"
+  },
+  "image_upload_form_7b74079a": {
+    "message": "Форма отправки изображения"
+  },
+  "the_material_is_licensed_under_creative_commons_3242cb5e": {
+    "message": "Материал распространяется по лицензии Creative Commons"
+  },
+  "images_7ce26570": {
+    "message": "Изображения"
+  },
+  "link_to_other_content_in_the_course_879163b5": {
+    "message": "Ссылка на другое содержание в этом курсе."
+  },
+  "font_size_press_down_to_select_6c25dc2d": {
+    "message": "Размер шрифта, нажмите стрелку вниз, чтобы выбрать"
+  },
+  "select_a_folder_to_upload_your_file_into_b82d12b": {
+    "message": "Выберите папку, в которую будет помещен ваш файл"
+  },
+  "course_navigation_dd035109": {
+    "message": "Навигация курса"
+  },
+  "choose_usage_rights_33683854": {
+    "message": "Выбрать права на использование..."
+  },
+  "text_color_press_down_to_select_8f5ad9b5": {
+    "message": "Цвет текста, нажмите стрелку вниз, чтобы выбрать"
+  },
+  "embed_image_1080badc": {
+    "message": "Вставить изображение"
+  },
+  "creative_commons_license_725584ae": {
+    "message": "Лицензионное соглашение Creative Commons:"
+  },
+  "the_material_is_in_the_public_domain_279c39a3": {
+    "message": "Материал находится в общедоступном домене"
+  }
+}

@@ -38,7 +38,7 @@ class CanvadocSessionsController < ApplicationController
         opts[:preferred_plugins].unshift Canvadocs::RENDER_O365
       end
 
-      opts[:enable_annotations] = blob["enable_annotations"]
+      opts[:enable_annotations] = blob["enable_annotations"] && !anonymous_grading_enabled?(attachment)
       attachment.submit_to_canvadocs(1, opts) unless attachment.canvadoc_available?
       url = attachment.canvadoc.session_url(opts.merge({
         user: @current_user,
@@ -63,5 +63,17 @@ class CanvadocSessionsController < ApplicationController
   rescue Timeout::Error
     render :plain => "Service is currently unavailable. Try again later.",
            :status => :service_unavailable
+  end
+
+  private
+
+  def anonymous_grading_enabled?(attachment)
+    return false unless @domain_root_account.feature_enabled?(:anonymous_moderated_marking)
+
+    Assignment.joins(submissions: :attachment_associations).
+      where(
+        submissions: {attachment_associations: {context_type: 'Submission', attachment: attachment}},
+        anonymous_grading: true
+      ).exists?
   end
 end

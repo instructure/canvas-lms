@@ -32,7 +32,6 @@ describe "submissions" do
 
     it "should allow media comments", priority: "1", test_id: 237032 do
       stub_kaltura
-      #pending("failing because it is dependant on an external kaltura system")
 
       student_in_course
       assignment = create_assignment

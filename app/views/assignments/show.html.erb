@@ -53,13 +53,16 @@
           data-id='<%= @assignment.id %>'
           class='btn <%= "published" if @assignment.published? %> <%= "disabled" unless assignment_publishing_enabled?(@assignment, @current_user) %>'>
         </button>
-        <% if can_do(@assignment, @current_user, :update) %>
-          <a href="<%= edit_polymorphic_path([@context, @assignment]) %>" class='btn edit_assignment_link'>
+        <% if @context.grants_right?(@current_user, :manage_assignments) %>
+          <a href="<%= edit_polymorphic_path([@context, @assignment]) %>" class='btn edit_assignment_link<%= ' disabled' unless can_do(@assignment, @current_user, :update) %>'>
             <i class='icon-edit'></i> <%= t('links.edit', 'Edit') %>
+            <% unless can_do(@assignment, @current_user, :update) %>
+              <span class="screenreader-only">You are not the selected moderator for this assignment</span>
+            <% end %>
           </a>
         <% end %>
         <%= assignment_submission_button(@assignment, @current_user, @current_user_submission) %>
-        <% if @assignment.moderated_grading? && can_do(@context, @current_user, :moderate_grades) %>
+        <% if show_moderation_link %>
           <a
             href='<%= course_assignment_moderate_url(@context, @assignment) %>'
             id="moderated_grading_button"

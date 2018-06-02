@@ -67,8 +67,8 @@
 
 .hero,
 .overlay {
-  border-bottom-left-radius: var(--heroBorderRadius);
-  border-top-left-radius: var(--heroBorderRadius);
+  border-bottom-inline-start-radius: var(--heroBorderRadius);
+  border-top-inline-start-radius: var(--heroBorderRadius);
 }
 
 .heroHover {
@@ -123,7 +123,7 @@
   }
   .title {
     font-size: var(--titleFontSizeTablet);
-    padding-left: 0;
+    padding-inline-start: 0;
   }
   .items {
     border-top-width: var(--borderTopWidthTablet);

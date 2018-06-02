@@ -52,9 +52,8 @@ describe "student planner" do
     validate_link_to_url(announcement, 'discussion_topics')
   end
 
-  it "shows and navigates to the events page", priority: "1", test_id: 3488530 do
-    skip('Unskip with ADMIN-278')
-    event = CalendarEvent.new(title: "New event")
+  it "shows and navigates to the calendar events page", priority: "1", test_id: 3488530 do
+    event = CalendarEvent.new(title: "New event", start_at: 1.minute.from_now)
     event.context = @course
     event.save!
     go_to_list_view
@@ -321,8 +320,7 @@ describe "student planner" do
       fj("a:contains('Title Text')", todo_item).click
 
       # gives the To Do a new name and saves it
-      modal = todo_sidebar_modal("Title Text")
-      element = f('input', modal)
+      element = title_input("Title Text")
       replace_content(element, "New Text")
       todo_save_button.click
 
@@ -348,8 +346,7 @@ describe "student planner" do
       fj("a:contains('Title Text')", todo_item).click
 
       # gives the To Do a new name and saves it
-      modal = todo_sidebar_modal("Title Text")
-      element = f('input', modal)
+      element = title_input("Title Text")
       replace_content(element, "New Text")
       todo_save_button.click
 
@@ -380,7 +377,6 @@ describe "student planner" do
     end
 
     it "groups the to-do item with other course items", priority: "1", test_id: 3482560 do
-      skip('unskip with ADMIN-917')
       @assignment = @course.assignments.create({
                                                  name: 'Assignment 1',
                                                  due_at: Time.zone.now + 1.day,
@@ -413,7 +409,6 @@ describe "student planner" do
     end
 
     it "adds date and time to a to-do item", priority: "1", test_id: 3482559 do
-      skip('unskip with ADMIN-298')
       go_to_list_view
       todo_modal_button.click
       modal = todo_sidebar_modal
@@ -421,12 +416,19 @@ describe "student planner" do
       element.click
       fj("button:contains('15')").click
 
+      title_element = title_input
+      title_element.send_keys('the title')
+
       time_element = time_input
       time_element.click
+      time_input.clear
       time_element.send_keys('9:00 am')
+      time_element.send_keys(:tab)
+
       todo_save_button.click
-      time = calendar_time_string(PlannerNote.last.todo_time).chop
-      expect(fxpath("//div[contains(@class, 'PlannerApp')]//span[contains(text(),'DUE: #{time}')]")).
+      # Gergich will complain, but there's no format_time_for_view format that returns what we need
+      time = PlannerNote.last.todo_date.strftime("%l:%M %p")
+      expect(fxpath("//div[contains(@class, 'PlannerApp')]//span[contains(text(),'DUE:#{time}')]")).
         to be_displayed
     end
 
@@ -542,7 +544,7 @@ describe "student planner" do
       go_to_list_view
       current_items = items_displayed.count
       driver.execute_script("window.scrollTo(0,  document.documentElement.scrollHeight);")
-      f('body').send_keys(:arrow_down)
+      fj('button:contains("Load more")').click
       wait_for_spinner
       expect(items_displayed.count).to be > current_items
     end

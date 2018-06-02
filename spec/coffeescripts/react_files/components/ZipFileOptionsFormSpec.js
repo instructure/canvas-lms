@@ -45,7 +45,7 @@ test('handleExpandClick expands zip', function() {
     onZipOptionsResolved: zipOptionsResolvedStub
   }
   const zFOF = TestUtils.renderIntoDocument(<ZipFileOptionsForm {...props} />)
-  TestUtils.Simulate.click($('.btn-primary')[0])
+  TestUtils.Simulate.click($('.btn-primary:contains("Upload It")')[0])
   ok(
     zipOptionsResolvedStub.calledWithMatch({
       file: 'the_file_obj',

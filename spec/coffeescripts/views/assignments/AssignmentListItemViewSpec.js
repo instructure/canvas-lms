@@ -129,6 +129,12 @@ const createView = function(model, options) {
     manage: options.canManage,
     read_grades: options.canReadGrades
   }
+
+  if (options.individualAssignmentPermissions) {
+    ENV.PERMISSIONS.by_assignment_id = {}
+    ENV.PERMISSIONS.by_assignment_id[model.id] = options.individualAssignmentPermissions
+  }
+
   ENV.POST_TO_SIS = options.post_to_sis
   ENV.DUPLICATE_ENABLED = options.duplicateEnabled
   const view = new AssignmentListItemView({
@@ -785,6 +791,209 @@ test('cannot move when canManage is false but the assignment group id is not loc
   const json = view.toJSON()
   notOk(json.canMove)
   ok(view.className().includes('sort-disabled'))
+})
+
+test('re-renders when assignment state changes', function() {
+  this.stub(AssignmentListItemView.prototype, 'render')
+  const view = createView(this.model)
+  ok(AssignmentListItemView.prototype.render.calledOnce)
+  this.model.trigger('change:workflow_state')
+  ok(AssignmentListItemView.prototype.render.calledTwice)
+})
+
+test('polls for updates if assignment is duplicating', function() {
+  this.stub(this.model, 'isDuplicating').returns(true)
+  this.stub(this.model, 'pollUntilFinishedDuplicating')
+  const view = createView(this.model)
+  ok(this.model.pollUntilFinishedDuplicating.calledOnce)
+})
+
+QUnit.module('AssignmentListItemViewSpec - editing assignments', function(hooks) {
+  hooks.beforeEach(function() {
+    fakeENV.setup({
+      current_user_roles: ['teacher'],
+      URLS: {assignment_sort_base_url: 'test'}
+    })
+
+    genSetup.call(this)
+  })
+
+  hooks.afterEach(function() {
+    fakeENV.teardown()
+    genTeardown.call(this)
+  })
+
+  test('canEdit is true if no individual permissions are set and canManage is true', function() {
+    const view = createView(this.model, {
+      userIsAdmin: false,
+      canManage: true
+    })
+
+    const json = view.toJSON()
+    strictEqual(json.canEdit, true)
+  })
+
+  test('canEdit is false if no individual permissions are set and canManage is false', function() {
+    const view = createView(this.model, {
+      userIsAdmin: false,
+      canManage: false
+    })
+
+    const json = view.toJSON()
+    strictEqual(json.canEdit, false)
+  })
+
+  test('canEdit is true if no individual permissions are set and userIsAdmin is true', function() {
+    const view = createView(this.model, {
+      userIsAdmin: true,
+      canManage: false
+    })
+
+    const json = view.toJSON()
+    strictEqual(json.canEdit, true)
+  })
+
+  test('canEdit is false if canManage is true and the individual assignment cannot be updated', function() {
+    const view = createView(this.model, {
+      canManage: true,
+      individualAssignmentPermissions: {update: false}
+    })
+
+    const json = view.toJSON()
+    strictEqual(json.canEdit, false)
+  })
+
+  test('canEdit is true if canManage is true and the individual assignment can be updated', function() {
+    const view = createView(this.model, {
+      canManage: true,
+      individualAssignmentPermissions: {update: true}
+    })
+
+    const json = view.toJSON()
+    strictEqual(json.canEdit, true)
+  })
+
+  test('edit link is enabled when the individual assignment is editable', function() {
+    const view = createView(this.model, {
+      individualAssignmentPermissions: {update: true}
+    })
+
+    strictEqual(view.$('.edit_assignment').hasClass('disabled'), false);
+  })
+
+  test('edit link is disabled when the individual assignment is not editable', function() {
+    const view = createView(this.model, {
+      individualAssignmentPermissions: {update: false}
+    })
+
+    strictEqual(view.$('.edit_assignment').hasClass('disabled'), true);
+  })
+});
+
+QUnit.module('AssignmentListItemViewSpec - deleting assignments', function(hooks) {
+  hooks.beforeEach(function() {
+    fakeENV.setup({
+      current_user_roles: ['teacher'],
+      URLS: {assignment_sort_base_url: 'test'}
+    })
+    genSetup.call(this)
+  })
+
+  hooks.afterEach(function() {
+    fakeENV.teardown()
+    genTeardown.call(this)
+  })
+
+  test('canDelete is true if no individual permissions are set and userIsAdmin is true', function() {
+    const view = createView(this.model, {
+      userIsAdmin: true,
+      canManage: false
+    })
+
+    const json = view.toJSON()
+    strictEqual(json.canDelete, true)
+  })
+
+  test('canDelete is false if canManage is true and the individual assignment cannot be updated', function() {
+    const view = createView(this.model, {
+      canManage: true,
+      individualAssignmentPermissions: {update: false}
+    })
+
+    const json = view.toJSON()
+    strictEqual(json.canDelete, false)
+  })
+
+  test('canDelete is true if canManage is true and the individual assignment can be updated', function() {
+    const view = createView(this.model, {
+      canManage: true,
+      individualAssignmentPermissions: {update: true}
+    })
+
+    const json = view.toJSON()
+    strictEqual(json.canDelete, true)
+  })
+
+  test('delete link is enabled when canDelete returns true', function() {
+    const view = createView(this.model, {
+      individualAssignmentPermissions: {update: true}
+    })
+
+    strictEqual(view.$('.delete_assignment').hasClass('disabled'), false);
+  })
+
+  test('delete link is disabled when canDelete returns false', function() {
+    const view = createView(this.model, {
+      individualAssignmentPermissions: {update: false}
+    })
+
+    strictEqual(view.$('.delete_assignment').hasClass('disabled'), true);
+  })
+})
+
+QUnit.module('AssignmentListItemViewSpec - publish/unpublish icon', function(hooks) {
+  hooks.beforeEach(function() {
+    fakeENV.setup({
+      current_user_roles: ['teacher'],
+      URLS: {assignment_sort_base_url: 'test'}
+    })
+    genSetup.call(this)
+  })
+
+  hooks.afterEach(function() {
+    fakeENV.teardown()
+    genTeardown.call(this)
+  })
+
+  test('publish icon is enabled if the user is an admin', function() {
+    const view = createView(this.model, {
+      userIsAdmin: true,
+      canManage: false
+    })
+
+    const json = view.toJSON()
+    strictEqual(view.$('.publish-icon').hasClass('disabled'), false);
+  })
+
+  test('publish icon is enabled if canManage is true and the individual assignment can be updated', function() {
+    const view = createView(this.model, {
+      canManage: true,
+      individualAssignmentPermissions: {update: true}
+    })
+
+    const json = view.toJSON()
+    strictEqual(view.$('.publish-icon').hasClass('disabled'), false);
+  })
+
+  test('publish icon is disabled if canManage is true and the individual assignment cannot be updated', function() {
+    const view = createView(this.model, {
+      canManage: true,
+      individualAssignmentPermissions: {update: false}
+    })
+
+    const json = view.toJSON()
+    strictEqual(view.$('.publish-icon').hasClass('disabled'), true);
+  })
 })
 
 QUnit.module('AssignmentListItemViewSpec\u2014alternate grading type: percent', {

@@ -2,9 +2,9 @@
 
 exports[`renders all future items loaded regardless of other props 1`] = `
 <div>
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     padding="x-large"
     textAlign="center"
   >
@@ -16,15 +16,15 @@ exports[`renders all future items loaded regardless of other props 1`] = `
     >
       All items loaded
     </Text>
-  </Container>
+  </View>
 </div>
 `;
 
 exports[`renders load more by default 1`] = `
 <div>
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     padding="x-large"
     textAlign="center"
   >
@@ -40,31 +40,27 @@ exports[`renders load more by default 1`] = `
     >
       Load more
     </Button>
-  </Container>
+  </View>
 </div>
 `;
 
 exports[`renders loading when indicated 1`] = `
 <div>
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     padding="x-large"
     textAlign="center"
   >
-    <Container
-      display={null}
+    <View
+      display="auto"
     >
-      <Container
-        display="inline"
-      >
-        <Spinner
-          margin="0 x-small 0 0"
-          size="small"
-          title="Loading..."
-          variant="default"
-        />
-      </Container>
+      <Spinner
+        margin="0 x-small 0 0"
+        size="small"
+        title="Loading..."
+        variant="default"
+      />
       <Text
         as="span"
         color="secondary"
@@ -73,16 +69,16 @@ exports[`renders loading when indicated 1`] = `
       >
         Loading...
       </Text>
-    </Container>
-  </Container>
+    </View>
+  </View>
 </div>
 `;
 
 exports[`shows an Alert when there's a query error 1`] = `
 <div>
-  <Container
+  <View
     as="div"
-    display={null}
+    display="auto"
     padding="x-large"
     textAlign="center"
   >
@@ -112,6 +108,6 @@ exports[`shows an Alert when there's a query error 1`] = `
     >
       Load more
     </Button>
-  </Container>
+  </View>
 </div>
 `;

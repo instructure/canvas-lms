@@ -23,7 +23,7 @@ import fcUtil from 'compiled/util/fcUtil'
 
 QUnit.module('TimeBlockList', {
   setup() {
-    const wrappedDate = str => moment(new Date(str))
+    const wrappedDate = str => $.fullCalendar.moment(new Date(str))
 
     this.$holder = $('<table>').appendTo('#fixtures')
     this.$splitter = $('<a>').appendTo('#fixtures')

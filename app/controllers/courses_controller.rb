@@ -1085,7 +1085,6 @@ class CoursesController < ApplicationController
           include_ungraded: true,
           limit: ToDoListPresenter::ASSIGNMENT_LIMIT,
           scope_only: true).
-        where('assignments.due_at IS NULL OR assignments.due_at > ?', Time.zone.now).
         reorder(:due_at, :id)
 
       grading_collection = BookmarkedCollection.wrap(bookmark, grading_scope)
@@ -1110,7 +1109,6 @@ class CoursesController < ApplicationController
             :needing_submitting => true,
             :scope_only => true
           ).
-          where('quizzes.due_at IS NULL OR quizzes.due_at > ?', Time.zone.now).
           reorder(:due_at, :id)
         quizzes_collection = BookmarkedCollection.wrap(quizzes_bookmark, quizzes_scope)
         quizzes_collection = BookmarkedCollection.transform(quizzes_collection) do |a|
@@ -1756,7 +1754,9 @@ class CoursesController < ApplicationController
         @padless = true
       when 'assignments'
         add_crumb(t('#crumbs.assignments', "Assignments"))
-        set_js_assignment_data
+        set_js_assignment_data(
+          include_assignment_permissions: @context.root_account.feature_enabled?(:anonymous_moderated_marking)
+        )
         js_env(:SIS_NAME => AssignmentUtil.post_to_sis_friendly_name(@context))
         js_env(:COURSE_HOME => true)
         @upcoming_assignments = get_upcoming_assignments(@context)

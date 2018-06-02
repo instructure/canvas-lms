@@ -244,7 +244,7 @@ CanvasRails::Application.routes.draw do
     get 'grades/:id' => 'gradebooks#grade_summary', as: :student_grades
     post 'save_assignment_order' => 'gradebooks#save_assignment_order', as: :save_assignment_order
     concerns :announcements
-    get 'calendar' => 'calendars#show2', as: :old_calendar
+    get 'calendar' => 'calendars#show'
     get :locks
     concerns :discussions
     resources :assignments do
@@ -536,7 +536,7 @@ CanvasRails::Application.routes.draw do
     resources :collaborations
     get 'lti_collaborations' => 'collaborations#lti_index'
     get 'lti_collaborations/*all' => 'collaborations#lti_index'
-    get 'calendar' => 'calendars#show2', as: :old_calendar
+    get 'calendar' => 'calendars#show'
 
     resources :external_tools do
       get :finished
@@ -599,17 +599,17 @@ CanvasRails::Application.routes.draw do
     resources :account_notifications, only: [:create, :update, :destroy]
     concerns :announcements
     resources :submissions
-    delete 'authentication_providers' => 'account_authorization_configs#destroy_all', as: :remove_all_authentication_providers
-    put 'sso_settings' => 'account_authorization_configs#update_sso_settings',
+    delete 'authentication_providers' => 'authentication_providers#destroy_all', as: :remove_all_authentication_providers
+    put 'sso_settings' => 'authentication_providers#update_sso_settings',
         as: :update_sso_settings
 
-    resources :authentication_providers, controller: :account_authorization_configs, only: [:index, :create, :update, :destroy]
-    get 'test_ldap_connections' => 'account_authorization_configs#test_ldap_connection'
-    get 'test_ldap_binds' => 'account_authorization_configs#test_ldap_bind'
-    get 'test_ldap_searches' => 'account_authorization_configs#test_ldap_search'
-    match 'test_ldap_logins' => 'account_authorization_configs#test_ldap_login', via: [:get, :post]
-    get 'saml_testing' => 'account_authorization_configs#saml_testing'
-    get 'saml_testing_stop' => 'account_authorization_configs#saml_testing_stop'
+    resources :authentication_providers, only: [:index, :create, :update, :destroy]
+    get 'test_ldap_connections' => 'authentication_providers#test_ldap_connection'
+    get 'test_ldap_binds' => 'authentication_providers#test_ldap_bind'
+    get 'test_ldap_searches' => 'authentication_providers#test_ldap_search'
+    match 'test_ldap_logins' => 'authentication_providers#test_ldap_login', via: [:get, :post]
+    get 'saml_testing' => 'authentication_providers#saml_testing'
+    get 'saml_testing_stop' => 'authentication_providers#saml_testing_stop'
 
     get 'external_tools/sessionless_launch' => 'external_tools#sessionless_launch'
     resources :external_tools do
@@ -836,8 +836,8 @@ CanvasRails::Application.routes.draw do
 
   resources :plugins, only: [:index, :show, :update]
 
-  get 'calendar' => 'calendars#show2'
-  get 'calendar2' => 'calendars#show2'
+  get 'calendar' => 'calendars#show'
+  get 'calendar2' => 'calendars#show'
   get 'course_sections/:course_section_id/calendar_events/:id' => 'calendar_events#show', as: :course_section_calendar_event
   get 'files' => 'files#index'
   get "files/folder#{full_path_glob}", controller: 'files', action: 'react_files', format: false
@@ -1305,6 +1305,14 @@ CanvasRails::Application.routes.draw do
         put    'users/:user_id/observees/:observee_id', action: :update
         delete 'users/:user_id/observees/:observee_id', action: :destroy
       end
+
+      scope(controller: :observer_alert_thresholds_api) do
+        get 'users/:user_id/observer_alert_thresholds', action: :index
+        post 'users/:user_id/observer_alert_thresholds', action: :create
+        get 'users/:user_id/observer_alert_thresholds/:observer_alert_threshold_id', action: :show
+        put 'users/:user_id/observer_alert_thresholds/:observer_alert_threshold_id', action: :update
+        delete 'users/:user_id/observer_alert_thresholds/:observer_alert_threshold_id', action: :destroy
+      end
     end
 
     scope(controller: :custom_data) do
@@ -1364,7 +1372,7 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/admins', action: :index, as: 'account_admins'
     end
 
-    scope(controller: :account_authorization_configs) do
+    scope(controller: :authentication_providers) do
       get 'accounts/:account_id/sso_settings', action: :show_sso_settings, as: 'account_show_sso_settings_url'
       put 'accounts/:account_id/sso_settings', action: :update_sso_settings, as: 'account_update_sso_settings_url'
 
@@ -2015,8 +2023,11 @@ CanvasRails::Application.routes.draw do
       patch 'courses/:id/late_policy', action: :update
     end
 
+    scope(controller: :planner) do
+      get 'planner/items', action: :index, as: :planner_items
+    end
+
     scope(controller: :planner_overrides) do
-      get 'planner/items', action: :items_index, as: :planner_items
       get 'planner/overrides', action: :index, as: :planner_overrides
       get 'planner/overrides/:id', action: :show
       put 'planner/overrides/:id', action: :update

@@ -17,12 +17,12 @@
  */
 import React from 'react';
 import { shallow, mount } from 'enzyme';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import {Day} from '../index';
 
 it('renders the base component with required props', () => {
   const wrapper = shallow(
-    <Day timeZone="America/Denver" day="2017-04-25" alwaysRender />
+    <Day timeZone="America/Denver" day="2017-04-25" />
   );
   expect(wrapper).toMatchSnapshot();
 });
@@ -195,15 +195,8 @@ it('groups itemsForDay that come in on prop changes', () => {
   expect(Object.keys(groupedItems).length).toEqual(3);
 });
 
-it('renders nothing when there are no items and the date is outside of two weeks', () => {
-  const date = moment.tz("Asia/Tokyo").add(15, 'days');
-  const wrapper = shallow(
-    <Day timeZone="Asia/Tokyo" day={date.format('YYYY-MM-DD')} itemsForDay={[]} />
-  );
-  expect(wrapper.type()).toBeNull();
-});
 
-it('renders when there are no items but within two weeks', () => {
+it('renders even when there are no items', () => {
   const date = moment.tz("Asia/Tokyo").add(13, 'days');
   const wrapper = shallow(
     <Day timeZone="Asia/Tokyo" day={date.format('YYYY-MM-DD')} itemsForDay={[]} />

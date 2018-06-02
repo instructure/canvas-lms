@@ -57,9 +57,14 @@ describe MathMan do
       expect(parsed.path).to eq ('/beta/mml')
     end
 
-    it 'should include target string in generated url' do
+    it 'includes target string in generated url' do
       expect(MathMan.url_for(latex: latex, target: :mml)).to match(/mml/)
       expect(MathMan.url_for(latex: latex, target: :svg)).to match(/svg/)
+    end
+
+    it 'errors if DynamicSettings is not configured' do
+      Canvas::DynamicSettings.fallback_data = nil
+      expect { MathMan.url_for(latex: latex, target: :mml) }.to raise_error MathMan::InvalidConfigurationError
     end
   end
 
@@ -70,6 +75,11 @@ describe MathMan do
 
     it 'returns false when PluginSetting is missing' do
       PluginSetting.where(name: 'mathman').first.destroy
+      expect(MathMan.use_for_mml?).to be_falsey
+    end
+
+    it 'does not error if DynamicSettings is not configured' do
+      Canvas::DynamicSettings.fallback_data = nil
       expect(MathMan.use_for_mml?).to be_falsey
     end
 
@@ -89,6 +99,11 @@ describe MathMan do
 
     it 'returns false when PluginSetting is missing' do
       PluginSetting.where(name: 'mathman').first.destroy
+      expect(MathMan.use_for_svg?).to be_falsey
+    end
+
+    it 'does not error if DynamicSettings is not configured' do
+      Canvas::DynamicSettings.fallback_data = nil
       expect(MathMan.use_for_svg?).to be_falsey
     end
 

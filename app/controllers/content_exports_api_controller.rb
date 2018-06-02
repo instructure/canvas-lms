@@ -128,6 +128,19 @@ class ContentExportsApiController < ApplicationController
   # @argument skip_notifications [Optional, Boolean]
   #   Don't send the notifications about the export to the user. Default: false
   #
+  # @argument select [Optional, Hash, "folders"|"files"|"attachments"|"quizzes"|"assignments"|"announcements"|"calendar_events"|"discussion_topics"|"modules"|"module_items"|"pages"|"rubrics"]
+  #   The select parameter allows exporting specific data. The keys are object types like 'files',
+  #   'folders', 'pages', etc. The value for each key is a list of object ids. An id can be an
+  #   integer or a string.
+  #
+  #   Multiple object types can be selected in the same call. However, not all object types are
+  #   valid for every export_type. Common Cartridge supports all object types. Zip and QTI only
+  #   support the object types as described below.
+  #
+  #   "folders":: Also supported for zip export_type.
+  #   "files":: Also supported for zip export_type.
+  #   "quizzes":: Also supported for qti export_type.
+  #
   # @returns ContentExport
   def create
     if authorized_action(@context, @current_user, :read)

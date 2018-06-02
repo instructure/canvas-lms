@@ -47,13 +47,13 @@ describe "site-wide" do
   it "should set no-cache headers for html requests" do
     get "/login"
     expect(response['Pragma']).to match(/no-cache/)
-    expect(response['Cache-Control']).to match(/must-revalidate/)
+    expect(response['Cache-Control']).to match(/no-store/)
   end
 
   it "should NOT set no-cache headers for API/xhr requests" do
     get "/api/v1/courses"
     expect(response['Pragma']).to be_nil
-    expect(response['Cache-Control']).not_to match(/must-revalidate/)
+    expect(response['Cache-Control']).not_to match(/no-store/)
   end
 
   it "should set the x-frame-options http header" do

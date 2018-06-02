@@ -46,6 +46,21 @@ All of these settings are contained under "course_navigation"
 
     Whether to enable this selection feature.
 
+-   display_type &lt;text&gt; (optional)
+
+    The layout type to use when launching the tool. Must be one of the following:
+    * default
+
+      Includes Canvas global navigation, breadcrumb, and course navigation.
+    * full_width
+
+      Includes Canvas global navigation but does not include breadcrumb or course navigation
+
+    * borderless
+
+      Does not include Canvas global navigation, course navigation, or breadcrumbs
+
+
 <a name="account_navigation"></a>
 ## Account navigation links
 External tools can also be configured to appear as links in
@@ -74,6 +89,20 @@ All of these settings are contained under "account_navigation"
 -   enabled: &lt;boolean&gt; (required)
 
     Whether to enable this selection feature.
+
+-   display_type &lt;text&gt; (optional)
+
+    The layout type to use when launching the tool. Must be one of the following:
+    * default
+
+      Includes Canvas global navigation, breadcrumb, and account navigation.
+    * full_width
+
+      Includes Canvas global navigation but does not include breadcrumb or account navigation
+
+    * borderless
+
+      Does not include Canvas global navigation, account navigation, or breadcrumbs
 
 <a name="user_navigation"></a>
 ## User navigation links

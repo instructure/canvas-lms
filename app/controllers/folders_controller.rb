@@ -480,7 +480,7 @@ class FoldersController < ApplicationController
   #
   # @example_request
   #
-  #   curl -XDELETE 'https://<canvas>/api/v1/folders/<folder_id>' \
+  #   curl -X DELETE 'https://<canvas>/api/v1/folders/<folder_id>' \
   #        -H 'Authorization: Bearer <token>'
   def api_destroy
     @folder = Folder.find(params[:id])

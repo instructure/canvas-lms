@@ -173,17 +173,17 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(Version::Partitioner, :process)
   end
 
-  if AccountAuthorizationConfig::SAML.enabled?
-    Delayed::Periodic.cron 'AccountAuthorizationConfig::SAML::MetadataRefresher.refresh_providers', '15 0 * * *' do
-      with_each_shard_by_database(AccountAuthorizationConfig::SAML::MetadataRefresher,
+  if AuthenticationProvider::SAML.enabled?
+    Delayed::Periodic.cron 'AuthenticationProvider::SAML::MetadataRefresher.refresh_providers', '15 0 * * *' do
+      with_each_shard_by_database(AuthenticationProvider::SAML::MetadataRefresher,
                                   :refresh_providers)
     end
 
-    AccountAuthorizationConfig::SAML::Federation.descendants.each do |federation|
-      Delayed::Periodic.cron "AccountAuthorizationConfig::SAML::#{federation.class_name}.refresh_providers", '45 0 * * *' do
+    AuthenticationProvider::SAML::Federation.descendants.each do |federation|
+      Delayed::Periodic.cron "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers", '45 0 * * *' do
         DatabaseServer.send_in_each_region(federation,
                                     :refresh_providers,
-                                    singleton: "AccountAuthorizationConfig::SAML::#{federation.class_name}.refresh_providers")
+                                    singleton: "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers")
       end
     end
   end
@@ -202,5 +202,13 @@ Rails.configuration.after_initialize do
 
   Delayed::Periodic.cron 'MissingPolicyApplicator.apply_missing_deductions', '*/5 * * * *', priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(MissingPolicyApplicator, :apply_missing_deductions)
+  end
+
+  Delayed::Periodic.cron 'Assignment.clean_up_duplicating_assignments', '*/5 * * * *', priority: Delayed::LOW_PRIORITY do
+    with_each_shard_by_database(Assignment, :clean_up_duplicating_assignments)
+  end
+
+  Delayed::Periodic.cron 'abandoned job cleanup', '*/10 * * * *' do
+    Delayed::Worker::HealthCheck.reschedule_abandoned_jobs
   end
 end

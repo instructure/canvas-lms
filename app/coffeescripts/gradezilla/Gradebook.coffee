@@ -65,6 +65,7 @@ define [
   'jsx/gradezilla/default_gradebook/components/StatusesModal'
   'jsx/gradezilla/default_gradebook/components/SubmissionTray'
   'jsx/gradezilla/default_gradebook/components/GradebookSettingsModal'
+  'jsx/gradezilla/default_gradebook/components/AnonymousSpeedGraderAlert'
   'jsx/gradezilla/default_gradebook/constants/colors'
   'jsx/gradezilla/default_gradebook/stores/StudentDatastore'
   'jsx/gradezilla/SISGradePassback/PostGradesStore'
@@ -102,7 +103,7 @@ define [
   EnterGradesAsSetting, SetDefaultGradeDialogManager, CurveGradesDialogManager, GradebookApi, SubmissionCommentApi,
   GradebookGrid, studentRowHeaderConstants, AssignmentRowCellPropFactory, GradebookMenu, ViewOptionsMenu, ActionMenu,
   AssignmentGroupFilter, GradingPeriodFilter, ModuleFilter, SectionFilter, GridColor, StatusesModal, SubmissionTray,
-  GradebookSettingsModal, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp, SubmissionStateMap,
+  GradebookSettingsModal, AnonymousSpeedGraderAlert, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp, SubmissionStateMap,
   DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GradebookKeyboardNav,
   AssignmentMuterDialogManager, assignmentHelper, TextMeasure, GradeInputHelper, { default: OutlierScoreHelper },
   LatePolicyApplicator, { default: Button }, { default: IconSettingsSolid }, FlashAlert) ->
@@ -226,6 +227,9 @@ define [
     {
       pendingGradeInfo: []
     }
+
+  anonymousSpeedGraderAlertMountPoint = () ->
+    document.querySelector("[data-component='AnonymousSpeedGraderAlert']")
 
   class Gradebook
     columnWidths =
@@ -1955,7 +1959,7 @@ define [
       not @isFilteringColumnsByGradingPeriod()
 
     fieldsToExcludeFromAssignments: ['description', 'needs_grading_count', 'in_closed_grading_period']
-    fieldsToIncludeWithAssignments: ['module_ids', 'assignment_group_id']
+    fieldsToIncludeWithAssignments: ['grades_published', 'module_ids', 'assignment_group_id']
 
     studentsParams: ->
       enrollmentStates = ['invited', 'active']
@@ -2180,6 +2184,7 @@ define [
       key: "grade_details_tray"
       latePolicy: @courseContent.latePolicy
       locale: @options.locale
+      onAnonymousSpeedGraderClick: @showAnonymousSpeedGraderAlertForURL
       onClose: => @gradebookGrid.gridSupport.helper.focus()
       onGradeSubmission: @gradeSubmission
       onRequestClose: @closeSubmissionTray
@@ -2670,7 +2675,8 @@ define [
       manager = new AssignmentMuterDialogManager(
         assignment,
         "#{@options.context_url}/assignments/#{assignmentId}/mute",
-        @contentLoadStates.submissionsLoaded
+        @contentLoadStates.submissionsLoaded,
+        @options.anonymous_moderated_marking_enabled
       )
 
       {
@@ -2792,6 +2798,18 @@ define [
         valid: true
 
       @apiUpdateSubmission(submissionData, gradeInfo)
+
+    renderAnonymousSpeedGraderAlert: (props) =>
+      renderComponent(AnonymousSpeedGraderAlert, anonymousSpeedGraderAlertMountPoint(), props)
+
+    showAnonymousSpeedGraderAlertForURL: (speedGraderUrl) =>
+      props = { speedGraderUrl, onClose: @hideAnonymousSpeedGraderAlert }
+      @anonymousSpeedGraderAlert = @renderAnonymousSpeedGraderAlert(props)
+      @anonymousSpeedGraderAlert.open()
+
+    hideAnonymousSpeedGraderAlert: =>
+      # React throws an error if we try to unmount while the event is being handled
+      @delayedCall 0, => ReactDOM.unmountComponentAtNode(anonymousSpeedGraderAlertMountPoint())
 
     destroy: =>
       $(window).unbind('resize.fillWindowWithMe')

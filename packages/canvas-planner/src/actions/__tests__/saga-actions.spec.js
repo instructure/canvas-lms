@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {mergeFutureItems, mergePastItems, mergePastItemsForNewActivity}
+import MockDate from 'mockdate';
+import {mergeFutureItems, mergePastItems, mergePastItemsForNewActivity, mergePastItemsForToday}
   from '../saga-actions';
 import {gotPartialFutureDays, gotPartialPastDays, gotDaysSuccess} from '../loading-actions';
 import {itemsToDays} from '../../utilities/daysUtils';
@@ -169,5 +170,59 @@ describe('mergePastItemsForNewActivity', () => {
     expect(result).toBe(true);
     expect(mockDispatch).toHaveBeenCalledWith(gotPartialPastDays(itemsToDays(mockItems), 'mock response'));
     expect(mockDispatch).toHaveBeenCalledWith(gotDaysSuccess(itemsToDays([mockItems[1], mockItems[2]]), 'mock response'));
+  });
+});
+
+describe('mergePastItemsForToday', () => {
+  beforeAll (() => {
+    MockDate.set('2017-12-22');
+  });
+  
+  afterAll (() => {
+    MockDate.reset();
+  });
+
+  it('does not merge complete days if we did not find today', () => {
+    const mockDispatch = jest.fn();
+    const mockItems = [mockItem('2017-12-23'), mockItem('2017-12-24')];
+    const result = mergePastItemsForToday(mockItems, 'mock response')(mockDispatch,
+      getStateFn({loading: {partialPastDays: itemsToDays(mockItems)}}),
+    );
+    expect(result).toBe(false);
+    expect(mockDispatch).toHaveBeenCalledWith(gotPartialPastDays(itemsToDays(mockItems), 'mock response'));
+    expect(mockDispatch).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not merge partial days even finding today', () => {
+    const mockDispatch = jest.fn();
+    const mockItems = [mockItem('2017-12-18')];
+    const result = mergePastItemsForToday(mockItems, 'mock response')(mockDispatch,
+      getStateFn({loading: {partialPastDays: itemsToDays(mockItems)}}),
+    );
+    expect(result).toBe(false);
+    expect(mockDispatch).toHaveBeenCalledWith(gotPartialPastDays(itemsToDays(mockItems), 'mock response'));
+    expect(mockDispatch).toHaveBeenCalledTimes(1);
+  });
+
+  it('merges days if allPastItemsLoaded even if we did not find today', () => {
+    const mockDispatch = jest.fn();
+    const mockItems = [mockItem('2017-12-14')];
+    const result = mergePastItemsForToday(mockItems, 'mock response')(mockDispatch,
+      getStateFn({loading: {partialPastDays: itemsToDays(mockItems), allPastItemsLoaded: true}}),
+    );
+    expect(result).toBe(true);
+    expect(mockDispatch).toHaveBeenCalledWith(gotPartialPastDays(itemsToDays(mockItems), 'mock response'));
+    expect(mockDispatch).toHaveBeenCalledWith(gotDaysSuccess(itemsToDays(mockItems), 'mock response'));
+  });
+
+  it('merges complete days when they contain today', () => {
+    const mockDispatch = jest.fn();
+    const mockItems = [mockItem('2017-12-15'), mockItem('2017-12-16')];
+    const result = mergePastItemsForToday(mockItems, 'mock response')(mockDispatch,
+      getStateFn({loading: {partialPastDays: itemsToDays(mockItems)}}),
+    );
+    expect(result).toBe(true);
+    expect(mockDispatch).toHaveBeenCalledWith(gotPartialPastDays(itemsToDays(mockItems), 'mock response'));
+    expect(mockDispatch).toHaveBeenCalledWith(gotDaysSuccess(itemsToDays([mockItems[1]]), 'mock response'));
   });
 });

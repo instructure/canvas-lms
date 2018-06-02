@@ -736,17 +736,21 @@ li.quiz {
   }
   .links {
     float: direction(right);
-    margin: 8px 8px 0 0;
+    margin: direction-sides(8px 8px 0 0);
     a {
       position: relative;
-      left: -100000px;
+      #{direction(left)}: -100000px;
       &:focus {
-        left: 0;
+        #{direction(left)}: 0;
       }
     }
   }
   .flag_question {
     background: $answersSprite -48px top;
+
+    // flip the sprite in RTL
+    @if $direction == 'rtl' { transform: scale(-1, 1) }
+
     cursor: pointer;
     position: absolute;
     #{direction(left)}: -30px;
@@ -873,6 +877,10 @@ li.quiz {
     .answer_select .answer_image {
       background-repeat: no-repeat;
       background-position: 3px 5px;
+
+      // flip the arrow in RTL
+      @if $direction == 'rtl' { transform: scale(-1, 1) }
+
       cursor: pointer;
     }
     &.hover .answer_select .answer_image,
@@ -1008,10 +1016,10 @@ form.question_form {
     }
     .answer .question_actions a {
       position: relative;
-      left: -100000px;
+      #{direction(left)}: -100000px;
     }
     .answer.hover .question_actions a, .question_actions a:focus {
-      left: 0;
+      #{direction(left)}: 0;
     }
     .answer_comments {
       overflow-x: auto;
@@ -1068,7 +1076,7 @@ form.question_form {
 
     .comment_focus {
       position: relative;
-      left: -100000px;
+      #{direction(left)}: -100000px;
       float: direction(right);
       .ellipsis {
         display: none;
@@ -1076,7 +1084,7 @@ form.question_form {
     }
 
     &.hover .comment_focus, .comment_focus:focus {
-      left: 0;
+      #{direction(left)}: 0;
     }
 
     .comment_top {
@@ -1094,7 +1102,7 @@ form.question_form {
       width: 50px;
       opacity: 0.5;
       .comment_focus {
-        left: 0;
+        #{direction(left)}: 0;
         float: none;
         display: block;
         text-align: center;
@@ -1126,7 +1134,7 @@ form.question_form {
 
 ul#question_list {
   margin: 0 0 13px;
-  padding: 0 0 0 20px;
+  padding: direction-sides(0 0 0 20px);
   list-style-type: none;
   li {
     padding-#{direction(left)}: 20px;
@@ -1142,7 +1150,9 @@ ul#question_list {
     }
     &.marked {
       font-weight: bold;
-      background: url(/images/flagged_question.png) 3px 7px no-repeat;
+      background-image: url("/images/flagged_question#{direction-rtl('-rtl', '')}.png");
+      background-position: direction('left') 3px top 7px;
+      background-repeat: no-repeat;
       @if $use_high_contrast {
         @include bg-image(flagged_question_hc, png, no-repeat, 3px, 7px, transparent, 10px, 8px);
       }
@@ -1525,7 +1535,7 @@ ul#quiz_versions {
   .found_question {
     margin-bottom: 5px;
     .question_text {
-      margin: 2px 10px 2px 25px;
+      margin: direction-sides(2px 10px 2px 25px);
       font-size: 0.8em;
     }
     .question_name {
@@ -1562,7 +1572,7 @@ ul#quiz_versions {
     }
     .ip_filter {
       .name_and_account {
-        padding: 2px 10px 2px 5px;
+        padding: direction-sides(2px 10px 2px 5px);
         .name {
           font-weight: bold;
         }
@@ -1574,7 +1584,7 @@ ul#quiz_versions {
       .filter {
         vertical-align: top;
         text-style: italic;
-        padding: 2px 5px 2px 10px;
+        padding: direction-sides(2px 5px 2px 10px);
       }
       &:hover {
         td {
@@ -1695,6 +1705,10 @@ ul#quiz_versions {
   &.incorrect:before, &.incorrect:after,
   &.info:before, &.info:after {
     background-image: $answersSprite;
+
+    // flip the arrow in RTL
+    @if $direction == 'rtl' { transform: scale(-1, 1) }
+
     background-repeat: no-repeat;
     content: " ";
     height: 27px;
@@ -1914,6 +1928,9 @@ ul#quiz_versions {
       /* Display persistent correct answer arrow when editing only. */
       &.selectable .form_answers .answer.correct_answer .answer_select .answer_image {
         background-image: url(/images/correct_answer.png);
+
+        // flip the arrow in RTL
+        @if $direction == 'rtl' { transform: scale(-1, 1) }
       }
     }
     .blank_id_select {
@@ -2125,7 +2142,7 @@ ul#quiz_versions {
   background: #e8e8e8;
   border-top: 1px solid #ccc;
   width: 100%;
-  padding: 20px 0 20px 20px;
+  padding: direction-sides(20px 0 20px 20px);
   position: fixed;
   bottom: 0px;
   #{direction(left)}: 0px;
@@ -2195,7 +2212,7 @@ ul#quiz_versions {
     background: #f6f6f6 none;
     border: 6px solid rgba(255, 255, 255, 0.25);
     border-radius: 7px;
-    padding: 12px 9px 12px 17px;
+    padding: direction-sides(12px 9px 12px 17px);
     box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.4);
     background-clip: padding-box;
     width: 40%;
@@ -2254,7 +2271,7 @@ li.quiz.quiz-loading-overrides {
     display: block;
     background-image: url("/images/ajax-loader-black-on-white.gif");
     background-color: white;
-    background-position: 90% 50%;
+    background-position: direction('left') 90% top 50%;
     background-repeat: no-repeat;
     opacity: 0.35;
     width: 100%;

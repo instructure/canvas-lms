@@ -149,7 +149,7 @@ import Link from '@instructure/ui-core/lib/components/Link'
           // cannot create new users. Just show the missing ones
           row = (
             <tr key={`missing_${missing.address}`}>
-              <td>{missing.address}</td>
+              <th scope="row">{missing.address}</th>
             </tr>
           );
         } else if (missing.createNew) {
@@ -183,7 +183,7 @@ import Link from '@instructure/ui-core/lib/components/Link'
                   onChange={this.onNewForMissingChange}
                 />
               </td>
-              <td>{missing.address}</td>
+              <th scope="row">{missing.address}</th>
             </tr>
           );
         } else {
@@ -201,7 +201,7 @@ import Link from '@instructure/ui-core/lib/components/Link'
                   {namePrompt}
                 </Link>
               </td>
-              <td>{missing.address}</td>
+              <th scope="row">{missing.address}</th>
             </tr>
           );
         }
@@ -220,7 +220,7 @@ import Link from '@instructure/ui-core/lib/components/Link'
           // cannot create new users. Just show the missing ones
           row = (
             <tr key={`missing_${missing.address}`}>
-              <td>{missing.address}</td>
+              <th scope="row">{missing.address}</th>
             </tr>
           );
         } else if (missing.createNew) {
@@ -245,7 +245,7 @@ import Link from '@instructure/ui-core/lib/components/Link'
                   value={missing.newUserInfo.name || null}
                 />
               </td>
-              <td>{missing.address}</td>
+              <th scope="row">{missing.address}</th>
             </tr>
           );
         } else {
@@ -263,7 +263,7 @@ import Link from '@instructure/ui-core/lib/components/Link'
                   {namePrompt}
                 </Link>
               </td>
-              <td>{missing.address}</td>
+              <th scope="row">{missing.address}</th>
             </tr>
           );
         }

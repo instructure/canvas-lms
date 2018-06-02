@@ -72,6 +72,23 @@ const developerKeysHandlers = {
     ...state,
     list: state.list.map((developerKey) => (action.payload.id === developerKey.id ? action.payload : developerKey)),
   }),
+  [ACTION_NAMES.LIST_DEVELOPER_KEYS_REPLACE_BINDING_STATE]: (state, action) => {
+    const newList = state.list.map((developerKey) => {
+      if (developerKey.id !== action.payload.developer_key_id.toString()) { return developerKey }
+      return Object.assign({}, developerKey, { developer_key_account_binding: action.payload })
+    })
+
+    const newInheritedList = state.inheritedList.map((developerKey) => {
+      if (developerKey.id !== action.payload.developer_key_id.toString()) { return developerKey }
+      return Object.assign({}, developerKey, { developer_key_account_binding: action.payload })
+    })
+
+    return {
+      ...state,
+      list: newList,
+      inheritedList: newInheritedList
+    }
+  },
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_DELETE]: (state, action) => ({
     ...state,
     list: state.list.filter(developerKey => action.payload.id !== developerKey.id)

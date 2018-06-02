@@ -43,18 +43,18 @@ describe "Gradezilla" do
     it "should gray out cells" do
       Gradezilla.visit(@course)
       # student 3, assignment 4
-      selector = '#gradebook_grid .container_1 .slick-row:nth-child(3) .l4'
+      selector = '#gradebook_grid .container_1 .slick-row:nth-child(3) .b4'
       cell = f(selector)
       expect(cell.find_element(:css, '.gradebook-cell')).to have_class('grayed-out')
       cell.click
       expect(cell).not_to contain_css('.grade')
       # student 2, assignment 4 (not grayed out)
-      cell = f('#gradebook_grid .container_1 .slick-row:nth-child(2) .l4')
+      cell = f('#gradebook_grid .container_1 .slick-row:nth-child(2) .b4')
       expect(cell.find_element(:css, '.gradebook-cell')).not_to have_class('grayed-out')
     end
 
     it "should gray out cells after removing an override which removes visibility" do
-      selector = '#gradebook_grid .container_1 .slick-row:nth-child(1) .l4'
+      selector = '#gradebook_grid .container_1 .slick-row:nth-child(1) .b4'
       @da_assignment.grade_student(@student_1, grade: 42, grader: @teacher)
       @override.destroy
       Gradezilla.visit(@course)

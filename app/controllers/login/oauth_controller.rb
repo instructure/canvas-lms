@@ -35,7 +35,7 @@ class Login::OauthController < Login::OauthBaseController
 
   def create
     @aac = @domain_root_account.authentication_providers.active.find(params[:id])
-    raise ActiveRecord::RecordNotFound unless @aac.is_a?(AccountAuthorizationConfig::Oauth)
+    raise ActiveRecord::RecordNotFound unless @aac.is_a?(AuthenticationProvider::Oauth)
 
     oauth_state = session.delete(:oauth)
     request_token = OAuth::RequestToken.new(@aac.consumer,

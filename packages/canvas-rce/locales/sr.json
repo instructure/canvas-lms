@@ -1,0 +1,140 @@
+{
+  "announcement_list_da155734": {
+    "message": "Lista za objave"
+  },
+  "announcements_a4b8ed4a": {
+    "message": "Obavještenja"
+  },
+  "assignment_list_a833f59d": {
+    "message": "Lista zadataka"
+  },
+  "assignments_1e02582c": {
+    "message": "Zadaci"
+  },
+  "background_color_press_down_to_select_ef99fdac": {
+    "message": "Boja pozadine, pritisnite dolje kako bi odabrali"
+  },
+  "cc_attribution_f6de631f": {
+    "message": "CC Atribut"
+  },
+  "cc_attribution_no_derivatives_b006744f": {
+    "message": "CC Atribut nije izveden"
+  },
+  "cc_attribution_non_commercial_39e0d30d": {
+    "message": "CC Atribut nije komercijalan"
+  },
+  "cc_attribution_non_commercial_no_derivatives_9fe74c00": {
+    "message": "CC Atribut nije komercijalan nije izveden"
+  },
+  "cc_attribution_non_commercial_share_alike_c7edb1e5": {
+    "message": "CC Atribut nije komercijalan podijeli kao sličan"
+  },
+  "cc_attribution_share_alike_669e7f16": {
+    "message": "CC Atribut podjeli kao sličan"
+  },
+  "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
+    "message": "Kliknite bilo koji dokument da ubacite link za preuzimanje za taj dokument."
+  },
+  "click_any_image_to_embed_the_image_in_the_page_2cdd1136": {
+    "message": "Kliknite bilo koju sliku da proširite sliku na stranici."
+  },
+  "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
+    "message": "Kliknite bilo koju stranicu da ubacite link za tu stranicu."
+  },
+  "click_to_embed_image_33107dd8": {
+    "message": "Kliknite da uklpoite sliku"
+  },
+  "collaborations_5c56c15f": {
+    "message": "Saradnje "
+  },
+  "course_navigation_dd035109": {
+    "message": "Navigacija kursa"
+  },
+  "course_syllabus_5de1b0af": {
+    "message": "Nastavni plan i program kursa"
+  },
+  "discussions_a5f96392": {
+    "message": "Diskusije"
+  },
+  "discussions_index_6c36ced": {
+    "message": "Indeks diskusija"
+  },
+  "embed_image_1080badc": {
+    "message": "Postavljanje slike"
+  },
+  "enter_search_terms_e397b1f0": {
+    "message": "ukucaj stavke za pretragu"
+  },
+  "files_c300e900": {
+    "message": "Datoteke"
+  },
+  "files_index_af7c662b": {
+    "message": "Indeks dokumenata"
+  },
+  "font_size_press_down_to_select_6c25dc2d": {
+    "message": "Veličina fonta, prtisnite dolje da odaberete"
+  },
+  "formatting_press_down_to_select_df728c30": {
+    "message": "Formatiranje, prtisnite dolje da odaberete"
+  },
+  "grades_a61eba0a": {
+    "message": "Ocjene"
+  },
+  "group_navigation_99f191a": {
+    "message": "Navigacija kroz grupu"
+  },
+  "images_7ce26570": {
+    "message": "Slike"
+  },
+  "insert_link_6dc23cae": {
+    "message": "Ubaci link"
+  },
+  "link_to_a_new_page_6c4ad034": {
+    "message": "Link ka novoj stranici"
+  },
+  "link_to_other_content_in_the_course_879163b5": {
+    "message": "Link za drugi sadržaj u kursu."
+  },
+  "link_to_other_content_in_the_group_3fe25379": {
+    "message": "Link za ostale sadržaje u grupi."
+  },
+  "links_14b70841": {
+    "message": "Linkovi"
+  },
+  "loading_25990131": {
+    "message": "Učitavanje..."
+  },
+  "modules_c4325335": {
+    "message": "Moduli"
+  },
+  "pages_e5414c2c": {
+    "message": "Stranice"
+  },
+  "people_b4ebb13c": {
+    "message": "Ljudi"
+  },
+  "quizzes_7e598f57": {
+    "message": "Kvizovi"
+  },
+  "search_280d00bd": {
+    "message": "Traži"
+  },
+  "text_color_press_down_to_select_8f5ad9b5": {
+    "message": "Boja teksta, pritisnite dolje kako bi odabrali"
+  },
+  "upload_8b403d05": {
+    "message": "Učitati"
+  },
+  "upload_a_new_file_96e6d4ff": {
+    "message": "Učitajte novu datoteku"
+  },
+  "upload_a_new_image_890df275": {
+    "message": "Učitajte novu sliku"
+  },
+  "what_would_you_like_to_call_the_new_page_d7e4488a": {
+    "message": "Kako biste voljeli nazvati novu stranicu?"
+  },
+  "wiki_home_9cd54d0": {
+    "message": "Wiki početna strana"
+  }
+}

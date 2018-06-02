@@ -1103,5 +1103,19 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       aq_to = @copy_to.assessment_questions.where(:migration_id => mig_id(aq)).first
       expect(aq_to.data['question_type']).to eq "multiple_choice_question"
     end
+
+    it "should not remove outer tags with style tags from questions" do
+      html = "<p style=\"text-align: center;\">This is aligned to the center</p>"
+      q = @copy_from.quizzes.create!(:title => "q")
+      data = {'question_name' => 'test question', 'question_type' => 'essay_question',
+        'question_text' => html}
+      qq = q.quiz_questions.create!(:question_data => data)
+
+      run_course_copy
+
+      q_to = @copy_to.quizzes.where(:migration_id => mig_id(q)).first
+      qq_to = q_to.quiz_questions.first
+      expect(qq_to.question_data[:question_text]).to eq html
+    end
   end
 end

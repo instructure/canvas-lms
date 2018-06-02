@@ -44,34 +44,35 @@ export class Animator {
     else this.queueAnimation(() => elt.focus(), 'unshift');
   }
 
-  recordFixedElement (elt) {
-    if (elt) {
-      this.fixedElement = elt;
-      this.fixedElementsInitialPositionInViewport = elt.getBoundingClientRect().top;
-    }
+  elementPositionMemo (elt) {
+    return {
+      element: elt,
+      rect: elt.getBoundingClientRect(),
+    };
   }
 
   // Based on this formula:
   // element's position in the viewport + the window's scroll position === the element's position in the document
   // so if we want the scroll position that will maintain the element in it's current viewport position,
   // window scroll position = element's current document position - element's initial viewport position
-  maintainViewportPosition () {
-    if (this.fixedElement == null) return;
+  maintainViewportPositionFromMemo (elt, memo) {
     this.queueAnimation(() => {
-      const fixedElementsNewPositionInViewport = this.fixedElement.getBoundingClientRect().top;
+      const fixedElementsInitialPositionInViewport = memo.rect.top;
+      const fixedElementsNewPositionInViewport = elt.getBoundingClientRect().top;
       const documentPositionInViewport = this.document.documentElement.getBoundingClientRect().top;
       const fixedElementsPositionInDocument = fixedElementsNewPositionInViewport - documentPositionInViewport;
-      const newWindowScrollPosition = fixedElementsPositionInDocument - this.fixedElementsInitialPositionInViewport;
+      const newWindowScrollPosition = fixedElementsPositionInDocument - fixedElementsInitialPositionInViewport;
       this.window.scroll(0, newWindowScrollPosition);
     }, 'push');
   }
 
-  scrollTo (elt, offset) {
+  scrollTo (elt, offset, onComplete) {
     this.queueAnimation(() => {
-      const viewportHeight = this.window.innerHeight;
-      const rect = elt.getBoundingClientRect();
-      if (rect.top < offset || rect.bottom > viewportHeight) {
-        this.velocity(elt, 'scroll', {offset: -offset, duration: 1000, easing: 'ease-in-out'});
+      if (this.isOffScreen(elt, offset)) {
+        this.velocity(elt, 'scroll', {offset: -offset, duration: 1000, easing: 'ease-in-out', complete: onComplete});
+      } else {
+        // even though we didn't need to run the animation, execute the onComplete callback
+        onComplete && onComplete();
       }
     });
   }
@@ -89,14 +90,22 @@ export class Animator {
     return elt.getBoundingClientRect().top < offset;
   }
 
-  documentIsTallerThanScreen () {
+  isBelowScreen (elt) {
     // clientHeight is rounded to an integer, while the rect is a more precise
     // float. Add some padding so we err on the side of loading too much.
     // Also, Canvas's footer makes the document always at least as tall as
     // the viewport.
     const doc = this.window.document.documentElement;
-    return doc.getBoundingClientRect().height > doc.clientHeight + 2;
+    return elt.getBoundingClientRect().bottom + 2 > doc.clientHeight;
   }
+
+  isOnScreen (elt, offset) {
+    return !this.isOffScreen(elt, offset);
+  }
+
+  isOffScreen (elt, offset) {
+     return this.isAboveScreen(elt, offset) || this.isBelowScreen(elt);
+   }
 
   runAnimationQueue = () => {
     while (this.animationQueue.length) {

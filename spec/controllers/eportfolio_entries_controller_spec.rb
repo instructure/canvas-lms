@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe EportfolioEntriesController do
   def eportfolio_category
@@ -133,6 +134,19 @@ describe EportfolioEntriesController do
         get 'attachment', params: {:eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => SecureRandom.uuid}
       rescue => e
         expect(e.to_s).to eql("Not Found")
+      end
+    end
+
+    describe "with sharding" do
+      specs_require_sharding
+
+      it "should find attachments on all shards associated with user" do
+        user_session(@user)
+        @shard1.activate do
+          @user.associate_with_shard(@shard1)
+          @a1 = Attachment.create!(user: @user, context: @user, filename: "test.jpg", uploaded_data: StringIO.new("first"))
+        end 
+        get 'attachment', params: {:eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => @a1.uuid}
       end
     end
   end

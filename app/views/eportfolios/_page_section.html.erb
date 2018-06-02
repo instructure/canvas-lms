@@ -39,7 +39,7 @@
         <%= page_section["content"] ? raw(page_section["content"]) : t('rich_text.default_content', "Nothing Entered Yet") %>
       <% elsif page_section["section_type"] == "attachment" %>
         <div style="text-align: center;" class="attachment">
-          <% attachment = @portfolio.user.attachments.find(page_section["attachment_id"]) %>
+          <% attachment = @portfolio.shard.activate { @portfolio.user.attachments.find(page_section["attachment_id"]) } %>
           <% if attachment && attachment.content_type.match(/\Aimage/) %>
             <a href="<%= eportfolio_entry_view_file_path(@portfolio, @page, attachment.uuid) %>" class="no-hover"><%= image_tag eportfolio_entry_view_file_path(@portfolio, @page, attachment.uuid), :alt => attachment.display_name %></a>
           <% elsif attachment %>

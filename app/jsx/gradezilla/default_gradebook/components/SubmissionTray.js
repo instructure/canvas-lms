@@ -45,17 +45,6 @@ function renderAvatar (name, avatarUrl) {
   );
 }
 
-function renderSpeedGraderLink (speedGraderUrl) {
-  return (
-    <Container as="div" textAlign="center">
-      <Button href={speedGraderUrl} variant="link">
-        <IconSpeedGraderLine />
-        {I18n.t('SpeedGrader')}
-      </Button>
-    </Container>
-  );
-}
-
 function renderTraySubHeading (headingText) {
   return (
     <Heading level="h4" as="h2" margin="auto auto small">
@@ -148,7 +137,8 @@ export default class SubmissionTray extends React.Component {
     isInOtherGradingPeriod: bool.isRequired,
     isInClosedGradingPeriod: bool.isRequired,
     isInNoGradingPeriod: bool.isRequired,
-    isNotCountedForScore: bool.isRequired
+    isNotCountedForScore: bool.isRequired,
+    onAnonymousSpeedGraderClick: func.isRequired
   };
 
   cancelCommenting = () => {
@@ -207,6 +197,24 @@ export default class SubmissionTray extends React.Component {
     );
   }
 
+  renderSpeedGraderLink (speedGraderProps) {
+    const buttonProps = { variant: 'link', href: speedGraderProps.speedGraderUrl }
+    if (this.props.anonymousModeratedMarkingEnabled && speedGraderProps.anonymousGrading) {
+      buttonProps.onClick = (e) => {
+        e.preventDefault();
+        this.props.onAnonymousSpeedGraderClick(speedGraderProps.speedGraderUrl);
+      };
+    }
+    return (
+      <Container as="div" textAlign="center">
+        <Button {...buttonProps}>
+          <IconSpeedGraderLine />
+          {I18n.t('SpeedGrader')}
+        </Button>
+      </Container>
+    );
+  }
+
   render () {
     const { name, avatarUrl } = this.props.student;
     const assignmentParam = `assignment_id=${this.props.submission.assignmentId}`;
@@ -232,6 +240,14 @@ export default class SubmissionTray extends React.Component {
       // When we don't have an avatar, let's ensure there's enough space between the tray close button and the student
       // carousel's previous student arrow
       carouselContainerStyleOverride = 'small 0 0 0';
+    }
+
+    let speedGraderProps = null;
+    if (this.props.speedGraderEnabled) {
+      speedGraderProps = {
+        anonymousGrading: this.props.assignment.anonymousGrading,
+        speedGraderUrl
+      };
     }
 
     return (
@@ -283,7 +299,7 @@ export default class SubmissionTray extends React.Component {
                 </Link>
               </Carousel>
 
-              { this.props.speedGraderEnabled && renderSpeedGraderLink(speedGraderUrl) }
+              { this.props.speedGraderEnabled && this.renderSpeedGraderLink(speedGraderProps) }
 
               <Container as="div" margin="small 0" className="hr" />
             </Container>

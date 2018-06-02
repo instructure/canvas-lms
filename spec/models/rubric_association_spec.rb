@@ -258,5 +258,12 @@ describe RubricAssociation do
       expect(assessment.assessor).to eq(second_teacher)
       expect(submission.grader).to eq(second_teacher)
     end
+
+    it "propagated hide_points value" do
+      rubric_association.update!(hide_points: true)
+      assessment = rubric_association.assess(user: student, assessor: first_teacher, artifact: submission,
+                                             assessment: assessment_params)
+      expect(assessment.hide_points).to be true
+    end
   end
 end

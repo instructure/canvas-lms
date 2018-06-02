@@ -17,8 +17,11 @@
  */
 
 import {DynamicUiManager as Manager} from '../manager';
-import {dismissedOpportunity, cancelEditingPlannerItem, setNaiAboveScreen, scrollToNewActivity} from '../../actions';
-import {startLoadingItems, gettingFutureItems, gettingPastItems, gotItemsSuccess} from '../../actions/loading-actions';
+import {specialFallbackFocusId} from '../util';
+import {dismissedOpportunity, setNaiAboveScreen} from '../../actions';
+import {
+  startLoadingItems, gettingFutureItems, gettingPastItems, gotItemsSuccess,
+  startLoadingGradesSaga, gotGradesSuccess} from '../../actions/loading-actions';
 import { initialize as alertInitialize } from '../../utilities/alertUtils';
 
 class MockAnimator {
@@ -26,7 +29,7 @@ class MockAnimator {
   isAboveScreen = jest.fn()
   recordFixedElement = jest.fn()
   constructor () {
-    ['maintainViewportPosition', 'focusElement', 'scrollTo', 'scrollToTop'].forEach(fnName => {
+    ['focusElement'].forEach(fnName => {
       this[fnName] = jest.fn(() => {
         this.animationOrder.push(fnName);
       });
@@ -84,54 +87,6 @@ function createManagerWithMocks (opts = {}) {
     store,
     animations,
   };
-}
-
-function registerStandardDays (manager, opts = {}) {
-  [2, 1, 0].forEach(dayIndex => registerStandardDay(manager, dayIndex, opts));
-}
-
-function registerStandardDay (manager, dayIndex, opts = {}) {
-  const uniqueId = `day-${dayIndex}`;
-  const dayElement = { uniqueId };
-  const itemElements = registerStandardGroups(manager, dayIndex, opts);
-  manager.registerAnimatable('day', dayElement, dayIndex, itemElements.map(i => i.uniqueId));
-}
-
-function registerStandardGroups (manager, dayIndex, opts = {}) {
-  let allItemElements = [];
-  [2, 1, 0].forEach(groupIndex => {
-    const itemElements = registerStandardItems(manager, dayIndex, groupIndex, opts);
-    allItemElements = allItemElements.concat(itemElements);
-    const uniqueId = `day-${dayIndex}-group-${groupIndex}`;
-    const groupElement = {
-      uniqueId,
-      getFocusable: opts.groupFocusable || (() => `focusable-${uniqueId}`),
-      getScrollable: () => `scrollable-${uniqueId}`,
-    };
-    const itemUniqueIds = itemElements.map(elt => elt.uniqueId);
-    manager.registerAnimatable('group', groupElement, groupIndex, itemUniqueIds);
-    const naiComponent = {
-      uniqueId,
-      getFocusable: () => { throw new Error('new activity indicators should not be focused'); },
-      getScrollable: () => `scrollable-nai-${uniqueId}`,
-    };
-    manager.registerAnimatable('new-activity-indicator', naiComponent, groupIndex, itemUniqueIds);
-  });
-  return allItemElements;
-}
-
-function registerStandardItems (manager, dayIndex, groupIndex, opts = {}) {
-  return [2, 1, 0].map(itemIndex => {
-    const uniqueId = `day-${dayIndex}-group-${groupIndex}-item-${itemIndex}`;
-    const itemElement = {
-      uniqueId,
-      newActivity: itemIndex === 1 ? true : false,
-      getFocusable: () => `focusable-${uniqueId}`,
-      getScrollable: () => `scrollable-${uniqueId}`
-   };
-    manager.registerAnimatable('item', itemElement, itemIndex, [uniqueId]);
-    return itemElement;
-  });
 }
 
 describe('registerAnimatable', () => {
@@ -197,6 +152,18 @@ describe('action handling', () => {
       ));
       expect(srAlertMock).toHaveBeenCalled();
     });
+
+    it('performs an srAlert when grades are loading', () => {
+      const {manager} = createManagerWithMocks();
+      manager.handleAction(startLoadingGradesSaga());
+      expect(alertMocks.srAlertCallback).toHaveBeenCalledWith('Loading Grades');
+    });
+
+    it('performs an srAlert when grades are loaded', () => {
+      const {manager} = createManagerWithMocks();
+      manager.handleAction(gotGradesSuccess());
+      expect(alertMocks.srAlertCallback).toHaveBeenCalledWith('Grades Loaded');
+    });
   });
 
   it('dispatches actions to the animations', () => {
@@ -236,74 +203,13 @@ describe('action handling', () => {
   });
 });
 
-describe('getting past items', () => {
-  it('records the fixed element on preTrigger', () => {
-    const {manager, animator} = createManagerWithMocks();
-    manager.preTriggerUpdates('fixed-element', 'app');
-    expect(animator.recordFixedElement).toHaveBeenCalledWith('fixed-element');
-  });
-});
-
-describe('manipulating items', () => {
-  it('restores previous focus on cancel', () => {
-    const {manager, animator, doc} = createManagerWithMocks();
-    manager.handleOpenEditingPlannerItem();
-    manager.handleAction(cancelEditingPlannerItem({noScroll: false}));
-    registerStandardDays(manager);
-    manager.preTriggerUpdates('fixed-element', 'app');
-    manager.triggerUpdates();
-    expect(animator.focusElement).toHaveBeenCalledWith(doc.activeElement);
-    // maintain and scrolling works around a chrome bug
-    expect(animator.maintainViewportPosition).toHaveBeenCalled();
-    expect(animator.scrollTo).toHaveBeenCalledWith(doc.activeElement, 42);
-  });
-
-  it('does not scroll on cancel if told not to', () => {
-    const {manager, animator, doc} = createManagerWithMocks();
-    manager.handleOpenEditingPlannerItem();
-    manager.handleAction(cancelEditingPlannerItem({noScroll: true}));
-    registerStandardDays(manager);
-    manager.preTriggerUpdates('fixed-element', 'app');
-    manager.triggerUpdates();
-    expect(animator.focusElement).toHaveBeenCalledWith(doc.activeElement);
-    // maintain and scrolling works around a chrome bug
-    expect(animator.maintainViewportPosition).toHaveBeenCalled();
-    expect(animator.scrollTo).not.toHaveBeenCalled();
-  });
-
-  it('restores focus to previous focus when saving an existing item', () => {
-    const {manager, animator} = createManagerWithMocks();
-    manager.handleOpenEditingPlannerItem();
-    manager.handleSavedPlannerItem({payload: {isNewItem: false, item: {uniqueId: 'day-0-group-0-item-0'}}});
-    registerStandardDays(manager);
-    manager.preTriggerUpdates('fixed-element', 'app');
-    manager.triggerUpdates();
-    expect(animator.focusElement).toHaveBeenCalledWith('focusable-day-0-group-0-item-0');
-    // maintain and scrolling works around a chrome bug
-    expect(animator.maintainViewportPosition).toHaveBeenCalled();
-    expect(animator.scrollTo).toHaveBeenCalledWith('scrollable-day-0-group-0-item-0', 42);
-  });
-
-  it('sets focus to the new item when adding a new item', () => {
-    const {manager, animator} = createManagerWithMocks();
-    manager.handleOpenEditingPlannerItem();
-    manager.handleSavedPlannerItem({payload: {isNewItem: true, item: {uniqueId: 'day-0-group-0-item-0'}}});
-    registerStandardDays(manager);
-    manager.preTriggerUpdates('fixed-element', 'app');
-    manager.triggerUpdates();
-    expect(animator.focusElement).toHaveBeenCalledWith('focusable-day-0-group-0-item-0');
-    expect(animator.maintainViewportPosition).toHaveBeenCalled();
-    expect(animator.scrollTo).toHaveBeenCalledWith('scrollable-day-0-group-0-item-0', 42);
-  });
-});
-
 describe('deleting an opportunity', () => {
   it('sets focus to an opportunity', () => {
     const {manager, animator} = createManagerWithMocks();
     manager.registerAnimatable('opportunity', {getFocusable: () => 'opp-1'}, 0, ['1']);
     manager.registerAnimatable('opportunity', {getFocusable: () => 'opp-2'}, 1, ['2']);
     manager.handleDismissedOpportunity(dismissedOpportunity({plannable_id: '2'}));
-    manager.preTriggerUpdates('fixed-element', 'app');
+    manager.preTriggerUpdates();
     manager.triggerUpdates();
     expect(animator.focusElement).toHaveBeenCalledWith('opp-1');
   });
@@ -315,7 +221,7 @@ describe('deleting an opportunity', () => {
     const fakeFallback = {getFocusable: () => 'fallback', getScrollable: () => 'scroll'};
     manager.registerAnimatable('opportunity', fakeFallback, -1, ['~~~opportunity-fallback-focus~~~']);
     manager.handleDismissedOpportunity(dismissedOpportunity({plannable_id: '1'}));
-    manager.preTriggerUpdates('fixed-element', 'app');
+    manager.preTriggerUpdates();
     manager.triggerUpdates();
     expect(animator.focusElement).toHaveBeenCalledWith('fallback');
   });
@@ -325,35 +231,22 @@ describe('deleting an opportunity', () => {
     manager.registerAnimatable('opportunity', {getFocusable: () => 'opp-1'}, 0, ['1']);
     manager.registerAnimatable('opportunity', {getFocusable: () => 'opp-2'}, 1, ['2']);
     manager.handleDismissedOpportunity(dismissedOpportunity({plannable_id: '1'}));
-    manager.preTriggerUpdates('fixed-element', 'app');
+    manager.preTriggerUpdates();
     manager.triggerUpdates();
     expect(animator.focusElement).not.toHaveBeenCalled();
   });
 });
 
 describe('update handling', () => {
-  it('ignores triggers when the animation plan is not ready', () => {
-    const {manager, animator} = createManagerWithMocks();
-    manager.handleOpenEditingPlannerItem();
-    manager.preTriggerUpdates('fixed-element', 'app');
-    manager.triggerUpdates();
-    expect(animator.animationOrder).toEqual([]);
-    expect(animator.focusElement).not.toHaveBeenCalled();
-  });
-
   it('clears animation plans between triggers', () => {
     const {manager, animator} = createManagerWithMocks();
-    manager.handleSavedPlannerItem({payload: {item: {uniqueId: 'day-0-group-0-item-0'}}});
-    registerStandardDays(manager);
-    manager.preTriggerUpdates('fixed-element', 'app');
+    manager.registerAnimatable('opportunity', {getFocusable: () => 'opp-1'}, 0, ['1']);
+    manager.registerAnimatable('opportunity', {getFocusable: () => 'opp-2'}, 1, ['2']);
+    manager.handleDismissedOpportunity(dismissedOpportunity({plannable_id: '1'}));
+    manager.preTriggerUpdates();
     manager.triggerUpdates();
-    expect(animator.focusElement).toHaveBeenCalledWith('focusable-day-0-group-0-item-0');
-
-    animator.focusElement = jest.fn();
-    manager.handleAction(gotItemsSuccess([
-      {uniqueId: 'day-1-group-0-item-0', newActivity: true},
-    ]));
-    manager.preTriggerUpdates('fixed-element', 'app');
+    animator.focusElement.mockClear();
+    manager.preTriggerUpdates();
     manager.triggerUpdates();
     expect(animator.focusElement).not.toHaveBeenCalled();
   });
@@ -408,5 +301,15 @@ describe('managing nai scroll position', () => {
     gbcr.mockReturnValueOnce({top: 8});
     manager.handleScrollPositionChange();
     expect(store.dispatch).not.toHaveBeenCalled();
+  });
+});
+
+describe('fallback focus', () => {
+  it('focuses the specified fallback focus', () => {
+    const {manager, animator} = createManagerWithMocks();
+    const fakeFallback = {getFocusable: () => 'fallback', getScrollable: () => 'scroll'};
+    manager.registerAnimatable('item', fakeFallback, -1, [specialFallbackFocusId('item')]);
+    manager.focusFallback('item');
+    expect(animator.focusElement).toHaveBeenCalledWith('fallback');
   });
 });

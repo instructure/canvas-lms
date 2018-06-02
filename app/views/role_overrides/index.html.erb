@@ -16,10 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% 
+<%
   @body_classes << "full-width"
   add_crumb t 'crumbs.permissions', "Permissions"
   content_for :page_title, t(:page_title, "Manage Permissions for %{account}", :account => @context.name)
-  js_bundle :roles
 %>
-

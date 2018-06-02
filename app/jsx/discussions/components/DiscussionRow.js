@@ -24,19 +24,25 @@ import { connect } from 'react-redux'
 import { DragSource, DropTarget } from 'react-dnd';
 import { findDOMNode } from 'react-dom'
 import { func, bool, string, arrayOf } from 'prop-types'
+import cx from 'classnames'
 
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
 
 import Badge from '@instructure/ui-core/lib/components/Badge'
 import Container from '@instructure/ui-core/lib/components/Container'
-import Grid, { GridCol, GridRow} from '@instructure/ui-core/lib/components/Grid'
+import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
+import Grid, { GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+
 import IconAssignmentLine from 'instructure-icons/lib/Line/IconAssignmentLine'
 import IconBookmarkLine from 'instructure-icons/lib/Line/IconBookmarkLine'
 import IconBookmarkSolid from 'instructure-icons/lib/Solid/IconBookmarkSolid'
 import IconCopySolid from 'instructure-icons/lib/Solid/IconCopySolid'
+import IconDragHandleLine from 'instructure-icons/lib/Line/IconDragHandleLine'
 import IconLock from 'instructure-icons/lib/Line/IconLockLine'
 import IconLtiLine from 'instructure-icons/lib/Line/IconLtiLine'
+import IconPeerReviewLine from 'instructure-icons/lib/Line/IconPeerReviewLine'
 import IconPinLine from 'instructure-icons/lib/Line/IconPinLine'
 import IconPinSolid from 'instructure-icons/lib/Solid/IconPinSolid'
 import IconPublishSolid from 'instructure-icons/lib/Solid/IconPublishSolid'
@@ -44,15 +50,18 @@ import IconTrashSolid from 'instructure-icons/lib/Solid/IconTrashSolid'
 import IconUnlock from 'instructure-icons/lib/Line/IconUnlockLine'
 import IconUnpublishedLine from 'instructure-icons/lib/Line/IconUnpublishedLine'
 import IconUpdownLine from 'instructure-icons/lib/Line/IconUpdownLine'
+import Pill from '@instructure/ui-core/lib/components/Pill'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-core/lib/components/Text'
 import { MenuItem } from '@instructure/ui-core/lib/components/Menu'
 
 import DiscussionModel from 'compiled/models/DiscussionTopic'
+import LockIconView from 'compiled/views/LockIconView'
+
 import actions from '../actions'
 import compose from '../../shared/helpers/compose'
-import CourseItemRow from '../../shared/components/CourseItemRow'
 import CyoeHelper from '../../shared/conditional_release/CyoeHelper'
+import DiscussionManageMenu from '../../shared/components/DiscussionManageMenu'
 import discussionShape from '../../shared/proptypes/discussion'
 import masterCourseDataShape from '../../shared/proptypes/masterCourseData'
 import propTypes from '../propTypes'
@@ -60,7 +69,7 @@ import SectionsTooltip from '../../shared/SectionsTooltip'
 import select from '../../shared/select'
 import ToggleIcon from '../../shared/components/ToggleIcon'
 import UnreadBadge from '../../shared/components/UnreadBadge'
-import { makeTimestamp } from '../../shared/date-utils'
+import { isPassedDelayedPostAt } from '../../shared/date-utils'
 
 const dragTarget = {
   beginDrag (props) {
@@ -111,6 +120,9 @@ export class DiscussionRow extends Component {
     displayDuplicateMenuItem: bool.isRequired,
     displayLockMenuItem: bool.isRequired,
     displayMasteryPathsMenuItem: bool,
+    displayMasteryPathsLink: bool,
+    displayMasteryPathsPill:bool,
+    masteryPathsPillLabel: string, // required if displayMasteryPathsPill is true
     displayManageMenu: bool.isRequired,
     displayPinMenuItem: bool.isRequired,
     draggable: bool,
@@ -134,10 +146,40 @@ export class DiscussionRow extends Component {
     isDragging: false,
     masterCourseData: null,
     displayMasteryPathsMenuItem: false,
+    displayMasteryPathsLink: false,
+    displayMasteryPathsPill: false,
+    masteryPathsPillLabel: "",
     moveCard: () => {},
     onMoveDiscussion: null,
     onSelectedChanged () {},
     rowRef () {},
+  }
+
+  componentDidMount = () => {
+    this.onFocusManage(this.props)
+  }
+
+  componentWillReceiveProps = (nextProps) => {
+    this.onFocusManage(nextProps)
+  }
+
+  // TODO: Move this to a common file so announcements can use this also.
+  onFocusManage = (props) => {
+    if (props.discussion.focusOn) {
+      switch (props.discussion.focusOn) {
+        case 'title':
+          this._titleElement.focus()
+          break;
+        case 'manageMenu':
+          this._manageMenu.focus()
+          break;
+        case 'toggleButton':
+          break;
+        default:
+          throw new Error(I18n.t('Illegal element focus request'))
+      }
+      this.props.cleanDiscussionFocus()
+    }
   }
 
   onManageDiscussion = (e, { action, id, menuTool }) => {
@@ -244,8 +286,7 @@ export class DiscussionRow extends Component {
          }
          onToggleOn={() => this.props.updateDiscussion(this.props.discussion, {published: true}, {})}
          onToggleOff={() => this.props.updateDiscussion(this.props.discussion, {published: false}, {})}
-         className="publish-button"
-       />)
+         className="publish-button"/>)
     : null
   )
 
@@ -388,9 +429,25 @@ export class DiscussionRow extends Component {
     return menuList
   }
 
+  renderDragHandleIfAppropriate = () => {
+    if (this.props.draggable && this.props.connectDragSource) {
+      return (
+        <div className="ic-item-row__drag-col">
+          <span>
+            <Text color="secondary" size="large">
+              <IconDragHandleLine />
+            </Text>
+          </span>
+        </div>
+      )
+    } else {
+      return null
+    }
+  }
+
   renderSectionsTooltip = () => {
     if (this.props.contextType === "group" || this.props.discussion.assignment ||
-        this.props.discussion.group_category_id) {
+      this.props.discussion.group_category_id) {
       return null
     }
 
@@ -402,13 +459,221 @@ export class DiscussionRow extends Component {
     )
   }
 
+
+  renderTitle = () => {
+    const refFn = (c) => { this._titleElement = c }
+    const linkUrl = this.props.discussion.html_url
+    return (
+      <div className="ic-item-row__content-col">
+        <Heading level="h3" margin="0">
+          <a style={{color:"inherit"}} className="discussion-title" ref={refFn} href={linkUrl}>
+            <span aria-hidden="true">
+              {this.props.discussion.title}
+            </span>
+            <ScreenReaderContent>
+              {this.getAccessibleTitle()}
+            </ScreenReaderContent>
+          </a>
+        </Heading>
+      </div>
+    )
+  }
+
+  renderLastReplyAt = () => {
+    const datetimeString = $.datetimeString(this.props.discussion.last_reply_at)
+    if (!datetimeString.length) {
+      return null
+    }
+    return (
+      <div className="ic-item-row__content-col ic-discussion-row__content last-reply-at">
+        { I18n.t('Last post at %{date}', { date: datetimeString }) }
+      </div>
+    )
+  }
+
+  renderDueDate = () => {
+    const assignment = this.props.discussion.assignment // eslint-disable-line
+    const dueDateString = assignment && assignment.due_at
+      ? I18n.t('Due %{date}', { date: $.datetimeString(assignment.due_at) })
+      : null
+    return (
+      <div className="ic-discussion-row__content">
+        { dueDateString }
+      </div>
+    )
+  }
+
+  getAvailabilityString = () => {
+    const availabilityBegin = this.props.discussion.delayed_post_at
+    const availabilityEnd = this.props.discussion.lock_at
+    if (availabilityBegin && !isPassedDelayedPostAt({ checkDate: null, delayedDate: availabilityBegin })) {
+      return I18n.t('Not available until %{date}', {date: $.datetimeString(availabilityBegin)})
+    }
+    if (availabilityEnd) {
+      if (isPassedDelayedPostAt({ checkDate: null, delayedDate: availabilityEnd })) {
+        return I18n.t('Was locked at %{date}', {date: $.datetimeString(availabilityEnd)})
+      } else {
+        return I18n.t('Available until %{date}',{date: $.datetimeString(availabilityEnd)})
+      }
+    }
+    return ""
+  }
+
+  renderAvailabilityDate = () => {
+    // Check if we are too early for the topic to be available
+    const availabilityString = this.getAvailabilityString();
+    return availabilityString && (
+      <div className="discussion-availability ic-item-row__content-col ic-discussion-row__content">
+        {this.getAvailabilityString()}
+      </div>
+    )
+  }
+
+  getAccessibleTitle = () => {
+    let result = `${this.props.discussion.title} `
+    const availability = this.getAvailabilityString()
+    if (availability) result += `${availability} `
+    const assignment = this.props.discussion.assignment
+    const dueDateString = assignment && assignment.due_at ?
+      I18n.t('Due %{date} ', { date: $.datetimeString(assignment.due_at) }) : " "
+    result += dueDateString
+    const lastReplyAtDate = $.datetimeString(this.props.discussion.last_reply_at)
+    if (lastReplyAtDate.length > 0) {
+      result += I18n.t('Last post at %{date}', { date: lastReplyAtDate })
+    }
+    return result
+  }
+
+  unmountMasterCourseLock = () => {
+    if (this.masterCourseLock) {
+      this.masterCourseLock.remove()
+      this.masterCourseLock = null
+    }
+  }
+
+  initializeMasterCourseIcon = (container) => {
+    const masterCourse = {
+      courseData: this.props.masterCourseData || {},
+      getLockOptions: () => ({
+        model: new DiscussionModel(this.props.discussion),
+        unlockedText: I18n.t('%{title} is unlocked. Click to lock.', {title: this.props.discussion.title}),
+        lockedText: I18n.t('%{title} is locked. Click to unlock', {title: this.props.discussion.title}),
+        course_id: this.props.masterCourseData.masterCourse.id,
+        content_id: this.props.discussion.id,
+        content_type: 'discussion_topic',
+      }),
+    }
+    const { courseData = {}, getLockOptions } = masterCourse || {}
+    if (container && (courseData.isMasterCourse || courseData.isChildCourse)) {
+      this.unmountMasterCourseLock()
+      const opts = getLockOptions()
+
+      // initialize master course lock icon, which is a Backbone view
+      // I know, I know, backbone in react is grosssss but wachagunnado
+      this.masterCourseLock = new LockIconView({ ...opts, el: container })
+      this.masterCourseLock.render()
+    }
+  }
+
+  renderUpperRightBadges = () => {
+    const assignment = this.props.discussion.assignment // eslint-disable-line
+    const peerReview = assignment ? assignment.peer_reviews : false
+    const maybeRenderPeerReviewIcon = peerReview ? (
+      <span className="ic-item-row__peer_review">
+        <Text color="success" size="medium">
+          <IconPeerReviewLine />
+        </Text>
+      </span>
+    ) : null
+    const maybeDisplayManageMenu = this.props.displayManageMenu ? (
+      <span display="inline-block">
+        <DiscussionManageMenu
+          menuRefFn = {(c) => {this._manageMenu = c }}
+          onSelect={this.onManageDiscussion}
+          entityTitle={this.props.discussion.title}
+          menuOptions={this.renderMenuList} />
+      </span>
+    ) : null
+    const returnTo = encodeURIComponent(window.location.pathname)
+    const discussionId = this.props.discussion.id
+    const maybeRenderMasteryPathsPill = this.props.displayMasteryPathsPill ? (
+      <span display="inline-block" className="discussion-row-mastery-paths-pill">
+        <Pill text={this.props.masteryPathsPillLabel} />
+      </span>
+    ) : null
+    const maybeRenderMasteryPathsLink = this.props.displayMasteryPathsLink ? (
+      <a href={`discussion_topics/${discussionId}/edit?return_to=${returnTo}#mastery-paths-editor`}
+         className="discussion-index-mastery-paths-link">
+        {I18n.t('Mastery Paths')}
+      </a>
+    ) : null
+    const actionsContent = [this.readCount(), this.publishButton(), this.subscribeButton()]
+    return (
+      <div>
+        <div>
+          {maybeRenderMasteryPathsPill}
+          {maybeRenderMasteryPathsLink}
+          {maybeRenderPeerReviewIcon}
+          {actionsContent}
+          <span ref={this.initializeMasterCourseIcon} className="ic-item-row__master-course-lock" />
+          {maybeDisplayManageMenu}
+        </div>
+      </div>
+    )
+  }
+
+  renderDiscussion = () => {
+    const classes = cx('ic-item-row')
+    return (
+      this.props.connectDropTarget(this.props.connectDragSource(
+        <div style={{ opacity: (this.props.isDragging) ? 0 : 1 }} className={`${classes} ic-discussion-row`}>
+          <Flex width="100%">
+            <FlexItem shrink padding="xx-small">
+              {this.renderDragHandleIfAppropriate()}
+            </FlexItem>
+            <FlexItem shrink padding="xx-small">
+              {this.renderIcon()}
+            </FlexItem>
+            <FlexItem padding="xx-small" grow shrink>
+              <Grid startAt="medium" vAlign="middle" rowSpacing="none" colSpacing="none">
+                <GridRow vAlign="middle">
+                  <GridCol vAlign="middle" textAlign="start">
+                    {this.renderTitle()}
+                    {this.renderSectionsTooltip()}
+                  </GridCol>
+                  <GridCol vAlign="top" textAlign="end">
+                    {this.renderUpperRightBadges()}
+                  </GridCol>
+                </GridRow>
+                <GridRow>
+                  <GridCol textAlign="start">
+                    <span aria-hidden="true">
+                      {this.renderLastReplyAt()}
+                    </span>
+                  </GridCol>
+                  <GridCol textAlign="center">
+                    <span aria-hidden="true">
+                      {this.renderAvailabilityDate()}
+                    </span>
+                  </GridCol>
+                  <GridCol textAlign="end">
+                    <span aria-hidden="true">
+                      {this.renderDueDate()}
+                    </span>
+                  </GridCol>
+                </GridRow>
+              </Grid>
+            </FlexItem>
+          </Flex>
+        </div>, {dropEffect: 'copy'}
+      ))
+    )
+  }
+
   render () {
     // necessary because discussions return html from RCE
     const contentWrapper = document.createElement('span')
     contentWrapper.innerHTML = this.props.discussion.message
-    const textContent = contentWrapper.textContent.trim()
-    const delayedLabel = I18n.t('Delayed until:');
-    const postedAtLabel = I18n.t('Posted on:');
 
     return this.props.connectDragPreview (
       <div>
@@ -423,62 +688,7 @@ export class DiscussionRow extends Component {
             </Container>}
             </GridCol>
             <GridCol>
-              <CourseItemRow
-                ref={this.props.rowRef}
-                className="ic-discussion-row"
-                key={this.props.discussion.id}
-                id={this.props.discussion.id}
-                isDragging={this.props.isDragging}
-                focusOn={this.props.discussion.focusOn}
-                draggable={this.props.draggable}
-                connectDragSource={this.props.connectDragSource}
-                connectDropTarget={this.props.connectDropTarget}
-                icon={this.renderIcon() }
-                isRead
-                author={this.props.discussion.author}
-                title={this.props.discussion.title}
-                body={textContent ? <div className="ic-discussion-row__content">{textContent}</div> : null}
-                sectionToolTip={this.renderSectionsTooltip()}
-                itemUrl={this.props.discussion.html_url}
-                onSelectedChanged={this.props.onSelectedChanged}
-                peerReview={this.props.discussion.assignment ? this.props.discussion.assignment.peer_reviews : false}
-                showManageMenu={this.props.displayManageMenu}
-                onManageMenuSelect={this.onManageDiscussion}
-                clearFocusDirectives={this.props.cleanDiscussionFocus}
-                manageMenuOptions={this.renderMenuList}
-                masterCourse={{
-                  courseData: this.props.masterCourseData || {},
-                  getLockOptions: () => ({
-                    model: new DiscussionModel(this.props.discussion),
-                    unlockedText: I18n.t('%{title} is unlocked. Click to lock.', {title: this.props.discussion.title}),
-                    lockedText: I18n.t('%{title} is locked. Click to unlock', {title: this.props.discussion.title}),
-                    course_id: this.props.masterCourseData.masterCourse.id,
-                    content_id: this.props.discussion.id,
-                    content_type: 'discussion_topic',
-                  }),
-                }}
-                metaContent={
-                  <div>
-                    <span className="ic-item-row__meta-content-heading">
-                      <Text size="small" as="p">{
-                        makeTimestamp(this.props.discussion,
-                          delayedLabel,
-                          postedAtLabel
-                        ).title
-                      }</Text>
-                    </span>
-                    <Text color="secondary" size="small" as="p">
-                      {$.datetimeString(
-                        makeTimestamp(this.props.discussion,
-                          delayedLabel,
-                          postedAtLabel
-                        ).date, {format: 'medium'}
-                      )}
-                    </Text>
-                  </div>
-                }
-                actionsContent={[this.readCount(), this.publishButton(), this.subscribeButton()]}
-              />
+              {this.renderDiscussion()}
             </GridCol>
           </GridRow>
         </Grid>
@@ -500,6 +710,8 @@ const mapDispatch = (dispatch) => {
 const mapState = (state, ownProps) => {
   const { discussion } = ownProps
   const cyoe = CyoeHelper.getItemData(discussion.assignment_id)
+  const shouldShowMasteryPathsPill = cyoe.isReleased && cyoe.releasedLabel &&
+    (cyoe.releasedLabel !== "") && discussion.permissions.update
   const propsFromState = {
     canPublish: state.permissions.publish,
     contextType: state.contextType,
@@ -508,6 +720,9 @@ const mapState = (state, ownProps) => {
     displayDuplicateMenuItem: state.permissions.manage_content,
     displayLockMenuItem: discussion.can_lock,
     displayMasteryPathsMenuItem: cyoe.isCyoeAble,
+    displayMasteryPathsLink: cyoe.isTrigger && discussion.permissions.update,
+    displayMasteryPathsPill: shouldShowMasteryPathsPill,
+    masteryPathsPillLabel: cyoe.releasedLabel,
     displayManageMenu: discussion.permissions.delete,
     displayPinMenuItem: state.permissions.moderate,
     masterCourseData: state.masterCourseData,

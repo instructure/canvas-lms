@@ -151,6 +151,7 @@ export class Grouping extends Component {
           toggleAPIPending={item.toggleAPIPending}
           status={item.status}
           newActivity={item.newActivity}
+          allDay={item.allDay}
           showNotificationBadge={showNotificationBadgeOnItem}
           currentUser={this.props.currentUser}
         />
@@ -214,12 +215,16 @@ export class Grouping extends Component {
     if (newItem || missing) {
       const IndicatorComponent = newItem ? NewActivityIndicator : MissingIndicator;
       const badgeMessage = this.props.title ? this.props.title : this.renderToDoText();
-      return <IndicatorComponent
-        title={badgeMessage}
-        itemIds={this.itemUniqueIds()}
-        animatableIndex={this.props.animatableIndex} />;
+      return (
+        <NotificationBadge>
+          <IndicatorComponent
+          title={badgeMessage}
+          itemIds={this.itemUniqueIds()}
+          animatableIndex={this.props.animatableIndex} />
+        </NotificationBadge>
+      );
     } else {
-      return null;
+      return <NotificationBadge/>;
     }
   }
 
@@ -259,11 +264,9 @@ export class Grouping extends Component {
   }
 
   render () {
-    const badge = this.renderNotificationBadge();
-
     return (
-      <div className={classnames(styles.root, styles[this.getLayout()])}>
-        <NotificationBadge>{badge}</NotificationBadge>
+      <div className={classnames(styles.root, styles[this.getLayout()], 'planner-grouping')} >
+        {this.renderNotificationBadge()}
         {this.renderGroupLink()}
         <ol className={styles.items} style={{ borderColor: this.props.color }}>
           { this.renderItemsAndFacade(this.props.items)}

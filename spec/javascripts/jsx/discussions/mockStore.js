@@ -18,7 +18,7 @@
 
 import { createStore, applyMiddleware } from 'redux'
 import ReduxThunk from 'redux-thunk'
-import rootReducer from 'jsx/discussions/reducer'
+import rootReducer from 'jsx/discussions/rootReducer'
 
 export default function mockStore (initialState) {
   return applyMiddleware(ReduxThunk)(createStore)(rootReducer, initialState)

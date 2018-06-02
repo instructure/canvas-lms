@@ -19,7 +19,9 @@ class ChangeAuthFilterToText < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up
-    change_column :account_authorization_configs, :auth_filter, :text
+    AuthenticationProvider.maybe_recreate_view do
+      change_column :account_authorization_configs, :auth_filter, :text
+    end
   end
 
   def self.down

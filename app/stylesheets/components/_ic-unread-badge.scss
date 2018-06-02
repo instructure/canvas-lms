@@ -23,6 +23,8 @@
   display: inline-block;
   font-size: 0.9rem;
   text-align: center;
+  margin-bottom: -6px;  // HACK
+  margin-#{direction(right)}: 5px;
 }
 
 .ic-unread-badge__count {

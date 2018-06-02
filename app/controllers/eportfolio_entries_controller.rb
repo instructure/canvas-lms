@@ -113,7 +113,7 @@ class EportfolioEntriesController < ApplicationController
     if authorized_action(@portfolio, @current_user, :read)
       @entry = @portfolio.eportfolio_entries.find(params[:entry_id])
       @category = @entry.eportfolio_category
-      @attachment = @portfolio.user.all_attachments.where(uuid: params[:attachment_id]).first
+      @attachment = @portfolio.user.all_attachments.shard(@portfolio.user).where(uuid: params[:attachment_id]).first
       # @entry.check_for_matching_attachment_id
       begin
         redirect_to file_download_url(@attachment, { :verifier => @attachment.uuid })

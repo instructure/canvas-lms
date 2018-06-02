@@ -19,16 +19,6 @@
 require 'spec_helper'
 
 describe Plannable do
-  context 'root_account_for_model' do
-    it 'should return root account for non-course announcements' do
-      account_model
-      group_category = @account.group_categories.create(name: 'Project Group')
-      group = group_model(name: 'Project Group 1', group_category: group_category, context: @account)
-      announcement = announcement_model(context: group)
-      expect(announcement.send(:root_account_for_model, announcement)).to eq @account
-    end
-  end
-
   context 'planner_override_for' do
     before :once do
       course_with_student(active_all: true)

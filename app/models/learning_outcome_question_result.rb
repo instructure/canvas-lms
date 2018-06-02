@@ -27,6 +27,8 @@ class LearningOutcomeQuestionResult < ActiveRecord::Base
     where(:associated_asset_type => associated_asset.class.to_s, :associated_asset_id => associated_asset.id)
   }
 
+  delegate :hide_points, to: :learning_outcome_result
+
   before_save :infer_defaults
 
   def infer_defaults

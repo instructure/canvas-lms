@@ -19,7 +19,7 @@
 import {
   mergeNewItemsIntoDays, mergeNewItemsIntoDaysHash, mergeDaysIntoDaysHash, mergeDaysHashes,
   itemsToDaysHash, daysToDaysHash, itemsToDays, daysToItems, mergeItems, purgeDuplicateDays,
-  mergeDays,
+  mergeDays, daysHashToDays,
 } from '../daysUtils';
 
 function mockItem (date = '2017-12-18', opts = {}) {
@@ -143,6 +143,21 @@ describe('daysToDaysHash', () => {
       '2017-12-18': days[0][1],
       '2017-12-19': days[1][1],
     });
+  });
+});
+
+describe('daysHashToDays', () => {
+  it('converts', () => {
+    const days = {
+      '2017-12-18': [mockItem('2017-12-18', {id: 1}), mockItem('2017-12-18', {id: 2})],
+      '2017-12-20': [],
+      '2017-12-19': [mockItem('2017-12-18', {id: 3})],
+    };
+    const result = daysHashToDays(days);
+    expect(result).toEqual([
+      ['2017-12-18', days['2017-12-18']],
+      ['2017-12-19', days['2017-12-19']],
+    ]);
   });
 });
 

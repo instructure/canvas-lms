@@ -22,29 +22,32 @@ import SpeedgraderHelpers from 'speed_grader_helpers';
 import htmlEscape from './str/htmlEscape';
 
 function optionsToHtml (optionDefinitions) {
-  return optionDefinitions.map((optionDef) => {
+  return optionDefinitions.map((definition) => {
     let html = '';
 
-    if (optionDef.options) {
-      // This is an optgroup
-      const childrenHtml = optionsToHtml(optionDef.options);
+    if (definition.options) {
+      const childrenHtml = optionsToHtml(definition.options);
       html = `
-        <optgroup label="${htmlEscape(optionDef.name)}">
-            ${childrenHtml}
+        <optgroup label="${htmlEscape(definition.name)}">
+          ${childrenHtml}
         </optgroup>
       `;
     } else {
-      const labels = [
-        optionDef.name,
-      ]
+      if (definition.anonymizableId == null) {
+        throw Error('`anonymizableId` required in optionDefinition objects')
+      }
+      const labels = [definition.name]
 
-      if (optionDef.className && optionDef.className.formatted) {
-        labels.push(optionDef.className.formatted);
+      if (definition.className && definition.className.formatted) {
+        labels.push(definition.className.formatted);
       }
 
       html = `
-        <option value="${htmlEscape(optionDef.id)}" class="${htmlEscape(optionDef.className.raw)} ui-selectmenu-hasIcon">
-            ${htmlEscape(labels.join(' - '))}
+        <option
+          value="${htmlEscape(definition[definition.anonymizableId])}"
+          class="${htmlEscape(definition.className.raw)} ui-selectmenu-hasIcon"
+        >
+          ${htmlEscape(labels.join(' – '))}
         </option>
       `;
     }
@@ -62,7 +65,7 @@ function buildStudentIdMap (optionDefinitions) {
       adjust += 1;
     }
     else {
-      studentMap[optionDefinition.id] = index - adjust;
+      studentMap[optionDefinition[optionDefinition.anonymizableId]] = index - adjust;
     }
   });
   return studentMap;
@@ -244,14 +247,14 @@ export default function speedgraderSelectMenu (optionsArray) {
         ${html}
         ${this.getIconHtml(htmlEscape(option.className.raw))}
         <span class="ui-selectmenu-item-header">
-            ${htmlEscape(option.name)}
+          ${htmlEscape(option.name)}
         </span>
     `;
   };
 
-  this.updateSelectMenuStatus = function (student, isCurrentStudent, newStudentInfo) {
+  this.updateSelectMenuStatus = function ({student, isCurrentStudent, newStudentInfo, anonymizableId}) {
     if (!student) return;
-    const optionIndex = this.student_id_map[student.id];
+    const optionIndex = this.student_id_map[student[anonymizableId]];
     let $query = this.$el.data('selectmenu').list.find(`li:eq(${optionIndex})`);
     const className = SpeedgraderHelpers.classNameBasedOnStudent(student);
     const submissionStates = 'not_graded not_submitted graded resubmitted';

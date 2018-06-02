@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import axios from 'axios';
 import moment from 'moment-timezone';
 import { select, call, put } from 'redux-saga/effects';
-import { gotItemsError, sendFetchRequest } from '../../actions/loading-actions';
-import { loadPastUntilNewActivitySaga, loadPastSaga, loadFutureSaga } from '../sagas';
+import { gotItemsError, sendFetchRequest, gotGradesSuccess, gotGradesError } from '../../actions/loading-actions';
+import { loadPastUntilNewActivitySaga, loadPastSaga, loadFutureSaga, loadGradesSaga } from '../sagas';
 import {
   mergeFutureItems, mergePastItems, mergePastItemsForNewActivity
 } from '../saga-actions';
+import { transformApiToInternalGrade } from '../../utilities/apiUtils';
 
 function initialState (overrides = {}) {
   return {loading: {seekingNewActivity: true}, days: [], timeZone: 'Asia/Tokyo', ...overrides};
@@ -106,4 +108,64 @@ describe('loadFutureSaga', () => {
   });
 
   // not doing a full sequence of tests becuase the code is shared with the above saga
+});
+
+function mockCourse (opts = {grade: '42.34'}) {
+  return {
+    id: '1',
+    has_grading_periods: true,
+    enrollments: [
+      {current_period_computed_current_grade: opts.grade},
+    ],
+    ...opts,
+  };
+}
+
+describe('loadGradesSaga', () => {
+  it('passes correct parameters to the api', () => {
+    const generator = loadGradesSaga();
+    expect(generator.next().value).toEqual(call(axios.get, '/api/v1/users/self/courses', {
+      params: {
+        include: ['total_scores', 'current_grading_period_scores'],
+        enrollment_type: 'student',
+        enrollment_state: 'active',
+      },
+    }));
+  });
+
+  it('exhausts pagination', () => {
+    const generator = loadGradesSaga();
+    generator.next();
+    expect(generator.next({
+      headers: {link: '<some-url>; rel="next"'},
+      data: [],
+    }).value).toEqual(call(axios.get, expect.anything(), expect.anything()));
+    generator.next({headers: {}, data: []}); // put
+    expect(generator.next().done).toBe(true);
+  });
+
+  it('puts gotGradesSuccess when all data is loaded', () => {
+    const generator = loadGradesSaga();
+    const mockCourses = [
+      mockCourse({id: '1', grade: '42.3'}),
+      mockCourse({id: '2', grade: '34.4'})
+    ];
+    generator.next();
+    const putResult = generator.next({
+      headers: {},
+      data: mockCourses,
+    });
+    expect(putResult.value).toEqual(put(gotGradesSuccess({
+      '1': transformApiToInternalGrade(mockCourses[0]),
+      '2': transformApiToInternalGrade(mockCourses[1]),
+    })));
+    expect(generator.next().done).toBe(true);
+  });
+
+  it('puts gotGradesError if there is a loading error', () => {
+    const generator = loadGradesSaga();
+    generator.next();
+    expect(generator.throw('some-error').value).toEqual(put(gotGradesError('some-error')));
+    expect(() => generator.next()).toThrow();
+  });
 });

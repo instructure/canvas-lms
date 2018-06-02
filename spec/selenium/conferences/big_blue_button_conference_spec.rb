@@ -24,16 +24,16 @@ describe 'BigBlueButton conferences' do
   include ConferencesCommon
   include WebMock::API
 
-  bbb_endpoint = 'bbb.instructure.com'
-  bbb_secret = '8cd8ef52e8e101574e400365b55e11a6'
+  bbb_endpoint = 'bbb.blah.com'
+  bbb_secret = 'mock-secret'
   bbb_fixtures = {
     :get_recordings => {
       'meetingID' => 'instructure_web_conference_3Fn2k10wu0jK7diwJHs2FkDU0oXyX1ErUZCavikc',
-      'checksum' => 'ffa33deaa16e039bcbd84df90ed39196e518c69e'
+      'checksum' => '9f41063382ab155ccf75fe2f212846e3bb103579'
     },
     :delete_recordings => {
       'recordID' => '0225ccf234655ae60658ccac1e272d48781b491c-1511812307014',
-      'checksum' => 'f9a2b4c9b3e0dd611c1b541eee8bb32309a327ae'
+      'checksum' => '4aefca80ba80ba3d540295ea3e88215df77cf5cf'
     }
   }
 
@@ -41,9 +41,7 @@ describe 'BigBlueButton conferences' do
     initialize_big_blue_button_conference_plugin bbb_endpoint, bbb_secret
     course_with_teacher(name: 'Teacher Bob', active_all: true)
     course_with_ta(name: 'TA Alice', course: @course, active_all: true)
-    4.times do |i|
-      course_with_student(name: "Student_#{i + 1}", course: @course, active_all: true)
-    end
+    course_with_student(name: "Student John", course: @course, active_all: true)
   end
 
   before(:each) do
@@ -53,9 +51,6 @@ describe 'BigBlueButton conferences' do
 
   after { close_extra_windows }
   context 'when a conference is open' do
-    before(:once) do
-      stub_request(:get, /create/)
-    end
 
     context 'and the conference has no recordings' do
       before(:once) do
@@ -98,6 +93,37 @@ describe 'BigBlueButton conferences' do
         show_recordings_in_first_conference_in_list
         delete_first_recording_in_first_conference_in_list
         verify_conference_does_not_include_recordings
+      end
+    end
+
+    context 'and the conference has one recording with statistics' do
+      before(:once) do
+        stub_request(:get, /getRecordings/).
+          with(query: bbb_fixtures[:get_recordings]).
+          to_return(:body => big_blue_button_mock_response('get_recordings', 'one'))
+        @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]['meetingID'])
+      end
+
+      it 'teacher should see link for statistics', priority: '2' do
+        show_recordings_in_first_conference_in_list
+        verify_conference_includes_recordings_with_statistics
+      end
+    end
+
+    context 'and the conference has one recording with statistics' do
+      before(:once) do
+        stub_request(:get, /getRecordings/).
+          with(query: bbb_fixtures[:get_recordings]).
+          to_return(:body => big_blue_button_mock_response('get_recordings', 'one'))
+        @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]['meetingID'])
+        @conference.add_user(@student, 'attendee')
+      end
+
+      it 'student should not see link for statistics', priority: '2' do
+        user_session(@student)
+        get conferences_index_page
+        show_recordings_in_first_conference_in_list
+        verify_conference_does_not_include_recordings_with_statistics
       end
     end
 

@@ -26,8 +26,11 @@ module GradebooksHelper
   end
 
   def anonymous_grading_required?(assignment)
-    course = assignment.context
-    course.feature_enabled?(:anonymous_grading)
+    if assignment.root_account.feature_enabled?(:anonymous_moderated_marking)
+      assignment.anonymous_grading?
+    else
+      assignment.course.feature_enabled?(:anonymous_grading)
+    end
   end
 
   def force_anonymous_grading?(assignment)

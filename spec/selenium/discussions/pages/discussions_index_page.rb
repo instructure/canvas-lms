@@ -83,7 +83,7 @@ class DiscussionsIndex
     end
 
     def discussion_title(title)
-      f('h3', discussion(title))
+      f('a', discussion(title))
     end
 
     def discussion_sections(title)
@@ -109,7 +109,7 @@ class DiscussionsIndex
 
     # ---------------------- Discussion Menu ----------------------
     def discussion_menu(title)
-      f('.ic-item-row__manage-menu button', discussion(title))
+      f('.discussions-index-manage-menu button', discussion(title))
     end
 
     def discussion_settings_button

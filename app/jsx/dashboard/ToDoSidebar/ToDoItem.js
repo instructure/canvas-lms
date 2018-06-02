@@ -120,8 +120,9 @@ export default class ToDoItem extends React.Component {
             size="small"
             onClick={this.handleClick}
             buttonRef={(elt) => {this.buttonRef = elt}}
+            aria-label={I18n.t('Dismiss %{itemTitle}', {itemTitle: this.props.title})}
           >
-            <XIcon title={I18n.t('Dismiss This')} className="ToDoSidebarItem__CloseIcon" />
+            <XIcon className="ToDoSidebarItem__CloseIcon" />
           </Button>
         </div>
       </div>

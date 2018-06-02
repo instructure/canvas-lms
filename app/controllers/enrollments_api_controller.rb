@@ -210,7 +210,24 @@
 #           },
 #           "grades": {
 #             "description": "The URL to the Canvas web UI page containing the grades associated with this enrollment.",
+#             "example": {
+#               "html_url": "https://...",
+#               "current_score": 35,
+#               "current_grade": null,
+#               "final_score": 6.67,
+#               "final_grade": null
+#             },
 #             "$ref": "Grade"
+#           },
+#           "user": {
+#             "description": "A description of the user.",
+#             "example": {
+#               "id": 3,
+#               "name": "Student 1",
+#               "sortable_name": "1, Student",
+#               "short_name": "Stud 1"
+#             },
+#             "$ref": "User"
 #           },
 #           "computed_current_score": {
 #             "description": "optional: The student's score in the course, ignoring ungraded assignments. (applies only to student enrollments, and only available in course endpoints)",
@@ -719,9 +736,9 @@ class EnrollmentsApiController < ApplicationController
   #     -H 'Authorization: Bearer <token>'
   #
   # @example_response
-  # {
-  #   "success": true
-  # }
+  #   {
+  #     "success": true
+  #   }
   def accept
     @enrollment = @context.enrollments.find(params[:id])
     return render_unauthorized_action unless @current_user && @enrollment.user == @current_user
@@ -746,9 +763,9 @@ class EnrollmentsApiController < ApplicationController
   #     -H 'Authorization: Bearer <token>'
   #
   # @example_response
-  # {
-  #   "success": true
-  # }
+  #   {
+  #     "success": true
+  #   }
   def reject
     @enrollment = @context.enrollments.find(params[:id])
     return render_unauthorized_action unless @current_user && @enrollment.user == @current_user

@@ -6,6 +6,9 @@
 </div>
 <div class="control-group options">
   <label class="control-label"><strong>{{#t "options"}}Options{{/t}}</strong></label>
+  {{#if quizzes_next_configured_root}}
+      <div class="controls importQuizzesNext"></div>
+  {{/if}}
   <div class="controls overwriteAssessmentContent"></div>
   <div class="dateShift"></div>
 </div>

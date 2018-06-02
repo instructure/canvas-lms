@@ -729,7 +729,7 @@ describe ApplicationHelper do
         @account.enable_feature! :student_planner
       end
 
-      it "returns the list of account-level groups the user belongs to" do
+      it "returns the list of groups the user belongs to" do
         user = user_model
         group1 = @account.groups.create! :name => 'Account group'
         course1 = @account.courses.create!
@@ -741,7 +741,7 @@ describe ApplicationHelper do
         course1.enroll_student(@current_user)
         groups.each {|g| g.add_user(user, 'accepted', true)}
         user_account_groups = map_groups_for_planner(groups)
-        expect(user_account_groups.map {|g| g[:id]}).to eq [group1.id, group3.id]
+        expect(user_account_groups.map {|g| g[:id]}).to eq [group1.id, group2.id, group3.id]
       end
     end
   end

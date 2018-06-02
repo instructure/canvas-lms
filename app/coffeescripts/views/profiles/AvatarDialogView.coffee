@@ -154,18 +154,24 @@ define [
         .catch((xhr) => @handleErrorUpdating(xhr.responseText))
 
     onUploadSuccess: (response) =>
-      @waitAndSaveUserAvatar(response.avatar.token, response.avatar.url)
+      @waitAndSaveUserAvatar(response.avatar.token, response.avatar.url, 0)
 
     # need to wait for the avatar to get processed by background jobs before
     # it will save properly.
-    waitAndSaveUserAvatar: (token, url) =>
+    # wait 5 seconds and then error out
+    waitAndSaveUserAvatar: (token, url, count) =>
       $.getJSON('/api/v1/users/self/avatars').then((avatarList) =>
         processedAvatar = _.find(avatarList, (avatar) -> avatar.token == token)
         if processedAvatar
           @saveUserAvatar(token, url)
+        else if count < 50
+          window.setTimeout((=> @waitAndSaveUserAvatar(token, url, count + 1)), 100)
         else
-          # throttle this a little bit
-          window.setTimeout((=> @waitAndSaveUserAvatar(token, url)), 100)
+          @handleErrorUpdating(JSON.stringify({
+            errors: { 
+              base: I18n.t("Profile photo save failed too many times")
+            }
+          }))
       )
 
     saveUserAvatar: (token, url) =>

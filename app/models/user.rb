@@ -1053,7 +1053,7 @@ class User < ActiveRecord::Base
     can :read_profile and can :view_statistics and can :read_reports and can :read_grades
 
     given {|user| self.check_accounts_right?(user, :manage_user_logins) }
-    can :read and can :read_reports
+    can :read and can :read_reports and can :read_profile and can :api_show_user
 
     given {|user| self.check_accounts_right?(user, :read_roster) }
     can :read_full_profile and can :api_show_user
@@ -1070,8 +1070,8 @@ class User < ActiveRecord::Base
     given do |user|
       self.check_accounts_right?(user, :manage_user_logins) && self.adminable_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) }
     end
-    can :manage_user_details and can :rename and can :read_profile and can :update_avatar and can :remove_avatar and
-      can :manage_feature_flags and can :api_show_user
+    can :manage_user_details and can :rename and can :update_avatar and can :remove_avatar and
+      can :manage_feature_flags
 
     given{ |user| self.pseudonyms.shard(self).any?{ |p| p.grants_right?(user, :update) } }
     can :merge
@@ -1609,7 +1609,7 @@ class User < ActiveRecord::Base
           end
 
           scope.select("courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment_type, enrollments.role_id AS primary_enrollment_role_id, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state, enrollments.created_at AS primary_enrollment_date").
-              order("courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}").
+              order(Arel.sql("courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}")).
               distinct_on(:id).shard(shards).to_a
         end
         result.dup
@@ -1802,17 +1802,13 @@ class User < ActiveRecord::Base
             limit(opts[:limit]).to_a
 
           subs_with_comment_scope = Submission.active.where(user_id: self).for_context_codes(context_codes).
-            joins(:submission_comments, :assignment).
+            joins(:assignment).
             where(assignments: {muted: false, workflow_state: 'published'}).
-            where('submission_comments.created_at>?', opts[:start_at]).
-            where.not(:submission_comments => {:author_id => self, :draft => true}).
-            distinct_on("submissions.id").
-            order("submissions.id, submission_comments.created_at DESC"). # get the last created comment
-            select("submissions.*, submission_comments.created_at AS last_updated_at_from_db")
+            where('last_comment_at > ?', opts[:start_at])
           # have to order by last_updated_at_from_db in another query because of distinct_on in the first one
-          submissions += Submission.from(subs_with_comment_scope).limit(opts[:limit]).order("last_updated_at_from_db").select("*").to_a
+          submissions += Submission.from(subs_with_comment_scope).limit(opts[:limit]).order("last_comment_at").select("*").to_a
 
-          submissions = submissions.sort_by{|t| t['last_updated_at_from_db'] || t.created_at}.reverse
+          submissions = submissions.sort_by{|t| t.last_comment_at || t.created_at}.reverse
           submissions = submissions.uniq
           submissions.first(opts[:limit])
 
@@ -1883,13 +1879,13 @@ class User < ActiveRecord::Base
     self.shard.activate do
       Shackles.activate(:slave) do
         visible_instances = visible_stream_item_instances(opts).
-            preload(stream_item: :context).
-            limit(Setting.get('recent_stream_item_limit', 100))
+          preload(stream_item: :context).
+          limit(Setting.get('recent_stream_item_limit', 100))
         visible_instances.map do |sii|
           si = sii.stream_item
-          next unless si.present?
+          next if si.blank?
           next if si.asset_type == 'Submission'
-          next if si.context_type == "Course" && (si.context.concluded? || !self.participating_enrollments.any?{|e| e.course_id == si.context_id})
+          next if si.context_type == "Course" && (si.context.concluded? || self.participating_enrollments.none?{|e| e.course_id == si.context_id})
           si.unread = sii.unread?
           si
         end.compact
@@ -1897,19 +1893,24 @@ class User < ActiveRecord::Base
     end
   end
 
+  def calendar_events_for_contexts(context_codes, opts={})
+    event_codes = context_codes
+    event_codes += AppointmentGroup.manageable_by(self, context_codes).intersecting(opts[:start_at], opts[:end_at]).map(&:asset_string)
+    CalendarEvent.active.for_user_and_context_codes(self, event_codes, []).between(opts[:start_at], opts[:end_at]).
+      updated_after(opts[:updated_at])
+  end
+
   def calendar_events_for_calendar(opts={})
     opts = opts.dup
     context_codes = opts[:context_codes] || (opts[:contexts] ? setup_context_lookups(opts[:contexts]) : self.cached_context_codes)
-    return [] if (!context_codes || context_codes.empty?)
+    return [] if !context_codes || context_codes.empty?
     opts[:start_at] ||= 2.weeks.ago
-    opts[:end_at] ||= 1.weeks.from_now
+    opts[:end_at] ||= 1.week.from_now
 
     events = []
-    ev = CalendarEvent
-    ev = CalendarEvent.active if !opts[:include_deleted_events]
-    event_codes = context_codes + AppointmentGroup.manageable_by(self, context_codes).intersecting(opts[:start_at], opts[:end_at]).map(&:asset_string)
-    events += ev.for_user_and_context_codes(self, event_codes, []).between(opts[:start_at], opts[:end_at]).updated_after(opts[:updated_at])
-    events += Assignment.published.for_context_codes(context_codes).due_between(opts[:start_at], opts[:end_at]).updated_after(opts[:updated_at]).with_just_calendar_attributes
+    events += calendar_events_for_contexts(context_codes, opts)
+    events += Assignment.published.for_context_codes(context_codes).due_between(opts[:start_at], opts[:end_at]).
+      updated_after(opts[:updated_at]).with_just_calendar_attributes
     events.sort_by{|e| [e.start_at, Canvas::ICU.collation_key(e.title || CanvasSort::First)] }.uniq
   end
 

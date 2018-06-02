@@ -19,15 +19,22 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import themeable from '@instructure/ui-themeable/lib';
 import Button from '@instructure/ui-core/lib/components/Button';
+import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton';
+import View from '@instructure/ui-layout/lib/components/View';
 import IconPlusLine from 'instructure-icons/lib/Line/IconPlusLine';
 import IconAlertsLine from 'instructure-icons/lib/Line/IconAlertsLine';
+import IconGradebookLine from 'instructure-icons/lib/Line/IconGradebookLine';
 import Popover, {PopoverTrigger, PopoverContent} from '@instructure/ui-core/lib/components/Popover';
 import PropTypes from 'prop-types';
 import UpdateItemTray from '../UpdateItemTray';
 import Tray from '@instructure/ui-core/lib/components/Tray';
 import Badge from '@instructure/ui-core/lib/components/Badge';
 import Opportunities from '../Opportunities';
-import {addDay, savePlannerItem, deletePlannerItem, cancelEditingPlannerItem, openEditingPlannerItem, getNextOpportunities, getInitialOpportunities, dismissOpportunity, clearUpdateTodo} from '../../actions';
+import GradesDisplay from '../GradesDisplay';
+import {
+  addDay, savePlannerItem, deletePlannerItem, cancelEditingPlannerItem, openEditingPlannerItem, getNextOpportunities,
+  getInitialOpportunities, dismissOpportunity, clearUpdateTodo, startLoadingGradesSaga, scrollToToday
+} from '../../actions';
 
 import { courseShape, opportunityShape } from '../plannerPropTypes';
 import styles from './styles.css';
@@ -46,6 +53,7 @@ export class PlannerHeader extends Component {
     openEditingPlannerItem: PropTypes.func,
     triggerDynamicUiUpdates: PropTypes.func,
     preTriggerDynamicUiUpdates: PropTypes.func,
+    scrollToToday: PropTypes.func,
     locale: PropTypes.string.isRequired,
     timeZone: PropTypes.string.isRequired,
     opportunities: PropTypes.shape(opportunityShape).isRequired,
@@ -53,6 +61,7 @@ export class PlannerHeader extends Component {
     getNextOpportunities: PropTypes.func.isRequired,
     dismissOpportunity: PropTypes.func.isRequired,
     clearUpdateTodo: PropTypes.func.isRequired,
+    startLoadingGradesSaga: PropTypes.func.isRequired,
     todo: PropTypes.shape({
       updateTodoItem: PropTypes.shape({
         title: PropTypes.string,
@@ -68,6 +77,9 @@ export class PlannerHeader extends Component {
       futureNextUrl: PropTypes.string,
       pastNextUrl: PropTypes.string,
       seekingNewActivity: PropTypes.bool,
+      loadingGrades: PropTypes.bool,
+      gradesLoaded: PropTypes.bool,
+      gradesLoadingError: PropTypes.string,
     }).isRequired,
     ariaHideElement: PropTypes.instanceOf(Element).isRequired
   };
@@ -83,6 +95,7 @@ export class PlannerHeader extends Component {
     this.state = {
       opportunities: props.opportunities.items,
       trayOpen: false,
+      gradesTrayOpen: false,
       opportunitiesOpen: false,
       dismissedTabSelected: false
     };
@@ -105,7 +118,7 @@ export class PlannerHeader extends Component {
   }
 
   componentWillUpdate () {
-    this.props.preTriggerDynamicUiUpdates(document.getElementById('planner-app-fixed-element'), 'header');
+    this.props.preTriggerDynamicUiUpdates();
   }
 
   componentDidUpdate () {
@@ -136,10 +149,8 @@ export class PlannerHeader extends Component {
   handleCancelPlannerItem = () => {
     this.toggleUpdateItemTray();
     // let the dynamic ui manager manage focus on cancel.
-    // Don't scroll if it was the add button because it's in the sticky header.
-    const canceledNewItem = !this.props.todo.updateTodoItem;
     if (this.props.cancelEditingPlannerItem) {
-      this.props.cancelEditingPlannerItem({noScroll: canceledNewItem});
+      this.props.cancelEditingPlannerItem();
     }
   }
 
@@ -155,6 +166,15 @@ export class PlannerHeader extends Component {
     this.setUpdateItemTray(!this.state.trayOpen);
   }
 
+  toggleGradesTray = () => {
+    if (!this.state.gradesTrayOpen &&
+      !this.props.loading.loadingGrades &&
+      !this.props.loading.gradesLoaded) {
+      this.props.startLoadingGradesSaga();
+    }
+    this.setState({gradesTrayOpen: !this.state.gradesTrayOpen});
+  }
+
   setUpdateItemTray (trayOpen) {
     if (trayOpen && this.props.openEditingPlannerItem) {
       this.props.openEditingPlannerItem();
@@ -162,6 +182,12 @@ export class PlannerHeader extends Component {
     this.setState({ trayOpen }, () => {
       this.toggleAriaHiddenStuff(this.state.trayOpen);
     });
+  }
+
+  handleTodayClick = () => {
+    if (this.props.scrollToToday) {
+      this.props.scrollToToday();
+    }
   }
 
   _doToggleOpportunitiesDropdown (openOrClosed) {
@@ -224,12 +250,26 @@ export class PlannerHeader extends Component {
     return (
       <div className={styles.root}>
         <Button
+          variant="light"
+          margin="0 medium 0 0"
+          onClick={this.handleTodayClick}
+        >
+          {formatMessage("Today")}
+        </Button>
+        <Button
           variant="icon"
           margin="0 medium 0 0"
           onClick={this.toggleUpdateItemTray}
           ref={(b) => { this.addNoteBtn = b; }}
         >
           <IconPlusLine title={formatMessage("Add To Do")} />
+        </Button>
+        <Button
+          variant="icon"
+          margin="0 medium 0 0"
+          onClick={this.toggleGradesTray}
+        >
+          <IconGradebookLine title={formatMessage("Show My Grades")} />
         </Button>
         <Popover
           onDismiss={this.closeOpportunitiesDropdown}
@@ -268,6 +308,7 @@ export class PlannerHeader extends Component {
           label={this.getTrayLabel()}
           placement="end"
           shouldContainFocus={true}
+          shouldReturnFocus={false}
           applicationElement={() => document.getElementById('application') }
           onExited={this.noteBtnOnClose}
           onDismiss={this.handleCancelPlannerItem}
@@ -281,6 +322,26 @@ export class PlannerHeader extends Component {
             courses={this.props.courses}
           />
         </Tray>
+        <Tray
+          label={formatMessage('My Grades')}
+          open={this.state.gradesTrayOpen}
+          placement="end"
+          shouldContainFocus
+          shouldReturnFocus
+          applicationElement={() => document.getElementById('application') }
+          onDismiss={this.toggleGradesTray}
+        >
+          <View as="div" padding="large large medium">
+            <CloseButton placement="start" variant="icon" onClick={this.toggleGradesTray}>
+              {formatMessage("Close")}
+            </CloseButton>
+            <GradesDisplay
+              courses={this.props.courses}
+              loading={this.props.loading.loadingGrades}
+              loadingError={this.props.loading.gradesLoadingError}
+            />
+          </View>
+        </Tray>
       </div>
     );
   }
@@ -290,6 +351,9 @@ export const ThemedPlannerHeader = themeable(theme, styles)(PlannerHeader);
 export const NotifierPlannerHeader = notifier(ThemedPlannerHeader);
 
 const mapStateToProps = ({opportunities, loading, courses, todo}) => ({opportunities, loading, courses, todo});
-const mapDispatchToProps = {addDay, savePlannerItem, deletePlannerItem, cancelEditingPlannerItem, openEditingPlannerItem, getInitialOpportunities, getNextOpportunities, dismissOpportunity, clearUpdateTodo};
+const mapDispatchToProps = {
+  addDay, savePlannerItem, deletePlannerItem, cancelEditingPlannerItem, openEditingPlannerItem,
+  getInitialOpportunities, getNextOpportunities, dismissOpportunity, clearUpdateTodo, startLoadingGradesSaga, scrollToToday
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(NotifierPlannerHeader);

@@ -335,8 +335,8 @@ describe MasterCourses::MasterMigration do
       run_master_migration
 
       quiz_to = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
-      qgroup1_to = quiz_to.quiz_groups.where(:migration_id => mig_id(qgroup1)).first
-      qgroup2_to = quiz_to.quiz_groups.where(:migration_id => mig_id(qgroup2)).first
+      qgroup1_to = quiz_to.quiz_groups.where(:migration_id => mig_id(qgroup1.asset_string)).first
+      qgroup2_to = quiz_to.quiz_groups.where(:migration_id => mig_id(qgroup2.asset_string)).first
       qq2_to = quiz_to.quiz_questions.where(:migration_id => mig_id(qq2)).first
 
       qq2_to.update_attribute(:question_data, qq2_to.question_data.merge('question_text' => 'something')) # trigger a downstream change on the quiz
@@ -397,8 +397,7 @@ describe MasterCourses::MasterMigration do
       run_master_migration
 
       quiz_to = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
-      qgroup_to = quiz_to.quiz_groups.where(:migration_id => mig_id(qgroup)).first
-
+      qgroup_to = quiz_to.quiz_groups.where(:migration_id => mig_id(qgroup.asset_string)).first
       qgroup_to.update_attribute(:name, "downstream") # should mark it as a downstream change
       Timecop.freeze(2.minutes.from_now) do
         qgroup.update_attribute(:name, "upstream")
@@ -833,7 +832,7 @@ describe MasterCourses::MasterMigration do
       expect(copied_page.title).to eq new_master_title # even the title
     end
 
-    it "overwrites/removes availability dates when pushing a locked quiz" do
+    it "overwrites/removes availability dates and settings when pushing a locked quiz" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
       dates1 = [1.day.ago, 1.day.from_now, 2.days.from_now].map(&:beginning_of_day)
@@ -848,12 +847,12 @@ describe MasterCourses::MasterMigration do
 
       Timecop.travel(5.minutes.from_now) do
         cq1.update_attributes(:unlock_at => dates2[0], :due_at => dates2[1], :lock_at => dates2[2])
-        cq2.update_attributes(:unlock_at => dates2[0], :due_at => dates2[1], :lock_at => dates2[2])
+        cq2.update_attributes(:unlock_at => dates2[0], :due_at => dates2[1], :lock_at => dates2[2], :ip_filter => '10.0.0.1/24', :hide_correct_answers_at => 1.week.from_now)
       end
 
       Timecop.travel(10.minutes.from_now) do
         @template.content_tag_for(quiz1).update_attribute(:restrictions, {:availability_dates => true, :due_dates => true})
-        @template.content_tag_for(quiz2).update_attribute(:restrictions, {:availability_dates => true, :due_dates => true})
+        @template.content_tag_for(quiz2).update_attribute(:restrictions, {:availability_dates => true, :due_dates => true, :settings => true})
 
         run_master_migration
       end
@@ -867,6 +866,8 @@ describe MasterCourses::MasterMigration do
       expect(cq2.due_at).to be_nil
       expect(cq2.unlock_at).to be_nil
       expect(cq2.lock_at).to be_nil
+      expect(cq2.ip_filter).to be_nil
+      expect(cq2.hide_correct_answers_at).to be_nil
     end
 
     it "removes due/available dates from locked assignments in sync" do

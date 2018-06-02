@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+ // TODO: Get rid of this component.  AnnouncementRow should manage its own layout
+ // with the shared utilities created in g/something.
 import I18n from 'i18n!shared_components'
 import React, { Component } from 'react'
 import { bool, node, string, func, shape, arrayOf, oneOf } from 'prop-types'

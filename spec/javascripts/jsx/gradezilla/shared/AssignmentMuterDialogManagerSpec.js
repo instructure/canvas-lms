@@ -16,50 +16,123 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/gradezilla/shared/AssignmentMuterDialogManager',
-  'compiled/AssignmentMuter'
-], (AssignmentMuterDialogManager, AssignmentMuter) => {
-  const assignment = { foo: 'bar' };
-  const url = 'http://example.com';
+import AssignmentMuterDialogManager from 'jsx/gradezilla/shared/AssignmentMuterDialogManager'
+import AssignmentMuter from 'compiled/AssignmentMuter'
 
-  QUnit.module('AssignmentMuterDialogManager - constructor');
+QUnit.module('AssignmentMuterDialogManager', suiteHooks => {
+  const url = 'http://example.com'
 
-  test('sets the arguments as properties', function () {
-    [true, false].forEach((submissionsLoaded) => {
-      const manager = new AssignmentMuterDialogManager(assignment, url, submissionsLoaded);
-      equal(manager.assignment, assignment);
-      equal(manager.url, url);
-      equal(manager.submissionsLoaded, submissionsLoaded);
-    });
-  });
+  let assignment
+  let submissionsLoaded
+  let anonymousModeratedMarkingEnabled
 
-  QUnit.module('AssignmentMuterDialogManager - showDialog');
+  suiteHooks.beforeEach(() => {
+    anonymousModeratedMarkingEnabled = false
+    assignment = {anonymous_grading: false, grades_published: true, muted: true}
+    submissionsLoaded = false
+  })
 
-  test('when assignment is muted calls AssignmentMuter.confirmUnmute', function () {
-    const confirmUnmuteSpy = this.spy(AssignmentMuter.prototype, 'confirmUnmute');
-    assignment.muted = true;
-    const manager = new AssignmentMuterDialogManager(assignment, url, true);
-    manager.showDialog();
+  function createManager() {
+    return new AssignmentMuterDialogManager(
+      assignment,
+      url,
+      submissionsLoaded,
+      anonymousModeratedMarkingEnabled
+    )
+  }
 
-    equal(confirmUnmuteSpy.callCount, 1);
-  });
+  QUnit.module('#assignment', () => {
+    test('is set to the "assignment" constructor argument', () => {
+      equal(createManager().assignment, assignment)
+    })
+  })
 
-  test('when assignment is not muted calls AssignmentMuter.showDialog', function () {
-    const showDialogSpy = this.spy(AssignmentMuter.prototype, 'showDialog');
-    assignment.muted = false;
-    const manager = new AssignmentMuterDialogManager(assignment, url, true);
-    manager.showDialog();
+  QUnit.module('#url', () => {
+    test('is set to the "url" constructor argument', () => {
+      equal(createManager().url, url)
+    })
+  })
 
-    equal(showDialogSpy.callCount, 1);
-  });
+  QUnit.module('#submissionsLoaded', () => {
+    test('is set to the "submissionsLoaded" constructor argument', () => {
+      equal(createManager().submissionsLoaded, submissionsLoaded)
+    })
+  })
 
-  QUnit.module('AssignmentMuterDialogManager - isDialogEnabled');
+  QUnit.module('#showDialog()', hooks => {
+    hooks.beforeEach(() => {
+      sinon.spy(AssignmentMuter.prototype, 'confirmUnmute')
+      sinon.spy(AssignmentMuter.prototype, 'showDialog')
+    })
 
-  test('return value agrees with submissionsLoaded value', function () {
-    [true, false].forEach((submissionsLoaded) => {
-      const manager = new AssignmentMuterDialogManager(assignment, url, submissionsLoaded);
-      equal(manager.isDialogEnabled(), submissionsLoaded);
-    });
-  });
-});
+    hooks.afterEach(() => {
+      AssignmentMuter.prototype.confirmUnmute.restore()
+      AssignmentMuter.prototype.showDialog.restore()
+    })
+
+    test('shows the Unmute dialog when the assignment is muted', () => {
+      assignment.muted = true
+      createManager().showDialog()
+      strictEqual(AssignmentMuter.prototype.confirmUnmute.callCount, 1)
+    })
+
+    test('shows the Mute dialog when the assignment is unmuted', () => {
+      assignment.muted = false
+      createManager().showDialog()
+      strictEqual(AssignmentMuter.prototype.showDialog.callCount, 1)
+    })
+  })
+
+  QUnit.module('#isDialogEnabled()', () => {
+    test('returns true when submissions are loaded', () => {
+      submissionsLoaded = true
+      strictEqual(createManager().isDialogEnabled(), true)
+    })
+
+    test('returns false when submissions are still loading', () => {
+      submissionsLoaded = false
+      strictEqual(createManager().isDialogEnabled(), false)
+    })
+
+    test('returns false when the assignment cannot be unmuted', () => {
+      anonymousModeratedMarkingEnabled = true
+      assignment.anonymous_grading = true
+      assignment.grades_published = false
+      submissionsLoaded = true
+      strictEqual(createManager().isDialogEnabled(), false)
+    })
+
+    test('returns true for anonymous moderated assignment is not muted', () => {
+      anonymousModeratedMarkingEnabled = true
+      assignment.anonymous_grading = true
+      assignment.grades_published = false
+      assignment.muted = false
+      submissionsLoaded = true
+      strictEqual(createManager().isDialogEnabled(), true)
+    })
+
+    test('returns true for anonymous assignments when Anonymous Moderated Marking is disabled', () => {
+      anonymousModeratedMarkingEnabled = false
+      assignment.anonymous_grading = true
+      assignment.grades_published = false
+      submissionsLoaded = true
+      strictEqual(createManager().isDialogEnabled(), true)
+    })
+
+    test('returns true for moderated assignments when not anonymous', () => {
+      anonymousModeratedMarkingEnabled = true
+      assignment.anonymous_grading = false
+      assignment.grades_published = false
+      submissionsLoaded = true
+      strictEqual(createManager().isDialogEnabled(), true)
+    })
+
+    test('returns true for anonymous assignments when not moderated', () => {
+      anonymousModeratedMarkingEnabled = true
+      assignment.anonymous_grading = true
+      assignment.grades_published = true
+      submissionsLoaded = true
+      strictEqual(createManager().isDialogEnabled(), true)
+    })
+  })
+})

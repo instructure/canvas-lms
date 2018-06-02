@@ -96,5 +96,14 @@ describe DiscussionTopicsApiController do
 
       expect(response).to be_success
     end
+
+    it "uses instfs to store attachment if instfs is enabled" do
+      allow(InstFS).to receive(:enabled?).and_return(true)
+      uuid = "1234-abcd"
+      allow(InstFS).to receive(:direct_upload).and_return(uuid)
+      post 'add_entry', params: {:topic_id => @topic.id, :course_id => @course.id, :user_id => @user.id, :message => 'message',
+        :read_state => 'read', :attachment => default_uploaded_data}, :format => 'json'
+      expect(@student.attachments.first.instfs_uuid).to eq(uuid)
+    end
   end
 end

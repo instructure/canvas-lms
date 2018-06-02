@@ -128,6 +128,14 @@ export default handleActions({
   ADD_OPPORTUNITIES: (state, action) => {
     return {...state, loadingOpportunities: false};
   },
+  START_LOADING_GRADES_SAGA: (state, action) => ({
+    ...state, loadingGrades: true, gradesLoadingError: null}),
+  GOT_GRADES_SUCCESS: (state, action) => ({
+    ...state, loadingGrades: false, gradesLoaded: true, gradesLoadingError: null}),
+  GOT_GRADES_ERROR: (state, action) => ({
+     ...state, loadingGrades: false, gradesLoaded: false,
+     gradesLoadingError: action.payload.message}),
+
 }, loadingState({}, {
   allPastItemsLoaded: false,
   allFutureItemsLoaded: false,
@@ -138,4 +146,7 @@ export default handleActions({
   seekingNewActivity: false,
   partialPastDays: [],
   partialFutureDays: [],
+  loadingGrades: false,
+  gradesLoaded: false,
+  gradesLoadingError: null,
 }));

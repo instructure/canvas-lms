@@ -19,6 +19,7 @@
 import INST from 'INST'
 import $ from 'jquery'
 import 'jquery.ajaxJSON'
+import sinon from 'sinon'
 
 let storedInstEnv = null
 
@@ -98,4 +99,51 @@ test('returns true if status is 401 and message is unauthenticated', () => {
     responseText: '{"status": "unauthenticated"}'
   }
   equal($.ajaxJSON.isUnauthenticated(xhr), true)
+})
+
+let abortXhr
+
+QUnit.module('$.ajaxJSON.abortRequest', {
+  setup () {
+    abortXhr = {
+      readyState: 0,
+      abort: this.spy()
+    }
+  }
+})
+
+test('aborts xhr if not done', () => {
+  $.ajaxJSON.abortRequest(abortXhr)
+  ok(abortXhr.abort.called)
+})
+
+test('does nothing if xhr is done', () => {
+  abortXhr.readyState = 4
+  $.ajaxJSON.abortRequest(abortXhr)
+  ok(abortXhr.abort.notCalled)
+})
+
+test('does not throw if called with null or undefined', () => {
+  $.ajaxJSON.abortRequest(null)
+  $.ajaxJSON.abortRequest(undefined)
+  ok(true) // required assertion
+})
+
+test('does not call success or error handler', () => {
+  const fakeXhr = sinon.useFakeXMLHttpRequest()
+  let xhr
+  fakeXhr.onCreate = _xhr => {
+    xhr = _xhr
+    const _abort = xhr.abort
+    xhr.abort = () => {
+      xhr.statusText = 'abort'
+      _abort.call(xhr)
+    }
+  }
+  const spy = sinon.spy()
+  $.ajaxJSON('/api', 'GET', {}, spy, spy)
+  $.ajaxJSON.abortRequest(xhr)
+  xhr.readyStateChange(sinon.FakeXMLHttpRequest.DONE);
+  fakeXhr.restore()
+  ok(spy.notCalled)
 })

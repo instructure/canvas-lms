@@ -47,6 +47,7 @@ define [
   'vendor/jquery.ba-tinypubsub'
   'jst/content_migrations/subviews/DaySubstitutionCollection'
   '../../views/content_migrations/subviews/OverwriteAssessmentContentView'
+  '../../views/content_migrations/subviews/ImportQuizzesNextView'
 ], (I18n, $,
     ProgressingContentMigrationCollection,
     ContentMigrationModel,
@@ -76,7 +77,8 @@ define [
     ExternalTool,
     pubsub,
     daySubCollectionTemplate,
-    OverwriteAssessmentContentView) ->
+    OverwriteAssessmentContentView,
+    ImportQuizzesNextView) ->
   ConverterViewControl.setModel new ContentMigrationModel
                                  course_id: ENV.COURSE_ID
                                  daySubCollection: daySubCollection
@@ -97,6 +99,9 @@ define [
                                  template: progressingMigrationCollectionTemplate
                                  emptyMessage: -> I18n.t('no_migrations_running', "There are no migrations currently running")
                                  itemView: ProgressingContentMigrationView
+  questionBankView = new QuestionBankView
+                        model: ConverterViewControl.getModel()
+                        questionBanks: ENV.QUESTION_BANKS
 
   progressingCollectionView.getStatusView = (migProgress) ->
     if getView = ConverterViewControl.getView(migProgress.get('migration_type'))?.view?.getStatusView
@@ -163,9 +168,7 @@ define [
 
             selectContent:       new SelectContentCheckboxView(model: ConverterViewControl.getModel())
 
-            questionBank:        new QuestionBankView
-                                   model: ConverterViewControl.getModel()
-                                   questionBanks: ENV.QUESTION_BANKS
+            questionBank:        questionBankView
 
             dateShift:        new DateShiftView
                                 model: ConverterViewControl.getModel()
@@ -198,11 +201,16 @@ define [
                                    fileSizeLimit: ENV.UPLOAD_LIMIT
 
             selectContent:       new SelectContentCheckboxView(model: ConverterViewControl.getModel())
+
+            questionBank:        questionBankView
+
+            importQuizzesNext:     new ImportQuizzesNextView
+                                  model: ConverterViewControl.getModel()
+                                  quizzesNextEnabled: ENV.QUIZZES_NEXT_ENABLED
+                                  questionBank: questionBankView
+
             overwriteAssessmentContent: new OverwriteAssessmentContentView(model: ConverterViewControl.getModel())
 
-            questionBank:        new QuestionBankView
-                                   questionBanks: ENV.QUESTION_BANKS
-                                   model: ConverterViewControl.getModel()
 
             dateShift:        new DateShiftView
                                 model: ConverterViewControl.getModel()
@@ -211,6 +219,9 @@ define [
                                 oldStartDate: ENV.OLD_START_DATE
                                 oldEndDate: ENV.OLD_END_DATE
 
+            quizzes_next_enabled: ENV.QUIZZES_NEXT_ENABLED
+            quizzes_next_configured_root: ENV.QUIZZES_NEXT_CONFIGURED_ROOT
+
   ConverterViewControl.register
     key: 'qti_converter'
     view: new QTIZipView
@@ -218,8 +229,16 @@ define [
                                    model: ConverterViewControl.getModel()
                                    fileSizeLimit: ENV.UPLOAD_LIMIT
 
+            questionBank:        questionBankView
+
+            importQuizzesNext:     new ImportQuizzesNextView
+                                  model: ConverterViewControl.getModel()
+                                  quizzesNextEnabled: ENV.QUIZZES_NEXT_ENABLED
+                                  questionBank: questionBankView
+
             overwriteAssessmentContent: new OverwriteAssessmentContentView(model: ConverterViewControl.getModel())
-            questionBank:        new QuestionBankView(questionBanks: ENV.QUESTION_BANKS, model: ConverterViewControl.getModel())
+            quizzes_next_enabled: ENV.QUIZZES_NEXT_ENABLED
+            quizzes_next_configured_root: ENV.QUIZZES_NEXT_CONFIGURED_ROOT
 
 
 

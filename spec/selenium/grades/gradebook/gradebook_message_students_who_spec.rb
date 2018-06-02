@@ -92,7 +92,7 @@ describe "gradebook - message students who" do
     get "/courses/#{@course.id}/gradebook"
     # set grade for first student, 3rd assignment
     # l4 because the the first two columns are part of the same grid
-    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l4', 0)
+    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .b4', 0)
     open_assignment_options(2)
 
     # expect dialog to show 1 more student with the "Haven't been graded" option

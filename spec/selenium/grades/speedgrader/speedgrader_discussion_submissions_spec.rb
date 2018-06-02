@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../../common"
+require_relative "../pages/speedgrader_page"
 
 describe "speed grader - discussion submissions" do
   include_context "in-process server selenium tests"
@@ -61,16 +62,16 @@ describe "speed grader - discussion submissions" do
   end
 
   it "displays discussion entries for only one student", priority: "1", test_id: 283745 do
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    Speedgrader.visit(@course.id, @assignment.id)
 
     # check for correct submissions in speed grader iframe
-    in_frame 'speedgrader_iframe' do
+    in_frame 'speedgrader_iframe', '#discussion_view_link' do
       expect(f('#main')).to include_text(@first_message)
       expect(f('#main')).not_to include_text(@second_message)
     end
     f('#next-student-button').click
     wait_for_ajax_requests
-    in_frame 'speedgrader_iframe' do
+    in_frame 'speedgrader_iframe', '#discussion_view_link' do
       expect(f('#main')).not_to include_text(@first_message)
       expect(f('#main')).to include_text(@second_message)
       url = f('#main div.attachment_data a')['href']
@@ -81,14 +82,14 @@ describe "speed grader - discussion submissions" do
 
   context "when student names hidden" do
     it "hides the name of student on discussion iframe", priority: "2", test_id: 283746 do
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      Speedgrader.visit(@course.id, @assignment.id)
 
       f("#settings_link").click
       f('#hide_student_names').click
       expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
 
       # check for correct submissions in speed grader iframe
-      in_frame 'speedgrader_iframe' do
+      in_frame 'speedgrader_iframe', '#discussion_view_link' do
         expect(f('#main')).to include_text("This Student")
       end
     end
@@ -103,14 +104,14 @@ describe "speed grader - discussion submissions" do
       teacher_entry.update_topic
       teacher_entry.context_module_action
 
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      Speedgrader.visit(@course.id, @assignment.id)
 
       f("#settings_link").click
       f('#hide_student_names').click
       expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
 
       # check for correct submissions in speed grader iframe
-      in_frame 'speedgrader_iframe' do
+      in_frame 'speedgrader_iframe', '#discussion_view_link' do
         f('#discussion_view_link').click
         wait_for_ajaximations
         authors = ff('h2.discussion-title span')
@@ -123,21 +124,21 @@ describe "speed grader - discussion submissions" do
     end
 
     it "hides avatars on entries on both discussion links", priority: "2", test_id: 283748 do
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      Speedgrader.visit(@course.id, @assignment.id)
 
       f("#settings_link").click
       f('#hide_student_names').click
       expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
 
       # check for correct submissions in speed grader iframe
-      in_frame 'speedgrader_iframe' do
+      in_frame 'speedgrader_iframe', '#discussion_view_link' do
         f('#discussion_view_link').click
         expect(f("body")).not_to contain_css('.avatar')
       end
 
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      Speedgrader.visit(@course.id, @assignment.id)
 
-      in_frame 'speedgrader_iframe' do
+      in_frame 'speedgrader_iframe', '#discussion_view_link' do
         f('.header_title a').click
         expect(f("body")).not_to contain_css('.avatar')
       end

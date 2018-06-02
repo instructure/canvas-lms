@@ -141,10 +141,21 @@ module CustomSeleniumActions
     f("#{selector} [#{attrib}='#{value}']")
   end
 
-  def in_frame(id)
-    f("[id=\"#{id}\"],[name=\"#{id}\"]") # ensure frame is loaded
+  def in_frame(id, loading_locator = nil)
+    f("[id=\"#{id}\"],[name=\"#{id}\"]") # ensure frame is
     saved_window_handle = driver.window_handle
-    driver.switch_to.frame(id)
+    if loading_locator.nil?
+      driver.switch_to.frame(id)
+    else
+      disable_implicit_wait do
+        keep_trying_until(3) do
+          # when it does switch frame but loading element did not exist we need to switch back then switch to iframe again
+          driver.switch_to.window saved_window_handle
+          driver.switch_to.frame(id)
+          expect(f(loading_locator)).to be_displayed
+        end
+      end
+    end
     begin
       yield
     ensure

@@ -10,18 +10,18 @@
 }
 
 .activityIndicator {
-  padding-right: 0;
-  padding-left: 0;
+  padding-inline-end: 0;
+  padding-inline-start: 0;
 }
 
 .showLabel {
-  margin-left: var(--gutterWidth);
+  margin-inline-start: var(--gutterWidth);
 }
 
 .contentPrimary {
   flex: 0 0 50%;
   margin-bottom: 0;
-  margin-left: var(--gutterWidth);
+  margin-inline-start: var(--gutterWidth);
   box-sizing: border-box;
   min-width: 1px;
 }
@@ -35,5 +35,5 @@
 }
 
 .activityIndicator + .contentPrimary {
-  margin-left: calc(var(--gutterWidth) - var(--buttonPadding) - var(--activityIndicatorWidth));
+  margin-inline-start: calc(var(--gutterWidth) - var(--buttonPadding) - var(--activityIndicatorWidth));
 }

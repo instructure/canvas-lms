@@ -367,7 +367,8 @@ QUnit.module('Gradebook#getVisibleGradeGridColumns', {
     this.allAssignmentColumns = [
       {object: {assignment_group: {position: 1}, position: 1, name: 'first'}},
       {object: {assignment_group: {position: 1}, position: 2, name: 'second'}},
-      {object: {assignment_group: {position: 1}, position: 3, name: 'third'}}
+      {object: {assignment_group: {position: 1}, position: 3, name: 'third'}},
+      {object: {assignment_group: {position: 1}, position: 4, name: 'moderated', moderation_in_progress: true}}
     ]
     this.aggregateColumns = []
     this.parentColumns = []
@@ -397,6 +398,18 @@ test('It does not sort columns when gradebookColumnOrderSettings is undefined', 
   this.gradebookColumnOrderSettings = undefined
   this.getVisibleGradeGridColumns()
   notOk(this.makeColumnSortFn.called)
+})
+
+test('sets cannot_edit if moderation_in_progress is true on the column object', function() {
+  const moderatedColumn = _.find(this.allAssignmentColumns, (column) => column.object.moderation_in_progress)
+  this.getVisibleGradeGridColumns()
+  strictEqual(moderatedColumn.cssClass, 'cannot_edit')
+})
+
+test('does not set cannot_edit if moderation_in_progress is not true on the column object', function() {
+  const unmoderatedColumn = this.allAssignmentColumns[0]
+  this.getVisibleGradeGridColumns()
+  notStrictEqual(unmoderatedColumn.cssClass, 'cannot_edit')
 })
 
 QUnit.module('Gradebook#customColumnDefinitions', {
@@ -852,5 +865,121 @@ QUnit.module('Gradebook#gotSubmissionsChunk', function(hooks) {
       const [students] = Array.from(gradebook.setupGrading.lastCall.args)
       deepEqual(students.map(student => student.id), ['1101', '1102'])
     })
+  })
+})
+
+QUnit.module('Gradebook#gotAllAssignmentGroups', suiteHooks => {
+  let studentSubmissions = null
+  let gradebook = null
+
+  let unmoderatedAssignment
+  let moderatedUnpublishedAssignment
+  let moderatedPublishedAssignment
+  let anonymousUnmoderatedAssignment
+  let anonymousModeratedAssignment
+  let assignmentGroups
+
+  suiteHooks.beforeEach(() => {
+    unmoderatedAssignment = {
+      id: 1,
+      name: 'test',
+      published: true,
+      anonymous_grading: false,
+      moderated_grading: false
+    }
+    moderatedUnpublishedAssignment = {
+      id: 2,
+      name: 'test',
+      published: true,
+      anonymous_grading: false,
+      moderated_grading: true,
+      grades_published: false
+    }
+    moderatedPublishedAssignment = {
+      id: 3,
+      name: 'test',
+      published: true,
+      anonymous_grading: false,
+      moderated_grading: true,
+      grades_published: true
+    }
+    anonymousUnmoderatedAssignment = {
+      id: 4,
+      name: 'test',
+      published: true,
+      anonymous_grading: true,
+      moderated_grading: false,
+      grades_published: true
+    }
+    anonymousModeratedAssignment = {
+      id: 5,
+      name: 'test',
+      published: true,
+      anonymous_grading: true,
+      moderated_grading: true,
+      grades_published: true
+    }
+
+    assignmentGroups = [{
+      id: 1,
+      assignments: [
+        unmoderatedAssignment,
+        moderatedUnpublishedAssignment,
+        moderatedPublishedAssignment,
+        anonymousUnmoderatedAssignment,
+        anonymousModeratedAssignment
+      ]
+    }]
+
+    gradebook = createGradebook()
+    sinon.stub(gradebook, 'updateAssignmentEffectiveDueDates')
+  })
+
+  suiteHooks.afterEach(() => {
+    gradebook.updateAssignmentEffectiveDueDates.restore()
+
+    // gotAllAssignmentGroups creates an AssignmentGroupWeightsDialog
+    // on the page; remove it as part of cleaning up
+    $('#assignment_group_weights_dialog').remove()
+  })
+
+  QUnit.module('when Anonymous Moderated Marking is enabled', hooks => {
+    hooks.beforeEach(() => {
+      gradebook.options.anonymous_moderated_marking_enabled = true
+    })
+
+    test('sets moderation_in_progress to true for a moderated assignment whose grades are not published', () => {
+      gradebook.gotAllAssignmentGroups(assignmentGroups)
+      strictEqual(moderatedUnpublishedAssignment.moderation_in_progress, true) })
+
+    test('sets moderation_in_progress to false for a moderated assignment whose grades are published', () => {
+      gradebook.gotAllAssignmentGroups(assignmentGroups)
+      strictEqual(moderatedPublishedAssignment.moderation_in_progress, false)
+    })
+
+    test('sets moderation_in_progress to false for an unmoderated assignment', () => {
+      gradebook.gotAllAssignmentGroups(assignmentGroups)
+      strictEqual(unmoderatedAssignment.moderation_in_progress, false)
+    })
+
+    test('sets hide_grades_when_muted to true for an anonymous assignment', () => {
+      gradebook.gotAllAssignmentGroups(assignmentGroups)
+      strictEqual(anonymousUnmoderatedAssignment.hide_grades_when_muted, true)
+    })
+
+    test('sets hide_grades_when_muted to false for a non-anonymous assignment', () => {
+      gradebook.gotAllAssignmentGroups(assignmentGroups)
+      strictEqual(unmoderatedAssignment.hide_grades_when_muted, false)
+    })
+  })
+
+  test('does not set moderation_in_progress when anonymous moderated marking is off', () => {
+    gradebook.gotAllAssignmentGroups(assignmentGroups)
+    strictEqual(moderatedUnpublishedAssignment.moderation_in_progress, undefined)
+  })
+
+  test('does not set hide_grades_when_muted when anonymous moderated marking is off', () => {
+    gradebook.gotAllAssignmentGroups(assignmentGroups)
+    strictEqual(moderatedUnpublishedAssignment.hide_grades_when_muted, undefined)
   })
 })

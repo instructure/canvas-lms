@@ -62,7 +62,7 @@ define(function(require) {
       return(
         <div id="ic-AnswerMatrix" className={className}>
           <h1 className="ic-QuizInspector__Header">
-            {I18n.t('page_header', 'Answer Sequence')}
+            {I18n.t('Answer Sequence')}
 
             <div className="ic-QuizInspector__HeaderControls">
               <Option

@@ -23,20 +23,23 @@ module Services
     before do
       allow(Services::RichContent).to receive(:contextually_on).and_call_original
       allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
-      allow(Canvas::DynamicSettings).to receive(:find)
-        .with('rich-content-service', default_ttl: 5.minutes)
-        .and_return({
+      allow(Canvas::DynamicSettings).to receive(:find).
+        with('rich-content-service', default_ttl: 5.minutes).
+        and_return({
           "app-host" => "rce-app",
           "cdn-host" => "rce-cdn"
         })
       allow(Setting).to receive(:get)
-      allow(Setting).to receive(:get)
-        .with('rich_content_service_enabled', 'false')
-        .and_return('true')
+      allow(Setting).to receive(:get).
+        with('rich_content_service_enabled', 'false').
+        and_return('true')
     end
 
     describe ".env_for" do
       it "just returns disabled value if no root_account" do
+        allow(Setting).to receive(:get).
+          with('rich_content_service_enabled', 'false').
+          and_return('false')
         expect(described_class.env_for(nil)).to eq({
           RICH_CONTENT_SERVICE_ENABLED: false
         })
@@ -50,9 +53,9 @@ module Services
       end
 
       it "populates hosts with an error signal when consul is down" do
-        allow(Canvas::DynamicSettings).to receive(:find)
-          .with('rich-content-service', default_ttl: 5.minutes)
-          .and_raise(Imperium::UnableToConnectError, "can't talk to consul")
+        allow(Canvas::DynamicSettings).to receive(:find).
+          with('rich-content-service', default_ttl: 5.minutes).
+          and_raise(Imperium::UnableToConnectError, "can't talk to consul")
         root_account = double("root_account", feature_enabled?: true)
         env = described_class.env_for(root_account)
         expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_truthy
@@ -149,9 +152,14 @@ module Services
           allow(root_account).to receive(:feature_enabled?).and_return(false)
         end
 
-        it "is contextually off when no risk specified" do
+        it "is contextually on when no risk specified" do
           env = described_class.env_for(root_account)
-          expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_falsey
+          expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_truthy
+        end
+
+        it "is contextually on for high risk areas" do
+          env = described_class.env_for(root_account, risk_level: :highrisk)
+          expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_truthy
         end
 
         it "is contextually on for low risk areas" do
@@ -166,6 +174,9 @@ module Services
       end
 
       it "treats nil feature values as false" do
+        allow(Setting).to receive(:get).
+          with('rich_content_service_enabled', 'false').
+          and_return('false')
         root_account = double("root_account")
         allow(root_account).to receive(:feature_enabled?).with(:rich_content_service_high_risk).and_return(nil)
         env = described_class.env_for(root_account)
@@ -194,19 +205,19 @@ module Services
           expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_truthy
         end
 
-        it "off for high risk if flag is disabled" do
+        it "on for high risk if flag is disabled" do
           account = account_model
           account.disable_feature!(:rich_content_service_high_risk)
           env = described_class.env_for(account)
-          expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_falsey
+          expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_truthy
         end
       end
 
       context "without rich_content_service_enabled setting true" do
         before(:each) do
-          allow(Setting).to receive(:get)
-            .with('rich_content_service_enabled', 'false')
-            .and_return(false)
+          allow(Setting).to receive(:get).
+            with('rich_content_service_enabled', 'false').
+            and_return(false)
         end
 
         it "on for all risk levels if feature flag is enabled" do

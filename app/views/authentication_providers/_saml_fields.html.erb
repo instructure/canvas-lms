@@ -1,0 +1,100 @@
+<%
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<p><%= mt(<<-TEXT, metadata_url: link_to(aac.entity_id, aac.entity_id))
+The Canvas SAML Entity ID is %{metadata_url}, and the Service Provider metadata
+is available at that URL.
+TEXT
+%></p>
+<% css_bundle :saml_fields %>
+<p><%= t(<<-TEXT)
+Provide a URI to your IdP's metadata to automatically populate the other
+fields. If your school is part of InCommon or the UK Access Management
+Federation, specify urn:mace:incommon or http://ukfederation.org.uk,
+respectively, for the metadata URI, and also provide your school's entity ID.
+TEXT
+%></p>
+<div class="ic-Form-control">
+  <%= f.label :metadata_uri, t('IdP Metadata URI'), class: 'ic-Label', for: "metadata_uri_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :metadata_uri, class: 'ic-Input', id: "metadata_uri_#{presenter.id_suffix(aac)}" %>
+</div>
+<div class="ic-Form-control">
+  <%= f.label :idp_entity_id, t('IdP Entity ID'), class: 'ic-Label', for: "idp_entity_id_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :idp_entity_id, class: 'ic-Input', id: "idp_entity_id_#{presenter.id_suffix(aac)}" %>
+</div>
+<div class="ic-Form-control">
+  <%= f.label :log_in_url, t('Log On URL'), class: 'ic-Label', for: "log_in_url_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :log_in_url, class: 'ic-Input', id: "log_in_url_#{presenter.id_suffix(aac)}" %>
+</div>
+<div class="ic-Form-control">
+  <%= f.label :log_out_url, t('Log Out URL'), class: 'ic-Label', for: "log_out_url_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :log_out_url, class: 'ic-Input', id: "log_out_url_#{presenter.id_suffix(aac)}" %>
+</div>
+<div class="ic-Form-control">
+  <%= f.label :certificate_fingerprint, t('Certificate Fingerprint'), class: 'ic-Label', for: "certificate_fingerprint_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :certificate_fingerprint, class: 'ic-Input', id: "certificate_fingerprint_#{presenter.id_suffix(aac)}" %>
+</div>
+<div class="ic-Form-control">
+  <%= f.label :login_attribute, t('Login Attribute'), class: 'ic-Label', for: "login_attributes_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field(:login_attribute,
+               class: 'ic-Input',
+               id: "login_attributes_#{presenter.id_suffix(aac)}",
+               list: "saml_login_attributes") %>
+</div>
+<div class="ic-Form-control">
+  <%= f.label :strip_domain_from_login_attribute, t('Strip Domain From Login Attribute Value'), class: 'ic-Label', for: "strip_domain_from_login_attribute_#{presenter.id_suffix(aac)}" %>
+  <%= f.check_box :strip_domain_from_login_attribute, class: 'strip_domain_from_login_attribute_checkbox', id: "strip_domain_from_login_attribute_#{presenter.id_suffix(aac)}" %>
+</div>
+<div class="ic-Form-control">
+  <%= f.label :identifier_format, t('Identifier Format'), class: 'ic-Label', for: "identifier_format_#{presenter.id_suffix(aac)}" %>
+  <%= f.select(:identifier_format,
+               presenter.saml_identifiers,
+               {},
+               class: 'ic-Input', id: "identifier_format_#{presenter.id_suffix(aac)}") %>
+</div>
+<div class="ic-Form-control">
+  <%= f.label :requested_authn_context, t('Authentication Context'), class: 'ic-Label', for: "requested_authn_context_#{presenter.id_suffix(aac)}" %>
+  <%= f.select(:requested_authn_context,
+               presenter.saml_authn_contexts,
+               {},
+               class: 'ic-Input', id: "requested_authn_context_#{presenter.id_suffix(aac)}") %>
+</div>
+<fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
+  <legend class="ic-Legend">
+    <%= t('Message Signing') %>
+  </legend>
+  <div class="ic-Form-control ic-Form-control--radio">
+    <p><%= t('The algorithm to use for signing AuthnRequest, LogoutRequest, and LogoutResponse messages sent to the IdP.') %></p>
+    <div class="ic-Radio">
+      <%= f.radio_button :sig_alg, false, id: "no_sig_alg_#{presenter.id_suffix(aac)}", checked: aac.sig_alg.nil? %>
+      <%= f.label :sig_alg, t('Not Signed'), for: "no_sig_alg_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
+    </div>
+    <div class="ic-Radio">
+      <%= f.radio_button :sig_alg, SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA1, id: "rsa_sha1_#{presenter.id_suffix(aac)}", checked: aac.sig_alg == SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA1 %>
+      <%= f.label :sig_alg, t('RSA-SHA1'), for: "rsa_sha1_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
+    </div>
+    <div class="ic-Radio">
+      <%= f.radio_button :sig_alg, SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA256, id: "rsa_sha256_#{presenter.id_suffix(aac)}", checked: aac.sig_alg == SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA256 %>
+      <%= f.label :sig_alg, t('RSA-SHA256'), for: "rsa_sha256_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
+    </div>
+  </div>
+</fieldset>
+<div class="ic-Form-control">
+
+</div>
+<%= render partial: 'jit_provisioning_field', locals: { aac: aac, presenter: presenter, f: f } %>

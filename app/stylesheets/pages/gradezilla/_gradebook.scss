@@ -69,7 +69,7 @@ $gradebook_cell_padding_top: 8px;
 
   .slick-cell { // each cell of the body
     border-bottom: 1px solid $grid-border-color;
-    border-right: 1px solid $grid-border-color;
+    border-#{direction(right)}: 1px solid $grid-border-color;
     padding: 0;
     overflow: visible;
 
@@ -81,12 +81,12 @@ $gradebook_cell_padding_top: 8px;
 
 .container_0 {
   .slick-header-column:first-child {
-    border-left: 1px solid $grid-border-color;
-    padding-left: 0px;
+    border-#{direction(left)}: 1px solid $grid-border-color;
+    padding-#{direction(left)}: 0px;
   }
 
   .slick-cell:first-child {
-    border-left: 1px solid $grid-border-color;
+    border-#{direction(left)}: 1px solid $grid-border-color;
   }
 }
 
@@ -201,14 +201,22 @@ $gradebook_cell_padding_top: 8px;
   // override jqueryUI style
   &.ui-state-default {
     border-top: 1px solid $grid-border-color;
-    border-right: 1px solid $grid-border-color;
+    border-#{direction(right)}: 1px solid $grid-border-color;
     border-bottom: 1px solid $grid-border-color;
-    border-left: none;
+    border-#{direction(left)}: none;
     height: $header-content-height;
     padding-bottom: 0;
-    padding-left: 1px;
-    padding-right: 0;
+    padding-#{direction(left)}: 1px;
+    padding-#{direction(right)}: 0;
     padding-top: 0;
+
+    @if $direction == 'rtl' {
+      .ui-widget &.ui-sortable-helper {
+        /* because in rtl we set the "right" property, but during drag jqueryUI uses the "left" property */
+        right: auto;
+        border-right: 1px solid $grid-border-color;
+      }
+    }
   }
 
   .assignment-name {
@@ -232,11 +240,11 @@ $gradebook_cell_padding_top: 8px;
   }
 
   .Gradebook__ColumnHeaderIndicators {
-    padding: 0 0 0 2px;
+    padding: direction-sides(0 0 0 2px);
   }
 
   .Gradebook__ColumnHeaderAction {
-    padding: 0 2px 0 0;
+    padding: direction-sides(0 2px 0 0);
   }
 
   .Gradebook__ColumnHeaderDetail {
@@ -331,7 +339,7 @@ $gradebook_cell_padding_top: 8px;
 .container_1 {
   .slick-row.active {
     .slick-cell:not(.active):last-child {
-      border-right: 1px solid $active-border-color;
+      border-#{direction(right)}: 1px solid $active-border-color;
     }
   }
 }
@@ -361,7 +369,7 @@ $gradebook_cell_padding_top: 8px;
     border-width: 5px 5px 0;
     position: absolute;
     width: 0;
-    left: 15px;
+    #{direction(left)}: 15px;
     content: "";
     border-top-color: transparent;
     border-left-color: transparent;
@@ -381,7 +389,7 @@ $gradebook_cell_padding_top: 8px;
   z-index: 7;
   position: absolute;
   font-size: 0.8em;
-  left: 0;
+  #{direction(left)}: 0;
   top: -30px;
   line-height: 1rem;
   &:after {
@@ -391,7 +399,7 @@ $gradebook_cell_padding_top: 8px;
     position: absolute;
     bottom: -5px;
     width: 0;
-    left: 15px;
+    #{direction(left)}: 15px;
     content: "";
   }
   .slick-cell.hover &, .slick-cell.focus &, .slick-cell.selected & {
@@ -423,12 +431,12 @@ $gradebook_cell_padding_top: 8px;
 }
 
 .container_1 .slick-cell:last-child .gradebook-tooltip {
-  left: auto;
-  right: 0;
+  #{direction(left)}: auto;
+  #{direction(right)}: 0;
 
   &:after {
-    left: auto;
-    right: 15px;
+    #{direction(left)}: auto;
+    #{direction(right)}: 15px;
   }
 }
 
@@ -449,7 +457,7 @@ $gradebook_cell_padding_top: 8px;
 .gradebook-cell-turnitin {
   position: absolute;
   top: 2px;
-  right: 2px;
+  #{direction(right)}: 2px;
   z-index: 1;
   width: 20px;
   height: 16px;
@@ -650,7 +658,17 @@ $gradebook_cell_padding_top: 8px;
   .Grid__AssignmentRowCell__PercentInput,
   .Grid__AssignmentRowCell__PointsInput,
   .Grid__AssignmentRowCell__GradingSchemeInput {
-    label input[type="text"] {
+
+    /*
+    the "html[dir] &" part here is to win the specificity war with
+    instUI's <Input> default styling in RTL. Because the postcss-bidirection
+    plugin that InstUI uses prints out css that looks something like:
+      .input {text-align: left}
+       html[dir="rtl"] .input {text-align: right}
+    the css used when in RTL is more specific than LTR so we need something
+    that wins in both cases. Otherwise, we win in LTR but it wins in RTL
+    */
+    html[dir] & label input[type="text"] {
       text-align: center;
     }
 
@@ -691,8 +709,8 @@ $gradebook_cell_padding_top: 8px;
   flex-shrink: 0;
   min-width: $cell-icon-width;
   overflow: hidden;
-  padding-left: 2px;
-  text-align: left;
+  padding-#{direction(left)}: 2px;
+  text-align: direction(left);
   white-space: nowrap;
 }
 
@@ -741,10 +759,10 @@ $gradebook_checkbox_size: 16px;
 .gradebook-checkbox {
   display: block;
   position: absolute;
-  left: 50%;
+  #{direction(left)}: 50%;
   top: 50%;
   margin-top: -($gradebook_checkbox_size / 2) - ( $gradebook_cell_padding_top / 2 );
-  margin-left: -$gradebook_checkbox_size / 2;
+  margin-#{direction(left)}: -$gradebook_checkbox_size / 2;
 }
 
 #hide_warning {
@@ -782,12 +800,12 @@ $gradebook_checkbox_size: 16px;
 .gradebook-filter-container {
   display: inline-block;
   flex: 0 1 auto;
-  margin-left: $ic-sp/2;
+  margin-#{direction(left)}: $ic-sp/2;
 }
 
 .gradebook_filter {
   display: inline-block;
-  margin-left: $ic-sp/2;
+  margin-#{direction(left)}: $ic-sp/2;
 
   input {
     width: 248px;
@@ -795,12 +813,12 @@ $gradebook_checkbox_size: 16px;
 }
 
 .gradebook_menu {
-  margin-left: $ic-sp/2;
+  margin-#{direction(left)}: $ic-sp/2;
   flex: 0 1 auto;
 
   @include breakpoint(desktop) {
     white-space: nowrap;
-    text-align: right;
+    text-align: direction(right);
   }
 }
 
@@ -834,7 +852,7 @@ $gradebook_checkbox_size: 16px;
 .gpa-scale-points {
   position: absolute;
   @include fontSize(12px);
-  padding-left: 8px;
+  padding-#{direction(left)}: 8px;
   line-height: 19px;
   color: $gradebook_letter-grade-font;
   .muted & {
@@ -848,7 +866,7 @@ $gradebook_checkbox_size: 16px;
 }
 
 .final-warning {
-  margin-left: -16px;
+  margin-#{direction(left)}: -16px;
 }
 
 .gradebook_dropdown, .export_dropdown {
@@ -894,7 +912,7 @@ $gradebook_checkbox_size: 16px;
 
   div {
     position: relative;
-    left: 0;
+    #{direction(left)}: 0;
     width: 20px;
     height: 8px;
     background: blue;
@@ -947,7 +965,7 @@ $gradebook_checkbox_size: 16px;
 }
 
 .NumberInput__Container-LeftIndent {
-  margin-left: 1.5rem
+  margin-#{direction(left)}: 1.5rem
 }
 
 .SubmissionTray__Container {
@@ -1004,4 +1022,9 @@ $gradebook_checkbox_size: 16px;
 #SubmissionTray__StudentName {
   text-align: center;
   padding: 0.7rem;
+}
+
+// Specific width to ensure the text of the dialog doesn't wrap by default
+#anonymous-speed-grader-alert-container {
+  min-width: 35rem;
 }

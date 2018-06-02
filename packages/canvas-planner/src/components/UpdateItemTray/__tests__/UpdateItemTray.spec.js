@@ -18,7 +18,7 @@
 import moment from 'moment-timezone';
 import React from 'react';
 import { shallow, mount } from 'enzyme';
-import UpdateItemTray from '../index';
+import { UpdateItemTray } from '../index';
 
 const defaultProps = {
   onSavePlannerItem: () => {},
@@ -28,10 +28,16 @@ const defaultProps = {
   courses: [],
 };
 
+const simpleItem = (opts = {}) => Object.assign({title: '', date: moment('2017-04-28T11:00:00Z')}, opts);
+
+afterEach(()=> {
+  jest.restoreAllMocks();
+});
+
 it('renders the item to update if provided', () => {
   const noteItem = {
     title: 'Planner Item',
-    date: '2017-04-25 01:49:00-0700',
+    date: moment('2017-04-25 01:49:00-0700'),
     context: {id: '1'},
     details: "You made this item to remind you of something, but you forgot what."
   };
@@ -44,11 +50,11 @@ it('renders the item to update if provided', () => {
 });
 
 it("doesn't re-render unless new item is provided", () => {
-  const wrapper = shallow(<UpdateItemTray {...defaultProps} />)
-  const newProps = {...defaultProps, locale: 'fr'}
-  wrapper.setProps(newProps)
-  expect(wrapper.find('DateInput').props()['messages'].length).toBe(0)
-})
+  const wrapper = shallow(<UpdateItemTray {...defaultProps} />);
+  const newProps = {...defaultProps, locale: 'fr'};
+  wrapper.setProps(newProps);
+  expect(wrapper.find('DateTimeInput').props()['messages'].length).toBe(0);
+});
 
 it('renders Add To Do header when creating a new to do', () => {
   const wrapper = mount(
@@ -78,43 +84,44 @@ it('shows details inputs', () => {
 });
 
 it('disables the save button when title is empty', () => {
-  const item = { title: '', date: '2017-04-28' };
+  const item = simpleItem();
   const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={item} />);
   const button = wrapper.find('Button[variant="primary"]');
   expect(button.props().disabled).toBe(true);
 });
 
 it('handles courseid being none', () => {
-  const item = { title: '', date: '2017-04-28' };
+  const item = simpleItem();
   const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={item} />);
   wrapper.instance().handleCourseIdChange({target: {value: 'none'}});
   expect(wrapper.instance().state.updates.courseId).toBe(undefined);
 });
 
 it('correctly updates id to null when courseid is none', () => {
-  const item = { title: '', date: '2017-04-28' };
+  const item = simpleItem();
   const mockCallback = jest.fn();
   const wrapper = shallow(<UpdateItemTray {...defaultProps} onSavePlannerItem={mockCallback} noteItem={item} />);
   wrapper.instance().handleCourseIdChange({target: {value: 'none'}});
   wrapper.instance().handleSave();
   expect(mockCallback).toHaveBeenCalledWith({
     title: item.title,
-    date: item.date,
+    date: item.date.toISOString(),
     context: {
       id: null
     }
   });
 });
 
-it('sets default date when no date is provided', () => {
+it('sets default datetime to 11:50pm today when no date is provided', () => {
+  const now = moment.tz(defaultProps.timeZone).endOf('day');
   const item = { title: 'an item', date: '' };
   const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={item} />);
-  const datePicker = wrapper.find('DateInput');
-  expect(!datePicker.props().dateValue.length).toBe(false);
+  const datePicker = wrapper.find('DateTimeInput');
+  expect(datePicker.props().value).toEqual(now.toISOString());
 });
 
 it('enables the save button when title and date are present', () => {
-  const item = { title: 'an item', date: '2017-04-28' };
+  const item = simpleItem({ title: 'an item' });
   const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={item} />);
   const button = wrapper.find('Button[variant="primary"]');
   expect(button.props().disabled).toBe(false);
@@ -151,7 +158,7 @@ xit('does not set an initial error message on date', () => {
 });
 
 xit('sets error message on date field when date is set to blank', () => {
-  const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={{date: '2017-04-28'}} />);
+  const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={simpleItem()} />);
   wrapper.instance().handleDateChange({target: {value: ''}});
   const dateInput = wrapper.find('TextInput').at(1);
   const messages = dateInput.props().messages;
@@ -160,7 +167,7 @@ xit('sets error message on date field when date is set to blank', () => {
 });
 
 xit('clears the error message when a date is typed in', () => {
-  const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={{date: '2017-04-28'}} />);
+  const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={simpleItem()} />);
   wrapper.instance().handleTitleChange({target: {value: ''}});
   wrapper.instance().handleTitleChange({target: {value: '2'}});
   const dateInput = wrapper.find('TextInput').at(1);
@@ -168,50 +175,43 @@ xit('clears the error message when a date is typed in', () => {
 });
 
 it('respects the provided timezone', () => {
-  const item = { title: '', date: '2017-04-25 12:00:00-0300' };
+  const item = simpleItem({date: moment('2017-04-25 12:00:00-0300')});
   const wrapper = mount(<UpdateItemTray {...defaultProps} noteItem={item} />);
   const d = wrapper.find('DateInput').find('TextInput').props().value;
   expect(d).toEqual('April 26, 2017');  // timezone shift from -3 to +9 pushes it to the next day
 });
 
 it('changes state when new date is typed in', () => {
-  const noteItem = {
-    title: 'Planner Item',
-    date: '2017-04-25',
-  };
+  const noteItem = simpleItem({title: 'Planner Item'});
   const mockCallback = jest.fn();
   const wrapper = mount(<UpdateItemTray {...defaultProps} onSavePlannerItem={mockCallback} noteItem={noteItem} />);
-  const newDate = moment('2017-10-16');
+  const newDate = moment('2017-10-16T13:30:00');
   wrapper.instance().handleDateChange({}, newDate.toISOString());
   wrapper.instance().handleSave();
   expect(mockCallback).toHaveBeenCalledWith({
     title: noteItem.title,
     date: newDate.toISOString(),
-    context: {
-      id: null
-    }
+    context: {id: null}
   });
 });
 
 it('updates state when new note is passed in', () => {
-  const noteItem1 = {
+  const noteItem1 = simpleItem({
     title: 'Planner Item 1',
-    date: '2017-04-25',
     context: {id: '1'},
     details: "You made this item to remind you of something, but you forgot what."
-  };
+  });
   const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={noteItem1} courses={[
     {id: '1', longName: 'first course'},
     {id: '2', longName: 'second course'},
   ]}/>);
   expect(wrapper).toMatchSnapshot();
 
-  const noteItem2 = {
+  const noteItem2 = simpleItem({
     title: 'Planner Item 2',
-    date: '2017-12-25',
     context: {id: '2'},
     details: "This is another reminder"
-  };
+  });
   wrapper.setProps({noteItem: noteItem2});
   expect(wrapper).toMatchSnapshot();
 });
@@ -247,29 +247,38 @@ it('invokes save callback with updated data', () => {
   const saveMock = jest.fn();
   const wrapper = shallow(<UpdateItemTray {...defaultProps}
     noteItem={{
-      title: 'title', date: '2017-04-27', courseId: '42', details: 'details',
+      title: 'title', date: moment('2017-04-27T13:00:00Z'), courseId: '42', details: 'details',
     }}
     courses={[{id: '42', longName: 'first'}, {id: '43', longName: 'second'}]}
     onSavePlannerItem={saveMock}
   />);
   wrapper.instance().handleTitleChange({target: {value: 'new title'}});
-  wrapper.instance().handleDateChange({}, '2017-05-01');
+  wrapper.instance().handleDateChange({}, '2017-05-01T14:00:00Z');
   wrapper.instance().handleCourseIdChange({target: {value: '43'}});
   wrapper.instance().handleChange('details', 'new details');
   wrapper.instance().handleSave();
   expect(saveMock).toHaveBeenCalledWith({
-    title: 'new title', date: moment('2017-05-01').toISOString(), context: {id: '43'}, details: 'new details',
+    title: 'new title', date: moment('2017-05-01T14:00:00Z').toISOString(), context: {id: '43'}, details: 'new details',
   });
 });
 
 it('invokes the delete callback', () => {
+  const item = simpleItem({title: 'a title'});
   const mockDelete = jest.fn();
   const wrapper = shallow(<UpdateItemTray {...defaultProps}
-    noteItem={{title: 'a title'}}
+    noteItem={item}
     onDeletePlannerItem={mockDelete} />);
   const confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(true);
   wrapper.instance().handleDeleteClick();
   expect(confirmSpy).toHaveBeenCalled();
-  expect(mockDelete).toHaveBeenCalledWith({title: 'a title'});
-  confirmSpy.mockRestore();
+  expect(mockDelete).toHaveBeenCalledWith(item);
+});
+
+it('invokes invalidDateTimeMessage when an invalid date is entered', () => {
+  const invalidCallbackSpy = jest.spyOn(UpdateItemTray.prototype, 'invalidDateTimeMessage');
+  const wrapper = mount(<UpdateItemTray {...defaultProps}  />);
+  const dateInput = wrapper.find('DateInput').find('input');
+  dateInput.simulate('change', {target: {value: 'xxxxx'}});
+  dateInput.simulate('blur');
+  expect(invalidCallbackSpy).toHaveBeenCalled();
 });

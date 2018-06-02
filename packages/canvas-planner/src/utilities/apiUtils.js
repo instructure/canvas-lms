@@ -17,6 +17,7 @@
  */
 import moment from 'moment-timezone';
 import _ from 'lodash';
+import { makeEndOfDayIfMidnight } from './dateUtils';
 
 const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
   let { plannable, plannable_type, planner_override } = apiResponse;
@@ -48,6 +49,10 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
   if (plannable_type === 'planner_note') {
     details.details = plannable.details;
   }
+
+  if (plannable_type === 'calendar_event') {
+    details.allDay = plannable.all_day
+  }
   return details;
 };
 
@@ -58,6 +63,7 @@ const TYPE_MAPPING = {
   wiki_page: "Page",
   announcement: "Announcement",
   planner_note: "To Do",
+  calendar_event: "Calendar Event",
 };
 
 const getItemType = (plannableType) => {
@@ -79,7 +85,7 @@ export function transformApiToInternalItem (apiResponse, courses, groups, timeZo
   const contextId = apiResponse[`${context_type.toLowerCase()}_id`];
   if (context_type === 'Course') {
     const course = courses.find(c => c.id === contextId);
-    contextInfo.context = getCourseContext(apiResponse, course);
+    contextInfo.context = getCourseContext(course);
   } else if (context_type === 'Group') {
     const group = groups.find(g => g.id === contextId) || {name: "Unknown Group", color: "#666666", url: undefined};
     contextInfo.context = getGroupContext(apiResponse, group);
@@ -87,27 +93,11 @@ export function transformApiToInternalItem (apiResponse, courses, groups, timeZo
   const details = getItemDetailsFromPlannable(apiResponse, timeZone);
 
   // Standardize 00:00:00 date to 11:59PM on the current day to make due date less confusing
-  let plannableDate = apiResponse.plannable_date
-  let currentDay = moment(plannableDate);
-  if (isMidnight(currentDay, timeZone)) {
-    plannableDate = currentDay.endOf('day').toISOString();
-  }
+  const plannableDate = makeEndOfDayIfMidnight(apiResponse.plannable_date, timeZone);
 
   if ((!contextInfo.context) && apiResponse.plannable_type === 'planner_note' && (details.course_id)) {
     const course = courses.find(c => c.id === details.course_id);
-    // shouldn't happen, but if the course data is missing, skip it.
-    // this has the effect of the planner note showing up as a vanilla todo not associated with a course
-    if (course) {
-      contextInfo.context = {
-        type: 'Planner Note',
-        id: details.course_id,
-        title: course.shortName,
-        image_url: course.image,
-        inform_students_of_overdue_submissions: course.informStudentsOfOverdueSubmissions,
-        color: course.color,
-        url: course.href
-      };
-    }
+    contextInfo.context = getCourseContext(course);
   }
 
   if (details.unread_count) {
@@ -136,22 +126,12 @@ export function transformPlannerNoteApiToInternalItem (plannerItemApiResponse, c
   let context = {};
   if (plannerNote.course_id) {
     const course = courses.find(c => c.id === plannerNote.course_id);
-    if (course) {
-      context = {
-        type: 'Planner Note',
-        id: plannerNote.course_id,
-        title: course.shortName,
-        image_url: course.image,
-        inform_students_of_overdue_submissions: course.informStudentsOfOverdueSubmissions,
-        color: course.color,
-        url: course.href
-      };
-    }
+    context = getCourseContext(course);
   }
   return {
     id: plannerNote.id,
     uniqueId: `planner_note-${plannerNote.id}`,
-    dateBucketMoment: moment.tz(plannerNote.todo_date, timeZone).startOf('day'),
+    dateBucketMoment: moment.tz(plannerNote.todo_date, timeZone),
     type: 'To Do',
     status: false,
     course_id: plannerNote.course_id,
@@ -197,10 +177,26 @@ export function transformInternalToApiOverride (internalItem, userId) {
   };
 }
 
-function getCourseContext(apiResponse, course) {
+export function transformApiToInternalGrade (apiResult) {
+  // Grades are the same across all enrollments, just look at first one
+  const courseId = apiResult.id;
+  const hasGradingPeriods = apiResult.has_grading_periods;
+  const enrollment = apiResult.enrollments[0];
+  let score = enrollment.computed_current_score;
+  let grade = enrollment.computed_current_grade;
+  if (hasGradingPeriods) {
+    score = enrollment.current_period_computed_current_score;
+    grade = enrollment.current_period_computed_current_grade;
+  }
+  return {courseId, hasGradingPeriods, grade, score};
+}
+
+function getCourseContext(course) {
+  // shouldn't happen, but if the course data is missing, skip it.
+  // this has the effect of a planner note showing up as a vanilla todo not associated with a course
   if (!course) return undefined;
   return {
-    type: apiResponse.context_type,
+    type: 'Course',
     id: course.id,
     title: course.shortName,
     image_url: course.image,
@@ -221,11 +217,4 @@ function getGroupContext(apiResponse, group) {
     color: group.color,
     url: group.url
   };
-}
-
-function isMidnight(currentDay, timeZone) {
-  // in languages like Arabic, moment.format returns strings in the native characters
-  // so this doesn't work
-  //currentDay.tz(timeZone).format('HH:mm:ss') === '00:00:00'
-  return currentDay.hours() === currentDay.minutes() === currentDay.seconds() === 0;
 }

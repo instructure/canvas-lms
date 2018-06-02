@@ -24,24 +24,20 @@ module Api::V1::PlannerItem
   include Api::V1::DiscussionTopics
   include Api::V1::WikiPage
   include Api::V1::PlannerOverride
-
-  PLANNABLE_TYPES = {
-    'discussion_topic' => 'DiscussionTopic',
-    'announcement' => 'DiscussionTopic',
-    'quiz' => 'Quizzes::Quiz',
-    'assignment' => 'Assignment',
-    'wiki_page' => 'WikiPage',
-    'planner_note' => 'PlannerNote'
-  }.freeze
+  include Api::V1::CalendarEvent
+  include PlannerHelper
 
   def planner_item_json(item, user, session, opts = {})
-    context_data(item).merge({
+    context_data(item, use_effective_code: true).merge({
       :plannable_id => item.id,
-      :visible_in_planner => item.visible_in_planner_for?(user),
       :planner_override => planner_override_json(item.planner_override_for(user), user, session),
       :new_activity => new_activity(item, user, opts)
     }).merge(submission_statuses_for(user, item, opts)).tap do |hash|
-      if item.is_a?(PlannerNote)
+      if item.is_a?(::CalendarEvent)
+        hash[:plannable_date] = item.start_at || item.created_at
+        hash[:plannable_type] = 'calendar_event'
+        hash[:plannable] = event_json(item, user, session)
+      elsif item.is_a?(::PlannerNote)
         hash[:plannable_date] = item.todo_date || item.created_at
         hash[:plannable_type] = 'planner_note'
         hash[:plannable] = api_json(item, user, session)
@@ -85,7 +81,8 @@ module Api::V1::PlannerItem
   end
 
   def planner_items_json(items, user, session, opts = {})
-    notes, context_items = items.partition{|i| i.is_a?(::PlannerNote)}
+    _events, other_items = items.partition{|i| i.is_a?(::CalendarEvent)}
+    notes, context_items = other_items.partition{|i| i.is_a?(::PlannerNote)}
     ActiveRecord::Associations::Preloader.new.preload(notes, :user => {:pseudonym => :account}) if notes.any?
     wiki_pages, other_context_items = context_items.partition{|i| i.is_a?(::WikiPage)}
     ActiveRecord::Associations::Preloader.new.preload(wiki_pages, :wiki => [{:course => :root_account}, {:group => :root_account}]) if wiki_pages.any?
@@ -108,6 +105,19 @@ module Api::V1::PlannerItem
       needs_grading: ss[:needs_grading].include?(item.id),
       has_feedback: ss[:has_feedback].include?(item.id)
     }
+
+    if submission_status[:submissions][:has_feedback]
+      relevant_submissions = user.recent_feedback.select {|s| s.assignment_id == item.id}
+      ActiveRecord::Associations::Preloader.new.preload(relevant_submissions, [visible_submission_comments: :author])
+      feedback_data = relevant_submissions
+                      .flat_map(&:visible_submission_comments)
+                      .flat_map {|comment| {
+                        comment: comment.comment,
+                        author_name: comment.author_name,
+                        author_avatar_url: comment.author.avatar_url
+                      }}
+      submission_status[:submissions][:feedback] = feedback_data if feedback_data.present?
+    end
 
     submission_status
   end

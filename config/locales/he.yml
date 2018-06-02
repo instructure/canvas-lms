@@ -34,11 +34,15 @@ he:
       removeError: "לא ניתן להסיר את הקבוצה. אנא נסה שנית מאוחר יותר"
       removed: "קבוצה הוסרה בהצלחה"
     student_count: 
+      many: "%{count} תלמידים"
       one: "תלמיד אחד"
       other: "%{count} תלמידים"
+      two: "%{count} תלמידים"
     user_count: 
+      many: "%{count} משתמשים"
       one: "%{count} משתמשים"
       other: "%{count} משתמשים"
+      two: "%{count} משתמשים"
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "התראה: המשתמש %{user} הינו כבר חבר ב %{group}"
@@ -639,21 +643,27 @@ he:
       user_search_label: "חיפוש משתמשים"
     course: 
       associated_count: 
+        many: "%{count} קורסים נלווים"
         one: "קורס נלווה אחד"
         other: "%{count} קורסים נלווים"
+        two: "%{count} קורסים נלווים"
       course_unpublished_title: "קורס זה טרם פורסם"
       course_unpublished_tooltip: "לא פורסם"
       homepage_link: "דף הבית"
       more_count: 
+        many: "עוד %{count}"
         one: "עוד אחד"
         other: "עוד %{count}"
+        two: "עוד %{count}"
       none: "אף אחד"
       settings_link: הגדרות
       sis_id_label: "מזהה SIS"
       statistics_link: סטטיסטיקות
       student_count: 
+        many: "%{count} תלמידים"
         one: "חניך אחד"
         other: "%{count} תלמידים"
+        two: "%{count} תלמידים"
       teachers_label: מורים
     course_add_failed_message: "הוספת קורס נכשלה, אנא נסו שוב"
     course_added_message: "%{course} נוסף בהצלחה!"
@@ -1229,8 +1239,10 @@ he:
       override_sis_stickiness_label: "דריסת שינויי UI"
       page_title: "ייבוא SIS"
       pending_batches_count: 
+        many: "%{count} משימות אצבה ממתינות לביצוע"
         one: "%{count} משימה ממתינה לביצוע"
         other: "%{count} משימות אצבה ממתינות לביצוע"
+        two: "%{count} משימות אצבה ממתינות לביצוע"
       pending_batches_title: "ריצות אצבות ממתינות"
       process_data_button: "עיבוד מידע"
       select_file_instructions: |-
@@ -1267,8 +1279,10 @@ he:
       loading_error: שגיאה
       loading_text: טוען...
       media_data: 
+        many: "%{file_size} *מתוך %{count} קבצים*"
         one: "%{file_size} *מתוך קובץ אחד*"
         other: "%{file_size} *מתוך %{count} קבצים*"
+        two: "%{file_size} *מתוך %{count} קבצים*"
       media_file_storage_header: "אחסון קבצי מדיה"
       none_message: "אין מידע להציג"
       over_time_link: "לאורך זמן"
@@ -1281,8 +1295,10 @@ he:
       started_at: "החל ב%{at}"
       title_data_point_over_time: "%{data_point}  לאורך זמן"
       uploaded_data: 
+        many: "%{file_size} *מתוך %{count} קבצים*"
         one: "%{file_size} *מתוך %{count} קבצים*"
         other: "%{file_size} *מתוך %{count} קבצים*"
+        two: "%{file_size} *מתוך %{count} קבצים*"
       uploaded_file_storage_header: "אחסון קבצים שהועלו"
     student_assessment_scores_csv_parameters: 
       account_reports: 
@@ -1390,8 +1406,10 @@ he:
           zero_activity: 
             text: "דוח זה מציג את כל התלמידים שנרשמו בכל קורס שהוא במחצית נתונה. קובץ ה CSV הנגזר יראה שורה לכל הרשמת משתמש אשר לא ביקר בקורס מאז התאריך שנבחר."
   achieve_mastery_count_times_8c9bbcec: 
+    many: "השגת רמת מומחה %{count} פעמים"
     one: "השגת רמת מומחה פעם אחת"
     other: "השגת רמת מומחה %{count} פעמים"
+    two: "השגת רמת מומחה %{count} פעמים"
   act_as_is_essentially_logging_in_as_this_user_with_6244031c: "הפעלה כאילו ההתחברות היא כמו משתתמש זה ללא סיסמה. תוכלו לבצע כל פעולה כאילו הייתם המשתמש עצמו, ומבחינתם של משתמשים אחרים כאילו המשתמש עצמו ביצע את הפעולה. אך לוג הפעולות ירשום שזה את/ה שביצעת את הפעולה עבור המשתמש."
   act_as_name_16d15bfa: "בצע בשם %{name}"
   act_as_user_d7ef0e48: "בצע כמשתמש"
@@ -1841,15 +1859,19 @@ he:
   archive_selected_d64506ca: "ארכיון נבחר"
   are_you_sure_26795d3c: "האם אתם בטוחים?"
   are_you_sure_you_want_to_archive_your_copies_of_th_7d219afe: 
+    many: "האם אתם בטוחים שרוצים להכניס לארכיב את עותקי שיחה זו שלכם?"
     one: "האם אתם בטוחים שרוצים להכניס לארכיב את עותקי שיחה זו שלכם?"
     other: "האם אתם בטוחים שרוצים להכניס לארכיב את עותקי שיחה זו שלכם?"
+    two: "האם אתם בטוחים שרוצים להכניס לארכיב את עותקי שיחה זו שלכם?"
   are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496: "האם בטוחים שרוצים לבטל? שינויים שבוצעו לא ישמרו"
   are_you_sure_you_want_to_cancel_your_appointment_w_dbbd27eb: "בטוחים שרוצים לבטל את הפגישה עם %{name}?"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: "בטוח/ה שרוצה להעתיק אל הרישום הסופי? הדבר ידרוס את הרישום הקיים."
   are_you_sure_you_want_to_deactivate_this_user_they_3fdaab79: "האם בטוחים שרוצים להשבית משתמש זה? הדבר ימנע מהתלמיד/ה השתתפות בקורס כל עוד נמצא/ת במצב לא פעיל."
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
+    many: "בטוח/ה שרוצה לבטל את %{count} פריטי החשבון האלה?"
     one: "בטוח/ה שרוצה לבטל את פריטי החשבון %{name}? האלה?"
     other: "בטוח/ה שרוצה לבטל את %{count} פריטי החשבון האלה?"
+    two: "בטוח/ה שרוצה לבטל את %{count} פריטי החשבון האלה?"
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "האם אתם בטוחים כי ברצונכם לבטל הודעה זו?"
   are_you_sure_you_want_to_delete_this_assignment_88be6f5e: "בטוחים שרוצים לבטל מטלה זו?"
   are_you_sure_you_want_to_delete_this_comment_4ee386d: "האם בטוחים שרוצים לבטל הערה זו"
@@ -1859,8 +1881,10 @@ he:
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "בטוח/ה שרוצה לבטל את סכימת ההערכה הזו?"
   are_you_sure_you_want_to_delete_this_to_do_item_497016ea: "האם אתם בטוחים שרוצים לבטל פריט משימה זה?"
   are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
+    many: "האם אתם בטוחים שרוצים לבטל עותק של שיחות אלו? אין אפשרות לשחזר את הביטול."
     one: "האם אתם בטוחים שרוצים לבטל עותק של שיחה זו? אין אפשרות לשחזר את הביטול."
     other: "האם אתם בטוחים שרוצים לבטל עותק של שיחות אלו? אין אפשרות לשחזר את הביטול."
+    two: "האם אתם בטוחים שרוצים לבטל עותק של שיחות אלו? אין אפשרות לשחזר את הביטול."
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "בטוחים שרוצים לבטל את הרשמתכם לאירוע זה?"
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "האם אתם בטוחים שרוצים למנוע את הסיכנכרוניזציה ל %{sisName} לכל המשימות האלו?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "בטוח/ה שרוצה לבצע פעולה זו? לא ניתן לשחזר זאת והפעולה תדרוס ציונים קיימים בספר הציונים."
@@ -1872,8 +1896,10 @@ he:
   are_you_sure_you_want_to_submit_this_comment_fbe76ba6: "האם בטוחים שרוצים לשגר הודעה זו"
   are_you_sure_you_want_to_sync_these_grades_to_the__ca3c28a4: "האם אתם בטוחים שרוצים לבצע סינכרוניזציה מחודשת של ציונים אלו למערכת המידע של התלמיד? יש לבצע זאת רק לאחר שכל הציונים הם סופיים."
   are_you_sure_you_want_to_unarchive_these_conversat_ec7d7e8d: 
+    many: "האם אתם בטוחים שרוצים להחזיר שיחות אלו מהארכיון?"
     one: "האם אתם בטוחים שרוצים להחזיר שיחות אלו מהארכיון?"
     other: "האם אתם בטוחים שרוצים להחזיר שיחות אלו מהארכיון?"
+    two: "האם אתם בטוחים שרוצים להחזיר שיחות אלו מהארכיון?"
   argentina_3257a200: ארגנטינה
   argentina_54_375d6af4: "ארגנטינה (+54)"
   arrange_by_34a545de: "אירגון לפי"
@@ -1906,8 +1932,10 @@ he:
     buttons: 
       select_url: בחירה
     comment_from_files: 
+      many: "ראו קובצים מצורפים"
       one: "ראו קובץ מצורף"
       other: "ראו קובצים מצורפים"
+      two: "ראו קובצים מצורפים"
     errors: 
       cannot_save_att: "אינך מורשה לערוך את המאפיין הנעול %{att_name}"
       upload_as_zip: "יש להעלות קבצים בפורמט זיפ. "
@@ -2010,8 +2038,10 @@ he:
   assignment_options_1e5b7074: "אפשרויות משימה"
   assignment_override: 
     student_count: 
+      many: "%{count} תלמידים "
       one: "%{count} תלמידים "
       other: "%{count} תלמידים "
+      two: "%{count} תלמידים "
   assignment_path_selected_e80191d1: "מסלול המטלה נבחר"
   assignment_preview_3833e819: "תצוגה מקדימה של %{assignment}"
   assignment_selection_6bff05c4: "בחירת משימה"
@@ -2142,12 +2172,16 @@ he:
         delete_assignment_group: "את/ה עומד/ת לבטל את *%{name}*, הכולל **%{assignment_count}**  משימות"
       would_you_like: "האם תרצו ל:"
     drop_highest_rule: 
+      many: "השמטת %{count} הציונים הגבוהים ביותר"
       one: "השמטת הציון הגבוה ביותר"
       other: "השמטת %{count} הציונים הגבוהים ביותר"
+      two: "השמטת %{count} הציונים הגבוהים ביותר"
     drop_highest_scores: "התעלם מ%{number}  הציונים הגבוהים ביותר"
     drop_lowest_rule: 
+      many: "השמטת %{count} הציונים הנמוכים ביותר"
       one: "השמטת הציון הנמוך ביותר"
       other: "השמטת %{count} הציונים הנמוכים ביותר"
+      two: "השמטת %{count} הציונים הנמוכים ביותר"
     drop_lowest_scores: "התעלם מ%{number}  הציונים הנמוכים ביותר"
     due_date_view: 
       overrides: 
@@ -2205,8 +2239,10 @@ he:
         peer_reviews: "בדיקת עמיתים"
         reupload_submissions: "העלאה מחדש של הגשות"
       resubmission_count: 
+        many: "%{count} הגשות מחודשות שלא הוערכו"
         one: "הגשה מחודשת שלא הוערכה"
         other: "%{count} הגשות מחודשות שלא הוערכו"
+        two: "%{count} הגשות מחודשות שלא הוערכו"
       speed_grader: SpeedGrader™
       titles: 
         related_items: "פריטים משויכים"
@@ -2376,8 +2412,10 @@ he:
     remove_never_drop_rule: "הסרת הכלל \"אין לדלג\""
     remove_unsaved_never_drop_rule: "הסרת כללי \"אין לדלג\" שלא נשמרו"
     rules_text: 
+      many: "%{count} כללים"
       one: "כלל אחד"
       other: "%{count} כללים"
+      two: "%{count} כללים"
     select_assignment: "[בחירת משימה]"
     show: 
       assignment_locked: "משימה זו נעולה כעת"
@@ -3015,8 +3053,10 @@ he:
       event_deleted: "%{event_title}  בוטל בהצלחה"
       event_saved: "האירוע נשמר בהצלחה"
       missingDueDate: 
+        many: "%{sections} ללא תאריך יעד."
         one: "%{sections} ללא תאריך יעד."
         other: "%{sections} ללא תאריך יעד."
+        two: "%{sections} ללא תאריך יעד."
       titles: 
         warning: אזהרה
     edit_appointment_group: 
@@ -4374,8 +4414,10 @@ he:
   context_navigation_menu_514c5889: "תפריט ניווט תלוי קונטקסט"
   context_type_eb76a7b9: context_type
   contextname_and_count_others_9dda769b: 
+    many: "%{contextName} ו %{count} אחרים"
     one: "%{contextName} ו %{count} אחר"
     other: "%{contextName} ו %{count} אחרים"
+    two: "%{contextName} ו %{count} אחרים"
   continue_ac067716: המשך
   continue_typing_to_find_additional_sections_or_stu_49786085: "המשיכו להקליד כדי למצוא הקבצות או תלמידים נוספים "
   contributed_to_this_module_item_and_is_complete_2799d5c: "המענה לפריט מודול זה הושלם"
@@ -4387,12 +4429,16 @@ he:
     subject: "הודעה פרטית"
     subject_specified: "הודעה פרטית:  %{subject}"
     users_added: 
+      many: "%{list_of_users} נוספו לשיחה ע\"י %{current_user}"
       one: "%{user}  נוספ/ה לדיון ע\"י %{current_user}"
       other: "%{list_of_users} נוספו לשיחה ע\"י %{current_user}"
+      two: "%{list_of_users} נוספו לשיחה ע\"י %{current_user}"
   conversation_participant: 
     batch_update_message: 
+      many: "%{count} שיחות עובדו"
       one: "שיחה אחת עובדה"
       other: "%{count} שיחות עובדו"
+      two: "%{count} שיחות עובדו"
     not_participating: "המשתמש אינו משתתף בדיון זה"
   conversations: 
     add_attachment: 
@@ -4539,11 +4585,15 @@ he:
     no_recipients_choose_another_group: "אין נמענים בקבוצה זו. בבקשה לבחור קבוצה אחרת."
     no_results_found: "לא נמצאו תוצאות"
     other: 
+      many: "%{count} אחרים"
       one: "אחד אחר"
       other: "%{count} אחרים"
+      two: "%{count} אחרים"
     other_recipients: 
+      many: "ו %{count} אחרים"
       one: "ואחד אחר"
       other: "ו %{count} אחרים"
+      two: "ו %{count} אחרים"
     result_status: "מנגנון ההשלמה האוטומטי מצא %{results} מופעים. יש להשתמש בחצי מעלה מטה כדי לנווט ברשימה ואז להקיש ENTER כדי להוסיף נמען לרשימת המכותבים."
     star: "סימון כוכבית"
     star_conversation: "סמן/י כוכבית לשיחה"
@@ -4583,87 +4633,125 @@ he:
     other: "%{count} משימות עם שגיאות"
     zero: "אין משימות עם שגיאות, הקלק/י להמשך"
   count_comments_cb137ab8: 
+    many: "%{count} הערות"
     one: "הערה אחת"
     other: "%{count} הערות"
+    two: "%{count} הערות"
   count_criteria_22927713: 
+    many: "%{count} קריטריונים"
     one: "קריטריון אחד"
     other: "%{count} קריטריונים"
+    two: "%{count} קריטריונים"
   count_exceptions_1176c596: 
+    many: "%{count} חריגים"
     one: "%{count} חריג"
     other: "%{count} חריגים"
+    two: "%{count} חריגים"
   count_files_updated_4570a8a: 
+    many: "%{count} קבצים הועלו"
     one: "קובץ אחד הועלה"
     other: "%{count} קבצים הועלו"
+    two: "%{count} קבצים הועלו"
   count_items_deleted_successfully_a287aa53: 
+    many: "%{count} פריטים בוטלו בהצלחה"
     one: "%{name}  בוטל בהצלחה"
     other: "%{count} פריטים בוטלו בהצלחה"
+    two: "%{count} פריטים בוטלו בהצלחה"
   count_items_on_page_page_961fc0c7: "%{count} פריטים בדף %{page}"
   count_items_selected_91814713: 
+    many: "%{count} פריטים נבחרו"
     one: "%{count} פריטים נבחרו"
     other: "%{count} פריטים נבחרו"
+    two: "%{count} פריטים נבחרו"
   count_max_students_2db76773: "%{count} / %{max} תלמידים"
   count_max_users_bdebb537: "%{count} / %{max} משתמשים"
   count_messages_4f8ff204: 
+    many: "%{count} הודעות"
     one: "1 הודעה"
     other: "%{count} הודעות"
+    two: "%{count} הודעות"
   count_minutes_a6eeeacb: 
     one: "דקה אחת"
     other: "%{count} דקות"
     zero: "פחות מדקה אחת"
   count_of_max_maximum_characters_fcb6ddf8: "%{count} מ %{max} תווים מירבי"
   count_options_190d6373: 
+    many: "%{count} אפשרויות"
     one: "אפשרות אחת"
     other: "%{count} אפשרויות"
+    two: "%{count} אפשרויות"
   count_page_views_b40102b3: 
+    many: "%{count} צפיות דף"
     one: "1 דפיית דף"
     other: "%{count} צפיות דף"
+    two: "%{count} צפיות דף"
   count_participations_ac8f82b7: 
+    many: "%{count} השתתפויות"
     one: "1 השתתפות"
     other: "%{count} השתתפויות"
+    two: "%{count} השתתפויות"
   count_people_successfully_enrolled_into_course_nam_db8eed18: 
+    many: "%{count} אנשים נרשמו בהצלחה ל *%{course_name}*."
     one: "%{user_name} נרשם בהצלחה ל *%{course_name}*."
     other: "%{count} אנשים נרשמו בהצלחה ל *%{course_name}*."
+    two: "%{count} אנשים נרשמו בהצלחה ל *%{course_name}*."
   count_points_4735a2e8: 
+    many: "%{count} נקודות"
     one: "נקודה אחת"
     other: "%{count} נקודות"
+    two: "%{count} נקודות"
   count_pushed_changes_6fe7fba: "%{count} שינויים הועברו"
   count_quizzes_found_e5e29bb4: 
     one: "בוחן אחד נמצא"
     other: "נמצאו %{count} בחנים."
     zero: "לא נמצאו בחנים המתאימים להגדרות החיפוש"
   count_results_9926447c: 
+    many: "%{count} תוצאות"
     one: "תוצאה אחת"
     other: "%{count} תוצאות"
+    two: "%{count} תוצאות"
   count_results_displayed_ed39a0f0: 
+    many: "%{count} תוצאות הוצגו"
     one: "תוצאה אחת הוצגה"
     other: "%{count} תוצאות הוצגו"
+    two: "%{count} תוצאות הוצגו"
   count_sets_of_grading_periods_found_c8857ae9: 
     one: "נמצא אוגדן אחד של תקופות הערכה"
     other: "%{count} אודנים של תקופות הערכה נמצאו ."
     zero: "לא נמצאו אוגדני תקופות הערכה מתאימים"
   count_students_30e46120: 
+    many: "%{count} תלמידים"
     one: "תלמיד אחד"
     other: "%{count} תלמידים"
+    two: "%{count} תלמידים"
   count_students_in_percentile_percentile_d0adecfe: 
+    many: "%{count} תלמידים באחוזון %{percentile}. "
     one: "תלמיד אחד באחוזון %{percentile}"
     other: "%{count} תלמידים באחוזון %{percentile}. "
+    two: "%{count} תלמידים באחוזון %{percentile}. "
   count_students_will_get_num_points_c970fc01: 
     one: "תלמיד/ה אחד/ת י/תקבל נקודה %{num} "
     other: "%{count} תלמידים יקבלו %{num} נקודות"
   count_sub_modules_3373a1c4: 
+    many: "%{count} מודולי משנה"
     one: "מודול משנה %{count} "
     other: "%{count} מודולי משנה"
+    two: "%{count} מודולי משנה"
   count_submissions_need_grading_d34bae25: 
+    many: "%{count} הגשות שמחייבות הערכה"
     one: "הגשה אחת המחוייבת בהערכה"
     other: "%{count} הגשות שמחייבות הערכה"
+    two: "%{count} הגשות שמחייבות הערכה"
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} יבוטל ועובר את הרף המוגדר של %{change_threshold}%"
   count_unsynced_changes_1fc147e5: "%{count} שינויים שאינם מסונכרנים"
   country_is_required_b0afbf52: "נדרש שם מדינה"
   course: 
     access_denied: "הגישה נדחתה"
     batch_update_message: 
+      many: "%{count} קורסים עובדו"
       one: "קורס אחד עובד"
       other: "%{count} קורסים עובדו"
+      two: "%{count} קורסים עובדו"
     course: קורס
     course_format: 
       blended: מעורב
@@ -5193,8 +5281,10 @@ he:
       drag_details: "הפיכת רוב הדפים ללא פעילים יגרום לתלמידים אשר ביקרו בדפים אלו להתנתב לדף הבית של הקורס."
       drag_to_hide: "גרור/י פריטים לכאן כדי להסתירם מתלמידים"
       enrollment_count: 
+        many: "%{count} משתמשים"
         one: "משתמש/ת אחד/ת"
         other: "%{count} משתמשים"
+        two: "%{count} משתמשים"
       headings: 
         details: "פרטי קורס:"
         grade_publishing: "פרסום הערכות"
@@ -5386,8 +5476,10 @@ he:
       discussion_topic: "נושא דיון"
       discussions: "דיונים "
       file_count: 
+        many: "%{count} קבצים"
         one: "קובץ אחד"
         other: "%{count} קבצים"
+        two: "%{count} קבצים"
       file_upload: "העלאת קובץ"
       headings: 
         assignments: "דוח שימוש משימות"
@@ -5600,34 +5692,50 @@ he:
   d_b59e2d8d: d
   dashboard: 
     announcements_collapse: 
+      many: "כיווץ %{count} הכרזות"
       one: "כיווץ הכרזה %{count}"
       other: "כיווץ %{count} הכרזות"
+      two: "כיווץ %{count} הכרזות"
     announcements_expand: 
+      many: "הרחבת %{count} הכרזות"
       one: "הרחבת הכרזה %{count}"
       other: "הרחבת %{count} הכרזות"
+      two: "הרחבת %{count} הכרזות"
     assignments_collapse: 
+      many: "כיווץ %{count} הודעות משימה"
       one: "כיווץ הודעות משימה %{count}"
       other: "כיווץ %{count} הודעות משימה"
+      two: "כיווץ %{count} הודעות משימה"
     assignments_expand: 
+      many: "הרחבת %{count} התראות משימה"
       one: "הרחבת התראת משימה %{count}"
       other: "הרחבת %{count} התראות משימה"
+      two: "הרחבת %{count} התראות משימה"
     confirm: 
       close: |-
           בטוח/ה שרוצה לסיים את שיחת הועידה?
           
           לא ניתן יהיה לפתחה שוב.
     conversations_collapse: 
+      many: "כיווץ %{count} הודעות שיחה"
       one: "כיווץ %{count} הודעות שיחה"
       other: "כיווץ %{count} הודעות שיחה"
+      two: "כיווץ %{count} הודעות שיחה"
     conversations_expand: 
+      many: "הרחבת %{count} הודעות שיחה"
       one: "הרחבת הודעת שיחה %{count} "
       other: "הרחבת %{count} הודעות שיחה"
+      two: "הרחבת %{count} הודעות שיחה"
     discussions_collapse: 
+      many: "כיווץ %{count} דיונים"
       one: "כיווץ דיון %{count}"
       other: "כיווץ %{count} דיונים"
+      two: "כיווץ %{count} דיונים"
     discussions_expand: 
+      many: "הרחבת %{count} דיונים"
       one: "הרחבת דיון %{count}"
       other: "הרחבת %{count} דיונים"
+      two: "הרחבת %{count} דיונים"
     show_more_link: 
       show_less: "הצג פחות"
       show_more: "הצג יותר"
@@ -5730,39 +5838,61 @@ he:
   datetime: 
     distance_in_words: 
       about_x_hours: 
+        many: "בערך %{count} שעות"
         one: "בערך שעה"
         other: "בערך %{count} שעות"
+        two: "בערך %{count} שעות"
       about_x_months: 
+        many: "בערך %{count} חודשים"
         one: "בערך חודש"
         other: "בערך %{count} חודשים"
+        two: "בערך %{count} חודשים"
       about_x_years: 
+        many: "בערך %{count} שנים"
         one: "בערך שנה"
         other: "בערך %{count} שנים"
+        two: "בערך %{count} שנים"
       almost_x_years: 
+        many: "כמעט %{count} שנים"
         one: "כמעט שנה"
         other: "כמעט %{count} שנים"
+        two: "כמעט %{count} שנים"
       half_a_minute: "חצי דקה"
       less_than_x_minutes: 
+        many: "פחות מ%{count} דקות"
         one: "פחות מדקה"
         other: "פחות מ%{count} דקות"
+        two: "פחות מ%{count} דקות"
       less_than_x_seconds: 
+        many: "פחות מ%{count} שניות"
         one: "פחות משנייה"
         other: "פחות מ%{count} שניות"
+        two: "פחות מ%{count} שניות"
       over_x_years: 
+        many: "מעל %{count} שנים"
         one: "יותר משנה"
         other: "מעל %{count} שנים"
+        two: "מעל %{count} שנים"
       x_days: 
+        many: "%{count} ימים"
         one: יום
         other: "%{count} ימים"
+        two: "%{count} ימים"
       x_minutes: 
+        many: "%{count} דקות"
         one: דקה
         other: "%{count} דקות"
+        two: "%{count} דקות"
       x_months: 
+        many: "%{count} חודשים"
         one: חודש
         other: "%{count} חודשים"
+        two: "%{count} חודשים"
       x_seconds: 
+        many: "%{count} שניות"
         one: שנייה
         other: "%{count} שניות"
+        two: "%{count} שניות"
     prompts: 
       day: יום
       hour: שעה
@@ -6020,17 +6150,23 @@ he:
       due_date: "תאריך יעד %{date}"
       for: עבור
       graded_discussion_and_points: 
+        many: "זהו דיון מוערך: *%{count} נקודות אפשריות*"
         one: "זהו דיון מוערך: *נקודה אחת אפשרית*"
         other: "זהו דיון מוערך: *%{count} נקודות אפשריות*"
+        two: "זהו דיון מוערך: *%{count} נקודות אפשריות*"
       show_due_dates: "הצגת תאריכי יעד"
       until: "עד אשר"
     cannot_unpublish_with_replies: "אין אפשרות לבטל פרסום אם תלמידים כבר השיבו"
     confirm_delete_announcement: 
+      many: "האם את/ה בטוח/ה שרוצה לבטל את %{count} ההכרזות האלה?"
       one: "האם את/ה בטוח/ה שרוצה לבטל את ההכרזה הזו?"
       other: "האם את/ה בטוח/ה שרוצה לבטל את %{count} ההכרזות האלה?"
+      two: "האם את/ה בטוח/ה שרוצה לבטל את %{count} ההכרזות האלה?"
     confirm_delete_discussion_topic: 
+      many: "האם את/ה בטוח/ה שרוצה לבטל את %{count} נושאי דיון אלה?"
       one: "האם את/ה בטוח/ה שרוצה לבטל את נושא השיחה הזה?"
       other: "האם את/ה בטוח/ה שרוצה לבטל את %{count} נושאי דיון אלה?"
+      two: "האם את/ה בטוח/ה שרוצה לבטל את %{count} נושאי דיון אלה?"
     create_new_crumb: "יצירת חדש"
     default_discussion_title: "אין כותרת"
     deleted_topic_notice: "הנושא בוטל"
@@ -6098,8 +6234,10 @@ he:
       make_side_comment: "הוספת הערת אגב..."
       reply_to_message: "הוספת הערת אגב"
       show_more_entries: 
+        many: "הצגת %{count} מופעים נוספים"
         one: "הצגת מופע נוסף"
         other: "הצגת %{count} מופעים נוספים"
+        two: "הצגת %{count} מופעים נוספים"
     error_draft_state_unauthorized: "אין לך הרשאות להגדיר נושא זה במצב טיוטה"
     error_draft_state_with_posts: "אין להגדיר נושא זה כטיוטה כיון שהוא כולל פרסומים"
     error_group_announcement: "אין אפשרות להשתמש בדיון קבוצתי להכרזה זו"
@@ -6259,8 +6397,10 @@ he:
     hide_due_dates: "הסתרת תאריכי יעד"
     initial_post_required_to_subscribe: "יש לפרסם תגובה לפני הרשמה"
     like_count: 
+      many: "(%{count} לייקים)"
       one: "(%{count} לייקים)"
       other: "(%{count} לייקים)"
+      two: "(%{count} לייקים)"
     mark_as_read: "סימון כנקרא"
     mark_as_unread: "סימון כלא נקרא"
     no_content: "חסר תכן"
@@ -6290,8 +6430,10 @@ he:
       unknown_author: "עורכ/ת לא ידוע/ה"
       view_in_discussion: "עיון בדיון"
     show_all_n_replies: 
+      many: "הצגת כל %{count} התגובות"
       one: "הצגת תגובה אחת"
       other: "הצגת כל %{count} התגובות"
+      two: "הצגת כל %{count} התגובות"
     show_due_dates: "הצגת תאריכי יעד"
     subscribe: "הרשמה לנושא זה"
     subscribed: "רשום "
@@ -6445,8 +6587,10 @@ he:
   edit_outcome_group_f82e0210: "עריכת קבוצת השגים"
   edit_pagetitle_cd8abab9: "עריכת %{pageTitle}"
   edit_permissions_for_count_items_d65e3855: 
+    many: "עריכת הרשאות עבור %{count} פריטים"
     one: "עריכת הרשאות עבור: %{itemName}"
     other: "עריכת הרשאות עבור %{count} פריטים"
+    two: "עריכת הרשאות עבור %{count} פריטים"
   edit_quiz_ededddd8: "עריכת בוחן"
   edit_rating_c2ac31e5: "עריכת דירוג"
   edit_role_1e96ad20: "עריכת תפקיד"
@@ -6456,8 +6600,10 @@ he:
       update_rubric: "עדכון רובריקה"
     change: שינוי
     discussion_points_possible: 
+      many: "%{count} נקודות אפשריות"
       one: " נקודה %{count} אפשרית"
       other: "%{count} נקודות אפשריות"
+      two: "%{count} נקודות אפשריות"
     errors: 
       load_rubrics_failed: "טעינת רובריקות נכשלה, אנא נסו שוב"
     leave_different: "השאר/י שונה"
@@ -6709,8 +6855,10 @@ he:
     edit_link_text: "%{edit_icon} עריכת דף זה"
     eportfolio: 
       entry_count: 
+        many: "*%{count}* דפים"
         one: "דף *אחד*"
         other: "*%{count}* דפים"
+        two: "*%{count}* דפים"
       updated_at: "עודכן לאחרונה ב %{updated_at}"
     help_link_text: "%{help_icon} איך אפשר..?"
     manage_pages_link_text: "ארגון/ניהול דפים"
@@ -6760,8 +6908,10 @@ he:
     show: 
       add_submission: "כדי ליצור דף חדש להגשה זו, יש לבחור הקבצה ולהזין את השם לדף חדש זה."
       attachment_count: 
+        many: "%{count} תצריפים"
         one: "תצריף אחד"
         other: "%{count} תצריפים"
+        two: "%{count} תצריפים"
       buttons: 
         add_comment: "הוספת הערה"
         add_page: "הוספת דף"
@@ -6774,8 +6924,10 @@ he:
         upload_file: "בחירת/העלאת קובץ"
       current_pages: "דפים נוכחיים"
       delete_confirm: 
+        many: "יש לך כעת %{count} דפים ב ePortfolio. האם את/ה בטוח/ה שרוצה לבטל את כל ה ePortfolio?"
         one: "יש לך כעת דף 1אחד ב ePortfolio. האם את/ה בטוח/ה שרוצה לבטל את ה ePortfolio?"
         other: "יש לך כעת %{count} דפים ב ePortfolio. האם את/ה בטוח/ה שרוצה לבטל את כל ה ePortfolio?"
+        two: "יש לך כעת %{count} דפים ב ePortfolio. האם את/ה בטוח/ה שרוצה לבטל את כל ה ePortfolio?"
       headers: 
         add_content: "הוספת תוכן"
         export_progress: "אוסף את מקורות ה ePortfolio. הדבר יכול לארוך זמן מה אם ישנם קבצים רבים ב ePortfolio שלך"
@@ -6955,14 +7107,20 @@ he:
       required: "חייב להתקיים"
       taken: "כבר בשימוש"
       too_long: 
+        many: "ארוך מדי (צריך לכל היותר %{count} תווים)"
         one: "ארוך מדי. (מותר לכל היותר תו אחד)"
         other: "ארוך מדי (צריך לכל היותר %{count} תווים)"
+        two: "ארוך מדי (צריך לכל היותר %{count} תווים)"
       too_short: 
+        many: "קצר מדי (צריך לפחות  %{count} תווים)"
         one: "קצר מדי. (נדרש לפחות תו אחד)"
         other: "קצר מדי (צריך לפחות  %{count} תווים)"
+        two: "קצר מדי (צריך לפחות  %{count} תווים)"
       wrong_length: 
+        many: "אורך לא מתאים (צריך להיות %{count} תווים)"
         one: "אורך לא מתאים. (צריך להיות בן תו אחד)"
         other: "אורך לא מתאים (צריך להיות %{count} תווים)"
+        two: "אורך לא מתאים (צריך להיות %{count} תווים)"
     no_attached_file: "יש לצרף לפחות קובץ אחד להגשה זו."
     notices: 
       error_reported: "תודה על עזרתך! מיד נתחיל לטפל בזה"
@@ -7409,8 +7567,10 @@ he:
     one: "נמצא קישור אחד לא תקין"
     other: "נמצאו %{count} קישורים לא תקינים"
   found_count_unresponsive_links_d1791380: 
+    many: "נמצאו %{count} קישורים שאינם מגיבים"
     one: "נמצא קישור אחד שאינו מגיב"
     other: "נמצאו %{count} קישורים שאינם מגיבים"
+    two: "נמצאו %{count} קישורים שאינם מגיבים"
   france_33_90b595d7: צרפת(+33)
   from_date_must_be_before_to_date_79f00046: "תאריך תחילה צריך להיות קודם לתאריך סיום"
   from_fdd4956d: מ-
@@ -7505,8 +7665,10 @@ he:
       no_students_in_groups_close: "לצערנו, הגשות של משימה זו לא ניתן להעריך ב Speedgrader  כיון שאין משתמשים מוקצים. יש להקצות משתמשים לאוסף קבוצות זה ולנסות מחדש. לסגירת חלון זה יש להקיש כן (OK) "
       no_students_in_section: "לא נמצאו תלמידים בהקבצה זו. חזרה להצגת כלל ההקבצות"
       scores_updated: 
+        many: "%{count} ציוני תלמידים עודכנו"
         one: "ציון של תלמיד אחד עודכן"
         other: "%{count} ציוני תלמידים עודכנו"
+        two: "%{count} ציוני תלמידים עודכנו"
     all_sections: "כל ההקבצות"
     allow_message: "הקלק/י על הכפתור \"אפשר\" כדי להתחיל בהקלטה."
     begin_record_prompt: "הקלק/י על הכפתור \"הקלטה\" כדי להתחיל. "
@@ -7942,8 +8104,10 @@ he:
       unauthorized: "אין לך הרשאה לעיין ברשימת הנוכחות של קורס זה."
       updated: "הגשת המשימה עודכנה בהצלחה"
       uploaded: 
+        many: "קבצים והערות נוצרו עבור %{count} הגשות"
         one: "קבצים והערות נוצרו עבור ההגשה"
         other: "קבצים והערות נוצרו עבור %{count} הגשות"
+        two: "קבצים והערות נוצרו עבור %{count} הגשות"
     out_of_final: "%{weight} מתוך הסופי"
     out_of_points_possible: "מ-%{points_possible}"
     react_gradebook: 
@@ -8055,13 +8219,17 @@ he:
         present: "סומן כנוכח, הקלק/י לפרטים נוספים"
     submissions_zip_upload: 
       comments_made: 
+        many: "%{count} הערות נכתבו"
         one: "הערה אחת נכתבה"
         other: "%{count} הערות נכתבו"
+        two: "%{count} הערות נכתבו"
       done: "בוצע! לקחנו את הקבצים שהעלית וצירפנו בתוספת הערה קצרה לכל דף הגשת תלמיד למשימה זו. התלמידים יקבלו תזכורת שנוספה הערה חדשה."
       failures: "לא ידענו מה לעשות עם חלק מהקבצים . הם לא נתווספו לדף ההגשות של אף אחד. ניתן לעיין ברשימה שלהם שבצד."
       files_ignored: 
+        many: "%{count} קבצים לא הובאו בחשבון"
         one: "קובץ אחד הושמט"
         other: "%{count} קבצים לא הובאו בחשבון"
+        two: "%{count} קבצים לא הובאו בחשבון"
       header: 
         ignored_files: "הקבצים הבאים לא הובאו בחשבון"
       headers: 
@@ -8087,8 +8255,10 @@ he:
   gradezilla: 
     alerts: 
       scores_updated: 
+        many: "%{count} ציוני תלמידים עודכנו"
         one: "ציוני תלמיד אחד עודכנו"
         other: "%{count} ציוני תלמידים עודכנו"
+        two: "%{count} ציוני תלמידים עודכנו"
     all_sections: "כל ההקבצות"
     course_average: "ממוצע קורס"
     course_median: "חציון של הקורס"
@@ -8683,20 +8853,30 @@ he:
       peer_review_label: "ביקור בדף ביקורות עמיתים לקורס"
       x_more: "%{x} יותר..."
       x_new_in_announcements: 
+        many: "*%{count}* הכרזות"
         one: "הכרזה *אחת* "
         other: "*%{count}* הכרזות"
+        two: "*%{count}* הכרזות"
       x_new_in_assignments: 
+        many: "*%{count}* התראות משימה"
         one: "התראת משימה *אחת*"
         other: "*%{count}* התראות משימה"
+        two: "*%{count}* התראות משימה"
       x_new_in_conversations: 
+        many: "*%{count}* הודעות שיחה"
         one: "הודעת שיחה *אחת*"
         other: "*%{count}* הודעות שיחה"
+        two: "*%{count}* הודעות שיחה"
       x_new_in_discussions: 
+        many: "*%{count}* דיונים"
         one: "דיון *אחד*"
         other: "*%{count}* דיונים"
+        two: "*%{count}* דיונים"
       x_new_in_peer_reviews: 
+        many: "*%{count}* ביקורות עמיתים"
         one: "ביקורת עמיתים *אחת*"
         other: "*%{count}* ביקורות עמיתים"
+        two: "*%{count}* ביקורות עמיתים"
     local: מקומי
     select: 
       prompt: "בבקשה לבחור"
@@ -9276,8 +9456,10 @@ he:
         subject: "מענה להודעה נכשל: %{subject}"
     progress_runner: 
       completed_message: 
+        many: "%{count} פריטים עובדו"
         one: "פריט אחד עובד"
         other: "%{count} פריטים עובדו"
+        two: "%{count} פריטים עובדו"
       error_message: "%{error}: %{ids}"
     send_to_inbox: 
       default_subject: "אין נושא"
@@ -9362,8 +9544,10 @@ he:
   loading_courses_409a3641: "טעינת קורסים"
   loading_courses_bd1bffe: "טעינת קורסים..."
   loading_courses_complete_count_courses_found_6768d9e1: 
+    many: "טעינת קורסים הסתיימה: %{count} קורסים נמצאו"
     one: "טעינת קורסים נסתיימה: נמצא קורס אחד"
     other: "טעינת קורסים הסתיימה: %{count} קורסים נמצאו"
+    two: "טעינת קורסים הסתיימה: %{count} קורסים נמצאו"
   loading_courses_started_6e6d742c: "טעינת קורסים החלה"
   loading_data_ecd89ba: "טוען נתונים..."
   loading_graders_f6a76142: "טוען בוחנים"
@@ -9725,18 +9909,26 @@ he:
     alert: 
       email: 
         body: 
+          many: "התראה נשלחה ל %{student} כיון שתנאים אלו נתקיימו:"
           one: "התראה נשלחה ל %{student} כיון שתנאי זה נתקיים:"
           other: "התראה נשלחה ל %{student} כיון שתנאים אלו נתקיימו:"
+          two: "התראה נשלחה ל %{student} כיון שתנאים אלו נתקיימו:"
         body_student: 
+          many: "התראה נשלחה אליך כיון שתנאים אלו נתקיימו:"
           one: "התראה נשלחה אליך כיון שתנאי זה התקיים:"
           other: "התראה נשלחה אליך כיון שתנאים אלו נתקיימו:"
+          two: "התראה נשלחה אליך כיון שתנאים אלו נתקיימו:"
         html: 
           body: 
+            many: "התראה נשלחה ל %{student} כיון שתנאים אלו נתקיימו:"
             one: "התראה נשלחה ל %{student} כיון שתנאי זה התקיים:"
             other: "התראה נשלחה ל %{student} כיון שתנאים אלו נתקיימו:"
+            two: "התראה נשלחה ל %{student} כיון שתנאים אלו נתקיימו:"
           body_student: 
+            many: "התראה נשלחה אליך כיון שתנאים אלו נתקיימו:"
             one: "התראה נשלחה אליך כיון שתנאי זה התקיים:"
             other: "התראה נשלחה אליך כיון שתנאים אלו נתקיימו:"
+            two: "התראה נשלחה אליך כיון שתנאים אלו נתקיימו:"
           interaction_description: "לא היתה אינטרקציה בין תלמיד/מורה במשך %{count} ימים."
           subject: "התראה:  %{user_name}"
           ungraded_count_description: "%{count} או יותר הגשות עדיין לא הוערכו."
@@ -9754,24 +9946,36 @@ he:
         more_info: "פרטים נוספים ב- %{url} "
       summary: 
         body: 
+          many: "התראה נשלחה אל %{student} כיון שתנאים אלו נתקיימו:"
           one: "התראה נשלחה ל %{student} כיון שתנאי זה התקיים:"
           other: "התראה נשלחה אל %{student} כיון שתנאים אלו נתקיימו:"
+          two: "התראה נשלחה אל %{student} כיון שתנאים אלו נתקיימו:"
         body_student: 
+          many: "התראה נשלחה אליך כיון שתנאים אלו נתקיימו:"
           one: "התראה נשלחה אליך כיון שתנאי זה התקיים:"
           other: "התראה נשלחה אליך כיון שתנאים אלו נתקיימו:"
+          two: "התראה נשלחה אליך כיון שתנאים אלו נתקיימו:"
         interaction_description: 
+          many: "לא התקיימה אינטרקציה בין מורה/תלמיד במשך  %{count} או יותר ימים"
           one: "לא התקיימה אינטרקציה בין מורה/תלמיד במשך יום אחד"
           other: "לא התקיימה אינטרקציה בין מורה/תלמיד במשך  %{count} או יותר ימים"
+          two: "לא התקיימה אינטרקציה בין מורה/תלמיד במשך  %{count} או יותר ימים"
         subject: "התראה:  %{user_name} "
         ungraded_count_description: 
+          many: "%{count} או יותר משימות לא הוערכו"
           one: " משימות אחת או יותר לא הוערכו"
           other: "%{count} או יותר משימות לא הוערכו"
+          two: "%{count} או יותר משימות לא הוערכו"
         ungraded_timespan_description: 
+          many: "אחת או יותר מההגשות נותרו ללא הערכה במשך %{count} או יותר ימים"
           one: "אחת או יותר מההגשות נותרו ללא הערכה במשך יום אחד או יותר"
           other: "אחת או יותר מההגשות נותרו ללא הערכה במשך %{count} או יותר ימים"
+          two: "אחת או יותר מההגשות נותרו ללא הערכה במשך %{count} או יותר ימים"
         usernote_description: 
+          many: "אין מופעי יומן פקולטה במשך %{count} או יותר ימים"
           one: "אין מופעי יומן פקולטה במשך יום אחד או יותר"
           other: "אין מופעי יומן פקולטה במשך %{count} או יותר ימים"
+          two: "אין מופעי יומן פקולטה במשך %{count} או יותר ימים"
       twitter: 
         body: "התראה נוצרה עבור %{student} "
         body_student: "התראה נוצרה עבורך "
@@ -11284,8 +11488,10 @@ he:
       twitter: 
         tweet: "התראת קנבס - הקלטה מוכנה: %{title}, %{name}"
   messages_deleted_8f781481: 
+    many: "ההודעה בוטלה!"
     one: "ההודעה בוטלה!"
     other: "ההודעה בוטלה!"
+    two: "ההודעה בוטלה!"
   mexico_52_60d635c7: "מכסיקו (+52)"
   mexico_b2d7a271: מקסיקו
   mgp_grade_export_d29b471f: "ייצוא ציונים ל MPG"
@@ -11391,8 +11597,10 @@ he:
       cancel: ביטול
       creating: יוצר...
     assignments_to_grade: 
+      many: "%{count} משימות עם הגשות שלא הוערכו"
       one: "משימוה עם הגשות שלא הוערכה"
       other: "%{count} משימות עם הגשות שלא הוערכו"
+      two: "%{count} משימות עם הגשות שלא הוערכו"
     assignments_to_post: 
       one: "את/ה מוכן/ה לפרסם משימה אחת."
       other: "את/ה מוכן/ה לפרסם %{count} משימות."
@@ -11513,8 +11721,10 @@ he:
   multiple_due_dates_6b0d75c6: "תאריכי יעד מרובים"
   multiple_modules_930713d4: "מודולים מרובים"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
+    many: "חובת השגת רמת מומחה לפחות %{count} פעמים. ציונים מעבר לרמת המומחה יחושבו כממוצע עבור הציון הסופי"
     one: "חובת השגת רמת מומחה לפחות פעם אחת. ציונים מעבר לרמת המומחה יחושבו כממוצע עבור הציון הסופי"
     other: "חובת השגת רמת מומחה לפחות %{count} פעמים. ציונים מעבר לרמת המומחה יחושבו כממוצע עבור הציון הסופי"
+    two: "חובת השגת רמת מומחה לפחות %{count} פעמים. ציונים מעבר לרמת המומחה יחושבו כממוצע עבור הציון הסופי"
   must_be_a_valid_number_59f0069: "חייב להיות מספר תקין"
   must_be_after_start_date_95e251a3: "חייב להיות מאוחר מתאריך התחלה"
   must_be_on_or_after_end_date_e4dda631: "חייב להיות בתאריך סיום או לאחריו"
@@ -11991,8 +12201,10 @@ he:
         format: "%n %u"
         units: 
           byte: 
+            many: בתים
             one: בייט
             other: בתים
+            two: בתים
           gb: ג'יגהבייט
           kb: קילובייט
           mb: מגהבייט
@@ -12230,11 +12442,15 @@ he:
     top_level: "%{context} רמה עליונה"
     user_outcome_results: 
       artifacts: 
+        many: "%{count} חפצים"
         one: "מוצג אחד"
         other: "%{count} חפצים"
+        two: "%{count} חפצים"
       attempts: 
+        many: "%{count} נסיונות"
         one: "נסיון אחד"
         other: "%{count} נסיונות"
+        two: "%{count} נסיונות"
       attempts_from_artifacts: "%{attempts} *מתוך %{artifacts}*"
       labels: 
         see_results: "ראו תוצאות של %{user_name}  עבור"
@@ -13298,17 +13514,25 @@ he:
     bookmarking: מסמן...
     buttons: 
       submit_copying: 
+        many: "מעתיק שאלות..."
         one: "מעתיק שאלה..."
         other: "מעתיק שאלות..."
+        two: "מעתיק שאלות..."
       submit_copying_failed: 
+        many: "העתקת שאלות נכשלה. יש לנסות שוב."
         one: "העתקת השאלה נכשלה. יש לנסות שוב."
         other: "העתקת שאלות נכשלה. יש לנסות שוב."
+        two: "העתקת שאלות נכשלה. יש לנסות שוב."
       submit_moving: 
+        many: "העברת שאלות..."
         one: "העברת השאלה..."
         other: "העברת שאלות..."
+        two: "העברת שאלות..."
       submit_moving_failed: 
+        many: "העברת שאלות נכשלה, יש לנסות שוב."
         one: "העברת שאלה נכשלה, יש לנסות שוב."
         other: "העברת שאלות נכשלה, יש לנסות שוב."
+        two: "העברת שאלות נכשלה, יש לנסות שוב."
       submit_retry_copying: "העתקת שאלה נכשלה, יש לנסות שוב..."
       submit_retry_moving: "העברת שאלה נכשלה, יש לנסות שוב..."
     default_name: "אין שם"
@@ -13348,8 +13572,10 @@ he:
       no_name: "אין שם "
       no_questions: "אין שאלות"
       question_count: 
+        many: "%{count} שאלות"
         one: "שאלה אחת"
         other: "%{count} שאלות"
+        two: "%{count} שאלות"
       unbookmark_bank: "ביטול סימון בנק שאלות זה"
     question_teaser: 
       full_details: "הקלק/י להצגת פרטי השאלה המלאים"
@@ -13412,13 +13638,17 @@ he:
       page_blurred: "הצגת דף קנבס של המענה לבחינה נפסקה..."
       page_focused: חודש/ה.
       question_answered: 
+        many: "השאלות לגביהן נתקבלו תשובות:"
         one: "השאלה לגביה נתקבלה תשובה:"
         other: "השאלות לגביהן נתקבלו תשובות:"
+        two: "השאלות לגביהן נתקבלו תשובות:"
       question_flagged: "שאלה מסומנת:"
       question_unflagged: "שאלה לא מסומנת:"
       question_viewed: 
+        many: "השאלות הבאות נצפו (ויתכן שנקראו):"
         one: "השאלה שנצפתה (ויתכן שנקראה):"
         other: "השאלות הבאות נצפו (ויתכן שנקראו):"
+        two: "השאלות הבאות נצפו (ויתכן שנקראו):"
       session_started: "הפעילות החלה"
     inverted_table_view: 
       headers: 
@@ -13507,16 +13737,22 @@ he:
     discrimination_index_help: "* המדד הזה מספק מדידה של ההבדל (או מפלה) בין תלמידים אשר הצטיינו במבחן לבין אלו שלא, על בסיס של שאלה אחת מתוך המבחן. * ** הוא מחלק תלמידים לשלש קבוצות על בסיס הציון של כלל הבוחן ומציג קבוצות אלו לפי המענה הנכון לשאלה. ** *** ***מידע נוסף זמין כאן.*** ***"
     download_submissions: "הורדת כל הקבצים"
     duration_in_hours: 
+      many: "%{count} שעות"
       one: "שעה אחת"
       other: "%{count} שעות"
+      two: "%{count} שעות"
     duration_in_hours_and_minutes: "%{hours} ו %{minutes}"
     duration_in_minutes: 
+      many: "%{count} דקות"
       one: "%{count} דקות"
       other: "%{count} דקות"
+      two: "%{count} דקות"
     duration_in_minutes_and_seconds: "%{minutes}  ו %{seconds}"
     duration_in_seconds: 
+      many: "%{count} שניות"
       one: "שניה אחת"
       other: "%{count} שניות"
+      two: "%{count} שניות"
     empty_question_breakdown: "אין סטטיסטיקות זמינות לשאלה."
     loading_questions: "סטטיסטיקות שאלה נטענות. נא להמתין"
     no_answer: "אין תשובה"
@@ -13547,13 +13783,17 @@ he:
     alerts: 
       no_valid_combinations: "המערכת לא הצליחה לייצר צרופים ולידיים כלשהם מהפרמטרים שסופקו."
       only_n_valid_combinations: 
+        many: "המערכת יכלה לייצר רק %{count} צירופים תקינים לפרמטרים שסופקו"
         one: "המערכת יכלה לייצר רק צירף אחד תקין לפרמטרים שסופקו"
         other: "המערכת יכלה לייצר רק %{count} צירופים תקינים לפרמטרים שסופקו"
+        two: "המערכת יכלה לייצר רק %{count} צירופים תקינים לפרמטרים שסופקו"
     answer_comments: "הערות לתשובה"
     answer_text: "מלל תשובה"
     assignment_points_possible: 
+      many: "%{count} נקודות"
       one: "נקודה אחת"
       other: "%{count} נקודות"
+      two: "%{count} נקודות"
     at_the_bottom: "-- בתחתית --"
     before_quiz_item: "לפני %{name}"
     buttons: 
@@ -13686,8 +13926,10 @@ he:
         server_communication_failed: "היתה בעית תקשורת עם השרת. המערכת תנסה שוב בעוד חמש דקות, או שאפשר לנסות לטעון את הדף מחדש."
       extensions_for_student: "הארכות לתלמיד %{student}"
       extensions_for_students: 
+        many: "הארכות ל %{count} תלמידים"
         one: "הארכות לתלמיד/ה אחד/ת"
         other: "הארכות ל %{count} תלמידים"
+        two: "הארכות ל %{count} תלמידים"
       finished_in_duration: "נסתיים תוך %{duration}"
       time_up: "נסתיים הזמן!"
       titles: 
@@ -13706,8 +13948,10 @@ he:
       positive_points: "חייב להיות אפס או יותר"
     question_colon: "שאלה:"
     question_count: 
+      many: "%{count} שאלות"
       one: "שאלה אחת"
       other: "%{count} שאלות"
+      two: "%{count} שאלות"
     question_limit_reached: |-
         הגעת לכמות המרבית של שאלות המותרות לבוחן  (%{count}/%{limit}).
         
@@ -13965,8 +14209,10 @@ he:
         buttons: 
           allow_extra_attempt: "לאפשר לתלמיד זה נסיון נוסף"
         count_attempts_left: 
+          many: "ל %{user} נותרו %{count} נסיונות"
           one: "ל %{user} נותר נסיון אחד"
           other: "ל %{user} נותרו %{count} נסיונות"
+          two: "ל %{user} נותרו %{count} נסיונות"
         default_quiz_name: "בוחן %{course_name}"
         default_survey_name: "סקר %{course_name}"
         grade_by_question_warning: "התכונה של ציון לפי שאלה מושפעת משאלות אשר מעורבבות אקראית לקבוצה."
@@ -14055,8 +14301,10 @@ he:
         page_title: "פיקוח על הבוחן"
         reload_student_table: "טעינ מחודשת של טבלת התלמיד"
         student_gets_extra_time: 
+          many: "*%{student_name}* **מקבל תוספת %{count} דקות לכל נסיון**"
           one: "*%{student_name}* **מקבל תוספת של דקה אחת לכל נסיון**"
           other: "*%{student_name}* **מקבל תוספת %{count} דקות לכל נסיון**"
+          two: "*%{student_name}* **מקבל תוספת %{count} דקות לכל נסיון**"
         student_n: "תלמיד %{n}"
         submitting: מבצע...
         titles: 
@@ -14156,11 +14404,15 @@ he:
         no_submission_for_user: "אין הגשות זמינות למשתמש זה"
         quiz_updated: "הבוחן עודכן בהצלחה"
         quizzes_published: 
+          many: "%{count} בחנים פורסמו בהצלחה!"
           one: "בוחן אחד פורסם בהצלחה!"
           other: "%{count} בחנים פורסמו בהצלחה!"
+          two: "%{count} בחנים פורסמו בהצלחה!"
         quizzes_unpublished: 
+          many: "%{count} בחנים הוסרו מפירסום בהצלחה!"
           one: "בוחן אחד הוסר מפירסום בהצלחה!"
           other: "%{count} בחנים הוסרו מפירסום בהצלחה!"
+          two: "%{count} בחנים הוסרו מפירסום בהצלחה!"
         submission_doesnt_count: "בוחן זה לא יכלל יותר בחישוב הציון שלך"
       question_group: 
         buttons: 
@@ -14214,8 +14466,10 @@ he:
         none: "אף אחד"
         requires_lockdown: "דורש דפדפן Respondus LockDown "
         time_limit: 
+          many: "%{count} דקות"
           one: "דקה אחת"
           other: "%{count} דקות"
+          two: "%{count} דקות"
         unlimited: "בלתי מוגבל"
       quiz_edit_details: 
         labels: 
@@ -14223,11 +14477,15 @@ he:
           quiz_score: ציון
       quiz_right_side: 
         attempts_left: 
+          many: "%{count} נסיונות נוספים אפשריים"
           one: "נסיון אחד נוסף אפשרי"
           other: "%{count} נסיונות נוספים אפשריים"
+          two: "%{count} נסיונות נוספים אפשריים"
         attempts_so_far: 
+          many: "%{count} נסיונות עד כה"
           one: "נסיון אחד עד כה"
           other: "%{count} נסיונות עד כה"
+          two: "%{count} נסיונות עד כה"
         labels: 
           current_score: "ניקוד נוכחי"
           kept_score: "הציון נשמר"
@@ -14266,8 +14524,10 @@ he:
         show_correct_answers: "הצגת תשובות נכונות"
         shuffle_answers: "שינוי אקראי של סדר התשובות "
         time_limit: 
+          many: "%{count} דקות"
           one: "דקה אחת"
           other: "%{count} דקות"
+          two: "%{count} דקות"
         until: "עד אשר"
         view_responses: "הצגת תגובות"
       quiz_submission: 
@@ -14363,13 +14623,17 @@ he:
         manage: ניהול
         only_registered_users: "רק משתמשים שנרשמו יכולים לגשת לבחנים עם הערכה"
         quiz_regraded_your_score_affected: 
+          many: "הבוחן הוערך מחדש. ציונך החדש משקף  %{count} שאלות שהושפעו."
           one: "הבוחן הוערך מחדש; ציונך החדש הושפע."
           other: "הבוחן הוערך מחדש. ציונך החדש משקף  %{count} שאלות שהושפעו."
+          two: "הבוחן הוערך מחדש. ציונך החדש משקף  %{count} שאלות שהושפעו."
         quiz_regraded_your_score_not_affected: "הבוחן הזה הוערך מחדש. ציוניך לא הושפעו"
         speed_grader: SpeedGrader™
         students_submitted_so_far: 
+          many: "%{count} תלמידים הגישו עד כה"
           one: "תלמיד/ה אחד/ת הגיש/ה עד כה"
           other: "%{count} תלמידים הגישו עד כה"
+          two: "%{count} תלמידים הגישו עד כה"
         titles: 
           delete: ביטול
           related_items: "פריטים משויכים"
@@ -14471,8 +14735,10 @@ he:
       confirms: 
         delete_quiz: "האם אתם בטוחים שרוצים לבטל בוחן זה?"
         delete_quiz_submissions_warning: 
+          many: "אזהרה: %{count} תלמידים כבר עשו את הבוחן. אם יתבטל, יבוטלו גם כל ההגשות שהושלמו ולא יופיעו בספר הציונים."
           one: "אזהרה: תלמידים אחד כבר לקח את הבוחן. אם יתבטל, תבוטלנה גם כל ההגשות שהושלמו ולא תופענה בספר הציונים."
           other: "אזהרה: %{count} תלמידים כבר עשו את הבוחן. אם יתבטל, יבוטלו גם כל ההגשות שהושלמו ולא יופיעו בספר הציונים."
+          two: "אזהרה: %{count} תלמידים כבר עשו את הבוחן. אם יתבטל, יבוטלו גם כל ההגשות שהושלמו ולא יופיעו בספר הציונים."
       links: 
         hide_student_quiz_results: "הסתרת תוצאות בוחן תלמיד"
         hide_student_survey_results: "הסתרת תוצאות סקר תלמיד"
@@ -14494,32 +14760,44 @@ he:
         cant_go_back_blank: "אין אפשרות לחזור לשאלה זו לא הקשה על \"הבא\". בטוח/ה שרוצה לעזוב אותה ריקה?"
         navigate_away: "יציאה מהדף. האם להמשיך בכל זאת?"
         unanswered_questions: 
+          many: "יש לך %{count} שאלות שטרם נענו  (פירוט בסרגל הצידי).  לשלוח בכל מקרה?"
           one: "יש לך שאלה אחת שטרם נענתה  (פירוט בסרגל הצידי).  לשלוח בכל מקרה?"
           other: "יש לך %{count} שאלות שטרם נענו  (פירוט בסרגל הצידי).  לשלוח בכל מקרה?"
+          two: "יש לך %{count} שאלות שטרם נענו  (פירוט בסרגל הצידי).  לשלוח בכל מקרה?"
         unfinished_quiz: "את/ת עומד/ת לעזוב את הבוחן לפני סיומו. להמשיך בכל זאת?"
         unseen_questions: 
+          many: "יש עוד %{count} שאלות שלא ראית.  האם לשלוח בכל זאת"
           one: "ישנה עדיין שאלה שטרם עיינת בה.  האם לשלוח בכל מקרה?"
           other: "יש עוד %{count} שאלות שלא ראית.  האם לשלוח בכל זאת"
+          two: "יש עוד %{count} שאלות שלא ראית.  האם לשלוח בכל זאת"
       days_count: 
+        many: "%{count} ימים"
         one: "יום אחד"
         other: "%{count} ימים"
+        two: "%{count} ימים"
       errors: 
         connection_lost: "התקשורת %{host} השתבשה. נא לבדוק את החיבור לאינטרנט ואז להמשיך."
         only_numerical_values: "רק ערכים מספריים מתקבלים"
       hide_time_link: הסתרה
       hours_count: 
+        many: "%{count} שעות"
         one: "שעה אחת"
         other: "%{count} שעות"
+        two: "%{count} שעות"
       labels: 
         time_elapsed: "הזמן שחלף "
       login_failed: "התחברות נכשלה"
       login_successful: "התחברות הצליחה"
       minutes_count: 
+        many: "%{count} דקות"
         one: "דקה אחת"
         other: "%{count} דקות"
+        two: "%{count} דקות"
       months_count: 
+        many: "%{count} חודשים"
         one: "חודש אחד"
         other: "%{count} חודשים"
+        two: "%{count} חודשים"
       notices: 
         due_date_five_minutes_left: "חמש דקות נותרו עד סימון הבוחן כ\"מאוחר\""
         due_date_one_minute_left: "דקה אחת נותרה לפני שהבוחן יסומן כ\"מאוחר\""
@@ -14535,15 +14813,19 @@ he:
       saving: שומר...
       saving_not_needed: "אין נתונים חדשים לשמירה. נבדק לאחרונה ב %{t}"
       seconds_count: 
+        many: "%{count} שניות"
         one: "שניה אחת"
         other: "%{count} שניות"
+        two: "%{count} שניות"
       show_time_link: הצגה
       titles: 
         come_back_later: "סימנת שאלה זו כדי לחזור אליה מאוחר יותר"
         times_up: "הזמן נגמר!"
       years_count: 
+        many: "%{count} שנים"
         one: "שנה אחת"
         other: "%{count} שנים"
+        two: "%{count} שנים"
     timing: 
       labels: 
         time_elapsed: "הזמן שחלף "
@@ -14588,8 +14870,10 @@ he:
     accept: קבלה
     cancel: ביטול
     confirm_delete_with_contents: 
+      many: "האם את/ה באמת רוצה לבטל %{count} פריטים אלה וכל מה שהם כוללים?"
       one: "האם את/ה בטוח/ה שרוצה לבטל את %{name}? הוא אינו ריק וכל מה שנכלל בתוכו יתבטל גם כן."
       other: "האם את/ה באמת רוצה לבטל %{count} פריטים אלה וכל מה שהם כוללים?"
+      two: "האם את/ה באמת רוצה לבטל %{count} פריטים אלה וכל מה שהם כוללים?"
     created_at: "תאריך יצירה"
     created_at_short: נוצר
     errors: 
@@ -14604,11 +14888,15 @@ he:
     folder_name: "שם תיקיה"
     modified_by: "עודכן ע\"י"
     move_question: 
+      many: "לאן ברצונך להעביר %{count} פריטים אלה?"
       one: "לאן ברצונך להעביר את הפריט %{item}?"
       other: "לאן ברצונך להעביר %{count} פריטים אלה?"
+      two: "לאן ברצונך להעביר %{count} פריטים אלה?"
     move_success: 
+      many: "%{count} פריטים הועברו אל %{destinationFolder}"
       one: "%{item}  הועבר אל %{destinationFolder}"
       other: "%{count} פריטים הועברו אל %{destinationFolder}"
+      two: "%{count} פריטים הועברו אל %{destinationFolder}"
     name: שם
     progress_message: "הורדה בשלבי הכנה: %{percent}% הושלם"
     results_count: "מציג %{num_results} תוצאות חיפוש"
@@ -14632,15 +14920,21 @@ he:
     context_search_placeholder: "הזנת שם, קורס, או קבוצה"
     context_search_title: "שם, קורס או קבוצה"
     groups_count: 
+      many: "%{count} קבוצות"
       one: "קבוצה אחת"
       other: "%{count} קבוצות"
+      two: "%{count} קבוצות"
     no_results: "לא נמצאו תוצאות"
     people_count: 
+      many: "%{count} אנשים"
       one: "אדם אחד"
       other: "%{count} אנשים"
+      two: "%{count} אנשים"
     sections_count: 
+      many: "%{count} הקבצות"
       one: "סעיף אחד"
       other: "%{count} הקבצות"
+      two: "%{count} הקבצות"
   record_media_6637ff19: "הקלטת מדיה"
   record_with_microphone_only_e4ee07aa: "הקלטת שמע בלבד"
   record_with_webcam_af21e07c: "הקלטה במצלמת אינטרנט"
@@ -14942,8 +15236,10 @@ he:
       edit_rubric: "עריכת רובריקה"
       page_title: רובריקות
       points_possible: 
+        many: "%{count} נקודות אפשריות"
         one: "נקודה אפשרית אחת"
         other: "%{count} נקודות אפשריות"
+        two: "%{count} נקודות אפשריות"
       user_rubrics: "רובריקות משתמש"
     loading: טוען...
     show: 
@@ -14964,8 +15260,10 @@ he:
         user_rubrics: "רובריקות משתמש "
       page_title: רובריקות
       points_possible: 
+        many: "%{count} נקודות אפשריות"
         one: "נקודה אחת אפשרית"
         other: "%{count} נקודות אפשריות"
+        two: "%{count} נקודות אפשריות"
       prompts: 
         are_you_sure_delete: "בטוח/ה שרוצה לבטל רובריקה זו? כל קורס הקשור כעת עם רובריקה זו יוכל עדיין לגשת אליה, אך קורסים חדשים לא יוכלו להשתמש בה"
         are_you_sure_remove: "בטוח/ה שרוצה להסיר רובריקה זו מהרשימה שלכם?"
@@ -15198,8 +15496,10 @@ he:
     show: 
       access_limit: "משתמשים יכולים רק להשתתף בקורס בין התאריכים הללו"
       active_enrollment: 
+        many: "%{count} הרשמות פעילות"
         one: "הרשמה פעילה אחת"
         other: "%{count} הרשמות פעילות"
+        two: "%{count} הרשמות פעילות"
       buttons: 
         back_to_course: "חזרה להגדרות הקורס"
         cancel: ביטול
@@ -15211,8 +15511,10 @@ he:
         uncrosslist_section: "ניתוק רישום צולב מהקבצה זו"
         update_section: "עדכון הקבצה"
       completed_enrollment: 
+        many: "%{count} הרשמות שהושלמו"
         one: "הרשמה אחת שהושלמה"
         other: "%{count} הרשמות שהושלמו"
+        two: "%{count} הרשמות שהושלמו"
       crosslist_description: "רישום צולב מאפשר לך ליצור הקבצה בחשבון אחד ואז להעביר אותה לקורס בחשבון אחר. לבנות רישום צולב  לקורס זה, יש צורך למצוא את הקורס אליו רוצים להעביר אותו, בין אם ע\"י כלי חיפוש או בהקלדת  מזהה הקורס."
       decrosslist_description: "הפעולה הזו תעביר את ההקבצה חזרה לקורס המקורי:  **%{course_name}**."
       decrosslist_long_description: "כל הציונים של תלמידים בקורס זה לא יהיו גלויים יותר. ניתן לאחזר את הציונים מאוחר יותר בעזרת החזרת הרישום הצולב של הקורס, אך בינתיים הציונים לתלמידים אלו יגיעו מהקורס המקורי."
@@ -15230,8 +15532,10 @@ he:
         start_at: מתחיל
       override_settings: "הדבר ידרוס את הגדרות כל תאריכי מחצית או קורס שהם"
       pending_enrollment: 
+        many: "%{count} הרשמות ממתינות"
         one: "הרשמה ממתינה אחת"
         other: "%{count} הרשמות ממתינות"
+        two: "%{count} הרשמות ממתינות"
       prompts: 
         are_you_sure_decrosslist: "בטוח/ה שרוצה לבטל את הרישום הצולב של הקבצה זו?"
       run_dates: "נמשך מ %{start_date} עד %{end_date}"
@@ -15253,8 +15557,10 @@ he:
   select_a_predefined_color_c77ab2f5: "בחירת צבע מוגדר מראש"
   select_all_count_9ad54aa1: "חיפוש כולם (%{count})"
   select_all_count_courses_4fc63811: 
+    many: "בחירת כל (%{count}) הקורסים"
     one: "בחירת קורס (%{count}) "
     other: "בחירת כל (%{count}) הקורסים"
+    two: "בחירת כל (%{count}) הקורסים"
   select_all_students_7c2c34b3: "בחירת כל התלמידים"
   select_audio_file_7d905cce: "בחירת קובץ שמע"
   select_calendars_d5fa50b6: "בחירת יומנים"
@@ -15774,8 +16080,10 @@ he:
       recent_activity_in_course: "פעילות אחרונה ב %{course_or_group}"
       unread_column: "לא נקרא"
       unread_count_badge: 
+        many: "%{count} *פריטים שלא נקראו*"
         one: "*פריט שלא נקרא*"
         other: "%{count} *פריטים שלא נקראו*"
+        two: "%{count} *פריטים שלא נקראו*"
     recent_activity_item: 
       close: סגירה
       unread: "לא נקרא"
@@ -15810,8 +16118,10 @@ he:
       messages: 
         locked: "אין אפשרות לשנות רובריקה לאחר שהתחלת להשתמש בה"
         rubric_in_use: 
+          many: "יש לזכור ש %{count} תלמידים כבר הוערכו בעזרת הרובריקה הזו. שינוי שלה ישפיע על ההערכות"
           one: "יש לזכור שתלמיד/ה אחד/ת כבר הוערך/ה בעזרת הרובריקה הזו. שינוי שלה ישפיע על ההערכות."
           other: "יש לזכור ש %{count} תלמידים כבר הוערכו בעזרת הרובריקה הזו. שינוי שלה ישפיע על ההערכות"
+          two: "יש לזכור ש %{count} תלמידים כבר הוערכו בעזרת הרובריקה הזו. שינוי שלה ישפיע על ההערכות"
         rubric_in_use2: "דרגת כבר תלמידים ברובריקה זו. כל שינוי משמעותי יכול להשפיע על תוצאות ההערכה שלהם."
       out_of: "%{points} *מתוך %{total}*"
       rubric: רובריקה
@@ -16283,8 +16593,10 @@ he:
     external_tool: "כלי חיצוני"
     final_point_ratio: " נקודות %{pointRatio}"
     invalid_group_warning: 
+      many: "שימו לב: הציון אינו כולל משימות מהקבוצות %{list_of_group_names} כיון שאין להן נקודות אפשריות"
       one: "שימו לב: הציון אינו כולל משימות מהקבוצה %{list_of_group_names} כיון שאין לה נקודות אפשריות."
       other: "שימו לב: הציון אינו כולל משימות מהקבוצות %{list_of_group_names} כיון שאין להן נקודות אפשריות"
+      two: "שימו לב: הציון אינו כולל משימות מהקבוצות %{list_of_group_names} כיון שאין להן נקודות אפשריות"
     media_recordin: "הקלטת מדיה"
     next_object: "%{type} הבא"
     no_assignment: "לא נבחרה אף משימה"
@@ -16366,11 +16678,15 @@ he:
   student_sis_d9f0cd39: "המערכת הבית ספרית SIS של התלמיד"
   student_viewed_document_9065adb8: "מסמך תלמיד שנצפה"
   studentcount_student_scores_updated_232ad7b7: 
+    many: "%{studentCount} ציוני תלמיד עודכנו"
     one: "ציון תלמיד עודכן"
     other: "%{studentCount} ציוני תלמיד עודכנו"
+    two: "%{studentCount} ציוני תלמיד עודכנו"
   studentcount_students_will_get_num_points_fdd43b55: 
+    many: "%{studentCount} תלמידים יקבלו %{num} נקודות"
     one: "תלמיד אחד יקבל %{num} נקודות"
     other: "%{studentCount} תלמידים יקבלו %{num} נקודות"
+    two: "%{studentCount} תלמידים יקבלו %{num} נקודות"
   students_1b8cd07b: תלמידים
   students_are_not_allowed_to_access_test_installati_11b9078: "תלמידים אינם מורשים לגשת להתקנות ניסיוניות"
   students_being_observed_4de3e520: "תלמידים בהשגחה"
@@ -16404,19 +16720,25 @@ he:
     confirms: 
       delete_subaccount: "בטוח/ה שרוצה לבטל חשבון משנה זה?"
     courses_count: 
+      many: "%{count} קורסים"
       one: "קורס אחד"
       other: "%{count} קורסים"
+      two: "%{count} קורסים"
     index: 
       page_header_title: "חשבונות משנה"
       titles: 
         sub_accounts: "חשבונות משנה"
     sub_accounts: 
       account_courses: 
+        many: "%{count} קורסים"
         one: "קורס אחד"
         other: "%{count} קורסים"
+        two: "%{count} קורסים"
       account_sub_accounts: 
+        many: "%{count} חשבונות משנה"
         one: "חשבון משנה אחד"
         other: "%{count} חשבונות משנה"
+        two: "%{count} חשבונות משנה"
       add_sub_accounts: "הוספת חשבון משנה"
       can_not_delete: "אין אפשרות לבטל חשבון משנה שיש לו כבר קורסים "
       delete_sub_account: "ביטול חשבון משנה"
@@ -16424,8 +16746,10 @@ he:
       hide_sub_accounts: "הסתרת חשבונות משנה"
       show_sub_accounts: "הצגת חשבונות משנה"
     sub_accounts_count: 
+      many: "%{count} חשבונות משנה"
       one: "חשבון משנה אחד"
       other: "%{count} חשבונות משנה"
+      two: "%{count} חשבונות משנה"
   subaccount_91f4c279: "חשבון משנה"
   subdomain_url_1e43b6f0: "כתובת דף של דומיין משנה"
   subject_114b2e98: נושא
@@ -16704,8 +17028,10 @@ he:
         add: "הוספת מחצית"
         update: "עדכון מחצית"
       course_count: 
+        many: "%{count} קורסים"
         one: "קורס אחד"
         other: "%{count} קורסים"
+        two: "%{count} קורסים"
       labels: 
         designers_can_access_from: "**מתכננים** יכולים לגשת מ"
         grading_period_set_title: "אוגדן תקופות הערכה"
@@ -16814,8 +17140,10 @@ he:
   theme_name_68f46e09: "שם ערכת הנושא"
   themes_89bfe9c4: "ערכות נושא"
   there_are_count_results_in_the_list_e74f6e36: 
+    many: "ישנן  %{count} תוצאות ברשימה"
     one: "יש תוצאה אחת ברשימה"
     other: "ישנן  %{count} תוצאות ברשימה"
+    two: "ישנן  %{count} תוצאות ברשימה"
   there_are_currently_no_associated_courses_fba1754f: "אין כרגע קורסים נלווים"
   there_are_no_announcements_for_this_course_5ee649c3: "אין הכרזות לקורס זה."
   there_are_no_available_signups_for_this_course_26b05c56: "אין הרשמות זמינות לקורס זה"
@@ -16941,11 +17269,15 @@ he:
   time: 
     am: "לפני הצהרים"
     count_hours_ago: 
+      many: "לפני %{count} שעות"
       one: "לפני שעה"
       other: "לפני %{count} שעות"
+      two: "לפני %{count} שעות"
     count_minutes_ago: 
+      many: "לפני %{count} דקות"
       one: "לפני דקה"
       other: "לפני %{count} דקות"
+      two: "לפני %{count} דקות"
     due_date: "%{date} לפי %{time}"
     event: "%{date} בשעה %{time}"
     formats: 
@@ -17401,16 +17733,20 @@ he:
   user_list_66428346: "רשימת משתמשים"
   user_lists: 
     add_n_users: 
+      many: "בסדר, נראה טוב. הוספה של %{count} משתמשים אלה"
       one: "בסדר, נראה טוב. הוספ/י משתמש/ת זה/זאת"
       other: "בסדר, נראה טוב. הוספה של %{count} משתמשים אלה"
+      two: "בסדר, נראה טוב. הוספה של %{count} משתמשים אלה"
     adding_users: "מוסיף משתמשים..."
     buttons: 
       continue: המשיכו...
     cant_unenroll: "משתמש זה נרשם באופן אוטומטי באמצעות מערכת הרישום בקמפוס, כך שהוא לא יכול להסיר את עצמו ידנית. יש ליצור קשר עם מנהל המערכת שלך באם ישנן שאלות בנושא."
     delete_confirm: "האם בטוחים שרוצים להסיר משתמש זה?"
     duplicate_users: 
+      many: "%{count} משתמשים כפולים נמצאו. הכפילויות הוסרו."
       one: "משתמש כפול אחד נמצא והוסר"
       other: "%{count} משתמשים כפולים נמצאו. הכפילויות הוסרו."
+      two: "%{count} משתמשים כפולים נמצאו. הכפילויות הוסרו."
     invalid_users_notice: "אולי היו כמה לא תקינים, וצריך לחזור ולתקן את השגיאות"
     just_now: "רק עתה"
     messages: 
@@ -17418,18 +17754,26 @@ he:
     titles: 
       existing_user: "משתמש קיים"
     user_parsing_errors: 
+      many: "אירעו %{count} שגיאות בעת פירוק רשימת המשתמשים הזו."
       one: "אירעה שגיאה אחת בעת פירוק רשימת המשתמשים הזו."
       other: "אירעו %{count} שגיאות בעת פירוק רשימת המשתמשים הזו."
+      two: "אירעו %{count} שגיאות בעת פירוק רשימת המשתמשים הזו."
     users_added: 
+      many: "%{count} משתמשים נוספו"
       one: "משתמש/ת אחד/ת נוסף/ה"
       other: "%{count} משתמשים נוספו"
+      two: "%{count} משתמשים נוספו"
     users_adding_failed: "כשלון ברישום משתמשים"
     users_existed: 
+      many: "(%{count} משתמשים כבר היו קיימים)"
       one: "משתמש/ת אחד/ת כבר היה/היתה קיים/ת"
       other: "(%{count} משתמשים כבר היו קיימים)"
+      two: "(%{count} משתמשים כבר היו קיימים)"
     users_to_add: 
+      many: "אם תמשיך/י כך, %{count} משתמשים יתווספו."
       one: "אם תמשיך/י כך, משתמש/ת אחד/ת ת/יתווסף."
       other: "אם תמשיך/י כך, %{count} משתמשים יתווספו."
+      two: "אם תמשיך/י כך, %{count} משתמשים יתווספו."
   user_logins: 
     buttons: 
       add_login: "הוספת לוג-אין"
@@ -17576,8 +17920,10 @@ he:
     current_conference: 
       current_conference_text: "הוזמנת להצטרף ל **[%{conference}](%{link_to_conference})**. שהתחיל ב %{started_at} וכולל %{participant_count}."
       participant_count: 
+        many: "%{count} משתתפים"
         one: "משתתף/ת אחד/ת"
         other: "%{count} משתתפים"
+        two: "%{count} משתתפים"
     dashboard_sidebar: 
       coming_up: בקרוב
       recent_feedback: "משוב אחרון"
@@ -17607,8 +17953,10 @@ he:
     google_drive_added: "חשבון גוגל דרייב נתווסף בהצלחה!"
     grades: 
       average_grades: 
+        many: "הממוצע ל %{count} תלמידים"
         one: "הממוצע לתלמיד"
         other: "הממוצע ל %{count} תלמידים"
+        two: "הממוצע ל %{count} תלמידים"
       course: קורס
       current_teacher_courses: "קורסים שאני מלמד/ת"
       linked_student_accounts: "חשבונות תלמיד מקושרים"
@@ -17857,8 +18205,10 @@ he:
       periodic_message: "התקנת קנבס הנה לצורך בדיקות בלבד, ותאופס מדי פעם."
       title: "התקנת מערכת הבדיקות של קנבס"
       weekly_message: 
+        many: "התקנת קנבס זו הנה למטרת בדיקות בלבד, ותאופס כל %{count} שבועות"
         one: "התקנת קנבס זו הנה למטרת בדיקות בלבד, ותאופס כל שבוע."
         other: "התקנת קנבס זו הנה למטרת בדיקות בלבד, ותאופס כל %{count} שבועות"
+        two: "התקנת קנבס זו הנה למטרת בדיקות בלבד, ותאופס כל %{count} שבועות"
   watermark_c93fae0d: "כתובית רקע שקופה"
   watermark_opacity_ce3d3097: "שקיפות כתובית רקע"
   watermarks_other_images_e970fc6a: "כתובית רקע ותמונות אחרות"
@@ -18231,8 +18581,10 @@ he:
   your_name_7665e1d8: שמך
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "תמונת הפרופיל שלך לא עלתה. יתכן שחרגת ממגבלות ההעלאה."
   your_search_encountered_the_following_errors_fc3e5e7f: 
+    many: "החיפוש שלך נתקל בשגיאות הבאות:"
     one: "החיפוש שלך נתקל בשגיאה הבאה:"
     other: "החיפוש שלך נתקל בשגיאות הבאות:"
+    two: "החיפוש שלך נתקל בשגיאות הבאות:"
   your_submission_has_not_been_graded_yet_d6963e53: "ההגשה שלך עדיין לא הוערכה."
   your_time_for_this_quiz_has_been_reduced_394652e9: "הזמן שהוקצה לך למשימה זו הופחת."
   yyyy_mm_dd_hh_mm_a01b6081: "YYYY-MM-DD hh:mm"

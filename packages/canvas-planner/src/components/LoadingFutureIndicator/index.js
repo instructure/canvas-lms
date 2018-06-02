@@ -18,7 +18,7 @@
 import React, { Component } from 'react';
 import {bool, func, string} from 'prop-types';
 import Button from '@instructure/ui-core/lib/components/Button';
-import Container from '@instructure/ui-core/lib/components/Container';
+import View from '@instructure/ui-layout/lib/components/View';
 import Spinner from '@instructure/ui-core/lib/components/Spinner';
 import Text from '@instructure/ui-core/lib/components/Text';
 import ErrorAlert from '../ErrorAlert';
@@ -69,13 +69,11 @@ export default class LoadingFutureIndicator extends Component {
 
   renderLoading () {
     if (this.props.loadingFuture && !this.props.allFutureItemsLoaded) {
-      return <Container>
-        <Container display="inline">
-          <Spinner size="small" margin="0 x-small 0 0" title={formatMessage('Loading...')} />
-        </Container>
+      return <View>
+        <Spinner size="small" margin="0 x-small 0 0" title={formatMessage('Loading...')} />
         <Text size="small" color="secondary">
           {formatMessage('Loading...')}</Text>
-      </Container>;
+      </View>;
     }
   }
 
@@ -88,12 +86,12 @@ export default class LoadingFutureIndicator extends Component {
 
   render () {
     return <div>
-      <Container as="div" padding="x-large" textAlign="center">
+      <View as="div" padding="x-large" textAlign="center">
         {this.renderError()}
         {this.renderLoadMore()}
         {this.renderLoading()}
         {this.renderEverythingLoaded()}
-      </Container>
+      </View>
     </div>;
   }
 }

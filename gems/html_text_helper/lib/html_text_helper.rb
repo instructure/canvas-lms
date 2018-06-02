@@ -93,7 +93,7 @@ module HtmlTextHelper
                  rescue URI::Error
                    # do nothing, let src pass through as is
                  end
-                 node['alt'] ? "[#{node['alt']}](#{src})" : src
+                 node['alt'] ? "[#{node['alt']}] (#{src})" : src
                end
              else
                ''
@@ -114,7 +114,7 @@ module HtmlTextHelper
                    rescue URI::Error
                      # do nothing, let href pass through as is
                    end
-                   href == subtext ? subtext : "[#{subtext}](#{href})"
+                   href == subtext ? subtext : "[#{subtext}] (#{href})"
                  end
                else
                  subtext

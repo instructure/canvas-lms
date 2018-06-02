@@ -50,6 +50,7 @@ module LtiOutbound
       hash['ext_ims_lis_basic_outcome_url'] = legacy_outcome_service_url
       hash['ext_outcome_data_values_accepted'] = assignment.return_types.join(',')
       hash['ext_outcome_result_total_score_accepted'] = true
+      hash['ext_outcome_submission_submitted_at_accepted'] = true
       hash['ext_outcomes_tool_placement_url'] = lti_turnitin_outcomes_placement_url
 
       add_assignment_substitutions!(assignment)

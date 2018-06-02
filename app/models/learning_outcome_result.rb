@@ -109,10 +109,10 @@ class LearningOutcomeResult < ActiveRecord::Base
   scope :for_user, lambda { |user| where(:user_id => user) }
   scope :custom_ordering, lambda { |param|
     orders = {
-      'recent' => "assessed_at DESC",
-      'highest' => "score DESC",
-      'oldest' => "score ASC",
-      'default' => "assessed_at DESC"
+      'recent' => {:assessed_at => :desc},
+      'highest' => {:score => :desc},
+      'oldest' => {:score => :asc},
+      'default' => {:assessed_at => :desc}
     }
     order_clause = orders[param] || orders['default']
     order(order_clause)

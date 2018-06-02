@@ -39,7 +39,8 @@ import ColumnHeaders from 'compiled/react_files/components/ColumnHeaders'
           'ef-usage-rights-col-offset': (column.property === 'usage_rights')
         });
 
-        const href = `${this.props.pathname}?${$.param(this.queryParamsFor(this.props.query, column.property))}`;
+        const encoded_path = this.props.pathname.split('/').map((part) => window.encodeURIComponent(part)).join('/');
+        const href = `${encoded_path}?${$.param(this.queryParamsFor(this.props.query, column.property))}`;
         const linkProps = {
           className: 'ef-plain-link',
           href

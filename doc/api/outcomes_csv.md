@@ -66,7 +66,7 @@ indicates this is a learning outcome group</td>
 <td>description</td>
 <td>text</td>
 <td></td>
-<td>The description of the learning outcome or learning outcome group.</td>
+<td>The description of the learning outcome or learning outcome group (optional, defaults to blank).</td>
 </tr>
 <tr>
 <td>display_name</td>

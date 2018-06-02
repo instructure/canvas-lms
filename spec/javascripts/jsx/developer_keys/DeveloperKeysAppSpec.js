@@ -19,6 +19,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-addons-test-utils'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
+
 import DeveloperKeysApp from 'jsx/developer_keys/DeveloperKeysApp';
 
 QUnit.module('DevelopersKeyApp',  {
@@ -61,124 +63,152 @@ function clickInheritedTab(componentNode) {
   TestUtils.Simulate.click(inheritedTab)
 }
 
-test('requests more inherited dev keys when the inherited "show all" button is clicked', () => {
-  const list = generateKeyList()
-  const inheritedList = generateKeyList(20)
-  const applicationState = initialApplicationState(list, inheritedList)
-  const getRemainingInheritedDeveloperKeysSpy = sinon.spy()
-  const fakeActions = {
-    getRemainingInheritedDeveloperKeys: getRemainingInheritedDeveloperKeysSpy
+function clickShowAllButton(componentNode, panel = 0) {
+  const buttons = componentNode.querySelectorAll("div[role='tabpanel']")[panel].querySelectorAll('button')
+  TestUtils.Simulate.click(buttons[buttons.length - 1]);
+}
+
+function renderComponent (overrides = {}) {
+  const props = {
+    applicationState: initialApplicationState(),
+    actions: {},
+    store: fakeStore(),
+    ...overrides
   }
-  const component = TestUtils.renderIntoDocument(
-    <DeveloperKeysApp applicationState={applicationState} actions={fakeActions} store={fakeStore()}/>
-  );
+  return TestUtils.renderIntoDocument(<DeveloperKeysApp {...props} />);
+}
+
+test('requests more inherited dev keys when the inherited "show all" button is clicked', () => {
+  const callbackSpy = sinon.spy()
+  const overrides = {
+    applicationState: initialApplicationState(generateKeyList(), generateKeyList(20)),
+    actions: {
+      getRemainingInheritedDeveloperKeys: () => (
+        () => (
+          {
+            then: callbackSpy
+          }
+        )
+      )
+    }
+  }
+  const component = renderComponent(overrides);
   const componentNode = ReactDOM.findDOMNode(component)
 
   clickInheritedTab(componentNode)
+  clickShowAllButton(componentNode, 1)
 
-  const button = componentNode.querySelectorAll("div[role='tabpanel']")[1].querySelector('button')
-  TestUtils.Simulate.click(button);
-
-  ok(getRemainingInheritedDeveloperKeysSpy.called)
+  ok(callbackSpy.called)
 })
 
 test('requests more account dev keys when the account "show all" button is clicked', () => {
-  const list = generateKeyList()
-
-  const applicationState = initialApplicationState(list)
-  const getRemainingDeveloperKeysSpy = sinon.spy()
-  const fakeActions = {
-    getRemainingDeveloperKeys: getRemainingDeveloperKeysSpy
+  const callbackSpy = sinon.spy()
+  const overrides = {
+    applicationState: initialApplicationState(generateKeyList()),
+    actions: {
+      getRemainingDeveloperKeys: () => (
+        () => (
+          {
+            then: callbackSpy
+          }
+        )
+      )
+    }
   }
-  const component = TestUtils.renderIntoDocument(
-    <DeveloperKeysApp applicationState={applicationState} actions={fakeActions} store={fakeStore()}/>
-  );
+  const component = renderComponent(overrides)
   const componentNode = ReactDOM.findDOMNode(component)
 
-  const button = componentNode.querySelectorAll("div[role='tabpanel']")[0].querySelector('button')
-  TestUtils.Simulate.click(button);
+  clickShowAllButton(componentNode)
 
-  ok(getRemainingDeveloperKeysSpy.called)
+  ok(callbackSpy.called)
 })
 
-test('calls the tables focusLastDeveloperKey after loading more account keys', () => {
-  const list = generateKeyList()
-  const applicationState = initialApplicationState(list)
-  const fakeActions = {
-    getRemainingDeveloperKeys: () => {}
+test('calls the tables createSetFocusCallback after loading more account keys', () => {
+  const callbackSpy = sinon.spy()
+  const overrides = {
+    applicationState: initialApplicationState(generateKeyList()),
+    actions: {
+      getRemainingDeveloperKeys: () => (
+        () => (
+          {
+            then: callbackSpy
+          }
+        )
+      )
+    }
   }
-  const component = TestUtils.renderIntoDocument(
-    <DeveloperKeysApp applicationState={applicationState} actions={fakeActions} store={fakeStore()}/>
-  );
+  const component = renderComponent(overrides);
   const componentNode = ReactDOM.findDOMNode(component)
   const focusSpy = sinon.spy()
-  component.mainTableRef.focusLastDeveloperKey = focusSpy
+  component.mainTableRef.createSetFocusCallback = focusSpy
 
-  const button = componentNode.querySelectorAll("div[role='tabpanel']")[0].querySelector('button')
-  TestUtils.Simulate.click(button);
+  clickShowAllButton(componentNode)
 
   ok(focusSpy.called)
 })
 
-test('calls the tables focusLastDeveloperKey after loading more inherited keys', () => {
-  const list = generateKeyList()
-  const inheritedList = generateKeyList()
-
-  const applicationState = initialApplicationState(list, inheritedList)
-  const fakeActions = {
-    getRemainingInheritedDeveloperKeys: () => {}
+test('calls the tables createSetFocusCallback after loading more inherited keys', () => {
+  const callbackSpy = sinon.spy()
+  const overrides = {
+    applicationState: initialApplicationState(generateKeyList(), generateKeyList()),
+    actions: {
+      getRemainingInheritedDeveloperKeys: () => (
+        () => (
+          {
+            then: callbackSpy
+          }
+        )
+      )
+    }
   }
-  const component = TestUtils.renderIntoDocument(
-    <DeveloperKeysApp applicationState={applicationState} actions={fakeActions} store={fakeStore()}/>
-  );
+  const component = renderComponent(overrides);
   const componentNode = ReactDOM.findDOMNode(component)
   const focusSpy = sinon.spy()
 
   clickInheritedTab(componentNode)
-  component.inheritedTableRef.focusLastDeveloperKey = focusSpy
+  component.inheritedTableRef.createSetFocusCallback = focusSpy
 
-  const button = componentNode.querySelectorAll("div[role='tabpanel']")[1].querySelector('button')
-  TestUtils.Simulate.click(button);
+  clickShowAllButton(componentNode, 1)
 
   ok(focusSpy.called)
 })
 
 test('renders the correct keys in the inherited tab', () => {
-  const component = TestUtils.renderIntoDocument(<DeveloperKeysApp applicationState={initialApplicationState()} actions={{}}/>);
+  const component = renderComponent();
   const componentNode = ReactDOM.findDOMNode(component)
   clickInheritedTab(componentNode)
   equal(developerKeyRows(componentNode, 1)[1].querySelector('.details div').innerHTML, 2)
 })
 
 test('only renders inherited keys in the inherited tab', () => {
-  const component = TestUtils.renderIntoDocument(<DeveloperKeysApp applicationState={initialApplicationState()} actions={{}}/>);
+  const component = renderComponent();
   const componentNode = ReactDOM.findDOMNode(component)
   clickInheritedTab(componentNode)
   equal(developerKeyRows(componentNode, 1).length, 2)
 })
 
 test('renders the correct keys in the account tab', () => {
-  const component = TestUtils.renderIntoDocument(<DeveloperKeysApp applicationState={initialApplicationState()} actions={{}}/>);
+  const component = renderComponent();
   const componentNode = ReactDOM.findDOMNode(component)
   equal(developerKeyRows(componentNode, 0)[1].querySelector('.details div').innerHTML, 1)
 })
 
 test('only renders account keys in the account tab', () => {
-  const component = TestUtils.renderIntoDocument(<DeveloperKeysApp applicationState={initialApplicationState()} actions={{}}/>);
+  const component = renderComponent();
   const componentNode = ReactDOM.findDOMNode(component)
 
   equal(developerKeyRows(componentNode, 0).length, 2)
 })
 
 test('renders the account keys tab', () => {
-  const component = TestUtils.renderIntoDocument(<DeveloperKeysApp applicationState={initialApplicationState()} actions={{}}/>);
+  const component = renderComponent();
   const componentNode = ReactDOM.findDOMNode(component)
 
   equal(componentNode.querySelector('div[role="tab"][aria-selected="true"]').textContent, "Account")
 })
 
 test('renders the inherited keys tab', () => {
-  const component = TestUtils.renderIntoDocument(<DeveloperKeysApp applicationState={initialApplicationState()} actions={{}}/>);
+  const component = renderComponent();
   const componentNode = ReactDOM.findDOMNode(component)
 
   equal(componentNode.querySelectorAll('div[role="tab"]')[1].textContent, "Inherited")
@@ -197,7 +227,7 @@ test('displays the show more button', () => {
     },
   };
 
-  const component = TestUtils.renderIntoDocument(<DeveloperKeysApp applicationState={applicationState} actions={{}}/>);
+  const component = renderComponent({ applicationState });
   const componentNode = ReactDOM.findDOMNode(component)
 
   ok(componentNode.innerHTML.includes("Show All Keys"))
@@ -218,7 +248,7 @@ test('renders the list of developer_keys when there are some', () => {
     },
   };
 
-  const component = TestUtils.renderIntoDocument(<DeveloperKeysApp applicationState={applicationState} actions={{}} />);
+  const component = renderComponent({ applicationState });
   const renderedText = ReactDOM.findDOMNode(TestUtils.findRenderedDOMComponentWithTag(component, 'table')).innerHTML;
   ok(renderedText.includes("abc12345678"))
 })
@@ -239,49 +269,73 @@ test('renders the spinner', () => {
     },
   };
 
-  const component = TestUtils.renderIntoDocument(<DeveloperKeysApp applicationState={applicationState} actions={{}} />);
+  const component = renderComponent({ applicationState });
+  const spinner = TestUtils.findRenderedComponentWithType(component, Spinner)
 
-  const renderedText = ReactDOM.findDOMNode(TestUtils.findRenderedDOMComponentWithTag(component, 'svg')).innerHTML;
-
-  ok(renderedText.includes("Loading"))
+  ok(spinner)
 })
 
 test('opens the modal when the create button is clicked', () => {
   const openSpy = sinon.spy()
 
-  const applicationState = {
-    createOrEditDeveloperKey: {},
-    listDeveloperKeys: {
-      listDeveloperKeysPending: true,
-      listDeveloperKeysSuccessful: false,
-      list: [
-        {
-          id: "111",
-          api_key: "abc12345678",
-          created_at: "2012-06-07T20:36:50Z"
-        }
-      ]
+  const overrides = {
+    applicationState: {
+      createOrEditDeveloperKey: {},
+      listDeveloperKeys: {
+        listDeveloperKeysPending: true,
+        listDeveloperKeysSuccessful: false,
+        list: [
+          {
+            id: "111",
+            api_key: "abc12345678",
+            created_at: "2012-06-07T20:36:50Z"
+          }
+        ]
+      },
     },
-  };
-
-  const fakeStore = {
-    dispatch: () => {}
+    actions: {
+      developerKeysModalOpen: openSpy
+    }
   }
 
-  const fakeActions = {
-    developerKeysModalOpen: openSpy
-  }
-
-  const component = TestUtils.renderIntoDocument(
-    <DeveloperKeysApp
-      applicationState={applicationState}
-      actions={fakeActions}
-      store={ fakeStore }
-    />
-  );
+  const component = renderComponent(overrides)
   const componentNode = ReactDOM.findDOMNode(component)
   const button = componentNode.querySelector('.ic-Action-header__Secondary button')
   TestUtils.Simulate.click(button)
 
   ok(openSpy.called)
+})
+
+test('does not have the create button on inherited tab', () => {
+  const openSpy = sinon.spy()
+
+  const overrides = {
+    applicationState: {
+      createOrEditDeveloperKey: {},
+      listDeveloperKeys: {
+        listInheritedDeveloperKeysPending: true,
+        listInheritedDeveloperKeysSuccessful: false,
+        listDeveloperKeysPending: true,
+        listDeveloperKeysSuccessful: false,
+        list: [],
+        inheritedList: [
+          {
+            id: "111",
+            api_key: "abc12345678",
+            created_at: "2012-06-07T20:36:50Z"
+          }
+        ]
+      },
+    },
+    actions: {
+      developerKeysModalOpen: openSpy
+    }
+  }
+
+  const component = renderComponent(overrides)
+  const componentNode = ReactDOM.findDOMNode(component)
+  clickInheritedTab(componentNode)
+  const button = componentNode.querySelector('.ic-Action-header__Secondary button')
+
+  notOk(button)
 })

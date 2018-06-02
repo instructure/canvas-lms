@@ -60,7 +60,7 @@ describe Quizzes::QuizSerializer do
     :allowed_attempts, :one_question_at_a_time, :question_count,
     :points_possible, :cant_go_back, :access_code, :ip_filter, :due_at,
     :lock_at, :unlock_at, :published, :show_correct_answers_at,
-    :hide_correct_answers_at, :show_correct_answers_last_attempt, :question_types,
+    :hide_correct_answers_at, :show_correct_answers_last_attempt,
     :has_access_code
   ].each do |attribute|
 
@@ -624,5 +624,9 @@ describe Quizzes::QuizSerializer do
     quiz.update_attributes(:quiz_type => "survey", :anonymous_submissions => true)
     new_json = quiz_serializer.as_json[:quiz]
     expect(new_json[:anonymous_submissions]).to eq true
+  end
+
+  it "does not include question_types" do
+    expect(json.keys).not_to include(:question_types)
   end
 end

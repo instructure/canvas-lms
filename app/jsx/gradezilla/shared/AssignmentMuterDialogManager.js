@@ -18,25 +18,37 @@
 
 import AssignmentMuter from 'compiled/AssignmentMuter'
 
-  class AssignmentMuterDialogManager {
-    constructor (assignment, url, submissionsLoaded) {
-      this.assignment = assignment;
-      this.url = url;
-      this.submissionsLoaded = submissionsLoaded;
-      this.showDialog = this.showDialog.bind(this);
-      this.isDialogEnabled = this.isDialogEnabled.bind(this);
-    }
+export default class AssignmentMuterDialogManager {
+  constructor(assignment, url, submissionsLoaded, anonymousModeratedMarkingEnabled) {
+    this.assignment = assignment
+    this.url = url
+    this.submissionsLoaded = submissionsLoaded
+    this.anonymousModeratedMarkingEnabled = anonymousModeratedMarkingEnabled
 
-    showDialog (cb) {
-      const assignmentMuter = new AssignmentMuter(
-        null, this.assignment, this.url, null, { openDialogInstantly: true }
-      );
-      assignmentMuter.show(cb);
-    }
-
-    isDialogEnabled () {
-      return this.submissionsLoaded;
-    }
+    this.showDialog = this.showDialog.bind(this)
+    this.isDialogEnabled = this.isDialogEnabled.bind(this)
   }
 
-export default AssignmentMuterDialogManager
+  showDialog(cb) {
+    const assignmentMuter = new AssignmentMuter(null, this.assignment, this.url, null, {
+      openDialogInstantly: true
+    })
+    assignmentMuter.show(cb)
+  }
+
+  isDialogEnabled() {
+    if (!this.submissionsLoaded) {
+      return false
+    }
+
+    if (
+      this.assignment.muted &&
+      this.anonymousModeratedMarkingEnabled &&
+      this.assignment.anonymous_grading
+    ) {
+      return this.assignment.grades_published
+    }
+
+    return true
+  }
+}

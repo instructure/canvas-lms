@@ -18,6 +18,16 @@
 
 
 module PlannerHelper
+  PLANNABLE_TYPES = {
+    'discussion_topic' => 'DiscussionTopic',
+    'announcement' => 'DiscussionTopic',
+    'quiz' => 'Quizzes::Quiz',
+    'assignment' => 'Assignment',
+    'wiki_page' => 'WikiPage',
+    'planner_note' => 'PlannerNote',
+    'calendar_event' => 'CalendarEvent'
+  }.freeze
+
   def planner_meta_cache_key
     ['planner_items_meta', @current_user].cache_key
   end

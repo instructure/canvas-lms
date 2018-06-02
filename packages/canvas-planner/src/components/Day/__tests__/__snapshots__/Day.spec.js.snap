@@ -1,7 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders grouping correctly when having itemsForDay 1`] = `
-<div>
+<div
+  className="planner-day"
+>
   <Heading
     border="none"
     color="inherit"
@@ -108,7 +110,9 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
 `;
 
 exports[`renders the base component with required props 1`] = `
-<div>
+<div
+  className="planner-day"
+>
   <Heading
     border="bottom"
     color="inherit"
@@ -134,13 +138,13 @@ exports[`renders the base component with required props 1`] = `
     </Text>
   </Heading>
   <div>
-    <Container
+    <View
       display="block"
       margin="small 0 0 0"
       textAlign="center"
     >
-      No "To-Do's" for this day yet.
-    </Container>
+      Nothing Planned Yet
+    </View>
   </div>
 </div>
 `;

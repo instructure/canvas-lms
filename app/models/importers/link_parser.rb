@@ -112,10 +112,10 @@ module Importers
         unresolved(:wiki_page, :migration_id => $1)
       elsif url =~ /discussion_topic_migration_id=(.*)/
         unresolved(:discussion_topic, :migration_id => $1)
-      elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/modules/items/(.*)}
-        unresolved(:module_item, :migration_id => $1)
-      elsif url =~ %r{(?:\$CANVAS_OBJECT_REFERENCE\$|\$WIKI_REFERENCE\$)/([^/]*)/(.*)}
-        unresolved(:object, :type => $1, :migration_id => $2)
+      elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/modules/items/([^\?]*)(\?.*)?}
+        unresolved(:module_item, :migration_id => $1, :query => $2)
+      elsif url =~ %r{(?:\$CANVAS_OBJECT_REFERENCE\$|\$WIKI_REFERENCE\$)/([^/]*)/([^\?]*)(\?.*)?}
+        unresolved(:object, :type => $1, :migration_id => $2, :query => $3)
 
       elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/(.*)}
         resolved("#{context_path}/#{$1}")

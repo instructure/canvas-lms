@@ -293,7 +293,7 @@ class GradebooksController < ApplicationController
     @gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
     per_page = Setting.get('api_max_per_page', '50').to_i
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(teacher_notes: true).first
-    ag_includes = [:assignments, :assignment_visibility]
+    ag_includes = [:assignments, :assignment_visibility, :grades_published]
     last_exported_attachment = @last_exported_gradebook_csv.try(:attachment)
     grading_standard = @context.grading_standard_or_default
     {

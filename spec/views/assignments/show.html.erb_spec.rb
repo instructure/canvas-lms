@@ -31,8 +31,35 @@ describe "/assignments/show" do
     assign(:assignment, a)
     assign(:assignment_groups, [g])
     assign(:current_user_rubrics, [])
+    allow(view).to receive(:show_moderation_link).and_return(true)
     render 'assignments/show'
     expect(response).not_to be_nil # have_tag()
+  end
+
+  describe "moderation page link" do
+    before :each do
+      course_with_teacher(active_all: true)
+      view_context(@course, @user)
+      g = @course.assignment_groups.create!(name: "Homework")
+      a = @course.assignments.create!(title: "Introduce Yourself")
+      a.assignment_group_id = g.id
+      a.save!
+      assign(:assignment, a)
+      assign(:assignment_groups, [g])
+      assign(:current_user_rubrics, [])
+    end
+
+    it "is rendered when 'show_moderation_link' is true" do
+      allow(view).to receive(:show_moderation_link).and_return(true)
+      render 'assignments/show'
+      expect(rendered).to include "moderated_grading_button"
+    end
+
+    it "is not rendered when 'show_moderation_link' is false" do
+      allow(view).to receive(:show_moderation_link).and_return(false)
+      render 'assignments/show'
+      expect(rendered).not_to include "moderated_grading_button"
+    end
   end
 
   context 'plagiarism platform' do

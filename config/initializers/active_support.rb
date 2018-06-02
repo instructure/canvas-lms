@@ -39,7 +39,26 @@ module ActiveSupport::Cache
     end
   end
   Store.prepend(RailsCacheShim)
+
+  unless CANVAS_RAILS5_1
+    module AllowMocksInStore
+      def should_compress?(*args)
+        if @value && Rails.env.test?
+          begin
+            marshaled_value
+            true
+          rescue TypeError => e
+            false
+          end
+        else
+          super
+        end
+      end
+    end
+    Entry.prepend(AllowMocksInStore)
+  end
 end
+
 
 module IgnoreMonkeyPatchesInDeprecations
   def extract_callstack(callstack)

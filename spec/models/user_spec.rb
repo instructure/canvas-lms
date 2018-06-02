@@ -1710,6 +1710,12 @@ describe User do
         expect(events.size).to eql 1
         expect(events.first.title).to eql 'Published'
       end
+
+      it "should not include events for the user if the user asset string is not included" do
+        user_event = @user.calendar_events.create!(context: @user, start_at: 1.minute.from_now, end_at: 5.minutes.from_now)
+        events = @user.calendar_events_for_calendar(contexts: [@course])
+        expect(events).not_to include user_event
+      end
     end
 
     describe "upcoming_events" do

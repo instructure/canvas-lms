@@ -17,7 +17,7 @@ for path in $(ls -1 {gems/{,plugins/},packages/}*/package.json 2> /dev/null); do
     NODE_ENV=production
   fi
 
-  if [[ $path != *"packages"* && ($1 == "test" || $1 == "lint" || $1 == "build") ]]; then
+  if [[ $path != *"packages"* && ($1 == "test" || $1 == "lint" || $1 == "build:canvas") ]]; then
     # yarn test and lint are packages directory specific commands
     popd > /dev/null
     continue

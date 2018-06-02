@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, { Component } from 'react';
+import classnames from 'classnames';
 import themeable from '@instructure/ui-themeable/lib';
 import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails';
 import Pill from '@instructure/ui-core/lib/components/Pill';
@@ -105,7 +106,7 @@ export class CompletedItemsFacade extends Component {
       iconMargin: this.theme.gutterWidth,
     } : null;
     return (
-      <div className={styles.root} ref={elt => this.rootDiv = elt}>
+      <div className={classnames(styles.root, 'planner-completed-items')} ref={elt => this.rootDiv = elt}>
         <NotificationBadge>{this.renderNotificationBadge()}</NotificationBadge>
         <div className={styles.contentPrimary}>
           <ToggleDetails

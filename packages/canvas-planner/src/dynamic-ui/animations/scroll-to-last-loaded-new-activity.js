@@ -22,6 +22,10 @@ import {daysToItems} from '../../utilities/daysUtils';
 import {isNewActivityItem} from '../../utilities/statusUtils';
 
 export class ScrollToLastLoadedNewActivity extends Animation {
+  fixedElement () {
+    return this.app().fixedElementForItemScrolling();
+  }
+
   uiDidUpdate () {
     const gotDaysAction = this.acceptedAction('GOT_DAYS_SUCCESS');
     const newDays = gotDaysAction.payload.internalDays;
@@ -43,7 +47,7 @@ export class ScrollToLastLoadedNewActivity extends Animation {
     const {component: groupComponentToFocus} =
       this.registry().getLastComponent('group', newActivityIndicatorComponentIds);
 
-    this.animator().maintainViewportPosition();
+    this.maintainViewportPositionOfFixedElement();
     this.animator().focusElement(groupComponentToFocus.getFocusable());
     this.animator().scrollTo(newActivityIndicator.getScrollable(), this.manager().totalOffset());
   }

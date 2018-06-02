@@ -161,31 +161,36 @@
     {{/if}}
 
     {{#unless isQuizLTIAssignment}}
-      <fieldset>
-        <div class="form-column-left">{{#t}}Moderated Grading{{/t}}</div>
-        <div class="form-column-right" style="margin-top: 14px;">
-          <label class="checkbox">
-            {{checkbox "moderatedGrading"
-              id="assignment_moderated_grading"
-              name="moderated_grading"
-            }}
-            {{#t}}Allow a moderator to review multiple independent grades for selected submissions{{/t}}
-          </label>
-        </div>
-      </fieldset>
+      {{#if anonymousModeratedMarkingEnabled}}
+        <span data-component="ModeratedGradingFormFieldGroup"></span>
+      {{else}}
+        <fieldset>
+          <div class="form-column-left">{{#t}}Moderated Grading{{/t}}</div>
+          <div class="form-column-right" style="margin-top: 14px;">
+            <label class="checkbox">
+              {{checkbox "moderatedGrading"
+                id="assignment_moderated_grading"
+                name="moderated_grading"
+              }}
+              {{#t}}Allow a moderator to review multiple independent grades for selected submissions{{/t}}
+            </label>
+          </div>
+        </fieldset>
+      {{/if}}
     {{/unless}}
 
     {{#if anonymousGradingEnabled}}
       <fieldset>
         <div class="form-column-left">{{#t}}Anonymous Grading{{/t}}</div>
-        <div id="enable-anonymous-grading" class="form-column-right" style="margin-top: 14px;">
+        <div id="enable-anonymous-grading" class="form-column-right">
           <div class="border border-trbl border-round">
             <label class="checkbox">
               {{checkbox "anonymousGrading"
+                class="GradeAnonymously__Checkbox"
                 id="assignment_anonymous_grading"
                 name="anonymous_grading"
               }}
-              <strong>{{#t}}Grade Anonymously{{/t}}</strong>
+              <strong class="GradeAnonymously__CheckboxLabelText">{{#t}}Grade Anonymously{{/t}}</strong>
 
               <p>{{#t}}Graders cannot see student names{{/t}}</p>
             </label>

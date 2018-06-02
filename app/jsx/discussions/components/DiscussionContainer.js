@@ -21,8 +21,9 @@ import React, { Component } from 'react'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import { DropTarget } from 'react-dnd';
-import { string, func, bool, arrayOf } from 'prop-types'
+import { string, func, bool } from 'prop-types'
 import I18n from 'i18n!discussions_v2'
+import moment from 'moment'
 
 import ToggleDetails from '@instructure/ui-core/lib/components/ToggleDetails'
 import Text from '@instructure/ui-core/lib/components/Text'
@@ -37,7 +38,8 @@ import propTypes from '../propTypes'
 
 // Handle drag and drop on a discussion. The props passed in tell us how we
 // should update the discussion if something is dragged into this container
-const discussionTarget = {
+export const discussionTarget = {
+  // TODO test this method now that we export this discussion target
   drop(props, monitor, component) {
     const discussion = monitor.getItem()
     const updateFields = {}
@@ -52,6 +54,12 @@ const discussionTarget = {
       ? component.state.discussions.map(d => d.id)
       : undefined
     props.handleDrop(discussion, updateFields, order)
+  },
+  canDrop(props, monitor) {
+    if (props.closedState && monitor.getItem().assignment) {
+      return moment(monitor.getItem().assignment.due_at) < moment()
+    }
+    return true
   },
 }
 

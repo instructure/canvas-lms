@@ -19,17 +19,36 @@ require File.expand_path('../spec_helper', File.dirname(__FILE__))
 
 
 describe TokenScopes do
-  describe ".generate_scopes" do
+  describe "SCOPES" do
     it "formats the scopes with url:http_verb|api_path" do
-      TokenScopes.generate_scopes.sort.each do |scope|
+      TokenScopes::SCOPES.sort.each do |scope|
         expect(/^url:(?:GET|OPTIONS|POST|PUT|PATCH|DELETE)\|\/api\/.+/ =~ scope).not_to be_nil
       end
     end
 
     it "does not include the optional format part of the route path" do
-      TokenScopes.generate_scopes.each do |scope|
+      TokenScopes::SCOPES.each do |scope|
         expect(/\(\.:format\)/ =~ scope).to be_nil
       end
     end
+
   end
+
+  describe "GROUPED_SCOPES" do
+    it "groups the scopes by controller" do
+      expect(TokenScopes::GROUPED_DETAILED_SCOPES["demos"]).to include({
+                                                                resource: "demos",
+                                                                verb: "POST",
+                                                                path: "/api/v1/demos",
+                                                                scope: "url:POST|/api/v1/demos"
+                                                              })
+
+    end
+
+    it "includes the user_info scope" do
+      expect(TokenScopes::GROUPED_DETAILED_SCOPES["oauth"]).to include TokenScopes::USER_INFO_SCOPE
+    end
+
+  end
+
 end

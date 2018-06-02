@@ -186,3 +186,97 @@ an Integer or Float value.
   </imsx_POXBody>
 </imsx_POXEnvelopeRequest>
 ```
+
+# Submission Details Return Extension
+
+Canvas sends an extension parameter for assignment launches that allows the tool
+provider to pass back submission metadata not directly related to the result.
+
+Details about the submission the external tool wants to supply
+should augment the POX sent with the grading value. <a href="http://www.imsglobal.org/LTI/v1p1/ltiIMGv1p1.html#_Toc319560473">LTI replaceResult POX</a>
+Simply add a node called `submissionDetails` to the `replaceResultRequest` node. Any data regarding
+the submission that is not related directly to the result will be included in this node.
+
+```xml
+<?xml version = "1.0" encoding = "UTF-8"?>
+<imsx_POXEnvelopeRequest xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
+  <imsx_POXHeader>
+    <imsx_POXRequestHeaderInfo>
+      <imsx_version>V1.0</imsx_version>
+      <imsx_messageIdentifier>999999123</imsx_messageIdentifier>
+    </imsx_POXRequestHeaderInfo>
+  </imsx_POXHeader>
+  <imsx_POXBody>
+    <replaceResultRequest>
+      <!-- Added element -->
+      <submissionDetails>
+        ...
+      </submissionDetails>
+      <resultRecord>
+        <sourcedGUID>
+          <sourcedId>3124567</sourcedId>
+        </sourcedGUID>
+        <result>
+          <resultScore>
+            <language>en</language>
+            <textString>0.92</textString>
+          </resultScore>
+        </result>
+      </resultRecord>
+    </replaceResultRequest>
+  </imsx_POXBody>
+</imsx_POXEnvelopeRequest>
+```
+
+## Submission Submitted At Timestamp Extension
+
+Canvas sends an extension parameter for assignment launches that allows the tool
+provider to pass back the submission submitted at timestamp.
+The key is `ext_outcome_submission_submitted_at_accepted` and the value is `true`.
+So the added launch parameter will look like this:
+
+`ext_outcome_submission_submitted_at_accepted=true`
+
+### Submission Submitted At Timestamp from Tool Provider
+
+If the external tool wants to supply this value, it can augment the POX sent
+with the submission submitted at value. <a href="http://www.imsglobal.org/LTI/v1p1/ltiIMGv1p1.html#_Toc319560473">LTI replaceResult POX</a>
+
+Simply add a node called `submittedAt` to the `submissionDetails` node. The text
+string must be an <a href="https://tools.ietf.org/html/rfc3339">iso8601 formatted timestamp</a>.
+If included, then it will override any existing submitted_at value on the submission even when
+result score or result total score are not present.
+
+
+```xml
+<?xml version = "1.0" encoding = "UTF-8"?>
+<imsx_POXEnvelopeRequest xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
+  <imsx_POXHeader>
+    <imsx_POXRequestHeaderInfo>
+      <imsx_version>V1.0</imsx_version>
+      <imsx_messageIdentifier>999999123</imsx_messageIdentifier>
+    </imsx_POXRequestHeaderInfo>
+  </imsx_POXHeader>
+  <imsx_POXBody>
+    <replaceResultRequest>
+      <submissionDetails>
+        <!-- Added element -->
+        <submittedAt>
+          2017-04-16T18:54:36.736+00:00
+        </submittedAt>
+      </submissionDetails>
+      <resultRecord>
+        <sourcedGUID>
+          <sourcedId>3124567</sourcedId>
+        </sourcedGUID>
+        <result>
+          <resultScore>
+            <language>en</language>
+            <textString>0.92</textString>
+          </resultScore>
+        </result>
+      </resultRecord>
+    </replaceResultRequest>
+  </imsx_POXBody>
+</imsx_POXEnvelopeRequest>
+```

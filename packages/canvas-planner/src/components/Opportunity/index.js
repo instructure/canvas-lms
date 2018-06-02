@@ -86,11 +86,25 @@ export class Opportunity extends Component {
     return (
       <div className={styles.root}>
         <div className={styles.header}>
-          <div className={styles.oppName}>
-            {this.props.courseName}
+          <div className={styles.oppNameAndTitle}>
+            <div className={styles.oppName}>
+              {this.props.courseName}
+            </div>
+            <div className={styles.title}>
+              <Link href={this.props.url} ref={this.linkRef}>{this.props.opportunityTitle}</Link>
+            </div>
           </div>
-          <div className={styles.title}>
-            <Link href={this.props.url} ref={this.linkRef}>{this.props.opportunityTitle}</Link>
+          <div className={styles.close}>
+            <Button
+              onClick={() => this.props.dismiss(this.props.id, this.props.plannerOverride)}
+              variant="icon"
+              size="small"
+            >
+              <IconXLine
+                className={styles.closeButtonIcon}
+                title={formatMessage("Dismiss {opportunityName}", {opportunityName: this.props.opportunityTitle})}
+              />
+            </Button>
           </div>
         </div>
         <div className={styles.footer}>
@@ -112,18 +126,6 @@ export class Opportunity extends Component {
               {formatMessage("points")}
             </PresentationContent>
           </div>
-        </div>
-        <div className={styles.close}>
-          <Button
-            onClick={() => this.props.dismiss(this.props.id, this.props.plannerOverride)}
-            variant="icon"
-            size="small"
-          >
-            <IconXLine
-              className={styles.closeButtonIcon}
-              title={formatMessage("Dismiss {opportunityName}", {opportunityName: this.props.opportunityTitle})}
-            />
-          </Button>
         </div>
       </div>
     );

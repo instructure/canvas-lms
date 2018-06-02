@@ -7,7 +7,7 @@
  * the terms of the GNU Affero General Public License as published by the Free
  * Software Foundation, version 3 of the License.
  *
- * Canvas is distributed in the hope that they will be useful, but WITHOUT ANY
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
  * details.
@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import moment from 'moment-timezone';
+
 import { handleActions } from 'redux-actions';
 import { formatDayKey } from '../utilities/dateUtils';
 import { findPlannerItemById } from '../utilities/storeUtils';
@@ -45,29 +45,18 @@ function _deletePlannerItem(state, doomedPlannerItem) {
   if (existingDay == null) return state;
 
   const newDay = existingDay.filter(item => item.id !== doomedPlannerItem.id);
-  keyedState.set(plannerDateString, newDay);
+  if (newDay.length) {
+    keyedState.set(plannerDateString, newDay);
+  } else {
+    keyedState.delete(plannerDateString);
+  }
   return [...keyedState.entries()];
 }
 
-function addMissingDays (dayKeyToItems) {
-  const sortedDayKeys = Object.keys(dayKeyToItems).sort();
-  if (sortedDayKeys.length === 0) return;
-  // timezones don't matter for this algorithm
-  const dateIterator = moment(sortedDayKeys[0]);
-  const lastDate = moment(sortedDayKeys[sortedDayKeys.length - 1]);
-  while (dateIterator.isBefore(lastDate)) {
-    const dayKey = formatDayKey(dateIterator);
-    if (!dayKeyToItems.hasOwnProperty(dayKey)) {
-      dayKeyToItems[dayKey] = [];
-    }
-    dateIterator.add(1, 'days');
-  }
-}
 
 function gotDaysSuccess (state, days) {
   const oldDaysHash = daysToDaysHash(state);
   const mergedDaysHash = mergeDaysIntoDaysHash(oldDaysHash, days);
-  addMissingDays(mergedDaysHash);
   return daysHashToDays(mergedDaysHash);
 }
 

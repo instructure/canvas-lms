@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {direction} from '../../../../shared/helpers/rtlHelper'
+
 export default class Style {
   constructor (grid, gridSupport) {
     this.grid = grid;
@@ -54,7 +56,7 @@ export default class Style {
     this.$styles.innerHTML = `
       .slick-header .slick-header-column.${location.columnId} {
         border: 1px solid ${options.activeBorderColor};
-        padding-left: 0;
+        padding-${direction('left')}: 0;
       }
       .slick-row .slick-cell.${location.columnId} {
         border-left: 1px solid ${options.activeBorderColor};
@@ -71,7 +73,7 @@ export default class Style {
     this.$styles.innerHTML = `
       .slick-header .slick-header-column.${location.columnId}:not(.primary-column) {
         border: 1px solid ${options.activeBorderColor};
-        padding-left: 0;
+        padding-${direction('left')}: 0;
       }
       .slick-cell.${location.columnId}:not(.primary-column):not(.active) {
         border-left: 1px solid ${options.activeBorderColor};

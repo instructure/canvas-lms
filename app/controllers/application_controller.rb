@@ -801,7 +801,7 @@ class ApplicationController < ActionController::Base
           courses = Course.
             shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current).
             joins(enrollments: :enrollment_state).
-            merge(enrollment_scope).
+            merge(enrollment_scope.except(:joins)).
             where(id: course_ids)
         end
         if include_groups
@@ -812,7 +812,7 @@ class ApplicationController < ActionController::Base
         courses = Course.
           shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current).
           joins(enrollments: :enrollment_state).
-          merge(enrollment_scope)
+          merge(enrollment_scope.except(:joins))
       end
 
       groups = []
@@ -1096,7 +1096,7 @@ class ApplicationController < ActionController::Base
 
   def set_no_cache_headers
     response.headers["Pragma"] = "no-cache"
-    response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
+    response.headers["Cache-Control"] = "no-cache, no-store"
   end
 
   def clear_cached_contexts
@@ -2205,11 +2205,17 @@ class ApplicationController < ActionController::Base
     js_env hash
   end
 
-  def set_js_assignment_data
+  def set_js_assignment_data(include_assignment_permissions: false)
     rights = [:manage_assignments, :manage_grades, :read_grades, :manage]
     permissions = @context.rights_status(@current_user, *rights)
     permissions[:manage_course] = permissions[:manage]
     permissions[:manage] = permissions[:manage_assignments]
+
+    if include_assignment_permissions
+      permissions[:by_assignment_id] = @context.assignments.map do |assignment|
+        [assignment.id, {update: assignment.user_can_update?(@current_user, session)}]
+      end.to_h
+    end
 
     js_env({
       :URLS => {
@@ -2274,6 +2280,10 @@ class ApplicationController < ActionController::Base
 
   def user_has_google_drive
     @user_has_google_drive ||= google_drive_connection.authorized?
+  end
+
+  def self.instance_id
+    nil
   end
 
   def self.region
@@ -2355,7 +2365,11 @@ class ApplicationController < ActionController::Base
     can_manage_account = @account.grants_right?(@current_user, session, :manage_account_settings)
 
     unless can_read_course_list || can_read_roster
-      return render_unauthorized_action
+      if @redirect_on_unauth
+        return redirect_to account_settings_url(@account)
+      else
+        return render_unauthorized_action
+      end
     end
 
     js_env({

@@ -53,11 +53,12 @@ module BroadcastPolicy
         if defined?(ActiveRecord)
           frd_mutations_before_last_save = @mutations_before_last_save
           other_attributes = other.instance_variable_get(:@attributes).deep_dup
+          namespace = CANVAS_RAILS5_1 ? ActiveRecord : ActiveModel
           @attributes.send(:attributes).each_key do |key|
             value = @attributes[key]
             # ignore newly added columns in the db that we don't really know
             # about yet
-            if other_attributes[key].is_a?(ActiveRecord::Attribute.const_get(:Null))
+            if other_attributes[key].is_a?(namespace::Attribute.const_get(:Null))
               other_attributes.instance_variable_get(:@attributes).delete(key)
               next
             end
@@ -67,7 +68,7 @@ module BroadcastPolicy
               other_attributes.write_from_database(key, value.value)
             end
           end
-          @mutations_before_last_save = ActiveRecord::AttributeMutationTracker.new(other_attributes)
+          @mutations_before_last_save = namespace::AttributeMutationTracker.new(other_attributes)
         end
         yield
       ensure

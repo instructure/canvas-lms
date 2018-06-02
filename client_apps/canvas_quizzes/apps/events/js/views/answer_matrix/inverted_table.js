@@ -48,7 +48,7 @@ define(function(require) {
           <thead>
             <tr className="ic-Table__row--bg-neutral">
               <th key="question">
-                {I18n.t('headers.question', 'Question')}
+                {I18n.t('Question')}
               </th>
 
               {this.props.events.map(this.renderHeaderCell)}

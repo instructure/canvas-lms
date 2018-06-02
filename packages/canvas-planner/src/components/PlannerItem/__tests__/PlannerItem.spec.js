@@ -37,6 +37,7 @@ function defaultProps (option = {}) {
       toggleCompletion: () => {},
       updateTodo: () => {},
       currentUser: {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here'},
+      ...option
   };
 }
 
@@ -345,21 +346,6 @@ it('renders Calendar Event correctly with everything', () => {
   expect(wrapper).toMatchSnapshot();
 });
 
-it('renders Calendar Event correctly with just points', () => {
-  const wrapper = shallow(
-    <PlannerItem {
-      ...defaultProps(
-        {
-          associated_item: 'Calendar Event',
-          completed: false,
-          title: "I am a Calendar Event",
-          points: 2,
-        })
-    } />
-  );
-  expect(wrapper).toMatchSnapshot();
-});
-
 it('renders Calendar Event correctly without right side content', () => {
   const wrapper = shallow(
     <PlannerItem {
@@ -383,6 +369,22 @@ it('renders Calendar Event correctly with just date', () => {
           completed: false,
           title: "I am a Calendar Event",
           date: DEFAULT_DATE,
+        })
+    } />
+  );
+  expect(wrapper).toMatchSnapshot();
+});
+
+it('renders Calendar Event correctly with an all day date', () => {
+  const wrapper = shallow(
+    <PlannerItem {
+      ...defaultProps(
+        {
+          associated_item: 'Calendar Event',
+          completed: false,
+          title: "I am a Calendar Event",
+          date: DEFAULT_DATE,
+          allDay: true,
         })
     } />
   );

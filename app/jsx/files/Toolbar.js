@@ -245,6 +245,7 @@ import Folder from 'compiled/models/Folder'
             aria-label= {I18n.t('Search for files')}
             type= 'search'
             ref='searchTerm'
+            role='textbox'
             className='ic-Input'
             defaultValue= {this.props.query.search_term}
           />

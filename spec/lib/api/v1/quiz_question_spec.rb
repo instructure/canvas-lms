@@ -29,13 +29,22 @@ end
 
 describe Api::V1::QuizQuestion do
   describe '.question_json' do
+    subject do
+      TestableApiQuizQuestion.question_json(
+        question, user, session, context, includes, censored, quiz_data, opts
+      )
+    end
+
     let(:answers) { [] }
     let(:question_data) { { "answers" => answers } }
     let(:question) { Quizzes::QuizQuestion.new(question_data: question_data) }
     let(:user) { User.new }
     let(:session) { nil }
-
-    subject { TestableApiQuizQuestion.question_json(question, user, session) }
+    let(:context) { nil }
+    let(:includes) { [] }
+    let(:censored) { false }
+    let(:quiz_data) { nil }
+    let(:opts) { {} }
 
     it { is_expected.to include("question_name" => "Question") }
     it { is_expected.to include("question_type" => "text_only_question") }
@@ -64,6 +73,20 @@ describe Api::V1::QuizQuestion do
       end
 
       it { is_expected.not_to include("bogus") }
+    end
+
+    context 'with quiz_data' do
+      let(:quiz_data) do
+        [{
+          "id" => question[:id],
+          "question_type" => "some_other_type",
+          "answers" => answers,
+          "position" => 4
+        }]
+      end
+
+      it { is_expected.to include("question_type" => "some_other_type") }
+      it { is_expected.to include("position" => 4) }
     end
   end
 

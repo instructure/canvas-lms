@@ -131,6 +131,46 @@ test('responds to listDeveloperKeysReplace', () => {
                             {id: 33, name: 'c'}])
 });
 
+test('istDeveloperKeysReplaceBindingState replaces state in list', () => {
+  const state = {
+    list: [
+      {id: '11', name: 'a'},
+    ],
+    inheritedList: []
+  }
+
+  const payload = {
+    developer_key_id: 11,
+    workflow_state: 'active',
+    account_id: 1
+  }
+
+  const action = actions.listDeveloperKeysReplaceBindingState(payload);
+  const newState = reducer(state, action);
+
+  propEqual(newState.list[0].developer_key_account_binding.workflow_state, 'active')
+});
+
+test('listDeveloperKeysReplaceBindingState in inherited list', () => {
+  const state = {
+    list: [],
+    inheritedList: [
+      {id: '11', name: 'a'},
+    ]
+  }
+
+  const payload = {
+    developer_key_id: 11,
+    workflow_state: 'active',
+    account_id: 1
+  }
+
+  const action = actions.listDeveloperKeysReplaceBindingState(payload);
+  const newState = reducer(state, action);
+
+  propEqual(newState.inheritedList[0].developer_key_account_binding.workflow_state, 'active')
+});
+
 test('responds to listDeveloperKeysDelete', () => {
   const state = {
     list: [

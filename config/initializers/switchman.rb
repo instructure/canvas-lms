@@ -33,47 +33,16 @@ Rails.application.config.after_initialize do
 
   module Canvas
     module Shard
-      module ClassMethods
-        def current(category=:primary)
-          if category == :delayed_jobs
-            active_shards[category] || super(:primary).delayed_jobs_shard
-          else
-            super
-          end
-        end
-
-        def activate!(categories)
-          if !@skip_delayed_job_auto_activation && !categories[:delayed_jobs] &&
-              categories[:primary] && categories[:primary] != active_shards[:primary] # only activate if it changed
-            skip_delayed_job_auto_activation do
-              categories[:delayed_jobs] = categories[:primary].delayed_jobs_shard
-            end
-          end
-          super
-        end
-
-        def skip_delayed_job_auto_activation
-          was = @skip_delayed_job_auto_activation
-          @skip_delayed_job_auto_activation = true
-          yield
-        ensure
-          @skip_delayed_job_auto_activation = was
-        end
-      end
-
       module IncludedClassMethods
         def birth
           default
         end
       end
 
-      def clear_cache
-        self.class.connection.after_transaction_commit { super }
-      end
-
       def settings
         return {} unless self.class.columns_hash.key?('settings')
         s = super
+        s = YAML.load(s) if s.is_a?(String) # no idea. it seems that sometimes rails forgets this column is serialized
         unless s.is_a?(Hash) || s.nil?
           s = s.unserialize(s.value)
         end
@@ -93,14 +62,9 @@ Rails.application.config.after_initialize do
         s
       end
 
-      def delayed_jobs_shard
-        shard = Switchman::Shard.lookup(self.delayed_jobs_shard_id) if self.read_attribute(:delayed_jobs_shard_id)
-        shard || self.database_server.try(:delayed_jobs_shard, self)
-      end
-
       def encrypt_settings
         s = self.settings.dup
-        if encryption_key = s.delete(:encryption_key)
+        if (encryption_key = s.delete(:encryption_key))
           secret, salt = Canvas::Security.encrypt_password(encryption_key, 'shard_encryption_key')
           s[:encryption_key_enc] = secret
           s[:encryption_key_salt] = salt
@@ -114,7 +78,6 @@ Rails.application.config.after_initialize do
   end
 
   Switchman::Shard.prepend(Canvas::Shard)
-  Switchman::Shard.singleton_class.prepend(Canvas::Shard::ClassMethods)
   Switchman::Shard.singleton_class.include(Canvas::Shard::IncludedClassMethods)
 
   Switchman::Shard.class_eval do
@@ -144,7 +107,7 @@ Rails.application.config.after_initialize do
 
     scope :in_current_region, -> do
       @current_region_scope ||=
-        if !default.is_a?(self)
+        if !default.is_a?(Switchman::Shard)
           # sharding isn't set up? maybe we're in tests, or a somehow degraded environment
           # either way there's only one shard, and we always want to see it
           [default]
@@ -157,16 +120,6 @@ Rails.application.config.after_initialize do
   end
 
   Switchman::DatabaseServer.class_eval do
-    def delayed_jobs_shard(shard = nil)
-      return shard if self.config[:delayed_jobs_shard] == 'self'
-      dj_shard = self.config[:delayed_jobs_shard] &&
-        Shard.lookup(self.config[:delayed_jobs_shard])
-      # have to avoid recursion for the default shard asking for the default shard's dj shard
-      dj_shard ||= shard if shard.default?
-      dj_shard ||= Shard.default.delayed_jobs_shard
-      dj_shard
-    end
-
     def self.regions
       @regions ||= all.map { |db| db.config[:region] }.compact.uniq.sort
     end
@@ -215,11 +168,7 @@ Rails.application.config.after_initialize do
       {}
     end
 
-    def delayed_jobs_shard
-      self
-    end
-
-    def in_region?(region)
+    def in_region?(_region)
       true
     end
 
@@ -227,12 +176,6 @@ Rails.application.config.after_initialize do
       true
     end
   end
-
-  Delayed::Backend::ActiveRecord::Job.class_eval do
-    self.shard_category = :delayed_jobs
-  end
-
-  Shard.default.delayed_jobs_shard.activate!(:delayed_jobs)
 
   if !Shard.default.is_a?(Shard) && Switchman.config[:force_sharding] && !ENV['SKIP_FORCE_SHARDING']
     raise 'Sharding is supposed to be set up, but is not! Use SKIP_FORCE_SHARDING=1 to ignore'

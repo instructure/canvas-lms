@@ -45,11 +45,6 @@ class AccessToken < ActiveRecord::Base
   scope :not_deleted, -> { where(:workflow_state => "active") }
 
   TOKEN_SIZE = 64
-  OAUTH2_SCOPE_NAMESPACE = '/auth/'.freeze
-  ALLOWED_SCOPES = [
-    "#{OAUTH2_SCOPE_NAMESPACE}userinfo",
-    *TokenScopes::SCOPES # this will need to change once we start capturing scopes on developer keys
-  ].freeze
 
   before_create :generate_token
   before_create :generate_refresh_token
@@ -235,7 +230,7 @@ class AccessToken < ActiveRecord::Base
 
   def must_only_include_valid_scopes
     return true if scopes.nil?
-    errors.add(:scopes, "must match accepted scopes") unless scopes.all? {|scope| ALLOWED_SCOPES.include?(scope)}
+    errors.add(:scopes, "must match accepted scopes") unless scopes.all? {|scope| TokenScopes::ALL_SCOPES.include?(scope)}
   end
 
   # It's encrypted, but end users still shouldn't see this.

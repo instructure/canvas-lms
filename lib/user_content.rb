@@ -167,6 +167,9 @@ module UserContent
     attr_reader :user, :context
 
     class UriMatch < Struct.new(:url, :type, :obj_class, :obj_id, :rest, :prefix)
+      def query
+        rest && rest[/\?.*/]
+      end
     end
 
     # specify a url type like "assignments" or "file_contents"

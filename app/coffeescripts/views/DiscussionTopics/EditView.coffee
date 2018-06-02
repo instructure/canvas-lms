@@ -480,9 +480,6 @@ define [
         else
           @$discussionEditView.tabs("option", "active", 0)
 
-      if errors['specific_sections']
-        $.flashError(I18n.t("You must input a section"))
-
       super(errors)
 
     toggleGradingDependentOptions: ->

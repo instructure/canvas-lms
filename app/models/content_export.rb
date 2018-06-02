@@ -216,6 +216,8 @@ class ContentExport < ActiveRecord::Base
         self.settings[:quizzes2][:qti_export][:url] = self.attachment.public_download_url
         self.progress = 100
         mark_exported
+      else
+        mark_failed
       end
     rescue
       add_error("Error running export to Quizzes 2.", $!)

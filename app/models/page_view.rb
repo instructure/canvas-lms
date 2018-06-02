@@ -447,7 +447,7 @@ class PageView < ActiveRecord::Base
       # this could run into problems if one account gets more than
       # batch_size page views created in the second on this boundary
       finder_sql = PageView.where("account_id = ? AND created_at >= ?", account_id, last_created_at).
-          order("created_at asc").limit(batch_size).to_sql
+          order(:created_at => :asc).limit(batch_size).to_sql
 
       # query just the raw attributes, don't instantiate AR objects
       rows = PageView.connection.select_all(finder_sql).to_a

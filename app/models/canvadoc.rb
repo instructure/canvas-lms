@@ -74,6 +74,25 @@ class Canvadoc < ActiveRecord::Base
     ].to_json)
   end
 
+  def self.submission_mime_types
+    JSON.parse Setting.get('canvadoc_submission_mime_types', %w[
+      application/excel
+      application/msword
+      application/pdf
+      application/vnd.ms-excel
+      application/vnd.ms-powerpoint
+      application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+      application/vnd.openxmlformats-officedocument.presentationml.presentation
+      application/vnd.openxmlformats-officedocument.wordprocessingml.document
+      image/bmp
+      image/jpeg
+      image/jpg
+      image/png
+      image/tif
+      image/tiff
+    ].to_json)
+  end
+
   def self.canvadocs_api
     raise "Canvadocs isn't enabled" unless Canvadocs.enabled?
     Canvadocs::API.new(token: Canvadocs.config['api_key'],

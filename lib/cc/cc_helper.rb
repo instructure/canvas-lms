@@ -233,9 +233,9 @@ module CCHelper
                  @course.wiki_pages.where(id: url_or_title.to_i).first
         end
         if page
-          "#{WIKI_TOKEN}/#{match.type}/#{page.url}"
+          "#{WIKI_TOKEN}/#{match.type}/#{page.url}#{match.query}"
         else
-          "#{WIKI_TOKEN}/#{match.type}/#{match.obj_id}"
+          "#{WIKI_TOKEN}/#{match.type}/#{match.obj_id}#{match.query}"
         end
       end
       @rewriter.set_handler('wiki', &wiki_handler)
@@ -243,7 +243,7 @@ module CCHelper
       @rewriter.set_handler('items') do |match|
         item = ContentTag.find(match.obj_id)
         migration_id = @key_generator.create_key(item)
-        new_url = "#{COURSE_TOKEN}/modules/#{match.type}/#{migration_id}"
+        new_url = "#{COURSE_TOKEN}/modules/#{match.type}/#{migration_id}#{match.query}"
       end
       @rewriter.set_default_handler do |match|
         new_url = match.url
@@ -253,7 +253,7 @@ module CCHelper
             # for all other types,
             # create a migration id for the object, and use that as the new link
             migration_id = @key_generator.create_key(obj)
-            new_url = "#{OBJECT_TOKEN}/#{match.type}/#{migration_id}"
+            new_url = "#{OBJECT_TOKEN}/#{match.type}/#{migration_id}#{match.query}"
           end
         elsif match.obj_id
           new_url = "#{COURSE_TOKEN}/#{match.type}/#{match.obj_id}#{match.rest}"
