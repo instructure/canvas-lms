@@ -29,9 +29,10 @@ module SIS
       def process(csv, index=nil, count=nil)
         count = SIS::AbstractCourseImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
-            update_progress
             begin
-              importer.add_abstract_course(row['abstract_course_id'], row['short_name'], row['long_name'], row['status'], row['term_id'], row['account_id'], row['fallback_account_id'])
+              importer.add_abstract_course(row['abstract_course_id'], row['short_name'],
+                                           row['long_name'], row['status'], row['term_id'],
+                                           row['account_id'], row['fallback_account_id'])
             rescue ImportError => e
               SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
             end

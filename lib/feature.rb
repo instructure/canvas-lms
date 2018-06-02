@@ -116,17 +116,6 @@ class Feature
   # TODO: register built-in features here
   # (plugins may register additional features during application initialization)
   register(
-    'refactor_of_sis_imports' =>
-      {
-        display_name: -> {I18n.t('SIS Import Refactor')},
-        description: -> {I18n.t(<<END
-The engine that processes SIS imports has been refactored to better handle the
-stability of large SIS imports. The functionality of SIS imports has not changed.
-END
-        )},
-        applies_to: 'RootAccount',
-        state: 'on'
-      },
     'permissions_v2_ui' =>
     {
       display_name: -> { I18n.t('Updated Permissions Page') },

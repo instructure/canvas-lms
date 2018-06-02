@@ -73,7 +73,6 @@ module SIS
         end
         @rows_for_parallel = nil
         update_pause_vars
-        @batch.data[:use_parallel_imports] = true
         sleep(@pause_duration)
       end
 
@@ -81,10 +80,6 @@ module SIS
         importer = self.new(root_account, opts)
         importer.process
         importer
-      end
-
-      def use_parallel_imports?
-        true
       end
 
       def prepare

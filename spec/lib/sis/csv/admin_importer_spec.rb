@@ -113,7 +113,6 @@ describe SIS::CSV::AdminImporter do
 
   it 'should create rollback data' do
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
-    @account.enable_feature!(:refactor_of_sis_imports)
     batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
       'user_id,account_id,role,status',

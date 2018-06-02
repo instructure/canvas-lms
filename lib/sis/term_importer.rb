@@ -25,8 +25,8 @@ module SIS
       EnrollmentTerm.process_as_sis(@sis_options) do
         yield importer
       end
-      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data) if @batch.using_parallel_importers?
-      @logger.debug("Terms took #{Time.now - start} seconds")
+      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)
+      @logger.debug("Terms took #{Time.zone.now - start} seconds")
       importer.success_count
     end
 

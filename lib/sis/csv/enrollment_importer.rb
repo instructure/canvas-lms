@@ -35,7 +35,6 @@ module SIS
         messages = []
         count = SIS::EnrollmentImporter.new(@root_account, importer_opts).process(messages) do |importer|
           csv_rows(csv, index, count) do |row|
-            update_progress
             begin
               importer.add_enrollment(create_enrollment(row, messages, csv: csv))
             rescue ImportError => e
@@ -65,10 +64,11 @@ module SIS
         )
 
         begin
-          enrollment.start_date = DateTime.parse(row['start_date']) if row['start_date'].present?
-          enrollment.end_date = DateTime.parse(row['end_date']) if row['end_date'].present?
+          enrollment.start_date = Time.zone.parse(row['start_date']) if row['start_date'].present?
+          enrollment.end_date = Time.zone.parse(row['end_date']) if row['end_date'].present?
         rescue ArgumentError
-          message = "Bad date format for user #{row['user_id']} in #{row['course_id'].blank? ? 'section' : 'course'} #{row['course_id'].presence || row['section_id']}"
+          course_or_section = "#{row['course_id'].blank? ? 'section' : 'course'} #{row['course_id'].presence || row['section_id']}"
+          message = "Bad date format for user #{row['user_id']} in " + course_or_section
           messages << SisBatch.build_error(csv, message, sis_batch: @batch, row: enrollment.lineno, row_info: row)
         end
 

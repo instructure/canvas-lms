@@ -25,7 +25,7 @@ module SIS
       Group.process_as_sis(@sis_options) do
         yield importer
       end
-      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data) if @batch.using_parallel_importers?
+      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)
       @logger.debug("Groups took #{Time.zone.now - start} seconds")
       importer.success_count
     end

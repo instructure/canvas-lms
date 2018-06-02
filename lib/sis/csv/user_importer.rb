@@ -34,7 +34,6 @@ module SIS
         messages = []
         count = SIS::UserImporter.new(@root_account, importer_opts).process(messages) do |importer|
           csv_rows(csv, index, count) do |row|
-            update_progress
             begin
               importer.add_user(create_user(row, csv))
             rescue ImportError => e

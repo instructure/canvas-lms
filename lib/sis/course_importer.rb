@@ -39,7 +39,7 @@ module SIS
         Course.where(:id => courses).update_all(:sis_batch_id => @batch.id)
       end
 
-      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data) if @batch.using_parallel_importers?
+      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)
       MasterCourses::MasterTemplate.create_associations_from_sis(@root_account, blueprint_associations, messages, @batch_user)
 
       @logger.debug("Courses took #{Time.zone.now - start} seconds")

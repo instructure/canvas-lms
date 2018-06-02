@@ -141,7 +141,6 @@ describe SisImportsApiController, type: :request do
     json.delete("user")
     expected_data = {
           "data" => { "import_type" => "instructure_csv",
-                      "use_parallel_imports" => true,
                       "completed_importers" => ["user"],
                       "running_immediately" => true,
                       "supplied_batches" => ["user"],
@@ -670,7 +669,6 @@ describe SisImportsApiController, type: :request do
 
     expected_data = {"sis_imports"=>[{
                       "data" => { "import_type" => "instructure_csv",
-                                  "use_parallel_imports" => true,
                                   "completed_importers" => ["account"],
                                   "running_immediately" => true,
                                   "supplied_batches" => ["account"],

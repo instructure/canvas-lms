@@ -34,12 +34,11 @@ module SIS
       def process(csv, index=nil, count=nil)
         count = SIS::TermImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
-            update_progress
             start_date = nil
             end_date = nil
             begin
-              start_date = DateTime.parse(row['start_date']) unless row['start_date'].blank?
-              end_date = DateTime.parse(row['end_date']) unless row['end_date'].blank?
+              start_date = Time.zone.parse(row['start_date']) if row['start_date'].present?
+              end_date = Time.zone.parse(row['end_date']) if row['end_date'].present?
             rescue
               SisBatch.add_error(csv, "Bad date format for term #{row['term_id']}", sis_batch: @batch, row: row['lineno'], row_info: row)
             end

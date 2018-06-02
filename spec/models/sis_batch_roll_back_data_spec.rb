@@ -22,7 +22,6 @@ describe SisBatchRollBackData do
   before :once do
     @account = account_model
     @batch = @account.sis_batches.create!
-    @batch.data = {use_parallel_imports: true}
   end
 
   it 'should create successfully' do
