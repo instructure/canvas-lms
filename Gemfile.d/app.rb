@@ -107,7 +107,7 @@ gem 'rotp', '3.3.1', require: false
 gem 'net-ldap', '0.16.1', require: false
 gem 'ruby-duration', '3.2.3', require: false
 gem 'ruby-saml-mod', '0.3.8'
-gem 'saml2', '2.2.4'
+gem 'saml2', '2.2.5'
   gem 'nokogiri-xmlsec-instructure', '0.9.6', require: false
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.2.1', require: 'zip'
