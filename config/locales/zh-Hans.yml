@@ -9994,7 +9994,7 @@ zh-Hans:
       在 K-12 环境中特别有用的功能、设置和样式。目前，这仅仅
       适用某些样式更改，但将来可能会添加更多特定于 K-12 的内容。
   k_2521301c: k
-  keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "请记住，此提交项不会计入您的%{groupType}小组中的每个人上。"
+  keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "请记住，此提交项将会计入您的%{groupType}小组中的每个人上。"
   keep_submissions_anonymous_5cbaf419: 保持匿名提交
   kenya_254_2945663a: "肯尼亚 (+254)"
   key_api_key_68bf80ae: "密钥：*%{api_key}*"
