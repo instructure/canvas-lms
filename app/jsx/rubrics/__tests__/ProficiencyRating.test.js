@@ -22,7 +22,7 @@ import ProficiencyRating from '../ProficiencyRating'
 
 const defaultProps = (props = {}) => (
   Object.assign({
-    color: '#00ff00',
+    color: '00ff00',
     description: 'Stellar',
     mastery: false,
     onColorChange: () => {},

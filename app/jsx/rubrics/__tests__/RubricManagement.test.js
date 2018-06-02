@@ -17,25 +17,21 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
-import I18n from 'i18n!rubrics'
-import TabList, { TabPanel } from '@instructure/ui-core/lib/components/TabList'
-import ProficiencyTable from 'jsx/rubrics/ProficiencyTable'
-import RubricPanel from 'jsx/rubrics/RubricPanel'
+import { shallow } from 'enzyme'
+import RubricManagement from '../RubricManagement'
 
-const RubricManagement = ({accountId}) => (
-    <TabList defaultSelectedIndex={0}>
-      <TabPanel title={I18n.t('Account Rubrics')}>
-        <RubricPanel />
-      </TabPanel>
-      <TabPanel title={I18n.t('Learning Mastery')}>
-        <ProficiencyTable accountId={accountId} />
-      </TabPanel>
-    </TabList>
-  )
+const defaultProps = (props = {}) => (
+  Object.assign({
+    accountId: '1'
+  }, props)
+)
 
-RubricManagement.propTypes = {
-  accountId: PropTypes.string.isRequired
-}
+it('renders the RubricManagement component', () => {
+  const wrapper = shallow(<RubricManagement {...defaultProps()}/>)
+  expect(wrapper.debug()).toMatchSnapshot()
+})
 
-export default RubricManagement
+it('passes accountId to the ProficiencyTable component', () => {
+  const wrapper = shallow(<RubricManagement {...defaultProps()}/>)
+  expect(wrapper.find('ProficiencyTable').prop('accountId')).toBe('1')
+})

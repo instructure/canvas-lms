@@ -17,34 +17,100 @@
  */
 
 import React from 'react'
-import { shallow } from 'enzyme'
+import axios from 'axios'
+import { mount, shallow } from 'enzyme'
 import ProficiencyTable from '../ProficiencyTable'
 
 const defaultProps = (props = {}) => (
   Object.assign({
+    accountId: '1'
   }, props)
 )
 
-it('renders the ProficiencyRating component', () => {
-  const wrapper = shallow(<ProficiencyTable {...defaultProps()}/>)
-  expect(wrapper.debug()).toMatchSnapshot()
+let promise
+let getSpy
+
+describe('default proficiency', () => {
+  beforeEach(() => {
+    promise = Promise.resolve({status: 404})
+    getSpy = jest.spyOn(axios,'get').mockImplementation(() => promise)
+  })
+
+  afterEach(() => {
+    getSpy.mockRestore()
+  })
+
+  it('renders the ProficiencyRating component', () => {
+    const wrapper = shallow(<ProficiencyTable {...defaultProps()}/>)
+    expect(wrapper.debug()).toMatchSnapshot()
+  })
+
+  it('renders loading at startup', () => {
+    const wrapper = shallow(<ProficiencyTable {...defaultProps()}/>)
+    expect(wrapper.find('Spinner')).toHaveLength(1)
+  })
+
+  it('renders four ratings', () => {
+    const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
+    return promise.then(() =>
+      expect(wrapper.find('ProficiencyRating')).toHaveLength(4)
+    )
+  })
+
+  it('clicking button adds rating', () => {
+    const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
+    return promise.then(() => {
+      wrapper.findWhere(n => n.prop('variant') === 'circle-primary').simulate('click')
+      expect(wrapper.find('ProficiencyRating')).toHaveLength(5)
+    })
+  })
+
+  it('handling delete rating removes rating', () => {
+    const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
+    return promise.then(() => {
+      wrapper.instance().handleDelete(0)()
+      expect(wrapper.find('ProficiencyRating')).toHaveLength(3)
+    })
+  })
+
+  it('sends POST on submit', () => {
+    const postSpy = jest.spyOn(axios,'post').mockImplementation(() => Promise.resolve({status: 200}))
+    const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
+    return promise.then(() => {
+      wrapper.find('Button').last().simulate('click')
+      expect(axios.post).toHaveBeenCalledTimes(1)
+      postSpy.mockRestore()
+    })
+  })
 })
 
-it('defaults to four ratings', () => {
-  const wrapper = shallow(<ProficiencyTable {...defaultProps()}/>)
-  expect(wrapper.find('ProficiencyRating')).toHaveLength(4)
-})
-
-it('clicking button adds rating', () => {
-  const wrapper = shallow(<ProficiencyTable {...defaultProps()}/>)
-  wrapper.find('Button').first().simulate('click')
-  expect(wrapper.find('ProficiencyRating')).toHaveLength(5)
-})
-
-it('handling delete rating removes rating', () => {
-  const wrapper = shallow(<ProficiencyTable {...defaultProps()}/>)
-  wrapper.instance().handleDelete(0)()
-  expect(wrapper.find('ProficiencyRating')).toHaveLength(3)
+describe('custom proficiency', () => {
+  it('renders two ratings', () => {
+    promise = Promise.resolve({
+      status: 200,
+      data: {ratings: [
+        {
+          description: 'Great',
+          points: 10,
+          color: '0000ff',
+          mastery: true
+        },
+        {
+          description: 'Poor',
+          points: 0,
+          color: 'ff0000',
+          mastery: false
+        }
+      ]}
+    })
+    const spy = jest.spyOn(axios,'get').mockImplementation(() => promise)
+    const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
+    return promise.then(() => {
+        spy.mockRestore()
+        expect(wrapper.find('ProficiencyRating')).toHaveLength(2)
+      }
+    )
+  })
 })
 
 it('empty rating description leaves state invalid', () => {

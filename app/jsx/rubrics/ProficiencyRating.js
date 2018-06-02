@@ -157,7 +157,7 @@ export default class ProficiencyRating extends React.Component {
             <PopoverTrigger>
               <Button variant="link">
                 <div>
-                  <span className="colorPickerIcon" style={{background: color}} />
+                  <span className="colorPickerIcon" style={{background: formatColor(color)}} />
                   {I18n.t('Change')}
                 </div>
               </Button>
@@ -166,7 +166,7 @@ export default class ProficiencyRating extends React.Component {
               <ColorPicker
                 parentComponent="ProficiencyRating"
                 colors={PREDEFINED_COLORS}
-                currentColor={color}
+                currentColor={formatColor(color)}
                 isOpen
                 hidePrompt
                 nonModal

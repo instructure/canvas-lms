@@ -16,38 +16,93 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import IconPlus from 'instructure-icons/lib/Line/IconPlusLine'
 import I18n from 'i18n!rubrics'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import Table from '@instructure/ui-elements/lib/components/Table'
 import ProficiencyRating from 'jsx/rubrics/ProficiencyRating'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import uuid from 'uuid/v1'
 import _ from 'underscore'
 import { fromJS, List } from 'immutable'
+import { fetchProficiency, saveProficiency } from './api'
 import NumberHelper from '../shared/helpers/numberHelper'
 
-const ADD_DEFAULT_COLOR = '#EF4437'
+const ADD_DEFAULT_COLOR = 'EF4437'
+
+function unformatColor (color) {
+  if (color[0] === '#') {
+    return color.substring(1);
+  }
+  return color;
+}
 
 export default class ProficiencyTable extends React.Component {
+  static propTypes = {
+    accountId: PropTypes.string.isRequired
+  }
+
   constructor (props) {
     super(props)
     this.state = {
+      loading: true,
       masteryIndex: 1,
       rows: List([
-        this.createRating('Exceeds Mastery', 5, '#6A843F'),
-        this.createRating('Mastery', 4, '#8AAC53'),
-        this.createRating('Near Mastery', 3, '#E0D773'),
-        this.createRating('Well Below Mastery', 2, '#DF5B59')
+        this.createRating('Exceeds Mastery', 5, '6A843F'),
+        this.createRating('Mastery', 4, '8AAC53'),
+        this.createRating('Near Mastery', 3, 'E0D773'),
+        this.createRating('Well Below Mastery', 2, 'DF5B59')
       ])
     }
+  }
+
+  componentDidMount() {
+    this.fetchRatings()
   }
 
   componentDidUpdate() {
     if (this.fieldWithFocus()) {
       this.setState({rows: this.state.rows.map(row => row.delete('focusField'))})
     }
+  }
+
+  fetchRatings = () => {
+    fetchProficiency(this.props.accountId)
+      .then((response) => {
+        if (response.status === 200) {
+          this.configToState(response.data)
+        } else {
+          $.flashError(I18n.t('An error occurred while loading account proficiency ratings'))
+          this.setState({loading: false})
+        }
+      })
+      .catch((e) => {
+        // 404 status means no custom ratings, so use defaults without an alert
+        if (e.response.status !== 404) {
+          $.flashError(I18n.t(
+            'An error occurred while loading account proficiency ratings: %{m}', {
+              m: e.response.statusText
+            }
+          ))
+        }
+        this.setState({loading: false})
+      })
+  }
+
+  configToState = (data) => {
+    const rows = List(data.ratings.map((rating) => this.createRating(rating.description,
+                                                                     rating.points,
+                                                                     rating.color)))
+    const masteryIndex = data.ratings.findIndex((rating) => rating.mastery)
+    this.setState({
+      loading: false,
+      masteryIndex,
+      rows: fromJS(rows)
+    })
   }
 
   fieldWithFocus = () => this.state.rows.some(row => row.get('focusField'))
@@ -95,7 +150,7 @@ export default class ProficiencyTable extends React.Component {
   })
 
   handleColorChange = _.memoize((index) => (value) => {
-    const rows = this.state.rows.update(index, row => row.set('color', value))
+    const rows = this.state.rows.update(index, row => row.set('color', unformatColor(value)))
     this.setState({rows})
   })
 
@@ -111,9 +166,28 @@ export default class ProficiencyTable extends React.Component {
   isStateValid = () => !this.state.rows.some(row =>
     this.invalidPoints(row.get('points')) || this.invalidDescription(row.get('description')))
 
+
+  stateToConfig = () => ({
+    ratings: this.state.rows.map((row, idx) => ({
+      description: row.get('description'),
+      points: row.get('points'),
+      mastery: idx === this.state.masteryIndex,
+      color: row.get('color')
+    })).toJS()
+  })
+
   handleSubmit = () => {
     if (!this.isStateValid()) {
       this.checkForErrors()
+    } else {
+      saveProficiency(this.props.accountId, this.stateToConfig())
+        .then((response) => {
+          if (response.status === 200) {
+            $.flashMessage(I18n.t('Account proficiency ratings saved'))
+          } else {
+            $.flashError(I18n.t('An error occurred while saving account proficiency ratings'))
+          }
+        })
     }
   }
 
@@ -144,7 +218,15 @@ export default class ProficiencyTable extends React.Component {
 
   invalidDescription = (description) => !description || description.trim().length === 0
 
-  render() {
+  renderSpinner() {
+    return (
+      <div style={{textAlign: 'center'}}>
+        <Spinner title="Loading" size="large" margin="0 0 0 medium" />
+      </div>
+    )
+  }
+
+  renderTable() {
     const masteryIndex = this.state.masteryIndex
     return (
       <div>
@@ -191,5 +273,14 @@ export default class ProficiencyTable extends React.Component {
         </div>
       </div>
     )
+  }
+
+  render() {
+    const loading = this.state.loading
+    if (loading) {
+      return this.renderSpinner()
+    } else {
+     return this.renderTable()
+    }
   }
 }
