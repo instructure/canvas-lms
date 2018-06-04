@@ -205,6 +205,18 @@ describe ObserverAlertThresholdsApiController, type: :request do
       expect(json['threshold']).to eq '65'
       expect(ObserverAlertThreshold.active.where(observer: @observer, student: @student, alert_type: 'assignment_grade_low').count).to eq 1
     end
+
+    it 'updates a deleted threshold of that alert_type' do
+      observer_alert_threshold_model(alert_type: 'assignment_grade_high', threshold: '90', observer: @observer, student: @student)
+      @observer_alert_threshold.destroy
+
+      create_params = {alert_type: 'assignment_grade_high', threshold: '85', observer_id: @observer.to_param, user_id: @student.to_param}
+      params = {user_id: @observer.to_param, observer_alert_threshold: create_params,
+        controller: 'observer_alert_thresholds_api', action: 'create', format: 'json'}
+      json = api_call_as_user(@observer, :post, @path, params)
+      expect(json['id']).to eq @observer_alert_threshold.id
+      expect(json['threshold']).to eq '85'
+    end
   end
 
   describe '#update' do
