@@ -232,6 +232,9 @@
 
         <% end %>
       <% end %>
+      <% if @bypass_lock || (progress && progress.workflow_state == 'completed') %>
+        <div class="bz-explain-grade-link"><a href="/bz/grade_details?module_item_id=<%= mod.content_tags.first.id %>">Explain Grade</a></div>
+      <% end %>
     </div>
     <% end %>
   </div>

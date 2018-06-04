@@ -1,0 +1,89 @@
+<% if @is_staff %>
+
+<form method="GET">
+  <input type="hidden" name="module_item_id" value="<%= @module_item_id %>" />
+  <select name="user_id">
+<%
+  @course.students.active.each do |student|
+  %>
+    <option value="<%=student.id%>" <%= (student.id == @user_id) ? "selected" : "" %>><%=student.name%></option>
+  <%
+  end
+%>
+  </select>
+  <input type="submit" value="View" />
+</form>
+
+<table>
+  <tr>
+    <th>Field Name</th>
+    <th>Provided Answer</th>
+    <th>When Answered</th>
+    <th>Points Awarded</th>
+    <th>Points Possible</th>
+    <th>Explanation</th>
+  </tr>
+<% @response_object["audit_trace"].each do |thing| %>
+  <tr>
+    <td><a href="#<%= thing["field_name"] %>"><%= thing["field_name"] %></a></td>
+    <td><%= thing["field_value"] %></td>
+    <td><%= thing["field_timing"] %></td>
+    <td><%= thing["points_amount"].round(2) %></td>
+    <td><%= thing["points_possible"].round(2) %></td>
+    <td><%= thing["points_reason_english"] %></td>
+  </tr>
+<% end %>
+</table>
+<!-- reasons:
+  wrong, already_awarded, N/A, past_due (last few for 0), not_answered, participation, mastery (these for points).
+  May be preceded with partial_credit:
+-->
+
+<% end %>
+
+<div class="bz-grade-details-total-score">
+  <span class="label">Total score:</span>
+  <span class="number"><%= @response_object["total_score"].round(2) %></span>
+</div>
+
+
+  <%= @document.to_s.html_safe %>
+
+
+<script>
+  function prettyRound(n) {
+    return Math.round(n * 100) / 100;
+  }
+
+  var all = document.querySelectorAll("[data-bz-grade-info]");
+  for(var i = 0; i < all.length; i++) {
+    var e = all[i];
+
+    var info = JSON.parse(e.getAttribute("data-bz-grade-info"));
+
+    var div = document.createElement("div");
+    div.className = "grade-explained";
+    if(info["points_amount"] == 0 || info["points_amount"] == info["points_possible"]) {
+      // full credit
+      div.innerHTML =
+        "<span class=\"score\">" + prettyRound(info["points_possible"]) + " points</span>\n" +
+        (info["points_given"] ? "awarded because: " : "deducted because: ") + "\n" +
+        "<span class=\"score-reason\">" + info["points_reason_english"] + "</span>";
+    } else {
+      // partial credit
+      div.innerHTML =
+        "<span class=\"score\">" + prettyRound(info["points_amount"]) + "/" + prettyRound(info["points_possible"]) + " points</span>\n" +
+        (info["points_given"] ? "awarded for: " : "missed because: ") + "\n" +
+        "<span class=\"score-reason\">" + info["points_reason_english"] + "</span>";
+    }
+
+    div.id = info["field_name"];
+
+    if(info["points_given"])
+      div.className += info["points_possible"] == info["points_amount"] ? " correct" : " partial";
+    else
+      div.className += " incorrect";
+
+    e.parentNode.insertBefore(div, e);
+  }
+</script>

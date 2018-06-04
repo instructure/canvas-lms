@@ -300,6 +300,30 @@ class BZGrading
       end
     end
 
+
+    response_object["points_reason_english"] = case response_object["points_reason"]
+      when 'wrong'
+        'wrong answer'
+      when 'already_awarded'
+        'points already awarded elsewhere'
+      when 'N/A'
+        'N/A'
+      when 'past_due'
+        'answered past due'
+      when 'not_answered'
+        'no participation'
+      when 'participation'
+        'participation'
+      when 'mastery'
+        'mastery'
+      when 'partial_credit:participation'
+        'partial participation'
+      when 'partial_credit:mastery'
+        'partial mastery'
+      else
+        '?'
+    end
+
     return response_object
   end
 end

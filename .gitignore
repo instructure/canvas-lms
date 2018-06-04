@@ -85,3 +85,4 @@ docker-compose.override.yml
 
 # Local Development only files
 *.dev
+.env

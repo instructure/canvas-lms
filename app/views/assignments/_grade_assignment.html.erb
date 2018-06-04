@@ -17,6 +17,18 @@
 
   <% if @can_grade %>
     <li><a class="icon-speed-grader" href="/bz/grades_download.csv?assignment_id=<%=@assignment.id%>">Download Grades</a></li>
+
+    <% if @assignment.name.starts_with? "Course Participation -" %>
+      <%
+        mid = 0
+        disp_name = @assignment.name["Course Participation - ".length .. -1]
+        tag = @context.context_modules.active.where(:name => disp_name).first.content_tags.first
+        #tag = ContentTag.where(:content_id => page.id, :context_id => @context.id, :context_type => 'Course', :content_type => 'WikiPage').first
+        mid = tag.id unless tag.nil?
+      %>
+      <li><a class="icon-speed-grader" href="/bz/grade_details?module_item_id=<%= mid %>">Audit Grades</a></li>
+    <% end %>
+
   <% end %>
 
   <% if @current_student_submissions.present? %>

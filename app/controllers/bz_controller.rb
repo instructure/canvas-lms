@@ -7,11 +7,43 @@ require 'google/api_client/auth/storages/file_store'
 
 require 'csv'
 
+require 'bz_grading'
+
 class BzController < ApplicationController
 
   # magic field dump uses an access token instead
-  before_filter :require_user, :except => [:magic_field_dump]
+  # and courses_for_email is unauthenticated since it isn't really sensitive
+  before_filter :require_user, :except => [:magic_field_dump, :courses_for_email]
   skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user, :user_retained_data_batch]
+
+  # this is meant to be used for requests from external services like LL kits
+  # to see what courses the user is in. SSO just gives email, and server side, there
+  # isn't an authentication token, so we just want to give back numbers for the email
+  # address. Since course IDs aren't really sensitive, I am just letting it go unauthenticated
+  # (worst this could reveal is that email address X is associated with Braven program Y... just
+  # hitting "forgot password" with that email can already reveal that anyway, so no new hole.)
+  #
+  # I am also not using an access token like with the api since that actually opens the attack
+  # surface - they have access to a LOT more if something goes wrong.
+
+  # Input: email=something
+  # Output: while(1);{"course_id":[list,of,course,ids]}
+  # course ids may be repeated.
+  def courses_for_email
+    email = params[:email]
+
+    result = {}
+    result["course_ids"] = []
+
+    ul = UserList.new(email)
+    ul.users.each do |u|
+      u.enrollments.active.each do |e|
+        result["course_ids"] << e.course_id
+      end
+    end
+
+    render :json => result
+  end
 
   def champion_connect_redirect
     redirect_to BeyondZConfiguration.join_url + "connect"
@@ -108,194 +140,36 @@ class BzController < ApplicationController
     end
   end
 
+  def grade_details
+    @is_staff = @current_user.id == 1
 
-  def get_assignment_info(assignment_id)
-    assignment = Assignment.find(assignment_id)
-    sg = Assignment::SpeedGrader.new(
-      assignment,
-      @current_user,
-      avatars: false,
-      grading_role: :grader
-    ).json
+    user = params[:user_id].nil? ? @current_user : User.find(params[:user_id])
+    if user.id != @current_user.id && !@is_staff
+      raise "permission denied"
+    end
+    module_item_id = params[:module_item_id]
+    @module_item_id = module_item_id
+    @user_id = user.id
 
-    rubric = assignment.rubric
+    bzg = BZGrading.new
 
-    criteria = []
-    if rubric
-      rubric.data.each do |criterion|
-        obj = {}
-        obj["description"] = criterion["description"]
-        obj["criterion_id"] = criterion["id"]
-        if criterion["description"]
-          obj["section"] = criterion["description"][/^([0-9]+)/, 1]
-          obj["subsection"] = criterion["description"][/^[0-9]+\.([0-9]+)/, 1]
-        else
-          obj["section"] = 0
-          obj["subsection"] = 0
-        end
-        obj["points_available"] = criterion["points"]
-        criteria << obj
+    @course = bzg.get_context_module(module_item_id).course
+
+    @response_object = bzg.calculate_user_module_score(module_item_id, user)
+    i = 0
+    @document = nil
+    bzg.module_unique_magic_fields(module_item_id) do |umf|
+      if i == 0
+        @document = umf.document
       end
+      umf["data-bz-grade-info"] = @response_object["audit_trace"][i].to_json
+      i += 1
     end
-
-    criteria = criteria.sort_by { |h| [h["section"], h["subsection"]] }
-
-    sections = []
-    criteria.each do |c|
-      if sections.length == 0 || sections[-1] != c["section"]
-        sections << c["section"]
-      end
-    end
-
-    sections_points_available = []
-    criteria.each do |c|
-      sections_points_available[c["section"].to_i] = 0.0 if sections_points_available[c["section"].to_i].nil?
-      sections_points_available[c["section"].to_i] += c["points_available"].to_f
-    end
-
-    assignment_info = {}
-    assignment_info[:sg] = sg
-    assignment_info[:assignment] = assignment
-    assignment_info[:rubric] = rubric
-    assignment_info[:criteria] = criteria
-    assignment_info[:sections] = sections
-    assignment_info[:sections_points_available] = sections_points_available
-
-    assignment_info
   end
 
   def grades_download
-    assignments_info = []
-
-    students = []
-
-    if params[:assignment_id]
-      assignments_info << get_assignment_info(params[:assignment_id])
-      students = Course.find(Assignment.find(params[:assignment_id]).context_id).students.active
-    elsif params[:course_id]
-      Course.find(params[:course_id]).assignments.active.each do |a|
-        assignments_info << get_assignment_info(a.id)
-      end
-      students = Course.find(params[:course_id]).students.active
-    end
-
-
-    csv = CSV.generate do |csv|
-      # header
-      row = []
-      row << "Student ID"
-      row << "Student Name"
-      row << "Student Email"
-
-      assignments_info.each do |assignment_info|
-        assignment = assignment_info[:assignment]
-        criteria = assignment_info[:criteria]
-        sections = assignment_info[:sections]
-
-        row << "Total Score -- #{assignment.name}"
-
-        sections.each do |section|
-          row << "Category #{section} Average -- #{assignment.name}"
-        end
-
-        criteria.each do |criterion|
-          row << "#{criterion["description"]} -- #{assignment.name}"
-        end
-      end
-
-      csv << row
-
-
-      # data
-      students_done = {}
-      students.each do |student_obj|
-        next if students_done[student_obj.id]
-        students_done[student_obj.id] = true
-
-        row = []
-        # name
-        row << student_obj.id
-        row << student_obj.name
-        row << student_obj.email
-
-        assignments_info.each do |assignment_info|
-          sg = assignment_info[:sg]
-          assignment = assignment_info[:assignment]
-          rubric = assignment_info[:rubric]
-          criteria = assignment_info[:criteria]
-          sections = assignment_info[:sections]
-          sections_points_available = assignment_info[:sections_points_available]
-
-
-          student = nil
-
-          sg["context"]["students"].each do |student_sg|
-            if student_sg["id"].to_i == student_obj.id.to_i
-              student = student_sg
-              break
-            end
-          end
-          if student.nil?
-            student = {}
-            student["name"] = student_obj.name
-            student["rubric_assessments"] = []
-          end
-
-          latest_assessment = student["rubric_assessments"].last
-
-          # total score
-          if latest_assessment
-            row << "#{(latest_assessment["score"].to_f * 100 / assignment.points_possible.to_f).round(2)}%"
-          else
-            row << "0"
-          end
-
-          # section averages...
-
-          section_scores = []
-
-          criteria.each do |criterion|
-            points = 0.0
-            if latest_assessment
-              latest_assessment["data"].each do |datum|
-                points = datum["points"].to_f if datum["criterion_id"] == criterion["criterion_id"]
-              end
-            end
-            if section_scores[criterion["section"].to_i].nil?
-              section_scores[criterion["section"].to_i] = 0.0
-            end
-            section_scores[criterion["section"].to_i] += points # zero-based array of one-based sections
-          end
-
-
-          sections.each do |idx|
-            ss = section_scores[idx.to_i]
-            if sections_points_available[idx.to_i].nil?
-              row << ss
-            else
-              row << "#{(ss * 100 / sections_points_available[idx.to_i]).round(2)}%"
-            end
-          end
-
-          # individual breakdown...
-
-          criteria.each do |criterion|
-            points = 0.0
-            if latest_assessment
-              latest_assessment["data"].each do |datum|
-                points = datum["points"].to_f if datum["criterion_id"] == criterion["criterion_id"]
-              end
-            end
-            row << points
-          end
-        end
-        csv << row
-      end
-    end
-
-    respond_to do |format|
-      format.csv { render text: csv }
-    end
+    download = BzController::ExportGrades.new(@current_user.email, params)
+    Delayed::Job.enqueue(download, max_attempts: 1)
   end
 
   # When in speed grader and there's an assignment with BOTH magic fields and file upload,
@@ -786,6 +660,28 @@ class BzController < ApplicationController
   end
 
   # (private)
+  
+  class ExportGrades
+    def initialize(email, params)
+      @email = email
+      @params = params
+    end
+    
+    def perform
+      csv = Export::GradeDownload.csv(@params)
+      Mailer.bz_message(@email, "Export Success", "Attached is your export data", "grades_download" => csv).deliver
+      
+      csv
+    end
+
+    def on_permanent_failure(error)
+      er_id = Canvas::Errors.capture_exception("BzController::ExportGrades", error)[:error_report]
+      # email us?
+      Mailer.debug_message("Export FAIL", error.to_s).deliver
+      Mailer.bz_message(@email, "Export Failed :(", "Your grades download export didn't work. The tech team was also emailed to look into why.")
+    end
+  end
+  
   class ExportWork # < Delayed::PerformableMethod
     def initialize(email)
       @email = email

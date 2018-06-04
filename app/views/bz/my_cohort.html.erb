@@ -49,6 +49,7 @@
     <tr>
       <th>Name</th>
       <th>Email</th>
+      <th>Interests</th>
     </tr>
     <% enrollment.course_section.students.active.each do |student| %>
       <tr>
@@ -56,6 +57,8 @@
       <%= student.name %>
       </td><td>
       <%= student.email %>
+      </td><td>
+      <%= student.industry_interests.join(", ") %>
       </td>
       </tr>
     <% end %>
