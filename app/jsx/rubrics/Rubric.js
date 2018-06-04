@@ -19,6 +19,7 @@ import React from 'react'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import Table from '@instructure/ui-elements/lib/components/Table'
+import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
 import I18n from 'i18n!edit_rubric'
 
 import Criterion from './Criterion'
@@ -85,8 +86,12 @@ const Rubric = ({ onAssessmentChange, rubric, rubricAssessment, rubricAssociatio
         <tbody className="criterions">
           {criteria}
           <tr>
-            <td colSpan="3" className="total-points">
-              {hideScore || noScore ? null : total}
+            <td colSpan="3">
+              <Flex justifyItems="end">
+                <FlexItem>
+                  {hideScore || noScore ? null : total}
+                </FlexItem>
+              </Flex>
             </td>
           </tr>
         </tbody>

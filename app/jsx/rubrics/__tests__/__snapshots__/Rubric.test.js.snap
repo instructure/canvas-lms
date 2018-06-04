@@ -20,7 +20,11 @@ exports[`the Rubric component hides the score total when needed 1`] = `
       <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={{...}} savedComments={{...}} customRatings={{...}} />
       <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={{...}} savedComments={{...}} customRatings={{...}} />
       <tr>
-        <td colSpan=\\"3\\" className=\\"total-points\\" />
+        <td colSpan=\\"3\\">
+          <Flex justifyItems=\\"end\\" as=\\"span\\" direction=\\"row\\" alignItems=\\"center\\" inline={false} visualDebug={false} wrapItems={false}>
+            <FlexItem as=\\"span\\" grow={false} shrink={false} />
+          </Flex>
+        </td>
       </tr>
     </tbody>
   </Table>
@@ -47,8 +51,12 @@ exports[`the Rubric component renders as expected 1`] = `
       <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={{...}} savedComments={{...}} customRatings={{...}} />
       <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={{...}} savedComments={{...}} customRatings={{...}} />
       <tr>
-        <td colSpan=\\"3\\" className=\\"total-points\\">
-          Total Points: 6.0
+        <td colSpan=\\"3\\">
+          <Flex justifyItems=\\"end\\" as=\\"span\\" direction=\\"row\\" alignItems=\\"center\\" inline={false} visualDebug={false} wrapItems={false}>
+            <FlexItem as=\\"span\\" grow={false} shrink={false}>
+              Total Points: 6.0
+            </FlexItem>
+          </Flex>
         </td>
       </tr>
     </tbody>
@@ -76,8 +84,12 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
       <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={{...}} savedComments={{...}} customRatings={{...}} />
       <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={{...}} savedComments={{...}} customRatings={{...}} />
       <tr>
-        <td colSpan=\\"3\\" className=\\"total-points\\">
-          Total Points: 11.0
+        <td colSpan=\\"3\\">
+          <Flex justifyItems=\\"end\\" as=\\"span\\" direction=\\"row\\" alignItems=\\"center\\" inline={false} visualDebug={false} wrapItems={false}>
+            <FlexItem as=\\"span\\" grow={false} shrink={false}>
+              Total Points: 11.0
+            </FlexItem>
+          </Flex>
         </td>
       </tr>
     </tbody>
@@ -105,8 +117,12 @@ exports[`the Rubric component updates the total score when an individual criteri
       <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={[Function]} savedComments={{...}} customRatings={{...}} />
       <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={[Function]} savedComments={{...}} customRatings={{...}} />
       <tr>
-        <td colSpan=\\"3\\" className=\\"total-points\\">
-          Total Points: 5 out of 11.0
+        <td colSpan=\\"3\\">
+          <Flex justifyItems=\\"end\\" as=\\"span\\" direction=\\"row\\" alignItems=\\"center\\" inline={false} visualDebug={false} wrapItems={false}>
+            <FlexItem as=\\"span\\" grow={false} shrink={false}>
+              Total Points: 5 out of 11.0
+            </FlexItem>
+          </Flex>
         </td>
       </tr>
     </tbody>
