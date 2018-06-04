@@ -70,10 +70,15 @@ _.toPairs(rubrics).forEach(([key, rubric]) => {
 
 describe('Criterion', () => {
   it('can open and close the long description dialog', () => {
+    const criterion = {
+      ...rubrics.freeForm.criteria[1],
+      long_description: '<p> a wild paragraph appears </p>'
+    }
+
     const component = (
       <Criterion
         assessment={assessments.freeForm.data[1]}
-        criterion={rubrics.freeForm.criteria[1]}
+        criterion={criterion}
         freeForm
       />
     )
@@ -85,7 +90,9 @@ describe('Criterion', () => {
     expectState(false)
     render.find('LongDescription').prop('showLongDescription')()
     expectState(true)
-    render.find('LongDescriptionDialog').prop('close')()
+    const dialog = render.find('LongDescriptionDialog')
+    expect(dialog.shallow().find('div').html()).toMatchSnapshot()
+    dialog.prop('close')()
     expectState(false)
   })
 })

@@ -1,5 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Criterion can open and close the long description dialog 1`] = `"<div><p> a wild paragraph appears </p></div>"`;
+
 exports[`Free-form Rubric with a custom criterion by default renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
 "<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function]} onClose={[Function]} onEnter={[Function]} onEntering={[Function]} onEntered={[Function]} onExit={[Function]} onExiting={[Function]} onExited={[Function]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function]} shouldReturnFocus={true} defaultFocusElement={{...}}>
   <ModalHeader>
@@ -11,7 +13,9 @@ exports[`Free-form Rubric with a custom criterion by default renders the LongDes
     </Heading>
   </ModalHeader>
   <ModalBody padding=\\"medium\\" as=\\"div\\">
-    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\" />
+    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
+      <div dangerouslySetInnerHTML={{...}} />
+    </Text>
   </ModalBody>
 </Modal>"
 `;
@@ -48,7 +52,9 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the Lon
     </Heading>
   </ModalHeader>
   <ModalBody padding=\\"medium\\" as=\\"div\\">
-    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\" />
+    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
+      <div dangerouslySetInnerHTML={{...}} />
+    </Text>
   </ModalBody>
 </Modal>"
 `;
@@ -85,7 +91,9 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
     </Heading>
   </ModalHeader>
   <ModalBody padding=\\"medium\\" as=\\"div\\">
-    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\" />
+    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
+      <div dangerouslySetInnerHTML={{...}} />
+    </Text>
   </ModalBody>
 </Modal>"
 `;
@@ -131,7 +139,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the LongDe
   </ModalHeader>
   <ModalBody padding=\\"medium\\" as=\\"div\\">
     <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
-      sa Sivert.
+      <div dangerouslySetInnerHTML={{...}} />
     </Text>
   </ModalBody>
 </Modal>"
@@ -197,7 +205,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Lo
   </ModalHeader>
   <ModalBody padding=\\"medium\\" as=\\"div\\">
     <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
-      sa Sivert.
+      <div dangerouslySetInnerHTML={{...}} />
     </Text>
   </ModalBody>
 </Modal>"
@@ -263,7 +271,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
   </ModalHeader>
   <ModalBody padding=\\"medium\\" as=\\"div\\">
     <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
-      sa Sivert.
+      <div dangerouslySetInnerHTML={{...}} />
     </Text>
   </ModalBody>
 </Modal>"
@@ -320,7 +328,9 @@ exports[`Point Rubric with a custom criterion by default renders the LongDescrip
     </Heading>
   </ModalHeader>
   <ModalBody padding=\\"medium\\" as=\\"div\\">
-    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\" />
+    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
+      <div dangerouslySetInnerHTML={{...}} />
+    </Text>
   </ModalBody>
 </Modal>"
 `;
@@ -357,7 +367,9 @@ exports[`Point Rubric with a custom criterion when assessing renders the LongDes
     </Heading>
   </ModalHeader>
   <ModalBody padding=\\"medium\\" as=\\"div\\">
-    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\" />
+    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
+      <div dangerouslySetInnerHTML={{...}} />
+    </Text>
   </ModalBody>
 </Modal>"
 `;
@@ -395,7 +407,9 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
     </Heading>
   </ModalHeader>
   <ModalBody padding=\\"medium\\" as=\\"div\\">
-    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\" />
+    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
+      <div dangerouslySetInnerHTML={{...}} />
+    </Text>
   </ModalBody>
 </Modal>"
 `;
@@ -447,7 +461,7 @@ exports[`Point Rubric with a outcome criterion by default renders the LongDescri
   </ModalHeader>
   <ModalBody padding=\\"medium\\" as=\\"div\\">
     <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
-      sa Sivert.
+      <div dangerouslySetInnerHTML={{...}} />
     </Text>
   </ModalBody>
 </Modal>"
@@ -513,7 +527,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the LongDe
   </ModalHeader>
   <ModalBody padding=\\"medium\\" as=\\"div\\">
     <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
-      sa Sivert.
+      <div dangerouslySetInnerHTML={{...}} />
     </Text>
   </ModalBody>
 </Modal>"
@@ -580,7 +594,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
   </ModalHeader>
   <ModalBody padding=\\"medium\\" as=\\"div\\">
     <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
-      sa Sivert.
+      <div dangerouslySetInnerHTML={{...}} />
     </Text>
   </ModalBody>
 </Modal>"

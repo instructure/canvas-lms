@@ -53,6 +53,7 @@ LongDescription.propTypes = {
 
 const LongDescriptionDialog = ({ open, close, longDescription }) => {
   const modalHeader = I18n.t('Criterion Long Description')
+  /* eslint-disable react/no-danger */
   return (
     <Modal
        open={open}
@@ -60,23 +61,26 @@ const LongDescriptionDialog = ({ open, close, longDescription }) => {
        size="medium"
        label={modalHeader}
        shouldCloseOnDocumentClick
-     >
-       <ModalHeader>
-         <CloseButton
-           placement="end"
-           offset="medium"
-           variant="icon"
-           onClick={close}
-         >
-           Close
-         </CloseButton>
-         <Heading>{modalHeader}</Heading>
-       </ModalHeader>
-       <ModalBody>
-         <Text lineHeight="double">{longDescription}</Text>
-       </ModalBody>
+    >
+      <ModalHeader>
+        <CloseButton
+          placement="end"
+          offset="medium"
+          variant="icon"
+          onClick={close}
+        >
+          Close
+        </CloseButton>
+        <Heading>{modalHeader}</Heading>
+      </ModalHeader>
+      <ModalBody>
+        <Text lineHeight="double">
+          <div dangerouslySetInnerHTML={{ __html: longDescription }} />
+        </Text>
+      </ModalBody>
     </Modal>
   )
+  /* eslint-enable react/no-danger */
 }
 LongDescriptionDialog.propTypes = {
   close: PropTypes.func.isRequired,
