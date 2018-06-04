@@ -6323,6 +6323,18 @@ describe Assignment do
             expect(errors[:final_grader]).to eq ['Final grader must be an instructor in this course']
           end
         end
+
+        describe 'graders_anonymous_to_graders' do
+          it 'cannot be set to true when grader_comments_visible_to_graders is false' do
+            @assignment.update!(grader_comments_visible_to_graders: false, graders_anonymous_to_graders: true)
+            expect(@assignment).not_to be_graders_anonymous_to_graders
+          end
+
+          it 'can be set to true when grader_comments_visible_to_graders is true' do
+            @assignment.update!(grader_comments_visible_to_graders: true, graders_anonymous_to_graders: true)
+            expect(@assignment).to be_graders_anonymous_to_graders
+          end
+        end
       end
     end
   end

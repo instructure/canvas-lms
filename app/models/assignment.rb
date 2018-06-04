@@ -398,6 +398,9 @@ class Assignment < ActiveRecord::Base
     anonymous_instructor_annotations
     anonymous_grading
     workflow_state
+    graders_anonymous_to_graders
+    grader_comments_visible_to_graders
+    grader_names_visible_to_final_grader
   ).freeze
 
   def external_tool?
@@ -754,6 +757,7 @@ class Assignment < ActiveRecord::Base
       :peer_reviews, :automatic_peer_reviews, :muted, :intra_group_peer_reviews,
       :anonymous_grading
     ].each { |attr| self[attr] = false if self[attr].nil? }
+    self.graders_anonymous_to_graders = false unless grader_comments_visible_to_graders
   end
   protected :default_values
 

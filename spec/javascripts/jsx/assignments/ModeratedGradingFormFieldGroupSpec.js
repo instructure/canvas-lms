@@ -28,6 +28,8 @@ QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
     props = {
       availableModerators: [{name: 'John Doe', id: '923'}, {name: 'Jane Doe', id: '492'}],
       finalGraderID: undefined,
+      graderCommentsVisibleToGraders: true,
+      graderNamesVisibleToFinalGrader: true,
       gradedSubmissionsExist: false,
       locale: 'en',
       maxGraderCount: 10,
@@ -39,29 +41,9 @@ QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
     wrapper = mount(<ModeratedGradingFormFieldGroup {...props} />)
   }
 
-  function checkbox() {
-    return wrapper.find('input#assignment_moderated_grading[type="checkbox"]')
-  }
-
   function content() {
     return wrapper.find('.ModeratedGrading__Content')
   }
-
-  test('renders a Moderated Grading checkbox', () => {
-    mountComponent()
-    strictEqual(checkbox().length, 1)
-  })
-
-  test('renders an unchecked checkbox for Moderated Grading when passed moderatedGradingEnabled: false', () => {
-    props.moderatedGradingEnabled = false
-    mountComponent()
-    strictEqual(checkbox().node.checked, false)
-  })
-
-  test('renders a checked checkbox for Moderated Grading when passed moderatedGradingEnabled: true', () => {
-    mountComponent()
-    strictEqual(checkbox().node.checked, true)
-  })
 
   test('hides the moderated grading content when passed moderatedGradingEnabled: false', () => {
     props.moderatedGradingEnabled = false
@@ -86,16 +68,82 @@ QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
     strictEqual(graderCountInput.length, 1)
   })
 
-  test('hides the moderated grading content when the checkbox is unchecked', () => {
-    mountComponent()
-    checkbox().simulate('change')
-    strictEqual(content().length, 0)
+  QUnit.module('Moderated Grading Checkbox', () => {
+    function moderatedGradingCheckbox() {
+      return wrapper.find('input#assignment_moderated_grading[type="checkbox"]')
+    }
+
+    test('renders the checkbox', () => {
+      mountComponent()
+      strictEqual(moderatedGradingCheckbox().length, 1)
+    })
+
+    test('renders an unchecked checkbox when passed moderatedGradingEnabled: false', () => {
+      props.moderatedGradingEnabled = false
+      mountComponent()
+      strictEqual(moderatedGradingCheckbox().node.checked, false)
+    })
+
+    test('renders a checked checkbox when passed moderatedGradingEnabled: true', () => {
+      mountComponent()
+      strictEqual(moderatedGradingCheckbox().node.checked, true)
+    })
+
+    test('hides the moderated grading content when the checkbox is unchecked', () => {
+      mountComponent()
+      moderatedGradingCheckbox().simulate('change')
+      strictEqual(content().length, 0)
+    })
+
+    test('shows the moderated grading content when the checkbox is checked', () => {
+      props.moderatedGradingEnabled = false
+      mountComponent()
+      moderatedGradingCheckbox().simulate('change')
+      strictEqual(content().length, 1)
+    })
   })
 
-  test('shows the moderated grading content when the checkbox is checked', () => {
-    props.moderatedGradingEnabled = false
-    mountComponent()
-    checkbox().simulate('change')
-    strictEqual(content().length, 1)
+  QUnit.module('Grader Comment Visibility Checkbox', () => {
+    function graderCommentsVisibleToGradersCheckbox() {
+      return wrapper.find('input#assignment_grader_comment_visibility')
+    }
+
+    test('renders the checkbox', () => {
+      mountComponent()
+      strictEqual(graderCommentsVisibleToGradersCheckbox().length, 1)
+    })
+
+    test('renders an unchecked checkbox when passed graderCommentsVisibleToGraders: false', () => {
+      props.graderCommentsVisibleToGraders = false
+      mountComponent()
+      strictEqual(graderCommentsVisibleToGradersCheckbox().node.checked, false)
+    })
+
+    test('renders a checked checkbox when passed graderCommentsVisibleToGraders: true', () => {
+      mountComponent()
+      strictEqual(graderCommentsVisibleToGradersCheckbox().node.checked, true)
+    })
+  })
+
+  QUnit.module('Grader Names Visible to Final Grader Checkbox', () => {
+    function graderNamesVisibleToFinalGraderCheckbox() {
+      return wrapper.find('input#assignment_grader_names_visible_to_final_grader')
+    }
+
+    test('renders a grader names visible to final grader checkbox in the moderated grading content', () => {
+      mountComponent()
+      strictEqual(graderNamesVisibleToFinalGraderCheckbox().length, 1)
+    })
+
+    test('renders an unchecked checkbox when passed graderNamesVisibleToFinalGrader: false', () => {
+      props.graderNamesVisibleToFinalGrader = false
+      mountComponent()
+      strictEqual(graderNamesVisibleToFinalGraderCheckbox().node.checked, false)
+    })
+
+    test('renders a checked checkbox for Moderated Grading when passed graderNamesVisibleToFinalGrader: true', () => {
+      mountComponent()
+      strictEqual(graderNamesVisibleToFinalGraderCheckbox().node.checked, true)
+    })
   })
 })

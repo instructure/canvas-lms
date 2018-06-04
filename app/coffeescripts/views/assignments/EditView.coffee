@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
+  'react'
+  'react-dom'
   'INST'
   'i18n!assignment'
   '../ValidatedFormView'
@@ -39,15 +41,17 @@ define [
   '../../util/deparam'
   '../../util/SisValidationHelper'
   'jsx/assignments/AssignmentConfigurationTools'
+  'jsx/assignments/ModeratedGradingFormFieldGroup'
   'jqueryui/dialog'
   'jquery.toJSON'
   '../../jquery.rails_flash_notifications'
   '../../behaviors/tooltip'
-], (INST, I18n, ValidatedFormView, _, $, numberHelper, round, RichContentEditor, EditViewTemplate,
-  userSettings, TurnitinSettings, VeriCiteSettings, TurnitinSettingsDialog,
-  preventDefault, MissingDateDialog, AssignmentGroupSelector,
-  GroupCategorySelector, toggleAccessibly, RCEKeyboardShortcuts,
-  ConditionalRelease, deparam, SisValidationHelper, SimilarityDetectionTools) ->
+], (React, ReactDOM, INST, I18n, ValidatedFormView, _, $, numberHelper, round,
+  RichContentEditor, EditViewTemplate, userSettings, TurnitinSettings,
+  VeriCiteSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
+  AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly,
+  RCEKeyboardShortcuts, ConditionalRelease, deparam, SisValidationHelper,
+  SimilarityDetectionTools, ModeratedGradingFormFieldGroup) ->
 
   RichContentEditor.preloadRemoteModule()
 
@@ -138,7 +142,6 @@ define [
       events["click #{EXTERNAL_TOOLS_URL}_find"] = 'showExternalToolsDialog'
       events["change #assignment_points_possible"] = 'handlePointsChange'
       events["change #{PEER_REVIEWS_BOX}"] = 'handleModeratedGradingChange'
-      events["change #{MODERATED_GRADING_BOX}"] = 'handleModeratedGradingChange'
       events["change #{GROUP_CATEGORY_BOX}"] = 'handleGroupCategoryChange'
       events["change #{ANONYMOUS_GRADING_BOX}"] = 'handleAnonymousGradingChange'
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
@@ -250,15 +253,7 @@ define [
         if @$moderatedGradingBox.prop('checked')
           @disableCheckbox(@$peerReviewsBox, I18n.t("Peer reviews cannot be enabled for moderated assignments"))
           @disableCheckbox(@$groupCategoryBox, I18n.t("Group assignments cannot be enabled for moderated assignments"))
-          @enableCheckbox(@$moderatedGradingBox)
         else
-          if @$groupCategoryBox.prop('checked')
-            @disableCheckbox(@$moderatedGradingBox,  I18n.t("Moderated grading cannot be enabled for group assignments"))
-          else if @$peerReviewsBox.prop('checked')
-            @disableCheckbox(@$moderatedGradingBox, I18n.t("Moderated grading cannot be enabled for peer reviewed assignments"))
-          else
-            @enableCheckbox(@$moderatedGradingBox)
-
           @enableCheckbox(@$peerReviewsBox)
           @enableCheckbox(@$groupCategoryBox)
 
@@ -342,6 +337,7 @@ define [
       @$intraGroupPeerReviews = $("#{INTRA_GROUP_PEER_REVIEWS}")
       @$groupCategoryBox = $("#{GROUP_CATEGORY_BOX}")
       @$anonymousGradingBox = $("#{ANONYMOUS_GRADING_BOX}")
+      @renderModeratedGradingFormFieldGroup()
 
       @similarityDetectionTools = SimilarityDetectionTools.attach(
             @$similarityDetectionTools.get(0),
@@ -359,8 +355,6 @@ define [
       @handleGroupCategoryChange()
       @handleAnonymousGradingChange()
 
-      if ENV?.HAS_GRADED_SUBMISSIONS
-        @disableCheckbox(@$moderatedGradingBox, I18n.t("Moderated grading setting cannot be changed if graded submissions exist"))
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
         @conditionalReleaseEditor = ConditionalRelease.attach(
           @$conditionalReleaseTarget.get(0),
@@ -681,3 +675,21 @@ define [
       $(this).change (event) ->
         this.value = lockedValue
         event.stopPropagation()
+
+    renderModeratedGradingFormFieldGroup: ->
+      return if !ENV.MODERATED_GRADING_ENABLED || @assignment.isQuizLTIAssignment()
+
+      props =
+        currentGraderCount: @assignment.get('grader_count')
+        finalGraderID: @assignment.get('final_grader_id')
+        graderCommentsVisibleToGraders: !!@assignment.get('grader_comments_visible_to_graders')
+        graderNamesVisibleToFinalGrader: !!@assignment.get('grader_names_visible_to_final_grader')
+        gradedSubmissionsExist: ENV.HAS_GRADED_SUBMISSIONS
+        moderatedGradingEnabled: @assignment.moderatedGrading()
+        availableModerators: ENV.AVAILABLE_MODERATORS
+        maxGraderCount: ENV.MODERATED_GRADING_MAX_GRADER_COUNT
+        locale: ENV.LOCALE
+
+      formFieldGroup = React.createElement(ModeratedGradingFormFieldGroup, props)
+      mountPoint = document.querySelector("[data-component='ModeratedGradingFormFieldGroup']")
+      ReactDOM.render(formFieldGroup, mountPoint)

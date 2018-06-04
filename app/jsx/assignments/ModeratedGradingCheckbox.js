@@ -27,12 +27,12 @@ export default function ModeratedGradingCheckbox(props) {
   }
 
   const body = (
-    <label className="ModeratedGrading__CheckboxLabel"htmlFor="assignment_moderated_grading">
+    <label className="ModeratedGrading__CheckboxLabel" htmlFor="assignment_moderated_grading">
       <input type="hidden" name="moderated_grading" value={props.checked} />
 
       <input
         aria-disabled={props.gradedSubmissionsExist}
-        className="ModeratedGrading__Checkbox"
+        className="Assignment__Checkbox ModeratedGrading__Checkbox"
         checked={props.checked}
         disabled={props.gradedSubmissionsExist}
         id="assignment_moderated_grading"

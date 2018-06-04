@@ -206,10 +206,6 @@ div.form-column-right, div.overrides-column-right {
   margin-top: 5px;
 }
 
-.GradeAnonymously__CheckboxLabelText {
-  font-size: 15px;
-}
-
 .ModeratedGrading__Container {
   display: inline-block;
   margin-#{direction(left)}: 4px;
@@ -232,10 +228,13 @@ div.form-column-right, div.overrides-column-right {
   }
 
   .ModeratedGrading__Checkbox {
+    margin-#{direction(left)}: 20px;
+  }
+
+  .Assignment__Checkbox {
     margin-top: 5px;
     margin-#{direction(right)}: 7px;
     margin-bottom: 7px;
-    margin-#{direction(left)}: 20px;
   }
 
   .ModeratedGrading__CheckboxDescription {
@@ -248,6 +247,10 @@ div.form-column-right, div.overrides-column-right {
   .ModeratedGrading__CheckboxLabel {
     display: block;
     padding: 25px 0;
+  }
+
+  .GraderCommentVisibility__CheckboxLabel, .GraderNamesVisibleToFinalGrader__CheckboxLabel {
+    padding: 0 0 10px;
   }
 
   .ModeratedGrading__CheckboxLabelText {

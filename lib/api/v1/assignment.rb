@@ -37,6 +37,9 @@ module Api::V1::Assignment
       due_at
       final_grader_id
       grader_count
+      graders_anonymous_to_graders
+      grader_comments_visible_to_graders
+      grader_names_visible_to_final_grader
       lock_at
       unlock_at
       assignment_group_id
@@ -57,6 +60,9 @@ module Api::V1::Assignment
 
   API_ASSIGNMENT_NEW_RECORD_FIELDS = {
     :only => %w(
+      graders_anonymous_to_graders
+      grader_comments_visible_to_graders
+      grader_names_visible_to_final_grader
       points_possible
       due_at
       assignment_group_id
@@ -77,6 +83,9 @@ module Api::V1::Assignment
     only_visible_to_overrides
     post_to_sis
     time_zone_edited
+    graders_anonymous_to_graders
+    grader_comments_visible_to_graders
+    grader_names_visible_to_final_grader
   ].freeze
 
   def assignments_json(assignments, user, session, opts = {})
@@ -383,6 +392,9 @@ module Api::V1::Assignment
     description
     position
     points_possible
+    graders_anonymous_to_graders
+    grader_comments_visible_to_graders
+    grader_names_visible_to_final_grader
     grader_count
     grading_type
     allowed_extensions

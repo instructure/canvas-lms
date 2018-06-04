@@ -2656,6 +2656,60 @@ describe AssignmentsApiController, type: :request do
       expect(json_parse(response.body)['grader_count']).to eq 4
     end
 
+    it 'allows updating graders_anonymous_to_graders' do
+      course_with_teacher(active_all: true)
+      assignment = @course.assignments.create!(name: 'Some Assignment', moderated_grading: true, grader_count: 2)
+      api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+        {
+          controller: 'assignments_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id,
+          id: assignment.to_param
+        },
+        { assignment: { graders_anonymous_to_graders: true } },
+      )
+      expect(json_parse(response.body)['graders_anonymous_to_graders']).to be true
+    end
+
+    it 'allows updating grader_comments_visible_to_graders' do
+      course_with_teacher(active_all: true)
+      assignment = @course.assignments.create!(name: 'Some Assignment', moderated_grading: true, grader_count: 2)
+      api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+        {
+          controller: 'assignments_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id,
+          id: assignment.to_param
+        },
+        { assignment: { grader_comments_visible_to_graders: false } },
+      )
+      expect(json_parse(response.body)['grader_comments_visible_to_graders']).to be false
+    end
+
+    it 'allows updating grader_names_visible_to_final_grader' do
+      course_with_teacher(active_all: true)
+      assignment = @course.assignments.create!(name: 'Some Assignment', moderated_grading: true, grader_count: 2)
+      api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+        {
+          controller: 'assignments_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id,
+          id: assignment.to_param
+        },
+        { assignment: { grader_names_visible_to_final_grader: false } },
+      )
+      expect(json_parse(response.body)['grader_names_visible_to_final_grader']).to eq false
+    end
+
     it "should not allow updating an assignment title to longer than 255 characters" do
       course_with_teacher(:active_all => true)
       name_too_long = "a" * 256

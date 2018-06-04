@@ -20,7 +20,9 @@ import {arrayOf, bool, number, shape, string} from 'prop-types'
 import React from 'react'
 import I18n from 'i18n!assignments'
 import FinalGraderSelectMenu from './FinalGraderSelectMenu'
+import GraderCommentVisibilityCheckbox from './GraderCommentVisibilityCheckbox'
 import GraderCountNumberInput from './GraderCountNumberInput'
+import GraderNamesVisibleToFinalGraderCheckbox from './GraderNamesVisibleToFinalGraderCheckbox'
 import ModeratedGradingCheckbox from './ModeratedGradingCheckbox'
 import {direction} from '../shared/helpers/rtlHelper'
 
@@ -29,6 +31,8 @@ export default class ModeratedGradingFormFieldGroup extends React.Component {
     availableModerators: arrayOf(shape({name: string.isRequired, id: string.isRequired})).isRequired,
     currentGraderCount: number,
     finalGraderID: string,
+    graderCommentsVisibleToGraders: bool.isRequired,
+    graderNamesVisibleToFinalGrader: bool.isRequired,
     gradedSubmissionsExist: bool.isRequired,
     locale: string.isRequired,
     maxGraderCount: number.isRequired,
@@ -72,9 +76,17 @@ export default class ModeratedGradingFormFieldGroup extends React.Component {
                   locale={this.props.locale}
                 />
 
+                <GraderCommentVisibilityCheckbox
+                  checked={this.props.graderCommentsVisibleToGraders}
+                />
+
                 <FinalGraderSelectMenu
                   availableModerators={this.props.availableModerators}
                   finalGraderID={this.props.finalGraderID}
+                />
+
+                <GraderNamesVisibleToFinalGraderCheckbox
+                  checked={this.props.graderNamesVisibleToFinalGrader}
                 />
               </div>
             )}

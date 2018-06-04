@@ -19,8 +19,6 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'react'
-  'react-dom'
   '../backbone-ext/DefaultUrlMixin'
   '../models/TurnitinSettings'
   '../models/VeriCiteSettings'
@@ -29,12 +27,11 @@ define [
   '../collections/DateGroupCollection'
   'i18n!assignments'
   'jsx/grading/helpers/GradingPeriodsHelper'
-  'jsx/assignments/ModeratedGradingFormFieldGroup.js'
   'timezone'
   'jsx/shared/helpers/numberHelper'
   '../util/PandaPubPoller'
-], ($, _, {Model}, React, ReactDOM, DefaultUrlMixin, TurnitinSettings, VeriCiteSettings, DateGroup,
-    AssignmentOverrideCollection, DateGroupCollection, I18n, GradingPeriodsHelper, ModeratedGradingFormFieldGroup,
+], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, VeriCiteSettings, DateGroup,
+    AssignmentOverrideCollection, DateGroupCollection, I18n, GradingPeriodsHelper,
     tz, numberHelper, PandaPubPoller) ->
 
   isAdmin = () ->
@@ -212,6 +209,10 @@ define [
     anonymousGrading: (anonymousGradingBoolean) =>
       return @get 'anonymous_grading' unless arguments.length > 0
       @set 'anonymous_grading', anonymousGradingBoolean
+
+    gradersAnonymousToGraders: (anonymousGraders) =>
+      return @get('graders_anonymous_to_graders') unless arguments.length > 0
+      @set 'graders_anonymous_to_graders', anonymousGraders
 
     peerReviews: (peerReviewBoolean) =>
       return @get 'peer_reviews' unless arguments.length > 0
@@ -452,7 +453,7 @@ define [
         'isImporting', 'failedToImport',
         'secureParams', 'inClosedGradingPeriod', 'dueDateRequired',
         'submissionTypesFrozen', 'anonymousInstructorAnnotations',
-        'anonymousGrading'
+        'anonymousGrading', 'gradersAnonymousToGraders'
       ]
 
       hash =
@@ -588,17 +589,3 @@ define [
 
     isRestrictedByMasterCourse: ->
       @get('is_master_course_child_content') && @get('restricted_by_master_course')
-
-    renderModeratedGradingFormFieldGroup: ->
-      props =
-        currentGraderCount: @get('grader_count')
-        finalGraderID: @get('final_grader_id')
-        gradedSubmissionsExist: ENV.HAS_GRADED_SUBMISSIONS
-        moderatedGradingEnabled: @moderatedGrading()
-        availableModerators: ENV.AVAILABLE_MODERATORS
-        maxGraderCount: ENV.MODERATED_GRADING_MAX_GRADER_COUNT
-        locale: ENV.LOCALE
-
-      formFieldGroup = React.createElement(ModeratedGradingFormFieldGroup, props)
-      mountPoint = document.querySelector("[data-component='ModeratedGradingFormFieldGroup']")
-      ReactDOM.render(formFieldGroup, mountPoint)

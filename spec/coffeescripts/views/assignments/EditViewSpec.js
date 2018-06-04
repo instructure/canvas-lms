@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import React from 'react'
 import _ from 'underscore'
 import SectionCollection from 'compiled/collections/SectionCollection'
 import Assignment from 'compiled/models/Assignment'
@@ -35,6 +36,7 @@ import tinymce from 'compiled/editor/stocktiny'
 import 'helpers/jquery.simulate'
 
 const s_params = 'some super secure params'
+const fixtures = document.getElementById('fixtures')
 
 const nameLengthHelper = function(
   view,
@@ -100,8 +102,14 @@ const editView = function(assignmentOpts = {}) {
 
 QUnit.module('EditView', {
   setup() {
+    fixtures.innerHTML = '<span data-component="ModeratedGradingFormFieldGroup"></span>'
     fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
       current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
       COURSE_ID: 1
     })
@@ -466,8 +474,17 @@ test('rounds points_possible', function() {
 
 QUnit.module('EditView: handleGroupCategoryChange', {
   setup() {
-    fakeENV.setup()
-    ENV.COURSE_ID = 1
+    fixtures.innerHTML = '<span data-component="ModeratedGradingFormFieldGroup"></span>'
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1
+    })
     this.server = sinon.fakeServer.create()
   },
   teardown() {
@@ -482,15 +499,25 @@ QUnit.module('EditView: handleGroupCategoryChange', {
 
 test('calls handleModeratedGradingChange', function() {
   const view = this.editView()
-  const spy = this.spy(view, 'handleModeratedGradingChange')
+  sinon.spy(view, 'handleModeratedGradingChange')
   view.handleGroupCategoryChange()
-  ok(spy.calledOnce)
+  ok(view.handleModeratedGradingChange.calledOnce)
+  view.handleModeratedGradingChange.restore()
 })
 
 QUnit.module('EditView: group category inClosedGradingPeriod', {
   setup() {
-    fakeENV.setup()
-    ENV.COURSE_ID = 1
+    fixtures.innerHTML = '<span data-component="ModeratedGradingFormFieldGroup"></span>'
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1
+    })
     this.server = sinon.fakeServer.create()
   },
   teardown() {
@@ -519,8 +546,17 @@ test('lock down group category after students submit', function() {
 
 QUnit.module('EditView: enableCheckbox', {
   setup() {
-    fakeENV.setup()
-    ENV.COURSE_ID = 1
+    fixtures.innerHTML = '<span data-component="ModeratedGradingFormFieldGroup"></span>'
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1
+    })
     this.server = sinon.fakeServer.create()
   },
 
@@ -557,8 +593,17 @@ test('does nothing if assignment is in closed grading period', function() {
 
 QUnit.module('EditView: setDefaultsIfNew', {
   setup() {
-    fakeENV.setup()
-    ENV.COURSE_ID = 1
+    fixtures.innerHTML = '<span data-component="ModeratedGradingFormFieldGroup"></span>'
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1
+    })
     this.server = sinon.fakeServer.create()
   },
   teardown() {
@@ -616,8 +661,17 @@ test('will overwrite empty arrays', function() {
 
 QUnit.module('EditView: setDefaultsIfNew: no localStorage', {
   setup() {
-    fakeENV.setup()
-    ENV.COURSE_ID = 1
+    fixtures.innerHTML = '<span data-component="ModeratedGradingFormFieldGroup"></span>'
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1
+    })
     this.stub(userSettings, 'contextGet').returns(null)
     this.server = sinon.fakeServer.create()
   },
@@ -639,8 +693,17 @@ test('submission_type is online if no cache', function() {
 
 QUnit.module('EditView: cacheAssignmentSettings', {
   setup() {
-    fakeENV.setup()
-    ENV.COURSE_ID = 1
+    fixtures.innerHTML = '<span data-component="ModeratedGradingFormFieldGroup"></span>'
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1
+    })
     this.server = sinon.fakeServer.create()
   },
   teardown() {
@@ -671,10 +734,19 @@ test('rejects invalid attributes when caching', function() {
 
 QUnit.module('EditView: Conditional Release', {
   setup() {
-    fakeENV.setup()
-    ENV.COURSE_ID = 1
-    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-    ENV.CONDITIONAL_RELEASE_ENV = {assignment: {id: 1}, jwt: 'foo'}
+    fixtures.innerHTML = '<span data-component="ModeratedGradingFormFieldGroup"></span>'
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      CONDITIONAL_RELEASE_ENV: {assignment: {id: 1}, jwt: 'foo'},
+      CONDITIONAL_RELEASE_SERVICE_ENABLED: true,
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1
+    })
     $(document).on('submit', () => false)
     this.server = sinon.fakeServer.create()
   },
@@ -757,8 +829,17 @@ test('focuses in conditional release editor if conditional save validation fails
 
 QUnit.module('Editview: Intra-Group Peer Review toggle', {
   setup() {
-    fakeENV.setup()
-    ENV.COURSE_ID = 1
+    fixtures.innerHTML = '<span data-component="ModeratedGradingFormFieldGroup"></span>'
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1
+    })
     this.server = sinon.fakeServer.create()
   },
   teardown() {
@@ -801,9 +882,18 @@ test('toggle does not appear when there is no group', function() {
 
 QUnit.module('EditView: Assignment Configuration Tools', {
   setup() {
-    fakeENV.setup()
-    ENV.COURSE_ID = 1
-    ENV.PLAGIARISM_DETECTION_PLATFORM = true
+    fixtures.innerHTML = '<span data-component="ModeratedGradingFormFieldGroup"></span>'
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      PLAGIARISM_DETECTION_PLATFORM: true,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1
+    })
     this.server = sinon.fakeServer.create()
   },
 
@@ -869,8 +959,16 @@ test('it is hidden if the plagiarism_detection_platform flag is disabled', funct
 
 QUnit.module('EditView: Quizzes 2', {
   setup() {
-    fakeENV.setup()
-    ENV.COURSE_ID = 1
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1
+    })
     this.server = sinon.fakeServer.create()
     this.view = editView({
       submission_types: ['external_tool'],
@@ -889,7 +987,7 @@ test('does not show the description textarea', function() {
 })
 
 test('does not show the moderated grading checkbox', function() {
-  equal(this.view.$moderatedGradingBox.length, 0)
+  equal(document.getElementById('assignment_moderated_grading'), null)
 })
 
 test('does not show the load in new tab checkbox', function() {
@@ -899,13 +997,24 @@ test('does not show the load in new tab checkbox', function() {
 QUnit.module('EditView: anonymous grading', (hooks) => {
   let server;
   hooks.beforeEach(() => {
-    fakeENV.setup()
+    fixtures.innerHTML = '<span data-component="ModeratedGradingFormFieldGroup"></span>'
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1
+    })
     server = sinon.fakeServer.create()
   });
 
   hooks.afterEach(() => {
     server.restore()
     fakeENV.teardown()
+    fixtures.innerHTML = ''
   });
 
   test('does not show the checkbox when environment is not set', () => {
@@ -946,14 +1055,24 @@ QUnit.module('EditView: Anonymous Instructor Annotations', (hooks) => {
   let server
 
   hooks.beforeEach(() => {
-    fakeENV.setup()
-    ENV.COURSE_ID = 1
+    fixtures.innerHTML = '<span data-component="ModeratedGradingFormFieldGroup"></span>'
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1
+    })
     server = sinon.fakeServer.create()
   })
 
   hooks.afterEach(() => {
     server.restore()
     fakeENV.teardown()
+    fixtures.innerHTML = ''
   })
 
   test('shows a checkbox', () => {
@@ -963,14 +1082,23 @@ QUnit.module('EditView: Anonymous Instructor Annotations', (hooks) => {
 })
 
 QUnit.module('EditView: Anonymous Moderated Marking', (hooks) => {
-  const fixtures = document.getElementById('fixtures')
   let server
 
   hooks.beforeEach(() => {
-    const editorTabs = document.createElement('span')
-    editorTabs.setAttribute('id', 'editor_tabs')
-    fixtures.appendChild(editorTabs)
-    fakeENV.setup({ COURSE_ID: 1 })
+    fixtures.innerHTML = `
+      <span id="editor_tabs"></span>
+      <span data-component="ModeratedGradingFormFieldGroup"></span>
+    `
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1
+    })
     server = sinon.fakeServer.create()
   })
 
@@ -988,15 +1116,24 @@ QUnit.module('EditView: Anonymous Moderated Marking', (hooks) => {
 })
 
 QUnit.module('EditView#validateFinalGrader', (hooks) => {
-  const fixtures = document.getElementById('fixtures')
   let server
   let view
 
   hooks.beforeEach(() => {
-    const editorTabs = document.createElement('span')
-    editorTabs.setAttribute('id', 'editor_tabs')
-    fixtures.appendChild(editorTabs)
-    fakeENV.setup({ COURSE_ID: 1 })
+    fixtures.innerHTML = `
+      <span id="editor_tabs"></span>
+      <span data-component="ModeratedGradingFormFieldGroup"></span>
+    `
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1
+    })
     server = sinon.fakeServer.create()
     view = editView()
   })
@@ -1024,13 +1161,24 @@ QUnit.module('EditView#validateFinalGrader', (hooks) => {
 })
 
 QUnit.module('EditView#validateGraderCount', (hooks) => {
-  const fixtures = document.getElementById('fixtures')
   let server
   let view
 
   hooks.beforeEach(() => {
-    fixtures.innerHTML = '<span id="editor_tabs"></span>'
-    fakeENV.setup({ COURSE_ID: 1 })
+    fixtures.innerHTML = `
+      <span id="editor_tabs"></span>
+      <span data-component="ModeratedGradingFormFieldGroup"></span>
+    `
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1
+    })
     server = sinon.fakeServer.create()
     view = editView()
   })
@@ -1064,5 +1212,113 @@ QUnit.module('EditView#validateGraderCount', (hooks) => {
   test('returns an error if moderated grading is turned on and grader count is 0', () => {
     const errors = view.validateGraderCount({ moderated_grading: 'on', grader_count: '0' })
     deepEqual(Object.keys(errors), ['grader_count'])
+  })
+})
+
+QUnit.module('EditView#renderModeratedGradingFormFieldGroup', (suiteHooks) => {
+  let view
+  let server
+  const availableModerators = [{ name: 'John Doe', id: '21' }, { name: 'Jane Doe', id: '89' }]
+
+  suiteHooks.beforeEach(() => {
+    fixtures.innerHTML = `
+      <span id="editor_tabs"></span>
+      <span data-component="ModeratedGradingFormFieldGroup"></span>
+    `
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: availableModerators,
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: false,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1
+    })
+    server = sinon.fakeServer.create()
+    view = editView()
+  })
+
+  suiteHooks.afterEach(() => {
+    server.restore()
+    fakeENV.teardown()
+    fixtures.innerHTML = ''
+  })
+
+  test('renders the moderated grading form field group when Moderated Grading is enabled', () => {
+    ENV.MODERATED_GRADING_ENABLED = true
+    view.renderModeratedGradingFormFieldGroup()
+    strictEqual(document.getElementsByClassName('ModeratedGrading__Container').length, 1)
+  })
+
+  test('does not render the moderated grading form field group when Moderated Grading is disabled', () => {
+    view.renderModeratedGradingFormFieldGroup()
+    strictEqual(document.getElementsByClassName('ModeratedGrading__Container').length, 0)
+  })
+
+  QUnit.module('props passed to the component', (hooks) => {
+    hooks.beforeEach(() => {
+      ENV.MODERATED_GRADING_ENABLED = true
+      sinon.spy(React, 'createElement')
+    })
+
+    hooks.afterEach(() => {
+      React.createElement.restore()
+    })
+
+    function props() {
+      return React.createElement.getCall(0).args[1]
+    }
+
+    test('passes the final_grader_id as a prop to the component', () => {
+      view.assignment.set('final_grader_id', '293')
+      view.renderModeratedGradingFormFieldGroup()
+      strictEqual(props().finalGraderID, '293')
+    })
+
+    test('passes moderated_grading as a prop to the component', () => {
+      view.assignment.set('moderated_grading', true)
+      view.renderModeratedGradingFormFieldGroup()
+      strictEqual(props().moderatedGradingEnabled, true)
+    })
+
+    test('passes available moderators in the ENV as a prop to the component', () => {
+      view.assignment.set('moderated_grading', true)
+      view.renderModeratedGradingFormFieldGroup()
+      strictEqual(props().availableModerators, availableModerators)
+    })
+
+    test('passes max grader count in the ENV as a prop to the component', () => {
+      view.renderModeratedGradingFormFieldGroup()
+      strictEqual(props().maxGraderCount, ENV.MODERATED_GRADING_MAX_GRADER_COUNT)
+    })
+
+    test('passes locale in the ENV as a prop to the component', () => {
+      view.renderModeratedGradingFormFieldGroup()
+      strictEqual(props().locale, ENV.LOCALE)
+    })
+
+    test('passes HAS_GRADED_SUBMISSIONS in the ENV as a prop to the component', () => {
+      view.renderModeratedGradingFormFieldGroup()
+      strictEqual(props().gradedSubmissionsExist, ENV.HAS_GRADED_SUBMISSIONS)
+    })
+
+    test('passes current grader count as a prop to the component', () => {
+      view.assignment.set('grader_count', 4)
+      view.renderModeratedGradingFormFieldGroup()
+      strictEqual(props().currentGraderCount, 4)
+    })
+
+    test('passes grader_comments_visible_to_graders as a prop to the component', () => {
+      view.assignment.set('grader_comments_visible_to_graders', true)
+      view.renderModeratedGradingFormFieldGroup()
+      strictEqual(props().graderCommentsVisibleToGraders, true)
+    })
+
+    test('passes grader_names_visible_to_final_grader as a prop to the component', () => {
+      view.assignment.set('grader_names_visible_to_final_grader', true)
+      view.renderModeratedGradingFormFieldGroup()
+      strictEqual(props().graderNamesVisibleToFinalGrader, true)
+    })
   })
 })
