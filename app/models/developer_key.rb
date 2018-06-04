@@ -251,7 +251,7 @@ class DeveloperKey < ActiveRecord::Base
   def validate_scopes!
     return true unless api_token_scoping_on?
     return true if self.scopes.empty?
-    invalid_scopes = self.scopes - TokenScopes::ALL_SCOPES
+    invalid_scopes = self.scopes - TokenScopes.all_scopes
     return true if invalid_scopes.empty?
     self.errors[:scopes] << "cannot contain #{invalid_scopes.join(', ')}"
   end
