@@ -1,0 +1,1 @@
+SettingsService::AuthToken.authenticator = ::AccessToken
