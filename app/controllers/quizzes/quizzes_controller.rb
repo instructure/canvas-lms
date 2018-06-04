@@ -432,6 +432,7 @@ class Quizzes::QuizzesController < ApplicationController
       end
 
       quiz_params[:lock_at] = nil if quiz_params.delete(:do_lock_at) == 'false'
+      created_quiz = @quiz.created?
 
       Assignment.suspend_due_date_caching do
         @quiz.with_versioning(false) do
@@ -497,7 +498,7 @@ class Quizzes::QuizzesController < ApplicationController
           end
         end
 
-        if @quiz.assignment && (@overrides_affected.to_i > 0 || cached_due_dates_changed)
+        if @quiz.assignment && (@overrides_affected.to_i > 0 || cached_due_dates_changed || created_quiz)
           DueDateCacher.recompute(@quiz.assignment, update_grades: true)
         end
 
