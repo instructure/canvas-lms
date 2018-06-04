@@ -62,7 +62,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
         expect(json.length).to eq 0
       end
 
-      it 'errors if users are no longer linked' do
+      it 'returns an empty array if users are no longer linked' do
         observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
         observer_alert_threshold_model(observer: observer, student: @student, alert_type: 'course_grade_high')
         observer.enrollments.active.map(&:destroy)
@@ -71,8 +71,8 @@ describe ObserverAlertThresholdsApiController, type: :request do
         params = {user_id: observer.to_param, student_id: @student.to_param,
           controller: 'observer_alert_thresholds_api', action: 'index', format: 'json'}
 
-        api_call_as_user(observer, :get, path, params)
-        expect(response.code).to eq "401"
+        json = api_call_as_user(observer, :get, path, params)
+        expect(json.length).to eq 0
       end
     end
 
@@ -99,7 +99,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
         expect(json.length).to eq 0
       end
 
-      it 'errors if users are no longer linked' do
+      it 'returns an empty array if users are no longer linked' do
         observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
         observer_alert_threshold_model(observer: observer, student: @student, alert_type: 'course_grade_high')
         observer.enrollments.active.map(&:destroy)
@@ -107,8 +107,8 @@ describe ObserverAlertThresholdsApiController, type: :request do
         path = "/api/v1/users/#{observer.id}/observer_alert_thresholds"
         params = {user_id: observer.to_param, controller: 'observer_alert_thresholds_api', action: 'index', format: 'json'}
 
-        api_call_as_user(observer, :get, path, params)
-        expect(response.code).to eq "401"
+        json = api_call_as_user(observer, :get, path, params)
+        expect(json.length).to eq 0
       end
     end
   end
@@ -149,7 +149,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
     end
 
     it 'creates the threshold' do
-      create_params = {alert_type: 'assignment_grade_high', threshold: "88", observer_id: @observer.to_param, user_id: @student.to_param}
+      create_params = {alert_type: 'assignment_grade_high', threshold: "88", user_id: @student.to_param}
       params = {user_id: @observer.to_param, observer_alert_threshold: create_params,
         controller: 'observer_alert_thresholds_api', action: 'create', format: 'json'}
       json = api_call_as_user(@observer, :post, @path, params)
@@ -217,7 +217,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
 
     it 'updates the threshold' do
       update_params = {threshold: "50", alert_type: "assignment_missing"}
-      params = @params.merge({observer_alert_threshold: update_params})
+      params = @params.merge(update_params)
       json = api_call_as_user(@observer, :put, @path, params)
       expect(json['alert_type']).to eq 'assignment_grade_low'
       expect(json['threshold']).to eq "50"
@@ -228,7 +228,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
     it 'errors if users are not linked' do
       user = user_model
       path = "/api/v1/users/#{user.id}/observer_alert_thresholds/#{@observer_alert_threshold.id}"
-      params = @params.merge({user_id: user.to_param, observer_alert_threshold: {threshold: "50"}})
+      params = @params.merge({user_id: user.to_param, threshold: "50"})
 
       api_call_as_user(user, :put, path, params)
       expect(response.code).to eq "401"

@@ -30,10 +30,7 @@ class ObserverAlertThresholdsApiController < ApplicationController
                    @current_user.as_observer_observer_alert_thresholds.active
                  end
 
-    if thresholds.count > 0
-      thresholds = thresholds.select(&:users_are_still_linked?)
-      return render_unauthorized_action unless thresholds.count > 0
-    end
+    thresholds = thresholds.select(&:users_are_still_linked?)
 
     render json: thresholds.map { |threshold| observer_alert_threshold_json(threshold, @current_user, session) }
   end
@@ -46,12 +43,18 @@ class ObserverAlertThresholdsApiController < ApplicationController
 
   def create
     attrs = create_params
+    begin
+      user = api_find(User, attrs[:user_id])
+    rescue
+      return render json: {errors: ['user_id is invalid']}, status: :bad_request
+    end
 
-    threshold = ObserverAlertThreshold.active.where(observer: attrs[:observer_id], student: attrs[:user_id], alert_type: attrs[:alert_type]).take
+    threshold = ObserverAlertThreshold.active.where(observer: @current_user, student: attrs[:user_id], alert_type: attrs[:alert_type]).take
     if threshold
       # update if duplicate
       threshold.update(threshold: attrs[:threshold])
     else
+      attrs = attrs.merge(observer: @current_user)
       threshold = ObserverAlertThreshold.create(attrs)
     end
 
@@ -65,8 +68,8 @@ class ObserverAlertThresholdsApiController < ApplicationController
   def update
     threshold = ObserverAlertThreshold.active.find(params[:observer_alert_threshold_id])
     return render_unauthorized_action unless threshold.observer_id == @current_user.id && threshold.users_are_still_linked?
-    threshold.update(update_params)
-    render json: observer_alert_threshold_json(threshold.reload, @current_user, session)
+    threshold.update(threshold: params[:threshold])
+    render json: observer_alert_threshold_json(threshold, @current_user, session)
   end
 
   def destroy
@@ -77,10 +80,6 @@ class ObserverAlertThresholdsApiController < ApplicationController
   end
 
   def create_params
-    params.require(:observer_alert_threshold).permit(:alert_type, :threshold, :observer_id, :user_id)
-  end
-
-  def update_params
-    params.require(:observer_alert_threshold).permit(:threshold)
+    params.require(:observer_alert_threshold).permit(:alert_type, :threshold, :user_id)
   end
 end
