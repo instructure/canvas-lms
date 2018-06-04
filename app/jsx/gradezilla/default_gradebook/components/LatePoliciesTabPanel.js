@@ -21,7 +21,7 @@ import { bool, func, number, shape, string } from 'prop-types';
 import Alert from '@instructure/ui-alerts/lib/components/Alert';
 import View from '@instructure/ui-layout/lib/components/View';
 import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup';
-import NumberInput from '@instructure/ui-core/lib/components/NumberInput';
+import NumberInput from '@instructure/ui-forms/lib/components/NumberInput';
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent';
 import Spinner from '@instructure/ui-elements/lib/components/Spinner';
 import Text from '@instructure/ui-elements/lib/components/Text';
@@ -50,21 +50,22 @@ function validationError (input) {
   return null;
 }
 
+const errorMessages = {
+  missingSubmissionDeduction: {
+    notNumeric: I18n.t('Missing submission grade must be numeric'),
+    outOfRange: I18n.t('Missing submission grade must be between 0 and 100')
+  },
+  lateSubmissionDeduction: {
+    notNumeric: I18n.t('Late submission deduction must be numeric'),
+    outOfRange: I18n.t('Late submission deduction must be between 0 and 100')
+  },
+  lateSubmissionMinimumPercent: {
+    notNumeric: I18n.t('Lowest possible grade must be numeric'),
+    outOfRange: I18n.t('Lowest possible grade must be between 0 and 100')
+  }
+};
+
 function validationErrorMessage (input, validationType) {
-  const errorMessages = {
-    missingSubmissionDeduction: {
-      notNumeric: I18n.t('Missing submission grade must be numeric'),
-      outOfRange: I18n.t('Missing submission grade must be between 0 and 100')
-    },
-    lateSubmissionDeduction: {
-      notNumeric: I18n.t('Late submission deduction must be numeric'),
-      outOfRange: I18n.t('Late submission deduction must be between 0 and 100')
-    },
-    lateSubmissionMinimumPercent: {
-      notNumeric: I18n.t('Lowest possible grade must be numeric'),
-      outOfRange: I18n.t('Lowest possible grade must be between 0 and 100')
-    }
-  };
   const error = validationError(input);
   return errorMessages[validationType][error];
 }
@@ -111,15 +112,10 @@ class LatePoliciesTabPanel extends React.Component {
     showAlert: bool.isRequired
   };
 
-  constructor (props) {
-    super(props);
-    this.state = { showAlert: props.showAlert };
-    this.changeMissingSubmissionDeduction = this.validateAndChangeNumber.bind(this, 'missingSubmissionDeduction');
-    this.changeLateSubmissionDeduction = this.validateAndChangeNumber.bind(this, 'lateSubmissionDeduction');
-    this.changeLateSubmissionMinimumPercent = this.validateAndChangeNumber.bind(this, 'lateSubmissionMinimumPercent');
-    this.missingPolicyMessages = messages.bind(this, ['missingSubmissionDeduction'])
-    this.latePolicyMessages = messages.bind(this, ['lateSubmissionDeduction', 'lateSubmissionMinimumPercent'])
-  }
+
+  state = { showAlert: this.props.showAlert };
+  missingPolicyMessages = messages.bind(this, ['missingSubmissionDeduction'])
+  latePolicyMessages = messages.bind(this, ['lateSubmissionDeduction', 'lateSubmissionMinimumPercent'])
 
   componentDidUpdate(_prevProps, prevState) {
     if (!prevState.showAlert || this.state.showAlert) {
@@ -158,8 +154,7 @@ class LatePoliciesTabPanel extends React.Component {
     this.props.changeLatePolicy({ ...this.props.latePolicy, changes: this.calculateChanges(updates) });
   }
 
-  validateAndChangeNumber = (name) => {
-    const inputValue = this[`${name}Input`].value;
+  validateAndChangeNumber = (name, inputValue) => {
     const errorMessage = validationErrorMessage(inputValue, name);
     if (errorMessage) {
       const validationErrors = { ...this.props.latePolicy.validationErrors, [name]: errorMessage };
@@ -192,7 +187,7 @@ class LatePoliciesTabPanel extends React.Component {
     this.props.changeLatePolicy({ ...this.props.latePolicy, changes });
   }
 
-  calculateChanges = (newData) => {
+  calculateChanges(newData) {
     const changes = { ...this.props.latePolicy.changes };
     Object.keys(newData).forEach((key) => {
       const initialValue = this.props.latePolicy.data[key];
@@ -257,7 +252,7 @@ class LatePoliciesTabPanel extends React.Component {
                   label={<ScreenReaderContent>{I18n.t('Missing submission grade percent')}</ScreenReaderContent>}
                   disabled={!this.getLatePolicyAttribute('missingSubmissionDeductionEnabled')}
                   defaultValue={markMissingSubmissionsDefaultValue(data.missingSubmissionDeduction)}
-                  onChange={this.changeMissingSubmissionDeduction}
+                  onChange={(_e, val)  => this.validateAndChangeNumber('missingSubmissionDeduction', val)}
                   min="0"
                   max="100"
                   inline
@@ -301,7 +296,7 @@ class LatePoliciesTabPanel extends React.Component {
         >
           <View as="div" margin="small small small large">
             <div style={{ marginLeft: '0.25rem' }}>
-              <View display="inline" as="div" margin="0 small 0 0">
+              <View display="inline-block" as="div" margin="0 small 0 0">
                 <PresentationContent>
                   <View as="div" margin="0 0 x-small 0">
                     <label htmlFor="late-submission-deduction">
@@ -318,7 +313,7 @@ class LatePoliciesTabPanel extends React.Component {
                     label={<ScreenReaderContent>{I18n.t('Late submission deduction percent')}</ScreenReaderContent>}
                     defaultValue={data.lateSubmissionDeduction.toString()}
                     disabled={!this.getLatePolicyAttribute('lateSubmissionDeductionEnabled')}
-                    onChange={this.changeLateSubmissionDeduction}
+                    onChange={(_e, val) => this.validateAndChangeNumber('lateSubmissionDeduction', val)}
                     min="0"
                     max="100"
                     inline
@@ -332,7 +327,7 @@ class LatePoliciesTabPanel extends React.Component {
                 </div>
               </View>
 
-              <View display="inline" as="div" margin="0 0 0 small">
+              <View display="inline-block" as="div" margin="0 0 0 small">
                 <PresentationContent>
                   <View as="div" margin="0 0 x-small 0">
                     <label htmlFor="late-submission-interval">
@@ -375,7 +370,7 @@ class LatePoliciesTabPanel extends React.Component {
                   label={<ScreenReaderContent>{I18n.t('Lowest possible grade percent')}</ScreenReaderContent>}
                   defaultValue={data.lateSubmissionMinimumPercent.toString()}
                   disabled={!this.getLatePolicyAttribute('lateSubmissionDeductionEnabled')}
-                  onChange={this.changeLateSubmissionMinimumPercent}
+                  onChange={(_e, val) => this.validateAndChangeNumber('lateSubmissionMinimumPercent', val)}
                   min="0"
                   max="100"
                   inline

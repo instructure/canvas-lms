@@ -20,7 +20,7 @@ import React from 'react';
 import { func, string, bool } from 'prop-types';
 import I18n from 'i18n!gradebook';
 import Button from '@instructure/ui-buttons/lib/components/Button';
-import Popover, { PopoverTrigger, PopoverContent } from '@instructure/ui-core/lib/components/Popover';
+import Popover, { PopoverTrigger, PopoverContent } from '@instructure/ui-overlays/lib/components/Popover';
 import Text from '@instructure/ui-elements/lib/components/Text';
 import IconDiscussionReplySolid from '@instructure/ui-icons/lib/Solid/IconDiscussionReply';
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
@@ -98,7 +98,6 @@ class StatusColorListItem extends React.Component {
                 show={isColorPickerShown}
                 onToggle={colorPickerOnToggle}
                 contentRef={colorPickerContentRef}
-                applicationElement={() => document.getElementById('application')}
               >
                 <PopoverTrigger>
 
