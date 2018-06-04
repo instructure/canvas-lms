@@ -535,9 +535,9 @@ class SisImportsApiController < ApplicationController
   #   If set, will only restore items that were deleted. This will ignore any
   #   items that were created or modified.
   #
-  #   Examples:
-  #     curl 'https://<canvas>/api/v1/accounts/<account_id>/sis_imports/<sis_import_id>/restore_states' \
-  #         -H "Authorization: Bearer <token>"
+  # @example_request
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/sis_imports/<sis_import_id>/restore_states' \
+  #     -H "Authorization: Bearer <token>"
   #
   # @returns SisImport
   def restore_states
