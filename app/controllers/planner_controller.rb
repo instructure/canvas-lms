@@ -121,7 +121,7 @@ class PlannerController < ApplicationController
   # ]
   def index
     # fetch a meta key so we can invalidate just this info and not the whole of the user's cache
-    planner_overrides_meta_key = Rails.cache.fetch(planner_meta_cache_key, expires_in: 120.minutes) do
+    planner_overrides_meta_key = Rails.cache.fetch(planner_meta_cache_key, expires_in: 30.minutes) do
       SecureRandom.uuid
     end
 
