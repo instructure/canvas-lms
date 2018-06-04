@@ -312,9 +312,7 @@ END
       description: -> { I18n.t("Allows the duplicating of modules in Canvas") },
       applies_to: 'Account',
       state: 'hidden',
-      root_opt_in: true,
-      development: true,
-      beta: true
+      root_opt_in: true
     },
     'allow_opt_out_of_inbox' =>
     {
