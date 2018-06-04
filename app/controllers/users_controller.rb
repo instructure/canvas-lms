@@ -2222,6 +2222,7 @@ class UsersController < ApplicationController
   #
   # @example_response
   #   {
+  #     "url": "https://example.com/pandata"
   #     "auth_token": "wek23klsdnsoieioeoi3of9deeo8r8eo8fdn",
   #     "props_token": "paowinefopwienpfiownepfiownepfownef",
   #     "expires_at": 1521667783000,
